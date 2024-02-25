@@ -542,7 +542,7 @@ class CRM_Financial_BAO_Payment {
    * @throws \CRM_Core_Exception
    */
   protected static function getPayableLineItems($params): array {
-    $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($params['contribution_id']);
+    $lineItems = LineItem::get(FALSE)->addWhere('contribution_id', '=', $params['contribution_id'])->execute()->indexBy('id');
     $lineItemOverrides = [];
     if (!empty($params['line_item'])) {
       // The format is a bit weird here - $params['line_item'] => [[1 => 10], [2 => 40]]
@@ -566,13 +566,13 @@ class CRM_Financial_BAO_Payment {
       // Ideally id would be set deeper but for now just add in here.
       $lineItems[$lineItemID]['id'] = $lineItemID;
       $lineItems[$lineItemID]['paid'] = self::getAmountOfLineItemPaid($lineItemID);
-      $lineItems[$lineItemID]['balance'] = $lineItem['subTotal'] - $lineItems[$lineItemID]['paid'];
+      $lineItems[$lineItemID]['balance'] = $lineItem['line_total'] - $lineItems[$lineItemID]['paid'];
       if (!empty($lineItemOverrides)) {
         $lineItems[$lineItemID]['allocation'] = $lineItemOverrides[$lineItemID] ?? NULL;
       }
       else {
         if (empty($lineItems[$lineItemID]['balance']) && !empty($ratio) && $params['total_amount'] < 0) {
-          $lineItems[$lineItemID]['allocation'] = $lineItem['subTotal'] * $ratio;
+          $lineItems[$lineItemID]['allocation'] = $lineItem['line_total'] * $ratio;
         }
         else {
           $lineItems[$lineItemID]['allocation'] = $lineItems[$lineItemID]['balance'] * $ratio;
