@@ -143,7 +143,7 @@ class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
   protected function getRows(): array {
     $rows = [];
     foreach ($this->_contactIds as $index => $contactID) {
-      $caseID = $this->getVar('_caseId');
+      $caseID = $this->_caseId;
       if (empty($caseID) && !empty($this->_caseIds[$index])) {
         $caseID = $this->_caseIds[$index];
       }
