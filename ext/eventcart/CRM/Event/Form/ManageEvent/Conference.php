@@ -14,6 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
+use Civi\Api4\Event;
 
 /**
  * This class generates form components for Conference Slots.
@@ -57,7 +58,7 @@ class CRM_Event_Form_ManageEvent_Conference extends CRM_Event_Form_ManageEvent {
     $params = $this->exportValues();
 
     $params['id'] = $this->_id;
-    CRM_Event_BAO_Event::add($params);
+    Event::save(FALSE)->addRecord($params)->execute();
 
     parent::endPostProcess();
   }
