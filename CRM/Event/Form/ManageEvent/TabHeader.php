@@ -17,6 +17,8 @@
 
 /**
  * Helper class to build navigation links
+ *
+ * @deprecated since 5.72 will be removed around 5.78.
  */
 class CRM_Event_Form_ManageEvent_TabHeader {
 
@@ -25,8 +27,11 @@ class CRM_Event_Form_ManageEvent_TabHeader {
    *
    * @return array
    * @throws \CRM_Core_Exception
+   *
+   * @deprecated since 5.72 will be removed around 5.78.
    */
   public static function build(&$form) {
+    CRM_Core_Error::deprecatedWarning('no alternative');
     $tabs = $form->get('tabHeader');
     if (!$tabs || empty($_GET['reset'])) {
       $tabs = self::process($form);
@@ -49,8 +54,11 @@ class CRM_Event_Form_ManageEvent_TabHeader {
    *
    * @return array
    * @throws Exception
+   *
+   * @deprecated since 5.72 will be removed around 5.78.
    */
   public static function process(&$form) {
+    CRM_Core_Error::deprecatedWarning('no alternative');
     if ($form->getVar('_id') <= 0) {
       return NULL;
     }
@@ -194,8 +202,11 @@ WHERE      e.id = %1
 
   /**
    * @param CRM_Event_Form_ManageEvent $form
+   *
+   * @deprecated since 5.72 will be removed around 5.78.
    */
   public static function reset(&$form) {
+    CRM_Core_Error::deprecatedWarning('no alternative');
     $tabs = self::process($form);
     $form->set('tabHeader', $tabs);
   }
@@ -204,8 +215,11 @@ WHERE      e.id = %1
    * @param $tabs
    *
    * @return int|string
+   *
+   * @deprecated since 5.72 will be removed around 5.78.
    */
   public static function getCurrentTab($tabs) {
+    CRM_Core_Error::deprecatedWarning('no alternative');
     static $current = FALSE;
 
     if ($current) {
