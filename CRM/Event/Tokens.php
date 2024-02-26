@@ -224,6 +224,7 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
       $tokens['end_date']['text/html'] = !empty($event['end_date']) ? new DateTime($event['end_date']) : '';
       $tokens['contact_email']['text/html'] = $event['loc_block_id.email_id.email'];
       $tokens['contact_phone']['text/html'] = $event['loc_block_id.phone_id.phone'];
+      $tokens['confirm_email_text']['text/html'] = $event['confirm_email_text'];
 
       foreach ($this->getTokenMetadata() as $fieldName => $fieldSpec) {
         if (!isset($tokens[$fieldName])) {
