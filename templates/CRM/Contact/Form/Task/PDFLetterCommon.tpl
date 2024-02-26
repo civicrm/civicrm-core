@@ -100,12 +100,14 @@
     </div>
 
 <div id="editMessageDetails">
+  {if call_user_func(array('CRM_Core_Permission','check'), 'edit message templates')}
     <div id="updateDetails" >
         {$form.updateTemplate.html}&nbsp;{$form.updateTemplate.label}
     </div>
     <div>
         {$form.saveTemplate.html}&nbsp;{$form.saveTemplate.label}
     </div>
+  {/if}
 </div>
 
 <div id="saveDetails" class="section">
