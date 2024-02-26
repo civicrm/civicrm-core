@@ -85,7 +85,8 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     /** @var \CRM_Core_Payment_Dummy $processor */
     $processor = Civi\Payment\System::singleton()->getById($paymentProcessorID);
     $processor->setDoDirectPaymentResult(['fee_amount' => 1.67]);
-    $event = $this->eventCreatePaid(['payment_processor' => [$paymentProcessorID]]);
+    $event = $this->eventCreatePaid(['payment_processor' => [$paymentProcessorID],
+      'selfcancelxfer_time' => 72]);
     $this->submitForm($event['id'], [
       'first_name' => 'k',
       'last_name' => 'p',
@@ -146,6 +147,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       'Visa',
       '************1111',
       'This is a confirmation that your registration has been received and your status has been updated to<strong> Registered</strong>',
+      'You may transfer your registration to another participant or cancel your registration up to 72 hours before the event',
     ]);
   }
 
