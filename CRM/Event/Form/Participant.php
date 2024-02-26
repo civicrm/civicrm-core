@@ -1651,7 +1651,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         'total_amount' => $params['total_amount'],
         'is_send_contribution_notification' => FALSE,
         'payment_instrument_id' => $params['payment_instrument_id'],
-        'trxn_date' => $params['receive_date'] ?? date('Y-m-d'),
+        'trxn_date' => $params['receive_date'] ?: date('Y-m-d'),
         'trxn_id' => $params['trxn_id'],
         'pan_truncation' => $params['pan_truncation'] ?? '',
         'card_type_id' => $params['card_type_id'] ?? '',
