@@ -426,9 +426,11 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
       ->addWhere('last_name', '=', $lastName)
       ->addSelect('first_name', 'age_years', 'next_birthday', 'DAYSTOANNIV(birth_date)')
       ->execute()->indexBy('first_name');
+
+    $adjustForLeapYear = (new \IntlGregorianCalendar())->isLeapYear(date('Y')) && (date('m') === '02') && (date('d') === '26' || date('d') === '27' || date('d') === '28' || date('d') === '29');
     $this->assertEquals(1, $result['abc']['age_years']);
-    $this->assertEquals(3, $result['abc']['next_birthday']);
-    $this->assertEquals(3, $result['abc']['DAYSTOANNIV:birth_date']);
+    $this->assertEquals($adjustForLeapYear ? 4 : 3, $result['abc']['next_birthday']);
+    $this->assertEquals($adjustForLeapYear ? 4 : 3, $result['abc']['DAYSTOANNIV:birth_date']);
     $this->assertEquals(21, $result['def']['age_years']);
     $this->assertEquals(0, $result['ghi']['age_years']);
     $this->assertEquals(0, $result['ghi']['next_birthday']);
