@@ -244,11 +244,15 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
       // tailored to respect the param and contactId options provided.
       $queries = [];
       while ($bao->fetch()) {
-        $bao->contactIds = $this->contactIds;
-        $bao->params = $this->params;
-
         // Skipping empty rules? Empty rules shouldn't exist; why check?
-        if ($query = $bao->sql()) {
+        if ($query = $bao->sql($this->params, $this->contactIds, [
+          'id' => (int) $bao->id,
+          'rule_table' => $bao->rule_table,
+          'rule_length' => $bao->rule_length,
+          'rule_field' => $bao->rule_field,
+          'rule_weight' => $bao->rule_weight,
+          'dedupe_rule_group_id' => $bao->dedupe_rule_group_id,
+        ])) {
           $queries["{$bao->rule_table}.{$bao->rule_field}.{$bao->rule_weight}"] = $query;
         }
       }
