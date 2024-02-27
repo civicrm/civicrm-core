@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/oembed</path>
+    <page_callback>CRM_Oembed_Page_Oembed</page_callback>
+    <title>Oembed</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+</menu>
