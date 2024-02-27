@@ -1619,8 +1619,8 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook allows modification of the queries constructed from dupe rules.
    *
-   * @param string $obj
-   *   Object of rulegroup class.
+   * @param CRM_Dedupe_DAO_DedupeRule|CRM_Dedupe_BAO_DedupeRuleGroup|null $obj
+   *   Object of rule group class.
    * @param string $type
    *   Type of queries e.g table / threshold.
    * @param array $query
