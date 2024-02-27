@@ -2,7 +2,7 @@
 <extension key="oembed" type="module">
   <file>oembed</file>
   <name>oembed</name>
-  <description>FIXME</description>
+  <description>Export CiviCRM content using the oEmbed protocol</description>
   <license>AGPL-3.0</license>
   <maintainer>
     <author>Tim Otten</author>
@@ -25,6 +25,9 @@
     <psr0 prefix="CRM_" path="."/>
     <psr4 prefix="Civi\" path="Civi"/>
   </classloader>
+  <requires>
+    <ext>iframe</ext>
+  </requires>
   <civix>
     <namespace>CRM/Oembed</namespace>
     <format>23.02.1</format>
