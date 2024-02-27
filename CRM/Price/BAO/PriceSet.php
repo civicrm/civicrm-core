@@ -667,6 +667,7 @@ WHERE  id = %1";
         ->execute()->first();
       $data['fields'] = (array) PriceField::get(FALSE)
         ->addWhere('price_set_id', '=', $priceSetID)
+        ->addWhere('is_active', '=', TRUE)
         ->addSelect('*', 'visibility_id:name')
         ->addOrderBy('weight', 'ASC')
         ->execute()->indexBy('id');
@@ -681,6 +682,7 @@ WHERE  id = %1";
       }
       $options = PriceFieldValue::get(FALSE)
         ->addWhere('price_field_id', 'IN', array_keys($data['fields']))
+        ->addWhere('is_active', '=', TRUE)
         ->setSelect($select)
         ->addOrderBy('weight', 'ASC')
         ->execute();
