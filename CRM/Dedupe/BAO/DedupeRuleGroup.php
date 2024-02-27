@@ -299,6 +299,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
       [$isInclusive, $isDie] = self::isQuerySetInclusive($tableQueries, $this->threshold, $exclWeightSum);
 
       if ($isInclusive) {
+        throw new CRM_Core_Exception('woohoo we test this');
         // order queries by table count
         self::orderByTableCount($tableQueries);
 
