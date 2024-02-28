@@ -117,7 +117,7 @@ class CRM_Contact_Form_Task_EmailTest extends CiviUnitTestCase {
     $form->isSearchContext = FALSE;
     $form->buildForm();
     $this->assertEquals([
-      'html_message' => '<br/><br/>--<p>This is a test Signature</p>',
+      'html_message' => '<br /><br />--<p>This is a test Signature</p>',
       'text_message' => '
 
 --
