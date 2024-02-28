@@ -30,6 +30,7 @@ use Civi\Api4\CustomGroup;
 use Civi\Api4\Email;
 use Civi\Api4\EntityTag;
 use Civi\Api4\OptionValue;
+use Civi\Api4\PCP;
 use Civi\Api4\Tag;
 use Civi\Api4\UserJob;
 use Civi\Api4\Utils\CoreUtil;
@@ -66,7 +67,7 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
       ->execute()
       ->indexBy('name');
     // Ensure table & column are returned
-    $this->assertEquals('civicrm_contact', $fields['display_name']['table_name']);
+    $this->assertEquals('civicrm_contact', $fields['contact_type']['table_name']);
     $this->assertEquals('display_name', $fields['display_name']['column_name']);
 
     // Check suffixes
@@ -244,7 +245,7 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
     $tagFields = EntityTag::getFields(FALSE)
       ->execute()->indexBy('name');
     $this->assertEmpty($tagFields['entity_id']['fk_entity']);
-    $this->assertContains('Activity', $tagFields['entity_id']['dfk_entities']);
+    $this->assertEquals('Activity', $tagFields['entity_id']['dfk_entities']['civicrm_activity']);
     $this->assertEquals('entity_table', $tagFields['entity_id']['input_attrs']['control_field']);
 
     $tagFields = EntityTag::getFields(FALSE)
@@ -252,13 +253,25 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
       ->execute()->indexBy('name');
     // fk_entity should be specific to specified entity_table, but dfk_entities should still contain all values
     $this->assertEquals('Activity', $tagFields['entity_id']['fk_entity']);
-    $this->assertContains('Contact', $tagFields['entity_id']['dfk_entities']);
+    $this->assertEquals('Contact', $tagFields['entity_id']['dfk_entities']['civicrm_contact']);
+    $this->assertEquals('id', $tagFields['entity_id']['fk_column']);
 
     $tagFields = EntityTag::getFields(FALSE)
       ->addValue('entity_table:name', 'Contact')
       ->execute()->indexBy('name');
     $this->assertEquals('Contact', $tagFields['entity_id']['fk_entity']);
-    $this->assertContains('SavedSearch', $tagFields['entity_id']['dfk_entities']);
+    $this->assertEquals('SavedSearch', $tagFields['entity_id']['dfk_entities']['civicrm_saved_search']);
+
+    $pcpFields = PCP::getFields(FALSE)
+      ->addValue('page_type:name', 'ContributionPage')
+      ->setLoadOptions(['id', 'name', 'label'])
+      ->execute()->indexBy('name');
+    $this->assertEquals('ContributionPage', $pcpFields['page_id']['fk_entity']);
+    $this->assertEquals('ContributionPage', $pcpFields['page_id']['dfk_entities']['contribute']);
+    $this->assertEquals('Event', $pcpFields['page_id']['dfk_entities']['event']);
+    $options = array_column($pcpFields['page_type']['options'], 'name', 'id');
+    $this->assertEquals('ContributionPage', $options['contribute']);
+    $this->assertEquals('Event', $options['event']);
   }
 
   public function testEmptyOptionListIsReturnedAsAnArray(): void {

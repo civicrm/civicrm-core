@@ -168,13 +168,13 @@ class ContactGetSpecProvider extends \Civi\Core\Service\AutoService implements G
   /**
    * Callback function to build option lists groups pseudo-field.
    *
-   * @param \Civi\Api4\Service\Spec\FieldSpec $spec
+   * @param array $field
    * @param array $values
    * @param bool|array $returnFormat
    * @param bool $checkPermissions
    * @return array
    */
-  public static function getGroupList($spec, $values, $returnFormat, $checkPermissions) {
+  public static function getGroupList($field, $values, $returnFormat, $checkPermissions) {
     $groups = $checkPermissions ? \CRM_Core_PseudoConstant::group() : \CRM_Core_PseudoConstant::allGroup(NULL, FALSE);
     $options = \CRM_Utils_Array::makeNonAssociative($groups, 'id', 'label');
     if ($options && is_array($returnFormat) && in_array('name', $returnFormat)) {

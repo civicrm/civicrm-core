@@ -72,6 +72,10 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
    */
   private static $UNDEFINED_VALUE;
 
+  /**
+   * @throws \CRM_Core_Exception
+   * @throws \SmartyException
+   */
   private function initialize() {
     $config = CRM_Core_Config::singleton();
 
@@ -147,7 +151,9 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
     }
 
     if (CRM_Utils_Constant::value('CIVICRM_SMARTY_DEFAULT_ESCAPE')
-      && !CRM_Utils_Constant::value('CIVICRM_SMARTY3_AUTOLOAD_PATH')) {
+      && !CRM_Utils_Constant::value('CIVICRM_SMARTY3_AUTOLOAD_PATH')
+      && !CRM_Utils_Constant::value('CIVICRM_SMARTY_AUTOLOAD_PATH')
+    ) {
       // Currently DEFAULT escape does not work with Smarty3
       // dunno why - thought it would be the default with Smarty3 - but
       // getting onto Smarty 3 is higher priority.
@@ -158,16 +164,20 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
       // contribution dashboard from RecentlyViewed.tpl
       require_once 'Smarty/plugins/modifier.escape.php';
       if (!isset($this->_plugins['modifier']['escape'])) {
-        $this->register_modifier('escape', ['CRM_Core_Smarty', 'escape']);
+        $this->registerPlugin('modifier', 'escape', ['CRM_Core_Smarty', 'escape']);
       }
       $this->default_modifiers[] = 'escape:"htmlall"';
     }
-    $this->load_filter('pre', 'resetExtScope');
-    $this->load_filter('pre', 'htxtFilter');
+    $this->loadFilter('pre', 'resetExtScope');
+    $this->loadFilter('pre', 'htxtFilter');
+    $this->registerPlugin('modifier', 'json_encode', 'json_encode');
+    $this->registerPlugin('modifier', 'count', 'count');
+    $this->registerPlugin('modifier', 'implode', 'implode');
+    $this->registerPlugin('modifier', 'str_starts_with', 'str_starts_with');
 
     $this->assign('crmPermissions', new CRM_Core_Smarty_Permissions());
 
-    if ($config->debug) {
+    if ($config->debug || str_contains(CIVICRM_UF_BASEURL, 'localhost') || CRM_Utils_Constant::value('CIVICRM_UF') === 'UnitTests') {
       $this->error_reporting = E_ALL;
     }
   }
@@ -215,7 +225,7 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
    */
   public function ensureVariablesAreAssigned(array $variables): void {
     foreach ($variables as $variable) {
-      if (!isset($this->get_template_vars()[$variable])) {
+      if (!isset($this->getTemplateVars()[$variable])) {
         $this->assign($variable);
       }
     }
@@ -234,7 +244,7 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
       'template' => FALSE,
     ];
 
-    $tabs = $this->get_template_vars('tabHeader');
+    $tabs = $this->getTemplateVars('tabHeader');
     foreach ((array) $tabs as $i => $tab) {
       $tabs[$i] = array_merge($defaults, $tab);
     }
@@ -269,7 +279,7 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
    * @param $value
    */
   public function appendValue($name, $value) {
-    $currentValue = $this->get_template_vars($name);
+    $currentValue = $this->getTemplateVars($name);
     if (!$currentValue) {
       $this->assign($name, $value);
     }
@@ -280,18 +290,25 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
     }
   }
 
-  public function clearTemplateVars() {
-    foreach (array_keys($this->_tpl_vars) as $key) {
-      if ($key == 'config' || $key == 'session') {
+  /**
+   * Clear template variables, except session or config.
+   *
+   * @return void
+   */
+  public function clearTemplateVars(): void {
+    foreach (array_keys($this->getTemplateVars()) as $key) {
+      if ($key === 'config' || $key === 'session') {
         continue;
       }
-      unset($this->_tpl_vars[$key]);
+      $this->clearAssign($key);
     }
   }
 
   public static function registerStringResource() {
-    require_once 'CRM/Core/Smarty/resources/String.php';
-    civicrm_smarty_register_string_resource();
+    if (method_exists('Smarty', 'register_resource')) {
+      require_once 'CRM/Core/Smarty/resources/String.php';
+      civicrm_smarty_register_string_resource();
+    }
   }
 
   /**
@@ -337,7 +354,7 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
    * @see popScope
    */
   public function pushScope($vars) {
-    $oldVars = $this->get_template_vars();
+    $oldVars = $this->getTemplateVars();
     $backupFrame = [];
     foreach ($vars as $key => $value) {
       $backupFrame[$key] = array_key_exists($key, $oldVars) ? $oldVars[$key] : static::$UNDEFINED_VALUE;
@@ -371,7 +388,7 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
         $this->assign($key, $value);
       }
       else {
-        $this->clear_assign($key);
+        $this->clearAssign($key);
       }
     }
     return $this;

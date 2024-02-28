@@ -12,11 +12,11 @@
     <url desc="Documentation">https://docs.civicrm.org/user/en/latest/grants/what-is-civigrant/</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
-  <releaseDate>2023-12-08</releaseDate>
-  <version>5.70.alpha1</version>
+  <releaseDate>2024-02-08</releaseDate>
+  <version>5.72.alpha1</version>
   <develStage>stable</develStage>
   <compatibility>
-    <ver>5.70</ver>
+    <ver>5.72</ver>
   </compatibility>
   <comments>CiviGrant was originally a core component before migrating to an extension</comments>
   <requires>
@@ -32,7 +32,7 @@
     <mixin>menu-xml@1.0.0</mixin>
     <mixin>mgd-php@1.0.0</mixin>
     <mixin>afform-entity-php@1.0.0</mixin>
-    <mixin>smarty-v2@1.0.1</mixin>
+    <mixin>smarty@1.0.0</mixin>
     <mixin>entity-types-php@1.0.0</mixin>
     <mixin>scan-classes@1.0.0</mixin>
   </mixins>

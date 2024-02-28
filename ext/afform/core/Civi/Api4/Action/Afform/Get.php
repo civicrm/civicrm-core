@@ -2,8 +2,6 @@
 
 namespace Civi\Api4\Action\Afform;
 
-use Civi\Api4\CustomField;
-use Civi\Api4\CustomGroup;
 use Civi\Core\Event\GenericHookEvent;
 use CRM_Afform_ExtensionUtil as E;
 
@@ -150,34 +148,26 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
     $groupNames = [];
     $afforms =& $event->afforms;
     foreach ($getNames['name'] ?? [] as $name) {
-      if (strpos($name, 'afblockCustom_') === 0 && strlen($name) > 13) {
+      if (str_starts_with($name, 'afblockCustom_') && strlen($name) > 13) {
         $groupNames[] = substr($name, 14);
       }
     }
     // Early return if this api call is fetching afforms by name and those names are not custom-related
     if ((!empty($getNames['name']) && !$groupNames)
-      || (!empty($getNames['module_name']) && !strstr(implode(' ', $getNames['module_name']), 'afblockCustom'))
-      || (!empty($getNames['directive_name']) && !strstr(implode(' ', $getNames['directive_name']), 'afblock-custom'))
+      || (!empty($getNames['module_name']) && !str_contains(implode(' ', $getNames['module_name']), 'afblockCustom'))
+      || (!empty($getNames['directive_name']) && !str_contains(implode(' ', $getNames['directive_name']), 'afblock-custom'))
     ) {
       return;
     }
-    $customApi = CustomGroup::get(FALSE)
-      ->addSelect('name', 'title', 'help_pre', 'help_post', 'extends', 'max_multiple')
-      ->addWhere('is_multiple', '=', 1)
-      ->addWhere('is_active', '=', 1);
+    $filters = [
+      'is_multiple' => TRUE,
+      'is_active' => TRUE,
+    ];
     if ($groupNames) {
-      $customApi->addWhere('name', 'IN', $groupNames);
+      $filters['name'] = $groupNames;
     }
-    if ($getLayout) {
-      $customApi->addSelect('help_pre', 'help_post');
-      $customApi->addChain('fields', CustomField::get(FALSE)
-        ->addSelect('name')
-        ->addWhere('custom_group_id', '=', '$id')
-        ->addWhere('is_active', '=', 1)
-        ->addOrderBy('weight', 'ASC')
-      );
-    }
-    foreach ($customApi->execute() as $custom) {
+    $customGroups = \CRM_Core_BAO_CustomGroup::getAll($filters);
+    foreach ($customGroups as $custom) {
       $name = 'afblockCustom_' . $custom['name'];
       $item = [
         'name' => $name,

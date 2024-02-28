@@ -27,12 +27,12 @@
  *   the help html to be inserted
  */
 function smarty_function_help($params, &$smarty) {
-  if (!isset($params['id']) || !isset($smarty->get_template_vars()['config'])) {
+  if (!isset($params['id']) || !isset($smarty->getTemplateVars()['config'])) {
     return NULL;
   }
 
-  if (empty($params['file']) && isset($smarty->get_template_vars()['tplFile'])) {
-    $params['file'] = $smarty->get_template_vars()['tplFile'];
+  if (empty($params['file']) && isset($smarty->getTemplateVars()['tplFile'])) {
+    $params['file'] = $smarty->getTemplateVars()['tplFile'];
   }
   elseif (empty($params['file'])) {
     return NULL;
@@ -42,7 +42,7 @@ function smarty_function_help($params, &$smarty) {
   $fieldID = str_replace('-', '_', preg_replace('/^id-/', '', $params['id']));
 
   if (empty($params['title'])) {
-    $vars = $smarty->get_template_vars();
+    $vars = $smarty->getTemplateVars();
 
     // The way this works is a bit bonkers. All the .hlp files are expecting an
     // assign called $params (which is different from our php var here called
@@ -71,13 +71,13 @@ function smarty_function_help($params, &$smarty) {
       $extraoutput = trim($smarty->fetch($additionalTPLFile));
       if ($extraoutput) {
         // Allow override param to replace default text e.g. {hlp id='foo' override=1}
-        $name = ($smarty->get_template_vars('override_help_text') || empty($name)) ? $extraoutput : $name . ' ' . $extraoutput;
+        $name = ($smarty->getTemplateVars('override_help_text') || empty($name)) ? $extraoutput : $name . ' ' . $extraoutput;
       }
     }
 
     // Ensure we didn't change any existing vars CRM-11900
     foreach ($vars as $key => $value) {
-      if ($smarty->get_template_vars($key) !== $value) {
+      if ($smarty->getTemplateVars($key) !== $value) {
         $smarty->assign($key, $value);
       }
     }

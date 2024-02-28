@@ -161,6 +161,29 @@ class CRM_Dedupe_Finder {
   }
 
   /**
+   * @param array $fields
+   * @param array $flat
+   * @param string $ctype
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private static function appendCustomDataFields(array &$fields, array &$flat, string $ctype): void {
+    $subTypes = $fields['contact_sub_type'] ?? [];
+    // Only return custom for subType + unrestricted or return all custom
+    // fields.
+    $tree = CRM_Core_BAO_CustomGroup::getTree($ctype, NULL, NULL, -1, $subTypes, NULL, TRUE, NULL, TRUE);
+    CRM_Core_BAO_CustomGroup::postProcess($tree, $fields, TRUE);
+    foreach ($tree as $key => $cg) {
+      if (!is_int($key)) {
+        continue;
+      }
+      foreach ($cg['fields'] as $cf) {
+        $flat[$cf['column_name']] = $cf['customValue']['data'] ?? NULL;
+      }
+    }
+  }
+
+  /**
    * A hackish function needed to massage CRM_Contact_Form_$ctype::formRule()
    * object into a valid $params array for dedupe
    *
@@ -217,20 +240,7 @@ class CRM_Dedupe_Finder {
     }
 
     // handle custom data
-
-    $subTypes = $fields['contact_sub_type'] ?? [];
-    // Only return custom for subType + unrestricted or return all custom
-    // fields.
-    $tree = CRM_Core_BAO_CustomGroup::getTree($ctype, NULL, NULL, -1, $subTypes, NULL, TRUE, NULL, TRUE);
-    CRM_Core_BAO_CustomGroup::postProcess($tree, $fields, TRUE);
-    foreach ($tree as $key => $cg) {
-      if (!is_int($key)) {
-        continue;
-      }
-      foreach ($cg['fields'] as $cf) {
-        $flat[$cf['column_name']] = $cf['customValue']['data'] ?? NULL;
-      }
-    }
+    self::appendCustomDataFields($fields, $flat, $ctype);
 
     // if the key is dotted, keep just the last part of it
     foreach ($flat as $key => $value) {

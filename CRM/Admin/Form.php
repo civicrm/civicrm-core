@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Utils\ReflectionUtils;
+
 /**
  * Base class for admin forms.
  */
@@ -72,7 +74,7 @@ class CRM_Admin_Form extends CRM_Core_Form {
     $this->_BAOName = $this->get('BAOName');
     // Otherwise, look it up from the api entity name
     if (!$this->_BAOName) {
-      $this->_BAOName = CRM_Core_DAO_AllCoreTables::getBAOClassName(CRM_Core_DAO_AllCoreTables::getFullName($this->getDefaultEntity()));
+      $this->_BAOName = CRM_Core_DAO_AllCoreTables::getBAOClassName(CRM_Core_DAO_AllCoreTables::getDAONameForEntity($this->getDefaultEntity()));
     }
     $this->retrieveValues();
     $this->setPageTitle($this->_BAOName::getEntityTitle());
@@ -154,7 +156,13 @@ class CRM_Admin_Form extends CRM_Core_Form {
     if (isset($this->_id) && CRM_Utils_Rule::positiveInteger($this->_id)) {
       if ($this->retrieveMethod === 'retrieve') {
         $params = ['id' => $this->_id];
-        $this->_BAOName::retrieve($params, $this->_values);
+        if (!empty(ReflectionUtils::getCodeDocs((new \ReflectionMethod($this->_BAOName, 'retrieve')), 'Method')['deprecated'])) {
+          CRM_Core_DAO::commonRetrieve($this->_BAOName, $params, $this->_values);
+        }
+        else {
+          // Are there still some out there?
+          $this->_BAOName::retrieve($params, $this->_values);
+        }
       }
       elseif ($this->retrieveMethod === 'api4') {
         $this->_values = civicrm_api4($this->getDefaultEntity(), 'get', [

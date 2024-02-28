@@ -611,11 +611,18 @@ class Api4SelectQuery extends Api4Query {
     // Used to dedupe acl clauses
     $aclStack = [NULL, NULL];
 
-    $linkConditions = $this->getBridgeLinkConditions($bridgeAlias, $alias, $joinTable, $joinRef);
+    $linkConditions = $this->getBridgeLinkConditions($bridgeAlias, $alias, $joinEntity, $joinRef);
 
     $bridgeConditions = $this->getBridgeJoinConditions($joinTree, $baseRef, $alias, $bridgeAlias, $bridgeEntity, $aclStack);
 
     $acls = array_values($this->getAclClause($alias, $joinEntity, $aclStack));
+
+    // Info needed to attach custom fields to the bridge entity instead of the base entity
+    // because the custom fields are joined first and the base entity might not be added yet.
+    // @see Joinable::getConditionsForJoin
+    $this->openJoin['bridgeAlias'] = $bridgeAlias;
+    $this->openJoin['bridgeKey'] = $joinRef->getReferenceKey();
+    $this->openJoin['bridgeCondition'] = array_intersect_key($linkConditions, [1 => 1]);
 
     $outerConditions = [];
     foreach (array_filter($joinTree) as $clause) {
@@ -624,7 +631,7 @@ class Api4SelectQuery extends Api4Query {
 
     // Info needed for joining custom fields extending the bridge entity
     $this->explicitJoins[$alias]['bridge_table_alias'] = $bridgeAlias;
-    // Invert the join
+    // Invert the join so all nested joins will link to the bridge entity
     $this->openJoin['table'] = $bridgeTable;
     $this->openJoin['alias'] = $bridgeAlias;
 
@@ -672,17 +679,18 @@ class Api4SelectQuery extends Api4Query {
    *
    * @param string $bridgeAlias
    * @param string $joinAlias
-   * @param string $joinTable
-   * @param $joinRef
+   * @param string $joinEntity
+   * @param \CRM_Core_Reference_Basic $joinRef
    * @return array
    */
-  private function getBridgeLinkConditions(string $bridgeAlias, string $joinAlias, string $joinTable, $joinRef): array {
+  private function getBridgeLinkConditions(string $bridgeAlias, string $joinAlias, string $joinEntity, \CRM_Core_Reference_Basic $joinRef): array {
     $linkConditions = [
       "`$bridgeAlias`.`{$joinRef->getReferenceKey()}` = `$joinAlias`.`{$joinRef->getTargetKey()}`",
     ];
     // For dynamic references, also add the type column (e.g. `entity_table`)
     if ($joinRef->getTypeColumn()) {
-      $linkConditions[] = "`$bridgeAlias`.`{$joinRef->getTypeColumn()}` = '$joinTable'";
+      $dfkOption = array_search($joinEntity, $joinRef->getTargetEntities());
+      $linkConditions[] = "`$bridgeAlias`.`{$joinRef->getTypeColumn()}` = '$dfkOption'";
     }
     return $linkConditions;
   }
@@ -715,7 +723,7 @@ class Api4SelectQuery extends Api4Query {
    * Extract bridge join conditions from the joinTree if any, else supply default conditions for join to base entity
    *
    * @param array $joinTree
-   * @param $baseRef
+   * @param \CRM_Core_Reference_Basic $baseRef
    * @param string $alias
    * @param string $bridgeAlias
    * @param string $bridgeEntity
@@ -723,7 +731,7 @@ class Api4SelectQuery extends Api4Query {
    * @return string[]
    * @throws \CRM_Core_Exception
    */
-  private function getBridgeJoinConditions(array &$joinTree, $baseRef, string $alias, string $bridgeAlias, string $bridgeEntity, array &$aclStack): array {
+  private function getBridgeJoinConditions(array &$joinTree, \CRM_Core_Reference_Basic $baseRef, string $alias, string $bridgeAlias, string $bridgeEntity, array &$aclStack): array {
     $bridgeConditions = [];
     // Find explicit bridge join conditions and move them out of the joinTree
     $joinTree = array_filter($joinTree, function ($clause) use ($baseRef, $alias, $bridgeAlias, &$bridgeConditions, &$aclStack) {
@@ -755,7 +763,8 @@ class Api4SelectQuery extends Api4Query {
       $bridgeConditions[] = "`$bridgeAlias`.`{$baseRef->getReferenceKey()}` = a.`{$baseRef->getTargetKey()}`";
       $aclStack = [$baseRef->getTargetKey()];
       if ($baseRef->getTypeColumn()) {
-        $bridgeConditions[] = "`$bridgeAlias`.`{$baseRef->getTypeColumn()}` = '" . $this->getFrom() . "'";
+        $dfkOption = array_search($this->getEntity(), $baseRef->getTargetEntities());
+        $bridgeConditions[] = "`$bridgeAlias`.`{$baseRef->getTypeColumn()}` = '$dfkOption'";
       }
     }
     return $bridgeConditions;
@@ -828,8 +837,8 @@ class Api4SelectQuery extends Api4Query {
         }
         if ($this->getCheckPermissions() && $isCustom) {
           // Check access to custom group
-          $groupId = \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $link->getTargetTable(), 'id', 'table_name');
-          if (!\CRM_Core_BAO_CustomGroup::checkGroupAccess($groupId, \CRM_Core_Permission::VIEW)) {
+          $allowedGroup = \CRM_Core_BAO_CustomGroup::getGroup(['table_name' => $link->getTargetTable()], \CRM_Core_Permission::VIEW);
+          if (!$allowedGroup) {
             return;
           }
         }
@@ -845,8 +854,7 @@ class Api4SelectQuery extends Api4Query {
         }
 
         // Cache field info for retrieval by $this->getField()
-        foreach ($link->getEntityFields() as $fieldObject) {
-          $fieldArray = $fieldObject->toArray();
+        foreach ($link->getEntityFields() as $fieldArray) {
           // Set sql name of field, using column name for real joins
           if (!$virtualField) {
             $fieldArray['sql_name'] = '`' . $tableAlias . '`.`' . $fieldArray['column_name'] . '`';
@@ -865,7 +873,7 @@ class Api4SelectQuery extends Api4Query {
 
         // Serialized joins are rendered by this::renderSerializedJoin. Don't add their tables.
         if (!$virtualField) {
-          $conditions = $link->getConditionsForJoin($baseTableAlias, $tableAlias);
+          $conditions = $link->getConditionsForJoin($baseTableAlias, $tableAlias, $this->openJoin);
           if ($joinEntity) {
             $conditions = array_merge($conditions, $this->getAclClause($tableAlias, $joinEntity, $joinPath));
           }

@@ -968,4 +968,28 @@ INNER JOIN civicrm_uf_group ufgroup
     return CRM_Core_PseudoConstant::getLabel('CRM_Event_BAO_Participant', 'event_id', $id);
   }
 
+  /**
+   * Possible values for the page_type field, used for dynamic foreign key lookups
+   *
+   * This is a non-standard dfk. Normally the columns would be named "entity_table" & "entity_id",
+   * and normally the `entity_table` field would contain a table name like "civicrm_contribution"
+   * instead of an arbitrary string like 'contribute'.
+   *
+   * @return array
+   */
+  public static function pageTypeOptions(): array {
+    return [
+      [
+        'id' => 'contribute',
+        'name' => 'ContributionPage',
+        'label' => ts('Contributions'),
+      ],
+      [
+        'id' => 'event',
+        'name' => 'Event',
+        'label' => ts('Events'),
+      ],
+    ];
+  }
+
 }

@@ -60,14 +60,12 @@ class CRM_Core_Permission_Base {
     [$civiPrefix, $name] = CRM_Utils_String::parsePrefix(':', $perm, NULL);
     switch ($civiPrefix) {
       case $nativePrefix:
+      case NULL:
         return $name;
 
       // pass through
       case 'cms':
-        return CRM_Utils_Array::value($name, $map, CRM_Core_Permission::ALWAYS_DENY_PERMISSION);
-
-      case NULL:
-        return $name;
+        return $map[$name] ?? CRM_Core_Permission::ALWAYS_DENY_PERMISSION;
 
       default:
         return CRM_Core_Permission::ALWAYS_DENY_PERMISSION;
@@ -392,25 +390,28 @@ class CRM_Core_Permission_Base {
    * Get the permissions defined in the hook_civicrm_permission implementation
    * in all enabled CiviCRM module extensions.
    *
-   * @param bool $descriptions
-   *
    * @return array
    *   Array of permissions, in the same format as CRM_Core_Permission::getCorePermissions().
+   * @throws RuntimeException
    */
-  public function getAllModulePermissions($descriptions = FALSE): array {
+  public function getAllModulePermissions(): array {
     $permissions = [];
     CRM_Utils_Hook::permission($permissions);
 
-    if ($descriptions) {
-      foreach ($permissions as $permission => $label) {
-        $permissions[$permission] = (is_array($label)) ? $label : [$label];
+    // Normalize permission array format.
+    // Historically, a string was acceptable (interpreted as label), as was a non-associative array.
+    // Convert them all to associative arrays.
+    foreach ($permissions as $name => $defn) {
+      $defn = (array) $defn;
+      if (!isset($defn['label'])) {
+        CRM_Core_Error::deprecatedWarning("Permission '$name' should be declared with 'label' and 'description' keys. See https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_permission/");
       }
-    }
-    else {
-      // Passing in false here is to be deprecated.
-      foreach ($permissions as $permission => $label) {
-        $permissions[$permission] = (is_array($label)) ? array_shift($label) : $label;
-      }
+      $permission = [
+        'label' => $defn['label'] ?? $defn[0],
+        'description' => $defn['description'] ?? $defn[1] ?? NULL,
+        'disabled' => $defn['disabled'] ?? NULL,
+      ];
+      $permissions[$name] = array_filter($permission, fn($item) => isset($item));
     }
     return $permissions;
   }

@@ -9,11 +9,15 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Test\FormTrait;
+use Civi\Test\FormWrapper;
+
 /**
  * Class CRM_Event_Form_Registration_RegisterTest
  * @group headless
  */
 class CRM_Event_Form_Registration_RegisterTest extends CiviUnitTestCase {
+  use FormTrait;
 
   /**
    * CRM-19626 - Test minimum value configured for price set.
@@ -21,36 +25,21 @@ class CRM_Event_Form_Registration_RegisterTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testMinValueForPriceSet(): void {
-    $minAmt = 100;
-    $priceSetID = $this->eventPriceSetCreate(1000, 100);
-    $event = $this->eventCreatePaid([], ['id' => $priceSetID, 'min_amount' => 100]);
-    $form = $this->getEventForm($this->getEventID());
-
-    $priceSet = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetID));
-    $form->_values['fee'] = $form->_feeBlock = $priceSet['fields'];
-    $form->_values['event'] = $event;
-    $form->_skipDupeRegistrationCheck = 1;
-
-    $priceField = $this->callAPISuccess('PriceField', 'get', ['price_set_id' => $priceSetID]);
-    $params = [
+    $this->eventCreatePaid([], ['min_amount' => 100]);
+    $submittedValues = [
       'email-Primary' => 'someone@example.com',
-      'priceSetId' => $priceSetID,
+      'priceSetId' => $this->ids['PriceSet']['PaidEvent'],
+      'price_' . $this->ids['PriceField']['PaidEvent'] => $this->ids['PriceFieldValue']['PaidEvent_student_early'],
+      'payment_processor_id' => 0,
     ];
-    // Check empty values for price fields.
-    foreach (array_keys($priceField['values']) as $fieldId) {
-      $params['price_' . $fieldId] = 0;
-    }
-    $form->set('priceSetId', $priceSetID);
-    $form->set('priceSet', $priceSet);
-    $form->set('name', 'CRM_Event_Form_Registration_Register');
-    $files = [];
-    $errors = CRM_Event_Form_Registration_Register::formRule($params, $files, $form);
+    $form = $this->getTestForm('CRM_Event_Form_Registration_Register', $submittedValues, ['id' => $this->getEventID()]);
+    $form->processForm(FormWrapper::VALIDATED);
 
     //Assert the validation Error.
     $expectedResult = [
-      '_qf_default' => ts('A minimum amount of %1 should be selected from Event Fee(s).', [1 => CRM_Utils_Money::format($minAmt)]),
+      '_qf_default' => ts('A minimum amount of %1 should be selected from Event Fee(s).', [1 => CRM_Utils_Money::format(100)]),
     ];
-    $this->checkArrayEquals($expectedResult, $errors);
+    $this->assertValidationError($expectedResult);
   }
 
   /**
@@ -81,27 +70,18 @@ class CRM_Event_Form_Registration_RegisterTest extends CiviUnitTestCase {
     // We should now have two participants.
     $this->callAPISuccessGetCount('Participant', ['event_id' => $event['id']], 2);
 
-    $form = $this->getEventForm($event['id']);
-    $form->set('cid', $waitlistContact);
+    $form = $this->getTestForm('CRM_Event_Form_Registration_Register', [], [
+      'id' => $this->getEventID(),
+      'cid' => $waitlistContact,
+    ]);
     // We SHOULD get an error when double registering a waitlisted user.
     try {
-      $form->preProcess();
+      $form->processForm(FormWrapper::PREPROCESSED);
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
       return;
     }
     $this->fail('Wait listed users shouldn\'t be allowed to re-register.');
-  }
-
-  /**
-   * @param int $eventID
-   *
-   * @return CRM_Event_Form_Registration_Register
-   */
-  protected function getEventForm(int $eventID): CRM_Event_Form_Registration_Register {
-    /** @var \CRM_Event_Form_Registration_Register $form */
-    $_REQUEST['id'] = $eventID;
-    return $this->getFormObject('CRM_Event_Form_Registration_Register');
   }
 
 }

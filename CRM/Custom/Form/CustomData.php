@@ -23,11 +23,6 @@ class CRM_Custom_Form_CustomData {
   /**
    * Generic wrapper to add custom data to a form via a single line in preProcess.
    *
-   * $this->getDefaultEntity() must be defined for the form class for this to work.
-   *
-   * If the postProcess form cannot use the api & instead uses a BAO function it will need.
-   *   $params['custom'] = CRM_Core_BAO_CustomField::postProcess($submitted, $this->_id, $this->getDefaultEntity());
-   *
    * @param CRM_Core_Form $form
    * @param null|string $entitySubType values stored in civicrm_custom_group.extends_entity_column_value
    *   e.g Student for contact type
@@ -36,6 +31,23 @@ class CRM_Custom_Form_CustomData {
    * @param null|int $contact_id contact ID associated with the custom data.
    *
    * @throws \CRM_Core_Exception
+   * @deprecated - preferred code now is to add to ensure the tpl loads custom
+   * data using the ajax template & add code to `buildForm()` like this
+   *
+   * ```
+   * if ($this->isSubmitted()) {
+   *   $this->addCustomDataFieldsToForm('Membership', array_filter([
+   *   'id' => $this->getMembershipID(),
+   *   'membership_type_id' => $this->getSubmittedValue('membership_type_id')
+   * ]));
+   * }
+   * ```
+   *
+   * $this->getDefaultEntity() must be defined for the form class for this to work.
+   *
+   * If the postProcess form cannot use the api & instead uses a BAO function it will need.
+   *   $params['custom'] = CRM_Core_BAO_CustomField::postProcess($submitted, $this->_id, $this->getDefaultEntity());
+   *
    */
   public static function addToForm(&$form, $entitySubType = NULL, $subName = NULL, $groupCount = 1, $contact_id = NULL) {
     $entityName = $form->getDefaultEntity();
@@ -72,15 +84,25 @@ class CRM_Custom_Form_CustomData {
    *   participant data this could be a value representing role.
    * @param null|string $subType
    * @param null|int $groupCount
-   * @param string $type
+   * @param null $type
    * @param null|int $entityID
    * @param null $onlySubType
+   * @param bool $isLoadFromCache
    *
    * @throws \CRM_Core_Exception
+   *
+   * @deprecated see https://github.com/civicrm/civicrm-core/pull/29241 for preferred approach - basically
+   * 1) at the tpl layer use CRM/common/customDataBlock.tpl
+   * 2) to make the fields available for postProcess
+   * if ($this->isSubmitted()) {
+   *   $this->addCustomDataFieldsToForm('FinancialAccount');
+   * }
+   * 3) pass getSubmittedValues() to CRM_Core_BAO_CustomField::postProcess($this->getSubmittedValues(), $this->_id, 'FinancialAccount');
+   *  to ensure any money or number fields are handled for localisation
    */
   public static function preProcess(
     &$form, $extendsEntityColumn = NULL, $subType = NULL,
-    $groupCount = NULL, $type = NULL, $entityID = NULL, $onlySubType = NULL
+    $groupCount = NULL, $type = NULL, $entityID = NULL, $onlySubType = NULL, $isLoadFromCache = TRUE
   ) {
     if (!$type) {
       CRM_Core_Error::deprecatedWarning('type should be passed in');
@@ -131,7 +153,6 @@ class CRM_Custom_Form_CustomData {
     }
 
     $gid = (isset($form->_groupID)) ? $form->_groupID : NULL;
-    $getCachedTree = $form->_getCachedTree ?? TRUE;
     if (!is_array($subType) && str_contains(($subType ?? ''), CRM_Core_DAO::VALUE_SEPARATOR)) {
       CRM_Core_Error::deprecatedWarning('Using a CRM_Core_DAO::VALUE_SEPARATOR separated subType deprecated, use a comma-separated string instead.');
       $subType = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',', trim($subType, CRM_Core_DAO::VALUE_SEPARATOR));
@@ -154,7 +175,7 @@ class CRM_Custom_Form_CustomData {
       $gid,
       $subType,
       $extendsEntityColumn,
-      $getCachedTree,
+      $isLoadFromCache,
       $onlySubType,
       FALSE,
       CRM_Core_Permission::EDIT,

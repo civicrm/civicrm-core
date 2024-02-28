@@ -58,6 +58,9 @@ class CRM_Profile_Form extends CRM_Core_Form {
    * The group id that we are passing in url.
    *
    * @var int
+   *
+   * @deprecated
+   * @internal
    */
   public $_grid;
 
@@ -886,10 +889,10 @@ class CRM_Profile_Form extends CRM_Core_Form {
     $this->setDefaultsValues();
 
     $action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, NULL);
+    $this->assign('showCMS', FALSE);
     if ($this->_mode == self::MODE_CREATE || $this->_mode == self::MODE_EDIT) {
       CRM_Core_BAO_CMSUser::buildForm($this, $this->_gid, $emailPresent, $action);
     }
-    $this->assign('showCMS', FALSE);
 
     $this->assign('groupId', $this->_gid);
 

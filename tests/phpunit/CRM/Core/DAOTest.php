@@ -1,5 +1,8 @@
 <?php
 
+use Civi\Api4\CustomField;
+use Civi\Api4\CustomGroup;
+
 /**
  * Class CRM_Core_DAOTest
  * @group headless
@@ -7,6 +10,11 @@
 class CRM_Core_DAOTest extends CiviUnitTestCase {
 
   const ABORTED_SQL = "_aborted_sql_";
+
+  protected function tearDown(): void {
+    $this->quickCleanup([], TRUE);
+    parent::tearDown();
+  }
 
   public function testGetReferenceColumns(): void {
     // choose CRM_Core_DAO_Email as an arbitrary example
@@ -20,6 +28,33 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $this->assertEquals('contact_id', $contactRef->getReferenceKey());
     $this->assertEquals('id', $contactRef->getTargetKey());
     $this->assertInstanceOf(\CRM_Core_Reference_Basic::class, $contactRef);
+  }
+
+  public function testGetDynamicReferenceColumns(): void {
+    // CRM_Core_DAO_EntityTag has an example of all 3 types of references
+    $referenceColumns = [];
+    foreach (CRM_Core_DAO_EntityTag::getReferenceColumns() as $reference) {
+      $this->assertEquals('civicrm_entity_tag', $reference->getReferenceTable());
+      $referenceColumns[$reference->getReferenceKey()] = $reference;
+    }
+
+    $reference = $referenceColumns['entity_table'];
+    $this->assertInstanceOf(\CRM_Core_Reference_OptionValue::class, $reference);
+    $this->assertNull($reference->getTypeColumn());
+    $this->assertEquals('civicrm_option_value', $reference->getTargetTable());
+    $this->assertEquals('value', $reference->getTargetKey());
+
+    $reference = $referenceColumns['tag_id'];
+    $this->assertInstanceOf(\CRM_Core_Reference_Basic::class, $reference);
+    $this->assertNull($reference->getTypeColumn());
+    $this->assertEquals('civicrm_tag', $reference->getTargetTable());
+    $this->assertEquals('id', $reference->getTargetKey());
+
+    $reference = $referenceColumns['entity_id'];
+    $this->assertInstanceOf(\CRM_Core_Reference_Dynamic::class, $reference);
+    $this->assertEquals('entity_table', $reference->getTypeColumn());
+    $this->assertNull($reference->getTargetTable());
+    $this->assertEquals('id', $reference->getTargetKey());
   }
 
   public function testGetReferencesToTable(): void {
@@ -611,6 +646,51 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $onlyName = ['name' => $saved->name];
     $this->assertEquals($label, CRM_Contact_BAO_SavedSearch::fillValues($onlyId, ['label'])['label']);
     $this->assertEquals($label, CRM_Contact_BAO_SavedSearch::fillValues($onlyName, ['label'])['label']);
+  }
+
+  public function testGetReferencesToContactTable(): void {
+    $group1 = CustomGroup::create(FALSE)
+      ->setValues([
+        'name' => 'cg1',
+        'title' => 'Custom Group1',
+        'extends' => 'Group',
+      ])
+      ->execute()->single();
+    $group2 = CustomGroup::create(FALSE)
+      ->setValues([
+        'name' => 'cg2',
+        'title' => 'Custom Group2',
+        'extends' => 'Contact',
+      ])
+      ->execute()->single();
+
+    $sampleFieldData = [
+      ['custom_group_id' => $group1['id'], 'data_type' => 'ContactReference', 'label' => 'f1'],
+      ['custom_group_id' => $group1['id'], 'fk_entity' => 'Household', 'label' => 'f2'],
+      ['custom_group_id' => $group2['id'], 'fk_entity' => 'Individual', 'label' => 'f3'],
+      ['custom_group_id' => $group2['id'], 'fk_entity' => 'Contact', 'label' => 'f4'],
+      ['custom_group_id' => $group2['id'], 'fk_entity' => 'Activity', 'label' => 'f5'],
+    ];
+    $customField = CustomField::save(FALSE)
+      ->setRecords($sampleFieldData)
+      ->setDefaults(['html_type' => 'Text', 'data_type' => 'EntityReference'])
+      ->execute();
+
+    $expectedCidRefs = [
+      $group1['table_name'] => [
+        $customField[0]['column_name'],
+        $customField[1]['column_name'],
+      ],
+      $group2['table_name'] => [
+        'entity_id',
+        $customField[2]['column_name'],
+        $customField[3]['column_name'],
+      ],
+    ];
+    $cidRefs = CRM_Core_DAO::getReferencesToContactTable();
+    foreach ($expectedCidRefs as $table => $refs) {
+      $this->assertEquals($refs, $cidRefs[$table]);
+    }
   }
 
 }

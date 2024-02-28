@@ -232,7 +232,7 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
     $params['id'] = $this->_id;
 
     if (empty($params['grant_report_received'])) {
-      $params['grant_report_received'] = "null";
+      $params['grant_report_received'] = 0;
     }
 
     // set the contact, when contact is selected

@@ -75,7 +75,7 @@
 <div class="vevent crm-event-id-{$event.id} crm-block crm-event-info-form-block">
   <div class="event-info">
   {* Display top buttons only if the page is long enough to merit duplicate buttons *}
-  {if $event.summary or $event.description}
+  {if (array_key_exists('summary', $event) && $event.summary) or array_key_exists('description', $event) && $event.description}
     <div class="crm-actionlinks-top">
       {crmRegion name="event-page-eventinfo-actionlinks-top"}
         {if $allowRegistration}
@@ -87,12 +87,13 @@
     </div>
   {/if}
 
-  {if $event.summary}
+  {if array_key_exists('summary', $event) && $event.summary}
       <div class="crm-section event_summary-section">
         {$event.summary|purify}
       </div>
   {/if}
-  {if $event.description}
+
+  {if array_key_exists('description', $event) && $event.description}
       <div class="crm-section event_description-section summary">
           {$event.description|purify}
       </div>
@@ -102,14 +103,14 @@
       <div class="label">{ts}When{/ts}</div>
       <div class="content">
         {strip}
-            {if $event.event_start_date && $event.event_end_date && ($event.event_end_date|crmDate:'%Y%m%d':0 == $event.event_start_date|crmDate:'%Y%m%d':0)}
+            {if $event.event_start_date && array_key_exists('event_end_date', $event) && $event.event_end_date && ($event.event_end_date|crmDate:'%Y%m%d':0 == $event.event_start_date|crmDate:'%Y%m%d':0)}
               {$event.event_start_date|crmDate:'Full':0}
               &nbsp;{ts}from{/ts}&nbsp;
               {$event.event_start_date|crmDate:0:1}
             {else}
               {$event.event_start_date|crmDate}
             {/if}
-            {if $event.event_end_date}
+            {if array_key_exists('event_end_date', $event) && $event.event_end_date}
                 &nbsp;{ts}to{/ts}&nbsp;
                 {* Only show end time if end date = start date *}
                 {if $event.event_end_date|crmDate:"%Y%m%d":0 == $event.event_start_date|crmDate:"%Y%m%d":0}
@@ -125,16 +126,16 @@
 
   {if $isShowLocation}
 
-        {if $location.address.1}
+        {if array_key_exists(1, $location.address) && $location.address.1}
             <div class="crm-section event_address-section">
                 <div class="label">{ts}Location{/ts}</div>
-                <div class="content">{$location.address.1.display|nl2br}</div>
+                <div class="content">{$location.address.1.display|purify|nl2br}</div>
                 <div class="clear"></div>
             </div>
         {/if}
 
       {if ($event.is_map && $config->mapProvider &&
-          (is_numeric($location.address.1.geo_code_1) ||
+          array_key_exists('address', $location)  && (is_numeric($location.address.1.geo_code_1) ||
           ($location.address.1.city AND $location.address.1.state_province)))}
           <div class="crm-section event_map-section">
               <div class="content">
@@ -149,34 +150,40 @@
   {/if}{*End of isShowLocation condition*}
 
 
-  {if $location.phone.1.phone || $location.email.1.email}
+  {if (array_key_exists(1, $location.phone) && $location.phone.1.phone)
+    || (array_key_exists(1, $location.email) && $location.email.1.email)}
       <div class="crm-section event_contact-section">
           <div class="label">{ts}Contact{/ts}</div>
           <div class="content">
+            {if array_key_exists('phone', $location)}
               {foreach from=$location.phone item=phone}
                   {if $phone.phone}
                     <div class="crm-eventinfo-contact-phone">
                       {* @todo This should use "{ts 1=$phone.phone_type_display 2=$phone}%1: %2{/ts}" because some language have nbsp before column *}
                       {if $phone.phone_type_id}{$phone.phone_type_display}:{else}{ts}Phone:{/ts}{/if}
-                      <span class="tel">{$phone.phone}{if array_key_exists('phone_ext', $phone)}&nbsp;{ts}ext.{/ts}&nbsp;{$phone.phone_ext}{/if}</span>
+                      <span class="tel">{$phone.phone|escape}{if array_key_exists('phone_ext', $phone)}&nbsp;{ts}ext.{/ts}&nbsp;{$phone.phone_ext|escape}{/if}</span>
                     </div>
                   {/if}
               {/foreach}
+            {/if}
+            {if array_key_exists('email', $location)}
               {foreach from=$location.email item=email}
                   {if $email.email}
                     <div class="crm-eventinfo-contact-email">
-                      {ts}Email:{/ts} <span class="email"><a href="mailto:{$email.email}">{$email.email}</a></span>
+                      {ts}Email:{/ts} <span class="email"><a href="mailto:{$email.email|purify}">{$email.email|escape}</a></span>
                     </div>
                   {/if}
               {/foreach}
+            {/if}
           </div>
           <div class="clear"></div>
       </div>
+
   {/if}
 
   {if $event.is_monetary eq 1 && $feeBlock.value}
       <div class="crm-section event_fees-section">
-          <div class="label">{$event.fee_label}</div>
+          <div class="label">{$event.fee_label|escape}</div>
           <div class="content">
               <table class="form-layout-compressed fee_block-table">
                   {foreach from=$feeBlock.value name=fees item=value}

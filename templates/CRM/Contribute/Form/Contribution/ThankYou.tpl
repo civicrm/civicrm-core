@@ -45,7 +45,7 @@
         </div>
       {/if}
     {elseif $isPendingOutcome}
-      <div>{ts 1=$paymentProcessor.name}Your contribution has been submitted to %1 for processing.{/ts}</div>
+      <div>{ts 1=$paymentProcessorName|escape}Your contribution has been submitted to %1 for processing.{/ts}</div>
         {if $is_email_receipt}
       <div>
         {if $onBehalfEmail AND ($onBehalfEmail neq $email)}
@@ -93,7 +93,7 @@
             {/if}
           {/if}
           <strong> -------------------------------------------</strong><br />
-          {ts}Total{/ts}: <strong>{$amount+$membership_amount|crmMoney}</strong><br />
+          {ts}Total{/ts}: <strong>{$orderTotal|crmMoney}</strong><br />
         {else}
           {if $totalTaxAmount}
             {ts}Tax Amount{/ts}: <strong>{$totalTaxAmount|crmMoney}</strong><br />
@@ -116,7 +116,7 @@
           {if !empty($auto_renew)} {* Auto-renew membership confirmation *}
             {crmRegion name="contribution-thankyou-recur-membership"}
               <br />
-              {if $installments > 1}
+              {if !$installments || $installments > 1}
                 {if $frequency_interval > 1}
                   <strong>{ts 1=$frequency_interval 2=$frequency_unit}This membership will be renewed automatically every %1 %2(s).{/ts}</strong>
                 {else}
@@ -315,6 +315,6 @@
   </div>
   {if $isShare}
     {capture assign=contributionUrl}{crmURL p='civicrm/contribute/transact' q="$qParams" a=1 fe=1 h=1}{/capture}
-    {include file="CRM/common/SocialNetwork.tpl" url=$contributionUrl title=$title pageURL=$contributionUrl emailMode=false}
+    {include file="CRM/common/SocialNetwork.tpl" url=$contributionUrl title=false pageURL=$contributionUrl emailMode=false}
   {/if}
 </div>

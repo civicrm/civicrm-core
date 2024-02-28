@@ -13,6 +13,7 @@
     <add>civicrm/admin/contribute/managePremiums/edit?action=add&amp;reset=1</add>
     <update>civicrm/admin/contribute/managePremiums/edit?action=update&amp;id=[id]&amp;reset=1</update>
     <delete>civicrm/admin/contribute/managePremiums/edit?action=delete&amp;id=[id]&amp;reset=1</delete>
+    <preview>civicrm/admin/contribute/managePremiums/edit?action=preview&amp;reset=1&amp;id=[id]</preview>
     <browse>civicrm/admin/contribute/managePremiums/</browse>
   </paths>
   <field>

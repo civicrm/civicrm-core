@@ -34,8 +34,8 @@
      </tr>
      <tr>
       <td colspan="2" {$valueStyle}>
-       {$event.event_title}<br />
-       {$event.event_start_date|crmDate}{if $event.event_end_date}-{if $event.event_end_date|crmDate:"shortdate" == $event.event_start_date|crmDate:"shortdate"}{$event.event_end_date|crmDate:"Time"}{else}{$event.event_end_date|crmDate}{/if}{/if}
+       {event.title}<br />
+       {event.start_date|crmDate:"%A"} {event.start_date|crmDate}{if {event.end_date|boolean}}-{if '{event.end_date|crmDate:"%Y%m%d"}' === '{event.start_date|crmDate:"%Y%m%d"}'}{event.end_date|crmDate:"Time"}{else}{event.end_date|crmDate:"%A"} {event.end_date|crmDate}{/if}{/if}
       </td>
      </tr>
      <tr>
@@ -46,48 +46,74 @@
        {participant.role_id:label}
       </td>
      </tr>
-
-     {if $isShowLocation}
-      <tr>
-       <td colspan="2" {$valueStyle}>
-        {$event.location.address.1.display|nl2br}
-       </td>
-      </tr>
-     {/if}
-
-     {if !empty($event.location.phone.1.phone) || !empty($event.location.email.1.email)}
-      <tr>
-       <td colspan="2" {$labelStyle}>
-        {ts}Event Contacts:{/ts}
-       </td>
-      </tr>
-      {foreach from=$event.location.phone item=phone}
-       {if $phone.phone}
+    {if {event.is_show_location|boolean}}
         <tr>
-         <td {$labelStyle}>
-          {if $phone.phone_type}{$phone.phone_type_display}{else}{ts}Phone{/ts}{/if}
-         </td>
-         <td {$valueStyle}>
-          {$phone.phone}
-         </td>
+          <td colspan="2" {$valueStyle}>
+            {event.location}
+          </td>
         </tr>
-       {/if}
-      {/foreach}
-      {foreach from=$event.location.email item=eventEmail}
-       {if $eventEmail.email}
-        <tr>
-         <td {$labelStyle}>
-          {ts}Email{/ts}
-         </td>
-         <td {$valueStyle}>
-          {$eventEmail.email}
-         </td>
-        </tr>
-       {/if}
-      {/foreach}
-     {/if}
+      {/if}
 
-     {if '{contact.email}'}
+    {if {event.loc_block_id.phone_id.phone|boolean} || {event.loc_block_id.email_id.email|boolean}}
+        <tr>
+          <td colspan="2" {$labelStyle}>
+            {ts}Event Contacts:{/ts}
+          </td>
+        </tr>
+
+        {if {event.loc_block_id.phone_id.phone|boolean}}
+          <tr>
+            <td {$labelStyle}>
+              {if {event.loc_block_id.phone_id.phone_type_id|boolean}}
+                {event.loc_block_id.phone_id.phone_type_id:label}
+              {else}
+                {ts}Phone{/ts}
+              {/if}
+            </td>
+            <td {$valueStyle}>
+              {event.loc_block_id.phone_id.phone} {if {event.loc_block_id.phone_id.phone_ext|boolean}}&nbsp;{ts}ext.{/ts} {event.loc_block_id.phone_id.phone_ext}{/if}
+            </td>
+          </tr>
+        {/if}
+        {if {event.loc_block_id.phone_2_id.phone|boolean}}
+          <tr>
+            <td {$labelStyle}>
+              {if {event.loc_block_id.phone_2_id.phone_type_id|boolean}}
+                {event.loc_block_id.phone_2_id.phone_type_id:label}
+              {else}
+                {ts}Phone{/ts}
+              {/if}
+            </td>
+            <td {$valueStyle}>
+              {event.loc_block_id.phone_2_id.phone} {if {event.loc_block_id.phone_2_id.phone_ext|boolean}}&nbsp;{ts}ext.{/ts} {event.loc_block_id.phone_2_id.phone_ext}{/if}
+            </td>
+          </tr>
+        {/if}
+
+        {if {event.loc_block_id.email_id.email|boolean}}
+          <tr>
+            <td {$labelStyle}>
+              {ts}Email{/ts}
+            </td>
+            <td {$valueStyle}>
+              {event.loc_block_id.email_id.email}
+            </td>
+          </tr>
+        {/if}
+
+        {if {event.loc_block_id.email_2_id.email|boolean}}
+          <tr>
+            <td {$labelStyle}>
+              {ts}Email{/ts}
+            </td>
+            <td {$valueStyle}>
+              {event.loc_block_id.email_2_id.email}
+            </td>
+          </tr>
+        {/if}
+      {/if}
+
+    {if '{contact.email}'}
       <tr>
        <th {$headerStyle}>
         {ts}Registered Email{/ts}

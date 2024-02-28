@@ -189,4 +189,16 @@ class CRM_Standaloneusers_Upgrader extends CRM_Extension_Upgrader_Base {
   //   return TRUE;
   // }
 
+  /**
+   * Create table civicrm_session
+   *
+   * @return TRUE on success
+   * @throws Exception
+   */
+  public function upgrade_5691(): bool {
+    $this->ctx->log->info('Applying update 5691');
+    $this->executeSqlFile('sql/upgrade_5691.sql');
+    return TRUE;
+  }
+
 }

@@ -159,14 +159,13 @@ SELECT  survey.id    as id,
   }
 
   /**
-   * Get Surveys custom groups.
+   * @deprecated since 5.71 will be removed around 5.85.
    *
    * @param array $surveyTypes
-   *   an array of survey type id.
-   *
    * @return array
    */
   public static function getSurveyCustomGroups($surveyTypes = []) {
+    CRM_Core_Error::deprecatedFunctionWarning('API');
     $customGroups = [];
     if (!is_array($surveyTypes)) {
       $surveyTypes = [$surveyTypes];

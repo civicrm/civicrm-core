@@ -52,8 +52,6 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     $res = CRM_Core_DAO::executeQuery($query);
     $openCaseType = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Open Case');
     while ($res->fetch()) {
-      $message = 'Failed asserting that the case activity query has a activity_type_id property:';
-      $this->assertObjectHasAttribute('activity_type_id', $res, $message . PHP_EOL . print_r($res, TRUE));
       $message = 'Failed asserting that the latest activity from Case ID 1 was "Open Case":';
       $this->assertEquals($openCaseType, $res->activity_type_id, $message . PHP_EOL . print_r($res, TRUE));
     }
@@ -758,7 +756,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     $closedStatus = $closedStatusResult['values'][$closedStatusResult['id']]['value'];
 
     // Go thru the motions to change case status
-    $form = new CRM_Case_Form_Activity_ChangeCaseStatus();
+    $form = new CRM_Case_Form_Activity();
     $form->_caseId = [$case1->id];
     $form->_oldCaseStatus = [$case1->status_id];
     $params = [

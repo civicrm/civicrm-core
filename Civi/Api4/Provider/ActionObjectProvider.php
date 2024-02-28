@@ -63,15 +63,23 @@ class ActionObjectProvider extends AutoService implements EventSubscriberInterfa
    */
   public function invoke($action) {
     // Load result class based on @return annotation in the execute() method.
-    $reflection = new \ReflectionClass($action);
-    $doc = ReflectionUtils::getCodeDocs($reflection->getMethod('execute'), 'Method');
-    $resultClass = $doc['return'][0] ?? '\\Civi\\Api4\\Generic\\Result';
+    $resultClass = $this->getResultClass($action);
     $result = new $resultClass();
     $result->action = $action->getActionName();
     $result->entity = $action->getEntityName();
     $action->_run($result);
     $this->handleChains($action, $result);
     return $result;
+  }
+
+  private function getResultClass($action): string {
+    $actionClassName = get_class($action);
+    if (!isset(\Civi::$statics[__CLASS__][__FUNCTION__][$actionClassName])) {
+      $reflection = new \ReflectionClass($action);
+      $doc = ReflectionUtils::getCodeDocs($reflection->getMethod('execute'), 'Method');
+      \Civi::$statics[__CLASS__][__FUNCTION__][$actionClassName] = $doc['return'][0] ?? '\Civi\Api4\Generic\Result';
+    }
+    return \Civi::$statics[__CLASS__][__FUNCTION__][$actionClassName];
   }
 
   /**

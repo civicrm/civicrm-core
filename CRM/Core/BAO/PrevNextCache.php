@@ -23,18 +23,26 @@ class CRM_Core_BAO_PrevNextCache extends CRM_Core_DAO_PrevNextCache {
   /**
    * Get the previous and next keys.
    *
+   * @internal as of Feb 2014 no universe usages other than defunct CiviHR
+   * code found.
+   *
    * @param string $cacheKey
    * @param int $id1
    * @param int $id2
-   * @param int $mergeId
-   * @param string $join
-   * @param string $where
+   * @param null $mergeId
+   * @param null $ignore
+   * @param null $ignore_more
    * @param bool $flip
    *
    * @return array
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\Core\Exception\DBQueryException
    */
-  public static function getPositions($cacheKey, $id1, $id2, &$mergeId = NULL, $join = NULL, $where = NULL, $flip = FALSE) {
+  public static function getPositions($cacheKey, $id1, $id2, &$mergeId = NULL, $ignore = NULL, $ignore_more = NULL, $flip = FALSE) {
+    $join = CRM_Dedupe_Merger::getJoinOnDedupeTable();
+    $where = "de.id IS NULL";
     if ($flip) {
+      CRM_Core_Error::deprecatedFunctionWarning('handle this outside the function');
       [$id1, $id2] = [$id2, $id1];
     }
 

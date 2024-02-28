@@ -29,12 +29,9 @@ interface SpecProviderInterface {
   /**
    * @param string $entity
    * @param string $action
-   * Optional @param array $values
-   *   $values from the api getFields request.
-   *   This param works but has not been added to the interface for the sake of backward-compatability.
    *
    * @return bool
    */
-  public function applies(string $entity, string $action/*, array $values = []*/);
+  public function applies(string $entity, string $action);
 
 }

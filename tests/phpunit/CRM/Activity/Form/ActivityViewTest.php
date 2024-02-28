@@ -82,7 +82,7 @@ class CRM_Activity_Form_ActivityViewTest extends CiviUnitTestCase {
 
     // check one of the smarty template vars
     // not checking EVERYTHING
-    $templateVar = CRM_Activity_Form_ActivityView::getTemplate()->get_template_vars('values');
+    $templateVar = CRM_Activity_Form_ActivityView::getTemplate()->getTemplateVars('values');
     $expected = [
       'assignee_contact' => [0 => $activity['target_contact_id']],
       // it's always Julia

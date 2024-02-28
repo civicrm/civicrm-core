@@ -51,7 +51,7 @@ function smarty_block_url($params, $text, &$smarty, &$repeat) {
   $url = (string) Civi::url($text, $flags)->addVars($params);
 
   // This could be neat, but see discussion in CRM_Core_Smarty_plugins_UrlTest for why it's currently off.
-  // $url->setVarsCallback([$smarty, 'get_template_vars']);
+  // $url->setVarsCallback([$smarty, 'getTemplateVars']);
 
   if ($assign !== NULL) {
     $smarty->assign([$assign => $url]);

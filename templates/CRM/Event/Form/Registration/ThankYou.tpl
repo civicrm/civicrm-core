@@ -13,10 +13,10 @@
 
 <div class="crm-event-id-{$event.id} crm-block crm-event-thankyou-form-block">
     {* Don't use "normal" thank-you message for Waitlist and Approval Required registrations - since it will probably not make sense for those situations. dgg *}
-    {if $event.thankyou_text AND (not $isOnWaitlist AND not $isRequireApproval)}
+    {if array_key_exists('thankyou_text', $event) AND (not $isOnWaitlist AND not $isRequireApproval)}
         <div id="intro_text" class="crm-section event_thankyou_text-section">
             <p>
-            {$event.thankyou_text}
+            {$event.thankyou_text|purify}
             </p>
         </div>
     {/if}
@@ -86,22 +86,22 @@
               <div class="crm-section no-label amount-item-section">
                     {foreach from=$finalAmount item=amount key=level}
                   <div class="content">
-                      {$amount.amount|crmMoney}&nbsp;&nbsp;{$amount.label}
+                      {$amount.amount|crmMoney:$currency}&nbsp;&nbsp;{$amount.label}
                   </div>
                   <div class="clear"></div>
                     {/foreach}
                 </div>
                 {if $totalTaxAmount}
-                  <div class="content bold">{ts}Tax Total{/ts}:&nbsp;&nbsp;{$totalTaxAmount|crmMoney}</div>
+                  <div class="content bold">{ts}Tax Total{/ts}:&nbsp;&nbsp;{$totalTaxAmount|crmMoney:$currency}</div>
                   <div class="clear"></div>
                 {/if}
                 {if $totalAmount}
                  <div class="crm-section no-label total-amount-section">
-                    <div class="content bold">{ts}Total Amount{/ts}:&nbsp;&nbsp;{$totalAmount|crmMoney}</div>
+                    <div class="content bold">{ts}Total Amount{/ts}:&nbsp;&nbsp;{$totalAmount|crmMoney:$currency}</div>
                     <div class="clear"></div>
                   </div>
 
-                    {if $hookDiscount.message}
+                    {if $hookDiscount}
                         <div class="crm-section hookDiscount-section">
                             <em>({$hookDiscount.message})</em>
                         </div>
@@ -186,9 +186,9 @@
       {/crmRegion}
     {/if}
 
-    {if $event.thankyou_footer_text}
+    {if array_key_exists('thankyou_footer_text', $event) && $event.thankyou_footer_text}
         <div id="footer_text" class="crm-section event_thankyou_footer-section">
-            <p>{$event.thankyou_footer_text}</p>
+            <p>{$event.thankyou_footer_text|purify}</p>
         </div>
     {/if}
 

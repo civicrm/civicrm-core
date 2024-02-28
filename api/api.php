@@ -302,5 +302,5 @@ function _civicrm_api_get_entity_name_from_camel($entity) {
  * @return string
  */
 function _civicrm_api_get_entity_name_from_dao($bao) {
-  return CRM_Core_DAO_AllCoreTables::getBriefName(get_class($bao));
+  return CRM_Core_DAO_AllCoreTables::getEntityNameForClass(get_class($bao));
 }

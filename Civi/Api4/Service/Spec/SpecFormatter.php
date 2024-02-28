@@ -18,35 +18,32 @@ use Civi\Api4\Utils\FormattingUtil;
 class SpecFormatter {
 
   /**
-   * @param array $data
-   * @param string $entityName
-   *
-   * @return FieldSpec
+   * Convert array from BAO::fields() or CustomGroup::getAll() into a FieldSpec object
    */
-  public static function arrayToField(array $data, string $entityName): FieldSpec {
+  public static function arrayToField(array $data, string $entityName, array $customGroup = NULL): FieldSpec {
     $dataTypeName = self::getDataType($data);
 
     $hasDefault = isset($data['default']) && $data['default'] !== '';
     // Custom field
-    if (!empty($data['custom_group_id'])) {
+    if ($customGroup) {
       $field = new CustomFieldSpec($data['name'], $entityName, $dataTypeName);
-      if (strpos($entityName, 'Custom_') !== 0) {
-        $field->setName($data['custom_group_id.name'] . '.' . $data['name']);
+      if (!str_starts_with($entityName, 'Custom_')) {
+        $field->setName($customGroup['name'] . '.' . $data['name']);
       }
       else {
         // Fields belonging to custom entities are treated as normal; type = Field instead of Custom
         $field->setType('Field');
-        $field->setTableName($data['custom_group_id.table_name']);
       }
+      $field->setTableName($customGroup['table_name']);
       if ($dataTypeName === 'EntityReference') {
         $field->setFkEntity($data['fk_entity']);
       }
       $field->setColumnName($data['column_name']);
       $field->setNullable(empty($data['is_required']));
       $field->setCustomFieldId($data['id'] ?? NULL);
-      $field->setCustomGroupName($data['custom_group_id.name']);
+      $field->setCustomGroupName($customGroup['name']);
       $field->setTitle($data['label']);
-      $field->setLabel($data['custom_group_id.title'] . ': ' . $data['label']);
+      $field->setLabel($customGroup['title'] . ': ' . $data['label']);
       $field->setHelpPre($data['help_pre'] ?? NULL);
       $field->setHelpPost($data['help_post'] ?? NULL);
       if (\CRM_Core_BAO_CustomField::hasOptions($data)) {
@@ -71,7 +68,7 @@ class SpecFormatter {
       $field->setLabel($data['html']['label'] ?? NULL);
       $field->setLocalizable($data['localizable'] ?? FALSE);
       if (!empty($data['DFKEntities'])) {
-        $field->setDfkEntities(array_values($data['DFKEntities']));
+        $field->setDfkEntities($data['DFKEntities']);
       }
       if (!empty($data['pseudoconstant'])) {
         // Do not load options if 'prefetch' is disabled
@@ -117,6 +114,9 @@ class SpecFormatter {
     elseif (($data['html']['type'] ?? NULL) === 'EntityRef' && !empty($data['pseudoconstant']['table'])) {
       $field->setFkEntity(CoreUtil::getApiNameFromTableName($data['pseudoconstant']['table']));
     }
+    if (!empty($data['FKColumnName'])) {
+      $field->setFkColumn($data['FKColumnName']);
+    }
 
     return $field;
   }
@@ -144,24 +144,24 @@ class SpecFormatter {
   /**
    * Callback function to build option lists for all DAO & custom fields.
    *
-   * @param FieldSpec $spec
+   * @param array $field
    * @param array $values
    * @param bool|array $returnFormat
    * @param bool $checkPermissions
    * @return array|false
    */
-  public static function getOptions($spec, $values, $returnFormat, $checkPermissions) {
-    $fieldName = $spec->getName();
+  public static function getOptions($field, $values, $returnFormat, $checkPermissions) {
+    $fieldName = $field['name'];
 
-    if ($spec instanceof CustomFieldSpec) {
+    if (!empty($field['custom_field_id'])) {
       // buildOptions relies on the custom_* type of field names
-      $fieldName = sprintf('custom_%d', $spec->getCustomFieldId());
+      $fieldName = sprintf('custom_%d', $field['custom_field_id']);
     }
 
     // BAO::buildOptions returns a single-dimensional list, we call that first because of the hook contract,
     // @see CRM_Utils_Hook::fieldOptions
     // We then supplement the data with additional properties if requested.
-    $bao = CoreUtil::getBAOFromApiName($spec->getEntity());
+    $bao = CoreUtil::getBAOFromApiName($field['entity']);
     $optionLabels = $bao::buildOptions($fieldName, NULL, $values);
 
     if (!is_array($optionLabels)) {
@@ -170,11 +170,11 @@ class SpecFormatter {
     else {
       $options = \CRM_Utils_Array::makeNonAssociative($optionLabels, 'id', 'label');
       if (is_array($returnFormat) && $options) {
-        self::addOptionProps($options, $spec, $bao, $fieldName, $values, $returnFormat);
+        self::addOptionProps($options, $field, $bao, $fieldName, $values, $returnFormat);
       }
     }
     // Special 'current_domain' option
-    if ($spec->getFkEntity() === 'Domain') {
+    if ($field['fk_entity'] === 'Domain') {
       array_unshift($options, [
         'id' => 'current_domain',
         'name' => 'current_domain',
@@ -191,13 +191,13 @@ class SpecFormatter {
    * We start with BAO::buildOptions in order to respect hooks which may be adding/removing items, then we add the extra data.
    *
    * @param array $options
-   * @param FieldSpec $spec
+   * @param array $field
    * @param \CRM_Core_DAO $baoName
    * @param string $fieldName
    * @param array $values
    * @param array $returnFormat
    */
-  private static function addOptionProps(&$options, $spec, $baoName, $fieldName, $values, $returnFormat) {
+  private static function addOptionProps(&$options, $field, $baoName, $fieldName, $values, $returnFormat) {
     // FIXME: For now, call the buildOptions function again and then combine the arrays. Not an ideal approach.
     // TODO: Teach CRM_Core_Pseudoconstant to always load multidimensional option lists so we can get more properties like 'color' and 'icon',
     // however that might require a change to the hook_civicrm_fieldOptions signature so that's a bit tricky.
@@ -208,8 +208,8 @@ class SpecFormatter {
     // CRM_Core_Pseudoconstant doesn't know how to fetch extra stuff like icon, description, color, etc., so we have to invent that wheel here...
     if ($returnFormat) {
       $optionIndex = array_flip(array_column($options, 'id'));
-      if ($spec instanceof CustomFieldSpec) {
-        $optionGroupId = \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $spec->getCustomFieldId(), 'option_group_id');
+      if (!empty($field['custom_field_id'])) {
+        $optionGroupId = \CRM_Core_BAO_CustomField::getField($field['custom_field_id'])['option_group_id'];
       }
       else {
         $dao = new $baoName();
@@ -278,7 +278,7 @@ class SpecFormatter {
    * @param array $data
    * @param string $dataTypeName
    */
-  public static function setInputTypeAndAttrs(FieldSpec &$fieldSpec, $data, $dataTypeName) {
+  public static function setInputTypeAndAttrs(FieldSpec $fieldSpec, $data, $dataTypeName) {
     $inputType = $data['html']['type'] ?? $data['html_type'] ?? NULL;
     $inputAttrs = $data['html'] ?? [];
     unset($inputAttrs['type']);
@@ -310,7 +310,7 @@ class SpecFormatter {
       $inputAttrs['step'] = $dataTypeName === 'Integer' ? 1 : .01;
     }
     // Date/time settings from custom fields
-    if ($inputType == 'Date' && !empty($data['custom_group_id'])) {
+    if ($inputType == 'Date' && is_a($fieldSpec, CustomFieldSpec::class)) {
       $inputAttrs['time'] = empty($data['time_format']) ? FALSE : ($data['time_format'] == 1 ? 12 : 24);
       $inputAttrs['date'] = $data['date_format'];
       $inputAttrs['start_date_years'] = isset($data['start_date_years']) ? (int) $data['start_date_years'] : NULL;

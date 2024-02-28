@@ -1,0 +1,25 @@
+<fieldset af-fieldset="" open="" af-title="Find Memberships">
+  <details class="af-container af-layout-inline" af-title="Contact Filters" open="">
+    <af-field name="contact_id.display_name" defn="{label: 'Member Name', input_attrs: {}}" />
+    <af-field name="Membership_Contact_contact_id_01.tags" defn="{input_attrs: {multiple: true}}" />
+    <af-field name="Membership_Contact_contact_id_01.groups" defn="{input_attrs: {multiple: true}}" />
+    <af-field name="Membership_Contact_contact_id_01.contact_type" defn="{input_attrs: {multiple: true}}" />
+    <af-field name="Membership_Contact_contact_id_01.is_deleted" defn="{label: 'Search in Trash (deleted contacts)'}" />
+  </details>
+  <details class="af-container af-layout-inline" af-title="Membership Filters" open="">
+    <af-field name="membership_type_id" defn="{input_attrs: {multiple: true}, required: false}" />
+    <af-field name="source" />
+    <af-field name="id" />
+    <af-field name="Membership_ContributionRecur_contribution_recur_id_01.contribution_status_id" defn="{input_attrs: {multiple: true}, label: 'Auto-Renew Subscription Status?'}" />
+    <af-field name="join_date" defn="{input_type: 'Select', search_range: true, default_date_type: 'fixed', input_attrs: {}}" />
+    <af-field name="start_date" defn="{input_type: 'Select', search_range: true, default_date_type: 'fixed', input_attrs: {}}" />
+    <af-field name="end_date" defn="{input_type: 'Select', search_range: true, default_date_type: 'fixed', input_attrs: {}}" />
+    <af-field name="status_id" defn="{input_attrs: {multiple: true}, required: false, label: 'Membership Status'}" />
+    <af-field name="is_override" defn="{label: 'Membership Status Is Overriden?', input_type: 'Radio'}" />
+    <af-field name="is_test" defn="{afform_default: '0', input_type: 'Radio', label: 'Membership is a Test?'}" />
+    <af-field name="is_pay_later" defn="{input_type: 'Radio', label: 'Pay Later?'}" />
+    <af-field name="is_primary_member" />
+    <af-field name="Membership_MembershipStatus_status_id_01.is_current_member" defn="{input_type: 'Radio'}" />
+  </details>
+  <crm-search-display-table search-name="Find_Memberships" display-name="Find_Memberships"></crm-search-display-table>
+</fieldset>

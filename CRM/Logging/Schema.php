@@ -158,6 +158,9 @@ AND    TABLE_NAME LIKE 'civicrm_%'
     // dev/core#1762 Don't log subscription_history
     $this->tables = preg_grep('/^civicrm_subscription_history/', $this->tables, PREG_GREP_INVERT);
 
+    // Don't log sessions
+    $this->tables = preg_grep('/^civicrm_session/', $this->tables, PREG_GREP_INVERT);
+
     // do not log civicrm_mailing_recipients table, CRM-16193
     $this->tables = array_diff($this->tables, ['civicrm_mailing_recipients']);
     $this->logTableSpec = array_fill_keys($this->tables, []);
@@ -200,13 +203,11 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
    */
   public function entityCustomDataLogTables($extends) {
     $customGroupTables = [];
-    $customGroupDAO = CRM_Core_BAO_CustomGroup::getAllCustomGroupsByBaseEntity($extends);
-    $customGroupDAO->find();
-    while ($customGroupDAO->fetch()) {
-      // logging is disabled for the table (e.g by hook) then $this->logs[$customGroupDAO->table_name]
+    foreach (CRM_Core_BAO_CustomGroup::getAll(['extends' => $extends]) as $customGroup) {
+      // logging is disabled for the table (e.g by hook) then $this->logs[$customGroup['table_name']]
       // will be empty.
-      if (!empty($this->logs[$customGroupDAO->table_name])) {
-        $customGroupTables[$customGroupDAO->table_name] = $this->logs[$customGroupDAO->table_name];
+      if (!empty($this->logs[$customGroup['table_name']])) {
+        $customGroupTables[$customGroup['table_name']] = $this->logs[$customGroup['table_name']];
       }
     }
     return $customGroupTables;

@@ -29,7 +29,7 @@ class MembershipTypesTest extends BaseTestClass {
     $page = new \CRM_Member_Page_MembershipType();
     $types = $this->setUpMembershipTypesACLLimited();
     $page->browse();
-    $assigned = \CRM_Core_Smarty::singleton()->get_template_vars();
+    $assigned = \CRM_Core_Smarty::singleton()->getTemplateVars();
     $this->assertArrayNotHasKey($types['Forbidden']['id'], $assigned['rows']);
     $this->assertArrayHasKey($types['Go for it']['id'], $assigned['rows']);
     $links = $assigned['rows'][$types['Go for it']['id']]['action'];
@@ -46,7 +46,7 @@ class MembershipTypesTest extends BaseTestClass {
     }
     $this->setPermissions($permissions);
     $page->browse();
-    $assigned = \CRM_Core_Smarty::singleton()->get_template_vars();
+    $assigned = \CRM_Core_Smarty::singleton()->getTemplateVars();
     $this->assertEquals('<span></span>', $assigned['rows'][$types['Go for it']['id']]['action']);
   }
 

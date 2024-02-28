@@ -35,6 +35,7 @@
     controller: function($scope, $timeout, searchMeta) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
+      let initDefaults;
 
       this.isSuperAdmin = CRM.checkPerm('all CiviCRM permissions and ACLs');
       this.aclBypassHelp = ts('Only users with "all CiviCRM permissions and ACLs" can disable permission checks.');
@@ -87,6 +88,10 @@
 
       this.styles = CRM.crmSearchAdmin.styles;
 
+      function selectToKey(selectExpr) {
+        return selectExpr.split(' AS ').slice(-1)[0];
+      }
+
       this.addCol = function(type) {
         var col = _.cloneDeep(this.colTypes[type].defaults);
         col.type = type;
@@ -97,15 +102,25 @@
       };
 
       this.removeCol = function(index) {
-        if (ctrl.display.settings.columns[index].type === 'field') {
-          ctrl.hiddenColumns.push(ctrl.display.settings.columns[index]);
-        }
         ctrl.display.settings.columns.splice(index, 1);
       };
 
-      this.restoreCol = function(index) {
-        ctrl.display.settings.columns.push(ctrl.hiddenColumns[index]);
-        ctrl.hiddenColumns.splice(index, 1);
+      this.getColumnIndex = function(key) {
+        key = selectToKey(key);
+        return ctrl.display.settings.columns.findIndex(col => key === col.key);
+      };
+
+      this.columnExists = function(key) {
+        return ctrl.getColumnIndex(key) > -1;
+      };
+
+      this.toggleColumn = function(key) {
+        let index = ctrl.getColumnIndex(key);
+        if (index > -1) {
+          ctrl.removeCol(index);
+        } else {
+          ctrl.display.settings.columns.push(searchMeta.fieldToColumn(key, initDefaults));
+        }
       };
 
       this.getExprFromSelect = function(key) {
@@ -121,7 +136,7 @@
       };
 
       this.getFieldLabel = function(key) {
-        var expr = ctrl.getExprFromSelect(key);
+        var expr = ctrl.getExprFromSelect(selectToKey(key));
         return searchMeta.getDefaultLabel(expr);
       };
 
@@ -294,25 +309,18 @@
 
       // Helper function to sort active from hidden columns and initialize each column with defaults
       this.initColumns = function(defaults) {
+        initDefaults = defaults;
         if (!ctrl.display.settings.columns) {
           ctrl.display.settings.columns = _.transform(ctrl.savedSearch.api_params.select, function(columns, fieldExpr) {
             columns.push(searchMeta.fieldToColumn(fieldExpr, defaults));
           });
-          ctrl.hiddenColumns = [];
         } else {
-          var activeColumns = _.collect(ctrl.display.settings.columns, 'key'),
-            selectAliases = _.map(ctrl.savedSearch.api_params.select, function(select) {
-              return _.last(select.split(' AS '));
-            });
-          ctrl.hiddenColumns = _.transform(ctrl.savedSearch.api_params.select, function(hiddenColumns, fieldExpr) {
-            var key = _.last(fieldExpr.split(' AS '));
-            if (!_.includes(activeColumns, key)) {
-              hiddenColumns.push(searchMeta.fieldToColumn(fieldExpr, defaults));
-            }
-          });
-          _.eachRight(activeColumns, function(key, index) {
-            if (key && !_.includes(selectAliases, key)) {
-              ctrl.display.settings.columns.splice(index, 1);
+          let activeColumns = ctrl.display.settings.columns.map(col => col.key);
+          let selectAliases = ctrl.savedSearch.api_params.select.map(selectExpr => selectToKey(selectExpr));
+          // Delete any column that is no longer in the
+          activeColumns.reverse().forEach((key, index) => {
+            if (key && !selectAliases.includes(key)) {
+              ctrl.removeCol(activeColumns.length - 1 - index);
             }
           });
         }

@@ -161,3 +161,10 @@ function _civicrm_api3_contribution_page_getlist_defaults(&$request) {
     ],
   ];
 }
+
+function _civicrm_api3_contribution_page_deprecation(): array {
+  return [
+    'submit' => 'Not recommended as reliable enough for production use. See methods in CRM_Contribute_Form_Contribution_ConfirmTest for better methods in tests.',
+    'validate' => 'Not recommended as reliable enough for production use. See methods in CRM_Contribute_Form_Contribution_ConfirmTest for better methods in tests.',
+  ];
+}

@@ -29,11 +29,11 @@
     // for date sorting see http://wiki.civicrm.org/confluence/display/CRMDOC/Sorting+Date+Fields+in+dataTables+Widget
     var useAjax = {/literal}{$useAjax}{literal},
       sourceUrl = '',
-      useClass  = 'display',
+      useClass = 'display',
       tcount = 1,
       tableId = [];
 
-    if ( useAjax ) {
+    if (useAjax) {
       {/literal}{if $sourceUrl}sourceUrl = "{$sourceUrl}";{/if}{literal}
       useClass = 'pagerDisplay';
       tcount = 5;
@@ -43,37 +43,37 @@
 
     // FIXME: Rewriting DOM ids is probably a bad idea, and could be avoided
     $('table.' + useClass).not('.dataTable').each(function() {
-      $(this).attr('id','option' + tcount + CRM.dataTableCount);
+      $(this).attr('id', 'option' + tcount + CRM.dataTableCount);
       tableId.push(CRM.dataTableCount);
       CRM.dataTableCount++;
     });
 
-    $.each(tableId, function(i,n){
+    $.each(tableId, function(i, n) {
       var tabId = '#option' + tcount + n;
-      //get the object of first tr data row.
+      // get the object of first tr data row.
       var tdObject = $(tabId + ' tr:nth(1) td');
-      var id = -1; var count = 0; var columns=''; var sortColumn = '';
-      //build columns array for sorting or not sorting
-      $(tabId + ' th').each( function( ) {
+      var id = -1; var count = 0; var columns = ''; var sortColumn = '';
+      // build columns array for sorting or not sorting
+      $(tabId + ' th').each(function() {
         var option = $(this).prop('id').split("_");
-        option  = ( option.length > 1 ) ? option[1] : option[0];
-        var stype   = 'numeric';
-        switch( option ) {
+        option = (option.length > 1) ? option[1] : option[0];
+        var stype = 'numeric';
+        switch (option) {
           case 'sortable':
-            sortColumn += '[' + count + ', "asc" ],';
-            columns += '{"sClass": "'+ getElementClass( this ) +'"},';
+            sortColumn += '[' + count + ', "{/literal}{$defaultOrderByDirection}{literal}" ],';
+            columns += '{"sClass": "' + getElementClass(this) + '"},';
             break;
           case 'date':
             stype = 'date';
           case 'order':
-            if ( $(this).attr('class') == 'sortable' ){
-              sortColumn += '[' + count + ', "asc" ],';
+            if ($(this).attr('class') == 'sortable') {
+              sortColumn += '[' + count + ', "{/literal}{$defaultOrderByDirection}{literal}" ],';
             }
-            var sortId   = getRowId(tdObject, $(this).attr('id') +' hiddenElement' );
+            var sortId = getRowId(tdObject, $(this).attr('id') + ' hiddenElement');
             columns += '{ "render": function ( data, type, row ) { return "<div style=\'display:none\'>"+ data +"</div>" + row[sortId] ; }, "targets": sortColumn,"bUseRendered": false},';
             break;
           case 'nosort':
-            columns += '{ "bSortable": false, "sClass": "'+ getElementClass( this ) +'"},';
+            columns += '{ "bSortable": false, "sClass": "' + getElementClass(this) + '"},';
             break;
           case 'currency':
             columns += '{ "sType": "currency" },';
@@ -82,8 +82,8 @@
             columns += '{"sType": "html"},';
             break;
           default:
-            if ( $(this).text() ) {
-              columns += '{"sClass": "'+ getElementClass( this ) +'"},';
+            if ($(this).text()) {
+              columns += '{"sClass": "' + getElementClass(this) + '"},';
             } else {
               columns += '{ "bSortable": false },';
             }
@@ -91,16 +91,15 @@
         }
         count++;
       });
-      // Fixme: this could be done without eval
-      columns    = columns.substring(0, columns.length - 1 );
-      sortColumn = sortColumn.substring(0, sortColumn.length - 1 );
-      eval('sortColumn =[' + sortColumn + ']');
-      eval('columns =[' + columns + ']');
+      columns = columns.substring(0, columns.length - 1);
+      sortColumn = sortColumn.substring(0, sortColumn.length - 1);
+      columns = JSON.parse('[' + columns + ']');
+      sortColumn = JSON.parse('[' + sortColumn + ']');
 
-      var noRecordFoundMsg  = {/literal}'{ts escape="js"}None found.{/ts}'{literal};
+      var noRecordFoundMsg = {/literal}'{ts escape="js"}None found.{/ts}'{literal};
 
       var oTable;
-      if ( useAjax ) {
+      if (useAjax) {
         oTable = $(tabId).dataTable({
           "iDisplayLength": 25,
           "bFilter": false,
@@ -109,17 +108,17 @@
           "aoColumns": columns,
           "bProcessing": true,
           "bJQueryUI": true,
-          "asStripClasses": [ "odd-row", "even-row" ],
+          "asStripClasses": ["odd-row", "even-row"],
           "sPaginationType": "full_numbers",
           "sDom": '<"crm-datatable-pager-top"lfp>rt<"crm-datatable-pager-bottom"ip>',
           "bServerSide": true,
           "sAjaxSource": sourceUrl,
-          "oLanguage":{
+          "oLanguage": {
             "sEmptyTable": noRecordFoundMsg,
             "sZeroRecords": noRecordFoundMsg
           },
-          "fnServerData": function ( sSource, aoData, fnCallback ) {
-            $.ajax( {
+          "fnServerData": function (sSource, aoData, fnCallback) {
+            $.ajax({
               "dataType": 'json',
               "type": "POST",
               "url": sSource,
@@ -135,12 +134,12 @@
           "bLengthChange": true,
           "bFilter": false,
           "bInfo": false,
-          "asStripClasses": [ "odd-row", "even-row" ],
+          "asStripClasses": ["odd-row", "even-row"],
           "bAutoWidth": false,
           "aoColumns": columns,
           "bSort": true,
           "sDom": 'ti',
-          "oLanguage":{
+          "oLanguage": {
             "sEmptyTable": noRecordFoundMsg,
             "sZeroRecords": noRecordFoundMsg
           }
@@ -149,23 +148,23 @@
     });
   });
 
-  //plugin to sort on currency
-  cj.fn.dataTableExt.oSort['currency-asc']  = function(a,b) {
+  // plugin to sort on currency
+  cj.fn.dataTableExt.oSort['currency-asc'] = function(a, b) {
     var symbol = "{/literal}{$defaultCurrencySymbol}{literal}";
     var x = (a == "-") ? 0 : a.replace( symbol, "" );
     var y = (b == "-") ? 0 : b.replace( symbol, "" );
-    x = parseFloat( x );
-    y = parseFloat( y );
-    return ((x < y) ? -1 : ((x > y) ?  1 : 0));
+    x = parseFloat(x);
+    y = parseFloat(y);
+    return ((x < y) ? -1 : ((x > y) ? 1 : 0));
   };
 
-  cj.fn.dataTableExt.oSort['currency-desc'] = function(a,b) {
+  cj.fn.dataTableExt.oSort['currency-desc'] = function(a, b) {
     var symbol = "{/literal}{$defaultCurrencySymbol}{literal}";
     var x = (a == "-") ? 0 : a.replace( symbol, "" );
     var y = (b == "-") ? 0 : b.replace( symbol, "" );
-    x = parseFloat( x );
-    y = parseFloat( y );
-    return ((x < y) ?  1 : ((x > y) ? -1 : 0));
+    x = parseFloat(x);
+    y = parseFloat(y);
+    return ((x < y) ? 1 : ((x > y) ? -1 : 0));
   };
 </script>
 {/literal}

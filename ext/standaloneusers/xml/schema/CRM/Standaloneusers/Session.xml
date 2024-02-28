@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Standaloneusers</base>
+  <class>Session</class>
+  <name>civicrm_session</name>
+  <comment>Standalone User Sessions</comment>
+  <log>false</log>
+
+  <field>
+    <name>id</name>
+    <type>int</type>
+    <required>true</required>
+    <comment>Unique Session ID</comment>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+
+  <field>
+    <name>session_id</name>
+    <type>char</type>
+    <length>64</length>
+    <required>true</required>
+    <comment>Hexadecimal Session Identifier</comment>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <index>
+    <fieldName>session_id</fieldName>
+    <name>index_session_id</name>
+    <unique>true</unique>
+  </index>
+
+  <field>
+    <name>data</name>
+    <type>longtext</type>
+    <comment>Session Data</comment>
+  </field>
+
+  <field>
+    <name>last_accessed</name>
+    <type>datetime</type>
+    <comment>Timestamp of the last session access</comment>
+  </field>
+
+</table>

@@ -1,6 +1,8 @@
 <?php
 
-class CRM_OAuth_BAO_OAuthContactToken extends CRM_OAuth_DAO_OAuthContactToken {
+use Civi\Api4\Event\AuthorizeRecordEvent;
+
+class CRM_OAuth_BAO_OAuthContactToken extends CRM_OAuth_DAO_OAuthContactToken implements \Civi\Core\HookInterface {
 
   /**
    * Create or update OAuthContactToken based on array-data
@@ -26,21 +28,18 @@ class CRM_OAuth_BAO_OAuthContactToken extends CRM_OAuth_DAO_OAuthContactToken {
   }
 
   /**
-   * @param string $entityName
-   * @param string $action
-   * @param array $record
-   * @param $userId
-   * @return bool
-   * @see CRM_Core_DAO::checkAccess
+   * @see \Civi\Api4\Utils\CoreUtil::checkAccessRecord
    */
-  public static function _checkAccess(string $entityName, string $action, array $record, $userId): bool {
+  public static function self_civi_api4_authorizeRecord(AuthorizeRecordEvent $e): void {
+    $record = $e->getRecord();
+    $userId = $e->getUserID();
     try {
       $record['check_permissions'] = TRUE;
       self::fillAndValidate($record, $userId);
-      return TRUE;
+      $e->setAuthorized(TRUE);
     }
-    catch (\Civi\API\Exception\UnauthorizedException $e) {
-      return FALSE;
+    catch (\Civi\API\Exception\UnauthorizedException $exception) {
+      $e->setAuthorized(FALSE);
     }
   }
 

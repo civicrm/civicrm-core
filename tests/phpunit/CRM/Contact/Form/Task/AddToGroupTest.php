@@ -11,28 +11,16 @@
 
 use Civi\Api4\Group;
 use Civi\Api4\GroupContact;
+use Civi\Test\FormTrait;
 
 /**
  * @group headless
  */
 class CRM_Contact_Form_Task_AddToGroupTest extends CiviUnitTestCase {
+  use FormTrait;
 
   /**
-   * @param array $formValues
-   * @return CRM_Contact_Form_Task_AddToGroup
-   */
-  protected function getSearchTaskFormObject(array $formValues): CRM_Contact_Form_Task_AddToGroup {
-    $_POST = $formValues;
-    $_SERVER['REQUEST_METHOD'] = 'GET';
-    $form = new CRM_Contact_Form_Task_AddToGroup();
-    $form->controller = new CRM_Contact_Controller_Search();
-    $form->controller->setStateMachine(new CRM_Core_StateMachine($form->controller));
-    $_SESSION['_' . $form->controller->_name . '_container']['values']['Advanced'] = $formValues;
-    return $form;
-  }
-
-  /**
-   * Test delete to trash.
+   * Test add to existing group.
    *
    * @throws \CRM_Core_Exception
    */
@@ -42,19 +30,17 @@ class CRM_Contact_Form_Task_AddToGroupTest extends CiviUnitTestCase {
       'first_name' => 'John',
       'last_name' => 'Doe',
     ]);
-    $contactId = $contact['id'];
     $existingGroupId = $this->groupCreate();
-    $form = $this->getSearchTaskFormObject(['cids' => $contactId, 'group_option' => 0, 'group_id' => $existingGroupId]);
-    $form->preProcess();
-    $form->_contactIds = [$contactId];
-    $form->set('_componentIds', [$contactId]);
-    $form->buildQuickForm();
-    $form->setDefaultValues();
-    $form->postProcess();
-
+    $form = $this->getTestForm('CRM_Contact_Form_Search_Basic', ['radio_ts' => 'ts_all'])
+      ->addSubsequentForm('CRM_Contact_Form_Task_AddToGroup', [
+        'group_option' => 0,
+        'group_id' => $existingGroupId,
+      ]);
+    $form->processForm();
     $groupCount = GroupContact::get()
       ->addWhere('group_id', '=', $existingGroupId)
       ->addWhere('status', '=', 'Added')
+      ->addWhere('contact_id', '=', $contact['id'])
       ->execute()
       ->count();
     $this->assertEquals(1, $groupCount);
@@ -71,24 +57,24 @@ class CRM_Contact_Form_Task_AddToGroupTest extends CiviUnitTestCase {
       'first_name' => 'Pete',
       'last_name' => 'Johnson',
     ]);
-    $contactId = $contact['id'];
+
     $customGroup = $this->customGroupCreate(['extends' => 'Group']);
     $customField = $this->customFieldCreate(['custom_group_id' => $customGroup['id']]);
     $customFieldId = $customField['id'];
 
-    $form = $this->getSearchTaskFormObject([
-      'cids' => $contactId,
-      'group_option' => 1,
-      'title' => 'Test Group With Custom Field',
-      'description' => '',
-      'custom_' . $customFieldId => 'Custom Value ABC',
-    ]);
-    $form->preProcess();
-    $form->_contactIds = [$contactId];
-    $form->set('_componentIds', [$contactId]);
-    $form->buildQuickForm();
-    $form->setDefaultValues();
-    $form->postProcess();
+    $form = $this->getTestForm(
+      'CRM_Contact_Form_Search_Basic',
+      ['radio_ts' => 'ts_all']
+    )->addSubsequentForm(
+      'CRM_Contact_Form_Task_AddToGroup',
+      [
+        'group_option' => 1,
+        'title' => 'Test Group With Custom Field',
+        'description' => '',
+        'custom_' . $customFieldId => 'Custom Value ABC',
+      ]
+    );
+    $form->processForm();
 
     $group = Group::get()
       ->addSelect('custom.*', 'id')
@@ -102,6 +88,7 @@ class CRM_Contact_Form_Task_AddToGroupTest extends CiviUnitTestCase {
     $groupCount = GroupContact::get()
       ->addWhere('group_id', '=', $group['id'])
       ->addWhere('status', '=', 'Added')
+      ->addWhere('contact_id', '=', $contact['id'])
       ->execute()
       ->count();
     $this->assertEquals(1, $groupCount);

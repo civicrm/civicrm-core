@@ -426,7 +426,7 @@ class CRM_Contact_Form_Edit_Address {
       CRM_Contact_Form_Edit_Address::storeRequiredCustomDataInfo($form, $groupTree);
 
       $tplGroupTree = CRM_Core_Smarty::singleton()
-        ->get_template_vars('address_groupTree');
+        ->getTemplateVars('address_groupTree');
       $tplGroupTree = empty($tplGroupTree) ? [] : $tplGroupTree;
 
       $form->assign('address_groupTree', $tplGroupTree + [$blockId => $groupTree]);

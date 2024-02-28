@@ -45,58 +45,38 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
 
   /**
    * @inheritDoc
-   * Provides permissions that are used by component.
-   * Needs to be implemented in component's information
-   * class.
-   *
-   * NOTE: if using conditionally permission return,
-   * implementation of $getAllUnconditionally is required.
-   *
-   * @param bool $getAllUnconditionally
-   * @param bool $descriptions
-   *   Whether to return permission descriptions
-   *
-   * @return array|null
-   *   collection of permissions, null if none
    */
-  public function getPermissions($getAllUnconditionally = FALSE, $descriptions = FALSE) {
+  public function getPermissions(): array {
     $permissions = [
       'access CiviReport' => [
-        ts('access CiviReport'),
-        ts('View reports'),
+        'label' => ts('access CiviReport'),
+        'description' => ts('View reports'),
       ],
       'access Report Criteria' => [
-        ts('access Report Criteria'),
-        ts('Change report search criteria'),
+        'label' => ts('access Report Criteria'),
+        'description' => ts('Change report search criteria'),
       ],
       'save Report Criteria' => [
-        ts('save Report Criteria'),
-        ts('Save report search criteria'),
+        'label' => ts('save Report Criteria'),
+        'description' => ts('Save report search criteria'),
       ],
       'administer private reports' => [
-        ts('administer private reports'),
-        ts('Edit all private reports'),
+        'label' => ts('administer private reports'),
+        'description' => ts('Edit all private reports'),
       ],
       'administer reserved reports' => [
-        ts('administer reserved reports'),
-        ts('Edit all reports that have been marked as reserved'),
+        'label' => ts('administer reserved reports'),
+        'description' => ts('Edit all reports that have been marked as reserved'),
       ],
       'administer Reports' => [
-        ts('administer Reports'),
-        ts('Manage report templates'),
+        'label' => ts('administer Reports'),
+        'description' => ts('Manage report templates'),
       ],
       'view report sql' => [
-        ts('view report sql'),
-        ts('View sql used in CiviReports'),
+        'label' => ts('view report sql'),
+        'description' => ts('View sql used in CiviReports'),
       ],
     ];
-
-    if (!$descriptions) {
-      foreach ($permissions as $name => $attr) {
-        $permissions[$name] = array_shift($attr);
-      }
-    }
-
     return $permissions;
   }
 

@@ -99,16 +99,25 @@ class Joinable {
    *
    * @param string $baseTableAlias
    * @param string $targetTableAlias
+   * @param array|null $openJoin
    *
    * @return array
    */
-  public function getConditionsForJoin(string $baseTableAlias, string $targetTableAlias) {
+  public function getConditionsForJoin(string $baseTableAlias, string $targetTableAlias, ?array $openJoin) {
     $conditions = [];
+    $baseColumn = $this->baseColumn;
+    // Joining within a bridge, use the bridge table key instead,
+    // because the custom fields are joined first and the base entity might not be added yet.
+    if (!empty($openJoin['bridgeKey']) && $baseTableAlias === $openJoin['alias']) {
+      $conditions = $openJoin['bridgeCondition'];
+      $baseTableAlias = $openJoin['bridgeAlias'];
+      $baseColumn = $openJoin['bridgeKey'];
+    }
     if ($this->baseColumn && $this->targetColumn) {
       $conditions[] = sprintf(
         '`%s`.`%s` =  `%s`.`%s`',
         $baseTableAlias,
-        $this->baseColumn,
+        $baseColumn,
         $targetTableAlias,
         $this->targetColumn
       );
@@ -302,40 +311,22 @@ class Joinable {
     return get_object_vars($this);
   }
 
-  /**
-   * @return \Civi\Api4\Service\Spec\RequestSpec
-   */
-  public function getEntityFields() {
+  public function getEntityFields(): array {
+    $entityFields = [];
     /** @var \Civi\Api4\Service\Spec\SpecGatherer $gatherer */
     $gatherer = \Civi::container()->get('spec_gatherer');
-    $spec = $gatherer->getSpec($this->entity, 'get', FALSE);
-    // Serialized fields require a specialized join
-    if ($this->serialize) {
-      foreach ($spec as $field) {
-        // The callback function expects separated values as output
-        $field->setSerialize(\CRM_Core_DAO::SERIALIZE_SEPARATOR_TRIMMED);
-        $field->setSqlRenderer(['Civi\Api4\Query\Api4SelectQuery', 'renderSerializedJoin']);
+    $allFields = $gatherer->getAllFields($this->entity, 'get');
+    foreach ($allFields as $field) {
+      if ($field['table_name'] === $this->targetTable) {
+        // Serialized fields require a specialized join
+        if ($this->serialize) {
+          $field['serialize'] = \CRM_Core_DAO::SERIALIZE_SEPARATOR_TRIMMED;
+          $field['sql_renderer'] = ['Civi\Api4\Query\Api4SelectQuery', 'renderSerializedJoin'];
+        }
+        $entityFields[] = $field;
       }
     }
-    return $spec;
-  }
-
-  /**
-   * @return array
-   */
-  public function getEntityFieldNames() {
-    $fieldNames = [];
-    foreach ($this->getEntityFields() as $fieldSpec) {
-      $fieldNames[] = $fieldSpec->getName();
-    }
-    return $fieldNames;
-  }
-
-  /**
-   * @return \Civi\Api4\Service\Spec\FieldSpec|NULL
-   */
-  public function getField($fieldName) {
-    return $this->getEntityFields()->getFieldByName($fieldName);
+    return $entityFields;
   }
 
 }

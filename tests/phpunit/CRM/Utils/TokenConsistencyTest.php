@@ -345,15 +345,28 @@ Czech Republic
    */
   public function testLocationTokens(): void {
     $contactID = $this->individualCreate(['email' => 'me@example.com']);
-    Address::create()->setValues([
+    $this->createTestEntity('Address', [
       'contact_id' => $contactID,
       'is_primary' => TRUE,
       'street_address' => 'Heartbreak Hotel',
       'supplemental_address_1' => 'Lonely Street',
-    ])->execute();
-    $text = '{contact.first_name} {contact.email_primary.email} {contact.address_primary.street_address}';
-    $text = $this->renderText(['contactId' => $contactID], $text);
-    $this->assertEquals('Anthony me@example.com Heartbreak Hotel', $text);
+      'state_province_id:name' => 'New York',
+    ], 'primary');
+
+    $this->createTestEntity('Address', [
+      'contact_id' => $contactID,
+      'is_billing' => TRUE,
+      'street_address' => 'Heartbreak Motel',
+      'supplemental_address_1' => 'Lonely Avenue',
+      'country_id:name' => 'United States',
+      'state_province_id:name' => 'California',
+    ], 'billing');
+    $template = '{contact.first_name} {contact.email_primary.email} {contact.address_primary.street_address} {contact.address_billing.supplemental_address_1} {contact.address_billing.state_province_id:abbr}';
+    $text = $this->renderText(['contactId' => $contactID], $template);
+    $this->assertEquals('Anthony me@example.com Heartbreak Hotel Lonely Avenue CA', $text);
+    Address::delete()->addWhere('id', '=', $this->ids['Address']['billing'])->execute();
+    $text = $this->renderText(['contactId' => $contactID], $template);
+    $this->assertEquals('Anthony me@example.com Heartbreak Hotel Lonely Street NY', $text);
   }
 
   /**
@@ -709,7 +722,7 @@ contribution_recur.payment_instrument_id:name :Check
     return "participant.status_id :2
 participant.role_id :1
 participant.register_date :February 19th, 2007
-participant.source :Wimbeldon
+participant.source :Wimbledon
 participant.fee_level :steep
 participant.fee_amount :$50.00
 participant.registered_by_id :

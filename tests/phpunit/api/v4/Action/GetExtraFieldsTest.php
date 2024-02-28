@@ -24,6 +24,7 @@ use Civi\Api4\Activity;
 use Civi\Api4\Address;
 use Civi\Api4\Contact;
 use Civi\Api4\Household;
+use Civi\Api4\Individual;
 use Civi\Api4\Tag;
 
 /**
@@ -60,6 +61,16 @@ class GetExtraFieldsTest extends Api4TestBase {
     $this->assertTrue($householdFields['contact_type']['readonly']);
     $this->assertArrayNotHasKey('first_name', $householdFields);
     $this->assertArrayHasKey('household_name', $householdFields);
+  }
+
+  public function testContactPseudoEntityGetFields(): void {
+    $individualFields = (array) Individual::getFields(FALSE)
+      ->execute()->indexBy('name');
+    $this->assertArrayNotHasKey('sic_code', $individualFields);
+    $this->assertArrayNotHasKey('contact_type', $individualFields);
+    $this->assertArrayHasKey('last_name', $individualFields);
+    $this->assertEquals('Individual', $individualFields['birth_date']['entity']);
+    $this->assertEquals('Individual', $individualFields['age_years']['entity']);
   }
 
   public function testGetOptionsAddress(): void {

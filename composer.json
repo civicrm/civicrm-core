@@ -2,7 +2,7 @@
   "name": "civicrm/civicrm-core",
   "description": "Open source constituent relationship management for non-profits, NGOs and advocacy organizations.",
   "type": "library",
-  "license": "AGPL-3.0",
+  "license": "AGPL-3.0-or-later",
   "authors": [
     {
       "name": "Coleman Watts",
@@ -76,7 +76,7 @@
     "pear/auth_sasl": "1.1.0",
     "pear/net_smtp": "1.10.*",
     "pear/net_socket": "1.0.*",
-    "pear/mail": "^1.5",
+    "pear/mail": "^2.0",
     "guzzlehttp/guzzle": "^6.3 || ^7.3",
     "psr/simple-cache": "~1.0.1",
     "cweagans/composer-patches": "~1.0",
@@ -85,14 +85,14 @@
     "civicrm/composer-downloads-plugin": "^3.0",
     "league/csv": "~9.7.4",
     "league/oauth2-client": "^2.4",
-    "league/oauth2-google": "^3.0",
+    "league/oauth2-google": "^3.0 || ^4.0",
     "tplaner/when": "~3.1",
     "xkerman/restricted-unserialize": "~1.1",
     "typo3/phar-stream-wrapper": "^2 || ^3.0",
     "brick/money": "~0.5",
     "ext-intl": "*",
     "pear/mail_mime": "~1.10",
-    "pear/db": "1.11",
+    "pear/db": "~1.12.1",
     "civicrm/composer-compile-lib": "~0.6 || ~1.0",
     "ext-json": "*",
     "ezyang/htmlpurifier": "^4.13",
@@ -102,7 +102,9 @@
     "symfony/polyfill-php82": "^1.0",
     "soundasleep/html2text": "^2.1",
     "psr/container": "~1.0 || ~2.0",
-    "ext-fileinfo": "*"
+    "ext-fileinfo": "*",
+    "pontedilana/php-weasyprint": "^0.13.0",
+    "knplabs/knp-snappy": "^1.4"
   },
   "scripts": {
     "post-install-cmd": [
@@ -246,9 +248,6 @@
         "url": "https://github.com/lodash/lodash-compat/archive/3.0.1.zip",
         "ignore": [".*", "*.log", "*.md", "component.json", "package.json", "node_modules"]
       },
-      "phantomjs-polyfill": {
-        "url": "https://github.com/conversocial/phantomjs-polyfill/archive/v0.0.2.zip"
-      },
       "select2": {
         "url": "https://github.com/colemanw/select2/archive/v3.5-civicrm-1.0.zip"
       },
@@ -265,14 +264,13 @@
         "ignore": ["examples"]
       }
     },
+    "patches-comments": "For information about defining patches via composer.json, see https://docs.civicrm.org/dev/en/latest/core/dependencies/",
     "patches": {
       "adrienrn/php-mimetyper": {
         "Update gitignore to ensure that sites that manage via git don't miss out on the important db.json file": "https://patch-diff.githubusercontent.com/raw/adrienrn/php-mimetyper/pull/15.patch",
         "Apply patch to fix php8.2 deprecation notice on dynamic property $filename": "https://patch-diff.githubusercontent.com/raw/adrienrn/php-mimetyper/pull/17.patch"
       },
       "pear/db": {
-        "Apply patch to ensure that MySQLI reporting remains the same in php8.1": "https://patch-diff.githubusercontent.com/raw/pear/DB/pull/13.patch",
-        "Apply patch to fix deprecations in php8.2": "https://patch-diff.githubusercontent.com/raw/pear/DB/pull/14.patch",
         "Apply CiviCRM Customisations for the pear:db package": "https://raw.githubusercontent.com/civicrm/civicrm-core/2ad420c394/tools/scripts/composer/pear_db_civicrm_changes.patch"
       },
       "pear/log": {

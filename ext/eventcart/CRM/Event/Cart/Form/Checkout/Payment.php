@@ -309,11 +309,12 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
   public function emailReceipt($events_in_cart, $params) {
     $contact_details = CRM_Contact_BAO_Contact::getContactDetails($this->payer_contact_id);
     $state_province = new CRM_Core_DAO_StateProvince();
-    $state_province->id = $params["billing_state_province_id-{$this->_bltID}"];
+    $billingID = CRM_Core_BAO_LocationType::getBilling();
+    $state_province->id = $params["billing_state_province_id-{$billingID}"];
     $state_province->find();
     $state_province->fetch();
     $country = new CRM_Core_DAO_Country();
-    $country->id = $params["billing_country_id-{$this->_bltID}"];
+    $country->id = $params["billing_country_id-{$billingID}"];
     $country->find();
     $country->fetch();
     foreach ($this->line_items as & $line_item) {
@@ -331,15 +332,14 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
       'toName' => $contact_details[0],
       'tplParams' => [
         'billing_name' => "{$params['billing_first_name']} {$params['billing_last_name']}",
-        'billing_city' => $params["billing_city-{$this->_bltID}"],
+        'billing_city' => $params["billing_city-{$billingID}"],
         'billing_country' => $country->name,
-        'billing_postal_code' => $params["billing_postal_code-{$this->_bltID}"],
+        'billing_postal_code' => $params["billing_postal_code-{$billingID}"],
         'billing_state' => $state_province->abbreviation,
-        'billing_street_address' => $params["billing_street_address-{$this->_bltID}"],
+        'billing_street_address' => $params["billing_street_address-{$billingID}"],
         'credit_card_exp_date' => $params['credit_card_exp_date'],
         'credit_card_type' => $params['credit_card_type'],
         'credit_card_number' => "************" . substr($params['credit_card_number'], -4, 4),
-        // XXX cart->get_discounts
         'discounts' => $this->discounts,
         'email' => $contact_details[1],
         'events_in_cart' => $events_in_cart,
@@ -409,7 +409,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
   public function postProcess() {
     $trxnDetails = NULL;
     $params = $this->_submitValues;
-
+    $billingID = CRM_Core_BAO_LocationType::getBilling();
     $main_participants = $this->cart->get_main_event_participants();
 
     $transaction = new CRM_Core_Transaction();
@@ -439,18 +439,18 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
         "billing_first_name" => 1,
         "billing_middle_name" => 1,
         "billing_last_name" => 1,
-        "billing_street_address-{$this->_bltID}" => 1,
-        "billing_city-{$this->_bltID}" => 1,
-        "billing_state_province_id-{$this->_bltID}" => 1,
-        "billing_postal_code-{$this->_bltID}" => 1,
-        "billing_country_id-{$this->_bltID}" => 1,
-        "address_name-{$this->_bltID}" => 1,
-        "email-{$this->_bltID}" => 1,
+        "billing_street_address-{$billingID}" => 1,
+        "billing_city-{$billingID}" => 1,
+        "billing_state_province_id-{$billingID}" => 1,
+        "billing_postal_code-{$billingID}" => 1,
+        "billing_country_id-{$billingID}" => 1,
+        "address_name-{$billingID}" => 1,
+        "email-{$billingID}" => 1,
       ];
 
-      $params["address_name-{$this->_bltID}"] = CRM_Utils_Array::value('billing_first_name', $params) . ' ' . CRM_Utils_Array::value('billing_middle_name', $params) . ' ' . CRM_Utils_Array::value('billing_last_name', $params);
+      $params["address_name-{$billingID}"] = CRM_Utils_Array::value('billing_first_name', $params) . ' ' . CRM_Utils_Array::value('billing_middle_name', $params) . ' ' . CRM_Utils_Array::value('billing_last_name', $params);
 
-      $params["email-{$this->_bltID}"] = $params['billing_contact_email'];
+      $params["email-{$billingID}"] = $params['billing_contact_email'];
       CRM_Contact_BAO_Contact::createProfileContact(
         $params,
         $billing_fields,
@@ -555,7 +555,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     $params['currencyID'] = CRM_Core_Config::singleton()->defaultCurrency;
 
     $payment = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
-    CRM_Core_Payment_Form::mapParams($this->_bltID, $params, $params, TRUE);
+    CRM_Core_Payment_Form::mapParams(NULL, $params, $params, TRUE);
 
     try {
       $result = $payment->doPayment($params);
@@ -655,7 +655,8 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     $default_country = new CRM_Core_DAO_Country();
     $default_country->iso_code = CRM_Core_BAO_Country::defaultContactCountry();
     $default_country->find(TRUE);
-    $defaults["billing_country_id-{$this->_bltID}"] = $default_country->id;
+    $billingID = CRM_Core_BAO_LocationType::getBilling();
+    $defaults["billing_country_id-{$billingID}"] = $default_country->id;
 
     if (self::getContactID()) {
       $params = ['id' => self::getContactID()];
@@ -681,11 +682,11 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
       $billing_address = CRM_Event_Cart_BAO_MerParticipant::billing_address_from_contact($contact);
 
       if ($billing_address != NULL) {
-        $defaults["billing_street_address-{$this->_bltID}"] = $billing_address['street_address'];
-        $defaults["billing_city-{$this->_bltID}"] = $billing_address['city'];
-        $defaults["billing_postal_code-{$this->_bltID}"] = $billing_address['postal_code'];
-        $defaults["billing_state_province_id-{$this->_bltID}"] = $billing_address['state_province_id'];
-        $defaults["billing_country_id-{$this->_bltID}"] = $billing_address['country_id'];
+        $defaults["billing_street_address-{$billingID}"] = $billing_address['street_address'];
+        $defaults["billing_city-{$billingID}"] = $billing_address['city'];
+        $defaults["billing_postal_code-{$billingID}"] = $billing_address['postal_code'];
+        $defaults["billing_state_province_id-{$billingID}"] = $billing_address['state_province_id'];
+        $defaults["billing_country_id-{$billingID}"] = $billing_address['country_id'];
       }
     }
 

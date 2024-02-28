@@ -170,6 +170,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       $defaults['note_columns'] = 60;
       $defaults['note_rows'] = 4;
       $defaults['is_view'] = 0;
+      $defaults['fk_entity_on_delete'] = CRM_Core_DAO_CustomField::fields()['fk_entity_on_delete']['default'];
 
       if (CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'is_multiple')) {
         $defaults['in_selector'] = 1;
@@ -193,7 +194,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
    */
   public function buildQuickForm() {
     if ($this->_gid) {
-      $this->_title = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'title');
+      $this->_title = CRM_Core_BAO_CustomGroup::getGroup(['id' => $this->_gid])['title'];
       $this->setTitle($this->_title . ' - ' . ($this->_id ? ts('Edit Field') : ts('New Field')));
     }
     $this->assign('gid', $this->_gid);
@@ -237,6 +238,8 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       'entity' => 'Entity',
       'select' => ['minimumInputLength' => 0],
     ]);
+
+    $this->addField('fk_entity_on_delete');
 
     $isUpdateAction = $this->_action == CRM_Core_Action::UPDATE;
     if ($isUpdateAction) {
@@ -826,7 +829,7 @@ AND    option_group_id = %2";
           $options = array_map(['CRM_Core_DAO', 'escapeString'], array_filter($fields['option_value'], 'strlen'));
           $optionQuery = '"' . implode('","', $options) . '"';
         }
-        $table = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $self->_gid, 'table_name');
+        $table = CRM_Core_BAO_CustomGroup::getGroup(['id' => $self->_gid])['table_name'];
         $column = $self->_values['column_name'];
         $invalid = CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM `$table` WHERE `$column` NOT IN ($optionQuery)");
         if ($invalid) {
@@ -944,7 +947,7 @@ AND    option_group_id = %2";
    * @throws CRM_Core_Exception
    */
   public function getMultiValueCount() {
-    $table = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'table_name');
+    $table = CRM_Core_BAO_CustomGroup::getGroup(['id' => $this->_gid])['table_name'];
     $column = $this->_values['column_name'];
     $sp = CRM_Core_DAO::VALUE_SEPARATOR;
     $sql = "SELECT COUNT(*) FROM `$table` WHERE `$column` LIKE '{$sp}%{$sp}%{$sp}'";

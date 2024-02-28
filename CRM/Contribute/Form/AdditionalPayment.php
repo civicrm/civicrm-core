@@ -24,6 +24,7 @@ use Civi\Payment\Exception\PaymentProcessorException;
 class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_AbstractEditPayment {
   use CRM_Contact_Form_ContactFormTrait;
   use CRM_Contribute_Form_ContributeFormTrait;
+  use CRM_Event_Form_EventFormTrait;
 
   /**
    * Id of the component entity
@@ -83,9 +84,17 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $this->assign('component', $this->_component);
     $this->assign('id', $this->_id);
     $this->assign('suppressPaymentFormButtons', $this->isBeingCalledFromSelectorContext());
-
-    if ($this->_view === 'transaction' && ($this->_action & CRM_Core_Action::BROWSE)) {
-      $title = $this->assignPaymentInfoBlock();
+    $isShowPayments = $this->isViewMode();
+    $this->assign('transaction', $isShowPayments);
+    if ($isShowPayments) {
+      $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->getContributionID(), 'contribution', TRUE);
+      $this->assign('payments', $paymentInfo['transaction'] ?? NULL);
+      $this->assign('paymentLinks', $paymentInfo['payment_links']);
+      $title = ts('View Payment');
+      if (!empty($this->_component) && $this->_component === 'event') {
+        $info = CRM_Event_BAO_Participant::participantDetails($this->_id);
+        $title .= " - {$info['title']}";
+      }
       $this->setTitle($title);
       return;
     }
@@ -139,8 +148,8 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
    * @return array
    * @throws \CRM_Core_Exception
    */
-  public function setDefaultValues() {
-    if ($this->_view === 'transaction' && ($this->_action & CRM_Core_Action::BROWSE)) {
+  public function setDefaultValues(): ?array {
+    if ($this->isViewMode()) {
       return NULL;
     }
     $defaults = [];
@@ -215,16 +224,9 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $this->add('textarea', 'receipt_text', ts('Confirmation Message'));
 
     $this->addField('trxn_date', ['entity' => 'FinancialTrxn', 'label' => $this->isARefund() ? ts('Refund Date') : ts('Contribution Date'), 'context' => 'Contribution'], FALSE, FALSE);
+    $this->assign('eventName', $this->getEventValue('title'));
 
-    if ($this->_contactId && $this->_id) {
-      if ($this->_component === 'event') {
-        $eventId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $this->_id, 'event_id', 'id');
-        $event = CRM_Event_BAO_Event::getEvents(0, $eventId);
-        $this->assign('eventName', $event[$eventId]);
-      }
-    }
-
-    $this->assign('displayName', $this->_contributorDisplayName);
+    $this->assign('displayName', $this->getContactValue('display_name'));
     $this->assign('component', $this->_component);
     $this->assign('email', $this->_contributorEmail);
 
@@ -235,7 +237,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
       $this->add('select', 'payment_instrument_id',
         ts('Payment Method'),
-        ['' => ts('- select -')] + CRM_Contribute_PseudoConstant::paymentInstrument(),
+        ['' => ts('- select -')] + CRM_Contribute_BAO_Contribution::buildOptions('payment_instrument_id', 'create', ['filter' => 0]),
         TRUE,
         ['onChange' => "return showHideByValue('payment_instrument_id','4','checkNumber','table-row','select',false);", 'class' => 'crm-select2']
       );
@@ -295,13 +297,9 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
   public function postProcess() {
     $submittedValues = $this->controller->exportValues($this->_name);
     $this->submit($submittedValues);
-    $childTab = 'contribute';
-    if ($this->_component === 'event') {
-      $childTab = 'participant';
-    }
     $session = CRM_Core_Session::singleton();
     $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view',
-      "reset=1&cid={$this->_contactId}&selectedChild={$childTab}"
+      "reset=1&cid={$this->_contactId}&selectedChild=" . $this->getParticipantID() ? 'participant' : 'contribute'
     ));
   }
 
@@ -319,7 +317,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
         ($this->_mode === 'test')
       );
     }
-    $this->assign('displayName', $this->getContactValue('display_name'));
 
     $paymentResult = [];
     if ($this->_mode) {
@@ -381,7 +378,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     // we need to retrieve email address
     if ($this->_context === 'standalone' && $this->getSubmittedValue('is_email_receipt')) {
       [$displayName] = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactId);
-      $this->assign('displayName', $displayName);
     }
 
     // at this point we've created a contact and stored its address etc
@@ -540,12 +536,37 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
   }
 
   /**
+   * Get the relevant participant ID, if any, in use.
+   *
+   * @return int
+   *
+   * @api supported for external use.
+   *
+   * @noinspection PhpDocMissingThrowsInspection
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  public function getParticipantID(): ?int {
+    if (CRM_Utils_Request::retrieve('component', 'String', $this, FALSE, 'contribution') !== 'event') {
+      return NULL;
+    }
+    return (int) CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
+  }
+
+  /**
    * Get the payment processor ID.
    *
    * @return int
    */
   public function getPaymentProcessorID(): int {
     return (int) ($this->getSubmittedValue('payment_processor_id') ?: $this->_paymentProcessor['id']);
+  }
+
+  /**
+   * @return bool
+   */
+  public function isViewMode(): bool {
+    $isShowPayments = $this->_view === 'transaction' && ($this->_action & CRM_Core_Action::BROWSE);
+    return $isShowPayments;
   }
 
 }

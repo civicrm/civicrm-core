@@ -22,10 +22,49 @@
 class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_Registration {
 
   /**
-   * Pre-registered additional participant id.
+   * Additional participant id.
+   *
    * @var int
+   * @internal
    */
-  public $additionalParticipantId = NULL;
+  public $_additionalParticipantId = NULL;
+
+  /**
+   * Tracks whether we are at the last participant.
+   *
+   * @var bool
+   * @internal
+   */
+  public $_lastParticipant = FALSE;
+
+  /**
+   * @var bool
+   * @internal
+   */
+  public $_resetAllowWaitlist = FALSE;
+
+  /**
+   * @var int
+   * @internal
+   */
+  public $_contactId;
+
+  /**
+   * Used within CRM_Event_Form_EventFees
+   *
+   * @var int
+   * @internal
+   */
+  public $_discountId;
+
+  /**
+   * Alias of $this->_additionalParticipantId,
+   * Used within CRM_Event_Form_EventFees
+   *
+   * @var int
+   * @internal
+   */
+  public $_pId;
 
   /**
    * Get the active UFGroups (profiles) on this form
@@ -51,10 +90,11 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
    * Set variables up before form is built.
    *
    * @return void
+   * @throws CRM_Core_Exception
    */
   public function preProcess() {
     parent::preProcess();
-
+    $this->addExpectedSmartyVariable('additionalCustomPost');
     $participantNo = substr($this->_name, 12);
 
     //lets process in-queue participants.
@@ -64,14 +104,11 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
 
     $participantCnt = $participantNo + 1;
     $this->assign('formId', $participantNo);
-    $this->_params = [];
     $this->_params = $this->get('params');
 
     $participantTot = $this->_params[0]['additional_participants'] + 1;
     $skipCount = count(array_keys($this->_params, "skip"));
-    if ($skipCount) {
-      $this->assign('skipCount', $skipCount);
-    }
+    $this->assign('skipCount', $skipCount);
     $this->setTitle(ts('Register Participant %1 of %2', [1 => $participantCnt, 2 => $participantTot]));
 
     //CRM-4320, hack to check last participant.
@@ -102,15 +139,15 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
       }
     }
     if ($this->_priceSetId) {
-      foreach ($this->_feeBlock as $key => $val) {
+      foreach ($this->getPriceFieldMetaData() as $key => $val) {
         if (empty($val['options'])) {
           continue;
         }
 
-        $optionsFull = CRM_Utils_Array::value('option_full_ids', $val, []);
+        $optionsFull = $this->getOptionFullPriceFieldValues($val);
         foreach ($val['options'] as $keys => $values) {
           if ($values['is_default'] && !in_array($keys, $optionsFull)) {
-            if ($val['html_type'] == 'CheckBox') {
+            if ($val['html_type'] === 'CheckBox') {
               $defaults["price_{$key}"][$keys] = 1;
             }
             else {
@@ -179,8 +216,9 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     $button = substr($this->controller->getButtonName(), -4);
 
     if ($this->_values['event']['is_monetary']) {
-      CRM_Event_Form_Registration_Register::buildAmount($this, TRUE, NULL, $this->_priceSetId);
+      $this->buildAmount(TRUE, NULL, $this->_priceSetId);
     }
+    $this->assign('priceSet', $this->_priceSet);
 
     //Add pre and post profiles on the form.
     foreach (['pre', 'post'] as $keys) {
@@ -207,7 +245,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
 
     if ($this->_lastParticipant || $pricesetFieldsCount) {
       //get the participant total.
-      $processedCnt = self::getParticipantCount($this, $this->_params, TRUE);
+      $processedCnt = $this->getParticipantCount($this->_params, TRUE);
     }
 
     if (!$this->_allowConfirmation && !empty($this->_params[0]['bypass_payment']) &&
@@ -285,8 +323,10 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
       }
     }
 
+    // Assign false & maybe overwrite with TRUE below.
+    $this->assign('allowGroupOnWaitlist', FALSE);
     // for priceset with count
-    if ($pricesetFieldsCount && !empty($this->_values['event']['has_waitlist']) &&
+    if ($pricesetFieldsCount && $this->getEventValue('has_waitlist') &&
       !$this->_allowConfirmation
     ) {
 
@@ -395,7 +435,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
       $realPayLater = $self->_params[0]['is_pay_later'] ?? NULL;
     }
 
-    if ($button != 'skip') {
+    if ($button !== 'skip') {
       //Check that either an email or firstname+lastname is included in the form(CRM-9587)
       CRM_Event_Form_Registration_Register::checkProfileComplete($fields, $errors, $self->_eventId);
 
@@ -458,10 +498,10 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
 
         //format current participant params.
         $allParticipantParams[$addParticipantNum] = self::formatPriceSetParams($self, $fields);
-        $totalParticipants = self::getParticipantCount($self, $allParticipantParams);
+        $totalParticipants = $self->getParticipantCount($allParticipantParams);
 
         //validate price field params.
-        $priceSetErrors = self::validatePriceSet($self, $allParticipantParams);
+        $priceSetErrors = $self->validatePriceSet($allParticipantParams, $self->get('priceSetId'), $self->get('priceSet'));
         $errors = array_merge($errors, CRM_Utils_Array::value($addParticipantNum, $priceSetErrors, []));
 
         if (!$self->_allowConfirmation &&
@@ -618,13 +658,13 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     ) {
       $this->_allowWaitlist = FALSE;
       //get the current page count.
-      $currentCount = self::getParticipantCount($this, $params);
-      if ($button == 'skip') {
+      $currentCount = $this->getParticipantCount($params);
+      if ($button === 'skip') {
         $currentCount = 'skip';
       }
 
       //get the total count.
-      $previousCount = self::getParticipantCount($this, $this->_params, TRUE);
+      $previousCount = $this->getParticipantCount($this->_params, TRUE);
       $totalParticipants = $previousCount;
       if (is_numeric($currentCount)) {
         $totalParticipants += $currentCount;
@@ -721,7 +761,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     }
 
     $participantNo = count($this->_params);
-    if ($button != 'skip') {
+    if ($button !== 'skip') {
       $statusMsg = ts('Registration information for participant %1 has been saved.', [1 => $participantNo]);
       CRM_Core_Session::setStatus($statusMsg, ts('Registration Saved'), 'success');
     }
@@ -760,7 +800,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
    * @param bool $isButtonJs
    *
    * @return bool
-   *   ture on success.
+   *   true on success.
    */
   public function isLastParticipant($isButtonJs = FALSE) {
     $participant = $isButtonJs ? $this->_params[0]['additional_participants'] : $this->_params[0]['additional_participants'] + 1;

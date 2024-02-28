@@ -123,7 +123,7 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
    * (currently CRM_Utils_Invoicing) with a view to possible removal from core.
    */
   public function isIncludeInvoiceLinks() {
-    if (!CRM_Invoicing_Utils::isInvoicingEnabled()) {
+    if (!\Civi::settings()->get('invoicing')) {
       return FALSE;
     }
     $dashboardOptions = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,

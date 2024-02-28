@@ -21,7 +21,7 @@
   <tr><td>{ts}When{/ts}</td>
       <td width="90%">
         {$event.event_start_date|crmDate}
-        {if $event.event_end_date}{ts}through{/ts}
+        {if array_key_exists('event_end_date', $event) && $event.event_end_date}{ts}through{/ts}
             {* Only show end time if end date = start date *}
             {if $event.event_end_date|crmDate:"%Y%m%d" == $event.event_start_date|crmDate:"%Y%m%d"}
               {$event.event_end_date|crmDate:0:1}
@@ -33,7 +33,7 @@
   </tr>
 
   {if $isShowLocation}
-    {if $location.address.1}
+    {if array_key_exists(1, $location.address) && $location.address.1}
       <tr><td>{ts}Location{/ts}</td>
           <td>
             {$location.address.1.display|nl2br}
@@ -48,13 +48,13 @@
     {/if}
   {/if}{*End of isShowLocation condition*}
 
-  {if $location.phone.1.phone || $location.email.1.email}
+  {if array_key_exists(1, $location.phone) || array(1, $location.email)}
     <tr><td>{ts}Contact{/ts}</td>
         <td>
         {* loop on any phones and emails for this event *}
            {foreach from=$location.phone item=phone}
              {if $phone.phone}
-                {if $phone.phone_type}{$phone.phone_type_display}{else}{ts}Phone{/ts}{/if}: {$phone.phone} {if $phone.phone_ext}&nbsp;{ts}ext.{/ts} {$phone.phone_ext}{/if}
+                {if array_key_exists('phone_type', $phone) && $phone.phone_type}{$phone.phone_type_display}{else}{ts}Phone{/ts}{/if}: {$phone.phone} {if array_key_exists('phone_ext', $phone) && $phone.phone_ext}&nbsp;{ts}ext.{/ts} {$phone.phone_ext}{/if}
                 <br />
             {/if}
            {/foreach}

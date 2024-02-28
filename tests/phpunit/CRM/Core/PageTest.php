@@ -64,8 +64,7 @@ class CRM_Core_PageTest extends CiviUnitTestCase {
     list($icon, $text, $condition, $attribs) = $params;
     $this->assertEquals($expectedMarkup, CRM_Core_Page::crmIcon($icon, $text, $condition, $attribs));
     if (!empty($smartyFunc)) {
-      $smarty = CRM_Core_Smarty::singleton();
-      $actual = $smarty->fetch('string:' . $smartyFunc);
+      $actual = CRM_Utils_String::parseOneOffStringThroughSmarty($smartyFunc);
       $this->assertEquals($expectedMarkup, $actual, "Process input=[$smartyFunc]");
     }
   }

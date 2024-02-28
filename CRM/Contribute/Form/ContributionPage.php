@@ -14,6 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
+use Civi\Api4\MembershipBlock;
 
 /**
  * Contribution Page form.
@@ -131,14 +132,14 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
     $this->applyFilter('__ALL__', 'trim');
 
     $session = CRM_Core_Session::singleton();
-    $this->_cancelURL = $_POST['cancelURL'] ?? NULL;
+    $cancelURL = $_POST['cancelURL'] ?? NULL;
 
-    if (!$this->_cancelURL) {
-      $this->_cancelURL = CRM_Utils_System::url('civicrm/admin/contribute', 'reset=1');
+    if (!$cancelURL) {
+      $cancelURL = CRM_Utils_System::url('civicrm/admin/contribute', 'reset=1');
     }
 
-    if ($this->_cancelURL) {
-      $this->addElement('hidden', 'cancelURL', $this->_cancelURL);
+    if ($cancelURL) {
+      $this->addElement('hidden', 'cancelURL', $cancelURL);
     }
 
     $buttons = [
@@ -154,7 +155,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
     ];
     $this->addButtons($buttons);
 
-    $session->replaceUserContext($this->_cancelURL);
+    $session->replaceUserContext($cancelURL);
 
     // don't show option for contribution amounts section if membership price set
     // this flag is sent to template
@@ -411,6 +412,18 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     }
     return $this->_id ? (int) $this->_id : NULL;
+  }
+
+  /**
+   * Get the membership Block ID, if any, attached to the contribution page.
+   *
+   * @return int|null
+   */
+  public function getMembershipBlockID(): ?int {
+    return MembershipBlock::get(FALSE)
+      ->addWhere('entity_table', '=', 'civicrm_contribution_page')
+      ->addWhere('entity_id', '=', $this->getContributionPageID())
+      ->addWhere('is_active', '=', TRUE)->execute()->first()['id'] ?? NULL;
   }
 
   /**

@@ -198,6 +198,10 @@
   name        : Bastien Ho
   organization: N.O.U.S. Open Usefull and Simple
 
+- github      : bb
+  name        : Benjamin Bock
+  organization: European Centre for Press and Media Freedom (ECPMF)
+
 - github      : bdpfreizeiten
   name        : David Geisel
   organization: Bund Deutscher PfadfinderInnen BaWue
@@ -833,6 +837,10 @@
   name        : Justin Freeman
   organization: Agileware
 
+- github      : justinmosier
+  name        : Justin Mosier
+  organization: Mosier Consulting
+
 - github      : jvos
 
 - github      : kainuk
@@ -1257,6 +1265,10 @@
 - name        : Patrick Corbett
   organization: Redfin Solutions
 
+- github      : patricklam
+  name        : Patrick Lam
+  organization: University of Waterloo
+
 - name        : Paul Barmak
 
 - github      : pbatroff
@@ -1524,6 +1536,9 @@
 
 - name        : Bashar Makhay
 
+- github      : technomaz
+  name        : Mark 
+
 - github      : TomRosenbloom
   name        : Tom Rosenbloom
 
@@ -1629,6 +1644,10 @@
 - github      : varshith
   name        : Vinu Varshith Sekar
   organization: CompuCorp
+
+- github      : vinay-osseed
+  name        : Vinay Gawade
+  organization: OSSeed Technologies LLP
 
 - github      : vinuvarshith
   name        : Vinu Varshith Sekar
@@ -1744,3 +1763,5 @@
   organization: Fuzion
 
 - github      : ziljah
+
+- github      : 19ATF72

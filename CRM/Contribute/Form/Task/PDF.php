@@ -61,13 +61,37 @@ AND    {$this->_componentClause}";
         'title' => ts('Search Results'),
       ],
     ];
-    CRM_Contact_Form_Task_EmailCommon ::preProcessFromAddress($this, FALSE);
+    $this->_contactIds = $this->_contactIds ?: [CRM_Core_Session::getLoggedInContactID()];
+    $this->preProcessFromAddress();
     // we have all the contribution ids, so now we get the contact ids
     parent::setContactIDs();
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
     $this->setTitle(ts('Print Contribution Receipts'));
     // Ajax submit would interfere with pdf file download
     $this->preventAjaxSubmit();
+  }
+
+  /**
+   * Pre Process Form Addresses to be used in Quickform
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function preProcessFromAddress() {
+    $fromEmailValues = CRM_Core_BAO_Email::getFromEmail();
+
+    if (empty($fromEmailValues)) {
+      CRM_Core_Error::statusBounce(ts('Your user record does not have a valid email address and no from addresses have been configured.'));
+    }
+
+    $defaults = [];
+    if (is_numeric(key($fromEmailValues))) {
+      $emailID = (int) key($fromEmailValues);
+      $defaults = CRM_Core_BAO_Email::getEmailSignatureDefaults($emailID);
+    }
+    if (!Civi::settings()->get('allow_mail_from_logged_in_contact')) {
+      $defaults['from_email_address'] = CRM_Core_BAO_Domain::getFromEmail();
+    }
+    $this->setDefaults($defaults);
   }
 
   /**

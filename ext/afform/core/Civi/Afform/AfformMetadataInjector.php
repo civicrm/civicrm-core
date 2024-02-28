@@ -126,8 +126,13 @@ class AfformMetadataInjector {
       // If 'operators' is present in the field definition, use it as a limiter
       // Afform expects 'operators' in the fieldDefn to be associative key/label, not just a flat array
       // like it is in the schema.
-      if (!empty($fieldInfo['operators'])) {
-        $operators = array_intersect_key($operators, array_flip($fieldInfo['operators']));
+      $allowedOperators = $fieldInfo['operators'] ?? NULL;
+      // Use list of allowed operators if set on the form (should be in js plain array format)
+      if (!empty($fieldDefn['operators'])) {
+        $allowedOperators = \CRM_Utils_JS::decode($fieldDefn['operators']);
+      }
+      if ($allowedOperators) {
+        $operators = array_intersect_key($operators, array_flip($allowedOperators));
       }
       $fieldDefn['operators'] = \CRM_Utils_JS::encode($operators);
     }

@@ -19,13 +19,13 @@ class LocalizedDataTest extends \CiviEndToEndTestCase {
    *
    * $ env CIVICRM_LOCALES=en_US,fr_FR,de_DE ./bin/setup.sh -g \
    *   && phpunit6 tests/phpunit/E2E/Core/LocalizedDataTest.php
+   *
+   * @group ornery
    */
   public function testLocalizedData(): void {
-    $getSql = $this->getSqlFunc();
-
     $sqls = [
-      'de_DE' => $getSql('de_DE'),
-      'fr_FR' => $getSql('fr_FR'),
+      'de_DE' => $this->getRenderedSql('de_DE'),
+      'fr_FR' => $this->getRenderedSql('fr_FR'),
     ];
     $pats = [
       'de_DE' => '/new_organization.*Neue Organisation/i',
@@ -42,38 +42,7 @@ class LocalizedDataTest extends \CiviEndToEndTestCase {
     $this->assertFalse($match('fr_FR', 'de_DE'), 'The French SQL should not match the German pattern.');
   }
 
-  /**
-   * @return callable
-   *   The SQL loader -- function(string $locale): string
-   */
-  private function getSqlFunc() {
-    // Some deployment styles use stored files, and some generate SQL programmatically.
-    // This heuristic discerns the style by UF name, although a better heuristic might be to check
-    // for composer at CMS root. This works in a pinch.
-    $uf = CIVICRM_UF;
-    $installerTypes = [
-      'Drupal' => [$this, '_getSqlFile'],
-      'Drupal8' => [$this, '_getSqlLive'],
-      'WordPress' => [$this, '_getSqlFile'],
-      'Backdrop' => [$this, '_getSqlFile'],
-      'Joomla' => [$this, '_getSqlFile'],
-      'Standalone' => [$this, '_getSqlFile'],
-    ];
-    if (isset($installerTypes[$uf])) {
-      return $installerTypes[$uf];
-    }
-    else {
-      throw new \RuntimeException("Failed to determine installation type for $uf");
-    }
-  }
-
-  private function _getSqlFile($locale) {
-    $path = \Civi::paths()->getPath("[civicrm.root]/sql/civicrm_data.{$locale}.mysql");
-    $this->assertFileExists($path);
-    return file_get_contents($path);
-  }
-
-  private function _getSqlLive($locale) {
+  private function getRenderedSql($locale) {
     $schema = new \CRM_Core_CodeGen_Schema(\Civi\Test::codeGen());
     $files = $schema->generateLocaleDataSql($locale);
     foreach ($files as $file => $content) {
@@ -81,7 +50,7 @@ class LocalizedDataTest extends \CiviEndToEndTestCase {
         return $content;
       }
     }
-    throw new \Exception("Faield to generate $locale");
+    throw new \Exception("Failed to generate $locale");
   }
 
 }

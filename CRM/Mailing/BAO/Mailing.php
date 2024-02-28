@@ -16,6 +16,7 @@
  */
 
 use Civi\API\Exception\UnauthorizedException;
+use Civi\Api4\MailingGroup;
 
 require_once 'Mail/mime.php';
 
@@ -65,18 +66,6 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing implements \Civi\C
   private $footer = NULL;
 
   /**
-   * The HTML content of the message.
-   * @var string
-   */
-  private $html = NULL;
-
-  /**
-   * The text content of the message.
-   * @var string
-   */
-  private $text = NULL;
-
-  /**
    * Cached BAO for the domain.
    * @var int
    */
@@ -95,7 +84,6 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing implements \Civi\C
     $mailingObj->id = $mailingID;
     $mailingObj->find(TRUE);
 
-    $mailing = CRM_Mailing_BAO_Mailing::getTableName();
     $contact = CRM_Contact_DAO_Contact::getTableName();
     $isSMSmode = (!CRM_Utils_System::isNull($mailingObj->sms_provider_id));
 
@@ -109,7 +97,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing implements \Civi\C
       ->param('#mailing_id', $mailingID)
       ->execute();
     while ($dao->fetch()) {
-      if ($dao->entity_table == 'civicrm_mailing') {
+      if ($dao->entity_table === 'civicrm_mailing') {
         $priorMailingIDs[$dao->group_type] = explode(',', $dao->group_ids);
       }
       else {
@@ -145,10 +133,10 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing implements \Civi\C
         if ($groupDAO->cache_date == NULL || $groupDAO->is_hidden) {
           CRM_Contact_BAO_GroupContactCache::load($groupDAO);
         }
-        if ($groupType == 'Include') {
+        if ($groupType === 'Include') {
           $includeSmartGroupIDs[] = $groupDAO->id;
         }
-        elseif ($groupType == 'Exclude') {
+        elseif ($groupType === 'Exclude') {
           $excludeSmartGroupIDs[] = $groupDAO->id;
         }
         //NOTE: Do nothing for base
@@ -452,31 +440,11 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing implements \Civi\C
    *
    * @param array $params
    * @param \CRM_Mailing_DAO_Mailing $mailing
-   *
-   * @return array
    */
-  protected static function doSubmitActions(array $params, CRM_Mailing_DAO_Mailing $mailing): array {
+  protected static function doSubmitActions(array $params, CRM_Mailing_DAO_Mailing $mailing): void {
     // Create parent job if not yet created.
     // Condition on the existence of a scheduled date.
-    if (!empty($params['scheduled_date']) && $params['scheduled_date'] != 'null' && empty($params['_skip_evil_bao_auto_schedule_'])) {
-
-      if (!isset($params['is_completed']) || $params['is_completed'] !== 1) {
-        $mailingGroups = \Civi\Api4\MailingGroup::get()
-          ->addSelect('group.id')
-          ->addJoin('Group AS group', 'LEFT', ['entity_id', '=', 'group.id'])
-          ->addWhere('mailing_id', '=', $mailing->id)
-          ->addWhere('entity_table', '=', 'civicrm_group')
-          ->addWhere('group_type', 'IN', ['Include', 'Exclude'])
-          ->addClause('OR', ['group.saved_search_id', 'IS NOT NULL'], ['group.children', 'IS NOT NULL'])
-          ->execute();
-        foreach ($mailingGroups as $mailingGroup) {
-          CRM_Contact_BAO_GroupContactCache::invalidateGroupContactCache($mailingGroup['group.id']);
-          $group = new CRM_Contact_DAO_Group();
-          $group->find(TRUE);
-          $group->id = $mailingGroup['group.id'];
-          CRM_Contact_BAO_GroupContactCache::load($group);
-        }
-      }
+    if (!empty($params['scheduled_date']) && $params['scheduled_date'] !== 'null' && empty($params['_skip_evil_bao_auto_schedule_'])) {
 
       $job = new CRM_Mailing_BAO_MailingJob();
       $job->mailing_id = $mailing->id;
@@ -497,9 +465,44 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing implements \Civi\C
 
     // Populate the recipients.
     if (empty($params['_skip_evil_bao_auto_recipients_'])) {
+      if ((!isset($params['is_completed']) || $params['is_completed'] !== 1)
+        && !empty($params['scheduled_date']) && $params['scheduled_date'] !== 'null'
+        && empty($params['_skip_evil_bao_auto_schedule_'])
+      ) {
+        self::refreshMailingGroupCache($mailing->id);
+      }
       self::getRecipients($mailing->id);
     }
-    return $params;
+  }
+
+  /**
+   * Refresh the group cache for groups relevant to the mailing.
+   *
+   * @param int $mailingID
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   *
+   * @internal not supported for use from outside of core. Function has always
+   * been internal so may be moved / removed / alters at any time without
+   * regard for external users.
+   */
+  public static function refreshMailingGroupCache(int $mailingID): void {
+    $mailingGroups = MailingGroup::get()
+      ->addSelect('group.id')
+      ->addJoin('Group AS group', 'LEFT', ['entity_id', '=', 'group.id'])
+      ->addWhere('mailing_id', '=', $mailingID)
+      ->addWhere('entity_table', '=', 'civicrm_group')
+      ->addWhere('group_type', 'IN', ['Include', 'Exclude'])
+      ->addClause('OR', ['group.saved_search_id', 'IS NOT NULL'], ['group.children', 'IS NOT NULL'])
+      ->execute();
+    foreach ($mailingGroups as $mailingGroup) {
+      CRM_Contact_BAO_GroupContactCache::invalidateGroupContactCache($mailingGroup['group.id']);
+      $group = new CRM_Contact_DAO_Group();
+      $group->find(TRUE);
+      $group->id = $mailingGroup['group.id'];
+      CRM_Contact_BAO_GroupContactCache::load($group);
+    }
   }
 
   /**
@@ -933,21 +936,18 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    *   ID of the EventQueue.
    * @param string $hash
    *   Hash of the EventQueue.
-   * @param string $email
-   *   Destination address.
    *
    * @return array
    *   (reference) array    array ref that hold array refs to the verp info and urls
    */
-  public static function getVerpAndUrls($job_id, $event_queue_id, $hash, $email) {
+  public static function getVerpAndUrls($job_id, $event_queue_id, $hash) {
     // create a skeleton object and set its properties that are required by getVerpAndUrlsAndHeaders()
-    $config = CRM_Core_Config::singleton();
     $bao = new CRM_Mailing_BAO_Mailing();
     $bao->_domain = CRM_Core_BAO_Domain::getDomain();
     $bao->from_name = $bao->from_email = $bao->subject = '';
 
     // use $bao's instance method to get verp and urls
-    [$verp, $urls, $_] = $bao->getVerpAndUrlsAndHeaders($job_id, $event_queue_id, $hash, $email);
+    [$verp, $urls, $_] = $bao->getVerpAndUrlsAndHeaders($job_id, $event_queue_id, $hash);
     return [$verp, $urls];
   }
 
@@ -960,15 +960,11 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    *   ID of the EventQueue.
    * @param string $hash
    *   Hash of the EventQueue.
-   * @param string $email
-   *   Destination address.
-   *
-   * @param bool $isForward
    *
    * @return array
    *   array ref that hold array refs to the verp info, urls, and headers
    */
-  public function getVerpAndUrlsAndHeaders($job_id, $event_queue_id, $hash, $email, $isForward = FALSE) {
+  public function getVerpAndUrlsAndHeaders($job_id, $event_queue_id, $hash) {
     $config = CRM_Core_Config::singleton();
 
     /**
@@ -1033,9 +1029,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       'List-Unsubscribe' => "<mailto:{$verp['unsubscribe']}>",
     ];
     self::addMessageIdHeader($headers, 'm', $job_id, $event_queue_id, $hash);
-    if ($isForward) {
-      $headers['Subject'] = "[Fwd:{$this->subject}]";
-    }
     return [&$verp, &$urls, &$headers];
   }
 
@@ -1065,7 +1058,10 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    * @param string $fromEmail
    *   Email address of who is forwarding it.
    *
-   * @param null $replyToEmail
+   * @deprecated since 5.17 will be removed around 5.74
+   *
+   * Note this REALLY should not be called anymore. I considered just removing
+   * but opted for noisy deprecation with short turn around.
    *
    * @return Mail_mime               The mail object
    */
@@ -1073,11 +1069,10 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     $job_id, $event_queue_id, $hash, $contactId,
     $email, &$recipient, $test,
     $contactDetails, &$attachments, $isForward = FALSE,
-    $fromEmail = NULL, $replyToEmail = NULL
+    $fromEmail = NULL
   ) {
-    $config = CRM_Core_Config::singleton();
     $this->getTokens();
-
+    CRM_Core_Error::deprecatedWarning('unused function - use flexmailer');
     if ($this->_domain == NULL) {
       $this->_domain = CRM_Core_BAO_Domain::getDomain();
     }
@@ -1085,19 +1080,13 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     [$verp, $urls, $headers] = $this->getVerpAndUrlsAndHeaders(
       $job_id,
       $event_queue_id,
-      $hash,
-      $email,
-      $isForward
+      $hash
     );
 
     //set from email who is forwarding it and not original one.
     if ($fromEmail) {
       unset($headers['From']);
       $headers['From'] = "<{$fromEmail}>";
-    }
-
-    if ($replyToEmail && ($fromEmail != $replyToEmail)) {
-      $headers['Reply-To'] = "{$replyToEmail}";
     }
 
     if ($contactDetails) {
@@ -1253,7 +1242,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     }
 
     if (!empty($mailParams['attachments'])) {
-      foreach ($mailParams['attachments'] as $fileID => $attach) {
+      foreach ($mailParams['attachments'] as $attach) {
         $message->addAttachment($attach['fullPath'],
           $attach['mime_type'],
           $attach['cleanName']
@@ -1305,11 +1294,12 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    *
    * Get mailing object and replaces subscribeInvite, domain and mailing tokens.
    *
-   * @deprecated
+   * @deprecated since 2017 will be removed around 5.74
    *   This is used by CiviMail but will be made redundant by FlexMailer/TokenProcessor.
    * @param CRM_Mailing_BAO_Mailing $mailing
    */
   public static function tokenReplace(&$mailing) {
+    CRM_Core_Error::deprecatedWarning('function no longer called, use flexmailer');
     $domain = CRM_Core_BAO_Domain::getDomain();
 
     foreach (['text', 'html'] as $type) {
@@ -1319,7 +1309,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         $mailing->templates[$type] = CRM_Utils_Token::replaceDomainTokens(
           $mailing->templates[$type],
           $domain,
-          $type == 'html',
+          $type === 'html',
           $tokens[$type]
         );
         $mailing->templates[$type] = CRM_Utils_Token::replaceMailingTokens($mailing->templates[$type], $mailing, NULL, $tokens[$type]);
@@ -1330,7 +1320,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   /**
    * Get data to resolve tokens.
    *
-   * @deprecated
+   * @deprecated since 2017 will be removed around 5.74
    *   This is used by CiviMail but will be made redundant by FlexMailer/TokenProcessor.
    *
    * @param array $token_a
@@ -1347,10 +1337,10 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     $type = $token_a['type'];
     $token = $token_a['token'];
     $data = $token;
-
+    CRM_Core_Error::deprecatedWarning('called only by deprecated function');
     $useSmarty = defined('CIVICRM_MAIL_SMARTY') && CIVICRM_MAIL_SMARTY;
 
-    if ($type == 'embedded_url') {
+    if ($type === 'embedded_url') {
       $embed_data = [];
       foreach ($token as $t) {
         $embed_data[] = $this->getTokenData($t, $html, $contact, $verp, $urls, $event_queue_id);
@@ -1381,7 +1371,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         $data = CRM_Utils_String::unstupifyUrl($data);
       }
     }
-    elseif ($type == 'url') {
+    elseif ($type === 'url') {
       if ($this->url_tracking && !empty($this->id)) {
         // ensure that Google CSS and any .css files are not tracked.
         if (!(strpos($token, 'css?family') || strpos($token, '.css'))) {
@@ -1395,21 +1385,21 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         $data = $token;
       }
     }
-    elseif ($type == 'contact') {
+    elseif ($type === 'contact') {
       $data = CRM_Utils_Token::getContactTokenReplacement($token, $contact, FALSE, FALSE, $useSmarty);
     }
-    elseif ($type == 'action') {
+    elseif ($type === 'action') {
       $data = CRM_Utils_Token::getActionTokenReplacement($token, $verp, $urls, $html);
     }
-    elseif ($type == 'domain') {
+    elseif ($type === 'domain') {
       $domain = CRM_Core_BAO_Domain::getDomain();
       $data = CRM_Utils_Token::getDomainTokenReplacement($token, $domain, $html);
     }
-    elseif ($type == 'mailing') {
-      if ($token == 'name') {
+    elseif ($type === 'mailing') {
+      if ($token === 'name') {
         $data = $this->name;
       }
-      elseif ($token == 'group') {
+      elseif ($token === 'group') {
         $groups = $this->getGroupNames();
         $data = implode(', ', $groups);
       }
@@ -1424,10 +1414,13 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    * Return a list of group names for this mailing.  Does not work with
    * prior-mailing targets.
    *
+   * @deprecated since 5.71 will be removed around 5.77
+   *
    * @return array
    *   Names of groups receiving this mailing
    */
   public function &getGroupNames() {
+    CRM_Core_Error::deprecatedWarning('unused function');
     if (!isset($this->id)) {
       return [];
     }
@@ -1437,7 +1430,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     permissions in the future, but it's called by some extensions during mail processing, when cron isn't necessarily
     called with a logged-in user.
      */
-    $mailingGroups = \Civi\Api4\MailingGroup::get(FALSE)
+    $mailingGroups = MailingGroup::get(FALSE)
       ->addSelect('group.title', 'group.frontend_title')
       ->addJoin('Group AS group', 'LEFT', ['entity_id', '=', 'group.id'])
       ->addWhere('mailing_id', '=', $this->id)
@@ -1561,8 +1554,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         'url_tracking' => Civi::settings()->get('url_tracking_default'),
         'visibility' => 'Public Pages',
         'replyto_email' => $domain_email,
-        'header_id' => CRM_Mailing_PseudoConstant::defaultComponent('header_id', ''),
-        'footer_id' => CRM_Mailing_PseudoConstant::defaultComponent('footer_id', ''),
+        'header_id' => CRM_Mailing_PseudoConstant::defaultComponent('Header', ''),
+        'footer_id' => CRM_Mailing_PseudoConstant::defaultComponent('Footer', ''),
         'from_email' => $domain_email,
         'from_name' => $domain_name,
         'msg_template_id' => NULL,
@@ -1643,8 +1636,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     // In v4 of the api they are not available via CRUD. At some
     // point we will create a 'submit' function which will do the crud+submit
     // but for now only CRUD is available via v4 api.
-    if (($params['version'] ?? '') !== 4) {
-      $params = self::doSubmitActions($params, $mailing);
+    if (empty($params['skip_legacy_scheduling'])) {
+      self::doSubmitActions($params, $mailing);
     }
 
     return $mailing;
@@ -1682,8 +1675,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     }
 
     if (!Civi::settings()->get('disable_mandatory_tokens_check')) {
-      $header = $mailing->header_id && $mailing->header_id != 'null' ? CRM_Mailing_BAO_MailingComponent::findById($mailing->header_id) : NULL;
-      $footer = $mailing->footer_id && $mailing->footer_id != 'null' ? CRM_Mailing_BAO_MailingComponent::findById($mailing->footer_id) : NULL;
+      $header = $mailing->header_id && $mailing->header_id !== 'null' ? CRM_Mailing_BAO_MailingComponent::findById($mailing->header_id) : NULL;
+      $footer = $mailing->footer_id && $mailing->footer_id !== 'null' ? CRM_Mailing_BAO_MailingComponent::findById($mailing->footer_id) : NULL;
       foreach (['body_html', 'body_text'] as $field) {
         if (empty($mailing->{$field})) {
           continue;
@@ -1722,7 +1715,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     civicrm_api3('mailing_group', 'replace', [
       'mailing_id' => $mailingId,
       'group_type' => $type,
-      'entity_table' => ($entity == 'groups') ? CRM_Contact_BAO_Group::getTableName() : CRM_Mailing_BAO_Mailing::getTableName(),
+      'entity_table' => ($entity === 'groups') ? CRM_Contact_BAO_Group::getTableName() : CRM_Mailing_BAO_Mailing::getTableName(),
       'values' => $values,
     ]);
   }
@@ -1898,10 +1891,10 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         $row['name'] = "Search Results";
       }
 
-      if ($mailing->group_type == 'Include') {
+      if ($mailing->group_type === 'Include') {
         $report['group']['include'][] = $row;
       }
-      elseif ($mailing->group_type == 'Base') {
+      elseif ($mailing->group_type === 'Base') {
         $report['group']['base'][] = $row;
       }
       else {
@@ -2181,8 +2174,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   public function getCount() {
     $this->selectAdd();
     $this->selectAdd('COUNT(id) as count');
-
-    $session = CRM_Core_Session::singleton();
     $this->find(TRUE);
 
     return $this->count;
@@ -2317,9 +2308,6 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
   public function &getRows($offset, $rowCount, $sort, $additionalClause = NULL, $additionalParams = NULL) {
     $mailing = self::getTableName();
     $job = CRM_Mailing_BAO_MailingJob::getTableName();
-    $group = CRM_Mailing_DAO_MailingGroup::getTableName();
-    $session = CRM_Core_Session::singleton();
-
     $mailingACL = self::mailingACL();
 
     //get all campaigns.
@@ -2437,29 +2425,26 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
    * @throws CRM_Core_Exception
    */
   public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if ($event->action === 'create') {
+      $params = &$event->params;
+      $params['created_id'] ??= CRM_Core_Session::singleton()->getLoggedInContactID();
+      $params['override_verp'] ??= !Civi::settings()->get('track_civimail_replies');
+      $params['visibility'] ??= 'Public Pages';
+      $params['dedupe_email'] ??= Civi::settings()->get('dedupe_email_default');
+      $params['open_tracking'] ??= Civi::settings()->get('open_tracking_default');
+      $params['url_tracking'] ??= Civi::settings()->get('url_tracking_default');
+      $params['header_id'] ??= CRM_Mailing_PseudoConstant::defaultComponent('Header', '');
+      $params['footer_id'] ??= CRM_Mailing_PseudoConstant::defaultComponent('Footer', '');
+      $params['optout_id'] ??= CRM_Mailing_PseudoConstant::defaultComponent('OptOut', '');
+      $params['reply_id'] ??= CRM_Mailing_PseudoConstant::defaultComponent('Reply', '');
+      $params['resubscribe_id'] ??= CRM_Mailing_PseudoConstant::defaultComponent('Resubscribe', '');
+      $params['unsubscribe_id'] ??= CRM_Mailing_PseudoConstant::defaultComponent('Unsubscribe', '');
+      $params['mailing_type'] ??= 'standalone';
+    }
     if ($event->action === 'delete' && $event->id) {
       // Delete all file attachments
       CRM_Core_BAO_File::deleteEntityFile('civicrm_mailing', $event->id);
     }
-  }
-
-  /**
-   * @deprecated
-   *  Use CRM_Mailing_BAO_MailingJob::del($id)
-   *
-   * @param int $id
-   *   Id of the Job to delete.
-   *
-   * @return void
-   */
-  public static function delJob($id) {
-    if (empty($id)) {
-      throw new CRM_Core_Exception(ts('No id passed to mailing delJob function'));
-    }
-
-    CRM_Core_Error::deprecatedWarning('This function is deprecated, use CRM_Mailing_BAO_MailingJob::del instead');
-
-    CRM_Mailing_BAO_MailingJob::deleteRecord(['id' => $id]);
   }
 
   /**
@@ -2469,7 +2454,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
    */
   public function getReturnProperties() {
     $tokens = &$this->getTokens();
-
+    CRM_Core_Error::deprecatedWarning('function no longer called - use flexmailer');
     $properties = [];
     if (isset($tokens['html']) &&
       isset($tokens['html']['contact'])
@@ -2633,27 +2618,6 @@ SELECT  $mailing.id as mailing_id
    *   array content/component.
    */
   public static function getMailingContent(&$report, &$form, $isSMS = FALSE) {
-    $htmlHeader = $textHeader = NULL;
-    $htmlFooter = $textFooter = NULL;
-
-    if (!$isSMS) {
-      if ($report['mailing']['header_id']) {
-        $header = new CRM_Mailing_BAO_MailingComponent();
-        $header->id = $report['mailing']['header_id'];
-        $header->find(TRUE);
-        $htmlHeader = $header->body_html;
-        $textHeader = $header->body_text;
-      }
-
-      if ($report['mailing']['footer_id']) {
-        $footer = new CRM_Mailing_BAO_MailingComponent();
-        $footer->id = $report['mailing']['footer_id'];
-        $footer->find(TRUE);
-        $htmlFooter = $footer->body_html;
-        $textFooter = $footer->body_text;
-      }
-    }
-
     $mailingKey = $form->_mailing_id;
     if (!$isSMS) {
       if ($hash = CRM_Mailing_BAO_Mailing::getMailingHash($mailingKey)) {

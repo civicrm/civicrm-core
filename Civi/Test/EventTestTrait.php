@@ -14,7 +14,6 @@ namespace Civi\Test;
 use Civi\Api4\Event;
 use Civi\Api4\ExampleData;
 use Civi\Api4\PriceFieldValue;
-use Civi\Api4\PriceSetEntity;
 use Civi\Api4\UFField;
 use Civi\Api4\UFGroup;
 use Civi\Api4\UFJoin;
@@ -51,22 +50,19 @@ trait EventTestTrait {
   protected function eventCreatePaid(array $eventParameters = [], array $priceSetParameters = [], string $identifier = 'PaidEvent'): array {
     $eventParameters = array_merge($this->getEventExampleData(), $eventParameters);
     $event = $this->eventCreate($eventParameters, $identifier);
-    if (empty($priceSetParameters['id'])) {
-      try {
+    try {
+      if (empty($priceSetParameters['id'])) {
         $this->eventCreatePriceSet($priceSetParameters, $identifier);
-        $this->setTestEntityID('PriceSetEntity', PriceSetEntity::create(FALSE)
-          ->setValues([
-            'entity_table' => 'civicrm_event',
-            'entity_id' => $event['id'],
-            'price_set_id' => $this->ids['PriceSet'][$identifier],
-          ])
-          ->execute()
-          ->first()['id'], $identifier);
+        $priceSetParameters['id'] = $this->ids['PriceSet'][$identifier];
       }
-
-      catch (\CRM_Core_Exception $e) {
-        $this->fail('Failed to create PriceSetEntity: ' . $e->getMessage());
-      }
+      $this->createTestEntity('PriceSetEntity', [
+        'entity_table' => 'civicrm_event',
+        'entity_id' => $event['id'],
+        'price_set_id' => $priceSetParameters['id'],
+      ], $identifier);
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->fail('Failed to create PriceSetEntity: ' . $e->getMessage());
     }
     return $event;
   }
@@ -292,7 +288,9 @@ trait EventTestTrait {
     try {
       $this->setTestEntity('UFJoin', UFJoin::create(FALSE)->setValues([
         'module' => $additionalSuffix ? 'CiviEvent_Additional' : 'CiviEvent',
+        'entity_table' => 'civicrm_event',
         'uf_group_id:name' => $profileName,
+        'entity_table' => 'civicrm_event',
         'entity_id' => $this->getEventID($identifier),
       ])->execute()->first(), $profileIdentifier);
     }
@@ -308,13 +306,13 @@ trait EventTestTrait {
    * @param string $identifier
    */
   private function eventCreatePriceSet(array $priceSetParameters, string $identifier): void {
-    $priceSetParameters = array_merge($priceSetParameters, [
+    $priceSetParameters = array_merge([
       'min_amount' => 0,
       'title' => 'Fundraising dinner',
       'name' => $identifier,
       'extends:name' => 'CiviEvent',
       'financial_type_id:name' => 'Event Fee',
-    ]);
+    ], $priceSetParameters);
 
     $this->createTestEntity('PriceSet', $priceSetParameters, $identifier);
     $this->createTestEntity('PriceField', [

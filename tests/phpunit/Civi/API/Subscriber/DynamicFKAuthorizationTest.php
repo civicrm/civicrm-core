@@ -31,7 +31,25 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    \CRM_Core_DAO_AllCoreTables::registerEntityType('FakeFile', 'CRM_Fake_DAO_FakeFile', 'fake_file');
+    $this->hookClass->setHook('civicrm_entityTypes', function (array &$entityTypes) {
+      $entityTypes['FakeFile'] = [
+        'name' => 'FakeFile',
+        'class' => 'CRM_Fake_DAO_FakeFile',
+        'table' => 'fake_file',
+      ];
+      $entityTypes['Widget'] = [
+        'name' => 'Widget',
+        'class' => 'CRM_Fake_DAO_Widget',
+        'table' => 'fake_widget',
+      ];
+      $entityTypes['Forbidden'] = [
+        'name' => 'Forbidden',
+        'class' => 'CRM_Fake_DAO_Forbidden',
+        'table' => 'fake_forbidden',
+      ];
+    });
+    \CRM_Core_DAO_AllCoreTables::flush();
+
     $fileProvider = new StaticProvider(
       3,
       'FakeFile',
@@ -43,7 +61,6 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
       ]
     );
 
-    \CRM_Core_DAO_AllCoreTables::registerEntityType('Widget', 'CRM_Fake_DAO_Widget', 'fake_widget');
     $widgetProvider = new StaticProvider(3, 'Widget',
       ['id', 'title'],
       [],
@@ -52,7 +69,6 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
       ]
     );
 
-    \CRM_Core_DAO_AllCoreTables::registerEntityType('Forbidden', 'CRM_Fake_DAO_Forbidden', 'fake_forbidden');
     $forbiddenProvider = new StaticProvider(
       3,
       'Forbidden',

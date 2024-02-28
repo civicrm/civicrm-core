@@ -13,12 +13,7 @@
     templateUrl: '~/crmSearchAdmin/displays/searchAdminDisplayAutocomplete.html',
     controller: function($scope, searchMeta) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
-        ctrl = this,
-        colTypes = [];
-
-      this.getColTypes = function() {
-        return colTypes;
-      };
+        ctrl = this;
 
       this.$onInit = function () {
         if (!ctrl.display.settings) {

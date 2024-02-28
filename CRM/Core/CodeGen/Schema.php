@@ -59,7 +59,7 @@ class CRM_Core_CodeGen_Schema extends CRM_Core_CodeGen_BaseTask {
     $dropOrder = array_reverse(array_keys($this->tables));
     $template->assign('dropOrder', $dropOrder);
     $template->assign('mysql', 'modern');
-
+    CRM_Core_CodeGen_Util_MessageTemplates::assignSmartyVariables($template->getSmarty());
     return ['civicrm.mysql' => $template->fetch('schema.tpl')];
   }
 
@@ -83,7 +83,7 @@ class CRM_Core_CodeGen_Schema extends CRM_Core_CodeGen_BaseTask {
    */
   public function generateLocaleDataSql($locale) {
     $template = new CRM_Core_CodeGen_Util_Template('sql');
-
+    CRM_Core_CodeGen_Util_MessageTemplates::assignSmartyVariables($template->getSmarty());
     global $tsLocale;
     $oldTsLocale = $tsLocale;
 
@@ -102,7 +102,7 @@ class CRM_Core_CodeGen_Schema extends CRM_Core_CodeGen_BaseTask {
         'civicrm_version_sql.tpl',
       ];
 
-      $ext = ($locale != 'en_US' ? ".$locale" : '');
+      $ext = ($locale !== 'en_US' ? ".$locale" : '');
 
       return [
         "civicrm_data$ext.mysql" => $template->fetchConcat($sections),

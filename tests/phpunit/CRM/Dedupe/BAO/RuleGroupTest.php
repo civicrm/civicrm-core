@@ -2,18 +2,7 @@
 
 class CRM_Dedupe_DAO_TestEntity extends CRM_Core_DAO {
 
-  /**
-   * Returns foreign keys and entity references.
-   *
-   * @return array
-   *   [CRM_Core_Reference_Interface]
-   */
-  public static function getReferenceColumns() {
-    if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic('civicrm_dedupe_test_table', 'contact_id', 'civicrm_contact', 'id');
-    }
-    return Civi::$statics[__CLASS__]['links'];
-  }
+  public static $_tableName = 'civicrm_dedupe_test_table';
 
   /**
    * Returns all the column names of this table
@@ -38,6 +27,7 @@ class CRM_Dedupe_DAO_TestEntity extends CRM_Core_DAO {
           'table_name' => 'civicrm_dedupe_test_table',
           'entity' => 'TestEntity',
           'FKClassName' => 'CRM_Contact_DAO_Contact',
+          'FKColumnName' => 'id',
         ],
         'dedupe_test_field' => [
           'name' => 'dedupe_test_field',
@@ -257,7 +247,14 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
    */
   public function testHookDupeQueryMatch(): void {
     $this->hookClass->setHook('civicrm_dupeQuery', [$this, 'hook_civicrm_dupeQuery']);
-    \CRM_Core_DAO_AllCoreTables::registerEntityType('TestEntity', 'CRM_Dedupe_DAO_TestEntity', 'civicrm_dedupe_test_table');
+    $this->hookClass->setHook('civicrm_entityTypes', function (array &$entityTypes) {
+      $entityTypes['TestEntity'] = [
+        'name' => 'TestEntity',
+        'class' => 'CRM_Dedupe_DAO_TestEntity',
+        'table' => 'civicrm_dedupe_test_table',
+      ];
+    });
+    \CRM_Core_DAO_AllCoreTables::flush();
     $this->apiKernel = \Civi::service('civi_api_kernel');
     $this->adhocProvider = new \Civi\API\Provider\AdhocProvider(3, 'TestEntity');
     $this->apiKernel->registerApiProvider($this->adhocProvider);

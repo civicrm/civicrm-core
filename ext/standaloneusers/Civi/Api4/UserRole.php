@@ -12,4 +12,14 @@ namespace Civi\Api4;
 class UserRole extends Generic\DAOEntity {
   use \Civi\Api4\Generic\Traits\EntityBridge;
 
+  /**
+   * Permissions are only used to *authorize* API actions for the
+   * current user.
+   */
+  public static function permissions() {
+    return [
+      'default'           => ['cms:administer users'],
+    ];
+  }
+
 }

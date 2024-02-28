@@ -50,42 +50,22 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
 
   /**
    * @inheritDoc
-   * Provides permissions that are used by component.
-   * Needs to be implemented in component's information
-   * class.
-   *
-   * NOTE: if using conditionally permission return,
-   * implementation of $getAllUnconditionally is required.
-   *
-   * @param bool $getAllUnconditionally
-   * @param bool $descriptions
-   *   Whether to return permission descriptions
-   *
-   * @return array|null
-   *   collection of permissions, null if none
    */
-  public function getPermissions($getAllUnconditionally = FALSE, $descriptions = FALSE) {
+  public function getPermissions(): array {
     $permissions = [
       'access CiviMember' => [
-        ts('access CiviMember'),
-        ts('View memberships'),
+        'label' => ts('access CiviMember'),
+        'description' => ts('View memberships'),
       ],
       'edit memberships' => [
-        ts('edit memberships'),
-        ts('Create and update memberships'),
+        'label' => ts('edit memberships'),
+        'description' => ts('Create and update memberships'),
       ],
       'delete in CiviMember' => [
-        ts('delete in CiviMember'),
-        ts('Delete memberships'),
+        'label' => ts('delete in CiviMember'),
+        'description' => ts('Delete memberships'),
       ],
     ];
-
-    if (!$descriptions) {
-      foreach ($permissions as $name => $attr) {
-        $permissions[$name] = array_shift($attr);
-      }
-    }
-
     return $permissions;
   }
 

@@ -52,11 +52,30 @@ class User extends Generic\DAOEntity {
   }
 
   /**
-   * Permissions are wide on this but are checked in validateValues.
+   * Permissions are only used to *authorize* API actions for the
+   * current user. This authorization knows nothing of the parameters,
+   * values etc. passed into the API call, so it's authorization or not
+   * cannot depend on the values. So you do not implement "update own
+   * user, but not others" here.
+   *
+   * For this reason, the default permission is just 'access CiviCRM'
+   * which is very (too) permissive, but each API method implemented
+   * further restricts its use, e.g. write methods typically use
+   * _checkAccess()
+   *
+   * Note that 'access password resets' permission is defined in
+   * this standaloneusers ext. and is intended to be public.
+   *
+   * We have to provide a permission for 'save' because it won't use
+   * 'default'; it will use the same as 'create' and we want users
+   * to be able to use save (on their own record).
    */
   public static function permissions() {
     return [
       'default'           => ['access CiviCRM'],
+      'save'              => ['access CiviCRM'],
+      'create'            => ['cms:administer users'],
+      'delete'            => ['cms:administer users'],
       'passwordReset'     => ['access password resets'],
       'sendPasswordReset' => ['access password resets'],
     ];

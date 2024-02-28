@@ -29,8 +29,6 @@ class Security {
   /**
    * CRM_Core_Permission_Standalone::check() delegates here.
    *
-   * @param \CRM_Core_Permission_Standalone $permissionObject
-   *
    * @param string $permissionName
    *   The permission to check.
    *
@@ -40,7 +38,7 @@ class Security {
    * @return bool
    *   true if yes, else false
    */
-  public function checkPermission(\CRM_Core_Permission_Standalone $permissionObject, string $permissionName, ?int $userID = NULL) {
+  public function checkPermission(string $permissionName, ?int $userID = NULL) {
     if ($permissionName == \CRM_Core_Permission::ALWAYS_DENY_PERMISSION) {
       return FALSE;
     }
@@ -226,7 +224,7 @@ class Security {
   }
 
   /**
-   * Currently only used by CRM_Utils_System_Standalone::loadBootstrap
+   * Register the given user as the currently logged in user.
    */
   public function loginAuthenticatedUserRecord(array $user, bool $withSession) {
     global $loggedInUserId, $loggedInUser;

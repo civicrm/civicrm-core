@@ -14,25 +14,14 @@ function search_kit_civicrm_config(&$config) {
 }
 
 /**
- * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
- */
-function search_kit_civicrm_container($container) {
-  $container->getDefinition('dispatcher')
-    ->addMethodCall('addListener', [
-      'civi.api4.authorizeRecord::SavedSearch',
-      ['CRM_Search_BAO_SearchDisplay', 'savedSearchCheckAccessByDisplay'],
-    ]);
-}
-
-/**
  * Implements hook_civicrm_permission().
  *
  * Define SearchKit permissions.
  */
 function search_kit_civicrm_permission(&$permissions) {
   $permissions['administer search_kit'] = [
-    E::ts('SearchKit: edit and delete searches'),
-    E::ts('Gives non-admin users access to the SearchKit UI to create, update and delete searches and displays'),
+    'label' => E::ts('SearchKit: edit and delete searches'),
+    'description' => E::ts('Gives non-admin users access to the SearchKit UI to create, update and delete searches and displays'),
   ];
 }
 

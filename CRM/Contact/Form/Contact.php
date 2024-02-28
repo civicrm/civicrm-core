@@ -322,7 +322,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         $paramSubType = implode(',', $contactSubType);
       }
 
-      $this->_getCachedTree = FALSE;
       unset($customGroupCount[0]);
       foreach ($customGroupCount as $groupID => $groupCount) {
         if ($groupCount > 1) {
@@ -330,7 +329,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
           //loop the group
           for ($i = 1; $i <= $groupCount; $i++) {
             CRM_Custom_Form_CustomData::preProcess($this, NULL, $contactSubType,
-              $i, $this->_contactType, $this->_contactId
+              $i, $this->_contactType, $this->_contactId, NULL, FALSE
             );
             CRM_Contact_Form_Edit_CustomData::buildQuickForm($this);
           }
@@ -365,7 +364,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         // the buildForm adds the contact_sub_type to the form we need to look in _submitValues for it - submitValues
         // is a un-sanitised version of what is in the form submission (_POST) whereas `getSubmittedValues()` retrieves
         // 'allowed' POSTED values - ie values which match available fields, with some localization handling.
-        CRM_Custom_Form_CustomData::preProcess($this, NULL, $this->isSubmitted() ? ($this->_submitValues['contact_sub_type'] ?? []) : $this->getContactValue('contact_sub_type'),
+        CRM_Custom_Form_CustomData::preProcess($this, NULL, $this->isSubmitted() ? ($this->_submitValues['contact_sub_type'] ?? []) : $this->getContactValue('contact_sub_type') ?? $this->_contactSubType,
           1, $this->_contactType, $this->getContactID()
         );
         $this->assign('customValueCount', $this->_customValueCount);
@@ -841,7 +840,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     }
 
     // build tags and groups
-    CRM_Contact_Form_Edit_TagsAndGroups::buildQuickForm($this, 0, CRM_Contact_Form_Edit_TagsAndGroups::ALL,
+    CRM_Contact_Form_Edit_TagsAndGroups::buildQuickForm($this, $this->getContactID(), CRM_Contact_Form_Edit_TagsAndGroups::ALL,
       FALSE, NULL, 'Group(s)', 'Tag(s)', NULL, 'select');
 
     // build location blocks.
@@ -988,14 +987,9 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       $params['preferred_communication_method'] = 'null';
     }
 
-    $group = $params['group'] ?? NULL;
-    $params['group'] = ($params['group'] == '') ? [] : $params['group'];
-    if (!empty($group)) {
-      $group = is_array($group) ? $group : explode(',', $group);
-      $params['group'] = [];
-      foreach ($group as $key => $value) {
-        $params['group'][$value] = 1;
-      }
+    if (array_key_exists('group', $params)) {
+      $group = is_array($params['group']) ? $params['group'] : explode(',', $params['group']);
+      $params['group'] = array_fill_keys($group, 1);
     }
 
     if (!empty($params['image_URL'])) {
@@ -1198,12 +1192,13 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * @return bool
    *   true if data exists, false otherwise
    */
-  public static function blockDataExists(&$fields) {
+  public static function blockDataExists($fields): bool {
     if (!is_array($fields)) {
+      CRM_Core_Error::deprecatedWarning('support for invalid values will be dropped');
       return FALSE;
     }
 
-    static $skipFields = [
+    $dataFields = array_filter(array_diff_key($fields, array_fill_keys([
       'location_type_id',
       'is_primary',
       'phone_type_id',
@@ -1211,34 +1206,8 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       'country_id',
       'website_type_id',
       'master_id',
-    ];
-    foreach ($fields as $name => $value) {
-      $skipField = FALSE;
-      foreach ($skipFields as $skip) {
-        if (strpos("[$skip]", $name) !== FALSE) {
-          if ($name == 'phone') {
-            continue;
-          }
-          $skipField = TRUE;
-          break;
-        }
-      }
-      if ($skipField) {
-        continue;
-      }
-      if (is_array($value)) {
-        if (self::blockDataExists($value)) {
-          return TRUE;
-        }
-      }
-      else {
-        if (!empty($value)) {
-          return TRUE;
-        }
-      }
-    }
-
-    return FALSE;
+    ], TRUE)));
+    return !empty($dataFields);
   }
 
   /**
@@ -1327,7 +1296,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     if ($this->_contactSubType) {
       $templateFile = "CRM/Contact/Form/Edit/SubType/{$this->_contactSubType}.tpl";
       $template = CRM_Core_Form::getTemplate();
-      if ($template->template_exists($templateFile)) {
+      if ($template->templateExists($templateFile)) {
         return $templateFile;
       }
     }

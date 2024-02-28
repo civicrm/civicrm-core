@@ -289,11 +289,11 @@ class CustomValueTest extends CustomTestBase {
 
     $this->assertNotContains("Custom_$groupName", Entity::get()->execute()->column('name'));
 
-    CustomGroup::create(FALSE)
+    $customGroup = CustomGroup::create(FALSE)
       ->addValue('title', $groupName)
       ->addValue('extends', 'Contact')
       ->addValue('is_multiple', FALSE)
-      ->execute();
+      ->execute()->single();
 
     $this->assertNotContains("Custom_$groupName", Entity::get()->execute()->column('name'));
 
@@ -302,6 +302,12 @@ class CustomValueTest extends CustomTestBase {
       ->addValue('is_multiple', TRUE)
       ->execute();
     $this->assertContains("Custom_$groupName", Entity::get()->execute()->column('name'));
+
+    $links = CustomValue::getLinks($groupName, FALSE)
+      ->addValue('id', 3)
+      ->execute()->indexBy('ui_action');
+    $this->assertStringContainsString('gid=' . $customGroup['id'], $links['view']['path']);
+    $this->assertStringContainsString('recId=3', $links['view']['path']);
 
     CustomGroup::update(FALSE)
       ->addWhere('name', '=', $groupName)

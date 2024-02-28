@@ -95,21 +95,19 @@
                 </div>
 
             {/if}
-              {if !empty($extends) && $extends eq "Membership"}
-                {if ($element.id == $priceSet.auto_renew_membership_field)}
-                  <div id="allow_auto_renew">
-                    <div class='crm-section auto-renew'>
-                      <div class='label'></div>
-                      <div class='content' id="auto_renew_section">
-                        {if $form.auto_renew}
-                          {$form.auto_renew.html}&nbsp;{$form.auto_renew.label|smarty:nodefaults|purify}
-                        {/if}
-                      </div>
-                      <div class='content' id="force_renew" style='display: none'>{ts}Membership will renew automatically.{/ts}</div>
-                    </div>
+            {if (array_key_exists('auto_renew', $form)) && !empty($extends) && $extends eq "Membership" && array_key_exists('supports_auto_renew', $element) && $element.supports_auto_renew}
+              <div id="allow_auto_renew">
+                <div class='crm-section auto-renew'>
+                  <div class='label'></div>
+                  <div class='content' id="auto_renew_section">
+                    {if $form.auto_renew}
+                      {$form.auto_renew.html}&nbsp;{$form.auto_renew.label|smarty:nodefaults|purify}
+                    {/if}
                   </div>
-                {/if}
-              {/if}
+                  <div class='content' id="force_renew" style='display: none'>{ts}Membership will renew automatically.{/ts}</div>
+                </div>
+              </div>
+            {/if}
               <div class="clear"></div>
           </div>
         {/if}

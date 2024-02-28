@@ -45,10 +45,10 @@ class UrlTest extends \CiviUnitTestCase {
     $relatives['asset'] = Civi::url('asset://[civicrm.packages]/js/foobar.js', 'r');
 
     foreach ($absolutes as $key => $url) {
-      $this->assertRegExp(';^https?://;', (string) $url, "absolutes[$key] should be absolute URL");
+      $this->assertMatchesRegularExpression(';^https?://;', (string) $url, "absolutes[$key] should be absolute URL");
     }
     foreach ($relatives as $key => $url) {
-      $this->assertNotRegExp(';^https?://;', (string) $url, "relatives[$key] should be relative URL");
+      $this->assertDoesNotMatchRegularExpression(';^https?://;', (string) $url, "relatives[$key] should be relative URL");
     }
   }
 

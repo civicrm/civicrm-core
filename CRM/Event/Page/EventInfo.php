@@ -20,6 +20,8 @@
  */
 class CRM_Event_Page_EventInfo extends CRM_Core_Page {
 
+  use CRM_Event_Form_EventFormTrait;
+
   /**
    * Run the page.
    *
@@ -79,15 +81,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
 
     // show event fees.
     if ($this->_id && !empty($values['event']['is_monetary'])) {
-
-      //CRM-10434
-      $discountId = CRM_Core_BAO_Discount::findSet($this->_id, 'civicrm_event');
-      if ($discountId) {
-        $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Discount', $discountId, 'price_set_id');
-      }
-      else {
-        $priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $this->_id);
-      }
+      $priceSetId = $this->getPriceSetID();
 
       // get price set options, - CRM-5209
       if ($priceSetId) {
@@ -207,8 +201,8 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
         'lat' => (float ) ($maxLat - $minLat),
         'lng' => (float ) ($maxLng - $minLng),
       ];
-      $this->assign_by_ref('center', $center);
-      $this->assign_by_ref('span', $span);
+      $this->assign('center', $center);
+      $this->assign('span', $span);
       if ($action == CRM_Core_Action::PREVIEW) {
         $mapURL = CRM_Utils_System::url('civicrm/contact/map/event',
           "eid={$this->_id}&reset=1&action=preview",
@@ -246,35 +240,32 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     }
 
     $hasWaitingList = $values['event']['has_waitlist'] ?? NULL;
-    $eventFullMessage = CRM_Event_BAO_Participant::eventFull($this->_id,
-      FALSE,
-      $hasWaitingList
-    );
+    $isEventOpenForRegistration = CRM_Event_BAO_Event::validRegistrationRequest($values['event'], $this->_id);
 
     $allowRegistration = FALSE;
-    $isEventOpenForRegistration = CRM_Event_BAO_Event::validRegistrationRequest($values['event'], $this->_id);
-    if (!empty($values['event']['is_online_registration'])) {
-      if ($isEventOpenForRegistration == 1) {
-        // we always generate urls for the front end in joomla
-        $action_query = $action === CRM_Core_Action::PREVIEW ? "&action=$action" : '';
-        $url = CRM_Utils_System::url('civicrm/event/register',
-          "id={$this->_id}&reset=1{$action_query}",
-          FALSE, NULL, TRUE,
-          TRUE
-        );
-        if (!$eventFullMessage || $hasWaitingList) {
-          $registerText = ts('Register Now');
-          if (!empty($values['event']['registration_link_text'])) {
-            $registerText = $values['event']['registration_link_text'];
-          }
-
-          //Fixed for CRM-4855
-          $allowRegistration = CRM_Event_BAO_Event::showHideRegistrationLink($values);
-
-          $this->assign('registerText', $registerText);
-          $this->assign('registerURL', $url);
-        }
+    // check that the user has permission to register for this event
+    // Looks like the form shows either way - just not the register option.
+    $hasPermission = CRM_Core_Permission::event(CRM_Core_Permission::EDIT,
+      $this->getEventID(), 'register for events'
+    );
+    if ($hasPermission && $this->isAvailableForOnlineRegistration()) {
+      // we always generate urls for the front end in joomla
+      $action_query = $action === CRM_Core_Action::PREVIEW ? "&action=$action" : '';
+      $url = CRM_Utils_System::url('civicrm/event/register',
+        "id={$this->_id}&reset=1{$action_query}",
+        FALSE, NULL, TRUE,
+        TRUE
+      );
+      $registerText = ts('Register Now');
+      if (!empty($values['event']['registration_link_text'])) {
+        $registerText = $values['event']['registration_link_text'];
       }
+
+      //Fixed for CRM-4855
+      $allowRegistration = CRM_Event_BAO_Event::showHideRegistrationLink($values);
+
+      $this->assign('registerText', $registerText);
+      $this->assign('registerURL', $url);
     }
 
     $this->assign('registerClosed', !empty($values['event']['is_online_registration']) && !$isEventOpenForRegistration && CRM_Core_Permission::check('register for events'));
@@ -287,8 +278,8 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
       'role_id' => $values['event']['default_role_id'] ?? NULL,
     ];
 
-    if ($eventFullMessage && ($noFullMsg == 'false') || CRM_Event_BAO_Event::checkRegistration($params)) {
-      $statusMessage = $eventFullMessage;
+    if (($this->isEventFull() && $noFullMsg === 'false') || CRM_Event_BAO_Event::checkRegistration($params)) {
+      $statusMessage = $this->getEventValue('event_full_text');
       if (CRM_Event_BAO_Event::checkRegistration($params)) {
         if ($noFullMsg == 'false') {
           if ($values['event']['allow_same_participant_emails']) {
@@ -359,6 +350,31 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
       }
     }
     return parent::getTemplateFileName();
+  }
+
+  /**
+   * Get the price set ID for the event.
+   *
+   * @return int|null
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   * @noinspection PhpDocMissingThrowsInspection
+   */
+  public function getPriceSetID(): ?int {
+    if ($this->getEventValue('is_monetary')) {
+      //CRM-10434
+      $discountID = CRM_Core_BAO_Discount::findSet($this->getEventID(), 'civicrm_event');
+      if ($discountID) {
+        return (int) CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Discount', $discountID, 'price_set_id');
+      }
+
+      return (int) CRM_Price_BAO_PriceSet::getFor('civicrm_event', $this->getEventID());
+    }
+    return NULL;
   }
 
 }

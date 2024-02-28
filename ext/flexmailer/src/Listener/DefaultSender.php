@@ -10,9 +10,16 @@
  */
 namespace Civi\FlexMailer\Listener;
 
+use Civi\Core\Service\AutoService;
 use Civi\FlexMailer\Event\SendBatchEvent;
 
-class DefaultSender extends BaseListener {
+/**
+ * @service civi_flexmailer_default_sender
+ */
+class DefaultSender extends AutoService {
+
+  use IsActiveTrait;
+
   const BULK_MAIL_INSERT_COUNT = 10;
 
   public function onSend(SendBatchEvent $e) {

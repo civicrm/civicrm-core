@@ -51,45 +51,25 @@ class CRM_Contribute_Info extends CRM_Core_Component_Info {
 
   /**
    * @inheritDoc
-   * Provides permissions that are used by component.
-   * Needs to be implemented in component's information
-   * class.
-   *
-   * NOTE: if using conditionally permission return,
-   * implementation of $getAllUnconditionally is required.
-   *
-   * @param bool $getAllUnconditionally
-   * @param bool $descriptions
-   *   Whether to return permission descriptions
-   *
-   * @return array|null
-   *   collection of permissions, null if none
    */
-  public function getPermissions($getAllUnconditionally = FALSE, $descriptions = FALSE) {
+  public function getPermissions(): array {
     $permissions = [
       'access CiviContribute' => [
-        ts('access CiviContribute'),
-        ts('Record backend contributions (with edit contributions) and view all contributions (for visible contacts)'),
+        'label' => ts('access CiviContribute'),
+        'description' => ts('Record backend contributions (with edit contributions) and view all contributions (for visible contacts)'),
       ],
       'edit contributions' => [
-        ts('edit contributions'),
-        ts('Record and update contributions'),
+        'label' => ts('edit contributions'),
+        'description' => ts('Record and update contributions'),
       ],
       'make online contributions' => [
-        ts('make online contributions'),
+        'label' => ts('make online contributions'),
       ],
       'delete in CiviContribute' => [
-        ts('delete in CiviContribute'),
-        ts('Delete contributions'),
+        'label' => ts('delete in CiviContribute'),
+        'description' => ts('Delete contributions'),
       ],
     ];
-
-    if (!$descriptions) {
-      foreach ($permissions as $name => $attr) {
-        $permissions[$name] = array_shift($attr);
-      }
-    }
-
     return $permissions;
   }
 

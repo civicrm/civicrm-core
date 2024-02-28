@@ -18,15 +18,14 @@
 /**
  * Smarty Compatibility class.
  *
- * This class implements but Smarty v2 & Smarty v3 functions so that
+ * This class implements both Smarty v2 & Smarty v3+ functions so that
  *
  * 1) we can start to transition functions like `$smarty->assign_var` to
  * `$smarty->assignVar()`
- * 2) if someone adds the Smarty3 package onto their site and
- * defines CIVICRM_SMARTY3_AUTOLOAD_PATH then Smarty3 will load from that
+ * 2) if someone defines CIVICRM_SMARTY_AUTOLOAD_PATH then Smarty will load from that
  * location.
  *
- * Note that experimenting with `CIVICRM_SMARTY3_AUTOLOAD_PATH` will not
+ * Note that experimenting with `CIVICRM_SMARTY_AUTOLOAD_PATH` will not
  * go well if extensions are installed that have not run civix upgrade
  * somewhat recently (ie have the old version of the hook_civicrm_config
  * with reference to `$template =& CRM_Core_Smarty::singleton();`
@@ -37,12 +36,12 @@
  * other similar PEAR packages. doubt it
  */
 if (!class_exists('Smarty')) {
-  if (defined('CIVICRM_SMARTY3_AUTOLOAD_PATH')) {
-    // @todo - this is experimental but it allows someone to
-    // get Smarty3 to load instead of Smarty2 if set.
-    // It is likely the final Smarty3 solution will look
-    // different but this makes testing possible without re-inventing
-    // it each time we try...
+  if (defined('CIVICRM_SMARTY_AUTOLOAD_PATH')) {
+    // Specify the smarty version to load.
+    require_once CIVICRM_SMARTY_AUTOLOAD_PATH;
+  }
+  elseif (defined('CIVICRM_SMARTY3_AUTOLOAD_PATH')) {
+    // older version of the above constant.
     require_once CIVICRM_SMARTY3_AUTOLOAD_PATH;
   }
   else {
@@ -55,14 +54,6 @@ if (!class_exists('Smarty')) {
  */
 class CRM_Core_SmartyCompatibility extends Smarty {
 
-  public function loadFilter($type, $name) {
-    if (method_exists(get_parent_class(), 'load_filter')) {
-      parent::load_filter($type, $name);
-      return;
-    }
-    parent::loadFilter($type, $name);
-  }
-
   /**
    * @deprecated
    *
@@ -72,10 +63,11 @@ class CRM_Core_SmartyCompatibility extends Smarty {
    * @throws \SmartyException
    */
   public function load_filter($type, $name) {
-    if (method_exists(get_parent_class(), 'load_filter')) {
+    if (method_exists(parent::class, 'load_filter')) {
       parent::load_filter($type, $name);
       return;
     }
+    CRM_Core_Error::deprecatedWarning('loadFilter');
     parent::loadFilter($type, $name);
   }
 
@@ -88,39 +80,39 @@ class CRM_Core_SmartyCompatibility extends Smarty {
    * @param string $modifier_impl name of PHP function to register
    */
   public function register_modifier($modifier, $modifier_impl) {
-    if (method_exists(get_parent_class(), 'register_modifier')) {
+    if (method_exists(parent::class, 'register_modifier')) {
       parent::register_modifier($modifier, $modifier_impl);
       return;
     }
+    CRM_Core_Error::deprecatedWarning('registerPlugin');
     parent::registerPlugin('modifier', $modifier, $modifier_impl);
-  }
-
-  public function registerPlugin($type, $name, $callback, $cacheable = TRUE, $cache_attr = NULL) {
-    if (method_exists(get_parent_class(), 'registerPlugin')) {
-      parent::registerPlugin($type, $name, $callback, $cacheable = TRUE, $cache_attr = NULL);
-      return;
-    }
-    if ($type === 'modifier') {
-      parent::register_modifier($name, $callback);
-    }
   }
 
   /**
    * Registers a resource to fetch a template
    *
+   * @deprecated
+   *
    * @param string $type name of resource
    * @param array $functions array of functions to handle resource
    */
   public function register_resource($type, $functions) {
-    if (method_exists(get_parent_class(), 'register_resource')) {
+    if (method_exists(parent::class, 'register_resource')) {
       parent::register_resource($type, $functions);
       return;
     }
+    if ($type === 'string') {
+      // Not valid / required for Smarty3+
+      return;
+    }
+    CRM_Core_Error::deprecatedWarning('registerResource');
     parent::registerResource($type, $functions);
   }
 
   /**
    * Registers custom function to be used in templates
+   *
+   * @deprecated
    *
    * @param string $function the name of the template function
    * @param string $function_impl the name of the PHP function to register
@@ -130,45 +122,29 @@ class CRM_Core_SmartyCompatibility extends Smarty {
    * @throws \SmartyException
    */
   public function register_function($function, $function_impl, $cacheable = TRUE, $cache_attrs = NULL) {
-    if (method_exists(get_parent_class(), 'register_function')) {
+    if (method_exists(parent::class, 'register_function')) {
       parent::register_function($function, $function_impl, $cacheable = TRUE, $cache_attrs = NULL);
       return;
     }
+    CRM_Core_Error::deprecatedWarning('registerPlugin');
     parent::registerPlugin('function', $function, $function, $cacheable, $cache_attrs);
   }
 
   /**
    * Returns an array containing template variables
    *
+   * @deprecated since 5.69 will be removed around 5.79
+   *
    * @param string $name
    *
    * @return array
    */
   public function &get_template_vars($name = NULL) {
-    if (method_exists(get_parent_class(), 'get_template_vars')) {
+    if (method_exists(parent::class, 'get_template_vars')) {
       return parent::get_template_vars($name);
     }
     $var = parent::getTemplateVars($name);
     return $var;
-  }
-
-  /**
-   * Returns a single or all template variables
-   *
-   * @api  Smarty::getTemplateVars()
-   * @link http://www.smarty.net/docs/en/api.get.template.vars.tpl
-   *
-   * @param string $varName variable name or NULL
-   * @param \Smarty_Internal_Data|\Smarty_Internal_Template|\Smarty $_ptr optional pointer to data object
-   * @param bool $searchParents include parent templates?
-   *
-   * @return mixed variable value or or array of variables
-   */
-  public function getTemplateVars($varName = NULL, Smarty_Internal_Data $_ptr = NULL, $searchParents = TRUE) {
-    if (method_exists(get_parent_class(), 'getTemplateVars')) {
-      return parent::getTemplateVars($varName . $_ptr, $searchParents);
-    }
-    return parent::get_template_vars($varName);
   }
 
   /**
@@ -177,15 +153,13 @@ class CRM_Core_SmartyCompatibility extends Smarty {
    * @deprecated
    * @param string $tpl_var
    * @param mixed $value
-   *
-   * @return mixed|null|void
    */
   public function assign_by_ref($tpl_var, &$value) {
-    if (method_exists(get_parent_class(), 'assign_by_ref')) {
+    if (method_exists(parent::class, 'assign_by_ref')) {
       parent::assign_by_ref($tpl_var, $value);
       return;
     }
-    return parent::assignByRef($tpl_var, $value);
+    $this->assign($tpl_var, $value);
   }
 
   /**
@@ -197,7 +171,7 @@ class CRM_Core_SmartyCompatibility extends Smarty {
    * @return mixed|null|void
    */
   public function clear_assign($tpl_var) {
-    if (method_exists(get_parent_class(), 'clear_assign')) {
+    if (method_exists(parent::class, 'clear_assign')) {
       parent::clear_assign($tpl_var);
       return;
     }
@@ -213,25 +187,10 @@ class CRM_Core_SmartyCompatibility extends Smarty {
    * @throws \SmartyException
    */
   public function template_exists($tpl_file) {
-    if (method_exists(get_parent_class(), 'template_exists')) {
+    if (method_exists(parent::class, 'template_exists')) {
       return parent::template_exists($tpl_file);
     }
     return parent::templateExists($tpl_file);
-  }
-
-  /**
-   * Check if a template resource exists
-   *
-   * @param string $resource_name template name
-   *
-   * @return bool status
-   * @throws \SmartyException
-   */
-  public function templateExists($resource_name) {
-    if (method_exists(get_parent_class(), 'templateExists')) {
-      return parent::templateExists($resource_name);
-    }
-    return parent::template_exists($resource_name);
   }
 
 }

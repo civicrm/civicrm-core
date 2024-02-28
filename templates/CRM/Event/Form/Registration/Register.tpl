@@ -76,8 +76,8 @@
       {include file="CRM/UF/Form/Block.tpl" fields=$customPre prefix=false hideFieldset=false}
     </div>
 
-    {if $priceSet}
-      {if ! $quickConfig}<fieldset id="priceset" class="crm-public-form-item crm-group priceset-group">
+    {if !$suppressPaymentBlock}
+      {if !$quickConfig}<fieldset id="priceset" class="crm-public-form-item crm-group priceset-group">
         <legend>{$event.fee_label}</legend>{/if}
       {include file="CRM/Price/Form/PriceSet.tpl" extends="Event" hideTotal=$quickConfig}
       {include file="CRM/Price/Form/ParticipantCount.tpl"}
@@ -130,7 +130,7 @@
       </fieldset>
     {/if}
 
-    {if $priceSet && !$showPaymentOnConfirm}
+    {if !$suppressPaymentBlock && !$showPaymentOnConfirm}
       {include file='CRM/Core/BillingBlockWrapper.tpl'}
     {/if}
 

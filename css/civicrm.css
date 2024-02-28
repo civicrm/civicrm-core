@@ -1863,8 +1863,10 @@ input.crm-form-entityref {
 
 .crm-container .crm-submit-buttons,
 .crm-container .action-link {
-  height: 27px;
   margin: 4px 0 4px 2px;
+}
+.crm-container .action-link {
+  height: 27px;
 }
 
 .crm-container .register_link-top {
@@ -1902,9 +1904,7 @@ input.crm-form-entityref {
   text-decoration: none;
   cursor: pointer;
   border: 1px solid #3e3e3e;
-  display: block;
-  float: left;
-  overflow: hidden;
+  display: inline-block;
   line-height: 135%;
   border-radius: 3px;
 }
@@ -2281,6 +2281,7 @@ div.crm-master-accordion-header a.helpicon {
 }
 
 .crm-container div.collapsed .crm-accordion-body,
+.crm-container fieldset.collapsed .crm-accordion-body,
 .crm-container .crm-collapsible.collapsed .collapsible-title + * {
   display: none;
 }

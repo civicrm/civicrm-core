@@ -5,7 +5,7 @@
        ng-model="getSetSelect"
        ng-model-options="{getterSetter: true}"
        crm-autocomplete="$ctrl.defn.fk_entity"
-       crm-autocomplete-params="{formName: 'afform:' + $ctrl.afFieldset.getFormName(), fieldName: $ctrl.afFieldset.getName() + ':' + $ctrl.fieldName, values: dataProvider.getFieldData()}"
+       crm-autocomplete-params="$ctrl.getAutocompleteParams"
        multi="$ctrl.defn.input_attrs.multiple"
        auto-open="$ctrl.defn.input_attrs.autoOpen"
        quick-add="$ctrl.defn.input_attrs.quickAdd"

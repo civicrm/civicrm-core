@@ -167,6 +167,7 @@ function afform_civicrm_tabset($tabsetName, &$tabs, $context) {
   if ($tabsetName !== 'civicrm/contact/view') {
     return;
   }
+  $existingTabs = array_combine(array_keys($tabs), array_column($tabs, 'id'));
   $contactTypes = array_merge((array) ($context['contact_type'] ?? []), $context['contact_sub_type'] ?? []);
   $afforms = Civi\Api4\Afform::get(FALSE)
     ->addSelect('name', 'title', 'icon', 'module_name', 'directive_name', 'summary_contact_type', 'summary_weight')
@@ -179,6 +180,11 @@ function afform_civicrm_tabset($tabsetName, &$tabs, $context) {
     if (!$summaryContactType || !$contactTypes || array_intersect($summaryContactType, $contactTypes)) {
       // Convention is to name the afform like "afformTabMyInfo" which gets the tab name "my_info"
       $tabId = CRM_Utils_String::convertStringToSnakeCase(preg_replace('#^(afformtab|afsearchtab|afform|afsearch)#i', '', $afform['name']));
+      // If a tab with that id already exists, allow the afform to replace it.
+      $existingTab = array_search($tabId, $existingTabs);
+      if ($existingTab !== FALSE) {
+        unset($tabs[$existingTab]);
+      }
       $tabs[] = [
         'id' => $tabId,
         'title' => $afform['title'],
@@ -426,8 +432,8 @@ function afform_civicrm_alterMenu(&$items) {
  */
 function afform_civicrm_permission(&$permissions) {
   $permissions['administer afform'] = [
-    E::ts('FormBuilder: edit and delete forms'),
-    E::ts('Allows non-admin users to create, update and delete forms'),
+    'label' => E::ts('FormBuilder: edit and delete forms'),
+    'description' => E::ts('Allows non-admin users to create, update and delete forms'),
   ];
 }
 

@@ -33,31 +33,12 @@ trait OptionsSpecTrait {
   /**
    * @var callable
    */
-  private $optionsCallback;
+  public $optionsCallback;
 
   /**
    * @var array
    */
-  private $optionsCallbackParams = [];
-
-  /**
-   * @param array $values
-   * @param array|bool $return
-   * @param bool $checkPermissions
-   *
-   * @return array
-   */
-  public function getOptions($values = [], $return = TRUE, $checkPermissions = TRUE) {
-    if (!isset($this->options)) {
-      if ($this->optionsCallback) {
-        $this->options = ($this->optionsCallback)($this, $values, $return, $checkPermissions, $this->optionsCallbackParams);
-      }
-      else {
-        $this->options = FALSE;
-      }
-    }
-    return $this->options;
-  }
+  public $optionsCallbackParams = [];
 
   /**
    * @param array|bool $options

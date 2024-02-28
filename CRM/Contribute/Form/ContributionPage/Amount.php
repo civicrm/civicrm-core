@@ -543,10 +543,12 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
     $contributionPageID = $contributionPage->id;
 
     // prepare for data cleanup.
-    $deleteAmountBlk = $deletePledgeBlk = $deletePriceSet = FALSE;
-    if ($this->_priceSetID) {
-      $deletePriceSet = TRUE;
-    }
+    $deleteAmountBlk = $deletePledgeBlk = FALSE;
+    // We delete the link to the price set (the price set entity record) when
+    // one exists and there is neither a contribution or membership section enabled.
+    // This amount form can set & unset the contribution section but must check the database
+    // for the membership section (membership block).
+    $deletePriceSet = $this->_priceSetID && !$this->getSubmittedValue('amount_block_is_active') && !$this->getMembershipBlockID();
     if ($this->_pledgeBlockID) {
       $deletePledgeBlk = TRUE;
     }
@@ -558,9 +560,9 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
 
       if (!empty($params['amount_block_is_active'])) {
         // handle price set.
+        $deletePriceSet = FALSE;
         if ($priceSetID) {
           // add/update price set.
-          $deletePriceSet = FALSE;
           if (!empty($params['price_field_id']) || !empty($params['price_field_other'])) {
             $deleteAmountBlk = TRUE;
           }
@@ -568,8 +570,6 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
           CRM_Price_BAO_PriceSet::addTo('civicrm_contribution_page', $contributionPageID, $priceSetID);
         }
         else {
-
-          $deletePriceSet = FALSE;
           // process contribution amount block
           $deleteAmountBlk = FALSE;
 
@@ -795,7 +795,6 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
           }
           else {
             $deleteAmountBlk = TRUE;
-            $deletePriceSet = TRUE;
           }
         }
       }

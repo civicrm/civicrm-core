@@ -57,6 +57,7 @@ class CRM_Event_Form_EventFees {
    */
   public static function setDefaultValues(&$form) {
     $defaults = [];
+    $billingLocationTypeID = CRM_Core_BAO_LocationType::getBilling();
 
     if ($form->_pId) {
       $ids = [];
@@ -86,12 +87,12 @@ class CRM_Event_Form_EventFees {
     if ($form->_mode) {
       $config = CRM_Core_Config::singleton();
       // set default country from config if no country set
-      if (empty($defaults["billing_country_id-{$form->_bltID}"])) {
-        $defaults["billing_country_id-{$form->_bltID}"] = $config->defaultContactCountry;
+      if (empty($defaults["billing_country_id-{$billingLocationTypeID}"])) {
+        $defaults["billing_country_id-{$billingLocationTypeID}"] = $config->defaultContactCountry;
       }
 
-      if (empty($defaults["billing_state_province_id-{$form->_bltID}"])) {
-        $defaults["billing_state_province_id-{$form->_bltID}"] = $config->defaultContactStateProvince;
+      if (empty($defaults["billing_state_province_id-{$billingLocationTypeID}"])) {
+        $defaults["billing_state_province_id-{$billingLocationTypeID}"] = $config->defaultContactStateProvince;
       }
 
       $billingDefaults = $form->getProfileDefaults('Billing', $form->_contactId);
@@ -174,6 +175,7 @@ class CRM_Event_Form_EventFees {
     //CRM-4453
     if (!empty($defaults['participant_fee_currency'])) {
       $form->assign('fee_currency', $defaults['participant_fee_currency']);
+      $form->assign('currency', $defaults['participant_fee_currency']);
     }
 
     // CRM-4395

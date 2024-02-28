@@ -49,7 +49,7 @@
             </td>
           {else}
             <td class="description">
-              {if $n|substr:0:5 eq 'phone'}
+              {if $n|str_starts_with:'phone'}
                 {assign var="phone_ext_field" value=$n|replace:'phone':'phone_ext'}
                 {$form.$n.html}
                 {if $form.$phone_ext_field.html}

@@ -785,7 +785,7 @@ MODIFY      {$columnName} varchar( $length )
    *
    * @return bool
    */
-  public static function migrateUtf8mb4($revert = FALSE, $patterns = ['civicrm\_%'], $databaseList = NULL) {
+  public static function migrateUtf8mb4($revert = FALSE, $patterns = [], $databaseList = NULL) {
     $newCharSet = $revert ? 'utf8' : 'utf8mb4';
     $newCollation = $revert ? 'utf8_unicode_ci' : 'utf8mb4_unicode_ci';
     $newBinaryCollation = $revert ? 'utf8_bin' : 'utf8mb4_bin';
@@ -795,6 +795,8 @@ MODIFY      {$columnName} varchar( $length )
 
     $tableNameLikePatterns = [];
     $logTableNameLikePatterns = [];
+
+    $patterns = $patterns ?: CRM_Core_DAO::getTableNames();
 
     foreach ($patterns as $pattern) {
       $pattern = CRM_Utils_Type::escape($pattern, 'String');

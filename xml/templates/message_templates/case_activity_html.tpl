@@ -23,7 +23,7 @@
           <table style="border: 1px solid #999; margin: 1em 0em 1em; border-collapse: collapse; width:100%;">
             <tr>
               <th {$headerStyle}>
-                {ts}Activity Summary{/ts} - {$activityTypeName}
+                {ts}Activity Summary{/ts} - {activity.activity_type_id:label}
               </th>
             </tr>
             {if !empty($isCaseActivity)}

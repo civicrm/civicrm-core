@@ -43,14 +43,10 @@ class SpecFormatterTest extends Api4TestBase {
   }
 
   public function testCustomFieldWillBeReturned(): void {
-    $customGroupId = 1432;
     $customFieldId = 3333;
     $name = 'MyFancyField';
 
     $data = [
-      'custom_group_id' => $customGroupId,
-      'custom_group_id.name' => 'my_group',
-      'custom_group_id.title' => 'My Group',
       'id' => $customFieldId,
       'name' => $name,
       'label' => $name,
@@ -60,15 +56,21 @@ class SpecFormatterTest extends Api4TestBase {
       'serialize' => 1,
       'is_view' => FALSE,
     ];
+    $customGroup = [
+      'name' => 'my_group',
+      'title' => 'My Group',
+      'table_name' => 'civicrm_value_my_group',
+    ];
 
     /** @var \Civi\Api4\Service\Spec\CustomFieldSpec $field */
-    $field = SpecFormatter::arrayToField($data, 'TestEntity');
+    $field = SpecFormatter::arrayToField($data, 'TestEntity', $customGroup);
 
     $this->assertInstanceOf(CustomFieldSpec::class, $field);
     $this->assertEquals('my_group', $field->getCustomGroupName());
     $this->assertEquals($customFieldId, $field->getCustomFieldId());
     $this->assertEquals(\CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND, $field->getSerialize());
     $this->assertEquals('Select', $field->getInputType());
+    $this->assertEquals('civicrm_value_my_group', $field->getTableName());
     $this->assertTrue($field->getInputAttrs()['multiple']);
   }
 

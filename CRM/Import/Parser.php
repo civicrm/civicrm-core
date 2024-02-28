@@ -1128,11 +1128,6 @@ abstract class CRM_Import_Parser implements UserJobInterface {
 
     // get the formatted location blocks into params - w/ 3.0 format, CRM-4605
     if (!empty($values['location_type_id'])) {
-      static $fields = NULL;
-      if ($fields == NULL) {
-        $fields = [];
-      }
-
       foreach (['Phone', 'Email', 'IM', 'OpenID', 'Phone_Ext'] as $block) {
         $name = strtolower($block);
         if (!array_key_exists($name, $values)) {
@@ -1731,12 +1726,8 @@ abstract class CRM_Import_Parser implements UserJobInterface {
       }
       else {
         if (!empty($fieldMetadata['custom_group_id'])) {
-          $customField = CustomField::get(FALSE)
-            ->addWhere('id', '=', $fieldMetadata['custom_field_id'])
-            ->addSelect('name', 'custom_group_id.name')
-            ->execute()
-            ->first();
-          $optionFieldName = $customField['custom_group_id.name'] . '.' . $customField['name'];
+          $customField = CRM_Core_BAO_CustomField::getField($fieldMetadata['custom_field_id']);
+          $optionFieldName = $customField['custom_group']['name'] . '.' . $customField['name'];
         }
         $options = civicrm_api4($this->getFieldEntity($fieldName), 'getFields', [
           'loadOptions' => ['id', 'name', 'label', 'abbr'],

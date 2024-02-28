@@ -83,7 +83,7 @@ updateFile("sql/test_data_second_domain.mysql", function ($content) use ($newVer
 });
 
 updateFile("js/version.json", function () use ($newVersion) {
-  return json_encode($newVersion) . '\n';
+  return json_encode($newVersion) . "\n";
 });
 
 // Update core extensions if this is a stable release
@@ -110,9 +110,12 @@ foreach ($infoXmls as $infoXml) {
   });
 }
 
+// Update deleted-files-list.json
+`php tools/scripts/generate-deleted-files-list.php`;
+
 if ($doCommit) {
   $files = array_filter(
-    array_merge(['xml/version.xml', 'js/version.json', 'sql/civicrm_generated.mysql', 'sql/test_data_second_domain.mysql', $phpFile, $sqlFile], $infoXmls),
+    array_merge(['xml/version.xml', 'js/version.json', 'deleted-files-list.json', 'sql/civicrm_generated.mysql', 'sql/test_data_second_domain.mysql', $phpFile, $sqlFile], $infoXmls),
     function($file) {
       return $file && file_exists($file);
     }

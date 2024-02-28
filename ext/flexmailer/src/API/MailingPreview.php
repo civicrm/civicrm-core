@@ -3,7 +3,6 @@ namespace Civi\FlexMailer\API;
 
 use Civi\FlexMailer\FlexMailer;
 use Civi\FlexMailer\FlexMailerTask;
-use Civi\FlexMailer\Listener\Abdicator;
 
 class MailingPreview {
 
@@ -31,11 +30,6 @@ class MailingPreview {
     }
     else {
       $mailing->copyValues($params);
-    }
-
-    if (!Abdicator::isFlexmailPreferred($mailing) && empty($mailing->sms_provider_id)) {
-      require_once 'api/v3/Mailing.php';
-      return civicrm_api3_mailing_preview($params);
     }
 
     $contactID = \CRM_Utils_Array::value('contact_id', $params,

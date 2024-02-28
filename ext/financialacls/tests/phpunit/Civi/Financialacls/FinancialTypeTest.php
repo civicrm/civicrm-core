@@ -50,19 +50,19 @@ class FinancialTypeTest extends BaseTestClass {
       foreach ($actions as $action => $action_ts) {
         $this->assertEquals(
           [
-            ts('CiviCRM: %1 contributions of type %2', [
+            'label' => ts('CiviCRM: %1 contributions of type %2', [
               1 => $action_ts,
               2 => $type,
             ]),
-            ts('%1 contributions of type %2', [1 => $action_ts, 2 => $type]),
+            'description' => ts('%1 contributions of type %2', [1 => $action_ts, 2 => $type]),
           ],
           $permissions[$action . ' contributions of type ' . $type]
         );
       }
     }
     $this->assertEquals([
-      ts('CiviCRM: administer CiviCRM Financial Types'),
-      ts('Administer access to Financial Types'),
+      'label' => ts('CiviCRM: administer CiviCRM Financial Types'),
+      'description' => ts('Administer access to Financial Types'),
     ], $permissions['administer CiviCRM Financial Types']);
   }
 
@@ -78,7 +78,7 @@ class FinancialTypeTest extends BaseTestClass {
   }
 
   /**
-   * Check method testCheckPermissionedLineItems()
+   * Check method test_civicrm_financial_acls_check_permissioned_line_items()
    *
    * @throws \CRM_Core_Exception
    */
@@ -139,7 +139,7 @@ class FinancialTypeTest extends BaseTestClass {
     ]);
 
     try {
-      \CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($contribution['id'], 'view');
+      _civicrm_financial_acls_check_permissioned_line_items($contribution['id'], 'view');
       $this->fail('Missed expected exception');
     }
     catch (\CRM_Core_Exception $e) {
@@ -150,7 +150,7 @@ class FinancialTypeTest extends BaseTestClass {
       'view contributions of type Donation',
     ]);
     try {
-      \CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($contribution['id'], 'view');
+      _civicrm_financial_acls_check_permissioned_line_items($contribution['id'], 'view');
     }
     catch (\CRM_Core_Exception $e) {
       $this->fail('permissions should be established');

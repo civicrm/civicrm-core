@@ -102,7 +102,7 @@ class CRM_Report_Form_Instance {
       $form->freeze('is_reserved');
     }
 
-    $getPerms = \Civi\Api4\Permission::get(0)
+    $getPerms = \Civi\Api4\Permission::get(FALSE)
       ->addWhere('is_active', '=', 1)
       ->addWhere('group', 'IN', ['civicrm', 'cms', 'const'])
       ->setOrderBy(['title' => 'ASC'])

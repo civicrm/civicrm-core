@@ -198,14 +198,6 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
   public function testMultiplePaymentForPartiallyPaidContributionWithOneCreditCardPayment(): void {
     $mut = new CiviMailUtils($this, TRUE);
     $this->createPartiallyPaidOrder();
-    // In general when there is tpl leakage we try to fix. At the moment, however,
-    // the tpl leakage on credit card related things is kind of 'by-design' - or
-    // at least we haven't found a way to replace the way in with Payment.send_confirmation
-    // picks them up from the form process so we will just clear templates here to stop leakage
-    // from previous tests causing a fail.
-    // The reason this is hard to fix is that we save a billing address per contribution not
-    // per payment so it's a problem with the data model
-    CRM_Core_Smarty::singleton()->clearTemplateVars();
 
     // pay additional amount
     $this->submitPayment(50, NULL, TRUE);

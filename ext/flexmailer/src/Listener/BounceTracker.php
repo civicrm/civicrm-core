@@ -10,9 +10,15 @@
  */
 namespace Civi\FlexMailer\Listener;
 
+use Civi\Core\Service\AutoService;
 use Civi\FlexMailer\Event\ComposeBatchEvent;
 
-class BounceTracker extends BaseListener {
+/**
+ * @service civi_flexmailer_bounce_tracker
+ */
+class BounceTracker extends AutoService {
+
+  use IsActiveTrait;
 
   /**
    * Inject bounce-tracking codes.
@@ -30,8 +36,7 @@ class BounceTracker extends BaseListener {
     foreach ($e->getTasks() as $task) {
       /** @var \Civi\FlexMailer\FlexMailerTask $task */
       list($verp) = $mailing->getVerpAndUrlsAndHeaders(
-        $e->getJob()->id, $task->getEventQueueId(), $task->getHash(),
-        $task->getAddress());
+        $e->getJob()->id, $task->getEventQueueId(), $task->getHash());
 
       if (!$task->getMailParam('Return-Path')) {
         $task->setMailParam('Return-Path', $defaultReturnPath ?? $verp['bounce']);

@@ -9,14 +9,16 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Event\AuthorizeRecordEvent;
 use Civi\Api4\Group;
+use Civi\Core\HookInterface;
 
 /**
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
+class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group implements HookInterface {
 
   /**
    * @deprecated
@@ -1441,32 +1443,26 @@ WHERE {$whereClause}";
   }
 
   /**
-   * @param string $entityName
-   * @param string $action
-   * @param array $record
-   * @param $userID
-   * @return bool
-   * @see CRM_Core_DAO::checkAccess
+   * Check write access.
+   * @see \Civi\Api4\Utils\CoreUtil::checkAccessRecord
    */
-  public static function _checkAccess(string $entityName, string $action, array $record, $userID): bool {
-    switch ($action) {
-      case 'create':
-        $groupType = (array) ($record['group_type:name'] ?? []);
-        // If not already in :name format, transform to name
-        foreach ((array) ($record['group_type'] ?? []) as $typeId) {
-          $groupType[] = CRM_Core_PseudoConstant::getName(self::class, 'group_type', $typeId);
-        }
-        if ($groupType === ['Mailing List']) {
-          // If it's only a Mailing List, edit groups OR create mailings will work
-          return CRM_Core_Permission::check(['access CiviCRM', ['edit groups', 'access CiviMail', 'create mailings']], $userID);
-        }
-        else {
-          return CRM_Core_Permission::check(['access CiviCRM', 'edit groups'], $userID);
-        }
-
-      default:
-        // All other actions just rely on gatekeeper permissions
-        return TRUE;
+  public static function self_civi_api4_authorizeRecord(AuthorizeRecordEvent $e): void {
+    $record = $e->getRecord();
+    $userID = $e->getUserID();
+    // Check create permission (all other actions just rely on gatekeeper permissions)
+    if ($e->getActionName() === 'create') {
+      $groupType = (array) ($record['group_type:name'] ?? []);
+      // If not already in :name format, transform to name
+      foreach ((array) ($record['group_type'] ?? []) as $typeId) {
+        $groupType[] = CRM_Core_PseudoConstant::getName(self::class, 'group_type', $typeId);
+      }
+      if ($groupType === ['Mailing List']) {
+        // If it's only a Mailing List, edit groups OR create mailings will work
+        $e->setAuthorized(CRM_Core_Permission::check(['access CiviCRM', ['edit groups', 'access CiviMail', 'create mailings']], $userID));
+      }
+      else {
+        $e->setAuthorized(CRM_Core_Permission::check(['access CiviCRM', 'edit groups'], $userID));
+      }
     }
   }
 

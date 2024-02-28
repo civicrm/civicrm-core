@@ -140,7 +140,7 @@ class CRM_Core_I18n_SchemaStructure {
         ],
         'civicrm_uf_group' => [
           'title' => "varchar(64) NOT NULL DEFAULT ''  COMMENT 'Form title.'",
-          'frontend_title' => "varchar(64) COMMENT 'Profile Form Public title'",
+          'frontend_title' => "varchar(64) NOT NULL DEFAULT ''  COMMENT 'Profile Form Public title'",
           'help_pre' => "text COMMENT 'Description and/or help text to display before fields in form.'",
           'help_post' => "text COMMENT 'Description and/or help text to display after fields in form.'",
           'cancel_button_text' => "varchar(64) DEFAULT NULL COMMENT 'Custom Text to display on the Cancel button when used in create or edit mode'",
@@ -563,6 +563,7 @@ class CRM_Core_I18n_SchemaStructure {
           ],
           'frontend_title' => [
             'type' => "Text",
+            'required' => "true",
           ],
           'help_pre' => [
             'type' => "TextArea",

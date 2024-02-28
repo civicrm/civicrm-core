@@ -36,7 +36,7 @@ class CRM_Contact_ActionMapping extends \Civi\ActionSchedule\MappingBase {
     return 'Contact';
   }
 
-  public function modifySpec(\Civi\Api4\Service\Spec\RequestSpec $spec) {
+  public function modifyApiSpec(\Civi\Api4\Service\Spec\RequestSpec $spec) {
     $spec->getFieldByName('entity_value')
       ->setLabel(ts('Date Field'))
       ->setInputAttr('multiple', FALSE);
@@ -47,15 +47,18 @@ class CRM_Contact_ActionMapping extends \Civi\ActionSchedule\MappingBase {
   }
 
   public function getValueLabels(): array {
-    $allCustomFields = \CRM_Core_BAO_CustomField::getFields('');
+    $filter = ['extends' => 'Contact', 'is_multiple' => FALSE, 'is_active' => TRUE];
+    $contactCustomGroups = \CRM_Core_BAO_CustomGroup::getAll($filter);
     $dateFields = [
       'birth_date' => ts('Birth Date'),
       'created_date' => ts('Created Date'),
       'modified_date' => ts('Modified Date'),
     ];
-    foreach ($allCustomFields as $fieldID => $field) {
-      if ($field['data_type'] == 'Date') {
-        $dateFields["custom_$fieldID"] = $field['label'];
+    foreach ($contactCustomGroups as $customGroup) {
+      foreach ($customGroup['fields'] as $field) {
+        if ($field['data_type'] == 'Date') {
+          $dateFields["custom_{$field['id']}"] = $field['label'];
+        }
       }
     }
     return $dateFields;

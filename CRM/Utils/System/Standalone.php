@@ -16,6 +16,7 @@
  */
 
 use Civi\Standalone\Security;
+use Civi\Standalone\SessionHandler;
 
 /**
  * Standalone specific stuff goes here.
@@ -28,23 +29,6 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    */
   public function isLoaded(): bool {
     return TRUE;
-  }
-
-  public function missingStandaloneExtension() {
-    // error_log("sessionStart, " . (class_exists(\Civi\Standalone\Security::class) ? 'exists' : 'no ext'));
-    return !class_exists(\Civi\Standalone\Security::class);
-  }
-
-  public function initialize() {
-    parent::initialize();
-    // Initialize the session if it looks like there might be one.
-    // Case 1: user sends no session cookie: do NOT start the session. May be anon access that does not require session data. Good for caching.
-    // Case 2: user sends a session cookie: start the session, so we can access data like lcMessages for localization (which occurs early in the boot process).
-    // Case 3: user sends a session cookie but it's invalid: start the session, it will be empty and a new cookie will be sent.
-    if (isset($_COOKIE['PHPSESSID'])) {
-      // Note: passing $isRead = FALSE in the arguments will cause the session to be started.
-      CRM_Core_Session::singleton()->initialize(FALSE);
-    }
   }
 
   /**
@@ -75,9 +59,6 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    *   uid if user was created, false otherwise
    */
   public function createUser(&$params, $mailParam) {
-    if ($this->missingStandaloneExtension()) {
-      return FALSE;
-    }
     return Security::singleton()->createUser($params, $mailParam);
   }
 
@@ -85,9 +66,6 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function updateCMSName($ufID, $email) {
-    if ($this->missingStandaloneExtension()) {
-      return FALSE;
-    }
     return Security::singleton()->updateCMSName($ufID, $email);
   }
 
@@ -242,9 +220,6 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @throws \CRM_Core_Exception.
    */
   public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
-    if ($this->missingStandaloneExtension()) {
-      return FALSE;
-    }
     return Security::singleton()->authenticate($name, $password, $loadCMSBootstrap, $realPath);
   }
 
@@ -257,9 +232,6 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @return int|null
    */
   public function getUfId($username) {
-    if ($this->missingStandaloneExtension()) {
-      return NULL;
-    }
     return Security::singleton()->getUserIDFromUsername($username);
   }
 
@@ -270,9 +242,6 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    *   This function should be removed in favor of linking to the CMS's logout page
    */
   public function logout() {
-    if ($this->missingStandaloneExtension()) {
-      return;
-    }
     return Security::singleton()->logoutUser();
   }
 
@@ -335,10 +304,6 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
 
     if (!$loadUser) {
       return TRUE;
-    }
-
-    if ($this->missingStandaloneExtension()) {
-      return FALSE;
     }
 
     $security = \Civi\Standalone\Security::singleton();
@@ -411,9 +376,6 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function isUserLoggedIn() {
-    if ($this->missingStandaloneExtension()) {
-      return TRUE;
-    }
     return Security::singleton()->isUserLoggedIn();
   }
 
@@ -445,11 +407,6 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function getLoggedInUfID() {
-
-    if ($this->missingStandaloneExtension()) {
-      // This helps towards getting the CiviCRM menu to display
-      return 1;
-    }
     return Security::singleton()->getLoggedInUfID();
   }
 
@@ -466,9 +423,6 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function synchronizeUsers() {
-    if ($this->missingStandaloneExtension()) {
-      return parent::synchronizeUsers();
-    }
     return Security::singleton()->synchronizeUsers();
   }
 
@@ -558,9 +512,10 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
       return $url;
     }
 
-    // Notice: we CANNOT call log here, it creates a nasty crash.
-    // \Civi::log()->warning("Standalone languageNegotiationURL is not written, but was called");
-    if ($this->missingStandaloneExtension()) {
+    // This method is called early in the boot process.
+    // Check if the extensions are available yet as our implementation requires Standaloneusers.
+    // Debugging note: calling Civi::log() methods here creates a nasty crash.
+    if (!class_exists(\Civi\Standalone\Security::class)) {
       return $url;
     }
     return Security::singleton()->languageNegotiationURL($url, $addLanguagePart = TRUE, $removeLanguagePart = FALSE);
@@ -571,9 +526,6 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @return array
    */
   public function getCMSPermissionsUrlParams() {
-    if ($this->missingStandaloneExtension()) {
-      return ['ufAccessURL' => '/civicrm/admin/roles'];
-    }
     return Security::singleton()->getCMSPermissionsUrlParams();
   }
 
@@ -595,6 +547,26 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
 
       throw new CRM_Core_Exception('Access denied. Standaloneusers extension not found');
     }
+  }
+
+  /**
+   * Start a new session.
+   */
+  public function sessionStart() {
+    $session_handler = new SessionHandler();
+    session_set_save_handler($session_handler);
+
+    $session_max_lifetime = Civi::settings()->get('standaloneusers_session_max_lifetime') ?? 1440;
+
+    session_start([
+      'cookie_httponly'  => 1,
+      'cookie_secure'    => !empty($_SERVER['HTTPS']),
+      'gc_maxlifetime'   => $session_max_lifetime,
+      'name'             => 'SESSCIVISO',
+      'use_cookies'      => 1,
+      'use_only_cookies' => 1,
+      'use_strict_mode'  => 1,
+    ]);
   }
 
 }

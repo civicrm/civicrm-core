@@ -12,13 +12,19 @@
   </div>
 
   <form>
-    <div class="crm-flex-box">
-      <div class="nav-stacked">
+    <div class="crm-flex-box crm-search-admin-outer">
+      <div class="crm-flex-1">
         <input id="crm-saved-search-label" class="form-control" ng-model="$ctrl.savedSearch.label" type="text" required placeholder="{{:: ts('Untitled Search') }}" ng-model-options="$ctrl.debounceMode">
       </div>
-      <div class="crm-flex-4 form-inline">
-        <label for="crm-search-main-entity">{{:: ts('Search for') }}</label>
-        <input id="crm-search-main-entity" class="form-control huge collapsible-optgroups" ng-model="$ctrl.savedSearch.api_entity" crm-ui-select="::{allowClear: false, data: mainEntitySelect}" ng-disabled="$ctrl.savedSearch.id">
+      <div class="crm-flex-1 form-inline">
+        <div class="btn-group">
+          <button type="button" class="btn" ng-class="{'btn-primary': status === 'unsaved', 'btn-warning': status === 'saving', 'btn-success': status === 'saved'}" ng-disabled="status !== 'unsaved'" ng-click="$ctrl.save()">
+            <i class="crm-i" ng-class="{'fa-check': status !== 'saving', 'fa-spin fa-spinner': status === 'saving'}"></i>
+            <span ng-if="status === 'saved'">{{:: ts('Saved') }}</span>
+            <span ng-if="status === 'unsaved'">{{:: ts('Save') }}</span>
+            <span ng-if="status === 'saving'">{{:: ts('Saving...') }}</span>
+          </button>
+        </div>
 
         <div class="form-group pull-right">
 
@@ -55,35 +61,54 @@
             </ul>
           </div>
 
-          <div class="btn-group">
-            <button type="button" class="btn" ng-class="{'btn-primary': status === 'unsaved', 'btn-warning': status === 'saving', 'btn-success': status === 'saved'}" ng-disabled="status !== 'unsaved'" ng-click="$ctrl.save()">
-              <i class="crm-i" ng-class="{'fa-check': status !== 'saving', 'fa-spin fa-spinner': status === 'saving'}"></i>
-              <span ng-if="status === 'saved'">{{:: ts('Saved') }}</span>
-              <span ng-if="status === 'unsaved'">{{:: ts('Save') }}</span>
-              <span ng-if="status === 'saving'">{{:: ts('Saving...') }}</span>
+          <div class="btn-group crm-search-admin-links" ng-if="$ctrl.savedSearch.id">
+            <a ng-href="{{ $ctrl.searchDisplayPath + '#/display/' + $ctrl.savedSearch.name }}" target="_blank" class="btn btn-primary-outline" title="{{:: ts('View search results table') }}">
+              <i class="crm-i fa-external-link"></i>
+              {{:: ts('View Results') }}
+            </a>
+            <button type="button" ng-click="$ctrl.openDisplayMenu = true;" class="btn btn-primary-outline dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <span class="caret"></span>
             </button>
+            <ul class="dropdown-menu dropdown-menu-right" ng-if=":: $ctrl.openDisplayMenu">
+              <li title="{{:: ts('View search results table') }}">
+                <a ng-href="{{ $ctrl.searchDisplayPath + '#/display/' + $ctrl.savedSearch.name }}" target="_blank">
+                  <i class="crm-i fa-table"></i>
+                  {{:: ts('Search results table') }}
+                </a>
+              </li>
+              <li ng-repeat="display in $ctrl.savedSearch.displays" ng-if="display.id" ng-class="{disabled: display.acl_bypass}" title="{{:: display.acl_bypass ? ts('Display has permissions disabled') : ts('View display') }}">
+                <a ng-href="{{ display.acl_bypass ? '' : $ctrl.searchDisplayPath + '#/display/' + $ctrl.savedSearch.name + '/' + display.name }}" target="_blank">
+                  <i class="crm-i {{ display.acl_bypass ? 'fa-unlock' : $ctrl.displayTypes[display.type].icon }}"></i>
+                  {{ display.label }}
+                </a>
+              </li>
+            </ul>
           </div>
 
         </div>
 
       </div>
     </div>
-    <div class="crm-flex-box">
-      <ul class="nav nav-pills nav-stacked" ng-include="'~/crmSearchAdmin/tabs.html'"></ul>
-      <div class="crm-flex-4" ng-switch="controls.tab">
-        <div ng-switch-when="compose">
-          <div ng-include="'~/crmSearchAdmin/compose.html'" class="crm-search-admin-relative"></div>
-          <crm-search-admin-results-table search="$ctrl.savedSearch"></crm-search-admin-results-table>
+
+    <div class="crm-flex-box crm-search-admin-outer">
+      <nav class="crm-search-admin-main-tabs">
+        <ul class="nav nav-pills nav-stacked" role="tablist" aria-orientation="vertical" ng-include="'~/crmSearchAdmin/tabs.html'"></ul>
+      </nav>
+      <div class="crm-flex-4 panel panel-default">
+        <div ng-if="!$ctrl.selectedDisplay()" class="panel-body" role="tabpanel">
+          <div ng-include="'~/crmSearchAdmin/crmSearch-' + controls.tab + '.html'" class="crm-search-admin-relative"></div>
         </div>
-        <div ng-switch-when="group">
-          <fieldset ng-include="'~/crmSearchAdmin/group.html'"></fieldset>
-        </div>
-        <div ng-switch-default>
+        <div ng-if="$ctrl.selectedDisplay()" class="panel-body" role="tabpanel">
           <div ng-repeat="display in $ctrl.savedSearch.displays" ng-if="controls.tab === ('display_' + $index)">
             <crm-search-admin-display class="crm-search-admin-relative" display="display" saved-search="$ctrl.savedSearch"></crm-search-admin-display>
           </div>
         </div>
       </div>
     </div>
+
+    <div ng-if="!$ctrl.selectedDisplay()">
+      <crm-search-admin-results-table search="$ctrl.savedSearch" debug="$ctrl.debug"></crm-search-admin-results-table>
+    </div>
+
   </form>
 </div>

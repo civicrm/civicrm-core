@@ -56,6 +56,22 @@ class CRM_Utils_PDF_Utils {
     // dompdf requires dimensions in points
     $paper_size = [0, 0, $paper_width, $paper_height];
     $orientation = CRM_Core_BAO_PdfFormat::getValue('orientation', $format);
+
+    if (\Civi::settings()->get('weasyprint_path')) {
+      if ($orientation == 'landscape') {
+        $css_pdf_width = $paperSize['height'];
+        $css_pdf_height = $paperSize['width'];
+      }
+      else {
+        $css_pdf_width = $paperSize['width'];
+        $css_pdf_height = $paperSize['height'];
+      }
+      $css_page_size = " size: {$css_pdf_width}{$paperSize['metric']} {$css_pdf_height}{$paperSize['metric']};";
+    }
+    else {
+      $css_page_size = "";
+    }
+
     $metric = CRM_Core_BAO_PdfFormat::getValue('metric', $format);
     $t = CRM_Core_BAO_PdfFormat::getValue('margin_top', $format);
     $r = CRM_Core_BAO_PdfFormat::getValue('margin_right', $format);
@@ -72,7 +88,7 @@ class CRM_Utils_PDF_Utils {
 <html>
   <head>
     <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>
-    <style>@page { margin: {$t}{$metric} {$r}{$metric} {$b}{$metric} {$l}{$metric}; }</style>
+    <style>@page { margin: {$t}{$metric} {$r}{$metric} {$b}{$metric} {$l}{$metric};$css_page_size }</style>
     <style type=\"text/css\">@import url(" . CRM_Core_Config::singleton()->userFrameworkResourceURL . "css/print.css);</style>
     {$htmlHeader}
   </head>
@@ -101,7 +117,10 @@ class CRM_Utils_PDF_Utils {
     </div>
   </body>
 </html>";
-    if (CRM_Core_Config::singleton()->wkhtmltopdfPath) {
+    if (\Civi::settings()->get('weasyprint_path')) {
+      return self::_html2pdf_weasyprint($html, $output, $fileName);
+    }
+    elseif (\Civi::settings()->get('wkhtmltopdfPath')) {
       return self::_html2pdf_wkhtmltopdf($paper_size, $orientation, $margins, $html, $output, $fileName);
     }
     else {
@@ -143,6 +162,24 @@ class CRM_Utils_PDF_Utils {
   }
 
   /**
+   * @param string $html
+   * @param bool $output
+   * @param string $fileName
+   */
+  public static function _html2pdf_weasyprint($html, $output, $fileName) {
+    $weasyprint = new Pontedilana\PhpWeasyPrint\Pdf(\Civi::settings()->get('weasyprint_path'));
+    $pdf = $weasyprint->getOutputFromHtml($html);
+    if ($output) {
+      return $pdf;
+    }
+    else {
+      CRM_Utils_System::setHttpHeader('Content-Type', 'application/pdf');
+      CRM_Utils_System::setHttpHeader('Content-Disposition', 'attachment; filename="' . $fileName . '"');
+      echo $pdf;
+    }
+  }
+
+  /**
    * @param float|int[] $paper_size
    * @param string $orientation
    * @param array $margins
@@ -151,9 +188,7 @@ class CRM_Utils_PDF_Utils {
    * @param string $fileName
    */
   public static function _html2pdf_wkhtmltopdf($paper_size, $orientation, $margins, $html, $output, $fileName) {
-    require_once 'snappy/src/autoload.php';
-    $config = CRM_Core_Config::singleton();
-    $snappy = new Knp\Snappy\Pdf($config->wkhtmltopdfPath);
+    $snappy = new Knp\Snappy\Pdf(\Civi::settings()->get('wkhtmltopdfPath'));
     $snappy->setOption("page-width", $paper_size[2] . "pt");
     $snappy->setOption("page-height", $paper_size[3] . "pt");
     $snappy->setOption("orientation", $orientation);

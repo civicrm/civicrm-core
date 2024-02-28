@@ -115,7 +115,11 @@
               {/if}
               <tr class="crm-case-activity-form-block-medium_id">
                 <td class="label">{$form.medium_id.label}</td>
-                <td class="view-value">{$form.medium_id.html}&nbsp;&nbsp;&nbsp;{$form.location.label} &nbsp;{$form.location.html|crmAddClass:huge}</td>
+                <td class="view-value">{$form.medium_id.html}</td>
+              </tr>
+              <tr class="crm-case-activity-form-block-location">
+                <td class="label">{$form.location.label}</td>
+                <td class="view-value">{$form.location.html|crmAddClass:huge}</td>
               </tr>
               <tr class="crm-case-activity-form-block-activity_date_time">
                 <td class="label">{$form.activity_date_time.label}</td>

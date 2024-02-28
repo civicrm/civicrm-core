@@ -4580,6 +4580,8 @@ civicrm_relationship.start_date > {$today}
    *
    * @return array
    * @throws \CRM_Core_Exception
+   *
+   * @deprecated since 5.71 - will be removed after all core usages are fully removed.
    */
   public static function apiQuery(
     $params = NULL,
@@ -6887,7 +6889,7 @@ AND   displayRelType.is_active = 1
     if (!empty($field) && empty($field['name'])) {
       // standardising field formatting here - over time we can phase out variants.
       // all paths using this currently unit tested
-      $field['name'] = CRM_Utils_Array::value('field_name', $field, CRM_Utils_Array::value('idCol', $field, $fieldName));
+      $field['name'] = $field['field_name'] ?? $field['idCol'] ?? $fieldName;
     }
     return $field;
   }

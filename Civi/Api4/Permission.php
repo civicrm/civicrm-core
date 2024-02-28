@@ -79,6 +79,12 @@ class Permission extends Generic\AbstractEntity {
           'default' => TRUE,
           'data_type' => 'Boolean',
         ],
+        [
+          'name' => 'implies',
+          'title' => 'Implies',
+          'description' => 'List of sub-permissions automatically granted by this one',
+          'data_type' => 'Array',
+        ],
       ];
     }))->setCheckPermissions($checkPermissions);
   }

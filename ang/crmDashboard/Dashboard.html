@@ -17,10 +17,10 @@
       </div>
     </div>
   </fieldset>
-  <div class="crm-flex-box" ng-if="!$ctrl.fullscreenDashlet">
-    <div ng-repeat="column in $ctrl.columns" class="crm-flex-{{2 + $index}} crm-dashboard-droppable" ng-model="column" ui-sortable="$ctrl.sortableOptions">
+  <div class="crm-flex-box">
+    <div ng-repeat="(colIndex, column) in $ctrl.columns" class="crm-flex-{{2 + colIndex}} crm-dashboard-droppable" ng-model="column" ui-sortable="$ctrl.sortableOptions">
       <div ng-repeat="dashlet in column" class="crm-dashlet">
-        <crm-dashlet dashlet="dashlet" remove="$ctrl.removeDashlet($parent.$index, $index)" fullscreen="$ctrl.showFullscreen(dashlet)" ></crm-dashlet>
+        <crm-dashlet dashlet="dashlet" remove="$ctrl.removeDashlet(colIndex, $index)" fullscreen="$ctrl.showFullscreen(dashlet)" ng-if="$ctrl.fullscreenDashlet !== dashlet.name"></crm-dashlet>
       </div>
     </div>
   </div>

@@ -307,8 +307,21 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     $hasSmarty = strpos($column['rewrite'], '{') !== FALSE;
     $output = $this->replaceTokens($column['rewrite'], $data, 'view');
     if ($hasSmarty) {
+      $vars = [];
+      // Convert dots to nested arrays which are more Smarty-friendly
+      foreach ($data as $key => $value) {
+        $parent = &$vars;
+        $keys = array_map('CRM_Utils_String::munge', explode('.', $key));
+        while (count($keys) > 1) {
+          $level = array_shift($keys);
+          $parent[$level] = $parent[$level] ?? [];
+          $parent = &$parent[$level];
+        }
+        $level = array_shift($keys);
+        $parent[$level] = $value;
+      }
       $smarty = \CRM_Core_Smarty::singleton();
-      $output = $smarty->fetchWith("string:$output", []);
+      $output = $smarty->fetchWith("string:$output", $vars);
     }
     return $output;
   }
@@ -470,7 +483,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   private function formatFieldLinks($column, $data, $value): array {
     $links = [];
     foreach ((array) $value as $index => $val) {
-      $link = $this->formatLink($column['link'], $data, $val, $index);
+      $link = $this->formatLink($column['link'], $data, FALSE, $val, $index);
       if ($link) {
         // Style rules get appled to each link
         if (!empty($column['cssRules'])) {
@@ -507,14 +520,55 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     return $out;
   }
 
-  protected function formatLink(array $link, array $data, string $text = NULL, $index = 0): ?array {
-    $link = $this->getLinkInfo($link);
-    if (!$this->checkLinkAccess($link, $data, $index)) {
+  /**
+   * Format a link to resolve tokens and form the url.
+   *
+   * There are 3 ways a link can be declared:
+   *  1. entity+action
+   *  2. entity+task
+   *  3. path
+   *
+   * @param array $link
+   * @param array $data
+   * @param bool $allowMultiple
+   * @param string|NULL $text
+   * @param int $index
+   * @return array|null
+   * @throws \CRM_Core_Exception
+   */
+  protected function formatLink(array $link, array $data, bool $allowMultiple = FALSE, string $text = NULL, $index = 0): ?array {
+    $useApi = (!empty($link['entity']) && !empty($link['action']));
+    if (isset($index)) {
+      foreach ($data as $key => $value) {
+        if (is_array($value)) {
+          $data[$key] = $value[$index] ?? NULL;
+        }
+      }
+    }
+    if ($useApi) {
+      $checkPermissions = !in_array($link['action'], ['view', 'preview'], TRUE);
+      if (!empty($link['prefix'])) {
+        $data = \CRM_Utils_Array::filterByPrefix($data, $link['prefix']);
+      }
+      // Hack to support links to relationships
+      $linkEntity = ($link['entity'] === 'Relationship') ? 'RelationshipCache' : $link['entity'];
+      $apiInfo = (array) civicrm_api4($linkEntity, 'getLinks', [
+        'checkPermissions' => $checkPermissions,
+        'values' => $data,
+        'expandMultiple' => $allowMultiple,
+        'where' => [['ui_action', '=', $link['action']]],
+      ]);
+      if ($allowMultiple && count($apiInfo) > 1) {
+        return $this->formatMultiLink($link, $apiInfo, $data);
+      }
+      $link['path'] = $apiInfo[0]['path'] ?? '';
+    }
+    elseif (!$this->checkLinkAccess($link, $data)) {
       return NULL;
     }
     $link['text'] = $text ?? $this->replaceTokens($link['text'], $data, 'view');
     // Will return null if `$link[path]` is empty or if any tokens do not resolve
-    $path = $this->replaceTokens($link['path'], $data, 'url', $index);
+    $path = $this->replaceTokens($link['path'], $data, 'url');
     if ($path) {
       $link['url'] = $this->getUrl($path);
       $keys = ['url', 'text', 'title', 'target', 'icon', 'style', 'autoOpen'];
@@ -533,6 +587,28 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   }
 
   /**
+   * Returns an array of multiple links for use as a dropdown-select when API::getLinks returns > 1 record
+   */
+  private function formatMultiLink(array $link, array $apiInfo, array $data): array {
+    $dropdown = [
+      'text' => $this->replaceTokens($link['text'], $data, 'view') ?: $apiInfo[0]['text'],
+      'icon' => $link['icon'] ?: $link[0]['icon'],
+      'title' => $link['title'],
+      'style' => $link['style'],
+      'children' => [],
+    ];
+    foreach ($apiInfo as $child) {
+      $dropdown['children'][] = [
+        'text' => $child['text'],
+        'target' => $child['target'],
+        'icon' => $child['icon'],
+        'url' => $this->getUrl($child['path']),
+      ];
+    }
+    return $dropdown;
+  }
+
+  /**
    * Check if a link should be visible to the user based on their permissions
    *
    * Checks ACLs for all links other than VIEW (presumably if a record is shown in
@@ -540,16 +616,15 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    *
    * @param array $link
    * @param array $data
-   * @param int $index
    * @return bool
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\NotImplementedException
    */
-  private function checkLinkAccess(array $link, array $data, int $index = 0): bool {
+  private function checkLinkAccess(array $link, array $data): bool {
     if (empty($link['path']) && empty($link['task'])) {
       return FALSE;
     }
-    if ($link['entity'] && !empty($link['action']) && !in_array($link['action'], ['view', 'preview'], TRUE) && $this->getCheckPermissions()) {
+    if (!empty($link['entity']) && !empty($link['action']) && !in_array($link['action'], ['view', 'preview'], TRUE) && $this->getCheckPermissions()) {
       $actionName = $this->getPermittedLinkAction($link['entity'], $link['action']);
       if (!$actionName) {
         return FALSE;
@@ -561,7 +636,6 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       $idField = CoreUtil::getIdFieldName($link['entity']);
       $idKey = $this->getIdKeyName($link['entity']);
       $id = $data[$link['prefix'] . $idKey] ?? NULL;
-      $id = is_array($id) ? $id[$index] ?? NULL : $id;
       if ($id) {
         $values = [$idField => $id];
         // If not aggregated, add other values to help checkAccess be efficient
@@ -651,7 +725,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       return \CRM_Core_Permission::check($permissions) == ($op !== '!=');
     }
     // Convert the conditional value of 'current_domain' into an actual value that filterCompare can work with
-    if ($item['condition'][2] ?? '' === 'current_domain') {
+    if (($item['condition'][2] ?? '') === 'current_domain') {
       if (str_ends_with($item['condition'][0], ':label') !== FALSE) {
         $item['condition'][2] = \CRM_Core_BAO_Domain::getDomain()->name;
       }
@@ -663,10 +737,30 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   }
 
   /**
-   * @param array{path: string, entity: string, action: string, task: string, join: string, target: string, style: string, title: string, text: string} $link
-   * @return array{path: string, entity: string, action: string, task: string, join: string, target: string, style: string, title: string, text: string, prefix: string}
+   * Fills in info about each link in the search display.
    */
-  private function getLinkInfo(array $link): array {
+  protected function preprocessLinks(): void {
+    foreach ($this->display['settings']['columns'] as &$column) {
+      if (!empty($column['link'])) {
+        $this->preprocessLink($column['link']);
+      }
+      if (!empty($column['links'])) {
+        foreach ($column['links'] as &$link) {
+          $this->preprocessLink($link);
+        }
+      }
+    }
+    if (!empty($this->display['settings']['toolbar'])) {
+      foreach ($this->display['settings']['toolbar'] as &$button) {
+        $this->preprocessLink($button);
+      }
+    }
+  }
+
+  /**
+   * @param array{path: string, entity: string, action: string, task: string, join: string, target: string, style: string, title: string, text: string, prefix: string} $link
+   */
+  private function preprocessLink(array &$link): void {
     $link += [
       'path' => '',
       'target' => '',
@@ -687,8 +781,14 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         $link['prefix'] = $link['join'] . '.';
       }
       // Get path from action
-      if (!$link['path'] && !empty($link['action'])) {
-        $link['path'] = CoreUtil::getInfoItem($entity, 'paths')[$link['action']] ?? NULL;
+      if (!empty($link['action'])) {
+        $getLinks = civicrm_api4($entity, 'getLinks', [
+          'checkPermissions' => FALSE,
+          'where' => [
+            ['ui_action', '=', $link['action']],
+          ],
+        ]);
+        $link['path'] = $getLinks[0]['path'] ?? NULL;
         // This is a bit clunky, the function_join_field gets un-munged later by $this->getJoinFromAlias()
         if ($this->canAggregate($link['prefix'] . $idKey)) {
           $link['prefix'] = 'GROUP_CONCAT_' . str_replace('.', '_', $link['prefix']);
@@ -724,7 +824,6 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       }
       $link['key'] = $link['prefix'] . $idKey;
     }
-    return $link;
   }
 
   /**
@@ -734,7 +833,6 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @return array
    */
   private function getLinkTokens(array $link): array {
-    $link = $this->getLinkInfo($link);
     $tokens = [];
     if (!$link['path'] && !empty($link['task'])) {
       $tokens[] = $link['prefix'] . $this->getIdKeyName($link['entity']);
@@ -978,22 +1076,16 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @param string $tokenExpr
    * @param array $data
    * @param string $format view|raw|url
-   * @param int $index
    * @return string
    */
-  private function replaceTokens($tokenExpr, $data, $format, $index = NULL) {
+  private function replaceTokens($tokenExpr, $data, $format) {
     foreach ($this->getTokens($tokenExpr ?? '') as $token) {
       $val = $data[$token] ?? NULL;
       if (isset($val) && $format === 'view') {
         $dataType = $this->getSelectExpression($token)['dataType'] ?? NULL;
         $val = $this->formatViewValue($token, $val, $data, $dataType);
       }
-      if (!(is_null($index))) {
-        $replacement = is_array($val) ? $val[$index] ?? '' : $val;
-      }
-      else {
-        $replacement = implode(', ', (array) $val);
-      }
+      $replacement = implode(', ', (array) $val);
       // A missing token value in a url invalidates it
       if ($format === 'url' && (!isset($replacement) || $replacement === '')) {
         return NULL;

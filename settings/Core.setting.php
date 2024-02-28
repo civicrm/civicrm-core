@@ -321,7 +321,7 @@ return [
     'help_text' => NULL,
     'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND,
     'validate_callback' => 'CRM_Admin_Form_Setting_Search::enableOptionOne',
-    'settings_pages' => ['search' => ['weight' => 80]],
+    'settings_pages' => ['search' => ['weight' => 120]],
   ],
   'contact_reference_options' => [
     'group_name' => 'CiviCRM Preferences',
@@ -341,7 +341,7 @@ return [
     'help_text' => NULL,
     'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND,
     'validate_callback' => 'CRM_Admin_Form_Setting_Search::enableOptionOne',
-    'settings_pages' => ['search' => ['weight' => 90]],
+    'settings_pages' => ['search' => ['weight' => 130]],
   ],
   'contact_smart_group_display' => [
     'group_name' => 'CiviCRM Preferences',
@@ -616,6 +616,25 @@ return [
     'default' => NULL,
     'help_text' => NULL,
     'add' => '5.43',
+  ],
+  'weasyprint_path' => [
+    'group_name' => 'CiviCRM Preferences',
+    'group' => 'core',
+    'name' => 'weasyprint_path',
+    'type' => 'String',
+    'quick_form_type' => 'Element',
+    'html_attributes' => [
+      'size' => 64,
+      'maxlength' => 256,
+    ],
+    'html_type' => 'text',
+    'default' => NULL,
+    'add' => '5.68',
+    'title' => ts('Path to weasyprint executable'),
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => NULL,
+    'help_text' => NULL,
   ],
   'wkhtmltopdfPath' => [
     'group_name' => 'CiviCRM Preferences',

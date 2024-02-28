@@ -202,14 +202,11 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
 
     // Ensure that the getFields (FieldSpec) format is generally consistent.
     foreach ($fields as $field) {
-      $isNotNull = function($v) {
-        return $v !== NULL;
-      };
       $class = empty($field['custom_field_id']) ? FieldSpec::class : CustomFieldSpec::class;
       $spec = (new $class($field['name'], $field['entity']))->loadArray($field, TRUE);
       $this->assertEquals(
-        array_filter($field, $isNotNull),
-        array_filter($spec->toArray(), $isNotNull)
+        array_filter($field),
+        array_filter($spec->toArray())
       );
     }
   }

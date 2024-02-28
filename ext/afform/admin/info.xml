@@ -12,11 +12,11 @@
     <url desc="Chat">https://chat.civicrm.org/civicrm/channels/dev-afform</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
-  <releaseDate>2023-12-08</releaseDate>
-  <version>5.70.alpha1</version>
+  <releaseDate>2024-02-08</releaseDate>
+  <version>5.72.alpha1</version>
   <develStage>beta</develStage>
   <compatibility>
-    <ver>5.70</ver>
+    <ver>5.72</ver>
   </compatibility>
   <comments>FormBuilder provides a UI to administer and edit forms. It is an optional admin tool and not required for the forms to function.</comments>
   <requires>
@@ -37,7 +37,7 @@
     <mixin>menu-xml@1.0.0</mixin>
     <mixin>mgd-php@1.0.0</mixin>
     <mixin>afform-entity-php@1.0.0</mixin>
-    <mixin>smarty-v2@1.0.1</mixin>
+    <mixin>smarty@1.0.0</mixin>
   </mixins>
   <upgrader>CRM_AfformAdmin_Upgrader</upgrader>
 </extension>

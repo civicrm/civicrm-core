@@ -15,10 +15,12 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Event\AuthorizeRecordEvent;
+
 /**
  * Business objects for managing custom data values.
  */
-class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
+class CRM_Core_BAO_CustomValue extends CRM_Core_DAO implements \Civi\Core\HookInterface {
 
   /**
    * Validate a value against a CustomField type.
@@ -192,7 +194,7 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
    */
   public static function deleteCustomValue($customValueID, $customGroupID) {
     // first we need to find custom value table, from custom group ID
-    $tableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroupID, 'table_name');
+    $tableName = CRM_Core_BAO_CustomGroup::getGroup(['id' => $customGroupID])['table_name'];
 
     // Retrieve the $entityId so we can pass that to the hook.
     $entityID = (int) CRM_Core_DAO::singleValueQuery("SELECT entity_id FROM {$tableName} WHERE id = %1", [
@@ -230,36 +232,28 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
   }
 
   /**
-   * Special checkAccess function for multi-record custom pseudo-entities
-   *
-   * @param string $entityName
-   *   APIv4-style entity name e.g. 'Custom_Foobar'
-   * @param string $action
-   * @param array $record
-   * @param int $userID
-   *   Contact ID of the active user (whose access we must check). 0 for anonymous.
-   * @return bool
-   *   TRUE if granted. FALSE if prohibited. NULL if indeterminate.
+   * Access check for multi-record custom pseudo-entities
+   * @see \Civi\Api4\Utils\CoreUtil::checkAccessRecord
    */
-  public static function _checkAccess(string $entityName, string $action, array $record, int $userID): ?bool {
+  public static function on_civi_api4_authorizeRecord(AuthorizeRecordEvent $e): void {
+    $groupName = \Civi\Api4\Utils\CoreUtil::getCustomGroupName($e->getEntityName());
+    if (!$groupName) {
+      return;
+    }
+
     // This check implements two rules: you must have access to the specific custom-data-group - and to the underlying record (e.g. Contact).
+    $record = $e->getRecord();
+    $userID = $e->getUserID();
+    $action = $e->getActionName();
 
     // Expecting APIv4-style entity name
-    $groupName = \Civi\Api4\Utils\CoreUtil::getCustomGroupName($entityName);
     $extends = \CRM_Core_BAO_CustomGroup::getEntityForGroup($groupName);
     $id = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $groupName, 'id', 'name');
-    if (!$groupName) {
-      // $groupName is required but the function signature has to match the parent.
-      throw new CRM_Core_Exception('Missing required group-name in CustomValue::checkAccess');
-    }
-
-    if (empty($extends) || empty($id)) {
-      throw new CRM_Core_Exception('Received invalid group-name in CustomValue::checkAccess');
-    }
 
     $actionType = $action === 'get' ? CRM_Core_Permission::VIEW : CRM_Core_Permission::EDIT;
     if (!\CRM_Core_BAO_CustomGroup::checkGroupAccess($id, $actionType, $userID)) {
-      return FALSE;
+      $e->setAuthorized(FALSE);
+      return;
     }
 
     $eid = $record['entity_id'] ?? NULL;
@@ -270,7 +264,7 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
 
     // Do we have access to the target record?
     $delegatedAction = $action === 'get' ? 'get' : 'update';
-    return \Civi\Api4\Utils\CoreUtil::checkAccessDelegated($extends, $delegatedAction, ['id' => $eid], $userID);
+    $e->setAuthorized(\Civi\Api4\Utils\CoreUtil::checkAccessDelegated($extends, $delegatedAction, ['id' => $eid], $userID));
   }
 
 }

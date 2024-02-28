@@ -93,8 +93,7 @@ WHERE  email = %2
   /**
    * Unsubscribe a contact from all groups that received this mailing.
    *
-   * @param int $job_id
-   *   The job ID.
+   * @param null $unused
    * @param int $queue_id
    *   The Queue Event ID of the recipient.
    * @param string $hash
@@ -107,7 +106,7 @@ WHERE  email = %2
    *
    * @throws \CRM_Core_Exception
    */
-  public static function unsub_from_mailing($job_id, $queue_id, $hash, $return = FALSE): ?array {
+  public static function unsub_from_mailing($unused, $queue_id, $hash, $return = FALSE): ?array {
     // First make sure there's a matching queue event.
 
     $q = CRM_Mailing_Event_BAO_MailingEventQueue::verify(NULL, $queue_id, $hash);
@@ -117,7 +116,7 @@ WHERE  email = %2
 
     $contact_id = $q->contact_id;
 
-    $mailing_id = (int) civicrm_api3('MailingJob', 'getvalue', ['id' => $job_id, 'return' => 'mailing_id']);
+    $mailing_id = (int) civicrm_api3('MailingEventQueue', 'getvalue', ['id' => $queue_id, 'return' => 'mailing_id']);
     $mailing_type = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_Mailing', $mailing_id, 'mailing_type', 'id');
 
     // We need a mailing id that points to the mailing that defined the recipients.
@@ -335,8 +334,6 @@ WHERE  email = %2
   public static function send_unsub_response($queue_id, $groups, $is_domain, $job) {
     $config = CRM_Core_Config::singleton();
     $domain = CRM_Core_BAO_Domain::getDomain();
-    $jobObject = new CRM_Mailing_BAO_MailingJob();
-    $jobTable = $jobObject->getTableName();
     $mailingObject = new CRM_Mailing_DAO_Mailing();
     $mailingTable = $mailingObject->getTableName();
     $contactsObject = new CRM_Contact_DAO_Contact();
@@ -351,9 +348,9 @@ WHERE  email = %2
 
     $dao = new CRM_Mailing_BAO_Mailing();
     $dao->query("   SELECT * FROM $mailingTable
-                        INNER JOIN $jobTable ON
-                            $jobTable.mailing_id = $mailingTable.id
-                        WHERE $jobTable.id = $job");
+                        INNER JOIN civicrm_mailing_event_queue queue ON
+                            queue.mailing_id = $mailingTable.id
+                        WHERE queue.id = $queue_id");
     $dao->fetch();
 
     $component = new CRM_Mailing_BAO_MailingComponent();
@@ -395,7 +392,7 @@ WHERE  email = %2
       }
     }
 
-    [$addresses, $urls] = CRM_Mailing_BAO_Mailing::getVerpAndUrls($job, $queue_id, $eq->hash, $eq->email);
+    [$addresses, $urls] = CRM_Mailing_BAO_Mailing::getVerpAndUrls($job, $queue_id, $eq->hash);
     $bao = new CRM_Mailing_BAO_Mailing();
     $bao->body_text = $text;
     $bao->body_html = $html;

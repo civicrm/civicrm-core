@@ -34,7 +34,7 @@
 <div class="crm-event-id-{$event.id} crm-block crm-event-additionalparticipant-form-block">
 {if $priceSet}
      <fieldset id="priceset" class="crm-public-form-item crm-group priceset-group"><legend>{$event.fee_label}</legend>
-        {include file="CRM/Price/Form/PriceSet.tpl" extends="Event" hideTotal=false}
+        {include file="CRM/Price/Form/PriceSet.tpl" extends="Event" hideTotal=false isAdditionalParticipants=true}
     </fieldset>
 {else}
     {if $paidEvent}

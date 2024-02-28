@@ -36,6 +36,28 @@ class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
   public $_activityId = NULL;
 
   /**
+   * This should be replaced by an externally supposed getCaseID() method.
+   *
+   * Property may change as it is not really required.
+   *
+   * @var int|null
+   *
+   * @internal
+   */
+  public $_caseId;
+
+  /**
+   * This should be replaced by an externally supposed getCaseID() method.
+   *
+   * Property may change as it is kinda weird.
+   *
+   * @var int|null
+   *
+   * @internal
+   */
+  public $_caseIds;
+
+  /**
    * Build all the data structures needed to build the form.
    */
   public function preProcess() {
@@ -121,7 +143,7 @@ class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
   protected function getRows(): array {
     $rows = [];
     foreach ($this->_contactIds as $index => $contactID) {
-      $caseID = $this->getVar('_caseId');
+      $caseID = $this->_caseId;
       if (empty($caseID) && !empty($this->_caseIds[$index])) {
         $caseID = $this->_caseIds[$index];
       }

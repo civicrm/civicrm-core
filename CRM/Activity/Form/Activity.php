@@ -250,13 +250,15 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     }
     $this->assign('contactId', $this->_currentlyViewedContactId);
 
-    // Give the context.
+    // FIXME: Overcomplicated 'context' causes push-pull between various use-cases for the form
+    // FIXME: the solution is typically to ditch 'context' and just respond to the data
+    // (e.g. is an activity_type_id present? is case_id present?)
     if (!isset($this->_context)) {
       $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
       if (CRM_Contact_Form_Search::isSearchContext($this->_context)) {
         $this->_context = 'search';
       }
-      elseif (!in_array($this->_context, ['dashlet', 'case', 'dashletFullscreen'])
+      elseif (!in_array($this->_context, ['standalone', 'dashlet', 'case', 'dashletFullscreen'])
         && $this->_currentlyViewedContactId
       ) {
         $this->_context = 'activity';

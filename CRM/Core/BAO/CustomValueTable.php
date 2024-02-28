@@ -371,8 +371,7 @@ class CRM_Core_BAO_CustomValueTable {
           'table_name' => $customValue['table_name'],
           'column_name' => $customValue['column_name'],
           // is_multiple refers to the custom group, serialize refers to the field.
-          // @todo is_multiple can be null - does that mean anything different from 0?
-          'is_multiple' => $customValue['is_multiple'] ?? CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customValue['custom_group_id'], 'is_multiple'),
+          'is_multiple' => (int) ($customValue['is_multiple'] ?? CRM_Core_BAO_CustomGroup::getGroup(['id' => $customValue['custom_group_id']])['is_multiple']),
           'serialize' => $customValue['serialize'] ?? (int) CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $customValue['custom_field_id'], 'serialize'),
           'file_id' => $customValue['file_id'],
         ];
@@ -580,54 +579,30 @@ AND    $cond
     // custom_X => value or custom_X_VALUEID => value (for multiple values), VALUEID == -1, -2 etc for new insertions
     $fieldValues = [];
     foreach ($params as $n => $v) {
-      if ($customFieldInfo = CRM_Core_BAO_CustomField::getKeyID($n, TRUE)) {
-        $fieldID = (int ) $customFieldInfo[0];
-        if (CRM_Utils_Type::escape($fieldID, 'Integer', FALSE) === NULL) {
-          throw new CRM_Core_Exception(ts('field ID needs to be of type Integer for index %1',
-            [1 => $fieldID]
-          ));
-        }
-        if (!array_key_exists($fieldID, $fieldValues)) {
-          $fieldValues[$fieldID] = [];
-        }
+      $customFieldInfo = CRM_Core_BAO_CustomField::getKeyID($n, TRUE);
+      if ($customFieldInfo[0]) {
+        $fieldId = (int) $customFieldInfo[0];
         $id = -1;
         if ($customFieldInfo[1]) {
-          $id = (int ) $customFieldInfo[1];
+          $id = (int) $customFieldInfo[1];
         }
-        $fieldValues[$fieldID][] = [
+        $fieldValues[$fieldId][] = [
           'value' => $v,
           'id' => $id,
         ];
       }
     }
 
-    $fieldIDList = implode(',', array_keys($fieldValues));
-
-    // format it so that we can just use create
-    $sql = "
-SELECT cg.table_name  as table_name ,
-       cg.id          as cg_id      ,
-       cg.is_multiple as is_multiple,
-       cg.extends     as extends,
-       cf.column_name as column_name,
-       cf.id          as cf_id      ,
-       cf.html_type   as html_type  ,
-       cf.data_type   as data_type  ,
-       cf.serialize   as serialize
-FROM   civicrm_custom_group cg,
-       civicrm_custom_field cf
-WHERE  cf.custom_group_id = cg.id
-AND    cf.id IN ( $fieldIDList )
-";
-
-    $dao = CRM_Core_DAO::executeQuery($sql);
     $cvParams = [];
-
-    while ($dao->fetch()) {
-      $dataType = $dao->data_type == 'Date' ? 'Timestamp' : $dao->data_type;
-      foreach ($fieldValues[$dao->cf_id] as $fieldValue) {
+    foreach ($fieldValues as $fieldId => $fieldVals) {
+      $fieldInfo = CRM_Core_BAO_CustomField::getField($fieldId);
+      if (!$fieldInfo) {
+        throw new CRM_Core_Exception("Custom field with id $fieldId not found.");
+      }
+      $dataType = $fieldInfo['data_type'] == 'Date' ? 'Timestamp' : $fieldInfo['data_type'];
+      foreach ($fieldVals as $fieldValue) {
         // Serialize array values
-        if (is_array($fieldValue['value']) && CRM_Core_BAO_CustomField::isSerialized($dao)) {
+        if (is_array($fieldValue['value']) && CRM_Core_BAO_CustomField::isSerialized($fieldInfo)) {
           $fieldValue['value'] = CRM_Utils_Array::implodePadded($fieldValue['value']);
         }
         // Format null values correctly
@@ -657,7 +632,7 @@ AND    cf.id IN ( $fieldIDList )
           throw new CRM_Core_Exception(ts('value: %1 is not of the right field data type: %2',
             [
               1 => $fieldValue['value'],
-              2 => $dao->data_type,
+              2 => $fieldInfo['data_type'],
             ]
           ));
         }
@@ -666,13 +641,13 @@ AND    cf.id IN ( $fieldIDList )
           'entity_id' => $params['entityID'],
           'value' => $fieldValue['value'],
           'type' => $dataType,
-          'custom_field_id' => $dao->cf_id,
-          'custom_group_id' => $dao->cg_id,
-          'table_name' => $dao->table_name,
-          'column_name' => $dao->column_name,
-          'is_multiple' => $dao->is_multiple,
-          'serialize' => $dao->serialize,
-          'extends' => $dao->extends,
+          'custom_field_id' => $fieldInfo['id'],
+          'custom_group_id' => $fieldInfo['custom_group']['id'],
+          'table_name' => $fieldInfo['custom_group']['table_name'],
+          'column_name' => $fieldInfo['column_name'],
+          'is_multiple' => $fieldInfo['custom_group']['is_multiple'],
+          'serialize' => $fieldInfo['serialize'],
+          'extends' => $fieldInfo['custom_group']['extends'],
         ];
 
         if (!empty($params['id'])) {
@@ -683,18 +658,18 @@ AND    cf.id IN ( $fieldIDList )
           $cvParam['file_id'] = $fieldValue['value'];
         }
 
-        if (!array_key_exists($dao->table_name, $cvParams)) {
-          $cvParams[$dao->table_name] = [];
+        if (!array_key_exists($cvParam['table_name'], $cvParams)) {
+          $cvParams[$cvParam['table_name']] = [];
         }
 
-        if (!array_key_exists($fieldValue['id'], $cvParams[$dao->table_name])) {
-          $cvParams[$dao->table_name][$fieldValue['id']] = [];
+        if (!array_key_exists($fieldValue['id'], $cvParams[$cvParam['table_name']])) {
+          $cvParams[$cvParam['table_name']][$fieldValue['id']] = [];
         }
 
         if ($fieldValue['id'] > 0) {
           $cvParam['id'] = $fieldValue['id'];
         }
-        $cvParams[$dao->table_name][$fieldValue['id']][] = $cvParam;
+        $cvParams[$cvParam['table_name']][$fieldValue['id']][] = $cvParam;
       }
     }
 

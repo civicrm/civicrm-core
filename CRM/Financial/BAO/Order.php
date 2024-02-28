@@ -672,6 +672,7 @@ class CRM_Financial_BAO_Order {
    */
   protected function setPriceFieldMetadata(array $metadata): void {
     foreach ($metadata as $index => $priceField) {
+      $metadata[$index]['supports_auto_renew'] = FALSE;
       if ($this->isExcludeExpiredFields && !$priceField['is_active']) {
         unset($metadata[$index]);
       }
@@ -688,12 +689,11 @@ class CRM_Financial_BAO_Order {
           }
           elseif (!empty($option['membership_type_id'])) {
             $membershipType = CRM_Member_BAO_MembershipType::getMembershipType((int) $option['membership_type_id']);
-            $metadata[$index]['options'][$optionID]['auto_renew'] = (int) $membershipType['auto_renew'];
-            if ($membershipType['auto_renew'] && empty($this->priceSetMetadata['auto_renew_membership_field'])) {
-              // Quick form layer supports one auto-renew membership type per price set. If we
-              // want more for any reason we can add another array property.
-              $this->priceSetMetadata['auto_renew_membership_field'] = (int) $option['price_field_id'];
-            }
+            $metadata[$index]['options'][$optionID]['membership_type_id.auto_renew'] = (int) $membershipType['auto_renew'];
+            $metadata[$index]['supports_auto_renew'] = $metadata[$index]['supports_auto_renew'] ?? $membershipType['auto_renew'] ?: (bool) $membershipType['auto_renew'];
+          }
+          else {
+            $metadata[$index]['options'][$optionID]['membership_type_id.auto_renew'] = NULL;
           }
         }
       }
@@ -717,7 +717,6 @@ class CRM_Financial_BAO_Order {
     if (empty($this->priceSetMetadata)) {
       $this->priceSetMetadata = CRM_Price_BAO_PriceSet::getCachedPriceSetDetail($this->getPriceSetID());
       $this->priceSetMetadata['id'] = $this->getPriceSetID();
-      $this->priceSetMetadata['auto_renew_membership_field'] = NULL;
       $this->setPriceFieldMetadata($this->priceSetMetadata['fields']);
       unset($this->priceSetMetadata['fields']);
     }
@@ -823,6 +822,38 @@ class CRM_Financial_BAO_Order {
   }
 
   /**
+   * Is participant count being used.
+   *
+   * This would be true if at least one price field value
+   * has a count value that is not 0 or NULL. In this case
+   * the row value will be used for the participant.
+   *
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  public function isUseParticipantCount(): bool {
+    foreach ($this->getPriceFieldsMetadata() as $fieldMetadata) {
+      foreach ($fieldMetadata['options'] as $option) {
+        if (($option['count'] ?? 0) > 0) {
+          return TRUE;
+        }
+      }
+    }
+    return FALSE;
+  }
+
+  /**
+   * Recalculate the line items.
+   *
+   * @return void
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function recalculateLineItems(): void {
+    $this->lineItems = $this->calculateLineItems();
+  }
+
+  /**
    * Get line items in a 'traditional' indexing format.
    *
    * This ensures the line items are indexed by
@@ -923,8 +954,9 @@ class CRM_Financial_BAO_Order {
         if ($valueID !== '') {
           $this->setPriceSetIDFromSelectedField($fieldID);
           $throwAwayArray = [];
+          $temporaryParams = $params;
           // @todo - still using getLine for now but better to bring it to this class & do a better job.
-          $newLines = CRM_Price_BAO_PriceSet::getLine($params, $throwAwayArray, $this->getPriceSetID(), $this->getPriceFieldSpec($fieldID), $fieldID)[1];
+          $newLines = CRM_Price_BAO_PriceSet::getLine($temporaryParams, $throwAwayArray, $this->getPriceSetID(), $this->getPriceFieldSpec($fieldID), $fieldID)[1];
           foreach ($newLines as $newLine) {
             $lineItems[$newLine['price_field_value_id']] = $newLine;
           }
@@ -956,6 +988,7 @@ class CRM_Financial_BAO_Order {
       $lineItem['membership_type_id'] ??= NULL;
       if ($lineItem['membership_type_id']) {
         $lineItem['entity_table'] = 'civicrm_membership';
+        $lineItem['membership_num_terms'] = $lineItem['membership_num_terms'] ?:1;
       }
       $lineItem['title'] = $this->getLineItemTitle($lineItem);
       $lineItem['tax_rate'] = $taxRate = $this->getTaxRate((int) $lineItem['financial_type_id']);

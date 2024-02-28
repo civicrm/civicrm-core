@@ -23,6 +23,10 @@
   min-height: 10em;
 }
 
+crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
+  height: calc(100% - 1em);
+}
+
 .crm-container .ui-sortable-helper.crm-dashlet {
   box-shadow: 1px 1px 8px 3px rgba(0,0,0,0.5);
 }

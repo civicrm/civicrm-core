@@ -21,8 +21,6 @@
 class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_ContributionRecur {
   protected $_mode = NULL;
 
-  public $_bltID = NULL;
-
   /**
    * Set variables up before form is built.
    *
@@ -82,34 +80,34 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
    */
   public function setDefaultValues() {
     $this->_defaults = [];
-
+    $billingLocationID = CRM_Core_BAO_LocationType::getBilling();
     if ($this->getSubscriptionDetails()->contact_id) {
       $fields = [];
       $names = [
         'first_name',
         'middle_name',
         'last_name',
-        "street_address-{$this->_bltID}",
-        "city-{$this->_bltID}",
-        "postal_code-{$this->_bltID}",
-        "country_id-{$this->_bltID}",
-        "state_province_id-{$this->_bltID}",
+        "street_address-{$billingLocationID}",
+        "city-{$billingLocationID}",
+        "postal_code-{$billingLocationID}",
+        "country_id-{$billingLocationID}",
+        "state_province_id-{$billingLocationID}",
       ];
       foreach ($names as $name) {
         $fields[$name] = 1;
       }
-      $fields["state_province-{$this->_bltID}"] = 1;
-      $fields["country-{$this->_bltID}"] = 1;
-      $fields["email-{$this->_bltID}"] = 1;
+      $fields["state_province-{$billingLocationID}"] = 1;
+      $fields["country-{$billingLocationID}"] = 1;
+      $fields["email-{$billingLocationID}"] = 1;
       $fields['email-Primary'] = 1;
 
       CRM_Core_BAO_UFGroup::setProfileDefaults($this->getSubscriptionDetails()->contact_id, $fields, $this->_defaults);
 
       // use primary email address if billing email address is empty
-      if (empty($this->_defaults["email-{$this->_bltID}"]) &&
+      if (empty($this->_defaults["email-{$billingLocationID}"]) &&
         !empty($this->_defaults['email-Primary'])
       ) {
-        $this->_defaults["email-{$this->_bltID}"] = $this->_defaults['email-Primary'];
+        $this->_defaults["email-{$billingLocationID}"] = $this->_defaults['email-Primary'];
       }
 
       foreach ($names as $name) {
@@ -121,8 +119,8 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
 
     $config = CRM_Core_Config::singleton();
     // set default country from config if no country set
-    if (empty($this->_defaults["billing_country_id-{$this->_bltID}"])) {
-      $this->_defaults["billing_country_id-{$this->_bltID}"] = $config->defaultContactCountry;
+    if (empty($this->_defaults["billing_country_id-{$billingLocationID}"])) {
+      $this->_defaults["billing_country_id-{$billingLocationID}"] = $config->defaultContactCountry;
     }
 
     return $this->_defaults;
@@ -182,12 +180,12 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
     $status = NULL;
-
+    $billingLocationID = CRM_Core_BAO_LocationType::getBilling();
     // now set the values for the billing location.
     foreach ($this->_fields as $name => $value) {
       $fields[$name] = 1;
     }
-    $fields["email-{$this->_bltID}"] = 1;
+    $fields["email-{$billingLocationID}"] = 1;
 
     $processorParams = [];
     foreach ($params as $key => $val) {
@@ -195,8 +193,8 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
       list($key) = explode('-', $key);
       $processorParams[$key] = $val;
     }
-    $processorParams['billingStateProvince'] = $processorParams['state_province'] = CRM_Core_PseudoConstant::stateProvince($params["billing_state_province_id-{$this->_bltID}"], FALSE);
-    $processorParams['billingCountry'] = $processorParams['country'] = CRM_Core_PseudoConstant::country($params["billing_country_id-{$this->_bltID}"], FALSE);
+    $processorParams['billingStateProvince'] = $processorParams['state_province'] = CRM_Core_PseudoConstant::stateProvince($params["billing_state_province_id-{$billingLocationID}"], FALSE);
+    $processorParams['billingCountry'] = $processorParams['country'] = CRM_Core_PseudoConstant::country($params["billing_country_id-{$billingLocationID}"], FALSE);
     $processorParams['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($processorParams);
     $processorParams['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($processorParams);
     $processorParams['recurProcessorID'] = $processorParams['subscriptionId'] = $this->getSubscriptionDetails()->processor_id;
@@ -256,11 +254,11 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
       $tplParams['address'] = CRM_Utils_Address::format($addressParts);
 
       // format old address to store in activity details
-      $this->_defaults["state_province-{$this->_bltID}"] = CRM_Core_PseudoConstant::stateProvince($this->_defaults["state_province-{$this->_bltID}"], FALSE);
-      $this->_defaults["country-{$this->_bltID}"] = CRM_Core_PseudoConstant::country($this->_defaults["country-{$this->_bltID}"], FALSE);
+      $this->_defaults["state_province-{$billingLocationID}"] = CRM_Core_PseudoConstant::stateProvince($this->_defaults["state_province-{$billingLocationID}"], FALSE);
+      $this->_defaults["country-{$billingLocationID}"] = CRM_Core_PseudoConstant::country($this->_defaults["country-{$billingLocationID}"], FALSE);
       $addressParts = ["street_address", "city", "postal_code", "state_province", "country"];
       foreach ($addressParts as $part) {
-        $key = "{$part}-{$this->_bltID}";
+        $key = "{$part}-{$billingLocationID}";
         $addressParts[$part] = $this->_defaults[$key] ?? NULL;
       }
       $this->_defaults['address'] = CRM_Utils_Address::format($addressParts);

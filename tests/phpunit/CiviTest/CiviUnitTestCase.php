@@ -761,36 +761,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   }
 
   /**
-   * Create test Authorize.net instance.
-   *
-   * @param array $params
-   * @param string $identifier
-   *
-   * @return int
-   */
-  public function paymentProcessorAuthorizeNetCreate(array $params = [], string $identifier = 'authorize_net'): int {
-    $params = array_merge([
-      'name' => 'Authorize',
-      'domain_id' => CRM_Core_Config::domainID(),
-      'payment_processor_type_id:name' => 'AuthNet',
-      'title' => 'AuthNet',
-      'is_active' => 1,
-      'is_default' => 0,
-      'is_test' => 1,
-      'is_recur' => 1,
-      'user_name' => '4y5BfuW7jm',
-      'password' => '4cAmW927n8uLf5J8',
-      'url_site' => 'https://test.authorize.net/gateway/transact.dll',
-      'url_recur' => 'https://apitest.authorize.net/xml/v1/request.api',
-      'class_name' => 'Payment_AuthorizeNet',
-      'billing_mode' => 1,
-    ], $params);
-
-    $result = $this->createTestEntity('PaymentProcessor', $params, $identifier);
-    return (int) $result['id'];
-  }
-
-  /**
    * Create Participant.
    *
    * @param array $params
@@ -811,7 +781,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'status_id' => 2,
       'role_id' => 1,
       'register_date' => 20070219,
-      'source' => 'Wimbeldon',
+      'source' => 'Wimbledon',
       'event_level' => 'Payment',
       'debug' => 1,
     ];
@@ -2583,8 +2553,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     CRM_Contribute_PseudoConstant::flush('membershipType');
     // Pseudoconstants may be saved to the cache table.
     CRM_Core_DAO::executeQuery("TRUNCATE civicrm_cache");
-    CRM_Financial_BAO_FinancialType::$_statusACLFt = [];
-    CRM_Financial_BAO_FinancialType::$_availableFinancialTypes = NULL;
   }
 
   /**
@@ -3454,8 +3422,8 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
           $participants[$lineItem['entity_id']] = $lineItem['entity_id'];
         }
       }
-      $membershipPayments = $this->callAPISuccess('MembershipPayment', 'get', ['contribution_id' => $contribution['id'], 'return' => 'membership_id'])['values'];
-      $participantPayments = $this->callAPISuccess('ParticipantPayment', 'get', ['contribution_id' => $contribution['id'], 'return' => 'participant_id'])['values'];
+      $membershipPayments = $this->callAPISuccess('MembershipPayment', 'get', ['contribution_id' => $contribution['id'], 'return' => 'membership_id', 'version' => 3])['values'];
+      $participantPayments = $this->callAPISuccess('ParticipantPayment', 'get', ['contribution_id' => $contribution['id'], 'return' => 'participant_id', 'version' => 3])['values'];
       $this->assertCount(count($memberships), $membershipPayments);
       $this->assertCount(count($participants), $participantPayments);
       foreach ($membershipPayments as $payment) {

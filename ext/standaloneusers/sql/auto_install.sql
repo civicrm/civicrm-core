@@ -19,6 +19,7 @@ SET FOREIGN_KEY_CHECKS=0;
 
 DROP TABLE IF EXISTS `civicrm_user_role`;
 DROP TABLE IF EXISTS `civicrm_uf_match`;
+DROP TABLE IF EXISTS `civicrm_session`;
 DROP TABLE IF EXISTS `civicrm_role`;
 
 SET FOREIGN_KEY_CHECKS=1;
@@ -43,7 +44,24 @@ CREATE TABLE `civicrm_role` (
   `is_active` tinyint NOT NULL DEFAULT 1 COMMENT 'Only active roles grant permissions',
   PRIMARY KEY (`id`)
 )
-ENGINE=InnoDB;
+ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
+
+-- /*******************************************************
+-- *
+-- * civicrm_session
+-- *
+-- * Standalone User Sessions
+-- *
+-- *******************************************************/
+CREATE TABLE `civicrm_session` (
+  `id` int NOT NULL AUTO_INCREMENT COMMENT 'Unique Session ID',
+  `session_id` char(64) NOT NULL COMMENT 'Hexadecimal Session Identifier',
+  `data` longtext COMMENT 'Session Data',
+  `last_accessed` datetime COMMENT 'Timestamp of the last session access',
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `index_session_id`(session_id)
+)
+ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 -- /*******************************************************
 -- *
@@ -75,7 +93,7 @@ CREATE TABLE `civicrm_uf_match` (
   CONSTRAINT FK_civicrm_uf_match_domain_id FOREIGN KEY (`domain_id`) REFERENCES `civicrm_domain`(`id`),
   CONSTRAINT FK_civicrm_uf_match_contact_id FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE SET NULL
 )
-ENGINE=InnoDB;
+ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 -- /*******************************************************
 -- *
@@ -92,4 +110,4 @@ CREATE TABLE `civicrm_user_role` (
   CONSTRAINT FK_civicrm_user_role_user_id FOREIGN KEY (`user_id`) REFERENCES `civicrm_uf_match`(`id`) ON DELETE CASCADE,
   CONSTRAINT FK_civicrm_user_role_role_id FOREIGN KEY (`role_id`) REFERENCES `civicrm_role`(`id`) ON DELETE CASCADE
 )
-ENGINE=InnoDB;
+ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;

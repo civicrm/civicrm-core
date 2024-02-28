@@ -4,13 +4,44 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Event\AuthorizeRecordEvent;
 use Civi\Api4\UserRole;
-use CRM_Standaloneusers_ExtensionUtil as E;
+use Civi\Core\HookInterface;
 
 /**
  * Business access object for the User entity.
  */
-class CRM_Standaloneusers_BAO_User extends CRM_Standaloneusers_DAO_User implements \Civi\Core\HookInterface {
+class CRM_Standaloneusers_BAO_User extends CRM_Standaloneusers_DAO_User implements HookInterface {
+
+  /**
+   * @see \Civi\Api4\Utils\CoreUtil::checkAccessRecord
+   */
+  public static function self_civi_api4_authorizeRecord(AuthorizeRecordEvent $e): void {
+    $record = $e->getRecord();
+    $action = $e->getActionName();
+    $mayAdminUsers = \CRM_Core_Permission::check('cms:administer users');
+    $isOwnUser = ((int) \CRM_Utils_System::getLoggedInUfID()) == $record['id'] ?? NULL;
+    if ($action === 'delete') {
+      if ($isOwnUser) {
+        // Prevent users from deleting their own user account
+        $e->setAuthorized(FALSE);
+      }
+      else {
+        // Enforce administer user permission requirement
+        $e->setAuthorized($mayAdminUsers);
+      }
+    }
+    elseif ($action === 'update') {
+      $e->setAuthorized($isOwnUser ?: $mayAdminUsers);
+    }
+    elseif ($action === 'create') {
+      $e->setAuthorized($mayAdminUsers);
+    }
+    else {
+      // Is there another write action we don't know about? If so, play it safe and say No.
+      $e->setAuthorized(FALSE);
+    }
+  }
 
   /**
    * Event fired before an action is taken on a User record.
@@ -73,26 +104,39 @@ class CRM_Standaloneusers_BAO_User extends CRM_Standaloneusers_DAO_User implemen
     return $timeZones;
   }
 
-  /**
-   * Check access permission
-   *
-   * @param string $entityName
-   * @param string $action
-   * @param array $record
-   * @param integer|null $userID
-   * @return boolean
-   * @see CRM_Core_DAO::checkAccess
-   */
-  public static function _checkAccess(string $entityName, string $action, array $record, ?int $userID): bool {
-    // Prevent users from deleting their own user account
-    if (in_array($action, ['delete'], TRUE)) {
-      $sess = CRM_Core_Session::singleton();
-      $ufID = (int) $sess->get('ufID');
-      if ($record['id'] == $ufID) {
-        return FALSE;
-      };
+  public function addSelectWhereClause(string $entityName = NULL, int $userId = NULL, array $conditions = []): array {
+    $clauses = [];
+
+    // ↓ The following is copied from parent::addSelectWhereClause(). Is it needed? :shrug:
+    $fields = $this::getSupportedFields();
+    foreach ($fields as $fieldName => $field) {
+      // Clause for contact-related entities like Email, Relationship, etc.
+      if (str_starts_with($fieldName, 'contact_id') && ($field['FKClassName'] ?? NULL) === 'CRM_Contact_DAO_Contact') {
+        $contactClause = CRM_Utils_SQL::mergeSubquery('Contact');
+        if (!empty($contactClause)) {
+          $clauses[$fieldName] = $contactClause;
+        }
+      }
+      // Clause for an entity_table/entity_id combo
+      if ($fieldName === 'entity_id' && isset($fields['entity_table'])) {
+        $relatedClauses = self::getDynamicFkAclClauses('entity_table', 'entity_id', $conditions['entity_table'] ?? NULL);
+        if ($relatedClauses) {
+          // Nested array will be joined with OR
+          $clauses['entity_table'] = [$relatedClauses];
+        }
+      }
     }
-    return TRUE;
+    // ↑ end copy of parent's code.
+
+    // Limit those without administer users permission to their own record.
+    if (!CRM_Core_Permission::check('cms:administer users')) {
+      // A user without administer users permission is potentially requesting record(s)
+      // other than their own. Limit to their own.
+      $clauses['id'] = [sprintf('= %s', (int) CRM_Utils_System::getLoggedInUfID())];
+    }
+
+    CRM_Utils_Hook::selectWhereClause($entityName ?? $this, $clauses);
+    return $clauses;
   }
 
 }

@@ -185,7 +185,9 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $contribution['id']]);
     $this->assertNotEmpty($contribution['receipt_date']);
     $mut->checkMailLog([
-      'Fundraising Dinner -...            1    $100.00     $100.00',
+      'Fundraising Dinner',
+      '$100.00',
+      '$200.00',
       'event place',
       'streety street',
     ]);
@@ -285,7 +287,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    */
   public function testPaymentEmailReceiptFullyPaid(): void {
     $mut = new CiviMailUtils($this);
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviContribute', 'edit contributions', 'access CiviCRM'];
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviContribute', 'edit contributions', 'access CiviCRM', 'profile listings and forms'];
     $contribution = $this->createPartiallyPaidParticipantOrder();
 
     $params = [

@@ -62,7 +62,8 @@ return [
     'config_key' => 'debug',
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
-    'default' => '0',
+    // default to TRUE for demo or localhost sites.
+    'default' => str_contains(CIVICRM_UF_BASEURL, 'localhost') || str_contains(CIVICRM_UF_BASEURL, 'demo.civicrm.org'),
     'add' => '4.3',
     'title' => ts('Enable Debugging'),
     'is_domain' => 1,

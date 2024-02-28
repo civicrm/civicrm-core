@@ -43,10 +43,10 @@
             {/if}
         {elseif !empty($isRequireApproval)}
           <p>{ts}Your registration has been submitted.{/ts}</p>
-            {if $isPrimary}
-              <p>{ts}Once your registration has been reviewed, you will receive an email with a link to a web page where you can complete the registration process.{/ts}</p>
-            {/if}
-        {elseif !empty($is_pay_later) && empty($isAmountzero) && empty($isAdditionalParticipant)}
+          {if $isPrimary}
+            <p>{ts}Once your registration has been reviewed, you will receive an email with a link to a web page where you can complete the registration process.{/ts}</p>
+          {/if}
+        {elseif {contribution.is_pay_later|boolean} && {contribution.balance_amount|boolean} && $isPrimary}
           <p>{if {event.pay_later_receipt|boolean}}{event.pay_later_receipt}{/if}</p>
         {/if}
     </td>
@@ -77,7 +77,7 @@
           </tr>
         {/if}
 
-        {if !empty($isShowLocation)}
+        {if {event.is_show_location|boolean}}
           <tr>
             <td colspan="2" {$valueStyle}>
               {event.location}
@@ -206,7 +206,7 @@
                               <th>{ts}Tax Amount{/ts}</th>
                             {/if}
                           <th>{ts}Total{/ts}</th>
-                          {if !empty($pricesetFieldsCount)}
+                          {if $isShowParticipantCount}
                             <th>{ts}Total Participants{/ts}</th>
                           {/if}
                         </tr>
@@ -228,7 +228,7 @@
                             <td {$tdStyle}>
                               {$line.line_total_inclusive|crmMoney:$currency}
                             </td>
-                            {if !empty($pricesetFieldsCount)}
+                            {if $isShowParticipantCount}
                               <td {$tdStyle}>{$line.participant_count}</td>
                             {/if}
                           </tr>
@@ -300,25 +300,12 @@
                   {contribution.total_amount} {if !empty($hookDiscount.message)}({$hookDiscount.message}){/if}
                 </td>
               </tr>
-              {if !empty($pricesetFieldsCount)}
+              {if $isShowParticipantCount}
                 <tr>
                   <td {$labelStyle}>
                     {ts}Total Participants{/ts}</td>
                   <td {$valueStyle}>
-                    {assign var="count" value= 0}
-                    {foreach from=$lineItem item=pcount}
-                      {assign var="lineItemCount" value=0}
-                      {if $pcount neq 'skip'}
-                        {foreach from=$pcount item=p_count}
-                          {assign var="lineItemCount" value=$lineItemCount+$p_count.participant_count}
-                        {/foreach}
-                        {if $lineItemCount < 1}
-                          {assign var="lineItemCount" value=1}
-                        {/if}
-                        {assign var="count" value=$count+$lineItemCount}
-                      {/if}
-                    {/foreach}
-                    {$count}
+                    {$participantCount}
                   </td>
                 </tr>
               {/if}
@@ -334,35 +321,35 @@
                 </tr>
               {/if}
 
-              {if !empty($receive_date)}
+              {if {contribution.receive_date|boolean}}
                 <tr>
                   <td {$labelStyle}>
                     {ts}Transaction Date{/ts}
                   </td>
                   <td {$valueStyle}>
-                    {$receive_date|crmDate}
+                    {contribution.receive_date}
                   </td>
                 </tr>
               {/if}
 
-              {if !empty($financialTypeName)}
+              {if {contribution.financial_type_id|boolean}}
                 <tr>
                   <td {$labelStyle}>
                     {ts}Financial Type{/ts}
                   </td>
                   <td {$valueStyle}>
-                    {$financialTypeName}
+                    {contribution.financial_type_id:label}
                   </td>
                 </tr>
               {/if}
 
-              {if !empty($trxn_id)}
+              {if {contribution.trxn_id|boolean}}
                 <tr>
                   <td {$labelStyle}>
                     {ts}Transaction #{/ts}
                   </td>
                   <td {$valueStyle}>
-                    {$trxn_id}
+                    {contribution.trxn_id|boolean}
                   </td>
                 </tr>
               {/if}
@@ -378,13 +365,13 @@
                 </tr>
               {/if}
 
-              {if !empty($checkNumber)}
+              {if {contribution.check_number|boolean}}
                 <tr>
                   <td {$labelStyle}>
                     {ts}Check Number{/ts}
                   </td>
                   <td {$valueStyle}>
-                    {$checkNumber}
+                    {contribution.check_number}
                   </td>
                 </tr>
               {/if}
@@ -471,10 +458,12 @@
         {/if}
 
       </table>
-      {if !empty($event.allow_selfcancelxfer)}
+      {if {event.allow_selfcancelxfer|boolean}}
         <tr>
           <td colspan="2" {$valueStyle}>
-            {ts 1=$selfcancelxfer_time 2=$selfservice_preposition}You may transfer your registration to another participant or cancel your registration up to %1 hours %2 the event.{/ts} {if !empty($totalAmount)}{ts}Cancellations are not refundable.{/ts}{/if}<br/>
+            {capture assign=selfservice_preposition}{if {event.selfcancelxfer_time|boolean} && {event.selfcancelxfer_time} > 0}{ts}before{/ts}{else}{ts}after{/ts}{/if}{/capture}
+            {ts 1="{event.selfcancelxfer_time}" 2="$selfservice_preposition"}You may transfer your registration to another participant or cancel your registration up to %1 hours %2 the event.{/ts}
+            {if {contribution.paid_amount|boolean}}{ts}Cancellations are not refundable.{/ts}{/if}<br/>
             {capture assign=selfService}{crmURL p='civicrm/event/selfsvcupdate' q="reset=1&pid={participant.id}&{contact.checksum}"  h=0 a=1 fe=1}{/capture}
             <a href="{$selfService}">{ts}Click here to transfer or cancel your registration.{/ts}</a>
           </td>

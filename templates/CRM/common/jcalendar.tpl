@@ -10,7 +10,7 @@
 {if $batchUpdate}
     {assign var='elementId'   value=$form.field.$elementIndex.$elementName.id}
     {assign var="tElement" value=$elementName|cat:"_time"}
-    {assign var="timeElement" value=field_`$elementIndex`_`$elementName`_time}
+    {assign var="timeElement" value="field_`$elementIndex`_`$elementName`_time"}
     {$form.field.$elementIndex.$elementName.html}
 {elseif $elementIndex}
     {assign var='elementId'   value=$form.$elementName.$elementIndex.id}

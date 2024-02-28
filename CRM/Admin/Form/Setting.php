@@ -22,6 +22,14 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
 
   use CRM_Admin_Form_SettingTrait;
 
+  /**
+   * Subset of settings on the page as defined using the legacy method.
+   *
+   * @var array
+   *
+   * @deprecated - do not add new settings here - the page to display
+   * settings on should be defined in the setting metadata.
+   */
   protected $_settings = [];
 
   /**

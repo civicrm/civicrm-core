@@ -48,12 +48,26 @@ class EventGetSpecProvider extends \Civi\Core\Service\AutoService implements Gen
    * @param array $maxField
    * @param \Civi\Api4\Query\Api4SelectQuery $query
    * return string
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function getRemainingParticipants(array $maxField, Api4SelectQuery $query): string {
-    $statuses = \CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 1');
+    $statuses = \CRM_Event_BAO_Participant::buildOptions('status_id', NULL, ['is_counted' => 1]) ?: [0];
     $statusIds = implode(',', array_keys($statuses));
     $idField = $query->getFieldSibling($maxField, 'id');
-    return "IF($maxField[sql_name], (CAST($maxField[sql_name] AS SIGNED) - (SELECT COUNT(`p`.`id`) FROM `civicrm_participant` `p`, `civicrm_contact` `c` WHERE `p`.`event_id` = $idField[sql_name] AND `p`.`contact_id` = `c`.`id` AND `p`.`is_test` = 0 AND `c`.`is_deleted` = 0 AND `p`.status_id IN ($statusIds))), NULL)";
+    $whereClauses = [
+      '`p`.`event_id` = ' . $idField['sql_name'],
+      '`p`.`contact_id` = `c`.`id`',
+      '`p`.`is_test` = 0',
+      '`c`.`is_deleted` = 0',
+      "`p`.status_id IN ($statusIds)",
+    ];
+    $participantRoleClause = \CRM_Event_BAO_Participant::getParticipantRoleClause();
+    if ($participantRoleClause) {
+      $whereClauses[] = 'role_id ' . $participantRoleClause;
+    }
+    return "IF($maxField[sql_name], (CAST($maxField[sql_name] AS SIGNED) - (SELECT COUNT(`p`.`id`) FROM `civicrm_participant` `p`, `civicrm_contact` `c`
+      WHERE " . implode(' AND ', $whereClauses) . ")), NULL)";
   }
 
 }

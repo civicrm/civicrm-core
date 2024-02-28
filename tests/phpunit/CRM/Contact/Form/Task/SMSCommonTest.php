@@ -9,11 +9,15 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Test\FormTrait;
+
 /**
  * Test class for CRM_Contact_Form_Task_SMSCommon.
  * @group headless
  */
 class CRM_Contact_Form_Task_SMSCommonTest extends CiviUnitTestCase {
+
+  use FormTrait;
 
   /**
    * Set up SMS recipients.
@@ -97,11 +101,29 @@ class CRM_Contact_Form_Task_SMSCommonTest extends CiviUnitTestCase {
    * Test to ensure SMS Activity QuickForm displays the right phone numbers.
    */
   public function testQuickFormMobileNumbersDisplay(): void {
-    $form = $this->getFormObject('CRM_Core_Form');
-    $form->_contactIds = array_values($this->ids['Contact']);
-    $form->_single = FALSE;
-    CRM_Contact_Form_Task_SMSCommon::buildQuickForm($form);
-    $contacts = json_decode($form->get_template_vars('toContact'));
+    $this->createLoggedInUser();
+    $this->createTestEntity('OptionValue', ['option_group_id:name' => 'sms_provider_name', 'name' => 'dummy sms', 'label' => 'Dummy']);
+    CRM_Core_DAO::executeQuery('INSERT INTO civicrm_sms_provider (name,title, api_type, api_params) VALUES ("SMS", "SMS", 1, "1=2")');
+    $form = $this->getTestForm('CRM_Contact_Form_Search_Basic', [
+      'radio_ts' => 'ts_all',
+      'to' => implode(',', [
+        $this->ids['Contact']['first'] . '::' . 1111111111,
+        $this->ids['Contact']['second'] . '::' . 2222222222,
+        $this->ids['Contact']['third'] . '::' . 3333333333,
+      ]),
+    ], ['action' => 1])
+      ->addSubsequentForm('CRM_Contact_Form_Task_SMS', [
+        'sms_provider_id' => 1,
+        'to' => implode(',', [
+          $this->ids['Contact']['first'] . '::' . 1111111111,
+          $this->ids['Contact']['second'] . '::' . 2222222222,
+          $this->ids['Contact']['third'] . '::' . 3333333333,
+        ]),
+        'activity_subject' => 'Your SMS Reminder',
+        'sms_text_message' => 'Do not forget',
+      ]);
+    $form->processForm();
+    $contacts = json_decode($form->getTemplateVariable('toContact'));
     $smsRecipientsActual = [];
 
     $phoneNumbers = [

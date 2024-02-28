@@ -41,53 +41,41 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
 
   /**
    * @inheritDoc
-   * @param bool $getAllUnconditionally
-   * @param bool $descriptions
-   *   Whether to return permission descriptions
-   *
-   * @return array
    */
-  public function getPermissions($getAllUnconditionally = FALSE, $descriptions = FALSE) {
+  public function getPermissions(): array {
     $permissions = [
       'access CiviEvent' => [
-        ts('access CiviEvent'),
-        ts('Create events, view all events, and view participant records (for visible contacts)'),
+        'label' => ts('access CiviEvent'),
+        'description' => ts('Create events, view all events, and view participant records (for visible contacts)'),
       ],
       'edit event participants' => [
-        ts('edit event participants'),
-        ts('Record and update backend event registrations'),
+        'label' => ts('edit event participants'),
+        'description' => ts('Record and update backend event registrations'),
       ],
       'edit all events' => [
-        ts('edit all events'),
-        ts('Edit events even without specific ACL granted'),
+        'label' => ts('edit all events'),
+        'description' => ts('Edit events even without specific ACL granted'),
       ],
       'register for events' => [
-        ts('register for events'),
-        ts('Register for events online'),
+        'label' => ts('register for events'),
+        'description' => ts('Register for events online'),
       ],
       'view event info' => [
-        ts('view event info'),
-        ts('View online event information pages'),
+        'label' => ts('view event info'),
+        'description' => ts('View online event information pages'),
       ],
       'view event participants' => [
-        ts('view event participants'),
+        'label' => ts('view event participants'),
       ],
       'delete in CiviEvent' => [
-        ts('delete in CiviEvent'),
-        ts('Delete participants and events that you can edit'),
+        'label' => ts('delete in CiviEvent'),
+        'description' => ts('Delete participants and events that you can edit'),
       ],
       'manage event profiles' => [
-        ts('manage event profiles'),
-        ts('Allow users to create, edit and copy event-related profile forms used for online event registration.'),
+        'label' => ts('manage event profiles'),
+        'description' => ts('Allow users to create, edit and copy event-related profile forms used for online event registration.'),
       ],
     ];
-
-    if (!$descriptions) {
-      foreach ($permissions as $name => $attr) {
-        $permissions[$name] = array_shift($attr);
-      }
-    }
-
     return $permissions;
   }
 

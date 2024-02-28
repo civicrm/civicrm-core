@@ -40,7 +40,7 @@
    </tr>
 
 
-{if $SMSTask}
+{if array_key_exists('SMStemplate', $form)}
     <tr class="crm-contactPhone-form-block-template">
         <td class="label">{$form.SMStemplate.label}</td>
         <td>{$form.SMStemplate.html}</td>

@@ -9,6 +9,7 @@ use Civi\Api4\Contribution;
  */
 class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
   use CRMTraits_Financial_OrderTrait;
+  use CRM_Core_Payment_AuthorizeNetTrait;
 
   protected $_financialTypeID = 1;
   protected $_contactID;

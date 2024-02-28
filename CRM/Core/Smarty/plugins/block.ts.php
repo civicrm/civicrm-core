@@ -37,7 +37,8 @@
  */
 function smarty_block_ts($params, $text, &$smarty, &$repeat) {
   if (!$repeat) {
-    if (!isset($params['domain']) && $extensionKey = $smarty->get_template_vars('extensionKey')) {
+    $extensionKey = $smarty->getTemplateVars('extensionKey');
+    if (!isset($params['domain']) && $extensionKey) {
       $params['domain'] = is_array($extensionKey) ? $extensionKey : [$extensionKey, NULL];
     }
     return _ts($text, $params);

@@ -152,7 +152,7 @@ class CRM_Core_PseudoConstant {
       'condition' => [],
       'values' => [],
     ];
-    $entity = CRM_Core_DAO_AllCoreTables::getBriefName($daoName);
+    $entity = CRM_Core_DAO_AllCoreTables::getEntityNameForClass($daoName);
 
     // Custom fields are not in the schema
     if (strpos($fieldName, 'custom_') === 0 && is_numeric($fieldName[7])) {
