@@ -29,11 +29,11 @@
   <td>{$form.email.$blockId.email.html|crmAddClass:email}&nbsp;{$form.email.$blockId.location_type_id.html}
     {if $isAddSignatureFields}
       <div class="clear"></div>
-      <div class="email-signature crm-collapsible collapsed">
-        <div class="collapsible-title">
+      <details class="email-signature crm-accordion-light">
+        <summary>
           {ts}Signature{/ts}
-        </div>
-        <div id="signatureBlock{$blockId}">
+        </summary>
+        <div id="signatureBlock{$blockId}" class="crm-accordion-body">
           {$form.email.$blockId.signature_html.label}<br/>{$form.email.$blockId.signature_html.html}<br/>
           {$form.email.$blockId.signature_text.label}<br/>{$form.email.$blockId.signature_text.html}
         </div>
