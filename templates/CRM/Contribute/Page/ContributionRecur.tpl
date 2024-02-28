@@ -45,6 +45,7 @@
       <tr><td class="label">{ts}Send receipt for each contribution?{/ts}</td><td>{if $recur.is_email_receipt}{ts}Yes{/ts}{else}{ts}No{/ts}{/if}</td></tr>
       {if $recur.payment_processor}<tr><td class="label">{ts}Payment Processor{/ts}</td><td>{$recur.payment_processor}</td></tr>{/if}
       {if $recur.financial_type}<tr><td class="label">{ts}Financial Type{/ts}</td><td>{$recur.financial_type}</td></tr>{/if}
+      {if $recur.contribution_page_title}<tr><td class="label">{ts}Online Contribution Page{/ts}</td><td>{$recur.contribution_page_title}</td></tr>{/if}
       {if !empty($recur.campaign)}<tr><td class="label">{ts}Campaign{/ts}</td><td>{$recur.campaign}</td></tr>{/if}
       {if !empty($recur.membership_id)}<tr>
         <td class="label">{ts}Membership{/ts}</td>

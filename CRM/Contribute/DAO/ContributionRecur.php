@@ -262,6 +262,15 @@ class CRM_Contribute_DAO_ContributionRecur extends CRM_Core_DAO {
   public $financial_type_id;
 
   /**
+   * The Contribution Page which triggered this contribution
+   *
+   * @var int|string|null
+   *   (SQL type: int unsigned)
+   *   Note that values will be retrieved from the database as a string.
+   */
+  public $contribution_page_id;
+
+  /**
    * FK to Payment Instrument
    *
    * @var int|string|null
@@ -949,6 +958,38 @@ class CRM_Contribute_DAO_ContributionRecur extends CRM_Core_DAO {
             'labelColumn' => 'name',
           ],
           'add' => '4.3',
+        ],
+        'contribution_page_id' => [
+          'name' => 'contribution_page_id',
+          'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Contribution Page ID'),
+          'description' => ts('The Contribution Page which triggered this contribution'),
+          'usage' => [
+            'import' => TRUE,
+            'export' => TRUE,
+            'duplicate_matching' => TRUE,
+            'token' => FALSE,
+          ],
+          'import' => TRUE,
+          'where' => 'civicrm_contribution_recur.contribution_page_id',
+          'export' => TRUE,
+          'table_name' => 'civicrm_contribution_recur',
+          'entity' => 'ContributionRecur',
+          'bao' => 'CRM_Contribute_BAO_ContributionRecur',
+          'localizable' => 0,
+          'FKClassName' => 'CRM_Contribute_DAO_ContributionPage',
+          'FKColumnName' => 'id',
+          'html' => [
+            'type' => 'Select',
+            'label' => ts("Contribution Page"),
+          ],
+          'pseudoconstant' => [
+            'table' => 'civicrm_contribution_page',
+            'keyColumn' => 'id',
+            'labelColumn' => 'title',
+            'nameColumn' => 'name',
+          ],
+          'add' => '5.71',
         ],
         'payment_instrument_id' => [
           'name' => 'payment_instrument_id',

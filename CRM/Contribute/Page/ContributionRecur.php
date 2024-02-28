@@ -59,6 +59,11 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
         $contributionRecur[substr($idField, 0, -3)] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_ContributionRecur', $idField, $contributionRecur[$idField]);
       }
     }
+    $contributionRecur['contribution_page_title'] = '';
+    if (!empty($contributionRecur['contribution_page_id'])) {
+      $contribPages = CRM_Contribute_PseudoConstant::contributionPage(NULL, TRUE);
+      $contributionRecur['contribution_page_title'] = $contribPages[$contributionRecur['contribution_page_id']] ?? '';
+    }
 
     // Add linked membership
     $membership = civicrm_api3('Membership', 'get', [

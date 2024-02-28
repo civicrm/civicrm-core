@@ -32,7 +32,6 @@ class CRM_Upgrade_Incremental_php_FiveSeventyOne extends CRM_Upgrade_Incremental
     // It is important the line above run before the sql, which will populate the fields
     // before they are made required.
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
-
     $this->addTask('Add entity_delete column', 'addColumn', 'civicrm_custom_field', 'fk_entity_on_delete', "VARCHAR(255) NOT NULL DEFAULT 'set_null' COMMENT 'Behavior if referenced entity is deleted.' AFTER `fk_entity`");
 
     $this->addTask('Make civicrm_uf_group.name required', 'alterColumn', 'civicrm_uf_group', 'name',
@@ -42,6 +41,26 @@ class CRM_Upgrade_Incremental_php_FiveSeventyOne extends CRM_Upgrade_Incremental
       "varchar(64) NOT NULL  COMMENT 'Profile Form Public title'",
       TRUE
     );
+    $this->addTask('dev/core#4947 - Add contribution_page_id column to civicrm_contribution_recur table', 'addColumn', 'civicrm_contribution_recur', 'contribution_page_id',
+      'int unsigned COMMENT "The Contribution Page which triggered this contribution"');
+    $this->addTask('dev/core#4947 - Add contribution_page_id foreign key to civicrm_contribution_recur', 'addContributionPageIdFKToContributionRecur');
+  }
+
+  /**
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public static function addContributionPageIdFKToContributionRecur(CRM_Queue_TaskContext $ctx): bool {
+    if (!self::checkFKExists('civicrm_contribution_recur', 'FK_civicrm_contribution_recur_contribution_page_id')) {
+      CRM_Core_DAO::executeQuery("
+        ALTER TABLE `civicrm_contribution_recur`
+          ADD CONSTRAINT `FK_civicrm_contribution_recur_contribution_page_id`
+            FOREIGN KEY (`contribution_page_id`) REFERENCES `civicrm_contribution_page` (`id`)
+            ON DELETE SET NULL;
+      ", [], TRUE, NULL, FALSE, FALSE);
+    }
+    return TRUE;
   }
 
 }

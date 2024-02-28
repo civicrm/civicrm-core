@@ -399,6 +399,30 @@
     <onDelete>SET NULL</onDelete>
   </foreignKey>
   <field>
+    <name>contribution_page_id</name>
+    <title>Contribution Page ID</title>
+    <type>int unsigned</type>
+    <import>true</import>
+    <comment>The Contribution Page which triggered this contribution</comment>
+    <pseudoconstant>
+      <table>civicrm_contribution_page</table>
+      <keyColumn>id</keyColumn>
+      <nameColumn>name</nameColumn>
+      <labelColumn>title</labelColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+      <label>Contribution Page</label>
+    </html>
+    <add>5.71</add>
+  </field>
+  <foreignKey>
+    <name>contribution_page_id</name>
+    <table>civicrm_contribution_page</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
     <name>payment_instrument_id</name>
     <title>Payment Method</title>
     <type>int unsigned</type>
