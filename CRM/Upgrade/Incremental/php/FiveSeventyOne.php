@@ -44,4 +44,17 @@ class CRM_Upgrade_Incremental_php_FiveSeventyOne extends CRM_Upgrade_Incremental
     );
   }
 
+  /**
+   * Upgrade step; adds tasks including 'runSql'.
+   *
+   * @param string $rev
+   *   The version number matching this function name
+   */
+  public function upgrade_5_71_beta1(string $rev): void {
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Make civicrm_event.selfcancelxfer_time', 'alterColumn', 'civicrm_event', 'selfcancelxfer_time',
+      "int(11) DEFAULT 0 NOT NULL COMMENT 'Number of hours prior to event start date to allow self-service cancellation or transfer.'"
+    );
+  }
+
 }
