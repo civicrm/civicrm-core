@@ -237,6 +237,7 @@ Order By  camp.title";
       $campaigns = [
         'campaigns' => [],
         'hasAccessCampaign' => FALSE,
+        'hasViewCampaign' => FALSE,
         'isCampaignEnabled' => FALSE,
       ];
 
@@ -247,7 +248,8 @@ Order By  camp.title";
 
       //do check for permissions.
       if ($doCheckForPermissions) {
-        $campaigns['hasAccessCampaign'] = $isValid = self::accessCampaign();
+        $campaigns['hasAccessCampaign'] = self::accessCampaign();
+        $campaigns['hasViewCampaign'] = $isValid = self::viewCampaign();
       }
 
       //finally retrieve campaigns from db.
@@ -342,6 +344,24 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
   }
 
   /**
+   * @return bool
+   */
+  public static function viewCampaign() {
+    static $allowView = NULL;
+
+    if (!isset($allowView)) {
+      $allowView = FALSE;
+      if (self::accessCampaign() ||
+        CRM_Core_Permission::check('view campaign')
+      ) {
+        $allowView = TRUE;
+      }
+    }
+
+    return $allowView;
+  }
+
+  /**
    * Add select element for campaign
    * and assign needful info to templates.
    *
@@ -396,7 +416,7 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
     $campaignInfo = [];
     $campaignDetails = self::getPermissionedCampaigns(NULL, NULL, FALSE, FALSE, FALSE, TRUE);
     $campaigns = $campaignDetails['campaigns'] ?? NULL;
-    $hasAccessCampaign = $campaignDetails['hasAccessCampaign'] ?? NULL;
+    $hasAccessCampaign = $campaignDetails['hasViewCampaign'] ?? NULL;
     $isCampaignEnabled = $campaignDetails['isCampaignEnabled'] ?? NULL;
 
     $showCampaignInSearch = FALSE;

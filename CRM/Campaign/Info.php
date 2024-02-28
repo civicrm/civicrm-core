@@ -52,6 +52,10 @@ class CRM_Campaign_Info extends CRM_Core_Component_Info {
         'label' => ts('manage campaign'),
         'description' => ts('Create new campaigns, surveys and petitions, reserve respondents'),
       ],
+      'view campaign' => [
+        ts('view campaign'),
+        ts('View and search campaigns'),
+      ],
       'reserve campaign contacts' => [
         'label' => ts('reserve campaign contacts'),
         'description' => ts('Reserve campaign contacts for surveys and petitions'),
