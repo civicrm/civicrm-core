@@ -172,13 +172,112 @@ class CRM_Dedupe_Finder {
     // Only return custom for subType + unrestricted or return all custom
     // fields.
     $tree = CRM_Core_BAO_CustomGroup::getTree($ctype, NULL, NULL, -1, $subTypes, NULL, TRUE, NULL, TRUE);
-    CRM_Core_BAO_CustomGroup::postProcess($tree, $fields, TRUE);
+    self::postProcess($tree, $fields, TRUE);
     foreach ($tree as $key => $cg) {
       if (!is_int($key)) {
         continue;
       }
       foreach ($cg['fields'] as $cf) {
         $flat[$cf['column_name']] = $cf['customValue']['data'] ?? NULL;
+      }
+    }
+  }
+
+  /**
+   * Previously shared function to unravel.
+   *
+   * @see CRM_Dedupe_Finder::formatParams
+   *
+   * @param array $groupTree
+   * @param array $params
+   * @param bool $skipFile
+   */
+  private static function postProcess(&$groupTree, &$params, $skipFile = FALSE) {
+    // Get the Custom form values and groupTree
+    foreach ($groupTree as $groupID => $group) {
+      if ($groupID === 'info') {
+        continue;
+      }
+      foreach ($group['fields'] as $field) {
+        $fieldId = $field['id'];
+        $serialize = CRM_Core_BAO_CustomField::isSerialized($field);
+
+        // Reset all checkbox, radio and multiselect data
+        if ($field['html_type'] == 'Radio' || $serialize) {
+          $groupTree[$groupID]['fields'][$fieldId]['customValue']['data'] = 'NULL';
+        }
+
+        $v = NULL;
+        foreach ($params as $key => $val) {
+          if (preg_match('/^custom_(\d+)_?(-?\d+)?$/', $key, $match) &&
+            $match[1] == $field['id']
+          ) {
+            $v = $val;
+          }
+        }
+
+        if (!isset($groupTree[$groupID]['fields'][$fieldId]['customValue'])) {
+          // field exists in db so populate value from "form".
+          $groupTree[$groupID]['fields'][$fieldId]['customValue'] = [];
+        }
+
+        // Serialize checkbox and multi-select data (using array keys for checkbox)
+        if ($serialize) {
+          $v = ($v && $field['html_type'] === 'Checkbox') ? array_keys($v) : $v;
+          $v = $v ? CRM_Utils_Array::implodePadded($v) : NULL;
+        }
+
+        switch ($field['html_type']) {
+
+          case 'Select Date':
+            $date = CRM_Utils_Date::processDate($v);
+            $groupTree[$groupID]['fields'][$fieldId]['customValue']['data'] = $date;
+            break;
+
+          case 'File':
+            if ($skipFile) {
+              break;
+            }
+
+            // store the file in d/b
+            $entityId = explode('=', $groupTree['info']['where'][0]);
+            $fileParams = ['upload_date' => date('YmdHis')];
+
+            if ($groupTree[$groupID]['fields'][$fieldId]['customValue']['fid']) {
+              $fileParams['id'] = $groupTree[$groupID]['fields'][$fieldId]['customValue']['fid'];
+            }
+            if (!empty($v)) {
+              $fileParams['uri'] = $v['name'];
+              $fileParams['mime_type'] = $v['type'];
+              CRM_Core_BAO_File::filePostProcess($v['name'],
+                $groupTree[$groupID]['fields'][$fieldId]['customValue']['fid'],
+                $groupTree[$groupID]['table_name'],
+                trim($entityId[1]),
+                FALSE,
+                TRUE,
+                $fileParams,
+                'custom_' . $fieldId,
+                $v['type']
+              );
+            }
+            $defaults = [];
+            $paramsFile = [
+              'entity_table' => $groupTree[$groupID]['table_name'],
+              'entity_id' => $entityId[1],
+            ];
+
+            CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_EntityFile',
+              $paramsFile,
+              $defaults
+            );
+
+            $groupTree[$groupID]['fields'][$fieldId]['customValue']['data'] = $defaults['file_id'];
+            break;
+
+          default:
+            $groupTree[$groupID]['fields'][$fieldId]['customValue']['data'] = $v;
+            break;
+        }
       }
     }
   }
