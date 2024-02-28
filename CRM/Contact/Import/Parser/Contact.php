@@ -388,7 +388,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
           foreach ($customOption as $customValue) {
             $val = $customValue['value'] ?? NULL;
             $label = strtolower($customValue['label'] ?? '');
-            $value = strtolower(trim($formatted[$key]));
+            $value = strtolower(trim($formatted[$key] ?? ''));
             if (($value == $label) || ($value == strtolower($val))) {
               $params[$key] = $formatted[$key] = $val;
             }

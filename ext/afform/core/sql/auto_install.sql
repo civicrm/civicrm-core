@@ -43,4 +43,4 @@ CREATE TABLE `civicrm_afform_submission` (
   PRIMARY KEY (`id`),
   CONSTRAINT FK_civicrm_afform_submission_contact_id FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE SET NULL
 )
-ENGINE=InnoDB ROW_FORMAT=DYNAMIC;
+ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;

@@ -89,7 +89,8 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
       elseif (CRM_Contact_BAO_Contact::checkDomainContact($cid)) {
         CRM_Core_Error::statusBounce(ts('This contact is a special one for the contact information associated with the CiviCRM installation for this domain. No one is allowed to delete it because the information is used for special system purposes.'));
       }
-
+      // Indicates it is not called from search context so 'view selected contacts' link is suppressed.
+      $this->assign('isSelectedContacts', FALSE);
       $this->_contactIds = [$cid];
       $this->_single = TRUE;
       $this->assign('totalSelectedContacts', 1);

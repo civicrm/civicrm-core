@@ -81,11 +81,8 @@ class api_v3_MailingTest extends CiviUnitTestCase {
    * Test civicrm_mailing_create.
    *
    * @dataProvider versionThreeAndFour
-   *
-   * @param int $version
    */
-  public function testMailerCreateSuccess(int $version): void {
-    $this->_apiversion = $version;
+  public function testMailerCreateSuccess(): void {
     $this->callAPISuccess('Campaign', 'create', ['name' => 'big campaign', 'title' => 'abc']);
     $result = $this->callAPISuccess('mailing', 'create', $this->_params + ['scheduled_date' => 'now', 'campaign_id' => 'big campaign']);
     $jobs = $this->callAPISuccess('MailingJob', 'get', ['mailing_id' => $result['id']]);
@@ -111,11 +108,8 @@ class api_v3_MailingTest extends CiviUnitTestCase {
    * Create a completed mailing (e.g when importing from a provider).
    *
    * @dataProvider versionThreeAndFour
-   *
-   * @param int $version
    */
-  public function testMailerCreateCompleted(int $version): void {
-    $this->_apiversion = $version;
+  public function testMailerCreateCompleted(): void {
     $this->_params['body_html'] = 'I am completed so it does not matter if there is an opt out link since I have already been sent by another system';
     $this->_params['is_completed'] = 1;
     $result = $this->callAPISuccess('mailing', 'create', $this->_params + ['scheduled_date' => 'now']);
@@ -466,10 +460,16 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       'first_name' => 'Alice',
       'last_name' => 'Person',
     ]);
+    $contactIDs['bob'] = $this->individualCreate([
+      'email' => 'bob@example.org',
+      'first_name' => 'Bob',
+      'last_name' => 'Person',
+      'do_not_email' => 1,
+    ]);
 
     $mail = $this->callAPISuccess('mailing', 'create', $this->_params);
 
-    $params = ['mailing_id' => $mail['id'], 'test_email' => 'ALicE@example.org', 'test_group' => NULL];
+    $params = ['mailing_id' => $mail['id'], 'test_email' => 'ALicE@example.org,bob@example.org', 'test_group' => NULL];
     // Per https://lab.civicrm.org/dev/core/issues/229 ensure this is not passed through!
     // Per https://lab.civicrm.org/dev/mail/issues/32 test non-lowercase email
     $params['id'] = $mail['id'];
@@ -953,27 +953,6 @@ SELECT event_queue_id, time_stamp FROM {$temporaryTableName}";
       'time_stamp' => '20111111010101',
     ];
     $this->callAPIFailure('mailing_event', 'reply', $params,
-      'Queue event could not be found'
-    );
-  }
-
-  //----------- civicrm_mailing_event_forward methods ----------
-
-  /**
-   * Test civicrm_mailing_event_forward with wrong params.
-   * Note that tests like this are slightly better than no test but an
-   * api function cannot be considered supported  / 'part of the api' without a
-   * success test
-   */
-  public function testMailerForwardWrongParams(): void {
-    $params = [
-      'job_id' => 'Wrong ID',
-      'event_queue_id' => 'Wrong ID',
-      'hash' => 'Wrong Hash',
-      'email' => $this->_email,
-      'time_stamp' => '20111111010101',
-    ];
-    $this->callAPIFailure('mailing_event', 'forward', $params,
       'Queue event could not be found'
     );
   }

@@ -390,7 +390,7 @@ class CRM_Utils_REST {
     }
     $param = array_map('htmlentities', $_GET);
     unset($param['q']);
-    $smarty->assign_by_ref("request", $param);
+    $smarty->assign("request", $param);
 
     if (!self::isWebServiceRequest()) {
 

@@ -1,11 +1,10 @@
 <?php
 
 require_once 'financialacls.civix.php';
-// phpcs:disable
+
 use Civi\Api4\EntityFinancialAccount;
 use Civi\Api4\MembershipType;
 use CRM_Financialacls_ExtensionUtil as E;
-// phpcs:enable
 
 /**
  * Implements hook_civicrm_config().
@@ -59,7 +58,7 @@ function financialacls_civicrm_pre($op, $objectName, $id, &$params) {
   }
   if (in_array($objectName, ['LineItem', 'Product'], TRUE) && !empty($params['check_permissions'])) {
     if (empty($params['financial_type_id']) && !empty($params['id'])) {
-      $dao = CRM_Core_DAO_AllCoreTables::getFullName($objectName);
+      $dao = CRM_Core_DAO_AllCoreTables::getDAONameForEntity($objectName);
       $params['financial_type_id'] = CRM_Core_DAO::getFieldValue($dao, $params['id'], 'financial_type_id');
     }
     $operationMap = ['delete' => CRM_Core_Action::DELETE, 'edit' => CRM_Core_Action::UPDATE, 'create' => CRM_Core_Action::ADD];
@@ -246,23 +245,23 @@ function financialacls_civicrm_permission(&$permissions) {
     return;
   }
   $actions = [
-    'add' => ts('add'),
-    'view' => ts('view'),
-    'edit' => ts('edit'),
-    'delete' => ts('delete'),
+    'add' => E::ts('add'),
+    'view' => E::ts('view'),
+    'edit' => E::ts('edit'),
+    'delete' => E::ts('delete'),
   ];
   $financialTypes = \CRM_Contribute_BAO_Contribution::buildOptions('financial_type_id', 'validate');
   foreach ($financialTypes as $id => $type) {
     foreach ($actions as $action => $action_ts) {
       $permissions[$action . ' contributions of type ' . $type] = [
-        ts("CiviCRM: %1 contributions of type %2", [1 => $action_ts, 2 => $type]),
-        ts('%1 contributions of type %2', [1 => $action_ts, 2 => $type]),
+        'label' => E::ts("CiviCRM: %1 contributions of type %2", [1 => $action_ts, 2 => $type]),
+        'description' => E::ts('%1 contributions of type %2', [1 => $action_ts, 2 => $type]),
       ];
     }
   }
   $permissions['administer CiviCRM Financial Types'] = [
-    ts('CiviCRM: administer CiviCRM Financial Types'),
-    ts('Administer access to Financial Types'),
+    'label' => E::ts('CiviCRM: administer CiviCRM Financial Types'),
+    'description' => E::ts('Administer access to Financial Types'),
   ];
 }
 

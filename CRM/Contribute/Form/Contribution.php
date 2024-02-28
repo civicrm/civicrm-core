@@ -1194,7 +1194,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     // so we copy stuff over to first_name etc.
     $paymentParams = $this->_params;
     $paymentParams['contactID'] = $contactID;
-    CRM_Core_Payment_Form::mapParams($this->_bltID, $this->_params, $paymentParams, TRUE);
+    CRM_Core_Payment_Form::mapParams(NULL, $this->_params, $paymentParams, TRUE);
 
     $financialType = new CRM_Financial_DAO_FinancialType();
     $financialType->id = $params['financial_type_id'];
@@ -1239,7 +1239,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       'is_test' => $isTest,
       'campaign_id' => $this->_params['campaign_id'] ?? NULL,
       'contribution_page_id' => $this->_params['contribution_page_id'] ?? NULL,
-      'source' => CRM_Utils_Array::value('source', $paymentParams, CRM_Utils_Array::value('description', $paymentParams)),
+      'source' => $paymentParams['source'] ?? $paymentParams['description'] ?? NULL,
       'thankyou_date' => $this->_params['thankyou_date'] ?? NULL,
     ];
     $contributionParams['payment_instrument_id'] = $this->_paymentProcessor['payment_instrument_id'];
@@ -2016,7 +2016,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
       $params['line_item'] = $lineItem;
       $params['payment_processor_id'] = $params['payment_processor'] = $this->_paymentProcessor['id'] ?? NULL;
-      $params['tax_amount'] = CRM_Utils_Array::value('tax_amount', $submittedValues, CRM_Utils_Array::value('tax_amount', $this->_values));
+      $params['tax_amount'] = $submittedValues['tax_amount'] ?? $this->_values['tax_amount'] ?? NULL;
       //create contribution.
       if ($isQuickConfig) {
         $params['is_quick_config'] = 1;
@@ -2034,6 +2034,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         && 'Completed' === CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $this->getSubmittedValue('contribution_status_id'))) {
         // @todo make users use add payment form.
         civicrm_api3('Payment', 'create', [
+          'is_send_contribution_notification' => FALSE,
           'contribution_id' => $this->getContributionID(),
           'total_amount' => $this->getContributionValue('balance_amount'),
           'currency' => $this->getSubmittedValue('currency'),
@@ -2048,6 +2049,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->invoicingPostProcessHook($submittedValues, $action, $lineItem);
 
       //send receipt mail.
+      //FIXME: 'payment.create' could send a receipt.
       if ($contribution->id && !empty($formValues['is_email_receipt'])) {
         $formValues['contact_id'] = $this->_contactID;
         $formValues['contribution_id'] = $contribution->id;

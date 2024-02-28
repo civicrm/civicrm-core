@@ -75,6 +75,39 @@ class AfformGetTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
     $this->assertArrayNotHasKey('#children', $layout[0]['#children'][0]);
   }
 
+  public function testGetHtmlEncoding(): void {
+    Afform::create(FALSE)
+      ->setLayoutFormat('shallow')
+      ->addValue('name', $this->formName)
+      ->addValue('title', 'Test Form')
+      ->addValue('layout', [
+        [
+          '#tag' => 'af-form',
+          'ctrl' => 'afform',
+          '#children' => [
+            [
+              '#tag' => 'af-entity',
+              'data' => "{contact_type: 'Individual', source: 'This isn\\'t \"quotes\"'}",
+              'type' => 'Contact',
+              'name' => 'Individual1',
+            ],
+          ],
+        ],
+      ])
+      ->execute();
+
+    $html = Afform::get(FALSE)
+      ->addWhere('name', '=', $this->formName)
+      ->setLayoutFormat('html')
+      ->execute()->single()['layout'];
+
+    $expected = <<<HTML
+data="{contact_type: 'Individual', source: 'This isn\'t &quot;quotes&quot;'}"
+HTML;
+
+    $this->assertStringContainsString($expected, $html);
+  }
+
   public function testAfformAutocomplete(): void {
     // Use a numeric title to test that the "search by id" feature
     // doesn't kick in for Afforms (which don't have a numeric "id")

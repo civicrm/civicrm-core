@@ -41,8 +41,8 @@ The original form used table layout; don't know if we have an alternative, CSS-b
     <div crm-ui-field="{title: ts('Enabled?')}">
       <input name="is_active" type="checkbox" ng-model="caseType.is_active" ng-true-value="'1'" ng-false-value="'0'"/>
     </div>
-    <fieldset class="crm-collapsible">
-      <legend class="collapsible-title">{{:: ts('Activity assignment settings') }}</legend>
+    <fieldset>
+      <legend>{{:: ts('Activity assignment settings') }}</legend>
       <div>
         <div crm-ui-field="{name: 'caseTypeDetailForm.activityAsgmtGrps', title: ts('Restrict to Groups'), help: hs('activityAsgmtGrps')}">
           <input

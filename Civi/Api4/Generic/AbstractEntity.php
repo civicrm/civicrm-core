@@ -130,7 +130,7 @@ abstract class AbstractEntity {
    * @return \CRM_Core_DAO|string|null
    */
   protected static function getDaoName(): ?string {
-    return \CRM_Core_DAO_AllCoreTables::getFullName(static::getEntityName());
+    return \CRM_Core_DAO_AllCoreTables::getDAONameForEntity(static::getEntityName());
   }
 
   /**
@@ -158,10 +158,10 @@ abstract class AbstractEntity {
     if ($dao) {
       $info['paths'] = $dao::getEntityPaths();
       $info['primary_key'] = $dao::$_primaryKey;
-      $info['icon'] = $dao::$_icon;
+      $info['icon'] = $dao::getEntityIcon($entityName);
       $info['label_field'] = $dao::$_labelField;
       $info['dao'] = $dao;
-      $info['table_name'] = $dao::$_tableName;
+      $info['table_name'] = $dao::getTableName();
       $info['icon_field'] = (array) ($dao::fields()['icon']['name'] ?? NULL);
       if (method_exists($dao, 'indices')) {
         foreach (\CRM_Utils_Array::findAll($dao::indices(FALSE), ['unique' => TRUE, 'localizable' => FALSE]) as $index) {

@@ -2,7 +2,7 @@
   "name": "civicrm/civicrm-core",
   "description": "Open source constituent relationship management for non-profits, NGOs and advocacy organizations.",
   "type": "library",
-  "license": "AGPL-3.0",
+  "license": "AGPL-3.0-or-later",
   "authors": [
     {
       "name": "Coleman Watts",

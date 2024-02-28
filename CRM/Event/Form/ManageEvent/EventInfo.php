@@ -20,6 +20,7 @@ use Civi\Api4\Event;
  * This class generates form components for processing Event.
  */
 class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
+  use CRM_Custom_Form_CustomDataTrait;
 
   /**
    * Event type.
@@ -47,10 +48,6 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
       $this->set('subType', $_POST['event_type_id'] ?? '');
       $this->assign('customDataSubType', $_POST['event_type_id'] ?? '');
       $this->set('entityId', $entityID);
-
-      CRM_Custom_Form_CustomData::preProcess($this, NULL, $this->_eventType, 1, 'Event', $entityID);
-      CRM_Custom_Form_CustomData::buildQuickForm($this);
-      CRM_Custom_Form_CustomData::setDefaultValues($this);
     }
   }
 
@@ -188,6 +185,16 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     $this->addElement('checkbox', 'is_active', ts('Is this Event Active?'));
 
     $this->addFormRule(['CRM_Event_Form_ManageEvent_EventInfo', 'formRule']);
+    if ($this->isSubmitted()) {
+      // The custom data fields are added to the form by an ajax form.
+      // However, if they are not present in the element index they will
+      // not be available from `$this->getSubmittedValue()` in post process.
+      // We do not have to set defaults or otherwise render - just add to the element index.
+      $this->addCustomDataFieldsToForm('Event', array_filter([
+        'id' => $this->getEventID(),
+        'event_type_id' => $_POST['event_type_id'],
+      ]));
+    }
 
     parent::buildQuickForm();
   }

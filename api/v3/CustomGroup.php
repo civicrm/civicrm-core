@@ -39,7 +39,6 @@ function civicrm_api3_custom_group_create($params) {
       'ParticipantEventName',
       'ParticipantEventType',
     ];
-    $params['extends_entity_column_id'] = 'null';
     if (in_array($extendsEntity, $participantEntities)
     ) {
       $params['extends_entity_column_id'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', $extendsEntity, 'value', 'name');

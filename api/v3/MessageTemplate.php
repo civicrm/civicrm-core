@@ -107,12 +107,9 @@ function civicrm_api3_message_template_send($params) {
       unset($params[$field]);
     }
   }
-  if (!isset($params['model'])) {
-    $params['model'] = [
-      // Pass through legacy receipt_text.
-      'userEnteredText' => $params['tplParams']['receipt_text'] ?? NULL,
-    ];
-  }
+  $params['modelProps'] = [
+    'userEnteredText' => $params['tplParams']['receipt_text'] ?? NULL,
+  ];
   if (empty($params['messageTemplateID'])) {
     if (empty($params['workflow'])) {
       // Can't use civicrm_api3_verify_mandatory for this because it would give the wrong field names

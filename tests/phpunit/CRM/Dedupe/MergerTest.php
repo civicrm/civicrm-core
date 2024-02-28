@@ -204,7 +204,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     $select = ['pn.is_selected' => 'is_selected'];
     $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($dao->id, $this->_groupId, [], TRUE, 0);
     $pnDupePairs = CRM_Core_BAO_PrevNextCache::retrieve($cacheKeyString, NULL, NULL, 0, 0, $select);
-    $this->assertEquals(count($foundDupes), count($pnDupePairs), 'Check number of dupe pairs in prev next cache.');
+    $this->assertCount(count($foundDupes), $pnDupePairs, 'Check number of dupe pairs in prev next cache.');
 
     // mark first two pairs as selected
     CRM_Core_DAO::singleValueQuery("UPDATE civicrm_prevnext_cache SET is_selected = 1 WHERE id IN ({$pnDupePairs[0]['prevnext_id']}, {$pnDupePairs[1]['prevnext_id']})");
@@ -408,8 +408,6 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
 
   /**
    * Test results are returned when criteria are passed in.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testGetMatchesCriteriaMatched(): void {
     $this->setupMatchData();
@@ -418,6 +416,70 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
       'criteria' => ['contact' => ['id' => ['>' => 1]]],
     ])['values'];
     $this->assertCount(2, $pairs);
+  }
+
+  public function testGetMatchesUpdatesOnMerge(): void {
+    $this->individualCreate([
+      'first_name' => 'Mickey',
+      'last_name' => 'Mouse',
+      'email' => 'mickey@mouse.com',
+    ], 'mickey_1');
+    $this->individualCreate([
+      'first_name' => 'Mickey',
+      'last_name' => 'Mouse',
+      'nick_name' => 'MouseMeister',
+      'email' => 'mickey@mouse.com',
+    ], 'mickey_2');
+    $this->individualCreate([
+      'first_name' => 'Mickey',
+      'last_name' => 'Mouse',
+      'email' => 'mickey@mouse.com',
+    ], 'mickey_3');
+    $this->individualCreate([
+      'first_name' => 'Mickey',
+      'last_name' => 'Mouse',
+      'email' => 'mickey@mouse.com',
+    ], 'mickey_4');
+    $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
+      'rule_group_id' => 1,
+      'criteria' => ['contact' => ['first_name' => 'Mickey']],
+    ])['values'];
+    // Each of the 4 Mickeys matches all the others 3+2+1 = 6 matches
+    $this->assertCount(6, $pairs);
+    // Merge 2 Mickeys
+    $this->callAPISuccess('Contact', 'merge', [
+      'to_keep_id' => $this->ids['Contact']['mickey_3'],
+      'to_remove_id' => $this->ids['Contact']['mickey_4'],
+    ]);
+    $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
+      'rule_group_id' => 1,
+      'criteria' => ['contact' => ['first_name' => 'Mickey']],
+    ])['values'];
+    // Now we should have 3 motches as there are 3 Mickeys - 2 + 1 matches
+    $this->assertCount(3, $pairs);
+
+    // Now re-do our get limiting it by nick name - Mickey 2
+    // is the only mouse who matches the criteria - but Mickey 2
+    // matches both remaining mice.
+    $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
+      'rule_group_id' => 1,
+      'criteria' => ['contact' => ['nick_name' => 'MouseMeister']],
+    ])['values'];
+    $this->assertCount(2, $pairs);
+
+    // Merge Mickey 2 into Mickey 3
+    $this->callAPISuccess('Contact', 'merge', [
+      'to_keep_id' => $this->ids['Contact']['mickey_3'],
+      'to_remove_id' => $this->ids['Contact']['mickey_2'],
+    ]);
+    // Now get our merge-able pairs again. Even though mickey_2 is gone
+    // the user is still expecting to see that merged mickey available
+    // to merge with Mickey 1.
+    $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
+      'rule_group_id' => 1,
+      'criteria' => ['contact' => ['nick_name' => 'MouseMeister']],
+    ])['values'];
+    $this->assertCount(1, $pairs);
   }
 
   /**
@@ -1284,58 +1346,64 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
 
   /**
    * Set up some contacts for our matching.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function setupMatchData(): void {
-    $fixtures = [
+    $individuals = [
       [
         'first_name' => 'Mickey',
         'last_name' => 'Mouse',
         'email' => 'mickey@mouse.com',
+        'identifier' => 'mickey_1',
       ],
       [
         'first_name' => 'Mickey',
         'last_name' => 'Mouse',
         'email' => 'mickey@mouse.com',
+        'identifier' => 'mickey_2',
       ],
       [
         'first_name' => 'Minnie',
         'last_name' => 'Mouse',
         'email' => 'mickey@mouse.com',
+        'identifier' => 'minnie_1',
       ],
       [
         'first_name' => 'Minnie',
         'last_name' => 'Mouse',
         'email' => 'mickey@mouse.com',
+        'identifier' => 'minnie_2',
       ],
     ];
-    foreach ($fixtures as $fixture) {
-      $contactID = $this->individualCreate($fixture);
-      $this->contacts[] = array_merge($fixture, ['id' => $contactID]);
+    foreach ($individuals as $individual) {
+      $contactID = $this->individualCreate($individual, $individual['identifier']);
+      $this->contacts[] = array_merge($individual, ['id' => $contactID]);
       sleep(2);
     }
-    $organizationFixtures = [
+    $organizations = [
       [
         'organization_name' => 'Walt Disney Ltd',
         'email' => 'walt@disney.com',
+        'identifier' => 'walt_1',
       ],
       [
         'organization_name' => 'Walt Disney Ltd',
         'email' => 'walt@disney.com',
+        'identifier' => 'walt_2',
       ],
       [
         'organization_name' => 'Walt Disney',
         'email' => 'walt@disney.com',
+        'identifier' => 'walt_3',
       ],
       [
         'organization_name' => 'Walt Disney',
         'email' => 'walter@disney.com',
+        'identifier' => 'walt_4',
       ],
     ];
-    foreach ($organizationFixtures as $fixture) {
-      $contactID = $this->organizationCreate($fixture);
-      $this->contacts[] = array_merge($fixture, ['id' => $contactID]);
+    foreach ($organizations as $organization) {
+      $contactID = $this->organizationCreate($organization, $organization['identifier']);
+      $this->contacts[] = array_merge($organization, ['id' => $contactID]);
     }
   }
 

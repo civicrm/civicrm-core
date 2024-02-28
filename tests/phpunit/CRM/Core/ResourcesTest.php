@@ -46,10 +46,6 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $this->res->setCacheCode('resTest');
     CRM_Core_Resources::singleton($this->res);
 
-    // Templates injected into regions should normally be file names, but for unit-testing it's handy to use "string:" notation
-    require_once 'CRM/Core/Smarty/resources/String.php';
-    civicrm_smarty_register_string_resource();
-
     $this->originalRequest = $_REQUEST;
     $this->originalGet = $_GET;
   }
@@ -134,28 +130,13 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
       ->addScriptFile('com.example.ext', 'foo%20bar.js', 0, 'testAddScriptFile')
       ->addScriptFile('civicrm', 'foo%20bar.js', 0, 'testAddScriptFile');
 
-    $smarty = CRM_Core_Smarty::singleton();
-    $actual = $smarty->fetch('string:{crmRegion name=testAddScriptFile}{/crmRegion}');
+    $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{crmRegion name="testAddScriptFile"}{/crmRegion}');
     // stable ordering: alphabetical by (snippet.weight,snippet.name)
     $expected = ""
       . "<script type=\"text/javascript\" src=\"http://core-app/foo%20bar.js?r=resTesten_US\">\n</script>\n"
       . "<script type=\"text/javascript\" src=\"http://ext-dir/com.example.ext/foo%20bar.js?r=resTesten_US\">\n</script>\n";
     $this->assertEquals($expected, $actual);
   }
-
-  /**
-   * When adding a script file, any ts() expressions should be translated and added to the 'strings'
-   *
-   * FIXME: This can't work because the tests run in English and CRM_Core_Resources optimizes
-   * away the English data from $settings['strings']
-   * public function testAddScriptFile_strings(): void {
-   * file_put_contents($this->mapper->keyToBasePath('com.example.ext') . '/hello.js', 'alert(ts("Hello world"));');
-   * $this->res->addScriptFile('com.example.ext', 'hello.js', 0, 'testAddScriptFile_strings');
-   * $settings = $this->res->getSettings();
-   * $expected = array('Hello world');
-   * $this->assertEquals($expected, $settings['strings']);
-   * }
-   */
 
   /**
    * Ensure that adding a script URL creates expected markup.
@@ -167,8 +148,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
       ->addScriptUrl('/whiz/foo%20bar.js', 0, 'testAddScriptURL')
       ->addScriptUrl('/whizbang/foo%20bar.js', 0, 'testAddScriptURL');
 
-    $smarty = CRM_Core_Smarty::singleton();
-    $actual = $smarty->fetch('string:{crmRegion name=testAddScriptURL}{/crmRegion}');
+    $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{crmRegion name="testAddScriptURL"}{/crmRegion}');
     // stable ordering: alphabetical by (snippet.weight,snippet.name)
     $expected = ""
       . "<script type=\"text/javascript\" src=\"/whiz/foo%20bar.js\">\n</script>\n"
@@ -181,8 +161,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
       ->addScript('alert("hi");', 0, 'testAddScript')
       ->addScript('alert("there");', 0, 'testAddScript');
 
-    $smarty = CRM_Core_Smarty::singleton();
-    $actual = $smarty->fetch('string:{crmRegion name=testAddScript}{/crmRegion}');
+    $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{crmRegion name="testAddScript"}{/crmRegion}');
     $expected = ""
       . "<script type=\"text/javascript\">\nalert(\"hi\");\n</script>\n"
       . "<script type=\"text/javascript\">\nalert(\"there\");\n</script>\n";
@@ -279,15 +258,13 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
   }
 
   public function testCrmJS(): void {
-    $smarty = CRM_Core_Smarty::singleton();
-
-    $actual = $smarty->fetch('string:{crmScript ext=com.example.ext file=foo%20bar.js region=testCrmJS}');
+    $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{crmScript ext="com.example.ext" file="foo%20bar.js" region="testCrmJS"}');
     $this->assertEquals('', $actual);
 
-    $actual = $smarty->fetch('string:{crmScript url=/whiz/foo%20bar.js region=testCrmJS weight=1}');
+    $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{crmScript url="/whiz/foo%20bar.js" region="testCrmJS" weight=1}');
     $this->assertEquals('', $actual);
 
-    $actual = $smarty->fetch('string:{crmRegion name=testCrmJS}{/crmRegion}');
+    $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{crmRegion name="testCrmJS"}{/crmRegion}');
     // stable ordering: alphabetical by (snippet.weight,snippet.name)
     $expected = ""
       . "<script type=\"text/javascript\" src=\"http://ext-dir/com.example.ext/foo%20bar.js?r=resTesten_US\">\n</script>\n"
@@ -302,8 +279,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
       ->addStyleFile('com.example.ext', 'foo%20bar.css', 0, 'testAddStyleFile')
       ->addStyleFile('civicrm', 'foo%20bar.css', 0, 'testAddStyleFile');
 
-    $smarty = CRM_Core_Smarty::singleton();
-    $actual = $smarty->fetch('string:{crmRegion name=testAddStyleFile}{/crmRegion}');
+    $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{crmRegion name="testAddStyleFile"}{/crmRegion}');
     // stable ordering: alphabetical by (snippet.weight,snippet.name)
     $expected = ""
       . "<link href=\"http://core-app/foo%20bar.css?r=resTesten_US\" rel=\"stylesheet\" type=\"text/css\"/>\n"
@@ -318,8 +294,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
       ->addStyleUrl('/whiz/foo%20bar.css', 0, 'testAddStyleURL')
       ->addStyleUrl('/whizbang/foo%20bar.css', 0, 'testAddStyleURL');
 
-    $smarty = CRM_Core_Smarty::singleton();
-    $actual = $smarty->fetch('string:{crmRegion name=testAddStyleURL}{/crmRegion}');
+    $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{crmRegion name="testAddStyleURL"}{/crmRegion}');
     // stable ordering: alphabetical by (snippet.weight,snippet.name)
     $expected = ""
       . "<link href=\"/whiz/foo%20bar.css\" rel=\"stylesheet\" type=\"text/css\"/>\n"
@@ -332,8 +307,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
       ->addStyle('body { background: black; }', 0, 'testAddStyle')
       ->addStyle('body { text-color: black; }', 0, 'testAddStyle');
 
-    $smarty = CRM_Core_Smarty::singleton();
-    $actual = $smarty->fetch('string:{crmRegion name=testAddStyle}{/crmRegion}');
+    $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{crmRegion name="testAddStyle"}{/crmRegion}');
     $expected = ""
       . "<style type=\"text/css\">\nbody { background: black; }\n</style>\n"
       . "<style type=\"text/css\">\nbody { text-color: black; }\n</style>\n";
@@ -341,15 +315,13 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
   }
 
   public function testCrmCSS(): void {
-    $smarty = CRM_Core_Smarty::singleton();
-
-    $actual = $smarty->fetch('string:{crmStyle ext=com.example.ext file=foo%20bar.css region=testCrmCSS}');
+    $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{crmStyle ext="com.example.ext" file="foo%20bar.css" region=testCrmCSS}');
     $this->assertEquals('', $actual);
 
-    $actual = $smarty->fetch('string:{crmStyle url=/whiz/foo%20bar.css region=testCrmCSS weight=1}');
+    $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{crmStyle url="/whiz/foo%20bar.css" region="testCrmCSS" weight=1}');
     $this->assertEquals('', $actual);
 
-    $actual = $smarty->fetch('string:{crmRegion name=testCrmCSS}{/crmRegion}');
+    $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{crmRegion name="testCrmCSS"}{/crmRegion}');
     // stable ordering: alphabetical by (snippet.weight,snippet.name)
     $expected = ""
       . "<link href=\"http://ext-dir/com.example.ext/foo%20bar.css?r=resTesten_US\" rel=\"stylesheet\" type=\"text/css\"/>\n"
@@ -377,18 +349,16 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
   }
 
   public function testCrmResURL(): void {
-    $smarty = CRM_Core_Smarty::singleton();
-
-    $actual = $smarty->fetch('string:{crmResURL ext=com.example.ext file=foo%20bar.png}');
+    $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{crmResURL ext="com.example.ext" file="foo%20bar.png"}');
     $this->assertEquals('http://ext-dir/com.example.ext/foo%20bar.png', $actual);
 
-    $actual = $smarty->fetch('string:{crmResURL ext=com.example.ext file=foo%20bar.png addCacheCode=1}');
+    $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{crmResURL ext="com.example.ext" file="foo%20bar.png" addCacheCode=1}');
     $this->assertEquals('http://ext-dir/com.example.ext/foo%20bar.png?r=resTesten_US', $actual);
 
-    $actual = $smarty->fetch('string:{crmResURL ext=com.example.ext}');
+    $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{crmResURL ext="com.example.ext"}');
     $this->assertEquals('http://ext-dir/com.example.ext/', $actual);
 
-    $actual = $smarty->fetch('string:{crmResURL expr="[civicrm.root]/foo"}');
+    $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{crmResURL expr="[civicrm.root]/foo"}');
     $this->assertEquals(Civi::paths()->getUrl('[civicrm.root]/foo'), $actual);
   }
 
@@ -415,7 +385,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $this->assertEquals($result, CRM_Core_Resources::isAjaxMode());
   }
 
-  public function ajaxModeData() {
+  public function ajaxModeData(): array {
     return [
       [['q' => 'civicrm/ajax/foo'], TRUE],
       [['q' => 'civicrm/angularprofiles/template'], TRUE],
@@ -429,7 +399,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
   /**
    * @return CRM_Extension_Mapper
    */
-  private function createMapper() {
+  private function createMapper(): CRM_Extension_Mapper {
     $basedir = rtrim($this->createTempDir('ext-'), '/');
     mkdir("$basedir/com.example.ext");
     mkdir("$basedir/com.example.ext/js");
@@ -447,7 +417,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
    *
    * @dataProvider urlForCacheCodeProvider
    */
-  public function testAddingCacheCode($url, $expected) {
+  public function testAddingCacheCode(string $url, string $expected): void {
     $resources = CRM_Core_Resources::singleton();
     $resources->setCacheCode($this->cacheBusterString);
     $this->assertEquals($expected, $resources->addCacheCode($url));
@@ -456,7 +426,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function urlForCacheCodeProvider() {
+  public function urlForCacheCodeProvider(): array {
     $cacheBusterString = Civi::resources()
       ->setCacheCode($this->cacheBusterString)
       ->getCacheCode();
@@ -479,7 +449,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
   /**
    * return array
    */
-  public function urlsToCheckIfFullyFormed() {
+  public function urlsToCheckIfFullyFormed(): array {
     return [
       ['civicrm/test/page', FALSE],
       ['#', FALSE],
@@ -496,7 +466,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
    *
    * @dataProvider urlsToCheckIfFullyFormed
    */
-  public function testIsFullyFormedUrl($url, $expected) {
+  public function testIsFullyFormedUrl($url, $expected): void {
     $this->assertEquals($expected, CRM_Core_Resources::isFullyFormedUrl($url));
   }
 

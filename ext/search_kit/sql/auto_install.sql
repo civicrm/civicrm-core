@@ -46,7 +46,7 @@ CREATE TABLE `civicrm_search_display` (
   UNIQUE INDEX `UI_saved_search__id_name`(saved_search_id, name),
   CONSTRAINT FK_civicrm_search_display_saved_search_id FOREIGN KEY (`saved_search_id`) REFERENCES `civicrm_saved_search`(`id`) ON DELETE CASCADE
 )
-ENGINE=InnoDB ROW_FORMAT=DYNAMIC;
+ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 -- /*******************************************************
 -- *
@@ -65,4 +65,4 @@ CREATE TABLE `civicrm_search_segment` (
   PRIMARY KEY (`id`),
   UNIQUE INDEX `UI_name`(name)
 )
-ENGINE=InnoDB ROW_FORMAT=DYNAMIC;
+ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;

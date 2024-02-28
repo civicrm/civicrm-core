@@ -47,7 +47,7 @@ class CRM_Member_ActionMapping extends \Civi\ActionSchedule\MappingBase {
   }
 
   public function getStatusLabels(?array $entityValue): array {
-    foreach ($entityValue ?? [] as $membershipType) {
+    foreach (array_filter($entityValue ?? []) as $membershipType) {
       if (\CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $membershipType, 'auto_renew')) {
         return \CRM_Core_OptionGroup::values('auto_renew_options');
       }

@@ -88,7 +88,7 @@ class CRM_Core_Payment_ProcessorForm {
       $form->paymentInstrumentID
     );
 
-    $form->assign_by_ref('paymentProcessor', $form->_paymentProcessor);
+    $form->assign('paymentProcessor', $form->_paymentProcessor);
 
     // check if this is a paypal auto return and redirect accordingly
     //@todo - determine if this is legacy and remove

@@ -319,7 +319,7 @@ WHERE li.contribution_id = %1";
         'max_value' => $options[$oid]['max_value'] ?? NULL,
         'membership_type_id' => $options[$oid]['membership_type_id'] ?? NULL,
         'membership_num_terms' => $options[$oid]['membership_num_terms'] ?? NULL,
-        'auto_renew' => $options[$oid]['auto_renew'] ?? NULL,
+        'auto_renew' => !empty($options[$oid]['auto_renew']) ? (int) $options[$oid]['auto_renew'] : NULL,
         'html_type' => $fields['html_type'],
         'financial_type_id' => $options[$oid]['financial_type_id'] ?? NULL,
         'tax_amount' => $options[$oid]['tax_amount'] ?? 0,
@@ -327,7 +327,7 @@ WHERE li.contribution_id = %1";
       ];
 
       if ($values[$oid]['membership_type_id'] && empty($values[$oid]['auto_renew'])) {
-        $values[$oid]['auto_renew'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $values[$oid]['membership_type_id'], 'auto_renew');
+        $values[$oid]['auto_renew'] = (int) CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $values[$oid]['membership_type_id'], 'auto_renew');
       }
     }
   }
@@ -677,7 +677,7 @@ WHERE li.contribution_id = %1";
       $updatedAmount = CRM_Price_BAO_LineItem::getLineTotal($contributionId);
     }
     else {
-      $updatedAmount = CRM_Utils_Array::value('amount', $params, CRM_Utils_Array::value('total_amount', $params));
+      $updatedAmount = $params['amount'] ?? $params['total_amount'] ?? NULL;
     }
     if (strlen($params['tax_amount']) != 0) {
       $taxAmount = $params['tax_amount'];

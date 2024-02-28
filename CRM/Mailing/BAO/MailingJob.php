@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 use Civi\Api4\ActivityContact;
+use Civi\Api4\MailingJob;
 
 /**
  *
@@ -43,8 +44,10 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
    * @throws \CRM_Core_Exception
    */
   public static function create(array $params): self {
+    CRM_Core_Error::deprecatedWarning('use the api');
     $jobDAO = self::writeRecord($params);
     if (!empty($params['mailing_id']) && empty('is_calling_function_updated_to_reflect_deprecation')) {
+      CRM_Core_Error::deprecatedWarning('mail recipients should not be generated during MailingJob::create');
       CRM_Mailing_BAO_Mailing::getRecipients($params['mailing_id']);
     }
     return $jobDAO;
@@ -147,11 +150,11 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
         }
 
         // Update to show job has started.
-        self::create([
+        MailingJob::update(FALSE)->setValues([
           'id' => $job->id,
           'start_date' => date('YmdHis'),
           'status' => 'Running',
-        ]);
+        ])->execute();
 
         $transaction->commit();
       }
@@ -171,9 +174,11 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
       if ($isComplete) {
         // Finish the job.
 
-        $transaction = new CRM_Core_Transaction();
-        self::create(['id' => $job->id, 'end_date' => date('YmdHis'), 'status' => 'Complete']);
-        $transaction->commit();
+        MailingJob::update(FALSE)->setValues([
+          'id' => $job->id,
+          'end_date' => 'now',
+          'status' => 'Complete',
+        ])->execute();
 
         // don't mark the mailing as complete
       }
@@ -337,7 +342,11 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
       self::split_job((int) $offset, (int) $job->id, (int) $job->mailing_id, $job->scheduled_date);
 
       // Update the status of the parent job
-      self::create(['id' => $job->id, 'start_date' => date('YmdHis'), 'status' => 'Running']);
+      MailingJob::update(FALSE)->setValues([
+        'id' => $job->id,
+        'start_date' => 'now',
+        'status' => 'Running',
+      ])->execute();
       $transaction->commit();
 
       // Release the job lock
@@ -726,64 +735,6 @@ AND    record_type_id = $targetRecordID
     }
 
     return $result;
-  }
-
-  /**
-   * Search the mailing-event queue for a list of pending delivery tasks.
-   *
-   * @param int $jobId
-   * @param string $medium
-   *   Ex: 'email' or 'sms'.
-   *
-   * @return \CRM_Mailing_Event_BAO_MailingEventQueue
-   *   A query object whose rows provide ('id', 'contact_id', 'hash') and ('email' or 'phone').
-   */
-  public static function findPendingTasks(int $jobId, string $medium): CRM_Mailing_Event_BAO_MailingEventQueue {
-    $eq = new CRM_Mailing_Event_BAO_MailingEventQueue();
-
-    $query = "  SELECT      queue.id,
-                                email.email as email,
-                                queue.contact_id,
-                                queue.hash,
-                                NULL as phone
-                    FROM        civicrm_mailing_event_queue queue
-                    INNER JOIN  civicrm_email email
-                            ON  queue.email_id = email.id
-                    INNER JOIN  civicrm_contact contact
-                            ON  contact.id = email.contact_id
-                    LEFT JOIN   civicrm_mailing_event_delivered delivered
-                            ON  queue.id = delivered.event_queue_id
-                    LEFT JOIN   civicrm_mailing_event_bounce bounce
-                            ON  queue.id = bounce.event_queue_id
-                    WHERE       queue.job_id = " . $jobId . "
-                        AND     delivered.id IS null
-                        AND     bounce.id IS null
-                        AND     contact.is_opt_out = 0";
-
-    if ($medium === 'sms') {
-      $query = "
-                    SELECT      queue.id,
-                                phone,
-                                queue.contact_id,
-                                queue.hash,
-                                NULL as email
-                    FROM        civicrm_mailing_event_queue queue
-                    INNER JOIN  civicrm_phone phone
-                            ON  queue.phone_id = phone.id
-                    INNER JOIN  civicrm_contact contact
-                            ON  contact.id = phone.contact_id
-                    LEFT JOIN   civicrm_mailing_event_delivered delivered
-                            ON  queue.id = delivered.event_queue_id
-                    LEFT JOIN   civicrm_mailing_event_bounce bounce
-                            ON  queue.id = bounce.event_queue_id
-                    WHERE       queue.job_id = " . $jobId . "
-                        AND     delivered.id IS null
-                        AND     bounce.id IS null
-                        AND    ( contact.is_opt_out = 0
-                        OR       contact.do_not_sms = 0 )";
-    }
-    $eq->query($query);
-    return $eq;
   }
 
   /**

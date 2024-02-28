@@ -227,7 +227,7 @@ class Kernel {
     /** @var \Civi\API\Event\AuthorizeEvent $event */
     $event = $this->dispatcher->dispatch('civi.api.authorize', new AuthorizeEvent($apiProvider, $apiRequest, $this, \CRM_Core_Session::getLoggedInContactID() ?: 0));
     if (!$event->isAuthorized()) {
-      throw new \Civi\API\Exception\UnauthorizedException("Authorization failed");
+      throw new \Civi\API\Exception\UnauthorizedException("Authorization failed: CiviCRM APIv{$apiRequest['version']} ({$apiRequest['entity']}::{$apiRequest['action']})");
     }
   }
 

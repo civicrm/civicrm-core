@@ -24,7 +24,7 @@ use Civi\Core\Event\PostEvent;
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution implements Civi\Test\HookInterface {
+class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution implements Civi\Core\HookInterface {
 
   /**
    * Static field for all the contribution information that we can potentially import
@@ -1596,10 +1596,13 @@ WHERE  civicrm_contribution.contact_id = civicrm_contact.id
    * @param array $componentIds
    *   Component ids.
    *
+   * @deprecated since 5.72 will be removed around 5.90
+   *
    * @return array
    *   associated array
    */
   public static function getContributionDetails($exportMode, $componentIds) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     $paymentDetails = [];
     $componentClause = ' IN ( ' . implode(',', $componentIds) . ' ) ';
 
@@ -1833,10 +1836,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       }
     }
 
-    $paymentProcessorID = CRM_Utils_Array::value('payment_processor_id', $input, CRM_Utils_Array::value(
-      'paymentProcessor',
-      $ids
-    ));
+    $paymentProcessorID = $input['payment_processor_id'] ?? $ids['paymentProcessor'] ?? NULL;
 
     if (!isset($input['payment_processor_id']) && !$paymentProcessorID && $contribution->contribution_page_id) {
       $paymentProcessorID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage',
@@ -2668,6 +2668,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         }
       }
       else {
+        $values['modelProps'] = $input['modelProps'] ?? [];
         return CRM_Contribute_BAO_ContributionPage::sendMail($ids['contact'], $values, $isTest, $returnMessageText);
       }
     }
@@ -3386,7 +3387,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       && $params['prevContribution']->contribution_status_id != $params['contribution']->contribution_status_id
     ) {
       $eventID = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $entityId, 'event_id');
-      $feeLevel[] = str_replace('', '', $params['prevContribution']->amount_level);
+      $feeLevel = str_replace('�', '', $params['prevContribution']->amount_level);
       CRM_Event_BAO_Participant::createDiscountTrxn($eventID, $params, $feeLevel);
     }
     unset($params['line_item']);

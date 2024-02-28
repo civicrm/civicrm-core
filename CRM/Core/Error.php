@@ -182,7 +182,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
         else {
           $mysql_error = 'fixme-unknown-db-cxn';
         }
-        $template->assign_by_ref('mysql_code', $mysql_error);
+        $template->assign('mysql_code', $mysql_error);
       }
     }
 

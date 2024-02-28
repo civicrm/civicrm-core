@@ -32,8 +32,18 @@ class CRM_Core_JobManager {
    */
   public $currentJob = NULL;
 
+  /**
+   * @var array
+   *
+   * @fixme How are these set? What do they do?
+   */
   public $singleRunParams = [];
 
+  /**
+   * @var string|null
+   *
+   * @fixme Looks like this is only used by "singleRun"
+   */
   public $_source = NULL;
 
   /**
@@ -124,7 +134,7 @@ class CRM_Core_JobManager {
     try {
       $result = civicrm_api($job->api_entity, $job->api_action, $params);
     }
-    catch (Exception$e) {
+    catch (Exception $e) {
       $this->logEntry('Error while executing ' . $job->name . ': ' . $e->getMessage());
       $result = $e;
     }
@@ -191,7 +201,7 @@ class CRM_Core_JobManager {
    * @param $entity
    * @param $job
    * @param array $params
-   * @param null $source
+   * @param string|null $source
    */
   public function setSingleRunParams($entity, $job, $params, $source = NULL) {
     $this->_source = $source;

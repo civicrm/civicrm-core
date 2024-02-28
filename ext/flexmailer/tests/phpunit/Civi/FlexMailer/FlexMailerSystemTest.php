@@ -20,13 +20,13 @@ namespace Civi\FlexMailer;
 use Civi\Core\Event\GenericHookEvent;
 
 // For compat w/v4.6 phpunit
-require_once 'tests/phpunit/CRM/Mailing/BaseMailingSystemTest.php';
+require_once 'tests/phpunit/CRM/Mailing/MailingSystemTestBase.php';
 
 /**
  * Class FlexMailerSystemTest
  *
  * MailingSystemTest checks that overall composition and delivery of
- * CiviMail blasts works. It extends CRM_Mailing_BaseMailingSystemTest
+ * CiviMail blasts works. It extends CRM_Mailing_MailingSystemTestBase
  * which provides the general test scenarios -- but this variation
  * checks that certain internal events/hooks fire.
  *
@@ -35,7 +35,7 @@ require_once 'tests/phpunit/CRM/Mailing/BaseMailingSystemTest.php';
  * @group civimail
  * @see CRM_Mailing_MailingSystemTest
  */
-class FlexMailerSystemTest extends \CRM_Mailing_BaseMailingSystemTest {
+class FlexMailerSystemTest extends \CRM_Mailing_MailingSystemTestBase {
 
   private $counts;
 

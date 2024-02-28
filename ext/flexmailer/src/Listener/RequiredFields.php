@@ -10,6 +10,7 @@
  */
 namespace Civi\FlexMailer\Listener;
 
+use Civi\Core\Service\AutoService;
 use CRM_Flexmailer_ExtensionUtil as E;
 use Civi\FlexMailer\Event\CheckSendableEvent;
 
@@ -19,7 +20,22 @@ use Civi\FlexMailer\Event\CheckSendableEvent;
  *
  * The RequiredFields listener checks that all mandatory fields have a value.
  */
-class RequiredFields extends BaseListener {
+class RequiredFields extends AutoService {
+
+  use IsActiveTrait;
+
+  /**
+   * @service civi_flexmailer_required_fields
+   */
+  public static function factory(): RequiredFields {
+    return new static([
+      'subject',
+      'name',
+      'from_name',
+      'from_email',
+      '(body_html|body_text)',
+    ]);
+  }
 
   /**
    * @var array

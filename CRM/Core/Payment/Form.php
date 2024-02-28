@@ -209,7 +209,7 @@ class CRM_Core_Payment_Form {
    */
   public static function buildPaymentForm(&$form, $processor, $billing_profile_id, $isBackOffice, $paymentInstrumentID = NULL) {
     //if the form has address fields assign to the template so the js can decide what billing fields to show
-    $form->assign('profileAddressFields', $form->get('profileAddressFields') ?? NULL);
+    $form->assign('profileAddressFields', $form->get('profileAddressFields'));
     $form->addExpectedSmartyVariable('suppressSubmitButton');
     if (!empty($processor['object']) && $processor['object']->buildForm($form)) {
       return;
@@ -313,7 +313,7 @@ class CRM_Core_Payment_Form {
   /**
    * Map address fields.
    *
-   * @param int $id unused
+   * @param null $id unused
    * @param array $src
    * @param array $dst
    * @param bool $reverse

@@ -17,6 +17,8 @@
 
 /**
  * This class provides the common functionality for sending sms to one or a group of contact ids.
+ *
+ * @deprecated since 5.71 will be removed around 5.77.
  */
 class CRM_Contact_Form_Task_SMSCommon {
   const RECIEVED_SMS_ACTIVITY_SUBJECT = "SMS Received";
@@ -30,9 +32,12 @@ class CRM_Contact_Form_Task_SMSCommon {
   /**
    * Pre process the provider.
    *
+   * @deprecated since 5.71 will be removed around 5.77.
+   *
    * @param CRM_Core_Form $form
    */
   public static function preProcessProvider(&$form) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     $form->_single = FALSE;
     $className = CRM_Utils_System::getClassName($form);
 
@@ -68,8 +73,11 @@ class CRM_Contact_Form_Task_SMSCommon {
    * Build the form object.
    *
    * @param CRM_Core_Form $form
+   *
+   * @deprecated since 5.71 will be removed around 5.77.
    */
   public static function buildQuickForm(&$form) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative supported for non-core use');
 
     $toArray = [];
 
@@ -102,7 +110,7 @@ class CRM_Contact_Form_Task_SMSCommon {
 
       $form->_contactIds = [];
       foreach ($allToPhone as $value) {
-        list($contactId, $phone) = explode('::', $value);
+        [$contactId, $phone] = explode('::', $value);
         if ($contactId) {
           $form->_contactIds[] = $contactId;
           $form->_toContactPhone[] = $phone;
@@ -283,7 +291,7 @@ class CRM_Contact_Form_Task_SMSCommon {
    */
   public static function formRule($fields, $dontCare, $self) {
     $errors = [];
-
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative supported for non-core use');
     $template = CRM_Core_Smarty::singleton();
 
     if (empty($fields['sms_text_message'])) {
@@ -311,9 +319,11 @@ class CRM_Contact_Form_Task_SMSCommon {
    * Process the form after the input has been submitted and validated.
    *
    * @param CRM_Core_Form $form
+   *
+   * @deprecated since 5.71 will be removed around 5.77.
    */
   public static function postProcess(&$form) {
-
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative supported for non-core use');
     $thisValues = $form->controller->exportValues($form->getName());
 
     $fromSmsProviderId = $thisValues['sms_provider_id'];
@@ -364,7 +374,7 @@ class CRM_Contact_Form_Task_SMSCommon {
     $contactIds = array_keys($form->_contactDetails);
     $allContactIds = array_keys($form->_allContactDetails);
 
-    list($sent, $activityId, $countSuccess) = CRM_Activity_BAO_Activity::sendSMS($formattedContactDetails,
+    [$sent, $activityId, $countSuccess] = CRM_Activity_BAO_Activity::sendSMS($formattedContactDetails,
       $thisValues,
       $smsParams,
       $contactIds

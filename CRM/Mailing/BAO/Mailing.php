@@ -936,20 +936,18 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    *   ID of the EventQueue.
    * @param string $hash
    *   Hash of the EventQueue.
-   * @param string $email
-   *   Destination address.
    *
    * @return array
    *   (reference) array    array ref that hold array refs to the verp info and urls
    */
-  public static function getVerpAndUrls($job_id, $event_queue_id, $hash, $email) {
+  public static function getVerpAndUrls($job_id, $event_queue_id, $hash) {
     // create a skeleton object and set its properties that are required by getVerpAndUrlsAndHeaders()
     $bao = new CRM_Mailing_BAO_Mailing();
     $bao->_domain = CRM_Core_BAO_Domain::getDomain();
     $bao->from_name = $bao->from_email = $bao->subject = '';
 
     // use $bao's instance method to get verp and urls
-    [$verp, $urls, $_] = $bao->getVerpAndUrlsAndHeaders($job_id, $event_queue_id, $hash, $email);
+    [$verp, $urls, $_] = $bao->getVerpAndUrlsAndHeaders($job_id, $event_queue_id, $hash);
     return [$verp, $urls];
   }
 
@@ -962,15 +960,11 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    *   ID of the EventQueue.
    * @param string $hash
    *   Hash of the EventQueue.
-   * @param string $email
-   *   Destination address.
-   *
-   * @param bool $isForward
    *
    * @return array
    *   array ref that hold array refs to the verp info, urls, and headers
    */
-  public function getVerpAndUrlsAndHeaders($job_id, $event_queue_id, $hash, $email, $isForward = FALSE) {
+  public function getVerpAndUrlsAndHeaders($job_id, $event_queue_id, $hash) {
     $config = CRM_Core_Config::singleton();
 
     /**
@@ -1035,9 +1029,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       'List-Unsubscribe' => "<mailto:{$verp['unsubscribe']}>",
     ];
     self::addMessageIdHeader($headers, 'm', $job_id, $event_queue_id, $hash);
-    if ($isForward) {
-      $headers['Subject'] = "[Fwd:{$this->subject}]";
-    }
     return [&$verp, &$urls, &$headers];
   }
 
@@ -1067,6 +1058,11 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    * @param string $fromEmail
    *   Email address of who is forwarding it.
    *
+   * @deprecated since 5.17 will be removed around 5.74
+   *
+   * Note this REALLY should not be called anymore. I considered just removing
+   * but opted for noisy deprecation with short turn around.
+   *
    * @return Mail_mime               The mail object
    */
   public function compose(
@@ -1076,7 +1072,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     $fromEmail = NULL
   ) {
     $this->getTokens();
-
+    CRM_Core_Error::deprecatedWarning('unused function - use flexmailer');
     if ($this->_domain == NULL) {
       $this->_domain = CRM_Core_BAO_Domain::getDomain();
     }
@@ -1084,9 +1080,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     [$verp, $urls, $headers] = $this->getVerpAndUrlsAndHeaders(
       $job_id,
       $event_queue_id,
-      $hash,
-      $email,
-      $isForward
+      $hash
     );
 
     //set from email who is forwarding it and not original one.
@@ -1300,11 +1294,12 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    *
    * Get mailing object and replaces subscribeInvite, domain and mailing tokens.
    *
-   * @deprecated
+   * @deprecated since 2017 will be removed around 5.74
    *   This is used by CiviMail but will be made redundant by FlexMailer/TokenProcessor.
    * @param CRM_Mailing_BAO_Mailing $mailing
    */
   public static function tokenReplace(&$mailing) {
+    CRM_Core_Error::deprecatedWarning('function no longer called, use flexmailer');
     $domain = CRM_Core_BAO_Domain::getDomain();
 
     foreach (['text', 'html'] as $type) {
@@ -1325,7 +1320,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   /**
    * Get data to resolve tokens.
    *
-   * @deprecated
+   * @deprecated since 2017 will be removed around 5.74
    *   This is used by CiviMail but will be made redundant by FlexMailer/TokenProcessor.
    *
    * @param array $token_a
@@ -1342,7 +1337,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     $type = $token_a['type'];
     $token = $token_a['token'];
     $data = $token;
-
+    CRM_Core_Error::deprecatedWarning('called only by deprecated function');
     $useSmarty = defined('CIVICRM_MAIL_SMARTY') && CIVICRM_MAIL_SMARTY;
 
     if ($type === 'embedded_url') {
@@ -1419,10 +1414,13 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    * Return a list of group names for this mailing.  Does not work with
    * prior-mailing targets.
    *
+   * @deprecated since 5.71 will be removed around 5.77
+   *
    * @return array
    *   Names of groups receiving this mailing
    */
   public function &getGroupNames() {
+    CRM_Core_Error::deprecatedWarning('unused function');
     if (!isset($this->id)) {
       return [];
     }
@@ -1638,7 +1636,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     // In v4 of the api they are not available via CRUD. At some
     // point we will create a 'submit' function which will do the crud+submit
     // but for now only CRUD is available via v4 api.
-    if (($params['version'] ?? '') !== 4) {
+    if (empty($params['skip_legacy_scheduling'])) {
       self::doSubmitActions($params, $mailing);
     }
 
@@ -2451,31 +2449,12 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
 
   /**
    * @deprecated
-   *  Use CRM_Mailing_BAO_MailingJob::del($id)
-   *
-   * @param int $id
-   *   Id of the Job to delete.
-   *
-   * @return void
-   */
-  public static function delJob($id) {
-    if (empty($id)) {
-      throw new CRM_Core_Exception(ts('No id passed to mailing delJob function'));
-    }
-
-    CRM_Core_Error::deprecatedWarning('This function is deprecated, use CRM_Mailing_BAO_MailingJob::del instead');
-
-    CRM_Mailing_BAO_MailingJob::deleteRecord(['id' => $id]);
-  }
-
-  /**
-   * @deprecated
    *   This is used by CiviMail but will be made redundant by FlexMailer/TokenProcessor.
    * @return array
    */
   public function getReturnProperties() {
     $tokens = &$this->getTokens();
-
+    CRM_Core_Error::deprecatedWarning('function no longer called - use flexmailer');
     $properties = [];
     if (isset($tokens['html']) &&
       isset($tokens['html']['contact'])

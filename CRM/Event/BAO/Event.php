@@ -123,10 +123,6 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event implements \Civi\Core\Hook
 
     $event = self::add($params);
     CRM_Price_BAO_PriceSet::setPriceSets($params, $event, 'event');
-    if (is_a($event, 'CRM_Core_Error')) {
-      CRM_Core_DAO::transaction('ROLLBACK');
-      return $event;
-    }
 
     $contactId = CRM_Core_Session::getLoggedInContactID();
     if (!$contactId) {
@@ -1599,10 +1595,11 @@ WHERE civicrm_event.is_active = 1
             $idx = $detailName . '_id';
             $values[$index] = $params[$idx];
           }
-          elseif ($fieldName == 'im') {
+          elseif ($fieldName === 'im') {
             $providerName = NULL;
             if ($providerId = $detailName . '-provider_id') {
-              $providerName = $imProviders[$params[$providerId]] ?? NULL;
+              $inputProvider = $params[$providerId] ?? '';
+              $providerName = $imProviders[$inputProvider] ?? NULL;
             }
             if ($providerName) {
               $values[$index] = $params[$detailName] . " (" . $providerName . ")";
@@ -1611,7 +1608,7 @@ WHERE civicrm_event.is_active = 1
               $values[$index] = $params[$detailName];
             }
           }
-          elseif ($fieldName == 'phone') {
+          elseif ($fieldName === 'phone') {
             $phoneExtField = str_replace('phone', 'phone_ext', $detailName);
             if (isset($params[$phoneExtField])) {
               $values[$index] = $params[$detailName] . " (" . $params[$phoneExtField] . ")";
@@ -1680,8 +1677,6 @@ WHERE  id = $cfID
                   $customVal = $params[$name];
                 }
                 //take the custom field options
-                $returnProperties = [$name => 1];
-                $query = new CRM_Contact_BAO_Query($params, $returnProperties, $fields);
                 if (!$skip) {
                   $displayValue = CRM_Core_BAO_CustomField::displayValue($customVal, $cfID);
                 }

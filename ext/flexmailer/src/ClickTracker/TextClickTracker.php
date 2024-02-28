@@ -10,7 +10,12 @@
  */
 namespace Civi\FlexMailer\ClickTracker;
 
-class TextClickTracker implements ClickTrackerInterface {
+use Civi\Core\Service\AutoService;
+
+/**
+ * @service civi_flexmailer_text_click_tracker
+ */
+class TextClickTracker extends AutoService implements ClickTrackerInterface {
 
   public function filterContent($msg, $mailing_id, $queue_id) {
     return self::replaceTextUrls($msg,

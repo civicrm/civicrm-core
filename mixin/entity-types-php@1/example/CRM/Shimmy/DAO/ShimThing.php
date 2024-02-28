@@ -120,61 +120,6 @@ class CRM_Shimmy_DAO_ShimThing extends CRM_Core_DAO {
   }
 
   /**
-   * Return a mapping from field-name to the corresponding key (as used in fields()).
-   *
-   * @return array
-   *   Array(string $name => string $uniqueName).
-   */
-  public static function &fieldKeys() {
-    if (!isset(Civi::$statics[__CLASS__]['fieldKeys'])) {
-      Civi::$statics[__CLASS__]['fieldKeys'] = array_flip(CRM_Utils_Array::collect('name', self::fields()));
-    }
-    return Civi::$statics[__CLASS__]['fieldKeys'];
-  }
-
-  /**
-   * Returns the names of this table
-   *
-   * @return string
-   */
-  public static function getTableName() {
-    return self::$_tableName;
-  }
-
-  /**
-   * Returns if this table needs to be logged
-   *
-   * @return bool
-   */
-  public function getLog() {
-    return self::$_log;
-  }
-
-  /**
-   * Returns the list of fields that can be imported
-   *
-   * @param bool $prefix
-   *
-   * @return array
-   */
-  public static function &import($prefix = FALSE) {
-    $r = CRM_Core_DAO_AllCoreTables::getImports(__CLASS__, 'shim_thing', $prefix, []);
-    return $r;
-  }
-
-  /**
-   * Returns the list of fields that can be exported
-   *
-   * @param bool $prefix
-   *
-   * @return array
-   */
-  public static function &export($prefix = FALSE) {
-    $r = CRM_Core_DAO_AllCoreTables::getExports(__CLASS__, 'shim_thing', $prefix, []);
-    return $r;
-  }
-
-  /**
    * Returns the list of indices
    *
    * @param bool $localize

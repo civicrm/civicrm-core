@@ -355,6 +355,7 @@ abstract class Api4Query {
     // For arrays & serialized fields, they only match a complete (not partial) string within the array.
     if ($operator === 'CONTAINS' || $operator === 'NOT CONTAINS') {
       $sep = \CRM_Core_DAO::VALUE_SEPARATOR;
+      $original_operator = $operator;
       switch ($field['serialize'] ?? NULL) {
 
         case \CRM_Core_DAO::SERIALIZE_JSON:
@@ -389,6 +390,12 @@ abstract class Api4Query {
           $operator = ($operator === 'CONTAINS') ? 'LIKE' : 'NOT LIKE';
           $value = '%' . $value . '%';
           break;
+      }
+
+      if ($original_operator === "NOT CONTAINS") {
+        // For a "NOT CONTAINS", this adds an "OR IS NULL" clause - we want to know that a particular value is not present and don't care whether it has any other value
+        $mainClause = \CRM_Core_DAO::createSQLFilter($fieldAlias, [$operator => $value]);
+        return "(($mainClause) OR $fieldAlias IS NULL)";
       }
     }
 

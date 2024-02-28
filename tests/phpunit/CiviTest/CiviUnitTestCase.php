@@ -2553,8 +2553,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     CRM_Contribute_PseudoConstant::flush('membershipType');
     // Pseudoconstants may be saved to the cache table.
     CRM_Core_DAO::executeQuery("TRUNCATE civicrm_cache");
-    CRM_Financial_BAO_FinancialType::$_statusACLFt = [];
-    CRM_Financial_BAO_FinancialType::$_availableFinancialTypes = NULL;
   }
 
   /**

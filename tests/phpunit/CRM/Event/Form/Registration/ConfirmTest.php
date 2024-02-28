@@ -2,6 +2,7 @@
 
 declare(strict_types = 1);
 use Civi\Api4\Participant;
+use Civi\Api4\PriceFieldValue;
 use Civi\Test\FormTrait;
 
 /**
@@ -84,35 +85,16 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     /** @var \CRM_Core_Payment_Dummy $processor */
     $processor = Civi\Payment\System::singleton()->getById($paymentProcessorID);
     $processor->setDoDirectPaymentResult(['fee_amount' => 1.67]);
-    $event = $this->eventCreatePaid(['payment_processor' => [$paymentProcessorID]]);
+    $event = $this->eventCreatePaid([
+      'payment_processor' => [$paymentProcessorID],
+      'selfcancelxfer_time' => 72,
+    ]);
     $this->submitForm($event['id'], [
       'first_name' => 'k',
       'last_name' => 'p',
       'email-Primary' => 'demo@example.com',
-      'hidden_processor' => '1',
-      'credit_card_number' => '4111111111111111',
-      'cvv2' => '123',
-      'credit_card_exp_date' => [
-        'M' => '1',
-        'Y' => date('Y') + 1,
-      ],
-      'credit_card_type' => 'Visa',
-      'billing_first_name' => 'p',
-      'billing_middle_name' => '',
-      'billing_last_name' => 'p',
-      'billing_street_address-5' => 'p',
-      'billing_city-5' => 'p',
-      'billing_state_province_id-5' => '1061',
-      'billing_postal_code-5' => '7',
-      'billing_country_id-5' => '1228',
-      'priceSetId' => $this->getPriceSetID('PaidEvent'),
       'price_' . $this->getPriceFieldID('PaidEvent') => $this->ids['PriceFieldValue']['PaidEvent_standard'],
-      'payment_processor_id' => $paymentProcessorID,
-      'year' => '2019',
-      'month' => '1',
-      'billing_state_province-5' => 'AP',
-      'billing_country-5' => 'US',
-    ]);
+    ] + $this->getCreditCardParameters($paymentProcessorID));
     $this->callAPISuccessGetCount('Participant', [], 1);
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
     $this->assertEquals(300, $contribution['total_amount']);
@@ -167,6 +149,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       'Visa',
       '************1111',
       'This is a confirmation that your registration has been received and your status has been updated to<strong> Registered</strong>',
+      'You may transfer your registration to another participant or cancel your registration up to 72 hours before the event',
     ]);
   }
 
@@ -289,6 +272,57 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $this->assertStringNotContainsString('job_title	oracle', $mailSent[1]);
     $this->assertStringNotContainsString('job_title	wizard', $mailSent[1]);
     $this->assertStringContainsString('job_title	seer', $mailSent[1]);
+  }
+
+  /**
+   * Test price set level participant count with multiple participants.
+   *
+   * In this scenario each price field value has a participant count
+   * and the total (7) exceeds the available places (6).
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testEventFullHandlingMultipleParticipants(): void {
+    $paymentProcessorID = $this->paymentProcessorCreate();
+    $this->eventCreatePaid(['max_participants' => 6, 'processor_id' => $paymentProcessorID]);
+    $participantCount = [
+      'standard' => 1,
+      'student' => 4,
+      'student_plus' => 2,
+    ];
+    foreach ($participantCount as $key => $count) {
+      PriceFieldValue::update(FALSE)
+        ->addWhere('id', '=', $this->ids['PriceFieldValue']['PaidEvent_' . $key])
+        ->setValues(['count' => $count])->execute();
+    }
+    $this->getTestForm('CRM_Event_Form_Registration_Register', [
+      'first_name' => 'Participant1',
+      'last_name' => 'LastName',
+      'email-Primary' => 'participant1@example.com',
+      'additional_participants' => 2,
+      'priceSetId' => $this->getPriceSetID('PaidEvent'),
+      'payment_processor_id' => 0,
+      'price_' . $this->ids['PriceField']['PaidEvent'] => $this->ids['PriceFieldValue']['PaidEvent_standard'],
+    ], ['id' => $this->getEventID()])
+      ->addSubsequentForm('CRM_Event_Form_Registration_AdditionalParticipant', [
+        'first_name' => 'Participant2',
+        'last_name' => 'LastName',
+        'job_title' => 'wizard',
+        'email-Primary' => 'participant2@example.com',
+        'priceSetId' => $this->getPriceSetID('PaidEvent'),
+        'price_' . $this->ids['PriceField']['PaidEvent'] => $this->ids['PriceFieldValue']['PaidEvent_student'],
+      ])
+      ->addSubsequentForm('CRM_Event_Form_Registration_AdditionalParticipant', [
+        'first_name' => 'Participant3',
+        'last_name' => 'LastName',
+        'job_title' => 'seer',
+        'email-Primary' => 'participant3@example.com',
+        'priceSetId' => $this->getPriceSetID('PaidEvent'),
+        'price_' . $this->ids['PriceField']['PaidEvent'] => $this->ids['PriceFieldValue']['PaidEvent_student_plus'],
+      ])
+      ->addSubsequentForm('CRM_Event_Form_Registration_Confirm')
+      ->processForm();
+    // nothing to see here - just a no-fail test at this stage.
   }
 
   /**
@@ -620,10 +654,6 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
           'email-Primary' => 'bruce@gotham.com',
           'is_primary' => 1,
           'is_pay_later' => 0,
-          'campaign_id' => NULL,
-          'defaultRole' => 1,
-          'participant_role_id' => '1',
-          'button' => '_qf_Register_upload',
         ],
       ]
     );
@@ -648,6 +678,36 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       $submittedValues,
       ['id' => $eventID])
       ->addSubsequentForm('CRM_Event_Form_Registration_Confirm');
+  }
+
+  /**
+   * @param int $paymentProcessorID
+   *
+   * @return array
+   */
+  public function getCreditCardParameters(int $paymentProcessorID): array {
+    return [
+      'credit_card_number' => '4111111111111111',
+      'cvv2' => '123',
+      'credit_card_exp_date' => [
+        'M' => '1',
+        'Y' => date('Y') + 1,
+      ],
+      'priceSetId' => $this->getPriceSetID('PaidEvent'),
+      'billing_state_province-5' => 'AP',
+      'billing_country-5' => 'US',
+      'credit_card_type' => 'Visa',
+      'billing_first_name' => 'p',
+      'billing_middle_name' => '',
+      'billing_last_name' => 'p',
+      'billing_street_address-5' => 'p',
+      'billing_city-5' => 'p',
+      'billing_state_province_id-5' => '1061',
+      'billing_postal_code-5' => '7',
+      'billing_country_id-5' => '1228',
+      'payment_processor_id' => $paymentProcessorID,
+      'hidden_processor' => '1',
+    ];
   }
 
 }

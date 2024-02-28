@@ -25,12 +25,20 @@ class SearchSegmentTest extends \PHPUnit\Framework\TestCase implements HeadlessI
   }
 
   public function tearDown(): void {
-    foreach (['Activity', 'SearchSegment', 'CustomGroup', 'Contact'] as $entity) {
+    foreach (['Activity', 'SearchSegment', 'CustomGroup'] as $entity) {
       civicrm_api4($entity, 'delete', [
         'checkPermissions' => FALSE,
         'where' => [['id', '>', '0']],
       ]);
     }
+    // Delete all contacts without a UFMatch.
+    $contacts = Contact::get(FALSE)
+      ->addSelect('id')
+      ->addJoin('UFMatch AS uf_match', 'EXCLUDE')
+      ->execute()->column('id');
+    Contact::delete(FALSE)
+      ->addWhere('id', 'IN', $contacts)
+      ->execute();
     parent::tearDown();
   }
 

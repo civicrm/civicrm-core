@@ -80,33 +80,23 @@ class SubmitFile extends AbstractProcessor {
       throw new \CRM_Core_Exception('Entity not found');
     }
 
-    $attachmentParams = [
+    $file = civicrm_api3('Attachment', 'create', [
       'entity_id' => $entityId,
+      'entity_table' => CoreUtil::getTableName($apiEntity),
       'mime_type' => $_FILES['file']['type'],
       'name' => $_FILES['file']['name'],
       'options' => [
         'move-file' => $_FILES['file']['tmp_name'],
       ],
-    ];
+    ]);
 
-    if (strpos($this->fieldName, '.')) {
-      $attachmentParams['field_name'] = $this->convertFieldNameToApi3($apiEntity, $this->fieldName);
-    }
-    else {
-      $attachmentParams['entity_table'] = CoreUtil::getTableName($apiEntity);
-    }
-
-    $file = civicrm_api3('Attachment', 'create', $attachmentParams);
-
-    // Update multi-record custom field with value
-    if (strpos($apiEntity, 'Custom_') === 0) {
-      civicrm_api4($apiEntity, 'update', [
-        'values' => [
-          $idField => $entityId,
-          $this->fieldName => $file['id'],
-        ],
-      ]);
-    }
+    civicrm_api4($apiEntity, 'update', [
+      'values' => [
+        $idField => $entityId,
+        $this->fieldName => $file['id'],
+      ],
+      'checkPermissions' => FALSE,
+    ]);
 
     return [];
   }
@@ -126,22 +116,6 @@ class SubmitFile extends AbstractProcessor {
     }
 
     $this->_entityIds = $info['civiAfformSubmission']['data'];
-  }
-
-  /**
-   * @param string $apiEntity
-   * @param string $fieldName
-   * @return string
-   */
-  private function convertFieldNameToApi3($apiEntity, $fieldName) {
-    if (strpos($fieldName, '.')) {
-      $fields = civicrm_api4($apiEntity, 'getFields', [
-        'checkPermissions' => FALSE,
-        'where' => [['name', '=', $fieldName]],
-      ]);
-      return 'custom_' . $fields[0]['custom_field_id'];
-    }
-    return $fieldName;
   }
 
 }

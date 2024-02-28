@@ -388,6 +388,7 @@ London,',
       $event = $this->eventCreateUnpaid($eventParams);
     }
     $submittedValues['event_id'] = $event['id'];
+    $submittedValues['_qf_default'] = 'Builder:refresh';
     $submittedValues['receipt_text'] = 'Contact the Development Department if you need to make any changes to your registration.';
     return $this->getTestForm('CRM_Event_Form_Participant', $submittedValues, ['cid' => $submittedValues['contact_id']])->processForm(FormWrapper::BUILT);
   }
@@ -403,7 +404,7 @@ London,',
    */
   protected function submitForm(array $eventParams = [], array $submittedValues = [], bool $isQuickConfig = FALSE): EventFormParticipant {
     $form = $this->getForm($eventParams, $submittedValues, $isQuickConfig);
-    $form->postProcess();
+    $form->processForm();
     return $form;
   }
 

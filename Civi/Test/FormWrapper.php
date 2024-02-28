@@ -79,6 +79,15 @@ class FormWrapper {
     return $this->templateVariables;
   }
 
+  /**
+   * Get a variable assigned to the template.
+   *
+   * @return mixed
+   */
+  public function getTemplateVariable($string) {
+    return $this->templateVariables[$string];
+  }
+
   private $redirects;
 
   private $mailSpoolID;
@@ -154,9 +163,11 @@ class FormWrapper {
    * @return $this
    */
   public function addSubsequentForm(string $formName, array $formValues = []): FormWrapper {
-    /* @var \CRM_Core_Form */
+    /* @var \CRM_Core_Form $form */
     $form = new $formName();
     $form->controller = $this->form->controller;
+    $form->_submitValues = $formValues;
+    $form->controller->addPage($form);
     $_SESSION['_' . $this->form->controller->_name . '_container']['values'][$form->getName()] = $formValues;
     $this->subsequentForms[$form->getName()] = $form;
     return $this;
@@ -200,6 +211,8 @@ class FormWrapper {
       foreach ($this->subsequentForms as $form) {
         $form->preProcess();
         $form->buildForm();
+        $form->validate();
+        $this->validation[$form->getName()] = $form->_errors;
         $form->postProcess();
       }
     }
@@ -338,8 +351,16 @@ class FormWrapper {
         $_SESSION['_' . $this->form->controller->_name . '_container']['values']['Preview'] = $formValues;
         return;
 
+      case $class === 'CRM_Contact_Form_Search_Basic':
+        $this->form->controller = new \CRM_Contact_Controller_Search('Basic', TRUE, \CRM_Core_Action::BASIC);
+        $this->form->setAction(\CRM_Core_Action::BASIC);
+        break;
+
       case strpos($class, 'Search') !== FALSE:
         $this->form->controller = new \CRM_Contact_Controller_Search();
+        if ($class === 'CRM_Contact_Form_Search_Basic') {
+          $this->form->setAction(\CRM_Core_Action::BASIC);
+        }
         break;
 
       case strpos($class, '_Form_') !== FALSE:

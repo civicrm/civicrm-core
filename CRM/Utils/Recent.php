@@ -264,7 +264,7 @@ class CRM_Utils_Recent {
    */
   private static function getIcon($entityType, $entityId) {
     $icon = NULL;
-    $daoClass = CRM_Core_DAO_AllCoreTables::getFullName($entityType);
+    $daoClass = CRM_Core_DAO_AllCoreTables::getDAONameForEntity($entityType);
     if ($daoClass) {
       $icon = CRM_Core_DAO_AllCoreTables::getBAOClassName($daoClass)::getEntityIcon($entityType, $entityId);
     }

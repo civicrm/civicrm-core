@@ -219,7 +219,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
         $bc[] = $crumbs;
       }
     }
-    $template->assign_by_ref('breadcrumb', $bc);
+    $template->assign('breadcrumb', $bc);
   }
 
   /**

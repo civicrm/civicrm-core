@@ -43,13 +43,6 @@ class CRM_Core_DAO extends DB_DataObject {
   public static $_primaryKey = ['id'];
 
   /**
-   * @return string[]
-   */
-  protected function getPrimaryKey(): array {
-    return static::$_primaryKey;
-  }
-
-  /**
    * @return string
    */
   protected function getFirstPrimaryKey(): string {
@@ -58,7 +51,7 @@ class CRM_Core_DAO extends DB_DataObject {
     // keys (which we support in codegen if not many other places) we return 'id'
     // simply because that is what we historically did & we don't want to 'just change'
     // it & break those extensions without doing the work to create an alternative.
-    return count($this->getPrimaryKey()) > 1 ? 'id' : $this->getPrimaryKey()[0];
+    return count($this->keys()) > 1 ? 'id' : $this->keys()[0];
   }
 
   /**
@@ -149,7 +142,7 @@ class CRM_Core_DAO extends DB_DataObject {
    */
   public function __construct() {
     $this->initialize();
-    $this->__table = $this->getTableName();
+    $this->__table = $this::getLocaleTableName();
   }
 
   /**
@@ -160,7 +153,7 @@ class CRM_Core_DAO extends DB_DataObject {
   public static function getEntityTitle() {
     $className = static::class;
     CRM_Core_Error::deprecatedWarning("$className needs to be regenerated. Missing getEntityTitle method.");
-    return CRM_Core_DAO_AllCoreTables::getBriefName($className);
+    return CRM_Core_DAO_AllCoreTables::getEntityNameForClass($className);
   }
 
   /**
@@ -191,10 +184,16 @@ class CRM_Core_DAO extends DB_DataObject {
   /**
    * Returns the name of this table
    *
+   * Name is not localized, which is generally fine because localization happens when executing the query:
+   * @see \CRM_Core_I18n_Schema::rewriteQuery()
+   *
+   * To get the localized name of this table,
+   * @see self::getLocaleTableName()
+   *
    * @return string
    */
   public static function getTableName() {
-    return self::getLocaleTableName(static::$_tableName ?? NULL);
+    return static::$_tableName ?? NULL;
   }
 
   /**
@@ -204,6 +203,26 @@ class CRM_Core_DAO extends DB_DataObject {
    */
   public function getLog() {
     return static::$_log ?? FALSE;
+  }
+
+  /**
+   * Returns the list of fields that can be imported
+   *
+   * @param bool $prefix
+   * @return array
+   */
+  public static function import($prefix = FALSE) {
+    return CRM_Core_DAO_AllCoreTables::getImports(static::class, substr(static::getTableName(), 8), $prefix);
+  }
+
+  /**
+   * Returns the list of fields that can be exported
+   *
+   * @param bool $prefix
+   * @return array
+   */
+  public static function export($prefix = FALSE) {
+    return CRM_Core_DAO_AllCoreTables::getExports(static::class, substr(static::getTableName(), 8), $prefix);
   }
 
   /**
@@ -441,11 +460,20 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
-   * @param string $tableName
+   * Get localized name of this table, if applicable.
+   *
+   * If this is a multi-language installation and the table has localized columns,
+   * will return table name with language string appended, which points to a sql view.
+   * Otherwise, this returns the same output as
+   * @see self::getTableName()
+   *
+   * @param string|null $tableName
+   *  Unnecessary deprecated param
    *
    * @return string
    */
-  public static function getLocaleTableName($tableName) {
+  public static function getLocaleTableName($tableName = NULL) {
+    $tableName ??= static::getTableName();
     global $dbLocale;
     if ($dbLocale) {
       $tables = CRM_Core_I18n_Schema::schemaStructureTables();
@@ -505,31 +533,24 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
-   * Defines the default key as 'id'.
+   * Returns primary keys (usually ['id'])
    *
-   * @return array
+   * @return string[]
    */
   public function keys() {
-    static $keys;
-    if (!isset($keys)) {
-      $keys = ['id'];
-    }
-    return $keys;
+    return static::$_primaryKey;
   }
 
   /**
    * Tells DB_DataObject which keys use autoincrement.
    * 'id' is autoincrementing by default.
    *
+   * FIXME: this should return all autoincrement keys not just the first.
    *
    * @return array
    */
   public function sequenceKey() {
-    static $sequenceKeys;
-    if (!isset($sequenceKeys)) {
-      $sequenceKeys = [$this->getFirstPrimaryKey(), TRUE];
-    }
-    return $sequenceKeys;
+    return [$this->getFirstPrimaryKey(), TRUE];
   }
 
   /**
@@ -594,7 +615,7 @@ class CRM_Core_DAO extends DB_DataObject {
 
     // Exclude fields yet not added by pending upgrades
     $dbVer = \CRM_Core_BAO_Domain::version();
-    $daoExt = defined(static::class . '::EXT') ? constant(static::class . '::EXT') : NULL;
+    $daoExt = static::getExtensionName();
     if ($fields && $daoExt === 'civicrm' && version_compare($dbVer, \CRM_Utils_System::version()) < 0) {
       $fields = array_filter($fields, function($field) use ($dbVer) {
         $add = $field['add'] ?? '1.0.0';
@@ -613,6 +634,14 @@ class CRM_Core_DAO extends DB_DataObject {
     }
 
     return $fields;
+  }
+
+  /**
+   * Get name of extension in which this DAO is defined.
+   * @return string|null
+   */
+  public static function getExtensionName(): ?string {
+    return defined(static::class . '::EXT') ? constant(static::class . '::EXT') : NULL;
   }
 
   /**
@@ -1003,7 +1032,7 @@ class CRM_Core_DAO extends DB_DataObject {
     if ($className === 'CRM_Core_DAO') {
       throw new CRM_Core_Exception('Function writeRecord must be called on a subclass of CRM_Core_DAO');
     }
-    $entityName = CRM_Core_DAO_AllCoreTables::getBriefName($className);
+    $entityName = CRM_Core_DAO_AllCoreTables::getEntityNameForClass($className);
 
     // For legacy reasons, empty values would sometimes be passed around as the string 'null'.
     // The DAO treats 'null' the same as '', and an empty string makes a lot more sense!
@@ -1034,7 +1063,7 @@ class CRM_Core_DAO extends DB_DataObject {
     $instance->save();
 
     if (!empty($record['custom']) && is_array($record['custom'])) {
-      CRM_Core_BAO_CustomValueTable::store($record['custom'], static::$_tableName, $instance->$idField, $op);
+      CRM_Core_BAO_CustomValueTable::store($record['custom'], static::getTableName(), $instance->$idField, $op);
     }
 
     \CRM_Utils_Hook::post($op, $entityName, $instance->$idField, $instance, $record);
@@ -1072,7 +1101,7 @@ class CRM_Core_DAO extends DB_DataObject {
     if ($className === 'CRM_Core_DAO') {
       throw new CRM_Core_Exception('Function deleteRecord must be called on a subclass of CRM_Core_DAO');
     }
-    $entityName = CRM_Core_DAO_AllCoreTables::getBriefName($className);
+    $entityName = CRM_Core_DAO_AllCoreTables::getEntityNameForClass($className);
     if (empty($record[$idField])) {
       throw new CRM_Core_Exception("Cannot delete {$entityName} with no $idField.");
     }
@@ -1144,26 +1173,23 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
-   * Gets the names of all the tables in the schema.
+   * Gets the names of all enabled schema tables.
+   *
+   * - Includes tables from core, components & enabled extensions.
+   * - Excludes log tables, temp tables, and missing/disabled extensions.
    *
    * @return array
    *
    * @throws \CRM_Core_Exception
    */
   public static function getTableNames(): array {
-    $dao = CRM_Core_DAO::executeQuery(
-      "SELECT TABLE_NAME
-       FROM information_schema.TABLES
-       WHERE TABLE_SCHEMA = DATABASE()
-         AND TABLE_NAME LIKE 'civicrm_%'
-         AND TABLE_NAME NOT LIKE '%_tmp%'
-      ");
+    // CRM_Core_DAO_AllCoreTables returns all tables with a dao (core + extensions)
+    $daoTables = array_column(CRM_Core_DAO_AllCoreTables::getEntities(), 'table');
 
-    $values = [];
-    while ($dao->fetch()) {
-      $values[] = $dao->TABLE_NAME;
-    }
-    return $values;
+    // Include custom value tables
+    $customTables = array_column(CRM_Core_BAO_CustomGroup::getAll(), 'table_name');
+
+    return array_merge($daoTables, $customTables);
   }
 
   /**
@@ -1224,14 +1250,10 @@ class CRM_Core_DAO extends DB_DataObject {
   /**
    * Checks if CONSTRAINT keyword exists for a specified table.
    *
-   * @param array $tables
-   *
-   * @throws CRM_Core_Exception
-   *
-   * @return bool
-   *   true if CONSTRAINT keyword exists, false otherwise
+   * @deprecated in 5.72 will be removed in 5.85
    */
   public static function schemaRequiresRebuilding($tables = ["civicrm_contact"]) {
+    CRM_Core_Error::deprecatedFunctionWarning('No alternative');
     $show = [];
     foreach ($tables as $tableName) {
       if (!array_key_exists($tableName, $show)) {
@@ -1260,15 +1282,10 @@ class CRM_Core_DAO extends DB_DataObject {
    * Checks if the FK constraint name is in the format 'FK_tableName_columnName'
    * for a specified column of a table.
    *
-   * @param string $tableName
-   * @param string $columnName
-   *
-   * @return bool
-   *   true if in format, false otherwise
-   *
-   * @throws \CRM_Core_Exception
+   * @deprecated in 5.72 will be removed in 5.85
    */
   public static function checkFKConstraintInFormat($tableName, $columnName) {
+    CRM_Core_Error::deprecatedFunctionWarning('No alternative');
     static $show = [];
 
     if (!array_key_exists($tableName, $show)) {
@@ -1289,14 +1306,10 @@ class CRM_Core_DAO extends DB_DataObject {
   /**
    * Check whether a specific column in a specific table has always the same value.
    *
-   * @param string $tableName
-   * @param string $columnName
-   * @param string $columnValue
-   *
-   * @return bool
-   *   true if the value is always $columnValue, false otherwise
+   * @deprecated in 5.72 will be removed in 5.85
    */
   public static function checkFieldHasAlwaysValue($tableName, $columnName, $columnValue) {
+    CRM_Core_Error::deprecatedFunctionWarning('APIv4');
     $query = "SELECT * FROM $tableName WHERE $columnName != '$columnValue'";
     $dao = CRM_Core_DAO::executeQuery($query);
     $result = $dao->fetch() ? FALSE : TRUE;
@@ -1306,13 +1319,10 @@ class CRM_Core_DAO extends DB_DataObject {
   /**
    * Check whether a specific column in a specific table is always NULL.
    *
-   * @param string $tableName
-   * @param string $columnName
-   *
-   * @return bool
-   *   true if if the value is always NULL, false otherwise
+   * @deprecated in 5.72 will be removed in 5.85
    */
   public static function checkFieldIsAlwaysNull($tableName, $columnName) {
+    CRM_Core_Error::deprecatedFunctionWarning('APIv4');
     $query = "SELECT * FROM $tableName WHERE $columnName IS NOT NULL";
     $dao = CRM_Core_DAO::executeQuery($query);
     $result = $dao->fetch() ? FALSE : TRUE;
@@ -1327,13 +1337,25 @@ class CRM_Core_DAO extends DB_DataObject {
    * @return bool
    * @throws CRM_Core_Exception
    */
-  public static function tableHasBeenAdded() {
+  public static function tableHasBeenAdded(): bool {
     if (CRM_Utils_System::version() === CRM_Core_BAO_Domain::version()) {
       return TRUE;
     }
-    $daoExt = defined(static::class . '::EXT') ? constant(static::class . '::EXT') : NULL;
-    $daoVersion = defined(static::class . '::TABLE_ADDED') ? constant(static::class . '::TABLE_ADDED') : '1.0';
-    return !($daoExt === 'civicrm' && version_compare(CRM_Core_BAO_Domain::version(), $daoVersion, '<'));
+    $daoExt = static::getExtensionName();
+    if ($daoExt !== 'civicrm') {
+      // FIXME: Check extension tables
+      return TRUE;
+    }
+    $daoVersion = static::getTableAddVersion();
+    return !(version_compare(CRM_Core_BAO_Domain::version(), $daoVersion, '<'));
+  }
+
+  /**
+   * @return string
+   *   Version in which table was added
+   */
+  protected static function getTableAddVersion(): string {
+    return defined(static::class . '::TABLE_ADDED') ? constant(static::class . '::TABLE_ADDED') : '1.0';
   }
 
   /**
@@ -1365,17 +1387,6 @@ LIKE %1
   public static function checkTableHasData($tableName) {
     $c = CRM_Core_DAO::singleValueQuery(sprintf('SELECT count(*) c FROM `%s`', $tableName));
     return $c > 0;
-  }
-
-  /**
-   * @param $version
-   * @deprecated
-   * @return bool
-   */
-  public function checkVersion($version) {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_BAO_Domain::version');
-    $dbVersion = CRM_Core_BAO_Domain::version();
-    return trim($version) == trim($dbVersion);
   }
 
   /**
@@ -1575,15 +1586,11 @@ LIKE %1
   }
 
   /**
-   * Get sort string.
-   *
-   * @param array|object $sort either array or CRM_Utils_Sort
-   * @param string $default
-   *   Default sort value.
-   *
-   * @return string
+   * Unused function.
+   * @deprecated in 5.72 will be removed in 5.85
    */
   public static function getSortString($sort, $default = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('No alternative');
     // check if sort is of type CRM_Utils_Sort
     if (is_a($sort, 'CRM_Utils_Sort')) {
       return $sort->orderBy();
@@ -1635,14 +1642,9 @@ LIKE %1
   }
 
   /**
-   * Delete the object records that are associated with this contact.
+   * Unused function.
    *
-   * @deprecated
-   *
-   * @param string $daoName
-   *   Name of the dao object.
-   * @param int $contactId
-   *   Id of the contact to delete.
+   * @deprecated in 5.47 will be removed in 5.80
    */
   public static function deleteEntityContact($daoName, $contactId) {
     CRM_Core_Error::deprecatedFunctionWarning('APIv4');
@@ -2028,7 +2030,7 @@ LIKE %1
       if (!$blockCopyofCustomValues) {
         $newObject->copyCustomFields($object->id, $newObject->id);
       }
-      CRM_Utils_Hook::post('create', CRM_Core_DAO_AllCoreTables::getBriefName($daoName), $newObject->id, $newObject);
+      CRM_Utils_Hook::post('create', CRM_Core_DAO_AllCoreTables::getEntityNameForClass($daoName), $newObject->id, $newObject);
     }
 
     return $newObject;
@@ -2110,7 +2112,7 @@ LIKE %1
    * @param string $parentOperation
    */
   public function copyCustomFields($entityID, $newEntityID, $parentOperation = NULL) {
-    $entity = CRM_Core_DAO_AllCoreTables::getBriefName(get_class($this));
+    $entity = CRM_Core_DAO_AllCoreTables::getEntityNameForClass(get_class($this));
     $tableName = CRM_Core_DAO_AllCoreTables::getTableForClass(get_class($this));
     // Obtain custom values for the old entity.
     $customParams = $htmlType = [];
@@ -3267,7 +3269,7 @@ SELECT contact_id
   public static function getSelectWhereClause($tableAlias = NULL, $entityName = NULL, $conditions = []) {
     $bao = new static();
     $tableAlias ??= $bao->tableName();
-    $entityName ??= CRM_Core_DAO_AllCoreTables::getBriefName(get_class($bao));
+    $entityName ??= CRM_Core_DAO_AllCoreTables::getEntityNameForClass(get_class($bao));
     $finalClauses = [];
     $fields = static::getSupportedFields();
     $selectWhereClauses = $bao->addSelectWhereClause($entityName, NULL, $conditions);
@@ -3453,7 +3455,7 @@ SELECT contact_id
   /**
    * Overridable function to get icon for a particular entity.
    *
-   * Example: `CRM_Contact_BAO_Contact::getIcon('Contact', 123)`
+   * Example: `CRM_Contact_BAO_Contact::getEntityIcon('Contact', 123)`
    *
    * @param string $entityName
    *   Short name of the entity. This may seem redundant because the entity name can usually be inferred
@@ -3462,10 +3464,7 @@ SELECT contact_id
    *   Id of the entity.
    * @throws CRM_Core_Exception
    */
-  public static function getEntityIcon(string $entityName, int $entityId) {
-    if (static::class === 'CRM_Core_DAO' || static::class !== CRM_Core_DAO_AllCoreTables::getBAOClassName(static::class)) {
-      throw new CRM_Core_Exception('CRM_Core_DAO::getIcon must be called on a BAO class e.g. CRM_Contact_BAO_Contact::getIcon("Contact", 123).');
-    }
+  public static function getEntityIcon(string $entityName, int $entityId = NULL): ?string {
     // By default, just return the icon representing this entity. If there's more complex lookup to do,
     // the BAO for this entity should override this method.
     return static::$_icon;

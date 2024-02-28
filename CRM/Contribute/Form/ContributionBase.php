@@ -928,6 +928,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       ->addSelect('product_id')
       ->addSelect('premiums_id.*')
       ->addWhere('product_id.is_active', '=', TRUE)
+      ->addWhere('premiums_id.premiums_active', '=', TRUE)
       ->addWhere('premiums_id.entity_id', '=', $this->getContributionPageID())
       ->addWhere('premiums_id.entity_table', '=', 'civicrm_contribution_page')
       ->addOrderBy('weight')
@@ -1545,19 +1546,14 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * Rather historic - might have unneeded stuff
    *
    * @return string
+   * @throws \CRM_Core_Exception
    */
-  public function getCurrency() {
-    $currency = $this->_values['currency'] ?? NULL;
-    // For event forms, currency is in a different spot
-    if (empty($currency)) {
-      $currency = CRM_Utils_Array::value('currency', CRM_Utils_Array::value('event', $this->_values));
-    }
+  public function getCurrency(): string {
+    $currency = $this->getContributionPageValue('currency');
     if (empty($currency)) {
       $currency = CRM_Utils_Request::retrieveValue('currency', 'String');
     }
-    // @todo If empty there is a problem - we should probably put in a deprecation notice
-    // to warn if that seems to be happening.
-    return (string) $currency;
+    return (string) ($currency ?? \Civi::settings()->get('currency'));
   }
 
 }

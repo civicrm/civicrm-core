@@ -32,15 +32,21 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
    * Retrieve a group by id, name, etc.
    *
    * @param array $filter
+   *   Simplified version of $filters in self::getAll; returns first group that matches every filter.
    *   e.g. `['id' => 23]` or `['name' => 'MyGroup']`
+   * @param int|null $permissionType
+   *    Check permission: (CRM_Core_Permission::VIEW | CRM_Core_Permission::EDIT)
+   * @param int|null $userId
+   *    User contact id for permission check (defaults to current user)
    * @return array|null
    *   Result includes all custom fields in addition to group info.
    */
-  public static function getGroup(array $filter): ?array {
+  public static function getGroup(array $filter, int $permissionType = NULL, int $userId = NULL): ?array {
+    $allGroups = self::getAll([], $permissionType, $userId);
     if (isset($filter['id']) && count($filter) === 1) {
-      return self::getAll()[$filter['id']] ?? NULL;
+      return $allGroups[$filter['id']] ?? NULL;
     }
-    foreach (self::getAll() as $group) {
+    foreach ($allGroups as $group) {
       if (array_intersect_assoc($filter, $group) === $filter) {
         return $group;
       }
@@ -64,23 +70,16 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
    * @return array[]
    */
   public static function getAll(array $filters = [], int $permissionType = NULL, int $userId = NULL): array {
+    $allGroups = self::loadAll();
     if (isset($permissionType)) {
       if (!in_array($permissionType, [CRM_Core_Permission::EDIT, CRM_Core_Permission::VIEW], TRUE)) {
         throw new CRM_Core_Exception('permissionType must be CRM_Core_Permission::VIEW or CRM_Core_Permission::EDIT');
       }
       $permittedIds = CRM_Core_Permission::customGroup($permissionType, FALSE, $userId);
-      if (!empty($filters['id'])) {
-        $filters['id'] = array_intersect((array) $filters['id'], $permittedIds);
-      }
-      else {
-        $filters['id'] = $permittedIds;
-      }
-      if (!$filters['id']) {
-        return [];
-      }
+      $allGroups = array_intersect_key($allGroups, array_flip($permittedIds));
     }
     if (!$filters) {
-      return self::loadAll();
+      return $allGroups;
     }
     if (!empty($filters['extends']) && is_string($filters['extends'])) {
       $contactTypes = CRM_Contact_BAO_ContactType::basicTypes(TRUE);
@@ -93,7 +92,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
         $filters['extends'] = ['Contact', $filters['extends']];
       }
     }
-    $allGroups = array_filter(self::loadAll(), function($group) use ($filters) {
+    $allGroups = array_filter($allGroups, function($group) use ($filters) {
       foreach ($filters as $filterKey => $filterValue) {
         $groupValue = $group[$filterKey] ?? NULL;
         // Compare arrays using array_intersect
@@ -197,7 +196,11 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
     }
     if (!CRM_Utils_System::isNull($extendsChildType)) {
       $b = self::getMungedEntity($params['extends'], $params['extends_entity_column_id'] ?? NULL);
-      $registeredSubTypes = self::getSubTypes()[$b];
+      $subTypes = self::getExtendsEntityColumnValueOptions('validate', ['values' => $params]);
+      $registeredSubTypes = [];
+      foreach ($subTypes as $subTypeDetail) {
+        $registeredSubTypes[$subTypeDetail['id']] = $subTypeDetail['label'];
+      }
       if (is_array($extendsChildType)) {
         foreach ($extendsChildType as $childType) {
           if (!array_key_exists($childType, $registeredSubTypes) && !in_array($childType, $registeredSubTypes, TRUE)) {
@@ -371,7 +374,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
    */
   public static function validateCustomGroupName(CRM_Core_DAO_CustomGroup $group) {
     $extends = in_array($group->extends, CRM_Contact_BAO_ContactType::basicTypes(TRUE)) ? 'Contact' : $group->extends;
-    $extendsDAO = CRM_Core_DAO_AllCoreTables::getFullName($extends);
+    $extendsDAO = CRM_Core_DAO_AllCoreTables::getDAONameForEntity($extends);
     if ($extendsDAO) {
       $fields = array_column($extendsDAO::fields(), 'name');
       if (in_array($group->name, $fields)) {
@@ -1451,8 +1454,8 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
    *
    * @throws \CRM_Core_Exception
    */
-  public static function buildQuickForm(&$form, &$groupTree, $inactiveNeeded = FALSE, $prefix = '') {
-    $form->assign_by_ref("{$prefix}groupTree", $groupTree);
+  public static function buildQuickForm($form, $groupTree, $inactiveNeeded = FALSE, $prefix = '') {
+    $form->assign("{$prefix}groupTree", $groupTree);
 
     foreach ($groupTree as $id => $group) {
       foreach ($group['fields'] as $field) {
@@ -1700,14 +1703,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
         $form->assign('qfKey', $qf);
         Civi::cache('customData')->set($qf, $formValues);
       }
-
-      // hack for field type File
-      $formUploadNames = $form->get('uploadNames');
-      if (is_array($formUploadNames)) {
-        $uploadNames = array_unique(array_merge($formUploadNames, $uploadNames));
-      }
-
-      $form->set('uploadNames', $uploadNames);
+      $form->registerFileField($uploadNames);
     }
 
     return $formattedGroupTree;
@@ -1992,9 +1988,6 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
           $fkNameField = isset($fkFields['name']) ? 'name' : 'id';
           $select = [$fkIdField, $fkNameField, $fkLabelField];
           $where = [];
-          if (isset($fkFields['is_active'])) {
-            $where[] = ['is_active', '=', TRUE];
-          }
           $fkEntities = civicrm_api4($field['fk_entity'], 'get', [
             'checkPermissions' => !(isset($params['check_permissions']) && !$params['check_permissions']),
             'select' => $select,
@@ -2117,10 +2110,11 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
 
   /**
    * Use APIv4 getFields (or self::getExtendsEntityColumnValueOptions) instead of this beast.
-   * @deprecated
+   * @deprecated as of 5.72 use getExtendsEntityColumnValueOptions - will be removed by 5.78
    * @return array
    */
   public static function getSubTypes(): array {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_BAO_CustomGroup::getExtendsEntityColumnValueOptions');
     $sel2 = [];
     $activityType = CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'search');
 

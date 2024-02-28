@@ -81,7 +81,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $this->_params[0]['is_pay_later'] = $this->get('is_pay_later');
     $this->assign('is_pay_later', $this->_params[0]['is_pay_later']);
     $this->assign('pay_later_receipt', $this->_params[0]['is_pay_later'] ? $this->_values['event']['pay_later_receipt'] : NULL);
-
+    $this->assign('confirm_text', $this->getEventValue('confirm_text'));
     CRM_Utils_Hook::eventDiscount($this, $this->_params);
 
     if (!empty($this->_params[0]['discount']) && !empty($this->_params[0]['discount']['applied'])) {
@@ -108,7 +108,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $this->setTitle($this->_values['event']['confirm_title']);
     }
 
-    // Personal campaign page
+    // Personal campaign page.
+    // Unclear if this really is possible on event pages or copy & paste.
+    $this->assign('pcpBlock', FALSE);
     if ($this->_pcpId) {
       $params = CRM_Contribute_Form_Contribution_Confirm::processPcp($this, $this->_params[0]);
       $this->_params[0] = $params;
@@ -218,18 +220,20 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    */
   public function buildQuickForm() {
     $this->assignToTemplate();
+    // This use of the ts function uses the legacy interpolation of the button name to avoid translations having to be re-done.
+    $this->assign('verifyText', !$this->_totalAmount ? ts('Click <strong>%1</strong> to complete your registration.', [1 => ts('Register')]) : $this->getPaymentProcessorObject()->getText('eventContinueText', []));
 
     if ($this->_values['event']['is_monetary'] &&
-      ($this->_params[0]['amount'] || $this->_params[0]['amount'] == 0) &&
+      (isset($this->_params[0]['amount']) && is_numeric($this->_params[0]['amount'])) &&
       !$this->_requireApproval
     ) {
 
       [$taxAmount, $participantDetails, $individual, $amountArray] = $this->calculateAmounts();
       $this->assign('totalTaxAmount', $taxAmount);
       $this->_amount = $amountArray;
-
+      $this->assign('taxTerm', \Civi::settings()->get('tax_term'));
       if (\Civi::settings()->get('invoicing')) {
-        $this->assign('taxTerm', \Civi::settings()->get('tax_term'));
+        // @todo - remove this - used to be for online event template but no longer used.
         $this->assign('individual', $individual);
         $this->set('individual', $individual);
       }
@@ -239,9 +243,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $this->assign('amounts', $amountArray);
       $this->assign('totalAmount', $this->_totalAmount);
       $this->set('totalAmount', $this->_totalAmount);
-      // This use of the ts function uses the legacy interpolation of the button name to avoid translations having to be re-done.
-      $this->assign('verifyText', !$this->_totalAmount ? ts('Click <strong>%1</strong> to complete your registration.', [1 => ts('Register')]) : $this->getPaymentProcessorObject()->getText('eventContinueText', []));
-
       $showPaymentOnConfirm = (in_array($this->_eventId, \Civi::settings()->get('event_show_payment_on_confirm')) || in_array('all', \Civi::settings()->get('event_show_payment_on_confirm')));
       $this->assign('showPaymentOnConfirm', $showPaymentOnConfirm);
       if ($showPaymentOnConfirm) {
@@ -347,13 +348,11 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
     }
     if ($form->getEventValue('is_monetary')) {
-      $form->_feeBlock = $form->_values['fee'];
-      CRM_Event_Form_Registration_Register::formatFieldsForOptionFull($form);
 
       if (!empty($form->_priceSetId) &&
         !$form->_requireApproval && !$form->_allowWaitlist
       ) {
-        $errors = $form->validatePriceSet($form->_params);
+        $errors = $form->validatePriceSet($form->_params, $form->_priceSetId, $form->get('priceSet'));
         if (!empty($errors)) {
           CRM_Core_Session::setStatus(ts('You have been returned to the start of the registration process and any sold out events have been removed from your selections. You will not be able to continue until you review your booking and select different events if you wish.'), ts('Unfortunately some of your options have now sold out for one or more participants.'), 'error');
           CRM_Core_Session::setStatus(ts('Please note that the options which are marked or selected are sold out for participant being viewed.'), ts('Sold out:'), 'error');
@@ -962,7 +961,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     // create contribution record
     $contribution = CRM_Contribute_BAO_Contribution::add($contribParams);
     // CRM-11124
-    CRM_Event_BAO_Participant::createDiscountTrxn($form->getEventID(), $contribParams, NULL, CRM_Price_BAO_PriceSet::parseFirstPriceSetValueIDFromParams($params));
+    CRM_Event_BAO_Participant::createDiscountTrxn($form->getEventID(), $contribParams, '', CRM_Price_BAO_PriceSet::parseFirstPriceSetValueIDFromParams($params));
 
     $transaction->commit();
 
@@ -1141,7 +1140,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   /**
    * Assign Profiles to the template.
    *
-   * @param CRM_Event_Form_Registration_Confirm $form
+   * @param CRM_Event_Form_Registration_Confirm|\CRM_Event_Form_Registration_ThankYou $form
    *
    * @throws \CRM_Core_Exception
    */
@@ -1205,6 +1204,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
       $form->_fields = $profileFields;
     }
+    $form->assign('addParticipantProfile', []);
     if (!empty($formattedValues)) {
       $form->assign('primaryParticipantProfile', $formattedValues[1]);
       $form->set('primaryParticipantProfile', $formattedValues[1]);

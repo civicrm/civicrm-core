@@ -313,18 +313,14 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         }
         [$values['customPost_grouptitle'], $values['customPost']] = self::getProfileNameAndFields($postID, $userID, $params['custom_post_id']);
       }
-      // Assign honoree values for the receipt. But first, stop any leaks from
-      // previously assigned values.
-      $template->assign('honoreeProfile', []);
-      $template->assign('honorName', NULL);
-      if (isset($values['honor'])) {
-        $honorValues = $values['honor'];
-        $template->_values = ['honoree_profile_id' => $values['honoree_profile_id']];
-        CRM_Contribute_BAO_ContributionSoft::formatHonoreeProfileFields(
-          $template,
-          $honorValues['honor_profile_values'],
-          $honorValues['honor_id']
-        );
+      // Assign honoree values for the receipt.
+      $honorValues = $values['honor'] ?? ['honor_profile_id' => NULL, 'honor_id' => NULL, 'honor_profile_values' => []];
+      foreach (CRM_Contribute_BAO_ContributionSoft::getHonorTemplateVariables(
+        $honorValues['honor_profile_id'] ? (int) $honorValues['honor_profile_id'] : NULL,
+        $honorValues['honor_id'] ? (int) $honorValues['honor_id'] : NULL,
+        $honorValues['honor_profile_values'] ?? [],
+      ) as $honorFieldName => $honorFieldValue) {
+        $template->assign($honorFieldName, $honorFieldValue);
       }
 
       $title = $values['title'] ?? CRM_Contribute_BAO_Contribution_Utils::getContributionPageTitle($values['contribution_page_id']);
@@ -417,6 +413,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         'tokenContext' => $tokenContext,
         'isTest' => $isTest,
         'PDFFilename' => 'receipt.pdf',
+        'modelProps' => $values['modelProps'] ?? [],
       ];
 
       if ($returnMessageText) {

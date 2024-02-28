@@ -92,8 +92,8 @@
   <script type="text/javascript" >
   CRM.$(function($) {
     var $form = $("form.{/literal}{$form.formClass}{literal}"),
-      action = {/literal}{$action|intval}{literal},
-      cid = {/literal}{$contactId|intval}{literal},
+      action = {/literal}{$action|string_format:"%d"}{literal},
+      cid = {/literal}{$contactId|string_format:"%d"}{literal},
       _ = CRM._;
 
     $('.crm-accordion-body').each( function() {

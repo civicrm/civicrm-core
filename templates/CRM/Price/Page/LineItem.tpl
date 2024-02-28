@@ -109,7 +109,7 @@
         {assign var="lineItemCount" value=0}
 
         {foreach from=$pcount item=p_count}
-          {assign var="intPCount" value=$p_count.participant_count|intval}
+          {assign var="intPCount" value=$p_count.participant_count|string_format:"%d"}
           {assign var="lineItemCount" value=$lineItemCount+$intPCount}
         {/foreach}
         {if $lineItemCount < 1}
@@ -129,4 +129,3 @@
     <em>({$hookDiscount.message})</em>
   </div>
 {/if}
-

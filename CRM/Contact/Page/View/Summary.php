@@ -276,7 +276,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     // FIXME: when we sort out TZ isssues with DATETIME/TIMESTAMP, we can skip next query
     // also assign the last modifed details
     $lastModified = CRM_Core_BAO_Log::lastModified($this->_contactId, 'civicrm_contact');
-    $this->assign_by_ref('lastModified', $lastModified);
+    $this->assign('lastModified', $lastModified);
 
     $this->_viewOptions = CRM_Core_BAO_Setting::valueOptions(
       CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
@@ -285,7 +285,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     );
 
     $changeLog = $this->_viewOptions['log'];
-    $this->assign_by_ref('changeLog', $changeLog);
+    $this->assign('changeLog', $changeLog);
 
     $this->assign('allTabs', $this->getTabs($defaults));
 
@@ -294,7 +294,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     $contentPlacement = CRM_Utils_Hook::SUMMARY_BELOW;
     CRM_Utils_Hook::summary($this->_contactId, $content, $contentPlacement);
     if ($content) {
-      $this->assign_by_ref('hookContent', $content);
+      $this->assign('hookContent', $content);
       $this->assign('hookContentPlacement', $contentPlacement);
     }
   }

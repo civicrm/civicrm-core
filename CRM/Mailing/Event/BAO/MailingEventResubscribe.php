@@ -180,9 +180,6 @@ class CRM_Mailing_Event_BAO_MailingEventResubscribe {
   public static function send_resub_response($queue_id, $groups, $job) {
     // param is_domain is not supported as of now.
 
-    $config = CRM_Core_Config::singleton();
-    $domain = CRM_Core_BAO_Domain::getDomain();
-
     $jobTable = CRM_Mailing_BAO_MailingJob::getTableName();
     $mailingTable = CRM_Mailing_DAO_Mailing::getTableName();
     $contacts = CRM_Contact_DAO_Contact::getTableName();
@@ -229,18 +226,18 @@ class CRM_Mailing_Event_BAO_MailingEventResubscribe {
       }
     }
 
-    list($addresses, $urls) = CRM_Mailing_BAO_Mailing::getVerpAndUrls($job, $queue_id, $eq->hash, $eq->email);
+    list($addresses, $urls) = CRM_Mailing_BAO_Mailing::getVerpAndUrls($job, $queue_id, $eq->hash);
     $bao = new CRM_Mailing_BAO_Mailing();
     $bao->body_text = $text;
     $bao->body_html = $html;
     $tokens = $bao->getTokens();
     $templates = $bao->getTemplates();
 
-    $html = CRM_Utils_Token::replaceResubscribeTokens($templates['html'], $domain, $groups, TRUE, $eq->contact_id, $eq->hash);
+    $html = CRM_Utils_Token::replaceResubscribeTokens($templates['html'], NULL, $groups);
     $html = CRM_Utils_Token::replaceActionTokens($html, $addresses, $urls, TRUE, $tokens['html']);
     $html = CRM_Utils_Token::replaceMailingTokens($html, $dao, NULL, $tokens['html']);
 
-    $text = CRM_Utils_Token::replaceResubscribeTokens($templates['text'], $domain, $groups, FALSE, $eq->contact_id, $eq->hash);
+    $text = CRM_Utils_Token::replaceResubscribeTokens($templates['text'], NULL, $groups);
     $text = CRM_Utils_Token::replaceActionTokens($text, $addresses, $urls, FALSE, $tokens['text']);
     $text = CRM_Utils_Token::replaceMailingTokens($text, $dao, NULL, $tokens['text']);
 

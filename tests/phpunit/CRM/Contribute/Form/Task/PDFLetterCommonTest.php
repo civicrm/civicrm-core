@@ -570,8 +570,7 @@ value=$contact_aggregate+$contribution.total_amount}
   public function hook_aggregateTokenValues(array &$values, $contactIDs, $job = NULL, $tokens = [], $context = NULL) {
     foreach ($contactIDs as $contactID) {
       CRM_Core_Smarty::singleton()->assign('messageContactID', $contactID);
-      $values[$contactID]['aggregate.rendered_token'] = CRM_Core_Smarty::singleton()
-        ->fetch('string:' . $this->getHtmlMessage());
+      $values[$contactID]['aggregate.rendered_token'] = CRM_Utils_String::parseOneOffStringThroughSmarty($this->getHtmlMessage());
     }
   }
 

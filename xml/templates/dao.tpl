@@ -56,7 +56,7 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
        *
        * @var bool
        */
-      public static $_log = {$table.log|strtoupper};
+      public static $_log = {$table.log|upper};
       {if $table.paths}
      /**
       * Paths for accessing this entity in the UI.
@@ -111,7 +111,7 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
   * @return string
   */
   public static function getEntityDescription() {ldelim}
-    return {$tsFunctionName}('{$table.description|replace:"'":"\'"}');
+    return {$tsFunctionName}('{$table.description|crmEscapeSingleQuotes}');
   {rdelim}
 {/if}
 
@@ -137,16 +137,16 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
                                                                       'title'     => {$tsFunctionName}('{$field.title}'),
 {/if}
 {if $field.comment}
-                                                                      'description'     => {$tsFunctionName}('{$field.comment|replace:"'":"\'"}'),
+                                                                      'description'     => {$tsFunctionName}('{$field.comment|crmEscapeSingleQuotes}'),
 {/if}
 {if $field.required}
-                                        'required'  => {$field.required|strtoupper},
+                                        'required'  => {$field.required|upper},
 {/if} {* field.required *}
 {if isset($field.length)}
                       'maxlength' => {$field.length},
 {/if} {* field.length *}
 {if isset($field.precision)}
-                      'precision'      => array({$field.precision}),
+                      'precision'      => array({$field.precision},),
 {/if}
 {if isset($field.size)}
                       'size'      => {$field.size},
@@ -158,17 +158,16 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
                       'cols'      => {$field.cols},
 {/if} {* field.cols *}
                       'usage'     => array(
-                                       {foreach from=$field.usage key=usage item=isUsed}'{$usage}' => {$isUsed},
+                                       {foreach from=$field.usage key="usage" item="isUsed"}'{$usage}' => {if $isUsed}TRUE{else}FALSE{/if},
                                        {/foreach}),
-{if $field.import === 'TRUE'}
+{if $field.usage.import}
                       'import'    => TRUE,
-
 {/if} {* field.import *}
   'where'     => '{$table.name}.{$field.name}',
   {if $field.headerPattern}'headerPattern' => '{$field.headerPattern}',{/if}
   {if $field.dataPattern}'dataPattern' => '{$field.dataPattern}',{/if}
-{if $field.export === 'TRUE' || ($field.export === 'FALSE' && $field.import === 'TRUE')}
-                      'export'    => {$field.export},
+{if $field.usage.export || (!$field.usage.export && $field.usage.import)}
+                      'export'    => {if $field.usage.export}TRUE{else}FALSE{/if},
 {/if} {* field.export - only show if meaningful, deprecated for usage *}
 {if $field.contactType}
                       'contactType' => {if $field.contactType == 'null'}NULL{else}'{$field.contactType}'{/if},
@@ -202,7 +201,7 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
                       'component' => '{$field.component}',
 {/if}
 {if $field.serialize}
-  'serialize' => self::SERIALIZE_{$field.serialize|strtoupper},
+  'serialize' => self::SERIALIZE_{$field.serialize|upper},
 {/if}
 {if $field.uniqueTitle}
   'unique_title' => {$tsFunctionName}('{$field.uniqueTitle}'),

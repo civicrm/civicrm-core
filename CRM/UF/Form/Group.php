@@ -30,10 +30,10 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
   /**
    * Set entity fields to be assigned to the form.
    */
-  protected function setEntityFields() {
+  protected function setEntityFields(): void {
     $this->entityFields = [
-      'title' => ['name' => 'title'],
-      'frontend_title' => ['name' => 'frontend_title'],
+      'title' => ['name' => 'title', 'required' => TRUE],
+      'frontend_title' => ['name' => 'frontend_title', 'required' => TRUE],
       'description' => [
         'name' => 'description',
         'help' => ['id' => 'id-description', 'file' => 'CRM/UF/Form/Group.hlp'],

@@ -232,7 +232,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       $op = empty($records[$index]['id']) ? 'create' : 'edit';
       // Theoretically a custom field could have custom fields! Trippy...
       if (!empty($records[$index]['custom']) && is_array($records[$index]['custom'])) {
-        CRM_Core_BAO_CustomValueTable::store($records[$index]['custom'], static::$_tableName, $customField->id, $op);
+        CRM_Core_BAO_CustomValueTable::store($records[$index]['custom'], static::getTableName(), $customField->id, $op);
       }
       CRM_Utils_Hook::post($op, 'CustomField', $customField->id, $customField);
     }
@@ -550,13 +550,15 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   }
 
   /**
-   * Use the cache to get all values of a specific custom field.
+   * Get specific custom field as an object.
+   * @deprecated
+   * @see CRM_Core_BAO_CustomField::getField()
+   * which does the same thing but returns an array instead of an object.
    *
    * @param int $fieldID
    *   The custom field ID.
    *
    * @return CRM_Core_BAO_CustomField
-   *   The field object.
    * @throws CRM_Core_Exception
    */
   public static function getFieldObject($fieldID) {
@@ -1181,9 +1183,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     $value = NULL
   ) {
     //get the type of custom field
-    $customField = new CRM_Core_BAO_CustomField();
-    $customField->id = $customFieldId;
-    $customField->find(TRUE);
+    $customField = self::getFieldObject($customFieldId);
 
     if (!$contactId) {
       if ($mode == CRM_Profile_Form::MODE_CREATE) {
@@ -2311,7 +2311,8 @@ AND      default_value IS NOT NULL";
     $customData = [];
 
     foreach ($params as $key => $value) {
-      if ($customFieldInfo = CRM_Core_BAO_CustomField::getKeyID($key, TRUE)) {
+      $customFieldInfo = CRM_Core_BAO_CustomField::getKeyID($key, TRUE);
+      if ($customFieldInfo[0]) {
 
         // for autocomplete transfer hidden value instead of label
         if ($params[$key] && isset($params[$key . '_id'])) {
@@ -2557,6 +2558,13 @@ WHERE      f.id IN ($ids)";
     }
     // Otherwise this is the new standard as of 5.27
     return is_object($field) ? !empty($field->serialize) : !empty($field['serialize']);
+  }
+
+  public static function getFkEntityOnDeleteOptions(): array {
+    return [
+      'set_null' => ts('Delete reference'),
+      'cascade' => ts('Delete entity'),
+    ];
   }
 
   /**

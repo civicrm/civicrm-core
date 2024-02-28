@@ -273,15 +273,22 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     }
 
     // Figure out the FK field between the join entity and the main entity
-    if (self::getEntityField($joinEntityType, 'entity_id')) {
-      $params[] = ['entity_id', '=', $mainEntityId];
-      if (self::getEntityField($joinEntityType, 'entity_table')) {
-        $params[] = ['entity_table', '=', CoreUtil::getTableName($mainEntityType)];
+    $directFk = FALSE;
+    // First look for a direct foreign key field e.g. `contact_id`
+    foreach (self::getEntityFields($joinEntityType) as $field) {
+      if ($field['fk_entity'] === $mainEntityType) {
+        $directFk = TRUE;
+        $params[] = [$field['name'], '=', $mainEntityId];
       }
     }
-    else {
-      $mainEntityField = \CRM_Core_DAO_AllCoreTables::convertEntityNameToLower($mainEntityType) . '_id';
-      $params[] = [$mainEntityField, '=', $mainEntityId];
+    // Else look for dynamic foreign keys e.g. `entity_table` + `entity_id`
+    if (!$directFk) {
+      foreach (self::getEntityFields($joinEntityType) as $field) {
+        if (in_array($mainEntityType, $field['dfk_entities'] ?? [], TRUE)) {
+          $params[] = [$field['name'], '=', $mainEntityId];
+          $params[] = [$field['input_attrs']['control_field'], '=', array_search($mainEntityType, $field['dfk_entities'])];
+        }
+      }
     }
     return $params;
   }
@@ -289,20 +296,28 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   /**
    * Get field definition for a given entity
    *
-   * @param $entityName
-   * @param $fieldName
+   * @param string $entityName
+   * @param string $fieldName
    * @return array|null
    * @throws \CRM_Core_Exception
    */
-  public static function getEntityField($entityName, $fieldName) {
-    if (!isset(\Civi::$statics[__CLASS__][__FUNCTION__][$entityName])) {
-      $fields = civicrm_api4($entityName, 'getFields', [
-        'checkPermissions' => FALSE,
-        'action' => 'create',
-      ]);
-      \Civi::$statics[__CLASS__][__FUNCTION__][$entityName] = $fields->indexBy('name');
-    }
-    return \Civi::$statics[__CLASS__][__FUNCTION__][$entityName][$fieldName] ?? NULL;
+  public static function getEntityField(string $entityName, string $fieldName) {
+    return self::getEntityFields($entityName)[$fieldName] ?? NULL;
+  }
+
+  /**
+   * Get all fields for a given entity
+   *
+   * @param string $entityName
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  public static function getEntityFields(string $entityName): array {
+    \Civi::$statics[__CLASS__][__FUNCTION__][$entityName] ??= (array) civicrm_api4($entityName, 'getFields', [
+      'checkPermissions' => FALSE,
+      'action' => 'create',
+    ])->indexBy('name');
+    return \Civi::$statics[__CLASS__][__FUNCTION__][$entityName];
   }
 
   /**

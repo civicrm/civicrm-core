@@ -7,6 +7,11 @@ class CRM_Core_CodeGen_Util_Template {
   protected $filetype;
 
   protected $smarty;
+
+  public function getSmarty(): Smarty {
+    return $this->smarty;
+  }
+
   protected $beautifier;
 
   /**
