@@ -1619,6 +1619,8 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook allows modification of the queries constructed from dupe rules.
    *
+   * @deprecated since 5.72
+   *
    * @param string $obj
    *   Object of rulegroup class.
    * @param string $type
