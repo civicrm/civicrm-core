@@ -26,14 +26,14 @@
       </tr>
       <tr>
         <td><font size="1" align="center">{contact.display_name}{if '{contact.current_employer}'} ({contact.current_employer}){/if}</font></td>
-        <td><font size="1" align="right">{$invoice_date}</font></td>
+        <td><font size="1" align="right">{contribution.receive_date|crmDate:"Full"}</font></td>
         <td style="white-space: nowrap"><font size="1" align="right">
           {domain.street_address}
           {domain.supplemental_address_1}
         </font></td>
       </tr>
       <tr>
-        <td><font size="1" align="center">{$street_address} {$supplemental_address_1}</font></td>
+        <td><font size="1" align="center">{contact.address_billing.street_address} {contact.address_billing.supplemental_address_1}</font></td>
         <td><b><font size="1" align="right">{ts}Invoice Number:{/ts}</font></b></td>
         <td><font size="1" align="right">
           {domain.supplemental_address_2}
@@ -41,7 +41,7 @@
         </font></td>
       </tr>
       <tr>
-        <td><font size="1" align="center">{$supplemental_address_2} {$stateProvinceAbbreviation}</font></td>
+        <td><font size="1" align="center">{contact.address_billing.supplemental_address_2} {contact.address_billing.state_province_id:abbr}</font></td>
         <td><font size="1" align="right">{contribution.invoice_number}</font></td>
         <td style="white-space: nowrap"><font size="1" align="right">
           {domain.city}
@@ -49,12 +49,12 @@
         </font></td>
       </tr>
       <tr>
-        <td><font size="1" align="right">{$city}  {$postal_code}</font></td>
+        <td><font size="1" align="right">{contact.address_billing.city}  {contact.address_billing.postal_code}</font></td>
         <td height="10"><b><font size="1" align="right">{ts}Reference:{/ts}</font></b></td>
         <td><font size="1" align="right">{domain.country_id:label}</font></td>
       </tr>
       <tr>
-        <td><font size="1" align="right"> {$country}</font></td>
+        <td><font size="1" align="right"> {contact.address_billing.country_id:label}</font></td>
         <td><font size="1" align="right">{contribution.source}</font></td>
         <td valign="top" style="white-space: nowrap"><font size="1" align="right">{domain.email}</font> </td>
       </tr>
@@ -71,7 +71,7 @@
         <th style="text-align:right;font-weight:bold;white-space: nowrap"><font size="1">{ts}Quantity{/ts}</font></th>
         <th style="text-align:right;font-weight:bold;white-space: nowrap"><font size="1">{ts}Unit Price{/ts}</font></th>
         <th style="text-align:right;font-weight:bold;white-space: nowrap"><font size="1">{domain.tax_term}</font></th>
-        <th style="text-align:right;font-weight:bold;white-space: nowrap"><font size="1">{ts 1=$currency}Amount %1{/ts}</font></th>
+        <th style="text-align:right;font-weight:bold;white-space: nowrap"><font size="1">{ts 1='{contribution.currency}'}Amount %1{/ts}</font></th>
       </tr>
       {foreach from=$lineItems item=line}
         <tr>
@@ -91,7 +91,7 @@
       <tr>
         <td colspan="3"></td>
         <td style="text-align:right;"><font size="1">{ts}Sub Total{/ts}</font></td>
-        <td style="text-align:right;"><font size="1">{$subTotal|crmMoney:$currency}</font></td>
+        <td style="text-align:right;"><font size="1">{contribution.tax_exclusive_amount}</font></td>
       </tr>
       {foreach from=$taxRateBreakdown item=taxDetail key=taxRate}
         {if $taxRate != 0}
@@ -104,8 +104,8 @@
       {/foreach}
       <tr>
         <td colspan="3"></td>
-        <td style="text-align:right;white-space: nowrap"><b><font size="1">{ts 1=$currency}TOTAL %1{/ts}</font></b></td>
-        <td style="text-align:right;"><font size="1">{$amount|crmMoney:$currency}</font></td>
+        <td style="text-align:right;white-space: nowrap"><b><font size="1">{ts 1='{contribution.currency}'}TOTAL %1{/ts}</font></b></td>
+        <td style="text-align:right;"><font size="1">{contribution.total_amount}</font></td>
       </tr>
       <tr>
         <td colspan="3"></td>
@@ -116,7 +116,7 @@
             {ts}Amount Paid{/ts}
           {/if}
         </font></td>
-        <td style="text-align:right;"><font size="1">{$amountPaid|crmMoney:$currency}</font></td>
+        <td style="text-align:right;"><font size="1">{contribution.paid_amount}</font></td>
       </tr>
       <tr>
         <td colspan="3"></td>
@@ -125,7 +125,7 @@
       <tr>
         <td colspan="3"></td>
         <td style="text-align:right;white-space: nowrap" ><b><font size="1">{ts}AMOUNT DUE:{/ts}</font></b></td>
-        <td style="text-align:right;"><b><font size="1">{$amountDue|crmMoney:$currency}</font></b></td>
+        <td style="text-align:right;"><b><font size="1">{contribution.balance_amount}</font></b></td>
       </tr>
       <tr>
         <td colspan="5"></td>
@@ -170,15 +170,15 @@
                 <td><font size="1" align="right">{contribution.invoice_number}</font></td>
               </tr>
               <tr><td colspan="5" style="color:#F5F5F5;"><hr></td></tr>
-              {if $is_pay_later == 1}
+              {if {contribution.is_pay_later|boolean}}
                 <tr>
                   <td><font size="1" align="right" style="font-weight:bold;">{ts}Amount Due:{/ts}</font></td>
-                  <td><font size="1" align="right" style="font-weight:bold;">{$amount|crmMoney:$currency}</font></td>
+                  <td><font size="1" align="right" style="font-weight:bold;">{contribution.total_amount}</font></td>
                 </tr>
               {else}
                 <tr>
                   <td><font size="1" align="right" style="font-weight:bold;">{ts}Amount Due:{/ts}</font></td>
-                  <td><font size="1" align="right" style="font-weight:bold;">{$amountDue|crmMoney:$currency}</font></td>
+                  <td><font size="1" align="right" style="font-weight:bold;">{contribution.paid_amount}</font></td>
                 </tr>
               {/if}
               <tr>
@@ -211,14 +211,14 @@
       </tr>
       <tr>
         <td style="padding-left:17px;"><font size="1" align="center">{contact.display_name}{if '{contact.current_employer}'} ({contact.current_employer}){/if}</font></td>
-        <td style="padding-left:30px;"><font size="1" align="right">{$invoice_date}</font></td>
+        <td style="padding-left:30px;"><font size="1" align="right">{contribution.receive_date|crmDate:"Full"}</font></td>
         <td><font size="1" align="right">
           {domain.street_address}
           {domain.supplemental_address_1}
          </font></td>
       </tr>
       <tr>
-        <td style="padding-left:17px;"><font size="1" align="center">{$street_address}   {$supplemental_address_1}</font></td>
+        <td style="padding-left:17px;"><font size="1" align="center">{contact.address_billing.street_address}   {contact.address_billing.supplemental_address_1}</font></td>
         <td style="padding-left:30px;"><b><font size="1" align="right">{ts}Credit Note Number:{/ts}</font></b></td>
         <td><font size="1" align="right">
           {domain.supplemental_address_2}
@@ -226,7 +226,7 @@
         </font></td>
       </tr>
       <tr>
-        <td style="padding-left:17px;"><font size="1" align="center">{$supplemental_address_2}  {$stateProvinceAbbreviation}</font></td>
+        <td style="padding-left:17px;"><font size="1" align="center">{contact.address_billing.supplemental_address_2} {contact.address_billing.state_province_id:abbr}</font></td>
         <td style="padding-left:30px;"><font size="1" align="right">{contribution.creditnote_id}</font></td>
         <td><font size="1" align="right">
           {domain.city}
@@ -234,7 +234,7 @@
         </font></td>
       </tr>
       <tr>
-        <td style="padding-left:17px;"><font size="1" align="right">{$city}  {$postal_code}</font></td>
+        <td style="padding-left:17px;"><font size="1" align="right">{contact.address_billing.city}  {contact.address_billing.postal_code}</font></td>
         <td height="10" style="padding-left:30px;"><b><font size="1" align="right">{ts}Reference:{/ts}</font></b></td>
         <td><font size="1" align="right">
           {domain.country_id:label}
@@ -265,7 +265,7 @@
               <th style="padding-left:28px;text-align:right;font-weight:bold;"><font size="1">{ts}Quantity{/ts}</font></th>
               <th style="padding-left:28px;text-align:right;font-weight:bold;"><font size="1">{ts}Unit Price{/ts}</font></th>
               <th style="padding-left:28px;text-align:right;font-weight:bold;"><font size="1">{domain.tax_term}</font></th>
-              <th style="padding-left:28px;text-align:right;font-weight:bold;"><font size="1">{ts 1=$currency}Amount %1{/ts}</font></th>
+              <th style="padding-left:28px;text-align:right;font-weight:bold;"><font size="1">{ts 1="{contribution.currency}"}Amount %1{/ts}</font></th>
             </tr>
             {foreach from=$lineItems item=line key=index}
               <tr><td colspan="5"><hr {if $index == 0}size="3" style="color:#000;"{else}style="color:#F5F5F5;"{/if}></hr></td></tr>
@@ -274,7 +274,7 @@
                   {$line.title}
                 </font></td>
                 <td style="padding-left:28px;text-align:right;"><font size="1">{$line.qty}</font></td>
-                <td style="padding-left:28px;text-align:right;"><font size="1">{$line.unit_price|crmMoney:$currency}</font></td>
+                <td style="padding-left:28px;text-align:right;"><font size="1">{$line.unit_price|crmMoney:'{contribution.currency}'}</font></td>
                 {if $line.tax_amount != ''}
                   <td style="padding-left:28px;text-align:right;"><font size="1">{if $line.tax_rate}{$line.tax_rate|crmNumberFormat}%{/if}</font></td>
                 {else}
@@ -287,7 +287,7 @@
             <tr>
               <td colspan="3"></td>
               <td style="padding-left:28px;text-align:right;"><font size="1">{ts}Sub Total{/ts}</font></td>
-              <td style="padding-left:28px;text-align:right;"><font size="1">{$subTotal|crmMoney:$currency}</font></td>
+              <td style="padding-left:28px;text-align:right;"><font size="1">{contribution.tax_exclusive_amount}</font></td>
             </tr>
             {foreach from=$taxRateBreakdown item=taxDetail key=taxRate}
                 {if $taxRate != 0}
@@ -304,14 +304,14 @@
             </tr>
             <tr>
               <td colspan="3"></td>
-              <td style="padding-left:28px;text-align:right;"><b><font size="1">{ts 1=$currency}TOTAL %1{/ts}</font></b></td>
-              <td style="padding-left:28px;text-align:right;"><font size="1">{$amount|crmMoney:$currency}</font></td>
+              <td style="padding-left:28px;text-align:right;"><b><font size="1">{ts 1='{contribution.currency}'}TOTAL %1{/ts}</font></b></td>
+              <td style="padding-left:28px;text-align:right;"><font size="1">{contribution.total_amount}</font></td>
             </tr>
-            {if '{contribution.is_pay_later}' == 0}
+            {if !'{contribution.is_pay_later|boolean}'}
               <tr>
                 <td colspan="3"></td>
                 <td style="padding-left:28px;text-align:right;"><font size="1">{ts}LESS Credit to invoice(s){/ts}</font></td>
-                <td style="padding-left:28px;text-align:right;"><font size="1">{$amount|crmMoney:$currency}</font></td>
+                <td style="padding-left:28px;text-align:right;"><font size="1">{contribution.total_amount}</font></td>
               </tr>
               <tr>
                 <td colspan="3"></td>
@@ -320,7 +320,7 @@
               <tr>
                 <td colspan="3"></td>
                 <td style="padding-left:28px;text-align:right;"><b><font size="1">{ts}REMAINING CREDIT{/ts}</font></b></td>
-                <td style="padding-left:28px;text-align:right;"><b><font size="1">{$amountDue|crmMoney:$currency}</font></b></td>
+                <td style="padding-left:28px;text-align:right;"><b><font size="1">{contribution.balance_amount}</font></b></td>
                 <td style="padding-left:28px;"><font size="1" align="right"></font></td>
               </tr>
             {/if}
@@ -362,7 +362,7 @@
             <tr>
               <td colspan="2"></td>
               <td><font size="1" align="right" style="font-weight:bold;">{ts}Credit Amount:{/ts}</font></td>
-              <td width='50px'><font size="1" align="right" style="font-weight:bold;">{$amount|crmMoney:$currency}</font></td>
+              <td width='50px'><font size="1" align="right" style="font-weight:bold;">{contribution.total_amount}</font></td>
             </tr>
           </table>
         </td>
