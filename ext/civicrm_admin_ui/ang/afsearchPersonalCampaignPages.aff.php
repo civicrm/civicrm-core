@@ -5,7 +5,7 @@ return [
   'type' => 'search',
   'title' => E::ts('Personal Campaign Pages'),
   'icon' => 'fa-list-alt',
-  'server_route' => 'civicrm/pcpadmin',
+  'server_route' => 'civicrm/admin/pcp',
   'permission' => [
     'access CiviCRM',
     'edit contributions',
