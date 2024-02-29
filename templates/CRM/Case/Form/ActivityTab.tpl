@@ -19,7 +19,7 @@
         <summary>
           {ts}Search Filters{/ts}
         </summary>
-        <div class="crm-accordion-body">
+        <div>
           <table class="no-border form-layout-compressed" id="searchOptions">
             <tr>
               <td class="crm-case-caseview-form-block-repoter_id"colspan="2"><label for="reporter_id">{ts}Reporter/Role{/ts}</label><br />
