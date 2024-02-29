@@ -12,6 +12,7 @@
 
 namespace Civi\Afform;
 
+use Civi\Api4\Utils\FormattingUtil;
 use CRM_Afform_ExtensionUtil as E;
 
 /**
@@ -98,6 +99,26 @@ class Utils {
 
     return $isChanged('server_route') ||
       (!empty($updatedAfform['server_route']) && $isChanged('title'));
+  }
+
+  public static function formatViewValue(string $fieldName, array $fieldInfo, array $values): string {
+    $value = $values[$fieldName] ?? NULL;
+    if (isset($value)) {
+      $dataType = $fieldInfo['data_type'] ?? NULL;
+      if (!empty($fieldInfo['options'])) {
+        $value = FormattingUtil::replacePseudoconstant(array_column($fieldInfo['options'], 'label', 'id'), $value);
+      }
+      elseif ($dataType === 'Boolean') {
+        $value = $value ? ts('Yes') : ts('No');
+      }
+      elseif ($dataType === 'Date' || $dataType === 'Timestamp') {
+        $value = \CRM_Utils_Date::customFormat($value);
+      }
+      if (is_array($value)) {
+        $value = implode(', ', $value);
+      }
+    }
+    return $value ?? '';
   }
 
 }

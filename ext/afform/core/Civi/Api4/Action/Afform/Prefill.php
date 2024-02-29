@@ -3,7 +3,6 @@
 namespace Civi\Api4\Action\Afform;
 
 use Civi\Api4\Utils\CoreUtil;
-use Civi\Api4\Utils\FormattingUtil;
 
 /**
  * Class Prefill
@@ -54,7 +53,7 @@ class Prefill extends AbstractProcessor {
     $originalValues = $valueSets;
     foreach ($this->getDisplayOnlyFields($afformEntity['fields']) as $fieldName) {
       foreach ($valueSets as $index => $valueSet) {
-        $this->formatViewValue($afformEntity['type'], $fieldName, $valueSets[$index]['fields'], $originalValues[$index]['fields']);
+        $this->replaceViewValue($afformEntity['type'], $fieldName, $valueSets[$index]['fields'], $originalValues[$index]['fields']);
       }
     }
     foreach ($afformEntity['joins'] ?? [] as $joinEntity => $join) {
@@ -62,7 +61,7 @@ class Prefill extends AbstractProcessor {
         foreach ($valueSets as $index => $valueSet) {
           if (!empty($valueSet['joins'][$joinEntity])) {
             foreach ($valueSet['joins'][$joinEntity] as $joinIndex => $joinValues) {
-              $this->formatViewValue($joinEntity, $fieldName, $valueSets[$index]['joins'][$joinEntity][$joinIndex], $originalValues[$index]['joins'][$joinEntity][$joinIndex]);
+              $this->replaceViewValue($joinEntity, $fieldName, $valueSets[$index]['joins'][$joinEntity][$joinIndex], $originalValues[$index]['joins'][$joinEntity][$joinIndex]);
             }
           }
         }
@@ -70,22 +69,10 @@ class Prefill extends AbstractProcessor {
     }
   }
 
-  private function formatViewValue(string $entityType, string $fieldName, array &$values, $originalValues) {
+  private function replaceViewValue(string $entityType, string $fieldName, array &$values, $originalValues) {
     if (isset($values[$fieldName])) {
       $fieldInfo = $this->_formDataModel->getField($entityType, $fieldName, 'create', $originalValues);
-      $dataType = $fieldInfo['data_type'] ?? NULL;
-      if (!empty($fieldInfo['options'])) {
-        $values[$fieldName] = FormattingUtil::replacePseudoconstant(array_column($fieldInfo['options'], 'label', 'id'), $values[$fieldName]);
-      }
-      elseif ($dataType === 'Boolean') {
-        $values[$fieldName] = $values[$fieldName] ? ts('Yes') : ts('No');
-      }
-      elseif ($dataType === 'Date' || $dataType === 'Timestamp') {
-        $values[$fieldName] = \CRM_Utils_Date::customFormat($values[$fieldName]);
-      }
-      if (is_array($values[$fieldName])) {
-        $values[$fieldName] = implode(', ', $values[$fieldName]);
-      }
+      $values[$fieldName] = \Civi\Afform\Utils::formatViewValue($fieldName, $fieldInfo, $originalValues);
     }
   }
 
