@@ -33,8 +33,8 @@
 
         $element.addClass('af-field-type-' + _.kebabCase(ctrl.defn.input_type));
 
-        if (this.defn.name !== this.fieldName) {
-          namePrefix = this.fieldName.substr(0, this.fieldName.length - this.defn.name.length);
+        if (this.defn.name && this.defn.name !== this.fieldName) {
+          namePrefix = this.fieldName.substring(0, this.fieldName.length - this.defn.name.length);
         }
 
         if (this.defn.search_operator) {

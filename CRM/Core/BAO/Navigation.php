@@ -280,7 +280,7 @@ ORDER BY weight";
    *
    * @return array
    */
-  private static function buildTree($elements, $parentId = NULL) {
+  private static function  buildTree($elements, $parentId = NULL) {
     $branch = [];
 
     foreach ($elements as $id => $element) {
