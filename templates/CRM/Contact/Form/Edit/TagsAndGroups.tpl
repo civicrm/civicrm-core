@@ -8,8 +8,8 @@
  +--------------------------------------------------------------------+
 *}
 {if $title}
-<div class="crm-accordion-wrapper crm-tagGroup-accordion collapsed">
-  <div class="crm-accordion-header">{$title}</div>
+<details class="crm-accordion-bold crm-tagGroup-accordion">
+  <summary>{$title}</summary>
   <div class="crm-accordion-body" id="tagGroup">
 {/if}
     <table class="form-layout-compressed{if $context EQ 'profile'} crm-profile-tagsandgroups{/if}">
@@ -49,5 +49,5 @@
     </table>
 {if $title}
   </div>
-</div><!-- /.crm-accordion-wrapper -->
+</details>
 {/if}

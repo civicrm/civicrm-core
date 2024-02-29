@@ -79,10 +79,10 @@
         </div>
 
 
-        <div class="crm-accordion-wrapper collapsed crm-case-roles-block">
-         <div class="crm-accordion-header">
+        <details class="crm-accordion-bold crm-case-roles-block">
+         <summary>
           {ts}Edit Widget Colors{/ts}
-         </div><!-- /.crm-accordion-header -->
+         </summary>
          <div class="crm-accordion-body">
             <table class="form-layout-compressed">
             {foreach from=$colorFields item=field key=fieldName}
@@ -90,7 +90,7 @@
             {/foreach}
             </table>
          </div><!-- /.crm-accordion-body -->
-        </div><!-- /.crm-accordion-wrapper -->
+        </details>
 
     </div>
 

@@ -40,10 +40,10 @@
         <div class="crm-section crm-error-message">{$error.message|escape}</div>
     {/if}
     {if (!empty($code) || !empty($mysql_code) || !empty($errorDetails)) AND $config->debug}
-        <div class="crm-accordion-wrapper collapsed crm-fatal-error-details-block">
-         <div class="crm-accordion-header" onclick="toggle(this);";>
+        <details class="crm-accordion-bold crm-fatal-error-details-block">
+         <summary  onclick="toggle(this);";>
           {ts}Error Details{/ts}
-         </div><!-- /.crm-accordion-header -->
+         </summary>
          <div class="crm-accordion-body">
             {if !empty($code)}
                 <div class="crm-section">{ts}Error Code:{/ts} {$code|purify}</div>
@@ -55,7 +55,7 @@
                 <div class="crm-section">{ts}Additional Details:{/ts} {$errorDetails|purify}</div>
             {/if}
          </div><!-- /.crm-accordion-body -->
-        </div><!-- /.crm-accordion-wrapper -->
+        </details>
     {/if}
     <p><a href="{$config->userFrameworkBaseURL}" title="{ts}Main Menu{/ts}">{ts}Return to home page.{/ts}</a></p>
 </div>

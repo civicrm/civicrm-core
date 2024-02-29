@@ -23,10 +23,10 @@
     {include file="CRM/common/formButtons.tpl" location="top"}
     </div>
 
-    <div class="crm-accordion-wrapper crm-contactDetails-accordion">
-      <div class="crm-accordion-header">
+    <details class="crm-accordion-bold crm-contactDetails-accordion" open>
+      <summary>
         {ts}Contact Details{/ts}
-      </div><!-- /.crm-accordion-header -->
+      </summary>
       <div class="crm-accordion-body" id="contactDetails">
         <div id="contactDetails">
           <div class="crm-section contact_basic_information-section">
@@ -74,7 +74,7 @@
           <div class="spacer"></div>
         </div>
       </div><!-- /.crm-accordion-body -->
-    </div><!-- /.crm-accordion-wrapper -->
+    </details>
 
     {foreach from = $editOptions item = "title" key="name"}
       {if $name eq 'CustomData'}

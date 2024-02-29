@@ -9,11 +9,11 @@
 *}
 {*common template for compose mail*}
 
-<div class="crm-accordion-wrapper crm-html_email-accordion ">
-<div class="crm-accordion-header">
+<details class="crm-accordion-bold crm-html_email-accordion " open>
+<summary>
     {ts}HTML Format{/ts}
     {help id="id-message-text" file="CRM/Contact/Form/Task/Email.hlp"}
-</div><!-- /.crm-accordion-header -->
+</summary>
  <div class="crm-accordion-body">
   <div class="helpIcon" id="helphtml">
     <input class="crm-token-selector big" data-field="html_message" />
@@ -24,12 +24,12 @@
       {$form.html_message.html}<br />
     </div>
   </div><!-- /.crm-accordion-body -->
-</div><!-- /.crm-accordion-wrapper -->
+</details>
 
-<div class="crm-accordion-wrapper crm-plaint_text_email-accordion collapsed">
-<div class="crm-accordion-header">
+<details class="crm-accordion-bold crm-plaint_text_email-accordion">
+<summary>
   {ts}Plain-Text Format{/ts}
-  </div><!-- /.crm-accordion-header -->
+  </summary>
  <div class="crm-accordion-body">
    <div class="helpIcon" id="helptext">
      <input class="crm-token-selector big" data-field="text_message" />
@@ -39,7 +39,7 @@
       {$form.text_message.html}<br />
     </div>
   </div><!-- /.crm-accordion-body -->
-</div><!-- /.crm-accordion-wrapper -->
+</details>
 <div id="editMessageDetails" class="section">
   {if call_user_func(array('CRM_Core_Permission','check'), 'edit message templates')}
       <div id="updateDetails" class="section" >

@@ -62,17 +62,15 @@
   {if $contactSmartGroupSettings neq 3}
     <div class="spacer" style="height: 1.5em;"></div>
     <div class="accordion ui-accordion ui-widget ui-helper-reset">
-      <div class="crm-accordion-wrapper crm-ajax-accordion crm-smartgroup-accordion {if $contactSmartGroupSettings eq 1}collapsed{/if}">
-        <div class="crm-accordion-header" id="crm-contact_smartgroup" contact_id="{$contactId}">
+      <details class="crm-accordion-bold crm-ajax-accordion crm-smartgroup-accordion" {if $contactSmartGroupSettings eq 1}{else}open{/if}>
+        <summary  id="crm-contact_smartgroup" contact_id="{$contactId}">
           {ts}Smart Groups{/ts}
-        </div>
-        <!-- /.crm-accordion-header -->
+        </summary>
         <div class="crm-accordion-body">
           <div class="crm-contact_smartgroup" style="min-height: 3em;"></div>
         </div>
         <!-- /.crm-accordion-body -->
-      </div>
-      <!-- /.crm-accordion-wrapper -->
+      </details>
     </div>
   {/if}
 
