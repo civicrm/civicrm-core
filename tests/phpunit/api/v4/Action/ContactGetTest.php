@@ -22,6 +22,7 @@ namespace api\v4\Action;
 use api\v4\Api4TestBase;
 use Civi\Api4\Contact;
 use Civi\Api4\Email;
+use Civi\Api4\Individual;
 use Civi\Api4\Relationship;
 use Civi\Test\TransactionalInterface;
 
@@ -411,6 +412,23 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
       ->addClause('OR', ['first_name', '=', '🚂'], ['last_name', '=', '🚂'])
       ->setCheckPermissions(FALSE)
       ->execute();
+  }
+
+  public function testCompareWithHaving(): void {
+    $same = $this->createTestRecord('Individual', [
+      'first_name' => 'Hi 😁',
+      'last_name' => 'Hi 😁',
+    ]);
+    $diff = $this->createTestRecord('Individual', [
+      'first_name' => 'Hi 😁',
+      'last_name' => 'Hi ☹️',
+    ]);
+    $result = Individual::get(FALSE)
+      ->addWhere('first_name', '=', 'Hi 😁')
+      ->addHaving('first_name', '=', 'last_name', TRUE)
+      ->execute()->indexBy('id')->column('first_name');
+    $this->assertEquals('Hi 😁', $result[$same['id']]);
+    $this->assertArrayNotHasKey($diff['id'], $result);
   }
 
   public function testAge(): void {
