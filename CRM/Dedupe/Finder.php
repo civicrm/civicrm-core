@@ -307,6 +307,7 @@ class CRM_Dedupe_Finder {
     ];
     foreach (['individual_suffix', 'individual_prefix', 'gender'] as $name) {
       if (!empty($fields[$name])) {
+        CRM_Core_Error::deprecatedWarning('code thought to be unreachable - slated for removal');
         $flat[$replace_these[$name]] = $flat[$name];
         unset($flat[$name]);
       }
