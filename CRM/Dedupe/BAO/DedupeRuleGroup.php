@@ -245,7 +245,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
       $queries = [];
       while ($bao->fetch()) {
         // Skipping empty rules? Empty rules shouldn't exist; why check?
-        if ($query = $bao->sql($this->params, $this->contactIds, [
+        if ($query = CRM_Dedupe_BAO_DedupeRule::sql($this->params, $this->contactIds, [
           'id' => (int) $bao->id,
           'rule_table' => $bao->rule_table,
           'rule_length' => $bao->rule_length,
