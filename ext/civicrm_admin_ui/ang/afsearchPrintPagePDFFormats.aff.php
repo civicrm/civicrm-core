@@ -5,5 +5,5 @@ return [
   'type' => 'search',
   'title' => E::ts('Print Page (PDF) Formats'),
   'icon' => 'fa-list-alt',
-  'server_route' => 'civicrm/admin_ui/admin/pdfFormats',
+  'server_route' => 'civicrm/admin/pdfFormats',
 ];
