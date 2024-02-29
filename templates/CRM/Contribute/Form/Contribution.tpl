@@ -329,10 +329,10 @@
           // bind first click of accordion header to load crm-accordion-body with snippet
           // everything else taken care of by cj().crm-accordions()
           cj('#adjust-option-type').hide();
-          cj('.crm-ajax-accordion .crm-accordion-header').one('click', function() {
+          cj('.crm-ajax-accordion summary').one('click', function() {
             loadPanes(cj(this).attr('id'));
           });
-          cj('.crm-ajax-accordion:not(.collapsed) .crm-accordion-header').each(function(index) {
+          cj('.crm-ajax-accordion[open] summary').each(function(index) {
             loadPanes(cj(this).attr('id'));
           });
         });

@@ -183,8 +183,8 @@
       }
     }
     // bind first click of accordion header to load crm-accordion-body with snippet
-    $('.view-contact-groups .crm-ajax-accordion.collapsed .crm-accordion-header').one('click', loadPanes);
-    $('.view-contact-groups .crm-ajax-accordion:not(.collapsed) .crm-accordion-header').each(loadPanes);
+    $('.view-contact-groups .crm-ajax-accordion:not([open]) summary').one('click', loadPanes);
+    $('.view-contact-groups .crm-ajax-accordion[open] summary').each(loadPanes);
     // Handle enable/delete links
     var that;
     function refresh() {

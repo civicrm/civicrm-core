@@ -41,7 +41,7 @@
     {/if}
     {if (!empty($code) || !empty($mysql_code) || !empty($errorDetails)) AND $config->debug}
         <details class="crm-accordion-bold crm-fatal-error-details-block">
-         <summary  onclick="toggle(this);";>
+         <summary>
           {ts}Error Details{/ts}
          </summary>
          <div class="crm-accordion-body">
@@ -60,19 +60,6 @@
     <p><a href="{$config->userFrameworkBaseURL}" title="{ts}Main Menu{/ts}">{ts}Return to home page.{/ts}</a></p>
 </div>
 </div> {* end crm-container div *}
-{literal}
-<script language="JavaScript">
-function toggle( element ) {
-    var parent = element.parentNode;
-    var className = parent.className;
-    if ( className  == 'crm-accordion-wrapper collapsed crm-fatal-error-details-block') {
-        parent.className = 'crm-accordion-wrapper  crm-fatal-error-details-block';
-    } else {
-        parent.className = 'crm-accordion-wrapper collapsed crm-fatal-error-details-block';
-    }
-}
-</script>
-{/literal}
 {if $config->userFramework != 'WordPress'}
 </body>
 </html>
