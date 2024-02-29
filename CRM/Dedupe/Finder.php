@@ -171,7 +171,7 @@ class CRM_Dedupe_Finder {
     $subTypes = $fields['contact_sub_type'] ?? [];
     // Only return custom for subType + unrestricted or return all custom
     // fields.
-    $tree = CRM_Core_BAO_CustomGroup::getTree($ctype, NULL, NULL, -1, $subTypes, NULL, TRUE, NULL, TRUE);
+    $tree = self::getTree($ctype, $subTypes);
     self::postProcess($tree, $fields, TRUE);
     foreach ($tree as $key => $cg) {
       if (!is_int($key)) {
@@ -403,6 +403,222 @@ class CRM_Dedupe_Finder {
       }
     }
     return $params;
+  }
+
+  /**
+   * @param string $entityType
+   *   Of the contact whose contact type is needed.
+   * @param array $subTypes
+   *
+   * @return array[]
+   *   The returned array is keyed by group id and has the custom group table fields
+   *   and a subkey 'fields' holding the specific custom fields.
+   *   If entityId is passed in the fields keys have a subkey 'customValue' which holds custom data
+   *   if set for the given entity. This is structured as an array of values with each one having the keys 'id', 'data'
+   *
+   * @throws \CRM_Core_Exception
+   * @deprecated Function demonstrates just how bad code can get from 20 years of entropy.
+   *
+   * This function takes an overcomplicated set of params and returns an overcomplicated
+   * mix of custom groups, custom fields, custom values (if passed $entityID), and other random stuff.
+   *
+   * @see CRM_Core_BAO_CustomGroup::getAll()
+   * for a better alternative to fetching a tree of custom groups and fields.
+   *
+   * @see APIv4::get()
+   * for a better alternative to fetching entity values.
+   *
+   */
+  private static function getTree($entityType, $subTypes) {
+    $entityID = NULL;
+    $subName = NULL;
+    $onlySubType = NULL;
+    $returnAll = TRUE;
+    $checkPermission = CRM_Core_Permission::EDIT;
+    $singleRecord = NULL;
+    if (!is_array($subTypes)) {
+      if (empty($subTypes)) {
+        $subTypes = [];
+      }
+      else {
+        if (stristr($subTypes, ',')) {
+          $subTypes = explode(',', $subTypes);
+        }
+        else {
+          $subTypes = explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($subTypes, CRM_Core_DAO::VALUE_SEPARATOR));
+        }
+      }
+    }
+
+    if (str_contains($entityType, "'")) {
+      // Handle really weird legacy input format
+      $entityType = explode(',', str_replace([' ', "'"], '', $entityType));
+    }
+
+    $filters = [
+      'extends' => $entityType,
+      'is_active' => TRUE,
+    ];
+    if ($subTypes) {
+      foreach ($subTypes as $subType) {
+        $filters['extends_entity_column_value'][] = self::validateSubTypeByEntity($entityType, $subType);
+      }
+      if (!$onlySubType) {
+        $filters['extends_entity_column_value'][] = NULL;
+      }
+      if ($subName) {
+        $filters['extends_entity_column_id'] = $subName;
+      }
+    }
+    elseif (!$returnAll) {
+      $filters['extends_entity_column_value'] = NULL;
+    }
+
+    [$multipleFieldGroups, $groupTree] = self::buildLegacyGroupTree($filters, $checkPermission, $subTypes);
+
+    // entitySelectClauses is an array of select clauses for custom value tables which are not multiple
+    // and have data for the given entities. $entityMultipleSelectClauses is the same for ones with multiple
+    $entitySingleSelectClauses = $entityMultipleSelectClauses = $groupTree['info']['select'] = [];
+    $singleFieldTables = [];
+    // now that we have all the groups and fields, lets get the values
+    // since we need to know the table and field names
+    // add info to groupTree
+    if (!empty($groupTree['info']['tables'])) {
+      $groupTree['info']['where'] = NULL;
+
+      foreach ($groupTree['info']['tables'] as $table => $fields) {
+        $groupTree['info']['from'][] = $table;
+        $select = [
+          "{$table}.id as {$table}_id",
+          "{$table}.entity_id as {$table}_entity_id",
+        ];
+        foreach ($fields as $column => $dontCare) {
+          $select[] = "{$table}.{$column} as {$table}_{$column}";
+        }
+        $groupTree['info']['select'] = array_merge($groupTree['info']['select'], $select);
+        if ($entityID) {
+          $groupTree['info']['where'][] = "{$table}.entity_id = $entityID";
+          if (in_array($table, $multipleFieldGroups) &&
+            CRM_Core_BAO_CustomGroup::customGroupDataExistsForEntity($entityID, $table)
+          ) {
+            $entityMultipleSelectClauses[$table] = $select;
+          }
+          else {
+            $singleFieldTables[] = $table;
+            $entitySingleSelectClauses = array_merge($entitySingleSelectClauses, $select);
+          }
+
+        }
+      }
+      if ($entityID && !empty($singleFieldTables)) {
+        CRM_Core_BAO_CustomGroup::buildEntityTreeSingleFields($groupTree, $entityID, $entitySingleSelectClauses, $singleFieldTables);
+      }
+      $multipleFieldTablesWithEntityData = array_keys($entityMultipleSelectClauses);
+      if (!empty($multipleFieldTablesWithEntityData)) {
+        CRM_Core_BAO_CustomGroup::buildEntityTreeMultipleFields($groupTree, $entityID, $entityMultipleSelectClauses, $multipleFieldTablesWithEntityData, $singleRecord);
+      }
+
+    }
+    return $groupTree;
+  }
+
+  /**
+   * Recreates legacy formatting for getTree but uses the new cached function to retrieve data.
+   * @deprecated only used by legacy function.
+   */
+  private static function buildLegacyGroupTree($filters, $permission, $subTypes) {
+    $multipleFieldGroups = [];
+    $customValueTables = [];
+    $customGroups = CRM_Core_BAO_CustomGroup::getAll($filters, $permission ?: NULL);
+    foreach ($customGroups as &$group) {
+      self::formatLegacyDbValues($group);
+      if ($group['is_multiple']) {
+        $multipleFieldGroups[$group['id']] = $group['table_name'];
+      }
+      // CRM-5507 - Hard to know what this was supposed to do but this faithfully recreates
+      // whatever it was doing before the refactor, which was probably broken anyway.
+      if (!empty($subTypes[0])) {
+        $group['subtype'] = self::validateSubTypeByEntity(CRM_Utils_Array::first((array) $filters['extends']), $subTypes[0]);
+      }
+      foreach ($group['fields'] as &$field) {
+        self::formatLegacyDbValues($field);
+        $customValueTables[$group['table_name']][$field['column_name']] = 1;
+      }
+    }
+    $customGroups['info'] = ['tables' => $customValueTables];
+    return [$multipleFieldGroups, $customGroups];
+  }
+
+  /**
+   * Validates contact subtypes and event types.
+   *
+   * Performs case-insensitive matching of strings and outputs the correct case.
+   * e.g. an input of "meeting" would output "Meeting".
+   *
+   * For all other entities, it doesn't validate except to check the subtype is an integer.
+   *
+   * @param string $entityType
+   * @param string $subType
+   *
+   * @return string
+   * @throws \CRM_Core_Exception
+   */
+  private static function validateSubTypeByEntity($entityType, $subType) {
+    $subType = trim($subType, CRM_Core_DAO::VALUE_SEPARATOR);
+    if (is_numeric($subType)) {
+      return $subType;
+    }
+
+    $contactTypes = CRM_Contact_BAO_ContactType::basicTypeInfo(TRUE);
+    $contactTypes['Contact'] = 1;
+
+    if ($entityType === 'Event') {
+      $subTypes = CRM_Core_OptionGroup::values('event_type', TRUE, FALSE, FALSE, NULL, 'name');
+    }
+    elseif (!array_key_exists($entityType, $contactTypes)) {
+      throw new CRM_Core_Exception('Invalid Entity Filter');
+    }
+    else {
+      $subTypes = CRM_Contact_BAO_ContactType::subTypeInfo($entityType, TRUE);
+      $subTypes = array_column($subTypes, 'name', 'name');
+    }
+    // When you create a new contact type it gets saved in mixed case in the database.
+    // Eg. "Service User" becomes "Service_User" in civicrm_contact_type.name
+    // But that field does not differentiate case (eg. you can't add Service_User and service_user because mysql will report a duplicate error)
+    // webform_civicrm and some other integrations pass in the name as lowercase to API3 Contact.duplicatecheck
+    // Since we can't actually have two strings with different cases in the database perform a case-insensitive search here:
+    $subTypesByName = array_combine($subTypes, $subTypes);
+    $subTypesByName = array_change_key_case($subTypesByName, CASE_LOWER);
+    $subTypesByKey = array_change_key_case($subTypes, CASE_LOWER);
+    $subTypeKey = mb_strtolower($subType);
+    if (!array_key_exists($subTypeKey, $subTypesByKey) && !in_array($subTypeKey, $subTypesByName)) {
+      \Civi::log()->debug("entityType: {$entityType}; subType: {$subType}");
+      throw new CRM_Core_Exception('Invalid Filter');
+    }
+    return $subTypesByName[$subTypeKey] ?? $subTypesByKey[$subTypeKey];
+  }
+
+  /**
+   * Recreates the crude string-only format originally produced by self::getTree.
+   * @deprecated only used by legacy functions.
+   */
+  private static function formatLegacyDbValues(array &$values): void {
+    foreach ($values as $key => $value) {
+      if ($key === 'fields') {
+        continue;
+      }
+      if (is_null($value)) {
+        unset($values[$key]);
+        continue;
+      }
+      if (is_bool($value)) {
+        $value = (int) $value;
+      }
+      if (is_array($value)) {
+        $value = CRM_Utils_Array::implodePadded($value);
+      }
+      $values[$key] = (string) $value;
+    }
   }
 
   /**
