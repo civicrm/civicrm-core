@@ -838,6 +838,10 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   }
 
   /**
+   * As the test is slow we mark it ornery to suppress in PR runs.
+   *
+   * @group ornery
+   *
    * @dataProvider custom_data_incl_non_std_entities_get
    *
    * @param string $entityName
@@ -1287,10 +1291,17 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    *
    * limitations include the problem with avoiding loops when creating test objects -
    * hence FKs only set by createTestObject when required. e.g parent_id on campaign is not being followed through
-   * Currency - only seems to support US
-   * @param $entityName
+   * Currency - only seems to support US.
+   *
+   * As the test is slow we mark it ornery to suppress in PR runs.
+   *
+   * @param string $entityName
+   *
+   * @group ornery
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testCreateSingleValueAlter($entityName): void {
+  public function testCreateSingleValueAlter(string $entityName): void {
     if (in_array($entityName, $this->toBeImplemented['create'], TRUE)) {
       // $this->markTestIncomplete("civicrm_api3_{$Entity}_create to be implemented");
       return;
