@@ -333,12 +333,11 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
   }
 
   /**
-   * @param int $entityID
-   * @param string $entity
+   * @param int $recurringContributionID
    *
    * @return null|Object
    */
-  public static function getSubscriptionDetails($entityID, $entity = 'recur') {
+  public static function getSubscriptionDetails($recurringContributionID) {
     // Note: processor_id used to be aliased as subscription_id so we include it here
     // both as processor_id and subscription_id for legacy compatibility.
     $sql = "
@@ -360,35 +359,13 @@ SELECT rec.id                   as recur_id,
        con.id as contribution_id,
        con.contribution_page_id,
        rec.contact_id,
-       mp.membership_id";
-
-    if ($entity == 'recur') {
-      // This should be always true now.
-      $sql .= "
+       mp.membership_id
       FROM civicrm_contribution_recur rec
 LEFT JOIN civicrm_contribution       con ON ( con.contribution_recur_id = rec.id )
 LEFT  JOIN civicrm_membership_payment mp  ON ( mp.contribution_id = con.id )
      WHERE rec.id = %1";
-    }
-    elseif ($entity == 'contribution') {
-      CRM_Core_Error::deprecatedWarning('no longer used');
-      $sql .= "
-      FROM civicrm_contribution       con
-INNER JOIN civicrm_contribution_recur rec ON ( con.contribution_recur_id = rec.id )
-LEFT  JOIN civicrm_membership_payment mp  ON ( mp.contribution_id = con.id )
-     WHERE con.id = %1";
-    }
-    elseif ($entity == 'membership') {
-      CRM_Core_Error::deprecatedWarning('no longer used');
-      $sql .= "
-      FROM civicrm_membership_payment mp
-INNER JOIN civicrm_membership         mem ON ( mp.membership_id = mem.id )
-INNER JOIN civicrm_contribution_recur rec ON ( mem.contribution_recur_id = rec.id )
-INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
-     WHERE mp.membership_id = %1";
-    }
 
-    $dao = CRM_Core_DAO::executeQuery($sql, [1 => [$entityID, 'Integer']]);
+    $dao = CRM_Core_DAO::executeQuery($sql, [1 => [$recurringContributionID, 'Integer']]);
     if ($dao->fetch()) {
       return $dao;
     }
