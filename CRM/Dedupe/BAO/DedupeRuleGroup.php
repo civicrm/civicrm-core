@@ -120,7 +120,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
         }
       }
       //Does this have to run outside of cache?
-      CRM_Utils_Hook::dupeQuery(CRM_Core_DAO::$_nullObject, 'supportedFields', $fields);
+      CRM_Utils_Hook::dupeQuery(NULL, 'supportedFields', $fields);
       Civi::$statics[__CLASS__]['supportedFields'] = $fields;
     }
 
