@@ -269,7 +269,7 @@ trait CRM_Contact_Form_Task_SMSTrait {
     $contactIds = array_keys($form->_contactDetails);
     $allContactIds = array_keys($form->_allContactDetails);
 
-    [$sent, $activityId, $countSuccess] = $this->sendSMS($formattedContactDetails,
+    [$sent, $countSuccess] = $this->sendSMS($formattedContactDetails,
       $thisValues,
       $smsParams,
       $contactIds
@@ -327,7 +327,6 @@ trait CRM_Contact_Form_Task_SMSTrait {
    * @param array $activityParams
    * @param array $smsProviderParams
    * @param array $contactIds
-   * @param int $sourceContactId This is the source contact Id
    *
    * @return array(bool $sent, int $activityId, int $success)
    * @throws CRM_Core_Exception
@@ -336,8 +335,7 @@ trait CRM_Contact_Form_Task_SMSTrait {
     &$contactDetails,
     &$activityParams,
     &$smsProviderParams = [],
-    &$contactIds = NULL,
-    $sourceContactId = NULL
+    &$contactIds = NULL
   ) {
 
     if (!isset($contactDetails) && !isset($contactIds)) {
@@ -360,16 +358,11 @@ trait CRM_Contact_Form_Task_SMSTrait {
       }
     }
 
-    // Get logged in User Id
-    if (empty($sourceContactId)) {
-      $sourceContactId = CRM_Core_Session::getLoggedInContactID();
-    }
-
     $text = &$activityParams['sms_text_message'];
 
     // Create the meta level record first ( sms activity )
     $activityParams = [
-      'source_contact_id' => $sourceContactId,
+      'source_contact_id' => CRM_Core_Session::getLoggedInContactID(),
       'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'SMS'),
       'activity_date_time' => date('YmdHis'),
       'subject' => $activityParams['activity_subject'],
@@ -405,7 +398,7 @@ trait CRM_Contact_Form_Task_SMSTrait {
             $tokenText,
             $smsProviderParams,
             $activityID,
-            $sourceContactId
+            CRM_Core_Session::getLoggedInContactID()
           );
           $success++;
         }
@@ -427,7 +420,7 @@ trait CRM_Contact_Form_Task_SMSTrait {
       $sent = $errMsgs;
     }
 
-    return [$sent, $activity->id, $success];
+    return [$sent, $success];
   }
 
   /**
