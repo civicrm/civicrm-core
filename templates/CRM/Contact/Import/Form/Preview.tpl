@@ -138,17 +138,3 @@
    {include file="CRM/common/formButtons.tpl" location="bottom"}
 </div>
 </div>
-
-{literal}
-<script type="text/javascript">
-
-if (cj("#newGroupName").val()) {
-  cj("#new-group.collapsed").crmAccordionToggle();
-}
-
-if (cj("#newTagName").val()) {
-  cj("#new-tag.collapsed").crmAccordionToggle();
-}
-
-</script>
-{/literal}
