@@ -1073,6 +1073,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     }
 
     if (isset($values['individual_prefix'])) {
+      CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
       if (!empty($params['prefix_id'])) {
         $prefixes = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
         $params['prefix'] = $prefixes[$params['prefix_id']];
@@ -1084,6 +1085,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     }
 
     if (isset($values['individual_suffix'])) {
+      CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
       if (!empty($params['suffix_id'])) {
         $suffixes = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id');
         $params['suffix'] = $suffixes[$params['suffix_id']];
@@ -1095,6 +1097,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     }
 
     if (isset($values['gender'])) {
+      CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
       if (!empty($params['gender_id'])) {
         $genders = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
         $params['gender'] = $genders[$params['gender_id']];
