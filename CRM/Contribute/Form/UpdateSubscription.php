@@ -58,15 +58,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
     parent::preProcess();
     $this->setAction(CRM_Core_Action::UPDATE);
 
-    if ($this->_coid) {
-      $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_coid, 'contribute', 'info');
-      $this->contributionRecurID = $this->getSubscriptionDetails()->recur_id;
-    }
-    elseif ($this->contributionRecurID) {
-      $this->_coid = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $this->contributionRecurID, 'id', 'contribution_recur_id');
-    }
-
-    if (!$this->contributionRecurID || !$this->getSubscriptionDetails()) {
+    if (!$this->getSubscriptionDetails()) {
       CRM_Core_Error::statusBounce(ts('Required information missing.'));
     }
 
@@ -149,7 +141,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
   public function buildQuickForm() {
     // CRM-16398: If current recurring contribution got > 1 lineitems then make amount field readonly
     $amtAttr = ['size' => 20];
-    $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($this->_coid);
+    $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($this->getContributionID());
     if (count($lineItems) > 1) {
       $amtAttr += ['readonly' => TRUE];
     }

@@ -29,6 +29,8 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
    * Contribution ID.
    *
    * @var int
+   *
+   * @internal
    */
   protected $_coid = NULL;
 
