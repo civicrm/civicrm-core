@@ -14,6 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
+use Civi\Api4\Activity;
 use Civi\Token\TokenProcessor;
 
 /**
@@ -82,7 +83,7 @@ trait CRM_Contact_Form_Task_SMSTrait {
 
       $form->_contactIds = [];
       foreach ($allToPhone as $value) {
-        list($contactId, $phone) = explode('::', $value);
+        [$contactId, $phone] = explode('::', $value);
         if ($contactId) {
           $form->_contactIds[] = $contactId;
           $form->_toContactPhone[] = $phone;
@@ -241,7 +242,7 @@ trait CRM_Contact_Form_Task_SMSTrait {
     $phonesToSendTo = explode(',', $this->getSubmittedValue('to'));
     $contactIds = $phones = [];
     foreach ($phonesToSendTo as $phone) {
-      list($contactId, $phone) = explode('::', $phone);
+      [$contactId, $phone] = explode('::', $phone);
       if ($contactId) {
         $contactIds[] = $contactId;
         $phones[] = $phone;
@@ -361,16 +362,14 @@ trait CRM_Contact_Form_Task_SMSTrait {
     $text = &$activityParams['sms_text_message'];
 
     // Create the meta level record first ( sms activity )
-    $activityParams = [
+    $activityID = Activity::create()->setValues([
       'source_contact_id' => CRM_Core_Session::getLoggedInContactID(),
-      'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'SMS'),
-      'activity_date_time' => date('YmdHis'),
-      'subject' => $activityParams['activity_subject'],
-      'details' => $text,
-      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'status_id', 'Completed'),
-    ];
-    $activity = CRM_Activity_BAO_Activity::create($activityParams);
-    $activityID = $activity->id;
+      'activity_type_id:name' => 'SMS',
+      'activity_date_time' => 'now',
+      'subject' => $this->getSubmittedValue('activity_subject'),
+      'details' => $this->getSubmittedValue('sms_text_message'),
+      'status_id:name' => 'Completed',
+    ])->execute()->first()['id'];
 
     $success = 0;
     $errMsgs = [];
