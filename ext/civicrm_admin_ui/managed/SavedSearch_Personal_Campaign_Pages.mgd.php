@@ -25,6 +25,7 @@ return [
             'PCP_Event_page_id_01.start_date',
             'PCP_Event_page_id_01.end_date',
             'status_id:label',
+            'is_active',
           ],
           'orderBy' => [],
           'where' => [],
@@ -215,7 +216,11 @@ return [
                   'icon' => 'fa-toggle-on',
                   'text' => E::ts('Enable'),
                   'style' => 'default',
-                  'condition' => [],
+                  'condition' => [
+                    'is_active',
+                    '=',
+                    FALSE,
+                  ],
                   'task' => 'enable',
                   'entity' => 'PCP',
                   'action' => '',
@@ -232,7 +237,11 @@ return [
                   'style' => 'default',
                   'path' => '',
                   'action' => '',
-                  'condition' => [],
+                  'condition' => [
+                    'is_active',
+                    '=',
+                    TRUE,
+                  ],
                 ],
                 [
                   'task' => 'delete',
@@ -255,6 +264,14 @@ return [
           'classes' => [
             'table',
             'table-striped',
+          ],
+          'cssRules' => [
+            [
+              'disabled',
+              'is_active',
+              '=',
+              FALSE,
+            ],
           ],
         ],
       ],
