@@ -63,7 +63,7 @@ class ScriptManager extends AutoService implements HookInterface {
       'fa-download'
     );
     if ($this->isInstallable()) {
-      $message->addAction(ts('Deploy now'), FALSE, 'api3', ['Iframe', 'installscript']);
+      $message->addAction(ts('Deploy now'), FALSE, 'api4', ['Iframe', 'installScript']);
     }
     $message->addAction(ts('Deploy instructions'), FALSE, 'href', ['path' => 'civicrm/admin/iframe/install', 'query' => 'reset=1']);
     $messages[] = $message;

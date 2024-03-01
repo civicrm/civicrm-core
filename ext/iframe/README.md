@@ -18,7 +18,7 @@ At time of writing, the extension is in an incubation period. It does not appear
 * Install the entry-point script (`iframe.php`). There are three ways to do this:
     * __Web UI__: Open the "System Status". If you have permission, it will show a button "Deploy now".
     * __Manual__: Open the "System Status". It will show a button "Deploy instructions". Copy-paste the content into the target file.
-    * __CLI/API__: Run `cv api iframe.installscript`
+    * __CLI/API__: Run `cv api4 Iframe.installScript`
 
 * Pick a CiviCRM page (eg `civicrm/contribute/transact?reset=1&id=1`). On an external website, you can make an HTML page which embeds the CiviCRM page:
     ```html
@@ -63,7 +63,7 @@ IFRAME Example Page:  https://example.org/iframe.php/civicrm/contribute/transact
 
 * Whenever you edit your template in `Civi/Iframe/EntryPoint/`, the status-check will complain that `iframe.php` is out-of-date and prompt you to re-deploy it.
 
-    (The quickest way to republish is to run `cv api iframe.installscript`)
+    (The quickest way to republish is to run `cv api4 Iframe.installScript`)
 
 * The D10 template is ore involved. It needs some helper classes. These are in `lib/`.
 

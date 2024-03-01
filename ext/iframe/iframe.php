@@ -38,7 +38,3 @@ function iframe_civicrm_install(): void {
 function iframe_civicrm_enable(): void {
   _iframe_civix_civicrm_enable();
 }
-
-function iframe_civicrm_alterAPIPermissions($entity, $action, &$params, &$permissions) {
-  $permissions['iframe']['installscript'] = ['administer iframe'];
-}
