@@ -2820,10 +2820,10 @@ ORDER BY civicrm_mailing.id DESC";
         "mid={$values['mailing_id']}&reset=1&cid={$params['contact_id']}&event=queue&context=mailing");
       $mailing['start_date'] = CRM_Utils_Date::customFormat($values['start_date']);
       //CRM-12814
-      $mailing['openstats'] = "Opens: " .
-        CRM_Utils_Array::value($values['mailing_id'], $openCounts, 0) .
-        "<br />Clicks: " .
-        $clickCounts[$values['mailing_id']] ?? 0;
+      $clicks = $clickCounts[$values['mailing_id']] ?? 0;
+      $opens = $openCounts[$values['mailing_id']] ?? 0;
+      $mailing['openstats'] = "Opens: {$opens}" .
+        "<br />Clicks: {$clicks}";
 
       $actionLinks = [
         CRM_Core_Action::VIEW => [
