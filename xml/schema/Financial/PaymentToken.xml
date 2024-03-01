@@ -46,7 +46,12 @@
     <title>Payment Processor ID</title>
     <type>int unsigned</type>
     <required>true</required>
-    <comment></comment>
+    <pseudoconstant>
+      <table>civicrm_payment_processor</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+      <nameColumn>name</nameColumn>
+    </pseudoconstant>
     <html>
       <label>Payment Processor</label>
     </html>
