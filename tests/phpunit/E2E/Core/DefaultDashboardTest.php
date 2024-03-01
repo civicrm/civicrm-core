@@ -14,13 +14,15 @@ use Civi;
 class DefaultDashboardTest extends \MinkBase {
 
   public function testDashboard() {
+    $session = $this->mink->getSession();
+    $page = $session->getPage();
+
     $this->login($GLOBALS['_CV']['ADMIN_USER']);
     file_put_contents('/tmp/test-login.png', $this->mink->getSession()->getDriver()->getScreenshot());
 
     $this->visit(Civi::url('backend://civicrm/dashboard'));
-    $this->mink->getSession()->wait(5000, "document.getElementsByClassName('crm-hover-button').length");
-    $inactiveDashletLink = $this->mink->getSession()->getPage()->find('xpath', '//a[contains(@class, "crm-hover-button")]');
-    $inactiveDashletLink->click();
+    $session->wait(5000, "document.getElementsByClassName('crm-hover-button').length");
+    $inactiveDashletLink = $page->find('xpath', '//a[contains(@class, "crm-hover-button")]')->click();
     
     file_put_contents('/tmp/test-dashboard.png', $this->mink->getSession()->getDriver()->getScreenshot());
     $this->assertSession()->pageTextContains('Event Income Summary');
