@@ -391,13 +391,72 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('fa-external-link', $result[0]['columns'][1]['links'][0]['icon']);
     // 2nd link is to the native SK bulk-update task
     $this->assertArrayNotHasKey('url', $result[0]['columns'][1]['links'][1]);
+    $this->assertArrayNotHasKey('action', $result[0]['columns'][1]['links'][1]);
     $this->assertEquals('update', $result[0]['columns'][1]['links'][1]['task']);
     $this->assertEquals('fa-pencil', $result[0]['columns'][1]['links'][1]['icon']);
     // 3rd link is a popup link to the delete contribution quickform
+    $this->assertArrayNotHasKey('task', $result[0]['columns'][1]['links'][2]);
     $this->assertStringContainsString('action=delete&id=' . $contributions[0]['id'], $result[0]['columns'][1]['links'][2]['url']);
     $this->assertEquals('crm-popup', $result[0]['columns'][1]['links'][2]['target']);
     $this->assertEquals('fa-trash', $result[0]['columns'][1]['links'][2]['icon']);
     $this->assertEquals('Delete', $result[0]['columns'][1]['links'][2]['title']);
+  }
+
+  public function testEnableDisableTaskLinks():void {
+    $contributionPage = $this->createTestRecord('ContributionPage');
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'ContributionPage',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['title'],
+          'where' => [['id', '=', $contributionPage['id']]],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => 'testDisplay',
+        'settings' => [
+          'actions' => TRUE,
+          'pager' => [],
+          'columns' => [
+            [
+              'key' => 'title',
+              'label' => 'Title',
+              'dataType' => 'String',
+              'type' => 'field',
+            ],
+            [
+              'type' => 'buttons',
+              'links' => [
+                [
+                  'entity' => 'ContributionPage',
+                  'task' => 'enable',
+                  'icon' => 'fa-pencil',
+                ],
+                [
+                  'entity' => 'ContributionPage',
+                  'task' => 'disable',
+                  'icon' => 'fa-pencil',
+                ],
+              ],
+            ],
+          ],
+          'sort' => [
+            ['id', 'ASC'],
+          ],
+        ],
+      ],
+    ];
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertEquals(1, $result->count());
+    // Native SK tasks should not have a url
+    $this->assertArrayNotHasKey('url', $result[0]['columns'][1]['links'][1]);
+    $this->assertArrayNotHasKey('action', $result[0]['columns'][1]['links'][1]);
+    $this->assertEquals('disable', $result[0]['columns'][1]['links'][1]['task']);
+    $this->assertEquals('fa-pencil', $result[0]['columns'][1]['links'][1]['icon']);
   }
 
   public function testRelationshipCacheLinks():void {
