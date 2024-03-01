@@ -72,4 +72,29 @@ abstract class MinkBase extends \CiviEndToEndTestCase {
     $mink->getSession()->start();
     return $mink;
   }
+
+  /**
+   * Creates a screenshot.
+   *
+   * @param string $filename
+   *   The file name of the resulting screenshot including a writable path. For
+   *   example, /tmp/test_screenshot.jpg.
+   * @param bool $set_background_color
+   *   (optional) By default this method will set the background color to white.
+   *   Set to FALSE to override this behavior.
+   *
+   * @throws \Behat\Mink\Exception\UnsupportedDriverActionException
+   *   When operation not supported by the driver.
+   * @throws \Behat\Mink\Exception\DriverException
+   *   When the operation cannot be done.
+   */
+  protected function createScreenshot($filename, $set_background_color = TRUE) : void {
+    $session = $this->mink->getSession();
+    if ($set_background_color) {
+      $session->executeScript("document.body.style.backgroundColor = 'white';");
+    }
+    $image = $session->getScreenshot();
+    file_put_contents($filename, $image);
+  }
+
 }
