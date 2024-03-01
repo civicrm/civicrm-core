@@ -244,14 +244,7 @@
     {/literal}{* Ajax check for matching contacts *}
     {if $checkSimilar == 1}
     var contactType = {$contactType|@json_encode},
-      rules = {*$ruleFields|@json_encode*}{literal}[
-        'first_name',
-        'last_name',
-        'nick_name',
-        'household_name',
-        'organization_name',
-        'email'
-      ],
+      rules = {$ruleFields}{literal},
       ruleFields = {},
       $ruleElements = $(),
       matchMessage,

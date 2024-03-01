@@ -805,7 +805,25 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     $this->assign('checkSimilar', $checkSimilar);
     if ($checkSimilar == 1) {
       $ruleParams = ['used' => 'Supervised', 'contact_type' => $this->_contactType];
-      $this->assign('ruleFields', CRM_Dedupe_BAO_DedupeRule::dedupeRuleFields($ruleParams));
+      // These are the fields tht are passed to apiv3 Contact.getduplicates.
+      // Most likely it is enough to pass only the fields returned from the function but
+      // this code has been a bit flip-floppy with the ruleFields removed in favour of
+      // the hard-coded list below here
+      // https://github.com/civicrm/civicrm-core/commit/01ee39a0165a6f3fdc8b105626abaa9cb951bb3f#diff-eee833728c23038f8ac3e2bbb37bef5fa1f718d327896178ae9526c31ee80672L265-R273
+      // at that point the api was switched here https://github.com/civicrm/civicrm-core/commit/01ee39a0165a6f3fdc8b105626abaa9cb951bb3f#diff-eee833728c23038f8ac3e2bbb37bef5fa1f718d327896178ae9526c31ee80672R311
+      // However, it was at least partially switched back here https://github.com/civicrm/civicrm-core/commit/a7ba493ce752fee7b05daa103bc1c956b7d05b0f#diff-eee833728c23038f8ac3e2bbb37bef5fa1f718d327896178ae9526c31ee80672R334
+      // so deliberately erring on the side of passing too much information in hopes of breaking
+      // the wheel.
+      $ruleFields = array_unique(CRM_Dedupe_BAO_DedupeRule::dedupeRuleFields($ruleParams)
+        + [
+          'first_name',
+          'last_name',
+          'nick_name',
+          'household_name',
+          'organization_name',
+          'email',
+        ]);
+      $this->assign('ruleFields', json_encode($ruleFields));
     }
 
     // build Custom data if Custom data present in edit option
