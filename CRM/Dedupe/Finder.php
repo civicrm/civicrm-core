@@ -431,12 +431,11 @@ class CRM_Dedupe_Finder {
    *
    */
   private static function getTree($entityType, $subTypes) {
-    $entityID = NULL;
     $subName = NULL;
     $onlySubType = NULL;
     $returnAll = TRUE;
     $checkPermission = CRM_Core_Permission::EDIT;
-    $singleRecord = NULL;
+
     if (!is_array($subTypes)) {
       if (empty($subTypes)) {
         $subTypes = [];
@@ -497,28 +496,7 @@ class CRM_Dedupe_Finder {
           $select[] = "{$table}.{$column} as {$table}_{$column}";
         }
         $groupTree['info']['select'] = array_merge($groupTree['info']['select'], $select);
-        if ($entityID) {
-          $groupTree['info']['where'][] = "{$table}.entity_id = $entityID";
-          if (in_array($table, $multipleFieldGroups) &&
-            CRM_Core_BAO_CustomGroup::customGroupDataExistsForEntity($entityID, $table)
-          ) {
-            $entityMultipleSelectClauses[$table] = $select;
-          }
-          else {
-            $singleFieldTables[] = $table;
-            $entitySingleSelectClauses = array_merge($entitySingleSelectClauses, $select);
-          }
-
-        }
       }
-      if ($entityID && !empty($singleFieldTables)) {
-        CRM_Core_BAO_CustomGroup::buildEntityTreeSingleFields($groupTree, $entityID, $entitySingleSelectClauses, $singleFieldTables);
-      }
-      $multipleFieldTablesWithEntityData = array_keys($entityMultipleSelectClauses);
-      if (!empty($multipleFieldTablesWithEntityData)) {
-        CRM_Core_BAO_CustomGroup::buildEntityTreeMultipleFields($groupTree, $entityID, $entityMultipleSelectClauses, $multipleFieldTablesWithEntityData, $singleRecord);
-      }
-
     }
     return $groupTree;
   }
