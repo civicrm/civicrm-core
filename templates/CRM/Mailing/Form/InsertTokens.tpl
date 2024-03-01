@@ -119,7 +119,6 @@ function showSaveUpdateChkBox(prefix) {
 }
 
 function selectValue( val, prefix) {
-  console.log('here');
   if (manageTemplateFieldsExists(prefix)) {
     document.getElementsByName(prefix + "saveTemplate")[0].checked = false;
     document.getElementsByName(prefix + "updateTemplate")[0].checked = false;
