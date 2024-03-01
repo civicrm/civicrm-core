@@ -12,7 +12,7 @@ return [
       'values' => [
         'name' => 'SMS_Provider',
         'label' => E::ts('SMS Provider'),
-        'api_entity' => 'Provider',
+        'api_entity' => 'SmsProvider',
         'api_params' => [
           'version' => 4,
           'select' => [
@@ -46,7 +46,7 @@ return [
       'version' => 4,
       'values' => [
         'name' => 'SMS_Provider_Table_1',
-        'label' => E::ts('SMS Provider Table 1'),
+        'label' => E::ts('SMS Provider'),
         'saved_search_id.name' => 'SMS_Provider',
         'type' => 'table',
         'settings' => [
@@ -69,9 +69,7 @@ return [
               'dataType' => 'String',
               'label' => E::ts('Provider Details'),
               'sortable' => TRUE,
-              'rewrite' => '<strong>[name]</strong> ([title])<br>'."\n"
-                .'API Type: [api_type:label]<br>'."\n"
-                .'API Url:[api_url]',
+              'rewrite' => '<strong>[name]</strong> ([title])<br>API Type: [api_type:label]<br>API Url:[api_url]',
             ],
             [
               'type' => 'field',
@@ -95,7 +93,7 @@ return [
               'icon' => 'fa-bars',
               'links' => [
                 [
-                  'entity' => 'Provider',
+                  'entity' => 'SmsProvider',
                   'action' => 'update',
                   'join' => '',
                   'target' => 'crm-popup',
@@ -107,7 +105,31 @@ return [
                   'condition' => [],
                 ],
                 [
-                  'entity' => 'Provider',
+                  'task' => 'enable',
+                  'entity' => 'SmsProvider',
+                  'join' => '',
+                  'target' => 'crm-popup',
+                  'icon' => 'fa-toggle-on',
+                  'text' => E::ts('Enable'),
+                  'style' => 'default',
+                  'path' => '',
+                  'action' => '',
+                  'condition' => ['is_active', '=', FALSE],
+                ],
+                [
+                  'task' => 'disable',
+                  'entity' => 'SmsProvider',
+                  'join' => '',
+                  'target' => 'crm-popup',
+                  'icon' => 'fa-toggle-off',
+                  'text' => E::ts('Disable'),
+                  'style' => 'default',
+                  'path' => '',
+                  'action' => '',
+                  'condition' => ['is_active', '=', TRUE],
+                ],
+                [
+                  'entity' => 'SmsProvider',
                   'action' => 'delete',
                   'join' => '',
                   'target' => 'crm-popup',
@@ -116,30 +138,6 @@ return [
                   'style' => 'danger',
                   'path' => '',
                   'task' => '',
-                  'condition' => [],
-                ],
-                [
-                  'task' => 'enable',
-                  'entity' => 'Provider',
-                  'join' => '',
-                  'target' => 'crm-popup',
-                  'icon' => 'fa-toggle-on',
-                  'text' => E::ts('Enable'),
-                  'style' => 'default',
-                  'path' => '',
-                  'action' => '',
-                  'condition' => [],
-                ],
-                [
-                  'task' => 'disable',
-                  'entity' => 'Provider',
-                  'join' => '',
-                  'target' => 'crm-popup',
-                  'icon' => 'fa-toggle-off',
-                  'text' => E::ts('Disable'),
-                  'style' => 'default',
-                  'path' => '',
-                  'action' => '',
                   'condition' => [],
                 ],
               ],
@@ -159,7 +157,7 @@ return [
           'toolbar' => [
             [
               'action' => 'add',
-              'entity' => 'Provider',
+              'entity' => 'SmsProvider',
               'text' => E::ts('Add SMS Provider'),
               'icon' => 'fa-plus',
               'style' => 'primary',
@@ -168,6 +166,14 @@ return [
               'path' => '',
               'task' => '',
               'condition' => [],
+            ],
+          ],
+          'cssRules' => [
+            [
+              'disabled',
+              'is_active',
+              '=',
+              FALSE,
             ],
           ],
         ],
