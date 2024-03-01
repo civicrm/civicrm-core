@@ -27,8 +27,6 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
 
   public $_paymentProcessor = NULL;
 
-  public $_paymentProcessorObj = NULL;
-
   /**
    * Fields that affect the schedule and are defined as editable by the processor.
    *
@@ -62,8 +60,6 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
 
     if ($this->_coid) {
       $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_coid, 'contribute', 'info');
-      // @todo test & replace with $this->_paymentProcessorObj =  Civi\Payment\System::singleton()->getById($this->_paymentProcessor['id']);
-      $this->_paymentProcessorObj = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_coid, 'contribute', 'obj');
       $this->contributionRecurID = $this->getSubscriptionDetails()->recur_id;
     }
     elseif ($this->contributionRecurID) {
@@ -92,9 +88,9 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
     $this->assign('recur_frequency_interval', $this->getSubscriptionDetails()->frequency_interval);
     $this->assign('recur_frequency_unit', $this->getSubscriptionDetails()->frequency_unit);
 
-    $this->editableScheduleFields = $this->_paymentProcessorObj->getEditableRecurringScheduleFields();
+    $this->editableScheduleFields = $this->getPaymentProcessorObject()->getEditableRecurringScheduleFields();
 
-    $changeHelpText = $this->_paymentProcessorObj->getRecurringScheduleUpdateHelpText();
+    $changeHelpText = $this->getPaymentProcessorObject()->getRecurringScheduleUpdateHelpText();
     if (!in_array('amount', $this->editableScheduleFields)) {
       // Not sure if this is good behaviour - maintaining this existing behaviour for now.
       CRM_Core_Session::setStatus($changeHelpText, ts('Warning'), 'alert');
@@ -231,9 +227,9 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
     $params['recurProcessorID'] = $params['subscriptionId'] = $this->getSubscriptionDetails()->processor_id;
 
     $updateSubscription = TRUE;
-    if ($this->_paymentProcessorObj->supports('changeSubscriptionAmount')) {
+    if ($this->getPaymentProcessorObject()->supports('changeSubscriptionAmount')) {
       try {
-        $updateSubscription = $this->_paymentProcessorObj->changeSubscriptionAmount($activityDetails, $params);
+        $updateSubscription = $this->getPaymentProcessorObject()->changeSubscriptionAmount($activityDetails, $params);
         if ($updateSubscription instanceof CRM_Core_Error) {
           CRM_Core_Error::deprecatedWarning('An exception should be thrown');
           throw new PaymentProcessorException(ts('Could not update the Recurring contribution details'));
