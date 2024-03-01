@@ -2385,6 +2385,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
     $props['class'] = ltrim(($props['class'] ?? '') . ' crm-form-autocomplete');
     $props['placeholder'] ??= self::selectOrAnyPlaceholder($props, $required);
+    CRM_Utils_Hook::alterEntityRefParams($props, get_class($this));
     $props['data-select-params'] = json_encode($props['select']);
     $props['data-api-params'] = json_encode($props['api']);
     $props['data-api-entity'] = $props['entity'];
