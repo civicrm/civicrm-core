@@ -25,6 +25,8 @@ class CRM_Dedupe_BAO_DedupeRule extends CRM_Dedupe_DAO_DedupeRule {
    * Return the SQL query for the given rule - either for finding matching
    * pairs of contacts, or for matching against the $params variable (if set).
    *
+   * @internal do not call from outside tested core code. No universe uses Feb 2024.
+   *
    * @param array|null $params
    *   Params to dedupe against (queries against the whole contact set otherwise)
    * @param array $contactIDs
@@ -37,7 +39,7 @@ class CRM_Dedupe_BAO_DedupeRule extends CRM_Dedupe_DAO_DedupeRule {
    *
    * @throws \CRM_Core_Exception
    */
-  public function sql($params, $contactIDs, array $rule): ?string {
+  public static function sql($params, $contactIDs, array $rule): ?string {
     if ($params &&
       (!array_key_exists($rule['rule_table'], $params) ||
         !array_key_exists($rule['rule_field'], $params[$rule['rule_table']])
@@ -60,7 +62,7 @@ class CRM_Dedupe_BAO_DedupeRule extends CRM_Dedupe_DAO_DedupeRule {
       "t1.{$rule['rule_field']} = t2.{$rule['rule_field']}",
     ];
 
-    if (in_array($this->getFieldType($rule['rule_field']), CRM_Utils_Type::getTextTypes(), TRUE)) {
+    if (in_array(CRM_Dedupe_BAO_DedupeRule::getFieldType($rule['rule_field'], $rule['rule_table']), CRM_Utils_Type::getTextTypes(), TRUE)) {
       $innerJoinClauses[] = "t1.{$rule['rule_field']} <> ''";
       $innerJoinClauses[] = "t2.{$rule['rule_field']} <> ''";
     }
@@ -172,8 +174,10 @@ class CRM_Dedupe_BAO_DedupeRule extends CRM_Dedupe_DAO_DedupeRule {
    *
    * @return array
    *   rule fields array associated to rule group
+   *
+   * @internal do not call from outside tested core code. No universe uses Feb 2024.
    */
-  public static function dedupeRuleFields($params) {
+  public static function dedupeRuleFields(array $params) {
     $rgBao = new CRM_Dedupe_BAO_DedupeRuleGroup();
     $rgBao->used = $params['used'];
     $rgBao->contact_type = $params['contact_type'];
@@ -185,7 +189,7 @@ class CRM_Dedupe_BAO_DedupeRule extends CRM_Dedupe_DAO_DedupeRule {
     $ruleFields = [];
     while ($ruleBao->fetch()) {
       $field_name = $ruleBao->rule_field;
-      if ($field_name == 'phone_numeric') {
+      if ($field_name === 'phone_numeric') {
         $field_name = 'phone';
       }
       $ruleFields[] = $field_name;
@@ -198,6 +202,8 @@ class CRM_Dedupe_BAO_DedupeRule extends CRM_Dedupe_DAO_DedupeRule {
    * @param int $oid
    *
    * @return bool
+   *
+   * @internal do not call from outside tested core code. No universe uses Feb 2024.
    */
   public static function validateContacts($cid, $oid) {
     if (!$cid || !$oid) {
@@ -219,15 +225,17 @@ class CRM_Dedupe_BAO_DedupeRule extends CRM_Dedupe_DAO_DedupeRule {
    * Get the specification for the given field.
    *
    * @param string $fieldName
+   * @param string $ruleTable
    *
    * @return array
    * @throws \CRM_Core_Exception
+   * @internal function has only ever been available from the class & will be moved.
    */
-  public function getFieldType($fieldName) {
-    $entity = CRM_Core_DAO_AllCoreTables::getEntityNameForTable($this->rule_table);
+  public static function getFieldType(string $fieldName, string $ruleTable) {
+    $entity = CRM_Core_DAO_AllCoreTables::getEntityNameForTable($ruleTable);
     if (!$entity) {
       // This means we have stored a custom field rather than an entity name in rule_table, figure out the entity.
-      $customGroup = CRM_Core_BAO_CustomGroup::getGroup(['table_name' => $this->rule_table]);
+      $customGroup = CRM_Core_BAO_CustomGroup::getGroup(['table_name' => $ruleTable]);
       if (!$customGroup) {
         throw new CRM_Core_Exception('Unknown dedupeRule field');
       }
