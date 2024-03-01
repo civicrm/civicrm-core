@@ -239,6 +239,7 @@ abstract class Api4Query {
     if (!in_array($operator, CoreUtil::getOperators(), TRUE)) {
       throw new \CRM_Core_Exception('Illegal operator');
     }
+    $fieldAlias = NULL;
 
     // For WHERE clause, expr must be the name of a field.
     if ($type === 'WHERE' && !$isExpression) {
@@ -263,7 +264,7 @@ abstract class Api4Query {
       if (isset($this->selectAliases[$expr])) {
         $fieldAlias = $expr;
         // Attempt to format if this is a real field
-        if (isset($this->apiFieldSpec[$expr])) {
+        if (isset($this->apiFieldSpec[$expr]) && !$isExpression) {
           $field = $this->getField($expr);
           FormattingUtil::formatInputValue($value, $expr, $field, $this->entityValues, $operator);
         }
@@ -273,7 +274,7 @@ abstract class Api4Query {
         $fieldAlias = array_search($expr, $this->selectAliases);
       }
       // If either the having or select field contains a pseudoconstant suffix, match and perform substitution
-      else {
+      elseif (!$isExpression) {
         [$fieldName] = explode(':', $expr);
         foreach ($this->selectAliases as $selectAlias => $selectExpr) {
           [$selectField] = explode(':', $selectAlias);
@@ -294,6 +295,13 @@ abstract class Api4Query {
         }
       }
       $fieldAlias = '`' . $fieldAlias . '`';
+      if ($isExpression) {
+        $targetField = isset($this->selectAliases[$value]) ? $value : array_search($value, $this->selectAliases);
+        if (!$targetField) {
+          throw new \CRM_Core_Exception("Invalid expression in HAVING clause: '$value'. Must use a value from SELECT clause.");
+        }
+        return sprintf('%s %s `%s`', $fieldAlias, $operator, $targetField);
+      }
     }
     elseif ($type === 'ON' || ($type === 'WHERE' && $isExpression)) {
       $expr = $this->getExpression($expr);

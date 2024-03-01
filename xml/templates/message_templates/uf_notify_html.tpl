@@ -26,7 +26,7 @@
        {ts}Submitted For{/ts}
       </td>
       <td {$valueStyle}>
-       {$displayName}
+       {contact.display_name}
       </td>
      </tr>
      <tr>
@@ -34,7 +34,7 @@
        {ts}Date{/ts}
       </td>
       <td {$valueStyle}>
-       {$currentDate}
+       {domain.now|crmDate:"Full"}
       </td>
      </tr>
      <tr>

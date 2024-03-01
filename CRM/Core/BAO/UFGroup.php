@@ -2642,41 +2642,21 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       return;
 
     }
-    $template = CRM_Core_Smarty::singleton();
-
-    $displayName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
-      $contactID,
-      'display_name'
-    );
-
-    self::profileDisplay($values['id'], $values['values'], $template);
     $emailList = explode(',', $values['email']);
-
-    $contactLink = CRM_Utils_System::url('civicrm/contact/view',
-      "reset=1&cid=$contactID",
-      TRUE, NULL, FALSE, FALSE, TRUE
-    );
 
     //get the default domain email address.
     [$domainEmailName, $domainEmailAddress] = CRM_Core_BAO_Domain::getNameAndEmail();
 
-    if (!$domainEmailAddress || $domainEmailAddress == 'info@EXAMPLE.ORG') {
+    if (!$domainEmailAddress || $domainEmailAddress === 'info@EXAMPLE.ORG') {
       $fixUrl = CRM_Utils_System::url('civicrm/admin/domain', 'action=update&reset=1');
       CRM_Core_Error::statusBounce(ts('The site administrator needs to enter a valid \'FROM Email Address\' in <a href="%1">Administer CiviCRM &raquo; Communications &raquo; FROM Email Addresses</a>. The email address used may need to be a valid mail account with your email service provider.', [1 => $fixUrl]));
     }
 
     foreach ($emailList as $emailTo) {
-      // FIXME: take the below out of the foreach loop
       CRM_Core_BAO_MessageTemplate::sendTemplate(
         [
-          'groupName' => 'msg_tpl_workflow_uf',
           'workflow' => 'uf_notify',
-          'contactId' => $contactID,
-          'tplParams' => [
-            'displayName' => $displayName,
-            'currentDate' => date('r'),
-            'contactLink' => $contactLink,
-          ],
+          'modelProps' => ['contactID' => $contactID, 'profileID' => $values['id'], 'profileFields' => $values['values']],
           'from' => "$domainEmailName <$domainEmailAddress>",
           'toEmail' => $emailTo,
         ]
@@ -2720,22 +2700,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       }
     }
     return NULL;
-  }
-
-  /**
-   * Assign uf fields to template.
-   *
-   * @param int $gid
-   *   Group id.
-   * @param array $values
-   * @param CRM_Core_Smarty $template
-   */
-  public static function profileDisplay($gid, $values, $template) {
-    $groupTitle = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $gid, 'title');
-    $template->assign('grouptitle', $groupTitle);
-    if (count($values)) {
-      $template->assign('values', $values);
-    }
   }
 
   /**

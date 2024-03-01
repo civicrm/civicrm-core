@@ -13,6 +13,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
+use Civi\Api4\Event;
 
 /**
  * This class generates form components for processing Event.
@@ -92,9 +93,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
         'entity_id' => $eventId,
       ];
 
-      list($defaults['custom_pre_id'],
-        $defaults['custom_post']
-        ) = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
+      [$defaults['custom_pre_id'], $defaults['custom_post']] = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
 
       // Get the id for the event registration profile
       $eventRegistrationIdParams = $eventRegistrationIdDefaults = [
@@ -133,9 +132,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
           'entity_id' => $eventId,
         ];
 
-        list($defaults['additional_custom_pre_id'],
-          $defaults['additional_custom_post']
-          ) = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinAddParams);
+        [$defaults['additional_custom_pre_id'], $defaults['additional_custom_post']] = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinAddParams);
 
         if (isset($defaults['additional_custom_post']) && is_numeric($defaults['additional_custom_post'])) {
           $defaults['additional_custom_post_id'] = $defaults['additional_custom_post'];
@@ -794,11 +791,9 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     if (!$params['is_online_registration']) {
       $params['is_email_confirm'] = FALSE;
     }
-    if (!empty($params['allow_selfcancelxfer'])) {
-      $params['selfcancelxfer_time'] = !empty($params['selfcancelxfer_time']) ? $params['selfcancelxfer_time'] : 0;
-    }
+    $params['selfcancelxfer_time'] = !empty($params['selfcancelxfer_time']) ? $params['selfcancelxfer_time'] : 0;
 
-    CRM_Event_BAO_Event::add($params);
+    Event::save(FALSE)->addRecord($params)->execute();
 
     // also update the ProfileModule tables
     $ufJoinParams = [

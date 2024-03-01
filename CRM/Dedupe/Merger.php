@@ -729,25 +729,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     ) {
       $data['contact_sub_type'] = CRM_Utils_Array::implodePadded($params['contact_sub_type']);
     }
-    elseif (array_key_exists('contact_sub_type_hidden', $params) &&
-      !empty($params['contact_sub_type_hidden'])
-    ) {
-      CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
-      // if profile was used, and had any subtype, we obtain it from there
-      //CRM-13596 - add to existing contact types, rather than overwriting
-      if (empty($data['contact_sub_type'])) {
-        // If we don't have a contact ID the $data['contact_sub_type'] will not be defined...
-        $data['contact_sub_type'] = CRM_Utils_Array::implodePadded($params['contact_sub_type_hidden']);
-      }
-      else {
-        $data_contact_sub_type_arr = CRM_Utils_Array::explodePadded($data['contact_sub_type']);
-        if (!in_array($params['contact_sub_type_hidden'], $data_contact_sub_type_arr)) {
-          //CRM-20517 - make sure contact_sub_type gets the correct delimiters
-          $data['contact_sub_type'] = trim($data['contact_sub_type'], CRM_Core_DAO::VALUE_SEPARATOR);
-          $data['contact_sub_type'] = CRM_Core_DAO::VALUE_SEPARATOR . $data['contact_sub_type'] . CRM_Utils_Array::implodePadded($params['contact_sub_type_hidden']);
-        }
-      }
-    }
 
     $locationType = [];
     $count = 1;
@@ -951,15 +932,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           }
 
           //CRM-13596 - check for contact_sub_type_hidden first
-          if (array_key_exists('contact_sub_type_hidden', $params)) {
-            CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
-            $type = $params['contact_sub_type_hidden'];
-          }
-          else {
-            $type = $data['contact_type'];
-            if (!empty($data['contact_sub_type'])) {
-              $type = CRM_Utils_Array::explodePadded($data['contact_sub_type']);
-            }
+          $type = $data['contact_type'];
+          if (!empty($data['contact_sub_type'])) {
+            $type = CRM_Utils_Array::explodePadded($data['contact_sub_type']);
           }
 
           CRM_Core_BAO_CustomField::formatCustomField($customFieldId,

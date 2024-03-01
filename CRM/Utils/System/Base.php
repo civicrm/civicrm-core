@@ -113,9 +113,7 @@ abstract class CRM_Utils_System_Base {
     }
 
     $current_path = CRM_Utils_System::currentPath();
-    return $this->url($current_path,
-      NULL, TRUE, NULL, FALSE
-    );
+    return (string) Civi::url('current://' . $current_path, 'a');
   }
 
   /**

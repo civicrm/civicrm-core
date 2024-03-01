@@ -207,7 +207,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       $this->assign('batchTotal', !empty($this->_batchInfo['total']) ? $this->_batchInfo['total'] : NULL);
       $this->assign('batchType', $this->_batchInfo['type_id']);
 
-      // get the profile id associted with this batch type
+      // get the profile id associated with this batch type
       $this->_profileId = CRM_Batch_BAO_Batch::getProfileId($this->_batchInfo['type_id']);
     }
     CRM_Core_Resources::singleton()
@@ -239,7 +239,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    *
    * @throws \CRM_Core_Exception
    */
-  public function buildQuickForm() {
+  public function buildQuickForm(): void {
     if (!$this->_profileId) {
       CRM_Core_Error::statusBounce(ts('Profile for bulk data entry is missing.'));
     }
@@ -403,6 +403,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    *
    * @return array
    *   list of errors to be posted back to the form
+   * @throws \CRM_Core_Exception
    */
   public static function formRule($params, $files, $self) {
     $errors = [];
@@ -436,7 +437,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
     $batchTotal = 0;
     foreach ($params['field'] as $key => $value) {
-      $batchTotal += ($value['total_amount'] ?: 0);
+      $batchTotal += (float) (CRM_Utils_Rule::cleanMoney($value['total_amount'] ?: 0));
 
       //validate for soft credit fields
       if (!empty($params['soft_credit_contact_id'][$key]) && empty($params['soft_credit_amount'][$key])) {
@@ -566,7 +567,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    *
    * @throws \CRM_Core_Exception
    */
-  private function processContribution(&$params) {
+  private function processContribution(array &$params): bool {
 
     foreach ($this->submittableMoneyFields as $moneyField) {
       foreach ($params['field'] as $index => $fieldValues) {
@@ -704,7 +705,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
             $result = CRM_Pledge_BAO_PledgePayment::getPledgePayments($pledgeId);
             $pledgePaymentId = 0;
             foreach ($result as $key => $values) {
-              if ($values['status'] != 'Completed') {
+              if ($values['status'] !== 'Completed') {
                 $pledgePaymentId = $values['id'];
                 break;
               }
@@ -868,7 +869,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
               'total_amount' => $order->getTotalAmount() + $order->getTotalTaxAmount(),
               'check_number' => $this->currentRow['check_number'] ?? '',
               'trxn_date' => $this->currentRow['receive_date'],
-              'trxn_id' => $this->currentRow['trxn_id'],
+              'trxn_id' => $this->currentRow['trxn_id'] ?? '',
               'payment_instrument_id' => $this->currentRow['payment_instrument_id'],
               'contribution_id' => $this->getCurrentRowContributionID(),
               'is_send_contribution_notification' => FALSE,
@@ -941,7 +942,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
     if (!empty($formValues['contribution_status_id'])) {
       $form->assign('contributionStatusID', $formValues['contribution_status_id']);
-      $form->assign('contributionStatus', CRM_Contribute_PseudoConstant::contributionStatus($formValues['contribution_status_id'], 'name'));
+      $form->assign('contributionStatus', CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $formValues['contribution_status_id']));
     }
 
     $form->assign('receiptType', $this->currentRowIsRenew() ? 'membership renewal' : 'membership signup');
@@ -988,6 +989,9 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    *
    * @param array $value
    *   Associated array of submitted values.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
   private function updateContactInfo(array &$value) {
     $value['preserveDBName'] = $this->_preserveDefault;
@@ -1009,6 +1013,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    * @param array $params
    *
    * @return bool
+   * @throws \CRM_Core_Exception
    */
   public function testProcessMembership($params) {
     return $this->processMembership($params);
