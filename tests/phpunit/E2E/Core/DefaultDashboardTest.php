@@ -3,7 +3,11 @@
 namespace E2E\Core;
 
 use Civi;
+<<<<<<< HEAD
 use Civi\Api4\Group;
+=======
+
+>>>>>>> d62ed1633f (mink WIP)
 
 /**
  * Class DefaultDashboardTest
@@ -14,6 +18,7 @@ use Civi\Api4\Group;
 class DefaultDashboardTest extends \MinkBase {
 
   public function testDashboard() {
+<<<<<<< HEAD
     $session = $this->mink->getSession();
     $page = $session->getPage();
 
@@ -53,4 +58,18 @@ class DefaultDashboardTest extends \MinkBase {
     // Delete all groups.
     Group::delete(FALSE)->addWhere('id', 'IN', [$gid1, $gid2])->execute();
   }
+=======
+    $this->login($GLOBALS['_CV']['ADMIN_USER']);
+    file_put_contents('/tmp/test-login.png', $this->mink->getSession()->getDriver()->getScreenshot());
+
+    $this->visit(Civi::url('backend://civicrm/dashboard'));
+    $this->mink->getSession()->wait(5000, "document.getElementsByClassName('crm-hover-button').length");
+    $inactiveDashletLink = $this->mink->getSession()->getPage()->find('xpath', '//a[contains(@class, "crm-hover-button")]');
+    $inactiveDashletLink->click();
+    
+    file_put_contents('/tmp/test-dashboard.png', $this->mink->getSession()->getDriver()->getScreenshot());
+    $this->assertSession()->pageTextContains('Event Income Summary');
+  }
+
+>>>>>>> d62ed1633f (mink WIP)
 }

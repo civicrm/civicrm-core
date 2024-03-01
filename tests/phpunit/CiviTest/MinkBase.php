@@ -72,6 +72,7 @@ abstract class MinkBase extends \CiviEndToEndTestCase {
     $mink->getSession()->start();
     return $mink;
   }
+<<<<<<< HEAD
 
   /**
    * Creates a screenshot.
@@ -97,4 +98,6 @@ abstract class MinkBase extends \CiviEndToEndTestCase {
     file_put_contents($filename, $image);
   }
 
+=======
+>>>>>>> d62ed1633f (mink WIP)
 }
