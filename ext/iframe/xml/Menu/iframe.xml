@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/admin/iframe/install</path>
+    <page_callback>CRM_Iframe_Page_InstallPage</page_callback>
+    <title>IFRAME Installation</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+</menu>

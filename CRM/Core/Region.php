@@ -61,6 +61,10 @@ class CRM_Core_Region implements CRM_Core_Resources_CollectionInterface, CRM_Cor
       $this->snippets['default']['markup'] = $default;
     }
 
+    if (defined('CIVICRM_IFRAME')) {
+      $allowCmsOverride = FALSE;
+    }
+
     Civi::dispatcher()->dispatch('civi.region.render', \Civi\Core\Event\GenericHookEvent::create(['region' => $this]));
 
     $this->sort();

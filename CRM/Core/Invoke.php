@@ -127,8 +127,10 @@ class CRM_Core_Invoke {
   /**
    * Determine which menu $item corresponds to $args
    *
-   * @param array $args
-   *   List of path parts.
+   * @param string|string[] $args
+   *   Path to lookup
+   *   Ex: 'civicrm/foo/bar'
+   *   Ex: ['civicrm', 'foo', 'bar']
    * @return array; see CRM_Core_Menu
    */
   public static function getItem($args) {

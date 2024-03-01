@@ -663,8 +663,8 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     if (!empty($action)) {
       return $action;
     }
-    $current_path = \Drupal::service('path.current')->getPath();
-    return $this->url($current_path);
+    $current_path = ltrim(\Drupal::service('path.current')->getPath(), '/');
+    return (string) Civi::url('current://' . $current_path);
   }
 
   /**

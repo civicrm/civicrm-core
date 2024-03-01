@@ -43,6 +43,8 @@ class CRM_Utils_Url {
    * @param string|null $currentHostPort
    *   The value of HTTP_HOST. (NULL means "lookup HTTP_HOST")
    * @return string
+   *   Either the relative version of $value (if on the same HTTP_HOST), or else
+   *   the absolute version.
    */
   public static function toRelative(string $value, ?string $currentHostPort = NULL): string {
     $currentHostPort = $currentHostPort ?: $_SERVER['HTTP_HOST'] ?? NULL;
@@ -54,6 +56,21 @@ class CRM_Utils_Url {
     }
 
     return $value;
+  }
+
+  /**
+   * Determine if $child is a descendent of $parent.
+   *
+   * Relative URLs mean that multiple strings may not
+   *
+   * @param string|\Psr\Http\Message\UriInterface|\Civi\Core\Url $child
+   * @param string|\Psr\Http\Message\UriInterface|\Civi\Core\Url $parent
+   * @return bool
+   */
+  public static function isChildOf($child, $parent): bool {
+    $childRel = static::toRelative((string) $child);
+    $parentRel = static::toRelative((string) $parent);
+    return str_starts_with($childRel, $parentRel);
   }
 
 }

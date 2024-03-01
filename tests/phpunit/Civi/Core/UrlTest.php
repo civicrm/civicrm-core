@@ -17,7 +17,7 @@ class UrlTest extends \CiviUnitTestCase {
 
   public function setUp(): void {
     $parts = explode('/', CIVICRM_UF_BASEURL);
-    $this->assertRegexp(';^[a-z0-9\.\-]+(:\d+)?$;', $parts[2], 'CIVICRM_UF_BASEURL should have domain name and/or port');
+    $this->assertMatchesRegularExpression(';^[a-z0-9\.\-]+(:\d+)?$;', $parts[2], 'CIVICRM_UF_BASEURL should have domain name and/or port');
     $tmpVars['_SERVER']['HTTP_HOST'] = $parts[2];
     \CRM_Utils_GlobalStack::singleton()->push($tmpVars);
 
@@ -36,6 +36,8 @@ class UrlTest extends \CiviUnitTestCase {
     $absolutes['method'] = Civi::url('backend://civicrm/admin')->setPreferFormat('absolute');
     $absolutes['ext'] = Civi::url('ext://org.civicrm.search_kit/js/foobar.js', 'a');
     $absolutes['asset'] = Civi::url('asset://[civicrm.packages]/js/foobar.js', 'a');
+    $absolutes['http'] = Civi::url('http://example.com/foo', 'a');
+    $absolutes['https'] = Civi::url('https://example.com/foo', 'a');
 
     $relatives = [];
     $relatives['default'] = Civi::url('backend://civicrm/admin');
@@ -49,6 +51,22 @@ class UrlTest extends \CiviUnitTestCase {
     }
     foreach ($relatives as $key => $url) {
       $this->assertDoesNotMatchRegularExpression(';^https?://;', (string) $url, "relatives[$key] should be relative URL");
+    }
+  }
+
+  public function testHttp(): void {
+    $examples = [];
+    $examples[] = 'http://example.com';
+    $examples[] = 'https://example.com';
+    $examples[] = 'http://example.com:8888';
+    $examples[] = 'https://example.com:8000';
+    $examples[] = 'http://example.com/some/path?var=123';
+    $examples[] = 'https://example.com/other/path#some-fragment';
+
+    foreach ($examples as $example) {
+      // Do a round-trip parse and re-encode
+      $output = (string) Civi::url($example);
+      $this->assertEquals($example, $output);
     }
   }
 
@@ -80,6 +98,8 @@ class UrlTest extends \CiviUnitTestCase {
     $examples[] = ['reset=1&id=9', Civi::url('frontend://civicrm/profile/view?forget=this')->setQuery('reset=1&id=9')];
     $examples[] = ['reset=1&id=9', Civi::url('frontend://civicrm/profile/view?forget=this')->setQuery(['reset' => 1, 'id' => 9])];
     $examples[] = ['reset=1&id=9', Civi::url('frontend://civicrm/profile/view?forget=this')->setQuery('reset=1')->addQuery('id=9')];
+    $examples[] = ['reset=1&id=9&foo=1', Civi::url('https://example.com/base?reset=1&id=9&foo=1')];
+    $examples[] = ['reset=1&id=9&foo=2', Civi::url('http://example.com/base?reset=1&id=9&foo=2')];
 
     foreach ($examples as $key => $example) {
       /** @var \Civi\Core\Url $url */
@@ -183,6 +203,29 @@ class UrlTest extends \CiviUnitTestCase {
     foreach ($alternatives as $key => $alternative) {
       $this->assertEquals($baseline, (string) $alternative, "Alternative #$key should match baseline");
     }
+  }
+
+  public function testCustomSchemeClean(): void {
+    Civi::dispatcher()->addListener('&civi.url.render.custom', function(Url $url, &$result) {
+      $result = Civi::url('https://example.com/base')
+        ->merge($url, ['path', 'query', 'fragment', 'fragmentQuery', 'flags']);
+    });
+
+    $this->assertEquals('https://example.com/base/foo', Civi::url('custom://foo')->__toString());
+    $this->assertEquals('https://example.com/base/foo/bar?x=1', Civi::url('custom://foo/bar?x=1')->__toString());
+    $this->assertEquals('https://example.com/base/foo/bar#whiz', Civi::url('custom://foo/bar#whiz')->__toString());
+  }
+
+  public function testCustomSchemeDirty(): void {
+    Civi::dispatcher()->addListener('&civi.url.render.custom', function(Url $url, &$result) {
+      $result = Civi::url('https://example.com/dirty.jsp')
+        ->addQuery(['q' => $url->getPath()])
+        ->merge($url, ['query', 'fragment', 'fragmentQuery', 'flags']);
+    });
+
+    $this->assertEquals('https://example.com/dirty.jsp?q=foo', Civi::url('custom://foo')->__toString());
+    $this->assertEquals('https://example.com/dirty.jsp?q=foo%2Fbar&x=1', Civi::url('custom://foo/bar?x=1')->__toString());
+    $this->assertEquals('https://example.com/dirty.jsp?q=foo%2Fbar#whiz', Civi::url('custom://foo/bar#whiz')->__toString());
   }
 
 }
