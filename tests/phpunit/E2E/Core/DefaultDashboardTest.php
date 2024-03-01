@@ -18,13 +18,12 @@ class DefaultDashboardTest extends \MinkBase {
     $page = $session->getPage();
 
     $this->login($GLOBALS['_CV']['ADMIN_USER']);
-    file_put_contents('/tmp/test-login.png', $this->mink->getSession()->getDriver()->getScreenshot());
+    $this->createScreenshot('/tmp/test-login.png');
 
     $this->visit(Civi::url('backend://civicrm/dashboard'));
     $session->wait(5000, "document.getElementsByClassName('crm-hover-button').length");
     $page->find('xpath', '//a[contains(@class, "crm-hover-button")]')->click();
-    
-    file_put_contents('/tmp/test-dashboard.png', $this->mink->getSession()->getDriver()->getScreenshot());
+    $this->createScreenshot('/tmp/test-dashboard.png');
     $this->assertSession()->pageTextContains('Event Income Summary');
   }
 
