@@ -170,13 +170,15 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
   protected $contributionID;
 
   /**
-   * Get the contribution id that has been created or is being edited.
+   * Get the contribution ID.
    *
-   * @internal - not supported for outside core.
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
    *
    * @return int|null
    */
-  protected function getContributionID(): ?int {
+  public function getContributionID(): ?int {
     return $this->contributionID;
   }
 
