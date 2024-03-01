@@ -862,7 +862,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Pcp' => 'PCP',
       'Rule' => 'DedupeRule',
       'RuleGroup' => 'DedupeRuleGroup',
-      'SmsProvider' => 'Provider',
     ];
 
     $usableName = $entitiesWithNamingIssues[$entityName] ?? $entityName;

@@ -19,6 +19,6 @@ namespace Civi\Api4;
  * @since 5.69
  * @package Civi\Api4
  */
-class Provider extends Generic\DAOEntity {
+class SmsProvider extends Generic\DAOEntity {
 
 }
