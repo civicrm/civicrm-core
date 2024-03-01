@@ -18,6 +18,7 @@ class Oembed extends AutoService {
 
   public function create(string $path, array $query = [], array $options = []): array {
     $options = $this->normalizeOptions($options);
+    $query = $this->findPropagatedParams($query);
 
     $route = \CRM_Core_Menu::get($path);
     $result = [
@@ -60,6 +61,7 @@ class Oembed extends AutoService {
    */
   public function createLinkTags(string $path, array $query = [], array $options = []): string {
     $oembed = static::create($path, $query);
+    $query = $this->findPropagatedParams($query);
     $url = \Civi::url('frontend://civicrm/oembed', 'a')->addQuery([
       'url' => (string) \Civi::url('frontend://' . $path, 'a')->addQuery($query),
     ]);
@@ -89,6 +91,33 @@ class Oembed extends AutoService {
     $value = max($value, $this->minPixels);
     $value = min($value, $this->maxPixels);
     return $value;
+  }
+
+  /**
+   * Identify any query parameters that should be preserved/propagated to the equivalent oEmbed request.
+   *
+   * Note that support for this may vary by oEmbed client. When using <LINK>-based discovery,
+   * some clients (eg WordPress) may interject with their preferred value of `url=XYZ`.
+   */
+  public function findPropagatedParams(array $query): array {
+    $urlVar = \CRM_Core_Config::singleton()->userFrameworkURLVar;
+    $result = [];
+    foreach ($query as $key => $value) {
+      if ($key[0] !== '_' && !in_array($key, [$urlVar])) {
+        $result[$key] = $value;
+      }
+    }
+    return $result;
+  }
+
+  /**
+   * Do we permit embedding of this route?
+   *
+   * @param string $path
+   * @return bool
+   */
+  public function isAllowedRoute(string $path): bool {
+    return \Civi::service('iframe.router')->isAllowedRoute($path) && !preg_match(';^civicrm/(ajax|asset);', $path);
   }
 
 }

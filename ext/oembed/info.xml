@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <extension key="oembed" type="module">
   <file>oembed</file>
-  <name>oembed</name>
+  <name>oEmbed</name>
   <description>Export CiviCRM content using the oEmbed protocol</description>
   <license>AGPL-3.0</license>
   <maintainer>
@@ -39,5 +39,6 @@
     <mixin>smarty-v2@1.0.1</mixin>
     <mixin>menu-xml@1.0.0</mixin>
     <mixin>scan-classes@1.0.0</mixin>
+    <mixin>setting-admin@1.0.1</mixin>
   </mixins>
 </extension>

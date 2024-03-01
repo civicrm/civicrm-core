@@ -46,40 +46,6 @@ class CRM_Oembed_Page_OembedTest extends \PHPUnit\Framework\TestCase implements 
     $this->assertStringContainsString('Unrecognized host', (string) $response->getBody());
   }
 
-  public function testShare_default() {
-    $pageUrl = Civi::url('frontend://civicrm/contribute/transact?reset=1&id=1');
-    $oembedUrl = Civi::url('frontend://civicrm/oembed?format=share')->addQuery([
-      'url' => $pageUrl,
-    ]);
-    $response = $this->client->sendRequest(new Request('GET', (string) $oembedUrl));
-    $this->assertEquals(200, $response->getStatusCode());
-    $responseBody = (string) $response->getBody();
-    $doc = \phpQuery::newDocument($responseBody, 'text/html');
-
-    $link = $doc->find('link[type=application/json+oembed]');
-    $this->assertMatchesRegularExpression(';civicrm/oembed.url=http.*civicrm%2Fcontribute%2Ftransact%26reset%3D1%26id%3D1&format=json;', $link->attr('href'));
-
-    $link = $doc->find('link[type=text/xml+oembed]');
-    $this->assertMatchesRegularExpression(';civicrm/oembed.url=http.*civicrm%2Fcontribute%2Ftransact%26reset%3D1%26id%3D1&format=xml;', $link->attr('href'));
-  }
-
-  public function testShare_1024() {
-    $pageUrl = Civi::url('frontend://civicrm/contribute/transact?reset=1&id=1');
-    $oembedUrl = Civi::url('frontend://civicrm/oembed?format=share&maxwidth=1024&maxheight=768')->addQuery([
-      'url' => $pageUrl,
-    ]);
-    $response = $this->client->sendRequest(new Request('GET', (string) $oembedUrl));
-    $this->assertEquals(200, $response->getStatusCode());
-    $responseBody = (string) $response->getBody();
-    $doc = \phpQuery::newDocument($responseBody, 'text/html');
-
-    $link = $doc->find('link[type=application/json+oembed]');
-    $this->assertMatchesRegularExpression(';civicrm/oembed.url=http.*civicrm%2Fcontribute%2Ftransact%26reset%3D1%26id%3D1&maxwidth=1024&maxheight=768&format=json;', $link->attr('href'));
-
-    $link = $doc->find('link[type=text/xml+oembed]');
-    $this->assertMatchesRegularExpression(';civicrm/oembed.url=http.*civicrm%2Fcontribute%2Ftransact%26reset%3D1%26id%3D1&maxwidth=1024&maxheight=768&format=xml;', $link->attr('href'));
-  }
-
   public function testJson() {
     $pageUrl = Civi::url('frontend://civicrm/contribute/transact?reset=1&id=1');
     $oembedUrl = Civi::url('frontend://civicrm/oembed?format=json')->addQuery([
