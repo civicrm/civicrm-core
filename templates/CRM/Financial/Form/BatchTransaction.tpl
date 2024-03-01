@@ -81,7 +81,7 @@
 <script type="text/javascript">
 CRM.$(function($) {
   CRM.$('#_qf_BatchTransaction_submit-top, #_qf_BatchTransaction_submit-bottom').click(function() {
-    CRM.$('.crm-batch_transaction_search-accordion:not(.collapsed)').crmAccordionToggle();
+    CRM.$('.crm-batch_transaction_search-accordion[open]').prop('open', false);
   });
   var batchStatus = {/literal}{$statusID}{literal};
   {/literal}{if $validStatus}{literal}

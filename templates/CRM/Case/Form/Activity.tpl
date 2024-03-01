@@ -268,10 +268,10 @@
   {if $action neq 8 and $action neq 32768 and empty($activityTypeFile)}
   <script type="text/javascript">
     {if $searchRows}
-      cj('#sendcopy').crmAccordionToggle();
+      cj('#sendcopy').prop('open', function(i, val) {return !val;});
     {/if}
 
-    cj('#follow-up').crmAccordionToggle();
+    cj('#follow-up').prop('open', function(i, val) {return !val;});
   </script>
   {/if}
 

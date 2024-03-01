@@ -134,13 +134,13 @@
   // bind first click of accordion header to load crm-accordion-body with snippet
   // everything else taken care of by $().crm-accordions()
   CRM.$(function($) {
-    $('.crm-ajax-accordion .crm-accordion-header').one('click', function() {
+    $('.crm-ajax-accordion summary').one('click', function() {
       loadPanes($(this).attr('id'));
     });
     $('#currency').on('change', function() {
       replaceCurrency($('#currency option:selected').text());
     });
-    $('.crm-ajax-accordion:not(.collapsed) .crm-accordion-header').each(function(index) {
+    $('.crm-ajax-accordion[open] summary').each(function(index) {
       loadPanes($(this).attr('id'));
     });
 

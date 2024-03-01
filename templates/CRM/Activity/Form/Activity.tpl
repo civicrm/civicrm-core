@@ -208,7 +208,7 @@
             $('.crm-accordion-body', $form).each( function() {
               //open tab if form rule throws error
               if ( $(this).children( ).find('span.crm-error').text( ).length > 0 ) {
-                $(this).parent('details:not([open])').crmAccordionToggle();
+                $(this).parent('details').prop('open', true);
               }
             });
             function toggleMultiActivityCheckbox() {
