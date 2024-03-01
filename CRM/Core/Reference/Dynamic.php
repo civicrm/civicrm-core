@@ -103,7 +103,7 @@ EOS;
     // Look up option value for this entity. It's usually the table name, but not always.
     // If the lookup fails (some entities are missing the option list for the ref column),
     // then fall back on the table name.
-    $targetEntity = CRM_Core_DAO_AllCoreTables::getBriefName(get_class($targetDao));
+    $targetEntity = CRM_Core_DAO_AllCoreTables::getEntityNameForClass(get_class($targetDao));
     $targetEntities = $this->getTargetEntities();
     $targetValue = array_search($targetEntity, $targetEntities) ?: $targetDao::getTableName();
 
