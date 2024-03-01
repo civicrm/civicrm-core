@@ -95,8 +95,9 @@ trait CRM_Custom_Form_CustomDataTrait {
         $this->registerFileField([$elementName]);
       }
       // Get any values from the POST & cache them so that they can be retrieved from the
-      // CustomDataByType form.
-      $formValues[$elementName] = CRM_Utils_String::purifyHTML($this->getSubmitValue($elementName));
+      // CustomDataByType form in it's setDefaultValues() function - otherwise it cannot reload the
+      // values that were just entered if validation fails.
+      $formValues[$elementName] = is_string($this->getSubmitValue($elementName)) ? CRM_Utils_String::purifyHTML($this->getSubmitValue($elementName)) : $this->getSubmitValue($elementName);
     }
     $qf = $this->get('qfKey');
     $this->assign('qfKey', $qf);
