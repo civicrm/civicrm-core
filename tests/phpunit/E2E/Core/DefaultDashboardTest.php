@@ -61,7 +61,7 @@ class DefaultDashboardTest extends \MinkBase {
 
     $this->visit(Civi::url('backend://civicrm/dashboard'));
     $session->wait(5000, "document.getElementsByClassName('crm-hover-button').length");
-    $inactiveDashletLink = $page->find('xpath', '//a[contains(@class, "crm-hover-button")]')->click();
+    $page->find('xpath', '//a[contains(@class, "crm-hover-button")]')->click();
     
     file_put_contents('/tmp/test-dashboard.png', $this->mink->getSession()->getDriver()->getScreenshot());
     $this->assertSession()->pageTextContains('Event Income Summary');
