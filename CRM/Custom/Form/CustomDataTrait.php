@@ -82,6 +82,7 @@ trait CRM_Custom_Form_CustomDataTrait {
       }
     }
 
+    $formValues = [];
     foreach ($fields as $field) {
       $suffix = $customGroupSuffixes[$field['table_name']];
       $elementName = 'custom_' . $field['custom_field_id'] . $suffix;
@@ -93,7 +94,13 @@ trait CRM_Custom_Form_CustomDataTrait {
       if ($field['input_type'] === 'File') {
         $this->registerFileField([$elementName]);
       }
+      // Get any values from the POST & cache them so that they can be retrieved from the
+      // CustomDataByType form.
+      $formValues[$elementName] = CRM_Utils_String::purifyHTML($this->getSubmitValue($elementName));
     }
+    $qf = $this->get('qfKey');
+    $this->assign('qfKey', $qf);
+    Civi::cache('customData')->set($qf, $formValues);
   }
 
 }
