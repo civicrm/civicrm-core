@@ -554,17 +554,17 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       return NULL;
     }
     $link['text'] = $text ?? $this->replaceTokens($link['text'], $data, 'view');
-    // Will return null if `$link[path]` is empty or if any tokens do not resolve
-    $path = $this->replaceTokens($link['path'], $data, 'url');
-    if ($path) {
-      $link['url'] = $this->getUrl($path);
-      $keys = ['url', 'text', 'title', 'target', 'icon', 'style', 'autoOpen'];
-    }
-    elseif (!empty($link['task'])) {
+    if (!empty($link['task'])) {
       $keys = ['task', 'text', 'title', 'icon', 'style'];
     }
     else {
-      return NULL;
+      $path = $this->replaceTokens($link['path'], $data, 'url');
+      if (!$path) {
+        // Return null if `$link[path]` is empty or if any tokens do not resolve
+        return NULL;
+      }
+      $link['url'] = $this->getUrl($path);
+      $keys = ['url', 'text', 'title', 'target', 'icon', 'style', 'autoOpen'];
     }
     $link = array_intersect_key($link, array_flip($keys));
     return array_filter($link, function($value) {
@@ -793,7 +793,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
           $data = \CRM_Utils_JS::getRawProps($task['crmPopup']['data']);
           // Find the special key that combines selected ids and replace it with id token
           $idsKey = array_search("ids.join(',')", $data);
-          unset($data[$idsKey]);
+          unset($data[$idsKey], $link['task']);
           $amp = strpos($link['path'], '?') ? '&' : '?';
           $link['path'] .= $amp . $idField . '=[' . $link['prefix'] . $idKey . ']';
           // Add the rest of the data items
