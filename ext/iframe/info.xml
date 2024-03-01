@@ -2,7 +2,7 @@
 <extension key="iframe" type="module">
   <file>iframe</file>
   <name>IFrame Connector</name>
-  <description>Enable external websites to embed CiviCRM pages using an HTML &lt;IFRAME&gt;.</description>
+  <description>Enable external websites to embed CiviCRM pages using an HTML IFRAME.</description>
   <license>AGPL-3.0</license>
   <maintainer>
     <author>Tim Otten</author>
