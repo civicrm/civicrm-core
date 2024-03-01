@@ -40,20 +40,21 @@
     </div>
   </div>
 </details>
-<div id="editMessageDetails" class="section">
-  {if call_user_func(array('CRM_Core_Permission','check'), 'edit message templates')}
-      <div id="updateDetails" class="section" >
-    {$form.updateTemplate.html}&nbsp;{$form.updateTemplate.label}
-      </div>
-      <div class="section">
-    {$form.saveTemplate.html}&nbsp;{$form.saveTemplate.label}
-      </div>
-  {/if}
+
+<div id="editMessageDetails">
+  <div id="updateDetails" >
+    {if array_key_exists('updateTemplate', $form)}{$form.updateTemplate.html}&nbsp;{$form.updateTemplate.label}{/if}
+  </div>
+  <div>
+    {if array_key_exists('saveTemplate', $form)}{$form.saveTemplate.html}&nbsp;{$form.saveTemplate.label}{/if}
+  </div>
 </div>
 
 <div id="saveDetails" class="section">
-   <div class="label">{$form.saveTemplateName.label}</div>
-   <div class="content">{$form.saveTemplateName.html|crmAddClass:huge}</div>
+  {if array_key_exists('saveTemplateName', $form)}
+    <div class="label">{$form.saveTemplateName.label}</div>
+    <div class="content">{$form.saveTemplateName.html|crmAddClass:huge}</div>
+  {/if}
 </div>
 
 {if !$noAttach}
