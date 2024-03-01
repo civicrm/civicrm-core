@@ -24,7 +24,7 @@ class CiviTestSMSProvider extends CRM_SMS_Provider {
 
   public static function &singleton($providerParams = [], $force = FALSE) {
     if (isset($providerParams['provider'])) {
-      $providers = CRM_SMS_BAO_Provider::getProviders(NULL, ['name' => $providerParams['provider']]);
+      $providers = CRM_SMS_BAO_SmsProvider::getProviders(NULL, ['name' => $providerParams['provider']]);
       $provider = current($providers);
       $providerID = $provider['id'] ?? NULL;
     }
@@ -37,7 +37,7 @@ class CiviTestSMSProvider extends CRM_SMS_Provider {
     if (!isset(self::$_singleton[$cacheKey]) || $force) {
       $provider = [];
       if ($providerID) {
-        $provider = CRM_SMS_BAO_Provider::getProviderInfo($providerID);
+        $provider = CRM_SMS_BAO_SmsProvider::getProviderInfo($providerID);
       }
       self::$_singleton[$cacheKey] = new CiviTestSMSProvider($provider, $skipAuth);
     }

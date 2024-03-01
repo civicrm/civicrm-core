@@ -467,9 +467,9 @@ return [
     'class' => 'CRM_Financial_DAO_PaymentToken',
     'table' => 'civicrm_payment_token',
   ],
-  'CRM_SMS_DAO_Provider' => [
-    'name' => 'Provider',
-    'class' => 'CRM_SMS_DAO_Provider',
+  'CRM_SMS_DAO_SmsProvider' => [
+    'name' => 'SmsProvider',
+    'class' => 'CRM_SMS_DAO_SmsProvider',
     'table' => 'civicrm_sms_provider',
   ],
   'CRM_Member_DAO_MembershipType' => [

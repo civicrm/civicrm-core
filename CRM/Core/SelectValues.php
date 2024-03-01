@@ -494,7 +494,7 @@ class CRM_Core_SelectValues {
   }
 
   public static function smsProvider(): array {
-    $providers = CRM_SMS_BAO_Provider::getProviders(NULL, NULL, TRUE, 'is_default desc, title');
+    $providers = CRM_SMS_BAO_SmsProvider::getProviders(NULL, NULL, TRUE, 'is_default desc, title');
     $result = [];
     foreach ($providers as $provider) {
       $result[] = [
