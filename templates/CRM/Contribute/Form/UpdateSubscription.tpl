@@ -48,7 +48,7 @@
   </table>
 
   {if !$self_service}
-    {include file="CRM/common/customDataBlock.tpl"}
+    {include file="CRM/common/customDataBlock.tpl" groupID='' customDataType='ContributionRecur' customDataSubType=false entityID=$pledgeID cid=false}
   {/if}
 
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
