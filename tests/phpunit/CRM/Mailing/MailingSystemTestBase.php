@@ -18,6 +18,7 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\MailSettings;
 use GuzzleHttp\Psr7\Request;
 
 /**
@@ -41,7 +42,6 @@ abstract class CRM_Mailing_MailingSystemTestBase extends CiviUnitTestCase {
     parent::setUp();
     $this->useTransaction();
     CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0;
-    CRM_Core_BAO_MailSettings::defaultDAO(TRUE);
 
     $this->_groupID = $this->groupCreate();
     $this->createContactsInGroup(2, $this->_groupID);
@@ -142,9 +142,11 @@ abstract class CRM_Mailing_MailingSystemTestBase extends CiviUnitTestCase {
     $this->assertEquals(2, $getMembers('Removed')->count());
   }
 
-  public function testHttpUnsubscribe_altVerp(): void {
-    CRM_Core_DAO::executeQuery('UPDATE civicrm_mail_settings SET localpart = "aeiou.aeiou-"');
-    CRM_Core_BAO_MailSettings::defaultDAO(TRUE);
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  public function testHttpUnsubscribeChangedVerpSeparator(): void {
+    MailSettings::update(FALSE)->setValues(['localpart' => "aeiou.aeiou-"])->addWhere('id', '>', 0)->execute();
 
     try {
       Civi::settings()->set('verpSeparator', '-');
