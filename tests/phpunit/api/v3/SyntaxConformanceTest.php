@@ -1095,6 +1095,10 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   /**
    * Ensure that the "get" operation accepts limiting the #result records.
    *
+   * As the test is slow we mark it ornery to suppress in PR runs.
+   *
+   * @group ornery
+   *
    * @dataProvider entities_getSqlOperators
    *
    * @param string $entityName
@@ -1234,11 +1238,16 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   /* ---- testing the _create ---- */
 
   /**
+   * As the test is slow we mark it ornery to suppress in PR runs.
+   *
+   * @group ornery
+   *
    * @dataProvider toBeSkipped_create
    * entities that don't need a create action
+   *
    * @param $Entity
    */
-  public function testNotImplemented_create($Entity) {
+  public function testNotImplementedCreate($Entity) {
     $result = civicrm_api($Entity, 'Create', ['version' => 3]);
     $this->assertEquals(1, $result['is_error']);
     $this->assertStringContainsString(strtolower("API ($Entity, Create) does not exist"), strtolower($result['error_message']));
@@ -1540,10 +1549,15 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   }
 
   /**
+   *  As the test is slow we mark it ornery to suppress in PR runs.
+   *
+   * @group ornery
+   *
    * @dataProvider entities_delete
+   *
    * @param $Entity
    */
-  public function testEmptyParam_delete($Entity) {
+  public function testEmptyParamDelete($Entity) {
     if (in_array($Entity, $this->toBeImplemented['delete'])) {
       // $this->markTestIncomplete("civicrm_api3_{$Entity}_delete to be implemented");
       return;
