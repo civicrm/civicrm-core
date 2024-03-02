@@ -29,7 +29,7 @@
         </tr>
       </table>
       </form>
-    </div><!-- /.crm-accordion-body -->
+    </div>
   </details>
   <table class="contact-activity-selector-{$context} crm-ajax-table" style="width: 100%;">
     <thead>

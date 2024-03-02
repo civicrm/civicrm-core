@@ -89,7 +89,7 @@
               <tr><td class="label">{$form.$fieldName.label}<span class="crm-marker"> *</span></td><td>{$form.$fieldName.html}</td></tr>
             {/foreach}
             </table>
-         </div><!-- /.crm-accordion-body -->
+         </div>
         </details>
 
     </div>

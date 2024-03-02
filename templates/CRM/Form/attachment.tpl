@@ -109,7 +109,7 @@
       {/if}
       </table>
     </div>
-  </div><!-- /.crm-accordion-body -->
+  </div>
   </details>
     {literal}
     <script type="text/javascript">

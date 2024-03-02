@@ -31,7 +31,7 @@
        <span class="label">{$form.deceased_date.label}</span>
        <span class="fields">{$form.deceased_date.html}</span>
   </div>
- </div><!-- /.crm-accordion-body -->
+ </div>
 </details>
 
 {literal}

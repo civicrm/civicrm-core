@@ -40,7 +40,7 @@
         <td>{$form.from_email_address.html}</td>
       </tr>
     </table>
-  </div><!-- /.crm-accordion-body -->
+  </div>
 </details>
 
 {include file="CRM/Contact/Form/Task/PDFLetterCommon.tpl"}

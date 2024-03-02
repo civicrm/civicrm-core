@@ -73,7 +73,7 @@
           {/if}
           <div class="spacer"></div>
         </div>
-      </div><!-- /.crm-accordion-body -->
+      </div>
     </details>
 
     {foreach from = $editOptions item = "title" key="name"}

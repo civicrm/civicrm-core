@@ -185,7 +185,7 @@
         {ts}Are you sure you want to end this relationship?{/ts}
       </div>
 
-   </div><!-- /.crm-accordion-body -->
+   </div>
   </details>
 
   {if $hasAccessToAllCases}
@@ -252,7 +252,7 @@
     {/literal}
   {/if}
 
-  </div><!-- /.crm-accordion-body -->
+  </div>
 </details>
 
 {/if} {* other relationship section ends *}
@@ -295,7 +295,7 @@
     </a>
   </div>
 
- </div><!-- /.crm-accordion-body -->
+ </div>
 </details>
 
 <div id="manageTagsDialog" class="hiddenElement">

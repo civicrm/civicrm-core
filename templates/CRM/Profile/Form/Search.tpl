@@ -83,7 +83,7 @@
   </div>
   {/if}
   {if $groupId}
-  </div><!-- /.crm-accordion-body -->
+  </div>
   </details>
   {/if}
 

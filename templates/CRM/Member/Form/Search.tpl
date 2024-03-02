@@ -23,7 +23,7 @@
           </tr>
       </table>
   {/strip}
-   </div><!-- /.crm-accordion-body -->
+   </div>
   </details>
 </div><!-- /.crm-form-block -->
 <div class="crm-content-block">

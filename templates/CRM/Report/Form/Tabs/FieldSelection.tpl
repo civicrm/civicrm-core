@@ -34,7 +34,7 @@
         </tr>
       </table>
       {if !empty($grpFields.use_accordian_for_field_selection)}
-        </div><!-- /.crm-accordion-body -->
+        </div>
         </details>
       {/if}
     {/foreach}

@@ -54,7 +54,7 @@
             {if !empty($errorDetails)}
                 <div class="crm-section">{ts}Additional Details:{/ts} {$errorDetails|purify}</div>
             {/if}
-         </div><!-- /.crm-accordion-body -->
+         </div>
         </details>
     {/if}
     <p><a href="{$config->userFrameworkBaseURL}" title="{ts}Main Menu{/ts}">{ts}Return to home page.{/ts}</a></p>

@@ -24,5 +24,5 @@
        </td>
      </tr>
    </table>
- </div><!-- /.crm-accordion-body -->
+ </div>
 </details>

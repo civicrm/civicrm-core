@@ -160,7 +160,7 @@
         {if $activityTypeFile EQ 'ChangeCaseStatus'
         || $activityTypeFile EQ 'ChangeCaseType'
         || $activityTypeFile EQ 'ChangeCaseStartDate'}
-          </div><!-- /.crm-accordion-body -->
+          </div>
         </details>
         {* End of Activity Details accordion tab *}
       {/if}
@@ -201,7 +201,7 @@
                   {/foreach}
                 </table>
               {/strip}
-            </div><!-- /.crm-accordion-body -->
+            </div>
           </details>
         </td>
       </tr>

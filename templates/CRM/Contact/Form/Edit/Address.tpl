@@ -71,7 +71,7 @@
 
 {if $className eq 'CRM_Contact_Form_Contact' && $title}
 </div>
- </div><!-- /.crm-accordion-body -->
+ </div>
 </details>
 {/if}
 {literal}

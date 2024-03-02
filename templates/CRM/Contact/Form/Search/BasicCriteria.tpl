@@ -79,7 +79,7 @@
             </div>
         {/if}
         <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
-    </div><!-- /.crm-accordion-body -->
+    </div>
     </details>
 </div><!-- /.crm-form-block -->
 {/strip}

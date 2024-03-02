@@ -29,7 +29,7 @@
           {/if}
         </tr>
       </table>
-    </div><!-- /.crm-accordion-body -->
+    </div>
   </details>
 </div>
 <div class="spacer"></div>

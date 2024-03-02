@@ -69,7 +69,6 @@
         <div class="crm-accordion-body">
           <div class="crm-contact_smartgroup" style="min-height: 3em;"></div>
         </div>
-        <!-- /.crm-accordion-body -->
       </details>
     </div>
   {/if}

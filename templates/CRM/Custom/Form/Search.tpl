@@ -48,7 +48,7 @@
           </tr>
       {/foreach}
      </table>
-    </div><!-- /.crm-accordion-body -->
+    </div>
   </details>
 
 {/foreach}

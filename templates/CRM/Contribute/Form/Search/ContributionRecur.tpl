@@ -78,7 +78,6 @@
       {/if}
     </table>
   </div>
-<!-- /.crm-accordion-body -->
 </details>
 
 

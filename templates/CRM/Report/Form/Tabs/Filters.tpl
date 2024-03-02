@@ -49,7 +49,7 @@
         {/foreach}
         </table>
         {if $filterGroup.use_accordion_for_field_selection}
-            </div><!-- /.crm-accordion-body -->
+            </div>
           </details>
         {/if}
       {/foreach}

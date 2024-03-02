@@ -23,7 +23,7 @@
     <div class='html'>
       {$form.html_message.html}<br />
     </div>
-  </div><!-- /.crm-accordion-body -->
+  </div>
 </details>
 
 <details class="crm-accordion-bold crm-plaint_text_email-accordion">
@@ -38,7 +38,7 @@
     <div class='text'>
       {$form.text_message.html}<br />
     </div>
-  </div><!-- /.crm-accordion-body -->
+  </div>
 </details>
 <div id="editMessageDetails" class="section">
   {if call_user_func(array('CRM_Core_Permission','check'), 'edit message templates')}

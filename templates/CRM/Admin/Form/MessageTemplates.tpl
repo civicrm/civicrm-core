@@ -79,7 +79,7 @@
           <div class='html'>
             {$form.msg_html.html|crmAddClass:huge}
           </div>
-        </div><!-- /.crm-accordion-body -->
+        </div>
       </details>
 
       <details id="msg_text_section" class="crm-accordion-bold crm-plaint_text_email-accordion " open>
@@ -96,7 +96,7 @@
           <div class='text'>
             {$form.msg_text.html|crmAddClass:huge}
           </div>
-        </div><!-- /.crm-accordion-body -->
+        </div>
       </details>
 
       <details id="pdf_format" class="crm-accordion-bold crm-html_email-accordion " open>
@@ -110,7 +110,7 @@
             {help id="id-msg-template" file="CRM/Contact/Form/Task/PDFLetterCommon.hlp"}
             <div class="description">{ts}Page format to use when creating PDF files using this template.{/ts}</div>
           </div>
-        </div><!-- /.crm-accordion-body -->
+        </div>
       </details>
 
       {if !$isWorkflow}

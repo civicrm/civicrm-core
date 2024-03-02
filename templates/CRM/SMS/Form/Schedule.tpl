@@ -38,7 +38,7 @@
     <tr><td class="label">{if $preview.type eq 'html'}{ts}SMS HTML:{/ts}{else}{ts}SMS Text:{/ts}{/if}</td><td><iframe height="300" src="{$preview.viewURL}" width="80%"><a href="{$preview.viewURL}" onclick="window.open(this.href); return false;">{ts}SMS Text:{/ts}</a></iframe></td></tr>
           {/if}
         </table>
-    </div><!-- /.crm-accordion-body -->
+    </div>
 </details>
 {/if}
 

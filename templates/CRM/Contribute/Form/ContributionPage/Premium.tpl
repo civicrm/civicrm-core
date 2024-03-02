@@ -103,7 +103,6 @@
           </tr>
         </table>
       </div>
-      <!-- /.crm-accordion-body -->
     </details>
 
     {* include premium product templates *}

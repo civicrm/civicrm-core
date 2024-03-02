@@ -25,7 +25,7 @@
             </tr>
             </table>
         {/strip}
-      </div><!-- /.crm-accordion-body -->
+      </div>
     </details>
 </div><!-- /.crm-form-block -->
 {if $rowsEmpty || $rows}

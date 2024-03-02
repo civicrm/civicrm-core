@@ -82,7 +82,7 @@
   </summary>
   <div class="crm-accordion-body">
     <div id='document-preview'></div>
-  </div><!-- /.crm-accordion-body -->
+  </div>
 </details>
 
 <details class="crm-accordion-bold crm-html_email-accordion " open>
@@ -115,7 +115,7 @@
   {/if}
 </div>
 
-  </div><!-- /.crm-accordion-body -->
+  </div>
 </details>
 
 <table class="form-layout-compressed">

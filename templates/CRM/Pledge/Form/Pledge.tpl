@@ -179,7 +179,7 @@
   </summary>
  <div class="crm-accordion-body">
        <div class="{$paneValue.id}"></div>
- </div><!-- /.crm-accordion-body -->
+ </div>
 </details>
 
 {/foreach}

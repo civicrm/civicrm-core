@@ -106,6 +106,6 @@
           <td>{$form.is_opt_out.html} {$form.is_opt_out.label} {help id="id-optOut" file="CRM/Contact/Form/Contact.hlp"}</td>
         </tr>
     </table>
- </div><!-- /.crm-accordion-body -->
+ </div>
 </details>
 {include file="CRM/Contact/Form/Edit/CommunicationPreferences.js.tpl"}

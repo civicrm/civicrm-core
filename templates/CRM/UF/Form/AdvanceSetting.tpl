@@ -86,7 +86,7 @@
         </tr>
     </table>
     </div><!-- / .crm-block -->
-  </div><!-- /.crm-accordion-body -->
+  </div>
 </details>
 {literal}
   <script type="text/javascript">

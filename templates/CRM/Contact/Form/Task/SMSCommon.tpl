@@ -22,7 +22,7 @@
     <div class='text'>
   {$form.sms_text_message.html}<br />
     </div>
-  </div><!-- /.crm-accordion-body -->
+  </div>
 </details>
 <div id="SMSeditMessageDetails" class="section">
   <div id="SMSupdateDetails" class="section" >

@@ -75,7 +75,7 @@
                <td>{$form.newGroupType.html}</td>
              </tr>
             </table>
- </div><!-- /.crm-accordion-body -->
+ </div>
 </details>
 
 
@@ -90,7 +90,7 @@
         <div class="form-item">
         <table><tr><td style="width: 14em;"></td><td>{$form.groups.html}</td></tr></table>
         </div>
- </div><!-- /.crm-accordion-body -->
+ </div>
 </details>
 
     {* Tag options *}
@@ -113,7 +113,7 @@
            </tr>
         </table>
     </div>
- </div><!-- /.crm-accordion-body -->
+ </div>
 </details>
     {* Existing Tag Imported Contact *}
 
@@ -130,7 +130,7 @@
             </td>
           </tr>
         </table>
- </div><!-- /.crm-accordion-body -->
+ </div>
 </details>
 </div> {* End of preview-info div. We hide this on form submit. *}
 
