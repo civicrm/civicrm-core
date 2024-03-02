@@ -87,6 +87,12 @@ class ValidateFieldsSubscriber extends Generic\AbstractPrepareSubscriber {
           }
           break;
 
+        case 'float':
+          if (\CRM_Utils_Rule::numeric($value)) {
+            return TRUE;
+          }
+          break;
+
         case 'mixed':
           return TRUE;
 
