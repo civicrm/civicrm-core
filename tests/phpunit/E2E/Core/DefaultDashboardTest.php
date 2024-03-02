@@ -40,7 +40,7 @@ class DefaultDashboardTest extends \Civi\Test\MinkBase {
       ->execute();
 
     // add a product using USD
-    $results = \Civi\Api4\Product::create(TRUE)
+    $result1 = \Civi\Api4\Product::create(TRUE)
       ->addValue('name', '"Takeya Actives Insulated Water Bottle"')
       ->addValue('description', '"Great spout on water bottle with flip lid."')
       ->addValue('sku', '"WBOT-101"')
@@ -49,9 +49,11 @@ class DefaultDashboardTest extends \Civi\Test\MinkBase {
       ->addValue('currency', 'USD')
       ->addValue('is_active', TRUE)
       ->execute();
+    
+    $gid1 = $result1[0]['id'];
 
     // add a product using EUR
-    $results = \Civi\Api4\Product::create(TRUE)
+    $results2 = \Civi\Api4\Product::create(TRUE)
       ->addValue('name', '"Black Bennie"')
       ->addValue('description', '"Cotton beannie with logo."')
       ->addValue('sku', '"BEAN101"')
@@ -61,20 +63,14 @@ class DefaultDashboardTest extends \Civi\Test\MinkBase {
       ->addValue('is_active', TRUE)
       ->execute();
 
-    // load the Manage Product form
+    $gid2 = $results2[0]['id'];
+
     $this->visit(Civi::url('backend://civicrm/admin/contribute/managePremiums'));
+    $session->wait(5000, 'document.querySelectorAll("tr[data-entity-id]").length > 0');
+    $this->createScreenshot('/tmp/test-searchProductPage.png');
 
-    // print the screenshot
-    $session->wait(5000, 'document.querySelector("afsearch-premium-products") != null');
-    //$session->wait(5000, FALSE);
-
-    file_put_contents('/tmp/test-searchProductPage.png', $this->mink->getSession()->getDriver()->getScreenshot());
-
-    $afformTable = $page->find('xpath', '//afsearch-premium-products//table');
-    //$rows = $afformTable->findAll('css', 'tbody tr');
-
-    // asset tha that the currency for product A is USD
-    // $this->assertSession()->pageTextContains('Event Income Summary');
+    $this->assertSession()->elementTextContains('xpath', "//tr[@data-entity-id = '$gid1']", "$");
+    $this->assertSession()->elementTextContains('xpath', "//tr[@data-entity-id = '$gid2']", "€");
 
   }
 
