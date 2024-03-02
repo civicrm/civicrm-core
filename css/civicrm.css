@@ -2106,7 +2106,7 @@ a.crm-i:hover {
   content: "\f059";
 }
 
-div.crm-accordion-header a.helpicon {
+details > summary a.helpicon {
   color: inherit;
 }
 div.crm-master-accordion-header a.helpicon {
