@@ -25,20 +25,20 @@ class EntityTypesTest extends \PHPUnit\Framework\Assert {
   }
 
   public function testInstalled($cv): void {
-    $this->assertEquals(self::EXAMPLE_NAME, $cv->phpCall('CRM_Core_DAO_AllCoreTables::getBriefName', [self::EXAMPLE_DAO]));
+    $this->assertEquals(self::EXAMPLE_NAME, $cv->phpCall('CRM_Core_DAO_AllCoreTables::getEntityNameForClass', [self::EXAMPLE_DAO]));
     $this->assertEquals(self::EXAMPLE_TABLE, $cv->phpCall('CRM_Core_DAO_AllCoreTables::getTableForClass', [self::EXAMPLE_DAO]));
     $this->assertEquals(self::EXAMPLE_NAME, $cv->phpCall('CRM_Core_DAO_AllCoreTables::getEntityNameForTable', [self::EXAMPLE_TABLE]));
     $this->assertEquals('ShimThing ID', $cv->phpEval('return \CRM_Shimmy_DAO_ShimThing::fields()["id"]["title"];'));
   }
 
   public function testDisabled($cv): void {
-    $this->assertEquals(NULL, $cv->phpCall('CRM_Core_DAO_AllCoreTables::getBriefName', [self::EXAMPLE_DAO]));
+    $this->assertEquals(NULL, $cv->phpCall('CRM_Core_DAO_AllCoreTables::getEntityNameForClass', [self::EXAMPLE_DAO]));
     $this->assertEquals(NULL, $cv->phpCall('CRM_Core_DAO_AllCoreTables::getTableForClass', [self::EXAMPLE_DAO]));
     $this->assertEquals(NULL, $cv->phpCall('CRM_Core_DAO_AllCoreTables::getEntityNameForTable', [self::EXAMPLE_TABLE]));
   }
 
   public function testUninstalled($cv): void {
-    $this->assertEquals(NULL, $cv->phpCall('CRM_Core_DAO_AllCoreTables::getBriefName', [self::EXAMPLE_DAO]));
+    $this->assertEquals(NULL, $cv->phpCall('CRM_Core_DAO_AllCoreTables::getEntityNameForClass', [self::EXAMPLE_DAO]));
     $this->assertEquals(NULL, $cv->phpCall('CRM_Core_DAO_AllCoreTables::getTableForClass', [self::EXAMPLE_DAO]));
     $this->assertEquals(NULL, $cv->phpCall('CRM_Core_DAO_AllCoreTables::getEntityNameForTable', [self::EXAMPLE_TABLE]));
   }
