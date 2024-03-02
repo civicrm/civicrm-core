@@ -10,10 +10,10 @@
 {if $groupTree}
 {foreach from=$groupTree item=cd_edit key=group_id}
 
-  <div class="crm-accordion-wrapper crm-contactDetails-accordion {if $form.formName eq 'Advanced' AND $cd_edit.collapse_adv_display eq 1}collapsed{/if}" id="{$cd_edit.name}" >
-    <div class="crm-accordion-header">
+  <details class="crm-accordion-bold crm-contactDetails-accordion" id="{$cd_edit.name}"  {if $form.formName eq 'Advanced' AND $cd_edit.collapse_adv_display eq 1}{else}open{/if}>
+    <summary>
         {$cd_edit.title}
-    </div>
+    </summary>
     <div class="crm-accordion-body">
     <table class="form-layout-compressed">
     {foreach from=$cd_edit.fields item=element key=field_id}
@@ -48,8 +48,8 @@
           </tr>
       {/foreach}
      </table>
-    </div><!-- /.crm-accordion-body -->
-  </div><!-- /.crm-accordion-wrapper -->
+    </div>
+  </details>
 
 {/foreach}
   {if !empty($add_multivalue_js)}

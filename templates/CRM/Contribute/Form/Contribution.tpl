@@ -258,10 +258,10 @@
 
     <!-- start of soft credit -->
     {if !$payNow}
-      <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed {if $noSoftCredit}collapsed{/if}" id="softCredit">
-        <div class="crm-accordion-header">
+      <details class="crm-accordion-bold crm-accordion_title-accordion crm-accordion-processed" id="softCredit" {if $noSoftCredit}{else}open{/if}>
+        <summary>
           {ts}Soft Credit{/ts}&nbsp;{help id="id-soft_credit"}
-        </div>
+        </summary>
         <div class="crm-accordion-body">
           <table class="form-layout-compressed">
             <tr class="crm-contribution-form-block-soft_credit_to">
@@ -271,16 +271,16 @@
             </tr>
           </table>
         </div>
-      </div>
+      </details>
     {/if}
     <!-- end of soft credit -->
 
     <!-- start of PCP -->
     {if array_key_exists('pcp_made_through_id', $form) && !$payNow}
-      <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed {if $noPCP}collapsed{/if}" id="pcp">
-        <div class="crm-accordion-header">
+      <details class="crm-accordion-bold crm-accordion_title-accordion crm-accordion-processed" id="pcp" {if $noPCP}{else}open{/if}>
+        <summary>
           {ts}Personal Campaign Page{/ts}&nbsp;{help id="id-pcp"}
-        </div>
+        </summary>
         <div class="crm-accordion-body">
           <table class="form-layout-compressed">
             <tr class="crm-contribution-pcp-block crm-contribution-form-block-pcp_made_through_id">
@@ -310,7 +310,7 @@
             </tr>
           </table>
         </div>
-      </div>
+      </details>
       {include file="CRM/Contribute/Form/PCP.js.tpl"}
     {/if}
     <!-- end of PCP -->
@@ -329,10 +329,10 @@
           // bind first click of accordion header to load crm-accordion-body with snippet
           // everything else taken care of by cj().crm-accordions()
           cj('#adjust-option-type').hide();
-          cj('.crm-ajax-accordion .crm-accordion-header').one('click', function() {
+          cj('.crm-ajax-accordion summary').one('click', function() {
             loadPanes(cj(this).attr('id'));
           });
-          cj('.crm-ajax-accordion:not(.collapsed) .crm-accordion-header').each(function(index) {
+          cj('.crm-ajax-accordion[open] summary').each(function(index) {
             loadPanes(cj(this).attr('id'));
           });
         });
@@ -402,17 +402,15 @@
         {/if}
       </script>
 
-      <div class="accordion ui-accordion ui-widget ui-helper-reset">
-        {* Additional Detail / Honoree Information / Premium Information *}
-        {foreach from=$allPanes key=paneName item=paneValue}
-          <div class="crm-accordion-wrapper crm-ajax-accordion crm-{$paneValue.id}-accordion {if $paneValue.open neq 'true'}collapsed{/if}">
-            <div class="crm-accordion-header" id="{$paneValue.id}">{$paneName}</div>
-            <div class="crm-accordion-body">
-              <div class="{$paneValue.id}"></div>
-            </div><!-- /.crm-accordion-body -->
-          </div><!-- /.crm-accordion-wrapper -->
-        {/foreach}
-      </div>
+      {* Additional Detail / Honoree Information / Premium Information *}
+      {foreach from=$allPanes key=paneName item=paneValue}
+        <details class="crm-accordion-bold crm-ajax-accordion crm-{$paneValue.id}-accordion" {if $paneValue.open neq 'true'}{else}open{/if}>
+          <summary  id="{$paneValue.id}">{$paneName}</summary>
+          <div class="crm-accordion-body">
+            <div class="{$paneValue.id}"></div>
+          </div>
+        </details>
+      {/foreach}
     {/if}
     {if $billing_address}
       <fieldset>

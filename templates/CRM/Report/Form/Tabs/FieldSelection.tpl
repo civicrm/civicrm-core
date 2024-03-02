@@ -13,10 +13,10 @@
       {assign  var="count" value=0}
       {* Wrap custom field sets in collapsed accordion pane. *}
       {if !empty($grpFields.use_accordian_for_field_selection)}
-        <div class="crm-accordion-wrapper crm-accordion collapsed">
-        <div class="crm-accordion-header">
+        <details class="crm-accordion-bold crm-accordion">
+        <summary>
           {$grpFields.group_title}
-        </div><!-- /.crm-accordion-header -->
+        </summary>
         <div class="crm-accordion-body">
       {/if}
       <table class="criteria-group">
@@ -34,8 +34,8 @@
         </tr>
       </table>
       {if !empty($grpFields.use_accordian_for_field_selection)}
-        </div><!-- /.crm-accordion-body -->
-        </div><!-- /.crm-accordion-wrapper -->
+        </div>
+        </details>
       {/if}
     {/foreach}
   </div>

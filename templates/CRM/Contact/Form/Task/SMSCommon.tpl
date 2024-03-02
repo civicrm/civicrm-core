@@ -9,10 +9,10 @@
 *}
 {*common template for compose sms*}
 
-<div class="crm-accordion-wrapper crm-plaint_text_sms-accordion ">
-<div class="crm-accordion-header">
+<details class="crm-accordion-bold crm-plaint_text_sms-accordion " open>
+<summary>
   {$form.sms_text_message.label}
-  </div><!-- /.crm-accordion-header -->
+  </summary>
  <div class="crm-accordion-body">
  <div><span id="char-count-message"></span> <span id="char-count-help">{help id="id-count-text" tplFile=$tplFile file="CRM/Contact/Form/Task/SMS.hlp"}</span></div>
    <div class="helpIcon" id="helptext">
@@ -22,9 +22,8 @@
     <div class='text'>
   {$form.sms_text_message.html}<br />
     </div>
-  </div><!-- /.crm-accordion-body -->
-</div><!-- /.crm-accordion-wrapper -->
-
+  </div>
+</details>
 <div id="SMSeditMessageDetails" class="section">
   <div id="SMSupdateDetails" class="section" >
     {if array_key_exists('SMSupdateTemplate', $form)}{$form.SMSupdateTemplate.html}&nbsp;{$form.SMSupdateTemplate.label}{/if}

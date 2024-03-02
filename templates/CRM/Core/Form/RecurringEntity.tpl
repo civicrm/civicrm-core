@@ -8,10 +8,10 @@
  +--------------------------------------------------------------------+
 *}
 
-<div class="crm-core-form-recurringentity-block crm-accordion-wrapper{if $recurringFormIsEmbedded && !$scheduleReminderId} collapsed{/if}" id="recurring-entity-block">
-  <div class="crm-accordion-header">
+<details class="crm-core-form-recurringentity-block crm-accordion-bold" id="recurring-entity-block" {if $recurringFormIsEmbedded && !$scheduleReminderId}{else}open{/if}>
+  <summary>
     {ts 1=$recurringEntityType}Repeat %1{/ts}
-  </div>
+  </summary>
   <div class="crm-accordion-body">
     <table class="form-layout-compressed">
       <tr class="crm-core-form-recurringentity-block-repetition_frequency">
@@ -60,7 +60,7 @@
       </div>
     {/if}
   </div>
-</div>
+</details>
 {literal}
 <script type="text/javascript">
 (function (_) {

@@ -134,13 +134,13 @@
   // bind first click of accordion header to load crm-accordion-body with snippet
   // everything else taken care of by $().crm-accordions()
   CRM.$(function($) {
-    $('.crm-ajax-accordion .crm-accordion-header').one('click', function() {
+    $('.crm-ajax-accordion summary').one('click', function() {
       loadPanes($(this).attr('id'));
     });
     $('#currency').on('change', function() {
       replaceCurrency($('#currency option:selected').text());
     });
-    $('.crm-ajax-accordion:not(.collapsed) .crm-accordion-header').each(function(index) {
+    $('.crm-ajax-accordion[open] summary').each(function(index) {
       loadPanes($(this).attr('id'));
     });
 
@@ -173,14 +173,14 @@
 
 <div class="accordion ui-accordion ui-widget ui-helper-reset">
 {foreach from=$allPanes key=paneName item=paneValue}
-<div class="crm-accordion-wrapper crm-ajax-accordion crm-{$paneValue.id}-accordion {if $paneValue.open neq 'true'}collapsed{/if}">
-<div class="crm-accordion-header" id="{$paneValue.id}">
+<details class="crm-accordion-bold crm-ajax-accordion crm-{$paneValue.id}-accordion" {if $paneValue.open neq 'true'}{else}open{/if}>
+<summary  id="{$paneValue.id}">
         {$paneName}
-  </div><!-- /.crm-accordion-header -->
+  </summary>
  <div class="crm-accordion-body">
        <div class="{$paneValue.id}"></div>
- </div><!-- /.crm-accordion-body -->
-</div><!-- /.crm-accordion-wrapper -->
+ </div>
+</details>
 
 {/foreach}
 </div>

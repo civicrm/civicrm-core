@@ -23,10 +23,10 @@
 
 
 <div id="id-additional" class="form-item">
-<div class="crm-accordion-wrapper ">
- <div class="crm-accordion-header">
+<details class="crm-accordion-bold " open>
+ <summary>
 {ts}Mailing Recipients{/ts}
- </div><!-- /.crm-accordion-header -->
+ </summary>
  <div class="crm-accordion-body">
   {strip}
 
@@ -46,8 +46,8 @@
   </table>
 
   {/strip}
- </div><!-- /.crm-accordion-body -->
-</div><!-- /.crm-accordion-wrapper -->
+ </div>
+</details>
 
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location=''}</div>
 </div>

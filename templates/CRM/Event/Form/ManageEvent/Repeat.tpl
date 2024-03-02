@@ -10,8 +10,8 @@
 <div class="crm-block crm-form-block crm-event-manage-repeat-form-block">
 {include file="CRM/Core/Form/RecurringEntity.tpl" recurringFormIsEmbedded=false}
 {if $rows}
-<div class="crm-block crm-manage-events crm-accordion-wrapper">
-  <div class="crm-accordion-header">{ts}Connected Repeating Events{/ts}</div>
+<details class="crm-block crm-manage-events crm-accordion-bold" open>
+  <summary>{ts}Connected Repeating Events{/ts}</summary>
   <div class="crm-accordion-body">
   {strip}
   {include file="CRM/common/jsortable.tpl"}
@@ -57,6 +57,6 @@
     </table>
   {/strip}
   </div>
-</div>
+</details>
 {/if}
 </div>
