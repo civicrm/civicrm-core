@@ -78,6 +78,17 @@
     <add>4.1</add>
   </field>
   <field>
+    <name>last_run_end</name>
+    <type>timestamp</type>
+    <default>NULL</default>
+    <required>false</required>
+    <comment>When did this cron entry last finish running</comment>
+    <html>
+      <label>Last Run End</label>
+    </html>
+    <add>5.72</add>
+  </field>
+  <field>
     <name>scheduled_run_date</name>
     <type>timestamp</type>
     <default>NULL</default>
