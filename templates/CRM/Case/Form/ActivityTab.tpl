@@ -53,7 +53,7 @@
               </tr>
             {/if}
           </table>
-        </div><!-- /.crm-accordion-body -->
+        </div>
       </details>
     {/if}
 
@@ -106,6 +106,6 @@
   </style>
 
 {if $isForm}
-    </div><!-- /.crm-accordion-body -->
+    </div>
   </details><!-- /.crm-accordion-wrapper -->
 {/if}

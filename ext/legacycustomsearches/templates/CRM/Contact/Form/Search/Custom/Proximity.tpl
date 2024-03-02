@@ -34,7 +34,7 @@
            <tr><td class="label">{$form.tag.label}</td><td>{$form.tag.html}</td></tr>
         </table>
         <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
-    </div><!-- /.crm-accordion-body -->
+    </div>
 </details>
 </div><!-- /.crm-form-block -->
 
