@@ -434,7 +434,6 @@ class CRM_Dedupe_Finder {
     $subName = NULL;
     $onlySubType = NULL;
     $returnAll = TRUE;
-    $checkPermission = CRM_Core_Permission::EDIT;
 
     if (!is_array($subTypes)) {
       if (empty($subTypes)) {
@@ -474,7 +473,7 @@ class CRM_Dedupe_Finder {
       $filters['extends_entity_column_value'] = NULL;
     }
 
-    [$multipleFieldGroups, $groupTree] = self::buildLegacyGroupTree($filters, $checkPermission, $subTypes);
+    $groupTree = self::buildLegacyGroupTree($filters, $subTypes);
 
     // entitySelectClauses is an array of select clauses for custom value tables which are not multiple
     // and have data for the given entities. $entityMultipleSelectClauses is the same for ones with multiple
@@ -505,15 +504,11 @@ class CRM_Dedupe_Finder {
    * Recreates legacy formatting for getTree but uses the new cached function to retrieve data.
    * @deprecated only used by legacy function.
    */
-  private static function buildLegacyGroupTree($filters, $permission, $subTypes) {
-    $multipleFieldGroups = [];
+  private static function buildLegacyGroupTree($filters, $subTypes) {
     $customValueTables = [];
-    $customGroups = CRM_Core_BAO_CustomGroup::getAll($filters, $permission ?: NULL);
+    $customGroups = CRM_Core_BAO_CustomGroup::getAll($filters, CRM_Core_Permission::EDIT);
     foreach ($customGroups as &$group) {
       self::formatLegacyDbValues($group);
-      if ($group['is_multiple']) {
-        $multipleFieldGroups[$group['id']] = $group['table_name'];
-      }
       // CRM-5507 - Hard to know what this was supposed to do but this faithfully recreates
       // whatever it was doing before the refactor, which was probably broken anyway.
       if (!empty($subTypes[0])) {
@@ -525,7 +520,7 @@ class CRM_Dedupe_Finder {
       }
     }
     $customGroups['info'] = ['tables' => $customValueTables];
-    return [$multipleFieldGroups, $customGroups];
+    return $customGroups;
   }
 
   /**
