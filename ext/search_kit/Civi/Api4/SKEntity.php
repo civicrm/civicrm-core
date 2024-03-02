@@ -64,6 +64,16 @@ class SKEntity {
 
   /**
    * @param string $displayEntity
+   * @param bool $checkPermissions
+   * @return \Civi\Api4\Action\GetLinks
+   */
+  public static function getLinks(string $displayEntity, bool $checkPermissions = TRUE): Action\GetLinks {
+    return (new Action\GetLinks('SK_' . $displayEntity, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param string $displayEntity
    * @return \Civi\Api4\Generic\CheckAccessAction
    * @throws \CRM_Core_Exception
    */
