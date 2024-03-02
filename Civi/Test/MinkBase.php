@@ -13,14 +13,15 @@ use DMore\ChromeDriver\ChromeDriver;
  * Class MinkBase.  Helper functions for E2E testing.
  */
 abstract class MinkBase extends \CiviEndToEndTestCase {
-   /**
-   * @var \Behat\Mink\Mink|null
-   */
+
   protected ?Mink $mink = NULL;
+  protected bool $screenshotsEnabled = FALSE;
 
   protected function setUp(): void {
     parent::setUp();
+    $this->failOnJavascriptConsoleErrors = TRUE;
     $this->mink = $this->createMink();
+    $this->screenshotsEnabled = $_ENV['SCREENSHOTS'] ?? FALSE;
     $GLOBALS['civicrm_url_defaults'][] = ['format' => 'absolute', 'scheme' => 'backend'];
   }
 
@@ -90,7 +91,10 @@ abstract class MinkBase extends \CiviEndToEndTestCase {
    * @throws \Behat\Mink\Exception\DriverException
    *   When the operation cannot be done.
    */
-  protected function createScreenshot($filename, $set_background_color = TRUE) : void {
+  protected function createScreenshot($filename, $set_background_color = TRUE, $force = FALSE) : void {
+    if (!($this->screenshotsEnabled || $force)) {
+      return;
+    }
     $session = $this->mink->getSession();
     if ($set_background_color) {
       $session->executeScript("document.body.style.backgroundColor = 'white';");
