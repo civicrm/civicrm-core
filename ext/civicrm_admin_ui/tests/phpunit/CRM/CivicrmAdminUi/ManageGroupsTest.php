@@ -29,6 +29,7 @@ class CRM_CivicrmAdminUi_ManageGroupsTest extends \Civi\Test\MinkBase {
     $session->wait(5000, 'document.querySelectorAll("tr[data-entity-id]").length > 0');
     $this->createScreenshot('/tmp/manage-groups-1.png');
     $afformTable = $page->find('xpath', '//afsearch-manage-groups//table');
+    $this->assertSession()->elementExists('css', "tr[data-entity-id='this-is-a-failing-test']", $afformTable);
     $basicGroupRow = $this->assertSession()->elementExists('css', "tr[data-entity-id='$gidBasic']", $afformTable);
     $this->assertSession()->elementTextNotContains('css', "tr[data-entity-id='$gidBasic']", 'Mailing List');
     $this->assertSession()->elementExists('css', "tr[data-entity-id='$gidMailing']", $afformTable);
