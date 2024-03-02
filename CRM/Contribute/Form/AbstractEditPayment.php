@@ -430,7 +430,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
 
     // this required to show billing block
     // @todo remove this assignment the billing block is now designed to be always included but will not show fieldsets unless those sets of fields are assigned
-    $this->assign_by_ref('paymentProcessor', $this->_paymentProcessor);
+    $this->assign('paymentProcessor', $this->_paymentProcessor);
   }
 
   /**
