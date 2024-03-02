@@ -71,7 +71,6 @@ class CRM_Core_ClassLoader {
       'Custom',
       'Event',
       'Membership',
-      'MinkBase',
       'Participant',
       'PaypalPro',
     ];
