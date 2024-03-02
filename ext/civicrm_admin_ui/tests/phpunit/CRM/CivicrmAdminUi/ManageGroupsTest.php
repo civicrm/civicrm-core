@@ -24,8 +24,8 @@ class CRM_CivicrmAdminUi_ManageGroupsTest extends \Civi\Test\MinkBase {
     $page = $session->getPage();
 
     $this->login($GLOBALS['_CV']['ADMIN_USER']);
-    $gidBasic = $this->createTestRecord('Group');
-    $gidMailing = $this->createTestRecord('Group', ['group_type:name' => ['Mailing List']]);
+    $gidBasic = $this->createTestRecord('Group')['id'];
+    $gidMailing = $this->createTestRecord('Group', ['group_type:name' => ['Mailing List']])['id'];
 
     $this->visit(Civi::url('backend://civicrm/group'));
     $session->wait(5000, 'document.querySelectorAll("tr[data-entity-id]").length > 0');
