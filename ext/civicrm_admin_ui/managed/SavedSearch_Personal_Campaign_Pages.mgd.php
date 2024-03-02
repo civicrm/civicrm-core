@@ -163,14 +163,14 @@ return [
               'links' => [
                 [
                   'task' => '',
-                  'entity' => '',
+                  'entity' => 'PCP',
                   'join' => '',
                   'target' => '_blank',
-                  'icon' => 'fa-external-link',
+                  'icon' => 'fa-pencil',
                   'text' => E::ts('Edit'),
                   'style' => 'default',
-                  'path' => 'civicrm/pcp/info?action=update&reset=1&id=[id]',
-                  'action' => '',
+                  'path' => '',
+                  'action' => 'update',
                   'condition' => [],
                 ],
                 [
