@@ -128,10 +128,10 @@
   <div class="clear"></div>
   {include file="CRM/Case/Page/CustomDataView.tpl"}
 
-  <div class="crm-accordion-wrapper collapsed crm-case-roles-block">
-    <div class="crm-accordion-header">
+  <details class="crm-accordion-bold crm-case-roles-block">
+    <summary>
       {ts}Roles{/ts}
-    </div><!-- /.crm-accordion-header -->
+    </summary>
     <div class="crm-accordion-body">
 
       {if $hasAccessToAllCases}
@@ -185,14 +185,14 @@
         {ts}Are you sure you want to end this relationship?{/ts}
       </div>
 
-   </div><!-- /.crm-accordion-body -->
-  </div><!-- /.crm-accordion-wrapper -->
+   </div>
+  </details>
 
   {if $hasAccessToAllCases}
-  <div class="crm-accordion-wrapper collapsed crm-case-other-relationships-block">
-    <div class="crm-accordion-header">
+  <details class="crm-accordion-bold crm-case-other-relationships-block">
+    <summary>
       {ts}Other Relationships{/ts}
-    </div><!-- /.crm-accordion-header -->
+    </summary>
     <div class="crm-accordion-body">
       <div class="crm-submit-buttons">
         {crmButton p='civicrm/contact/view/rel' q="action=add&reset=1&cid=`$contactId`&caseID=`$caseID`" icon="plus-circle"}{ts}Add client relationship{/ts}{/crmButton}
@@ -252,18 +252,18 @@
     {/literal}
   {/if}
 
-  </div><!-- /.crm-accordion-body -->
-</div><!-- /.crm-accordion-wrapper -->
+  </div>
+</details>
 
 {/if} {* other relationship section ends *}
 {include file="CRM/Case/Form/ActivityToCase.tpl"}
 
 {* pane to display / edit regular tags or tagsets for cases *}
 {if $showTags}
-<div id="casetags" class="crm-accordion-wrapper  crm-case-tags-block">
- <div class="crm-accordion-header">
+<details id="casetags" class="crm-accordion-bold  crm-case-tags-block" open>
+ <summary>
   {ts}Case Tags{/ts}
- </div><!-- /.crm-accordion-header -->
+ </summary>
  <div class="crm-accordion-body">
   {if $tags}
     <p class="crm-block crm-content-block crm-case-caseview-display-tags">
@@ -295,8 +295,8 @@
     </a>
   </div>
 
- </div><!-- /.crm-accordion-body -->
-</div><!-- /.crm-accordion-wrapper -->
+ </div>
+</details>
 
 <div id="manageTagsDialog" class="hiddenElement">
   <div class="label">{$form.case_tag.label}</div>

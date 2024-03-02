@@ -7,11 +7,11 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-<div class="crm-accordion-wrapper crm-notesBlock-accordion collapsed">
- <div class="crm-accordion-header">
+<details class="crm-accordion-bold crm-notesBlock-accordion">
+ <summary>
 
     {$title}
-  </div><!-- /.crm-accordion-header -->
+  </summary>
   <div class="crm-accordion-body" id="notesBlock">
    <table class="form-layout-compressed">
      <tr>
@@ -24,5 +24,5 @@
        </td>
      </tr>
    </table>
- </div><!-- /.crm-accordion-body -->
-</div><!-- /.crm-accordion-wrapper -->
+ </div>
+</details>

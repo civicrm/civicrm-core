@@ -98,9 +98,9 @@
 <div class="spacer"></div>
 
 {*Registration Block*}
-<fieldset id="registration" class="crm-collapsible {if $defaultsEmpty}collapsed{/if}">
-  <legend class="collapsible-title">{ts}Registration Screen{/ts}</legend>
-  <div id="registration_screen">
+<details id="registration" {if !$defaultsEmpty}open{/if}>
+  <summary>{ts}Registration Screen{/ts}</summary>
+  <div id="registration_screen" class="crm-accordion-body">
     <table class="form-layout-compressed">
       <tr class="crm-event-manage-registration-form-block-intro_text">
         <td scope="row" class="label"
@@ -191,12 +191,13 @@
       {/if}
     </table>
   </div>
-</fieldset>
+</details>
 
 {*Confirmation Block*}
-<fieldset id="confirm" class="crm-collapsible {if $defaultsEmpty}collapsed{/if}">
-  <legend class="collapsible-title">{ts}Confirmation Screen{/ts}</legend>
-  {if !$is_monetary}
+<details id="confirm" {if !$defaultsEmpty}open{/if}>
+  <summary class="collapsible-title">{ts}Confirmation Screen{/ts}</summary>
+  <div id="confirm_screen_settings" class="crm-accordion-body">
+    {if !$is_monetary}
     <table class="form-layout-compressed">
       <tr class="crm-event-manage-registration-form-block-is_confirm_enabled">
         <td scope="row" class="label" width="20%">{$form.is_confirm_enabled.label}</td>
@@ -205,9 +206,7 @@
         </td>
       </tr>
     </table>
-  {/if}
-
-  <div id="confirm_screen_settings">
+    {/if}
     <table class="form-layout-compressed">
       <tr class="crm-event-manage-registration-form-block-confirm_title">
         <td scope="row" class="label" width="20%">{$form.confirm_title.label} <span
@@ -227,34 +226,36 @@
       </tr>
     </table>
   </div>
-</fieldset>
+</details>
 
 {*ThankYou Block*}
-<fieldset id="thankyou" class="crm-collapsible {if $defaultsEmpty}collapsed{/if}">
-  <legend class="collapsible-title">{ts}Thank-you Screen{/ts}</legend>
-  <table class="form-layout-compressed">
-    <tr class="crm-event-manage-registration-form-block-confirm_thankyou_title">
-      <td scope="row" class="label" width="20%">{$form.thankyou_title.label} <span
-          class="crm-marker">*</span> {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='thankyou_title' id=$eventID}{/if}
-      </td>
-      <td>{$form.thankyou_title.html}</td>
-    </tr>
-    <tr class="crm-event-manage-registration-form-block-confirm_thankyou_text">
-      <td scope="row" class="label" width="20%">{$form.thankyou_text.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='thankyou_text' id=$eventID}{/if}</td>
-      <td>{$form.thankyou_text.html}</td>
-    </tr>
-    <tr class="crm-event-manage-registration-form-block-confirm_thankyou_footer_text">
-      <td scope="row" class="label"
-          width="20%">{$form.thankyou_footer_text.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='thankyou_footer_text' id=$eventID}{/if}</td>
-      <td>{$form.thankyou_footer_text.html}</td>
-    </tr>
-  </table>
-</fieldset>
+<details id="thankyou" {if !$defaultsEmpty}open{/if}>
+  <summary>{ts}Thank-you Screen{/ts}</summary>
+  <div class="crm-accordion-body">
+    <table class="form-layout-compressed">
+      <tr class="crm-event-manage-registration-form-block-confirm_thankyou_title">
+        <td scope="row" class="label" width="20%">{$form.thankyou_title.label} <span
+            class="crm-marker">*</span> {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='thankyou_title' id=$eventID}{/if}
+        </td>
+        <td>{$form.thankyou_title.html}</td>
+      </tr>
+      <tr class="crm-event-manage-registration-form-block-confirm_thankyou_text">
+        <td scope="row" class="label" width="20%">{$form.thankyou_text.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='thankyou_text' id=$eventID}{/if}</td>
+        <td>{$form.thankyou_text.html}</td>
+      </tr>
+      <tr class="crm-event-manage-registration-form-block-confirm_thankyou_footer_text">
+        <td scope="row" class="label"
+            width="20%">{$form.thankyou_footer_text.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='thankyou_footer_text' id=$eventID}{/if}</td>
+        <td>{$form.thankyou_footer_text.html}</td>
+      </tr>
+    </table>
+  </div
+</details>
 
 {* Confirmation Email Block *}
-<fieldset id="mail" class="crm-collapsible {if $defaultsEmpty}collapsed{/if}">
-  <legend class="collapsible-title">{ts}Confirmation Email{/ts}</legend>
-  <div>
+<details id="mail" {if !$defaultsEmpty}open{/if}>
+  <summary class="collapsible-title">{ts}Confirmation Email{/ts}</summary>
+  <div class="crm-accordion-wrapper">
     <table class="form-layout-compressed">
       <tr class="crm-event-manage-registration-form-block-is_email_confirm">
         <td scope="row" class="label" width="20%">{$form.is_email_confirm.label} {help id="id-is_email_confirm"}</td>
@@ -292,7 +293,7 @@
       </table>
     </div>
   </div>
-</fieldset>
+</details>
 </div> {*end of div registration_blocks*}
     </div>
   <div class="crm-submit-buttons">

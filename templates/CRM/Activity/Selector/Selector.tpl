@@ -8,10 +8,10 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-activity-selector-{$context}">
-  <div class="crm-accordion-wrapper crm-search_filters-accordion">
-    <div class="crm-accordion-header">
+  <details class="crm-accordion-bold crm-search_filters-accordion" open>
+    <summary>
     {ts}Filter by Activity{/ts}
-    </div><!-- /.crm-accordion-header -->
+    </summary>
     <div class="crm-accordion-body">
       <form><!-- form element is here to fool the datepicker widget -->
       <table class="no-border form-layout-compressed activity-search-options">
@@ -29,8 +29,8 @@
         </tr>
       </table>
       </form>
-    </div><!-- /.crm-accordion-body -->
-  </div><!-- /.crm-accordion-wrapper -->
+    </div>
+  </details>
   <table class="contact-activity-selector-{$context} crm-ajax-table" style="width: 100%;">
     <thead>
     <tr>

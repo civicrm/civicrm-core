@@ -29,7 +29,7 @@ class CRM_SMS_Page_Provider extends CRM_Core_Page_Basic {
    *   Classname of BAO.
    */
   public function getBAOName() {
-    return 'CRM_SMS_BAO_Provider';
+    return 'CRM_SMS_BAO_SmsProvider';
   }
 
   /**
@@ -61,7 +61,7 @@ class CRM_SMS_Page_Provider extends CRM_Core_Page_Basic {
    * @param array $action
    */
   public function browse($action = NULL) {
-    $providers = CRM_SMS_BAO_Provider::getProviders();
+    $providers = CRM_SMS_BAO_SmsProvider::getProviders();
     $rows = [];
     foreach ($providers as $provider) {
       $action = array_sum(array_keys($this->links()));

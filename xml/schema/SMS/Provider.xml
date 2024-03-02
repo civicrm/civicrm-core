@@ -2,7 +2,7 @@
 
 <table>
   <base>CRM/SMS</base>
-  <class>Provider</class>
+  <class>SmsProvider</class>
   <name>civicrm_sms_provider</name>
   <comment>Table to add different sms providers </comment>
   <add>4.2</add>

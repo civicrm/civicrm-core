@@ -32,10 +32,10 @@
 </table>
 {/if}
 
-<div class="crm-accordion-wrapper collapsed crm-pdf-format-accordion">
-    <div class="crm-accordion-header">
+<details class="crm-accordion-bold crm-pdf-format-accordion">
+    <summary>
       {ts}Page Format:{/ts} <span class="pdf-format-header-label"></span>
-    </div>
+    </summary>
     <div class="crm-accordion-body">
       <div class="crm-block crm-form-block">
     <table class="form-layout-compressed">
@@ -74,21 +74,21 @@
         <div id="updateFormat" style="display: none">{$form.update_format.html}&nbsp;{$form.update_format.label}</div>
       </div>
   </div>
-</div>
+</details>
 
-<div class="crm-accordion-wrapper crm-document-accordion ">
-  <div class="crm-accordion-header">
+<details class="crm-accordion-bold crm-document-accordion " open>
+  <summary>
     {ts}Preview Document{/ts}
-  </div><!-- /.crm-accordion-header -->
+  </summary>
   <div class="crm-accordion-body">
     <div id='document-preview'></div>
-  </div><!-- /.crm-accordion-body -->
-</div><!-- /.crm-accordion-wrapper -->
+  </div>
+</details>
 
-<div class="crm-accordion-wrapper crm-html_email-accordion ">
-<div class="crm-accordion-header">
+<details class="crm-accordion-bold crm-html_email-accordion " open>
+<summary>
     {$form.html_message.label}
-</div><!-- /.crm-accordion-header -->
+</summary>
  <div class="crm-accordion-body">
    <div class="helpIcon" id="helphtml">
      <input class="crm-token-selector big" data-field="html_message" />
@@ -101,20 +101,22 @@
 
 <div id="editMessageDetails">
     <div id="updateDetails" >
-        {$form.updateTemplate.html}&nbsp;{$form.updateTemplate.label}
+      {if array_key_exists('updateTemplate', $form)}{$form.updateTemplate.html}&nbsp;{$form.updateTemplate.label}{/if}
     </div>
     <div>
-        {$form.saveTemplate.html}&nbsp;{$form.saveTemplate.label}
+      {if array_key_exists('saveTemplate', $form)}{$form.saveTemplate.html}&nbsp;{$form.saveTemplate.label}{/if}
     </div>
 </div>
 
 <div id="saveDetails" class="section">
+  {if array_key_exists('saveTemplateName', $form)}
     <div class="label">{$form.saveTemplateName.label}</div>
     <div class="content">{$form.saveTemplateName.html|crmAddClass:huge}</div>
+  {/if}
 </div>
 
-  </div><!-- /.crm-accordion-body -->
-</div><!-- /.crm-accordion-wrapper -->
+  </div>
+</details>
 
 <table class="form-layout-compressed">
   <tr>

@@ -29,8 +29,14 @@
       <td class="label">{$form.amount.label}</td>
       <td>{$form.currency.html|crmAddClass:eight}&nbsp;{$form.amount.html|crmAddClass:eight} ({ts}every{/ts} {$recur_frequency_interval} {$recur_frequency_unit})</td>
     </tr>
-    <tr><td class="label">{$form.installments.label}</td><td>{$form.installments.html}<br />
-          <span class="description">{ts}Total number of payments to be made. Set this to 0 if this is an open-ended commitment i.e. no set end date.{/ts}</span></td></tr>
+    {if array_key_exists('installments', $form)}
+      <tr>
+        <td class="label">{$form.installments.label}</td>
+        <td>{$form.installments.html}<br />
+          <span class="description">{ts}Total number of payments to be made. Set this to 0 if this is an open-ended commitment i.e. no set end date.{/ts}</span>
+        </td>
+      </tr>
+    {/if}
     {foreach from=$editableScheduleFields item='field'}
       <tr><td class="label">{$form.$field.label}</td><td>{$form.$field.html}</td></tr>
     {/foreach}

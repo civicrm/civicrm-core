@@ -9,10 +9,10 @@
 *}
 {if $action eq 2 || $action eq 16}
 <div class="form-item">
-  <div class="crm-accordion-wrapper crm-search_filters-accordion">
-    <div class="crm-accordion-header">
+  <details class="crm-accordion-bold crm-search_filters-accordion" open>
+    <summary>
     {ts}Filter Contacts{/ts}</a>
-    </div><!-- /.crm-accordion-header -->
+    </summary>
     <div class="crm-accordion-body">
       <table class="no-border form-layout-compressed" id="searchOptions" style="width:100%;">
         <tr>
@@ -52,8 +52,8 @@
           </td>
         </tr>
       </table>
-    </div><!-- /.crm-accordion-body -->
-  </div><!-- /.crm-accordion-wrapper -->
+    </div>
+  </details>
   <div>
     {ts}Show / Hide columns:{/ts}
     <input type='checkbox' id='steet-address' class='toggle-vis' data-column-main="7" data-column-dupe="8" >

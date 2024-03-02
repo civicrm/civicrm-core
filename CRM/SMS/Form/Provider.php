@@ -70,7 +70,7 @@ class CRM_SMS_Form_Provider extends CRM_Core_Form {
       return;
     }
 
-    $attributes = CRM_Core_DAO::getAttribute('CRM_SMS_DAO_Provider');
+    $attributes = CRM_Core_DAO::getAttribute('CRM_SMS_DAO_SmsProvider');
 
     $providerNames = CRM_Core_OptionGroup::values('sms_provider_name', FALSE, FALSE, FALSE, NULL, 'label');
     $apiTypes = CRM_Core_OptionGroup::values('sms_api_type', FALSE, FALSE, FALSE, NULL, 'label');
@@ -82,7 +82,7 @@ class CRM_SMS_Form_Provider extends CRM_Core_Form {
     );
 
     $this->addRule('title', ts('This Title already exists in Database.'), 'objectExists', [
-      'CRM_SMS_DAO_Provider',
+      'CRM_SMS_DAO_SmsProvider',
       $this->_id,
     ]);
 
@@ -127,7 +127,7 @@ class CRM_SMS_Form_Provider extends CRM_Core_Form {
       return $defaults;
     }
 
-    $dao = new CRM_SMS_DAO_Provider();
+    $dao = new CRM_SMS_DAO_SmsProvider();
     $dao->id = $this->_id;
 
     if ($name) {
@@ -151,7 +151,7 @@ class CRM_SMS_Form_Provider extends CRM_Core_Form {
     CRM_Utils_System::flushCache();
 
     if ($this->_action & CRM_Core_Action::DELETE) {
-      CRM_SMS_BAO_Provider::del($this->_id);
+      CRM_SMS_BAO_SmsProvider::del($this->_id);
       CRM_Core_Session::setStatus(ts('Selected Provider has been deleted.'), ts('Deleted'), 'success');
       return;
     }

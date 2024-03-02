@@ -104,9 +104,9 @@
   </table>
   {/crmRegion}
   {crmRegion name="contribute-form-managepremiums-other-fields"}
-  <fieldset id="time-delimited" class="crm-collapsible {if empty($showSubscriptions)}collapsed{/if}">
-    <legend class="collapsible-title">{ts}Subscription or Service Settings{/ts}</legend>
-    <div>
+  <details id="time-delimited" class="crm-accordion-light" {if !empty($showSubscriptions)}open{/if}>
+    <summary>{ts}Subscription or Service Settings{/ts}</summary>
+    <div class="crm-accordion-body">
       <table class="form-layout-compressed">
         <tr class="crm-contribution-form-block-period_type">
            <td class="label">{$form.period_type.label}</td>
@@ -134,7 +134,7 @@
         </tr>
       </table>
     </div>
-  </fieldset>
+  </details>
   {/crmRegion}
  {/if}
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>

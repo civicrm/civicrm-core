@@ -1,6 +1,6 @@
 {if $contributionsCount > 0}
-  <div class="crm-accordion-wrapper">
-    <div class="crm-accordion-header">{ts}Related Contributions{/ts}</div>
+  <details class="crm-accordion-bold" open>
+    <summary>{ts}Related Contributions{/ts}</summary>
     <div class="crm-accordion-body">
       <table class="crm-contact-contributions">
         <thead>
@@ -33,7 +33,7 @@
         {/literal}
       </script>
     </div>
-  </div>
+  </details>
 {else}
   <div class="messages status no-popup">
     {icon icon="fa-info-circle"}{/icon}

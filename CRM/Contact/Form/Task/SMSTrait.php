@@ -14,6 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
+use Civi\Api4\Activity;
 use Civi\Token\TokenProcessor;
 
 /**
@@ -82,7 +83,7 @@ trait CRM_Contact_Form_Task_SMSTrait {
 
       $form->_contactIds = [];
       foreach ($allToPhone as $value) {
-        list($contactId, $phone) = explode('::', $value);
+        [$contactId, $phone] = explode('::', $value);
         if ($contactId) {
           $form->_contactIds[] = $contactId;
           $form->_toContactPhone[] = $phone;
@@ -110,18 +111,10 @@ trait CRM_Contact_Form_Task_SMSTrait {
 
         //to check if the phone type is "Mobile"
         $phoneTypes = CRM_Core_OptionGroup::values('phone_type', TRUE, FALSE, FALSE, NULL, 'name');
-
-        if (CRM_Utils_System::getClassName($form) == 'CRM_Activity_Form_Task_SMS') {
-          //to check for "if the contact id belongs to a specified activity type"
-          // @todo use the api instead - function is deprecated.
-          $actDetails = CRM_Activity_BAO_Activity::getContactActivity($contactId);
-          if ($this->getActivityName() !==
-            CRM_Utils_Array::retrieveValueRecursive($actDetails, 'subject')
-          ) {
-            $suppressedSms++;
-            unset($form->_contactDetails[$contactId]);
-            continue;
-          }
+        if ($this->isInvalidRecipient($contactId)) {
+          $suppressedSms++;
+          unset($form->_contactDetails[$contactId]);
+          continue;
         }
 
         // No phone, No SMS or Deceased: then we suppress it.
@@ -209,7 +202,7 @@ trait CRM_Contact_Form_Task_SMSTrait {
    *
    * @internal likely to change.
    */
-  protected function postProcessSms() {
+  protected function postProcessSms(): void {
     $form = $this;
     $thisValues = $form->controller->exportValues($form->getName());
 
@@ -241,7 +234,7 @@ trait CRM_Contact_Form_Task_SMSTrait {
     $phonesToSendTo = explode(',', $this->getSubmittedValue('to'));
     $contactIds = $phones = [];
     foreach ($phonesToSendTo as $phone) {
-      list($contactId, $phone) = explode('::', $phone);
+      [$contactId, $phone] = explode('::', $phone);
       if ($contactId) {
         $contactIds[] = $contactId;
         $phones[] = $phone;
@@ -269,7 +262,7 @@ trait CRM_Contact_Form_Task_SMSTrait {
     $contactIds = array_keys($form->_contactDetails);
     $allContactIds = array_keys($form->_allContactDetails);
 
-    [$sent, $activityId, $countSuccess] = $this->sendSMS($formattedContactDetails,
+    [$sent, $countSuccess] = $this->sendSMS($formattedContactDetails,
       $thisValues,
       $smsParams,
       $contactIds
@@ -327,7 +320,6 @@ trait CRM_Contact_Form_Task_SMSTrait {
    * @param array $activityParams
    * @param array $smsProviderParams
    * @param array $contactIds
-   * @param int $sourceContactId This is the source contact Id
    *
    * @return array(bool $sent, int $activityId, int $success)
    * @throws CRM_Core_Exception
@@ -336,8 +328,7 @@ trait CRM_Contact_Form_Task_SMSTrait {
     &$contactDetails,
     &$activityParams,
     &$smsProviderParams = [],
-    &$contactIds = NULL,
-    $sourceContactId = NULL
+    &$contactIds = NULL
   ) {
 
     if (!isset($contactDetails) && !isset($contactIds)) {
@@ -360,24 +351,17 @@ trait CRM_Contact_Form_Task_SMSTrait {
       }
     }
 
-    // Get logged in User Id
-    if (empty($sourceContactId)) {
-      $sourceContactId = CRM_Core_Session::getLoggedInContactID();
-    }
-
     $text = &$activityParams['sms_text_message'];
 
     // Create the meta level record first ( sms activity )
-    $activityParams = [
-      'source_contact_id' => $sourceContactId,
-      'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'SMS'),
-      'activity_date_time' => date('YmdHis'),
-      'subject' => $activityParams['activity_subject'],
-      'details' => $text,
-      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'status_id', 'Completed'),
-    ];
-    $activity = CRM_Activity_BAO_Activity::create($activityParams);
-    $activityID = $activity->id;
+    $activityID = Activity::create()->setValues([
+      'source_contact_id' => CRM_Core_Session::getLoggedInContactID(),
+      'activity_type_id:name' => 'SMS',
+      'activity_date_time' => 'now',
+      'subject' => $this->getSubmittedValue('activity_subject'),
+      'details' => $this->getSubmittedValue('sms_text_message'),
+      'status_id:name' => 'Completed',
+    ])->execute()->first()['id'];
 
     $success = 0;
     $errMsgs = [];
@@ -405,7 +389,7 @@ trait CRM_Contact_Form_Task_SMSTrait {
             $tokenText,
             $smsProviderParams,
             $activityID,
-            $sourceContactId
+            CRM_Core_Session::getLoggedInContactID()
           );
           $success++;
         }
@@ -427,7 +411,7 @@ trait CRM_Contact_Form_Task_SMSTrait {
       $sent = $errMsgs;
     }
 
-    return [$sent, $activity->id, $success];
+    return [$sent, $success];
   }
 
   /**
@@ -461,6 +445,11 @@ trait CRM_Contact_Form_Task_SMSTrait {
     }
 
     return empty($errors) ? TRUE : $errors;
+  }
+
+  protected function isInvalidRecipient($contactID): bool {
+    //Overridden by the activity child class.
+    return FALSE;
   }
 
   /**

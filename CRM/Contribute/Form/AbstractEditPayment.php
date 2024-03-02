@@ -170,13 +170,15 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
   protected $contributionID;
 
   /**
-   * Get the contribution id that has been created or is being edited.
+   * Get the contribution ID.
    *
-   * @internal - not supported for outside core.
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
    *
    * @return int|null
    */
-  protected function getContributionID(): ?int {
+  public function getContributionID(): ?int {
     return $this->contributionID;
   }
 
@@ -428,7 +430,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
 
     // this required to show billing block
     // @todo remove this assignment the billing block is now designed to be always included but will not show fieldsets unless those sets of fields are assigned
-    $this->assign_by_ref('paymentProcessor', $this->_paymentProcessor);
+    $this->assign('paymentProcessor', $this->_paymentProcessor);
   }
 
   /**

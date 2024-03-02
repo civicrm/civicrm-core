@@ -44,7 +44,7 @@ abstract class CRM_SMS_Provider {
       $providerParams['provider_id'] = $providerID;
     }
     if ($providerID) {
-      $providerName = CRM_SMS_BAO_Provider::getProviderInfo($providerID, 'name');
+      $providerName = CRM_SMS_BAO_SmsProvider::getProviderInfo($providerID, 'name');
     }
 
     if (!$providerName) {

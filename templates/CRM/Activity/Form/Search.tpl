@@ -13,7 +13,6 @@
     <summary class="crm-accordion-header crm-master-accordion-header">
       {ts}Edit Search Criteria{/ts}
     </summary>
-    <!-- /.crm-accordion-header -->
     <div class="crm-accordion-body">
       <div id="searchForm" class="form-item">
         {strip}

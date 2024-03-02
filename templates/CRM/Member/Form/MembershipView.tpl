@@ -64,10 +64,10 @@
     {include file="CRM/Custom/Page/CustomDataView.tpl"}
 
     {if $accessContribution}
-      <div class="crm-accordion-wrapper">
-        <div class="crm-accordion-header">
+      <details class="crm-accordion-bold" open>
+        <summary>
           {ts}Related Contributions and Recurring Contributions{/ts}
-        </div>
+        </summary>
         <div class="crm-accordion-body">
           {if $rows.0.contribution_id}
             {include file="CRM/Contribute/Form/Selector.tpl" context="Search"}
@@ -97,14 +97,14 @@
           </script>
           <div id="membership-recurring-contributions"></div>
         </div>
-      </div>
+      </details>
     {/if}
 
     {if $softCredit}
-        <div class="crm-accordion-wrapper">
-            <div class="crm-accordion-header">{ts}Related Soft Contributions{/ts}</div>
+        <details class="crm-accordion-bold" open>
+            <summary>{ts}Related Soft Contributions{/ts}</summary>
             <div class="crm-accordion-body">{include file="CRM/Contribute/Page/ContributionSoft.tpl" context="membership"}</div>
-        </div>
+        </details>
     {/if}
 
     {if $has_related}

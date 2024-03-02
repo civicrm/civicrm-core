@@ -3344,7 +3344,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'total_amount' => 20,
     ]);
     $membership = $this->callAPISuccess('membership', 'getsingle', ['id' => $this->_ids['membership']]);
-    $this->assertEquals(date('Y-m-d', strtotime('yesterday + 2 year')), $membership['end_date']);
+    // In a leap year, yesterday on Mar 1 is Feb 29, so adding 2 years makes it Mar 1 again
+    $adjustmentForLeapYear = ((new \IntlGregorianCalendar())->isLeapYear(date('Y')) && (date('md') === '0301')) ? ' + 1 day' : '';
+    $this->assertEquals(date('Y-m-d', strtotime('yesterday + 2 year' . $adjustmentForLeapYear)), $membership['end_date']);
     $logs = $this->callAPISuccess('MembershipLog', 'get', [
       'membership_id' => $this->getMembershipID(),
     ]);
@@ -3463,7 +3465,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ]);
 
     $membership = $this->callAPISuccessGetSingle('membership', ['id' => $this->getMembershipID()]);
-    $this->assertEquals(date('Y-m-d', strtotime('yesterday + 2 years')), $membership['end_date']);
+    // In a leap year, yesterday on Mar 1 is Feb 29, so adding 2 years makes it Mar 1 again
+    $adjustmentForLeapYear = ((new \IntlGregorianCalendar())->isLeapYear(date('Y')) && (date('md') === '0301')) ? ' + 1 day' : '';
+    $this->assertEquals(date('Y-m-d', strtotime('yesterday + 2 years' . $adjustmentForLeapYear)), $membership['end_date']);
 
     $paymentProcessorID = $this->paymentProcessorAuthorizeNetCreate();
 
@@ -3471,14 +3475,14 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contribution', 'create', ['id' => $this->getContributionID(), 'contribution_recur_id' => $contributionRecurID]);
     $this->callAPISuccess('contribution', 'repeattransaction', ['contribution_recur_id' => $contributionRecurID, 'contribution_status_id' => 'Completed']);
     $membership = $this->callAPISuccessGetSingle('membership', ['id' => $this->getMembershipID()]);
-    $this->assertEquals(date('Y-m-d', strtotime('yesterday + 4 years')), $membership['end_date']);
+    $this->assertEquals(date('Y-m-d', strtotime('yesterday + 4 years' . $adjustmentForLeapYear)), $membership['end_date']);
 
     // Update the most recent contribution to have a qty of 1 in it's line item and then repeat, expecting just 1 year to be added.
     $contribution = Contribution::get()->setOrderBy(['id' => 'DESC'])->setSelect(['id'])->execute()->first();
     CRM_Core_DAO::executeQuery('UPDATE civicrm_line_item SET price_field_value_id = ' . $this->_ids['price_field_value'][0] . ' WHERE contribution_id = ' . $contribution['id']);
     $this->callAPISuccess('contribution', 'repeattransaction', ['contribution_recur_id' => $contributionRecurID, 'contribution_status_id' => 'Completed']);
     $membership = $this->callAPISuccessGetSingle('membership', ['id' => $this->_ids['membership']]);
-    $this->assertEquals(date('Y-m-d', strtotime('yesterday + 5 years')), $membership['end_date']);
+    $this->assertEquals(date('Y-m-d', strtotime('yesterday + 5 years' . $adjustmentForLeapYear)), $membership['end_date']);
   }
 
   /**

@@ -179,22 +179,22 @@ final class Url implements \JsonSerializable {
     if ($parsed === FALSE && preg_match(';^(\w+)://$;', $logicalUri, $m)) {
       $parsed = ['scheme' => $m[1], 'path' => ''];
     }
-    $this->setScheme($parsed['scheme'] ?? NULL);
+    $this->setScheme($parsed['scheme'] ?? '');
     if (in_array($this->scheme, ['http', 'https'])) {
       $this->host = $parsed['host'];
-      $this->port = $parsed['port'] ?? NULL;
-      $this->path = $parsed['path'] ?? NULL;
+      $this->port = $parsed['port'] ?? '';
+      $this->path = $parsed['path'] ?? '';
     }
     else {
-      $this->path = $parsed['host'] ?? NULL;
+      $this->path = $parsed['host'] ?? '';
       if (isset($parsed['path'])) {
         $this->path .= $parsed['path'];
       }
     }
-    $this->query = $parsed['query'] ?? NULL;
+    $this->query = $parsed['query'] ?? '';
     $fragmentParts = isset($parsed['fragment']) ? explode('?', $parsed['fragment'], 2) : [];
-    $this->fragment = $fragmentParts[0] ?? NULL;
-    $this->fragmentQuery = $fragmentParts[1] ?? NULL;
+    $this->fragment = $fragmentParts[0] ?? '';
+    $this->fragmentQuery = $fragmentParts[1] ?? '';
   }
 
   /**
@@ -793,7 +793,7 @@ final class Url implements \JsonSerializable {
       return;
     }
 
-    if ($var === NULL) {
+    if ($var === NULL || $var === '') {
       $var = $value;
       return;
     }

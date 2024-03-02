@@ -21,6 +21,7 @@ use Civi\Api4\ContributionRecur;
  * This class generates form components for offline membership form.
  */
 class CRM_Member_Form_Membership extends CRM_Member_Form {
+  use CRM_Custom_Form_CustomDataTrait;
 
   /**
    * If this is set (to 'test' or 'live') then the payment processor will be shown on the form to take a payment.
@@ -75,11 +76,21 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   }
 
   /**
-   * Overriding this entity trait function as not yet tested.
-   *
-   * We continue to rely on legacy handling.
+   * Overriding this entity trait function as the function does not
+   * at this stage use the CustomDataTrait which works better with php8.2.
    */
-  public function addCustomDataToForm() {}
+  public function addCustomDataToForm() {
+    if ($this->isSubmitted()) {
+      // The custom data fields are added to the form by an ajax form.
+      // However, if they are not present in the element index they will
+      // not be available from `$this->getSubmittedValue()` in post process.
+      // We do not have to set defaults or otherwise render - just add to the element index.
+      $this->addCustomDataFieldsToForm('Membership', array_filter([
+        'id' => $this->getMembershipID(),
+        'membership_type_id' => $this->getSubmittedValue('membership_type_id'),
+      ]));
+    }
+  }
 
   /**
    * Overriding this entity trait function as not yet tested.
@@ -224,8 +235,9 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       }
     }
 
-    // Add custom data to form
-    CRM_Custom_Form_CustomData::addToForm($this, $this->_memType);
+    $this->assign('customDataType', 'Membership');
+    $this->assign('customDataSubType', $this->_memType);
+
     $this->setPageTitle(ts('Membership'));
   }
 
@@ -1489,7 +1501,7 @@ DESC limit 1");
    * @throws \CRM_Core_Exception
    */
   protected function emailMembershipReceipt($formValues) {
-    $customValues = $this->getCustomValuesForReceipt($formValues);
+    $customValues = $this->getCustomValuesForReceipt();
     $this->assign('customValues', $customValues);
     $this->assign('total_amount', $this->order->getTotalAmount());
     $this->assign('totalTaxAmount', $this->order->getTotalTaxAmount());
@@ -1515,35 +1527,46 @@ DESC limit 1");
   /**
    * Filter the custom values from the input parameters (for display in the email).
    *
-   * @todo figure out why the scary code this calls does & document.
+   * @todo move this to the WorkFlowMessageTrait.
    *
-   * @param array $formValues
    * @return array
    */
-  protected function getCustomValuesForReceipt($formValues): array {
-    $customFields = $customValues = [];
-    if (property_exists($this, '_groupTree')
-      && !empty($this->_groupTree)
-    ) {
-      foreach ($this->_groupTree as $groupID => $group) {
-        if ($groupID === 'info') {
-          continue;
-        }
-        foreach ($group['fields'] as $k => $field) {
-          $field['title'] = $field['label'];
-          $customFields["custom_{$k}"] = $field;
-        }
+  protected function getCustomValuesForReceipt(): array {
+    $customFieldValues = $this->getCustomFieldValues();
+    $customValues = [];
+    foreach ($customFieldValues as $customFieldString => $submittedValue) {
+      if ($submittedValue === NULL) {
+        // This would occur when the field is no longer appropriate - ie changing
+        // from a membership type with the field to one without it.
+        continue;
+      }
+      $customFieldID = (int) CRM_Core_BAO_CustomField::getKeyID($customFieldString);
+      $value = CRM_Core_BAO_CustomField::displayValue($this->getSubmittedValue($customFieldString), $customFieldID);
+      $customValues[CRM_Core_BAO_CustomField::getField($customFieldID)['label']] = $value;
+    }
+    return $customValues;
+  }
+
+  /**
+   * Get the custom fields tat are on the form with the submitted values.
+   *
+   * @internal I think it would be good to make this field
+   * available as an api supported method - maybe on the form custom data trait
+   * but I feel like we might want to talk about the format of the returned results
+   * (key-value vs array, custom field ID keys vs custom_, filters/ multiple functions
+   * with different formatting) so keeping private for now.
+   *
+   * @return array
+   */
+  private function getCustomFieldValues(): array {
+    $customFields = [];
+    foreach ($this->_elements as $element) {
+      $customFieldID = CRM_Core_BAO_CustomField::getKeyID($element->getName());
+      if ($customFieldID) {
+        $customFields[$element->getName()] = $this->getSubmittedValue($element->getName());
       }
     }
-
-    $members = [['member_id', '=', $this->getMembershipID(), 0, 0]];
-    // check whether its a test drive
-    if ($this->_mode === 'test') {
-      $members[] = ['member_test', '=', 1, 0, 0];
-    }
-
-    CRM_Core_BAO_UFGroup::getValues($formValues['contact_id'], $customFields, $customValues, FALSE, $members);
-    return $customValues;
+    return $customFields;
   }
 
   /**
@@ -1682,7 +1705,6 @@ DESC limit 1");
    * @throws \CRM_Core_Exception
    */
   protected function getFormMembershipParams(): array {
-    $submittedValues = $this->controller->exportValues($this->_name);
     return [
       'status_id' => $this->getSubmittedValue('status_id'),
       'source' => $this->getSubmittedValue('source') ?? $this->getContributionSource(),
@@ -1690,7 +1712,7 @@ DESC limit 1");
       'is_override' => $this->getSubmittedValue('is_override'),
       'status_override_end_date' => $this->getSubmittedValue('status_override_end_date'),
       'campaign_id' => $this->getSubmittedValue('campaign_id'),
-      'custom' => CRM_Core_BAO_CustomField::postProcess($submittedValues,
+      'custom' => CRM_Core_BAO_CustomField::postProcess($this->getSubmittedValues(),
         $this->_id,
         'Membership'
       ),

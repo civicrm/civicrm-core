@@ -314,12 +314,6 @@ function _civicrm_api3_get_DAO($name) {
   if ($name === 'AclRole' || $name === 'ACLRole') {
     return 'CRM_ACL_DAO_ACLEntityRole';
   }
-  // FIXME: DAO should be renamed CRM_SMS_DAO_SmsProvider
-  // But this would impact SMS extensions so need to coordinate
-  // Probably best approach is to migrate them to use the api and decouple them from core BAOs
-  if ($name === 'SmsProvider') {
-    return 'CRM_SMS_DAO_Provider';
-  }
   // Entity was renamed to CRM_Dedupe_DAO_DedupeRule for APIv4
   if ($name === 'Rule') {
     return 'CRM_Dedupe_DAO_DedupeRule';
