@@ -85,6 +85,9 @@ abstract class MinkBase extends \CiviEndToEndTestCase {
    * @param bool $set_background_color
    *   (optional) By default this method will set the background color to white.
    *   Set to FALSE to override this behavior.
+   * @param bool $force
+   *   (optional) By default this method will not take screenshots for performance reasons.
+   *   Set to TRUE to take screenshots.
    *
    * @throws \Behat\Mink\Exception\UnsupportedDriverActionException
    *   When operation not supported by the driver.
