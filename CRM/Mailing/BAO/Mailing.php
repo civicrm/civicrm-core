@@ -2822,8 +2822,8 @@ ORDER BY civicrm_mailing.id DESC";
       //CRM-12814
       $clicks = $clickCounts[$values['mailing_id']] ?? 0;
       $opens = $openCounts[$values['mailing_id']] ?? 0;
-      $mailing['openstats'] = "Opens: {$opens}" .
-        "<br />Clicks: {$clicks}";
+      $mailing['openstats'] = ts('Opens: %1', [1 => $opens]) . '<br />' .
+        ts('Clicks: %1', [1 => $clicks]);
 
       $actionLinks = [
         CRM_Core_Action::VIEW => [
