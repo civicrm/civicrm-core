@@ -18,8 +18,6 @@ class CRM_CivicrmAdminUi_ManageGroupsTest extends \Civi\Test\MinkBase {
   }
 
   public function testManageGroups() {
-    // I have no idea why this is necessary. Hopefully can remove later.
-    $this->expectNotToPerformAssertions();
     $session = $this->mink->getSession();
     $page = $session->getPage();
 
@@ -31,13 +29,23 @@ class CRM_CivicrmAdminUi_ManageGroupsTest extends \Civi\Test\MinkBase {
     $session->wait(5000, 'document.querySelectorAll("tr[data-entity-id]").length > 0');
     $this->createScreenshot('/tmp/manage-groups-1.png');
     $afformTable = $page->find('xpath', '//afsearch-manage-groups//table');
-    $this->assertSession()->elementExists('xpath', "//tr[@data-entity-id = '$gidBasic']", $afformTable);
-    $this->assertSession()->elementTextNotContains('xpath', "//tr[@data-entity-id = '$gidBasic']", 'Mailing List');
-    $this->assertSession()->elementExists('xpath', "//tr[@data-entity-id = '$gidMailing']", $afformTable);
-    $this->assertSession()->elementTextContains('xpath', "//tr[@data-entity-id = '$gidMailing']", 'Mailing List');
-    $this->assertSession()->elementNotExists('xpath', "//tr[@data-entity-id = '$gidInactive']", $afformTable);
+    $basicGroupRow = $this->assertSession()->elementExists('css', "tr[data-entity-id='$gidBasic']", $afformTable);
+    $this->assertSession()->elementTextNotContains('css', "tr[data-entity-id='$gidBasic']", 'Mailing List');
+    $this->assertSession()->elementExists('css', "tr[data-entity-id='$gidMailing']", $afformTable);
+    $this->assertSession()->elementTextContains('css', "tr[data-entity-id='$gidMailing']", 'Mailing List');
+    $this->assertSession()->elementNotExists('css', "tr[data-entity-id='$gidInactive']", $afformTable);
     $this->createScreenshot('/tmp/test-manage-groups.png');
-    // $this->assertSession()->elementExists('xpath', "//tr[@data-entity-id = '99999']", $afformTable);
+    // Test some in-line editing.
+    // Equivalent JS: document.querySelector('[data-field-name="is_active"]').querySelector('span').click(); 
+    $isActiveCell = $basicGroupRow->find('css', '[data-field-name="is_active"]');
+    $isActiveField = $isActiveCell->find('css', 'span');
+    $isActiveField->click();
+    $isActiveCell->find('css','input[value="false"]')->click();
+    $isActiveCell->find('css','button.btn-success')->click();
+    // Confirm the group is now inactive.  But wait until "Saved" appears because of race conditions.
+    $session->wait(5000, 'document.querySelectorAll("div.crm-status-box-outer.status-success").length > 0');
+    $basicGroupStatus = Group::get(FALSE)->addWhere('id', '=', $gidBasic)->execute()->single()['is_active'];
+    $this->assertEquals(FALSE, $basicGroupStatus);
   }
 
   public function tearDown(): void {
