@@ -111,18 +111,10 @@ trait CRM_Contact_Form_Task_SMSTrait {
 
         //to check if the phone type is "Mobile"
         $phoneTypes = CRM_Core_OptionGroup::values('phone_type', TRUE, FALSE, FALSE, NULL, 'name');
-
-        if (CRM_Utils_System::getClassName($form) == 'CRM_Activity_Form_Task_SMS') {
-          //to check for "if the contact id belongs to a specified activity type"
-          // @todo use the api instead - function is deprecated.
-          $actDetails = CRM_Activity_BAO_Activity::getContactActivity($contactId);
-          if ($this->getActivityName() !==
-            CRM_Utils_Array::retrieveValueRecursive($actDetails, 'subject')
-          ) {
-            $suppressedSms++;
-            unset($form->_contactDetails[$contactId]);
-            continue;
-          }
+        if ($this->isInvalidRecipient($contactId)) {
+          $suppressedSms++;
+          unset($form->_contactDetails[$contactId]);
+          continue;
         }
 
         // No phone, No SMS or Deceased: then we suppress it.
@@ -210,7 +202,7 @@ trait CRM_Contact_Form_Task_SMSTrait {
    *
    * @internal likely to change.
    */
-  protected function postProcessSms() {
+  protected function postProcessSms(): void {
     $form = $this;
     $thisValues = $form->controller->exportValues($form->getName());
 
@@ -453,6 +445,11 @@ trait CRM_Contact_Form_Task_SMSTrait {
     }
 
     return empty($errors) ? TRUE : $errors;
+  }
+
+  protected function isInvalidRecipient($contactID): bool {
+    //Overridden by the activity child class.
+    return FALSE;
   }
 
   /**
