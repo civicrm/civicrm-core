@@ -26,12 +26,17 @@ class CRM_CivicrmAdminUi_ManageGroupsTest extends \Civi\Test\MinkBase {
     $this->login($GLOBALS['_CV']['ADMIN_USER']);
     $gidBasic = $this->createTestRecord('Group')['id'];
     $gidMailing = $this->createTestRecord('Group', ['group_type:name' => ['Mailing List']])['id'];
-
+    $gidInactive = $this->createTestRecord('Group', ['is_active' => FALSE])['id'];
     $this->visit(Civi::url('backend://civicrm/group'));
     $session->wait(5000, 'document.querySelectorAll("tr[data-entity-id]").length > 0');
     $this->createScreenshot('/tmp/manage-groups-1.png');
     $afformTable = $page->find('xpath', '//afsearch-manage-groups//table');
     $this->assertSession()->elementExists('xpath', "//tr[@data-entity-id = '$gidBasic']", $afformTable);
+    $this->assertSession()->elementTextNotContains('xpath', "//tr[@data-entity-id = '$gidBasic']", 'Mailing List');
+    $this->assertSession()->elementExists('xpath', "//tr[@data-entity-id = '$gidMailing']", $afformTable);
+    $this->assertSession()->elementTextContains('xpath', "//tr[@data-entity-id = '$gidMailing']", 'Mailing List');
+    $this->assertSession()->elementNotExists('xpath', "//tr[@data-entity-id = '$gidInactive']", $afformTable);
+    $this->createScreenshot('/tmp/test-manage-groups.png');
     // $this->assertSession()->elementExists('xpath', "//tr[@data-entity-id = '99999']", $afformTable);
   }
 
