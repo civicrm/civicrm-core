@@ -165,13 +165,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       }
     }
 
-    // when custom data is included in this page
-    if (!empty($_POST['hidden_custom'])) {
-      CRM_Custom_Form_CustomData::preProcess($this, NULL, $this->_memType, 1, 'Membership', $this->_id);
-      CRM_Custom_Form_CustomData::buildQuickForm($this);
-      CRM_Custom_Form_CustomData::setDefaultValues($this);
-    }
-
     $this->setTitle(ts('Renew Membership'));
 
     parent::preProcess();
@@ -240,6 +233,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
   public function buildQuickForm() {
 
     parent::buildQuickForm();
+    $this->addCustomDataToForm();
 
     $defaults = parent::setDefaultValues();
     $this->assign('customDataType', 'Membership');
@@ -499,7 +493,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $this->_params['total_amount'] = CRM_Utils_Array::value('total_amount', $this->_params,
       CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_memType, 'minimum_fee')
     );
-    $customFieldsFormatted = CRM_Core_BAO_CustomField::postProcess($this->_params,
+    $customFieldsFormatted = CRM_Core_BAO_CustomField::postProcess($this->getSubmittedValues(),
       $this->getMembershipID(),
       'Membership'
     );

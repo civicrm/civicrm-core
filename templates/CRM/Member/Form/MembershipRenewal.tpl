@@ -122,7 +122,7 @@
       </table>
     {/if}
 
-    {include file="CRM/common/customDataBlock.tpl"}
+    {include file="CRM/common/customDataBlock.tpl" groupID='' customDataType='Membership' cid=false}
 
     <div>{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 
