@@ -439,7 +439,7 @@
     <div class="crm-accordion-body">
       <div class="doc-filename"><%- file %></div>
       <pre class="lang-php linenums"><%- code %></pre>
-    </div><!-- /.crm-accordion-body -->
+    </div>
   </details>
 </script>
 

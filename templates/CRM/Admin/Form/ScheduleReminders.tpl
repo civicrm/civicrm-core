@@ -144,7 +144,7 @@
             </tr>
           </table>
             {include file="CRM/Contact/Form/Task/EmailCommon.tpl" upload=1 noAttach=1}
-        </div><!-- /.crm-accordion-body -->
+        </div>
       </details>
     {if $sms}
       <details id="sms-section" open>
@@ -161,7 +161,7 @@
             </tr>
           </table>
           {include file="CRM/Contact/Form/Task/SMSCommon.tpl" upload=1 noAttach=1}
-        <div><!-- /.crm-accordion-body -->
+        <div>
       </details>
     {/if}
 

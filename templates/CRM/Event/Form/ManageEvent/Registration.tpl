@@ -190,7 +190,7 @@
         {/foreach}
       {/if}
     </table>
-  </div><!-- /.crm-accordion-body-->
+  </div>
 </details>
 
 {*Confirmation Block*}
@@ -225,7 +225,7 @@
         <td>{$form.confirm_footer_text.html}</td>
       </tr>
     </table>
-  </div><!-- /.crm-accordion-body-->
+  </div>
 </details>
 
 {*ThankYou Block*}
@@ -249,7 +249,7 @@
         <td>{$form.thankyou_footer_text.html}</td>
       </tr>
     </table>
-  </div<!-- /.crm-accordion-body -->
+  </div
 </details>
 
 {* Confirmation Email Block *}
@@ -292,7 +292,7 @@
         </tr>
       </table>
     </div>
-  </div><!-- /.crm-accordion-body -->
+  </div>
 </details>
 </div> {*end of div registration_blocks*}
     </div>

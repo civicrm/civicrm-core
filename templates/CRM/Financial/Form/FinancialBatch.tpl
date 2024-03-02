@@ -60,7 +60,7 @@
           <td class="html-adjust">{$form.total.html|crmAddClass:number} {help id="total"}</td>
         </tr>
       </table>
-    </div><!-- /.crm-accordion-body -->
+    </div>
   </details>
 {/if}
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="botttom"}</div>
