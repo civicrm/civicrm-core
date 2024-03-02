@@ -1,26 +1,25 @@
 <?php
-use CRM_CivicrmSearchUi_ExtensionUtil as E;
+use CRM_CivicrmAdminUi_ExtensionUtil as E;
 
 return [
   [
-    'name' => 'SavedSearch_Badged_Group',
+    'name' => 'SavedSearch_Administer_Badge_Layouts',
     'entity' => 'SavedSearch',
     'cleanup' => 'unused',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
       'values' => [
-        'name' => 'Badged_Group',
-        'label' => E::ts('Badged Group'),
+        'name' => 'Administer_Badge_Layouts',
+        'label' => E::ts('Administer Badge Layouts'),
         'api_entity' => 'PrintLabel',
         'api_params' => [
           'version' => 4,
           'select' => [
+            'id',
             'title',
             'description',
-            'is_active',
             'is_default',
-            'is_reserved',
           ],
           'orderBy' => [],
           'where' => [],
@@ -35,16 +34,16 @@ return [
     ],
   ],
   [
-    'name' => 'SavedSearch_Badged_Group_SearchDisplay_Badged_Group_Table_1',
+    'name' => 'SavedSearch_Administer_Badge_Layouts_SearchDisplay_Administer_Badge_Layouts_Table_1',
     'entity' => 'SearchDisplay',
     'cleanup' => 'unused',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
       'values' => [
-        'name' => 'Badged_Group_Table_1',
-        'label' => E::ts('Badged Group Table 1'),
-        'saved_search_id.name' => 'Badged_Group',
+        'name' => 'Administer_Badge_Layouts_Table_1',
+        'label' => E::ts('Administer Badge Layouts Table 1'),
+        'saved_search_id.name' => 'Administer_Badge_Layouts',
         'type' => 'table',
         'settings' => [
           'description' => NULL,
@@ -69,101 +68,91 @@ return [
             ],
             [
               'type' => 'field',
-              'key' => 'is_active',
-              'dataType' => 'Boolean',
-              'label' => E::ts('Enabled'),
-              'sortable' => TRUE,
-            ],
-            [
-              'type' => 'field',
               'key' => 'is_default',
               'dataType' => 'Boolean',
               'label' => E::ts('Default'),
               'sortable' => TRUE,
             ],
             [
+              'text' => '',
+              'style' => 'default',
               'size' => 'btn-xs',
+              'icon' => 'fa-bars',
               'links' => [
                 [
-                  'path' => 'civicrm/admin/badgelayout?action=update&id=[id]&reset=1',
-                  'icon' => '',
+                  'action' => 'update',
+                  'entity' => 'PrintLabel',
+                  'icon' => 'fa-pencil',
                   'text' => E::ts('Edit'),
                   'style' => 'default',
                   'condition' => [],
                   'task' => '',
-                  'entity' => '',
-                  'action' => '',
+                  'path' => '',
                   'join' => '',
                   'target' => 'crm-popup',
                 ],
-              ],
-              'type' => 'buttons',
-              'alignment' => 'text-right',
-            ],
-            [
-              'size' => 'btn-xs',
-              'links' => [
                 [
-                  'path' => 'civicrm/admin/badgelayout?reset=1&action=browse#',
-                  'icon' => '',
+                  'task' => 'disable',
+                  'entity' => 'PrintLabel',
+                  'join' => '',
+                  'target' => 'crm-popup',
+                  'icon' => 'fa-toggle-off',
                   'text' => E::ts('Disable'),
                   'style' => 'default',
+                  'path' => '',
+                  'action' => '',
                   'condition' => [
-                    'is_reserved',
+                    'is_active',
+                    '=',
+                    TRUE,
+                  ],
+                ],
+                [
+                  'task' => 'enable',
+                  'entity' => 'PrintLabel',
+                  'join' => '',
+                  'target' => 'crm-popup',
+                  'icon' => 'fa-toggle-on',
+                  'text' => E::ts('Enable'),
+                  'style' => 'default',
+                  'path' => '',
+                  'action' => '',
+                  'condition' => [
+                    'is_active',
                     '=',
                     FALSE,
                   ],
-                  'task' => '',
-                  'entity' => '',
-                  'action' => '',
+                ],
+                [
+                  'task' => 'delete',
+                  'entity' => 'PrintLabel',
                   'join' => '',
                   'target' => 'crm-popup',
-                ],
-              ],
-              'type' => 'buttons',
-              'alignment' => 'text-right',
-            ],
-            [
-              'size' => 'btn-xs',
-              'links' => [
-                [
-                  'path' => '',
                   'icon' => 'fa-trash',
                   'text' => E::ts('Delete'),
                   'style' => 'danger',
-                  'condition' => [
-                    'is_reserved',
-                    '=',
-                    FALSE,
-                  ],
-                  'task' => 'delete',
-                  'entity' => 'PrintLabel',
+                  'path' => '',
                   'action' => '',
-                  'join' => '',
-                  'target' => 'crm-popup',
+                  'condition' => [],
                 ],
               ],
-              'type' => 'buttons',
+              'type' => 'menu',
               'alignment' => 'text-right',
             ],
           ],
-          'actions' => FALSE,
+          'actions' => TRUE,
           'classes' => [
             'table',
             'table-striped',
           ],
           'toolbar' => [
             [
-              'path' => 'civicrm/admin/badgelayout?action=add&reset=1',
-              'icon' => '',
+              'action' => 'add',
+              'entity' => 'PrintLabel',
+              'icon' => 'fa-plus',
               'text' => E::ts('New Badge Layout'),
-              'style' => 'default',
-              'condition' => [],
-              'task' => '',
-              'entity' => '',
-              'action' => '',
-              'join' => '',
-              'target' => '',
+              'style' => 'primary',
+              'target' => 'crm-popup',
             ],
           ],
           'cssRules' => [
@@ -183,3 +172,4 @@ return [
     ],
   ],
 ];
+
