@@ -101,16 +101,18 @@
 
 <div id="editMessageDetails">
     <div id="updateDetails" >
-        {$form.updateTemplate.html}&nbsp;{$form.updateTemplate.label}
+      {if array_key_exists('updateTemplate', $form)}{$form.updateTemplate.html}&nbsp;{$form.updateTemplate.label}{/if}
     </div>
     <div>
-        {$form.saveTemplate.html}&nbsp;{$form.saveTemplate.label}
+      {if array_key_exists('saveTemplate', $form)}{$form.saveTemplate.html}&nbsp;{$form.saveTemplate.label}{/if}
     </div>
 </div>
 
 <div id="saveDetails" class="section">
+  {if array_key_exists('saveTemplateName', $form)}
     <div class="label">{$form.saveTemplateName.label}</div>
     <div class="content">{$form.saveTemplateName.html|crmAddClass:huge}</div>
+  {/if}
 </div>
 
   </div><!-- /.crm-accordion-body -->

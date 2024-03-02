@@ -24,18 +24,21 @@
     </div>
   </div><!-- /.crm-accordion-body -->
 </div><!-- /.crm-accordion-wrapper -->
+
 <div id="SMSeditMessageDetails" class="section">
-    <div id="SMSupdateDetails" class="section" >
-  {$form.SMSupdateTemplate.html}&nbsp;{$form.SMSupdateTemplate.label}
-    </div>
-    <div class="section">
-  {$form.SMSsaveTemplate.html}&nbsp;{$form.SMSsaveTemplate.label}
-    </div>
+  <div id="SMSupdateDetails" class="section" >
+    {if array_key_exists('SMSupdateTemplate', $form)}{$form.SMSupdateTemplate.html}&nbsp;{$form.SMSupdateTemplate.label}{/if}
+  </div>
+  <div class="section">
+    {if array_key_exists('SMSsaveTemplate', $form)}{$form.SMSsaveTemplate.html}&nbsp;{$form.SMSsaveTemplate.label}{/if}
+  </div>
 </div>
 
 <div id="SMSsaveDetails" class="section">
-   <div class="label">{$form.SMSsaveTemplateName.label}</div>
-   <div class="content">{$form.SMSsaveTemplateName.html|crmAddClass:huge}</div>
+  {if array_key_exists('SMSsaveTemplateName', $form)}
+    <div class="label">{$form.SMSsaveTemplateName.label}</div>
+    <div class="content">{$form.SMSsaveTemplateName.html|crmAddClass:huge}</div>
+  {/if}
 </div>
 
 {capture assign="char_count_message"}
