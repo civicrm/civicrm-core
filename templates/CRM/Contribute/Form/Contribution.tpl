@@ -402,7 +402,7 @@
         {/if}
       </script>
 
-      {* Additional Detail / Honoree Information / Premium Information *}
+      {* Additional Detail / Premium Information *}
       {foreach from=$allPanes key=paneName item=paneValue}
         <details class="crm-accordion-bold crm-ajax-accordion crm-{$paneValue.id}-accordion" {if $paneValue.open neq 'true'}{else}open{/if}>
           <summary  id="{$paneValue.id}">{$paneName}</summary>
