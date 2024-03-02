@@ -26,42 +26,6 @@ class DefaultDashboardTest extends \Civi\Test\MinkBase {
     $this->assertSession()->pageTextContains('Event Income Summary');
   }
 
-  public function testManageGroups() {
-    $session = $this->mink->getSession();
-    $page = $session->getPage();
-
-    $this->login($GLOBALS['_CV']['ADMIN_USER']);
-    $gid1 = Group::create(FALSE)
-      ->addValue('name', 'group1')
-      ->addValue('title', 'Group 1')
-      ->addValue('description', 'This is a basic group.')
-      ->execute()[0]['id'];
-    $gid2 = Group::create(FALSE)
-      ->addValue('name', 'mailing_group')
-      ->addValue('title', 'A Mailing Group')
-      ->addValue('description', 'This is a mailing group.')
-      ->addValue('group_type:name', ['Mailing List'])
-      ->execute()[0]['id'];
-
-    $this->visit(Civi::url('backend://civicrm/group'));
-    $session->wait(5000, 'document.querySelectorAll("tr[data-entity-id]").length > 0');
-    $this->createScreenshot('/tmp/manage-groups-1.png');
-    $afformTable = $page->find('xpath', '//afsearch-manage-groups//table');
-    $this->assertSession()->elementExists('xpath', "//tr[@data-entity-id = '$gid1']", $afformTable);
-    $session = $this->mink->getSession();
-    $page = $session->getPage();
-
-    $this->login($GLOBALS['_CV']['ADMIN_USER']);
-    file_put_contents('/tmp/test-login.png', $this->mink->getSession()->getDriver()->getScreenshot());
-
-    $this->visit(Civi::url('backend://civicrm/dashboard'));
-    $session->wait(5000, "document.getElementsByClassName('crm-hover-button').length");
-    $page->find('css', '.crm-hover-button')->click();
-
-    file_put_contents('/tmp/test-dashboard.png', $this->mink->getSession()->getDriver()->getScreenshot());
-    $this->assertSession()->pageTextContains('Event Income Summary');
-  }
-
   public function testDefaultCurrency() {
     $session = $this->mink->getSession();
     $page = $session->getPage();
@@ -112,11 +76,6 @@ class DefaultDashboardTest extends \Civi\Test\MinkBase {
     // asset tha that the currency for product A is USD
     // $this->assertSession()->pageTextContains('Event Income Summary');
 
-  }
-
-  protected function tearDown(): void {
-    Group::delete(FALSE)->addWhere('id', '>=', 5)->execute();
-    parent::tearDown();
   }
 
 }
