@@ -44,15 +44,10 @@ class DefaultDashboardTest extends \MinkBase {
       ->execute()[0]['id'];
 
     $this->visit(Civi::url('backend://civicrm/group'));
-    $session->wait(5000, 'document.querySelector("afsearch-manage-groups") != null');
+    $session->wait(5000, 'document.querySelectorAll("tr[data-entity-id]").length > 0');
     $this->createScreenshot('/tmp/manage-groups-1.png');
     $afformTable = $page->find('xpath', '//afsearch-manage-groups//table');
-    // $group1Row = $afformTable->find('xpath', '//tr[contains(text(), "Group 1")]');
-    $group1Row = $afformTable->find('xpath', '//*[contains(text(), "Group 1")]/ancestor::tr');
-    // $rows->find('named', ['content', 'Group 1']);
-    // Delete all groups.
-    Group::delete(FALSE)->addWhere('id', 'IN', [$gid1, $gid2])->execute();
-  }
+    $this->assertSession()->elementExists('xpath', "//tr[@data-entity-id = '$gid1']", $afformTable);
     $session = $this->mink->getSession();
     $page = $session->getPage();
 
@@ -62,7 +57,7 @@ class DefaultDashboardTest extends \MinkBase {
     $this->visit(Civi::url('backend://civicrm/dashboard'));
     $session->wait(5000, "document.getElementsByClassName('crm-hover-button').length");
     $page->find('css', '.crm-hover-button')->click();
-    
+
     file_put_contents('/tmp/test-dashboard.png', $this->mink->getSession()->getDriver()->getScreenshot());
     $this->assertSession()->pageTextContains('Event Income Summary');
   }
@@ -111,16 +106,17 @@ class DefaultDashboardTest extends \MinkBase {
 
     file_put_contents('/tmp/test-searchProductPage.png', $this->mink->getSession()->getDriver()->getScreenshot());
 
-
     $afformTable = $page->find('xpath', '//afsearch-premium-products//table');
     //$rows = $afformTable->findAll('css', 'tbody tr');
-
-
-
 
     // asset tha that the currency for product A is USD
     // $this->assertSession()->pageTextContains('Event Income Summary');
 
+  }
+
+  protected function tearDown(): void {
+    Group::delete(FALSE)->addWhere('id', '>=', 5)->execute();
+    parent::tearDown();
   }
 
 }
