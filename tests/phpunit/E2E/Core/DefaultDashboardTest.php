@@ -11,7 +11,7 @@ use Civi\Api4\Group;
  * @package E2E\Core
  * @group e2e
  */
-class DefaultDashboardTest extends \MinkBase {
+class DefaultDashboardTest extends \Civi\Test\MinkBase {
 
   public function testDashboard() {
     $session = $this->mink->getSession();

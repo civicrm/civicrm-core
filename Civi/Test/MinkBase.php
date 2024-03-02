@@ -1,6 +1,8 @@
 <?php
 
+namespace Civi\Test;
 
+use Civi;
 use Behat\Mink\WebAssert;
 use Behat\Mink\Mink;
 use Behat\Mink\Session;
@@ -8,8 +10,7 @@ use Behat\Mink\Element\TraversableElement;
 use DMore\ChromeDriver\ChromeDriver;
 
 /**
- * Class MinkBase
- * @group e2e
+ * Class MinkBase.  Helper functions for E2E testing.
  */
 abstract class MinkBase extends \CiviEndToEndTestCase {
    /**
