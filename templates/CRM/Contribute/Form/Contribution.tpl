@@ -402,17 +402,15 @@
         {/if}
       </script>
 
-      <div class="accordion ui-accordion ui-widget ui-helper-reset">
-        {* Additional Detail / Honoree Information / Premium Information *}
-        {foreach from=$allPanes key=paneName item=paneValue}
-          <details class="crm-accordion-bold crm-ajax-accordion crm-{$paneValue.id}-accordion" {if $paneValue.open neq 'true'}{else}open{/if}>
-            <summary  id="{$paneValue.id}">{$paneName}</summary>
-            <div class="crm-accordion-body">
-              <div class="{$paneValue.id}"></div>
-            </div><!-- /.crm-accordion-body -->
-          </details>
-        {/foreach}
-      </div>
+      {* Additional Detail / Honoree Information / Premium Information *}
+      {foreach from=$allPanes key=paneName item=paneValue}
+        <details class="crm-accordion-bold crm-ajax-accordion crm-{$paneValue.id}-accordion" {if $paneValue.open neq 'true'}{else}open{/if}>
+          <summary  id="{$paneValue.id}">{$paneName}</summary>
+          <div class="crm-accordion-body">
+            <div class="{$paneValue.id}"></div>
+          </div><!-- /.crm-accordion-body -->
+        </details>
+      {/foreach}
     {/if}
     {if $billing_address}
       <fieldset>
