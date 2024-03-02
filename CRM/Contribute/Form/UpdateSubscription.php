@@ -63,23 +63,13 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
       CRM_Core_Error::statusBounce(ts('Required information missing.'));
     }
 
-    if ($this->getSubscriptionDetails()->membership_id && $this->getSubscriptionDetails()->auto_renew) {
-      // Add Membership details to form
-      $membership = civicrm_api3('Membership', 'get', [
-        'contribution_recur_id' => $this->contributionRecurID,
-      ]);
-      if (!empty($membership['count'])) {
-        $membershipDetails = reset($membership['values']);
-        $values['membership_id'] = $membershipDetails['id'];
-        $values['membership_name'] = $membershipDetails['membership_name'];
-      }
-      $this->assign('recurMembership', $values);
-      $this->assign('contactId', $this->getSubscriptionContactID());
-    }
+    $this->assign('contactId', $this->getSubscriptionContactID());
+    $this->assign('membershipID', $this->getMembershipID());
+    $this->assign('membershipName', $this->getMembershipValue('name'));
 
     $this->assign('self_service', $this->isSelfService());
-    $this->assign('recur_frequency_interval', $this->getSubscriptionDetails()->frequency_interval);
-    $this->assign('recur_frequency_unit', $this->getSubscriptionDetails()->frequency_unit);
+    $this->assign('recur_frequency_interval', $this->getContributionRecurValue('frequency_interval'));
+    $this->assign('recur_frequency_unit', $this->getContributionRecurValue('frequency_unit'));
 
     $this->editableScheduleFields = $this->getPaymentProcessorObject()->getEditableRecurringScheduleFields();
 
@@ -175,7 +165,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
       CRM_Campaign_BAO_Campaign::addCampaign($this, $this->getSubscriptionDetails()->campaign_id);
     }
 
-    if (CRM_Contribute_BAO_ContributionRecur::supportsFinancialTypeChange($this->contributionRecurID)) {
+    if (CRM_Contribute_BAO_ContributionRecur::supportsFinancialTypeChange($this->getContributionRecurID())) {
       $this->addEntityRef('financial_type_id', ts('Financial Type'), ['entity' => 'FinancialType'], !$this->isSelfService());
     }
 

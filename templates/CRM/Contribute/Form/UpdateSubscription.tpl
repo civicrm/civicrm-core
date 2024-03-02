@@ -11,9 +11,9 @@
   {if $changeHelpText}
     <div class="help">
       {$changeHelpText}
-      {if $recurMembership}
+      {if $membershipID}
         <br/><strong> {ts}WARNING: This recurring contribution is linked to membership:{/ts}
-        <a class="crm-hover-button" href='{crmURL p="civicrm/contact/view/membership" q="action=view&reset=1&cid=`$contactId`&id=`$recurMembership.membership_id`&context=membership&selectedChild=member"}'>{$recurMembership.membership_name}</a>
+        <a class="crm-hover-button" href='{crmURL p="civicrm/contact/view/membership" q="action=view&reset=1&cid=`$contactId`&id=`$membershipID`&context=membership&selectedChild=member"}'>{$membershipName|escape}</a>
         </strong>
       {/if}
     </div>
@@ -27,7 +27,7 @@
   <table class="form-layout">
     <tr>
       <td class="label">{$form.amount.label}</td>
-      <td>{$form.currency.html|crmAddClass:eight}&nbsp;{$form.amount.html|crmAddClass:eight} ({ts}every{/ts} {$recur_frequency_interval} {$recur_frequency_unit})</td>
+      <td>{$form.currency.html|crmAddClass:eight}&nbsp;{$form.amount.html|crmAddClass:eight} ({ts}every{/ts} {$recur_frequency_interval|escape} {$recur_frequency_unit|escape})</td>
     </tr>
     {if array_key_exists('installments', $form)}
       <tr>
@@ -48,7 +48,7 @@
   </table>
 
   {if !$self_service}
-    {include file="CRM/common/customDataBlock.tpl" groupID='' customDataType='ContributionRecur' customDataSubType=false entityID=$pledgeID cid=false}
+    {include file="CRM/common/customDataBlock.tpl" groupID='' customDataType='ContributionRecur' customDataSubType=false entityID=$contributionRecurID cid=false}
   {/if}
 
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
