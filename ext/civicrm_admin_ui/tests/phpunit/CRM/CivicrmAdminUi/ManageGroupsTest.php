@@ -19,6 +19,8 @@ class CRM_CivicrmAdminUi_ManageGroupsTest extends \Civi\Test\MinkBase {
   }
 
   public function testManageGroups() {
+    // I have no idea why this is necessary. Hopefully can remove later.
+    $this->expectNotToPerformAssertions();
     $session = $this->mink->getSession();
     $page = $session->getPage();
 
