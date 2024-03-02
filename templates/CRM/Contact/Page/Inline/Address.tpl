@@ -48,7 +48,7 @@
       {assign var="isAddressCustomPresent" value=1}
       {foreach from=$customGroup item=customValue key=cvId}
         <details id="address_custom_{$cgId}_{$locationIndex}" class="crm-address-custom-{$cgId}-{$locationIndex}-accordion" {if $customValue.collapse_display}{else}open{/if}>
-          <summary>
+          <summary class="collapsible-title">
             {$customValue.title}
           </summary>
           <div class="crm-summary-block">
