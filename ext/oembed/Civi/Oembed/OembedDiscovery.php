@@ -43,16 +43,24 @@ class OembedDiscovery extends AutoService implements EventSubscriberInterface {
     // In explicit sharing, the administrator sees a panel with options for sharing.
     if (Civi::settings()->get('oembed_share') && \CRM_Core_Permission::check('administer oembed')) {
       $query = $oembed->findPropagatedParams($_GET);
-      $oembed = \Civi::service('oembed')->create($pathStr, $query);
-      $vars = [
-        'oembedSharingUrl' => (string) Civi::url('frontend://civicrm/share', 'a')->addQuery([
-          'url' => (string) Civi::url('frontend://' . $pathStr, 'a')->addQuery($query),
-        ]),
-        'oembedSharingIframe' => $oembed['html'],
+
+      $data = [
+        'page' => Civi::url('frontend://' . $pathStr, 'a')->addQuery($query),
+        'iframe' => Civi::url('iframe://' . $pathStr, 'a')->addQuery($query),
+        'share' => Civi::url('frontend://civicrm/share', 'a')->addQuery(['url' => Civi::url('frontend://' . $pathStr, 'a')->addQuery($query)]),
       ];
+      $options = [
+        'maxwidth' => Civi::service('oembed')->getDefaultWidth(),
+        'maxheight' => Civi::service('oembed')->getDefaultHeight(),
+      ];
+
+      Civi::service('angularjs.loader')->addModules(['crmOembedSharing']);
       \CRM_Core_Region::instance('page-footer')->add([
         'name' => 'oembed-share',
-        'markup' => \CRM_Core_Smarty::singleton()->fetchWith('CRM/Oembed/OembedSharing.tpl', $vars),
+        'markup' => sprintf('<crm-angular-js modules="crmOembedSharing"> <crm-oembed-sharing urls="%s" options="%s" /> </crm-angular-js>',
+          htmlentities(\CRM_Utils_JS::encode($data)),
+          htmlentities(\CRM_Utils_JS::encode($options)),
+        ),
       ]);
     }
   }

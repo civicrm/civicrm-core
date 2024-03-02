@@ -120,4 +120,12 @@ class Oembed extends AutoService {
     return \Civi::service('iframe.router')->isAllowedRoute($path) && !preg_match(';^civicrm/(ajax|asset);', $path);
   }
 
+  public function getDefaultWidth(): int {
+    return $this->defaultWidth;
+  }
+
+  public function getDefaultHeight(): int {
+    return $this->defaultHeight;
+  }
+
 }
