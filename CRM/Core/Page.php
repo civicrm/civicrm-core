@@ -323,9 +323,12 @@ class CRM_Core_Page {
    * @param string $var
    * @param mixed $value
    *   (reference) value of variable.
+   *
+   * @deprecated since 5.72 will be removed around 5.84
    */
   public function assign_by_ref($var, &$value) {
-    self::$_template->assign_by_ref($var, $value);
+    CRM_Core_Error::deprecatedFunctionWarning('assign');
+    self::$_template->assign($var, $value);
   }
 
   /**
