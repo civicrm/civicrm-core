@@ -86,7 +86,7 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
     $preview = [];
     $preview['type'] = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_Mailing', $this->_mailingID, 'body_html') ? 'html' : 'text';
     $preview['viewURL'] = CRM_Utils_System::url('civicrm/mailing/view', "reset=1&id={$this->_mailingID}");
-    $this->assign_by_ref('preview', $preview);
+    $this->assign('preview', $preview);
   }
 
   /**
