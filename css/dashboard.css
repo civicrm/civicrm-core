@@ -16,11 +16,15 @@
   border-radius: 3px;
 }
 
-.crm-container .crm-dashlet-content {
+#civicrm-dashboard  .crm-dashlet-content {
   background-color: #ffffff;
-  padding: 0.5em;
+  padding: 0.25rem;
   overflow-x: auto;
   min-height: 10em;
+}
+
+.crm-container .crm-dashlet-content details {
+  padding: 0;
 }
 
 crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
@@ -34,7 +38,8 @@ crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
 .crm-container .crm-dashlet-header {
   background-color: #5d677b;
   display: block;
-  padding: 5px 0;
+  padding: 0;
+  border-radius: 4px;
 }
 
 .crm-container .crm-dashlet-header h3 {
@@ -48,9 +53,9 @@ crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
   overflow: hidden;
 }
 
-.crm-container .crm-dashlet-header a {
+.crm-container .crm-dashlet-header > a {
   font-size: 14px;
-  padding: 0 6px;
+  padding: 7px 5px;
   font-weight: normal;
   float: right;
   cursor: pointer;
