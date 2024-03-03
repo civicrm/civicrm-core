@@ -68,6 +68,9 @@
     <dataPattern>/^[\w\/\:\.]+$/</dataPattern>
     <comment>the OpenID (or OpenID-style http://username.domain/) unique identifier for this contact mainly used for logging in to CiviCRM</comment>
     <rule>url</rule>
+    <html>
+      <type>Url</type>
+    </html>
     <comment>OpenID</comment>
     <add>2.0</add>
   </field>
