@@ -35,6 +35,20 @@ trait CRM_Contact_Form_Task_SMSTrait {
     // Activity sub class does this.
   }
 
+  /**
+   * Get SMS provider parameters.
+   *
+   * @return array
+   */
+  protected function getSmsProviderParams(): array {
+    // $smsParams carries all the arguments provided on form (or via hooks), to the provider->send() method
+    // this gives flexibility to the users / implementors to add their own args via hooks specific to their sms providers
+    $smsProviderParams = $this->getSubmittedValues();
+    unset($smsProviderParams['sms_text_message']);
+    $smsProviderParams['provider_id'] = $this->getSubmittedValue('sms_provider_id');
+    return $smsProviderParams;
+  }
+
   protected function bounceOnNoActiveProviders(): void {
     $providersCount = CRM_SMS_BAO_Provider::activeProviderCount();
     if (!$providersCount) {
@@ -206,8 +220,6 @@ trait CRM_Contact_Form_Task_SMSTrait {
     $form = $this;
     $thisValues = $form->controller->exportValues($form->getName());
 
-    $fromSmsProviderId = $thisValues['sms_provider_id'];
-
     // process message template
     if (!empty($thisValues['SMSsaveTemplate']) || !empty($thisValues['SMSupdateTemplate'])) {
       $messageTemplate = [
@@ -254,17 +266,11 @@ trait CRM_Contact_Form_Task_SMSTrait {
       }
     }
 
-    // $smsParams carries all the arguments provided on form (or via hooks), to the provider->send() method
-    // this gives flexibity to the users / implementors to add their own args via hooks specific to their sms providers
-    $smsParams = $thisValues;
-    unset($smsParams['sms_text_message']);
-    $smsParams['provider_id'] = $fromSmsProviderId;
     $contactIds = array_keys($form->_contactDetails);
     $allContactIds = array_keys($form->_allContactDetails);
 
     [$sent, $countSuccess] = $this->sendSMS($formattedContactDetails,
       $thisValues,
-      $smsParams,
       $contactIds
     );
 
@@ -318,7 +324,6 @@ trait CRM_Contact_Form_Task_SMSTrait {
    *
    * @param array $contactDetails
    * @param array $activityParams
-   * @param array $smsProviderParams
    * @param array $contactIds
    *
    * @return array(bool $sent, int $activityId, int $success)
@@ -327,7 +332,6 @@ trait CRM_Contact_Form_Task_SMSTrait {
   protected function sendSMS(
     &$contactDetails,
     &$activityParams,
-    &$smsProviderParams = [],
     &$contactIds = NULL
   ) {
 
@@ -368,7 +372,7 @@ trait CRM_Contact_Form_Task_SMSTrait {
     foreach ($contactDetails as $contact) {
       $contactId = $contact['contact_id'];
       $tokenText = CRM_Core_BAO_MessageTemplate::renderTemplate(['messageTemplate' => ['msg_text' => $text], 'contactId' => $contactId, 'disableSmarty' => TRUE])['text'];
-
+      $smsProviderParams = $this->getSmsProviderParams();
       // Only send if the phone is of type mobile
       if ($contact['phone_type_id'] == CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'phone_type_id', 'Mobile')) {
         $smsProviderParams['To'] = $contact['phone'];
