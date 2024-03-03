@@ -122,7 +122,7 @@ return [
                   'text' => E::ts('Process'),
                   'style' => 'default',
                   'condition' => [
-                    'status_id:label',
+                    'status_id:name',
                     '=',
                     'Pending',
                   ],
