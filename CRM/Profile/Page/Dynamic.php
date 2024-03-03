@@ -339,8 +339,8 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
         ];
       }
 
-      $template->assign_by_ref('row', $values);
-      $template->assign_by_ref('profileFields', $profileFields);
+      $template->assign('row', $values);
+      $template->assign('profileFields', $profileFields);
     }
 
     $name = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $this->_gid, 'name');

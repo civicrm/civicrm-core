@@ -119,7 +119,7 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
     $preview['type'] = $this->_mailing->body_html ? 'html' : 'text';
     $preview['attachment'] = CRM_Core_BAO_File::attachmentInfo('civicrm_mailing', $this->_mailingID);
 
-    $this->assign_by_ref('preview', $preview);
+    $this->assign('preview', $preview);
   }
 
   /**

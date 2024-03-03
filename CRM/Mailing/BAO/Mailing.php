@@ -1167,7 +1167,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     if ($useSmarty) {
       $smarty = CRM_Core_Smarty::singleton();
       // also add the contact tokens to the template
-      $smarty->assign_by_ref('contact', $contact);
+      $smarty->assign('contact', $contact);
     }
 
     $mailParams = $headers;
