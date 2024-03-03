@@ -38,6 +38,12 @@ class ParticipantLinksProvider extends \Civi\Core\Service\AutoSubscriber {
     if ($request['version'] == 4 && $request->getEntityName() === 'Participant' && is_a($request, '\Civi\Api4\Action\GetLinks')) {
       $links = (array) $e->getResponse();
       $addLinkIndex = self::getActionIndex($links, 'add');
+      $transferLinkIndex = self::getActionIndex($links, 'detach');
+      if (isset($transferLinkIndex)) {
+        if ($request->getCheckPermissions() && !\CRM_Core_Permission::check('edit event participants')) {
+          unset($links[$transferLinkIndex]);
+        }
+      }
       if (isset($addLinkIndex)) {
         $contactId = $request->getValue('contact_id');
         if ($request->getCheckPermissions() && !\CRM_Core_Permission::check('edit event participants')) {

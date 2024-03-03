@@ -163,6 +163,21 @@ return [
                 ],
                 [
                   'entity' => 'Participant',
+                  'action' => 'detach',
+                  'icon' => 'fa-random',
+                  'text' => E::ts('Transfer or Cancel'),
+                  'style' => 'default',
+                  'condition' => [
+                    'status_id:name',
+                    'NOT IN',
+                    ['Cancelled', 'Transferred'],
+                  ],
+                  'task' => '',
+                  'join' => '',
+                  'target' => 'crm-popup',
+                ],
+                [
+                  'entity' => 'Participant',
                   'action' => 'delete',
                   'join' => '',
                   'target' => 'crm-popup',
