@@ -6,23 +6,8 @@
     <summary>
       {{:: $ctrl.dashlet.label }}
     </summary>
-    <div class="crm-dashlet-content crm-accordion-body" ng-show="!$ctrl.collapsed">
+    <div class="crm-dashlet-content crm-accordion-body" >
       <div ng-if="$ctrl.dashlet.directive" ng-include="'~/crmDashboard/directives/' + $ctrl.dashlet.directive + '.html'"></div>
     </div>
   </details>
 </div>
-
-
-<!-- 
-<details class="crm-accordion-bold">
-  <summary>
-    <h3>{{:: $ctrl.dashlet.label }}</h3>
-    <a href class="crm-i fa-times" title="{{:: ts('Remove from dashboard') }}" aria-hidden="true" ng-click="$ctrl.remove()"></a>
-    <a href class="crm-i fa-expand" title="{{:: ts('View fullscreen') }}" aria-hidden="true" ng-click="$ctrl.fullscreen()"></a>
-    <a href class="crm-i fa-refresh" title="{{:: ts('Refresh') }}" aria-hidden="true" ng-click="$ctrl.forceRefresh()"></a>
-  </summary>
-<div class="crm-accordion-body crm-dashlet-content" ng-show="!$ctrl.collapsed">
-  <div ng-if="$ctrl.dashlet.directive" ng-include="'~/crmDashboard/directives/' + $ctrl.dashlet.directive + '.html'"></div>
-</div>
-</details>
- -->
