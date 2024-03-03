@@ -428,7 +428,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       );
       $this->set('availableRegistrations', $this->_availableRegistrations);
     }
-    $this->assign_by_ref('paymentProcessor', $this->_paymentProcessor);
+    $this->assign('paymentProcessor', $this->_paymentProcessor);
 
     // check if this is a paypal auto return and redirect accordingly
     if (CRM_Core_Payment::paypalRedirect($this->_paymentProcessor)) {
