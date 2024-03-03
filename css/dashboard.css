@@ -39,7 +39,6 @@ crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
   background-color: #5d677b;
   display: block;
   padding: 0;
-  border-radius: 4px;
 }
 
 .crm-container .crm-dashlet-header h3 {
