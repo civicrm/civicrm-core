@@ -588,7 +588,7 @@ SELECT count(id)
     $params['total'] = CRM_Core_DAO::singleValueQuery($query, $whereParams);
 
     $this->_pager = new CRM_Utils_Pager($params);
-    $this->assign_by_ref('pager', $this->_pager);
+    $this->assign('pager', $this->_pager);
   }
 
   /**

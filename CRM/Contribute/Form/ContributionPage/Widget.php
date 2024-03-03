@@ -210,8 +210,8 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
       );
     }
 
-    $this->assign_by_ref('fields', $this->_fields);
-    $this->assign_by_ref('colorFields', $this->_colorFields);
+    $this->assign('fields', $this->_fields);
+    $this->assign('colorFields', $this->_colorFields);
 
     $this->_refreshButtonName = $this->getButtonName('refresh');
     $this->addElement('xbutton',

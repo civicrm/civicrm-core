@@ -115,7 +115,7 @@ class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
 
       // also set the group title
       $groupValues = ['id' => $this->_id, 'title' => $this->_title];
-      $this->assign_by_ref('group', $groupValues);
+      $this->assign('group', $groupValues);
     }
 
     // Set dynamic page title for 'Add Members Group (confirm)'
