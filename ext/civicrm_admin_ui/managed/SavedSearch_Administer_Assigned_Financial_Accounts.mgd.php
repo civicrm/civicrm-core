@@ -142,7 +142,7 @@ return [
                   'text' => E::ts('Delete'),
                   'style' => 'danger',
                   'condition' => [
-                    'account_relationship:label',
+                    'account_relationship:name',
                     '!=',
                     'Accounts Receivable Account is',
                   ],
