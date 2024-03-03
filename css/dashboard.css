@@ -41,17 +41,6 @@ crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
   padding: 0;
 }
 
-.crm-container .crm-dashlet-header h3 {
-  background: transparent;
-  cursor: move;
-  margin: 0 50px 0 0;
-  padding: 0;
-  color: #fcfcfc;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-}
-
 .crm-container .crm-dashlet-header > a {
   font-size: 14px;
   padding: 7px 5px;

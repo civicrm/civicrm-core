@@ -1,4 +1,4 @@
-<div class="crm-dashlet-header">
+<div class="crm-dashlet-header crm-accordion-bold">
   <a href class="crm-i fa-times" title="{{:: ts('Remove from dashboard') }}" aria-hidden="true" ng-click="$ctrl.remove()"></a>
   <a href class="crm-i fa-expand" title="{{:: ts('View fullscreen') }}" aria-hidden="true" ng-click="$ctrl.fullscreen()"></a>
   <a href class="crm-i fa-refresh" title="{{:: ts('Refresh') }}" aria-hidden="true" ng-click="$ctrl.forceRefresh()"></a>
@@ -6,7 +6,7 @@
     <summary>
       {{:: $ctrl.dashlet.label }}
     </summary>
-    <div class="crm-dashlet-content crm-accordion-body" >
+    <div class="crm-dashlet-content crm-accordion-body">
       <div ng-if="$ctrl.dashlet.directive" ng-include="'~/crmDashboard/directives/' + $ctrl.dashlet.directive + '.html'"></div>
     </div>
   </details>
