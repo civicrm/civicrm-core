@@ -676,7 +676,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     }
     CRM_Core_BAO_UFGroup::getValues($this->_contactID, $customFields, $customValues, FALSE, $members);
 
-    $this->assign_by_ref('formValues', $this->_params);
+    $this->assign('formValues', $this->_params);
 
     $this->assign('membership_name', CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
       $membership->membership_type_id

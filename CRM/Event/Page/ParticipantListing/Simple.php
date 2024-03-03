@@ -87,7 +87,7 @@ LIMIT    $offset, $rowCount";
       ];
       $rows[] = $row;
     }
-    $this->assign_by_ref('rows', $rows);
+    $this->assign('rows', $rows);
 
     return parent::run();
   }
@@ -118,7 +118,7 @@ SELECT count( civicrm_contact.id )
 
     $params['total'] = CRM_Core_DAO::singleValueQuery($query, $whereParams);
     $this->_pager = new CRM_Utils_Pager($params);
-    $this->assign_by_ref('pager', $this->_pager);
+    $this->assign('pager', $this->_pager);
   }
 
   /**
@@ -148,8 +148,8 @@ SELECT count( civicrm_contact.id )
       );
     }
     $sort = new CRM_Utils_Sort($headers, $sortID);
-    $this->assign_by_ref('headers', $headers);
-    $this->assign_by_ref('sort', $sort);
+    $this->assign('headers', $headers);
+    $this->assign('sort', $sort);
     $this->set(CRM_Utils_Sort::SORT_ID,
       $sort->getCurrentSortID()
     );
