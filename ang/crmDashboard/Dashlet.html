@@ -6,7 +6,7 @@
     <summary>
       {{:: $ctrl.dashlet.label }}
     </summary>
-    <div class="crm-dashlet-content crm-accordion-body">
+    <div class="crm-dashlet-content">
       <div ng-if="$ctrl.dashlet.directive" ng-include="'~/crmDashboard/directives/' + $ctrl.dashlet.directive + '.html'"></div>
     </div>
   </details>

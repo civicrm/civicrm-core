@@ -18,7 +18,7 @@
 
 #civicrm-dashboard  .crm-dashlet-content {
   background-color: #ffffff;
-  padding: 0.25rem;
+  padding: 0.5rem;
   overflow-x: auto;
   min-height: 10em;
 }
