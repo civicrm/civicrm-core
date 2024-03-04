@@ -53,7 +53,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
       throw new CRM_Core_Exception('Required information missing.');
     }
 
-    if (!$this->_paymentProcessor['object']->supports('updateSubscriptionBillingInfo')) {
+    if (!$this->getPaymentProcessorObject()->supports('updateSubscriptionBillingInfo')) {
       throw new CRM_Core_Exception(ts("%1 processor doesn't support updating subscription billing details.",
         [1 => $this->_paymentProcessor['title']]
       ));
@@ -201,7 +201,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
     $processorParams['amount'] = $this->getSubscriptionDetails()->amount;
     $processorParams['contributionRecurID'] = $this->getContributionRecurID();
     $message = '';
-    $updateSubscription = $this->_paymentProcessor['object']->updateSubscriptionBillingInfo($message, $processorParams);
+    $updateSubscription = $this->getPaymentProcessorObject()->updateSubscriptionBillingInfo($message, $processorParams);
     if (is_a($updateSubscription, 'CRM_Core_Error')) {
       CRM_Core_Error::displaySessionError($updateSubscription);
     }
