@@ -3128,6 +3128,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     if ($contributionStatus !== 'Failed' &&
       !($contributionStatus === 'Pending' && !$params['contribution']->is_pay_later)
+      && !$params['contribution']->is_template
     ) {
       $skipRecords = TRUE;
       $pendingStatus = [
