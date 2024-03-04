@@ -532,7 +532,9 @@ class CRM_Utils_Array {
     $fields = (array) $field;
     uasort($array, function ($a, $b) use ($fields) {
       foreach ($fields as $f) {
-        $v = strnatcmp($a[$f], $b[$f]);
+        $f1 = $a[$f] ?? '';
+        $f2 = $b[$f] ?? '';
+        $v = strnatcmp($f1, $f2);
         if ($v !== 0) {
           return $v;
         }
