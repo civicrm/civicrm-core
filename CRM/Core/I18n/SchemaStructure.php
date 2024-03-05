@@ -692,7 +692,7 @@ class CRM_Core_I18n_SchemaStructure {
             'cols' => "50",
           ],
           'confirm_email_text' => [
-            'type' => "TextArea",
+            'type' => "RichTextEditor",
             'rows' => "4",
             'cols' => "50",
           ],

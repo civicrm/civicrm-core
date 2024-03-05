@@ -444,7 +444,7 @@
     <type>text</type>
     <title>Confirmation Email Text</title>
     <html>
-      <type>TextArea</type>
+      <type>RichTextEditor</type>
       <rows>4</rows>
       <cols>50</cols>
     </html>
