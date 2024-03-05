@@ -279,9 +279,7 @@ trait CRM_Contact_Form_Task_SMSTrait {
       }
     }
 
-    [$sent, $countSuccess] = $this->sendSMS($formattedContactDetails,
-      $thisValues
-    );
+    [$sent, $countSuccess] = $this->sendSMS($formattedContactDetails);
 
     if ($countSuccess > 0) {
       CRM_Core_Session::setStatus(ts('One message was sent successfully.', [
@@ -333,17 +331,13 @@ trait CRM_Contact_Form_Task_SMSTrait {
    * Send SMS.  Returns: bool $sent, int $activityId, int $success (number of sent SMS)
    *
    * @param array $contactDetails
-   * @param array $activityParams
    *
    * @return array(bool $sent, int $activityId, int $success)
    * @throws CRM_Core_Exception
    */
   protected function sendSMS(
-    $contactDetails,
-    $activityParams
+    $contactDetails
   ) {
-
-    $text = &$activityParams['sms_text_message'];
 
     // Create the meta level record first ( sms activity )
     $activityID = Activity::create()->setValues([
@@ -359,7 +353,7 @@ trait CRM_Contact_Form_Task_SMSTrait {
     $errMsgs = [];
     foreach ($contactDetails as $contact) {
       $contactId = $contact['contact_id'];
-      $tokenText = CRM_Core_BAO_MessageTemplate::renderTemplate(['messageTemplate' => ['msg_text' => $text], 'contactId' => $contactId, 'disableSmarty' => TRUE])['text'];
+      $tokenText = CRM_Core_BAO_MessageTemplate::renderTemplate(['messageTemplate' => ['msg_text' => $this->getSubmittedValue('sms_text_message')], 'contactId' => $contactId, 'disableSmarty' => TRUE])['text'];
       $smsProviderParams = $this->getSmsProviderParams();
       // Only send if the phone is of type mobile
       if ($contact['phone_type_id'] == CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'phone_type_id', 'Mobile')) {
