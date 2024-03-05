@@ -183,15 +183,6 @@
     <add>2.1</add>
   </field>
   <field>
-    <name>is_ssl</name>
-    <title>Use SSL?</title>
-    <type>boolean</type>
-    <default>1</default>
-    <required>true</required>
-    <comment>Should this menu be exposed via SSL if enabled?</comment>
-    <add>2.1</add>
-  </field>
-  <field>
     <name>weight</name>
     <title>Order</title>
     <type>int</type>

@@ -60,7 +60,6 @@ return [
     'is_active' => "DEFAULT 1 COMMENT 'Is this menu item active?'",
     'is_public' => "DEFAULT 0 COMMENT 'Is this menu accessible to the public?'",
     'is_exposed' => "DEFAULT 1 COMMENT 'Is this menu exposed to the navigation system?'",
-    'is_ssl' => "DEFAULT 1 COMMENT 'Should this menu be exposed via SSL if enabled?'",
     'skipBreadcrumb' => "DEFAULT 0 COMMENT 'skip this url being exposed to breadcrumb'",
   ],
   'civicrm_msg_template' => [

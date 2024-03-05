@@ -160,7 +160,7 @@ class CRM_Core_Menu {
             $value = [[$value], 'and'];
           }
         }
-        elseif ($key == 'is_public' || $key == 'is_ssl') {
+        elseif ($key == 'is_public') {
           $value = ($value == 'true' || $value == 1) ? 1 : 0;
         }
         $menu[$path][$key] = $value;
@@ -210,7 +210,6 @@ class CRM_Core_Menu {
       'access_arguments',
       'page_callback',
       'page_arguments',
-      'is_ssl',
     ];
     $fieldsPresent = [];
     foreach ($fieldsToPropagate as $field) {
