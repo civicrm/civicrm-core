@@ -307,6 +307,7 @@ class CRM_Dedupe_Finder {
    * @param string $entityType
    *   Of the contact whose contact type is needed.
    * @param array $subTypes
+   * @param array $params
    *
    * @return array[]
    *   The returned array is keyed by group id and has the custom group table fields
@@ -372,33 +373,9 @@ class CRM_Dedupe_Finder {
 
     $groupTree = self::buildLegacyGroupTree($filters, $subTypes);
 
-    // entitySelectClauses is an array of select clauses for custom value tables which are not multiple
-    // and have data for the given entities. $entityMultipleSelectClauses is the same for ones with multiple
-    $entitySingleSelectClauses = $entityMultipleSelectClauses = $groupTree['info']['select'] = [];
-    $singleFieldTables = [];
-    // now that we have all the groups and fields, lets get the values
-    // since we need to know the table and field names
-    // add info to groupTree
-    if (!empty($groupTree['info']['tables'])) {
-      $groupTree['info']['where'] = NULL;
-
-      foreach ($groupTree['info']['tables'] as $table => $fields) {
-        $groupTree['info']['from'][] = $table;
-        $select = [
-          "{$table}.id as {$table}_id",
-          "{$table}.entity_id as {$table}_entity_id",
-        ];
-        foreach ($fields as $column => $dontCare) {
-          $select[] = "{$table}.{$column} as {$table}_{$column}";
-        }
-        $groupTree['info']['select'] = array_merge($groupTree['info']['select'], $select);
-      }
-    }
+    unset($groupTree['info']);
     // Get the Custom form values and groupTree
     foreach ($groupTree as $groupID => $group) {
-      if ($groupID === 'info') {
-        continue;
-      }
       foreach ($group['fields'] as $field) {
         $fieldId = $field['id'];
         $serialize = CRM_Core_BAO_CustomField::isSerialized($field);
@@ -444,7 +421,6 @@ class CRM_Dedupe_Finder {
         }
       }
     }
-    unset($groupTree['info']);
     return $groupTree;
   }
 
