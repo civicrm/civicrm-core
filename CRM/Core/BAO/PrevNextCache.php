@@ -393,8 +393,68 @@ WHERE (pn.cachekey $op %1 OR pn.cachekey $op %2)
     }
 
     if (!empty($foundDupes)) {
-      CRM_Dedupe_Finder::parseAndStoreDupePairs($foundDupes, $cacheKeyString);
+      self::parseAndStoreDupePairs($foundDupes, $cacheKeyString);
     }
+  }
+
+  /**
+   * Parse duplicate pairs into a standardised array and store in the prev_next_cache.
+   *
+   * @param array $foundDupes
+   * @param string $cacheKeyString
+   *
+   * @return array
+   *   Dupe pairs with the keys
+   *   -srcID
+   *   -srcName
+   *   -dstID
+   *   -dstName
+   *   -weight
+   *   -canMerge
+   */
+  private static function parseAndStoreDupePairs($foundDupes, $cacheKeyString) {
+    $cids = [];
+    foreach ($foundDupes as $dupe) {
+      $cids[$dupe[0]] = 1;
+      $cids[$dupe[1]] = 1;
+    }
+    $cidString = implode(', ', array_keys($cids));
+
+    $dao = CRM_Core_DAO::executeQuery("SELECT id, display_name FROM civicrm_contact WHERE id IN ($cidString) ORDER BY sort_name");
+    $displayNames = [];
+    while ($dao->fetch()) {
+      $displayNames[$dao->id] = $dao->display_name;
+    }
+
+    $userId = CRM_Core_Session::getLoggedInContactID();
+    foreach ($foundDupes as $dupes) {
+      $srcID = $dupes[1];
+      $dstID = $dupes[0];
+      // The logged in user should never be the src (ie. the contact to be removed).
+      if ($srcID == $userId) {
+        $srcID = $dstID;
+        $dstID = $userId;
+      }
+
+      $mainContacts[] = $row = [
+        'dstID' => (int) $dstID,
+        'dstName' => $displayNames[$dstID],
+        'srcID' => (int) $srcID,
+        'srcName' => $displayNames[$srcID],
+        'weight' => $dupes[2],
+        'canMerge' => TRUE,
+      ];
+
+      CRM_Core_DAO::executeQuery("INSERT INTO civicrm_prevnext_cache (entity_table, entity_id1, entity_id2, cacheKey, data) VALUES
+        ('civicrm_contact', %1, %2, %3, %4)", [
+          1 => [$dstID, 'Integer'],
+          2 => [$srcID, 'Integer'],
+          3 => [$cacheKeyString, 'String'],
+          4 => [serialize($row), 'String'],
+        ]
+      );
+    }
+    return $mainContacts;
   }
 
   /**
