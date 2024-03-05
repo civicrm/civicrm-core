@@ -371,7 +371,16 @@ class CRM_Dedupe_Finder {
       $filters['extends_entity_column_value'] = NULL;
     }
 
-    $groupTree = self::buildLegacyGroupTree($filters, $subTypes);
+    $customGroups = CRM_Core_BAO_CustomGroup::getAll($filters, CRM_Core_Permission::EDIT);
+    foreach ($customGroups as &$group) {
+      self::formatLegacyDbValues($group);
+      // CRM-5507 - Hard to know what this was supposed to do but this faithfully recreates
+      // whatever it was doing before the refactor, which was probably broken anyway.
+      if (!empty($subTypes[0])) {
+        $group['subtype'] = self::validateSubTypeByEntity(CRM_Utils_Array::first((array) $filters['extends']), $subTypes[0]);
+      }
+    }
+    $groupTree = $customGroups;
 
     unset($groupTree['info']);
     // Get the Custom form values and groupTree
@@ -422,29 +431,6 @@ class CRM_Dedupe_Finder {
       }
     }
     return $groupTree;
-  }
-
-  /**
-   * Recreates legacy formatting for getTree but uses the new cached function to retrieve data.
-   * @deprecated only used by legacy function.
-   */
-  private static function buildLegacyGroupTree($filters, $subTypes) {
-    $customValueTables = [];
-    $customGroups = CRM_Core_BAO_CustomGroup::getAll($filters, CRM_Core_Permission::EDIT);
-    foreach ($customGroups as &$group) {
-      self::formatLegacyDbValues($group);
-      // CRM-5507 - Hard to know what this was supposed to do but this faithfully recreates
-      // whatever it was doing before the refactor, which was probably broken anyway.
-      if (!empty($subTypes[0])) {
-        $group['subtype'] = self::validateSubTypeByEntity(CRM_Utils_Array::first((array) $filters['extends']), $subTypes[0]);
-      }
-      foreach ($group['fields'] as &$field) {
-        self::formatLegacyDbValues($field);
-        $customValueTables[$group['table_name']][$field['column_name']] = 1;
-      }
-    }
-    $customGroups['info'] = ['tables' => $customValueTables];
-    return $customGroups;
   }
 
   /**
