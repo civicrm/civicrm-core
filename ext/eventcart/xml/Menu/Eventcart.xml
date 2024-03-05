@@ -19,7 +19,6 @@
     <page_callback>CRM_Event_Cart_Page_AddToCart</page_callback>
     <access_callback>1</access_callback>
     <is_public>true</is_public>
-    <is_ssl>false</is_ssl>
   </item>
   <item>
     <path>civicrm/event/cart_checkout</path>
@@ -27,7 +26,6 @@
     <page_callback>CRM_Event_Cart_Controller_Checkout</page_callback>
     <access_callback>1</access_callback>
     <is_public>true</is_public>
-    <is_ssl>true</is_ssl>
   </item>
   <item>
     <path>civicrm/event/remove_from_cart</path>
@@ -35,7 +33,6 @@
     <page_callback>CRM_Event_Cart_Page_RemoveFromCart</page_callback>
     <access_callback>1</access_callback>
     <is_public>true</is_public>
-    <is_ssl>false</is_ssl>
   </item>
   <item>
     <path>civicrm/event/view_cart</path>
@@ -43,7 +40,6 @@
     <page_callback>CRM_Event_Cart_Page_ViewCart</page_callback>
     <access_callback>1</access_callback>
     <is_public>true</is_public>
-    <is_ssl>false</is_ssl>
   </item>
   <item>
     <path>civicrm/admin/options/conference_slot</path>
@@ -59,7 +55,6 @@
     <title>Conference Slots</title>
     <page_callback>CRM_Event_Form_ManageEvent_Conference</page_callback>
     <access_arguments>access CiviEvent</access_arguments>
-    <is_ssl>true</is_ssl>
     <weight>950</weight>
   </item>
 </menu>

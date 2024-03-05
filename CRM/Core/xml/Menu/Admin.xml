@@ -664,7 +664,6 @@
      <access_arguments>administer CiviCRM system,administer CiviCRM data,access CiviCRM</access_arguments>
      <page_type>1</page_type>
      <page_callback>CRM_Admin_Page_Admin</page_callback>
-     <is_ssl>true</is_ssl>
      <weight>9000</weight>
   </item>
   <item>

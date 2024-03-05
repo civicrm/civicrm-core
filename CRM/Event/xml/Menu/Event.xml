@@ -31,7 +31,6 @@
      <page_callback>CRM_Event_Controller_Registration</page_callback>
      <access_callback>1</access_callback>
      <is_public>true</is_public>
-     <is_ssl>true</is_ssl>
   </item>
   <item>
      <path>civicrm/event/confirm</path>
@@ -39,7 +38,6 @@
      <page_callback>CRM_Event_Form_Registration_ParticipantConfirm</page_callback>
      <access_callback>1</access_callback>
      <is_public>true</is_public>
-     <is_ssl>true</is_ssl>
   </item>
   <item>
      <path>civicrm/event/ical</path>
@@ -150,7 +148,6 @@
      <page_callback>CRM_Event_Page_ManageEvent</page_callback>
      <access_arguments>access CiviEvent</access_arguments>
      <page_type>1</page_type>
-     <is_ssl>true</is_ssl>
      <weight>820</weight>
   </item>
   <item>
@@ -164,7 +161,6 @@
      <title>Event Info and Settings</title>
      <page_callback>CRM_Event_Form_ManageEvent_EventInfo</page_callback>
      <access_arguments>access CiviEvent</access_arguments>
-     <is_ssl>true</is_ssl>
      <weight>910</weight>
   </item>
   <item>
@@ -172,7 +168,6 @@
      <title>Event Location</title>
      <page_callback>CRM_Event_Form_ManageEvent_Location</page_callback>
      <access_arguments>access CiviEvent</access_arguments>
-     <is_ssl>true</is_ssl>
      <weight>930</weight>
   </item>
   <item>
@@ -180,7 +175,6 @@
      <title>Event Fees</title>
      <page_callback>CRM_Event_Form_ManageEvent_Fee</page_callback>
      <access_arguments>access CiviEvent</access_arguments>
-     <is_ssl>true</is_ssl>
      <weight>920</weight>
   </item>
   <item>
@@ -188,7 +182,6 @@
      <title>Event Online Registration</title>
      <page_callback>CRM_Event_Form_ManageEvent_Registration</page_callback>
      <access_arguments>access CiviEvent</access_arguments>
-     <is_ssl>true</is_ssl>
      <weight>930</weight>
   </item>
   <item>
@@ -196,7 +189,6 @@
      <title>Tell a Friend</title>
      <page_callback>CRM_Friend_Form_Event</page_callback>
      <access_arguments>access CiviEvent</access_arguments>
-     <is_ssl>true</is_ssl>
      <weight>940</weight>
   </item>
   <item>
@@ -204,7 +196,6 @@
      <title>Schedule Reminders</title>
      <page_callback>CRM_Event_Form_ManageEvent_ScheduleReminders</page_callback>
      <access_arguments>access CiviEvent</access_arguments>
-     <is_ssl>true</is_ssl>
      <weight>950</weight>
   </item>
   <item>
@@ -212,7 +203,6 @@
      <title>Repeat Event</title>
      <page_callback>CRM_Event_Form_ManageEvent_Repeat</page_callback>
      <access_arguments>access CiviEvent</access_arguments>
-     <is_ssl>true</is_ssl>
      <weight>960</weight>
   </item>
   <item>
