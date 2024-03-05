@@ -258,26 +258,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
       $activitySubject = ts('Recurring Contribution Updated');
       $contactID = $this->getSubscriptionContactID();
 
-      if ($this->getSubscriptionDetails()->amount != $params['amount']) {
-        $activityDetails .= "<br /> " . ts("Recurring contribution amount has been updated from %1 to %2 for this subscription.",
-            [
-              1 => CRM_Utils_Money::format($this->getSubscriptionDetails()->amount, $this->getSubscriptionDetails()->currency),
-              2 => CRM_Utils_Money::format($params['amount'], $this->getSubscriptionDetails()->currency),
-            ]) . ' ';
-        if ($this->getSubscriptionDetails()->amount < $params['amount']) {
-          $activitySubject = ts('Recurring Contribution Updated - increased installment amount');
-        }
-        else {
-          $activitySubject = ts('Recurring Contribution Updated - decreased installment amount');
-        }
-      }
-
-      if ($this->getSubscriptionDetails()->installments != $params['installments']) {
-        $activityDetails .= "<br /> " . ts("Recurring contribution installments have been updated from %1 to %2 for this subscription.", [
-          1 => $this->getSubscriptionDetails()->installments,
-          2 => $params['installments'],
-        ]) . ' ';
-      }
+      $this->updateActivitySubjectAndDetails($params, $activitySubject, $activityDetails);
 
       $activityParams = [
         'source_contact_id' => $contactID,
@@ -330,6 +311,46 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
       // keep result as 1, since we not displaying anything on the redirected page anyway
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/subscriptionstatus',
         "reset=1&task=update&result=1"));
+    }
+  }
+
+  private function updateActivitySubjectAndDetails(array $params, string &$activitySubject, string &$activityDetails): void {
+    if ($this->getSubscriptionDetails()->amount != $params['amount']) {
+      $activityDetails .= "<br /> " . ts("Recurring contribution amount has been updated from %1 to %2 for this subscription.",
+          [
+            1 => CRM_Utils_Money::format($this->getSubscriptionDetails()->amount, $this->getSubscriptionDetails()->currency),
+            2 => CRM_Utils_Money::format($params['amount'], $this->getSubscriptionDetails()->currency),
+          ]) . ' ';
+      if ($this->getSubscriptionDetails()->amount < $params['amount']) {
+        $activitySubject = ts('Recurring Contribution Updated - increased installment amount');
+      }
+      else {
+        $activitySubject = ts('Recurring Contribution Updated - decreased installment amount');
+      }
+    }
+
+    if ($this->getSubscriptionDetails()->installments != $params['installments']) {
+      $activityDetails .= "<br /> " . ts("Recurring contribution installments have been updated from %1 to %2 for this subscription.", [
+        1 => $this->getSubscriptionDetails()->installments,
+        2 => $params['installments'],
+      ]) . ' ';
+    }
+
+    if (!empty($params['cycle_day']) && $this->getSubscriptionDetails()->cycle_day != $params['cycle_day']) {
+      $activityDetails .= "<br /> " . ts("Cycle day has been updated from %1 to %2 for this subscription.", [
+        1 => $this->getSubscriptionDetails()->cycle_day,
+        2 => $params['cycle_day'],
+      ]) . ' ';
+    }
+
+    if (
+      !empty($params['next_sched_contribution_date']) &&
+      $this->getSubscriptionDetails()->next_sched_contribution_date != $params['next_sched_contribution_date']
+    ) {
+      $activityDetails .= "<br /> " . ts("Next scheduled contribution date has been updated from %1 to %2 for this subscription.", [
+        1 => $this->getSubscriptionDetails()->next_sched_contribution_date,
+        2 => $params['next_sched_contribution_date'],
+      ]) . ' ';
     }
   }
 
