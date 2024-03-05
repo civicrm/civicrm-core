@@ -243,13 +243,14 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $memtypeID = NULL;
     if ($this->_priceSetId) {
       if ($this->getFormContext() === 'membership') {
+        $existingMembershipTypeID = $this->getRenewableMembershipValue('membership_type_id');
         $selectedCurrentMemTypes = [];
         foreach ($this->_priceSet['fields'] as $key => $val) {
           foreach ($val['options'] as $keys => $values) {
             $opMemTypeId = $values['membership_type_id'] ?? NULL;
             $priceFieldName = 'price_' . $values['price_field_id'];
             $priceFieldValue = CRM_Price_BAO_PriceSet::getPriceFieldValueFromURL($this, $priceFieldName);
-            if (!empty($priceFieldValue) && !$this->isDefined('RenewableMembership')) {
+            if (!empty($priceFieldValue) && !$existingMembershipTypeID) {
               CRM_Price_BAO_PriceSet::setDefaultPriceSetField($priceFieldName, $priceFieldValue, $val['html_type'], $this->_defaults);
               // break here to prevent overwriting of default due to 'is_default'
               // option configuration or setting of current membership or
@@ -258,8 +259,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
               break;
             }
             if ($opMemTypeId &&
-              // @todo - maybe use the defined renewable membership to avoid lifetime memberships.
-              !empty($this->getExistingMembership($opMemTypeId)) &&
+              $existingMembershipTypeID &&
               !in_array($opMemTypeId, $selectedCurrentMemTypes)
             ) {
               CRM_Price_BAO_PriceSet::setDefaultPriceSetField($priceFieldName, $keys, $val['html_type'], $this->_defaults);
@@ -272,8 +272,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
             }
           }
         }
-        $membershipID = CRM_Utils_Array::value('id', CRM_Member_BAO_Membership::getContactMembership($contactID, $memtypeID, NULL));
-        if ($contactID) {
+
+        if ($contactID && $existingMembershipTypeID) {
           // Set the default values for any membership custom fields on the page via a profile.
           // Note that this will have been done further up if the contact ID was not determined.
           foreach ($this->_fields as $name => $field) {
@@ -283,7 +283,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
               if (!CRM_Core_BAO_CustomGroup::checkCustomField($customFieldID, ['Membership'])
               ) {
                 CRM_Core_BAO_CustomField::setProfileDefaults($customFieldID, $name, $this->_defaults,
-                  $membershipID, CRM_Profile_Form::MODE_REGISTER
+                  $existingMembershipTypeID, CRM_Profile_Form::MODE_REGISTER
                 );
               }
             }
@@ -1981,6 +1981,17 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $this->set('lineItem', NULL);
     $this->order->setPriceSelectionFromUnfilteredInput($fields);
     $this->order->recalculateLineItems();
+  }
+
+  /**
+   * @return void
+   * @throws \CRM_Core_Exception
+   */
+  public function getRenewableMembershipValue(string $value) {
+    if (!$this->isDefined('RenewableMembership')) {
+      return NULL;
+    }
+    return $this->lookup('RenewableMembership', $value);
   }
 
 }
