@@ -171,113 +171,10 @@ class CRM_Dedupe_Finder {
     $subTypes = $fields['contact_sub_type'] ?? [];
     // Only return custom for subType + unrestricted or return all custom
     // fields.
-    $tree = self::getTree($ctype, $subTypes);
-    self::postProcess($tree, $fields, TRUE);
+    $tree = self::getTree($ctype, $subTypes, $fields);
     foreach ($tree as $key => $cg) {
-      if (!is_int($key)) {
-        continue;
-      }
       foreach ($cg['fields'] as $cf) {
         $flat[$cf['column_name']] = $cf['customValue']['data'] ?? NULL;
-      }
-    }
-  }
-
-  /**
-   * Previously shared function to unravel.
-   *
-   * @see CRM_Dedupe_Finder::formatParams
-   *
-   * @param array $groupTree
-   * @param array $params
-   * @param bool $skipFile
-   */
-  private static function postProcess(&$groupTree, &$params, $skipFile = FALSE) {
-    // Get the Custom form values and groupTree
-    foreach ($groupTree as $groupID => $group) {
-      if ($groupID === 'info') {
-        continue;
-      }
-      foreach ($group['fields'] as $field) {
-        $fieldId = $field['id'];
-        $serialize = CRM_Core_BAO_CustomField::isSerialized($field);
-
-        // Reset all checkbox, radio and multiselect data
-        if ($field['html_type'] == 'Radio' || $serialize) {
-          $groupTree[$groupID]['fields'][$fieldId]['customValue']['data'] = 'NULL';
-        }
-
-        $v = NULL;
-        foreach ($params as $key => $val) {
-          if (preg_match('/^custom_(\d+)_?(-?\d+)?$/', $key, $match) &&
-            $match[1] == $field['id']
-          ) {
-            $v = $val;
-          }
-        }
-
-        if (!isset($groupTree[$groupID]['fields'][$fieldId]['customValue'])) {
-          // field exists in db so populate value from "form".
-          $groupTree[$groupID]['fields'][$fieldId]['customValue'] = [];
-        }
-
-        // Serialize checkbox and multi-select data (using array keys for checkbox)
-        if ($serialize) {
-          $v = ($v && $field['html_type'] === 'Checkbox') ? array_keys($v) : $v;
-          $v = $v ? CRM_Utils_Array::implodePadded($v) : NULL;
-        }
-
-        switch ($field['html_type']) {
-
-          case 'Select Date':
-            $date = CRM_Utils_Date::processDate($v);
-            $groupTree[$groupID]['fields'][$fieldId]['customValue']['data'] = $date;
-            break;
-
-          case 'File':
-            if ($skipFile) {
-              break;
-            }
-
-            // store the file in d/b
-            $entityId = explode('=', $groupTree['info']['where'][0]);
-            $fileParams = ['upload_date' => date('YmdHis')];
-
-            if ($groupTree[$groupID]['fields'][$fieldId]['customValue']['fid']) {
-              $fileParams['id'] = $groupTree[$groupID]['fields'][$fieldId]['customValue']['fid'];
-            }
-            if (!empty($v)) {
-              $fileParams['uri'] = $v['name'];
-              $fileParams['mime_type'] = $v['type'];
-              CRM_Core_BAO_File::filePostProcess($v['name'],
-                $groupTree[$groupID]['fields'][$fieldId]['customValue']['fid'],
-                $groupTree[$groupID]['table_name'],
-                trim($entityId[1]),
-                FALSE,
-                TRUE,
-                $fileParams,
-                'custom_' . $fieldId,
-                $v['type']
-              );
-            }
-            $defaults = [];
-            $paramsFile = [
-              'entity_table' => $groupTree[$groupID]['table_name'],
-              'entity_id' => $entityId[1],
-            ];
-
-            CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_EntityFile',
-              $paramsFile,
-              $defaults
-            );
-
-            $groupTree[$groupID]['fields'][$fieldId]['customValue']['data'] = $defaults['file_id'];
-            break;
-
-          default:
-            $groupTree[$groupID]['fields'][$fieldId]['customValue']['data'] = $v;
-            break;
-        }
       }
     }
   }
@@ -410,6 +307,7 @@ class CRM_Dedupe_Finder {
    * @param string $entityType
    *   Of the contact whose contact type is needed.
    * @param array $subTypes
+   * @param array $params
    *
    * @return array[]
    *   The returned array is keyed by group id and has the custom group table fields
@@ -430,7 +328,7 @@ class CRM_Dedupe_Finder {
    * for a better alternative to fetching entity values.
    *
    */
-  private static function getTree($entityType, $subTypes) {
+  private static function getTree($entityType, $subTypes, $params) {
     $subName = NULL;
     $onlySubType = NULL;
     $returnAll = TRUE;
@@ -473,39 +371,6 @@ class CRM_Dedupe_Finder {
       $filters['extends_entity_column_value'] = NULL;
     }
 
-    $groupTree = self::buildLegacyGroupTree($filters, $subTypes);
-
-    // entitySelectClauses is an array of select clauses for custom value tables which are not multiple
-    // and have data for the given entities. $entityMultipleSelectClauses is the same for ones with multiple
-    $entitySingleSelectClauses = $entityMultipleSelectClauses = $groupTree['info']['select'] = [];
-    $singleFieldTables = [];
-    // now that we have all the groups and fields, lets get the values
-    // since we need to know the table and field names
-    // add info to groupTree
-    if (!empty($groupTree['info']['tables'])) {
-      $groupTree['info']['where'] = NULL;
-
-      foreach ($groupTree['info']['tables'] as $table => $fields) {
-        $groupTree['info']['from'][] = $table;
-        $select = [
-          "{$table}.id as {$table}_id",
-          "{$table}.entity_id as {$table}_entity_id",
-        ];
-        foreach ($fields as $column => $dontCare) {
-          $select[] = "{$table}.{$column} as {$table}_{$column}";
-        }
-        $groupTree['info']['select'] = array_merge($groupTree['info']['select'], $select);
-      }
-    }
-    return $groupTree;
-  }
-
-  /**
-   * Recreates legacy formatting for getTree but uses the new cached function to retrieve data.
-   * @deprecated only used by legacy function.
-   */
-  private static function buildLegacyGroupTree($filters, $subTypes) {
-    $customValueTables = [];
     $customGroups = CRM_Core_BAO_CustomGroup::getAll($filters, CRM_Core_Permission::EDIT);
     foreach ($customGroups as &$group) {
       self::formatLegacyDbValues($group);
@@ -514,13 +379,58 @@ class CRM_Dedupe_Finder {
       if (!empty($subTypes[0])) {
         $group['subtype'] = self::validateSubTypeByEntity(CRM_Utils_Array::first((array) $filters['extends']), $subTypes[0]);
       }
-      foreach ($group['fields'] as &$field) {
-        self::formatLegacyDbValues($field);
-        $customValueTables[$group['table_name']][$field['column_name']] = 1;
+    }
+    $groupTree = $customGroups;
+
+    unset($groupTree['info']);
+    // Get the Custom form values and groupTree
+    foreach ($groupTree as $groupID => $group) {
+      foreach ($group['fields'] as $field) {
+        $fieldId = $field['id'];
+        $serialize = CRM_Core_BAO_CustomField::isSerialized($field);
+
+        // Reset all checkbox, radio and multiselect data
+        if ($field['html_type'] === 'Radio' || $serialize) {
+          $groupTree[$groupID]['fields'][$fieldId]['customValue']['data'] = 'NULL';
+        }
+
+        $v = NULL;
+        foreach ($params as $key => $val) {
+          if (preg_match('/^custom_(\d+)_?(-?\d+)?$/', $key, $match) &&
+            $match[1] == $field['id']
+          ) {
+            $v = $val;
+          }
+        }
+
+        if (!isset($groupTree[$groupID]['fields'][$fieldId]['customValue'])) {
+          // field exists in db so populate value from "form".
+          $groupTree[$groupID]['fields'][$fieldId]['customValue'] = [];
+        }
+
+        // Serialize checkbox and multi-select data (using array keys for checkbox)
+        if ($serialize) {
+          $v = ($v && $field['html_type'] === 'Checkbox') ? array_keys($v) : $v;
+          $v = $v ? CRM_Utils_Array::implodePadded($v) : NULL;
+        }
+
+        switch ($field['html_type']) {
+
+          case 'Select Date':
+            $date = CRM_Utils_Date::processDate($v);
+            $groupTree[$groupID]['fields'][$fieldId]['customValue']['data'] = $date;
+            break;
+
+          case 'File':
+            break;
+
+          default:
+            $groupTree[$groupID]['fields'][$fieldId]['customValue']['data'] = $v;
+            break;
+        }
       }
     }
-    $customGroups['info'] = ['tables' => $customValueTables];
-    return $customGroups;
+    return $groupTree;
   }
 
   /**
@@ -593,66 +503,6 @@ class CRM_Dedupe_Finder {
       }
       $values[$key] = (string) $value;
     }
-  }
-
-  /**
-   * Parse duplicate pairs into a standardised array and store in the prev_next_cache.
-   *
-   * @param array $foundDupes
-   * @param string $cacheKeyString
-   *
-   * @return array
-   *   Dupe pairs with the keys
-   *   -srcID
-   *   -srcName
-   *   -dstID
-   *   -dstName
-   *   -weight
-   *   -canMerge
-   */
-  public static function parseAndStoreDupePairs($foundDupes, $cacheKeyString) {
-    $cids = [];
-    foreach ($foundDupes as $dupe) {
-      $cids[$dupe[0]] = 1;
-      $cids[$dupe[1]] = 1;
-    }
-    $cidString = implode(', ', array_keys($cids));
-
-    $dao = CRM_Core_DAO::executeQuery("SELECT id, display_name FROM civicrm_contact WHERE id IN ($cidString) ORDER BY sort_name");
-    $displayNames = [];
-    while ($dao->fetch()) {
-      $displayNames[$dao->id] = $dao->display_name;
-    }
-
-    $userId = CRM_Core_Session::getLoggedInContactID();
-    foreach ($foundDupes as $dupes) {
-      $srcID = $dupes[1];
-      $dstID = $dupes[0];
-      // The logged in user should never be the src (ie. the contact to be removed).
-      if ($srcID == $userId) {
-        $srcID = $dstID;
-        $dstID = $userId;
-      }
-
-      $mainContacts[] = $row = [
-        'dstID' => (int) $dstID,
-        'dstName' => $displayNames[$dstID],
-        'srcID' => (int) $srcID,
-        'srcName' => $displayNames[$srcID],
-        'weight' => $dupes[2],
-        'canMerge' => TRUE,
-      ];
-
-      CRM_Core_DAO::executeQuery("INSERT INTO civicrm_prevnext_cache (entity_table, entity_id1, entity_id2, cacheKey, data) VALUES
-        ('civicrm_contact', %1, %2, %3, %4)", [
-          1 => [$dstID, 'Integer'],
-          2 => [$srcID, 'Integer'],
-          3 => [$cacheKeyString, 'String'],
-          4 => [serialize($row), 'String'],
-        ]
-      );
-    }
-    return $mainContacts;
   }
 
 }

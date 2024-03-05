@@ -850,15 +850,26 @@ class CRM_Import_Forms extends CRM_Core_Form {
   public function getHeaderPatterns(): array {
     $headerPatterns = [];
     foreach ($this->getFields() as $name => $field) {
-      if (empty($field['headerPattern']) || $field['headerPattern'] === '//') {
-        continue;
+      if (!empty($field['usage']['import']) && !empty($field['title'])) {
+        $patterns = [
+          $this->strToPattern($field['name']),
+          $this->strToPattern($field['title']),
+        ];
+        if (!empty($field['html']['label'])) {
+          $patterns[] = $this->strToPattern($field['html']['label']);
+        }
+        // Swap out dots for double underscores so as not to break the quick form js.
+        // We swap this back on postProcess.
+        $name = str_replace('.', '__', $name);
+        $headerPatterns[$name] = '/^' . implode('|', array_unique($patterns)) . '$/i';
       }
-      // Swap out dots for double underscores so as not to break the quick form js.
-      // We swap this back on postProcess.
-      $name = str_replace('.', '__', $name);
-      $headerPatterns[$name] = $field['headerPattern'];
     }
     return $headerPatterns;
+  }
+
+  private function strToPattern(string $str) {
+    $str = str_replace(['_', '-'], ' ', $str);
+    return strtolower(str_replace(' ', '[-_ ]?', preg_quote($str, '/')));
   }
 
   /**

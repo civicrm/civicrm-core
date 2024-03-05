@@ -522,11 +522,12 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   /**
    * Do this work on the form layer.
    *
-   * @deprecated
+   * @deprecated in 5.54 will be removed around 5.80
    *
    * @return array
    */
   public function getHeaderPatterns(): array {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Import_Forms::getHeaderPatterns');
     $values = [];
     foreach ($this->importableFieldsMetadata as $name => $field) {
       if (isset($field['headerPattern'])) {
