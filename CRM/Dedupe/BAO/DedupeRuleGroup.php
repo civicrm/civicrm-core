@@ -609,7 +609,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
    *
    * @throws \CRM_Core_Exception
    */
-  public static function getTree($entityType) {
+  private static function getTree($entityType) {
 
     if (str_contains($entityType, "'")) {
       // Handle really weird legacy input format
@@ -630,22 +630,14 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
    * Recreates legacy formatting for getTree but uses the new cached function to retrieve data.
    * @deprecated only used by legacy function.
    */
-  private static function buildLegacyGroupTree($filters, $permission, $subTypes) {
-    $customValueTables = [];
+  private static function buildLegacyGroupTree($filters, $permission) {
     $customGroups = CRM_Core_BAO_CustomGroup::getAll($filters, $permission ?: NULL);
     foreach ($customGroups as &$group) {
       self::formatLegacyDbValues($group);
-      // CRM-5507 - Hard to know what this was supposed to do but this faithfully recreates
-      // whatever it was doing before the refactor, which was probably broken anyway.
-      if (!empty($subTypes[0])) {
-        $group['subtype'] = self::validateSubTypeByEntity(CRM_Utils_Array::first((array) $filters['extends']), $subTypes[0]);
-      }
       foreach ($group['fields'] as &$field) {
         self::formatLegacyDbValues($field);
-        $customValueTables[$group['table_name']][$field['column_name']] = 1;
       }
     }
-    $customGroups['info'] = ['tables' => $customValueTables];
     return [NULL, $customGroups];
   }
 
