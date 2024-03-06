@@ -610,12 +610,6 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
    * @throws \CRM_Core_Exception
    */
   private static function getTree($entityType) {
-
-    if (str_contains($entityType, "'")) {
-      // Handle really weird legacy input format
-      $entityType = explode(',', str_replace([' ', "'"], '', $entityType));
-    }
-
     $filters = [
       'extends' => $entityType,
       'is_active' => TRUE,
