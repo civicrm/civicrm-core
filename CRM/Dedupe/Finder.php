@@ -373,7 +373,22 @@ class CRM_Dedupe_Finder {
 
     $customGroups = CRM_Core_BAO_CustomGroup::getAll($filters, CRM_Core_Permission::EDIT);
     foreach ($customGroups as &$group) {
-      self::formatLegacyDbValues($group);
+      foreach ($group as $key => $value) {
+        if ($key === 'fields') {
+          continue;
+        }
+        if (is_null($value)) {
+          unset($group[$key]);
+          continue;
+        }
+        if (is_bool($value)) {
+          $value = (int) $value;
+        }
+        if (is_array($value)) {
+          $value = CRM_Utils_Array::implodePadded($value);
+        }
+        $group[$key] = (string) $value;
+      }
       // CRM-5507 - Hard to know what this was supposed to do but this faithfully recreates
       // whatever it was doing before the refactor, which was probably broken anyway.
       if (!empty($subTypes[0])) {
@@ -480,29 +495,6 @@ class CRM_Dedupe_Finder {
       throw new CRM_Core_Exception('Invalid Filter');
     }
     return $subTypesByName[$subTypeKey] ?? $subTypesByKey[$subTypeKey];
-  }
-
-  /**
-   * Recreates the crude string-only format originally produced by self::getTree.
-   * @deprecated only used by legacy functions.
-   */
-  private static function formatLegacyDbValues(array &$values): void {
-    foreach ($values as $key => $value) {
-      if ($key === 'fields') {
-        continue;
-      }
-      if (is_null($value)) {
-        unset($values[$key]);
-        continue;
-      }
-      if (is_bool($value)) {
-        $value = (int) $value;
-      }
-      if (is_array($value)) {
-        $value = CRM_Utils_Array::implodePadded($value);
-      }
-      $values[$key] = (string) $value;
-    }
   }
 
 }
