@@ -329,8 +329,6 @@ class CRM_Dedupe_Finder {
    *
    */
   private static function getTree($entityType, $subTypes, $params) {
-    $subName = NULL;
-    $onlySubType = NULL;
     $returnAll = TRUE;
 
     if (!is_array($subTypes)) {
@@ -360,15 +358,7 @@ class CRM_Dedupe_Finder {
       foreach ($subTypes as $subType) {
         $filters['extends_entity_column_value'][] = self::validateSubTypeByEntity($entityType, $subType);
       }
-      if (!$onlySubType) {
-        $filters['extends_entity_column_value'][] = NULL;
-      }
-      if ($subName) {
-        $filters['extends_entity_column_id'] = $subName;
-      }
-    }
-    elseif (!$returnAll) {
-      $filters['extends_entity_column_value'] = NULL;
+      $filters['extends_entity_column_value'][] = NULL;
     }
 
     $customGroups = CRM_Core_BAO_CustomGroup::getAll($filters, CRM_Core_Permission::EDIT);
