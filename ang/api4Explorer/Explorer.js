@@ -1275,16 +1275,17 @@
           } else if (_.includes(['=', '!=', '<>', 'IN', 'NOT IN'], op) && (field.fk_entity || field.options || dataType === 'Boolean')) {
            if (field.options) {
               var id = field.pseudoconstant || 'id';
-              $el.addClass('loading').attr('placeholder', ts('- select -')).crmSelect2({multiple: multi, data: [{id: '', text: ''}]});
+              $el.addClass('loading').attr('placeholder', ts('- select -')).crmSelect2({multiple: multi, separator: "\u0001", data: [{id: '', text: ''}]});
               loadFieldOptions(field.entity || entity).then(function(data) {
                 var options = _.transform(data[field.name].options, function(options, opt) {
                   options.push({id: opt[id], text: opt.label, description: opt.description, color: opt.color, icon: opt.icon});
                 }, []);
-                $el.removeClass('loading').crmSelect2({data: options, multiple: multi});
+                $el.removeClass('loading').crmSelect2({data: options, multiple: multi, separator: "\u0001"});
               });
             } else if (field.fk_entity) {
               $el.crmAutocomplete(field.fk_entity, {fieldName: field.entity + '.' + field.name, key: field.id_field || null}, {
                 multiple: multi,
+                separator: "\u0001",
                 static: field.fk_entity === 'Contact' ? ['user_contact_id'] : [],
                 minimumInputLength: field.fk_entity === 'Contact' ? 1 : 0
               });
@@ -1323,7 +1324,7 @@
           var list = [];
 
           if (viewValue) {
-            _.each(viewValue.split(','), function(value) {
+            _.each(viewValue.split("\u0001"), function(value) {
               if (value) list.push(_.trim(value));
             });
           }

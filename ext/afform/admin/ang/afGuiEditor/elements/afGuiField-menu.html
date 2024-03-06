@@ -40,7 +40,7 @@
 </li>
 <li ng-if="$ctrl.fieldDefn.input_type === 'EntityRef'" title="{{:: ts('Allow a new entity to be created via quick-add popup') }}">
   <div href ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown">
-    <input crm-ui-select="{data: $ctrl.quickAddLinks, multiple: true, placeholder: ts('Quick Add')}" ng-model="getSet('input_attrs.quickAdd')" ng-model-options="{getterSetter: true}" ng-list class="form-control">
+    <input crm-ui-select="{data: $ctrl.quickAddLinks, multiple: true, separator: '\u0001', placeholder: ts('Quick Add')}" ng-model="getSet('input_attrs.quickAdd')" ng-model-options="{getterSetter: true}" ng-list="" class="form-control">
   </div>
 </li>
 <li ng-if="$ctrl.fieldDefn.input_type === 'EntityRef'">

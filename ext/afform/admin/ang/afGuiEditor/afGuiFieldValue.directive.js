@@ -56,6 +56,7 @@
               var params = field.entity && field.name ? {fieldName: field.entity + '.' + field.name} : {filters: filters};
               $el.crmAutocomplete(field.fk_entity, params, {
                 multiple: multi,
+                separator: '\u0001',
                 "static": options,
                 minimumInputLength: options.length ? 1 : 0
               });
@@ -63,9 +64,9 @@
               options = _.transform(field.options, function(options, val) {
                 options.push({id: val.id, text: val.label});
               }, []);
-              $el.select2({data: options, multiple: multi});
+              $el.select2({data: options, multiple: multi, separator: '\u0001'});
             } else if (dataType === 'Boolean') {
-              $el.attr('placeholder', ts('- select -')).crmSelect2({allowClear: false, multiple: multi, placeholder: ts('- select -'), data: [
+              $el.attr('placeholder', ts('- select -')).crmSelect2({allowClear: false, multiple: multi, separator: '\u0001', placeholder: ts('- select -'), data: [
                   {id: '1', text: ts('Yes')},
                   {id: '0', text: ts('No')}
                 ]});
@@ -95,7 +96,7 @@
           var list = [];
 
           if (viewValue) {
-            _.each(viewValue.split(','), function(value) {
+            _.each(viewValue.split("\u0001"), function(value) {
               if (value) list.push(_.trim(value));
             });
           }

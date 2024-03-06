@@ -82,7 +82,7 @@
         </fieldset>
         <div class="api4-input form-inline" ng-mouseenter="help('fields', availableParams.fields)" ng-mouseleave="help()" ng-if="::availableParams.fields">
           <label for="api4-param-fields">fields<span class="crm-marker" ng-if="::availableParams.fields.required"> *</span></label>
-          <input class="form-control" ng-list crm-ui-select="::{data: fields, multiple: true}" id="api4-param-fields" ng-model="params.fields" style="width: 85%;"/>
+          <input class="form-control" ng-list="" crm-ui-select="::{data: fields, multiple: true, separator: '\u0001'}" id="api4-param-fields" ng-model="params.fields" style="width: 85%;"/>
         </div>
         <div class="api4-input form-inline" ng-mouseenter="help('action', availableParams.action)" ng-mouseleave="help()"ng-if="::availableParams.action">
           <label for="api4-param-action">action<span class="crm-marker" ng-if="::availableParams.action.required"> *</span></label>
