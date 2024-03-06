@@ -207,7 +207,7 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
    */
   public function testSupportedCustomFields(): void {
     //Create custom group with fields of all types to test.
-    $customGroup = $this->createCustomGroup(['extends' => 'Organization']);
+    $this->createCustomGroup(['extends' => 'Organization']);
 
     $customGroupID = $this->ids['CustomGroup']['Custom Group'];
     $cf = $this->createTextCustomField(['custom_group_id' => $customGroupID]);
@@ -228,8 +228,8 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
   public function testSupportedCustomFieldsSubtype(): void {
 
     //Create custom group with fields of all types to test.
-    $contactType = $this->callAPISuccess('ContactType', 'create', ['name' => 'Big Bank', 'label' => 'biggee', 'parent_id' => 'Organization']);
-    $customGroup = $this->createCustomGroup(['extends' => 'Organization', 'extends_entity_column_value' => ['Big_Bank']]);
+    $this->callAPISuccess('ContactType', 'create', ['name' => 'Big Bank', 'label' => 'biggee', 'parent_id' => 'Organization']);
+    $this->createCustomGroup(['extends' => 'Organization', 'extends_entity_column_value' => ['Big_Bank']]);
 
     $customGroupID = $this->ids['CustomGroup']['Custom Group'];
     $cf = $this->createTextCustomField(['custom_group_id' => $customGroupID]);
