@@ -600,7 +600,6 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
    *
    * @param string $entityType
    *   Of the contact whose contact type is needed.
-   * @param array $subTypes
    *
    * @return array[]
    *   The returned array is keyed by group id and has the custom group table fields
@@ -623,26 +622,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
     ];
 
     [, $groupTree] = self::buildLegacyGroupTree($filters, CRM_Core_Permission::EDIT, []);
-
-    // now that we have all the groups and fields, lets get the values
-    // since we need to know the table and field names
-    // add info to groupTree
-    if (!empty($groupTree['info']['tables'])) {
-      $groupTree['info']['where'] = NULL;
-
-      foreach ($groupTree['info']['tables'] as $table => $fields) {
-        $groupTree['info']['from'][] = $table;
-        $select = [
-          "{$table}.id as {$table}_id",
-          "{$table}.entity_id as {$table}_entity_id",
-        ];
-        foreach ($fields as $column => $dontCare) {
-          $select[] = "{$table}.{$column} as {$table}_{$column}";
-        }
-        $groupTree['info']['select'] = array_merge($groupTree['info']['select'], $select);
-      }
-
-    }
+    unset($groupTree['info']);
     return $groupTree;
   }
 
