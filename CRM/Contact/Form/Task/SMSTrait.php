@@ -255,8 +255,15 @@ trait CRM_Contact_Form_Task_SMSTrait {
     // format contact details array to handle multiple sms from same contact
     $formattedContactDetails = [];
     $phonesToSendTo = explode(',', $this->getSubmittedValue('to'));
+    $errors = [];
     foreach ($phonesToSendTo as $phone) {
       [$contactId] = explode('::', $phone);
+      $phoneValues = $this->getPhones()[$contactId] ?? NULL;
+      if (!$phoneValues) {
+        $errors[] = ts('Contact Does not accept SMS') . ' ' . CRM_Utils_String::purifyHTML($phone);
+        continue;
+      }
+
       if ($contactId && !empty($form->_contactDetails[$contactId])) {
         $formattedContactDetails[] = $form->_contactDetails[$contactId];
       }
@@ -337,33 +344,19 @@ trait CRM_Contact_Form_Task_SMSTrait {
       $contactId = $contact['contact_id'];
       $tokenText = CRM_Core_BAO_MessageTemplate::renderTemplate(['messageTemplate' => ['msg_text' => $this->getSubmittedValue('sms_text_message')], 'contactId' => $contactId, 'disableSmarty' => TRUE])['text'];
       $smsProviderParams = $this->getSmsProviderParams();
-      // Only send if the phone is of type mobile
-      if ($contact['phone_type_id'] == CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'phone_type_id', 'Mobile')) {
-        $smsProviderParams['To'] = $contact['phone'];
+      $smsProviderParams['To'] = $contact['phone'];
+      try {
+        CRM_Activity_BAO_Activity::sendSMSMessage(
+          $contactId,
+          $tokenText,
+          $smsProviderParams,
+          $activityID,
+          CRM_Core_Session::getLoggedInContactID()
+        );
+        $numberSent++;
       }
-      else {
-        $smsProviderParams['To'] = '';
-      }
-
-      $doNotSms = $contact['do_not_sms'] ?? 0;
-
-      if ($doNotSms) {
-        $errors[] = ts('Contact Does not accept SMS');
-      }
-      else {
-        try {
-          $sendResult = CRM_Activity_BAO_Activity::sendSMSMessage(
-            $contactId,
-            $tokenText,
-            $smsProviderParams,
-            $activityID,
-            CRM_Core_Session::getLoggedInContactID()
-          );
-          $numberSent++;
-        }
-        catch (CRM_Core_Exception $e) {
-          $errors[] = $e->getMessage();
-        }
+      catch (CRM_Core_Exception $e) {
+        $errors[] = $e->getMessage();
       }
     }
     return [$errors, $numberSent];
