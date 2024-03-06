@@ -555,8 +555,18 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * Start a new session.
    */
   public function sessionStart() {
-    $session_handler = new SessionHandler();
-    session_set_save_handler($session_handler);
+    if (defined('CIVI_SETUP')) {
+      // during installation we can't use the session
+      // handler from the extension yet so we just
+      // use a default php session
+      // use a different cookie name to avoid any nasty clash
+      $session_cookie_name = 'SESSCIVISOINSTALL';
+    }
+    else {
+      $session_handler = new SessionHandler();
+      session_set_save_handler($session_handler);
+      $session_cookie_name = 'SESSCIVISO';
+    }
 
     $session_max_lifetime = Civi::settings()->get('standaloneusers_session_max_lifetime') ?? 1440;
 
@@ -564,7 +574,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
       'cookie_httponly'  => 1,
       'cookie_secure'    => !empty($_SERVER['HTTPS']),
       'gc_maxlifetime'   => $session_max_lifetime,
-      'name'             => 'SESSCIVISO',
+      'name'             => $session_cookie_name,
       'use_cookies'      => 1,
       'use_only_cookies' => 1,
       'use_strict_mode'  => 1,
