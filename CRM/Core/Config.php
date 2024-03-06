@@ -281,13 +281,16 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
    *
    * @param bool $sessionReset
    */
-  public function cleanupCaches($sessionReset = TRUE) {
+  public function cleanupCaches($sessionReset = FALSE) {
     // cleanup templates_c directory
     $this->cleanup(1, FALSE);
     UserJob::delete(FALSE)->addWhere('expires_date', '<', 'now')->execute();
     // clear all caches
     self::clearDBCache();
-    Civi::cache('session')->clear();
+    // Avoid clearing QuickForm sessions unless explicitly requested
+    if ($sessionReset) {
+      Civi::cache('session')->clear();
+    }
     Civi::cache('metadata')->clear();
     CRM_Core_DAO_AllCoreTables::flush();
     CRM_Utils_System::flushCache();
@@ -349,7 +352,8 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
     $queries = [
       'TRUNCATE TABLE civicrm_acl_cache',
       'TRUNCATE TABLE civicrm_acl_contact_cache',
-      'TRUNCATE TABLE civicrm_cache',
+      // Do not truncate, reduce risks of losing a quickform session
+      'DELETE FROM civicrm_cache WHERE group_name NOT LIKE "CiviCRM%Session"',
       'TRUNCATE TABLE civicrm_prevnext_cache',
       'UPDATE civicrm_group SET cache_date = NULL',
       'TRUNCATE TABLE civicrm_group_contact_cache',
