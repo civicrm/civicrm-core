@@ -104,7 +104,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
         $fields[$ctype]['civicrm_contact']['sort_name'] = ts('Sort Name');
 
         // add all custom data fields including those only for sub_types.
-        foreach (self::getTree($ctype, NULL, NULL, -1, [], NULL, TRUE, NULL, TRUE) as $key => $cg) {
+        foreach (self::getTree($ctype) as $key => $cg) {
           if (!is_int($key)) {
             continue;
           }
@@ -600,23 +600,6 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
    *
    * @param string $entityType
    *   Of the contact whose contact type is needed.
-   * @param array $toReturn
-   *   What data should be returned. ['custom_group' => ['id', 'name', etc.], 'custom_field' => ['id', 'label', etc.]]
-   * @param int $entityID
-   * @param int $groupID
-   * @param array $subTypes
-   * @param string $subName
-   * @param bool $fromCache
-   * @param bool $onlySubType
-   *   Only return specified subtype or return specified subtype + unrestricted fields.
-   * @param bool $returnAll
-   *   Do not restrict by subtype at all. (The parameter feels a bit cludgey but is only used from the
-   *   api - through which it is properly tested - so can be refactored with some comfort.)
-   * @param bool|int $checkPermission
-   *   Either a CRM_Core_Permission constant or FALSE to disable checks
-   * @param string|int $singleRecord
-   *   holds 'new' or id if view/edit/copy form for a single record is being loaded.
-   * @param bool $showPublicOnly
    *
    * @return array[]
    *   The returned array is keyed by group id and has the custom group table fields
@@ -626,40 +609,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
    *
    * @throws \CRM_Core_Exception
    */
-  public static function getTree(
-    $entityType,
-    $toReturn = [],
-    $entityID = NULL,
-    $groupID = NULL,
-    $subTypes = [],
-    $subName = NULL,
-    $fromCache = TRUE,
-    $onlySubType = NULL,
-    $returnAll = FALSE,
-    $checkPermission = CRM_Core_Permission::EDIT,
-    $singleRecord = NULL,
-    $showPublicOnly = FALSE
-  ) {
-    if ($checkPermission && !in_array($checkPermission, [CRM_Core_Permission::EDIT, CRM_Core_Permission::VIEW], TRUE)) {
-      CRM_Core_Error::deprecatedWarning("Unexpected value '$checkPermission' passed to CustomGroup::getTree \$checkPermission param.");
-      $checkPermission = CRM_Core_Permission::EDIT;
-    }
-    if ($entityID) {
-      $entityID = CRM_Utils_Type::escape($entityID, 'Integer');
-    }
-    if (!is_array($subTypes)) {
-      if (empty($subTypes)) {
-        $subTypes = [];
-      }
-      else {
-        if (stristr($subTypes, ',')) {
-          $subTypes = explode(',', $subTypes);
-        }
-        else {
-          $subTypes = explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($subTypes, CRM_Core_DAO::VALUE_SEPARATOR));
-        }
-      }
-    }
+  private static function getTree($entityType) {
 
     if (str_contains($entityType, "'")) {
       // Handle really weird legacy input format
@@ -670,76 +620,9 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
       'extends' => $entityType,
       'is_active' => TRUE,
     ];
-    if ($subTypes) {
-      foreach ($subTypes as $subType) {
-        $filters['extends_entity_column_value'][] = self::validateSubTypeByEntity($entityType, $subType);
-      }
-      if (!$onlySubType) {
-        $filters['extends_entity_column_value'][] = NULL;
-      }
-      if ($subName) {
-        $filters['extends_entity_column_id'] = $subName;
-      }
-    }
-    elseif (!$returnAll) {
-      $filters['extends_entity_column_value'] = NULL;
-    }
-    if ($groupID > 0) {
-      $filters['id'] = $groupID;
-    }
-    elseif (!$groupID) {
-      // since groupID is false we need to show all Inline groups
-      $filters['style'] = 'Inline';
-    }
-    if ($showPublicOnly) {
-      $filters['is_public'] = TRUE;
-    }
 
-    [$multipleFieldGroups, $groupTree] = self::buildLegacyGroupTree($filters, $checkPermission, $subTypes);
-
-    // entitySelectClauses is an array of select clauses for custom value tables which are not multiple
-    // and have data for the given entities. $entityMultipleSelectClauses is the same for ones with multiple
-    $entitySingleSelectClauses = $entityMultipleSelectClauses = $groupTree['info']['select'] = [];
-    $singleFieldTables = [];
-    // now that we have all the groups and fields, lets get the values
-    // since we need to know the table and field names
-    // add info to groupTree
-    if (!empty($groupTree['info']['tables']) && $singleRecord != 'new') {
-      $groupTree['info']['where'] = NULL;
-
-      foreach ($groupTree['info']['tables'] as $table => $fields) {
-        $groupTree['info']['from'][] = $table;
-        $select = [
-          "{$table}.id as {$table}_id",
-          "{$table}.entity_id as {$table}_entity_id",
-        ];
-        foreach ($fields as $column => $dontCare) {
-          $select[] = "{$table}.{$column} as {$table}_{$column}";
-        }
-        $groupTree['info']['select'] = array_merge($groupTree['info']['select'], $select);
-        if ($entityID) {
-          $groupTree['info']['where'][] = "{$table}.entity_id = $entityID";
-          if (in_array($table, $multipleFieldGroups) &&
-            CRM_Core_BAO_CustomGroup::customGroupDataExistsForEntity($entityID, $table)
-          ) {
-            $entityMultipleSelectClauses[$table] = $select;
-          }
-          else {
-            $singleFieldTables[] = $table;
-            $entitySingleSelectClauses = array_merge($entitySingleSelectClauses, $select);
-          }
-
-        }
-      }
-      if ($entityID && !empty($singleFieldTables)) {
-        CRM_Core_BAO_CustomGroup::buildEntityTreeSingleFields($groupTree, $entityID, $entitySingleSelectClauses, $singleFieldTables);
-      }
-      $multipleFieldTablesWithEntityData = array_keys($entityMultipleSelectClauses);
-      if (!empty($multipleFieldTablesWithEntityData)) {
-        CRM_Core_BAO_CustomGroup::buildEntityTreeMultipleFields($groupTree, $entityID, $entityMultipleSelectClauses, $multipleFieldTablesWithEntityData, $singleRecord);
-      }
-
-    }
+    [, $groupTree] = self::buildLegacyGroupTree($filters, CRM_Core_Permission::EDIT, []);
+    unset($groupTree['info']);
     return $groupTree;
   }
 
@@ -747,27 +630,15 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
    * Recreates legacy formatting for getTree but uses the new cached function to retrieve data.
    * @deprecated only used by legacy function.
    */
-  private static function buildLegacyGroupTree($filters, $permission, $subTypes) {
-    $multipleFieldGroups = [];
-    $customValueTables = [];
+  private static function buildLegacyGroupTree($filters, $permission) {
     $customGroups = CRM_Core_BAO_CustomGroup::getAll($filters, $permission ?: NULL);
     foreach ($customGroups as &$group) {
       self::formatLegacyDbValues($group);
-      if ($group['is_multiple']) {
-        $multipleFieldGroups[$group['id']] = $group['table_name'];
-      }
-      // CRM-5507 - Hard to know what this was supposed to do but this faithfully recreates
-      // whatever it was doing before the refactor, which was probably broken anyway.
-      if (!empty($subTypes[0])) {
-        $group['subtype'] = self::validateSubTypeByEntity(CRM_Utils_Array::first((array) $filters['extends']), $subTypes[0]);
-      }
       foreach ($group['fields'] as &$field) {
         self::formatLegacyDbValues($field);
-        $customValueTables[$group['table_name']][$field['column_name']] = 1;
       }
     }
-    $customGroups['info'] = ['tables' => $customValueTables];
-    return [$multipleFieldGroups, $customGroups];
+    return [NULL, $customGroups];
   }
 
   /**
