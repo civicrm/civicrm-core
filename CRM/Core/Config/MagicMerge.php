@@ -240,10 +240,19 @@ class CRM_Core_Config_MagicMerge {
           $value = CRM_Utils_File::addTrailingSlash($value);
           if (isset($this->map[$k][2]) && in_array('mkdir', $this->map[$k][2])) {
             if (!is_dir($value) && !CRM_Utils_File::createDir($value, FALSE)) {
-              CRM_Core_Session::setStatus(ts('Failed to make directory (%1) at "%2". Please update the settings or file permissions.', [
+              // we want to warn the user about this error
+              // ideally we show a browser alert
+              // but this might not be possible if the session handler isn't up yet, so fallback to just printing it (sorry)
+              $alertMessage = ts('Failed to make directory (%1) at "%2". Please update the settings or file permissions.', [
                 1 => $k,
                 2 => $value,
-              ]));
+              ]);
+              try {
+                CRM_Core_Session::setStatus($alertMessage);
+              }
+              catch (\Error $e) {
+                echo $alertMessage;
+              }
             }
           }
           if (isset($this->map[$k][2]) && in_array('restrict', $this->map[$k][2])) {
