@@ -15,9 +15,20 @@ Other resources for identifying changes are:
     * https://github.com/civicrm/civicrm-joomla
     * https://github.com/civicrm/civicrm-wordpress
 
+## CiviCRM 5.71.0
+
+Released March 6, 2024
+
+- **[Synopsis](release-notes/5.71.0.md#synopsis)**
+- **[Features](release-notes/5.71.0.md#features)**
+- **[Bugs resolved](release-notes/5.71.0.md#bugs)**
+- **[Miscellany](release-notes/5.71.0.md#misc)**
+- **[Credits](release-notes/5.71.0.md#credits)**
+- **[Feedback](release-notes/5.71.0.md#feedback)**
+
 ## CiviCRM 5.70.0
 
-Released February 8, 2024
+Released February 7, 2024
 
 - **[Synopsis](release-notes/5.70.0.md#synopsis)**
 - **[Features](release-notes/5.70.0.md#features)**
