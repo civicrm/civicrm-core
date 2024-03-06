@@ -262,8 +262,7 @@ trait CRM_Contact_Form_Task_SMSTrait {
       }
     }
 
-    [$sent, $countSuccess] = $this->sendSMS($formattedContactDetails);
-
+    [$errors, $countSuccess] = $this->sendSMS($formattedContactDetails);
     if ($countSuccess > 0) {
       CRM_Core_Session::setStatus(ts('One message was sent successfully.', [
         'plural' => '%count messages were sent successfully.',
@@ -271,16 +270,16 @@ trait CRM_Contact_Form_Task_SMSTrait {
       ]), ts('Message Sent', ['plural' => 'Messages Sent', 'count' => $countSuccess]), 'success');
     }
 
-    if (is_array($sent)) {
+    if (!empty($errors)) {
       // At least one PEAR_Error object was generated.
       // Display the error messages to the user.
       $status = '<ul>';
-      foreach ($sent as $errMsg) {
+      foreach ($errors as $errMsg) {
         $status .= '<li>' . $errMsg . '</li>';
       }
       $status .= '</ul>';
       CRM_Core_Session::setStatus($status, ts('One Message Not Sent', [
-        'count' => count($sent),
+        'count' => count($errors),
         'plural' => '%count Messages Not Sent',
       ]), 'info');
     }
@@ -332,8 +331,8 @@ trait CRM_Contact_Form_Task_SMSTrait {
       'status_id:name' => 'Completed',
     ])->execute()->first()['id'];
 
-    $success = 0;
-    $errMsgs = [];
+    $numberSent = 0;
+    $errors = [];
     foreach ($contactDetails as $contact) {
       $contactId = $contact['contact_id'];
       $tokenText = CRM_Core_BAO_MessageTemplate::renderTemplate(['messageTemplate' => ['msg_text' => $this->getSubmittedValue('sms_text_message')], 'contactId' => $contactId, 'disableSmarty' => TRUE])['text'];
@@ -349,7 +348,7 @@ trait CRM_Contact_Form_Task_SMSTrait {
       $doNotSms = $contact['do_not_sms'] ?? 0;
 
       if ($doNotSms) {
-        $errMsgs[] = PEAR::raiseError('Contact Does not accept SMS', NULL, PEAR_ERROR_RETURN);
+        $errors[] = ts('Contact Does not accept SMS');
       }
       else {
         try {
@@ -360,27 +359,14 @@ trait CRM_Contact_Form_Task_SMSTrait {
             $activityID,
             CRM_Core_Session::getLoggedInContactID()
           );
-          $success++;
+          $numberSent++;
         }
         catch (CRM_Core_Exception $e) {
-          $errMsgs[] = $e->getMessage();
+          $errors[] = $e->getMessage();
         }
       }
     }
-
-    // If at least one message was sent and no errors
-    // were generated then return a boolean value of TRUE.
-    // Otherwise, return FALSE (no messages sent) or
-    // and array of 1 or more PEAR_Error objects.
-    $sent = FALSE;
-    if ($success > 0 && count($errMsgs) == 0) {
-      $sent = TRUE;
-    }
-    elseif (count($errMsgs) > 0) {
-      $sent = $errMsgs;
-    }
-
-    return [$sent, $success];
+    return [$errors, $numberSent];
   }
 
   /**
