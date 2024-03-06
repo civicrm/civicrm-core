@@ -59,7 +59,7 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
    *
    * @var array
    */
-  protected $contactIDs = [];
+  protected array $contactIDs = [];
 
   /**
    * ID of the group holding the contacts.
@@ -103,9 +103,12 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
    *
    * This is a statically maintained (in this test list).
    *
+   * @param string $contactType
+   *
+   * @return array
    */
-  public function getSupportedFields() {
-    return [
+  public function getSupportedFields(string $contactType): array {
+    $sharedFields = [
       'civicrm_address' =>
         [
           'name' => 'Address Name',
@@ -125,7 +128,6 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
         ],
       'civicrm_contact' =>
         [
-          'addressee_id' => 'Addressee',
           'addressee_custom' => 'Addressee Custom',
           'id' => 'Contact ID',
           'source' => 'Contact Source',
@@ -135,20 +137,15 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
           'do_not_phone' => 'Do Not Phone',
           'do_not_sms' => 'Do Not Sms',
           'do_not_trade' => 'Do Not Trade',
-          'email_greeting_id' => 'Email Greeting',
           'email_greeting_custom' => 'Email Greeting Custom',
           'external_identifier' => 'External Identifier',
           'image_URL' => 'Image Url',
           'legal_identifier' => 'Legal Identifier',
-          'legal_name' => 'Legal Name',
           'nick_name' => 'Nickname',
           'is_opt_out' => 'No Bulk Emails (User Opt Out)',
-          'organization_name' => 'Organization Name',
-          'postal_greeting_id' => 'Postal Greeting',
           'postal_greeting_custom' => 'Postal Greeting Custom',
           'preferred_communication_method' => 'Preferred Communication Method',
           'preferred_language' => 'Preferred Language',
-          'sic_code' => 'Sic Code',
           'user_unique_id' => 'Unique ID (OpenID)',
           'sort_name' => 'Sort Name',
           'communication_style_id' => 'Communication Style',
@@ -181,6 +178,31 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
           'url' => 'Website',
         ],
     ];
+    $contactTypeFields = [
+      'Organization' => [
+        'legal_name' => 'Legal Name',
+        'organization_name' => 'Organization Name',
+        'sic_code' => 'Sic Code',
+      ],
+      'Individual' => [
+        'birth_date' => 'Birth Date',
+        'is_deceased' => 'Deceased',
+        'deceased_date' => 'Deceased Date',
+        'first_name' => 'First Name',
+        'formal_title' => 'Formal Title',
+        'gender_id' => 'Gender ID',
+        'prefix_id' => 'Individual Prefix',
+        'suffix_id' => 'Individual Suffix',
+        'job_title' => 'Job Title',
+        'last_name' => 'Last Name',
+        'middle_name' => 'Middle Name',
+      ],
+      'Household' => [
+        'household_name' => 'Household Name',
+      ],
+    ];
+    $sharedFields['civicrm_contact'] += $contactTypeFields[$contactType];
+    return $sharedFields;
   }
 
   /**
@@ -197,8 +219,23 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
    */
   public function testSupportedFields(): void {
     $fields = CRM_Dedupe_BAO_DedupeRuleGroup::supportedFields('Organization');
+    $this->assertEquals($this->getSupportedFields('Organization'), $fields);
+  }
 
-    $this->assertEquals($this->getSupportedFields(), $fields);
+  /**
+   * Test individual supported fields.
+   */
+  public function testSupportedFieldsIndividual(): void {
+    $fields = CRM_Dedupe_BAO_DedupeRuleGroup::supportedFields('Individual');
+    $this->assertEquals($this->getSupportedFields('Individual'), $fields);
+  }
+
+  /**
+   * Test individual supported fields.
+   */
+  public function testSupportedFieldsHousehold(): void {
+    $fields = CRM_Dedupe_BAO_DedupeRuleGroup::supportedFields('Household');
+    $this->assertEquals($this->getSupportedFields('Household'), $fields);
   }
 
   /**
@@ -210,10 +247,10 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
     $customGroup = $this->createCustomGroup(['extends' => 'Organization']);
 
     $customGroupID = $this->ids['CustomGroup']['Custom Group'];
-    $cf = $this->createTextCustomField(['custom_group_id' => $customGroupID]);
+    $customField = $this->createTextCustomField(['custom_group_id' => $customGroupID]);
 
-    $fields = $this->getSupportedFields();
-    $fields[$this->getCustomGroupTable()][$cf['column_name']] = 'Custom Group' . ' : ' . $cf['label'];
+    $fields = $this->getSupportedFields('Organization');
+    $fields[$this->getCustomGroupTable()][$customField['column_name']] = 'Custom Group' . ' : ' . $customField['label'];
 
     $this->assertEquals($fields, CRM_Dedupe_BAO_DedupeRuleGroup::supportedFields('Organization'));
   }
@@ -234,7 +271,7 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
     $customGroupID = $this->ids['CustomGroup']['Custom Group'];
     $cf = $this->createTextCustomField(['custom_group_id' => $customGroupID]);
 
-    $fields = $this->getSupportedFields();
+    $fields = $this->getSupportedFields('Organization');
     $fields[$this->getCustomGroupTable()][$cf['column_name']] = 'Custom Group' . ' : ' . $cf['label'];
 
     $this->assertEquals($fields, CRM_Dedupe_BAO_DedupeRuleGroup::supportedFields('Organization'));

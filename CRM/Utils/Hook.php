@@ -1635,7 +1635,7 @@ abstract class CRM_Utils_Hook {
       $null, $null, $null,
       'civicrm_dupeQuery'
     );
-    if ($original !== $query) {
+    if ($original !== $query && $type !== 'supportedFields') {
       CRM_Core_Error::deprecatedWarning('hook_civicrm_dupeQuery is deprecated.');
     }
   }

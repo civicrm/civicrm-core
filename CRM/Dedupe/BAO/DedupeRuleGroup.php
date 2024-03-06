@@ -66,12 +66,6 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
         'civicrm_country.name' => 'civicrm_address.country_id',
         'civicrm_county.name' => 'civicrm_address.county_id',
         'civicrm_state_province.name' => 'civicrm_address.state_province_id',
-        'gender.label' => 'civicrm_contact.gender_id',
-        'individual_prefix.label' => 'civicrm_contact.prefix_id',
-        'individual_suffix.label' => 'civicrm_contact.suffix_id',
-        'addressee.label' => 'civicrm_contact.addressee_id',
-        'email_greeting.label' => 'civicrm_contact.email_greeting_id',
-        'postal_greeting.label' => 'civicrm_contact.postal_greeting_id',
         'civicrm_phone.phone' => 'civicrm_phone.phone_numeric',
       ];
       // the table names we support in dedupe rules - a filter for importableFields()
@@ -144,16 +138,6 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
   private static function importableFields($contactType): array {
 
     $fields = CRM_Contact_DAO_Contact::import();
-
-    // get the fields thar are meant for contact types
-    if (in_array($contactType, [
-      'Individual',
-      'Household',
-      'Organization',
-      'All',
-    ])) {
-      $fields = array_merge($fields, CRM_Core_OptionValue::getFields('', $contactType));
-    }
 
     $locationFields = array_merge(CRM_Core_DAO_Address::import(),
       CRM_Core_DAO_Phone::import(),
