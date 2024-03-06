@@ -36,7 +36,7 @@ trait CRM_Contact_Form_Task_SMSTrait {
    *
    * @throws \CRM_Core_Exception
    */
-  public function postProcess() {
+  public function postProcess(): void {
     $this->postProcessSms();
   }
 
@@ -122,7 +122,7 @@ trait CRM_Contact_Form_Task_SMSTrait {
     $form->add('text', 'activity_subject', ts('Name The SMS'), ['class' => 'huge'], TRUE);
 
     $toSetDefault = TRUE;
-    if (property_exists($form, '_context') && $form->_context == 'standalone') {
+    if (property_exists($form, '_context') && $form->_context === 'standalone') {
       $toSetDefault = FALSE;
     }
 
@@ -254,28 +254,11 @@ trait CRM_Contact_Form_Task_SMSTrait {
 
     // format contact details array to handle multiple sms from same contact
     $formattedContactDetails = [];
-    $tempPhones = [];
     $phonesToSendTo = explode(',', $this->getSubmittedValue('to'));
-    $contactIds = $phones = [];
     foreach ($phonesToSendTo as $phone) {
-      [$contactId, $phone] = explode('::', $phone);
-      if ($contactId) {
-        $contactIds[] = $contactId;
-        $phones[] = $phone;
-      }
-    }
-    foreach ($contactIds as $key => $contactId) {
-      $phone = $phones[$key];
-
-      if ($phone) {
-        $phoneKey = "{$contactId}::{$phone}";
-        if (!in_array($phoneKey, $tempPhones)) {
-          $tempPhones[] = $phoneKey;
-          if (!empty($form->_contactDetails[$contactId])) {
-            $formattedContactDetails[] = $form->_contactDetails[$contactId];
-            $contactIds[] = $contactId;
-          }
-        }
+      [$contactId] = explode('::', $phone);
+      if ($contactId && !empty($form->_contactDetails[$contactId])) {
+        $formattedContactDetails[] = $form->_contactDetails[$contactId];
       }
     }
 
@@ -315,7 +298,7 @@ trait CRM_Contact_Form_Task_SMSTrait {
           $not_sent[] = "<a href='$contactViewUrl' title='$displayName'>$displayName</a>";
         }
         $status = '(' . ts('because no phone number on file or communication preferences specify DO NOT SMS or Contact is deceased');
-        if (CRM_Utils_System::getClassName($form) == 'CRM_Activity_Form_Task_SMS') {
+        if (CRM_Utils_System::getClassName($form) === 'CRM_Activity_Form_Task_SMS') {
           $status .= ' ' . ts("or the contact is not part of the activity '%1'", [1 => $this->getActivityName()]);
         }
         $status .= ')<ul><li>' . implode('</li><li>', $not_sent) . '</li></ul>';
