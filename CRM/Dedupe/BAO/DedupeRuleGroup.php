@@ -104,11 +104,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
         $fields[$ctype]['civicrm_contact']['sort_name'] = ts('Sort Name');
 
         // add all custom data fields including those only for sub_types.
-        foreach (self::getTree($ctype) as $cg) {
-          foreach ($cg['fields'] as $cf) {
-            $fields[$ctype][$cg['table_name']][$cf['column_name']] = $cg['title'] . ' : ' . $cf['label'];
-          }
-        }
+        $fields[$ctype] += self::getCustomFields($ctype);
       }
       //Does this have to run outside of cache?
       CRM_Utils_Hook::dupeQuery(NULL, 'supportedFields', $fields);
@@ -584,42 +580,28 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
   }
 
   /**
-   * @deprecated Function demonstrates just how bad code can get from 20 years of entropy.
+   * Get the custom fields for the custom type.
    *
-   * This function takes an overcomplicated set of params and returns an overcomplicated
-   * mix of custom groups, custom fields, custom values (if passed $entityID), and other random stuff.
-   *
-   * @see CRM_Core_BAO_CustomGroup::getAll()
-   * for a better alternative to fetching a tree of custom groups and fields.
-   *
-   * @see APIv4::get()
-   * for a better alternative to fetching entity values.
-   *
-   * @param string $entityType
+   * @param string $contactType
    *   Of the contact whose contact type is needed.
    *
-   * @return array[]
-   *   The returned array is keyed by group id and has the custom group table fields
-   *   and a subkey 'fields' holding the specific custom fields.
-   *   If entityId is passed in the fields keys have a subkey 'customValue' which holds custom data
-   *   if set for the given entity. This is structured as an array of values with each one having the keys 'id', 'data'
-   *
+   * @return array
+   *   e.g [['marital_status_4' => 'Constituent Information:Marital Status']],
    * @throws \CRM_Core_Exception
    */
-  private static function getTree($entityType) {
+  private static function getCustomFields(string $contactType): array {
     $filters = [
-      'extends' => $entityType,
+      'extends' => $contactType,
       'is_active' => TRUE,
     ];
-
+    $fields = [];
     $customGroups = CRM_Core_BAO_CustomGroup::getAll($filters, CRM_Core_Permission::EDIT);
-    foreach ($customGroups as &$group) {
-      self::formatLegacyDbValues($group);
-      foreach ($group['fields'] as &$field) {
-        self::formatLegacyDbValues($field);
+    foreach ($customGroups as $customGroup) {
+      foreach ($customGroup['fields'] as $customField) {
+        $fields[$customGroup['table_name']][$customField['column_name']] = $customGroup['title'] . ' : ' . $customField['label'];
       }
     }
-    return $customGroups;
+    return $fields;
   }
 
   /**
