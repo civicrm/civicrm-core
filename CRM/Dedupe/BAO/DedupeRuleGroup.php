@@ -104,10 +104,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
         $fields[$ctype]['civicrm_contact']['sort_name'] = ts('Sort Name');
 
         // add all custom data fields including those only for sub_types.
-        foreach (self::getTree($ctype) as $key => $cg) {
-          if (!is_int($key)) {
-            continue;
-          }
+        foreach (self::getTree($ctype) as $cg) {
           foreach ($cg['fields'] as $cf) {
             $fields[$ctype][$cg['table_name']][$cf['column_name']] = $cg['title'] . ' : ' . $cf['label'];
           }
