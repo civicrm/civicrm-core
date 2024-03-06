@@ -50,7 +50,7 @@ class CRM_Logging_Schema {
    * @var array
    */
   private $exceptions = [
-    'civicrm_job' => ['last_run'],
+    'civicrm_job' => ['last_run', 'last_run_end'],
     'civicrm_group' => ['cache_date', 'refresh_date'],
   ];
 
