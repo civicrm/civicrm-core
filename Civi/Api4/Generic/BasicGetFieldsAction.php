@@ -379,6 +379,12 @@ class BasicGetFieldsAction extends BasicGetAction {
         'data_type' => 'Array',
       ],
       [
+        'name' => 'usage',
+        'data_type' => 'Array',
+        'description' => 'Contexts in which field is used.',
+        'default_value' => [],
+      ],
+      [
         'name' => 'output_formatters',
         'data_type' => 'Array',
         '@internal' => TRUE,
