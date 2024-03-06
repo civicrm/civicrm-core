@@ -615,24 +615,14 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
       'is_active' => TRUE,
     ];
 
-    [, $groupTree] = self::buildLegacyGroupTree($filters, CRM_Core_Permission::EDIT, []);
-    unset($groupTree['info']);
-    return $groupTree;
-  }
-
-  /**
-   * Recreates legacy formatting for getTree but uses the new cached function to retrieve data.
-   * @deprecated only used by legacy function.
-   */
-  private static function buildLegacyGroupTree($filters, $permission) {
-    $customGroups = CRM_Core_BAO_CustomGroup::getAll($filters, $permission ?: NULL);
+    $customGroups = CRM_Core_BAO_CustomGroup::getAll($filters, CRM_Core_Permission::EDIT);
     foreach ($customGroups as &$group) {
       self::formatLegacyDbValues($group);
       foreach ($group['fields'] as &$field) {
         self::formatLegacyDbValues($field);
       }
     }
-    return [NULL, $customGroups];
+    return $customGroups;
   }
 
   /**
