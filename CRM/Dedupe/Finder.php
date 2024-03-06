@@ -171,11 +171,9 @@ class CRM_Dedupe_Finder {
     $subTypes = $fields['contact_sub_type'] ?? [];
     // Only return custom for subType + unrestricted or return all custom
     // fields.
-    $tree = self::getTree($ctype, $subTypes, $fields);
-    foreach ($tree as $key => $cg) {
-      foreach ($cg['fields'] as $cf) {
-        $flat[$cf['column_name']] = $cf['customValue']['data'] ?? NULL;
-      }
+    $customFields = self::getTree($ctype, $subTypes, $fields);
+    foreach ($customFields as $customField) {
+      $flat[$customField['column_name']] = $customField['customValue']['data'] ?? NULL;
     }
   }
 
@@ -329,8 +327,6 @@ class CRM_Dedupe_Finder {
    *
    */
   private static function getTree($entityType, $subTypes, $params) {
-    $returnAll = TRUE;
-
     if (!is_array($subTypes)) {
       if (empty($subTypes)) {
         $subTypes = [];
@@ -357,75 +353,59 @@ class CRM_Dedupe_Finder {
     }
 
     $customGroups = CRM_Core_BAO_CustomGroup::getAll($filters, CRM_Core_Permission::EDIT);
-    foreach ($customGroups as &$group) {
-      foreach ($group as $key => $value) {
-        if ($key === 'fields') {
-          continue;
-        }
-        if (is_null($value)) {
-          unset($group[$key]);
-          continue;
-        }
-        if (is_bool($value)) {
-          $value = (int) $value;
-        }
-        if (is_array($value)) {
-          $value = CRM_Utils_Array::implodePadded($value);
-        }
-        $group[$key] = (string) $value;
-      }
-    }
-    $groupTree = $customGroups;
-
-    unset($groupTree['info']);
-    // Get the Custom form values and groupTree
-    foreach ($groupTree as $groupID => $group) {
+    $customFields = [];
+    foreach ($customGroups as $group) {
       foreach ($group['fields'] as $field) {
-        $fieldId = $field['id'];
-        $serialize = CRM_Core_BAO_CustomField::isSerialized($field);
-
-        // Reset all checkbox, radio and multiselect data
-        if ($field['html_type'] === 'Radio' || $serialize) {
-          $groupTree[$groupID]['fields'][$fieldId]['customValue']['data'] = 'NULL';
-        }
-
-        $v = NULL;
-        foreach ($params as $key => $val) {
-          if (preg_match('/^custom_(\d+)_?(-?\d+)?$/', $key, $match) &&
-            $match[1] == $field['id']
-          ) {
-            $v = $val;
-          }
-        }
-
-        if (!isset($groupTree[$groupID]['fields'][$fieldId]['customValue'])) {
-          // field exists in db so populate value from "form".
-          $groupTree[$groupID]['fields'][$fieldId]['customValue'] = [];
-        }
-
-        // Serialize checkbox and multi-select data (using array keys for checkbox)
-        if ($serialize) {
-          $v = ($v && $field['html_type'] === 'Checkbox') ? array_keys($v) : $v;
-          $v = $v ? CRM_Utils_Array::implodePadded($v) : NULL;
-        }
-
-        switch ($field['html_type']) {
-
-          case 'Select Date':
-            $date = CRM_Utils_Date::processDate($v);
-            $groupTree[$groupID]['fields'][$fieldId]['customValue']['data'] = $date;
-            break;
-
-          case 'File':
-            break;
-
-          default:
-            $groupTree[$groupID]['fields'][$fieldId]['customValue']['data'] = $v;
-            break;
-        }
+        $customFields[$field['id']] = $field;
       }
     }
-    return $groupTree;
+
+    foreach ($customFields as $field) {
+      $fieldId = $field['id'];
+      $serialize = CRM_Core_BAO_CustomField::isSerialized($field);
+
+      // Reset all checkbox, radio and multiselect data
+      if ($field['html_type'] === 'Radio' || $serialize) {
+        $customFields[$fieldId]['customValue']['data'] = 'NULL';
+      }
+
+      $v = NULL;
+      foreach ($params as $key => $val) {
+        if (preg_match('/^custom_(\d+)_?(-?\d+)?$/', $key, $match) &&
+          $match[1] == $field['id']
+        ) {
+          $v = $val;
+        }
+      }
+
+      if (!isset($customFields[$fieldId]['customValue'])) {
+        // field exists in db so populate value from "form".
+        $customFields[$fieldId]['customValue'] = [];
+      }
+
+      // Serialize checkbox and multi-select data (using array keys for checkbox)
+      if ($serialize) {
+        $v = ($v && $field['html_type'] === 'Checkbox') ? array_keys($v) : $v;
+        $v = $v ? CRM_Utils_Array::implodePadded($v) : NULL;
+      }
+
+      switch ($field['html_type']) {
+
+        case 'Select Date':
+          $date = CRM_Utils_Date::processDate($v);
+          $customFields[$fieldId]['customValue']['data'] = $date;
+          break;
+
+        case 'File':
+          break;
+
+        default:
+          $customFields[$fieldId]['customValue']['data'] = $v;
+          break;
+      }
+    }
+
+    return $customFields;
   }
 
   /**
