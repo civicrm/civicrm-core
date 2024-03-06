@@ -345,11 +345,6 @@ class CRM_Dedupe_Finder {
       }
     }
 
-    if (str_contains($entityType, "'")) {
-      // Handle really weird legacy input format
-      $entityType = explode(',', str_replace([' ', "'"], '', $entityType));
-    }
-
     $filters = [
       'extends' => $entityType,
       'is_active' => TRUE,
@@ -378,11 +373,6 @@ class CRM_Dedupe_Finder {
           $value = CRM_Utils_Array::implodePadded($value);
         }
         $group[$key] = (string) $value;
-      }
-      // CRM-5507 - Hard to know what this was supposed to do but this faithfully recreates
-      // whatever it was doing before the refactor, which was probably broken anyway.
-      if (!empty($subTypes[0])) {
-        $group['subtype'] = self::validateSubTypeByEntity(CRM_Utils_Array::first((array) $filters['extends']), $subTypes[0]);
       }
     }
     $groupTree = $customGroups;
