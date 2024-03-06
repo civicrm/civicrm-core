@@ -136,8 +136,7 @@ body {
   display: none;
 }
 
-.civicrm-setup-body .install-validate-bad {
-}
+/* .civicrm-setup-body .install-validate-bad { } */
 
 .civicrm-setup-body .reqTable {
   border-collapse: collapse;

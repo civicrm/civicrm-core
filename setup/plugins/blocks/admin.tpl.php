@@ -18,7 +18,7 @@
       echo '<div>';
       echo ts('Suggestion: <code>%1</code>', [1 => $model->extras['adminPass']]);
       echo '</div>';
-} ?>
+    } ?>
 </div>
 
 <div class="civicrm-setup-field-wrapper">
