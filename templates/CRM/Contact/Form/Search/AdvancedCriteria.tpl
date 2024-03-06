@@ -87,8 +87,8 @@ CRM.$(function($) {
 {/if}
 
 {strip}
-  <details class="crm-accordion-wrapper crm-search_criteria_basic-accordion" open>
-    <summary class="crm-accordion-header">
+  <details class="crm-accordion-bold crm-search_criteria_basic-accordion" open>
+    <summary>
       {ts}Display Settings For Results{/ts}
     </summary>
     <div class="crm-accordion-body">
