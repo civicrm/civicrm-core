@@ -8,7 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 {include file="CRM/common/dedupe.tpl"}
-<details class="crm-accordion-bold">
+<details class="crm-accordion-bold" open>
   <summary>
     {ts}Filter Contacts{/ts}
   </summary>
