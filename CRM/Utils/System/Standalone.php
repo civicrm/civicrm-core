@@ -420,10 +420,12 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * CMS User Sync doesn't make sense when using standaloneusers
+   * (but leave open the door for other user extensions, which might have a sync method)
+   * @return bool
    */
-  public function synchronizeUsers() {
-    return Security::singleton()->synchronizeUsers();
+  public function allowSynchronizeUsers() {
+    return !\CRM_Extension_System::singleton()->getManager()->isEnabled('standaloneusers');
   }
 
   /**

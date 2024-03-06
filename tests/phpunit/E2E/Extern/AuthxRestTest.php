@@ -22,7 +22,7 @@ class E2E_Extern_AuthxRestTest extends E2E_Extern_BaseRestTest {
       ->install(['authx'])
       ->callback(
         function() {
-          \CRM_Utils_System::synchronizeUsers();
+          \CRM_Utils_System::synchronizeUsersIfAllowed();
         },
         'synchronizeUsers'
       )
