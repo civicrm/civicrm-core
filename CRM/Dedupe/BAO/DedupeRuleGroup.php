@@ -104,7 +104,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
         $fields[$ctype]['civicrm_contact']['sort_name'] = ts('Sort Name');
 
         // add all custom data fields including those only for sub_types.
-        foreach (self::getTree($ctype, NULL, -1, [], NULL, TRUE, NULL) as $key => $cg) {
+        foreach (self::getTree($ctype) as $key => $cg) {
           if (!is_int($key)) {
             continue;
           }
@@ -600,13 +600,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
    *
    * @param string $entityType
    *   Of the contact whose contact type is needed.
-   * @param array $toReturn
-   *   What data should be returned. ['custom_group' => ['id', 'name', etc.], 'custom_field' => ['id', 'label', etc.]]
-   * @param int $groupID
    * @param array $subTypes
-   * @param string $subName
-   * @param bool $fromCache
-   * @param bool $onlySubType
    *
    * @return array[]
    *   The returned array is keyed by group id and has the custom group table fields
@@ -616,29 +610,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
    *
    * @throws \CRM_Core_Exception
    */
-  public static function getTree(
-    $entityType,
-    $toReturn = [],
-    $groupID = NULL,
-    $subTypes = [],
-    $subName = NULL,
-    $fromCache = TRUE,
-    $onlySubType = NULL
-  ) {
-
-    if (!is_array($subTypes)) {
-      if (empty($subTypes)) {
-        $subTypes = [];
-      }
-      else {
-        if (stristr($subTypes, ',')) {
-          $subTypes = explode(',', $subTypes);
-        }
-        else {
-          $subTypes = explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($subTypes, CRM_Core_DAO::VALUE_SEPARATOR));
-        }
-      }
-    }
+  public static function getTree($entityType) {
 
     if (str_contains($entityType, "'")) {
       // Handle really weird legacy input format
@@ -649,27 +621,8 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
       'extends' => $entityType,
       'is_active' => TRUE,
     ];
-    if ($subTypes) {
-      foreach ($subTypes as $subType) {
-        $filters['extends_entity_column_value'][] = self::validateSubTypeByEntity($entityType, $subType);
-      }
-      if (!$onlySubType) {
-        $filters['extends_entity_column_value'][] = NULL;
-      }
-      if ($subName) {
-        $filters['extends_entity_column_id'] = $subName;
-      }
-    }
 
-    if ($groupID > 0) {
-      $filters['id'] = $groupID;
-    }
-    elseif (!$groupID) {
-      // since groupID is false we need to show all Inline groups
-      $filters['style'] = 'Inline';
-    }
-
-    [, $groupTree] = self::buildLegacyGroupTree($filters, CRM_Core_Permission::EDIT, $subTypes);
+    [, $groupTree] = self::buildLegacyGroupTree($filters, CRM_Core_Permission::EDIT, []);
 
     // now that we have all the groups and fields, lets get the values
     // since we need to know the table and field names
