@@ -81,8 +81,8 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
         'email-1' => $emails[$i][0],
         'email-2' => $emails[$i][1],
       ];
-      $dedupeParams = CRM_Dedupe_Finder::formatParams($fields, 'Individual');
-      $dedupeResults = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual');
+      $dedupeResults = CRM_Contact_BAO_Contact::getDuplicateContacts($fields, 'Individual');
+
       $this->assertCount(1, $dedupeResults);
     }
   }
