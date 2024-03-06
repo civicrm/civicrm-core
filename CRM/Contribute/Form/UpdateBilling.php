@@ -40,16 +40,16 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
       $this->_paymentProcessor['object'] = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_coid, 'contribute', 'obj');
     }
 
-    if ($this->_mid) {
-      $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_mid, 'membership', 'info');
-      $this->_paymentProcessor['object'] = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_mid, 'membership', 'obj');
+    if ($this->getMembershipID()) {
+      $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->getMembershipID(), 'membership', 'info');
+      $this->_paymentProcessor['object'] = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->getMembershipID(), 'membership', 'obj');
       $membershipTypes = CRM_Member_PseudoConstant::membershipType();
-      $membershipTypeId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->_mid, 'membership_type_id');
+      $membershipTypeId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->getMembershipID(), 'membership_type_id');
       $this->assign('membershipType', CRM_Utils_Array::value($membershipTypeId, $membershipTypes));
       $this->_mode = 'auto_renew';
     }
 
-    if ((!$this->_crid && !$this->_coid && !$this->_mid) || (!$this->getSubscriptionDetails())) {
+    if ((!$this->_crid && !$this->_coid && !$this->getMembershipID()) || (!$this->getSubscriptionDetails())) {
       throw new CRM_Core_Exception('Required information missing.');
     }
 

@@ -24,6 +24,7 @@ use Civi\Payment\Exception\PaymentProcessorException;
  * made here could potentially affect the API etc. Be careful, be aware, use unit tests.
  */
 class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_ContributionRecur {
+  use CRM_Custom_Form_CustomDataTrait;
 
   public $_paymentProcessor = NULL;
 
@@ -62,23 +63,13 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
       CRM_Core_Error::statusBounce(ts('Required information missing.'));
     }
 
-    if ($this->getSubscriptionDetails()->membership_id && $this->getSubscriptionDetails()->auto_renew) {
-      // Add Membership details to form
-      $membership = civicrm_api3('Membership', 'get', [
-        'contribution_recur_id' => $this->contributionRecurID,
-      ]);
-      if (!empty($membership['count'])) {
-        $membershipDetails = reset($membership['values']);
-        $values['membership_id'] = $membershipDetails['id'];
-        $values['membership_name'] = $membershipDetails['membership_name'];
-      }
-      $this->assign('recurMembership', $values);
-      $this->assign('contactId', $this->getSubscriptionContactID());
-    }
+    $this->assign('contactId', $this->getSubscriptionContactID());
+    $this->assign('membershipID', $this->getMembershipID());
+    $this->assign('membershipName', $this->getMembershipValue('name'));
 
     $this->assign('self_service', $this->isSelfService());
-    $this->assign('recur_frequency_interval', $this->getSubscriptionDetails()->frequency_interval);
-    $this->assign('recur_frequency_unit', $this->getSubscriptionDetails()->frequency_unit);
+    $this->assign('recur_frequency_interval', $this->getContributionRecurValue('frequency_interval'));
+    $this->assign('recur_frequency_unit', $this->getContributionRecurValue('frequency_unit'));
 
     $this->editableScheduleFields = $this->getPaymentProcessorObject()->getEditableRecurringScheduleFields();
 
@@ -97,11 +88,14 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
       }
     }
 
-    // when custom data is included in this page
-    if (!empty($_POST['hidden_custom']) && !$this->isSelfService()) {
-      CRM_Custom_Form_CustomData::preProcess($this, NULL, NULL, 1, 'ContributionRecur', $this->contributionRecurID);
-      CRM_Custom_Form_CustomData::buildQuickForm($this);
-      CRM_Custom_Form_CustomData::setDefaultValues($this);
+    if ($this->isSubmitted() && !$this->isSelfService()) {
+      // The custom data fields are added to the form by an ajax form.
+      // However, if they are not present in the element index they will
+      // not be available from `$this->getSubmittedValue()` in post process.
+      // We do not have to set defaults or otherwise render - just add to the element index.
+      $this->addCustomDataFieldsToForm('ContributionRecur', array_filter([
+        'id' => $this->getContributionRecurID(),
+      ]));
     }
 
     $this->assign('editableScheduleFields', array_diff($this->editableScheduleFields, $alreadyHardCodedFields));
@@ -171,13 +165,11 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
       CRM_Campaign_BAO_Campaign::addCampaign($this, $this->getSubscriptionDetails()->campaign_id);
     }
 
-    if (CRM_Contribute_BAO_ContributionRecur::supportsFinancialTypeChange($this->contributionRecurID)) {
+    if (CRM_Contribute_BAO_ContributionRecur::supportsFinancialTypeChange($this->getContributionRecurID())) {
       $this->addEntityRef('financial_type_id', ts('Financial Type'), ['entity' => 'FinancialType'], !$this->isSelfService());
     }
 
-    // Add custom data
-    $this->assign('customDataType', 'ContributionRecur');
-    $this->assign('entityID', $this->contributionRecurID);
+    $this->assign('contributionRecurID', $this->getContributionRecurID());
 
     $type = 'next';
     if ($this->isSelfService()) {
@@ -233,7 +225,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
     }
     if ($updateSubscription) {
       // Handle custom data
-      $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params, $this->contributionRecurID, 'ContributionRecur');
+      $params['custom'] = CRM_Core_BAO_CustomField::postProcess($this->getSubmittedValues(), $this->getContributionRecurID(), 'ContributionRecur');
       // save the changes
       CRM_Contribute_BAO_ContributionRecur::add($params);
       $status = ts('Recurring contribution has been updated to: %1, every %2 %3(s) for %4 installments.',
