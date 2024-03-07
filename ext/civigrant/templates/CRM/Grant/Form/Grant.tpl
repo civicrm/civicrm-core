@@ -75,7 +75,7 @@
       </tr>
   </table>
 
-  {include file="CRM/common/customDataBlock.tpl"}
+  {include file="CRM/common/customDataBlock.tpl" groupID='' customDataType='Grant' cid=false}
 
   <div class="crm-grant-form-block-attachment">
     {include file="CRM/Form/attachment.tpl"}
