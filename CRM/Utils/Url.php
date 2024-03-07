@@ -59,6 +59,72 @@ class CRM_Utils_Url {
   }
 
   /**
+   * Parse an internal URL. Extract the CiviCRM route.
+   *
+   * @param string $pageUrl
+   *   Ex: 'https://example.com/cms/civicrm/foo?id=1'
+   * @param string|null $cmsRootUrl
+   * @return array
+   *   Ex: ['path' => 'civicrm/foo', 'query' => 'id=1']
+   *
+   *   Similar to parse_url(), this returns a key-value array.
+   *   Keys are: 'path', 'query', 'fragment', 'user', 'pass'
+   *   Keys are only returned if they have values. Unused elements are omitted.
+   *
+   *   Currently, this does not support detecting schemes (such as frontend or backend).
+   * @throws \CRM_Core_Exception
+   */
+  public static function parseInternalRoute(string $pageUrl, ?string $cmsRootUrl = NULL): array {
+    $cmsRootUrl ??= CIVICRM_UF_BASEURL;
+    $cmsRootUrl = rtrim($cmsRootUrl, '/');
+
+    $parsedRoot = parse_url($cmsRootUrl ?: Civi::paths()->getUrl('[cms.root]/.'));
+    $parsedPage = parse_url($pageUrl);
+
+    $result = [];
+
+    // The scheme and host don't really matter for output, but the inputted values should be normal.
+    if (!in_array($parsedPage['scheme'], ['http', 'https'])) {
+      throw new \CRM_Core_Exception("Failed to parse internal URL. Invalid scheme.");
+    }
+    $hosts = [$_SERVER['HTTP_HOST'] ?? NULL, $parsedRoot['host']];
+    if (!in_array($parsedPage['host'], $hosts)) {
+      throw new \CRM_Core_Exception("Failed to parse internal URL. Unrecognized host.");
+    }
+
+    foreach (['user', 'pass', 'fragment'] as $passthru) {
+      if (isset($parsedPage[$passthru])) {
+        $result[$passthru] = $parsedPage[$passthru];
+      }
+    }
+
+    if (isset($parsedPage['query'])) {
+      $urlVar = CRM_Core_Config::singleton()->userFrameworkURLVar;
+      parse_str($parsedPage['query'] ?? '', $queryParts);
+      unset($parsedPage['query']);
+      if (isset($queryParts[$urlVar])) {
+        $result['path'] = $queryParts[$urlVar];
+        unset($queryParts[$urlVar]);
+      }
+      if (!empty($queryParts)) {
+        $result['query'] = http_build_query($queryParts);
+      }
+    }
+
+    if (!isset($result['path']) && str_starts_with($parsedPage['path'], $parsedRoot['path'] ?? '')) {
+      $result['path'] = substr($parsedPage['path'], 1 + strlen($parsedRoot['path'] ?? ''));
+    }
+
+    if (str_starts_with($result['path'] ?? '', 'civicrm/')) {
+      return $result;
+    }
+    else {
+      throw new CRM_Core_Exception('Failed to parse internal URL. Malformed path.');
+    }
+
+  }
+
+  /**
    * Determine if $child is a descendent of $parent.
    *
    * Relative URLs mean that multiple strings may not
