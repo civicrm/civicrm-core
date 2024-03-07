@@ -98,7 +98,7 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
   /**
    * Build the form object.
    */
-  public function buildQuickForm() {
+  public function buildQuickForm(): void {
     $this->add('text', 'title', ts('Title'), CRM_Core_DAO::getAttribute('CRM_Campaign_DAO_Survey', 'title'), TRUE);
 
     // Activity Type id
