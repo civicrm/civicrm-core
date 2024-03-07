@@ -240,12 +240,11 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $this->_defaults["billing_state_province_id-{$this->_bltID}"] = $config->defaultContactStateProvince;
     }
 
-    $memtypeID = NULL;
     if ($this->_priceSetId) {
       if ($this->getFormContext() === 'membership') {
         $existingMembershipTypeID = $this->getRenewableMembershipValue('membership_type_id');
         $selectedCurrentMemTypes = [];
-        foreach ($this->_priceSet['fields'] as $key => $val) {
+        foreach ($this->_priceSet['fields'] as $val) {
           foreach ($val['options'] as $keys => $priceFieldOption) {
             $opMemTypeId = $priceFieldOption['membership_type_id'] ?? NULL;
             $priceFieldName = 'price_' . $priceFieldOption['price_field_id'];
@@ -262,12 +261,10 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
               && !in_array($opMemTypeId, $selectedCurrentMemTypes)
             ) {
               CRM_Price_BAO_PriceSet::setDefaultPriceSetField($priceFieldName, $keys, $val['html_type'], $this->_defaults);
-              $memtypeID = $selectedCurrentMemTypes[] = $priceFieldOption['membership_type_id'];
             }
             elseif (!empty($priceFieldOption['is_default']) && (!isset($this->_defaults[$priceFieldName]) ||
               ($val['html_type'] === 'CheckBox' && !isset($this->_defaults[$priceFieldName][$keys])))) {
               CRM_Price_BAO_PriceSet::setDefaultPriceSetField($priceFieldName, $keys, $val['html_type'], $this->_defaults);
-              $memtypeID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $this->_defaults[$priceFieldName], 'membership_type_id');
             }
           }
         }
