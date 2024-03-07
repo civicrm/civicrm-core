@@ -14,6 +14,8 @@
  */
 class CRM_Contact_Form_Relationship extends CRM_Core_Form {
 
+  use CRM_Custom_Form_CustomDataTrait;
+
   /**
    * The relationship id, used when editing the relationship
    *
@@ -175,8 +177,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       $this->_rtype = str_replace($this->_relationshipTypeId . '_', '', $this->_rtypeId);
     }
 
-    //need to assign custom data type and subtype to the template - FIXME: explain why
-    $this->assign('customDataType', 'Relationship');
+    //need to assign custom data subtype to the template for the initial load of custom fields.
     $this->assign('customDataSubType', $this->_relationshipTypeId);
     $this->assign('entityID', $this->_relationshipId);
 
@@ -190,12 +191,25 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       }
     }
 
-    // when custom data is included in this page
-    if (!empty($_POST['hidden_custom'])) {
-      CRM_Custom_Form_CustomData::preProcess($this, NULL, $this->_relationshipTypeId, 1, 'Relationship', $this->_relationshipId);
-      CRM_Custom_Form_CustomData::buildQuickForm($this);
-      CRM_Custom_Form_CustomData::setDefaultValues($this);
+    if ($this->isSubmitted()) {
+      // The custom data fields are added to the form by an ajax form.
+      // However, if they are not present in the element index they will
+      // not be available from `$this->getSubmittedValue()` in post process.
+      // We do not have to set defaults or otherwise render - just add to the element index.
+      $this->addCustomDataFieldsToForm('Relationship', array_filter([
+        'id' => $this->getRelationshipID(),
+        'relationship_type_id' => $this->_relationshipTypeId,
+      ]));
     }
+  }
+
+  /**
+   * @api supported for use from outside core.
+   *
+   * @return int|null
+   */
+  public function getRelationshipID(): ?int {
+    return $this->_relationshipId;
   }
 
   /**
@@ -381,13 +395,13 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    */
   public function postProcess() {
     // Store the submitted values in an array.
-    $params = $this->controller->exportValues($this->_name);
+    $params = $this->getSubmittedValues();
 
     $values = $this->submit($params);
     if (empty($values)) {
       return;
     }
-    list ($params, $relationshipIds) = $values;
+    [$params, $relationshipIds] = $values;
 
     // if this is called from case view,
     //create an activity for case role removal.CRM-4480
