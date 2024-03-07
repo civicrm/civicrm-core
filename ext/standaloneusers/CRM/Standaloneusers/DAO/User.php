@@ -159,7 +159,7 @@ class CRM_Standaloneusers_DAO_User extends CRM_Core_DAO {
    * The unspent token
    *
    * @var string|null
-   *   (SQL type: varchar(40))
+   *   (SQL type: varchar(255))
    *   Note that values will be retrieved from the database as a string.
    */
   public $password_reset_token;
@@ -498,8 +498,8 @@ class CRM_Standaloneusers_DAO_User extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_STRING,
           'title' => E::ts('Password Reset Token'),
           'description' => E::ts('The unspent token'),
-          'maxlength' => 40,
-          'size' => CRM_Utils_Type::BIG,
+          'maxlength' => 255,
+          'size' => CRM_Utils_Type::HUGE,
           'usage' => [
             'import' => FALSE,
             'export' => FALSE,

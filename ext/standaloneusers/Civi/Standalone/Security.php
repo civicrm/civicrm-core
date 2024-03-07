@@ -1,6 +1,7 @@
 <?php
 namespace Civi\Standalone;
 
+use Civi\Crypto\Exception\CryptoException;
 use CRM_Core_Session;
 use Civi;
 use Civi\Api4\User;
@@ -15,6 +16,11 @@ use CRM_Standaloneusers_WorkflowMessage_PasswordReset;
  *
  */
 class Security {
+
+  /**
+   * Scope identifier for password reset JWTs
+   */
+  const PASSWORD_RESET_SCOPE = 'pw_reset';
 
   /**
    * @return static
@@ -369,30 +375,36 @@ class Security {
    *
    */
   public function checkPasswordResetToken(string $token, bool $spend = TRUE): ?int {
-    if (!preg_match('/^([0-9a-f]{8})([a-zA-Z0-9]{32})([0-9a-f]+)$/', $token, $matches)) {
-      // Hacker
-      Civi::log()->warning("Rejected passwordResetToken with invalid syntax.", compact('token'));
+    try {
+      $decodedToken = \Civi::service('crypto.jwt')->decode($token);
+    }
+    catch (CryptoException $e) {
+      Civi::log()->warning('Exception while decoding JWT', ['exception' => $e]);
       return NULL;
     }
 
-    $userID = hexdec($matches[3]);
+    $scope = $decodedToken['scope'] ?? '';
+    if ($scope != Security::PASSWORD_RESET_SCOPE) {
+      Civi::log()->warning('Expected JWT password reset, got ' . $scope);
+      return NULL;
+    }
+
+    if (empty($decodedToken['sub']) || substr($decodedToken['sub'], 0, 4) !== 'uid:') {
+      Civi::log()->warning('Missing uid in JWT sub field');
+      return NULL;
+    }
+    else {
+      $userID = substr($decodedToken['sub'], 4);
+    }
     if (!$userID > 0) {
       // Hacker
       Civi::log()->warning("Rejected passwordResetToken with invalid userID.", compact('token', 'userID'));
       return NULL;
     }
 
-    $expiry = hexdec($matches[1]);
-    if (time() > $expiry) {
-      // Less serious
-      Civi::log()->info("Rejected expired passwordResetToken for user $userID");
-      return NULL;
-    }
-
-    $storedToken = $matches[1] . $matches[2];
     $matched = User::get(FALSE)
       ->addWhere('id', '=', $userID)
-      ->addWhere('password_reset_token', '=', $storedToken)
+      ->addWhere('password_reset_token', '=', $token)
       ->addWhere('is_active', '=', 1)
       ->selectRowCount()
       ->execute()->countMatched() === 1;
@@ -432,7 +444,7 @@ class Security {
     }
 
     // The template_params are used in the template like {$resetUrlHtml} and {$resetUrlHtml} {$usernamePlaintext} {$usernameHtml}
-    list($domainFromName, $domainFromEmail) = \CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
+    [$domainFromName, $domainFromEmail] = \CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
     $workflowMessage = (new \CRM_Standaloneusers_WorkflowMessage_PasswordReset())
       ->setDataFromUser($user, $token)
       ->setFrom("\"$domainFromName\" <$domainFromEmail>");

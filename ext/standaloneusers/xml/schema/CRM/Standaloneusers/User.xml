@@ -200,7 +200,7 @@
     <title>Password Reset Token</title>
     <comment>The unspent token</comment>
     <type>varchar</type>
-    <length>40</length>
+    <length>255</length>
     <readonly>true</readonly>
     <permission>
       <or>administer CiviCRM, cms:administer users</or>
