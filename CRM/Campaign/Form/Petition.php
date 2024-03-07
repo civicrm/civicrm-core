@@ -19,6 +19,7 @@
  * This class generates form components for adding a petition.
  */
 class CRM_Campaign_Form_Petition extends CRM_Core_Form {
+  use CRM_Custom_Form_CustomDataTrait;
 
   /**
    * Making this public so we can reference it in the formRule
@@ -42,6 +43,24 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
     return $this->_surveyId;
   }
 
+  /**
+   * Get the survey ID.
+   *
+   * @api supported for external use.
+   *
+   * @return int|null
+   * @throws \CRM_Core_Exception
+   */
+  public function getSurveyID(): ?int {
+    if (!isset($this->_surveyId)) {
+      $this->_surveyId = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    }
+    return $this->_surveyId;
+  }
+
+  /**
+   * @throws \CRM_Core_Exception
+   */
   public function preProcess() {
     if (!CRM_Campaign_BAO_Campaign::accessCampaign()) {
       CRM_Utils_System::permissionDenied();
@@ -64,8 +83,15 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
       }
     }
 
-    // Add custom data to form
-    CRM_Custom_Form_CustomData::addToForm($this);
+    if ($this->isSubmitted()) {
+      // The custom data fields are added to the form by an ajax form.
+      // However, if they are not present in the element index they will
+      // not be available from `$this->getSubmittedValue()` in post process.
+      // We do not have to set defaults or otherwise render - just add to the element index.
+      $this->addCustomDataFieldsToForm('Survey', array_filter([
+        'id' => $this->getSurveyID(),
+      ]));
+    }
 
     $session = CRM_Core_Session::singleton();
     $url = CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=survey');
@@ -341,9 +367,7 @@ WHERE  $whereClause
       CRM_Core_BAO_UFJoin::create($ufJoinParams);
     }
 
-    if (!is_a($surveyId, 'CRM_Core_Error')) {
-      CRM_Core_Session::setStatus(ts('Petition has been saved.'), ts('Saved'), 'success');
-    }
+    CRM_Core_Session::setStatus(ts('Petition has been saved.'), ts('Saved'), 'success');
 
     $buttonName = $this->controller->getButtonName();
     if ($buttonName == $this->getButtonName('next', 'new')) {
