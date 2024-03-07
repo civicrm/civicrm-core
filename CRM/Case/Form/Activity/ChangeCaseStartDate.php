@@ -58,7 +58,7 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
       $openCaseInfo = current($openCaseInfo);
 
       // store activity id for updating it later
-      $form->openCaseActivityId = $openCaseInfo['id'];
+      $form->setOpenCaseActivityId($openCaseInfo['id']);
 
       $defaults['start_date'] = $openCaseInfo['activity_date'];
     }
@@ -164,10 +164,10 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
 
     // 2.5 Update open case activity date
     // @todo Since revisioning code has been removed this can be refactored more
-    if ($form->openCaseActivityId) {
+    if ($form->getOpenCaseActivityId()) {
 
       $abao = new CRM_Activity_BAO_Activity();
-      $oldParams = ['id' => $form->openCaseActivityId];
+      $oldParams = ['id' => $form->getOpenCaseActivityId()];
       $oldActivityDefaults = [];
       $oldActivity = $abao->retrieve($oldParams, $oldActivityDefaults);
 
