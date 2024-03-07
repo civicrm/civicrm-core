@@ -21,6 +21,7 @@
 class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
   use CRM_Activity_Form_ActivityFormTrait;
+  use CRM_Custom_Form_CustomDataTrait;
 
   /**
    * The id of the object being edited / created
@@ -430,16 +431,15 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     // when custom data is included in this page
     $this->assign('cid', $this->_currentlyViewedContactId);
-    if (!empty($_POST['hidden_custom'])) {
-      // We need to set it in the session for the code below to work.
-      // CRM-3014
-      // Need to assign custom data subtype to the template.
-      $this->set('type', 'Activity');
-      $this->set('subType', $this->_activityTypeId);
-      $this->set('entityId', $this->_activityId);
-      CRM_Custom_Form_CustomData::preProcess($this, NULL, $this->_activityTypeId, 1, 'Activity', $this->_activityId);
-      CRM_Custom_Form_CustomData::buildQuickForm($this);
-      CRM_Custom_Form_CustomData::setDefaultValues($this);
+    if ($this->isSubmitted()) {
+      // The custom data fields are added to the form by an ajax form.
+      // However, if they are not present in the element index they will
+      // not be available from `$this->getSubmittedValue()` in post process.
+      // We do not have to set defaults or otherwise render - just add to the element index.
+      $this->addCustomDataFieldsToForm('Activity', array_filter([
+        'id' => $this->getActivityID(),
+        'activity_type_id' => $this->_activityTypeId,
+      ]));
     }
 
     // add attachments part
@@ -727,8 +727,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       $this->getElement('source_contact_id')->freeze();
     }
 
-    //need to assign custom data type and subtype to the template
-    $this->assign('customDataType', 'Activity');
+    //need to assign custom data subtype to the template for the initial loading of the custom data.
     $this->assign('customDataSubType', $this->_activityTypeId);
     $this->assign('entityID', $this->_activityId);
 
@@ -910,12 +909,10 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       $params['activity_type_id'] = $this->_activityTypeId;
     }
 
-    if (!empty($params['hidden_custom']) && !isset($params['custom'])) {
-      $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
-        $this->_activityId,
-        'Activity'
-      );
-    }
+    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($this->getSubmittedValues(),
+      $this->_activityId,
+      'Activity'
+    );
 
     // format params as arrays
     foreach (['target', 'assignee', 'followup_assignee'] as $name) {
