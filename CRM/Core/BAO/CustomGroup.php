@@ -1196,8 +1196,8 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
    * @param bool $inactiveNeeded
    * @param int $action
    */
-  public static function setDefaults(&$groupTree, &$defaults, $viewMode = FALSE, $inactiveNeeded = FALSE, $action = CRM_Core_Action::NONE) {
-    foreach ($groupTree as $id => $group) {
+  public static function setDefaults($groupTree, &$defaults, $viewMode = FALSE, $inactiveNeeded = FALSE, $action = CRM_Core_Action::NONE) {
+    foreach ($groupTree as $group) {
       if (!isset($group['fields'])) {
         continue;
       }
