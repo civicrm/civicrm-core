@@ -19,6 +19,7 @@
  * This class generates form components for processing a campaign.
  */
 class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
+  use CRM_Custom_Form_CustomDataTrait;
 
   /**
    * Action
@@ -55,6 +56,9 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     return 'Campaign';
   }
 
+  /**
+   * @throws \CRM_Core_Exception
+   */
   public function preProcess() {
     if (!CRM_Campaign_BAO_Campaign::accessCampaign()) {
       CRM_Utils_System::permissionDenied();
@@ -97,16 +101,15 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
       $this->set('values', $this->_values);
     }
 
-    // when custom data is included in form.
-    if (!empty($_POST['hidden_custom'])) {
-      $campaignTypeId = empty($_POST['campaign_type_id']) ? NULL : $_POST['campaign_type_id'];
-      $this->set('type', 'Campaign');
-      $this->set('subType', $campaignTypeId);
-      $this->set('entityId', $this->_campaignId);
-
-      CRM_Custom_Form_CustomData::preProcess($this, NULL, $campaignTypeId, 1, 'Campaign', $this->_campaignId);
-      CRM_Custom_Form_CustomData::buildQuickForm($this);
-      CRM_Custom_Form_CustomData::setDefaultValues($this);
+    if ($this->isSubmitted()) {
+      // The custom data fields are added to the form by an ajax form.
+      // However, if they are not present in the element index they will
+      // not be available from `$this->getSubmittedValue()` in post process.
+      // We do not have to set defaults or otherwise render - just add to the element index.
+      $this->addCustomDataFieldsToForm('Campaign', array_filter([
+        'id' => $this->_campaignId,
+        'campaign_type_id' => $this->getSubmittedValue('campaign_type_id'),
+      ]));
     }
   }
 
@@ -168,8 +171,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
 
     $this->applyFilter('__ALL__', 'trim');
 
-    //lets assign custom data type and subtype.
-    $this->assign('customDataType', 'Campaign');
+    // Assign custom data subtype for initial ajax load of custom data.
     $this->assign('entityID', $this->_campaignId);
     $this->assign('customDataSubType', CRM_Utils_Array::value('campaign_type_id', $this->_values));
 
@@ -272,7 +274,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     // store the submitted values in an array
 
     $session = CRM_Core_Session::singleton();
-    $params = $this->controller->exportValues($this->_name);
+    $params = $this->getSubmittedValues();
     // To properly save the DAO we need to ensure we don't have a blank id key passed through.
     if (empty($params['id'])) {
       unset($params['id']);
