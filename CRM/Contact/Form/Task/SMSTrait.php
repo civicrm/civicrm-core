@@ -71,15 +71,33 @@ trait CRM_Contact_Form_Task_SMSTrait {
    */
   protected function getPhones(): array {
     if (!isset($this->phones)) {
-      $this->phones = (array) Phone::get()
-        ->addWhere('contact_id', 'IN', $this->getContactIDs())
+      $contacts = [];
+      $phoneGet = Phone::get()
         ->addWhere('contact_id.do_not_sms', '=', FALSE)
         ->addWhere('contact_id.is_deceased', '=', FALSE)
         ->addWhere('phone_numeric', '>', 0)
         ->addWhere('phone_type_id:name', '=', 'Mobile')
         ->addOrderBy('is_primary')
-        ->addSelect('id', 'contact_id', 'phone', 'phone_type_id:name', 'contact_id.sort_name', 'phone_type_id', 'contact_id.display_name')
-        ->execute()->indexBy('contact_id');
+        ->addSelect('id', 'contact_id', 'phone', 'phone_type_id:name', 'phone_numeric', 'contact_id.sort_name', 'phone_type_id', 'contact_id.display_name');
+      if ($this->getSubmittedValue('to')) {
+        $phoneGet->addWhere('id', 'IN', explode(',', $this->getSubmittedValue('to')));
+      }
+      else {
+        $phoneGet->addWhere('contact_id', 'IN', $this->getContactIDs());
+      }
+      $this->phones = (array) $phoneGet->execute()->indexBy('id');
+      foreach ($this->phones as $index => $phone) {
+        if ($this->isInvalidRecipient($phone['contact_id'])) {
+          unset($this->phones[$index]);
+        }
+        if (!$this->getSubmittedValue('to')) {
+          // In this pre-submit case we want to make the contact Ids unique.
+          if (isset($contacts[$phone['contact_id']])) {
+            unset($this->phones[$index]);
+          }
+          $contacts[$phone['contact_id']] = TRUE;
+        }
+      }
     }
     return $this->phones;
   }
@@ -102,7 +120,6 @@ trait CRM_Contact_Form_Task_SMSTrait {
       throw new CRM_Core_Exception("You do not have the 'send SMS' permission");
     }
     $form = $this;
-    $toArray = [];
 
     $providers = CRM_SMS_BAO_Provider::getProviders(NULL, NULL, TRUE, 'is_default desc');
 
@@ -118,7 +135,15 @@ trait CRM_Contact_Form_Task_SMSTrait {
       $form->_contactIds = [$cid];
     }
 
-    $to = $form->add('text', 'to', ts('To'), ['class' => 'huge'], TRUE);
+    $this->addAutocomplete('to', ts('Send to'), [
+      'entity' => 'Phone',
+      'api' => [
+        'fieldName' => 'Phone.id',
+      ],
+      'select' => ['multiple' => TRUE],
+      'class' => 'select2',
+    ], TRUE);
+
     $form->add('text', 'activity_subject', ts('Name The SMS'), ['class' => 'huge'], TRUE);
 
     $toSetDefault = TRUE;
@@ -127,71 +152,28 @@ trait CRM_Contact_Form_Task_SMSTrait {
     }
 
     // when form is submitted recompute contactIds
-    $allToSMS = [];
-    if ($this->getSubmittedValue('to')) {
-      $allToPhone = explode(',', $to->getValue());
-
+    if ($this->isSubmitted()) {
       $form->_contactIds = [];
-      foreach ($allToPhone as $value) {
-        [$contactId, $phone] = explode('::', $value);
-        if ($contactId) {
-          $form->_contactIds[] = $contactId;
-        }
+      foreach ($this->getPhones() as $phone) {
+        $form->_contactIds[] = $phone['contact_id'];
       }
-      $toSetDefault = TRUE;
     }
 
     //get the group of contacts as per selected by user in case of Find Activities
     $this->filterContactIDs();
 
-    if (is_array($form->_contactIds) && !empty($form->_contactIds) && $toSetDefault) {
-      $form->_contactDetails = civicrm_api3('Contact', 'get', [
-        'id' => ['IN' => $form->_contactIds],
-        'return' => ['sort_name', 'phone', 'do_not_sms', 'is_deceased', 'display_name'],
-        'options' => ['limit' => 0],
-      ])['values'];
-
-      // make a copy of all contact details
-      $form->_allContactDetails = $form->_contactDetails;
-
+    if (!empty($form->getContactIDs())) {
       $phoneNumbers = $this->getPhones();
       $suppressedSms = count($this->getContactIDs()) - count($phoneNumbers);
-      foreach ($phoneNumbers as $phone) {
-        if ($this->isInvalidRecipient($phone['contact_id'])) {
-          $suppressedSms++;
-          continue;
-        }
-        // We hope to refactor this array away but for now...
-        $form->_contactDetails[$phone['contact_id']] = [
-          'id' => $phone['contact_id'],
-          'contact_id' => $phone['contact_id'],
-          'sort_name' => $phone['contact_id.sort_name'],
-          'display_name' => $phone['contact_id.display_name'],
-          // Might need to be set later - we know it is false here.
-          'do_not_sms' => FALSE,
-          'phone_id' => $phone['id'],
-          'phone' => $phone['phone'],
-          'phone_type_id' => $phone['phone_type_id'],
-        ];
-
-        if ($phone) {
-          $toArray[] = [
-            'text' => CRM_Utils_String::purifyHTML('"' . $phone['contact_id.sort_name'] . '" (' . $phone['phone'] . ')'),
-            'id' => $phone['contact_id'] . '::' . CRM_Utils_String::purifyHTML($phone['phone']),
-          ];
-        }
-      }
-
-      if (empty($toArray)) {
-        CRM_Core_Error::statusBounce(ts('Selected contact(s) do not have a valid Phone, or communication preferences specify DO NOT SMS, or they are deceased'));
-      }
+    }
+    if (!$this->getSubmittedValue('to') && !$this->getPhones()) {
+      CRM_Core_Error::statusBounce(ts('Selected contact(s) do not have a valid Phone, or communication preferences specify DO NOT SMS, or they are deceased'));
     }
 
     //activity related variables
     $form->addExpectedSmartyVariable('invalidActivity');
     $form->addExpectedSmartyVariable('extendTargetContacts');
 
-    $form->assign('toContact', json_encode($toArray));
     $form->assign('suppressedSms', $suppressedSms);
     $form->assign('totalSelectedContacts', count($this->getContactIDs()));
 
@@ -219,6 +201,18 @@ trait CRM_Contact_Form_Task_SMSTrait {
     }
 
     $form->addFormRule([__CLASS__, 'formRuleSms'], $form);
+  }
+
+  /**
+   * Set the default form values.
+   *
+   *
+   * @return array
+   *   the default array reference
+   */
+  public function setDefaultValues() {
+    $phones = $this->getPhones();
+    return ['to' => implode(',', array_keys($phones))];
   }
 
   /**
@@ -252,18 +246,22 @@ trait CRM_Contact_Form_Task_SMSTrait {
       }
     }
 
-    // format contact details array to handle multiple sms from same contact
-    $formattedContactDetails = [];
     $phonesToSendTo = explode(',', $this->getSubmittedValue('to'));
-    foreach ($phonesToSendTo as $phone) {
-      [$contactId] = explode('::', $phone);
-      if ($contactId && !empty($form->_contactDetails[$contactId])) {
-        $formattedContactDetails[] = $form->_contactDetails[$contactId];
+    $unexpectedErrors = $phonesToSMS = [];
+    foreach ($phonesToSendTo as $phoneID) {
+      $phoneValues = $this->getPhones()[$phoneID] ?? NULL;
+      if (!$phoneValues) {
+        $unexpectedErrors[] = ts('Contact Does not accept SMS');
+        continue;
       }
+      $phonesToSMS[] = $phoneValues;
+    }
+    // These errors are unexpected because the ajax should filter them out.
+    foreach ($unexpectedErrors as $unexpectedError) {
+      CRM_Core_Session::setStatus($unexpectedError, ts('Invalid phone submitted'));
     }
 
-    [$sent, $countSuccess] = $this->sendSMS($formattedContactDetails);
-
+    [$errors, $countSuccess] = $this->sendSMS($phonesToSMS);
     if ($countSuccess > 0) {
       CRM_Core_Session::setStatus(ts('One message was sent successfully.', [
         'plural' => '%count messages were sent successfully.',
@@ -271,22 +269,21 @@ trait CRM_Contact_Form_Task_SMSTrait {
       ]), ts('Message Sent', ['plural' => 'Messages Sent', 'count' => $countSuccess]), 'success');
     }
 
-    if (is_array($sent)) {
+    if (!empty($errors)) {
       // At least one PEAR_Error object was generated.
       // Display the error messages to the user.
       $status = '<ul>';
-      foreach ($sent as $errMsg) {
+      foreach ($errors as $errMsg) {
         $status .= '<li>' . $errMsg . '</li>';
       }
       $status .= '</ul>';
       CRM_Core_Session::setStatus($status, ts('One Message Not Sent', [
-        'count' => count($sent),
+        'count' => count($errors),
         'plural' => '%count Messages Not Sent',
       ]), 'info');
     }
     else {
-      $contactIds = array_keys($form->_contactDetails);
-      $allContactIds = array_keys($form->_allContactDetails);
+      $contactIds = array_values($this->getContactIDs());
       //Display the name and number of contacts for those sms is not sent.
       $smsNotSent = array_diff_assoc($this->getContactIDs(), $contactIds);
 
@@ -311,16 +308,14 @@ trait CRM_Contact_Form_Task_SMSTrait {
   }
 
   /**
-   * Send SMS.  Returns: bool $sent, int $activityId, int $success (number of sent SMS)
+   * Send SMS.
    *
-   * @param array $contactDetails
+   * @param array $phones
    *
-   * @return array(bool $sent, int $activityId, int $success)
+   * @return array(array $errors, int $numberSent)
    * @throws CRM_Core_Exception
    */
-  protected function sendSMS(
-    $contactDetails
-  ) {
+  protected function sendSMS(array $phones): array {
 
     // Create the meta level record first ( sms activity )
     $activityID = Activity::create()->setValues([
@@ -332,55 +327,28 @@ trait CRM_Contact_Form_Task_SMSTrait {
       'status_id:name' => 'Completed',
     ])->execute()->first()['id'];
 
-    $success = 0;
-    $errMsgs = [];
-    foreach ($contactDetails as $contact) {
-      $contactId = $contact['contact_id'];
+    $numberSent = 0;
+    $errors = [];
+    foreach ($phones as $phone) {
+      $contactId = $phone['contact_id'];
       $tokenText = CRM_Core_BAO_MessageTemplate::renderTemplate(['messageTemplate' => ['msg_text' => $this->getSubmittedValue('sms_text_message')], 'contactId' => $contactId, 'disableSmarty' => TRUE])['text'];
       $smsProviderParams = $this->getSmsProviderParams();
-      // Only send if the phone is of type mobile
-      if ($contact['phone_type_id'] == CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'phone_type_id', 'Mobile')) {
-        $smsProviderParams['To'] = $contact['phone'];
+      $smsProviderParams['To'] = $phone['phone_numeric'];
+      try {
+        CRM_Activity_BAO_Activity::sendSMSMessage(
+          $contactId,
+          $tokenText,
+          $smsProviderParams,
+          $activityID,
+          CRM_Core_Session::getLoggedInContactID()
+        );
+        $numberSent++;
       }
-      else {
-        $smsProviderParams['To'] = '';
-      }
-
-      $doNotSms = $contact['do_not_sms'] ?? 0;
-
-      if ($doNotSms) {
-        $errMsgs[] = PEAR::raiseError('Contact Does not accept SMS', NULL, PEAR_ERROR_RETURN);
-      }
-      else {
-        try {
-          $sendResult = CRM_Activity_BAO_Activity::sendSMSMessage(
-            $contactId,
-            $tokenText,
-            $smsProviderParams,
-            $activityID,
-            CRM_Core_Session::getLoggedInContactID()
-          );
-          $success++;
-        }
-        catch (CRM_Core_Exception $e) {
-          $errMsgs[] = $e->getMessage();
-        }
+      catch (CRM_Core_Exception $e) {
+        $errors[] = $e->getMessage();
       }
     }
-
-    // If at least one message was sent and no errors
-    // were generated then return a boolean value of TRUE.
-    // Otherwise, return FALSE (no messages sent) or
-    // and array of 1 or more PEAR_Error objects.
-    $sent = FALSE;
-    if ($success > 0 && count($errMsgs) == 0) {
-      $sent = TRUE;
-    }
-    elseif (count($errMsgs) > 0) {
-      $sent = $errMsgs;
-    }
-
-    return [$sent, $success];
+    return [$errors, $numberSent];
   }
 
   /**
