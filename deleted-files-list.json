@@ -551,6 +551,7 @@
     "Civi/Api4/PriceSet.php",
     "Civi/Api4/PriceSetEntity.php",
     "Civi/Api4/Product.php",
+    "Civi/Api4/Provider.php",
     "Civi/Api4/ReportInstance.php",
     "Civi/Api4/Service/Autocomplete/ParticipantAutocompleteProvider.php",
     "Civi/Api4/Service/Schema/Joinable/ActivityToActivityContactAssigneesJoinable.php",
