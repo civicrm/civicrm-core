@@ -83,7 +83,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
   /**
    * Build the form object.
    */
-  public function buildQuickForm() {
+  public function buildQuickForm(): void {
     $optionGroups = CRM_Campaign_BAO_Survey::getResultSets();
 
     if (empty($optionGroups)) {
