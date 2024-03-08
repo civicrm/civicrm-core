@@ -18,6 +18,7 @@ class CRM_Contact_Form_IndividualTest extends CiviUnitTestCase {
   public function testOpeningNewIndividualForm(): void {
     $_REQUEST['reset'] = 1;
     $_REQUEST['ct'] = 'Individual';
+    $_POST = [];
     $form = $this->getFormObject('CRM_Contact_Form_Contact');
     $form->assign('urlIsPublic');
     $form->assign('linkButtons', []);
