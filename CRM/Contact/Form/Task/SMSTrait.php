@@ -16,6 +16,7 @@
  */
 use Civi\Api4\Activity;
 use Civi\API\EntityLookupTrait;
+use Civi\Api4\MessageTemplate;
 use Civi\Api4\Phone;
 use Civi\Token\TokenProcessor;
 
@@ -229,21 +230,20 @@ trait CRM_Contact_Form_Task_SMSTrait {
     // process message template
     if (!empty($thisValues['SMSsaveTemplate']) || !empty($thisValues['SMSupdateTemplate'])) {
       $messageTemplate = [
-        'msg_text' => $thisValues['sms_text_message'],
+        'msg_text' => $this->getSubmittedValue('sms_text_message'),
         'is_active' => TRUE,
         'is_sms' => TRUE,
       ];
 
       if (!empty($thisValues['SMSsaveTemplate'])) {
-        $messageTemplate['msg_title'] = $thisValues['SMSsaveTemplateName'];
-        CRM_Core_BAO_MessageTemplate::add($messageTemplate);
+        $messageTemplate['msg_title'] = $this->getSubmittedValue('SMSsaveTemplateName');
       }
 
-      if (!empty($thisValues['SMStemplate']) && !empty($thisValues['SMSupdateTemplate'])) {
-        $messageTemplate['id'] = $thisValues['SMStemplate'];
+      if ($this->getSubmittedValue('SMStemplate') && $this->getSubmittedValue('SMSupdateTemplate')) {
+        $messageTemplate['id'] = $this->getSubmittedValue('SMStemplate');
         unset($messageTemplate['msg_title']);
-        CRM_Core_BAO_MessageTemplate::add($messageTemplate);
       }
+      MessageTemplate::save()->addRecord($messageTemplate)->execute();
     }
 
     $phonesToSendTo = explode(',', $this->getSubmittedValue('to'));
