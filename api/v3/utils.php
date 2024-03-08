@@ -1423,7 +1423,7 @@ function _civicrm_api3_custom_data_get(&$returnArray, $checkPermission, $entity,
   CRM_Core_BAO_CustomGroup::setDefaults($groupTree, $customValues);
   $fieldInfo = [];
   foreach ($groupTree as $set) {
-    $fieldInfo += $set['fields'];
+    $fieldInfo += ($set['fields'] ?? []);
   }
   if (!empty($customValues)) {
     foreach ($customValues as $key => $val) {
