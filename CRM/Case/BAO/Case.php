@@ -2995,11 +2995,28 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
 
       // Filter status id by case type id
       case 'status_id':
-        if (!empty($props['case_type_id']) && is_scalar($props['case_type_id'])) {
-          $idField = is_numeric($props['case_type_id']) ? 'id' : 'name';
-          $caseType = civicrm_api3('CaseType', 'getsingle', [$idField => $props['case_type_id'], 'return' => 'definition']);
-          if (!empty($caseType['definition']['statuses'])) {
-            $params['condition'] = 'v.name IN ("' . implode('","', $caseType['definition']['statuses']) . '")';
+        if (!empty($props['case_type_id'])) {
+          // cast single values to a single value array
+          $caseTypeIdValues = (array) $props['case_type_id'];
+
+          $idField = is_numeric($caseTypeIdValues[0]) ? 'id' : 'name';
+          $caseTypeDefs = (array) \Civi\Api4\CaseType::get(FALSE)
+            ->addSelect('definition')
+            ->addWhere($idField, 'IN', $caseTypeIdValues)
+            ->execute()->column('definition');
+
+          $allowAll = FALSE;
+          $statuses = [];
+          foreach ($caseTypeDefs as $definition) {
+            if (empty($definition['statuses'])) {
+              // if any case type has no status restrictions, we want to allow all options
+              $allowAll = TRUE;
+              break;
+            }
+            $statuses = array_unique(array_merge($statuses, $definition['statuses']));
+          }
+          if (!$allowAll) {
+            $params['condition'] = 'v.name IN ("' . implode('","', $statuses) . '")';
           }
         }
         break;
