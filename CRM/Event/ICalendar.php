@@ -46,6 +46,11 @@ class CRM_Event_ICalendar {
 
     $info = CRM_Event_BAO_Event::getCompleteInfo($start, $type, $id, $end);
 
+    // Cleanup Event Description
+    foreach ($info as $id => &$event_info) {
+      self::trimEventDetails($event_info);
+    }
+
     if ($gCalendar && count($info) === 1) {
       return self::gCalRedirect($info);
     }
@@ -100,26 +105,11 @@ class CRM_Event_ICalendar {
 
     $dates = $start_date->format('Ymd\THis') . '/' . $end_date->format('Ymd\THis');
 
-    $event_details = $event['description'];
-
-    // Add space after paragraph
-    $event_details = str_replace('</p>', '</p> ', $event_details);
-    $event_details = strip_tags($event_details);
-
-    // Truncate Event Description and add permalink if greater than 996 characters
-    if (strlen($event_details) > 996) {
-      if (preg_match('/^.{0,996}(?=\s|$_)/', $event_details, $m)) {
-        $event_details = $m[0] . '...';
-      }
-    }
-
-    $event_details .= "\n\n<a href=\"{$event['url']}\">" . ts('View %1 Details', [1 => $event['event_type']]) . '</a>';
-
     $params = [
       'action' => 'TEMPLATE',
       'text' => strip_tags($event['title']),
       'dates' => $dates,
-      'details' => $event_details,
+      'details' => $event['description'],
       'location' => str_replace("\n", "\t", $event['location']),
       'trp' => 'false',
       'sprop' => 'website:' . CRM_Utils_System::baseCMSURL(),
@@ -129,6 +119,27 @@ class CRM_Event_ICalendar {
     $url = 'https://www.google.com/calendar/event?' . CRM_Utils_System::makeQueryString($params);
 
     CRM_Utils_System::redirect($url);
+  }
+
+  public static function trimEventDetails(array &$event) {
+    if (!empty($event)) {
+      $event_details = $event['description'];
+
+      // Add space after paragraph
+      $event_details = str_replace('</p>', '</p> ', $event_details);
+      $event_details = strip_tags($event_details);
+
+      // Truncate Event Description and add permalink if greater than 996 characters
+      if (strlen($event_details) > 996) {
+        if (preg_match('/^.{0,996}(?=\s|$_)/', $event_details, $m)) {
+          $event_details = $m[0] . '...';
+        }
+      }
+
+      $event_details .= "\n\n<a href=\"{$event['url']}\">" . ts('View %1 Details', [1 => $event['event_type']]) . '</a>';
+      $event['description'] = $event_description;
+    }
+
   }
 
 }
