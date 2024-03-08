@@ -21,7 +21,6 @@ use Civi\Api4\ContributionRecur;
  * This class generates form components for offline membership form.
  */
 class CRM_Member_Form_Membership extends CRM_Member_Form {
-  use CRM_Custom_Form_CustomDataTrait;
 
   /**
    * If this is set (to 'test' or 'live') then the payment processor will be shown on the form to take a payment.
@@ -73,23 +72,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       . ts('Consider modifying the membership status instead if you want to maintain an audit trail and avoid losing payment data. You can set the status to Cancelled by editing the membership and clicking the Status Override checkbox.')
       . '</p><p>'
       . ts("Click 'Delete' if you want to continue.") . '</p>';
-  }
-
-  /**
-   * Overriding this entity trait function as the function does not
-   * at this stage use the CustomDataTrait which works better with php8.2.
-   */
-  public function addCustomDataToForm() {
-    if ($this->isSubmitted()) {
-      // The custom data fields are added to the form by an ajax form.
-      // However, if they are not present in the element index they will
-      // not be available from `$this->getSubmittedValue()` in post process.
-      // We do not have to set defaults or otherwise render - just add to the element index.
-      $this->addCustomDataFieldsToForm('Membership', array_filter([
-        'id' => $this->getMembershipID(),
-        'membership_type_id' => $this->getSubmittedValue('membership_type_id'),
-      ]));
-    }
   }
 
   /**
