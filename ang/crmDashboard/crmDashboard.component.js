@@ -10,7 +10,7 @@
       this.contactDashlets = {};
       this.sortableOptions = {
         connectWith: '.crm-dashboard-droppable',
-        handle: '.crm-dashlet-header'
+        handle: '.crm-accordion-bold'
       };
       $scope.hs = crmUiHelp({file: 'CRM/Contact/Page/Dashboard'});
 
