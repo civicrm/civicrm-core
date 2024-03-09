@@ -23,11 +23,14 @@ class CRM_Contact_Form_Edit_CustomData {
   /**
    * Build all the data structures needed to build the form.
    *
+   * @deprecated since 5.73 will be removed around 5.85
+   *
    * @param CRM_Core_Form $form
    *
    * @throws \CRM_Core_Exception
    */
   public static function preProcess(&$form) {
+    CRM_Core_Error::deprecatedFunctionWarning('maybe take a copy?');
     $customDataType = CRM_Utils_Request::retrieve('type', 'String');
 
     if ($customDataType) {
