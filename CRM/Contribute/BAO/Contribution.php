@@ -3323,6 +3323,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $params['trxnParams']['trxn_id'] = $params['contribution']->trxn_id;
         if (isset($totalAmount) &&
           $totalAmount != $params['prevContribution']->total_amount
+          && !$params['contribution']->is_template
         ) {
           //Update Financial Records
           $params['trxnParams']['from_financial_account_id'] = NULL;
