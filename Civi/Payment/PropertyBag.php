@@ -81,6 +81,7 @@ class PropertyBag implements \ArrayAccess {
     'recurProcessorID'            => TRUE,
     'transactionID'               => TRUE,
     'transaction_id'              => 'transactionID',
+    'trxn_id'                     => 'transactionID',
     'trxnResultCode'              => TRUE,
     'isNotifyProcessorOnCancelRecur' => TRUE,
   ];
