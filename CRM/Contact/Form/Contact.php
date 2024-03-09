@@ -352,23 +352,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         $paramSubType = (isset($paramSubType)) ? $paramSubType :
           str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',', trim($this->_contactSubType, CRM_Core_DAO::VALUE_SEPARATOR));
       }
-
-      if (CRM_Utils_Request::retrieve('type', 'String')) {
-        $this->preProcessCustomData();
-      }
-      else {
-        // The reason we call this here is that it sets the _groupTree property which is later used
-        // in setDefaultValues and buildForm. (Ideally instead we would have a trait with getCustomGroup & getCustomFields
-        // that can be called at appropriate times). In order for buildForm to add the right fields it needs
-        // to know any contact sub types that are being added in the submission. Since this runs before
-        // the buildForm adds the contact_sub_type to the form we need to look in _submitValues for it - submitValues
-        // is a un-sanitised version of what is in the form submission (_POST) whereas `getSubmittedValues()` retrieves
-        // 'allowed' POSTED values - ie values which match available fields, with some localization handling.
-        $this->legacyPreProcessCustomData(NULL, $this->isSubmitted() ? ($this->_submitValues['contact_sub_type'] ?? []) : $this->getContactValue('contact_sub_type') ?? $this->_contactSubType,
-          1, $this->_contactType, $this->getContactID()
-        );
-        $this->assign('customValueCount', $this->_customValueCount);
-      }
+      $this->preProcessCustomData();
     }
     $this->assign('paramSubType', $paramSubType ?? '');
   }
@@ -524,18 +508,35 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    */
   private function preProcessCustomData(): void {
     $customDataType = CRM_Utils_Request::retrieve('type', 'String');
-
+    // if customDataType is present it implies it is a new contact - ie
+    // the person has selected 'New Individual' and the type 'Individual' is in the url.
     if ($customDataType) {
       $this->assign('addBlock', TRUE);
       $this->assign('blockName', 'CustomData');
     }
-
-    $this->legacyPreProcessCustomData(NULL, NULL, NULL,
-      $customDataType ?: $this->_contactType
+    // We should probably fold this into the function in the build quick form process.
+    // There is no particular reason to call it in preProcess & it logically
+    // belongs with the buildQuickForm code.
+    // The comments below this line are historical.
+    // The reason we call this here is that it sets the _groupTree property which is later used
+    // in setDefaultValues and buildForm. (Ideally instead we would have a trait with getCustomGroup & getCustomFields
+    // that can be called at appropriate times). In order for buildForm to add the right fields it needs
+    // to know any contact sub types that are being added in the submission. Since this runs before
+    // the buildForm adds the contact_sub_type to the form we need to look in _submitValues for it - submitValues
+    // is a un-sanitised version of what is in the form submission (_POST) whereas `getSubmittedValues()` retrieves
+    // 'allowed' POSTED values - ie values which match available fields, with some localization handling.
+    // @todo - it's probably that there is no reason to pass NULl vs 1 for groupCount below.
+    $this->legacyPreProcessCustomData(NULL, $this->isSubmitted() ? ($this->_submitValues['contact_sub_type'] ?? []) : $this->getContactValue('contact_sub_type') ?? $this->_contactSubType,
+      $customDataType ? NULL : 1, $customDataType ?: $this->_contactType, $this->getContactID()
     );
-
-    //assign group tree after build.
-    $this->assign('groupTree', $this->_groupTree);
+    if (!$customDataType) {
+      // Probably this does not need to be wrapped in an IF.
+      $this->assign('customValueCount', $this->_customValueCount);
+    }
+    if ($customDataType) {
+      // Not too sure why this makes sense for new contacts only.
+      $this->assign('groupTree', $this->_groupTree);
+    }
   }
 
   /**
