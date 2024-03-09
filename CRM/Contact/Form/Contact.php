@@ -434,8 +434,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     // set defaults for blocks ( custom data, address, communication preference, notes, tags and groups )
     foreach ($this->_editOptions as $name => $label) {
       if (!in_array($name, ['Address', 'Notes'])) {
-        $className = 'CRM_Contact_Form_Edit_' . $name;
-        $className::setDefaultValues($this, $defaults);
+        $this->setBlockDefaults($name, $defaults);
       }
     }
 
@@ -767,8 +766,8 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   public function buildQuickForm() {
     //load form for child blocks
     if ($this->isAjaxMode()) {
-      $className = 'CRM_Contact_Form_Edit_' . $this->getAjaxBlockName();
-      return $className::buildQuickForm($this);
+      $this->buildLocationBlock($this->getAjaxBlockName());
+      return;
     }
 
     if ($this->_action == CRM_Core_Action::UPDATE) {
@@ -797,8 +796,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     }
 
     //build contact type specific fields
-    $className = 'CRM_Contact_Form_Edit_' . $this->_contactType;
-    $className::buildQuickForm($this);
+    $this->buildContactTypeSpecificFields();
 
     // Ajax duplicate checking
     $checkSimilar = Civi::settings()->get('contact_ajax_check_similar');
@@ -846,15 +844,14 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
     // build edit blocks ( custom data, demographics, communication preference, notes, tags and groups )
     foreach ($this->_editOptions as $name => $label) {
-      if ($name == 'Address') {
+      if ($name === 'Address') {
         $this->_blocks['Address'] = $this->_editOptions['Address'];
         continue;
       }
-      if ($name == 'TagsAndGroups') {
+      if ($name === 'TagsAndGroups') {
         continue;
       }
-      $className = 'CRM_Contact_Form_Edit_' . $name;
-      $className::buildQuickForm($this);
+      $this->buildBlock($name);
     }
 
     // build tags and groups
@@ -974,11 +971,8 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
             break;
 
           default:
-            // @todo This pattern actually adds complexity compared to filling out a switch statement
-            // for the limited number of blocks - as we also have to receive the block count
             $this->set($blockName . '_Block_Count', $instance);
-            $formName = 'CRM_Contact_Form_Edit_' . $blockName;
-            $formName::buildQuickForm($this);
+            $this->buildLocationBlock($blockName);
         }
       }
     }
@@ -1504,6 +1498,122 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
     }
     return $this->_contactId ? (int) $this->_contactId : NULL;
+  }
+
+  private function buildLocationBlock(string $name): void {
+    if ($name === 'Address') {
+      CRM_Contact_Form_Edit_Address::buildQuickForm($this);
+      return;
+    }
+    if ($name === 'Phone') {
+      CRM_Contact_Form_Edit_Phone::buildQuickForm($this);
+      return;
+    }
+    if ($name === 'IM') {
+      CRM_Contact_Form_Edit_IM::buildQuickForm($this);
+      return;
+    }
+    if ($name === 'Website') {
+      CRM_Contact_Form_Edit_Website::buildQuickForm($this);
+      return;
+    }
+    if ($name === 'IM') {
+      CRM_Contact_Form_Edit_IM::buildQuickForm($this);
+      return;
+    }
+    if ($name === 'OpenID') {
+      CRM_Contact_Form_Edit_OpenID::buildQuickForm($this);
+      return;
+    }
+    CRM_Core_Error::deprecatedWarning('unused?');
+    $this->buildBlock($name);
+  }
+
+  /**
+   * @param $name
+   *
+   * @return void
+   */
+  private function buildBlock(string $name): void {
+    if ($name === 'TagsAndGroups') {
+      CRM_Core_Error::deprecatedWarning('unused?');
+      CRM_Contact_Form_Edit_TagsAndGroups::buildQuickForm($this);
+      return;
+    }
+    if ($name === 'CustomData') {
+      CRM_Contact_Form_Edit_CustomData::buildQuickForm($this);
+      return;
+    }
+    if ($name === 'CommunicationPreferences') {
+      CRM_Contact_Form_Edit_CommunicationPreferences::buildQuickForm($this);
+      return;
+    }
+    if ($name === 'Demographics') {
+      CRM_Contact_Form_Edit_Demographics::buildQuickForm($this);
+      return;
+    }
+    if ($name === 'Notes') {
+      CRM_Contact_Form_Edit_Notes::buildQuickForm($this);
+      return;
+    }
+    CRM_Core_Error::deprecatedWarning('unused?');
+    // Ideally nothing here would be called but it's possible it could be injected from
+    // outside of core. For core purposed we can be sure no core forms are called here
+    // and any extensions doing magic are buyer-beware.
+    $className = 'CRM_Contact_Form_Edit_' . $name;
+    $className::buildQuickForm($this);
+  }
+
+  /**
+   * @return void
+   */
+  private function buildContactTypeSpecificFields(): void {
+    switch ($this->_contactType) {
+      case 'Individual':
+        CRM_Contact_Form_Edit_Individual::buildQuickForm($this);
+        return;
+
+      case 'Organization':
+        CRM_Contact_Form_Edit_Organization::buildQuickForm($this);
+        return;
+
+      case 'Household':
+        CRM_Contact_Form_Edit_Household::buildQuickForm($this);
+        return;
+
+      default:
+        CRM_Core_Error::deprecatedWarning('unreachable?');
+        $className = 'CRM_Contact_Form_Edit_' . $this->_contactType;
+        $className::buildQuickForm($this);
+    }
+  }
+
+  /**
+   * @param $name
+   * @param $defaults
+   *
+   * @return void
+   */
+  private function setBlockDefaults($name, $defaults): void {
+    if ($name === 'TagsAndGroups') {
+      CRM_Contact_Form_Edit_TagsAndGroups::setDefaultValues($this, $defaults);
+      return;
+    }
+    if ($name === 'CustomData') {
+      CRM_Contact_Form_Edit_CustomData::setDefaultValues($this, $defaults);
+      return;
+    }
+    if ($name === 'CommunicationPreferences') {
+      CRM_Contact_Form_Edit_CommunicationPreferences::setDefaultValues($this, $defaults);
+      return;
+    }
+    if ($name === 'Demographics') {
+      CRM_Contact_Form_Edit_Demographics::setDefaultValues($this, $defaults);
+      return;
+    }
+    CRM_Core_Error::deprecatedWarning('unused?');
+    $className = 'CRM_Contact_Form_Edit_' . $name;
+    $className::setDefaultValues($this, $defaults);
   }
 
 }
