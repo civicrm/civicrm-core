@@ -3072,8 +3072,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         WHERE con.id = %1 LIMIT 1";
     $params = [1 => [$contributionId, 'Integer']];
     $statusId = CRM_Core_DAO::singleValueQuery($sql, $params);
-    $status = CRM_Contribute_PseudoConstant::contributionStatus($statusId, 'name');
-    if ($status == 'Cancelled') {
+    $status = CRM_Core_Pseudoconstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $statusId);
+    if ($status === 'Cancelled') {
       return TRUE;
     }
     return FALSE;
@@ -3180,14 +3180,14 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         'trxn_date' => $params['receive_date'] ?? date('YmdHis'),
         'total_amount' => $totalAmount,
         'fee_amount' => $params['fee_amount'] ?? NULL,
-        'net_amount' => CRM_Utils_Array::value('net_amount', $params, $totalAmount),
+        'net_amount' => $params['net_amount'] ?? $totalAmount,
         'currency' => $contribution->currency,
         'trxn_id' => $contribution->trxn_id,
         // @todo - this is getting the status id from the contribution - that is BAD - ie the contribution could be partially
         // paid but each payment is completed. The work around is to pass in the status_id in the trxn_params but
         // this should really default to completed (after discussion).
         'status_id' => $statusId,
-        'payment_instrument_id' => CRM_Utils_Array::value('payment_instrument_id', $params, $params['contribution']->payment_instrument_id),
+        'payment_instrument_id' => $params['payment_instrument_id'] ?? $params['contribution']->payment_instrument_id,
         'check_number' => $params['check_number'] ?? NULL,
         'pan_truncation' => $params['pan_truncation'] ?? NULL,
         'card_type_id' => $params['card_type_id'] ?? NULL,
@@ -3267,7 +3267,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
                 $line['financial_type_id'] = $params['financial_type_id'];
               }
             }
-            CRM_Core_BAO_FinancialTrxn::createDeferredTrxn(CRM_Utils_Array::value('line_item', $params), $params['contribution'], TRUE, 'changeFinancialType');
+            CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($params['line_item'] ?? NULL, $params['contribution'], TRUE, 'changeFinancialType');
             /* $params['trxnParams']['to_financial_account_id'] = $trxnParams['to_financial_account_id']; */
             $params['financial_account_id'] = $newFinancialAccount;
             $params['total_amount'] = $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = $trxnParams['total_amount'];
@@ -3276,7 +3276,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
               $params['trxnParams']['fee_amount'] = $params['fee_amount'];
             }
             CRM_Contribute_BAO_FinancialProcessor::updateFinancialAccounts($params);
-            CRM_Core_BAO_FinancialTrxn::createDeferredTrxn(CRM_Utils_Array::value('line_item', $params), $params['contribution'], TRUE);
+            CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($params['line_item'] ?? NULL, $params['contribution'], TRUE);
             $params['trxnParams']['to_financial_account_id'] = $trxnParams['to_financial_account_id'];
             $updated = TRUE;
             $params['deferred_financial_account_id'] = $newFinancialAccount;
@@ -3298,7 +3298,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           $callUpdateFinancialAccounts = CRM_Contribute_BAO_FinancialProcessor::updateFinancialAccountsOnContributionStatusChange($params);
           if ($callUpdateFinancialAccounts) {
             CRM_Contribute_BAO_FinancialProcessor::updateFinancialAccounts($params, 'changedStatus');
-            CRM_Core_BAO_FinancialTrxn::createDeferredTrxn(CRM_Utils_Array::value('line_item', $params), $params['contribution'], TRUE, 'changedStatus');
+            CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($params['line_item'] ?? NULL, $params['contribution'], TRUE, 'changedStatus');
           }
           $updated = TRUE;
         }
@@ -3327,7 +3327,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           //Update Financial Records
           $params['trxnParams']['from_financial_account_id'] = NULL;
           CRM_Contribute_BAO_FinancialProcessor::updateFinancialAccounts($params, 'changedAmount');
-          CRM_Core_BAO_FinancialTrxn::createDeferredTrxn(CRM_Utils_Array::value('line_item', $params), $params['contribution'], TRUE, 'changedAmount');
+          CRM_Core_BAO_FinancialTrxn::createDeferredTrxn($params['line_item'] ?? NULL, $params['contribution'], TRUE, 'changedAmount');
           $updated = TRUE;
         }
 
