@@ -354,7 +354,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       }
 
       if (CRM_Utils_Request::retrieve('type', 'String')) {
-        CRM_Contact_Form_Edit_CustomData::preProcess($this);
+        $this->preProcessCustomData();
       }
       else {
         // The reason we call this here is that it sets the _groupTree property which is later used
@@ -393,6 +393,27 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       $this->set('addressSequence', $addressSequence);
     }
     $this->assign('addressSequence', $addressSequence);
+  }
+
+  /**
+   * Do some custom data wrangling.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function preProcessCustomData(): void {
+    $customDataType = CRM_Utils_Request::retrieve('type', 'String');
+
+    if ($customDataType) {
+      $this->assign('addBlock', TRUE);
+      $this->assign('blockName', 'CustomData');
+    }
+
+    CRM_Custom_Form_CustomData::preProcess($this, NULL, NULL, NULL,
+      $customDataType ?: $this->_contactType
+    );
+
+    //assign group tree after build.
+    $this->assign('groupTree', $this->_groupTree);
   }
 
   /**
