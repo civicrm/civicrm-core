@@ -434,7 +434,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     // set defaults for blocks ( custom data, address, communication preference, notes, tags and groups )
     foreach ($this->_editOptions as $name => $label) {
       if (!in_array($name, ['Address', 'Notes'])) {
-        $this->setBlockDefaults($name, $defaults);
+        $this->setBlockDefaults($defaults, $name);
       }
     }
 
@@ -1589,18 +1589,19 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   }
 
   /**
-   * @param $name
-   * @param $defaults
+   * @param array $defaults
+   *
+   * @param string $name
    *
    * @return void
    */
-  private function setBlockDefaults($name, $defaults): void {
+  private function setBlockDefaults(array &$defaults, string $name): void {
     if ($name === 'TagsAndGroups') {
       CRM_Contact_Form_Edit_TagsAndGroups::setDefaultValues($this, $defaults);
       return;
     }
     if ($name === 'CustomData') {
-      CRM_Contact_Form_Edit_CustomData::setDefaultValues($this, $defaults);
+      CRM_Core_BAO_CustomGroup::setDefaults($this->_groupTree, $defaults, FALSE, FALSE, $this->getAction());
       return;
     }
     if ($name === 'CommunicationPreferences') {

@@ -76,11 +76,13 @@ class CRM_Contact_Form_Edit_CustomData {
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
+   * @deprecated since 5.73 will be removed around 5.85
    *
    * @param CRM_Core_Form $form
    * @param array $defaults
    */
   public static function setDefaultValues(&$form, &$defaults) {
+    CRM_Core_Error::deprecatedFunctionWarning('take a copy?');
     $defaults += CRM_Custom_Form_CustomData::setDefaultValues($form);
   }
 
