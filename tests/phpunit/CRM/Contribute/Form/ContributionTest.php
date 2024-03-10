@@ -77,7 +77,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
 
     $product1 = $this->callAPISuccess('Product', 'create', [
       'name' => 'Smurf',
-      'options' => 'brainy smurf, clumsy smurf, papa smurf',
+      'options' => 'brainy smurf, clumsy smurf, papa smurf, skusmurf=SKU Smurf',
     ]);
 
     $this->products[] = $product1['values'][$product1['id']];
@@ -720,7 +720,7 @@ Receipt Date: ' . date('m/d/Y'),
       'contact_id' => $this->_individualId,
       'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
       'contribution_status_id' => 1,
-      'product_name' => [$this->products[0]['id'], 1],
+      'product_name' => [$this->products[0]['id'], 'clumsy smurf'],
       'fulfilled_date' => '',
       'is_email_receipt' => TRUE,
       'from_email_address' => 'test@test.com',
@@ -739,6 +739,32 @@ Receipt Date: ' . date('m/d/Y'),
   /**
    * Test functions involving premiums.
    */
+  public function testPremiumUpdateWithSKUkey(): void {
+    $this->submitContributionForm([
+      'total_amount' => 50,
+      'financial_type_id' => 1,
+      'contact_id' => $this->_individualId,
+      'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
+      'contribution_status_id' => 1,
+      'product_name' => [$this->products[0]['id'], 'skusmurf'],
+      'fulfilled_date' => '',
+      'is_email_receipt' => TRUE,
+      'from_email_address' => 'test@test.com',
+      'hidden_Premium' => 1,
+    ]);
+    $contributionProduct = $this->callAPISuccess('contribution_product', 'getsingle', []);
+    $this->assertEquals('skusmurf', $contributionProduct['product_option']);
+    $this->assertMailSentContainingStrings([
+      'Premium Information',
+      'Smurf',
+      'SKU Smurf',
+    ]);
+    $this->assertMailSentContainingStrings(['Smurf', 'SKU Smurf']);
+  }
+
+  /**
+   * Test functions involving premiums.
+   */
   public function testPremiumUpdateCreditCard(): void {
     $form = $this->submitContributionForm([
       'total_amount' => 50,
@@ -746,7 +772,7 @@ Receipt Date: ' . date('m/d/Y'),
       'contact_id' => $this->_individualId,
       'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
       'contribution_status_id' => 1,
-      'product_name' => [$this->products[0]['id'], 1],
+      'product_name' => [$this->products[0]['id'], 'clumsy smurf'],
       'fulfilled_date' => '',
       'is_email_receipt' => TRUE,
       'from_email_address' => 'test@test.com',
