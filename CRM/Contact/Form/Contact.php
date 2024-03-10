@@ -328,7 +328,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
           $this->set('groupID', $groupID);
           //loop the group
           for ($i = 1; $i <= $groupCount; $i++) {
-            $this->legacyPreProcessCustomData(NULL, $contactSubType,
+            $this->legacyPreProcessCustomData($contactSubType,
               $i, $this->_contactType, $this->_contactId, NULL, FALSE
             );
             CRM_Contact_Form_Edit_CustomData::buildQuickForm($this);
@@ -380,9 +380,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   }
 
   /**
-   * @param null|string $extendsEntityColumn
-   *   Additional filter on the type of custom data to retrieve - e.g for
-   *   participant data this could be a value representing role.
    * @param null|string $subType
    * @param null|int $groupCount
    * @param null $type
@@ -401,8 +398,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * 3) pass getSubmittedValues() to CRM_Core_BAO_CustomField::postProcess($this->getSubmittedValues(), $this->_id, 'FinancialAccount');
    *  to ensure any money or number fields are handled for localisation
    */
-  private function legacyPreProcessCustomData(
-    $extendsEntityColumn = NULL, $subType = NULL,
+  private function legacyPreProcessCustomData($subType = NULL,
     $groupCount = NULL, $type = NULL, $entityID = NULL, $onlySubType = NULL, $isLoadFromCache = TRUE
   ) {
     $form = $this;
@@ -417,11 +413,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     if ($subType === 'null') {
       // Is this reachable?
       $subType = NULL;
-    }
-    $extendsEntityColumn = $extendsEntityColumn ?: CRM_Utils_Request::retrieve('subName', 'String', $form);
-    if ($extendsEntityColumn === 'null') {
-      // Is this reachable?
-      $extendsEntityColumn = NULL;
     }
 
     if ($groupCount) {
@@ -476,7 +467,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       $form->_entityId,
       $gid,
       $subType,
-      $extendsEntityColumn,
+      NULL,
       $isLoadFromCache,
       $onlySubType,
       FALSE,
@@ -526,7 +517,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     // is a un-sanitised version of what is in the form submission (_POST) whereas `getSubmittedValues()` retrieves
     // 'allowed' POSTED values - ie values which match available fields, with some localization handling.
     // @todo - it's probably that there is no reason to pass NULl vs 1 for groupCount below.
-    $this->legacyPreProcessCustomData(NULL, $this->isSubmitted() ? ($this->_submitValues['contact_sub_type'] ?? []) : $this->getContactValue('contact_sub_type') ?? $this->_contactSubType,
+    $this->legacyPreProcessCustomData($this->isSubmitted() ? ($this->_submitValues['contact_sub_type'] ?? []) : $this->getContactValue('contact_sub_type') ?? $this->_contactSubType,
       $customDataType ? NULL : 1, $customDataType ?: $this->_contactType, $this->getContactID()
     );
     if (!$customDataType) {
