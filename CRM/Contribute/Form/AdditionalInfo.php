@@ -40,11 +40,9 @@ class CRM_Contribute_Form_AdditionalInfo {
     while ($dao->fetch()) {
       $sel1[$dao->id] = $dao->name . " ( " . $dao->sku . " )";
       $min_amount[$dao->id] = $dao->min_contribution;
-      $options = explode(',', $dao->options);
-      foreach ($options as $k => $v) {
-        $options[$k] = trim($v);
-      }
-      if ($options[0] != '') {
+      $options = CRM_Contribute_BAO_Premium::parseProductOptions($dao->options);
+      if (!empty($options)) {
+        $options = ['' => ts('- select -')] + $options;
         $sel2[$dao->id] = $options;
       }
       $form->assign('premiums', TRUE);
@@ -189,7 +187,7 @@ class CRM_Contribute_Form_AdditionalInfo {
     CRM_Contribute_BAO_Product::retrieve($premiumParams, $productDetails);
     $dao->financial_type_id = $productDetails['financial_type_id'] ?? NULL;
     if (!empty($options[$selectedProductID])) {
-      $dao->product_option = $options[$selectedProductID][$selectedProductOptionID];
+      $dao->product_option = $selectedProductOptionID;
     }
 
     // This IF condition codeblock does the following:

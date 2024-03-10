@@ -130,12 +130,8 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
             CRM_Core_DAO::storeValues($productDAO, $products[$productDAO->id]);
           }
         }
-        $options = $temp = [];
-        $temp = explode(',', $productDAO->options);
-        foreach ($temp as $value) {
-          $options[trim($value)] = trim($value);
-        }
-        if ($temp[0] != '') {
+        $options = self::parseProductOptions($productDAO->options);
+        if (!empty($options)) {
           $form->addElement('select', 'options_' . $productDAO->id, NULL, $options);
         }
       }
@@ -244,6 +240,27 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
       self::$productInfo = [$products, $options];
     }
     return self::$productInfo;
+  }
+
+  /**
+   * Convert key=val options into an array while keeping
+   * compatibility for values only.
+   */
+  public static function parseProductOptions($string) : array {
+    $options = [];
+    $temp = explode(',', $string);
+
+    foreach ($temp as $value) {
+      $parts = explode('=', $value, 2);
+      if (count($parts) == 2) {
+        $options[trim($parts[0])] = trim($parts[1]);
+      }
+      else {
+        $options[trim($value)] = trim($value);
+      }
+    }
+
+    return $options;
   }
 
 }
