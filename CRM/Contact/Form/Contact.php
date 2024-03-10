@@ -401,14 +401,13 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   private function legacyPreProcessCustomData($subType = NULL,
     $groupCount = NULL, $type = NULL, $entityID = NULL, $onlySubType = NULL, $isLoadFromCache = TRUE
   ) {
-    $form = $this;
     if (!$type) {
       CRM_Core_Error::deprecatedWarning('type should be passed in');
-      $type = CRM_Utils_Request::retrieve('type', 'String', $form);
+      $type = CRM_Utils_Request::retrieve('type', 'String', $this);
     }
 
     if (!isset($subType)) {
-      $subType = CRM_Utils_Request::retrieve('subType', 'String', $form);
+      $subType = CRM_Utils_Request::retrieve('subType', 'String', $this);
     }
     if ($subType === 'null') {
       // Is this reachable?
@@ -416,55 +415,55 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     }
 
     if ($groupCount) {
-      $form->_groupCount = $groupCount;
+      $this->_groupCount = $groupCount;
     }
     else {
-      $form->_groupCount = CRM_Utils_Request::retrieve('cgcount', 'Positive', $form);
+      $this->_groupCount = CRM_Utils_Request::retrieve('cgcount', 'Positive', $this);
     }
 
-    $form->assign('cgCount', $form->_groupCount);
+    $this->assign('cgCount', $this->_groupCount);
 
     //carry qf key, since this form is not inhereting core form.
     if ($qfKey = CRM_Utils_Request::retrieve('qfKey', 'String')) {
-      $form->assign('qfKey', $qfKey);
+      $this->assign('qfKey', $qfKey);
     }
 
     if ($entityID) {
-      $form->_entityId = $entityID;
+      $this->_entityId = $entityID;
     }
     else {
-      $form->_entityId = CRM_Utils_Request::retrieve('entityID', 'Positive', $form);
+      $this->_entityId = CRM_Utils_Request::retrieve('entityID', 'Positive', $this);
     }
 
     $typeCheck = CRM_Utils_Request::retrieve('type', 'String');
     $urlGroupId = CRM_Utils_Request::retrieve('groupID', 'Positive');
     if (isset($typeCheck) && $urlGroupId) {
-      $form->_groupID = $urlGroupId;
+      $this->_groupID = $urlGroupId;
     }
     else {
-      $form->_groupID = CRM_Utils_Request::retrieve('groupID', 'Positive', $form);
+      $this->_groupID = CRM_Utils_Request::retrieve('groupID', 'Positive', $this);
     }
 
-    $gid = (isset($form->_groupID)) ? $form->_groupID : NULL;
+    $gid = (isset($this->_groupID)) ? $this->_groupID : NULL;
     if (!is_array($subType) && str_contains(($subType ?? ''), CRM_Core_DAO::VALUE_SEPARATOR)) {
       CRM_Core_Error::deprecatedWarning('Using a CRM_Core_DAO::VALUE_SEPARATOR separated subType deprecated, use a comma-separated string instead.');
       $subType = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',', trim($subType, CRM_Core_DAO::VALUE_SEPARATOR));
     }
 
     $singleRecord = NULL;
-    if (!empty($form->_groupCount) && !empty($form->_multiRecordDisplay) && $form->_multiRecordDisplay == 'single') {
-      $singleRecord = $form->_groupCount;
+    if (!empty($this->_groupCount) && !empty($this->_multiRecordDisplay) && $this->_multiRecordDisplay == 'single') {
+      $singleRecord = $this->_groupCount;
     }
-    $mode = CRM_Utils_Request::retrieve('mode', 'String', $form);
+    $mode = CRM_Utils_Request::retrieve('mode', 'String', $this);
     // when a new record is being added for multivalued custom fields.
-    if (isset($form->_groupCount) && $form->_groupCount == 0 && $mode == 'add' &&
-      !empty($form->_multiRecordDisplay) && $form->_multiRecordDisplay == 'single') {
+    if (isset($this->_groupCount) && $this->_groupCount == 0 && $mode == 'add' &&
+      !empty($this->_multiRecordDisplay) && $this->_multiRecordDisplay == 'single') {
       $singleRecord = 'new';
     }
 
     $groupTree = CRM_Core_BAO_CustomGroup::getTree($type,
       NULL,
-      $form->_entityId,
+      $this->_entityId,
       $gid,
       $subType,
       NULL,
@@ -475,20 +474,20 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       $singleRecord
     );
 
-    if (property_exists($form, '_customValueCount') && !empty($groupTree)) {
-      $form->_customValueCount = CRM_Core_BAO_CustomGroup::buildCustomDataView($form, $groupTree, TRUE, NULL, NULL, NULL, $form->_entityId);
+    if (property_exists($this, '_customValueCount') && !empty($groupTree)) {
+      $this->_customValueCount = CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, TRUE, NULL, NULL, NULL, $this->_entityId);
     }
     // we should use simplified formatted groupTree
-    $groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, $form->_groupCount, $form);
+    $groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, $this->_groupCount, $this);
 
-    if (isset($form->_groupTree) && is_array($form->_groupTree)) {
+    if (isset($this->_groupTree) && is_array($this->_groupTree)) {
       $keys = array_keys($groupTree);
       foreach ($keys as $key) {
-        $form->_groupTree[$key] = $groupTree[$key];
+        $this->_groupTree[$key] = $groupTree[$key];
       }
     }
     else {
-      $form->_groupTree = $groupTree;
+      $this->_groupTree = $groupTree;
     }
   }
 
