@@ -299,51 +299,71 @@ class Submit extends AbstractProcessor {
     foreach ($event->records as $relationship) {
       $relationship = $relationship['fields'] ?? [];
       if (empty($relationship['contact_id_a']) || empty($relationship['contact_id_b']) || empty($relationship['relationship_type_id'])) {
-        return;
+        self::saveRelationshipById($relationship, $event->getEntity(), $api4);
       }
-      $relationshipType = RelationshipType::get(FALSE)
-        ->addWhere('id', '=', $relationship['relationship_type_id'])
-        ->execute()->single();
-      $isReciprocal = $relationshipType['label_a_b'] == $relationshipType['label_b_a'];
-      $isActive = !isset($relationship['is_active']) || !empty($relationship['is_active']);
-      // Each contact id could be multivalued (e.g. using `af-repeat`)
-      foreach ((array) $relationship['contact_id_a'] as $contact_id_a) {
-        foreach ((array) $relationship['contact_id_b'] as $contact_id_b) {
-          $params = $relationship;
-          $params['contact_id_a'] = $contact_id_a;
-          $params['contact_id_b'] = $contact_id_b;
-          // Check for existing relationships (if allowed)
-          if (!empty($event->getEntity()['actions']['update'])) {
-            $where = [
-              ['is_active', '=', $isActive],
-              ['relationship_type_id', '=', $relationship['relationship_type_id']],
+      else {
+        self::saveRelationshipByValues($relationship, $event->getEntity(), $api4);
+      }
+    }
+  }
+
+  /**
+   * @param array $relationship
+   * @param array $entity
+   * @param callable $api4
+   */
+  private static function saveRelationshipById(array $relationship, array $entity, callable $api4): void {
+    if (!empty($entity['actions']['update']) && !empty($relationship['id'])) {
+      $api4('Relationship', 'save', ['records' => [$relationship]]);
+    }
+  }
+
+  /**
+   * @param array $relationship
+   * @param array $entity
+   * @param callable $api4
+   */
+  private static function saveRelationshipByValues(array $relationship, array $entity, callable $api4): void {
+    $relationshipType = RelationshipType::get(FALSE)
+      ->addWhere('id', '=', $relationship['relationship_type_id'])
+      ->execute()->single();
+    $isReciprocal = $relationshipType['label_a_b'] == $relationshipType['label_b_a'];
+    $isActive = !isset($relationship['is_active']) || !empty($relationship['is_active']);
+    // Each contact id could be multivalued (e.g. using `af-repeat`)
+    foreach ((array) $relationship['contact_id_a'] as $contact_id_a) {
+      foreach ((array) $relationship['contact_id_b'] as $contact_id_b) {
+        $params = $relationship;
+        $params['contact_id_a'] = $contact_id_a;
+        $params['contact_id_b'] = $contact_id_b;
+        // Check for existing relationships (if allowed)
+        if (!empty($entity['actions']['update'])) {
+          $where = [
+            ['is_active', '=', $isActive],
+            ['relationship_type_id', '=', $relationship['relationship_type_id']],
+          ];
+          // Reciprocal relationship types need an extra check
+          if ($isReciprocal) {
+            $where[] = [
+              'OR', [
+                ['AND', [['contact_id_a', '=', $contact_id_a], ['contact_id_b', '=', $contact_id_b]]],
+                ['AND', [['contact_id_a', '=', $contact_id_b], ['contact_id_b', '=', $contact_id_a]]],
+              ],
             ];
-            // Reciprocal relationship types need an extra check
-            if ($isReciprocal) {
-              $where[] = [
-                'OR', [
-                  ['AND', [['contact_id_a', '=', $contact_id_a], ['contact_id_b', '=', $contact_id_b]]],
-                  ['AND', [['contact_id_a', '=', $contact_id_b], ['contact_id_b', '=', $contact_id_a]]],
-                ],
-              ];
-            }
-            else {
-              $where[] = ['contact_id_a', '=', $contact_id_a];
-              $where[] = ['contact_id_b', '=', $contact_id_b];
-            }
-            $existing = $api4('Relationship', 'get', ['where' => $where])->first();
-            if ($existing) {
-              $params['id'] = $existing['id'];
-              unset($params['contact_id_a'], $params['contact_id_b']);
-              // If this is a flipped reciprocal relationship, also flip the permissions
-              $params['is_permission_a_b'] = $relationship['is_permission_b_a'] ?? NULL;
-              $params['is_permission_b_a'] = $relationship['is_permission_a_b'] ?? NULL;
-            }
           }
-          $api4('Relationship', 'save', [
-            'records' => [$params],
-          ]);
+          else {
+            $where[] = ['contact_id_a', '=', $contact_id_a];
+            $where[] = ['contact_id_b', '=', $contact_id_b];
+          }
+          $existing = $api4('Relationship', 'get', ['where' => $where])->first();
+          if ($existing) {
+            $params['id'] = $existing['id'];
+            unset($params['contact_id_a'], $params['contact_id_b']);
+            // If this is a flipped reciprocal relationship, also flip the permissions
+            $params['is_permission_a_b'] = $relationship['is_permission_b_a'] ?? NULL;
+            $params['is_permission_b_a'] = $relationship['is_permission_a_b'] ?? NULL;
+          }
         }
+        $api4('Relationship', 'save', ['records' => [$params]]);
       }
     }
   }
