@@ -158,7 +158,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup impl
     }
 
     $optimizer = new CRM_Dedupe_FinderQueryOptimizer($id, $contactIDs, []);
-    $tableQueries = $optimizer->getRuleQueries();
+    $tableQueries = $optimizer->getOptimizedQueries();
     if (empty($tableQueries)) {
       return;
     }
