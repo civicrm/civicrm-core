@@ -1,30 +1,24 @@
 <?xml version="1.0"?>
 <extension key="civicrm_admin_ui" type="module">
   <file>civicrm_admin_ui</file>
-  <name>AdminUI</name>
-  <description>Administration screens for managing CiviCRM settings, options, custom data, etc.</description>
+  <name>AdminUI (Preview)</name>
+  <description>Start using new versions of administration screens by installing this exension. These updates will be rolled out to all users in a future version.</description>
   <license>AGPL-3.0</license>
   <maintainer>
-    <author>Coleman Watts</author>
-    <email>coleman@civicrm.org</email>
+    <author>CiviCRM</author>
+    <email>info@civicrm.org</email>
   </maintainer>
   <urls>
-    <url desc="Main Extension Page">https://lab.civicrm.org/dev/core/-/issues/3912</url>
     <url desc="Documentation">https://lab.civicrm.org/dev/core/-/issues/3912</url>
-    <url desc="Support">https://lab.civicrm.org/dev/core/-/issues</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
-  <releaseDate>2024-02-08</releaseDate>
-  <version>5.72.alpha1</version>
+  <releaseDate>2024-03-06</releaseDate>
+  <version>5.73.alpha1</version>
   <develStage>beta</develStage>
   <compatibility>
-    <ver>5.72</ver>
+    <ver>5.73</ver>
   </compatibility>
-  <requires>
-    <ext>org.civicrm.search_kit</ext>
-    <ext>org.civicrm.afform</ext>
-  </requires>
-  <comments>Replaces legacy pages with configurable Search Display Forms.</comments>
+  <comments>Key CiviCRM interfaces are being rewritten as configurable Search Display Forms. This extension lets you try these updates now, before the screens are permanently replaced in core.</comments>
   <classloader>
     <psr0 prefix="CRM_" path="."/>
     <psr4 prefix="Civi\" path="Civi"/>

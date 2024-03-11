@@ -838,6 +838,10 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   }
 
   /**
+   * As the test is slow we mark it ornery to suppress in PR runs.
+   *
+   * @group ornery
+   *
    * @dataProvider custom_data_incl_non_std_entities_get
    *
    * @param string $entityName
@@ -862,7 +866,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Pcp' => 'PCP',
       'Rule' => 'DedupeRule',
       'RuleGroup' => 'DedupeRuleGroup',
-      'SmsProvider' => 'Provider',
     ];
 
     $usableName = $entitiesWithNamingIssues[$entityName] ?? $entityName;
@@ -1092,6 +1095,10 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   /**
    * Ensure that the "get" operation accepts limiting the #result records.
    *
+   * As the test is slow we mark it ornery to suppress in PR runs.
+   *
+   * @group ornery
+   *
    * @dataProvider entities_getSqlOperators
    *
    * @param string $entityName
@@ -1231,11 +1238,16 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   /* ---- testing the _create ---- */
 
   /**
+   * As the test is slow we mark it ornery to suppress in PR runs.
+   *
+   * @group ornery
+   *
    * @dataProvider toBeSkipped_create
    * entities that don't need a create action
+   *
    * @param $Entity
    */
-  public function testNotImplemented_create($Entity) {
+  public function testNotImplementedCreate($Entity) {
     $result = civicrm_api($Entity, 'Create', ['version' => 3]);
     $this->assertEquals(1, $result['is_error']);
     $this->assertStringContainsString(strtolower("API ($Entity, Create) does not exist"), strtolower($result['error_message']));
@@ -1288,10 +1300,17 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    *
    * limitations include the problem with avoiding loops when creating test objects -
    * hence FKs only set by createTestObject when required. e.g parent_id on campaign is not being followed through
-   * Currency - only seems to support US
-   * @param $entityName
+   * Currency - only seems to support US.
+   *
+   * As the test is slow we mark it ornery to suppress in PR runs.
+   *
+   * @param string $entityName
+   *
+   * @group ornery
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testCreateSingleValueAlter($entityName): void {
+  public function testCreateSingleValueAlter(string $entityName): void {
     if (in_array($entityName, $this->toBeImplemented['create'], TRUE)) {
       // $this->markTestIncomplete("civicrm_api3_{$Entity}_create to be implemented");
       return;
@@ -1530,10 +1549,15 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   }
 
   /**
+   *  As the test is slow we mark it ornery to suppress in PR runs.
+   *
+   * @group ornery
+   *
    * @dataProvider entities_delete
+   *
    * @param $Entity
    */
-  public function testEmptyParam_delete($Entity) {
+  public function testEmptyParamDelete($Entity) {
     if (in_array($Entity, $this->toBeImplemented['delete'])) {
       // $this->markTestIncomplete("civicrm_api3_{$Entity}_delete to be implemented");
       return;

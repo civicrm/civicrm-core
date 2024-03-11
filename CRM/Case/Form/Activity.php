@@ -70,6 +70,12 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
   public $_defaultCaseStatus;
 
   /**
+   * @var int
+   * Used by ChangeCaseStartDate. See getter/setter below.
+   */
+  private $openCaseActivityId;
+
+  /**
    * Build the form object.
    */
   public function preProcess() {
@@ -816,6 +822,24 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       }
     }
     return $bounceMessage;
+  }
+
+  /**
+   * Getter used by ChangeCaseStartDate
+   * @return int|null
+   * @internal
+   */
+  public function getOpenCaseActivityId(): ?int {
+    return $this->openCaseActivityId;
+  }
+
+  /**
+   * Setter used by ChangeCaseStartDate
+   * @param int $id
+   * @internal
+   */
+  public function setOpenCaseActivityId(int $id): void {
+    $this->openCaseActivityId = $id;
   }
 
 }

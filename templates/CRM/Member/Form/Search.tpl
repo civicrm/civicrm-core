@@ -8,10 +8,10 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-form-block crm-search-form-block">
-  <div class="crm-accordion-wrapper crm-member_search_form-accordion {if $rows}collapsed{/if}">
-   <div class="crm-accordion-header crm-master-accordion-header">
+  <details class="crm-accordion-light crm-member_search_form-accordion" {if $rows}{else}open{/if}>
+   <summary>
       {ts}Edit Search Criteria{/ts}
-    </div><!-- /.crm-accordion-header -->
+    </summary>
   <div class="crm-accordion-body">
   {strip}
        <table class="form-layout">
@@ -23,8 +23,8 @@
           </tr>
       </table>
   {/strip}
-   </div><!-- /.crm-accordion-body -->
-  </div><!-- /.crm-accordion-wrapper -->
+   </div>
+  </details>
 </div><!-- /.crm-form-block -->
 <div class="crm-content-block">
   {if $rowsEmpty}

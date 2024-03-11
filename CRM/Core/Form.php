@@ -779,7 +779,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
 
     if (!empty($defaults)) {
-      $this->setDefaults($defaults);
+      $this->setPurifiedDefaults($defaults);
     }
 
     // call the form hook
@@ -808,6 +808,15 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     self::$_template->ensureVariablesAreAssigned($this->expectedSmartyVariables);
     self::$_template->addExpectedTabHeaderKeys();
     $this->_formBuilt = TRUE;
+  }
+
+  public function setPurifiedDefaults($defaults) {
+    foreach ($defaults as $index => $default) {
+      if (is_string($default) && !is_numeric($default)) {
+        $defaults[$index] = CRM_Utils_String::purifyHTML($default);
+      }
+    }
+    $this->setDefaults($defaults);
   }
 
   /**
@@ -1396,9 +1405,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   Name of variable.
    * @param mixed $value
    *   Value of variable.
+   *
+   * @deprecated since 5.72 will be removed around 5.84
    */
   public function assign_by_ref($var, &$value) {
-    self::$_template->assign_by_ref($var, $value);
+    CRM_Core_Error::deprecatedFunctionWarning('assign');
+    self::$_template->assign($var, $value);
   }
 
   /**

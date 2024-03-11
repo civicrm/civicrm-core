@@ -91,6 +91,11 @@ class FieldSpec {
   public $outputFormatters;
 
   /**
+   * @var string[]
+   */
+  public array $usage = [];
+
+  /**
    * @param string $name
    * @param string $entity
    * @param string $dataType
@@ -258,6 +263,20 @@ class FieldSpec {
     $this->deprecated = $deprecated;
 
     return $this;
+  }
+
+  /**
+   * @return string[]
+   */
+  public function getUsage(): array {
+    return $this->usage;
+  }
+
+  /**
+   * @param string[] $usage
+   */
+  public function setUsage(array $usage): void {
+    $this->usage = $usage;
   }
 
 }

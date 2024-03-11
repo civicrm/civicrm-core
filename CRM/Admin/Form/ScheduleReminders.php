@@ -179,7 +179,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $this->add('select', 'absolute_or_relative_date', ts('When (trigger date)'), ['relative' => ts('Relative Date'), 'absolute' => ts('Choose Date')], TRUE);
 
     // SMS-only fields
-    $providersCount = CRM_SMS_BAO_Provider::activeProviderCount();
+    $providersCount = CRM_SMS_BAO_SmsProvider::activeProviderCount();
     $this->assign('sms', $providersCount);
     if ($providersCount) {
       $this->addField('mode', ['placeholder' => FALSE, 'option_url' => FALSE], TRUE)->setAttribute('class', 'crm-form-select');

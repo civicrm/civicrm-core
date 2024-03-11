@@ -68,6 +68,11 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Base {
     return TRUE;
   }
 
+  public function cmsRootPath() {
+    // There's no particularly sensible value here. We just want to avoid crashes in some tests.
+    return sys_get_temp_dir() . '/UnitTests';
+  }
+
   /**
    * @inheritdoc
    */

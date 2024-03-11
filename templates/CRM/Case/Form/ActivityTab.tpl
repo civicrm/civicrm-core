@@ -10,64 +10,65 @@
 {*this template is used for activity accordion*}
 {assign var=caseid value=$caseID}
 {if $isForm}
-  <div class="crm-accordion-wrapper crm-case_activities-accordion  crm-case-activities-block">
-    <div class="crm-accordion-header">
+  <details class="crm-accordion-bold crm-case_activities-accordion  crm-case-activities-block" open>
+    <summary>
       {ts}Activities{/ts}
-    </div>
-
+    </summary>
     <div id="activities" class="crm-accordion-body padded">
-    <div class="crm-collapsible crm-search_filters-accordion collapsed">
-      <div class="collapsible-title">
-        {ts}Search Filters{/ts}
-      </div>
-      <table class="no-border form-layout-compressed" id="searchOptions">
-        <tr>
-          <td class="crm-case-caseview-form-block-repoter_id"colspan="2"><label for="reporter_id">{ts}Reporter/Role{/ts}</label><br />
-            {$form.reporter_id.html|crmAddClass:twenty}
-          </td>
-          <td class="crm-case-caseview-form-block-status_id"><label for="status_id">{$form.status_id.label}</label><br />
-            {$form.status_id.html}
-          </td>
-        </tr>
-        <tr>
-          <td class="crm-case-caseview-form-block-activity_date_low">
-            {assign var=activitylow  value="activity_date_low_`$caseID`"}
-            {$form.$activitylow.label}<br />
-            {$form.$activitylow.html}
-          </td>
-          <td class="crm-case-caseview-form-block-activity_date_high">
-            {assign var=activityhigh  value="activity_date_high_`$caseID`"}
-            {$form.$activityhigh.label}<br />
-            {$form.$activityhigh.html}
-          </td>
-          <td class="crm-case-caseview-form-block-activity_type_filter_id">
-            {$form.activity_type_filter_id.label}<br />
-            {$form.activity_type_filter_id.html}
-          </td>
-        </tr>
-        {if !empty($form.activity_deleted)}
-          <tr class="crm-case-caseview-form-block-activity_deleted">
-            <td>
-              {$form.activity_deleted.html}{$form.activity_deleted.label}
-            </td>
-          </tr>
-        {/if}
-      </table>
-    </div><!-- /.crm-accordion-wrapper -->
-{/if}
+      <details class="crm-accordion-light crm-search_filters-accordion">
+        <summary>
+          {ts}Search Filters{/ts}
+        </summary>
+        <div class="crm-accordion-body">
+          <table class="no-border form-layout-compressed" id="searchOptions">
+            <tr>
+              <td class="crm-case-caseview-form-block-repoter_id"colspan="2"><label for="reporter_id">{ts}Reporter/Role{/ts}</label><br />
+                {$form.reporter_id.html|crmAddClass:twenty}
+              </td>
+              <td class="crm-case-caseview-form-block-status_id"><label for="status_id">{$form.status_id.label}</label><br />
+                {$form.status_id.html}
+              </td>
+            </tr>
+            <tr>
+              <td class="crm-case-caseview-form-block-activity_date_low">
+                {assign var=activitylow  value="activity_date_low_`$caseID`"}
+                {$form.$activitylow.label}<br />
+                {$form.$activitylow.html}
+              </td>
+              <td class="crm-case-caseview-form-block-activity_date_high">
+                {assign var=activityhigh  value="activity_date_high_`$caseID`"}
+                {$form.$activityhigh.label}<br />
+                {$form.$activityhigh.html}
+              </td>
+              <td class="crm-case-caseview-form-block-activity_type_filter_id">
+                {$form.activity_type_filter_id.label}<br />
+                {$form.activity_type_filter_id.html}
+              </td>
+            </tr>
+            {if !empty($form.activity_deleted)}
+              <tr class="crm-case-caseview-form-block-activity_deleted">
+                <td>
+                  {$form.activity_deleted.html}{$form.activity_deleted.label}
+                </td>
+              </tr>
+            {/if}
+          </table>
+        </div>
+      </details>
+    {/if}
 
-    <table id="case_id_{$caseid}"  class="nestedActivitySelector crm-ajax-table" data-page-length="10">
-      <thead><tr>
-        <th data-data="activity_date_time" class="crm-case-activities-date">{ts}Date{/ts}</th>
-        <th data-data="subject" cell-class="crmf-subject crm-editable" class="crm-case-activities-subject">{ts}Subject{/ts}</th>
-        <th data-data="type" class="crm-case-activities-type">{ts}Type{/ts}</th>
-        <th data-data="target_contact_name" class="crm-case-activities-with">{ts}With{/ts}</th>
-        <th data-data="source_contact_name" class="crm-case-activities-assignee">{ts}Reporter{/ts}</th>
-        <th data-data="assignee_contact_name" class="crm-case-activities-assignee">{ts}Assignee{/ts}</th>
-        <th data-data="status_id" cell-class="crmf-status_id crm-editable" cell-data-type="select" cell-data-refresh=1 class="crm-case-activities-status">{ts}Status{/ts}</th>
-        <th data-data="links" data-orderable="false" class="crm-case-activities-status">&nbsp;</th>
-      </tr></thead>
-    </table>
+  <table id="case_id_{$caseid}"  class="nestedActivitySelector crm-ajax-table" data-page-length="10">
+    <thead><tr>
+      <th data-data="activity_date_time" class="crm-case-activities-date">{ts}Date{/ts}</th>
+      <th data-data="subject" cell-class="crmf-subject crm-editable" class="crm-case-activities-subject">{ts}Subject{/ts}</th>
+      <th data-data="type" class="crm-case-activities-type">{ts}Type{/ts}</th>
+      <th data-data="target_contact_name" class="crm-case-activities-with">{ts}With{/ts}</th>
+      <th data-data="source_contact_name" class="crm-case-activities-assignee">{ts}Reporter{/ts}</th>
+      <th data-data="assignee_contact_name" class="crm-case-activities-assignee">{ts}Assignee{/ts}</th>
+      <th data-data="status_id" cell-class="crmf-status_id crm-editable" cell-data-type="select" cell-data-refresh=1 class="crm-case-activities-status">{ts}Status{/ts}</th>
+      <th data-data="links" data-orderable="false" class="crm-case-activities-status">&nbsp;</th>
+    </tr></thead>
+  </table>
   {literal}
     <script type="text/javascript">
       (function($) {
@@ -105,6 +106,6 @@
   </style>
 
 {if $isForm}
-    </div><!-- /.crm-accordion-body -->
-  </div><!-- /.crm-accordion-wrapper -->
+    </div>
+  </details><!-- /.crm-accordion-wrapper -->
 {/if}

@@ -171,15 +171,9 @@ class CRM_Dedupe_Finder {
     $subTypes = $fields['contact_sub_type'] ?? [];
     // Only return custom for subType + unrestricted or return all custom
     // fields.
-    $tree = CRM_Core_BAO_CustomGroup::getTree($ctype, NULL, NULL, -1, $subTypes, NULL, TRUE, NULL, TRUE);
-    CRM_Core_BAO_CustomGroup::postProcess($tree, $fields, TRUE);
-    foreach ($tree as $key => $cg) {
-      if (!is_int($key)) {
-        continue;
-      }
-      foreach ($cg['fields'] as $cf) {
-        $flat[$cf['column_name']] = $cf['customValue']['data'] ?? NULL;
-      }
+    $customFields = self::getTree($ctype, $subTypes, $fields);
+    foreach ($customFields as $customField) {
+      $flat[$customField['column_name']] = $customField['customValue']['data'] ?? NULL;
     }
   }
 
@@ -208,6 +202,7 @@ class CRM_Dedupe_Finder {
     ];
     foreach (['individual_suffix', 'individual_prefix', 'gender'] as $name) {
       if (!empty($fields[$name])) {
+        CRM_Core_Error::deprecatedWarning('code thought to be unreachable - slated for removal');
         $flat[$replace_these[$name]] = $flat[$name];
         unset($flat[$name]);
       }
@@ -307,63 +302,159 @@ class CRM_Dedupe_Finder {
   }
 
   /**
-   * Parse duplicate pairs into a standardised array and store in the prev_next_cache.
+   * @param string $entityType
+   *   Of the contact whose contact type is needed.
+   * @param array $subTypes
+   * @param array $params
    *
-   * @param array $foundDupes
-   * @param string $cacheKeyString
+   * @return array[]
+   *   The returned array is keyed by group id and has the custom group table fields
+   *   and a subkey 'fields' holding the specific custom fields.
+   *   If entityId is passed in the fields keys have a subkey 'customValue' which holds custom data
+   *   if set for the given entity. This is structured as an array of values with each one having the keys 'id', 'data'
    *
-   * @return array
-   *   Dupe pairs with the keys
-   *   -srcID
-   *   -srcName
-   *   -dstID
-   *   -dstName
-   *   -weight
-   *   -canMerge
+   * @throws \CRM_Core_Exception
+   * @deprecated Function demonstrates just how bad code can get from 20 years of entropy.
+   *
+   * This function takes an overcomplicated set of params and returns an overcomplicated
+   * mix of custom groups, custom fields, custom values (if passed $entityID), and other random stuff.
+   *
+   * @see CRM_Core_BAO_CustomGroup::getAll()
+   * for a better alternative to fetching a tree of custom groups and fields.
+   *
+   * @see APIv4::get()
+   * for a better alternative to fetching entity values.
+   *
    */
-  public static function parseAndStoreDupePairs($foundDupes, $cacheKeyString) {
-    $cids = [];
-    foreach ($foundDupes as $dupe) {
-      $cids[$dupe[0]] = 1;
-      $cids[$dupe[1]] = 1;
+  private static function getTree($entityType, $subTypes, $params) {
+    if (!is_array($subTypes)) {
+      if (empty($subTypes)) {
+        $subTypes = [];
+      }
+      else {
+        if (stristr($subTypes, ',')) {
+          $subTypes = explode(',', $subTypes);
+        }
+        else {
+          $subTypes = explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($subTypes, CRM_Core_DAO::VALUE_SEPARATOR));
+        }
+      }
     }
-    $cidString = implode(', ', array_keys($cids));
 
-    $dao = CRM_Core_DAO::executeQuery("SELECT id, display_name FROM civicrm_contact WHERE id IN ($cidString) ORDER BY sort_name");
-    $displayNames = [];
-    while ($dao->fetch()) {
-      $displayNames[$dao->id] = $dao->display_name;
+    $filters = [
+      'extends' => $entityType,
+      'is_active' => TRUE,
+    ];
+    if ($subTypes) {
+      foreach ($subTypes as $subType) {
+        $filters['extends_entity_column_value'][] = self::validateSubTypeByEntity($entityType, $subType);
+      }
+      $filters['extends_entity_column_value'][] = NULL;
     }
 
-    $userId = CRM_Core_Session::getLoggedInContactID();
-    foreach ($foundDupes as $dupes) {
-      $srcID = $dupes[1];
-      $dstID = $dupes[0];
-      // The logged in user should never be the src (ie. the contact to be removed).
-      if ($srcID == $userId) {
-        $srcID = $dstID;
-        $dstID = $userId;
+    $customGroups = CRM_Core_BAO_CustomGroup::getAll($filters, CRM_Core_Permission::EDIT);
+    $customFields = [];
+    foreach ($customGroups as $group) {
+      foreach ($group['fields'] as $field) {
+        $customFields[$field['id']] = $field;
+      }
+    }
+
+    foreach ($customFields as $field) {
+      $fieldId = $field['id'];
+      $serialize = CRM_Core_BAO_CustomField::isSerialized($field);
+
+      // Reset all checkbox, radio and multiselect data
+      if ($field['html_type'] === 'Radio' || $serialize) {
+        $customFields[$fieldId]['customValue']['data'] = 'NULL';
       }
 
-      $mainContacts[] = $row = [
-        'dstID' => (int) $dstID,
-        'dstName' => $displayNames[$dstID],
-        'srcID' => (int) $srcID,
-        'srcName' => $displayNames[$srcID],
-        'weight' => $dupes[2],
-        'canMerge' => TRUE,
-      ];
+      $v = NULL;
+      foreach ($params as $key => $val) {
+        if (preg_match('/^custom_(\d+)_?(-?\d+)?$/', $key, $match) &&
+          $match[1] == $field['id']
+        ) {
+          $v = $val;
+        }
+      }
 
-      CRM_Core_DAO::executeQuery("INSERT INTO civicrm_prevnext_cache (entity_table, entity_id1, entity_id2, cacheKey, data) VALUES
-        ('civicrm_contact', %1, %2, %3, %4)", [
-          1 => [$dstID, 'Integer'],
-          2 => [$srcID, 'Integer'],
-          3 => [$cacheKeyString, 'String'],
-          4 => [serialize($row), 'String'],
-        ]
-      );
+      if (!isset($customFields[$fieldId]['customValue'])) {
+        // field exists in db so populate value from "form".
+        $customFields[$fieldId]['customValue'] = [];
+      }
+
+      // Serialize checkbox and multi-select data (using array keys for checkbox)
+      if ($serialize) {
+        $v = ($v && $field['html_type'] === 'Checkbox') ? array_keys($v) : $v;
+        $v = $v ? CRM_Utils_Array::implodePadded($v) : NULL;
+      }
+
+      switch ($field['html_type']) {
+
+        case 'Select Date':
+          $date = CRM_Utils_Date::processDate($v);
+          $customFields[$fieldId]['customValue']['data'] = $date;
+          break;
+
+        case 'File':
+          break;
+
+        default:
+          $customFields[$fieldId]['customValue']['data'] = $v;
+          break;
+      }
     }
-    return $mainContacts;
+
+    return $customFields;
+  }
+
+  /**
+   * Validates contact subtypes and event types.
+   *
+   * Performs case-insensitive matching of strings and outputs the correct case.
+   * e.g. an input of "meeting" would output "Meeting".
+   *
+   * For all other entities, it doesn't validate except to check the subtype is an integer.
+   *
+   * @param string $entityType
+   * @param string $subType
+   *
+   * @return string
+   * @throws \CRM_Core_Exception
+   */
+  private static function validateSubTypeByEntity($entityType, $subType) {
+    $subType = trim($subType, CRM_Core_DAO::VALUE_SEPARATOR);
+    if (is_numeric($subType)) {
+      return $subType;
+    }
+
+    $contactTypes = CRM_Contact_BAO_ContactType::basicTypeInfo(TRUE);
+    $contactTypes['Contact'] = 1;
+
+    if ($entityType === 'Event') {
+      $subTypes = CRM_Core_OptionGroup::values('event_type', TRUE, FALSE, FALSE, NULL, 'name');
+    }
+    elseif (!array_key_exists($entityType, $contactTypes)) {
+      throw new CRM_Core_Exception('Invalid Entity Filter');
+    }
+    else {
+      $subTypes = CRM_Contact_BAO_ContactType::subTypeInfo($entityType, TRUE);
+      $subTypes = array_column($subTypes, 'name', 'name');
+    }
+    // When you create a new contact type it gets saved in mixed case in the database.
+    // Eg. "Service User" becomes "Service_User" in civicrm_contact_type.name
+    // But that field does not differentiate case (eg. you can't add Service_User and service_user because mysql will report a duplicate error)
+    // webform_civicrm and some other integrations pass in the name as lowercase to API3 Contact.duplicatecheck
+    // Since we can't actually have two strings with different cases in the database perform a case-insensitive search here:
+    $subTypesByName = array_combine($subTypes, $subTypes);
+    $subTypesByName = array_change_key_case($subTypesByName, CASE_LOWER);
+    $subTypesByKey = array_change_key_case($subTypes, CASE_LOWER);
+    $subTypeKey = mb_strtolower($subType);
+    if (!array_key_exists($subTypeKey, $subTypesByKey) && !in_array($subTypeKey, $subTypesByName)) {
+      \Civi::log()->debug("entityType: {$entityType}; subType: {$subType}");
+      throw new CRM_Core_Exception('Invalid Filter');
+    }
+    return $subTypesByName[$subTypeKey] ?? $subTypesByKey[$subTypeKey];
   }
 
 }

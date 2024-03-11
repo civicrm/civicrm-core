@@ -102,7 +102,7 @@ class ActivityLinksProvider extends \Civi\Core\Service\AutoSubscriber {
         }
       }
       elseif ($act['name'] === 'SMS') {
-        if (!\CRM_SMS_BAO_Provider::activeProviderCount() ||
+        if (!\CRM_SMS_BAO_SmsProvider::activeProviderCount() ||
           ($checkPermissions && !\CRM_Core_Permission::check('send SMS'))
         ) {
           continue;

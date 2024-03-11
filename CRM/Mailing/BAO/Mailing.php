@@ -1167,7 +1167,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     if ($useSmarty) {
       $smarty = CRM_Core_Smarty::singleton();
       // also add the contact tokens to the template
-      $smarty->assign_by_ref('contact', $contact);
+      $smarty->assign('contact', $contact);
     }
 
     $mailParams = $headers;
@@ -2564,9 +2564,11 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
           ['onChange' => "selectValue( this.value, '{$prefix}');", 'class' => 'crm-select2 huge']
         );
       }
-      $form->add('checkbox', "{$prefix}updateTemplate", ts('Update Template'), NULL);
-      $form->add('checkbox', "{$prefix}saveTemplate", ts('Save As New Template'), ['onclick' => "showSaveDetails(this, '{$prefix}');"]);
-      $form->add('text', "{$prefix}saveTemplateName", ts('Template Title'));
+      if (\CRM_Core_Permission::check('edit message templates')) {
+        $form->add('checkbox', "{$prefix}updateTemplate", ts('Update Template'), NULL);
+        $form->add('checkbox', "{$prefix}saveTemplate", ts('Save As New Template'), ['onclick' => "showSaveDetails(this, '{$prefix}');"]);
+        $form->add('text', "{$prefix}saveTemplateName", ts('Template Title'));
+      }
     }
 
     // I'm not sure this is ever called.
@@ -2820,10 +2822,10 @@ ORDER BY civicrm_mailing.id DESC";
         "mid={$values['mailing_id']}&reset=1&cid={$params['contact_id']}&event=queue&context=mailing");
       $mailing['start_date'] = CRM_Utils_Date::customFormat($values['start_date']);
       //CRM-12814
-      $mailing['openstats'] = "Opens: " .
-        CRM_Utils_Array::value($values['mailing_id'], $openCounts, 0) .
-        "<br />Clicks: " .
-        $clickCounts[$values['mailing_id']] ?? 0;
+      $clicks = $clickCounts[$values['mailing_id']] ?? 0;
+      $opens = $openCounts[$values['mailing_id']] ?? 0;
+      $mailing['openstats'] = ts('Opens: %1', [1 => $opens]) . '<br />' .
+        ts('Clicks: %1', [1 => $clicks]);
 
       $actionLinks = [
         CRM_Core_Action::VIEW => [

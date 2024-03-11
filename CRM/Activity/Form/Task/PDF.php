@@ -61,9 +61,9 @@ class CRM_Activity_Form_Task_PDF extends CRM_Activity_Form_Task {
    *
    * @return \Civi\Token\TokenProcessor
    */
-  public function createTokenProcessor() {
+  public function createTokenProcessor(): TokenProcessor {
     return new TokenProcessor(\Civi::dispatcher(), [
-      'controller' => get_class(),
+      'controller' => __CLASS__,
       'smarty' => FALSE,
       'schema' => ['activityId'],
     ]);
@@ -76,10 +76,8 @@ class CRM_Activity_Form_Task_PDF extends CRM_Activity_Form_Task {
    * @param  array $activityIds  array of activity ids
    * @param  string $html_message message text with tokens
    * @param  array $formValues   formValues from the form
-   *
-   * @return array
    */
-  public function createDocument($activityIds, $html_message, $formValues) {
+  public function createDocument($activityIds, $html_message, $formValues): void {
     $tp = $this->createTokenProcessor();
     $tp->addMessage('body_html', $html_message, 'text/html');
 
@@ -88,13 +86,13 @@ class CRM_Activity_Form_Task_PDF extends CRM_Activity_Form_Task {
     }
     $tp->evaluate();
 
-    return $this->renderFromRows($tp->getRows(), 'body_html', $formValues);
+    $this->renderFromRows($tp->getRows(), 'body_html', $formValues);
   }
 
   /**
    * Render html from rows
    *
-   * @param array $rows
+   * @param \Traversable $rows
    * @param string $msgPart
    *   The name registered with the TokenProcessor
    * @param array $formValues

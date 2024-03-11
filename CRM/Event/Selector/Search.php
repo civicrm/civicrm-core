@@ -425,7 +425,7 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
       }
       $rows[] = $row;
     }
-    CRM_Core_Selector_Controller::$_template->assign_by_ref('lineItems', $lineItems);
+    CRM_Core_Smarty::singleton()->assign('lineItems', $lineItems ?? []);
 
     return $rows;
   }

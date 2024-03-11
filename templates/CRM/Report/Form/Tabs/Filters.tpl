@@ -14,10 +14,10 @@
       {foreach from=$filterGroups item=filterGroup}
         {* Wrap custom field sets in collapsed accordion pane. *}
         {if $filterGroup.use_accordion_for_field_selection}
-          <div class="crm-accordion-wrapper crm-accordion collapsed">
-            <div class="crm-accordion-header">
+          <details class="crm-accordion-bold crm-accordion">
+            <summary>
               {$filterGroup.group_title}
-            </div><!-- /.crm-accordion-header -->
+            </summary>
             <div class="crm-accordion-body">
         {/if}
         <table class="report-layout">
@@ -49,8 +49,8 @@
         {/foreach}
         </table>
         {if $filterGroup.use_accordion_for_field_selection}
-            </div><!-- /.crm-accordion-body -->
-          </div><!-- /.crm-accordion-wrapper -->
+            </div>
+          </details>
         {/if}
       {/foreach}
   </div>

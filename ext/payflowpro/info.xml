@@ -14,11 +14,11 @@
     <url desc="Support">https://lab.civicrm.org</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
-  <releaseDate>2024-02-08</releaseDate>
-  <version>5.72.alpha1</version>
+  <releaseDate>2024-03-06</releaseDate>
+  <version>5.73.alpha1</version>
   <develStage>stable</develStage>
   <compatibility>
-    <ver>5.72</ver>
+    <ver>5.73</ver>
   </compatibility>
   <comments>This extension is extraction of the original Core Payflow Pro Payment Processor</comments>
   <classloader>

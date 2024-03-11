@@ -20,7 +20,7 @@
  *
  */
 class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
-
+  use CRM_Custom_Form_CustomDataTrait;
   use CRM_Core_Form_EntityFormTrait;
 
   /**
@@ -604,6 +604,23 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    */
   private function isQuickConfig(): bool {
     return $this->_priceSetId && CRM_Price_BAO_PriceSet::isQuickConfig($this->_priceSetId);
+  }
+
+  /**
+   * Overriding this entity trait function as the function does not
+   * at this stage use the CustomDataTrait which works better with php8.2.
+   */
+  public function addCustomDataToForm() {
+    if ($this->isSubmitted()) {
+      // The custom data fields are added to the form by an ajax form.
+      // However, if they are not present in the element index they will
+      // not be available from `$this->getSubmittedValue()` in post process.
+      // We do not have to set defaults or otherwise render - just add to the element index.
+      $this->addCustomDataFieldsToForm('Membership', array_filter([
+        'id' => $this->getMembershipID(),
+        'membership_type_id' => $this->getSubmittedValue('membership_type_id'),
+      ]));
+    }
   }
 
   /**

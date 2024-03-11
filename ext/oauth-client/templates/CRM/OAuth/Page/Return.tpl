@@ -1,8 +1,8 @@
 {if $error}
-    <div class="crm-accordion-wrapper">
-        <div class="crm-accordion-header">
+    <details class="crm-accordion-bold" open>
+        <summary>
             {ts}OAuth Error Details{/ts}
-        </div>
+        </summary>
         <div class="crm-accordion-body">
             <ul>
                 <li><strong>{ts}Error type:{/ts}</strong> {$error.error|escape:'html'}</li>
@@ -12,30 +12,30 @@
                 <li><strong>{ts}Error URI:{/ts}</strong> <code>{$error.error_uri|escape:'html'}</code></li>
             </ul>
         </div>
-    </div>
+    </details>
 {else}
     <p>{ts}An OAuth token was created!{/ts}</p>
     <p>{ts}There is no clear "next step", so this may be a new integration. Please update the integration to define a next step via "hook_civicrm_oauthReturn" or "landingUrl".{/ts}</p>
 {/if}
 
 {if $stateJson}
-    <div class="crm-accordion-wrapper collapsed">
-        <div class="crm-accordion-header">
+    <details class="crm-accordion-bold">
+        <summary>
             {ts}OAuth State{/ts}
-        </div>
+        </summary>
         <div class="crm-accordion-body">
             <pre>{$stateJson}</pre>
         </div>
-    </div>
+    </details>
 {/if}
 
 {if $tokenJson}
-    <div class="crm-accordion-wrapper collapsed">
-        <div class="crm-accordion-header">
+    <details class="crm-accordion-bold">
+        <summary>
             {ts}OAuth Token{/ts}
-        </div>
+        </summary>
         <div class="crm-accordion-body">
             <pre>{$tokenJson}</pre>
         </div>
-    </div>
+    </details>
 {/if}

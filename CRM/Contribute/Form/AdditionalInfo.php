@@ -239,6 +239,8 @@ class CRM_Contribute_Form_AdditionalInfo {
    * @param int $contactID
    * @param int $contributionID
    * @param int $contributionNoteID
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function processNote($params, $contactID, $contributionID, $contributionNoteID = NULL) {
     if (CRM_Utils_System::isNull($params['note']) && $contributionNoteID) {
@@ -322,7 +324,7 @@ class CRM_Contribute_Form_AdditionalInfo {
     if (!empty($params['payment_instrument_id'])) {
       $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
       $params['paidBy'] = $paymentInstrument[$params['payment_instrument_id']];
-      if ($params['paidBy'] != 'Check' && isset($params['check_number'])) {
+      if ($params['paidBy'] !== 'Check' && isset($params['check_number'])) {
         unset($params['check_number']);
       }
     }
@@ -421,7 +423,7 @@ class CRM_Contribute_Form_AdditionalInfo {
       $form->assign('customGroup', $customGroup);
     }
 
-    $form->assign_by_ref('formValues', $params);
+    $form->assign('formValues', $params);
     list($contributorDisplayName,
       $contributorEmail
       ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($params['contact_id']);

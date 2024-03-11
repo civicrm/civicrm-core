@@ -4,7 +4,7 @@
     <crm-search-function ng-if="!col.isPseudoField" class="form-inline" mode="select" expr="col.key"></crm-search-function>
     <label ng-if="col.isPseudoField">{{:: col.label }}</label>
     <button type="button" class="btn btn-xs pull-right" ng-if="$ctrl.select.length > 1" ng-click="$ctrl.crmSearchAdmin.clearParam('select', $index)" title="{{:: ts('Remove') }}">
-      <i class="crm-i fa-ban"></i>
+      <i class="crm-i fa-times"></i>
     </button>
   </fieldset>
 </div>

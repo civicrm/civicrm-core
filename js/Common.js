@@ -1172,20 +1172,10 @@ if (!CRM.vars) CRM.vars = {};
       $('table.crm-ajax-table', e.target).each(function() {
         var
           $table = $(this),
-          script = CRM.config.resourceBase + 'js/jquery/jquery.crmAjaxTable.js',
-          $accordion = $table.closest('.crm-accordion-wrapper.collapsed, .crm-collapsible.collapsed');
-        // For tables hidden by collapsed accordions, wait.
-        if ($accordion.length) {
-          $accordion.one('crmAccordion:open', function() {
-            CRM.loadScript(script).done(function() {
-              $table.crmAjaxTable();
-            });
-          });
-        } else {
-          CRM.loadScript(script).done(function() {
-            $table.crmAjaxTable();
-          });
-        }
+          script = CRM.config.resourceBase + 'js/jquery/jquery.crmAjaxTable.js';
+        CRM.loadScript(script).done(function() {
+          $table.crmAjaxTable();
+        });
       });
       if ($("input:radio[name=radio_ts]").length == 1) {
         $("input:radio[name=radio_ts]").prop("checked", true);
@@ -1713,15 +1703,13 @@ if (!CRM.vars) CRM.vars = {};
       })
       // Handle accordions
       .on('click.crmAccordions', 'div.crm-accordion-header, fieldset.crm-accordion-header, .crm-collapsible .collapsible-title', function (e) {
-        var action = 'open';
         if ($(this).parent().hasClass('collapsed')) {
           $(this).next().css('display', 'none').slideDown(200);
         }
         else {
           $(this).next().css('display', 'block').slideUp(200);
-          action = 'close';
         }
-        $(this).parent().toggleClass('collapsed').trigger('crmAccordion:' + action);
+        $(this).parent().toggleClass('collapsed');
         e.preventDefault();
       });
 
@@ -1730,19 +1718,23 @@ if (!CRM.vars) CRM.vars = {};
 
   /**
    * Collapse or expand an accordion
+   * @deprecated
    * @param speed
    */
   $.fn.crmAccordionToggle = function (speed) {
     $(this).each(function () {
-      var action = 'open';
+      // Backward-compat, for when this older function is used on a newer <details> element
+      if ($(this).is('details')) {
+        this.open = !this.open;
+        return;
+      }
       if ($(this).hasClass('collapsed')) {
         $('.crm-accordion-body', this).first().css('display', 'none').slideDown(speed);
       }
       else {
         $('.crm-accordion-body', this).first().css('display', 'block').slideUp(speed);
-        action = 'close';
       }
-      $(this).toggleClass('collapsed').trigger('crmAccordion:' + action);
+      $(this).toggleClass('collapsed');
     });
   };
 

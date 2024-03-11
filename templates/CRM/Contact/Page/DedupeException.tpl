@@ -8,26 +8,27 @@
  +--------------------------------------------------------------------+
 *}
 {include file="CRM/common/dedupe.tpl"}
-<div class="crm-accordion-header">
-  {ts}Filter Contacts{/ts}
-</div>
-<div class="crm-accordion-body">
-  <form method="get">
-    <table class="no-border form-layout-compressed" id="searchOptions" style="width:100%;">
-      <tr>
-        <td class="crm-contact-form-block-contact1">
-          <label for="search-contact1">{ts}Contact Name{/ts}</label><br />
-          <input class="crm-form-text" type="text" size="50" placeholder="{ts}Search Contacts{/ts}" value="{$searchcontact1}" id="search-contact1" search-column="0" />
-        </td>
-        <td class="crm-contact-form-block-search">
-          <label>&nbsp;</label><br />
-          <button type="submit" class="button crm-button filtercontacts"><span><i class="crm-i fa-search" aria-hidden="true"></i> {ts}Find Contacts{/ts}</span></button>
-        </td>
-      </tr>
-    </table>
-  </form>
-</div>
-
+<details class="crm-accordion-bold" open>
+  <summary>
+    {ts}Filter Contacts{/ts}
+  </summary>
+  <div class="crm-accordion-body">
+    <form method="get">
+      <table class="no-border form-layout-compressed" id="searchOptions" style="width:100%;">
+        <tr>
+          <td class="crm-contact-form-block-contact1">
+            <label for="search-contact1">{ts}Contact Name{/ts}</label><br />
+            <input class="crm-form-text" type="text" size="50" placeholder="{ts}Search Contacts{/ts}" value="{$searchcontact1}" id="search-contact1" search-column="0" />
+          </td>
+          <td class="crm-contact-form-block-search">
+            <label>&nbsp;</label><br />
+            <button type="submit" class="button crm-button filtercontacts"><span><i class="crm-i fa-search" aria-hidden="true"></i> {ts}Find Contacts{/ts}</span></button>
+          </td>
+        </tr>
+      </table>
+    </form>
+  </div>
+</details>
 
 <div class="crm-content-block crm-block">
   {include file="CRM/common/pager.tpl" location="top"}

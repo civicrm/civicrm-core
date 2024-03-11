@@ -193,7 +193,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
       ->addWhere('is_sms', '=', $isSMS);
 
     if (!$all) {
-      $messageTemplates->addWhere('workflow_id', 'IS NULL');
+      $messageTemplates->addWhere('workflow_name', 'IS NULL');
     }
 
     $msgTpls = array_column((array) $messageTemplates->execute(), 'msg_title', 'id');

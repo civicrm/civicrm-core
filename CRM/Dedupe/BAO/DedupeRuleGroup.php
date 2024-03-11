@@ -66,12 +66,6 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
         'civicrm_country.name' => 'civicrm_address.country_id',
         'civicrm_county.name' => 'civicrm_address.county_id',
         'civicrm_state_province.name' => 'civicrm_address.state_province_id',
-        'gender.label' => 'civicrm_contact.gender_id',
-        'individual_prefix.label' => 'civicrm_contact.prefix_id',
-        'individual_suffix.label' => 'civicrm_contact.suffix_id',
-        'addressee.label' => 'civicrm_contact.addressee_id',
-        'email_greeting.label' => 'civicrm_contact.email_greeting_id',
-        'postal_greeting.label' => 'civicrm_contact.postal_greeting_id',
         'civicrm_phone.phone' => 'civicrm_phone.phone_numeric',
       ];
       // the table names we support in dedupe rules - a filter for importableFields()
@@ -109,18 +103,19 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
         // exension is installed (https://github.com/eileenmcnaughton/org.wikimedia.thethe)
         $fields[$ctype]['civicrm_contact']['sort_name'] = ts('Sort Name');
 
+        $customGroups = CRM_Core_BAO_CustomGroup::getAll([
+          'extends' => $ctype,
+          'is_active' => TRUE,
+        ], CRM_Core_Permission::EDIT);
         // add all custom data fields including those only for sub_types.
-        foreach (CRM_Core_BAO_CustomGroup::getTree($ctype, NULL, NULL, -1, [], NULL, TRUE, NULL, TRUE) as $key => $cg) {
-          if (!is_int($key)) {
-            continue;
-          }
+        foreach ($customGroups as $cg) {
           foreach ($cg['fields'] as $cf) {
             $fields[$ctype][$cg['table_name']][$cf['column_name']] = $cg['title'] . ' : ' . $cf['label'];
           }
         }
       }
       //Does this have to run outside of cache?
-      CRM_Utils_Hook::dupeQuery(CRM_Core_DAO::$_nullObject, 'supportedFields', $fields);
+      CRM_Utils_Hook::dupeQuery(NULL, 'supportedFields', $fields);
       Civi::$statics[__CLASS__]['supportedFields'] = $fields;
     }
 
@@ -144,16 +139,6 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
   private static function importableFields($contactType): array {
 
     $fields = CRM_Contact_DAO_Contact::import();
-
-    // get the fields thar are meant for contact types
-    if (in_array($contactType, [
-      'Individual',
-      'Household',
-      'Organization',
-      'All',
-    ])) {
-      $fields = array_merge($fields, CRM_Core_OptionValue::getFields('', $contactType));
-    }
 
     $locationFields = array_merge(CRM_Core_DAO_Address::import(),
       CRM_Core_DAO_Phone::import(),
@@ -244,11 +229,15 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
       // tailored to respect the param and contactId options provided.
       $queries = [];
       while ($bao->fetch()) {
-        $bao->contactIds = $this->contactIds;
-        $bao->params = $this->params;
-
         // Skipping empty rules? Empty rules shouldn't exist; why check?
-        if ($query = $bao->sql()) {
+        if ($query = CRM_Dedupe_BAO_DedupeRule::sql($this->params, $this->contactIds, [
+          'id' => (int) $bao->id,
+          'rule_table' => $bao->rule_table,
+          'rule_length' => $bao->rule_length,
+          'rule_field' => $bao->rule_field,
+          'rule_weight' => $bao->rule_weight,
+          'dedupe_rule_group_id' => $bao->dedupe_rule_group_id,
+        ])) {
           $queries["{$bao->rule_table}.{$bao->rule_field}.{$bao->rule_weight}"] = $query;
         }
       }

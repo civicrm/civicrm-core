@@ -124,6 +124,7 @@ trait Api4TestTrait {
         ['readonly', 'IS EMPTY'],
       ],
       'orderBy' => ['required' => 'DESC'],
+      'checkPermissions' => FALSE,
     ], 'name');
 
     $extraValues = [];

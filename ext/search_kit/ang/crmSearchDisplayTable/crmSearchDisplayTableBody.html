@@ -1,11 +1,11 @@
-<tr ng-repeat="(rowIndex, row) in $ctrl.results">
+<tr ng-repeat="(rowIndex, row) in $ctrl.results" data-entity-id="{{:: row.key }}">
   <td ng-if=":: $ctrl.hasExtraFirstColumn()" class="{{:: row.cssClass }}">
     <span ng-if=":: $ctrl.settings.draggable" class="crm-draggable" title="{{:: ts('Drag to reposition') }}">
       <i class="crm-i fa-arrows-v"></i>
     </span>
     <input ng-if=":: $ctrl.settings.actions" type="checkbox" ng-checked="$ctrl.isRowSelected(row)" ng-click="$ctrl.toggleRow(row, $event)" ng-disabled="!!$ctrl.loadingAllRows">
   </td>
-  <td ng-repeat="(colIndex, colData) in row.columns" ng-include="'~/crmSearchDisplay/colType/' + $ctrl.settings.columns[colIndex].type + '.html'" title="{{:: colData.title }}" class="crm-search-col-type-{{:: $ctrl.settings.columns[colIndex].type }} {{:: row.cssClass }} {{:: colData.cssClass }}">
+  <td ng-repeat="(colIndex, colData) in row.columns" ng-include="'~/crmSearchDisplay/colType/' + $ctrl.settings.columns[colIndex].type + '.html'" title="{{:: colData.title }}" class="crm-search-col-type-{{:: $ctrl.settings.columns[colIndex].type }} {{:: row.cssClass }} {{:: colData.cssClass }}" data-field-name="{{:: colData.edit.value_key }}">
   </td>
 </tr>
 <tr ng-if="$ctrl.rowCount === 0">

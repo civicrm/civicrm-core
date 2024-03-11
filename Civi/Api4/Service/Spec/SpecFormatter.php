@@ -95,6 +95,9 @@ class SpecFormatter {
         $field->setSuffixes($suffixes);
       }
       $field->setReadonly(!empty($data['readonly']));
+      if (isset($data['usage'])) {
+        $field->setUsage(array_keys(array_filter($data['usage'])));
+      }
     }
     if ($hasDefault) {
       $field->setDefaultValue(FormattingUtil::convertDataType($data['default'], $dataTypeName));

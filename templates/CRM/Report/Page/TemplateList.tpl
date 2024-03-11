@@ -17,10 +17,10 @@
     {if $list}
       {counter start=0 skip=1 print=false}
       {foreach from=$list item=rows key=report}
-        <div class="crm-accordion-wrapper crm-accordion_{$report}-accordion ">
-          <div class="crm-accordion-header">
+        <details class="crm-accordion-bold crm-accordion_{$report}-accordion " open>
+          <summary>
             {if $report}{if $report EQ 'Contribute'}{ts}Contribution{/ts}{else}{$report}{/if}{else}{ts}Contact{/ts}{/if} Report Templates
-          </div><!-- /.crm-accordion-header -->
+          </summary>
           <div class="crm-accordion-body">
             <div id="{$report}" class="boxBlock">
               <table class="report-layout">
@@ -41,8 +41,8 @@
                 {/foreach}
               </table>
             </div>
-          </div><!-- /.crm-accordion-body -->
-        </div><!-- /.crm-accordion-wrapper -->
+          </div>
+        </details>
       {/foreach}
     {else}
       <div class="messages status no-popup">

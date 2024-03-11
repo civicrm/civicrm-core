@@ -30,6 +30,17 @@ class CRM_Upgrade_Incremental_php_FiveSeventyTwo extends CRM_Upgrade_Incremental
   public function upgrade_5_72_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Remove localized suffixes from civicrm_mailing_group.entity_table', 'fixMailingGroupEntityTable');
+    $this->addTask('Replace displayName smarty token in UFNotify subject',
+      'updateMessageToken', 'uf_notify', 'ts 1=$displayName', 'ts 1=$userDisplayName', $rev
+    );
+    $this->addTask('Replace displayName smarty token in UFNotify',
+      'updateMessageToken', 'uf_notify', '$displayName', 'contact.display_name', $rev
+    );
+    $this->addTask('Replace currentDate smarty token in UFNotify',
+      'updateMessageToken', 'uf_notify', '$currentDate', 'domain.now|crmDate:"Full"', $rev
+    );
+    $this->addTask('Add last_run_end column to Job table', 'addColumn', 'civicrm_job', 'last_run_end',
+      'timestamp NULL DEFAULT NULL COMMENT "When did this cron entry last finish running"');
   }
 
   /**

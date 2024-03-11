@@ -2,6 +2,8 @@
 
 namespace Civi\Core;
 
+use Civi\Core\Event\GenericHookEvent;
+
 /**
  * Generate a URL.
  *
@@ -31,6 +33,7 @@ namespace Civi\Core;
  * Additionally, the setters+adders accept arrays.
  *
  * This cl
+ *
  * @see \Civi::url()
  */
 final class Url implements \JsonSerializable {
@@ -40,6 +43,28 @@ final class Url implements \JsonSerializable {
    *   Ex: 'frontend', 'backend'
    */
   private $scheme;
+
+  /**
+   * NOTE: In most schemes, this field will be ignored.
+   * It is only handled for HTTP/HTTPS. I haven't looked through
+   * the edge-cases of mixing "host"ed vs non-"host"ed URLs. If
+   * you think through those edges and want to expose
+   * more helpers, cool.
+   *
+   * @var string
+   */
+  private $host;
+
+  /**
+   * NOTE: In most schemes, this field will be ignored.
+   * It is only handled for HTTP/HTTPS. I haven't looked through
+   * the edge-cases of mixing "host"ed vs non-"host"ed URLs. If
+   * you think through those edges and want to expose
+   * more helpers, cool.
+   *
+   * @var string
+   */
+  private $port;
 
   /**
    * @var string
@@ -151,15 +176,72 @@ final class Url implements \JsonSerializable {
     //   - `Civi::url('civicrm/event/info', 'f')`.
 
     $parsed = parse_url($logicalUri);
-    $this->scheme = $parsed['scheme'] ?? NULL;
-    $this->path = $parsed['host'] ?? NULL;
-    if (isset($parsed['path'])) {
-      $this->path .= $parsed['path'];
+    if ($parsed === FALSE && preg_match(';^(\w+)://$;', $logicalUri, $m)) {
+      $parsed = ['scheme' => $m[1], 'path' => ''];
     }
-    $this->query = $parsed['query'] ?? NULL;
+    $this->setScheme($parsed['scheme'] ?? '');
+    if (in_array($this->scheme, ['http', 'https'])) {
+      $this->host = $parsed['host'];
+      $this->port = $parsed['port'] ?? '';
+      $this->path = $parsed['path'] ?? '';
+    }
+    else {
+      $this->path = $parsed['host'] ?? '';
+      if (isset($parsed['path'])) {
+        $this->path .= $parsed['path'];
+      }
+    }
+    $this->query = $parsed['query'] ?? '';
     $fragmentParts = isset($parsed['fragment']) ? explode('?', $parsed['fragment'], 2) : [];
-    $this->fragment = $fragmentParts[0] ?? NULL;
-    $this->fragmentQuery = $fragmentParts[1] ?? NULL;
+    $this->fragment = $fragmentParts[0] ?? '';
+    $this->fragmentQuery = $fragmentParts[1] ?? '';
+  }
+
+  /**
+   * Take another URL. Add its components into the components of this URL.
+   *
+   * @param \Civi\Core\Url $other
+   * @param string[] $parts
+   *   Ex: ['path', 'query', 'fragment', 'fragmentQuery', 'flags']
+   *
+   * @return $this
+   */
+  public function merge(Url $other, array $parts) {
+    foreach ($parts as $part) {
+      switch ($part) {
+        case 'path':
+          $this->addPath($other->getPath());
+          break;
+
+        case 'query':
+          $this->addQuery($other->getQuery());
+          break;
+
+        case 'fragment':
+          $this->addFragment($other->getFragment());
+          break;
+
+        case 'fragmentQuery':
+          $this->addFragmentQuery($other->getFragmentQuery());
+          break;
+
+        case 'flags':
+          if ($other->ssl !== NULL) {
+            $this->setSsl($other->getSsl());
+          }
+          if ($other->cacheCode !== NULL) {
+            $this->setCacheCode($other->getCacheCode());
+          }
+          if ($other->preferFormat !== NULL) {
+            $this->setPreferFormat($other->getPreferFormat());
+          }
+          break;
+
+        default:
+          throw new \CRM_Core_Exception("Unrecognized URL merge flag: $part");
+      }
+    }
+    return $this;
   }
 
   /**
@@ -171,11 +253,14 @@ final class Url implements \JsonSerializable {
   }
 
   /**
-   * @param string $scheme
+   * @param string|null $scheme
    *   Ex: 'frontend' or 'backend'
    */
-  public function setScheme(string $scheme): Url {
+  public function setScheme(?string $scheme): Url {
     $this->scheme = $scheme;
+    if ($scheme === 'https') {
+      $this->setSsl(TRUE);
+    }
     return $this;
   }
 
@@ -566,9 +651,23 @@ final class Url implements \JsonSerializable {
         $result = \Civi::resources()->getUrl($parts[0], $parts[1] ?? NULL, FALSE) . $this->composeQuery();
         break;
 
+      case 'http':
+      case 'https':
+        $port = is_numeric($this->port) ? ":{$this->port}" : "";
+        $path = $this->getPath();
+        $result = $this->getScheme() . '://' . $this->host . $port . $path . $this->composeQuery();
+        break;
+
       // Handle 'frontend', 'backend', 'service', and any extras.
       default:
         $result = $userSystem->getRouteUrl($scheme, $this->getPath(), $this->getQuery());
+        if ($result === NULL) {
+          $event = GenericHookEvent::create(['url' => $this, 'result' => &$result]);
+          \Civi::dispatcher()->dispatch('civi.url.render.' . $scheme, $event);
+          if ($result instanceof Url) {
+            return $result->__toString();
+          }
+        }
         if ($result === NULL) {
           throw new \RuntimeException("Unknown URL scheme: $scheme");
         }
@@ -690,11 +789,11 @@ final class Url implements \JsonSerializable {
   }
 
   private static function appendString(?string &$var, string $separator, ?string $value): void {
-    if ($value === NULL) {
+    if ($value === NULL || $value === '') {
       return;
     }
 
-    if ($var === NULL) {
+    if ($var === NULL || $var === '') {
       $var = $value;
       return;
     }

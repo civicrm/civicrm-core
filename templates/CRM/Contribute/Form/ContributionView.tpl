@@ -194,10 +194,10 @@
 </table>
 
 {if $softContributions && count($softContributions)} {* We show soft credit name with PCP section if contribution is linked to a PCP. *}
-  <div class="crm-accordion-wrapper crm-soft-credit-pane">
-    <div class="crm-accordion-header">
+  <details class="crm-accordion-bold crm-soft-credit-pane" open>
+    <summary>
       {ts}Soft Credit{/ts}
-    </div>
+    </summary>
     <div class="crm-accordion-body">
       <table class="crm-info-panel crm-soft-credit-listing">
         {foreach from=$softContributions item="softCont"}
@@ -216,14 +216,14 @@
         {/foreach}
       </table>
     </div>
-  </div>
+  </details>
 {/if}
 
 {if $premium}
-  <div class="crm-accordion-wrapper ">
-    <div class="crm-accordion-header">
+  <details class="crm-accordion-bold " open>
+    <summary>
       {ts}Premium Information{/ts}
-    </div>
+    </summary>
     <div class="crm-accordion-body">
       <table class="crm-info-panel">
         <td class="label">{ts}Premium{/ts}</td>
@@ -234,14 +234,14 @@
         <td>{$fulfilled|truncate:10:''|crmDate}</td>
       </table>
     </div>
-  </div>
+  </details>
 {/if}
 
 {if $pcp_id}
-  <div id='PCPView' class="crm-accordion-wrapper ">
-    <div class="crm-accordion-header">
+  <details id='PCPView' class="crm-accordion-bold " open>
+    <summary>
       {ts}Personal Campaign Page Contribution Information{/ts}
-    </div>
+    </summary>
     <div class="crm-accordion-body">
       <table class="crm-info-panel">
         <tr>
@@ -273,7 +273,7 @@
         {/if}
       </table>
     </div>
-  </div>
+  </details>
 {/if}
 
 {include file="CRM/Custom/Page/CustomDataView.tpl"}

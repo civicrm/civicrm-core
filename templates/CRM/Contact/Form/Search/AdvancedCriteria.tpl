@@ -13,11 +13,11 @@
 CRM.$(function($) {
   // Bind first click of accordion header to load crm-accordion-body with snippet
   // everything else is taken care of by crmAccordions()
-  $('.crm-search_criteria_basic-accordion .crm-accordion-header').addClass('active');
-  $('.crm-ajax-accordion').on('click', '.crm-accordion-header:not(.active)', function() {
+  $('.crm-search_criteria_basic-accordion summary').addClass('active');
+  $('.crm-ajax-accordion').on('click', 'summary:not(.active)', function() {
     loadPanes($(this).attr('id'));
   });
-  $('.crm-ajax-accordion:not(.collapsed) .crm-accordion-header').each(function() {
+  $('.crm-ajax-accordion[open] summary').each(function() {
     loadPanes($(this).attr('id'));
   });
   $('.crm-ajax-accordion').on('click', '.crm-close-accordion', function() {
@@ -46,7 +46,7 @@ CRM.$(function($) {
     $('#task').val('');
     var mode = modes[$('#component_mode').val()] || null;
     if (mode) {
-      $('.crm-' + mode + '-accordion.collapsed').crmAccordionToggle();
+      $('.crm-' + mode + '-accordion:not([open])').prop('open', true);
       loadPanes(mode);
     }
     if ('related_contact' === modes[$('#component_mode').val()]) {
@@ -87,8 +87,8 @@ CRM.$(function($) {
 {/if}
 
 {strip}
-  <details class="crm-accordion-wrapper crm-search_criteria_basic-accordion" open>
-    <summary class="crm-accordion-header">
+  <details class="crm-accordion-bold crm-search_criteria_basic-accordion" open>
+    <summary>
       {ts}Display Settings For Results{/ts}
     </summary>
     <div class="crm-accordion-body">

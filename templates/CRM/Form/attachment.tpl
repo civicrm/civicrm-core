@@ -32,10 +32,10 @@
     {else}
       {capture assign=attachTitle}{ts}Attachment(s){/ts}{/capture}
     {/if}
-    <div class="crm-accordion-wrapper {if (!$context || $context NEQ 'pcpCampaign') AND !$currentAttachmentInfo}collapsed{/if}">
-     <div class="crm-accordion-header">
+    <details class="crm-accordion-bold" {if (!$context || $context NEQ 'pcpCampaign') AND !$currentAttachmentInfo}{else}open{/if}>
+     <summary>
       {$attachTitle}
-     </div><!-- /.crm-accordion-header -->
+     </summary>
     <div class="crm-accordion-body">
     <div id="attachments">
       <table class="form-layout-compressed">
@@ -109,8 +109,8 @@
       {/if}
       </table>
     </div>
-  </div><!-- /.crm-accordion-body -->
-  </div><!-- /.crm-accordion-wrapper -->
+  </div>
+  </details>
     {literal}
     <script type="text/javascript">
       CRM.$(function($) {

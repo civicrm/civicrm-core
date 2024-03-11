@@ -207,8 +207,8 @@
       </table>
       {include file="CRM/common/customDataBlock.tpl"}
       {if $accessContribution and $action eq 2 and $rows.0.contribution_id}
-        <div class="crm-accordion-wrapper">
-          <div class="crm-accordion-header">{ts}Related Contributions{/ts}</div>
+        <details class="crm-accordion-bold" open>
+          <summary>{ts}Related Contributions{/ts}</summary>
           <div class="crm-accordion-body">
             {include file="CRM/Contribute/Form/Selector.tpl" context="Search"}
             <script type="text/javascript">
@@ -236,13 +236,13 @@
             </script>
             <div id="membership-recurring-contributions"></div>
           </div>
-        </div>
+        </details>
       {/if}
       {if $softCredit}
-        <div class="crm-accordion-wrapper">
-          <div class="crm-accordion-header">{ts}Related Soft Contributions{/ts}</div>
+        <details class="crm-accordion-bold" open>
+          <summary>{ts}Related Soft Contributions{/ts}</summary>
           <div class="crm-accordion-body">{include file="CRM/Contribute/Page/ContributionSoft.tpl" context="membership"}</div>
-       </div>
+       </details>
       {/if}
     {/if}
 
@@ -590,7 +590,7 @@
       showEmailOptions();
     }
 
-    var customDataType = {/literal}{$customDataType|@json_encode}{literal};
+    var customDataType = 'Membership';
 
     // load form during form rule.
     {/literal}{if $buildPriceSet}{literal}
@@ -605,7 +605,7 @@
         var fname = '#priceset';
         if ( !priceSetId ) {
         cj('#membership_type_id_1').val(0);
-        CRM.buildCustomData(customDataType, null);
+        CRM.buildCustomData('Membership', null);
 
         // hide price set fields.
         cj( fname ).hide( );
@@ -788,7 +788,7 @@
         subTypeNames = null;
       }
 
-      CRM.buildCustomData(customDataType, subTypeNames);
+      CRM.buildCustomData('Membership', subTypeNames);
     }
 
   function enableAmountSection( setContributionType ) {

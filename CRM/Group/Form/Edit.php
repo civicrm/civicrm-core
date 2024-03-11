@@ -369,7 +369,7 @@ WHERE  title = %1
         }
       }
     }
-    $form->assign_by_ref('parent_groups', $parentGroupElements);
+    $form->assign('parent_groups', $parentGroupElements);
 
     if (isset($form->_id)) {
       $potentialParentGroupIds = CRM_Contact_BAO_GroupNestingCache::getPotentialCandidates($form->_id, $groupNames);

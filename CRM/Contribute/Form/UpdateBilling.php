@@ -40,20 +40,20 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
       $this->_paymentProcessor['object'] = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_coid, 'contribute', 'obj');
     }
 
-    if ($this->_mid) {
-      $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_mid, 'membership', 'info');
-      $this->_paymentProcessor['object'] = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_mid, 'membership', 'obj');
+    if ($this->getMembershipID()) {
+      $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->getMembershipID(), 'membership', 'info');
+      $this->_paymentProcessor['object'] = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->getMembershipID(), 'membership', 'obj');
       $membershipTypes = CRM_Member_PseudoConstant::membershipType();
-      $membershipTypeId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->_mid, 'membership_type_id');
+      $membershipTypeId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->getMembershipID(), 'membership_type_id');
       $this->assign('membershipType', CRM_Utils_Array::value($membershipTypeId, $membershipTypes));
       $this->_mode = 'auto_renew';
     }
 
-    if ((!$this->_crid && !$this->_coid && !$this->_mid) || (!$this->getSubscriptionDetails())) {
+    if ((!$this->_crid && !$this->_coid && !$this->getMembershipID()) || (!$this->getSubscriptionDetails())) {
       throw new CRM_Core_Exception('Required information missing.');
     }
 
-    if (!$this->_paymentProcessor['object']->supports('updateSubscriptionBillingInfo')) {
+    if (!$this->getPaymentProcessorObject()->supports('updateSubscriptionBillingInfo')) {
       throw new CRM_Core_Exception(ts("%1 processor doesn't support updating subscription billing details.",
         [1 => $this->_paymentProcessor['title']]
       ));
@@ -201,7 +201,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
     $processorParams['amount'] = $this->getSubscriptionDetails()->amount;
     $processorParams['contributionRecurID'] = $this->getContributionRecurID();
     $message = '';
-    $updateSubscription = $this->_paymentProcessor['object']->updateSubscriptionBillingInfo($message, $processorParams);
+    $updateSubscription = $this->getPaymentProcessorObject()->updateSubscriptionBillingInfo($message, $processorParams);
     if (is_a($updateSubscription, 'CRM_Core_Error')) {
       CRM_Core_Error::displaySessionError($updateSubscription);
     }

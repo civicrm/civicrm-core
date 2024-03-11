@@ -41,10 +41,10 @@
       {* Added Activity Details accordion tab *}
       <tr class="crm-case-activity-form-block-activity-details">
         <td colspan="2">
-          <div id="activity-details" class="crm-accordion-wrapper collapsed">
-            <div class="crm-accordion-header">
+          <details id="activity-details" class="crm-accordion-bold">
+            <summary>
               {ts}Activity Details{/ts}
-            </div><!-- /.crm-accordion-header -->
+            </summary>
             <div class="crm-accordion-body">
     {else}
       <tr class="crm-case-activity-form-block-activity-details">
@@ -139,7 +139,7 @@
               </tr>
               {/if}
               <tr>
-                <td colspan="2">{include file="CRM/common/customDataBlock.tpl"}</td>
+                <td colspan="2">{include file="CRM/common/customDataBlock.tpl" groupID='' customDataType='Activity'}</td>
               </tr>
               {if NOT $activityTypeFile}
                 <tr class="crm-case-activity-form-block-details">
@@ -160,8 +160,8 @@
         {if $activityTypeFile EQ 'ChangeCaseStatus'
         || $activityTypeFile EQ 'ChangeCaseType'
         || $activityTypeFile EQ 'ChangeCaseStartDate'}
-          </div><!-- /.crm-accordion-body -->
-        </div><!-- /.crm-accordion-wrapper -->
+          </div>
+        </details>
         {* End of Activity Details accordion tab *}
       {/if}
       </td>
@@ -172,10 +172,10 @@
     {if $searchRows} {* We have got case role rows to display for "Send Copy To" feature *}
       <tr class="crm-case-activity-form-block-send_copy">
         <td colspan="2">
-          <div id="sendcopy" class="crm-accordion-wrapper collapsed">
-            <div class="crm-accordion-header">
+          <details id="sendcopy" class="crm-accordion-bold">
+            <summary>
               {ts}Send a Copy{/ts}
-            </div><!-- /.crm-accordion-header -->
+            </summary>
             <div id="sendcopy-body" class="crm-accordion-body">
 
               <div class="description">{ts}Email a complete copy of this activity record to other people involved with the case. Click the top left box to select all.{/ts}</div>
@@ -201,8 +201,8 @@
                   {/foreach}
                 </table>
               {/strip}
-            </div><!-- /.crm-accordion-body -->
-          </div><!-- /.crm-accordion-wrapper -->
+            </div>
+          </details>
         </td>
       </tr>
     {/if}
@@ -268,10 +268,14 @@
   {if $action neq 8 and $action neq 32768 and empty($activityTypeFile)}
   <script type="text/javascript">
     {if $searchRows}
-      cj('#sendcopy').crmAccordionToggle();
+      {literal}
+      cj('#sendcopy').prop('open', function(i, val) {return !val;});
+      {/literal}
     {/if}
 
-    cj('#follow-up').crmAccordionToggle();
+    {literal}
+    cj('#follow-up').prop('open', function(i, val) {return !val;});
+    {/literal}
   </script>
   {/if}
 

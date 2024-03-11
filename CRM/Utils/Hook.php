@@ -1619,21 +1619,25 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook allows modification of the queries constructed from dupe rules.
    *
+   * @deprecated since 5.72
+   *
    * @param string $obj
    *   Object of rulegroup class.
    * @param string $type
    *   Type of queries e.g table / threshold.
    * @param array $query
    *   Set of queries.
-   *
-   * @return mixed
    */
   public static function dupeQuery($obj, $type, &$query) {
     $null = NULL;
-    return self::singleton()->invoke(['obj', 'type', 'query'], $obj, $type, $query,
+    $original = $query;
+    self::singleton()->invoke(['obj', 'type', 'query'], $obj, $type, $query,
       $null, $null, $null,
       'civicrm_dupeQuery'
     );
+    if ($original !== $query && $type !== 'supportedFields') {
+      CRM_Core_Error::deprecatedWarning('hook_civicrm_dupeQuery is deprecated.');
+    }
   }
 
   /**

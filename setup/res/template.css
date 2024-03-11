@@ -34,16 +34,15 @@ body {
   100% {
     left: 0;
     color: #555;
-}
+  }
 }
 
 @keyframes slide {
   100% {
     left: 0;
     color: #555;
+  }
 }
-}
-
 
 .civicrm-setup-header hr {
   border-bottom: 2px solid #fff;
@@ -61,7 +60,6 @@ body {
 .civicrm-setup-body .civicrm-logo img {
   width: 100%;
 }
-
 
 /* Header End */
 
@@ -81,7 +79,6 @@ body {
 }
 
 .civicrm-setup-body h2 {
-  margin-top: 0;
   display: inline-block;
 }
 
@@ -127,7 +124,7 @@ body {
   background: #ffb;
   padding: 0.5em;
   margin: 1em auto;
-  width: 50%
+  width: 50%;
 }
 
 .civicrm-setup-body .advancedTip {
@@ -139,8 +136,7 @@ body {
   display: none;
 }
 
-.civicrm-setup-body .install-validate-bad {
-}
+/* .civicrm-setup-body .install-validate-bad { } */
 
 .civicrm-setup-body .reqTable {
   border-collapse: collapse;
@@ -163,7 +159,7 @@ body {
 
 .civicrm-setup-body .settingsTable {
   border-collapse: collapse;
-  margin: 2em
+  margin: 2em;
 }
 
 .civicrm-setup-body th,
@@ -263,7 +259,7 @@ body {
   text-align: center;
   margin: 2em 0.5em;
 }
-.civicrm-setup-body button[type=submit] {
+.civicrm-setup-body button[type="submit"] {
   padding: 15px 25px;
   background: #82c459;
   color: white;
@@ -273,19 +269,33 @@ body {
   border-radius: 5px;
   font-size: 20px;
 }
-.civicrm-setup-body button[type=submit]:hover {
+.civicrm-setup-body button[type="submit"]:hover {
   background: #60a237;
 }
-.civicrm-setup-body button[type=submit]:disabled {
+.civicrm-setup-body button[type="submit"]:disabled {
   background: #888;
   cursor: not-allowed;
 }
 
-.civicrm-setup-body .settingsTable input[type=text] {
+.civicrm-setup-body .settingsTable input[type="text"] {
   width: 80%;
 }
 
-
+.civicrm-setup-field-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 0.5em;
+  gap: 1em;
+}
+.civicrm-setup-field-wrapper > label {
+  flex: 0 0 25ch;
+}
+.civicrm-setup-field-wrapper > input {
+  flex: 0 0 25ch;
+}
+.civicrm-setup-field-wrapper > div {
+  flex: 0 0 auto;
+}
 
 @media only screen and (max-width: 801px) {
   .civicrm-setup-body .comp-box {
@@ -307,7 +317,6 @@ body {
     width: 95%;
     margin: 10px 2% 10px 2%;
   }
-
 }
 
 @media only screen and (max-width: 503px) {

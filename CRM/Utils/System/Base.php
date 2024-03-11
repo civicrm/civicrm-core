@@ -113,9 +113,7 @@ abstract class CRM_Utils_System_Base {
     }
 
     $current_path = CRM_Utils_System::currentPath();
-    return $this->url($current_path,
-      NULL, TRUE, NULL, FALSE
-    );
+    return (string) Civi::url('current://' . $current_path, 'a');
   }
 
   /**
@@ -964,6 +962,27 @@ abstract class CRM_Utils_System_Base {
   public function synchronizeUsers() {
     throw new Exception('CMS user creation not supported for this framework');
     return [];
+  }
+
+  /**
+   * Whether to allow access to CMS user sync action
+   * @return bool
+   */
+  public function allowSynchronizeUsers() {
+    return TRUE;
+  }
+
+  /**
+   * Run CMS user sync if allowed, otherwise just returns empty array
+   * @return array
+   */
+  public function synchronizeUsersIfAllowed() {
+    if ($this->allowSynchronizeUsers()) {
+      return $this->synchronizeUsers();
+    }
+    else {
+      return [];
+    }
   }
 
   /**

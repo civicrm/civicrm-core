@@ -11,10 +11,10 @@
 {assign var="showBlock" value="'searchForm'"}
 {assign var="hideBlock" value="'searchForm_show'"}
 <div class="crm-block crm-form-block crm-event-search-form-block">
-<div class="crm-accordion-wrapper crm-advanced_search_form-accordion {if !empty($ssID) or $rows}collapsed{/if}">
- <div class="crm-accordion-header crm-master-accordion-header">
+<details class="crm-accordion-light crm-advanced_search_form-accordion" {if !empty($ssID) or $rows}{else}open{/if}>
+ <summary>
         {ts}Edit Search Criteria{/ts}
-  </div>
+  </summary>
  <div class="crm-accordion-body">
 <div id="searchForm">
     {strip}
@@ -30,7 +30,7 @@
     {/strip}
 </div>
 </div>
-</div>
+</details>
 </div>
 {if $rowsEmpty|| $rows}
 <div class="crm-block crm-content-block">

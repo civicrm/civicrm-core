@@ -14,10 +14,10 @@
   <a accesskey="N" href="{crmURL p='civicrm/financial/batch' q="reset=1&action=add&context=$batchStatus"}" id="newBatch" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}New Accounting Batch{/ts}</span></a>
 </div>
 <div class="crm-form-block crm-search-form-block">
-  <div class="crm-accordion-wrapper crm-activity_search-accordion">
-    <div class="crm-accordion-header">
+  <details class="crm-accordion-bold crm-activity_search-accordion" open>
+    <summary>
       {ts}Filter Results{/ts}
-    </div>
+    </summary>
     <div class="crm-accordion-body">
       <div id="financial-search-form" class="crm-block crm-form-block">
         <table class="form-layout-compressed">
@@ -33,7 +33,7 @@
         </table>
       </div>
     </div>
-  </div>
+  </details>
 </div>
 {if !empty($form.batch_update)}<div class="form-layout-compressed">{$form.batch_update.html}&nbsp;{$form.submit.html}</div><br/>{/if}
 <table id="crm-batch-selector-{$batchStatus}" class="row-highlight">

@@ -328,10 +328,10 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
           $this->set('groupID', $groupID);
           //loop the group
           for ($i = 1; $i <= $groupCount; $i++) {
-            CRM_Custom_Form_CustomData::preProcess($this, NULL, $contactSubType,
+            $this->legacyPreProcessCustomData($contactSubType,
               $i, $this->_contactType, $this->_contactId, NULL, FALSE
             );
-            CRM_Contact_Form_Edit_CustomData::buildQuickForm($this);
+            $this->buildCustomData();
           }
         }
       }
@@ -352,23 +352,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         $paramSubType = (isset($paramSubType)) ? $paramSubType :
           str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',', trim($this->_contactSubType, CRM_Core_DAO::VALUE_SEPARATOR));
       }
-
-      if (CRM_Utils_Request::retrieve('type', 'String')) {
-        CRM_Contact_Form_Edit_CustomData::preProcess($this);
-      }
-      else {
-        // The reason we call this here is that it sets the _groupTree property which is later used
-        // in setDefaultValues and buildForm. (Ideally instead we would have a trait with getCustomGroup & getCustomFields
-        // that can be called at appropriate times). In order for buildForm to add the right fields it needs
-        // to know any contact sub types that are being added in the submission. Since this runs before
-        // the buildForm adds the contact_sub_type to the form we need to look in _submitValues for it - submitValues
-        // is a un-sanitised version of what is in the form submission (_POST) whereas `getSubmittedValues()` retrieves
-        // 'allowed' POSTED values - ie values which match available fields, with some localization handling.
-        CRM_Custom_Form_CustomData::preProcess($this, NULL, $this->isSubmitted() ? ($this->_submitValues['contact_sub_type'] ?? []) : $this->getContactValue('contact_sub_type') ?? $this->_contactSubType,
-          1, $this->_contactType, $this->getContactID()
-        );
-        $this->assign('customValueCount', $this->_customValueCount);
-      }
+      $this->preProcessCustomData();
     }
     $this->assign('paramSubType', $paramSubType ?? '');
   }
@@ -393,6 +377,156 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       $this->set('addressSequence', $addressSequence);
     }
     $this->assign('addressSequence', $addressSequence);
+  }
+
+  /**
+   * @param null|string $subType
+   * @param null|int $groupCount
+   * @param null $type
+   * @param null|int $entityID
+   * @param null $onlySubType
+   * @param bool $isLoadFromCache
+   *
+   * @throws \CRM_Core_Exception
+   *
+   * @deprecated see https://github.com/civicrm/civicrm-core/pull/29241 for preferred approach - basically
+   * 1) at the tpl layer use CRM/common/customDataBlock.tpl
+   * 2) to make the fields available for postProcess
+   * if ($this->isSubmitted()) {
+   *   $this->addCustomDataFieldsToForm('FinancialAccount');
+   * }
+   * 3) pass getSubmittedValues() to CRM_Core_BAO_CustomField::postProcess($this->getSubmittedValues(), $this->_id, 'FinancialAccount');
+   *  to ensure any money or number fields are handled for localisation
+   */
+  private function legacyPreProcessCustomData($subType = NULL,
+    $groupCount = NULL, $type = NULL, $entityID = NULL, $onlySubType = NULL, $isLoadFromCache = TRUE
+  ) {
+    if (!$type) {
+      CRM_Core_Error::deprecatedWarning('type should be passed in');
+      $type = CRM_Utils_Request::retrieve('type', 'String', $this);
+    }
+
+    if (!isset($subType)) {
+      $subType = CRM_Utils_Request::retrieve('subType', 'String', $this);
+    }
+    if ($subType === 'null') {
+      // Is this reachable?
+      $subType = NULL;
+    }
+
+    if ($groupCount) {
+      $this->_groupCount = $groupCount;
+    }
+    else {
+      $this->_groupCount = CRM_Utils_Request::retrieve('cgcount', 'Positive', $this);
+    }
+
+    $this->assign('cgCount', $this->_groupCount);
+
+    //carry qf key, since this form is not inhereting core form.
+    if ($qfKey = CRM_Utils_Request::retrieve('qfKey', 'String')) {
+      $this->assign('qfKey', $qfKey);
+    }
+
+    if ($entityID) {
+      $this->_entityId = $entityID;
+    }
+    else {
+      $this->_entityId = CRM_Utils_Request::retrieve('entityID', 'Positive', $this);
+    }
+
+    $typeCheck = CRM_Utils_Request::retrieve('type', 'String');
+    $urlGroupId = CRM_Utils_Request::retrieve('groupID', 'Positive');
+    if (isset($typeCheck) && $urlGroupId) {
+      $this->_groupID = $urlGroupId;
+    }
+    else {
+      $this->_groupID = CRM_Utils_Request::retrieve('groupID', 'Positive', $this);
+    }
+
+    $gid = (isset($this->_groupID)) ? $this->_groupID : NULL;
+    if (!is_array($subType) && str_contains(($subType ?? ''), CRM_Core_DAO::VALUE_SEPARATOR)) {
+      CRM_Core_Error::deprecatedWarning('Using a CRM_Core_DAO::VALUE_SEPARATOR separated subType deprecated, use a comma-separated string instead.');
+      $subType = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',', trim($subType, CRM_Core_DAO::VALUE_SEPARATOR));
+    }
+
+    $singleRecord = NULL;
+    if (!empty($this->_groupCount) && !empty($this->_multiRecordDisplay) && $this->_multiRecordDisplay == 'single') {
+      $singleRecord = $this->_groupCount;
+    }
+    $mode = CRM_Utils_Request::retrieve('mode', 'String', $this);
+    // when a new record is being added for multivalued custom fields.
+    if (isset($this->_groupCount) && $this->_groupCount == 0 && $mode == 'add' &&
+      !empty($this->_multiRecordDisplay) && $this->_multiRecordDisplay == 'single') {
+      $singleRecord = 'new';
+    }
+
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree($type,
+      NULL,
+      $this->_entityId,
+      $gid,
+      $subType,
+      NULL,
+      $isLoadFromCache,
+      $onlySubType,
+      FALSE,
+      CRM_Core_Permission::EDIT,
+      $singleRecord
+    );
+
+    if (property_exists($this, '_customValueCount') && !empty($groupTree)) {
+      $this->_customValueCount = CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, TRUE, NULL, NULL, NULL, $this->_entityId);
+    }
+    // we should use simplified formatted groupTree
+    $groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, $this->_groupCount, $this);
+
+    if (isset($this->_groupTree) && is_array($this->_groupTree)) {
+      $keys = array_keys($groupTree);
+      foreach ($keys as $key) {
+        $this->_groupTree[$key] = $groupTree[$key];
+      }
+    }
+    else {
+      $this->_groupTree = $groupTree;
+    }
+  }
+
+  /**
+   * Do some custom data wrangling.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function preProcessCustomData(): void {
+    $customDataType = CRM_Utils_Request::retrieve('type', 'String');
+    // if customDataType is present it implies it is a new contact - ie
+    // the person has selected 'New Individual' and the type 'Individual' is in the url.
+    if ($customDataType) {
+      $this->assign('addBlock', TRUE);
+      $this->assign('blockName', 'CustomData');
+    }
+    // We should probably fold this into the function in the build quick form process.
+    // There is no particular reason to call it in preProcess & it logically
+    // belongs with the buildQuickForm code.
+    // The comments below this line are historical.
+    // The reason we call this here is that it sets the _groupTree property which is later used
+    // in setDefaultValues and buildForm. (Ideally instead we would have a trait with getCustomGroup & getCustomFields
+    // that can be called at appropriate times). In order for buildForm to add the right fields it needs
+    // to know any contact sub types that are being added in the submission. Since this runs before
+    // the buildForm adds the contact_sub_type to the form we need to look in _submitValues for it - submitValues
+    // is a un-sanitised version of what is in the form submission (_POST) whereas `getSubmittedValues()` retrieves
+    // 'allowed' POSTED values - ie values which match available fields, with some localization handling.
+    // @todo - it's probably that there is no reason to pass NULl vs 1 for groupCount below.
+    $this->legacyPreProcessCustomData($this->isSubmitted() ? ($this->_submitValues['contact_sub_type'] ?? []) : $this->getContactValue('contact_sub_type') ?? $this->_contactSubType,
+      $customDataType ? NULL : 1, $customDataType ?: $this->_contactType, $this->getContactID()
+    );
+    if (!$customDataType) {
+      // Probably this does not need to be wrapped in an IF.
+      $this->assign('customValueCount', $this->_customValueCount);
+    }
+    if ($customDataType) {
+      // Not too sure why this makes sense for new contacts only.
+      $this->assign('groupTree', $this->_groupTree);
+    }
   }
 
   /**
@@ -434,8 +568,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     // set defaults for blocks ( custom data, address, communication preference, notes, tags and groups )
     foreach ($this->_editOptions as $name => $label) {
       if (!in_array($name, ['Address', 'Notes'])) {
-        $className = 'CRM_Contact_Form_Edit_' . $name;
-        $className::setDefaultValues($this, $defaults);
+        $this->setBlockDefaults($defaults, $name);
       }
     }
 
@@ -767,8 +900,8 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   public function buildQuickForm() {
     //load form for child blocks
     if ($this->isAjaxMode()) {
-      $className = 'CRM_Contact_Form_Edit_' . $this->getAjaxBlockName();
-      return $className::buildQuickForm($this);
+      $this->buildLocationBlock($this->getAjaxBlockName());
+      return;
     }
 
     if ($this->_action == CRM_Core_Action::UPDATE) {
@@ -797,15 +930,32 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     }
 
     //build contact type specific fields
-    $className = 'CRM_Contact_Form_Edit_' . $this->_contactType;
-    $className::buildQuickForm($this);
+    $this->buildContactTypeSpecificFields();
 
     // Ajax duplicate checking
     $checkSimilar = Civi::settings()->get('contact_ajax_check_similar');
     $this->assign('checkSimilar', $checkSimilar);
     if ($checkSimilar == 1) {
       $ruleParams = ['used' => 'Supervised', 'contact_type' => $this->_contactType];
-      $this->assign('ruleFields', CRM_Dedupe_BAO_DedupeRule::dedupeRuleFields($ruleParams));
+      // These are the fields tht are passed to apiv3 Contact.getduplicates.
+      // Most likely it is enough to pass only the fields returned from the function but
+      // this code has been a bit flip-floppy with the ruleFields removed in favour of
+      // the hard-coded list below here
+      // https://github.com/civicrm/civicrm-core/commit/01ee39a0165a6f3fdc8b105626abaa9cb951bb3f#diff-eee833728c23038f8ac3e2bbb37bef5fa1f718d327896178ae9526c31ee80672L265-R273
+      // at that point the api was switched here https://github.com/civicrm/civicrm-core/commit/01ee39a0165a6f3fdc8b105626abaa9cb951bb3f#diff-eee833728c23038f8ac3e2bbb37bef5fa1f718d327896178ae9526c31ee80672R311
+      // However, it was at least partially switched back here https://github.com/civicrm/civicrm-core/commit/a7ba493ce752fee7b05daa103bc1c956b7d05b0f#diff-eee833728c23038f8ac3e2bbb37bef5fa1f718d327896178ae9526c31ee80672R334
+      // so deliberately erring on the side of passing too much information in hopes of breaking
+      // the wheel.
+      $ruleFields = array_unique(CRM_Dedupe_BAO_DedupeRule::dedupeRuleFields($ruleParams)
+        + [
+          'first_name',
+          'last_name',
+          'nick_name',
+          'household_name',
+          'organization_name',
+          'email',
+        ]);
+      $this->assign('ruleFields', json_encode($ruleFields));
     }
 
     // build Custom data if Custom data present in edit option
@@ -828,15 +978,14 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
     // build edit blocks ( custom data, demographics, communication preference, notes, tags and groups )
     foreach ($this->_editOptions as $name => $label) {
-      if ($name == 'Address') {
+      if ($name === 'Address') {
         $this->_blocks['Address'] = $this->_editOptions['Address'];
         continue;
       }
-      if ($name == 'TagsAndGroups') {
+      if ($name === 'TagsAndGroups') {
         continue;
       }
-      $className = 'CRM_Contact_Form_Edit_' . $name;
-      $className::buildQuickForm($this);
+      $this->buildBlock($name);
     }
 
     // build tags and groups
@@ -956,11 +1105,8 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
             break;
 
           default:
-            // @todo This pattern actually adds complexity compared to filling out a switch statement
-            // for the limited number of blocks - as we also have to receive the block count
             $this->set($blockName . '_Block_Count', $instance);
-            $formName = 'CRM_Contact_Form_Edit_' . $blockName;
-            $formName::buildQuickForm($this);
+            $this->buildLocationBlock($blockName);
         }
       }
     }
@@ -1486,6 +1632,153 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
     }
     return $this->_contactId ? (int) $this->_contactId : NULL;
+  }
+
+  private function buildLocationBlock(string $name): void {
+    if ($name === 'Address') {
+      CRM_Contact_Form_Edit_Address::buildQuickForm($this);
+      return;
+    }
+    if ($name === 'Phone') {
+      CRM_Contact_Form_Edit_Phone::buildQuickForm($this);
+      return;
+    }
+    if ($name === 'IM') {
+      CRM_Contact_Form_Edit_IM::buildQuickForm($this);
+      return;
+    }
+    if ($name === 'Website') {
+      CRM_Contact_Form_Edit_Website::buildQuickForm($this);
+      return;
+    }
+    if ($name === 'IM') {
+      CRM_Contact_Form_Edit_IM::buildQuickForm($this);
+      return;
+    }
+    if ($name === 'OpenID') {
+      CRM_Contact_Form_Edit_OpenID::buildQuickForm($this);
+      return;
+    }
+    CRM_Core_Error::deprecatedWarning('unused?');
+    $this->buildBlock($name);
+  }
+
+  /**
+   * @param $name
+   *
+   * @return void
+   */
+  private function buildBlock(string $name): void {
+    if ($name === 'TagsAndGroups') {
+      CRM_Core_Error::deprecatedWarning('unused?');
+      CRM_Contact_Form_Edit_TagsAndGroups::buildQuickForm($this);
+      return;
+    }
+    if ($name === 'CustomData') {
+      $this->buildCustomData();
+      return;
+    }
+    if ($name === 'CommunicationPreferences') {
+      CRM_Contact_Form_Edit_CommunicationPreferences::buildQuickForm($this);
+      return;
+    }
+    if ($name === 'Demographics') {
+      CRM_Contact_Form_Edit_Demographics::buildQuickForm($this);
+      return;
+    }
+    if ($name === 'Notes') {
+      CRM_Contact_Form_Edit_Notes::buildQuickForm($this);
+      return;
+    }
+    CRM_Core_Error::deprecatedWarning('unused?');
+    // Ideally nothing here would be called but it's possible it could be injected from
+    // outside of core. For core purposed we can be sure no core forms are called here
+    // and any extensions doing magic are buyer-beware.
+    $className = 'CRM_Contact_Form_Edit_' . $name;
+    $className::buildQuickForm($this);
+  }
+
+  /**
+   * Build the form object elements for CustomData object.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function buildCustomData(): void {
+    $customValueCount = $this->_submitValues['hidden_custom_group_count'] ?? NULL;
+    if (is_array($customValueCount)) {
+      if (array_key_exists(0, $customValueCount)) {
+        unset($customValueCount[0]);
+      }
+      $this->_customValueCount = $customValueCount;
+      $this->assign('customValueCount', $customValueCount);
+    }
+
+    $this->addElement('hidden', 'hidden_custom', 1);
+    $this->addElement('hidden', "hidden_custom_group_count[{$this->_groupID}]", $this->_groupCount);
+    CRM_Core_BAO_CustomGroup::buildQuickForm($this, $this->_groupTree);
+
+    //build custom data.
+    if (!empty($_POST["hidden_custom"]) && !empty($_POST['contact_sub_type'])) {
+      $contactSubType = $_POST['contact_sub_type'];
+    }
+    else {
+      $contactSubType = $this->_values['contact_sub_type'] ?? NULL;
+    }
+    $this->assign('contactType', $this->_contactType);
+    $this->assign('contactSubType', $contactSubType);
+  }
+
+  /**
+   * @return void
+   */
+  private function buildContactTypeSpecificFields(): void {
+    switch ($this->_contactType) {
+      case 'Individual':
+        CRM_Contact_Form_Edit_Individual::buildQuickForm($this);
+        return;
+
+      case 'Organization':
+        CRM_Contact_Form_Edit_Organization::buildQuickForm($this);
+        return;
+
+      case 'Household':
+        CRM_Contact_Form_Edit_Household::buildQuickForm($this);
+        return;
+
+      default:
+        CRM_Core_Error::deprecatedWarning('unreachable?');
+        $className = 'CRM_Contact_Form_Edit_' . $this->_contactType;
+        $className::buildQuickForm($this);
+    }
+  }
+
+  /**
+   * @param array $defaults
+   *
+   * @param string $name
+   *
+   * @return void
+   */
+  private function setBlockDefaults(array &$defaults, string $name): void {
+    if ($name === 'TagsAndGroups') {
+      CRM_Contact_Form_Edit_TagsAndGroups::setDefaultValues($this, $defaults);
+      return;
+    }
+    if ($name === 'CustomData') {
+      CRM_Core_BAO_CustomGroup::setDefaults($this->_groupTree, $defaults, FALSE, FALSE, $this->getAction());
+      return;
+    }
+    if ($name === 'CommunicationPreferences') {
+      CRM_Contact_Form_Edit_CommunicationPreferences::setDefaultValues($this, $defaults);
+      return;
+    }
+    if ($name === 'Demographics') {
+      CRM_Contact_Form_Edit_Demographics::setDefaultValues($this, $defaults);
+      return;
+    }
+    CRM_Core_Error::deprecatedWarning('unused?');
+    $className = 'CRM_Contact_Form_Edit_' . $name;
+    $className::setDefaultValues($this, $defaults);
   }
 
 }

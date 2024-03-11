@@ -13,6 +13,7 @@
     <add>civicrm/participant/add?action=add&amp;context=standalone&amp;reset=1</add>
     <view>civicrm/contact/view/participant?id=[id]&amp;cid=[contact_id]&amp;action=view&amp;reset=1</view>
     <update>civicrm/contact/view/participant?id=[id]&amp;cid=[contact_id]&amp;action=update&amp;reset=1</update>
+    <detach>civicrm/event/selfsvcupdate?reset=1&amp;pid=[id]&amp;is_backoffice=1</detach>
     <delete>civicrm/participant/delete?id=[id]&amp;reset=1</delete>
   </paths>
   <field>

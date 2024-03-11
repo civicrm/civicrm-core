@@ -14,6 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
+use Civi\Api4\Membership;
 
 /**
  * Shared parent class for recurring contribution forms.
@@ -29,6 +30,8 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
    * Contribution ID.
    *
    * @var int
+   *
+   * @internal
    */
   protected $_coid = NULL;
 
@@ -37,7 +40,7 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
    *
    * @var int
    *
-   * @internal
+   * @deprecated
    */
   protected $_crid = NULL;
 
@@ -51,16 +54,16 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
    *
    * @internal
    */
-  protected $contributionRecurID = NULL;
+  protected int $contributionRecurID;
 
   /**
    * Membership ID.
    *
-   * @var int
+   * @var int|null
    *
    * @internal
    */
-  protected $_mid;
+  protected ?int $_mid;
 
   /**
    * Payment processor object.
@@ -91,14 +94,6 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
    * @var bool
    */
   protected $selfService;
-
-  /**
-   * Used by `CRM_Contribute_Form_UpdateSubscription`
-   *
-   * @var CRM_Core_DAO
-   * @deprecated This is being set temporarily - we should eventually just use the getter fn.
-   */
-  protected $_subscriptionDetails = NULL;
 
   /**
    * Explicitly declare the entity api name.
@@ -162,7 +157,7 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
    * Set the subscription details on the form.
    */
   protected function setSubscriptionDetails() {
-    $this->subscriptionDetails = $this->_subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->getContributionRecurID());
+    $this->subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->getContributionRecurID());
   }
 
   /**
@@ -194,15 +189,17 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
    * @return int
    */
   public function getContributionRecurID(): int {
-    $id = CRM_Utils_Request::retrieve('crid', 'Integer', $this, FALSE);
-    if (!$id && $this->getContributionID()) {
-      $id = $this->getContributionValue('contribution_recur_id');
+    if (!isset($this->contributionRecurID)) {
+      $id = CRM_Utils_Request::retrieve('crid', 'Integer', $this, FALSE);
+      if (!$id && $this->getContributionID()) {
+        $id = $this->getContributionValue('contribution_recur_id');
+      }
+      if (!$id) {
+        $id = $this->getMembershipValue('contribution_recur_id');
+      }
+      $this->contributionRecurID = $this->_crid = $id;
     }
-    if (!$id) {
-      $id = $this->getMembershipValue('contribution_recur_id');
-    }
-    $this->contributionRecurID = $this->_crid = $id;
-    return (int) $id;
+    return (int) $this->contributionRecurID;
   }
 
   /**
@@ -222,15 +219,37 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
   /**
    * Get the membership ID.
    *
+   * @return int
+   * @throws \CRM_Core_Exception
+   *
    * @api This function will not change in a minor release and is supported for
    * use outside of core. This annotation / external support for properties
    * is only given where there is specific test cover.
    *
-   * @return int
    */
   protected function getMembershipID(): ?int {
-    $this->_mid = CRM_Utils_Request::retrieve('mid', 'Integer', $this, FALSE);
-    return $this->_mid ? (int) $this->_mid : NULL;
+    $membershipID = CRM_Utils_Request::retrieve('mid', 'Integer', $this);
+    if (!isset($this->contributionRecurID)) {
+      // This is being called before the contribution recur ID is set - return quickly to avoid a loop.
+      return $membershipID ? (int) $membershipID : NULL;
+    }
+    if (!isset($this->_mid)) {
+      $this->_mid = NULL;
+      if (!$this->isDefined('Membership')) {
+        $membership = Membership::get(FALSE)
+          ->addWhere('contribution_recur_id', '=', $this->getContributionRecurID())
+          ->execute()->first();
+        if ($membershipID && (!$membership || ($membership['id'] !== $membershipID))) {
+          // this feels unreachable
+          throw new CRM_Core_Exception(ts('invalid membership ID'));
+        }
+        if ($membership) {
+          $this->define('Membership', 'Membership', $membership);
+          $this->_mid = $membership['id'];
+        }
+      }
+    }
+    return $this->_mid;
   }
 
   /**

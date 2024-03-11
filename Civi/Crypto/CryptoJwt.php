@@ -11,6 +11,7 @@
 
 namespace Civi\Crypto;
 
+use Civi\Core\Service\AutoService;
 use Civi\Crypto\Exception\CryptoException;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
@@ -25,8 +26,9 @@ use Firebase\JWT\Key;
  *
  * @package Civi\Crypto
  * @see https://jwt.io/
+ * @service crypto.jwt
  */
-class CryptoJwt {
+class CryptoJwt extends AutoService {
 
   /**
    * @var \Civi\Crypto\CryptoRegistry

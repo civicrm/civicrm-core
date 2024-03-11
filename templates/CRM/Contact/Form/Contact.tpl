@@ -23,10 +23,10 @@
     {include file="CRM/common/formButtons.tpl" location="top"}
     </div>
 
-    <div class="crm-accordion-wrapper crm-contactDetails-accordion">
-      <div class="crm-accordion-header">
+    <details class="crm-accordion-bold crm-contactDetails-accordion" open>
+      <summary>
         {ts}Contact Details{/ts}
-      </div><!-- /.crm-accordion-header -->
+      </summary>
       <div class="crm-accordion-body" id="contactDetails">
         <div id="contactDetails">
           <div class="crm-section contact_basic_information-section">
@@ -73,8 +73,8 @@
           {/if}
           <div class="spacer"></div>
         </div>
-      </div><!-- /.crm-accordion-body -->
-    </div><!-- /.crm-accordion-wrapper -->
+      </div>
+    </details>
 
     {foreach from = $editOptions item = "title" key="name"}
       {if $name eq 'CustomData'}
@@ -106,15 +106,15 @@
       }
       //open tab if form rule throws error
       if ( $(this).children().find('span.crm-error').text().length > 0 ) {
-        $(this).parents('.collapsed').crmAccordionToggle();
+        $(this).parents('details').prop('open', true);
       }
     });
     if (action === 2) {
-      $('.crm-accordion-wrapper').not('.crm-accordion-wrapper .crm-accordion-wrapper').each(function() {
+      $('details').not('details details').each(function() {
         highlightTabs(this);
       });
       $('#crm-container').on('change click', '.crm-accordion-body :input, .crm-accordion-body a', function() {
-        highlightTabs($(this).parents('.crm-accordion-wrapper'));
+        highlightTabs($(this).parents('details'));
       });
     }
     function highlightTabs(tab) {
@@ -125,7 +125,7 @@
             case 'checkbox':
             case 'radio':
               if($(this).is(':checked') && !$(this).is('[id$=IsPrimary],[id$=IsBilling]')) {
-                $('.crm-accordion-header:first', tab).addClass('active');
+                $('summary:first', tab).addClass('active');
                 return false;
               }
               break;
@@ -133,7 +133,7 @@
             case 'text':
             case 'textarea':
               if($(this).val()) {
-                $('.crm-accordion-header:first', tab).addClass('active');
+                $('summary:first', tab).addClass('active');
                 return false;
               }
               break;
@@ -141,19 +141,19 @@
             case 'select-one':
             case 'select-multiple':
               if($(this).val() && $('option[value=""]', this).length > 0) {
-                $('.crm-accordion-header:first', tab).addClass('active');
+                $('summary:first', tab).addClass('active');
                 return false;
               }
               break;
 
             case 'file':
               if($(this).next().html()) {
-                $('.crm-accordion-header:first', tab).addClass('active');
+                $('summary:first', tab).addClass('active');
                 return false;
               }
               break;
           }
-          $('.crm-accordion-header:first', tab).removeClass('active');
+          $('summary:first', tab).removeClass('active');
       });
     }
 
@@ -161,11 +161,11 @@
       if( $(this).attr('href') == '#expand') {
         var message = {/literal}"{ts escape='js'}Collapse all tabs{/ts}"{literal};
         $(this).attr('href', '#collapse');
-        $('.crm-accordion-wrapper.collapsed').crmAccordionToggle();
+        $('.crm-form-block details').prop('open', true);
       }
       else {
         var message = {/literal}"{ts escape='js'}Expand all tabs{/ts}"{literal};
-        $('.crm-accordion-wrapper:not(.collapsed)').crmAccordionToggle();
+        $('.crm-form-block details').prop('open', false);
         $(this).attr('href', '#expand');
       }
       $(this).html(message);
@@ -244,14 +244,7 @@
     {/literal}{* Ajax check for matching contacts *}
     {if $checkSimilar == 1}
     var contactType = {$contactType|@json_encode},
-      rules = {*$ruleFields|@json_encode*}{literal}[
-        'first_name',
-        'last_name',
-        'nick_name',
-        'household_name',
-        'organization_name',
-        'email'
-      ],
+      rules = {$ruleFields}{literal},
       ruleFields = {},
       $ruleElements = $(),
       matchMessage,

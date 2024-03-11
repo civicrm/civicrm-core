@@ -13,22 +13,19 @@
     {assign var=tableID value=$cd_edit.table_id}
     {assign var=divName value=$group_id|cat:"_$tableID"}
     <div></div>
-    <div
-     class="crm-accordion-wrapper crm-custom-accordion {if $cd_edit.collapse_display and !$skipTitle}collapsed{/if}">
+    <details class="crm-accordion-bold crm-custom-accordion" {if $cd_edit.collapse_display and !$skipTitle}{else}open{/if}>
   {else}
-    <div id="{$cd_edit.name}"
-       class="crm-accordion-wrapper crm-custom-accordion {if $cd_edit.collapse_display}collapsed{/if}">
+    <details id="{$cd_edit.name}" class="crm-accordion-bold crm-custom-accordion" {if $cd_edit.collapse_display}{else}open{/if}>
   {/if}
-    <div class="crm-accordion-header">
+    <summary>
       {$cd_edit.title}
-    </div>
+    </summary>
     <div id="customData{$group_id}" class="crm-accordion-body">
       {include file="CRM/Custom/Form/Edit/CustomData.tpl" customDataEntity=''}
       {include file="CRM/Form/attachmentjs.tpl"}
     </div>
     <!-- crm-accordion-body-->
-  </div>
-  <!-- crm-accordion-wrapper -->
+  </details>
   <div id="custom_group_{$group_id}_{$cgCount}"></div>
   {/foreach}
 

@@ -14,14 +14,14 @@
     <url desc="Issues">https://lab.civicrm.org/dev/core/-/issues</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
-  <releaseDate>2024-02-08</releaseDate>
-  <version>5.72.alpha1</version>
+  <releaseDate>2024-03-06</releaseDate>
+  <version>5.73.alpha1</version>
   <develStage>stable</develStage>
   <tags>
     <tag>mgmt:required</tag>
   </tags>
   <compatibility>
-    <ver>5.72</ver>
+    <ver>5.73</ver>
   </compatibility>
   <comments>AuthX enables remote applications to connect to CiviCRM. Use it to enable and disable different forms of authentication (such as username-password, API key, and/or JWT).</comments>
   <classloader>

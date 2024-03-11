@@ -1196,8 +1196,8 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
    * @param bool $inactiveNeeded
    * @param int $action
    */
-  public static function setDefaults(&$groupTree, &$defaults, $viewMode = FALSE, $inactiveNeeded = FALSE, $action = CRM_Core_Action::NONE) {
-    foreach ($groupTree as $id => $group) {
+  public static function setDefaults($groupTree, &$defaults, $viewMode = FALSE, $inactiveNeeded = FALSE, $action = CRM_Core_Action::NONE) {
+    foreach ($groupTree as $group) {
       if (!isset($group['fields'])) {
         continue;
       }
@@ -1343,7 +1343,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
   }
 
   /**
-   * @deprecated function only called from one place...
+   * @deprecated since 5.71 will be remvoed around 5.77
    * @see CRM_Dedupe_Finder::formatParams
    *
    * @param array $groupTree
@@ -1351,6 +1351,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
    * @param bool $skipFile
    */
   public static function postProcess(&$groupTree, &$params, $skipFile = FALSE) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     // Get the Custom form values and groupTree
     foreach ($groupTree as $groupID => $group) {
       if ($groupID === 'info') {

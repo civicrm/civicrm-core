@@ -140,8 +140,10 @@ class SetupController implements SetupControllerInterface {
 
     global $civicrm_paths;
     foreach ($model->paths as $pathVar => $pathValues) {
-      foreach (['url', 'path'] as $aspectName => $aspectValue) {
-        $civicrm_paths[$pathVar][$aspectName] = $aspectValue;
+      foreach ($pathValues as $aspectName => $aspectValue) {
+        if (in_array($aspectName, ['url', 'path'])) {
+          $civicrm_paths[$pathVar][$aspectName] = $aspectValue;
+        }
       }
     }
 
