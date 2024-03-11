@@ -139,7 +139,7 @@
               </tr>
               {/if}
               <tr>
-                <td colspan="2">{include file="CRM/common/customDataBlock.tpl"}</td>
+                <td colspan="2">{include file="CRM/common/customDataBlock.tpl" groupID='' customDataType='Activity'}</td>
               </tr>
               {if NOT $activityTypeFile}
                 <tr class="crm-case-activity-form-block-details">

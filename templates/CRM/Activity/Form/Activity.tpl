@@ -173,7 +173,7 @@
       {if $action eq 4}
         {include file="CRM/Custom/Page/CustomDataView.tpl"}
       {else}
-        {include file="CRM/common/customDataBlock.tpl"}
+        {include file="CRM/common/customDataBlock.tpl" groupID='' customDataType='Activity'}
       {/if}
     </td>
   </tr>
