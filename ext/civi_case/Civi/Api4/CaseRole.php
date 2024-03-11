@@ -11,17 +11,21 @@
 namespace Civi\Api4;
 
 /**
- * RelationshipCache - readonly table to facilitate joining and finding contacts by relationship.
+ * CaseRoleCache - API wrapper on Relationship entity to facilitate joining and finding contacts with a role on a case
  *
  * @searchable secondary
- * @searchFields near_contact_id.sort_name,near_relation:label,far_contact_id.sort_name
+ * @searchFields contact_a_id.sort_name,relationship_type_id:label,case_id.subject
  * @see \Civi\Api4\Relationship
- * @ui_join_filters near_relation
- * @since 5.29
+ * @ui_join_filters relationship_type_id,is_active
+ * @since 5.72
  * @package Civi\Api4
  */
-class RelationshipCache extends Generic\AbstractEntity {
+class CaseRole extends Generic\AbstractEntity {
   use Generic\Traits\EntityBridge;
+
+  protected static function getEntityTitle(bool $plural = FALSE): string {
+    return $plural ? ts('Case Roles') : ts('Case Role');
+  }
 
   /**
    * @param bool $checkPermissions
@@ -42,34 +46,23 @@ class RelationshipCache extends Generic\AbstractEntity {
   }
 
   /**
-   * @param bool $checkPermissions
-   * @return Action\RelationshipCache\Rebuild
-   */
-  public static function rebuild($checkPermissions = TRUE) {
-    return (new Action\RelationshipCache\Rebuild(__CLASS__, __FUNCTION__))
-      ->setCheckPermissions($checkPermissions);
-  }
-
-  /**
    * @return array
    */
   public static function getInfo() {
     $info = parent::getInfo();
-    $info['bridge_title'] = ts('Relationship');
+    $info['bridge_title'] = ts('Case Roles');
     $info['bridge'] = [
-      'near_contact_id' => [
-        'to' => 'far_contact_id',
-        'label' => ts('Related Contacts'),
-        'description' => ts('One or more related contacts'),
+      'contact_id_b' => [
+        'to' => 'case_id',
+        'label' => ts('Contact Roles'),
+        'description' => ts('Contacts with a role in the this case'),
       ],
     ];
-    if (\CRM_Core_Component::isEnabled('CiviCase')) {
-      $info['bridge']['case_id'] = [
-        'to' => 'far_contact_id',
-        'label' => ts('Case Roles Cache (deprecated)'),
-        'description' => ts('Cases in which this contact has a role'),
-      ];
-    }
+    $info['bridge']['case_id'] = [
+      'to' => 'contact_id_b',
+      'label' => ts('Case Roles'),
+      'description' => ts('Cases in which this contact has a role'),
+    ];
     return $info;
   }
 
