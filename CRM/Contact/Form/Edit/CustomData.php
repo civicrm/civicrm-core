@@ -16,7 +16,9 @@
  */
 
 /**
- * Form helper class for an Demographics object.
+ * Form helper class for an Demographics object (ahem).
+ *
+ * @deprecated since 5.73 will be removed around 5.85
  */
 class CRM_Contact_Form_Edit_CustomData {
 
