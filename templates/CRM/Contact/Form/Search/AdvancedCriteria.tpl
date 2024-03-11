@@ -95,16 +95,16 @@ CRM.$(function($) {
       {include file="CRM/Contact/Form/Search/Criteria/DisplaySettings.tpl"}
     </div>
   </details>
-  <details class="crm-accordion-wrapper crm-search_criteria_basic-accordion" open>
-    <summary class="crm-accordion-header">
+  <details class="crm-accordion-bold crm-search_criteria_basic-accordion" open>
+    <summary>
       {ts}Search Settings{/ts}
     </summary>
     <div class="crm-accordion-body">
       {include file="CRM/Contact/Form/Search/Criteria/SearchSettings.tpl"}
     </div>
   </details>
-  <details class="crm-accordion-wrapper crm-search_criteria_basic-accordion" open>
-    <summary class="crm-accordion-header">
+  <details class="crm-accordion-bold crm-search_criteria_basic-accordion" open>
+    <summary>
       {ts}Basic Criteria{/ts}
     </summary>
     <div class="crm-accordion-body">
@@ -112,8 +112,8 @@ CRM.$(function($) {
     </div>
   </details>
   {foreach from=$allPanes key=paneName item=paneValue}
-    <details class="crm-accordion-wrapper crm-ajax-accordion crm-{$paneValue.id}-accordion {if $paneValue.open eq 'true' || array_key_exists($paneName, $openedPanes)} {else}collapsed{/if}">
-      <summary class="crm-accordion-header" id="{$paneValue.id}">
+    <details class="crm-accordion-bold crm-ajax-accordion crm-{$paneValue.id}-accordion {if $paneValue.open eq 'true' || array_key_exists($paneName, $openedPanes)} {else}collapsed{/if}">
+      <summary id="{$paneValue.id}">
         {$paneName}
       </summary>
     <div class="crm-accordion-body {$paneValue.id}"></div>
