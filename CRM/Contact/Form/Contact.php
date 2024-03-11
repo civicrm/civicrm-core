@@ -328,7 +328,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
           $this->set('groupID', $groupID);
           //loop the group
           for ($i = 1; $i <= $groupCount; $i++) {
-            $this->legacyPreProcessCustomData(NULL, $contactSubType,
+            $this->legacyPreProcessCustomData($contactSubType,
               $i, $this->_contactType, $this->_contactId, NULL, FALSE
             );
             CRM_Contact_Form_Edit_CustomData::buildQuickForm($this);
@@ -352,23 +352,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         $paramSubType = (isset($paramSubType)) ? $paramSubType :
           str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',', trim($this->_contactSubType, CRM_Core_DAO::VALUE_SEPARATOR));
       }
-
-      if (CRM_Utils_Request::retrieve('type', 'String')) {
-        $this->preProcessCustomData();
-      }
-      else {
-        // The reason we call this here is that it sets the _groupTree property which is later used
-        // in setDefaultValues and buildForm. (Ideally instead we would have a trait with getCustomGroup & getCustomFields
-        // that can be called at appropriate times). In order for buildForm to add the right fields it needs
-        // to know any contact sub types that are being added in the submission. Since this runs before
-        // the buildForm adds the contact_sub_type to the form we need to look in _submitValues for it - submitValues
-        // is a un-sanitised version of what is in the form submission (_POST) whereas `getSubmittedValues()` retrieves
-        // 'allowed' POSTED values - ie values which match available fields, with some localization handling.
-        $this->legacyPreProcessCustomData(NULL, $this->isSubmitted() ? ($this->_submitValues['contact_sub_type'] ?? []) : $this->getContactValue('contact_sub_type') ?? $this->_contactSubType,
-          1, $this->_contactType, $this->getContactID()
-        );
-        $this->assign('customValueCount', $this->_customValueCount);
-      }
+      $this->preProcessCustomData();
     }
     $this->assign('paramSubType', $paramSubType ?? '');
   }
@@ -396,9 +380,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   }
 
   /**
-   * @param null|string $extendsEntityColumn
-   *   Additional filter on the type of custom data to retrieve - e.g for
-   *   participant data this could be a value representing role.
    * @param null|string $subType
    * @param null|int $groupCount
    * @param null $type
@@ -417,82 +398,75 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * 3) pass getSubmittedValues() to CRM_Core_BAO_CustomField::postProcess($this->getSubmittedValues(), $this->_id, 'FinancialAccount');
    *  to ensure any money or number fields are handled for localisation
    */
-  private function legacyPreProcessCustomData(
-    $extendsEntityColumn = NULL, $subType = NULL,
+  private function legacyPreProcessCustomData($subType = NULL,
     $groupCount = NULL, $type = NULL, $entityID = NULL, $onlySubType = NULL, $isLoadFromCache = TRUE
   ) {
-    $form = $this;
     if (!$type) {
       CRM_Core_Error::deprecatedWarning('type should be passed in');
-      $type = CRM_Utils_Request::retrieve('type', 'String', $form);
+      $type = CRM_Utils_Request::retrieve('type', 'String', $this);
     }
 
     if (!isset($subType)) {
-      $subType = CRM_Utils_Request::retrieve('subType', 'String', $form);
+      $subType = CRM_Utils_Request::retrieve('subType', 'String', $this);
     }
     if ($subType === 'null') {
       // Is this reachable?
       $subType = NULL;
     }
-    $extendsEntityColumn = $extendsEntityColumn ?: CRM_Utils_Request::retrieve('subName', 'String', $form);
-    if ($extendsEntityColumn === 'null') {
-      // Is this reachable?
-      $extendsEntityColumn = NULL;
-    }
 
     if ($groupCount) {
-      $form->_groupCount = $groupCount;
+      $this->_groupCount = $groupCount;
     }
     else {
-      $form->_groupCount = CRM_Utils_Request::retrieve('cgcount', 'Positive', $form);
+      $this->_groupCount = CRM_Utils_Request::retrieve('cgcount', 'Positive', $this);
     }
 
-    $form->assign('cgCount', $form->_groupCount);
+    $this->assign('cgCount', $this->_groupCount);
 
     //carry qf key, since this form is not inhereting core form.
     if ($qfKey = CRM_Utils_Request::retrieve('qfKey', 'String')) {
-      $form->assign('qfKey', $qfKey);
+      $this->assign('qfKey', $qfKey);
     }
 
     if ($entityID) {
-      $form->_entityId = $entityID;
+      $this->_entityId = $entityID;
     }
     else {
-      $form->_entityId = CRM_Utils_Request::retrieve('entityID', 'Positive', $form);
+      $this->_entityId = CRM_Utils_Request::retrieve('entityID', 'Positive', $this);
     }
 
     $typeCheck = CRM_Utils_Request::retrieve('type', 'String');
     $urlGroupId = CRM_Utils_Request::retrieve('groupID', 'Positive');
     if (isset($typeCheck) && $urlGroupId) {
-      $form->_groupID = $urlGroupId;
+      $this->_groupID = $urlGroupId;
     }
     else {
-      $form->_groupID = CRM_Utils_Request::retrieve('groupID', 'Positive', $form);
+      $this->_groupID = CRM_Utils_Request::retrieve('groupID', 'Positive', $this);
     }
 
-    $gid = (isset($form->_groupID)) ? $form->_groupID : NULL;
+    $gid = (isset($this->_groupID)) ? $this->_groupID : NULL;
     if (!is_array($subType) && str_contains(($subType ?? ''), CRM_Core_DAO::VALUE_SEPARATOR)) {
       CRM_Core_Error::deprecatedWarning('Using a CRM_Core_DAO::VALUE_SEPARATOR separated subType deprecated, use a comma-separated string instead.');
       $subType = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',', trim($subType, CRM_Core_DAO::VALUE_SEPARATOR));
     }
 
     $singleRecord = NULL;
-    if (!empty($form->_groupCount) && !empty($form->_multiRecordDisplay) && $form->_multiRecordDisplay == 'single') {
-      $singleRecord = $form->_groupCount;
+    if (!empty($this->_groupCount) && !empty($this->_multiRecordDisplay) && $this->_multiRecordDisplay == 'single') {
+      $singleRecord = $this->_groupCount;
     }
-    $mode = CRM_Utils_Request::retrieve('mode', 'String', $form);
+    $mode = CRM_Utils_Request::retrieve('mode', 'String', $this);
     // when a new record is being added for multivalued custom fields.
-    if (isset($form->_groupCount) && $form->_groupCount == 0 && $mode == 'add' &&
-      !empty($form->_multiRecordDisplay) && $form->_multiRecordDisplay == 'single') {
+    if (isset($this->_groupCount) && $this->_groupCount == 0 && $mode == 'add' &&
+      !empty($this->_multiRecordDisplay) && $this->_multiRecordDisplay == 'single') {
       $singleRecord = 'new';
     }
 
     $groupTree = CRM_Core_BAO_CustomGroup::getTree($type,
       NULL,
-      $form->_entityId,
+      $this->_entityId,
       $gid,
       $subType,
-      $extendsEntityColumn,
+      NULL,
       $isLoadFromCache,
       $onlySubType,
       FALSE,
@@ -500,20 +474,20 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       $singleRecord
     );
 
-    if (property_exists($form, '_customValueCount') && !empty($groupTree)) {
-      $form->_customValueCount = CRM_Core_BAO_CustomGroup::buildCustomDataView($form, $groupTree, TRUE, NULL, NULL, NULL, $form->_entityId);
+    if (property_exists($this, '_customValueCount') && !empty($groupTree)) {
+      $this->_customValueCount = CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, TRUE, NULL, NULL, NULL, $this->_entityId);
     }
     // we should use simplified formatted groupTree
-    $groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, $form->_groupCount, $form);
+    $groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, $this->_groupCount, $this);
 
-    if (isset($form->_groupTree) && is_array($form->_groupTree)) {
+    if (isset($this->_groupTree) && is_array($this->_groupTree)) {
       $keys = array_keys($groupTree);
       foreach ($keys as $key) {
-        $form->_groupTree[$key] = $groupTree[$key];
+        $this->_groupTree[$key] = $groupTree[$key];
       }
     }
     else {
-      $form->_groupTree = $groupTree;
+      $this->_groupTree = $groupTree;
     }
   }
 
@@ -524,18 +498,35 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    */
   private function preProcessCustomData(): void {
     $customDataType = CRM_Utils_Request::retrieve('type', 'String');
-
+    // if customDataType is present it implies it is a new contact - ie
+    // the person has selected 'New Individual' and the type 'Individual' is in the url.
     if ($customDataType) {
       $this->assign('addBlock', TRUE);
       $this->assign('blockName', 'CustomData');
     }
-
-    $this->legacyPreProcessCustomData(NULL, NULL, NULL,
-      $customDataType ?: $this->_contactType
+    // We should probably fold this into the function in the build quick form process.
+    // There is no particular reason to call it in preProcess & it logically
+    // belongs with the buildQuickForm code.
+    // The comments below this line are historical.
+    // The reason we call this here is that it sets the _groupTree property which is later used
+    // in setDefaultValues and buildForm. (Ideally instead we would have a trait with getCustomGroup & getCustomFields
+    // that can be called at appropriate times). In order for buildForm to add the right fields it needs
+    // to know any contact sub types that are being added in the submission. Since this runs before
+    // the buildForm adds the contact_sub_type to the form we need to look in _submitValues for it - submitValues
+    // is a un-sanitised version of what is in the form submission (_POST) whereas `getSubmittedValues()` retrieves
+    // 'allowed' POSTED values - ie values which match available fields, with some localization handling.
+    // @todo - it's probably that there is no reason to pass NULl vs 1 for groupCount below.
+    $this->legacyPreProcessCustomData($this->isSubmitted() ? ($this->_submitValues['contact_sub_type'] ?? []) : $this->getContactValue('contact_sub_type') ?? $this->_contactSubType,
+      $customDataType ? NULL : 1, $customDataType ?: $this->_contactType, $this->getContactID()
     );
-
-    //assign group tree after build.
-    $this->assign('groupTree', $this->_groupTree);
+    if (!$customDataType) {
+      // Probably this does not need to be wrapped in an IF.
+      $this->assign('customValueCount', $this->_customValueCount);
+    }
+    if ($customDataType) {
+      // Not too sure why this makes sense for new contacts only.
+      $this->assign('groupTree', $this->_groupTree);
+    }
   }
 
   /**
