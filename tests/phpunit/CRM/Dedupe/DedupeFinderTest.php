@@ -80,6 +80,60 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test the ability of the Dedupe Query Optimizer to join queries appropriately.
+   *
+   * @return void
+   */
+  public function testFinderQueryOptimizer(): void {
+    // Note that in this format the number at the end is the weight.
+    $queries = [
+      'civicrm_email.email.16' => 'c',
+      'civicrm_contact.first_name.7' => 'c',
+      'civicrm_phone.phone.5' => 'd',
+      'civicrm_contact.nick_name.5' => 'b',
+      'civicrm_address.street_address.4' => 'a',
+      'civicrm_address.city.3' => 'd',
+    ];
+    $optimizer = new CRM_Dedupe_FinderQueryOptimizer($queries, 16);
+    $combinations = $optimizer->getValidCombinations();
+    // There are 5 possible combinations that add up to 16.
+    // 1 combo with civicrm_email.x.16 (because we don't need to do any more)
+    // 3 with civicrm_contact.x.7 and 1 with all the fields excluding those 2.
+    $this->assertCount(5, $combinations);
+    // There are no opportunities to combine fields here
+    // as each field can be combined in multiple ways.
+    $this->assertCount(0, $optimizer->getCombinableQueries());
+
+    $queries = [
+      'civicrm_contact.first_name.8' => 'd',
+      'civicrm_contact.last_name.7' => 'c',
+      'civicrm_contact.nick_name.5' => 'b',
+      'civicrm_address.street_address.5' => 'a',
+    ];
+    $optimizer = new CRM_Dedupe_FinderQueryOptimizer($queries, 20);
+    // we can get there with first+last+nick name or first+last + street_address
+    $this->assertCount(2, $optimizer->getValidCombinations());
+    // We can combine the first & last name queries because they are
+    // always both required.
+    $this->assertCount(1, $optimizer->getCombinableQueries());
+
+    $queries = [
+      'civicrm_contact.first_name.8' => 'd',
+      'civicrm_contact.last_name.7' => 'c',
+      'civicrm_contact.nick_name.3' => 'b',
+      'civicrm_address.street_address.2' => 'a',
+      'civicrm_address.city.2' => 'a',
+    ];
+    $optimizer = new CRM_Dedupe_FinderQueryOptimizer($queries, 20);
+    // we can get there with first+last+nick name+street  or first+last+nick + city
+    $this->assertCount(2, $optimizer->getValidCombinations());
+    // We can combine the first & last name + nick name queries because they are
+    // always both required. Even though we can also combine first+last
+    // this should not be returned as it is a subset.
+    $this->assertCount(1, $optimizer->getCombinableQueries());
+  }
+
+  /**
    * Test that a rule set to is_reserved = 0 works.
    *
    * There is a different search used dependent on this variable.
