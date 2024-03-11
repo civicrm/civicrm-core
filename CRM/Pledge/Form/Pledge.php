@@ -114,7 +114,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       $this->assign('is_test', TRUE);
     }
 
-    if ($this->_id) {
+    if ($this->getPledgeID()) {
       // check is this pledge pending.
       // fix the display of the monetary value, CRM-4038.
       if ($this->_isPending) {
@@ -417,7 +417,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
    */
   public function postProcess(): void {
     if ($this->_action & CRM_Core_Action::DELETE) {
-      CRM_Pledge_BAO_Pledge::deletePledge($this->_id);
+      CRM_Pledge_BAO_Pledge::deletePledge($this->getPledgeID());
       return;
     }
 
@@ -454,7 +454,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
 
     $dates = ['create_date', 'start_date', 'acknowledge_date', 'cancel_date'];
     foreach ($dates as $d) {
-      if ($this->_id && (!$this->_isPending) && !empty($this->_values[$d])) {
+      if ($this->getPledgeID() && (!$this->_isPending) && !empty($this->_values[$d])) {
         if ($d === 'start_date') {
           $params['scheduled_date'] = CRM_Utils_Date::processDate($this->_values[$d]);
         }
@@ -477,7 +477,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
 
     // assign id only in update mode
     if ($this->_action & CRM_Core_Action::UPDATE) {
-      $params['id'] = $this->_id;
+      $params['id'] = $this->getPledgeID();
     }
 
     $params['contact_id'] = $this->_contactID;
