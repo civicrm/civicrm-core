@@ -331,7 +331,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
             $this->legacyPreProcessCustomData($contactSubType,
               $i, $this->_contactType, $this->_contactId, NULL, FALSE
             );
-            CRM_Contact_Form_Edit_CustomData::buildQuickForm($this);
+            $this->buildCustomData();
           }
         }
       }
@@ -1675,7 +1675,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       return;
     }
     if ($name === 'CustomData') {
-      CRM_Contact_Form_Edit_CustomData::buildQuickForm($this);
+      $this->buildCustomData();
       return;
     }
     if ($name === 'CommunicationPreferences') {
@@ -1696,6 +1696,36 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     // and any extensions doing magic are buyer-beware.
     $className = 'CRM_Contact_Form_Edit_' . $name;
     $className::buildQuickForm($this);
+  }
+
+  /**
+   * Build the form object elements for CustomData object.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function buildCustomData(): void {
+    $customValueCount = $this->_submitValues['hidden_custom_group_count'] ?? NULL;
+    if (is_array($customValueCount)) {
+      if (array_key_exists(0, $customValueCount)) {
+        unset($customValueCount[0]);
+      }
+      $this->_customValueCount = $customValueCount;
+      $this->assign('customValueCount', $customValueCount);
+    }
+
+    $this->addElement('hidden', 'hidden_custom', 1);
+    $this->addElement('hidden', "hidden_custom_group_count[{$this->_groupID}]", $this->_groupCount);
+    CRM_Core_BAO_CustomGroup::buildQuickForm($this, $this->_groupTree);
+
+    //build custom data.
+    if (!empty($_POST["hidden_custom"]) && !empty($_POST['contact_sub_type'])) {
+      $contactSubType = $_POST['contact_sub_type'];
+    }
+    else {
+      $contactSubType = $this->_values['contact_sub_type'] ?? NULL;
+    }
+    $this->assign('contactType', $this->_contactType);
+    $this->assign('contactSubType', $contactSubType);
   }
 
   /**

@@ -46,10 +46,13 @@ class CRM_Contact_Form_Edit_CustomData {
   /**
    * Build the form object elements for CustomData object.
    *
+   * @deprecated since 5.73 will be removed around 5.85
+   *
    * @param CRM_Core_Form $form
    *   Reference to the form object.
    */
   public static function buildQuickForm(&$form) {
+    CRM_Core_Error::deprecatedFunctionWarning('take a copy?');
     $customValueCount = $form->_submitValues['hidden_custom_group_count'] ?? NULL;
     if (is_array($customValueCount)) {
       if (array_key_exists(0, $customValueCount)) {
