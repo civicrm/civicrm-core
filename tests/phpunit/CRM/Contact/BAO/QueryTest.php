@@ -387,6 +387,104 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     }
   }
 
+  public function testSearchProfileWithPhone() {
+    $ufGroupID = $this->callAPISuccess('UFGroup', 'create', [
+      'group_type' => 'Individual,Contact',
+      'title' => 'Test Search Profile',
+      'name' => 'test_search_profile',
+    ])['id'];
+    $this->callAPISuccess('UFField', 'create', [
+      'uf_group_id' => $ufGroupID,
+      'field_name' => 'first_name',
+      'is_required' => FALSE,
+      'visibility' => 'Public Pages and Listings',
+      'label' => 'First Name',
+      'field_type' => 'Individual',
+    ]);
+    $this->callAPISuccess('UFField', 'create', [
+      'uf_group_id' => $ufGroupID,
+      'field_name' => 'last_name',
+      'is_required' => FALSE,
+      'visibility' => 'Public Pages and Listings',
+      'label' => 'Last Name',
+      'field_type' => 'Individual',
+    ]);
+    $this->callAPISuccess('UFField', 'create', [
+      'uf_group_id' => $ufGroupID,
+      'field_name' => 'phone',
+      'is_required' => FALSE,
+      'visibility' => 'Public Pages and Listings',
+      'location_type_id' => 1,
+      'phone_type_id' => 1,
+      'label' => 'Phone-Phone (Primary)',
+      'field_type' => 'Contact',
+    ]);
+    $this->callAPISuccess('UFField', 'create', [
+      'uf_group_id' => $ufGroupID,
+      'field_name' => 'city',
+      'is_required' => FALSE,
+      'visibility' => 'Public Pages and Listings',
+      'in_selector' => 1,
+      'label' => 'City (Primary)',
+      'field_type' => 'Contact',
+    ]);
+
+    Civi::settings()->set('defaultSearchProfileID', $ufGroupID);
+    $params = array(
+      0 => array(
+        0 => 'entryURL',
+        1 => '=',
+        2 => 'http://dmaster.brienne/civicrm/contact/search/advanced?reset=1',
+        3 => 0,
+        4 => 0,
+      ),
+      1 => array(
+        0 => 'group_search_selected',
+        1 => '=',
+        2 => 'group',
+        3 => 0,
+        4 => 0,
+      ),
+      2 => array(
+        0 => 'privacy_operator',
+        1 => '=',
+        2 => 'OR',
+        3 => 0,
+        4 => 0,
+      ),
+      3 => array(
+        0 => 'privacy_toggle',
+        1 => '=',
+        2 => '1',
+        3 => 0,
+        4 => 0,
+      ),
+      4 => array(
+        0 => 'phone_numeric',
+        1 => '=',
+        2 => '301',
+        3 => 0,
+        4 => 0,
+      ),
+    );
+    $returnProperties = array(
+      'first_name' => 1,
+      'last_name' => 1,
+      'location' => array(
+        1 => array(
+          'location_type' => 'Primary',
+          'phone-1' => 1,
+          'city' => 1,
+        ),
+      ),
+      'contact_type' => 1,
+      'contact_sub_type' => 1,
+      'sort_name' => 1,
+    );
+    $queryObj = new CRM_Contact_BAO_Query($params, $returnProperties, NULL, FALSE, FALSE, 1, FALSE, TRUE, FALSE, "");
+    $queryObj->alphabetQuery();
+  }
+
   /**
    * Check that we get a successful result querying for home address.
    * CRM-14263 search builder failure with search profile & address in criteria
