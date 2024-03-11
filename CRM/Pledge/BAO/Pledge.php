@@ -289,9 +289,9 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    * @param string $startDate
    * @param string $endDate
    *
-   * @return array|null
+   * @return array
    */
-  public static function getTotalAmountAndCount($status = NULL, $startDate = NULL, $endDate = NULL) {
+  public static function getTotalAmountAndCount($status = NULL, $startDate = NULL, $endDate = NULL): array {
     $where = [];
     $select = $from = $queryDate = NULL;
     $statusId = CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'status_id', $status);
@@ -411,7 +411,12 @@ GROUP BY  currency
     else {
       return $pledge_amount;
     }
-    return NULL;
+    return [
+      'purl' => '',
+      'pledge_count' => 0,
+      'received_count' => 0,
+      'url' => '',
+    ];
   }
 
   /**
