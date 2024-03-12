@@ -20,6 +20,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   use CRM_Contact_Form_ContactFormTrait;
   use CRM_Contribute_Form_ContributeFormTrait;
   use CRM_Financial_Form_PaymentProcessorFormTrait;
+  use CRM_Custom_Form_CustomDataTrait;
 
   /**
    * The id of the contribution that we are processing.
@@ -302,9 +303,15 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
     $this->assign('is_template', $this->_values['is_template']);
 
-    // when custom data is included in this page
-    if (!empty($_POST['hidden_custom'])) {
-      $this->applyCustomData('Contribution', $this->getFinancialTypeID(), $this->_id);
+    if ($this->isSubmitted()) {
+      // The custom data fields are added to the form by an ajax form.
+      // However, if they are not present in the element index they will
+      // not be available from `$this->getSubmittedValue()` in post process.
+      // We do not have to set defaults or otherwise render - just add to the element index.
+      $this->addCustomDataFieldsToForm('Contribution', array_filter([
+        'id' => $this->getContributionID(),
+        'financial_type_id' => $this->getFinancialTypeID(),
+      ]));
     }
 
     $this->_lineItems = [];
@@ -687,8 +694,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $this->applyFilter('__ALL__', 'trim');
 
-    //need to assign custom data type and subtype to the template
-    $this->assign('customDataType', 'Contribution');
+    //need to assign custom data subtype to the template for initial custom data load
     $this->assign('customDataSubType', $this->getFinancialTypeID());
     $this->assign('entityID', $this->getContributionID());
     $this->assign('email', $this->getContactValue('email_primary.email'));

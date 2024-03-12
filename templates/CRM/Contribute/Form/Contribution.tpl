@@ -316,9 +316,8 @@
     <!-- end of PCP -->
 
     {if !$payNow}
-      {include file="CRM/common/customDataBlock.tpl" cid=$contactId}
+      {include file="CRM/common/customDataBlock.tpl" groupID='' customDataType='Contribution' cid=$contactId}
     {/if}
-
     {literal}
       <script type="text/javascript">
         CRM.$(function($) {

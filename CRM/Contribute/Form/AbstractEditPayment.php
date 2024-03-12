@@ -358,22 +358,6 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
   }
 
   /**
-   * @param string $type
-   *   Eg 'Contribution'.
-   * @param string $subType
-   * @param int $entityId
-   */
-  public function applyCustomData($type, $subType, $entityId) {
-    $this->set('type', $type);
-    $this->set('subType', $subType);
-    $this->set('entityId', $entityId);
-
-    CRM_Custom_Form_CustomData::preProcess($this, NULL, $subType, 1, $type, $entityId);
-    CRM_Custom_Form_CustomData::buildQuickForm($this);
-    CRM_Custom_Form_CustomData::setDefaultValues($this);
-  }
-
-  /**
    * @return array
    *   Array of valid processors. The array resembles the DB table but also has 'object' as a key
    * @throws Exception
