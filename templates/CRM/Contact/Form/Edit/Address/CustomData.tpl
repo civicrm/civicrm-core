@@ -15,7 +15,7 @@
             {$cd_edit.title}
         </summary>
         <div class="crm-accordion-body">
-        {include file="CRM/Custom/Form/Edit/CustomData.tpl" customDataEntity='address'}
+        {include file="CRM/Custom/Form/Edit/CustomData.tpl" customDataEntity='address' isSingleRecordEdit=false prefix=''}
         </div><!-- crm-accordion-body-->
     </details>
 
