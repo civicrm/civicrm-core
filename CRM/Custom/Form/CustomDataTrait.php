@@ -36,6 +36,10 @@ trait CRM_Custom_Form_CustomDataTrait {
    * and only fields that have been registered make it through to the values
    * available in `$form->getSubmittedValues()`.
    *
+   * @internal this is not supported for use outside of core and there is no guarantee the
+   * function signature or behaviour won't change. It you use if from outside core
+   * be sure to use unit tests in your non-core use.
+   *
    * @param string $entity
    * @param array $filters
    *   Filters is only needed for entities where CustomDataGroups may be filtered.
@@ -46,7 +50,7 @@ trait CRM_Custom_Form_CustomDataTrait {
    * @throws \CRM_Core_Exception
    */
   protected function addCustomDataFieldsToForm(string $entity, array $filters = []): void {
-    $fields = civicrm_api4($entity, 'getFields', [
+    $fields = (array) civicrm_api4($entity, 'getFields', [
       'action' => 'create',
       'values' => $filters,
       'where' => [
@@ -56,52 +60,88 @@ trait CRM_Custom_Form_CustomDataTrait {
       'checkPermissions' => TRUE,
     ])->indexBy('custom_field_id');
 
-    $customGroupSuffixes = [];
-    foreach ($fields as $field) {
-      // This default suffix indicates the contact has no existing row in the table.
-      // It will be overridden below with the id of any row the contact DOES have in the table.
-      $customGroupSuffixes[$field['table_name']] = '_-1';
-    }
-    if (!empty($filters['id'])) {
-      $query = [];
-      foreach (array_keys($customGroupSuffixes) as $tableName) {
-        $query[] = CRM_Core_DAO::composeQuery(
-          'SELECT %1 as table_name, id FROM %2 WHERE entity_id = %3',
-          [
-            1 => [$tableName, 'String'],
-            2 => [$tableName, 'MysqlColumnNameOrAlias'],
-            3 => [$filters['id'], 'Integer'],
-          ]
-        );
+    if ($entity === 'Contact') {
+      // Ideally this would not be contact specific but the function being
+      // called here does not handle the filters as received.
+      $fieldFilters = [
+        'extends' => [$entity, $filters['contact_type']],
+        'is_multiple' => TRUE,
+        'style' => 'Inline',
+      ];
+      if (!empty($filters['contact_sub_type'])) {
+        $fieldFilters['extends_entity_column_value'] = [NULL, $filters['contact_sub_type']];
       }
-      if (!empty($query)) {
-        $tables = CRM_Core_DAO::executeQuery(implode(' UNION ', $query));
-        while ($tables->fetch()) {
-          $customGroupSuffixes[$tables->table_name] = '_' . $tables->id;
+
+      $multipleCustomGroups = CRM_Core_BAO_CustomGroup::getAll($fieldFilters);
+      foreach ($multipleCustomGroups as $multipleCustomGroup) {
+        foreach ($multipleCustomGroup['fields'] as $groupField) {
+          $groupField['custom_group_id.is_multiple'] = TRUE;
+          $groupField['table_name'] = $multipleCustomGroup['table_name'];
+          $groupField['custom_field_id'] = $groupField['id'];
+          $groupField['required'] = $groupField['is_required'];
+          $groupField['input_type'] = $groupField['html_type'];
+          $fields[$groupField['id']] = $groupField;
         }
       }
     }
 
     $formValues = [];
     foreach ($fields as $field) {
-      $suffix = $customGroupSuffixes[$field['table_name']];
-      $elementName = 'custom_' . $field['custom_field_id'] . $suffix;
-      // Note that passing required = TRUE here does not seem to actually do anything. As long
-      // as the form opens in pop up mode jquery validation from the ajax form ensures required fields are
-      // submitted. In non-popup mode however the required is not enforced. This appears to be
-      // a bug that has been around for a while.
-      CRM_Core_BAO_CustomField::addQuickFormElement($this, $elementName, $field['custom_field_id'], $field['required']);
-      if ($field['input_type'] === 'File') {
-        $this->registerFileField([$elementName]);
+      // Here we add the custom fields to the form
+      // based on whether they have been 'POSTed'
+      foreach ($this->getInstancesOfField($field['custom_field_id']) as $elementName) {
+        $formValues[$elementName] = $this->addCustomField($elementName, $field);
       }
-      // Get any values from the POST & cache them so that they can be retrieved from the
-      // CustomDataByType form in it's setDefaultValues() function - otherwise it cannot reload the
-      // values that were just entered if validation fails.
-      $formValues[$elementName] = is_string($this->getSubmitValue($elementName)) ? CRM_Utils_String::purifyHTML($this->getSubmitValue($elementName)) : $this->getSubmitValue($elementName);
     }
     $qf = $this->get('qfKey');
     $this->assign('qfKey', $qf);
     Civi::cache('customData')->set($qf, $formValues);
+  }
+
+  /**
+   * Get the instances of the given field in $_POST to determine how many to add to the form.
+   *
+   * @param int $id
+   *
+   * @return array
+   */
+  private function getInstancesOfField($id): array {
+    $instances = [];
+    foreach ($_POST as $key => $value) {
+      if (preg_match('/^custom_' . $id . '_?(-?\d+)?$/', $key)) {
+        $instances[] = $key;
+      }
+    }
+    return $instances;
+  }
+
+  /**
+   * Add the given field to the form.
+   *
+   * @param string $elementName
+   * @param array $field
+   *
+   * @return mixed
+   *
+   * @throws \CRM_Core_Exception
+   *
+   * @internal this is not supported for use outside of core and there is no guarantee the
+   *  function signature or behaviour won't change. It you use if from outside core
+   *  be sure to use unit tests in your non-core use.
+   */
+  protected function addCustomField(string $elementName, array $field) {
+    // Note that passing required = TRUE here does not seem to actually do anything. As long
+    // as the form opens in pop up mode jquery validation from the ajax form ensures required fields are
+    // submitted. In non-popup mode however the required is not enforced. This appears to be
+    // a bug that has been around for a while.
+    CRM_Core_BAO_CustomField::addQuickFormElement($this, $elementName, $field['custom_field_id'], $field['required']);
+    if ($field['input_type'] === 'File') {
+      $this->registerFileField([$elementName]);
+    }
+    // Get any values from the POST & cache them so that they can be retrieved from the
+    // CustomDataByType form in it's setDefaultValues() function - otherwise it cannot reload the
+    // values that were just entered if validation fails.
+    return is_string($this->getSubmitValue($elementName)) ? CRM_Utils_String::purifyHTML($this->getSubmitValue($elementName)) : $this->getSubmitValue($elementName);
   }
 
 }
