@@ -22,6 +22,8 @@ use Civi\Api4\PledgePayment;
  */
 class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
   use CRM_Contact_Form_ContactFormTrait;
+  use CRM_Custom_Form_CustomDataTrait;
+  use CRM_Pledge_Form_PledgeFormTrait;
 
   public $_action;
 
@@ -29,6 +31,8 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
    * The id of the pledge that we are processing.
    *
    * @var int
+   *
+   * @internal
    */
   public $_id;
 
@@ -67,7 +71,6 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String',
       $this, FALSE, 'add'
     );
-    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $this->setContext();
     // check for action permissions.
     if (!CRM_Core_Permission::checkActionPermission('CiviPledge', $this->_action)) {
@@ -82,15 +85,12 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
 
     $this->setPageTitle(ts('Pledge'));
 
-    // build custom data
-    CRM_Custom_Form_CustomData::preProcess($this, NULL, NULL, 1, 'Pledge', $this->_id);
     $this->_values = [];
     // current pledge id
-    if ($this->_id) {
-      $params = ['id' => $this->_id];
+    if ($this->getPledgeID()) {
+      $params = ['id' => $this->getPledgeID()];
       CRM_Pledge_BAO_Pledge::getValues($params, $this->_values);
-
-      $this->_isPending = !CRM_Pledge_BAO_Pledge::pledgeHasFinancialTransactions($this->_id, CRM_Utils_Array::value('status_id', $this->_values));
+      $this->_isPending = !CRM_Pledge_BAO_Pledge::pledgeHasFinancialTransactions($this->getPledgeID(), $this->getPledgeValue('status_id'));
     }
 
     // get the pledge frequency units.
@@ -114,7 +114,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       $this->assign('is_test', TRUE);
     }
 
-    if ($this->_id) {
+    if ($this->getPledgeID()) {
       // check is this pledge pending.
       // fix the display of the monetary value, CRM-4038.
       if ($this->_isPending) {
@@ -162,9 +162,6 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     ));
 
     $this->assign('email', $this->getContactValue('email_primary.email'));
-    // custom data set defaults
-    $defaults += CRM_Custom_Form_CustomData::setDefaultValues($this);
-
     return $defaults;
   }
 
@@ -194,7 +191,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     if ($this->getContext() !== 'standalone') {
       $contactField->freeze();
     }
-
+    $this->assign('pledgeID', $this->getPledgeID());
     $formType = CRM_Utils_Request::retrieveValue('formType', 'String');
 
     $allPanes[ts('Payment Reminders')] = [
@@ -336,7 +333,15 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     $this->assign('outBound_option', $mailingInfo['outBound_option']);
 
     // build custom data
-    CRM_Custom_Form_CustomData::buildQuickForm($this);
+    if ($this->isSubmitted()) {
+      // The custom data fields are added to the form by an ajax form.
+      // However, if they are not present in the element index they will
+      // not be available from `$this->getSubmittedValue()` in post process.
+      // We do not have to set defaults or otherwise render - just add to the element index.
+      $this->addCustomDataFieldsToForm('Pledge', array_filter([
+        'id' => $this->getPledgeID(),
+      ]));
+    }
 
     // make this form an upload since we dont know if the custom data injected dynamically
     // is of type file etc $uploadNames = $this->get( 'uploadNames' );
@@ -412,7 +417,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
    */
   public function postProcess(): void {
     if ($this->_action & CRM_Core_Action::DELETE) {
-      CRM_Pledge_BAO_Pledge::deletePledge($this->_id);
+      CRM_Pledge_BAO_Pledge::deletePledge($this->getPledgeID());
       return;
     }
 
@@ -443,13 +448,13 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     }
 
     // format amount
-    $params['amount'] = CRM_Utils_Rule::cleanMoney(CRM_Utils_Array::value('amount', $formValues));
+    $params['amount'] = $this->getSubmittedValue('amount');
     $params['currency'] = $formValues['currency'] ?? NULL;
     $params['original_installment_amount'] = ($params['amount'] / $params['installments']);
 
     $dates = ['create_date', 'start_date', 'acknowledge_date', 'cancel_date'];
     foreach ($dates as $d) {
-      if ($this->_id && (!$this->_isPending) && !empty($this->_values[$d])) {
+      if ($this->getPledgeID() && (!$this->_isPending) && !empty($this->_values[$d])) {
         if ($d === 'start_date') {
           $params['scheduled_date'] = CRM_Utils_Date::processDate($this->_values[$d]);
         }
@@ -472,20 +477,16 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
 
     // assign id only in update mode
     if ($this->_action & CRM_Core_Action::UPDATE) {
-      $params['id'] = $this->_id;
+      $params['id'] = $this->getPledgeID();
     }
 
     $params['contact_id'] = $this->_contactID;
 
     // format custom data
-    if (!empty($formValues['hidden_custom'])) {
-      $params['hidden_custom'] = 1;
-
-      $params['custom'] = CRM_Core_BAO_CustomField::postProcess($formValues,
-        $this->_id,
-        'Pledge'
-      );
-    }
+    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($this->getSubmittedValues(),
+      $this->getPledgeID(),
+      'Pledge'
+    );
 
     // handle pending pledge.
     $params['is_pledge_pending'] = $this->_isPending;
@@ -571,6 +572,21 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
         "reset=1&action=add&context=pledge&cid={$this->_contactID}"
       ));
     }
+  }
+
+  /**
+   * Get the pledge ID.
+   *
+   * @api supported for external use.
+   *
+   * @return int|null
+   * @throws \CRM_Core_Exception
+   */
+  public function getPledgeID(): ?int {
+    if (!isset($this->_id)) {
+      $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    }
+    return $this->_id ? (int) $this->_id : NULL;
   }
 
 }
