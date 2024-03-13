@@ -10,8 +10,6 @@
 
 {foreach from=$groupTree item=cd_edit key=group_id}
   {if $cd_edit.is_multiple eq 1}
-    {assign var=tableID value=$cd_edit.table_id}
-    {assign var=divName value=$group_id|cat:"_$tableID"}
     <div></div>
     <details class="crm-accordion-bold crm-custom-accordion" {if $cd_edit.collapse_display and !$skipTitle}{else}open{/if}>
   {else}
