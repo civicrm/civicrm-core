@@ -1315,8 +1315,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     // build the confirm page
     $confirmForm = &$this->controller->_pages['Confirm'];
-    $confirmForm->preProcess();
-    $confirmForm->buildQuickForm();
+    $confirmForm->buildForm();
 
     // the confirmation page is valid
     $data = &$this->controller->container();
