@@ -19,7 +19,7 @@
   </field>
   <primaryKey>
     <name>id</name>
-    <autoincrement>false</autoincrement>
+    <autoincrement>true</autoincrement>
   </primaryKey>
   <field>
     <name>context</name>
