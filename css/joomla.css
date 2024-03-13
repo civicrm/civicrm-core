@@ -33,7 +33,7 @@ body.admin.com_civicrm .crm-container details + details {
   margin: 0.25rem 0 0;
 }
 body.admin.com_civicrm .crm-container details summary ~ * { /* Atum J4 reset */
-  margin-top: 0; 
+  margin-top: 0;
 }
 body.admin.com_civicrm.layout-default .crm-dashlet {
   max-width: 60vw;
