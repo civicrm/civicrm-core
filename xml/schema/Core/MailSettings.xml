@@ -192,7 +192,7 @@
     <html>
       <type>CheckBox</type>
     </html>
-    <description>If this option is enabled, CiviCRM will not create new contacts when filing emails.</description>
+    <comment>If this option is enabled, CiviCRM will not create new contacts when filing emails.</comment>
     <add>5.31</add>
   </field>
   <field>
