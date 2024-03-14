@@ -13,8 +13,8 @@
 
   {include file="CRM/Contact/Form/Search/Intro.tpl"}
 
-  <details class="crm-advanced_search_form-accordion" {if !$rows}open{/if} >
-    <summary class="crm-master-accordion-header">
+  <details class="crm-accordion-light crm-advanced_search_form-accordion" {if !$rows}open{/if} >
+    <summary>
       {if !empty($savedSearch)}
         {ts 1=$savedSearch.name}Edit %1 Smart Group Criteria{/ts}
       {elseif !empty($ssID) or $rows}
