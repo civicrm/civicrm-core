@@ -1264,6 +1264,11 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
                 }
               }
               else {
+                if ($field['html_type'] === 'Autocomplete-Select') {
+                  $checkedValue = array_filter(explode(CRM_Core_DAO::VALUE_SEPARATOR, $value));
+                  $defaults[$elementName] = implode(',', $checkedValue);
+                  continue;
+                }
                 // Values may be "array strings" or actual arrays. Handle both.
                 if (is_array($value) && count($value)) {
                   CRM_Utils_Array::formatArrayKeys($value);
@@ -1274,7 +1279,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
                 }
                 foreach ($customOption as $val) {
                   if (in_array($val['value'], $checkedValue)) {
-                    if ($field['html_type'] == 'CheckBox') {
+                    if ($field['html_type'] === 'CheckBox') {
                       $defaults[$elementName][$val['value']] = 1;
                     }
                     else {
