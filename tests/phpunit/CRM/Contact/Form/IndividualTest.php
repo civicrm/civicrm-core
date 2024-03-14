@@ -14,9 +14,6 @@ class CRM_Contact_Form_IndividualTest extends CiviUnitTestCase {
    * notices or errors. For example to make it fail change the spelling of a
    * variable in the form so it has a typo, and then this test will throw an
    * exception.
-   *
-   * @group ornery
-   *   Suppress for PR tests while this does not pass pn php8.2.
    */
   public function testOpeningNewIndividualForm(): void {
     $_REQUEST['reset'] = 1;
