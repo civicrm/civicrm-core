@@ -349,7 +349,7 @@
                     {ts}Transaction #{/ts}
                   </td>
                   <td {$valueStyle}>
-                    {contribution.trxn_id|boolean}
+                    {contribution.trxn_id}
                   </td>
                 </tr>
               {/if}
