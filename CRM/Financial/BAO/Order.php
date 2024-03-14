@@ -995,7 +995,7 @@ class CRM_Financial_BAO_Order {
       if ($this->getOverrideTotalAmount() !== FALSE) {
         $this->addTotalsToLineBasedOnOverrideTotal((int) $lineItem['financial_type_id'], $lineItem);
       }
-      elseif ($this->getPriceFieldMetadata($lineItem['price_field_id'])['name'] === 'other_amount') {
+      elseif ($this->getPriceFieldMetadata($lineItem['price_field_id'])['name'] === 'other_amount' && $lineItem['line_total']) {
         // Other amount is a front end user entered form. It is reasonable to think it would be tax inclusive.
         $lineItem['line_total_inclusive'] = $lineItem['line_total'];
         $lineItem['line_total'] = $lineItem['line_total_inclusive'] / (1 + ($lineItem['tax_rate'] / 100));
