@@ -22,6 +22,19 @@ body.admin.com_civicrm .subhead-collapse,
 body.admin.com_civicrm.layout-default a[target="_blank"]::before {
   display: none;
 }
+body.admin.com_civicrm .crm-container details { /* Atum J4 reset */
+  background: inherit;
+  border: none;
+  border-radius: inherit;
+  margin: 0;
+  padding: 0;
+}
+body.admin.com_civicrm .crm-container details + details {
+  margin: 0.25rem 0 0;
+}
+body.admin.com_civicrm .crm-container details summary ~ * { /* Atum J4 reset */
+  margin-top: 0;
+}
 body.admin.com_civicrm.layout-default .crm-dashlet {
   max-width: 60vw;
 }
