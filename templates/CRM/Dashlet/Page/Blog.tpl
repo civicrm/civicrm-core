@@ -16,7 +16,7 @@
   #civicrm-news-feed .crm-news-feed-unread .crm-news-feed-item-title {
     font-weight: bold;
   }
-  #civicrm-news-feed details:not([open]) .crm-accordion-header {
+  #civicrm-news-feed details:not([open]) summary {
     text-overflow: ellipsis;
     text-wrap: none;
     white-space: nowrap;
@@ -46,8 +46,8 @@
   {foreach from=$feeds item="channel"}
     <div id="civicrm-news-feed-{$channel.name}">
     {foreach from=$channel.items item=article}
-      <details class="crm-accordion-wrapper">
-        <summary class="crm-accordion-header">
+      <details class="crm-accordion-bold">
+        <summary>
           <span class="crm-news-feed-item-title">{$article.title|smarty:nodefaults|purify}</span>
           <span class="crm-news-feed-item-preview"> - {if function_exists('mb_substr')}{$article.description|smarty:nodefaults|strip_tags|mb_substr:0:150}{else}{$article.description|smarty:nodefaults|strip_tags}{/if}</span>
         </summary>

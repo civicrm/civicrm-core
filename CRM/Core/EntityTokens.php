@@ -17,6 +17,7 @@ use Civi\Token\TokenRow;
 use Civi\ActionSchedule\Event\MailingQueryEvent;
 use Civi\Token\TokenProcessor;
 use Brick\Money\Money;
+use Brick\Math\RoundingMode;
 
 /**
  * Class CRM_Core_EntityTokens
@@ -126,7 +127,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
       }
 
       return $row->format('text/plain')->tokens($entity, $field,
-        Money::of($fieldValue, $currency));
+        Money::of($fieldValue, $currency, NULL, RoundingMode::HALF_UP));
 
     }
     if ($this->isDateField($field)) {
