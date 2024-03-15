@@ -72,6 +72,8 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    * Price set ID configured for the form.
    *
    * @var int
+   *
+   * @deprecated use getPriceSetID()
    */
   public $_priceSetId;
 
@@ -602,8 +604,8 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    *
    * @return bool
    */
-  private function isQuickConfig(): bool {
-    return $this->_priceSetId && CRM_Price_BAO_PriceSet::isQuickConfig($this->_priceSetId);
+  protected function isQuickConfig(): bool {
+    return $this->getPriceSetID() && CRM_Price_BAO_PriceSet::isQuickConfig($this->getPriceSetID());
   }
 
   /**
