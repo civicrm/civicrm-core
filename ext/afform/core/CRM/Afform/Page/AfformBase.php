@@ -20,10 +20,6 @@ class CRM_Afform_Page_AfformBase extends CRM_Core_Page {
     Civi::service('angularjs.loader')
       ->addModules([$afform['module_name'], 'afformStandalone']);
 
-    // Title will be supplied by AfformBase.tpl.
-    // @see crmUi.directive(crmPageTitle)
-    CRM_Utils_System::setTitle('');
-
     $isFrontEndPage = !empty($afform['is_public']);
 
     // If not being shown on the front-end website, calculate breadcrumbs
@@ -43,8 +39,8 @@ class CRM_Afform_Page_AfformBase extends CRM_Core_Page {
       }
     }
 
-    // Add current afform page to breadcrumb
     if (!empty($afform['title'])) {
+      // Add current afform page to breadcrumb
       $title = strip_tags($afform['title']);
       if (!$isFrontEndPage) {
         CRM_Utils_System::appendBreadCrumb([
@@ -54,6 +50,13 @@ class CRM_Afform_Page_AfformBase extends CRM_Core_Page {
           ],
         ]);
       }
+      // 'CiviCRM' be replaced with Afform title via AfformBase.tpl.
+      // @see crmUi.directive(crmPageTitle)
+      CRM_Utils_System::setTitle('CiviCRM');
+    }
+    else {
+      // Afform has no title
+      CRM_Utils_System::setTitle('');
     }
 
     parent::run();
