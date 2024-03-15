@@ -4,6 +4,8 @@
  * File for the CRM_Custom_Import_Parser_ContributionTest class.
  */
 
+use Civi\Api4\CustomValue;
+
 /**
  *  Test Contribution import parser.
  *
@@ -42,6 +44,11 @@ class CRM_Custom_Import_Parser_ApiTest extends CiviUnitTestCase {
     $this->assertEquals('ERROR', $row['_status']);
     $row = $dataSource->getRow();
     $this->assertEquals('IMPORTED', $row['_status'], $row['_status_message']);
+    $values = CustomValue::get('level', FALSE)
+      ->addWhere('entity_id', '=', $row['the_contact_id'])->execute();
+    $this->assertEquals(['R'], $values[0]['Pick_Color']);
+    $this->assertEquals(['R'], $values[1]['Pick_Color']);
+    $this->assertEquals(['R', 'Y'], $values[2]['Pick_Color']);
   }
 
   /**
