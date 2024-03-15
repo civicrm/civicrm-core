@@ -50,8 +50,15 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
       $this->setTitle(ts('Configure Survey') . ' - ' . $this->_surveyTitle);
     }
 
-    // Add custom data to form
-    CRM_Custom_Form_CustomData::addToForm($this);
+    if ($this->isSubmitted()) {
+      // The custom data fields are added to the form by an ajax form.
+      // However, if they are not present in the element index they will
+      // not be available from `$this->getSubmittedValue()` in post process.
+      // We do not have to set defaults or otherwise render - just add to the element index.
+      $this->addCustomDataFieldsToForm('Survey', array_filter([
+        'id' => $this->getSurveyID(),
+      ]));
+    }
 
     if ($this->_name != 'Petition') {
       $url = CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=survey');
@@ -158,7 +165,7 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
     $params['is_active'] ??= 0;
     $params['is_default'] ??= 0;
 
-    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params, $this->getEntityId(), $this->getDefaultEntity());
+    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($this->getSubmittedValues(), $this->getSurveyID(), 'Survey');
 
     $survey = CRM_Campaign_BAO_Survey::create($params);
     $this->_surveyId = $survey->id;

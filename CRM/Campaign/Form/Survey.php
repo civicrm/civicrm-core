@@ -19,11 +19,14 @@
  * This class generates form components for processing a survey.
  */
 class CRM_Campaign_Form_Survey extends CRM_Core_Form {
+  use CRM_Custom_Form_CustomDataTrait;
 
   /**
    * The id of the object being edited.
    *
    * @var int
+   *
+   * @internal
    */
   protected $_surveyId;
 
@@ -51,12 +54,17 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
   /**
    * Get the entity id being edited.
    *
+   * @internal
+   *
    * @return int|null
    */
   public function getEntityId() {
     return $this->_surveyId;
   }
 
+  /**
+   * @throws \CRM_Core_Exception
+   */
   public function preProcess() {
     // Multistep form doesn't play well with popups
     $this->preventAjaxSubmit();
@@ -66,9 +74,7 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
     }
 
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add', 'REQUEST');
-    $this->_surveyId = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE);
-
-    if ($this->_surveyId) {
+    if ($this->getSurveyID()) {
       $this->_single = TRUE;
 
       $params = ['id' => $this->_surveyId];
@@ -79,10 +85,17 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
     }
 
     $this->assign('action', $this->_action);
-    $this->assign('surveyId', $this->_surveyId);
+    $this->assign('surveyId', $this->getSurveyID());
 
-    // Add custom data to form
-    CRM_Custom_Form_CustomData::addToForm($this);
+    if ($this->isSubmitted()) {
+      // The custom data fields are added to the form by an ajax form.
+      // However, if they are not present in the element index they will
+      // not be available from `$this->getSubmittedValue()` in post process.
+      // We do not have to set defaults or otherwise render - just add to the element index.
+      $this->addCustomDataFieldsToForm('Survey', array_filter([
+        'id' => $this->getSurveyID(),
+      ]));
+    }
 
     // CRM-11480, CRM-11682
     // Preload libraries required by the "Questions" tab
@@ -91,6 +104,21 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
     CRM_UF_Page_ProfileEditor::registerSchemas(['IndividualModel', 'ActivityModel']);
 
     $this->build();
+  }
+
+  /**
+   * Get the survey ID.
+   *
+   * @api supported for external use.
+   *
+   * @return int|null
+   * @throws \CRM_Core_Exception
+   */
+  public function getSurveyID(): ?int {
+    if (!isset($this->_surveyId)) {
+      $this->_surveyId = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    }
+    return $this->_surveyId;
   }
 
   /**
@@ -144,10 +172,11 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
   /**
    *
    * @return array
+   * @throws \CRM_Core_Exception
    */
   private function processSurveyForm() {
     $form = $this;
-    if ($form->getVar('_surveyId') <= 0) {
+    if ($this->getSurveyID() <= 0) {
       return NULL;
     }
 
@@ -175,8 +204,8 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
       ],
     ];
 
-    $surveyID = $form->getVar('_surveyId');
-    $class = $form->getVar('_name');
+    $surveyID = $this->getSurveyID();
+    $class = $this->_name;
     $class = CRM_Utils_String::getClassName($class);
     $class = strtolower($class);
 

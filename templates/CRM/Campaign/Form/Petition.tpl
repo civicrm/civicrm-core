@@ -94,7 +94,7 @@
         </td>
       </tr>
     </table>
-    {include file="CRM/common/customDataBlock.tpl"}
+    {include file="CRM/common/customDataBlock.tpl"  groupID='' customDataType='Survey' customDataSubType=false entityID=$surveyId cid=false}
   {/if}
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
