@@ -241,23 +241,21 @@ class CRM_Admin_Page_AJAX {
 
         case 'CRM_Contact_BAO_Group':
           $ret['content'] = ts('Are you sure you want to disable this Group?');
-          $smartGroupsReferencingThisGroup = CRM_Contact_BAO_Group::getSmartGroupsUsingGroup($recordID);
-          if (!empty($smartGroupsReferencingThisGroup)) {
-            $ret['content'] .= '<br /><br /><strong>';
-            $ret['content'] .= ts('WARNING this Group is currently referenced by %1 group/s',
-                                  [1 => count($smartGroupsReferencingThisGroup)]);
-            $ret['content'] .= '</strong><ul>';
-
-            foreach ($smartGroupsReferencingThisGroup as $group_id => $group_title) {
-              $ret['content'] .= '<li>' . ts('Group id: %1 title: %2 ', [
-                1 => $group_id,
-                2 => $group_title,
+          $sgContent = '';
+          $sgReferencingThisGroup = CRM_Contact_BAO_SavedSearch::getSmartGroupsUsingGroup($recordID);
+          if (!empty($sgReferencingThisGroup)) {
+            $sgContent .= '<br /><br /><strong>' . ts('WARNING - This Group is currently referenced by %1 smart group(s).', [
+              1 => count($sgReferencingThisGroup),
+            ]) . '</strong><ul>';
+            foreach ($sgReferencingThisGroup as $gid => $group) {
+              $sgContent .= '<li>' . ts('%1 <a class="action-item crm-hover-button" href="%2" target="_blank">Edit Smart Group Criteria</a>', [
+                1 => $group['title'],
+                2 => $group['editSearchURL'],
               ]) . '</li>';
             }
-            $ret['content'] .= '</ul>';
-            $ret['content'] .= ts('Disabling this group will cause these groups to no longer restrict members based on membership in this group. Please edit and remove this group as a criteria from these smart groups.') . '<br /><br />';
+            $sgContent .= '</ul>' . ts('Disabling this group will cause these groups to no longer restrict members based on membership in this group. Please edit and remove this group as a criteria from these smart groups.');
           }
-          $ret['content'] .= '<br /><br /><strong>' . ts('WARNING - Disabling this group will disable all the child groups associated if any.') . '</strong>';
+          $ret['content'] .= $sgContent . '<br /><br /><strong>' . ts('WARNING - Disabling this group will disable all the child groups associated if any.') . '</strong>';
           break;
 
         case 'CRM_Core_BAO_OptionGroup':

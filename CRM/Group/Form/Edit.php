@@ -125,8 +125,7 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
           }
         }
         $this->assign('count', $count ?? NULL);
-        $smartGroupsUsingThisGroup = CRM_Contact_BAO_Group::getSmartGroupsUsingGroup($this->_id);
-        $this->assign('smartGroupsUsingThisGroup', $smartGroupsUsingThisGroup);
+        $this->assign('smartGroupsUsingThisGroup', CRM_Contact_BAO_SavedSearch::getSmartGroupsUsingGroup($this->_id));
         $this->setTitle(ts('Confirm Group Delete'));
       }
       if ($this->_groupValues['is_reserved'] == 1 && !CRM_Core_Permission::check('administer reserved groups')) {
