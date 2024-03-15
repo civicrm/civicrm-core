@@ -170,9 +170,10 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
     }
     $this->loadFilter('pre', 'resetExtScope');
     $this->loadFilter('pre', 'htxtFilter');
-    $this->registerPlugin('modifier', 'json_encode', 'json_encode');
-    $this->registerPlugin('modifier', 'count', 'count');
-    $this->registerPlugin('modifier', 'implode', 'implode');
+    // This is used on the manage extensions page - we do plan on replacing it
+    // but perhaps no harm to add in trim anyway.
+    $this->registerPlugin('modifier', 'trim', 'trim');
+    // Smarty now supports substr natively but str_starts_with is kinda nicer.
     $this->registerPlugin('modifier', 'str_starts_with', 'str_starts_with');
 
     $this->assign('crmPermissions', new CRM_Core_Smarty_Permissions());
