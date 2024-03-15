@@ -546,7 +546,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
           str_contains($clause, 'civicrm_employer_contact_target_employer') ||
           str_contains($clause, 'civicrm_address_')
         ) {
-          $this->_selectClauses[$key] = "GROUP_CONCAT(DISTINCT $clause SEPARATOR ';') as $clause";
+          $this->_selectClauses[$key] = "GROUP_CONCAT(DISTINCT $clause ORDER BY civicrm_contact_contact_source, civicrm_contact_contact_assignee, civicrm_contact_contact_target SEPARATOR ';') as $clause";
         }
       }
     }
