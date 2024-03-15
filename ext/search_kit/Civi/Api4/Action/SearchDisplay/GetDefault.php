@@ -154,6 +154,20 @@ class GetDefault extends \Civi\Api4\Generic\AbstractAction {
         $menu[] = $link;
       }
     }
+    if ($this->getField('is_active')) {
+      $menu[] = [
+        'entity' => $mainEntity,
+        'task' => 'enable',
+        'icon' => 'fa-toggle-on',
+        'text' => E::ts('Enable'),
+      ];
+      $menu[] = [
+        'entity' => $mainEntity,
+        'task' => 'disable',
+        'icon' => 'fa-toggle-off',
+        'text' => E::ts('Disable'),
+      ];
+    }
     $keys = ['entity' => TRUE, 'bridge' => TRUE];
     foreach ($this->getJoins() as $join) {
       if (!$this->canAggregate($join['alias'] . '.' . CoreUtil::getIdFieldName($join['entity']))) {
