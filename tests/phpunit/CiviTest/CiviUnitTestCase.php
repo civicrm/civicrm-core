@@ -584,7 +584,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @return int
    */
-  public function membershipTypeCreate(array $params = [], $identifer = 'test'): int {
+  public function membershipTypeCreate(array $params = [], string $identifer = 'test'): int {
     CRM_Member_PseudoConstant::flush('membershipType');
     CRM_Core_Config::clearDBCache();
     $this->setupIDs['contact'] = $memberOfOrganization = $this->organizationCreate();
@@ -601,11 +601,10 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'visibility' => 'Public',
     ], $params);
 
-    $result = $this->callAPISuccess('MembershipType', 'Create', $params);
+    $result = $this->createTestEntity('MembershipType', $params, $identifer);
 
     CRM_Member_PseudoConstant::flush('membershipType');
     CRM_Utils_Cache::singleton()->flush();
-    $this->ids['MembershipType'][$identifer] = (int) $result['id'];
     return (int) $result['id'];
   }
 
@@ -2244,9 +2243,9 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       $recurParams['frequency_unit'] = $params['frequency_unit'];
     }
 
-    $this->ids['membership_type'] = $this->membershipTypeCreate($membershipParams);
+    $this->membershipTypeCreate($membershipParams);
     //create a contribution so our membership & contribution don't both have id = 1
-    if ($this->callAPISuccess('Contribution', 'getcount', []) === 0) {
+    if ($this->callAPISuccess('Contribution', 'getcount') === 0) {
       $this->contributionCreate([
         'contact_id' => $this->ids['Contact']['individual_0'],
         'is_test' => 1,
@@ -2267,12 +2266,12 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
               'unit_price' => 200,
               'line_total' => 200,
               'financial_type_id' => 1,
-              'membership_type_id' => $this->ids['membership_type'],
+              'membership_type_id' => $this->ids['MembershipType']['test'],
             ],
           ],
           'params' => [
             'contact_id' => $this->ids['Contact']['individual_0'],
-            'membership_type_id' => $this->ids['membership_type'],
+            'membership_type_id' => $this->ids['MembershipType']['test'],
             'source' => 'Payment',
           ],
         ],
@@ -2811,7 +2810,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @param $entity
    * @param array $params
    */
-  public function createPriceSetWithPage($entity = NULL, $params = []) {
+  public function createPriceSetWithPage($entity = NULL, $params = []): void {
     $membershipTypeID = $this->createTestEntity('MembershipType', [
       'name' => 'Special',
       'member_of_contact_id' => CRM_Core_BAO_Domain::getDomain()->contact_id,
@@ -2828,13 +2827,13 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'is_monetary' => TRUE,
       'is_email_receipt' => FALSE,
     ])['id'];
-    $priceSet = $this->callAPISuccess('price_set', 'create', [
+    $priceSetID = $this->createTestEntity('PriceSet', [
       'is_quick_config' => 0,
       'extends' => 'CiviMember',
       'financial_type_id' => 1,
       'title' => 'my Page',
-    ]);
-    $priceSetID = $priceSet['id'];
+      'name' => 'member_not_quick_config',
+    ])['id'];
 
     CRM_Price_BAO_PriceSet::addTo('civicrm_contribution_page', $contributionPageID, $priceSetID);
     $priceField = $this->callAPISuccess('price_field', 'create', [
@@ -2877,11 +2876,8 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     ])->execute();
     $this->_ids['price_field_value']['cont'] = $priceFieldValue['id'];
 
-    $this->_ids['price_set'] = $priceSetID;
     $this->_ids['contribution_page'] = $contributionPageID;
     $this->_ids['price_field'] = [$priceField['id']];
-
-    $this->_ids['membership_type'] = $membershipTypeID;
   }
 
   /**

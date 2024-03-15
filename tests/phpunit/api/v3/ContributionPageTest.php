@@ -668,7 +668,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->ids['MembershipType'] = array_keys($membershipTypes['values']);
     $this->ids['MembershipType']['org2'] = $this->membershipTypeCreate(['contact_id' => $organization2ID, 'name' => 'Org 2']);
     $priceField = $this->callAPISuccess('PriceField', 'create', [
-      'price_set_id' => $this->_ids['price_set'],
+      'price_set_id' => $this->ids['PriceSet'],
       'html_type' => 'Radio',
       'name' => 'Org1 Price',
       'label' => 'Org1Price',
@@ -687,7 +687,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->_ids['price_field_value']['org1'] = $priceFieldValue;
 
     $priceField = $this->callAPISuccess('PriceField', 'create', [
-      'price_set_id' => $this->_ids['price_set'],
+      'price_set_id' => $this->ids['PriceSet'],
       'html_type' => 'Radio',
       'name' => 'Org2 Price',
       'label' => 'Org2Price',
@@ -944,7 +944,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    */
   public function addOtherAmountFieldToMembershipPriceSet(): void {
     $this->_ids['price_field']['other_amount'] = $this->callAPISuccess('price_field', 'create', [
-      'price_set_id' => reset($this->_ids['price_set']),
+      'price_set_id' => reset($this->ids['PriceSet']),
       'name' => 'other_amount',
       'label' => 'Other Amount',
       'html_type' => 'Text',

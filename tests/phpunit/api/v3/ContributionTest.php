@@ -15,7 +15,6 @@ use Civi\Api4\ContributionRecur;
 use Civi\Api4\Pledge;
 use Civi\Api4\PriceField;
 use Civi\Api4\PriceFieldValue;
-use Civi\Api4\PriceSet;
 use Civi\Test\FormTrait;
 
 /**
@@ -1225,7 +1224,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ]);
     $contribution = $this->callAPISuccess('contribution', 'create', $newParams);
     $contribution = $contribution['values'][$contribution['id']];
-    $this->assertEquals($contribution['contribution_status_id'], '1');
+    $this->assertEquals('1', $contribution['contribution_status_id']);
     $this->_checkFinancialItem($contribution['id'], 'paylater');
     $this->_checkFinancialTrxn($contribution, 'payLater');
   }
@@ -3498,7 +3497,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $contactID = $this->ids['Contact']['individual_0'] ?? $this->individualCreate();
     $membershipParams = array_merge([
       'contact_id' => $contactID,
-      'membership_type_id' => $this->_ids['membership_type'],
+      'membership_type_id' => $this->ids['MembershipType']['special'],
     ], $membershipParams);
     if ($key === 'first') {
       // If we want these after the initial we will set them.
@@ -4979,12 +4978,12 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'is_billing_required' => 0,
     ], $contributionPageParams))['id'];
 
-    $priceSetID = PriceSet::create()->setValues([
+    $priceSetID = $this->createTestEntity('PriceSet', [
       'name' => 'quick config set',
       'title' => 'basic price set',
       'is_quick_config' => TRUE,
       'extends' => 2,
-    ])->execute()->first()['id'];
+    ], 'basic')['id'];
 
     $priceFieldID = PriceField::create()->setValues([
       'price_set_id' => $priceSetID,

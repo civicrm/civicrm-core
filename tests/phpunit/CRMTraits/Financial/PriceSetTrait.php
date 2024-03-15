@@ -132,7 +132,7 @@ trait CRMTraits_Financial_PriceSetTrait {
     $labels = ['Shoe eating goat', 'Long Haired Goat', 'Pesky rabbit', 'Rabbits are goats too', 'Runaway rabbit'];
     $amounts = [10, 20, 259, 88, 133];
     $membershipNumTerms = [1, 1, 2, 1, 1, 1];
-    foreach ($this->ids['membership_type'] as $membershipKey => $membershipTypeID) {
+    foreach ($this->ids['MembershipType'] as $membershipKey => $membershipTypeID) {
       $this->ids['PriceFieldValue'][$membershipKey] = $this->callAPISuccess('price_field_value', 'create', [
         'price_set_id' => $this->ids['PriceSet'],
         'price_field_id' => $this->ids['PriceField']['membership'],
@@ -189,7 +189,7 @@ trait CRMTraits_Financial_PriceSetTrait {
     }
     if (!empty($this->ids['MembershipType']['org2'])) {
       $priceField = $this->callAPISuccess('price_field', 'create', [
-        'price_set_id' => reset($this->_ids['price_set']),
+        'price_set_id' => reset($this->ids['PriceSet']),
         'name' => 'membership_org2',
         'label' => 'Membership Org2',
         'html_type' => 'Checkbox',
