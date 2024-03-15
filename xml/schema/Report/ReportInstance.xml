@@ -22,7 +22,7 @@
   </field>
   <primaryKey>
     <name>id</name>
-    <autoincrement>false</autoincrement>
+    <autoincrement>true</autoincrement>
   </primaryKey>
   <field>
     <name>domain_id</name>

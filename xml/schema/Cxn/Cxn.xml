@@ -16,7 +16,7 @@
   </field>
   <primaryKey>
     <name>id</name>
-    <autoincrement>false</autoincrement>
+    <autoincrement>true</autoincrement>
   </primaryKey>
 
   <!-- Application identification -->
