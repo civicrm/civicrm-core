@@ -84,6 +84,7 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
         $tasks[$entity['name']]['enable'] = [
           'title' => E::ts('Enable %1', [1 => $entity['title_plural']]),
           'icon' => 'fa-toggle-on',
+          'conditions' => [['is_active', '=', FALSE]],
           'apiBatch' => [
             'action' => 'update',
             'params' => ['values' => ['is_active' => TRUE]],
@@ -95,6 +96,7 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
         $tasks[$entity['name']]['disable'] = [
           'title' => E::ts('Disable %1', [1 => $entity['title_plural']]),
           'icon' => 'fa-toggle-off',
+          'conditions' => [['is_active', '=', TRUE]],
           'apiBatch' => [
             'action' => 'update',
             'params' => ['values' => ['is_active' => FALSE]],
