@@ -44,11 +44,7 @@ $links = [
     'style' => 'default',
     'path' => '',
     'action' => '',
-    'condition' => [
-      'is_active',
-      '=',
-      TRUE,
-    ],
+    'condition' => [],
   ],
   [
     'entity' => 'Relationship',
@@ -443,11 +439,7 @@ return [
                   'style' => 'default',
                   'path' => '',
                   'action' => '',
-                  'condition' => [
-                    'is_active',
-                    '=',
-                    FALSE,
-                  ],
+                  'condition' => [],
                 ],
                 [
                   'entity' => 'Relationship',

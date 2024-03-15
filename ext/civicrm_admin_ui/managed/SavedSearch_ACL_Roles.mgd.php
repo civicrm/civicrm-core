@@ -127,11 +127,7 @@ return [
                   'style' => 'default',
                   'path' => '',
                   'action' => '',
-                  'condition' => [
-                    'is_active',
-                    '=',
-                    FALSE,
-                  ],
+                  'condition' => [],
                 ],
                 [
                   'task' => 'disable',
@@ -143,11 +139,7 @@ return [
                   'style' => 'default',
                   'path' => '',
                   'action' => '',
-                  'condition' => [
-                    'is_active',
-                    '=',
-                    TRUE,
-                  ],
+                  'condition' => [],
                 ],
                 [
                   'entity' => 'ACLEntityRole',

@@ -142,11 +142,7 @@ return [
                   'style' => 'default',
                   'path' => '',
                   'action' => '',
-                  'condition' => [
-                    'is_active',
-                    '=',
-                    TRUE,
-                  ],
+                  'condition' => [],
                 ],
                 [
                   'task' => 'enable',
@@ -158,11 +154,7 @@ return [
                   'style' => 'default',
                   'path' => '',
                   'action' => '',
-                  'condition' => [
-                    'is_active',
-                    '=',
-                    FALSE,
-                  ],
+                  'condition' => [],
                 ],
                 [
                   'entity' => 'ActionSchedule',
