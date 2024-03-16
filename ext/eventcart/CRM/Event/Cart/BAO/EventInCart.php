@@ -30,12 +30,6 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
     $event_in_cart = new CRM_Event_Cart_BAO_EventInCart();
     $event_in_cart->copyValues($params);
     $event_in_cart = $event_in_cart->save();
-
-    if (is_a($event_in_cart, 'CRM_Core_Error')) {
-      $transaction->rollback();
-      throw new CRM_Core_Exception(ts('There was an error creating an event_in_cart'));
-    }
-
     $transaction->commit();
 
     return $event_in_cart;
