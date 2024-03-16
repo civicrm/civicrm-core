@@ -62,7 +62,7 @@
   {/if}
   {if ($action EQ 1) OR ($action EQ 2)}
     {*include custom data js file *}
-    {include file="CRM/common/customData.tpl"}
+    {include file="CRM/common/customDataBlock.tpl" groupID='' customDataType='Relationship' cid=false}
     <script type="text/javascript">
       {literal}
       CRM.$(function($) {
