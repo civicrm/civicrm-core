@@ -34,8 +34,8 @@ class CRM_Mailing_Event_BAO_MailingEventConfirm extends CRM_Mailing_Event_DAO_Ma
    * @param string $hash
    *   The hash.
    *
-   * @return bool
-   *   True on success
+   * @return bool|string
+   *   FALSE on failure, group frontend title on success.
    * @throws \CRM_Core_Exception
    */
   public static function confirm(int $contact_id, int $subscribe_id, string $hash) {
@@ -59,7 +59,7 @@ class CRM_Mailing_Event_BAO_MailingEventConfirm extends CRM_Mailing_Event_DAO_Ma
       return CRM_Core_DAO::getFieldValue(
         'CRM_Contact_DAO_Group',
         $se->group_id,
-        'title'
+        'frontend_title'
       );
     }
 
@@ -96,7 +96,7 @@ class CRM_Mailing_Event_BAO_MailingEventConfirm extends CRM_Mailing_Event_DAO_Ma
     // we should return early if welcome email temaplate is disabled
     // this means confirmation email will not be sent
     if (!$component->find(TRUE)) {
-      return $group->title;
+      return $group->frontend_title;
     }
 
     $html = $component->body_html;
@@ -144,7 +144,7 @@ class CRM_Mailing_Event_BAO_MailingEventConfirm extends CRM_Mailing_Event_DAO_Ma
     // send - ignore errors because the desired status change has already been successful
     CRM_Utils_Mail::send($mailParams);
 
-    return $group->title;
+    return $group->frontend_title;
   }
 
 }
