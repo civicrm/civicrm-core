@@ -169,7 +169,7 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
 
     if (!$message->fromContactID) {
       // find sender by phone number if $fromContactID not set by hook
-      $formatFrom = '%' . $this->formatPhone($this->stripPhone($message->from), $like, "like");
+      $formatFrom = '%' . $this->formatPhoneNumber($this->stripPhone($message->from));
       $message->fromContactID = CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM civicrm_phone JOIN civicrm_contact ON civicrm_contact.id = civicrm_phone.contact_id WHERE !civicrm_contact.is_deleted AND phone_numeric LIKE %1", [
         1 => [$formatFrom, 'String'],
       ]);
@@ -242,7 +242,7 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
    *
    * @return mixed|string
    */
-  public function stripPhone($phone) {
+  public function stripPhone($phone): string {
     $newphone = preg_replace('/[^0-9x]/', '', $phone);
     while (substr($newphone, 0, 1) == "1") {
       $newphone = substr($newphone, 1);
@@ -253,7 +253,49 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
     while (substr($newphone, -1) == "x") {
       $newphone = substr($newphone, 0, -1);
     }
-    return $newphone;
+    return (string) $newphone;
+  }
+
+  /**
+   * Format phone number with % - this may no longer make sense as we
+   * now compare with phone_numeric.
+   *
+   * @param string $phone
+   *
+   * @return string
+   */
+  private function formatPhoneNumber(string $phone): string {
+    $phoneA = explode("x", $phone);
+    switch (strlen($phoneA[0])) {
+      case 0:
+        $area = "";
+        $exch = "";
+        $uniq = "";
+        $ext = $phoneA[1];
+        break;
+
+      case 7:
+        $area = "";
+        $exch = substr($phone, 0, 3);
+        $uniq = substr($phone, 3, 4);
+        $ext = $phoneA[1];
+        break;
+
+      case 10:
+        $area = substr($phone, 0, 3);
+        $exch = substr($phone, 3, 3);
+        $uniq = substr($phone, 6, 4);
+        $ext = $phoneA[1];
+        break;
+
+      default:
+        return $phone;
+    }
+
+    $newphone = '%' . $area . '%' . $exch . '%' . $uniq . '%' . $ext . '%';
+    $newphone = str_replace('%%', '%', $newphone);
+    $newphone = str_replace('%%', '%', $newphone);
+    return (string) $newphone;
   }
 
   /**
@@ -261,9 +303,12 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
    * @param $kind
    * @param string $format
    *
+   * @deprecated since 5.73 will be removed around 5.95
+   *
    * @return mixed|string
    */
   public function formatPhone($phone, &$kind, $format = "dash") {
+    CRM_Core_Error::deprecatedFunctionWarning('unused');
     $phoneA = explode("x", $phone);
     switch (strlen($phoneA[0])) {
       case 0:
