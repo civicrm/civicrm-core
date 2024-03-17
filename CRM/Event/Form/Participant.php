@@ -456,10 +456,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         }
       }
 
-      $submittedRole = $this->getElementValue('role_id');
-      if (!empty($submittedRole[0])) {
-        $roleID = $submittedRole[0];
-      }
       $submittedEvent = $this->getElementValue('event_id');
       if (!empty($submittedEvent[0])) {
         $eventID = $submittedEvent[0];
