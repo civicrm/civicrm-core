@@ -163,7 +163,7 @@ trait SavedSearchInspectorTrait {
    * @return array
    */
   private function getEntityFields() {
-    if (!isset($this->_searchEntityFields)) {
+    if (!isset($this->_searchEntityFields) && !empty($this->savedSearch['api_entity'])) {
       $this->_searchEntityFields = Request::create($this->savedSearch['api_entity'], 'get', $this->savedSearch['api_params'])
         ->entityFields();
     }

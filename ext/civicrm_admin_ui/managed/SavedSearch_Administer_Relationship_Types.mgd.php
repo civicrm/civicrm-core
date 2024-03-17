@@ -136,7 +136,7 @@ return [
                   'icon' => 'fa-toggle-on',
                   'text' => E::ts('Enable'),
                   'style' => 'default',
-                  'condition' => ['is_active', '=', FALSE],
+                  'condition' => [],
                 ],
                 [
                   'task' => 'disable',
@@ -145,7 +145,7 @@ return [
                   'icon' => 'fa-toggle-off',
                   'text' => E::ts('Disable'),
                   'style' => 'default',
-                  'condition' => ['is_active', '=', TRUE],
+                  'condition' => [],
                 ],
                 [
                   'entity' => 'RelationshipType',

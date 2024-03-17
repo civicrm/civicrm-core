@@ -101,6 +101,7 @@ class GetLinks extends BasicGetAction {
         'icon' => \CRM_Core_Action::getIcon($actionKey),
         'weight' => (int) \CRM_Core_Action::getWeight($actionKey),
         'target' => 'crm-popup',
+        'conditions' => [],
       ];
       $links[] = $link;
     }
@@ -114,6 +115,7 @@ class GetLinks extends BasicGetAction {
         'entity' => $entityName,
         'weight' => 0,
         'target' => 'crm-popup',
+        'conditions' => [],
       ];
     }
     usort($links, ['CRM_Utils_Sort', 'cmpFunc']);
@@ -224,6 +226,11 @@ class GetLinks extends BasicGetAction {
       [
         'name' => 'target',
         'description' => 'HTML target attribute',
+      ],
+      [
+        'name' => 'conditions',
+        'data_type' => 'Array',
+        'description' => 'Conditions for displaying link',
       ],
     ];
   }

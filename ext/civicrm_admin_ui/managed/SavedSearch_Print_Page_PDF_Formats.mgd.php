@@ -111,7 +111,7 @@ return [
                   'style' => 'default',
                   'path' => '',
                   'task' => 'enable',
-                  'condition' => ['is_active', '=', FALSE],
+                  'condition' => [],
                 ],
                 [
                   'task' => 'disable',
@@ -123,7 +123,7 @@ return [
                   'style' => 'default',
                   'path' => '',
                   'action' => 'disable',
-                  'condition' => ['is_active', '=', TRUE],
+                  'condition' => [],
                 ],
                 [
                   'entity' => 'OptionValue',
