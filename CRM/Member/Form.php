@@ -586,12 +586,12 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
     $this->order->setForm($this);
     $this->order->setPriceSelectionFromUnfilteredInput($formValues);
 
-    if (isset($formValues['total_amount'])) {
-      $this->order->setOverrideTotalAmount((float) $formValues['total_amount']);
+    if ($this->getSubmittedValue('total_amount')) {
+      $this->order->setOverrideTotalAmount((float) $this->getSubmittedValue('total_amount'));
     }
 
-    if ($this->isQuickConfig()) {
-      $this->order->setOverrideFinancialTypeID((int) $formValues['financial_type_id']);
+    if ($this->isQuickConfig() && $this->getSubmittedValue('financial_type_id')) {
+      $this->order->setOverrideFinancialTypeID((int) $this->getSubmittedValue('financial_type_id'));
     }
 
     return $formValues;
