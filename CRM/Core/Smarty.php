@@ -293,11 +293,15 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
   /**
    * Clear template variables, except session or config.
    *
+   * Also the debugging variable because during test runs initialize() is only
+   * called once at the start but the var gets indirectly accessed by a couple
+   * tests that test forms.
+   *
    * @return void
    */
   public function clearTemplateVars(): void {
     foreach (array_keys($this->getTemplateVars()) as $key) {
-      if ($key === 'config' || $key === 'session') {
+      if ($key === 'config' || $key === 'session' || $key === 'debugging') {
         continue;
       }
       $this->clearAssign($key);
