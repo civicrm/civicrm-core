@@ -104,7 +104,9 @@
     "psr/container": "~1.0 || ~2.0",
     "ext-fileinfo": "*",
     "pontedilana/php-weasyprint": "^0.13.0",
-    "knplabs/knp-snappy": "^1.4"
+    "knplabs/knp-snappy": "^1.4",
+    "behat/mink": "^1.10",
+    "dmore/chrome-mink-driver": "^2.9"
   },
   "scripts": {
     "post-install-cmd": [
