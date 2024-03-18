@@ -12,6 +12,7 @@
 use Civi\Api4\ActivityContact;
 use Civi\Api4\Contribution;
 use Civi\Api4\ContributionRecur;
+use Civi\Api4\LineItem;
 use Civi\Api4\Pledge;
 use Civi\Api4\PriceField;
 use Civi\Api4\PriceFieldValue;
@@ -3478,7 +3479,11 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     // Update the most recent contribution to have a qty of 1 in it's line item and then repeat, expecting just 1 year to be added.
     $contribution = Contribution::get()->setOrderBy(['id' => 'DESC'])->setSelect(['id'])->execute()->first();
-    CRM_Core_DAO::executeQuery('UPDATE civicrm_line_item SET price_field_value_id = ' . $this->_ids['price_field_value'][0] . ' WHERE contribution_id = ' . $contribution['id']);
+    LineItem::update(FALSE)
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->addValue('membership_num_terms', 1)
+      ->execute();
+
     $this->callAPISuccess('contribution', 'repeattransaction', ['contribution_recur_id' => $contributionRecurID, 'contribution_status_id' => 'Completed']);
     $membership = $this->callAPISuccessGetSingle('membership', ['id' => $this->_ids['membership']]);
     $this->assertEquals(date('Y-m-d', strtotime('yesterday + 5 years' . $adjustmentForLeapYear)), $membership['end_date']);

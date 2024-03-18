@@ -16,6 +16,7 @@ use Civi\Api4\Contribution;
 use Civi\Api4\ContributionRecur;
 use Civi\Api4\LineItem;
 use Civi\Api4\ContributionSoft;
+use Civi\Api4\MembershipLog;
 use Civi\Api4\PaymentProcessor;
 use Civi\Core\Event\PostEvent;
 
@@ -452,10 +453,11 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
    * @param int $membershipTypeID
    *
    * @param int $contributionID
-   *
+   * @deprecated
    * @return int
    */
   public static function getNumTermsByContributionAndMembershipType($membershipTypeID, $contributionID) {
+    CRM_Core_Error::deprecatedFunctionWarning('Use API4 LineItem::get');
     $numTerms = CRM_Core_DAO::singleValueQuery("
       SELECT v.membership_num_terms FROM civicrm_line_item li
       LEFT JOIN civicrm_price_field_value v ON li.price_field_value_id = v.id
@@ -4170,7 +4172,9 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * load them in this function. Code clean up would compensate for any minor performance implication.
    *
    * @param int $contributionID
+   *   The Contribution ID that was Completed
    * @param string $changeDate
+   *   If provided, specify an alternative date to use as "today" calculation of membership dates
    *
    * @throws \CRM_Core_Exception
    */
@@ -4193,30 +4197,29 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
       // CRM-8141 update the membership type with the value recorded in log when membership created/renewed
       // this picks up membership type changes during renewals
-      // @todo this is almost certainly an obsolete sql call, the pre-change
-      // membership is accessible via $this->_relatedObjects
-      $sql = "
-SELECT    membership_type_id
-FROM      civicrm_membership_log
-WHERE     membership_id={$membershipParams['id']}
-ORDER BY  id DESC
-LIMIT 1;";
-      $dao = CRM_Core_DAO::executeQuery($sql);
-      if ($dao->fetch()) {
-        if (!empty($dao->membership_type_id)) {
-          $membershipParams['membership_type_id'] = $dao->membership_type_id;
-        }
+      $preChangeMembership = MembershipLog::get(FALSE)
+        ->addSelect('membership_type_id')
+        ->addWhere('membership_id', '=', $membershipParams['id'])
+        ->addOrderBy('id', 'DESC')
+        ->execute()
+        ->first();
+      if (!empty($preChangeMembership) && !empty($preChangeMembership['membership_type_id'])) {
+        $membershipParams['membership_type_id'] = $preChangeMembership['membership_type_id'];
       }
       if (empty($membership['end_date']) || (int) $membership['status_id'] !== CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Pending')) {
         // Passing num_terms to the api triggers date calculations, but for pending memberships these may be already calculated.
         // sigh - they should  be  consistent but removing the end date check causes test failures & maybe UI too?
         // The api assumes num_terms is a special sauce for 'is_renewal' so we need to not pass it when updating a pending to completed.
         // ... except testCompleteTransactionMembershipPriceSetTwoTerms hits this line so the above is obviously not true....
-        // @todo once apiv4 ships with core switch to that & find sanity.
-        $membershipParams['num_terms'] = self::getNumTermsByContributionAndMembershipType(
-          $membershipParams['membership_type_id'],
-          $contributionID
-        );
+        $lineItem = LineItem::get(FALSE)
+          ->addSelect('membership_num_terms')
+          ->addJoin('PriceFieldValue AS price_field_value', 'LEFT')
+          ->addWhere('contribution_id', '=', $contributionID)
+          ->addWhere('price_field_value.membership_type_id', '=', $membershipParams['membership_type_id'])
+          ->execute()
+          ->first();
+        // default of 1 is precautionary
+        $membershipParams['num_terms'] = empty($lineItem['membership_num_terms']) ? 1 : $lineItem['membership_num_terms'];
       }
       // @todo remove all this stuff in favour of letting the api call further down handle in
       // (it is a duplication of what the api does).
@@ -4253,7 +4256,7 @@ LIMIT 1;";
         );
 
         unset($dates['end_date']);
-        $membershipParams['status_id'] = CRM_Utils_Array::value('id', $calcStatus, 'New');
+        $membershipParams['status_id'] = $calcStatus['id'] ?? 'New';
       }
       //we might be renewing membership,
       //so make status override false.
