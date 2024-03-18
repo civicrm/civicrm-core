@@ -182,7 +182,10 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
           ]);
         }
       }
-      return CRM_Custom_Form_CustomData::buildQuickForm($this);
+      $this->addElement('hidden', 'hidden_custom', 1);
+      $this->addElement('hidden', "hidden_custom_group_count[{$this->_groupID}]", $this->_groupCount);
+      CRM_Core_BAO_CustomGroup::buildQuickForm($this, $this->_groupTree);
+      return;
     }
 
     //need to assign custom data type and subtype to the template
@@ -239,7 +242,8 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
         }
       }
       else {
-        $customDefaultValue = CRM_Custom_Form_CustomData::setDefaultValues($this);
+        $customDefaultValue = [];
+        CRM_Core_BAO_CustomGroup::setDefaults($this->_groupTree, $customDefaultValue, FALSE, FALSE, $this->get('action'));
       }
       return $customDefaultValue;
     }
