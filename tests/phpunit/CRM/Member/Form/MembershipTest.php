@@ -1306,6 +1306,7 @@ Expires: ',
    * @param array $formValues
    *
    * @return \CRM_Member_Form_Membership
+   * @throws \CRM_Core_Exception
    */
   protected function getForm(array $formValues = []): CRM_Member_Form_Membership {
     if (isset($_REQUEST['cid'])) {
@@ -1552,12 +1553,10 @@ Expires: ',
   /**
    * Test that membership end_date is correct for multiple terms for pending contribution
    *
-   * @throws \CRM_Core_Exception
    * @throws \Exception
    */
   public function testCreatePendingWithMultipleTerms(): void {
     CRM_Core_Session::singleton()->getStatus(TRUE);
-    $mailUtil = new CiviMailUtils($this, TRUE);
     $this->createLoggedInUser();
     $membershipTypeAnnualRolling = $this->callAPISuccess('membership_type', 'create', [
       'domain_id' => 1,
@@ -1572,7 +1571,7 @@ Expires: ',
       'financial_type_id' => 2,
     ]);
     $params = [
-      'cid' => $this->ids['Contact']['individual_0'],
+      'contact_id' => $this->ids['Contact']['individual_0'],
       'join_date' => date('Y-m-d'),
       'start_date' => '',
       'end_date' => '',
@@ -1589,10 +1588,8 @@ Expires: ',
       'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
       'receipt_text' => '',
     ];
-    $form = $this->getForm();
-    $form->preProcess();
-    $form->_contactID = $this->ids['Contact']['individual_0'];
-    $form->testSubmit($params);
+    $form = $this->getTestForm('CRM_Member_Form_Membership', $params);
+    $form->processForm();
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->ids['Contact']['individual_0']]);
     // Check if Membership is set to Pending.
     $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Pending'), $membership['status_id']);

@@ -147,8 +147,14 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
     // get price set id.
     $this->_priceSetId = $_GET['priceSetId'] ?? NULL;
-    $this->set('priceSetId', $this->_priceSetId);
-    $this->assign('priceSetId', $this->_priceSetId);
+    // This is assigned only for the purposes of displaying the price block
+    // INSTEAD of the edit form. ie when the form is being overloaded
+    // via ajax (which is a long-standing anti-pattern - in
+    // some cases we have moved that overload behaviour
+    // to a separate form but note that it is necessary to
+    // add the fields to QuickForm when the form
+    // has been submitted so they appear in submittedValues().
+    $this->assign('priceSetId', $_GET['priceSetId'] ?? NULL);
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       $contributionID = CRM_Member_BAO_Membership::getMembershipContributionId($this->_id);
@@ -1750,9 +1756,20 @@ DESC limit 1");
         $membershipTypeValues[$memType]['max_related'] = $this->getSubmittedValue('max_related');
       }
     }
-
+    // Really we don't need to do all this unless one of the join dates
+    // has been left empty by the submitter - ie in an ADD scenario but not really
+    // valid when editing & it would possibly not get the number of terms right
+    // so ideally the fields would be required on edit & the below would only
+    // be called on ADD
     foreach ($this->order->getMembershipLineItems() as $membershipLineItem) {
-      $memTypeNumTerms = $this->getSubmittedValue('num_terms') ?: $membershipLineItem['membership_num_terms'];
+      if ($this->getAction() === CRM_Core_Action::ADD && $this->isQuickConfig()) {
+        $memTypeNumTerms = $this->getSubmittedValue('num_terms');
+      }
+      else {
+        // The submitted value is hidden when a price set is selected so
+        // although it is present it should be ignored.
+        $memTypeNumTerms = $membershipLineItem['membership_num_terms'];
+      }
       $calcDates = CRM_Member_BAO_MembershipType::getDatesForMembershipType(
         $membershipLineItem['membership_type_id'],
         $this->getSubmittedValue('join_date'),
