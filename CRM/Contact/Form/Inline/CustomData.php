@@ -54,7 +54,9 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
-    CRM_Custom_Form_CustomData::buildQuickForm($this);
+    $this->addElement('hidden', 'hidden_custom', 1);
+    $this->addElement('hidden', "hidden_custom_group_count[{$this->_groupID}]", $this->_groupCount);
+    CRM_Core_BAO_CustomGroup::buildQuickForm($this, $this->_groupTree);
   }
 
   /**
@@ -63,7 +65,9 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
    * @return array
    */
   public function setDefaultValues() {
-    return CRM_Custom_Form_CustomData::setDefaultValues($this);
+    $defaults = [];
+    CRM_Core_BAO_CustomGroup::setDefaults($this->_groupTree, $defaults, FALSE, FALSE, $this->get('action'));
+    return $defaults;
   }
 
   /**

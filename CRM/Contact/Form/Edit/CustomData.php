@@ -66,7 +66,9 @@ class CRM_Contact_Form_Edit_CustomData {
       $form->_customValueCount = $customValueCount;
       $form->assign('customValueCount', $customValueCount);
     }
-    CRM_Custom_Form_CustomData::buildQuickForm($form);
+    $form->addElement('hidden', 'hidden_custom', 1);
+    $form->addElement('hidden', "hidden_custom_group_count[{$form->_groupID}]", $form->_groupCount);
+    CRM_Core_BAO_CustomGroup::buildQuickForm($form, $form->_groupTree);
 
     //build custom data.
     $contactSubType = NULL;
@@ -91,7 +93,8 @@ class CRM_Contact_Form_Edit_CustomData {
    */
   public static function setDefaultValues(&$form, &$defaults) {
     CRM_Core_Error::deprecatedFunctionWarning('take a copy?');
-    $defaults += CRM_Custom_Form_CustomData::setDefaultValues($form);
+    CRM_Core_BAO_CustomGroup::setDefaults($form->_groupTree, $defaults, FALSE, FALSE, $form->get('action'));
+    return $defaults;
   }
 
 }
