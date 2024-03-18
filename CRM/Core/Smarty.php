@@ -170,10 +170,15 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
     }
     $this->loadFilter('pre', 'resetExtScope');
     $this->loadFilter('pre', 'htxtFilter');
+    // In theory json_encode, count & implode no longer need to
+    // be added as they are now more natively supported in smarty4, smarty5
     $this->registerPlugin('modifier', 'json_encode', 'json_encode');
     $this->registerPlugin('modifier', 'count', 'count');
     $this->registerPlugin('modifier', 'implode', 'implode');
+    // We use str_starts_with to check if a field is (e.g 'phone_' in profile presentation.
     $this->registerPlugin('modifier', 'str_starts_with', 'str_starts_with');
+    // Trim is used on the extensions page.
+    $this->registerPlugin('modifier', 'trim', 'trim');
 
     $this->assign('crmPermissions', new CRM_Core_Smarty_Permissions());
 
