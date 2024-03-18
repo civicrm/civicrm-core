@@ -20,6 +20,7 @@
  */
 class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
   use CRM_Custom_Form_CustomDataTrait;
+  use CRM_Campaign_Form_CampaignFormTrait;
 
   /**
    * Action
@@ -107,7 +108,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
       // not be available from `$this->getSubmittedValue()` in post process.
       // We do not have to set defaults or otherwise render - just add to the element index.
       $this->addCustomDataFieldsToForm('Campaign', array_filter([
-        'id' => $this->_campaignId,
+        'id' => $this->getCampaignID(),
         'campaign_type_id' => $this->getSubmittedValue('campaign_type_id'),
       ]));
     }
@@ -173,7 +174,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
 
     // Assign custom data subtype for initial ajax load of custom data.
     $this->assign('entityID', $this->_campaignId);
-    $this->assign('customDataSubType', $this->_values['campaign_type_id'] ?? NULL);
+    $this->assign('customDataSubType', $this->getSubmittedValue('campaign_type_id') ?: $this->getCampaignValue('campaign_type_id'));
 
     $attributes = CRM_Core_DAO::getAttribute('CRM_Campaign_DAO_Campaign');
 
@@ -245,6 +246,22 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     $this->addButtons($buttons);
 
     $this->addFormRule(['CRM_Campaign_Form_Campaign', 'formRule']);
+  }
+
+  /**
+   * Get the selected Campaign ID.
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  public function getCampaignID(): ?int {
+    if (!isset($this->_campaignId)) {
+      $this->_campaignId = CRM_Utils_Request::retrieve('id', 'Positive') ?: NULL;
+    }
+    return $this->_campaignId;
   }
 
   /**
