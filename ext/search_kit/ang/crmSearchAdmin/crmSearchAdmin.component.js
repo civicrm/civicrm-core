@@ -43,17 +43,17 @@
       },
       {
         key: 'fields',
-        title: ts('Select Fields'),
+        title: ts('Field Transformations'),
         icon: 'fa-columns',
       },
       {
         key: 'settings',
-        title: ts('Configure Settings'),
+        title: ts('Save Options'),
         icon: 'fa-gears',
       },
       {
         key: 'query',
-        title: ts('Query Info'),
+        title: ts('Debug Info'),
         icon: 'fa-info-circle',
       },
     ];
