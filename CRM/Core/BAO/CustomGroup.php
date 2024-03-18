@@ -1265,7 +1265,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
               }
               else {
                 if ($field['html_type'] === 'Autocomplete-Select') {
-                  $checkedValue = array_filter(explode(CRM_Core_DAO::VALUE_SEPARATOR, $value));
+                  $checkedValue = array_filter((array) \CRM_Utils_Array::explodePadded($value));
                   $defaults[$elementName] = implode(',', $checkedValue);
                   continue;
                 }
