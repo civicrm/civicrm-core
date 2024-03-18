@@ -132,14 +132,16 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
 
     $this->assign('config', $config);
     $this->assign('session', $session);
-    $this->assign('debugging', [
+    $debugdata = [
       'smartyDebug' => CRM_Utils_Request::retrieveValue('smartyDebug', 'Integer'),
       'sessionReset' => CRM_Utils_Request::retrieveValue('sessionReset', 'Integer'),
       'sessionDebug' => CRM_Utils_Request::retrieveValue('sessionDebug', 'Integer'),
       'directoryCleanup' => CRM_Utils_Request::retrieveValue('directoryCleanup', 'Integer'),
       'cacheCleanup' => CRM_Utils_Request::retrieveValue('cacheCleanup', 'Integer'),
       'configReset' => CRM_Utils_Request::retrieveValue('configReset', 'Integer'),
-    ]);
+    ];
+    fwrite(STDERR, "testing theory that this is only called once during the whole suite and that it is empty-ish during tests\n" . var_export($debugdata, true));
+    $this->assign('debugging', $debugdata);
     $this->assign('snippet_type', CRM_Utils_Request::retrieveValue('snippet', 'String'));
 
     $tsLocale = CRM_Core_I18n::getLocale();
