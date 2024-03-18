@@ -418,42 +418,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   }
 
   /**
-   * Do some custom data wrangling.
-   *
-   * @throws \CRM_Core_Exception
-   */
-  private function preProcessCustomData(): void {
-    $customDataType = CRM_Utils_Request::retrieve('type', 'String');
-    // if customDataType is present it implies it is a new contact - ie
-    // the person has selected 'New Individual' and the type 'Individual' is in the url.
-    if ($customDataType) {
-      $this->assign('addBlock', TRUE);
-      $this->assign('blockName', 'CustomData');
-    }
-    // We should probably fold this into the function in the build quick form process.
-    // There is no particular reason to call it in preProcess & it logically
-    // belongs with the buildQuickForm code.
-    // The comments below this line are historical.
-    // The reason we call this here is that it sets the _groupTree property which is later used
-    // in setDefaultValues and buildForm. (Ideally instead we would have a trait with getCustomGroup & getCustomFields
-    // that can be called at appropriate times). In order for buildForm to add the right fields it needs
-    // to know any contact sub types that are being added in the submission. Since this runs before
-    // the buildForm adds the contact_sub_type to the form we need to look in _submitValues for it - submitValues
-    // is a un-sanitised version of what is in the form submission (_POST) whereas `getSubmittedValues()` retrieves
-    // 'allowed' POSTED values - ie values which match available fields, with some localization handling.
-    // @todo - it's probably that there is no reason to pass NULl vs 1 for groupCount below.
-    $this->legacyPreProcessCustomData();
-    if (!$customDataType) {
-      // Probably this does not need to be wrapped in an IF.
-      $this->assign('customValueCount', $this->_customValueCount);
-    }
-    if ($customDataType) {
-      // Not too sure why this makes sense for new contacts only.
-      $this->assign('groupTree', $this->_groupTree);
-    }
-  }
-
-  /**
    * Set default values for the form.
    *
    * Note that in edit/view mode the default values are retrieved from the database
@@ -1628,7 +1592,34 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   private function buildCustomData(): void {
-    $this->preProcessCustomData();
+    $customDataType = CRM_Utils_Request::retrieve('type', 'String');
+    // if customDataType is present it implies it is a new contact - ie
+    // the person has selected 'New Individual' and the type 'Individual' is in the url.
+    if ($customDataType) {
+      $this->assign('addBlock', TRUE);
+      $this->assign('blockName', 'CustomData');
+    }
+    // We should probably fold this into the function in the build quick form process.
+    // There is no particular reason to call it in preProcess & it logically
+    // belongs with the buildQuickForm code.
+    // The comments below this line are historical.
+    // The reason we call this here is that it sets the _groupTree property which is later used
+    // in setDefaultValues and buildForm. (Ideally instead we would have a trait with getCustomGroup & getCustomFields
+    // that can be called at appropriate times). In order for buildForm to add the right fields it needs
+    // to know any contact sub types that are being added in the submission. Since this runs before
+    // the buildForm adds the contact_sub_type to the form we need to look in _submitValues for it - submitValues
+    // is a un-sanitised version of what is in the form submission (_POST) whereas `getSubmittedValues()` retrieves
+    // 'allowed' POSTED values - ie values which match available fields, with some localization handling.
+    // @todo - it's probably that there is no reason to pass NULl vs 1 for groupCount below.
+    $this->legacyPreProcessCustomData();
+    if (!$customDataType) {
+      // Probably this does not need to be wrapped in an IF.
+      $this->assign('customValueCount', $this->_customValueCount);
+    }
+    if ($customDataType) {
+      // Not too sure why this makes sense for new contacts only.
+      $this->assign('groupTree', $this->_groupTree);
+    }
     $customValueCount = $this->_submitValues['hidden_custom_group_count'] ?? NULL;
     if (is_array($customValueCount)) {
       if (array_key_exists(0, $customValueCount)) {
