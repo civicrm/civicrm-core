@@ -9,6 +9,9 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\FinancialAccount;
+use Civi\Api4\FinancialItem;
+
 /**
  *
  * @package CRM
@@ -260,16 +263,19 @@ WHERE cc.id IN (' . implode(',', $contactIds) . ') AND con.is_test = 0';
    * @return array
    */
   public static function getPreviousFinancialItem($entityId) {
-    $params = [
-      'entity_id' => $entityId,
-      'entity_table' => 'civicrm_line_item',
-      'options' => ['limit' => 1, 'sort' => 'id DESC'],
-    ];
-    $salesTaxFinancialAccounts = civicrm_api3('FinancialAccount', 'get', ['is_tax' => 1]);
-    if ($salesTaxFinancialAccounts['count']) {
-      $params['financial_account_id'] = ['NOT IN' => array_keys($salesTaxFinancialAccounts['values'])];
+    $financialItemAPI = FinancialItem::get(FALSE)
+      ->addWhere('entity_id', '=', $entityId)
+      ->addWhere('entity_table', '=', 'civicrm_line_item')
+      ->addOrderBy('id', 'DESC');
+
+    $salesTaxFinancialAccounts = FinancialAccount::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('is_tax', '=', 1)
+      ->execute();
+    if ($salesTaxFinancialAccounts->count() > 0) {
+      $financialItemAPI->addWhere('financial_account_id', 'NOT IN', $salesTaxFinancialAccounts->column('id'));
     }
-    return civicrm_api3('FinancialItem', 'getsingle', $params);
+    return $financialItemAPI->execute()->first();
   }
 
   /**
