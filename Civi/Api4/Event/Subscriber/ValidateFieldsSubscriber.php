@@ -44,7 +44,7 @@ class ValidateFieldsSubscriber extends Generic\AbstractPrepareSubscriber {
         $getParam = 'get' . ucfirst($param);
         $value = $apiRequest->$getParam();
         // Required fields
-        if (!empty($info['required']) && (!$value && $value !== 0 && $value !== '0')) {
+        if (!empty($info['required']) && ($value === NULL || $value === '' || $value === [] || $value === FALSE)) {
           throw new \CRM_Core_Exception('Parameter "' . $param . '" is required.');
         }
         if (!empty($info['type']) && !self::checkType($value, $info['type'])) {
