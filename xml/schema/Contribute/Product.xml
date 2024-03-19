@@ -65,6 +65,7 @@
     <type>text</type>
     <localizable>true</localizable>
     <comment>Store comma-delimited list of color, size, etc. options for the product.</comment>
+    <serialize>COMMA</serialize>
     <add>1.4</add>
   </field>
   <field>
