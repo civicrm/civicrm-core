@@ -26,7 +26,7 @@ class CRM_Core_ComposerConfigTest extends \PHPUnit\Framework\TestCase {
       'symfony/event-dispatcher' => '/^v4\.4\./',
       'symfony/filesystem' => '/^v4\.4\./',
       'symfony/finder' => '/^v4\.4\./',
-      'symfony/process' => '/^v4\.4\./',
+      'symfony/process' => '/^v5\.4\./',
     ];
 
     $lockFile = Civi::paths()->getPath('[civicrm.root]/composer.lock');
