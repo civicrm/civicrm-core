@@ -39,6 +39,8 @@
  */
 class CRM_Core_BAO_SchemaHandler {
 
+  const DEFAULT_COLLATION = 'utf8mb4_unicode_ci';
+
   /**
    * Create a CiviCRM-table
    *
@@ -899,7 +901,7 @@ MODIFY      {$columnName} varchar( $length )
     if (!isset(\Civi::$statics[__CLASS__][__FUNCTION__])) {
       $dao = CRM_Core_DAO::executeQuery('SHOW TABLE STATUS LIKE \'civicrm_contact\'');
       $dao->fetch();
-      \Civi::$statics[__CLASS__][__FUNCTION__] = $dao->Collation;
+      \Civi::$statics[__CLASS__][__FUNCTION__] = $dao->Collation ?? self::DEFAULT_COLLATION;
     }
     return \Civi::$statics[__CLASS__][__FUNCTION__];
   }
