@@ -94,7 +94,7 @@
     <tr class="crm-contribution-form-block-options">
        <td class="label">{$form.options.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_product' field='options' id=$productId}{/if}</td>
       <td class="html-adjust">{$form.options.html}<br />
-          <span class="description">{ts}Enter a comma-delimited list of color, size, etc. options for the product if applicable. Contributors will be presented a drop-down menu of these options when they select this product.{/ts}</span>
+          <span class="description">{ts}Enter a comma-delimited list of color, size, etc. options for the product if applicable. Contributors will be presented a drop-down menu of these options when they select this product.{/ts} {ts}You can also use the format key=label, where the key could be the SKU of the option, for example.{/ts}</span>
        </td>
     </tr>
     <tr class="crm-contribution-form-block-is_active">

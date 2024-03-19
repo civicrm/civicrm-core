@@ -231,7 +231,7 @@
         <td class="label">{ts}Option{/ts}</td>
         <td>{$option}</td>
         <td class="label">{ts}Fulfilled{/ts}</td>
-        <td>{$fulfilled|truncate:10:''|crmDate}</td>
+        <td>{if $fulfilled}{$fulfilled|truncate:10:''|crmDate}{else}{ts}No{/ts}{/if}</td>
       </table>
     </div>
   </details>
