@@ -1201,10 +1201,23 @@ DESC limit 1");
         // If we are recording a contribution we *do* want to trigger a recalculation of membership status so it can go from Pending->New/Current
         // So here we check if status_id is empty, default (ie. status in database) is pending and that we are not recording a contribution -
         //   If all those are true then we skip the status calculation and explicitly set the pending status (to avoid a DB constraint status_id=0).
+        // Test cover in `CRM_Member_Form_MembershipTest::testOverrideSubmit()`.
+        $isPaymentPending = FALSE;
+        if ($this->getMembershipID()) {
+          $contributionId = CRM_Member_BAO_Membership::getMembershipContributionId($this->getMembershipID());
+          if ($contributionId) {
+            $isPaymentPending = \Civi\Api4\Contribution::get(FALSE)
+              ->addSelect('contribution_status_id:name')
+              ->addWhere('id', '=', $contributionId)
+              ->execute()
+              ->first()['contribution_status_id:name'] === 'Pending';
+          }
+        }
         if (empty($membershipParams['status_id'])
           && !empty($this->_defaultValues['status_id'])
           && !$this->getSubmittedValue('record_contribution')
           && (int) $this->_defaultValues['status_id'] === $pendingMembershipStatusId
+          && $isPaymentPending
         ) {
           $membershipParams['status_id'] = $this->_defaultValues['status_id'];
         }
