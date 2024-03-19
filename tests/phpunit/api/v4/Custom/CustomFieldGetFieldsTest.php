@@ -59,17 +59,17 @@ class CustomFieldGetFieldsTest extends Api4TestBase {
         [
           'name' => 'int',
           'data_type' => 'Int',
-          'html_type' => 'Text',
+          'html_type' => 'Number',
         ],
         [
           'name' => 'float',
           'data_type' => 'Float',
-          'html_type' => 'Text',
+          'html_type' => 'Number',
         ],
         [
           'name' => 'money',
           'data_type' => 'Money',
-          'html_type' => 'Text',
+          'html_type' => 'Number',
         ],
         [
           'name' => 'memo',
@@ -179,16 +179,16 @@ class CustomFieldGetFieldsTest extends Api4TestBase {
     $field = $fields["$customGroupName.float"];
     $this->assertSame('Number', $field['input_type']);
     $this->assertSame('Float', $field['data_type']);
-    $this->assertSame(.01, $field['input_attrs']['step']);
+    $this->assertSame('any', $field['input_attrs']['step']);
     $this->assertFalse($field['options']);
     $this->assertNull($field['operators']);
     $this->assertNull($field['serialize']);
 
     // Check money field
     $field = $fields["$customGroupName.money"];
-    $this->assertSame('Text', $field['input_type']);
+    $this->assertSame('Number', $field['input_type']);
     $this->assertSame('Money', $field['data_type']);
-    $this->assertArrayNotHasKey('step', $field['input_attrs']);
+    $this->assertSame('any', $field['input_attrs']['step']);
     $this->assertFalse($field['options']);
     $this->assertNull($field['operators']);
     $this->assertNull($field['serialize']);
