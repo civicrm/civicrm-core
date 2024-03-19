@@ -340,7 +340,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
 
     $this->applyFilter('__ALL__', 'trim');
-    $this->assign('showMainEmail', empty($this->_ccid));
+    $this->assign('showMainEmail', (empty($this->_ccid) && $this->_emailExists === FALSE));
     if (empty($this->_ccid)) {
       if ($this->_emailExists == FALSE) {
         $this->add('text', "email-{$this->_bltID}",
