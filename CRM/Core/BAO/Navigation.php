@@ -470,8 +470,6 @@ ORDER BY weight";
       $query = "UPDATE civicrm_setting SET value = '$ser' WHERE name='navigation' AND contact_id IS NOT NULL";
       CRM_Core_DAO::executeQuery($query);
       Civi::cache('navigation')->flush();
-      // reset ACL and System caches
-      CRM_Core_BAO_Cache::resetCaches();
     }
     else {
       // before inserting check if contact id exists in db
