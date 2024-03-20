@@ -125,8 +125,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     // Make the contributionPageID available to the template
     $this->assign('contributionPageID', $this->_id);
     $this->assign('ccid', $this->_ccid);
-    $this->assign('isShare', CRM_Utils_Array::value('is_share', $this->_values));
-    $this->assign('isConfirmEnabled', CRM_Utils_Array::value('is_confirm_enabled', $this->_values));
+    $this->assign('isShare', $this->_values['is_share'] ?? NULL);
+    $this->assign('isConfirmEnabled', $this->_values['is_confirm_enabled'] ?? NULL);
 
     // Required for currency formatting in the JS layer
     // this is a temporary fix intended to resolve a regression quickly

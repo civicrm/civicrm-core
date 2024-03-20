@@ -44,11 +44,11 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
 
     $this->_params = $this->get('params');
     $this->_useForMember = $this->get('useForMember');
-    $this->assign('thankyou_title', CRM_Utils_Array::value('thankyou_title', $this->_values));
-    $this->assign('thankyou_text', CRM_Utils_Array::value('thankyou_text', $this->_values));
-    $this->assign('thankyou_footer', CRM_Utils_Array::value('thankyou_footer', $this->_values));
-    $this->assign('max_reminders', CRM_Utils_Array::value('max_reminders', $this->_values));
-    $this->assign('initial_reminder_day', CRM_Utils_Array::value('initial_reminder_day', $this->_values));
+    $this->assign('thankyou_title', $this->_values['thankyou_title'] ?? NULL);
+    $this->assign('thankyou_text', $this->_values['thankyou_text'] ?? NULL);
+    $this->assign('thankyou_footer', $this->_values['thankyou_footer'] ?? NULL);
+    $this->assign('max_reminders', $this->_values['max_reminders'] ?? NULL);
+    $this->assign('initial_reminder_day', $this->_values['initial_reminder_day'] ?? NULL);
     $this->assignTotalAmounts();
     // Link (button) for users to create their own Personal Campaign page
     if ($linkText = CRM_PCP_BAO_PCP::getPcpBlockStatus($this->getContributionPageID(), 'contribute')) {
@@ -98,7 +98,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     $this->_ccid = $this->get('ccid');
     $option = $this->get('option');
     $membershipTypeID = $this->get('membershipTypeID');
-    $this->assign('receiptFromEmail', CRM_Utils_Array::value('receipt_from_email', $this->_values));
+    $this->assign('receiptFromEmail', $this->_values['receipt_from_email'] ?? NULL);
 
     if ($this->getProductID()) {
       $this->buildPremiumsBlock(FALSE, $option);

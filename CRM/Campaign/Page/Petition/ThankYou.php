@@ -28,11 +28,11 @@ class CRM_Campaign_Page_Petition_ThankYou extends CRM_Core_Page {
     $petition = [];
     CRM_Campaign_BAO_Survey::retrieve($params, $petition);
     $this->assign('petitionTitle', $petition['title']);
-    $this->assign('thankyou_title', CRM_Utils_Array::value('thankyou_title', $petition));
-    $this->assign('thankyou_text', CRM_Utils_Array::value('thankyou_text', $petition));
+    $this->assign('thankyou_title', $petition['thankyou_title'] ?? NULL);
+    $this->assign('thankyou_text', $petition['thankyou_text'] ?? NULL);
     $this->assign('survey_id', $petition_id);
     $this->assign('status_id', $id);
-    $this->assign('is_share', CRM_Utils_Array::value('is_share', $petition));
+    $this->assign('is_share', $petition['is_share'] ?? NULL);
     CRM_Utils_System::setTitle(CRM_Utils_Array::value('thankyou_title', $petition));
 
     // send thank you or email verification emails

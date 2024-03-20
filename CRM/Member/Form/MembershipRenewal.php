@@ -217,7 +217,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
     $renewalDate = $defaults['renewal_date'] ?? NULL;
     $this->assign('renewalDate', $renewalDate);
-    $this->assign('member_is_test', CRM_Utils_Array::value('member_is_test', $defaults));
+    $this->assign('member_is_test', $defaults['member_is_test'] ?? NULL);
 
     if ($this->_mode) {
       $defaults = $this->getBillingDefaults($defaults);
@@ -487,7 +487,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $this->storeContactFields($this->_params);
     $this->beginPostProcess();
     $now = CRM_Utils_Date::getToday(NULL, 'YmdHis');
-    $this->assign('receive_date', CRM_Utils_Array::value('receive_date', $this->_params, CRM_Utils_Time::date('Y-m-d H:i:s')));
+    $this->assign('receive_date', $this->_params['receive_date'] ?? CRM_Utils_Time::date('Y-m-d H:i:s'));
     $this->processBillingAddress($this->getContributionContactID(), (string) $this->_contributorEmail);
 
     $this->_params['total_amount'] = CRM_Utils_Array::value('total_amount', $this->_params,

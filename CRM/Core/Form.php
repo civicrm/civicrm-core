@@ -401,7 +401,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     // Workaround for CRM-15153 - give each form a reasonably unique css class
     $this->addClass(CRM_Utils_System::getClassName($this));
 
-    $this->assign('snippet', CRM_Utils_Array::value('snippet', $_GET));
+    $this->assign('snippet', $_GET['snippet'] ?? NULL);
     $this->setTranslatedFields();
   }
 

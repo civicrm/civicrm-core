@@ -198,12 +198,12 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
         }
       }
     }
-    $this->assign('totalAmount', CRM_Utils_Array::value('fee_amount', $defaults[$this->_participantId]));
+    $this->assign('totalAmount', $defaults[$this->_participantId]['fee_amount'] ?? NULL);
     if ($this->_action == CRM_Core_Action::UPDATE) {
       $fee_level = $defaults[$this->_participantId]['fee_level'];
       CRM_Event_BAO_Participant::fixEventLevel($fee_level);
       $this->assign('fee_level', $fee_level);
-      $this->assign('fee_amount', CRM_Utils_Array::value('fee_amount', $defaults[$this->_participantId]));
+      $this->assign('fee_amount', $defaults[$this->_participantId]['fee_amount'] ?? NULL);
     }
     $defaults = $defaults[$this->_participantId];
     return $defaults;
@@ -650,7 +650,7 @@ SELECT  id, html_type
       }
 
       $this->assign('totalAmount', $this->contributionAmt);
-      $this->assign('checkNumber', CRM_Utils_Array::value('check_number', $params));
+      $this->assign('checkNumber', $params['check_number'] ?? NULL);
     }
 
     $this->assign('register_date', $params['register_date']);

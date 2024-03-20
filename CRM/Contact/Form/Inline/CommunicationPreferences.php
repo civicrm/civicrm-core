@@ -51,7 +51,7 @@ class CRM_Contact_Form_Inline_CommunicationPreferences extends CRM_Contact_Form_
 
     foreach (CRM_Contact_BAO_Contact::$_greetingTypes as $greeting) {
       $name = "{$greeting}_display";
-      $this->assign($name, CRM_Utils_Array::value($name, $defaults));
+      $this->assign($name, $defaults[$name] ?? NULL);
     }
     return $defaults;
   }
