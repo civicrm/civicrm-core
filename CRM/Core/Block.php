@@ -399,7 +399,7 @@ class CRM_Core_Block {
     // Hook that enables extensions to add user-defined links
     CRM_Utils_Hook::links('create.new.shortcuts',
       NULL,
-      CRM_Core_DAO::$_nullObject,
+      NULL,
       $values
     );
 
