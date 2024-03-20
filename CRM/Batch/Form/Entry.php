@@ -946,7 +946,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     }
 
     $form->assign('receiptType', $this->currentRowIsRenew() ? 'membership renewal' : 'membership signup');
-    $form->assign('receive_date', CRM_Utils_Array::value('receive_date', $formValues));
+    $form->assign('receive_date', $formValues['receive_date'] ?? NULL);
     $form->assign('formValues', $formValues);
 
     $form->assign('mem_start_date', CRM_Utils_Date::formatDateOnlyLong($membership->start_date));

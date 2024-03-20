@@ -764,7 +764,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       }
     }
     else {
-      $this->assign('email', CRM_Utils_Array::value("email-{$this->_bltID}", $this->_params));
+      $this->assign('email', $this->_params["email-{$this->_bltID}"] ?? NULL);
     }
   }
 

@@ -521,7 +521,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $this->assign('is_pay_later', !empty($defaults['is_pay_later']));
 
-    $this->assign('contribution_status_id', CRM_Utils_Array::value('contribution_status_id', $defaults));
+    $this->assign('contribution_status_id', $defaults['contribution_status_id'] ?? NULL);
     if (!empty($defaults['contribution_status_id']) && in_array(
         CRM_Contribute_PseudoConstant::contributionStatus($defaults['contribution_status_id'], 'name'),
         // Historically not 'Cancelled' hence not using CRM_Contribute_BAO_Contribution::isContributionStatusNegative.
@@ -549,8 +549,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $this->assign('currency', $currency);
     // Hack to get currency info to the js layer. CRM-11440.
     CRM_Utils_Money::format(1);
-    $this->assign('currencySymbol', CRM_Utils_Array::value($currency, CRM_Utils_Money::$_currencySymbols));
-    $this->assign('totalAmount', CRM_Utils_Array::value('total_amount', $defaults));
+    $this->assign('currencySymbol', CRM_Utils_Money::$_currencySymbols[$currency] ?? NULL);
+    $this->assign('totalAmount', $defaults['total_amount'] ?? NULL);
 
     // Inherit campaign from pledge.
     if ($this->_ppID && !empty($this->_pledgeValues['campaign_id'])) {
@@ -2150,7 +2150,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $this->assign('getTaxDetails', $getTaxDetails);
       }
       else {
-        $this->assign('totalTaxAmount', CRM_Utils_Array::value('tax_amount', $submittedValues));
+        $this->assign('totalTaxAmount', $submittedValues['tax_amount'] ?? NULL);
       }
     }
   }

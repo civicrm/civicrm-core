@@ -79,8 +79,8 @@ class CRM_Event_Form_EventFees {
           $form->assign('discount', $discounts[$defaults['discount_id']]);
         }
 
-        $form->assign('fee_amount', CRM_Utils_Array::value('fee_amount', $defaults));
-        $form->assign('fee_level', CRM_Utils_Array::value('fee_level', $defaults));
+        $form->assign('fee_amount', $defaults['fee_amount'] ?? NULL);
+        $form->assign('fee_level', $defaults['fee_level'] ?? NULL);
       }
     }
 
@@ -163,12 +163,12 @@ class CRM_Event_Form_EventFees {
         }
       }
 
-      $form->assign('totalAmount', CRM_Utils_Array::value('fee_amount', $defaults));
+      $form->assign('totalAmount', $defaults['fee_amount'] ?? NULL);
       if ($form->_action == CRM_Core_Action::UPDATE) {
         $fee_level = $defaults['fee_level'];
         CRM_Event_BAO_Participant::fixEventLevel($fee_level);
         $form->assign('fee_level', $fee_level);
-        $form->assign('fee_amount', CRM_Utils_Array::value('fee_amount', $defaults));
+        $form->assign('fee_amount', $defaults['fee_amount'] ?? NULL);
       }
     }
 

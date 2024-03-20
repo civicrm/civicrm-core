@@ -343,7 +343,7 @@ DESC limit 1");
       $this->assign('autoRenewOption', CRM_Price_BAO_PriceSet::checkAutoRenewForPriceSet($this->_priceSetId));
 
       $this->assign('optionsMembershipTypes', $optionsMembershipTypes);
-      $this->assign('contributionType', CRM_Utils_Array::value('financial_type_id', $this->_priceSet));
+      $this->assign('contributionType', $this->_priceSet['financial_type_id'] ?? NULL);
 
       // get only price set form elements.
       if ($getOnlyPriceSetElements) {
@@ -871,7 +871,7 @@ DESC limit 1");
     else {
       $this->assign('receiptType', 'membership signup');
     }
-    $this->assign('receive_date', CRM_Utils_Array::value('receive_date', $formValues));
+    $this->assign('receive_date', $formValues['receive_date'] ?? NULL);
     $this->assign('formValues', $formValues);
 
     $this->assign('mem_start_date', CRM_Utils_Date::formatDateOnlyLong($membership['start_date']));
@@ -1152,7 +1152,7 @@ DESC limit 1");
       }
 
       $this->set('params', $formValues);
-      $this->assign('trxn_id', CRM_Utils_Array::value('trxn_id', $result));
+      $this->assign('trxn_id', $result['trxn_id'] ?? NULL);
       $this->assign('receive_date',
         CRM_Utils_Date::mysqlToIso($params['receive_date'])
       );

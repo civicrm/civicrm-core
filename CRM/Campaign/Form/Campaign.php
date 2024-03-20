@@ -173,7 +173,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
 
     // Assign custom data subtype for initial ajax load of custom data.
     $this->assign('entityID', $this->_campaignId);
-    $this->assign('customDataSubType', CRM_Utils_Array::value('campaign_type_id', $this->_values));
+    $this->assign('customDataSubType', $this->_values['campaign_type_id'] ?? NULL);
 
     $attributes = CRM_Core_DAO::getAttribute('CRM_Campaign_DAO_Campaign');
 
