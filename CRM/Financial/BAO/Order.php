@@ -981,7 +981,8 @@ class CRM_Financial_BAO_Order {
         $lineItem['tax_amount'] = round($lineItem['line_total_inclusive'] - $lineItem['line_total'], 2);
         // Make sure they still add up to each other afer the rounding.
         $lineItem['line_total'] = $lineItem['line_total_inclusive'] - $lineItem['tax_amount'];
-        $lineItem['unit_price'] = $lineItem['line_total'] / $lineItem['qty'];
+        $lineItem['qty'] = 1;
+        $lineItem['unit_price'] = $lineItem['line_total'];
 
       }
       elseif ($taxRate) {
