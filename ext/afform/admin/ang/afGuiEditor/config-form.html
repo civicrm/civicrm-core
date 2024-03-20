@@ -23,7 +23,7 @@
       {{:: ts('Permission') }}
     </label>
     <div class="form-inline" >
-      <input ng-model="editor.afform.permission" class="form-control" id="af_config_form_permission" crm-ui-select="{data: editor.meta.permissions, multiple: true}" ng-list >
+      <input ng-model="editor.afform.permission" class="form-control" id="af_config_form_permission" crm-ui-select="{data: editor.meta.permissions, multiple: true, separator: '\u0001'}" ng-list="" >
       <select ng-model="editor.afform.permission_operator" class="form-control" id="af_config_form_permission_operator" >
         <option value="AND">{{:: ts('And') }}</option>
         <option value="OR">{{:: ts('Or') }}</option>
