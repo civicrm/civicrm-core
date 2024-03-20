@@ -373,9 +373,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
       $row['campaign_id'] = $result->contribution_campaign_id;
 
       // add contribution status name
-      $row['contribution_status_name'] = CRM_Utils_Array::value($row['contribution_status_id'],
-        $contributionStatuses
-      );
+      $row['contribution_status_name'] = $contributionStatuses[$row['contribution_status_id']] ?? NULL;
 
       $isPayLater = FALSE;
       if ($result->is_pay_later && ($row['contribution_status_name'] ?? NULL) === 'Pending') {

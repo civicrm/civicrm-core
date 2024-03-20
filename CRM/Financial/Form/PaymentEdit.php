@@ -168,7 +168,7 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
       'id' => $this->_id,
       'payment_instrument_id' => $this->_submitValues['payment_instrument_id'],
       'trxn_id' => $this->_submitValues['trxn_id'] ?? NULL,
-      'trxn_date' => CRM_Utils_Array::value('trxn_date', $this->_submitValues, date('YmdHis')),
+      'trxn_date' => $this->_submitValues['trxn_date'] ?? date('YmdHis'),
     ];
 
     $paymentInstrumentName = CRM_Core_PseudoConstant::getName('CRM_Financial_DAO_FinancialTrxn', 'payment_instrument_id', $params['payment_instrument_id']);

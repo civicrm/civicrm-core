@@ -201,7 +201,7 @@ SELECT module,is_reserved
 
     $cancelButtonValue = !empty($this->_ufGroup['cancel_button_text']) ? $this->_ufGroup['cancel_button_text'] : ts('Cancel');
     $this->assign('cancelButtonText', $cancelButtonValue);
-    $this->assign('includeCancelButton', CRM_Utils_Array::value('add_cancel_button', $this->_ufGroup));
+    $this->assign('includeCancelButton', $this->_ufGroup['add_cancel_button'] ?? FALSE);
 
     if (($this->_multiRecord & CRM_Core_Action::DELETE) && $this->_recordExists) {
       $this->_deleteButtonName = $this->getButtonName('upload', 'delete');
