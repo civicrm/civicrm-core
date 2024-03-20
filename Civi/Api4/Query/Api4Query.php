@@ -490,17 +490,24 @@ abstract class Api4Query {
   }
 
   /**
-   * @return \CRM_Utils_SQL_Select
-   */
-  public function getQuery() {
-    return $this->query;
-  }
-
-  /**
    * @return bool|string
    */
   public function getCheckPermissions() {
     return $this->api->getCheckPermissions();
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getApiParam($param) {
+    return call_user_func([$this->api, 'get' . ucfirst($param)]);
+  }
+
+  /**
+   * @return \CRM_Utils_SQL_Select
+   */
+  public function getQuery() {
+    return $this->query;
   }
 
   /**
