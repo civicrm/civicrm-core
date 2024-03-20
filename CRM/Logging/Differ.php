@@ -219,7 +219,7 @@ WHERE lt.log_conn_id = %1
           continue;
         }
 
-        if (($original[$diff] ?? NULL) === CRM_Utils_Array::value($diff, $changed)) {
+        if (($original[$diff] ?? NULL) === ($changed[$diff] ?? NULL)) {
           continue;
         }
 

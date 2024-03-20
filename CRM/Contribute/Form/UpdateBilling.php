@@ -45,7 +45,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
       $this->_paymentProcessor['object'] = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->getMembershipID(), 'membership', 'obj');
       $membershipTypes = CRM_Member_PseudoConstant::membershipType();
       $membershipTypeId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->getMembershipID(), 'membership_type_id');
-      $this->assign('membershipType', CRM_Utils_Array::value($membershipTypeId, $membershipTypes));
+      $this->assign('membershipType', $membershipTypes[$membershipTypeId] ?? NULL);
       $this->_mode = 'auto_renew';
     }
 

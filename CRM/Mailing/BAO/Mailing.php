@@ -1204,9 +1204,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $mailParams['Subject'] = implode('', $mailParams['Subject']);
     }
 
-    $mailParams['toName'] = CRM_Utils_Array::value('display_name',
-      $contact
-    );
+    $mailParams['toName'] = $contact['display_name'] ?? NULL;
     $mailParams['toEmail'] = $email;
 
     // Add job ID to mailParams for external email delivery service to utilise
