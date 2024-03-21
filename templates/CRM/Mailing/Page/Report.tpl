@@ -193,7 +193,7 @@
 <tr><td class="label">{ts}Mailing Name{/ts}</td><td>{$report.mailing.name}</td></tr>
 <tr><td class="label">{ts}Subject{/ts}</td><td>{$report.mailing.subject}</td></tr>
 <tr><td class="label">{ts}From{/ts}</td><td>{$report.mailing.from_name} &lt;{$report.mailing.from_email}&gt;</td></tr>
-<tr><td class="label">{ts}Reply-to email{/ts}</td><td>{$report.mailing.replyto_email|htmlentities}</td></tr>
+<tr><td class="label">{ts}Reply-to email{/ts}</td><td>{$report.mailing.replyto_email|escape:'htmlall'}</td></tr>
 
 <tr><td class="label">{ts}Forward replies{/ts}</td><td>{if $report.mailing.forward_replies}{ts}Enabled{/ts}{else}{ts}Disabled{/ts}{/if}</td></tr>
 <tr><td class="label">{ts}Auto-respond to replies{/ts}</td><td>{if $report.mailing.auto_responder}{ts}Enabled{/ts}{else}{ts}Disabled{/ts}{/if}</td></tr>

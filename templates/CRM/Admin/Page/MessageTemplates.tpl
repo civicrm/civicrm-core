@@ -37,7 +37,7 @@
   <div class="crm-section msg_html-section">
     <h3 class="header-dark">{$form.msg_html.label}</h3>
     <div class='text'>
-      <textarea class="huge" name='msg_html' id='msg_html'>{$form.msg_html.value|htmlentities}</textarea>
+      <textarea class="huge" name='msg_html' id='msg_html'>{$form.msg_html.value|escape:'htmlall'}</textarea>
       <div class='spacer'></div>
       <div class="section">
         <a href='#' onclick='MessageTemplates.msg_html.select(); return false;' class='button'><span>{ts}Select HTML Message{/ts}</span></a>
@@ -49,7 +49,7 @@
   <div class="crm-section msg_txt-section">
   <h3 class="header-dark">{$form.msg_text.label}</h3>
     <div class="text">
-      <textarea class="huge" name='msg_text' id='msg_text'>{$form.msg_text.value|htmlentities}</textarea>
+      <textarea class="huge" name='msg_text' id='msg_text'>{$form.msg_text.value|escape:'htmlall'}</textarea>
       <div class='spacer'></div>
       <div class="section">
         <a href='#' onclick='MessageTemplates.msg_text.select(); return false;' class='button'><span>{ts}Select Text Message{/ts}</span></a>

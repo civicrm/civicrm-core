@@ -366,7 +366,7 @@
       {/literal}
         <select class="crm-form-select api-param-op">
           {foreach from=$operators item='op'}
-            <option value="{$op|htmlspecialchars}">{$op|htmlspecialchars}</option>
+            <option value="{$op|escape}">{$op|escape}</option>
           {/foreach}
         </select>
       {literal}
