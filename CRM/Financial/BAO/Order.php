@@ -675,12 +675,15 @@ class CRM_Financial_BAO_Order {
       $metadata[$index]['supports_auto_renew'] = FALSE;
       if ($this->isExcludeExpiredFields && !$priceField['is_active']) {
         unset($metadata[$index]);
+        continue;
       }
       if ($this->isExcludeExpiredFields && !empty($priceField['active_on']) && time() < strtotime($priceField['active_on'])) {
         unset($metadata[$index]);
+        continue;
       }
       elseif ($this->isExcludeExpiredFields && !empty($priceField['expire_on']) && strtotime($priceField['expire_on']) < time()) {
         unset($metadata[$index]);
+        continue;
       }
       elseif (!empty($priceField['options'])) {
         foreach ($priceField['options'] as $optionID => $option) {
