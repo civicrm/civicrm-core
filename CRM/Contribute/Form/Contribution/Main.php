@@ -814,13 +814,16 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    *   true if no errors, else array of errors
    */
   public static function formRule($fields, $files, $self) {
+    foreach ($fields as $key => $field) {
+      $fields[$key] = $self->getUnLocalizedSubmittedValue($key, $field);
+    }
     $self->resetOrder($fields);
     $errors = array_filter(['auto_renew' => $self->getAutoRenewError($fields)]);
     // @todo - should just be $this->getOrder()->getTotalAmount()
     $amount = $self->computeAmount($fields, $self->_values);
 
     if ((!empty($fields['selectMembership']) &&
-        $fields['selectMembership'] != 'no_thanks'
+        $fields['selectMembership'] !== 'no_thanks'
       ) ||
       (!empty($fields['priceSetId']) &&
         $self->_useForMember
@@ -862,7 +865,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
             $otherAmount = $priceField->id;
           }
           elseif (!empty($fields["price_{$priceField->id}"])) {
-            $otherAmountVal = CRM_Utils_Rule::cleanMoney($fields["price_{$priceField->id}"]);
+            $otherAmountVal = $fields["price_{$priceField->id}"];
             $min = $self->_values['min_amount'] ?? NULL;
             $max = $self->_values['max_amount'] ?? NULL;
             if ($min && $otherAmountVal < $min) {
@@ -1131,21 +1134,20 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    */
   private function computeAmount($params, $formValues) {
     $amount = 0;
-    // First clean up the other amount field if present.
-    if (isset($params['amount_other'])) {
-      $params['amount_other'] = CRM_Utils_Rule::cleanMoney($params['amount_other']);
-    }
 
     if (($params['amount'] ?? NULL) == 'amount_other_radio' || !empty($params['amount_other'])) {
+      // @todo - probably unreachable - field would be (e.) price_12 now....
       $amount = $params['amount_other'];
     }
     elseif (!empty($params['pledge_amount'])) {
       foreach ($params['pledge_amount'] as $paymentId => $dontCare) {
+        // @todo - why would this be a good thing? Is it reachable.
         $amount += CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_PledgePayment', $paymentId, 'scheduled_amount');
       }
     }
     else {
       if (!empty($formValues['amount'])) {
+        // @todo - probably unreachable.
         $amountID = $params['amount'] ?? NULL;
 
         if ($amountID) {
