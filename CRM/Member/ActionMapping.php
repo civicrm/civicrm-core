@@ -95,9 +95,12 @@ class CRM_Member_ActionMapping extends \Civi\ActionSchedule\MappingBase {
       $query['casDateField'] = 'e.' . $query['casDateField'];
     }
 
-    $recurStatuses = civicrm_api3('ContributionRecur', 'getoptions', [
-      'field' => "contribution_recur_contribution_status_id",
-    ])['values'] ?? [];
+    $recurStatuses = \Civi\Api4\ContributionRecur::getFields(FALSE)
+      ->setLoadOptions(TRUE)
+      ->addWhere('name', '=', 'contribution_status_id')
+      ->addSelect('options')
+      ->execute()
+      ->first()['options'];
     // Exclude the renewals that are cancelled or failed.
     $nonRenewStatusIds = array_keys(array_intersect($recurStatuses, ['Cancelled', 'Failed']));
     // FIXME: Numbers should be constants.
