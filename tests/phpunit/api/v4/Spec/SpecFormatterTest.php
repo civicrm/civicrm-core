@@ -102,4 +102,43 @@ class SpecFormatterTest extends Api4TestBase {
     ];
   }
 
+  /**
+   * @param int $dataTypeInt
+   * @param string $htmlType
+   * @param int|float|null $step
+   * @param int|float $expectedStep
+   *
+   * @dataProvider numericFieldTypesProvider
+   */
+  public function testNumericFields(int $dataTypeInt, string $htmlType, $step, $expectedStep): void {
+    $data = [
+      'name' => 'Foo',
+      'title' => 'Bar',
+      'type' => $dataTypeInt,
+      'html' => ['type' => $htmlType],
+    ];
+    if ($step !== NULL) {
+      $data['html']['step'] = $step;
+    }
+
+    $fieldSpec = SpecFormatter::arrayToField($data, 'TestEntity');
+    static::assertSame('Number', $fieldSpec->getInputType());
+    static::assertSame(['step' => $expectedStep], $fieldSpec->getInputAttrs());
+  }
+
+  public function numericFieldTypesProvider(): iterable {
+    yield [\CRM_Utils_Type::T_FLOAT, 'Text', NULL, .01];
+    yield [\CRM_Utils_Type::T_FLOAT, 'Text', 2, 2];
+    yield [\CRM_Utils_Type::T_FLOAT, 'Number', NULL, .01];
+    yield [\CRM_Utils_Type::T_FLOAT, 'Number', 2, 2];
+    yield [\CRM_Utils_Type::T_INT, 'Text', NULL, 1];
+    yield [\CRM_Utils_Type::T_INT, 'Text', 2, 2];
+    yield [\CRM_Utils_Type::T_INT, 'Number', NULL, 1];
+    yield [\CRM_Utils_Type::T_INT, 'Number', 2, 2];
+    yield [\CRM_Utils_Type::T_MONEY, 'Text', NULL, .01];
+    yield [\CRM_Utils_Type::T_MONEY, 'Text', 2, 2];
+    yield [\CRM_Utils_Type::T_MONEY, 'Number', NULL, .01];
+    yield [\CRM_Utils_Type::T_MONEY, 'Number', 2, 2];
+  }
+
 }
