@@ -32,7 +32,6 @@
     <page_callback>CRM_Contribute_Controller_Contribution</page_callback>
     <access_arguments>make online contributions</access_arguments>
     <weight>0</weight>
-    <is_ssl>true</is_ssl>
     <is_public>true</is_public>
   </item>
   <item>
