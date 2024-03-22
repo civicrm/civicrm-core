@@ -46,6 +46,19 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Base {
   }
 
   /**
+   * Send an HTTP Response base on PSR HTTP RespnseInterface response.
+   *
+   * @param \Psr\Http\Message\ResponseInterface $response
+   */
+  public function sendResponse(\Psr\Http\Message\ResponseInterface $response) {
+    // We'll if the simple version passes. If not, then we might need to enable `setHttpHeader()`.
+    // foreach ($response->getHeaders() as $name => $values) {
+    //   CRM_Utils_System::setHttpHeader($name, implode(', ', (array) $values));
+    // }
+    CRM_Utils_System::civiExit(0, ['response' => $response]);
+  }
+
+  /**
    * @param string $name
    * @param string $value
    */
