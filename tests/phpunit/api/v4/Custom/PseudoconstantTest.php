@@ -164,7 +164,7 @@ class PseudoconstantTest extends CustomTestBase {
       )->addChain('field2', CustomField::create()
         ->addValue('custom_group_id', '$id')
         ->addValue('option_values', $technicolor)
-        ->addValue('label', 'Technicolor')
+        ->addValue('label', 'Multicolor')
         ->addValue('html_type', 'CheckBox')
       )->execute();
 
@@ -175,44 +175,49 @@ class PseudoconstantTest extends CustomTestBase {
 
     foreach ($technicolor as $index => $option) {
       foreach ($option as $prop => $val) {
-        $this->assertEquals($val, $fields['myPseudoconstantTest.Technicolor']['options'][$index][$prop]);
+        $this->assertEquals($val, $fields['myPseudoconstantTest.Multicolor']['options'][$index][$prop]);
       }
     }
 
     $cid = $this->createTestRecord('Contact', [
       'first_name' => 'col',
       'myPseudoconstantTest.Color:label' => 'blü',
+      'myPseudoconstantTest.Multicolor:label' => ['RED', 'BLUE'],
     ])['id'];
 
     $result = Contact::get(FALSE)
       ->addWhere('id', '=', $cid)
       ->addSelect('myPseudoconstantTest.Color:name', 'myPseudoconstantTest.Color:label', 'myPseudoconstantTest.Color')
+      ->addSelect('myPseudoconstantTest.Multicolor:name', 'myPseudoconstantTest.Multicolor:label', 'myPseudoconstantTest.Multicolor')
       ->execute()->first();
 
     $this->assertEquals('blü', $result['myPseudoconstantTest.Color:label']);
     $this->assertEquals('bl_', $result['myPseudoconstantTest.Color:name']);
     $this->assertEquals('b', $result['myPseudoconstantTest.Color']);
+    $this->assertEquals(['RED', 'BLUE'], $result['myPseudoconstantTest.Multicolor:label']);
+    $this->assertEquals(['red', 'blue'], $result['myPseudoconstantTest.Multicolor:name']);
+    $this->assertEquals(['r', 'b'], $result['myPseudoconstantTest.Multicolor']);
 
     $cid1 = $this->createTestRecord('Contact', [
       'first_name' => 'two',
-      'myPseudoconstantTest.Technicolor:label' => 'RED',
+      'myPseudoconstantTest.Multicolor:label' => 'RED',
     ])['id'];
     $cid2 = $this->createTestRecord('Contact', [
       'first_name' => 'two',
-      'myPseudoconstantTest.Technicolor:label' => 'GREEN',
+      'myPseudoconstantTest.Multicolor:label' => 'GREEN',
     ])['id'];
 
     // Test ordering by label
     $result = Contact::get(FALSE)
       ->addWhere('id', 'IN', [$cid1, $cid2])
       ->addSelect('id')
-      ->addOrderBy('myPseudoconstantTest.Technicolor:label')
+      ->addOrderBy('myPseudoconstantTest.Multicolor:label')
       ->execute()->first()['id'];
     $this->assertEquals($cid2, $result);
     $result = Contact::get(FALSE)
       ->addWhere('id', 'IN', [$cid1, $cid2])
       ->addSelect('id')
-      ->addOrderBy('myPseudoconstantTest.Technicolor:label', 'DESC')
+      ->addOrderBy('myPseudoconstantTest.Multicolor:label', 'DESC')
       ->execute()->first()['id'];
     $this->assertEquals($cid1, $result);
   }
