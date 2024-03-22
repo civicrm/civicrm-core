@@ -96,12 +96,15 @@ class CRM_Member_ActionMapping extends \Civi\ActionSchedule\MappingBase {
     }
 
     // FIXME: Numbers should be constants.
+    $contribution_status_id_pending = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
     if (in_array(2, $selectedStatuses)) {
       //auto-renew memberships
-      $query->where("e.contribution_recur_id IS NOT NULL");
+      $query->join('contribution_recur', 'inner join civicrm_contribution_recur on e.contribution.id = contribution_recur.id');
+      $query->where("contribution_recur.contribution_status_id = #pending", ['pending' => $contribution_status_id_pending]);
     }
     elseif (in_array(1, $selectedStatuses)) {
-      $query->where("e.contribution_recur_id IS NULL");
+      $query->join('contribution_recur', 'left join civicrm_contribution_recur on e.contribution.id = contribution_recur.id');
+      $query->where("contribution_recur.contribution_status_id <> #pending or contribution_recur.contribution_status_id is NULL", ['pending' => $contribution_status_id_pending]);
     }
 
     if (!empty($selectedValues)) {
