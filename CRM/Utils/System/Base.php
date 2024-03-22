@@ -69,6 +69,19 @@ abstract class CRM_Utils_System_Base {
   abstract public function loadBootStrap($params = [], $loadUser = TRUE, $throwError = TRUE, $realPath = NULL);
 
   /**
+   * Returns the Smarty template path to the main template that renders the content.
+   *
+   * In CMS contexts, this goes inside their theme, but Standalone needs to render the full HTML page.
+   */
+  public static function getContentTemplate(bool $print = FALSE, bool $frontEnd = FALSE): string {
+    if ($print) {
+      return 'CRM/common/print.tpl';
+    }
+    $config = CRM_Core_Config::singleton();
+    return 'CRM/common/' . strtolower($config->userFramework) . '.tpl';
+  }
+
+  /**
    * Append an additional breadcrumb tag to the existing breadcrumb.
    *
    * @param array $breadCrumbs

@@ -486,13 +486,8 @@ class CRM_Core_Selector_Controller {
     }
 
     self::$_template->assign('tplFile', $this->_object->getHookedTemplateFileName());
-    if ($this->_print) {
-      $content = self::$_template->fetch('CRM/common/print.tpl');
-    }
-    else {
-      $config = CRM_Core_Config::singleton();
-      $content = self::$_template->fetch('CRM/common/' . strtolower($config->userFramework) . '.tpl');
-    }
+    $contentTpl = CRM_Utils_System::getContentTemplate($this->_print);
+    $content = self::$_template->fetch($contentTpl);
     echo CRM_Utils_System::theme($content, $this->_print);
   }
 

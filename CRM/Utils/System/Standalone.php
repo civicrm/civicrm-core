@@ -247,6 +247,20 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
 
   /**
    * @inheritDoc
+   *
+   */
+  public static function getContentTemplate(bool $print = FALSE, bool $frontEnd = FALSE): string {
+    if ($print) {
+      return 'CRM/common/print.tpl';
+    }
+    $isPublic = \CRM_Core_Smarty::singleton()->getTemplateVars('urlIsPublic');
+    // Alternative:
+    // $isPublic = ($_GET['q'] ?? '') ? CRM_Core_Menu::isPublicRoute($_GET['q']) : FALSE;
+    return $isPublic ? 'CRM/common/standalone-frontend.tpl' : 'CRM/common/standalone.tpl';
+  }
+
+  /**
+   * @inheritDoc
    */
   public function theme(&$content, $print = FALSE, $maintenance = FALSE) {
 

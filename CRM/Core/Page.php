@@ -270,7 +270,7 @@ class CRM_Core_Page {
       CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js', 1, 'html-header');
     }
 
-    $content = self::$_template->fetch('CRM/common/' . strtolower($config->userFramework) . '.tpl');
+    $content = self::$_template->fetch(CRM_Utils_System::getContentTemplate());
 
     // Render page header
     if (!defined('CIVICRM_UF_HEAD') && $region = CRM_Core_Region::instance('html-header', FALSE)) {

@@ -777,8 +777,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
       }
     }
     else {
-      $config = CRM_Core_Config::singleton();
-      return 'CRM/common/' . strtolower($config->userFramework) . '.tpl';
+      return CRM_Utils_System::getContentTemplate($this->_print);
     }
   }
 
