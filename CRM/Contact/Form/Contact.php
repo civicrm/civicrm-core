@@ -367,57 +367,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   }
 
   /**
-   * @todo - fold into buildForm
-   *
-   * @throws \CRM_Core_Exception
-   *
-   * @deprecated see https://github.com/civicrm/civicrm-core/pull/29241 for preferred approach - basically
-   * 1) at the tpl layer use CRM/common/customDataBlock.tpl
-   * 2) to make the fields available for postProcess
-   * if ($this->isSubmitted()) {
-   *   $this->addCustomDataFieldsToForm('FinancialAccount');
-   * }
-   * 3) pass getSubmittedValues() to CRM_Core_BAO_CustomField::postProcess($this->getSubmittedValues(), $this->_id, 'FinancialAccount');
-   *  to ensure any money or number fields are handled for localisation
-   */
-  private function legacyPreProcessCustomData() {
-    $isAddContact = $this->getAction() === CRM_Core_Action::ADD;
-    $this->assign('cgCount', 1);
-    $type = CRM_Utils_Request::retrieve('type', 'String') ?: $this->_contactType;
-    $subType = $this->isSubmitted() ? ($this->_submitValues['contact_sub_type'] ?? []) : $this->getContactValue('contact_sub_type') ?? $this->_contactSubType;
-    $groupTree = CRM_Core_BAO_CustomGroup::getTree($type,
-      NULL,
-      $this->getContactID(),
-      NULL,
-      $subType
-    );
-
-    if (!empty($groupTree)) {
-      $this->_customValueCount = CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, TRUE, NULL, NULL, NULL, $this->getContactID());
-    }
-    foreach ($groupTree as $customGroup) {
-      foreach ($customGroup['fields'] ?? [] as $customField) {
-        if ($customField['data_type'] === 'File') {
-          $this->registerFileField(["custom_{$customField['id']}_-" . ($isAddContact ? '' : 1)]);
-        }
-      }
-    }
-
-    // we should use simplified formatted groupTree
-    $groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, 1);
-
-    if (isset($this->_groupTree) && is_array($this->_groupTree)) {
-      $keys = array_keys($groupTree);
-      foreach ($keys as $key) {
-        $this->_groupTree[$key] = $groupTree[$key];
-      }
-    }
-    else {
-      $this->_groupTree = $groupTree;
-    }
-  }
-
-  /**
    * Set default values for the form.
    *
    * Note that in edit/view mode the default values are retrieved from the database
@@ -1599,26 +1548,38 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       $this->assign('addBlock', TRUE);
       $this->assign('blockName', 'CustomData');
     }
-    // We should probably fold this into the function in the build quick form process.
-    // There is no particular reason to call it in preProcess & it logically
-    // belongs with the buildQuickForm code.
-    // The comments below this line are historical.
-    // The reason we call this here is that it sets the _groupTree property which is later used
-    // in setDefaultValues and buildForm. (Ideally instead we would have a trait with getCustomGroup & getCustomFields
-    // that can be called at appropriate times). In order for buildForm to add the right fields it needs
-    // to know any contact sub types that are being added in the submission. Since this runs before
-    // the buildForm adds the contact_sub_type to the form we need to look in _submitValues for it - submitValues
-    // is a un-sanitised version of what is in the form submission (_POST) whereas `getSubmittedValues()` retrieves
-    // 'allowed' POSTED values - ie values which match available fields, with some localization handling.
-    // @todo - it's probably that there is no reason to pass NULl vs 1 for groupCount below.
-    $this->legacyPreProcessCustomData();
+    $isAddContact = $this->getAction() === CRM_Core_Action::ADD;
+    $this->assign('cgCount', 1);
+    $type = CRM_Utils_Request::retrieve('type', 'String') ?: $this->_contactType;
+    $subType = $this->isSubmitted() ? ($this->_submitValues['contact_sub_type'] ?? []) : $this->getContactValue('contact_sub_type') ?? $this->_contactSubType;
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree($type,
+      NULL,
+      $this->getContactID(),
+      NULL,
+      $subType
+    );
+
+    if (!empty($groupTree)) {
+      $this->_customValueCount = CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, TRUE, NULL, NULL, NULL, $this->getContactID());
+    }
+    foreach ($groupTree as $customGroup) {
+      foreach ($customGroup['fields'] ?? [] as $customField) {
+        if ($customField['data_type'] === 'File') {
+          $this->registerFileField(["custom_{$customField['id']}_-" . ($isAddContact ? '' : 1)]);
+        }
+      }
+    }
+
+    // we should use simplified formatted groupTree
+    $groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, 1);
+
     if (!$customDataType) {
       // Probably this does not need to be wrapped in an IF.
       $this->assign('customValueCount', $this->_customValueCount);
     }
     if ($customDataType) {
       // Not too sure why this makes sense for new contacts only.
-      $this->assign('groupTree', $this->_groupTree);
+      $this->assign('groupTree', $groupTree);
     }
     $customValueCount = $this->_submitValues['hidden_custom_group_count'] ?? NULL;
     if (is_array($customValueCount)) {
@@ -1631,7 +1592,8 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
     $this->addElement('hidden', 'hidden_custom', 1);
     $this->addElement('hidden', "hidden_custom_group_count[]", ($this->getAction() !== CRM_Core_Action::ADD));
-    CRM_Core_BAO_CustomGroup::buildQuickForm($this, $this->_groupTree);
+    CRM_Core_BAO_CustomGroup::buildQuickForm($this, $groupTree);
+    CRM_Core_BAO_CustomGroup::setDefaults($groupTree, $this->_values, FALSE, FALSE, $this->getAction());
 
     //build custom data.
     if (!empty($_POST["hidden_custom"]) && !empty($_POST['contact_sub_type'])) {
@@ -1681,7 +1643,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       return;
     }
     if ($name === 'CustomData') {
-      CRM_Core_BAO_CustomGroup::setDefaults($this->_groupTree, $defaults, FALSE, FALSE, $this->getAction());
       return;
     }
     if ($name === 'CommunicationPreferences') {
