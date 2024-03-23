@@ -97,7 +97,7 @@
 {* This shows CASE custom fields, as opposed to ACTIVITY custom fields, so is not a duplicate of the other custom data block above. *}
 <tr class="crm-case-form-block-custom_data">
     <td colspan="2">
-      {include file="CRM/common/customDataBlock.tpl" customDataType='Case'}
+      {include file="CRM/common/customDataBlock.tpl" customDataType='Case' customDataSubType=$caseTypeID cid=false}
     </td>
 </tr>
 

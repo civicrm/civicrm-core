@@ -19,6 +19,8 @@
  * This class generates form components for case activity.
  */
 class CRM_Case_Form_Case extends CRM_Core_Form {
+  use CRM_Custom_Form_CustomDataTrait;
+  use CRM_Case_Form_CaseFormTrait;
 
   /**
    * The context
@@ -29,7 +31,12 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
 
   /**
    * Case Id
+   *
    * @var int
+   *
+   * @internal
+   *
+   * use getCaseID to access.
    */
   public $_caseId = NULL;
 
@@ -95,6 +102,8 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
 
   /**
    * Build the form object.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function preProcess() {
     if (empty($this->_action)) {
@@ -183,15 +192,35 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
     CRM_Custom_Form_CustomData::preProcess($this, NULL, $this->_activityTypeId, 1, 'Activity');
     $className = "CRM_Case_Form_Activity_{$this->_activityTypeFile}";
     $className::preProcess($this);
-    $activityGroupTree = $this->_groupTree;
 
-    // Add case custom data to form
-    $caseTypeId = CRM_Utils_Array::value('case_type_id', CRM_Utils_Request::exportValues(), $this->_caseTypeId);
-    CRM_Custom_Form_CustomData::addToForm($this, $caseTypeId);
+    if ($this->isSubmitted()) {
+      // The custom data fields are added to the form by an ajax form.
+      // However, if they are not present in the element index they will
+      // not be available from `$this->getSubmittedValue()` in post process.
+      // We do not have to set defaults or otherwise render - just add to the element index.
+      $this->addCustomDataFieldsToForm('Case', array_filter([
+        'id' => $this->getCaseID(),
+        'case_type_id' => $this->getSubmittedValue('case_type_id'),
+      ]));
+    }
+    // Used for loading custom data fields
+    $this->assign('caseTypeID', $this->getSubmittedValue('case_type_id') ?: $this->getCaseValue('campaign_type_id'));
+  }
 
-    // so that grouptree is not populated with case fields, since the grouptree is used
-    // for populating activity custom fields.
-    $this->_groupTree = $activityGroupTree;
+  /**
+   * Get the selected Case ID.
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  public function getCaseID(): ?int {
+    if (!isset($this->_caseId)) {
+      $this->_caseId = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    }
+    return $this->_caseId;
   }
 
   /**
@@ -340,15 +369,11 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
       $className::beginPostProcess($this, $params);
     }
 
-    if (!empty($params['hidden_custom']) &&
-      !isset($params['custom'])
-    ) {
-      $params['custom'] = CRM_Core_BAO_CustomField::postProcess(
-        $params,
-        NULL,
-        'Case'
-      );
-    }
+    $params['custom'] = CRM_Core_BAO_CustomField::postProcess(
+      $this->getSubmittedValues(),
+      NULL,
+      'Case'
+    );
 
     // 2. create/edit case
     if (!empty($params['case_type_id'])) {
