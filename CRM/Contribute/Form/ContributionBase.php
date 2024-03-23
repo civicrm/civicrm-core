@@ -925,7 +925,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     $this->add('hidden', 'selectProduct', $selectedProductID, ['id' => 'selectProduct']);
     $premiumProducts = PremiumsProduct::get()
       ->addSelect('product_id.*')
-      ->addSelect('product_id')
       ->addSelect('premiums_id.*')
       ->addWhere('product_id.is_active', '=', TRUE)
       ->addWhere('premiums_id.premiums_active', '=', TRUE)
@@ -936,23 +935,14 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     $products = [];
     $premium = [];
     foreach ($premiumProducts as $premiumProduct) {
-      $product = ['options' => NULL];
-      foreach ($premiumProduct as $key => $value) {
-        if (str_starts_with($key, 'product_id.')) {
-          if ($key === 'product_id.options' && $selectedProductID === $product['id'] && $selectedOption) {
-            // In this case we are on the thank you or confirm page so assign
-            // the selected option to the page for display.
-            $product['options'] = ts('Selected Option') . ': ' . $selectedOption;
-          }
-          else {
-            $product[str_replace('product_id.', '', $key)] = $value;
-          }
-        }
-        if (str_starts_with($key, 'premiums_id.')) {
-          $premium[str_replace('premiums_id.', '', $key)] = $value;
-        }
+      $product = CRM_Utils_Array::filterByPrefix($premiumProduct, 'product_id.');
+      $premium = CRM_Utils_Array::filterByPrefix($premiumProduct, 'premiums_id.');
+      if ($selectedProductID === $product['id'] && $selectedOption) {
+        // In this case we are on the thank you or confirm page so assign
+        // the selected option to the page for display.
+        $product['options'] = [ts('Selected Option') . ': ' . $selectedOption];
       }
-      $options = array_filter(explode(',', $product['options']));
+      $options = array_filter((array) $product['options']);
       $productOptions = [];
       foreach ($options as $option) {
         $optionValue = trim($option);
@@ -963,10 +953,10 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       if (!empty($options)) {
         $this->addElement('select', 'options_' . $product['id'], NULL, $productOptions);
       }
-      $products[$premiumProduct['product_id']] = $product;
+      $products[$product['id']] = $product;
     }
     $this->assign('premiumBlock', $premium);
-    $this->assign('products', $products ?? NULL);
+    $this->assign('products', $products);
   }
 
   /**
