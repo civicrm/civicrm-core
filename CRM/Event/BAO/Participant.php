@@ -170,11 +170,6 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant implements \Ci
 
     $participant = self::add($params);
 
-    if (is_a($participant, 'CRM_Core_Error')) {
-      $transaction->rollback();
-      return $participant;
-    }
-
     // Log activity when creating new participant or changing status
     if (empty($params['id']) ||
       (isset($params['status_id']) && $params['status_id'] != $status)
