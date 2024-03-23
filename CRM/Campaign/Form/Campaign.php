@@ -23,6 +23,27 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
   use CRM_Campaign_Form_CampaignFormTrait;
 
   /**
+   * Fields for the entity to be assigned to the template.
+   *
+   * Note this form is not implementing the EntityFormTrait but
+   * is following it's syntax for consistency.
+   *
+   * Fields may have keys
+   *  - name (required to show in tpl from the array)
+   *  - description (optional, will appear below the field)
+   *  - not-auto-addable - this class will not attempt to add the field using addField.
+   *    (this will be automatically set if the field does not have html in it's metadata
+   *    or is not a core field on the form's entity).
+   *  - help (option) add help to the field - e.g ['id' => 'id-source', 'file' => 'CRM/Contact/Form/Contact']]
+   *  - template - use a field specific template to render this field
+   *  - required
+   *  - is_freeze (field should be frozen).
+   *
+   * @var array
+   */
+  protected array $entityFields = [];
+
+  /**
    * Action
    *
    * @var int
@@ -37,16 +58,11 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
   protected $_context;
 
   /**
-   * Object values.
-   *
-   * @var array
-   */
-  protected $_values;
-
-  /**
-   * The id of the campaign we are proceessing
+   * The id of the campaign we are processing
    *
    * @var int
+   *
+   * @deprecated use getCampaignID()
    */
   protected $_campaignId;
 
@@ -65,6 +81,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
       CRM_Utils_System::permissionDenied();
     }
 
+    $this->setEntityFields();
     $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
 
     $this->assign('context', $this->_context);
@@ -87,21 +104,6 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     $session->pushUserContext(CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=campaign'));
     $this->assign('action', $this->_action);
 
-    //load the values;
-    $this->_values = $this->get('values');
-    if (!is_array($this->_values)) {
-      $this->_values = [];
-
-      // if we are editing
-      if (isset($this->_campaignId) && $this->_campaignId) {
-        $params = ['id' => $this->_campaignId];
-        CRM_Campaign_BAO_Campaign::retrieve($params, $this->_values);
-      }
-
-      //lets use current object session.
-      $this->set('values', $this->_values);
-    }
-
     if ($this->isSubmitted()) {
       // The custom data fields are added to the form by an ajax form.
       // However, if they are not present in the element index they will
@@ -115,31 +117,44 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
   }
 
   /**
+   * Set entity fields to be assigned to the form.
+   */
+  protected function setEntityFields(): void {
+    $this->entityFields = [
+      'title' => ['name' => 'title'],
+      'description' => ['name' => 'description'],
+      'start_date' => ['name' => 'start_date', 'default' => date('Y-m-d H:i:s')],
+      'end_date' => ['name' => 'start_date'],
+      'campaign_type_id' => ['name' => 'campaign_type_id'],
+      'status_id' => ['name' => 'status_id'],
+      'goal_general' => ['name' => 'goal_general'],
+      'goal_revenue' => ['name' => 'goal_revenue'],
+      'external_identifier' => ['name' => 'external_identifier'],
+      'is_active' => ['name' => 'is_active', 'default' => 1],
+    ];
+  }
+
+  /**
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   *
    * @return array
+   * @throws \CRM_Core_Exception
    */
-  public function setDefaultValues() {
-    $defaults = $this->_values;
-
-    if (empty($defaults['start_date'])) {
-      $defaults['start_date'] = date('Y-m-d H:i:s');
+  public function setDefaultValues(): array {
+    $defaults = [];
+    foreach ($this->entityFields as $field) {
+      $defaults[$field['name']] = $this->getCampaignValue($field['name']) ?? ($field['default'] ?? '');
     }
 
-    if (!isset($defaults['is_active'])) {
-      $defaults['is_active'] = 1;
-    }
-
-    if (!$this->_campaignId) {
+    if (!$this->getCampaignID()) {
       return $defaults;
     }
 
     $dao = new CRM_Campaign_DAO_CampaignGroup();
 
     $campaignGroups = [];
-    $dao->campaign_id = $this->_campaignId;
+    $dao->campaign_id = $this->getCampaignID();
     $dao->find();
 
     while ($dao->fetch()) {
@@ -202,7 +217,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     );
 
     // add Campaign Parent Id
-    $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns(CRM_Utils_Array::value('parent_id', $this->_values), $this->_campaignId);
+    $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns($this->getCampaignValue('parent_id'), $this->getCampaignID());
     if (!empty($campaigns)) {
       $this->addElement('select', 'parent_id', ts('Parent ID'),
         ['' => ts('- select Parent -')] + $campaigns,
