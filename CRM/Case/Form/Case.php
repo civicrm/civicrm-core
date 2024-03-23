@@ -188,8 +188,6 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
 
     $this->_currentUserId = CRM_Core_Session::getLoggedInContactID();
 
-    //Add activity custom data is included in this page
-    CRM_Custom_Form_CustomData::preProcess($this, NULL, $this->_activityTypeId, 1, 'Activity');
     $className = "CRM_Case_Form_Activity_{$this->_activityTypeFile}";
     $className::preProcess($this);
 
@@ -202,8 +200,12 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
         'id' => $this->getCaseID(),
         'case_type_id' => $this->getSubmittedValue('case_type_id'),
       ]));
+      $this->addCustomDataFieldsToForm('Activity', [
+        'activity_type_id' => $this->_activityTypeId,
+      ]);
     }
     // Used for loading custom data fields
+    $this->assign('activityTypeID', $this->_activityTypeId);
     $this->assign('caseTypeID', $this->getSubmittedValue('case_type_id') ?: $this->getCaseValue('campaign_type_id'));
   }
 
@@ -231,9 +233,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
       return [];
     }
     $className = "CRM_Case_Form_Activity_{$this->_activityTypeFile}";
-    $defaults = $className::setDefaultValues($this);
-    $defaults = array_merge($defaults, CRM_Custom_Form_CustomData::setDefaultValues($this));
-    return $defaults;
+    return $className::setDefaultValues($this);
   }
 
   public function buildQuickForm() {
@@ -260,9 +260,6 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
       ]);
       return;
     }
-
-    // Add the activity custom data to the form
-    CRM_Custom_Form_CustomData::buildQuickForm($this);
 
     // we don't want to show button on top of custom form
     $this->assign('noPreCustomButton', TRUE);
@@ -393,12 +390,10 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
     CRM_Core_Session::singleton()->pushUserContext($url);
 
     // 3. format activity custom data
-    if (!empty($params['hidden_custom'])) {
-      $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
-        $this->_activityId,
-        'Activity'
-      );
-    }
+    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($this->getSubmittedValues(),
+      $this->_activityId,
+      'Activity'
+    );
 
     // 4. call end post process
     if ($this->_activityTypeFile) {

@@ -58,11 +58,11 @@
 
 {* custom data group *}
 {* This shows ACTIVITY custom fields, as opposed to CASE custom fields, so is not a duplicate of the other custom data block below. *}
-{if $groupTree}
-    <tr>
-       <td colspan="2">{include file="CRM/Custom/Form/CustomData.tpl" skipTitle=0}</td>
-    </tr>
-{/if}
+<tr class="crm-activity-form-block-custom_data">
+  <td colspan="2">
+    {include file="CRM/common/customDataBlock.tpl" customDataType='Activity' customDataSubType=$activityTypeID cid=false}
+  </td>
+</tr>
 
 {if !empty($form.activity_subject.html)}
     <tr class="crm-case-form-block-activity_subject">

@@ -95,7 +95,12 @@ trait CRM_Custom_Form_CustomDataTrait {
     }
     $qf = $this->get('qfKey');
     $this->assign('qfKey', $qf);
-    Civi::cache('customData')->set($qf, $formValues);
+    // We cached the POSTed values so that they can be reloaded
+    // if the form fails to submit. Note that we may be combining the
+    // values with those stored by other custom field entities on the
+    // form.
+    $defaultValues = (array) Civi::cache('customData')->get($qf);
+    Civi::cache('customData')->set($qf, $formValues + $defaultValues);
   }
 
   /**
