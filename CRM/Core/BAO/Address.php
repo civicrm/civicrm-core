@@ -294,6 +294,11 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address implements Civi\Core\Hoo
 
     $config = CRM_Core_Config::singleton();
     foreach ($params as $name => $value) {
+      if (is_array($value) && str_starts_with($name, 'custom_')) {
+        // This could be a custom field of type file. We want to unset these as they could
+        // give false positives.
+        unset($value['error'], $value['size']);
+      }
       if (in_array($name, [
         'is_primary',
         'location_type_id',
