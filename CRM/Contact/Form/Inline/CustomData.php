@@ -42,26 +42,12 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
 
     $this->_groupID = CRM_Utils_Request::retrieve('groupID', 'Positive', $this, TRUE, NULL);
     $this->assign('customGroupId', $this->_groupID);
-    $customRecId = CRM_Utils_Request::retrieve('customRecId', 'Positive', $this, FALSE, 1);
-    $cgcount = CRM_Utils_Request::retrieve('cgcount', 'Positive', $this, FALSE, 1);
-    $subType = CRM_Contact_BAO_Contact::getContactSubType($this->_contactId, ',');
-    $this->preProcessCustomData(NULL, $subType, $cgcount,
-      $this->_contactType, $this->_contactId);
+    $this->preProcessCustomData();
   }
 
   /**
    *
    * Previously shared function.
-   *
-   * @param null|string $extendsEntityColumn
-   *   Additional filter on the type of custom data to retrieve - e.g for
-   *   participant data this could be a value representing role.
-   * @param null|string $subType
-   * @param null|int $groupCount
-   * @param null $type
-   * @param null|int $entityID
-   * @param null $onlySubType
-   * @param bool $isLoadFromCache
    *
    * @throws \CRM_Core_Exception
    *
@@ -74,14 +60,12 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
    * 3) pass getSubmittedValues() to CRM_Core_BAO_CustomField::postProcess($this->getSubmittedValues(), $this->_id, 'FinancialAccount');
    *  to ensure any money or number fields are handled for localisation
    */
-  private function preProcessCustomData($extendsEntityColumn = NULL, $subType = NULL,
-    $groupCount = NULL, $type = NULL, $entityID = NULL, $onlySubType = NULL, $isLoadFromCache = TRUE
-  ) {
+  private function preProcessCustomData() {
     $form = $this;
-    if (!$type) {
-      CRM_Core_Error::deprecatedWarning('type should be passed in');
-      $type = CRM_Utils_Request::retrieve('type', 'String', $form);
-    }
+    $type = $this->_contactType;
+    $entityID = $this->_contactId;
+    $groupCount = CRM_Utils_Request::retrieve('cgcount', 'Positive', $this, FALSE, 1);
+    $subType = CRM_Contact_BAO_Contact::getContactSubType($this->_contactId, ',');
 
     if (!isset($subType)) {
       $subType = CRM_Utils_Request::retrieve('subType', 'String', $form);
@@ -90,7 +74,7 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
       // Is this reachable?
       $subType = NULL;
     }
-    $extendsEntityColumn = $extendsEntityColumn ?: CRM_Utils_Request::retrieve('subName', 'String', $form);
+    $extendsEntityColumn = CRM_Utils_Request::retrieve('subName', 'String', $form);
     if ($extendsEntityColumn === 'null') {
       // Is this reachable?
       $extendsEntityColumn = NULL;
@@ -103,7 +87,7 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
       $form->_groupCount = CRM_Utils_Request::retrieve('cgcount', 'Positive', $form);
     }
 
-    $form->assign('cgCount', $form->_groupCount);
+    $form->assign('cgCount', $groupCount);
 
     //carry qf key, since this form is not inhereting core form.
     if ($qfKey = CRM_Utils_Request::retrieve('qfKey', 'String')) {
@@ -137,16 +121,14 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
       $form->_entityId,
       $gid,
       $subType,
-      $extendsEntityColumn,
-      $isLoadFromCache,
-      $onlySubType
+      $extendsEntityColumn
     );
 
     if (property_exists($form, '_customValueCount') && !empty($groupTree)) {
       $form->_customValueCount = CRM_Core_BAO_CustomGroup::buildCustomDataView($form, $groupTree, TRUE, NULL, NULL, NULL, $form->_entityId);
     }
     // we should use simplified formatted groupTree
-    $groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, $form->_groupCount, $form);
+    $groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, $groupCount, $form);
 
     if (isset($form->_groupTree) && is_array($form->_groupTree)) {
       $keys = array_keys($groupTree);
@@ -165,7 +147,7 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
   public function buildQuickForm() {
     parent::buildQuickForm();
     $this->addElement('hidden', 'hidden_custom', 1);
-    $this->addElement('hidden', "hidden_custom_group_count[{$this->_groupID}]", $this->_groupCount);
+    $this->addElement('hidden', "hidden_custom_group_count[{$this->_groupID}]", CRM_Utils_Request::retrieve('cgcount', 'Positive', $this, FALSE, 1));
     CRM_Core_BAO_CustomGroup::buildQuickForm($this, $this->_groupTree);
   }
 
