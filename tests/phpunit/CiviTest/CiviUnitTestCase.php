@@ -27,6 +27,7 @@
  */
 declare(strict_types = 1);
 use Civi\Api4\Address;
+use Civi\Api4\CiviCase;
 use Civi\Api4\Contribution;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
@@ -48,6 +49,7 @@ use Civi\Test\Api3TestTrait;
 use Civi\Test\ContactTestTrait;
 use Civi\Test\DbTestTrait;
 use Civi\Test\EventTestTrait;
+use Civi\Test\FormTrait;
 use Civi\Test\GenericAssertionsTrait;
 use Civi\Test\LocaleTestTrait;
 use Civi\Test\MailingTestTrait;
@@ -86,6 +88,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   use ContactTestTrait;
   use MailingTestTrait;
   use LocaleTestTrait;
+  use FormTrait;
 
   /**
    * API version in use.
@@ -232,6 +235,40 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     if (function_exists('_civix_phpunit_setUp')) {
       // FIXME: loosen coupling
       _civix_phpunit_setUp();
+    }
+  }
+
+  /**
+   * @param array $formValues
+   * @param string $identifier
+   *
+   * @return void
+   */
+  public function caseCreate(array $formValues, string $identifier): void {
+    if (!CRM_Core_Session::getLoggedInContactID()) {
+      $this->createLoggedInUser();
+    }
+    $this->getTestForm('CRM_Case_Form_Case',
+      array_merge([
+        'activity_subject' => 'Case Subject',
+        'case_type_id' => 1,
+        'status_id' => 1,
+        'case_type' => 'housing_support',
+        'subject' => 'Case Subject',
+        'start_date' => date('Y-m-d'),
+        'start_date_time' => date('YmdHis'),
+        'medium_id' => 2,
+        'activity_details' => '',
+      ], $formValues),
+      ['cid' => $formValues['client_id']]
+    )->processForm();
+    try {
+      $this->ids['Case'][$identifier] = CiviCase::get(FALSE)
+        ->addOrderBy('id', 'DESC')
+        ->execute()->first()['id'];
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->fail('Case not retrieved');
     }
   }
 
@@ -3480,28 +3517,24 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   /**
    * Create and return a case object for the given Client ID.
    *
+   * Note that calling caseCreate directly is preferred.
+   *
    * @param int $clientID
    * @param int|null $loggedInUser
    *   Omit or pass NULL to use the same as clientId
    * @param array $extra
    *   Optional specific parameters such as start_date
+   * @param string $identifier
    *
    * @return CRM_Case_BAO_Case
    */
-  public function createCase(int $clientID, ?int $loggedInUser = NULL, array $extra = []): CRM_Case_DAO_Case {
-    $caseParams = array_merge([
-      'activity_subject' => 'Case Subject',
-      'client_id'        => $clientID,
-      'case_type_id'     => 1,
-      'status_id'        => 1,
-      'case_type'        => 'housing_support',
-      'subject'          => 'Case Subject',
-      'start_date'       => date('Y-m-d'),
-      'start_date_time'  => date('YmdHis'),
-      'medium_id'        => 2,
-      'activity_details' => '',
-    ], $extra);
-    return (new CRM_Case_Form_Case())->testSubmit($caseParams, 'OpenCase', $loggedInUser ?: $clientID, 'standalone');
+  public function createCase(int $clientID, ?int $loggedInUser = NULL, array $extra = [], string $identifier = 'form-created'): CRM_Case_DAO_Case {
+    $extra['client_id'] = $clientID;
+    $this->caseCreate($extra, $identifier);
+    $case = new CRM_Case_BAO_Case();
+    $case->id = $this->ids['Case'][$identifier];
+    $case->find(TRUE);
+    return $case;
   }
 
   /**
