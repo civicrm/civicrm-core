@@ -141,7 +141,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
         'contact_id_a'         => $contactID,
         'contact_id_b'         => $loggedInUser,
         'relationship_type_id' => $relationshipType,
-        'case_id'              => $caseID,
+        'case_id'              => $this->ids['Case']['form-created'],
         'is_active'            => TRUE,
       ]);
     }
@@ -226,7 +226,6 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
   /**
    * Test that Case count is exactly one for logged in user for user's active role.
    *
-   * @throws \CRM_Core_Exception
    */
   public function testActiveCaseRole(): void {
     $individual = $this->individualCreate();
@@ -261,6 +260,8 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
 
   /**
    * Test that all custom files are migrated to new case when case is assigned to new client.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testCaseReassignForCustomFiles(): void {
     $individual = $this->individualCreate();
@@ -1324,7 +1325,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
   public function testGetRelatedAndGlobalContacts(): void {
     $loggedInUserId = $this->createLoggedInUser();
     $clientId = $this->individualCreate(['first_name' => 'Cli', 'last_name' => 'Ent'], 0, TRUE);
-    $caseObj = $this->createCase($clientId, $loggedInUserId);
+    $this->createCase($clientId, $loggedInUserId);
 
     $gid = $this->callAPISuccess('Group', 'getsingle', ['name' => 'Case_Resources'])['id'];
 
@@ -1342,7 +1343,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
         'contact_id' => $contacts[$i]['id'],
       ]);
     }
-    $retrievedContacts = CRM_Case_BAO_Case::getRelatedAndGlobalContacts($caseObj->id);
+    $retrievedContacts = CRM_Case_BAO_Case::getRelatedAndGlobalContacts($this->ids['Case']['form-created']);
     // 29 because the case manager is also in the list
     $this->assertCount(29, $retrievedContacts);
 
@@ -1375,18 +1376,18 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     $loggedInUserId = $this->createLoggedInUser();
     $clientId = $this->individualCreate([], 0, TRUE);
     // old start date so there's no upcoming
-    $caseObj = $this->createCase($clientId, $loggedInUserId, ['start_date' => date('Y-m-d', strtotime('-2 years'))]);
+    $this->createCase($clientId, $loggedInUserId, ['start_date' => date('Y-m-d', strtotime('-2 years'))]);
     // quickie hack to make them all completed
-    CRM_Core_DAO::executeQuery("UPDATE civicrm_case_activity ca INNER JOIN civicrm_activity a ON a.id = ca.activity_id SET a.status_id = 2 WHERE ca.case_id = %1", [1 => [$caseObj->id, 'Integer']]);
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_case_activity ca INNER JOIN civicrm_activity a ON a.id = ca.activity_id SET a.status_id = 2 WHERE ca.case_id = %1", [1 => [$this->ids['Case']['form-created'], 'Integer']]);
     // Add a recent one
-    $activity = $this->callAPISuccess('Activity', 'create', [
+    $this->callAPISuccess('Activity', 'create', [
       'source_contact_id' => $loggedInUserId,
       'target_contact_id' => $clientId,
       'activity_type_id' => 'Follow up',
       'status_id' => 'Completed',
       'activity_date_time' => date('Y-m-d H:i:s', strtotime('-2 days')),
       'subject' => 'backdated',
-      'case_id' => $caseObj->id,
+      'case_id' => $this->ids['Case']['form-created'],
     ]);
     $this->assertEquals(0, CRM_Case_BAO_Case::getCases(TRUE, ['type' => 'upcoming'], 'dashboard', TRUE));
     $this->assertEquals(1, CRM_Case_BAO_Case::getCases(TRUE, ['type' => 'recent'], 'dashboard', TRUE));

@@ -177,8 +177,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
     }
     $this->assign('clientName', isset($this->_currentlyViewedContactId) ? $contact->display_name : NULL);
 
-    $session = CRM_Core_Session::singleton();
-    $this->_currentUserId = $session->get('userID');
+    $this->_currentUserId = CRM_Core_Session::getLoggedInContactID();
 
     //Add activity custom data is included in this page
     CRM_Custom_Form_CustomData::preProcess($this, NULL, $this->_activityTypeId, 1, 'Activity');
