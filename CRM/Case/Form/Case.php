@@ -337,25 +337,6 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
   }
 
   /**
-   * Wrapper for unit testing the post process submit function.
-   *
-   * @param $params
-   * @param $activityTypeFile
-   * @param $contactId
-   * @param $context
-   * @return CRM_Case_BAO_Case
-   */
-  public function testSubmit($params, $activityTypeFile, $contactId, $context = "case") {
-    $this->controller = new CRM_Core_Controller();
-
-    $this->_activityTypeFile = $activityTypeFile;
-    $this->_currentUserId = $contactId;
-    $this->_context = $context;
-
-    return $this->submit($params);
-  }
-
-  /**
    * Submit the form with given params.
    *
    * @param $params
