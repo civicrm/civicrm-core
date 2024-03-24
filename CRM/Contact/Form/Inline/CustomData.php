@@ -132,17 +132,6 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
       $subType = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',', trim($subType, CRM_Core_DAO::VALUE_SEPARATOR));
     }
 
-    $singleRecord = NULL;
-    if (!empty($form->_groupCount) && !empty($form->_multiRecordDisplay) && $form->_multiRecordDisplay == 'single') {
-      $singleRecord = $form->_groupCount;
-    }
-    $mode = CRM_Utils_Request::retrieve('mode', 'String', $form);
-    // when a new record is being added for multivalued custom fields.
-    if (isset($form->_groupCount) && $form->_groupCount == 0 && $mode == 'add' &&
-      !empty($form->_multiRecordDisplay) && $form->_multiRecordDisplay == 'single') {
-      $singleRecord = 'new';
-    }
-
     $groupTree = CRM_Core_BAO_CustomGroup::getTree($type,
       NULL,
       $form->_entityId,
@@ -150,10 +139,7 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
       $subType,
       $extendsEntityColumn,
       $isLoadFromCache,
-      $onlySubType,
-      FALSE,
-      CRM_Core_Permission::EDIT,
-      $singleRecord
+      $onlySubType
     );
 
     if (property_exists($form, '_customValueCount') && !empty($groupTree)) {
