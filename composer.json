@@ -60,7 +60,7 @@
     "symfony/dependency-injection": "~4.4 || ~6.0",
     "symfony/event-dispatcher": "~4.4 || ~6.0",
     "symfony/filesystem": "~4.4 || ~6.0",
-    "symfony/process": "~4.4 || ~6.0",
+    "symfony/process": "~4.4 || ~5.0 || ~6.0",
     "symfony/var-dumper": "~4.4 || ~5.1 || ~6.0",
     "symfony/service-contracts": "~2.2 || ~3.1",
     "psr/log": "~1.0 || ~2.0 || ~3.0",
@@ -103,7 +103,7 @@
     "soundasleep/html2text": "^2.1",
     "psr/container": "~1.0 || ~2.0",
     "ext-fileinfo": "*",
-    "pontedilana/php-weasyprint": "^0.13.0",
+    "pontedilana/php-weasyprint": "^1",
     "knplabs/knp-snappy": "^1.4"
   },
   "scripts": {
