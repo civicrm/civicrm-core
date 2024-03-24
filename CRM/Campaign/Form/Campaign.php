@@ -69,14 +69,14 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
   /**
    * Explicitly declare the entity api name.
    */
-  public function getDefaultEntity() {
+  public function getDefaultEntity(): string {
     return 'Campaign';
   }
 
   /**
    * @throws \CRM_Core_Exception
    */
-  public function preProcess() {
+  public function preProcess(): void {
     if (!CRM_Campaign_BAO_Campaign::accessCampaign()) {
       CRM_Utils_System::permissionDenied();
     }
@@ -167,8 +167,11 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     return $defaults;
   }
 
-  public function buildQuickForm() {
-    $this->add('hidden', 'id', $this->_campaignId);
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  public function buildQuickForm(): void {
+    $this->add('hidden', 'id', $this->getCampaignID());
     if ($this->_action & CRM_Core_Action::DELETE) {
 
       $this->addButtons([
@@ -188,27 +191,16 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     $this->applyFilter('__ALL__', 'trim');
 
     // Assign custom data subtype for initial ajax load of custom data.
-    $this->assign('entityID', $this->_campaignId);
+    $this->assign('entityID', $this->getCampaignID());
     $this->assign('customDataSubType', $this->getSubmittedValue('campaign_type_id') ?: $this->getCampaignValue('campaign_type_id'));
 
     $attributes = CRM_Core_DAO::getAttribute('CRM_Campaign_DAO_Campaign');
 
-    // add comaign title.
     $this->add('text', 'title', ts('Title'), $attributes['title'], TRUE);
-
-    // add description
     $this->add('textarea', 'description', ts('Description'), $attributes['description']);
-
-    // add campaign start date
     $this->add('datepicker', 'start_date', ts('Start Date'), [], TRUE);
-
-    // add campaign end date
     $this->add('datepicker', 'end_date', ts('End Date'));
-
-    // add campaign type
     $this->addSelect('campaign_type_id', ['placeholder' => ts('- select type -'), 'onChange' => "CRM.buildCustomData( 'Campaign', this.value );"], TRUE);
-
-    // add campaign status
     $this->addSelect('status_id', ['placeholder' => ts('- select status -')]);
 
     // add External Identifier Element
@@ -302,7 +294,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
   /**
    * Form submission of new/edit campaign is processed.
    */
-  public function postProcess() {
+  public function postProcess(): void {
     // store the submitted values in an array
 
     $session = CRM_Core_Session::singleton();
@@ -348,7 +340,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
   public static function submit($params, $form) {
     $groups = [];
     if (!empty($params['includeGroups']) && is_array($params['includeGroups'])) {
-      foreach ($params['includeGroups'] as $key => $id) {
+      foreach ($params['includeGroups'] as $id) {
         if ($id) {
           $groups['include'][] = $id;
         }
@@ -374,8 +366,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
 
     // dev/core#1067 Clean Money before passing onto BAO to do the create.
     $params['goal_revenue'] = CRM_Utils_Rule::cleanMoney($params['goal_revenue']);
-    $result = civicrm_api3('Campaign', 'create', $params);
-    return $result;
+    return civicrm_api3('Campaign', 'create', $params);
   }
 
 }
