@@ -20,8 +20,33 @@ class SqlGenerator {
    */
   private array $entities;
 
-  public function __construct(array $entities) {
+  private $findExternalTable;
+
+  /**
+   * @param string $path
+   *   Ex: '/var/www/sites/all/modules/civicrm/schema'
+   * @param bool $isolated
+   *   TRUE if these entities should be a self-sufficient (i.e. no external references).
+   *   FALSE if these entities may include references to other tables.
+   *   TRUE would make sense in (eg) civicrm-core, before installation or bootstrap
+   *   FALSE would make sense in (eg) an extension on an active system.
+   *
+   * @return \Civi\Schema\SqlGenerator
+   */
+  public static function createFromFolder(string $path, bool $isolated): SqlGenerator {
+    $files = \CRM_Utils_File::findFiles($path, '*.entityType.php');
+    $entities = [];
+    foreach ($files as $file) {
+      $entities[] = include $file;
+    }
+
+    $findExternalTable = $isolated ? (fn($entity) => NULL) : (['CRM_Core_DAO_AllCoreTables', 'getTableForEntityName']);
+    return new static($entities, $findExternalTable);
+  }
+
+  public function __construct(array $entities, callable $findExternalTable) {
     $this->entities = $this->sortEntitiesByForeignKey($entities);
+    $this->findExternalTable = $findExternalTable;
   }
 
   public function getEntitiesSortedByForeignKey(): array {
@@ -142,7 +167,7 @@ class SqlGenerator {
   }
 
   private function getTableForEntity(string $entityName): string {
-    return $this->entities[$entityName]['table'] ?? \CRM_Core_DAO_AllCoreTables::getTableForEntityName($entityName);
+    return $this->entities[$entityName]['table'] ?? call_user_func($this->findExternalTable, $entityName);
   }
 
   /**
