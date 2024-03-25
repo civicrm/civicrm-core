@@ -47,7 +47,7 @@
         <tr class="crm-relationship-form-block-is_permission_b_a">
           <td class="label"> </td>
           <td>
-            {ts 1=$contact_b|ucfirst 2=$display_name_a}Permission for <strong>%1</strong> to access information about <strong>%2</strong>{/ts}<br />
+            {ts 1=$contact_b|capitalize 2=$display_name_a}Permission for <strong>%1</strong> to access information about <strong>%2</strong>{/ts}<br />
             {$form.is_permission_b_a.html}
           </td>
         </tr>
