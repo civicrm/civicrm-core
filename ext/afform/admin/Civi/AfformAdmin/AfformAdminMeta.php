@@ -43,19 +43,11 @@ class AfformAdminMeta {
   }
 
   /**
-   * Get info about an api entity, with special handling for contact types
+   * Get info about an api entity
    * @param string $entityName
    * @return array|null
    */
   public static function getApiEntity(string $entityName) {
-    $contactTypes = \CRM_Contact_BAO_ContactType::basicTypeInfo();
-    if (isset($contactTypes[$entityName])) {
-      return [
-        'entity' => 'Contact',
-        'contact_type' => $entityName,
-        'label' => $contactTypes[$entityName]['label'],
-      ];
-    }
     $info = \Civi\Api4\Entity::get(FALSE)
       ->addWhere('name', '=', $entityName)
       ->execute()->first();
@@ -99,10 +91,6 @@ class AfformAdminMeta {
       'select' => ['name', 'label', 'input_type', 'input_attrs', 'required', 'options', 'help_pre', 'help_post', 'serialize', 'data_type', 'entity', 'fk_entity', 'readonly', 'operators'],
       'where' => [['deprecated', '=', FALSE], ['input_type', 'IS NOT NULL']],
     ];
-    if (in_array($entityName, \CRM_Contact_BAO_ContactType::basicTypes(TRUE), TRUE)) {
-      $params['values']['contact_type'] = $entityName;
-      $entityName = 'Contact';
-    }
     if ($entityName === 'Address') {
       // The stateProvince option list is waaay too long unless country limits are set
       if (!\Civi::settings()->get('provinceLimit')) {

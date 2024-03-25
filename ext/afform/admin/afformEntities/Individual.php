@@ -3,7 +3,6 @@ return [
   'type' => 'primary',
   'defaults' => "{
     data: {
-      contact_type: 'Individual',
       source: afform.title
     }
   }",

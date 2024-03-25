@@ -3,7 +3,7 @@ namespace Civi\Afform\Behavior;
 
 use Civi\Afform\AbstractBehavior;
 use Civi\Afform\Event\AfformSubmitEvent;
-use Civi\Api4\Contact;
+use Civi\Api4\Utils\CoreUtil;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use CRM_Afform_ExtensionUtil as E;
 
@@ -55,7 +55,7 @@ class ContactDedupe extends AbstractBehavior implements EventSubscriberInterface
   public static function onAfformSubmit(AfformSubmitEvent $event) {
     $entity = $event->getEntity();
     $dedupeMode = $entity['contact-dedupe'] ?? NULL;
-    if ($event->getEntityType() !== 'Contact' || !$dedupeMode) {
+    if (!CoreUtil::isContact($entity['type']) || !$dedupeMode) {
       return;
     }
     // Apply dedupe rule if contact isn't already identified
@@ -67,10 +67,11 @@ class ContactDedupe extends AbstractBehavior implements EventSubscriberInterface
           $values += \CRM_Utils_Array::prefixKeys($record['joins'][$joinEntity][0], strtolower($joinEntity) . '_primary.');
         }
       }
-      $match = Contact::getDuplicates(FALSE)
-        ->setValues($values)
-        ->setDedupeRule($dedupeMode)
-        ->execute()->first();
+      $match = civicrm_api4($entity['type'], 'getDuplicates', [
+        'checkPermissions' => FALSE,
+        'values' => $values,
+        'dedupeRule' => $dedupeMode,
+      ])->first();
       if (!empty($match['id'])) {
         $event->setEntityId($index, $match['id']);
       }
