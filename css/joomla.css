@@ -42,7 +42,10 @@ body.admin.com_civicrm .crm-container.ui-dialog {
   z-index: 100000;
 }
 body.admin.com_civicrm.layout-default .ui-widget-overlay {
-  z-index: 1;
+  z-index: 100001;
+}
+body.admin.com_civicrm.layout-default .select2-drop {
+  z-index: 100002;
 }
 body.admin.com_civicrm.layout-default .modal-dialog {
   max-width: inherit;
