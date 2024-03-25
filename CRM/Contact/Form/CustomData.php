@@ -86,7 +86,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
     $this->_cdType = $_GET['type'] ?? NULL;
     $isBuildForm = ($_GET['type'] ?? NULL) && CRM_Utils_Request::retrieve('multiRecordDisplay', 'String', $this);
     $this->_multiRecordDisplay = CRM_Utils_Request::retrieve('multiRecordDisplay', 'String', $this);
-    $this->assign('cdType', CRM_Utils_Request::retrieve('multiRecordDisplay', 'String', $this));
+    $this->assign('cdType', (bool) $this->_cdType);
     if ($isBuildForm) {
       // NOTE : group id is not stored in session from within CRM_Custom_Form_CustomData::preProcess func
       // this is due to some condition inside it which restricts it from saving in session
