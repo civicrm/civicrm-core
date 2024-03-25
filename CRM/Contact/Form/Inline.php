@@ -23,6 +23,8 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
   /**
    * Id of the contact that is being edited
    * @var int
+   *
+   * @internal - use getContactID()
    */
   public $_contactId;
 
@@ -56,12 +58,11 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
    * Common preprocess: fetch contact ID and contact type
    */
   public function preProcess() {
-    $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
-    $this->assign('contactId', $this->_contactId);
+    $this->assign('contactId', $this->getContactID());
 
     // get contact type and subtype
     if (empty($this->_contactType)) {
-      $contactTypeInfo = CRM_Contact_BAO_Contact::getContactTypes($this->_contactId);
+      $contactTypeInfo = CRM_Contact_BAO_Contact::getContactTypes($this->getContactID());
       $this->_contactType = $contactTypeInfo[0];
 
       // check if subtype is set
@@ -78,10 +79,27 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
   }
 
   /**
+   * Get the contact ID.
+   *
+   * Override this for more complex retrieval as required by the form.
+   *
+   * @return int|null
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   * @noinspection PhpDocMissingThrowsInspection
+   */
+  public function getContactID(): int {
+    if (!isset($this->_contactId)) {
+      $this->_contactId = (int) CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
+    }
+    return $this->_contactId;
+  }
+
+  /**
    * Common form elements.
    */
   public function buildQuickForm() {
-    CRM_Contact_Form_Inline_Lock::buildQuickForm($this, $this->_contactId);
+    CRM_Contact_Form_Inline_Lock::buildQuickForm($this, $this->getContactID());
 
     $buttons = [
       [
@@ -111,10 +129,8 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
    * @return array
    */
   public function setDefaultValues() {
-    $defaults = $params = [];
-    $params['id'] = $this->_contactId;
-
-    CRM_Contact_BAO_Contact::getValues($params, $defaults);
+    $defaults = [];
+    CRM_Contact_BAO_Contact::getValues(['id' => $this->getContactID()], $defaults);
 
     return $defaults;
   }
@@ -123,9 +139,9 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
    * Add entry to log table.
    */
   protected function log() {
-    CRM_Core_BAO_Log::register($this->_contactId,
+    CRM_Core_BAO_Log::register($this->getContactID(),
       'civicrm_contact',
-      $this->_contactId
+      $this->getContactID()
     );
   }
 
@@ -136,9 +152,9 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
    */
   protected function response() {
     $this->ajaxResponse = array_merge(
-      self::renderFooter($this->_contactId),
+      self::renderFooter($this->getContactID()),
       $this->ajaxResponse,
-      CRM_Contact_Form_Inline_Lock::getResponse($this->_contactId)
+      CRM_Contact_Form_Inline_Lock::getResponse($this->getContactID())
     );
     // Note: Post hooks will be called by CRM_Core_Form::mainProcess
   }

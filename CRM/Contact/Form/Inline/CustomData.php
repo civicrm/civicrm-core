@@ -37,7 +37,7 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
   /**
    * Call preprocess.
    */
-  public function preProcess() {
+  public function preProcess(): void {
     parent::preProcess();
 
     $this->_groupID = CRM_Utils_Request::retrieve('groupID', 'Positive', $this, TRUE, NULL);
@@ -60,11 +60,10 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
    * 3) pass getSubmittedValues() to CRM_Core_BAO_CustomField::postProcess($this->getSubmittedValues(), $this->_id, 'FinancialAccount');
    *  to ensure any money or number fields are handled for localisation
    */
-  private function preProcessCustomData() {
+  private function preProcessCustomData(): void {
     $type = $this->_contactType;
-    $entityID = $this->_contactId;
     $groupCount = CRM_Utils_Request::retrieve('cgcount', 'Positive', $this, FALSE, 1);
-    $subType = CRM_Contact_BAO_Contact::getContactSubType($this->_contactId, ',');
+    $subType = CRM_Contact_BAO_Contact::getContactSubType($this->getContactID());
 
     if (!isset($subType)) {
       $subType = CRM_Utils_Request::retrieve('subType', 'String', $this);
@@ -88,16 +87,9 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
 
     $this->assign('cgCount', $groupCount);
 
-    //carry qf key, since this form is not inhereting core form.
+    //carry qf key, since this form is not inheriting core form.
     if ($qfKey = CRM_Utils_Request::retrieve('qfKey', 'String')) {
       $this->assign('qfKey', $qfKey);
-    }
-
-    if ($entityID) {
-      $this->_entityId = $entityID;
-    }
-    else {
-      $this->_entityId = CRM_Utils_Request::retrieve('entityID', 'Positive', $this);
     }
 
     $typeCheck = CRM_Utils_Request::retrieve('type', 'String');
@@ -117,14 +109,14 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
 
     $groupTree = CRM_Core_BAO_CustomGroup::getTree($type,
       NULL,
-      $this->_entityId,
+      $this->getContactID(),
       $gid,
       $subType,
       $extendsEntityColumn
     );
 
     if (property_exists($this, '_customValueCount') && !empty($groupTree)) {
-      $this->_customValueCount = CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, TRUE, NULL, NULL, NULL, $this->_entityId);
+      $this->_customValueCount = CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, TRUE, NULL, NULL, NULL, $this->getContactID());
     }
     // we should use simplified formatted groupTree
     $groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, $groupCount, $this);
@@ -143,7 +135,7 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
   /**
    * Build the form object elements for custom data.
    */
-  public function buildQuickForm() {
+  public function buildQuickForm(): void {
     parent::buildQuickForm();
     $this->addElement('hidden', 'hidden_custom', 1);
     $this->addElement('hidden', "hidden_custom_group_count[{$this->_groupID}]", CRM_Utils_Request::retrieve('cgcount', 'Positive', $this, FALSE, 1));
@@ -155,7 +147,7 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
    *
    * @return array
    */
-  public function setDefaultValues() {
+  public function setDefaultValues(): array {
     $defaults = [];
     CRM_Core_BAO_CustomGroup::setDefaults($this->_groupTree, $defaults, FALSE, FALSE, $this->get('action'));
     return $defaults;
@@ -164,13 +156,13 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
   /**
    * Process the form.
    */
-  public function postProcess() {
+  public function postProcess(): void {
     // Process / save custom data
     // Get the form values and groupTree
     $params = $this->getSubmittedValues();
     CRM_Core_BAO_CustomValueTable::postProcess($params,
       'civicrm_contact',
-      $this->_contactId,
+      $this->getContactID(),
       $this->_entityType
     );
 
