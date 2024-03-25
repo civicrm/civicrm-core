@@ -36,6 +36,8 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
 
   /**
    * Call preprocess.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function preProcess(): void {
     parent::preProcess();
@@ -63,6 +65,7 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
   private function preProcessCustomData(): void {
     $type = $this->_contactType;
     $groupCount = CRM_Utils_Request::retrieve('cgcount', 'Positive', $this, FALSE, 1);
+    $this->assign('cgCount', $groupCount);
     $subType = CRM_Contact_BAO_Contact::getContactSubType($this->getContactID());
 
     if (!isset($subType)) {
@@ -77,15 +80,6 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
       // Is this reachable?
       $extendsEntityColumn = NULL;
     }
-
-    if ($groupCount) {
-      $this->_groupCount = $groupCount;
-    }
-    else {
-      $this->_groupCount = CRM_Utils_Request::retrieve('cgcount', 'Positive', $this);
-    }
-
-    $this->assign('cgCount', $groupCount);
 
     //carry qf key, since this form is not inheriting core form.
     if ($qfKey = CRM_Utils_Request::retrieve('qfKey', 'String')) {
@@ -134,6 +128,8 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
 
   /**
    * Build the form object elements for custom data.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function buildQuickForm(): void {
     parent::buildQuickForm();
