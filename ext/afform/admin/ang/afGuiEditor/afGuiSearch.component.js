@@ -329,6 +329,14 @@
         }
       };
 
+      this.toggleStoreValues = function() {
+        if (this.display.fieldset['store-values']) {
+          delete this.display.fieldset['store-values'];
+        } else {
+          this.display.fieldset['store-values'] = '1';
+        }
+      };
+
       // Convert filters array to js notation & add to crm-search-display element
       function writeFilters() {
         var output = [];
