@@ -56,7 +56,7 @@
           <td>{$form.is_active.html}</td>
         </tr>
       </table>
-      <div id="customData"></div>
+      <div id="customData_Relationship"></div>
       <div class="spacer"></div>
     </div>
   {/if}
