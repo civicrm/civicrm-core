@@ -43,7 +43,7 @@ class LocalizedDataTest extends \CiviEndToEndTestCase {
   }
 
   private function getRenderedSql($locale) {
-    $schema = new \CRM_Core_CodeGen_Schema(\Civi\Test::codeGen());
+    $schema = new \CRM_Core_CodeGen_PhpSchema(\Civi\Test::codeGen());
     $files = $schema->generateLocaleDataSql($locale);
     foreach ($files as $file => $content) {
       if (preg_match(';^civicrm_data\.;', $file)) {

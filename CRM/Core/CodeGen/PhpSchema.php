@@ -1,25 +1,23 @@
 <?php
 
 /**
- * Create SQL files to create and populate a new schema.
+ * Drop-in replacement for CRM_Core_CodeGen_Schema which uses schema/**.entityType.php instead of xml/schema/**.xml
  *
- * @deprecated
- *   Replaced by CRM_Core_CodeGen_PhpSchema.
- *   Delete this after civicrm-core and civix drop their references.
- *   Maybe allow grace-period of a couple months.
+ * @internal
  */
-class CRM_Core_CodeGen_Schema extends CRM_Core_CodeGen_BaseTask {
+class CRM_Core_CodeGen_PhpSchema extends CRM_Core_CodeGen_BaseTask {
 
   public $locales;
 
   /**
-   * CRM_Core_CodeGen_Schema constructor.
+   * CRM_Core_CodeGen_PhpSchema constructor.
    *
    * @param \CRM_Core_CodeGen_Main $config
    */
   public function __construct($config) {
     parent::__construct($config);
     $this->locales = $this->findLocales();
+    $this->sqlGenerator = \Civi\Schema\SqlGenerator::createFromFolder($this->config->phpCodePath . '/schema', TRUE);
   }
 
   public function run() {
@@ -57,23 +55,11 @@ class CRM_Core_CodeGen_Schema extends CRM_Core_CodeGen_BaseTask {
   }
 
   public function generateCreateSql() {
-    $template = new CRM_Core_CodeGen_Util_Template('sql');
-
-    $template->assign('database', $this->config->database);
-    $template->assign('tables', $this->tables);
-    $dropOrder = array_reverse(array_keys($this->tables));
-    $template->assign('dropOrder', $dropOrder);
-    $template->assign('mysql', 'modern');
-    CRM_Core_CodeGen_Util_MessageTemplates::assignSmartyVariables($template->getSmarty());
-    return ['civicrm.mysql' => $template->fetch('schema.tpl')];
+    return ['civicrm.mysql' => $this->sqlGenerator->getCreateTablesSql()];
   }
 
   public function generateDropSql() {
-    $dropOrder = array_reverse(array_keys($this->tables));
-    $template = new CRM_Core_CodeGen_Util_Template('sql');
-    $template->assign('dropOrder', $dropOrder);
-    $template->assign('isOutputLicense', TRUE);
-    return ['civicrm_drop.mysql' => $template->fetch('drop.tpl')];
+    return ['civicrm.mysql' => $this->sqlGenerator->getDropTablesSql()];
   }
 
   public function generateNavigation() {
