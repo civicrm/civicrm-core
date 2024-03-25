@@ -11,8 +11,6 @@
 
 namespace Civi\Schema;
 
-use MJS\TopSort\Implementations\FixedArraySort;
-
 class SqlGenerator {
 
   /**
@@ -45,11 +43,11 @@ class SqlGenerator {
   }
 
   public function __construct(array $entities, callable $findExternalTable) {
-    $this->entities = $this->sortEntitiesByForeignKey($entities);
+    $this->entities = $entities;
     $this->findExternalTable = $findExternalTable;
   }
 
-  public function getEntitiesSortedByForeignKey(): array {
+  public function getEntities(): array {
     return $this->entities;
   }
 
@@ -58,40 +56,25 @@ class SqlGenerator {
     foreach ($this->entities as $entity) {
       $sql .= $this->generateCreateTableSql($entity);
     }
+    foreach ($this->entities as $entity) {
+      $sql .= $this->generateConstraintsSql($entity);
+    }
     return $sql;
   }
 
   public function getCreateTableSql(string $entityName): string {
-    return $this->generateCreateTableSql($this->entities[$entityName]);
+    $sql = $this->generateCreateTableSql($this->entities[$entityName]);
+    $sql .= $this->generateConstraintsSql($this->entities[$entityName]);
+    return $sql;
   }
 
   public function getDropTablesSql(): string {
     $sql = "SET FOREIGN_KEY_CHECKS=0;\n";
-    foreach (array_reverse($this->entities) as $entity) {
+    foreach ($this->entities as $entity) {
       $sql .= "DROP TABLE IF EXISTS `{$entity['table']}`;\n";
     }
     $sql .= "SET FOREIGN_KEY_CHECKS=1;\n";
     return $sql;
-  }
-
-  private function sortEntitiesByForeignKey(array $entities): array {
-    $entities = array_column($entities, NULL, 'name');
-    $sorter = new FixedArraySort();
-    foreach ($entities as $name => $entity) {
-      $references = [];
-      foreach ($entity['getFields']() as $field) {
-        if (!empty($field['entity_reference']['entity']) && isset($entities[$field['entity_reference']['entity']])) {
-          $references[] = $field['entity_reference']['entity'];
-        }
-      }
-      $sorter->add($name, $references);
-    }
-    $sortedEntityNames = $sorter->sort();
-    $sortedEntities = [];
-    foreach ($sortedEntityNames as $name) {
-      $sortedEntities[$name] = $entities[$name];
-    }
-    return $sortedEntities;
   }
 
   private function generateCreateTableSql(array $entity): string {
@@ -128,18 +111,28 @@ class SqlGenerator {
       }
       $definition[] = (!empty($index['unique']) ? 'UNIQUE ' : '') . "INDEX `$indexName`(" . implode(', ', $indexFields) . ')';
     }
-    foreach ($entity['getFields']() as $fieldName => $field) {
-      if (!empty($field['entity_reference']['entity'])) {
-        $definition[] = "CONSTRAINT `FK_{$entity['table']}_$fieldName` FOREIGN KEY (`$fieldName`)" .
-          " REFERENCES `" . $this->getTableForEntity($field['entity_reference']['entity']) . "`(`{$field['entity_reference']['key']}`)" .
-          " ON DELETE {$field['entity_reference']['on_delete']}";
-      }
-    }
 
     $sql = "CREATE TABLE `{$entity['table']}` (\n  " .
       implode(",\n  ", $definition) .
       "\n)\n" .
       $this->getTableOptions() . ";\n";
+    return $sql;
+  }
+
+  private function generateConstraintsSql(array $entity): string {
+    $constraints = [];
+    foreach ($entity['getFields']() as $fieldName => $field) {
+      if (!empty($field['entity_reference']['entity'])) {
+        $constraints[] = "ADD CONSTRAINT `FK_{$entity['table']}_$fieldName` FOREIGN KEY (`$fieldName`)" .
+          " REFERENCES `" . $this->getTableForEntity($field['entity_reference']['entity']) . "`(`{$field['entity_reference']['key']}`)" .
+          " ON DELETE {$field['entity_reference']['on_delete']}";
+      }
+    }
+    $sql = '';
+    if ($constraints) {
+      $sql .= "ALTER TABLE `{$entity['table']}`\n  ";
+      $sql .= implode(",\n  ", $constraints) . ";\n";
+    }
     return $sql;
   }
 
