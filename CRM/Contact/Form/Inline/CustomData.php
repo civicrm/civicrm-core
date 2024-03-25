@@ -66,15 +66,7 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
     $type = $this->_contactType;
     $groupCount = CRM_Utils_Request::retrieve('cgcount', 'Positive', $this, FALSE, 1);
     $this->assign('cgCount', $groupCount);
-    $subType = CRM_Contact_BAO_Contact::getContactSubType($this->getContactID());
 
-    if (!isset($subType)) {
-      $subType = CRM_Utils_Request::retrieve('subType', 'String', $this);
-    }
-    if ($subType === 'null') {
-      // Is this reachable?
-      $subType = NULL;
-    }
     $extendsEntityColumn = CRM_Utils_Request::retrieve('subName', 'String', $this);
     if ($extendsEntityColumn === 'null') {
       // Is this reachable?
@@ -96,16 +88,12 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
     }
 
     $gid = (isset($this->_groupID)) ? $this->_groupID : NULL;
-    if (!is_array($subType) && str_contains(($subType ?? ''), CRM_Core_DAO::VALUE_SEPARATOR)) {
-      CRM_Core_Error::deprecatedWarning('Using a CRM_Core_DAO::VALUE_SEPARATOR separated subType deprecated, use a comma-separated string instead.');
-      $subType = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',', trim($subType, CRM_Core_DAO::VALUE_SEPARATOR));
-    }
 
     $groupTree = CRM_Core_BAO_CustomGroup::getTree($type,
       NULL,
       $this->getContactID(),
       $gid,
-      $subType,
+      CRM_Contact_BAO_Contact::getContactSubType($this->getContactID()),
       $extendsEntityColumn
     );
 
