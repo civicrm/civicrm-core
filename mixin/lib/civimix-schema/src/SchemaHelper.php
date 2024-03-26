@@ -74,7 +74,7 @@ return new class() implements SchemaHelperInterface {
   private function getSqlGenerator() {
     if ($this->sqlGenerator === NULL) {
       $gen = require __DIR__ . '/SqlGenerator.php';
-      $this->sqlGenerator = $gen::createFromFolder($this->getExtensionDir() . '/schema', $this->key === 'civicrm');
+      $this->sqlGenerator = $gen::createFromFolder($this->key, $this->getExtensionDir() . '/schema', $this->key === 'civicrm');
     }
     return $this->sqlGenerator;
   }

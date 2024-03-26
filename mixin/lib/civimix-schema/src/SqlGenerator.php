@@ -19,6 +19,8 @@ return new class([], fn()=>NULL) {
   private $findExternalTable;
 
   /**
+   * @param string $module
+   *   Ex: 'civicrm' or 'org.example.mymodule'
    * @param string $path
    *   Ex: '/var/www/sites/all/modules/civicrm/schema'
    * @param bool $isolated
@@ -29,11 +31,13 @@ return new class([], fn()=>NULL) {
    *
    * @return static
    */
-  public static function createFromFolder(string $path, bool $isolated) {
+  public static function createFromFolder(string $module, string $path, bool $isolated) {
     $files = \CRM_Utils_File::findFiles($path, '*.entityType.php');
     $entities = [];
     foreach ($files as $file) {
-      $entities[] = include $file;
+      $entity = include $file;
+      $entity['module'] = $module;
+      $entities[$entity['name']] = $entity;
     }
 
     $findExternalTable = $isolated ? (fn($entity) => NULL) : (['CRM_Core_DAO_AllCoreTables', 'getTableForEntityName']);
