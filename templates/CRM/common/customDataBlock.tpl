@@ -17,3 +17,5 @@
   </script>
   {/literal}
 {/if}
+{* jQuery validate *}
+{include file="CRM/Form/validate.tpl"}

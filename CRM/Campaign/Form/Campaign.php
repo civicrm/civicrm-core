@@ -20,6 +20,28 @@
  */
 class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
   use CRM_Custom_Form_CustomDataTrait;
+  use CRM_Campaign_Form_CampaignFormTrait;
+
+  /**
+   * Fields for the entity to be assigned to the template.
+   *
+   * Note this form is not implementing the EntityFormTrait but
+   * is following it's syntax for consistency.
+   *
+   * Fields may have keys
+   *  - name (required to show in tpl from the array)
+   *  - description (optional, will appear below the field)
+   *  - not-auto-addable - this class will not attempt to add the field using addField.
+   *    (this will be automatically set if the field does not have html in it's metadata
+   *    or is not a core field on the form's entity).
+   *  - help (option) add help to the field - e.g ['id' => 'id-source', 'file' => 'CRM/Contact/Form/Contact']]
+   *  - template - use a field specific template to render this field
+   *  - required
+   *  - is_freeze (field should be frozen).
+   *
+   * @var array
+   */
+  protected array $entityFields = [];
 
   /**
    * Action
@@ -36,34 +58,30 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
   protected $_context;
 
   /**
-   * Object values.
-   *
-   * @var array
-   */
-  protected $_values;
-
-  /**
-   * The id of the campaign we are proceessing
+   * The id of the campaign we are processing
    *
    * @var int
+   *
+   * @deprecated use getCampaignID()
    */
   protected $_campaignId;
 
   /**
    * Explicitly declare the entity api name.
    */
-  public function getDefaultEntity() {
+  public function getDefaultEntity(): string {
     return 'Campaign';
   }
 
   /**
    * @throws \CRM_Core_Exception
    */
-  public function preProcess() {
+  public function preProcess(): void {
     if (!CRM_Campaign_BAO_Campaign::accessCampaign()) {
       CRM_Utils_System::permissionDenied();
     }
 
+    $this->setEntityFields();
     $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
 
     $this->assign('context', $this->_context);
@@ -86,59 +104,57 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     $session->pushUserContext(CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=campaign'));
     $this->assign('action', $this->_action);
 
-    //load the values;
-    $this->_values = $this->get('values');
-    if (!is_array($this->_values)) {
-      $this->_values = [];
-
-      // if we are editing
-      if (isset($this->_campaignId) && $this->_campaignId) {
-        $params = ['id' => $this->_campaignId];
-        CRM_Campaign_BAO_Campaign::retrieve($params, $this->_values);
-      }
-
-      //lets use current object session.
-      $this->set('values', $this->_values);
-    }
-
     if ($this->isSubmitted()) {
       // The custom data fields are added to the form by an ajax form.
       // However, if they are not present in the element index they will
       // not be available from `$this->getSubmittedValue()` in post process.
       // We do not have to set defaults or otherwise render - just add to the element index.
       $this->addCustomDataFieldsToForm('Campaign', array_filter([
-        'id' => $this->_campaignId,
+        'id' => $this->getCampaignID(),
         'campaign_type_id' => $this->getSubmittedValue('campaign_type_id'),
       ]));
     }
   }
 
   /**
+   * Set entity fields to be assigned to the form.
+   */
+  protected function setEntityFields(): void {
+    $this->entityFields = [
+      'title' => ['name' => 'title'],
+      'description' => ['name' => 'description'],
+      'start_date' => ['name' => 'start_date', 'default' => date('Y-m-d H:i:s')],
+      'end_date' => ['name' => 'start_date'],
+      'campaign_type_id' => ['name' => 'campaign_type_id'],
+      'status_id' => ['name' => 'status_id'],
+      'goal_general' => ['name' => 'goal_general'],
+      'goal_revenue' => ['name' => 'goal_revenue'],
+      'external_identifier' => ['name' => 'external_identifier'],
+      'is_active' => ['name' => 'is_active', 'default' => 1],
+    ];
+  }
+
+  /**
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
-   *
    * @return array
+   * @throws \CRM_Core_Exception
    */
-  public function setDefaultValues() {
-    $defaults = $this->_values;
-
-    if (empty($defaults['start_date'])) {
-      $defaults['start_date'] = date('Y-m-d H:i:s');
+  public function setDefaultValues(): array {
+    $defaults = [];
+    foreach ($this->entityFields as $field) {
+      $defaults[$field['name']] = $this->getCampaignValue($field['name']) ?? ($field['default'] ?? '');
     }
 
-    if (!isset($defaults['is_active'])) {
-      $defaults['is_active'] = 1;
-    }
-
-    if (!$this->_campaignId) {
+    if (!$this->getCampaignID()) {
       return $defaults;
     }
 
     $dao = new CRM_Campaign_DAO_CampaignGroup();
 
     $campaignGroups = [];
-    $dao->campaign_id = $this->_campaignId;
+    $dao->campaign_id = $this->getCampaignID();
     $dao->find();
 
     while ($dao->fetch()) {
@@ -151,8 +167,11 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     return $defaults;
   }
 
-  public function buildQuickForm() {
-    $this->add('hidden', 'id', $this->_campaignId);
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  public function buildQuickForm(): void {
+    $this->add('hidden', 'id', $this->getCampaignID());
     if ($this->_action & CRM_Core_Action::DELETE) {
 
       $this->addButtons([
@@ -172,27 +191,16 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     $this->applyFilter('__ALL__', 'trim');
 
     // Assign custom data subtype for initial ajax load of custom data.
-    $this->assign('entityID', $this->_campaignId);
-    $this->assign('customDataSubType', $this->_values['campaign_type_id'] ?? NULL);
+    $this->assign('entityID', $this->getCampaignID());
+    $this->assign('customDataSubType', $this->getSubmittedValue('campaign_type_id') ?: $this->getCampaignValue('campaign_type_id'));
 
     $attributes = CRM_Core_DAO::getAttribute('CRM_Campaign_DAO_Campaign');
 
-    // add comaign title.
     $this->add('text', 'title', ts('Title'), $attributes['title'], TRUE);
-
-    // add description
     $this->add('textarea', 'description', ts('Description'), $attributes['description']);
-
-    // add campaign start date
     $this->add('datepicker', 'start_date', ts('Start Date'), [], TRUE);
-
-    // add campaign end date
     $this->add('datepicker', 'end_date', ts('End Date'));
-
-    // add campaign type
     $this->addSelect('campaign_type_id', ['placeholder' => ts('- select type -'), 'onChange' => "CRM.buildCustomData( 'Campaign', this.value );"], TRUE);
-
-    // add campaign status
     $this->addSelect('status_id', ['placeholder' => ts('- select status -')]);
 
     // add External Identifier Element
@@ -201,7 +209,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     );
 
     // add Campaign Parent Id
-    $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns(CRM_Utils_Array::value('parent_id', $this->_values), $this->_campaignId);
+    $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns($this->getCampaignValue('parent_id'), $this->getCampaignID());
     if (!empty($campaigns)) {
       $this->addElement('select', 'parent_id', ts('Parent ID'),
         ['' => ts('- select Parent -')] + $campaigns,
@@ -248,6 +256,22 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
   }
 
   /**
+   * Get the selected Campaign ID.
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  public function getCampaignID(): ?int {
+    if (!isset($this->_campaignId)) {
+      $this->_campaignId = CRM_Utils_Request::retrieve('id', 'Positive') ?: NULL;
+    }
+    return $this->_campaignId;
+  }
+
+  /**
    * add the rules (mainly global rules) for form.
    * All local rules are added near the element
    *
@@ -270,7 +294,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
   /**
    * Form submission of new/edit campaign is processed.
    */
-  public function postProcess() {
+  public function postProcess(): void {
     // store the submitted values in an array
 
     $session = CRM_Core_Session::singleton();
@@ -316,7 +340,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
   public static function submit($params, $form) {
     $groups = [];
     if (!empty($params['includeGroups']) && is_array($params['includeGroups'])) {
-      foreach ($params['includeGroups'] as $key => $id) {
+      foreach ($params['includeGroups'] as $id) {
         if ($id) {
           $groups['include'][] = $id;
         }
@@ -342,8 +366,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
 
     // dev/core#1067 Clean Money before passing onto BAO to do the create.
     $params['goal_revenue'] = CRM_Utils_Rule::cleanMoney($params['goal_revenue']);
-    $result = civicrm_api3('Campaign', 'create', $params);
-    return $result;
+    return civicrm_api3('Campaign', 'create', $params);
   }
 
 }
