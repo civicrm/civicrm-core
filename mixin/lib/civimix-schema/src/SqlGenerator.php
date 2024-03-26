@@ -99,7 +99,7 @@ return new class([], fn()=>NULL) {
       }
       $fieldSql .= self::getDefaultSql($field);
       if (!empty($field['description'])) {
-        $fieldSql .= " COMMENT '" . \CRM_Core_DAO::escapeString($field['description']) . "'";
+        $fieldSql .= " COMMENT '" . \CRM_Core_I18n::escape($field['description'], 'sql') . "'";
       }
       $definition[] = $fieldSql;
     }
@@ -157,7 +157,7 @@ return new class([], fn()=>NULL) {
       $default = $field['default'];
     }
     else {
-      $default = "'" . \CRM_Core_DAO::escapeString($field['default']) . "'";
+      $default = "'" . \CRM_Core_I18n::escape($field['default'], 'sql') . "'";
     }
     return ' DEFAULT ' . $default;
   }
