@@ -547,6 +547,7 @@ class CRM_Financial_BAO_Payment {
       }
     }
     $outstandingBalance = CRM_Contribute_BAO_Contribution::getContributionBalance($params['contribution_id']);
+    $isPaymentCompletesContribution = self::isPaymentCompletesContribution($params['contribution_id'], $params['total_amount'], '');
     if ($outstandingBalance !== 0.0) {
       $ratio = $params['total_amount'] / $outstandingBalance;
     }
@@ -567,17 +568,30 @@ class CRM_Financial_BAO_Payment {
       }
       else {
         if (empty($lineItems[$lineItemID]['balance']) && !empty($ratio) && $params['total_amount'] < 0) {
-          $lineItems[$lineItemID]['allocation'] = $lineItem['subTotal'] * $ratio;
+          $lineItems[$lineItemID]['allocation'] = round($lineItem['subTotal'] * $ratio, 2);
+        }
+        elseif ($isPaymentCompletesContribution) {
+          $lineItems[$lineItemID]['allocation'] = $lineItems[$lineItemID]['balance'];
         }
         else {
-          $lineItems[$lineItemID]['allocation'] = $lineItems[$lineItemID]['balance'] * $ratio;
+          $lineItems[$lineItemID]['allocation'] = round($lineItems[$lineItemID]['balance'] * $ratio, 2);
         }
 
         if (!empty($lineItem['tax_amount'])) {
-          $lineItems[$lineItemID]['tax_allocation'] = $lineItem['tax_amount'] * ($params['total_amount'] / $contribution['total_amount']);
+          $lineItems[$lineItemID]['tax_allocation'] = round($lineItem['tax_amount'] * ($params['total_amount'] / $contribution['total_amount']), 2);
         }
 
       }
+    }
+
+    if (empty($lineItemOverrides) && !empty($ratio)) {
+      $totalTaxAllocation = array_sum(array_column($lineItems, 'tax_allocation'));
+      $totalAllocation = array_sum(array_column($lineItems, 'allocation'));
+      $total = $totalTaxAllocation + $totalAllocation;
+      $leftPayment = $params['total_amount'] - $total;
+
+      // assign any leftover amount, to the last lineitem
+      $lineItems[$lineItemID]['allocation'] += $leftPayment;
     }
 
     return $lineItems;
