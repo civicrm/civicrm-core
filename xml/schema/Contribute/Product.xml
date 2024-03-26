@@ -166,8 +166,7 @@
     <type>varchar</type>
     <length>8</length>
     <default>'rolling'</default>
-    <comment>Rolling means we set start/end based on current day, fixed means we set start/end for current year or month
-      (e.g. 1 year + fixed -> we would set start/end for 1/1/06 thru 12/31/06 for any premium chosen in 2006) </comment>
+    <comment>Rolling means we set start/end based on current day, fixed means we set start/end for current year or month (e.g. 1 year + fixed -> we would set start/end for 1/1/06 thru 12/31/06 for any premium chosen in 2006)</comment>
     <pseudoconstant>
       <callback>CRM_Core_SelectValues::periodType</callback>
     </pseudoconstant>
