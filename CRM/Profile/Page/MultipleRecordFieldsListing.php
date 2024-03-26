@@ -27,6 +27,13 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
 
   protected $_profileId = NULL;
 
+  /**
+   * @param int $profileId
+   */
+  public function setProfileID(int $profileId): void {
+    $this->_profileId = $profileId;
+  }
+
   public $_contactId = NULL;
 
   public $_customGroupTitle = NULL;
