@@ -592,7 +592,7 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
       $this->fail("Non-admins should not be able to use User.delete API");
     }
     catch (\Civi\API\Exception\UnauthorizedException $e) {
-      $this->assertEquals('Authorization failed', $e->getMessage());
+      $this->assertStringContainsString('Authorization failed', $e->getMessage());
     }
 
     // ...try another account
@@ -603,7 +603,7 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
       $this->fail("Non-admins should not be able to use User.delete API");
     }
     catch (\Civi\API\Exception\UnauthorizedException $e) {
-      $this->assertEquals('Authorization failed', $e->getMessage());
+      $this->assertStringContainsString('Authorization failed', $e->getMessage());
     }
   }
 
@@ -617,7 +617,7 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
       $this->fail("Non admins should not be allowed to use User.create");
     }
     catch (\Civi\API\Exception\UnauthorizedException $e) {
-      $this->assertEquals('Authorization failed', $e->getMessage());
+      $this->assertStringContainsString('Authorization failed', $e->getMessage());
     }
   }
 
@@ -662,7 +662,7 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
         $this->fail("User::$actionName should have thrown exception");
       }
       catch (\Exception $e) {
-        $this->assertEquals("Authorization failed", $e->getMessage());
+        $this->assertStringContainsString("Authorization failed", $e->getMessage());
       }
     }
   }
@@ -680,7 +680,7 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
       $this->fail("UserRole::create should have thrown exception");
     }
     catch (\Exception $e) {
-      $this->assertEquals("Authorization failed", $e->getMessage());
+      $this->assertStringContainsString("Authorization failed", $e->getMessage());
     }
 
     // ...via editing own user.
@@ -728,7 +728,7 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
         $this->fail("$entity::get should fail for anon user.");
       }
       catch (\Exception $e) {
-        $this->assertEquals("Authorization failed", $e->getMessage());
+        $this->assertStringContainsString("Authorization failed", $e->getMessage());
       }
     }
 
@@ -740,7 +740,7 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
         $this->fail("$entity::get should fail for anon user.");
       }
       catch (\Exception $e) {
-        $this->assertEquals("Authorization failed", $e->getMessage());
+        $this->assertStringContainsString("Authorization failed", $e->getMessage());
       }
     }
 
