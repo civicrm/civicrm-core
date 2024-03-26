@@ -205,7 +205,7 @@
             {$form.receipt_text.html|crmAddClass:huge}</td>
         </tr>
       </table>
-      {include file="CRM/common/customDataBlock.tpl"}
+      {include file="CRM/common/customDataBlock.tpl" cid=false}
       {if $accessContribution and $action eq 2 and $rows.0.contribution_id}
         <details class="crm-accordion-bold" open>
           <summary>{ts}Related Contributions{/ts}</summary>
