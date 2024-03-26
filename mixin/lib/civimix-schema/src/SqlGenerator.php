@@ -165,14 +165,21 @@ return new class([], fn()=>NULL) {
    * Get general/default options for use in CREATE TABLE (eg character set, collation).
    */
   private function getTableOptions(): string {
-    // What character-set is used for CiviCRM core schema? What collation?
-    // This depends on when the DB was *initialized*:
-    // - civicrm-core >= 5.33 has used `CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
-    // - civicrm-core 4.3-5.32 has used `CHARACTER SET utf8 COLLATE utf8_unicode_ci`
-    // - civicrm-core <= 4.2 -- I haven't checked, but it's probably the same.
-    // Some systems have migrated (eg APIv3's `System.utf8conversion`), but (as of Feb 2024)
-    // we haven't made any effort to push to this change.
-    $collation = \CRM_Core_BAO_SchemaHandler::getInUseCollation();
+    if (!Civi\Core\Container::isContainerBooted()) {
+      // Pre-installation environment ==> aka new install
+      $collation = CRM_Core_BAO_SchemaHandler::DEFAULT_COLLATION;
+    }
+    else {
+      // What character-set is used for CiviCRM core schema? What collation?
+      // This depends on when the DB was *initialized*:
+      // - civicrm-core >= 5.33 has used `CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
+      // - civicrm-core 4.3-5.32 has used `CHARACTER SET utf8 COLLATE utf8_unicode_ci`
+      // - civicrm-core <= 4.2 -- I haven't checked, but it's probably the same.
+      // Some systems have migrated (eg APIv3's `System.utf8conversion`), but (as of Feb 2024)
+      // we haven't made any effort to push to this change.
+      $collation = \CRM_Core_BAO_SchemaHandler::getInUseCollation();
+    }
+
     $characterSet = (stripos($collation, 'utf8mb4') !== FALSE) ? 'utf8mb4' : 'utf8';
     return "ENGINE=InnoDB DEFAULT CHARACTER SET {$characterSet} COLLATE {$collation} ROW_FORMAT=DYNAMIC";
   }
