@@ -102,7 +102,8 @@ return new class([], fn()=>NULL) {
     if ($primaryKeys) {
       $definition[] = 'PRIMARY KEY (' . implode(', ', $primaryKeys) . ')';
     }
-    foreach ($entity['getIndices']() as $indexName => $index) {
+    $indices = isset($entity['getIndices']) ? $entity['getIndices']() : [];
+    foreach ($indices as $indexName => $index) {
       $indexFields = [];
       foreach ($index['fields'] as $fieldName => $length) {
         $indexFields[] = "`$fieldName`" . (is_int($length) ? "($length)" : '');
