@@ -415,6 +415,33 @@ class CoreUtil {
     return $formatted;
   }
 
+  public static function formatViewValue(string $entityName, string $fieldName, array $values, string $action = 'get') {
+    if (!isset($values[$fieldName]) || $values[$fieldName] === '') {
+      return '';
+    }
+    $params = [
+      'action' => $action,
+      'where' => [['name', '=', $fieldName]],
+      'loadOptions' => ['id', 'label'],
+      'checkPermissions' => FALSE,
+      'values' => $values,
+    ];
+    $fieldInfo = civicrm_api4($entityName, 'getFields', $params)->single();
+    $dataType = $fieldInfo['data_type'] ?? NULL;
+    if (!empty($fieldInfo['options'])) {
+      return FormattingUtil::replacePseudoconstant(array_column($fieldInfo['options'], 'label', 'id'), $values[$fieldName]);
+    }
+    elseif ($dataType === 'Boolean') {
+      return $values[$fieldName] ? ts('Yes') : ts('No');
+    }
+    elseif ($dataType === 'Date' || $dataType === 'Timestamp') {
+      $values[$fieldName] = \CRM_Utils_Date::customFormat($values[$fieldName]);
+    }
+    if (is_array($values[$fieldName])) {
+      $values[$fieldName] = implode(', ', $values[$fieldName]);
+    }
+  }
+
   /**
    * Gets info about all available sql functions
    * @return array

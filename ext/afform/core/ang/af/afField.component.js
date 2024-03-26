@@ -186,7 +186,9 @@
       // Set default value; ensure data type matches input type
       function setValue(value) {
         // correct the value type
-        value = correctValueType(value, ctrl.defn.data_type);
+        if (ctrl.defn.input_type !== 'DisplayOnly') {
+          value = correctValueType(value, ctrl.defn.data_type);
+        }
 
         if (ctrl.defn.input_type === 'Number' && ctrl.defn.search_range) {
           if (!_.isPlainObject(value)) {
