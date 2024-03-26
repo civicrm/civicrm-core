@@ -451,6 +451,9 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       $content = self::formatHtmlException($exception) . $content;
     }
 
+    // set the response code before starting the request
+    http_response_code(500);
+
     echo CRM_Utils_System::theme($content);
     $exit = CRM_Utils_System::shouldExitAfterFatal();
 
