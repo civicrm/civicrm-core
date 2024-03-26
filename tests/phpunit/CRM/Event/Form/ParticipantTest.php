@@ -81,9 +81,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     $this->eventCreatePaid();
     $_REQUEST['cid'] = $this->individualCreate();
     $form = $this->getFormObject('CRM_Event_Form_Participant', [
-      'is_monetary' => 1,
       'register_date' => date('Ymd'),
-      'is_pay_later' => 1,
       'payment_processor_id' => 0,
       'record_contribution' => TRUE,
       'financial_type_id' => 1,
@@ -98,8 +96,6 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'send_receipt' => '1',
       'from_email_address' => '"FIXME" <info@EXAMPLE.ORG>',
       'receipt_text' => 'Contact the Development Department if you need to make any changes to your registration.',
-      'hidden_custom' => '1',
-      'hidden_custom_group_count' => ['' => 1],
       'role_id' => [0 => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'role_id', 'Attendee')],
       'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'Pending from pay later'),
       'source' => 'I wrote this',
@@ -724,8 +720,6 @@ London,',
    */
   protected function getRecordContributionParams(string $participantStatus): array {
     return [
-      'hidden_feeblock' => '1',
-      'hidden_eventFullMsg' => '',
       'priceSetId' => $this->getPriceSetID('PaidEvent'),
       $this->getPriceFieldKey() => $this->ids['PriceFieldValue']['PaidEvent_family_package'],
       'check_number' => '879',
@@ -739,8 +733,6 @@ London,',
       'send_receipt' => '1',
       'from_email_address' => '"FIXME" <info@EXAMPLE.ORG>',
       'receipt_text' => 'Contact the Development Department if you need to make any changes to your registration.',
-      'hidden_custom' => '1',
-      'hidden_custom_group_count' => ['' => 1],
       'register_date' => '2020-01-31 00:50:00',
       'role_id' => [CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'role_id', 'Attendee')],
       'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', $participantStatus),
