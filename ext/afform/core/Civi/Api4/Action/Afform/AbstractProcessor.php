@@ -217,7 +217,10 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     return $result;
   }
 
-  private function getFileFields($entityName, $entityFields): array {
+  protected static function getFileFields($entityName, $entityFields): array {
+    if (!$entityFields) {
+      return [];
+    }
     return civicrm_api4($entityName, 'getFields', [
       'checkPermissions' => FALSE,
       'action' => 'create',
@@ -429,25 +432,46 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
         // Unset prefilled file fields
         foreach ($fileFields as $fileFieldName) {
           if (isset($values['fields'][$fileFieldName]) && is_array($values['fields'][$fileFieldName])) {
-            unset($values['fields'][$fileFieldName]);
+            // File was unchanged
+            if (isset($values['fields'][$fileFieldName]['file_name'])) {
+              unset($values['fields'][$fileFieldName]);
+            }
+            // File was deleted
+            elseif (array_key_exists('file_name', $values['fields'][$fileFieldName])) {
+              $values['fields'][$fileFieldName] = '';
+            }
           }
         }
         // Only accept joins set on the form
         $values['joins'] = array_intersect_key($values['joins'] ?? [], $entity['joins']);
         foreach ($values['joins'] as $joinEntity => &$joinValues) {
+          // Only accept values from join fields on the form
+          $idField = CoreUtil::getIdFieldName($joinEntity);
+          $allowedFields = $entity['joins'][$joinEntity]['fields'] ?? [];
+          $allowedFields[$idField] = TRUE;
+          $fileFields = $this->getFileFields($joinEntity, $allowedFields);
           // Enforce the limit set by join[max]
           $joinValues = array_slice($joinValues, 0, $entity['joins'][$joinEntity]['max'] ?? NULL);
           foreach ($joinValues as $index => $vals) {
-            // Only accept values from join fields on the form
-            $allowedFields = $entity['joins'][$joinEntity]['fields'] ?? [];
-            $allowedFields[CoreUtil::getIdFieldName($joinEntity)] = TRUE;
             $joinValues[$index] = array_intersect_key($vals, $allowedFields);
             // Unset prefilled file fields
-            foreach ($this->getFileFields($joinEntity, $entity['joins'][$joinEntity]['fields']) as $fileFieldName) {
+            foreach ($fileFields as $fileFieldName) {
               if (isset($joinValues[$index][$fileFieldName]) && is_array($joinValues[$index][$fileFieldName])) {
-                unset($joinValues[$index][$fileFieldName]);
+                // File was unchanged
+                if (isset($joinValues[$index][$fileFieldName]['file_name'])) {
+                  unset($joinValues[$index][$fileFieldName]);
+                }
+                // File was deleted
+                elseif (array_key_exists('file_name', $joinValues[$index][$fileFieldName])) {
+                  $joinValues[$index][$fileFieldName] = '';
+                }
+              }
+              // Creating new record, add placeholder value so the file upload will have an id
+              if (empty($joinValues[$index][$idField])) {
+                $joinValues[$index][$fileFieldName] = '';
               }
             }
+
             // Merge in pre-set data
             $joinValues[$index] = array_merge($joinValues[$index], $entity['joins'][$joinEntity]['data'] ?? []);
           }
