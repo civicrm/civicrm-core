@@ -249,6 +249,12 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $sql = CRM_Contribute_BAO_Contribution::getAnnualQuery([$contactID]);
     $result = CRM_Core_DAO::executeQuery($sql);
     $result->fetch();
+    $this->assertEquals(0, $result->N);
+
+    // It didn't find any rows cos it is restricted to only find contributions where all lines are visible.
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_line_item SET financial_type_id = ' . CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'));
+    $result = CRM_Core_DAO::executeQuery($sql);
+    $result->fetch();
     $this->assertEquals(300, $result->amount);
     $this->assertEquals(1, $result->count);
     $this->disableFinancialACLs();

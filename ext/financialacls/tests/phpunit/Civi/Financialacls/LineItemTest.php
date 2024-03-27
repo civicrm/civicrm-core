@@ -64,7 +64,7 @@ class LineItemTest extends BaseTestClass {
 
     $lineItems = $this->callAPISuccess('LineItem', 'get', ['sequential' => TRUE])['values'];
     $this->assertCount(2, $lineItems);
-    $this->callAPISuccessGetCount('LineItem', ['check_permissions' => TRUE], 1);
+    $this->callAPISuccessGetCount('LineItem', ['check_permissions' => TRUE], 0);
 
     $this->callAPISuccess('LineItem', 'Delete', ['check_permissions' => ($version == 3), 'id' => $lineItems[0]['id']]);
     $this->callAPIFailure('LineItem', 'Delete', ['check_permissions' => TRUE, 'id' => $lineItems[1]['id']]);

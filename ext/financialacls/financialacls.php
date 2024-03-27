@@ -3,6 +3,7 @@
 require_once 'financialacls.civix.php';
 
 use Civi\Api4\EntityFinancialAccount;
+use Civi\Api4\FinancialType;
 use Civi\Api4\MembershipType;
 use CRM_Financialacls_ExtensionUtil as E;
 
@@ -95,6 +96,12 @@ function financialacls_civicrm_selectWhereClause($entity, &$clauses) {
     case 'Contribution':
     case 'Product':
       $clauses['financial_type_id'][] = _financialacls_civicrm_get_type_clause();
+      if ($entity === 'Contribution') {
+        $unavailableTypes = _financialacls_civicrm_get_inaccessible_financial_types();
+        if (!empty($unavailableTypes)) {
+          $clauses['id'][] = 'NOT IN (SELECT contribution_id FROM civicrm_line_item WHERE financial_type_id IN (' . implode(',', $unavailableTypes) . '))';
+        }
+      }
       break;
 
     case 'Membership':
@@ -165,6 +172,21 @@ function _financialacls_civicrm_get_accessible_financial_types(): array {
   CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types);
   if (empty($types)) {
     $types = [0];
+  }
+  return array_keys($types);
+}
+
+/**
+ * Get an array of the ids of accessible financial types.
+ *
+ * If none then it will be [0]
+ *
+ * @return int[]
+ */
+function _financialacls_civicrm_get_inaccessible_financial_types(): array {
+  $types = (array) FinancialType::get(FALSE)->addSelect('id')->execute()->indexBy('id');
+  foreach (_financialacls_civicrm_get_accessible_financial_types() as $accessibleFinancialType) {
+    unset($types[$accessibleFinancialType]);
   }
   return array_keys($types);
 }
