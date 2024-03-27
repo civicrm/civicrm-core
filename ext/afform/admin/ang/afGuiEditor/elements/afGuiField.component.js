@@ -66,14 +66,6 @@
           this.searchOperators = _.pick(this.searchOperators, ctrl.fieldDefn.operators);
         }
         setDateOptions();
-
-        if (ctrl.getDefn().input_type == 'Date') {
-          if (!getSet('default_date_type')) {
-            ctrl.defaultDateType = getSet('default_date_type', 'fixed');
-          } else {
-            ctrl.defaultDateType = getSet("default_date_type");
-          }
-        }
       };
 
       this.getFkEntity = function() {
@@ -288,8 +280,50 @@
         }
       };
 
-      $scope.setDefaultDateType = function() {
-        ctrl.defaultDateType = getSet('default_date_type');
+      this.defaultDateType = function(newValue) {
+        if (arguments.length) {
+          if (newValue === 'relative') {
+            getSet('afform_default', 'now +0 day');
+          }
+          if (newValue === 'now') {
+            getSet('afform_default', 'now');
+          }
+          if (newValue === 'fixed') {
+            getSet('afform_default', '');
+          }
+        }
+        if (this.fieldDefn.input_type === 'Date') {
+          const defaultVal = getSet('afform_default');
+          if (defaultVal === 'now') {
+            return 'now';
+          }
+          else if (typeof defaultVal === 'string' && defaultVal.startsWith('now')) {
+            return 'relative';
+          }
+        }
+        return 'fixed';
+      };
+
+      this.defaultDateOffset = function(newValue) {
+        let defaultVals = getSet('afform_default').split(' ');
+        if (arguments.length) {
+          defaultVals[1] = newValue < 0 ? newValue : '+' + newValue;
+          getSet('afform_default', defaultVals.join(' '));
+        }
+        return parseInt(defaultVals[1], 10);
+      };
+
+      this.defaultDateUnit = function(newValue) {
+        let defaultVals = getSet('afform_default').split(' ');
+        if (arguments.length) {
+          defaultVals[2] = newValue;
+          getSet('afform_default', defaultVals.join(' '));
+        }
+        return defaultVals[2];
+      };
+
+      this.defaultDatePlural = function() {
+        return Math.abs(this.defaultDateOffset()) !== 1;
       };
 
       $scope.defaultValueContains = function(val) {
