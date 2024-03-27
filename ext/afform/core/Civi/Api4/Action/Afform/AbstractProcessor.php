@@ -439,7 +439,9 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
           $joinValues = array_slice($joinValues, 0, $entity['joins'][$joinEntity]['max'] ?? NULL);
           foreach ($joinValues as $index => $vals) {
             // Only accept values from join fields on the form
-            $joinValues[$index] = array_intersect_key($vals, $entity['joins'][$joinEntity]['fields'] ?? []);
+            $allowedFields = $entity['joins'][$joinEntity]['fields'] ?? [];
+            $allowedFields[CoreUtil::getIdFieldName($joinEntity)] = TRUE;
+            $joinValues[$index] = array_intersect_key($vals, $allowedFields);
             // Unset prefilled file fields
             foreach ($this->getFileFields($joinEntity, $entity['joins'][$joinEntity]['fields']) as $fileFieldName) {
               if (isset($joinValues[$index][$fileFieldName]) && is_array($joinValues[$index][$fileFieldName])) {
