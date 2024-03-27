@@ -1815,10 +1815,10 @@ class CRM_Core_Permission {
         $info = $component->getInfo();
         foreach ($perms as $name => $perm) {
           $perm['label'] = $info['translatedName'] . ': ' . $perm['label'];
-          $permissions[$name] = $perm;
           if (!$component->isEnabled()) {
             $perm['disabled'] = TRUE;
           }
+          $permissions[$name] = $perm;
         }
       }
     }
