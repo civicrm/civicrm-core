@@ -399,19 +399,8 @@ class Submit extends AbstractProcessor {
    */
   private static function filterEmptyJoins($entity, $join) {
     $idField = CoreUtil::getIdFieldName($entity);
-    $fileFields = (array) civicrm_api4($entity, 'getFields', [
-      'checkPermissions' => FALSE,
-      'where' => [['fk_entity', '=', 'File']],
-    ], ['name']);
-    // Files will be uploaded later, fill with empty values for now
-    // TODO: Somehow check if a file has actually been selected for upload
-    foreach ($join as &$item) {
-      if (empty($item[$idField]) && $fileFields) {
-        $item += array_fill_keys($fileFields, '');
-      }
-    }
-    return array_filter($join, function($item) use($entity, $idField, $fileFields) {
-      if (!empty($item[$idField]) || $fileFields) {
+    return array_filter($join, function($item) use($entity, $idField) {
+      if (!empty($item[$idField])) {
         return TRUE;
       }
       switch ($entity) {
