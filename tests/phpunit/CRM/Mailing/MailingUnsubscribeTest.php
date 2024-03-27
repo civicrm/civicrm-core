@@ -13,82 +13,188 @@
  */
 class CRM_Mailing_MailingUnsubscribeTest extends CiviUnitTestCase {
 
+  public $indivId;
+  public $groupIds;
+
   public function setUp(): void {
     parent::setUp();
     $this->useTransaction();
+    // Need to set this to prevent error when calling Job process_mailing
+    $this->callAPISuccess('mail_settings', 'get', ['api.mail_settings.create' => ['domain' => 'chaos.org']]);
+    $this->indivId = $this->individualCreate(['last_name' => 'Testy']);
+  }
+
+  /*
+   * Tests
+   */
+
+  /**
+   * Sent to 2 groups, contact in 1 group
+   */
+  public function testUnsubscribeSimple() : void {
+    $this->setUpGroups('group1', 'group2');
+    $this->addIndivToGroups('group1');
+    $this->sendAndUnsubscribe('group1', 'group2');
+    $this->checkGroupContactStatus(['group1' => 'Removed', 'group2' => NULL]);
   }
 
   /**
-   * Test CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing()
+   * Sent to Parent of Child groups, contact in some Child groups
+   * Should remove from all child groups if a member
+   */
+  public function testUnsubscribeParent() : void {
+    $this->setUpGroups('parent', 'child1', 'child2', 'child3');
+    $this->addParent('parent', ['child1', 'child2', 'child3']);
+    $this->addIndivToGroups('child1', 'child2');
+    $this->sendAndUnsubscribe('parent');
+    $this->checkGroupContactStatus(['parent' => NULL, 'child1' => 'Removed', 'child2' => 'Removed', 'child3' => NULL]);
+  }
+
+  /**
+   * Sent to a child group, contact in some Child groups
+   * Should remove from child group but not siblings
+   */
+  public function testUnsubscribeChild() : void {
+    $this->setUpGroups('parent', 'child1', 'child2', 'child3');
+    $this->addParent('parent', ['child1', 'child2', 'child3']);
+    $this->addIndivToGroups('child1', 'child2');
+    $this->sendAndUnsubscribe('child1');
+    $this->checkGroupContactStatus(['parent' => NULL, 'child1' => 'Removed', 'child2' => 'Added', 'child3' => NULL]);
+  }
+
+  /**
+   * Sent to Parent, contact directly in parent & child
+   * Should remove from parent and child groups if a member
+   */
+  public function testUnsubscribeParentDirect() : void {
+    $this->setUpGroups('parent', 'child1', 'child2', 'child3');
+    $this->addParent('parent', ['child1', 'child2']);
+    $this->addIndivToGroups('parent', 'child1', 'child2');
+    $this->sendAndUnsubscribe('parent');
+    $this->checkGroupContactStatus(['parent' => 'Removed', 'child1' => 'Removed', 'child2' => 'Removed', 'child3' => NULL]);
+  }
+
+  /**
+   * Sent to Parent & Child, contact in child group
+   * Should remove from child if a member
+   */
+  public function testUnsubscribeParentChild() : void {
+    $this->setUpGroups('parent', 'child1', 'child2');
+    $this->addParent('parent', ['child1', 'child2']);
+    $this->addIndivToGroups('child1');
+    $this->sendAndUnsubscribe('parent', 'child1');
+    $this->checkGroupContactStatus(['parent' => NULL, 'child1' => 'Removed', 'child2' => NULL]);
+  }
+
+  /**
+   * Sent to Grandparent, contact in child group
+   * Should remove from sibling groups and groups of other parent
+   */
+  public function testUnsubscribeGrandparent() : void {
+    $this->setUpGroups('grandparent', 'parent1', 'parent2', 'child1a', 'child1b', 'child2a', 'child2b');
+    $this->addParent('grandparent', ['parent1', 'parent2']);
+    $this->addParent('parent1', ['child1a', 'child1b']);
+    $this->addParent('parent2', ['child2a', 'child2b']);
+    $this->addIndivToGroups('child1a', 'child2a');
+    $this->sendAndUnsubscribe('grandparent');
+    $this->checkGroupContactStatus([
+      'grandparent' => NULL,
+      'parent1' => NULL,
+      'child1a' => 'Removed',
+      'child1b' => NULL,
+      'parent2' => NULL,
+      'child2a' => 'Removed',
+      'child2b' => NULL,
+    ]);
+  }
+
+  /**
+   * Grandparent structue, Sent to parent, contact in child group
+   * Should remove from sibling groups but not groups of other parent
+   */
+  public function testUnsubscribeGrandparent2() : void {
+    $this->setUpGroups('grandparent', 'parent1', 'parent2', 'child1a', 'child1b', 'child2a', 'child2b');
+    $this->addParent('grandparent', ['parent1', 'parent2']);
+    $this->addParent('parent1', ['child1a', 'child1b']);
+    $this->addParent('parent2', ['child2a', 'child2b']);
+    $this->addIndivToGroups('child1a', 'child2a');
+    $this->sendAndUnsubscribe('parent1');
+    $this->checkGroupContactStatus([
+      'grandparent' => NULL,
+      'parent1' => NULL,
+      'child1a' => 'Removed',
+      'child1b' => NULL,
+      'parent2' => NULL,
+      'child2a' => 'Added',
+      'child2b' => NULL,
+    ]);
+  }
+
+  /**
+   * Sent to a smart group, contact in smart group
+   * Should remove from smart group
+   */
+  public function testUnsubscribeFromSmartGroup() : void {
+    $this->setUpSmartGroup('smart');
+    $this->sendAndUnsubscribe('smart');
+    $this->checkNotInSmartGroup('smart');
+  }
+
+  /**
+   * Sent to a parent of smart group, contact in smart group.
+   * Should remove from smart group
+   */
+  public function testUnsubscribeFromSmartGroupAsChild() : void {
+    $this->setUpSmartGroup('smart');
+    $this->setUpGroups('parent');
+    $this->addParent('parent', ['smart']);
+    $this->sendAndUnsubscribe('parent');
+    $this->checkNotInSmartGroup('smart');
+  }
+
+  /**
+   *
+   * Helper functions
    *
    */
-  public function testMailingUnsubscribe() : void {
-
-    // Create contact, groupIds and group contacts
-    $indivId = $this->individualCreate();
-    $groupIds['group1'] = $this->groupCreate(['name' => 'group1', 'title' => 'Group with indiv']);
-    $groupIds['group2'] = $this->groupCreate(['name' => 'group2', 'title' => 'Group without indiv']);
-    $belongsTo = ['group1'];
-    $sentTo = ['group1', 'group2'];
-
-    // Create 4 sets of parent + 3 child groups
-    // The contact is sometimes in child*a, never in child*b, always in child*c
-    // child*c is never directly sent to. child*a is sometimes sent to.
-    foreach ([1, 2, 3, 4] as $parent) {
-      $parentkey = 'parent' . $parent;
-      $groupIds[$parentkey] = $this->groupCreate(['name' => $parentkey, 'title' => "Parent Group $parent"]);
-      foreach (['a', 'b', 'c'] as $child) {
-        $childkey = 'child' . $parent . $child;
-        $groupIds[$childkey] = $this->groupCreate([
-          'name' => $childkey,
-          'title' => "Child Group {$parent}{$child}",
-          'parents' => [$groupIds[$parentkey]],
-        ]);
-      }
-      $belongsTo[] = 'child' . $parent . 'c';
+  private function setUpGroups(...$keys) {
+    foreach ($keys as $key) {
+      $this->groupIds[$key] = $this->groupCreate(['name' => $key, 'title' => $key]);
     }
+  }
 
-    // 1: Parent in mailing, Child not in mailing, contact in child group
-    $sentTo[] = 'parent1'; $belongsTo[] = 'child1a';
+  private function setUpSmartGroup($key) : void {
+    // Create smart group
+    $this->groupIds[$key] = $this->smartGroupCreate(['form_values' => ['last_name' => 'Testy']], ['name' => $key, 'title' => $key, 'is_active' => 1], 'Individual');
 
-    // 2: Parent not in mailing, Child in mailing, contact in child group
-    $sentTo[] = 'child2a'; $belongsTo[] = 'child2a';
-
-    // 3: Parent in mailing, child not in mailing, contact in parent
-    $sentTo[] = 'parent3'; $belongsTo[] = 'parent3';
-
-    // 4: Parent in mailing, child in mailing, contact in parent, contact in child
-    $sentTo[] = 'parent4'; $sentTo[] = 'child4a'; $belongsTo[] = 'parent4'; $belongsTo[] = 'child4a';
-
-    // Add contact to groups
-    foreach ($belongsTo as $group) {
-      $this->callAPISuccess('GroupContact', 'create', ['contact_id' => $indivId, 'group_id' => $groupIds[$group]]);
-    }
-
-    // Populate $sentToIds from $sentTo and $groupIds
-    foreach ($sentTo as $group) {
-      $sentToIds[$group] = $groupIds[$group];
-    }
-
-    // end of setup... lets start testing:
-
-    // Test that contact starts in the expected groups
-    $myGroups = Civi\Api4\GroupContact::get(FALSE)
-      ->addWhere('contact_id', '=', $indivId)
+    // Check contact is in smart group
+    $isContactInGroup = (bool) \Civi\Api4\Contact::get(FALSE)
+      ->addWhere('id', '=', $this->indivId)
+      ->addWhere('groups', 'IN', [$this->groupIds[$key]])
       ->execute()
-      ->indexBy('group_id');
-    foreach ($groupIds as $group => $gid) {
-      if (in_array($group, $belongsTo)) {
-        $this->assertEquals('Added', $myGroups[$gid]['status'], "Contact should be Added to group $group");
-      }
-      else {
-        $this->assertTrue(!isset($myGroups[$gid]), "Contact should not be in $group");
-      }
+      ->count();
+    $this->assertTrue($isContactInGroup, "Contact should be in smart group before unsubscribe");
+  }
+
+  private function addParent($parent, $kids) : void {
+    foreach ($kids as $kid) {
+      \Civi\Api4\Group::update(FALSE)
+        ->addWhere('id', '=', $this->groupIds[$kid])
+        ->addValue('parents', [$this->groupIds[$parent]])
+        ->execute();
     }
+  }
 
-    // Need to set this to prevent error when calling Job process_mailing
-    $this->callAPISuccess('mail_settings', 'get', ['api.mail_settings.create' => ['domain' => 'chaos.org']]);
+  private function addIndivToGroups(...$groups) {
+    foreach ($groups as $group) {
+      $this->callAPISuccess('GroupContact', 'create', ['contact_id' => $this->indivId, 'group_id' => $this->groupIds[$group]]);
+    }
+  }
 
+  private function sendAndUnsubscribe(...$sentTo) : void {
+    foreach ($sentTo as $group) {
+      $sentToIds[] = $this->groupIds[$group];
+    }
     // Create the mailing
     $mailingId = $this->callAPISuccess('Mailing', 'create', [
       'name' => 'mailing name',
@@ -113,103 +219,37 @@ class CRM_Mailing_MailingUnsubscribeTest extends CiviUnitTestCase {
     $queue_info = \Civi\Api4\MailingEventQueue::get(TRUE)
       ->addSelect('id', 'hash')
       ->addWhere('mailing_id', '=', $mailingId)
-      ->addWhere('contact_id', '=', $indivId)
+      ->addWhere('contact_id', '=', $this->indivId)
       ->execute()
       ->single();
 
     // Do the unsubscribe
     CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing(NULL, $queue_info['id'], $queue_info['hash']);
+  }
 
-    // Test that contact is in the expected groups
-    $myGroups = Civi\Api4\GroupContact::get(FALSE)
-      ->addWhere('contact_id', '=', $indivId)
+  private function checkNotInSmartGroup($key) : void {
+    // Check contact is no longer in smart group
+    $isContactInGroup = (bool) \Civi\Api4\Contact::get(FALSE)
+      ->addWhere('id', '=', $this->indivId)
+      ->addWhere('groups', 'IN', [$this->groupIds[$key]])
       ->execute()
-      ->indexBy('group_id');
+      ->count();
+    $this->assertFalse($isContactInGroup, "Contact should not be in smart group after unsubscribe");
 
-    foreach ($groupIds as $group => $gid) {
-      switch ($group) {
+    $this->checkGroupContactStatus([$key => 'Removed']);
+  }
 
-        // Group in mailing, contact in group
-        case 'group1':
-          $this->assertEquals('Removed', $myGroups[$gid]['status'], "Contact should be Removed in group $group");
-          break;
-
-        // Group in mailing, contact not in group
-        case 'group2':
-          $this->assertTrue(!isset($myGroups[$gid]), "Contact should not be in $group");
-          break;
-
-        // 1: Parent in mailing, Child not in mailing, contact in child group
-        case 'parent1':
-          $this->assertTrue(!isset($myGroups[$gid]), "Contact should not be in $group");
-          break;
-
-        case 'child1a':
-          $this->assertEquals('Removed', $myGroups[$gid]['status'], "Contact should be Removed in group $group");
-          break;
-
-        case 'child1b':
-          $this->assertTrue(!isset($myGroups[$gid]), "Contact should not be in $group");
-          break;
-
-        case 'child1c':
-          $this->assertEquals('Removed', $myGroups[$gid]['status'], "Contact should be Removed in group $group");
-          break;
-
-        // 2: Parent not in mailing, Child in mailing, contact in child group
-        case 'parent2':
-          $this->assertTrue(!isset($myGroups[$gid]), "Contact should not be in $group");
-          break;
-
-        case 'child2a':
-          $this->assertEquals('Removed', $myGroups[$gid]['status'], "Contact should be Removed in group $group");
-          break;
-
-        case 'child2b':
-          $this->assertTrue(!isset($myGroups[$gid]), "Contact should not be in $group");
-          break;
-
-        case 'child2c':
-          $this->assertEquals('Added', $myGroups[$gid]['status'], "Contact should be Added in group $group");
-          break;
-
-        // 3: Parent in mailing, child not in mailing, contact in parent
-        case 'parent3':
-          $this->assertEquals('Removed', $myGroups[$gid]['status'], "Contact should be Removed in group $group");
-          break;
-
-        case 'child3a':
-          $this->assertTrue(!isset($myGroups[$gid]), "Contact should not be in $group");
-          break;
-
-        case 'child3b':
-          $this->assertTrue(!isset($myGroups[$gid]), "Contact should not be in $group");
-          break;
-
-        case 'child3c':
-          $this->assertEquals('Removed', $myGroups[$gid]['status'], "Contact should be Removed in group $group");
-          break;
-
-        // 4: Parent in mailing, child in mailing, contact in parent, contact in child
-        case 'parent4':
-          $this->assertEquals('Removed', $myGroups[$gid]['status'], "Contact should be Removed in group $group");
-          break;
-
-        case 'child4a':
-          $this->assertEquals('Removed', $myGroups[$gid]['status'], "Contact should be Removed in group $group");
-          break;
-
-        case 'child4b':
-          $this->assertTrue(!isset($myGroups[$gid]), "Contact should not be in $group");
-          break;
-
-        case 'child4c':
-          $this->assertEquals('Removed', $myGroups[$gid]['status'], "Contact should be Removed in group $group");
-          break;
-
-        default:
-          throw new Exception("Group $group not configured in tests");
-        break;
+  private function checkGroupContactStatus($statuses) {
+    $myGroups = Civi\Api4\GroupContact::get(FALSE)->addWhere('contact_id', '=', $this->indivId)->execute()->indexBy('group_id');
+    foreach ($statuses as $group => $status) {
+      if ($status == 'Added' || $status == 'Removed') {
+        if (!isset($myGroups[$this->groupIds[$group]])) {
+          throw new Exception("No mygroups for $group");
+        }
+        $this->assertEquals($status, $myGroups[$this->groupIds[$group]]['status'], "Contact should be $status in group $group");
+      }
+      else {
+        $this->assertTrue(!isset($myGroups[$this->groupIds[$group]]), "Contact should not be in $group");
       }
     }
   }
