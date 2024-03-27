@@ -8,6 +8,28 @@ namespace CiviMix\Schema;
 return new class() {
 
   /**
+   * @var string
+   *   Regular expression. Note the 2 groupings. $m[1] identifies a per-extension namespace. $m[2] identifies the actual class.
+   */
+  private $regex = ';^CiviMix\\\Schema\\\(\w+)\\\(AutomaticUpgrader)$;';
+
+  /**
+   * If someone requests a class like:
+   *
+   *    CiviMix\Schema\MyExt\AutomaticUpgrader
+   *
+   * then load the latest version of:
+   *
+   *    civimix-schema/src/Helper.php
+   */
+  public function loadClass(string $class) {
+    if (preg_match($this->regex, $class, $m)) {
+      $absPath = __DIR__ . DIRECTORY_SEPARATOR . $m[2] . '.php';
+      class_alias(get_class(require $absPath), $class);
+    }
+  }
+
+  /**
    * @param string $extensionKey
    *   Ex: 'org.civicrm.flexmailer'
    * @return \CiviMix\Schema\SchemaHelperInterface
