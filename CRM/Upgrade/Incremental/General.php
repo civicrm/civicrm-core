@@ -135,14 +135,6 @@ class CRM_Upgrade_Incremental_General {
       $preUpgradeMessage .= '<br />' . ts('This database uses InnoDB Full Text Search for optimized searching. The upgrade procedure has not been tested with this feature. You should disable (and later re-enable) the feature by navigating to "Administer => Customize Data and Screens => Search Preferences".');
     }
 
-    $ftAclSetting = Civi::settings()->get('acl_financial_type');
-    if ($ftAclSetting && !self::isExtensionInstalled('biz.jmaconsulting.financialaclreport')) {
-      $preUpgradeMessage .= '<br />' . ts('CiviCRM will in the future require the extension %1 for CiviCRM Reports to work correctly with the Financial Type ACLs. The extension can be downloaded <a href="%2">here</a>', [
-        1 => 'biz.jmaconsulting.financialaclreport',
-        2 => 'https://github.com/JMAConsulting/biz.jmaconsulting.financialaclreport',
-      ]);
-    }
-
     $snapshotIssues = CRM_Upgrade_Snapshot::getActivationIssues();
     if ($snapshotIssues) {
       $preUpgradeMessage .= '<details>';

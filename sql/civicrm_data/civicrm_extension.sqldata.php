@@ -21,10 +21,6 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_extension', 'INSERT IGNORE INTO
       'name' => 'Theme: Greenwich',
     ],
     [
-      'full_name' => 'financialacls',
-      'name' => 'Financial ACLs',
-    ],
-    [
       'full_name' => 'recaptcha',
       'name' => 'reCAPTCHA',
     ],

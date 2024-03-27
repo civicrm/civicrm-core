@@ -29,6 +29,18 @@ class CRM_Upgrade_Incremental_php_FiveSeventyThree extends CRM_Upgrade_Increment
    */
   public function upgrade_5_73_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask(ts('Disable financial ACL extension if unused'), 'disableFinancialAcl');
+  }
+
+  public static function disableFinancialAcl($rev): bool {
+    $setting = CRM_Core_DAO::singleValueQuery('SELECT value FROM civicrm_setting WHERE name = "acl_financial_type"');
+    if ($setting) {
+      $setting = unserialize($setting);
+    }
+    if (!$setting) {
+      CRM_Core_DAO::executeQuery('UPDATE civicrm_extension SET is_active = 0 WHERE full_name = "financialacls"');
+    }
+    return TRUE;
   }
 
 }
