@@ -2,6 +2,11 @@
 
 /**
  * Create SQL files to create and populate a new schema.
+ *
+ * @deprecated
+ *   Replaced by CRM_Core_CodeGen_PhpSchema.
+ *   Delete this after civicrm-core and civix drop their references.
+ *   Maybe allow grace-period of a couple months.
  */
 class CRM_Core_CodeGen_Schema extends CRM_Core_CodeGen_BaseTask {
 

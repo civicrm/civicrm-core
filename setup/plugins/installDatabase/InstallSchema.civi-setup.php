@@ -66,10 +66,9 @@ class InstallSchemaPlugin implements \Symfony\Component\EventDispatcher\EventSub
     $model = $e->getModel();
 
     $sqlPath = $model->srcPath . DIRECTORY_SEPARATOR . 'sql';
-    $spec = $this->loadSpecification($model->srcPath);
 
     \Civi\Setup::log()->info(sprintf('[%s] Load basic tables', basename(__FILE__)));
-    \Civi\Setup\DbUtil::sourceSQL($model->db, \Civi\Setup\SchemaGenerator::generateCreateSql($model->srcPath, $spec->database, $spec->tables));
+    \Civi\Setup\DbUtil::sourceSQL($model->db, Civi::schemaHelper()->generateInstallSql());
 
     $seedLanguage = $model->lang;
     if (!empty($model->loadGenerated)) {
@@ -84,20 +83,6 @@ class InstallSchemaPlugin implements \Symfony\Component\EventDispatcher\EventSub
       \Civi\Setup::log()->info(sprintf('[%s] Load basic data', basename(__FILE__)));
       \Civi\Setup\DbUtil::sourceSQL($model->db, \Civi\Setup\SchemaGenerator::generateBasicData($model->srcPath));
     }
-  }
-
-  /**
-   * @param string $srcPath
-   * @return \CRM_Core_CodeGen_Specification
-   */
-  protected function loadSpecification($srcPath) {
-    $schemaFile = implode(DIRECTORY_SEPARATOR, [$srcPath, 'xml', 'schema', 'Schema.xml']);
-    $versionFile = implode(DIRECTORY_SEPARATOR, [$srcPath, 'xml', 'version.xml']);
-    $xmlBuilt = \CRM_Core_CodeGen_Util_Xml::parse($versionFile);
-    $buildVersion = preg_replace('/^(\d{1,2}\.\d{1,2})\.(\d{1,2}|\w{4,7})$/i', '$1', $xmlBuilt->version_no);
-    $specification = new \CRM_Core_CodeGen_Specification();
-    $specification->parse($schemaFile, $buildVersion, FALSE);
-    return $specification;
   }
 
 }

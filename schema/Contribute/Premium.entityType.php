@@ -1,0 +1,125 @@
+<?php
+
+return [
+  'name' => 'Premium',
+  'table' => 'civicrm_premiums',
+  'class' => 'CRM_Contribute_DAO_Premium',
+  'getInfo' => fn() => [
+    'title' => ts('Premium'),
+    'title_plural' => ts('Premiums'),
+    'description' => ts('table - settings for the Premiums features for a given contribution page'),
+    'log' => TRUE,
+    'add' => '1.4',
+  ],
+  'getFields' => fn() => [
+    'id' => [
+      'title' => ts('Premium ID'),
+      'sql_type' => 'int unsigned',
+      'input_type' => 'Number',
+      'required' => TRUE,
+      'add' => '1.4',
+      'primary_key' => TRUE,
+      'auto_increment' => TRUE,
+    ],
+    'entity_table' => [
+      'title' => ts('Premium Entity'),
+      'sql_type' => 'varchar(64)',
+      'input_type' => 'Select',
+      'required' => TRUE,
+      'description' => ts('Joins these premium settings to another object. Always civicrm_contribution_page for now.'),
+      'add' => '1.4',
+      'input_attrs' => [
+        'maxlength' => 64,
+      ],
+      'pseudoconstant' => [
+        'callback' => 'CRM_Contribute_BAO_Premium::entityTables',
+      ],
+    ],
+    'entity_id' => [
+      'title' => ts('Premium entity ID'),
+      'sql_type' => 'int unsigned',
+      'input_type' => 'EntityRef',
+      'required' => TRUE,
+      'add' => '1.4',
+      'entity_reference' => [
+        'dynamic_entity' => 'entity_table',
+        'key' => 'id',
+      ],
+    ],
+    'premiums_active' => [
+      'title' => ts('Is Premium Active?'),
+      'sql_type' => 'boolean',
+      'input_type' => 'CheckBox',
+      'required' => TRUE,
+      'description' => ts('Is the Premiums feature enabled for this page?'),
+      'add' => '1.4',
+      'default' => FALSE,
+    ],
+    'premiums_intro_title' => [
+      'title' => ts('Title for Premiums section'),
+      'sql_type' => 'varchar(255)',
+      'input_type' => 'Text',
+      'localizable' => TRUE,
+      'description' => ts('Title for Premiums section.'),
+      'add' => '1.4',
+      'input_attrs' => [
+        'maxlength' => 255,
+      ],
+    ],
+    'premiums_intro_text' => [
+      'title' => ts('Premium Introductory Text'),
+      'sql_type' => 'text',
+      'input_type' => 'TextArea',
+      'localizable' => TRUE,
+      'description' => ts('Displayed in <div> at top of Premiums section of page. Text and HTML allowed.'),
+      'add' => '1.4',
+    ],
+    'premiums_contact_email' => [
+      'title' => ts('Premium Contact Email'),
+      'sql_type' => 'varchar(100)',
+      'input_type' => 'Text',
+      'description' => ts('This email address is included in receipts if it is populated and a premium has been selected.'),
+      'add' => '1.4',
+      'input_attrs' => [
+        'maxlength' => 100,
+      ],
+    ],
+    'premiums_contact_phone' => [
+      'title' => ts('Premiums Contact Phone'),
+      'sql_type' => 'varchar(50)',
+      'input_type' => 'Text',
+      'description' => ts('This phone number is included in receipts if it is populated and a premium has been selected.'),
+      'add' => '1.4',
+      'input_attrs' => [
+        'maxlength' => 50,
+      ],
+    ],
+    'premiums_display_min_contribution' => [
+      'title' => ts('Display Minimum Contribution?'),
+      'sql_type' => 'boolean',
+      'input_type' => 'CheckBox',
+      'required' => TRUE,
+      'description' => ts('Boolean. Should we automatically display minimum contribution amount text after the premium descriptions.'),
+      'add' => '1.4',
+      'default' => FALSE,
+    ],
+    'premiums_nothankyou_label' => [
+      'title' => ts('No Thank-you Text'),
+      'sql_type' => 'varchar(255)',
+      'input_type' => 'Text',
+      'localizable' => TRUE,
+      'description' => ts('Label displayed for No Thank-you option in premiums block (e.g. No thank you)'),
+      'add' => '4.3',
+      'input_attrs' => [
+        'maxlength' => 255,
+      ],
+    ],
+    'premiums_nothankyou_position' => [
+      'title' => ts('No Thank-you Position'),
+      'sql_type' => 'int unsigned',
+      'input_type' => 'Number',
+      'add' => '4.3',
+      'default' => 1,
+    ],
+  ],
+];

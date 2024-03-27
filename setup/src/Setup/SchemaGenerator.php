@@ -4,26 +4,6 @@ namespace Civi\Setup;
 class SchemaGenerator {
 
   /**
-   * Return translated SQL content using tpl, mainly contain SQL codes on table CREATE/DROP
-   *
-   * @param string $srcPath
-   * @param array $database
-   * @param array $tables
-   * @return string
-   */
-  public static function generateCreateSql($srcPath, $database, $tables) {
-    $template = new Template($srcPath, 'sql');
-
-    $template->assign('database', $database);
-    $template->assign('tables', $tables);
-    $dropOrder = array_reverse(array_keys($tables));
-    $template->assign('dropOrder', $dropOrder);
-    $template->assign('mysql', 'modern');
-
-    return $template->getContent('schema.tpl');
-  }
-
-  /**
    * Generate an example set of data, including the basic data as well
    * as some example records/entities (e.g. case-types, membership types).
    *

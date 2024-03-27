@@ -44,7 +44,7 @@ class CRM_Core_I18n {
    * @param string $mode
    * @return string
    */
-  protected static function escape($text, $mode) {
+  public static function escape($text, $mode) {
     switch ($mode) {
       case 'sql':
         if (self::$SQL_ESCAPER == NULL) {
