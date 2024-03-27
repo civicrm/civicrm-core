@@ -1,6 +1,11 @@
 <?php
 use CRM_CivicrmAdminUi_ExtensionUtil as E;
 
+// Temporary check can be removed when moving this file to the civi_event extension.
+if (!CRM_Core_Component::isEnabled('CiviEvent')) {
+  return [];
+}
+
 return [
   [
     'name' => 'SavedSearch_Contact_Summary_Events',
