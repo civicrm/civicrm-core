@@ -18,6 +18,7 @@
 
 use Civi\API\EntityLookupTrait;
 use Civi\Api4\Contribution;
+use Civi\Api4\LineItem;
 
 /**
  * Back office participant form.
@@ -172,6 +173,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * Id of payment, if any
    *
    * @var int
+   *
+   * @internal
    */
   public $_paymentId;
 
@@ -1559,10 +1562,15 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       'note' => $this->getSubmittedValue('note'),
       'is_test' => $this->isTest(),
     ];
-    $order = $this->getOrder();
-    if ($order) {
-      $participantParams['fee_level'] = $order->getAmountLevel();
-      $participantParams['fee_amount'] = $order->getTotalAmount();
+    if (!$this->getParticipantID()) {
+      // For new registrations fill in fee detail. For existing
+      // registrations we are not doing anything on this form that would require
+      // these fields to change.
+      $order = $this->getOrder();
+      if ($order) {
+        $participantParams['fee_level'] = $order->getAmountLevel();
+        $participantParams['fee_amount'] = $order->getTotalAmount();
+      }
     }
     $participantParams['discount_id'] = $this->getSubmittedValue('discount_id');
     $participant = CRM_Event_BAO_Participant::create($participantParams);
@@ -1587,19 +1595,35 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * 2) _paymentID is the contribution id.
    *
    * @return bool
+   * @throws \CRM_Core_Exception
    */
   protected function isPaymentOnExistingContribution(): bool {
-    return ($this->getParticipantID() && $this->_action & CRM_Core_Action::UPDATE) && $this->_paymentId;
+    return (bool) $this->getExistingContributionID();
   }
 
   /**
-   * @return false|int
+   * @return null|int
+   * @throws \CRM_Core_Exception
    */
-  protected function getExistingContributionID() {
-    if ($this->isPaymentOnExistingContribution()) {
-      return (int) $this->_paymentId;
+  protected function getExistingContributionID(): ?int {
+    if (!$this->getParticipantID()) {
+      return NULL;
     }
-    return FALSE;
+    if ($this->isDefined('ExistingContribution')) {
+      return $this->lookup('ExistingContribution', 'id');
+    }
+    // CRM-12615 - Get payment information from the primary registration if relevant.
+    $participantID = $this->getParticipantValue('registered_by_id') ?: $this->getParticipantID();
+    $lineItem = LineItem::get(FALSE)
+      ->addWhere('entity_table', '=', 'civicrm_participant')
+      ->addWhere('entity_id', '=', $participantID)
+      ->addWhere('contribution_id', 'IS NOT NULL')
+      ->execute()->first();
+    if (empty($lineItem)) {
+      return NULL;
+    }
+    $this->define('Contribution', 'ExistingContribution', ['id' => $lineItem['contribution_id']]);
+    return $lineItem['contribution_id'];
   }
 
   /**
