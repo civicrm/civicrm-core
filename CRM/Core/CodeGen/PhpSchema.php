@@ -17,7 +17,6 @@ class CRM_Core_CodeGen_PhpSchema extends CRM_Core_CodeGen_BaseTask {
   public function __construct($config) {
     parent::__construct($config);
     $this->locales = $this->findLocales();
-    $this->sqlGenerator = \Civi\Schema\SqlGenerator::createFromFolder($this->config->phpCodePath . '/schema', TRUE);
   }
 
   public function run() {
@@ -55,11 +54,11 @@ class CRM_Core_CodeGen_PhpSchema extends CRM_Core_CodeGen_BaseTask {
   }
 
   public function generateCreateSql() {
-    return ['civicrm.mysql' => $this->sqlGenerator->getCreateTablesSql()];
+    return ['civicrm.mysql' => \Civi::schemaHelper()->generateUninstallSql() . \Civi::schemaHelper()->generateInstallSql()];
   }
 
   public function generateDropSql() {
-    return ['civicrm.mysql' => $this->sqlGenerator->getDropTablesSql()];
+    return ['civicrm_drop.mysql' => \Civi::schemaHelper()->generateUninstallSql()];
   }
 
   public function generateNavigation() {

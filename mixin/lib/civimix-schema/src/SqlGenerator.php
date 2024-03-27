@@ -9,9 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
-namespace Civi\Schema;
-
-class SqlGenerator {
+return new class([], fn()=>NULL) {
 
   /**
    * @var array
@@ -29,9 +27,9 @@ class SqlGenerator {
    *   TRUE would make sense in (eg) civicrm-core, before installation or bootstrap
    *   FALSE would make sense in (eg) an extension on an active system.
    *
-   * @return \Civi\Schema\SqlGenerator
+   * @return static
    */
-  public static function createFromFolder(string $path, bool $isolated): SqlGenerator {
+  public static function createFromFolder(string $path, bool $isolated) {
     $files = \CRM_Utils_File::findFiles($path, '*.entityType.php');
     $entities = [];
     foreach ($files as $file) {
@@ -179,4 +177,4 @@ class SqlGenerator {
     return "ENGINE=InnoDB DEFAULT CHARACTER SET {$characterSet} COLLATE {$collation} ROW_FORMAT=DYNAMIC";
   }
 
-}
+};

@@ -19,9 +19,7 @@ class CoreSchemaStep implements StepInterface {
    */
   public function getSql() {
     if (!isset(\Civi\Test::$statics['core_schema_sql'])) {
-      $civiRoot = dirname(__DIR__, 2);
-      $gen = \Civi\Schema\SqlGenerator::createFromFolder($civiRoot . '/schema');
-      $sql = $gen->getCreateTablesSql();
+      $sql = \Civi::schemaHelper()->generateInstallSql();
       \Civi\Test::$statics['core_schema_sql'] = [
         'digest' => md5($sql),
         'content' => $sql,
