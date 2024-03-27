@@ -68,8 +68,7 @@ class InstallSchemaPlugin implements \Symfony\Component\EventDispatcher\EventSub
     $sqlPath = $model->srcPath . DIRECTORY_SEPARATOR . 'sql';
 
     \Civi\Setup::log()->info(sprintf('[%s] Load basic tables', basename(__FILE__)));
-    $sqlGenerator = \Civi\Schema\SqlGenerator::createFromFolder($model->srcPath . '/schema');
-    \Civi\Setup\DbUtil::sourceSQL($model->db, $sqlGenerator->getCreateTablesSql());
+    \Civi\Setup\DbUtil::sourceSQL($model->db, Civi::schemaHelper()->generateInstallSql());
 
     $seedLanguage = $model->lang;
     if (!empty($model->loadGenerated)) {
