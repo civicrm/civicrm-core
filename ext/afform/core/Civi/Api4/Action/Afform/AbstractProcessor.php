@@ -429,7 +429,14 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
         // Unset prefilled file fields
         foreach ($fileFields as $fileFieldName) {
           if (isset($values['fields'][$fileFieldName]) && is_array($values['fields'][$fileFieldName])) {
-            unset($values['fields'][$fileFieldName]);
+            // File was unchanged
+            if (isset($values['fields'][$fileFieldName]['file_name'])) {
+              unset($values['fields'][$fileFieldName]);
+            }
+            // File was deleted
+            elseif (array_key_exists('file_name', $values['fields'][$fileFieldName])) {
+              $values['fields'][$fileFieldName] = '';
+            }
           }
         }
         // Only accept joins set on the form
@@ -445,7 +452,14 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
             // Unset prefilled file fields
             foreach ($this->getFileFields($joinEntity, $entity['joins'][$joinEntity]['fields']) as $fileFieldName) {
               if (isset($joinValues[$index][$fileFieldName]) && is_array($joinValues[$index][$fileFieldName])) {
-                unset($joinValues[$index][$fileFieldName]);
+                // File was unchanged
+                if (isset($joinValues[$index][$fileFieldName]['file_name'])) {
+                  unset($joinValues[$index][$fileFieldName]);
+                }
+                // File was deleted
+                elseif (array_key_exists('file_name', $joinValues[$index][$fileFieldName])) {
+                  $joinValues[$index][$fileFieldName] = '';
+                }
               }
             }
             // Merge in pre-set data
