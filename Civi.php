@@ -313,4 +313,19 @@ class Civi {
     return new \Civi\Schema\EntityProvider($entityName);
   }
 
+  /**
+   * Get the schema-helper for CiviCRM (core-core).
+   *
+   * @param string $key
+   *   Ex: 'civicrm' or 'org.example.myextension'
+   * @return \CiviMix\Schema\SchemaHelperInterface
+   */
+  public static function schemaHelper(string $key = 'civicrm'): \CiviMix\Schema\SchemaHelperInterface {
+    if (!isset(Civi::$statics['schemaHelper'])) {
+      pathload()->loadPackage('civimix-schema@5');
+      Civi::$statics['schemaHelper'] = TRUE;
+    }
+    return $GLOBALS['CiviMixSchema']->getHelper($key);
+  }
+
 }
