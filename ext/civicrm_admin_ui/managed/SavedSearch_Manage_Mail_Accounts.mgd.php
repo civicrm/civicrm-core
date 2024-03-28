@@ -1,6 +1,10 @@
 <?php
-
 use CRM_CivicrmAdminUi_ExtensionUtil as E;
+
+// Temporary check can be removed when moving this file to the civi_mail extension.
+if (!CRM_Core_Component::isEnabled('CiviMail')) {
+  return [];
+}
 
 // This SearchDisplay shows an editable-in-place field for Enabled? for all rows, including the bounce processing mail account, which cannot actually be disabled (you can change it to No, but it won't actually be disabled). So this is FIXME for when we can set rows to edit-in-place conditionally.
 return [
