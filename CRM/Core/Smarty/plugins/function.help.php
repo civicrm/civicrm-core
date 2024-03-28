@@ -67,7 +67,7 @@ function smarty_function_help($params, &$smarty) {
     // we want here.
     $name = trim($smarty->fetchWith($params['file'] . '.hlp', $temporary_vars)) ?: $vars['form'][$fieldID]['textLabel'] ?? '';
     $additionalTPLFile = $params['file'] . '.extra.hlp';
-    if ($smarty->template_exists($additionalTPLFile)) {
+    if ($smarty->templateExists($additionalTPLFile)) {
       $extraoutput = trim($smarty->fetch($additionalTPLFile));
       if ($extraoutput) {
         // Allow override param to replace default text e.g. {hlp id='foo' override=1}

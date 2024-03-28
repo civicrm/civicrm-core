@@ -1037,7 +1037,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     if ($this->_id) {
       $templateFile = "CRM/Contribute/Form/Contribution/{$this->_id}/{$this->_name}.{$suffix}tpl";
       $template = CRM_Core_Form::getTemplate();
-      if ($template->template_exists($templateFile)) {
+      if ($template->templateExists($templateFile)) {
         return $templateFile;
       }
     }
