@@ -1998,6 +1998,9 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       }
     }
 
+    //its time to call the hook.
+    CRM_Utils_Hook::buildAmount('event', $form, $feeFields);
+
     //reset required if participant is skipped.
     $button = substr($form->controller->getButtonName(), -4);
     if ($required && $button === 'skip') {
@@ -2095,6 +2098,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         $form->addRule('amount', ts('Fee Level is a required field.'), 'required');
       }
     }
+
+    $this->setPriceFieldMetaData($feeFields);
   }
 
   /**
