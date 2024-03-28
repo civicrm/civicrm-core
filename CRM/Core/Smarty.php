@@ -321,31 +321,6 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
   }
 
   /**
-   * Add template directory(s).
-   *
-   * @param string|array $template_dir directory(s) of template sources
-   * @param string $key (Smarty3+) of the array element to assign the template dir to
-   * @param bool $isConfig (Smarty3+) true for config_dir
-   *
-   * @return Smarty          current Smarty instance for chaining
-   */
-  public function addTemplateDir($template_dir, $key = NULL, $isConfig = FALSE) {
-    if (method_exists('parent', 'addTemplateDir')) {
-      // More recent versions of Smarty have this method.
-      return parent::addTemplateDir($template_dir, $key, $isConfig);
-    }
-    if (is_array($this->template_dir)) {
-      if (!in_array($template_dir, $this->template_dir)) {
-        array_unshift($this->template_dir, $template_dir);
-      }
-    }
-    else {
-      $this->template_dir = [$template_dir, $this->template_dir];
-    }
-    return $this;
-  }
-
-  /**
    * Temporarily assign a list of variables.
    *
    * ```
