@@ -135,6 +135,12 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
           $url = 'civicrm/contact/view/participant';
           $qsView = "action=view&reset=1&id={$participantId}&cid=%%cid%%&context=%%cxt%%{$extraParams}";
         }
+        else {
+          // Allow deletion of orphan activities if the contribution/participant was probably deleted
+          $url = 'civicrm/activity';
+          $showView = $showDelete = TRUE;
+          $qsView = "atype={$activityTypeId}&action=view&reset=1&id=%%id%%&cid=%%cid%%&context=%%cxt%%{$extraParams}";
+        }
         break;
 
       case 'Membership Signup':
