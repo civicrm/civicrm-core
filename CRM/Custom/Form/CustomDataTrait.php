@@ -94,6 +94,9 @@ trait CRM_Custom_Form_CustomDataTrait {
       }
     }
     $qf = $this->get('qfKey');
+    if (get_class($this) == 'CRM_Case_Form_Case') {
+      throw new \Exception('qfKey is ' . var_export($qf, TRUE));
+    }
     $this->assign('qfKey', $qf);
     // We cached the POSTed values so that they can be reloaded
     // if the form fails to submit. Note that we may be combining the
