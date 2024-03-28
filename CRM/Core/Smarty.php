@@ -80,22 +80,35 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
     $config = CRM_Core_Config::singleton();
 
     if (isset($config->customTemplateDir) && $config->customTemplateDir) {
-      $this->template_dir = array_merge([$config->customTemplateDir],
+      $template_dir = array_merge([$config->customTemplateDir],
         $config->templateDir
       );
     }
     else {
-      $this->template_dir = $config->templateDir;
+      $template_dir = $config->templateDir;
     }
-    $this->compile_dir = CRM_Utils_File::addTrailingSlash(CRM_Utils_File::addTrailingSlash($config->templateCompileDir) . $this->getLocale());
-    CRM_Utils_File::createDir($this->compile_dir);
-    CRM_Utils_File::restrictAccess($this->compile_dir);
+    $compile_dir = CRM_Utils_File::addTrailingSlash(CRM_Utils_File::addTrailingSlash($config->templateCompileDir) . $this->getLocale());
+
+    if (!defined('SMARTY_DIR')) {
+      // The absence of the global indicates Smarty5 - which is not a fan of bypassing the functions.
+      // In theory this would work on all & it does run fun with Smarty2 but our tests
+      // do something weird with loading Smarty so we have to head tests running Smarty2 off
+      // at the pass.
+      $this->setTemplateDir($template_dir);
+      $this->setCompileDir($compile_dir);
+    }
+    else {
+      $this->template_dir = $template_dir;
+      $this->compile_dir = $compile_dir;
+    }
+    CRM_Utils_File::createDir($compile_dir);
+    CRM_Utils_File::restrictAccess($compile_dir);
 
     // check and ensure it is writable
     // else we sometime suppress errors quietly and this results
     // in blank emails etc
-    if (!is_writable($this->compile_dir)) {
-      echo "CiviCRM does not have permission to write temp files in {$this->compile_dir}, Exiting";
+    if (!is_writable($compile_dir)) {
+      echo "CiviCRM does not have permission to write temp files in {$compile_dir}, Exiting";
       exit();
     }
 
