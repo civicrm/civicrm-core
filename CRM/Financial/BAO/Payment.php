@@ -43,7 +43,7 @@ class CRM_Financial_BAO_Payment {
     $contribution = civicrm_api3('Contribution', 'getsingle', ['id' => $params['contribution_id']]);
     $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution['contribution_status_id']);
     $isPaymentCompletesContribution = self::isPaymentCompletesContribution($params['contribution_id'], $params['total_amount'], $contributionStatus);
-    $lineItems = self::getPayableLineItems($params);
+    $lineItems = self::getPayableLineItems($params, $contribution);
 
     $whiteList = ['check_number', 'payment_processor_id', 'fee_amount', 'total_amount', 'contribution_id', 'net_amount', 'card_type_id', 'pan_truncation', 'trxn_result_code', 'payment_instrument_id', 'trxn_id', 'trxn_date', 'order_reference'];
     $paymentTrxnParams = array_intersect_key($params, array_fill_keys($whiteList, 1));
@@ -163,19 +163,13 @@ class CRM_Financial_BAO_Payment {
           if ($financialItem['financial_item.entity_id'] === (int) $lineItem['id']
             && in_array($financialItem['financial_item.financial_account_id'], $salesTaxFinancialAccount, TRUE)
           ) {
-            // If we find a "Sales Tax" lineitem we record a tax entry in entityFiancncialTrxn
-            // @todo - this is expected to be broken - it should be fixed to
-            // a) have the getPayableLineItems add the amount to allocate for tax
-            // b) call EntityFinancialTrxn directly - per above.
-            // - see https://github.com/civicrm/civicrm-core/pull/14763
-            $entityParams = [
-              'contribution_total_amount' => $contribution['total_amount'],
-              'trxn_total_amount' => $params['total_amount'],
-              'trxn_id' => $trxn->id,
-              'line_item_amount' => $financialItem['tax_amount'],
+            $eftParams = [
+              'entity_table' => 'civicrm_financial_item',
+              'financial_trxn_id' => $trxn->id,
+              'entity_id' => $financialItem['financial_item.id'],
+              'amount' => $lineItem['tax_allocation'],
             ];
-            $eftParams['entity_id'] = $financialItem['financial_item.id'];
-            CRM_Contribute_BAO_Contribution::createProportionalEntry($entityParams, $eftParams);
+            civicrm_api3('EntityFinancialTrxn', 'create', $eftParams);
           }
         }
       }
@@ -537,11 +531,12 @@ class CRM_Financial_BAO_Payment {
    * - if overrides have been passed in we use those amounts instead.
    *
    * @param $params
+   * @param $contribution
    *
    * @return array
    * @throws \CRM_Core_Exception
    */
-  protected static function getPayableLineItems($params): array {
+  protected static function getPayableLineItems($params, $contribution): array {
     $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($params['contribution_id']);
     $lineItemOverrides = [];
     if (!empty($params['line_item'])) {
@@ -552,6 +547,7 @@ class CRM_Financial_BAO_Payment {
       }
     }
     $outstandingBalance = CRM_Contribute_BAO_Contribution::getContributionBalance($params['contribution_id']);
+    $isPaymentCompletesContribution = self::isPaymentCompletesContribution($params['contribution_id'], $params['total_amount'], '');
     if ($outstandingBalance !== 0.0) {
       $ratio = $params['total_amount'] / $outstandingBalance;
     }
@@ -572,13 +568,32 @@ class CRM_Financial_BAO_Payment {
       }
       else {
         if (empty($lineItems[$lineItemID]['balance']) && !empty($ratio) && $params['total_amount'] < 0) {
-          $lineItems[$lineItemID]['allocation'] = $lineItem['subTotal'] * $ratio;
+          $lineItems[$lineItemID]['allocation'] = round($lineItem['subTotal'] * $ratio, 2);
+        }
+        elseif ($isPaymentCompletesContribution) {
+          $lineItems[$lineItemID]['allocation'] = $lineItems[$lineItemID]['balance'];
         }
         else {
-          $lineItems[$lineItemID]['allocation'] = $lineItems[$lineItemID]['balance'] * $ratio;
+          $lineItems[$lineItemID]['allocation'] = round($lineItems[$lineItemID]['balance'] * $ratio, 2);
         }
+
+        if (!empty($lineItem['tax_amount'])) {
+          $lineItems[$lineItemID]['tax_allocation'] = round($lineItem['tax_amount'] * ($params['total_amount'] / $contribution['total_amount']), 2);
+        }
+
       }
     }
+
+    if (empty($lineItemOverrides) && !empty($ratio)) {
+      $totalTaxAllocation = array_sum(array_column($lineItems, 'tax_allocation'));
+      $totalAllocation = array_sum(array_column($lineItems, 'allocation'));
+      $total = $totalTaxAllocation + $totalAllocation;
+      $leftPayment = $params['total_amount'] - $total;
+
+      // assign any leftover amount, to the last lineitem
+      $lineItems[$lineItemID]['allocation'] += $leftPayment;
+    }
+
     return $lineItems;
   }
 
@@ -608,6 +623,16 @@ class CRM_Financial_BAO_Payment {
       foreach ($entityFinancialTrxns as $entityFinancialTrxn) {
         $paid += $entityFinancialTrxn['amount'];
       }
+    }
+
+    $lineItem = \Civi\Api4\LineItem::get(FALSE)
+      ->addWhere('id', '=', $lineItemID)
+      ->execute()
+      ->first();
+    if (!empty($lineItem['tax_amount']) && $paid > 0) {
+      $total = floatval($lineItem['line_total']);
+      $tax = floatval($lineItem['tax_amount']);
+      $paid = ($total * $paid) / ($tax + $total);
     }
     return (float) $paid;
   }
