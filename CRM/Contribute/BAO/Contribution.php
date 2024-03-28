@@ -4625,53 +4625,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
   }
 
   /**
-   * Do not use - unused in core.
-   *
-   * Function to replace contribution tokens.
-   *
-   * @param array $contributionIds
-   *
-   * @param string $subject
-   *
-   * @param array $subjectToken
-   *
-   * @param string $text
-   *
-   * @param string $html
-   *
-   * @param array $messageToken
-   *
-   * @param bool $escapeSmarty
-   *
-   * @deprecated
-   *
-   * @return array
-   * @throws \CRM_Core_Exception
-   */
-  public static function replaceContributionTokens(
-    $contributionIds,
-    $subject,
-    $subjectToken,
-    $text,
-    $html,
-    $messageToken,
-    $escapeSmarty
-  ) {
-    CRM_Core_Error::deprecatedFunctionWarning('use the TokenProcessor');
-    if (empty($contributionIds)) {
-      return [];
-    }
-    $contributionDetails = [];
-    foreach ($contributionIds as $id) {
-      $result = self::getContributionTokenValues($id, $messageToken);
-      $contributionDetails[$result['values'][$result['id']]['contact_id']]['subject'] = CRM_Utils_Token::replaceContributionTokens($subject, $result, FALSE, $subjectToken, FALSE, $escapeSmarty);
-      $contributionDetails[$result['values'][$result['id']]['contact_id']]['text'] = CRM_Utils_Token::replaceContributionTokens($text, $result, FALSE, $messageToken, FALSE, $escapeSmarty);
-      $contributionDetails[$result['values'][$result['id']]['contact_id']]['html'] = CRM_Utils_Token::replaceContributionTokens($html, $result, FALSE, $messageToken, FALSE, $escapeSmarty);
-    }
-    return $contributionDetails;
-  }
-
-  /**
    * Do not use - still called from CRM_Contribute_Form_Task_PDFLetter
    *
    * This needs to be refactored out of use & deprecated out of existence.
