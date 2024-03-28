@@ -3,6 +3,9 @@
 function invoke() {
   $requestUri = $_SERVER['REQUEST_URI'] ?? '';
 
+  // initialise config and boot container
+  \CRM_Core_Config::singleton();
+
   // Add CSS, JS, etc. that is required for this page.
   \CRM_Core_Resources::singleton()->addCoreResources();
   $parts = explode('?', $requestUri);
