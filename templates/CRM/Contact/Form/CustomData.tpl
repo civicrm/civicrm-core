@@ -14,7 +14,7 @@
      <div class="crm-submit-buttons">{$form.buttons.html}</div>
    {/if}
 {else}
-    <div id="customData_{$contact_type}"></div>
+    <div id="customData_{$contact_type}" class="crm-customData-block"></div>
     <div class="crm-submit-buttons">{$form.buttons.html}</div>
 
     {*include custom data js file*}
