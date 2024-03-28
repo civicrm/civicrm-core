@@ -1,6 +1,6 @@
 
 {if !empty($customDataType)}
-  <div id="customData_{$customDataType}"></div>
+  <div id="customData_{$customDataType}" class="crm-custom-data-container"></div>
   {*include custom data js file*}
   {include file="CRM/common/customData.tpl"}
   {literal}
