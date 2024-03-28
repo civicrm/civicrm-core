@@ -16,7 +16,9 @@
  */
 
 /**
- * this class builds custom data
+ * Deprecated class no longer used in core.
+ *
+ * @deprecated since 5.72 will be removed around 5.92
  */
 class CRM_Custom_Form_CustomData {
 
