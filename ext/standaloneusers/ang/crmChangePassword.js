@@ -1,4 +1,4 @@
-(function (angular, $, _) {
+(function(angular, $, _) {
   "use strict";
 
   angular.module('crmChangePassword', CRM.angRequires('crmChangePassword'));
@@ -10,11 +10,11 @@
       hibp: '@',
       userId: '@'
     },
-    controller: function($scope, $timeout, crmApi4) {
+    controller: function($scope, $timeout, crmApi4, crmStatus) {
       var ts = $scope.ts = CRM.ts(null),
-      ctrl = this;
+        ctrl = this;
 
-      console.log('init crmChangePassword component starting');
+      console.log('init crmChangePassword component starting 1');
       // $onInit gets run after the this controller is called, and after the bindings have been applied.
       // this.$onInit = function() { console.log('user', ctrl.userId); };
       ctrl.actorPassword = '';
@@ -23,34 +23,25 @@
       ctrl.busy = '';
       ctrl.pwnd = false;
 
-      let updateAngular = (prop, newVal) => {
-        $timeout(() => {
-          console.log("Setting", prop, "to", newVal);
-          ctrl[prop] = newVal;
-        }, 0);
+      let updateAngular = (newVals) => {
+        $timeout(() => Object.assign(ctrl, newVals), 0);
       };
 
       ctrl.attemptChange = () => {
-        updateAngular('busy', '');
-        updateAngular('pwnd', false);
-        updateAngular('formInactive', true);
-        if (ctrl.newPassword.length < 8) {
-          alert(ts("C'mon now, you can do better than that."));
-          return;
-        }
+        updateAngular({ busy: '', pwnd: false, formInactive: true });
         if (ctrl.newPassword != ctrl.newPasswordAgain) {
           alert(ts("Passwords do not match"));
           return;
         }
 
-        let promises = Promise.resolve(null);
+        let promises = Promise.resolve({ okToProceed: true });
         if (ctrl.hibp) {
           promises = promises.then(() => {
-            updateAngular('busy', ts('Checking password is not known to have been involved in data breach...'));
+            updateAngular({ busy: ts('Checking password is not known to have been involved in data breach...') });
             return sha1(ctrl.newPassword)
               .then(hash => {
                 if (!hash.match(/^[a-f0-9]+$/)) {
-                  updateAngular('busy', ts('Could not check. Is your browser up-to-date?'));
+                  updateAngular({ busy: ts('Could not check. Is your browser up-to-date?') });
                 }
                 else {
                   hash = hash.toUpperCase();
@@ -61,34 +52,51 @@
                       if (hibpResult &&
                         hibpResult.split(/\r\n/).find(line => hashPrefix + line.replace(/:\d+$/, '') === hash)) {
                         // e.g. Password123
-                        updateAngular('pwn', true);
-                        return;
+                        updateAngular({ pwnd: true, busy: '' });
+                        return { okToProceed: false };
                       }
-                      updateAngular('busy', '');
+                      updateAngular({ busy: '' });
+                      return { okToProceed: true };
                     })
-                    .catch( () => {
-                      updateAngular('busy', ts('Could not perform check; service error.'));
+                    .catch(() => {
+                      updateAngular({ busy: ts('Could not perform check; service error.') });
+                      return { okToProceed: false };
                     });
                 }
               });
           });
         }
 
-        promises = promises.then(() => {
-          updateAngular('busy', ctrl.busy + ts('Changing...'));
+        promises = promises.then((status) => {
+          if (!status.okToProceed) {
+            CRM.alert(
+              ts('The given password cannot be considered secure.'),
+              ts('Password NOT changed'),
+              'error');
+            console.log("Prevented changing password because of hibp result");
+            return;
+          }
+
+          updateAngular({ busy: ctrl.busy + ts('Changing...') });
           // Now submit api request.
           const userUpdateParams = {
             actorPassword: ctrl.actorPassword,
-            values: {password: ctrl.newPassword},
+            values: { password: ctrl.newPassword },
             where: [['id', '=', ctrl.userId]]
           };
           return crmApi4('User', 'Update', userUpdateParams)
-            .then(r => updateAngular('busy', ts('Password successfully updated')))
+            .then(r => {
+              CRM.alert(ts('Your password was successfully changed.'), ts('Password updated'), 'success');
+              updateAngular({ busy: '' });
+            })
             .catch(e => {
-              let msg = (e.error_message === 'Authorization failed') ?
-                ts("Sorry, that didn't work. Perhaps you mistyped your password?") :
-                e.error_message;
-              updateAngular('busy', msg);
+              CRM.alert(
+                (e.error_message === 'Authorization failed') ?
+                  ts('Perhaps you mistyped your existing password?') :
+                  e.error_message,
+                ts('Password NOT changed'),
+                'error');
+              updateAngular({ busy: '' });
             });
         });
       };
@@ -102,8 +110,8 @@
           .then(hashBuffer => {
             const hashArray = Array.from(new Uint8Array(hashBuffer)); // convert buffer to byte array
             const hashHex = hashArray
-            .map((b) => b.toString(16).padStart(2, "0"))
-            .join(""); // convert bytes to hex string
+              .map((b) => b.toString(16).padStart(2, "0"))
+              .join(""); // convert bytes to hex string
             return hashHex;
           });
       }

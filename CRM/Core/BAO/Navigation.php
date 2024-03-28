@@ -903,6 +903,16 @@ ORDER BY weight";
             ],
           ];
         }
+        else {
+          $item['child'][] = [
+            'attributes' => [
+              'label' => ts('Change Password'),
+              'name' => 'Change Password',
+              'url' => 'civicrm/admin/user/password',
+              'weight' => 2,
+            ],
+          ];
+        }
         $item['child'][] = [
           'attributes' => [
             'label' => ts('Log out'),
