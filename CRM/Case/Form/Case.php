@@ -203,17 +203,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
 
     $this->_currentUserId = CRM_Core_Session::getLoggedInContactID();
 
-    $className = "CRM_Case_Form_Activity_{$this->_activityTypeFile}";
-    switch ($className) {
-      // @todo flesh out this switch. Sure we hate switches but it's better than
-      // than the default below for code tracing purposes.
-      case 'CRM_Case_Form_Activity_OpenCase':
-        CRM_Case_Form_Activity_OpenCase::preProcess($this);
-        break;
-
-      default:
-        $className::preProcess($this);
-    }
+    CRM_Case_Form_Activity_OpenCase::preProcess($this);
 
     if ($this->isSubmitted()) {
       // The custom data fields are added to the form by an ajax form.
