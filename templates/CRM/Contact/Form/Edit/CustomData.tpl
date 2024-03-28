@@ -18,7 +18,7 @@
     <summary>
       {$cd_edit.title}
     </summary>
-    <div id="customData{$group_id}" class="crm-accordion-body">
+    <div id="customData_{$contactType}{$group_id}" class="crm-accordion-body crm-customData-block">
       {include file="CRM/Custom/Form/Edit/CustomData.tpl" customDataEntity=''}
       {include file="CRM/Form/attachmentjs.tpl"}
     </div>

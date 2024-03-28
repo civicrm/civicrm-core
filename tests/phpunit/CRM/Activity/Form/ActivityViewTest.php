@@ -63,7 +63,6 @@ class CRM_Activity_Form_ActivityViewTest extends CiviUnitTestCase {
    * Test that the smarty template for ActivityView contains what we expect
    * after preProcess().
    *
-   * @throws \CRM_Core_Exception
    */
   public function testActivityViewPreProcess(): void {
     // create activity

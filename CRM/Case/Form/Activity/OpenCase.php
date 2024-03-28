@@ -31,8 +31,8 @@ class CRM_Case_Form_Activity_OpenCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public static function preProcess(&$form) {
-    if ($form->_context == 'caseActivity') {
+  public static function preProcess(&$form): void {
+    if ($form->_context === 'caseActivity') {
       $contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $form);
       $atype = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Change Case Start Date');
       $caseId = CRM_Utils_Array::first($form->_caseId);
@@ -74,7 +74,7 @@ class CRM_Case_Form_Activity_OpenCase {
    */
   public static function setDefaultValues(&$form) {
     $defaults = [];
-    if ($form->_context == 'caseActivity') {
+    if ($form->_context === 'caseActivity') {
       return $defaults;
     }
 
@@ -249,8 +249,8 @@ class CRM_Case_Form_Activity_OpenCase {
    *
    * @throws \Exception
    */
-  public static function endPostProcess(&$form, &$params) {
-    if ($form->_context == 'caseActivity') {
+  public static function endPostProcess($form, &$params): void {
+    if ($form->_context === 'caseActivity') {
       return;
     }
 
