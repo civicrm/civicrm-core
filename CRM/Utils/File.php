@@ -282,11 +282,14 @@ class CRM_Utils_File {
   }
 
   /**
+   * Runs an SQL query.
    *
    * @param string|null $dsn
    * @param string $queryString
    * @param string $prefix
    * @param bool $dieOnErrors
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function runSqlQuery($dsn, $queryString, $prefix = NULL, $dieOnErrors = TRUE) {
     $string = $prefix . $queryString;
@@ -302,7 +305,7 @@ class CRM_Utils_File {
         $db = DB::connect($dsn, $options);
       }
       catch (Exception $e) {
-        die("Cannot open $dsn: " . $e->getMessage());
+        throw new CRM_Core_Exception("Cannot open $dsn: " . $e->getMessage());
       }
     }
 
@@ -324,7 +327,7 @@ class CRM_Utils_File {
         }
         catch (Exception $e) {
           if ($dieOnErrors) {
-            die("Cannot execute $query: " . $e->getMessage());
+            throw new CRM_Core_Exception("Cannot execute $query: " . $e->getMessage());
           }
           else {
             echo "Cannot execute $query: " . $e->getMessage() . "<p>";
