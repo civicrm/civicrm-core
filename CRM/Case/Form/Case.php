@@ -230,7 +230,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
     }
     // Used for loading custom data fields
     $this->assign('activityTypeID', $this->_activityTypeId);
-    $this->assign('caseTypeID', $this->getSubmittedValue('case_type_id') ?: $this->getCaseValue('campaign_type_id'));
+    $this->assign('caseTypeID', $this->getSubmittedValue('case_type_id') ?: $this->getCaseValue('case_type_id'));
   }
 
   /**
