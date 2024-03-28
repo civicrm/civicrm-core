@@ -151,4 +151,15 @@ class ClickTrackerTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     $this->assertEquals('<p><a href="http://example.com/extern?u=1&amp;qid=1" rel=\'nofollow\'>See This</a></p>', $result);
   }
 
+  public function testTraditionalViewMailingTokenFormat(): void {
+    $filter = new HtmlClickTracker();
+    $msg = '<p><a href="http://civicrm.org/civicrm/mailing/view?id={mailing.key}&{contact.checksum}&cid={contact.contact_id}">View online</a></p>';
+    \runkit7_method_rename('\CRM_Mailing_BAO_MailingTrackableURL', 'getBasicTrackerURL', 'new_getBasicTrackerURL');
+    \runkit7_method_rename('\CRM_Mailing_BAO_MailingTrackableURL', 'orig_getBasicTrackerURL', 'getBasicTrackerURL');
+    $result = $filter->filterContent($msg, 1, 1);
+    \runkit7_method_rename('\CRM_Mailing_BAO_MailingTrackableURL', 'getBasicTrackerURL', 'orig_getBasicTrackerURL');
+    \runkit7_method_rename('\CRM_Mailing_BAO_MailingTrackableURL', 'new_getBasicTrackerURL', 'getBasicTrackerURL');
+    $this->assertEquals('<p><a href="http://civicrm.org/civicrm/mailing/view?id={mailing.key}&amp;{contact.checksum}&amp;cid={contact.contact_id}" rel=\'nofollow\'>View online</a></p>', $result);
+  }
+
 }
