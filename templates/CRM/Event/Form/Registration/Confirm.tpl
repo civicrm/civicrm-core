@@ -35,7 +35,7 @@
 
     {if $confirm_text}
         <div id="intro_text" class="crm-section event_confirm_text-section">
-          <p>{$confirm_text|escape}</p>
+          <p>{$confirm_text|purify}</p>
         </div>
     {/if}
 
