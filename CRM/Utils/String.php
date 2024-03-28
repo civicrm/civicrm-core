@@ -1042,7 +1042,7 @@ class CRM_Utils_String {
     // is invalid in Windows, causing failure.
     // Adding this is preparatory to smarty 3. The original PR failed some
     // tests so we check for the function.
-    if (!function_exists('smarty_function_eval') && !file_exists(SMARTY_DIR . '/plugins/function.eval.php')) {
+    if (!function_exists('smarty_function_eval') && (!defined('SMARTY_DIR') || !file_exists(SMARTY_DIR . '/plugins/function.eval.php'))) {
       try {
         $templateString = (string) $smarty->fetch('eval:' . $templateString);
       }
