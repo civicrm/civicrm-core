@@ -256,8 +256,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
     if ($this->_action & CRM_Core_Action::DELETE || $this->_action & CRM_Core_Action::RENEW) {
       return [];
     }
-    $className = "CRM_Case_Form_Activity_{$this->_activityTypeFile}";
-    return $className::setDefaultValues($this);
+    return CRM_Case_Form_Activity_OpenCase::setDefaultValues($this);
   }
 
   public function buildQuickForm() {
@@ -323,8 +322,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
       ],
     ]);
 
-    $className = "CRM_Case_Form_Activity_{$this->_activityTypeFile}";
-    $className::buildQuickForm($this);
+    CRM_Case_Form_Activity_OpenCase::buildQuickForm($this);
   }
 
   /**
@@ -336,7 +334,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
     if ($this->_action & CRM_Core_Action::DELETE || $this->_action & CRM_Core_Action::RENEW) {
       return TRUE;
     }
-    $className = "CRM_Case_Form_Activity_{$this->_activityTypeFile}";
+    $className = "CRM_Case_Form_Activity_OpenCase";
     $this->addFormRule([$className, 'formRule'], $this);
     $this->addFormRule(['CRM_Case_Form_Case', 'formRule'], $this);
   }
@@ -367,8 +365,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
 
     // 1. call begin post process
     if ($this->_activityTypeFile) {
-      $className = "CRM_Case_Form_Activity_{$this->_activityTypeFile}";
-      $className::beginPostProcess($this, $params);
+      CRM_Case_Form_Activity_OpenCase::beginPostProcess($this, $params);
     }
 
     $params['custom'] = CRM_Core_BAO_CustomField::postProcess(
@@ -421,7 +418,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
 
     // 4. call end post process
     if ($this->_activityTypeFile) {
-      $className::endPostProcess($this, $params);
+      CRM_Case_Form_Activity_OpenCase::endPostProcess($this, $params);
     }
 
     return $caseObj;
