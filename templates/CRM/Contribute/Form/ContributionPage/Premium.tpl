@@ -141,5 +141,5 @@
   {/literal}
 </script>
 {/crmRegion}
-{crmRegion name="contribute-form-contributionpage-premium-post}
+{crmRegion name="contribute-form-contributionpage-premium-post"}
 {/crmRegion}
