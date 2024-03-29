@@ -95,13 +95,29 @@ class CRM_Member_ActionMapping extends \Civi\ActionSchedule\MappingBase {
       $query['casDateField'] = 'e.' . $query['casDateField'];
     }
 
+    $recurStatuses = \Civi\Api4\ContributionRecur::getFields(FALSE)
+      ->setLoadOptions(TRUE)
+      ->addWhere('name', '=', 'contribution_status_id')
+      ->addSelect('options')
+      ->execute()
+      ->first()['options'];
+    // Exclude the renewals that are cancelled or failed.
+    $nonRenewStatusIds = array_keys(array_intersect($recurStatuses, ['Cancelled', 'Failed']));
     // FIXME: Numbers should be constants.
     if (in_array(2, $selectedStatuses)) {
       //auto-renew memberships
-      $query->where("e.contribution_recur_id IS NOT NULL");
+      $query->join('cr', 'INNER JOIN civicrm_contribution_recur cr on e.contribution_recur_id = cr.id');
+      $query->where("cr.contribution_status_id NOT IN (#nonRenewStatusIds)")
+        ->param('nonRenewStatusIds', $nonRenewStatusIds);
     }
     elseif (in_array(1, $selectedStatuses)) {
-      $query->where("e.contribution_recur_id IS NULL");
+      // non-auto-renew memberships
+      // Include the renewals that were cancelled or Failed.
+      $query->join('cr', 'LEFT JOIN civicrm_contribution_recur cr on e.contribution_recur_id = cr.id');
+      $query->where("e.contribution_recur_id IS NULL OR (
+        e.contribution_recur_id IS NOT NULL AND cr.contribution_status_id IN (#nonRenewStatusIds)
+        )")
+        ->param('nonRenewStatusIds', $nonRenewStatusIds);
     }
 
     if (!empty($selectedValues)) {
