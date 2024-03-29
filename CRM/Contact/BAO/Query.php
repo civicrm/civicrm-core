@@ -5504,7 +5504,7 @@ civicrm_relationship.start_date > {$today}
 
     $asofDateValues = $this->getWhereValues("{$fieldName}_asof_date", $grouping);
     // will be treated as current day
-    $asofDate = NULL;
+    $asofDate = '';
     if ($asofDateValues) {
       $asofDate = CRM_Utils_Date::processDate($asofDateValues[2]);
       $asofDateFormat = CRM_Utils_Date::customFormat(substr($asofDate, 0, 8));
