@@ -124,8 +124,8 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
     //Email box
     $this->addField("email[1][email]", [
       'entity' => 'email',
-      'aria-label' => ts('Email %1', [1 => 1]),
-      'label' => ts('Email %1', [1 => 1]),
+      'aria-label' => ts('Email 1'),
+      'label' => ts('Email 1'),
     ]);
     $this->addRule("email[1][email]", ts('Email is not valid.'), 'email');
     CRM_Contact_Form_Edit_Phone::buildQuickForm($this, 1);
