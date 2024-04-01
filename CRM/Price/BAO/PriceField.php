@@ -811,16 +811,21 @@ WHERE  id IN (" . implode(',', array_keys($priceFields)) . ')';
   public static function getTaxLabel($opt, $valueFieldName, $currency = NULL) {
     $taxTerm = Civi::settings()->get('tax_term');
     $displayOpt = Civi::settings()->get('tax_display_settings');
+    $taxRates = CRM_Core_PseudoConstant::getTaxRates();
     if ($displayOpt === 'Do_not_show') {
       $label = CRM_Utils_Money::format($opt[$valueFieldName] + $opt['tax_amount'], $currency);
     }
     elseif ($displayOpt === 'Inclusive') {
       $label = CRM_Utils_Money::format($opt[$valueFieldName] + $opt['tax_amount'], $currency);
-      $label .= '<span class="crm-price-amount-tax"> ' . ts('(includes %1 of %2)', [1 => $taxTerm, 2 => CRM_Utils_Money::format($opt['tax_amount'], $currency)]) . '</span>';
+      if (array_key_exists($opt['financial_type_id'], $taxRates)) {
+        $label .= '<span class="crm-price-amount-tax"> ' . ts('(includes %1 of %2)', [1 => $taxTerm, 2 => CRM_Utils_Money::format($opt['tax_amount'], $currency)]) . '</span>';
+      }
     }
     else {
       $label = CRM_Utils_Money::format($opt[$valueFieldName], $currency);
-      $label .= '<span class="crm-price-amount-tax"> + ' . CRM_Utils_Money::format($opt['tax_amount'], $currency) . ' ' . $taxTerm . '</span>';
+      if (array_key_exists($opt['financial_type_id'], $taxRates)) {
+        $label .= '<span class="crm-price-amount-tax"> + ' . CRM_Utils_Money::format($opt['tax_amount'], $currency) . ' ' . $taxTerm . '</span>';
+      }
     }
 
     return $label;
