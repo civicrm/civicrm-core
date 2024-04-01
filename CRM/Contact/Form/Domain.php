@@ -120,7 +120,14 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
     //build location blocks.
     $this->assign('addressSequence', CRM_Core_BAO_Address::addressSequence());
     CRM_Contact_Form_Edit_Address::buildQuickForm($this, 1);
-    CRM_Contact_Form_Edit_Email::buildQuickForm($this, 1);
+
+    //Email box
+    $this->addField("email[1][email]", [
+      'entity' => 'email',
+      'aria-label' => ts('Email %1', [1 => 1]),
+      'label' => ts('Email %1', [1 => 1]),
+    ]);
+    $this->addRule("email[1][email]", ts('Email is not valid.'), 'email');
     CRM_Contact_Form_Edit_Phone::buildQuickForm($this, 1);
 
     $this->addButtons([
