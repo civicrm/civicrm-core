@@ -86,10 +86,10 @@ class CRM_Extension_System {
   public function __construct($parameters = []) {
     $config = CRM_Core_Config::singleton();
     $parameters['maxDepth'] = CRM_Utils_Array::value('maxDepth', $parameters, \Civi::settings()->get('ext_max_depth'));
-    $parameters['extensionsDir'] = CRM_Utils_Array::value('extensionsDir', $parameters, $config->extensionsDir);
-    $parameters['extensionsURL'] = CRM_Utils_Array::value('extensionsURL', $parameters, $config->extensionsURL);
-    $parameters['resourceBase'] = CRM_Utils_Array::value('resourceBase', $parameters, $config->resourceBase);
-    $parameters['uploadDir'] = CRM_Utils_Array::value('uploadDir', $parameters, $config->uploadDir);
+    $parameters['extensionsDir'] = CRM_Utils_Array::value('extensionsDir', $parameters, \Civi::settings()->get('extensionsDir'));
+    $parameters['extensionsURL'] = CRM_Utils_Array::value('extensionsURL', $parameters, \Civi::settings()->get('extensionsURL'));
+    $parameters['resourceBase'] = CRM_Utils_Array::value('resourceBase', $parameters, \Civi::settings()->get('resourceBase'));
+    $parameters['uploadDir'] = CRM_Utils_Array::value('uploadDir', $parameters, \Civi::settings()->get('uploadDir'));
     $parameters['userFrameworkBaseURL'] = CRM_Utils_Array::value('userFrameworkBaseURL', $parameters, $config->userFrameworkBaseURL);
     if (!array_key_exists('civicrm_root', $parameters)) {
       $parameters['civicrm_root'] = $GLOBALS['civicrm_root'];
