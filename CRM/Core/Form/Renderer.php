@@ -233,7 +233,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
   public function _tplFetch($tplSource) {
     // Smarty3 does not have this function defined so the parent fails.
     // Adding this is preparatory to smarty 3....
-    if (!function_exists('smarty_function_eval') && !file_exists(SMARTY_DIR . '/plugins/function.eval.php')) {
+    if (!function_exists('smarty_function_eval') && (!defined('SMARTY_DIR') || !file_exists(SMARTY_DIR . '/plugins/function.eval.php'))) {
       $smarty = $this->_tpl;
       $smarty->assign('var', $tplSource);
       return $smarty->fetch("eval:$tplSource");
