@@ -553,7 +553,7 @@ class CRM_Extension_Mapper {
    * @return string
    */
   public function getUpgradeLink($remoteExtensionInfo, $localExtensionInfo) {
-    if (!empty($remoteExtensionInfo) && version_compare($localExtensionInfo['version'], $remoteExtensionInfo->version, '<')) {
+    if (!empty($remoteExtensionInfo) && version_compare($localExtensionInfo['version'] ?? '', $remoteExtensionInfo->version, '<')) {
       return ts('Version %1 is installed. <a %2>Upgrade to version %3</a>.', [
         1 => $localExtensionInfo['version'],
         2 => 'href="' . CRM_Utils_System::url('civicrm/admin/extensions', "action=update&id={$localExtensionInfo['key']}&key={$localExtensionInfo['key']}") . '"',
