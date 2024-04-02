@@ -332,11 +332,34 @@ class CRM_Dedupe_Finder {
         $subTypes = [];
       }
       else {
-        if (stristr($subTypes, ',')) {
+        if (strpos($subTypes, ',') !== FALSE) {
+          CRM_Core_Error::deprecatedWarning('subtype should be an array, if multiple');
           $subTypes = explode(',', $subTypes);
         }
-        else {
+        elseif (strpos($subTypes, CRM_Core_DAO::VALUE_SEPARATOR) !== FALSE) {
+          CRM_Core_Error::deprecatedWarning('subtype should be an array, if multiple');
           $subTypes = explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($subTypes, CRM_Core_DAO::VALUE_SEPARATOR));
+        }
+        else {
+          $subTypes = (array) $subTypes;
+        }
+      }
+    }
+    foreach ($subTypes as $index => $subType) {
+      if (trim($subType, CRM_Core_DAO::VALUE_SEPARATOR) !== $subType) {
+        CRM_Core_Error::deprecatedWarning('subtype should not require extra cleanup');
+        $subTypes[$index] = trim($subType, CRM_Core_DAO::VALUE_SEPARATOR);
+      }
+      $validatedSubType = self::validateSubTypeByEntity($entityType, $subType);
+      if ($subType !== $validatedSubType) {
+        if (strtolower($subType) === strtolower($validatedSubType)) {
+          CRM_Core_Error::deprecatedWarning('passing in contact subtype with incorrect capitalization is deprecated');
+          $subTypes[$index] = $validatedSubType;
+        }
+        else {
+          // This is a security check rather than a deprecation.
+          \Civi::log()->warning('invalid subtype passed to duplicate check {type}', ['type' => $subType]);
+          unset($subTypes[$index]);
         }
       }
     }
@@ -347,7 +370,7 @@ class CRM_Dedupe_Finder {
     ];
     if ($subTypes) {
       foreach ($subTypes as $subType) {
-        $filters['extends_entity_column_value'][] = self::validateSubTypeByEntity($entityType, $subType);
+        $filters['extends_entity_column_value'][] = $subType;
       }
       $filters['extends_entity_column_value'][] = NULL;
     }
@@ -423,7 +446,7 @@ class CRM_Dedupe_Finder {
    * @throws \CRM_Core_Exception
    */
   private static function validateSubTypeByEntity($entityType, $subType) {
-    $subType = trim($subType, CRM_Core_DAO::VALUE_SEPARATOR);
+
     if (is_numeric($subType)) {
       return $subType;
     }
@@ -431,16 +454,12 @@ class CRM_Dedupe_Finder {
     $contactTypes = CRM_Contact_BAO_ContactType::basicTypeInfo(TRUE);
     $contactTypes['Contact'] = 1;
 
-    if ($entityType === 'Event') {
-      $subTypes = CRM_Core_OptionGroup::values('event_type', TRUE, FALSE, FALSE, NULL, 'name');
-    }
-    elseif (!array_key_exists($entityType, $contactTypes)) {
+    if (!array_key_exists($entityType, $contactTypes)) {
       throw new CRM_Core_Exception('Invalid Entity Filter');
     }
-    else {
-      $subTypes = CRM_Contact_BAO_ContactType::subTypeInfo($entityType, TRUE);
-      $subTypes = array_column($subTypes, 'name', 'name');
-    }
+
+    $subTypes = CRM_Contact_BAO_ContactType::subTypeInfo($entityType, TRUE);
+    $subTypes = array_column($subTypes, 'name', 'name');
     // When you create a new contact type it gets saved in mixed case in the database.
     // Eg. "Service User" becomes "Service_User" in civicrm_contact_type.name
     // But that field does not differentiate case (eg. you can't add Service_User and service_user because mysql will report a duplicate error)
