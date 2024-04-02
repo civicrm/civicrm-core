@@ -205,6 +205,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
     if (!$this->name == NULL || $this->is_reserved == NULL) {
       $this->find(TRUE);
     }
+    $contactType = $this->contact_type;
 
     // Reserved Rule Groups can optionally get special treatment by
     // implementing an optimization class and returning a query array.
@@ -237,7 +238,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
           'rule_field' => $bao->rule_field,
           'rule_weight' => $bao->rule_weight,
           'dedupe_rule_group_id' => $bao->dedupe_rule_group_id,
-        ])) {
+        ], $contactType)) {
           $queries["{$bao->rule_table}.{$bao->rule_field}.{$bao->rule_weight}"] = $query;
         }
       }
@@ -257,21 +258,22 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
    * Return the SQL query for the given rule - either for finding matching
    * pairs of contacts, or for matching against the $params variable (if set).
    *
-   * @internal do not call from outside tested core code. No universe uses Feb 2024.
-   *
    * @param array|null $params
    *   Params to dedupe against (queries against the whole contact set otherwise)
    * @param array $contactIDs
    *   Ids of the contacts to limit the SQL queries (whole-database queries otherwise)
    * @param array $rule
+   * @param string $contactType
    *
    * @return string
    *   SQL query performing the search
    *   or NULL if params is present and doesn't have and for a field.
    *
    * @throws \CRM_Core_Exception
+   * @internal do not call from outside tested core code. No universe uses Feb 2024.
+   *
    */
-  private static function sql($params, $contactIDs, array $rule): ?string {
+  private static function sql($params, $contactIDs, array $rule, string $contactType): ?string {
     if ($params &&
       (!array_key_exists($rule['rule_table'], $params) ||
         !array_key_exists($rule['rule_field'], $params[$rule['rule_table']])
@@ -306,14 +308,12 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
       case 'civicrm_contact':
         $id = 'id';
         //we should restrict by contact type in the first step
-        $sql = "SELECT contact_type FROM civicrm_dedupe_rule_group WHERE id = {$rule['dedupe_rule_group_id']};";
-        $ct = CRM_Core_DAO::singleValueQuery($sql);
         if ($params) {
-          $where[] = "t1.contact_type = '{$ct}'";
+          $where[] = "t1.contact_type = '{$contactType}'";
         }
         else {
-          $where[] = "t1.contact_type = '{$ct}'";
-          $where[] = "t2.contact_type = '{$ct}'";
+          $where[] = "t1.contact_type = '{$contactType}'";
+          $where[] = "t2.contact_type = '{$contactType}'";
         }
         break;
 
