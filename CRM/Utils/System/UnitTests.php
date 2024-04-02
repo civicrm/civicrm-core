@@ -192,4 +192,12 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Base {
     throw new Exception("Method not implemented: getLoginURL");
   }
 
+  /**
+   * @inheritdoc
+   */
+  public function mailingWorkflowIsEnabled():bool {
+    $enableWorkflow = Civi::settings()->get('civimail_workflow');
+    return (bool) $enableWorkflow;
+  }
+
 }
