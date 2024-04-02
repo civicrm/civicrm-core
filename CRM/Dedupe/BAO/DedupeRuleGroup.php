@@ -208,9 +208,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
 
     // Reserved Rule Groups can optionally get special treatment by
     // implementing an optimization class and returning a query array.
-    if ($this->is_reserved &&
-      CRM_Utils_File::isIncludable("CRM/Dedupe/BAO/QueryBuilder/{$this->name}.php")
-    ) {
+    if ($this->isUseReservedQuery()) {
       $command = empty($this->params) ? 'internal' : 'record';
       $queries = call_user_func(["CRM_Dedupe_BAO_QueryBuilder_{$this->name}", $command], $this);
     }
@@ -585,6 +583,28 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
     }
 
     return \Civi::$statics[__CLASS__]['rule_groups'][$rule_group_id]['contact_type'];
+  }
+
+  /**
+   * Is a file based reserved query configured.
+   *
+   * File based reserved queries were an early idea about how to optimise the dedupe queries.
+   *
+   * In theory extensions could implement them although there is no evidence any of them have.
+   * However, if these are implemented by core or by extensions we should not attempt to optimise
+   * the query by (e.g.) combining queries.
+   *
+   * In practice the queries implemented only return one query anyway
+   *
+   * @see \CRM_Dedupe_BAO_QueryBuilder_IndividualGeneral
+   * @see \CRM_Dedupe_BAO_QueryBuilder_IndividualSupervised
+   * @see \CRM_Dedupe_BAO_QueryBuilder_IndividualUnsupervised
+   *
+   * @return bool
+   */
+  private function isUseReservedQuery(): bool {
+    return $this->is_reserved &&
+      CRM_Utils_File::isIncludable("CRM/Dedupe/BAO/QueryBuilder/{$this->name}.php");
   }
 
 }
