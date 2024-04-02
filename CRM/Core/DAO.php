@@ -845,11 +845,11 @@ class CRM_Core_DAO extends DB_DataObject {
     $primaryKey = $this->getFirstPrimaryKey();
     foreach ($this->fields() as $uniqueName => $field) {
       $dbName = $field['name'];
-      if (array_key_exists($dbName, $params)) {
+      if (is_array($params) && array_key_exists($dbName, $params)) {
         $value = $params[$dbName];
         $exists = TRUE;
       }
-      elseif (array_key_exists($uniqueName, $params)) {
+      elseif (is_array($params) && array_key_exists($uniqueName, $params)) {
         $value = $params[$uniqueName];
         $exists = TRUE;
       }
