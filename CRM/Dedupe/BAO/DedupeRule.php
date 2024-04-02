@@ -25,8 +25,6 @@ class CRM_Dedupe_BAO_DedupeRule extends CRM_Dedupe_DAO_DedupeRule {
    * Return the SQL query for the given rule - either for finding matching
    * pairs of contacts, or for matching against the $params variable (if set).
    *
-   * @internal do not call from outside tested core code. No universe uses Feb 2024.
-   *
    * @param array|null $params
    *   Params to dedupe against (queries against the whole contact set otherwise)
    * @param array $contactIDs
@@ -38,8 +36,12 @@ class CRM_Dedupe_BAO_DedupeRule extends CRM_Dedupe_DAO_DedupeRule {
    *   or NULL if params is present and doesn't have and for a field.
    *
    * @throws \CRM_Core_Exception
+   *
+   * @deprecated since 5.73 will be removed around 5.80
+   * @internal do not call from outside tested core code. No universe uses Feb 2024.
    */
   public static function sql($params, $contactIDs, array $rule): ?string {
+    CRM_Core_Error::deprecatedFunctionWarning('unsed, no alternative');
     if ($params &&
       (!array_key_exists($rule['rule_table'], $params) ||
         !array_key_exists($rule['rule_field'], $params[$rule['rule_table']])
