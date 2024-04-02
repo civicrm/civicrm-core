@@ -60,6 +60,9 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
 
       $params = [
         'select' => ['*', 'dashboard_contact.*'],
+        'join' => [
+          ['DashboardContact AS dashboard_contact', 'LEFT'],
+        ],
         'where' => [
           ['domain_id', '=', 'current_domain'],
         ],
