@@ -137,7 +137,7 @@ class CRM_Dedupe_BAO_DedupeRule extends CRM_Dedupe_DAO_DedupeRule {
     }
     else {
       if ($rule['rule_length']) {
-        $from = "{$rule['rule_table']} t1 JOIN {$rule['rule_table']} t2 ON (" . implode(' AND ', $on) . ")";
+        $from = "{$rule['rule_table']} t1 INNER JOIN {$rule['rule_table']} t2 ON (" . implode(' AND ', $on) . ")";
       }
       else {
         $from = "{$rule['rule_table']} t1 INNER JOIN {$rule['rule_table']} t2 ON (" . implode(' AND ', $innerJoinClauses) . ")";
