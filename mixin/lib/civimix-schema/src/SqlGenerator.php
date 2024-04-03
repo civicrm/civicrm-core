@@ -126,9 +126,12 @@ return new class([], fn()=>NULL) {
     $constraints = [];
     foreach ($entity['getFields']() as $fieldName => $field) {
       if (!empty($field['entity_reference']['entity'])) {
-        $constraints[] = "ADD CONSTRAINT `FK_{$entity['table']}_$fieldName` FOREIGN KEY (`$fieldName`)" .
-          " REFERENCES `" . $this->getTableForEntity($field['entity_reference']['entity']) . "`(`{$field['entity_reference']['key']}`)" .
-          " ON DELETE {$field['entity_reference']['on_delete']}";
+        $constraint = "ADD CONSTRAINT `FK_{$entity['table']}_$fieldName` FOREIGN KEY (`$fieldName`)" .
+          " REFERENCES `" . $this->getTableForEntity($field['entity_reference']['entity']) . "`(`{$field['entity_reference']['key']}`)";
+        if (!empty($field['entity_reference']['on_delete'])) {
+          $constraint .= " ON DELETE {$field['entity_reference']['on_delete']}";
+        }
+        $constraints[] = $constraint;
       }
     }
     $sql = '';
