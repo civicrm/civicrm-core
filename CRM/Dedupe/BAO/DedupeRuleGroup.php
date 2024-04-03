@@ -281,17 +281,6 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
       return NULL;
     }
 
-    $innerJoinClauses = [
-      "t1.{$rule['rule_field']} IS NOT NULL",
-      "t2.{$rule['rule_field']} IS NOT NULL",
-      "t1.{$rule['rule_field']} = t2.{$rule['rule_field']}",
-    ];
-
-    if (in_array(CRM_Dedupe_BAO_DedupeRule::getFieldType($rule['rule_field'], $rule['rule_table']), CRM_Utils_Type::getTextTypes(), TRUE)) {
-      $innerJoinClauses[] = "t1.{$rule['rule_field']} <> ''";
-      $innerJoinClauses[] = "t2.{$rule['rule_field']} <> ''";
-    }
-
     $filter = self::getRuleTableFilter($rule['rule_table'], $contactType);
     $contactIDFieldName = self::getContactIDFieldName($rule['rule_table']);
 
@@ -321,20 +310,10 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
         't1.' . $filter,
         't2.' . $filter,
       ] : [];
-
-      if ($rule['rule_length']) {
-        $on = ["SUBSTR(t1.{$rule['rule_field']}, 1, {$rule['rule_length']}) = SUBSTR(t2.{$rule['rule_field']}, 1, {$rule['rule_length']})"];
-        $from = "{$rule['rule_table']} t1 JOIN {$rule['rule_table']} t2 ON (" . implode(' AND ', $on) . ")";
-      }
-      else {
-        $from = "{$rule['rule_table']} t1 INNER JOIN {$rule['rule_table']} t2 ON (" . implode(' AND ', $innerJoinClauses) . ")";
-      }
-    }
-
-    // finish building WHERE, also limit the results if requested
-    if (!$params) {
       $where[] = "t1.$contactIDFieldName < t2.$contactIDFieldName";
+      $from = "{$rule['rule_table']} t1 INNER JOIN {$rule['rule_table']} t2 ON (" . self::getRuleFieldFilter($rule) . ")";
     }
+
     $query = "SELECT $select FROM $from WHERE " . implode(' AND ', $where);
     if ($contactIDs) {
       $cids = [];
@@ -406,7 +385,35 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
     return '';
   }
 
-  public function fillTable() {
+  /**
+   * @param array $rule
+   *
+   * @return string
+   * @throws \CRM_Core_Exception
+   */
+  private static function getRuleFieldFilter(array $rule): string {
+    if ($rule['rule_length']) {
+      $on = ["SUBSTR(t1.{$rule['rule_field']}, 1, {$rule['rule_length']}) = SUBSTR(t2.{$rule['rule_field']}, 1, {$rule['rule_length']})"];
+      return "(" . implode(' AND ', $on) . ")";
+    }
+    $innerJoinClauses = [
+      "t1.{$rule['rule_field']} IS NOT NULL",
+      "t2.{$rule['rule_field']} IS NOT NULL",
+      "t1.{$rule['rule_field']} = t2.{$rule['rule_field']}",
+    ];
+
+    if (in_array(CRM_Dedupe_BAO_DedupeRule::getFieldType($rule['rule_field'], $rule['rule_table']), CRM_Utils_Type::getTextTypes(), TRUE)) {
+      $innerJoinClauses[] = "t1.{$rule['rule_field']} <> ''";
+      $innerJoinClauses[] = "t2.{$rule['rule_field']} <> ''";
+    }
+    return "(" . implode(' AND ', $innerJoinClauses) . ")";
+  }
+
+  /**
+   * @return void
+   * @throws \Civi\Core\Exception\DBQueryException
+   */
+  public function fillTable(): void {
     // get the list of queries handy
     $tableQueries = $this->tableQuery();
 
