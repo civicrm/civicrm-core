@@ -1,6 +1,11 @@
 <?php
 use CRM_CivicrmAdminUi_ExtensionUtil as E;
 
+// Temporary check can be removed when moving this file to the civi_member extension.
+if (!CRM_Core_Component::isEnabled('CiviMember')) {
+  return [];
+}
+
 return [
   [
     'name' => 'SavedSearch_Contact_Summary_Membership_Type',
