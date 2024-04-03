@@ -281,13 +281,6 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
       return NULL;
     }
 
-    // we need to initialise WHERE, ON and USING here, as some table types
-    // extend them; $where is an array of required conditions, $on and
-    // $using are arrays of required field matchings (for substring and
-    // full matches, respectively)
-    $where = [];
-    $on = ["SUBSTR(t1.{$rule['rule_field']}, 1, {$rule['rule_length']}) = SUBSTR(t2.{$rule['rule_field']}, 1, {$rule['rule_length']})"];
-
     $innerJoinClauses = [
       "t1.{$rule['rule_field']} IS NOT NULL",
       "t2.{$rule['rule_field']} IS NOT NULL",
@@ -299,48 +292,15 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
       $innerJoinClauses[] = "t2.{$rule['rule_field']} <> ''";
     }
 
-    $eidRefs = CRM_Core_DAO::getDynamicReferencesToTable('civicrm_contact');
-
-    switch ($rule['rule_table']) {
-      case 'civicrm_contact':
-        //we should restrict by contact type in the first step
-        if ($params) {
-          $where[] = "t1.contact_type = '{$contactType}'";
-        }
-        else {
-          $where[] = "t1.contact_type = '{$contactType}'";
-          $where[] = "t2.contact_type = '{$contactType}'";
-        }
-        break;
-
-      default:
-        if (array_key_exists($rule['rule_table'], $eidRefs)) {
-          $entity_table = $eidRefs[$rule['rule_table']][1];
-          if ($params) {
-            $where[] = "t1.$entity_table = 'civicrm_contact'";
-          }
-          else {
-            $where[] = "t1.$entity_table = 'civicrm_contact'";
-            $where[] = "t2.$entity_table = 'civicrm_contact'";
-          }
-        }
-        break;
-    }
+    $filter = self::getRuleTableFilter($rule['rule_table'], $contactType);
     $contactIDFieldName = self::getContactIDFieldName($rule['rule_table']);
-    // build SELECT based on the field names containing contact ids
-    // if there are params provided, id1 should be 0
-    if ($params) {
-      $select = "t1.$contactIDFieldName id1, {$rule['rule_weight']} weight";
-      $subSelect = 'id1, weight';
-    }
-    else {
-      $select = "t1.$contactIDFieldName id1, t2.$contactIDFieldName id2, {$rule['rule_weight']} weight";
-      $subSelect = 'id1, id2, weight';
-    }
 
     // build FROM (and WHERE, if it's a parametrised search)
     // based on whether the rule is about substrings or not
     if ($params) {
+      $select = "t1.$contactIDFieldName id1, {$rule['rule_weight']} weight";
+      $subSelect = 'id1, weight';
+      $where = $filter ? ['t1.' . $filter] : [];
       $from = "{$rule['rule_table']} t1";
       $str = 'NULL';
       if (isset($params[$rule['rule_table']][$rule['rule_field']])) {
@@ -355,7 +315,15 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
       }
     }
     else {
+      $select = "t1.$contactIDFieldName id1, t2.$contactIDFieldName id2, {$rule['rule_weight']} weight";
+      $subSelect = 'id1, id2, weight';
+      $where = $filter ? [
+        't1.' . $filter,
+        't2.' . $filter,
+      ] : [];
+
       if ($rule['rule_length']) {
+        $on = ["SUBSTR(t1.{$rule['rule_field']}, 1, {$rule['rule_length']}) = SUBSTR(t2.{$rule['rule_field']}, 1, {$rule['rule_length']})"];
         $from = "{$rule['rule_table']} t1 JOIN {$rule['rule_table']} t2 ON (" . implode(' AND ', $on) . ")";
       }
       else {
@@ -411,6 +379,31 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
       return \CRM_Core_DAO::getReferencesToContactTable()[$tableName][0];
     }
     throw new CRM_Core_Exception('invalid field');
+  }
+
+  /**
+   * Get any where filter that restricts the specific table.
+   *
+   * Generally this is along the lines of entity_table = civicrm_contact
+   * although for the contact table it could be the id restriction.
+   *
+   * @param string $tableName
+   * @param string $contactType
+   *
+   * @return string
+   */
+  private static function getRuleTableFilter(string $tableName, string $contactType): string {
+    if ($tableName === 'civicrm_contact') {
+      return "contact_type = '{$contactType}'";
+    }
+    $dynamicReferences = CRM_Core_DAO::getDynamicReferencesToTable('civicrm_contact')[$tableName] ?? NULL;
+    if (!$dynamicReferences) {
+      return '';
+    }
+    if (!empty(CRM_Core_DAO::getDynamicReferencesToTable('civicrm_contact')[$tableName])) {
+      return $dynamicReferences[1] . "= 'civicrm_contact'";
+    }
+    return '';
   }
 
   public function fillTable() {
