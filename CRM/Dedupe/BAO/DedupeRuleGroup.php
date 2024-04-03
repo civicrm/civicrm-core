@@ -299,12 +299,10 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
       $innerJoinClauses[] = "t2.{$rule['rule_field']} <> ''";
     }
 
-    $cidRefs = CRM_Core_DAO::getReferencesToContactTable();
     $eidRefs = CRM_Core_DAO::getDynamicReferencesToTable('civicrm_contact');
 
     switch ($rule['rule_table']) {
       case 'civicrm_contact':
-        $id = 'id';
         //we should restrict by contact type in the first step
         if ($params) {
           $where[] = "t1.contact_type = '{$contactType}'";
@@ -317,7 +315,6 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
 
       default:
         if (array_key_exists($rule['rule_table'], $eidRefs)) {
-          $id = $eidRefs[$rule['rule_table']][0];
           $entity_table = $eidRefs[$rule['rule_table']][1];
           if ($params) {
             $where[] = "t1.$entity_table = 'civicrm_contact'";
@@ -327,23 +324,17 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
             $where[] = "t2.$entity_table = 'civicrm_contact'";
           }
         }
-        elseif (array_key_exists($rule['rule_table'], $cidRefs)) {
-          $id = $cidRefs[$rule['rule_table']][0];
-        }
-        else {
-          throw new CRM_Core_Exception("Unsupported rule_table for civicrm_dedupe_rule.id of {$rule['id']}");
-        }
         break;
     }
-
+    $contactIDFieldName = self::getContactIDFieldName($rule['rule_table']);
     // build SELECT based on the field names containing contact ids
     // if there are params provided, id1 should be 0
     if ($params) {
-      $select = "t1.$id id1, {$rule['rule_weight']} weight";
+      $select = "t1.$contactIDFieldName id1, {$rule['rule_weight']} weight";
       $subSelect = 'id1, weight';
     }
     else {
-      $select = "t1.$id id1, t2.$id id2, {$rule['rule_weight']} weight";
+      $select = "t1.$contactIDFieldName id1, t2.$contactIDFieldName id2, {$rule['rule_weight']} weight";
       $subSelect = 'id1, id2, weight';
     }
 
@@ -374,7 +365,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
 
     // finish building WHERE, also limit the results if requested
     if (!$params) {
-      $where[] = "t1.$id < t2.$id";
+      $where[] = "t1.$contactIDFieldName < t2.$contactIDFieldName";
     }
     $query = "SELECT $select FROM $from WHERE " . implode(' AND ', $where);
     if ($contactIDs) {
@@ -383,11 +374,11 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
         $cids[] = CRM_Utils_Type::escape($cid, 'Integer');
       }
       if (count($cids) == 1) {
-        $query .= " AND (t1.$id = {$cids[0]}) UNION $query AND t2.$id = {$cids[0]}";
+        $query .= " AND (t1.$contactIDFieldName = {$cids[0]}) UNION $query AND t2.$contactIDFieldName = {$cids[0]}";
       }
       else {
-        $query .= " AND t1.$id IN (" . implode(',', $cids) . ")
-        UNION $query AND  t2.$id IN (" . implode(',', $cids) . ")";
+        $query .= " AND t1.$contactIDFieldName IN (" . implode(',', $cids) . ")
+        UNION $query AND  t2.$contactIDFieldName IN (" . implode(',', $cids) . ")";
       }
       // The `weight` is ambiguous in the context of the union; put the whole
       // thing in a subquery.
@@ -395,6 +386,31 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
     }
 
     return $query;
+  }
+
+  /**
+   * Get the name of the field in the table that refers to the Contact ID.
+   *
+   * e.g in civicrm_contact this is 'id' whereas in civicrm_address this is
+   * contact_id and in a custom field table it might be entity_id.
+   *
+   * @param string $tableName
+   *
+   * @return string
+   *   Usually id, contact_id or entity_id.
+   * @throws \CRM_Core_Exception
+   */
+  private static function getContactIDFieldName(string $tableName): string {
+    if ($tableName === 'civicrm_contact') {
+      return 'id';
+    }
+    if (isset(CRM_Core_DAO::getDynamicReferencesToTable('civicrm_contact')[$tableName][0])) {
+      return CRM_Core_DAO::getDynamicReferencesToTable('civicrm_contact')[$tableName][0];
+    }
+    if (isset(\CRM_Core_DAO::getReferencesToContactTable()[$tableName][0])) {
+      return \CRM_Core_DAO::getReferencesToContactTable()[$tableName][0];
+    }
+    throw new CRM_Core_Exception('invalid field');
   }
 
   public function fillTable() {

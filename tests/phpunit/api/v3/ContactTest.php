@@ -908,8 +908,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * Test creating a current employer through API.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testContactCreateCurrentEmployer(): void {
     // Here we will just do the get for set-up purposes.
