@@ -378,8 +378,9 @@ class Submit extends AbstractProcessor {
    * @throws \CRM_Core_Exception
    */
   protected static function saveJoins(AfformSubmitEvent $event, $index, $entityId, $joins) {
+    $mainEntity = $event->getFormDataModel()->getEntity($event->getEntityName());
     foreach ($joins as $joinEntityName => $join) {
-      $values = self::filterEmptyJoins($joinEntityName, $join);
+      $values = self::filterEmptyJoins($mainEntity, $joinEntityName, $join);
       // TODO: REPLACE works for creating or updating contacts, but different logic would be needed if
       // the contact was being auto-updated via a dedupe rule; in that case we would not want to
       // delete any existing records.
@@ -413,28 +414,22 @@ class Submit extends AbstractProcessor {
   /**
    * Filter out join entities that have been left blank on the form
    *
-   * @param $entity
-   * @param $join
+   * @param array $mainEntity
+   * @param string $joinEntityName
+   * @param array $join
    * @return array
    */
-  private static function filterEmptyJoins($entity, $join) {
-    $idField = CoreUtil::getIdFieldName($entity);
-    $fileFields = (array) civicrm_api4($entity, 'getFields', [
-      'checkPermissions' => FALSE,
-      'where' => [['fk_entity', '=', 'File']],
-    ], ['name']);
-    // Files will be uploaded later, fill with empty values for now
+  private static function filterEmptyJoins(array $mainEntity, string $joinEntityName, $join) {
+    $idField = CoreUtil::getIdFieldName($joinEntityName);
+    // Files will be uploaded later, fill with placeholder values for now
     // TODO: Somehow check if a file has actually been selected for upload
-    foreach ($join as &$item) {
-      if (empty($item[$idField]) && $fileFields) {
-        $item += array_fill_keys($fileFields, '');
-      }
-    }
-    return array_filter($join, function($item) use($entity, $idField, $fileFields) {
-      if (!empty($item[$idField]) || $fileFields) {
+    $fileFields = self::getFileFields($joinEntityName, $mainEntity['joins'][$joinEntityName]['fields'] ?? []);
+    return array_filter($join, function($item) use($joinEntityName, $idField, $fileFields) {
+      $item = array_merge($item, $fileFields);
+      if (!empty($item[$idField])) {
         return TRUE;
       }
-      switch ($entity) {
+      switch ($joinEntityName) {
         case 'Email':
           return !empty($item['email']);
 

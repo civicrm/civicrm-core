@@ -7,6 +7,7 @@ use Civi\Afform\Event\AfformPrefillEvent;
 use Civi\Afform\Event\AfformSubmitEvent;
 use Civi\Afform\FormDataModel;
 use Civi\API\Exception\UnauthorizedException;
+use Civi\Api4\File;
 use Civi\Api4\Generic\Result;
 use Civi\Api4\Utils\CoreUtil;
 use CRM_Afform_ExtensionUtil as E;
@@ -200,28 +201,32 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     $idField = CoreUtil::getIdFieldName($entityName);
     $params['select'] = array_unique(array_merge([$idField], array_keys($entityFields)));
     $result = (array) $api4($entityName, 'get', $params)->indexBy($idField);
-    // Check for file fields
-    $fieldInfo = civicrm_api4($entityName, 'getFields', [
-      'checkPermissions' => FALSE,
-      'action' => 'create',
-      'select' => ['name', 'fk_entity'],
-      'where' => [['name', 'IN', array_keys($entityFields)]],
-    ])->indexBy('name');
     // Fill additional info about file fields
-    foreach ($fieldInfo as $fieldName => $fieldDefn) {
-      if ($fieldDefn['fk_entity'] === 'File') {
-        foreach ($result as &$item) {
-          if (!empty($item[$fieldName])) {
-            // Fall back on APIv3 until we have an attachment API for v4.
-            $fileInfo = \CRM_Utils_Array::filterColumns(civicrm_api3('Attachment', 'get', [
-              'id' => $item[$fieldName],
-            ])['values'], ['name', 'icon']);
-            $item[$fieldName] = \CRM_Utils_Array::first($fileInfo);
-          }
+    $fileFields = $this->getFileFields($entityName, $entityFields);
+    foreach ($fileFields as $fieldName => $fieldDefn) {
+      foreach ($result as &$item) {
+        if (!empty($item[$fieldName])) {
+          $fileInfo = File::get(FALSE)
+            ->addSelect('file_name', 'icon')
+            ->addWhere('id', '=', $item[$fieldName])
+            ->execute()->first();
+          $item[$fieldName] = $fileInfo;
         }
       }
     }
     return $result;
+  }
+
+  protected static function getFileFields($entityName, $entityFields): array {
+    if (!$entityFields) {
+      return [];
+    }
+    return civicrm_api4($entityName, 'getFields', [
+      'checkPermissions' => FALSE,
+      'action' => 'create',
+      'select' => ['name'],
+      'where' => [['name', 'IN', array_keys($entityFields)], ['fk_entity', '=', 'File']],
+    ])->indexBy('name')->column('name');
   }
 
   /**
@@ -419,18 +424,54 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     $entityValues = [];
     foreach ($this->_formDataModel->getEntities() as $entityName => $entity) {
       $entityValues[$entityName] = [];
+      $fileFields = $this->getFileFields($entity['type'], $entity['fields']);
       // Gather submitted field values from $values['fields'] and sub-entities from $values['joins']
       foreach ($submittedValues[$entityName] ?? [] as $values) {
         // Only accept values from fields on the form
         $values['fields'] = array_intersect_key($values['fields'] ?? [], $entity['fields']);
+        // Unset prefilled file fields
+        foreach ($fileFields as $fileFieldName) {
+          if (isset($values['fields'][$fileFieldName]) && is_array($values['fields'][$fileFieldName])) {
+            // File was unchanged
+            if (isset($values['fields'][$fileFieldName]['file_name'])) {
+              unset($values['fields'][$fileFieldName]);
+            }
+            // File was deleted
+            elseif (array_key_exists('file_name', $values['fields'][$fileFieldName])) {
+              $values['fields'][$fileFieldName] = '';
+            }
+          }
+        }
         // Only accept joins set on the form
         $values['joins'] = array_intersect_key($values['joins'] ?? [], $entity['joins']);
         foreach ($values['joins'] as $joinEntity => &$joinValues) {
+          // Only accept values from join fields on the form
+          $idField = CoreUtil::getIdFieldName($joinEntity);
+          $allowedFields = $entity['joins'][$joinEntity]['fields'] ?? [];
+          $allowedFields[$idField] = TRUE;
+          $fileFields = $this->getFileFields($joinEntity, $allowedFields);
           // Enforce the limit set by join[max]
           $joinValues = array_slice($joinValues, 0, $entity['joins'][$joinEntity]['max'] ?? NULL);
           foreach ($joinValues as $index => $vals) {
-            // Only accept values from join fields on the form
-            $joinValues[$index] = array_intersect_key($vals, $entity['joins'][$joinEntity]['fields'] ?? []);
+            $joinValues[$index] = array_intersect_key($vals, $allowedFields);
+            // Unset prefilled file fields
+            foreach ($fileFields as $fileFieldName) {
+              if (isset($joinValues[$index][$fileFieldName]) && is_array($joinValues[$index][$fileFieldName])) {
+                // File was unchanged
+                if (isset($joinValues[$index][$fileFieldName]['file_name'])) {
+                  unset($joinValues[$index][$fileFieldName]);
+                }
+                // File was deleted
+                elseif (array_key_exists('file_name', $joinValues[$index][$fileFieldName])) {
+                  $joinValues[$index][$fileFieldName] = '';
+                }
+              }
+              // Creating new record, add placeholder value so the file upload will have an id
+              if (empty($joinValues[$index][$idField])) {
+                $joinValues[$index][$fileFieldName] = '';
+              }
+            }
+
             // Merge in pre-set data
             $joinValues[$index] = array_merge($joinValues[$index], $entity['joins'][$joinEntity]['data'] ?? []);
           }
