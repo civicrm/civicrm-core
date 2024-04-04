@@ -82,17 +82,21 @@
           ngModel.$render = function () {
             element.val(ngModel.$viewValue).change();
           };
+          let settings = angular.copy(scope.crmUiDatepicker || {});
+          // Set defaults to be non-restrictive
+          settings.start_date_years = settings.start_date_years || 100;
+          settings.end_date_years = settings.end_date_years || 100;
 
           element
-            .crmDatepicker(scope.crmUiDatepicker)
+            .crmDatepicker(settings)
             .on('change', function() {
               // Because change gets triggered from the $render function we could be either inside or outside the $digest cycle
               $timeout(function() {
-                var requiredLength = 19;
-                if (scope.crmUiDatepicker && scope.crmUiDatepicker.time === false) {
+                let requiredLength = 19;
+                if (settings.time === false) {
                   requiredLength = 10;
                 }
-                if (scope.crmUiDatepicker && scope.crmUiDatepicker.date === false) {
+                if (settings.date === false) {
                   requiredLength = 8;
                 }
                 ngModel.$setValidity('incompleteDateTime', !(element.val().length && element.val().length !== requiredLength));
