@@ -1655,12 +1655,18 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
    * @throws \CRM_Core_Exception
    */
   public static function isSubscriptionCancelled(int $membershipID): bool {
-    // Check permissions set to false 'in case' - ideally would check permissions are
-    // correct & remove.
-    return (bool) Membership::get(FALSE)
-      ->addWhere('id', '=', $membershipID)
-      ->addWhere('contribution_recur_id.contribution_status_id:name', '=', 'Cancelled')
-      ->selectRowCount()->execute()->count();
+    $isCiviContributeEnabled = CRM_Extension_System::singleton()
+      ->getManager()
+      ->isEnabled('civi_contribute');
+    if ($isCiviContributeEnabled) {
+      // Check permissions set to false 'in case' - ideally would check permissions are
+      // correct & remove.
+      return (bool) Membership::get(FALSE)
+        ->addWhere('id', '=', $membershipID)
+        ->addWhere('contribution_recur_id.contribution_status_id:name', '=', 'Cancelled')
+        ->selectRowCount()->execute()->count();
+    }
+    return FALSE;
   }
 
   /**
