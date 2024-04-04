@@ -160,8 +160,16 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
       $productDAO->id = $productID;
       $productDAO->find(TRUE);
 
+      // If the option has a key/val that are not identical, display as "label (key)"
+      // where the "key" is somewhat assumed to be the SKU of the option
+      $options = CRM_Contribute_BAO_Premium::parseProductOptions($productDAO->options);
+      $option_key = $option_label = $dao->product_option;
+      if ($option_key && !empty($options[$option_key]) && $options[$option_key] != $option_key) {
+        $option_label = $options[$option_key] . ' (' . $option_key . ')';
+      }
+
       $this->assign('premium', $productDAO->name);
-      $this->assign('option', $dao->product_option);
+      $this->assign('option', $option_label);
       $this->assign('fulfilled', $dao->fulfilled_date);
     }
 

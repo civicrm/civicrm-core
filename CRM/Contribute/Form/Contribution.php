@@ -497,9 +497,13 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if (empty($defaults['payment_instrument_id'])) {
       $defaults['payment_instrument_id'] = $this->getDefaultPaymentInstrumentId();
     }
-    $this->assign('is_test', !empty($defaults['is_test']));
 
+    $this->assign('is_test', !empty($defaults['is_test']));
+    $this->assign('email', $this->userEmail);
+    $this->assign('is_pay_later', !empty($defaults['is_pay_later']));
+    $this->assign('contribution_status_id', $defaults['contribution_status_id'] ?? NULL);
     $this->assign('showOption', TRUE);
+
     // For Premium section.
     if ($this->_premiumID) {
       $this->assign('showOption', FALSE);
@@ -507,9 +511,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       if (!$options) {
         $this->assign('showOption', TRUE);
       }
-      $options_key = CRM_Utils_Array::key($this->_productDAO->product_option, $options);
-      if ($options_key) {
-        $defaults['product_name'] = [$this->_productDAO->product_id, trim($options_key)];
+      if ($this->_productDAO->product_option) {
+        $defaults['product_name'] = [$this->_productDAO->product_id, $this->_productDAO->product_option];
       }
       else {
         $defaults['product_name'] = [$this->_productDAO->product_id];
@@ -519,9 +522,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
     }
 
-    $this->assign('is_pay_later', !empty($defaults['is_pay_later']));
-
-    $this->assign('contribution_status_id', $defaults['contribution_status_id'] ?? NULL);
     if (!empty($defaults['contribution_status_id']) && in_array(
         CRM_Contribute_PseudoConstant::contributionStatus($defaults['contribution_status_id'], 'name'),
         // Historically not 'Cancelled' hence not using CRM_Contribute_BAO_Contribution::isContributionStatusNegative.
