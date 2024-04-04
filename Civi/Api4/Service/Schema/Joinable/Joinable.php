@@ -313,17 +313,18 @@ class Joinable {
 
   public function getEntityFields(): array {
     $entityFields = [];
-    /** @var \Civi\Api4\Service\Spec\SpecGatherer $gatherer */
-    $gatherer = \Civi::container()->get('spec_gatherer');
-    $allFields = $gatherer->getAllFields($this->entity, 'get');
-    foreach ($allFields as $field) {
-      if ($field['table_name'] === $this->targetTable) {
-        // Serialized fields require a specialized join
-        if ($this->serialize) {
-          $field['serialize'] = \CRM_Core_DAO::SERIALIZE_SEPARATOR_TRIMMED;
-          $field['sql_renderer'] = ['Civi\Api4\Query\Api4SelectQuery', 'renderSerializedJoin'];
+    if (!empty($this->entity)) {
+      $gatherer = \Civi::container()->get('spec_gatherer');
+      $allFields = $gatherer->getAllFields($this->entity, 'get');
+      foreach ($allFields as $field) {
+        if ($field['table_name'] === $this->targetTable) {
+          // Serialized fields require a specialized join
+          if ($this->serialize) {
+            $field['serialize'] = \CRM_Core_DAO::SERIALIZE_SEPARATOR_TRIMMED;
+            $field['sql_renderer'] = ['Civi\Api4\Query\Api4SelectQuery', 'renderSerializedJoin'];
+          }
+          $entityFields[] = $field;
         }
-        $entityFields[] = $field;
       }
     }
     return $entityFields;
