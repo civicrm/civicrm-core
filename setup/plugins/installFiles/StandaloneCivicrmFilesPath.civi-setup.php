@@ -14,6 +14,12 @@ if (!defined('CIVI_SETUP')) {
     \Civi\Setup::log()->info(sprintf('[%s] Handle %s', basename(__FILE__), 'checkRequirements'));
     $m = $e->getModel();
 
+    if ($m->cms !== 'Standalone') {
+      // The installers on WP+J don't prepopulate $m->paths['civicrm.files'].
+      // TODO: Maybe they should? It would probably be good for all UF's to follow same codepaths for setting up the folder.
+      return;
+    }
+
     $civicrmFilesDirectory = $m->paths['civicrm.files']['path'] ?? '';
 
     if (!$civicrmFilesDirectory) {
