@@ -88,6 +88,8 @@ class GroupTest extends Api4TestBase {
   }
 
   public function testCreate(): void {
+    \Civi::settings()->set('civimail_workflow', TRUE);
+    \CRM_Core_BAO_ConfigSetting::enableAllComponents();
     $this->createLoggedInUser();
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
       'access CiviCRM',

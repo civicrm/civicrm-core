@@ -985,13 +985,22 @@ class CRM_Core_Permission {
       return [$permissionName];
     }
     try {
-      $impliedPermissions = self::basicPermissions(TRUE, TRUE)[$permissionName]['implied_by'] ?? [];
+      $permission = self::basicPermissions(TRUE, TRUE)[$permissionName] ?? NULL;
+      $impliedPermissions = array_merge([$permissionName], $permission['implied_by'] ?? []);
+      // Permission for a disabled component: always deny
+      if (!empty($permission['disabled'])) {
+        return [self::ALWAYS_DENY_PERMISSION];
+      }
+      // If it's a CiviCRM permission, then it's also implied by the master permission
+      elseif ($permission) {
+        $impliedPermissions[] = 'all CiviCRM permissions and ACLs';
+      }
     }
     // This could happen early in the boot-cycle or during upgrade
     catch (RuntimeException $e) {
-      $impliedPermissions = [];
+      $impliedPermissions = [$permissionName, 'all CiviCRM permissions and ACLs'];
     }
-    return array_merge([$permissionName, 'all CiviCRM permissions and ACLs'], $impliedPermissions);
+    return $impliedPermissions;
   }
 
   /**
@@ -1815,10 +1824,10 @@ class CRM_Core_Permission {
         $info = $component->getInfo();
         foreach ($perms as $name => $perm) {
           $perm['label'] = $info['translatedName'] . ': ' . $perm['label'];
-          $permissions[$name] = $perm;
           if (!$component->isEnabled()) {
             $perm['disabled'] = TRUE;
           }
+          $permissions[$name] = $perm;
         }
       }
     }
