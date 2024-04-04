@@ -62,14 +62,26 @@
   </a>
 </li>
 <li ng-if="$ctrl.fieldDefn.input_type === 'Date' && $ctrl.hasDefaultValue">
-  <div ng-click="setDefaultDateType(); $event.stopPropagation(); $event.target.blur();" class="af-gui-field-select-in-dropdown form-inline">
-    <select class="form-control" ng-model="getSet('default_date_type')" ng-model-options="{getterSetter: true}">
+  <div ng-click="$event.stopPropagation();" class="af-gui-field-select-in-dropdown form-inline">
+    <select class="form-control" ng-model="$ctrl.defaultDateType" ng-model-options="{getterSetter: true}">
       <option value="fixed">{{:: ts('Pick Date') }}</option>
       <option value="now">{{:: ts('Now') }}</option>
+      <option value="relative">{{:: ts('Relative') }}</option>
     </select>
   </div>
 </li>
-<li ng-if="$ctrl.hasDefaultValue && $ctrl.defaultDateType !== 'now'">
+<li ng-if="$ctrl.hasDefaultValue && $ctrl.defaultDateType() === 'relative'">
+  <form ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown form-inline">
+    <label>{{ ts('Now') + ($ctrl.defaultDateOffset() < 0 ? '' : ' +') }}</label>
+    <input class="form-control" type="number" ng-model="$ctrl.defaultDateOffset" ng-model-options="{getterSetter: true}">
+    <select class="form-control" ng-model="$ctrl.defaultDateUnit" ng-model-options="{getterSetter: true}">
+      <option value="day">{{ $ctrl.defaultDatePlural() ? ts('Days') : ts('Day') }}</option>
+      <option value="week">{{ $ctrl.defaultDatePlural() ? ts('Weeks') : ts('Week') }}</option>
+      <option value="year">{{ $ctrl.defaultDatePlural() ? ts('Years') : ts('Year') }}</option>
+    </select>
+  </form>
+</li>
+<li ng-if="$ctrl.hasDefaultValue && $ctrl.defaultDateType() === 'fixed'">
   <form ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown form-inline">
     <input class="form-control" af-gui-field-value="$ctrl.fieldDefn" ng-model="getSet('afform_default')" ng-model-options="{getterSetter: true}" >
   </form>
