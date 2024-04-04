@@ -27,7 +27,7 @@ class AfformFileUploadTest extends AfformUsageTestCase {
     <afblock-name-individual></afblock-name-individual>
     <af-field name="MyInfo.single_file_field"></af-field>
     <div af-join="Custom_MyFiles" af-repeat="Add" max="3">
-      <afjoin-custom-my-files></afjoin-custom-my-files>
+      <afblock-custom-my-files></afblock-custom-my-files>
     </div>
   </fieldset>
   <button class="af-button btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
