@@ -738,6 +738,9 @@
   name        : Josh Corlew
   organization: AGH Strategies
 
+- github      : JamesBugden314
+  name        : James Bugden
+
 - name        : Jane Hanley
   organization: AGH Strategies
 
@@ -850,6 +853,10 @@
 - github      : Kajakaran
   name        : Kajakaran Balakrishnan
   organization: Veda Consulting
+
+- github      : kapn1966
+  name        : Keith Nunn
+  organization: kapn*net Technology Services
 
 - github      : kartik1000
   name        : Kartik Kathuria
@@ -1756,7 +1763,7 @@
 
 - github      : jofranz
   name        : Johannes Franz
-  organization: SYSTOPIA
+  organization: Systopia
 
 - github      : mikeybeck
   name        : Mike Beck
