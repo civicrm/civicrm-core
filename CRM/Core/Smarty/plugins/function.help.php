@@ -16,17 +16,24 @@
  */
 
 /**
- * Adds inline help
+ * Adds inline help.
+ *
+ * This function adds a call to the js function which loads the help text in a pop-up.
+ *
+ * It does a lot of work to get the title which it passes into the crmHelp function
+ * but the main reason it gets that title is because it adds that to the css as
+ * title & aria-label. Since it's loaded it somewhat makes sense to pass it into
+ * CRM.help but .. it's confusing.
  *
  * @param array $params
  *   The function params.
- * @param CRM_Core_Smarty $smarty
- *   Reference to the smarty object.
+ * @param Smarty $smarty
+ *   Smarty object.
  *
  * @return string
  *   the help html to be inserted
  */
-function smarty_function_help($params, &$smarty) {
+function smarty_function_help($params, $smarty) {
   if (!isset($params['id']) || !isset($smarty->getTemplateVars()['config'])) {
     return NULL;
   }
@@ -41,7 +48,11 @@ function smarty_function_help($params, &$smarty) {
   $params['file'] = str_replace(['.tpl', '.hlp'], '', $params['file']);
   $fieldID = str_replace('-', '_', preg_replace('/^id-/', '', $params['id']));
 
-  if (empty($params['title'])) {
+  if (!empty($params['title'])) {
+    // Passing in title is preferable..... ideally we would always pass in title & remove from the .hlp files....
+    $helpTextTitle = trim(strip_tags($params['title'])) ?: $vars['form'][$fieldID]['textLabel'] ?? '';
+  }
+  else {
     $vars = $smarty->getTemplateVars();
 
     // The way this works is a bit bonkers. All the .hlp files are expecting an
@@ -62,28 +73,36 @@ function smarty_function_help($params, &$smarty) {
       // overwrite it, so only do this if not already set.
       $temporary_vars += ['params' => []];
     }
-    // Note fetchWith adds the temporary ones to the existing scope but then
-    // will reset, unsetting them if not already present before, which is what
-    // we want here.
-    $name = trim($smarty->fetchWith($params['file'] . '.hlp', $temporary_vars)) ?: $vars['form'][$fieldID]['textLabel'] ?? '';
-    $additionalTPLFile = $params['file'] . '.extra.hlp';
-    if ($smarty->template_exists($additionalTPLFile)) {
-      $extraoutput = trim($smarty->fetch($additionalTPLFile));
-      if ($extraoutput) {
-        // Allow override param to replace default text e.g. {hlp id='foo' override=1}
-        $name = ($smarty->getTemplateVars('override_help_text') || empty($name)) ? $extraoutput : $name . ' ' . $extraoutput;
-      }
-    }
 
-    // Ensure we didn't change any existing vars CRM-11900
-    foreach ($vars as $key => $value) {
-      if ($smarty->getTemplateVars($key) !== $value) {
-        $smarty->assign($key, $value);
+    $helpFile = $params['file'] . '.hlp';
+    $additionalFile = $params['file'] . '.extra.hlp';
+    $coreSmarty = CRM_Core_Smarty::singleton();
+    $directories = $coreSmarty->getTemplateDir();
+    $helpText = '';
+    foreach ($directories as $directory) {
+      if (CRM_Utils_File::isIncludable($directory . $helpFile)) {
+        $helpText = file_get_contents($directory . $helpFile);
+        break;
       }
     }
-  }
-  else {
-    $name = trim(strip_tags($params['title'])) ?: $vars['form'][$fieldID]['textLabel'] ?? '';
+    $additionalTexts = [];
+    foreach ($directories as $directory) {
+      if (CRM_Utils_File::isIncludable($directory . $additionalFile)) {
+        $additionalTexts[] = file_get_contents($directory . $additionalFile);
+        break;
+      }
+    }
+    try {
+      $coreSmarty->pushScope($temporary_vars);
+      $helpTextTitle = trim(CRM_Utils_String::parseOneOffStringThroughSmarty($helpText) ?: $vars['form'][$fieldID]['textLabel'] ?? '');
+      foreach ($additionalTexts as $additionalText) {
+        $additionalTextTitle = trim(CRM_Utils_String::parseOneOffStringThroughSmarty($additionalText));
+        $helpTextTitle = ($smarty->getTemplateVars('override_help_text') || empty($helpTextTitle)) ? $additionalTextTitle : $helpTextTitle . ' ' . $additionalTextTitle;
+      }
+    }
+    finally {
+      $coreSmarty->popScope();
+    }
   }
 
   $class = "helpicon";
@@ -92,14 +111,14 @@ function smarty_function_help($params, &$smarty) {
   }
 
   // Escape for html
-  $title = htmlspecialchars(ts('%1 Help', [1 => $name]));
+  $title = htmlspecialchars(ts('%1 Help', [1 => $helpTextTitle]));
   // Escape for html and js
-  $name = htmlspecialchars(json_encode($name), ENT_QUOTES);
+  $helpTextTitle = htmlspecialchars(json_encode($helpTextTitle), ENT_QUOTES);
 
   // Format params to survive being passed through json & the url
   unset($params['text'], $params['title']);
   foreach ($params as &$param) {
     $param = is_bool($param) || is_numeric($param) ? (int) $param : (string) $param;
   }
-  return '<a class="' . $class . '" title="' . $title . '" aria-label="' . $title . '" href="#" onclick=\'CRM.help(' . $name . ', ' . json_encode($params) . '); return false;\'>&nbsp;</a>';
+  return '<a class="' . $class . '" title="' . $title . '" aria-label="' . $title . '" href="#" onclick=\'CRM.help(' . $helpTextTitle . ', ' . json_encode($params) . '); return false;\'>&nbsp;</a>';
 }
