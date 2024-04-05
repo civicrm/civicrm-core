@@ -361,6 +361,7 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
       'comments' => FALSE,
     ];
     $info = array_merge($defaultKeys, $info);
+    $info['is_stable'] = $info['develStage'] === 'stable' && !preg_match(";(alpha|beta|dev);", $info['version']);
     foreach ($info['authors'] as &$author) {
       $author = array_merge(['homepage' => ''], $author);
     }
