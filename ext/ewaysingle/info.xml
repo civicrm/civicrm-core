@@ -14,8 +14,8 @@
     <url desc="Support">https://github.com/civicrm/civicrm-core/blob/master/ext/ewaysingle</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
-  <releaseDate>2024-03-06</releaseDate>
-  <version>5.73.alpha1</version>
+  <releaseDate>2024-04-04</releaseDate>
+  <version>5.73.beta1</version>
   <tags>
     <tag>mgmt:hidden</tag>
   </tags>
