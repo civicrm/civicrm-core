@@ -160,6 +160,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
   /**
    * Price set as an array
+   *
    * @var array
    */
   public $_priceSet;
@@ -213,6 +214,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * @var bool
    */
   private $_payNow;
+
+  private $order;
 
   /**
    * Explicitly declare the form context.
@@ -930,32 +933,45 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   }
 
   /**
+   * @throws \CRM_Core_Exception
+   */
+  protected function getOrder(): CRM_Financial_BAO_Order {
+    if (!$this->order) {
+      $this->initializeOrder();
+    }
+    return $this->order;
+  }
+
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  protected function initializeOrder(): void {
+    $this->order = new CRM_Financial_BAO_Order();
+    $this->order->setPriceSetID($this->getPriceSetID());
+    $this->order->setForm($this);
+    $this->order->setPriceSelectionFromUnfilteredInput($this->getSubmittedValues());
+  }
+
+  /**
+   * Get the form context.
+   *
+   * This is important for passing to the buildAmount hook as CiviDiscount checks it.
+   *
+   * @return string
+   */
+  public function getFormContext(): string {
+    return 'contribution';
+  }
+
+  /**
    * Build the price set form.
    */
   private function buildPriceSet(): void {
-    $priceSetId = $this->getPriceSetID();
     $form = $this;
-    $component = 'contribution';
-    $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($priceSetId, TRUE, FALSE);
-    $form->_priceSet = $priceSet[$priceSetId] ?? NULL;
-    $validPriceFieldIds = array_keys($form->_priceSet['fields']);
-
-    $form->_priceSet['id'] ??= $priceSetId;
-    $form->assign('priceSet', $form->_priceSet);
-
-    $feeBlock = &$form->_priceSet['fields'];
-
-    // Call the buildAmount hook.
-    CRM_Utils_Hook::buildAmount($component ?? 'contribution', $form, $feeBlock);
-
-    $hideAdminValues = !CRM_Core_Permission::check('edit contributions');
-    // CRM-14492 Admin price fields should show up on event registration if user has 'administer CiviCRM' permissions
-    $adminFieldVisible = CRM_Core_Permission::check('administer CiviCRM');
-    $checklifetime = FALSE;
-    foreach ($feeBlock as $id => $field) {
+    $this->_priceSet = $this->getOrder()->getPriceSetMetadata();
+    foreach ($this->getPriceFieldMetaData() as $id => $field) {
       $options = $field['options'] ?? NULL;
-
-      if (!is_array($options) || !in_array($id, $validPriceFieldIds)) {
+      if (!is_array($options)) {
         continue;
       }
 
@@ -970,6 +986,29 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         );
       }
     }
+    $form->assign('priceSet', $form->_priceSet);
+  }
+
+  /**
+   * Get price field metadata.
+   *
+   * The returned value is an array of arrays where each array
+   * is an id-keyed price field and an 'options' key has been added to that
+   * array for any options.
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @return array
+   */
+  public function getPriceFieldMetaData(): array {
+    if (!empty($this->_priceSet['fields'])) {
+      return $this->_priceSet['fields'];
+    }
+
+    $this->_priceSet['fields'] = $this->getOrder()->getPriceFieldsMetadata();
+    return $this->_priceSet['fields'];
   }
 
   /**
