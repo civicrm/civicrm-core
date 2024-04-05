@@ -666,6 +666,7 @@ class CRM_Financial_BAO_Payment {
    * @throws \CRM_Core_Exception
    */
   protected static function getNewFinancialItemID($lineItem, $trxn_date, $contactID, $currency): int {
+    throw new CRM_Core_Exception('tada');
     $financialAccount = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(
       $lineItem['financial_type_id'],
       'Income Account Is'
