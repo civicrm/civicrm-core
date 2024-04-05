@@ -1,7 +1,7 @@
 (function(angular, $, _) {
 
   angular.module('crmMailingAB').controller('CrmMailingABWinnerDialogCtrl', function($scope, $timeout, dialogService, crmMailingMgr, crmStatus) {
-    var ts = $scope.ts = CRM.ts(null);
+    var ts = $scope.ts = CRM.ts('civi_mail');
     var abtest = $scope.abtest = $scope.model.abtest;
     var mailingName = $scope.model.mailingName;
 

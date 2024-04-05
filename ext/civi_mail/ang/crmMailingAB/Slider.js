@@ -12,7 +12,7 @@
         var sliderTests = $('.slider-test', element);
         var sliderWin = $('.slider-win', element);
 
-        scope.ts = CRM.ts(null);
+        scope.ts = CRM.ts('civi_mail');
         scope.testValue = 0;
         scope.winValue = 100;
 
