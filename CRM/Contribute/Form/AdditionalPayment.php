@@ -335,7 +335,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       'pan_truncation' => substr((string) $this->getSubmittedValue('credit_card_number'), -4),
       'trxn_result_code' => $paymentResult['trxn_result_code'] ?? NULL,
       'payment_instrument_id' => $this->getSubmittedValue('payment_instrument_id'),
-      'trxn_id' => $paymentResult['trxn_id'] ?? NULL,
+      'trxn_id' => $paymentResult['trxn_id'] ?? ($this->getSubmittedValue('trxn_id') ?? NULL),
       'trxn_date' => $this->getSubmittedValue('trxn_date'),
       // This form sends payment notification only, for historical reasons.
       'is_send_contribution_notification' => FALSE,
