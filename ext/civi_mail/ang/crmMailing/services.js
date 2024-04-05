@@ -639,7 +639,7 @@
             scope.mailing = newValue;
           });
           scope.crmMailingConst = CRM.crmMailing;
-          scope.ts = CRM.ts(null);
+          scope.ts = CRM.ts('civi_mail');
           scope.hs = crmUiHelp({file: 'CRM/Mailing/MailingUI'});
           scope.checkPerm = CRM.checkPerm;
           scope[directiveName] = attr[directiveName] ? scope.$parent.$eval(attr[directiveName]) : {};

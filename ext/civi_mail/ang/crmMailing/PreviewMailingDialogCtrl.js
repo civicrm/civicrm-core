@@ -6,7 +6,7 @@
   //   - "body_html"
   //   - "body_text"
   angular.module('crmMailing').controller('PreviewMailingDialogCtrl', function PreviewMailingDialogCtrl($scope) {
-    $scope.ts = CRM.ts(null);
+    $scope.ts = CRM.ts('civi_mail');
   });
 
 })(angular, CRM.$, CRM._);

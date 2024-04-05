@@ -19,7 +19,7 @@
           scope.abtest = model(scope.$parent);
           scope.crmMailingConst = CRM.crmMailing;
           scope.crmMailingABCriteria = crmMailingABCriteria;
-          scope.ts = CRM.ts(null);
+          scope.ts = CRM.ts('civi_mail');
           scope.hs = crmUiHelp({file: 'CRM/Mailing/MailingUI'});
 
           var fieldsModel = $parse(attr[directiveName]);
