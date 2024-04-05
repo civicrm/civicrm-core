@@ -15,7 +15,7 @@
           scope.attachments = newValue;
         });
         scope.crmMailingConst = CRM.crmMailing;
-        scope.ts = CRM.ts(null);
+        scope.ts = CRM.ts('civi_mail');
         scope.previewMailing = function previewMailing(mailing, mode) {
           return crmMailingPreviewMgr.preview(mailing, mode);
         };
