@@ -499,7 +499,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     $this->assign('is_test', !empty($defaults['is_test']));
-    $this->assign('email', $this->userEmail);
+    $this->assign('email', $this->getContactValue('email_primary.email'));
     $this->assign('is_pay_later', !empty($defaults['is_pay_later']));
     $this->assign('contribution_status_id', $defaults['contribution_status_id'] ?? NULL);
     $this->assign('showOption', TRUE);
