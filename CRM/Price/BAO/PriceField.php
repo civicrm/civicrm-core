@@ -783,7 +783,7 @@ WHERE  id IN (" . implode(',', array_keys($priceFields)) . ')';
     $taxAmount = $opt['tax_amount'] ?? NULL;
     if ($isDisplayAmounts) {
       $optionLabel = !empty($optionLabel) ? $optionLabel . '<span class="crm-price-amount-label-separator">&nbsp;-&nbsp;</span>' : '';
-      if (isset($taxAmount) && $invoicing) {
+      if ($opt['tax_amount'] && $invoicing) {
         $optionLabel = $optionLabel . self::getTaxLabel($opt, $valueFieldName);
       }
       else {
