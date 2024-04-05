@@ -34,6 +34,17 @@ class CRM_Core_Permission_Standalone extends CRM_Core_Permission_Base {
   public $permissions = NULL;
 
   /**
+   * @inheritdoc
+   * on Standalone we don't want to add any "synthetic" cms permissions
+   * because we have concrete equivalents, provided by e.g. standaloneusers extension
+   * so we override the base class to suppress the synthetic ones
+   *
+   */
+  public function getAvailablePermissions() {
+    return [];
+  }
+
+  /**
    * Given a permission string, check for access requirements.
    *
    * Note this differs from CRM_Core_Permission::check() which handles

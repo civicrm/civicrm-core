@@ -103,7 +103,7 @@ class CRM_Core_Permission_WordPress extends CRM_Core_Permission_Base {
       $wpCaps = array_unique(array_merge(array_keys($wpRole['capabilities']), $wpCaps));
     }
 
-    $permissions = [];
+    $permissions = parent::getAvailablePermissions();
     foreach ($wpCaps as $wpCap) {
       if (!in_array($wpCap, $mungedCorePerms)) {
         $permissions["WordPress:$wpCap"] = [
