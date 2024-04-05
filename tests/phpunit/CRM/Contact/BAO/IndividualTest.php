@@ -127,41 +127,29 @@ class CRM_Contact_BAO_IndividualTest extends CiviUnitTestCase {
    */
   public static function displayFormatCases(): array {
     return [
-      'Nick name with tilde' => ['{contact.first_name}{ }{contact.last_name}{ ~ }{contact.nick_name}', TRUE, FALSE],
-      'Empty nick name' => ['{contact.first_name}{ }{contact.last_name}{ ~ }{contact.nick_name}', FALSE, FALSE],
-      'No Nick Name but Prefix' => ['{contact.individual_prefix}{ }{contact.first_name}{ }{contact.middle_name}{ }{contact.last_name}{ }{contact.individual_suffix}{ ~ }{contact.nick_name}', FALSE, TRUE],
+      'Nick name with tilde' => ['{contact.first_name}{ }{contact.last_name}{ ~ }{contact.nick_name}', 'Michael Jackson ~ Mick'],
+      'Empty nick name' => ['{contact.first_name}{ }{contact.last_name}{ ~ }{contact.nick_name}', 'Michael Jackson', ['nick_name' => '']],
+      'No Nick Name but Prefix' => ['{contact.individual_prefix}{ }{contact.first_name}{ }{contact.middle_name}{ }{contact.last_name}{ }{contact.individual_suffix}{ ~ }{contact.nick_name}', 'Mr. Michael Jackson Jr.', ['nick_name' => '']],
     ];
   }
 
   /**
    * @dataProvider displayFormatCases
    */
-  public function testGenerateDisplayNameCustomFormats(string $displayNameFormat, bool $includeNickName, bool $includePrefix): void {
-    $params = [
+  public function testGenerateDisplayNameCustomFormats(string $displayNameFormat, string $expected, $contactValues = []): void {
+    $params = $contactValues + [
       'contact_type' => 'Individual',
       'first_name' => 'Michael',
       'last_name' => 'Jackson',
       'individual_prefix' => 'Mr.',
       'individual_suffix' => 'Jr.',
+      'nick_name' => 'Mick',
     ];
-    if ($includeNickName) {
-      $params['nick_name'] = 'Mick';
-    }
     \Civi::settings()->set('display_name_format', $displayNameFormat);
     $contact = new CRM_Contact_DAO_Contact();
 
     CRM_Contact_BAO_Individual::format($params, $contact);
-    if ($includeNickName) {
-      $this->assertEquals('Michael Jackson ~ Mick', $contact->display_name);
-    }
-    else {
-      if ($includePrefix) {
-        $this->assertEquals('Mr. Michael Jackson Jr.', $contact->display_name);
-      }
-      else {
-        $this->assertEquals('Michael Jackson', $contact->display_name);
-      }
-    }
+    $this->assertEquals($expected, $contact->display_name);
     \Civi::settings()->set('display_name_format', \Civi::settings()->getDefault('display_name_format'));
   }
 
