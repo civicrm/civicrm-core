@@ -4,7 +4,7 @@
   // Note: Expects $scope.model to be an object with properties:
   //   - recipients: array of contacts
   angular.module('crmMailing').controller('PreviewRecipCtrl', function($scope) {
-    $scope.ts = CRM.ts(null);
+    $scope.ts = CRM.ts('civi_mail');
   });
 
 })(angular, CRM.$, CRM._);

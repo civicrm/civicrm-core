@@ -244,7 +244,7 @@
 
     (function init () {
 
-      ts = $scope.ts = CRM.ts(null);
+      ts = $scope.ts = CRM.ts('civi_case');
       $scope.hs = crmUiHelp({file: 'CRM/Case/CaseType'});
       $scope.locks = { caseTypeName: true, activitySetName: true };
       $scope.workflows = { timeline: 'Timeline', sequence: 'Sequence' };
@@ -715,7 +715,7 @@
   });
 
   crmCaseType.controller('CaseTypeListCtrl', function($scope, crmApi, caseTypes) {
-    var ts = $scope.ts = CRM.ts(null);
+    var ts = $scope.ts = CRM.ts('civi_case');
 
     $scope.caseTypes = caseTypes.values;
     $scope.toggleCaseType = function (caseType) {
