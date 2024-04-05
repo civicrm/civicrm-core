@@ -115,7 +115,7 @@ trait CRM_Contribute_Form_ContributeFormTrait {
   }
 
   /**
-   * Get the selected Contribution ID.
+   * Get the selected Contribution Recur ID.
    *
    * @api This function will not change in a minor release and is supported for
    * use outside of core. This annotation / external support for properties
@@ -124,7 +124,7 @@ trait CRM_Contribute_Form_ContributeFormTrait {
    * @noinspection PhpUnhandledExceptionInspection
    */
   public function getContributionRecurID(): ?int {
-    throw new CRM_Core_Exception('`getContributionID` must be implemented');
+    throw new CRM_Core_Exception('`getContributionRecurID` must be implemented');
   }
 
 }
