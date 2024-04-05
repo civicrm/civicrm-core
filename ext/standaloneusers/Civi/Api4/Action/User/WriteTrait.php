@@ -103,7 +103,7 @@ trait WriteTrait {
         throw new UnauthorizedException("Unauthorized");
       }
       else {
-        $changingOtherUser = ($values['id'] ?? FALSE) !== $loggedInUserID;
+        $changingOtherUser = intval($values['id'] ?? FALSE) !== $loggedInUserID;
         if ($changingOtherUser && !$hasAdminPermission) {
           throw new UnauthorizedException("You are not permitted to change other users' accounts.");
         }
