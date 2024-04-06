@@ -5,6 +5,8 @@ namespace Civi\Financialacls;
 use Civi\Api4\PriceField;
 use Civi\Api4\PriceSet;
 use Civi\Api4\PriceFieldValue;
+use Civi\Test\FormTrait;
+use Civi\Test\FormWrapper;
 
 // I fought the Autoloader and the autoloader won.
 require_once 'BaseTestClass.php';
@@ -15,6 +17,7 @@ require_once 'BaseTestClass.php';
  * @group headless
  */
 class BuildAmountHookTest extends BaseTestClass {
+  use FormTrait;
 
   /**
    * Test api applies permissions on line item actions (delete & get).
@@ -32,11 +35,9 @@ class BuildAmountHookTest extends BaseTestClass {
       ['financial_type_id:name' => 'Member Dues', 'name' => 'b', 'label' => 'b', 'amount' => 2],
     ])->setDefaults(['price_field_id' => '$id']))->execute();
     $this->setupLoggedInUserWithLimitedFinancialTypeAccess();
-    $form = new \CRM_Member_Form_Membership();
-    $form->controller = new \CRM_Core_Controller();
-    $form->set('priceSetId', $priceSet['id']);
-    \CRM_Price_BAO_PriceSet::buildPriceSet($form);
-    $priceField = reset($form->_priceSet['fields']);
+    $form = $this->getTestForm('CRM_Member_Form_Membership', ['price_set_id' => $priceSet['id']])->processForm(FormWrapper::CONSTRUCTED);
+    $fields = $form->getPriceFieldMetadata();
+    $priceField = reset($fields);
     $this->assertCount(1, $priceField['options']);
     $this->assertEquals('a', reset($priceField['options'])['name']);
   }

@@ -789,6 +789,44 @@ DESC limit 1");
   }
 
   /**
+   * Get price field metadata.
+   *
+   * The returned value is an array of arrays where each array
+   * is an id-keyed price field and an 'options' key has been added to that
+   * array for any options.
+   *
+   * @api  - this is not yet being used by the form - only by a test but
+   * follows standard methodology so should stay the same.
+   *
+   * @return array
+   */
+  public function getPriceFieldMetaData(): array {
+    $this->_priceSet['fields'] = $this->getOrder()->getPriceFieldsMetadata();
+    return $this->_priceSet['fields'];
+  }
+
+  /**
+   * @return \CRM_Financial_BAO_Order
+   * @throws \CRM_Core_Exception
+   */
+  protected function getOrder(): CRM_Financial_BAO_Order {
+    if (!$this->order) {
+      $this->initializeOrder();
+    }
+    return $this->order;
+  }
+
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  protected function initializeOrder(): void {
+    $this->order = new CRM_Financial_BAO_Order();
+    $this->order->setPriceSetID($this->getPriceSetID());
+    $this->order->setForm($this);
+    $this->order->setPriceSelectionFromUnfilteredInput($this->getSubmittedValues());
+  }
+
+  /**
    * Process the form submission.
    *
    * @throws \CRM_Core_Exception
