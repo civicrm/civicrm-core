@@ -256,7 +256,7 @@ if (!defined('CIVICRM_UF_BASEURL')) {
 /**
  * Specify a Smarty 3 autoload file.
  *
- * Smarty3 is the version of Smarty we are in the process of adopting. To enable it
+ * Smarty5 is the version of Smarty we are in the process of adopting. To enable it
  * un-comment the line describing the path. Note that this will become always enabled in
  * the near future - this opt-in setting is transitional.
  */
@@ -264,10 +264,10 @@ if (!defined('CIVICRM_SMARTY_AUTOLOAD_PATH')) {
   // enable by default for dev & demo sites for now - will soon enable by default for all new installs.
   if (strpos(CIVICRM_UF_BASEURL, 'localhost') !== FALSE || strpos(CIVICRM_UF_BASEURL, 'demo.civicrm.org') !== FALSE) {
     if (is_dir($civicrm_root . '/packages')) {
-      define('CIVICRM_SMARTY_AUTOLOAD_PATH', $civicrm_root . '/packages/smarty4/vendor/autoload.php');
+      define('CIVICRM_SMARTY_AUTOLOAD_PATH', $civicrm_root . '/packages/smarty5/Smarty.php');
     }
     elseif (is_dir($civicrm_root . '/../civicrm-packages')) {
-      define('CIVICRM_SMARTY_AUTOLOAD_PATH', $civicrm_root . '/../civicrm-packages/smarty4/vendor/autoload.php');
+      define('CIVICRM_SMARTY_AUTOLOAD_PATH', $civicrm_root . '/../civicrm-packages/smarty5/Smarty.php');
     }
   }
 }
