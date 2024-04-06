@@ -720,15 +720,9 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   public function testSubmitPartialPayment(string $thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);
     // Step 1: submit a partial payment for a membership via backoffice
-    $form = $this->getForm();
-    $form->preProcess();
-    $mailUtil = new CiviMailUtils($this, TRUE);
-    $this->createLoggedInUser();
-    $priceSet = $this->callAPISuccess('PriceSet', 'Get', ["extends" => "CiviMember"]);
-    $form->set('priceSetId', $priceSet['id']);
 
-    CRM_Price_BAO_PriceSet::buildPriceSet($form);
-    $params = [
+    $this->createLoggedInUser();
+    $this->getTestForm('CRM_Member_Form_Membership', [
       'contact_id' => $this->ids['Contact']['individual_0'],
       'join_date' => date('Y-m-d'),
       'start_date' => '',
@@ -743,9 +737,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       //Member dues, see data.xml
       'financial_type_id' => '2',
       'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
-    ];
-    $form->_contactID = $this->ids['Contact']['individual_0'];
-    $form->testSubmit($params);
+    ])->processForm();
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->ids['Contact']['individual_0']]);
     // check the membership status after partial payment, if its Pending
     $this->assertEquals(array_search('Pending', CRM_Member_PseudoConstant::membershipStatus(), TRUE), $membership['status_id']);
