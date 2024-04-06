@@ -499,10 +499,8 @@ emo
     $this->assertEquals(2, $activities['count']);
     $this->assertEquals($html[1], $activities['values'][0]['details']);
     $this->assertEquals($html[2], $activities['values'][1]['details']);
-    // Checking it is not called multiple times.
-    // once for each contact create + once for the activities.
-    // By calling the cached function we can get this down to 1
-    $this->assertEquals(3, $this->hookTokensCalled);
+    // Checking the cacheable hook is not called multiple times.
+    $this->assertEquals(1, $this->hookTokensCalled);
     $mailUtil->checkAllMailLog($html);
 
   }
