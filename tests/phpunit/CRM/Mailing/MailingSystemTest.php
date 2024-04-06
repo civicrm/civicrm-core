@@ -154,7 +154,7 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_MailingSystemTestBase {
   }
 
   /**
-   * @throws \CRM_Core_Exception
+   * Test the auto-respond email, including token presence.
    */
   public function testMailingReplyAutoRespond(): void {
     // Because our parent class marks the _groupID as private, we can't use that :-(
