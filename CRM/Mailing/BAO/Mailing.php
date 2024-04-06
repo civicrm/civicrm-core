@@ -892,9 +892,9 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    *   Array of message headers to update, in-out.
    * @param string $prefix
    *   Prefix for the message ID, use same prefixes as verp.
-   *                                wherever possible
-   * @param string $job_id
-   *   Job ID component of the generated message ID.
+   *   wherever possible
+   * @param null $theVoid
+   *   Stare into the abyss.
    * @param string $event_queue_id
    *   Event Queue ID component of the generated message ID.
    * @param string $hash
@@ -902,7 +902,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    *
    * @return void
    */
-  public static function addMessageIdHeader(&$headers, $prefix, $job_id, $event_queue_id, $hash) {
+  public static function addMessageIdHeader(&$headers, $prefix, $theVoid, $event_queue_id, $hash): void {
     $config = CRM_Core_Config::singleton();
     $localpart = CRM_Core_BAO_MailSettings::defaultLocalpart();
     $emailDomain = CRM_Core_BAO_MailSettings::defaultDomain();

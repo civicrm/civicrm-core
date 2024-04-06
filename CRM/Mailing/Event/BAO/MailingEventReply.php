@@ -200,7 +200,6 @@ class CRM_Mailing_Event_BAO_MailingEventReply extends CRM_Mailing_Event_DAO_Mail
     $eq = CRM_Core_DAO::executeQuery(
       'SELECT
                   email.email as email,
-                  queue.job_id as job_id,
                   queue.hash as hash
         FROM civicrm_contact contact
         INNER JOIN  civicrm_mailing_event_queue queue ON queue.contact_id = contact.id
@@ -243,7 +242,7 @@ class CRM_Mailing_Event_BAO_MailingEventReply extends CRM_Mailing_Event_DAO_Mail
       $params['text'] = $tokenProcessor->getRow(0)->render('body_text');
     }
 
-    CRM_Mailing_BAO_Mailing::addMessageIdHeader($params, 'a', $eq->job_id, $queue_id, $eq->hash);
+    CRM_Mailing_BAO_Mailing::addMessageIdHeader($params, 'a', NULL, $queue_id, $eq->hash);
     if (CRM_Core_BAO_MailSettings::includeMessageId()) {
       $params['messageId'] = $params['Message-ID'];
     }
