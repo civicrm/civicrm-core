@@ -236,7 +236,8 @@ WHERE  inst.report_id = %1";
     // Replace internal header names with friendly ones, where available.
     foreach ($columnHeaders as $header) {
       if (isset($form->_columnHeaders[$header])) {
-        $headers[] = '"' . html_entity_decode(strip_tags($form->_columnHeaders[$header]['title'])) . '"';
+        $title = $form->_columnHeaders[$header]['title'] ?? '';
+        $headers[] = '"' . html_entity_decode(strip_tags($title)) . '"';
       }
     }
     // Add the headers.
