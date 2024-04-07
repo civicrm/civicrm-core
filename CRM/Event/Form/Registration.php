@@ -288,12 +288,24 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
     $this->showPaymentOnConfirm = (in_array($this->_eventId, \Civi::settings()->get('event_show_payment_on_confirm')) || in_array('all', \Civi::settings()->get('event_show_payment_on_confirm')));
     $this->assign('showPaymentOnConfirm', $this->showPaymentOnConfirm);
+    $priceSetID = $this->getPriceSetID();
+    if ($priceSetID) {
+      $this->_priceSet = $this->getOrder()->getPriceSetMetadata();
+      $this->setPriceFieldMetaData($this->getOrder()->getPriceFieldsMetadata());
+      $this->assign('quickConfig', $this->isQuickConfig());
+    }
 
-    if (!$this->_values) {
+    // If there is money involved the call to setPriceFieldMetaData will have set the key 'fee'.
+    // 'fee' is a duplicate of other properties but some places still refer to it
+    // $this->getPriceFieldsMetadata() is the recommended interaction.
+    if (!$this->_values || count($this->_values) === 1) {
 
       // get all the values from the dao object
       $this->_values = $this->_fields = [];
-
+      // ensure 'fee' is set since it just got wiped out
+      if ($this->getPriceSetID()) {
+        $this->setPriceFieldMetaData($this->getOrder()->getPriceFieldsMetadata());
+      }
       //retrieve event information
       $params = ['id' => $this->getEventID()];
       CRM_Event_BAO_Event::retrieve($params, $this->_values['event']);
@@ -359,8 +371,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $priceSetID = $this->getPriceSetID();
       if ($priceSetID) {
         $this->_values['line_items'] = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant');
-        $this->_priceSet = $this->getOrder()->getPriceSetMetadata();
-        $this->setPriceFieldMetaData($this->order->getPriceFieldsMetadata());
         $this->initEventFee();
 
         //fix for non-upgraded price sets.CRM-4256.
@@ -370,10 +380,9 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         else {
           $isPaidEvent = $this->_values['event']['is_monetary'] ?? NULL;
         }
-        if ($isPaidEvent && empty($this->_values['fee'])) {
+        if ($isPaidEvent && empty($this->getPriceFieldMetaData())) {
           CRM_Core_Error::statusBounce(ts('No Fee Level(s) or Price Set is configured for this event.<br />Click <a href=\'%1\'>CiviEvent >> Manage Event >> Configure >> Event Fees</a> to configure the Fee Level(s) or Price Set for this event.', [1 => CRM_Utils_System::url('civicrm/event/manage/fee', 'reset=1&action=update&id=' . $this->_eventId)]));
         }
-        $this->assign('quickConfig', $this->isQuickConfig());
       }
 
       // get the profile ids
@@ -1157,7 +1166,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    *
    * Convert price set each param as an array.
    *
-   * @param CRM_Core_Form $form
+   * @param self $form
    * @param array $params
    *   An array of user submitted params.
    *
@@ -1998,9 +2007,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       }
     }
 
-    //its time to call the hook.
-    CRM_Utils_Hook::buildAmount('event', $form, $feeFields);
-
     //reset required if participant is skipped.
     $button = substr($form->controller->getButtonName(), -4);
     if ($required && $button === 'skip') {
@@ -2098,8 +2104,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         $form->addRule('amount', ts('Fee Level is a required field.'), 'required');
       }
     }
-
-    $this->setPriceFieldMetaData($feeFields);
   }
 
   /**
