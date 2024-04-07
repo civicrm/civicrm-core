@@ -101,7 +101,6 @@ class CRM_Financial_BAO_Payment {
     }
     else {
       // Record new "payment" (financial_trxn, financial_item, entity_financial_trxn etc).
-      $salesTaxFinancialAccount = CRM_Contribute_BAO_Contribution::getSalesTaxFinancialAccounts();
       // Get all the lineitems and add financial_item information to them for the contribution on which we are recording a payment.
       // @todo - get this payableItems array in the first place from getPayableItems() above.
       $items = LineItem::get(FALSE)
@@ -135,52 +134,43 @@ class CRM_Financial_BAO_Payment {
         // across multiple EntityFinancialItems. Not using this yet but we can in a bit.
         $payableItems[$item['financial_item.id']]['financial_item.amount_sum'] += $item['financial_item.amount'];
       }
+      unset($items);
+      unset($lineItems);
 
-      // Loop through our list of payable lineitems
-      // @todo - this is still convoluted - we only need to loop through payable items but
-      // working through smaller refactors.
-      foreach ($lineItems as $lineItem) {
-        if ($lineItem['allocation'] === (float) 0) {
+      // Loop through our list of payable items
+      // @todo - this is still convoluted - we only need to loop through payable items once
+      // but the sales tax lines don't have allocations yet - working through smaller refactors.
+      foreach ($payableItems as $payableItem) {
+        if ($payableItem['allocation'] === 0.0 || $payableItem['financial_item.financial_account_id.is_tax']) {
+          // We don't really want to continue for tax lines - but at the moment they are not
+          // being correctly filled out with allocation details so we are relying on
+          // the quasi-correct sub loop lower down.
           continue;
-        }
-        $financialItemID = NULL;
-        $currentFinancialItemStatus = NULL;
-        foreach ($payableItems as $payableItem) {
-          // $financialItems is a list of all lineitems for the contribution
-          // Loop through all of them and match on the first one which is not of type "Sales Tax".
-          if ($payableItem['financial_item.entity_id'] === (int) $lineItem['id']
-            && !in_array($payableItem['financial_item.financial_account_id'], $salesTaxFinancialAccount, TRUE)
-          ) {
-            $financialItemID = $payableItem['financial_item.id'];
-            $currentFinancialItemStatus = $payableItem['financial_item.status_id:name'];
-            // We can break out of the loop because there will only be one lineitem=financial_item.entity_id.
-            break;
-          }
         }
 
         // Now create an EntityFinancialTrxn record to link the new financial_trxn to the lineitem and mark it as paid.
         $eftParams = [
           'entity_table' => 'civicrm_financial_item',
           'financial_trxn_id' => $trxn->id,
-          'entity_id' => $financialItemID,
+          'entity_id' => $payableItem['financial_item.id'],
           'amount' => $payableItem['allocation'],
         ];
         civicrm_api3('EntityFinancialTrxn', 'create', $eftParams);
 
-        if ($currentFinancialItemStatus && ('Paid' !== $currentFinancialItemStatus)) {
+        if ('Paid' !== $payableItem['financial_item.status_id:name']) {
           // Did the lineitem get fully paid?
-          $newStatus = $payableItem['allocation'] < $lineItem['balance'] ? 'Partially paid' : 'Paid';
+          $newStatus = $payableItem['allocation'] < $payableItem['balance'] ? 'Partially paid' : 'Paid';
           FinancialItem::update(FALSE)
             ->addValue('status_id:name', $newStatus)
-            ->addWhere('id', '=', $financialItemID)
+            ->addWhere('id', '=', $payableItem['financial_item.id'])
             ->execute();
         }
 
-        foreach ($items as $financialItem) {
+        foreach ($payableItems as $financialItem) {
           // $financialItems is a list of all lineitems for the contribution
           // Now we loop through all of them and match on the first one which IS of type "Sales Tax".
-          if ($financialItem['financial_item.entity_id'] === (int) $lineItem['id']
-            && in_array($financialItem['financial_item.financial_account_id'], $salesTaxFinancialAccount, TRUE)
+          if ($financialItem['financial_item.entity_id'] === (int) $payableItem['id']
+            && $payableItem['financial_item.financial_account_id.is_tax']
           ) {
             // If we find a "Sales Tax" lineitem we record a tax entry in entityFiancncialTrxn
             // @todo - this is expected to be broken - it should be fixed to
