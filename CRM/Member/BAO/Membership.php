@@ -243,6 +243,13 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
       $memTypeDetails = CRM_Member_BAO_MembershipType::getMembershipType($params['membership_type_id']);
       $isLifeTime = $memTypeDetails['duration_unit'] === 'lifetime' ? TRUE : FALSE;
     }
+    if (!empty($params['id']) && !isset($params['skipStatusCal'])) {
+      // Don't calculate status on existing membership - expect API use to pass them in or leave unchanged.
+      // API3 does this. In-place edit (ie. API4 did not and we ended up updating membership status every time
+      // we did an in-place edit on an unrelated field (eg. source, customfield).
+      $params['skipStatusCal'] = 1;
+    }
+
     // always calculate status if is_override/skipStatusCal is not true.
     // giving respect to is_override during import.  CRM-4012
 
