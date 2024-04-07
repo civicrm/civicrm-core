@@ -43,7 +43,7 @@ class CRM_Financial_BAO_Payment {
     $contribution = civicrm_api3('Contribution', 'getsingle', ['id' => $params['contribution_id']]);
     $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution['contribution_status_id']);
     $isPaymentCompletesContribution = self::isPaymentCompletesContribution($params['contribution_id'], $params['total_amount'], $contributionStatus);
-    $lineItems = self::getPayableItems($params);
+    $payableItems = self::getPayableItems($params, $contribution);
 
     $whiteList = ['check_number', 'payment_processor_id', 'fee_amount', 'total_amount', 'contribution_id', 'net_amount', 'card_type_id', 'pan_truncation', 'trxn_result_code', 'payment_instrument_id', 'trxn_id', 'trxn_date', 'order_reference'];
     $paymentTrxnParams = array_intersect_key($params, array_fill_keys($whiteList, 1));
@@ -100,43 +100,6 @@ class CRM_Financial_BAO_Payment {
       self::reverseAllocationsFromPreviousPayment($params, $trxn->id);
     }
     else {
-      // Record new "payment" (financial_trxn, financial_item, entity_financial_trxn etc).
-      // Get all the lineitems and add financial_item information to them for the contribution on which we are recording a payment.
-      // @todo - get this payableItems array in the first place from getPayableItems() above.
-      $items = LineItem::get(FALSE)
-        ->addSelect('*', 'financial_item.status_id:name', 'financial_item.id', 'financial_item.financial_account_id', 'financial_item_id.currency', 'financial_item.financial_account_id.is_tax', 'financial_item.entity_id', 'financial_item.amount')
-        ->addJoin(
-          'FinancialItem AS financial_item',
-          'LEFT',
-          ['financial_item.entity_table', '=', '"civicrm_line_item"'],
-          ['financial_item.entity_id', '=', 'id']
-        )
-        ->addOrderBy('financial_item.id', 'DESC')
-        ->addWhere('contribution_id', '=', (int) $params['contribution_id'])
-        ->setDebug(TRUE)
-        ->execute();
-
-      $payableItems = [];
-      foreach ($items as $item) {
-        if (!$item['financial_item.id']) {
-          // If we didn't find a financial item that is NOT of type "Sales Tax" then create a new one.
-          $item = self::createFinancialItem($item, $params['trxn_date'], $contribution['contact_id'], $paymentTrxnParams['currency']);
-        }
-        $item['allocation'] = $lineItems[$item['id']]['allocation'];
-        $item['balance'] = $lineItems[$item['id']]['balance'];
-        // Re-index to ensure 1 row per item - we couldn't use GroupBy above as it
-        // hits fullGroupBy issues & we couldn't use indexBy as it borks on the possible null value fixed above.
-        if (!isset($payableItems[$item['financial_item.id']])) {
-          $item['financial_item.amount_sum'] = 0;
-          $payableItems[$item['financial_item.id']] = $item;
-        }
-        // Add the total paid on this financial item so far - this could be
-        // across multiple EntityFinancialItems. Not using this yet but we can in a bit.
-        $payableItems[$item['financial_item.id']]['financial_item.amount_sum'] += $item['financial_item.amount'];
-      }
-      unset($items);
-      unset($lineItems);
-
       // Loop through our list of payable items
       // @todo - this is still convoluted - we only need to loop through payable items once
       // but the sales tax lines don't have allocations yet - working through smaller refactors.
@@ -545,13 +508,17 @@ class CRM_Financial_BAO_Payment {
    *   and then assign apply that ratio to each line item.
    * - if overrides have been passed in we use those amounts instead.
    *
-   * @param $params
+   * @param array $params
+   * @param array $contribution
    *
    * @return array
    * @throws \CRM_Core_Exception
    */
-  protected static function getPayableItems($params): array {
-    $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($params['contribution_id']);
+  protected static function getPayableItems(array $params, array $contribution): array {
+    $lineItems = LineItem::get(FALSE)
+      ->addOrderBy('financial_item.id', 'DESC')
+      ->addWhere('contribution_id', '=', (int) $params['contribution_id'])
+      ->execute();
     $lineItemOverrides = [];
     if (!empty($params['line_item'])) {
       // The format is a bit weird here - $params['line_item'] => [[1 => 10], [2 => 40]]
@@ -588,7 +555,40 @@ class CRM_Financial_BAO_Payment {
         }
       }
     }
-    return $lineItems;
+    // Get all the lineitems and add financial_item information to them for the contribution on which we are recording a payment.
+    // @todo - do this get above & work with it from the start.
+    $items = LineItem::get(FALSE)
+      ->addSelect('*', 'financial_item.status_id:name', 'financial_item.id', 'financial_item.financial_account_id', 'financial_item_id.currency', 'financial_item.financial_account_id.is_tax', 'financial_item.entity_id', 'financial_item.amount')
+      ->addJoin(
+        'FinancialItem AS financial_item',
+        'LEFT',
+        ['financial_item.entity_table', '=', '"civicrm_line_item"'],
+        ['financial_item.entity_id', '=', 'id']
+      )
+      ->addOrderBy('financial_item.id', 'DESC')
+      ->addWhere('contribution_id', '=', (int) $params['contribution_id'])
+      ->setDebug(TRUE)
+      ->execute();
+
+    $payableItems = [];
+    foreach ($items as $item) {
+      if (!$item['financial_item.id']) {
+        // If we didn't find a financial item that is NOT of type "Sales Tax" then create a new one.
+        $item = self::createFinancialItem($item, $params['trxn_date'], $contribution['contact_id'], $contribution['currency']);
+      }
+      $item['allocation'] = $lineItems[$item['id']]['allocation'];
+      $item['balance'] = $lineItems[$item['id']]['balance'];
+      // Re-index to ensure 1 row per item - we couldn't use GroupBy above as it
+      // hits fullGroupBy issues & we couldn't use indexBy as it borks on the possible null value fixed above.
+      if (!isset($payableItems[$item['financial_item.id']])) {
+        $item['financial_item.amount_sum'] = 0;
+        $payableItems[$item['financial_item.id']] = $item;
+      }
+      // Add the total paid on this financial item so far - this could be
+      // across multiple EntityFinancialItems. Not using this yet but we can in a bit.
+      $payableItems[$item['financial_item.id']]['financial_item.amount_sum'] += $item['financial_item.amount'];
+    }
+    return $payableItems;
   }
 
   /**
