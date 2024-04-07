@@ -115,14 +115,15 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
     }
 
     $pkgsDir = Civi::paths()->getVariable('civicrm.packages', 'path');
-    $smartyDir = $pkgsDir . DIRECTORY_SEPARATOR . 'Smarty' . DIRECTORY_SEPARATOR;
-    $pluginsDir = __DIR__ . DIRECTORY_SEPARATOR . 'Smarty' . DIRECTORY_SEPARATOR . 'plugins' . DIRECTORY_SEPARATOR;
+    // smarty3/4 have the define, fall back to smarty2. smarty5 deprecates plugins_dir - TBD.
+    $smartyPluginsDir = defined('SMARTY_PLUGINS_DIR') ? SMARTY_PLUGINS_DIR : ($pkgsDir . DIRECTORY_SEPARATOR . 'Smarty' . DIRECTORY_SEPARATOR . 'plugins');
+    $corePluginsDir = __DIR__ . DIRECTORY_SEPARATOR . 'Smarty' . DIRECTORY_SEPARATOR . 'plugins' . DIRECTORY_SEPARATOR;
 
     if ($customPluginsDir) {
-      $this->plugins_dir = [$customPluginsDir, $smartyDir . 'plugins', $pluginsDir];
+      $this->plugins_dir = [$customPluginsDir, $smartyPluginsDir, $corePluginsDir];
     }
     else {
-      $this->plugins_dir = [$smartyDir . 'plugins', $pluginsDir];
+      $this->plugins_dir = [$smartyPluginsDir, $corePluginsDir];
     }
 
     $this->compile_check = $this->isCheckSmartyIsCompiled();
