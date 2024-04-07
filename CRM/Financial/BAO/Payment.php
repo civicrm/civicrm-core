@@ -43,7 +43,7 @@ class CRM_Financial_BAO_Payment {
     $contribution = civicrm_api3('Contribution', 'getsingle', ['id' => $params['contribution_id']]);
     $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution['contribution_status_id']);
     $isPaymentCompletesContribution = self::isPaymentCompletesContribution($params['contribution_id'], $params['total_amount'], $contributionStatus);
-    $lineItems = self::getPayableLineItems($params);
+    $lineItems = self::getPayableItems($params);
 
     $whiteList = ['check_number', 'payment_processor_id', 'fee_amount', 'total_amount', 'contribution_id', 'net_amount', 'card_type_id', 'pan_truncation', 'trxn_result_code', 'payment_instrument_id', 'trxn_id', 'trxn_date', 'order_reference'];
     $paymentTrxnParams = array_intersect_key($params, array_fill_keys($whiteList, 1));
@@ -103,40 +103,59 @@ class CRM_Financial_BAO_Payment {
       // Record new "payment" (financial_trxn, financial_item, entity_financial_trxn etc).
       $salesTaxFinancialAccount = CRM_Contribute_BAO_Contribution::getSalesTaxFinancialAccounts();
       // Get all the lineitems and add financial_item information to them for the contribution on which we are recording a payment.
-      $financialItems = LineItem::get(FALSE)
-        ->addSelect('tax_amount', 'price_field_value_id', 'financial_item.id', 'financial_item.status_id:name', 'financial_item.financial_account_id', 'financial_item.entity_id')
+      // @todo - get this payableItems array in the first place from getPayableItems() above.
+      $items = LineItem::get(FALSE)
+        ->addSelect('*', 'financial_item.status_id:name', 'financial_item.id', 'financial_item.financial_account_id', 'financial_item_id.currency', 'financial_item.financial_account_id.is_tax', 'financial_item.entity_id', 'financial_item.amount')
         ->addJoin(
           'FinancialItem AS financial_item',
-          'INNER',
-          NULL,
+          'LEFT',
           ['financial_item.entity_table', '=', '"civicrm_line_item"'],
           ['financial_item.entity_id', '=', 'id']
         )
         ->addOrderBy('financial_item.id', 'DESC')
-        ->addWhere('contribution_id', '=', (int) $params['contribution_id'])->execute();
+        ->addWhere('contribution_id', '=', (int) $params['contribution_id'])
+        ->setDebug(TRUE)
+        ->execute();
+
+      $payableItems = [];
+      foreach ($items as $item) {
+        if (!$item['financial_item.id']) {
+          // If we didn't find a financial item that is NOT of type "Sales Tax" then create a new one.
+          $item = self::createFinancialItem($item, $params['trxn_date'], $contribution['contact_id'], $paymentTrxnParams['currency']);
+        }
+        $item['allocation'] = $lineItems[$item['id']]['allocation'];
+        $item['balance'] = $lineItems[$item['id']]['balance'];
+        // Re-index to ensure 1 row per item - we couldn't use GroupBy above as it
+        // hits fullGroupBy issues & we couldn't use indexBy as it borks on the possible null value fixed above.
+        if (!isset($payableItems[$item['financial_item.id']])) {
+          $item['financial_item.amount_sum'] = 0;
+          $payableItems[$item['financial_item.id']] = $item;
+        }
+        // Add the total paid on this financial item so far - this could be
+        // across multiple EntityFinancialItems. Not using this yet but we can in a bit.
+        $payableItems[$item['financial_item.id']]['financial_item.amount_sum'] += $item['financial_item.amount'];
+      }
 
       // Loop through our list of payable lineitems
+      // @todo - this is still convoluted - we only need to loop through payable items but
+      // working through smaller refactors.
       foreach ($lineItems as $lineItem) {
         if ($lineItem['allocation'] === (float) 0) {
           continue;
         }
         $financialItemID = NULL;
         $currentFinancialItemStatus = NULL;
-        foreach ($financialItems as $financialItem) {
+        foreach ($payableItems as $payableItem) {
           // $financialItems is a list of all lineitems for the contribution
           // Loop through all of them and match on the first one which is not of type "Sales Tax".
-          if ($financialItem['financial_item.entity_id'] === (int) $lineItem['id']
-            && !in_array($financialItem['financial_item.financial_account_id'], $salesTaxFinancialAccount, TRUE)
+          if ($payableItem['financial_item.entity_id'] === (int) $lineItem['id']
+            && !in_array($payableItem['financial_item.financial_account_id'], $salesTaxFinancialAccount, TRUE)
           ) {
-            $financialItemID = $financialItem['financial_item.id'];
-            $currentFinancialItemStatus = $financialItem['financial_item.status_id:name'];
+            $financialItemID = $payableItem['financial_item.id'];
+            $currentFinancialItemStatus = $payableItem['financial_item.status_id:name'];
             // We can break out of the loop because there will only be one lineitem=financial_item.entity_id.
             break;
           }
-        }
-        if (!$financialItemID) {
-          // If we didn't find a lineitem that is NOT of type "Sales Tax" then create a new one.
-          $financialItemID = self::getNewFinancialItemID($lineItem, $params['trxn_date'], $contribution['contact_id'], $paymentTrxnParams['currency']);
         }
 
         // Now create an EntityFinancialTrxn record to link the new financial_trxn to the lineitem and mark it as paid.
@@ -144,20 +163,20 @@ class CRM_Financial_BAO_Payment {
           'entity_table' => 'civicrm_financial_item',
           'financial_trxn_id' => $trxn->id,
           'entity_id' => $financialItemID,
-          'amount' => $lineItem['allocation'],
+          'amount' => $payableItem['allocation'],
         ];
         civicrm_api3('EntityFinancialTrxn', 'create', $eftParams);
 
         if ($currentFinancialItemStatus && ('Paid' !== $currentFinancialItemStatus)) {
           // Did the lineitem get fully paid?
-          $newStatus = $lineItem['allocation'] < $lineItem['balance'] ? 'Partially paid' : 'Paid';
+          $newStatus = $payableItem['allocation'] < $lineItem['balance'] ? 'Partially paid' : 'Paid';
           FinancialItem::update(FALSE)
             ->addValue('status_id:name', $newStatus)
             ->addWhere('id', '=', $financialItemID)
             ->execute();
         }
 
-        foreach ($financialItems as $financialItem) {
+        foreach ($items as $financialItem) {
           // $financialItems is a list of all lineitems for the contribution
           // Now we loop through all of them and match on the first one which IS of type "Sales Tax".
           if ($financialItem['financial_item.entity_id'] === (int) $lineItem['id']
@@ -541,7 +560,7 @@ class CRM_Financial_BAO_Payment {
    * @return array
    * @throws \CRM_Core_Exception
    */
-  protected static function getPayableLineItems($params): array {
+  protected static function getPayableItems($params): array {
     $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($params['contribution_id']);
     $lineItemOverrides = [];
     if (!empty($params['line_item'])) {
@@ -661,11 +680,11 @@ class CRM_Financial_BAO_Payment {
    * @param int $contactID
    * @param string $currency
    *
-   * @return int
+   * @return array
    *
    * @throws \CRM_Core_Exception
    */
-  protected static function getNewFinancialItemID($lineItem, $trxn_date, $contactID, $currency): int {
+  protected static function createFinancialItem($lineItem, $trxn_date, $contactID, $currency): array {
     $financialAccount = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(
       $lineItem['financial_type_id'],
       'Income Account Is'
@@ -681,7 +700,19 @@ class CRM_Financial_BAO_Payment {
       'entity_table' => 'civicrm_line_item',
       'entity_id' => $lineItem['id'],
     ];
-    return (int) civicrm_api3('FinancialItem', 'create', $itemParams)['id'];
+
+    civicrm_api3('FinancialItem', 'create', $itemParams);
+    return LineItem::get(FALSE)
+      ->addSelect('*', 'financial_item.status_id:name', 'financial_item.id', 'financial_item.financial_account_id', 'financial_item_id.currency', 'financial_item.financial_account_id.is_tax', 'financial_item.entity_id', 'financial_item.amount')
+      ->addJoin(
+        'FinancialItem AS financial_item',
+        'LEFT',
+        ['financial_item.entity_table', '=', '"civicrm_line_item"'],
+        ['financial_item.entity_id', '=', 'id']
+      )
+      ->addOrderBy('financial_item.id', 'DESC')
+      ->addWhere('id', '=', (int) $lineItem['id'])
+      ->execute()->first();
   }
 
 }
