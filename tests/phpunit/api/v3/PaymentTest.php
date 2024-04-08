@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\EntityFinancialTrxn;
+
 /**
  *  Test APIv3 civicrm_contribute_* functions
  *
@@ -430,15 +432,12 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $payment = $this->callAPISuccess('payment', 'create', $params);
     $this->checkPaymentIsValid($payment['id'], $contribution['id']);
 
-    $params = [
-      'entity_table' => 'civicrm_financial_item',
-      'financial_trxn_id' => $payment['id'],
-    ];
-    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
-    $amounts = [33.33, 16.67];
-    foreach ($eft['values'] as $value) {
-      $this->assertEquals($value['amount'], array_pop($amounts));
-    }
+    $entityFinancialTrxns = EntityFinancialTrxn::get(FALSE)
+      ->addWhere('entity_table', '=', 'civicrm_financial_item')
+      ->addWhere('financial_trxn_id', '=', $payment['id'])
+      ->addOrderBy('amount')->execute();
+    $this->assertEquals(16.67, $entityFinancialTrxns->first()['amount'], 'Incorrect tax amount in entity financial trxn');
+    $this->assertEquals(33.33, $entityFinancialTrxns->last()['amount'], 'Incorrect tax exclusive amount in entity financial trxn');
 
     // Now create payment to complete total amount of contribution
     $params = [
@@ -456,15 +455,14 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       ],
     ];
     $this->checkPaymentResult($payment, $expectedResult);
-    $params = [
-      'entity_table' => 'civicrm_financial_item',
-      'financial_trxn_id' => $payment['id'],
-    ];
-    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
-    $amounts = [66.67, 33.33];
-    foreach ($eft['values'] as $value) {
-      $this->assertEquals($value['amount'], array_pop($amounts));
-    }
+
+    $entityFinancialTrxns = EntityFinancialTrxn::get(FALSE)
+      ->addWhere('entity_table', '=', 'civicrm_financial_item')
+      ->addWhere('financial_trxn_id', '=', $payment['id'])
+      ->addOrderBy('amount')->execute();
+    $this->assertEquals(33.33, $entityFinancialTrxns->first()['amount'], 'Incorrect tax amount in entity financial trxn');
+    $this->assertEquals(66.67, $entityFinancialTrxns->last()['amount'], 'Incorrect tax exclusive amount in entity financial trxn');
+
     // Check contribution for completed status
     $contribution = $this->callAPISuccess('contribution', 'get', ['id' => $contribution['id']]);
 
@@ -511,17 +509,13 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $payment = $this->callAPISuccess('Payment', 'create', $params);
     $this->checkPaymentIsValid($payment['id'], $contribution['id']);
 
-    $params = [
-      'entity_table' => 'civicrm_financial_item',
-      'financial_trxn_id' => $payment['id'],
-      'return' => ['entity_id.entity_id', 'amount'],
-    ];
-    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params)['values'];
-    $this->assertCount(2, $eft);
-    $amounts = [40, 10];
-    foreach ($eft as $value) {
-      $this->assertEquals($value['amount'], array_pop($amounts));
-    }
+    $entityFinancialTrxns = EntityFinancialTrxn::get(FALSE)
+      ->addWhere('entity_table', '=', 'civicrm_financial_item')
+      ->addWhere('financial_trxn_id', '=', $payment['id'])
+      ->addOrderBy('amount')->execute();
+    $this->assertCount(2, $entityFinancialTrxns);
+    $this->assertEquals(10, $entityFinancialTrxns->first()['amount'], 'Incorrect tax amount in entity financial trxn');
+    $this->assertEquals(40, $entityFinancialTrxns->last()['amount'], 'Incorrect tax exclusive amount in entity financial trxn');
 
     // Now create payment to complete total amount of contribution
     $params = [
@@ -543,16 +537,15 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       ],
     ];
     $this->checkPaymentResult($payment, $expectedResult);
-    $params = [
-      'entity_table' => 'civicrm_financial_item',
-      'financial_trxn_id' => $payment['id'],
-    ];
-    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params)['values'];
-    $this->assertCount(2, $eft);
-    $amounts = [80, 20];
-    foreach ($eft as $value) {
-      $this->assertEquals($value['amount'], array_pop($amounts));
-    }
+
+    $entityFinancialTrxns = EntityFinancialTrxn::get(FALSE)
+      ->addWhere('entity_table', '=', 'civicrm_financial_item')
+      ->addWhere('financial_trxn_id', '=', $payment['id'])
+      ->addOrderBy('amount')->execute();
+    $this->assertCount(2, $entityFinancialTrxns);
+    $this->assertEquals(20, $entityFinancialTrxns->first()['amount'], 'Incorrect tax amount in entity financial trxn');
+    $this->assertEquals(80, $entityFinancialTrxns->last()['amount'], 'Incorrect tax exclusive amount in entity financial trxn');
+
     // Check contribution for completed status
     $contribution = $this->callAPISuccess('Contribution', 'get', ['id' => $contribution['id']]);
 
@@ -737,15 +730,12 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     ];
     $this->checkPaymentResult($payment, $expectedResult);
 
-    $params = [
-      'entity_table' => 'civicrm_financial_item',
-      'financial_trxn_id' => $payment['id'],
-    ];
-    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
-    $amounts = [33.33, 16.67];
-    foreach ($eft['values'] as $value) {
-      $this->assertEquals($value['amount'], array_pop($amounts));
-    }
+    $entityFinancialTrxns = EntityFinancialTrxn::get(FALSE)
+      ->addWhere('entity_table', '=', 'civicrm_financial_item')
+      ->addWhere('financial_trxn_id', '=', $payment['id'])
+      ->addOrderBy('amount')->execute();
+    $this->assertEquals(16.67, $entityFinancialTrxns->first()['amount'], 'Incorrect tax amount in entity financial trxn');
+    $this->assertEquals(33.33, $entityFinancialTrxns->last()['amount'], 'Incorrect tax exclusive amount in entity financial trxn');
 
     // update the amount for payment
     $params = [
@@ -756,36 +746,30 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     ];
     // @todo - move this permissions test to it's own test - it just confuses here.
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['administer CiviCRM', 'access CiviContribute'];
-    $this->callAPIFailure('payment', 'create', $params, 'API permission check failed for Payment/create call; insufficient permission: require access CiviCRM and access CiviContribute and edit contributions');
+    $this->callAPIFailure('Payment', 'create', $params, 'API permission check failed for Payment/create call; insufficient permission: require access CiviCRM and access CiviContribute and edit contributions');
 
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['administer CiviCRM', 'access CiviContribute', 'access CiviCRM', 'edit contributions'];
-    $payment = $this->callAPISuccess('payment', 'create', $params);
+    $payment = $this->callAPISuccess('Payment', 'create', $params);
 
     $this->validateAllPayments();
     // Check for proportional cancelled payment against line items.
-    $minParams = [
-      'entity_table' => 'civicrm_financial_item',
-      'financial_trxn_id' => $payment['id'] - 1,
-    ];
-
-    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $minParams)['values'];
-    $this->assertCount(2, $eft);
-    $amounts = [-33.33, -16.67];
-
-    foreach ($eft as $value) {
-      $this->assertEquals($value['amount'], array_pop($amounts));
-    }
+    $entityFinancialTrxns = EntityFinancialTrxn::get(FALSE)
+      ->addWhere('entity_table', '=', 'civicrm_financial_item')
+      ->addWhere('financial_trxn_id', '=', ($payment['id'] - 1))
+      ->addOrderBy('amount')->execute();
+    $this->assertCount(2, $entityFinancialTrxns);
+    $this->assertEquals(-33.33, $entityFinancialTrxns->first()['amount'], 'Incorrect tax amount in entity financial trxn');
+    $this->assertEquals(-16.67, $entityFinancialTrxns->last()['amount'], 'Incorrect tax exclusive amount in entity financial trxn');
 
     // Check for proportional updated payment against line items.
-    $params = [
-      'entity_table' => 'civicrm_financial_item',
-      'financial_trxn_id' => $payment['id'],
-    ];
-    $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params)['values'];
-    $amounts = [66.67, 33.33];
-    foreach ($eft as $value) {
-      $this->assertEquals($value['amount'], array_pop($amounts));
-    }
+    $entityFinancialTrxns = EntityFinancialTrxn::get(FALSE)
+      ->addWhere('entity_table', '=', 'civicrm_financial_item')
+      ->addWhere('financial_trxn_id', '=', $payment['id'])
+      ->addOrderBy('amount')->execute();
+    $this->assertCount(2, $entityFinancialTrxns);
+    $this->assertEquals(33.33, $entityFinancialTrxns->first()['amount'], 'Incorrect tax amount in entity financial trxn');
+    $this->assertEquals(66.67, $entityFinancialTrxns->last()['amount'], 'Incorrect tax exclusive amount in entity financial trxn');
+
     $items = $this->callAPISuccess('FinancialItem', 'get', [])['values'];
     $this->assertCount(2, $items);
     $itemSum = 0;
