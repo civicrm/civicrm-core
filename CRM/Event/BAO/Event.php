@@ -275,10 +275,14 @@ WHERE  ( civicrm_event.is_template  = 0 )";
     }
     elseif ($all == 0) {
       // find only events ending in the future
+      // The STR_TO_DATE is because in mariadb with strict mode off you can
+      // have dates like '0000-00-00' and we want to include those here, but a
+      // comparison to '' or '0000-00-00' directly will error in mysql8 with
+      // strict mode on. So this works for both.
       $endDate = date('YmdHis');
       $query .= "
         AND ( `end_date` >= {$endDate} OR
-           (
+          (
             ( end_date IS NULL OR end_date = STR_TO_DATE('', '%Y%m%d%H%i%s') ) AND start_date >= {$endDate}
           )
         )";
