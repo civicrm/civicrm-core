@@ -278,7 +278,9 @@ WHERE  ( civicrm_event.is_template  = 0 )";
       $endDate = date('YmdHis');
       $query .= "
         AND ( `end_date` >= {$endDate} OR
-          end_date IS NULL AND start_date >= {$endDate}
+           (
+            ( end_date IS NULL OR end_date = STR_TO_DATE('', '%Y%m%d%H%i%s') ) AND start_date >= {$endDate}
+          )
         )";
     }
     elseif ($all == 2) {
