@@ -37,9 +37,9 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
       'id' => $participant->id,
       'event_id' => $event->id,
       'register_date' => date('YmdHis'),
-      'source' => CRM_Utils_Array::value('participant_source', $params, $this->description),
+      'source' => $params['participant_source'] ?? $this->description,
       'is_pay_later' => $this->is_pay_later,
-      'fee_amount' => CRM_Utils_Array::value('amount', $params, 0),
+      'fee_amount' => $params['amount'] ?? 0,
       'fee_currency' => $params['currencyID'] ?? NULL,
     ];
 
@@ -605,7 +605,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
       'trxn_id' => "{$params['trxn_id']}-{$this->sub_trxn_index}",
       'currency' => $params['currencyID'] ?? NULL,
       'source' => $event->title,
-      'is_pay_later' => CRM_Utils_Array::value('is_pay_later', $params, 0),
+      'is_pay_later' => $params['is_pay_later'] ?? 0,
       'contribution_status_id' => $params['contribution_status_id'],
       'payment_instrument_id' => $params['payment_instrument_id'],
       'check_number' => $params['check_number'] ?? NULL,

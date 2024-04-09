@@ -326,7 +326,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
       }
 
       CRM_Core_Session::setStatus(ts("'%1' information has been saved.",
-        [1 => CRM_Utils_Array::value('title', CRM_Utils_Array::value($subPage, $this->get('tabHeader')), $className)]
+        [1 => $this->get('tabHeader')[$subPage]['title'] ?? $className]
       ), $this->getTitle(), 'success');
 
       if (CRM_Core_Component::isEnabled('CiviCampaign')) {

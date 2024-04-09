@@ -1666,21 +1666,21 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       if (!empty($overduePayments)) {
         foreach ($overduePayments as $id => $payment) {
           $label = ts("%1 - due on %2 (overdue)", [
-            1 => CRM_Utils_Money::format(CRM_Utils_Array::value('scheduled_amount', $payment), CRM_Utils_Array::value('scheduled_amount_currency', $payment)),
+            1 => CRM_Utils_Money::format($payment['scheduled_amount'] ?? NULL, $payment['scheduled_amount_currency'] ?? NULL),
             2 => $payment['scheduled_date'] ?? NULL,
           ]);
           $paymentID = $payment['id'] ?? NULL;
-          $payments[] = $this->createElement('checkbox', $paymentID, NULL, $label, ['amount' => CRM_Utils_Array::value('scheduled_amount', $payment)]);
+          $payments[] = $this->createElement('checkbox', $paymentID, NULL, $label, ['amount' => $payment['scheduled_amount'] ?? NULL]);
         }
       }
 
       if (!empty($nextPayment)) {
         $label = ts("%1 - due on %2", [
-          1 => CRM_Utils_Money::format(CRM_Utils_Array::value('scheduled_amount', $nextPayment), CRM_Utils_Array::value('scheduled_amount_currency', $nextPayment)),
+          1 => CRM_Utils_Money::format($nextPayment['scheduled_amount'] ?? NULL, $nextPayment['scheduled_amount_currency'] ?? NULL),
           2 => $nextPayment['scheduled_date'] ?? NULL,
         ]);
         $paymentID = $nextPayment['id'] ?? NULL;
-        $payments[] = $this->createElement('checkbox', $paymentID, NULL, $label, ['amount' => CRM_Utils_Array::value('scheduled_amount', $nextPayment)]);
+        $payments[] = $this->createElement('checkbox', $paymentID, NULL, $label, ['amount' => $nextPayment['scheduled_amount'] ?? NULL]);
       }
       // give error if empty or build form for payment.
       if (empty($payments)) {

@@ -1083,7 +1083,7 @@ class CRM_Report_Form extends CRM_Core_Form {
           ) {
             $order_by = [
               'column' => $fieldName,
-              'order' => CRM_Utils_Array::value('default_order', $field, 'ASC'),
+              'order' => $field['default_order'] ?? 'ASC',
               'section' => $field['default_is_section'] ?? 0,
             ];
 

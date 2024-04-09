@@ -684,11 +684,11 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
       $params['option_amount'] = [1 => $params['price']];
       $params['option_label'] = [1 => $params['label']];
       $params['option_count'] = [1 => $params['count']];
-      $params['option_max_value'] = [1 => CRM_Utils_Array::value('max_value', $params)];
+      $params['option_max_value'] = [1 => $params['max_value'] ?? NULL];
       //$params['option_description']  = array( 1 => $params['description'] );
       $params['option_weight'] = [1 => $params['weight']];
       $params['option_financial_type_id'] = [1 => $params['financial_type_id']];
-      $params['option_visibility_id'] = [1 => CRM_Utils_Array::value('visibility_id', $params)];
+      $params['option_visibility_id'] = [1 => $params['visibility_id'] ?? NULL];
     }
 
     $params['membership_num_terms'] = (!empty($params['membership_type_id'])) ? CRM_Utils_Array::value('membership_num_terms', $params, 1) : NULL;

@@ -196,7 +196,7 @@ function _civicrm_api3_contribution_create_legacy_support_45(&$params) {
     $params['soft_credit'][] = [
       'contact_id'          => $params['honor_contact_id'],
       'amount'              => $params['total_amount'],
-      'soft_credit_type_id' => CRM_Utils_Array::value('honor_type_id', $params, CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionSoft', 'soft_credit_type_id', 'in_honor_of')),
+      'soft_credit_type_id' => $params['honor_type_id'] ?? CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionSoft', 'soft_credit_type_id', 'in_honor_of'),
     ];
   }
 }
