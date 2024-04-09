@@ -47,7 +47,7 @@ class AfformAdminInjector extends AutoSubscriber {
             // Create a link to edit the form, plus all embedded SavedSearches
             $links = [
               [
-                'url' => \CRM_Utils_System::url('civicrm/admin/afform', NULL, FALSE, "/edit/{$afform['name']}", TRUE),
+                'url' => \CRM_Utils_System::url('civicrm/admin/afform', NULL, FALSE, "/edit/{$afform['name']}", TRUE, FALSE, TRUE),
                 'text' => E::ts('Edit %1 in FormBuilder', [1 => "<em>{$afform['title']}</em>"]),
                 'icon' => 'fa-pencil',
               ],
@@ -63,7 +63,7 @@ class AfformAdminInjector extends AutoSubscriber {
                 ->execute();
               foreach ($savedSearches as $savedSearch) {
                 $links[] = [
-                  'url' => \CRM_Utils_System::url('civicrm/admin/search', NULL, FALSE, "/edit/{$savedSearch['id']}", TRUE),
+                  'url' => \CRM_Utils_System::url('civicrm/admin/search', NULL, FALSE, "/edit/{$savedSearch['id']}", TRUE, FALSE, TRUE),
                   'text' => E::ts('Edit %1 in SearchKit', [1 => "<em>{$savedSearch['label']}</em>"]),
                   'icon' => 'fa-search-plus',
                 ];
