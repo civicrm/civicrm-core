@@ -131,16 +131,18 @@ class AfformAdminMeta {
     }
     // Index by name
     $fields = array_column($fields, NULL, 'name');
-    if ($params['action'] === 'create') {
-      // Add existing entity field
-      $idField = CoreUtil::getIdFieldName($entityName);
+    $idField = CoreUtil::getIdFieldName($entityName);
+    // Convert ID field to existing entity field
+    if (isset($fields[$idField])) {
       $fields[$idField]['readonly'] = FALSE;
       $fields[$idField]['input_type'] = 'EntityRef';
       // Afform-only (so far) metadata tells the form to update an existing entity autofilled from this value
       $fields[$idField]['input_attrs']['autofill'] = 'update';
       $fields[$idField]['fk_entity'] = $entityName;
       $fields[$idField]['label'] = E::ts('Existing %1', [1 => CoreUtil::getInfoItem($entityName, 'title')]);
-      // Mix in alterations declared by afform entities
+    }
+    // Mix in alterations declared by afform entities
+    if ($params['action'] === 'create') {
       $afEntity = self::getMetadata()['entities'][$entityName] ?? [];
       if (!empty($afEntity['alterFields'])) {
         foreach ($afEntity['alterFields'] as $fieldName => $changes) {

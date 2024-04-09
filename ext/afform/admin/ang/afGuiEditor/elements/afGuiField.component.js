@@ -178,7 +178,7 @@
             return defn.options || defn.data_type === 'Boolean';
 
           case 'Select':
-            return defn.options || defn.data_type === 'Boolean' || defn.input_type === 'EntityRef' || (defn.input_type === 'Date' && ctrl.isSearch());
+            return defn.options || defn.data_type === 'Boolean' || (defn.input_type === 'EntityRef' && !ctrl.isSearch()) || (defn.input_type === 'Date' && ctrl.isSearch());
 
           case 'Date':
             return defn.input_type === 'Date';

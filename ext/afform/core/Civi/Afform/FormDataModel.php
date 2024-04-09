@@ -234,7 +234,7 @@ class FormDataModel {
       return NULL;
     }
     // Id field for selecting existing entity
-    if ($action === 'create' && $field['name'] === CoreUtil::getIdFieldName($entityName)) {
+    if ($field['name'] === CoreUtil::getIdFieldName($entityName)) {
       $entityTitle = CoreUtil::getInfoItem($entityName, 'title');
       $field['input_type'] = 'EntityRef';
       $field['fk_entity'] = $entityName;
