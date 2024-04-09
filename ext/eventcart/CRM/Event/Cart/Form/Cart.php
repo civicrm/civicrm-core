@@ -144,7 +144,7 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
       'email-Primary' => $fields['email'] ?? NULL,
       'first_name' => $fields['first_name'] ?? NULL,
       'last_name' => $fields['last_name'] ?? NULL,
-      'is_deleted' => CRM_Utils_Array::value('is_deleted', $fields, TRUE),
+      'is_deleted' => $fields['is_deleted'] ?? TRUE,
     ];
     $no_fields = [];
     $contact_id = CRM_Contact_BAO_Contact::createProfileContact($contact_params, $no_fields, NULL);

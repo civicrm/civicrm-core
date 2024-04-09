@@ -100,7 +100,7 @@ class CRM_Utils_Money {
     $replacements = [
       '%a' => $amount,
       '%C' => $currency,
-      '%c' => CRM_Utils_Array::value($currency, self::$_currencySymbols, $currency),
+      '%c' => self::$_currencySymbols[$currency] ?? $currency,
     ];
     return strtr($format, $replacements);
   }
@@ -347,7 +347,9 @@ class CRM_Utils_Money {
     if (is_numeric($amount) && function_exists('money_format')) {
       $lc = setlocale(LC_MONETARY, 0);
       setlocale(LC_MONETARY, 'en_US.utf8', 'en_US', 'en_US.utf8', 'en_US', 'C');
+      // phpcs:disable
       $amount = money_format($valueFormat, $amount);
+      // phpcs:enable
       setlocale(LC_MONETARY, $lc);
     }
     return $amount;

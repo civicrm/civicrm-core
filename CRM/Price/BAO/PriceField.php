@@ -111,20 +111,20 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           'label' => trim($params['option_label'][$index]),
           'name' => CRM_Utils_String::munge($params['option_label'][$index], '_', 64),
           'amount' => trim($params['option_amount'][$index]),
-          'count' => CRM_Utils_Array::value($index, CRM_Utils_Array::value('option_count', $params), NULL),
-          'max_value' => CRM_Utils_Array::value($index, CRM_Utils_Array::value('option_max_value', $params), NULL),
-          'description' => CRM_Utils_Array::value($index, CRM_Utils_Array::value('option_description', $params), NULL),
-          'membership_type_id' => CRM_Utils_Array::value($index, CRM_Utils_Array::value('membership_type_id', $params), NULL),
+          'count' => $params['option_count'][$index] ?? NULL,
+          'max_value' => $params['option_max_value'][$index] ?? NULL,
+          'description' => $params['option_description'][$index] ?? NULL,
+          'membership_type_id' => $params['membership_type_id'][$index] ?? NULL,
           'weight' => $params['option_weight'][$index],
           'is_active' => 1,
           'is_default' => !empty($defaultArray[$params['option_weight'][$index]]) ? $defaultArray[$params['option_weight'][$index]] : 0,
           'membership_num_terms' => NULL,
           'non_deductible_amount' => $params['non_deductible_amount'] ?? NULL,
-          'visibility_id' => CRM_Utils_Array::value($index, CRM_Utils_Array::value('option_visibility_id', $params), self::getVisibilityOptionID('public')),
+          'visibility_id' => $params['option_visibility_id'][$index] ?? self::getVisibilityOptionID('public'),
         ];
 
         if ($options['membership_type_id']) {
-          $options['membership_num_terms'] = CRM_Utils_Array::value($index, CRM_Utils_Array::value('membership_num_terms', $params), 1);
+          $options['membership_num_terms'] = $params['membership_num_terms'][$index] ?? 1;
           $options['is_default'] = !empty($defaultArray[$params['membership_type_id'][$index]]) ? $defaultArray[$params['membership_type_id'][$index]] : 0;
         }
 
