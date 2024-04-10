@@ -179,6 +179,12 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue implements \Civi
       $optionValue->find(TRUE);
       self::updateOptionDefaults($params['option_group_id'], $optionValue->id, $optionValue, $groupName);
     }
+    if (!empty($params['custom']) &&
+      is_array($params['custom'])
+    ) {
+      CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_option_value', $optionValue->id, $op);
+    }
+
     Civi::cache('metadata')->flush();
     CRM_Core_PseudoConstant::flush();
 

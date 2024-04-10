@@ -156,6 +156,11 @@
              <td>{$form.contact_type_id.html}</td>
            </tr>
         {/if}
+        <tr class="crm-admin-options-form-block-custom_data">
+          <td colspan="2">
+            {include file="CRM/common/customDataBlock.tpl" customDataType='OptionValue' cid=false}
+          </td>
+        </tr>
     </table>
   {/if}
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
