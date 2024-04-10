@@ -448,58 +448,23 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
   /**
  * @param string $type
  * @param int $userID
- * @param string|null $condition
+ * @param array $condition
  * @param string|null $limit
  * @param string|null $order
  *
  * @return array
  */
-public static function getCaseActivities($type, $userID, $condition = NULL, $limit = NULL, $order = NULL) {
-  $params = [
-      'sequential' => 1,
-      'options' => ['limit' => $limit],
-      'activity_type' => 'caseActivity',
-  ];
-
-  switch ($type) {
-      case 'upcoming':
-          $params['activity_id.activity_date_time'] = ['>' => 'now'];
-          break;
-
-      case 'recent':
-          $params['activity_id.activity_date_time'] = ['<' => 'now'];
-          break;
-
-      case 'any':
-          break;
-
-      default:
-          throw new Exception('Invalid type specified');
-  }
-
-  if ($condition) {
-      $params['where'] = $condition;
-  }
-
-  return civicrm_api4('CaseActivity', 'get', $params)['values'] ?? [];
+public static function getCaseActivities(string $type, int $userID, array $condition = [], ?string $limit = NULL, ?string $order = NULL) : array {
 }
 
 /**
  * @param string $type
  * @param int $userID
- * @param string|null $condition
+ * @param array $condition
  *
  * @return int
  */
-public static function getCaseActivitiesCount($type, $userID, $condition = NULL) {
-  $params = [
-      'activity_type' => 'caseActivity',
-  ];
-
-  switch ($type) {
-      case 'upcoming':
-          $params['activity_id.activity_date_time'] = ['>' => 'now'];
-          break;
+public static function getCaseActivitiesCount(string $type, int $userID, array $condition = []) : int{
 
       case 'recent':
           $params['activity_id.activity_date_time'] = ['<' => 'now'];
@@ -660,7 +625,7 @@ HERESQL;
    *   Array of Cases
    */
   public static function getCases($allCases = TRUE, $params = [], $context = 'dashboard', $getCount = FALSE) {
-    $condition = NULL;
+    $condition = [];
     $casesList = [];
 
     // validate access for own cases.
@@ -682,23 +647,27 @@ HERESQL;
       $allCases = FALSE;
     }
 
-    $whereClauses = ['civicrm_case.is_deleted = 0 AND civicrm_contact.is_deleted <> 1'];
+    // $whereClauses = ['civicrm_case.is_deleted = 0 AND civicrm_contact.is_deleted <> 1'];
+    $condition[] = ['case_id.is_deleted', '<>', TRUE];
 
     if (!$allCases) {
-      $whereClauses[] = "(case_relationship.contact_id_b = {$userID} OR case_relationship.contact_id_a = {$userID})";
-      $whereClauses[] = 'case_relationship.is_active';
+      // $whereClauses[] = "(case_relationship.contact_id_b = {$userID} OR case_relationship.contact_id_a = {$userID})";
+      $condition[] = ['OR', [['relationship.contact_id_b', '=', $userID], ['relationship.contact_id_a', '=', $userID]]];
+      // $whereClauses[] = 'case_relationship.is_active';
+      $condition[] = ['relationship.is_active', '=', TRUE];
     }
     if (empty($params['status_id']) && $type == 'upcoming') {
-      $whereClauses[] = "civicrm_case.status_id != " . CRM_Core_PseudoConstant::getKey('CRM_Case_BAO_Case', 'case_status_id', 'Closed');
+      // $whereClauses[] = "civicrm_case.status_id != " . CRM_Core_PseudoConstant::getKey('CRM_Case_BAO_Case', 'case_status_id', 'Closed');
+      $status_id = CRM_Core_PseudoConstant::getKey('CRM_Case_BAO_Case', 'case_status_id', 'Closed');
+      $condition[] = ['case_id.status_id', '!=', $status_id];
     }
 
     foreach (['case_type_id', 'status_id'] as $column) {
       if (!empty($params[$column])) {
-        $whereClauses[] = sprintf("civicrm_case.%s IN (%s)", $column, $params[$column]);
+        // $condition[] = sprintf("civicrm_case.%s IN (%s)", $column, $params[$column]);
+        $condition[] = ['case_id' . $column, 'IN', $params[$column]];
       }
     }
-    $condition = implode(' AND ', $whereClauses);
-
     $totalCount = self::getCaseActivitiesCount($type, $userID, $condition);
     if ($getCount) {
         Civi::$statics[__CLASS__]['totalCount'][$type] = $totalCount;
@@ -1578,27 +1547,32 @@ HERESQL;
 
     $caseID = implode(',', $cases['case_id']);
     $contactID = implode(',', $cases['contact_id']);
+    $condition = [];
+    $condition[] = ['case_contact.id', 'IN', $contactID];
+    $condition[] = ['case.id', 'IN', $caseID];
+    $condition[] = ['case.is_deleted', '=', $cases['case_deleted']];
+//     $condition = " civicrm_case_contact.contact_id IN( {$contactID} )
+//  AND civicrm_case.id IN( {$caseID})
+//  AND civicrm_case.is_deleted     = {$cases['case_deleted']}";
 
-    $condition = " civicrm_case_contact.contact_id IN( {$contactID} )
- AND civicrm_case.id IN( {$caseID})
- AND civicrm_case.is_deleted     = {$cases['case_deleted']}";
-
-    $query = self::getCaseActivityQuery($type, $userID, $condition);
+    // $query = self::getCaseActivityQuery($type, $userID, $condition);
+    $cases = self::getCaseActivities($type, $userID, $condition);
     $activityTypes = CRM_Activity_BAO_Activity::buildOptions('activity_type_id');
-
-    $res = CRM_Core_DAO::executeQuery($query);
+    // $res = CRM_Core_DAO::executeQuery($query);
 
     $activityInfo = [];
-    while ($res->fetch()) {
+    // while ($res->fetch()) {
+    foreach ($cases as $case) {
       if ($type == 'upcoming') {
-        $activityInfo[$res->case_id]['date'] = $res->activity_date_time;
-        $activityInfo[$res->case_id]['type'] = $activityTypes[$res->activity_type_id] ?? NULL;
+        $activityInfo[$case->case_id]['date'] = $case->activity_date_time;
+        $activityInfo[$case->case_id]['type'] = $activityTypes[$case->activity_type_id] ?? NULL;
       }
       else {
-        $activityInfo[$res->case_id]['date'] = $res->activity_date_time;
-        $activityInfo[$res->case_id]['type'] = $activityTypes[$res->activity_type_id] ?? NULL;
+        $activityInfo[$case->case_id]['date'] = $case->activity_date_time;
+        $activityInfo[$case->case_id]['type'] = $activityTypes[$case->activity_type_id] ?? NULL;
       }
     }
+
 
     return $activityInfo;
   }
