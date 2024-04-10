@@ -23,6 +23,8 @@ use Civi\Api4\OptionValue;
  */
 class CRM_Admin_Form_Options extends CRM_Admin_Form {
 
+  use CRM_Core_Form_EntityFormTrait;
+
   /**
    * The option group name.
    *
@@ -47,6 +49,13 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
    * @var bool
    */
   public $submitOnce = TRUE;
+
+  /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'OptionValue';
+  }
 
   /**
    * Pre-process
@@ -98,7 +107,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
 
     $session->pushUserContext(CRM_Utils_System::url($url, $params));
     $this->assign('id', $this->_id);
-
+    $this->setDeleteMessage(ts('WARNING: Deleting this option will result in the loss of all %1 related records which use the option.', [1 => $this->_gLabel]) . ts('This may mean the loss of a substantial amount of data, and the action cannot be undone.') . ts('Do you want to continue?'));
     if ($this->_id && CRM_Core_OptionGroup::isDomainOptionGroup($this->_gName)) {
       $domainID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', $this->_id, 'domain_id', 'id');
       if (CRM_Core_Config::domainID() != $domainID) {
@@ -156,6 +165,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
     $this->setPageTitle(ts('%1 Option', [1 => $this->_gLabel]));
 
     if ($this->_action & CRM_Core_Action::DELETE) {
+      $this->buildDeleteForm();
       return;
     }
 
