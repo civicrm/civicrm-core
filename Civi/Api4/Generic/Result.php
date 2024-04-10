@@ -107,6 +107,8 @@ class Result extends \ArrayObject implements \JsonSerializable {
    *
    * Drops any item from the results that does not contain the specified key
    *
+   * Unlike $this->rekey, this rewrites the row keys not the column keys.
+   *
    * @param string $key
    * @return $this
    * @throws \CRM_Core_Exception
@@ -192,6 +194,24 @@ class Result extends \ArrayObject implements \JsonSerializable {
    */
   public function column($name): array {
     return array_column($this->getArrayCopy(), $name, $this->indexedBy);
+  }
+
+  /**
+   * Rewrite keys in each result according to a map or a callback function.
+   *
+   * Unlike $this->indexBy, this rewrites the column keys not the row keys.
+   *
+   * @param array|callable $map
+   *   Map of keys to convert e.g. `[old_key => new_key]`
+   *   Or a callback function like `fn($key, $value) => $newKey`
+   * @return $this
+   */
+  public function rekey($map) {
+    $callback = is_callable($map) ? $map : fn($key) => $map[$key] ?? $key;
+    foreach ($this as &$items) {
+      $items = \CRM_Utils_Array::rekey($items, $callback);
+    }
+    return $this;
   }
 
   /**
