@@ -455,6 +455,51 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
  * @return array
  */
 public static function getCaseActivities(string $type, int $userID, array $condition = [], ?string $limit = NULL, ?string $order = NULL) : array {
+  $params = self::getCaseActivityParams($type, $userID, $condition);
+  $params['select'] = [
+    'case_id',
+    'case_id.subject',
+    'case_contact.contact_id',
+    'case_contact.sort_name',
+    'case_contact.phone',
+    'case_contact.contact_type',
+    'case_contact.contact_sub_type',
+    'activity_id.activity_type_id',
+    'case_id.case_type_id',
+    'case_id.status_id',
+    'activity_id.status_id',
+    'case_id.start_date',
+    'relationship.label_a_b',
+    'relationship.label_b_a',
+    'activity_id.activity_date_time',
+    'activity_id.id',
+    'case_status.label',
+    'case_type.title',
+  ];
+    $cases = [];
+  $result = civicrm_api4('CaseActivity', 'get', $params);
+  foreach ($result as $case) {
+    $cases[$case['case_id']] = [
+      'case_id' => $case['case_id'],
+      'case_subject' => $case['case_id.subject'],
+      'contact_id' => $case['case_contact.contact_id'],
+      'sort_name' => $case['case_contact.sort_name'],
+      'phone' => $case['case_contact.phone'],
+      'contact_type' => $case['case_contact.contact_type'],
+      'contact_sub_type' => $case['case_contact.contact_sub_type'],
+      'activity_type_id' => $case['activity_id.activity_type_id'],
+      'case_type_id' => $case['case_id.case_type_id'],
+      'case_status_id' => $case['case_id.status_id'],
+      'status_id' => $case['activity_id.status_id'],
+      'case_start_date' => $case['case_id.start_date'],
+      'case_role' => $case['relationship.label_a_b'] ?? $case['relationship.label_b_a'],
+      'activity_date_time' => $case['activity_id.activity_date_time'],
+      'activity_id' => $case['activity_id.id'],
+      'case_status' => $case['case_status.label'],
+      'case_type' => $case['case_type.title'],
+    ];
+  }
+  return $cases;
 }
 
 /**
@@ -465,26 +510,50 @@ public static function getCaseActivities(string $type, int $userID, array $condi
  * @return int
  */
 public static function getCaseActivitiesCount(string $type, int $userID, array $condition = []) : int{
+  $params = self::getCaseActivityParams($type, $userID, $condition);
+  $params['select'] = [
+    'row_count',
+  ];
 
-      case 'recent':
-          $params['activity_id.activity_date_time'] = ['<' => 'now'];
-          break;
-
-      case 'any':
-          break;
-
-      default:
-          throw new Exception('Invalid type specified');
-  }
-
-  if ($condition) {
-      $params['where'] = $condition;
-  }
-
-  $result = civicrm_api4('CaseActivity', 'getcount', $params);
-
-  return $result['count'] ?? 0;
+  $result = civicrm_api4('CaseActivity', 'get', $params);
+  return $result->rowCount ?? 0;
 }
+
+/**
+ * @param string $type
+ * @param int $userID
+ * @param array $condition
+ * @return array
+ * 
+ */
+  public static function getCaseActivityParams(string $type, int $userID, array $condition = []) : array
+  {
+    $params = [];
+    $params['join'] = [
+      ['Relationship AS relationship', 'LEFT', ['case_id', '=', 'relationship.case_id']],
+      ['CaseContact AS case_contact', 'LEFT', ['case_id.id', '=', 'case_contact.case_id']],
+    ];
+    switch ($type) {
+        case 'upcoming':
+            $condition[] = ['activity_id.activity_date_time', '>' , date('Y-m-d')];
+            break;
+
+        case 'recent':
+            $condition[] = ['activity_id.activity_date_time', '<' , date('Y-m-d')];
+            break;
+
+        case 'any':
+            break;
+
+        default:
+            throw new Exception('Invalid type specified');
+    }
+
+    if ($condition) {
+        $params['where'] = $condition;
+    }
+    return $params;
+  }
 
   /**
    * @param string $type
