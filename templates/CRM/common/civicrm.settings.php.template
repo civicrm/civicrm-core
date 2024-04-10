@@ -254,7 +254,7 @@ if (!defined('CIVICRM_UF_BASEURL')) {
 
 
 /**
- * Specify a Smarty 3 autoload file.
+ * Specify a Smarty autoload file.
  *
  * Smarty5 is the version of Smarty we are in the process of adopting. To enable it
  * un-comment the line describing the path. Note that this will become always enabled in
