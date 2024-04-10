@@ -444,6 +444,83 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
     return $caseArray;
   }
 
+
+  /**
+ * @param string $type
+ * @param int $userID
+ * @param string|null $condition
+ * @param string|null $limit
+ * @param string|null $order
+ *
+ * @return array
+ */
+public static function getCaseActivities($type, $userID, $condition = NULL, $limit = NULL, $order = NULL) {
+  $params = [
+      'sequential' => 1,
+      'options' => ['limit' => $limit],
+      'activity_type' => 'caseActivity',
+  ];
+
+  switch ($type) {
+      case 'upcoming':
+          $params['activity_id.activity_date_time'] = ['>' => 'now'];
+          break;
+
+      case 'recent':
+          $params['activity_id.activity_date_time'] = ['<' => 'now'];
+          break;
+
+      case 'any':
+          break;
+
+      default:
+          throw new Exception('Invalid type specified');
+  }
+
+  if ($condition) {
+      $params['where'] = $condition;
+  }
+
+  return civicrm_api4('CaseActivity', 'get', $params)['values'] ?? [];
+}
+
+/**
+ * @param string $type
+ * @param int $userID
+ * @param string|null $condition
+ *
+ * @return int
+ */
+public static function getCaseActivitiesCount($type, $userID, $condition = NULL) {
+  $params = [
+      'activity_type' => 'caseActivity',
+  ];
+
+  switch ($type) {
+      case 'upcoming':
+          $params['activity_id.activity_date_time'] = ['>' => 'now'];
+          break;
+
+      case 'recent':
+          $params['activity_id.activity_date_time'] = ['<' => 'now'];
+          break;
+
+      case 'any':
+          break;
+
+      default:
+          throw new Exception('Invalid type specified');
+  }
+
+  if ($condition) {
+      $params['where'] = $condition;
+  }
+
+  $result = civicrm_api4('CaseActivity', 'getcount', $params);
+
+  return $result['count'] ?? 0;
+}
+
   /**
    * @param string $type
    * @param int $userID
@@ -579,7 +656,7 @@ HERESQL;
    * @param string $context
    * @param bool $getCount
    *
-   * @return array
+   * @return array | int
    *   Array of Cases
    */
   public static function getCases($allCases = TRUE, $params = [], $context = 'dashboard', $getCount = FALSE) {
@@ -622,11 +699,14 @@ HERESQL;
     }
     $condition = implode(' AND ', $whereClauses);
 
-    Civi::$statics[__CLASS__]['totalCount'][$type] = $totalCount = CRM_Core_DAO::singleValueQuery(self::getCaseActivityCountQuery($type, $userID, $condition));
+    $totalCount = self::getCaseActivitiesCount($type, $userID, $condition);
     if ($getCount) {
-      return $totalCount;
+        Civi::$statics[__CLASS__]['totalCount'][$type] = $totalCount;
+        return $totalCount;
     }
+    $casesList = self::getCaseActivities($type, $userID, $condition);
     $casesList['total'] = $totalCount;
+    
 
     $limit = '';
     if (!empty($params['rp'])) {
@@ -645,8 +725,7 @@ HERESQL;
       $order = "ORDER BY " . $params['sortBy'];
     }
 
-    $query = self::getCaseActivityQuery($type, $userID, $condition, $limit, $order);
-    $result = CRM_Core_DAO::executeQuery($query);
+    $cases = self::getCaseActivities($type, $userID, $condition, $limit, $order);
 
     // we're going to use the usual actions, so doesn't make sense to duplicate definitions
     $actions = CRM_Case_Selector_Search::links();
@@ -669,7 +748,7 @@ HERESQL;
     $caseTypeTitles = CRM_Case_PseudoConstant::caseType('title', FALSE);
     $activityTypeLabels = CRM_Activity_BAO_Activity::buildOptions('activity_type_id');
 
-    foreach ($result->fetchAll() as $case) {
+    foreach ($cases as $case) {
       $key = $case['case_id'];
       $casesList[$key] = [];
       $casesList[$key]['DT_RowId'] = $case['case_id'];
