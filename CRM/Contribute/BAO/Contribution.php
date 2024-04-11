@@ -14,6 +14,7 @@ use Civi\Api4\ActivityContact;
 use Civi\Api4\Address;
 use Civi\Api4\Contribution;
 use Civi\Api4\ContributionRecur;
+use Civi\Api4\EntityFinancialTrxn;
 use Civi\Api4\LineItem;
 use Civi\Api4\ContributionSoft;
 use Civi\Api4\MembershipLog;
@@ -4523,14 +4524,13 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    *
    * @throws \CRM_Core_Exception
    */
-  public static function createProportionalEntry($entityParams, $eftParams) {
-    $paid = 0;
+  public static function createProportionalEntry(array $entityParams, array $eftParams): void {
+    $eftParams['amount'] = 0;
     if ($entityParams['contribution_total_amount'] != 0) {
-      $paid = $entityParams['line_item_amount'] * ($entityParams['trxn_total_amount'] / $entityParams['contribution_total_amount']);
+      $eftParams['amount'] = $entityParams['line_item_amount'] * ($entityParams['trxn_total_amount'] / $entityParams['contribution_total_amount']);
     }
     // Record Entity Financial Trxn; CRM-20145
-    $eftParams['amount'] = $paid;
-    civicrm_api3('EntityFinancialTrxn', 'create', $eftParams);
+    EntityFinancialTrxn::create(FALSE)->setValues($eftParams)->execute();
   }
 
   /**
