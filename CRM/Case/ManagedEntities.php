@@ -43,7 +43,7 @@ class CRM_Case_ManagedEntities {
             'description' => (string) $xml->description,
             'is_reserved' => 1,
             'is_active' => 1,
-            'weight' => $xml->weight ? $xml->weight : 1,
+            'weight' => $xml->weight ?: 1,
           ],
         ];
       }

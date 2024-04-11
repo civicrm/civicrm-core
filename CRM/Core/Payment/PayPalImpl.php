@@ -1124,7 +1124,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       $keyPos = strpos($str, '=');
 
       // position of value
-      $valPos = strpos($str, '&') ? strpos($str, '&') : strlen($str);
+      $valPos = strpos($str, '&') ?: strlen($str);
 
       /*getting the Key and Value values and storing in a Associative Array*/
 

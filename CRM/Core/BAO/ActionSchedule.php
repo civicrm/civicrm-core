@@ -543,7 +543,7 @@ FROM civicrm_action_schedule cas
     $activityParams = [
       'subject' => $tokenRow->render('subject'),
       'details' => $tokenRow->render('body_html'),
-      'source_contact_id' => $session->get('userID') ? $session->get('userID') : $contactID,
+      'source_contact_id' => $session->get('userID') ?: $contactID,
       'target_contact_id' => $contactID,
       // @todo - not required with api
       'activity_date_time' => CRM_Utils_Time::getTime('YmdHis'),
@@ -615,7 +615,7 @@ FROM civicrm_action_schedule cas
     $sms_body_text = $tokenRow->render('sms_body_text');
 
     $session = CRM_Core_Session::singleton();
-    $userID = $session->get('userID') ? $session->get('userID') : $tokenRow->context['contactId'];
+    $userID = $session->get('userID') ?: $tokenRow->context['contactId'];
     $smsParams = [
       'To' => $toPhoneNumber,
       'provider_id' => $schedule->sms_provider_id,
