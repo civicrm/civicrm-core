@@ -714,6 +714,7 @@ class CRM_Core_Permission {
         'implies' => [
           'administer CiviCRM system',
           'administer CiviCRM data',
+          'access CiviCRM',
         ],
       ],
       'skip IDS check' => [
