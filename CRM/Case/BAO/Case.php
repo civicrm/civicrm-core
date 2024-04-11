@@ -528,6 +528,7 @@ public static function getCaseActivitiesCount(string $type, int $userID, array $
   $params['select'] = [
     'row_count',
   ];
+  $params['groupBy'] = ['case_id'];
 
   $result = civicrm_api4('CaseActivity', 'get', $params);
   return $result->rowCount ?? 0;
