@@ -171,7 +171,7 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
     $ufField->field_type = $params['field_type'] ?? NULL;
     $ufField->field_name = $params['field_name'] ?? NULL;
     $ufField->website_type_id = $params['website_type_id'] ?? NULL;
-    if (is_null(CRM_Utils_Array::value('location_type_id', $params, ''))) {
+    if (array_key_exists('location_type_id', $params) && is_null($params['location_type_id'])) {
       // primary location type have NULL value in DB
       $ufField->whereAdd("location_type_id IS NULL");
     }

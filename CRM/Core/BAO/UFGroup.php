@@ -457,7 +457,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
     if (isset($field->phone_type_id)) {
       $name .= "-{$field->phone_type_id}";
     }
-    $fieldMetaData = CRM_Utils_Array::value($name, $importableFields, ($importableFields[$field->field_name] ?? []));
+    $fieldMetaData = $importableFields[$name] ?? $importableFields[$field->field_name] ?? [];
 
     // No lie: this is bizarre; why do we need to mix so many UFGroup properties into UFFields?
     // I guess to make field self sufficient with all the required data and avoid additional calls
@@ -470,7 +470,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
       'groupHelpPost' => empty($group->help_post) ? '' : $group->help_post,
       'title' => $title,
       'where' => $importableFields[$field->field_name]['where'] ?? NULL,
-      'attributes' => CRM_Core_DAO::makeAttribute(CRM_Utils_Array::value($field->field_name, $importableFields)),
+      'attributes' => CRM_Core_DAO::makeAttribute($importableFields[$field->field_name] ?? NULL),
       'is_required' => $field->is_required,
       'is_view' => $field->is_view,
       'help_pre' => $field->help_pre,
@@ -486,15 +486,9 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
       'add_captcha' => $group->add_captcha ?? NULL,
       'field_type' => $field->field_type,
       'field_id' => $field->id,
-      'pseudoconstant' => CRM_Utils_Array::value(
-        'pseudoconstant',
-        CRM_Utils_Array::value($field->field_name, $importableFields)
-      ),
+      'pseudoconstant' => $importableFields[$field->field_name]['pseudoconstant'] ?? NULL,
       // obsolete this when we remove the name / dbName discrepancy with gender/suffix/prefix
-      'dbName' => CRM_Utils_Array::value(
-        'dbName',
-        CRM_Utils_Array::value($field->field_name, $importableFields)
-      ),
+      'dbName' => $importableFields[$field->field_name]['dbName'] ?? NULL,
       'skipDisplay' => 0,
       'data_type' => CRM_Utils_Type::getDataTypeFromFieldMetadata($fieldMetaData),
       'bao' => $fieldMetaData['bao'] ?? NULL,
@@ -822,9 +816,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
       );
       if ($reset || $doNotProcess) {
         // hack to make sure we do not process this form
-        $oldQFDefault = CRM_Utils_Array::value('_qf_default',
-          $_POST
-        );
+        $oldQFDefault = $_POST['_qf_default'] ?? NULL;
         unset($_POST['_qf_default']);
         unset($_REQUEST['_qf_default']);
         if ($reset) {
@@ -2145,9 +2137,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     }
     elseif (substr($fieldName, -11) == 'campaign_id') {
       if (CRM_Campaign_BAO_Campaign::isComponentEnabled()) {
-        $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns(CRM_Utils_Array::value($contactId,
-          $form->_componentCampaigns
-        ), NULL, TRUE, FALSE);
+        $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns($form->_componentCampaigns[$contactId] ?? NULL, NULL, TRUE, FALSE);
         $form->add('select', $name, $title,
           $campaigns, $required,
           [
@@ -2330,7 +2320,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
 
                 // fixed for CRM-665
                 if (is_numeric($locTypeId)) {
-                  if ($primaryLocationType || $locTypeId == CRM_Utils_Array::value('location_type_id', $value)) {
+                  if ($primaryLocationType || $locTypeId == ($value['location_type_id'] ?? NULL)) {
                     if (!empty($value[$fieldName])) {
                       //to handle stateprovince and country
                       if ($fieldName == 'state_province') {
@@ -3144,7 +3134,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
 
               foreach ($formattedGroupTree as $tree) {
                 if (!empty($tree['fields'][$customFieldDetails[0]])) {
-                  if ('CheckBox' == CRM_Utils_Array::value('html_type', $tree['fields'][$customFieldDetails[0]])) {
+                  if ('CheckBox' == ($tree['fields'][$customFieldDetails[0]]['html_type'] ?? NULL)) {
                     $skipValue = TRUE;
                     $defaults['field'][$componentId][$name] = $customValue;
                     break;
