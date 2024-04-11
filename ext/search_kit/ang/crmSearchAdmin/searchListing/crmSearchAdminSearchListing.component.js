@@ -18,7 +18,7 @@
       this.searchDisplayPath = CRM.url('civicrm/search');
       this.afformPath = CRM.url('civicrm/admin/afform');
       this.afformEnabled = 'org.civicrm.afform' in CRM.crmSearchAdmin.modules;
-      this.afformAdminEnabled = (CRM.checkPerm('administer CiviCRM') || CRM.checkPerm('administer afform')) &&
+      this.afformAdminEnabled = CRM.checkPerm('administer afform') &&
         'org.civicrm.afform_admin' in CRM.crmSearchAdmin.modules;
       const scheduledCommunicationsEnabled = 'scheduled_communications' in CRM.crmSearchAdmin.modules;
 

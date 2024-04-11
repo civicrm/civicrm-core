@@ -28,7 +28,7 @@ class AfformBehavior extends Generic\AbstractEntity {
   public static function permissions() {
     return [
       'meta' => ['access CiviCRM'],
-      'get' => [['administer CiviCRM', 'administer afform']],
+      'get' => ['administer afform'],
     ];
   }
 

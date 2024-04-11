@@ -13,10 +13,8 @@ return [
         'name' => 'afform_admin',
         'label' => E::ts('FormBuilder'),
         'permission' => [
-          'administer CiviCRM',
           'administer afform',
         ],
-        'permission_operator' => 'OR',
         'parent_id.name' => 'Customize Data and Screens',
         'weight' => 1,
         'url' => 'civicrm/admin/afform',
