@@ -622,12 +622,9 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
         $params['price_' . $priceFieldID] = [$id => 1];
       }
     }
-    $form = $this->getContributionForm($params);
-    $mailUtil = new CiviMailUtils($this, TRUE);
-    $form->_priceSet = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetID));
-    $form->postProcess();
+    $this->submitContributionForm($params);
     if ($isTaxed) {
-      $mailUtil->checkMailLog([
+      $this->assertMailSentContainingString(
         'Dear Anthony,
 
 ===========================================================
@@ -648,10 +645,10 @@ Total Tax Amount : $10.00
 Total Amount : $110.00
 Contribution Date: ' . date('m/d/Y') . '
 Receipt Date: ' . date('m/d/Y'),
-      ]);
+      );
     }
     else {
-      $mailUtil->checkMailLog([
+      $this->assertMailSentContainingString(
         'Dear Anthony,
 
 ===========================================================
@@ -669,8 +666,9 @@ Price Field - Price Field 1        1    $100.00       $100.00
 Total Amount : $100.00
 Contribution Date: ' . date('m/d/Y') . '
 Receipt Date: ' . date('m/d/Y'),
-      ],
-      ['Amount before Tax', 'Tax Amount']);
+      );
+      $this->assertMailSentNotContainingString('Amount before Tax');
+      $this->assertMailSentNotContainingString('Tax Amount');
     }
   }
 
@@ -2108,6 +2106,7 @@ Receipt Date: ' . date('m/d/Y'),
   protected function getContributionForm(array $formValues): CRM_Contribute_Form_Contribution {
     /** @var CRM_Contribute_Form_Contribution $form */
     $form = $this->getFormObject('CRM_Contribute_Form_Contribution', $formValues);
+    $form->preProcess();
     $form->buildForm();
     return $form;
   }
