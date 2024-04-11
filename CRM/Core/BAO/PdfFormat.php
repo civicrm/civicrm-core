@@ -256,7 +256,7 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
           $f = rtrim($f, '.');
           return (float) (empty($f) ? '0' : $f);
       }
-      return CRM_Utils_Array::value($field, $values, $default);
+      return $values[$field] ?? $default;
     }
     return $default;
   }

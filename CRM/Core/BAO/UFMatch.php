@@ -113,8 +113,8 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
       // Are we processing logged in user.
       if ($loggedInUserUfID && $loggedInUserUfID != $ufID) {
         $userIds = self::getUFValues($loggedInUserUfID);
-        $ufID = CRM_Utils_Array::value('uf_id', $userIds, '');
-        $userID = CRM_Utils_Array::value('contact_id', $userIds, '');
+        $ufID = $userIds['uf_id'] ?? '';
+        $userID = $userIds['contact_id'] ?? '';
       }
     }
 
