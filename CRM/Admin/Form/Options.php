@@ -58,6 +58,13 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
   }
 
   /**
+   * The Option Group ID.
+   * @var int
+   * @internal
+   */
+  protected $_gid;
+
+  /**
    * Pre-process
    */
   public function preProcess() {
@@ -113,6 +120,16 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       if (CRM_Core_Config::domainID() != $domainID) {
         CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
       }
+    }
+    if ($this->isSubmitted()) {
+      // The custom data fields are added to the form by an ajax form.
+      // However, if they are not present in the element index they will
+      // not be available from `$this->getSubmittedValue()` in post process.
+      // We do not have to set defaults or otherwise render - just add to the element index.
+      $this->addCustomDataFieldsToForm('OptionValue', array_filter([
+        'id' => $this->_id,
+        'option_group_id' => $this->_gid,
+      ]));
     }
   }
 
@@ -363,6 +380,9 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
     }
 
     $this->addFormRule(['CRM_Admin_Form_Options', 'formRule'], $this);
+    //need to assign subtype to the template
+    $this->assign('customDataSubType', $this->_gid);
+    $this->assign('entityID', $this->_id);
   }
 
   /**
@@ -482,7 +502,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       }
     }
     else {
-      $params = $this->exportValues();
+      $params = $this->getSubmittedValues();
       if ($this->isGreetingOptionGroup()) {
         $params['filter'] = $params['contact_type_id'];
       }
@@ -504,7 +524,10 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       if (isset($params['color']) && strtolower($params['color']) == '#ffffff') {
         $params['color'] = 'null';
       }
-
+      $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
+        $this->_id,
+        'OptionValue'
+      );
       $optionValue = CRM_Core_OptionValue::addOptionValue($params, $this->_gName, $this->_action, $this->_id);
 
       CRM_Core_Session::setStatus(ts('The %1 \'%2\' has been saved.', [
