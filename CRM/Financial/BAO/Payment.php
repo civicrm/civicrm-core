@@ -17,6 +17,7 @@
 
 use Civi\Api4\FinancialItem;
 use Civi\Api4\LineItem;
+use Civi\Api4\EntityFinancialTrxn;
 
 /**
  * This class contains payment related functions.
@@ -156,7 +157,7 @@ class CRM_Financial_BAO_Payment {
           'entity_id' => $payableItem['financial_item.id'],
           'amount' => $payableItem['allocation'],
         ];
-        civicrm_api3('EntityFinancialTrxn', 'create', $eftParams);
+        EntityFinancialTrxn::create(FALSE)->setValues($eftParams)->execute();
 
         if ('Paid' !== $payableItem['financial_item.status_id:name']) {
           // Did the lineitem get fully paid?
@@ -175,16 +176,14 @@ class CRM_Financial_BAO_Payment {
             // If we find a "Sales Tax" lineitem we record a tax entry in entityFiancncialTrxn
             // @todo - this is expected to be broken - it should be fixed to
             // a) have the getPayableLineItems add the amount to allocate for tax
-            // b) call EntityFinancialTrxn directly - per above.
             // - see https://github.com/civicrm/civicrm-core/pull/14763
-            $entityParams = [
-              'contribution_total_amount' => $contribution['total_amount'],
-              'trxn_total_amount' => $params['total_amount'],
-              'trxn_id' => $trxn->id,
-              'line_item_amount' => $financialItem['tax_amount'],
-            ];
             $eftParams['entity_id'] = $financialItem['financial_item.id'];
-            CRM_Contribute_BAO_Contribution::createProportionalEntry($entityParams, $eftParams);
+            $eftParams['amount'] = 0;
+            if ($contribution['total_amount'] != 0) {
+              $eftParams['amount'] = $financialItem['tax_amount'] * ($params['total_amount'] / $contribution['total_amount']);
+            }
+            // Record Entity Financial Trxn; CRM-20145
+            EntityFinancialTrxn::create(FALSE)->setValues($eftParams)->execute();
           }
         }
       }
