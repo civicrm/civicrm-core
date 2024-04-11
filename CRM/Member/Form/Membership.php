@@ -333,8 +333,7 @@ DESC limit 1");
         $getOnlyPriceSetElements = FALSE;
       }
 
-      $this->set('priceSetId', $this->_priceSetId);
-      CRM_Price_BAO_PriceSet::buildPriceSet($this, 'membership', FALSE);
+      $this->buildMembershipPriceSet();
 
       $optionsMembershipTypes = [];
       foreach ($this->_priceSet['fields'] as $pField) {
@@ -574,6 +573,80 @@ DESC limit 1");
     $this->assign('isEmailEnabledForSite', ($mailingInfo['outBound_option'] != 2));
 
     parent::buildQuickForm();
+  }
+
+  /**
+   * Build the price set form.
+   *
+   * @return void
+   *
+   * @deprecated this should be updated to align with the other forms that use getOrder()
+   */
+  private function buildMembershipPriceSet() {
+    $priceSetId = $this->getPriceSetID();
+    $form = $this;
+
+    $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($priceSetId, TRUE, FALSE);
+    $form->_priceSet = $priceSet[$priceSetId] ?? NULL;
+    $validPriceFieldIds = array_keys($form->_priceSet['fields']);
+
+    // Mark which field should have the auto-renew checkbox, if any. CRM-18305
+    if (!empty($form->_membershipTypeValues) && is_array($form->_membershipTypeValues)) {
+      $autoRenewMembershipTypes = [];
+      foreach ($form->_membershipTypeValues as $membershipTypeValue) {
+        if ($membershipTypeValue['auto_renew']) {
+          $autoRenewMembershipTypes[] = $membershipTypeValue['id'];
+        }
+      }
+      foreach ($form->_priceSet['fields'] as $field) {
+        if (array_key_exists('options', $field) && is_array($field['options'])) {
+          foreach ($field['options'] as $option) {
+            if (!empty($option['membership_type_id'])) {
+              if (in_array($option['membership_type_id'], $autoRenewMembershipTypes)) {
+                $form->_priceSet['auto_renew_membership_field'] = $field['id'];
+                // Only one field can offer auto_renew memberships, so break here.
+                break;
+              }
+            }
+          }
+        }
+      }
+    }
+    $form->_priceSet['id'] ??= $priceSetId;
+    $form->assign('priceSet', $form->_priceSet);
+
+    $feeBlock = &$form->_priceSet['fields'];
+
+    // Call the buildAmount hook.
+    CRM_Utils_Hook::buildAmount('membership', $form, $feeBlock);
+
+    // CRM-14492 Admin price fields should show up on event registration if user has 'administer CiviCRM' permissions
+    $adminFieldVisible = CRM_Core_Permission::check('administer CiviCRM');
+    $checklifetime = FALSE;
+    $validFieldsOnly = FALSE;
+    foreach ($feeBlock as $id => $field) {
+      if (($field['visibility'] ?? NULL) == 'public' ||
+        (($field['visibility'] ?? NULL) == 'admin' && $adminFieldVisible == TRUE) ||
+        !$validFieldsOnly
+      ) {
+        $options = $field['options'] ?? NULL;
+        if (!is_array($options) || !in_array($id, $validPriceFieldIds)) {
+          continue;
+        }
+        if (!empty($options)) {
+          CRM_Price_BAO_PriceField::addQuickFormElement($form,
+            'price_' . $field['id'],
+            $field['id'],
+            FALSE,
+            $field['is_required'] ?? FALSE,
+            NULL,
+            $options
+          );
+        }
+      }
+    }
+    $form->assign('ispricelifetime', $checklifetime);
+
   }
 
   /**
