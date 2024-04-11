@@ -82,6 +82,7 @@ function standaloneusers_civicrm_permission(&$permissions) {
   // Concrete implementations of synthetic cms: permissions.
   $permissions['administer users'] = [
     'label' => E::ts('Administer user accounts'),
+    'implies' => ['view user account'],
   ];
   $permissions['view user account'] = [
     'label' => E::ts('View user accounts'),
