@@ -11,8 +11,12 @@ body.admin.com_civicrm .crm-container .label {
   font-size: inherit;
   line-height: inherit;
 }
-body.admin.com_civicrm.layout-default #content {
+body.admin.com_civicrm.layout-default #content,
+body.admin.com_civicrm.layout-default #content > .row > .col-md-12 {
   padding: 0;
+}
+body.admin.com_civicrm.layout-default #content > .row {
+  margin-inline: 0;
 }
 body.admin.com_civicrm #crm-content {
   padding: 1rem;
