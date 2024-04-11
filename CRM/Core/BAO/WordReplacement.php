@@ -263,11 +263,8 @@ WHERE  domain_id = %1
    *   List of word replacements (enabled/disabled) for the given locale.
    */
   public static function getLocaleCustomStrings($locale, $domainId = NULL) {
-    if ($domainId === NULL) {
-      $domainId = CRM_Core_Config::domainID();
-    }
-
-    return CRM_Utils_Array::value($locale, self::_getLocaleCustomStrings($domainId));
+    $domainId ??= CRM_Core_Config::domainID();
+    return self::_getLocaleCustomStrings($domainId)[$locale] ?? [];
   }
 
   /**
