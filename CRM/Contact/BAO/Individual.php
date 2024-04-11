@@ -55,10 +55,10 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
     $firstName = trim($params['first_name'] ?? '');
     $middleName = trim($params['middle_name'] ?? '');
     $lastName = trim($params['last_name'] ?? '');
-    $nickName = CRM_Utils_Array::value('nick_name', $params, '');
-    $prefix_id = CRM_Utils_Array::value('prefix_id', $params, '');
-    $suffix_id = CRM_Utils_Array::value('suffix_id', $params, '');
-    $formalTitle = CRM_Utils_Array::value('formal_title', $params, '');
+    $nickName = $params['nick_name'] ?? '';
+    $prefix_id = $params['prefix_id'] ?? '';
+    $suffix_id = $params['suffix_id'] ?? '';
+    $formalTitle = $params['formal_title'] ?? '';
 
     // get prefix and suffix names
     $params['prefix_id:label'] = $prefix = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', 'prefix_id', $prefix_id);
