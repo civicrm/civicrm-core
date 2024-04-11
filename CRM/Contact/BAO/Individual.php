@@ -73,15 +73,17 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
         //lets allow to update single name field though preserveDBName
         //but if db having null value and params contain value, CRM-4330.
         $useDBNames = [];
-
-        foreach (['last', 'middle', 'first', 'nick'] as $name) {
-          $dbName = "{$name}_name";
-          $value = $individual->$dbName;
-
-          // the db has name values
-          if ($value && !empty($params['preserveDBName'])) {
-            $useDBNames[] = $name;
-          }
+        if ($individual->last_name && !empty($params['preserveDBName'])) {
+          $useDBNames[] = 'last';
+        }
+        if ($individual->middle_name && !empty($params['preserveDBName'])) {
+          $useDBNames[] = 'middle';
+        }
+        if ($individual->first_name && !empty($params['preserveDBName'])) {
+          $useDBNames[] = 'first';
+        }
+        if ($individual->nick_name && !empty($params['preserveDBName'])) {
+          $useDBNames[] = 'nick';
         }
 
         if ($individual->suffix_id && !empty($params['preserveDBName'])) {
