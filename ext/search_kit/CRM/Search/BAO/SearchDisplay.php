@@ -32,7 +32,7 @@ class CRM_Search_BAO_SearchDisplay extends CRM_Search_DAO_SearchDisplay implemen
         return;
       }
       // Must be at least a SearchKit administrator
-      if (!CRM_Core_Permission::check([['administer CiviCRM data', 'administer search_kit']], $userCID)) {
+      if (!CRM_Core_Permission::check('administer search_kit', $userCID)) {
         $e->setAuthorized(FALSE);
         return;
       }
