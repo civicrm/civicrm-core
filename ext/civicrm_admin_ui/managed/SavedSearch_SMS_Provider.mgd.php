@@ -114,7 +114,6 @@ return [
                   'style' => 'default',
                   'path' => '',
                   'action' => '',
-                  'condition' => ['is_active', '=', FALSE],
                 ],
                 [
                   'task' => 'disable',
@@ -126,7 +125,6 @@ return [
                   'style' => 'default',
                   'path' => '',
                   'action' => '',
-                  'condition' => ['is_active', '=', TRUE],
                 ],
                 [
                   'entity' => 'SmsProvider',
