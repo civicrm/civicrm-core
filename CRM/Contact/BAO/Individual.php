@@ -100,22 +100,52 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
         //1. preserve db name if want
         //2. lets get value from param if exists.
         //3. if not in params, lets get from db.
+        if (in_array('last', $useDBNames)) {
+          $params['last_name'] = $individual->last_name;
+          $contact->last_name = $individual->last_name;
+          $lastName = $individual->last_name;
+        }
+        elseif (array_key_exists('last_name', $params)) {
+          $lastName = $params['last_name'];
+        }
+        elseif ($individual->last_name) {
+          $lastName = $individual->last_name;
+        }
 
-        foreach (['last', 'middle', 'first', 'nick'] as $name) {
-          $phpName = "{$name}Name";
-          $dbName = "{$name}_name";
-          $value = $individual->$dbName;
-          if (in_array($name, $useDBNames)) {
-            $params[$dbName] = $value;
-            $contact->$dbName = $value;
-            $$phpName = $value;
-          }
-          elseif (array_key_exists($dbName, $params)) {
-            $$phpName = $params[$dbName];
-          }
-          elseif ($value) {
-            $$phpName = $value;
-          }
+        if (in_array('middle', $useDBNames)) {
+          $params['middle_name'] = $individual->middle_name;
+          $contact->middle_name = $individual->middle_name;
+          $middleName = $individual->middle_name;
+        }
+        elseif (array_key_exists('middle_name', $params)) {
+          $middleName = $params['middle_name'];
+        }
+        elseif ($individual->middle_name) {
+          $middleName = $individual->middle_name;
+        }
+
+        if (in_array('first', $useDBNames)) {
+          $params['first_name'] = $individual->first_name;
+          $contact->first_name = $individual->first_name;
+          $firstName = $individual->first_name;
+        }
+        elseif (array_key_exists('first_name', $params)) {
+          $firstName = $params['first_name'];
+        }
+        elseif ($individual->first_name) {
+          $firstName = $individual->first_name;
+        }
+
+        if (in_array('nick', $useDBNames)) {
+          $params['nick_name'] = $individual->nick_name;
+          $contact->nick_name = $individual->nick_name;
+          $nickName = $individual->nick_name;
+        }
+        elseif (array_key_exists('nick_name', $params)) {
+          $nickName = $params['nick_name'];
+        }
+        elseif ($individual->nick_name) {
+          $nickName = $individual->nick_name;
         }
 
         foreach (['prefix', 'suffix'] as $name) {
