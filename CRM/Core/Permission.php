@@ -591,6 +591,14 @@ class CRM_Core_Permission {
     $permissions = self::getCoreAndComponentPermissions();
     $module_permissions = CRM_Core_Config::singleton()->userPermissionClass->getAllModulePermissions();
     $allPermissions = array_merge($permissions, $module_permissions);
+    // Propagate implied_by permissions to their parents
+    foreach ($allPermissions as $name => $permission) {
+      foreach ($permission['implied_by'] ?? [] as $parent) {
+        if (isset($allPermissions[$parent])) {
+          $allPermissions[$parent]['implies'][] = $name;
+        }
+      }
+    }
     // Propagate implied permissions to their children
     foreach ($allPermissions as $name => $permission) {
       if (!empty($permission['implies'])) {
@@ -706,6 +714,7 @@ class CRM_Core_Permission {
         'implies' => [
           'administer CiviCRM system',
           'administer CiviCRM data',
+          'access CiviCRM',
         ],
       ],
       'skip IDS check' => [

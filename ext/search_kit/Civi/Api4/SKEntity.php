@@ -87,8 +87,8 @@ class SKEntity {
   public static function permissions(): array {
     return [
       'meta' => ['access CiviCRM'],
-      'refresh' => [['administer CiviCRM data', 'administer search_kit']],
-      'getRefreshDate' => [['administer CiviCRM data', 'administer search_kit']],
+      'refresh' => ['administer search_kit'],
+      'getRefreshDate' => ['administer search_kit'],
     ];
   }
 

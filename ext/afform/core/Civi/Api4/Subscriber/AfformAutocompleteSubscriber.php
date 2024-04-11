@@ -132,7 +132,7 @@ class AfformAutocompleteSubscriber extends AutoService implements EventSubscribe
    * @param \Civi\Api4\Generic\AutocompleteAction $apiRequest
    */
   private function processAfformAdminAutocomplete(string $fieldName, AutocompleteAction $apiRequest):void {
-    if (!\CRM_Core_Permission::check([['administer CiviCRM', 'administer afform']])) {
+    if (!\CRM_Core_Permission::check('administer afform')) {
       return;
     }
     switch ($fieldName) {

@@ -434,6 +434,7 @@ function afform_civicrm_permission(&$permissions) {
   $permissions['administer afform'] = [
     'label' => E::ts('FormBuilder: edit and delete forms'),
     'description' => E::ts('Allows non-admin users to create, update and delete forms'),
+    'implied_by' => ['administer CiviCRM'],
   ];
 }
 

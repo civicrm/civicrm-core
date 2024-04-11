@@ -410,6 +410,8 @@ class CRM_Core_Permission_Base {
         'label' => $defn['label'] ?? $defn[0],
         'description' => $defn['description'] ?? $defn[1] ?? NULL,
         'disabled' => $defn['disabled'] ?? NULL,
+        'implies' => $defn['implies'] ?? NULL,
+        'implied_by' => $defn['implied_by'] ?? NULL,
       ];
       $permissions[$name] = array_filter($permission, fn($item) => isset($item));
     }

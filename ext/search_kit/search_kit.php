@@ -22,6 +22,7 @@ function search_kit_civicrm_permission(&$permissions) {
   $permissions['administer search_kit'] = [
     'label' => E::ts('SearchKit: edit and delete searches'),
     'description' => E::ts('Gives non-admin users access to the SearchKit UI to create, update and delete searches and displays'),
+    'implied_by' => ['administer CiviCRM data'],
   ];
 }
 
