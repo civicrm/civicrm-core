@@ -351,7 +351,7 @@ class CRM_Admin_Page_AJAX {
             'is_selectable' => (bool) $dao->is_selectable,
             'is_reserved' => (bool) $dao->is_reserved,
             'used_for' => $usedFor,
-            'color' => $dao->color ? $dao->color : '#ffffff',
+            'color' => $dao->color ?: '#ffffff',
             'usages' => civicrm_api3('EntityTag', 'getcount', [
               'entity_table' => ['IN' => $usedFor],
               'tag_id' => $dao->id,

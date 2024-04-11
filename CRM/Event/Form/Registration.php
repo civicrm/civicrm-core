@@ -838,7 +838,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     $participantParams = [
       'id' => $params['participant_id'] ?? NULL,
       'contact_id' => $contactID,
-      'event_id' => $form->_eventId ? $form->_eventId : $params['event_id'],
+      'event_id' => $form->_eventId ?: $params['event_id'],
       'status_id' => $params['participant_status'] ?? 1,
       'role_id' => $params['participant_role_id'] ?? CRM_Event_BAO_Participant::getDefaultRoleID(),
       'register_date' => ($registerDate) ? $registerDate : date('YmdHis'),

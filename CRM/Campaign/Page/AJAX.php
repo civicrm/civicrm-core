@@ -290,7 +290,7 @@ class CRM_Campaign_Page_AJAX {
       );
       while ($result->fetch()) {
         $contactID = $result->contact_id;
-        $typeImage = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ? $result->contact_sub_type : $result->contact_type,
+        $typeImage = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ?: $result->contact_type,
           FALSE,
           $result->contact_id
         );

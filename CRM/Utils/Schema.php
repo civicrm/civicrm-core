@@ -73,7 +73,7 @@ class CRM_Utils_Schema {
         break;
 
       case 'decimal':
-        $length = $fieldXML->length ? $fieldXML->length : '20,2';
+        $length = $fieldXML->length ?: '20,2';
         $field['sqlType'] = 'decimal(' . $length . ')';
         $field['crmType'] = self::toString('crmType', $fieldXML) ?: 'CRM_Utils_Type::T_MONEY';
         $field['precision'] = $length;

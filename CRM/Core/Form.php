@@ -938,7 +938,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @return string
    */
   public function getTitle() {
-    return $this->_title ? $this->_title : ts('ERROR: Title is not Set');
+    return $this->_title ?: ts('ERROR: Title is not Set');
   }
 
   /**

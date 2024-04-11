@@ -847,14 +847,14 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
         $contactUrl = CRM_Utils_System::url('civicrm/contact/view',
           "reset=1&cid={$result->contact_id}&key={$this->_key}&context={$this->_context}"
         );
-        $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ? $result->contact_sub_type : $result->contact_type,
+        $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ?: $result->contact_type,
           FALSE,
           $result->contact_id,
           TRUE,
           $contactUrl
         );
 
-        $row['contact_type_orig'] = $result->contact_sub_type ? $result->contact_sub_type : $result->contact_type;
+        $row['contact_type_orig'] = $result->contact_sub_type ?: $result->contact_type;
         $row['contact_id'] = $result->contact_id;
         $row['sort_name'] = $result->sort_name;
         // Surely this if should be if NOT - otherwise it's just wierd.

@@ -335,7 +335,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
         $result->case_id
       );
 
-      $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ? $result->contact_sub_type : $result->contact_type
+      $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ?: $result->contact_type
       );
 
       //adding case manager to case selector.CRM-4510.

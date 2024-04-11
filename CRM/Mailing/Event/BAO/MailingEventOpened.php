@@ -100,7 +100,7 @@ class CRM_Mailing_Event_BAO_MailingEventOpened extends CRM_Mailing_Event_DAO_Mai
       return $dao->N;
     }
     else {
-      return $dao->opened ? $dao->opened : 0;
+      return $dao->opened ?: 0;
     }
   }
 

@@ -501,7 +501,7 @@ WHERE  email = %2
       return $dao->N;
     }
     else {
-      return $dao->unsubs ? $dao->unsubs : 0;
+      return $dao->unsubs ?: 0;
     }
   }
 

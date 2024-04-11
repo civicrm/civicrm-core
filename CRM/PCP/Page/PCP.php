@@ -238,7 +238,7 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
       $pages['event'][$epages->id]['end_date'] = $epages->registration_end_date;
     }
 
-    $params = $this->get('params') ? $this->get('params') : [];
+    $params = $this->get('params') ?: [];
 
     $title = '1';
     if ($this->_sortByCharacter !== NULL) {

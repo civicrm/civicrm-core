@@ -787,7 +787,7 @@ class CRM_Core_I18n {
     }
 
     // FIXME: Is there a constant we can reference instead of hardcoding en_US?
-    $replacementsLocale = $this->locale ? $this->locale : 'en_US';
+    $replacementsLocale = $this->locale ?: 'en_US';
     if ((!isset(Civi::$statics[__CLASS__]) || !array_key_exists($replacementsLocale, Civi::$statics[__CLASS__]))) {
       if (defined('CIVICRM_DSN') && !CRM_Core_Config::isUpgradeMode()) {
         Civi::$statics[__CLASS__][$replacementsLocale] = CRM_Core_BAO_WordReplacement::getLocaleCustomStrings($replacementsLocale);

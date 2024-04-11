@@ -1273,7 +1273,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = c.contact_id )
       'details' => $message,
       'subject' => ts('Payment failed at payment processor'),
       'source_record_id' => $contributionID,
-      'source_contact_id' => CRM_Core_Session::getLoggedInContactID() ? CRM_Core_Session::getLoggedInContactID() : $contactID,
+      'source_contact_id' => CRM_Core_Session::getLoggedInContactID() ?: $contactID,
     ]);
 
     // CRM-20336 Make sure that the contribution status is Failed, not Pending.

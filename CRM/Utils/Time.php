@@ -126,7 +126,7 @@ class CRM_Utils_Time {
    * @return string
    */
   public static function setTime($newDateTime, $returnFormat = 'YmdHis') {
-    $mode = getenv('TIME_FUNC') ? getenv('TIME_FUNC') : 'natural';
+    $mode = getenv('TIME_FUNC') ?: 'natural';
 
     list ($modeName, $modeNum) = explode(":", "$mode:");
 

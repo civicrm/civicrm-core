@@ -239,7 +239,7 @@ class CRM_Utils_Mail_EmailProcessor {
 
         // get $replyTo from either the Reply-To header or from From
         // FIXME: make sure it works with Reply-Tos containing non-email stuff
-        $replyTo = $mail->getHeader('Reply-To') ? $mail->getHeader('Reply-To') : ($mail->from ? $mail->from->email : "");
+        $replyTo = $mail->getHeader('Reply-To') ?: ($mail->from ? $mail->from->email : "");
 
         // handle the action by passing it to the proper API call
         if (!empty($action)) {

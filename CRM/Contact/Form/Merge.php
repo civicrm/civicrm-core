@@ -173,11 +173,11 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
 
       $this->assign('mainLocBlock', json_encode($rowsElementsAndInfo['main_details']['location_blocks']));
       $this->assign('locationBlockInfo', json_encode(CRM_Dedupe_Merger::getLocationBlockInfo()));
-      $this->assign('mainContactTypeIcon', CRM_Contact_BAO_Contact_Utils::getImage($contacts[$this->_cid]['contact_sub_type'] ? $contacts[$this->_cid]['contact_sub_type'] : $contacts[$this->_cid]['contact_type'],
+      $this->assign('mainContactTypeIcon', CRM_Contact_BAO_Contact_Utils::getImage($contacts[$this->_cid]['contact_sub_type'] ?: $contacts[$this->_cid]['contact_type'],
         FALSE,
         $this->_cid
       ));
-      $this->assign('otherContactTypeIcon', CRM_Contact_BAO_Contact_Utils::getImage($contacts[$this->_oid]['contact_sub_type'] ? $contacts[$this->_oid]['contact_sub_type'] : $contacts[$this->_oid]['contact_type'],
+      $this->assign('otherContactTypeIcon', CRM_Contact_BAO_Contact_Utils::getImage($contacts[$this->_oid]['contact_sub_type'] ?: $contacts[$this->_oid]['contact_type'],
         FALSE,
         $this->_oid
       ));

@@ -116,8 +116,8 @@ class CRM_Utils_SQL_TempTable {
   public function getName() {
     $parts = ['civicrm', 'tmp'];
     $parts[] = ($this->durable ? 'd' : 'e');
-    $parts[] = $this->category ? $this->category : 'dflt';
-    $parts[] = $this->id ? $this->id : 'dflt';
+    $parts[] = $this->category ?: 'dflt';
+    $parts[] = $this->id ?: 'dflt';
     return implode('_', $parts);
   }
 
