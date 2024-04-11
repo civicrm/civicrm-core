@@ -77,7 +77,7 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
     if (empty($params['id'])) {
       $params['is_active'] ??= FALSE;
       $params['has_separator'] ??= FALSE;
-      $params['domain_id'] = CRM_Utils_Array::value('domain_id', $params, CRM_Core_Config::domainID());
+      $params['domain_id'] = $params['domain_id'] ?? CRM_Core_Config::domainID();
     }
 
     if (!isset($params['id']) ||
