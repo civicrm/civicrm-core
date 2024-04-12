@@ -152,12 +152,12 @@ class CRM_Utils_Check_Message {
    * @param string|false $confirmation
    *   Optional confirmation message before performing action
    * @param string $type
-   *   Currently supports: api3 or href
+   *   Link action type. One of: href|api3|api4
    * @param array $params
-   *   Params to be passed to CRM.api3 or CRM.url depending on type
-   *   Ex: ['MyApiEntity', 'MyApiAction', [...params...]]
-   *   Ex: ['path' => 'civicrm/admin/foo', 'query' => 'reset=1']
-   *   Ex: ['url' => 'https://example.com/more/info']
+   *   Params to be passed to the api or CRM.url (depending on $type)
+   *   Ex (api4): ['MyApiEntity', 'MyApiAction', [...apiParams...]]
+   *   Ex (href): ['path' => 'civicrm/admin/foo', 'query' => 'reset=1']
+   *   Ex (href): ['url' => 'https://example.com/more/info']
    * @param string $icon
    *   Fa-icon class for the button
    */
