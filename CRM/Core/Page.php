@@ -353,6 +353,7 @@ class CRM_Core_Page {
    * @return array
    */
   public function get_template_vars($name = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('getTemplateVars');
     return $this->getTemplateVars($name);
   }
 
@@ -362,6 +363,9 @@ class CRM_Core_Page {
    * @param string|null $name
    */
   public function getTemplateVars($name = NULL) {
+    if (!$name) {
+      CRM_Core_Error::deprecatedWarning('not passing a variable name will give unexpected results on som smarty versions');
+    }
     return self::$_template->getTemplateVars($name);
   }
 
