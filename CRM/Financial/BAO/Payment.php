@@ -130,6 +130,9 @@ class CRM_Financial_BAO_Payment {
         if ($item['financial_item.financial_account_id.is_tax'] &&
           !isset($payableItems[$item['id'] . '-tax'])
         ) {
+          // @todo - revisit this calculation - it is how it has been done historically but has been identified as
+          // incorrect.
+          $item['allocation'] = $item['tax_amount'] * ($params['total_amount'] / $contribution['total_amount']);
           $payableItems[$item['id'] . '-tax'] = $item;
         }
         elseif (!isset($payableItems[$item['id']])) {
@@ -139,11 +142,9 @@ class CRM_Financial_BAO_Payment {
       unset($items);
       unset($lineItems);
 
-      // Loop through our list of payable items
-      // @todo - this is still convoluted - we only need to loop through payable items once
-      // but the sales tax lines don't have allocations yet - working through smaller refactors.
+      // Loop through our list of payable items and created EntityFinancialItems.
       foreach ($payableItems as $payableItem) {
-        if ($payableItem['allocation'] === 0.0 || $payableItem['financial_item.financial_account_id.is_tax']) {
+        if ($payableItem['allocation'] === 0.0) {
           // We don't really want to continue for tax lines - but at the moment they are not
           // being correctly filled out with allocation details so we are relying on
           // the quasi-correct sub loop lower down.
@@ -151,13 +152,12 @@ class CRM_Financial_BAO_Payment {
         }
 
         // Now create an EntityFinancialTrxn record to link the new financial_trxn to the lineitem and mark it as paid.
-        $eftParams = [
+        EntityFinancialTrxn::create(FALSE)->setValues([
           'entity_table' => 'civicrm_financial_item',
           'financial_trxn_id' => $trxn->id,
           'entity_id' => $payableItem['financial_item.id'],
           'amount' => $payableItem['allocation'],
-        ];
-        EntityFinancialTrxn::create(FALSE)->setValues($eftParams)->execute();
+        ])->execute();
 
         if ('Paid' !== $payableItem['financial_item.status_id:name']) {
           // Did the lineitem get fully paid?
@@ -166,25 +166,6 @@ class CRM_Financial_BAO_Payment {
             ->addValue('status_id:name', $newStatus)
             ->addWhere('id', '=', $payableItem['financial_item.id'])
             ->execute();
-        }
-
-        foreach ($payableItems as $financialItem) {
-          // We ignored the tax lines in the main loop but here we find the one/s
-          // with the same id (line item ID) as the payable Item we are dealing with.
-          if ($financialItem['financial_item.entity_id'] === (int) $payableItem['id']
-            && $financialItem['financial_item.financial_account_id.is_tax']) {
-            // If we find a "Sales Tax" lineitem we record a tax entry in entityFiancncialTrxn
-            // @todo - this is expected to be broken - it should be fixed to
-            // a) have the getPayableLineItems add the amount to allocate for tax
-            // - see https://github.com/civicrm/civicrm-core/pull/14763
-            $eftParams['entity_id'] = $financialItem['financial_item.id'];
-            $eftParams['amount'] = 0;
-            if ($contribution['total_amount'] != 0) {
-              $eftParams['amount'] = $financialItem['tax_amount'] * ($params['total_amount'] / $contribution['total_amount']);
-            }
-            // Record Entity Financial Trxn; CRM-20145
-            EntityFinancialTrxn::create(FALSE)->setValues($eftParams)->execute();
-          }
         }
       }
     }
