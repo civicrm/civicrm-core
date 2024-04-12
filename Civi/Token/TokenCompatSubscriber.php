@@ -88,8 +88,14 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
     // {contact.address_primary.city}{, }{contact.address_primary.state_province_id:label}{ }{contact.address_primary.postal_code}
     // Where state_province is not present. No perfect solution here but we
     // do want to keep the comma in this case.
+    // e.g String is Michael{ }Jackson{ (}Mick{)}
     $e->string = preg_replace('/\\\\|{(\s*([,`~()\-*|])*\s*)?}}*({\s})/', '$1', $e->string);
+    // e.g. String is Michael{ }Jackson{ (}Mick{)}
     $e->string = preg_replace('/\\\\|{(\s*(\s|,|`|~|\(|\)|-|\*|\|)*\s*)?\}}*(?=[^{\s])/', '$1', $e->string);
+    // e.g. String is Michael Jackson (Mick{)}
+    // Specific regex for handling a closing bracket at the end of line `{)}` where there is a closing bracket present
+    $e->string = preg_replace('/\([^{]*{(\s*\)+\s*)}$/', '$1', $e->string);
+    // String is Michael Jackson (Mick)
     // Now do a another pass, removing any remaining instances (which will get rid of any that were not
     // followed by something).
     $e->string = preg_replace('/\\\\|' . '\{(\s*(\s|,|`|~|\(|\)|-|\*|\|)*\s?)?\}/', '', $e->string);
