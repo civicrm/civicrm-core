@@ -38,7 +38,7 @@
  */
 function smarty_block_edit($params, $text, &$smarty, &$repeat) {
   if (!$repeat) {
-    $action = $smarty->getTemplateVars()['action'];
+    $action = (int) $smarty->getTemplateVars('action');
     return ($action & 3) ? $text : NULL;
   }
 }
