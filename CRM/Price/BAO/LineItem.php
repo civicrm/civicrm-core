@@ -128,8 +128,10 @@ WHERE li.contribution_id = %1";
   }
 
   /**
-   * Wrapper for line item retrieval when contribution ID is known.
+   * (quasi-deprecated) Wrapper for line item retrieval when contribution ID is known.
    * @param int $contributionID
+   *
+   * @internal - apiv4 is recommended.
    *
    * @return array
    */
