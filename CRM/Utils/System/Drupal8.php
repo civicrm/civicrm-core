@@ -188,6 +188,15 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   public function appendBreadCrumb($breadcrumbs) {
     $civicrmPageState = \Drupal::service('civicrm.page_state');
     foreach ($breadcrumbs as $breadcrumb) {
+      if (stripos($breadcrumb['url'], 'id%%')) {
+        $args = ['cid', 'mid'];
+        foreach ($args as $a) {
+          $val = CRM_Utils_Request::retrieve($a, 'Positive');
+          if ($val) {
+            $breadcrumb['url'] = str_ireplace("%%{$a}%%", $val, $breadcrumb['url']);
+          }
+        }
+      }
       $civicrmPageState->addBreadcrumb($breadcrumb['title'], $breadcrumb['url']);
     }
   }
@@ -296,6 +305,8 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
         'fragment' => $fragment,
         'absolute' => $absolute,
       ])->toString();
+      // Decode %% for better readability, e.g., %%cid%%.
+      $url = str_replace('%25%25', '%%', $url);
     }
     catch (Exception $e) {
       \Drupal::logger('civicrm')->error($e->getMessage());
