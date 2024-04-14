@@ -165,7 +165,7 @@ class CRM_Financial_BAO_Payment {
         civicrm_api3('Participant', 'create', ['id' => $participantPayment['participant_id'], 'status_id' => 'Partially paid']);
       }
     }
-    elseif ($contributionStatus === 'Completed' && ((float) CRM_Core_BAO_FinancialTrxn::getTotalPayments($contribution['id'], TRUE) === 0.0)) {
+    elseif ($contributionStatus === 'Completed' && ((float) $contribution['paid_amount'] === 0.0)) {
       // If the contribution has previously been completed (fully paid) and now has total payments adding up to 0
       //  change status to refunded.
       self::updateContributionStatus($contribution['id'], 'Refunded');
@@ -493,11 +493,6 @@ class CRM_Financial_BAO_Payment {
    * @throws \CRM_Core_Exception
    */
   protected static function getPayableItems(array $params, array $contribution): array {
-    // @todo - do the 'full' version of this 'get' here & remove the double up below.
-    $lineItems = (array) LineItem::get(FALSE)
-      ->addSelect('*')
-      ->addWhere('contribution_id', '=', (int) $params['contribution_id'])
-      ->execute()->indexBy('id');
     $lineItemOverrides = [];
     if (!empty($params['line_item'])) {
       // The format is a bit weird here - $params['line_item'] => [[1 => 10], [2 => 40]]
@@ -511,26 +506,11 @@ class CRM_Financial_BAO_Payment {
       $ratio = $params['total_amount'] / $outstandingBalance;
     }
     elseif ($params['total_amount'] < 0) {
-      $ratio = $params['total_amount'] / (float) CRM_Core_BAO_FinancialTrxn::getTotalPayments($params['contribution_id'], TRUE);
+      $ratio = $params['total_amount'] / (float) $contribution['paid_amount'];
     }
     else {
       // Help we are making a payment but no money is owed. We won't allocate the overpayment to any line item.
       $ratio = 0;
-    }
-    foreach ($lineItems as $lineItemID => $lineItem) {
-      $lineItems[$lineItemID]['paid'] = self::getAmountOfLineItemPaid($lineItemID);
-      $lineItems[$lineItemID]['balance'] = $lineItem['line_total'] - $lineItems[$lineItemID]['paid'];
-      if (!empty($lineItemOverrides)) {
-        $lineItems[$lineItemID]['allocation'] = $lineItemOverrides[$lineItemID] ?? NULL;
-      }
-      else {
-        if (empty($lineItems[$lineItemID]['balance']) && !empty($ratio) && $params['total_amount'] < 0) {
-          $lineItems[$lineItemID]['allocation'] = $lineItem['line_total'] * $ratio;
-        }
-        else {
-          $lineItems[$lineItemID]['allocation'] = $lineItems[$lineItemID]['balance'] * $ratio;
-        }
-      }
     }
     $items = LineItem::get(FALSE)
       ->addSelect('*', 'financial_item.status_id:name', 'financial_item.id', 'financial_item.financial_account_id', 'financial_item_id.currency', 'financial_item.financial_account_id.is_tax', 'financial_item.entity_id', 'financial_item.amount')
@@ -551,8 +531,20 @@ class CRM_Financial_BAO_Payment {
         // If we didn't find a financial item that is NOT of type "Sales Tax" then create a new one.
         $item = self::createFinancialItem($item, $params['trxn_date'], $contribution['contact_id'], $contribution['currency']);
       }
-      $item['allocation'] = $lineItems[$item['id']]['allocation'];
-      $item['balance'] = $lineItems[$item['id']]['balance'];
+      // @todo we can get this amount of line item paid from the values we are iterating
+      $item['paid'] = self::getAmountOfLineItemPaid($item['id']);
+      $item['balance'] = $item['line_total'] - $item['paid'];
+      if (!empty($lineItemOverrides)) {
+        $item['allocation'] = $lineItemOverrides[$item['id']] ?? NULL;
+      }
+      else {
+        if (empty($item['balance']) && !empty($ratio) && $params['total_amount'] < 0) {
+          $item['allocation'] = $item['line_total'] * $ratio;
+        }
+        else {
+          $item['allocation'] = $item['balance'] * $ratio;
+        }
+      }
       // Re-index to ensure 1 row per item - we couldn't use GroupBy above as it
       // hits fullGroupBy issues & we couldn't use indexBy as it borks on the possible null value fixed above.
       if ($item['financial_item.financial_account_id.is_tax'] &&
