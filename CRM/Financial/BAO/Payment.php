@@ -655,24 +655,26 @@ class CRM_Financial_BAO_Payment {
    *
    * @throws \CRM_Core_Exception
    */
-  protected static function createFinancialItem($lineItem, $trxn_date, $contactID, $currency): array {
+  protected static function createFinancialItem(array $lineItem, string $trxn_date, int $contactID, string $currency): array {
     $financialAccount = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(
       $lineItem['financial_type_id'],
       'Income Account Is'
     );
-    $itemParams = [
-      'transaction_date' => $trxn_date,
-      'contact_id' => $contactID,
-      'currency' => $currency,
-      'amount' => $lineItem['line_total'],
-      'description' => $lineItem['label'],
-      'status_id' => 'Unpaid',
-      'financial_account_id' => $financialAccount,
-      'entity_table' => 'civicrm_line_item',
-      'entity_id' => $lineItem['id'],
-    ];
 
-    civicrm_api3('FinancialItem', 'create', $itemParams);
+    FinancialItem::create(FALSE)
+      ->setValues([
+        'transaction_date' => $trxn_date,
+        'contact_id' => $contactID,
+        'currency' => $currency,
+        'amount' => $lineItem['line_total'],
+        'description' => $lineItem['label'],
+        'status_id:name' => 'Unpaid',
+        'financial_account_id' => $financialAccount,
+        'entity_table' => 'civicrm_line_item',
+        'entity_id' => $lineItem['id'],
+      ])
+      ->execute();
+
     return LineItem::get(FALSE)
       ->addSelect('*', 'financial_item.status_id:name', 'financial_item.id', 'financial_item.financial_account_id', 'financial_item_id.currency', 'financial_item.financial_account_id.is_tax', 'financial_item.entity_id', 'financial_item.amount')
       ->addJoin(
