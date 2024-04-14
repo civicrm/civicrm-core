@@ -15,6 +15,7 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Contribution;
 use Civi\Api4\FinancialItem;
 use Civi\Api4\LineItem;
 use Civi\Api4\EntityFinancialTrxn;
@@ -41,8 +42,11 @@ class CRM_Financial_BAO_Payment {
    * @throws \CRM_Core_Exception
    */
   public static function create(array $params): CRM_Financial_DAO_FinancialTrxn {
-    $contribution = civicrm_api3('Contribution', 'getsingle', ['id' => $params['contribution_id']]);
-    $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution['contribution_status_id']);
+    $contribution = Contribution::get(FALSE)
+      ->addWhere('id', '=', $params['contribution_id'])
+      ->addSelect('*', 'contribution_status_id:name', 'balance_amount', 'paid_amount')
+      ->execute()->first();
+    $contributionStatus = $contribution['contribution_status_id:name'];
     $isPaymentCompletesContribution = self::isPaymentCompletesContribution($params['contribution_id'], $params['total_amount'], $contributionStatus);
     $lineItems = self::getPayableItems($params);
 
