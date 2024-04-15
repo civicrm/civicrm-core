@@ -377,6 +377,14 @@ class CRM_Upgrade_Incremental_MessageTemplates {
           ['name' => 'membership_online_receipt', 'type' => 'subject'],
         ],
       ],
+      [
+        'version' => '5.74.alpha1',
+        'upgrade_descriptor' => ts('Minor space issue in string'),
+        'templates' => [
+          ['name' => 'event_online_receipt', 'type' => 'text'],
+          ['name' => 'event_online_receipt', 'type' => 'html'],
+        ],
+      ],
     ];
   }
 

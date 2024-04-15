@@ -185,7 +185,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $contribution->id = $this->_contributionId;
     $contribution->loadRelatedObjects($this->_processorId, $this->ids);
     $msg = $contribution->composeMessageArray($this->input, $this->ids);
-    $this->assertStringContainsString('registration has been received and your status has been updated to<strong> Attended</strong>.', $msg['html']);
+    $this->assertStringContainsString('registration has been received and your status has been updated to <strong>Attended</strong>.', $msg['html']);
     $this->assertStringContainsString('Annual CiviCRM meet', $msg['html']);
   }
 
