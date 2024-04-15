@@ -82,7 +82,7 @@ function standaloneusers_civicrm_permission(&$permissions) {
   // provide expected cms: permissions.
   $permissions['cms:administer users'] = [
     'label' => E::ts('CiviCRM Standalone Users: Administer user accounts'),
-    'implies' => ['cms: view user account'],
+    'implies' => ['cms:view user account'],
   ];
   $permissions['cms:view user account'] = [
     'label' => E::ts('CiviCRM Standalone Users: View user accounts'),
