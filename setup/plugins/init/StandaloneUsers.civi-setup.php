@@ -141,9 +141,10 @@ if (!defined('CIVI_SETUP')) {
             'view own manual batches',
             'access all custom data',
             'access contact reference fields',
-            // Standalone-defined permissions that have the same name as the cms: prefixed synthetic ones
-            'administer users',
-            'view user account',
+            // standaloneusers provides concrete permissions in place of
+            // the synthetic ones on other UF
+            'cms:administer users',
+            'cms:view user account',
             // The admninister CiviCRM data implicitly sets other permissions as well.
             // Such as, edit message templates and admnister dedupe rules.
             'administer CiviCRM Data',

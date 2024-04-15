@@ -284,11 +284,11 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
             'view own manual batches',
             'access all custom data',
             'access contact reference fields',
-            // Standalone-defined permissions that have the same name as the cms: prefixed synthetic ones
-            // 'administer users',
-            'view user account',
-            // The admninister CiviCRM data implicitly sets other permissions as well.
-            // Such as, edit message templates and admnister dedupe rules.
+            // Standalone-defined permissions that stand in for the synthetic ones on CMSes
+            // 'cms: administer users',
+            'cms: view user account',
+            // The administer CiviCRM data implicitly sets other permissions as well.
+            // Such as, edit message templates and administer dedupe rules.
             'administer CiviCRM Data',
           ],
         ],

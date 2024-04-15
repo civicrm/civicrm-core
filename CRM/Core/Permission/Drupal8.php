@@ -61,7 +61,7 @@ class CRM_Core_Permission_Drupal8 extends CRM_Core_Permission_DrupalBase {
     $dperms = \Drupal::service('user.permissions')->getPermissions();
     $modules = \Drupal::service('extension.list.module')->getAllInstalledInfo();
 
-    $permissions = [];
+    $permissions = parent::getAvailablePermissions();
     foreach ($dperms as $permName => $dperm) {
       if (isset($allCorePerms[$permName])) {
         continue;

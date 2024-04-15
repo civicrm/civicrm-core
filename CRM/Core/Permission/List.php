@@ -54,28 +54,15 @@ class CRM_Core_Permission_List {
     $config = \CRM_Core_Config::singleton();
 
     $ufPerms = $config->userPermissionClass->getAvailablePermissions();
+
     foreach ($ufPerms as $permName => $cmsPerm) {
       $e->permissions[$permName] = [
         'group' => 'cms',
         'title' => $cmsPerm['title'] ?? $permName,
         'description' => $cmsPerm['description'] ?? NULL,
+        'is_synthetic' => $cmsPerm['is_synthetic'] ?? FALSE,
       ];
     }
-
-    // There are a handful of special permissions defined in CRM/Core/Permission/*.php
-    // using the `translatePermission()` mechanism.
-    $e->permissions['cms:view user account'] = [
-      'group' => 'cms',
-      'title' => ts('CMS') . ': ' . ts('View user accounts'),
-      'description' => ts('View user accounts. (Synthetic permission - adapts to local CMS)'),
-      'is_synthetic' => TRUE,
-    ];
-    $e->permissions['cms:administer users'] = [
-      'group' => 'cms',
-      'title' => ts('CMS') . ': ' . ts('Administer user accounts'),
-      'description' => ts('Administer user accounts. (Synthetic permission - adapts to local CMS)'),
-      'is_synthetic' => TRUE,
-    ];
   }
 
   /**

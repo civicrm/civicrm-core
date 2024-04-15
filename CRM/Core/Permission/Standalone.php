@@ -34,6 +34,17 @@ class CRM_Core_Permission_Standalone extends CRM_Core_Permission_Base {
   public $permissions = NULL;
 
   /**
+   * @inheritdoc
+   * on Standalone we don't want to add any "synthetic" cms permissions
+   * because we have concrete equivalents, provided by e.g. standaloneusers extension
+   * so we override the base class to suppress the synthetic ones
+   *
+   */
+  public function getAvailablePermissions() {
+    return [];
+  }
+
+  /**
    * Given a permission string, check for access requirements.
    *
    * Note this differs from CRM_Core_Permission::check() which handles
@@ -48,14 +59,6 @@ class CRM_Core_Permission_Standalone extends CRM_Core_Permission_Base {
    *   true if yes, else false
    */
   public function check($str, $userId = NULL) {
-    // These core-defined synthetic permissions (which cannot be applied by our Role UI):
-    // cms:administer users
-    // cms:view user account
-    // need mapping to our concrete permissions (which can be applied to Roles) with the same names:
-    $str = $this->translatePermission($str, 'Standalone', [
-      'view user account' => 'view user account',
-      'administer users' => 'administer users',
-    ]);
     return \Civi\Standalone\Security::singleton()->checkPermission($str, $userId);
   }
 
