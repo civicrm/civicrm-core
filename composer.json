@@ -65,7 +65,7 @@
     "symfony/service-contracts": "~2.2 || ~3.1",
     "psr/log": "~1.0 || ~2.0 || ~3.0",
     "symfony/finder": "~4.4 || ~6.0",
-    "tecnickcom/tcpdf" : "6.4.*",
+    "tecnickcom/tcpdf" : "6.4.* || 6.7.*",
     "totten/ca-config": "~23.07",
     "zetacomponents/base": "1.9.*",
     "zetacomponents/mail": "~1.9.4",
