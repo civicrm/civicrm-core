@@ -1,12 +1,28 @@
-<div class="af-gui-columns crm-flex-box" ng-if="!$ctrl.entity.loading">
+<form class="af-gui-columns crm-flex-box" ng-if="!$ctrl.entity.loading">
   <fieldset class="af-gui-entity-values" ng-if="$ctrl.editor.getAfform().type !== 'block'">
     <legend>{{:: ts('Values:') }}</legend>
-    <div class="form-inline" ng-if="getMeta().fields[fieldName]" ng-repeat="(fieldName, value) in $ctrl.entity.data">
-      <label>{{ getMeta().fields[fieldName].label }}:</label><br />
-      <input class="form-control" af-gui-field-value="getField($ctrl.getEntityType(), fieldName)" ng-model="$ctrl.entity.data[fieldName]" />
-      <a href ng-click="removeValue($ctrl.entity, fieldName)">
-        <i class="crm-i fa-times"></i>
-      </a>
+    <div ng-if="getMeta().fields[fieldName]" ng-repeat="(fieldName, value) in $ctrl.entity.data">
+      <label class="af-gui-block-label" for="{{ $ctrl.getFieldId(fieldName) }}">{{:: getMeta().fields[fieldName].label }}:</label>
+      <label class="af-gui-block-label" ng-if="getField($ctrl.getEntityType(), fieldName)['input_type'] === 'Date'">
+        <input type="radio" name="{{:: fieldName + 'now' }}" ng-click="$ctrl.entity.data[fieldName] = 'now'" ng-checked="$ctrl.entity.data[fieldName] === 'now'">
+        {{:: ts('Current Date') }}
+      </label>
+      <div class="form-inline">
+        <input type="radio" ng-if="getField($ctrl.getEntityType(), fieldName)['input_type'] === 'Date'" name="{{:: fieldName + 'now' }}" ng-click="$ctrl.entity.data[fieldName] = ''" ng-checked="$ctrl.entity.data[fieldName] !== 'now'">
+        <input disabled
+               class="form-control"
+               placeholder="{{:: ts('Pick Date') }}"
+               ng-if="getField($ctrl.getEntityType(), fieldName)['input_type'] === 'Date' && $ctrl.entity.data[fieldName] === 'now'">
+        <input required
+               ng-if="getField($ctrl.getEntityType(), fieldName)['input_type'] !== 'Date' || $ctrl.entity.data[fieldName] !== 'now'"
+               id="{{ $ctrl.getFieldId(fieldName) }}"
+               class="form-control"
+               af-gui-field-value="getField($ctrl.getEntityType(), fieldName)"
+               ng-model="$ctrl.entity.data[fieldName]" />
+        <a href ng-click="removeValue($ctrl.entity, fieldName)">
+          <i class="crm-i fa-times"></i>
+        </a>
+      </div>
     </div>
     <hr />
     <div class="form-inline">
@@ -48,7 +64,7 @@
       </div>
     </div>
   </fieldset>
-</div>
+</form>
 
 <a ng-if="!$ctrl.entity.loading && $ctrl.editor.allowEntityConfig" href ng-click="$ctrl.editor.removeEntity($ctrl.entity.name)" class="btn btn-sm btn-danger-outline af-gui-remove-entity" title="{{ ts('Remove %1', {1: getMeta().label}) }}">
   <i class="crm-i fa-trash"></i>
