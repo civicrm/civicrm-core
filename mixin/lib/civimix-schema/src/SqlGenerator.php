@@ -95,6 +95,10 @@ return new class([], fn()=>NULL) {
       if (!empty($field['required'])) {
         $fieldSql .= ' NOT NULL';
       }
+      // Mysql 5.7 requires timestamp to be explicitly declared NULL
+      if (empty($field['required']) && $field['sql_type'] === 'timestamp') {
+        $fieldSql .= ' NULL';
+      }
       if (!empty($field['auto_increment'])) {
         $fieldSql .= " AUTO_INCREMENT";
       }
