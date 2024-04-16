@@ -2298,6 +2298,9 @@ SELECT contact_id
     if ($string === NULL) {
       return '';
     }
+    if (isset($GLOBALS['CIVICRM_SQL_ESCAPER'])) {
+      return call_user_func($GLOBALS['CIVICRM_SQL_ESCAPER'], $string);
+    }
     static $_dao = NULL;
     if (!$_dao) {
       // If this is an atypical case (e.g. preparing .sql file before CiviCRM

@@ -31,15 +31,15 @@ class Test {
   public static function asPreInstall($callback) {
     $conn = \Civi\Test::pdo();
 
-    $oldEscaper = \CRM_Core_I18n::$SQL_ESCAPER;
+    $oldEscaper = $GLOBALS['CIVICRM_SQL_ESCAPER'] ?? NULL;
     \Civi\Test::$statics['testPreInstall'] = (\Civi\Test::$statics['testPreInstall'] ?? 0) + 1;
     try {
-      \CRM_Core_I18n::$SQL_ESCAPER = function ($text) use ($conn) {
+      $GLOBALS['CIVICRM_SQL_ESCAPER'] = function ($text) use ($conn) {
         return substr($conn->quote($text), 1, -1);
       };
       return $callback();
     } finally {
-      \CRM_Core_I18n::$SQL_ESCAPER = $oldEscaper;
+      $GLOBALS['CIVICRM_SQL_ESCAPER'] = $oldEscaper;
       \Civi\Test::$statics['testPreInstall']--;
       if (\Civi\Test::$statics['testPreInstall'] <= 0) {
         unset(\Civi\Test::$statics['testPreInstall']);
