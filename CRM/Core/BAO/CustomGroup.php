@@ -226,7 +226,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
           CRM_Core_DAO::VALUE_SEPARATOR;
       }
     }
-    else {
+    elseif (empty($params['id'])) {
       $extendsChildType = 'null';
     }
     $group->extends_entity_column_value = $extendsChildType;
