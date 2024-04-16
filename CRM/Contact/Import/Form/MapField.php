@@ -185,7 +185,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
             $highlightedRelFields[$key][] = $k;
           }
         }
-        $this->assign('highlightedRelFields', $highlightedRelFields);
+        $this->assign('highlightedRelFields', json_encode($highlightedRelFields));
         $sel2[$key] = $this->_formattedFieldNames[$relatedContactType];
 
         if (!empty($relatedContactSubType)) {

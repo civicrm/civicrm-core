@@ -10,12 +10,13 @@
 {* Highlight the required field during import (included within a <script>)*}
 {literal}
 CRM.$(function($) {
-  var highlightedFields = ["{/literal}{'","'|implode:$highlightedFields}{literal}"];
+  var highlightedFields = {/literal}{$highlightedFields}{literal};
   $.each(highlightedFields, function() {
+    // This addition of color by css appears to have stopped working along the way although the append works.
     $('select[id^="mapper"][id$="_0"] option[value='+ this + ']').append(' *').css({"color":"#FF0000"});
   });
   {/literal}{if $highlightedRelFields}{literal}
-  var highlightedRelFields = {/literal}{$highlightedRelFields|@json_encode}{literal};
+  var highlightedRelFields = {/literal}{$highlightedRelFields}{literal};
   function highlight() {
     var select, fields = highlightedRelFields[$(this).val()];
     if (fields) {
