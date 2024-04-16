@@ -202,6 +202,10 @@
         }
       };
 
+      this.getFieldId = function(fieldName) {
+        return _.kebabCase(ctrl.entity.name + '-' + fieldName);
+      };
+
       this.$onInit = function() {
         // When a new block is saved, update the list
         this.meta = afGui.meta;

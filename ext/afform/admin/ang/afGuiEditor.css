@@ -216,6 +216,7 @@ body.af-gui-dragging {
 #afGuiEditor af-gui-container,
 #afGuiEditor af-gui-markup,
 #afGuiEditor af-gui-field,
+#afGuiEditor .af-gui-block-label,
 #afGuiEditor af-gui-edit-options {
   display: block;
 }
