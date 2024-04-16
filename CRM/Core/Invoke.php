@@ -200,7 +200,9 @@ class CRM_Core_Invoke {
    *
    * @param array $item
    *   See CRM_Core_Menu.
+   *
    * @return string, HTML
+   * @throws \CRM_Core_Exception
    */
   public static function runItem($item) {
     $ids = new CRM_Core_IDS();
@@ -317,7 +319,14 @@ class CRM_Core_Invoke {
             $addSequence = $addSequence ? 'true' : 'false';
             unset($pageArgs['addSequence']);
           }
-          $object = new $item['page_callback']($title, TRUE, $mode, NULL, $addSequence);
+          if ($item['page_callback'] === 'CRM_Import_Controller') {
+            // Let the generic import controller have the page arguments.... so we don't need
+            // one class per import.
+            $object = new CRM_Import_Controller($title, $pageArgs);
+          }
+          else {
+            $object = new $item['page_callback']($title, TRUE, $mode, NULL, $addSequence);
+          }
         }
         else {
           throw new CRM_Core_Exception('Execute supplied menu action');

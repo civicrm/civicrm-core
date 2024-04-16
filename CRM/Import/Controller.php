@@ -14,26 +14,22 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Activity_Import_Controller extends CRM_Core_Controller {
+class CRM_Import_Controller extends CRM_Core_Controller {
 
   /**
    * Class constructor.
    *
    * @param string $title
-   * @param bool|int $action
-   * @param bool $modal
+   * @param array $arguments
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function __construct($title = NULL, $action = CRM_Core_Action::NONE, $modal = TRUE) {
-    parent::__construct($title, $modal);
-
+  public function __construct(string $title, array $arguments) {
+    parent::__construct($title, TRUE);
     set_time_limit(0);
-
-    $this->_stateMachine = new CRM_Import_StateMachine($this, $action);
-
-    // create and instantiate the pages
-    $this->addPages($this->_stateMachine, $action);
-
-    // add all the actions
+    $this->_stateMachine = new CRM_Import_StateMachine($this, TRUE, $arguments['entity_prefix']);
+    // 1 (or TRUE)  has been the action passed historically - but it is probably meaningless.
+    $this->addPages($this->_stateMachine, CRM_Core_Action::ADD);
     $config = CRM_Core_Config::singleton();
     $this->addActions($config->uploadDir, ['uploadFile']);
   }
