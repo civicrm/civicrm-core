@@ -24,16 +24,13 @@ class CRM_Core_I18n {
   const NONE = 'none', AUTO = 'auto';
 
   /**
-   * @var callable|null
-   *   A callback function which handles SQL string encoding.
-   *   Set NULL to use the default, CRM_Core_DAO::escapeString().
-   *   This is used by `ts(..., [escape=>sql])`.
+   * @var string
+   * @deprecated
+   *   This variable has 1-2 references in contrib, which -probably- aren't functionally
+   *   necessary. (Extensions don't load in pre-installation environments...)
+   *   But we'll keep the property stub just to prevent crashes.
    *
-   * This option is not intended for general consumption. It is only intended
-   * for certain pre-boot/pre-install contexts.
-   *
-   * You might ask, "Why on Earth does string-translation have an opinion on
-   * SQL escaping?" Good question!
+   *   Replaced by $GLOBALS['CIVICRM_SQL_ESCAPER'].
    */
   public static $SQL_ESCAPER = NULL;
 
@@ -47,12 +44,7 @@ class CRM_Core_I18n {
   protected static function escape($text, $mode) {
     switch ($mode) {
       case 'sql':
-        if (self::$SQL_ESCAPER == NULL) {
-          return CRM_Core_DAO::escapeString($text);
-        }
-        else {
-          return call_user_func(self::$SQL_ESCAPER, $text);
-        }
+        return CRM_Core_DAO::escapeString($text);
 
       case 'js':
         return substr(json_encode($text, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT), 1, -1);

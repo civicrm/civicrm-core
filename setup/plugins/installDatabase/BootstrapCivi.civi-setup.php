@@ -21,7 +21,7 @@ if (!defined('CIVI_SETUP')) {
   ->addListener('civi.setup.installDatabase', function (\Civi\Setup\Event\InstallDatabaseEvent $e) {
     \Civi\Setup::log()->info(sprintf('[%s] Bootstrap CiviCRM', basename(__FILE__)));
 
-    \CRM_Core_I18n::$SQL_ESCAPER = NULL;
+    unset($GLOBALS['CIVICRM_SQL_ESCAPER']);
     unset(\Civi\Test::$statics['testPreInstall']);
 
     CRM_Core_Config::singleton(TRUE, TRUE);

@@ -38,7 +38,7 @@ if (!defined('CIVI_SETUP')) {
     CRM_Core_ClassLoader::singleton()->register();
 
     $conn = \Civi\Setup\DbUtil::connect($e->getModel()->db);
-    \CRM_Core_I18n::$SQL_ESCAPER = function($text) use ($conn) {
+    $GLOBALS['CIVICRM_SQL_ESCAPER'] = function($text) use ($conn) {
       return $conn->escape_string($text);
     };
 
