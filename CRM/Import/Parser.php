@@ -30,10 +30,6 @@ use Civi\UserJob\UserJobInterface;
  * supported.
  */
 abstract class CRM_Import_Parser implements UserJobInterface {
-  /**
-   * Settings
-   */
-  const MAX_WARNINGS = 25, DEFAULT_TIMEOUT = 30;
 
   /**
    * Return codes
@@ -41,21 +37,9 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   const VALID = 1, WARNING = 2, ERROR = 4, CONFLICT = 8, STOP = 16, DUPLICATE = 32, MULTIPLE_DUPE = 64, NO_MATCH = 128, UNPARSED_ADDRESS_WARNING = 256;
 
   /**
-   * Parser modes
-   */
-  const MODE_MAPFIELD = 1, MODE_PREVIEW = 2, MODE_SUMMARY = 4, MODE_IMPORT = 8;
-
-  /**
    * Codes for duplicate record handling
    */
   const DUPLICATE_SKIP = 1, DUPLICATE_UPDATE = 4, DUPLICATE_FILL = 8, DUPLICATE_NOCHECK = 16;
-
-  /**
-   * Contact types
-   *
-   * @deprecated
-   */
-  const CONTACT_INDIVIDUAL = 'Individual', CONTACT_HOUSEHOLD = 'Household', CONTACT_ORGANIZATION = 'Organization';
 
   /**
    * User job id.
@@ -224,61 +208,10 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   }
 
   /**
-   * Total number of non empty lines
-   * @var int
-   */
-  protected $_totalCount;
-
-  /**
-   * Running total number of valid lines
-   * @var int
-   */
-  protected $_validCount;
-
-  /**
-   * Running total number of invalid rows
-   * @var int
-   */
-  protected $_invalidRowCount;
-
-  /**
    * Array of error lines, bounded by MAX_ERROR
    * @var array
    */
   protected $_errors;
-
-  /**
-   * Total number of duplicate (from database) lines
-   * @var int
-   */
-  protected $_duplicateCount;
-
-  /**
-   * Array of duplicate lines
-   * @var array
-   */
-  protected $_duplicates;
-
-  /**
-   * Maximum number of warnings to store
-   * @var int
-   */
-  protected $_maxWarningCount = self::MAX_WARNINGS;
-
-  /**
-   * Array of warning lines, bounded by MAX_WARNING
-   * @var array
-   */
-  protected $_warnings;
-
-  /**
-   * TO BE REMOVED.
-   *
-   * Array of all the fields that could potentially be part
-   * of this import process
-   * @var array
-   */
-  private $_fields;
 
   private $dedupeRules = [];
 
@@ -405,13 +338,6 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   protected function isFillDuplicates(): bool {
     return ((int) $this->getSubmittedValue('onDuplicate')) === CRM_Import_Parser::DUPLICATE_FILL;
   }
-
-  /**
-   * Cache of preview rows
-   *
-   * @var array
-   */
-  protected $_rows;
 
   /**
    * Contact type
