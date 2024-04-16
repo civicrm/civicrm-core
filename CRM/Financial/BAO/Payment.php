@@ -48,7 +48,7 @@ class CRM_Financial_BAO_Payment {
       ->execute()->first();
     $contributionStatus = $contribution['contribution_status_id:name'];
     $isPaymentCompletesContribution = self::isPaymentCompletesContribution($params['contribution_id'], $params['total_amount'], $contributionStatus);
-    $lineItems = self::getPayableItems($params);
+    $lineItems = self::getPayableItems($params, $contribution);
 
     $whiteList = ['check_number', 'payment_processor_id', 'fee_amount', 'total_amount', 'contribution_id', 'net_amount', 'card_type_id', 'pan_truncation', 'trxn_result_code', 'payment_instrument_id', 'trxn_id', 'trxn_date', 'order_reference'];
     $paymentTrxnParams = array_intersect_key($params, array_fill_keys($whiteList, 1));
@@ -529,13 +529,18 @@ class CRM_Financial_BAO_Payment {
    *   and then assign apply that ratio to each line item.
    * - if overrides have been passed in we use those amounts instead.
    *
-   * @param $params
+   * @param array $params
+   * @param array $contribution
    *
    * @return array
    * @throws \CRM_Core_Exception
    */
-  protected static function getPayableItems($params): array {
-    $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($params['contribution_id']);
+  protected static function getPayableItems(array $params, array $contribution): array {
+    // @todo - do the 'full' version of this 'get' here & remove the double up below.
+    $lineItems = (array) LineItem::get(FALSE)
+      ->addSelect('*')
+      ->addWhere('contribution_id', '=', (int) $params['contribution_id'])
+      ->execute()->indexBy('id');
     $lineItemOverrides = [];
     if (!empty($params['line_item'])) {
       // The format is a bit weird here - $params['line_item'] => [[1 => 10], [2 => 40]]
@@ -559,13 +564,13 @@ class CRM_Financial_BAO_Payment {
       // Ideally id would be set deeper but for now just add in here.
       $lineItems[$lineItemID]['id'] = $lineItemID;
       $lineItems[$lineItemID]['paid'] = self::getAmountOfLineItemPaid($lineItemID);
-      $lineItems[$lineItemID]['balance'] = $lineItem['subTotal'] - $lineItems[$lineItemID]['paid'];
+      $lineItems[$lineItemID]['balance'] = $lineItem['line_total'] - $lineItems[$lineItemID]['paid'];
       if (!empty($lineItemOverrides)) {
         $lineItems[$lineItemID]['allocation'] = $lineItemOverrides[$lineItemID] ?? NULL;
       }
       else {
         if (empty($lineItems[$lineItemID]['balance']) && !empty($ratio) && $params['total_amount'] < 0) {
-          $lineItems[$lineItemID]['allocation'] = $lineItem['subTotal'] * $ratio;
+          $lineItems[$lineItemID]['allocation'] = $lineItem['line_total'] * $ratio;
         }
         else {
           $lineItems[$lineItemID]['allocation'] = $lineItems[$lineItemID]['balance'] * $ratio;
