@@ -48,7 +48,7 @@ class CRM_Financial_BAO_Payment {
       ->execute()->first();
     $contributionStatus = $contribution['contribution_status_id:name'];
     $isPaymentCompletesContribution = self::isPaymentCompletesContribution($params['contribution_id'], $params['total_amount'], $contributionStatus);
-    $lineItems = self::getPayableItems($params, $contribution);
+    $payableItems = self::getPayableItems($params, $contribution);
 
     $whiteList = ['check_number', 'payment_processor_id', 'fee_amount', 'total_amount', 'contribution_id', 'net_amount', 'card_type_id', 'pan_truncation', 'trxn_result_code', 'payment_instrument_id', 'trxn_id', 'trxn_date', 'order_reference'];
     $paymentTrxnParams = array_intersect_key($params, array_fill_keys($whiteList, 1));
@@ -105,57 +105,13 @@ class CRM_Financial_BAO_Payment {
       self::reverseAllocationsFromPreviousPayment($params, $trxn->id);
     }
     else {
-      // Record new "payment" (financial_trxn, financial_item, entity_financial_trxn etc).
-      // Get all the lineitems and add financial_item information to them for the contribution on which we are recording a payment.
-      // @todo - get this payableItems array in the first place from getPayableItems() above.
-      $items = LineItem::get(FALSE)
-        ->addSelect('*', 'financial_item.status_id:name', 'financial_item.id', 'financial_item.financial_account_id', 'financial_item_id.currency', 'financial_item.financial_account_id.is_tax', 'financial_item.entity_id', 'financial_item.amount')
-        ->addJoin(
-          'FinancialItem AS financial_item',
-          'LEFT',
-          ['financial_item.entity_table', '=', '"civicrm_line_item"'],
-          ['financial_item.entity_id', '=', 'id']
-        )
-        ->addOrderBy('financial_item.id', 'DESC')
-        ->addWhere('contribution_id', '=', (int) $params['contribution_id'])
-        ->setDebug(TRUE)
-        ->execute();
-
-      $payableItems = [];
-      foreach ($items as $item) {
-        if (!$item['financial_item.id']) {
-          // If we didn't find a financial item that is NOT of type "Sales Tax" then create a new one.
-          $item = self::createFinancialItem($item, $params['trxn_date'], $contribution['contact_id'], $paymentTrxnParams['currency']);
-        }
-        $item['allocation'] = $lineItems[$item['id']]['allocation'];
-        $item['balance'] = $lineItems[$item['id']]['balance'];
-        // Re-index to ensure 1 row per item - we couldn't use GroupBy above as it
-        // hits fullGroupBy issues & we couldn't use indexBy as it borks on the possible null value fixed above.
-        if ($item['financial_item.financial_account_id.is_tax'] &&
-          !isset($payableItems[$item['id'] . '-tax'])
-        ) {
-          // @todo - revisit this calculation - it is how it has been done historically but has been identified as
-          // incorrect.
-          $item['allocation'] = $item['tax_amount'] * ($params['total_amount'] / $contribution['total_amount']);
-          $payableItems[$item['id'] . '-tax'] = $item;
-        }
-        elseif (!isset($payableItems[$item['id']])) {
-          $payableItems[$item['id']] = $item;
-        }
-      }
-      unset($items);
-      unset($lineItems);
-
-      // Loop through our list of payable items and created EntityFinancialItems.
+      // Link the payment with the relevant financial items, by creating EntityFinancialItems.
+      // We also ensure the status of the Item is set to Paid or Partially Paid as appropriate.
       foreach ($payableItems as $payableItem) {
         if ($payableItem['allocation'] === 0.0) {
-          // We don't really want to continue for tax lines - but at the moment they are not
-          // being correctly filled out with allocation details so we are relying on
-          // the quasi-correct sub loop lower down.
           continue;
         }
 
-        // Now create an EntityFinancialTrxn record to link the new financial_trxn to the lineitem and mark it as paid.
         EntityFinancialTrxn::create(FALSE)->setValues([
           'entity_table' => 'civicrm_financial_item',
           'financial_trxn_id' => $trxn->id,
@@ -164,7 +120,7 @@ class CRM_Financial_BAO_Payment {
         ])->execute();
 
         if ('Paid' !== $payableItem['financial_item.status_id:name']) {
-          // Did the lineitem get fully paid?
+          // Did the item get fully paid?
           $newStatus = $payableItem['allocation'] < $payableItem['balance'] ? 'Partially paid' : 'Paid';
           FinancialItem::update(FALSE)
             ->addValue('status_id:name', $newStatus)
@@ -176,8 +132,6 @@ class CRM_Financial_BAO_Payment {
     self::updateRelatedContribution($params, $params['contribution_id']);
     if ($isPaymentCompletesContribution) {
       if ($contributionStatus === 'Pending refund') {
-        // Ideally we could still call completetransaction as non-payment related actions should
-        // be outside this class. However, for now we just update the contribution here.
         // Unit test cover in CRM_Event_BAO_AdditionalPaymentTest::testTransactionInfo.
         civicrm_api3('Contribution', 'create',
           [
@@ -521,7 +475,10 @@ class CRM_Financial_BAO_Payment {
   /**
    * Get the line items for the contribution.
    *
-   * Retrieve the line items and wrangle the following
+   * Retrieve the financial items that need to be linked to the payment.
+   *
+   * EntityFinancialItems will be added to the sum of the Payment total
+   * linking it to these items.
    *
    * - get the outstanding balance on a line item basis.
    * - determine what amount is being paid on this line item - we get the total being paid
@@ -577,7 +534,42 @@ class CRM_Financial_BAO_Payment {
         }
       }
     }
-    return $lineItems;
+    $items = LineItem::get(FALSE)
+      ->addSelect('*', 'financial_item.status_id:name', 'financial_item.id', 'financial_item.financial_account_id', 'financial_item_id.currency', 'financial_item.financial_account_id.is_tax', 'financial_item.entity_id', 'financial_item.amount')
+      ->addJoin(
+        'FinancialItem AS financial_item',
+        'LEFT',
+        ['financial_item.entity_table', '=', '"civicrm_line_item"'],
+        ['financial_item.entity_id', '=', 'id']
+      )
+      ->addOrderBy('financial_item.id', 'DESC')
+      ->addWhere('contribution_id', '=', (int) $params['contribution_id'])
+      ->setDebug(TRUE)
+      ->execute();
+
+    $payableItems = [];
+    foreach ($items as $item) {
+      if (!$item['financial_item.id']) {
+        // If we didn't find a financial item that is NOT of type "Sales Tax" then create a new one.
+        $item = self::createFinancialItem($item, $params['trxn_date'], $contribution['contact_id'], $contribution['currency']);
+      }
+      $item['allocation'] = $lineItems[$item['id']]['allocation'];
+      $item['balance'] = $lineItems[$item['id']]['balance'];
+      // Re-index to ensure 1 row per item - we couldn't use GroupBy above as it
+      // hits fullGroupBy issues & we couldn't use indexBy as it borks on the possible null value fixed above.
+      if ($item['financial_item.financial_account_id.is_tax'] &&
+        !isset($payableItems[$item['id'] . '-tax'])
+      ) {
+        // @todo - revisit this calculation - it is how it has been done historically but has been identified as
+        // incorrect.
+        $item['allocation'] = $item['tax_amount'] * ($params['total_amount'] / $contribution['total_amount']);
+        $payableItems[$item['id'] . '-tax'] = $item;
+      }
+      elseif (!isset($payableItems[$item['id']])) {
+        $payableItems[$item['id']] = $item;
+      }
+    }
+    return $payableItems;
   }
 
   /**
