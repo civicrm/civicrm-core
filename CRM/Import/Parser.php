@@ -676,7 +676,11 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     // The retry limit for the queue is set to 5 - allowing for a few deadlocks but we might consider
     // making this configurable at some point.
     $queue = Civi::queue('user_job_' . $this->getUserJobID(), ['type' => 'Sql', 'error' => 'abort', 'runner' => 'task', 'user_job_id' => $this->getUserJobID(), 'retry_limit' => 5]);
-    UserJob::update(FALSE)->setValues(['queue_id.name' => 'user_job_' . $this->getUserJobID()])->addWhere('id', '=', $this->getUserJobID())->execute();
+    UserJob::update(FALSE)
+      ->setValues([
+        'queue_id.name' => 'user_job_' . $this->getUserJobID(),
+        'status_id:name' => 'scheduled',
+      ])->addWhere('id', '=', $this->getUserJobID())->execute();
     $offset = 0;
     $batchSize = Civi::settings()->get('import_batch_size');
     while ($totalRows > 0) {
@@ -2107,7 +2111,17 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * @throws \CRM_Core_Exception
    */
   public static function runJob(\CRM_Queue_TaskContext $taskContext, int $userJobID, int $limit, int $offset): bool {
-    $userJob = UserJob::get()->addWhere('id', '=', $userJobID)->addSelect('job_type')->execute()->first();
+    $userJob = UserJob::get()->addWhere('id', '=', $userJobID)
+      ->addSelect('job_type', 'start_date')->execute()->first();
+    if (!$userJob['start_date']) {
+      UserJob::update(FALSE)
+        ->setValues([
+          'status_id:name' => 'in_progress',
+          'start_date' => 'now',
+        ])
+        ->addWhere('id', '=', $userJob['id'])
+        ->execute();
+    }
     $parserClass = NULL;
     foreach (CRM_Core_BAO_UserJob::getTypes() as $userJobType) {
       if ($userJob['job_type'] === $userJobType['id']) {
