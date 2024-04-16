@@ -323,7 +323,7 @@ DESC limit 1");
     $isUpdateToExistingRecurringMembership = $this->isUpdateToExistingRecurringMembership();
     // build price set form.
     $buildPriceSet = FALSE;
-    if ($this->_priceSetId || !empty($_POST['price_set_id'])) {
+    if ($this->isAjaxOverLoadMode() || !empty($_POST['price_set_id'])) {
       if (!empty($_POST['price_set_id'])) {
         $buildPriceSet = TRUE;
       }
