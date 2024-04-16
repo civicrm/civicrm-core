@@ -549,7 +549,7 @@ class CRM_Financial_BAO_Payment {
         $lineItemOverrides += $lineItem;
       }
     }
-    $outstandingBalance = CRM_Contribute_BAO_Contribution::getContributionBalance($params['contribution_id']);
+    $outstandingBalance = $contribution['balance_amount'];
     if ($outstandingBalance !== 0.0) {
       $ratio = $params['total_amount'] / $outstandingBalance;
     }
