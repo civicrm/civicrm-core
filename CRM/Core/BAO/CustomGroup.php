@@ -185,9 +185,6 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
     }
     // create custom group dao, populate fields and then save.
     $group = new CRM_Core_DAO_CustomGroup();
-    if (isset($params['title'])) {
-      $group->title = $params['title'];
-    }
 
     $extendsChildType = NULL;
     // lets allow user to pass direct child type value, CRM-6893
@@ -231,14 +228,17 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
     }
     $group->extends_entity_column_value = $extendsChildType;
 
-    if (isset($params['id'])) {
+    // Assign new weight
+    if (empty($params['id'])) {
+      $group->weight = CRM_Utils_Weight::updateOtherWeights('CRM_Core_DAO_CustomGroup', 0, $params['weight'] ?? CRM_Utils_Weight::getMax('CRM_Core_DAO_CustomGroup'));
+    }
+    // Update weight
+    if (isset($params['weight']) && !empty($params['id'])) {
       $oldWeight = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $params['id'], 'weight', 'id');
+      $group->weight = CRM_Utils_Weight::updateOtherWeights('CRM_Core_DAO_CustomGroup', $oldWeight, $params['weight']);
     }
-    else {
-      $oldWeight = 0;
-    }
-    $group->weight = CRM_Utils_Weight::updateOtherWeights('CRM_Core_DAO_CustomGroup', $oldWeight, CRM_Utils_Array::value('weight', $params, FALSE));
     $fields = [
+      'title',
       'style',
       'collapse_display',
       'collapse_adv_display',
@@ -347,12 +347,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
     // reset the cache
     CRM_Utils_System::flushCache();
 
-    if ($tableName) {
-      CRM_Utils_Hook::post('create', 'CustomGroup', $group->id, $group);
-    }
-    else {
-      CRM_Utils_Hook::post('edit', 'CustomGroup', $group->id, $group);
-    }
+    CRM_Utils_Hook::post($op, 'CustomGroup', $group->id, $group);
 
     return $group;
   }
