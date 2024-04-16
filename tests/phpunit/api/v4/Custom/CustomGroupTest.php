@@ -27,28 +27,65 @@ use Civi\Api4\CustomGroup;
 class CustomGroupTest extends CustomTestBase {
 
   public function testUpdateCustomGroup(): void {
-    $customGroup1 = $this->createTestRecord('CustomGroup', [
-      'extends' => 'Contribution',
-      'weight' => 1,
+    $this->createTestRecord('ContactType', [
+      'parent_id:name' => 'Individual',
+      'label' => 'Tester',
     ]);
-    $customGroup2 = $this->createTestRecord('CustomGroup', [
-      'extends' => 'Contribution',
+    $financialType = $this->createTestRecord('FinancialType');
+    $customGroup = $this->saveTestRecords('CustomGroup', [
+      'records' => [
+        [
+          'extends' => 'Contribution',
+          'weight' => 1,
+        ],
+        [
+          'extends' => 'Contribution',
+          'extends_entity_column_value' => [$financialType['id']],
+          'weight' => 2,
+        ],
+        [
+          'extends' => 'Individual',
+          'extends_entity_column_value' => ['Tester'],
+          'weight' => 3,
+        ],
+      ],
     ]);
+    $id = $customGroup->column('id');
 
+    // Change weight of 2nd group
     CustomGroup::update(FALSE)
       ->addValue('weight', 1)
-      ->addWhere('id', '=', $customGroup2['id'])
+      ->addWhere('id', '=', $id[1])
       ->execute();
 
+    // Verify new weights
     $groups = CustomGroup::get(FALSE)
-      ->addWhere('id', 'IN', [$customGroup1['id'], $customGroup2['id']])
-      ->addOrderBy('id')
+      ->addWhere('id', 'IN', $id)
+      ->execute()->indexBy('id');
+    $this->assertEquals(1, $groups[$id[1]]['weight']);
+    $this->assertEquals(2, $groups[$id[0]]['weight']);
+    $this->assertEquals(3, $groups[$id[2]]['weight']);
+
+    // Change weight of 3rd group
+    CustomGroup::update(FALSE)
+      ->addValue('weight', 1)
+      ->addWhere('id', '=', $id[2])
       ->execute();
 
-    $this->assertEquals(1, $groups[1]['weight']);
-    $this->assertEquals(2, $groups[0]['weight']);
-    $this->assertEquals('Contribution', $groups[0]['extends']);
-    $this->assertEquals('Contribution', $groups[1]['extends']);
+    // Verify new weights
+    $groups = CustomGroup::get(FALSE)
+      ->addWhere('id', 'IN', $id)
+      ->execute()->indexBy('id');
+    $this->assertEquals(1, $groups[$id[2]]['weight']);
+    $this->assertEquals(2, $groups[$id[1]]['weight']);
+    $this->assertEquals(3, $groups[$id[0]]['weight']);
+
+    // Verify that other values were not interfered with
+    $this->assertEquals('Contribution', $groups[$id[0]]['extends']);
+    $this->assertEquals('Contribution', $groups[$id[1]]['extends']);
+    $this->assertEquals([$financialType['id']], $groups[$id[1]]['extends_entity_column_value']);
+    $this->assertEquals('Individual', $groups[$id[2]]['extends']);
+    $this->assertEquals(['Tester'], $groups[$id[2]]['extends_entity_column_value']);
   }
 
   public function testGetExtendsEntityColumnValuePseudoconstant(): void {
