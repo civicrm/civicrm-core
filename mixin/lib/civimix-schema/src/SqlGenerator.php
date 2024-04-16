@@ -91,7 +91,8 @@ return new class([], fn()=>NULL) {
         $fieldSql .= " COLLATE {$field['collate']}";
       }
       // Required fields and booleans cannot be null
-      if (!empty($field['required']) || $field['sql_type'] === 'boolean') {
+      // FIXME: For legacy support this doesn't force boolean fields to be NOT NULL... but it really should.
+      if (!empty($field['required'])) {
         $fieldSql .= ' NOT NULL';
       }
       if (!empty($field['auto_increment'])) {
