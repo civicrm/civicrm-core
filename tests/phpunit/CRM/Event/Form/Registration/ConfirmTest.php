@@ -148,7 +148,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       'Expires: January ' . (date('Y') + 1),
       'Visa',
       '************1111',
-      'This is a confirmation that your registration has been received and your status has been updated to<strong> Registered</strong>',
+      'This is a confirmation that your registration has been received and your status has been updated to <strong>Registered</strong>',
       'You may transfer your registration to another participant or cancel your registration up to 72 hours before the event',
     ]);
   }
