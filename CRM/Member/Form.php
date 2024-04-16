@@ -560,14 +560,30 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    * @return int
    */
   public function getPriceSetID(): int {
-    $this->_priceSetId = $this->getSubmittedValue('price_set_id') ?? NULL;
+    $this->_priceSetId = $this->isAjaxOverLoadMode() ? CRM_Utils_Request::retrieve('priceSetId', 'Integer') : ($this->getSubmittedValue('price_set_id') ?? NULL);
     if (!$this->_priceSetId) {
       $priceSet = CRM_Price_BAO_PriceSet::getDefaultPriceSet('membership');
       $priceSet = reset($priceSet);
-      $priceSetDetails = CRM_Price_BAO_PriceSet::getSetDetail($priceSet['setID']);
-      $this->_priceSetId = key($priceSetDetails);
+      $this->_priceSetId = (int) $priceSet['setID'];
     }
     return (int) $this->_priceSetId;
+  }
+
+  /**
+   * Is the form being called in ajax overload mode.
+   *
+   * Ajax overload mode is what the form is called via ajax to render the price
+   * form, without the rest of the processing. This is a legacy of a time when
+   * we didn't have better ways to do this. We only render the price set form
+   * on overload mode, but we need to ensure the fields are added to the
+   * form when the form is submitted so QuickForm sees the fields. Over time
+   * we have broken this approach for the payment form and custom data form
+   * and may do so here one day....
+   *
+   * @return bool
+   */
+  protected function isAjaxOverLoadMode(): bool {
+    return !empty($_GET['priceSetId']);
   }
 
   /**
