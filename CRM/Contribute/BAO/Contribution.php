@@ -121,10 +121,11 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
     if (!$contributionStatusID) {
       // Since the fee amount is expecting this (later on) ensure it is always set.
       // It would only not be set for an update where it is unchanged.
-      $params['contribution_status_id'] = civicrm_api3('Contribution', 'getvalue', [
-        'id' => $contributionID,
-        'return' => 'contribution_status_id',
-      ]);
+      $params['contribution_status_id'] = Contribution::get(FALSE)
+        ->addSelect('contribution_status_id')
+        ->addWhere('id', '=', $contributionID)
+        ->execute()
+        ->first()['contribution_status_id'] ?? NULL;
     }
     $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', (int) $params['contribution_status_id']);
 
@@ -375,10 +376,11 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
         if (isset($params['fee_amount']) || isset($params['total_amount'])) {
           // We have an existing contribution and fee_amount or total_amount has been passed in but not net_amount.
           // net_amount may need adjusting.
-          $contribution = civicrm_api3('Contribution', 'getsingle', [
-            'id' => $contributionID,
-            'return' => ['total_amount', 'net_amount', 'fee_amount'],
-          ]);
+          $contribution = Contribution::get(FALSE)
+            ->addSelect('total_amount', 'net_amount', 'fee_amount')
+            ->addWhere('id', '=', $contributionID)
+            ->execute()
+            ->first();
           $totalAmount = (isset($params['total_amount']) ? (float) $params['total_amount'] : (float) CRM_Utils_Array::value('total_amount', $contribution));
           $feeAmount = (isset($params['fee_amount']) ? (float) $params['fee_amount'] : (float) CRM_Utils_Array::value('fee_amount', $contribution));
           $params['net_amount'] = $totalAmount - $feeAmount;
@@ -3623,18 +3625,14 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     $paymentBalance = CRM_Contribute_BAO_Contribution::getContributionBalance($contributionId, $total);
 
-    $contribution = civicrm_api3('Contribution', 'getsingle', [
-      'id' => $contributionId,
-      'return' => [
-        'currency',
-        'is_pay_later',
-        'contribution_status_id',
-        'financial_type_id',
-      ],
-    ]);
+    $contribution = Contribution::get(FALSE)
+      ->addSelect('currency', 'is_pay_later', 'contribution_status_id:name', 'financial_type_id')
+      ->addWhere('id', '=', $contributionId)
+      ->execute()
+      ->first();
 
     $info['payLater'] = $contribution['is_pay_later'];
-    $info['contribution_status'] = $contribution['contribution_status'];
+    $info['contribution_status'] = $contribution['contribution_status_id:name'];
     $info['currency'] = $contribution['currency'];
 
     $info['total'] = $total;
