@@ -6,6 +6,11 @@
   <name>civicrm_print_label</name>
   <comment>Table to store the labels created by user.</comment>
   <add>4.4</add>
+  <paths>
+    <add>civicrm/admin/badgelayout/add?action=edit&amp;id=[id]&amp;reset=1</add>
+    <update>civicrm/admin/badgelayout/add?action=update&amp;id=[id]&amp;reset=1</update>
+    <browse>civicrm/admin/badgelayout</browse>
+  </paths>
   <field>
     <name>id</name>
     <title>Print Label ID</title>
