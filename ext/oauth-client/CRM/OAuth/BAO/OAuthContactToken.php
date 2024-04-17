@@ -58,7 +58,7 @@ class CRM_OAuth_BAO_OAuthContactToken extends CRM_OAuth_DAO_OAuthContactToken im
       if (!CRM_Contact_BAO_Contact_Permission::allow($cid, CRM_Core_Permission::EDIT, $userId)) {
         throw new \Civi\API\Exception\UnauthorizedException('Access denied to contact');
       }
-      if (!CRM_Core_Permission::check([['manage all OAuth contact tokens', 'manage my OAuth contact tokens']], $userId)) {
+      if (!CRM_Core_Permission::check('manage my OAuth contact tokens', $userId)) {
         throw new \Civi\API\Exception\UnauthorizedException('Access denied to OAuthContactToken');
       }
       if (
