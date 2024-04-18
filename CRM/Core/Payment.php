@@ -589,6 +589,12 @@ abstract class CRM_Core_Payment {
         return '';
 
       case 'contributionPageContinueText':
+        if ($params['amount'] <= 0.0 || (int) $this->_paymentProcessor['billing_mode'] === 4) {
+          return ts('Click the <strong>Continue</strong> button to proceed with the payment.');
+        }
+        if ($params['is_payment_to_existing']) {
+          return ts('Click the <strong>Make Payment</strong> button to proceed with the payment.');
+        }
         return ts('Click the <strong>Make Contribution</strong> button to proceed with the payment.');
 
       case 'contributionPageConfirmText':
