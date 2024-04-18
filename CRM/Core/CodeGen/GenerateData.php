@@ -277,6 +277,10 @@ class CRM_Core_CodeGen_GenerateData {
 
   private $deceasedContactIds = [];
 
+  private $time;
+
+  private $relTypes;
+
   /*********************************
    * private methods
    * *******************************
