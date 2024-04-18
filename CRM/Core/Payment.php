@@ -589,7 +589,7 @@ abstract class CRM_Core_Payment {
         return '';
 
       case 'contributionPageContinueText':
-        return ts('Click the <strong>Continue</strong> button to proceed with the payment.');
+        return ts('Click the <strong>Make Contribution</strong> button to proceed with the payment.');
 
       case 'contributionPageConfirmText':
         if ($params['amount'] <= 0.0) {
