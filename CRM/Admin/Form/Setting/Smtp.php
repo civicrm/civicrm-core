@@ -130,9 +130,6 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
 
         $to = '"' . $toDisplayName . '"' . "<$toEmail>";
         $from = '"' . $domainEmailName . '" <' . $domainEmailAddress . '>';
-        $testMailStatusMsg = ts('Sending test email') . ':<br />'
-          . ts('From: %1', [1 => $domainEmailAddress]) . '<br />'
-          . ts('To: %1', [1 => $toEmail]) . '<br />';
 
         $params = [];
         if ($formValues['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_SMTP) {
@@ -173,32 +170,16 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
           $mailerName = 'mail';
         }
 
-        $headers = [
-          'From' => $from,
-          'To' => $to,
-          'Subject' => $subject,
+        $mailParams = [
+          'from' => $from,
+          'to' => $to,
+          'subject' => $subject,
+          'text' => $message,
+          'toEmail' => $toEmail,
         ];
 
         $mailer = CRM_Utils_Mail::_createMailer($mailerName, $params);
-
-        try {
-          $mailer->send($toEmail, $headers, $message);
-          if (defined('CIVICRM_MAIL_LOG') && defined('CIVICRM_MAIL_LOG_AND_SEND')) {
-            $testMailStatusMsg .= '<br />' . ts('You have defined CIVICRM_MAIL_LOG_AND_SEND - mail will be logged.') . '<br /><br />';
-          }
-          if (defined('CIVICRM_MAIL_LOG') && !defined('CIVICRM_MAIL_LOG_AND_SEND')) {
-            CRM_Core_Session::setStatus($testMailStatusMsg . ts('You have defined CIVICRM_MAIL_LOG - no mail will be sent.  Your %1 settings have not been tested.', [1 => strtoupper($mailerName)]), ts("Mail not sent"), "warning");
-          }
-          else {
-            CRM_Core_Session::setStatus($testMailStatusMsg . ts('Your %1 settings are correct. A test email has been sent to your email address.', [1 => strtoupper($mailerName)]), ts("Mail Sent"), "success");
-          }
-        }
-        catch (Exception $e) {
-          $result = $e;
-          Civi::log()->error($e->getMessage());
-          $errorMessage = CRM_Utils_Mail::errorMessage($mailer, $result);
-          CRM_Core_Session::setStatus($testMailStatusMsg . ts('Oops. Your %1 settings are incorrect. No test mail has been sent.', [1 => strtoupper($mailerName)]) . $errorMessage, ts("Mail Not Sent"), "error");
-        }
+        CRM_Utils_Mail::sendTest($mailer, $mailParams);
       }
     }
 
