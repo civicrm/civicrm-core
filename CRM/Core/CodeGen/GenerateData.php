@@ -1556,6 +1556,9 @@ VALUES
    * @return string
    */
   public static function repairDate($date) {
+    if ($date === NULL) {
+      return '';
+    }
     $dropArray = ['-' => '', ':' => '', ' ' => ''];
     return strtr($date, $dropArray);
   }
