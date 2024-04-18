@@ -277,6 +277,10 @@ class CRM_Core_CodeGen_GenerateData {
 
   private $deceasedContactIds = [];
 
+  private $time;
+
+  private $relTypes;
+
   /*********************************
    * private methods
    * *******************************
@@ -1556,6 +1560,9 @@ VALUES
    * @return string
    */
   public static function repairDate($date) {
+    if ($date === NULL) {
+      return '';
+    }
     $dropArray = ['-' => '', ':' => '', ' ' => ''];
     return strtr($date, $dropArray);
   }
