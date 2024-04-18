@@ -226,7 +226,8 @@
   <item>
      <path>civicrm/event/import</path>
      <title>Import Participants</title>
-     <page_callback>CRM_Event_Import_Controller</page_callback>
+     <page_callback>CRM_Import_Controller</page_callback>
+     <page_arguments>entity_prefix=Event</page_arguments>
      <access_arguments>access CiviEvent,edit event participants</access_arguments>
      <page_type>1</page_type>
      <weight>840</weight>

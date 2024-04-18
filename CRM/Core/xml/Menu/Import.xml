@@ -6,7 +6,8 @@
      <title>Import</title>
      <access_arguments>import contacts,access CiviCRM</access_arguments>
      <page_type>1</page_type>
-     <page_callback>CRM_Contact_Import_Controller</page_callback>
+     <page_callback>CRM_Import_Controller</page_callback>
+     <page_arguments>entity_prefix=Contact</page_arguments>
      <weight>400</weight>
   </item>
   <item>
@@ -14,7 +15,8 @@
      <title>Import Contacts</title>
      <access_arguments>import contacts,access CiviCRM</access_arguments>
      <page_type>1</page_type>
-     <page_callback>CRM_Contact_Import_Controller</page_callback>
+     <page_callback>CRM_Import_Controller</page_callback>
+    <page_arguments>entity_prefix=Contact</page_arguments>
      <weight>410</weight>
   </item>
   <item>
@@ -36,13 +38,15 @@
      <title>Import Activities</title>
      <access_arguments>import contacts,access CiviCRM</access_arguments>
      <page_type>1</page_type>
-     <page_callback>CRM_Activity_Import_Controller</page_callback>
+     <page_callback>CRM_Import_Controller</page_callback>
+     <page_arguments>entity_prefix=Activity</page_arguments>
      <weight>420</weight>
   </item>
   <item>
     <path>civicrm/import/contribution</path>
     <title>Import Contributions</title>
-    <page_callback>CRM_Contribute_Import_Controller</page_callback>
+    <page_callback>CRM_Import_Controller</page_callback>
+    <page_arguments>entity_prefix=Contribute</page_arguments>
     <access_arguments>access CiviContribute,edit contributions</access_arguments>
     <page_type>1</page_type>
     <weight>520</weight>
@@ -53,7 +57,8 @@
      <title>Import Multi-value Custom Data</title>
      <access_arguments>access CiviCRM</access_arguments>
      <page_type>1</page_type>
-     <page_callback>CRM_Custom_Import_Controller</page_callback>
+     <page_callback>CRM_Import_Controller</page_callback>
+     <page_arguments>entity_prefix=Custom</page_arguments>
      <weight>420</weight>
   </item>
   <item>
