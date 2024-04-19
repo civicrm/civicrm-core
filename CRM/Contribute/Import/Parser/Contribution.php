@@ -433,7 +433,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         }
       }
 
-      $this->deprecatedFormatParams($contributionParams, $contributionParams);
+      $this->deprecatedFormatParams($contributionParams);
 
       // From this point on we are changing stuff - the prior rows were doing lookups and exiting
       // if the lookups failed.
@@ -564,14 +564,10 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    * convert it into the same format that we use in QF and BAO object
    *
    * @param array $params
-   *   Associative array of property name/value
-   *   pairs to insert in new contact.
-   * @param array $values
-   *   The reformatted properties that we can use internally.
    *
    * @throws \CRM_Core_Exception
    */
-  private function deprecatedFormatParams($params, &$values): void {
+  private function deprecatedFormatParams(&$params): void {
     // copy all the contribution fields as is
     if (empty($params['pledge_id'])) {
       return;
@@ -603,14 +599,13 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       if (CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_Pledge', $params['pledge_id'], 'contact_id') != $contributionContactID) {
         throw new CRM_Core_Exception('Invalid Pledge ID provided. Contribution row was skipped.', CRM_Import_Parser::ERROR);
       }
-      $values['pledge_id'] = $params['pledge_id'];
     }
 
     // we need to check if oldest payment amount equal to contribution amount
-    $pledgePaymentDetails = CRM_Pledge_BAO_PledgePayment::getOldestPledgePayment($values['pledge_id']);
+    $pledgePaymentDetails = CRM_Pledge_BAO_PledgePayment::getOldestPledgePayment($params['pledge_id']);
 
     if ($pledgePaymentDetails['amount'] == $totalAmount) {
-      $values['pledge_payment_id'] = $pledgePaymentDetails['id'];
+      $params['pledge_payment_id'] = $pledgePaymentDetails['id'];
     }
     else {
       throw new CRM_Core_Exception('Contribution and Pledge Payment amount mismatch for this record. Contribution row was skipped.', CRM_Import_Parser::ERROR);
