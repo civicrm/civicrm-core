@@ -39,7 +39,7 @@ class LegacySqlEntityMetadata extends EntityMetadataBase {
         return $this->getClassName()::getEntityPaths();
 
       case 'label_field':
-        return $this->getClassName()::$_labelField;
+        return $this->getClassName()::getLabelField();
 
       case 'primary_keys':
         return $this->getClassName()::$_primaryKey ?? ['id'];

@@ -156,6 +156,10 @@ class CRM_Core_DAO extends DB_DataObject {
     return CRM_Core_DAO_AllCoreTables::getEntityNameForClass($className);
   }
 
+  public static function getLabelField(): ?string {
+    return static::$_labelField;
+  }
+
   /**
    * Returns user-friendly description of this entity.
    *
@@ -3489,7 +3493,7 @@ SELECT contact_id
       // No unique index on "name", do nothing
       return;
     }
-    $labelField = $this::$_labelField;
+    $labelField = $this::getLabelField();
     $label = $this->$labelField ?? NULL;
     if (!$label && $label !== '0') {
       // No label supplied, do nothing
