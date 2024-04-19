@@ -520,8 +520,6 @@ class CRM_Financial_BAO_Payment {
       $ratio = 0;
     }
     foreach ($lineItems as $lineItemID => $lineItem) {
-      // Ideally id would be set deeper but for now just add in here.
-      $lineItems[$lineItemID]['id'] = $lineItemID;
       $lineItems[$lineItemID]['paid'] = self::getAmountOfLineItemPaid($lineItemID);
       $lineItems[$lineItemID]['balance'] = $lineItem['line_total'] - $lineItems[$lineItemID]['paid'];
       if (!empty($lineItemOverrides)) {
