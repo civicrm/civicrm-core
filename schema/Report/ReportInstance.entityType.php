@@ -1,0 +1,272 @@
+<?php
+
+return [
+  'name' => 'ReportInstance',
+  'table' => 'civicrm_report_instance',
+  'class' => 'CRM_Report_DAO_ReportInstance',
+  'getInfo' => fn() => [
+    'title' => ts('Report'),
+    'title_plural' => ts('Reports'),
+    'description' => ts('Users can save their report instance and put in a cron tab etc.'),
+    'add' => '2.2',
+    'icon' => 'fa-bar-chart',
+  ],
+  'getFields' => fn() => [
+    'id' => [
+      'title' => ts('Report Instance ID'),
+      'sql_type' => 'int unsigned',
+      'input_type' => 'Number',
+      'required' => TRUE,
+      'description' => ts('Report Instance ID'),
+      'add' => '2.2',
+      'primary_key' => TRUE,
+      'auto_increment' => TRUE,
+    ],
+    'domain_id' => [
+      'title' => ts('Domain ID'),
+      'sql_type' => 'int unsigned',
+      'input_type' => 'EntityRef',
+      'required' => TRUE,
+      'description' => ts('Which Domain is this instance for'),
+      'add' => '3.1',
+      'input_attrs' => [
+        'label' => ts('Domain'),
+      ],
+      'pseudoconstant' => [
+        'table' => 'civicrm_domain',
+        'key_column' => 'id',
+        'label_column' => 'name',
+      ],
+      'entity_reference' => [
+        'entity' => 'Domain',
+        'key' => 'id',
+      ],
+    ],
+    'title' => [
+      'title' => ts('Report Instance Title'),
+      'sql_type' => 'varchar(255)',
+      'input_type' => 'Text',
+      'description' => ts('Report Instance Title.'),
+      'add' => '2.2',
+      'input_attrs' => [
+        'maxlength' => 255,
+      ],
+    ],
+    'report_id' => [
+      'title' => ts('Report template ID'),
+      'sql_type' => 'varchar(512)',
+      'input_type' => 'Select',
+      'required' => TRUE,
+      'description' => ts('FK to civicrm_option_value for the report template'),
+      'add' => '2.2',
+      'input_attrs' => [
+        'maxlength' => 512,
+      ],
+    ],
+    'name' => [
+      'title' => ts('Report instance Name'),
+      'sql_type' => 'varchar(255)',
+      'input_type' => 'Text',
+      'description' => ts('when combined with report_id/template uniquely identifies the instance'),
+      'add' => '3.2',
+      'input_attrs' => [
+        'maxlength' => 255,
+      ],
+    ],
+    'args' => [
+      'title' => ts('Report Instance Arguments'),
+      'sql_type' => 'varchar(255)',
+      'input_type' => 'Text',
+      'description' => ts('arguments that are passed in the url when invoking the instance'),
+      'add' => '3.2',
+      'input_attrs' => [
+        'maxlength' => 255,
+      ],
+    ],
+    'description' => [
+      'title' => ts('Report Instance description'),
+      'sql_type' => 'varchar(255)',
+      'input_type' => 'Text',
+      'description' => ts('Report Instance description.'),
+      'add' => '2.2',
+      'input_attrs' => [
+        'maxlength' => 255,
+      ],
+    ],
+    'permission' => [
+      'title' => ts('Report Instance Permissions'),
+      'sql_type' => 'varchar(255)',
+      'input_type' => 'Select',
+      'description' => ts('permission required to be able to run this instance'),
+      'add' => '2.2',
+      'input_attrs' => [
+        'label' => ts('Permission'),
+        'maxlength' => 255,
+      ],
+    ],
+    'grouprole' => [
+      'title' => ts('Report Instance Assigned to Roles'),
+      'sql_type' => 'varchar(1024)',
+      'input_type' => 'Select',
+      'description' => ts('role required to be able to run this instance'),
+      'add' => '4.1',
+      'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_TRIMMED,
+      'input_attrs' => [
+        'title' => ts('ACL Group/Role'),
+        'multiple' => '1',
+        'maxlength' => 1024,
+      ],
+      'pseudoconstant' => [
+        'callback' => 'CRM_Report_BAO_ReportInstance::getGrouproleOptions',
+      ],
+    ],
+    'form_values' => [
+      'title' => ts('Submitted Form Values'),
+      'sql_type' => 'longtext',
+      'input_type' => 'TextArea',
+      'description' => ts('Submitted form values for this report'),
+      'add' => '2.2',
+      'serialize' => CRM_Core_DAO::SERIALIZE_PHP,
+      'usage' => [
+        'import',
+        'export',
+        'duplicate_matching',
+      ],
+    ],
+    'is_active' => [
+      'title' => ts('Report Instance is Active'),
+      'sql_type' => 'boolean',
+      'input_type' => 'CheckBox',
+      'required' => TRUE,
+      'description' => ts('Is this entry active?'),
+      'add' => '2.2',
+      'default' => TRUE,
+      'input_attrs' => [
+        'label' => ts('Enabled'),
+      ],
+    ],
+    'created_id' => [
+      'title' => ts('Created By Contact ID'),
+      'sql_type' => 'int unsigned',
+      'input_type' => 'EntityRef',
+      'description' => ts('FK to contact table.'),
+      'add' => '4.6',
+      'input_attrs' => [
+        'label' => ts('Created By'),
+      ],
+      'entity_reference' => [
+        'entity' => 'Contact',
+        'key' => 'id',
+        'on_delete' => 'SET NULL',
+      ],
+    ],
+    'owner_id' => [
+      'title' => ts('Owned By Contact ID'),
+      'sql_type' => 'int unsigned',
+      'input_type' => 'EntityRef',
+      'description' => ts('FK to contact table.'),
+      'add' => '4.6',
+      'input_attrs' => [
+        'label' => ts('Owned By'),
+      ],
+      'entity_reference' => [
+        'entity' => 'Contact',
+        'key' => 'id',
+        'on_delete' => 'SET NULL',
+      ],
+    ],
+    'email_subject' => [
+      'title' => ts('Report Instance email Subject'),
+      'sql_type' => 'varchar(255)',
+      'input_type' => 'Text',
+      'description' => ts('Subject of email'),
+      'input_attrs' => [
+        'maxlength' => 255,
+      ],
+    ],
+    'email_to' => [
+      'title' => ts('Email Report Instance To'),
+      'sql_type' => 'text',
+      'input_type' => 'Text',
+      'description' => ts('comma-separated list of email addresses to send the report to'),
+      'add' => '2.2',
+    ],
+    'email_cc' => [
+      'title' => ts('cc Email Report Instance To'),
+      'sql_type' => 'text',
+      'input_type' => 'Text',
+      'description' => ts('comma-separated list of email addresses to send the report to'),
+      'add' => '2.2',
+    ],
+    'header' => [
+      'title' => ts('Report Instance Header'),
+      'sql_type' => 'text',
+      'input_type' => 'TextArea',
+      'description' => ts('comma-separated list of email addresses to send the report to'),
+      'add' => '2.2',
+      'input_attrs' => [
+        'rows' => 4,
+        'cols' => 60,
+      ],
+    ],
+    'footer' => [
+      'title' => ts('Report Instance Footer'),
+      'sql_type' => 'text',
+      'input_type' => 'TextArea',
+      'description' => ts('comma-separated list of email addresses to send the report to'),
+      'add' => '2.2',
+      'input_attrs' => [
+        'rows' => 4,
+        'cols' => 60,
+      ],
+    ],
+    'navigation_id' => [
+      'title' => ts('Navigation ID'),
+      'sql_type' => 'int unsigned',
+      'input_type' => 'EntityRef',
+      'description' => ts('FK to navigation ID'),
+      'add' => '3.0',
+      'usage' => [
+        'import',
+        'export',
+        'duplicate_matching',
+      ],
+      'input_attrs' => [
+        'label' => ts('Navigation'),
+      ],
+      'entity_reference' => [
+        'entity' => 'Navigation',
+        'key' => 'id',
+        'on_delete' => 'SET NULL',
+      ],
+    ],
+    'drilldown_id' => [
+      'title' => ts('Drilldown Report ID'),
+      'sql_type' => 'int unsigned',
+      'input_type' => 'EntityRef',
+      'description' => ts('FK to instance ID drilldown to'),
+      'add' => '4.3',
+      'usage' => [
+        'import',
+        'export',
+        'duplicate_matching',
+      ],
+      'input_attrs' => [
+        'label' => ts('Drilldown Report'),
+      ],
+      'entity_reference' => [
+        'entity' => 'ReportInstance',
+        'key' => 'id',
+        'on_delete' => 'SET NULL',
+      ],
+    ],
+    'is_reserved' => [
+      'title' => ts('Instance is Reserved'),
+      'sql_type' => 'boolean',
+      'input_type' => 'CheckBox',
+      'required' => TRUE,
+      'add' => '4.2',
+      'default' => FALSE,
+    ],
+  ],
+];

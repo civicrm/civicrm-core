@@ -10,6 +10,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Schema\EntityRepository;
+
 /**
  *
  * @package CRM
@@ -18,36 +20,14 @@
 class CRM_Core_DAO_AllCoreTables {
 
   /**
-   * Initialise.
+   * @deprecated in 5.73 will be removed in 5.90
    *
    * @param bool $fresh Deprecated parameter, use flush() to flush.
    */
   public static function init(bool $fresh = FALSE): void {
-    if (isset(Civi::$statics[__CLASS__]) && !$fresh) {
-      return;
-    }
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_DAO_AllCoreTables::flush()');
     if ($fresh) {
-      CRM_Core_Error::deprecatedWarning('Use CRM_Core_DAO_AllCoreTables::flush()');
-    }
-
-    Civi::$statics[__CLASS__] = [
-      'entities' => [],
-      'tables' => [],
-      'classes' => [],
-    ];
-
-    $file = preg_replace('/\.php$/', '.data.php', __FILE__);
-    $entityTypes = require $file;
-    CRM_Utils_Hook::entityTypes($entityTypes);
-
-    foreach ($entityTypes as $entityType) {
-      self::registerEntityType(
-        $entityType['name'],
-        $entityType['class'],
-        $entityType['table'],
-        $entityType['fields_callback'] ?? NULL,
-        $entityType['links_callback'] ?? NULL
-      );
+      EntityRepository::flush();
     }
   }
 
@@ -55,32 +35,7 @@ class CRM_Core_DAO_AllCoreTables {
    * Flush class cache.
    */
   public static function flush(): void {
-    Civi::$statics[__CLASS__] = NULL;
-  }
-
-  /**
-   * Add entity type to cached array.
-   *
-   * @param string $briefName
-   * @param string $className
-   * @param string $tableName
-   * @param string $fields_callback
-   * @param string $links_callback
-   * @internal
-   */
-  private static function registerEntityType($briefName, $className, $tableName, $fields_callback = NULL, $links_callback = NULL) {
-    Civi::$statics[__CLASS__]['tables'][$tableName] = $briefName;
-    Civi::$statics[__CLASS__]['classes'][$className] = $briefName;
-    Civi::$statics[__CLASS__]['entities'][$briefName] = [
-      'class' => $className,
-      'table' => $tableName,
-    ];
-    if ($fields_callback) {
-      Civi::$statics[__CLASS__]['entities'][$briefName]['fields_callback'] = $fields_callback;
-    }
-    if ($links_callback) {
-      Civi::$statics[__CLASS__]['entities'][$briefName]['links_callback'] = $links_callback;
-    }
+    EntityRepository::flush();
   }
 
   /**
@@ -88,8 +43,7 @@ class CRM_Core_DAO_AllCoreTables {
    *   [EntityName => [table => table_name, class => CRM_DAO_ClassName]][]
    */
   public static function getEntities(): array {
-    self::init();
-    return Civi::$statics[__CLASS__]['entities'];
+    return EntityRepository::getEntities();
   }
 
   /**
@@ -97,8 +51,7 @@ class CRM_Core_DAO_AllCoreTables {
    *   [table_name => EntityName][]
    */
   private static function getEntitiesByTable(): array {
-    self::init();
-    return Civi::$statics[__CLASS__]['tables'];
+    return EntityRepository::getTableIndex();
   }
 
   /**
@@ -109,8 +62,7 @@ class CRM_Core_DAO_AllCoreTables {
    *   [CRM_DAO_ClassName => EntityName]
    */
   private static function getEntitiesByClass(): array {
-    self::init();
-    return Civi::$statics[__CLASS__]['classes'];
+    return EntityRepository::getClassIndex();
   }
 
   /**

@@ -115,6 +115,10 @@ class CRM_Utils_Schema {
     if (!empty($fieldXML->html) && !empty($fieldXML->html->size)) {
       return (string) $fieldXML->html->size;
     }
+    return self::getDefaultSize(self::toString('length', $fieldXML));
+  }
+
+  public static function getDefaultSize($length) {
     // Infer from <length> tag if <size> was not explicitly set or was invalid
     // This map is slightly different from CRM_Core_Form_Renderer::$_sizeMapper
     // Because we usually want fields to render as smaller than their maxlength
@@ -127,12 +131,37 @@ class CRM_Utils_Schema {
       32 => 'MEDIUM',
       64 => 'BIG',
     ];
-    foreach ($sizes as $length => $name) {
-      if ($fieldXML->length <= $length) {
+    foreach ($sizes as $size => $name) {
+      if ($length <= $size) {
         return "CRM_Utils_Type::$name";
       }
     }
     return 'CRM_Utils_Type::HUGE';
+  }
+
+  public static function getCrmTypeFromSqlType(string $sqlType) {
+    [$type] = explode('(', $sqlType);
+    switch ($type) {
+      case 'varchar':
+      case 'char':
+        return 'CRM_Utils_Type::T_STRING';
+
+      case 'datetime':
+        return 'CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME';
+
+      case 'decimal':
+        return 'CRM_Utils_Type::T_MONEY';
+
+      case 'double':
+        return 'CRM_Utils_Type::T_FLOAT';
+
+      case 'int unsigned':
+      case 'tinyint':
+        return 'CRM_Utils_Type::T_INT';
+
+      default:
+        return 'CRM_Utils_Type::T_' . strtoupper($type);
+    }
   }
 
   /**
