@@ -1099,6 +1099,10 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    *   optional description of old method (if not the calling method). eg. CRM_MyClass::myOldMethodToGetTheOptions()
    */
   public static function deprecatedFunctionWarning(string $newMethod, ?string $oldMethod = NULL): void {
+    if (!(error_reporting() & E_USER_DEPRECATED)) {
+      // Logging deprecations should be opt-in, it's useless to non-developers.
+      return;
+    }
     $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 4);
     if (!$oldMethod) {
       $callerFunction = $backtrace[1]['function'] ?? NULL;
@@ -1122,6 +1126,10 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @param string $message
    */
   public static function deprecatedWarning($message) {
+    if (!(error_reporting() & E_USER_DEPRECATED)) {
+      // Logging deprecations should be opt-in, it's useless to non-developers.
+      return;
+    }
     // Even though the tag is no longer used within the log() function,
     // \Civi\API\LogObserver instances may still be monitoring it.
     $dbt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
