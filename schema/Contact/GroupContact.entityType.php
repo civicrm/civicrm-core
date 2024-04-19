@@ -5,9 +5,9 @@ return [
   'table' => 'civicrm_group_contact',
   'class' => 'CRM_Contact_DAO_GroupContact',
   'getInfo' => fn() => [
-    'title' => ts('Groupcontact'),
-    'title_plural' => ts('Groupcontacts'),
-    'description' => 'Join table sets membership for \'static\' groups. Also used to store \'opt-out\' entries for \'query\' type groups (status = \'OUT\')',
+    'title' => ts('Group Contact'),
+    'title_plural' => ts('Group Contacts'),
+    'description' => ts('Join table sets membership for \'static\' groups. Also used to store \'opt-out\' entries for \'query\' type groups (status = \'OUT\')'),
     'log' => TRUE,
     'add' => '1.1',
   ],

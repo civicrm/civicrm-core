@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_case_contact',
   'class' => 'CRM_Case_DAO_CaseContact',
   'getInfo' => fn() => [
-    'title' => ts('Casecontact'),
-    'title_plural' => ts('Casecontacts'),
+    'title' => ts('Case Contact'),
+    'title_plural' => ts('Case Contacts'),
     'description' => ts('Joining table for case-contact associations.'),
     'log' => TRUE,
     'add' => '2.1',

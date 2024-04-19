@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_mailing_bounce_type',
   'class' => 'CRM_Mailing_DAO_BounceType',
   'getInfo' => fn() => [
-    'title' => ts('Bouncetype'),
-    'title_plural' => ts('Bouncetypes'),
+    'title' => ts('Bounce Type'),
+    'title_plural' => ts('Bounce Types'),
     'description' => ts('Table to index the various bounce types and their properties'),
   ],
   'getFields' => fn() => [

@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_acl_cache',
   'class' => 'CRM_ACL_DAO_ACLCache',
   'getInfo' => fn() => [
-    'title' => ts('Aclcache'),
-    'title_plural' => ts('Aclcaches'),
+    'title' => ts('ACLCache'),
+    'title_plural' => ts('ACLCaches'),
     'description' => ts('Cache for acls and contacts'),
     'add' => '1.6',
   ],

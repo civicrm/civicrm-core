@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_contribution_product',
   'class' => 'CRM_Contribute_DAO_ContributionProduct',
   'getInfo' => fn() => [
-    'title' => ts('Contributionproduct'),
-    'title_plural' => ts('Contributionproducts'),
+    'title' => ts('Contribution Product'),
+    'title_plural' => ts('Contribution Products'),
     'description' => ts('FIXME'),
     'log' => TRUE,
     'add' => '1.4',

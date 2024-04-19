@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_financial_account',
   'class' => 'CRM_Financial_DAO_FinancialAccount',
   'getInfo' => fn() => [
-    'title' => ts('Financialaccount'),
-    'title_plural' => ts('Financialaccounts'),
+    'title' => ts('Financial Account'),
+    'title_plural' => ts('Financial Accounts'),
     'description' => ts('FIXME'),
     'log' => TRUE,
     'add' => '3.2',

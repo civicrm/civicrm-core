@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_dedupe_rule_group',
   'class' => 'CRM_Dedupe_DAO_DedupeRuleGroup',
   'getInfo' => fn() => [
-    'title' => ts('Deduperulegroup'),
-    'title_plural' => ts('Deduperulegroups'),
+    'title' => ts('Dedupe Rule Group'),
+    'title_plural' => ts('Dedupe Rule Groups'),
     'description' => ts('Dedupe rule groups'),
     'add' => '1.8',
   ],

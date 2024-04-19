@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_entity_tag',
   'class' => 'CRM_Core_DAO_EntityTag',
   'getInfo' => fn() => [
-    'title' => ts('Entitytag'),
-    'title_plural' => ts('Entitytags'),
+    'title' => ts('Entity Tag'),
+    'title_plural' => ts('Entity Tags'),
     'description' => ts('Tag entities (Contacts, Groups, Actions) to categories.'),
     'log' => TRUE,
     'add' => '1.1',

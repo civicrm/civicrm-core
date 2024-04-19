@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_contact_type',
   'class' => 'CRM_Contact_DAO_ContactType',
   'getInfo' => fn() => [
-    'title' => ts('Contacttype'),
-    'title_plural' => ts('Contacttypes'),
+    'title' => ts('Contact Type'),
+    'title_plural' => ts('Contact Types'),
     'description' => ts('Provide type information for contacts'),
     'add' => '3.1',
     'label_field' => 'label',

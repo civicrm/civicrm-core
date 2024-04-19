@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_location_type',
   'class' => 'CRM_Core_DAO_LocationType',
   'getInfo' => fn() => [
-    'title' => ts('Locationtype'),
-    'title_plural' => ts('Locationtypes'),
+    'title' => ts('Location Type'),
+    'title_plural' => ts('Location Types'),
     'description' => ts('FIXME'),
     'log' => TRUE,
     'add' => '1.1',

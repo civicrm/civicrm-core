@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_line_item',
   'class' => 'CRM_Price_DAO_LineItem',
   'getInfo' => fn() => [
-    'title' => ts('Lineitem'),
-    'title_plural' => ts('Lineitems'),
+    'title' => ts('Line Item'),
+    'title_plural' => ts('Line Items'),
     'description' => ts('FIXME'),
     'log' => TRUE,
     'add' => '1.7',

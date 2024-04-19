@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_mailing_abtest',
   'class' => 'CRM_Mailing_DAO_MailingAB',
   'getInfo' => fn() => [
-    'title' => ts('Mailingab'),
-    'title_plural' => ts('Mailingabs'),
+    'title' => ts('Mailing AB'),
+    'title_plural' => ts('Mailing ABs'),
     'description' => ts('Stores information about abtesting'),
   ],
   'getFields' => fn() => [

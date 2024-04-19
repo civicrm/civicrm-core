@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_campaign_group',
   'class' => 'CRM_Campaign_DAO_CampaignGroup',
   'getInfo' => fn() => [
-    'title' => ts('Campaigngroup'),
-    'title_plural' => ts('Campaigngroups'),
+    'title' => ts('Campaign Group'),
+    'title_plural' => ts('Campaign Groups'),
     'description' => ts('Campaign Group Details.'),
     'add' => '3.3',
   ],

@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_address_format',
   'class' => 'CRM_Core_DAO_AddressFormat',
   'getInfo' => fn() => [
-    'title' => ts('Addressformat'),
-    'title_plural' => ts('Addressformats'),
+    'title' => ts('Address Format'),
+    'title_plural' => ts('Address Formats'),
     'description' => ts('FIXME'),
     'add' => '3.2',
   ],

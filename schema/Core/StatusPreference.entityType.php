@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_status_pref',
   'class' => 'CRM_Core_DAO_StatusPreference',
   'getInfo' => fn() => [
-    'title' => ts('Statuspreference'),
-    'title_plural' => ts('Statuspreferences'),
+    'title' => ts('Status Preference'),
+    'title_plural' => ts('Status Preferences'),
     'description' => ts('Preferences controlling status checks called in system.check.'),
     'add' => '4.7',
   ],
@@ -98,7 +98,7 @@ return [
       'title' => ts('Status Preferences'),
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
-      'description' => 'These settings are per-check, and can\'t be compared across checks.',
+      'description' => ts('These settings are per-check, and can\'t be compared across checks.'),
       'add' => '4.7',
       'input_attrs' => [
         'maxlength' => 255,
@@ -108,7 +108,7 @@ return [
       'title' => ts('Check Info'),
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
-      'description' => 'These values are per-check, and can\'t be compared across checks.',
+      'description' => ts('These values are per-check, and can\'t be compared across checks.'),
       'add' => '4.7',
       'input_attrs' => [
         'maxlength' => 255,

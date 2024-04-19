@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_price_field_value',
   'class' => 'CRM_Price_DAO_PriceFieldValue',
   'getInfo' => fn() => [
-    'title' => ts('Pricefieldvalue'),
-    'title_plural' => ts('Pricefieldvalues'),
+    'title' => ts('Price Field Value'),
+    'title_plural' => ts('Price Field Values'),
     'description' => ts('FIXME'),
     'add' => '3.3',
   ],
@@ -235,7 +235,7 @@ return [
       'title' => ts('Price Field Option Visibility'),
       'sql_type' => 'int unsigned',
       'input_type' => 'Select',
-      'description' => 'Implicit FK to civicrm_option_group with name = \'visibility\'',
+      'description' => ts('Implicit FK to civicrm_option_group with name = \'visibility\''),
       'add' => '4.7',
       'default' => 1,
       'pseudoconstant' => [

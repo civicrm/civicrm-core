@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_membership_block',
   'class' => 'CRM_Member_DAO_MembershipBlock',
   'getInfo' => fn() => [
-    'title' => ts('Membershipblock'),
-    'title_plural' => ts('Membershipblocks'),
+    'title' => ts('Membership Block'),
+    'title_plural' => ts('Membership Blocks'),
     'description' => ts('A Membership Block stores admin configurable status options and rules'),
     'log' => TRUE,
     'add' => '1.5',

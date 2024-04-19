@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_openid',
   'class' => 'CRM_Core_DAO_OpenID',
   'getInfo' => fn() => [
-    'title' => ts('Openid'),
-    'title_plural' => ts('Openids'),
+    'title' => ts('Open ID'),
+    'title_plural' => ts('Open IDs'),
     'description' => ts('OpenID information for a specific location.'),
     'add' => '2.0',
   ],

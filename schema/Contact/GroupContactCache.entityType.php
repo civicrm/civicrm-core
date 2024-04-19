@@ -5,9 +5,9 @@ return [
   'table' => 'civicrm_group_contact_cache',
   'class' => 'CRM_Contact_DAO_GroupContactCache',
   'getInfo' => fn() => [
-    'title' => ts('Groupcontactcache'),
-    'title_plural' => ts('Groupcontactcaches'),
-    'description' => 'Join table cache for \'static\' groups.',
+    'title' => ts('Group Contact Cache'),
+    'title_plural' => ts('Group Contact Caches'),
+    'description' => ts('Join table cache for \'static\' groups.'),
     'add' => '2.1',
   ],
   'getIndices' => fn() => [

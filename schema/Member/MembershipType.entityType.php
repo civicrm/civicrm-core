@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_membership_type',
   'class' => 'CRM_Member_DAO_MembershipType',
   'getInfo' => fn() => [
-    'title' => ts('Membershiptype'),
-    'title_plural' => ts('Membershiptypes'),
+    'title' => ts('Membership Type'),
+    'title_plural' => ts('Membership Types'),
     'description' => ts('Sites can configure multiple types of memberships. They encode the owner organization, fee, and the rules needed to set start and end (expire) dates when a member signs up for that type.'),
     'log' => TRUE,
     'add' => '1.5',

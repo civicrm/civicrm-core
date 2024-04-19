@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_pledge_block',
   'class' => 'CRM_Pledge_DAO_PledgeBlock',
   'getInfo' => fn() => [
-    'title' => ts('Pledgeblock'),
-    'title_plural' => ts('Pledgeblocks'),
+    'title' => ts('Pledge Block'),
+    'title_plural' => ts('Pledge Blocks'),
     'description' => ts('FIXME'),
     'log' => TRUE,
     'add' => '2.1',

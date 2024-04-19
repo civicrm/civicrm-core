@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_group_nesting',
   'class' => 'CRM_Contact_DAO_GroupNesting',
   'getInfo' => fn() => [
-    'title' => ts('Groupnesting'),
-    'title_plural' => ts('Groupnestings'),
+    'title' => ts('Group Nesting'),
+    'title_plural' => ts('Group Nestings'),
     'description' => ts('Provide parent-child relationships for groups'),
     'log' => TRUE,
     'add' => '2.0',

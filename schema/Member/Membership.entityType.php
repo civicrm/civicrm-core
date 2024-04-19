@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Membership'),
     'title_plural' => ts('Memberships'),
-    'description' => 'Records of contacts belonging to an organization\'s membership program.',
+    'description' => ts('Records of contacts belonging to an organization\'s membership program.'),
     'log' => TRUE,
     'add' => '1.5',
     'icon' => 'fa-id-badge',
@@ -197,7 +197,7 @@ return [
       'title' => ts('Status Override End Date'),
       'sql_type' => 'date',
       'input_type' => 'Select Date',
-      'description' => 'Then end date of membership status override if \'Override until selected date\' override type is selected.',
+      'description' => ts('Then end date of membership status override if \'Override until selected date\' override type is selected.'),
       'add' => '4.7',
       'default' => NULL,
       'usage' => [

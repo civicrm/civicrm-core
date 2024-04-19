@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_financial_item',
   'class' => 'CRM_Financial_DAO_FinancialItem',
   'getInfo' => fn() => [
-    'title' => ts('Financialitem'),
-    'title_plural' => ts('Financialitems'),
+    'title' => ts('Financial Item'),
+    'title_plural' => ts('Financial Items'),
     'description' => ts('Financial data for civicrm_line_item, etc.'),
     'log' => TRUE,
     'add' => '4.3',

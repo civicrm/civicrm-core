@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_group_organization',
   'class' => 'CRM_Contact_DAO_GroupOrganization',
   'getInfo' => fn() => [
-    'title' => ts('Grouporganization'),
-    'title_plural' => ts('Grouporganizations'),
+    'title' => ts('Group Organization'),
+    'title_plural' => ts('Group Organizations'),
     'description' => ts('Integrate Organization information into Groups'),
     'log' => TRUE,
     'add' => '2.0',
