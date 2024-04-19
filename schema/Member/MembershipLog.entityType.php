@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_membership_log',
   'class' => 'CRM_Member_DAO_MembershipLog',
   'getInfo' => fn() => [
-    'title' => ts('Membershiplog'),
-    'title_plural' => ts('Membershiplogs'),
+    'title' => ts('Membership Log'),
+    'title_plural' => ts('Membership Logs'),
     'description' => ts('Logs actions which affect a Membership record (signup, status override, renewal, etc.)'),
     'log' => TRUE,
     'add' => '1.5',

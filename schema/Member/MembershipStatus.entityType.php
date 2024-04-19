@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_membership_status',
   'class' => 'CRM_Member_DAO_MembershipStatus',
   'getInfo' => fn() => [
-    'title' => ts('Membershipstatus'),
-    'title_plural' => ts('Membershipstatuses'),
+    'title' => ts('Membership Status'),
+    'title_plural' => ts('Membership Statuses'),
     'description' => ts('Membership Status stores admin configurable rules for assigning status to memberships.'),
     'log' => TRUE,
     'add' => '1.5',

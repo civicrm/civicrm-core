@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_recurring_entity',
   'class' => 'CRM_Core_DAO_RecurringEntity',
   'getInfo' => fn() => [
-    'title' => ts('Recurringentity'),
-    'title_plural' => ts('Recurringentities'),
+    'title' => ts('Recurring Entity'),
+    'title_plural' => ts('Recurring Entities'),
     'description' => ts('FIXME'),
     'log' => TRUE,
     'add' => '4.6',

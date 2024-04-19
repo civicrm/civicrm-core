@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_acl_contact_cache',
   'class' => 'CRM_Contact_DAO_ACLContactCache',
   'getInfo' => fn() => [
-    'title' => ts('Aclcontactcache'),
-    'title_plural' => ts('Aclcontactcaches'),
+    'title' => ts('ACLContact Cache'),
+    'title_plural' => ts('ACLContact Caches'),
     'description' => ts('Join table cache for contacts that a user has permission on.'),
     'add' => '3.1',
   ],

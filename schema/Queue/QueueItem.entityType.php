@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_queue_item',
   'class' => 'CRM_Queue_DAO_QueueItem',
   'getInfo' => fn() => [
-    'title' => ts('Queueitem'),
-    'title_plural' => ts('Queueitems'),
+    'title' => ts('Queue Item'),
+    'title_plural' => ts('Queue Items'),
     'description' => ts('Stores a list of queue items'),
     'add' => '4.2',
   ],

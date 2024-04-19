@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_user_job',
   'class' => 'CRM_Core_DAO_UserJob',
   'getInfo' => fn() => [
-    'title' => ts('Userjob'),
-    'title_plural' => ts('Userjobs'),
+    'title' => ts('User Job'),
+    'title_plural' => ts('User Jobs'),
     'description' => ts('Tracking for user jobs (eg. imports).'),
     'log' => FALSE,
     'add' => '5.50',

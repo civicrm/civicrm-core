@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_option_value',
   'class' => 'CRM_Core_DAO_OptionValue',
   'getInfo' => fn() => [
-    'title' => ts('Optionvalue'),
-    'title_plural' => ts('Optionvalues'),
+    'title' => ts('Option Value'),
+    'title_plural' => ts('Option Values'),
     'description' => ts('FIXME'),
     'log' => TRUE,
     'add' => '1.5',

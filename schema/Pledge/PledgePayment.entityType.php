@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_pledge_payment',
   'class' => 'CRM_Pledge_DAO_PledgePayment',
   'getInfo' => fn() => [
-    'title' => ts('Pledgepayment'),
-    'title_plural' => ts('Pledgepayments'),
+    'title' => ts('Pledge Payment'),
+    'title_plural' => ts('Pledge Payments'),
     'description' => ts('Pledge Payment'),
     'log' => TRUE,
     'add' => '2.1',

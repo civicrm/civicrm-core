@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_payment_token',
   'class' => 'CRM_Financial_DAO_PaymentToken',
   'getInfo' => fn() => [
-    'title' => ts('Paymenttoken'),
-    'title_plural' => ts('Paymenttokens'),
+    'title' => ts('Payment Token'),
+    'title_plural' => ts('Payment Tokens'),
     'description' => ts('Payment Token'),
     'add' => '4.6',
   ],

@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_entity_batch',
   'class' => 'CRM_Batch_DAO_EntityBatch',
   'getInfo' => fn() => [
-    'title' => ts('Entitybatch'),
-    'title_plural' => ts('Entitybatches'),
+    'title' => ts('Entity Batch'),
+    'title_plural' => ts('Entity Batches'),
     'description' => ts('Batch entities (Contributions, Participants, Contacts) to a batch.'),
     'add' => '3.3',
   ],

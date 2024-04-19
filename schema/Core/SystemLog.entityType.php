@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_system_log',
   'class' => 'CRM_Core_DAO_SystemLog',
   'getInfo' => fn() => [
-    'title' => ts('Systemlog'),
-    'title_plural' => ts('Systemlogs'),
+    'title' => ts('System Log'),
+    'title_plural' => ts('System Logs'),
     'description' => ts('FIXME'),
     'add' => '4.5',
   ],

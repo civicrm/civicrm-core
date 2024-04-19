@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_entity_financial_account',
   'class' => 'CRM_Financial_DAO_EntityFinancialAccount',
   'getInfo' => fn() => [
-    'title' => ts('Entityfinancialaccount'),
-    'title_plural' => ts('Entityfinancialaccounts'),
+    'title' => ts('Entity Financial Account'),
+    'title_plural' => ts('Entity Financial Accounts'),
     'description' => ts('Map between an entity and a financial account, where there is a specific relationship between the financial account and the entity, e.g. Income Account for or AR Account for'),
     'log' => TRUE,
     'add' => '4.3',

@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_entity_file',
   'class' => 'CRM_Core_DAO_EntityFile',
   'getInfo' => fn() => [
-    'title' => ts('Entityfile'),
-    'title_plural' => ts('Entityfiles'),
+    'title' => ts('Entity File'),
+    'title_plural' => ts('Entity Files'),
     'description' => ts('Attaches (joins) uploaded files (images, documents, etc.) to entities (Contacts, Groups, Actions).'),
     'log' => TRUE,
     'add' => '1.5',

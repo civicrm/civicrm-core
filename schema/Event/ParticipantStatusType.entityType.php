@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_participant_status_type',
   'class' => 'CRM_Event_DAO_ParticipantStatusType',
   'getInfo' => fn() => [
-    'title' => ts('Participantstatustype'),
-    'title_plural' => ts('Participantstatustypes'),
+    'title' => ts('Participant Status Type'),
+    'title_plural' => ts('Participant Status Types'),
     'description' => ts('various types of CiviEvent participant statuses'),
     'log' => TRUE,
     'add' => '3.0',

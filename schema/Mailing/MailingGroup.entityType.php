@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_mailing_group',
   'class' => 'CRM_Mailing_DAO_MailingGroup',
   'getInfo' => fn() => [
-    'title' => ts('Mailinggroup'),
-    'title_plural' => ts('Mailinggroups'),
+    'title' => ts('Mailing Group'),
+    'title_plural' => ts('Mailing Groups'),
     'description' => ts('Stores information about the groups that participate in this mailing..'),
   ],
   'getFields' => fn() => [

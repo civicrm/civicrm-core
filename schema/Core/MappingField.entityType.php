@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_mapping_field',
   'class' => 'CRM_Core_DAO_MappingField',
   'getInfo' => fn() => [
-    'title' => ts('Mappingfield'),
-    'title_plural' => ts('Mappingfields'),
+    'title' => ts('Mapping Field'),
+    'title_plural' => ts('Mapping Fields'),
     'description' => ts('Individual field mappings for Mapping'),
     'add' => '1.2',
   ],

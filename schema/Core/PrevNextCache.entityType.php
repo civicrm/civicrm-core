@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_prevnext_cache',
   'class' => 'CRM_Core_DAO_PrevNextCache',
   'getInfo' => fn() => [
-    'title' => ts('Prevnextcache'),
-    'title_plural' => ts('Prevnextcaches'),
+    'title' => ts('Prev Next Cache'),
+    'title_plural' => ts('Prev Next Caches'),
     'description' => ts('Table to cache items for navigation on civicrm searched results.'),
     'add' => '3.4',
   ],

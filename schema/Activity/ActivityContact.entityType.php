@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_activity_contact',
   'class' => 'CRM_Activity_DAO_ActivityContact',
   'getInfo' => fn() => [
-    'title' => ts('Activitycontact'),
-    'title_plural' => ts('Activitycontacts'),
+    'title' => ts('Activity Contact'),
+    'title_plural' => ts('Activity Contacts'),
     'description' => ts('Activity Contact'),
     'log' => TRUE,
     'add' => '4.4',
@@ -81,7 +81,7 @@ return [
       'title' => ts('Activity Contact Type'),
       'sql_type' => 'int unsigned',
       'input_type' => 'Select',
-      'description' => 'Determines the contact\'s role in the activity (source, target, or assignee).',
+      'description' => ts('Determines the contact\'s role in the activity (source, target, or assignee).'),
       'add' => '4.4',
       'input_attrs' => [
         'label' => ts('Contact Role'),

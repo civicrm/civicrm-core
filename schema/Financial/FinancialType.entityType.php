@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_financial_type',
   'class' => 'CRM_Financial_DAO_FinancialType',
   'getInfo' => fn() => [
-    'title' => ts('Financialtype'),
-    'title_plural' => ts('Financialtypes'),
+    'title' => ts('Financial Type'),
+    'title_plural' => ts('Financial Types'),
     'description' => ts('Formerly civicrm_contribution_type merged into this table in 4.3'),
     'log' => TRUE,
     'add' => '1.3',

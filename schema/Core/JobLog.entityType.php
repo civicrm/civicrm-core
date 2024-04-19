@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_job_log',
   'class' => 'CRM_Core_DAO_JobLog',
   'getInfo' => fn() => [
-    'title' => ts('Joblog'),
-    'title_plural' => ts('Joblogs'),
+    'title' => ts('Job Log'),
+    'title_plural' => ts('Job Logs'),
     'description' => ts('Scheduled jobs log.'),
     'log' => FALSE,
     'add' => '4.1',

@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_acl',
   'class' => 'CRM_ACL_DAO_ACL',
   'getInfo' => fn() => [
-    'title' => ts('Acl'),
-    'title_plural' => ts('Acls'),
+    'title' => ts('ACL'),
+    'title_plural' => ts('ACLs'),
     'description' => ts('Access Control List'),
     'add' => '1.6',
   ],

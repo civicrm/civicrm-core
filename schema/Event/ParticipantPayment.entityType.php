@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_participant_payment',
   'class' => 'CRM_Event_DAO_ParticipantPayment',
   'getInfo' => fn() => [
-    'title' => ts('Participantpayment'),
-    'title_plural' => ts('Participantpayments'),
+    'title' => ts('Participant Payment'),
+    'title_plural' => ts('Participant Payments'),
     'description' => ts('FIXME'),
     'log' => TRUE,
     'add' => '1.7',

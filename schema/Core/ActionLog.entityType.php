@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_action_log',
   'class' => 'CRM_Core_DAO_ActionLog',
   'getInfo' => fn() => [
-    'title' => ts('Actionlog'),
-    'title_plural' => ts('Actionlogs'),
+    'title' => ts('Action Log'),
+    'title_plural' => ts('Action Logs'),
     'description' => ts('Table to store log for the reminder.'),
     'add' => '3.4',
   ],

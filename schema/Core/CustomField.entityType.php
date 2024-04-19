@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_custom_field',
   'class' => 'CRM_Core_DAO_CustomField',
   'getInfo' => fn() => [
-    'title' => ts('Customfield'),
-    'title_plural' => ts('Customfields'),
+    'title' => ts('Custom Field'),
+    'title_plural' => ts('Custom Fields'),
     'description' => ts('Stores info about an extended (custom) property (data and form field info).'),
     'log' => TRUE,
     'add' => '1.1',

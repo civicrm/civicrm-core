@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_print_label',
   'class' => 'CRM_Core_DAO_PrintLabel',
   'getInfo' => fn() => [
-    'title' => ts('Printlabel'),
-    'title_plural' => ts('Printlabels'),
+    'title' => ts('Print Label'),
+    'title_plural' => ts('Print Labels'),
     'description' => ts('Table to store the labels created by user.'),
     'add' => '4.4',
   ],

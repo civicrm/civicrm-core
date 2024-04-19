@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_subscription_history',
   'class' => 'CRM_Contact_DAO_SubscriptionHistory',
   'getInfo' => fn() => [
-    'title' => ts('Subscriptionhistory'),
-    'title_plural' => ts('Subscriptionhistories'),
+    'title' => ts('Subscription History'),
+    'title_plural' => ts('Subscription Histories'),
     'description' => ts('History information of subscribe/unsubscribe actions'),
     'log' => TRUE,
     'add' => '1.1',

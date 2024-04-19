@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_dedupe_exception',
   'class' => 'CRM_Dedupe_DAO_DedupeException',
   'getInfo' => fn() => [
-    'title' => ts('Dedupeexception'),
-    'title_plural' => ts('Dedupeexceptions'),
+    'title' => ts('Dedupe Exception'),
+    'title_plural' => ts('Dedupe Exceptions'),
     'description' => ts('Dedupe exceptions'),
     'add' => '3.3',
   ],

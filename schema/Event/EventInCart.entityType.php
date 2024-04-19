@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_events_in_carts',
   'class' => 'CRM_Event_Cart_DAO_EventInCart',
   'getInfo' => fn() => [
-    'title' => ts('Eventincart'),
-    'title_plural' => ts('Eventincarts'),
+    'title' => ts('Event In Cart'),
+    'title_plural' => ts('Event In Carts'),
     'description' => ts('FIXME'),
   ],
   'getFields' => fn() => [

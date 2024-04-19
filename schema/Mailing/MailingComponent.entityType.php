@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_mailing_component',
   'class' => 'CRM_Mailing_DAO_MailingComponent',
   'getInfo' => fn() => [
-    'title' => ts('Mailingcomponent'),
-    'title_plural' => ts('Mailingcomponents'),
+    'title' => ts('Mailing Component'),
+    'title_plural' => ts('Mailing Components'),
     'description' => ts('Stores information about the mailing components (header/footer).'),
   ],
   'getPaths' => fn() => [

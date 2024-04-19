@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_saved_search',
   'class' => 'CRM_Contact_DAO_SavedSearch',
   'getInfo' => fn() => [
-    'title' => ts('Savedsearch'),
-    'title_plural' => ts('Savedsearches'),
+    'title' => ts('Saved Search'),
+    'title_plural' => ts('Saved Searches'),
     'description' => ts('Users can save their complex SQL queries and use them later.'),
     'add' => '1.1',
     'icon' => 'fa-search-plus',

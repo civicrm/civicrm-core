@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_payment_processor_type',
   'class' => 'CRM_Financial_DAO_PaymentProcessorType',
   'getInfo' => fn() => [
-    'title' => ts('Paymentprocessortype'),
-    'title_plural' => ts('Paymentprocessortypes'),
+    'title' => ts('Payment Processor Type'),
+    'title_plural' => ts('Payment Processor Types'),
     'description' => ts('FIXME'),
     'add' => '1.8',
   ],

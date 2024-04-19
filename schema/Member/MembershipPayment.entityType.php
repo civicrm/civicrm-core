@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_membership_payment',
   'class' => 'CRM_Member_DAO_MembershipPayment',
   'getInfo' => fn() => [
-    'title' => ts('Membershippayment'),
-    'title_plural' => ts('Membershippayments'),
+    'title' => ts('Membership Payment'),
+    'title_plural' => ts('Membership Payments'),
     'description' => ts('Membership Payment'),
     'log' => TRUE,
     'add' => '1.5',

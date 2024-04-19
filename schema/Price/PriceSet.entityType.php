@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_price_set',
   'class' => 'CRM_Price_DAO_PriceSet',
   'getInfo' => fn() => [
-    'title' => ts('Priceset'),
-    'title_plural' => ts('Pricesets'),
+    'title' => ts('Price Set'),
+    'title_plural' => ts('Price Sets'),
     'description' => ts('FIXME'),
     'log' => TRUE,
     'add' => '1.8',

@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_worldregion',
   'class' => 'CRM_Core_DAO_Worldregion',
   'getInfo' => fn() => [
-    'title' => ts('Worldregion'),
-    'title_plural' => ts('Worldregions'),
+    'title' => ts('World Region'),
+    'title_plural' => ts('World Regions'),
     'description' => ts('FIXME'),
     'add' => '1.8',
   ],

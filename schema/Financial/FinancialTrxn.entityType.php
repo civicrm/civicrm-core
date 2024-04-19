@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_financial_trxn',
   'class' => 'CRM_Financial_DAO_FinancialTrxn',
   'getInfo' => fn() => [
-    'title' => ts('Financialtrxn'),
-    'title_plural' => ts('Financialtrxns'),
+    'title' => ts('Financial Trxn'),
+    'title_plural' => ts('Financial Trxns'),
     'description' => ts('FIXME'),
     'log' => TRUE,
     'add' => '1.3',

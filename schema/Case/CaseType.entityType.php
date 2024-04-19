@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_case_type',
   'class' => 'CRM_Case_DAO_CaseType',
   'getInfo' => fn() => [
-    'title' => ts('Casetype'),
-    'title_plural' => ts('Casetypes'),
+    'title' => ts('Case Type'),
+    'title_plural' => ts('Case Types'),
     'description' => ts('Case type definition'),
     'log' => TRUE,
     'add' => '4.5',

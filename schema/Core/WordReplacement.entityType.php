@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_word_replacement',
   'class' => 'CRM_Core_DAO_WordReplacement',
   'getInfo' => fn() => [
-    'title' => ts('Wordreplacement'),
-    'title_plural' => ts('Wordreplacements'),
+    'title' => ts('Word Replacement'),
+    'title_plural' => ts('Word Replacements'),
     'description' => ts('Top-level hierarchy to support word replacement.'),
     'add' => '4.4',
   ],

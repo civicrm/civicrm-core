@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_mailing_bounce_pattern',
   'class' => 'CRM_Mailing_DAO_BouncePattern',
   'getInfo' => fn() => [
-    'title' => ts('Bouncepattern'),
-    'title_plural' => ts('Bouncepatterns'),
+    'title' => ts('Bounce Pattern'),
+    'title_plural' => ts('Bounce Patterns'),
     'description' => ts('Pseudo-constant table of patterns for bounce classification'),
   ],
   'getFields' => fn() => [

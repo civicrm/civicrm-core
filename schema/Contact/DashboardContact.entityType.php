@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_dashboard_contact',
   'class' => 'CRM_Contact_DAO_DashboardContact',
   'getInfo' => fn() => [
-    'title' => ts('Dashboardcontact'),
-    'title_plural' => ts('Dashboardcontacts'),
+    'title' => ts('Dashboard Contact'),
+    'title_plural' => ts('Dashboard Contacts'),
     'description' => ts('Table to store dashboard for each contact.'),
     'add' => '3.1',
   ],

@@ -5,8 +5,8 @@ return [
   'table' => 'civicrm_contribution_page',
   'class' => 'CRM_Contribute_DAO_ContributionPage',
   'getInfo' => fn() => [
-    'title' => ts('Contributionpage'),
-    'title_plural' => ts('Contributionpages'),
+    'title' => ts('Contribution Page'),
+    'title_plural' => ts('Contribution Pages'),
     'description' => ts('A Contribution object store meta information about a single customized contribution page'),
     'log' => TRUE,
     'add' => '1.3',
