@@ -117,7 +117,7 @@ jobs:
           git commit -m "regenerate civicrm_generated" sql/civicrm_generated.mysql
           git remote add mine https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY.git
           git push mine
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: ${{ success() }}
         with:
           name: the_file_you_requested
