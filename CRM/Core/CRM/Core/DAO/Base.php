@@ -43,6 +43,10 @@ abstract class CRM_Core_DAO_Base extends CRM_Core_DAO {
     return [];
   }
 
+  public static function getLabelField(): ?string {
+    return static::getEntityInfo()['label_field'] ?? NULL;
+  }
+
   /**
    * @inheritDoc
    */
