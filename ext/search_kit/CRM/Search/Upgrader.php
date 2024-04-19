@@ -7,19 +7,6 @@ use CRM_Search_ExtensionUtil as E;
 class CRM_Search_Upgrader extends CRM_Extension_Upgrader_Base {
 
   /**
-   * Upgrade 1000 - install schema
-   * @return bool
-   */
-  public function upgrade_1000(): bool {
-    $this->ctx->log->info('Applying update 1000 - install schema.');
-    // For early, early adopters who installed the extension pre-beta
-    if (!CRM_Core_DAO::singleValueQuery("SHOW TABLES LIKE 'civicrm_search_display'")) {
-      $this->executeSqlFile('sql/auto_install.sql');
-    }
-    return TRUE;
-  }
-
-  /**
    * Upgrade 1001 - normalize search display column keys
    * @return bool
    */
