@@ -432,7 +432,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('Order', 'create', $orderParams);
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $contribution['id']]);
     $this->assertEquals('Pending', CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution['contribution_status_id']));
-    $this->_contributionId = $contribution['id'];
+    $this->ids['Contribution']['pending'] = $this->_contributionId = $contribution['id'];
   }
 
   /**
@@ -474,6 +474,35 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
       'api.MembershipStatus.create' => ['name' => $membershipStatusName],
     ];
     $this->callAPISuccess('MembershipStatus', 'get', $params);
+  }
+
+  /**
+   * Test that multiple payment has correct line item allocations.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testMultiplePaymentForPendingPayLaterContributionHasCorrectionAllocation(): void {
+    $this->enableTaxAndInvoicing();
+    $this->addTaxAccountToFinancialType(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'), ['tax_rate' => 20]);
+    $this->createPendingOrder();
+
+    $this->submitPayment(60);
+    $this->submitPayment(30);
+    $result = $this->callAPISuccess('EntityFinancialTrxn', 'get', [
+      'version' => 4,
+      'where' => [
+        ['entity_table', '=', 'civicrm_contribution'],
+        ['entity_id', '=', $this->ids['Contribution']['pending']],
+      ],
+      'chain' => [
+        'line_items' => ['EntityFinancialTrxn', 'get', ['where' => [['financial_trxn_id', '=', '$financial_trxn_id'], ['id', '!=', '$id']]]],
+      ],
+    ])['values'];
+
+    // Assert that the line items have the correct allocations from the paid amount
+    foreach ($result as $entityFnTrxn) {
+      $this->assertEquals(round($entityFnTrxn['amount'], 2), round(array_sum(array_column($entityFnTrxn['line_items'], 'amount')), 2));
+    }
   }
 
 }

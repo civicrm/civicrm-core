@@ -516,16 +516,22 @@ class CRM_Financial_BAO_Payment {
     }
 
     $items = LineItem::get(FALSE)
-      ->addSelect('*', 'financial_item.status_id:name', 'financial_item.id', 'financial_item.financial_account_id', 'financial_item_id.currency', 'financial_item.financial_account_id.is_tax', 'financial_item.entity_id', 'financial_item.amount')
+      ->addSelect('*', 'financial_item.status_id:name', 'financial_item.id', 'financial_item.financial_account_id', 'financial_item_id.currency', 'financial_item.financial_account_id.is_tax', 'financial_item.entity_id', 'financial_item.amount', 'allocated.amount')
       ->addJoin(
         'FinancialItem AS financial_item',
         'LEFT',
         ['financial_item.entity_table', '=', '"civicrm_line_item"'],
         ['financial_item.entity_id', '=', 'id']
       )
+      ->addJoin('EntityFinancialTrxn AS allocated',
+        'LEFT',
+        ['allocated.entity_id', '=', 'financial_item.id'],
+        ['allocated.entity_table', '=', '"civicrm_financial_item"'],
+        ['allocated.financial_trxn_id.is_payment', '=', TRUE]
+      )
       // Ideally we would group by financial_item.id & get the sum of
       // amount, but we hit full group by issues.
-      ->addOrderBy('financial_item.id', 'DESC')
+      ->addOrderBy('financial_item.id')
       ->addWhere('contribution_id', '=', (int) $params['contribution_id'])
       ->execute();
 
@@ -538,72 +544,30 @@ class CRM_Financial_BAO_Payment {
         // This covers a situation that would not normally exist where the site has a data issue.
         $item = self::createFinancialItem($item, $params['trxn_date'], $contribution['contact_id'], $contribution['currency']);
       }
-      // Calling this function is historical - we could get it by doing calculations
-      // on the array we are iterating as it has all the relevant information.
-      // Also, we should probably switch to calculating by FinancialItem rather than
-      // by line item as then we would be calculating the balance on the tax items too,
-      // which is currently not quite right.
-      $item['paid'] = self::getAmountOfLineItemPaid($lineItemID);
-      $item['balance'] = $item['line_total'] - $item['paid'];
+      // Add up the amount paid by line item, separated into tax & non-tax.
+      // Up to 2 items per line item are added to payable items (tax + no tax).
+      // The item added from the last row 'wins' - it will have the totals based on the total
+      // of the amount paid across all of the rows.
+      // @todo perhaps this should be done by financial item, not line item.
+      $payableItemIndex = $item['financial_item.financial_account_id.is_tax'] ? ($item['id'] . '-tax') : $item['id'];
+      $item['paid'] = ($item['allocated.amount'] ?: 0) + ($payableItems[$payableItemIndex]['paid'] ?? 0);
+      $item['item_total'] = $item['financial_item.financial_account_id.is_tax'] ? $item['tax_amount'] : $item['line_total'];
+      $item['balance'] = $item['item_total'] - $item['paid'];
       if (!empty($lineItemOverrides)) {
         $item['allocation'] = $lineItemOverrides[$lineItemID] ?? NULL;
       }
       else {
         if (empty($item['balance']) && !empty($ratio) && $params['total_amount'] < 0) {
-          $item['allocation'] = $item['line_total'] * $ratio;
+          $item['allocation'] = $item['item_total'] * $ratio;
         }
         else {
           $item['allocation'] = $item['balance'] * $ratio;
         }
       }
-      // Re-index to ensure 1 row per item - we couldn't use GroupBy above as it
-      // hits fullGroupBy issues & we couldn't use indexBy as it borks on the possible null value fixed above.
-      if ($item['financial_item.financial_account_id.is_tax'] &&
-        !isset($payableItems[$item['id'] . '-tax'])
-      ) {
-        // @todo - revisit this calculation - it is how it has been done historically but has been identified as
-        // incorrect.
-        // We could calculate the outstanding balance on this financial item &
-        // then use the ratio....
-        $item['allocation'] = $item['tax_amount'] * ($params['total_amount'] / $contribution['total_amount']);
-        $payableItems[$item['id'] . '-tax'] = $item;
-      }
-      elseif (!isset($payableItems[$item['id']])) {
-        $payableItems[$item['id']] = $item;
-      }
+      $payableItems[$payableItemIndex] = $item;
     }
 
     return $payableItems;
-  }
-
-  /**
-   * Get the amount paid so far against this line item.
-   *
-   * @param int $lineItemID
-   *
-   * @return float
-   *
-   * @throws \CRM_Core_Exception
-   */
-  protected static function getAmountOfLineItemPaid($lineItemID) {
-    $paid = 0;
-    $financialItems = civicrm_api3('FinancialItem', 'get', [
-      'entity_id' => $lineItemID,
-      'entity_table' => 'civicrm_line_item',
-      'options' => ['sort' => 'id DESC', 'limit' => 0],
-    ])['values'];
-    if (!empty($financialItems)) {
-      $entityFinancialTrxns = civicrm_api3('EntityFinancialTrxn', 'get', [
-        'entity_table' => 'civicrm_financial_item',
-        'entity_id' => ['IN' => array_keys($financialItems)],
-        'options' => ['limit' => 0],
-        'financial_trxn_id.is_payment' => 1,
-      ])['values'];
-      foreach ($entityFinancialTrxns as $entityFinancialTrxn) {
-        $paid += $entityFinancialTrxn['amount'];
-      }
-    }
-    return (float) $paid;
   }
 
   /**
@@ -680,12 +644,18 @@ class CRM_Financial_BAO_Payment {
       ->execute();
 
     return LineItem::get(FALSE)
-      ->addSelect('*', 'financial_item.status_id:name', 'financial_item.id', 'financial_item.financial_account_id', 'financial_item_id.currency', 'financial_item.financial_account_id.is_tax', 'financial_item.entity_id', 'financial_item.amount')
+      ->addSelect('*', 'financial_item.status_id:name', 'financial_item.id', 'financial_item.financial_account_id', 'financial_item_id.currency', 'financial_item.financial_account_id.is_tax', 'financial_item.entity_id', 'financial_item.amount', 'allocated.amount')
       ->addJoin(
         'FinancialItem AS financial_item',
         'LEFT',
         ['financial_item.entity_table', '=', '"civicrm_line_item"'],
         ['financial_item.entity_id', '=', 'id']
+      )
+      ->addJoin('EntityFinancialTrxn AS allocated',
+        'LEFT',
+        ['allocated.entity_id', '=', 'financial_item.id'],
+        ['allocated.entity_table', '=', '"civicrm_financial_item"'],
+        ['allocated.financial_trxn_id.is_payment', '=', TRUE]
       )
       ->addOrderBy('financial_item.id', 'DESC')
       ->addWhere('id', '=', (int) $lineItem['id'])
