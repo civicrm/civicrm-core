@@ -315,10 +315,20 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         while (count($keys) > 1) {
           $level = array_shift($keys);
           $parent[$level] = $parent[$level] ?? [];
+          if (is_scalar($parent[$level])) {
+            $parent[$level] = [
+              'id' => $parent[$level],
+            ];
+          }
           $parent = &$parent[$level];
         }
         $level = array_shift($keys);
-        $parent[$level] = $value;
+        if (isset($parent[$level]) && is_array($parent[$level])) {
+          $parent[$level]['id'] = $value;
+        }
+        else {
+          $parent[$level] = $value;
+        }
       }
       $smarty = \CRM_Core_Smarty::singleton();
       $output = $smarty->fetchWith("string:$output", $vars);
