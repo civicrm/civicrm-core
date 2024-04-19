@@ -165,9 +165,11 @@ class CRM_Financial_BAO_Payment {
         civicrm_api3('Participant', 'create', ['id' => $participantPayment['participant_id'], 'status_id' => 'Partially paid']);
       }
     }
+    // Note that we reload the payments rather than use $contribution['paid_amount']
+    // here as we are interested in the paid_amount AFTER this payment has been made.
     elseif ($contributionStatus === 'Completed' && ((float) CRM_Core_BAO_FinancialTrxn::getTotalPayments($contribution['id'], TRUE) === 0.0)) {
       // If the contribution has previously been completed (fully paid) and now has total payments adding up to 0
-      //  change status to refunded.
+      //  change status to 'refunded'.
       self::updateContributionStatus($contribution['id'], 'Refunded');
     }
     CRM_Contribute_BAO_Contribution::recordPaymentActivity($params['contribution_id'], $params['participant_id'] ?? NULL, $params['total_amount'], $trxn->currency, $trxn->trxn_date);
@@ -511,7 +513,7 @@ class CRM_Financial_BAO_Payment {
       $ratio = $params['total_amount'] / $outstandingBalance;
     }
     elseif ($params['total_amount'] < 0) {
-      $ratio = $params['total_amount'] / (float) CRM_Core_BAO_FinancialTrxn::getTotalPayments($params['contribution_id'], TRUE);
+      $ratio = $params['total_amount'] / $contribution['paid_amount'];
     }
     else {
       // Help we are making a payment but no money is owed. We won't allocate the overpayment to any line item.
