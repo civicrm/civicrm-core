@@ -114,7 +114,7 @@ abstract class CRM_Core_DAO_Base extends CRM_Core_DAO {
     foreach ($entityDef['getFields']() as $fieldName => $fieldSpec) {
       $field = [
         'name' => $fieldName,
-        'type' => !empty($fieldSpec['data_type']) ? \CRM_Utils_Type::getValidTypes()[$fieldSpec['data_type']] : constant(\CRM_Utils_Schema::getCrmTypeFromSqlType($fieldSpec['sql_type'])),
+        'type' => !empty($fieldSpec['data_type']) ? \CRM_Utils_Type::getValidTypes()[$fieldSpec['data_type']] : CRM_Utils_Schema::getCrmTypeFromSqlType($fieldSpec['sql_type']),
         'title' => $fieldSpec['title'],
         'description' => $fieldSpec['description'] ?? NULL,
       ];

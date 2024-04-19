@@ -12,9 +12,11 @@
 namespace Civi\Schema;
 
 /**
- * Gathers and stores schema meatadata
+ * Gathers and stores schema metadata
  */
 class EntityRepository {
+
+  private static $isBooted = FALSE;
 
   private static $entities;
 
@@ -60,20 +62,39 @@ class EntityRepository {
 
   public static function flush(): void {
     self::$entities = NULL;
+    self::$isBooted = FALSE;
   }
 
   private static function loadAll(): void {
-    if (self::$entities) {
+    if (self::$isBooted) {
       return;
     }
-    // Temporary until the data file is moved
-    $allCoreTables = new \ReflectionClass('CRM_Core_DAO_AllCoreTables');
-    $dataFile = preg_replace('/\.php$/', '.data.php', $allCoreTables->getFileName());
-    $entityTypes = require $dataFile;
-    \CRM_Utils_Hook::entityTypes($entityTypes);
+    // In pre-boot conditions cannot call hooks so only load core entities
+    $containerBooted = \Civi\Core\Container::isContainerBooted();
+    if (!$containerBooted && self::$entities) {
+      return;
+    }
+    $entityTypes = self::loadCoreEntities();
+    // Cannot call hook prior to container boot. Only core entities can load.
+    if ($containerBooted) {
+      \CRM_Utils_Hook::entityTypes($entityTypes);
+      self::$isBooted = TRUE;
+    }
     self::$entities = array_column($entityTypes, NULL, 'name');
     self::$tableIndex = array_column($entityTypes, 'name', 'table');
     self::$classIndex = array_column($entityTypes, 'name', 'class');
+  }
+
+  private static function loadCoreEntities(): array {
+    $entityTypes = [];
+    $path = \Civi::paths()->getPath('[civicrm.root]/schema/*/*.entityType.php');
+    $files = (array) glob($path);
+    foreach ($files as $file) {
+      $entity = include $file;
+      $entity['module'] = 'civicrm';
+      $entityTypes[$entity['name']] = $entity;
+    }
+    return $entityTypes;
   }
 
 }
