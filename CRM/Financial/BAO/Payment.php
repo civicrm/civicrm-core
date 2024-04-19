@@ -495,19 +495,6 @@ class CRM_Financial_BAO_Payment {
    * @throws \CRM_Core_Exception
    */
   protected static function getPayableItems(array $params, array $contribution): array {
-    // @todo - do the 'full' version of this 'get' here & remove the double up below.
-    $lineItems = (array) LineItem::get(FALSE)
-      ->addSelect('*')
-      ->addWhere('contribution_id', '=', (int) $params['contribution_id'])
-      ->execute()->indexBy('id');
-    $lineItemOverrides = [];
-    if (!empty($params['line_item'])) {
-      // The format is a bit weird here - $params['line_item'] => [[1 => 10], [2 => 40]]
-      // Squash to [1 => 10, 2 => 40]
-      foreach ($params['line_item'] as $lineItem) {
-        $lineItemOverrides += $lineItem;
-      }
-    }
     $outstandingBalance = $contribution['balance_amount'];
     if ($outstandingBalance !== 0.0) {
       $ratio = $params['total_amount'] / $outstandingBalance;
@@ -519,21 +506,15 @@ class CRM_Financial_BAO_Payment {
       // Help we are making a payment but no money is owed. We won't allocate the overpayment to any line item.
       $ratio = 0;
     }
-    foreach ($lineItems as $lineItemID => $lineItem) {
-      $lineItems[$lineItemID]['paid'] = self::getAmountOfLineItemPaid($lineItemID);
-      $lineItems[$lineItemID]['balance'] = $lineItem['line_total'] - $lineItems[$lineItemID]['paid'];
-      if (!empty($lineItemOverrides)) {
-        $lineItems[$lineItemID]['allocation'] = $lineItemOverrides[$lineItemID] ?? NULL;
-      }
-      else {
-        if (empty($lineItems[$lineItemID]['balance']) && !empty($ratio) && $params['total_amount'] < 0) {
-          $lineItems[$lineItemID]['allocation'] = $lineItem['line_total'] * $ratio;
-        }
-        else {
-          $lineItems[$lineItemID]['allocation'] = $lineItems[$lineItemID]['balance'] * $ratio;
-        }
+    $lineItemOverrides = [];
+    if (!empty($params['line_item'])) {
+      // The format is a bit weird here - $params['line_item'] => [[1 => 10], [2 => 40]]
+      // Squash to [1 => 10, 2 => 40]
+      foreach ($params['line_item'] as $lineItem) {
+        $lineItemOverrides += $lineItem;
       }
     }
+
     $items = LineItem::get(FALSE)
       ->addSelect('*', 'financial_item.status_id:name', 'financial_item.id', 'financial_item.financial_account_id', 'financial_item_id.currency', 'financial_item.financial_account_id.is_tax', 'financial_item.entity_id', 'financial_item.amount')
       ->addJoin(
@@ -542,19 +523,39 @@ class CRM_Financial_BAO_Payment {
         ['financial_item.entity_table', '=', '"civicrm_line_item"'],
         ['financial_item.entity_id', '=', 'id']
       )
+      // Ideally we would group by financial_item.id & get the sum of
+      // amount, but we hit full group by issues.
       ->addOrderBy('financial_item.id', 'DESC')
       ->addWhere('contribution_id', '=', (int) $params['contribution_id'])
-      ->setDebug(TRUE)
       ->execute();
 
     $payableItems = [];
+
     foreach ($items as $item) {
+      $lineItemID = $item['id'];
       if (!$item['financial_item.id']) {
         // If we didn't find a financial item that is NOT of type "Sales Tax" then create a new one.
+        // This covers a situation that would not normally exist where the site has a data issue.
         $item = self::createFinancialItem($item, $params['trxn_date'], $contribution['contact_id'], $contribution['currency']);
       }
-      $item['allocation'] = $lineItems[$item['id']]['allocation'];
-      $item['balance'] = $lineItems[$item['id']]['balance'];
+      // Calling this function is historical - we could get it by doing calculations
+      // on the array we are iterating as it has all the relevant information.
+      // Also, we should probably switch to calculating by FinancialItem rather than
+      // by line item as then we would be calculating the balance on the tax items too,
+      // which is currently not quite right.
+      $item['paid'] = self::getAmountOfLineItemPaid($lineItemID);
+      $item['balance'] = $item['line_total'] - $item['paid'];
+      if (!empty($lineItemOverrides)) {
+        $item['allocation'] = $lineItemOverrides[$lineItemID] ?? NULL;
+      }
+      else {
+        if (empty($item['balance']) && !empty($ratio) && $params['total_amount'] < 0) {
+          $item['allocation'] = $item['line_total'] * $ratio;
+        }
+        else {
+          $item['allocation'] = $item['balance'] * $ratio;
+        }
+      }
       // Re-index to ensure 1 row per item - we couldn't use GroupBy above as it
       // hits fullGroupBy issues & we couldn't use indexBy as it borks on the possible null value fixed above.
       if ($item['financial_item.financial_account_id.is_tax'] &&
@@ -562,6 +563,8 @@ class CRM_Financial_BAO_Payment {
       ) {
         // @todo - revisit this calculation - it is how it has been done historically but has been identified as
         // incorrect.
+        // We could calculate the outstanding balance on this financial item &
+        // then use the ratio....
         $item['allocation'] = $item['tax_amount'] * ($params['total_amount'] / $contribution['total_amount']);
         $payableItems[$item['id'] . '-tax'] = $item;
       }
@@ -569,6 +572,7 @@ class CRM_Financial_BAO_Payment {
         $payableItems[$item['id']] = $item;
       }
     }
+
     return $payableItems;
   }
 
