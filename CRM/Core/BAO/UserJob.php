@@ -62,7 +62,7 @@ class CRM_Core_BAO_UserJob extends CRM_Core_DAO_UserJob implements HookInterface
     if ($userJobId && $status === 'completed') {
       UserJob::update(FALSE)
         ->addWhere('id', '=', $userJobId)
-        ->setValues(['status_id' => 1])
+        ->setValues(['status_id' => 1, 'end_date' => 'now'])
         ->execute();
     }
   }
