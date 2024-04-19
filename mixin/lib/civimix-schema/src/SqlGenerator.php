@@ -9,13 +9,16 @@
  +--------------------------------------------------------------------+
  */
 
-return new class([], fn()=>NULL) {
+return new class() {
 
   /**
    * @var array
    */
-  private array $entities;
+  private $entities;
 
+  /**
+   * @var callable
+   */
   private $findExternalTable;
 
   /**
@@ -40,13 +43,15 @@ return new class([], fn()=>NULL) {
       $entities[$entity['name']] = $entity;
     }
 
-    $findExternalTable = $isolated ? (fn($entity) => NULL) : (['CRM_Core_DAO_AllCoreTables', 'getTableForEntityName']);
+    $findExternalTable = $isolated ? NULL : (['CRM_Core_DAO_AllCoreTables', 'getTableForEntityName']);
     return new static($entities, $findExternalTable);
   }
 
-  public function __construct(array $entities, callable $findExternalTable) {
+  public function __construct(array $entities = [], ?callable $findExternalTable = NULL) {
     $this->entities = $entities;
-    $this->findExternalTable = $findExternalTable;
+    $this->findExternalTable = $findExternalTable ?: function() {
+      return NULL;
+    };
   }
 
   public function getEntities(): array {
