@@ -664,7 +664,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
               'key' => 'contact_id',
               'label' => 'Contact ID',
               'type' => 'field',
-              'rewrite' => '#{$contact_id.id}',
+              'rewrite' => '#{$contact_id.id} is #{$contact_id}',
             ],
             [
               'key' => 'first_name',
@@ -680,7 +680,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
       ],
     ];
     $result = civicrm_api4('SearchDisplay', 'run', $params);
-    $this->assertEquals('#' . $contacts[0]['id'], $result[0]['columns'][0]['val']);
+    $this->assertEquals("#{$contacts[0]['id']} is #{$contacts[0]['id']}", $result[0]['columns'][0]['val']);
     $this->assertEquals("Uno $lastName", $result[0]['columns'][1]['val']);
   }
 

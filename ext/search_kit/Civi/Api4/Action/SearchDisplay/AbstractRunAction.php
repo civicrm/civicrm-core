@@ -308,14 +308,17 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     $output = $this->replaceTokens($column['rewrite'], $data, 'view');
     if ($hasSmarty) {
       $vars = [];
+      $nestedIds = [];
       // Convert dots to nested arrays which are more Smarty-friendly
       foreach ($data as $key => $value) {
         $parent = &$vars;
-        $keys = array_map('CRM_Utils_String::munge', explode('.', $key));
+        $allKeys = $keys = array_map('CRM_Utils_String::munge', explode('.', $key));
         while (count($keys) > 1) {
           $level = array_shift($keys);
           $parent[$level] = $parent[$level] ?? [];
+          // Fix collisions between e.g. contact_id & contact_id.display_name by nesting the id
           if (is_scalar($parent[$level])) {
+            $nestedIds[] = implode('.', array_slice($allKeys, 0, count($keys)));
             $parent[$level] = [
               'id' => $parent[$level],
             ];
@@ -323,12 +326,19 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
           $parent = &$parent[$level];
         }
         $level = array_shift($keys);
+        // Fix collisions between e.g. contact_id & contact_id.display_name by nesting the id
         if (isset($parent[$level]) && is_array($parent[$level])) {
+          $nestedIds[] = implode('.', $allKeys);
           $parent[$level]['id'] = $value;
         }
         else {
           $parent[$level] = $value;
         }
+      }
+      // Fix references to e.g. contact_id as scalar if it was moved by above fixes, change reference to nested id
+      foreach (array_unique($nestedIds) as $nestedId) {
+        $quotedId = preg_quote('$' . $nestedId);
+        $output = preg_replace("/$quotedId(?![.\w])/", '$' . "$nestedId.id", $output);
       }
       $smarty = \CRM_Core_Smarty::singleton();
       $output = $smarty->fetchWith("string:$output", $vars);
