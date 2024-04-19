@@ -19,39 +19,6 @@
  * class to parse membership csv files
  */
 class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
-  protected $_mapperKeys;
-
-  protected $_fileName;
-
-  /**
-   * Imported file size.
-   *
-   * @var int
-   */
-  protected $_fileSize;
-
-  /**
-   * Separator being used.
-   *
-   * @var string
-   */
-  protected $_separator;
-
-  /**
-   * Whether the file has a column header or not
-   *
-   * @var bool
-   */
-  protected $_haveColumnHeader;
-
-  /**
-   * Class constructor.
-   *
-   * @param array $mapperKeys
-   */
-  public function __construct(&$mapperKeys = []) {
-    $this->_mapperKeys = &$mapperKeys;
-  }
 
   /**
    * Get information about the provided job.
