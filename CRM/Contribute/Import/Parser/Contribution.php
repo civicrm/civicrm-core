@@ -26,13 +26,6 @@ use Civi\Api4\Note;
  */
 class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
 
-  /**
-   * Array of successfully imported contribution id's
-   *
-   * @var array
-   */
-  protected $_newContributions;
-
   protected $baseEntity = 'Contribution';
 
   /**
@@ -62,18 +55,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    * @see CRM_Import_Parser result code constants
    */
   const SOFT_CREDIT = 512, SOFT_CREDIT_ERROR = 1024, PLEDGE_PAYMENT = 2048, PLEDGE_PAYMENT_ERROR = 4096;
-
-  /**
-   * Separator being used
-   * @var string
-   */
-  protected $_separator;
-
-  /**
-   * Array of pledge payment error lines, bounded by MAX_ERROR
-   * @var array
-   */
-  protected $_pledgePaymentErrors;
 
   /**
    * Get the field mappings for the import.
