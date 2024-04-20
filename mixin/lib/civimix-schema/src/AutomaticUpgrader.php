@@ -2,6 +2,8 @@
 
 namespace CiviMix\Schema;
 
+use Civi\Test\Invasive;
+
 /**
  * The "AutomaticUpgrader" will create and destroy the SQL tables
  * using schema files (`SchemaHelper`). It also calls-out to any custom
@@ -130,6 +132,45 @@ return new class() implements \CRM_Extension_Upgrader_Interface {
     }
 
     return $errors;
+  }
+
+  public function __set($property, $value) {
+    switch ($property) {
+      // _queueAdapter() needs these properties.
+      case 'ctx':
+      case 'queue':
+        if (!$this->customUpgrader) {
+          throw new \RuntimeException("AutomaticUpgrader($this->extensionName): Cannot assign delegated property: $property (No custom-upgrader found)");
+        }
+        // "Invasive": unlike QueueTrait, we are not in the same class as the recipient. And we can't replace previously-published QueueTraits.
+        Invasive::set([$this->customUpgrader, $property], $value);
+        return;
+    }
+
+    throw new \RuntimeException("AutomaticUpgrader($this->extensionName): Cannot assign unknown property: $property");
+  }
+
+  public function __get($property) {
+    switch ($property) {
+      // _queueAdapter() needs these properties.
+      case 'ctx':
+      case 'queue':
+        if (!$this->customUpgrader) {
+          throw new \RuntimeException("AutomaticUpgrader($this->extensionName): Cannot read delegated property: $property (No custom-upgrader found)");
+        }
+        // "Invasive": Unlike QueueTrait, we are not in the same class as the recipient. And we can't replace previously-published QueueTraits.
+        return Invasive::get([$this->customUpgrader, $property]);
+    }
+    throw new \RuntimeException("AutomaticUpgrader($this->extensionName): Cannot read unknown property: $property");
+  }
+
+  public function __call($name, $arguments) {
+    if ($this->customUpgrader) {
+      return call_user_func_array([$this->customUpgrader, $name], $arguments);
+    }
+    else {
+      throw new \RuntimeException("AutomaticUpgrader($this->extensionName): Cannot delegate method $name (No custom-upgrader found)");
+    }
   }
 
 };
