@@ -27,7 +27,6 @@ class InstallSchemaPlugin implements \Symfony\Component\EventDispatcher\EventSub
     $m = $e->getModel();
     $files = array(
       'xmlMissing' => implode(DIRECTORY_SEPARATOR, [$m->srcPath, 'xml']),
-      'xmlSchemaMissing' => implode(DIRECTORY_SEPARATOR, [$m->srcPath, 'xml', 'schema', 'Schema.xml']),
       'xmlVersionMissing' => implode(DIRECTORY_SEPARATOR, [$m->srcPath, 'xml', 'version.xml']),
     );
 
