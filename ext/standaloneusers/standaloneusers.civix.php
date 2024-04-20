@@ -75,9 +75,30 @@ class CRM_Standaloneusers_ExtensionUtil {
     return self::CLASS_PREFIX . '_' . str_replace('\\', '_', $suffix);
   }
 
+  /**
+   * @return \CiviMix\Schema\SchemaHelperInterface
+   */
+  public static function schema() {
+    return $GLOBALS['CiviMixSchema5']->getHelper(static::LONG_NAME);
+  }
+
 }
 
 use CRM_Standaloneusers_ExtensionUtil as E;
+
+($GLOBALS['_PathLoad'][0] ?? require __DIR__ . '/mixin/lib/pathload-0.php');
+pathload()->addSearchDir(__DIR__ . '/mixin/lib');
+spl_autoload_register('_standaloneusers_civix_class_loader', TRUE, TRUE);
+
+function _standaloneusers_civix_class_loader($class) {
+  // This allows us to tap-in to the installation process (without incurring real file-reads on typical requests).
+  if (strpos($class, 'CiviMix\\Schema\\Standaloneusers\\') === 0) {
+    // civimix-schema@5 is designed for backported use in download/activation workflows,
+    // where new revisions may become dynamically available.
+    pathload()->loadPackage('civimix-schema@5', TRUE);
+    CiviMix\Schema\loadClass($class);
+  }
+}
 
 /**
  * (Delegated) Implements hook_civicrm_config().
