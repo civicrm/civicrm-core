@@ -28,10 +28,11 @@ class EntityTest extends \CiviUnitTestCase {
     $this->assertTrue($fields['id']['primary_key']);
     $this->assertTrue($fields['id']['auto_increment']);
     $this->assertTrue($fields['id']['required']);
-    $this->assertFalse($fields['created_date']['required']);
+    $this->assertTrue(empty($fields['created_date']['required']));
     $this->assertEquals('Relationship', $fields['relationship_id']['entity_reference']['entity']);
     $this->assertEquals('engagement_index', $fields['engagement_level']['pseudoconstant']['option_group_name']);
-    $this->assertEquals([], $fields['weight']['usage']);
+    $this->assertTrue(empty($fields['weight']['usage']));
+    $this->assertEquals('datetime', $fields['activity_date_time']['sql_type']);
     $this->assertEquals('timestamp', $fields['modified_date']['sql_type']);
     $this->assertEquals('CiviCampaign', $fields['campaign_id']['component']);
     $this->assertEquals('EntityRef', $fields['campaign_id']['input_type']);
@@ -39,7 +40,7 @@ class EntityTest extends \CiviUnitTestCase {
     $this->assertEquals('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP', $fields['modified_date']['default']);
     $this->assertTrue($fields['modified_date']['readonly']);
     $this->assertFalse($fields['is_deleted']['default']);
-    $this->assertFalse($fields['is_deleted']['localizable']);
+    $this->assertTrue(empty($fields['is_deleted']['localizable']));
   }
 
 }

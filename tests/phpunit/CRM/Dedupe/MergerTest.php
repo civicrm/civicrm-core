@@ -1734,7 +1734,7 @@ WHERE
    * Declare a callback to hookLinkCallBack function.
    */
   public function hookEntityTypes(&$entityTypes): void {
-    $entityTypes['CRM_Core_DAO_IM']['links_callback'][] = [$this, 'hookLinkCallBack'];
+    $entityTypes['IM']['links_callback'][] = [$this, 'hookLinkCallBack'];
   }
 
   /**

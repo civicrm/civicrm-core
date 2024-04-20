@@ -14,6 +14,16 @@
  */
 abstract class CRM_Core_DAO_Base extends CRM_Core_DAO {
 
+  public function __construct() {
+    parent::__construct();
+    // Historically a generated DAO would have one class variable per field.
+    // To prevent undefined property warnings, this dynamic DAO mimics that by
+    // initializing the object with a property for each field.
+    foreach (static::getEntityDefinition()['getFields']() as $name => $field) {
+      $this->$name = NULL;
+    }
+  }
+
   /**
    * @inheritDoc
    */
