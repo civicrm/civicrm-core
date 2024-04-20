@@ -47,10 +47,7 @@ class ParticipantTest extends Api4TestBase {
    * @throws \CRM_Core_Exception
    */
   public function testGet(): void {
-    $rows = $this->getRowCount('civicrm_participant');
-    if ($rows > 0) {
-      $this->fail('Participant table must be empty');
-    }
+    Participant::delete(FALSE)->addWhere('id', '>', 0)->execute();
 
     // With no records:
     $result = Participant::get(FALSE)->execute();
@@ -312,6 +309,44 @@ class ParticipantTest extends Api4TestBase {
     $this->assertEquals(-1, $events[0]['remaining_participants']);
     // `remaining_participants` is always NULL for unlimited events
     $this->assertNull($events[1]['remaining_participants']);
+  }
+
+  public function testFilterByRole(): void {
+    $this->createTestRecord('OptionValue', [
+      'option_group_id:name' => 'participant_role',
+      'label' => 'Role1',
+      'name' => 'role_1',
+    ]);
+    $this->createTestRecord('OptionValue', [
+      'option_group_id:name' => 'participant_role',
+      'label' => 'Role2',
+      'name' => 'role_2',
+    ]);
+    $participants = $this->saveTestRecords('Participant', [
+      'records' => [
+        ['role_id:name' => 'role_1'],
+        ['role_id:name' => 'role_2'],
+        ['role_id:name' => ['role_1', 'role_2']],
+      ],
+    ])->column('id');
+
+    $hasRole1 = Participant::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('role_id:name', 'CONTAINS', 'role_1')
+      ->execute()->column('id');
+    $this->assertEquals([$participants[0], $participants[2]], $hasRole1);
+
+    $hasRole2 = Participant::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('role_id:name', 'CONTAINS', 'role_2')
+      ->execute()->column('id');
+    $this->assertEquals([$participants[1], $participants[2]], $hasRole2);
+
+    $notHasRole1 = Participant::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('role_id:name', 'NOT CONTAINS', 'role_1')
+      ->execute()->column('id');
+    $this->assertEquals([$participants[1]], $notHasRole1);
   }
 
   /**
