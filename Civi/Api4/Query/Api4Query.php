@@ -359,11 +359,12 @@ abstract class Api4Query {
       return $sql ? implode(' AND ', $sql) : NULL;
     }
 
+    $original_operator = $operator;
+
     // The CONTAINS and NOT CONTAINS operators match a substring for strings.
     // For arrays & serialized fields, they only match a complete (not partial) string within the array.
     if ($operator === 'CONTAINS' || $operator === 'NOT CONTAINS') {
       $sep = \CRM_Core_DAO::VALUE_SEPARATOR;
-      $original_operator = $operator;
       switch ($field['serialize'] ?? NULL) {
 
         case \CRM_Core_DAO::SERIALIZE_JSON:
@@ -399,12 +400,6 @@ abstract class Api4Query {
           $value = '%' . $value . '%';
           break;
       }
-
-      if ($original_operator === "NOT CONTAINS") {
-        // For a "NOT CONTAINS", this adds an "OR IS NULL" clause - we want to know that a particular value is not present and don't care whether it has any other value
-        $mainClause = \CRM_Core_DAO::createSQLFilter($fieldAlias, [$operator => $value]);
-        return "(($mainClause) OR $fieldAlias IS NULL)";
-      }
     }
 
     if ($operator === 'IS EMPTY' || $operator === 'IS NOT EMPTY') {
@@ -418,10 +413,6 @@ abstract class Api4Query {
       }
     }
 
-    if ($operator == 'REGEXP' || $operator == 'NOT REGEXP' || $operator == 'REGEXP BINARY' || $operator == 'NOT REGEXP BINARY') {
-      return sprintf('%s %s "%s"', (str_ends_with($operator, 'BINARY') ? 'CAST(' . $fieldAlias . ' AS BINARY)' : $fieldAlias), $operator, \CRM_Core_DAO::escapeString($value));
-    }
-
     if (!$value && ($operator === 'IN' || $operator === 'NOT IN')) {
       $value[] = FALSE;
     }
@@ -430,7 +421,19 @@ abstract class Api4Query {
       $value = (int) $value;
     }
 
-    return \CRM_Core_DAO::createSQLFilter($fieldAlias, [$operator => $value]);
+    if ($operator == 'REGEXP' || $operator == 'NOT REGEXP' || $operator == 'REGEXP BINARY' || $operator == 'NOT REGEXP BINARY') {
+      $sqlClause = sprintf('%s %s "%s"', (str_ends_with($operator, 'BINARY') ? 'CAST(' . $fieldAlias . ' AS BINARY)' : $fieldAlias), $operator, \CRM_Core_DAO::escapeString($value));
+    }
+    else {
+      $sqlClause = \CRM_Core_DAO::createSQLFilter($fieldAlias, [$operator => $value]);
+    }
+
+    if ($original_operator === "NOT CONTAINS") {
+      // For a "NOT CONTAINS", this adds an "OR IS NULL" clause - we want to know that a particular value is not present and don't care whether it has any other value
+      return "(($sqlClause) OR $fieldAlias IS NULL)";
+    }
+
+    return $sqlClause;
   }
 
   /**

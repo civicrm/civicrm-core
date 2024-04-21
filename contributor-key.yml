@@ -1215,14 +1215,18 @@
 - github      : olivierh65
   name        : Olivier Hertrich
 
+- github      : omarlopesino
+  name        : Omar Mohamad
+  organization: MetaDrop
+
 - github      : otetard
   name        : Olivier Tétard
 
 - github      : nowszy
   name        : Pawel Nowak
 
-- github       : pboling
-  name         : Peter Boling
+- github      : pboling
+  name        : Peter Boling
 
 - name        : Peter Bull
 
@@ -1546,7 +1550,7 @@
 - name        : Bashar Makhay
 
 - github      : technomaz
-  name        : Mark 
+  name        : Mark
 
 - github      : TomRosenbloom
   name        : Tom Rosenbloom

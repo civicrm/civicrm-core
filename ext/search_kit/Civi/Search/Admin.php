@@ -307,18 +307,14 @@ class Admin {
 
             // For dynamic references getTargetEntities will return multiple targets; for normal joins this loop will only run once
             foreach ($reference->getTargetEntities() as $dynamicValue => $targetEntityName) {
-              if (
-                !isset($allowedEntities[$targetEntityName]) ||
-                // What to do with self-references? They're weird but sometimes useful.
-                // For now, only allowing it for dynamic columns since they're explicitly declared
-                // (e.g. a Note can be a comment on a Note), and only the 1-n join since n-1 can be done with implicit joins.
-                ($targetEntityName === $entity['name'] && !$dynamicCol)
-              ) {
+              if (!isset($allowedEntities[$targetEntityName])) {
+                // Skip if target entity doesn't exist
                 continue;
               }
               $targetEntity = $allowedEntities[$targetEntityName];
-              // Add the straight 1-1 join (but only if it's not a reference to itself, see above)
-              if ($targetEntityName !== $entity['name']) {
+              $isSelf = $targetEntityName === $entity['name'];
+              // Add the straight 1-1 join (but only if it's not a reference to itself, those can be done with implicit joins)
+              if (!$isSelf) {
                 $alias = $entity['name'] . '_' . $targetEntityName . '_' . $keyField['name'];
                 $joins[$entity['name']][] = [
                   'label' => $entity['title'] . ' ' . ($dynamicCol ? $targetEntity['title'] : $keyField['label']),
@@ -333,8 +329,8 @@ class Admin {
               // Flip the conditions & add the reverse (1-n) join
               $alias = $targetEntityName . '_' . $entity['name'] . '_' . $keyField['name'];
               $joins[$targetEntityName][] = [
-                'label' => $targetEntity['title'] . ' ' . $entity['title_plural'],
-                'description' => $dynamicCol ? '' : $keyField['label'],
+                'label' => ($isSelf ? $keyField['label'] : $targetEntity['title']) . ' ' . $entity['title_plural'],
+                'description' => $dynamicCol || $isSelf ? '' : $keyField['label'],
                 'entity' => $entity['name'],
                 'conditions' => self::getJoinConditions($reference->getTargetKey(), $alias . '.' . $keyField['name'], $dynamicValue, $dynamicCol ? $alias . '.' . $dynamicCol : NULL),
                 'defaults' => self::getJoinDefaults($alias, $entity),
