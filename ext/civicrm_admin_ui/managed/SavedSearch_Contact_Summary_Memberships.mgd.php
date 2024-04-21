@@ -29,7 +29,7 @@ return [
             'status_id:label',
             'source',
             'Membership_ContributionRecur_contribution_recur_id_01.auto_renew',
-            'IF(owner_membership_id, "(by relationship)", owner_membership_id) AS IF_owner_membership_id_owner_membership_id',
+            'IF(owner_membership_id, "(' . E::ts('by relationship') . ')", owner_membership_id) AS IF_owner_membership_id_owner_membership_id',
             'COUNT(DISTINCT Membership_Membership_owner_membership_id_01.id) AS COUNT_Membership_Membership_owner_membership_id_01_id',
           ],
           'orderBy' => [],

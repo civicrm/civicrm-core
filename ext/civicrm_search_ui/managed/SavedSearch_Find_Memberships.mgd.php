@@ -157,7 +157,7 @@ return [
               'label' => E::ts('Auto Renew'),
               'sortable' => FALSE,
               'alignment' => '',
-              'rewrite' => '{ts}{/ts}',
+              'rewrite' => ' ',
               'icons' => [
                 [
                   'icon' => 'fa-ban',
