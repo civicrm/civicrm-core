@@ -206,86 +206,8 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
 
     $customFields = CRM_Core_BAO_CustomField::getFields('Participant', FALSE, FALSE, NULL, NULL, FALSE, FALSE, FALSE);
 
-    foreach ($params as $key => $value) {
-      // ignore empty values or empty arrays etc
-      if (CRM_Utils_System::isNull($value)) {
-        continue;
-      }
-
-      switch ($key) {
-        case 'participant_contact_id':
-          if (!CRM_Utils_Rule::integer($value)) {
-            return civicrm_api3_create_error("contact_id not valid: $value");
-          }
-          if (!CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_contact WHERE id = $value")) {
-            return civicrm_api3_create_error("Invalid Contact ID: There is no contact record with contact_id = $value.");
-          }
-          $values['contact_id'] = $values['participant_contact_id'];
-          unset($values['participant_contact_id']);
-          break;
-
-        case 'participant_register_date':
-          if (!CRM_Utils_Rule::dateTime($value)) {
-            return civicrm_api3_create_error("$key not a valid date: $value");
-          }
-          break;
-
-        case 'participant_status_id':
-          if (!CRM_Utils_Rule::integer($value)) {
-            return civicrm_api3_create_error("Event Status ID is not valid: $value");
-          }
-          break;
-
-        case 'participant_status':
-          $status = CRM_Event_PseudoConstant::participantStatus();
-          $values['participant_status_id'] = CRM_Utils_Array::key($value, $status);
-          break;
-
-        case 'participant_role_id':
-        case 'participant_role':
-          $role = CRM_Event_PseudoConstant::participantRole();
-          $participantRoles = explode(",", $value);
-          foreach ($participantRoles as $k => $v) {
-            $v = trim($v);
-            if ($key == 'participant_role') {
-              $participantRoles[$k] = CRM_Utils_Array::key($v, $role);
-            }
-            else {
-              $participantRoles[$k] = $v;
-            }
-          }
-          $values['role_id'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $participantRoles);
-          unset($values[$key]);
-          break;
-
-        default:
-          break;
-      }
-    }
-
     if (array_key_exists('participant_note', $params)) {
       $values['participant_note'] = $params['participant_note'];
-    }
-
-    // CRM_Event_BAO_Participant::create() handles register_date,
-    // status_id and source. So, if $values contains
-    // participant_register_date, participant_status_id or participant_source,
-    // convert it to register_date, status_id or source
-    $changes = [
-      'participant_register_date' => 'register_date',
-      'participant_source' => 'source',
-      'participant_status_id' => 'status_id',
-      'participant_role_id' => 'role_id',
-      'participant_fee_level' => 'fee_level',
-      'participant_fee_amount' => 'fee_amount',
-      'participant_id' => 'id',
-    ];
-
-    foreach ($changes as $orgVal => $changeVal) {
-      if (isset($values[$orgVal])) {
-        $values[$changeVal] = $values[$orgVal];
-        unset($values[$orgVal]);
-      }
     }
 
     return NULL;
