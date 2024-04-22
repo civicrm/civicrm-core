@@ -467,9 +467,12 @@ WHERE id={$contactId}; ";
    * @param string $title
    *   fieldset title.
    *
+   * @deprecated since 5.74 will be removed around 5.80
+   *
    * @throws \CRM_Core_Exception
    */
   public static function buildOnBehalfForm(&$form, $contactType, $countryID, $stateID, $title) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     $form->assign('contact_type', $contactType);
     $form->assign('fieldSetTitle', $title);
     $form->assign('contactEditMode', TRUE);
