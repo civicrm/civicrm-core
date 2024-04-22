@@ -768,23 +768,6 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
   }
 
   /**
-   * Get the values for pseudoconstants for name->value and reverse.
-   *
-   * @param array $defaults
-   *   (reference) the default values, some of which need to be resolved.
-   * @param bool $reverse
-   *   Always true as this function is only called from one place..
-   *
-   * @deprecated
-   *
-   * This is called specifically from the contact import parser & should be moved there
-   * as it is not truly a generic function.
-   *
-   */
-  public static function resolveDefaults(&$defaults, $reverse = FALSE) {
-  }
-
-  /**
    * Fetch object based on array of properties.
    *
    * @deprecated This is called from a few places but creates rather than solves
