@@ -746,12 +746,12 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
    *
    * Call this via the api, not directly.
    *
-   * @param \CRM_Contact_BAO_Contact $contact
+   * @param \CRM_Contact_DAO_Contact $contact
    *
    * @return bool
    * @throws \CRM_Core_Exception
    */
-  protected static function contactTrash($contact): bool {
+  protected static function contactTrash(CRM_Contact_DAO_Contact $contact): bool {
     $updateParams = [
       'id' => $contact->id,
       'is_deleted' => 1,
