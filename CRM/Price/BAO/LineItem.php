@@ -432,8 +432,11 @@ WHERE li.contribution_id = %1";
    * @param string $entityTable
    * @param $amount
    * @param array $otherParams
+   *
+   * @deprecated since 5.74 will be removed around 5.84
    */
   public static function syncLineItems($entityId, $entityTable, $amount, $otherParams = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative - this function probably messes up your data');
     if (!$entityId || CRM_Utils_System::isNull($amount)) {
       return;
     }

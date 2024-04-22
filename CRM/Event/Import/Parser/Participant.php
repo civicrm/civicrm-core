@@ -104,7 +104,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
                 'fee_label' => $formatted['fee_level'],
                 'event_id' => $newParticipant->event_id,
               ];
-              CRM_Price_BAO_LineItem::syncLineItems($newParticipant->id, 'civicrm_participant', $newParticipant->fee_amount, $otherParams);
+              $this->syncLineItems($newParticipant->id, $newParticipant->fee_amount, $otherParams);
             }
             $this->setImportStatus($rowNumber, 'IMPORTED', '', $newParticipant->id);
             return;
@@ -232,6 +232,53 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
       }
     }
     return civicrm_api3('Participant', 'create', $params);
+  }
+
+  /**
+   * @param int $entityId
+   * @param $amount
+   * @param array $otherParams
+   */
+  private function syncLineItems($entityId, $amount, $otherParams = NULL) {
+    if (!$entityId || CRM_Utils_System::isNull($amount)) {
+      return;
+    }
+
+    $from = " civicrm_line_item li
+      LEFT JOIN   civicrm_price_field pf ON pf.id = li.price_field_id
+      LEFT JOIN   civicrm_price_set ps ON ps.id = pf.price_set_id ";
+
+    $set = " li.unit_price = %3,
+      li.line_total = %3 ";
+
+    $where = " li.entity_id = %1 AND
+      li.entity_table = %2 ";
+
+    $params = [
+      1 => [$entityId, 'Integer'],
+      2 => ['civicrm_participant', 'String'],
+      3 => [$amount, 'Float'],
+    ];
+
+    $from .= "
+      LEFT JOIN civicrm_price_set_entity cpse ON cpse.price_set_id = ps.id
+      LEFT JOIN civicrm_price_field_value cpfv ON cpfv.price_field_id = pf.id and cpfv.label = %4 ";
+    $set .= " ,li.label = %4,
+      li.price_field_value_id = cpfv.id ";
+    $where .= " AND cpse.entity_table = 'civicrm_event' AND cpse.entity_id = %5 ";
+    $amount = empty($amount) ? 0 : $amount;
+    $params += [
+      4 => [$otherParams['fee_label'], 'String'],
+      5 => [$otherParams['event_id'], 'String'],
+    ];
+
+    $query = "
+      UPDATE $from
+      SET    $set
+      WHERE  $where
+      ";
+
+    CRM_Core_DAO::executeQuery($query, $params);
   }
 
   /**
