@@ -255,8 +255,9 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
       $ufmatch->contact_id = $cid;
       $ufmatch->domain_id = CRM_Core_Config::domainID();
       if ($ufmatch->find(TRUE)) {
-        $status = ts('The contact has a CMS account. You will need to delete it before you can delete this contact.');        
-      } else {
+        $status = ts('The contact has a CMS account. You will need to delete it before you can delete this contact.');
+      }
+      else {
         $status = ts('The contact might be the Membership Organization of a Membership Type. You will need to edit the Membership Type and change the Membership Organization before you can delete this contact.');
       }
       $session->setStatus('<ul><li>' . implode('</li><li>', $not_deleted) . '</li></ul>' . $status, $title, 'error');
