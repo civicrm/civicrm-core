@@ -50,11 +50,6 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
         unset($this->_mapperFields[$value]);
       }
     }
-    elseif (
-      $this->getSubmittedValue('onDuplicate') == CRM_Import_Parser::DUPLICATE_SKIP
-      || $this->getSubmittedValue('onDuplicate') == CRM_Import_Parser::DUPLICATE_NOCHECK) {
-      unset($this->_mapperFields['participant_id']);
-    }
   }
 
   /**
@@ -82,9 +77,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
    *   list of errors to be posted back to the form
    */
   public static function formRule($fields, $files, $self) {
-    $errors = [];
-    // define so we avoid notices below
-    $errors['_qf_default'] = '';
+    $requiredError = [];
 
     if (!array_key_exists('savedMapping', $fields)) {
       $importKeys = [];
@@ -98,24 +91,26 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
       ];
 
       $contactFieldsBelowWeightMessage = self::validateRequiredContactMatchFields($self->getContactType(), $importKeys);
-
+      if (in_array('id', $importKeys)) {
+        // ID is the only field we need, if present.
+        $requiredFields = [];
+      }
       foreach ($requiredFields as $field => $title) {
         if (!in_array($field, $importKeys)) {
           if ($field === 'contact_id') {
-            if (!$contactFieldsBelowWeightMessage || in_array('external_identifier', $importKeys) ||
-              in_array('participant_id', $importKeys)
+            if (!$contactFieldsBelowWeightMessage || in_array('external_identifier', $importKeys)
             ) {
               continue;
             }
             if ($self->isUpdateExisting()) {
-              $errors['_qf_default'] .= ts('Missing required field: Provide Participant ID') . '<br />';
+              $requiredError[] = ts('Missing required field: Provide Participant ID') . '<br />';
             }
             else {
-              $errors['_qf_default'] .= ts('Missing required contact matching fields.') . " $contactFieldsBelowWeightMessage " . ' ' . ts('Or Provide Contact ID or External ID.') . '<br />';
+              $requiredError[] = ts('Missing required contact matching fields.') . " $contactFieldsBelowWeightMessage " . ' ' . ts('Or Provide Contact ID or External ID.') . '<br />';
             }
           }
           elseif (!in_array('event_title', $importKeys)) {
-            $errors['_qf_default'] .= ts('Missing required field: Provide %1 or %2',
+            $requiredError[] = ts('Missing required field: Provide %1 or %2',
                 [1 => $title, 2 => 'Event Title']
               ) . '<br />';
           }
@@ -123,11 +118,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
       }
     }
 
-    if (empty($errors['_qf_default'])) {
-      unset($errors['_qf_default']);
-    }
-
-    return empty($errors) ? TRUE : $errors;
+    return empty($requiredError) ? TRUE : ['_qf_default' => implode('<br', $requiredError)];
   }
 
   /**

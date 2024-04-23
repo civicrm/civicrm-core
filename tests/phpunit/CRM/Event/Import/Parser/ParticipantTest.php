@@ -36,6 +36,8 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
       'civicrm_queue_item',
       'civicrm_mapping',
       'civicrm_mapping_field',
+      'civicrm_uf_field',
+      'civicrm_uf_group',
     ], TRUE);
     parent::tearDown();
   }
@@ -138,6 +140,33 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $row = $dataSource->getRow();
     $this->assertEquals('ERROR', $row['_status']);
+  }
+
+  /**
+   * Test that we can do an update using the participant ID.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportUpdateUsingID() :void {
+    // Ensure that the next id on the participant table is 1 since that is in the csv.
+    $this->quickCleanup(['civicrm_participant']);
+    $this->individualCreate();
+    $this->createTestEntity('Participant', [
+      'status_id:name' => 'Pending from pay later',
+      'contact_id' => $this->individualCreate(),
+      'event_id' => $this->eventCreatePaid()['id'],
+      'role_id:name' => ['Attendee'],
+    ]);
+    $this->importCSV('cancel_participant.csv', [
+      ['name' => 'id'],
+      ['name' => 'status_id'],
+    ]);
+    $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
+    $row = $dataSource->getRow();
+    $this->assertEquals('IMPORTED', $row['_status'], $row['_status_message']);
+    $row = $dataSource->getRow();
+    $this->assertEquals('ERROR', $row['_status']);
+    $this->assertEquals('Participant record not found for id 2', $row['_status_message']);
   }
 
   /**
