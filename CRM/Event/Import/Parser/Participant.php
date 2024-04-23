@@ -260,6 +260,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
    * Set up field metadata.
    *
    * @return void
+   * @throws \CRM_Core_Exception
    */
   protected function setFieldMetadata(): void {
     if (empty($this->importableFieldsMetadata)) {
@@ -274,22 +275,13 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
             'options' => FALSE,
           ],
         ],
-        CRM_Event_DAO_Participant::import(),
+        $this->getImportFieldsForEntity('Participant'),
         CRM_Core_BAO_CustomField::getFieldsForImport('Participant'),
         $this->getContactMatchingFields()
       );
 
-      $fields['participant_contact_id']['title'] .= ' (match to contact)';
-      $fields['participant_contact_id']['html']['label'] = $fields['participant_contact_id']['title'];
-      foreach ($fields as $index => $field) {
-        if (isset($field['name']) && $field['name'] !== $index) {
-          // undo unique names - participant is the primary
-          // entity and no others have conflicting unique names
-          // if we ever added them the should have unique names - v4api style
-          $fields[$field['name']] = $field;
-          unset($fields[$index]);
-        }
-      }
+      $fields['contact_id']['title'] .= ' (match to contact)';
+      $fields['contact_id']['html']['label'] = $fields['contact_id']['title'];
       $this->importableFieldsMetadata = $fields;
     }
   }
