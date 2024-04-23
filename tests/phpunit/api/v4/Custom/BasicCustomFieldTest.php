@@ -149,6 +149,7 @@ class BasicCustomFieldTest extends CustomTestBase {
         ->addValue('custom_group_id', '$id')
         ->addValue('html_type', 'Text')
         ->addValue('is_required', TRUE)
+        ->addValue('is_view', TRUE)
         ->addValue('data_type', 'String'))
       ->execute();
 
@@ -163,6 +164,8 @@ class BasicCustomFieldTest extends CustomTestBase {
     $this->assertFalse($fields['MyContactFields_._Food']['required']);
     // But the api will report is_required as not nullable
     $this->assertFalse($fields['MyContactFields_._Food']['nullable']);
+    $this->assertEquals(['export', 'duplicate_matching', 'token', 'import'], $fields['MyContactFields._Food']['usage']);
+    $this->assertEquals(['export', 'duplicate_matching', 'token'], $fields['MyContactFields_._Food']['usage']);
 
     $contactId1 = $this->createTestRecord('Contact', [
       'first_name' => 'Johann',
