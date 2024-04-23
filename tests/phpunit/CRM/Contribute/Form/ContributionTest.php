@@ -61,10 +61,10 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
 
     $this->individualCreate([], 0);
     $this->_params = [
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact'][0],
       'receive_date' => '20120511',
       'total_amount' => 100.00,
-      'financial_type_id' => $this->financialTypeID,
+      'financial_type_id:name' => 'Donation',
       'non_deductible_amount' => 10.00,
       'fee_amount' => 5.00,
       'net_amount' => 95.00,
@@ -114,11 +114,11 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $this->submitContributionForm([
       'total_amount' => $this->formatMoneyInput(1234),
       'financial_type_id' => 1,
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact'][0],
       'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
       'contribution_status_id' => 1,
     ]);
-    $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $this->_individualId]);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $this->ids['Contact'][0]]);
     $this->assertEmpty($contribution['amount_level']);
     $this->assertEquals(1234, $contribution['total_amount']);
     $this->assertEquals(1234, $contribution['net_amount']);
@@ -131,12 +131,12 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $this->submitContributionForm([
       'total_amount' => 50,
       'financial_type_id' => 1,
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact'][0],
       'payment_instrument_id' => $this->getPaymentInstrumentID('Credit Card'),
       'contribution_status_id' => 1,
     ]);
     $this->callAPISuccessGetCount('Contribution', [
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact'][0],
       'contribution_status_id' => 'Completed',
     ], 1);
   }
@@ -148,7 +148,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $form = $this->submitContributionForm([
       'total_amount' => 50,
       'financial_type_id' => 1,
-      'contact_id' => $this->ids['Contact']['individual_0'],
+      'contact_id' => $this->ids['Contact'][0],
       'contribution_status_id' => 1,
       'credit_card_number' => 4444333322221111,
       'cvv2' => 123,
@@ -181,7 +181,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals(1, $form->getMailCount());
 
     $contribution = $this->callAPISuccess('Contribution', 'get', [
-      'contact_id' => $this->ids['Contact']['0'],
+      'contact_id' => $this->ids['Contact'][0],
       'contribution_status_id' => 'Completed',
       'payment_instrument_id' => $this->callAPISuccessGetValue('PaymentProcessor', [
         'return' => 'payment_instrument_id',
@@ -192,7 +192,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals(1, $contribution['count'], 'Contribution count should be one.');
     $this->assertNotEmpty($contribution['values'][$contribution['id']]['receipt_date'], 'Receipt date should not be blank.');
 
-    $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $this->ids['Contact']['individual_0']]);
+    $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $this->ids['Contact'][0]]);
     $this->assertArrayNotHasKey('source', $contact);
   }
 
@@ -203,7 +203,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $form = $this->submitContributionForm([
       'total_amount' => 50,
       'financial_type_id' => 1,
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact'][0],
       'contribution_status_id' => 1,
       'credit_card_number' => 4444333322221111,
       'cvv2' => 123,
@@ -235,14 +235,14 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     ], NULL, 'Live');
 
     $this->callAPISuccessGetCount('Contribution', [
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact'][0],
       'contribution_status_id' => 'Completed',
       'payment_instrument_id' => $this->callAPISuccessGetValue('PaymentProcessor', [
         'return' => 'payment_instrument_id',
         'id' => $this->paymentProcessorID,
       ]),
     ], 1);
-    $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $this->_individualId]);
+    $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $this->ids['Contact'][0]]);
     $this->assertArrayNotHasKey('source', $contact);
     $this->assertEquals(1, $form->getMailCount());
   }
@@ -258,7 +258,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       $this->submitContributionForm([
         'total_amount' => 60,
         'financial_type_id' => 1,
-        'contact_id' => $this->_individualId,
+        'contact_id' => $this->ids['Contact'][0],
         'contribution_status_id' => 1,
         'credit_card_number' => 4444333322221111,
         'cvv2' => 123,
@@ -271,7 +271,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
         'billing_middle_name' => '',
         'billing_last_name' => 'Adams',
         'billing_street_address-5' => '790L Lincoln St S',
-        'billing_city-5' => 'Maryknoll',
+        'billing_city-5' => 'Mary Knoll',
         'billing_state_province_id-5' => 1031,
         'billing_postal_code-5' => 10545,
         'billing_country_id-5' => 1228,
@@ -294,14 +294,14 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     }
 
     $this->callAPISuccessGetCount('Contribution', [
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact'][0],
       'contribution_status_id' => $error ? 'Failed' : 'Completed',
       'payment_instrument_id' => $this->callAPISuccessGetValue('PaymentProcessor', [
         'return' => 'payment_instrument_id',
         'id' => $this->paymentProcessorID,
       ]),
     ], 1);
-    $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $this->_individualId]);
+    $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $this->ids['Contact'][0]]);
     $this->assertArrayNotHasKey('source', $contact);
     $mut->assertMailLogEmpty();
     $mut->stop();
@@ -315,7 +315,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $this->submitContributionForm([
       'total_amount' => 50,
       'financial_type_id' => 1,
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact'][0],
       'payment_instrument_id' => $this->getPaymentInstrumentID('Credit Card'),
       'contribution_status_id' => 1,
       'credit_card_number' => 4444333322221111,
@@ -347,7 +347,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     ], NULL, 'Live');
 
     $contribution = $this->callAPISuccessGetSingle('Contribution', [
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact'][0],
       'contribution_status_id' => 'Completed',
     ]);
     $this->assertEquals('50.00', $contribution['total_amount']);
@@ -420,7 +420,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $this->submitContributionForm([
       'total_amount' => 50,
       'financial_type_id' => 1,
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact'][0],
       'payment_instrument_id' => $this->getPaymentInstrumentID('Credit Card'),
       'payment_processor_id' => $this->paymentProcessorID,
       'credit_card_exp_date' => ['M' => 5, 'Y' => 2012],
@@ -428,7 +428,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'credit_card_type' => 'Visa',
     ], NULL, 'live');
     $this->callAPISuccessGetCount('Contribution', [
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact'][0],
       'contribution_status_id' => 'Failed',
     ], 1);
     $lineItem = $this->callAPISuccessGetSingle('line_item', []);
@@ -483,7 +483,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'frequency_unit' => 'month',
       'installments' => 2,
       'receive_date' => $receiveDate,
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact'][0],
       'payment_instrument_id' => $this->getPaymentInstrumentID('Credit Card'),
       'payment_processor_id' => $this->paymentProcessorID,
       'credit_card_exp_date' => ['M' => 5, 'Y' => 2025],
@@ -793,7 +793,7 @@ Receipt Date: ' . date('m/d/Y'),
     $pcpID = $this->createPCPBlock($params);
     $this->submitContributionForm([
       'financial_type_id' => 3,
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact'][0],
       'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
       'contribution_status_id' => 1,
       'total_amount' => 5,
@@ -804,7 +804,7 @@ Receipt Date: ' . date('m/d/Y'),
     ]);
     $softCredit = $this->callAPISuccessGetSingle('ContributionSoft', []);
     $this->assertEquals('Dobby', $softCredit['pcp_roll_nickname']);
-    $this->assertMailSentContainingStrings(['Personal Campaign Page Owner Notification']);
+    $this->assertMailSentContainingStrings(['You have received a donation at your personal page']);
   }
 
   /**
