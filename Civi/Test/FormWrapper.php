@@ -275,7 +275,7 @@ class FormWrapper {
       case 'CRM_Contact_Import_Form_DataSource':
       case 'CRM_Contact_Import_Form_MapField':
       case 'CRM_Contact_Import_Form_Preview':
-        $this->form->controller = new \CRM_Import_Controller('Contact import', ['entity_prefix' => 'Contact']);
+        $this->form->controller = new \CRM_Import_Controller('Contact import', ['entity' => 'Contact']);
         $this->form->controller->setStateMachine(new \CRM_Core_StateMachine($this->form->controller));
         // The submitted values should be set on one or the other of the forms in the flow.
         // For test simplicity we set on all rather than figuring out which ones go where....
@@ -292,7 +292,7 @@ class FormWrapper {
           $this->form->controller = $this->formController;
         }
         else {
-          $this->form->controller = new \CRM_Import_Controller('Contribution import', ['entity_prefix' => 'Contribution']);
+          $this->form->controller = new \CRM_Import_Controller('Contribution import', ['entity' => 'Contribution']);
           $this->form->controller->setStateMachine(new \CRM_Core_StateMachine($this->form->controller));
           $this->formController = $this->form->controller;
         }
@@ -306,7 +306,7 @@ class FormWrapper {
       case 'CRM_Member_Import_Form_DataSource':
       case 'CRM_Member_Import_Form_MapField':
       case 'CRM_Member_Import_Form_Preview':
-        $this->form->controller = new \CRM_Import_Controller('Contribution import', ['entity_prefix' => 'Member']);
+        $this->form->controller = new \CRM_Import_Controller('Membership import', ['entity' => 'Membership']);
         $this->form->controller->setStateMachine(new \CRM_Core_StateMachine($this->form->controller));
         // The submitted values should be set on one or the other of the forms in the flow.
         // For test simplicity we set on all rather than figuring out which ones go where....
@@ -318,7 +318,7 @@ class FormWrapper {
       case 'CRM_Event_Import_Form_DataSource':
       case 'CRM_Event_Import_Form_MapField':
       case 'CRM_Event_Import_Form_Preview':
-        $this->form->controller = new \CRM_Import_Controller('Contribution import', ['entity_prefix' => 'Event']);
+        $this->form->controller = new \CRM_Import_Controller('Participant import', ['entity' => 'Participant']);
         $this->form->controller->setStateMachine(new \CRM_Core_StateMachine($this->form->controller));
         // The submitted values should be set on one or the other of the forms in the flow.
         // For test simplicity we set on all rather than figuring out which ones go where....
@@ -330,7 +330,7 @@ class FormWrapper {
       case 'CRM_Activity_Import_Form_DataSource':
       case 'CRM_Activity_Import_Form_MapField':
       case 'CRM_Activity_Import_Form_Preview':
-        $this->form->controller = new \CRM_Import_Controller('Contribution import', ['entity_prefix' => 'Activity']);
+        $this->form->controller = new \CRM_Import_Controller('Activity import', ['entity' => 'Activity']);
         $this->form->controller->setStateMachine(new \CRM_Core_StateMachine($this->form->controller));
         // The submitted values should be set on one or the other of the forms in the flow.
         // For test simplicity we set on all rather than figuring out which ones go where....
@@ -342,7 +342,7 @@ class FormWrapper {
       case 'CRM_Custom_Import_Form_DataSource':
       case 'CRM_Custom_Import_Form_MapField':
       case 'CRM_Custom_Import_Form_Preview':
-        $this->form->controller = new \CRM_Import_Controller('Contribution import', ['entity_prefix' => 'Custom']);
+        $this->form->controller = new \CRM_Import_Controller('Custom Value import', ['class_prefix' => 'CRM_Custom_Import']);
         $this->form->controller->setStateMachine(new \CRM_Core_StateMachine($this->form->controller));
         // The submitted values should be set on one or the other of the forms in the flow.
         // For test simplicity we set on all rather than figuring out which ones go where....

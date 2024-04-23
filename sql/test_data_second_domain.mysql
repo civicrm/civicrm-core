@@ -170,7 +170,7 @@ VALUES
     ( @domainID, 'civicrm/event&reset=1',                                   'Dashboard',          'CiviEvent Dashboard',  'access CiviEvent', '',    @eventlastID, '1', NULL, 1 ),
     ( @domainID, 'civicrm/participant/add&reset=1&action=add&context=standalone', 'Register Event Participant', 'Register Event Participant', 'access CiviEvent,edit event participants', 'AND', @eventlastID, '1', NULL, 2 ),
     ( @domainID, 'civicrm/event/search&reset=1',                            'Find Participants',  'Find Participants',    'access CiviEvent', '',    @eventlastID, '1', NULL, 3 ),
-    ( @domainID, 'civicrm/event/import&reset=1',                            'Import Participants','Import Participants',  'access CiviEvent,edit event participants', 'AND',    @eventlastID, '1', '1',  4 ),
+    ( @domainID, 'civicrm/import/participant&reset=1',                            'Import Participants','Import Participants',  'access CiviEvent,edit event participants', 'AND',    @eventlastID, '1', '1',  4 ),
     ( @domainID, 'civicrm/event/add&reset=1&action=add',                    'New Event',          'New Event',            'access CiviEvent,edit all events', 'AND',    @eventlastID, '1', NULL, 5 ),
     ( @domainID, 'civicrm/event/manage&reset=1',                            'Manage Events',      'Manage Events',        'access CiviEvent,edit all events', 'AND',    @eventlastID, '1', 1, 6 ),
     ( @domainID, 'civicrm/admin/pcp?reset=1&page_type=event',               'Personal Campaign Pages',    'Personal Campaign Pages',   'access CiviEvent,administer CiviCRM', 'AND', @eventlastID, '1', 1, 7 ),
