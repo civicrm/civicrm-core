@@ -82,6 +82,10 @@ class CRM_Import_Forms extends CRM_Core_Form {
     return '';
   }
 
+  public function getEntity() {
+    return $this->controller->getEntity();
+  }
+
   /**
    * @return int|null
    */

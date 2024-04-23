@@ -3016,7 +3016,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       case 'CRM_Contact_Import_Form_DataSource':
       case 'CRM_Contact_Import_Form_MapField':
       case 'CRM_Contact_Import_Form_Preview':
-        $form->controller = new CRM_Import_Controller('import contacts', ['entity_prefix' => 'Contact']);
+        $form->controller = new CRM_Import_Controller('import contacts', ['entity' => 'Contact']);
         $form->controller->setStateMachine(new CRM_Core_StateMachine($form->controller));
         // The submitted values should be set on one or the other of the forms in the flow.
         // For test simplicity we set on all rather than figuring out which ones go where....
@@ -3033,7 +3033,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
           $form->controller = $this->formController;
         }
         else {
-          $form->controller = new CRM_Import_Controller('import contributions', ['entity_prefix' => 'Contribute']);
+          $form->controller = new CRM_Import_Controller('import contributions', ['entity' => 'Contribution']);
           $form->controller->setStateMachine(new CRM_Core_StateMachine($form->controller));
           $this->formController = $form->controller;
         }
@@ -3047,7 +3047,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       case 'CRM_Member_Import_Form_DataSource':
       case 'CRM_Member_Import_Form_MapField':
       case 'CRM_Member_Import_Form_Preview':
-        $form->controller = new CRM_Import_Controller('import memberships', ['entity_prefix' => 'Member']);
+        $form->controller = new CRM_Import_Controller('import memberships', ['entity' => 'Membership']);
         $form->controller->setStateMachine(new CRM_Core_StateMachine($form->controller));
         // The submitted values should be set on one or the other of the forms in the flow.
         // For test simplicity we set on all rather than figuring out which ones go where....
@@ -3059,7 +3059,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       case 'CRM_Event_Import_Form_DataSource':
       case 'CRM_Event_Import_Form_MapField':
       case 'CRM_Event_Import_Form_Preview':
-        $form->controller = new CRM_Import_Controller('import participants', ['entity_prefix' => 'Event']);
+        $form->controller = new CRM_Import_Controller('import participants', ['entity' => 'Participant']);
         $form->controller->setStateMachine(new CRM_Core_StateMachine($form->controller));
         // The submitted values should be set on one or the other of the forms in the flow.
         // For test simplicity we set on all rather than figuring out which ones go where....
@@ -3071,7 +3071,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       case 'CRM_Activity_Import_Form_DataSource':
       case 'CRM_Activity_Import_Form_MapField':
       case 'CRM_Activity_Import_Form_Preview':
-        $form->controller = new CRM_Import_Controller('import contributions', ['entity_prefix' => 'Activity']);
+        $form->controller = new CRM_Import_Controller('import contributions', ['entity' => 'Activity']);
         $form->controller->setStateMachine(new CRM_Core_StateMachine($form->controller));
         // The submitted values should be set on one or the other of the forms in the flow.
         // For test simplicity we set on all rather than figuring out which ones go where....
@@ -3083,7 +3083,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       case 'CRM_Custom_Import_Form_DataSource':
       case 'CRM_Custom_Import_Form_MapField':
       case 'CRM_Custom_Import_Form_Preview':
-        $form->controller = new CRM_Import_Controller('import contributions', ['entity_prefix' => 'Custom']);
+        $form->controller = new CRM_Import_Controller('import custom data', ['class_prefix' => 'CRM_Custom_Import']);
         $form->controller->setStateMachine(new CRM_Core_StateMachine($form->controller));
         // The submitted values should be set on one or the other of the forms in the flow.
         // For test simplicity we set on all rather than figuring out which ones go where....

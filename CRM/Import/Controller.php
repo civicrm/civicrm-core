@@ -17,6 +17,15 @@
 class CRM_Import_Controller extends CRM_Core_Controller {
 
   /**
+   * @var string
+   */
+  private string $entity;
+
+  public function getEntity(): string {
+    return $this->entity;
+  }
+
+  /**
    * Class constructor.
    *
    * @param string $title
@@ -27,7 +36,16 @@ class CRM_Import_Controller extends CRM_Core_Controller {
   public function __construct(string $title, array $arguments) {
     parent::__construct($title, TRUE);
     set_time_limit(0);
-    $this->_stateMachine = new CRM_Import_StateMachine($this, TRUE, $arguments['entity_prefix']);
+
+    if (!empty($arguments['entity'])) {
+      $this->entity = $arguments['entity'];
+    }
+    else {
+      $pathArguments = explode('/', CRM_Utils_System::currentPath());
+      unset($pathArguments[0], $pathArguments[1]);
+      $this->entity = CRM_Utils_String::convertStringToCamel(implode('_', $pathArguments));
+    }
+    $this->_stateMachine = new CRM_Import_StateMachine($this, TRUE, $this->entity, $arguments['class_prefix'] ?? NULL);
     // 1 (or TRUE)  has been the action passed historically - but it is probably meaningless.
     $this->addPages($this->_stateMachine, CRM_Core_Action::ADD);
     $config = CRM_Core_Config::singleton();

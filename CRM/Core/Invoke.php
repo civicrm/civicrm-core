@@ -322,7 +322,7 @@ class CRM_Core_Invoke {
           if ($item['page_callback'] === 'CRM_Import_Controller') {
             // Let the generic import controller have the page arguments.... so we don't need
             // one class per import.
-            $object = new CRM_Import_Controller($title, $pageArgs);
+            $object = new CRM_Import_Controller($title, $pageArgs ?? []);
           }
           else {
             $object = new $item['page_callback']($title, TRUE, $mode, NULL, $addSequence);
