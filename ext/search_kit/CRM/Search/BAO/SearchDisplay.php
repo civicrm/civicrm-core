@@ -49,7 +49,7 @@ class CRM_Search_BAO_SearchDisplay extends CRM_Search_DAO_SearchDisplay implemen
     }
 
     // Ensure only super-admins may update SavedSearches linked to displays with `acl_bypass`
-    elseif ($recordType === 'SavedSearch' && $e->getActionName() === 'update') {
+    if ($recordType === 'SavedSearch' && $e->getActionName() === 'update' && !CRM_Core_Permission::check('all CiviCRM permissions and ACLs', $userCID)) {
       $id = (int) $e->getRecord()['id'];
       $sql = "SELECT COUNT(id) FROM civicrm_search_display WHERE acl_bypass = 1 AND saved_search_id = $id";
       if (CRM_Core_DAO::singleValueQuery($sql)) {
