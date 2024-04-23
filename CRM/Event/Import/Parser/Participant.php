@@ -76,12 +76,6 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
         $formatValues[$key] = $field;
       }
 
-      $formatError = $this->formatValues($formatted, $formatValues);
-
-      if ($formatError) {
-        throw new CRM_Core_Exception($formatError['error_message']);
-      }
-
       if ($this->isUpdateExisting()) {
         if (!empty($formatValues['participant_id'])) {
           $dao = new CRM_Event_BAO_Participant();
@@ -181,29 +175,6 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
       return;
     }
     $this->setImportStatus($rowNumber, 'IMPORTED', '', $newParticipant['id']);
-  }
-
-  /**
-   * Format values
-   *
-   * @todo lots of tidy up needed here - very old function relocated.
-   *
-   * @param array $values
-   * @param array $params
-   *
-   * @return array|null
-   */
-  protected function formatValues(&$values, $params) {
-    $fields = CRM_Event_DAO_Participant::fields();
-    _civicrm_api3_store_values($fields, $params, $values);
-
-    $customFields = CRM_Core_BAO_CustomField::getFields('Participant', FALSE, FALSE, NULL, NULL, FALSE, FALSE, FALSE);
-
-    if (array_key_exists('participant_note', $params)) {
-      $values['participant_note'] = $params['participant_note'];
-    }
-
-    return NULL;
   }
 
   /**
