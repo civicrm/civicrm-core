@@ -78,15 +78,14 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
 
       if (!empty($params['id'])) {
         $this->checkEntityExists('Participant', $params['id']);
-      }
-      if ($this->isUpdateExisting()) {
-        if (!empty($params['id'])) {
-          //@todo calling api functions directly is not supported
-          $this->deprecated_participant_check_params($formatted);
-          $newParticipant = CRM_Event_BAO_Participant::create($formatted);
-          $this->setImportStatus($rowNumber, 'IMPORTED', '', $newParticipant->id);
-          return;
+        if (!$this->isUpdateExisting()) {
+          throw new CRM_Core_Exception(ts('% record found and update not selected', [1 => 'Participant']));
         }
+        //@todo calling api functions directly is not supported
+        $this->deprecated_participant_check_params($formatted);
+        $newParticipant = CRM_Event_BAO_Participant::create($formatted);
+        $this->setImportStatus($rowNumber, 'IMPORTED', '', $newParticipant->id);
+        return;
       }
 
       if (empty($params['contact_id'])) {
