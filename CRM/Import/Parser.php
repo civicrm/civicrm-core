@@ -266,6 +266,18 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   }
 
   /**
+   * @param string $entity
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected function getImportFieldsForEntity(string $entity): array {
+    return (array) civicrm_api4($entity, 'getFields', [
+      'where' => [['usage', 'CONTAINS', 'import']],
+    ])->indexBy('name');
+  }
+
+  /**
    * Gets the fields available for importing in a key-name, title format.
    *
    * @return array
@@ -1570,23 +1582,21 @@ abstract class CRM_Import_Parser implements UserJobInterface {
       $comparisonValue = $this->getComparisonValue($importedValue);
       return $options[$comparisonValue] ?? 'invalid_import_value';
     }
-    if (!empty($fieldMetadata['FKClassName']) || ($fieldMetadata['pseudoconstant']['prefetch'] ?? NULL) === 'disabled') {
-      // @todo - make this generic - for fields where getOptions doesn't fetch
-      // getOptions does not retrieve these fields with high potential results
-      if ($fieldName === 'event_id') {
-        if (!isset(Civi::$statics[__CLASS__][$fieldName][$importedValue])) {
-          $event = Event::get()->addClause('OR', ['title', '=', $importedValue], ['id', '=', $importedValue])->addSelect('id')->execute()->first();
-          Civi::$statics[__CLASS__][$fieldName][$importedValue] = $event['id'] ?? FALSE;
-        }
-        return Civi::$statics[__CLASS__][$fieldName][$importedValue] ?? 'invalid_import_value';
+    // @todo - make this generic - for fields where getOptions doesn't fetch
+    // getOptions does not retrieve these fields with high potential results
+    if ($fieldName === 'event_id') {
+      if (!isset(Civi::$statics[__CLASS__][$fieldName][$importedValue])) {
+        $event = Event::get()->addClause('OR', ['title', '=', $importedValue], ['id', '=', $importedValue])->addSelect('id')->execute()->first();
+        Civi::$statics[__CLASS__][$fieldName][$importedValue] = $event['id'] ?? FALSE;
       }
-      if ($fieldMetadata['name'] === 'campaign_id') {
-        if (!isset(Civi::$statics[__CLASS__][$fieldName][$importedValue])) {
-          $campaign = Campaign::get()->addClause('OR', ['title', '=', $importedValue], ['name', '=', $importedValue], ['id', '=', $importedValue])->addSelect('id')->execute()->first();
-          Civi::$statics[__CLASS__][$fieldName][$importedValue] = $campaign['id'] ?? FALSE;
-        }
-        return Civi::$statics[__CLASS__][$fieldName][$importedValue] ?: 'invalid_import_value';
+      return Civi::$statics[__CLASS__][$fieldName][$importedValue] ?? 'invalid_import_value';
+    }
+    if ($fieldMetadata['name'] === 'campaign_id') {
+      if (!isset(Civi::$statics[__CLASS__][$fieldName][$importedValue])) {
+        $campaign = Campaign::get()->addClause('OR', ['title', '=', $importedValue], ['name', '=', $importedValue], ['id', '=', $importedValue])->addSelect('id')->execute()->first();
+        Civi::$statics[__CLASS__][$fieldName][$importedValue] = $campaign['id'] ?? FALSE;
       }
+      return Civi::$statics[__CLASS__][$fieldName][$importedValue] ?: 'invalid_import_value';
     }
     if ($dataType === 'Integer') {
       // We have resolved the options now so any remaining ones should be integers.
