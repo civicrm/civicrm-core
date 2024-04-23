@@ -315,8 +315,6 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
         $this->getContactMatchingFields()
       );
 
-      $fields['participant_contact_id']['title'] .= ' (match to contact)';
-      $fields['participant_contact_id']['html']['label'] = $fields['participant_contact_id']['title'];
       foreach ($fields as $index => $field) {
         if (isset($field['name']) && $field['name'] !== $index) {
           // undo unique names - participant is the primary
@@ -326,6 +324,8 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
           unset($fields[$index]);
         }
       }
+      $fields['contact_id']['title'] .= ' (match to contact)';
+      $fields['contact_id']['html']['label'] = $fields['contact_id']['title'];
       $this->importableFieldsMetadata = $fields;
     }
   }
