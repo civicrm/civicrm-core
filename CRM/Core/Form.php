@@ -882,7 +882,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
           $attrs['accesskey'] = 'S';
         }
         $buttonContents = CRM_Core_Page::crmIcon($button['icon'] ?? $defaultIcon) . ' ' . $button['name'];
-        $buttonName = $this->getButtonName($button['type'], CRM_Utils_Array::value('subName', $button));
+        $buttonName = $this->getButtonName($button['type'], $button['subName'] ?? NULL);
         $attrs['class'] .= " crm-button crm-button-type-{$button['type']} crm-button{$buttonName}";
         $attrs['type'] = 'submit';
         $prevnext[] = $this->createElement('xbutton', $buttonName, $buttonContents, $attrs);
@@ -2428,7 +2428,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   public function addEntityRef($name, $label = '', $props = [], $required = FALSE) {
     // Default properties
-    $props['api'] = CRM_Utils_Array::value('api', $props, []);
+    $props['api'] = $props['api'] ?? [];
     $props['entity'] = CRM_Core_DAO_AllCoreTables::convertEntityNameToCamel($props['entity'] ?? 'Contact');
     $props['class'] = ltrim(($props['class'] ?? '') . ' crm-form-entityref');
 
@@ -2442,7 +2442,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if (!empty($props['multiple'])) {
       $defaults['multiple'] = TRUE;
     }
-    $props['select'] = CRM_Utils_Array::value('select', $props, []) + $defaults;
+    $props['select'] = ($props['select'] ?? []) + $defaults;
 
     $this->formatReferenceFieldAttributes($props, get_class($this));
     return $this->add('text', $name, $label, $props, $required);
