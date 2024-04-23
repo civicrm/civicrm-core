@@ -82,17 +82,13 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
           $dao->id = $formatValues['participant_id'];
 
           if ($dao->find(TRUE)) {
-            $ids = [
-              'participant' => $formatValues['participant_id'],
-              'userId' => $session->get('userID'),
-            ];
             $participantValues = [];
             //@todo calling api functions directly is not supported
             $newParticipant = $this->deprecated_participant_check_params($formatted, $participantValues, FALSE);
             if ($newParticipant['error_message']) {
               throw new CRM_Core_Exception($newParticipant['error_message']);
             }
-            $newParticipant = CRM_Event_BAO_Participant::create($formatted, $ids);
+            $newParticipant = CRM_Event_BAO_Participant::create($formatted);
             $this->setImportStatus($rowNumber, 'IMPORTED', '', $newParticipant->id);
             return;
           }
