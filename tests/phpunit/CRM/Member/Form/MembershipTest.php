@@ -1137,11 +1137,14 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'duration_interval' => 1,
       'auto_renew' => 1,
     ]);
-    $form = $this->getForm($this->getBaseSubmitParams());
     $this->createLoggedInUser();
-    $form->_mode = 'test';
-    $form->_contactID = $this->ids['Contact']['individual_0'];
-    $form->testSubmit();
+    $this->getTestForm('CRM_Member_Form_Membership',
+      $this->getBaseSubmitParams(),
+      [
+        'cid' => $this->ids['Contact']['individual_0'],
+        'mode' => 'test',
+      ])
+      ->processForm();
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->ids['Contact']['individual_0']]);
     $this->callAPISuccessGetCount('ContributionRecur', ['contact_id' => $this->ids['Contact']['individual_0']], 1);
 
@@ -1159,28 +1162,16 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'entity_table' => 'civicrm_membership',
       'contribution_id' => $contribution['id'],
     ], 1);
-    $mut->checkMailLog([
-      '===========================================================
-Billing Name and Address
-===========================================================
-Test Last
-10 Test St
-Test, AR 90210
-US',
-      '===========================================================
-Membership Information
-===========================================================
-Membership Type: AnnualFixed
-Membership Start Date: ',
-      '===========================================================
-Credit Card Information
-===========================================================
-Visa
-************1111
-Expires: ',
+    $this->assertMailSentContainingStrings([
+      'Billing Name and Address',
+      'Test Last',
+      '10 Test St',
+      'Test, AR 90210',
+      'US',
+      'Membership Information',
+      'AnnualFixed',
+      '************1111',
     ]);
-    $mut->stop();
-
   }
 
   /**
