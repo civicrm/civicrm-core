@@ -210,7 +210,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
       $participant = new CRM_Event_BAO_Participant();
       $participant->id = $params['id'];
       if (!$participant->find(TRUE)) {
-        return civicrm_api3_create_error(ts('Participant  id is not valid'));
+        throw new CRM_Core_Exception(ts('Participant  id is not valid'));
       }
     }
 
@@ -219,7 +219,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
       $contact = new CRM_Contact_BAO_Contact();
       $contact->id = $params['contact_id'];
       if (!$contact->find(TRUE)) {
-        return civicrm_api3_create_error(ts('Contact id is not valid'));
+        throw new CRM_Core_Exception(ts('Contact id is not valid'));
       }
     }
 
@@ -227,7 +227,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
     if (!empty($params['event_id'])) {
       $isTemplate = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $params['event_id'], 'is_template');
       if (!empty($isTemplate)) {
-        return civicrm_api3_create_error(ts('Event templates are not meant to be registered.'));
+        throw new CRM_Core_Exception(ts('Event templates are not meant to be registered.'));
       }
     }
 
@@ -249,7 +249,6 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
         );
       }
     }
-    return TRUE;
   }
 
   /**
