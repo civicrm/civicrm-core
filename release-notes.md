@@ -73,6 +73,15 @@ Released May 2, 2024
 - **[Credits](release-notes/5.73.0.md#credits)**
 - **[Feedback](release-notes/5.73.0.md#feedback)**
 
+## CiviCRM 5.72.2
+
+Released April 23, 2024
+
+- **[Synopsis](release-notes/5.72.2.md#synopsis)**
+- **[Bugs resolved](release-notes/5.72.2.md#bugs)**
+- **[Credits](release-notes/5.72.2.md#credits)**
+- **[Feedback](release-notes/5.72.2.md#feedback)**
+
 ## CiviCRM 5.72.1
 
 Released April 8, 2024
