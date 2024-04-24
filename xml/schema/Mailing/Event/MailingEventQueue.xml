@@ -77,6 +77,7 @@
     <comment>FK to Email</comment>
     <html>
       <label>Email</label>
+      <type>EntityRef</type>
     </html>
   </field>
   <foreignKey>
