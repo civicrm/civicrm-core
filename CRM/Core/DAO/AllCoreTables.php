@@ -181,12 +181,19 @@ class CRM_Core_DAO_AllCoreTables {
   /**
    * Get the DAO for a BAO class.
    *
-   * @param string $baoName
+   * @param string $className
    *
    * @return string
    */
-  public static function getCanonicalClassName($baoName) {
-    return str_replace('_BAO_', '_DAO_', ($baoName ?? ''));
+  public static function getCanonicalClassName($className) {
+    while (!str_contains($className, '_DAO_')) {
+      $parent = get_parent_class($className);
+      if (!$parent || $parent === 'CRM_Core_DAO') {
+        return $className;
+      }
+      $className = $parent;
+    }
+    return $className;
   }
 
   /**
