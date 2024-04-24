@@ -100,7 +100,7 @@
     ignoreTitle: true,
     errorPlacement: function(error, element) {
       if (element.prop('type') === 'radio') {
-        error.appendTo(element.parent('div.content'));
+        error.appendTo(element.parents('div.content'));
       }
       else {
         error.insertAfter(element);
