@@ -10,7 +10,7 @@ class CRM_Standaloneusers_BAO_Session extends CRM_Standaloneusers_DAO_Session {
    * @return void
    */
   public static function deleteExpired($db, $expiration_date) {
-    $table_name = self::$_tableName;
+    $table_name = self::getTableName();
     $stmt = $db->prepare("DELETE FROM $table_name WHERE last_accessed < ?");
     $db->execute($stmt, $expiration_date);
   }
@@ -23,7 +23,7 @@ class CRM_Standaloneusers_BAO_Session extends CRM_Standaloneusers_DAO_Session {
    * @return void
    */
   public static function destroy($db, $session_id) {
-    $table_name = self::$_tableName;
+    $table_name = self::getTableName();
     $stmt = $db->prepare("DELETE FROM $table_name WHERE session_id = ?");
     $db->execute($stmt, $session_id);
   }
@@ -36,7 +36,7 @@ class CRM_Standaloneusers_BAO_Session extends CRM_Standaloneusers_DAO_Session {
    * @return string
    */
   public static function read($db, $session_id) {
-    $table_name = self::$_tableName;
+    $table_name = self::getTableName();
     $stmt = $db->prepare("SELECT * FROM $table_name WHERE session_id = ? FOR UPDATE");
 
     return $db->execute($stmt, $session_id)->fetchRow(DB_FETCHMODE_ASSOC);
@@ -51,7 +51,7 @@ class CRM_Standaloneusers_BAO_Session extends CRM_Standaloneusers_DAO_Session {
    * @return void
    */
   public static function write($db, $session_id, $data = NULL) {
-    $table_name = self::$_tableName;
+    $table_name = self::getTableName();
 
     if (is_null($data)) {
       $stmt = $db->prepare("
