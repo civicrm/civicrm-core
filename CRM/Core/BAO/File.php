@@ -114,7 +114,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
 
     $config = CRM_Core_Config::singleton();
 
-    $path = explode('/', $data);
+    $path = explode(DIRECTORY_SEPARATOR, $data);
     $filename = $path[count($path) - 1];
 
     // rename this file to go into the secure directory
