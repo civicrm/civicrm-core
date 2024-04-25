@@ -55,6 +55,11 @@ class SpecFormatter {
         $field->setSuffixes($suffixes);
       }
       $field->setReadonly($data['is_view']);
+      $usage = ['export', 'duplicate_matching', 'token'];
+      if (empty($data['is_view'])) {
+        $usage[] = 'import';
+      }
+      $field->setUsage($usage);
     }
     // Core field
     else {
