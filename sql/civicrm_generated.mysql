@@ -5632,7 +5632,7 @@ INSERT INTO `civicrm_navigation` (`id`, `domain_id`, `label`, `name`, `url`, `ic
  (228,1,'Api Explorer v4','Api Explorer v4','civicrm/api4#/explorer',NULL,'administer CiviCRM','',226,1,NULL,2),
  (229,1,'Developer Docs','Developer Docs','https://civicrm.org/developer-documentation?src=iam',NULL,'administer CiviCRM','',226,1,NULL,3),
  (230,1,'Reports','Reports',NULL,'crm-i fa-bar-chart','access CiviReport','',NULL,1,NULL,95),
- (231,1,'Contact Reports','Contact Reports','civicrm/report/list?compid=99&reset=1',NULL,'administer CiviCRM','',230,1,0,1),
+ (231,1,'Contact Reports','Contact Reports','civicrm/report/list?compid=99&reset=1',NULL,'access CiviReport','',230,1,0,1),
  (232,1,'Contribution Reports','Contribution Reports','civicrm/report/list?compid=2&reset=1',NULL,'access CiviContribute','',230,1,0,2),
  (233,1,'Pledge Reports','Pledge Reports','civicrm/report/list?compid=6&reset=1',NULL,'access CiviPledge','',230,1,0,3),
  (234,1,'Event Reports','Event Reports','civicrm/report/list?compid=1&reset=1',NULL,'access CiviEvent','',230,1,0,4),
