@@ -87,7 +87,7 @@ class EntityRepository {
 
   private static function loadCoreEntities(): array {
     $entityTypes = [];
-    $path = \Civi::paths()->getPath('[civicrm.root]/schema/*/*.entityType.php');
+    $path = dirname(__DIR__, 2) . '/schema/*/*.entityType.php';
     $files = (array) glob($path);
     foreach ($files as $file) {
       $entity = include $file;
