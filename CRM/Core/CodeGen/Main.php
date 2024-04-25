@@ -144,11 +144,11 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
 
     $tasks = [];
     $tasks[] = new CRM_Core_CodeGen_Config($this);
-    $tasks[] = new CRM_Core_CodeGen_Reflection($this);
+    // $tasks[] = new CRM_Core_CodeGen_Reflection($this);
     $tasks[] = new CRM_Core_CodeGen_PhpSchema($this);
-    foreach (array_keys($this->tables) as $name) {
-      $tasks[] = new CRM_Core_CodeGen_DAO($this, $name);
-    }
+    //  foreach (array_keys($this->tables) as $name) {
+    //    $tasks[] = new CRM_Core_CodeGen_DAO($this, $name);
+    //  }
     $tasks[] = new CRM_Core_CodeGen_I18n($this);
     return $tasks;
   }
