@@ -338,4 +338,51 @@ class CRM_Utils_Schema {
     return $widget;
   }
 
+  public static function generateFieldSql(array $field) {
+    $fieldSql = $field['sql_type'];
+    if (!empty($field['collate'])) {
+      $fieldSql .= " COLLATE {$field['collate']}";
+    }
+    // Required fields and booleans cannot be null
+    // FIXME: For legacy support this doesn't force boolean fields to be NOT NULL... but it really should.
+    if (!empty($field['required'])) {
+      $fieldSql .= ' NOT NULL';
+    }
+    // Mysql 5.7 requires timestamp to be explicitly declared NULL
+    if (empty($field['required']) && $field['sql_type'] === 'timestamp') {
+      $fieldSql .= ' NULL';
+    }
+    if (!empty($field['auto_increment'])) {
+      $fieldSql .= " AUTO_INCREMENT";
+    }
+    $fieldSql .= self::getDefaultSql($field);
+    if (!empty($field['description'])) {
+      $fieldSql .= " COMMENT '" . \CRM_Core_DAO::escapeString($field['description']) . "'";
+    }
+    return $fieldSql;
+  }
+
+  private static function getDefaultSql(array $field): string {
+    // Booleans always have a default
+    if ($field['sql_type'] === 'boolean') {
+      $field += ['default' => FALSE];
+    }
+    if (!array_key_exists('default', $field)) {
+      return '';
+    }
+    if (is_null($field['default'])) {
+      $default = 'NULL';
+    }
+    elseif (is_bool($field['default'])) {
+      $default = $field['default'] ? 'TRUE' : 'FALSE';
+    }
+    elseif (!is_string($field['default']) || str_starts_with($field['default'], 'CURRENT_TIMESTAMP')) {
+      $default = $field['default'];
+    }
+    else {
+      $default = "'" . CRM_Core_DAO::escapeString($field['default']) . "'";
+    }
+    return ' DEFAULT ' . $default;
+  }
+
 }
