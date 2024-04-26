@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3a2073dd08f97d610360b308786f13cd",
+    "content-hash": "0e9d582d833277a8f63a2996d22ea889",
     "packages": [
         {
             "name": "adrienrn/php-mimetyper",
@@ -2355,23 +2355,24 @@
         },
         {
             "name": "pear/net_socket",
-            "version": "v1.2.2",
+            "version": "v1.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/Net_Socket.git",
-                "reference": "bbe6a12bb4f7059dba161f6ddd43f369c0ec8d09"
+                "reference": "f31d75ac352d49908f8987bbb1496c02a409812a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/Net_Socket/zipball/bbe6a12bb4f7059dba161f6ddd43f369c0ec8d09",
-                "reference": "bbe6a12bb4f7059dba161f6ddd43f369c0ec8d09",
+                "url": "https://api.github.com/repos/pear/Net_Socket/zipball/f31d75ac352d49908f8987bbb1496c02a409812a",
+                "reference": "f31d75ac352d49908f8987bbb1496c02a409812a",
                 "shasum": ""
             },
             "require": {
-                "pear/pear_exception": "*"
+                "pear/pear_exception": "@stable",
+                "php": ">=5.4.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "*"
+                "phpunit/phpunit": "^4"
             },
             "type": "library",
             "autoload": {
@@ -2384,7 +2385,7 @@
                 "./"
             ],
             "license": [
-                "PHP License"
+                "BSD-2-Clause"
             ],
             "authors": [
                 {
@@ -2408,7 +2409,7 @@
                 "issues": "http://pear.php.net/bugs/search.php?cmd=display&package_name[]=Net_Socket",
                 "source": "https://github.com/pear/Net_Socket"
             },
-            "time": "2015-03-22T15:48:19+00:00"
+            "time": "2017-04-06T15:16:38+00:00"
         },
         {
             "name": "pear/pear-core-minimal",
