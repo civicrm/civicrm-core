@@ -28,8 +28,6 @@ if (!defined('DB_DSN_MODE')) {
 require_once 'PEAR.php';
 require_once 'DB/DataObject.php';
 
-require_once 'CRM/Core/I18n.php';
-
 /**
  * Class CRM_Core_DAO
  */
