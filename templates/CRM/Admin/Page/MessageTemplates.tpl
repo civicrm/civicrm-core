@@ -95,7 +95,7 @@
           {if $type eq 'userTemplates'}
             {capture assign=schedRemURL}{crmURL p='civicrm/admin/scheduleReminders' q="reset=1"}{/capture}
             {ts 1=$schedRemURL}Message templates allow you to easily create similar emails or letters on a recurring basis. Messages used for membership renewal reminders, as well as event and activity related reminders should be created via <a href="%1">Schedule Reminders</a>.{/ts}
-            {if array_search('CiviMail', $config->enableComponents)}
+            {if $isCiviMailEnabled}
               {capture assign=automatedMsgURL}{crmURL p='civicrm/admin/component' q="reset=1"}{/capture}
               {ts 1=$automatedMsgURL}You can also use message templates for CiviMail (bulk email) content. However, subscribe, unsubscribe and opt-out messages are configured at <a href="%1">Administer > CiviMail > Headers, Footers and Automated Messages</a>.{/ts}
             {/if}

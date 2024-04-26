@@ -285,6 +285,7 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
     $this->assign('canEditSystemTemplates', CRM_Core_Permission::check('edit system workflow message templates'));
     $this->assign('canEditMessageTemplates', CRM_Core_Permission::check('edit message templates'));
     $this->assign('canEditUserDrivenMessageTemplates', CRM_Core_Permission::check('edit user-driven message templates'));
+    $this->assign('isCiviMailEnabled', CRM_Core_Component::isEnabled('CiviMail'));
     Civi::resources()
       ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')
       ->addSetting([
