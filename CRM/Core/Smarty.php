@@ -244,9 +244,9 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
    * @throws \CRM_Core_Exception
    */
   public function handleSmartyError(int $errorNumber, string $errorMessage): void {
+    restore_error_handler();
     $event = new SmartyErrorEvent($errorNumber, $errorMessage);
     \Civi::dispatcher()->dispatch('civi.smarty.error', $event);
-    restore_error_handler();
     throw new \CRM_Core_Exception('Message was not parsed due to invalid smarty syntax : ' . $errorMessage);
   }
 

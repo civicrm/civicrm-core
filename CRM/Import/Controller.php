@@ -44,9 +44,9 @@ class CRM_Import_Controller extends CRM_Core_Controller {
       if (CRM_Utils_System::currentPath() === NULL) {
         fwrite(STDERR, 'error reporting is ' . error_reporting() . "\n");
         $old_error_handler = set_error_handler(function($errno, $errstr, $errfile, $errline) {
-          restore_error_handler();
-          throw new \ErrorException($errstr);
+          //throw new \ErrorException($errstr);
         });
+        restore_error_handler();
         fwrite(STDERR, 'old error handler is ' . ($old_error_handler === NULL ? 'null' : print_r($old_error_handler, TRUE)) . "\n");
       }
       $pathArguments = explode('/', CRM_Utils_System::currentPath());
