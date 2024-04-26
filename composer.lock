@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cca75cde325b4871a7077f494228b377",
+    "content-hash": "0e9d582d833277a8f63a2996d22ea889",
     "packages": [
         {
             "name": "adrienrn/php-mimetyper",
@@ -1938,20 +1938,17 @@
         },
         {
             "name": "pear/auth_sasl",
-            "version": "v1.1.0",
+            "version": "v1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/Auth_SASL.git",
-                "reference": "db1ead3dc0bf986d2bab0dbc04d114800cf91dee"
+                "reference": "ebf4c2c5ea190b283229f8443b866ccf34422471"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/Auth_SASL/zipball/db1ead3dc0bf986d2bab0dbc04d114800cf91dee",
-                "reference": "db1ead3dc0bf986d2bab0dbc04d114800cf91dee",
+                "url": "https://api.github.com/repos/pear/Auth_SASL/zipball/ebf4c2c5ea190b283229f8443b866ccf34422471",
+                "reference": "ebf4c2c5ea190b283229f8443b866ccf34422471",
                 "shasum": ""
-            },
-            "require": {
-                "pear/pear_exception": "@stable"
             },
             "require-dev": {
                 "phpunit/phpunit": "@stable"
@@ -1967,7 +1964,7 @@
                 "./"
             ],
             "license": [
-                "BSD"
+                "BSD-3-Clause"
             ],
             "authors": [
                 {
@@ -1987,11 +1984,12 @@
                 }
             ],
             "description": "Abstraction of various SASL mechanism responses",
+            "homepage": "http://pear.php.net/package/Auth_SASL",
             "support": {
                 "issues": "http://pear.php.net/bugs/search.php?cmd=display&package_name[]=Auth_SASL",
                 "source": "https://github.com/pear/Auth_SASL"
             },
-            "time": "2017-03-07T14:37:05+00:00"
+            "time": "2023-12-21T21:52:08+00:00"
         },
         {
             "name": "pear/console_getopt",
@@ -2288,16 +2286,16 @@
         },
         {
             "name": "pear/net_smtp",
-            "version": "1.10.0",
+            "version": "1.12.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/Net_SMTP.git",
-                "reference": "51e5997b711fbd1e5a9a075634d4d682168537fa"
+                "reference": "5d7ba854d75a7c207d8581de1cc6fd2895ae2518"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/Net_SMTP/zipball/51e5997b711fbd1e5a9a075634d4d682168537fa",
-                "reference": "51e5997b711fbd1e5a9a075634d4d682168537fa",
+                "url": "https://api.github.com/repos/pear/Net_SMTP/zipball/5d7ba854d75a7c207d8581de1cc6fd2895ae2518",
+                "reference": "5d7ba854d75a7c207d8581de1cc6fd2895ae2518",
                 "shasum": ""
             },
             "require": {
@@ -2335,6 +2333,11 @@
                     "name": "Chuck Hagenbuch",
                     "email": "chuck@horde.org",
                     "role": "Lead"
+                },
+                {
+                    "name": "Armin Graefe",
+                    "email": "schengawegga@gmail.com",
+                    "role": "Lead"
                 }
             ],
             "description": "An implementation of the SMTP protocol",
@@ -2348,27 +2351,28 @@
                 "issues": "https://github.com/pear/Net_SMTP/issues",
                 "source": "https://github.com/pear/Net_SMTP"
             },
-            "time": "2021-03-19T18:39:42+00:00"
+            "time": "2024-04-15T19:42:15+00:00"
         },
         {
             "name": "pear/net_socket",
-            "version": "1.0.14",
+            "version": "v1.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/Net_Socket.git",
-                "reference": "fcd33efd77e4b35ce85489141ab9145343579fe8"
+                "reference": "f31d75ac352d49908f8987bbb1496c02a409812a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/Net_Socket/zipball/fcd33efd77e4b35ce85489141ab9145343579fe8",
-                "reference": "fcd33efd77e4b35ce85489141ab9145343579fe8",
+                "url": "https://api.github.com/repos/pear/Net_Socket/zipball/f31d75ac352d49908f8987bbb1496c02a409812a",
+                "reference": "f31d75ac352d49908f8987bbb1496c02a409812a",
                 "shasum": ""
             },
             "require": {
-                "pear/pear_exception": "*"
+                "pear/pear_exception": "@stable",
+                "php": ">=5.4.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "*"
+                "phpunit/phpunit": "^4"
             },
             "type": "library",
             "autoload": {
@@ -2381,7 +2385,7 @@
                 "./"
             ],
             "license": [
-                "PHP License"
+                "BSD-2-Clause"
             ],
             "authors": [
                 {
@@ -2405,7 +2409,7 @@
                 "issues": "http://pear.php.net/bugs/search.php?cmd=display&package_name[]=Net_Socket",
                 "source": "https://github.com/pear/Net_Socket"
             },
-            "time": "2014-02-20T19:27:06+00:00"
+            "time": "2017-04-06T15:16:38+00:00"
         },
         {
             "name": "pear/pear-core-minimal",
@@ -5511,5 +5515,5 @@
     "platform-overrides": {
         "php": "7.4.0"
     },
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.3.0"
 }
