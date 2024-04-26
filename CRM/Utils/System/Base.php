@@ -92,7 +92,7 @@ abstract class CRM_Utils_System_Base {
         return 'CRM/Contact/Form/Task/Excel.tpl';
 
       default:
-        return 'CRM/common/print.tpl';
+        return 'CRM/common/snippet.tpl';
     }
   }
 
