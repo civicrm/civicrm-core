@@ -10,8 +10,6 @@ class SmartyUtil {
    * @throws \SmartyException
    */
   public static function createSmarty($srcPath) {
-    require_once 'CRM/Core/I18n.php';
-
     $packagePath = PackageUtil::getPath($srcPath);
     require_once $packagePath . '/smarty4/vendor/autoload.php';
 
