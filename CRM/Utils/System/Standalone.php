@@ -253,9 +253,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
     if ($print) {
       return 'CRM/common/print.tpl';
     }
-    $isPublic = \CRM_Core_Smarty::singleton()->getTemplateVars('urlIsPublic');
-    // Alternative:
-    // $isPublic = ($_GET['q'] ?? '') ? CRM_Core_Menu::isPublicRoute($_GET['q']) : FALSE;
+    $isPublic = CRM_Utils_System::isFrontEndPage();
     return $isPublic ? 'CRM/common/standalone-frontend.tpl' : 'CRM/common/standalone.tpl';
   }
 
@@ -384,6 +382,10 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
       return $civicrm_paths['cms.root']['path'];
     }
     throw new \RuntimeException("Standalone requires the path is set for now. Set \$civicrm_paths['cms.root']['path'] in civicrm.settings.php to the webroot.");
+  }
+
+  public function isFrontEndPage() {
+    return CRM_Core_Menu::isPublicRoute(CRM_Utils_System::currentPath() ?? '');
   }
 
   /**
