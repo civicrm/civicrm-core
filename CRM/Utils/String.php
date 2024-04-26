@@ -1047,6 +1047,8 @@ class CRM_Utils_String {
         $templateString = (string) $smarty->fetch('eval:' . $templateString);
       }
       catch (SmartyCompilerException $e) {
+        fwrite(STDERR, "you are here\n");
+        restore_error_handler();
         \Civi::log('smarty')->info('parsing smarty template {template}', [
           'template' => $templateString,
         ]);
