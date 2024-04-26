@@ -60,6 +60,7 @@ class CRM_Core_Smarty_plugins_HtxtTest extends CiviUnitTestCase {
       $this->fail("That should have thrown an error. Are you working on a better parsing rule?");
     }
     catch (Throwable $t) {
+      fwrite(STDERR, get_class($t) . "\n");
       $this->assertTrue(str_contains($t->getMessage(), 'Invalid {htxt} tag'));
     }
   }

@@ -495,6 +495,12 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @noinspection PhpUnhandledExceptionInspection
    */
   protected function tearDown(): void {
+    $old_error_handler = set_error_handler(function($errno, $errstr, $errfile, $errline) {});
+    restore_error_handler();
+    if (is_array($old_error_handler) && (($old_error_handler[1] ?? '') == 'handleSmartyError')) {
+      fwrite(STDERR, 'test ' . get_class($this) . '::' . $this->getName() . " has ended with smarty as the error handler.\n");
+      restore_error_handler();
+    }
     $this->_apiversion = 3;
     $this->resetLabels();
     $this->frozenTime = NULL;
