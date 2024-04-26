@@ -72,13 +72,28 @@ abstract class CRM_Utils_System_Base {
    * Returns the Smarty template path to the main template that renders the content.
    *
    * In CMS contexts, this goes inside their theme, but Standalone needs to render the full HTML page.
+   *
+   * @var int|string $print
+   *   Should match a CRM_Core_Smarty::PRINT_* constant,
+   *   or equal 0 if not in print mode.
    */
-  public static function getContentTemplate(bool $print = FALSE, bool $frontEnd = FALSE): string {
-    if ($print) {
-      return 'CRM/common/print.tpl';
+  public static function getContentTemplate($print = 0): string {
+    switch ($print) {
+      case 0:
+        // Not a print context.
+        $config = CRM_Core_Config::singleton();
+        return 'CRM/common/' . strtolower($config->userFramework) . '.tpl';
+
+      case CRM_Core_Smarty::PRINT_PAGE:
+        return 'CRM/common/print.tpl';
+
+      case 'xls':
+      case 'doc':
+        return 'CRM/Contact/Form/Task/Excel.tpl';
+
+      default:
+        return 'CRM/common/print.tpl';
     }
-    $config = CRM_Core_Config::singleton();
-    return 'CRM/common/' . strtolower($config->userFramework) . '.tpl';
   }
 
   /**

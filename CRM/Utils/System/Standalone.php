@@ -248,13 +248,17 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   /**
    * @inheritDoc
    *
+   * Standalone offers different HTML templates for front and back-end routes.
+   *
    */
-  public static function getContentTemplate(bool $print = FALSE, bool $frontEnd = FALSE): string {
+  public static function getContentTemplate($print = 0): string {
     if ($print) {
-      return 'CRM/common/print.tpl';
+      return parent::getContentTemplate($print);
     }
-    $isPublic = CRM_Utils_System::isFrontEndPage();
-    return $isPublic ? 'CRM/common/standalone-frontend.tpl' : 'CRM/common/standalone.tpl';
+    else {
+      $isPublic = CRM_Utils_System::isFrontEndPage();
+      return $isPublic ? 'CRM/common/standalone-frontend.tpl' : 'CRM/common/standalone.tpl';
+    }
   }
 
   /**
