@@ -780,10 +780,10 @@ WHERE  id IN (" . implode(',', array_keys($priceFields)) . ')';
     }
 
     $invoicing = Civi::settings()->get('invoicing');
-    $taxAmount = $opt['tax_amount'] ?? NULL;
+    $taxAmount = $opt['tax_amount'] ?? 0;
     if ($isDisplayAmounts) {
       $optionLabel = !empty($optionLabel) ? $optionLabel . '<span class="crm-price-amount-label-separator">&nbsp;-&nbsp;</span>' : '';
-      if ($opt['tax_amount'] && $invoicing) {
+      if ($taxAmount && $invoicing) {
         $optionLabel = $optionLabel . self::getTaxLabel($opt, $valueFieldName);
       }
       else {
