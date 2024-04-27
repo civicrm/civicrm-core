@@ -387,7 +387,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
         'first_name' => 'Bruce',
         'last_name' => 'Wayne',
         'email-Primary' => 'bruce@gotham.com',
-        'price_' . $priceField['id'] => '',
+        'price_' . $priceField['id'] => 0,
         'priceSetId' => $priceField['values'][$priceField['id']]['price_set_id'],
         'payment_processor_id' => $paymentProcessorID,
         'button' => '_qf_Register_upload',
