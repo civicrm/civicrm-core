@@ -2735,6 +2735,8 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
       '1/10/2022 3:54:56' => ['date' => '1/10/2022 3:54:56', 'format' => CRM_Utils_Date::DATE_dd_mm_yyyy, 'expected' => '20221001035456'],
       '1-10-2022 15:54:56' => ['date' => '1-10-2022 15:54:56', 'format' => CRM_Utils_Date::DATE_dd_mm_yyyy, 'expected' => '20221001155456'],
       '1-10-2022 3:54:56' => ['date' => '1-10-2022 3:54:56', 'format' => CRM_Utils_Date::DATE_dd_mm_yyyy, 'expected' => '20221001035456'],
+      // German format https://civicrm.stackexchange.com/questions/34174/contact-import-german-date-format-support
+      '01.10.2022' => ['date' => '01.10.2022', 'format' => CRM_Utils_Date::DATE_dd_mm_yyyy, 'expected' => '20221001000000'],
     ];
   }
 

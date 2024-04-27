@@ -251,7 +251,7 @@ class CRM_Utils_Date {
       CRM_Utils_Date::DATE_mm_dd_yyyy => ts('mm/dd/yyyy OR mm-dd-yyyy (12/25/1998 OR 12-25-1998) OR (9/1/2008 OR 9-1-2008)'),
       CRM_Utils_Date::DATE_Month_dd_yyyy => ts('Month dd, yyyy (December 12, 1998)'),
       CRM_Utils_Date::DATE_dd_mon_yy => ts('dd-mon-yy OR dd/mm/yy (25-Dec-98 OR 25/12/98 OR 1-09-98)'),
-      CRM_Utils_Date::DATE_dd_mm_yyyy => ts('dd/mm/yyyy (25/12/1998 OR 1/9/2008 OR 1-Sep-2008)'),
+      CRM_Utils_Date::DATE_dd_mm_yyyy => ts('dd/mm/yyyy (25/12/1998 OR 1/9/2008 OR 1-Sep-2008 or 25.12.1998 or 25-12-1998)'),
     ];
   }
 
@@ -761,10 +761,10 @@ class CRM_Utils_Date {
         return preg_match('/^\d\d\d\d-?(\d|\d\d)-?(\d|\d\d)$/', $inputValue);
 
       case self::DATE_mm_dd_yy:
-        return preg_match('/^(\d|\d\d)[-\/](\d|\d\d)[-\/]\d\d$/', $inputValue);
+        return preg_match('/^(\d|\d\d)[-\/.](\d|\d\d)[-\/.]\d\d$/', $inputValue);
 
       case self::DATE_mm_dd_yyyy:
-        return preg_match('/^(\d|\d\d)[-\/](\d|\d\d)[-\/]\d\d\d\d$/', $inputValue);
+        return preg_match('/^(\d|\d\d)[-\/.](\d|\d\d)[-\/,]\d\d\d\d$/', $inputValue);
 
       case self::DATE_Month_dd_yyyy:
         $monthRegex = self::getMonthRegex();
@@ -775,7 +775,7 @@ class CRM_Utils_Date {
         return preg_match('/^(\d|\d\d)-' . self::getMonthRegex() . '-\d\d$/i', $inputValue) || preg_match('/^(\d|\d\d)[-\/](\d|\d\d)[-\/]\d\d$/', $inputValue);
 
       case self::DATE_dd_mm_yyyy:
-        return preg_match('/^(\d|\d\d)[-\/](\d|\d\d)[-\/]\d\d\d\d/', $inputValue);
+        return preg_match('/^(\d|\d\d)[-\/.](\d|\d\d)[-\/.]\d\d\d\d/', $inputValue);
     }
     return FALSE;
   }
@@ -2215,13 +2215,13 @@ class CRM_Utils_Date {
       // PHP interprets slashes as American and dots/dashes as European/other.
       // The only thing we support for mm_dd_yy that differs from strtotime is
       // the use of dashes - so here we replace then we can use strtotime.
-      $date = str_replace('-', '/', $date);
+      $date = str_replace(['-', '.'], '/', $date);
       $date = self::replaceShortYear($date, '/', 3);
     }
     if ($dateType === self::DATE_dd_mon_yy || $dateType === self::DATE_dd_mm_yyyy) {
       // PHP interprets slashes as American and dashes as European/other
       // We swap any slashes to dashes so strtotime will handle.
-      $date = str_replace('/', '-', $date);
+      $date = str_replace(['/', '.'], '-', $date);
       $date = self::replaceTextMonth($date, '-', 2);
       $date = self::replaceShortYear($date, '-', 3);
     }
