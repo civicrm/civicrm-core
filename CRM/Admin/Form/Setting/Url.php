@@ -32,6 +32,8 @@ class CRM_Admin_Form_Setting_Url extends CRM_Admin_Form_Setting {
     // @todo remove these, define any not yet defined in the setting metadata.
     'disable_core_css' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'defaultExternUrl' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'enableSSL' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'verifySSL' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'userFrameworkResourceURL' => CRM_Core_BAO_Setting::URL_PREFERENCES_NAME,
     'imageUploadURL' => CRM_Core_BAO_Setting::URL_PREFERENCES_NAME,
     'customCSSURL' => CRM_Core_BAO_Setting::URL_PREFERENCES_NAME,
@@ -43,15 +45,6 @@ class CRM_Admin_Form_Setting_Url extends CRM_Admin_Form_Setting {
    */
   public function buildQuickForm() {
     $this->setTitle(ts('Settings - Resource URLs'));
-    $settingFields = civicrm_api('setting', 'getfields', [
-      'version' => 3,
-    ]);
-
-    $this->addYesNo('enableSSL', ts('Force Secure URLs (SSL)'));
-    $this->addYesNo('verifySSL', ts('Verify SSL Certs'));
-    // FIXME: verifySSL should use $_settings instead of manually adding fields
-    $this->assign('verifySSL_description', $settingFields['values']['verifySSL']['description']);
-
     $this->addFormRule(['CRM_Admin_Form_Setting_Url', 'formRule']);
 
     parent::buildQuickForm();

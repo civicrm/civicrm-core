@@ -65,6 +65,7 @@
         </td>
         <td>
             {$form.enableSSL.html}
+            <p class="description font-red">{ts}{$settings_fields.enableSSL.description}{/ts}</p>
         </td>
     </tr>
     <tr class="crm-url-form-block-verifySSL">
@@ -73,7 +74,7 @@
         </td>
         <td>
             {$form.verifySSL.html}<br/>
-            <p class="description font-red">{ts}{$verifySSL_description}{/ts}</p>
+            <p class="description font-red">{ts}{$settings_fields.verifySSL.description}{/ts}</p>
         </td>
     </tr>
     <tr class="crm-url-form-block-defaultExternUrl">
