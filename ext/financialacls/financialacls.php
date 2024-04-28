@@ -368,26 +368,29 @@ function financialacls_civicrm_fieldOptions($entity, $field, &$options, $params)
   if (!financialacls_is_acl_limiting_enabled()) {
     return;
   }
-  if (in_array($entity, ['Contribution', 'ContributionRecur'], TRUE) && $field === 'financial_type_id' && $params['context'] === 'search') {
-    $action = CRM_Core_Action::VIEW;
-    // At this stage we are only considering the view action. Code from
-    // CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes().
-    $actions = [
-      CRM_Core_Action::VIEW => 'view',
-      CRM_Core_Action::UPDATE => 'edit',
-      CRM_Core_Action::ADD => 'add',
-      CRM_Core_Action::DELETE => 'delete',
-    ];
-    $cacheKey = 'available_types_' . $action;
-    if (!isset(\Civi::$statics['CRM_Financial_BAO_FinancialType'][$cacheKey])) {
-      foreach ($options as $finTypeId => $type) {
-        if (!CRM_Core_Permission::check($actions[$action] . ' contributions of type ' . $type)) {
-          unset($options[$finTypeId]);
+  $context = $params['context'];
+  if (in_array($entity, ['Contribution', 'ContributionRecur'], TRUE) && $field === 'financial_type_id') {
+    if ($context === 'search' || $context === 'create') {
+      // At this stage we are only considering the view & create actions. Code from
+      // CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes().
+      $actions = [
+        CRM_Core_Action::VIEW => 'view',
+        CRM_Core_Action::UPDATE => 'edit',
+        CRM_Core_Action::ADD => 'add',
+        CRM_Core_Action::DELETE => 'delete',
+      ];
+      $action = $context === 'create' ? CRM_Core_Action::ADD : CRM_Core_Action::VIEW;
+      $cacheKey = 'available_types_' . $action;
+      if (!isset(\Civi::$statics['CRM_Financial_BAO_FinancialType'][$cacheKey])) {
+        foreach ($options as $finTypeId => $type) {
+          if (!CRM_Core_Permission::check($actions[$action] . ' contributions of type ' . $type)) {
+            unset($options[$finTypeId]);
+          }
         }
+        \Civi::$statics['CRM_Financial_BAO_FinancialType'][$cacheKey] = $options;
       }
-      \Civi::$statics['CRM_Financial_BAO_FinancialType'][$cacheKey] = $options;
+      $options = \Civi::$statics['CRM_Financial_BAO_FinancialType'][$cacheKey];
     }
-    $options = \Civi::$statics['CRM_Financial_BAO_FinancialType'][$cacheKey];
   }
 }
 

@@ -1193,8 +1193,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    */
   public function buildEventFeeForm($form) {
     //as when call come from register.php
-    $financialTypes = CRM_Contribute_BAO_Contribution::buildOptions('financial_type_id', 'create');
-
     if (!$form->_eventId) {
       $form->_eventId = CRM_Utils_Request::retrieve('eventId', 'Positive', $form);
     }
@@ -1268,13 +1266,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         $form->addElement('checkbox', 'record_contribution', ts('Record Payment?'), NULL,
           ['onclick' => "return showHideByValue('record_contribution','','payment_information','table-row','radio',false);"]
         );
-        // Check permissions for financial type first
-        if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
-          CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, $form->_action);
-        }
-        else {
-          $financialTypes = CRM_Contribute_BAO_Contribution::buildOptions('financial_type_id', 'create');
-        }
+        $financialTypes = CRM_Contribute_BAO_Contribution::buildOptions('financial_type_id', 'create');
 
         $form->add('select', 'financial_type_id',
           ts('Financial Type'),
