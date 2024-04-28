@@ -336,7 +336,7 @@ DESC limit 1");
       $this->buildMembershipPriceSet();
 
       $optionsMembershipTypes = [];
-      foreach ($this->_priceSet['fields'] as $pField) {
+      foreach ($this->getPriceFieldMetaData() as $pField) {
         if (empty($pField['options'])) {
           continue;
         }
@@ -583,14 +583,13 @@ DESC limit 1");
    * @deprecated this should be updated to align with the other forms that use getOrder()
    */
   private function buildMembershipPriceSet() {
-    $priceSetId = $this->getPriceSetID();
     $form = $this;
 
-    $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($priceSetId, TRUE, FALSE);
-    $form->_priceSet = $priceSet[$priceSetId] ?? NULL;
-    $validPriceFieldIds = array_keys($form->_priceSet['fields']);
+    $this->_priceSet = $this->getOrder()->getPriceSetMetadata();
+    $validPriceFieldIds = array_keys($this->getPriceFieldMetaData());
 
     // Mark which field should have the auto-renew checkbox, if any. CRM-18305
+    // This is probably never set & relates to another form from previously shared code.
     if (!empty($form->_membershipTypeValues) && is_array($form->_membershipTypeValues)) {
       $autoRenewMembershipTypes = [];
       foreach ($form->_membershipTypeValues as $membershipTypeValue) {
@@ -598,13 +597,14 @@ DESC limit 1");
           $autoRenewMembershipTypes[] = $membershipTypeValue['id'];
         }
       }
-      foreach ($form->_priceSet['fields'] as $field) {
+      foreach ($form->getPriceFieldMetaData() as $field) {
         if (array_key_exists('options', $field) && is_array($field['options'])) {
           foreach ($field['options'] as $option) {
             if (!empty($option['membership_type_id'])) {
               if (in_array($option['membership_type_id'], $autoRenewMembershipTypes)) {
                 $form->_priceSet['auto_renew_membership_field'] = $field['id'];
                 // Only one field can offer auto_renew memberships, so break here.
+                // May not relate to this form? From previously shared code.
                 break;
               }
             }
@@ -612,15 +612,10 @@ DESC limit 1");
         }
       }
     }
-    $form->_priceSet['id'] ??= $priceSetId;
     $form->assign('priceSet', $form->_priceSet);
 
-    $feeBlock = &$form->_priceSet['fields'];
-
-    // Call the buildAmount hook.
-    CRM_Utils_Hook::buildAmount('membership', $form, $feeBlock);
     $checklifetime = FALSE;
-    foreach ($feeBlock as $id => $field) {
+    foreach ($this->getPriceFieldMetaData() as $id => $field) {
       $options = $field['options'] ?? NULL;
       if (!is_array($options) || !in_array($id, $validPriceFieldIds)) {
         continue;
@@ -636,8 +631,6 @@ DESC limit 1");
         );
       }
     }
-    $form->assign('ispricelifetime', $checklifetime);
-
   }
 
   /**
