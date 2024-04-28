@@ -41,7 +41,7 @@ class CRM_Import_Controller extends CRM_Core_Controller {
       $this->entity = $arguments['entity'];
     }
     else {
-      $pathArguments = explode('/', CRM_Utils_System::currentPath());
+      $pathArguments = explode('/', (CRM_Utils_System::currentPath() ?: ''));
       unset($pathArguments[0], $pathArguments[1]);
       $this->entity = CRM_Utils_String::convertStringToCamel(implode('_', $pathArguments));
     }
