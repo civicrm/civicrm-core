@@ -1262,13 +1262,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           ['class' => "crm-select2"]
         );
       }
-      if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
-        && empty($form->_values['fee'])
-        && ($_REQUEST['snippet'] ?? NULL) == CRM_Core_Smarty::PRINT_NOFORM
-      ) {
-        CRM_Core_Session::setStatus(ts('You do not have all the permissions needed for this page.'), 'Permission Denied', 'error');
-        return FALSE;
-      }
 
       CRM_Core_Payment_Form::buildPaymentForm($form, $form->_paymentProcessor, FALSE, TRUE, self::getDefaultPaymentInstrumentId());
       if (!$form->_mode) {
@@ -1356,7 +1349,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   /**
    * Initiate event fee.
    *
-   * @param self $form
    * @param int|null $priceSetId
    *   ID of the price set in use.
    *

@@ -210,6 +210,14 @@ function financialacls_civicrm_buildAmount($component, $form, &$feeBlock) {
       unset($feeBlock[$key]);
     }
   }
+  if (is_a($form, 'CRM_Event_Form_Participant')
+    && empty($feeBlock)
+    && ($_REQUEST['snippet'] ?? NULL) == CRM_Core_Smarty::PRINT_NOFORM
+  ) {
+    CRM_Core_Session::setStatus(ts('You do not have all the permissions needed for this page.'), 'Permission Denied', 'error');
+    return FALSE;
+  }
+
 }
 
 /**
