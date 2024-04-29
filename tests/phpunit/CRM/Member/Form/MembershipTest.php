@@ -1096,24 +1096,30 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $params = $this->getBaseSubmitParams();
     unset($params['auto_renew'], $params['is_recur']);
     $params['is_override'] = 1;
-    $params['status_id'] = $pendingStatusId;
-
-    $form = $this->getForm($params);
+    $params['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Pending');
     $this->createLoggedInUser();
-    $form->_mode = FALSE;
-    $form->_contactID = $this->_individualId;
-    $form->testSubmit($params);
-    $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
-    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Pending'), $membership['status_id']);
+    $this->getTestForm('CRM_Member_Form_Membership', $params, [
+      'cid' => $this->ids['Contact']['individual_0'],
+    ])->processForm();
+    $membership = $this->callAPISuccessGetSingle('Membership', [
+      'contact_id' => $this->ids['Contact']['individual_0'],
+      'version' => 4,
+      'select' => ['status_id:name'],
+    ]);
+    $this->assertEquals('Pending', $membership['status_id:name']);
 
+    unset($params['is_override'], $params['status_id']);
     // Disable "Override" and let the form save recalculate the status.
-    $form->_defaultValues['status_id'] = $pendingStatusId;
-    $params['is_override'] = 0;
-    unset($params['status_id']);
-    $form->testSubmit($params);
-    $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
-    // Membership should be updated to New.
-    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'New'), $membership['status_id']);
+    $this->getTestForm('CRM_Member_Form_Membership', $params, [
+      'cid' => $this->ids['Contact']['individual_0'],
+    ])->processForm();
+    $membership = $this->callAPISuccessGetSingle('Membership', [
+      'contact_id' => $this->ids['Contact']['individual_0'],
+      'id' => ['>' => $membership['id']],
+      'version' => 4,
+      'select' => ['status_id:name'],
+    ]);
+    $this->assertEquals('New', $membership['status_id:name']);
   }
 
   /**
