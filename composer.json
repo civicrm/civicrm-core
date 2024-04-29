@@ -35,6 +35,7 @@
       "Civi\\": [".", "Civi/", "setup/src/"]
     },
     "files": [
+      "functions.php",
       "guzzle_php81_shim.php"
     ]
   },
