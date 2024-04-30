@@ -34,6 +34,10 @@ class CRM_Mailing_Service_ListUnsubscribe extends \Civi\Core\Service\AutoService
     // This code is a little ugly because it anticipates serving both code-paths.
     // But the BAO path should be properly killed. Doing so will allow you cleanup this code more.
 
+    // SMS messages don't have List-Unsubscribe, so bail early.
+    if (!array_key_exists('List-Unsubscribe', $params)) {
+      return;
+    }
     if (!in_array($context, ['civimail', 'flexmailer'])) {
       return;
     }
