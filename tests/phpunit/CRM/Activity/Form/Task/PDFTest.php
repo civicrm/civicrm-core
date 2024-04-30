@@ -9,6 +9,13 @@ use Civi\Token\TokenProcessor;
 class CRM_Activity_Form_Task_PDFTest extends CiviUnitTestCase {
 
   /**
+   * API version in use.
+   *
+   * @var int
+   */
+  protected $_apiversion = 4;
+
+  /**
    * Set up for tests.
    */
   public function setUp(): void {
