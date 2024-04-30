@@ -11,6 +11,8 @@
 
 use Civi\Test\FormTrait;
 
+require_once 'CiviTest/CiviTestSMSProvider.php';
+
 /**
  * Test class for CRM_Contact_Form_Task_SMSCommon.
  * @group headless
@@ -99,7 +101,16 @@ class CRM_Contact_Form_Task_SMSCommonTest extends CiviUnitTestCase {
   public function testQuickFormMobileNumbersDisplay(): void {
     $this->createLoggedInUser();
     $this->createTestEntity('OptionValue', ['option_group_id:name' => 'sms_provider_name', 'name' => 'dummy sms', 'label' => 'Dummy']);
-    CRM_Core_DAO::executeQuery('INSERT INTO civicrm_sms_provider (name,title, api_type, api_params) VALUES ("SMS", "SMS", 1, "1=2")');
+    $sms_provider = $this->callAPISuccess('SmsProvider', 'create', [
+      'sequential' => 1,
+      'name' => 'CiviTestSMSProvider',
+      'title' => "Test",
+      'username' => "Test",
+      'password' => "Test",
+      'api_type' => 1,
+      'is_active' => 1,
+      'api_params' => 'From=+1234567890',
+    ]);
     $form = $this->getTestForm('CRM_Contact_Form_Search_Basic', [
       'radio_ts' => 'ts_all',
       'to' => implode(',', [
