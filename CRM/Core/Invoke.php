@@ -120,7 +120,6 @@ class CRM_Core_Invoke {
     $config = CRM_Core_Config::singleton();
 
     // also initialize the i18n framework
-    require_once 'CRM/Core/I18n.php';
     $i18n = CRM_Core_I18n::singleton();
   }
 

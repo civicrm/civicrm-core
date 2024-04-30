@@ -17,8 +17,6 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-require_once 'CRM/Core/I18n.php';
-
 /**
  * Class CRM_Queue_Menu
  */
