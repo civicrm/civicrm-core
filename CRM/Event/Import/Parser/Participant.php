@@ -59,10 +59,10 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
     $rowNumber = (int) ($values[array_key_last($values)]);
     try {
       $params = $this->getMappedRow($values);
-      if ($params['external_identifier']) {
+      if (!empty($params['external_identifier'])) {
         $params['contact_id'] = $this->lookupExternalIdentifier($params['external_identifier'], $this->getContactType(), $params['contact_id'] ?? NULL);
       }
-      $session = CRM_Core_Session::singleton();
+
       $formatted = $params;
       // don't add to recent items, CRM-4399
       $formatted['skipRecentView'] = TRUE;
@@ -76,24 +76,16 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
         $formatValues[$key] = $field;
       }
 
-      if ($this->isUpdateExisting()) {
-        if (!empty($formatValues['participant_id'])) {
-          $dao = new CRM_Event_BAO_Participant();
-          $dao->id = $formatValues['participant_id'];
-
-          if ($dao->find(TRUE)) {
-            $participantValues = [];
-            //@todo calling api functions directly is not supported
-            $newParticipant = $this->deprecated_participant_check_params($formatted, $participantValues, FALSE);
-            if ($newParticipant['error_message']) {
-              throw new CRM_Core_Exception($newParticipant['error_message']);
-            }
-            $newParticipant = CRM_Event_BAO_Participant::create($formatted);
-            $this->setImportStatus($rowNumber, 'IMPORTED', '', $newParticipant->id);
-            return;
-          }
-          throw new CRM_Core_Exception('Matching Participant record not found for Participant ID ' . $formatValues['participant_id'] . '. Row was skipped.');
+      if (!empty($params['id'])) {
+        $this->checkEntityExists('Participant', $params['id']);
+        if (!$this->isUpdateExisting()) {
+          throw new CRM_Core_Exception(ts('% record found and update not selected', [1 => 'Participant']));
         }
+        //@todo calling api functions directly is not supported
+        $this->deprecated_participant_check_params($formatted);
+        $newParticipant = CRM_Event_BAO_Participant::create($formatted);
+        $this->setImportStatus($rowNumber, 'IMPORTED', '', $newParticipant->id);
+        return;
       }
 
       if (empty($params['contact_id'])) {
@@ -205,21 +197,12 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
    */
   protected function deprecated_participant_check_params($params, $checkDuplicate = FALSE) {
 
-    // check if participant id is valid or not
-    if (!empty($params['id'])) {
-      $participant = new CRM_Event_BAO_Participant();
-      $participant->id = $params['id'];
-      if (!$participant->find(TRUE)) {
-        return civicrm_api3_create_error(ts('Participant  id is not valid'));
-      }
-    }
-
     // check if contact id is valid or not
     if (!empty($params['contact_id'])) {
       $contact = new CRM_Contact_BAO_Contact();
       $contact->id = $params['contact_id'];
       if (!$contact->find(TRUE)) {
-        return civicrm_api3_create_error(ts('Contact id is not valid'));
+        throw new CRM_Core_Exception(ts('Contact id is not valid'));
       }
     }
 
@@ -227,7 +210,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
     if (!empty($params['event_id'])) {
       $isTemplate = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $params['event_id'], 'is_template');
       if (!empty($isTemplate)) {
-        return civicrm_api3_create_error(ts('Event templates are not meant to be registered.'));
+        throw new CRM_Core_Exception(ts('Event templates are not meant to be registered.'));
       }
     }
 
@@ -249,7 +232,6 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
         );
       }
     }
-    return TRUE;
   }
 
   /**

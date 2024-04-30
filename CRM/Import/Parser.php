@@ -1600,7 +1600,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     }
     if ($dataType === 'Integer') {
       // We have resolved the options now so any remaining ones should be integers.
-      return CRM_Utils_Rule::numeric($importedValue) ? $importedValue : 'invalid_import_value';
+      return CRM_Utils_Rule::numeric($importedValue) ? (int) $importedValue : 'invalid_import_value';
     }
     return $importedValue;
   }
@@ -2226,6 +2226,21 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     }
 
     return $matchIDs;
+  }
+
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  protected function checkEntityExists(string $entity, int $id) {
+    try {
+      civicrm_api4($entity, 'get', ['where' => [['id', '=', $id]], 'select' => ['id']])->single();
+    }
+    catch (CRM_Core_Exception $e) {
+      throw new CRM_Core_Exception(ts('%1 record not found for id %2', [
+        1 => $entity,
+        2 => $id,
+      ]));
+    }
   }
 
   /**
