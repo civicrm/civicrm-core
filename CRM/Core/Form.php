@@ -810,9 +810,19 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $this->_formBuilt = TRUE;
   }
 
+  /**
+   * Override this in a subclass to prevent fields intended to contain
+   * "raw html" from getting broken. E.g. system message templates
+   * @return array
+   */
+  protected function getFieldsToExcludeFromPurification(): array {
+    return [];
+  }
+
   public function setPurifiedDefaults($defaults) {
+    $exclude = $this->getFieldsToExcludeFromPurification();
     foreach ($defaults as $index => $default) {
-      if (is_string($default) && !is_numeric($default)) {
+      if (!in_array($index, $exclude, TRUE) && is_string($default) && !is_numeric($default)) {
         $defaults[$index] = CRM_Utils_String::purifyHTML($default);
       }
     }

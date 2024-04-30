@@ -334,4 +334,12 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Core_Form {
     }
   }
 
+  /**
+   * Override
+   * @return array
+   */
+  protected function getFieldsToExcludeFromPurification(): array {
+    return ['msg_html'];
+  }
+
 }
