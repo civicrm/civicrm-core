@@ -260,14 +260,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
     $this->_fields = CRM_Core_BAO_UFGroup::getFields($this->_profileId, FALSE, CRM_Core_Action::VIEW);
 
-    // remove file type field and then limit fields
-    $suppressFields = FALSE;
     foreach ($this->_fields as $name => $field) {
-      if ($cfID = CRM_Core_BAO_CustomField::getKeyID($name) && $this->_fields[$name]['html_type'] == 'Autocomplete-Select') {
-        $suppressFields = TRUE;
-        unset($this->_fields[$name]);
-      }
-
       //fix to reduce size as we are using this field in grid
       if (is_array($field['attributes']) && $this->_fields[$name]['attributes']['size'] > 19) {
         //shrink class to "form-text-medium"
@@ -385,10 +378,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
     // don't set the status message when form is submitted.
     $buttonName = $this->controller->getButtonName('submit');
-
-    if ($suppressFields && $buttonName != '_qf_Entry_next') {
-      CRM_Core_Session::setStatus(ts("File type field(s) in the selected profile are not supported for Update multiple records."), ts('Some Fields Excluded'), 'info');
-    }
   }
 
   /**
