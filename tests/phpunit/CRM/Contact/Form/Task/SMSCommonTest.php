@@ -10,6 +10,7 @@
  */
 
 use Civi\Test\FormTrait;
+
 require_once 'CiviTest/CiviTestSMSProvider.php';
 
 /**
