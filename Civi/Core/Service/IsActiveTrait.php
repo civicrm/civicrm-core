@@ -8,12 +8,8 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
-namespace Civi\FlexMailer\Listener;
+namespace Civi\Core\Service;
 
-/**
- * class \Civi\FlexMailer\Listener\IsActiveTrait
- * @todo: Replace this with \Civi\Core\Service\IsActiveTrait
- */
 trait IsActiveTrait {
 
   /**
