@@ -164,6 +164,9 @@ class CRM_Utils_Cache_Tiered implements CRM_Utils_Cache_Interface {
       return $this->maxTimeouts[$tierNum];
     }
     else {
+      if ($ttl instanceof \DateInterval) {
+        $ttl = date_add(new DateTime(), $ttl)->getTimestamp() - time();
+      }
       return min($this->maxTimeouts[$tierNum], $ttl);
     }
   }
