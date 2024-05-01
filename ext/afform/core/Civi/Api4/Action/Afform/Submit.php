@@ -108,13 +108,29 @@ class Submit extends AbstractProcessor {
    * @param \Civi\Afform\Event\AfformValidateEvent $event
    */
   public static function validateRequiredFields(AfformValidateEvent $event): void {
+    $layout = $event->getAfform()['layout'];
     foreach ($event->getFormDataModel()->getEntities() as $entityName => $entity) {
       $entityValues = $event->getEntityValues()[$entityName] ?? [];
       foreach ($entityValues as $values) {
         foreach ($entity['fields'] as $fieldName => $attributes) {
+          // Determine if this field is required without considering the field's visibility.
           $error = self::getRequiredFieldError($entity['type'], $fieldName, $attributes, $values['fields'][$fieldName] ?? NULL);
-          if ($error) {
-            $event->setError($error);
+          if (!$error) {
+            continue;
+          }
+          // Let's confirm this field is visible.
+          $isVisible = TRUE;
+          $conditionals = self::findElementAndParentVisibility($layout, $fieldName, $entityName) ?? [];
+          foreach ($conditionals as $conditional) {
+            $isVisible = self::checkAfformConditional($conditional, $event->getEntityValues());
+            if (!$isVisible) {
+              break;
+            }
+          }
+          if ($isVisible) {
+            if ($error) {
+              $event->setError($error);
+            }
           }
         }
         foreach ($entity['joins'] as $joinEntity => $join) {
@@ -128,6 +144,159 @@ class Submit extends AbstractProcessor {
           }
         }
       }
+    }
+  }
+
+  /**
+   * Search the layout to find the visibility of all the parent containers of this field.
+   * Because two fields can have the same name, we pass in the entity as well.  We only search the children
+   * of that entity's fieldset.
+   */
+  private static function findElementAndParentVisibility(array $layout, string $fieldName, string $entityName, array $parents = []): ?array {
+    foreach ($layout as $element) {
+      // Check if the current element has an 'af-fieldset' key and if it matches the desired fieldset
+      if (isset($element['af-fieldset']) && $element['af-fieldset'] === $entityName) {
+        // If the current element has an 'af-if' key, add its value to the parents array
+        $currentParents = $parents;
+        if (isset($element['af-if'])) {
+          $currentParents[] = $element['af-if'];
+        }
+        // Once we find the matching fieldset, search its children for the name. Note that multiple fieldsets may exist per entity.
+        $result = self::searchInChildren($element['#children'], $fieldName, $parents);
+        if ($result !== NULL) {
+          return array_merge($currentParents, $result);
+        }
+      }
+
+      // If the current element has '#children', search recursively within the children for the fieldset
+      if (isset($element['#children'])) {
+        $result = self::findElementAndParentVisibility($element['#children'], $fieldName, $entityName, $parents);
+        if ($result !== NULL) {
+          return $result;
+        }
+      }
+    }
+    return NULL;
+  }
+
+  /**
+   * Having found the fieldset that contains this field, we can now search recursively for elements that have `af-if` elements.
+   */
+  private static function searchInChildren(array $children, string $fieldName, array $parents = []): ?array {
+    foreach ($children as $child) {
+      // Check if the current child has a 'name' key and if it matches the desired name
+      if (isset($child['name']) && $child['name'] === $fieldName) {
+        // If the child has an 'af-if' key, add its value to the parents array
+        if (isset($child['af-if'])) {
+          $parents[] = $child['af-if'];
+        }
+        return $parents;
+      }
+
+      // If the current child has an 'af-if' key, add its value to the parents array
+      if (isset($child['af-if'])) {
+        $currentParents = array_merge($parents, [$child['af-if']]);
+      }
+      else {
+        $currentParents = $parents;
+      }
+
+      // Check if the current child has '#children' and search recursively within the children
+      if (isset($child['#children']) && is_array($child['#children'])) {
+        $result = self::searchInChildren($child['#children'], $fieldName, $currentParents);
+        if ($result !== NULL) {
+          return $result;
+        }
+      }
+    }
+    return NULL;
+  }
+
+  /**
+   * PHP interpretation of the "af-if" directive to determine conditional status.
+   * FIXME: This is a naive implementation that will need refactoring when conditionals can evaluate to more than true/false.
+   * @return bool - Is this conditional true or not.
+   */
+  public static function checkAfformConditional(string $conditional, array $allEntityValues) : bool {
+    // decode and remove cruft
+    $conditional = substr($conditional, 1, -1);
+    $conditional = json_decode(html_entity_decode($conditional));
+    foreach ($conditional as $clause) {
+      $clauseResult = self::checkAfformConditionalClause($clause, $allEntityValues);
+      if (!$clauseResult) {
+        return FALSE;
+      }
+    }
+    return TRUE;
+  }
+
+  private static function checkAfformConditionalClause(array $clause, array $allEntityValues) {
+    if ($clause[0] == 'OR') {
+      // recurse here.
+      $orResult = FALSE;
+      foreach ($clause[1] as $subClause) {
+        $orResult = $orResult || self::checkAfformConditionalClause($subClause, $allEntityValues);
+      }
+      return $orResult;
+    }
+    else {
+      $submittedValue = self::getValueFromEntity($clause[0], $allEntityValues);
+      return self::compareValues($submittedValue, $clause[2], $clause[1]);
+    }
+
+  }
+
+  /**
+   * Given a value like "Individual1[0][fields][Volunteer_Info.Residency_History]", searches a multi-dimensional array for the corresponding value if it exists.
+   */
+  private static function getValueFromEntity(string $getThisValue, array $allEntityValues) {
+    $keys = explode('[', str_replace(']', '', $getThisValue));
+
+    // Initialize the value to the original array
+    $value = $allEntityValues;
+
+    foreach ($keys as $key) {
+      if (isset($value[$key])) {
+        $value = $value[$key];
+      }
+      else {
+        // If any key is not found, return null
+        return NULL;
+      }
+    }
+    return $value;
+  }
+
+  /**
+   * Oh, the things we do to avoid `eval()`.
+   * Pass in two values and a comparison operator. Get the result of comparing the two values.
+   * If we expand the conditional operators in JS, we need to do so here as well.
+   */
+  private static function compareValues($operand1, $operand2, string $operator) : bool {
+
+    // Compare based on the operator
+    switch ($operator) {
+      case '==':
+        return $operand1 == $operand2;
+
+      case '!=':
+        return $operand1 != $operand2;
+
+      case '>':
+        return $operand1 > $operand2;
+
+      case '<':
+        return $operand1 < $operand2;
+
+      case '>=':
+        return $operand1 >= $operand2;
+
+      case '<=':
+        return $operand1 <= $operand2;
+
+      default:
+        // Handle unknown operator
+        throw new \CRM_Core_Exception("Unknown conditional operator $operator.");
     }
   }
 
