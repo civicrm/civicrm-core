@@ -68,7 +68,7 @@
       </tr>
       <tr class="crm-member-membershiprenew-form-block-membership_status">
         <td class="label">{ts}Membership Status{/ts}</td>
-        <td class="html-adjust">&nbsp;{$membershipStatus}</td>
+        <td class="html-adjust">&nbsp;{$membershipStatus|escape}</td>
       </tr>
       <tr class="crm-member-membershiprenew-form-block-end_date">
         <td class="label">{ts}Membership Expiration Date{/ts}</td>

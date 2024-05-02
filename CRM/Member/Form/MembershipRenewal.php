@@ -144,19 +144,11 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $currentMembership = civicrm_api3('Membership', 'getsingle', ['id' => $this->_id]);
     CRM_Member_BAO_Membership::fixMembershipStatusBeforeRenew($currentMembership);
 
-    $this->assign('endDate', $currentMembership['end_date']);
-    $this->assign('membershipStatus',
-      CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipStatus',
-        CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership',
-          $this->_id, 'status_id'
-        ),
-        'name'
-      )
-    );
+    $this->assign('endDate', $this->getMembershipValue('end_date'));
+    $this->assign('membershipStatus', $this->getMembershipValue('membership_status_id:name'));
 
     if ($this->_mode) {
-      $membershipFee = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_memType, 'minimum_fee');
-      if (!$membershipFee) {
+      if (!$this->getMembershipValue('membership_type_id.minimum_fee')) {
         $statusMsg = ts('Membership Renewal using a credit card requires a Membership fee. Since there is no fee associated with the selected membership type, you can use the normal renewal mode.');
         CRM_Core_Session::setStatus($statusMsg, '', 'info');
         CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/view/membership',
