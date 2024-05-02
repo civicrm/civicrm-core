@@ -178,15 +178,6 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
         }
       }
 
-      $tokens = [];
-      CRM_Utils_Hook::tokens($tokens);
-      $tokenFields = [];
-      foreach ($tokens as $catTokens) {
-        foreach ($catTokens as $token => $label) {
-          $tokenFields[] = $token;
-        }
-      }
-
       $formatted['id'] = $contact->id ?? $params['id'] ?? 0;
       $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
         'class' => __CLASS__,
