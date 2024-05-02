@@ -760,8 +760,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       }
     }
 
-    // @todo stop passing $ids (membership and userId may be set by this point)
-    CRM_Member_BAO_Membership::create($memParams, $ids);
+    CRM_Member_BAO_Membership::create($memParams);
   }
 
 }
