@@ -17,7 +17,7 @@ CRM.$(function($) {
   $('.crm-ajax-accordion').on('click', 'summary:not(.active)', function() {
     loadPanes($(this).attr('id'));
   });
-  $('.crm-ajax-accordion[open] summary').each(function() {
+  $('.crm-ajax-accordion:not(.collapsed) summary').each(function() {
     loadPanes($(this).attr('id'));
   });
   $('.crm-ajax-accordion').on('click', '.crm-close-accordion', function() {
