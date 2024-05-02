@@ -586,7 +586,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     if (!empty($this->_params['record_contribution']) || $this->_mode) {
       // set the source
       [$userName] = CRM_Contact_BAO_Contact_Location::getEmailDetails(CRM_Core_Session::singleton()->get('userID'));
-      $this->membershipTypeName = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $membership->membership_type_id,
+      $this->membershipTypeName = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $membershipParams['membership_type_id'],
         'name');
       $this->_params['contribution_source'] = "{$this->membershipTypeName} Membership: Offline membership renewal (by {$userName})";
 
@@ -611,7 +611,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       // temporary variable to avoid e-notice & to make it clear to future refactorer that
       // this function is NOT reliant on that var being set
       $temporaryParams = array_merge($this->_params, [
-        'membership_id' => $membership->id,
+        'membership_id' => $membershipParams['id'],
         'contribution_recur_id' => $contributionRecurID,
       ]);
       $this->setContributionID(CRM_Member_BAO_Membership::recordMembershipContribution($temporaryParams)->id);
@@ -659,9 +659,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $this->assign('customValues', $customValues);
 
     if ($this->_mode) {
-      $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters(
-        $this->_params,
-      ));
+      $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters($this->_params));
 
       $this->assign('is_pay_later', 0);
       $this->assign('isPrimary', 1);
@@ -702,7 +700,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    * @param $numRenewTerms
    * @param bool $pending
    *
-   * @return CRM_Member_BAO_Membership
    * @throws \CRM_Core_Exception
    */
   public function processMembership($memParams, $changeToday, $numRenewTerms, $pending) {
@@ -750,13 +747,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     }
 
     // @todo stop passing $ids (membership and userId may be set by this point)
-    $membership = CRM_Member_BAO_Membership::create($memParams, $ids);
-
-    // not sure why this statement is here, seems quite odd :( - Lobo: 12/26/2010
-    // related to: http://forum.civicrm.org/index.php/topic,11416.msg49072.html#msg49072
-    $membership->find(TRUE);
-
-    return $membership;
+    CRM_Member_BAO_Membership::create($memParams, $ids);
   }
 
 }
