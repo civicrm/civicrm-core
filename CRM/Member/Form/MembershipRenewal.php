@@ -423,7 +423,9 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     // CRM-20571: Check if the renewal date is not before Join Date, if it is then add to 'errors' array
     // The fields in Renewal form come into this routine in $params array. 'renewal_date' is in the form
     // We process both the dates before comparison using CRM utils so that they are in same date format
-    if (isset($params['renewal_date'])) {
+    // If renewal date is empty we renew based on existing membership end date and 'num_terms'.
+    // If renewal date is specified it will always renew from that date.
+    if (!empty($params['renewal_date'])) {
       if ($params['renewal_date'] < $joinDate) {
         $errors['renewal_date'] = ts('Renewal date must be the same or later than Member Since.');
       }
