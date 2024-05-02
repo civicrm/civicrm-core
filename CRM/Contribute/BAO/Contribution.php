@@ -3852,7 +3852,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     if ($contributionParams['contribution_status_id'] === $completedContributionStatusID) {
       self::updateMembershipBasedOnCompletionOfContribution(
         $contributionID,
-        $input['trxn_date'] ?? date('YmdHis')
+        NULL
       );
     }
 
