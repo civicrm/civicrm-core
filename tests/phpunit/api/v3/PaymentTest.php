@@ -397,11 +397,11 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    * @throws \Civi\Core\Exception\DBQueryException
    */
   public function testAddPaymentMissingFinancialItems(): void {
-    $contribution = $this->callAPISuccess('Contribution', 'create', [
+    $contribution = $this->createTestEntity('Contribution', [
       'total_amount' => 50,
-      'financial_type_id' => 'Donation',
+      'financial_type_id:name' => 'Donation',
       'contact_id' => $this->individualCreate(),
-      'contribution_status_id' => 'Pending',
+      'contribution_status_id:name' => 'Pending',
     ]);
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_financial_item');
     $this->callAPISuccess('Payment', 'create', ['contribution_id' => $contribution['id'], 'payment_instrument_id' => 'Check', 'total_amount' => 5]);
