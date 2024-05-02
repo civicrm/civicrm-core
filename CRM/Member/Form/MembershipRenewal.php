@@ -333,7 +333,14 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
     $this->applyFilter('__ALL__', 'trim');
 
-    $this->add('datepicker', 'renewal_date', ts('Date Renewal Entered'), [], FALSE, ['time' => FALSE]);
+    // Only add renewal date if membership is not current
+    if (!Membership::get(FALSE)
+      ->addSelect('status_id.is_current_member')
+      ->addWhere('id', '=', $this->getMembershipID())
+      ->execute()
+      ->first()['status_id.is_current_member']) {
+      $this->add('datepicker', 'renewal_date', ts('Renewal Date'), [], FALSE, ['time' => FALSE]);
+    }
 
     $this->add('select', 'financial_type_id', ts('Financial Type'),
       ['' => ts('- select -')] + CRM_Contribute_PseudoConstant::financialType()
@@ -430,7 +437,9 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     // CRM-20571: Check if the renewal date is not before Join Date, if it is then add to 'errors' array
     // The fields in Renewal form come into this routine in $params array. 'renewal_date' is in the form
     // We process both the dates before comparison using CRM utils so that they are in same date format
-    if (isset($params['renewal_date'])) {
+    // If renewal date is empty we renew based on existing membership end date and 'num_terms'.
+    // If renewal date is specified it will always renew from that date.
+    if (!empty($params['renewal_date'])) {
       if ($params['renewal_date'] < $joinDate) {
         $errors['renewal_date'] = ts('Renewal date must be the same or later than Member Since.');
       }
@@ -585,7 +594,19 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     if ($contributionRecurID) {
       $membershipParams['contribution_recur_id'] = $contributionRecurID;
     }
-    $this->processMembership($membershipParams, $this->getSubmittedValue('renewal_date'), $numRenewTerms, $pending);
+    // Only pass through "changeToday" for non-current memberships as it's not used otherwise
+    $changeToday = NULL;
+    $membership = Membership::get(FALSE)
+      ->addSelect('status_id.is_current_member', 'end_date')
+      ->addWhere('id', '=', $membershipParams['id'])
+      ->execute()
+      ->first();
+    if (!$membership['status_id.is_current_member']) {
+      $changeToday = !empty($this->getSubmittedValue('renewal_date'))
+        ? $this->getSubmittedValue('renewal_date')
+        : date('Ymd', strtotime($membership['end_date'] . '+1 day'));
+    }
+    $this->processMembership($membershipParams, $changeToday, $numRenewTerms, $pending);
 
     if (!empty($this->_params['record_contribution']) || $this->_mode) {
       // set the source
