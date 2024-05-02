@@ -263,8 +263,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
     if (empty($params['contribution_recur_id']) && empty($params['prevContribution']->contribution_recur_id)) {
       return FALSE;
     }
-    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-    if ($params['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatus)) {
+    if ($params['prevContribution']->contribution_status_id == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending')) {
       return TRUE;
     }
     return FALSE;
