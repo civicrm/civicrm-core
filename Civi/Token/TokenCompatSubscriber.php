@@ -71,7 +71,7 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
     // has an extra construct '{ }' which will resolve what is inside the {} if the
     // tokens on either side are resolved to 'something' (ie there is some sort of
     // non whitespace character after the string.
-    // Accepted variants of { } are {`} {|} {,} {`} {*} {-} {(} {)}
+    // Accepted variants of { } are {|} {,} {`} {*} {-} {(} {)}
     // In each case any amount of preceding or trailing whitespace is acceptable.
     // The accepted variants list contains known or suspected real world usages.
     // Regex is to capture  { followed by 0 or more white spaces followed by
@@ -81,6 +81,8 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
     // the captured string is followed by 1 or more non-white spaces.
     // If it is repeated it will be replaced by the first input -
     // ie { }{ } will be replaced by the content of the latter token.
+    // except that {(}, {)} and {`} are treated differently: repeated tokens are both removed
+    // eg {contact.first_name}{ }{ (}{contact.nick_name}{) }{contact.last_name} becomes "First Last", not "First )Last"
     // Check testGenerateDisplayNameCustomFormats for test cover.
     // and testMailingLabel
     // This first regex targets anything like {, }{ } - where the presence of the space
@@ -88,11 +90,41 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
     // {contact.address_primary.city}{, }{contact.address_primary.state_province_id:label}{ }{contact.address_primary.postal_code}
     // Where state_province is not present. No perfect solution here but we
     // do want to keep the comma in this case.
-    $e->string = preg_replace('/\\\\|{(\s*([,`~()\-*|])*\s*)?}}*({\s})/', '$1', $e->string);
-    $e->string = preg_replace('/\\\\|{(\s*(\s|,|`|~|\(|\)|-|\*|\|)*\s*)?\}}*(?=[^{\s])/', '$1', $e->string);
-    // Now do a another pass, removing any remaining instances (which will get rid of any that were not
-    // followed by something).
-    $e->string = preg_replace('/\\\\|' . '\{(\s*(\s|,|`|~|\(|\)|-|\*|\|)*\s?)?\}/', '', $e->string);
+
+    // Pattern to match all curlies
+    $any_curly = '\{(?:\s+|\s*[,~()`\-*|]*\s*)\}';
+
+    // Pattern to match curlies occuring in pairs - ie {(} {)} {`}
+    $paired_curly = '\{(?:\s*[`()]\s*)\}';
+
+    // Pattern to match other curlies
+    $unpaired_curly = '\{(?:\s+|\s*[,~\-*|]*\s*)\}';
+
+    // Captures the inside of a curly
+    $curly_inner = '\{(\s+|\s*[,~()`\-*|]*\s*)\}';
+
+    $regexes = [];
+
+    // Special oddball for addresses: {, }{ } -> {, }
+    $regexes[] = ["/(\{,\s+\})\s*\{\s+\}/", '$1'];
+
+    // Remove two adjacent paired curlies
+    $regexes[] = ["/$paired_curly\s*$paired_curly/", ''];
+
+    // Replace multiple adjacent curlies with the last
+    $regexes[] = ["/(?:$any_curly\s*)+($any_curly)/", '$1'];
+
+    // Remove leading unpaired curly
+    $regexes[] = ["/^\s*$unpaired_curly/", ''];
+
+    // Remove trailing unpaired curly
+    $regexes[] = ["/$unpaired_curly\s*$/", ''];
+
+    // Finally replace curlies with the inner content
+    $regexes[] = ["/$curly_inner/", '$1'];
+
+    $e->string = preg_replace(array_column($regexes, 0), array_column($regexes, 1), $e->string);
+
     if ($useSmarty) {
       $smartyVars = [];
       foreach ($e->context['smartyTokenAlias'] ?? [] as $smartyName => $tokenName) {

@@ -76,7 +76,12 @@ return [
         'type' => 'table',
         'settings' => [
           'description' => NULL,
-          'sort' => [],
+          'sort' => [
+            [
+              'register_date',
+              'DESC',
+            ],
+          ],
           'limit' => 50,
           'pager' => [
             'show_count' => TRUE,
