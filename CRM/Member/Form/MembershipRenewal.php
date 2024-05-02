@@ -215,8 +215,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $scTypes = CRM_Core_OptionGroup::values('soft_credit_type');
     $defaults['soft_credit_type_id'] = CRM_Utils_Array::value(ts('Gift'), array_flip($scTypes));
 
-    $renewalDate = $defaults['renewal_date'] ?? NULL;
-    $this->assign('renewalDate', $renewalDate);
+    $this->assign('renewalDate', $defaults['renewal_date']);
     $this->assign('member_is_test', $defaults['member_is_test'] ?? NULL);
 
     if ($this->_mode) {
@@ -566,8 +565,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       $this->assign('trxn_id', $result['trxn_id']);
     }
 
-    $renewalDate = !empty($this->_params['renewal_date']) ? $renewalDate = $this->_params['renewal_date'] : NULL;
-
     // chk for renewal for multiple terms CRM-8750
     $numRenewTerms = 1;
     if (is_numeric($this->_params['num_terms'] ?? '')) {
@@ -594,7 +591,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     if ($contributionRecurID) {
       $membershipParams['contribution_recur_id'] = $contributionRecurID;
     }
-    $membership = $this->processMembership($membershipParams, $renewalDate, $numRenewTerms, $pending);
+    $membership = $this->processMembership($membershipParams, $this->getSubmittedValue('renewal_date'), $numRenewTerms, $pending);
 
     if (!empty($this->_params['record_contribution']) || $this->_mode) {
       // set the source
