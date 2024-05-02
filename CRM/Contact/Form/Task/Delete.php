@@ -247,11 +247,21 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
     }
     // Alert user of any failures
     if ($not_deleted) {
-      $status = ts('The contact might be the Membership Organization of a Membership Type. You will need to edit the Membership Type and change the Membership Organization before you can delete this contact.');
       $title = ts('Unable to Delete');
+      // If the contact has a CMS account, you can't delete them. The deletion
+      // call just returns TRUE or FALSE, so we check if they have a CMS account
+      // Note: we're not using CRM_Core_BAO_UFMatch::getUFId() because that's cached.
+      $ufmatch = new CRM_Core_DAO_UFMatch();
+      $ufmatch->contact_id = $cid;
+      $ufmatch->domain_id = CRM_Core_Config::domainID();
+      if ($ufmatch->find(TRUE)) {
+        $status = ts('The contact has a CMS account. You will need to delete it before you can delete this contact.');
+      }
+      else {
+        $status = ts('The contact might be the Membership Organization of a Membership Type. You will need to edit the Membership Type and change the Membership Organization before you can delete this contact.');
+      }
       $session->setStatus('<ul><li>' . implode('</li><li>', $not_deleted) . '</li></ul>' . $status, $title, 'error');
     }
-
     if (isset($this->_sharedAddressMessage) && $this->_sharedAddressMessage['count'] > 0) {
       if (count($this->_sharedAddressMessage['contactList']) == 1) {
         $message = ts('The following contact had been sharing an address with a contact you just deleted. Their address will no longer be shared, but has not been removed or altered.');
