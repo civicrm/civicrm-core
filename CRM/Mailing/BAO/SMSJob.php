@@ -158,7 +158,7 @@ class CRM_Mailing_BAO_SMSJob extends CRM_Mailing_BAO_MailingJob {
       ];
       CRM_Utils_Hook::alterMailParams($mailParams, 'civimail');
       $body = $mailParams['text'];
-      $headers = ['To' => $field['phone']];
+      $headers = ['To' => $field['phone'], 'contact_id' => $contact['id']];
 
       try {
         $result = $mailer->send($headers['To'], $headers, $body, $this->id);

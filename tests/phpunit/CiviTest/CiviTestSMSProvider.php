@@ -46,6 +46,8 @@ class CiviTestSMSProvider extends CRM_SMS_Provider {
 
   public function send($recipients, $header, $message, $dncID = NULL) {
     $this->sentMessage = $message;
+    $sid = substr(str_shuffle('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'), 0, 16);
+    $this->createActivity($sid, $message, $header, $dncID);
   }
 
   /**
