@@ -523,6 +523,8 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
           'url' => 'civicrm/contact/view/membership',
           'qs' => 'action=view&reset=1&cid=%%cid%%&id=%%id%%&context=membership&selectedChild=member',
           'title' => ts('View Membership'),
+          // The constants are a bit backward - VIEW comes after UPDATE
+          'weight' => 2,
         ],
       ];
     }
@@ -534,24 +536,29 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
           'url' => 'civicrm/contact/view/membership',
           'qs' => 'action=update&reset=1&cid=%%cid%%&id=%%id%%&context=membership&selectedChild=member',
           'title' => ts('Edit Membership'),
+          // The constants are a bit backward - VIEW comes after UPDATE
+          'weight' => 4,
         ],
         CRM_Core_Action::RENEW => [
           'name' => ts('Renew'),
           'url' => 'civicrm/contact/view/membership',
           'qs' => 'action=renew&reset=1&cid=%%cid%%&id=%%id%%&context=membership&selectedChild=member',
           'title' => ts('Renew Membership'),
+          'weight' => CRM_Core_Action::RENEW,
         ],
         CRM_Core_Action::FOLLOWUP => [
           'name' => ts('Renew-Credit Card'),
           'url' => 'civicrm/contact/view/membership',
           'qs' => 'action=renew&reset=1&cid=%%cid%%&id=%%id%%&context=membership&selectedChild=member&mode=live',
           'title' => ts('Renew Membership Using Credit Card'),
+          'weight' => CRM_Core_Action::FOLLOWUP,
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/contact/view/membership',
           'qs' => 'action=delete&reset=1&cid=%%cid%%&id=%%id%%&context=membership&selectedChild=member',
           'title' => ts('Delete Membership'),
+          'weight' => CRM_Core_Action::DELETE,
         ],
       ];
       if (!$isPaymentProcessor || !$accessContribution) {
@@ -570,6 +577,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
         'qs' => 'reset=1&cid=%%cid%%&mid=%%id%%&context=membership&selectedChild=member',
         'title' => ts('Cancel Auto Renew Subscription'),
         'extra' => 'onclick = "if (confirm(\'' . $cancelMessage . '\') ) {  return true; else return false;}"',
+        'weight' => CRM_Core_Action::DISABLE,
       ];
     }
     elseif (isset(self::$_links['all'][CRM_Core_Action::DISABLE])) {
@@ -582,6 +590,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
         'url' => 'civicrm/contribute/updatebilling',
         'qs' => 'reset=1&cid=%%cid%%&mid=%%id%%&context=membership&selectedChild=member',
         'title' => ts('Change Billing Details'),
+        'weight' => CRM_Core_Action::MAP,
       ];
     }
     elseif (isset(self::$_links['all'][CRM_Core_Action::MAP])) {
