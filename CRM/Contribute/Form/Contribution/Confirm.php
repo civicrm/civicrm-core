@@ -703,7 +703,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           if ($selectedMembershipTypeID != NULL) {
             if ($memType['id'] == $selectedMembershipTypeID) {
               $this->assign('minimum_fee', $memType['minimum_fee'] ?? NULL);
-              $this->assign('membership_name', $memType['name']);
               if ($cid) {
                 $membership = new CRM_Member_DAO_Membership();
                 $membership->contact_id = $cid;
@@ -1330,7 +1329,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $membershipTypes = CRM_Member_BAO_Membership::buildMembershipTypeValues($this, $membershipTypeIDs);
     $membershipType = empty($membershipTypes) ? [] : reset($membershipTypes);
 
-    $this->assign('membership_name', $membershipType['name']);
     $this->_values['membership_name'] = $membershipType['name'] ?? NULL;
 
     $isPaidMembership = FALSE;
