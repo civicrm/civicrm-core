@@ -103,23 +103,27 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
     // Captures the inside of a curly
     $curly_inner = '\{(\s+|\s*[,~()`\-*|]*\s*)\}';
 
+    $regexes = [];
+
     // Special oddball for addresses: {, }{ } -> {, }
-    $e->string = preg_replace("/(\{,\s+\})\s*\{\s+\}/", '$1', $e->string);
+    $regexes[] = ["/(\{,\s+\})\s*\{\s+\}/", '$1'];
 
     // Remove two adjacent paired curlies
-    $e->string = preg_replace("/$paired_curly\s*$paired_curly/", '', $e->string);
+    $regexes[] = ["/$paired_curly\s*$paired_curly/", ''];
 
     // Replace multiple adjacent curlies with the last
-    $e->string = preg_replace("/(?:$any_curly\s*)+($any_curly)/", '$1', $e->string);
+    $regexes[] = ["/(?:$any_curly\s*)+($any_curly)/", '$1'];
 
     // Remove leading unpaired curly
-    $e->string = preg_replace("/^\s*$unpaired_curly/", '', $e->string);
+    $regexes[] = ["/^\s*$unpaired_curly/", ''];
 
     // Remove trailing unpaired curly
-    $e->string = preg_replace("/$unpaired_curly\s*$/", '', $e->string);
+    $regexes[] = ["/$unpaired_curly\s*$/", ''];
 
     // Finally replace curlies with the inner content
-    $e->string = preg_replace("/$curly_inner/", '$1', $e->string);
+    $regexes[] = ["/$curly_inner/", '$1'];
+
+    $e->string = preg_replace(array_column($regexes, 0), array_column($regexes, 1), $e->string);
 
     if ($useSmarty) {
       $smartyVars = [];
