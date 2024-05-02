@@ -129,6 +129,11 @@ class CRM_Contact_BAO_IndividualTest extends CiviUnitTestCase {
     return [
       'Nick name with tilde' => ['{contact.first_name}{ }{contact.last_name}{ ~ }{contact.nick_name}', 'Michael Jackson ~ Mick'],
       'Empty nick name' => ['{contact.first_name}{ }{contact.last_name}{ ~ }{contact.nick_name}', 'Michael Jackson', ['nick_name' => '']],
+      'Nick name with tilde, empty nick' => ['{contact.first_name}{ }{contact.last_name}{ ~ }{contact.nick_name}', 'Michael Jackson', ['nick_name' => '']],
+      'Nick name surrounding brackets' => ['{contact.first_name}{ }{ (}{contact.nick_name}{) }{contact.last_name}', 'Michael (Mick) Jackson'],
+      'Nick name surrounding brackets, empty nick' => ['{contact.first_name}{ }{ (}{contact.nick_name}{) }{contact.last_name}', 'Michael Jackson', ['nick_name' => '']],
+      'Nick name surrounding brackets at end' => ['{contact.first_name}{ }{contact.last_name}{ (}{contact.nick_name}{)}', 'Michael Jackson (Mick)'],
+      'Nick name surrounding brackets at end, empty nick' => ['{contact.first_name}{ }{contact.last_name}{ (}{contact.nick_name}{)}', 'Michael Jackson', ['nick_name' => '']],
       'No Nick Name but Prefix' => ['{contact.individual_prefix}{ }{contact.first_name}{ }{contact.middle_name}{ }{contact.last_name}{ }{contact.individual_suffix}{ ~ }{contact.nick_name}', 'Mr. Michael Jackson Jr.', ['nick_name' => '']],
     ];
   }
