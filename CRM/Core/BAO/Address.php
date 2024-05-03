@@ -942,36 +942,82 @@ SELECT is_primary,
    * @param string $parentOperation Operation being taken on the parent entity.
    */
   public static function processSharedAddress($addressId, $params, $parentOperation = NULL) {
+    // Collect all downstream records of our record so we can update them.
     $query = 'SELECT id, contact_id FROM civicrm_address WHERE master_id = %1';
-    $dao = CRM_Core_DAO::executeQuery($query, [1 => [$addressId, 'Integer']]);
+    $downstreamDao = CRM_Core_DAO::executeQuery($query, [1 => [$addressId, 'Integer']]);
 
     // Default to TRUE if not set to maintain api backward compatibility.
     $createRelationship = $params['add_relationship'] ?? TRUE;
 
-    // unset contact id
-    $skipFields = ['is_primary', 'location_type_id', 'is_billing', 'contact_id'];
-    if (isset($params['master_id']) && !CRM_Utils_System::isNull($params['master_id'])) {
-      if ($createRelationship) {
-        // call the function to create a relationship for the new shared address
-        self::processSharedAddressRelationship($params['master_id'], $params['contact_id']);
-      }
+    // If master_id is set and has a value, we should use it. If it's set and
+    // there is no value, we use the empty value. If it is not set, we should
+    // look it up in the database (could be an update that is not sending the
+    // master id, e.g. a contact added via a profile that is matched with an
+    // exiting contact).
+    if (!array_key_exists('master_id', $params)) {
+      $masterId = \Civi\Api4\Address::get(FALSE)
+        ->addWhere('id', '=', $addressId)
+        ->addSelect('master_id')
+        ->execute()->first()['master_id'] ?? NULL;
     }
     else {
-      // else no new shares will be created, only update shared addresses
-      $skipFields[] = 'master_id';
+      $masterId = $params['master_id'] ?? NULL;
     }
+
+    if ($masterId) {
+      if ($createRelationship) {
+        $contactId = $params['contact_id'] ?? NULL;
+        if (!$contactId) {
+          $contactId = \Civi\Api4\Address::get(FALSE)
+            ->addWhere('id', '=', $addressId)
+            ->addSelect('contact_id')
+            ->execute()->first()['contact_id'];
+        }
+        // call the function to create a relationship for the new shared address
+        self::processSharedAddressRelationship($masterId, $contactId);
+      }
+
+      // Collect the upstream record so we can update it.
+      $query = 'SELECT id, contact_id FROM civicrm_address WHERE id = %1';
+      $upstreamDao = CRM_Core_DAO::executeQuery($query, [1 => [$masterId, 'Integer']]);
+    }
+
+    // These fields never get copied to shared addresses, upstream or down.
+    $skipFields = [
+      'is_primary',
+      'location_type_id',
+      'is_billing',
+      'contact_id',
+    ];
     foreach ($skipFields as $value) {
       unset($params[$value]);
     }
 
-    $addressDAO = new CRM_Core_DAO_Address();
-    while ($dao->fetch()) {
+    while ($downstreamDao->fetch()) {
       // call the function to update the relationship
-      if ($createRelationship && isset($params['master_id']) && !CRM_Utils_System::isNull($params['master_id'])) {
-        self::processSharedAddressRelationship($params['master_id'], $dao->contact_id);
+      if ($masterId) {
+        // If we have a master_id AND we have downstream addresses, this is
+        // untenable. Ensure we overwrite the downstream addresses so they have
+        // a direct relationship with our master_id
+        $params['master_id'] = $masterId;
       }
+      elseif ($createRelationship) {
+        self::processSharedAddressRelationship($addressId, $downstreamDao->contact_id);
+      }
+
+      $addressDAO = new CRM_Core_DAO_Address();
       $addressDAO->copyValues($params);
-      $addressDAO->id = $dao->id;
+      $addressDAO->id = $downstreamDao->id;
+      $addressDAO->save();
+      $addressDAO->copyCustomFields($addressId, $addressDAO->id, $parentOperation);
+    }
+    if ($masterId) {
+      // Update the upstream address. But don't copy up the master_id.
+      unset($params['master_id']);
+      $addressDAO = new CRM_Core_DAO_Address();
+      $upstreamDao->fetch();
+      $addressDAO->copyValues($params);
+      $addressDAO->id = $upstreamDao->id;
       $addressDAO->save();
       $addressDAO->copyCustomFields($addressId, $addressDAO->id, $parentOperation);
     }
