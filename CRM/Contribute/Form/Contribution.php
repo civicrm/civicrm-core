@@ -1594,7 +1594,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       'amount_level' => $params['amount_level'] ?? NULL,
       'invoice_id' => $params['invoiceID'],
       'currency' => $params['currencyID'],
-      'is_pay_later' => $params['is_pay_later'] ?? 0,
+      'is_pay_later' => $this->isPayLater(),
       //configure cancel reason, cancel date and thankyou date
       //from 'contribution' type profile if included
       'cancel_reason' => $params['cancel_reason'] ?? 0,
@@ -1981,17 +1981,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       if ($this->_id && $action & CRM_Core_Action::UPDATE) {
         // Can only be updated to contribution which is handled via Payment.create
         $params['contribution_status_id'] = $this->getSubmittedValue('contribution_status_id');
-
-        // Set is_pay_later flag for back-office offline Pending status contributions CRM-8996
-        // else if contribution_status is changed to Completed is_pay_later flag is changed to 0, CRM-15041
-        if ($params['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending')) {
-          $params['is_pay_later'] = 1;
-        }
-        elseif ($params['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed')) {
-          // @todo - if the contribution is new then it should be Pending status & then we use
-          // Payment.create to update to Completed.
-          $params['is_pay_later'] = 0;
-        }
       }
 
       $params['revenue_recognition_date'] = NULL;
@@ -2539,6 +2528,28 @@ WHERE  contribution_id = {$id}
     }
 
     $form->add('checkbox', 'is_recur', $is_recur_label, NULL);
+  }
+
+  /**
+   *
+   * @return bool|null
+   * @throws \CRM_Core_Exception
+   */
+  private function isPayLater(): bool {
+    $submittedStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $this->getSubmittedValue('contribution_status_id'));
+    if ($this->getAction() === CRM_Core_Action::ADD) {
+      // New contribution, base it on the status, CRM-8996
+      return $submittedStatus === 'Pending';
+    }
+    if ($this->_mode) {
+      return FALSE;
+    }
+    // (This is historical but has been questioned)
+    // If contribution_status Completed changed to FALSE, CRM-15041
+    if ($submittedStatus === 'Completed') {
+      return TRUE;
+    }
+    return $this->getContributionValue('is_pay_later');
   }
 
 }
