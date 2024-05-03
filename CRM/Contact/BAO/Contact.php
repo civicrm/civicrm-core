@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contact;
 use Civi\Api4\Event\AuthorizeRecordEvent;
 use Civi\Token\TokenProcessor;
 
@@ -1151,7 +1152,11 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
         // $controller is not used at all but we need the CRM_Core_Controller object as in it's constructor
         // It retrieves the qfKey from GET or POST and then passes it to CRM_Core_Key::validate the generated key and redirects to a standard error message if fails
         $controller = new CRM_Core_Controller_Simple($formName, ts('New Contact'), NULL, TRUE, FALSE);
-        if (!CRM_Contact_BAO_Contact::_checkAccess('Contact', 'update', ['id' => $cid], NULL)) {
+
+        if (!Contact::checkAccess()
+          ->setAction('update')
+          ->addValue('id', $cid)
+          ->execute()->first()['access']) {
           CRM_Utils_System::permissionDenied();
         }
         CRM_Contact_BAO_Contact::deleteContactImage($cid);
