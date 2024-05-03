@@ -1223,6 +1223,7 @@
     "templates/CRM/Contribute/Form/Task/SearchTaskHookSample.tpl",
     "templates/CRM/Contribute/Import/Form/MapTable.tpl",
     "templates/CRM/Contribute/Import/Form/Summary.tpl",
+    "templates/CRM/Core/Form/RecurringEntity.hlp",
     "templates/CRM/Core/paypalexpress.tpl",
     "templates/CRM/Custom/Form/ChangeFieldType.tpl",
     "templates/CRM/Custom/Form/Edit.tpl",
