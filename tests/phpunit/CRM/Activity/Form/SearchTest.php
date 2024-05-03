@@ -7,6 +7,13 @@
 class CRM_Activity_Form_SearchTest extends CiviUnitTestCase {
 
   /**
+   * API version in use.
+   *
+   * @var int
+   */
+  protected $_apiversion = 4;
+
+  /**
    * @var int
    */
   protected $individualID;

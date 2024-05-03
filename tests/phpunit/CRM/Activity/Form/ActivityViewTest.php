@@ -6,6 +6,13 @@
 class CRM_Activity_Form_ActivityViewTest extends CiviUnitTestCase {
 
   /**
+   * API version in use.
+   *
+   * @var int
+   */
+  protected $_apiversion = 4;
+
+  /**
    * @var int
    */
   protected $source_contact_id;
@@ -69,7 +76,7 @@ class CRM_Activity_Form_ActivityViewTest extends CiviUnitTestCase {
     $activity = $this->activityCreate();
 
     // $activity doesn't contain everything we need, so do another get call
-    $activityMoreInfo = $this->callAPISuccess('activity', 'getsingle', ['id' => $activity['id']]);
+    $activityMoreInfo = $this->callAPISuccess('Activity', 'getsingle', ['id' => $activity['id'], 'version' => 3]);
 
     // do preProcess
     $activityViewForm = new CRM_Activity_Form_ActivityView();

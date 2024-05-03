@@ -11,6 +11,13 @@ use Civi\Test\Invasive;
  */
 class CRM_Activity_Form_ActivityTest extends CiviUnitTestCase {
 
+  /**
+   * API version in use.
+   *
+   * @var int
+   */
+  protected $_apiversion = 4;
+
   use FormTrait;
 
   protected $assignee1;
@@ -190,6 +197,7 @@ class CRM_Activity_Form_ActivityTest extends CiviUnitTestCase {
       'entity_id' => $activity['id'],
       'entity_table' => 'civicrm_activity',
       'content' => 'delete me',
+      'version' => 3,
     ]);
     $this->assertNotEmpty($attachment['id']);
 

@@ -1486,12 +1486,12 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @return array
    *   ids of created objects
    */
-  public function entityCustomGroupWithSingleStringMultiSelectFieldCreate($function, $filename) {
+  public function entityCustomGroupWithSingleStringMultiSelectFieldCreate($function, $filename): array {
     $params = ['title' => $function];
     $entity = substr(basename($filename), 0, strlen(basename($filename)) - 8);
     $params['extends'] = $entity ?: 'Contact';
     $customGroup = $this->customGroupCreate($params);
-    $customField = $this->customFieldCreate(['custom_group_id' => $customGroup['id'], 'label' => $function, 'html_type' => 'Multi-Select', 'default_value' => 1]);
+    $customField = $this->customFieldCreate(['version' => 3, 'custom_group_id' => $customGroup['id'], 'label' => $function, 'html_type' => 'Multi-Select', 'default_value' => 1]);
     CRM_Core_PseudoConstant::flush();
     $options = [
       'defaultValue' => 'Default Value',
@@ -1500,7 +1500,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'NULL' => 'NULL',
     ];
     $custom_field_params = ['sequential' => 1, 'id' => $customField['id']];
-    $custom_field_api_result = $this->callAPISuccess('custom_field', 'get', $custom_field_params);
+    $custom_field_api_result = $this->callAPISuccess('CustomField', 'get', $custom_field_params);
     $this->assertNotEmpty($custom_field_api_result['values'][0]['option_group_id']);
     $option_group_params = ['sequential' => 1, 'id' => $custom_field_api_result['values'][0]['option_group_id']];
     $option_group_result = $this->callAPISuccess('OptionGroup', 'get', $option_group_params);
