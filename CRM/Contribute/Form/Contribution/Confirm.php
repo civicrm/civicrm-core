@@ -29,9 +29,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
 
   /**
-   * The id of the contribution object that is created when the form is submitted.
+   * The id of the contribution object that is created when the form is submitted, or passed in.
    *
    * @var int
+   *
+   * @deprecated use getContributionID()
    */
   public $_contributionID;
 
@@ -1045,8 +1047,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
       $contribution = CRM_Contribute_BAO_Contribution::add($contributionParams);
 
-      // lets store it in the form variable so postProcess hook can get to this and use it
-      $form->_contributionID = $contribution->id;
+      // lets store it in the form variable so postProcess hook can access it via getContributionID()
+      $this->_contributionID = $contribution->id;
     }
     // @fixme: This is assigned to the smarty template for the receipt. It's value should be calculated and not taken from $params.
     $form->assign('totalTaxAmount', $params['tax_amount'] ?? NULL);
@@ -1915,6 +1917,19 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
+   * Get the contribution ID.
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @return int|null
+   */
+  public function getContributionID(): ?int {
+    return $this->_ccid ?: $this->_contributionID;
+  }
+
+  /**
    * Helper function for static submit function.
    *
    * Set relevant params - help us to build up an array that we can pass in.
@@ -1965,8 +1980,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $this->_params['is_pay_later'] = $isPayLater = TRUE;
     }
 
-    if (!empty($this->_ccid)) {
-      $this->_params['contribution_id'] = $this->_ccid;
+    if ($this->getContributionID()) {
+      $this->_params['contribution_id'] = $this->getContributionID();
     }
     //Set email-bltID if pre/post profile contains an email.
     if ($this->_emailExists == TRUE) {
@@ -2372,8 +2387,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
       catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
         CRM_Core_Session::singleton()->setStatus($e->getMessage());
-        if (!empty($this->_contributionID)) {
-          CRM_Contribute_BAO_Contribution::failPayment($this->_contributionID,
+        if ($this->getContributionID()) {
+          CRM_Contribute_BAO_Contribution::failPayment($this->getContributionID(),
             $contactID, $e->getMessage());
         }
         CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact', "_qf_Main_display=true&qfKey={$this->_params['qfKey']}"));
