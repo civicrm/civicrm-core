@@ -17,7 +17,7 @@ Other resources for identifying changes are:
 
 ## CiviCRM 5.73.0
 
-Released May 1, 2024
+Released May 2, 2024
 
 - **[Synopsis](release-notes/5.73.0.md#synopsis)**
 - **[Features](release-notes/5.73.0.md#features)**

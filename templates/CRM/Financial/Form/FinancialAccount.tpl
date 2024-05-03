@@ -75,9 +75,7 @@
       </td>
     </tr>
   </table>
-  <details id="financial_account_custom_field_extension_section" class="crm-accordion-wrapper crm-financial-account-panel" open>
-    {include file="CRM/common/customDataBlock.tpl" groupID='' customDataType='FinancialAccount' customDataSubType=false cid=false}
-  </details>
+  {include file="CRM/common/customDataBlock.tpl" groupID='' customDataType='FinancialAccount' customDataSubType=false cid=false}
 {/if}
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="botttom"}</div>
+<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="botttom"}</div>
 </div>
