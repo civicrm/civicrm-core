@@ -12,8 +12,8 @@
     <url desc="Documentation">https://docs.civicrm.org/user/en/latest/reporting/what-is-civireport/</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
-  <releaseDate>2024-04-04</releaseDate>
-  <version>5.74.alpha1</version>
+  <releaseDate>2024-05-02</releaseDate>
+  <version>5.74.beta1</version>
   <develStage>stable</develStage>
   <tags>
     <tag>component</tag>
