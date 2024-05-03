@@ -264,7 +264,7 @@ trait DAOActionTrait {
 
       // Match contact id to strings like "user_contact_id"
       // FIXME handle arrays for multi-value contact reference fields, etc.
-      if ($field['data_type'] === 'ContactReference' && is_string($value) && !is_numeric($value)) {
+      if (in_array($field['data_type'], ['ContactReference', 'EntityReference']) && is_string($value) && !is_numeric($value)) {
         // FIXME decouple from v3 API
         require_once 'api/v3/utils.php';
         $value = \_civicrm_api3_resolve_contactID($value);
