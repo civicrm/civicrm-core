@@ -2639,12 +2639,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         foreach ($this->_relatedObjects['membership'] as $membership) {
           if ($membership->id) {
             $values['membership_id'] = $membership->id;
-            // need to set the membership values here
-            $template->assign('membership_name',
-              CRM_Member_PseudoConstant::membershipType($membership->membership_type_id)
-            );
             $membership_status = CRM_Member_PseudoConstant::membershipStatus($membership->status_id, NULL, 'label');
-            $template->assign('mem_status', $membership_status);
             if ($membership_status === 'Pending' && $membership->is_pay_later == 1) {
               $values['is_pay_later'] = 1;
             }

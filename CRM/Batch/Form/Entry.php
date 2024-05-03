@@ -900,32 +900,18 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    *
    */
   protected function emailReceipt($form, &$formValues): bool {
-    $membership = new CRM_Member_BAO_Membership();
-    $membership->id = $this->getCurrentRowMembershipID();
-    $membership->find(TRUE);
     // @todo figure out how much of the stuff below is genuinely shared with the batch form & a logical shared place.
     if (!empty($formValues['payment_instrument_id'])) {
       $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
       $formValues['paidBy'] = $paymentInstrument[$formValues['payment_instrument_id']];
     }
 
+    // @todo - as of 5.74 module is noisy deprecated - can stop assigning around 5.80.
     $form->assign('module', 'Membership');
-    $form->assign('contactID', $formValues['contact_id']);
-
-    if (!empty($formValues['contribution_status_id'])) {
-      $form->assign('contributionStatusID', $formValues['contribution_status_id']);
-      $form->assign('contributionStatus', CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $formValues['contribution_status_id']));
-    }
 
     $form->assign('receiptType', $this->currentRowIsRenew() ? 'membership renewal' : 'membership signup');
-    $form->assign('receive_date', $formValues['receive_date'] ?? NULL);
+    // @todo - as of 5.74 form values is noisy deprecated - can stop assigning around 5.80.
     $form->assign('formValues', $formValues);
-
-    $form->assign('mem_start_date', CRM_Utils_Date::formatDateOnlyLong($membership->start_date));
-    if (!CRM_Utils_System::isNull($membership->end_date)) {
-      $form->assign('mem_end_date', CRM_Utils_Date::formatDateOnlyLong($membership->end_date));
-    }
-    $form->assign('membership_name', CRM_Member_PseudoConstant::membershipType($membership->membership_type_id));
 
     [$contributorDisplayName, $contributorEmail]
       = CRM_Contact_BAO_Contact_Location::getEmailDetails($formValues['contact_id']);

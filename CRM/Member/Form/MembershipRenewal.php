@@ -628,18 +628,16 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     }
 
     if (!empty($this->_params['send_receipt'])) {
-      $this->sendReceipt($membership);
+      $this->sendReceipt();
     }
   }
 
   /**
    * Send a receipt.
    *
-   * @param CRM_Member_BAO_Membership $membership
-   *
    * @throws \CRM_Core_Exception
    */
-  protected function sendReceipt($membership) {
+  protected function sendReceipt() {
     $receiptFrom = $this->_params['from_email_address'];
 
     if (!empty($this->_params['payment_instrument_id'])) {
@@ -668,21 +666,11 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     CRM_Core_BAO_UFGroup::getValues($this->_contactID, $customFields, $customValues, FALSE, $members);
 
     $this->assign('formValues', $this->_params);
-
-    $this->assign('membership_name', CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
-      $membership->membership_type_id
-    ));
     $this->assign('customValues', $customValues);
 
-    $membership_status = CRM_Member_PseudoConstant::membershipStatus($membership->status_id, NULL, 'label');
-    $this->assign('mem_status', $membership_status);
-    $this->assign('mem_join_date', CRM_Utils_Date::formatDateOnlyLong($membership->join_date));
-    $this->assign('mem_start_date', CRM_Utils_Date::formatDateOnlyLong($membership->start_date));
-    $this->assign('mem_end_date', CRM_Utils_Date::formatDateOnlyLong($membership->end_date));
     if ($this->_mode) {
       $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters(
         $this->_params,
-        $this->_bltID
       ));
 
       $this->assign('is_pay_later', 0);

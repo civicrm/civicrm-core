@@ -356,7 +356,6 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
           if ($selectedMembershipTypeID != NULL) {
             if ($memType['id'] == $selectedMembershipTypeID) {
               $this->assign('minimum_fee', $memType['minimum_fee'] ?? NULL);
-              $this->assign('membership_name', $memType['name']);
               $membershipTypes[] = $memType;
             }
           }

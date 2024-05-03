@@ -942,7 +942,6 @@ DESC limit 1");
    *
    */
   protected function emailReceipt($formValues) {
-    $membership = $this->getMembership();
     // retrieve 'from email id' for acknowledgement
     $receiptFrom = $formValues['from_email_address'] ?? NULL;
 
@@ -951,20 +950,8 @@ DESC limit 1");
       $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
       $formValues['paidBy'] = $paymentInstrument[$formValues['payment_instrument_id']];
     }
-
+    // @todo - as of 5.74 module is noisy deprecated - can stop assigning around 5.80.
     $this->assign('module', 'Membership');
-
-    if (!empty($formValues['contribution_id'])) {
-      $this->assign('currency', CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $formValues['contribution_id'], 'currency'));
-    }
-    else {
-      $this->assign('currency', CRM_Core_Config::singleton()->defaultCurrency);
-    }
-
-    if (!empty($formValues['contribution_status_id'])) {
-      $this->assign('contributionStatusID', $formValues['contribution_status_id']);
-      $this->assign('contributionStatus', CRM_Contribute_PseudoConstant::contributionStatus($formValues['contribution_status_id'], 'name'));
-    }
 
     if (!empty($formValues['is_renew'])) {
       $this->assign('receiptType', 'membership renewal');
@@ -972,14 +959,8 @@ DESC limit 1");
     else {
       $this->assign('receiptType', 'membership signup');
     }
-    $this->assign('receive_date', $formValues['receive_date'] ?? NULL);
+    // @todo - as of 5.74 form values is noisy deprecated - can stop assigning around 5.80.
     $this->assign('formValues', $formValues);
-
-    $this->assign('mem_start_date', CRM_Utils_Date::formatDateOnlyLong($membership['start_date']));
-    if (!CRM_Utils_System::isNull($membership['end_date'])) {
-      $this->assign('mem_end_date', CRM_Utils_Date::formatDateOnlyLong($membership['end_date']));
-    }
-    $this->assign('membership_name', CRM_Member_PseudoConstant::membershipType($membership['membership_type_id']));
 
     if ((empty($this->_contributorDisplayName) || empty($this->_contributorEmail))) {
       // in this case the form is being called statically from the batch editing screen

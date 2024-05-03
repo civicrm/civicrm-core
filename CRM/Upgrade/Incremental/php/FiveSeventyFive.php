@@ -29,6 +29,48 @@ class CRM_Upgrade_Incremental_php_FiveSeventyFive extends CRM_Upgrade_Incrementa
    */
   public function upgrade_5_75_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Replace mem_join_date smarty token in offline membership template',
+      'updateMessageToken', 'membership_offline_receipt', '$mem_join_date', 'membership.join_date|crmDate:"Full"', $rev
+    );
+    $this->addTask('Replace mem_start_date smarty token in offline membership template',
+      'updateMessageToken', 'membership_offline_receipt', '$mem_start_date', 'membership.start_date|crmDate:"Full"', $rev
+    );
+    $this->addTask('Replace mem_end_date smarty token in offline membership template',
+      'updateMessageToken', 'membership_offline_receipt', '$mem_end_date', 'membership.end_date|crmDate:"Full"', $rev
+    );
+    $this->addTask('Replace membership_name smarty token in offline membership template',
+      'updateMessageToken', 'membership_offline_receipt', '$membership_name', 'membership.membership_type_id:name', $rev
+    );
+    $this->addTask('Replace mem_status smarty token in offline membership template',
+      'updateMessageToken', 'membership_offline_receipt', '$membership_status', 'membership.status_id:name', $rev
+    );
+    $this->addTask('Replace contributionStatus smarty token in offline membership template',
+      'updateMessageToken', 'membership_offline_receipt', '$contributionStatus', 'contribution.contribution_status_id:name', $rev
+    );
+    $this->addTask('Replace contributionStatusID smarty token in offline membership template',
+      'updateMessageToken', 'membership_offline_receipt', '$contributionStatusID', 'contribution.contribution_status_id', $rev
+    );
+    $this->addTask('Replace receive_date smarty token in offline membership template',
+      'updateMessageToken', 'membership_offline_receipt', '$receive_date', 'contribution.receive_date', $rev
+    );
+    $this->addTask('Replace formValues.paidBy smarty token in offline membership template',
+      'updateMessageToken', 'membership_offline_receipt', '$formValues.paidBy', 'contribution.payment_instrument_id:label', $rev
+    );
+    $this->addTask('Replace formValues.paidBy smarty token in offline membership template',
+      'updateMessageToken', 'membership_offline_receipt', '$currency', 'contribution.currency', $rev
+    );
+    $this->addTask('Replace membership_name smarty token in online membership template',
+      'updateMessageToken', 'membership_online_receipt', '$membership_name', 'membership.membership_type_id:name', $rev
+    );
+    $this->addTask('Replace mem_status smarty token in online membership template',
+      'updateMessageToken', 'membership_online_receipt', '$membership_status', 'membership.status_id:name', $rev
+    );
+    $this->addTask('Replace formValues.paidBy smarty token in online membership template',
+      'updateMessageToken', 'membership_online_receipt', '$currency', 'contribution.currency', $rev
+    );
+    $this->addTask('Replace receive_date smarty token in online membership template',
+      'updateMessageToken', 'membership_online_receipt', '$receive_date', 'contribution.receive_date', $rev
+    );
   }
 
 }
