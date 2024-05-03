@@ -1,0 +1,166 @@
+<?php
+/*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 5                                                  |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*/
+
+/**
+ * CiviCRM Path Settings
+ */
+
+/**
+ * By default, Standalone uses a helper to set paths, which provides some standalone-appropriate defaults
+ * and allows for overriding paths using env vars.
+ */
+
+// \Civi\Standalone\AppSettings::set('CIVICRM_UF_BASEURL', 'http');
+
+// \Civi\Standalone\AppSettings::set('CIVICRM_PATH_CORE', '[app_root]/core');
+// \Civi\Standalone\AppSettings::set('CIVICRM_PATH_COMPILE', '[private]/compiler_cache');
+
+
+/**
+ * File System Paths:
+ *
+ * CIVICRM_PATH_CORE is the file system path on your server where the civicrm
+ * code is installed. Use an ABSOLUTE path (not a RELATIVE path) for this setting.
+ *
+ * CIVICRM_PATH_COMPILE is the file system path where compiled templates are stored.
+ * These sub-directories and files are temporary caches and will be recreated automatically
+ * if deleted.
+ *
+ * IMPORTANT: The COMPILEDIR directory must exist,
+ * and your web server must have read/write access to these directories.
+ *
+ *
+ * EXAMPLE - Drupal:
+ * If the path to the Drupal home directory is /var/www/htdocs/drupal
+ * the CIVICRM_PATH_CORE setting would be:
+ *      \Civi\Standalone\AppSettings::set('CIVICRM_PATH_CORE', '/var/www/htdocs/drupal/sites/all/modules/civicrm/');
+ *
+ * the CIVICRM_PATH_COMPILE would be:
+ *      \Civi\Standalone\AppSettings::set( 'CIVICRM_PATH_COMPILE', '/var/www/htdocs/drupal/sites/default/files/civicrm/templates_c/');
+ *
+ * EXAMPLE - Backdrop CMS:
+ * If the path to the Backdrop home directory is /var/www/htdocs/backdrop
+ * the $civicrm_root setting would be:
+ *      \Civi\Standalone\AppSettings::set('CIVICRM_PATH_CORE', '/var/www/htdocs/backdrop/modules/civicrm/';
+ *
+ * the CIVICRM_PATH_COMPILE would be:
+ *      \Civi\Standalone\AppSettings::set( 'CIVICRM_PATH_COMPILE', '/var/www/htdocs/backdrop/files/civicrm/templates_c/');
+ *
+ * EXAMPLE - Joomla Installations:
+ * If the path to the Joomla home directory is /var/www/htdocs/joomla
+ * the $civicrm_root setting would be:
+ *      \Civi\Standalone\AppSettings::set('CIVICRM_PATH_CORE', '/var/www/htdocs/joomla/administrator/components/com_civicrm/civicrm/';
+ *
+ * the CIVICRM_PATH_COMPILE would be:
+ *      \Civi\Standalone\AppSettings::set( 'CIVICRM_PATH_COMPILE', '/var/www/htdocs/joomla/media/civicrm/templates_c/');
+ *
+ * EXAMPLE - WordPress Installations:
+ * If the path to the WordPress home directory is /var/www/htdocs/wordpress and the path to the plugin directory is /var/www/htdocs/wordpress/wp-content/plugins
+ * the $civicrm_root setting would be:
+ *     \Civi\Standalone\AppSettings::set('CIVICRM_PATH_CORE', '/var/www/htdocs/wordpress/wp-content/plugins/civicrm/civicrm/');
+ *
+ * the CIVICRM_PATH_COMPILE would be:
+ *      \Civi\Standalone\AppSettings::set( 'CIVICRM_PATH_COMPILE', '/var/www/htdocs/wordpress/wp-content/uploads/civicrm/templates_c/');
+ *
+ */
+
+
+/**
+ * Site URLs:
+ *
+ * This section defines absolute and relative URLs to access the host CMS (Backdrop, Drupal, or Joomla) resources.
+ *
+ * IMPORTANT: Trailing slashes should be used on all URL settings.
+ *
+ *
+ * EXAMPLE - Drupal Installations:
+ * If your site's home url is http://www.example.com/drupal/
+ * these variables would be set as below. Modify as needed for your install.
+ *
+ * CIVICRM_UF_BASEURL - home URL for your site:
+ *      \Civi\Standalone\AppSettings::set( 'CIVICRM_PATH_WEB_ROOT' , 'http://www.example.com/drupal/');
+ *
+ * EXAMPLE - Backdrop CMS Installations:
+ * If your site's home url is http://www.example.com/backdrop/
+ * these variables would be set as below. Modify as needed for your install.
+ *
+ * CIVICRM_UF_BASEURL - home URL for your site:
+ *      \Civi\Standalone\AppSettings::set( 'CIVICRM_PATH_WEB_ROOT' , 'http://www.example.com/backdrop/');
+ *
+ * EXAMPLE - Joomla Installations:
+ * If your site's home url is http://www.example.com/joomla/
+ *
+ * CIVICRM_UF_BASEURL - home URL for your site:
+ * Administration site:
+ *      \Civi\Standalone\AppSettings::set( 'CIVICRM_PATH_WEB_ROOT' , 'http://www.example.com/joomla/administrator/');
+ * Front-end site:
+ *      \Civi\Standalone\AppSettings::set( 'CIVICRM_PATH_WEB_ROOT' , 'http://www.example.com/joomla/');
+ *
+ */
+
+
+/**
+ * CiviCRM Settings Overrides relating to paths
+ * @see https://docs.civicrm.org/sysadmin/en/latest/customize/settings/
+ *
+ * Uncomment and edit the below as appropriate.
+ */
+
+ // Override the Temporary Files directory.
+ // \Civi\Standalone\AppSettings::set('CIVICRM_SETTINGS_UPLOAD_DIR', '/path/to/upload-dir');
+
+ // Override the custom files upload directory.
+ // \Civi\Standalone\AppSettings::set('CIVICRM_SETTINGS_CUSTOM_FILE_UPLOAD_DIR', '/path/to/custom-dir');
+
+ // Override the images directory.
+ // \Civi\Standalone\AppSettings::set('CIVICRM_SETTINGS_IMAGE_UPLOAD_DIR', '/path/to/image-upload-dir');
+
+ // Override the custom templates directory.
+ // \Civi\Standalone\AppSettings::set('CIVICRM_SETTINGS_CUSTOM_TEMPLATE_DIR', '/path/to/template-dir');
+
+ // Override the Custom php path directory.
+ // \Civi\Standalone\AppSettings::set('CIVICRM_SETTINGS_CUSTOM_PHP_PATH_DIR', '/path/to/custom-php-dir');
+
+ // Override the extensions directory.
+ // \Civi\Standalone\AppSettings::set('CIVICRM_SETTINGS_EXTENSIONS_DIR', '/path/to/extensions-dir');
+
+ // Override the resource url
+ // \Civi\Standalone\AppSettings::set('CIVICRM_SETTINGS_USER_FRAMEWORK_RESOURCE_URL'', 'http://example.com/example-resource-url/');
+
+ // Override the Image Upload URL (System Settings > Resource URLs)
+ // \Civi\Standalone\AppSettings::set('CIVICRM_SETTINGS_IMAGE_UPLOAD_URL', 'http://example.com/example-image-upload-url');
+
+ // Override the Custom CiviCRM CSS URL
+ // \Civi\Standalone\AppSettings::set('CIVICRM_SETTINGS_CUSTOM_CSS_URL', 'http://example.com/example-css-url');
+
+ // Override the extensions resource URL
+ // \Civi\Standalone\AppSettings::set('CIVICRM_SETTINGS_EXTENSIONS_URL', 'http://example.com/pathtoextensiondir');
+
+ // Override the CMS root path defined by cmsRootPath.
+ // \Civi\Standalone\AppSettings::set('CIVICRM_CMSDIR', '/path/to/install/root/');
+
+

@@ -127,9 +127,15 @@ class SetupController implements SetupControllerInterface {
     /** @var \Civi\Setup\Model $model */
     $model = $this->setup->getModel();
 
-    define('CIVICRM_UF', $model->cms);
-    define('CIVICRM_TEMPLATE_COMPILEDIR', $model->templateCompilePath);
-    define('CIVICRM_UF_BASEURL', $model->cmsBaseUrl);
+    if (!defined('CIVICRM_UF')) {
+      define('CIVICRM_UF', $model->cms);
+    }
+    if (!defined('CIVICRM_TEMPLATE_COMPILEDIR')) {
+      define('CIVICRM_TEMPLATE_COMPILEDIR', $model->templateCompilePath);
+    }
+    if (!defined('CIVICRM_UF_BASEURL')) {
+      define('CIVICRM_UF_BASEURL', $model->cmsBaseUrl);
+    }
 
     global $civicrm_root;
     $civicrm_root = $model->srcPath;

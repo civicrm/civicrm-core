@@ -1,0 +1,105 @@
+<?php
+/*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 5                                                  |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*/
+
+/**
+ * CiviCRM Cache Settings
+ */
+
+
+/**
+ * Settings to enable external caching using a cache server.  This is an
+ * advanced feature, and you should read and understand the documentation
+ * before you turn it on. We cannot store these settings in the DB since the
+ * config could potentially also be cached and we need to avoid an infinite
+ * recursion scenario.
+ *
+ * @see http://civicrm.org/node/126
+ */
+
+/**
+ * If you have a cache server configured and want CiviCRM to make use of it,
+ * set the following constant.  You should only set this once you have your cache
+ * server up and working, because CiviCRM will not start up if your server is
+ * unavailable on the host and port that you specify. By default CiviCRM will use
+ * an in-memory array cache
+ *
+ * To use the php extension memcache  use a value of 'Memcache'
+ * To use the php extension memcached use a value of 'Memcached'
+ * To use the php extension apc       use a value of 'APCcache'
+ * To use the php extension redis     use a value of 'Redis'
+ * To not use any caching (not recommended), use a value of 'NoCache'
+ *
+ */
+// \Civi\Standalone\AppSettings::set('CIVICRM_DB_CACHE_CLASS', 'ArrayCache');
+
+/**
+ * Change this to the IP address of your cache server if it is not on the
+ * same machine (Unix).
+ */
+// \Civi\Standalone\AppSettings::set('CIVICRM_DB_CACHE_HOST', 'localhost');
+
+
+/**
+ * Change this if you are not using the standard port for your cache server.
+ *
+ * The standard default port for Memcache & APCCache is 11211. If class is set to Redis, update to 6379.
+ */
+
+// \Civi\Standalone\AppSettings::set('CIVICRM_DB_CACHE_PORT', 11211);
+
+if (\Civi\Standalone\AppSettings::get('CIVICRM_DB_CACHE_CLASS') === 'Redis') {
+  \Civi\Standalone\AppSettings::set('CIVICRM_DB_CACHE_PORT', 6379);
+}
+
+/**
+ * Change this if your cache server requires a password (currently only works
+ * with Redis)
+ */
+// \Civi\Standalone\AppSettings::set('CIVICRM_DB_CACHE_PASSWORD', '' );
+
+
+/**
+ * Items in cache will expire after the number of seconds specified here.
+ * Default value is 3600 (i.e., after an hour)
+ */
+// \Civi\Standalone\AppSettings::set('CIVICRM_DB_CACHE_TIMEOUT', 3600 );
+
+/**
+ * If you are sharing the same cache instance with more than one CiviCRM
+ * database, you will need to set a different value for the following argument
+ * so that each copy of CiviCRM will not interfere with other copies.  If you only
+ * have one copy of CiviCRM, you may leave this set to ''.  A good value for
+ * this if you have two servers might be 'server1_' for the first server, and
+ * 'server2_' for the second server.
+ */
+// \Civi\Standalone\AppSettings::set('CIVICRM_DB_CACHE_PREFIX', '');
+
+/**
+ * The cache system traditionally allowed a wide range of cache-keys, but some
+ * cache-keys are prohibited by PSR-16.
+ */
+// \Civi\Standalone\AppSettings::set('CIVICRM_PSR16_STRICT', FALSE);

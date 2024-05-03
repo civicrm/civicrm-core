@@ -1,0 +1,96 @@
+<?php
+/*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 5                                                  |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*/
+
+/**
+ * CiviCRM Configuration File.
+ */
+
+/**
+ * Define any CiviCRM Settings Overrides
+ * @see https://docs.civicrm.org/sysadmin/en/latest/customize/settings/
+ *
+ * Uncomment and edit the below as appropriate.
+ */
+
+ // Disable display of Community Messages on home dashboard
+ // \Civi\Standalone\AppSettings::set('CIVICRM_SETTING_COMMUNITY_MESSAGES_URL', false);
+
+ // Disable automatic download / installation of extensions
+ // \Civi\Standalone\AppSettings::set('CIVICRM_SETTING_EXT_REPO_URL', false);
+
+ // set triggers to be managed offline per CRM-18212
+ // \Civi\Standalone\AppSettings::set('CIVICRM_SETTING_LOGGING_NO_TRIGGER_PERMISSION', 1);
+
+ // Opt-out of announcements by the CiviCRM core team for releases, paid services, events, etc. Separate each preferred optout category with a comma:
+ //   "offers": paid service offers
+ //   "asks": requests for donations or membership signup/renewal to CiviCRM
+ //   "releases": major release announcements
+ //   "events": announcements of local/national upcoming events
+ // \Civi\Standalone\AppSettings::set('CIVICRM_SETTING_COMMUNITY_MESSAGES_URL', 'https://alert.civicrm.org/alert?prot=1&ver={ver}&uf={uf}&sid={sid}&lang={lang}&co={co}&optout=offers,asks');
+
+/**
+ * Enable this constant, if you want to send your email through the smarty
+ * templating engine(allows you to do conditional and more complex logic)
+ *
+ */
+// \Civi\Standalone\AppSettings::set( 'CIVICRM_MAIL_SMARTY', 0 );
+
+/**
+ * This setting logs all emails to a file. Useful for debugging any mail (or civimail) issues.
+ * Enabling this setting will not send any email, ensure this is commented out in production
+ * The CIVICRM_MAIL_LOG is a debug option which disables MTA (mail transport agent) interaction.
+ * You must disable CIVICRM_MAIL_LOG before CiviCRM will talk to your MTA.
+ */
+// \Civi\Standalone\AppSettings::set( 'CIVICRM_MAIL_LOG', '[civicrm.log]/mail.log');
+
+/**
+ * This setting will only work if CIVICRM_MAIL_LOG is defined.  Mail will be logged and then sent.
+ */
+// \Civi\Standalone\AppSettings::set( 'CIVICRM_MAIL_LOG_AND_SEND', 1);
+
+/**
+ * Which directories should we exclude when scanning the codebase for things
+ * like extension .info files, or .html partials or .xml files etc. This needs
+ * to be a valid preg_match() pattern.
+ *
+ * If you do not define it, a pattern that excludes dirs starting with a dot is
+ * used, e.g. to exclude .git/). Adding suitable patterns here can vastly speed
+ * up your container rebuilds and cache flushes. The pattern is matched against
+ * the absolute path. Remember to use your system's DIRECTORY_SEPARATOR the
+ * examples below assume /
+ *
+ * The default excludes node_modules (can be huge), various CiviCRM dirs that
+ * are unlikely to have anything we need to scan inside, and (what could be
+ * your) Drupal's private file storage area. It does not exclude
+ * vendor but you are likely to see an improvement by adding it.
+ *
+ * See https://docs.civicrm.org/sysadmin/en/latest/setup/optimizations/#exclude-dirs-that-do-not-need-to-be-scanned
+ * and also discussion on including vendor (excluded) in https://lab.civicrm.org/dev/core/-/issues/2031
+ */
+
+// \Civi\Standalone\AppSettings::set('CIVICRM_EXCLUDE_DIRS_PATTERN', '@/(\.|node_modules|js/|css/|bower_components|packages/|sites/default/files/private)@');
+

@@ -51,9 +51,10 @@ class StandaloneScaffold {
 
     $dirs = [
       "$destDir",
-      "$destDir/data",
-      "$destDir/data/private",
-      "$destDir/data/public",
+      "$destDir/settings",
+      "$destDir/private",
+      "$destDir/public",
+      "$destDir/ext",
     ];
 
     foreach ($dirs as $dir) {
@@ -67,6 +68,13 @@ class StandaloneScaffold {
       'index.php.txt' => 'index.php',
       'htaccess.txt' => '.htaccess',
     ];
+
+    // map all settings files
+    foreach (glob("$srcDir/settings/*") as $settingsFile) {
+      $fileName = basename($settingsFile, '.txt');
+      $files["settings/{$fileName}.txt"] = "settings/$fileName";
+    }
+
     foreach ($files as $srcFile => $destFile) {
       switch ($mode) {
         case 'copy':

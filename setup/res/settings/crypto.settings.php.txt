@@ -1,0 +1,76 @@
+<?php
+/*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 5                                                  |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*/
+
+/**
+ * CiviCRM Cryptography Settings
+ */
+
+/**
+ * If you are using any CiviCRM script in the bin directory that
+ * requires authentication, then you also need to set this key.
+ * We recommend using a 16-32 bit alphanumeric/punctuation key.
+ * More info at https://docs.civicrm.org/sysadmin/en/latest/setup/site-key/
+ */
+// \Civi\Standalone\AppSettings::set( 'CIVICRM_SITE_KEY', 'your_key_here');
+
+/**
+ * If credentials are stored in the database, the CIVICRM_CRED_KEYS will be
+ * used to encrypt+decrypt them. This is a space-delimited list of keys (ordered by
+ * priority). Put the preferred key first. Any old/deprecated keys may be
+ * listed after.
+ *
+ * Each key is in format "<cipher-suite>:<key-encoding>:<key-content>", as in:
+ *
+ * Ex: \Civi\Standalone\AppSettings::set('CIVICRM_CRED_KEYS', 'aes-cbc:hkdf-sha256:RANDOM_1')
+ * Ex: \Civi\Standalone\AppSettings::set('CIVICRM_CRED_KEYS', 'aes-ctr-hs:b64:RANDOM_2 aes-ctr-hs:b64:RANDOM_3')
+ * Ex: \Civi\Standalone\AppSettings::set('CIVICRM_CRED_KEYS', '::MY_NEW_KEY ::MY_OLD_KEY')
+ *
+ * If cipher-suite or key-encoding is blank, they will use defaults ("aes-cbc"
+ * and "hkdf-sha256", respectively).
+ *
+ * More info at https://docs.civicrm.org/sysadmin/en/latest/setup/cred-key/
+ */
+// \Civi\Standalone\AppSettings::set( 'CIVICRM_CRED_KEYS', 'replace_me');
+
+// \Civi\Standalone\AppSettings::set( 'CIVICRM_DEPLOY_ID', 'replace_me');
+
+/**
+ * The signing key is used to generate and verify shareable tokens.
+ *
+ * This is a space-delimited list of keys (ordered by priority). Put the preferred
+ * key first. Any old/deprecated keys may be listed after.
+ *
+ * Each key is in format "<cipher-suite>:<key-encoding>:<key-content>", as in:
+ *
+ * Ex: \Civi\Standalone\AppSettings::set('CIVICRM_SIGN_KEYS', 'jwt-hs256:hkdf-sha256:RANDOM_1')
+ * Ex: \Civi\Standalone\AppSettings::set('CIVICRM_SIGN_KEYS', 'jwt-hs256::RANDOM_2 jwt-hs256::RANDOM_3')
+ * Ex: \Civi\Standalone\AppSettings::set('CIVICRM_SIGN_KEYS', 'jwt-hs256:b64:RANDOM_4 jwt-hs256:b64:RANDOM_5')
+ *
+ * If key-encoding is blank, it will default to "hkdf-sha256".
+ */
+
+ // \Civi\Standalone\AppSettings::set( 'CIVICRM_SIGN_KEYS', 'replace_me');

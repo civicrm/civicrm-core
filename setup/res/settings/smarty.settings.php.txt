@@ -1,0 +1,68 @@
+<?php
+/*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 5                                                  |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*/
+
+/**
+ * CiviCRM Smarty Settings
+ */
+
+
+/**
+ * SMARTY Compile Check:
+ *
+ * This tells Smarty whether to check for recompiling or not. Recompiling
+ * does not need to happen unless a template or config file is changed.
+ * Typically you enable this during development, and disable for production.
+ *
+ * Related issue:
+ * https://lab.civicrm.org/dev/core/issues/1073
+ *
+ */
+//  \Civi\Standalone\AppSettings::set('CIVICRM_TEMPLATE_COMPILE_CHECK', FALSE);
+
+/**
+ * Smarty escape on output.
+ *
+ * This does not currently work if you have a Smarty 3 path defined
+ * (see above).
+ *
+ * This tells smarty to pass all variables through the escape function
+ * unless they are piped to smarty:nodefaults (eg. {$myScript|smarty:nodefaults}
+ * At this stage it should only be enabled on development sites.
+ * @see https://github.com/civicrm/civicrm-core/pull/21935
+ */
+//  \Civi\Standalone\AppSettings::set('CIVICRM_SMARTY_DEFAULT_ESCAPE', TRUE);
+
+/**
+ * Specify a Smarty autoload file.
+ *
+ * Smarty5 is the version of Smarty we are in the process of adopting. To enable it
+ * un-comment the line describing the path. Note that this will become always enabled in
+ * the near future - this opt-in setting is transitional.
+ */
+  // enable by default for dev & demo sites for now - will soon enable by default for all new installs.
+
+// \Civi\Standalone\AppSettings::set('CIVICRM_SMARTY_AUTOLOAD_PATH', '[packages]/smarty5/Smarty.php']);

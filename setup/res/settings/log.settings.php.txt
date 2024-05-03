@@ -1,0 +1,67 @@
+<?php
+/*
+ +--------------------------------------------------------------------+
+ | CiviCRM version 5                                                  |
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC (c) 2004-2020                                |
+ +--------------------------------------------------------------------+
+ | This file is a part of CiviCRM.                                    |
+ |                                                                    |
+ | CiviCRM is free software; you can copy, modify, and distribute it  |
+ | under the terms of the GNU Affero General Public License           |
+ | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+ |                                                                    |
+ | CiviCRM is distributed in the hope that it will be useful, but     |
+ | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+ | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+ | See the GNU Affero General Public License for more details.        |
+ |                                                                    |
+ | You should have received a copy of the GNU Affero General Public   |
+ | License and the CiviCRM Licensing Exception along                  |
+ | with this program; if not, contact CiviCRM LLC                     |
+ | at info[AT]civicrm[DOT]org. If you have questions about the        |
+ | GNU Affero General Public License or the licensing of CiviCRM,     |
+ | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ +--------------------------------------------------------------------+
+*/
+
+/**
+ * CiviCRM Log Settings
+ */
+
+/**
+ * CiviCRM Logging Database
+ *
+ * Used to point to a different database to use for logging (if desired). If unset defaults to equal CIVICRM_DSN.
+ * The CIVICRM_DSN user needs to have the rights to modify the below database schema and be able to write to it.
+ */
+
+// will default to whatever is set for CIVICRM_DB
+//
+// EITHER:
+// \Civi\Standalone\AppSettings::set('CIVICRM_LOGGING_DB_HOST', 'localhost');
+// \Civi\Standalone\AppSettings::set('CIVICRM_LOGGING_DB_PORT', 3306);
+// \Civi\Standalone\AppSettings::set('CIVICRM_LOGGING_DB_NAME', 'civicrm');
+// \Civi\Standalone\AppSettings::set('CIVICRM_LOGGING_DB_USER', 'civicrm');
+// \Civi\Standalone\AppSettings::set('CIVICRM_LOGGING_DB_PASS', '');
+// \Civi\Standalone\AppSettings::set('CIVICRM_LOGGING_DB_SSL', '');
+
+// OR set the whole dsn directly
+// \Civi\Standalone\AppSettings::set('CIVICRM_LOGGING_DSN', 'mysql://user:pass@host:port/name?new_link=true');
+
+
+/**
+ * Whether to include the hash in config log filenames. Defaults to TRUE.
+ * Disable only if you have configured the logfiles to be outside the docroot
+ * using the civicrm.log path setting.
+ *
+ */
+// \Civi\Standalone\AppSettings::set('CIVICRM_LOG_HASH', FALSE );
+
+/**
+ * The maximum size a log file may be before it's rotated, in bytes.
+ * Set to 0 to disable rotation (only recommended if you have an
+ * external logrotate configuration).
+ */
+// \Civi\Standalone\AppSettings::set('CIVICRM_LOG_ROTATESIZE', 0 );
+

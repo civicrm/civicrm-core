@@ -20,7 +20,7 @@ class WebEntrypoint {
       self::invoke();
     }
     else {
-      self::installer();
+      \Civi\Setup\UI\StandaloneWebInstall::invoke();
     }
   }
 
@@ -80,34 +80,6 @@ class WebEntrypoint {
 
     // Render the page
     print \CRM_Core_Invoke::invoke($args);
-  }
-
-  public static function installer(): void {
-    \Civi\Setup::assertProtocolCompatibility(1.0);
-
-    // the core folder is up two directories from this file
-    // TODO: use AppSettings to get the configured core path
-    $corePath = implode(DIRECTORY_SEPARATOR, array_slice(explode(DIRECTORY_SEPARATOR, __DIR__), 0, -2));
-
-    \Civi\Setup::init([
-      // This is just enough information to get going.
-      'cms'     => 'Standalone',
-      'srcPath' => $corePath,
-    ]);
-
-    $coreUrl = \Civi\Setup::instance()->getModel()->mandatorySettings['userFrameworkResourceURL'];
-
-    $ctrl = \Civi\Setup::instance()->createController()->getCtrl();
-    $ctrl->setUrls([
-      // The URL of this setup controller. May be used for POST-backs
-      'ctrl'             => '/civicrm',
-      // The base URL for loading resource files (images/javascripts) for this project. Includes trailing slash.
-      'res'              => $coreUrl . '/setup/res/',
-      'jquery.js'        => $coreUrl . '/bower_components/jquery/dist/jquery.min.js',
-      'font-awesome.css' => $coreUrl . '/bower_components/font-awesome/css/font-awesome.min.css',
-    ]);
-    \Civi\Setup\BasicRunner::run($ctrl);
-    exit();
   }
 
 }
