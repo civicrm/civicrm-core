@@ -121,7 +121,7 @@
         </div>
       {/if}
 
-      {if $action eq 2 and $accessContribution and $rows.0.contribution_id}
+      {if $action eq 2 and $accessContribution and array_key_exists(0, $rows) &&  $rows.0.contribution_id}
       {include file="CRM/Contribute/Form/Selector.tpl" context="Search"}
       {/if}
 
