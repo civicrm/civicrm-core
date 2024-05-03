@@ -23,13 +23,6 @@ use Civi\Api4\Contribution;
 class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
   /**
-   * Maximum profile fields that will be displayed.
-   *
-   * @var int
-   */
-  protected $_rowCount = 1;
-
-  /**
    * Batch id.
    *
    * @var int
@@ -70,13 +63,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    * @var int
    */
   protected $currentRowIsRenewOption;
-
-  /**
-   * Contact fields.
-   *
-   * @var array
-   */
-  protected $_contactFields = [];
 
   /**
    * Fields array of fields in the batch profile.
@@ -135,7 +121,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   }
 
   /**
-   * @return mixed
+   * @return int
    */
   public function getCurrentRowMembershipID() {
     return $this->currentRowMembershipID;
@@ -260,14 +246,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
     $this->_fields = CRM_Core_BAO_UFGroup::getFields($this->_profileId, FALSE, CRM_Core_Action::VIEW);
 
-    // remove file type field and then limit fields
-    $suppressFields = FALSE;
     foreach ($this->_fields as $name => $field) {
-      if ($cfID = CRM_Core_BAO_CustomField::getKeyID($name) && $this->_fields[$name]['html_type'] == 'Autocomplete-Select') {
-        $suppressFields = TRUE;
-        unset($this->_fields[$name]);
-      }
-
       //fix to reduce size as we are using this field in grid
       if (is_array($field['attributes']) && $this->_fields[$name]['attributes']['size'] > 19) {
         //shrink class to "form-text-medium"
@@ -321,7 +300,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         'placeholder' => ts('- select -'),
       ]);
 
-      // special field specific to membership batch udpate
+      // special field specific to membership batch update
       if ($this->_batchInfo['type_id'] == 2) {
         $options = [
           1 => ts('Add Membership'),
@@ -350,7 +329,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         $this->add('select', "open_pledges[$rowNumber]", '', $options);
       }
 
-      foreach ($this->_fields as $name => $field) {
+      foreach ($this->_fields as $field) {
         if (in_array($field['field_type'], $contactTypes)) {
           $fld = explode('-', $field['name']);
           $contactReturnProperties[$field['name']] = $fld[0];
@@ -385,10 +364,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
     // don't set the status message when form is submitted.
     $buttonName = $this->controller->getButtonName('submit');
-
-    if ($suppressFields && $buttonName != '_qf_Entry_next') {
-      CRM_Core_Session::setStatus(ts("File type field(s) in the selected profile are not supported for Update multiple records."), ts('Some Fields Excluded'), 'info');
-    }
   }
 
   /**
@@ -704,7 +679,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           if (is_numeric($pledgeId)) {
             $result = CRM_Pledge_BAO_PledgePayment::getPledgePayments($pledgeId);
             $pledgePaymentId = 0;
-            foreach ($result as $key => $values) {
+            foreach ($result as $values) {
               if ($values['status'] !== 'Completed') {
                 $pledgePaymentId = $values['id'];
                 break;
@@ -772,7 +747,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     $batchTotal = 0;
     // get the price set associated with offline membership
     $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', 'default_membership_type_amount', 'id', 'name');
-    $this->_priceSet = $priceSets = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId));
+    $this->_priceSet = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId));
 
     if (isset($params['field'])) {
       // @todo - most of the wrangling in this function is because the api is not being used, especially date stuff.
@@ -886,13 +861,10 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         //process premiums
         if (!empty($value['product_name'])) {
           if ($value['product_name'][0] > 0) {
-            [$products, $options] = CRM_Contribute_BAO_Premium::getPremiumProductInfo();
+            [, $options] = CRM_Contribute_BAO_Premium::getPremiumProductInfo();
 
             $value['hidden_Premium'] = 1;
-            $value['product_option'] = CRM_Utils_Array::value(
-              $value['product_name'][1],
-              $options[$value['product_name'][0]]
-            );
+            $value['product_option'] = $options[$value['product_name'][0]][$value['product_name'][1]] ?? NULL;
 
             $premiumParams = [
               'product_id' => $value['product_name'][0],
@@ -1012,7 +984,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    *
    * @param array $params
    *
-   * @return bool
+   * @return float
    * @throws \CRM_Core_Exception
    */
   public function testProcessMembership($params) {
@@ -1194,7 +1166,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    */
   protected function getCurrentMembership() {
     if (!isset($this->currentRowExistingMembership)) {
-      // CRM-7297 - allow membership type to be be changed during renewal so long as the parent org of new membershipType
+      // CRM-7297 - allow membership type to be changed during renewal so long as the parent org of new membershipType
       // is the same as the parent org of an existing membership of the contact
       $this->currentRowExistingMembership = CRM_Member_BAO_Membership::getContactMembership($this->getCurrentRowContactID(), $this->getCurrentRowMembershipTypeID(),
         FALSE, NULL, TRUE
@@ -1211,6 +1183,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    * Get the params as related to the membership entity.
    *
    * @return array
+   * @throws \CRM_Core_Exception
    */
   private function getCurrentRowMembershipParams(): array {
     return array_merge($this->getCurrentRowCustomParams(), [
