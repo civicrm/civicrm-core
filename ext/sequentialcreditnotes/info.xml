@@ -15,13 +15,13 @@
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
   <releaseDate>2024-05-02</releaseDate>
-  <version>5.74.beta1</version>
+  <version>5.75.alpha1</version>
   <tags>
     <tag>mgmt:hidden</tag>
   </tags>
   <develStage>stable</develStage>
   <compatibility>
-    <ver>5.74</ver>
+    <ver>5.75</ver>
   </compatibility>
   <mixins>
     <mixin>setting-php@1.0.0</mixin>
