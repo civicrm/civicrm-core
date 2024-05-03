@@ -2504,6 +2504,9 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
   /**
    * Fetch the object and store the values in the values array.
    *
+   * @deprecated avoid this function, no planned removed at this stage as there
+   * are still core callers.
+   *
    * @param array $params
    *   Input parameters to find object.
    * @param array $values

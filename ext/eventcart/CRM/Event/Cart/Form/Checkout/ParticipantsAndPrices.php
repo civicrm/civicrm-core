@@ -8,13 +8,6 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
   public $_values = NULL;
 
   /**
-   * Pre process function.
-   */
-  public function preProcess() {
-    parent::preProcess();
-  }
-
-  /**
    * Build quick form.
    */
   public function buildQuickForm() {
@@ -43,7 +36,7 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
 
     if ($this->getContactID()) {
       $params = ['id' => $this->getContactID()];
-      $contact = CRM_Contact_BAO_Contact::retrieve($params, $defaults);
+      $contact = $this->retrieveContact($params, $defaults);
       $contact_values = [];
       CRM_Core_DAO::storeValues($contact, $contact_values);
       $this->assign('contact', $contact_values);
@@ -195,7 +188,7 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
       ) {
         $defaults = [];
         $params = ['id' => $this->getContactID()];
-        $contact = CRM_Contact_BAO_Contact::retrieve($params, $defaults);
+        $contact = $this->retrieveContact($params, $defaults);
         $participant->contact_id = $this->getContactID();
         $participant->save();
         $participant->email = self::primary_email_from_contact($contact);
@@ -260,7 +253,7 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
         if ($participant->contact_id && $contact_id != $participant->contact_id) {
           $defaults = [];
           $params = ['id' => $participant->contact_id];
-          $temporary_contact = CRM_Contact_BAO_Contact::retrieve($params, $defaults);
+          $temporary_contact = $this->retrieveContact($params, $defaults);
 
           foreach ($this->cart->get_subparticipants($participant) as $subparticipant) {
             $subparticipant->contact_id = $contact_id;
