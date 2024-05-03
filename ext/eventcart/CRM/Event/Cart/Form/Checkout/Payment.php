@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Api4\Contact;
+
 /**
  * Class CRM_Event_Cart_Form_Checkout_Payment
  */
@@ -90,7 +92,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
       CRM_Core_BAO_Address::fixAddress($location['address'][1]);
     }
 
-    list($pre_id, $post_id) = CRM_Event_Cart_Form_MerParticipant::get_profile_groups($participant->event_id);
+    [$pre_id, $post_id] = CRM_Event_Cart_Form_MerParticipant::get_profile_groups($participant->event_id);
     $payer_values = [
       'email' => '',
       'name' => '',
@@ -415,11 +417,10 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     $transaction = new CRM_Core_Transaction();
 
     foreach ($main_participants as $participant) {
-      $defaults = [];
-      $ids = ['contact_id' => $participant->contact_id];
-      $contact = CRM_Contact_BAO_Contact::retrieve($ids, $defaults);
-      $contact->is_deleted = 0;
-      $contact->save();
+      Contact::update(FALSE)
+        ->addValue('is_deleted', FALSE)
+        ->addWhere('id', '=', $participant->contact_id)
+        ->execute();
     }
 
     $trxn_prefix = 'VR';
@@ -660,7 +661,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
 
     if (self::getContactID()) {
       $params = ['id' => self::getContactID()];
-      $contact = CRM_Contact_BAO_Contact::retrieve($params, $defaults);
+      $contact = $this->retrieveContact($params, $defaults);
 
       foreach ($contact->email as $email) {
         if ($email['is_billing']) {

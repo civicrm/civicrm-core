@@ -164,4 +164,42 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
     return $container['values'][$page_name];
   }
 
+  /**
+   *
+   * @deprecated copy of previously shared code.
+   *
+   * @param array $params
+   *   (reference ) an assoc array of name/value pairs.
+   * @param array $defaults
+   *   (reference ) an assoc array to hold the name / value pairs.
+   *                        in a hierarchical manner
+   * @param bool $microformat
+   *   For location in microformat.
+   *
+   * @return CRM_Contact_BAO_Contact
+   */
+  protected function retrieveContact(&$params, &$defaults = [], $microformat = FALSE) {
+    if (array_key_exists('contact_id', $params)) {
+      $params['id'] = $params['contact_id'];
+    }
+    elseif (array_key_exists('id', $params)) {
+      $params['contact_id'] = $params['id'];
+    }
+
+    $contact = new CRM_Contact_BAO_Contact();
+
+    $contact->copyValues($params);
+
+    if ($contact->find(TRUE)) {
+
+      CRM_Core_DAO::storeValues($contact, $values);
+      $contact->contact_id = $contact->id;
+    }
+
+    unset($params['id']);
+    $contact->email = $defaults['email'] = CRM_Core_BAO_Email::getValues(['contact_id' => $params['contact_id']]);
+    $contact->address = $defaults['address'] = CRM_Core_BAO_Address::getValues(['contact_id' => $params['contact_id']], $microformat);
+    return $contact;
+  }
+
 }
