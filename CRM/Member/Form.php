@@ -22,6 +22,7 @@
 class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   use CRM_Custom_Form_CustomDataTrait;
   use CRM_Core_Form_EntityFormTrait;
+  use CRM_Member_Form_MembershipFormTrait;
 
   /**
    * Membership created or edited on this form.
@@ -471,7 +472,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
     }
 
     if ($this->_id) {
-      $this->_memType = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->_id, 'membership_type_id');
+      $this->_memType = $this->getMembershipValue('membership_type_id');
       $this->_membershipIDs[] = $this->_id;
     }
     $this->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
