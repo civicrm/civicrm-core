@@ -190,8 +190,10 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $multilingual = CRM_Core_I18n::isMultilingual();
     $this->assign('multilingual', $multilingual);
     if ($multilingual) {
-      $this->addField('filter_contact_language', ['placeholder' => ts('Any language')]);
-      $this->addField('communication_language', ['placeholder' => 'System default language']);
+      $filterLanguages = \CRM_Core_BAO_ActionSchedule::getFilterContactLanguageOptions();
+      $this->addField('filter_contact_language', ['placeholder' => ts('Any language'), 'options' => $filterLanguages]);
+      $communicationLanguages = \CRM_Core_BAO_ActionSchedule::getCommunicationLanguageOptions();
+      $this->addField('communication_language', ['placeholder' => 'System default language', 'options' => $communicationLanguages]);
     }
 
     // Message fields
