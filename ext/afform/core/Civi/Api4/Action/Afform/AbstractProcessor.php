@@ -281,7 +281,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     $directFk = FALSE;
     // First look for a direct foreign key field e.g. `contact_id`
     foreach (self::getEntityFields($joinEntityType) as $field) {
-      if ($field['fk_entity'] === $mainEntityType) {
+      if ($field['fk_entity'] === $mainEntityType && $field['type'] === 'Field') {
         $directFk = TRUE;
         $params[] = [$field['name'], '=', $mainEntityId];
       }
