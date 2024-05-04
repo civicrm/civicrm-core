@@ -454,8 +454,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
    * @param bool $onlySubType
    *   Only return specified subtype or return specified subtype + unrestricted fields.
    * @param bool $returnAll
-   *   Do not restrict by subtype at all. (The parameter feels a bit cludgey but is only used from the
-   *   api - through which it is properly tested - so can be refactored with some comfort.)
+   *   Do not restrict by subtype at all.
    * @param bool|int $checkPermission
    *   Either a CRM_Core_Permission constant or FALSE to disable checks
    * @param string|int $singleRecord
@@ -1494,7 +1493,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
       return [];
     }
 
-    $groupTree = CRM_Core_BAO_CustomGroup::getTree($type);
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree($type, [], NULL, NULL, [], NULL, TRUE, NULL, TRUE);
     $customValue = [];
     $htmlType = [
       'CheckBox',
