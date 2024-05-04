@@ -144,12 +144,6 @@ class CRM_Core_JobManager {
 
     // Save the job last run end date (if this doesn't get written we know the job crashed and was not caught (eg. OOM).
     $job->saveLastRunEnd();
-
-    //Disable outBound option after executing the job.
-    $environment = CRM_Core_Config::environment(NULL, TRUE);
-    if ($environment != 'Production' && !empty($job->apiParams['runInNonProductionEnvironment'])) {
-      Civi::settings()->set('mailing_backend', ['outBound_option' => CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED]);
-    }
   }
 
   /**
