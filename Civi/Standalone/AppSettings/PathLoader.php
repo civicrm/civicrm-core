@@ -19,7 +19,7 @@ class PathLoader {
       }
     }
     // better default for web_root from server vars
-    if (isset($_SERVER['DOCUMENT_ROOT'])) {
+    if ($_SERVER['DOCUMENT_ROOT'] ?? null) {
       // if available, this is a better default
       $this->paths['web_root'] = $_SERVER['DOCUMENT_ROOT'];
     }
