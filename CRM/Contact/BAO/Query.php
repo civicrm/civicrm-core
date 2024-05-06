@@ -4763,13 +4763,9 @@ civicrm_relationship.start_date > {$today}
     if (($customFieldID = CRM_Core_BAO_CustomField::getKeyID($fieldName)) == FALSE) {
       return FALSE;
     }
-    try {
-      $customFieldData = CRM_Core_BAO_CustomField::getField($customFieldID);
-      if ($customFieldData && 'Date' == $customFieldData['data_type']) {
-        return TRUE;
-      }
-    }
-    catch (Exception $e) {
+    $customFieldData = CRM_Core_BAO_CustomField::getField($customFieldID);
+    if ($customFieldData && 'Date' == $customFieldData['data_type']) {
+      return TRUE;
     }
     return FALSE;
   }
