@@ -117,6 +117,29 @@ class AfformAdminMeta {
         }
       }
     }
+    // Add LocBlock joins
+    if ($params['action'] === 'create' && $entityName === 'LocBlock') {
+      $joinParams = $params;
+      // Exclude fields that don't apply to locBlocks
+      $joinParams['where'][] = ['name', 'NOT IN', ['id', 'is_primary', 'is_billing', 'location_type_id', 'contact_id']];
+      foreach (['Address', 'Email', 'Phone', 'IM'] as $joinEntity) {
+        $joinEntityFields = (array) civicrm_api4($joinEntity, 'getFields', $joinParams);
+        $joinEntityLabel = CoreUtil::getInfoItem($joinEntity, 'title');
+        foreach ([1 => '', 2 => '_2'] as $number => $suffix) {
+          $joinField = strtolower($joinEntity) . $suffix . '_id';
+          foreach ($joinEntityFields as $joinEntityField) {
+            if (strtolower($joinEntity) === $joinEntityField['name']) {
+              $joinEntityField['label'] .= " $number";
+            }
+            else {
+              $joinEntityField['label'] = "$joinEntityLabel $number {$joinEntityField['label']}";
+            }
+            $joinEntityField['name'] = "$joinField." . $joinEntityField['name'];
+            $fields[] = $joinEntityField;
+          }
+        }
+      }
+    }
     // Index by name
     $fields = array_column($fields, NULL, 'name');
     $idField = CoreUtil::getIdFieldName($entityName);

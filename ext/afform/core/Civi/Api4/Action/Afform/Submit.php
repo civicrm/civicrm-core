@@ -453,14 +453,40 @@ class Submit extends AbstractProcessor {
     $mainEntity = $event->getFormDataModel()->getEntity($event->getEntityName());
     foreach ($joins as $joinEntityName => $join) {
       $values = self::filterEmptyJoins($mainEntity, $joinEntityName, $join);
+      $whereClause = self::getJoinWhereClause($event->getFormDataModel(), $event->getEntityName(), $joinEntityName, $entityId);
+      $mainIdField = CoreUtil::getIdFieldName($mainEntity['type']);
+      $joinIdField = CoreUtil::getIdFieldName($joinEntityName);
+
+      // Forward FK e.g. Event.loc_block_id => LocBlock
+      $forwardFkField = self::getFkField($mainEntity['type'], $joinEntityName);
+      if ($forwardFkField && $values) {
+        // Add id to values for update op
+        if ($whereClause) {
+          $values[0][$joinIdField] = $whereClause[0][2];
+        }
+        $result = civicrm_api4($joinEntityName, 'save', [
+          // Disable permission checks because the main entity has already been vetted
+          'checkPermissions' => FALSE,
+          'records' => $values,
+        ]);
+        civicrm_api4($mainEntity['type'], 'update', [
+          'checkPermissions' => FALSE,
+          'where' => [[$mainIdField, '=', $entityId]],
+          'values' => [$forwardFkField['name'] => $result[0]['id']],
+        ]);
+        $indexedResult = array_combine(array_keys($values), (array) $result);
+        $event->setJoinIds($index, $joinEntityName, $indexedResult);
+      }
+
+      // Reverse FK e.g. Contact <= Email.contact_id
       // TODO: REPLACE works for creating or updating contacts, but different logic would be needed if
       // the contact was being auto-updated via a dedupe rule; in that case we would not want to
       // delete any existing records.
-      if ($values) {
+      elseif ($values) {
         $result = civicrm_api4($joinEntityName, 'replace', [
           // Disable permission checks because the main entity has already been vetted
           'checkPermissions' => FALSE,
-          'where' => self::getJoinWhereClause($event->getFormDataModel(), $event->getEntityName(), $joinEntityName, $entityId),
+          'where' => $whereClause,
           'records' => $values,
         ]);
         $indexedResult = array_combine(array_keys($values), (array) $result);
@@ -472,7 +498,7 @@ class Submit extends AbstractProcessor {
           civicrm_api4($joinEntityName, 'delete', [
             // Disable permission checks because the main entity has already been vetted
             'checkPermissions' => FALSE,
-            'where' => self::getJoinWhereClause($event->getFormDataModel(), $event->getEntityName(), $joinEntityName, $entityId),
+            'where' => $whereClause,
           ]);
         }
         catch (\CRM_Core_Exception $e) {

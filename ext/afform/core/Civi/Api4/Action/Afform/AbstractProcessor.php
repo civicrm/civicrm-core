@@ -186,11 +186,17 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
           if ($multipleLocationBlocks) {
             $limit = 0;
           }
-          $joinResult = $this->apiGet($api4, $joinEntity, $join['fields'] + ($join['data'] ?? []), [
-            'where' => self::getJoinWhereClause($this->_formDataModel, $entity['name'], $joinEntity, $id),
-            'limit' => $limit,
-            'orderBy' => self::getEntityField($joinEntity, 'is_primary') ? ['is_primary' => 'DESC'] : [],
-          ]);
+          $where = self::getJoinWhereClause($this->_formDataModel, $entity['name'], $joinEntity, $id);
+          if ($where) {
+            $joinResult = $this->apiGet($api4, $joinEntity, $join['fields'] + ($join['data'] ?? []), [
+              'where' => $where,
+              'limit' => $limit,
+              'orderBy' => self::getEntityField($joinEntity, 'is_primary') ? ['is_primary' => 'DESC'] : [],
+            ]);
+          }
+          else {
+            $joinResult = [];
+          }
           // Sort into multiple location blocks
           if ($multipleLocationBlocks) {
             $items = array_column($joinResult, NULL, 'location_type_id');
@@ -279,43 +285,67 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   abstract protected function processForm();
 
   /**
+   * Gets the clause for looking up join entities, or NULL if not available.
+   *
+   * Joins can come in two styles:
+   *  - Forward FK e.g. Event.loc_block_id => LocBlock
+   *  - Reverse FK e.g. Contact <= Email.contact_id
+   *
    * @param \Civi\Afform\FormDataModel $formDataModel
    * @param string $mainEntityName
    * @param string $joinEntityType
    * @param int|string $mainEntityId
-   * @return array
+   * @return array[]
    * @throws \CRM_Core_Exception
    */
-  protected static function getJoinWhereClause(FormDataModel $formDataModel, string $mainEntityName, string $joinEntityType, $mainEntityId) {
+  protected static function getJoinWhereClause(FormDataModel $formDataModel, string $mainEntityName, string $joinEntityType, $mainEntityId): ?array {
     $entity = $formDataModel->getEntity($mainEntityName);
     $mainEntityType = CoreUtil::isContact($entity['type']) ? 'Contact' : $entity['type'];
     $params = [];
 
+    // Forward FK e.g. Event.loc_block_id => LocBlock
+    $forwardFkField = self::getFkField($mainEntityType, $joinEntityType);
+    if ($forwardFkField) {
+      $joinIdField = $forwardFkField['fk_column'];
+      $mainEntityJoinValue = civicrm_api4($mainEntityType, 'get', [
+        'checkPermissions' => FALSE,
+        'where' => [['id', '=', $mainEntityId]],
+        'select' => [$forwardFkField['name']],
+      ])->first();
+      if (!empty($mainEntityJoinValue[$forwardFkField['name']])) {
+        $params[] = [$joinIdField, '=', $mainEntityJoinValue[$forwardFkField['name']] ?? 0];
+        return $params;
+      }
+      return NULL;
+    }
+
+    // Reverse FK e.g. Contact <= Email.contact_id
     // Add data as clauses e.g. `is_primary: true`
     foreach ($entity['joins'][$joinEntityType]['data'] ?? [] as $key => $val) {
       $op = is_array($val) ? 'IN' : '=';
       $params[] = [$key, $op, $val];
     }
 
-    // Figure out the FK field between the join entity and the main entity
-    $directFk = FALSE;
-    // First look for a direct foreign key field e.g. `contact_id`
-    foreach (self::getEntityFields($joinEntityType) as $field) {
-      if ($field['fk_entity'] === $mainEntityType && $field['type'] === 'Field') {
-        $directFk = TRUE;
-        $params[] = [$field['name'], '=', $mainEntityId];
-      }
-    }
-    // Else look for dynamic foreign keys e.g. `entity_table` + `entity_id`
-    if (!$directFk) {
-      foreach (self::getEntityFields($joinEntityType) as $field) {
-        if (in_array($mainEntityType, $field['dfk_entities'] ?? [], TRUE)) {
-          $params[] = [$field['name'], '=', $mainEntityId];
-          $params[] = [$field['input_attrs']['control_field'], '=', array_search($mainEntityType, $field['dfk_entities'])];
-        }
+    $reverseFkField = self::getFkField($joinEntityType, $mainEntityType);
+    if ($reverseFkField) {
+      $params[] = [$reverseFkField['name'], '=', $mainEntityId];
+      // Handle dynamic foreign keys e.g. `entity_table` + `entity_id`
+      if (!empty($reverseFkField['dfk_entities'])) {
+        $params[] = [$reverseFkField['input_attrs']['control_field'], '=', array_search($mainEntityType, $reverseFkField['dfk_entities'])];
       }
     }
     return $params;
+  }
+
+  protected static function getFkField($mainEntity, $otherEntity): ?array {
+    foreach (self::getEntityFields($mainEntity) as $field) {
+      if ($field['type'] === 'Field' && empty($field['custom_field_id']) &&
+        ($field['fk_entity'] === $otherEntity || in_array($otherEntity, $field['dfk_entities'] ?? [], TRUE))
+      ) {
+        return $field;
+      }
+    }
+    return NULL;
   }
 
   /**
