@@ -7,7 +7,7 @@
     </select>
     <button type="button" class="btn btn-default btn-xs" ng-if="block && !block.layout" ng-click="saveBlock()" title="{{:: ts('Save block') }}">{{:: ts('Save...') }}</button>
     <div class="btn-group pull-right" title="">
-      <af-gui-container-multi-toggle ng-if="!ctrl.loading && ($ctrl.join || $ctrl.node['af-repeat'])" entity="$ctrl.getFieldEntityType()" class="btn-group"></af-gui-container-multi-toggle>
+      <af-gui-container-multi-toggle ng-if="!ctrl.loading && ($ctrl.join || $ctrl.node['af-repeat']) && isRepeatable()" entity="$ctrl.getFieldEntityType()" class="btn-group"></af-gui-container-multi-toggle>
       <div class="btn-group" af-gui-menu>
         <button type="button" class="btn btn-default btn-xs dropdown-toggle af-gui-add-element-button" data-toggle="dropdown" title="{{:: ts('Configure') }}">
           <span><i class="crm-i fa-gear"></i></span>

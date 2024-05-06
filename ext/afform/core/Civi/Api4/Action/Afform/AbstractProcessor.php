@@ -272,30 +272,44 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     $mainEntityType = $entity['type'];
     $params = [];
 
+    // Forward FK e.g. Event.loc_block_id => LocBlock
+    $forwardFkField = self::getFkField($mainEntityType, $joinEntityType);
+    if ($forwardFkField) {
+      $joinIdField = $forwardFkField['fk_column'];
+      $mainEntityJoinValue = civicrm_api4($mainEntityType, 'get', [
+        'checkPermissions' => FALSE,
+        'where' => [['id', '=', $mainEntityId]],
+        'select' => [$forwardFkField['name']],
+      ])->first();
+      return [$joinIdField, '=', $mainEntityJoinValue[$forwardFkField['name']] ?? 0];
+    }
+
+    // Reverse FK e.g. Contact <= Email.contact_id
     // Add data as clauses e.g. `is_primary: true`
     foreach ($entity['joins'][$joinEntityType]['data'] ?? [] as $key => $val) {
       $params[] = [$key, '=', $val];
     }
 
-    // Figure out the FK field between the join entity and the main entity
-    $directFk = FALSE;
-    // First look for a direct foreign key field e.g. `contact_id`
-    foreach (self::getEntityFields($joinEntityType) as $field) {
-      if ($field['fk_entity'] === $mainEntityType && $field['type'] === 'Field') {
-        $directFk = TRUE;
-        $params[] = [$field['name'], '=', $mainEntityId];
-      }
-    }
-    // Else look for dynamic foreign keys e.g. `entity_table` + `entity_id`
-    if (!$directFk) {
-      foreach (self::getEntityFields($joinEntityType) as $field) {
-        if (in_array($mainEntityType, $field['dfk_entities'] ?? [], TRUE)) {
-          $params[] = [$field['name'], '=', $mainEntityId];
-          $params[] = [$field['input_attrs']['control_field'], '=', array_search($mainEntityType, $field['dfk_entities'])];
-        }
+    $reverseFkField = self::getFkField($joinEntityType, $mainEntityType);
+    if ($reverseFkField) {
+      $params[] = [$reverseFkField['name'], '=', $mainEntityId];
+      // Handle dynamic foreign keys e.g. `entity_table` + `entity_id`
+      if (!empty($reverseFkField['dfk_entities'])) {
+        $params[] = [$reverseFkField['input_attrs']['control_field'], '=', array_search($mainEntityType, $reverseFkField['dfk_entities'])];
       }
     }
     return $params;
+  }
+
+  protected static function getFkField($mainEntity, $otherEntity): ?array {
+    foreach (self::getEntityFields($mainEntity) as $field) {
+      if ($field['type'] === 'Field' && empty($field['custom_field_id']) &&
+        ($field['fk_entity'] === $otherEntity || in_array($otherEntity, $field['dfk_entities'] ?? [], TRUE))
+      ) {
+        return $field;
+      }
+    }
+    return NULL;
   }
 
   /**
