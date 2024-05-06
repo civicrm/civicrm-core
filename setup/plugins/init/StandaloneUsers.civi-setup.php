@@ -179,9 +179,9 @@ if (!defined('CIVI_SETUP')) {
     $userID = \CRM_Core_BAO_CMSUser::create($params, 'email');
 
     // Assign 'admin' role to user
-    \Civi\Api4\User::update(FALSE)
-      ->addWhere('id', '=', $userID)
-      ->addValue('roles:name', ['admin'])
+    \Civi\Api4\UserRole::create(FALSE)
+      ->addValue('user_id', $userID)
+      ->addValue('role_id', $roles['admin']['id'])
       ->execute();
 
     $message = "Created new user \"{$e->getModel()->extras['adminUser']}\" (user ID #$userID, contact ID #$contactID) with 'admin' role and ";
