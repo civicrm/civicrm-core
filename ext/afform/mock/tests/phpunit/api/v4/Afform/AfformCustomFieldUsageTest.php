@@ -13,6 +13,12 @@ use Civi\Api4\CustomGroup;
  */
 class AfformCustomFieldUsageTest extends AfformUsageTestCase {
 
+  public function tearDown(): void {
+    parent::tearDown();
+    CustomField::delete(FALSE)->addWhere('id', '>', '0')->execute();
+    CustomGroup::delete(FALSE)->addWhere('id', '>', '0')->execute();
+  }
+
   public static function setUpBeforeClass(): void {
     parent::setUpBeforeClass();
 
