@@ -234,8 +234,6 @@
      <path>civicrm/admin/setting/preferences/date/edit</path>
      <title>Date Preferences</title>
      <page_callback>CRM_Admin_Form_PreferencesDate</page_callback>
-     <adminGroup>Customize Data and Screens</adminGroup>
-     <weight>97</weight>
   </item>
   <item>
      <path>civicrm/admin/menu</path>
@@ -599,8 +597,10 @@
   </item>
   <item>
      <path>civicrm/admin/setting/preferences/date</path>
-     <title>View Date Preferences</title>
+     <title>Date Preferences</title>
      <page_callback>CRM_Admin_Page_PreferencesDate</page_callback>
+     <adminGroup>Customize Data and Screens</adminGroup>
+     <weight>97</weight>
   </item>
 
   <item>
