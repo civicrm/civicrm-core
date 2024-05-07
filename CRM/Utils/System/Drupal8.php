@@ -653,6 +653,21 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
+   * Commit the session before exiting.
+   * Similar to drupal_exit().
+   */
+  public function onCiviExit() {
+    if (class_exists('Drupal')) {
+      if (!defined('_CIVICRM_FAKE_SESSION')) {
+        $session = \Drupal::service('session');
+        if (!$session->isEmpty()) {
+          $session->save();
+        }
+      }
+    }
+  }
+
+  /**
    * @inheritDoc
    */
   public function setMessage($message) {
