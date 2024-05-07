@@ -36,14 +36,14 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
    *
    * @var int
    */
-  protected $_compID = NULL;
+  protected $compID = NULL;
 
   /**
    * ID of grouping if report list is filtered.
    *
    * @var int
    */
-  protected $_grouping = NULL;
+  protected $grouping = NULL;
 
   /**
    * Possibly always null.... maybe $_title is used...
@@ -59,7 +59,7 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
    *
    * @var int
    */
-  protected $_ovID = NULL;
+  protected $ovID = NULL;
 
   /**
    * Title of parent report template if list is filtered by template.
@@ -67,6 +67,11 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
    * @var string
    */
   protected $_title = NULL;
+
+  /**
+   * @var string
+   */
+  protected $myReports;
 
   /**
    * Retrieves report instances, optionally filtered.
