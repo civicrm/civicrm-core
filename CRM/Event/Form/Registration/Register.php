@@ -594,7 +594,11 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
 
     //don't allow to register w/ waiting if enough spaces available.
-    if (!empty($fields['bypass_payment']) && $form->_allowConfirmation) {
+    // @todo - this might not be working too well cos bypass_payment is working over time here.
+    // it will always be true if there is no payment on the form & it's a bit hard
+    // to determine if this is and we don't want people trying to confirm registration to be blocked here
+    /// see https://lab.civicrm.org/dev/core/-/issues/5168
+    if ($form->getPriceSetID() && !empty($fields['bypass_payment']) && $form->_allowConfirmation) {
       if ($spacesAvailable === 0 ||
         (empty($fields['priceSetId']) && CRM_Utils_Array::value('additional_participants', $fields) < $spacesAvailable)
       ) {
