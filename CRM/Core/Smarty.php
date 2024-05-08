@@ -132,11 +132,13 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
     $smartyPluginsDir = defined('SMARTY_PLUGINS_DIR') ? SMARTY_PLUGINS_DIR : ($pkgsDir . DIRECTORY_SEPARATOR . 'Smarty' . DIRECTORY_SEPARATOR . 'plugins');
     $corePluginsDir = __DIR__ . DIRECTORY_SEPARATOR . 'Smarty' . DIRECTORY_SEPARATOR . 'plugins' . DIRECTORY_SEPARATOR;
 
-    if ($customPluginsDir) {
-      $this->plugins_dir = [$customPluginsDir, $smartyPluginsDir, $corePluginsDir];
-    }
-    else {
-      $this->plugins_dir = [$smartyPluginsDir, $corePluginsDir];
+    if ($this->getVersion() !== 5) {
+      if ($customPluginsDir) {
+        $this->plugins_dir = [$customPluginsDir, $smartyPluginsDir, $corePluginsDir];
+      }
+      else {
+        $this->plugins_dir = [$smartyPluginsDir, $corePluginsDir];
+      }
     }
 
     $this->compile_check = $this->isCheckSmartyIsCompiled();
@@ -520,6 +522,17 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
       ]);
     }
     return $value;
+  }
+
+  /**
+   * Get the smarty version - smarty 5 overrides this - otherwise we aren't quite sure.
+   *
+   * @todo figure out how to identify the other versions & reply accurately.
+   *
+   * @return int|null
+   */
+  public function getVersion(): ?int {
+    return NULL;
   }
 
 }
