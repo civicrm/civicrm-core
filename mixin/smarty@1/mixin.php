@@ -4,7 +4,7 @@
  * Auto-register "templates/" folder.
  *
  * @mixinName smarty
- * @mixinVersion 1.0.0
+ * @mixinVersion 1.0.2
  * @since 5.71
  *
  * @param CRM_Extension_MixInfo $mixInfo
@@ -19,9 +19,21 @@ return function ($mixInfo, $bootCache) {
   }
 
   $register = function() use ($dir) {
-    // This implementation has a theoretical edge-case bug on older versions of CiviCRM where a template could
-    // be registered more than once.
-    CRM_Core_Smarty::singleton()->addTemplateDir($dir);
+    $smarty = CRM_Core_Smarty::singleton();
+    // Smarty2 compatibility
+    if (isset($smarty->_version) && version_compare($smarty->_version, 3, '<')) {
+      $smarty->addTemplateDir($dir);
+      return;
+    }
+    // getTemplateDir returns string or array by reference
+    $templateRef = $smarty->getTemplateDir();
+    // Dereference and normalize as array
+    $templateDirs = (array) $templateRef;
+    // Add the dir if not already present
+    if (!in_array($dir, $templateDirs, TRUE)) {
+      array_unshift($templateDirs, $dir);
+      $smarty->setTemplateDir($templateDirs);
+    }
   };
 
   // Let's figure out what environment we're in -- so that we know the best way to call $register().
