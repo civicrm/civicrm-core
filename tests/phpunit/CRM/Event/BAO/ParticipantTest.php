@@ -146,14 +146,6 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * ImportableFields() method ( Checking the Event's Importable Fields )
-   */
-  public function testImportableFields(): void {
-    $importableFields = CRM_Event_BAO_Participant::importableFields();
-    $this->assertNotCount(0, $importableFields, 'Checking array not to be empty.');
-  }
-
-  /**
    * ParticipantDetails() method ( Checking the Participant Details )
    */
   public function testParticipantDetails(): void {
