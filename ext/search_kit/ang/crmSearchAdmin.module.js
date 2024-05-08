@@ -363,10 +363,25 @@
           return searchTasks[entityName];
         },
         // Supply default aggregate function appropriate to the data_type
-        getDefaultAggregateFn: function(info) {
-          var arg = info.args[0] || {};
+        getDefaultAggregateFn: function(info, apiParams) {
+          let arg = info.args[0] || {};
           if (arg.suffix) {
             return null;
+          }
+          let groupByFn;
+          if (apiParams.groupBy) {
+            apiParams.groupBy.forEach(function(groupBy) {
+              let expr = parseExpr(groupBy);
+              if (expr && expr.fn && expr.args) {
+                let paths = expr.args.map(ex => ex.path);
+                if (paths.includes(arg.path)) {
+                  groupByFn = expr.fn.name;
+                }
+              }
+            });
+          }
+          if (groupByFn) {
+            return groupByFn;
           }
           switch (info.data_type) {
             case 'Integer':
