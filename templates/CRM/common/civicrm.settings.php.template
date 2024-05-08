@@ -30,6 +30,7 @@
  */
 global $civicrm_root, $civicrm_setting, $civicrm_paths;
 
+
 /**
  * Content Management System (CMS) Host:
  *
@@ -58,6 +59,14 @@ if (!defined('CIVICRM_UF')) {
   else {
     define('CIVICRM_UF', '%%cms%%');
   }
+}
+
+/**
+ * Standalone requires this constant to be set to know not to show the installer
+ * (this should be moved to the Standalone specific template soon)
+ */
+if (CIVICRM_UF === 'Standalone' && !defined('CIVICRM_INSTALLED')) {
+  define('CIVICRM_INSTALLED', 1);
 }
 
 /**

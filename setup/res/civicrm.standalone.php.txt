@@ -18,7 +18,7 @@ $classLoader = implode(DIRECTORY_SEPARATOR, [$appRootPath, 'core', 'CRM', 'Core'
 # $autoLoader = implode(DIRECTORY_SEPARATOR, [$appRootPath , 'vendor', 'autoload.php']);
 # $classLoader = implode(DIRECTORY_SEPARATOR, [$appRootPath, 'vendor', 'civicrm', 'civicrm-core', 'CRM', 'Core', 'ClassLoader.php']);
 
-$settingsPath = implode(DIRECTORY_SEPARATOR, [__DIR__, 'civicrm.settings.php']);
+$settingsPath = implode(DIRECTORY_SEPARATOR, [__DIR__, 'data', 'civicrm.settings.php']);
 
 require_once $autoLoader;
 require_once $classLoader;
