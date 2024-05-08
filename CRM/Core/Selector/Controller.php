@@ -114,7 +114,7 @@ class CRM_Core_Selector_Controller {
    *   Should match a CRM_Core_Smarty::PRINT_* constant,
    *   or equal 0 if not in print mode
    */
-  protected $_print = FALSE;
+  protected $_print = 0;
 
   /**
    * The storage object (typically a form or a page)
@@ -486,13 +486,8 @@ class CRM_Core_Selector_Controller {
     }
 
     self::$_template->assign('tplFile', $this->_object->getHookedTemplateFileName());
-    if ($this->_print) {
-      $content = self::$_template->fetch('CRM/common/print.tpl');
-    }
-    else {
-      $config = CRM_Core_Config::singleton();
-      $content = self::$_template->fetch('CRM/common/' . strtolower($config->userFramework) . '.tpl');
-    }
+    $contentTpl = CRM_Utils_System::getContentTemplate($this->_print);
+    $content = self::$_template->fetch($contentTpl);
     echo CRM_Utils_System::theme($content, $this->_print);
   }
 

@@ -247,6 +247,22 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
 
   /**
    * @inheritDoc
+   *
+   * Standalone offers different HTML templates for front and back-end routes.
+   *
+   */
+  public static function getContentTemplate($print = 0): string {
+    if ($print) {
+      return parent::getContentTemplate($print);
+    }
+    else {
+      $isPublic = CRM_Utils_System::isFrontEndPage();
+      return $isPublic ? 'CRM/common/standalone-frontend.tpl' : 'CRM/common/standalone.tpl';
+    }
+  }
+
+  /**
+   * @inheritDoc
    */
   public function theme(&$content, $print = FALSE, $maintenance = FALSE) {
 
@@ -370,6 +386,10 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
       return $civicrm_paths['cms.root']['path'];
     }
     throw new \RuntimeException("Standalone requires the path is set for now. Set \$civicrm_paths['cms.root']['path'] in civicrm.settings.php to the webroot.");
+  }
+
+  public function isFrontEndPage() {
+    return CRM_Core_Menu::isPublicRoute(CRM_Utils_System::currentPath() ?? '');
   }
 
   /**

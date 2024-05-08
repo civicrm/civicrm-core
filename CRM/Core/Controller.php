@@ -765,21 +765,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * @return string
    */
   public function getTemplateFile() {
-    if ($this->_print) {
-      if ($this->_print == CRM_Core_Smarty::PRINT_PAGE) {
-        return 'CRM/common/print.tpl';
-      }
-      elseif ($this->_print === 'xls' || $this->_print === 'doc') {
-        return 'CRM/Contact/Form/Task/Excel.tpl';
-      }
-      else {
-        return 'CRM/common/snippet.tpl';
-      }
-    }
-    else {
-      $config = CRM_Core_Config::singleton();
-      return 'CRM/common/' . strtolower($config->userFramework) . '.tpl';
-    }
+    return CRM_Utils_System::getContentTemplate($this->_print);
   }
 
   /**
