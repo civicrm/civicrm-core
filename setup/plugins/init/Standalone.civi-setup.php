@@ -59,14 +59,17 @@ function _standalone_setup_scheme(): string {
         // Ex: Clone ~/src/civicrm-core; use PHP built-in server and standalone.
         $model->srcPath . '/srv',
 
-        // Ex: Make a vhost and clone `civicrm-core` as `HTTP_ROOT/core`
+        // Ex: `civicrm-core` in web root = project root
+        dirname($model->srcPath, 1),
+
+        // Ex: `civicrm-core` in web root 1 step below project root
         dirname($model->srcPath, 2),
 
         // Ex: Clone `civicrm-standalone` which depends on `civicrm-core`. Use Apache/nginx/etc.
         dirname($model->srcPath, 3),
       ];
       foreach ($candidates as $candidate) {
-        if (file_exists($candidate . '/civicrm.config.php.standalone')) {
+        if (file_exists($candidate . '/civicrm.standalone.php')) {
           $projectRootPath = $model->extras['standaloneRoot'] = $candidate;
           break;
         }
@@ -75,9 +78,9 @@ function _standalone_setup_scheme(): string {
     if (empty($projectRootPath)) {
       throw new \RuntimeException("Failed to identify standalone root. (TIP: Set extras.standaloneRoot)");
     }
-    $model->paths['civicrm.private']['path'] = implode(DIRECTORY_SEPARATOR, [$projectRootPath, 'data']);
-    $model->settingsPath = implode(DIRECTORY_SEPARATOR, [$projectRootPath, 'data', 'civicrm.settings.php']);
-    $model->templateCompilePath = implode(DIRECTORY_SEPARATOR, [$projectRootPath, 'data', 'templates_c']);
+    $model->paths['civicrm.private']['path'] = implode(DIRECTORY_SEPARATOR, [$projectRootPath, 'data', 'private']);
+    $model->settingsPath = implode(DIRECTORY_SEPARATOR, [$projectRootPath, 'data', 'private', 'civicrm.settings.php']);
+    $model->templateCompilePath = implode(DIRECTORY_SEPARATOR, [$projectRootPath, 'data', 'private', 'templates_c']);
     // print "\n-------------------------\nSet model values:\n" . json_encode($model->getValues(), JSON_PRETTY_PRINT) . "\n-----------------------------\n";
 
     // Compute DSN.
@@ -99,11 +102,11 @@ function _standalone_setup_scheme(): string {
     // These paths get set as
     // $civicrm_paths[k]['url'|'path'] = v
     $model->paths['cms.root'] = [
-      'path' => $projectRootPath . DIRECTORY_SEPARATOR . 'web',
+      'path' => $projectRootPath,
     ];
     $model->paths['civicrm.files'] = [
-      'path' => rtrim($projectRootPath . DIRECTORY_SEPARATOR . 'web') . DIRECTORY_SEPARATOR . 'upload',
-      'url' => $model->cmsBaseUrl . '/upload',
+      'path' => implode(DIRECTORY_SEPARATOR, [$projectRootPath, 'data', 'public']),
+      'url' => $model->cmsBaseUrl . '/data/public',
     ];
 
     // Compute default locale.
