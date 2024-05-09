@@ -39,9 +39,12 @@ class WebEntrypoint {
     if (defined('CIVICRM_INSTALLED')) {
       return !!CIVICRM_INSTALLED;
     }
-    if (defined('CIVICRM_DSN')) {
-      // can we autodetect a good value here?
-    }
+    // TODO: if CIVICRM_INSTALLED isnt set explicitly, can we check
+    // whether we have valid database connection to a valid database?
+    //
+    // if (defined('CIVICRM_DSN')) {
+    //   ?? return DB::credentialsPointToValidDatabase(); ??
+    // }
     return FALSE;
   }
 
