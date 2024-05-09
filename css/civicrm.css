@@ -270,7 +270,7 @@ input.crm-form-entityref {
   border-top: 1px solid #696969;
 }
 
-/* Size the verticle heights in crm-containers by class. */
+/* Size the vertical heights in crm-containers by class. */
 .crm-container .ht-one {
   height: 1em;
 }
@@ -3262,7 +3262,7 @@ span.crm-select-item-color {
   width: 93%;
 }
 
-/* Checkbox gropus */
+/* Checkbox groups */
 .crm-container ul.crm-checkbox-list {
   list-style: none;
   margin: 0;
@@ -3319,6 +3319,20 @@ span.crm-select-item-color {
 }
 .crm-container ul.crm-checkbox-list.crm-sortable-list li input {
   left: 23px;
+}
+/* Checkbox/radio fields with n-per-line. See https://lab.civicrm.org/dev/core/-/issues/4985 */
+.crm-container .crm-options-per-line {
+  --gap: 1em;
+  --checkbox-width: 2em;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap);
+}
+.crm-container .crm-options-per-line .crm-option-label-pair {
+  flex: 0 0 calc((100% - (var(--crm-opts-per-line) - 1) * var(--gap)) / var(--crm-opts-per-line));
+  display: grid;
+  grid-template-columns: var(--checkbox-width) 1fr;
+  align-items: baseline;
 }
 
 /* classes related to batch entry operation */
@@ -3974,6 +3988,7 @@ span.crm-status-icon {
 .dedupe-rules-dialog label > * {
   margin-left: 30px;
 }
+
 
 /* Standalone-only styles. A minimal set to make it usable out-of-the-box. */
 html.crm-standalone body {
