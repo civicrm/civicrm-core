@@ -865,7 +865,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $this->add('text', 'source', ts('Contribution Source'), CRM_Utils_Array::value('source', $attributes));
 
     // CRM-7362 --add campaigns.
-    CRM_Campaign_BAO_Campaign::addCampaign($this, CRM_Utils_Array::value('campaign_id', $this->_values));
+    CRM_Campaign_BAO_Campaign::addCampaign($this, $this->_values['campaign_id'] ?? NULL);
 
     if (empty($this->_payNow)) {
       CRM_Contribute_Form_SoftCredit::buildQuickForm($this);

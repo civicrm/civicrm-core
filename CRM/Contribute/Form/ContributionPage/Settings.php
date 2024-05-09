@@ -123,7 +123,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
     $this->addField('frontend_title', ['entity' => 'ContributionPage'], TRUE);
 
     //CRM-7362 --add campaigns.
-    CRM_Campaign_BAO_Campaign::addCampaign($this, CRM_Utils_Array::value('campaign_id', $this->_values));
+    CRM_Campaign_BAO_Campaign::addCampaign($this, $this->_values['campaign_id'] ?? NULL);
 
     $this->add('wysiwyg', 'intro_text', ts('Introductory Message'), $attributes['intro_text']);
 

@@ -296,7 +296,7 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
     }
 
     $params = $this->controller->exportValues($this->_name);
-    $groups = CRM_Utils_Array::value('groups', $params, []);
+    $groups = $params['groups'] ?? [];
     $newGroupName = $params['newGroupName'] ?? NULL;
     $newGroupDesc = $params['newGroupDesc'] ?? NULL;
 
@@ -320,11 +320,9 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
         $totalCount = $addCount[1] ?? NULL;
         if ($groupId == $newGroupId) {
           $name = $newGroupName;
-          $new = TRUE;
         }
         else {
           $name = $existingGroups[$groupId];
-          $new = FALSE;
         }
         if ($totalCount) {
           $url = CRM_Utils_System::url('civicrm/group/search',
