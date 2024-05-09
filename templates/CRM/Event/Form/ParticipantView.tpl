@@ -120,7 +120,7 @@
       {include file="CRM/Contribute/Page/PaymentInfo.tpl" show='payments'}
     {/if}
     {include file="CRM/Custom/Page/CustomDataView.tpl"}
-    {if $accessContribution and $rows.0.contribution_id}
+    {if $accessContribution and array_key_exists(0, $rows) and $rows.0.contribution_id}
         {include file="CRM/Contribute/Form/Selector.tpl" context="Search" single=true}
     {/if}
     <div class="crm-submit-buttons">
