@@ -3321,18 +3321,24 @@ span.crm-select-item-color {
   left: 23px;
 }
 /* Checkbox/radio fields with n-per-line. See https://lab.civicrm.org/dev/core/-/issues/4985 */
-.crm-container .crm-options-per-line {
+.crm-container .crm-multiple-checkbox-radio-options {
   --gap: 1em;
   --checkbox-width: 2em;
   display: flex;
   flex-wrap: wrap;
   gap: var(--gap);
 }
-.crm-container .crm-options-per-line .crm-option-label-pair {
-  flex: 0 0 calc((100% - (var(--crm-opts-per-line) - 1) * var(--gap)) / var(--crm-opts-per-line));
+/* Override more general styling */
+.crm-container .crm-multiple-checkbox-radio-options :where(input.crm-form-radio, input.crm-form-checkbox) + label {
+  margin-left: 0;
+}
+.crm-container .crm-multiple-checkbox-radio-options .crm-option-label-pair {
   display: grid;
   grid-template-columns: var(--checkbox-width) 1fr;
   align-items: baseline;
+}
+.crm-container .crm-multiple-checkbox-radio-options.crm-options-per-line .crm-option-label-pair {
+  flex: 0 0 calc((100% - (var(--crm-opts-per-line) - 1) * var(--gap)) / var(--crm-opts-per-line));
 }
 
 /* classes related to batch entry operation */
