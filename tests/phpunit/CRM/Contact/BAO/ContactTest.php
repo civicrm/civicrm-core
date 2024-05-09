@@ -477,28 +477,6 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test case for resolveDefaults( ).
-   *
-   * @todo the resolveDefaults function is on it's way out - so is this test...
-   *
-   * Test all pseudoConstant, stateProvince, country.
-   */
-  public function testResolveDefaults(): void {
-    $params = [];
-
-    $params['address'][1] = [
-      'location_type_id' => 1,
-      'is_primary' => 1,
-      'country_id' => 1228,
-      'state_province_id' => 1004,
-    ];
-    // @todo - we are testing this with $reverse = FALSE but it is never called that way!
-    CRM_Contact_BAO_Contact::resolveDefaults($params);
-
-    $this->assertEquals(1004, $params['address'][1]['state_province_id']);
-  }
-
-  /**
    * Test case for retrieve( ).
    *
    * Test with all values.
