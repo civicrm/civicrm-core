@@ -376,8 +376,9 @@ class AppSettings {
    *
    * Should we limit to valid keys?:
    *
+   * @return mixed
    */
-  public static function get(string $settingName): mixed {
+  public static function get(string $settingName) {
     $settingName = self::singleton()->getValidPreferredKey($settingName);
     if (!$settingName) {
       // doesn't exist? should we warn or error?
@@ -399,8 +400,9 @@ class AppSettings {
    * todo: support parsing basic arrays maybe?
    *
    * note: could be non-static if we wanted to have any config options for casting?
+   * @return string|bool|int|null
    */
-  protected static function getCastedEnvVar($settingName): string|bool|int|null {
+  protected static function getCastedEnvVar($settingName) {
     $value = getenv($settingName);
     if ($value === FALSE || $value === '') {
       return NULL;
