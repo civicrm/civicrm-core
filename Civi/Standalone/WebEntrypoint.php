@@ -97,7 +97,7 @@ class WebEntrypoint {
     $ctrl = \Civi\Setup::instance()->createController()->getCtrl();
     $ctrl->setUrls([
       // The URL of this setup controller. May be used for POST-backs
-      'ctrl'             => '/civicrm', /* @todo this had url('civicrm') ? */
+      'ctrl'             => '/civicrm',
       // The base URL for loading resource files (images/javascripts) for this project. Includes trailing slash.
       'res'              => $coreUrl . '/setup/res/',
       'jquery.js'        => $coreUrl . '/bower_components/jquery/dist/jquery.min.js',
