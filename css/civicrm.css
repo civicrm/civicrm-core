@@ -3329,7 +3329,8 @@ span.crm-select-item-color {
   gap: var(--gap);
 }
 /* Override more general styling */
-.crm-container .crm-multiple-checkbox-radio-options :where(input.crm-form-radio, input.crm-form-checkbox) + label {
+.crm-container .crm-multiple-checkbox-radio-options :where(input.crm-form-radio,
+input.crm-form-checkbox) + label {
   margin-left: 0;
 }
 .crm-container .crm-multiple-checkbox-radio-options .crm-option-label-pair {
