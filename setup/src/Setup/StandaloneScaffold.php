@@ -70,9 +70,9 @@ class StandaloneScaffold {
     ];
 
     // map all settings files
-    foreach (glob("$srcDir/settings/*") as $settingsFile) {
-      $fileName = basename($settingsFile, '.txt');
-      $files["settings/{$fileName}.txt"] = "settings/$fileName";
+    foreach (glob("$srcDir/settings/*.php.txt") as $settingsFile) {
+      $fileKey = basename($settingsFile, '.php.txt');
+      $files["settings/{$fileKey}.php.txt"] = "settings/$fileKey.php";
     }
 
     foreach ($files as $srcFile => $destFile) {
