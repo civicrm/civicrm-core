@@ -214,7 +214,7 @@ abstract class CRM_Core_DAO_Base extends CRM_Core_DAO {
           $field['pseudoconstant']['optionEditPath'] = 'civicrm/admin/options/' . $field['pseudoconstant']['optionGroupName'];
         }
       }
-      if (!empty($fieldSpec['primary_key']) || !empty($field['readonly'])) {
+      if (!empty($fieldSpec['primary_key']) || !empty($fieldSpec['readonly'])) {
         $field['readonly'] = TRUE;
       }
       $field['add'] = $fieldSpec['add'] ?? NULL;
