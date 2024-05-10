@@ -24,22 +24,27 @@ if (!defined('CIVI_SETUP')) {
       $db = $e->getModel()->{$dbField};
 
       $keys = array_keys($db);
-      sort($keys);
-      $expectedKeys = array('server', 'username', 'password', 'database');
-      sort($expectedKeys);
-      if ($keys !== $expectedKeys) {
-        // if it failed it might be because of the optional ssl parameters
-        $expectedKeys[] = 'ssl_params';
-        sort($expectedKeys);
-        if ($keys !== $expectedKeys) {
-          $e->addError('database', $dbField, sprintf("The database credentials for \"%s\" should be specified as (%s) not (%s)",
-            $dbField,
-            implode(',', $expectedKeys),
-            implode(',', $keys)
-          ));
-          $errors++;
-        }
+      $requiredKeys = ['server', 'username', 'password', 'database'];
+      $allowedKeys = [...$requiredKeys, 'ssl_params', 'password_preset'];
+
+      // are we missing any required keys, or do we have any not allowed keys
+      $requiredKeysMissing = array_diff($requiredKeys, $keys);
+      if ($requiredKeysMissing) {
+        $e->addError('database', $dbField, sprintf("The database credentials for \"%s\" are missing required keys: (%s)",
+          $dbField,
+          implode(',', $requiredKeysMissing)
+        ));
+        $errors++;
       }
+      $disallowedKeys = array_diff($keys, $allowedKeys);
+      if ($disallowedKeys) {
+        $e->addError('database', $dbField, sprintf("The database credentials for \"%s\" have extra keys that aren't allowed: (%s)",
+          $dbField,
+          implode(',', $disallowedKeys)
+        ));
+        $errors++;
+      }
+
 
       foreach ($db as $k => $v) {
         if ($k === 'password' && empty($v)) {
