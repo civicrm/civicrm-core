@@ -617,6 +617,12 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       }
     }
     $this->submitContributionForm($params);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', [
+      'contact_id' => $this->ids['Contact'][0],
+      'version' => 4,
+    ]);
+
+    $this->assertTrue($contribution['is_pay_later']);
     $this->assertMailSentContainingStrings([
       'Dear Anthony,',
       'Contribution Information',
