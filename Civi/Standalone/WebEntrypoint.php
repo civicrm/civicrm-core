@@ -25,27 +25,18 @@ class WebEntrypoint {
   }
 
   /**
-   * if CIVICRM_INSTALLED flag is set in settings, we think the database
-   * *should* already be installed and we'll never show the installer
+   * Determine whether to display the web-based installer.
    *
-   * if its not set, we check for presence of an existing database
+   * If `civicrm.settings.php` (CIVICRM_SETTINGS_PATH) has been loaded, then the database
+   * *should* already be installed, and we won't re-run the installer.
    *
-   * in general setting the flag is probably a good idea to never show the installer again
+   * It is probably a good idea to disallow re-installation here.
    * e.g. you dont want to show the installer if your database goes down
    * (especially as the standalone installer is permissionless - no cms user accounts! - and
    * may even know your database credentials if these are provided as env variables)
    */
-  public static function checkCiviInstalled(): bool {
-    if (defined('CIVICRM_INSTALLED')) {
-      return !!CIVICRM_INSTALLED;
-    }
-    // TODO: if CIVICRM_INSTALLED isnt set explicitly, can we check
-    // whether we have valid database connection to a valid database?
-    //
-    // if (defined('CIVICRM_DSN')) {
-    //   ?? return DB::credentialsPointToValidDatabase(); ??
-    // }
-    return FALSE;
+  private static function checkCiviInstalled(): bool {
+    return !defined('CIVICRM_SETTINGS_PATH');
   }
 
   /**

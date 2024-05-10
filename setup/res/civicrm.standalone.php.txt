@@ -25,5 +25,8 @@ require_once $classLoader;
 \CRM_Core_ClassLoader::singleton()->register();
 
 if (file_exists($settingsPath)) {
+  if (!defined('CIVICRM_SETTINGS_PATH')) {
+    define('CIVICRM_SETTINGS_PATH', $settingsPath);
+  }
   require_once $settingsPath;
 }

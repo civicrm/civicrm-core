@@ -62,14 +62,6 @@ if (!defined('CIVICRM_UF')) {
 }
 
 /**
- * Standalone requires this constant to be set to know not to show the installer
- * (this should be moved to the Standalone specific template soon)
- */
-if (CIVICRM_UF === 'Standalone' && !defined('CIVICRM_INSTALLED')) {
-  define('CIVICRM_INSTALLED', 1);
-}
-
-/**
  * Content Management System (CMS) Datasource:
  *
  * Update this setting with your CMS (Drupal, Backdrop CMS, or Joomla) database username, password, server and DB name.
