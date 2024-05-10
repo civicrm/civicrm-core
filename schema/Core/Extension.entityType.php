@@ -10,6 +10,7 @@ return [
     'description' => ts('FIXME'),
     'log' => FALSE,
     'add' => '4.2',
+    'label_field' => 'label',
   ],
   'getIndices' => fn() => [
     'UI_extension_full_name' => [

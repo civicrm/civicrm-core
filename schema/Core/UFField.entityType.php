@@ -10,6 +10,7 @@ return [
     'description' => ts('User Framework fields and their properties.'),
     'log' => TRUE,
     'add' => '1.1',
+    'label_field' => 'label',
   ],
   'getPaths' => fn() => [
     'add' => 'civicrm/admin/uf/group/field/add?reset=1&action=add&gid=[uf_group_id]',

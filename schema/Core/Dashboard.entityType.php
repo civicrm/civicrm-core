@@ -9,6 +9,7 @@ return [
     'title_plural' => ts('Dashboards'),
     'description' => ts('Table to store dashboard.'),
     'add' => '3.1',
+    'label_field' => 'label',
   ],
   'getFields' => fn() => [
     'id' => [

@@ -10,6 +10,7 @@ return [
     'description' => ts('FIXME'),
     'log' => TRUE,
     'add' => '1.5',
+    'label_field' => 'label',
   ],
   'getPaths' => fn() => [
     'update' => 'civicrm/admin/options/[option_group_id:name]?reset=1&action=update&id=[id]',

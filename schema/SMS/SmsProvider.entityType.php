@@ -9,6 +9,7 @@ return [
     'title_plural' => ts('SMS Providers'),
     'description' => ts('Table to add different sms providers'),
     'add' => '4.2',
+    'label_field' => 'title',
   ],
   'getPaths' => fn() => [
     'add' => 'civicrm/admin/sms/provider/edit?reset=1&action=add',

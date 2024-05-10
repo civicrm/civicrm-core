@@ -9,6 +9,7 @@ return [
     'title_plural' => ts('Dedupe Rule Groups'),
     'description' => ts('Dedupe rule groups'),
     'add' => '1.8',
+    'label_field' => 'title',
   ],
   'getIndices' => fn() => [
     'UI_name' => [

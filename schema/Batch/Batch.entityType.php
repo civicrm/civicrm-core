@@ -9,6 +9,7 @@ return [
     'title_plural' => ts('Batches'),
     'description' => ts('Stores the details of a batch operation Used primarily when doing batch operations with an external system.'),
     'add' => '3.3',
+    'label_field' => 'title',
   ],
   'getIndices' => fn() => [
     'UI_name' => [

@@ -295,7 +295,7 @@ return [
       'add' => '1.7',
       'default' => FALSE,
       'input_attrs' => [
-        'label' => 'Enabled',
+        'label' => ts('Enabled'),
       ],
     ],
     'fee_label' => [

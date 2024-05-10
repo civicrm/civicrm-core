@@ -10,6 +10,7 @@ return [
     'description' => ts('FIXME'),
     'log' => TRUE,
     'add' => '1.7',
+    'label_field' => 'label',
   ],
   'getIndices' => fn() => [
     'UI_line_item_value' => [

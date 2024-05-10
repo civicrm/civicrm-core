@@ -9,6 +9,7 @@ return [
     'title_plural' => ts('Payment Processors'),
     'description' => ts('FIXME'),
     'add' => '1.8',
+    'label_field' => 'title',
   ],
   'getPaths' => fn() => [
     'add' => 'civicrm/admin/paymentProcessor/edit?action=add&reset=1',

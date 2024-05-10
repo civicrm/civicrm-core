@@ -10,6 +10,7 @@ return [
     'description' => ts('FIXME'),
     'log' => TRUE,
     'add' => '1.8',
+    'label_field' => 'label',
   ],
   'getPaths' => fn() => [
     'add' => 'civicrm/admin/price/field/edit?reset=1&action=add&sid=[price_set_id]',
