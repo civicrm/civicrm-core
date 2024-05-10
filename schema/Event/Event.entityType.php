@@ -295,10 +295,7 @@ return [
       'add' => '1.7',
       'default' => FALSE,
       'input_attrs' => [
-        'label' => [
-          'Enabled',
-          'Enabled',
-        ],
+        'label' => 'Enabled',
       ],
     ],
     'fee_label' => [
