@@ -7,8 +7,35 @@ use Civi\Standalone\AppSettings;
 class DsnLoader {
 
   public static function resolveDsn(string $prefix) {
-    if (AppSettings::get($prefix . '_DSN')) {
-      // if dsn is already set, ignore component values
+    $dsn = AppSettings::get($prefix . '_DSN');
+    if ($dsn) {
+      // if dsn is set explicitly, use this as the source of truth.
+      // set the component parts in case anyone wants to AppSettings::get them
+      $urlComponents = \parse_url($dsn);
+
+      if (!$urlComponents) {
+        // couldn't parse for some reason? give up
+        return;
+      }
+
+      foreach (['user', 'pass', 'host', 'port'] as $componentKey) {
+        $settingName = $prefix . '_DB_' . strtoupper($componentKey);
+        $value = $urlComponents[$componentKey] ?? null;
+
+        if ($value) {
+            AppSettings::set($settingName, $value);
+        }
+      }
+
+      // for db name we need to parse the path
+      $settingName = $prefix . '_DB_NAME';
+
+      $urlPath = $urlComponents['path'] ?? '';
+      $dbName = trim($urlPath, '/');
+      if ($dbName) {
+        AppSettings::set($settingName, $dbName);
+      }
+
       return;
     }
 
@@ -18,7 +45,7 @@ class DsnLoader {
       $value = AppSettings::get($prefix . '_DB_' . $componentKey);
       if (!$value) {
         // missing a required key to compose the dsn - so give up
-        // (note: defaults should be set in self::CONSTANTS and returned by get)
+        // (note: defaults should be set in AppSettings::CONSTANTS and returned by get - so this is probably only password)
         return;
       }
       $db[$componentKey] = $value;
