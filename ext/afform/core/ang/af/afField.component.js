@@ -183,6 +183,9 @@
       function setValue(value) {
         // correct the value type
         if (ctrl.defn.input_type !== 'DisplayOnly') {
+          if (_.isString(value) && ctrl.isMultiple() && ctrl.defn.data_type === 'Integer'){
+            value = value.split(',');
+          }
           value = correctValueType(value, ctrl.defn.data_type);
         }
 
@@ -208,9 +211,6 @@
             '>=': ('' + value).split('-')[0],
             '<=': ('' + value).split('-')[1] || '',
           };
-        }
-        else if (_.isString(value) && ctrl.isMultiple()) {
-          value = value.split(',');
         }
         $scope.getSetValue(value);
       }
