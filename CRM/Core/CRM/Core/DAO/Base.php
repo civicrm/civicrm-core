@@ -197,7 +197,7 @@ abstract class CRM_Core_DAO_Base extends CRM_Core_DAO {
         $field['uniqueName'] = $fieldSpec['unique_name'];
       }
       if (!empty($fieldSpec['unique_title'])) {
-        $field['uniqueTitle'] = $fieldSpec['unique_title'];
+        $field['unique_title'] = $fieldSpec['unique_title'];
       }
       if (!empty($fieldSpec['deprecated'])) {
         $field['deprecated'] = TRUE;
