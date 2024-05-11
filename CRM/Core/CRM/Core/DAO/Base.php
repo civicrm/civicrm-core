@@ -133,7 +133,7 @@ abstract class CRM_Core_DAO_Base extends CRM_Core_DAO {
       }
       if (str_starts_with($fieldSpec['sql_type'], 'decimal(')) {
         $precision = self::getFieldLength($fieldSpec['sql_type']);
-        $field['precision'] = explode(',', $precision);
+        $field['precision'] = array_map('intval', explode(',', $precision));
       }
       foreach (['maxlength', 'size', 'rows', 'cols'] as $attr) {
         if (isset($fieldSpec['input_attrs'][$attr])) {
