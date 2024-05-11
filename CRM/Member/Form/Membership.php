@@ -408,24 +408,21 @@ DESC limit 1");
     // retrieve all memberships
     $allMembershipInfo = [];
     foreach ($this->allMembershipTypeDetails as $key => $values) {
-      if ($this->_mode && empty($values['minimum_fee'])) {
-        continue;
-      }
-      else {
-        $memberOfContactId = $values['member_of_contact_id'] ?? NULL;
-        if (empty($selMemTypeOrg[$memberOfContactId])) {
-          $selMemTypeOrg[$memberOfContactId] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
-            $memberOfContactId,
-            'display_name',
-            'id'
-          );
 
-          $selOrgMemType[$memberOfContactId][0] = ts('- select -');
-        }
-        if (empty($selOrgMemType[$memberOfContactId][$key])) {
-          $selOrgMemType[$memberOfContactId][$key] = $values['name'] ?? NULL;
-        }
+      $memberOfContactId = $values['member_of_contact_id'] ?? NULL;
+      if (empty($selMemTypeOrg[$memberOfContactId])) {
+        $selMemTypeOrg[$memberOfContactId] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
+          $memberOfContactId,
+          'display_name',
+          'id'
+        );
+
+        $selOrgMemType[$memberOfContactId][0] = ts('- select -');
       }
+      if (empty($selOrgMemType[$memberOfContactId][$key])) {
+        $selOrgMemType[$memberOfContactId][$key] = $values['name'] ?? NULL;
+      }
+
       $totalAmount = $values['minimum_fee'] ?? 0;
       // build membership info array, which is used when membership type is selected to:
       // - set the payment information block
