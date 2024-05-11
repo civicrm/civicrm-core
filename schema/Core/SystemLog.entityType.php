@@ -64,9 +64,6 @@ return [
       'input_type' => 'Number',
       'description' => ts('Optional Contact ID that created the log. Not an FK as we keep this regardless'),
       'add' => '4.5',
-      'input_attrs' => [
-        'maxlength' => 11,
-      ],
     ],
     'hostname' => [
       'title' => ts('Log Host'),

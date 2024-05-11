@@ -18,9 +18,6 @@ return [
       'input_type' => 'Number',
       'required' => TRUE,
       'add' => '4.6',
-      'input_attrs' => [
-        'maxlength' => 10,
-      ],
       'primary_key' => TRUE,
       'auto_increment' => TRUE,
     ],
@@ -31,9 +28,6 @@ return [
       'required' => TRUE,
       'description' => ts('Recurring Entity Parent ID'),
       'add' => '4.6',
-      'input_attrs' => [
-        'maxlength' => 10,
-      ],
     ],
     'entity_id' => [
       'title' => ts('Entity ID'),
@@ -41,9 +35,6 @@ return [
       'input_type' => 'Number',
       'description' => ts('Recurring Entity Child ID'),
       'add' => '4.6',
-      'input_attrs' => [
-        'maxlength' => 10,
-      ],
     ],
     'entity_table' => [
       'title' => ts('Entity Table'),

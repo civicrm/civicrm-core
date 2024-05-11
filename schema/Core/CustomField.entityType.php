@@ -315,9 +315,6 @@ return [
       'description' => ts('Serialization method - a non-zero value indicates a multi-valued field.'),
       'add' => '5.27',
       'default' => 0,
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
       'pseudoconstant' => [
         'callback' => 'CRM_Core_SelectValues::fieldSerialization',
       ],

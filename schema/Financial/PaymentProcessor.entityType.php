@@ -116,7 +116,6 @@ return [
       'add' => '4.3',
       'input_attrs' => [
         'label' => ts('Type'),
-        'maxlength' => 10,
       ],
       'pseudoconstant' => [
         'table' => 'civicrm_payment_processor_type',

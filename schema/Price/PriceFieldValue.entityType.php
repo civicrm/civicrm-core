@@ -118,7 +118,6 @@ return [
       'add' => '3.3',
       'input_attrs' => [
         'size' => '8',
-        'maxlength' => 18,
       ],
     ],
     'count' => [

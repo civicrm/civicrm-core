@@ -61,6 +61,7 @@ class CRM_Price_Form_FieldTest extends CiviUnitTestCase {
     $fields = CRM_Price_DAO_PriceFieldValue::fields();
     $this->assertSame([18, 9], $fields['amount']['precision']);
     $this->assertSame(CRM_Utils_Type::T_MONEY, $fields['amount']['type']);
+    $this->assertArrayNotHasKey('maxlength', $fields['amount']);
   }
 
   /**
