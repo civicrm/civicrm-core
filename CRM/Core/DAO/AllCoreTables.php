@@ -407,7 +407,7 @@ class CRM_Core_DAO_AllCoreTables {
    *   Ex: 'address'.
    * @param bool $prefix
    * @param array $foreignDAOs
-   *   Historically used for... something? Currently never set by any core BAO.
+   *   Will merge in exportable fields from other DAOs.
    * @return array
    * @internal
    */
@@ -425,7 +425,7 @@ class CRM_Core_DAO_AllCoreTables {
       }
     }
 
-    // TODO: Remove this bit; no core DAO actually uses it
+    // Merge in exportable fields from other DAOs
     foreach ($foreignDAOs as $foreignDAO) {
       $exports = array_merge($exports, $foreignDAO::export(TRUE));
     }
@@ -442,8 +442,7 @@ class CRM_Core_DAO_AllCoreTables {
    *   Ex: 'address'.
    * @param bool $prefix
    * @param array $foreignDAOs
-   *   Historically used for... something? Currently never set by any core BAO.
-   * @return array
+   *   Will merge in importable fields from other DAOs.   * @return array
    * @internal
    */
   public static function getImports($dao, $labelName, $prefix, $foreignDAOs = []): array {
@@ -460,7 +459,7 @@ class CRM_Core_DAO_AllCoreTables {
       }
     }
 
-    // TODO: Remove this bit; no core DAO actually uses it
+    // Merge in importable fields from other DAOs
     foreach ($foreignDAOs as $foreignDAO) {
       $imports = array_merge($imports, $foreignDAO::import(TRUE));
     }
