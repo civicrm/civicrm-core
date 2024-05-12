@@ -28,7 +28,6 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
 
   protected int $financialTypeID = 1;
   protected $_params;
-  protected $_ids = [];
 
   /**
    * Products.
@@ -1604,7 +1603,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'qfKey' => 'abc',
       'priceSetId' => reset($this->ids['PriceSet']),
       'price_set_id' => reset($this->ids['PriceSet']),
-      'price_' . $this->_ids['price_field'][0] => $this->_ids['price_field_value']['cont'],
+      'price_' . $this->ids['PriceField']['default'] => $this->ids['PriceFieldValue']['donation'],
       'invoiceID' => '9a6f7b49358dc31c3604e463b225c5be',
       'email' => 'admin@example.com',
       'currencyID' => 'USD',
@@ -1630,7 +1629,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $this->contributionDelete($contribution['id']);
 
     //Choose Membership Priceset
-    $form->_params["price_{$this->_ids['price_field'][0]}"] = $this->_ids['price_field_value'][0];
+    $form->_params["price_{$this->ids['PriceField']['default']}"] = $this->ids['PriceFieldValue']['one_term_membership'];
     $form->_params['amount'] = 20;
     $form->submit($form->_params);
 
