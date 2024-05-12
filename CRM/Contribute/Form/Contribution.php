@@ -2120,19 +2120,22 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $params[$f] = $formValues[$f] ?? NULL;
       }
       if ($this->_id && $action & CRM_Core_Action::UPDATE) {
+        // @todo - should we remove all this - if it's going from Pending to Completed then
+        // add payment handles that - what statuses CAN be changed here?
+        // Also - the changing of is_pay_later to 0 here has been debated at times
+        // as it could be argued it still showed the intent.
         // Can only be updated to contribution which is handled via Payment.create
         $params['contribution_status_id'] = $this->getSubmittedValue('contribution_status_id');
-
-        // Set is_pay_later flag for back-office offline Pending status contributions CRM-8996
-        // else if contribution_status is changed to Completed is_pay_later flag is changed to 0, CRM-15041
-        if ($params['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending')) {
-          $params['is_pay_later'] = 1;
-        }
-        elseif ($params['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed')) {
+        if ($params['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed')) {
           // @todo - if the contribution is new then it should be Pending status & then we use
           // Payment.create to update to Completed.
+          // If contribution_status is changed to Completed is_pay_later flag is changed to 0, CRM-15041
           $params['is_pay_later'] = 0;
         }
+      }
+      // Set is_pay_later flag for new back-office offline Pending status contributions CRM-8996
+      if (!$this->getContributionID() && $params['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending')) {
+        $params['is_pay_later'] = 1;
       }
 
       $params['revenue_recognition_date'] = NULL;
