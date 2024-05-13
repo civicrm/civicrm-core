@@ -19,26 +19,6 @@ class CRM_OAuth_BAO_OAuthSysToken extends CRM_OAuth_DAO_OAuthSysToken {
   private static $returnFields = ['id', 'client_id', 'expires', 'tag'];
 
   /**
-   * Create a new OAuthSysToken based on array-data
-   *
-   * @param array $params key-value pairs
-   * @return CRM_OAuth_DAO_OAuthSysToken|NULL
-   *
-   * public static function create($params) {
-   * $className = 'CRM_OAuth_DAO_OAuthSysToken';
-   * $entityName = 'OAuthSysToken';
-   * $hook = empty($params['id']) ? 'create' : 'edit';
-   *
-   * CRM_Utils_Hook::pre($hook, $entityName, CRM_Utils_Array::value('id', $params), $params);
-   * $instance = new $className();
-   * $instance->copyValues($params);
-   * $instance->save();
-   * CRM_Utils_Hook::post($hook, $entityName, $instance->id, $instance);
-   *
-   * return $instance;
-   * } */
-
-  /**
    * Redact the content of a token.
    *
    * This is useful for processes which must internally use the entire token

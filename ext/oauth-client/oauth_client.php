@@ -1,9 +1,7 @@
 <?php
 
 require_once 'oauth_client.civix.php';
-// phpcs:disable
 use CRM_OauthClient_ExtensionUtil as E;
-// phpcs:enable
 
 /**
  * Implements hook_civicrm_config().
