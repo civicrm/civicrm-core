@@ -759,7 +759,6 @@ HERESQL;
     }
     $casesList = self::getCaseActivities($type, $userID, $condition);
     $casesList['total'] = $totalCount;
-    
 
     $limit = '';
     if (!empty($params['rp'])) {
@@ -1650,7 +1649,6 @@ HERESQL;
         $activityInfo[$case->case_id]['type'] = $activityTypes[$case->activity_type_id] ?? NULL;
       }
     }
-
 
     return $activityInfo;
   }
