@@ -483,10 +483,10 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
       foreach ($result as $activity) {
         if ($activity['case_id'] === $case['case_id']) {
           if ($activity['relationship.contact_id_b'] == $userID) {
-              $roles[] = $activity['relationship_type.label_b_a'];
+            $roles[] = $activity['relationship_type.label_b_a'];
           }
           if ($activity['relationship.contact_id_a'] == $userID) {
-              $roles[] = $activity['relationship_type.label_a_b'];
+            $roles[] = $activity['relationship_type.label_a_b'];
           }
         }
       }
@@ -538,7 +538,7 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
    * @param string $type
    * @param int $userID
    * @param array $condition
-   * 
+   *
    * @return array
    */
   public static function getCaseActivityParams(string $type, int $userID, array $condition = []) : array {
@@ -550,23 +550,23 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
       ['RelationshipType AS relationship_type', 'LEFT', ['relationship.relationship_type_id', '=', 'relationship_type.id']],
     ];
     switch ($type) {
-        case 'upcoming':
-          $condition[] = ['activity_id.activity_date_time', '>' , date('Y-m-d')];
-          break;
+      case 'upcoming':
+        $condition[] = ['activity_id.activity_date_time', '>' , date('Y-m-d')];
+        break;
 
-        case 'recent':
-          $condition[] = ['activity_id.activity_date_time', '<' , date('Y-m-d')];
-          break;
+      case 'recent':
+        $condition[] = ['activity_id.activity_date_time', '<' , date('Y-m-d')];
+        break;
 
-        case 'any':
-          break;
+      case 'any':
+        break;
 
-        default:
-          throw new Exception('Invalid type specified');
+      default:
+        throw new Exception('Invalid type specified');
     }
 
     if ($condition) {
-        $params['where'] = $condition;
+      $params['where'] = $condition;
     }
     return $params;
   }
@@ -754,8 +754,8 @@ HERESQL;
     }
     $totalCount = self::getCaseActivitiesCount($type, $userID, $condition);
     if ($getCount) {
-        Civi::$statics[__CLASS__]['totalCount'][$type] = $totalCount;
-        return $totalCount;
+      Civi::$statics[__CLASS__]['totalCount'][$type] = $totalCount;
+      return $totalCount;
     }
     $casesList = self::getCaseActivities($type, $userID, $condition);
     $casesList['total'] = $totalCount;
