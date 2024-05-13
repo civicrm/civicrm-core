@@ -89,7 +89,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
       }
     }
     $hook = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'MessageTemplate', CRM_Utils_Array::value('id', $params), $params);
+    CRM_Utils_Hook::pre($hook, 'MessageTemplate', $params['id'] ?? NULL, $params);
 
     if (!empty($params['file_id']) && is_array($params['file_id']) && count($params['file_id'])) {
       $fileParams = $params['file_id'];

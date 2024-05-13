@@ -87,9 +87,7 @@ class CRM_Core_BAO_Country extends CRM_Core_DAO_Country {
 
     if (!empty($defaultContactCountry) && !$cachedContactCountry) {
       $countryIsoCodes = CRM_Core_PseudoConstant::countryIsoCode();
-      $cachedContactCountry = CRM_Utils_Array::value($defaultContactCountry,
-        $countryIsoCodes
-      );
+      $cachedContactCountry = $countryIsoCodes[$defaultContactCountry] ?? NULL;
     }
     return $cachedContactCountry;
   }

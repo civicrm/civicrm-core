@@ -310,7 +310,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
       $group->is_reserved = $params['is_reserved'] ? 1 : 0;
     }
     $op = isset($params['id']) ? 'edit' : 'create';
-    CRM_Utils_Hook::pre($op, 'CustomGroup', CRM_Utils_Array::value('id', $params), $params);
+    CRM_Utils_Hook::pre($op, 'CustomGroup', $params['id'] ?? NULL, $params);
 
     // enclose the below in a transaction
     $transaction = new CRM_Core_Transaction();
