@@ -444,7 +444,6 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
     return $caseArray;
   }
 
-
   /**
    * @param string $type
    * @param int $userID
