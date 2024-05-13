@@ -306,7 +306,7 @@ class CRM_Utils_Mail {
       // This is copied from the Action Schedule send code.
       $textMessage = str_replace('&amp;', '&', $textMessage);
     }
-    if (str_contains($textMessage, 'Undefined array key') || str_contains($htmlMessage, 'Undefined array key') || str_contains($htmlMessage, 'Undefined index')) {
+    if (str_contains($textMessage, 'Undefined array key') || str_contains($htmlMessage, 'Undefined array key') || str_contains($htmlMessage, 'Undefined index') || str_contains($textMessage, 'array offset on value of type null') || str_contains($htmlMessage, 'array offset on value of type null')) {
       $logCount = \Civi::$statics[__CLASS__][__FUNCTION__]['count'] ?? 0;
       if ($logCount < 3) {
         // Only record the first 3 times since there might be different messages but after 3 chances are
