@@ -18,6 +18,11 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
   public $payer_contact_id;
   public $is_pay_later = FALSE;
   public $pay_later_receipt;
+  public $_price_values;
+  public $_paymentFields;
+  public $sub_trxn_index;
+  public $trxn_id;
+  public $trxn_date;
 
   /**
    * @var array

@@ -69,7 +69,6 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
    */
   public function build_price_options($event) {
     $price_fields_for_event = [];
-    $base_field_name = "event_{$event->id}_amount";
     $price_set_id = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $event->id);
     //CRM-14492 display admin fields only if user is admin
     $adminFieldVisible = FALSE;
@@ -79,14 +78,18 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
     if ($price_set_id) {
       $price_sets = CRM_Price_BAO_PriceSet::getSetDetail($price_set_id, TRUE, TRUE);
       $price_set = $price_sets[$price_set_id];
-      $index = -1;
       foreach ($price_set['fields'] as $field) {
-        $index++;
         if (($field['visibility'] ?? '') === 'public' ||
            (($field['visibility'] ?? '') === 'admin' && $adminFieldVisible == TRUE)) {
           $field_name = "event_{$event->id}_price_{$field['id']}";
           if (!empty($field['options'])) {
-            CRM_Price_BAO_PriceField::addQuickFormElement($this, $field_name, $field['id'], FALSE);
+            $options = $field['options'];
+            foreach ($options as &$option) {
+              if (!isset($option['tax_amount'])) {
+                $option['tax_amount'] = 0;
+              }
+            }
+            CRM_Price_BAO_PriceField::addQuickFormElement($this, $field_name, $field['id'], FALSE, TRUE, NULL, $options);
             $price_fields_for_event[] = $field_name;
           }
         }
