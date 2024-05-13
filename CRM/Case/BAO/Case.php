@@ -1634,12 +1634,14 @@ HERESQL;
   public static function getNextScheduledActivity($cases, $type = 'upcoming') {
     $userID = CRM_Core_Session::getLoggedInContactID();
 
-    $caseID = implode(',', $cases['case_id']);
-    $contactID = implode(',', $cases['contact_id']);
+    // $caseID = implode(',', $cases['case_id']);
+    $caseID = $cases['case_id'];
+    // $contactID = implode(',', $cases['contact_id']);
+    $contactID = $cases['contact_id'];
     $condition = [];
     $condition[] = ['case_contact.id', 'IN', $contactID];
-    $condition[] = ['case.id', 'IN', $caseID];
-    $condition[] = ['case.is_deleted', '=', $cases['case_deleted']];
+    $condition[] = ['case_id', 'IN', $caseID];
+    $condition[] = ['case_id.is_deleted', '=', $cases['case_deleted']];
 //     $condition = " civicrm_case_contact.contact_id IN( {$contactID} )
 //  AND civicrm_case.id IN( {$caseID})
 //  AND civicrm_case.is_deleted     = {$cases['case_deleted']}";
