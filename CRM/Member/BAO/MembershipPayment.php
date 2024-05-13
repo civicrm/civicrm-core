@@ -27,7 +27,7 @@ class CRM_Member_BAO_MembershipPayment extends CRM_Member_DAO_MembershipPayment 
    */
   public static function create($params) {
     $hook = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'MembershipPayment', CRM_Utils_Array::value('id', $params), $params);
+    CRM_Utils_Hook::pre($hook, 'MembershipPayment', $params['id'] ?? NULL, $params);
     $dao = new CRM_Member_DAO_MembershipPayment();
     $dao->copyValues($params);
     // We check for membership_id in case we are being called too early in the process. This is
