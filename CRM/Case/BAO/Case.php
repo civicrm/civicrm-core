@@ -446,101 +446,101 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
 
 
   /**
- * @param string $type
- * @param int $userID
- * @param array $condition
- * @param string|null $limit
- * @param string|null $order
- *
- * @return array
- */
-public static function getCaseActivities(string $type, int $userID, array $condition = [], ?string $limit = NULL, ?string $order = NULL) : array {
-  $params = self::getCaseActivityParams($type, $userID, $condition);
-  $params['select'] = [
-    'case_id',
-    'case_id.subject',
-    'case_contact.contact_id',
-    'contact.sort_name',
-    'contact.phone_primary',
-    'contact.contact_type',
-    'contact.contact_sub_type',
-    'activity_id.activity_type_id',
-    'case_id.case_type_id',
-    'case_id.status_id',
-    'activity_id.status_id',
-    'case_id.start_date',
-    'relationship.contact_id_b',
-    'relationship.contact_id_a',
-    'relationship_type.label_b_a',
-    'activity_id.activity_date_time',
-    'activity_id.id',
-    'case_id.status_id:label',
-    'case_id.case_type_id:name',
-  ];
-  $cases = [];
-  $result = civicrm_api4('CaseActivity', 'get', $params);
-  foreach ($result as $case) {
-    $roles = [];
-    foreach ($result as $activity) {
-      if ($activity['case_id'] === $case['case_id']) {
-          if ($activity['relationship.contact_id_b'] == $userID) {
-              $roles[] = $activity['relationship_type.label_b_a'];
-          }
-          if ($activity['relationship.contact_id_a'] == $userID) {
-              $roles[] = $activity['relationship_type.label_a_b'];
-          }
-      }
-    }
-    $uniqueRoles = array_unique($roles);
-    $role = implode(', ', $uniqueRoles);
-    $cases[$case['case_id']] = [
-      'case_id' => $case['case_id'],
-      'case_subject' => $case['case_id.subject'],
-      'contact_id' => $case['case_contact.contact_id'],
-      'sort_name' => $case['contact.sort_name'],
-      'phone' => $case['contact.phone_primary'],
-      'contact_type' => $case['contact.contact_type'],
-      'contact_sub_type' => $case['contact.contact_sub_type'],
-      'activity_type_id' => $case['activity_id.activity_type_id'],
-      'case_type_id' => $case['case_id.case_type_id'],
-      'case_status_id' => $case['case_id.status_id'],
-      'status_id' => $case['activity_id.status_id'],
-      'case_start_date' => $case['case_id.start_date'],
-      'case_role' => $role,
-      'activity_date_time' => $case['activity_id.activity_date_time'],
-      'activity_id' => $case['activity_id.id'],
-      'case_status' => $case['case_id.status_id:label'],
-      'case_type' => $case['case_id.case_type_id:name'],
+   * @param string $type
+   * @param int $userID
+   * @param array $condition
+   * @param string|null $limit
+   * @param string|null $order
+   *
+   * @return array
+   */
+  public static function getCaseActivities(string $type, int $userID, array $condition = [], ?string $limit = NULL, ?string $order = NULL) : array {
+    $params = self::getCaseActivityParams($type, $userID, $condition);
+    $params['select'] = [
+      'case_id',
+      'case_id.subject',
+      'case_contact.contact_id',
+      'contact.sort_name',
+      'contact.phone_primary',
+      'contact.contact_type',
+      'contact.contact_sub_type',
+      'activity_id.activity_type_id',
+      'case_id.case_type_id',
+      'case_id.status_id',
+      'activity_id.status_id',
+      'case_id.start_date',
+      'relationship.contact_id_b',
+      'relationship.contact_id_a',
+      'relationship_type.label_b_a',
+      'activity_id.activity_date_time',
+      'activity_id.id',
+      'case_id.status_id:label',
+      'case_id.case_type_id:name',
     ];
+    $cases = [];
+    $result = civicrm_api4('CaseActivity', 'get', $params);
+    foreach ($result as $case) {
+      $roles = [];
+      foreach ($result as $activity) {
+        if ($activity['case_id'] === $case['case_id']) {
+            if ($activity['relationship.contact_id_b'] == $userID) {
+                $roles[] = $activity['relationship_type.label_b_a'];
+            }
+            if ($activity['relationship.contact_id_a'] == $userID) {
+                $roles[] = $activity['relationship_type.label_a_b'];
+            }
+        }
+      }
+      $uniqueRoles = array_unique($roles);
+      $role = implode(', ', $uniqueRoles);
+      $cases[$case['case_id']] = [
+        'case_id' => $case['case_id'],
+        'case_subject' => $case['case_id.subject'],
+        'contact_id' => $case['case_contact.contact_id'],
+        'sort_name' => $case['contact.sort_name'],
+        'phone' => $case['contact.phone_primary'],
+        'contact_type' => $case['contact.contact_type'],
+        'contact_sub_type' => $case['contact.contact_sub_type'],
+        'activity_type_id' => $case['activity_id.activity_type_id'],
+        'case_type_id' => $case['case_id.case_type_id'],
+        'case_status_id' => $case['case_id.status_id'],
+        'status_id' => $case['activity_id.status_id'],
+        'case_start_date' => $case['case_id.start_date'],
+        'case_role' => $role,
+        'activity_date_time' => $case['activity_id.activity_date_time'],
+        'activity_id' => $case['activity_id.id'],
+        'case_status' => $case['case_id.status_id:label'],
+        'case_type' => $case['case_id.case_type_id:name'],
+      ];
+    }
+    return $cases;
   }
-  return $cases;
-}
 
-/**
- * @param string $type
- * @param int $userID
- * @param array $condition
- *
- * @return int
- */
-public static function getCaseActivitiesCount(string $type, int $userID, array $condition = []) : int{
-  $params = self::getCaseActivityParams($type, $userID, $condition);
-  $params['select'] = [
-    'row_count',
-  ];
-  $params['groupBy'] = ['case_id'];
+  /**
+   * @param string $type
+   * @param int $userID
+   * @param array $condition
+   *
+   * @return int
+   */
+  public static function getCaseActivitiesCount(string $type, int $userID, array $condition = []) : int{
+    $params = self::getCaseActivityParams($type, $userID, $condition);
+    $params['select'] = [
+      'row_count',
+    ];
+    $params['groupBy'] = ['case_id'];
 
-  $result = civicrm_api4('CaseActivity', 'get', $params);
-  return $result->rowCount ?? 0;
-}
+    $result = civicrm_api4('CaseActivity', 'get', $params);
+    return $result->rowCount ?? 0;
+  }
 
-/**
- * @param string $type
- * @param int $userID
- * @param array $condition
- * @return array
- * 
- */
+  /**
+   * @param string $type
+   * @param int $userID
+   * @param array $condition
+   * @return array
+   * 
+   */
   public static function getCaseActivityParams(string $type, int $userID, array $condition = []) : array
   {
     $params = [];
