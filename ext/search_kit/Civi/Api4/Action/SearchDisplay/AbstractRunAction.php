@@ -303,9 +303,10 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @return string
    */
   private function rewrite(array $column, array $data): string {
-    // Cheap strpos to skip Smarty processing if not needed
-    $hasSmarty = strpos($column['rewrite'], '{') !== FALSE;
     $output = $this->replaceTokens($column['rewrite'], $data, 'view');
+    $output = \Civi\Token\TokenCompatSubscriber::renderConditionalPunctuation($output);
+    // Cheap strpos to skip Smarty processing if not needed
+    $hasSmarty = strpos($output, '{') !== FALSE;
     if ($hasSmarty) {
       $vars = [];
       $nestedIds = [];
