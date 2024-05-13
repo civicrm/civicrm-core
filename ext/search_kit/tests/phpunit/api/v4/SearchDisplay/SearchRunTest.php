@@ -80,7 +80,9 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
         'api_params' => [
           'version' => 4,
           'select' => ['id', 'first_name', 'middle_name', 'last_name', 'contact_sub_type:label', 'is_deceased'],
-          'where' => [],
+          'where' => [
+            ['do_not_email', 'IS EMPTY'],
+          ],
         ],
       ],
       'display' => [
