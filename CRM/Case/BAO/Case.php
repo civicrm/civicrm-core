@@ -538,8 +538,8 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
    * @param string $type
    * @param int $userID
    * @param array $condition
-   * @return array
    * 
+   * @return array
    */
   public static function getCaseActivityParams(string $type, int $userID, array $condition = []) : array {
     $params = [];
