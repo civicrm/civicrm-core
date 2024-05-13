@@ -751,7 +751,7 @@ HERESQL;
     foreach (['case_type_id', 'status_id'] as $column) {
       if (!empty($params[$column])) {
         // $condition[] = sprintf("civicrm_case.%s IN (%s)", $column, $params[$column]);
-        $condition[] = ['case_id' . $column, 'IN', $params[$column]];
+        $condition[] = ['case_id.' . $column, 'IN', $params[$column]];
       }
     }
     $totalCount = self::getCaseActivitiesCount($type, $userID, $condition);
