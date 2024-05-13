@@ -229,12 +229,16 @@ class PathLoader {
     $keyMap = [
       'cms.root' => 'web_root',
       'civicrm.private' => 'private',
+      'civicrm.compile' => 'compile',
       'civicrm.files' => 'public_uploads',
       'civicrm.l10n' => 'translations',
       'civicrm.tmp' => 'tmp',
       'civicrm.custom' => 'private_uploads',
       'civicrm.log' => 'log',
+      'civicrm.root' => 'core',
       'civicrm.vendor' => 'vendor',
+      'civicrm.packages' => 'packages',
+      'civicrm.bower' => 'bower',
     ];
 
     $mapped = [];
