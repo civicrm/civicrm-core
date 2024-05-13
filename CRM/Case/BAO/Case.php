@@ -483,12 +483,12 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
       $roles = [];
       foreach ($result as $activity) {
         if ($activity['case_id'] === $case['case_id']) {
-            if ($activity['relationship.contact_id_b'] == $userID) {
-                $roles[] = $activity['relationship_type.label_b_a'];
-            }
-            if ($activity['relationship.contact_id_a'] == $userID) {
-                $roles[] = $activity['relationship_type.label_a_b'];
-            }
+          if ($activity['relationship.contact_id_b'] == $userID) {
+              $roles[] = $activity['relationship_type.label_b_a'];
+          }
+          if ($activity['relationship.contact_id_a'] == $userID) {
+              $roles[] = $activity['relationship_type.label_a_b'];
+          }
         }
       }
       $uniqueRoles = array_unique($roles);
