@@ -530,6 +530,7 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
     $params['groupBy'] = ['case_id'];
 
     $result = civicrm_api4('CaseActivity', 'get', $params);
+    throw new \Exception('test');
     return $result->rowCount ?? 0;
   }
 
@@ -578,6 +579,7 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
    * @return string
    */
   public static function getCaseActivityCountQuery($type, $userID, $condition = NULL) {
+    throw new \Exception('test');
     return sprintf(" SELECT COUNT(*) FROM (%s) temp ", self::getCaseActivityQuery($type, $userID, $condition));
   }
 
