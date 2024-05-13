@@ -706,7 +706,7 @@ HERESQL;
    * @param string $context
    * @param bool $getCount
    *
-   * @return array | int
+   * @return array|int
    *   Array of Cases
    */
   public static function getCases($allCases = TRUE, $params = [], $context = 'dashboard', $getCount = FALSE) {
