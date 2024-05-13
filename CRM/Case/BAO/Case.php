@@ -745,7 +745,7 @@ HERESQL;
 
     foreach (['case_type_id', 'status_id'] as $column) {
       if (!empty($params[$column])) {
-        if(is_string($params[$column])){
+        if (is_string($params[$column])) {
           $params[$column] = explode(',', $params[$column]);
         }
         $condition[] = ['case_id.' . $column, 'IN', $params[$column]];
