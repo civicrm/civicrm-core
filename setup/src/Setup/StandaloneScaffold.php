@@ -54,7 +54,8 @@ class StandaloneScaffold {
       "$destDir/settings",
       "$destDir/private",
       "$destDir/public",
-      "$destDir/ext",
+      "$destDir/public/uploads",
+      "$destDir/extensions",
     ];
 
     foreach ($dirs as $dir) {
