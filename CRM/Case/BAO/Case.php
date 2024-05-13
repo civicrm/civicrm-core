@@ -523,7 +523,7 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
    *
    * @return int
    */
-  public static function getCaseActivitiesCount(string $type, int $userID, array $condition = []) : int{
+  public static function getCaseActivitiesCount(string $type, int $userID, array $condition = []) : int {
     $params = self::getCaseActivityParams($type, $userID, $condition);
     $params['select'] = [
       'row_count',
@@ -541,8 +541,7 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
    * @return array
    * 
    */
-  public static function getCaseActivityParams(string $type, int $userID, array $condition = []) : array
-  {
+  public static function getCaseActivityParams(string $type, int $userID, array $condition = []) : array {
     $params = [];
     $params['join'] = [
       ['Relationship AS relationship', 'LEFT', ['case_id', '=', 'relationship.case_id']],
@@ -552,18 +551,18 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
     ];
     switch ($type) {
         case 'upcoming':
-            $condition[] = ['activity_id.activity_date_time', '>' , date('Y-m-d')];
-            break;
+          $condition[] = ['activity_id.activity_date_time', '>' , date('Y-m-d')];
+          break;
 
         case 'recent':
-            $condition[] = ['activity_id.activity_date_time', '<' , date('Y-m-d')];
-            break;
+          $condition[] = ['activity_id.activity_date_time', '<' , date('Y-m-d')];
+          break;
 
         case 'any':
-            break;
+          break;
 
         default:
-            throw new Exception('Invalid type specified');
+          throw new Exception('Invalid type specified');
     }
 
     if ($condition) {
