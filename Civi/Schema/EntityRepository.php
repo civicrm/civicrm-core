@@ -86,12 +86,20 @@ class EntityRepository {
   }
 
   private static function loadCoreEntities(): array {
+    static $cache;
+
     $entityTypes = [];
     $path = dirname(__DIR__, 2) . '/schema/*/*.entityType.php';
     $files = (array) glob($path);
     foreach ($files as $file) {
-      $entity = include $file;
-      $entity['module'] = 'civicrm';
+      if (isset($cache[$file])) {
+        $entity = $cache[$file];
+      }
+      else {
+        $entity = include $file;
+        $entity['module'] = 'civicrm';
+        $cache[$file] = $entity;
+      }
       $entityTypes[$entity['name']] = $entity;
     }
     return $entityTypes;
