@@ -285,6 +285,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
 
     $customOption = $fieldOptions;
     if (!is_array($customOption)) {
+      // @deprecated - always pass in customOption.
       $customOption = CRM_Price_BAO_PriceField::getOptions($field->id, $inactiveNeeded);
     }
 
@@ -537,6 +538,10 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    *   Discard stored values.
    * @param bool $isDefaultContributionPriceSet
    *   Discard tax amount calculation for price set = default_contribution_amount.
+   *
+   * @deprecated since 5.75 will be removed around 5.95 - it is unclear why
+   * this function does not set tax for default contribution tax rate & hence it
+   * should be avoided.
    *
    * @return array
    *   array of options
