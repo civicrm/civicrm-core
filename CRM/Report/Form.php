@@ -2398,7 +2398,6 @@ INNER JOIN civicrm_custom_group cg ON cg.id = cf.custom_group_id
 WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
       cg.is_active = 1 AND
       cf.is_active = 1 AND
-      cf.is_searchable = 1 AND
       cf.data_type   NOT IN ('ContactReference', 'Date') AND
       cf.id IN (" . implode(",", $customFieldIds) . ")";
 
@@ -4029,8 +4028,7 @@ INNER  JOIN civicrm_custom_field cf ON cg.id = cf.custom_group_id
 WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
       {$customGroupWhere}
       cg.is_active = 1 AND
-      cf.is_active = 1 AND
-      cf.is_searchable = 1
+      cf.is_active = 1
 ORDER BY cg.weight, cf.weight";
     $customDAO = CRM_Core_DAO::executeQuery($sql);
 
