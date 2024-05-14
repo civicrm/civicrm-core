@@ -156,24 +156,21 @@ input.crm-form-checkbox + label {
 .crm-container table.form-layout-compressed tbody th.label {
   background-color: #f7f7f7;
 }
+
+/* Styles for sticky header */
 .crm-wordpress-permissions thead {
-  position:sticky;
-  top:40px;
-  box-shadow:0 2px 2px -1px #cfcec3;
-}
-.crm-menubar-below-cms-menu .crm-wordpress-permissions thead {
-  top:72px;
-}
-/*
-.crm-wordpress-permissions thead > tr > th {
-  position:sticky;
-  top:40px;
-}
-*/
-.crm-menubar-below-cms-menu .crm-wordpress-permissions thead > tr > th {
-  top:72px;
+  position: sticky;
+  top: 40px;
+  box-shadow: 0 2px 2px -1px #cfcec3;
 }
 
+.crm-menubar-below-cms-menu .crm-wordpress-permissions thead {
+  top: 72px;
+}
+
+.crm-menubar-below-cms-menu .crm-wordpress-permissions thead > tr > th {
+  top: 72px;
+}
 
 .crm-container tbody {
   border-top: none;
@@ -2764,7 +2761,7 @@ div.crm-container form {
 
 /* tables */
 .crm-container table {
-  position:relative;
+  position: relative;
   border: 1px solid #efefef;
 }
 
