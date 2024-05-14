@@ -959,7 +959,7 @@ LIMIT  1
 
     // Retrieve custom values for cases.
     $customValues = CRM_Core_BAO_CustomValueTable::getEntityValues($caseID, 'Case');
-    $extends = ['case'];
+    $extends = ['Case'];
     $groupTree = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, NULL, $extends);
     $caseCustomFields = [];
     foreach ($groupTree as $gid => $group_values) {
