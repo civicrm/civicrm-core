@@ -512,6 +512,7 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
         'case_type' => $case['case_id.case_type_id:name'],
       ];
     }
+    throw new \Exception('test');
     return $cases;
   }
 
@@ -695,7 +696,7 @@ HERESQL;
     if ($limit) {
       $query .= $limit;
     }
-
+    throw new \Exception('test');
     return $query;
   }
 
