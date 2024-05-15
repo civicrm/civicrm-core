@@ -25,12 +25,21 @@ class CRM_Contact_Form_Edit_Email {
    *
    * @param CRM_Core_Form $form
    *   Reference to the form object.
-   * @param int $blockId
+   * @param int $blockCount
    *   Block number to build.
    * @param bool $blockEdit
    *   Is it block edit.
    */
-  public static function buildQuickForm($form, int $blockId, $blockEdit = FALSE): void {
+  public static function buildQuickForm(&$form, $blockCount = NULL, $blockEdit = FALSE) {
+    // passing this via the session is AWFUL. we need to fix this
+    if (!$blockCount) {
+      CRM_Core_Error::deprecatedWarning('pass in blockCount');
+      $blockId = ($form->get('Email_Block_Count')) ? $form->get('Email_Block_Count') : 1;
+    }
+    else {
+      $blockId = $blockCount;
+    }
+
     $form->applyFilter('__ALL__', 'trim');
 
     //Email box
