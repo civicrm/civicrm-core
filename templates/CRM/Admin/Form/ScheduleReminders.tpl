@@ -210,7 +210,7 @@
                     $field.toggleClass('required', fieldSpec.required);
                     $field.removeClass('loading');
                     // Show field and update option list if applicable
-                    if (fieldSpec.options) {
+                    if (fieldSpec.options && fieldSpec.options.length) {
                       fieldSpec.options.forEach(function(option) {
                         option.text = option.label;
                         delete(option.label);
