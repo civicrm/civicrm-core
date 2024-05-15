@@ -924,6 +924,8 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         }
         switch ($blockName) {
           case 'Email':
+            // setDefaults uses this to tell which instance
+            $this->set('Email_Block_Count', $instance);
             CRM_Contact_Form_Edit_Email::buildQuickForm($this, $instance);
             // Only display the signature fields if this contact has a CMS account
             // because they can only send email if they have access to the CRM
