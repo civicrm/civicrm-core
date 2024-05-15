@@ -911,8 +911,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
           }
         }
         // $membershipFieldId is set and additional amount is 'No thank you' or NULL then throw error
-        if ($membershipFieldId && !(CRM_Utils_Array::value('price_' . $contributionFieldId, $fields, -1) > 0) && empty($fields['price_' . $otherFieldId])) {
-          $errors["price_{$errorKey}"] = ts('Additional Contribution is required.');
+        if ($membershipFieldId && !(($fields["price_$contributionFieldId"] ?? -1) > 0) && empty($fields['price_' . $otherFieldId])) {
+          $errors["price_$errorKey"] = ts('Additional Contribution is required.');
         }
       }
       if (empty($check) && empty($self->_ccid)) {
@@ -924,7 +924,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         }
       }
       if ($otherAmount && !empty($check)) {
-        $errors["price_{$otherAmount}"] = ts('Amount is required field.');
+        $errors["price_$otherAmount"] = ts('Amount is required field.');
       }
 
       // @todo - this should probably be $this->getFormContext() === 'membership'
@@ -935,25 +935,25 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         $priceFieldMemTypes = [];
 
         foreach ($self->_priceSet['fields'] as $priceId => $value) {
-          if (!empty($fields['price_' . $priceId]) || ($self->isQuickConfig() && $value['name'] === 'membership_amount' && empty($self->_membershipBlock['is_required']))) {
-            if (!empty($fields['price_' . $priceId]) && is_array($fields['price_' . $priceId])) {
-              foreach ($fields['price_' . $priceId] as $priceFldVal => $isSet) {
+          if (!empty($fields["price_$priceId"]) || ($self->isQuickConfig() && $value['name'] === 'membership_amount' && empty($self->_membershipBlock['is_required']))) {
+            if (!empty($fields["price_$priceId"]) && is_array($fields["price_$priceId"])) {
+              foreach ($fields["price_$priceId"] as $priceFldVal => $isSet) {
                 if ($isSet) {
                   $priceFieldIDS[] = $priceFldVal;
                 }
               }
             }
-            elseif (!$value['is_enter_qty'] && !empty($fields['price_' . $priceId])) {
+            elseif (!$value['is_enter_qty'] && !empty($fields["price_$priceId"])) {
               // The check for {!$value['is_enter_qty']} is done since, quantity fields allow entering
               // quantity. And the quantity can't be conisdered as civicrm_price_field_value.id, CRM-9577
-              $priceFieldIDS[] = $fields['price_' . $priceId];
+              $priceFieldIDS[] = $fields["price_$priceId"];
             }
 
             if (!empty($value['options'])) {
               foreach ($value['options'] as $val) {
                 if (!empty($val['membership_type_id']) && (
-                    ($fields['price_' . $priceId] == $val['id']) ||
-                    (isset($fields['price_' . $priceId]) && !empty($fields['price_' . $priceId][$val['id']]))
+                    ($fields["price_$priceId"] == $val['id']) ||
+                    (isset($fields["price_$priceId"]) && !empty($fields["price_$priceId"][$val['id']]))
                   )
                 ) {
                   $priceFieldMemTypes[] = $val['membership_type_id'];
@@ -1061,32 +1061,28 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         }
       }
       elseif (!empty($fields['is_pledge'])) {
-        if (CRM_Utils_Rule::positiveInteger(CRM_Utils_Array::value('pledge_installments', $fields)) == FALSE) {
+        if (!isset($fields['pledge_installments'])) {
+          $errors['pledge_installments'] = ts('Pledge Installments is required field.');
+        }
+        elseif (!CRM_Utils_Rule::positiveInteger($fields['pledge_installments'])) {
           $errors['pledge_installments'] = ts('Please enter a valid number of pledge installments.');
         }
-        else {
-          if (!isset($fields['pledge_installments'])) {
-            $errors['pledge_installments'] = ts('Pledge Installments is required field.');
-          }
-          elseif (($fields['pledge_installments'] ?? NULL) == 1) {
-            $errors['pledge_installments'] = ts('Pledges consist of multiple scheduled payments. Select one-time contribution if you want to make your gift in a single payment.');
-          }
-          elseif (empty($fields['pledge_installments'])) {
-            $errors['pledge_installments'] = ts('Pledge Installments field must be > 1.');
-          }
+        elseif ($fields['pledge_installments'] == 1) {
+          $errors['pledge_installments'] = ts('Pledges consist of multiple scheduled payments. Select one-time contribution if you want to make your gift in a single payment.');
+        }
+        elseif (!$fields['pledge_installments']) {
+          $errors['pledge_installments'] = ts('Pledge Installments field must be > 1.');
         }
 
         //validation for Pledge Frequency Interval.
-        if (CRM_Utils_Rule::positiveInteger(CRM_Utils_Array::value('pledge_frequency_interval', $fields)) == FALSE) {
+        if (!isset($fields['pledge_frequency_interval'])) {
+          $errors['pledge_frequency_interval'] = ts('Pledge Frequency Interval. is required field.');
+        }
+        elseif (!CRM_Utils_Rule::positiveInteger($fields['pledge_frequency_interval'])) {
           $errors['pledge_frequency_interval'] = ts('Please enter a valid Pledge Frequency Interval.');
         }
-        else {
-          if (!isset($fields['pledge_frequency_interval'])) {
-            $errors['pledge_frequency_interval'] = ts('Pledge Frequency Interval. is required field.');
-          }
-          elseif (empty($fields['pledge_frequency_interval'])) {
-            $errors['pledge_frequency_interval'] = ts('Pledge frequency interval field must be > 0');
-          }
+        elseif (!$fields['pledge_frequency_interval']) {
+          $errors['pledge_frequency_interval'] = ts('Pledge frequency interval field must be > 0');
         }
       }
     }
@@ -1209,7 +1205,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $priceOptions = [];
       while ($priceField->fetch()) {
         CRM_Price_BAO_PriceFieldValue::getValues($priceField->id, $priceOptions);
-        if (($selectedPriceOptionID = CRM_Utils_Array::value("price_{$priceField->id}", $params)) != FALSE && $selectedPriceOptionID > 0) {
+        $selectedPriceOptionID = $params["price_{$priceField->id}"] ?? NULL;
+        if ($selectedPriceOptionID && $selectedPriceOptionID > 0) {
           switch ($priceField->name) {
             case 'membership_amount':
               $this->_params['selectMembership'] = $params['selectMembership'] = $priceOptions[$selectedPriceOptionID]['membership_type_id'] ?? NULL;
