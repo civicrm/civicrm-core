@@ -9,6 +9,9 @@
   <component>CiviContribute</component>
   <labelField>title</labelField>
   <title>Personal Campaign Page</title>
+  <paths>
+    <update>civicrm/pcp/info?action=update&amp;reset=1&amp;id=[id]</update>
+  </paths>
   <field>
     <name>id</name>
     <uniqueName>pcp_id</uniqueName>
