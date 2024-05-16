@@ -48,7 +48,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
       'timeline' => "standard_timeline",
     ]);
 
-    $query = CRM_Case_BAO_Case::getCaseActivities('recent', $userID, [' civicrm_case.id IN( 1 )']);
+    $query = CRM_Case_BAO_Case::getCaseActivities('recent', $userID, [['case_id', 'IN', 1]]);
     $res = CRM_Core_DAO::executeQuery($query);
     $openCaseType = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Open Case');
     while ($res->fetch()) {
