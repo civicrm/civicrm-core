@@ -520,4 +520,15 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
     return in_array($this->getOptionGroupName(), ['email_greeting', 'postal_greeting', 'addressee'], TRUE);
   }
 
+  /**
+   * Override
+   * @return array
+   */
+  protected function getFieldsToExcludeFromPurification(): array {
+    if ($this->_gName === 'from_email_address') {
+      return ['label'];
+    }
+    return [];
+  }
+
 }
