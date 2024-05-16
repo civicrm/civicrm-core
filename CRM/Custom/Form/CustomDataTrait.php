@@ -112,7 +112,7 @@ trait CRM_Custom_Form_CustomDataTrait {
    */
   private function getInstancesOfField($id): array {
     $instances = [];
-    foreach ($_POST as $key => $value) {
+    foreach (array_merge($_POST, ($_FILES ?? [])) as $key => $value) {
       if (preg_match('/^custom_' . $id . '_?(-?\d+)?$/', $key)) {
         $instances[] = $key;
       }
