@@ -223,7 +223,7 @@
                       $field.prop('disabled', false).closest('tr').show();
                       $field.crmSelect2('destroy');
                       $field.crmSelect2({
-                        multiple: !!fieldSpec.input_attrs.multiple,
+                        multiple: fieldSpec.input_attrs.multiple,
                         data: fieldSpec.options
                       });
                     } else {
