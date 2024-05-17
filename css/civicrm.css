@@ -19,6 +19,14 @@
   position: absolute;
 }
 
+/* CMS specific padding for sticky header padding */
+.wp-toolbar {
+  --crm-sticky-top: 40px;
+}
+.wp-toolbar .crm-menubar-below-cms-menu {
+  --crm-sticky-top: 72px;
+}
+
 .crm-container .crm-flex-box {
   display: flex;
   flex-wrap: wrap;
@@ -125,7 +133,7 @@ input.crm-form-checkbox + label {
   vertical-align: top;
 }
 /* Styles for Sticky Header */
-.crm-wordpress-permissions thead > tr > th,
+.crm-sticky thead > tr > th,
 .crm-container table thead.sticky {
   background-color: #fff;
 }
@@ -134,11 +142,17 @@ input.crm-form-checkbox + label {
   height: 15px;
 }
 
-.crm-wordpress-permissions thead,
+.crm-sticky thead,
 .crm-container thead div.sticky-header {
   border-bottom: 2px solid #cfcec3;
   background-color: #fff;
   z-index: 10;
+}
+
+.crm-sticky thead {
+  position: sticky;
+  top: var(--crm-sticky-top);
+  box-shadow: 0 2px 2px -1px #cfcec3;
 }
 
 /* Styles for Sorting Header */
@@ -155,21 +169,6 @@ input.crm-form-checkbox + label {
 /* Set background back to normal gray for form labels which use <th>. Temporary fix until we standardize form layout markup. */
 .crm-container table.form-layout-compressed tbody th.label {
   background-color: #f7f7f7;
-}
-
-/* Styles for sticky header */
-.crm-wordpress-permissions thead {
-  position: sticky;
-  top: 40px;
-  box-shadow: 0 2px 2px -1px #cfcec3;
-}
-
-.crm-menubar-below-cms-menu .crm-wordpress-permissions thead {
-  top: 72px;
-}
-
-.crm-menubar-below-cms-menu .crm-wordpress-permissions thead > tr > th {
-  top: 72px;
 }
 
 .crm-container tbody {
