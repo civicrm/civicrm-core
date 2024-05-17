@@ -101,7 +101,7 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
 
     // Give our user this role only.
     \Civi\Api4\User::update(FALSE)
-      ->addValue('roles:name', ['demo_role'])
+      ->addValue('roles', [$roleID])
       ->addWhere('id', '=', $userID)
       ->execute();
 
