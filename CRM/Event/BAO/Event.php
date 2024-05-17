@@ -175,9 +175,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event implements \Civi\Core\Hook
    */
   public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
     if ($event->action === 'delete' && $event->id) {
-
-      $extends = ['Event'];
-      $groupTree = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, NULL, $extends);
+      $groupTree = CRM_Core_BAO_CustomGroup::getAll(['extends' => ['Event']]);
       // @todo is this custom field loop necessary? The cascade delete on the
       // db foreign key should do it already.
       foreach ($groupTree as $values) {

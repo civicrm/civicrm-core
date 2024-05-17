@@ -938,6 +938,18 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
   }
 
   /**
+   * Get custom group details for a group. Legacy function for backwards compatibility.
+   * @deprecated Legacy function
+   *
+   * @see CRM_Core_BAO_CustomGroup::getAll()
+   * for a better alternative.
+   */
+  public static function &getGroupDetail($groupId = NULL, $searchable = FALSE, &$extends = NULL, $inSelector = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('getCustomGroupDetail');
+    return self::getCustomGroupDetail($groupId, $extends, $inSelector);
+  }
+
+  /**
    * @deprecated Legacy function
    *
    * @see CRM_Core_BAO_CustomGroup::getAll()
@@ -945,8 +957,6 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
    *
    * @param int $groupId
    *   Group id whose details are needed.
-   * @param bool $searchable
-   *   Is this field searchable.
    * @param array $extends
    *   Which table does it extend if any.
    * @param bool $inSelector
@@ -954,16 +964,13 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
    * @return array
    *   array consisting of all group and field details
    */
-  public static function &getGroupDetail($groupId = NULL, $searchable = NULL, &$extends = NULL, $inSelector = NULL) {
+  public static function &getCustomGroupDetail($groupId = NULL, $extends = NULL, $inSelector = NULL) {
     $groupFilters = [
       'is_active' => TRUE,
     ];
     $fieldFilters = [];
     if ($groupId) {
       $groupFilters['id'] = $groupId;
-    }
-    if ($searchable) {
-      $fieldFilters['is_searchable'] = TRUE;
     }
     if ($inSelector) {
       $groupFilters['is_multiple'] = TRUE;

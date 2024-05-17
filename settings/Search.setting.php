@@ -215,7 +215,7 @@ return [
     'title' => ts('Quicksearch options'),
     'is_domain' => '1',
     'is_contact' => 0,
-    'description' => ts("Which fields can be searched on in the menubar quicksearch box? Don't see your custom field here? Make sure it is marked as Searchable."),
+    'description' => ts("Which fields can be searched on in the menubar quicksearch box?"),
     'help_text' => NULL,
     'settings_pages' => ['search' => ['weight' => 90]],
   ],
