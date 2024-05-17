@@ -858,7 +858,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @return array|null
    */
   public function getRoleNames() {
-    $roles = \Drupal\user\Role::loadMultiple();
+    $roles = \Drupal\user\Entity\Role::loadMultiple();
     $names =  array_map(fn(\Drupal\user\RoleInterface $role) => $role->label(), $roles);
     return $names;
   }

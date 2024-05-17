@@ -93,7 +93,7 @@ class CRM_Core_Permission_Drupal8 extends CRM_Core_Permission_DrupalBase {
     if (isset($_cache[$permissionName])) {
       return $_cache[$permissionName];
     }
-    $roles = \Drupal\user\Role::loadMultiple();
+    $roles = \Drupal\user\Entity\Role::loadMultiple();
     unset($roles[\Drupal\user\RoleInterface::ANONYMOUS_ID]);
     $role_ids = array_map(
       function (\Drupal\user\RoleInterface $role) {
@@ -117,7 +117,7 @@ class CRM_Core_Permission_Drupal8 extends CRM_Core_Permission_DrupalBase {
       throw new CRM_Core_Exception("Cannot upgrade permissions: permission list missing");
     }
 
-    $roles = \Drupal\user\Role::loadMultiple();
+    $roles = \Drupal\user\Entity\Role::loadMultiple();
     unset($roles[\Drupal\user\RoleInterface::ANONYMOUS_ID]);
     foreach ($roles as $role) {
       foreach ($civicrm_perms as $permission) {
