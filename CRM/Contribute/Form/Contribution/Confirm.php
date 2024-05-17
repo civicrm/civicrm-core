@@ -519,6 +519,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $this->assign('autoRenewOption', 2);
       }
     }
+    $this->assign('membershipBlock', FALSE);
     if (CRM_Core_Component::isEnabled('CiviMember') && empty($this->_ccid)) {
       if (isset($params['selectMembership']) &&
         $params['selectMembership'] !== 'no_thanks'
@@ -527,9 +528,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           $this->_membershipContactID,
           $params['selectMembership']
         );
-      }
-      else {
-        $this->assign('membershipBlock', FALSE);
       }
     }
 
