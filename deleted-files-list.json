@@ -485,6 +485,7 @@
     "CRM/Utils/Tree.php",
     "CRM/Widget/*",
     "Civi/API/Subscriber/XDebugSubscriber.php",
+    "Civi/ActionSchedule/Mapping.php",
     "Civi/Api4/Action/Campaign/*",
     "Civi/Api4/Action/CiviCase/*",
     "Civi/Api4/Action/Contact/GetFields.php",
