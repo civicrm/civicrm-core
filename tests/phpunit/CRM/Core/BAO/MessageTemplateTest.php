@@ -721,7 +721,7 @@ emo
       $tokenLines[] = trim($tokenName, '{}') . ':' . $tokenName;
     }
     foreach (array_keys($tokenData) as $key) {
-      $tokenLines[] .= "contact.$key:{contact.$key}";
+      $tokenLines[] = "contact.$key:{contact.$key}";
     }
     $tokenLines = array_unique($tokenLines);
     sort($tokenLines);

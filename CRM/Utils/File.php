@@ -491,7 +491,7 @@ class CRM_Utils_File {
     if ($dh = opendir($path)) {
       while (FALSE !== ($elem = readdir($dh))) {
         if (substr($elem, -(strlen($ext) + 1)) == '.' . $ext) {
-          $files[] .= $path . $elem;
+          $files[] = $path . $elem;
         }
       }
       closedir($dh);
