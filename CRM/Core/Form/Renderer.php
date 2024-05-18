@@ -190,6 +190,9 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
     elseif (strpos($class, 'crm-form-entityref') !== FALSE) {
       self::preProcessEntityRef($element);
     }
+    elseif (str_contains($class, 'crm-form-autocomplete')) {
+      self::preProcessAutocomplete($element);
+    }
     elseif (strpos($class, 'crm-form-contact-reference') !== FALSE) {
       self::preprocessContactReference($element);
     }
@@ -243,6 +246,16 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
       require SMARTY_DIR . '/plugins/function.eval.php';
     }
     return smarty_function_eval(['var' => $tplSource], $this->_tpl);
+  }
+
+  /**
+   * @param HTML_QuickForm_element $field
+   */
+  private static function preProcessAutocomplete($field) {
+    $val = $field->getValue();
+    if (is_array($val)) {
+      $field->setValue(implode(',', $val));
+    }
   }
 
   /**
