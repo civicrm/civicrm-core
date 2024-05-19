@@ -117,7 +117,7 @@ class CRM_Friend_Form extends CRM_Core_Form {
     }
 
     if (!$this->_contactID) {
-      CRM_Core_Error::statusBounce(ts('Could not get the contact ID'));
+      CRM_Core_Error::statusBounce(ts('To prevent spam, this feature requires either a valid transaction or a user account.'));
     }
 
     // we do not want to display recently viewed items, so turn off

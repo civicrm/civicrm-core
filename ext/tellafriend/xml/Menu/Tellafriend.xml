@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<menu>
+  <item>
+    <path>civicrm/friend</path>
+    <title>Tell a Friend</title>
+    <page_callback>CRM_Friend_Form</page_callback>
+    <access_callback>1</access_callback>
+    <is_public>true</is_public>
+  </item>
+</menu>

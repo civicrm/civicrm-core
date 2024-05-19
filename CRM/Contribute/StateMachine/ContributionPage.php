@@ -46,6 +46,9 @@ class CRM_Contribute_StateMachine_ContributionPage extends CRM_Core_StateMachine
       'CRM_Contribute_Form_ContributionPage_Widget' => NULL,
     ];
 
+    if (!function_exists('tellafriend_civicrm_config')) {
+      unset($this->_pages['CRM_Friend_Form_Contribute']);
+    }
     if (!CRM_Core_Component::isEnabled('CiviMember')) {
       unset($this->_pages['CRM_Member_Form_MembershipBlock']);
     }
