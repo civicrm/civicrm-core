@@ -332,7 +332,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       'contribution_id' => $this->getContributionID(),
       'payment_processor_id' => $this->getPaymentProcessorID(),
       'card_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_FinancialTrxn', 'card_type_id', $this->getSubmittedValue('credit_card_type')),
-      'pan_truncation' => substr((string) $this->getSubmittedValue('credit_card_number'), -4),
+      'pan_truncation' => $this->getSubmittedValue('pan_truncation') ?: substr((string) $this->getSubmittedValue('credit_card_number'), -4),
       'trxn_result_code' => $paymentResult['trxn_result_code'] ?? NULL,
       'payment_instrument_id' => $this->getSubmittedValue('payment_instrument_id'),
       'trxn_id' => $paymentResult['trxn_id'] ?? ($this->getSubmittedValue('trxn_id') ?? NULL),
