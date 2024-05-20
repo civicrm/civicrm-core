@@ -566,7 +566,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @param string $name
    */
   public function buildCustom($id, $name) {
-    if ($name === 'customPost') {
+    if ($name === 'customPost' || $name === 'additionalCustomPost') {
       $this->assign('postPageProfiles', []);
     }
     $this->assign($name, []);
@@ -629,7 +629,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     ) {
       CRM_Core_BAO_Address::checkContactSharedAddressFields($fields, $contactID);
     }
-    if ($name === 'customPost') {
+    if ($name === 'customPost' || $name === 'additionalCustomPost') {
       $postPageProfiles = [];
       foreach ($fields as $fieldName => $field) {
         $postPageProfiles[$field['groupName']][$fieldName] = $field;
