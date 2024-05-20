@@ -617,6 +617,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'price_' . $this->_ids['price_field'][0] => $this->_ids['price_field_value']['cont'],
       'price_' . $this->_ids['price_field']['org1'] => $this->_ids['price_field_value']['org1'],
       'price_' . $this->_ids['price_field']['org2'] => $this->_ids['price_field_value']['org2'],
+      'price_' . $this->_ids['price_field'][1] => [$this->_ids['price_field_value']['straw'] => 1, $this->_ids['price_field_value']['feed'] => 1],
       'id' => $this->getContributionPageID(),
       'billing_first_name' => 'Billy',
       'billing_middle_name' => 'Goat',
@@ -646,7 +647,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     ]);
     $this->assertEquals(2, $membershipPayments['count']);
     $lines = $this->validateTripleLines($contribution['id'], $preExistingMembershipID);
-    $this->assertEquals($preExistingMembershipID + 2, $lines[2]['entity_id']);
+    $this->assertEquals($preExistingMembershipID + 2, $lines[4]['entity_id']);
 
     $this->callAPISuccessGetSingle('MembershipPayment', ['contribution_id' => $contribution['id'], 'membership_id' => $preExistingMembershipID + 1]);
     $membership = $this->callAPISuccessGetSingle('membership', ['id' => $preExistingMembershipID + 1]);
@@ -1426,12 +1427,12 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'sequential' => 1,
       'contribution_id' => $id,
     ])['values'];
-    $this->assertCount(3, $lines);
+    $this->assertCount(5, $lines);
     $this->assertEquals('civicrm_membership', $lines[1]['entity_table']);
     $this->assertEquals($preExistingMembershipID + 1, $lines[1]['entity_id']);
     $this->assertEquals('civicrm_contribution', $lines[0]['entity_table']);
     $this->assertEquals($id, $lines[0]['entity_id']);
-    $this->assertEquals('civicrm_membership', $lines[2]['entity_table']);
+    $this->assertEquals('civicrm_membership', $lines[4]['entity_table']);
     return $lines;
   }
 
