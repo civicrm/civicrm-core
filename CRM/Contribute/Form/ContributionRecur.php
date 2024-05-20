@@ -228,6 +228,9 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
    *
    */
   protected function getMembershipID(): ?int {
+    if (!CRM_Core_Component::isEnabled('CiviMember')) {
+      return NULL;
+    }
     $membershipID = CRM_Utils_Request::retrieve('mid', 'Integer', $this);
     if (!isset($this->contributionRecurID)) {
       // This is being called before the contribution recur ID is set - return quickly to avoid a loop.
