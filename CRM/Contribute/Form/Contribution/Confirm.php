@@ -1356,8 +1356,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $membershipParams['contribution_source'] = $this->_params['membership_source'];
     }
 
-    $this->postProcessMembership($membershipParams, $contactID, $premiumParams, $customFieldsFormatted, $membershipType, $membershipTypeIDs, $isPaidMembership, $this->_membershipId, $isProcessSeparateMembershipTransaction, $financialTypeID,
-      $membershipLineItems);
+    $this->postProcessMembership($membershipParams, $contactID, $premiumParams, $customFieldsFormatted, $membershipType, $membershipTypeIDs, $isPaidMembership, $this->_membershipId, $financialTypeID,);
 
     $this->set('membershipTypeID', $membershipParams['selectMembership']);
   }
@@ -1380,10 +1379,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param bool $isPaidMembership
    * @param array $membershipID
    *
-   * @param bool $isProcessSeparateMembershipTransaction
-   *
    * @param int $financialTypeID
-   * @param array $unprocessedLineItems
    *   Line items for payment options chosen on the form.
    *
    * @throws \CRM_Core_Exception
@@ -1392,7 +1388,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   protected function postProcessMembership(
     $membershipParams, $contactID, $premiumParams,
     $customFieldsFormatted, $membershipDetails, $membershipTypeIDs, $isPaidMembership, $membershipID,
-    $isProcessSeparateMembershipTransaction, $financialTypeID, $unprocessedLineItems) {
+    $financialTypeID) {
     $membershipContribution = NULL;
     $isTest = $membershipParams['is_test'] ?? FALSE;
     $errors = $paymentResults = [];
