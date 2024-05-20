@@ -4911,6 +4911,10 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'title' => ts('Age'),
         'dbAlias' => 'TIMESTAMPDIFF(YEAR, contact_civireport.birth_date, CURDATE())',
       ],
+      'is_deceased' => [],
+      'deceased_date' => [
+        'title' => ts('Deceased Date'),
+      ],
       'job_title' => [
         'title' => ts('Contact Job title'),
       ],
@@ -4926,7 +4930,6 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       'do_not_sms' => [],
       'do_not_trade' => [],
       'is_opt_out' => [],
-      'is_deceased' => [],
       'preferred_language' => [],
       'employer_id' => [
         'title' => ts('Current Employer'),
