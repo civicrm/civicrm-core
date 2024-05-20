@@ -2879,6 +2879,11 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'label' => 'Goat Breed',
       'html_type' => 'Radio',
     ]);
+    $addOnPriceField = $this->callAPISuccess('price_field', 'create', [
+      'price_set_id' => $priceSetID,
+      'label' => 'Goat Addons',
+      'html_type' => 'CheckBox',
+    ]);
     $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', [
       'price_set_id' => $priceSetID,
       'price_field_id' => $priceField['id'],
@@ -2913,9 +2918,24 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'is_separate_payment' => FALSE,
     ])->execute();
     $this->_ids['price_field_value']['cont'] = $priceFieldValue['id'];
-
+    $strawPriceFieldValue = $this->callAPISuccess('price_field_value', 'create', [
+      'price_set_id' => $priceSetID,
+      'price_field_id' => $addOnPriceField['id'],
+      'label' => 'Straw',
+      'amount' => 5,
+      'financial_type_id' => 'Donation',
+    ]);
+    $this->_ids['price_field_value']['straw'] = $strawPriceFieldValue['id'];
+    $feedPriceFieldValue = $this->callAPISuccess('price_field_value', 'create', [
+      'price_set_id' => $priceSetID,
+      'price_field_id' => $addOnPriceField['id'],
+      'label' => 'Feed',
+      'amount' => 30,
+      'financial_type_id' => 'Donation',
+    ]);
+    $this->_ids['price_field_value']['feed'] = $feedPriceFieldValue['id'];
     $this->_ids['contribution_page'] = $contributionPageID;
-    $this->_ids['price_field'] = [$priceField['id']];
+    $this->_ids['price_field'] = [$priceField['id'], $addOnPriceField['id']];
   }
 
   /**
