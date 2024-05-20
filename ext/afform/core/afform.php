@@ -334,6 +334,12 @@ function _afform_hook_civicrm_angularModules($e) {
       'exports' => [
         $afform['directive_name'] => 'E',
       ],
+      // Permissions needed for conditionally displaying edit-links
+      'permissions' => [
+        'administer afform',
+        'administer search_kit',
+        'all CiviCRM permissions and ACLs',
+      ],
     ];
   }
 

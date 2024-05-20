@@ -16,6 +16,7 @@
           $scope.crmStatus = crmStatus;
           $scope.crmUiAlert = crmUiAlert;
           $scope.crmUrl = CRM.url;
+          $scope.checkPerm = CRM.checkPerm;
 
           $el.addClass('afform-directive');
 
