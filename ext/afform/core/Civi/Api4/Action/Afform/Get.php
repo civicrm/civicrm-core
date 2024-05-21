@@ -160,7 +160,6 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
       return;
     }
     $filters = [
-      'is_multiple' => TRUE,
       'is_active' => TRUE,
     ];
     if ($groupNames) {
@@ -177,13 +176,21 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
         'description' => '',
         'is_public' => FALSE,
         'permission' => ['access CiviCRM'],
-        'join_entity' => 'Custom_' . $custom['name'],
         'entity_type' => $custom['extends'],
       ];
+      if ($custom['is_multiple']) {
+        $item['join_entity'] = 'Custom_' . $custom['name'];
+      }
       if ($getLayout) {
         $item['layout'] = ($custom['help_pre'] ? '<div class="af-markup">' . $custom['help_pre'] . "</div>\n" : '');
         foreach ($custom['fields'] as $field) {
-          $item['layout'] .= "<af-field name=\"{$field['name']}\" />\n";
+          $nameAttribute = $field['name'];
+          // for multiple record fields there is no need to prepend the custom group name
+          // because it is provided as the join_entity above
+          if (!$custom['is_multiple']) {
+            $nameAttribute = $custom['name'] . "." . $nameAttribute;
+          }
+          $item['layout'] .= "<af-field name=\"{$nameAttribute}\" />\n";
         }
         $item['layout'] .= ($custom['help_post'] ? '<div class="af-markup">' . $custom['help_post'] . "</div>\n" : '');
       }
