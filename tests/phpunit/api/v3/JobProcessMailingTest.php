@@ -238,6 +238,8 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
    *
    */
   public function testMailNonProductionRun(): void {
+    $origMailingBackend = Civi::settings()->get('mailing_backend');
+
     // Test in non-production mode.
     $params = [
       'environment' => 'Staging',
@@ -257,8 +259,25 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
     $this->assertEquals($result['error_message'], "Job has not been executed as it is a Staging (non-production) environment.");
 
     // Test with runInNonProductionEnvironment param.
-    $this->callAPISuccess('job', 'process_mailing', ['runInNonProductionEnvironment' => TRUE]);
-    $this->_mut->assertRecipients($this->getRecipients(1, 2));
+    try {
+      // Do not call with callAPIFailure because we want to test the exception here
+      civicrm_api3('job', 'process_mailing', ['runInNonProductionEnvironment' => TRUE]);
+      $this->fail('should not be reachable');
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->assertEquals('civiExit called', $e->getMessage());
+      $statuses = CRM_Core_Session::singleton()->getStatus();
+      $hasExpectedMessage = FALSE;
+      foreach ($statuses as $status) {
+        if (str_contains($status['text'], 'Outbound mail has been disabled')) {
+          $hasExpectedMessage = TRUE;
+          break;
+        }
+      }
+      if (!$hasExpectedMessage) {
+        $this->fail('Status messages should contain "Outbound mail has been disabled"');
+      }
+    }
 
     $jobId = $this->callAPISuccessGetValue('Job', [
       'return' => "id",
@@ -276,6 +295,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
     $this->assertEquals($mailingBackend['outBound_option'], CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED);
 
     // Test in production mode.
+    Civi::settings()->set('mailing_backend', $origMailingBackend);
     $params = [
       'environment' => 'Production',
     ];
