@@ -2873,6 +2873,12 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
         'html_type' => 'Radio',
         'name' => 'goat_breed',
       ]);
+      $addOnPriceField = $this->createTestEntity('PriceField', [
+        'price_set_id' => $priceSetID,
+        'label' => 'Goat Addons',
+        'html_type' => 'CheckBox',
+        'name' => 'goat_addons',
+      ], 'addon');
       $this->createTestEntity('PriceFieldValue', [
         'price_set_id' => $priceSetID,
         'price_field_id' => $priceField['id'],
@@ -2904,6 +2910,20 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
         'entity_table' => 'civicrm_contribution_page',
         'is_separate_payment' => FALSE,
       ]);
+      $this->createTestEntity('PriceFieldValue', [
+        'price_set_id' => $priceSetID,
+        'price_field_id' => $addOnPriceField['id'],
+        'label' => 'Straw',
+        'amount' => 5,
+        'financial_type_id:name' => 'Donation',
+      ], 'straw');
+      $this->createTestEntity('PriceFieldValue', [
+        'price_set_id' => $priceSetID,
+        'price_field_id' => $addOnPriceField['id'],
+        'label' => 'Feed',
+        'amount' => 30,
+        'financial_type_id:name' => 'Donation',
+      ], 'feed');
     }
     catch (CRM_Core_Exception $e) {
       $this->fail($e->getMessage());

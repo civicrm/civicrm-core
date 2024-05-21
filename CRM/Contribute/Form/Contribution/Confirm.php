@@ -2933,7 +2933,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       if (empty($lineItem['membership_type_id']) && $this->isSeparateMembershipPayment()) {
         continue;
       }
-      $lineItemSplit[$lineItem['membership_type_id'] ?: $defaultMembershipTypeID][$lineItem['price_field_id']] = $lineItem;
+      $lineItemSplit[$lineItem['membership_type_id'] ?: $defaultMembershipTypeID]['price_field_value_' . $lineItem['price_field_value_id']] = $lineItem;
     }
     return $lineItemSplit[$membershipTypeID];
   }
