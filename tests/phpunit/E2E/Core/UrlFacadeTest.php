@@ -1,8 +1,9 @@
 <?php
 
-namespace Civi\Core;
+namespace E2E\Core;
 
 use Civi;
+use Civi\Core\Url;
 
 /**
  * Test generation of URLs via `Civi::url()` (`Civi\Core\Url`).
@@ -11,9 +12,9 @@ use Civi;
  * There is also some coverage of the UF-specific parts in the E2E suite.
  *
  * @see \E2E\Core\PathUrlTest
- * @group headless
+ * @group e2e
  */
-class UrlTest extends \CiviUnitTestCase {
+class UrlFacadeTest extends \CiviEndToEndTestCase {
 
   public function setUp(): void {
     $parts = explode('/', CIVICRM_UF_BASEURL);
@@ -22,7 +23,6 @@ class UrlTest extends \CiviUnitTestCase {
     \CRM_Utils_GlobalStack::singleton()->push($tmpVars);
 
     parent::setUp();
-    $this->useTransaction();
   }
 
   protected function tearDown(): void {
