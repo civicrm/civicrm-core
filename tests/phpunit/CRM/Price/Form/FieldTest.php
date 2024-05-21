@@ -57,6 +57,13 @@ class CRM_Price_Form_FieldTest extends CiviUnitTestCase {
     $this->assertTrue(array_key_exists('visibility_id', $validationResult));
   }
 
+  public function testFieldMetadata(): void {
+    $fields = CRM_Price_DAO_PriceFieldValue::fields();
+    $this->assertSame([18, 9], $fields['amount']['precision']);
+    $this->assertSame(CRM_Utils_Type::T_MONEY, $fields['amount']['type']);
+    $this->assertArrayNotHasKey('maxlength', $fields['amount']);
+  }
+
   /**
    * Test submitting a large float value is stored correctly in the db.
    *

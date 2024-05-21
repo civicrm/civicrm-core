@@ -10,6 +10,7 @@ return [
     'description' => ts('User framework groups. Each group represents a form which encompasses a set of fields defined in civicrm_uf_fields table. Initially will be used for CiviCRM Profile form(s). Subsequently we anticipate using this to define other public facing forms (e.g. online donation solicitation forms, mailing list preferences, etc.).'),
     'log' => TRUE,
     'add' => '1.1',
+    'label_field' => 'title',
   ],
   'getPaths' => fn() => [
     'add' => 'civicrm/admin/uf/group/add?action=add&reset=1',

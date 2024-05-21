@@ -10,6 +10,7 @@ return [
     'description' => ts('FIXME'),
     'log' => TRUE,
     'add' => '1.8',
+    'label_field' => 'title',
   ],
   'getPaths' => fn() => [
     'add' => 'civicrm/admin/price/add?reset=1&action=add',

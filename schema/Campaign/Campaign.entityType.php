@@ -225,10 +225,7 @@ return [
       'add' => '3.3',
       'default' => TRUE,
       'input_attrs' => [
-        'label' => [
-          'Enabled',
-          'Enabled',
-        ],
+        'label' => ts('Enabled'),
       ],
     ],
     'created_id' => [

@@ -39,9 +39,6 @@ return [
       'input_type' => 'Number',
       'required' => TRUE,
       'add' => '4.3',
-      'input_attrs' => [
-        'maxlength' => 10,
-      ],
       'primary_key' => TRUE,
       'auto_increment' => TRUE,
     ],

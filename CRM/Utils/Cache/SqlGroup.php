@@ -76,7 +76,7 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
    * @return \CRM_Utils_Cache_SqlGroup
    */
   public function __construct($config) {
-    $this->table = CRM_Core_DAO_Cache::getTableName();
+    $this->table = 'civicrm_cache';
     if (isset($config['group'])) {
       $this->group = $config['group'];
     }

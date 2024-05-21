@@ -10,6 +10,7 @@ return [
     'description' => ts('A Widget object to store meta information about a single customized contribution widget'),
     'log' => TRUE,
     'add' => '2.0',
+    'label_field' => 'title',
   ],
   'getFields' => fn() => [
     'id' => [

@@ -10,6 +10,7 @@ return [
     'description' => ts('Case type definition'),
     'log' => TRUE,
     'add' => '4.5',
+    'label_field' => 'title',
   ],
   'getIndices' => fn() => [
     'case_type_name' => [

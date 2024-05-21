@@ -26,9 +26,6 @@ return [
       'required' => TRUE,
       'description' => ts('ID of original financial_type so you can search this table by the financial_type.id and then select the relevant version based on the timestamp'),
       'add' => '1.3',
-      'input_attrs' => [
-        'maxlength' => 10,
-      ],
       'primary_key' => TRUE,
       'auto_increment' => TRUE,
     ],
@@ -73,7 +70,6 @@ return [
       'default' => FALSE,
       'input_attrs' => [
         'label' => ts('Tax-Deductible?'),
-        'maxlength' => 4,
       ],
     ],
     'is_reserved' => [
@@ -86,7 +82,6 @@ return [
       'default' => FALSE,
       'input_attrs' => [
         'label' => ts('Reserved?'),
-        'maxlength' => 4,
       ],
     ],
     'is_active' => [
@@ -99,7 +94,6 @@ return [
       'default' => TRUE,
       'input_attrs' => [
         'label' => ts('Enabled'),
-        'maxlength' => 4,
       ],
     ],
   ],

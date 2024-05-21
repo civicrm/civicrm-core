@@ -159,9 +159,6 @@ return [
       'input_type' => NULL,
       'description' => ts('The percentage of the total_amount that is due for this tax.'),
       'add' => '4.3',
-      'input_attrs' => [
-        'maxlength' => 10,
-      ],
     ],
     'is_reserved' => [
       'title' => ts('Reserved Financial Account?'),

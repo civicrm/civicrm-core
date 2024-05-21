@@ -9,6 +9,7 @@ return [
     'title_plural' => ts('Menus'),
     'description' => ts('Table to store menu items for all civicrm components.'),
     'add' => '1.1',
+    'label_field' => 'title',
   ],
   'getIndices' => fn() => [
     'UI_path_domain_id' => [

@@ -134,7 +134,6 @@ return [
       'default' => '0',
       'input_attrs' => [
         'label' => ts('Minimum Fee'),
-        'maxlength' => 18,
       ],
     ],
     'duration_unit' => [

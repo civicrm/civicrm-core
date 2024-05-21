@@ -10,6 +10,7 @@ return [
     'description' => ts('Users can save their report instance and put in a cron tab etc.'),
     'add' => '2.2',
     'icon' => 'fa-bar-chart',
+    'label_field' => 'title',
   ],
   'getFields' => fn() => [
     'id' => [

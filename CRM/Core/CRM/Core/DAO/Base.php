@@ -14,6 +14,16 @@
  */
 abstract class CRM_Core_DAO_Base extends CRM_Core_DAO {
 
+  public function __construct() {
+    parent::__construct();
+    // Historically a generated DAO would have one class variable per field.
+    // To prevent undefined property warnings, this dynamic DAO mimics that by
+    // initializing the object with a property for each field.
+    foreach (static::getEntityDefinition()['getFields']() as $name => $field) {
+      $this->$name = NULL;
+    }
+  }
+
   /**
    * @inheritDoc
    */
@@ -114,7 +124,7 @@ abstract class CRM_Core_DAO_Base extends CRM_Core_DAO {
     foreach ($entityDef['getFields']() as $fieldName => $fieldSpec) {
       $field = [
         'name' => $fieldName,
-        'type' => !empty($fieldSpec['data_type']) ? \CRM_Utils_Type::getValidTypes()[$fieldSpec['data_type']] : constant(\CRM_Utils_Schema::getCrmTypeFromSqlType($fieldSpec['sql_type'])),
+        'type' => !empty($fieldSpec['data_type']) ? \CRM_Utils_Type::getValidTypes()[$fieldSpec['data_type']] : CRM_Utils_Schema::getCrmTypeFromSqlType($fieldSpec['sql_type']),
         'title' => $fieldSpec['title'],
         'description' => $fieldSpec['description'] ?? NULL,
       ];
@@ -123,7 +133,7 @@ abstract class CRM_Core_DAO_Base extends CRM_Core_DAO {
       }
       if (str_starts_with($fieldSpec['sql_type'], 'decimal(')) {
         $precision = self::getFieldLength($fieldSpec['sql_type']);
-        $field['precision'] = explode(',', $precision);
+        $field['precision'] = array_map('intval', explode(',', $precision));
       }
       foreach (['maxlength', 'size', 'rows', 'cols'] as $attr) {
         if (isset($fieldSpec['input_attrs'][$attr])) {
@@ -187,7 +197,7 @@ abstract class CRM_Core_DAO_Base extends CRM_Core_DAO {
         $field['uniqueName'] = $fieldSpec['unique_name'];
       }
       if (!empty($fieldSpec['unique_title'])) {
-        $field['uniqueTitle'] = $fieldSpec['unique_title'];
+        $field['unique_title'] = $fieldSpec['unique_title'];
       }
       if (!empty($fieldSpec['deprecated'])) {
         $field['deprecated'] = TRUE;
@@ -204,7 +214,7 @@ abstract class CRM_Core_DAO_Base extends CRM_Core_DAO {
           $field['pseudoconstant']['optionEditPath'] = 'civicrm/admin/options/' . $field['pseudoconstant']['optionGroupName'];
         }
       }
-      if (!empty($fieldSpec['primary_key']) || !empty($field['readonly'])) {
+      if (!empty($fieldSpec['primary_key']) || !empty($fieldSpec['readonly'])) {
         $field['readonly'] = TRUE;
       }
       $field['add'] = $fieldSpec['add'] ?? NULL;

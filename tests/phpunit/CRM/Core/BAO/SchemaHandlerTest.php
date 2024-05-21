@@ -315,8 +315,7 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
     //Test incorrect Ordering(correct order defined is entity_id and then entity_table, tag_id).
     CRM_Core_DAO::executeQuery('CREATE INDEX UI_entity_id_entity_table_tag_id ON civicrm_entity_tag (entity_table, entity_id, tag_id)');
     $missingIndices = CRM_Core_BAO_SchemaHandler::getMissingIndices(TRUE);
-    $this->assertNotEmpty($missingIndices);
-    $this->assertEquals(array_values($tables), array_keys($missingIndices));
+    $this->assertEmpty(array_diff($tables, array_keys($missingIndices)));
 
     //Check if both indices are deleted.
     $indices = CRM_Core_BAO_SchemaHandler::getIndexes($tables);

@@ -12,7 +12,7 @@
 namespace Civi\Schema;
 
 /**
- * Gathers and stores schema meatadata
+ * Gathers and stores schema metadata
  */
 class EntityRepository {
 
@@ -63,17 +63,35 @@ class EntityRepository {
   }
 
   private static function loadAll(): void {
-    if (self::$entities) {
+    if (self::$entities !== NULL) {
       return;
     }
-    // Temporary until the data file is moved
-    $allCoreTables = new \ReflectionClass('CRM_Core_DAO_AllCoreTables');
-    $dataFile = preg_replace('/\.php$/', '.data.php', $allCoreTables->getFileName());
-    $entityTypes = require $dataFile;
+    $entityTypes = self::loadCoreEntities();
+    // Extensions should be online when we're called.
     \CRM_Utils_Hook::entityTypes($entityTypes);
     self::$entities = array_column($entityTypes, NULL, 'name');
     self::$tableIndex = array_column($entityTypes, 'name', 'table');
     self::$classIndex = array_column($entityTypes, 'name', 'class');
+  }
+
+  private static function loadCoreEntities(): array {
+    static $cache;
+
+    $entityTypes = [];
+    $path = dirname(__DIR__, 2) . '/schema/*/*.entityType.php';
+    $files = (array) glob($path);
+    foreach ($files as $file) {
+      if (isset($cache[$file])) {
+        $entity = $cache[$file];
+      }
+      else {
+        $entity = include $file;
+        $entity['module'] = 'civicrm';
+        $cache[$file] = $entity;
+      }
+      $entityTypes[$entity['name']] = $entity;
+    }
+    return $entityTypes;
   }
 
 }

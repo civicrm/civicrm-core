@@ -10,6 +10,7 @@ return [
     'description' => ts('various types of CiviEvent participant statuses'),
     'log' => TRUE,
     'add' => '3.0',
+    'label_field' => 'label',
   ],
   'getPaths' => fn() => [
     'add' => 'civicrm/admin/participant_status?action=add&reset=1',

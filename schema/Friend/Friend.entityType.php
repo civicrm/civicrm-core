@@ -9,6 +9,7 @@ return [
     'title_plural' => ts('Friends'),
     'description' => ts('FIXME'),
     'add' => '2.0',
+    'label_field' => 'title',
   ],
   'getFields' => fn() => [
     'id' => [

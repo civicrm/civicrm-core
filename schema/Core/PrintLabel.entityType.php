@@ -9,6 +9,7 @@ return [
     'title_plural' => ts('Print Labels'),
     'description' => ts('Table to store the labels created by user.'),
     'add' => '4.4',
+    'label_field' => 'title',
   ],
   'getFields' => fn() => [
     'id' => [
