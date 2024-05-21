@@ -322,8 +322,10 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
       foreach ($result as &$item) {
         if (!empty($item[$fieldName])) {
           $fileInfo = File::get(FALSE)
-            ->addSelect('file_name', 'icon')
+            ->addSelect('file_name', 'icon', 'url')
             ->addWhere('id', '=', $item[$fieldName])
+            // entity join is required to get hashed url
+            ->addJoin($entityName, 'LEFT', 'EntityFile')
             ->execute()->first();
           $item[$fieldName] = $fileInfo;
         }
