@@ -75,11 +75,9 @@ class EntityRepository {
       return;
     }
     $entityTypes = self::loadCoreEntities();
-    // Cannot call hook prior to container boot. Only core entities can load.
-    if ($containerBooted) {
-      \CRM_Utils_Hook::entityTypes($entityTypes);
-      self::$isBooted = TRUE;
-    }
+    // Extensions should be online when we're called.
+    \CRM_Utils_Hook::entityTypes($entityTypes);
+    self::$isBooted = TRUE;
     self::$entities = array_column($entityTypes, NULL, 'name');
     self::$tableIndex = array_column($entityTypes, 'name', 'table');
     self::$classIndex = array_column($entityTypes, 'name', 'class');
