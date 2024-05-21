@@ -28,7 +28,7 @@ class AfformMetadataTest extends \PHPUnit\Framework\TestCase implements Headless
     $individualFields = \Civi\AfformAdmin\AfformAdminMeta::getFields('Individual');
 
     // Ensure the "Existing" contact field exists
-    $this->assertEquals('Existing Contact', $individualFields['id']['label']);
+    $this->assertEquals('Existing Individual', $individualFields['id']['label']);
     $this->assertEquals('EntityRef', $individualFields['id']['input_type']);
   }
 

@@ -1,9 +1,9 @@
 <?php
 
 return [
-  'html' => '<af-form ctrl="afform"><af-entity security="FBAC" type="Contact" name="me" data="{contact_type: \'Individual\', source: \'Hello\'}" actions="{create: 1, update: 0}" /></af-form>',
+  'html' => '<af-form ctrl="afform"><af-entity security="FBAC" type="Individual" name="me" data="{source: \'Hello\'}" actions="{create: 1, update: 0}" /></af-form>',
   'pretty' => '<af-form ctrl="afform">
-  <af-entity security="FBAC" type="Contact" name="me" data="{contact_type: \'Individual\', source: \'Hello\'}" actions="{create: 1, update: 0}" />
+  <af-entity security="FBAC" type="Individual" name="me" data="{source: \'Hello\'}" actions="{create: 1, update: 0}" />
 </af-form>
 ',
   'stripped' => [
@@ -14,9 +14,9 @@ return [
         [
           '#tag' => 'af-entity',
           'security' => 'FBAC',
-          'type' => 'Contact',
+          'type' => 'Individual',
           'name' => 'me',
-          'data' => '{contact_type: \'Individual\', source: \'Hello\'}',
+          'data' => '{source: \'Hello\'}',
           'actions' => '{create: 1, update: 0}',
         ],
       ],
@@ -30,9 +30,9 @@ return [
         [
           '#tag' => 'af-entity',
           'security' => 'FBAC',
-          'type' => 'Contact',
+          'type' => 'Individual',
           'name' => 'me',
-          'data' => '{contact_type: \'Individual\', source: \'Hello\'}',
+          'data' => '{source: \'Hello\'}',
           'actions' => '{create: 1, update: 0}',
         ],
       ],
@@ -46,9 +46,9 @@ return [
         [
           '#tag' => 'af-entity',
           'security' => 'FBAC',
-          'type' => 'Contact',
+          'type' => 'Individual',
           'name' => 'me',
-          'data' => ['contact_type' => 'Individual', 'source' => 'Hello'],
+          'data' => ['source' => 'Hello'],
           'actions' => ['create' => 1, 'update' => 0],
         ],
       ],
