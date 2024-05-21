@@ -83,7 +83,7 @@ class UrlFacadeTest extends \CiviEndToEndTestCase {
       /** @var \Civi\Core\Url $url */
       [$expected, $url] = $example;
       $this->assertEquals($expected, $url->getPath(), sprintf("%s at %d should be have matching property", __FUNCTION__, $key));
-      $this->assertUrlComponentContains('path', $expected, $url, sprintf("%s at %d should be have matching output", __FUNCTION__, $key));
+      $this->assertUrlComponentContains('path', $expected, $url, sprintf('%s at %d: ', __FUNCTION__, $key));
     }
   }
 
@@ -105,7 +105,7 @@ class UrlFacadeTest extends \CiviEndToEndTestCase {
       /** @var \Civi\Core\Url $url */
       [$expected, $url] = $example;
       $this->assertEquals($expected, $url->getQuery(), sprintf("%s at %d should be have matching property", __FUNCTION__, $key));
-      $this->assertStringContainsString($expected, (string) $url, sprintf("%s at %d should be have matching output", __FUNCTION__, $key));
+      $this->assertUrlComponentContains('query', $expected, $url, sprintf('%s at %d: ', __FUNCTION__, $key));
     }
   }
 
@@ -235,7 +235,14 @@ class UrlFacadeTest extends \CiviEndToEndTestCase {
       $expectField = 'query';
       $expectValue = \CRM_Core_Config::singleton()->userFrameworkURLVar . '=' . urlencode($expectValue);
     }
-    $this->assertStringContainsString($expectValue, $parsedUrl[$expectField], $message . sprintf("Field \"%s\" should be have matching output. (Full URL: %s)", $expectField, $renderedUrl));
+    $actualValue = $parsedUrl[$expectField];
+    if ($expectField === 'query' && CIVICRM_UF === 'Drupal8') {
+      // These characters may be URL encoded -- even when they don't need to be. We'll accept either form.
+      $replace = ['%20' => '+', '%2F' => '/', '%5B' => '[', '%5D' => ']'];
+      $expectValue = strtr($expectValue, $replace);
+      $actualValue = strtr($actualValue, $replace);
+    }
+    $this->assertStringContainsString($expectValue, $actualValue, $message . sprintf("Field \"%s\" should contain \"%s\". (Full URL: %s)", $expectField, $expectValue, $renderedUrl));
   }
 
 }
