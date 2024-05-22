@@ -1760,6 +1760,7 @@ class CRM_Utils_Token {
           '$mem_end_date' => 'membership.end_date',
           '$mem_join_date' => 'membership.join_date',
           '$membership_name' => 'membership.membership_type_id:name',
+          '$mem_type_id' => 'membership.membership_type_id',
           '$mem_status' => 'membership.membership_status_id:name',
           '$receive_date' => 'contribution.receive_date',
           '$currency' => 'contribution.currency',
