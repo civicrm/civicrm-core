@@ -747,12 +747,12 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
    *
    * Call this via the api, not directly.
    *
-   * @param \CRM_Contact_BAO_Contact $contact
+   * @param \CRM_Contact_DAO_Contact $contact
    *
    * @return bool
    * @throws \CRM_Core_Exception
    */
-  protected static function contactTrash($contact): bool {
+  protected static function contactTrash(CRM_Contact_DAO_Contact $contact): bool {
     $updateParams = [
       'id' => $contact->id,
       'is_deleted' => 1,
@@ -852,12 +852,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
    *
    * @throws \CRM_Core_Exception
    */
-  public static function deleteContact($id, $restore = FALSE, $skipUndelete = FALSE, $checkPermissions = TRUE) {
-
-    if (!$id || !is_numeric($id)) {
-      CRM_Core_Error::deprecatedFunctionWarning('calling delete contact without a valid contact ID is deprecated.');
-      return FALSE;
-    }
+  public static function deleteContact(int $id, bool $restore = FALSE, bool $skipUndelete = FALSE, bool $checkPermissions = TRUE): bool {
     // If trash is disabled in system settings then we always skip
     if (!Civi::settings()->get('contact_undelete')) {
       $skipUndelete = TRUE;

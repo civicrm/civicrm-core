@@ -1112,7 +1112,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     foreach ($backtrace as $backtraceLine) {
       $miniBacktrace[] = ($backtraceLine['class'] ?? '') . '::' . ($backtraceLine['function'] ?? '');
     }
-    Civi::log()->warning($message . "\n" . implode("\n", $miniBacktrace), ['civi.tag' => 'deprecated']);
+    Civi::log('deprecated')->warning($message . "\n" . implode("\n", $miniBacktrace), ['civi.tag' => 'deprecated']);
     trigger_error($message, E_USER_DEPRECATED);
   }
 
