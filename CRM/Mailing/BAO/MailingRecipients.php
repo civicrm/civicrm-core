@@ -51,25 +51,34 @@ WHERE  mailing_id = %1
     }
 
     $isSMSMode = CRM_Core_DAO::getFieldValue('CRM_Mailing_BAO_Mailing', $mailingID, 'sms_provider_id', 'id');
-    $additionalJoin = $isSMSMode ? '' : " INNER JOIN civicrm_email e ON (r.email_id = e.id AND e.on_hold = 0)";
-
-    $sql = "
-      SELECT r.contact_id, r.email_id, r.phone_id
-      FROM   civicrm_mailing_recipients r
-      INNER JOIN civicrm_contact c on
-        (c.id = r.contact_id
-          AND c.is_deleted = 0
+    $mailingObject = new CRM_Mailing_BAO_Mailing();
+    $mailingObject->id = $mailingID;
+    $mailingObject->fetch();
+    $criteria = [
+      'contact_join' => CRM_Utils_SQL_Select::fragment()->join('c', 'INNER JOIN civicrm_contact c ON (c.id = r.contact_id
+       AND c.is_deleted = 0
           AND c.is_deceased = 0
-          AND c.do_not_" . ($isSMSMode ? 'sms' : 'email') . " = 0
+          AND c.do_not_' . ($isSMSMode ? 'sms' : 'email') . ' = 0
           AND c.is_opt_out = 0
-        )
-      {$additionalJoin}
-      WHERE  r.mailing_id = %1
-        $limitString
-      ";
-    $params = [1 => [$mailingID, 'Integer']];
+        )'),
+    ];
+    if (!$isSMSMode) {
+      $criteria['additional_join'] = CRM_Utils_SQL_Select::fragment()->join('e', 'INNER JOIN civicrm_email e ON (r.email_id = e.id AND e.on_hold = 0)');
+    }
+    CRM_Utils_Hook::alterMailingRecipients($mailingObject, $criteria, 'mailingQuery');
 
-    return CRM_Core_DAO::executeQuery($sql, $params);
+    $sqlObject = CRM_Utils_SQL_Select::from('civicrm_mailing_recipients r')
+      ->select('r.contact_id')
+      ->select('r.email_id')
+      ->select('r.phone_id')
+      ->merge($criteria)
+      ->where('r.mailing_id = #mailingID')
+      ->param('#mailingID', $mailingID);
+    if ($limitString) {
+      $sqlObject->limit($limit, $offset);
+    }
+    $sql = $sqlObject->toSQL();
+    return CRM_Core_DAO::executeQuery($sql);
   }
 
   /**

@@ -453,4 +453,38 @@ abstract class CRM_Mailing_MailingSystemTestBase extends CiviUnitTestCase {
     return $allMessages;
   }
 
+  public function hook_alterMailingReceipientsIgnoreOptOut(&$mailingObject, &$criteria, $context): void {
+    if ($context === 'mailingQuery') {
+      $criteria['contact_join'] = CRM_Utils_SQL_Select::fragment()->join('c', 'INNER JOIN civicrm_contact c ON (c.id = r.contact_id
+        AND c.is_deleted = 0
+        AND c.is_deceased = 0
+        AND c.do_not_email = 0
+      )');
+    }
+    if ($context === 'pre') {
+      unset($criteria['is_opt_out']);
+    }
+  }
+
+  public function testModifyMailingReceipientsIgnoreOptOut(): void {
+    $optOutContact = $this->individualCreate(['is_opt_out' => 1, 'email' => 'testoptout@example.com'], 'opt_out_individual');
+    $this->callAPISuccess('GroupContact', 'create', [
+      'contact_id' => $optOutContact,
+      'group_id' => $this->_groupID,
+      'status' => 'Added',
+    ]);
+    $hooks = \CRM_Utils_Hook::singleton();
+    $hooks->setHook('civicrm_alterMailingRecipients', [$this, 'hook_alterMailingReceipientsIgnoreOptOut']);
+    $mailingParams = array_merge($this->defaultParams, [
+      'subject' => 'Accidents in cars cause children for {contact.display_name}!',
+      'body_text' => 'BEWARE children need regular infusions of toys. Santa knows your {domain.address}. There is no {action.optOutUrl}.',
+    ]);
+    $this->callAPISuccess('Mailing', 'create', $mailingParams);
+    $this->_mut->assertRecipients([]);
+    $this->callAPISuccess('job', 'process_mailing', ['runInNonProductionEnvironment' => TRUE]);
+    $queueItems = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_mailing_event_queue")->fetchAll();
+    $this->assertCount(3, $queueItems);
+    $hooks->reset();
+  }
+
 }
