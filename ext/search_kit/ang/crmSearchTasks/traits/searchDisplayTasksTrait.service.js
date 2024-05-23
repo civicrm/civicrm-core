@@ -60,13 +60,13 @@
         if (task.crmPopup) {
           var path = $rootScope.$eval(task.crmPopup.path, data),
             query = task.crmPopup.query && $rootScope.$eval(task.crmPopup.query, data);
-          CRM.loadForm(CRM.url(path, query), {post: task.crmPopup.data && $rootScope.$eval(task.crmPopup.data, data)})
+          CRM.loadForm(CRM.url(path, query, 'back'), {post: task.crmPopup.data && $rootScope.$eval(task.crmPopup.data, data)})
             .on('crmFormSuccess', mngr.refreshAfterTask);
         }
         else if (task.redirect) {
           var redirectPath = $rootScope.$eval(task.redirect.path, data),
             redirectQuery = task.redirect.query && $rootScope.$eval(task.redirect.query, data) && $rootScope.$eval(task.redirect.data, data);
-          $window.open(CRM.url(redirectPath, redirectQuery), '_blank');
+          $window.open(CRM.url(redirectPath, redirectQuery, 'back'), '_blank');
         }
         // If task uses dialogService
         else {
