@@ -776,6 +776,15 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
   }
 
   /**
+   * Return a list of log table names.
+   *
+   * @return array
+   */
+  public function getLogTableNames() {
+    return array_values($this->logs);
+  }
+
+  /**
    * Create a log table with schema mirroring the given table’s structure and seeding it with the given table’s contents.
    *
    * @param string $table
