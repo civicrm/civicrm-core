@@ -22,8 +22,11 @@
 class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
 
   /**
-   * Ids of the contacts to limit the SQL queries (whole-database queries otherwise)
    * @var array
+   *
+   * Ids of the contacts to limit the SQL queries (whole-database queries otherwise)
+   *
+   * @internal
    */
   public $contactIds = [];
 
@@ -33,6 +36,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
    * @param array $contactIds
    */
   public function setContactIds($contactIds) {
+    CRM_Core_Error::deprecatedWarning('unused');
     $this->contactIds = $contactIds;
   }
 
@@ -44,7 +48,13 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
 
   /**
    * If there are no rules in rule group.
+   *
    * @var bool
+   *
+   * @deprecated this was introduced in https://github.com/civicrm/civicrm-svn/commit/15136b07013b3477d601ebe5f7aa4f99f801beda
+   * as an awkward way to avoid fatalling on an invalid rule set with no rules.
+   *
+   * Passing around a property is a bad way to do that check & we will work to remove.
    */
   public $noRules = FALSE;
 
@@ -410,14 +420,25 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
   }
 
   /**
+   * Fill the dedupe finder table.
+   *
+   * @internal do not access from outside core.
+   *
+   * @param int $id
+   * @param array $contactIDs
+   * @param array $params
+   *
    * @return void
    * @throws \Civi\Core\Exception\DBQueryException
    */
-  public function fillTable(): void {
+  public function fillTable(int $id, array $contactIDs, array $params): void {
+    $this->contactIds = $contactIDs;
+    $this->params = $params;
+    $this->id = $id;
     // get the list of queries handy
     $tableQueries = $this->tableQuery();
 
-    if ($this->params && !$this->noRules) {
+    if ($params && !empty($tableQueries)) {
       $this->temporaryTables['dedupe'] = CRM_Utils_SQL_TempTable::build()
         ->setCategory('dedupe')
         ->createWithColumns("id1 int, weight int, UNIQUE UI_id1 (id1)")->getName();
