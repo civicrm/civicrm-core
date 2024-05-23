@@ -209,6 +209,11 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   private $frozenTime;
 
   /**
+   * @var mixed
+   */
+  private $errorHandlerAtStartOfTest;
+
+  /**
    *  Constructor.
    *
    *  Because we are overriding the parent class constructor, we
@@ -378,6 +383,12 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $this->ensureMySQLMode(['IGNORE_SPACE', 'ERROR_FOR_DIVISION_BY_ZERO', 'STRICT_TRANS_TABLES']);
     putenv('CIVICRM_SMARTY_DEFAULT_ESCAPE=1');
     $this->originalSettings = \Civi::settings()->all();
+
+    // There doesn't seem to be a better way to get the current error handler.
+    // We want to know it so we can compare at the end of the test to see if
+    // something changed it and then inadvertently didn't restore it.
+    $this->errorHandlerAtStartOfTest = set_error_handler(function($errno, $errstr, $errfile, $errline) {});
+    restore_error_handler();
   }
 
   /**
@@ -556,6 +567,13 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @throws \CRM_Core_Exception
    */
   protected function assertPostConditions(): void {
+    // There doesn't seem to be a better way to get the current error handler.
+    $errorHandlerAtEndOfTest = set_error_handler(function($errno, $errstr, $errfile, $errline) {});
+    restore_error_handler();
+    if ($this->errorHandlerAtStartOfTest != $errorHandlerAtEndOfTest) {
+      $this->fail('Error handler is not the same at the end of the test as when it started. Start: ' . print_r($this->errorHandlerAtStartOfTest, TRUE) . "\nEnd: " . print_r($errorHandlerAtEndOfTest, TRUE));
+    }
+
     // Reset to version 3 as not all (e.g payments) work on v4
     $this->_apiversion = 3;
     CRM_Core_BAO_ConfigSetting::enableComponent('CiviContribute');
