@@ -2505,9 +2505,9 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $paramsSet['title'] = 'Price Set' . $identifier;
     $paramsSet['name'] = $identifier;
     $paramsSet['is_active'] = TRUE;
-    $paramsSet['financial_type_id'] = 'Event Fee';
+    $paramsSet['financial_type_id:name'] = 'Event Fee';
     $paramsSet['extends'] = 1;
-    $priceSet = $this->callAPISuccess('PriceSet', 'create', $paramsSet);
+    $priceSet = $this->createTestEntity('PriceSet', $paramsSet, $identifier);
     if ($componentID) {
       CRM_Price_BAO_PriceSet::addTo('civicrm_' . $component, $componentID, $priceSet['id']);
     }
