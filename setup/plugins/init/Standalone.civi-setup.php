@@ -113,9 +113,10 @@ function _standalone_setup_scheme(): string {
     $model->lang = $_REQUEST['lang'] ?? 'en_US';
 
     if (\Composer\InstalledVersions::isInstalled('civicrm/civicrm-asset-plugin')) {
-      // civicrm-asset-plugin will fill-in various $paths.
-      // we need to set the url for core to get assets in the web ui
-      $model->paths['civicrm.root']['url'] = $model->cmsBaseUrl . '/assets/civicrm/core';
+      // civicrm-asset-plugin loads core asset paths directly into the $civicrm_paths global
+
+      // we need to set the civicrm.root url on the model so it can be used to load assets in the web UI
+      $model->paths['civicrm.root']['url'] = $GLOBALS['civicrm_paths']['civicrm.root']['url'];
     }
     else {
       $model->paths['civicrm.root']['url'] = $model->cmsBaseUrl . '/core';
