@@ -186,6 +186,9 @@ trait EventTestTrait {
    */
   public function eventCreate(array $params = [], string $identifier = 'event'): array {
     try {
+      if ($params['is_template'] ?? NULL && empty($params['template_title'])) {
+        $params['template_title'] = 'template event';
+      }
       $event = Event::create(FALSE)->setValues($params)->execute()->first();
       $this->setTestEntity('Event', $event, $identifier);
       $this->addProfilesToEvent($identifier);

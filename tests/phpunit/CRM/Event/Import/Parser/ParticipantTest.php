@@ -170,6 +170,36 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that we cannot import to a template event.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportToTemplateEvent() :void {
+    // When setting up for the test make sure the IDs match those in the csv.
+    $this->assertEquals(1, $this->eventCreatePaid(['is_template' => TRUE])['id']);
+    $this->assertEquals(3, $this->individualCreate());
+    $this->importCSV('participant_with_event_id.csv', [
+      ['name' => 'event_id'],
+      ['name' => 'do_not_import'],
+      ['name' => 'contact_id'],
+      ['name' => 'fee_amount'],
+      ['name' => 'do_not_import'],
+      ['name' => 'fee_level'],
+      ['name' => 'is_pay_later'],
+      ['name' => 'role_id'],
+      ['name' => 'source'],
+      ['name' => 'status_id'],
+      ['name' => 'register_date'],
+      ['name' => 'do_not_import'],
+      ['name' => 'do_not_import'],
+    ]);
+    $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
+    $row = $dataSource->getRow();
+    $this->assertEquals('ERROR', $row['_status']);
+    $this->assertEquals('Missing required fields: Event ID', $row['_status_message']);
+  }
+
+  /**
    * Test that imports work generally.
    *
    * @throws \CRM_Core_Exception

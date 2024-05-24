@@ -206,14 +206,6 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
       }
     }
 
-    // check that event id is not an template
-    if (!empty($params['event_id'])) {
-      $isTemplate = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $params['event_id'], 'is_template');
-      if (!empty($isTemplate)) {
-        throw new CRM_Core_Exception(ts('Event templates are not meant to be registered.'));
-      }
-    }
-
     $result = [];
     if ($checkDuplicate) {
       if (CRM_Event_BAO_Participant::checkDuplicate($params, $result)) {
