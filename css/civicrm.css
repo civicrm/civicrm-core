@@ -19,14 +19,6 @@
   position: absolute;
 }
 
-/* CMS specific padding for sticky header padding */
-.wp-toolbar {
-  --crm-sticky-top: 40px;
-}
-.wp-toolbar .crm-menubar-below-cms-menu {
-  --crm-sticky-top: 72px;
-}
-
 .crm-container .crm-flex-box {
   display: flex;
   flex-wrap: wrap;
@@ -151,8 +143,19 @@ input.crm-form-checkbox + label {
 
 .crm-sticky thead {
   position: sticky;
-  top: var(--crm-sticky-top);
+  top: var(--crm-menubar-bottom);
   box-shadow: 0 2px 2px -1px #cfcec3;
+}
+
+@media (max-width: 782px) {
+  /** WP **/
+  .wp-admin .crm-sticky thead {
+    top: 48px;
+  }
+  /** Drupal **/
+  .path-civicrm.crm-menu-visible {
+    top: 39px;
+  }
 }
 
 /* Styles for Sorting Header */
@@ -432,6 +435,17 @@ input.crm-form-entityref {
 .crm-container .crm-section,
 .crm-container div.crm-field-wrapper {
   margin-bottom: 1em;
+}
+
+@media (min-width:1079px) {
+  .wp-toolbar {
+    --crm-sticky-top: 80px;
+  }
+  .wp-toolbar .crm-menubar-above-cms-menu,
+  .wp-toolbar .crm-menubar-below-cms-menu {
+    --crm-sticky-top: 112px;
+  }
+
 }
 
 /* todo: See PR#19968 to move towards configurable breakpoints */
