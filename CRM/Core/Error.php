@@ -1128,7 +1128,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     $callerFunction = $dbt[2]['function'] ?? NULL;
     $callerClass = $dbt[2]['class'] ?? NULL;
     $message .= " Caller: {$callerClass}::{$callerFunction}";
-    Civi::log()->warning($message, ['civi.tag' => 'deprecated']);
+    Civi::log('deprecated')->warning($message, ['civi.tag' => 'deprecated']);
     trigger_error($message, E_USER_DEPRECATED);
   }
 
