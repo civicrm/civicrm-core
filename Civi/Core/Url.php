@@ -599,13 +599,11 @@ final class Url implements \JsonSerializable {
   }
 
   /**
-   * @return array{scheme: ?string, port: ?int, path: ?string, query: ?string}
+   * @return array{scheme: ?string, path: ?string, query: ?string}
    */
   private function toRenderedPieces(): array {
     return [
       'scheme' => $this->replaceVars('scheme', $this->getScheme()),
-      'host' => $this->replaceVars('host', $this->host),
-      'port' => $this->replaceVars('port', $this->port),
       'path' => $this->replaceVars('path', $this->getPath()),
       'query' => $this->replaceVars('query', $this->getQuery()),
       'fragment' => $this->replaceVars('fragment', $this->fragment),
