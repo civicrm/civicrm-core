@@ -1354,14 +1354,6 @@ civicrm_relationship.is_active = 1 AND
   public function testGetSummaryQueryWithFinancialACLDisabled(): void {
     $this->createContributionsForSummaryQueryTests();
 
-    // Test the function directly
-    $where = $from = NULL;
-    $queryObject = new CRM_Contact_BAO_Query();
-    $queryObject->appendFinancialTypeWhereAndFromToQueryStrings($where,
-      $from);
-    $this->assertEquals(NULL, $where);
-    $this->assertEquals(NULL, $from);
-
     // Test the function in action
     $queryObject = new CRM_Contact_BAO_Query([['contribution_source', '=', 'SSF', '', '']]);
     $summary = $queryObject->summaryContribution();
@@ -1390,20 +1382,10 @@ civicrm_relationship.is_active = 1 AND
    * @throws \CRM_Core_Exception
    */
   public function testGetSummaryQueryWithFinancialACLEnabled(): void {
-    $where = $from = NULL;
+
     $this->createContributionsForSummaryQueryTests();
     $this->enableFinancialACLs();
     $this->createLoggedInUserWithFinancialACL();
-
-    // Test the function directly
-    $queryObject = new CRM_Contact_BAO_Query();
-    $queryObject->appendFinancialTypeWhereAndFromToQueryStrings($where,
-      $from);
-    $donationTypeID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation');
-    $this->assertEquals(
-      " LEFT JOIN civicrm_line_item li
-                  ON civicrm_contribution.id = li.contribution_id AND
-                     li.entity_table = 'civicrm_contribution' AND li.financial_type_id NOT IN ({$donationTypeID}) ", $from);
 
     // Test the function in action
     $queryObject = new CRM_Contact_BAO_Query([['contribution_source', '=', 'SSF', '', '']]);
