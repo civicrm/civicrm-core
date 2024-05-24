@@ -38,6 +38,7 @@ use Civi\Api4\LineItem;
 use Civi\Api4\MembershipType;
 use Civi\Api4\OptionGroup;
 use Civi\Api4\Phone;
+use Civi\Api4\PriceFieldValue;
 use Civi\Api4\PriceSet;
 use Civi\Api4\RelationshipType;
 use Civi\Api4\UFGroup;
@@ -2529,7 +2530,11 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     ], $priceFieldOptions);
 
     $priceField = $this->callAPISuccess('PriceField', 'create', $paramsField);
-    return $this->callAPISuccess('PriceFieldValue', 'get', ['price_field_id' => $priceField['id']]);
+    $this->ids['PriceField'][0] = $priceField['id'];
+    $this->ids['PriceFieldValue'] = array_keys((array) PriceFieldValue::get()
+      ->addWhere('price_field_id', '=', $this->ids['PriceField'][0])
+      ->execute()->indexBy('id'));
+    return $this->callAPISuccess('PriceFieldValue', 'get', ['price_field_id' => $this->ids['PriceField'][0]]);
   }
 
   /**

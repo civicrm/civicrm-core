@@ -91,13 +91,12 @@ class BaseTestClass extends TestCase implements HeadlessInterface, HookInterface
    * @throws \CRM_Core_Exception
    */
   protected function createPriceSet(): void {
-    $priceSet = PriceSet::create(FALSE)->setValues([
+    $priceSet = $this->createTestEntity('PriceSet', [
       'title' => 'Price Set',
       'name' => 'price_set',
       'financial_type_id.name' => 'Event Fee',
       'extends' => 1,
-    ])->execute()->first();
-    $this->ids['PriceSet'][0] = $priceSet['id'];
+    ], 0);
     $this->ids['PriceField'][0] = PriceField::create(FALSE)->setValues([
       'label' => 'Price Field',
       'name' => 'price_field',

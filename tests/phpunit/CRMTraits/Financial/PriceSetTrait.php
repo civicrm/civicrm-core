@@ -10,6 +10,7 @@
  */
 
 use Civi\Api4\PriceField;
+use Civi\Api4\PriceFieldValue;
 use Civi\Api4\PriceSet;
 use Civi\Api4\PriceSetEntity;
 
@@ -78,7 +79,7 @@ trait CRMTraits_Financial_PriceSetTrait {
    * @param array $lineItemFinancialTypes
    *   Financial Types, if an override is intended.
    * @param string $identifier
-   *   Name to to identify price set.
+   *   Name to identify price set.
    */
   protected function createContributionWithTwoLineItemsAgainstPriceSet($params, array $lineItemFinancialTypes = [], string $identifier = 'Donation'): void {
     $params = (array) array_merge([
@@ -86,8 +87,11 @@ trait CRMTraits_Financial_PriceSetTrait {
       'financial_type_id' => 'Donation',
       'contribution_status_id' => 'Pending',
     ], $params);
-    $priceFields = $this->createPriceSet('contribution', NULL, [], $identifier);
-    foreach ($priceFields['values'] as $key => $priceField) {
+    $this->createPriceSet('contribution', NULL, [], $identifier);
+    $priceFieldValues = PriceFieldValue::get(FALSE)
+      ->addWhere('id', 'IN', $this->ids['PriceFieldValue'])
+      ->execute();
+    foreach ($priceFieldValues as $key => $priceField) {
       $financialTypeID = (!empty($lineItemFinancialTypes) ? array_shift($lineItemFinancialTypes) : $priceField['financial_type_id']);
       $params['line_items'][]['line_item'][$key] = [
         'price_field_id' => $priceField['price_field_id'],
@@ -101,10 +105,11 @@ trait CRMTraits_Financial_PriceSetTrait {
         'entity_table' => 'civicrm_contribution',
       ];
     }
-    $order = $this->callAPISuccess('Order', 'create', $params);
+    $order = $this->callAPISuccess('Order', 'create', $params + ['version' => 3]);
     $this->callAPISuccess('Payment', 'create', [
       'contribution_id' => $order['id'],
       'total_amount' => $params['total_amount'],
+      'version' => 3,
     ]);
   }
 
