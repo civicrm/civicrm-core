@@ -40,51 +40,7 @@ function _standalone_setup_scheme(): string {
     }
     \Civi\Setup::log()->info(sprintf('[%s] Handle %s', basename(__FILE__), 'init'));
 
-    // error_log('artfulrobot: ' . __FILE__ . ' listener for civi.setup.init');
-    // Compute settingsPath.
-    // We use this structure: /var/www/standalone/data/{civicrm.settings.php,templates_c}
-    // to reduce the number of directories that admins have to chmod
-
-    /**
-     * @var string $projectRootPath
-     *       refers to the root of the *application*, not the actual webroot as reachable by http.
-     *       Typically, this means that $projectRootPath might be like /var/www/example.org/ and
-     *       the actual web root would be /var/www/example.org/web/
-     */
-    if (!empty($model->extras['standaloneRoot'])) {
-      $projectRootPath = $model->extras['standaloneRoot'];
-    }
-    else {
-      $candidates = [
-        // Ex: Clone ~/src/civicrm-core; use PHP built-in server and standalone.
-        $model->srcPath . '/srv',
-
-        // Ex: `civicrm-core` in web root = project root
-        dirname($model->srcPath, 1),
-
-        // Ex: `civicrm-core` in web root 1 step below project root
-        dirname($model->srcPath, 2),
-
-        // Ex: Clone `civicrm-standalone` which depends on `civicrm-core`. Use Apache/nginx/etc.
-        dirname($model->srcPath, 3),
-      ];
-      foreach ($candidates as $candidate) {
-        if (file_exists($candidate . '/civicrm.standalone.php')) {
-          $projectRootPath = $model->extras['standaloneRoot'] = $candidate;
-          break;
-        }
-      }
-    }
-    if (empty($projectRootPath)) {
-      throw new \RuntimeException("Failed to identify standalone root. (TIP: Set extras.standaloneRoot)");
-    }
-    $model->paths['civicrm.private']['path'] = implode(DIRECTORY_SEPARATOR, [$projectRootPath, 'data', 'private']);
-    $model->settingsPath = implode(DIRECTORY_SEPARATOR, [$projectRootPath, 'data', 'private', 'civicrm.settings.php']);
-    $model->templateCompilePath = implode(DIRECTORY_SEPARATOR, [$projectRootPath, 'data', 'private', 'templates_c']);
-    // print "\n-------------------------\nSet model values:\n" . json_encode($model->getValues(), JSON_PRETTY_PRINT) . "\n-----------------------------\n";
-
     // Compute DSN.
-    // print "=======================\n". json_encode(['model' => $model->getValues(), 'server' => $_SERVER], JSON_PRETTY_PRINT) ."\n";
     $model->db = $model->cmsDb = [
       'server' => 'localhost',
       'username' => '',
@@ -92,25 +48,44 @@ function _standalone_setup_scheme(): string {
       'database' => '',
     ];
 
-    // Compute URLs (@todo?)
-    // original: $model->cmsBaseUrl = $_SERVER['HTTP_ORIGIN'] ?: $_SERVER['HTTP_REFERER'];
-    if (empty($model->cmsBaseUrl)) {
-      // A buildkit install (which uses cv core:install) sets this correctly. But a standard composer-then-website type install does not.
-      $model->cmsBaseUrl = _standalone_setup_scheme() . '://' . $_SERVER['HTTP_HOST'];
-    }
-
-    // These paths get set as
-    // $civicrm_paths[k]['url'|'path'] = v
-    $model->paths['cms.root'] = [
-      'path' => $projectRootPath,
-    ];
-    $model->paths['civicrm.files'] = [
-      'path' => implode(DIRECTORY_SEPARATOR, [$projectRootPath, 'data', 'public']),
-      'url' => $model->cmsBaseUrl . '/data/public',
-    ];
-
     // Compute default locale.
     $model->lang = $_REQUEST['lang'] ?? 'en_US';
+
+    // Compute paths and urls
+
+
+    // get globals set in civicrm.standalone.php
+    global $appRootPath, $settingsPath;
+
+    // try to determine base url
+    // TODO: this won't work if we are installing in a subdirectory of the webroot
+    $baseUrl = _standalone_setup_scheme() . '://' . $_SERVER['HTTP_HOST'];
+
+    // TODO: at the moment the installer will only work when app root = web root
+    $model->paths['cms.root']['path'] =  $appRootPath;
+    $model->paths['cms.root']['url'] =  $model->cmsBaseUrl = $baseUrl;
+
+    // we already know settings path from civicrm.standalone.php
+    $model->settingsPath = $settingsPath;
+
+    // private directories
+    $model->paths['civicrm.private']['path'] = $privatePath = $appRootPath . '/private';
+    $model->paths['civicrm.compile']['path'] = $model->templateCompilePath = $privatePath . '/compiler_cache';
+    $model->paths['civicrm.log']['path'] = $privatePath . '/log';
+    $model->paths['civicrm.l10n']['path'] = $privatePath . '/translations';
+    $model->mandatorySettings['customFileUploadDir'] = $privatePath . '/uploads';
+    $model->mandatorySettings['uploadDir'] = $privatePath . '/tmp';
+
+    // public directories
+    $model->paths['civicrm.files']['path'] = $publicPath = $appRootPath . '/public';
+    $model->paths['civicrm.files']['url'] = $publicUrl = $baseUrl . '/public';
+
+    $model->mandatorySettings['imageUploadDir'] = $publicPath . '/uploads';
+    $model->mandatorySettings['imageUploadURL'] = $publicUrl . '/uploads';
+
+    // extensions directory
+    $model->mandatorySettings['extensionsDir'] = $appRootPath . '/extensions';
+    $model->mandatorySettings['extensionsURL'] = $baseUrl . '/extensions';
 
     if (\Composer\InstalledVersions::isInstalled('civicrm/civicrm-asset-plugin')) {
       // civicrm-asset-plugin loads core asset paths directly into the $civicrm_paths global
@@ -119,15 +94,17 @@ function _standalone_setup_scheme(): string {
       $model->paths['civicrm.root']['url'] = $GLOBALS['civicrm_paths']['civicrm.root']['url'];
     }
     else {
-      $model->paths['civicrm.root']['url'] = $model->cmsBaseUrl . '/core';
-      $model->paths['civicrm.root']['path'] = $model->srcPath;
-      $model->paths['civicrm.vendor']['url'] = $model->cmsBaseUrl . '/core/vendor';
-      $model->paths['civicrm.vendor']['path'] = $model->srcPath . '/vendor';
-      $model->paths['civicrm.bower']['url'] = $model->cmsBaseUrl . '/core/bower_components';
-      $model->paths['civicrm.bower']['path'] = $model->srcPath . '/bower_components';
-      $model->paths['civicrm.packages']['url'] = $model->cmsBaseUrl . '/core/packages';
-      $model->paths['civicrm.packages']['path'] = file_exists($model->srcPath . '/packages')
-          ? $model->srcPath . '/packages'
-          : dirname($model->srcPath) . '/civicrm-packages';
+      // if not using composer, dependencies will be inside the civicrm core directory
+      $model->paths['civicrm.root']['path'] = $corePath = $appRootPath . '/core';
+      $model->paths['civicrm.root']['url'] = $coreUrl = $baseUrl . '/core';
+
+      $model->paths['civicrm.vendor']['path'] = $corePath . '/vendor';
+      $model->paths['civicrm.vendor']['url'] = $coreUrl . '/vendor';
+
+      $model->paths['civicrm.bower']['path'] = $corePath . '/bower_components';
+      $model->paths['civicrm.bower']['url'] = $coreUrl . '/bower_components';
+
+      $model->paths['civicrm.packages']['path'] = $corePath . '/packages';
+      $model->paths['civicrm.packages']['url'] = $coreUrl . '/packages';
     }
   });
