@@ -95,7 +95,7 @@ class WebEntrypoint {
       'srcPath' => $corePath,
     ]);
 
-    $coreUrl = \Civi\Setup::instance()->getModel()->mandatorySettings['userFrameworkResourceURL'];
+    $coreUrl = \Civi\Setup::instance()->getModel()->paths['civicrm.root']['url'];
 
     $ctrl = \Civi\Setup::instance()->createController()->getCtrl();
     $ctrl->setUrls([

@@ -113,13 +113,13 @@ function _standalone_setup_scheme(): string {
     $model->lang = $_REQUEST['lang'] ?? 'en_US';
 
     if (\Composer\InstalledVersions::isInstalled('civicrm/civicrm-asset-plugin')) {
-      $model->mandatorySettings['userFrameworkResourceURL'] = $model->cmsBaseUrl . '/assets/civicrm/core';
       // civicrm-asset-plugin will fill-in various $paths.
+      // we need to set the url for core to get assets in the web ui
+      $model->paths['civicrm.root']['url'] = $model->cmsBaseUrl . '/assets/civicrm/core';
     }
     else {
-      $model->mandatorySettings['userFrameworkResourceURL'] = $model->cmsBaseUrl . '/core';
-      $model->paths['civicrm.core']['url'] = $model->cmsBaseUrl . '/core';
-      $model->paths['civicrm.core']['path'] = $model->srcPath;
+      $model->paths['civicrm.root']['url'] = $model->cmsBaseUrl . '/core';
+      $model->paths['civicrm.root']['path'] = $model->srcPath;
       $model->paths['civicrm.vendor']['url'] = $model->cmsBaseUrl . '/core/vendor';
       $model->paths['civicrm.vendor']['path'] = $model->srcPath . '/vendor';
       $model->paths['civicrm.bower']['url'] = $model->cmsBaseUrl . '/core/bower_components';
