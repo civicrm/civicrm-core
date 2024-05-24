@@ -1,4 +1,5 @@
-<?php
+<?php /** @noinspection PhpUndefinedFieldInspection */
+
 /*
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC. All rights reserved.                        |
