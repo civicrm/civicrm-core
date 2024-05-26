@@ -211,9 +211,11 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     $errors = [];
 
     // Validate start/end date inputs
-    $validateDates = \CRM_Utils_Date::validateStartEndDatepickerInputs('start_date', $values['start_date'], 'end_date', $values['end_date']);
-    if ($validateDates !== TRUE) {
-      $errors[$validateDates['key']] = $validateDates['message'];
+    if ($values['is_template'] != 1) {
+      $validateDates = \CRM_Utils_Date::validateStartEndDatepickerInputs('start_date', $values['start_date'], 'end_date', $values['end_date']);
+      if ($validateDates !== TRUE) {
+        $errors[$validateDates['key']] = $validateDates['message'];
+      }
     }
 
     return $errors;
