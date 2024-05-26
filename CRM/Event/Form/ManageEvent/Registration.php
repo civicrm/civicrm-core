@@ -466,9 +466,11 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
       }
 
       // Validate start/end date inputs
-      $validateDates = \CRM_Utils_Date::validateStartEndDatepickerInputs('registration_start_date', $values['registration_start_date'], 'registration_end_date', $values['registration_end_date']);
-      if ($validateDates !== TRUE) {
-        $errorMsg[$validateDates['key']] = $validateDates['message'];
+      if ($values['is_template'] != 1) {
+        $validateDates = \CRM_Utils_Date::validateStartEndDatepickerInputs('registration_start_date', $values['registration_start_date'], 'registration_end_date', $values['registration_end_date']);
+        if ($validateDates !== TRUE) {
+          $errorMsg[$validateDates['key']] = $validateDates['message'];
+        }
       }
 
       //check that the selected profiles have either firstname+lastname or email required
