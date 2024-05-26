@@ -30,6 +30,11 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   protected $_profilePostMultiple = [];
   protected $_profilePostMultipleAdd = [];
 
+  protected $_addProfileBottom;
+  protected $_profileBottomNum;
+  protected $_addProfileBottomAdd;
+  protected $_profileBottomNumAdd;
+
   /**
    * Set variables up before form is built.
    */
