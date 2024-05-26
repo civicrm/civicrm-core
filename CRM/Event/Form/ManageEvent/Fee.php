@@ -203,15 +203,15 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
       $defaults['pay_later_text'] = ts('I will send payment by check');
     }
 
-    $this->_showHide = new CRM_Core_ShowHideBlocks();
+    $showHide = new CRM_Core_ShowHideBlocks();
     if (!$defaults['is_monetary']) {
-      $this->_showHide->addHide('event-fees');
+      $showHide->addHide('event-fees');
     }
 
     if (isset($defaults['price_set_id'])) {
-      $this->_showHide->addHide('map-field');
+      $showHide->addHide('map-field');
     }
-    $this->_showHide->addToTemplate();
+    $showHide->addToTemplate();
     $this->assign('inDate', $this->_inDate);
     if (!empty($defaults['payment_processor'])) {
       $defaults['payment_processor'] = array_fill_keys(explode(CRM_Core_DAO::VALUE_SEPARATOR,
