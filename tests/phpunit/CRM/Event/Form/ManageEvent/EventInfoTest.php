@@ -14,14 +14,17 @@ class CRM_Event_Form_ManageEvent_EventInfoTest extends CiviUnitTestCase {
       'default_role_id' => 1,
       'start_date' => date('Y-m-d'),
       'end_date' => date('Y-m-d', time() + 86400),
+      'is_template' => '0',
     ];
   }
 
   /**
    * Test correct form submission.
+   * @dataProvider isTemplateProvider
+   * @param string $is_template
    */
-  public function testValidFormSubmission(): void {
-    $values = $this->getCorrectFormFields();
+  public function testValidFormSubmission(string $is_template): void {
+    $values = array_merge($this->getCorrectFormFields(), ['is_template' => $is_template]);
     $validationResult = \CRM_Event_Form_ManageEvent_EventInfo::formRule($values);
     $this->assertEmpty($validationResult);
   }
@@ -44,6 +47,14 @@ class CRM_Event_Form_ManageEvent_EventInfoTest extends CiviUnitTestCase {
     $values['end_date'] = '1900-01-01 00:00';
     $validationResult = \CRM_Event_Form_ManageEvent_EventInfo::formRule($values);
     $this->assertArrayHasKey('end_date', $validationResult);
+  }
+
+  /**
+   * dataprovider to test both regular events and event templates
+   * @return array
+   */
+  public function isTemplateProvider(): array {
+    return [['0'], ['1']];
   }
 
 }
