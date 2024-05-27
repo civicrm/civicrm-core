@@ -26,29 +26,18 @@
     {if array_key_exists('options_per_line', $field) && $field.options_per_line != 0}
       <div class="crm-section editrow_{$profileFieldName}-section form-item" id="editrow-{$rowIdentifier}">
         <div class="label option-label">{$formElement.label}</div>
-        <div class="content 3">
-
-          {assign var="count" value=1}
-          {strip}
-            <table class="form-layout-compressed">
-              <tr>
-                {* sort by fails for option per line. Added a variable to iterate through the element array*}
-                {foreach name=outer key=key item=item from=$formElement}
-                  {* There are both numeric and non-numeric keys mixed in here, where the non-numeric are metadata that aren't arrays with html members. *}
-                  {if is_array($item) && array_key_exists('html', $item)}
-                <td class="labels font-light">{$formElement.$key.html}</td>
-                {if $count == $field.options_per_line}
-              </tr>
-              <tr>
-                {assign var="count" value=1}
-                {else}
-                {assign var="count" value=$count+1}
-                {/if}
-                {/if}
-                {/foreach}
-              </tr>
-            </table>
-          {/strip}
+        <div class="content">
+          <div class="crm-multiple-checkbox-radio-options crm-options-per-line" style="--crm-opts-per-line:{$field.options_per_line};">
+            {foreach name=outer key=key item=item from=$formElement}
+              {if is_array($item) && array_key_exists('html', $item)}
+                <div class="crm-option-label-pair" >{$formElement.$key.html}</div>
+              {/if}
+            {/foreach}
+          </div>
+          {* Include the edit options list for admins *}
+          {if $formElement.html|strstr:"crm-option-edit-link"}
+            {$formElement.html|regex_replace:"@^.*(<a href=.*? class=.crm-option-edit-link.*?</a>)$@":"$1"}
+          {/if}
         </div>
         <div class="clear"></div>
       </div>
@@ -133,6 +122,18 @@
               {/if}
             {elseif $field.html_type eq 'File' && $viewOnlyFileValues}
               {$viewOnlyFileValues.$profileFieldName}
+            {elseif $field.html_type eq 'Radio' or $field.html_type eq 'CheckBox'}
+              <div class="crm-multiple-checkbox-radio-options" >
+                {foreach name=outer key=key item=item from=$formElement}
+                  {if is_array($item) && array_key_exists('html', $item)}
+                    <div class="crm-option-label-pair" >{$formElement.$key.html}</div>
+                  {/if}
+                {/foreach}
+              </div>
+              {* Include the edit options list for admins *}
+              {if $formElement.html|strstr:"crm-option-edit-link"}
+                {$formElement.html|regex_replace:"@^.*(<a href=.*? class=.crm-option-edit-link.*?</a>)$@":"$1"}
+              {/if}
             {else}
               {$formElement.html}
             {/if}
