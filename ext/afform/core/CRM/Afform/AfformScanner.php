@@ -140,6 +140,12 @@ class CRM_Afform_AfformScanner {
    * @see \Civi\Api4\Afform::getFields
    */
   public function getMeta(string $name, bool $getLayout = FALSE): ?array {
+    if ($this->isUseCachedPaths()) {
+      $cachedDefn = $this->cache->get('afform.meta.' . $name);
+      if ($cachedDefn !== NULL) {
+        return $cachedDefn;
+      }
+    }
     $defn = [];
     $mtime = NULL;
 
@@ -173,6 +179,9 @@ class CRM_Afform_AfformScanner {
     }
     $defn['name'] = $name;
     $defn['modified_date'] = date('Y-m-d H:i:s', $mtime);
+    if ($this->isUseCachedPaths()) {
+      $this->cache->set('afform.meta.' . $name, $defn);
+    }
     return $defn;
   }
 
