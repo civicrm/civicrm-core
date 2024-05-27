@@ -205,10 +205,11 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
   public function postProcess() {
 
     CRM_Utils_System::flushCache();
-
+    $redirectUrl = CRM_Utils_System::url('civicrm/admin/job', 'reset=1');
     if ($this->_action & CRM_Core_Action::DELETE) {
       CRM_Core_BAO_Job::deleteRecord(['id' => $this->_id]);
       CRM_Core_Session::setStatus("", ts('Scheduled Job Deleted.'), "success");
+      CRM_Utils_System::redirect($redirectUrl);
       return;
     }
 
@@ -218,13 +219,9 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
       $jm->executeJobById($this->_id);
       $jobName = self::getJobName($this->_id);
       CRM_Core_Session::setStatus(ts('%1 Scheduled Job has been executed. See the log for details.', [1 => $jobName]), ts("Executed"), "success");
-
       if ($this->getContext() === 'joblog') {
         // If we were triggered via the joblog form redirect back there when we finish
         $redirectUrl = CRM_Utils_System::url('civicrm/admin/joblog', 'reset=1&jid=' . $this->_id);
-      }
-      else {
-        $redirectUrl = CRM_Utils_System::url('civicrm/admin/job', 'reset=1');
       }
       CRM_Utils_System::redirect($redirectUrl);
       return;
