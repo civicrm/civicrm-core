@@ -278,9 +278,9 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
 
         // sequentially deletes EntityFile entry and then deletes File record
         CRM_Core_DAO_EntityFile::deleteRecord(['id' => $cefIDs[$fileID]]);
-        self::deleteRecord(['id' => $fileID]);
         // Delete file only if there are no longer any entities using this file.
         if (!CRM_Core_DAO::getFieldValue('CRM_Core_DAO_EntityFile', $fileID, 'id', 'file_id')) {
+          self::deleteRecord(['id' => $fileID]);
           unlink($config->customFileUploadDir . DIRECTORY_SEPARATOR . $fUri);
         }
       }
