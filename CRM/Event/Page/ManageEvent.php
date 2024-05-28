@@ -43,6 +43,10 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
 
   protected $_isTemplate = FALSE;
 
+  protected $_searchResult;
+
+  protected $_force;
+
   /**
    * Get action Links.
    *
