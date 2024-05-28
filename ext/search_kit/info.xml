@@ -28,7 +28,7 @@
     <psr0 prefix="CRM_" path="."/>
     <psr4 prefix="Civi\" path="Civi"/>
   </classloader>
-  <upgrader>CiviMix\Schema\Search\AutomaticUpgrader</upgrader>
+  <upgrader>CiviMix\Schema\SearchKit\AutomaticUpgrader</upgrader>
   <mixins>
     <mixin>ang-php@1.0.0</mixin>
     <mixin>scan-classes@1.0.0</mixin>
