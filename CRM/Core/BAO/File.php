@@ -261,51 +261,32 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
     [$sql, $params] = self::sql($entityTable, $entityID, $fileTypeID, $fileID);
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
 
-    $cfIDs = [];
-    $cefIDs = [];
+    $cfIDs = $cefIDs = [];
     while ($dao->fetch()) {
       $cfIDs[$dao->cfID] = $dao->uri;
-      $cefIDs[] = $dao->cefID;
+      $cefIDs[$dao->cfID] = $dao->cefID;
     }
 
-    // Delete tags from entity tag table.
     if (!empty($cfIDs)) {
-      $deleteFiles = [];
-      foreach ($cfIDs as $fId => $fUri) {
+      foreach ($cfIDs as $fileID => $fUri) {
         $tagParams = [
           'entity_table' => 'civicrm_file',
-          'entity_id' => $fId,
+          'entity_id' => $fileID,
         ];
+        // Delete tags from entity tag table.
         CRM_Core_BAO_EntityTag::del($tagParams);
-      }
-    }
 
-    // Delete entries from entity file table.
-    if (!empty($cefIDs)) {
-      $cefIDs = implode(',', $cefIDs);
-      $sql = "DELETE FROM civicrm_entity_file where id IN ( $cefIDs )";
-      CRM_Core_DAO::executeQuery($sql);
-      $isDeleted = TRUE;
-    }
-
-    if (!empty($cfIDs)) {
-      $deleteFiles = [];
-      foreach ($cfIDs as $fId => $fUri) {
+        // sequentially deletes EntityFile entry and then deletes File record
+        CRM_Core_DAO_EntityFile::deleteRecord(['id' => $cefIDs[$fileID]]);
         // Delete file only if there are no longer any entities using this file.
-        if (!CRM_Core_DAO::getFieldValue('CRM_Core_DAO_EntityFile', $fId, 'id', 'file_id')) {
+        if (!CRM_Core_DAO::getFieldValue('CRM_Core_DAO_EntityFile', $fileID, 'id', 'file_id')) {
+          self::deleteRecord(['id' => $fileID]);
           unlink($config->customFileUploadDir . DIRECTORY_SEPARATOR . $fUri);
-          $deleteFiles[$fId] = $fId;
         }
       }
-
-      // Delete entries from file table.
-      if (!empty($deleteFiles)) {
-        $deleteFiles = implode(',', $deleteFiles);
-        $sql = "DELETE FROM civicrm_file where id IN ( $deleteFiles )";
-        CRM_Core_DAO::executeQuery($sql);
-      }
       $isDeleted = TRUE;
     }
+
     return $isDeleted;
   }
 
