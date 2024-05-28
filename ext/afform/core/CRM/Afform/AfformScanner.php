@@ -141,21 +141,19 @@ class CRM_Afform_AfformScanner {
    */
   public function getMeta(string $name, bool $getLayout = FALSE): ?array {
     $cacheKey = 'afform.meta.' . $name;
-    if ($getLayout) {
-      $cacheKey .= '.getLayout';
-    }
     if ($this->isUseCachedPaths()) {
       $cachedDefn = $this->cache->get($cacheKey);
       if ($cachedDefn !== NULL) {
+        $cachedDefn = $this->addLayoutToMetaDataDefinition($cachedDefn, $getLayout);
         return $cachedDefn;
       }
     }
+
     $defn = [];
     $mtime = NULL;
 
     $jsonFile = $this->findFilePath($name, self::METADATA_JSON);
-    $htmlFile = $this->findFilePath($name, self::LAYOUT_FILE);
-
+    $phpFile = NULL;
     // Meta file can be either php or json format.
     // Json takes priority because local overrides are always saved in that format.
     if ($jsonFile !== NULL) {
@@ -170,21 +168,41 @@ class CRM_Afform_AfformScanner {
         $mtime = filemtime($phpFile);
       }
     }
+    $defn['name'] = $name;
+    $defn['modified_date'] = date('Y-m-d H:i:s', $mtime);
+    if ($this->isUseCachedPaths()) {
+      $this->cache->set($cacheKey, $defn);
+    }
+    $defn = $this->addLayoutToMetaDataDefinition($defn, $getLayout);
+    if ($jsonFile === NULL && $phpFile === NULL && empty($defn['layout'])) {
+      // No json File, no phpFile and no layout found.
+      if ($this->isUseCachedPaths()) {
+        $this->cache->delete($cacheKey);
+      }
+      return NULL;
+    }
+    return $defn;
+  }
+
+  /**
+   * Add layout the to the metadata definition.
+   *
+   * It could be that the layout does not exists in that case the layout is not set.
+   *
+   * @param array $defn
+   * @param bool $getLayout
+   * @return array
+   */
+  public function addLayoutToMetaDataDefinition(array $defn, bool $getLayout): array {
+    $name = $defn['name'];
+    $mtime = strtotime($defn['modified_date']);
+    $htmlFile = $this->findFilePath($name, self::LAYOUT_FILE);
     if ($htmlFile !== NULL) {
       $mtime = max($mtime, filemtime($htmlFile));
       if ($getLayout) {
         // If the defn file included a layout, the html file overrides
         $defn['layout'] = file_get_contents($htmlFile);
       }
-    }
-    // All 3 files don't exist!
-    elseif (!$defn) {
-      return NULL;
-    }
-    $defn['name'] = $name;
-    $defn['modified_date'] = date('Y-m-d H:i:s', $mtime);
-    if ($this->isUseCachedPaths()) {
-      $this->cache->set($cacheKey, $defn);
     }
     return $defn;
   }
