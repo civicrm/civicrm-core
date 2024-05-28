@@ -43,6 +43,10 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
 
   protected $_isTemplate = FALSE;
 
+  protected $_searchResult;
+
+  protected $_force;
+
   /**
    * Get action Links.
    *
@@ -297,6 +301,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
     );
     $this->_searchResult = CRM_Utils_Request::retrieve('searchResult', 'Boolean', $this);
 
+    // @todo Does $this->_force get used somewhere deeper down? It doesn't seem used in whereClause()?
     $whereClause = $this->whereClause($params, FALSE, $this->_force);
 
     if (CRM_Core_Config::singleton()->includeAlphabeticalPager) {
