@@ -1183,6 +1183,12 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       // Line total inclusive should really be always set but this is a safe fall back.
       $amount += $lineItem['line_total_inclusive'] ?? ($lineItem['line_total'] + $lineItem['tax_amount']);
     }
+
+    // format the amount to prevent potential rounding errors
+    if (!empty($this->_params['currencyID'])) {
+      $amount = Civi::format()->moneyNumber($amount, CRM_Utils_Money::getCurrencyObject($this->_params['currencyID']));
+    }
+
     return $amount;
   }
 
