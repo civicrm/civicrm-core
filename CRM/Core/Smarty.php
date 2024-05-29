@@ -194,8 +194,6 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
       // Trim is used on the extensions page.
       'trim',
       'is_numeric',
-      // used for permission checks although it might be nicer if it wasn't
-      'call_user_func',
       'array_key_exists',
       'strstr',
       'strpos',
@@ -204,11 +202,45 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
       $this->registerPlugin('modifier', $function, $function);
     }
 
+    $this->registerPlugin('modifier', 'call_user_func', [self::class, 'callUserFuncArray']);
+    // This does not appear to be used & feels like the sort of approach that would be phased out.
     $this->assign('crmPermissions', new CRM_Core_Smarty_Permissions());
 
     if ($config->debug || str_contains(CIVICRM_UF_BASEURL, 'localhost') || CRM_Utils_Constant::value('CIVICRM_UF') === 'UnitTests') {
       $this->error_reporting = E_ALL;
     }
+  }
+
+  /**
+   * Call a permitted function from the Smarty layer.
+   *
+   * In general calling functions from the Smarty layer is being made stricter in
+   * Smarty - they need to be registered.
+   *
+   * We can't quite kill off call_user_func from the smarty layer yet but we
+   * can deprecate using it to call anything other than the 3 known patterns.
+   * In Smarty5 this will hard-fail, which is OK as Smarty5 is being phased in
+   * and can err on the side of strictness, at least for now.
+   *
+   * @param callable $callable
+   * @param mixed $args
+   *
+   * @return mixed
+   * @throws \CRM_Core_Exception
+   */
+  public static function callUserFuncArray(callable $callable, ...$args) {
+    $permitted = [
+      ['CRM_Campaign_BAO_Campaign', 'isComponentEnabled'],
+      ['CRM_Case_BAO_Case', 'checkPermission'],
+      ['CRM_Core_Permission', 'check'],
+    ];
+    if (!in_array($callable, $permitted)) {
+      if (CRM_Core_Smarty::singleton()->getVersion() === 5) {
+        throw new CRM_Core_Exception('unsupported function');
+      }
+      CRM_Core_Error::deprecatedWarning('unsupported function. call_user_func array is not generally supported in Smarty5 but we have transitional support for 2 functions that are in common use');
+    }
+    return call_user_func_array($callable, $args ?: []);
   }
 
   /**
