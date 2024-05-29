@@ -94,7 +94,7 @@
     "ext-intl": "*",
     "pear/mail_mime": "~1.10",
     "pear/db": "~1.12.1",
-    "civicrm/composer-compile-lib": "~0.6 || ~1.0 || dev-d11-test",
+    "civicrm/composer-compile-lib": "~0.6 || ~1.0",
     "ext-json": "*",
     "ezyang/htmlpurifier": "^4.13",
     "phpoffice/phpspreadsheet": "^1.18",
