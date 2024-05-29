@@ -54,7 +54,7 @@ class CRM_Core_CodeGen_PhpSchema extends CRM_Core_CodeGen_BaseTask {
   }
 
   public function generateCreateSql() {
-    return ['civicrm.mysql' => \Civi::schemaHelper()->generateUninstallSql() . \Civi::schemaHelper()->generateInstallSql()];
+    return ['civicrm.mysql' => \Civi::schemaHelper()->generateInstallSql()];
   }
 
   public function generateDropSql() {
