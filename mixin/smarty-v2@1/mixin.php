@@ -4,7 +4,7 @@
  * Auto-register "templates/" folder.
  *
  * @mixinName smarty-v2
- * @mixinVersion 1.0.2
+ * @mixinVersion 1.0.3
  * @since 5.59
  *
  * @deprecated - it turns out that the mixin is not version specific so the 'smarty'
@@ -29,14 +29,19 @@ return function ($mixInfo, $bootCache) {
       $smarty->addTemplateDir($dir);
       return;
     }
-    // getTemplateDir returns string or array by reference
-    $templateRef = $smarty->getTemplateDir();
-    // Dereference and normalize as array
-    $templateDirs = (array) $templateRef;
-    // Add the dir if not already present
-    if (!in_array($dir, $templateDirs, TRUE)) {
-      array_unshift($templateDirs, $dir);
-      $smarty->setTemplateDir($templateDirs);
+    // Avoid calling getTemplateDir on Smarty 3+ when we know we
+    // have already registered the directory
+    if (empty(Civi::$statics[__FUNCTION__][$dir])) {
+      // getTemplateDir returns string or array by reference
+      $templateRef = $smarty->getTemplateDir();
+      // Dereference and normalize as array
+      $templateDirs = (array) $templateRef;
+      // Add the dir if not already present
+      if (!in_array($dir, $templateDirs, TRUE)) {
+        array_unshift($templateDirs, $dir);
+        $smarty->setTemplateDir($templateDirs);
+      }
+      Civi::$statics[__FUNCTION__][$dir] = true;
     }
   };
 
