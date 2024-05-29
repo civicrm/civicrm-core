@@ -73,6 +73,13 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
   private static $UNDEFINED_VALUE;
 
   /**
+   * @return mixed
+   */
+  protected static function getSmartyLoadPath() {
+    return CRM_Utils_Constant::value('CIVICRM_SMARTY_AUTOLOAD_PATH') ?: CRM_Utils_Constant::value('CIVICRM_SMARTY3_AUTOLOAD_PATH');
+  }
+
+  /**
    * @throws \CRM_Core_Exception
    * @throws \SmartyException
    */
@@ -517,6 +524,18 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
       ]);
     }
     return $value;
+  }
+
+  public function getVersion (): int {
+    $path = $this->getSmartyLoadPath();
+    if (str_contains($path, 'smarty3')) {
+      return 3;
+    }
+    if (str_contains($path, 'smarty4')) {
+      return 4;
+    }
+    // 5 is handled by overriding this function.
+    return 2;
   }
 
 }
