@@ -1321,11 +1321,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param int $contactID
    * @param array $customFieldsFormatted
    * @param array $premiumParams
-   * @param array $membershipLineItems
-   *   Line items specifically relating to memberships.
    */
-  protected function processMembership($membershipParams, $contactID, $customFieldsFormatted, $premiumParams,
-                                $membershipLineItems): void {
+  protected function processMembership($membershipParams, $contactID, $customFieldsFormatted, $premiumParams): void {
 
     $membershipTypeIDs = array_keys($this->order->getMembershipTypes());
     $membershipTypes = CRM_Member_BAO_Membership::buildMembershipTypeValues($this, $membershipTypeIDs);
@@ -2375,9 +2372,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     if ($this->isMembershipSelected()) {
       // CRM-12233.
       try {
-        $membershipLineItems = [$this->getPriceSetID() => $this->getMainContributionLineItems()];
         $membershipParams['amount'] = $this->getMainContributionAmount();
-        $this->processMembership($membershipParams, $contactID, $customFieldsFormatted, $premiumParams, $membershipLineItems);
+        $this->processMembership($membershipParams, $contactID, $customFieldsFormatted, $premiumParams);
       }
       catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
         CRM_Core_Session::singleton()->setStatus($e->getMessage());
