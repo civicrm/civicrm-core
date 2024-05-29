@@ -1186,7 +1186,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
     // format the amount to prevent potential rounding errors
     if (!empty($this->_params['currencyID'])) {
-      $amount = Civi::format()->moneyNumber($amount, CRM_Utils_Money::getCurrencyObject($this->_params['currencyID']));
+      $amount = (float) Civi::format()->moneyNumber($amount, CRM_Utils_Money::getCurrencyObject($this->_params['currencyID']));
     }
 
     return $amount;
