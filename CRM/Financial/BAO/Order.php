@@ -1010,7 +1010,7 @@ class CRM_Financial_BAO_Order {
 
       }
       elseif ($taxRate) {
-        $lineItem['tax_amount'] = ($taxRate / 100) * $lineItem['line_total'];
+        $lineItem['tax_amount'] = round(($taxRate / 100) * $lineItem['line_total'], 2);
       }
       $lineItem['line_total_inclusive'] = $lineItem['line_total_inclusive'] ?? ($lineItem['line_total'] + $lineItem['tax_amount']);
     }
