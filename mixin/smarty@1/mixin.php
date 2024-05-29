@@ -4,7 +4,7 @@
  * Auto-register "templates/" folder.
  *
  * @mixinName smarty
- * @mixinVersion 1.0.2
+ * @mixinVersion 1.0.3
  * @since 5.71
  *
  * @param CRM_Extension_MixInfo $mixInfo
@@ -30,7 +30,8 @@ return function ($mixInfo, $bootCache) {
     // Dereference and normalize as array
     $templateDirs = (array) $templateRef;
     // Add the dir if not already present
-    if (!in_array($dir, $templateDirs, TRUE)) {
+    if (!in_array($dir . '/', $templateDirs, TRUE)
+      && !in_array($dir, $templateDirs, TRUE)) {
       array_unshift($templateDirs, $dir);
       $smarty->setTemplateDir($templateDirs);
     }
