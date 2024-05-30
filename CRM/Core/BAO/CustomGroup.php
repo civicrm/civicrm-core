@@ -2254,6 +2254,13 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
         'is_multiple' => FALSE,
       ],
       [
+        'id' => 'ContributionPage',
+        'label' => ts('Contribution Pages'),
+        'grouping' => NULL,
+        'table_name' => 'civicrm_contribution_page',
+        'is_multiple' => FALSE,
+      ],
+      [
         'id' => 'Group',
         'label' => ts('Groups'),
         'grouping' => NULL,

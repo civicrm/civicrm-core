@@ -153,6 +153,11 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
     $this->assign('qParams', $qParams);
     $this->assign('footer_text', $this->_values['footer_text'] ?? NULL);
+
+    // Custom data fields
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree('ContributionPage', NULL, $this->_id, 0, '', NULL,
+      TRUE, NULL, FALSE, CRM_Core_Permission::VIEW, NULL, TRUE);
+    CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, NULL, NULL, $this->_id);
   }
 
   /**
