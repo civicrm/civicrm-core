@@ -53,7 +53,6 @@ function _standalone_setup_scheme(): string {
 
     // Compute paths and urls
 
-
     // get globals set in civicrm.standalone.php
     global $appRootPath, $settingsPath;
 
@@ -62,8 +61,8 @@ function _standalone_setup_scheme(): string {
     $baseUrl = _standalone_setup_scheme() . '://' . $_SERVER['HTTP_HOST'];
 
     // TODO: at the moment the installer will only work when app root = web root
-    $model->paths['cms.root']['path'] =  $appRootPath;
-    $model->paths['cms.root']['url'] =  $model->cmsBaseUrl = $baseUrl;
+    $model->paths['cms.root']['path'] = $appRootPath;
+    $model->paths['cms.root']['url'] = $model->cmsBaseUrl = $baseUrl;
 
     // we already know settings path from civicrm.standalone.php
     $model->settingsPath = $settingsPath;
