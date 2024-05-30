@@ -32,17 +32,23 @@
  */
 
 /**
+ * Get the path to load Smarty.
+ *
+ * @return string|null
+ */
+function crm_smarty_compatibility_get_path() {
+  return CRM_Utils_Constant::value('CIVICRM_SMARTY_AUTOLOAD_PATH') ?: CRM_Utils_Constant::value('CIVICRM_SMARTY3_AUTOLOAD_PATH');
+}
+
+/**
  * Fix for bug CRM-392. Not sure if this is the best fix or it will impact
  * other similar PEAR packages. doubt it
  */
 if (!class_exists('Smarty')) {
-  if (defined('CIVICRM_SMARTY_AUTOLOAD_PATH')) {
+  $path = crm_smarty_compatibility_get_path();
+  if ($path) {
     // Specify the smarty version to load.
-    require_once CIVICRM_SMARTY_AUTOLOAD_PATH;
-  }
-  elseif (defined('CIVICRM_SMARTY3_AUTOLOAD_PATH')) {
-    // older version of the above constant.
-    require_once CIVICRM_SMARTY3_AUTOLOAD_PATH;
+    require_once $path;
   }
   else {
     require_once 'Smarty/Smarty.class.php';

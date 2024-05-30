@@ -4,7 +4,7 @@
  * Auto-register "templates/" folder.
  *
  * @mixinName smarty-v2
- * @mixinVersion 1.0.2
+ * @mixinVersion 1.0.3
  * @since 5.59
  *
  * @deprecated - it turns out that the mixin is not version specific so the 'smarty'
@@ -22,20 +22,15 @@ return function ($mixInfo, $bootCache) {
     return;
   }
 
-  $register = function() use ($dir) {
+  $register = function($newDirs) {
     $smarty = CRM_Core_Smarty::singleton();
-    // Smarty2 compatibility
-    if (isset($smarty->_version) && version_compare($smarty->_version, 3, '<')) {
-      $smarty->addTemplateDir($dir);
-      return;
+    $v2 = isset($smarty->_version) && version_compare($smarty->_version, 3, '<');
+    $templateDirs = (array) ($v2 ? $smarty->template_dir : $smarty->getTemplateDir());
+    $templateDirs = array_merge($newDirs, $templateDirs);
+    if ($v2) {
+      $smarty->template_dir = $templateDirs;
     }
-    // getTemplateDir returns string or array by reference
-    $templateRef = $smarty->getTemplateDir();
-    // Dereference and normalize as array
-    $templateDirs = (array) $templateRef;
-    // Add the dir if not already present
-    if (!in_array($dir, $templateDirs, TRUE)) {
-      array_unshift($templateDirs, $dir);
+    else {
       $smarty->setTemplateDir($templateDirs);
     }
   };
@@ -45,7 +40,7 @@ return function ($mixInfo, $bootCache) {
   if (!empty($GLOBALS['_CIVIX_MIXIN_POLYFILL'])) {
     // Polyfill Loader (v<=5.45): We're already in the middle of firing `hook_config`.
     if ($mixInfo->isActive()) {
-      $register();
+      $register([$dir]);
     }
     return;
   }
@@ -53,14 +48,25 @@ return function ($mixInfo, $bootCache) {
   if (CRM_Extension_System::singleton()->getManager()->extensionIsBeingInstalledOrEnabled($mixInfo->longName)) {
     // New Install, Standard Loader: The extension has just been enabled, and we're now setting it up.
     // System has already booted. New templates may be needed for upcoming installation steps.
-    $register();
+    $register([$dir]);
     return;
   }
 
   // Typical Pageview, Standard Loader: Defer the actual registration for a moment -- to ensure that Smarty is online.
-  \Civi::dispatcher()->addListener('hook_civicrm_config', function() use ($mixInfo, $register) {
+  // We need to bundle-up all dirs -- Smarty 3/4/5 is inefficient with processing repeated calls to `getTemplateDir()`+`setTemplateDir()`
+  if (!isset(Civi::$statics[__FILE__]['event'])) {
+    Civi::$statics[__FILE__]['event'] = 'civi.smarty-v2.addPaths.' . md5(__FILE__);
+    Civi::dispatcher()->addListener('hook_civicrm_config', function() use ($register) {
+      $dirs = [];
+      $event = \Civi\Core\Event\GenericHookEvent::create(['dirs' => &$dirs]);
+      Civi::dispatcher()->dispatch(Civi::$statics[__FILE__]['event'], $event);
+      $register($dirs);
+    });
+  }
+
+  Civi::dispatcher()->addListener(Civi::$statics[__FILE__]['event'], function($event) use ($mixInfo, $dir) {
     if ($mixInfo->isActive()) {
-      $register();
+      array_unshift($event->dirs, $dir);
     }
   });
 
