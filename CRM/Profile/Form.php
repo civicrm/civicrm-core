@@ -158,6 +158,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
   protected $_customGroupId = NULL;
 
+  protected $_mail;
+
   protected $_currentUserID = NULL;
   protected $_session = NULL;
 
