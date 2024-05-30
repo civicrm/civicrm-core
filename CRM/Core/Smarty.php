@@ -527,7 +527,9 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
     if (str_contains($path, 'smarty4')) {
       return 4;
     }
-    // 5 is handled by overriding this function.
+    if (str_contains($path, 'smarty5')) {
+      return 5;
+    }
     return 2;
   }
 
