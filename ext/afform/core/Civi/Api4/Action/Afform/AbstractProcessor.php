@@ -369,10 +369,12 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
       foreach ($record['fields'] as $field => $value) {
         if (array_intersect($entityNames, (array) $value) && $this->getEntityField($entityType, $field)['input_type'] === 'EntityRef') {
           if (is_array($value)) {
-            foreach ($value as $i => $val) {
+            foreach ($value as $val) {
               if (in_array($val, $entityNames, TRUE)) {
                 $refIds = array_filter(array_column($this->_entityIds[$val], 'id'));
-                array_splice($records[$key]['fields'][$field], $i, 1, $refIds);
+                // replace the reference element in the field value array with found id(s)
+                $refPosition = array_search($val, $records[$key]['fields'][$field]);
+                array_splice($records[$key]['fields'][$field], $refPosition, 1, $refIds);
               }
             }
           }
