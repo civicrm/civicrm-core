@@ -272,7 +272,7 @@ if (!defined('CIVICRM_SMARTY_AUTOLOAD_PATH') && getenv('CIVICRM_SMARTY_AUTOLOAD_
 
 // If not set above we should default the Smarty version to Smarty4 which is our stable version.
 // This will not work for all composer-based installs @todo.
-if (!defined('CIVICRM_SMARTY_AUTOLOAD_PATH')) {
+if (!defined('CIVICRM_SMARTY_AUTOLOAD_PATH') && getenv('CIVICRM_SMARTY_AUTOLOAD_PATH') === FALSE) {
   if (is_dir($civicrm_root . '/packages')) {
     define('CIVICRM_SMARTY_AUTOLOAD_PATH', $civicrm_root . '/packages/smarty4/vendor/autoload.php');
   }
