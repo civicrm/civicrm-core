@@ -233,6 +233,7 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
       ['CRM_Campaign_BAO_Campaign', 'isComponentEnabled'],
       ['CRM_Case_BAO_Case', 'checkPermission'],
       ['CRM_Core_Permission', 'check'],
+      ['CRM_Core_Permission', 'access'],
     ];
     if (!in_array($callable, $permitted)) {
       if (CRM_Core_Smarty::singleton()->getVersion() === 5) {
