@@ -22,7 +22,12 @@ return function ($mixInfo, $bootCache) {
     $smarty = CRM_Core_Smarty::singleton();
     $v2 = isset($smarty->_version) && version_compare($smarty->_version, 3, '<');
     $templateDirs = (array) ($v2 ? $smarty->template_dir : $smarty->getTemplateDir());
-    $templateDirs = array_unique(array_merge($newDirs, $templateDirs));
+    $templateDirs = array_merge($newDirs, $templateDirs);
+    $templateDirs = array_unique(array_map(function($v) {
+      $v = str_replace(DIRECTORY_SEPARATOR, '/', $v);
+      $v = rtrim($v, '/') . '/';
+      return $v;
+    }, $templateDirs));
     if ($v2) {
       $smarty->template_dir = $templateDirs;
     }
