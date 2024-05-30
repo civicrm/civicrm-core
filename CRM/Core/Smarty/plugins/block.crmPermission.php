@@ -20,7 +20,10 @@
  *
  * /**
  * @param array $params
- *  Array containing the permission/s to check and optional contact ID.
+ *  Array containing 'permission' and / or 'not' and optionally contact_id.
+ *   - permission string or array of permission/s to check per CRM_Core_Permission::check
+ *   - not - same as permission but needs to be not present
+ *   - contact_id (optional).
  * @param CRM_Core_Smarty $smarty
  *   The Smarty object.
  * @param bool $repeat
@@ -32,7 +35,15 @@
  */
 function smarty_block_crmPermission($params, $content, &$smarty, &$repeat) {
   if (!$repeat) {
-    if (CRM_Core_Permission::check($params['permission'], $params['contact_id'] ?? NULL)) {
+    if (empty($params['permission']) && empty($params['not'])) {
+      // This would be due to developer error - better to return nothing to make it more visible.
+      return '';
+    }
+    $hasPermission = empty($params['permission']) || CRM_Core_Permission::check($params['permission'], $params['contact_id'] ?? NULL);
+    if (!$hasPermission) {
+      return '';
+    }
+    if (empty($params['not']) || !CRM_Core_Permission::check($params['permission'], $params['contact_id'] ?? NULL)) {
       return $content;
     }
   }
