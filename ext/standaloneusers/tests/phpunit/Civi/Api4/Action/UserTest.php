@@ -130,18 +130,6 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
   }
 
   /**
-   * Temporary debugging function
-   */
-  public function dumpUFMatch(string $s = '') {
-    $d = \CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_uf_match;");
-    print "\ndump---------- $s\n";
-    foreach ($d->fetchAll() as $row) {
-      print json_encode($row, JSON_UNESCAPED_SLASHES) . "\n";
-    }
-    print "--------------\n";
-  }
-
-  /**
    */
   protected function createFixture(): void {
 
@@ -164,7 +152,7 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
     $this->assertEquals('user_one', $user['username']);
     $this->assertEquals($this->adminContactID, $user['contact_id']);
     $this->assertEquals($this->adminUserID, $user['uf_id']);
-    $this->assertEquals('user_one@example.org', $user['uf_name']);
+    $this->assertEquals('user_one@example.org', $user['email']);
     $this->assertStringStartsWith('$', $user['hashed_password']);
     // The bundled staff role has lots of permissions including 'administer users'.
     $result = UserRole::create(FALSE)

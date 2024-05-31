@@ -6,6 +6,7 @@
 
 use Civi\Api4\Event\AuthorizeRecordEvent;
 use Civi\Api4\UserRole;
+use Civi\Api4\UFMatch;
 use Civi\Core\HookInterface;
 
 /**
@@ -62,7 +63,43 @@ class CRM_Standaloneusers_BAO_User extends CRM_Standaloneusers_DAO_User implemen
    * @param \Civi\Core\Event\PostEvent $event
    */
   public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
-    // Handle virtual "roles" field (defined in UserSpecProvider)
+    // Handle virtual "contact_id" field that jumps the join to civicrm_uf_match table
+    // @see \Civi\Api4\Service\Spec\Provider\UserSpecProvider
+    if (
+      in_array($event->action, ['create', 'edit'], TRUE) &&
+      isset($event->params['contact_id']) && $event->id
+    ) {
+      if ($event->params['contact_id']) {
+        UFMatch::replace(FALSE)
+          ->addWhere('uf_id', '=', $event->id)
+          ->setMatch(['uf_id'])
+          ->setRecords([
+            [
+                'uf_id' => $event->id,
+                'contact_id' => $event->params['contact_id'],
+            ]
+          ])->execute();
+      }
+      else {
+        // removing the contact link
+        UFMatch::delete(FALSE)
+          ->addWhere('uf_id', '=', $event->id)
+          ->execute();
+      }
+    }
+    // Handle virtual "language" field that jumps the join to civicrm_uf_match table
+    // @see \Civi\Api4\Service\Spec\Provider\UserSpecProvider
+    if (
+      in_array($event->action, ['create', 'edit'], TRUE) &&
+      isset($event->params['language']) && $event->id
+    ) {
+        // record will exist because created above
+        UFMatch::update(FALSE)
+            ->addWhere('uf_id', '=', $event->id)
+            ->addValue('language', $event->params['language'])
+            ->execute();
+    }
+    // Handle virtual "roles" (defined in UserSpecProvider)
     // @see \Civi\Api4\Service\Spec\Provider\UserSpecProvider
     if (
       in_array($event->action, ['create', 'edit'], TRUE) &&
@@ -86,9 +123,11 @@ class CRM_Standaloneusers_BAO_User extends CRM_Standaloneusers_DAO_User implemen
   }
 
   public static function updateLastAccessed() {
+    $table_name = self::getTableName();
+
     $sess = CRM_Core_Session::singleton();
     $ufID = (int) $sess->get('ufID');
-    CRM_Core_DAO::executeQuery("UPDATE civicrm_uf_match SET when_last_accessed = NOW() WHERE id = $ufID");
+    CRM_Core_DAO::executeQuery("UPDATE $table_name SET when_last_accessed = NOW() WHERE id = $ufID");
     $sess->set('lastAccess', time());
   }
 

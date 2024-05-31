@@ -135,13 +135,6 @@ trait WriteTrait {
     // Call parent to do the main saving.
     $saved = parent::write($items);
 
-    // Enforce uf_id === id
-    foreach ($saved as $bao) {
-      if ($bao->uf_id !== $bao->id) {
-        $bao->uf_id = $bao->id;
-        $bao->save();
-      }
-    }
     return $saved;
   }
 

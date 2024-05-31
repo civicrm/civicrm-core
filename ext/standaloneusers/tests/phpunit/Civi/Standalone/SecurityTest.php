@@ -114,18 +114,6 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
   }
 
   /**
-   * Temporary debugging function
-   */
-  public function dumpUFMatch(string $s = '') {
-    $d = \CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_uf_match;");
-    print "\ndump---------- $s\n";
-    foreach ($d->fetchAll() as $row) {
-      print json_encode($row, JSON_UNESCAPED_SLASHES) . "\n";
-    }
-    print "--------------\n";
-  }
-
-  /**
    * @return Array[int, int, \Civi\Standalone\Security]
    */
   public function createFixtureContactAndUser(): array {

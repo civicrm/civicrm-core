@@ -5,6 +5,7 @@ use Civi\Crypto\Exception\CryptoException;
 use CRM_Core_Session;
 use Civi;
 use Civi\Api4\User;
+use Civi\Api4\UFMatch;
 use Civi\Api4\MessageTemplate;
 use CRM_Standaloneusers_WorkflowMessage_PasswordReset;
 
@@ -156,11 +157,18 @@ class Security {
       $email = $params[$emailParam];
       $userID = User::create(FALSE)
         ->addValue('username', $params['cms_name'])
-        ->addValue('uf_name', $email)
+        ->addValue('email', $email)
         ->addValue('password', $params['cms_pass'])
         ->addValue('contact_id', $params['contact_id'] ?? NULL)
-        // ->addValue('uf_id', 0) // does not work without this.
         ->execute()->single()['id'];
+
+      UFMatch::save(FALSE)
+          ->setRecords([
+          [
+              'uf_id' => $userID,
+              'contact_id' => $params['contact_id'] ?? NULL,
+          ]
+          ])->execute();
     }
     catch (\Exception $e) {
       \Civi::log()->warning("Failed to create user '$email': " . $e->getMessage());
@@ -183,7 +191,7 @@ class Security {
   public function updateCMSName($ufID, $email) {
     \Civi\Api4\User::update(FALSE)
       ->addWhere('id', '=', $ufID)
-      ->addValue('uf_name', $email)
+      ->addValue('email', $email)
       ->execute();
   }
 
@@ -438,7 +446,7 @@ class Security {
       Civi::log()->notice("There is no active, default password_reset message template, which has prevented emailing a reset to {username}", ['username' => $user['username']]);
       return NULL;
     }
-    if (!filter_var($user['uf_name'] ?? '', \FILTER_VALIDATE_EMAIL)) {
+    if (!filter_var($user['email'] ?? '', \FILTER_VALIDATE_EMAIL)) {
       Civi::log()->warning("User $user[id] has an invalid email. Failed to send password reset.");
       return NULL;
     }

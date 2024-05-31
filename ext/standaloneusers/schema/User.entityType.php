@@ -3,12 +3,12 @@ use CRM_Standaloneusers_ExtensionUtil as E;
 
 return [
   'name' => 'User',
-  'table' => 'civicrm_uf_match',
+  'table' => 'civicrm_user_account',
   'class' => 'CRM_Standaloneusers_DAO_User',
   'getInfo' => fn() => [
     'title' => E::ts('User'),
     'title_plural' => E::ts('Users'),
-    'description' => E::ts('Standalone User Account. In Standalone this is a superset of the original civicrm_uf_match table.'),
+    'description' => E::ts('Standalone User Accounts.'),
     'log' => TRUE,
     'label_field' => 'username',
   ],
@@ -17,38 +17,16 @@ return [
     'update' => 'civicrm/admin/user/#?User1=[id]',
   ],
   'getIndices' => fn() => [
-    'I_civicrm_uf_match_uf_id' => [
-      'fields' => [
-        'uf_id' => TRUE,
-      ],
-      'add' => '3.3',
-    ],
     'UI_username' => [
       'fields' => [
         'username' => TRUE,
       ],
       'unique' => TRUE,
     ],
-    'UI_uf_name_domain_id' => [
-      'fields' => [
-        'uf_name' => TRUE,
-        'domain_id' => TRUE,
-      ],
-      'unique' => TRUE,
-      'add' => '2.1',
-    ],
-    'UI_contact_domain_id' => [
-      'fields' => [
-        'contact_id' => TRUE,
-        'domain_id' => TRUE,
-      ],
-      'unique' => TRUE,
-      'add' => '1.6',
-    ],
   ],
   'getFields' => fn() => [
     'id' => [
-      'title' => E::ts('UF Match ID'),
+      'title' => E::ts('User ID'),
       'sql_type' => 'int unsigned',
       'input_type' => 'Number',
       'required' => TRUE,
@@ -57,60 +35,13 @@ return [
       'primary_key' => TRUE,
       'auto_increment' => TRUE,
     ],
-    'domain_id' => [
-      'title' => E::ts('Domain ID'),
-      'sql_type' => 'int unsigned',
-      'input_type' => 'EntityRef',
-      'required' => TRUE,
-      'description' => E::ts('Which Domain is this match entry for'),
-      'add' => '3.0',
-      'input_attrs' => [
-        'label' => E::ts('Domain'),
-      ],
-      'pseudoconstant' => [
-        'table' => 'civicrm_domain',
-        'key_column' => 'id',
-        'label_column' => 'name',
-      ],
-      'entity_reference' => [
-        'entity' => 'Domain',
-        'key' => 'id',
-      ],
-    ],
-    'uf_id' => [
-      'title' => E::ts('CMS ID'),
-      'sql_type' => 'int unsigned',
-      'input_type' => 'Number',
-      'required' => TRUE,
-      'description' => E::ts('UF ID. Redundant in Standalone. Needs to be identical to id.'),
-      'add' => '1.1',
-      'default' => 0,
-    ],
-    'uf_name' => [
+    'email' => [
       'title' => E::ts('User Email'),
       'sql_type' => 'varchar(255)',
       'input_type' => 'Email',
       'description' => E::ts('Email (e.g. for password resets)'),
       'input_attrs' => [
         'maxlength' => 255,
-      ],
-    ],
-    'contact_id' => [
-      'title' => E::ts('Contact ID'),
-      'sql_type' => 'int unsigned',
-      'input_type' => 'EntityRef',
-      'description' => E::ts('FK to Contact ID'),
-      'add' => '1.1',
-      'input_attrs' => [
-        'label' => E::ts('Contact'),
-        'filter' => [
-          'contact_type=Individual',
-        ],
-      ],
-      'entity_reference' => [
-        'entity' => 'Contact',
-        'key' => 'id',
-        'on_delete' => 'SET NULL',
       ],
     ],
     'username' => [
@@ -176,19 +107,6 @@ return [
       ],
       'pseudoconstant' => [
         'callback' => 'CRM_Standaloneusers_BAO_User::getTimeZones',
-      ],
-    ],
-    'language' => [
-      'title' => E::ts('Preferred Language'),
-      'sql_type' => 'varchar(5)',
-      'input_type' => 'Select',
-      'description' => E::ts('UI language preferred by the given user/contact'),
-      'add' => '2.1',
-      'input_attrs' => [
-        'maxlength' => 5,
-      ],
-      'pseudoconstant' => [
-        'callback' => 'CRM_Standaloneusers_BAO_User::getPreferredLanguages',
       ],
     ],
     'password_reset_token' => [

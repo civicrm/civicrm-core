@@ -38,13 +38,13 @@ class CRM_Core_BAO_CMSUser {
   public static function create(&$params, $mailParam) {
     $config = CRM_Core_Config::singleton();
 
+    echo json_encode($params);
     $ufID = $config->userSystem->createUser($params, $mailParam);
 
     // Create UF Match if we have contactID unless we're Standalone
     // since in Standalone uf_match is the same table as User.
     if (
-      CIVICRM_UF !== 'Standalone'
-      && $ufID !== FALSE
+      $ufID !== FALSE
       && isset($params['contactID'])
     ) {
       // create the UF Match record

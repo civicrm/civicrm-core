@@ -64,7 +64,7 @@ class CRM_Standaloneusers_WorkflowMessage_PasswordReset extends GenericWorkflowM
       'userID'   => $user['id'],
       'contactID' => $user['contact_id'],
       'username' => $user['username'],
-      'email'    => $user['uf_name'],
+      'email'    => $user['email'],
       'url'      => $resetUrlPlaintext,
     ];
     $this
@@ -72,7 +72,7 @@ class CRM_Standaloneusers_WorkflowMessage_PasswordReset extends GenericWorkflowM
       ->setResetUrlHtml($resetUrlHtml)
       ->setUsernamePlaintext($user['username'])
       ->setUsernameHtml(htmlspecialchars($user['username']))
-      ->setTo(['name' => $user['username'], 'email' => $user['uf_name']])
+      ->setTo(['name' => $user['username'], 'email' => $user['email']])
       ->setContactID($user['contact_id']);
     return $this;
   }

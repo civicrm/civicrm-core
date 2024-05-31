@@ -41,11 +41,11 @@ class SendPasswordReset extends AbstractAction {
     }
 
     $user = User::get(FALSE)
-      ->addSelect('id', 'uf_name', 'username', 'contact_id')
+      ->addSelect('id', 'email', 'username', 'contact_id')
       ->addWhere('is_active', '=', TRUE)
       ->setLimit(1)
       ->addWhere(
-        filter_var($identifier, FILTER_VALIDATE_EMAIL) ? 'uf_name' : 'username',
+        filter_var($identifier, FILTER_VALIDATE_EMAIL) ? 'email' : 'username',
         '=',
         $identifier)
       ->execute()

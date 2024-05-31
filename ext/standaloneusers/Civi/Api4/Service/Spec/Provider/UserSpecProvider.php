@@ -34,6 +34,17 @@ class UserSpecProvider extends \Civi\Core\Service\AutoService implements Generic
       $password->setInputType('Password');
       $spec->addFieldSpec($password);
     }
+    // Virtual "contact_id" field that jumps the join via `civicrm_uf_match` bridge
+    $contactId = new FieldSpec('contact_id', 'User', 'Integer');
+    $contactId->setRequired($spec->getAction() === 'create');
+    $contactId->setTitle(E::ts('Contact ID'));
+    $contactId->setDescription(E::ts('Contact ID related to this user.'));
+    $contactId->setInputType('EntityRef');
+    $contactId->setFkEntity('Contact');
+    $contactId->setColumnName('id');
+    $contactId->setSqlRenderer([__CLASS__, 'getContactIdSql']);
+    $spec->addFieldSpec($contactId);
+
     // Virtual "roles" field is a facade to the FK values in `civicrm_user_role`.
     // It makes forms easier to write by acting as if user.roles were a simple field on the User record.
     $roles = new FieldSpec('roles', 'User', 'Array');
@@ -62,6 +73,10 @@ class UserSpecProvider extends \Civi\Core\Service\AutoService implements Generic
       \Civi::cache('metadata')->set('user_roles', $roles);
     }
     return $roles;
+  }
+
+  public static function getContactIdSql(array $field, Api4SelectQuery $query): string {
+    return "(SELECT contact_id FROM civicrm_uf_match uf WHERE uf.uf_id = {$field['sql_name']})";
   }
 
   public static function getRolesSql(array $field, Api4SelectQuery $query): string {
