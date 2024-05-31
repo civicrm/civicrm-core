@@ -14,8 +14,8 @@
     <url desc="Support">http://civicrm.stackexchange.com/</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
-  <releaseDate>2024-05-23</releaseDate>
-  <version>5.73.3</version>
+  <releaseDate>2024-05-30</releaseDate>
+  <version>5.73.4</version>
   <develStage>stable</develStage>
   <comments>
     FlexMailer is an email delivery engine which replaces the internal guts
