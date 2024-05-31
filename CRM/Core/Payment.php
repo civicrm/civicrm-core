@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Participant;
 use Civi\Payment\System;
 use Civi\Payment\Exception\PaymentProcessorException;
 use Civi\Payment\PropertyBag;
@@ -1234,9 +1235,12 @@ abstract class CRM_Core_Payment {
     }
 
     if ($this->_component == 'event') {
+      $eventID = Participant::get(FALSE)->addWhere('id', '=', $participantID)
+        ->addSelect('event_id')->execute()->single()['event_id'];
       return CRM_Utils_System::url($this->getBaseReturnUrl(), [
         'reset' => 1,
         'cc' => 'fail',
+        'id' => $eventID,
         'participantId' => $participantID,
       ],
         TRUE, NULL, FALSE
