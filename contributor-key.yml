@@ -332,6 +332,10 @@
   name        : Chandana Bandara
   organization: CompuCorp
 
+- github      : crusonweb
+  name        : Dan Cruson
+  organization: CrusonWeb
+
 - github      : CsarRamos
   name        : César Ramos
   organization: iXiam
@@ -545,6 +549,9 @@
 
 - github      : francescbassas
   name        : Francesc Bassas i Bullich
+
+- github      : franslyml
+  name        : Fransly
 
 - github      : freeform-sg
   organization: Freeform Solutions
