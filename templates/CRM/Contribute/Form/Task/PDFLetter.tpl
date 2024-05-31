@@ -36,7 +36,7 @@
         <td>{$form.email_options.html}</td>
       </tr>
       <tr>
-        <td class="label-left">{$form.from_email_address.label}  {help id="id-from_email" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp"}</td>
+        <td class="label-left">{$form.from_email_address.label}  {help id="id-from_email" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp" title=$form.from_email_address.label}</td>
         <td>{$form.from_email_address.html}</td>
       </tr>
     </table>
