@@ -4,7 +4,7 @@
  * Base class which provides helpers to execute upgrade logic.
  *
  * @since 5.38
- * LIFECYCLE METHODS: Subclasses may optionally define install(), postInstall(),
+ * LIFECYCLE METHODS: Subclasses may optionally define preInstall(), install(), postInstall(),
  * uninstall(), enable(), disable().
  *
  * UPGRADE METHODS: Subclasses may define any number of methods named "upgrade_NNNN()".
@@ -37,6 +37,19 @@ class CRM_Extension_Upgrader_Base implements CRM_Extension_Upgrader_Interface {
   // ******** Hook delegates ********
 
   /**
+   * Run pre-installation steps. Ex: Validate system environment
+   *
+   * This runs BEFORE creating any sql tables.
+   *
+   * @return void
+   */
+  public function onPreInstall() {
+    if (is_callable([$this, 'preInstall'])) {
+      $this->preInstall();
+    }
+  }
+
+  /**
    * Run early installation steps. Ex: Create new MySQL table.
    *
    * This dispatches directly to each new extension. You will only receive notices for your own installation.
@@ -44,7 +57,8 @@ class CRM_Extension_Upgrader_Base implements CRM_Extension_Upgrader_Interface {
    * If multiple extensions are installed simultaneously, they will all run
    * `hook_install`/`hook_enable` back-to-back (in order of dependency).
    *
-   * This runs BEFORE refreshing major caches and services (such as
+   * This runs AFTER creating tables, but
+   * BEFORE refreshing major caches and services (such as
    * `ManagedEntities` and `CRM_Logging_Schema`).
    *
    * @see https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_install
