@@ -31,6 +31,10 @@ class CRM_Core_I18n_SchemaStructure {
         }
         foreach ($entity['getFields']() as $fieldName => $field) {
           if (!empty($field['localizable'])) {
+            // dev/core#2581 set blank default for required fields; avoids error in MariaDB with STRICT_TRANS_TABLES
+            if (!empty($field['required'])) {
+              $field += ['default' => ''];
+            }
             $result[$entity['table']][$fieldName] = CRM_Utils_Schema::generateFieldSql($field);
           }
         }
