@@ -1001,7 +1001,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     // and the fallback to drupal_flush_css_js. Still need the class_exists.
     try {
       // Sometimes metadata gets cleared while the cms isn't bootstrapped.
-      if (class_exists('\Drupal')) {
+      if (class_exists('\Drupal') && \Drupal::hasContainer()) {
         \Drupal::service('asset.query_string')->reset();
         $cleared = TRUE;
       }
