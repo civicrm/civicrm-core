@@ -37,6 +37,12 @@ class CRM_Contribute_Task extends CRM_Core_Task {
   public static $objectType = 'contribution';
 
   /**
+   * @var array
+   * We declare this in this child task so other children of CRM_Core_Task don't share a tasks cache with this class.
+   */
+  public static $_tasks = [];
+
+  /**
    * These tasks are the core set of tasks that the user can perform
    * on a contact / group of contacts
    *

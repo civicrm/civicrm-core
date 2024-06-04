@@ -33,6 +33,12 @@ class CRM_Grant_Task extends CRM_Core_Task {
   public static $objectType = 'grant';
 
   /**
+   * @var array
+   * We declare this in this child task so other children of CRM_Core_Task don't share a tasks cache with this class.
+   */
+  public static $_tasks = [];
+
+  /**
    * These tasks are the core set of tasks that the user can perform
    * on a contact / group of contacts
    *
@@ -64,6 +70,14 @@ class CRM_Grant_Task extends CRM_Core_Task {
           'title' => ts('Update grants'),
           'class' => 'CRM_Grant_Form_Task_Update',
           'result' => FALSE,
+        ],
+        self::PDF_LETTER => [
+          'title' => ts('Print/merge document'),
+          'class' => 'CRM_Grant_Form_Task_PDF',
+          'result' => FALSE,
+          'key' => 'receipt',
+          'url' => 'civicrm/grant/task?reset=1&task_item=receipt',
+          'icon' => 'fa-envelope-o',
         ],
       ];
 

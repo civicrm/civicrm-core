@@ -878,7 +878,6 @@
     "ext/civicrm_search_ui/managed/SavedSearch_label_format.mgd.php",
     "ext/civigrant/CRM/Grant/Info.php",
     "ext/civigrant/CRM/Grant/Page/Tab.php",
-    "ext/civigrant/Civi/Api4/Service/*",
     "ext/civigrant/ang/afsearchGrants.aff.html",
     "ext/civigrant/ang/afsearchGrants.aff.json",
     "ext/civigrant/ang/afsearchTabGrant.aff.json",
