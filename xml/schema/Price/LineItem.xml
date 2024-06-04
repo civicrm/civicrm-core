@@ -144,18 +144,6 @@
     <add>3.2</add>
 
   </field>
-   <index>
-    <name>UI_line_item_value</name>
-    <fieldName>entity_id</fieldName>
-    <fieldName>entity_table</fieldName>
-    <fieldName>contribution_id</fieldName>
-    <fieldName>price_field_value_id</fieldName>
-    <fieldName>price_field_id</fieldName>
-    <unique>true</unique>
-    <add>3.3</add>
-    <change>4.5</change>
-    <!-- Add contribution_id to unique index in 4.5  -->
-  </index>
   <field>
     <name>price_field_value_id</name>
     <title>Option ID</title>
