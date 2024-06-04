@@ -46,7 +46,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
   }
 
   public function testSubmitDualRole(): void {
-    $email = $this->getForm([], [
+    $this->getForm([], [
       'status_id' => 1,
       'register_date' => date('Ymd'),
       'send_receipt' => 1,
@@ -55,8 +55,13 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
         CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'role_id', 'Volunteer'),
         CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'role_id', 'Speaker'),
       ],
-    ])->postProcess()->getFirstMailBody();
-    $this->assertStringContainsString('Volunteer, Speaker', $email);
+    ])->postProcess();
+    $participant = \Civi\Api4\Participant::get()
+      ->addSelect('role_id:name')
+      ->addOrderBy('id', 'DESC')
+      ->execute()
+      ->first();
+    $this->assertEqualsCanonicalizing(['Volunteer', 'Speaker'], $participant['role_id:name']);
   }
 
   public function testSubmitWithCustomData(): void {
