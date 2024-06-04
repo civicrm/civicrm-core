@@ -12,19 +12,6 @@ return [
     'add' => '1.7',
     'label_field' => 'label',
   ],
-  'getIndices' => fn() => [
-    'UI_line_item_value' => [
-      'fields' => [
-        'entity_id' => TRUE,
-        'entity_table' => TRUE,
-        'contribution_id' => TRUE,
-        'price_field_value_id' => TRUE,
-        'price_field_id' => TRUE,
-      ],
-      'unique' => TRUE,
-      'add' => '3.3',
-    ],
-  ],
   'getFields' => fn() => [
     'id' => [
       'title' => ts('Line Item ID'),

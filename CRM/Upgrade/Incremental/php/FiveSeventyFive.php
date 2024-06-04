@@ -71,6 +71,8 @@ class CRM_Upgrade_Incremental_php_FiveSeventyFive extends CRM_Upgrade_Incrementa
     $this->addTask('Replace receive_date smarty token in online membership template',
       'updateMessageToken', 'membership_online_receipt', '$receive_date', 'contribution.receive_date', $rev
     );
+
+    CRM_Core_BAO_SchemaHandler::dropIndexIfExists('civicrm_line_item', 'UI_line_item_value');
   }
 
 }
