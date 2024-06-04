@@ -607,10 +607,7 @@ class CRM_Contact_Form_Search_Criteria {
       CRM_Contact_BAO_ContactType::basicTypes(),
       CRM_Contact_BAO_ContactType::subTypes()
     );
-    $groupDetails = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, TRUE,
-      $extends
-    );
-
+    $groupDetails = CRM_Core_BAO_CustomGroup::getAll(['extends' => $extends]);
     $form->assign('groupTree', $groupDetails);
 
     foreach ($groupDetails as $key => $group) {
