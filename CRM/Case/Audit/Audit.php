@@ -135,7 +135,7 @@ class CRM_Case_Audit_Audit {
 
           // Now sort the fields based on the order in the config file.
           foreach ($regionList as $region) {
-            $this->auditConfig->sort($retval[$activityindex][$region], $region);
+            if (isset($retval[$activityindex][$region])) $this->auditConfig->sort($retval[$activityindex][$region], $region);
           }
 
           $retval[$activityindex]['editurl'] = $activity->getElementsByTagName("EditURL")->item(0)->nodeValue;
