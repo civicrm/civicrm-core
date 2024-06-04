@@ -143,6 +143,7 @@ class CRM_Case_Audit_Audit {
           // If there are any fields with ifBlank specified, replace their values.
           // We need to do this as a second pass because if we do it while looping through fields we might not have come across the field we need yet.
           foreach ($regionList as $region) {
+            if (!isset($retval[$activityindex][$region])) continue;
             foreach ($retval[$activityindex][$region] as & $v) {
               $vlabel = $v['label'];
               if (trim($v['value']) == '' && !empty($ifBlanks[$region][$vlabel])) {
