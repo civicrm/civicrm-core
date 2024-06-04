@@ -2013,6 +2013,9 @@ WHERE  id IN ( %1, %2 )
     $transaction = new CRM_Core_Transaction();
     $params = self::prepareCreate($params);
 
+    // Clear caches before passing the data to hooks.
+    Civi::cache('metadata')->clear();
+
     $customField = new CRM_Core_DAO_CustomField();
     $customField->copyValues($params);
     $customField->save();
