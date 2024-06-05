@@ -644,7 +644,7 @@ FROM civicrm_action_schedule cas
         $smsParams,
         $activity->id,
         $userID,
-        $entityID,
+        $entityID
       );
     }
     catch (CRM_Core_Exception $e) {
