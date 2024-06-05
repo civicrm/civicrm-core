@@ -122,7 +122,6 @@ trait CRM_Contribute_Form_Task_TaskTrait {
     $ids = $this->getSelectedIDs($this->getSearchFormValues());
     if (!$ids) {
       $result = $this->getSearchQueryResults();
-      $ids = [];
       while ($result->fetch()) {
         $ids[] = $result->contribution_id;
       }
