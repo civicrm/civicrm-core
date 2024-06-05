@@ -25,6 +25,8 @@ class CRM_Core_I18n_SchemaStructure {
     static $result = NULL;
     if (!$result) {
       $result = [];
+      global $civicrm_root;
+      $sqlGenerator = require "$civicrm_root/mixin/lib/civimix-schema/src/SqlGenerator.php";
       foreach (\Civi\Schema\EntityRepository::getEntities() as $entity) {
         if (empty($entity['getFields'])) {
           continue;
@@ -35,7 +37,7 @@ class CRM_Core_I18n_SchemaStructure {
             if (!empty($field['required'])) {
               $field += ['default' => ''];
             }
-            $result[$entity['table']][$fieldName] = CRM_Utils_Schema::generateFieldSql($field);
+            $result[$entity['table']][$fieldName] = $sqlGenerator::generateFieldSql($field);
           }
         }
       }
