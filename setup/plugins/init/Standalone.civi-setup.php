@@ -56,6 +56,25 @@ function _standalone_setup_scheme(): string {
     // get globals set in civicrm.standalone.php
     global $appRootPath, $settingsPath;
 
+    // sometimes when using cv these global won't be set
+    if (!$appRootPath) {
+      $appRootCandidate = $model->srcPath;
+      while ($appRootCandidate) {
+        $appRootCandidate = dirname($appRootCandidate);
+
+        if (file_exists(implode(DIRECTORY_SEPARATOR, [$appRootCandidate, 'civicrm.standalone.php']))) {
+          $appRootPath = $appRootCandidate;
+          break;
+        }
+      }
+      if (!$appRootPath) {
+        throw new \Exception("Can't locate Standalone root path as source path is not set.");
+      }
+    }
+    if (!$settingsPath) {
+      $settingsPath = implode(DIRECTORY_SEPARATOR, [$appRootPath, 'private', 'civicrm.settings.php']);
+    }
+
     // try to determine base url
     // TODO: this won't work if we are installing in a subdirectory of the webroot
     $baseUrl = _standalone_setup_scheme() . '://' . $_SERVER['HTTP_HOST'];
@@ -64,7 +83,7 @@ function _standalone_setup_scheme(): string {
     $model->paths['cms.root']['path'] = $appRootPath;
     $model->paths['cms.root']['url'] = $model->cmsBaseUrl = $baseUrl;
 
-    // we already know settings path from civicrm.standalone.php
+    // we should already know settings path from civicrm.standalone.php
     $model->settingsPath = $settingsPath;
 
     // private directories
