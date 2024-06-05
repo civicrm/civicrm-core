@@ -823,7 +823,15 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $exclude = $this->getFieldsToExcludeFromPurification();
     foreach ($defaults as $index => $default) {
       if (!in_array($index, $exclude, TRUE) && is_string($default) && !is_numeric($default)) {
+        $hasEncodedAmp = str_contains('&amp;', $default);
+        $hasEncodedQuote = str_contains('&quot;', $default);
         $defaults[$index] = CRM_Utils_String::purifyHTML($default);
+        if (!$hasEncodedAmp) {
+          $defaults[$index] = str_replace('&amp;', '&', $defaults[$index]);
+        }
+        if (!$hasEncodedQuote) {
+          $defaults[$index] = str_replace('&quot;', '"', $defaults[$index]);
+        }
       }
     }
     $this->setDefaults($defaults);
