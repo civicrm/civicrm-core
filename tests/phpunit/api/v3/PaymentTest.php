@@ -76,8 +76,10 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
   /**
    * Test multiple payments for contribution and assert if option
    * and is_payment returns the correct list of payments.
+   * @dataProvider versionThreeAndFour
    */
-  public function testMultiplePaymentsForContribution(): void {
+  public function testMultiplePaymentsForContribution($apiVersion): void {
+    $this->_apiversion = $apiVersion;
     $params = [
       'contact_id' => $this->individualCreate(),
       'total_amount' => 100,
@@ -95,7 +97,10 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
 
     $paymentParams['total_amount'] = 50;
     $this->callAPISuccess('payment', 'create', $paymentParams);
-
+    // We reset the API version here because Payment.Get has not yet been implemented in V4
+    if ($apiVersion == 4) {
+      $this->_apiversion = 3;
+    }
     //check if contribution status is set to "Completed".
     $contribution = $this->callAPISuccessGetSingle('Contribution', [
       'id' => $contributionID,
@@ -168,12 +173,13 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
 
   /**
    * Test contribution receipts triggered by Payment.create with is_send_contribution_notification = TRUE.
-   *
+   * @dataProvider versionThreeAndFour
    * @throws \CRM_Core_Exception
    */
-  public function testPaymentSendContributionReceipt(): void {
+  public function testPaymentSendContributionReceipt($apiVersion): void {
     $mut = new CiviMailUtils($this);
     $contribution = $this->createPartiallyPaidParticipantOrder();
+    $this->_apiversion = $apiVersion;
     $event = $this->callAPISuccess('Event', 'get', []);
     $this->addLocationToEvent($event['id']);
     $params = [
@@ -197,10 +203,11 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
 
   /**
    * Test full refund when no payment has actually been record.
-   *
+   * @dataProvider versionThreeAndFour
    * @throws \CRM_Core_Exception
    */
-  public function testFullRefundWithPaymentAlreadyRefunded(): void {
+  public function testFullRefundWithPaymentAlreadyRefunded($apiVersion): void {
+    $this->_apiversion = $apiVersion;
     $contributionID1 = $this->contributionCreate([
       'contact_id' => $this->individualCreate(),
       'trxn_id' => 111111,
@@ -208,8 +215,17 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     ]);
     $paymentParams = ['contribution_id' => $contributionID1];
     $this->callAPISuccess('Payment', 'create', ['total_amount' => '-10', 'contribution_id' => $contributionID1]);
+    // We reset the API version here because Payment.Get has not yet been implemented in V4
+    if ($apiVersion === 4) {
+      $this->_apiversion = 3;
+    }
     $this->callAPISuccess('payment', 'get', $paymentParams);
+    $this->_apiversion = $apiVersion;
     $this->callAPISuccess('Payment', 'create', ['total_amount' => '-10', 'contribution_id' => $contributionID1]);
+    // We reset the API version here because Payment.Get has not yet been implemented in V4
+    if ($apiVersion === 4) {
+      $this->_apiversion = 3;
+    }
     $this->callAPISuccess('payment', 'get', $paymentParams);
     $this->validateAllPayments();
   }

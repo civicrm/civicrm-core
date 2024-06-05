@@ -36,12 +36,14 @@ class CRM_Financial_BAO_Payment {
    *   - contribution_id
    *   - total_amount
    *   - line_item
+   * @param bool $disableActionsOnCompleteOrder Disble membership, participant processing when the payment completes the order
+   *   Note this is only set by Payment.Create in APIv4 and should not be used elsewhere and is likely to change.
    *
    * @return \CRM_Financial_DAO_FinancialTrxn
    *
    * @throws \CRM_Core_Exception
    */
-  public static function create(array $params): CRM_Financial_DAO_FinancialTrxn {
+  public static function create(array $params, $disableActionsOnCompleteOrder = FALSE): CRM_Financial_DAO_FinancialTrxn {
     $contribution = Contribution::get(FALSE)
       ->addWhere('id', '=', $params['contribution_id'])
       ->addSelect('*', 'contribution_status_id:name', 'balance_amount', 'paid_amount')
@@ -154,7 +156,7 @@ class CRM_Financial_BAO_Payment {
           'trxn_date' => $params['trxn_date'],
           'payment_instrument_id' => $paymentTrxnParams['payment_instrument_id'],
           'payment_processor_id' => $paymentTrxnParams['payment_processor_id'] ?? '',
-        ], $contributionBAO->contribution_recur_id, $contribution['id'], TRUE);
+        ], $contributionBAO->contribution_recur_id, $contribution['id'], TRUE, $disableActionsOnCompleteOrder);
         // Get the trxn
         $trxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
         $ftParams = ['id' => $trxnId['financialTrxnId']];
