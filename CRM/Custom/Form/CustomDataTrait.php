@@ -59,14 +59,13 @@ trait CRM_Custom_Form_CustomDataTrait {
       ],
       'checkPermissions' => TRUE,
     ])->indexBy('custom_field_id');
-
+    $fieldFilters = ['style' => 'Inline'];
     if ($entity === 'Contact') {
       // Ideally this would not be contact specific but the function being
       // called here does not handle the filters as received.
-      $fieldFilters = [
+      $fieldFilters += [
         'extends' => [$entity, $filters['contact_type']],
         'is_multiple' => TRUE,
-        'style' => 'Inline',
       ];
       if (!empty($filters['contact_sub_type'])) {
         $fieldFilters['extends_entity_column_value'] = [NULL, $filters['contact_sub_type']];
