@@ -375,7 +375,10 @@ class CRM_Core_ManagedEntities {
         break;
 
       case 'unused':
-        if (CRM_Core_BAO_Managed::isApi4ManagedType($item['entity_type'])) {
+        if (!$item['entity_id']) {
+          $getRefCount = [];
+        }
+        elseif (CRM_Core_BAO_Managed::isApi4ManagedType($item['entity_type'])) {
           $getRefCount = CoreUtil::getRefCount($item['entity_type'], $item['entity_id']);
         }
         else {
