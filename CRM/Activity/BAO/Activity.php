@@ -1293,7 +1293,7 @@ WHERE entity_id =%1 AND entity_table = %2";
     $smsProviderParams,
     $activityID,
     $sourceContactID = NULL,
-    $entityID
+    $entityID = NULL
   ) {
     $toPhoneNumber = NULL;
     if ($smsProviderParams['To']) {
