@@ -827,6 +827,15 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         "reset=1&action=add&context={$this->_context}&cid={$this->_contactId}"
       ));
     }
+    elseif ($this->_contactId) {
+      // Refresh other tabs with related data
+      $this->ajaxResponse['updateTabs'] = [
+        '#tab_activity' => TRUE,
+      ];
+      if (CRM_Core_Permission::access('CiviContribute')) {
+        $this->ajaxResponse['updateTabs']['#tab_contribute'] = CRM_Contact_BAO_Contact::getCountComponent('contribution', $this->_contactId);
+      }
+    }
   }
 
   /**
