@@ -211,7 +211,7 @@ class CRM_Utils_Mail_EmailProcessor {
 
             $result = civicrm_api3('Activity', 'create', $activityParams);
             $matches = TRUE;
-            CRM_Utils_Hook::emailProcessor('activity', $activityParams, $mail, $result);
+            CRM_Utils_Hook::emailProcessor('activity', $activityParams, $mail, $result, NULL, $dao->id);
             echo "Processed as Activity: {$mail->subject}\n";
           }
           catch (Exception $e) {
@@ -337,7 +337,7 @@ class CRM_Utils_Mail_EmailProcessor {
             echo "Failed Processing: {$mail->subject}, Action: $action, Job ID: $job, Queue ID: $queue, Hash: $hash. Reason: {$result['error_message']}\n";
           }
           else {
-            CRM_Utils_Hook::emailProcessor('mailing', $activityParams, $mail, $result, $action);
+            CRM_Utils_Hook::emailProcessor('mailing', $activityParams, $mail, $result, $action, $dao->id);
           }
         }
 
