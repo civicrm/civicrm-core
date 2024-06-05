@@ -89,7 +89,7 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
    * @return bool|int|null|string
    */
   public function checkEventCapacity($event_id) {
-    $empty_seats = CRM_Event_BAO_Participant::eventFull($event_id, TRUE);
+    $empty_seats = self::eventFull($event_id, TRUE);
     if (is_numeric($empty_seats)) {
       return $empty_seats;
     }
@@ -97,6 +97,181 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
       return 0;
     }
     return NULL;
+  }
+
+  /**
+   * Check whether the event is full for participation and return as.
+   * per requirements.
+   *
+   * @param int $eventId
+   *   Event id.
+   * @param bool $returnEmptySeats
+   *   Are we require number if empty seats.
+   * @param bool $includeWaitingList
+   *   Consider waiting list in event full.
+   *                 calculation or not. (it is for cron job  purpose)
+   *
+   * @param bool $returnWaitingCount
+   * @param bool $considerTestParticipant deprecated, unused
+   * @param bool $onlyPositiveStatuses
+   *   When FALSE, count all participant statuses where is_counted = 1.  This includes
+   *   both "Positive" participants (Registered, Attended, etc.) and waitlisted
+   *   (and some pending) participants.
+   *   When TRUE, count only participants with statuses of "Positive".
+   *
+   * @return bool|int|null|string
+   *   1. false                 => If event having some empty spaces.
+   * @throws \CRM_Core_Exception
+   */
+  private static function eventFull(
+    $eventId,
+    $returnEmptySeats = FALSE,
+    $includeWaitingList = TRUE,
+    $returnWaitingCount = FALSE,
+    $considerTestParticipant = FALSE,
+    $onlyPositiveStatuses = FALSE
+  ) {
+    $result = NULL;
+    if (!$eventId) {
+      return $result;
+    }
+
+    // consider event is full when.
+    // 1. (count(is_counted) >= event_size) or
+    // 2. (count(participants-with-status-on-waitlist) > 0)
+    // It might be case there are some empty spaces and still event
+    // is full, as waitlist might represent group require spaces > empty.
+
+    $countedStatuses = \CRM_Event_BAO_Participant::buildOptions('status_id', NULL, ['is_counted' => 1]);;
+    $positiveStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Positive'");
+    $waitingStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Waiting'");
+    $onWaitlistStatusId = array_search('On waitlist', $waitingStatuses);
+
+    $where = [' event.id = %1 ', ' participant.is_test = 0 '];
+    $participantRoleClause = self::getParticipantRoleClause();
+    if ($participantRoleClause) {
+      $where[] = " participant.role_id " . $participantRoleClause;
+    }
+    $eventParams = [1 => [$eventId, 'Positive']];
+
+    //in case any waiting, straight forward event is full.
+    if ($includeWaitingList && $onWaitlistStatusId) {
+
+      //build the where clause.
+      $whereClause = ' WHERE ' . implode(' AND ', $where);
+      $whereClause .= " AND participant.status_id = $onWaitlistStatusId ";
+      $eventSeatsWhere = implode(' AND ', $where) . " AND ( participant.status_id = $onWaitlistStatusId )";
+
+      $query = "
+    SELECT  participant.id id
+      FROM  civicrm_participant participant
+INNER JOIN  civicrm_event event ON ( event.id = participant.event_id )
+            {$whereClause}";
+
+      $hasWaitlistedParticipants = CRM_Core_DAO::singleValueQuery($query, $eventParams);
+      if ($hasWaitlistedParticipants) {
+        //oops here event is full and we don't want waiting count.
+        if ($returnWaitingCount) {
+          return CRM_Event_BAO_Event::eventTotalSeats($eventId, $eventSeatsWhere);
+        }
+        return CRM_Core_DAO::singleValueQuery('SELECT event_full_text FROM civicrm_event WHERE id = ' . (int) $eventId) ?: ts('This event is full.');
+      }
+    }
+
+    //Consider only counted participants, or alternatively only registered (not on waitlist) participants.
+    if ($onlyPositiveStatuses) {
+      $where[] = ' participant.status_id IN ( ' . implode(', ', array_keys($positiveStatuses)) . ' ) ';
+    }
+    else {
+      $where[] = ' participant.status_id IN ( ' . implode(', ', array_keys($countedStatuses)) . ' ) ';
+    }
+    $whereClause = ' WHERE ' . implode(' AND ', $where);
+    $eventSeatsWhere = implode(' AND ', $where);
+
+    $query = "
+    SELECT  participant.id id,
+            event.event_full_text as event_full_text,
+            event.max_participants as max_participants
+      FROM  civicrm_participant participant
+INNER JOIN  civicrm_event event ON ( event.id = participant.event_id )
+            {$whereClause}";
+
+    $eventMaxSeats = NULL;
+    $eventFullText = ts('This event is full.');
+    $participants = CRM_Core_DAO::executeQuery($query, $eventParams);
+    while ($participants->fetch()) {
+      if ($participants->event_full_text) {
+        $eventFullText = $participants->event_full_text;
+      }
+      $eventMaxSeats = $participants->max_participants;
+      //don't have limit for event seats.
+      if ($participants->max_participants == NULL) {
+        return $result;
+      }
+    }
+
+    //get the total event seats occupied by these participants.
+    $eventRegisteredSeats = CRM_Event_BAO_Event::eventTotalSeats($eventId, $eventSeatsWhere);
+
+    if ($eventRegisteredSeats) {
+      if ($eventRegisteredSeats >= $eventMaxSeats) {
+        $result = $eventFullText;
+      }
+      elseif ($returnEmptySeats) {
+        $result = $eventMaxSeats - $eventRegisteredSeats;
+      }
+      return $result;
+    }
+    else {
+      $query = '
+SELECT  event.event_full_text,
+        event.max_participants
+  FROM  civicrm_event event
+ WHERE  event.id = %1';
+      $event = CRM_Core_DAO::executeQuery($query, $eventParams);
+      while ($event->fetch()) {
+        $eventFullText = $event->event_full_text;
+        $eventMaxSeats = $event->max_participants;
+      }
+    }
+
+    // no limit for registration.
+    if ($eventMaxSeats == NULL) {
+      return $result;
+    }
+    if ($eventMaxSeats) {
+      return ($returnEmptySeats) ? (int) $eventMaxSeats : FALSE;
+    }
+
+    return $eventFullText;
+  }
+
+  /**
+   * Get the clause to exclude uncounted participant roles.
+   *
+   * @internal do not call from outside core code.
+   *
+   * @return string
+   * @throws \CRM_Core_Exception
+   */
+  private static function getParticipantRoleClause(): string {
+    // Only count Participant Roles with the "Counted?" flag.
+    $participantRoles = CRM_Event_BAO_Participant::buildOptions('role_id', NULL, ['filter' => TRUE]);
+    $allRoles = CRM_Event_BAO_Participant::buildOptions('role_id');
+    if ($participantRoles === $allRoles) {
+      // Don't complicate the query if no roles are excluded.
+      return '';
+    }
+    if (!empty($participantRoles)) {
+      $escapedRoles = [];
+      foreach (array_keys($participantRoles) as $participantRole) {
+        $escapedRoles[] = CRM_Utils_Type::escape($participantRole, 'String');
+      }
+
+      $regexp = "([[:cntrl:]]|^)" . implode('([[:cntrl:]]|$)|([[:cntrl:]]|^)', $escapedRoles) . "([[:cntrl:]]|$)";
+      $participantRoleClause = "REGEXP '{$regexp}'";
+    }
+    return $participantRoleClause ?? '';
   }
 
   /**
