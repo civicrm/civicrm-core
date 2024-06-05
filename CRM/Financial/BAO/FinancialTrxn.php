@@ -14,7 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Financial_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
+class CRM_Financial_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn implements Civi\Core\HookInterface {
 
   /**
    * Takes an associative array and creates a financial transaction object.
@@ -24,23 +24,7 @@ class CRM_Financial_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
    * @return CRM_Financial_DAO_FinancialTrxn
    */
   public static function create(array $params): CRM_Financial_DAO_FinancialTrxn {
-    $trxn = new CRM_Financial_DAO_FinancialTrxn();
-    $trxn->copyValues($params);
-
-    if (isset($params['fee_amount']) && is_numeric($params['fee_amount'])) {
-      if (!isset($params['total_amount'])) {
-        $trxn->fetch();
-        $params['total_amount'] = $trxn->total_amount;
-      }
-      $trxn->net_amount = $params['total_amount'] - $params['fee_amount'];
-    }
-
-    if (empty($params['id']) && !CRM_Utils_Rule::currencyCode($trxn->currency)) {
-      $trxn->currency = CRM_Core_Config::singleton()->defaultCurrency;
-    }
-
-    $trxn->save();
-
+    $trxn = self::writeRecord($params);
     if (!empty($params['id'])) {
       // For an update entity financial transaction record will already exist. Return early.
       return $trxn;
@@ -80,6 +64,32 @@ class CRM_Financial_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
     else {
       parent::assignTestValue($fieldName, $fieldDef, $counter);
     }
+  }
+
+  /**
+   * Modify a financial Transaction prior to saving to re-calculate net amount and correct the currency value
+   * @param \Civi\Core\Event\PreEvent $event
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    $params = $event->params;
+    $trxn = new CRM_Financial_DAO_FinancialTrxn();
+    $trxn->copyValues($params);
+
+    if (isset($params['fee_amount']) && is_numeric($params['fee_amount'])) {
+      if (!isset($params['total_amount'])) {
+        $trxn->fetch();
+        $params['total_amount'] = $trxn->total_amount;
+      }
+      $params['net_amount'] = $params['total_amount'] - $params['fee_amount'];
+    }
+
+    if (empty($params['id']) && !CRM_Utils_Rule::currencyCode($trxn->currency)) {
+      $params['currency'] = CRM_Core_Config::singleton()->defaultCurrency;
+    }
+    if (!empty($trxn->id)) {
+      $params['id'] = $trxn->id;
+    }
+    $event->params = $params;
   }
 
 }
