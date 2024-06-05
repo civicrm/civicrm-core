@@ -49,9 +49,6 @@ return new class() implements \CRM_Extension_Upgrader_Interface {
     }
 
     if ($event === 'install') {
-      if ($this->customUpgrader) {
-        $this->customUpgrader->notify('preInstall', $params);
-      }
       $GLOBALS['CiviMixSchema']->getHelper($this->getExtensionKey())->install();
     }
 

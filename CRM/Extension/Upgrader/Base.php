@@ -4,8 +4,9 @@
  * Base class which provides helpers to execute upgrade logic.
  *
  * @since 5.38
- * LIFECYCLE METHODS: Subclasses may optionally define preInstall(), install(), postInstall(),
- * uninstall(), enable(), disable().
+ * LIFECYCLE METHODS: Subclasses may optionally define
+ *   - preInstall() [5.75+]
+ *   - install(), postInstall(), uninstall(), enable(), disable() [5.38+]
  *
  * UPGRADE METHODS: Subclasses may define any number of methods named "upgrade_NNNN()".
  * Each value of NNNN is treated as a new schema revision. (See also: RevisionsTrait)
