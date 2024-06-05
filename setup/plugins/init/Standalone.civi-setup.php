@@ -75,13 +75,17 @@ function _standalone_setup_scheme(): string {
       $settingsPath = implode(DIRECTORY_SEPARATOR, [$appRootPath, 'private', 'civicrm.settings.php']);
     }
 
-    // try to determine base url
-    // TODO: this won't work if we are installing in a subdirectory of the webroot
-    $baseUrl = _standalone_setup_scheme() . '://' . $_SERVER['HTTP_HOST'];
+    // try to determine base url if we dont have already (e.g. from buildkit)
+    // TODO:
+    // a) this won't work if we are installing in a subdirectory of the webroot
+    // b) https detection might be problematic behind a reverse proxy
+    if (empty($model->cmsBaseUrl)) {
+      $model->cmsBaseUrl = _standalone_setup_scheme() . '://' . $_SERVER['HTTP_HOST'];
+    }
 
     // TODO: at the moment the installer will only work when app root = web root
     $model->paths['cms.root']['path'] = $appRootPath;
-    $model->paths['cms.root']['url'] = $model->cmsBaseUrl = $baseUrl;
+    $model->paths['cms.root']['url'] = $baseUrl = $model->cmsBaseUrl;
 
     // we should already know settings path from civicrm.standalone.php
     $model->settingsPath = $settingsPath;
