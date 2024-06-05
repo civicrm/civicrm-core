@@ -567,7 +567,8 @@ FROM civicrm_action_schedule cas
     $select = CRM_Utils_SQL_Select::from('civicrm_action_log reminder')
       ->select("reminder.id as reminderID, reminder.contact_id as contactID, reminder.entity_table as entityTable, reminder.*, e.id AS entityID")
       ->join('e', "!casMailingJoinType !casMappingEntity e ON !casEntityJoinExpr")
-      ->select("e.id as entityID, e.*")
+      ->join('case_id_1', "!caseJoinType !caseTable ON !caseEntityJoinExpr")
+      ->select("e.id as entityID, e.*, case_id_1.id AS case_id")
       ->where("reminder.action_schedule_id = #casActionScheduleId")
       ->where("reminder.action_date_time IS NULL")
       ->param([
@@ -576,6 +577,9 @@ FROM civicrm_action_schedule cas
         'casMappingId' => $mapping->getId(),
         'casMappingEntity' => $mapping->getEntityTable($actionSchedule),
         'casEntityJoinExpr' => 'e.id = IF(reminder.entity_table = "civicrm_contact", reminder.contact_id, reminder.entity_id)',
+        'caseJoinType' => 'LEFT JOIN',
+        'caseTable' => 'civicrm_case case_id_1',
+        'caseEntityJoinExpr' => 'case_id_1.id = (SELECT civicrm_case_activity.case_id FROM civicrm_case_activity WHERE civicrm_case_activity.activity_id = e.id LIMIT 1)',
       ]);
 
     if ($actionSchedule->limit_to == 2) {
