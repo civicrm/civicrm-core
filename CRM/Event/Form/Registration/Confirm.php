@@ -243,9 +243,8 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $this->assign('amounts', $amountArray);
       $this->assign('totalAmount', $this->_totalAmount);
       $this->set('totalAmount', $this->_totalAmount);
-      $showPaymentOnConfirm = (in_array($this->_eventId, \Civi::settings()->get('event_show_payment_on_confirm')) || in_array('all', \Civi::settings()->get('event_show_payment_on_confirm')));
-      $this->assign('showPaymentOnConfirm', $showPaymentOnConfirm);
-      if ($showPaymentOnConfirm) {
+      $this->assign('showPaymentOnConfirm', $this->isShowPaymentOnConfirm());
+      if ($this->isShowPaymentOnConfirm()) {
         $isPayLater = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->_eventId, 'is_pay_later');
         $this->setPayLaterLabel($isPayLater ? $this->_values['event']['pay_later_text'] : '');
         $this->_paymentProcessorIDs = explode(CRM_Core_DAO::VALUE_SEPARATOR, $this->_values['event']['payment_processor'] ?? NULL);
@@ -316,7 +315,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     }
 
     $this->setDefaults($defaults);
-    $showPaymentOnConfirm = (in_array($this->_eventId, \Civi::settings()->get('event_show_payment_on_confirm')) || in_array('all', \Civi::settings()->get('event_show_payment_on_confirm')));
+    $showPaymentOnConfirm = $this->isShowPaymentOnConfirm();
     if (!$showPaymentOnConfirm) {
       $this->freeze();
     }
@@ -1358,6 +1357,19 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
     }
     return $amountArray;
+  }
+
+  /**
+   * Is this event configured to show the payment processors on the confirmation form?
+   *
+   * @return bool
+   */
+  private function isShowPaymentOnConfirm(): bool {
+    $showPaymentOnConfirm = (in_array(
+      $this->getEventID(),
+      \Civi::settings()->get('event_show_payment_on_confirm')) || in_array('all', \Civi::settings()->get('event_show_payment_on_confirm'))
+    );
+    return $showPaymentOnConfirm;
   }
 
 }
