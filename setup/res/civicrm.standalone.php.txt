@@ -10,7 +10,7 @@
 // this file should always be in the project root
 $appRootPath = __DIR__;
 
-// standard "flat earth" file structure
+// standard file structure with top-level private, public and extensions dirs.
 $autoLoader = implode(DIRECTORY_SEPARATOR, [$appRootPath, 'core', 'vendor', 'autoload.php']);
 $classLoader = implode(DIRECTORY_SEPARATOR, [$appRootPath, 'core', 'CRM', 'Core', 'ClassLoader.php']);
 

@@ -75,7 +75,7 @@ class WebEntrypoint {
         \CRM_Utils_System::redirect('/civicrm/login');
       }
     }
-    // This IS required for compatibility. e.g. the extensions (at least) quickform uses it for the form's action attribute.
+    // This is required for compatibility. e.g. the extensions (at least) quickform uses it for the form's action attribute.
     $_GET['q'] = implode('/', $args);
 
     // Render the page
@@ -83,11 +83,11 @@ class WebEntrypoint {
   }
 
   public static function installer(): void {
-    \Civi\Setup::assertProtocolCompatibility(1.0);
+    \Civi\Setup::assertProtocolCompatibility('1.0');
 
     // the core folder is up two directories from this file
     // TODO: use AppSettings to get the configured core path
-    $corePath = implode(DIRECTORY_SEPARATOR, array_slice(explode(DIRECTORY_SEPARATOR, __DIR__), 0, -2));
+    $corePath = dirname(__DIR__, 2);
 
     \Civi\Setup::init([
       // This is just enough information to get going.
