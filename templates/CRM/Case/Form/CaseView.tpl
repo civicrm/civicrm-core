@@ -118,7 +118,7 @@
           </span>
         {/if}
 
-        {if call_user_func(array('CRM_Core_Permission','giveMeAllACLs'))}
+        {if $hasAllACLs}
           <a class="action-item crm-hover-button medium-popup" href="{crmURL p='civicrm/contact/view/case/editClient' h=1 q="reset=1&action=update&id=$caseID&cid=$contactID"}"><i class="crm-i fa-user" aria-hidden="true"></i> {ts}Assign to Another Client{/ts}</a>
         {/if}
       </p>
