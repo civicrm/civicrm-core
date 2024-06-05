@@ -20,9 +20,9 @@ class ErrorHandler {
     ?int $errline
   ) {
 
-    static $handlingError = FALSE;
+    self::$handlingError = FALSE;
 
-    if ($handlingError) {
+    if (self::$handlingError) {
       throw new \RuntimeException("Died: error was thrown during error handling");
     }
 
@@ -31,7 +31,7 @@ class ErrorHandler {
       // For these errors to show, we must be debugging.
       return;
     }
-    $handlingError = TRUE;
+    self::$handlingError = TRUE;
 
     $trace = '';
     if ($config->backtrace) {
