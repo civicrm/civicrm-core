@@ -174,6 +174,11 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
       $totalAmount += $v['line_total'];
     }
     $this->assign('currency', $this->getParticipantValue('fee_currency'));
+    // It would be more  correct to assign totalTaxAmount & TotalAmount
+    // from the order object - however, that assumes a contribution exists & there is this
+    // we have this weird possibility of line items against a participant record with
+    // no contribution attached to it - maybe we have eliminated this? But I have a nasty feeling about
+    // webform.
     $this->assign('totalTaxAmount', $totalTaxAmount ?? NULL);
     $this->assign('totalAmount', $totalAmount);
     $this->assign('pricesetFieldsCount', $participantCount);
