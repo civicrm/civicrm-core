@@ -207,14 +207,8 @@ class ContactGetSpecProvider extends \Civi\Core\Service\AutoService implements G
    * @return string
    */
   public static function calculateBirthday(array $field): string {
-    return "DATEDIFF(
-        IF(
-            DATE(CONCAT(YEAR(CURDATE()), '-', MONTH({$field['sql_name']}), '-', DAY({$field['sql_name']}))) < CURDATE(),
-            CONCAT(YEAR(CURDATE()) + 1, '-', MONTH({$field['sql_name']}), '-', DAY({$field['sql_name']})),
-            CONCAT(YEAR(CURDATE()), '-', MONTH({$field['sql_name']}), '-', DAY({$field['sql_name']}))
-        ),
-        CURDATE()
-    )";
+    $anniversarySql = \CRM_Utils_Date::getAnniversarySql($field['sql_name']);
+    return "DATEDIFF($anniversarySql, CURDATE())";
   }
 
 }

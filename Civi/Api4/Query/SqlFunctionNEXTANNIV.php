@@ -14,11 +14,11 @@ namespace Civi\Api4\Query;
 /**
  * Sql function
  */
-class SqlFunctionDAYSTOANNIV extends SqlFunction {
+class SqlFunctionNEXTANNIV extends SqlFunction {
 
   protected static $category = self::CATEGORY_DATE;
 
-  protected static $dataType = 'Integer';
+  protected static $dataType = 'Date';
 
   protected static function params(): array {
     return [
@@ -33,22 +33,21 @@ class SqlFunctionDAYSTOANNIV extends SqlFunction {
    * @return string
    */
   public static function getTitle(): string {
-    return ts('Days to Anniversary');
+    return ts('Next Anniversary');
   }
 
   /**
    * @return string
    */
   public static function getDescription(): string {
-    return ts('Number of days until the next anniversary of this date.');
+    return ts('Date of next anniversary of this date.');
   }
 
   /**
    * @inheritDoc
    */
   protected function renderExpression(string $output): string {
-    $anniversarySql = \CRM_Utils_Date::getAnniversarySql($output);
-    return "DATEDIFF($anniversarySql, CURDATE())";
+    return \CRM_Utils_Date::getAnniversarySql($output);
   }
 
 }
