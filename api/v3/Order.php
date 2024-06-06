@@ -99,6 +99,9 @@ function civicrm_api3_order_create(array $params): array {
           $lineItem['membership_type_id'] = CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'membership_type_id', $lineItems['params']['membership_type_id']);
         }
         $lineIndex = $index . '+' . $innerIndex;
+        if (!empty($lineItem['financial_type_id']) && !is_numeric($lineItem['financial_type_id'])) {
+          $lineItem['financial_type_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', $lineItem['financial_type_id']);
+        }
         $order->setLineItem($lineItem, $lineIndex);
         $order->addLineItemToEntityParameters($lineIndex, $index);
       }
