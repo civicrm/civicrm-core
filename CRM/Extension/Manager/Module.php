@@ -35,6 +35,7 @@ class CRM_Extension_Manager_Module extends CRM_Extension_Manager_Base {
    */
   public function onPreInstall(CRM_Extension_Info $info) {
     $this->registerClassloader($info);
+    $this->callHook($info, 'preInstall');
     $this->callHook($info, 'install');
     $this->callHook($info, 'enable');
   }
