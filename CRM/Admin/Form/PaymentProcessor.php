@@ -52,6 +52,9 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
       'payment_processor_type_id' => [
         'name' => 'payment_processor_type_id',
         'required' => TRUE,
+        // This is being double added - perhaps we can fix but for now....
+        // dev/core#5266
+        'not-auto-addable' => TRUE,
       ],
       'title' => [
         'name' => 'title',
