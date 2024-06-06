@@ -2611,6 +2611,24 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $values['contributionId'] = $ids['contribution'];
       }
 
+      // dev/core#224 Ensure that additional participant information and profiles are loaded into the template
+      if (!empty($participantID)) {
+        $additionalIDs = CRM_Event_BAO_Participant::getAdditionalParticipantIds($participantID);
+        if (!empty($additionalIDs)) {
+          $additionalParticipantProfile = new CRM_Core_BAO_UFJoin();
+          $additionalParticipantProfile->entity_id = $ids['event'];
+          $additionalParticipantProfile->module = 'CiviEvent_Additional';
+          $additionalParticipantProfile->find();
+          while ($additionalParticipantProfile->fetch()) {
+            $values['additional_custom_pre_id'][$additionalParticipantProfile->id] = $additionalParticipantProfile->uf_group_id;
+          }
+          $customProfile = CRM_Event_BAO_Event::buildCustomProfile($participantID, $values);
+          if (count($customProfile)) {
+            $values['customProfile'] = $customProfile;
+          }
+        }
+      }
+
       return CRM_Event_BAO_Event::sendMail($ids['contact'], $values,
         $participantID, $this->is_test, $returnMessageText
       );
