@@ -243,12 +243,15 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $this->assign('amounts', $amountArray);
       $this->assign('totalAmount', $this->_totalAmount);
       $this->set('totalAmount', $this->_totalAmount);
+
       $this->assign('showPaymentOnConfirm', $this->isShowPaymentOnConfirm());
       if ($this->isShowPaymentOnConfirm()) {
-        $isPayLater = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->_eventId, 'is_pay_later');
-        $this->setPayLaterLabel($isPayLater ? $this->_values['event']['pay_later_text'] : '');
+        // Setup and load the payment elements on the form
         $this->_paymentProcessorIDs = explode(CRM_Core_DAO::VALUE_SEPARATOR, $this->_values['event']['payment_processor'] ?? NULL);
-        $this->assignPaymentProcessor($isPayLater);
+        $this->setPayLaterLabel('');
+        $this->assign('pay_later_receipt', '');
+        // @fixme These functions all seem to do similar things but take one away and the house of cards falls down..
+        $this->assignPaymentProcessor($this->_values['event']['is_pay_later']);
         CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
         $this->addPaymentProcessorFieldsToForm();
       }
@@ -315,8 +318,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     }
 
     $this->setDefaults($defaults);
-    $showPaymentOnConfirm = $this->isShowPaymentOnConfirm();
-    if (!$showPaymentOnConfirm) {
+    if (!$this->isShowPaymentOnConfirm()) {
       $this->freeze();
     }
 
@@ -423,6 +425,11 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $participantCount = [];
     $totalTaxAmount = 0;
 
+    if ($this->isShowPaymentOnConfirm()) {
+      // Set the payment processor so that we can submit the payment
+      $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($this->getSubmittedValue('payment_processor_id'));
+    }
+
     //unset the skip participant from params.
     //build the $participantCount array.
     //maintain record for all participants.
@@ -443,6 +450,15 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         $additionalId = $participantRecord['participant_id'] ?? NULL;
         if ($additionalId && $key = array_search($additionalId, $cancelledIds)) {
           unset($cancelledIds[$key]);
+        }
+      }
+      if ($this->isShowPaymentOnConfirm()) {
+        // "is_pay_later" may have been set by the registration page. Reset it here.
+        $params[$participantNum]['is_pay_later'] = 0;
+        // Again, here we have to use getSubmitValue because getSubmittedValue is not set.
+        if ($this->getSubmitValue('hidden_processor') === NULL || $this->getSubmitValue('payment_processor_id') == 0) {
+          // If we submitted with no payment processor then we must be pay later - set it here.
+          $params[$participantNum]['is_pay_later'] = 1;
         }
       }
     }
