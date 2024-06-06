@@ -203,7 +203,7 @@ CRM.$(function($) {
 
   // When saving the form after removing sub-types
   $('.crm-warnDataLoss', $form).on('click', function() {
-    var submittedSubtypes = $('[name=extends_entity_column_value]', $form).val();
+    var submittedSubtypes = $('[name=extends_entity_column_value]', $form).val().split(',');
 
     var warning = false;
     $.each(defaultSubtypes, function(index, subtype) {
