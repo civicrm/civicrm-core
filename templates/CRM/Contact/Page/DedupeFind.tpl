@@ -105,13 +105,13 @@
 {if $context eq 'search'}
    {crmButton href=$backURL icon="times"}{ts}Done{/ts}{/crmButton}
 {elseif $context eq 'conflicts'}
-  {if call_user_func(array('CRM_Core_Permission','check'), 'force merge duplicate contacts')}
+  {crmPermission has='force merge duplicate contacts'}
      {capture assign=backURL}{crmURL p="civicrm/contact/dedupemerge" q="`$urlQuery`&action=map&mode=aggressive" a=1}{/capture}
      <a href="{$backURL}" title="{ts}Force Merge Selected Duplicates{/ts}" onclick="return confirm('{ts escape="js"}This will run the batch merge process on the selected duplicates. The operation will run in force merge mode - all selected duplicates will be merged into main contacts even in case of any conflicts. Click OK to proceed if you are sure you wish to run this operation.{/ts}');" class="button"><span><i class="crm-i fa-bolt" aria-hidden="true"></i> {ts}Force Merge Selected Duplicates{/ts}</span></a>
 
      {capture assign=backURL}{crmURL p="civicrm/contact/dedupemerge" q="`$urlQuery`&action=map" a=1}{/capture}
      <a href="{$backURL}" title="{ts}Safe Merge Selected Duplicates{/ts}" onclick="return confirm('{ts escape="js"}This will run the batch merge process on the selected duplicates. The operation will run in safe mode - only records with no direct data conflicts will be merged. Click OK to proceed if you are sure you wish to run this operation.{/ts}');" class="button"><span><i class="crm-i fa-compress" aria-hidden="true"></i> {ts}Safe Merge Selected Duplicates{/ts}</span></a>
-  {/if}
+  {/crmPermission}
 
   {capture assign=backURL}{crmURL p="civicrm/contact/dedupefind" q="`$urlQuery`&action=update&selected=0" a=1}{/capture}
    <a href="{$backURL}" title="{ts}List All Duplicates{/ts}" class="button"><span><i class="crm-i fa-refresh" aria-hidden="true"></i> {ts}List All Duplicates{/ts}</span></a>
