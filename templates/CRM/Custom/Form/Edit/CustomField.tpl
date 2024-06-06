@@ -24,21 +24,18 @@
     <td class="label">{$formElement.label}{if $element.help_post}{help id=$element.id file="CRM/Custom/Form/CustomField.hlp" title=$element.label}{/if}</td>
     <td class="html-adjust">
 
-      <div class="content">
-        <div class="crm-multiple-checkbox-radio-options crm-options-per-line" style="--crm-opts-per-line:{$element.options_per_line};">
-          {foreach name=outer key=key item=item from=$formElement}
-            {if is_array($item) && array_key_exists('html', $item)}
-              <div class="crm-option-label-pair" >{$formElement.$key.html}</div>
-            {/if}
-          {/foreach}
-        </div>
-
-        {* Include the edit options list for admins *}
-        {if $formElement.html|strstr:"crm-option-edit-link"}
-          {$formElement.html|regex_replace:"@^.*(<a href=.*? class=.crm-option-edit-link.*?</a>)$@":"$1"}
-        {/if}
+      <div class="crm-multiple-checkbox-radio-options crm-options-per-line" style="--crm-opts-per-line:{$element.options_per_line};">
+        {foreach name=outer key=key item=item from=$formElement}
+          {if is_array($item) && array_key_exists('html', $item)}
+            <div class="crm-option-label-pair" >{$formElement.$key.html}</div>
+          {/if}
+        {/foreach}
       </div>
-      <div class="clear"></div>
+
+      {* Include the edit options list for admins *}
+      {if $formElement.html|strstr:"crm-option-edit-link"}
+        {$formElement.html|regex_replace:"@^.*(<a href=.*? class=.crm-option-edit-link.*?</a>)$@":"$1"}
+      {/if}
 
     </td>
   </tr>
