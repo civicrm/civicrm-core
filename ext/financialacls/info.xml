@@ -20,9 +20,6 @@
   <compatibility>
     <ver>5.75</ver>
   </compatibility>
-  <tags>
-    <tag>mgmt:hidden</tag>
-  </tags>
   <comments>Financial acls - working towards moving this code to the extension from core</comments>
   <classloader>
     <psr0 prefix="CRM_" path="."/>

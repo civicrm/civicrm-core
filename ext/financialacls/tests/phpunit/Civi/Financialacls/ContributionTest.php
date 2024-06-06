@@ -26,7 +26,6 @@ class ContributionTest extends BaseTestClass {
    */
   public function testAnnualWithMultipleLineItems(): void {
     $this->createContributionWithTwoLineItems();
-    \Civi::settings()->set('acl_financial_type', TRUE);
     $this->addFinancialAclPermissions([['view', 'Donation']]);
     $sql = \CRM_Contribute_BAO_Contribution::getAnnualQuery([$this->ids['Contact']['logged_in']]);
     $result = \CRM_Core_DAO::executeQuery($sql);

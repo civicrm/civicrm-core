@@ -85,9 +85,6 @@ function financialacls_civicrm_pre($op, $objectName, $id, &$params) {
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_selectWhereClause
  */
 function financialacls_civicrm_selectWhereClause($entity, &$clauses) {
-  if (!financialacls_is_acl_limiting_enabled()) {
-    return;
-  }
 
   switch ($entity) {
     case 'LineItem':
@@ -425,7 +422,8 @@ function financialacls_civicrm_fieldOptions($entity, $field, &$options, $params)
  * @return bool
  */
 function financialacls_is_acl_limiting_enabled(): bool {
-  return (bool) Civi::settings()->get('acl_financial_type');
+  // @todo - remove this...
+  return TRUE;
 }
 
 /**

@@ -71,8 +71,19 @@ class CRM_Upgrade_Incremental_php_FiveSeventyFive extends CRM_Upgrade_Incrementa
     $this->addTask('Replace receive_date smarty token in online membership template',
       'updateMessageToken', 'membership_online_receipt', '$receive_date', 'contribution.receive_date', $rev
     );
-
     CRM_Core_BAO_SchemaHandler::dropIndexIfExists('civicrm_line_item', 'UI_line_item_value');
+    $this->addTask(ts('Disable financial ACL extension if unused'), 'disableFinancialAcl');
+  }
+
+  public static function disableFinancialAcl($rev): bool {
+    $setting = CRM_Core_DAO::singleValueQuery('SELECT value FROM civicrm_setting WHERE name = "acl_financial_type"');
+    if ($setting) {
+      $setting = unserialize($setting);
+    }
+    if (!$setting) {
+      CRM_Core_DAO::executeQuery('UPDATE civicrm_extension SET is_active = 0 WHERE full_name = "financialacls"');
+    }
+    return TRUE;
   }
 
 }
