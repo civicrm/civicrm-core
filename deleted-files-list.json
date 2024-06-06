@@ -73,6 +73,7 @@
     "CRM/Core/BAO/Persistent.php",
     "CRM/Core/BAO/Preferences.php",
     "CRM/Core/Base.php",
+    "CRM/Core/CRM/*",
     "CRM/Core/CodeGen/Version.php",
     "CRM/Core/Component/Config.php",
     "CRM/Core/Config/Defaults.php",
