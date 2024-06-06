@@ -141,14 +141,20 @@ class CRM_Financial_BAO_Payment {
         );
       }
       else {
-        civicrm_api3('Contribution', 'completetransaction', [
-          'id' => $contribution['id'],
-          'is_post_payment_create' => TRUE,
+        $contributionBAO = new CRM_Contribute_BAO_Contribution();
+        $contributionBAO->id = $contribution['id'];
+        if (!$contributionBAO->find(TRUE)) {
+          throw new CRM_Core_Exception('A valid contribution ID is required', 'invalid_data');
+        }
+        if ($contributionBAO->contribution_status_id == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed')) {
+          throw new CRM_Core_Exception(ts('Contribution already completed'), 'contribution_completed');
+        }
+        CRM_Contribute_BAO_Contribution::completeOrder([
           'is_email_receipt' => $params['is_send_contribution_notification'],
           'trxn_date' => $params['trxn_date'],
           'payment_instrument_id' => $paymentTrxnParams['payment_instrument_id'],
           'payment_processor_id' => $paymentTrxnParams['payment_processor_id'] ?? '',
-        ]);
+        ], $contributionBAO->contribution_recur_id, $contribution['id'], TRUE);
         // Get the trxn
         $trxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
         $ftParams = ['id' => $trxnId['financialTrxnId']];
