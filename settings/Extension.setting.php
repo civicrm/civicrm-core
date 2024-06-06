@@ -55,5 +55,6 @@ return [
     'is_contact' => 0,
     'description' => ts('Maximum number of sub-directories to search when looking for extensions'),
     'help_text' => NULL,
+    'settings_pages' => ['path' => ['weight' => 100]],
   ],
 ];
