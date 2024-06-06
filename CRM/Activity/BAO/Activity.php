@@ -1321,7 +1321,7 @@ WHERE entity_id =%1 AND entity_table = %2";
     $recipient = $toPhoneNumber;
     $smsProviderParams['contact_id'] = $toID;
     $smsProviderParams['parent_activity_id'] = $activityID;
-    $smsProviderParams['dao_entity_id'] = $entityID;
+    $smsProviderParams['entity_id'] = $entityID;
 
     $providerObj = CRM_SMS_Provider::singleton(['provider_id' => $smsProviderParams['provider_id']]);
     $sendResult = $providerObj->send($recipient, $smsProviderParams, $tokenText, NULL, $sourceContactID);
