@@ -1675,13 +1675,15 @@ abstract class CRM_Utils_Hook {
    * @param array &$result the result returned by the api call
    * @param string $action
    *   (optional ) the requested action to be performed if the types was 'mailing'.
+   * @param int|null $mailSettingId
+   *   The MailSetting ID the email relates to
    *
    * @return mixed
    */
-  public static function emailProcessor($type, &$params, $mail, &$result, $action = NULL) {
+  public static function emailProcessor($type, &$params, $mail, &$result, $action = NULL, int $mailSettingId = NULL) {
     $null = NULL;
     return self::singleton()
-      ->invoke(['type', 'params', 'mail', 'result', 'action'], $type, $params, $mail, $result, $action, $null, 'civicrm_emailProcessor');
+      ->invoke(['type', 'params', 'mail', 'result', 'action', 'mailSettingId'], $type, $params, $mail, $result, $action, $mailSettingId, 'civicrm_emailProcessor');
   }
 
   /**
