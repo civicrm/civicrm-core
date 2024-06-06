@@ -25,4 +25,8 @@ class Payment extends Generic\AbstractEntity {
     return (new Action\Payment\Create(__CLASS__, __FUNCTION__))->setCheckPermissions($checkPermissions);
   }
 
+  public static function get($checkPermissions = TRUE) {
+    return (new Action\Payment\Get(__CLASS__, __FUNCTION__))->setCheckPermissions($checkPermissions);
+  }
+
 }

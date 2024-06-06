@@ -97,15 +97,11 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
 
     $paymentParams['total_amount'] = 50;
     $this->callAPISuccess('payment', 'create', $paymentParams);
-    // We reset the API version here because Payment.Get has not yet been implemented in V4
-    if ($apiVersion == 4) {
-      $this->_apiversion = 3;
-    }
     //check if contribution status is set to "Completed".
     $contribution = $this->callAPISuccessGetSingle('Contribution', [
       'id' => $contributionID,
     ]);
-    $this->assertEquals('Completed', $contribution['contribution_status']);
+    $this->assertEquals(1, $contribution['contribution_status_id']);
 
     //Get Payment using options
     $getParams = [
@@ -215,17 +211,8 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     ]);
     $paymentParams = ['contribution_id' => $contributionID1];
     $this->callAPISuccess('Payment', 'create', ['total_amount' => '-10', 'contribution_id' => $contributionID1]);
-    // We reset the API version here because Payment.Get has not yet been implemented in V4
-    if ($apiVersion === 4) {
-      $this->_apiversion = 3;
-    }
     $this->callAPISuccess('payment', 'get', $paymentParams);
-    $this->_apiversion = $apiVersion;
     $this->callAPISuccess('Payment', 'create', ['total_amount' => '-10', 'contribution_id' => $contributionID1]);
-    // We reset the API version here because Payment.Get has not yet been implemented in V4
-    if ($apiVersion === 4) {
-      $this->_apiversion = 3;
-    }
     $this->callAPISuccess('payment', 'get', $paymentParams);
     $this->validateAllPayments();
   }
