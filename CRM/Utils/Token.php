@@ -213,7 +213,7 @@ class CRM_Utils_Token {
   /**
    * Replace all the domain-level tokens in $str
    *
-   * @deprecated
+   * @deprecated since ages ago will be removed around 5.90
    *
    * @param string $str
    *   The string with tokens to be replaced.
@@ -235,6 +235,7 @@ class CRM_Utils_Token {
     $knownTokens = NULL,
     $escapeSmarty = FALSE
   ) {
+    CRM_Core_Error::deprecatedFunctionWarning('use the Token Processor');
     $key = 'domain';
     if (
       !$knownTokens || empty($knownTokens[$key])
