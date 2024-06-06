@@ -1282,6 +1282,7 @@ WHERE entity_id =%1 AND entity_table = %2";
    * @param int $activityID
    *   The activity ID that tracks the message.
    * @param int $sourceContactID
+   * @param int|null $entityID
    *
    * @return bool true on success
    * @throws CRM_Core_Exception
@@ -1291,7 +1292,8 @@ WHERE entity_id =%1 AND entity_table = %2";
     &$tokenText,
     $smsProviderParams,
     $activityID,
-    $sourceContactID = NULL
+    $sourceContactID = NULL,
+    $entityID = NULL
   ) {
     $toPhoneNumber = NULL;
     if ($smsProviderParams['To']) {
@@ -1319,6 +1321,7 @@ WHERE entity_id =%1 AND entity_table = %2";
     $recipient = $toPhoneNumber;
     $smsProviderParams['contact_id'] = $toID;
     $smsProviderParams['parent_activity_id'] = $activityID;
+    $smsProviderParams['entity_id'] = $entityID;
 
     $providerObj = CRM_SMS_Provider::singleton(['provider_id' => $smsProviderParams['provider_id']]);
     $sendResult = $providerObj->send($recipient, $smsProviderParams, $tokenText, NULL, $sourceContactID);
