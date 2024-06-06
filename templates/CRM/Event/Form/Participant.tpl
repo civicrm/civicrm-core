@@ -182,7 +182,9 @@
 
         function buildRoleCustomData() {
           var roleId = $('select[name^=role_id]', $form).val() || [];
-          CRM.buildCustomData('Participant', roleId.join(), {/literal}{$roleCustomDataTypeID}{literal});
+          // If -1 is passed this will avoid https://lab.civicrm.org/dev/core/-/issues/5253
+          // as it is not a valid role ID but it is not 'empty'
+          CRM.buildCustomData('Participant', roleId.join() || -1, {/literal}{$roleCustomDataTypeID}{literal});
         }
 
         //build fee block

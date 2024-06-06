@@ -409,12 +409,6 @@
       CRM.tabHeader.resetTab('#tab_member');
     });
 
-    // Changing membership may affect related contributions & activity. Ensure they are refreshed.
-    $('#contact-member').on('crmPopupFormSuccess', function() {
-      CRM.tabHeader.resetTab('#tab_contribute', true);
-      CRM.tabHeader.resetTab('#tab_activity', true);
-    });
-
     onResize();
     $(window).resize(onResize);
   });

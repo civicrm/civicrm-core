@@ -345,10 +345,9 @@ class CRM_Core_DAO_AllCoreTables {
   }
 
   /**
-   * @deprecated in 5.72 will be removed in 5.96
+   * @deprecated in 5.72 will be removed in 5.102
    */
   public static function getBriefName($className): ?string {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_DAO_AllCoreTables::getEntityNameForClass');
     return self::getEntityNameForClass((string) $className);
   }
 
