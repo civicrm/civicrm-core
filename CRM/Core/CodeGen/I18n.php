@@ -7,7 +7,7 @@ class CRM_Core_CodeGen_I18n extends CRM_Core_CodeGen_BaseTask {
 
   public function run() {
     $this->generateInstallLangs();
-    $this->generateSchemaStructure();
+    // $this->generateSchemaStructure();
   }
 
   public function generateInstallLangs() {

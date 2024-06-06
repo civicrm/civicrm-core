@@ -140,7 +140,9 @@ class CRM_Core_DAO extends DB_DataObject {
    */
   public function __construct() {
     $this->initialize();
-    $this->__table = $this::getLocaleTableName();
+    if (is_subclass_of($this, 'CRM_Core_DAO')) {
+      $this->__table = $this::getLocaleTableName();
+    }
   }
 
   /**

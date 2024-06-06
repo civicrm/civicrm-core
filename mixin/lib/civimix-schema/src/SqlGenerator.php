@@ -91,27 +91,7 @@ return new class() {
       if (!empty($field['primary_key'])) {
         $primaryKeys[] = "`$fieldName`";
       }
-      $fieldSql = "`$fieldName` {$field['sql_type']}";
-      if (!empty($field['collate'])) {
-        $fieldSql .= " COLLATE {$field['collate']}";
-      }
-      // Required fields and booleans cannot be null
-      // FIXME: For legacy support this doesn't force boolean fields to be NOT NULL... but it really should.
-      if (!empty($field['required'])) {
-        $fieldSql .= ' NOT NULL';
-      }
-      // Mysql 5.7 requires timestamp to be explicitly declared NULL
-      if (empty($field['required']) && $field['sql_type'] === 'timestamp') {
-        $fieldSql .= ' NULL';
-      }
-      if (!empty($field['auto_increment'])) {
-        $fieldSql .= " AUTO_INCREMENT";
-      }
-      $fieldSql .= self::getDefaultSql($field);
-      if (!empty($field['description'])) {
-        $fieldSql .= " COMMENT '" . \CRM_Core_DAO::escapeString($field['description']) . "'";
-      }
-      $definition[] = $fieldSql;
+      $definition[] = "`$fieldName` " . self::generateFieldSql($field);
     }
     if ($primaryKeys) {
       $definition[] = 'PRIMARY KEY (' . implode(', ', $primaryKeys) . ')';
@@ -150,6 +130,30 @@ return new class() {
       $sql .= implode(",\n  ", $constraints) . ";\n";
     }
     return $sql;
+  }
+
+  public static function generateFieldSql(array $field) {
+    $fieldSql = $field['sql_type'];
+    if (!empty($field['collate'])) {
+      $fieldSql .= " COLLATE {$field['collate']}";
+    }
+    // Required fields and booleans cannot be null
+    // FIXME: For legacy support this doesn't force boolean fields to be NOT NULL... but it really should.
+    if (!empty($field['required'])) {
+      $fieldSql .= ' NOT NULL';
+    }
+    // Mysql 5.7 requires timestamp to be explicitly declared NULL
+    if (empty($field['required']) && $field['sql_type'] === 'timestamp') {
+      $fieldSql .= ' NULL';
+    }
+    if (!empty($field['auto_increment'])) {
+      $fieldSql .= " AUTO_INCREMENT";
+    }
+    $fieldSql .= self::getDefaultSql($field);
+    if (!empty($field['description'])) {
+      $fieldSql .= " COMMENT '" . \CRM_Core_DAO::escapeString($field['description']) . "'";
+    }
+    return $fieldSql;
   }
 
   private static function getDefaultSql(array $field): string {
