@@ -41,15 +41,6 @@ or want to inquire about reinstating your registration for this event.{/ts}</p>
        {event.start_date|crmDate:"%A"} {event.start_date|crmDate}{if {event.end_date|boolean}}-{if '{event.end_date|crmDate:"%Y%m%d"}' === '{event.start_date|crmDate:"%Y%m%d"}'}{event.end_date|crmDate:"Time"}{else}{event.end_date|crmDate:"%A"} {event.end_date|crmDate}{/if}{/if}
       </td>
      </tr>
-     <tr>
-      <td {$labelStyle}>
-       {ts}Participant Role{/ts}:
-      </td>
-      <td {$valueStyle}>
-        {participant.role_id:label}
-      </td>
-     </tr>
-
     {if {event.is_show_location|boolean}}
         <tr>
           <td colspan="2" {$valueStyle}>

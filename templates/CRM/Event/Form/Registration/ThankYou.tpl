@@ -139,20 +139,6 @@
         </div>
     {/if}
 
-    {if $event.participant_role neq 'Attendee' and $defaultRole}
-        <div class="crm-group participant_role-group">
-            <div class="header-dark">
-                {ts}Participant Role{/ts}
-            </div>
-            <div class="crm-section no-label participant_role-section">
-                <div class="content">
-                    {$event.participant_role}
-                </div>
-            <div class="clear"></div>
-          </div>
-        </div>
-    {/if}
-
     {include file="CRM/Event/Form/Registration/DisplayProfile.tpl"}
     {if $billingName or $address}
         <div class="crm-group billing_name_address-group">

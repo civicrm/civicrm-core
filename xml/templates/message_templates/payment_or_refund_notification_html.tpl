@@ -180,17 +180,6 @@
         </td>
       </tr>
 
-      {if {participant.role_id|boolean}}
-      <tr>
-        <td {$labelStyle}>
-          {ts}Participant Role{/ts}
-        </td>
-        <td {$valueStyle}>
-         {participant.role_id:label}
-        </td>
-      </tr>
-      {/if}
-
       {if {event.is_show_location|boolean}}
             <tr>
               <td colspan="2" {$valueStyle}>
