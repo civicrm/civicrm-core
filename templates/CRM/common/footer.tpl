@@ -7,7 +7,7 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{crmPermission permission='access CiviCRM'}
+{crmPermission has='access CiviCRM'}
   {include file="CRM/common/accesskeys.tpl"}
   {if $contactId}
     {include file="CRM/common/contactFooter.tpl"}
@@ -19,7 +19,7 @@
       <a href="{crmURL p='civicrm/a/#/status'}">{$footer_status_message}</a>
     </span>&nbsp;
     {else}
-      {crmPermission permission='administer CiviCRM'}
+      {crmPermission has='administer CiviCRM'}
     <span class="status crm-status-none">
       <a href="{crmURL p='civicrm/a/#/status'}">{ts}System Status{/ts}</a>
     </span>&nbsp;
