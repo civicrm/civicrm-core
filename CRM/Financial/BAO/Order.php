@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contribution;
+use Civi\Api4\Generic\Result;
 use Civi\Api4\LineItem;
 use Civi\Api4\PriceField;
 use Civi\Api4\PriceFieldValue;
@@ -1432,6 +1434,54 @@ class CRM_Financial_BAO_Order {
       }
     }
     return $lineItemTitle ?? '';
+  }
+
+  /**
+   * @param array $contributionValues
+   *
+   * @return \Civi\Api4\Generic\Result
+   *
+   * @internal Access through apiv4 Order api only. Signature subject to change.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function save(array $contributionValues): Result {
+    foreach ($this->getLineItems() as $index => $lineItem) {
+      // Save entities first so we can get the Entity ID.
+      if ($lineItem['entity_table'] !== 'civicrm_contribution') {
+        $this->setLineItemValue('entity_id', $this->saveLineItemEntity($lineItem), $index);
+      }
+    }
+    $contributionValues['total_amount'] = $this->getTotalAmount();
+    $contributionValues['tax_amount'] = $this->getTotalTaxAmount();
+    $contributionValues['amount_level'] = $this->getAmountLevel();
+    $contributionValues['contribution_status_id:name'] = 'Pending';
+    $contributionValues['line_item'] = [$this->getLineItems()];
+    return Contribution::create()
+      ->setValues($contributionValues)->execute();
+  }
+
+  /**
+   * Save the entity related to a given line item.
+   *
+   * @param array $lineItem
+   *
+   * @return int
+   * @throws \CRM_Core_Exception
+   */
+  private function saveLineItemEntity(array $lineItem): int {
+    $entity = CRM_Core_DAO_AllCoreTables::getEntityNameForTable($lineItem['entity_table']);
+    $entityValues = empty($lineItem['entity_id']) ? [] : ['id' => $lineItem['entity_id']];
+    foreach ($lineItem as $fieldName => $fieldValue) {
+      if (str_starts_with($fieldName, 'entity_id.')) {
+        $entityValues[substr($fieldName, 10)] = $fieldValue;
+      }
+    }
+    if (array_keys($entityValues) === ['id']) {
+      // Nothing to save.
+      return $entityValues['id'];
+    }
+    return civicrm_api4($entity, 'save', ['records' => [$entityValues]])->first()['id'];
   }
 
 }

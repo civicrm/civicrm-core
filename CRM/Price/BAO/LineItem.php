@@ -382,10 +382,7 @@ WHERE li.contribution_id = %1";
       return;
     }
 
-    foreach ($lineItems as $priceSetId => &$values) {
-      if (!$priceSetId) {
-        continue;
-      }
+    foreach ($lineItems as &$values) {
 
       foreach ($values as &$line) {
         if (empty($line['entity_table'])) {
