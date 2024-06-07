@@ -72,11 +72,6 @@
         &nbsp;{$form.postal_mailing_export.html}
         {ts}Exclude contacts with "do not mail" privacy, no street address, or who are deceased.{/ts}
     </div>
-    <br/>
-    <div class="label crm-label-additionalGroup">{$form.additional_group.label}</div>
-    <div class="content crm-content-additionalGroup">
-        &nbsp;{$form.additional_group.html}
-    </div>
   <div class="clear"></div>
   </div>
   {/if}
