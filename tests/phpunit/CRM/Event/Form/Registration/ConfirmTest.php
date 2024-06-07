@@ -260,8 +260,9 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
 
     $this->assertStringContainsString('Dear Participant1', $mailSent[2]);
     $this->assertStringContainsString('job_title	oracle', $mailSent[2]);
-    // Note the delayed version does not add the additional participant profiles
-    // This could be fixed at some point so no assertions added.
+    $this->assertStringContainsString('job_title	wizard', $mailSent[2]);
+    $this->assertStringContainsString('job_title	seer', $mailSent[2]);
+    $this->assertStringNotContainsString('Participant 4', $mailSent[2]);
 
     $this->assertStringContainsString('Dear Participant2', $mailSent[0]);
     $this->assertStringNotContainsString('job_title	oracle', $mailSent[0]);
@@ -489,7 +490,6 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    * email reflects the submitted value
    *
    * @throws \CRM_Core_Exception
-   * @throws \Exception
    */
   public function testNoteSubmission(): void {
     // Create an event with an attached profile containing a note
