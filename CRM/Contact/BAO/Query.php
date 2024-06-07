@@ -4495,6 +4495,7 @@ civicrm_relationship.start_date > {$today}
           'legal_name' => 1,
           'sic_code' => 1,
           'current_employer' => 1,
+          'contact_source' => 1,
           // FIXME: should we use defaultHierReturnProperties() for the below?
           'do_not_email' => 1,
           'do_not_mail' => 1,
