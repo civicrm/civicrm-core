@@ -23,11 +23,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
 
   use CRMTraits_Financial_TaxTrait;
 
-  protected $_individualId;
-
   protected $_financialTypeId = 1;
-
-  public $debug = 0;
 
   protected static $phpunitStartedDate;
   protected static $skipStatusCalStillExists;
@@ -37,9 +33,8 @@ class api_v3_OrderTest extends CiviUnitTestCase {
    */
   public function setUp(): void {
     parent::setUp();
-
     $this->_apiversion = 3;
-    $this->_individualId = $this->individualCreate();
+    $this->individualCreate();
   }
 
   /**
@@ -53,8 +48,6 @@ class api_v3_OrderTest extends CiviUnitTestCase {
 
   /**
    * Test Get order api.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testGetOrder(): void {
     $contribution = $this->addOrder(FALSE, 100);
@@ -81,9 +74,6 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       'financial_type_id' => 1,
     ];
     $this->checkPaymentResult($order, $expectedResult, $lineItems);
-    $this->callAPISuccess('Contribution', 'Delete', [
-      'id' => $contribution['id'],
-    ]);
   }
 
   /**
@@ -102,9 +92,6 @@ class api_v3_OrderTest extends CiviUnitTestCase {
     $order = $this->callAPISuccess('Order', 'get', $params);
 
     $this->assertCount(2, $order['values'][$contribution['id']]['line_items']);
-    $this->callAPISuccess('Contribution', 'Delete', [
-      'id' => $contribution['id'],
-    ]);
   }
 
   /**
@@ -135,7 +122,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
    */
   public function addOrder(bool $isPriceSet, float $amount = 300.00, array $extraParams = []): array {
     $p = [
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact']['individual_0'],
       'receive_date' => '2010-01-20',
       'total_amount' => $amount,
       'financial_type_id' => $this->_financialTypeId,
@@ -163,16 +150,14 @@ class api_v3_OrderTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test create order api
-   *
-   * @throws \CRM_Core_Exception
+   * Test create order api.
    */
   public function testAddOrder(): void {
     $order = $this->addOrder(FALSE, 100);
     $params = [
       'contribution_id' => $order['id'],
     ];
-    $order = $this->callAPISuccess('order', 'get', $params);
+    $order = $this->callAPISuccess('Order', 'get', $params);
     $expectedResult = [
       $order['id'] => [
         'total_amount' => 100,
@@ -190,9 +175,6 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       'financial_type_id' => 1,
     ];
     $this->checkPaymentResult($order, $expectedResult, $lineItems);
-    $this->callAPISuccess('Contribution', 'Delete', [
-      'id' => $order['id'],
-    ]);
   }
 
   /**
@@ -205,7 +187,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
     $membershipType1 = $this->membershipTypeCreate();
     $membershipType = $membershipTypes = [$membershipType, $membershipType1];
     $p = [
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact']['individual_0'],
       'receive_date' => '2010-01-20',
       'financial_type_id' => 'Event Fee',
       'contribution_status_id' => 'Pending',
@@ -228,7 +210,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
     $p['line_items'][] = [
       'line_item' => [array_pop($lineItems)],
       'params' => [
-        'contact_id' => $this->_individualId,
+        'contact_id' => $this->ids['Contact']['individual_0'],
         'membership_type_id' => array_pop($membershipTypes),
         'join_date' => '2006-01-21',
         'start_date' => '2006-01-21',
@@ -258,7 +240,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
     $p['line_items'][] = [
       'line_item' => [array_pop($lineItems)],
       'params' => [
-        'contact_id' => $this->_individualId,
+        'contact_id' => $this->ids['Contact']['individual_0'],
         'membership_type_id' => array_pop($membershipTypes),
         'join_date' => '2006-01-21',
         'start_date' => '2006-01-21',
@@ -300,9 +282,6 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       ->addSelect('status_id')->execute() as $item) {
       $this->assertEquals('Paid', CRM_Core_PseudoConstant::getName('CRM_Financial_BAO_FinancialItem', 'status_id', $item['status_id']));
     }
-    $this->callAPISuccess('Contribution', 'Delete', [
-      'id' => $order['id'],
-    ]);
   }
 
   /**
@@ -334,7 +313,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       $originalMembershipID = $this->callAPISuccess('Membership', 'create',
         $membershipExtraParams['renewalOf']
         + [
-          'contact_id'         => $this->_individualId,
+          'contact_id'         => $this->ids['Contact']['individual_0'],
           'membership_type_id' => $membershipType,
           'source'             => 'Old',
         ])['id'];
@@ -346,7 +325,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
     // Use the 2nd and last price field value defined in the fixture, which has value 200
     $priceFieldValue = end($this->createPriceSet()['values']);
     $orderCreateParams = [
-      'contact_id'             => $this->_individualId,
+      'contact_id'             => $this->ids['Contact']['individual_0'],
       'financial_type_id'      => 'Member Dues',
       'contribution_status_id' => 'Pending',
       'line_items'             => [[
@@ -364,7 +343,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
         ],
         ],
         'params' => [
-          'contact_id'         => $this->_individualId,
+          'contact_id'         => $this->ids['Contact']['individual_0'],
           'membership_type_id' => $membershipType,
           'source'             => 'Payment',
         ] + $membershipExtraParams,
@@ -423,7 +402,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
    * As well as checking various things work as expected, this set of tests is
    * here to set out what IS expected behaviour.
    */
-  public function dataForTestAddOrderForMembershipWithDates() {
+  public function dataForTestAddOrderForMembershipWithDates(): array {
     // Prevent test mis-fires because of running over midnight.
     static::$phpunitStartedDate = date('Y-m-d');
 
@@ -438,7 +417,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
     ];
 
     $tests = [
-      // #0 Without dates, we should get a pending membership starting today.'
+      // #0 Without dates, we should get a pending membership starting today.
       [[], NULL, $fromTodayForAYear + ['status_id' => 'Pending']],
       // #1 With our own dates.
       [$historical + ['skipStatusCal' => 1], NULL, $historical + ['status_id' => 'Pending']],
@@ -499,7 +478,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
   public function testAddOrderForParticipant(): void {
     $this->eventCreatePaid();
     $p = [
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact']['individual_0'],
       'receive_date' => '2010-01-20',
       'financial_type_id' => $this->_financialTypeId,
       'contribution_status_id' => 'Pending',
@@ -521,7 +500,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
     $p['line_items'][] = [
       'line_item' => $lineItems,
       'params' => [
-        'contact_id' => $this->_individualId,
+        'contact_id' => $this->ids['Contact']['individual_0'],
         'event_id' => $this->getEventID(),
         'role_id' => 1,
         'register_date' => '2007-07-21 00:00:00',
@@ -593,9 +572,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test create order api with line items
-   *
-   * @throws \CRM_Core_Exception
+   * Test create order api with line items.
    */
   public function testAddOrderWithLineItems(): void {
     $order = $this->addOrder(TRUE);
@@ -647,9 +624,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test delete order api
-   *
-   * @throws \CRM_Core_Exception
+   * Test delete order api.
    */
   public function testDeleteOrder(): void {
     $order = $this->addOrder(FALSE, 100);
@@ -729,9 +704,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test cancel order api
-   *
-   * @throws \CRM_Core_Exception
+   * Test cancel order api.
    */
   public function testCancelOrder(): void {
     $contribution = $this->addOrder(FALSE, 100);
@@ -759,7 +732,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
    */
   public function testCreateOrderIfTotalAmountDoesNotMatchLineItemsAmountsIfNoTaxSupplied(): void {
     $params = [
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact']['individual_0'],
       'receive_date' => '2018-01-01',
       'total_amount' => 50,
       'financial_type_id' => $this->_financialTypeId,
@@ -791,7 +764,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
    */
   public function testCreateOrderIfTotalAmountDoesNotMatchLineItemsAmountsIfTaxSupplied(): void {
     $params = [
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact']['individual_0'],
       'receive_date' => '2018-01-01',
       'total_amount' => 50,
       'financial_type_id' => $this->_financialTypeId,
@@ -827,7 +800,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
     $this->enableTaxAndInvoicing();
     $this->createFinancialTypeWithSalesTax();
     $params = [
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact']['individual_0'],
       'receive_date' => '2018-01-01',
       'total_amount' => 36.75,
       'financial_type_id' => $this->_financialTypeId,
@@ -864,11 +837,9 @@ class api_v3_OrderTest extends CiviUnitTestCase {
    * We have just deprecated creating an order with a status other than
    * pending. It makes sense to support adding a payment straight away by
    * chaining.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testCreateWithChainedPayment(): void {
-    $contributionID = $this->callAPISuccess('Order', 'create', ['contact_id' => $this->_individualId, 'total_amount' => 5, 'financial_type_id' => 2, 'contribution_status_id' => 'Pending', 'api.Payment.create' => ['total_amount' => 5]])['id'];
+    $contributionID = $this->callAPISuccess('Order', 'create', ['contact_id' => $this->ids['Contact']['individual_0'], 'total_amount' => 5, 'financial_type_id' => 2, 'contribution_status_id' => 'Pending', 'api.Payment.create' => ['total_amount' => 5]])['id'];
     $this->assertEquals('Completed', $this->callAPISuccessGetValue('Contribution', ['id' => $contributionID, 'return' => 'contribution_status']));
   }
 
