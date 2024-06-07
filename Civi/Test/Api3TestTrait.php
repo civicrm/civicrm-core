@@ -387,7 +387,13 @@ trait Api3TestTrait {
       $v3Fields['version'] = ['name' => 'version', 'api.aliases' => ['domain_version']];
       unset($v3Fields['domain_version']);
     }
-
+    if ($v4Entity == 'Payment') {
+      unset($v3Fields['entity_id']);
+      if (!empty($v3Params['contribution_id']) && $v4Action === 'get') {
+        $v4Params['contributionID'] = $v3Params['contribution_id'];
+        \CRM_Utils_Array::remove($v3Params, 'contribution_id');
+      }
+    }
     foreach ($v3Fields as $name => $field) {
       // Resolve v3 aliases
       foreach ($field['api.aliases'] ?? [] as $alias) {
