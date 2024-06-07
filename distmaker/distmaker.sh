@@ -39,6 +39,7 @@ BPACK=0
 D5PACK=0
 D7DIR=0
 J5PACK=0
+JOOMLA5PACK=0
 WP5PACK=0
 PATCHPACK=0
 SK5PACK=0
@@ -178,9 +179,19 @@ case $1 in
   ;;
 
   # JOOMLA PHP5
-  j5|Joomla)
+  Joomla)
   dm_note "Enable CiviCRM-Joomla"
   J5PACK=1
+  ;;
+
+  Joomla5)
+  dm_note "Enable CiviCRM-Joomla 5"; echo;
+  JOOMLA5PACK=1
+  ;;
+
+  j5)
+  echo >&2 "j5 is ambiguous"
+  exit 1
   ;;
 
   # WORDPRESS PHP5
@@ -213,6 +224,7 @@ case $1 in
   BPACK=1
   D5PACK=1
   J5PACK=1
+  JOOMLA5PACK=1
   WP5PACK=1
   PATCHPACK=1
   SKPACK=1
@@ -293,6 +305,12 @@ if [ "$J5PACK" = 1 ]; then
   dm_title "Build CiviCRM-Joomla"
   dm_git_checkout "$DM_SOURCEDIR/joomla" "$DM_REF_JOOMLA"
   bash $P/dists/joomla_php5.sh
+fi
+
+if [ "$JOOMLA5PACK" = 1 ]; then
+  dm_title "Build CiviCRM-Joomla 5"
+  dm_git_checkout "$DM_SOURCEDIR/joomla" "$DM_REF_JOOMLA"
+  bash $P/dists/joomla5_php.sh
 fi
 
 if [ "$WP5PACK" = 1 ]; then
