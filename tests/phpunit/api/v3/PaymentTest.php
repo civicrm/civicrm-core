@@ -1320,4 +1320,32 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
 
   }
 
+  public function testPaymentGetNonPaymentRecords(): void {
+    $this->_apiversion = 4;
+    Civi::settings()->set('always_post_to_accounts_receivable', 1);
+    $contributionID = $this->contributionCreate([
+      'contact_id'             => $this->individualCreate(),
+      'total_amount'           => 110,
+      'contribution_status_id' => 'Pending',
+      'receive_date'           => date('Y-m-d H:i:s'),
+      'fee_amount' => 0,
+      'financial_type_id' => 1,
+      'is_pay_later' => 1,
+    ]);
+    $trxnID = 'abcd';
+    $this->callAPISuccess('Payment', 'create', [
+      'total_amount' => 100,
+      'order_id'     => $contributionID,
+      'trxn_date'    => date('Y-m-d H:i:s'),
+      'trxn_id'      => $trxnID,
+      'fee_amount' => .2,
+    ]);
+    $payments = $this->callAPISuccess('Payment', 'get', []);
+    $this->assertCount(1, $payments['values']);
+    $payments = $this->callAPISuccess('Payment', 'get', ['is_payment' => ['IN' => [0, 1]]]);
+    // Ensure that we are only returning payments
+    $this->assertCount(1, $payments['values']);
+    Civi::settings()->set('always_post_to_accounts_receivable', 0);
+  }
+
 }

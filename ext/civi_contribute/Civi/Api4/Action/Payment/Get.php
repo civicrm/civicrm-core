@@ -32,7 +32,12 @@ class Get extends \Civi\Api4\Generic\DAOGetAction {
   protected $contributionID = NULL;
 
   public static function getGetFields(): array {
-    $financialTrxnFields = FinancialTrxn::getFields()->execute()->getArrayCopy();
+    $financialTrxnFields = FinancialTrxn::getFields(FALSE)->execute()->getArrayCopy();
+    foreach ($financialTrxnFields as $key => $field) {
+      if ($field['name'] === 'is_payment') {
+        $financialTrxnFields[$key]['default_value'] = TRUE;
+      }
+    }
     $financialTrxnFields[] = [
       'column_name' => 'financial_trxn_id',
       'description' => ts('Contribution ID linked to the financial trxn'),
@@ -74,6 +79,7 @@ class Get extends \Civi\Api4\Generic\DAOGetAction {
         ->column('id');
       $this->addWhere('id', 'IN', $financialTrxns);
     }
+    $this->addWhere('is_payment', '=', TRUE);
     parent::_run($result);
     foreach ($result as $key => $r) {
       $result[$key]['contribution_id'] = EntityFinancialTrxn::get(FALSE)->addWhere('financial_trxn_id', '=', $r['id'])->addWhere('entity_table', '=', 'civicrm_contribution')->execute()->first()['entity_id'] ?? NULL;
