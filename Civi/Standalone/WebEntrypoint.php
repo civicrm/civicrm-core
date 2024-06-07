@@ -36,7 +36,7 @@ class WebEntrypoint {
    * may even know your database credentials if these are provided as env variables)
    */
   private static function checkCiviInstalled(): bool {
-    return !defined('CIVICRM_SETTINGS_PATH');
+    return defined('CIVICRM_SETTINGS_PATH');
   }
 
   /**
