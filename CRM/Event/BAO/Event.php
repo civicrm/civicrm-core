@@ -10,6 +10,7 @@
  */
 
 use Civi\Api4\Event\AuthorizeRecordEvent;
+use Civi\Api4\UFGroup;
 
 /**
  *
@@ -1296,7 +1297,9 @@ WHERE civicrm_event.is_active = 1
       $profileIds = $id;
     }
 
-    $val = $groupTitles = NULL;
+    $val = NULL;
+    $groups = $participantParams['group'] ?? NULL;
+    $note = $participantParams['note'] ?? NULL;
     foreach ($profileIds as $gid) {
       if (CRM_Core_BAO_UFGroup::filterUFGroups($gid, $cid)) {
         $values = [];
@@ -1334,26 +1337,19 @@ WHERE civicrm_event.is_active = 1
           unset($fields['participant_campaign_id']);
         }
 
-        $groupTitle = NULL;
         foreach ($fields as $k => $v) {
-          if (!$groupTitle) {
-            $groupTitle = $v['groupDisplayTitle'];
-          }
           // suppress all file fields from display
           if (
-            CRM_Utils_Array::value('data_type', $v, '') == 'File' ||
-            CRM_Utils_Array::value('name', $v, '') == 'image_URL' ||
+            ($v['data_type'] ?? '') == 'File' ||
+            ($v['name'] ?? '') == 'image_URL' ||
             ($v['field_type'] ?? NULL) == 'Formatting'
           ) {
             unset($fields[$k]);
           }
         }
 
-        if ($groupTitle) {
-          $groupTitles[] = $groupTitle;
-        }
         //display profile groups those are subscribed by participant.
-        if (($groups = CRM_Utils_Array::value('group', $participantParams)) &&
+        if ($groups &&
           is_array($groups)
         ) {
           $grpIds = [];
@@ -1382,7 +1378,7 @@ WHERE civicrm_event.is_active = 1
         //dev/event#10
         //If the event profile includes a note field and the submitted value of
         //that field is "", then remove the old note returned by getValues.
-        if (isset($participantParams['note']) && empty($participantParams['note'])) {
+        if ($note === '') {
           $noteKeyPos = array_search('note', array_keys($fields));
           $valuesKeys = array_keys($values);
           $values[$valuesKeys[$noteKeyPos]] = "";
@@ -1392,18 +1388,17 @@ WHERE civicrm_event.is_active = 1
           isset($values[$fields['participant_status_id']['title']]) &&
           is_numeric($values[$fields['participant_status_id']['title']])
         ) {
-          $status = [];
-          $status = CRM_Event_PseudoConstant::participantStatus();
-          $values[$fields['participant_status_id']['title']] = $status[$values[$fields['participant_status_id']['title']]];
+          // @todo - is this a thing?
+          $statusID = $values[$fields['participant_status_id']['title']];
+          $values[$fields['participant_status_id']['title']] = CRM_Core_PseudoConstant::getLabel('CRM_Event_BAO_Participant', 'status_id', $statusID);
         }
 
         if (isset($fields['participant_role_id']['title']) &&
           isset($values[$fields['participant_role_id']['title']]) &&
           is_numeric($values[$fields['participant_role_id']['title']])
         ) {
-          $roles = [];
-          $roles = CRM_Event_PseudoConstant::participantRole();
-          $values[$fields['participant_role_id']['title']] = $roles[$values[$fields['participant_role_id']['title']]];
+          $roleID = $values[$fields['participant_role_id']['title']];
+          $values[$fields['participant_role_id']['title']] = CRM_Core_PseudoConstant::getLabel('CRM_Event_BAO_Participant', 'role_id', $roleID);
         }
 
         if (isset($fields['participant_register_date']['title']) &&
@@ -1434,6 +1429,10 @@ WHERE civicrm_event.is_active = 1
     }
 
     $template->assign($name, $val);
+    $groupTitles = UFGroup::get(FALSE)
+      ->addWhere('id', 'IN', $profileIds)
+      ->addSelect('frontend_title')
+      ->execute()->column('frontend_title');
     $template->assign($name . '_grouptitle', $groupTitles);
 
     //return if we only require array of participant's info.
