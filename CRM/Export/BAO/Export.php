@@ -101,15 +101,6 @@ class CRM_Export_BAO_Export {
       $exportParams['postal_mailing_export']['postal_mailing_export'] == 1
     );
 
-    if (!$selectAll && $componentTable && !empty($exportParams['additional_group'])) {
-      // If an Additional Group is selected, then all contacts in that group are
-      // added to the export set (filtering out duplicates).
-      // Really - the calling function could do this ... just saying
-      // @todo take a whip to the calling function.
-      CRM_Core_DAO::executeQuery("
-INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_contact gc WHERE gc.group_id = {$exportParams['additional_group']} ON DUPLICATE KEY UPDATE {$componentTable}.contact_id = gc.contact_id"
-      );
-    }
     // rectify params to what proximity search expects if there is a value for prox_distance
     // CRM-7021
     // @todo - move this back to the calling functions

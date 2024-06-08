@@ -1184,7 +1184,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
         'addressee' => '2',
         'addressee_other' => 'random string {contact.display_name}',
         'mergeOption' => '1',
-        'additional_group' => '',
         'mapping' => '',
       ],
     ]);
