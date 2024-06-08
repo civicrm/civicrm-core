@@ -199,6 +199,7 @@ class CRM_Extension_System {
   public function getClassLoader() {
     if ($this->classLoader === NULL) {
       $this->classLoader = new CRM_Extension_ClassLoader($this->getMapper(), $this->getFullContainer(), $this->getManager());
+      $this->classLoader->register();
     }
     return $this->classLoader;
   }
