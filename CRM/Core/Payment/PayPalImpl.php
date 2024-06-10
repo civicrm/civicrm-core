@@ -358,7 +358,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $args['payerID'] = $params['payer_id'];
     $args['invnum'] = $params['invoiceID'];
     $args['returnURL'] = $this->getReturnSuccessUrl($params['qfKey']);
-    $args['cancelURL'] = $this->getCancelUrl($params['qfKey'], NULL);
+    $args['cancelURL'] = $this->getCancelUrl($params['qfKey'], ($params['participantID'] ?? NULL));
     $args['desc'] = $params['description'];
 
     // add CiviCRM BN code
