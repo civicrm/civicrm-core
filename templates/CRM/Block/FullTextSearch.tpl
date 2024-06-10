@@ -33,18 +33,18 @@
       <option value="Contact">{ts}Contacts{/ts}</option>
 {/if}
       <option value="Activity">{ts}Activities{/ts}</option>
-{if call_user_func(array('CRM_Core_Permission','access'), 'CiviCase')}
+{crmPermission has='access all cases and activities,access my cases and activities'}
       <option value="Case">{ts}Cases{/ts}</option>
-{/if}
-{if call_user_func(array('CRM_Core_Permission','access'), 'CiviContribute')}
+{/crmPermission}
+{crmPermission has='access CiviContribute'}
         <option value="Contribution">{ts}Contributions{/ts}</option>
-{/if}
-{if call_user_func(array('CRM_Core_Permission','access'), 'CiviEvent')}
+{/crmPermission}
+{crmPermission has='access CiviEvent'}
         <option value="Participant">{ts}Participants{/ts}</option>
-{/if}
-{if call_user_func(array('CRM_Core_Permission','access'), 'CiviMember')}
+{/crmPermission}
+{crmPermission has='access CiviMember'}
         <option value="Membership">{ts}Memberships{/ts}</option>
-{/if}
+{/crmPermission}
     </select> {help id="id-fullText" file="CRM/Contact/Form/Search/Custom/FullText.hlp"}
     <div class="crm-submit-buttons"><button type="submit" name="submit" id="fulltext_submit" class="crm-button crm-form-submit" onclick='submitForm();'>{ts}Search{/ts}</button></div>
     </form>
