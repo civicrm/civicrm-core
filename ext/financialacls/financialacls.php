@@ -277,12 +277,19 @@ function financialacls_civicrm_permission(&$permissions) {
     'edit' => E::ts('edit'),
     'delete' => E::ts('delete'),
   ];
+  foreach ($actions as $action => $action_ts) {
+    $permissions[$action . ' contributions of all types'] = [
+      'label' => E::ts("CiviCRM: %1 contributions of all types", [1 => $action_ts]),
+      'description' => E::ts('%1 contributions of all types', [1 => $action_ts]),
+    ];
+  }
   $financialTypes = \CRM_Contribute_BAO_Contribution::buildOptions('financial_type_id', 'validate');
-  foreach ($financialTypes as $id => $type) {
+  foreach ($financialTypes as $type) {
     foreach ($actions as $action => $action_ts) {
       $permissions[$action . ' contributions of type ' . $type] = [
         'label' => E::ts("CiviCRM: %1 contributions of type %2", [1 => $action_ts, 2 => $type]),
         'description' => E::ts('%1 contributions of type %2', [1 => $action_ts, 2 => $type]),
+        'implied_by' => [$action . ' contributions of all types'],
       ];
     }
   }
