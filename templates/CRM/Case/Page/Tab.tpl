@@ -14,11 +14,11 @@
     <div class="messages status no-popup">
       {icon icon="fa-info-circle"}{/icon}
          <strong>{ts}It looks like there are no active case types yet.{/ts}</strong>
-           {if call_user_func(array('CRM_Core_Permission','check'), ' administer CiviCase')}
+           {crmPermission has='administer CiviCase'}
              {capture assign=adminCaseTypeURL}{crmURL p='civicrm/a/#/caseType'}
        {/capture}
              {ts 1=$adminCaseTypeURL 2=$adminCaseStatusURL}Enable <a href='%1'>case types</a>.{/ts}
-           {/if}
+           {/crmPermission}
     </div>
 
 {else}
@@ -35,17 +35,17 @@
     <div class="view-content">
     <div class="help">
          {ts 1=$displayName}This page lists all case records for %1.{/ts}
-         {if $permission EQ 'edit' and call_user_func(array('CRM_Core_Permission','check'), 'access all cases and activities') and $allowToAddNewCase}
+         {if $permission EQ 'edit' and $allowToAddNewCase}
+         {crmPermission has='access all cases and activities'}
          {ts 1="href='$newCaseURL' class='action-item'"}Click <a %1>Add Case</a> to add a case record for this contact.{/ts}{/if}
     </div>
 
-    {if $action eq 16 and $permission EQ 'edit' and
-        ( call_user_func(array('CRM_Core_Permission','check'), 'access all cases and activities') OR
-          call_user_func(array('CRM_Core_Permission','check'), 'add cases') ) AND
-        $allowToAddNewCase}
-        <div class="action-link">
-        <a accesskey="N" href="{$newCaseURL|smarty:nodefaults}" class="button no-popup"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Add Case{/ts}</span></a>
-        </div>
+    {if $action eq 16 and $permission EQ 'edit' and $allowToAddNewCase}
+        {crmPermission has='access all cases and activities,add cases'}
+          <div class="action-link">
+          <a accesskey="N" href="{$newCaseURL|smarty:nodefaults}" class="button no-popup"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}Add Case{/ts}</span></a>
+          </div>
+        {/crmPermission}
     {/if}
 
     {if $rows}
@@ -58,5 +58,6 @@
     {/if}
     </div>
     </div>
+    {/crmPermission}
     {/if}
 {/if}

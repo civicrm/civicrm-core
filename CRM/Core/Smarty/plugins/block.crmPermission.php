@@ -36,11 +36,11 @@ function smarty_block_crmPermission($params, $content, &$smarty, &$repeat) {
       // This would be due to developer error - better to return nothing to make it more visible.
       return '';
     }
-    $hasPermission = empty($params['has']) || CRM_Core_Permission::check($params['has'], $params['contact_id'] ?? NULL);
+    $hasPermission = empty($params['has']) || CRM_Core_Permission::check(explode(',', $params['has']), $params['contact_id'] ?? NULL);
     if (!$hasPermission) {
       return '';
     }
-    if (empty($params['not']) || !CRM_Core_Permission::check($params['not'], $params['contact_id'] ?? NULL)) {
+    if (empty($params['not']) || !CRM_Core_Permission::check(explode(',', $params['not']), $params['contact_id'] ?? NULL)) {
       return $content;
     }
   }
