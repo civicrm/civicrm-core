@@ -445,8 +445,16 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     ], $this->getEventID());
     $form->processForm();
     $form->checkTemplateVariable('primaryParticipantProfile', [
-      'CustomPre' => ['Comment' => $note, 'job_title' => 'Magician'],
-      'CustomPreGroupTitle' => 'Public Event Post Post Profile',
+      'CustomPre' => ['email' => 'demo@example.com'],
+      'CustomPreGroupTitle' => 'Public Event Pre Profile',
+      'CustomPost' => [
+        $this->ids['UFGroup']['event_post_event'] => ['first_name' => NULL, 'last_name' => NULL],
+        $this->ids['UFGroup']['event_post_post_event'] => ['Comment' => $note, 'job_title' => 'Magician'],
+      ],
+      'CustomPostGroupTitle' => [
+        $this->ids['UFGroup']['event_post_event'] => ['groupTitle' => 'Public Event Post Profile'],
+        $this->ids['UFGroup']['event_post_post_event'] => ['groupTitle' => 'Public Event Post Post Profile'],
+      ],
     ]);
   }
 
@@ -512,43 +520,13 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    */
   public function testSubmitNonPrimaryEmail(): void {
     $event = $this->eventCreateUnpaid();
-    $mut = new CiviMailUtils($this, TRUE);
-    $this->submitFormLegacy($event['id'], [
-      [
-        'first_name' => 'k',
-        'last_name' => 'p',
-        'email-Other' => 'nonprimaryemail@example.com',
-        'hidden_processor' => '1',
-        'credit_card_number' => '4111111111111111',
-        'cvv2' => '123',
-        'credit_card_exp_date' => [
-          'M' => '1',
-          'Y' => '2019',
-        ],
-        'credit_card_type' => 'Visa',
-        'billing_first_name' => 'p',
-        'billing_middle_name' => '',
-        'billing_last_name' => 'p',
-        'billing_street_address-5' => 'p',
-        'billing_city-5' => 'p',
-        'billing_state_province_id-5' => '1061',
-        'billing_postal_code-5' => '7',
-        'billing_country_id-5' => '1228',
-        'priceSetId' => '6',
-        'price_7' => [
-          13 => 1,
-        ],
-        'payment_processor_id' => '1',
-        'year' => '2019',
-        'month' => '1',
-        'button' => '_qf_Register_upload',
-        'billing_state_province-5' => 'AP',
-        'billing_country-5' => 'US',
-      ],
+    $this->submitForm($event['id'], [
+      'first_name' => 'Kim',
+      'last_name' => 'Price',
+      'email-Other' => 'nonprimaryemail@example.com',
+      'email-Primary' => 'demo@example.com',
     ]);
-    $mut->checkMailLog(['nonprimaryemail@example.com']);
-    $mut->stop();
-    $mut->clearMessages();
+    $this->assertMailSentContainingHeaderString('nonprimaryemail@example.com');
   }
 
   /**
