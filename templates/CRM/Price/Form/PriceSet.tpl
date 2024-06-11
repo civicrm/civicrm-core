@@ -14,7 +14,7 @@
     {/if}
 
     {assign var='adminFld' value=false}
-    {if call_user_func(array('CRM_Core_Permission','check'), 'administer CiviCRM')}
+    {crmPermission has='administer CiviCRM'}
       {assign var='adminFld' value=true}
       {if $priceSet.id && !$priceSet.is_quick_config}
         <div class='float-right'>
@@ -23,7 +23,7 @@
           </a>
         </div>
       {/if}
-    {/if}
+    {/crmPermission}
 
     {foreach from=$priceSet.fields item=element key=field_id}
         {* Skip 'Admin' visibility price fields WHEN this tpl is used in online registration unless user has administer CiviCRM permission. *}
