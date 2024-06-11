@@ -16,10 +16,11 @@
      &nbsp;{ts}Registration is closed for this event{/ts}
   </div>
 {/if}
-{if call_user_func(array('CRM_Core_Permission','check'), 'access CiviEvent')}
+{crmPermission has='access CiviEvent'}
 <div class="crm-actions-ribbon crm-event-manage-tab-actions-ribbon">
   <ul id="actions">
-{if call_user_func(array('CRM_Core_Permission','check'), 'edit all events') && !empty($manageEventLinks)}
+{crmPermission has='edit all events'}
+{if !empty($manageEventLinks)}
   <li>
     <div id="crm-event-links-wrapper">
       <span id="crm-event-configure-link" class="crm-hover-button">
@@ -44,6 +45,7 @@
     </div>
   </li>
 {/if}
+{/crmPermission}
   <li>
     <div id="crm-participant-wrapper">
       <span id="crm-participant-links" class="crm-hover-button">
@@ -71,7 +73,7 @@
   </ul>
   <div class="clear"></div>
 </div>
-{/if}
+{/crmPermission}
 <div class="vevent crm-event-id-{$event.id} crm-block crm-event-info-form-block">
   <div class="event-info">
   {* Display top buttons only if the page is long enough to merit duplicate buttons *}
