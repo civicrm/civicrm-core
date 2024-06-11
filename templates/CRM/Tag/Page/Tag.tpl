@@ -10,10 +10,10 @@
 <div class="crm-content-block">
   <div class="help">
     {ts 1=', '|implode:$usedFor}Tags are a convenient way to categorize data (%1).{/ts}
-    {if call_user_func(array('CRM_Core_Permission','check'), 'administer Tagsets')}
+    {crmPermission has='administer Tagsets'}
       <br />
       {ts}Create predefined tags in the main tree, or click the <strong>+</strong> to add a set for free tagging.{/ts}
-    {/if}
+    {/crmPermission}
     {docURL page="user/organising-your-data/groups-and-tags"}
   </div>
 
@@ -27,11 +27,11 @@
           <a href="#tagset-{$set.id}">{$set.label}</a>
         </li>
       {/foreach}
-      {if call_user_func(array('CRM_Core_Permission','check'), 'administer Tagsets')}
+      {crmPermission has='administer Tagsets'}
         <li class="ui-corner-all crm-tab-button" title="{ts}Add Tag Set{/ts}">
           <a href="#new-tagset"><i class="crm-i fa-plus" aria-hidden="true"></i></a>
         </li>
-      {/if}
+      {/crmPermission}
     </ul>
     <div id="tree">
       <div class="help">
@@ -410,14 +410,14 @@
   li.is-reserved > a:after {
     content: ' *';
   }
-  {/literal}{if !call_user_func(array('CRM_Core_Permission', 'check'), 'administer reserved tags')}{literal}
+  {/literal}{crmPermission not='administer reserved tags'}{literal}
     #tree li.is-reserved > a.crm-tag-item {
       cursor: not-allowed;
     }
     li.is-reserved > a:after {
       color: #8A1F11;
     }
-  {/literal}{/if}{literal}
+  {/literal}{/crmPermission}{literal}
   .tag-tree-wrapper ul {
     margin: 0;
     padding: 0;

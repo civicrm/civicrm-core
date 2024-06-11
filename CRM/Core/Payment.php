@@ -1241,8 +1241,11 @@ abstract class CRM_Core_Payment {
     }
 
     if ($this->_component == 'event') {
-      $eventID = Participant::get(FALSE)->addWhere('id', '=', $participantID)
-        ->addSelect('event_id')->execute()->single()['event_id'];
+      $eventID = NULL;
+      if ($participantID) {
+        $eventID = Participant::get(FALSE)->addWhere('id', '=', $participantID)
+          ->addSelect('event_id')->execute()->single()['event_id'];
+      }
       return CRM_Utils_System::url($this->getBaseReturnUrl(), [
         'reset' => 1,
         'cc' => 'fail',

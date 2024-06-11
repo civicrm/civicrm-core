@@ -15,11 +15,11 @@
 {/literal}
 </script>
 
-{if call_user_func(array('CRM_Core_Permission','check'), 'administer CiviCampaign')}
+{crmPermission has='administer CiviCampaign'}
   {capture assign="buttonTitle"}{ts}Edit Petition{/ts}{/capture}
   {crmButton target="_blank" p="civicrm/petition/add" q="reset=1&action=update&id=`$petition.id`" fb=1 title="$buttonTitle" icon="fa-wrench"}{ts}Configure{/ts}{/crmButton}
   <div class='clear'></div>
-{/if}
+{/crmPermission}
 
 {if ! $isActive}
   <p>{ts}Petition is no longer active.{/ts}</p>
