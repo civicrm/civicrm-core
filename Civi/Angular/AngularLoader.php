@@ -183,8 +183,8 @@ class AngularLoader {
         $res->addScriptFile('civicrm', 'ang/resetLocationProviderHashPrefix.js', 101, $this->getRegion(), FALSE);
       }
       foreach ($moduleNames as $moduleName) {
-        foreach ($this->angular->getResources($moduleName, 'css', 'cacheUrl') as $url) {
-          $res->addStyleUrl($url, self::DEFAULT_MODULE_WEIGHT + (++$headOffset), $this->getRegion());
+        foreach ($this->angular->getResources($moduleName, 'css', 'relUrl') as $relUrl) {
+          $res->addStyleFile($relUrl['ext'], $relUrl['file'], self::DEFAULT_MODULE_WEIGHT + (++$headOffset), $this->getRegion());
         }
         foreach ($this->angular->getResources($moduleName, 'js', 'cacheUrl') as $url) {
           $res->addScriptUrl($url, self::DEFAULT_MODULE_WEIGHT + (++$headOffset), $this->getRegion());
@@ -205,8 +205,8 @@ class AngularLoader {
       //$aggStyleUrl = \Civi::service('asset_builder')->getUrl('angular-modules.css', $assetParams);
       //$res->addStyleUrl($aggStyleUrl, 120, $this->getRegion());
 
-      foreach ($this->angular->getResources($moduleNames, 'css', 'cacheUrl') as $url) {
-        $res->addStyleUrl($url, self::DEFAULT_MODULE_WEIGHT + (++$headOffset), $this->getRegion());
+      foreach ($this->angular->getResources($moduleNames, 'css', 'relUrl') as $relUrl) {
+        $res->addStyleFile($relUrl['ext'], $relUrl['file'], self::DEFAULT_MODULE_WEIGHT + (++$headOffset), $this->getRegion());
       }
     }
     // Add bundles
