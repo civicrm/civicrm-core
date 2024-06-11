@@ -144,6 +144,7 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
    * Set variables up before form is built.
    *
    * @return void
+   * @throws \Civi\Core\Exception\DBQueryException
    */
   public function preProcess() {
     $values = [];
@@ -217,7 +218,6 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
           'id'
         );
 
-        $direction = strrev($membershipType['relationship_direction']);
         // To display relationship type in view membership page
         $sql = "
 SELECT relationship_type_id,
