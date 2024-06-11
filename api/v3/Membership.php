@@ -252,13 +252,13 @@ function _civicrm_api3_membership_relationsship_get_customv2behaviour(&$params, 
   $relationships = [];
   foreach ($membershipValues as $membershipId => $values) {
     // populate the membership type name for the membership type id
-    $membershipType = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($values['membership_type_id']) ?? [];
+    $membershipType = CRM_Member_BAO_MembershipType::getMembershipType($values['membership_type_id']) ?? [];
 
     if (!empty($membershipType)) {
       $membershipValues[$membershipId]['membership_name'] = $membershipType['name'];
 
       if (!empty($membershipType['relationship_type_id'])) {
-        $relationships[$membershipType['relationship_type_id']] = $membershipId;
+        $relationships[reset($membershipType['relationship_type_id'])] = $membershipId;
       }
     }
 

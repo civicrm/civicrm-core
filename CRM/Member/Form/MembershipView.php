@@ -179,7 +179,11 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
       // should be moved to the php layer - with financialacls using hooks.
       $this->assign('noACL', !CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus());
 
-      $membershipType = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($values['membership_type_id']);
+      $membershipType = \Civi\Api4\Membership::get(FALSE)
+        ->addSelect('relationship_direction', 'relationship_type_id')
+        ->addWhere('id', '=', $values['membership_type_id'])
+        ->execute()
+        ->first();
 
       // Do the action on related Membership if needed
       $relAction = CRM_Utils_Request::retrieve('relAction', 'String', $this);
@@ -215,7 +219,6 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
 
         $direction = strrev($membershipType['relationship_direction']);
         // To display relationship type in view membership page
-        $relTypeIds = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ",", $membershipType['relationship_type_id']);
         $sql = "
 SELECT relationship_type_id,
   CASE
@@ -223,7 +226,7 @@ SELECT relationship_type_id,
   WHEN  contact_id_b = {$values['owner_contact_id']} AND contact_id_a = {$values['contact_id']} THEN 'a_b'
 END AS 'relType'
   FROM civicrm_relationship
- WHERE relationship_type_id IN ($relTypeIds)";
+ WHERE relationship_type_id IN ({$membershipType['relationship_type_id']})";
         $dao = CRM_Core_DAO::executeQuery($sql);
         $values['relationship'] = NULL;
         while ($dao->fetch()) {
@@ -249,10 +252,8 @@ END AS 'relType'
         $this->assign('has_related', TRUE);
         $this->assign('max_related', $values['max_related'] ?? ts('Unlimited'));
         // split the relations in 2 arrays based on direction
-        $relTypeId = explode(CRM_Core_DAO::VALUE_SEPARATOR, $membershipType['relationship_type_id']);
-        $relDirection = explode(CRM_Core_DAO::VALUE_SEPARATOR, $membershipType['relationship_direction']);
-        foreach ($relTypeId as $x => $rid) {
-          $relTypeDir[substr($relDirection[$x], 0, 1)][] = $rid;
+        foreach ($membershipType['relationship_type_id'] as $x => $rid) {
+          $relTypeDir[substr($membershipType['relationship_direction'][$x], 0, 1)][] = $rid;
         }
         // build query in 2 parts with a UNION if necessary
         // _x and _y are replaced with _a and _b first, then vice-versa
