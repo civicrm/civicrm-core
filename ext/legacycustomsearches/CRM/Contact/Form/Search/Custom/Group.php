@@ -396,7 +396,7 @@ WHERE  gcc.group_id = {$ssGroup->id}
         }
       }
 
-      $this->_iGTable->createWithColumns("id int PRIMARY KEY AUTO_INCREMENT, contact_id int, group_names varchar(64)");
+      $this->_iGTable->createWithColumns("id int PRIMARY KEY AUTO_INCREMENT, contact_id int, group_names varchar(255)");
 
       if ($iGroups) {
         $includeGroup = "INSERT INTO {$this->_iGTableName} (contact_id, group_names)
