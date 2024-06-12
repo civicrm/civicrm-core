@@ -259,7 +259,12 @@ trait DAOActionTrait {
 
       // Uglify checkbox values for the sake of CustomField::formatCustomField()
       if ($field['html_type'] === 'CheckBox' && is_array($value)) {
-        $value = array_fill_keys($value, TRUE);
+        if (empty($value)) {
+          $value = '';
+        }
+        else {
+          $value = array_fill_keys($value, TRUE);
+        }
       }
 
       // Match contact id to strings like "user_contact_id"
