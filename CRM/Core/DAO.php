@@ -3220,9 +3220,9 @@ SELECT contact_id
       $allTableNames = CRM_Core_DAO_AllCoreTables::tables();
       $relatedEntities = array_intersect_key(array_flip((array) $entityTableValues), $allTableNames);
     }
-    // No valid entity_table in WHERE clause so build an ACL case for every possible entity type
+    // No valid entity_table in WHERE clause so build an ACL case for every enabled entity type
     if (empty($relatedEntities)) {
-      $relatedEntities = static::buildOptions($entityTableField, 'get');
+      $relatedEntities = static::buildOptions($entityTableField, 'create');
     }
     // Hmm, this entity is missing entity_table pseudoconstant. We really should fix that.
     if (!$relatedEntities) {
@@ -3232,6 +3232,10 @@ SELECT contact_id
     foreach ($relatedEntities as $table => $ent) {
       // Ensure $ent is the machine name of the entity not a translated title
       $ent = CRM_Core_DAO_AllCoreTables::getEntityNameForTable($table);
+      // Skip if entity doesn't exist. This shouldn't happen, but better safe than sorry.
+      if (!$ent) {
+        continue;
+      }
       // Prevent infinite recursion
       $subquery = $table === static::getTableName() ? NULL : CRM_Utils_SQL::mergeSubquery($ent);
       if ($subquery) {
