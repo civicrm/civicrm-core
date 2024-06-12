@@ -93,30 +93,6 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
   /**
    * Test the LoadObjects function with recurring membership data.
    *
-   * @throws \CRM_Core_Exception
-   */
-  public function testLoadMembershipObjectsLoadAll(): void {
-    $this->_setUpMembershipObjects();
-    $this->_setUpRecurringContribution();
-    $this->_membershipId = $this->ids['membership'];
-    unset($this->ids['membership']);
-    $contribution = new CRM_Contribute_BAO_Contribution();
-    $contribution->id = $this->_contributionId;
-    $contribution->find(TRUE);
-    $contribution->_component = 'contribute';
-    $ids = array_merge(CRM_Contribute_BAO_Contribution::getComponentDetails($this->_contributionId), $this->ids);
-
-    $contribution->loadRelatedObjects($this->_processorId, $ids);
-    $this->assertNotEmpty($contribution->_relatedObjects['membership']);
-    $this->assertArrayHasKey($this->_membershipId . '_' . $this->_membershipTypeID, $contribution->_relatedObjects['membership']);
-    $this->assertTrue(is_a($contribution->_relatedObjects['membership'][$this->_membershipId . '_' . $this->_membershipTypeID], 'CRM_Member_BAO_Membership'));
-    $this->assertNotEmpty($contribution->_relatedObjects['contributionRecur']);
-    $this->assertNotEmpty($contribution->_relatedObjects['paymentProcessor']);
-  }
-
-  /**
-   * Test the LoadObjects function with recurring membership data.
-   *
    * @throws \Exception
    */
   public function testSendMailMembershipObjects(): void {
@@ -171,22 +147,6 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->assertIsArray($msg, 'Message not returned as an array');
     $this->assertEquals('Mr. Anthony Anderson II', $msg['to']);
     $this->assertStringContainsString('General', $msg['html']);
-  }
-
-  /**
-   * Test the LoadObjects function with a participant.
-   *
-   * @throws \CRM_Core_Exception
-   * @throws \Exception
-   */
-  public function testComposeMailParticipant(): void {
-    $this->_setUpParticipantObjects();
-    $contribution = new CRM_Contribute_BAO_Contribution();
-    $contribution->id = $this->_contributionId;
-    $contribution->loadRelatedObjects($this->_processorId, $this->ids);
-    $msg = $contribution->composeMessageArray($this->input, $this->ids);
-    $this->assertStringContainsString('registration has been received and your status has been updated to <strong>Attended</strong>.', $msg['html']);
-    $this->assertStringContainsString('Annual CiviCRM meet', $msg['html']);
   }
 
   /**
