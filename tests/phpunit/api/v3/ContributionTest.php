@@ -3269,7 +3269,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * Test completing a transaction with an event via the API.
    *
-   * Note that we are creating a logged in user because email goes out from
+   * Note that we are creating a logged-in user because email goes out from
    * that person
    */
   public function testCompleteTransactionWithParticipantRecord(): void {
@@ -3310,7 +3310,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'This is a confirmation that your registration has been received and your status has been updated to Registered.',
       'First Name',
       'Logged In',
-      'Public Event Post Post Profile',
+      'Public title',
       'public 2',
       'public 3',
     ], ['Back end title', 'title_post_2', 'title_post_3']);

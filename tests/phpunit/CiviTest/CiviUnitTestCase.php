@@ -2485,7 +2485,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  protected function createPartiallyPaidParticipantOrder() {
+  protected function createPartiallyPaidParticipantOrder(): array {
     $orderParams = $this->getParticipantOrderParams();
     $orderParams['api.Payment.create'] = ['total_amount' => 150];
     return $this->callAPISuccess('Order', 'create', $orderParams);
@@ -3375,10 +3375,11 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    */
   protected function getParticipantOrderParams(): array {
     $this->eventCreatePaid();
+    $contactID = $this->individualCreate();
     return [
       'total_amount' => 300,
       'currency' => 'USD',
-      'contact_id' => $this->individualCreate(),
+      'contact_id' => $contactID,
       'financial_type_id' => 4,
       'line_items' => [
         [
@@ -3418,7 +3419,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
             'role_id' => 1,
             'status_id' => 14,
             'fee_currency' => 'USD',
-            'contact_id' => $this->individualCreate(),
+            'contact_id' => $contactID,
           ],
         ],
       ],
