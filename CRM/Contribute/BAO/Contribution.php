@@ -2123,10 +2123,14 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * @param array $ids
    *   Ids as Loaded by Payment Processor.
    *
+   * @deprecated since 5.75 will be removed around 5.99.
+   * Note some universe usages exist but may be in unused extensions.
+   *
    * @return bool
    * @throws CRM_Core_Exception
    */
   public function loadRelatedObjects($paymentProcessorID, &$ids) {
+    CRM_Core_Error::deprecatedFunctionWarning('use Payment.create to complete orders');
     // @todo deprecate this function - we are slowly returning the functionality to
     // the calling functions so this can be unravelled. It is only called from
     // tests, composeMessage & transitionComponents. The last of these is itself
@@ -2267,8 +2271,86 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $intentionalEnotice = $CRM16923AnUnreliableMethodHasBeenUserToDeterminePaymentProcessorFromContributionPage;
       }
     }
+    $ids['contributionType'] = $this->financial_type_id;
+    $ids['financialType'] = $this->financial_type_id;
+    if ($this->contribution_page_id) {
+      $ids['contributionPage'] = $this->contribution_page_id;
+    }
 
-    $this->loadRelatedObjects($paymentProcessorID, $ids);
+    $this->loadRelatedEntitiesByID($ids);
+
+    if (!empty($ids['contributionRecur']) && !$paymentProcessorID) {
+      $paymentProcessorID = $this->_relatedObjects['contributionRecur']->payment_processor_id;
+    }
+
+    if (!empty($ids['pledge_payment'])) {
+      foreach ($ids['pledge_payment'] as $key => $paymentID) {
+        if (empty($paymentID)) {
+          continue;
+        }
+        $payment = new CRM_Pledge_BAO_PledgePayment();
+        $payment->id = $paymentID;
+        if (!$payment->find(TRUE)) {
+          throw new CRM_Core_Exception("Could not find pledge payment record: " . $paymentID);
+        }
+        $this->_relatedObjects['pledge_payment'][] = $payment;
+      }
+    }
+
+    // These are probably no longer accessed from anywhere
+    // @todo remove this line, after ensuring not used.
+    $ids = $this->loadRelatedMembershipObjects($ids);
+
+    if ($this->_component != 'contribute') {
+      // we are in event mode
+      // make sure event exists and is valid
+      $event = new CRM_Event_BAO_Event();
+      $event->id = $ids['event'];
+      if ($ids['event'] &&
+        !$event->find(TRUE)
+      ) {
+        throw new CRM_Core_Exception("Could not find event: " . $ids['event']);
+      }
+
+      $this->_relatedObjects['event'] = &$event;
+
+      $participant = new CRM_Event_BAO_Participant();
+      $participant->id = $ids['participant'];
+      if ($ids['participant'] &&
+        !$participant->find(TRUE)
+      ) {
+        throw new CRM_Core_Exception("Could not find participant: " . $ids['participant']);
+      }
+      $participant->register_date = CRM_Utils_Date::isoToMysql($participant->register_date);
+
+      $this->_relatedObjects['participant'] = &$participant;
+
+      // get the payment processor id from event - this is inaccurate see CRM-16923
+      // in future we should look at throwing an exception here rather than an dubious guess.
+      if (!$paymentProcessorID) {
+        $paymentProcessorID = $this->_relatedObjects['event']->payment_processor;
+        if ($paymentProcessorID) {
+          $intentionalEnotice = $CRM16923AnUnreliableMethodHasBeenUserToDeterminePaymentProcessorFromEvent;
+        }
+      }
+    }
+
+    $relatedContact = CRM_Contribute_BAO_Contribution::getOnbehalfIds($this->id);
+    if (!empty($relatedContact['individual_id'])) {
+      $ids['related_contact'] = $relatedContact['individual_id'];
+    }
+
+    if ($paymentProcessorID) {
+      $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($paymentProcessorID,
+        $this->is_test ? 'test' : 'live'
+      );
+      $ids['paymentProcessor'] = $paymentProcessorID;
+      $this->_relatedObjects['paymentProcessor'] = $paymentProcessor;
+    }
+
+    // Add contribution id to $ids. CRM-20401
+    $ids['contribution'] = $this->id;
+
     $paymentProcessor = $this->_relatedObjects['paymentProcessor'] ?? NULL;
     $eventID = isset($ids['event']) ? (int) $ids['event'] : NULL;
     $participantID = isset($ids['participant']) ? (int) $ids['participant'] : NULL;
