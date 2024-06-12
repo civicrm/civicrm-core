@@ -242,6 +242,7 @@ function civicrm_api3_extension_download($params) {
   }
   CRM_Extension_System::singleton()->getCache()->flush();
   CRM_Extension_System::singleton(TRUE);
+  CRM_Extension_System::singleton()->getClassLoader()->register();
   if ($params['install']) {
     CRM_Extension_System::singleton()->getManager()->install([$params['key']]);
   }
