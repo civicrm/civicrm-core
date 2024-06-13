@@ -165,7 +165,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $_REQUEST['mode'] = 'live';
     // Add someone to the waitlist.
     $waitlistContactID = $this->individualCreate();
-    $waitlistParticipantID = $this->participantCreate(['event_id' => $event['id'], 'contact_id' => $waitlistContactID, 'status_id' => 'On waitlist']);
+    $waitlistParticipantID = $this->participantCreate(['event_id' => $event['id'], 'contact_id' => $waitlistContactID, 'status_id.name' => 'On waitlist']);
 
     $waitlistParticipant = $this->callAPISuccess('Participant', 'getsingle', ['id' => $waitlistParticipantID, 'return' => ['participant_status']]);
     $this->assertEquals('On waitlist', $waitlistParticipant['participant_status'], 'Invalid participant status. Expecting: On waitlist');

@@ -832,7 +832,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       $params['event_id'] = $event['id'];
     }
     $defaults = [
-      'status_id' => 2,
       'role_id' => 1,
       'register_date' => 20070219,
       'source' => 'Wimbledon',
@@ -841,7 +840,10 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     ];
 
     $params = array_merge($defaults, $params);
-    $result = $this->callAPISuccess('Participant', 'create', $params);
+    if (empty($params['status_id']) && empty($params['status_id.name'])) {
+      $params['status_id.name'] = 'Attended';
+    }
+    $result = $this->createTestEntity('Participant', $params);
     return $result['id'];
   }
 

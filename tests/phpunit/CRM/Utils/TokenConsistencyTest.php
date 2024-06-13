@@ -1151,7 +1151,7 @@ United States', $tokenProcessor->getRow(0)->render('message'));
       'event_id' => $this->ids['Event'][0],
       'fee_amount' => 50,
       'fee_level' => 'steep',
-      $this->getCustomFieldName('participant_int') => '99999',
+      $this->getCustomFieldName('participant_int', 4) => '99999',
     ]);
   }
 
