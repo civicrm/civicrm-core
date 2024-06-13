@@ -241,6 +241,7 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
       if (!$this->isDefined('Membership')) {
         $membership = Membership::get(FALSE)
           ->addWhere('contribution_recur_id', '=', $this->getContributionRecurID())
+          ->addSelect('*', 'membership_type_id.name')
           ->execute()->first();
         if ($membershipID && (!$membership || ($membership['id'] !== $membershipID))) {
           // this feels unreachable
