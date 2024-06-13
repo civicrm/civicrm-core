@@ -2388,12 +2388,18 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $this->_relatedObjects['paymentProcessor'] = $paymentProcessor;
     }
 
-    // Add contribution id to $ids. CRM-20401
-    $ids['contribution'] = $this->id;
-
     $paymentProcessor = $this->_relatedObjects['paymentProcessor'] ?? NULL;
     $eventID = isset($ids['event']) ? (int) $ids['event'] : NULL;
     $participantID = isset($ids['participant']) ? (int) $ids['participant'] : NULL;
+    $relatedContactID = isset($ids['related_contact']) ? (int) $ids['related_contact'] : NULL;
+    $contributionID = (int) $this->id;
+    $contactID = (int) $ids['contact'];
+    $onbehalfDedupeAlert = $ids['onbehalf_dupe_alert'] ?? NULL;
+    // not sure whether it is possible for this not to be an array - load related contacts loads an array but this code was expecting a string
+    // the addition of the casting is in case it could get here & be a string. Added in 4.6 - maybe remove later? This AuthorizeNetIPN & PaypalIPN tests hit this
+    // line having loaded an array
+    $membershipIDs = !empty($ids['membership']) ? (array) $ids['membership'] : NULL;
+    unset($ids);
 
     //not really sure what params might be passed in but lets merge em into values
     $values = array_merge($this->_gatherMessageValues($values, $eventID, $participantID), $values);
@@ -2411,17 +2417,13 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $paymentObject = Civi\Payment\System::singleton()->getByProcessor($paymentProcessor);
 
       $entityID = $entity = NULL;
-      if (isset($ids['contribution'])) {
+      if ($contributionID) {
         $entity = 'contribution';
-        $entityID = $ids['contribution'];
+        $entityID = $contributionID;
       }
-      if (!empty($ids['membership'])) {
-        // not sure whether it is possible for this not to be an array - load related contacts loads an array but this code was expecting a string
-        // the addition of the casting is in case it could get here & be a string. Added in 4.6 - maybe remove later? This AuthorizeNetIPN & PaypalIPN tests hit this
-        // line having loaded an array
-        $ids['membership'] = (array) $ids['membership'];
+      if ($membershipIDs) {
         $entity = 'membership';
-        $entityID = $ids['membership'][0];
+        $entityID = $membershipIDs[0];
       }
 
       $template->assign('cancelSubscriptionUrl', $paymentObject->subscriptionURL($entityID, $entity, 'cancel'));
@@ -2444,7 +2446,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
       $ufJoinParams = [
         'entity_table' => 'civicrm_event',
-        'entity_id' => $ids['event'],
+        'entity_id' => $eventID,
         'module' => 'CiviEvent',
       ];
 
@@ -2465,23 +2467,23 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $values['is_email_receipt'] = 1;
       }
 
-      if (!empty($ids['contribution'])) {
-        $values['contributionId'] = $ids['contribution'];
+      if ($contributionID) {
+        $values['contributionId'] = $contributionID;
       }
 
-      return CRM_Event_BAO_Event::sendMail($ids['contact'], $values,
+      return CRM_Event_BAO_Event::sendMail($contactID, $values,
         $participantID, $this->is_test, $returnMessageText
       );
     }
     else {
       $values['contribution_id'] = $this->id;
-      if (!empty($ids['related_contact'])) {
-        $values['related_contact'] = $ids['related_contact'];
-        if (isset($ids['onbehalf_dupe_alert'])) {
-          $values['onbehalf_dupe_alert'] = $ids['onbehalf_dupe_alert'];
+      if ($relatedContactID) {
+        $values['related_contact'] = $relatedContactID;
+        if ($onbehalfDedupeAlert) {
+          $values['onbehalf_dupe_alert'] = $onbehalfDedupeAlert;
         }
         $entityBlock = [
-          'contact_id' => $ids['contact'],
+          'contact_id' => $contactID,
           'location_type_id' => CRM_Core_DAO::getFieldValue('CRM_Core_DAO_LocationType',
             'Home', 'id', 'name'
           ),
@@ -2516,7 +2518,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
               $template->assign('updateSubscriptionUrl', $url);
             }
 
-            $result = CRM_Contribute_BAO_ContributionPage::sendMail($ids['contact'], $values, $isTest, $returnMessageText);
+            $result = CRM_Contribute_BAO_ContributionPage::sendMail($contactID, $values, $isTest, $returnMessageText);
 
             return $result;
             // otherwise if its about sending emails, continue sending without return, as we
@@ -2526,7 +2528,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
       else {
         $values['modelProps'] = $input['modelProps'] ?? [];
-        return CRM_Contribute_BAO_ContributionPage::sendMail($ids['contact'], $values, $isTest, $returnMessageText);
+        return CRM_Contribute_BAO_ContributionPage::sendMail($contactID, $values, $isTest, $returnMessageText);
       }
     }
   }
