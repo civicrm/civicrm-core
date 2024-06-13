@@ -660,7 +660,7 @@ final class Url implements \JsonSerializable {
 
       // Handle 'frontend', 'backend', 'service', and any extras.
       default:
-        $result = $userSystem->getRouteUrl($scheme, $this->getPath(), $this->getQuery());
+        $result = $userSystem->getRouteUrl($scheme, $this->getPath(), $this->getQuery(), $preferFormat);
         if ($result === NULL) {
           $event = GenericHookEvent::create(['url' => $this, 'result' => &$result]);
           \Civi::dispatcher()->dispatch('civi.url.render.' . $scheme, $event);
