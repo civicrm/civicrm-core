@@ -149,11 +149,6 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
       $defaults['options_per_line'] = 1;
       $defaults['is_display_amounts'] = 1;
     }
-    $enabledComponents = CRM_Core_Component::getEnabledComponents();
-    $eventComponentId = NULL;
-    if (array_key_exists('CiviEvent', $enabledComponents)) {
-      $eventComponentId = CRM_Core_Component::getComponentID('CiviEvent');
-    }
 
     if (isset($this->_sid) && $this->_action == CRM_Core_Action::ADD) {
       $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_sid, 'financial_type_id');
