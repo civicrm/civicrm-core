@@ -2364,15 +2364,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $participant->register_date = CRM_Utils_Date::isoToMysql($participant->register_date);
 
       $this->_relatedObjects['participant'] = &$participant;
-
-      // get the payment processor id from event - this is inaccurate see CRM-16923
-      // in future we should look at throwing an exception here rather than an dubious guess.
-      if (!$paymentProcessorID) {
-        $paymentProcessorID = $this->_relatedObjects['event']->payment_processor;
-        if ($paymentProcessorID) {
-          $intentionalEnotice = $CRM16923AnUnreliableMethodHasBeenUserToDeterminePaymentProcessorFromEvent;
-        }
-      }
     }
 
     $relatedContact = CRM_Contribute_BAO_Contribution::getOnbehalfIds($this->id);
@@ -2380,15 +2371,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $ids['related_contact'] = $relatedContact['individual_id'];
     }
 
-    if ($paymentProcessorID) {
-      $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($paymentProcessorID,
-        $this->is_test ? 'test' : 'live'
-      );
-      $ids['paymentProcessor'] = $paymentProcessorID;
-      $this->_relatedObjects['paymentProcessor'] = $paymentProcessor;
-    }
-
-    $paymentProcessor = $this->_relatedObjects['paymentProcessor'] ?? NULL;
     $eventID = isset($ids['event']) ? (int) $ids['event'] : NULL;
     $participantID = isset($ids['participant']) ? (int) $ids['participant'] : NULL;
     $relatedContactID = isset($ids['related_contact']) ? (int) $ids['related_contact'] : NULL;
@@ -2413,7 +2395,11 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $template = $this->_assignMessageVariablesToTemplate($values, $input, $returnMessageText);
     //what does recur 'mean here - to do with payment processor return functionality but
     // what is the importance
-    if (!empty($this->contribution_recur_id) && !empty($paymentProcessor)) {
+    if (!empty($this->contribution_recur_id) && $paymentProcessorID) {
+      // Probably we don't need these 2 lines & can do Civi\Payment\System::singleton()->getById()
+      $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($paymentProcessorID,
+        $this->is_test ? 'test' : 'live'
+      );
       $paymentObject = Civi\Payment\System::singleton()->getByProcessor($paymentProcessor);
 
       $entityID = $entity = NULL;
