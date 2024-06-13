@@ -194,15 +194,6 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     $visibilityType = CRM_Core_PseudoConstant::visibility();
     $this->assign('visibilityType', $visibilityType);
 
-    $enabledComponents = CRM_Core_Component::getEnabledComponents();
-    $eventComponentId = $memberComponentId = NULL;
-    if (array_key_exists('CiviEvent', $enabledComponents)) {
-      $eventComponentId = CRM_Core_Component::getComponentID('CiviEvent');
-    }
-    if (array_key_exists('CiviMember', $enabledComponents)) {
-      $memberComponentId = CRM_Core_Component::getComponentID('CiviMember');
-    }
-
     $attributes = CRM_Core_DAO::getAttribute('CRM_Price_DAO_PriceFieldValue');
 
     $this->add('select', 'financial_type_id',
@@ -211,7 +202,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     );
 
     $this->assign('useForMember', FALSE);
-    if (in_array($eventComponentId, $this->_extendComponentId)) {
+    if ($this->extendsEvent()) {
       $this->add('text', 'count', ts('Participant Count'), $attributes['count']);
 
       $this->addRule('count', ts('Participant Count should be a positive number'), 'positiveInteger');
@@ -222,7 +213,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
       $this->assign('useForEvent', TRUE);
     }
     else {
-      if (in_array($memberComponentId, $this->_extendComponentId)) {
+      if ($this->extendsMembership()) {
         $this->_useForMember = 1;
         $this->assign('useForMember', $this->_useForMember);
       }
@@ -277,7 +268,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
         ts('Financial Type'),
         ['' => ts('- select -')] + $financialTypes
       );
-      if (in_array($eventComponentId, $this->_extendComponentId)) {
+      if ($this->extendsEvent()) {
         // count
         $this->add('text', 'option_count[' . $i . ']', ts('Participant Count'), $attributes['count']);
         $this->addRule('option_count[' . $i . ']', ts('Please enter a valid Participants Count.'), 'positiveInteger');
@@ -289,7 +280,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
         // description
         //$this->add('textArea', 'option_description['.$i.']', ts('Description'), array('rows' => 1, 'cols' => 40 ));
       }
-      elseif (in_array($memberComponentId, $this->_extendComponentId)) {
+      if ($this->extendsMembership()) {
         $membershipTypes = CRM_Member_PseudoConstant::membershipType();
         $js = ['onchange' => "calculateRowValues( $i );"];
 
@@ -694,6 +685,30 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     $params['membership_num_terms'] = (!empty($params['membership_type_id'])) ? CRM_Utils_Array::value('membership_num_terms', $params, 1) : NULL;
 
     return CRM_Price_BAO_PriceField::create($params);
+  }
+
+  /**
+   * Does the price Set extend events.
+   *
+   * @return bool
+   */
+  protected function extendsMembership(): bool {
+    if (!CRM_Core_Component::isEnabled('CiviMember')) {
+      return FALSE;
+    }
+    return in_array(CRM_Core_Component::getComponentID('CiviMember'), array_filter($this->_extendComponentId));
+  }
+
+  /**
+   * Does the price Set extend events.
+   *
+   * @return bool
+   */
+  protected function extendsEvent(): bool {
+    if (!CRM_Core_Component::isEnabled('CiviEvent')) {
+      return FALSE;
+    }
+    return in_array(CRM_Core_Component::getComponentID('CiviEvent'), array_filter($this->_extendComponentId));
   }
 
 }
