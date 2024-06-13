@@ -144,7 +144,10 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         continue;
       }
       $fieldSpec = $this->getFieldMetadata($mappedField['name']);
-      $fieldValue = $values[$i];
+      $columnHeader = $this->getUserJob()['metadata']['DataSource']['column_headers'][$i] ?? '';
+      // If there is no column header we are dealing with an added value mapping, do not use
+      // the database value as it will be for (e.g.) `_status`
+      $fieldValue = $columnHeader ? $values[$i] : '';
       if ($fieldValue === '' && isset($mappedField['default_value'])) {
         $fieldValue = $mappedField['default_value'];
       }
