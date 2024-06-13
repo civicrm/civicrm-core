@@ -108,7 +108,7 @@ return [
     'financial_type_id' => [
       'title' => ts('Financial Type ID'),
       'sql_type' => 'int unsigned',
-      'input_type' => 'EntityRef',
+      'input_type' => 'Select',
       'required' => TRUE,
       'description' => ts('If membership is paid by a contribution - what financial type should be used. FK to civicrm_financial_type.id'),
       'add' => '4.3',
