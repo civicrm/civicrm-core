@@ -39,6 +39,7 @@
 !/ext/civi_report
 !/ext/scheduled_communications
 !/ext/user_dashboard
+!/ext/tellafriend
 backdrop/
 bower_components
 CRM/Case/xml/configuration

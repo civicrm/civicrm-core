@@ -12268,24 +12268,6 @@ INSERT INTO `civicrm_tag` (`id`, `name`, `label`, `description`, `parent_id`, `i
 UNLOCK TABLES;
 
 --
--- Dumping data for table `civicrm_tell_friend`
---
-
-LOCK TABLES `civicrm_tell_friend` WRITE;
-/*!40000 ALTER TABLE `civicrm_tell_friend` DISABLE KEYS */;
-INSERT INTO `civicrm_tell_friend` (`id`, `entity_table`, `entity_id`, `title`, `intro`, `suggested_message`, `general_link`, `thankyou_title`, `thankyou_text`, `is_active`) VALUES
- (1,'civicrm_contribution_page',1,'Tell A Friend','<p>Help us spread the word and leverage the power of your contribution by telling your friends. Use the space below to personalize your email message - let your friends know why you support us. Then fill in the name(s) and email address(es) and click \'Send Your Message\'.</p>','Thought you might be interested in learning about and helping this organization. I think they do important work.',NULL,'Thanks for Spreading the Word','<p><strong>Thanks for telling your friends about us and supporting our efforts. Together we can make a difference.</strong></p>',1),
- (2,'civicrm_event',1,'Tell A Friend','<p>Help us spread the word about this event. Use the space below to personalize your email message - let your friends know why you\'re attending. Then fill in the name(s) and email address(es) and click \'Send Your Message\'.</p>','Thought you might be interested in checking out this event. I\'m planning on attending.',NULL,'Thanks for Spreading the Word','<p>Thanks for spreading the word about this event to your friends.</p>',1),
- (3,'civicrm_event',6,'Tell A Friend','<p>Help us spread the word about this event. Use the space below to personalize your email message - let your friends know why you\'re attending. Then fill in the name(s) and email address(es) and click \'Send Your Message\'.</p>','Thought you might be interested in checking out this event. I\'m planning on attending.',NULL,'Thanks for Spreading the Word','<p>Thanks for spreading the word about this event to your friends.</p>',1),
- (4,'civicrm_event',1,'Tell A Friend','<p>Help us spread the word about this event. Use the space below to personalize your email message - let your friends know why you\'re attending. Then fill in the name(s) and email address(es) and click \'Send Your Message\'.</p>','Thought you might be interested in checking out this event. I\'m planning on attending.',NULL,'Thanks for Spreading the Word','<p>Thanks for spreading the word about this event to your friends.</p>',1),
- (5,'civicrm_event',3,'Tell A Friend','<p>Help us spread the word about this event. Use the space below to personalize your email message - let your friends know why you\'re attending. Then fill in the name(s) and email address(es) and click \'Send Your Message\'.</p>','Thought you might be interested in checking out this event. I\'m planning on attending.',NULL,'Thanks for Spreading the Word','<p>Thanks for spreading the word about this event to your friends.</p>',1),
- (6,'civicrm_event',4,'Tell A Friend','<p>Help us spread the word about this event. Use the space below to personalize your email message - let your friends know why you\'re attending. Then fill in the name(s) and email address(es) and click \'Send Your Message\'.</p>','Thought you might be interested in checking out this event. I\'m planning on attending.',NULL,'Thanks for Spreading the Word','<p>Thanks for spreading the word about this event to your friends.</p>',1),
- (7,'civicrm_event',5,'Tell A Friend','<p>Help us spread the word about this event. Use the space below to personalize your email message - let your friends know why you\'re attending. Then fill in the name(s) and email address(es) and click \'Send Your Message\'.</p>','Thought you might be interested in checking out this event. I\'m planning on attending.',NULL,'Thanks for Spreading the Word','<p>Thanks for spreading the word about this event to your friends.</p>',1),
- (8,'civicrm_event',2,'Tell A Friend','<p>Help us spread the word about this event. Use the space below to personalize your email message - let your friends know why you\'re attending. Then fill in the name(s) and email address(es) and click \'Send Your Message\'.</p>','Thought you might be interested in checking out this event. I\'m planning on attending.',NULL,'Thanks for Spreading the Word','<p>Thanks for spreading the word about this event to your friends.</p>',1);
-/*!40000 ALTER TABLE `civicrm_tell_friend` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Dumping data for table `civicrm_timezone`
 --
 
