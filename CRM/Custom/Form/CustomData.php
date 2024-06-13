@@ -72,11 +72,6 @@ class CRM_Custom_Form_CustomData {
         self::setDefaultValues($form);
       }
     }
-    // need to assign custom data type and subtype to the template
-    $form->assign('customDataType', $entityName);
-    $form->assign('customDataSubType', $entitySubType);
-    $form->assign('entityID', $entityID);
-    $form->assign('cid', $contact_id);
   }
 
   /**
