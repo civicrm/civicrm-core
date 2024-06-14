@@ -91,6 +91,8 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
 
   /**
    * Test get participants with role_id.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testGetParticipantWithRole(): void {
     $roleId = [1, 2, 3];
@@ -105,22 +107,18 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $params = [
       'role_id' => 2,
     ];
-    $result = $this->callAPISuccess('participant', 'get', $params);
+    $result = $this->callAPISuccess('Participant', 'get', $params);
     //Assert all the returned participants has a role_id of 2
     foreach ($result['values'] as $values) {
       $this->assertEquals(2, $values['participant_role_id']);
     }
 
-    $this->participantCreate([
-      'id' => $this->ids['Participant']['primary'],
-      'role_id' => NULL,
-      'event_id' => $this->getEventID(),
-    ]);
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_participant SET role_id = NULL WHERE id = ' . $this->ids['Participant']['primary']);
 
     $params['role_id'] = [
       'IS NULL' => 1,
     ];
-    $result = $this->callAPISuccess('participant', 'get', $params);
+    $result = $this->callAPISuccess('Participant', 'get', $params);
     foreach ($result['values'] as $values) {
       $this->assertEquals(NULL, $values['participant_role_id']);
     }
@@ -688,13 +686,13 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $this->isValidateFinancialsOnPostAssert = FALSE;
     $participantID = $this->participantCreate([
       'contact_id' => $this->_contactID,
-      'status_id' => 5,
+      'status_id.name' => 'Pending from pay later',
       'event_id' => $this->getEventID(),
     ]);
     $participantID2 = $this->participantCreate([
       'contact_id' => $this->_contactID2,
       'event_id' => $this->getEventID(),
-      'status_id' => 5,
+      'status_id.name' => 'Pending from pay later',
       'registered_by_id' => $participantID,
     ]);
 

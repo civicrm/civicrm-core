@@ -153,7 +153,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testComposeMailParticipantObjects(): void {
-    $this->_setUpParticipantObjects();
+    $this->setUpParticipantObjects();
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->id = $this->_contributionId;
     $msg = $contribution->composeMessageArray($this->input, $this->ids);
@@ -165,7 +165,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
    * Test the LoadObjects function with recurring membership data.
    */
   public function testSendMailParticipantObjectsCheckLog(): void {
-    $this->_setUpParticipantObjects();
+    $this->setUpParticipantObjects();
     $mut = new CiviMailUtils($this, TRUE);
     $this->callAPISuccess('Contribution', 'sendconfirmation', [
       'id' => $this->_contributionId,
@@ -184,7 +184,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testSendMailParticipantObjectsNoMail(): void {
-    $this->_setUpParticipantObjects();
+    $this->setUpParticipantObjects();
     $event = new CRM_Event_BAO_Event();
     $event->id = $this->_eventId;
     $event->is_email_confirm = FALSE;
@@ -326,7 +326,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
    *   The participant to create status
    *
    */
-  public function _setUpParticipantObjects(string $participantStatus = 'Attended'): void {
+  public function setUpParticipantObjects(string $participantStatus = 'Attended'): void {
     $event = $this->eventCreatePaid(['is_email_confirm' => 1, 'email_confirm_text' => '']);
     $this->setupContribution();
 
@@ -334,7 +334,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->_participantId = $this->participantCreate([
       'event_id' => $this->_eventId,
       'contact_id' => $this->_contactId,
-      'status_id' => $participantStatus,
+      'status_id.name' => $participantStatus,
     ]);
 
     $this->callAPISuccess('participant_payment', 'create', [
