@@ -92,7 +92,7 @@ function _standalone_setup_scheme(): string {
 
     // private directories
     $model->paths['civicrm.private']['path'] = $privatePath = $appRootPath . '/private';
-    $model->paths['civicrm.compile']['path'] = $model->templateCompilePath = $privatePath . '/compiler_cache';
+    $model->paths['civicrm.compile']['path'] = $model->templateCompilePath = $privatePath . '/cache';
     $model->paths['civicrm.log']['path'] = $privatePath . '/log';
     $model->paths['civicrm.l10n']['path'] = $privatePath . '/l10n';
     $model->mandatorySettings['customFileUploadDir'] = '[cms.root]/private/attachment';
