@@ -148,4 +148,22 @@ trait CRM_Custom_Form_CustomDataTrait {
     return is_string($this->getSubmitValue($elementName)) ? CRM_Utils_String::purifyHTML($this->getSubmitValue($elementName)) : $this->getSubmitValue($elementName);
   }
 
+  /**
+   * Get the submitted custom fields.
+   *
+   * This is returned apiv3 style but in future could take
+   * api version as a parameter.
+   *
+   * @return array
+   */
+  protected function getSubmittedCustomFields(): array {
+    $fields = [];
+    foreach ($this->getSubmittedValues() as $label => $field) {
+      if (CRM_Core_BAO_CustomField::getKeyID($label)) {
+        $fields[$label] = $field;
+      }
+    }
+    return $fields;
+  }
+
 }
