@@ -95,19 +95,19 @@ function _standalone_setup_scheme(): string {
     $model->paths['civicrm.compile']['path'] = $model->templateCompilePath = $privatePath . '/compiler_cache';
     $model->paths['civicrm.log']['path'] = $privatePath . '/log';
     $model->paths['civicrm.l10n']['path'] = $privatePath . '/translations';
-    $model->mandatorySettings['customFileUploadDir'] = $privatePath . '/uploads';
-    $model->mandatorySettings['uploadDir'] = $privatePath . '/tmp';
+    $model->mandatorySettings['customFileUploadDir'] = '[cms.root]/private/uploads';
+    $model->mandatorySettings['uploadDir'] = '[cms.root]/private/tmp';
 
     // public directories
-    $model->paths['civicrm.files']['path'] = $publicPath = $appRootPath . '/public';
-    $model->paths['civicrm.files']['url'] = $publicUrl = $baseUrl . '/public';
+    $model->paths['civicrm.files']['path'] = $appRootPath . '/public';
+    $model->paths['civicrm.files']['url'] = $baseUrl . '/public';
 
-    $model->mandatorySettings['imageUploadDir'] = $publicPath . '/uploads';
-    $model->mandatorySettings['imageUploadURL'] = $publicUrl . '/uploads';
+    $model->mandatorySettings['imageUploadDir'] = '[cms.root]/public/uploads';
+    $model->mandatorySettings['imageUploadURL'] = '[cms.root]/public/uploads';
 
     // extensions directory
-    $model->mandatorySettings['extensionsDir'] = $appRootPath . '/extensions';
-    $model->mandatorySettings['extensionsURL'] = $baseUrl . '/extensions';
+    $model->mandatorySettings['extensionsDir'] = '[cms.root]/extensions';
+    $model->mandatorySettings['extensionsURL'] = '[cms.root]/extensions';
 
     if (\Composer\InstalledVersions::isInstalled('civicrm/civicrm-asset-plugin')) {
       // civicrm-asset-plugin loads core asset paths directly into the $civicrm_paths global
