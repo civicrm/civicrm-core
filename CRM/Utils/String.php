@@ -1074,6 +1074,9 @@ class CRM_Utils_String {
       $smarty->caching = $cachingValue;
       $smarty->assign('smartySingleUseString');
       restore_error_handler();
+      if ($smarty->getVersion() !== 2) {
+        $smarty->disableSecurity();
+      }
     }
     return $templateString;
   }

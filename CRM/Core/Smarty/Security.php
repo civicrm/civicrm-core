@@ -56,6 +56,11 @@ class CRM_Core_Smarty_Security extends Smarty_Security {
       $this->php_functions = $phpFunctions;
       $this->php_modifiers = $modifiers;
     }
+
+    $this->static_classes = NULL;
+    $this->allow_constants = FALSE;
+    $this->allow_super_globals = FALSE;
+    $this->disabled_tags = ['crmAPI'];
   }
 
 }
