@@ -94,7 +94,7 @@ function _standalone_setup_scheme(): string {
     $model->paths['civicrm.private']['path'] = $privatePath = $appRootPath . '/private';
     $model->paths['civicrm.compile']['path'] = $model->templateCompilePath = $privatePath . '/compiler_cache';
     $model->paths['civicrm.log']['path'] = $privatePath . '/log';
-    $model->paths['civicrm.l10n']['path'] = $privatePath . '/translations';
+    $model->paths['civicrm.l10n']['path'] = $privatePath . '/l10n';
     $model->mandatorySettings['customFileUploadDir'] = '[cms.root]/private/uploads';
     $model->mandatorySettings['uploadDir'] = '[cms.root]/private/tmp';
 
@@ -106,8 +106,8 @@ function _standalone_setup_scheme(): string {
     $model->mandatorySettings['imageUploadURL'] = '[cms.root]/public/uploads';
 
     // extensions directory
-    $model->mandatorySettings['extensionsDir'] = '[cms.root]/extensions';
-    $model->mandatorySettings['extensionsURL'] = '[cms.root]/extensions';
+    $model->mandatorySettings['extensionsDir'] = '[cms.root]/ext';
+    $model->mandatorySettings['extensionsURL'] = '[cms.root]/ext';
 
     if (\Composer\InstalledVersions::isInstalled('civicrm/civicrm-asset-plugin')) {
       // civicrm-asset-plugin loads core asset paths directly into the $civicrm_paths global
