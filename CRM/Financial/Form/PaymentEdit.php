@@ -225,21 +225,6 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
   }
 
   /**
-   * Wrapper for unit testing the post process submit function.
-   *
-   * @param array $params
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function testSubmit(array $params): void {
-    $this->_id = $params['id'];
-    $this->_contributionID = $params['contribution_id'];
-    $this->_values = civicrm_api3('FinancialTrxn', 'getsingle', ['id' => $params['id']]);
-
-    $this->submit($params);
-  }
-
-  /**
    * Get payment fields
    */
   public function getPaymentFields() {
