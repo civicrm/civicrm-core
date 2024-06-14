@@ -95,15 +95,15 @@ function _standalone_setup_scheme(): string {
     $model->paths['civicrm.compile']['path'] = $model->templateCompilePath = $privatePath . '/compiler_cache';
     $model->paths['civicrm.log']['path'] = $privatePath . '/log';
     $model->paths['civicrm.l10n']['path'] = $privatePath . '/l10n';
-    $model->mandatorySettings['customFileUploadDir'] = '[cms.root]/private/uploads';
+    $model->mandatorySettings['customFileUploadDir'] = '[cms.root]/private/attachment';
     $model->mandatorySettings['uploadDir'] = '[cms.root]/private/tmp';
 
     // public directories
     $model->paths['civicrm.files']['path'] = $appRootPath . '/public';
     $model->paths['civicrm.files']['url'] = $baseUrl . '/public';
 
-    $model->mandatorySettings['imageUploadDir'] = '[cms.root]/public/uploads';
-    $model->mandatorySettings['imageUploadURL'] = '[cms.root]/public/uploads';
+    $model->mandatorySettings['imageUploadDir'] = '[cms.root]/public/media';
+    $model->mandatorySettings['imageUploadURL'] = '[cms.root]/public/media';
 
     // extensions directory
     $model->mandatorySettings['extensionsDir'] = '[cms.root]/ext';
