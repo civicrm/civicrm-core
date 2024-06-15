@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 use Civi\Api4\ActivityContact;
+use Civi\Api4\Mailing;
 use Civi\Api4\MailingJob;
 
 /**
@@ -82,7 +83,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
       // Select the first child job that is scheduled
       // CRM-6835
       $query = "
-      SELECT   j.*
+      SELECT   j.*, m.start_date as mailing_start_date, m.end_date  as mailing_end_date, m.status  as mailing_status
         FROM   civicrm_mailing_job     j,
            civicrm_mailing m
        WHERE   m.id = j.mailing_id AND m.domain_id = {$domainID}
@@ -148,11 +149,19 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
         }
 
         // Update to show job has started.
+        $startDate = date('YmdHis');
         MailingJob::update(FALSE)->setValues([
           'id' => $result->id,
           'start_date' => date('YmdHis'),
           'status' => 'Running',
         ])->execute();
+        if (empty($testParams) && empty($job->mailing_start_date)) {
+          Mailing::update(FALSE)->setValues([
+            'id' => $result->mailing_id,
+            'start_date' => $startDate,
+            'status' => 'Running',
+          ])->execute();
+        }
 
         $transaction->commit();
       }
@@ -183,8 +192,6 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
           'end_date' => 'now',
           'status' => 'Complete',
         ])->execute();
-
-        // don't mark the mailing as complete
       }
 
       // Release the child joblock
@@ -268,6 +275,8 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
         $mailing->reset();
         $mailing->id = $job->mailing_id;
         $mailing->is_completed = TRUE;
+        $mailing->status = 'Complete';
+        $mailing->end_date = date('Y-m-d H:i:s');
         $mailing->save();
         $transaction->commit();
 
@@ -525,6 +534,10 @@ AND    ( ( job_type IS NULL ) OR
     ) {
 
       self::create(['id' => $job->id, 'end_date' => date('YmdHis'), 'status' => 'Canceled']);
+      Mailing::update(FALSE)
+        ->setValues(['end_date' => date('YmdHis'), 'status' => 'Canceled'])
+        ->addWhere('id', '=', $mailingId)
+        ->execute();
 
       // also cancel all child jobs
       $sql = "
@@ -558,6 +571,10 @@ AND    status IN ( 'Scheduled', 'Running', 'Paused' )
       AND is_test = 0
       AND status IN ('Scheduled', 'Running')
     ";
+    Mailing::update(FALSE)
+      ->setValues(['status:name' => 'Paused'])
+      ->addWhere('id', '=', $mailingID)
+      ->execute();
     CRM_Core_DAO::executeQuery($sql, [1 => [$mailingID, 'Integer']]);
   }
 

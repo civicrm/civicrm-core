@@ -1234,6 +1234,10 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       }
     }
 
+    // If we are scheduling vai Mailing.create then also update the status to scheduled.
+    if (empty($params['skip_legacy_scheduling']) && !empty($params['scheduled_date']) && $params['scheduled_date'] !== 'null' && empty($params['_skip_evil_bao_auto_schedule_'])) {
+      $mailing->status = 'Scheduled';
+    }
     if (!empty($params['search_id']) && !empty($params['group_id'])) {
       $mg->reset();
       $mg->mailing_id = $mailing->id;

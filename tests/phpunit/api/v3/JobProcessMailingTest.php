@@ -93,9 +93,13 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
     Civi::settings()->add([
       'mailerBatchLimit' => 2,
     ]);
-    $this->callAPISuccess('Mailing', 'create', $this->_params);
+    $mailing = $this->callAPISuccess('Mailing', 'create', $this->_params);
     $this->_mut->assertRecipients([]);
     $this->callAPISuccess('job', 'process_mailing', []);
+    $mailing = $this->callAPISuccessGetSingle('Mailing', ['id' => $mailing['id'], 'version' => 4]);
+    $this->assertEquals(date('Y-m-d'), date('Y-m-d', strtotime($mailing['start_date'])));
+    $this->assertNull($mailing['end_date']);
+    $this->assertEquals('Running', $mailing['status']);
     $this->_mut->assertRecipients($this->getRecipients(1, 2));
     $this->_mut->clearMessages();
     // Now test forwarding from there
@@ -122,6 +126,18 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
       'Content-Transfer-Encoding: 8bit',
       'Hi there',
     ]);
+    CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0;
+    $this->callAPISuccess('Job', 'process_mailing', []);
+    CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0;
+    $this->callAPISuccess('Job', 'process_mailing', []);
+    CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0;
+    $this->callAPISuccess('Job', 'process_mailing', []);
+    CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0;
+    $this->callAPISuccess('Job', 'process_mailing', []);
+    $updatedMailing = $this->callAPISuccessGetSingle('Mailing', ['id' => $mailing['id'], 'version' => 4]);
+    $this->assertEquals($mailing['start_date'], $updatedMailing['start_date']);
+    $this->assertEquals(date('Y-m-d'), date('Y-m-d', strtotime($updatedMailing['end_date'])));
+    $this->assertEquals('Complete', $updatedMailing['status']);
   }
 
   /**
@@ -209,6 +225,8 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
     CRM_Mailing_BAO_MailingJob::pause($result['id']);
     $jobs = $this->callAPISuccess('mailing_job', 'get', ['mailing_id' => $result['id']]);
     $this->assertEquals('Paused', $jobs['values'][$jobs['id']]['status']);
+    $mailing = $this->callAPISuccessGetSingle('Mailing', ['id' => $result['id'], 'version' => 4]);
+    $this->assertEquals('Paused', $mailing['status']);
 
     //Verify if Paused mailing isn't considered in process_mailing job.
     $this->callAPISuccess('job', 'process_mailing', []);
