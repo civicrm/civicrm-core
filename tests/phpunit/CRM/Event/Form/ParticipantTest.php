@@ -123,6 +123,8 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       $sum += $financialItem['amount'];
     }
     $this->assertEquals(100, $sum);
+    $participant = $this->callAPISuccessGetSingle('Participant', []);
+    $this->assertEquals(100, $participant['participant_fee_amount']);
 
     $priceSetID = $this->ids['PriceSet']['PaidEvent'];
     $eventFeeBlock = CRM_Price_BAO_PriceSet::getSetDetail($priceSetID)[$priceSetID]['fields'];
@@ -147,6 +149,40 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       $sum += $financialItem['amount'];
     }
     $this->assertEquals(1550.55, $sum);
+  }
+
+  /**
+   * Test fee_amount altered while changed in a pending state.
+   *
+   * See https://lab.civicrm.org/dev/core/-/issues/5289
+   *
+   * @throws \Exception
+   */
+  public function testSubmitNoContributionPlusPriceChange(): void {
+    $this->eventCreatePaid([], ['is_quick_config' => TRUE]);
+    $params = [
+      'register_date' => date('Ymd'),
+      'record_contribution' => FALSE,
+      'priceSetId' => $this->getPriceSetID('PaidEvent'),
+      $this->getPriceFieldKey() => $this->ids['PriceFieldValue']['PaidEvent_student'],
+      'send_receipt' => FALSE,
+      'role_id' => [0 => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'role_id', 'Attendee')],
+      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'Pending from pay later'),
+      'source' => 'I wrote this',
+      'event_id' => $this->getEventID(),
+      'contact_id' => $this->individualCreate(),
+      '_qf_default' => '',
+    ];
+    $this->getTestForm('CRM_Event_Form_Participant', $params)->processForm();
+
+    $participant = $this->callAPISuccessGetSingle('Participant', []);
+    $this->assertEquals(100, $participant['participant_fee_amount']);
+
+    $params[$this->getPriceFieldKey()] = $this->ids['PriceFieldValue']['PaidEvent_standard'];
+    $this->getTestForm('CRM_Event_Form_Participant', $params, ['id' => $participant['id']])->processForm();
+
+    $participant = $this->callAPISuccessGetSingle('Participant', ['id' => $participant['id']]);
+    $this->assertEquals(300, $participant['participant_fee_amount']);
   }
 
   /**
