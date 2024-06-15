@@ -77,8 +77,8 @@ class CRM_Mailing_BAO_MailingComponent extends CRM_Mailing_DAO_MailingComponent 
       }
       CRM_Core_DAO::executeQuery($sql, $sqlParams);
     }
-
     $component->save();
+    \Civi::cache('metadata')->flush();
     return $component;
   }
 

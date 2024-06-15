@@ -14,6 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
+use Civi\Api4\MailingComponent;
 
 /**
  * This class is to build the form for adding Group.
@@ -102,7 +103,24 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
       if (!isset($defaults['address'][1]['state_province_id'])) {
         $defaults['address'][1]['state_province_id'] = $config->defaultContactStateProvince;
       }
-
+    }
+    $tokenID = MailingComponent::get(FALSE)
+      ->addWhere('component_type:name', '=', 'Token')
+      ->addWhere('name', '=', 'site_header')
+      ->execute()->first()['id'] ?? NULL;
+    if (!$tokenID) {
+      $this->assign('site_token_url', CRM_Utils_System::url('civicrm/admin/component/edit', [
+        'action' => 'add',
+        'name' => 'site_header',
+        'reset' => 1,
+      ]));
+    }
+    else {
+      $this->assign('site_token_url', CRM_Utils_System::url('civicrm/admin/component/edit', [
+        'action' => 'update',
+        'id' => $tokenID,
+        'reset' => 1,
+      ]));
     }
     $defaults = array_merge($defaults, $domainDefaults);
     return $defaults;

@@ -91,6 +91,13 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_mailing_component')
       'body_html' => ts('This is an automated reply from an un-attended mailbox. Please send any inquiries to the contact email address listed on our web-site.'),
       'body_text' => ts('This is an automated reply from an un-attended mailbox. Please send any inquiries to the contact email address listed on our web-site.'),
     ],
+    [
+      'name' => ts('site_header'),
+      'component_type' => 'Token',
+      'subject' => ts('Site Header'),
+      'body_html' => '<tr></tr>',
+      'body_text' => '',
+    ],
   ])
   ->addDefaults([
     'is_default' => 1,

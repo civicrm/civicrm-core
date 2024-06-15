@@ -10,6 +10,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\MailingComponent;
 use Civi\Token\AbstractTokenSubscriber;
 use Civi\Token\TokenRow;
 
@@ -40,7 +41,7 @@ class CRM_Core_DomainTokens extends AbstractTokenSubscriber {
   }
 
   public function getDomainTokens(): array {
-    return [
+    $tokens = [
       'name' => ts('Domain Name'),
       'address' => ts('Domain (Organization) Full Address'),
       'street_address' => ts('Domain (Organization) Street Address'),
@@ -60,6 +61,13 @@ class CRM_Core_DomainTokens extends AbstractTokenSubscriber {
       'tax_term' => ts('Sales tax term (e.g VAT)'),
       'empowered_by_civicrm_image_url' => ts('Empowered By CiviCRM Image'),
     ];
+    $componentTokens = MailingComponent::get(FALSE)
+      ->addWhere('component_type:name', '=', 'Token')
+      ->execute();
+    foreach ($componentTokens as $componentToken) {
+      $tokens['token_' . strtolower(CRM_Utils_String::munge($componentToken['name']))] = $componentToken['subject'];
+    }
+    return $tokens;
   }
 
   /**
@@ -131,6 +139,12 @@ class CRM_Core_DomainTokens extends AbstractTokenSubscriber {
       $tokens['base_url'] = Civi::paths()->getVariable('cms.root', 'url');
       $tokens['empowered_by_civicrm_image_url'] = CRM_Core_Config::singleton()->userFrameworkResourceURL . 'i/civi99.png';
       $tokens['tax_term'] = (string) Civi::settings()->get('tax_term');
+      $componentTokens = MailingComponent::get(FALSE)
+        ->addWhere('component_type:name', '=', 'Token')
+        ->execute();
+      foreach ($componentTokens as $componentToken) {
+        $tokens['token_' . strtolower(CRM_Utils_String::munge($componentToken['name']))] = $html ? $componentToken['body_html'] : $componentTokens['body_text'];
+      }
       Civi::cache('metadata')->set($cacheKey, $tokens);
     }
     return Civi::cache('metadata')->get($cacheKey);

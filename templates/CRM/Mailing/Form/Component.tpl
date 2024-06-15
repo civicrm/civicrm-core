@@ -10,6 +10,7 @@
 {* this template is used for adding/editing a mailing component  *}
 <div class="crm-block crm-form-block crm-mailing-component-form-block">
 <fieldset><legend>{if $action eq 1}{ts}New Mailing Component{/ts}{else}{ts}Edit Mailing Component{/ts}{/if}</legend>
+  {$tokenNotice}
   <table class="form-layout">
     <tr class="crm-mailing-component-form-block-name"><td class="label">{$form.name.label}</td><td>{$form.name.html}</td>
     <tr class="crm-mailing-component-form-block-component_type"><td class="label">{$form.component_type.label}</td><td>{$form.component_type.html}</td>

@@ -45,7 +45,12 @@
         </table>
 
     <div class="spacer"></div>
-
+    {if $site_token_url}
+    <div class="action-link">
+      <a href="{$site_token_url}" id="editDomainHeader"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}Edit Email Header{/ts}</a>
+      {ts}The email header is, optionally, included in site messages like contribution receipts{/ts}
+    </div>
+    {/if}
     {if ($action eq 4)}
     <div class="action-link">
     <a href="{crmURL q="action=update&reset=1"}" id="editDomainInfo"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}Edit Domain Information{/ts}</a>

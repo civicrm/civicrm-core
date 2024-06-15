@@ -35,6 +35,12 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
    */
   protected $_BAOName;
 
+  /**
+   * The current mailing component, if any.
+   * @var array
+   */
+  private array $component;
+
   public function preProcess() {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
   }
@@ -48,6 +54,14 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
     $this->add('text', 'name', ts('Name'),
       CRM_Core_DAO::getAttribute('CRM_Mailing_BAO_MailingComponent', 'name'), TRUE
     );
+    if ('site_header' === ($this->setDefaultValues()['name'] ?? NULL)) {
+      $tokenNotice = ts('Be careful editing this as it is likely to already be in use in message templates (e.g. contribution receipts) wherever the {domain.token_site_header} appears');
+    }
+    elseif ('Token' === ($this->getMailingComponent()['component_type:name'] ?? NULL)) {
+      $tokenNotice = ts('This component may be used as a token in various communications');
+    }
+    $this->assign('tokenNotice', $tokenNotice ?? NULL);
+
     $this->addRule('name', ts('Name already exists in Database.'), 'objectExists', [
       'CRM_Mailing_BAO_MailingComponent',
       $this->_id,
@@ -87,18 +101,17 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
 
   /**
    * Set default values for the form.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function setDefaultValues() {
-
-    if (isset($this->_id)) {
-      $defaults = MailingComponent::get(FALSE)
-        ->addWhere('id', '=', $this->_id)
-        ->execute()->single();
+  public function setDefaultValues(): array {
+    $defaults = ['is_active' => 1] + $this->getMailingComponent();
+    if (!$this->_id && CRM_Utils_Request::retrieve('name', 'String') === 'site_header') {
+      $defaults['name'] = 'site_header';
+      $defaults['component_type'] = 'Token';
+      $defaults['subject'] = ts('Site Header');
+      $defaults['body_html'] = '<tr></tr>';
     }
-    else {
-      $defaults['is_active'] = 1;
-    }
-
     return $defaults;
   }
 
@@ -183,6 +196,24 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
       $errors['body_html'] = ts("Please provide either HTML or TEXT format for the Body.");
     }
     return empty($errors) ? TRUE : $errors;
+  }
+
+  /**
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  public function getMailingComponent(): array {
+    if (isset($this->component)) {
+      return $this->component;
+    }
+    if (!$this->_id) {
+      return [];
+    }
+    $this->component = MailingComponent::get(FALSE)
+      ->addWhere('id', '=', $this->_id)
+      ->addSelect('*', 'component_type:name')
+      ->execute()->single();
+    return $this->component;
   }
 
 }

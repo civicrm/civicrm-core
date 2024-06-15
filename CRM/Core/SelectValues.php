@@ -391,7 +391,7 @@ class CRM_Core_SelectValues {
    *
    * @return array
    */
-  public static function mailingComponents() {
+  public static function mailingComponents(): array {
     return [
       'Header' => ts('Header'),
       'Footer' => ts('Footer'),
@@ -401,6 +401,7 @@ class CRM_Core_SelectValues {
       'Welcome' => ts('Welcome Message'),
       'Unsubscribe' => ts('Unsubscribe Message'),
       'Resubscribe' => ts('Resubscribe Message'),
+      'Token' => ts('Token'),
     ];
   }
 
