@@ -22,6 +22,9 @@ class CRM_Core_CodeGen_Specification {
   public function parse($schemaPath, $buildVersion, $verbose = TRUE) {
     $this->buildVersion = $buildVersion;
 
+    // Disabling xml parsing as the schema is no longer xml-based
+    return;
+
     if ($verbose) {
       echo 'Parsing schema description ' . $schemaPath . "\n";
     }
