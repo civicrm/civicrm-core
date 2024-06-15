@@ -84,7 +84,28 @@ return new class() {
     return $sql;
   }
 
+  public function generateCreateTableWithConstraintSql(array $entity): string {
+    $definition = $this->getTableDefinition($entity);
+    $constraints = $this->getTableConstraints($entity);
+    $sql = "CREATE TABLE `{$entity['table']}` (\n  " .
+      implode(",\n  ", $definition);
+    if ($constraints) {
+      $sql .= ",\n  " . implode(",\n  ", $constraints);
+    }
+    $sql .= "\n)\n" . $this->getTableOptions() . ";\n";
+    return $sql;
+  }
+
   private function generateCreateTableSql(array $entity): string {
+    $definition = $this->getTableDefinition($entity);
+    $sql = "CREATE TABLE `{$entity['table']}` (\n  " .
+      implode(",\n  ", $definition) .
+      "\n)\n" .
+      $this->getTableOptions() . ";\n";
+    return $sql;
+  }
+
+  private function getTableDefinition(array $entity): array {
     $definition = [];
     $primaryKeys = [];
     foreach ($entity['getFields']() as $fieldName => $field) {
@@ -104,19 +125,24 @@ return new class() {
       }
       $definition[] = (!empty($index['unique']) ? 'UNIQUE ' : '') . "INDEX `$indexName`(" . implode(', ', $indexFields) . ')';
     }
-
-    $sql = "CREATE TABLE `{$entity['table']}` (\n  " .
-      implode(",\n  ", $definition) .
-      "\n)\n" .
-      $this->getTableOptions() . ";\n";
-    return $sql;
+    return $definition;
   }
 
   private function generateConstraintsSql(array $entity): string {
+    $constraints = $this->getTableConstraints($entity);
+    $sql = '';
+    if ($constraints) {
+      $sql .= "ALTER TABLE `{$entity['table']}`\n  ";
+      $sql .= 'ADD ' . implode(",\n  ADD ", $constraints) . ";\n";
+    }
+    return $sql;
+  }
+
+  private function getTableConstraints(array $entity): array {
     $constraints = [];
     foreach ($entity['getFields']() as $fieldName => $field) {
       if (!empty($field['entity_reference']['entity'])) {
-        $constraint = "ADD CONSTRAINT `FK_{$entity['table']}_$fieldName` FOREIGN KEY (`$fieldName`)" .
+        $constraint = "CONSTRAINT `FK_{$entity['table']}_$fieldName` FOREIGN KEY (`$fieldName`)" .
           " REFERENCES `" . $this->getTableForEntity($field['entity_reference']['entity']) . "`(`{$field['entity_reference']['key']}`)";
         if (!empty($field['entity_reference']['on_delete'])) {
           $constraint .= " ON DELETE {$field['entity_reference']['on_delete']}";
@@ -124,12 +150,7 @@ return new class() {
         $constraints[] = $constraint;
       }
     }
-    $sql = '';
-    if ($constraints) {
-      $sql .= "ALTER TABLE `{$entity['table']}`\n  ";
-      $sql .= implode(",\n  ", $constraints) . ";\n";
-    }
-    return $sql;
+    return $constraints;
   }
 
   public static function generateFieldSql(array $field) {
