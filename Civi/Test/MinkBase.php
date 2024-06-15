@@ -64,7 +64,7 @@ abstract class MinkBase extends \CiviEndToEndTestCase {
   }
 
   protected function createMink(): Mink {
-    $chromeUrl = sprintf('http://%s:%s', getenv('LOCALHOST') ?: 'localhost', getenv('CHROME_PORT') ?: '9222');
+    $chromeUrl = sprintf('http://%s:%s', getenv('CHROME_HOST') ?: 'localhost', getenv('CHROME_PORT') ?: '9222');
 
     $driver = new ChromeDriver($chromeUrl, NULL, (string) Civi::url('[cms.root]', 'a'));
     $session = new Session($driver);
