@@ -63,8 +63,6 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
    * @return bool|null
    */
   public static function runJobs($testParams = NULL, $mode = NULL) {
-    $job = $mode === 'sms' ? new CRM_Mailing_BAO_SMSJob() : new CRM_Mailing_BAO_MailingJob();
-
     $mailerBatchLimit = Civi::settings()->get('mailerBatchLimit');
 
     if (!empty($testParams)) {
@@ -72,7 +70,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
       SELECT *
         FROM civicrm_mailing_job
        WHERE id = {$testParams['job_id']}";
-      $job->query($query);
+      $result = CRM_Core_DAO::executeQuery($query);
     }
     else {
       $currentTime = date('YmdHis');
@@ -101,13 +99,13 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
         j.id
       ";
 
-      $job->query($query);
+      $result = CRM_Core_DAO::executeQuery($query);
     }
 
-    while ($job->fetch()) {
-      $mailingID = $job->mailing_id;
+    while ($result->fetch()) {
+      $mailingID = $result->mailing_id;
       // still use job level lock for each child job
-      $lock = Civi::lockManager()->acquire("data.mailing.job.{$job->id}");
+      $lock = Civi::lockManager()->acquire("data.mailing.job.{$result->id}");
       if (!$lock->isAcquired()) {
         continue;
       }
@@ -117,17 +115,17 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
         // we've got the lock, but while we were waiting and processing
         // other emails, this job might have changed under us
         // lets get the job status again and check
-        $job->status = CRM_Core_DAO::getFieldValue(
+        $result->status = CRM_Core_DAO::getFieldValue(
           'CRM_Mailing_DAO_MailingJob',
-          $job->id,
+          $result->id,
           'status',
           'id',
           TRUE
         );
 
         if (
-          $job->status !== 'Running' &&
-          $job->status !== 'Scheduled'
+          $result->status !== 'Running' &&
+          $result->status !== 'Scheduled'
         ) {
           // this includes Cancelled and other statuses, CRM-4246
           $lock->release();
@@ -137,7 +135,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
 
       /* Queue up recipients for the child job being launched */
 
-      if ($job->status !== 'Running') {
+      if ($result->status !== 'Running') {
         $transaction = new CRM_Core_Transaction();
 
         // have to queue it up based on the offset and limits
@@ -146,12 +144,12 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
           CRM_Mailing_BAO_Mailing::getTestRecipients($testParams, (int) $mailingID);
         }
         else {
-          self::queue((int) $job->mailing_id, (int) $job->job_offset, (int) $job->job_limit, (int) $job->id);
+          self::queue((int) $result->mailing_id, (int) $result->job_offset, (int) $result->job_limit, (int) $result->id);
         }
 
         // Update to show job has started.
         MailingJob::update(FALSE)->setValues([
-          'id' => $job->id,
+          'id' => $result->id,
           'start_date' => date('YmdHis'),
           'status' => 'Running',
         ])->execute();
@@ -161,21 +159,27 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
 
       // Compose and deliver each child job
       if ($mode === NULL) {
+        $job = new CRM_Mailing_BAO_MailingJob();
+        $job->id = $result->id;
+        $job->find(TRUE);
         $mailer = \Civi::service('pear_mail');
         $isComplete = Civi\Core\Resolver::singleton()->call(CIVICRM_FLEXMAILER_HACK_DELIVER, [$job, $mailer, $testParams]);
       }
       elseif ($mode === 'sms') {
-        $isComplete = $job->deliver(NULL, !empty($testParams));
+        $smsJob = new CRM_Mailing_BAO_SMSJob();
+        $smsJob->id = $result->id;
+        $smsJob->find(TRUE);
+        $isComplete = $smsJob->deliver(NULL, !empty($testParams));
       }
 
-      CRM_Utils_Hook::post('create', 'CRM_Mailing_DAO_Spool', $job->id, $isComplete);
+      CRM_Utils_Hook::post('create', 'CRM_Mailing_DAO_Spool', $result->id, $isComplete);
 
       // Mark the child complete
       if ($isComplete) {
         // Finish the job.
 
         MailingJob::update(FALSE)->setValues([
-          'id' => $job->id,
+          'id' => $result->id,
           'end_date' => 'now',
           'status' => 'Complete',
         ])->execute();
