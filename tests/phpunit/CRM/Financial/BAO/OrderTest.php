@@ -139,6 +139,7 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
     $lineItem = (array) LineItem::get()
       ->addWhere('contribution_id', '=', $contribution['id'])
       ->addSelect('*', 'price_field_value_id.*', 'price_field_id.*')
+      ->addOrderBy('id')
       ->execute();
     $this->assertCount(3, $lineItem);
     $firstItem = array_pop($lineItem);
