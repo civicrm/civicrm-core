@@ -10,8 +10,7 @@
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this,
         originalEntity,
-        originalField,
-        meta = {};
+        originalField;
 
       this.entitySelect = searchMeta.getPrimaryAndSecondaryEntitySelect();
 
@@ -59,18 +58,8 @@
       };
 
       this.getOptionKey = function(expr) {
-        let arg = getFirstArgFromExpr(expr);
-        return arg.suffix ? arg.suffix.slice(1) : 'id';
+        return expr.split(':')[1] || 'id';
       };
-
-      // Gets the first arg of type "field"
-      function getFirstArgFromExpr(expr) {
-        if (!(expr in meta)) {
-          var args = searchMeta.parseExpr(expr).args;
-          meta[expr] = _.findWhere(args, {type: 'field'});
-        }
-        return meta[expr] || {};
-      }
 
       function getDefaultField() {
         var item = _.findLast(ctrl.segment.items, function(item) {
