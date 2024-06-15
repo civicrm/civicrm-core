@@ -6,7 +6,6 @@ use Civi;
 use Behat\Mink\WebAssert;
 use Behat\Mink\Mink;
 use Behat\Mink\Session;
-use Behat\Mink\Element\TraversableElement;
 use DMore\ChromeDriver\ChromeDriver;
 
 /**
@@ -104,4 +103,5 @@ abstract class MinkBase extends \CiviEndToEndTestCase {
     $image = $session->getScreenshot();
     file_put_contents($filename, $image);
   }
+
 }
