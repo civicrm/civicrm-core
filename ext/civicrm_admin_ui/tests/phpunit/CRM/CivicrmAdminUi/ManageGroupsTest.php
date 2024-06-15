@@ -4,7 +4,7 @@ use Civi\Api4\Group;
 
 /**
  * E2E Mink tests for Manage Groups screen.
- * 
+ *
  * @group e2e
  * @see cv
  */
@@ -37,12 +37,12 @@ class CRM_CivicrmAdminUi_ManageGroupsTest extends \Civi\Test\MinkBase {
     $this->assertSession()->elementNotExists('css', "tr[data-entity-id='$gidInactive']", $afformTable);
     $this->createScreenshot('/tmp/test-manage-groups.png');
     // Test some in-line editing.
-    // Equivalent JS: document.querySelector('[data-field-name="is_active"]').querySelector('span').click(); 
+    // Equivalent JS: document.querySelector('[data-field-name="is_active"]').querySelector('span').click();
     $isActiveCell = $basicGroupRow->find('css', '[data-field-name="is_active"]');
     $isActiveField = $isActiveCell->find('css', 'span');
     $isActiveField->click();
-    $isActiveCell->find('css','input[value="false"]')->click();
-    $isActiveCell->find('css','button.btn-success')->click();
+    $isActiveCell->find('css', 'input[value="false"]')->click();
+    $isActiveCell->find('css', 'button.btn-success')->click();
     // Confirm the group is now inactive.  But wait until "Saved" appears because of race conditions.
     $session->wait(5000, 'document.querySelectorAll("div.crm-status-box-outer.status-success").length > 0');
     $basicGroupStatus = Group::get(FALSE)->addWhere('id', '=', $gidBasic)->execute()->single()['is_active'];
