@@ -209,18 +209,14 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
     $job = new CRM_Mailing_BAO_MailingJob();
 
     $mailing = new CRM_Mailing_BAO_Mailing();
-
-    $config = CRM_Core_Config::singleton();
-    $jobTable = CRM_Mailing_DAO_MailingJob::getTableName();
     $mailingTable = CRM_Mailing_DAO_Mailing::getTableName();
 
     $currentTime = date('YmdHis');
-    $mailingACL = CRM_Mailing_BAO_Mailing::mailingACL('m');
     $domainID = CRM_Core_Config::domainID();
 
     $query = "
                 SELECT   j.*
-                  FROM   $jobTable     j,
+                  FROM   civicrm_mailing_job     j,
                                  $mailingTable m
                  WHERE   m.id = j.mailing_id AND m.domain_id = {$domainID}
                    AND   j.is_test = 0
