@@ -530,10 +530,8 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
    * @dataProvider getBooleanDataProvider
    *
    * @param bool $isBulk
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function testBatchActivityTargets($isBulk): void {
+  public function testBatchActivityTargets(bool $isBulk): void {
     $loggedInUserId = $this->createLoggedInUser();
 
     \Civi::settings()->set('mailerBatchLimit', 2);
@@ -546,7 +544,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
 
     $this->createContactsInGroup(6, $this->_groupID);
     $mailing = $this->callAPISuccess('mailing', 'create', $this->_params + ['scheduled_id' => $loggedInUserId]);
-    $this->callAPISuccess('job', 'process_mailing', []);
+    $this->callAPISuccess('Job', 'process_mailing', []);
     $bulkEmailActivity = $this->callAPISuccess('Activity', 'getsingle', [
       'source_record_id' => $mailing['id'],
       'activity_type_id' => 'Bulk Email',
