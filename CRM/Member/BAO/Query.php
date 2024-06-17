@@ -211,10 +211,23 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
         return;
 
       case 'member_join_date':
+        // This seeks to correct issue 5294. 'Old' smart groups will need
+        // updating in due course as the selection criteion here doesn't show
+        // any more. Without this patch, the smart group crashes.
+        // It will enable one update 'offending' smart groups.
+        CRM_Core_Error::deprecatedWarning('member_join_date field is deprecated please use membership_join_date field instead');
         $op = '>=';
         $date = CRM_Utils_Date::format($value);
         if ($date) {
           $query->_where[$grouping][] = "civicrm_membership.join_date {$op} {$date}";
+          if (!is_array($value)) {
+            $temp = $value;
+            $value = null; // erase it
+            $value[] = [];
+            $value[0] = substr($temp, 0, 4); // Year
+            $value[1] = substr($temp, 4, 2); // Month
+            $value[2] = substr($temp, 6, 2); // Day
+          }
           $format = CRM_Utils_Date::customFormat(CRM_Utils_Date::format(array_reverse($value), '-'));
           $query->_qill[$grouping][] = ts('Member Since %2 %1', [1 => $format, 2 => $op]);
         }
