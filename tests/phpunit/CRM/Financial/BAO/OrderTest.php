@@ -80,6 +80,10 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
       ])
       ->addLineItem([
         'price_field_value_id' => $this->ids['PriceFieldValue']['membership_first'],
+        // Because the price field value relates to a membership type
+        // the entity_id is understood to be a membership ID.
+        // All provided values prefixed by entity_id will be passed to
+        // the membership.create api.
         'entity_id.join_date' => '2006-01-21',
         'entity_id.start_date' => '2006-01-21',
         'entity_id.end_date' => '2006-12-21',
@@ -122,13 +126,22 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
         'financial_type_id:name' => 'Member Dues',
       ])
       ->addLineItem([
+        // As this price field value has a membership type ID attached
+        // a membership will be created in response to this.
+        // All other values will be loaded from the price field value,
+        // with the contact_id defaulting to that of the contribution (above).
         'price_field_value_id' => $this->ids['PriceFieldValue']['membership_first'],
       ])
       ->addLineItem([
+        // The amount, financial type will come from the price field value record.
+        // Note this price field value is not in the same price set as the above one.
         'price_field_value_id' => $this->ids['PriceFieldValue']['hundred'],
       ])
       ->addLineItem([
         // This will assume the order financial type & quantity = 1,
+        // The price field value will be that of the default line item
+        // (generally ID = 1) which is the 'generic' one.
+        // Note that it is not part of either the above price sets.
         'line_total' => 500,
         'description' => 'Some extra dosh',
       ])
