@@ -202,7 +202,7 @@ AND    {$this->_componentClause}";
       $input['trxn_date'] = $contribution->trxn_date ?? NULL;
       $input['receipt_update'] = $params['receipt_update'];
       $input['contribution_status_id'] = $contribution->contribution_status_id;
-      $input['paymentProcessor'] = empty($contribution->trxn_id) ? NULL :
+      $input['payment_processor_id'] = empty($contribution->trxn_id) ? NULL :
         CRM_Core_DAO::singleValueQuery("SELECT payment_processor_id
           FROM civicrm_financial_trxn
           WHERE trxn_id = %1
