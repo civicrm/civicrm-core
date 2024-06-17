@@ -71,7 +71,7 @@
           _.each(ctrl.display.settings.columns, function(col) {
             if (col.type === 'field') {
               col.tally = {
-                fn: searchMeta.getDefaultAggregateFn(searchMeta.parseExpr(ctrl.parent.getExprFromSelect(col.key)))
+                fn: searchMeta.getDefaultAggregateFn(searchMeta.parseExpr(ctrl.parent.getExprFromSelect(col.key)), ctrl.apiParams)
               };
             }
           });
