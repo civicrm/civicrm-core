@@ -2689,6 +2689,9 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
       'postal_greeting_display' => self::getTemplateForGreeting('postal_greeting', $contact),
       'addressee_display' => self::getTemplateForGreeting('addressee', $contact),
     ]);
+    if (empty($greetings)) {
+      return;
+    }
     // A DAO fetch here is more efficient than looking up
     // values in the token processor - this may be substantially improved by
     // https://github.com/civicrm/civicrm-core/pull/24294 and
