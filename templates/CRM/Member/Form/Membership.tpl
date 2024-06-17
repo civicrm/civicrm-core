@@ -48,7 +48,7 @@
   {/if}
   {if $membershipMode}
   <div class="help">
-    {ts 1=$displayName 2=$registerMode}Use this form to submit Membership Record on behalf of %1. <strong>A %2 transaction will be submitted</strong> using the selected payment processor.{/ts}
+    {ts 1=$displayName|escape 2=$registerMode}Use this form to submit Membership Record on behalf of %1. <strong>A %2 transaction will be submitted</strong> using the selected payment processor.{/ts}
   </div>
   {/if}
   <div class="crm-block crm-form-block crm-membership-form-block">
