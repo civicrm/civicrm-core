@@ -36,7 +36,7 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
   public function testCreateOrderParticipantAndDonation(): void {
     $this->eventCreatePaid();
     $this->individualCreate();
-    Order::create()
+    $order = Order::create()
       ->setContributionValues([
         'contact_id' => $this->ids['Contact']['individual_0'],
         'financial_type_id' => 1,
@@ -48,7 +48,8 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
         'financial_type_id' => 3,
         'price_field_value_id' => $this->ids['PriceFieldValue']['PaidEvent_student_early'],
       ])
-      ->execute();
+      ->execute()->single();
+    $this->assertCount(1, $order['line_item']);
     $contribution = Contribution::get(FALSE)
       ->addWhere('contact_id', '=', $this->ids['Contact']['individual_0'])
       ->execute()->single();
@@ -114,7 +115,7 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
     $this->setUpMembershipPriceSet();
     $this->setUpGenericPriceSet();
 
-    Order::create()
+    $order = Order::create()
       ->setContributionValues([
         'contact_id' => $this->individualCreate(),
         'receive_date' => '2010-01-20',
@@ -132,6 +133,8 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
         'description' => 'Some extra dosh',
       ])
       ->execute()->first();
+    $this->assertCount(3, $order['line_item']);
+    $this->assertEquals('civicrm_membership', $order['line_item'][0]['entity_table']);
     $contribution = Contribution::get(FALSE)
       ->addWhere('contact_id', '=', $this->ids['Contact']['individual_0'])
       ->execute()->single();

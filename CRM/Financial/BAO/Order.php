@@ -1474,8 +1474,10 @@ class CRM_Financial_BAO_Order {
     $contributionValues['amount_level'] = $this->getAmountLevel();
     $contributionValues['contribution_status_id:name'] = 'Pending';
     $contributionValues['line_item'] = [$this->getLineItems()];
-    return Contribution::create()
+    $result = Contribution::create()
       ->setValues($contributionValues)->execute();
+    $result[0]['line_item'] = $contributionValues['line_item'][0];
+    return $result;
   }
 
   /**
