@@ -12,12 +12,12 @@
 if (!class_exists('Smarty_Security')) {
   return;
 }
+
 /**
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-
 class CRM_Core_Smarty_Security extends Smarty_Security {
 
   /**
