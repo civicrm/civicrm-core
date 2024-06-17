@@ -185,4 +185,11 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
     return empty($errors) ? TRUE : $errors;
   }
 
+  /**
+   * @return array
+   */
+  protected function getFieldsToExcludeFromPurification(): array {
+    return ['body_html'];
+  }
+
 }

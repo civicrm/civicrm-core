@@ -1559,10 +1559,11 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       'note' => $this->getSubmittedValue('note'),
       'is_test' => $this->isTest(),
     ];
-    if (!$this->getParticipantID()) {
-      // For new registrations fill in fee detail. For existing
-      // registrations we are not doing anything on this form that would require
-      // these fields to change.
+    if (!$this->getParticipantID() || !$this->getContributionID()) {
+      // For new registrations, or existing ones with no contribution,
+      // fill in fee detail. For existing
+      // registrations with a contribution the user will have the option to
+      // change the fees via a different form.
       $order = $this->getOrder();
       if ($order) {
         $participantParams['fee_level'] = $order->getAmountLevel();
