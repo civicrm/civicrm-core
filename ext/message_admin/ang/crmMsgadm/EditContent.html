@@ -51,9 +51,11 @@
       <div class="clearfix"></div>
     </div>
     <div class="panel-body" uib-collapse="!accordions.msg_html">
+      <div crm-ui-debug="$ctrl"></div>
       <div ng-model="$ctrl.msgtpl.msg_html"
            crm-monaco="$ctrl.monacoOptions({language: 'html', crmHeightPct: 0.5})"
            crm-monaco-insert-rx="insert:msg_html"
+           crm-monaco-original="$ctrl.original.msg_html"
            ng-disabled="$ctrl.isDisabled()"
       ></div>
     </div>

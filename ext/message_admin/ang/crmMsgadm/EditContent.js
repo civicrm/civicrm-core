@@ -4,6 +4,7 @@
       onPreview: '&',
       tokenList: '<',
       disabled: '<',
+      original: '=',
       msgtpl: '='
     },
     templateUrl: '~/crmMsgadm/EditContent.html',

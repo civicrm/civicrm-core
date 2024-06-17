@@ -13,6 +13,7 @@
         this.editor = null; // Filled in by link().
       },
       link: function($scope, $el, $attr, controllers) {
+        // console.log('crmMonaco: attrs: ', $attr);
         var ngModel = controllers[0], crmMonaco = controllers[1];
         var heightPct = 0.70;
         var editor;
@@ -27,6 +28,8 @@
           if ($attr.crmMonaco) {
             angular.extend(options, $parse($attr.crmMonaco)($scope));
           }
+          let originalMessage = $parse($attr.crmMonacoOriginal)($scope);
+          // console.log('crm monaco received: orig: ', originalMessage);
           angular.extend(options, {
             value: ngModel.$modelValue,
             minimap: {
@@ -50,20 +53,35 @@
 
           var editorEl = $el.find('.crm-monaco-container');
           editorEl.css({height: Math.round(heightPct * $(window).height())});
-          editor = monaco.editor.create(editorEl[0], options);
+          // editor = monaco.editor.create(editorEl[0], options);
 
-          editor.onDidChangeModelContent(_.debounce(function () {
-            $scope.$apply(function () {
-              ngModel.$setViewValue(editor.getValue());
-            });
-          }, 150));
+          var originalModel = monaco.editor.createModel(originalMessage);
+          // var modifiedModel = monaco.editor.createModel('');
+          var modifiedModel = monaco.editor.createModel(ngModel.$modelValue);
+          // ^^^ This looks like it works on first load,
+          // but it's not following ngModel contract -- need to sort the listeners below.
 
-          ngModel.$render = function() {
-            if (editor) {
-              editor.setValue(ngModel.$modelValue);
-            }
-            // FIXME: else: retry?
-          };
+          options.renderSideBySide = false;
+          options.enableSplitViewResizing = false;
+          editor = monaco.editor.createDiffEditor(editorEl[0], options);
+          editor.setModel({original: originalModel, modified: modifiedModel});
+
+          // Important -- how to propagate changes back to angular
+          // modifiedModel.onDidChangeModelContent(_.debounce(function () {
+          //   $scope.$apply(function () {
+          //     // ngModel.$setViewValue(editor.getValue());
+          //     ngModel.$setViewValue(modifiedModel.getValue());
+          //   });
+          // }, 150));
+
+          // ngModel.$render = function() {
+          //   console.log('update modifiedModel content ' + new Date());
+          //   if (editor) {
+          //     // editor.setValue(ngModel.$modelValue);
+          //     modifiedModel.setValue(ngModel.$modelValue);
+          //   }
+          //   // FIXME: else: retry?
+          // };
 
           if ($attr.ngDisabled) {
             $scope.$watch($parse($attr.ngDisabled), function(disabled){
