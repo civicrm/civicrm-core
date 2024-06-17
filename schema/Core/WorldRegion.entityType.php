@@ -31,9 +31,6 @@ return [
       'usage' => [
         'export',
       ],
-      'input_attrs' => [
-        'maxlength' => 128,
-      ],
     ],
   ],
 ];

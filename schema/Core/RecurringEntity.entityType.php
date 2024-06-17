@@ -43,9 +43,6 @@ return [
       'required' => TRUE,
       'description' => ts('Physical tablename for entity, e.g. civicrm_event'),
       'add' => '4.6',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'mode' => [
       'title' => ts('Cascade Type'),

@@ -40,9 +40,6 @@ return [
         'export',
         'duplicate_matching',
       ],
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'label' => [
       'title' => ts('Participant Status Label'),
@@ -51,9 +48,6 @@ return [
       'localizable' => TRUE,
       'description' => ts('localized label for display of this status type'),
       'add' => '3.0',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'class' => [
       'title' => ts('Participant Status Class'),
@@ -61,9 +55,6 @@ return [
       'input_type' => 'Select',
       'description' => ts('the general group of status type this one belongs to'),
       'add' => '3.0',
-      'input_attrs' => [
-        'maxlength' => 8,
-      ],
       'pseudoconstant' => [
         'callback' => 'CRM_Event_PseudoConstant::participantStatusClassOptions',
       ],

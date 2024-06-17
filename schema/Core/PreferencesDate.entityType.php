@@ -41,9 +41,6 @@ return [
       'required' => TRUE,
       'description' => ts('The meta name for this date (fixed in code)'),
       'add' => '2.0',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'description' => [
       'title' => ts('Description'),
@@ -53,7 +50,6 @@ return [
       'add' => '2.0',
       'input_attrs' => [
         'label' => ts('Description'),
-        'maxlength' => 255,
       ],
     ],
     'start' => [
@@ -83,7 +79,6 @@ return [
       'add' => '2.0',
       'input_attrs' => [
         'label' => ts('Date Format'),
-        'maxlength' => 64,
       ],
     ],
     'time_format' => [
@@ -94,7 +89,6 @@ return [
       'add' => '3.1',
       'input_attrs' => [
         'label' => ts('Time Format'),
-        'maxlength' => 64,
       ],
     ],
   ],

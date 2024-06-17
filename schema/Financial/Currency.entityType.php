@@ -33,9 +33,6 @@ return [
         'export',
         'duplicate_matching',
       ],
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'symbol' => [
       'title' => ts('Currency Symbol'),
@@ -43,9 +40,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Currency Symbol'),
       'add' => '1.7',
-      'input_attrs' => [
-        'maxlength' => 8,
-      ],
     ],
     'numeric_code' => [
       'title' => ts('Currency Numeric Code'),
@@ -58,9 +52,6 @@ return [
         'export',
         'duplicate_matching',
       ],
-      'input_attrs' => [
-        'maxlength' => 3,
-      ],
     ],
     'full_name' => [
       'title' => ts('Full Currency Name'),
@@ -68,9 +59,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Full currency name'),
       'add' => '1.9',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
   ],
 ];

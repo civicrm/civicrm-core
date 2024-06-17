@@ -66,9 +66,6 @@ return [
       'required' => TRUE,
       'description' => ts('Variable name/programmatic handle for this field.'),
       'add' => '1.8',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'label' => [
       'title' => ts('Label'),
@@ -78,9 +75,6 @@ return [
       'localizable' => TRUE,
       'description' => ts('Text for form field label (also friendly name for administering this field).'),
       'add' => '1.8',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'html_type' => [
       'title' => ts('Html Type'),
@@ -90,7 +84,6 @@ return [
       'add' => '1.8',
       'input_attrs' => [
         'label' => ts('Html Type'),
-        'maxlength' => 12,
       ],
       'pseudoconstant' => [
         'callback' => 'CRM_Price_BAO_PriceField::htmlTypes',
@@ -202,9 +195,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Optional scripting attributes for field'),
       'add' => '1.8',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'visibility_id' => [
       'title' => ts('Price Field Visibility'),

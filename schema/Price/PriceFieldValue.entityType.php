@@ -51,9 +51,6 @@ return [
       'description' => ts('Price field option name'),
       'add' => '3.3',
       'default' => NULL,
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'label' => [
       'title' => ts('Label'),
@@ -63,9 +60,6 @@ return [
       'description' => ts('Price field option label'),
       'add' => '3.3',
       'default' => NULL,
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'description' => [
       'title' => ts('Description'),

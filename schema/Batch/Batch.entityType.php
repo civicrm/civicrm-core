@@ -37,9 +37,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Variable name/programmatic handle for this batch.'),
       'add' => '3.3',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'title' => [
       'title' => ts('Batch Title'),
@@ -48,9 +45,6 @@ return [
       'localizable' => TRUE,
       'description' => ts('Friendly Name.'),
       'add' => '4.2',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'description' => [
       'title' => ts('Batch Description'),

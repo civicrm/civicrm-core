@@ -66,7 +66,6 @@ return [
       ],
       'input_attrs' => [
         'label' => ts('Title'),
-        'maxlength' => 255,
       ],
     ],
     'summary' => [
@@ -188,9 +187,6 @@ return [
       'localizable' => TRUE,
       'description' => ts('Text for link to Event Registration form which is displayed on Event Information screen when is_online_registration is true.'),
       'add' => '1.7',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'registration_start_date' => [
       'title' => ts('Registration Start Date'),
@@ -269,7 +265,6 @@ return [
       'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_TRIMMED,
       'input_attrs' => [
         'label' => ts('Payment Processors'),
-        'maxlength' => 128,
       ],
       'pseudoconstant' => [
         'table' => 'civicrm_payment_processor',
@@ -308,9 +303,6 @@ return [
         'import',
         'export',
         'duplicate_matching',
-      ],
-      'input_attrs' => [
-        'maxlength' => 255,
       ],
     ],
     'is_show_location' => [
@@ -386,9 +378,6 @@ return [
       'description' => ts('Title for Confirmation page.'),
       'add' => '1.7',
       'default' => NULL,
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'confirm_text' => [
       'title' => ts('Confirm Text'),
@@ -442,9 +431,6 @@ return [
       'localizable' => TRUE,
       'description' => ts('FROM email name used for confirmation emails.'),
       'add' => '1.7',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'confirm_from_email' => [
       'title' => ts('Confirm From Email'),
@@ -452,9 +438,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('FROM email address used for confirmation emails.'),
       'add' => '1.7',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'cc_confirm' => [
       'title' => ts('Cc Confirm'),
@@ -464,7 +447,6 @@ return [
       'add' => '1.7',
       'input_attrs' => [
         'label' => ts('CC Confirm'),
-        'maxlength' => 255,
       ],
     ],
     'bcc_confirm' => [
@@ -475,7 +457,6 @@ return [
       'add' => '1.7',
       'input_attrs' => [
         'label' => ts('BCC Confirm'),
-        'maxlength' => 255,
       ],
     ],
     'default_fee_id' => [
@@ -500,9 +481,6 @@ return [
       'description' => ts('Title for ThankYou page.'),
       'add' => '1.7',
       'default' => NULL,
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'thankyou_text' => [
       'title' => ts('ThankYou Text'),
@@ -569,9 +547,6 @@ return [
       'localizable' => TRUE,
       'description' => ts('Initial amount label for partial payment'),
       'add' => '4.3',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'initial_amount_help_text' => [
       'title' => ts('Initial Amount Help Text'),
@@ -711,9 +686,6 @@ return [
         'export',
         'duplicate_matching',
       ],
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'created_id' => [
       'title' => ts('Created By Contact ID'),
@@ -750,7 +722,6 @@ return [
       ],
       'input_attrs' => [
         'label' => ts('Currency'),
-        'maxlength' => 3,
       ],
       'pseudoconstant' => [
         'table' => 'civicrm_currency',

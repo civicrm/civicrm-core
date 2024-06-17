@@ -44,7 +44,6 @@ return [
       ],
       'input_attrs' => [
         'label' => ts('Name'),
-        'maxlength' => 64,
       ],
     ],
     'description' => [
@@ -57,7 +56,6 @@ return [
         'rows' => 6,
         'cols' => 50,
         'label' => ts('Description'),
-        'maxlength' => 255,
       ],
     ],
     'is_deductible' => [

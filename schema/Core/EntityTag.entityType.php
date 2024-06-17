@@ -39,9 +39,6 @@ return [
       'input_type' => 'Select',
       'description' => ts('physical tablename for entity being joined to file, e.g. civicrm_contact'),
       'add' => '3.2',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
       'pseudoconstant' => [
         'option_group_name' => 'tag_used_for',
       ],

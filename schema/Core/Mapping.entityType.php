@@ -43,9 +43,6 @@ return [
       'required' => TRUE,
       'description' => ts('Unique name of Mapping'),
       'add' => '1.2',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'description' => [
       'title' => ts('Description'),
@@ -53,9 +50,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Description of Mapping.'),
       'add' => '1.2',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'mapping_type_id' => [
       'title' => ts('Mapping Type'),
