@@ -566,10 +566,7 @@ WHERE li.contribution_id = %1";
     $feeBlock
   ) {
     $entityTable = 'civicrm_' . $entity;
-    $newLineItems = [];
-    CRM_Price_BAO_PriceSet::processAmount($feeBlock,
-      $params, $newLineItems
-    );
+    CRM_Price_BAO_PriceSet::processAmount($feeBlock, $params);
     // initialize empty Lineitem instance to call protected helper functions
     $lineItemObj = new CRM_Price_BAO_LineItem();
 
