@@ -71,23 +71,6 @@
             });
           }
 
-          // FIXME: This makes vertical scrolling much better, but horizontal is still weird.
-          var origOverflow;
-          function bodyScrollSuspend() {
-            if (origOverflow !== undefined) return;
-            origOverflow = $('body').css('overflow');
-            $('body').css('overflow', 'hidden');
-          }
-          function bodyScrollRestore() {
-            if (origOverflow === undefined) return;
-            $('body').css('overflow', origOverflow);
-            origOverflow = undefined;
-          }
-          editorEl.on('mouseenter', bodyScrollSuspend);
-          editorEl.on('mouseleave', bodyScrollRestore);
-          editor.onDidFocusEditorWidget(bodyScrollSuspend);
-          editor.onDidBlurEditorWidget(bodyScrollRestore);
-
           crmMonaco.editor = editor;
 
           $scope.$on('$destroy', function () {

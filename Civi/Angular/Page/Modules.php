@@ -113,7 +113,13 @@ class Modules extends \CRM_Core_Page {
   public function digestJs($files) {
     $scripts = [];
     foreach ($files as $file) {
-      $scripts[] = \CRM_Utils_JS::stripComments(file_get_contents($file));
+      $content = file_get_contents($file);
+      if (str_contains($file, 'monaco-editor')) {
+        $scripts[] = $content;
+      }
+      else {
+        $scripts[] = \CRM_Utils_JS::stripComments($content);
+      }
     }
     $scripts = \CRM_Utils_JS::dedupeClosures(
       $scripts,
