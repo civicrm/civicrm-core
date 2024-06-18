@@ -222,11 +222,15 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
           $query->_where[$grouping][] = "civicrm_membership.join_date {$op} {$date}";
           if (!is_array($value)) {
             $temp = $value;
-            $value = NULL; // erase it
+             // erase it
+            $value = NULL;
             $value[] = [];
-            $value[0] = substr($temp, 0, 4); // Year
-            $value[1] = substr($temp, 4, 2); // Month
-            $value[2] = substr($temp, 6, 2); // Day
+            // Year
+            $value[0] = substr($temp, 0, 4);
+             // Month
+            $value[1] = substr($temp, 4, 2);
+             // Day
+            $value[2] = substr($temp, 6, 2);
           }
           $format = CRM_Utils_Date::customFormat(CRM_Utils_Date::format(array_reverse($value), '-'));
           $query->_qill[$grouping][] = ts('Member Since %2 %1', [1 => $format, 2 => $op]);
