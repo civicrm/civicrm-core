@@ -8,4 +8,5 @@ return [
   }",
   'boilerplate' => [],
   'icon' => 'fa-users',
+  'label' => 'Group Subscription',
 ];
