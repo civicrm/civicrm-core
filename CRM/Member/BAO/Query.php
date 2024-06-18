@@ -222,7 +222,7 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
           $query->_where[$grouping][] = "civicrm_membership.join_date {$op} {$date}";
           if (!is_array($value)) {
             $temp = $value;
-            $value = null; // erase it
+            $value = NULL; // erase it
             $value[] = [];
             $value[0] = substr($temp, 0, 4); // Year
             $value[1] = substr($temp, 4, 2); // Month
