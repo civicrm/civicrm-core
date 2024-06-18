@@ -730,6 +730,7 @@ input.crm-form-entityref {
   position: relative;
   width: 130px;
   top: 24px;
+  left: -8px;
 }
 
 .crm-container div.empowered-by-logo {
