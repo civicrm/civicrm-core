@@ -7,4 +7,5 @@ return [
     },
   }",
   'boilerplate' => [],
+  'icon' => 'fa-users',
 ];
