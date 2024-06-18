@@ -207,7 +207,7 @@
         "url": "https://github.com/twbs/bootstrap-sass/archive/v{$version}.zip",
         "path": "ext/greenwich/extern/bootstrap3",
         "version": "3.4.1",
-        "ignore": ["test", "tasks", "lib"]
+        "ignore": ["fonts", "test", "tasks", "lib"]
       },
       "font-awesome": {
         "url": "https://github.com/FortAwesome/Font-Awesome/archive/v4.7.0.zip",
