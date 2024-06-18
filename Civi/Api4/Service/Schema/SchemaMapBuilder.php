@@ -126,7 +126,13 @@ class SchemaMapBuilder extends AutoService {
       // Add joins for entityReference fields
       foreach ($customGroup['fields'] as $field) {
         if ($field['data_type'] === 'EntityReference' && isset($field['fk_entity'])) {
-          $targetTable = self::getTableName($field['fk_entity']);
+          $targetEntity = $field['fk_entity'];
+          $targetTable = self::getTableName($targetEntity);
+          if (!$targetTable) {
+            // the target entity doesn't exist - skip to avoid crashing
+            \Civi::log()->warning("Custom field {$field['name']} references a missing entity {$targetEntity} - you probably want to disable it");
+            continue;
+          }
           $joinable = new Joinable($targetTable, 'id', $field['name']);
           $customTable->addTableLink($field['column_name'], $joinable);
         }
@@ -149,13 +155,13 @@ class SchemaMapBuilder extends AutoService {
 
   /**
    * @param string $entityName
-   * @return string
+   * @return string|null
    */
-  private static function getTableName(string $entityName) {
+  private static function getTableName(string $entityName): ?string {
     if (CoreUtil::isContact($entityName)) {
       return 'civicrm_contact';
     }
-    return AllCoreTables::getTableForEntityName($entityName);
+    return AllCoreTables::getEntities()[$entityName]['table'] ?? NULL;
   }
 
 }
