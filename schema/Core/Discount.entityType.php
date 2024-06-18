@@ -46,9 +46,6 @@ return [
       'required' => TRUE,
       'description' => ts('physical tablename for entity being joined to discount, e.g. civicrm_event'),
       'add' => '2.1',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
       'pseudoconstant' => [
         'callback' => 'CRM_Core_BAO_Discount::entityTables',
       ],

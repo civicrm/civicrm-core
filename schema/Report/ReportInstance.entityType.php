@@ -49,9 +49,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Report Instance Title.'),
       'add' => '2.2',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'report_id' => [
       'title' => ts('Report template ID'),
@@ -60,9 +57,6 @@ return [
       'required' => TRUE,
       'description' => ts('FK to civicrm_option_value for the report template'),
       'add' => '2.2',
-      'input_attrs' => [
-        'maxlength' => 512,
-      ],
     ],
     'name' => [
       'title' => ts('Report instance Name'),
@@ -70,9 +64,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('when combined with report_id/template uniquely identifies the instance'),
       'add' => '3.2',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'args' => [
       'title' => ts('Report Instance Arguments'),
@@ -80,9 +71,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('arguments that are passed in the url when invoking the instance'),
       'add' => '3.2',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'description' => [
       'title' => ts('Report Instance description'),
@@ -90,9 +78,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Report Instance description.'),
       'add' => '2.2',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'permission' => [
       'title' => ts('Report Instance Permissions'),
@@ -102,7 +87,6 @@ return [
       'add' => '2.2',
       'input_attrs' => [
         'label' => ts('Permission'),
-        'maxlength' => 255,
       ],
     ],
     'grouprole' => [
@@ -115,7 +99,6 @@ return [
       'input_attrs' => [
         'title' => ts('ACL Group/Role'),
         'multiple' => '1',
-        'maxlength' => 1024,
       ],
       'pseudoconstant' => [
         'callback' => 'CRM_Report_BAO_ReportInstance::getGrouproleOptions',
@@ -181,9 +164,6 @@ return [
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'description' => ts('Subject of email'),
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'email_to' => [
       'title' => ts('Email Report Instance To'),

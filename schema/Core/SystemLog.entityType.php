@@ -28,9 +28,6 @@ return [
       'required' => TRUE,
       'description' => ts('Standardized message'),
       'add' => '4.5',
-      'input_attrs' => [
-        'maxlength' => 128,
-      ],
     ],
     'context' => [
       'title' => ts('Detailed Log Data'),
@@ -46,9 +43,6 @@ return [
       'description' => ts('error level per PSR3'),
       'add' => '4.5',
       'default' => 'info',
-      'input_attrs' => [
-        'maxlength' => 9,
-      ],
     ],
     'timestamp' => [
       'title' => ts('Log Timestamp'),
@@ -71,9 +65,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Optional Name of logging host'),
       'add' => '4.5',
-      'input_attrs' => [
-        'maxlength' => 128,
-      ],
     ],
   ],
 ];

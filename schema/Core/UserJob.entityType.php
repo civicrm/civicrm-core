@@ -40,9 +40,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Unique name for job.'),
       'add' => '5.50',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'created_id' => [
       'title' => ts('Created By Contact ID'),
@@ -125,7 +122,6 @@ return [
       'add' => '5.50',
       'input_attrs' => [
         'label' => ts('Job Type'),
-        'maxlength' => 64,
       ],
       'pseudoconstant' => [
         'callback' => 'CRM_Core_BAO_UserJob::getTypes',

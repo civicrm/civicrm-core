@@ -61,9 +61,6 @@ return [
         'export',
         'duplicate_matching',
       ],
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'hush_until' => [
       'title' => ts('Snooze Status Notifications Until'),
@@ -100,9 +97,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('These settings are per-check, and can\'t be compared across checks.'),
       'add' => '4.7',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'check_info' => [
       'title' => ts('Check Info'),
@@ -110,9 +104,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('These values are per-check, and can\'t be compared across checks.'),
       'add' => '4.7',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'is_active' => [
       'title' => ts('Check Is Active'),

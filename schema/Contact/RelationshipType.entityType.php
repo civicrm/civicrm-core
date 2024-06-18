@@ -52,9 +52,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('name for relationship of contact_a to contact_b.'),
       'add' => '1.1',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'label_a_b' => [
       'title' => ts('Relationship Type Label A to B'),
@@ -63,9 +60,6 @@ return [
       'localizable' => TRUE,
       'description' => ts('label for relationship of contact_a to contact_b.'),
       'add' => '3.0',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'name_b_a' => [
       'title' => ts('Relationship Type Name B to A'),
@@ -73,9 +67,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Optional name for relationship of contact_b to contact_a.'),
       'add' => '1.1',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'label_b_a' => [
       'title' => ts('Relationship Type Label B to A'),
@@ -84,9 +75,6 @@ return [
       'localizable' => TRUE,
       'description' => ts('Optional label for relationship of contact_b to contact_a.'),
       'add' => '3.0',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'description' => [
       'title' => ts('Relationship Description'),
@@ -95,9 +83,6 @@ return [
       'localizable' => TRUE,
       'description' => ts('Optional verbose description of the relationship type.'),
       'add' => '1.1',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'contact_type_a' => [
       'title' => ts('Contact Type for Contact A'),
@@ -105,9 +90,6 @@ return [
       'input_type' => 'Select',
       'description' => ts('If defined, contact_a in a relationship of this type must be a specific contact_type.'),
       'add' => '1.1',
-      'input_attrs' => [
-        'maxlength' => 12,
-      ],
       'pseudoconstant' => [
         'table' => 'civicrm_contact_type',
         'key_column' => 'name',
@@ -121,9 +103,6 @@ return [
       'input_type' => 'Select',
       'description' => ts('If defined, contact_b in a relationship of this type must be a specific contact_type.'),
       'add' => '1.1',
-      'input_attrs' => [
-        'maxlength' => 12,
-      ],
       'pseudoconstant' => [
         'table' => 'civicrm_contact_type',
         'key_column' => 'name',
@@ -137,9 +116,6 @@ return [
       'input_type' => 'Select',
       'description' => ts('If defined, contact_sub_type_a in a relationship of this type must be a specific contact_sub_type.'),
       'add' => '3.1',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
       'pseudoconstant' => [
         'table' => 'civicrm_contact_type',
         'key_column' => 'name',
@@ -153,9 +129,6 @@ return [
       'input_type' => 'Select',
       'description' => ts('If defined, contact_sub_type_b in a relationship of this type must be a specific contact_sub_type.'),
       'add' => '3.1',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
       'pseudoconstant' => [
         'table' => 'civicrm_contact_type',
         'key_column' => 'name',
