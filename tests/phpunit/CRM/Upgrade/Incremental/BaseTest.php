@@ -656,7 +656,7 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
     ]);
     CRM_Upgrade_Incremental_php_FiveTwentyFive::convertReportsJcalendarToDatePicker();
     $reportGet = $this->callAPISuccess('ReportInstance', 'getsingle', ['id' => $report['id']]);
-    $formValues = unserialize($reportGet['form_values']);
+    $formValues = @unserialize($reportGet['form_values']);
     $this->assertEquals('1991-11-01 00:00:00', $formValues['receive_date_from']);
   }
 
