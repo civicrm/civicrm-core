@@ -13,6 +13,7 @@
     controller: function ($scope) {
       var ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
         ctrl = this;
+      let conditionValue;
       this.operators = [
         {
           "key": "==",
@@ -55,8 +56,14 @@
         }
       }
 
+      // Getter for ng-model.
+      // Returns a reference to avoid infinite loops in ngModel.watch
       function getValue() {
-        return JSON.parse(ctrl.clause[1 + ctrl.offset]);
+        let newVal = JSON.parse(ctrl.clause[1 + ctrl.offset]);
+        if (!angular.equals(newVal, conditionValue)) {
+          conditionValue = newVal;
+        }
+        return conditionValue;
       }
 
       function setValue(val) {
