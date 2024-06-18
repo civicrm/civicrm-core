@@ -108,10 +108,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
     //set defaults in create mode
     if (!$contributionID) {
       CRM_Core_DAO::setCreateDefaults($params, self::getDefaults());
-      if (empty($params['invoice_number']) && \Civi::settings()->get('invoicing')) {
-        $nextContributionID = CRM_Core_DAO::singleValueQuery("SELECT COALESCE(MAX(id) + 1, 1) FROM civicrm_contribution");
-        $params['invoice_number'] = self::getInvoiceNumber($nextContributionID);
-      }
     }
 
     $contributionStatusID = $params['contribution_status_id'] ?? NULL;
@@ -203,6 +199,13 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
     }
 
     $result = $contribution->save();
+    // Save invoice number if appropriate. Note we used to try to
+    // avoid a second save but check https://lab.civicrm.org/dev/core/-/issues/5004
+    // to see how that worked out....
+    if ($action === 'create' && empty($params['invoice_number']) && \Civi::settings()->get('invoicing')) {
+      $contribution->invoice_number = self::getInvoiceNumber($contribution->id);
+      $contribution->save();
+    }
 
     // Add financial_trxn details as part of fix for CRM-4724
     $contribution->trxn_result_code = $params['trxn_result_code'] ?? NULL;
