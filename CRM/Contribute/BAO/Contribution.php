@@ -2366,14 +2366,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $this->_relatedObjects['participant'] = &$participant;
     }
 
-    $relatedContact = CRM_Contribute_BAO_Contribution::getOnbehalfIds($this->id);
-    if (!empty($relatedContact['individual_id'])) {
-      $ids['related_contact'] = $relatedContact['individual_id'];
-    }
-
     $eventID = isset($ids['event']) ? (int) $ids['event'] : NULL;
     $participantID = isset($ids['participant']) ? (int) $ids['participant'] : NULL;
-    $relatedContactID = isset($ids['related_contact']) ? (int) $ids['related_contact'] : NULL;
     $contributionID = (int) $this->id;
     $contactID = (int) $ids['contact'];
     $onbehalfDedupeAlert = $ids['onbehalf_dupe_alert'] ?? NULL;
@@ -2463,6 +2457,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
     else {
       $values['contribution_id'] = $this->id;
+      $relatedContactID = CRM_Contribute_BAO_Contribution::getOnbehalfIds($this->id)['individual_id'] ?? NULL;
       if ($relatedContactID) {
         $values['related_contact'] = $relatedContactID;
         if ($onbehalfDedupeAlert) {
