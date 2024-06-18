@@ -110,6 +110,13 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant implements \Ci
 
     $participantBAO->save();
 
+    // add custom field values
+    if (!empty($params['custom']) &&
+      is_array($params['custom'])
+    ) {
+      CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_participant', $participantBAO->id);
+    }
+
     CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
 
     if (!empty($params['id'])) {
@@ -189,13 +196,6 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant implements \Ci
     $id = $session->get('userID');
     if (!$id) {
       $id = $params['contact_id'] ?? NULL;
-    }
-
-    // add custom field values
-    if (!empty($params['custom']) &&
-      is_array($params['custom'])
-    ) {
-      CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_participant', $participant->id);
     }
 
     //process note, CRM-7634
