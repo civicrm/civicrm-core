@@ -10,38 +10,27 @@ use Civi\Api4\Generic\Result;
  * @inheritDoc
  * @package Civi\Api4\Action\GroupSubscription
  */
-class Save extends \Civi\Api4\Generic\BasicSaveAction {
-
-  /**
-   * Main contact to keep with merged values
-   *
-   * @var int
-   * @required
-   */
-  protected $contactId;
+class Save extends \Civi\Api4\Generic\AbstractSaveAction {
 
   /**
    * @param \Civi\Api4\Generic\Result $result
    */
   public function _run(Result $result) {
-    $groups = self::process($this->contactId, $this->records);
-
+    $groups = self::process($this->records[0]);
     $result[] = $groups;
   }
 
   /**
    * Function to process groups
    *
-   * @param int $contactId
-   * @param array $submittedGroups
+   * @param array $submittedData
    *
    * @return void
    */
-  public static function process($contactId, $submittedGroups) {
-    // submitted Array ( [group_2] => 1, [group_3] => 0,[group_4] => 1 )
+  public static function process($submittedData) {
+    // submitted  ['contact_id' => 203, 'group_2'' => 1, 'group_3' => 1]
 
-    // TOFIX: need to fix the flow via FB
-    return;
+    $contactId = $submittedData['contact_id'];
 
     // get the current groups for this contact
     $currentGroups = \Civi\Api4\GroupContact::get(FALSE)
@@ -53,7 +42,7 @@ class Save extends \Civi\Api4\Generic\BasicSaveAction {
     $groupChanges = [];
 
     // loop through submitted groups
-    foreach ($submittedGroups as $field => $value) {
+    foreach ($submittedData as $field => $value) {
       // check if it's a group field
       if (strpos($field, 'group_') === FALSE) {
         continue;
@@ -74,7 +63,7 @@ class Save extends \Civi\Api4\Generic\BasicSaveAction {
       // check if double opt in is enabled
       $groupStatus = 'Added';
       $contactPrimaryEmail = '';
-      if (!empty($submittedGroups['enable_double_optin'])) {
+      if (!empty($submittedData['enable_double_optin'])) {
         $groupStatus = 'Pending';
         $contactPrimaryEmail = self::getContactPrimaryEmail($contactId);
       }

@@ -38,6 +38,9 @@ class GroupSubscription extends Generic\AbstractEntity {
           'title' => ts('Contact ID'),
           'required' => TRUE,
           'fk_entity' => 'Contact',
+          'fk_column' => 'id',
+          'input_type' => 'EntityRef',
+          'label' => 'Contact',
         ],
       ];
 
