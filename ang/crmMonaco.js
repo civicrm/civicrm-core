@@ -74,7 +74,6 @@
           crmMonaco.editor = editor;
 
           $scope.$on('$destroy', function () {
-            bodyScrollRestore();
             if (editor) editor.dispose();
             delete crmMonaco.editor;
           });
