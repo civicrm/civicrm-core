@@ -141,9 +141,14 @@ abstract class CRM_Core_DAO_Base extends CRM_Core_DAO {
           unset($fieldSpec['input_attrs'][$attr]);
         }
       }
-      if (!isset($field['size']) && str_contains($fieldSpec['sql_type'], 'char')) {
+      if (str_contains($fieldSpec['sql_type'], 'char(')) {
         $length = self::getFieldLength($fieldSpec['sql_type']);
-        $field['size'] = constant(CRM_Utils_Schema::getDefaultSize($length));
+        if (!isset($field['size'])) {
+          $field['size'] = constant(CRM_Utils_Schema::getDefaultSize($length));
+        }
+        if (!isset($field['maxlength'])) {
+          $field['maxlength'] = $length;
+        }
       }
       $usage = $fieldSpec['usage'] ?? [];
       $field['usage'] = [

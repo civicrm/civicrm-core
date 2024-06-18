@@ -43,9 +43,6 @@ return [
         'export',
         'duplicate_matching',
       ],
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'abbreviation' => [
       'title' => ts('County Abbreviation'),
@@ -53,9 +50,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('2-4 Character Abbreviation of County'),
       'add' => '1.1',
-      'input_attrs' => [
-        'maxlength' => 4,
-      ],
     ],
     'state_province_id' => [
       'title' => ts('State ID'),

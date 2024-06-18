@@ -45,9 +45,6 @@ return [
       'required' => TRUE,
       'description' => ts('Name of the module which declared this object (soft FK to civicrm_extension.full_name)'),
       'add' => '4.2',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
       'pseudoconstant' => [
         'callback' => 'CRM_Core_BAO_Managed::getBaseModules',
       ],
@@ -59,9 +56,6 @@ return [
       'required' => TRUE,
       'description' => ts('Symbolic name used by the module to identify the object'),
       'add' => '4.2',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'entity_type' => [
       'title' => ts('Entity Type'),
@@ -70,9 +64,6 @@ return [
       'required' => TRUE,
       'description' => ts('API entity type'),
       'add' => '4.2',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'entity_id' => [
       'title' => ts('Entity ID'),
@@ -89,9 +80,6 @@ return [
       'description' => ts('Policy on when to cleanup entity (always, never, unused)'),
       'add' => '4.5',
       'default' => 'always',
-      'input_attrs' => [
-        'maxlength' => 16,
-      ],
       'pseudoconstant' => [
         'callback' => 'CRM_Core_ManagedEntities::getCleanupOptions',
       ],

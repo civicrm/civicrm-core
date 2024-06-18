@@ -41,9 +41,6 @@ return [
       'usage' => [
         'export',
       ],
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'description' => [
       'title' => ts('Description'),
@@ -62,9 +59,6 @@ return [
       'usage' => [
         'export',
       ],
-      'input_attrs' => [
-        'maxlength' => 50,
-      ],
     ],
     'options' => [
       'title' => ts('Options'),
@@ -81,9 +75,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Full or relative URL to uploaded image - fullsize.'),
       'add' => '1.4',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'thumbnail' => [
       'title' => ts('Thumbnail'),
@@ -91,9 +82,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Full or relative URL to image thumbnail.'),
       'add' => '1.4',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'price' => [
       'title' => ts('Price'),
@@ -111,7 +99,6 @@ return [
       'default' => NULL,
       'input_attrs' => [
         'label' => ts('Currency'),
-        'maxlength' => 3,
       ],
       'pseudoconstant' => [
         'table' => 'civicrm_currency',
@@ -175,9 +162,6 @@ return [
       'description' => ts('Rolling means we set start/end based on current day, fixed means we set start/end for current year or month (e.g. 1 year + fixed -> we would set start/end for 1/1/06 thru 12/31/06 for any premium chosen in 2006)'),
       'add' => '1.4',
       'default' => 'rolling',
-      'input_attrs' => [
-        'maxlength' => 8,
-      ],
       'pseudoconstant' => [
         'callback' => 'CRM_Core_SelectValues::periodType',
       ],
@@ -196,9 +180,6 @@ return [
       'input_type' => 'Select',
       'add' => '1.4',
       'default' => 'year',
-      'input_attrs' => [
-        'maxlength' => 8,
-      ],
       'pseudoconstant' => [
         'callback' => 'CRM_Core_SelectValues::getPremiumUnits',
       ],
@@ -217,9 +198,6 @@ return [
       'description' => ts('Frequency unit and interval allow option to store actual delivery frequency for a subscription or service.'),
       'add' => '1.4',
       'default' => 'month',
-      'input_attrs' => [
-        'maxlength' => 8,
-      ],
       'pseudoconstant' => [
         'callback' => 'CRM_Core_SelectValues::getPremiumUnits',
       ],

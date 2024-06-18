@@ -121,9 +121,6 @@ return [
         'export',
         'duplicate_matching',
       ],
-      'input_attrs' => [
-        'maxlength' => 96,
-      ],
     ],
     'street_number' => [
       'title' => ts('Street Number'),
@@ -144,9 +141,6 @@ return [
       'usage' => [
         'export',
       ],
-      'input_attrs' => [
-        'maxlength' => 8,
-      ],
     ],
     'street_number_predirectional' => [
       'title' => ts('Street Direction Prefix'),
@@ -154,9 +148,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Directional prefix, e.g. SE Main St, SE is the prefix.'),
       'add' => '1.1',
-      'input_attrs' => [
-        'maxlength' => 8,
-      ],
     ],
     'street_name' => [
       'title' => ts('Street Name'),
@@ -167,9 +158,6 @@ return [
       'usage' => [
         'export',
       ],
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'street_type' => [
       'title' => ts('Street Type'),
@@ -177,9 +165,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('St, Rd, Dr, etc.'),
       'add' => '1.1',
-      'input_attrs' => [
-        'maxlength' => 8,
-      ],
     ],
     'street_number_postdirectional' => [
       'title' => ts('Street Direction Suffix'),
@@ -187,9 +172,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Directional prefix, e.g. Main St S, S is the suffix.'),
       'add' => '1.1',
-      'input_attrs' => [
-        'maxlength' => 8,
-      ],
     ],
     'street_unit' => [
       'title' => ts('Street Unit'),
@@ -199,9 +181,6 @@ return [
       'add' => '1.1',
       'usage' => [
         'export',
-      ],
-      'input_attrs' => [
-        'maxlength' => 16,
       ],
     ],
     'supplemental_address_1' => [
@@ -215,9 +194,6 @@ return [
         'export',
         'duplicate_matching',
       ],
-      'input_attrs' => [
-        'maxlength' => 96,
-      ],
     ],
     'supplemental_address_2' => [
       'title' => ts('Supplemental Address 2'),
@@ -229,9 +205,6 @@ return [
         'import',
         'export',
         'duplicate_matching',
-      ],
-      'input_attrs' => [
-        'maxlength' => 96,
       ],
     ],
     'supplemental_address_3' => [
@@ -245,9 +218,6 @@ return [
         'export',
         'duplicate_matching',
       ],
-      'input_attrs' => [
-        'maxlength' => 96,
-      ],
     ],
     'city' => [
       'title' => ts('City'),
@@ -259,9 +229,6 @@ return [
         'import',
         'export',
         'duplicate_matching',
-      ],
-      'input_attrs' => [
-        'maxlength' => 64,
       ],
     ],
     'county_id' => [
@@ -330,7 +297,6 @@ return [
       ],
       'input_attrs' => [
         'size' => '3',
-        'maxlength' => 12,
       ],
     ],
     'postal_code' => [
@@ -346,7 +312,6 @@ return [
       ],
       'input_attrs' => [
         'size' => '6',
-        'maxlength' => 64,
       ],
     ],
     'usps_adc' => [
@@ -356,9 +321,6 @@ return [
       'deprecated' => TRUE,
       'description' => ts('USPS Bulk mailing code.'),
       'add' => '1.1',
-      'input_attrs' => [
-        'maxlength' => 32,
-      ],
     ],
     'country_id' => [
       'title' => ts('Country ID'),
@@ -435,9 +397,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Timezone expressed as a UTC offset - e.g. United States CST would be written as "UTC-6".'),
       'add' => '1.1',
-      'input_attrs' => [
-        'maxlength' => 8,
-      ],
     ],
     'name' => [
       'title' => ts('Address Name'),
@@ -449,9 +408,6 @@ return [
         'import',
         'export',
         'duplicate_matching',
-      ],
-      'input_attrs' => [
-        'maxlength' => 255,
       ],
     ],
     'master_id' => [

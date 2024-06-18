@@ -75,9 +75,6 @@ return [
       'input_type' => 'Select',
       'description' => ts('status of contact relative to membership in group'),
       'add' => '1.1',
-      'input_attrs' => [
-        'maxlength' => 8,
-      ],
       'pseudoconstant' => [
         'callback' => 'CRM_Core_SelectValues::groupContactStatus',
       ],

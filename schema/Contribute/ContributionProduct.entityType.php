@@ -57,9 +57,6 @@ return [
       'usage' => [
         'export',
       ],
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'quantity' => [
       'title' => ts('Quantity'),

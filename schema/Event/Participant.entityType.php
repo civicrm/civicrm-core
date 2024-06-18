@@ -137,7 +137,6 @@ return [
       'input_attrs' => [
         'multiple' => '1',
         'label' => ts('Participant Role'),
-        'maxlength' => 128,
       ],
       'pseudoconstant' => [
         'option_group_name' => 'participant_role',
@@ -170,9 +169,6 @@ return [
         'import',
         'export',
         'duplicate_matching',
-      ],
-      'input_attrs' => [
-        'maxlength' => 128,
       ],
     ],
     'fee_level' => [
@@ -281,9 +277,6 @@ return [
         'import',
         'export',
         'duplicate_matching',
-      ],
-      'input_attrs' => [
-        'maxlength' => 3,
       ],
       'pseudoconstant' => [
         'table' => 'civicrm_currency',

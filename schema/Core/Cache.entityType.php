@@ -44,9 +44,6 @@ return [
       'required' => TRUE,
       'description' => ts('group name for cache element, useful in cleaning cache elements'),
       'add' => '2.1',
-      'input_attrs' => [
-        'maxlength' => 32,
-      ],
     ],
     'path' => [
       'title' => ts('Path'),
@@ -54,9 +51,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Unique path name for cache element'),
       'add' => '2.1',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'data' => [
       'title' => ts('Data'),

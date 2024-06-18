@@ -50,9 +50,6 @@ return [
       'required' => TRUE,
       'description' => ts('Module which owns this uf_join instance, e.g. User Registration, CiviDonate, etc.'),
       'add' => '1.3',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'entity_table' => [
       'title' => ts('Profile Entity Table'),
@@ -60,9 +57,6 @@ return [
       'input_type' => 'Select',
       'description' => ts('Name of table where item being referenced is stored. Modules which only need a single collection of uf_join instances may choose not to populate entity_table and entity_id.'),
       'add' => '1.3',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
       'pseudoconstant' => [
         'callback' => 'CRM_Core_BAO_UFJoin::entityTables',
       ],
