@@ -75,6 +75,8 @@ class CRM_Core_Smarty_UserContentPolicy extends \Civi\Core\Service\AutoService {
     $smarty = CRM_Core_Smarty::singleton();
     switch ($smarty->getVersion()) {
       case 2:
+        $this->old_settings = $smarty->security_settings;
+        $smarty->security_settings = $this->createSmartyPolicy2($smarty);
         $smarty->security = TRUE;
         return;
 
@@ -93,6 +95,7 @@ class CRM_Core_Smarty_UserContentPolicy extends \Civi\Core\Service\AutoService {
     $smarty = CRM_Core_Smarty::singleton();
     switch ($smarty->getVersion()) {
       case 2:
+        $smarty->security_settings = $this->old_settings;
         $smarty->security = FALSE;
         return;
 
@@ -105,11 +108,20 @@ class CRM_Core_Smarty_UserContentPolicy extends \Civi\Core\Service\AutoService {
         $smarty->disableSecurity();
         return;
     }
+  }
 
+  protected function createSmartyPolicy2($smarty): array {
+    $result = $smarty->security_settings;
+    $result['IF_FUNCS'] = $this->php_functions;
+    $result['MODIFIER_FUNCS'] = $this->php_modifiers;
+    $result['ALLOW_CONSTANTS'] = $this->allow_constants;
+    $result['ALLOW_SUPER_GLOBALS'] = $this->allow_super_globals;
+    return $result;
   }
 
   protected function createSmartyPolicy34(): string {
     $obj = new class(NULL) extends Smarty_Security {
+
       public function __construct($smarty) {
         /** @var \CRM_Core_Smarty_UserContentPolicy $policy */
         $policy = Civi::service('civi.smarty.userContent');

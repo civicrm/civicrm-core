@@ -1035,7 +1035,7 @@ class CRM_Utils_String {
     $cachingValue = $smarty->caching;
     set_error_handler([$smarty, 'handleSmartyError'], E_USER_ERROR);
     $smarty->caching = 0;
-    $useSecurityPolicy = ($smarty->getVersion() !== 2) && (!$smarty->security_policy);
+    $useSecurityPolicy = ($smarty->getVersion() > 2) ? !$smarty->security_policy : !$smarty->security;
     // For Smarty v2, policy is applied at lower level.
     if ($useSecurityPolicy) {
       // $smarty->enableSecurity('CRM_Core_Smarty_Security');
