@@ -40,7 +40,15 @@ class SmartyStringTest extends \CiviEndToEndTestCase {
    */
   public function testDisallowedSmartyCalls($template, $expectedResult): void {
     $this->expectException(\Exception::class);
-    $this->assertNotEquals($expectedResult, \CRM_Utils_String::parseOneOffStringThroughSmarty($template));
+    $result = \CRM_Utils_String::parseOneOffStringThroughSmarty($template);
+    $this->assertNotEquals($expectedResult, $result);
+
+    if (\CRM_Core_Smarty::singleton()->getVersion() < 3) {
+      // For Smarty v2, we're just happy to know it failed -- even if it's awkwardly reported as content.
+      if (preg_match(';Smarty error.*(php tags not|constants not|super global access not);', $result)) {
+        throw new \Exception($result);
+      }
+    }
   }
 
   public function allowedSmartyCallsProvider(): array {
