@@ -2024,8 +2024,13 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
     }
 
     // This query retrieves ALL memberships of active types.
+    // Note: id, is_test, campaign_id expected by CRM_Activity_BAO_Activity::addActivity()
+    //   called by createChangeMembershipStatusActivity().
     $baseQuery = "
 SELECT     civicrm_membership.id                    as membership_id,
+           civicrm_membership.id                    as id,
+           civicrm_membership.is_test               as is_test,
+           civicrm_membership.campaign_id           as campaign_id,
            civicrm_membership.is_override           as is_override,
            civicrm_membership.status_override_end_date  as status_override_end_date,
            civicrm_membership.membership_type_id    as membership_type_id,
@@ -2066,20 +2071,21 @@ WHERE {$whereClause}";
       ]);
       $statusId = $newStatus['id'] ?? NULL;
 
-      //process only when status change.
+      // process only when status change.
       if ($statusId &&
         $statusId != $dao2->status_id
       ) {
-        $memberParams = [
+        // Update the status on the membership.
+        self::writeRecord([
           'id' => $dao2->membership_id,
-          'skipStatusCal' => TRUE,
-          'skipRecentView' => TRUE,
           'status_id' => $statusId,
-          'createActivity' => TRUE,
-        ];
+        ]);
 
-        //process member record.
-        civicrm_api3('membership', 'create', $memberParams);
+        self::createRelatedMemberships(['action' => CRM_Core_Action::UPDATE], $dao2);
+        // Now create the "Change Membership Status" activity
+        $allStatusLabels = CRM_Member_BAO_Membership::buildOptions('status_id', 'get');
+        $changedByContactID = CRM_Core_Session::getLoggedInContactID() ?? $dao2->contact_id;
+        self::createChangeMembershipStatusActivity($dao2, $allStatusLabels[$statusId], $allStatusLabels[$dao2->status_id], $changedByContactID);
         $updateCount++;
       }
     }
