@@ -68,16 +68,6 @@ class CRM_Core_Smarty_UserContentPolicy extends \Civi\Core\Service\AutoService {
     return $instance;
   }
 
-  public function isActive(): bool {
-    $smarty = CRM_Core_Smarty::singleton();
-    switch ($smarty->getVersion()) {
-      case 2:
-        return $smarty->security;
-      default:
-        return (bool) $smarty->security_policy;
-    }
-  }
-
   public function enable(): void {
     $smarty = CRM_Core_Smarty::singleton();
     switch ($smarty->getVersion()) {
@@ -157,6 +147,27 @@ class CRM_Core_Smarty_UserContentPolicy extends \Civi\Core\Service\AutoService {
       }
     };
     return get_class($obj);
+  }
+
+  /**
+   * Smarty 3+4 have option to disable tags in secure mode, but Smarty 2 doesn't.
+   * So for any potentially-sensitive tags, we support an alternate mechanism to check access.
+   *
+   * @param string $tag
+   * @return void
+   * @throws \Exception
+   */
+  public static function assertTagAllowed(string $tag): void {
+    $smarty = CRM_Core_Smarty::singleton();
+    $hasSecurity = ($smarty->getVersion() > 2) ? (bool) $smarty->security_policy : $smarty->security;
+    if (!$hasSecurity) {
+      return;
+    }
+
+    $policy = Civi::service('civi.smarty.userContent');
+    if (in_array($tag, $policy->disabled_tags)) {
+      throw new \Exception("Tag '{$tag}' is not allowed in secure mode.");
+    }
   }
 
 }
