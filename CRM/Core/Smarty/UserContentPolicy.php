@@ -176,6 +176,10 @@ class CRM_Core_Smarty_UserContentPolicy extends \Civi\Core\Service\AutoService {
    * @throws \Exception
    */
   public static function assertTagAllowed(string $tag): void {
+    // Pre boot scenario permit crmSqlData to be used.
+    if ($tag === 'crmSqlData' && !defined('CIVICRM_TEMPLATE_COMPILEDIR')) {
+      return;
+    }
     $smarty = CRM_Core_Smarty::singleton();
     $hasSecurity = ($smarty->getVersion() > 2) ? (bool) $smarty->security_policy : $smarty->security;
     if (!$hasSecurity) {
