@@ -145,7 +145,8 @@ class MessageTemplateTest extends Api4TestBase implements TransactionalInterface
 
       MessageTemplate::update(FALSE)
         ->addWhere('workflow_name', '=', 'contribution_offline_receipt')
-        ->addValue('msg_html', '<p>Some test {if 1 > 2} markup{/if}</p>')
+        ->addValue('msg_subject', 'Subject test {if 1 > 2} smarty{/if}')
+        ->addValue('msg_html', '<p>Body test {if 1 > 2} markup{/if}</p>')
         ->execute();
 
       $originalTemplate = MessageTemplate::get()
@@ -161,7 +162,8 @@ class MessageTemplateTest extends Api4TestBase implements TransactionalInterface
         ->execute()->first();
       $messageTemplateIDReserved = $reservedTemplate['id'];
 
-      $this->assertEquals('<p>Some test {if 1 > 2} markup{/if}</p>', $originalTemplate['msg_html']);
+      $this->assertEquals('Subject test {if 1 > 2} smarty{/if}', $originalTemplate['msg_subject']);
+      $this->assertEquals('<p>Body test {if 1 > 2} markup{/if}</p>', $originalTemplate['msg_html']);
       $this->assertNull($originalTemplate['master_id']);
       $this->assertNull($originalTemplate['master_id.msg_subject']);
 
