@@ -659,7 +659,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   public static function createDebugLogger($prefix = '') {
     self::generateLogFileName($prefix);
     $log = Log::singleton('file', \Civi::$statics[__CLASS__]['logger_file' . $prefix], '', [
-      'timeFormat' => '%Y-%m-%d %H:%M:%S%z',
+      'timeFormat' => 'Y-m-d H:i:sO',
     ]);
     if (is_callable([$log, 'setLocale'])) {
       $log->setLocale(CRM_Core_I18n::getLocale());
