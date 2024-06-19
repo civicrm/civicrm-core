@@ -50,24 +50,54 @@
 
           var editorEl = $el.find('.crm-monaco-container');
           editorEl.css({height: Math.round(heightPct * $(window).height())});
-          editor = monaco.editor.create(editorEl[0], options);
+          let originalMessage = $parse($attr.crmMonacoOriginal)($scope);
+          if (originalMessage) {
+            var originalModel = monaco.editor.createModel(originalMessage);
+            // var modifiedModel = monaco.editor.createModel('');
+            var modifiedModel = monaco.editor.createModel(ngModel.$modelValue);
+            // ^^^ This looks like it works on first load,
+            // but it's not following ngModel contract -- need to sort the listeners below.
 
-          editor.onDidChangeModelContent(_.debounce(function () {
-            $scope.$apply(function () {
-              ngModel.$setViewValue(editor.getValue());
-            });
-          }, 150));
+            options.renderSideBySide = false;
+            options.enableSplitViewResizing = false;
+            editor = monaco.editor.createDiffEditor(editorEl[0], options);
+            editor.setModel({ original: originalModel, modified: modifiedModel });
 
-          ngModel.$render = function() {
-            if (editor) {
-              editor.setValue(ngModel.$modelValue);
-            }
-            // FIXME: else: retry?
-          };
+            // Important -- how to propagate changes back to angular
+            editor.getModifiedEditor().onDidChangeModelContent(_.debounce(function () {
+              $scope.$apply(function () {
+                ngModel.$setViewValue(modifiedModel.getValue());
+              });
+            }, 150));
 
+            ngModel.$render = function () {
+              //   console.log('update modifiedModemodifiedEditorl content ' + new Date());
+              if (editor) {
+                editor.getModifiedEditor().setValue(ngModel.$modelValue);
+              }
+              // FIXME: else: retry?
+            };
+
+          }
+          else {
+            editor = monaco.editor.create(editorEl[0], options);
+
+            editor.onDidChangeModelContent(_.debounce(function () {
+              $scope.$apply(function () {
+                ngModel.$setViewValue(editor.getValue());
+              });
+            }, 150));
+
+            ngModel.$render = function() {
+              if (editor) {
+                editor.setValue(ngModel.$modelValue);
+              }
+              // FIXME: else: retry?
+            };
+          }
           if ($attr.ngDisabled) {
-            $scope.$watch($parse($attr.ngDisabled), function(disabled){
-              editor.updateOptions({readOnly: disabled});
+            $scope.$watch($parse($attr.ngDisabled), function (disabled) {
+              editor.updateOptions({ readOnly: disabled });
             });
           }
 
