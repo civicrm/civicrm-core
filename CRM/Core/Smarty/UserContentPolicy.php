@@ -176,18 +176,24 @@ class CRM_Core_Smarty_UserContentPolicy extends \Civi\Core\Service\AutoService {
    * @throws \Exception
    */
   public static function assertTagAllowed(string $tag): void {
-    // Pre boot scenario permit crmSqlData to be used.
-    if ($tag === 'crmSqlData' && !defined('CIVICRM_TEMPLATE_COMPILEDIR')) {
-      return;
+    if (!\Civi\Core\Container::isContainerBooted()) {
+      // We don't run user content before the system has booted.
+      // So the details here are kind of academic.
+      // Main thing: don't force a premature bootstrap.
+      $disabledTags = ['crmAPI'];
     }
-    $smarty = CRM_Core_Smarty::singleton();
-    $hasSecurity = ($smarty->getVersion() > 2) ? (bool) $smarty->security_policy : $smarty->security;
-    if (!$hasSecurity) {
-      return;
+    else {
+      $smarty = CRM_Core_Smarty::singleton();
+      $hasSecurity = ($smarty->getVersion() > 2) ? (bool) $smarty->security_policy : $smarty->security;
+      if (!$hasSecurity) {
+        return;
+      }
+
+      $policy = Civi::service('civi.smarty.userContent');
+      $disabledTags = $policy->disabled_tags;
     }
 
-    $policy = Civi::service('civi.smarty.userContent');
-    if (in_array($tag, $policy->disabled_tags)) {
+    if (in_array($tag, $disabledTags)) {
       throw new \Exception("Tag '{$tag}' is not allowed in secure mode.");
     }
   }
