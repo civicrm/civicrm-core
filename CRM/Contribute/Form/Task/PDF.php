@@ -191,6 +191,10 @@ AND    {$this->_componentClause}";
 
       $contribution = new CRM_Contribute_BAO_Contribution();
       $contribution->id = $contribID;
+      // @todo This fetch makes no sense because there is no query dao so
+      // $contribution only gets `id` set. It should be
+      // $contribution->find(TRUE). But then also it seems this isn't really
+      // used.
       $contribution->fetch();
 
       // set some fake input values so we can reuse IPN code
