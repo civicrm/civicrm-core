@@ -48,6 +48,12 @@ class CRM_Core_CodeGen_Util_Smarty {
   public function createSmarty(): Smarty {
     $base = dirname(__DIR__, 4);
     $pkgs = file_exists(dirname($base) . "/civicrm-packages") ? dirname($base) . "/civicrm-packages" : "$base/packages";
+
+    if (!defined('CIVICRM_SMARTY_AUTOLOAD_PATH')) {
+      define('CIVICRM_SMARTY_AUTOLOAD_PATH', $pkgs . '/smarty4/vendor/autoload.php');
+    }
+    // FIXME: If it's already set, and it doesn't match, then that's a problem.
+
     require_once $pkgs . '/smarty4/vendor/autoload.php';
     $smarty = new Smarty();
     $smarty->setTemplateDir("$base/xml/templates");
