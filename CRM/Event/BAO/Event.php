@@ -2120,14 +2120,13 @@ WHERE  ce.loc_block_id = $locBlockId";
 
     $allEvents = [];
     $createdEvents = [];
-    if ($eventResult = civicrm_api4('Event', 'get', $params)) {
-      $contactId = CRM_Core_Session::getLoggedInContactID();
-      foreach ($eventResult as $eventDetail) {
-        $eventId = $eventDetail['id'];
-        $allEvents[$eventId] = $eventId;
-        if (isset($eventDetail['created_id']) && $contactId == $eventDetail['created_id']) {
-          $createdEvents[$eventId] = $eventId;
-        }
+    $eventResult = civicrm_api4('Event', 'get', $params);
+    $contactId = CRM_Core_Session::getLoggedInContactID();
+    foreach ($eventResult as $eventDetail) {
+      $eventId = $eventDetail['id'];
+      $allEvents[$eventId] = $eventId;
+      if (isset($eventDetail['created_id']) && $contactId == $eventDetail['created_id']) {
+        $createdEvents[$eventId] = $eventId;
       }
     }
     return [$allEvents, $createdEvents];
