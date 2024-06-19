@@ -192,6 +192,72 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
         ],
         'grouping' => 'contact-fields',
       ],
+      'civicrm_address' => [
+        'dao' => 'CRM_Core_DAO_Address',
+        'fields' => [
+          'address_creditor' => [
+            'title' => ts('Soft Credit Street Address'),
+            'name' => 'street_address',
+            'alias' => 'acredit',
+            'default' => TRUE,
+          ],
+          'city_creditor' => [
+            'title' => ts('Soft Credit City'),
+            'name' => 'city',
+            'alias' => 'acredit',
+            'default' => TRUE,
+          ],
+          'postal_code_creditor' => [
+            'title' => ts('Soft Credit Postal Code'),
+            'name' => 'postal_code',
+            'alias' => 'acredit',
+            'default' => TRUE,
+          ],
+          'country_creditor' => [
+            'title' => ts('Soft Credit Country'),
+            'name' => 'country_id',
+            'alias' => 'acredit',
+            'default' => TRUE,
+          ],
+          'state_creditor' => [
+            'title' => ts('Soft Credit State'),
+            'name' => 'state_province_id',
+            'alias' => 'acredit',
+            'default' => TRUE,
+          ],
+          'address_constituent' => [
+            'title' => ts('Contributor\'s Street Address'),
+            'name' => 'street_address',
+            'alias' => 'aconst',
+            'no_repeat' => TRUE,
+          ],
+          'city_constituent' => [
+            'title' => ts('Contributor\'s City'),
+            'name' => 'city',
+            'alias' => 'acredit',
+            'default' => TRUE,
+          ],
+          'postal_code_constituent' => [
+            'title' => ts('Contributor\'s Postal Code'),
+            'name' => 'postal_code',
+            'alias' => 'acredit',
+            'default' => TRUE,
+          ],
+          'country_constituent' => [
+            'title' => ts('Contributor\'s Country'),
+            'name' => 'country_id',
+            'alias' => 'acredit',
+            'default' => TRUE,
+          ],
+          'state_constituent' => [
+            'title' => ts('Contributor\'s State'),
+            'name' => 'state_province_id',
+            'alias' => 'acredit',
+            'default' => TRUE,
+          ],
+        ],
+        'grouping' => 'contact-fields',
+      ],
       'civicrm_financial_type' => [
         'dao' => 'CRM_Financial_DAO_FinancialType',
         'fields' => ['financial_type' => NULL],
@@ -435,6 +501,15 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
                          {$alias}.contact_id  AND
                          {$alias}.is_primary = 1\n";
     }
+
+    foreach (['aconst', 'acredit'] as $alias_c) {
+      $this->_from .= "
+          LEFT JOIN civicrm_address {$alias}
+                    ON {$alias_c}.id =
+                       {$alias}.contact_id  AND
+                       {$alias}.is_primary = 1\n";
+    }
+
     // for credit card type
     $this->addFinancialTrxnFromClause();
   }
@@ -584,6 +659,20 @@ GROUP BY   {$this->_aliases['civicrm_contribution']}.currency
       if (!empty($row['civicrm_financial_trxn_card_type_id']) && !in_array('Subtotal', $rows[$rowNum])) {
         $rows[$rowNum]['civicrm_financial_trxn_card_type_id'] = $this->getLabels($row['civicrm_financial_trxn_card_type_id'], 'CRM_Financial_DAO_FinancialTrxn', 'card_type_id');
         $entryFound = TRUE;
+      }
+      $addrFields = [
+        'civicrm_address_state_creditor' => 'stateProvinceAbbreviation',
+        'civicrm_address_state_constituent' => 'stateProvinceAbbreviation',
+        'civicrm_address_country_creditor' => 'country',
+        'civicrm_address_country_constituent' => 'country',
+      ];
+      foreach ($addrFields as $key => $fn) {
+        if (array_key_exists($key, $row)) {
+          if ($value = $row[$key]) {
+            $rows[$rowNum][$key] = CRM_Core_PseudoConstant::$fn($value);
+          }
+          $entryFound = TRUE;
+        }
       }
 
       $entryFound = $this->alterDisplayContactFields($row, $rows, $rowNum, NULL, NULL) ? TRUE : $entryFound;
