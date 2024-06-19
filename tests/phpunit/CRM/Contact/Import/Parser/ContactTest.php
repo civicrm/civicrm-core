@@ -330,17 +330,24 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    */
   public function testImportNonDefaultCountryState(): void {
     \Civi::settings()->set('defaultContactCountry', 1228);
-    $this->validateCSV('individual_country_state.csv', [
+    $csv = 'individual_country_state.csv';
+    $mapper = [
       ['first_name'],
       ['last_name'],
       ['state_province', 'Primary'],
       ['country', 'Primary'],
-    ]);
-    $dataSource = $this->getDataSource();
-    $row = $dataSource->getRow();
+    ];
+    $this->validateCSV($csv, $mapper);
+    $this->importCSV($csv, $mapper);
+    $address = Address::get(FALSE)
+      ->addWhere('country_id.name', '=', 'Canada')
+      ->addWhere('state_province_id.name', '=', 'Alberta')
+      ->addSelect('contact_id.display_name')
+      ->execute()->single();
+    $this->assertEquals('Bob Smith', $address['contact_id.display_name']);
   }
 
-    /**
+  /**
    * Test updating an existing contact with external_identifier match but
    * subtype mismatch.
    *
