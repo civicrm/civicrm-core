@@ -1038,7 +1038,8 @@ class CRM_Utils_String {
     $useSecurityPolicy = ($smarty->getVersion() !== 2) && (!$smarty->security_policy);
     // For Smarty v2, policy is applied at lower level.
     if ($useSecurityPolicy) {
-      $smarty->enableSecurity('CRM_Core_Smarty_Security');
+      // $smarty->enableSecurity('CRM_Core_Smarty_Security');
+      Civi::service('civi.smarty.userContent')->enable();
     }
     $smarty->assign('smartySingleUseString', $templateString);
     try {
@@ -1077,7 +1078,8 @@ class CRM_Utils_String {
       $smarty->assign('smartySingleUseString');
       restore_error_handler();
       if ($useSecurityPolicy) {
-        $smarty->disableSecurity();
+        // $smarty->disableSecurity();
+        Civi::service('civi.smarty.userContent')->disable();
       }
     }
     return $templateString;
