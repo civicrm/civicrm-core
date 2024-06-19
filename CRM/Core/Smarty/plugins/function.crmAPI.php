@@ -22,6 +22,8 @@
  * @return string|void
  */
 function smarty_function_crmAPI($params, &$smarty) {
+  CRM_Core_Smarty_UserContentPolicy::assertTagAllowed('crmAPI');
+
   if (!array_key_exists('entity', $params)) {
     $smarty->trigger_error("assign: missing 'entity' parameter");
     return "crmAPI: missing 'entity' parameter";
