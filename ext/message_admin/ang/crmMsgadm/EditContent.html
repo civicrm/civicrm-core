@@ -33,11 +33,11 @@
         <i class="crm-i fa-caret-{{ accordions.msg_html ? 'down' : 'right' }}"></i>
         {{:: ts('HTML Content') }}
       </a>
-      <div class="btn-group btn-group-xs pull-right" role="toolbar" aria-label="{{::ts('HTML Content: Toolbar')}}" ng-show="accordions.msg_html">
-        <button type="button" class="btn btn-secondary" ng-show="!$ctrl.isDisabled()" title="{{::ts('Show diff')}}" ng-click="$ctrl.openFull(ts('HTML Content'), 'msg_html', {language: 'html'}, true)">
+      <div class=" pull-right" role="toolbar" aria-label="{{::ts('HTML Content: Toolbar')}}" ng-show="accordions.msg_html">
+        <button type="button" class="btn btn-primary" ng-show="!$ctrl.isDisabled()" title="{{::ts('Show diff')}}" ng-click="$ctrl.openFull(ts('HTML Content'), 'msg_html', {language: 'html'}, true)">
           {{::ts('Show diff')}}
         </button>
-        <button type="button" class="btn btn-secondary" title="{{::ts('Open preview')}}" ng-click="$ctrl.openPreview({formatName: 'msg_html'})">
+        <button type="button" class="btn btn-primary" title="{{::ts('Open preview')}}" ng-click="$ctrl.openPreview({formatName: 'msg_html'})">
           <i class="crm-i fa-eye"> {{::ts('Open preview')}}</i>
         </button>
         <button type="button" class="btn btn-secondary" title="{{::ts('Open large editor')}}" ng-click="$ctrl.openFull(ts('HTML Content'), 'msg_html', {language: 'html'})">
