@@ -17,7 +17,19 @@ class CRM_Core_Smarty_UserContentPolicy extends \Civi\Core\Service\AutoService {
    *
    * @var array
    */
-  public $php_functions;
+  public $php_functions = [
+    'array',
+    'list',
+    'isset',
+    'empty',
+    'count',
+    'sizeof',
+    'in_array',
+    'is_array',
+    'true',
+    'false',
+    'null',
+  ];
 
   /**
    * This is an array of trusted PHP modifiers.
@@ -26,7 +38,12 @@ class CRM_Core_Smarty_UserContentPolicy extends \Civi\Core\Service\AutoService {
    *
    * @var array
    */
-  public $php_modifiers;
+  public $php_modifiers = [
+    'escape',
+    'count',
+    'sizeof',
+    'nl2br',
+  ];
 
   /**
    * This is an array of disabled tags.
@@ -34,33 +51,19 @@ class CRM_Core_Smarty_UserContentPolicy extends \Civi\Core\Service\AutoService {
    *
    * @var array
    */
-  public $disabled_tags = array();
+  public $disabled_tags = ['crmAPI'];
+
+  public $allow_constants = FALSE;
+
+  public $allow_super_globals = FALSE;
+
+  private $old_settings = NULL;
 
   /**
    * @service civi.smarty.userContent
    */
   public static function create(): CRM_Core_Smarty_UserContentPolicy {
     $instance = new CRM_Core_Smarty_UserContentPolicy();
-
-    $instance->php_functions = [
-      'array',
-      'list',
-      'isset',
-      'empty',
-      'count',
-      'sizeof',
-      'in_array',
-      'is_array',
-      'true',
-      'false',
-    ];
-    $instance->php_modifiers = [
-      'escape',
-      'count',
-      'sizeof',
-      'nl2br',
-    ];
-    $instance->disabled_tags = ['crmAPI'];
 
     $event = \Civi\Core\Event\GenericHookEvent::create(['policy' => $instance]);
     Civi::dispatcher()->dispatch('hook_civicrm_userContentPolicy', $event);
@@ -116,9 +119,10 @@ class CRM_Core_Smarty_UserContentPolicy extends \Civi\Core\Service\AutoService {
         $this->disabled_tags = $policy->disabled_tags;
 
         $this->static_classes = NULL;
-        $this->allow_constants = FALSE;
-        $this->allow_super_globals = FALSE;
+        $this->allow_constants = $policy->allow_constants;
+        $this->allow_super_globals = $policy->allow_super_globals;
       }
+
     };
     return get_class($obj);
   }
@@ -126,6 +130,7 @@ class CRM_Core_Smarty_UserContentPolicy extends \Civi\Core\Service\AutoService {
   protected function createSmartyPolicy5(): string {
 
     $obj = new class(NULL) extends \Smarty\Security {
+
       public function __construct($smarty) {
         /** @var \CRM_Core_Smarty_UserContentPolicy $policy */
         $policy = Civi::service('civi.smarty.userContent');
@@ -142,9 +147,10 @@ class CRM_Core_Smarty_UserContentPolicy extends \Civi\Core\Service\AutoService {
         // }
 
         $this->static_classes = NULL;
-        $this->allow_constants = FALSE;
-        $this->allow_super_globals = FALSE;
+        $this->allow_constants = $policy->allow_constants;
+        $this->allow_super_globals = $policy->allow_super_globals;
       }
+
     };
     return get_class($obj);
   }
