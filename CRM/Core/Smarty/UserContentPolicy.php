@@ -123,6 +123,8 @@ class CRM_Core_Smarty_UserContentPolicy extends \Civi\Core\Service\AutoService {
     $obj = new class(NULL) extends Smarty_Security {
 
       public function __construct($smarty) {
+        parent::__construct($smarty);
+
         /** @var \CRM_Core_Smarty_UserContentPolicy $policy */
         $policy = Civi::service('civi.smarty.userContent');
 
@@ -144,6 +146,8 @@ class CRM_Core_Smarty_UserContentPolicy extends \Civi\Core\Service\AutoService {
     $obj = new class(NULL) extends \Smarty\Security {
 
       public function __construct($smarty) {
+        parent::__construct($smarty);
+
         /** @var \CRM_Core_Smarty_UserContentPolicy $policy */
         $policy = Civi::service('civi.smarty.userContent');
 
