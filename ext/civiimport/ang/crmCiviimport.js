@@ -243,6 +243,26 @@
         });
 
         /**
+         * Add another row to the mapping.
+         *
+         * This row will use a default value and be the same for all rows imported.
+         *
+         * @type {$scope.addRow}
+         */
+        $scope.addRow = (function () {
+          $scope.data.importMappings.push({'header' : '', 'selectedField' : undefined});
+          $scope.userJob.metadata.DataSource.column_headers.push('');
+        });
+
+        $scope.alterRow = (function (index, row) {
+          if (row.header === '' && row.selectedField === '') {
+            // Deleting a mapped row.
+            $scope.data.importMappings.splice(index, 1);
+            $scope.userJob.metadata.DataSource.column_headers.splice(index, 1);
+          }
+        });
+
+        /**
          * Save the user job configuration on save.
          *
          * We add two arrays to the 'metadata' key. This is in the format returned from `Parser->getFieldMappings()`
