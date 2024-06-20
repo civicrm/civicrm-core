@@ -87,7 +87,7 @@ return new class() {
   public function generateCreateTableWithConstraintSql(array $entity): string {
     $definition = $this->getTableDefinition($entity);
     $constraints = $this->getTableConstraints($entity);
-    $sql = "CREATE TABLE `{$entity['table']}` (\n  " .
+    $sql = "CREATE TABLE IF NOT EXISTS `{$entity['table']}` (\n  " .
       implode(",\n  ", $definition);
     if ($constraints) {
       $sql .= ",\n  " . implode(",\n  ", $constraints);
