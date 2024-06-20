@@ -536,6 +536,7 @@ WHERE participant.contact_id = %1 AND  note.entity_table = 'civicrm_participant'
     if ($relatedClauses) {
       // Nested array will be joined with OR
       $clauses['entity_table'] = [$relatedClauses];
+      $clauses['entity_table'][0][] = 'is null';
     }
     // Enforce note privacy setting
     if (!CRM_Core_Permission::check('view all notes', $userId)) {
