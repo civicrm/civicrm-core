@@ -553,17 +553,27 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
   }
 
   public function getVersion (): int {
-    $path = (string) crm_smarty_compatibility_get_path();
-    if (str_contains($path, 'smarty3')) {
-      return 3;
+    static $version;
+    if ($version === NULL) {
+      if (class_exists('Smarty\Smarty')) {
+        $version = 5;
+      }
+      else {
+        $class = new ReflectionClass('Smarty');
+        $path = $class->getFileName();
+        if (str_contains($path, 'smarty3')) {
+          $version = 3;
+        }
+        elseif (str_contains($path, 'smarty4')) {
+          $version = 4;
+        }
+        else {
+          $version = 2;
+        }
+      }
     }
-    if (str_contains($path, 'smarty4')) {
-      return 4;
-    }
-    if (str_contains($path, 'smarty5')) {
-      return 5;
-    }
-    return 2;
+    return $version;
+
   }
 
 }
