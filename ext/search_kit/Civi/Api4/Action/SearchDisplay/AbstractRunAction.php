@@ -451,6 +451,16 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       }
       $fieldKey = $this->renameIfAggregate($fieldKey);
     }
+    // Handle relative dates
+    if (!empty($clause[2])) {
+      $field = $this->getField($fieldKey);
+      if ($field && $field['data_type'] === 'Date') {
+        $clause[2] = date('Y-m-d', strtotime($clause[2]));
+      }
+      if ($field && $field['data_type'] === 'Timestamp') {
+        $clause[2] = date('Y-m-d H:i:s', strtotime($clause[2]));
+      }
+    }
     return [$fieldKey, $clause[1] ?? 'IS NOT EMPTY', $clause[2] ?? NULL];
   }
 
