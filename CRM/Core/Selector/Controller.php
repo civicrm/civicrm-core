@@ -114,7 +114,7 @@ class CRM_Core_Selector_Controller {
    *   Should match a CRM_Core_Smarty::PRINT_* constant,
    *   or equal 0 if not in print mode
    */
-  protected $_print = 0;
+  protected $_print = FALSE;
 
   /**
    * The storage object (typically a form or a page)
