@@ -14,8 +14,8 @@
     <url desc="Support">http://civicrm.org</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
-  <releaseDate>2024-06-15</releaseDate>
-  <version>5.74.3</version>
+  <releaseDate>2024-06-19</releaseDate>
+  <version>5.74.4</version>
   <develStage>stable</develStage>
   <compatibility>
     <ver>5.74</ver>
