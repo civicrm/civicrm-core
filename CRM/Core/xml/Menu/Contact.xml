@@ -297,7 +297,7 @@
 </item>
 <item>
    <path>civicrm/contact/deduperules</path>
-   <title>Find and Merge Duplicate Contacts</title>
+   <title>Manage Duplicates</title>
    <desc>Manage the rules used to identify potentially duplicate contact records. Scan for duplicates using a selected rule and merge duplicate contact data as needed.</desc>
    <page_callback>CRM_Contact_Page_DedupeRules</page_callback>
    <access_arguments>administer dedupe rules;merge duplicate contacts</access_arguments>
@@ -306,7 +306,7 @@
 </item>
 <item>
    <path>civicrm/contact/dedupefind</path>
-   <title>Find and Merge Duplicate Contacts</title>
+   <title>Manage Duplicates</title>
    <page_callback>CRM_Contact_Page_DedupeFind</page_callback>
    <access_arguments>merge duplicate contacts</access_arguments>
 </item>

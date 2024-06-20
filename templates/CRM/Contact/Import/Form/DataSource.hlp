@@ -72,7 +72,7 @@
   {ts}Dedupe Rule{/ts}
 {/htxt}
 {htxt id='id-dedupe_rule'}
-  {ts}If you have selected one of the dedupe options besides "no duplicate checking," CiviCRM will use a predefined dedupe rule to determine possible matches for your imported records. Existing dedupe rules may be reviewed, and new rules created, by visiting Contacts > Find and Merge Duplicate Contacts.{/ts}
+  {ts}If you have selected one of the dedupe options besides "no duplicate checking," CiviCRM will use a predefined dedupe rule to determine possible matches for your imported records. Existing dedupe rules may be reviewed, and new rules created, by visiting Contacts > Manage Duplicates.{/ts}
   {ts}When selecting a dedupe rule, be sure to choose one that includes fields contained in your import file. Also be aware that the update and fill options could have significant impact on your existing data. You should define and select a rule that is strict enough to ensure there are no false positive matches.{/ts}
 {/htxt}
 

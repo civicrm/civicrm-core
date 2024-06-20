@@ -56,7 +56,7 @@
   </tr>
   <tr>
    <td>
-    <p>{ts}If you think this may be a duplicate contact which should be merged with an existing record - Go to "Contacts >> Find and Merge Duplicate Contacts". Use the strict rule for Organizations to find the potential duplicates and merge them if appropriate.{/ts}</p>
+    <p>{ts}If you think this may be a duplicate contact which should be merged with an existing record - Go to "Contacts >> Manage Duplicates". Use the strict rule for Organizations to find the potential duplicates and merge them if appropriate.{/ts}</p>
    </td>
   </tr>
   {if $receiptMessage}
