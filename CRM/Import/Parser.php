@@ -1580,7 +1580,30 @@ abstract class CRM_Import_Parser implements UserJobInterface {
       }
 
       $comparisonValue = $this->getComparisonValue($importedValue);
-      return $options[$comparisonValue] ?? 'invalid_import_value';
+      $resolvedValue = $options[$comparisonValue] ?? 'invalid_import_value';
+      if (in_array($fieldName, ['state_province_id', 'county_id'], TRUE) && $resolvedValue === 'invalid_import_value') {
+        if ($fieldName === 'state_province_id') {
+          $stateID = CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_state_province WHERE name = %1', [1 => [$comparisonValue, 'String']]);
+          if (!$stateID) {
+            $stateID = CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_state_province WHERE abbreviation = %1', [1 => [$comparisonValue, 'String']]);
+          }
+          if ($stateID) {
+            $this->importableFieldsMetadata['state_province_id']['options'][$comparisonValue] = $stateID;
+            return $stateID;
+          }
+        }
+        if ($fieldName === 'county_id') {
+          $countyID = CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_county WHERE name = %1', [1 => [$comparisonValue, 'String']]);
+          if (!$countyID) {
+            $countyID = CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_county WHERE abbreviation = %1', [1 => [$comparisonValue, 'String']]);
+          }
+          if ($countyID) {
+            $this->importableFieldsMetadata['county_id']['options'][$comparisonValue] = $countyID;
+            return $countyID;
+          }
+        }
+      }
+      return $resolvedValue;
     }
     // @todo - make this generic - for fields where getOptions doesn't fetch
     // getOptions does not retrieve these fields with high potential results
