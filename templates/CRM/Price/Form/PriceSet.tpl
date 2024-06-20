@@ -32,7 +32,7 @@
             <div class="crm-section {$element.name|escape}-section crm-price-field-id-{$field_id}">
             {if ($element.html_type eq 'CheckBox' || $element.html_type == 'Radio') && $element.options_per_line}
               {assign var="element_name" value="price_`$field_id`"}
-              <div class="label">{$form.$element_name.label|purify}</div>
+              <div class="label">{$form.$element_name.label}</div>
               <div class="content {$element.name|escape}-content">
                 {assign var="elementCount" value="0"}
                 {assign var="optionCount" value="0"}
@@ -60,7 +60,7 @@
 
                 {assign var="element_name" value="price_"|cat:$field_id}
 
-                <div class="label">{$form.$element_name.label|purify}</div>
+                <div class="label">{$form.$element_name.label}</div>
                 <div class="content {$element.name|escape}-content">
                   {$form.$element_name.html}
                   {if $element.html_type eq 'Text'}
@@ -101,7 +101,7 @@
                   <div class='label'></div>
                   <div class='content' id="auto_renew_section">
                     {if $form.auto_renew}
-                      {$form.auto_renew.html}&nbsp;{$form.auto_renew.label|smarty:nodefaults|purify}
+                      {$form.auto_renew.html}&nbsp;{$form.auto_renew.label}
                     {/if}
                   </div>
                   <div class='content' id="force_renew" style='display: none'>{ts}Membership will renew automatically.{/ts}</div>

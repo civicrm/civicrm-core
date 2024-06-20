@@ -91,6 +91,15 @@ class CRM_Core_DAO_AllCoreTables {
   }
 
   /**
+   * Get the declared token classes.
+   * @return string[]
+   *   [table_name => token class]
+   */
+  public static function tokenClasses() {
+    return array_column(self::getEntities(), 'token_class', 'name');
+  }
+
+  /**
    * @return array
    *   List of indices.
    */

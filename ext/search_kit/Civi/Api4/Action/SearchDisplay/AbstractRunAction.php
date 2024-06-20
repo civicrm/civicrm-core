@@ -340,8 +340,8 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         $quotedId = preg_quote('$' . $nestedId);
         $output = preg_replace("/$quotedId(?![.\w])/", '$' . "$nestedId.id", $output);
       }
-      $smarty = \CRM_Core_Smarty::singleton();
-      $output = $smarty->fetchWith("string:$output", $vars);
+
+      $output = \CRM_Utils_String::parseOneOffStringThroughSmarty($output, $vars);
     }
     return $output;
   }

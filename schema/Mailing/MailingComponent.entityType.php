@@ -28,18 +28,12 @@ return [
       'sql_type' => 'varchar(64)',
       'input_type' => 'Text',
       'description' => ts('The name of this component'),
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'component_type' => [
       'title' => ts('Mailing Component Type'),
       'sql_type' => 'varchar(12)',
       'input_type' => 'Select',
       'description' => ts('Type of Component.'),
-      'input_attrs' => [
-        'maxlength' => 12,
-      ],
       'pseudoconstant' => [
         'callback' => 'CRM_Core_SelectValues::mailingComponents',
       ],
@@ -50,7 +44,6 @@ return [
       'input_type' => 'Text',
       'input_attrs' => [
         'label' => ts('Subject'),
-        'maxlength' => 255,
       ],
     ],
     'body_html' => [

@@ -82,6 +82,21 @@
       return url;
     };
 
+    /**
+     *
+     * @param record
+     * @returns {string}
+     */
+    $ctrl.revert = function(record) {
+      CRM.api4('MessageTemplate', 'revert', {
+        where: [["id", "=", record.id]]
+      }).then(function(results) {
+        $route.reload();
+      }, function(failure) {
+        // handle failure
+      });
+    };
+
     $ctrl.addTranslation = function(record) {
       var existing = findTranslations(record), activeLangs = findActiveLangs();
       var langs = [];

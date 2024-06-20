@@ -68,7 +68,6 @@ return [
       'add' => '1.8',
       'input_attrs' => [
         'label' => ts('Machine Name'),
-        'maxlength' => 64,
       ],
     ],
     'title' => [
@@ -81,7 +80,6 @@ return [
       'add' => '5.13',
       'input_attrs' => [
         'label' => ts('Backend Title'),
-        'maxlength' => 255,
       ],
     ],
     'frontend_title' => [
@@ -94,7 +92,6 @@ return [
       'add' => '5.61',
       'input_attrs' => [
         'label' => ts('Frontend Title'),
-        'maxlength' => 255,
       ],
     ],
     'description' => [
@@ -105,7 +102,6 @@ return [
       'add' => '1.8',
       'input_attrs' => [
         'label' => ts('Description'),
-        'maxlength' => 255,
       ],
     ],
     'payment_processor_type_id' => [
@@ -165,18 +161,12 @@ return [
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'add' => '1.8',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'password' => [
       'title' => ts('Password'),
       'sql_type' => 'varchar(255)',
       'input_type' => 'Password',
       'add' => '1.8',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'signature' => [
       'title' => ts('Signature'),
@@ -193,54 +183,36 @@ return [
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'add' => '1.8',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'url_api' => [
       'title' => ts('API URL'),
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'add' => '1.8',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'url_recur' => [
       'title' => ts('Recurring Payments URL'),
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'add' => '1.8',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'url_button' => [
       'title' => ts('Button URL'),
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'add' => '1.8',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'subject' => [
       'title' => ts('Subject'),
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'add' => '1.8',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'class_name' => [
       'title' => ts('Suffix for PHP class name implementation'),
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'add' => '1.8',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'billing_mode' => [
       'title' => ts('Processor Billing Mode'),

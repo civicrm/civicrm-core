@@ -345,6 +345,7 @@ class Container {
       'Civi\Token\TokenCompatSubscriber',
       []
     ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
+
     $container->setDefinition("crm_mailing_action_tokens", new Definition(
       'CRM_Mailing_ActionTokens',
       []
@@ -389,6 +390,16 @@ class Container {
       'CRM_Core_DomainTokens',
       []
     ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
+
+    // For each DAO that supports tokens by declaring the token class...
+    $entities = \CRM_Core_DAO_AllCoreTables::tokenClasses();
+    foreach ($entities as $entity => $class) {
+      $container->setDefinition('crm_entity_token_' . strtolower($entity), new Definition(
+        $class,
+        [$entity]
+      ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
+    }
+
     $container->setDefinition('crm_token_tidy', new Definition(
       '\Civi\Token\TidySubscriber',
       []

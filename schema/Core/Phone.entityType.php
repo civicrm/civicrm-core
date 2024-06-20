@@ -125,7 +125,6 @@ return [
       ],
       'input_attrs' => [
         'label' => ts('Phone'),
-        'maxlength' => 32,
       ],
     ],
     'phone_ext' => [
@@ -141,7 +140,6 @@ return [
       ],
       'input_attrs' => [
         'size' => '4',
-        'maxlength' => 16,
       ],
     ],
     'phone_numeric' => [
@@ -153,7 +151,6 @@ return [
       'add' => '4.3',
       'input_attrs' => [
         'label' => ts('Numeric'),
-        'maxlength' => 32,
       ],
     ],
     'phone_type_id' => [

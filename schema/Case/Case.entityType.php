@@ -83,9 +83,6 @@ return [
         'export',
         'duplicate_matching',
       ],
-      'input_attrs' => [
-        'maxlength' => 128,
-      ],
     ],
     'start_date' => [
       'title' => ts('Case Start Date'),

@@ -39,9 +39,6 @@ return [
       'required' => TRUE,
       'description' => ts('Table where referenced item is stored'),
       'add' => '5.39',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
       'pseudoconstant' => [
         'callback' => 'CRM_Core_BAO_Translation::getEntityTables',
       ],
@@ -53,9 +50,6 @@ return [
       'required' => TRUE,
       'description' => ts('Field where referenced item is stored'),
       'add' => '5.39',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
       'pseudoconstant' => [
         'callback' => 'CRM_Core_BAO_Translation::getEntityFields',
       ],
@@ -79,9 +73,6 @@ return [
       'required' => TRUE,
       'description' => ts('Relevant language'),
       'add' => '5.39',
-      'input_attrs' => [
-        'maxlength' => 5,
-      ],
       'pseudoconstant' => [
         'option_group_name' => 'languages',
         'key_column' => 'name',

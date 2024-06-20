@@ -67,9 +67,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Title of the job'),
       'add' => '4.1',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'command' => [
       'title' => ts('Command'),
@@ -77,9 +74,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Full path to file containing job script'),
       'add' => '4.1',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'description' => [
       'title' => ts('Description'),
@@ -87,9 +81,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Title line of log entry'),
       'add' => '4.1',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'data' => [
       'title' => ts('Extended Data'),

@@ -18,6 +18,9 @@
     <tbody>
     <tr ng-repeat="record in $ctrl.records | filter:filters.text | orderBy:['msg_title','_is_translation','tx_language_label']">
       <td>{{record.msg_title}}</td>
+      <td  class="text-right">
+        <a ng-show="record.master_id" class="btn btn-xs btn-default" ng-click="$ctrl.revert(record)">{{:: ts('Revert') }}</a>
+      </td>
       <td class="text-right">
         <a class="btn btn-xs btn-default" ng-href="{{$ctrl.editUrl(record)}}">{{:: ts('Edit') }}</a>
       </td>

@@ -56,7 +56,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
   protected function setUp(): void {
     parent::setUp();
     $originalExtensions = array_column(CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(), 'fullName');
-    $this->assertEquals([], array_intersect($originalExtensions, $this->toggleExtensions), 'These extensions may be enabled and disabled during the test. The start-state and end-state should be the same. It appears that we have an unexpected start-state. Perhaps another test left us with a weird start-state?');
+    $this->assertEquals(['civiimport'], array_values(array_intersect($originalExtensions, $this->toggleExtensions)), 'These extensions may be enabled and disabled during the test. The start-state and end-state should be the same. It appears that we have an unexpected start-state. Perhaps another test left us with a weird start-state?');
     $this->enableBackgroundQueueOriginalValue = Civi::settings()->get('enableBackgroundQueue');
   }
 
@@ -73,8 +73,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ->addWhere('rule_table', '!=', 'civicrm_email')
       ->addWhere('dedupe_rule_group_id.name', '=', 'IndividualUnsupervised')->execute();
     foreach ($this->toggleExtensions as $ext) {
-      CRM_Extension_System::singleton()->getManager()->disable([$ext]);
-      CRM_Extension_System::singleton()->getManager()->uninstall([$ext]);
+      CRM_Extension_System::singleton()->getManager()->install([$ext]);
     }
     Civi::settings()->set('enableBackgroundQueue', $this->enableBackgroundQueueOriginalValue);
     parent::tearDown();
@@ -797,6 +796,15 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   protected function getUserJobID(array $submittedValues = []): int {
+    $isCsv = ($submittedValues['dataSource'] ?? NULL) === 'CRM_Import_DataSource_CSV';
+    if (!$isCsv && !empty($submittedValues['mapper']) && empty($submittedValues['sqlQuery'])) {
+      $submittedValues['sqlQuery'] = 'SELECT ';
+      $submittedClauses = [];
+      foreach ($submittedValues['mapper'] as $field) {
+        $submittedClauses[] = "'' as " . CRM_Utils_String::munge($field[0]);
+      }
+      $submittedValues['sqlQuery'] .= implode(',', $submittedClauses);
+    }
     $userJobID = UserJob::create()->setValues([
       'metadata' => [
         'submitted_values' => array_merge([
@@ -812,7 +820,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       'status_id:name' => 'draft',
       'job_type' => 'contribution_import',
     ])->execute()->first()['id'];
-    if ($submittedValues['dataSource'] ?? NULL === 'CRM_Import_DataSource') {
+    if ($isCsv) {
       $dataSource = new CRM_Import_DataSource_CSV($userJobID);
     }
     else {

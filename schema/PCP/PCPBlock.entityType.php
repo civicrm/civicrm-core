@@ -27,9 +27,6 @@ return [
       'sql_type' => 'varchar(64)',
       'input_type' => 'Text',
       'add' => '2.2',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'entity_id' => [
       'title' => ts('Entity'),
@@ -51,9 +48,6 @@ return [
       'description' => ts('The type of entity that this pcp targets'),
       'add' => '4.1',
       'default' => 'contribute',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'target_entity_id' => [
       'title' => ts('Target Entity ID'),
@@ -128,9 +122,6 @@ return [
       'description' => ts('Link text for PCP.'),
       'add' => '2.2',
       'default' => NULL,
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'is_active' => [
       'title' => ts('Enabled?'),
@@ -151,9 +142,6 @@ return [
       'description' => ts('If set, notification is automatically emailed to this email-address on create/update Personal Campaign Page'),
       'add' => '2.2',
       'default' => NULL,
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
   ],
 ];

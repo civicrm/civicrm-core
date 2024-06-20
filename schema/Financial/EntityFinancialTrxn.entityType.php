@@ -47,9 +47,6 @@ return [
         'export',
         'duplicate_matching',
       ],
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
       'pseudoconstant' => [
         'callback' => 'CRM_Financial_BAO_EntityFinancialTrxn::entityTables',
       ],

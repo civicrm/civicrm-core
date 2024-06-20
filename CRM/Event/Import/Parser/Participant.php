@@ -93,12 +93,15 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
 
         if (CRM_Core_Error::isAPIError($error, CRM_Core_Error::DUPLICATE_CONTACT)) {
           $matchedIDs = (array) $error['error_message']['params'];
-          if (count($matchedIDs) >= 1) {
+          if (count($matchedIDs) === 1) {
             foreach ($matchedIDs as $contactId) {
               $formatted['contact_id'] = $contactId;
               $formatted['version'] = 3;
               $newParticipant = $this->deprecated_create_participant_formatted($formatted);
             }
+          }
+          elseif ($matchedIDs > 1) {
+            throw new CRM_Core_Exception(ts('Record duplicates multiple contacts: ') . implode(',', $matchedIDs));
           }
         }
         else {

@@ -39,9 +39,6 @@ return [
       'required' => TRUE,
       'description' => ts('Table which uses this price set'),
       'add' => '1.8',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'entity_id' => [
       'title' => ts('Entity ID'),

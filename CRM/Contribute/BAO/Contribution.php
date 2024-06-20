@@ -2263,17 +2263,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $this->find(TRUE);
     }
 
-    $paymentProcessorID = $input['payment_processor_id'] ?? $ids['paymentProcessor'] ?? NULL;
+    $paymentProcessorID = $input['payment_processor_id'] ?? NULL;
 
-    if (!isset($input['payment_processor_id']) && !$paymentProcessorID && $this->contribution_page_id) {
-      $paymentProcessorID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage',
-        $this->contribution_page_id,
-        'payment_processor'
-      );
-      if ($paymentProcessorID) {
-        $intentionalEnotice = $CRM16923AnUnreliableMethodHasBeenUserToDeterminePaymentProcessorFromContributionPage;
-      }
-    }
     $ids['contributionType'] = $this->financial_type_id;
     $ids['financialType'] = $this->financial_type_id;
     if ($this->contribution_page_id) {
@@ -2296,20 +2287,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     if (!empty($ids['contributionRecur']) && !$paymentProcessorID) {
       $paymentProcessorID = $this->_relatedObjects['contributionRecur']->payment_processor_id;
-    }
-
-    if (!empty($ids['pledge_payment'])) {
-      foreach ($ids['pledge_payment'] as $key => $paymentID) {
-        if (empty($paymentID)) {
-          continue;
-        }
-        $payment = new CRM_Pledge_BAO_PledgePayment();
-        $payment->id = $paymentID;
-        if (!$payment->find(TRUE)) {
-          throw new CRM_Core_Exception("Could not find pledge payment record: " . $paymentID);
-        }
-        $this->_relatedObjects['pledge_payment'][] = $payment;
-      }
     }
 
     // These are probably no longer accessed from anywhere
@@ -2344,31 +2321,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
     }
 
-    if ($this->_component != 'contribute') {
-      // we are in event mode
-      // make sure event exists and is valid
-      $event = new CRM_Event_BAO_Event();
-      $event->id = $ids['event'];
-      if ($ids['event'] &&
-        !$event->find(TRUE)
-      ) {
-        throw new CRM_Core_Exception("Could not find event: " . $ids['event']);
-      }
-
-      $this->_relatedObjects['event'] = &$event;
-
-      $participant = new CRM_Event_BAO_Participant();
-      $participant->id = $ids['participant'];
-      if ($ids['participant'] &&
-        !$participant->find(TRUE)
-      ) {
-        throw new CRM_Core_Exception("Could not find participant: " . $ids['participant']);
-      }
-      $participant->register_date = CRM_Utils_Date::isoToMysql($participant->register_date);
-
-      $this->_relatedObjects['participant'] = &$participant;
-    }
-
     $eventID = isset($ids['event']) ? (int) $ids['event'] : NULL;
     $participantID = isset($ids['participant']) ? (int) $ids['participant'] : NULL;
     $contributionID = (int) $this->id;
@@ -2379,6 +2331,31 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     // line having loaded an array
     $membershipIDs = !empty($ids['membership']) ? (array) $ids['membership'] : NULL;
     unset($ids);
+
+    if ($this->_component != 'contribute') {
+      // we are in event mode
+      // make sure event exists and is valid
+      $event = new CRM_Event_BAO_Event();
+      $event->id = $eventID;
+      if ($eventID &&
+        !$event->find(TRUE)
+      ) {
+        throw new CRM_Core_Exception("Could not find event: " . $eventID);
+      }
+
+      $this->_relatedObjects['event'] = &$event;
+
+      $participant = new CRM_Event_BAO_Participant();
+      $participant->id = $participantID;
+      if ($participantID &&
+        !$participant->find(TRUE)
+      ) {
+        throw new CRM_Core_Exception("Could not find participant: " . $participantID);
+      }
+      $participant->register_date = CRM_Utils_Date::isoToMysql($participant->register_date);
+
+      $this->_relatedObjects['participant'] = &$participant;
+    }
 
     //not really sure what params might be passed in but lets merge em into values
     $values = array_merge($this->_gatherMessageValues($values, $eventID, $participantID), $values);
