@@ -95,7 +95,7 @@ return [
       'title' => ts('Translated String'),
       'sql_type' => 'longtext',
       'input_type' => 'TextArea',
-      'required' => TRUE,
+      'required' => FALSE,
       'description' => ts('Translated string'),
       'add' => '5.39',
     ],
