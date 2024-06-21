@@ -396,6 +396,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch implements
     foreach ($groups as $group) {
       // Filter out arrays in Form Values which are group searchs.
       if (is_array($group['saved_search_id.form_values'])) {
+        $groupSearches = [];
         $groupSearches = array_filter(
           $group['saved_search_id.form_values'],
           function($v) {
