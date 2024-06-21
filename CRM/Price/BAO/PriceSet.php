@@ -569,7 +569,7 @@ WHERE  id = %1";
    * @todo $priceSetID is a pseudoparam for permit override - we should stop passing it where we
    * don't specifically need it & find a better way where we do.
    */
-  public static function processAmount($fields, &$params, &$lineItem, $priceSetID = NULL) {
+  public static function processAmount($fields, &$params, &$lineItem = [], $priceSetID = NULL) {
     // using price set
     foreach ($fields as $id => $field) {
       if (empty($params["price_{$id}"]) ||

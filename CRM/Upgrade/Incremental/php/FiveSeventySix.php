@@ -32,6 +32,29 @@ class CRM_Upgrade_Incremental_php_FiveSeventySix extends CRM_Upgrade_Incremental
     $this->addTask('Add start_date to civicrm_mailing table', 'addColumn', 'civicrm_mailing', 'start_date', "timestamp NULL DEFAULT NULL COMMENT 'date on which this mailing was started.'");
     $this->addTask('Add end_date to civicrm_mailing table', 'addColumn', 'civicrm_mailing', 'end_date', "timestamp NULL DEFAULT NULL COMMENT 'date on which this mailing was completed.'");
     $this->addTask('Add status to civicrm_mailing table', 'addColumn', 'civicrm_mailing', 'status', "varchar(12) DEFAULT NULL COMMENT 'The status of this Mailing'");
+    $this->addTask('Alter translation to make string non-required', 'alterColumn', 'civicrm_translation', 'string',
+      "longtext NULL COMMENT 'Translated string'"
+    );
+    $this->addTask('Install SiteToken entity', 'createEntityTable', '5.76.alpha1.SiteToken.entityType.php');
+    $this->addTask(ts('Create index %1', [1 => 'civicrm_site_token.UI_name_domain_id']), 'addIndex', 'civicrm_site_token', [['name', 'domain_id']], 'UI');
+    $this->addTask('Create "message header" token', 'create_mesage_header_token');
+  }
+
+  public static function create_mesage_header_token() {
+    $query = CRM_Core_DAO::executeQuery('SELECT id FROM civicrm_domain');
+    $domains = $query->fetchAll();
+    foreach ($domains as $domain) {
+      CRM_Core_DAO::executeQuery(
+        "INSERT IGNORE INTO civicrm_site_token (domain_id, name, label, body_html, body_text, is_reserved, is_active)
+      VALUES(
+       " . $domain['id'] . ",
+       'message_header',
+       '" . ts('Message Header') . "',
+     '<!-- " . ts('This is the %1 token HTML content.', [1 => '{site.message_header}']) . " -->',
+      '', 1, 1)"
+      );
+    }
+    return TRUE;
   }
 
 }

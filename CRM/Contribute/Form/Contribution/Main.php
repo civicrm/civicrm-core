@@ -995,7 +995,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       // @todo - processAmount is to be deprectated - can we use getTotalAmount or
       // a function of self->order here?
       CRM_Price_BAO_PriceSet::processAmount($self->_values['fee'],
-        $fields, $lineItem
+        $fields
       );
 
       $minAmt = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $fields['priceSetId'], 'min_amount');
