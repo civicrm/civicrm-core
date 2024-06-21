@@ -726,20 +726,19 @@ input.crm-form-entityref {
 
 .crm-container a.empowered-by-link {
   display: inline-block;
-  height: 70px;
+  height: 34px;
   position: relative;
-  width: 130px;
-  top: 24px;
-  left: -8px;
+  width: 99px;
 }
 
 .crm-container div.empowered-by-logo {
-  background-image: url('../i/civi99.svg');
-  background-repeat: no-repeat;
+  background: url('../i/civi99.png') no-repeat;
+  background-image: url('../i/civi99.svg'), none;
   display: block;
-  line-height: 80px;
+  line-height: 34px;
   position: absolute;
-  width: 140px;
+  top: 9px;
+  width: 99px;
 }
 
 .crm-container div.empowered-by-logo span {
