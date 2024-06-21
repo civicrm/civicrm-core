@@ -163,11 +163,13 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
       }
 
       foreach (['Membership Signup', 'Membership Renewal'] as $activityType) {
-        $activityParams['id'] = civicrm_api3('Activity', 'Get', [
-          'source_record_id' => $membership->id,
-          'activity_type_id' => $activityType,
-          'status_id' => 'Scheduled',
-        ])['id'] ?? NULL;
+        $activityParams['id'] = \Civi\Api4\Activity::get(FALSE)
+          ->addSelect('id')
+          ->addWhere('source_record_id', '=', $membership->id)
+          ->addWhere('activity_type_id:name', '=', $activityType)
+          ->addWhere('status_id:name', '=', 'Scheduled')
+          ->execute()
+          ->first()['id'] ?? NULL;
         // 1. Update Schedule Membership Signup/Renwal activity to completed on successful payment of pending membership
         // 2. OR Create renewal activity scheduled if its membership renewal will be paid later
         if (!empty($params['membership_activity_status']) && (!empty($activityParams['id']) || $activityType == 'Membership Renewal')) {
