@@ -1,8 +1,8 @@
 <?php
 use CRM_Event_Cart_ExtensionUtil as E;
 
-$htmlText = file_get_contents(__DIR__ . 'event_registration_receipt_html.tpl');
-$subject = file_get_contents(__DIR__ . 'event_registration_receipt_subject.tpl');
+$htmlText = file_get_contents(__DIR__ . '/event_registration_receipt_html.tpl');
+$subject = file_get_contents(__DIR__ . '/event_registration_receipt_subject.tpl');
 
 /**
  * Add event cart template.
