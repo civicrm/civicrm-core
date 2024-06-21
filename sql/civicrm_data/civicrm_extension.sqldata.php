@@ -69,4 +69,8 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_extension', 'INSERT IGNORE INTO
       'full_name' => 'civiimport',
       'name' => 'Civi-Import',
     ],
+    [
+      'full_name' => 'message_admin',
+      'name' => 'Message Administration',
+    ],
   ]);
