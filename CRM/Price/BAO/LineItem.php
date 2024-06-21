@@ -572,6 +572,15 @@ WHERE li.contribution_id = %1";
 
     // fetch submitted LineItems from input params and feeBlock information
     $submittedLineItems = $lineItemObj->getSubmittedLineItems($params, $feeBlock);
+    $feeAmount = $params['amount'];
+    $updatedAmount = $params['amount'] ?? $params['total_amount'] ?? NULL;
+    if (strlen($params['tax_amount']) != 0) {
+      $taxAmount = $params['tax_amount'];
+    }
+    else {
+      $taxAmount = "NULL";
+    }
+    unset($params);
 
     $requiredChanges = $lineItemObj->getLineItemsToAlter($submittedLineItems, $entityID, $entity);
 
@@ -616,15 +625,6 @@ WHERE li.contribution_id = %1";
     }
     if ($count > 1) {
       $updatedAmount = CRM_Price_BAO_LineItem::getLineTotal($contributionId);
-    }
-    else {
-      $updatedAmount = $params['amount'] ?? $params['total_amount'] ?? NULL;
-    }
-    if (strlen($params['tax_amount']) != 0) {
-      $taxAmount = $params['tax_amount'];
-    }
-    else {
-      $taxAmount = "NULL";
     }
     $displayParticipantCount = '';
     if ($totalParticipant > 0) {
@@ -671,7 +671,7 @@ WHERE li.contribution_id = %1";
     $lineItemObj->addFinancialItemsOnLineItemsChange(array_merge($requiredChanges['line_items_to_add'], $requiredChanges['line_items_to_resurrect']), $entityID, $entityTable, $contributionId, $trxn->id ?? NULL);
 
     // update participant fee_amount column
-    $lineItemObj->updateEntityRecordOnChangeFeeSelection($params, $entityID, $entity);
+    $lineItemObj->updateEntityRecordOnChangeFeeSelection($feeAmount, $entityID, $entity);
   }
 
   /**
@@ -947,12 +947,12 @@ WHERE li.contribution_id = %1";
   /**
    * Helper function to update entity record on change fee selection
    *
-   * @param array $inputParams
+   * @param int|float $feeAmount
    * @param int $entityID
    * @param string $entity
    *
    */
-  protected function updateEntityRecordOnChangeFeeSelection($inputParams, $entityID, $entity) {
+  protected function updateEntityRecordOnChangeFeeSelection($feeAmount, $entityID, $entity) {
     $entityTable = "civicrm_{$entity}";
 
     if ($entity == 'participant') {
@@ -967,7 +967,7 @@ WHERE li.contribution_id = %1";
       }
 
       $partUpdateFeeAmt['fee_level'] = $line;
-      $partUpdateFeeAmt['fee_amount'] = $inputParams['amount'];
+      $partUpdateFeeAmt['fee_amount'] = $feeAmount;
       CRM_Event_BAO_Participant::add($partUpdateFeeAmt);
 
       //activity creation
