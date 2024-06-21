@@ -312,7 +312,7 @@ class SpecFormatter {
     }
     if ($inputType === 'Number') {
       // Todo: make 'step' configurable for the custom field
-      $inputAttrs['step'] ??= $dataTypeName === 'Integer' ? 1 : .01;
+      $inputAttrs['step'] ??= $dataTypeName === 'Integer' ? 1 : 'any';
     }
     // Date/time settings from custom fields
     if ($inputType == 'Date' && is_a($fieldSpec, CustomFieldSpec::class)) {
