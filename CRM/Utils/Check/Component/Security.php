@@ -59,8 +59,8 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
 
     $config = CRM_Core_Config::singleton();
 
-    $log = CRM_Core_Error::createDebugLogger();
-    $log_filename = str_replace('\\', '/', $log->_filename ?? '');
+    CRM_Core_Error::createDebugLogger();
+    $log_filename = str_replace('\\', '/', CRM_Core_Error::generateLogFileName(''));
 
     $filePathMarker = $this->getFilePathMarker();
 
