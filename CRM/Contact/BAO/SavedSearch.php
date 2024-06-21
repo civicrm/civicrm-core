@@ -395,12 +395,14 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch implements
     $smartGroups = [];
     foreach ($groups as $group) {
       // Filter out arrays in Form Values which are group searchs.
-      $groupSearches = array_filter(
-        $group['saved_search_id.form_values'],
-        function($v) {
-          return ($v[0] == 'group');
-        }
-      );
+      if (is_array($group['saved_search_id.form_values'])) {
+        $groupSearches = array_filter(
+          $group['saved_search_id.form_values'],
+          function($v) {
+            return ($v[0] == 'group');
+          }
+        );
+      }
       // Check each group search for valid groups.
       foreach ($groupSearches as $groupSearch) {
         if (!empty($groupSearch[2]) && in_array($groupID, (array) $groupSearch[2])) {
