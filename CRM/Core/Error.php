@@ -693,8 +693,9 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * the file exists.
    *
    * @param string $prefix
+   * @return string The full path to the file.
    */
-  protected static function generateLogFileName($prefix) {
+  public static function generateLogFileName($prefix): string {
     if (!isset(\Civi::$statics[__CLASS__]['logger_file' . $prefix])) {
       $config = CRM_Core_Config::singleton();
 
@@ -728,6 +729,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       }
       \Civi::$statics[__CLASS__]['logger_file' . $prefix] = $fileName;
     }
+    return \Civi::$statics[__CLASS__]['logger_file' . $prefix];
   }
 
   /**
