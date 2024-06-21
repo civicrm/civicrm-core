@@ -312,10 +312,12 @@ class SpecFormatter {
       self::setLegacyDateFormat($inputAttrs);
     }
     // Number input for numeric fields
-    if ($inputType === 'Text' && in_array($dataTypeName, ['Integer', 'Float'], TRUE)) {
+    if ($inputType === 'Text' && in_array($dataTypeName, ['Integer', 'Float', 'Money'], TRUE)) {
       $inputType = 'Number';
+    }
+    if ($inputType === 'Number') {
       // Todo: make 'step' configurable for the custom field
-      $inputAttrs['step'] = $dataTypeName === 'Integer' ? 1 : .01;
+      $inputAttrs['step'] ??= $dataTypeName === 'Integer' ? 1 : 'any';
     }
     // Date/time settings from custom fields
     if ($inputType == 'Date' && is_a($fieldSpec, CustomFieldSpec::class)) {
