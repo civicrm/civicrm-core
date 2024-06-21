@@ -24,7 +24,6 @@
  * @property string|null $fee_currency
  * @property int|string|null $campaign_id
  * @property int|string|null $discount_amount
- * @property int|string|null $cart_id
  * @property int|string|null $must_wait
  * @property int|string|null $transferred_to_contact_id
  * @property int|string|null $created_id

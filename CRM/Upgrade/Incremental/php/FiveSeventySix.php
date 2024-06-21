@@ -38,6 +38,9 @@ class CRM_Upgrade_Incremental_php_FiveSeventySix extends CRM_Upgrade_Incremental
     $this->addTask('Install SiteToken entity', 'createEntityTable', '5.76.alpha1.SiteToken.entityType.php');
     $this->addTask(ts('Create index %1', [1 => 'civicrm_site_token.UI_name_domain_id']), 'addIndex', 'civicrm_site_token', [['name', 'domain_id']], 'UI');
     $this->addTask('Create "message header" token', 'create_mesage_header_token');
+    if (!CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_extension WHERE full_name = "eventcart"')) {
+      $this->addTask('Remove data related to disabled even cart extension', 'removeEventCartAssets');
+    }
   }
 
   public static function create_mesage_header_token() {
@@ -53,6 +56,31 @@ class CRM_Upgrade_Incremental_php_FiveSeventySix extends CRM_Upgrade_Incremental
      '<!-- " . ts('This is the %1 token HTML content.', [1 => '{site.message_header}']) . " -->',
       '', 1, 1)"
       );
+    }
+    return TRUE;
+  }
+
+  /**
+   * Drop tables, disable the message template as they relate to event carts.
+   *
+   * It would be nice to delete the message template but who knows there could be a gotcha.
+   *
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  public static function removeEventCartAssets(): bool {
+    try {
+      CRM_Core_DAO::executeQuery("UPDATE civicrm_msg_template SET is_active = 0 WHERE workflow_name = 'event_registration_receipt'");
+      if (!CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_events_in_carts LIMIT 1')) {
+        CRM_Core_DAO::executeQuery('DROP table civicrm_events_in_carts');
+      }
+      if (!CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_event_carts LIMIT 1')) {
+        \CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_participant', 'FK_civicrm_participant_cart_id');
+        CRM_Core_DAO::executeQuery('DROP table civicrm_event_carts');
+      }
+    }
+    catch (CRM_Core_Exception $e) {
+      // hmm what could possibly go wrong. A few stray artifacts is not as bad as a fail here I guess.
     }
     return TRUE;
   }

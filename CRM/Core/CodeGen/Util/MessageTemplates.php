@@ -115,12 +115,6 @@ class CRM_Core_CodeGen_Util_MessageTemplates {
         'weight' => 2,
         'value' => 2,
       ],
-      'event_registration_receipt' => [
-        'option_group_name' => 'event',
-        'title' => ts('Events - Receipt only', ['escape' => 'sql']),
-        'weight' => 3,
-        'value' => 3,
-      ],
       'participant_cancelled' => [
         'option_group_name' => 'event',
         'title' => ts('Events - Registration Cancellation Notice', ['escape' => 'sql']),
