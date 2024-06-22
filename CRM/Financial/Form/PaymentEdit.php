@@ -15,6 +15,7 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
+  use CRM_Custom_Form_CustomDataTrait;
 
   /**
    * Should financials be checked after the test but before tear down.
@@ -92,6 +93,8 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
 
   /**
    * Build quickForm.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {
     $this->setTitle(ts('Update Payment details'));
@@ -118,6 +121,15 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
 
     $this->assign('currency', CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_Currency', $this->_values['currency'], 'symbol', 'name'));
     $this->addFormRule([__CLASS__, 'formRule'], $this);
+    if ($this->isSubmitted()) {
+      // The custom data fields are added to the form by an ajax form.
+      // However, if they are not present in the element index they will
+      // not be available from `$this->getSubmittedValue()` in post process.
+      // We do not have to set defaults or otherwise render - just add to the element index.
+      $this->addCustomDataFieldsToForm('FinancialTrxn', array_filter([
+        'id' => $this->_id,
+      ]));
+    }
 
     $this->addButtons([
       [
@@ -166,18 +178,18 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
   public function postProcess(): void {
     $params = [
       'id' => $this->_id,
-      'payment_instrument_id' => $this->_submitValues['payment_instrument_id'],
-      'trxn_id' => $this->_submitValues['trxn_id'] ?? NULL,
-      'trxn_date' => $this->_submitValues['trxn_date'] ?? date('YmdHis'),
+      'payment_instrument_id' => $this->getSubmittedValue('payment_instrument_id'),
+      'trxn_id' => $this->getSubmittedValue('trxn_id'),
+      'trxn_date' => $this->getSubmittedValue('trxn_date') ?: date('YmdHis'),
     ];
 
     $paymentInstrumentName = CRM_Core_PseudoConstant::getName('CRM_Financial_DAO_FinancialTrxn', 'payment_instrument_id', $params['payment_instrument_id']);
     if ($paymentInstrumentName === 'Credit Card') {
-      $params['card_type_id'] = $this->_submitValues['card_type_id'] ?? NULL;
-      $params['pan_truncation'] = $this->_submitValues['pan_truncation'] ?? NULL;
+      $params['card_type_id'] = $this->getSubmittedValue('card_type_id');
+      $params['pan_truncation'] = $this->getSubmittedValue('pan_truncation');
     }
     elseif ($paymentInstrumentName === 'Check') {
-      $params['check_number'] = $this->_submitValues['check_number'] ?? NULL;
+      $params['check_number'] = $this->getSubmittedValue('check_number');
     }
 
     $this->submit($params);
@@ -214,11 +226,12 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
       $newFinancialTrxn['total_amount'] = $this->_values['total_amount'];
       $newFinancialTrxn['currency'] = $this->_values['currency'];
       $newFinancialTrxn['contribution_id'] = $this->getContributionID();
+      $newFinancialTrxn += $this->getSubmittedCustomFields();
       civicrm_api3('Payment', 'create', $newFinancialTrxn);
     }
     else {
       // simply update the financial trxn
-      civicrm_api3('FinancialTrxn', 'create', $submittedValues);
+      civicrm_api3('FinancialTrxn', 'create', $submittedValues + $this->getSubmittedCustomFields());
     }
 
     CRM_Financial_BAO_Payment::updateRelatedContribution($submittedValues, $this->getContributionID());
