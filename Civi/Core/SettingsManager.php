@@ -290,7 +290,6 @@ class SettingsManager {
     return $settings;
   }
 
-
   /**
    * Parse mandatory settings from global env var.
    *
@@ -360,6 +359,19 @@ class SettingsManager {
     return $this;
   }
 
-
+  /**
+   * Load boot settings from environment and/or settings file
+   *
+   * @param string $settingsPath
+   *    Path to the civicrm.settings.php file
+   */
+  public static function bootSettings($settingsPath) {
+    if (file_exists($settingsPath)) {
+      if (!defined('CIVICRM_SETTINGS_PATH')) {
+        define('CIVICRM_SETTINGS_PATH', $settingsPath);
+      }
+      require_once $settingsPath;
+    }
+  }
 
 }
