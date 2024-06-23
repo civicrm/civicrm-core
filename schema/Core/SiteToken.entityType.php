@@ -22,6 +22,14 @@ return [
       'unique' => TRUE,
       'add' => '5.76',
     ],
+    'UI_label_domain_id' => [
+      'fields' => [
+        'label' => TRUE,
+        'domain_id' => TRUE,
+      ],
+      'unique' => TRUE,
+      'add' => '5.76',
+    ],
   ],
   'getPaths' => fn() => [
     'add' => 'civicrm/admin/sitetoken/edit?action=add&reset=1',
