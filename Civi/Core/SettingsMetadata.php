@@ -37,6 +37,10 @@ class SettingsMetadata {
    * @param int $domainID
    * @param bool|array $loadOptions
    *
+   * The final param optionally restricts to only boottime settings
+   *
+   * @param bool $bootOnly - only
+   *
    * @return array
    *   the following information as appropriate for each setting
    *   - name
@@ -50,23 +54,29 @@ class SettingsMetadata {
    *   - options
    *   - pseudoconstant
    */
-  public static function getMetadata($filters = [], $domainID = NULL, $loadOptions = FALSE) {
-    if ($domainID === NULL) {
-      $domainID = \CRM_Core_Config::domainID();
+  public static function getMetadata($filters = [], $domainID = NULL, $loadOptions = FALSE, $bootOnly = FALSE) {
+    if ($bootOnly) {
+      $settingsMetadata = self::loadSettingsMetadata(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'settings', '*.boot.setting.php');
+    }
+    else {
+      if ($domainID === NULL) {
+        $domainID = \CRM_Core_Config::domainID();
+      }
+
+      $cache = \Civi::cache('settings');
+      $cacheString = 'settingsMetadata_' . $domainID . '_';
+      $settingsMetadata = $cache->get($cacheString);
+
+      if (!is_array($settingsMetadata)) {
+        global $civicrm_root;
+        $metaDataFolders = [\CRM_Utils_File::addTrailingSlash($civicrm_root) . 'settings'];
+        \CRM_Utils_Hook::alterSettingsFolders($metaDataFolders);
+        $settingsMetadata = self::loadSettingsMetaDataFolders($metaDataFolders);
+        \CRM_Utils_Hook::alterSettingsMetaData($settingsMetadata, $domainID, NULL);
+        $cache->set($cacheString, $settingsMetadata);
+      }
     }
 
-    $cache = \Civi::cache('settings');
-    $cacheString = 'settingsMetadata_' . $domainID . '_';
-    $settingsMetadata = $cache->get($cacheString);
-
-    if (!is_array($settingsMetadata)) {
-      global $civicrm_root;
-      $metaDataFolders = [\CRM_Utils_File::addTrailingSlash($civicrm_root) . 'settings'];
-      \CRM_Utils_Hook::alterSettingsFolders($metaDataFolders);
-      $settingsMetadata = self::loadSettingsMetaDataFolders($metaDataFolders);
-      \CRM_Utils_Hook::alterSettingsMetaData($settingsMetadata, $domainID, NULL);
-      $cache->set($cacheString, $settingsMetadata);
-    }
 
     self::_filterSettingsSpecification($filters, $settingsMetadata);
     if ($loadOptions) {
@@ -99,12 +109,13 @@ class SettingsMetadata {
    * Load up settings metadata from files.
    *
    * @param string $metaDataFolder
+   * @param string $filePattern
    *
    * @return array
    */
-  protected static function loadSettingsMetadata($metaDataFolder) {
+  protected static function loadSettingsMetadata($metaDataFolder, $filePattern = '*.setting.php') {
     $settingMetaData = [];
-    $settingsFiles = \CRM_Utils_File::findFiles($metaDataFolder, '*.setting.php');
+    $settingsFiles = \CRM_Utils_File::findFiles($metaDataFolder, $filePattern);
     foreach ($settingsFiles as $file) {
       $settings = include $file;
       $settingMetaData = array_merge($settingMetaData, $settings);

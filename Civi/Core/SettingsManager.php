@@ -25,10 +25,12 @@ namespace Civi\Core;
  *   - Explicit values (which are chosen by the user and stored in the DB).
  *   - Default values (which come from the settings metadata).
  *
- * Note: During the early stages of bootstrap, default values are not be available.
+ * Note: During the early stages of bootstrap, we run a limited "bootOnly" version
+ * of the SettingsManager, to get values which are critical for boot.
+ *
  * Loading the defaults requires loading metadata from various sources. However,
  * near the end of bootstrap, one calls SettingsManager::useDefaults() to fetch
- * and merge the defaults.
+ * and merge all the other defaults.
  *
  * Note: In a typical usage, there will only be one active domain and one
  * active contact (each having its own bag) within a given request. However,
@@ -72,11 +74,11 @@ class SettingsManager {
   protected $mandatory = NULL;
 
   /**
-   * Whether to use defaults.
+   * Whether we are ready to use all defaults (ie. system is booted)
    *
    * @var bool
    */
-  protected $useDefaults = FALSE;
+  protected $useAllDefaults = FALSE;
 
   /**
    * @param \CRM_Utils_Cache_Interface $cache
@@ -93,8 +95,8 @@ class SettingsManager {
    * @return SettingsManager
    */
   public function useDefaults() {
-    if (!$this->useDefaults) {
-      $this->useDefaults = TRUE;
+    if (!$this->useAllDefaults) {
+      $this->useAllDefaults = TRUE;
 
       if (!empty($this->bagsByDomain)) {
         foreach ($this->bagsByDomain as $bag) {
@@ -209,22 +211,24 @@ class SettingsManager {
    *   Array(string $settingName => mixed $value).
    */
   protected function getDefaults($entity) {
-    if (!$this->useDefaults) {
-      return self::getSystemDefaults($entity);
-    }
+    // caching isnt available during boot
+    $cacheKey = $this->useAllDefaults ? 'defaults_' . $entity : NULL;
+    $defaults = $cacheKey ? $this->cache->get($cacheKey) : NULL;
 
-    $cacheKey = 'defaults_' . $entity;
-    $defaults = $this->cache->get($cacheKey);
     if (!is_array($defaults)) {
+      $defaults = [];
+
       $specs = SettingsMetadata::getMetadata([
         'is_contact' => ($entity === 'contact' ? 1 : 0),
-      ]);
-      $defaults = [];
+      ], NULL, FALSE, !$this->useAllDefaults);
+
       foreach ($specs as $key => $spec) {
         $defaults[$key] = $spec['default'] ?? NULL;
       }
-      \CRM_Utils_Array::extend($defaults, self::getSystemDefaults($entity));
-      $this->cache->set($cacheKey, $defaults);
+
+      if ($cacheKey) {
+        $this->cache->set($cacheKey, $defaults);
+      }
     }
     return $defaults;
   }
@@ -327,39 +331,6 @@ class SettingsManager {
     return $this;
   }
 
-  /**
-   * Get a list of critical system defaults.
-   *
-   * The setting system can be modified by extensions, which means that it's not fully available
-   * during bootstrap -- in particular, defaults cannot be loaded. For a very small number of settings,
-   * we must define defaults before the system bootstraps.
-   *
-   * @param string $entity
-   *
-   * @return array
-   */
-  private static function getSystemDefaults($entity) {
-    $defaults = [];
-    switch ($entity) {
-      case 'domain':
-        $defaults = [
-          'installed' => FALSE,
-          // The default list of components should be kept in sync with "civicrm_extension.sqldata.php".
-          'enable_components' => ['CiviEvent', 'CiviContribute', 'CiviMember', 'CiviMail', 'CiviReport', 'CiviPledge'],
-          'customFileUploadDir' => '[civicrm.files]/custom/',
-          'imageUploadDir' => '[civicrm.files]/persist/contribute/',
-          'uploadDir' => '[civicrm.files]/upload/',
-          'imageUploadURL' => '[civicrm.files]/persist/contribute/',
-          'extensionsDir' => '[civicrm.files]/ext/',
-          'extensionsURL' => '[civicrm.files]/ext/',
-          'ext_max_depth' => \CRM_Extension_System::DEFAULT_MAX_DEPTH,
-          'resourceBase' => '[civicrm.root]/',
-          'userFrameworkResourceURL' => '[civicrm.root]/',
-        ];
-        break;
 
-    }
-    return $defaults;
-  }
 
 }
