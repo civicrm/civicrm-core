@@ -18,10 +18,11 @@ namespace Civi\Core;
  * The SettingsManager is responsible for tracking settings across various
  * domains and users.
  *
- * Generally, for any given setting, there are three levels where values
+ * Generally, for any given setting, there are four levels where values
  * can be declared:
  *
- *   - Mandatory values (which come from a global $civicrm_setting).
+ *   - Mandatory values (from an environment variable).
+ *   - Mandatory values (set using global variable $civicrm_setting).
  *   - Explicit values (which are chosen by the user and stored in the DB).
  *   - Default values (which come from the settings metadata).
  *
@@ -121,7 +122,7 @@ class SettingsManager {
    * all current and future bags.
    *
    * If you call useMandatory multiple times, it will
-   * re-scan the global $civicrm_setting.
+   * re-scan the global $civicrm_setting and environment variables
    *
    * @return SettingsManager
    */
@@ -234,7 +235,8 @@ class SettingsManager {
   }
 
   /**
-   * Get a list of mandatory/overriden settings.
+   * Get a list of mandatory/overriden settings from $civicrm_setting global
+   * or environemnt.
    *
    * @param string $entity
    *   Ex: 'domain' or 'contact'.
@@ -243,13 +245,54 @@ class SettingsManager {
    */
   protected function getMandatory($entity) {
     if ($this->mandatory === NULL) {
-      $this->mandatory = self::parseMandatorySettings($GLOBALS['civicrm_setting'] ?? NULL);
+      $this->mandatory = self::parseMandatorySettingsGlobalVar($GLOBALS['civicrm_setting'] ?? NULL);
+
+      // merge in settings from env - these take precedence over values from global
+      foreach (['domain', 'contact'] as $entityKey) {
+        $this->mandatory[$entityKey] = array_merge(
+            $this->mandatory[$entityKey],
+            self::getEnvSettingValues($entity, !$this->useAllDefaults, FALSE)
+        );
+      }
     }
     return $this->mandatory[$entity];
   }
 
   /**
-   * Parse mandatory settings.
+   * Get a settings set using environment variables
+   *
+   * @param string $entity
+   *   Ex: 'domain' or 'contact'.
+   * @param bool $bootOnly - whether to only load boot critical settings
+   * @param bool $fqnKeys - whether the return array keys are setting names or setting fqns
+   *
+   * @return array
+   *   Array(string $settingName or $settingFqn => mixed $value).
+   */
+  protected static function getEnvSettingValues($entity, $bootOnly, $fqnKeys = FALSE) {
+    $settings = [];
+
+    $specs = SettingsMetadata::getMetadata([
+      'is_contact' => ($entity === 'contact' ? 1 : 0),
+      'load_from_env' => TRUE,
+    ], NULL, FALSE, $bootOnly);
+
+    foreach ($specs as $key => $spec) {
+      $fqn = $spec['fqn'] ?? NULL;
+      if ($fqn) {
+        $envValue = getenv($fqn);
+        if ($envValue) {
+          $settings[$fqnKeys ? $fqn : $key] = $envValue;
+        }
+      }
+    }
+
+    return $settings;
+  }
+
+
+  /**
+   * Parse mandatory settings from global env var.
    *
    * In previous versions, settings were broken down into verbose+dynamic group names, e.g.
    *
@@ -259,36 +302,21 @@ class SettingsManager {
    *
    *    $civicrm_settings['domain']['foo'] = 'bar';
    *
-   * However, the old groups are grand-fathered in as aliases.
+   * 'Personal Preferences' is still aliased for compatibility (is this still needed in June 2024?).
    *
    * @param array $civicrm_setting
    *   Ex: $civicrm_setting['Group Name']['field'] = 'value'.
    *   Group names are an historical quirk; ignore them.
    * @return array
    */
-  public static function parseMandatorySettings($civicrm_setting) {
+  public static function parseMandatorySettingsGlobalVar($civicrm_setting) {
     $result = [
       'domain' => [],
       'contact' => [],
     ];
 
     $rewriteGroups = [
-      //\CRM_Core_BAO_Setting::ADDRESS_STANDARDIZATION_PREFERENCES_NAME => 'domain',
-      //\CRM_Core_BAO_Setting::CAMPAIGN_PREFERENCES_NAME => 'domain',
-      //\CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME => 'domain',
-      //\CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME => 'domain',
-      //\CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME => 'domain',
-      //\CRM_Core_BAO_Setting::EVENT_PREFERENCES_NAME => 'domain',
-      //\CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME => 'domain',
-      //\CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME => 'domain',
-      //\CRM_Core_BAO_Setting::MAP_PREFERENCES_NAME => 'domain',
-      //\CRM_Core_BAO_Setting::MEMBER_PREFERENCES_NAME => 'domain',
-      //\CRM_Core_BAO_Setting::MULTISITE_PREFERENCES_NAME => 'domain',
-      //\CRM_Core_BAO_Setting::PERSONAL_PREFERENCES_NAME => 'contact',
       'Personal Preferences' => 'contact',
-      //\CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME => 'domain',
-      //\CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME => 'domain',
-      //\CRM_Core_BAO_Setting::URL_PREFERENCES_NAME => 'domain',
       'domain' => 'domain',
       'contact' => 'contact',
     ];
@@ -299,6 +327,7 @@ class SettingsManager {
         $result[$newGroup] = array_merge($result[$newGroup], $values);
       }
     }
+
     return $result;
   }
 
