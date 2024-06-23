@@ -264,12 +264,11 @@ class SettingsManager {
    * @param string $entity
    *   Ex: 'domain' or 'contact'.
    * @param bool $bootOnly - whether to only load boot critical settings
-   * @param bool $fqnKeys - whether the return array keys are setting names or setting fqns
    *
    * @return array
    *   Array(string $settingName or $settingFqn => mixed $value).
    */
-  protected static function getEnvSettingValues($entity, $bootOnly, $fqnKeys = FALSE) {
+  protected static function getEnvSettingValues($entity, $bootOnly) {
     $settings = [];
 
     $specs = SettingsMetadata::getMetadata([
@@ -282,7 +281,7 @@ class SettingsManager {
       if ($fqn) {
         $envValue = getenv($fqn);
         if ($envValue) {
-          $settings[$fqnKeys ? $fqn : $key] = $envValue;
+          $settings[$key] = $envValue;
         }
       }
     }
@@ -366,6 +365,14 @@ class SettingsManager {
    *    Path to the civicrm.settings.php file
    */
   public static function bootSettings($settingsPath) {
+    $envSettings = self::getEnvSettingValues('domain', TRUE, TRUE);
+
+    foreach ($envSettings as $fqn => $value) {
+      if (!defined($fqn)) {
+        define($fqn, $value);
+      }
+    }
+
     if (file_exists($settingsPath)) {
       if (!defined('CIVICRM_SETTINGS_PATH')) {
         define('CIVICRM_SETTINGS_PATH', $settingsPath);
