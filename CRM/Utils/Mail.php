@@ -322,7 +322,8 @@ class CRM_Utils_Mail {
     if (!empty($params['headers'])) {
       $headers = array_merge($headers, $params['headers']);
     }
-    $headers['From'] = $params['from'];
+    // dev/core#5301: Allow From to be set directly.
+    $headers['From'] = $params['From'] ?? $params['from'];
     $headers['To'] = self::formatRFC822Email(
       $params['toName'] ?? NULL,
       $params['toEmail'] ?? NULL,
@@ -344,7 +345,8 @@ class CRM_Utils_Mail {
     $headers['Return-Path'] = $params['returnPath'] ?? $defaultReturnPath;
 
     // CRM-11295: Omit reply-to headers if empty; this avoids issues with overzealous mailservers
-    $replyTo = ($params['replyTo'] ?? ($params['from'] ?? NULL));
+    // dev/core#5301: Allow Reply-To to be set directly.
+    $replyTo = $params['Reply-To'] ?? ($params['replyTo'] ?? ($params['from'] ?? NULL));
 
     if (!empty($replyTo)) {
       $headers['Reply-To'] = $replyTo;
