@@ -312,7 +312,7 @@ class SettingsManager {
     ], NULL, FALSE, $this->preBoot);
 
     foreach ($specs as $key => $spec) {
-      $fqn = $spec['fqn'] ?? NULL;
+      $fqn = $spec['global_name'] ?? NULL;
       if ($fqn) {
         $envValue = getenv($fqn);
         if ($envValue) {
