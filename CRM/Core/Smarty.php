@@ -193,6 +193,7 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
       'str_starts_with',
       // Trim is used on the extensions page.
       'trim',
+      'mb_substr',
       'is_numeric',
       'array_key_exists',
       'strstr',
