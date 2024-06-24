@@ -18,6 +18,12 @@ namespace Civi\Core;
 class SettingsMetadata {
 
   /**
+   * @var array
+   * Cache for boot settings metadata (which is used before Civi::cache is available)
+   */
+  protected static ?array $bootCache = NULL;
+
+  /**
    * WARNING: This interface may change.
    *
    * This provides information about the setting - similar to the fields concept for DAO information.
@@ -53,30 +59,11 @@ class SettingsMetadata {
    *   - help_text
    *   - options
    *   - pseudoconstant
+   *   - load_from_env
+   *   - is_constant
    */
   public static function getMetadata($filters = [], $domainID = NULL, $loadOptions = FALSE, $bootOnly = FALSE) {
-    if ($bootOnly) {
-      $settingsMetadata = self::loadSettingsMetadata(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'settings', '*.boot.setting.php');
-    }
-    else {
-      if ($domainID === NULL) {
-        $domainID = \CRM_Core_Config::domainID();
-      }
-
-      $cache = \Civi::cache('settings');
-      $cacheString = 'settingsMetadata_' . $domainID . '_';
-      $settingsMetadata = $cache->get($cacheString);
-
-      if (!is_array($settingsMetadata)) {
-        global $civicrm_root;
-        $metaDataFolders = [\CRM_Utils_File::addTrailingSlash($civicrm_root) . 'settings'];
-        \CRM_Utils_Hook::alterSettingsFolders($metaDataFolders);
-        $settingsMetadata = self::loadSettingsMetaDataFolders($metaDataFolders);
-        \CRM_Utils_Hook::alterSettingsMetaData($settingsMetadata, $domainID, NULL);
-        $cache->set($cacheString, $settingsMetadata);
-      }
-    }
-
+    $settingsMetadata = $bootOnly ? self::getBootMetadata() : self::getFullMetadata($domainID);
 
     self::_filterSettingsSpecification($filters, $settingsMetadata);
     if ($loadOptions) {
@@ -84,6 +71,34 @@ class SettingsMetadata {
     }
 
     return $settingsMetadata;
+  }
+
+  protected static function getFullMetadata($domainID = NULL) {
+    if ($domainID === NULL) {
+      $domainID = \CRM_Core_Config::domainID();
+    }
+
+    $cache = \Civi::cache('settings');
+    $cacheString = 'settingsMetadata_' . $domainID . '_';
+    $settingsMetadata = $cache->get($cacheString);
+
+    if (!is_array($settingsMetadata)) {
+      global $civicrm_root;
+      $metaDataFolders = [\CRM_Utils_File::addTrailingSlash($civicrm_root) . 'settings'];
+      \CRM_Utils_Hook::alterSettingsFolders($metaDataFolders);
+      $settingsMetadata = self::loadSettingsMetaDataFolders($metaDataFolders);
+      \CRM_Utils_Hook::alterSettingsMetaData($settingsMetadata, $domainID, NULL);
+      $cache->set($cacheString, $settingsMetadata);
+    }
+
+    return $settingsMetadata;
+  }
+
+  protected static function getBootMetadata() {
+    if (!is_array(self::$bootCache)) {
+      self::$bootCache = self::loadSettingsMetadata(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'settings', '*.boot.setting.php');
+    }
+    return self::$bootCache;
   }
 
   /**
