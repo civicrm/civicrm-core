@@ -15,6 +15,7 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_ContributionPage {
+  use CRM_Custom_Form_CustomDataTrait;
 
   /**
    * Set variables up before form is built.
@@ -22,6 +23,11 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
   public function preProcess() {
     parent::preProcess();
     $this->setSelectedChild('settings');
+
+    // Custom data fields
+    $this->assign('customDataType', 'ContributionPage');
+    $this->assign('customDataSubType', '');
+    $this->assign('entityID', $this->_id);
   }
 
   /**
@@ -216,6 +222,13 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
 
     $this->addFormRule(['CRM_Contribute_Form_ContributionPage_Settings', 'formRule'], $this);
 
+    // Custom data fields
+    if ($this->isSubmitted()) {
+      $this->addCustomDataFieldsToForm('ContributionPage', array_filter([
+        'id' => $this->_id,
+      ]));
+    }
+
     parent::buildQuickForm();
   }
 
@@ -323,6 +336,9 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
       $params['honor_block_title'] = NULL;
       $params['honor_block_text'] = NULL;
     }
+
+    // Custom data fields
+    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($this->getSubmittedValues(), $this->_id, 'ContributionPage');
 
     $dao = CRM_Contribute_BAO_ContributionPage::create($params);
 

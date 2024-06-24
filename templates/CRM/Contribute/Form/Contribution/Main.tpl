@@ -67,6 +67,9 @@
     <div id="intro_text" class="crm-public-form-item crm-section intro_text-section">
       {$intro_text|purify}
     </div>
+
+    {include file="CRM/Custom/Page/CustomDataView.tpl" groupId=false}
+
     {include file="CRM/common/cidzero.tpl"}
 
     {if $isShowMembershipBlock && $hasExistingLifetimeMembership}
