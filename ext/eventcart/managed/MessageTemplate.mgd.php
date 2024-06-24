@@ -33,7 +33,7 @@ return [
     ],
   ],
   [
-    'name' => 'event_registration_receipt',
+    'name' => 'event_registration_receipt_reserved',
     'entity' => 'MessageTemplate',
     'cleanup' => 'unused',
     'update' => 'never',
