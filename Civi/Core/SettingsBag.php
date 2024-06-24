@@ -301,7 +301,12 @@ class SettingsBag {
           break;
       }
     }
-    return ['contribution_invoice_settings' => $contributionSettings];
+    return array_merge(
+        ['contribution_invoice_settings' => $contributionSettings],
+        $this->interpolateDsnSettings('civicrm'),
+        // TODO: provide equivalent component settings for CIVICRM_UF_DSN
+        // $this->interpolateDsnSettings('civicrm_uf')
+    );
   }
 
   /**
@@ -460,6 +465,72 @@ class SettingsBag {
       'invoicing' => 'invoicing',
     ];
     return $convertedKeys;
+  }
+
+  /**
+   * Compute a DSN from its component parts or vice versa
+   *
+   * @param string $prefix
+   *   The prefix of the DB setting group - e.g. "civicrm" or "civicrm_uf"
+   *
+   * @return array
+   *   Interpolated values
+   */
+  protected function interpolateDsnSettings(string $prefix): array {
+    $computed = [];
+
+    $dsn = $this->get($prefix . '_db_dsn');
+
+    if ($dsn) {
+      // if dsn is set explicitly, use this as the source of truth.
+      // set the component parts in case anyone wants to AppSettings::get them
+      $urlComponents = \parse_url($dsn);
+
+      if (!$urlComponents) {
+        // couldn't parse the dsn so we dont set the components
+        // (it could be a socket rather than a url)
+        return [];
+      }
+
+      foreach (['user', 'password', 'host', 'port'] as $componentKey) {
+        $settingName = $prefix . '_db_' . $componentKey;
+        $value = $urlComponents[$componentKey] ?? NULL;
+
+        if ($value) {
+          $computed[$settingName] = $value;
+        }
+      }
+
+      // for db name we need to parse the path
+      $settingName = $prefix . '_db_name';
+
+      $urlPath = $urlComponents['path'] ?? '';
+      $dbName = trim($urlPath, '/');
+      if ($dbName) {
+        $computed[$settingName] = $dbName;
+      }
+      return $computed;
+    }
+
+    $componentValues = [];
+
+    foreach (['host', 'name', 'user', 'password', 'port'] as $componentKey) {
+      $value = $this->get($prefix . '_db_' . $componentKey);
+      if (!$value) {
+        // missing a required key to compose the dsn - so give up
+        return [];
+      }
+      $componentValues[$componentKey] = $value;
+    }
+
+    $dsn = "mysql://{$componentValues['user']}:{$componentValues['password']}@{$componentValues['host']}:{$componentValues['port']}/{$componentValues['name']}?new_link=true";
+    $ssl = $this->get($prefix . '_db_ssl');
+    if ($ssl) {
+      $dsn .= '&' . $ssl;
+    }
+    $computed[$prefix . '_db_dsn'] = $dsn;
+
+    return $computed;
   }
 
 }
