@@ -3624,7 +3624,8 @@ INSERT INTO `civicrm_extension` (`id`, `type`, `full_name`, `name`, `label`, `fi
  (11,'module','civi_member','CiviMember','CiviMember','civi_member',NULL,1),
  (12,'module','civi_pledge','CiviPledge','CiviPledge','civi_pledge',NULL,1),
  (13,'module','civi_report','CiviReport','CiviReport','civi_report',NULL,1),
- (14,'module','civiimport','Civi-Import','Civi-Import','civiimport',NULL,1);
+ (14,'module','civiimport','Civi-Import','Civi-Import','civiimport',NULL,1),
+ (15,'module','message_admin','Message Administration','Message Administration','message_admin',NULL,1);
 /*!40000 ALTER TABLE `civicrm_extension` ENABLE KEYS */;
 UNLOCK TABLES;
 
