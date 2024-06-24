@@ -75,6 +75,13 @@ class SettingsManager {
   protected $mandatory = NULL;
 
   /**
+   * Flag for running at system boot with limited system dependencies
+   *
+   * @var bool
+   */
+  protected $bootOnly = FALSE;
+
+  /**
    * Whether we are ready to use all defaults (ie. system is booted)
    *
    * @var bool
@@ -85,8 +92,9 @@ class SettingsManager {
    * @param \CRM_Utils_Cache_Interface $cache
    *   A semi-durable location to store metadata.
    */
-  public function __construct($cache) {
+  public function __construct($cache, $bootOnly = FALSE) {
     $this->cache = $cache;
+    $this->bootOnly = $bootOnly;
   }
 
   /**
@@ -156,7 +164,7 @@ class SettingsManager {
 
     if (!isset($this->bagsByDomain[$domainId])) {
       $this->bagsByDomain[$domainId] = new SettingsBag($domainId, NULL);
-      if (\CRM_Core_Config::singleton()->dsn) {
+      if (!$this->bootOnly && \CRM_Core_Config::singleton()->dsn) {
         $this->bagsByDomain[$domainId]->loadValues();
       }
       $this->bagsByDomain[$domainId]
@@ -193,7 +201,7 @@ class SettingsManager {
     $key = "$domainId:$contactId";
     if (!isset($this->bagsByContact[$key])) {
       $this->bagsByContact[$key] = new SettingsBag($domainId, $contactId);
-      if (\CRM_Core_Config::singleton()->dsn) {
+      if (!$this->bootOnly && \CRM_Core_Config::singleton()->dsn) {
         $this->bagsByContact[$key]->loadValues();
       }
       $this->bagsByContact[$key]
@@ -213,7 +221,7 @@ class SettingsManager {
    */
   protected function getDefaults($entity) {
     // caching isnt available during boot
-    $cacheKey = $this->useAllDefaults ? 'defaults_' . $entity : NULL;
+    $cacheKey = $this->bootOnly ? NULL : 'defaults_' . $entity;
     $defaults = $cacheKey ? $this->cache->get($cacheKey) : NULL;
 
     if (!is_array($defaults)) {
@@ -221,7 +229,7 @@ class SettingsManager {
 
       $specs = SettingsMetadata::getMetadata([
         'is_contact' => ($entity === 'contact' ? 1 : 0),
-      ], NULL, FALSE, !$this->useAllDefaults);
+      ], NULL, FALSE, $this->bootOnly || !$this->useAllDefaults);
 
       foreach ($specs as $key => $spec) {
         $defaults[$key] = $spec['default'] ?? NULL;
@@ -250,8 +258,8 @@ class SettingsManager {
       // merge in settings from env - these take precedence over values from global
       foreach (['domain', 'contact'] as $entityKey) {
         $this->mandatory[$entityKey] = array_merge(
-            $this->mandatory[$entityKey],
-            self::getEnvSettingValues($entity, !$this->useAllDefaults, FALSE)
+            $this->mandatory[$entityKey] ?? [],
+            $this->getEnvSettingValues($entity)
         );
       }
     }
@@ -263,18 +271,17 @@ class SettingsManager {
    *
    * @param string $entity
    *   Ex: 'domain' or 'contact'.
-   * @param bool $bootOnly - whether to only load boot critical settings
    *
    * @return array
    *   Array(string $settingName or $settingFqn => mixed $value).
    */
-  protected static function getEnvSettingValues($entity, $bootOnly) {
+  protected function getEnvSettingValues($entity) {
     $settings = [];
 
     $specs = SettingsMetadata::getMetadata([
       'is_contact' => ($entity === 'contact' ? 1 : 0),
       'load_from_env' => TRUE,
-    ], NULL, FALSE, $bootOnly);
+    ], NULL, FALSE, $this->bootOnly || !$this->useAllDefaults);
 
     foreach ($specs as $key => $spec) {
       $fqn = $spec['fqn'] ?? NULL;
@@ -365,10 +372,26 @@ class SettingsManager {
    *    Path to the civicrm.settings.php file
    */
   public static function bootSettings($settingsPath) {
-    $envSettings = self::getEnvSettingValues('domain', TRUE, TRUE);
+    $bootSettingsCache = \CRM_Utils_Cache::create([
+      'name' => 'bootSettings',
+      'type' => ['ArrayCache'],
+    ]);
 
-    foreach ($envSettings as $fqn => $value) {
-      if (!defined($fqn)) {
+    $bootSettingsManager = new self($bootSettingsCache, TRUE);
+
+    // check for constants we need to define
+    $bootConstants = SettingsMetadata::getMetadata(['is_contact' => 0, 'is_constant' => TRUE], NULL, FALSE, TRUE);
+
+    // if a constant value has been set using an env var, we need
+    // to jump in and define it now so the env var value takes precedence
+    // over any "define" calls in the civicrm.settings.php
+    // (hopefully these use if (!defined(X))))
+    $envSettingsValues = $bootSettingsManager->getEnvSettingValues('domain');
+
+    foreach ($bootConstants as $key => $meta) {
+      $fqn = $meta['global_name'] ?? NULL;
+      $value = $envSettingsValues[$key] ?? NULL;
+      if ($fqn && !defined($fqn) && !is_null($value)) {
         define($fqn, $value);
       }
     }
@@ -378,6 +401,19 @@ class SettingsManager {
         define('CIVICRM_SETTINGS_PATH', $settingsPath);
       }
       require_once $settingsPath;
+    }
+
+    // get all effective values from the settings bag (resolving defaults etc)
+    $effectiveValues = $bootSettingsManager->getBagByDomain(NULL)->all();
+
+    foreach ($bootConstants as $key => $meta) {
+      $fqn = $meta['global_name'] ?? NULL;
+      $value = $effectiveValues[$key] ?? NULL;
+      if ($fqn && !defined($fqn) && !is_null($value)) {
+        define($fqn, $value);
+      }
+      // TODO: should we complain here if there are inconsistent defines
+      // from elsewhere?
     }
   }
 
