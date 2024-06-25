@@ -2030,7 +2030,11 @@ WHERE  id IN ( $deleteIDString )
     $result = CRM_Core_DAO::executeQuery($query[1] . ' LIMIT ' . (int) $limit);
     CRM_Core_DAO::reenableFullGroupByMode();
     while ($result->fetch()) {
-      $rows[] = $this->buildRow($query[0], $result, $outputColumns, [], []);
+      $row = $this->buildRow($query[0], $result, $outputColumns, [], []);
+      foreach ($row as $rowColumn => $value) {
+        $row[$rowColumn] = $this->formatLocal($value, $rowColumn);
+      }
+      $rows[] = $row;
     }
     return $rows;
   }
@@ -2274,7 +2278,7 @@ LIMIT $offset, $limit
         $row = [];
 
         foreach (array_keys($sqlColumns) as $column) {
-          $row[$column] = $dao->$column;
+          $row[$column] = $this->formatLocal($dao->$column, $column);
         }
         $componentDetails[] = $row;
       }
@@ -2282,6 +2286,46 @@ LIMIT $offset, $limit
 
       $offset += $limit;
     }
+  }
+
+  /**
+   * Format mysql value by field and default locale.
+   *
+   * @param mixed $value Mysql value
+   * @param string $fieldName Field name
+   *
+   * @return mixed|string
+   *  Returns formatted value or mysql value if field isn't localizable.
+   */
+  protected function formatLocal(mixed $value, string $fieldName): mixed {
+    $fieldMetaData = $this->getMetaDataForField($fieldName);
+
+    if (!isset($fieldMetaData['type']) || empty($value)) {
+      return $value;
+    }
+    $fieldType = $fieldMetaData['type'];
+    $isDate = ($fieldType & (CRM_Utils_Type::T_DATE | CRM_Utils_Type::T_TIME | CRM_Utils_Type::T_TIMESTAMP )) != 0 ;
+    if ( $isDate ) {
+        $formatType = $fieldMetaData['html']['formatType'] ?? NULL;
+      $formattedValue = CRM_Utils_Date::setDateDefaults($value, $formatType);
+      if ( !($formatType & CRM_Utils_Type::T_TIMESTAMP) ) {
+        if (!($fieldType & CRM_Utils_Type::T_DATE)) {
+          unset($formattedValue[0]);
+        }
+        if (!($fieldType & CRM_Utils_Type::T_TIME)) {
+          unset($formattedValue[1]);
+        }
+      }
+      $x = implode(' ', $formattedValue);
+      return implode(' ', $formattedValue);
+    }
+
+    if ($fieldType == CRM_Utils_Type::T_MONEY) {
+      $x = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($value);
+        return CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($value);
+    }
+        return $value;
+
   }
 
   /**
