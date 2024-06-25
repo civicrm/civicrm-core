@@ -369,6 +369,18 @@ class SettingsBag {
 
     $metadata = $fields['values'][$name];
 
+    // this should probably be higher in the Setting api layer as well
+    if ($metadata['is_constant'] ?? FALSE) {
+      $error = "{$metadata['title']} is a system constant. It can only be set in civicrm.settings.php";
+
+      if ($metadata['load_from_env'] ?? FALSE) {
+        $fqn = $metadata['global_name'] ?? '(ENV VAR NAME MISSING)';
+        $error .= " or using the environment variable {$fqn}";
+      }
+      $error .= ".";
+      throw new \CRM_Core_Exception($error);
+    }
+
     $dao = new \CRM_Core_DAO_Setting();
     $dao->name = $name;
     $dao->is_domain = 0;
