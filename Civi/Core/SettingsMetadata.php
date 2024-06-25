@@ -43,7 +43,7 @@ class SettingsMetadata {
    * @param int $domainID
    * @param bool|array $loadOptions
    *
-   * The final param optionally restricts to only boottime settings
+   * The final param optionally restricts to only boot-time settings
    *
    * @param bool $bootOnly - only
    *
@@ -59,8 +59,9 @@ class SettingsMetadata {
    *   - help_text
    *   - options
    *   - pseudoconstant
-   *   - load_from_env
-   *   - is_constant
+   *   - global_name (name for php constant / environment variable corresponding to this setting)
+   *   - load_from_env (whether this setting should be read from corresponding environment variable)
+   *   - is_constant (whether a PHP constant should be defined for this setting)
    */
   public static function getMetadata($filters = [], $domainID = NULL, $loadOptions = FALSE, $bootOnly = FALSE) {
     $settingsMetadata = $bootOnly ? self::getBootMetadata() : self::getFullMetadata($domainID);
@@ -73,6 +74,14 @@ class SettingsMetadata {
     return $settingsMetadata;
   }
 
+  /**
+   * Get the final metadata for all settings
+   *  - sources from extensions etc using alterSettingsFolders / alterSettingsMetadata hooks
+   *
+   * @param ?int $domainID
+   *
+   * @return array all settings metadata
+   */
   protected static function getFullMetadata($domainID = NULL) {
     if ($domainID === NULL) {
       $domainID = \CRM_Core_Config::domainID();
@@ -94,6 +103,11 @@ class SettingsMetadata {
     return $settingsMetadata;
   }
 
+  /**
+   * Get the starting metadata for boot settings from core. No hooks are called.
+   *
+   * @return array boot settings metadata
+   */
   protected static function getBootMetadata() {
     if (!is_array(self::$bootCache)) {
       self::$bootCache = self::loadSettingsMetadata(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'settings', '*.boot.setting.php');

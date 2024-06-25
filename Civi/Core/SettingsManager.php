@@ -21,17 +21,17 @@ namespace Civi\Core;
  * Generally, for any given setting, there are four levels where values
  * can be declared:
  *
- *   - Mandatory values (from an environment variable).
+ *   - Mandatory values (set using an environment variable corresponding to the setting).
  *   - Mandatory values (set using global variable $civicrm_setting).
  *   - Explicit values (which are chosen by the user and stored in the DB).
  *   - Default values (which come from the settings metadata).
  *
- * Note: During the early stages of bootstrap, we run a limited "bootOnly" version
- * of the SettingsManager, to get values which are critical for boot.
+ * During bootstrap the SystemManager runs a limited version to
+ * get values we need for bootstap - before we have full metadata from
+ * the extension system, and setting values from the database.
  *
- * Loading the defaults requires loading metadata from various sources. However,
- * near the end of bootstrap, one calls SettingsManager::useDefaults() to fetch
- * and merge all the other defaults.
+ * Near the end of bootstrap, one calls SettingsManager::bootComplete() to
+ * reload the full version.
  *
  * Note: In a typical usage, there will only be one active domain and one
  * active contact (each having its own bag) within a given request. However,
@@ -75,51 +75,81 @@ class SettingsManager {
   protected $mandatory = NULL;
 
   /**
-   * Flag for running at system boot with limited system dependencies
+   * During bootstrap we run a limited version of the SettingsManager because
+   * we don't have metadata from the extension system or setting values
+   * from the database.
    *
    * @var bool
    */
-  protected $bootOnly = FALSE;
-
-  /**
-   * Whether we are ready to use all defaults (ie. system is booted)
-   *
-   * @var bool
-   */
-  protected $useAllDefaults = FALSE;
+  protected $preBoot = TRUE;
 
   /**
    * @param \CRM_Utils_Cache_Interface $cache
    *   A semi-durable location to store metadata.
    */
-  public function __construct($cache, $bootOnly = FALSE) {
+  public function __construct($cache) {
     $this->cache = $cache;
-    $this->bootOnly = $bootOnly;
   }
 
   /**
-   * Ensure that all defaults values are included with
-   * all current and future bags.
+   * Remove pre-boot restrictions and reload defaults/mandatory
    *
    * @return SettingsManager
    */
+  public function bootComplete() {
+    if ($this->preBoot) {
+      $this->preBoot = FALSE;
+
+      // if the boot state has changed, we need to reload
+      // all the value layers
+      $this->reloadValues()->reloadDefaults()->useMandatory();
+    }
+    return $this;
+  }
+
+  /**
+   * Maintained as public alias of bootComplete for compatibility
+   *
+   * @deprecated
+   * @return SettingsManager
+   */
   public function useDefaults() {
-    if (!$this->useAllDefaults) {
-      $this->useAllDefaults = TRUE;
+    return $this->bootComplete();
+  }
 
-      if (!empty($this->bagsByDomain)) {
-        foreach ($this->bagsByDomain as $bag) {
-          /** @var SettingsBag $bag */
-          $bag->loadDefaults($this->getDefaults('domain'));
-        }
-      }
+  /**
+   * (Re)load database values for all existing settings bags
+   *
+   * @return SettingsManager
+   */
+  protected function reloadValues() {
+    foreach ($this->bagsByDomain as $bag) {
+      /** @var SettingsBag $bag */
+      $bag->loadValues();
+    }
 
-      if (!empty($this->bagsByContact)) {
-        foreach ($this->bagsByContact as $bag) {
-          /** @var SettingsBag $bag */
-          $bag->loadDefaults($this->getDefaults('contact'));
-        }
-      }
+    foreach ($this->bagsByContact as $bag) {
+      /** @var SettingsBag $bag */
+      $bag->loadValues();
+    }
+
+    return $this;
+  }
+
+  /**
+   * (Re)load default values for all existing settings bags
+   *
+   * @return SettingsManager
+   */
+  protected function reloadDefaults() {
+    foreach ($this->bagsByDomain as $bag) {
+      /** @var SettingsBag $bag */
+      $bag->loadDefaults($this->getDefaults('domain'));
+    }
+
+    foreach ($this->bagsByContact as $bag) {
+      /** @var SettingsBag $bag */
+      $bag->loadDefaults($this->getDefaults('contact'));
     }
 
     return $this;
@@ -164,7 +194,7 @@ class SettingsManager {
 
     if (!isset($this->bagsByDomain[$domainId])) {
       $this->bagsByDomain[$domainId] = new SettingsBag($domainId, NULL);
-      if (!$this->bootOnly && \CRM_Core_Config::singleton()->dsn) {
+      if (!$this->preBoot) {
         $this->bagsByDomain[$domainId]->loadValues();
       }
       $this->bagsByDomain[$domainId]
@@ -201,7 +231,7 @@ class SettingsManager {
     $key = "$domainId:$contactId";
     if (!isset($this->bagsByContact[$key])) {
       $this->bagsByContact[$key] = new SettingsBag($domainId, $contactId);
-      if (!$this->bootOnly && \CRM_Core_Config::singleton()->dsn) {
+      if (!$this->preBoot) {
         $this->bagsByContact[$key]->loadValues();
       }
       $this->bagsByContact[$key]
@@ -220,31 +250,28 @@ class SettingsManager {
    *   Array(string $settingName => mixed $value).
    */
   protected function getDefaults($entity) {
-    // caching isnt available during boot
-    $cacheKey = $this->bootOnly ? NULL : 'defaults_' . $entity;
-    $defaults = $cacheKey ? $this->cache->get($cacheKey) : NULL;
+    $cacheKey = ($this->preBoot ? 'preboot_' : '') . 'defaults_' . $entity;
+    $defaults = $this->cache->get($cacheKey);
 
     if (!is_array($defaults)) {
       $defaults = [];
 
       $specs = SettingsMetadata::getMetadata([
         'is_contact' => ($entity === 'contact' ? 1 : 0),
-      ], NULL, FALSE, $this->bootOnly || !$this->useAllDefaults);
+      ], NULL, FALSE, $this->preBoot);
 
       foreach ($specs as $key => $spec) {
         $defaults[$key] = $spec['default'] ?? NULL;
       }
 
-      if ($cacheKey) {
-        $this->cache->set($cacheKey, $defaults);
-      }
+      $this->cache->set($cacheKey, $defaults);
     }
     return $defaults;
   }
 
   /**
    * Get a list of mandatory/overriden settings from $civicrm_setting global
-   * or environemnt.
+   * or environment.
    *
    * @param string $entity
    *   Ex: 'domain' or 'contact'.
@@ -256,6 +283,7 @@ class SettingsManager {
       $this->mandatory = self::parseMandatorySettingsGlobalVar($GLOBALS['civicrm_setting'] ?? NULL);
 
       // merge in settings from env - these take precedence over values from global
+      // TODO: should we warn if env var is overriding $civicrm_setting setting?
       foreach (['domain', 'contact'] as $entityKey) {
         $this->mandatory[$entityKey] = array_merge(
             $this->mandatory[$entityKey] ?? [],
@@ -267,7 +295,7 @@ class SettingsManager {
   }
 
   /**
-   * Get a settings set using environment variables
+   * Get any setting values set using environment variables
    *
    * @param string $entity
    *   Ex: 'domain' or 'contact'.
@@ -281,7 +309,7 @@ class SettingsManager {
     $specs = SettingsMetadata::getMetadata([
       'is_contact' => ($entity === 'contact' ? 1 : 0),
       'load_from_env' => TRUE,
-    ], NULL, FALSE, $this->bootOnly || !$this->useAllDefaults);
+    ], NULL, FALSE, $this->preBoot);
 
     foreach ($specs as $key => $spec) {
       $fqn = $spec['fqn'] ?? NULL;
@@ -372,12 +400,13 @@ class SettingsManager {
    *    Path to the civicrm.settings.php file
    */
   public static function bootSettings($settingsPath) {
+    // during bootstrap we can't use a more persistent cache
     $bootSettingsCache = \CRM_Utils_Cache::create([
       'name' => 'bootSettings',
       'type' => ['ArrayCache'],
     ]);
 
-    $bootSettingsManager = new self($bootSettingsCache, TRUE);
+    $bootSettingsManager = new self($bootSettingsCache);
 
     // check for constants we need to define
     $bootConstants = SettingsMetadata::getMetadata(['is_contact' => 0, 'is_constant' => TRUE], NULL, FALSE, TRUE);

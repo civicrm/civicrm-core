@@ -104,7 +104,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
         // Extreme backward compat: $config binds to active domain at moment of setup.
         self::$_singleton->getSettings();
 
-        Civi::service('settings_manager')->useDefaults();
+        Civi::service('settings_manager')->bootComplete();
 
         self::$_singleton->handleFirstRun();
       }
