@@ -142,7 +142,7 @@
           <div class="crm-section event_map-section">
               <div class="content">
                     {assign var=showDirectly value="1"}
-                    {include file="CRM/Contact/Form/Task/Map/`$config->mapProvider`.tpl" fields=$showDirectly}
+                    {include file="CRM/Contact/Form/Task/Map/`$config->mapProvider`.tpl" fields=$showDirectly profileGID=false}
                     <a href="{$mapURL}" title="{ts}Show large map{/ts}">{ts}Show large map{/ts}</a>
               </div>
               <div class="clear"></div>
