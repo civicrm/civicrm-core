@@ -209,6 +209,11 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
 
     if ($config->debug || str_contains(CIVICRM_UF_BASEURL, 'localhost') || CRM_Utils_Constant::value('CIVICRM_UF') === 'UnitTests') {
       $this->error_reporting = E_ALL;
+      // In smarty 3+ warn about unassigned vars like it used to. It has the
+      // most effect in smarty 5. The property doesn't exist in smarty 2.
+      if ($this->getVersion() >= 3) {
+        $this->error_unassigned = TRUE;
+      }
     }
   }
 
