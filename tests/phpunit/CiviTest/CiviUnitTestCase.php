@@ -572,7 +572,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $errorHandlerAtEndOfTest = set_error_handler(function($errno, $errstr, $errfile, $errline) {});
     restore_error_handler();
     if ($this->errorHandlerAtStartOfTest != $errorHandlerAtEndOfTest) {
-      $this->fail('Error handler is not the same at the end of the test as when it started. Start: ' . print_r($this->errorHandlerAtStartOfTest, TRUE) . "\nEnd: " . print_r($errorHandlerAtEndOfTest, TRUE));
+      $this->fail('Error handler is not the same at the end of the test as when it started. Did you forget to call parent::setUp or parent::tearDown? Start: ' . print_r($this->errorHandlerAtStartOfTest, TRUE) . "\nEnd: " . print_r($errorHandlerAtEndOfTest, TRUE));
     }
 
     // Reset to version 3 as not all (e.g payments) work on v4
