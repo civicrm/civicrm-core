@@ -328,6 +328,9 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
       $location_params = ['entity_id' => $line_item['event']->id, 'entity_table' => 'civicrm_event'];
       $line_item['location'] = CRM_Core_BAO_Location::getValues($location_params, TRUE);
       CRM_Core_BAO_Address::fixAddress($line_item['location']['address'][1]);
+      if ($line_item['location']['address'][1] === NULL) {
+        $line_item['location']['address'][1] = ['display' => ''];
+      }
     }
     $send_template_params = [
       'table' => 'civicrm_msg_template',

@@ -325,15 +325,10 @@ return [
       'title' => ts('Event Cart ID'),
       'sql_type' => 'int unsigned',
       'input_type' => 'EntityRef',
-      'description' => ts('FK to civicrm_event_carts'),
+      'description' => ts('To be moved to event cart extension'),
       'add' => '4.1',
       'input_attrs' => [
         'label' => ts('Event Cart'),
-      ],
-      'entity_reference' => [
-        'entity' => 'Cart',
-        'key' => 'id',
-        'on_delete' => 'SET NULL',
       ],
     ],
     'must_wait' => [

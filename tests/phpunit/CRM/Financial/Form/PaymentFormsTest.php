@@ -33,6 +33,11 @@ class CRM_Financial_Form_PaymentFormsTest extends CiviUnitTestCase {
 
   use CRM_Core_Payment_AuthorizeNetTrait;
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->callAPISuccess('Extension', 'enable', ['keys' => ['eventcart']]);
+  }
+
   public function tearDown(): void {
     $this->callAPISuccess('Extension', 'disable', ['keys' => ['eventcart']]);
     $this->callAPISuccess('Extension', 'uninstall', ['keys' => ['eventcart']]);
