@@ -398,7 +398,7 @@ return [
         'formatType' => 'activityDateTime',
       ],
       'readonly' => TRUE,
-      'add' => 5.75,
+      'add' => 5.76,
     ],
     'end_date' => [
       'sql_type' => 'timestamp',
@@ -418,7 +418,7 @@ return [
         'formatType' => 'activityDateTime',
       ],
       'readonly' => TRUE,
-      'add' => 5.75,
+      'add' => 5.76,
     ],
     'status' => [
       'title' => ts('Mailing Status'),
@@ -441,7 +441,7 @@ return [
         'callback' => 'CRM_Core_SelectValues::getMailingJobStatus',
       ],
       'readonly' => TRUE,
-      'add' => 5.75,
+      'add' => 5.76,
     ],
     'approver_id' => [
       'title' => ts('Approved By Contact ID'),
