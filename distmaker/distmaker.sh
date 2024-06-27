@@ -39,6 +39,7 @@ BPACK=0
 D5PACK=0
 D7DIR=0
 J5PACK=0
+JOOMLA5PACK=0
 WP5PACK=0
 PATCHPACK=0
 SK5PACK=0
@@ -178,10 +179,14 @@ case $1 in
   ;;
 
   # JOOMLA PHP5
-  j5|Joomla)
+  Joomla)
   echo; echo "Generating Joomla PHP5 module"; echo;
   J5PACK=1
   ;;
+
+  j5|Joomla5)
+  echo; echo "Generating Joomla 5 PHP Module"; echo;
+  JOOMLA5PACK=1
 
   # WORDPRESS PHP5
   wp5|WordPress)
@@ -213,6 +218,7 @@ case $1 in
   BPACK=1
   D5PACK=1
   J5PACK=1
+  JOOMLA5PACK=1
   WP5PACK=1
   PATCHPACK=1
   SKPACK=1
@@ -289,6 +295,12 @@ if [ "$J5PACK" = 1 ]; then
   echo; echo "Packaging for Joomla, PHP5 version"; echo;
   dm_git_checkout "$DM_SOURCEDIR/joomla" "$DM_REF_JOOMLA"
   bash $P/dists/joomla_php5.sh
+fi
+
+if [ "$JOOMLA5PACK" = 1 ]; then
+  echo; echo "Packaging for Joomla 5, PHP version"; echo;
+  dm_git_checkout "$DM_SOURCEDIR/joomla" "$DM_REF_JOOMLA"
+  bash $P/dists/joomla5_php.sh
 fi
 
 if [ "$WP5PACK" = 1 ]; then
