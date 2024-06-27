@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Payment Processor'),
     'title_plural' => ts('Payment Processors'),
-    'description' => ts('FIXME'),
+    'description' => ts('Table containing list of defined payment processors'),
     'add' => '1.8',
     'label_field' => 'title',
   ],

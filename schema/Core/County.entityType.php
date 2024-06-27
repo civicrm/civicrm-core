@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('County'),
     'title_plural' => ts('Counties'),
-    'description' => ts('FIXME'),
+    'description' => ts('Table that contains a list of counties (if populated)'),
     'add' => '1.1',
     'label_field' => 'name',
   ],

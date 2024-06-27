@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Option Group'),
     'title_plural' => ts('Option Groups'),
-    'description' => ts('FIXME'),
+    'description' => ts('Table of option groups'),
     'log' => TRUE,
     'add' => '1.5',
     'label_field' => 'title',

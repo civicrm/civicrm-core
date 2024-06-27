@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Entity Financial Trxn'),
     'title_plural' => ts('Entity Financial Trxns'),
-    'description' => ts('FIXME'),
+    'description' => ts('Mapping table for FinancialTrxn to FinancialItem and Contribution'),
     'add' => '3.2',
   ],
   'getIndices' => fn() => [

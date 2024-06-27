@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Price Set Entity'),
     'title_plural' => ts('Price Set Entities'),
-    'description' => ts('FIXME'),
+    'description' => ts('Price Set Entities'),
     'log' => TRUE,
     'add' => '1.8',
   ],

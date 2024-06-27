@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Line Item'),
     'title_plural' => ts('Line Items'),
-    'description' => ts('FIXME'),
+    'description' => ts('Line Items for Contributions'),
     'log' => TRUE,
     'add' => '1.7',
     'label_field' => 'label',

@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('System Log'),
     'title_plural' => ts('System Logs'),
-    'description' => ts('FIXME'),
+    'description' => ts('System log table that contains a record of various events (eg. incoming IPN requests)'),
     'add' => '4.5',
   ],
   'getFields' => fn() => [

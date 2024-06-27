@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Event In Cart'),
     'title_plural' => ts('Event In Carts'),
-    'description' => ts('FIXME'),
+    'description' => ts('Events in Cart'),
   ],
   'getFields' => fn() => [
     'id' => [

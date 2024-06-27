@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Pledge Block'),
     'title_plural' => ts('Pledge Blocks'),
-    'description' => ts('FIXME'),
+    'description' => ts('Table containing Pledge blocks'),
     'log' => TRUE,
     'add' => '2.1',
   ],

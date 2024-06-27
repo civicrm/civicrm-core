@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Cxn'),
     'title_plural' => ts('Cxns'),
-    'description' => ts('FIXME'),
+    'description' => ts('Connections - this is no longer used and is not visible in the UI.'),
     'add' => '4.6',
   ],
   'getIndices' => fn() => [

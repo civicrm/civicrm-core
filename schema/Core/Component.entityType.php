@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Component'),
     'title_plural' => ts('Components'),
-    'description' => ts('FIXME'),
+    'description' => ts('Table of Core Components (deprecated - use core extensions instead)'),
     'add' => '2.0',
   ],
   'getFields' => fn() => [

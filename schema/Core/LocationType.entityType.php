@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Location Type'),
     'title_plural' => ts('Location Types'),
-    'description' => ts('FIXME'),
+    'description' => ts('Location types that are available for address, email, phone etc.'),
     'log' => TRUE,
     'add' => '1.1',
     'label_field' => 'display_name',

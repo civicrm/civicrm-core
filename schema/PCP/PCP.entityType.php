@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Personal Campaign Page'),
     'title_plural' => ts('Personal Campaign Pages'),
-    'description' => ts('FIXME'),
+    'description' => ts('Table containing list of Personal Campaign Pages'),
     'log' => TRUE,
     'add' => '2.2',
     'label_field' => 'title',
