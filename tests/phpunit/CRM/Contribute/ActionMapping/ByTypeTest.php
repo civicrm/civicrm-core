@@ -346,7 +346,8 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends AbstractMappingTest {
       campaign_id = {contribution.campaign_id}
       campaign name = {contribution.campaign_id:name}
       campaign label = {contribution.campaign_id:label}
-      receipt text = {contribution.contribution_page_id.receipt_text}';
+      receipt text = {contribution.contribution_page_id.receipt_text}
+      message_header = {site.message_header}';
 
     $this->schedule->save();
     $this->callAPISuccess('job', 'send_reminder', []);
@@ -376,6 +377,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends AbstractMappingTest {
       'campaign name = big_campaign',
       'campaign label = Campaign',
       'receipt text = Thank you!',
+      'header = <div><!-- This content comes from the site message header token--></div>',
     ];
     $this->mut->checkMailLog($expected);
 
@@ -472,6 +474,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends AbstractMappingTest {
         'address_id.id' => 'Address ID',
         'address_id.name' => 'Billing Address Name',
         'address_id.display' => 'Billing Address',
+        'header' => 'Message Header',
       ], $comparison);
   }
 

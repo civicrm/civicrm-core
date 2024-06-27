@@ -959,6 +959,7 @@ emo
       '{contact.checksum}' => 'Checksum',
       '{contact.id}' => 'Contact ID',
       '{important_stuff.favourite_emoticon}' => 'Best coolest emoticon',
+      '{site.message_header}' => 'Message Header',
     ];
   }
 
@@ -1336,6 +1337,7 @@ custom_3 |01/20/2021 12:00AM
 checksum |cs=' . $checksum . '
 id |' . $tokenData['contact_id'] . '
 t_stuff.favourite_emoticon |
+sage_header |<div><!-- This content comes from the site message header token--></div>
 ';
   }
 
