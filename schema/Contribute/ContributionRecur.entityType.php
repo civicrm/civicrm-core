@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Recurring Contribution'),
     'title_plural' => ts('Recurring Contributions'),
-    'description' => ts('FIXME'),
+    'description' => ts('Table of Recurring Contributions'),
     'log' => TRUE,
     'add' => '1.6',
   ],

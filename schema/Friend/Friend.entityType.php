@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Friend'),
     'title_plural' => ts('Friends'),
-    'description' => ts('FIXME'),
+    'description' => ts('Tell a Friend (deprecated - moved to extension)'),
     'add' => '2.0',
     'label_field' => 'title',
   ],

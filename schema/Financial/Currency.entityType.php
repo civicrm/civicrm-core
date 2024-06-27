@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Currency'),
     'title_plural' => ts('Currencies'),
-    'description' => ts('FIXME'),
+    'description' => ts('List of currencies'),
     'log' => TRUE,
     'add' => '1.7',
   ],

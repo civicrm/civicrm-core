@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Extension'),
     'title_plural' => ts('Extensions'),
-    'description' => ts('FIXME'),
+    'description' => ts('Table of extensions'),
     'log' => FALSE,
     'add' => '4.2',
     'label_field' => 'label',

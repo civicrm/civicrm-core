@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Timezone'),
     'title_plural' => ts('Timezones'),
-    'description' => ts('FIXME'),
+    'description' => ts('Table containing a list of known timezones'),
     'add' => '1.8',
   ],
   'getFields' => fn() => [

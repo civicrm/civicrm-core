@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Financial Account'),
     'title_plural' => ts('Financial Accounts'),
-    'description' => ts('FIXME'),
+    'description' => ts('Financial Accounts'),
     'log' => TRUE,
     'add' => '3.2',
   ],

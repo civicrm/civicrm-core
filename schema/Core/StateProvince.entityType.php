@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('State/Province'),
     'title_plural' => ts('States/Provinces'),
-    'description' => ts('FIXME'),
+    'description' => ts('Table containing a list of states/provinces for all countries'),
     'add' => '1.1',
     'label_field' => 'name',
   ],

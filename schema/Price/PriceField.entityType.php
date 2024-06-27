@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Price Field'),
     'title_plural' => ts('Price Fields'),
-    'description' => ts('FIXME'),
+    'description' => ts('Price fields (can be part of a PriceSet and can contain multiple PriceFieldValue)'),
     'log' => TRUE,
     'add' => '1.8',
     'label_field' => 'label',

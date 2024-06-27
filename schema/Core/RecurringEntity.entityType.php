@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Recurring Entity'),
     'title_plural' => ts('Recurring Entities'),
-    'description' => ts('FIXME'),
+    'description' => ts('Recurring entities (used by repeating activities and events)'),
     'log' => TRUE,
     'add' => '4.6',
   ],
