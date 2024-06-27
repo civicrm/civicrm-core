@@ -47,6 +47,7 @@ class CRM_Contact_Form_Task_Map extends CRM_Contact_Form_Task {
       $this, FALSE
     );
     $this->assign('profileGID', $profileGID);
+    $this->assign('showDirectly', FALSE);
     $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
 
     $type = 'Contact';
