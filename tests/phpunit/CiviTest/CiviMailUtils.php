@@ -132,21 +132,22 @@ class CiviMailUtils extends PHPUnit\Framework\TestCase {
   public function getAllMessages($type = 'raw') {
     $msgs = [];
 
-    $dao = CRM_Core_DAO::executeQuery('SELECT headers, body FROM civicrm_mailing_spool ORDER BY id');
+    $dao = CRM_Core_DAO::executeQuery('SELECT headers, body, recipient_email FROM civicrm_mailing_spool ORDER BY id');
     while ($dao->fetch()) {
-      $msgs[] = $dao->headers . "\n\n" . $dao->body;
-    }
+      $msg = $dao->headers . "\n\n" . $dao->body;
+      switch ($type) {
+        case 'raw':
+          $msgs[] = $msg;
+          break;
 
-    switch ($type) {
-      case 'raw':
-        // nothing to do
-        break;
+        case 'ezc':
+          $msgs[] = $this->convertToEzc($msg);
+          break;
 
-      case 'ezc':
-        foreach ($msgs as $i => $msg) {
-          $msgs[$i] = $this->convertToEzc($msg);
-        }
-        break;
+        case 'array':
+          $msgs[] = $dao->toArray();
+          break;
+      }
     }
 
     return $msgs;
@@ -200,7 +201,10 @@ class CiviMailUtils extends PHPUnit\Framework\TestCase {
   }
 
   /**
-   * Assert that $expectedRecipients (and no else) have received emails
+   * Assert recipients in the message "to" header.
+   *
+   * To also check cc and bcc,
+   * @see self::assertRecipientEmails()
    *
    * @param array $expectedRecipients
    *   Array($msgPos => array($recipPos => $emailAddr)).
@@ -223,6 +227,24 @@ class CiviMailUtils extends PHPUnit\Framework\TestCase {
       $recipients,
       "Incorrect recipients: " . print_r(['expected' => $expectedRecipients, 'actual' => $recipients], TRUE)
     );
+  }
+
+  /**
+   * Assert all recipients
+   *
+   * To only check the message "to" header,
+   * @see self::assertRecipients()
+   *
+   * @param string[] $expectedRecipients
+   *   Semicolon-separated strings, one string per message
+   *   E.g. ['a@test.com;b@test.com']
+   * @return void
+   */
+  public function assertRecipientEmails(array $expectedRecipients) {
+    sort($expectedRecipients);
+    $allRecipients = array_column($this->getAllMessages('array'), 'recipient_email');
+    sort($allRecipients);
+    $this->_ut->assertEquals($expectedRecipients, $allRecipients);
   }
 
   /**
