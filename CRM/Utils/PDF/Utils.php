@@ -83,9 +83,9 @@ class CRM_Utils_PDF_Utils {
     // Add a special region for the HTML header of PDF files:
     $pdfHeaderRegion = CRM_Core_Region::instance('export-document-header', FALSE);
     $htmlHeader = ($pdfHeaderRegion) ? $pdfHeaderRegion->render('', FALSE) : '';
-
+// height: 0 is a work-a-round for a extra empty page with wkhtmltopdf
     $html = "
-<html>
+<html style="height:0;">
   <head>
     <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>
     <style>@page { margin: {$t}{$metric} {$r}{$metric} {$b}{$metric} {$l}{$metric};$css_page_size }</style>
