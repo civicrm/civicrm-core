@@ -2635,6 +2635,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       if ($this->is_test) {
         $isTest = TRUE;
       }
+      $values['modelProps'] = $input['modelProps'] ?? [];
       if (!empty($this->_relatedObjects['membership'])) {
         foreach ($this->_relatedObjects['membership'] as $membership) {
           if ($membership->id) {
@@ -2672,7 +2673,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         }
       }
       else {
-        $values['modelProps'] = $input['modelProps'] ?? [];
         return CRM_Contribute_BAO_ContributionPage::sendMail($ids['contact'], $values, $isTest, $returnMessageText);
       }
     }

@@ -4399,6 +4399,31 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test custom receipt_text for a membership with Contribution.sendconfirmation
+   */
+  public function testSendconfirmationWithMembershipReceiptText(): void {
+    // Ideally we would start spooling lower down because the initial creation
+    // will also generate an email that might be misleading, but if we do that
+    // then it silently fails to send either email for some reason.
+    $mut = new CiviMailUtils($this, TRUE);
+    $this->createPriceSetWithPage('membership');
+    $this->createInitialPaidMembership();
+    // ignore first email
+    $mut->clearMessages();
+    $this->callAPISuccess('Contribution', 'sendconfirmation', [
+      'id' => $this->getContributionID(),
+      'receipt_from_email' => 'fromemail@fromemail.com',
+      'receipt_from_name' => 'fromemailname',
+      'receipt_text' => 'This is the custom receipt text.',
+    ]);
+    $mut->checkMailLog([
+      'fromemail@fromemail.com',
+      'This is the custom receipt text.',
+    ]);
+    $mut->stop();
+  }
+
+  /**
    * Test sending a mail via the API.
    */
   public function testSendMailWithRepeatTransactionAPIFailtoDomain(): void {
