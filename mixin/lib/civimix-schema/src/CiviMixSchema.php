@@ -11,7 +11,7 @@ return new class() {
    * @var string
    *   Regular expression. Note the 2 groupings. $m[1] identifies a per-extension namespace. $m[2] identifies the actual class.
    */
-  private $regex = ';^CiviMix\\\Schema\\\(\w+)\\\(AutomaticUpgrader)$;';
+  private $regex = ';^CiviMix\\\Schema\\\(\w+)\\\(AutomaticUpgrader|DAO)$;';
 
   /**
    * If someone requests a class like:
