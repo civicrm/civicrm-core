@@ -944,8 +944,12 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
    *
    * @return array
    * @throws \CRM_Core_Exception
+   *
+   * @deprecated
    */
   protected static function getRelatedMemberships(int $contributionID): array {
+    CRM_Core_Error::deprecatedWarning('getRelatedMemberships is only used by updateMembershipBasedOnCompletionOfContribution which has been moved to \Civi\Membership\OrderCompleteSubscriber and will be removed from CRM_Contribute_BAO_Contribution');
+
     $membershipIDs = array_keys((array) LineItem::get(FALSE)
       ->addWhere('contribution_id', '=', $contributionID)
       ->addWhere('entity_table', '=', 'civicrm_membership')
@@ -3667,10 +3671,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
 
     if ($contributionParams['contribution_status_id'] === $completedContributionStatusID && !$disableActionsOnCompleteOrder) {
-      self::updateMembershipBasedOnCompletionOfContribution(
-        $contributionID,
-        $input['trxn_date'] ?? date('YmdHis')
-      );
+      $dateTodayForDatesCalculations = $input['trxn_date'] ?? date('YmdHis');
+      \Civi::dispatcher()->dispatch('civi.order.complete', new \Civi\Order\Event\OrderCompleteEvent($contributionID, $dateTodayForDatesCalculations));
     }
 
     $participantPayments = civicrm_api3('ParticipantPayment', 'get', ['contribution_id' => $contributionID, 'return' => 'participant_id', 'sequential' => 1])['values'];
@@ -3995,8 +3997,12 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    *   If provided, specify an alternative date to use as "today" calculation of membership dates
    *
    * @throws \CRM_Core_Exception
+   *
+   * @deprecated
    */
   public static function updateMembershipBasedOnCompletionOfContribution($contributionID, $changeDate) {
+    CRM_Core_Error::deprecatedWarning('updateMembershipBasedOnCompletionOfContribution has been moved to \Civi\Membership\OrderCompleteSubscriber and will be removed from CRM_Contribute_BAO_Contribution');
+
     $memberships = self::getRelatedMemberships((int) $contributionID);
     foreach ($memberships as $membership) {
       $membershipParams = [
