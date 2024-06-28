@@ -153,15 +153,15 @@ abstract class CRM_Core_Task {
    *   the set of tasks for a group of participants
    */
   public static function getTask($value) {
-    static::tasks();
+    $tasks = self::$_tasks = static::tasks();
 
-    if (empty(self::$_tasks[$value])) {
+    if (empty($tasks[$value])) {
       // Children can specify a default task (eg. print), pick another if it is not valid.
-      $value = key(self::$_tasks);
+      $value = key($tasks);
     }
     return [
-      CRM_Utils_Array::value('class', self::$_tasks[$value]),
-      CRM_Utils_Array::value('result', self::$_tasks[$value]),
+      $tasks[$value]['class'] ?? '',
+      $tasks[$value]['result'] ?? '',
     ];
   }
 

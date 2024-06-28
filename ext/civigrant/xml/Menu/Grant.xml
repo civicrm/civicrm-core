@@ -34,4 +34,10 @@
      <page_callback>CRM_Grant_Form_GrantView</page_callback>
      <access_arguments>access CiviGrant</access_arguments>
   </item>
+  <item>
+    <path>civicrm/grant/task</path>
+    <title>Grant Task</title>
+    <page_callback>CRM_Grant_Controller_Task</page_callback>
+    <access_arguments>access CiviGrant</access_arguments>
+  </item>
 </menu>
