@@ -21,6 +21,8 @@
  */
 class CRM_Upgrade_Incremental_php_FiveSeventySix extends CRM_Upgrade_Incremental_Base {
 
+  const MAILING_BATCH_SIZE = 500;
+
   /**
    * Upgrade step; adds tasks including 'runSql'.
    *
@@ -41,6 +43,7 @@ class CRM_Upgrade_Incremental_php_FiveSeventySix extends CRM_Upgrade_Incremental
     if (!CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_extension WHERE full_name = "eventcart"')) {
       $this->addTask('Remove data related to disabled even cart extension', 'removeEventCartAssets');
     }
+    $this->addTask('Update civicrm_mailing to permit deleting records from civicrm_mailing_job', 'updateNewCiviMailFields');
   }
 
   public static function create_mesage_header_token() {
@@ -56,6 +59,22 @@ class CRM_Upgrade_Incremental_php_FiveSeventySix extends CRM_Upgrade_Incremental
      '<!-- " . ts('This is the %1 token HTML content.', [1 => '{site.message_header}']) . " -->',
       '', 1, 1)"
       );
+    }
+    return TRUE;
+  }
+
+  public static function updateNewCiviMailFields(CRM_Queue_TaskContext $ctx): bool {
+    [$minId, $maxId] = CRM_Core_DAO::executeQuery("SELECT coalesce(min(id),0), coalesce(max(id),0)
+      FROM civicrm_mailing ")->getDatabaseResult()->fetchRow();
+    if (!$maxId) {
+      return TRUE;
+    }
+    for ($startId = $minId; $startId <= $maxId; $startId += self::MAILING_BATCH_SIZE) {
+      $endId = min($maxId, $startId + self::MAILING_BATCH_SIZE - 1);
+      $task = new CRM_Queue_Task([static::class, 'fillMailingData'],
+        [$startId, $endId],
+        sprintf('Backfill civicrm_mailing start_date, end_date, status (%d => %d)', $startId, $endId));
+      $ctx->queue->createItem($task, ['weight' => -1]);
     }
     return TRUE;
   }
@@ -82,6 +101,88 @@ class CRM_Upgrade_Incremental_php_FiveSeventySix extends CRM_Upgrade_Incremental
     catch (CRM_Core_Exception $e) {
       // hmm what could possibly go wrong. A few stray artifacts is not as bad as a fail here I guess.
     }
+    return TRUE;
+  }
+
+  public static function fillMailingData(CRM_Queue_TaskContext $ctx, int $startId, int $endId): bool {
+    CRM_Core_DAO::executeQuery('
+UPDATE civicrm_mailing m
+LEFT JOIN
+    (SELECT MIN(job.start_date) as start_date, job.mailing_id FROM civicrm_mailing_job job GROUP BY mailing_id) as job
+ON job.mailing_id = m.id
+SET m.start_date = job.start_date
+WHERE m.id BETWEEN %1 AND %2
+   ', [1 => [$startId, 'Integer'], 2 => [$endId, 'Integer']]);
+
+    CRM_Core_DAO::executeQuery('
+UPDATE civicrm_mailing m
+LEFT JOIN
+    (SELECT MIN(job.start_date) as start_date, MAX(job.end_date) as end_date,
+  job.mailing_id FROM civicrm_mailing_job job GROUP BY job.mailing_id
+)
+as job
+ON job.mailing_id = m.id
+SET m.end_date = job.end_date, m.status = "Complete"
+WHERE m.is_completed = 1
+   AND m.id BETWEEN %1 AND %2
+   ', [1 => [$startId, 'Integer'], 2 => [$endId, 'Integer']]);
+
+    CRM_Core_DAO::executeQuery('
+UPDATE  civicrm_mailing m
+INNER JOIN
+  (
+  SELECT
+  job.mailing_id FROM civicrm_mailing_job job
+  WHERE status = "Paused"
+)
+as job
+ON job.mailing_id = m.id
+SET m.status = "Paused"
+WHERE m.status = "Draft"
+   AND m.id BETWEEN %1 AND %2', [1 => [$startId, 'Integer'], 2 => [$endId, 'Integer']]);
+
+    CRM_Core_DAO::executeQuery('
+UPDATE  civicrm_mailing m
+INNER JOIN
+  (
+    SELECT MAX(job.end_date) as end_date, mailing_id
+    FROM civicrm_mailing_job job
+    WHERE status = "Cancelled"
+    GROUP BY job.mailing_id
+  ) as job
+
+ON job.mailing_id = m.id
+SET m.status = "Canceled"
+WHERE m.status = "Draft"
+   AND m.id BETWEEN %1 AND %2', [1 => [$startId, 'Integer'], 2 => [$endId, 'Integer']]);
+
+    CRM_Core_DAO::executeQuery('
+UPDATE  civicrm_mailing m
+INNER JOIN
+    (SELECT MAX(job.end_date) as end_date,
+  job.mailing_id FROM civicrm_mailing_job job
+  WHERE status = "Running"
+  GROUP BY job.mailing_id
+)
+as job
+ON job.mailing_id = m.id
+SET m.status = "Running"
+WHERE m.status = "Draft"
+   AND m.id BETWEEN %1 AND %2', [1 => [$startId, 'Integer'], 2 => [$endId, 'Integer']]);
+
+    CRM_Core_DAO::executeQuery('
+UPDATE  civicrm_mailing m
+INNER JOIN
+    (SELECT MIN(job.start_date) as start_date, MAX(job.end_date) as end_date,
+  job.mailing_id FROM civicrm_mailing_job job
+  WHERE job.status = "Scheduled"
+  GROUP BY job.mailing_id
+)
+as job
+ON job.mailing_id = m.id
+SET m.status = "Scheduled"
+WHERE m.status = "Draft"
+   AND m.id BETWEEN %1 AND %2', [1 => [$startId, 'Integer'], 2 => [$endId, 'Integer']]);
     return TRUE;
   }
 
