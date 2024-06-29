@@ -133,7 +133,7 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
 
         $lineItem = [];
         if (is_array($this->_values['fee']['fields'])) {
-          CRM_Price_BAO_PriceSet::processAmount($this->_values['fee']['fields'], $fields, $lineItem);
+          $this->processCartAmount($this->_values['fee']['fields'], $fields, $lineItem);
           //XXX total...
           if ($fields['amount'] < 0) {
             $this->_errors['_qf_default'] = ts("Price Levels can not be less than zero. Please select the options accordingly");
@@ -171,6 +171,43 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
       }
     }
     return empty($this->_errors);
+  }
+
+  /**
+   * Get line item purchase information.
+   *
+   * This function takes the input parameters and interprets out of it what has been purchased.
+   *
+   * @param $fields
+   *   This is the output of the function CRM_Price_BAO_PriceSet::getSetDetail($priceSetID, FALSE, FALSE);
+   *   And, it would make sense to introduce caching into that function and call it from here rather than
+   *   require the $fields array which is passed from pillar to post around the form in order to pass it in here.
+   * @param array $params
+   *   Params reflecting form input e.g with fields 'price_5' => 7, 'price_8' => array(7, 8)
+   * @param $lineItem
+   *   Line item array to be altered.
+   * @param int $priceSetID
+   *
+   * @todo $priceSetID is a pseudoparam for permit override - we should stop passing it where we
+   * don't specifically need it & find a better way where we do.
+   */
+  private function processCartAmount($fields, &$params, &$lineItem = [], $priceSetID = NULL) {
+    // using price set
+    foreach ($fields as $id => $field) {
+      if (empty($params["price_{$id}"]) ||
+        (empty($params["price_{$id}"]) && $params["price_{$id}"] == NULL)
+      ) {
+        // skip if nothing was submitted for this field
+        continue;
+      }
+
+      [$params, $lineItem] = self::getLine($params, $lineItem, $priceSetID, $field, $id);
+    }
+    $order = new CRM_Financial_BAO_Order();
+    $order->setLineItems((array) $lineItem);
+    $params['amount_level'] = $order->getAmountLevel();
+    $params['amount'] = $order->getTotalAmount();
+    $params['tax_amount'] = $order->getTotalTaxAmount();
   }
 
   /**
