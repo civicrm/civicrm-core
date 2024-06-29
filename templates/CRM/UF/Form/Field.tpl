@@ -75,7 +75,7 @@
 <script type="text/javascript">
 
 CRM.$(function($) {
-  var otherModule = {/literal}{$otherModules|@json_encode}{literal};
+  var otherModule = {/literal}{$otherModules|@json_encode nofilter}{literal};
   if ( $.inArray( "Profile", otherModule ) > -1 && $.inArray( "Search Profile", otherModule ) == -1 ){
     $('#profile_visibility').show();
   }
