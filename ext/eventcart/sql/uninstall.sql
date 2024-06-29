@@ -1,1 +1,0 @@
-ALTER TABLE civicrm_participant DROP CONSTRAINT FK_civicrm_participant_cart_id;

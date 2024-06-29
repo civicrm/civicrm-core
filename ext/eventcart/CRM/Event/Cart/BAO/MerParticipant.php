@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\EventCartParticipant;
+
 /**
  * Class CRM_Event_Cart_BAO_MerParticipant
  */
@@ -29,14 +31,17 @@ class CRM_Event_Cart_BAO_MerParticipant extends CRM_Event_BAO_Participant {
    */
   public $cart = NULL;
 
+  private $cart_id;
+
   /**
    * @param array $participant
+   * @param int|null $cart_id
    */
-  public function __construct($participant = NULL) {
+  public function __construct($participant, $cart_id) {
     parent::__construct();
     $a = (array) $participant;
     $this->copyValues($a);
-
+    $this->cart_id = $cart_id;
     $this->email = $a['email'] ?? NULL;
   }
 
@@ -53,10 +58,15 @@ class CRM_Event_Cart_BAO_MerParticipant extends CRM_Event_BAO_Participant {
       'status_id' => self::get_pending_in_cart_status_id(),
       'contact_id' => $params['contact_id'],
       'event_id' => $params['event_id'],
-      'cart_id' => $params['cart_id'],
     ];
     $participant = CRM_Event_BAO_Participant::create($participantParams);
-    $mer_participant = new CRM_Event_Cart_BAO_MerParticipant($participant);
+    if (!empty($params['cart_id'])) {
+      EventCartParticipant::save(FALSE)
+        ->addRecord(['cart_id' => $params['cart_id'], 'participant_id' => $participant->id])
+        ->setMatch(['cart_id', 'participant_id'])
+        ->execute();
+    }
+    $mer_participant = new CRM_Event_Cart_BAO_MerParticipant($participant, $params['cart_id'] ?? NULL);
     return $mer_participant;
   }
 
@@ -79,18 +89,6 @@ class CRM_Event_Cart_BAO_MerParticipant extends CRM_Event_BAO_Participant {
   }
 
   /**
-   * @param int $event_cart_id
-   *
-   * @return array|null
-   */
-  public static function find_all_by_cart_id($event_cart_id) {
-    if ($event_cart_id == NULL) {
-      return NULL;
-    }
-    return self::find_all_by_params(['cart_id' => $event_cart_id]);
-  }
-
-  /**
    * @param int $event_id
    * @param int $event_cart_id
    *
@@ -100,7 +98,18 @@ class CRM_Event_Cart_BAO_MerParticipant extends CRM_Event_BAO_Participant {
     if ($event_cart_id == NULL) {
       return NULL;
     }
-    return self::find_all_by_params(['event_id' => $event_id, 'cart_id' => $event_cart_id]);
+    $participants = EventCartParticipant::get(FALSE)
+      ->addWhere('cart_id', '=', $event_cart_id)
+      ->addWhere('participant_id.event_id', '=', $event_id)
+      ->execute();
+    $result = [];
+    foreach ($participants as $participant) {
+      $dao = new CRM_Event_BAO_Participant();
+      $dao->id = $participant['participant_id'];
+      $dao->find(TRUE);
+      $result[] = new CRM_Event_Cart_BAO_MerParticipant($dao, $event_cart_id);
+    }
+    return $result;
   }
 
   /**
@@ -109,12 +118,26 @@ class CRM_Event_Cart_BAO_MerParticipant extends CRM_Event_BAO_Participant {
    * @return array
    */
   public static function find_all_by_params($params) {
-    $participant = new CRM_Event_BAO_Participant();
-    $participant->copyValues($params);
-    $result = [];
-    if ($participant->find()) {
-      while ($participant->fetch()) {
-        $result[] = new CRM_Event_Cart_BAO_MerParticipant(clone($participant));
+    if (!empty($params['cart_id'])) {
+      $participants = EventCartParticipant::get(FALSE)
+        ->addWhere('cart_id', '=', $params['cart_id'])
+        ->execute();
+      foreach ($participants as $participant) {
+        $dao = new CRM_Event_BAO_Participant();
+        $dao->id = $participant['participant_id'];
+        $dao->fetch();
+        $result[] = new CRM_Event_Cart_BAO_MerParticipant((array) $dao, $params['cart_id']);
+      }
+    }
+    else {
+      $participant = new CRM_Event_BAO_Participant();
+      $participant->copyValues($params);
+      $result = [];
+      if ($participant->find()) {
+        while ($participant->fetch()) {
+          // hopefully unreachable.
+          $result[] = new CRM_Event_Cart_BAO_MerParticipant(clone($participant), NULL);
+        }
       }
     }
     return $result;

@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Api4\EventCartParticipant;
+
 /**
  * Class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices
  */
@@ -132,7 +134,8 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
         }
 
         $lineItem = [];
-        if (is_array($this->_values['fee']['fields'])) {
+        if (isset($this->_values['fee']['fields']) && is_array($this->_values['fee']['fields'])) {
+          // Probably unreachable.
           $this->processCartAmount($this->_values['fee']['fields'], $fields, $lineItem);
           //XXX total...
           if ($fields['amount'] < 0) {
@@ -314,14 +317,17 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
         //TODO security check that participant ids are already in this cart
         $participant_params = [
           'id' => $participant_id,
-          'cart_id' => $this->cart->id,
           'event_id' => $event_id,
           'contact_id' => $contact_id,
           //'registered_by_id' => $this->cart->user_id,
           'email' => $fields['email'],
         ];
-        $participant = new CRM_Event_Cart_BAO_MerParticipant($participant_params);
+        $participant = new CRM_Event_Cart_BAO_MerParticipant($participant_params, $this->cart->id);
         $participant->save();
+        EventCartParticipant::save(FALSE)
+          ->addRecord(['cart_id' => $this->cart->id, 'participant_id' => $participant->id])
+          ->setMatch(['cart_id', 'participant_id'])
+          ->execute();
         $this->cart->add_participant_to_cart($participant);
 
         if (array_key_exists('field', $this->_submitValues) && array_key_exists($participant_id, $this->_submitValues['field'])) {
