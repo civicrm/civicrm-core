@@ -104,7 +104,7 @@
 .crm-container fieldset legend {
     font-weight: var(--crm-bold-weight);
     font-family: var(--crm-font-bold);
-    padding-inline: var(--crm-m);
+    padding-inline: var(--crm-s);
     color: var(--crm-c-text);
 }
 /* Required Mark */

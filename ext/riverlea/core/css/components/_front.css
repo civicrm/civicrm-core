@@ -1,0 +1,43 @@
+
+/* Front-end specific */
+
+.crm-container.crm-public #crm-main-content-wrapper {
+    /* max-width: var(--crm-f-form-width); */
+    margin-inline: auto;
+    width: clamp(calc(var(--crm-f-form-width) / 2),100%,var(--crm-f-form-width));
+}
+.crm-container.crm-public fieldset:not(.collapsed, .crm-inactive-dashlet-fieldset) {
+    background-color: var(--crm-f-fieldset-bg);
+    margin: var(--crm-f-fieldset-margin);
+    padding: var(--crm-f-fieldset-padding) 0;
+}
+.crm-container.crm-public .crm-section:has( > .label) {
+    padding: var(--crm-f-form-padding);
+    display: var(--crm-f-form-layout);
+    grid-template-columns: var(--crm-f-label-width) 1fr 0;
+}
+.crm-container.crm-public .crm-section:has(> div > input:focus) {
+    background-color: var(--crm-f-form-focus-bg);
+}
+.crm-container.crm-public .crm-section:has(> div > input.crm-inline-error) {
+    background-color: var(--crm-f-form-error-bg);
+}
+.crm-container.crm-public input[type="text"], 
+.crm-container.crm-public input[type="password"], 
+.crm-container.crm-public input[type="email"], 
+.crm-container.crm-public select {
+    border-radius: var(--crm-f-input-radius);
+    padding: var(--crm-f-input-padding);
+    font-size: var(--crm-f-input-font-size);
+    width: var(--crm-f-input-width);
+}
+@media (min-width: 480px) {
+    .crm-container.crm-public .crm-section .label {
+      float: none;
+      width: inherit;
+      text-align: var(--crm-f-label-align);
+    }
+    .crm-container.crm-public .crm-section .content {
+        margin-left: 0;
+      }
+  }

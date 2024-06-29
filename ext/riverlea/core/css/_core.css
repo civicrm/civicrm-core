@@ -15,12 +15,4 @@
 @import url(components/_dialogs.css);
 @import url(components/_page.css);
 @import url(components/_components.css);
-
-/* Responsive (move to own file at some point) */
-
-@media (max-width: 989px) {
-   /* base/position */ .crm-container .crm-flex-box,
-   /* sections/api4-explorer */ .api4-input {
-      flex-direction: column;
-   }
-}
+@import url(components/_front.css);

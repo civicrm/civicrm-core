@@ -256,8 +256,8 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-inline-edit-border: 0 solid transparent;
 --crm-inline-edit-bg: var(--crm-c-background);
 --crm-fieldset-border-color: var(--crm-c-gray-400);
---crm-fieldset-border: 1px;
---crm-fieldset-padding: var(--crm-padding-reg);
+--crm-fieldset-border: 1px 0 0 0;
+--crm-fieldset-padding: var(--crm-padding-reg) var(--crm-padding-small);
 --crm-checkbox-list-col: var(--crm-c-text);
 
 /* Tabs */
@@ -389,6 +389,24 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-wizard-active-bg: var(--crm-c-link);
 --crm-wizard-border-col: var(--crm-c-divider);
 --crm-wizard-bg: var(--crm-c-page-background);
+
+/* Frontend */
+--crm-f-form-width: 700px;
+--crm-f-fieldset-bg: var(--crm-c-background);
+--crm-f-fieldset-padding: var(--crm-r);
+--crm-f-fieldset-margin: 0 0 var(--crm-padding-reg) 0;
+--crm-f-legend-align: ;
+--crm-f-form-padding: var(--crm-padding-reg);
+--crm-f-form-layout: block; /* 'grid' = inline, 'block' = stacked */
+--crm-f-label-position: ;
+--crm-f-label-align: left;
+--crm-f-label-width: 200px;
+--crm-f-input-radius: var(--crm-roundness);
+--crm-f-input-padding: var(--crm-r2) var(--crm-m2);
+--crm-f-input-font-size: var(--crm-r1);
+--crm-f-input-width: 100%;
+--crm-f-form-focus-bg: var(--crm-c-green);
+--crm-f-form-error-bg: var(--crm-c-red);
 }
 
 /* light/dark mode settings */

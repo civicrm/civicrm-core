@@ -402,3 +402,12 @@
 .crm-container .float-right {
     float: right;
 }
+/* Responsive  */
+
+@media (max-width: 989px) {
+    .crm-container .crm-flex-box,
+    .api4-input /* sections/api4-explorer */ {
+       flex-direction: column;
+    }
+ }
+ 

@@ -250,3 +250,10 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
     background-color: transparent;
     padding: 0;
 }
+/* Spinners */
+.crm-container button i.crm-i.fa-spinner,
+.crm-container .btn i.crm-i.fa-spinner {
+    padding: 0;
+    background: transparent;
+    border: 0;
+}
