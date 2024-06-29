@@ -866,7 +866,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     if ($this->_isPaidEvent) {
       $params = $this->preparePaidEventProcessing($params);
     }
-    $lineItem = [$this->getPriceSetID() => $this->getLineItems()];
+
     // @todo - stop assigning these - pass financial_trxnId in token context
     // and swap template to use tokens.
     $this->assign('credit_card_type', $this->getSubmittedValue('credit_card_type'));
