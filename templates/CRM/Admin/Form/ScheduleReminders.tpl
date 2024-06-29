@@ -170,8 +170,8 @@
         (function($, _) {
           $(function($) {
             const $form = $('form.{/literal}{$form.formClass}{literal}'),
-              controlFields = {/literal}{$controlFields|@json_encode}{literal},
-              recurringFrequencyOptions = {/literal}{$recurringFrequencyOptions|@json_encode}{literal};
+              controlFields = {/literal}{$controlFields|@json_encode nofilter}{literal},
+              recurringFrequencyOptions = {/literal}{$recurringFrequencyOptions|@json_encode nofilter}{literal};
 
             // Reload metadata when a controlField is changed
             $form.on('change', 'input', function() {
