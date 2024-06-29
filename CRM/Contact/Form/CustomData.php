@@ -87,6 +87,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
     $this->_multiRecordDisplay = CRM_Utils_Request::retrieve('multiRecordDisplay', 'String', $this);
     $isBuildForm = $this->_cdType && $this->_multiRecordDisplay;
     $this->assign('cdType', (bool) $this->_cdType);
+    // This will be false if display type is tab and it's not multivalued.
     if ($isBuildForm) {
       // NOTE : group id is not stored in session from within CRM_Custom_Form_CustomData::preProcess func
       // this is due to some condition inside it which restricts it from saving in session
@@ -125,9 +126,6 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
         }
       }
       return;
-    }
-    else {
-      CRM_Core_Error::deprecatedWarning("I'm so confused - how did we get here?");
     }
     $this->_groupID = CRM_Utils_Request::retrieve('groupID', 'Positive', $this, TRUE);
     $this->_tableID = CRM_Utils_Request::retrieve('tableId', 'Positive', $this, TRUE);
