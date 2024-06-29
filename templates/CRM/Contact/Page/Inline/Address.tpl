@@ -39,7 +39,7 @@
           {if array_key_exists($locationIndex, $sharedAddresses) && !empty($sharedAddresses.$locationIndex.shared_address_display.name)}
             <strong>{ts 1=$sharedAddresses.$locationIndex.shared_address_display.name}Address belongs to %1{/ts}</strong><br />
           {/if}
-          {$add.display|smarty:nodefaults|purify|nl2br}
+          {$add.display|purify|nl2br nofilter}
         </div>
       </div>
 
