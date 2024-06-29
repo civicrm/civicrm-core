@@ -541,7 +541,8 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
       }
     }
 
-    $value = smarty_modifier_escape($string, $esc_type, $char_set);
+    $string = mb_convert_encoding($string, 'UTF-8', $char_set);
+    $value = htmlentities($string, ENT_QUOTES, 'UTF-8');
     if ($value !== $string) {
       Civi::log('smarty')->debug('smarty escaping original {original}, escaped {escaped} type {type} charset {charset}', [
         'original' => $string,
