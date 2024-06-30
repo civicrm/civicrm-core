@@ -67,56 +67,48 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
   }
 
   /**
-   * The email token `{afform.mockPublicFormUrl}` should evaluate to an authenticated URL.
+   * There are two tokens ({afform.mockPublicFormUrl} and {afform.mockPublicFormLink})
+   * which are rendered in two contexts (text and HTML).
+   *
+   * Make sure that the resulting URLs point to the same place, regardless of which
+   * variant or environment is used.
+   *
+   * @return void
    */
-  public function testAuthenticatedUrlToken_Plain() {
-    $this->assertTrue(function_exists('authx_civicrm_config'), 'Cannot test without authx');
-
+  public function testWellFormedTokens() {
     $lebowski = $this->getLebowskiCID();
-    $text = $this->renderTokens($lebowski, 'Please go to {afform.mockPublicFormUrl}', 'text/plain');
-    if (!preg_match(';Please go to ([^\s]+);', $text, $m)) {
-      $this->fail('Plain text message did not have URL in expected place: ' . $text);
-    }
-    $url = $m[1];
-    $this->assertMatchesRegularExpression(';^https?:.*civicrm/mock-public-form.*;', $url, "URL should look plausible");
+    $messages = \CRM_Core_TokenSmarty::render([
+      'text' => 'url=({afform.mockPublicFormUrl}) link=({afform.mockPublicFormLink})',
+      'html' => '<p>url=({afform.mockPublicFormUrl}) link=({afform.mockPublicFormLink})</p>',
+    ], ['contactId' => $lebowski]);
 
-    $this->assertUrlStartsSession($url, $lebowski);
+    $httpTextUrl = '(https?:[a-zA-Z0-9_/\.\?\-\+:=#&]+)';
+    $httpHtmlUrl = '(https?:[a-zA-Z0-9_/\.\?\-\+:=#&\;]+)';
+    $textPattern = ";url=\($httpTextUrl\) link=\(\[My public form\]\($httpTextUrl\)\); ";
+    $htmlPattern = ";\<p\>url=\($httpHtmlUrl\) link=\(<a href=\"$httpHtmlUrl\">My public form</a>\)\</p\>;";
+
+    $this->assertMatchesRegularExpression($textPattern, $messages['text']);
+    $this->assertMatchesRegularExpression($htmlPattern, $messages['html']);
+
+    preg_match($textPattern, $messages['text'], $textMatches);
+    preg_match($htmlPattern, $messages['html'], $htmlMatches);
+
+    $this->assertEquals($textMatches[1], html_entity_decode($htmlMatches[1]), 'Text and HTML values of {afform.mockPublicFormUrl} should point to same place');
+    $this->assertEquals($textMatches[2], html_entity_decode($htmlMatches[2]), 'Text and HTML values of {afform.mockPublicFormLink} should point to same place');
+
+    $this->assertMatchesRegularExpression(';^https?:.*civicrm/mock-public-form.*;', $textMatches[1], "URL should look plausible");
+    $this->assertMatchesRegularExpression(';^https?:.*civicrm/mock-public-form.*;', $textMatches[2], "URL should look plausible");
   }
 
   /**
    * The email token `{afform.mockPublicFormUrl}` should evaluate to an authenticated URL.
    */
-  public function testAuthenticatedUrlToken_Html() {
+  public function testAuthenticatedUrlToken() {
     $this->assertTrue(function_exists('authx_civicrm_config'), 'Cannot test without authx');
 
     $lebowski = $this->getLebowskiCID();
-    $html = $this->renderTokens($lebowski, 'Please go to <a href="{afform.mockPublicFormUrl}">my form</a>', 'text/html');
-
-    if (!preg_match(';a href="([^"]+)";', $html, $m)) {
-      $this->fail('HTML message did not have URL in expected place: ' . $html);
-    }
-    $url = html_entity_decode($m[1]);
+    $url = $this->renderTokens($lebowski, '{afform.mockPublicFormUrl}', 'text/plain');
     $this->assertMatchesRegularExpression(';^https?:.*civicrm/mock-public-form.*;', $url, "URL should look plausible");
-
-    $this->assertUrlStartsSession($url, $lebowski);
-  }
-
-  /**
-   * The email token `{afform.mockPublicFormLink}` should evaluate to an authenticated URL.
-   */
-  public function testAuthenticatedLinkToken_Html() {
-    $this->assertTrue(function_exists('authx_civicrm_config'), 'Cannot test without authx');
-
-    $lebowski = $this->getLebowskiCID();
-    $html = $this->renderTokens($lebowski, 'Please go to {afform.mockPublicFormLink}', 'text/html');
-    $doc = \phpQuery::newDocument($html, 'text/html');
-    $this->assertEquals(1, $doc->find('a')->count(), 'Document should have hyperlink');
-    foreach ($doc->find('a') as $item) {
-      /** @var \DOMElement $item */
-      $this->assertMatchesRegularExpression(';^https?:.*civicrm/mock-public-form.*;', $item->getAttribute('href'));
-      $this->assertEquals('My public form', $item->firstChild->data);
-      $url = $item->getAttribute('href');
-    }
 
     $this->assertUrlStartsSession($url, $lebowski);
   }
