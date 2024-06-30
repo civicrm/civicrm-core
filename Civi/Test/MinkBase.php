@@ -18,6 +18,11 @@ abstract class MinkBase extends \CiviEndToEndTestCase {
 
   protected function setUp(): void {
     parent::setUp();
+
+    if (CIVICRM_UF === 'Drupal8' && version_compare(\CRM_Core_Config::singleton()->userSystem->getVersion(), '10', '<')) {
+      $this->markTestSkipped('Browser testing is currently unsupported on Civi-Drupal 9');
+    }
+
     // $this->failOnJavascriptConsoleErrors = TRUE; // Not implemented yet
     $this->mink = $this->createMink();
     $this->screenshotsEnabled = $_ENV['SCREENSHOTS'] ?? FALSE;
