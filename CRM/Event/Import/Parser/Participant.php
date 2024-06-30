@@ -96,8 +96,6 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
           if (count($matchedIDs) === 1) {
             foreach ($matchedIDs as $contactId) {
               $formatted['contact_id'] = $contactId;
-              $formatted['version'] = 3;
-              $newParticipant = $this->deprecated_create_participant_formatted($formatted);
             }
           }
           elseif ($matchedIDs > 1) {
@@ -136,9 +134,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
           throw new CRM_Core_Exception('No matching Contact found for (' . $disp . ')');
         }
       }
-      else {
-        $newParticipant = $this->deprecated_create_participant_formatted($formatted);
-      }
+      $newParticipant = $this->deprecated_create_participant_formatted($formatted);
 
       if (is_array($newParticipant) && civicrm_error($newParticipant)) {
         if ($this->isSkipDuplicates()) {
