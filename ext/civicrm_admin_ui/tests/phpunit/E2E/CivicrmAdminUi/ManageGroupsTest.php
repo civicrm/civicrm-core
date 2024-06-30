@@ -8,7 +8,7 @@ use Civi\Api4\Group;
  * @group e2e
  * @see cv
  */
-class CRM_CivicrmAdminUi_ManageGroupsTest extends \Civi\Test\MinkBase {
+class E2E_CivicrmAdminUi_ManageGroupsTest extends \Civi\Test\MinkBase {
 
   use Civi\Test\Api4TestTrait;
 
