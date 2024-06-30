@@ -18,7 +18,7 @@ abstract class MinkBase extends \CiviEndToEndTestCase {
 
   protected function setUp(): void {
     parent::setUp();
-    $this->failOnJavascriptConsoleErrors = TRUE;
+    // $this->failOnJavascriptConsoleErrors = TRUE; // Not implemented yet
     $this->mink = $this->createMink();
     $this->screenshotsEnabled = $_ENV['SCREENSHOTS'] ?? FALSE;
     $GLOBALS['civicrm_url_defaults'][] = ['format' => 'absolute', 'scheme' => 'backend'];
