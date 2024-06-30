@@ -1,12 +1,16 @@
 <?php
 
+namespace E2E\AfformMock;
+
+use CRM_Core_DAO;
+
 /**
  * @group e2e
  * @group ang
  */
 class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
 
-  const FILE = __FILE__;
+  protected $formName = 'mockPublicForm';
 
   public function testGetPage() {
     $r = $this->createGuzzle()->get('civicrm/mock-public-form');
@@ -28,14 +32,14 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
     $this->submit(['args' => [], 'values' => ['me' => $me]]);
 
     // Contact was created...
-    $contact = Civi\Api4\Contact::get(FALSE)->addWhere('first_name', '=', 'Firsty' . $r)->execute()->single();
+    $contact = \Civi\Api4\Contact::get(FALSE)->addWhere('first_name', '=', 'Firsty' . $r)->execute()->single();
     $this->assertEquals('Firsty' . $r, $contact['first_name']);
     $this->assertEquals('Lasty' . $r, $contact['last_name']);
     $this->assertTrue($contact['id'] > $initialMaxId);
   }
 
   public function testPublicEditDisallowed() {
-    $contact = Civi\Api4\Contact::create(FALSE)
+    $contact = \Civi\Api4\Contact::create(FALSE)
       ->setValues([
         'first_name' => 'FirstBegin',
         'last_name' => 'LastBegin',
@@ -54,7 +58,7 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
     $this->submit(['args' => [], 'values' => ['me' => $me]]);
 
     // Original contact hasn't changed
-    $get = Civi\Api4\Contact::get(FALSE)->addWhere('id', '=', $contact['id'])->execute()->single();
+    $get = \Civi\Api4\Contact::get(FALSE)->addWhere('id', '=', $contact['id'])->execute()->single();
     $this->assertEquals('FirstBegin', $get['first_name']);
     $this->assertEquals('LastBegin', $get['last_name']);
 
