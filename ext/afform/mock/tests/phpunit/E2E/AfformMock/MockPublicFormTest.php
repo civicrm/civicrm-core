@@ -82,13 +82,7 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
     $url = $m[1];
     $this->assertMatchesRegularExpression(';^https?:.*civicrm/mock-public-form.*;', $url, "URL should look plausible");
 
-    // Going to this page will cause us to authenticate as the target contact
-    $http = $this->createGuzzle(['http_errors' => FALSE, 'cookies' => new \GuzzleHttp\Cookie\CookieJar()]);
-    $response = $http->get($url);
-    $r = (string) $response->getBody();
-    $this->assertStatusCode(200, $response);
-    $response = $http->get('civicrm/authx/id');
-    $this->assertContactJson($lebowski, $response);
+    $this->assertUrlStartsSession($url, $lebowski);
   }
 
   /**
@@ -108,12 +102,7 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
     $url = html_entity_decode($m[1]);
     $this->assertMatchesRegularExpression(';^https?:.*civicrm/mock-public-form.*;', $url, "URL should look plausible");
 
-    // Going to this page will cause us to authenticate as the target contact
-    $http = $this->createGuzzle(['cookies' => new \GuzzleHttp\Cookie\CookieJar()]);
-    $response = $http->get($url);
-    $this->assertStatusCode(200, $response);
-    $response = $http->get('civicrm/authx/id');
-    $this->assertContactJson($lebowski, $response);
+    $this->assertUrlStartsSession($url, $lebowski);
   }
 
   /**
@@ -135,12 +124,7 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
       $url = $item->getAttribute('href');
     }
 
-    // Going to this page will cause us to authenticate as the target contact
-    $http = $this->createGuzzle(['cookies' => new \GuzzleHttp\Cookie\CookieJar()]);
-    $response = $http->get($url);
-    $this->assertStatusCode(200, $response);
-    $response = $http->get('civicrm/authx/id');
-    $this->assertContactJson($lebowski, $response);
+    $this->assertUrlStartsSession($url, $lebowski);
   }
 
   protected function renderTokens($cid, $body, $format) {
@@ -151,7 +135,7 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
     return $tp->getRow(0)->render('example');
   }
 
-  protected function getLebowskiCID() {
+  protected function getLebowskiCID(): int {
     $contact = \civicrm_api3('Contact', 'create', [
       'contact_type' => 'Individual',
       'first_name' => 'Jeffrey',
@@ -177,6 +161,27 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
     $j = json_decode((string) $response->getBody(), 1);
     $formattedFailure = $this->formatFailure($response);
     $this->assertEquals($cid, $j['contact_id'], "Response did not give expected contact ID\n" . $formattedFailure);
+  }
+
+  /**
+   * Opening $url
+   *
+   * @param string $url
+   * @param int $contactId
+   *
+   * @return void
+   * @throws \GuzzleHttp\Exception\GuzzleException
+   */
+  protected function assertUrlStartsSession(string $url, int $contactId): void {
+    $http = $this->createGuzzle([
+      'http_errors' => FALSE,
+      'cookies' => new \GuzzleHttp\Cookie\CookieJar(),
+    ]);
+    $response = $http->get($url);
+    $r = (string) $response->getBody();
+    $this->assertStatusCode(200, $response);
+    $response = $http->get('civicrm/authx/id');
+    $this->assertContactJson($contactId, $response);
   }
 
 }
