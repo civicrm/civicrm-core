@@ -70,9 +70,7 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
    * The email token `{afform.mockPublicFormUrl}` should evaluate to an authenticated URL.
    */
   public function testAuthenticatedUrlToken_Plain() {
-    if (!function_exists('authx_civicrm_config')) {
-      $this->fail('Cannot test without authx');
-    }
+    $this->assertTrue(function_exists('authx_civicrm_config'), 'Cannot test without authx');
 
     $lebowski = $this->getLebowskiCID();
     $text = $this->renderTokens($lebowski, 'Please go to {afform.mockPublicFormUrl}', 'text/plain');
@@ -89,9 +87,7 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
    * The email token `{afform.mockPublicFormUrl}` should evaluate to an authenticated URL.
    */
   public function testAuthenticatedUrlToken_Html() {
-    if (!function_exists('authx_civicrm_config')) {
-      $this->fail('Cannot test without authx');
-    }
+    $this->assertTrue(function_exists('authx_civicrm_config'), 'Cannot test without authx');
 
     $lebowski = $this->getLebowskiCID();
     $html = $this->renderTokens($lebowski, 'Please go to <a href="{afform.mockPublicFormUrl}">my form</a>', 'text/html');
@@ -109,9 +105,7 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
    * The email token `{afform.mockPublicFormLink}` should evaluate to an authenticated URL.
    */
   public function testAuthenticatedLinkToken_Html() {
-    if (!function_exists('authx_civicrm_config')) {
-      $this->fail('Cannot test without authx');
-    }
+    $this->assertTrue(function_exists('authx_civicrm_config'), 'Cannot test without authx');
 
     $lebowski = $this->getLebowskiCID();
     $html = $this->renderTokens($lebowski, 'Please go to {afform.mockPublicFormLink}', 'text/html');
