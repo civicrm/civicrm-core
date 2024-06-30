@@ -5,6 +5,11 @@ namespace E2E\AfformMock;
 use CRM_Core_DAO;
 
 /**
+ * Perform some tests against `mockPublicForm.aff.html`.
+ *
+ * This test uses Guzzle and checks more low-level behaviors. For more comprehensive
+ * tests that also cover browser/Chrome/JS behaviors, see MockPublicFormBrowserTest.
+ *
  * @group e2e
  * @group ang
  */
@@ -101,16 +106,58 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
   }
 
   /**
-   * The email token `{afform.mockPublicFormUrl}` should evaluate to an authenticated URL.
+   * Evaluate the email token `{afform.mockPublicFormUrl}`. The output should be a session-level auth token.
    */
-  public function testAuthenticatedUrlToken() {
+  public function testAuthenticatedUrlToken_Session() {
     $this->assertTrue(function_exists('authx_civicrm_config'), 'Cannot test without authx');
+    Civi::settings()->set('afform_mail_auth_token', 'session');
 
     $lebowski = $this->getLebowskiCID();
     $url = $this->renderTokens($lebowski, '{afform.mockPublicFormUrl}', 'text/plain');
     $this->assertMatchesRegularExpression(';^https?:.*civicrm/mock-public-form.*;', $url, "URL should look plausible");
 
     $this->assertUrlStartsSession($url, $lebowski);
+  }
+
+  /**
+   * Evaluate the email token `{afform.mockPublicFormUrl}`. The output should be a page-level auth token.
+   */
+  public function testAuthenticatedUrlToken_Page() {
+    $this->assertTrue(function_exists('authx_civicrm_config'), 'Cannot test without authx');
+    Civi::settings()->set('afform_mail_auth_token', 'page');
+
+    $lebowski = $this->getLebowskiCID();
+    $url = $this->renderTokens($lebowski, '{afform.mockPublicFormUrl}', 'text/plain');
+    $this->assertMatchesRegularExpression(';^https?:.*civicrm/mock-public-form.*;', $url, "URL should look plausible");
+
+    // This URL doesn't specifically log you in to a durable sesion.
+    // $this->assertUrlStartsSession($url, NULL);
+
+    // However, there is an auth token.
+    $query = parse_url($url, PHP_URL_QUERY);
+    parse_str($query, $queryParams);
+    $token = $queryParams['_aff'];
+    $this->assertNotEmpty($token);
+    $auth = ['_authx' => $token];
+
+    // This token cannot be used for any random API...
+    $body = $this->callApi4AuthTokenFailure($auth, 'Contact', 'get', ['limit' => 5]);
+    $this->assertMatchesRegularExpression('/JWT specifies a different form or route/', $body, 'Response should have error message');
+
+    // The token can be used for Afform.prefill and Afform.submit...
+    $response = $this->callApi4AuthTokenSuccess($auth, 'Afform', 'prefill', [
+      'name' => $this->getFormName(),
+    ]);
+    $this->assertEquals('me', $response['values'][0]['name']);
+    $this->assertEquals($lebowski, $response['values'][0]['values'][0]['fields']['id'], 'Afform.prefill should return id');
+    $this->assertEquals('Lebowski', $response['values'][0]['values'][0]['fields']['last_name'], 'Afform.prefill should return last_name');
+
+    // But the token cannot be used for Afform calls with sneaky params...
+    $body = $this->callApi4AuthTokenFailure($auth, 'Afform', 'prefill', [
+      'name' => $this->getFormName(),
+      'chain' => ['name_me_0' => ['Contact', 'get', []]],
+    ]);
+    $this->assertMatchesRegularExpression('/JWT specifies a different form or route/', $body, 'Response should have error message');
   }
 
   protected function renderTokens($cid, $body, $format) {
@@ -150,15 +197,14 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
   }
 
   /**
-   * Opening $url
+   * Opening $url may generate a session-cookie. Does that cookie authenticate you as $contactId?
    *
    * @param string $url
-   * @param int $contactId
-   *
+   * @param int|null $contactId
    * @return void
    * @throws \GuzzleHttp\Exception\GuzzleException
    */
-  protected function assertUrlStartsSession(string $url, int $contactId): void {
+  protected function assertUrlStartsSession(string $url, ?int $contactId): void {
     $http = $this->createGuzzle([
       'http_errors' => FALSE,
       'cookies' => new \GuzzleHttp\Cookie\CookieJar(),
@@ -166,8 +212,49 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
     $response = $http->get($url);
     $r = (string) $response->getBody();
     $this->assertStatusCode(200, $response);
+
+    // We make another request in the same session. Is it the expected contact?
     $response = $http->get('civicrm/authx/id');
     $this->assertContactJson($contactId, $response);
+  }
+
+  protected function callApi4AuthTokenSuccess(array $auth, string $entity, string $action, $params = []) {
+    $response = $this->callApi4AuthToken($auth, $entity, $action, $params);
+    $this->assertContentType('application/json', $response);
+    $this->assertStatusCode(200, $response);
+    $result = json_decode((string) $response->getBody(), 1);
+    if (json_last_error() !== JSON_ERROR_NONE) {
+      $this->fail("Failed to decode APIv4 JSON.\n" . $this->formatFailure($response));
+    }
+    return $result;
+  }
+
+  protected function callApi4AuthTokenFailure(array $auth, string $entity, string $action, $params = []): string {
+    $httpResponse = $this->callApi4AuthToken($auth, $entity, $action, $params);
+    $this->assertEquals(401, $httpResponse->getStatusCode(), "HTTP status code should be 401");
+    return (string) $httpResponse->getBody();
+  }
+
+  /**
+   * @param array $auth
+   * @param string $entity
+   * @param string $action
+   * @param array $params
+   *
+   * @return \Psr\Http\Message\ResponseInterface
+   * @throws \GuzzleHttp\Exception\GuzzleException
+   */
+  protected function callApi4AuthToken(array $auth, string $entity, string $action, array $params = []): \Psr\Http\Message\ResponseInterface {
+    $http = $this->createGuzzle(['http_errors' => FALSE]);
+    $method = str_starts_with($action, 'get') ? 'GET' : 'POST';
+
+    $response = $http->request($method, "civicrm/ajax/api4/$entity/$action", [
+      'headers' => ['X-Requested-With' => 'XMLHttpRequest'],
+      // This should probably be 'form_params', but 'query' is more representative of frontend.
+      ($method === 'GET' ? 'query' : 'form_params') => array_merge(['params' => json_encode($params)], $auth),
+      'http_errors' => FALSE,
+    ]);
+    return $response;
   }
 
 }
