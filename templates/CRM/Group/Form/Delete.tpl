@@ -21,7 +21,7 @@
     {ts}Deleting this group will NOT delete the member contact records. However, all contact subscription information and history for this group will be deleted.{/ts} {ts}If this group is used in CiviCRM profiles, those fields will be reset.{/ts} {ts}This action cannot be undone.{/ts}
 
     {if $smartGroupsUsingThisGroup}
-      <p><strong>{ts 1=$smartGroupsUsingThisGroup|count}WARNING - This Group is currently referenced by %1 smart group(s).{/ts}</strong></p>
+      <p><strong>{ts 1=$smartGroupsUsingThisGroup|@count}WARNING - This Group is currently referenced by %1 smart group(s).{/ts}</strong></p>
       <p>{ts}Deleting this group will mean the following Smart Groups will no longer restrict based on membership in this group - as they do currently. Please edit and resave these smart groups to remove reference to this group before deleting.{/ts}</p>
       <ul>
       {foreach from=$smartGroupsUsingThisGroup item=group key=k}
