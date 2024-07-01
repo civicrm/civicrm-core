@@ -12,6 +12,8 @@ use Civi\Api4\Participant;
 trait CRM_Event_WorkflowMessage_ParticipantTrait {
 
   use CRM_Contribute_WorkflowMessage_ContributionTrait;
+  use CRM_Core_WorkflowMessage_ProfileTrait;
+
   /**
    * @var int
    *
@@ -247,7 +249,7 @@ trait CRM_Event_WorkflowMessage_ParticipantTrait {
    * Get the participant fields we need to load.
    */
   protected function getFieldsToLoadForParticipant(): array {
-    return ['registered_by_id'];
+    return ['registered_by_id', 'contact_id'];
   }
 
   /**
@@ -286,7 +288,7 @@ trait CRM_Event_WorkflowMessage_ParticipantTrait {
       if ($this->isCiviContributeEnabled()) {
         foreach ($this->getLineItems() as $lineItem) {
           if ($lineItem['entity_table'] === 'civicrm_participant') {
-            $participantID = $lineItem['entity_id'];
+            $participantID = (int) $lineItem['entity_id'];
           }
           else {
             // It is not clear if this could ever be true - testing the CiviCRM event
@@ -318,6 +320,7 @@ trait CRM_Event_WorkflowMessage_ParticipantTrait {
       $count = 1;
       foreach ($participants as $participantID => &$participant) {
         $participant['id'] = $participantID;
+        $participant['is_primary'] = $this->getParticipantID() === $participantID;
         $participant['index'] = $count;
         $participant['contact'] = $this->getParticipantContact($participantID);
         foreach ($participant['tax_rate_breakdown'] ?? [] as $rate => $details) {
