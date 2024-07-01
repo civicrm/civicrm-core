@@ -178,27 +178,6 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
   protected function deprecated_create_participant_formatted($params) {
     if ($this->isIgnoreDuplicates()) {
       CRM_Core_Error::reset();
-      $error = $this->deprecated_participant_check_params($params, TRUE);
-      if (civicrm_error($error)) {
-        return $error;
-      }
-    }
-    return civicrm_api3('Participant', 'create', $params);
-  }
-
-  /**
-   * Formatting that was written a long time ago and may not make sense now.
-   *
-   * @param array $params
-   *
-   * @param bool $checkDuplicate
-   *
-   * @return array|bool
-   */
-  protected function deprecated_participant_check_params($params, $checkDuplicate = FALSE) {
-
-    $result = [];
-    if ($checkDuplicate) {
       if (CRM_Event_BAO_Participant::checkDuplicate($params, $result)) {
         $participantID = array_pop($result);
 
@@ -215,6 +194,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
         );
       }
     }
+    return civicrm_api3('Participant', 'create', $params);
   }
 
   /**
