@@ -21,6 +21,15 @@
 class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
 
   /**
+   * Has this parser been fixed to expect `getMappedRow` to break it up
+   * by entity yet? This is a transitional property to allow the classes
+   * to be fixed up individually.
+   *
+   * @var bool
+   */
+  protected $isUpdatedForEntityRowParsing = TRUE;
+
+  /**
    * Get information about the provided job.
    *
    *  - name
@@ -59,85 +68,34 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
     $rowNumber = (int) ($values[array_key_last($values)]);
     try {
       $params = $this->getMappedRow($values);
-      if (!empty($params['external_identifier'])) {
-        $params['contact_id'] = $this->lookupExternalIdentifier($params['external_identifier'], $this->getContactType(), $params['contact_id'] ?? NULL);
-      }
-
-      $formatted = $params;
-      // don't add to recent items, CRM-4399
-      $formatted['skipRecentView'] = TRUE;
-
-      $formatValues = [];
-      foreach ($params as $key => $field) {
-        if ($field == NULL || $field === '') {
-          continue;
-        }
-
-        $formatValues[$key] = $field;
-      }
-
-      if (!empty($params['contact_id'])) {
-        $this->validateContactID($params['contact_id'], $this->getContactType());
-      }
-      if (!empty($params['id'])) {
-        $this->checkEntityExists('Participant', $params['id']);
+      $this->removeEmptyValues($params);
+      $participantParams = $params['Participant'];
+      $contactParams = $params['Contact'] ?? [];
+      if (!empty($participantParams['id'])) {
+        $existingParticipant = $this->checkEntityExists('Participant', $participantParams['id']);
         if (!$this->isUpdateExisting()) {
           throw new CRM_Core_Exception(ts('% record found and update not selected', [1 => 'Participant']));
         }
-        $newParticipant = civicrm_api3('Participant', 'create', $formatted);
+        $participantParams['contact_id'] = !empty($participantParams['contact_id']) ? (int) $participantParams['contact_id'] : $existingParticipant['contact_id'];
+      }
+
+      $participantParams['contact_id'] = $this->getContactID($contactParams, $participantParams['contact_id'] ?? NULL, 'Contact', $this->getDedupeRulesForEntity('Contact'));
+      // don't add to recent items, CRM-4399
+      $participantParams['skipRecentView'] = TRUE;
+
+      if (!empty($participantParams['id'])) {
+        $this->checkEntityExists('Participant', $participantParams['id']);
+        if (!$this->isUpdateExisting()) {
+          throw new CRM_Core_Exception(ts('% record found and update not selected', [1 => 'Participant']));
+        }
+        $newParticipant = civicrm_api3('Participant', 'create', $participantParams);
         $this->setImportStatus($rowNumber, 'IMPORTED', '', $newParticipant['id']);
         return;
       }
 
-      if (empty($params['contact_id'])) {
-        $error = $this->checkContactDuplicate($formatValues);
-
-        if (CRM_Core_Error::isAPIError($error, CRM_Core_Error::DUPLICATE_CONTACT)) {
-          $matchedIDs = (array) $error['error_message']['params'];
-          if (count($matchedIDs) === 1) {
-            foreach ($matchedIDs as $contactId) {
-              $formatted['contact_id'] = $contactId;
-            }
-          }
-          elseif ($matchedIDs > 1) {
-            throw new CRM_Core_Exception(ts('Record duplicates multiple contacts: ') . implode(',', $matchedIDs));
-          }
-        }
-        else {
-          // Using new Dedupe rule.
-          $ruleParams = [
-            'contact_type' => $this->_contactType,
-            'used' => 'Unsupervised',
-          ];
-          $fieldsArray = CRM_Dedupe_BAO_DedupeRule::dedupeRuleFields($ruleParams);
-
-          $disp = '';
-          foreach ($fieldsArray as $value) {
-            if (array_key_exists(trim($value), $params)) {
-              $paramValue = $params[trim($value)];
-              if (is_array($paramValue)) {
-                $disp .= $params[trim($value)][0][trim($value)] . " ";
-              }
-              else {
-                $disp .= $params[trim($value)] . " ";
-              }
-            }
-          }
-
-          if (!empty($params['external_identifier'])) {
-            if ($disp) {
-              $disp .= "AND {$params['external_identifier']}";
-            }
-            else {
-              $disp = $params['external_identifier'];
-            }
-          }
-          throw new CRM_Core_Exception('No matching Contact found for (' . $disp . ')');
-        }
-      }
       if ($this->isIgnoreDuplicates()) {
         CRM_Core_Error::reset();
-        if (CRM_Event_BAO_Participant::checkDuplicate($formatted, $result)) {
+        if (CRM_Event_BAO_Participant::checkDuplicate($participantParams, $result)) {
           $participantID = array_pop($result);
 
           $error = CRM_Core_Error::createError("Found matching participant record.",
@@ -147,14 +105,14 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
 
           $newParticipant = civicrm_api3_create_error($error->pop(),
             [
-              'contactID' => $formatted['contact_id'],
+              'contactID' => $participantParams['contact_id'],
               'participantID' => $participantID,
             ]
           );
         }
       }
       else {
-        $newParticipant = civicrm_api3('Participant', 'create', $formatted);
+        $newParticipant = civicrm_api3('Participant', 'create', $participantParams);
       }
 
       if (is_array($newParticipant) && civicrm_error($newParticipant)) {
@@ -216,10 +174,48 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
   }
 
   /**
+   * @param array $params
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function validateParams(array $params): void {
+    if (empty($params['Participant']['id'])) {
+      $this->validateRequiredFields($this->getRequiredFields(), $params['Participant']);
+    }
+    $errors = [];
+    foreach ($params as $key => $value) {
+      $errors = array_merge($this->getInvalidValues($value, $key), $errors);
+    }
+    if ($errors) {
+      throw new CRM_Core_Exception('Invalid value for field(s) : ' . implode(',', $errors));
+    }
+  }
+
+  /**
+   * Get the required fields.
+   *
    * @return array
    */
-  protected function getRequiredFields(): array {
-    return [['event_id', 'status_id']];
+  public function getRequiredFields(): array {
+    return [[$this->getRequiredFieldsForMatch(), $this->getRequiredFieldsForCreate()]];
+  }
+
+  /**
+   * Get required fields to create a contribution.
+   *
+   * @return array
+   */
+  public function getRequiredFieldsForCreate(): array {
+    return ['event_id', 'status_id'];
+  }
+
+  /**
+   * Get required fields to match a contribution.
+   *
+   * @return array
+   */
+  public function getRequiredFieldsForMatch(): array {
+    return [['id']];
   }
 
 }

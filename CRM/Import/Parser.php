@@ -1777,15 +1777,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    * @return string[]
    */
   protected function getOddlyMappedMetadataFields(): array {
-    return [
-      'country_id' => 'country',
-      'state_province_id' => 'state_province',
-      'county_id' => 'county',
-      'email_greeting_id' => 'email_greeting',
-      'postal_greeting_id' => 'postal_greeting',
-      'addressee_id' => 'addressee',
-      'source' => 'contact_source',
-    ];
+    return [];
   }
 
   /**
@@ -1902,16 +1894,9 @@ abstract class CRM_Import_Parser implements UserJobInterface {
       }
       if ($mappedField['name']) {
         $fieldSpec = $this->getFieldMetadata($mappedField['name']);
-
         $entity = $fieldSpec['entity_instance'] ?? $fieldSpec['entity'] ?? $fieldSpec['extends'] ?? NULL;
         if ($this->isUpdatedForEntityRowParsing && $entity) {
           // Split values into arrays by entity.
-          if (!isset($params[$entity])) {
-            $params[$entity] = [];
-            if ($entity === 'Contact') {
-              $params[$entity]['contact_type'] = $this->getContactTypeForEntity($entity) ?: $this->getContactType();
-            }
-          }
           // Apiv4 name is currently only set for contact, & only in cases where it would
           // be used for the dedupe rule (ie Membership import).
           $params[$entity][$fieldSpec['apiv4_name'] ?? $fieldSpec['name']] = $this->getTransformedFieldValue($mappedField['name'], $values[$i]);
@@ -2144,10 +2129,12 @@ abstract class CRM_Import_Parser implements UserJobInterface {
 
   /**
    * @throws \CRM_Core_Exception
+   *
+   * @return array
    */
-  protected function checkEntityExists(string $entity, int $id) {
+  protected function checkEntityExists(string $entity, int $id): array {
     try {
-      civicrm_api4($entity, 'get', ['where' => [['id', '=', $id]], 'select' => ['id']])->single();
+      return civicrm_api4($entity, 'get', ['where' => [['id', '=', $id]]])->single();
     }
     catch (CRM_Core_Exception $e) {
       throw new CRM_Core_Exception(ts('%1 record not found for id %2', [
