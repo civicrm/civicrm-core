@@ -554,7 +554,7 @@ WHERE li.contribution_id = %1";
    * @param int $entityID
    * @param int $entity
    * @param int $contributionId
-   * @param $feeBlock
+   * @param \CRM_Core_Form|null $form
    *
    * @throws \CRM_Core_Exception
    */
@@ -563,24 +563,21 @@ WHERE li.contribution_id = %1";
     $entityID,
     $entity,
     $contributionId,
-    $feeBlock
+    $form = NULL
   ) {
-    $entityTable = 'civicrm_' . $entity;
-    CRM_Price_BAO_PriceSet::processAmount($feeBlock, $params);
-    // initialize empty Lineitem instance to call protected helper functions
-    $lineItemObj = new CRM_Price_BAO_LineItem();
-
-    // fetch submitted LineItems from input params and feeBlock information
-    $submittedLineItems = $lineItemObj->getSubmittedLineItems($params, $feeBlock);
-    $feeAmount = $params['amount'];
-    $updatedAmount = $params['amount'] ?? $params['total_amount'] ?? NULL;
-    if (strlen($params['tax_amount']) != 0) {
-      $taxAmount = $params['tax_amount'];
-    }
-    else {
-      $taxAmount = "NULL";
+    $order = new CRM_Financial_BAO_Order();
+    $order->setPriceSelectionFromUnfilteredInput($params);
+    if ($form) {
+      // This will cause the buildAmount hook to be called.
+      $order->setForm($form);
     }
     unset($params);
+    $feeAmount = $updatedAmount = $order->getTotalAmount();
+    $taxAmount = $order->getTotalTaxAmount();
+    $submittedLineItems = $order->getLineItems();
+    $entityTable = 'civicrm_' . $entity;
+    // initialize empty Lineitem instance to call protected helper functions
+    $lineItemObj = new CRM_Price_BAO_LineItem();
 
     $requiredChanges = $lineItemObj->getLineItemsToAlter($submittedLineItems, $entityID, $entity);
 

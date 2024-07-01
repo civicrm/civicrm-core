@@ -267,7 +267,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
     $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($this->ids['PriceSet']['PaidEvent']);
     $priceSet = $priceSet[$this->ids['PriceSet']['PaidEvent']] ?? NULL;
     $feeBlock = $priceSet['fields'] ?? NULL;
-    CRM_Price_BAO_LineItem::changeFeeSelections($params, $result['participant']['id'], 'participant', $contributionID, $feeBlock, NULL);
+    CRM_Price_BAO_LineItem::changeFeeSelections($params, $result['participant']['id'], 'participant', $contributionID);
 
     $this->callAPISuccess('Payment', 'create', [
       'total_amount' => -50,
