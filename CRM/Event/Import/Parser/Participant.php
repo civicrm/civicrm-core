@@ -76,6 +76,9 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
         $formatValues[$key] = $field;
       }
 
+      if (!empty($params['contact_id'])) {
+        $this->validateContactID($params['contact_id'], $this->getContactType());
+      }
       if (!empty($params['id'])) {
         $this->checkEntityExists('Participant', $params['id']);
         if (!$this->isUpdateExisting()) {
@@ -195,15 +198,6 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
    * @return array|bool
    */
   protected function deprecated_participant_check_params($params, $checkDuplicate = FALSE) {
-
-    // check if contact id is valid or not
-    if (!empty($params['contact_id'])) {
-      $contact = new CRM_Contact_BAO_Contact();
-      $contact->id = $params['contact_id'];
-      if (!$contact->find(TRUE)) {
-        throw new CRM_Core_Exception(ts('Contact id is not valid'));
-      }
-    }
 
     $result = [];
     if ($checkDuplicate) {
