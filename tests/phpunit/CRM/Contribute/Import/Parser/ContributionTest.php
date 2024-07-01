@@ -947,38 +947,6 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Enhance field such that any combo of the custom field & first/last name is enough.
-   *
-   * @noinspection PhpUnhandledExceptionInspection
-   */
-  protected function addToDedupeRule(): void {
-    $this->createCustomGroupWithFieldOfType(['extends' => 'Contact']);
-    $dedupeRuleGroupID = DedupeRuleGroup::get()
-      ->addWhere('name', '=', 'IndividualUnsupervised')
-      ->addSelect('id')
-      ->execute()
-      ->first()['id'];
-    $this->callAPISuccess('Rule', 'create', [
-      'dedupe_rule_group_id' => $dedupeRuleGroupID,
-      'rule_weight' => 5,
-      'rule_table' => $this->getCustomGroupTable(),
-      'rule_field' => $this->getCustomFieldColumnName('text'),
-    ]);
-    $this->callAPISuccess('Rule', 'create', [
-      'dedupe_rule_group_id' => $dedupeRuleGroupID,
-      'rule_weight' => 5,
-      'rule_table' => 'civicrm_contact',
-      'rule_field' => 'first_name',
-    ]);
-    $this->callAPISuccess('Rule', 'create', [
-      'dedupe_rule_group_id' => $dedupeRuleGroupID,
-      'rule_weight' => 5,
-      'rule_table' => 'civicrm_contact',
-      'rule_field' => 'last_name',
-    ]);
-  }
-
-  /**
    * Test the Import api works from the extension when the extension is enabled
    * after the import.
    *
