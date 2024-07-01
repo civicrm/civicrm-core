@@ -21,6 +21,7 @@
       this.afformAdminEnabled = CRM.checkPerm('administer afform') &&
         'org.civicrm.afform_admin' in CRM.crmSearchAdmin.modules;
       const scheduledCommunicationsEnabled = 'scheduled_communications' in CRM.crmSearchAdmin.modules;
+      const scheduledCommunicationsAllowed = CRM.checkPerm('schedule communications');
 
       this.apiEntity = 'SavedSearch';
       this.search = {
@@ -104,6 +105,10 @@
           row.permissionToEdit = CRM.checkPerm('all CiviCRM permissions and ACLs') || !_.includes(row.data.display_acl_bypass, true);
           // If main entity doesn't exist, no can edit
           if (!row.data['api_entity:label']) {
+            row.permissionToEdit = false;
+          }
+          // Users without 'schedule communications' permission do not have edit access
+          if (scheduledCommunicationsEnabled && !scheduledCommunicationsAllowed && row.data.schedule_id) {
             row.permissionToEdit = false;
           }
           // Saves rendering cycles to not show an empty menu of search displays
@@ -243,8 +248,8 @@
             path: '~/crmSearchAdmin/searchListing/afforms.html'
           });
         }
-        // Add scheduled communication column if extension is enabled
-        if (scheduledCommunicationsEnabled) {
+        // Add scheduled communication column if user is allowed to use them
+        if (scheduledCommunicationsAllowed) {
           ctrl.display.settings.columns.push({
             type: 'include',
             label: ts('Communications'),
