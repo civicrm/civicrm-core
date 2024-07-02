@@ -43,7 +43,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
   public function __construct($inputData) {
     // CRM-19676
     $params = (!empty($inputData['custom'])) ?
-      array_merge($inputData, json_decode($inputData['custom'], TRUE)) :
+      array_merge($inputData, json_decode($inputData['custom'], TRUE) ?? []) :
       $inputData;
     $this->setInputParameters($params);
     parent::__construct();
