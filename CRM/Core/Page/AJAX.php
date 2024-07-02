@@ -118,6 +118,7 @@ class CRM_Core_Page_AJAX {
    * @return bool
    */
   public static function checkAuthz($type, $className, $fnName = NULL) {
+    self::validateAjaxRequestMethod();
     switch ($type) {
       case 'method':
         if (!preg_match('/^CRM_[a-zA-Z0-9]+_Page_AJAX$/', $className)) {
@@ -144,6 +145,24 @@ class CRM_Core_Page_AJAX {
   }
 
   /**
+   * Guards against CSRF by validating the request method appears to be an ajax request
+   */
+  public static function validateAjaxRequestMethod(): void {
+    if (!CRM_Utils_REST::isWebServiceRequest()) {
+      http_response_code(400);
+      Civi::log()->debug('SECURITY ALERT: Ajax requests can only be issued by javascript clients.',
+        [
+          'IP' => CRM_Utils_System::ipAddress(),
+          'level' => 'security',
+          'referer' => $_SERVER['HTTP_REFERER'] ?? '',
+          'reason' => 'CSRF suspected',
+        ]
+      );
+      throw new CRM_Core_Exception('SECURITY ALERT: Ajax requests can only be issued by javascript clients.');
+    }
+  }
+
+  /**
    * Outputs the CiviCRM standard json-formatted page/form response
    * @param array|string $response
    */
@@ -164,8 +183,11 @@ class CRM_Core_Page_AJAX {
     if ($session->getStatus(FALSE)) {
       $response['crmMessages'] = $session->getStatus(TRUE);
     }
+    $output = json_encode($response);
+
     CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
-    echo json_encode($response);
+
+    echo $output;
     CRM_Utils_System::civiExit();
   }
 
