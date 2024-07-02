@@ -1245,6 +1245,13 @@ class CRM_Report_Form extends CRM_Core_Form {
   }
 
   /**
+   * @return array
+   */
+  protected function getFieldsToExcludeFromPurification(): array {
+    return ['report_header', 'report_footer'];
+  }
+
+  /**
    * Remove any temporary tables.
    */
   public function cleanUpTemporaryTables() {
