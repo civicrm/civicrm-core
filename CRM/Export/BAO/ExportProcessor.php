@@ -2304,11 +2304,11 @@ LIMIT $offset, $limit
       return $value;
     }
     $fieldType = $fieldMetaData['type'];
-    $isDate = ($fieldType & (CRM_Utils_Type::T_DATE | CRM_Utils_Type::T_TIME | CRM_Utils_Type::T_TIMESTAMP )) != 0 ;
-    if ( $isDate ) {
-        $formatType = $fieldMetaData['html']['formatType'] ?? NULL;
+    $isDate = ($fieldType & (CRM_Utils_Type::T_DATE | CRM_Utils_Type::T_TIME | CRM_Utils_Type::T_TIMESTAMP)) != 0;
+    if ($isDate) {
+      $formatType = $fieldMetaData['html']['formatType'] ?? NULL;
       $formattedValue = CRM_Utils_Date::setDateDefaults($value, $formatType);
-      if ( !($formatType & CRM_Utils_Type::T_TIMESTAMP) ) {
+      if (!($formatType & CRM_Utils_Type::T_TIMESTAMP)) {
         if (!($fieldType & CRM_Utils_Type::T_DATE)) {
           unset($formattedValue[0]);
         }
@@ -2316,16 +2316,12 @@ LIMIT $offset, $limit
           unset($formattedValue[1]);
         }
       }
-      $x = implode(' ', $formattedValue);
       return implode(' ', $formattedValue);
     }
-
     if ($fieldType == CRM_Utils_Type::T_MONEY) {
-      $x = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($value);
-        return CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($value);
+      return CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($value);
     }
-        return $value;
-
+    return $value;
   }
 
   /**
