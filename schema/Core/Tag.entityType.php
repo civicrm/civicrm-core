@@ -40,9 +40,6 @@ return [
       'required' => TRUE,
       'description' => ts('Unique machine name'),
       'add' => '1.1',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'label' => [
       'title' => ts('Tag Label'),
@@ -51,9 +48,6 @@ return [
       'required' => TRUE,
       'description' => ts('User-facing tag name'),
       'add' => '5.68',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'description' => [
       'title' => ts('Description'),
@@ -61,9 +55,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Optional verbose description of the tag.'),
       'add' => '1.1',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'parent_id' => [
       'title' => ts('Parent Tag ID'),
@@ -118,9 +109,6 @@ return [
       'add' => '3.2',
       'default' => NULL,
       'serialize' => CRM_Core_DAO::SERIALIZE_COMMA,
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
       'pseudoconstant' => [
         'option_group_name' => 'tag_used_for',
       ],
@@ -147,9 +135,6 @@ return [
       'description' => ts('Hex color value e.g. #ffffff'),
       'add' => '4.7',
       'default' => NULL,
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'created_date' => [
       'title' => ts('Tag Created Date'),

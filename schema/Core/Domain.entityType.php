@@ -36,9 +36,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Name of Domain / Organization'),
       'add' => '1.1',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'description' => [
       'title' => ts('Domain Description'),
@@ -46,9 +43,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Description of Domain.'),
       'add' => '1.1',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'version' => [
       'title' => ts('CiviCRM Version'),
@@ -56,9 +50,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('The civicrm version this instance is running'),
       'add' => '2.0',
-      'input_attrs' => [
-        'maxlength' => 32,
-      ],
     ],
     'contact_id' => [
       'title' => ts('Contact ID'),

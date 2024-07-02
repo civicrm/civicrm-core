@@ -597,7 +597,21 @@ class CRM_Import_Forms extends CRM_Core_Form {
    */
   protected function getDataRows($statuses = [], int $limit = 0): array {
     $statuses = (array) $statuses;
-    return $this->getDataSourceObject()->setLimit($limit)->setStatuses($statuses)->getRows();
+    $rows = $this->getDataSourceObject()->setLimit($limit)->setStatuses($statuses)->getRows();
+    $headers = $this->getColumnHeaders();
+    $mappings = $this->getUserJob()['metadata']['import_mappings'] ?? [];
+    foreach ($rows as &$row) {
+      foreach ($headers as $index => $header) {
+        if (!$header) {
+          // Our rows are sequential lists of the values in the database table but the database
+          // table has some non-mapping related rows (`_status`, `_statusMessage` etc)
+          // and our mappings have some virtual rows, which do not have headers
+          // so, we populate our virtual values here.
+          $row[$index] = $mappings[$index]['default_value'] ?? '';
+        }
+      }
+    }
+    return $rows;
   }
 
   /**

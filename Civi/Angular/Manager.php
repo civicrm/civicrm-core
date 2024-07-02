@@ -362,6 +362,10 @@ class Manager {
               $result[] = $this->res->getUrl($module['ext'], $file, TRUE);
               break;
 
+            case 'relUrl':
+              $result[] = ['ext' => $module['ext'], 'file' => $file];
+              break;
+
             case 'path-assetBuilder':
               $assetName = parse_url($file, PHP_URL_HOST) . parse_url($file, PHP_URL_PATH);
               $assetParams = [];

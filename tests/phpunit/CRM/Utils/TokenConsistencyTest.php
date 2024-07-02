@@ -952,6 +952,7 @@ United States', $tokenProcessor->getRow(0)->render('message'));
       '{domain.state_province_id:label}' => 'Domain (Organization) State',
       '{domain.country_id:label}' => 'Domain (Organization) Country',
       '{domain.empowered_by_civicrm_image_url}' => 'Empowered By CiviCRM Image',
+      '{site.message_header}' => 'Message Header',
     ];
   }
 
@@ -1151,7 +1152,7 @@ United States', $tokenProcessor->getRow(0)->render('message'));
       'event_id' => $this->ids['Event'][0],
       'fee_amount' => 50,
       'fee_level' => 'steep',
-      $this->getCustomFieldName('participant_int') => '99999',
+      $this->getCustomFieldName('participant_int', 4) => '99999',
     ]);
   }
 

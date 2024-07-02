@@ -73,6 +73,7 @@ class CRM_Upgrade_Incremental_php_FiveSeventyFive extends CRM_Upgrade_Incrementa
     );
     CRM_Core_BAO_SchemaHandler::dropIndexIfExists('civicrm_line_item', 'UI_line_item_value');
     $this->addTask(ts('Disable financial ACL extension if unused'), 'disableFinancialAcl');
+    $this->addTask('Install tellafriend extension', 'installTellafriend');
   }
 
   public static function disableFinancialAcl($rev): bool {
@@ -82,6 +83,38 @@ class CRM_Upgrade_Incremental_php_FiveSeventyFive extends CRM_Upgrade_Incrementa
     }
     if (!$setting) {
       CRM_Core_DAO::executeQuery('UPDATE civicrm_extension SET is_active = 0 WHERE full_name = "financialacls"');
+    }
+    return TRUE;
+  }
+
+  /**
+   * Install tellafriend extension.
+   *
+   * This feature is restructured as a core extension - which is primarily a code cleanup step.
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  public static function installTellafriend(CRM_Queue_TaskContext $ctx) {
+    // Based on the instructions for the FiveThirty financialacls upgrade step
+    // Install via direct SQL manipulation. Note that:
+    // (1) This extension has no activation logic as of 5.75 (the DB tables are still in core)
+    // (2) This extension is not enabled on new installs.
+    // (3) Caches are flushed at the end of the upgrade.
+    // ($) Over long term, upgrade steps are more reliable in SQL. API/BAO sometimes don't work mid-upgrade.
+    $active = CRM_Core_DAO::singleValueQuery('SELECT is_active FROM civicrm_tell_friend WHERE is_active = 1 LIMIT 1');
+    if ($active) {
+      $insert = CRM_Utils_SQL_Insert::into('civicrm_extension')->row([
+        'type' => 'module',
+        'full_name' => 'tellafriend',
+        'name' => 'tellafriend',
+        'label' => 'Tell a Friend',
+        'file' => 'tellafriend',
+        'schema_version' => NULL,
+        'is_active' => 1,
+      ]);
+      CRM_Core_DAO::executeQuery($insert->usingReplace()->toSQL());
     }
     return TRUE;
   }

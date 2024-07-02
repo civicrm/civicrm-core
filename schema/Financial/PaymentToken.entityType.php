@@ -60,9 +60,6 @@ return [
       'required' => TRUE,
       'description' => ts('Externally provided token string'),
       'add' => '4.6',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'created_date' => [
       'title' => ts('Created Date'),
@@ -100,9 +97,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Email at the time of token creation. Useful for fraud forensics'),
       'add' => '4.6',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'billing_first_name' => [
       'title' => ts('Billing First Name'),
@@ -110,9 +104,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Billing first name at the time of token creation. Useful for fraud forensics'),
       'add' => '4.6',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'billing_middle_name' => [
       'title' => ts('Billing Middle Name'),
@@ -120,9 +111,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Billing middle name at the time of token creation. Useful for fraud forensics'),
       'add' => '4.6',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'billing_last_name' => [
       'title' => ts('Billing Last Name'),
@@ -130,9 +118,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Billing last name at the time of token creation. Useful for fraud forensics'),
       'add' => '4.6',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'masked_account_number' => [
       'title' => ts('Masked Account Number'),
@@ -140,9 +125,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Holds the part of the card number or account details that may be retained or displayed'),
       'add' => '4.6',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'ip_address' => [
       'title' => ts('IP Address'),
@@ -150,9 +132,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('IP used when creating the token. Useful for fraud forensics'),
       'add' => '4.6',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
   ],
 ];

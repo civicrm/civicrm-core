@@ -2294,6 +2294,11 @@ div.crm-master-accordion-header a.helpicon {
   padding: 0 0.25rem; /* adds padding for nested accordions */
 }
 
+.crm-container details table.dataTable {
+  width: 100% !important; /* stops collapsed dataTables: dev/user-interface/-/issues/73 */
+  box-sizing: border-box;
+}
+
 /* Collapse icon */
 
 /* General icon settings for all collapsible things */

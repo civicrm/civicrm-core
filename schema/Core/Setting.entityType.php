@@ -37,9 +37,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Unique name for setting'),
       'add' => '4.1',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'value' => [
       'title' => ts('Value'),

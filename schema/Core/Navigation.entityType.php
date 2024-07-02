@@ -47,9 +47,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Navigation Title'),
       'add' => '3.0',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'name' => [
       'title' => ts('Navigation Item Machine Name'),
@@ -57,9 +54,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Internal Name'),
       'add' => '3.0',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'url' => [
       'title' => ts('Url'),
@@ -67,9 +61,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('url in case of custom navigation link'),
       'add' => '3.0',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'icon' => [
       'title' => ts('Icon'),
@@ -78,9 +69,6 @@ return [
       'description' => ts('CSS class name for an icon'),
       'add' => '4.7',
       'default' => NULL,
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'permission' => [
       'title' => ts('Required Permission'),
@@ -89,9 +77,6 @@ return [
       'description' => ts('Permission(s) needed to access menu item'),
       'add' => '3.0',
       'serialize' => CRM_Core_DAO::SERIALIZE_COMMA,
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'permission_operator' => [
       'title' => ts('Permission Operator'),
@@ -99,9 +84,6 @@ return [
       'input_type' => 'Select',
       'description' => ts('Operator to use if item has more than one permission'),
       'add' => '3.0',
-      'input_attrs' => [
-        'maxlength' => 3,
-      ],
       'pseudoconstant' => [
         'callback' => 'CRM_Core_SelectValues::andOr',
       ],

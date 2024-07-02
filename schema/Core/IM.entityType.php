@@ -88,9 +88,6 @@ return [
         'export',
         'duplicate_matching',
       ],
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'provider_id' => [
       'title' => ts('IM Provider'),

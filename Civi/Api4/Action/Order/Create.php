@@ -18,7 +18,6 @@ use Civi\Api4\Generic\Result;
 /**
  *
  * @method $this setContributionValues(array $contributionValues) Set contribution values.
- * @method array getContributionValues() Get Contribution Values
  */
 class Create extends AbstractAction {
 
@@ -52,6 +51,21 @@ class Create extends AbstractAction {
   }
 
   /**
+   * @throws \CRM_Core_Exception
+   */
+  protected function getContributionValues(): array {
+    $values = $this->contributionValues;
+    $financialType = $values['financial_type_id:name'] ?? $values['financial_type_id.name'] ?? NULL;
+    if (empty($values['financial_type_id']) && $financialType) {
+      $values['financial_type_id'] = (int) \CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', $financialType);
+      if (!$values['financial_type_id']) {
+        throw new \CRM_Core_Exception(ts('Invalid financial type %1', [1 => $financialType]));
+      }
+    }
+    return $values;
+  }
+
+  /**
    * Run the api Action.
    *
    * @param \Civi\Api4\Generic\Result $result
@@ -65,7 +79,7 @@ class Create extends AbstractAction {
     foreach ($this->lineItems as $index => $lineItem) {
       $order->setLineItem($lineItem, $index);
     }
-    $result = $order->save($this->getContributionValues());
+    $result[] = $order->save($this->getContributionValues())->first();
   }
 
 }

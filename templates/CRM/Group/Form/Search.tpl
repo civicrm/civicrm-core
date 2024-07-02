@@ -67,9 +67,9 @@
 <div class="css_right">
   <a class="crm-hover-button action-item" href="{crmURL q="reset=1&update_smart_groups=1"}">{ts}Update Smart Group Counts{/ts}</a> {help id="update_smart_groups"}
 </div>
-{if call_user_func(array('CRM_Core_Permission','check'), 'edit groups')}
+{crmPermission has='edit groups'}
   {assign var='editableClass' value='crm-editable'}
-{/if}
+{/crmPermission}
 <table class="crm-group-selector crm-ajax-table" data-order='[[0,"asc"]]'>
   <thead>
     <tr>

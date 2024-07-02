@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Participant Payment'),
     'title_plural' => ts('Participant Payments'),
-    'description' => ts('FIXME'),
+    'description' => ts('Participant payments table (deprecated - use lineitems)'),
     'log' => TRUE,
     'add' => '1.7',
   ],

@@ -2340,11 +2340,11 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
         $activity['DT_RowAttr']['data-entity'] = 'activity';
         $activity['DT_RowAttr']['data-id'] = $activityId;
 
-        $activity['activity_type'] = (!empty($activityIcons[$values['activity_type_id']]) ? '<span class="crm-i ' . $activityIcons[$values['activity_type_id']] . '" aria-hidden="true"></span> ' : '') . $values['activity_type'];
+        $activity['activity_type'] = (!empty($activityIcons[$values['activity_type_id']]) ? '<span class="crm-i ' . $activityIcons[$values['activity_type_id']] . '" aria-hidden="true"></span> ' : '') . htmlentities($values['activity_type']);
         $activity['subject'] = $values['subject'];
 
         if ($params['contact_id'] == $values['source_contact_id']) {
-          $activity['source_contact_name'] = $values['source_contact_name'];
+          $activity['source_contact_name'] = htmlentities($values['source_contact_name']);
         }
         elseif ($values['source_contact_id']) {
           $srcTypeImage = "";
@@ -2376,7 +2376,7 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
 
           // The first target may not be accessable to the logged in user dev/core#1052
           if ($firstTargetName) {
-            $targetLink = CRM_Utils_System::href($firstTargetName, 'civicrm/contact/view', "reset=1&cid={$firstTargetContactID}");
+            $targetLink = CRM_Utils_System::href(htmlentities($firstTargetName), 'civicrm/contact/view', "reset=1&cid={$firstTargetContactID}");
             if ($showContactOverlay) {
               $targetTypeImage = CRM_Contact_BAO_Contact_Utils::getImage(
                 CRM_Contact_BAO_Contact::getContactType($firstTargetContactID),
@@ -2410,7 +2410,7 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
           foreach ($values['assignee_contact_name'] as $acID => $acName) {
             if ($acID && $count < 5) {
               $assigneeTypeImage = "";
-              $assigneeLink = CRM_Utils_System::href($acName, 'civicrm/contact/view', "reset=1&cid={$acID}");
+              $assigneeLink = CRM_Utils_System::href(htmlentities($acName), 'civicrm/contact/view', "reset=1&cid={$acID}");
               if ($showContactOverlay) {
                 $assigneeTypeImage = CRM_Contact_BAO_Contact_Utils::getImage(
                   CRM_Contact_BAO_Contact::getContactType($acID),

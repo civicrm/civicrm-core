@@ -34,9 +34,6 @@ return [
       'input_type' => 'Text',
       'required' => TRUE,
       'description' => ts('Name of the queue which includes this item'),
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'weight' => [
       'title' => ts('Order'),

@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Payment Processor Type'),
     'title_plural' => ts('Payment Processor Types'),
-    'description' => ts('FIXME'),
+    'description' => ts('Table containing list of defined Payment Processor types'),
     'add' => '1.8',
     'label_field' => 'title',
   ],
@@ -43,9 +43,6 @@ return [
       'required' => TRUE,
       'description' => ts('Payment Processor Type Name.'),
       'add' => '1.8',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'title' => [
       'title' => ts('Payment Processor Type Title'),
@@ -54,9 +51,6 @@ return [
       'required' => TRUE,
       'description' => ts('Payment Processor Type Title.'),
       'add' => '1.8',
-      'input_attrs' => [
-        'maxlength' => 127,
-      ],
     ],
     'description' => [
       'title' => ts('Processor Type Description'),
@@ -64,9 +58,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Payment Processor Description.'),
       'add' => '1.8',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'is_active' => [
       'title' => ts('Processor Type Is Active?'),
@@ -97,36 +88,24 @@ return [
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'add' => '1.8',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'password_label' => [
       'title' => ts('Label for password'),
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'add' => '1.8',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'signature_label' => [
       'title' => ts('Label for Signature'),
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'add' => '1.8',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'subject_label' => [
       'title' => ts('Label for Subject'),
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'add' => '1.8',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'class_name' => [
       'title' => ts('Suffix for PHP class name implementation'),
@@ -134,81 +113,54 @@ return [
       'input_type' => 'Text',
       'required' => TRUE,
       'add' => '1.8',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'url_site_default' => [
       'title' => ts('Default Live Site URL'),
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'add' => '1.8',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'url_api_default' => [
       'title' => ts('Default API Site URL'),
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'add' => '1.8',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'url_recur_default' => [
       'title' => ts('Default Live Recurring Payments URL'),
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'add' => '1.8',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'url_button_default' => [
       'title' => ts('Default Live Button URL'),
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'add' => '1.8',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'url_site_test_default' => [
       'title' => ts('Default Test Site URL'),
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'add' => '1.8',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'url_api_test_default' => [
       'title' => ts('Default Test API URL'),
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'add' => '1.8',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'url_recur_test_default' => [
       'title' => ts('Default Test Recurring Payment URL'),
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'add' => '1.8',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'url_button_test_default' => [
       'title' => ts('Default Test Button URL'),
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'add' => '1.8',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'billing_mode' => [
       'title' => ts('Billing Mode'),

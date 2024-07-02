@@ -32,7 +32,7 @@
     {/if}
 {else}
     {if $pageTitle}
-      <div class="crm-title">
+      <div class="crm-title crm-page-title-wrapper">
         <h1 class="title">{if $isDeleted}
           <del>{/if}{$pageTitle}{if $isDeleted}</del>{/if}</h1>
       </div>

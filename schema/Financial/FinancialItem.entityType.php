@@ -84,9 +84,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Human readable description of this item, to ease display without lookup of source item.'),
       'add' => '4.3',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'amount' => [
       'title' => ts('Amount'),
@@ -105,9 +102,6 @@ return [
       'add' => '4.3',
       'usage' => [
         'export',
-      ],
-      'input_attrs' => [
-        'maxlength' => 3,
       ],
       'pseudoconstant' => [
         'table' => 'civicrm_currency',
@@ -155,9 +149,6 @@ return [
       'input_type' => 'Select',
       'description' => ts('May contain civicrm_line_item, civicrm_financial_trxn etc'),
       'add' => '4.3',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
       'pseudoconstant' => [
         'callback' => 'CRM_Financial_BAO_FinancialItem::entityTables',
       ],

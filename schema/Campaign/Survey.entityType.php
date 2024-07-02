@@ -49,9 +49,6 @@ return [
         'export',
         'duplicate_matching',
       ],
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'campaign_id' => [
       'title' => ts('Campaign ID'),
@@ -226,9 +223,6 @@ return [
       'localizable' => TRUE,
       'description' => ts('Title for Thank-you page (header title tag, and display at the top of the page).'),
       'add' => '4.2',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'thankyou_text' => [
       'title' => ts('Thank-you Text'),

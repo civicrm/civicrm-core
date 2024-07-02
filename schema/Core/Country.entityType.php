@@ -44,9 +44,6 @@ return [
         'export',
         'duplicate_matching',
       ],
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'iso_code' => [
       'title' => ts('Country ISO Code'),
@@ -54,9 +51,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('ISO Code'),
       'add' => '1.1',
-      'input_attrs' => [
-        'maxlength' => 2,
-      ],
     ],
     'country_code' => [
       'title' => ts('Country Phone Prefix'),
@@ -64,9 +58,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('National prefix to be used when dialing TO this country.'),
       'add' => '1.1',
-      'input_attrs' => [
-        'maxlength' => 4,
-      ],
     ],
     'address_format_id' => [
       'title' => ts('Address Format ID'),
@@ -88,9 +79,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('International direct dialing prefix from within the country TO another country'),
       'add' => '1.1',
-      'input_attrs' => [
-        'maxlength' => 4,
-      ],
     ],
     'ndd_prefix' => [
       'title' => ts('Area Code'),
@@ -98,9 +86,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Access prefix to call within a country to a different area'),
       'add' => '1.1',
-      'input_attrs' => [
-        'maxlength' => 4,
-      ],
     ],
     'region_id' => [
       'title' => ts('World Region ID'),

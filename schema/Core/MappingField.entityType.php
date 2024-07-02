@@ -43,9 +43,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Mapping field key'),
       'add' => '1.2',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'contact_type' => [
       'title' => ts('Contact Type'),
@@ -53,9 +50,6 @@ return [
       'input_type' => 'Select',
       'description' => ts('Contact Type in mapping'),
       'add' => '1.2',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'column_number' => [
       'title' => ts('Column Number to map to'),
@@ -130,9 +124,6 @@ return [
       'sql_type' => 'varchar(6)',
       'input_type' => 'Text',
       'add' => '1.7',
-      'input_attrs' => [
-        'maxlength' => 6,
-      ],
     ],
     'grouping' => [
       'title' => ts('Field Grouping'),
@@ -148,9 +139,6 @@ return [
       'input_type' => 'Select',
       'description' => ts('SQL WHERE operator for search-builder mapping fields (search criteria).'),
       'add' => '1.5',
-      'input_attrs' => [
-        'maxlength' => 16,
-      ],
       'pseudoconstant' => [
         'callback' => 'CRM_Core_SelectValues::getSearchBuilderOperators',
       ],
@@ -161,9 +149,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('SQL WHERE value for search-builder mapping fields.'),
       'add' => '1.5',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
   ],
 ];

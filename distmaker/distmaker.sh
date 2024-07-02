@@ -254,11 +254,6 @@ if [ -z "$DM_KEEP_DEPS" ]; then
   dm_generate_vendor "$DM_SOURCEDIR"
 fi
 
-# Before anything - regenerate DAOs
-
-cd $DM_SOURCEDIR/xml
-${DM_PHP:-php} GenCode.php schema/Schema.xml $DM_VERSION $GENCODE_CMS
-
 cd $ORIGPWD
 
 if [ "$L10NPACK" = 1 ]; then

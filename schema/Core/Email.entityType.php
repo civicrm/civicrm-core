@@ -90,7 +90,6 @@ return [
       ],
       'input_attrs' => [
         'size' => '30',
-        'maxlength' => 254,
       ],
     ],
     'is_primary' => [

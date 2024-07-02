@@ -60,15 +60,19 @@ trait CRM_Extension_Upgrader_RevisionsTrait {
     $currentRevision = $this->getCurrentRevision();
     foreach ($this->getRevisions() as $revision) {
       if ($revision > $currentRevision) {
-        $title = ts('Upgrade %1 to revision %2', [
+        $titleA = ts('Upgrade %1 to revision %2 (main)', [
+          1 => $this->getExtensionKey(),
+          2 => $revision,
+        ]);
+        $titleB = ts('Upgrade %1 to revision %2 (set revision)', [
           1 => $this->getExtensionKey(),
           2 => $revision,
         ]);
 
         // note: don't use addTask() because it sets weight=-1
 
-        $this->appendTask($title, 'upgrade_' . $revision);
-        $this->appendTask($title, 'setCurrentRevision', $revision);
+        $this->appendTask($titleA, 'upgrade_' . $revision);
+        $this->appendTask($titleB, 'setCurrentRevision', $revision);
       }
     }
   }

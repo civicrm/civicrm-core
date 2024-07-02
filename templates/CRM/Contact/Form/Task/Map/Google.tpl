@@ -47,7 +47,7 @@
     {if $location.image && ( $location.marker_class neq 'Event' )}
        image = '{$location.image}';
     {else}
-                 {if $location.marker_class eq 'Individual'}
+       {if $location.marker_class eq 'Individual'}
            image = "{$config->resourceBase}i/contact_ind.gif";
        {/if}
        {if $location.marker_class eq 'Household'}
@@ -67,8 +67,6 @@
         {if count($locations) gt 1}
             map.fitBounds(bounds);
             map.setMapTypeId(google.maps.MapTypeId.TERRAIN);
-        {elseif $location.marker_class eq 'Event' || $location.marker_class eq 'Individual'|| $location.marker_class eq 'Household' || $location.marker_class eq 'Organization'}
-            map.setZoom({$defaultZoom});
         {else}
             map.setZoom({$defaultZoom});
         {/if}

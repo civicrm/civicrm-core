@@ -143,31 +143,34 @@ class MessageTemplateTest extends Api4TestBase implements TransactionalInterface
     \CRM_Core_Transaction::create(TRUE)->run(function(\CRM_Core_Transaction $tx) {
       $tx->rollback();
 
-      $messageTemplateID = MessageTemplate::get()
+      MessageTemplate::update(FALSE)
+        ->addWhere('workflow_name', '=', 'contribution_offline_receipt')
+        ->addValue('msg_subject', 'Subject test {if 1 > 2} smarty{/if}')
+        ->addValue('msg_html', '<p>Body test {if 1 > 2} markup{/if}</p>')
+        ->execute();
+
+      $originalTemplate = MessageTemplate::get()
         ->addWhere('is_default', '=', 1)
         ->addWhere('workflow_name', '=', 'contribution_offline_receipt')
-        ->addSelect('id')
-        ->execute()->first()['id'];
-      $messageTemplateIDReserved = MessageTemplate::get()
+        ->addSelect('id', 'msg_subject', 'msg_html', 'master_id', 'master_id.msg_subject')
+        ->execute()->first();
+      $messageTemplateID = $originalTemplate['id'];
+      $reservedTemplate = MessageTemplate::get()
         ->addWhere('is_reserved', '=', 1)
         ->addWhere('workflow_name', '=', 'contribution_offline_receipt')
-        ->addSelect('id')
-        ->execute()->first()['id'];
-      $msgTpl = MessageTemplate::get()
-        ->addSelect('msg_subject', 'master_id', 'master_id.msg_subject')
-        ->addWhere('id', '=', $messageTemplateID)
+        ->addSelect('id', 'msg_subject', 'msg_html')
         ->execute()->first();
-      // confirm subject is set
-      $this->assertNotNull($msgTpl['msg_subject']);
-      // message is unchanged from original so both of these should be null
-      $this->assertNull($msgTpl['master_id']);
-      $this->assertNull($msgTpl['master_id.msg_subject']);
+      $messageTemplateIDReserved = $reservedTemplate['id'];
+
+      $this->assertEquals('Subject test {if 1 > 2} smarty{/if}', $originalTemplate['msg_subject']);
+      $this->assertEquals('<p>Body test {if 1 > 2} markup{/if}</p>', $originalTemplate['msg_html']);
+      $this->assertNull($originalTemplate['master_id']);
+      $this->assertNull($originalTemplate['master_id.msg_subject']);
 
       MessageTemplate::update()
         ->addWhere('id', '=', $messageTemplateID)
         ->setValues([
           'msg_subject' => 'Hello world',
-          'msg_text' => 'Hello world',
           'msg_html' => '<p>Hello world</p>',
         ])
         ->execute();
@@ -176,13 +179,28 @@ class MessageTemplateTest extends Api4TestBase implements TransactionalInterface
         ->addWhere('id', '=', $messageTemplateID)
         ->execute()->first();
       // confirm subject is set
-      $this->assertNotNull($msgTpl['msg_subject']);
+      $this->assertEquals('Hello world', $msgTpl['msg_subject']);
       // message is changed so both of these should be set
       $this->assertEquals($msgTpl['master_id'], $messageTemplateIDReserved);
       $this->assertNotNull($msgTpl['master_id.msg_subject']);
       // these should be different
       $this->assertNotEquals($msgTpl['msg_subject'], $msgTpl['master_id.msg_subject']);
 
+      // Now revert it
+      MessageTemplate::revert(FALSE)
+        ->addWhere('id', '=', $messageTemplateID)
+        ->execute();
+
+      $msgTpl = MessageTemplate::get()
+        ->addSelect('msg_subject', 'msg_html', 'master_id', 'master_id.msg_subject')
+        ->addWhere('id', '=', $messageTemplateID)
+        ->execute()->first();
+      // confirm subject is reverted
+      $this->assertEquals($originalTemplate['msg_subject'], $msgTpl['msg_subject']);
+      $this->assertEquals($originalTemplate['msg_html'], $msgTpl['msg_html']);
+      // message is unchanged from original so both of these should be null
+      $this->assertNull($msgTpl['master_id']);
+      $this->assertNull($msgTpl['master_id.msg_subject']);
     });
   }
 

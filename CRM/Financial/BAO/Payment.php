@@ -57,6 +57,9 @@ class CRM_Financial_BAO_Payment {
     $paymentTrxnParams['is_payment'] = 1;
     // Really we should have a DB default.
     $paymentTrxnParams['fee_amount'] ??= 0;
+    if (!empty($params['custom'])) {
+      $paymentTrxnParams['custom'] = $params['custom'];
+    }
 
     if (isset($paymentTrxnParams['payment_processor_id']) && empty($paymentTrxnParams['payment_processor_id'])) {
       // Don't pass 0 - ie the Pay Later processor as it is  a pseudo-processor.

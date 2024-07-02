@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Membership;
 use Civi\Api4\MembershipType;
 
 /**
@@ -248,7 +249,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
   }
 
   /**
-   * Get membership Type Details.
+   * Get membership Type Details (cached).
    *
    * @deprecated use getMembershipType.
    *
@@ -257,6 +258,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
    * @return array|null
    */
   public static function getMembershipTypeDetails($membershipTypeId) {
+    CRM_Core_Error::deprecatedFunctionWarning('getMembershipType');
     $membershipTypeDetails = [];
 
     $membershipType = new CRM_Member_DAO_MembershipType();
@@ -288,7 +290,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
    *   associated array with  start date, end date and join date for the membership
    */
   public static function getDatesForMembershipType($membershipTypeId, $joinDate = NULL, $startDate = NULL, $endDate = NULL, $numRenewTerms = 1) {
-    $membershipTypeDetails = self::getMembershipTypeDetails($membershipTypeId);
+    $membershipTypeDetails = self::getMembershipType($membershipTypeId);
 
     // Convert all dates to 'Y-m-d' format.
     foreach (['joinDate', 'startDate', 'endDate'] as $dateParam) {
@@ -487,16 +489,21 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
       $membershipDates['join_date'] = CRM_Utils_Date::customFormat($membershipDetails->join_date, '%Y%m%d');
     }
 
-    $oldPeriodType = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
-      CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $membershipId, 'membership_type_id'), 'period_type');
+    $oldPeriodType = Membership::get(FALSE)
+      ->addSelect('membership_type_id.period_type')
+      ->addWhere('id', '=', $membershipId)
+      ->execute()
+      ->first()['membership_type_id.period_type'];
 
     // CRM-7297 Membership Upsell
     if (is_null($membershipTypeID)) {
-      $membershipTypeDetails = self::getMembershipTypeDetails($membershipDetails->membership_type_id);
+      $membershipTypeIDForDetails = $membershipDetails->membership_type_id;
     }
     else {
-      $membershipTypeDetails = self::getMembershipTypeDetails($membershipTypeID);
+      $membershipTypeIDForDetails = $membershipTypeID;
     }
+    $membershipTypeDetails = self::getMembershipType($membershipTypeIDForDetails);
+
     $statusDetails = CRM_Member_BAO_MembershipStatus::getMembershipStatus($statusID);
 
     if ($statusDetails['is_current_member'] == 1) {

@@ -20,9 +20,6 @@
   <compatibility>
     <ver>5.76</ver>
   </compatibility>
-  <requires>
-    <ext>org.civicrm.afform</ext>
-  </requires>
   <comments/>
   <classloader>
     <psr0 prefix="CRM_" path="."/>

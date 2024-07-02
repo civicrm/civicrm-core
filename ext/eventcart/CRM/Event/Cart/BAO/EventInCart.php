@@ -12,6 +12,8 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
   public $location = NULL;
   public $participants = [];
 
+  private $main_conference_event_id;
+
   /**
    * Add participant to cart.
    *

@@ -230,6 +230,11 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
       // not cope with a . the quick form layer will use a double underscore
       // as a stand in (the angular layer will not)
       $fieldName = str_replace('__', '.', $mapping[0]);
+      if (str_contains($fieldName, '.')) {
+        // If the field name contains a . - eg. address_primary.street_address
+        // we just want the part after the .
+        $fieldName = substr($fieldName, strpos($fieldName, '.') + 1);
+      }
       if ($fieldName === 'external_identifier' || $fieldName === 'contribution_contact_id' || $fieldName === 'contact__id') {
         // It is enough to have external identifier mapped.
         $weightSum = $threshold;

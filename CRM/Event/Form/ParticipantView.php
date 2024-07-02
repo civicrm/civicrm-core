@@ -158,7 +158,7 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
     }
     if (CRM_Core_Permission::check('delete in CiviEvent')) {
       $recentOther['deleteUrl'] = CRM_Utils_System::url('civicrm/participant/delete',
-        "reset=1&id={$values[$participantID]['id']}}"
+        "reset=1&id={$values[$participantID]['id']}"
       );
     }
 

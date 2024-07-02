@@ -182,12 +182,14 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
             'field' => 'reminder',
           ];
       }
-      self::$_tabLinks[$cacheKey]['friend']
-        = [
-          'title' => ts('Tell a Friend'),
-          'url' => 'civicrm/event/manage/friend',
-          'field' => 'friend',
-        ];
+      if (!function_exists('tellafriend_civicrm_config')) {
+        self::$_tabLinks[$cacheKey]['friend']
+          = [
+            'title' => ts('Tell a Friend'),
+            'url' => 'civicrm/event/manage/friend',
+            'field' => 'friend',
+          ];
+      }
       self::$_tabLinks[$cacheKey]['pcp']
         = [
           'title' => ts('Personal Campaign Pages'),
@@ -410,7 +412,9 @@ ORDER BY start_date desc
 
         $defaults['location'] = CRM_Core_BAO_Location::getValues($params, TRUE);
 
-        $manageEvent[$dao->id]['friend'] = CRM_Friend_BAO_Friend::getValues($params);
+        if (function_exists('tellafriend_civicrm_config')) {
+          $manageEvent[$dao->id]['friend'] = CRM_Friend_BAO_Friend::getValues($params);
+        }
 
         if (isset($defaults['location']['address'][1]['city'])) {
           $manageEvent[$dao->id]['city'] = $defaults['location']['address'][1]['city'];

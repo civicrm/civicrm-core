@@ -1037,25 +1037,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         $result['contact'][] = $validField;
       }
     }
-
-    $mainEvs = CRM_Core_BAO_CustomValueTable::getEntityValues($main['id']);
-    $otherEvs = CRM_Core_BAO_CustomValueTable::getEntityValues($other['id']);
-    $keys = array_unique(array_merge(array_keys($mainEvs), array_keys($otherEvs)));
-    foreach ($keys as $key) {
-      // Exclude multi-value fields CRM-13836
-      if (strpos($key, '_')) {
-        continue;
-      }
-      $key1 = $mainEvs[$key] ?? NULL;
-      $key2 = $otherEvs[$key] ?? NULL;
-      // We wish to retain '0' as it has a different meaning than NULL on a checkbox.
-      // However I can't think of a case where an empty string is more meaningful than null
-      // or where it would be FALSE or something else nullish.
-      $valuesToIgnore = [NULL, '', []];
-      if (!in_array($key1, $valuesToIgnore, TRUE) || !in_array($key2, $valuesToIgnore, TRUE)) {
-        $result['custom'][] = $key;
-      }
-    }
     return $result;
   }
 
@@ -1621,33 +1602,39 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       $mainCustomValues = Contact::get(FALSE)
         ->addWhere('id', '=', $mainID)
         ->addSelect($group['name'] . '.*')
-        ->execute();
+        ->execute()->first();
       $otherCustomValues = Contact::get(FALSE)
         ->addWhere('id', '=', $otherID)
         ->addSelect($group['name'] . '.*')
-        ->execute();
+        ->execute()->first();
       foreach ($group['fields'] as $field) {
         $fid = $field['id'];
         $apiFieldName = "{$group['name']}.{$field['name']}";
-        if (in_array($fid, $compareFields['custom'])) {
+        $mainContactValue = ($mainCustomValues[$apiFieldName] ?? NULL);
+        $otherContactValue = $otherCustomValues[$apiFieldName] ?? NULL;
+        $validEmptyValues = [0, '0', FALSE];
+        // If at least one contact has meaningful data in the field then add it in.
+        if ($mainContactValue || $otherContactValue
+         || in_array($mainContactValue, $validEmptyValues, TRUE)
+         || in_array($otherContactValue, $validEmptyValues, TRUE)
+        ) {
           $rows["custom_group_{$group['id']}"]['title'] ??= $group['title'];
-
-          foreach ($mainCustomValues as $values) {
-            $customValue = $values[$apiFieldName] ?? NULL;
-            $rows["move_custom_$fid"]['main'] = CRM_Core_BAO_CustomField::displayValue($customValue, $fid);
+          $rows["move_custom_$fid"]['main'] = CRM_Core_BAO_CustomField::displayValue($mainContactValue, $fid);
+          $rows["move_custom_$fid"]['other'] = CRM_Core_BAO_CustomField::displayValue($otherContactValue, $fid);
+          // The value assigned to the check box on the quick form is a string that holds the
+          // value to be carried over on submit. It would be a lot simpler if the checkbox
+          // just submitted TRUE or FALSE - but that may be hard to retrofit. The qfKeyBug string
+          // has to be used so that 0 is not treated as 'do not transfer'. One might argue
+          // the bug is in the design not the qfZero... just saying
+          $checkboxValue = in_array($otherContactValue, $validEmptyValues, TRUE) ? $qfZeroBug : $otherContactValue;
+          if (!$checkboxValue) {
+            // if the field does not have meaningful data then we use the word 'null'.
+            // an empty string, an empty array & NULL are all treated as being meaningful
+            // but 0, '0' or FALSE are treated as meaningful.
+            $checkboxValue = 'null';
           }
-          $value = 'null';
-          foreach ($otherCustomValues as $values) {
-            $customValue = $values[$apiFieldName] ?? NULL;
-            $rows["move_custom_$fid"]['other'] = CRM_Core_BAO_CustomField::displayValue($customValue, $fid);
-            if ($customValue === 0 || $customValue === '0' || $customValue === FALSE) {
-              $customValue = $qfZeroBug;
-            }
-            // FIXME: Not changed during refactor but this looks wrong: should be `??` not `?:`
-            $value = $customValue ?: $value;
-          }
-          // FIXME: Underlying code relies on $value to be a string.
-          $value = is_array($value) ? CRM_Utils_Array::implodePadded($value) : (string) $value;
+          // Value could be loaded as an array from the api.
+          $checkboxValue = is_array($checkboxValue) ? CRM_Utils_Array::implodePadded($checkboxValue) : (string) $checkboxValue;
           $rows["move_custom_$fid"]['title'] = $field['label'];
 
           $elements[] = [
@@ -1656,10 +1643,10 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
             2 => NULL,
             3 => NULL,
             4 => NULL,
-            5 => $value,
+            5 => $checkboxValue,
             'is_checked' => (!isset($rows["move_custom_$fid"]['main']) || $rows["move_custom_$fid"]['main'] === ''),
           ];
-          $migrationInfo["move_custom_$fid"] = $value;
+          $migrationInfo["move_custom_$fid"] = $checkboxValue;
         }
       }
     }

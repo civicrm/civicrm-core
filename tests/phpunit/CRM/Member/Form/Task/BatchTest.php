@@ -24,9 +24,8 @@ class CRM_Member_Form_Task_BatchTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
-    $this->validateAllContributions();
-    $this->validateAllPayments();
     $this->quickCleanUpFinancialEntities();
+    $this->quickCleanup(['civicrm_uf_field', 'civicrm_uf_group']);
     parent::tearDown();
   }
 
@@ -36,23 +35,49 @@ class CRM_Member_Form_Task_BatchTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testBatchSubmit(): void {
-    $form = $this->getFormObject('CRM_Member_Form_Task_Batch');
     $membership1 = $this->contactMembershipCreate(['contact_id' => $this->individualCreate()]);
     $membership2 = $this->contactMembershipCreate(['contact_id' => $this->individualCreate()]);
     $this->createCustomGroupWithFieldOfType(['extends' => 'Membership'], 'text');
-    $form->submit([
-      'field' => [
-        $membership1 => [
-          $this->getCustomFieldName('text') => '80',
-          'membership_join_date' => '2019-12-26',
-        ],
-        $membership2 => [
-          $this->getCustomFieldName('text') => '100',
-          'membership_join_date' => '2019-11-26',
-          'membership_source' => 'form',
-        ],
-      ],
+    $this->createTestEntity('UFGroup', [
+      'name' => 'membership',
+      'extends' => 'Membership',
     ]);
+    $this->createTestEntity('UFField', [
+      'uf_group_id.name' => 'membership',
+      'name' => 'custom_field',
+      'field_name' => $this->getCustomFieldName('text'),
+    ]);
+    $this->createTestEntity('UFField', [
+      'uf_group_id.name' => 'membership',
+      'name' => 'membership_join_date',
+      'field_name' => 'membership_join_date',
+    ]);
+    $this->createTestEntity('UFField', [
+      'uf_group_id.name' => 'membership',
+      'name' => 'membership_source',
+      'field_name' => 'membership_source',
+    ]);
+    $this->getTestForm('CRM_Contact_Form_Search_Basic', [
+      'radio_ts' => 'ts_all',
+      'task' => CRM_Member_Task::BATCH_UPDATE,
+    ], ['action' => 1])
+      ->addSubsequentForm('CRM_Member_Form_Task_PickProfile', ['uf_group_id' => $this->ids['UFGroup']['default']])
+      ->addSubsequentForm('CRM_Member_Form_Task_Batch', [
+        'field' => [
+          $membership1 => [
+            $this->getCustomFieldName('text') => '80',
+            'membership_join_date' => '2019-12-26',
+            'membership_source' => '',
+          ],
+          $membership2 => [
+            $this->getCustomFieldName('text') => '100',
+            'membership_join_date' => '2019-11-26',
+            'membership_source' => 'form',
+          ],
+        ],
+      ])
+      ->processForm();
+
     $memberships = $this->callAPISuccess('Membership', 'get', [])['values'];
     $this->assertEquals('2019-12-26', $memberships[$membership1]['join_date']);
     $this->assertEquals('2019-11-26', $memberships[$membership2]['join_date']);

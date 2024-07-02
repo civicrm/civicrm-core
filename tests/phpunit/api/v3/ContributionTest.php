@@ -3269,7 +3269,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * Test completing a transaction with an event via the API.
    *
-   * Note that we are creating a logged in user because email goes out from
+   * Note that we are creating a logged-in user because email goes out from
    * that person
    */
   public function testCompleteTransactionWithParticipantRecord(): void {
@@ -3310,7 +3310,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'This is a confirmation that your registration has been received and your status has been updated to Registered.',
       'First Name',
       'Logged In',
-      'Public Event Post Post Profile',
+      'Public title',
       'public 2',
       'public 3',
     ], ['Back end title', 'title_post_2', 'title_post_3']);
@@ -4384,6 +4384,31 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'Contribution Information',
     ], [
       'Event',
+    ]);
+    $mut->stop();
+  }
+
+  /**
+   * Test custom receipt_text for a membership with Contribution.sendconfirmation
+   */
+  public function testSendconfirmationWithMembershipReceiptText(): void {
+    // Ideally we would start spooling lower down because the initial creation
+    // will also generate an email that might be misleading, but if we do that
+    // then it silently fails to send either email for some reason.
+    $mut = new CiviMailUtils($this, TRUE);
+    $this->createPriceSetWithPage('membership');
+    $this->createInitialPaidMembership();
+    // ignore first email
+    $mut->clearMessages();
+    $this->callAPISuccess('Contribution', 'sendconfirmation', [
+      'id' => $this->getContributionID(),
+      'receipt_from_email' => 'fromemail@fromemail.com',
+      'receipt_from_name' => 'fromemailname',
+      'receipt_text' => 'This is the custom receipt text.',
+    ]);
+    $mut->checkMailLog([
+      'fromemail@fromemail.com',
+      'This is the custom receipt text.',
     ]);
     $mut->stop();
   }

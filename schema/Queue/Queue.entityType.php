@@ -36,9 +36,6 @@ return [
       'required' => TRUE,
       'description' => ts('Name of the queue'),
       'add' => '5.47',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'type' => [
       'title' => ts('Type'),
@@ -47,9 +44,6 @@ return [
       'required' => TRUE,
       'description' => ts('Type of the queue'),
       'add' => '5.47',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
       'pseudoconstant' => [
         'callback' => 'CRM_Queue_BAO_Queue::getTypes',
       ],
@@ -60,9 +54,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Name of the task runner'),
       'add' => '5.48',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'batch_limit' => [
       'title' => ts('Batch Limit'),
@@ -105,9 +96,6 @@ return [
       'description' => ts('Execution status'),
       'add' => '5.51',
       'default' => 'active',
-      'input_attrs' => [
-        'maxlength' => 16,
-      ],
       'pseudoconstant' => [
         'callback' => 'CRM_Queue_BAO_Queue::getStatuses',
       ],
@@ -118,9 +106,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Fallback behavior for unhandled errors'),
       'add' => '5.51',
-      'input_attrs' => [
-        'maxlength' => 16,
-      ],
       'pseudoconstant' => [
         'callback' => 'CRM_Queue_BAO_Queue::getErrorModes',
       ],

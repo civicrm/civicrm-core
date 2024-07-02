@@ -88,6 +88,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     parent::setUp();
     $this->enableCiviCampaign();
     $this->toBeImplemented['get'] = [
+      // Not apiv3.
+      'Afform',
       // CxnApp.get exists but relies on remote data outside our control; QA w/UtilsTest::testBasicArrayGet
       'CxnApp',
       'Profile',

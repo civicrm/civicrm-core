@@ -44,7 +44,6 @@ return [
       'default' => NULL,
       'input_attrs' => [
         'label' => ts('Name'),
-        'maxlength' => 255,
       ],
     ],
     'label' => [
@@ -56,7 +55,6 @@ return [
       'default' => NULL,
       'input_attrs' => [
         'label' => ts('Label'),
-        'maxlength' => 255,
       ],
     ],
     'form_values' => [
@@ -102,7 +100,6 @@ return [
       'add' => '5.24',
       'input_attrs' => [
         'label' => ts('For'),
-        'maxlength' => 255,
       ],
       'pseudoconstant' => [
         'callback' => 'CRM_Contact_BAO_SavedSearch::getApiEntityOptions',

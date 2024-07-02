@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Contribution Soft Credit'),
     'title_plural' => ts('Contribution Soft Credits'),
-    'description' => ts('FIXME'),
+    'description' => ts('Soft Credits for Contributions'),
     'log' => TRUE,
     'add' => '2.2',
   ],
@@ -94,9 +94,6 @@ return [
       'description' => ts('3 character string, value from config setting or input via user.'),
       'add' => '3.2',
       'default' => NULL,
-      'input_attrs' => [
-        'maxlength' => 3,
-      ],
       'pseudoconstant' => [
         'table' => 'civicrm_currency',
         'key_column' => 'name',
@@ -140,9 +137,6 @@ return [
       'input_type' => 'Text',
       'add' => '2.2',
       'default' => NULL,
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'pcp_personal_note' => [
       'title' => ts('Soft Contribution PCP Note'),
@@ -150,9 +144,6 @@ return [
       'input_type' => 'TextArea',
       'add' => '2.2',
       'default' => NULL,
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'soft_credit_type_id' => [
       'title' => ts('Soft Credit Type'),

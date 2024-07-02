@@ -22,6 +22,7 @@
      {/foreach}
    </div>
 {/crmRegion}
+{include file="CRM/common/customDataBlock.tpl" customDataType='FinancialTrxn' customDataSubType=false entityID=$id groupID='' cid=false}
 <div class="crm-submit-buttons">
   {include file="CRM/common/formButtons.tpl" location="bottom"}
 </div>

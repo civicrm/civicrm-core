@@ -43,9 +43,6 @@ return [
       'required' => TRUE,
       'description' => ts('Name of the scheduled action'),
       'add' => '3.4',
-      'input_attrs' => [
-        'maxlength' => 128,
-      ],
     ],
     'title' => [
       'title' => ts('Title'),
@@ -53,9 +50,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Title of the action(reminder)'),
       'add' => '3.4',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'recipient' => [
       'title' => ts('Recipient'),
@@ -66,7 +60,6 @@ return [
       'input_attrs' => [
         'label' => ts('Limit or Add Recipients'),
         'control_field' => 'mapping_id',
-        'maxlength' => 64,
       ],
       'pseudoconstant' => [
         'callback' => 'CRM_Core_BAO_ActionSchedule::getRecipientOptions',
@@ -97,7 +90,6 @@ return [
         'label' => ts('Entity Value'),
         'multiple' => '1',
         'control_field' => 'mapping_id',
-        'maxlength' => 255,
       ],
       'pseudoconstant' => [
         'callback' => 'CRM_Core_BAO_ActionSchedule::getEntityValueOptions',
@@ -114,7 +106,6 @@ return [
         'label' => ts('Entity Status'),
         'multiple' => '1',
         'control_field' => 'entity_value',
-        'maxlength' => 64,
       ],
       'pseudoconstant' => [
         'callback' => 'CRM_Core_BAO_ActionSchedule::getEntityStatusOptions',
@@ -141,7 +132,6 @@ return [
       'input_attrs' => [
         'label' => ts('Start Action Unit'),
         'control_field' => 'start_action_offset',
-        'maxlength' => 8,
       ],
       'pseudoconstant' => [
         'callback' => 'CRM_Core_BAO_ActionSchedule::getDateUnits',
@@ -155,7 +145,6 @@ return [
       'add' => '3.4',
       'input_attrs' => [
         'label' => ts('Start Condition'),
-        'maxlength' => 64,
       ],
       'pseudoconstant' => [
         'callback' => 'CRM_Core_SelectValues::beforeAfter',
@@ -170,7 +159,6 @@ return [
       'input_attrs' => [
         'label' => ts('Start Date'),
         'control_field' => 'entity_value',
-        'maxlength' => 64,
       ],
       'pseudoconstant' => [
         'callback' => 'CRM_Core_BAO_ActionSchedule::getActionDateOptions',
@@ -193,7 +181,6 @@ return [
       'input_attrs' => [
         'label' => ts('Repetition Frequency Unit'),
         'control_field' => 'repetition_frequency_interval',
-        'maxlength' => 8,
       ],
       'pseudoconstant' => [
         'callback' => 'CRM_Core_BAO_ActionSchedule::getDateUnits',
@@ -220,7 +207,6 @@ return [
       'input_attrs' => [
         'label' => ts('End Frequency Unit'),
         'control_field' => 'end_frequency_interval',
-        'maxlength' => 8,
       ],
       'pseudoconstant' => [
         'callback' => 'CRM_Core_BAO_ActionSchedule::getDateUnits',
@@ -246,7 +232,6 @@ return [
       'add' => '3.4',
       'input_attrs' => [
         'label' => ts('End Condition'),
-        'maxlength' => 32,
       ],
       'pseudoconstant' => [
         'callback' => 'CRM_Core_SelectValues::beforeAfter',
@@ -261,7 +246,6 @@ return [
       'input_attrs' => [
         'label' => ts('End Date'),
         'control_field' => 'entity_value',
-        'maxlength' => 64,
       ],
       'pseudoconstant' => [
         'callback' => 'CRM_Core_BAO_ActionSchedule::getActionDateOptions',
@@ -289,7 +273,6 @@ return [
       'input_attrs' => [
         'label' => ts('Manual Recipients'),
         'multiple' => '1',
-        'maxlength' => 128,
       ],
     ],
     'recipient_listing' => [
@@ -303,7 +286,6 @@ return [
         'label' => ts('Recipient Roles'),
         'multiple' => '1',
         'control_field' => 'recipient',
-        'maxlength' => 128,
       ],
       'pseudoconstant' => [
         'callback' => 'CRM_Core_BAO_ActionSchedule::getRecipientListingOptions',
@@ -336,9 +318,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Subject of mailing'),
       'add' => '3.4',
-      'input_attrs' => [
-        'maxlength' => 128,
-      ],
     ],
     'record_activity' => [
       'title' => ts('Record Activity'),
@@ -357,7 +336,6 @@ return [
       'add' => '3.4',
       'input_attrs' => [
         'label' => ts('Used For'),
-        'maxlength' => 64,
       ],
       'pseudoconstant' => [
         'callback' => 'CRM_Core_BAO_ActionSchedule::getMappingOptions',
@@ -435,7 +413,6 @@ return [
       'add' => '4.5',
       'input_attrs' => [
         'label' => ts('From Name'),
-        'maxlength' => 255,
       ],
     ],
     'from_email' => [
@@ -446,7 +423,6 @@ return [
       'add' => '4.5',
       'input_attrs' => [
         'label' => ts('From Email'),
-        'maxlength' => 255,
       ],
     ],
     'mode' => [
@@ -456,9 +432,6 @@ return [
       'description' => ts('Send the message as email or sms or both.'),
       'add' => '4.5',
       'default' => 'Email',
-      'input_attrs' => [
-        'maxlength' => 128,
-      ],
       'pseudoconstant' => [
         'option_group_name' => 'msg_mode',
       ],
@@ -488,7 +461,6 @@ return [
       'add' => '4.6',
       'input_attrs' => [
         'label' => ts('Used For'),
-        'maxlength' => 64,
       ],
     ],
     'filter_contact_language' => [
@@ -501,7 +473,6 @@ return [
       'input_attrs' => [
         'multiple' => '1',
         'label' => ts('Recipients Language'),
-        'maxlength' => 128,
       ],
       'pseudoconstant' => [
         'callback' => 'CRM_Core_BAO_ActionSchedule::getFilterContactLanguageOptions',
@@ -515,7 +486,6 @@ return [
       'add' => '4.7',
       'input_attrs' => [
         'label' => ts('Communication Language'),
-        'maxlength' => 8,
       ],
       'pseudoconstant' => [
         'callback' => 'CRM_Core_BAO_ActionSchedule::getCommunicationLanguageOptions',

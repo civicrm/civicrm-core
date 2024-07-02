@@ -561,7 +561,7 @@ abstract class AbstractAction implements \ArrayAccess {
       throw new \CRM_Core_Exception('Illegal character in expression');
     }
     $tpl = "{if $expr}1{else}0{/if}";
-    return (bool) trim(\CRM_Core_Smarty::singleton()->fetchWith('string:' . $tpl, $vars));
+    return (bool) trim(\CRM_Utils_String::parseOneOffStringThroughSmarty($tpl, $vars));
   }
 
   /**

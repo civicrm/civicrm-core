@@ -30,6 +30,7 @@
  */
 global $civicrm_root, $civicrm_setting, $civicrm_paths;
 
+
 /**
  * Content Management System (CMS) Host:
  *

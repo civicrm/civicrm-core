@@ -236,8 +236,8 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
         "reset=1&id={$this->_id}",
         FALSE, NULL, TRUE, TRUE
       );
-      $this->assign('participantListingURL', $participantListingURL);
     }
+    $this->assign('participantListingURL', $participantListingURL ?? NULL);
 
     $hasWaitingList = $values['event']['has_waitlist'] ?? NULL;
     $isEventOpenForRegistration = CRM_Event_BAO_Event::validRegistrationRequest($values['event'], $this->_id);

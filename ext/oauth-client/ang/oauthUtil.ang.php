@@ -11,7 +11,6 @@ return [
   // 'css' => ['ang/oauthUtil.css'],
   // 'partials' => ['ang/oauthUtil'],
   // 'requires' => ['crmUi', 'crmUtil'],
-  'settings' => [],
   'settingsFactory' => ['CRM_OAuth_Angular', 'getSettings'],
   'exports' => [
     'oauth-util-import' => 'A',

@@ -29,6 +29,12 @@ abstract class FormTestCase extends \PHPUnit\Framework\TestCase implements \Civi
 
   protected $formName = NULL;
 
+  public static function setUpBeforeClass(): void {
+    \Civi\Test::e2e()
+      ->install(['org.civicrm.afform', 'org.civicrm.afform-mock'])
+      ->apply();
+  }
+
   protected function setUp(): void {
     parent::setUp();
 
@@ -76,6 +82,9 @@ abstract class FormTestCase extends \PHPUnit\Framework\TestCase implements \Civi
   protected function getFormMeta(): array {
     $scanner = new \CRM_Afform_AfformScanner();
     $meta = $scanner->getMeta($this->getFormName());
+    if (empty($meta)) {
+      throw new \RuntimeException(sprintf("Failed to find metadata for form (%s)", $this->getFormName()));
+    }
     $scanner->addComputedFields($meta);
     return $meta;
   }

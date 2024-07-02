@@ -76,7 +76,6 @@ return [
       'unique_name' => 'mailing_job_status',
       'input_attrs' => [
         'label' => ts('Status'),
-        'maxlength' => 12,
       ],
       'pseudoconstant' => [
         'callback' => 'CRM_Core_SelectValues::getMailingJobStatus',
@@ -100,9 +99,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Type of mailling job: null | child'),
       'add' => '3.3',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'parent_id' => [
       'title' => ts('Parent ID'),

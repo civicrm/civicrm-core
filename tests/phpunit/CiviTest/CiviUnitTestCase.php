@@ -572,7 +572,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $errorHandlerAtEndOfTest = set_error_handler(function($errno, $errstr, $errfile, $errline) {});
     restore_error_handler();
     if ($this->errorHandlerAtStartOfTest != $errorHandlerAtEndOfTest) {
-      $this->fail('Error handler is not the same at the end of the test as when it started. Start: ' . print_r($this->errorHandlerAtStartOfTest, TRUE) . "\nEnd: " . print_r($errorHandlerAtEndOfTest, TRUE));
+      $this->fail('Error handler is not the same at the end of the test as when it started. Did you forget to call parent::setUp or parent::tearDown? Start: ' . print_r($this->errorHandlerAtStartOfTest, TRUE) . "\nEnd: " . print_r($errorHandlerAtEndOfTest, TRUE));
     }
 
     // Reset to version 3 as not all (e.g payments) work on v4
@@ -832,7 +832,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       $params['event_id'] = $event['id'];
     }
     $defaults = [
-      'status_id' => 2,
       'role_id' => 1,
       'register_date' => 20070219,
       'source' => 'Wimbledon',
@@ -841,7 +840,10 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     ];
 
     $params = array_merge($defaults, $params);
-    $result = $this->callAPISuccess('Participant', 'create', $params);
+    if (empty($params['status_id']) && empty($params['status_id.name'])) {
+      $params['status_id.name'] = 'Attended';
+    }
+    $result = $this->createTestEntity('Participant', $params);
     return $result['id'];
   }
 
@@ -2485,7 +2487,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  protected function createPartiallyPaidParticipantOrder() {
+  protected function createPartiallyPaidParticipantOrder(): array {
     $orderParams = $this->getParticipantOrderParams();
     $orderParams['api.Payment.create'] = ['total_amount' => 150];
     return $this->callAPISuccess('Order', 'create', $orderParams);
@@ -3375,10 +3377,11 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    */
   protected function getParticipantOrderParams(): array {
     $this->eventCreatePaid();
+    $contactID = $this->individualCreate();
     return [
       'total_amount' => 300,
       'currency' => 'USD',
-      'contact_id' => $this->individualCreate(),
+      'contact_id' => $contactID,
       'financial_type_id' => 4,
       'line_items' => [
         [
@@ -3418,7 +3421,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
             'role_id' => 1,
             'status_id' => 14,
             'fee_currency' => 'USD',
-            'contact_id' => $this->individualCreate(),
+            'contact_id' => $contactID,
           ],
         ],
       ],

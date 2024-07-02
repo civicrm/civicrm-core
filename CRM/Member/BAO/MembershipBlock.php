@@ -69,7 +69,7 @@ class CRM_Member_BAO_MembershipBlock extends CRM_Member_DAO_MembershipBlock impl
         $autoRenewOption = (int) $autoRenewOption;
         $membershipBlocks = MembershipBlock::get(FALSE)->execute();
         foreach ($membershipBlocks as $membershipBlock) {
-          if (array_key_exists($event->id, $membershipBlock['membership_types'])
+          if ($membershipBlock['membership_types'] && array_key_exists($event->id, $membershipBlock['membership_types'])
             && ((int) $membershipBlock['membership_types'][$event->id]) !== $autoRenewOption
           ) {
             $membershipBlock['membership_types'][$event->id] = $autoRenewOption;

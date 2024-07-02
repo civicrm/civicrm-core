@@ -60,9 +60,6 @@ return [
       'required' => TRUE,
       'description' => ts('Table of the object joined to the ACL Role (Contact or Group)'),
       'add' => '1.6',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
       'pseudoconstant' => [
         'callback' => 'CRM_ACL_BAO_ACLEntityRole::entityTables',
       ],

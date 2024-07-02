@@ -536,7 +536,14 @@ WHERE participant.contact_id = %1 AND  note.entity_table = 'civicrm_participant'
     if ($relatedClauses) {
       // Nested array will be joined with OR
       $clauses['entity_table'] = [$relatedClauses];
+      // Fix dev/core#4924 : Allow inclusion of rows that have no Note.
+      // This is a workaround specifically for CiviReport, which erroneously
+      // adds this clause to the WHERE instead of the JOIN. If that problem
+      // were solved in CiviReport, this could be removed.
+      // @see CRM_Report_Form::buildPermissionClause
+      $clauses['entity_table'][0][] = 'IS NULL';
     }
+
     // Enforce note privacy setting
     if (!CRM_Core_Permission::check('view all notes', $userId)) {
       // It was ok to have $userId = NULL for the permission check but must be an int for the query

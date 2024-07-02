@@ -55,9 +55,6 @@ return [
       'description' => ts('Scheduled job run frequency.'),
       'add' => '4.1',
       'default' => 'Daily',
-      'input_attrs' => [
-        'maxlength' => 8,
-      ],
       'pseudoconstant' => [
         'callback' => 'CRM_Core_SelectValues::getJobFrequency',
       ],
@@ -101,9 +98,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Title of the job'),
       'add' => '4.1',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'description' => [
       'title' => ts('Job Description'),
@@ -114,7 +108,6 @@ return [
       'input_attrs' => [
         'rows' => 4,
         'cols' => 60,
-        'maxlength' => 255,
       ],
     ],
     'api_entity' => [
@@ -123,9 +116,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Entity of the job api call'),
       'add' => '4.1',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'api_action' => [
       'title' => ts('API Action'),
@@ -133,9 +123,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Action of the job api call'),
       'add' => '4.1',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'parameters' => [
       'title' => ts('API Parameters'),

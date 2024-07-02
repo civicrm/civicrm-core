@@ -49,9 +49,6 @@ return [
       'input_type' => 'Select',
       'description' => ts('Type of Group.'),
       'default' => NULL,
-      'input_attrs' => [
-        'maxlength' => 8,
-      ],
       'pseudoconstant' => [
         'callback' => 'CRM_Core_SelectValues::getCampaignGroupTypes',
       ],
@@ -63,9 +60,6 @@ return [
       'description' => ts('Name of table where item being referenced is stored.'),
       'add' => '3.3',
       'default' => NULL,
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'entity_id' => [
       'title' => ts('Entity ID'),

@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Option Value'),
     'title_plural' => ts('Option Values'),
-    'description' => ts('FIXME'),
+    'description' => ts('Table of Option Values'),
     'log' => TRUE,
     'add' => '1.5',
     'label_field' => 'label',
@@ -73,9 +73,6 @@ return [
       'localizable' => TRUE,
       'description' => ts('Option string as displayed to users - e.g. the label in an HTML OPTION tag.'),
       'add' => '1.5',
-      'input_attrs' => [
-        'maxlength' => 512,
-      ],
     ],
     'value' => [
       'title' => ts('Option Value'),
@@ -84,9 +81,6 @@ return [
       'required' => TRUE,
       'description' => ts('The actual value stored (as a foreign key) in the data record. Functions which need lookup option_value.title should use civicrm_option_value.option_group_id plus civicrm_option_value.value as the key.'),
       'add' => '1.5',
-      'input_attrs' => [
-        'maxlength' => 512,
-      ],
     ],
     'name' => [
       'title' => ts('Option Name'),
@@ -99,9 +93,6 @@ return [
         'export',
         'duplicate_matching',
       ],
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'grouping' => [
       'title' => ts('Option Grouping Name'),
@@ -109,9 +100,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Use to sort and/or set display properties for sub-set(s) of options within an option group. EXAMPLE: Use for college_interest field, to differentiate partners from non-partners.'),
       'add' => '1.5',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'filter' => [
       'title' => ts('Filter'),
@@ -237,9 +225,6 @@ return [
       'description' => ts('crm-i icon class'),
       'add' => '4.7',
       'default' => NULL,
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'color' => [
       'title' => ts('Color'),
@@ -248,9 +233,6 @@ return [
       'description' => ts('Hex color value e.g. #ffffff'),
       'add' => '4.7',
       'default' => NULL,
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
   ],
 ];

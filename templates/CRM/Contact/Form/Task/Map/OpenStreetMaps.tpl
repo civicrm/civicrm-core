@@ -121,8 +121,6 @@
         map.setCenter(bounds.getCenterLonLat());
         {if count($locations) gt 1}
             map.zoomToExtent(bounds);
-        {elseif $location.marker_class eq 'Event' || $location.marker_class eq 'Individual'|| $location.marker_class eq 'Household' || $location.marker_class eq 'Organization'}
-            map.zoomTo({$defaultZoom});
         {else}
             map.zoomTo({$defaultZoom});
         {/if}

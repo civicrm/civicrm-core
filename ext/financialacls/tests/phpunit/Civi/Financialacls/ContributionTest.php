@@ -127,4 +127,30 @@ class ContributionTest extends BaseTestClass {
     ]);
   }
 
+  public function testSuperPermissions(): void {
+    // With no financial ACLs.
+    $this->setPermissions([
+      'access CiviCRM',
+      'access CiviContribute',
+      'edit contributions',
+      'view all contacts',
+    ]);
+    $this->createLoggedInUser();
+    $visibleFTs = \CRM_Contribute_BAO_Contribution::buildOptions('financial_type_id', 'search');
+    $this->assertEquals(count($visibleFTs), 0);
+
+    // With financial ACLs.
+    $permissions = array_merge(\CRM_Core_Config::singleton()->userPermissionClass->permissions, [
+      'view contributions of all types',
+      'delete contributions of all types',
+      'add contributions of all types',
+      'edit contributions of all types',
+    ]);
+    $this->setPermissions($permissions);
+    // Clear pseudoconstant lookup cache.
+    unset(\Civi::$statics['CRM_Core_PseudoConstant']);
+    $visibleFTs = \CRM_Contribute_BAO_Contribution::buildOptions('financial_type_id', 'search');
+    $this->assertEquals(count($visibleFTs), 4);
+  }
+
 }

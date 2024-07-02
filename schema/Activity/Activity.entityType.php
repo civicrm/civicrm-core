@@ -114,9 +114,6 @@ return [
         'export',
         'duplicate_matching',
       ],
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'activity_date_time' => [
       'title' => ts('Activity Date'),
@@ -159,9 +156,6 @@ return [
         'export',
         'duplicate_matching',
       ],
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'phone_id' => [
       'title' => ts('Phone ID (called)'),
@@ -186,9 +180,6 @@ return [
       'deprecated' => TRUE,
       'description' => ts('Phone number in case the number does not exist in the civicrm_phone table.'),
       'add' => '2.0',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'details' => [
       'title' => ts('Details'),
@@ -339,9 +330,6 @@ return [
       'description' => ts('Currently being used to store result id for survey activity, FK to option value.'),
       'add' => '3.3',
       'unique_name' => 'activity_result',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'is_deleted' => [
       'title' => ts('Activity is in the Trash'),

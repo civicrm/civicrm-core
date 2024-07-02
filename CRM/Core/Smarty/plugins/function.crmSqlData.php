@@ -27,14 +27,9 @@
  * @internal
  */
 function smarty_function_crmSqlData($params, &$smarty) {
-  if ((property_exists($smarty, 'security_policy') && $smarty->security_policy)
-    // security is the Smarty v2 property.
-  || (property_exists($smarty, 'security') && $smarty->security)
-  ) {
-    throw new \CRM_Core_Exception("crmSqlData not allowed in secure mode");
-    // In theory, there's nothing actually wrong with running in secure more. We just don't need it.
-    // If that changes, then be sure to double-check that the file-name sanitization is good.
-  }
+  CRM_Core_Smarty_UserContentPolicy::assertTagAllowed('crmSqlData');
+  // In theory, there's nothing actually wrong with running in secure more. We just don't need it.
+  // If that changes, then be sure to double-check that the file-name sanitization is good.
 
   $civicrmDir = dirname(__DIR__, 4);
   $files = glob($civicrmDir . DIRECTORY_SEPARATOR . $params['file']);

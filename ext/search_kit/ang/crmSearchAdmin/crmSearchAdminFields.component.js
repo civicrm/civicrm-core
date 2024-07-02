@@ -21,10 +21,18 @@
       $scope.$watchCollection('$ctrl.crmSearchAdmin.savedSearch.api_params.select', function(flatSelect) {
         ctrl.select.length = flatSelect.length;
         flatSelect.forEach((key, index) => {
-          ctrl.select[index] = ctrl.select[index] || {};
-          ctrl.select[index].key = key;
-          ctrl.select[index].label = ctrl.crmSearchAdmin.getFieldLabel(key);
-          ctrl.select[index].isPseudoField = ctrl.crmSearchAdmin.isPseudoField(key);
+          // Same field - just update the label
+          if (ctrl.select[index] && ctrl.select[index].key === key) {
+            ctrl.select[index].label = ctrl.crmSearchAdmin.getFieldLabel(key);
+          }
+          // Replace field
+          else {
+            ctrl.select[index] = {
+              key: key,
+              label: ctrl.crmSearchAdmin.getFieldLabel(key),
+              isPseudoField: ctrl.crmSearchAdmin.isPseudoField(key)
+            };
+          }
         });
       });
 

@@ -6,14 +6,14 @@
 </head>
 <body>
 
-  <table id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left; width:100%; max-width:700px; padding:0; margin:0; border:0px;">
-
   <!-- BEGIN HEADER -->
-  <!-- You can add table row(s) here with logo or other header elements -->
+    {* To modify content in this section, you can edit the Custom Token named "Message Header". See also: https://docs.civicrm.org/user/en/latest/email/message-templates/#modifying-system-workflow-message-templates *}
+    {site.message_header}
   <!-- END HEADER -->
 
   <!-- BEGIN CONTENT -->
 
+  <table id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left; width:100%; max-width:700px; padding:0; margin:0; border:0px;">
   <tr>
    <td>
 

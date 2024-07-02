@@ -22,7 +22,7 @@ class LogObserver extends \Log_observer {
    * @see \Log::_announce
    * @param array $event
    */
-  public function notify($event) {
+  public function notify(array $event): void {
     $levels = \CRM_Core_Error_Log::getMap();
     $event['level'] = array_search($event['priority'], $levels);
     // Extract [civi.tag] from message string

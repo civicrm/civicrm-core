@@ -205,7 +205,7 @@ class CRM_Utils_Mail {
 
     if (is_object($mailer)) {
       try {
-        $result = $mailer->send($to, $headers, $message);
+        $result = $mailer->send($to, $headers, $message ?? '');
       }
       catch (Exception $e) {
         \Civi::log()->error('Mailing error: ' . $e->getMessage());

@@ -21,6 +21,8 @@ namespace api\v4\Entity;
 
 use api\v4\Api4TestBase;
 use Civi\Api4\ExampleData;
+use Civi\Api4\MessageTemplate;
+use Civi\Api4\Translation;
 use Civi\Api4\WorkflowMessage;
 use Civi\Test\TransactionalInterface;
 
@@ -151,6 +153,48 @@ class WorkflowMessageTest extends Api4TestBase implements TransactionalInterface
         $this->fail('Unrecognized assertion: ' . json_encode($assert));
       }
     }
+  }
+
+  /**
+   * Test rendering a translation with no text version.
+   *
+   * In this scenario the parent DOES have a text version.
+   *
+   * The text version should fall back on the translated html,
+   * not the untranslated parent.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testRenderWithoutText(): void {
+    $workflow = 'contribution_dupalert';
+    $id = MessageTemplate::update(FALSE)
+      ->addWhere('workflow_name', '=', $workflow)
+      ->addWhere('is_default', '=', TRUE)
+      ->setValues(['msg_text' => 'hi'])
+      ->execute()->single()['id'];
+
+    Translation::save(FALSE)
+      ->setDefaults(['language' => 'es_ES', 'entity_table' => 'civicrm_msg_template', 'entity_id' => $id])
+      ->setRecords([
+        ['entity_field' => 'msg_html', 'string' => '<b>hola</b>'],
+        ['entity_field' => 'msg_subject', 'string' => 'hola'],
+        ['entity_field' => 'msg_text', 'string' => ''],
+      ])
+      ->setLanguage('es_ES')
+      ->execute();
+    $result = WorkflowMessage::render(FALSE)
+      ->setWorkflow($workflow)
+      ->execute()
+      ->single();
+    $this->assertEquals('hi', $result['text']);
+
+    $result = WorkflowMessage::render(FALSE)
+      ->setWorkflow($workflow)
+      ->setLanguage('es_ES')
+      ->execute()
+      ->single();
+
+    $this->assertArrayNotHasKey('text', $result);
   }
 
 }

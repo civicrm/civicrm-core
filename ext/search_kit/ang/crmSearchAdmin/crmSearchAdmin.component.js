@@ -424,8 +424,8 @@
         if (ctrl.mustAggregate(col)) {
           // Ensure all non-grouped columns are aggregated if using GROUP BY
           if (!info.fn || info.fn.category !== 'aggregate') {
-            var dflFn = searchMeta.getDefaultAggregateFn(info) || 'GROUP_CONCAT',
-              flagBefore = dflFn === 'GROUP_CONCAT' ? 'DISTINCT ' : '';
+            let dflFn = searchMeta.getDefaultAggregateFn(info, ctrl.savedSearch.api_params) || 'GROUP_CONCAT';
+            let flagBefore = dflFn === 'GROUP_CONCAT' ? 'DISTINCT ' : '';
             ctrl.savedSearch.api_params.select[pos] = dflFn + '(' + flagBefore + fieldExpr + ') AS ' + dflFn + '_' + fieldExpr.replace(/[.:]/g, '_');
           }
         } else {

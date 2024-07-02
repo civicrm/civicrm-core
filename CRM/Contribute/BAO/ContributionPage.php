@@ -742,11 +742,15 @@ WHERE entity_table = 'civicrm_contribution_page'
       'membership',
       'custom',
       'thankyou',
-      'friend',
       'pcp',
       'widget',
       'premium',
     ];
+
+    if (function_exists('tellafriend_civicrm_config')) {
+      $sections[] = 'friend';
+    }
+
     $query = "
    SELECT  civicrm_contribution_page.id as id,
            civicrm_contribution_page.financial_type_id as settings,

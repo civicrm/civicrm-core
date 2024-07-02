@@ -4,6 +4,7 @@
       onPreview: '&',
       tokenList: '<',
       disabled: '<',
+      original: '=',
       msgtpl: '='
     },
     templateUrl: '~/crmMsgadm/EditContent.html',
@@ -24,7 +25,7 @@
         }, opts);
       };
 
-      $ctrl.openFull = function(title, fld, monacoOptions) {
+      $ctrl.openFull = function(title, fld, monacoOptions, isDiff = false) {
         var model = {
           title: title,
           monacoOptions: $ctrl.monacoOptions(angular.extend({crmHeightPct: 0.80}, monacoOptions)),
@@ -33,7 +34,8 @@
           },
           record: $ctrl.msgtpl,
           field: fld,
-          tokenList: $ctrl.tokenList
+          tokenList: $ctrl.tokenList,
+          original: isDiff ? $ctrl.original[fld]: ''
         };
         var options = CRM.utils.adjustDialogDefaults({
           // show: {effect: 'slideDown'},

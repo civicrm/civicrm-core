@@ -151,7 +151,6 @@ return [
       'unique_name' => 'mailing_name',
       'input_attrs' => [
         'label' => ts('Name'),
-        'maxlength' => 128,
       ],
     ],
     'mailing_type' => [
@@ -160,9 +159,6 @@ return [
       'input_type' => 'Select',
       'description' => ts('differentiate between standalone mailings, A/B tests, and A/B final-winner'),
       'add' => '4.6',
-      'input_attrs' => [
-        'maxlength' => 32,
-      ],
       'pseudoconstant' => [
         'callback' => 'CRM_Mailing_PseudoConstant::mailingTypes',
       ],
@@ -174,7 +170,6 @@ return [
       'description' => ts('From Header of mailing'),
       'input_attrs' => [
         'label' => ts('From Name'),
-        'maxlength' => 128,
       ],
     ],
     'from_email' => [
@@ -184,7 +179,6 @@ return [
       'description' => ts('From Email of mailing'),
       'input_attrs' => [
         'label' => ts('From Email'),
-        'maxlength' => 128,
       ],
     ],
     'replyto_email' => [
@@ -194,7 +188,6 @@ return [
       'description' => ts('Reply-To Email of mailing'),
       'input_attrs' => [
         'label' => ts('Reply-To Email'),
-        'maxlength' => 128,
       ],
     ],
     'template_type' => [
@@ -205,9 +198,6 @@ return [
       'description' => ts('The language/processing system used for email templates.'),
       'add' => '4.7',
       'default' => 'traditional',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
       'pseudoconstant' => [
         'callback' => 'CRM_Mailing_BAO_Mailing::getTemplateTypeNames',
       ],
@@ -227,7 +217,6 @@ return [
       'description' => ts('Subject of mailing'),
       'input_attrs' => [
         'label' => ts('Subject'),
-        'maxlength' => 128,
       ],
     ],
     'body_text' => [
@@ -391,6 +380,69 @@ return [
         'format_type' => 'activityDateTime',
       ],
     ],
+    'start_date' => [
+      'title' => ts('Mailing Start Date'),
+      'sql_type' => 'timestamp',
+      'description' => ts('When the mailing started to go out'),
+      'required' => FALSE,
+      'usage' => [
+        'import' => FALSE,
+        'export' => FALSE,
+        'duplicate_matching' => FALSE,
+        'token' => FALSE,
+      ],
+      'default' => NULL,
+      'localizable' => 0,
+      'html' => [
+        'type' => 'Select Date',
+        'formatType' => 'activityDateTime',
+      ],
+      'readonly' => TRUE,
+      'add' => 5.76,
+    ],
+    'end_date' => [
+      'sql_type' => 'timestamp',
+      'title' => ts('Mailing End Date'),
+      'description' => ts('When the mailing finished going out.'),
+      'required' => FALSE,
+      'usage' => [
+        'import' => FALSE,
+        'export' => FALSE,
+        'duplicate_matching' => FALSE,
+        'token' => FALSE,
+      ],
+      'default' => NULL,
+      'localizable' => 0,
+      'html' => [
+        'type' => 'Select Date',
+        'formatType' => 'activityDateTime',
+      ],
+      'readonly' => TRUE,
+      'add' => 5.76,
+    ],
+    'status' => [
+      'title' => ts('Mailing Status'),
+      'sql_type' => 'varchar(32)',
+      'description' => ts('The status of this mailing'),
+      'maxlength' => 12,
+      'size' => CRM_Utils_Type::TWELVE,
+      'usage' => [
+        'import' => FALSE,
+        'export' => FALSE,
+        'duplicate_matching' => FALSE,
+        'token' => FALSE,
+      ],
+      'default' => 'Draft',
+      'localizable' => 0,
+      'html' => [
+        'type' => 'Select',
+      ],
+      'pseudoconstant' => [
+        'callback' => 'CRM_Core_SelectValues::getMailingJobStatus',
+      ],
+      'readonly' => TRUE,
+      'add' => 5.76,
+    ],
     'approver_id' => [
       'title' => ts('Approved By Contact ID'),
       'sql_type' => 'int unsigned',
@@ -451,7 +503,6 @@ return [
       'default' => 'Public Pages',
       'input_attrs' => [
         'label' => ts('Visibility'),
-        'maxlength' => 40,
       ],
       'pseudoconstant' => [
         'callback' => 'CRM_Core_SelectValues::groupVisibility',
@@ -509,9 +560,6 @@ return [
       'readonly' => TRUE,
       'description' => ts('Key for validating requests related to this mailing.'),
       'add' => '4.5',
-      'input_attrs' => [
-        'maxlength' => 16,
-      ],
     ],
     'location_type_id' => [
       'title' => ts('Location Type ID'),
@@ -542,7 +590,6 @@ return [
       'default' => 'automatic',
       'input_attrs' => [
         'label' => ts('Email Selection Method'),
-        'maxlength' => 20,
       ],
       'pseudoconstant' => [
         'callback' => 'CRM_Core_SelectValues::emailSelectMethods',
@@ -554,9 +601,6 @@ return [
       'input_type' => 'Select',
       'description' => ts('Language of the content of the mailing. Useful for tokens.'),
       'add' => '4.6',
-      'input_attrs' => [
-        'maxlength' => 5,
-      ],
       'pseudoconstant' => [
         'option_group_name' => 'languages',
         'key_column' => 'name',

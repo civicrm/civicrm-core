@@ -24,6 +24,17 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
   public $_values = [];
 
   /**
+   * @var int
+   * Billing type ID
+   */
+  protected $_bltID;
+
+  /**
+   * @var array
+   */
+  public $_paymentFields;
+
+  /**
    * @var array
    */
   public $_paymentProcessor;

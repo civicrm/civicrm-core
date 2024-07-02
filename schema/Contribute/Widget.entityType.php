@@ -56,9 +56,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Widget title.'),
       'add' => '2.0',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'url_logo' => [
       'title' => ts('Widget Image Url'),
@@ -66,9 +63,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('URL to Widget logo'),
       'add' => '2.0',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'button_title' => [
       'title' => ts('Button Title'),
@@ -76,9 +70,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Button title.'),
       'add' => '2.0',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'about' => [
       'title' => ts('Description'),
@@ -93,90 +84,60 @@ return [
       'input_type' => 'Text',
       'description' => ts('URL to Homepage.'),
       'add' => '2.0',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'color_title' => [
       'title' => ts('Title Color'),
       'sql_type' => 'varchar(10)',
       'input_type' => 'Text',
       'add' => '2.0',
-      'input_attrs' => [
-        'maxlength' => 10,
-      ],
     ],
     'color_button' => [
       'title' => ts('Button Color'),
       'sql_type' => 'varchar(10)',
       'input_type' => 'Text',
       'add' => '2.0',
-      'input_attrs' => [
-        'maxlength' => 10,
-      ],
     ],
     'color_bar' => [
       'title' => ts('Bar Color'),
       'sql_type' => 'varchar(10)',
       'input_type' => 'Text',
       'add' => '2.0',
-      'input_attrs' => [
-        'maxlength' => 10,
-      ],
     ],
     'color_main_text' => [
       'title' => ts('Main Text Color'),
       'sql_type' => 'varchar(10)',
       'input_type' => 'Text',
       'add' => '2.0',
-      'input_attrs' => [
-        'maxlength' => 10,
-      ],
     ],
     'color_main' => [
       'title' => ts('Main Color'),
       'sql_type' => 'varchar(10)',
       'input_type' => 'Text',
       'add' => '2.0',
-      'input_attrs' => [
-        'maxlength' => 10,
-      ],
     ],
     'color_main_bg' => [
       'title' => ts('Background Color'),
       'sql_type' => 'varchar(10)',
       'input_type' => 'Text',
       'add' => '2.0',
-      'input_attrs' => [
-        'maxlength' => 10,
-      ],
     ],
     'color_bg' => [
       'title' => ts('Other Background Color'),
       'sql_type' => 'varchar(10)',
       'input_type' => 'Text',
       'add' => '2.0',
-      'input_attrs' => [
-        'maxlength' => 10,
-      ],
     ],
     'color_about_link' => [
       'title' => ts('About Link Color'),
       'sql_type' => 'varchar(10)',
       'input_type' => 'Text',
       'add' => '2.0',
-      'input_attrs' => [
-        'maxlength' => 10,
-      ],
     ],
     'color_homepage_link' => [
       'title' => ts('Homepage Link Color'),
       'sql_type' => 'varchar(10)',
       'input_type' => 'Text',
       'add' => '2.0',
-      'input_attrs' => [
-        'maxlength' => 10,
-      ],
     ],
   ],
 ];

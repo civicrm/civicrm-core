@@ -401,6 +401,11 @@ class Admin {
         }
       }
     }
+    // Add contact joins to the contactType pseudo-entities
+    foreach (\CRM_Contact_BAO_ContactType::basicTypes() as $contactType) {
+      $joins += [$contactType => []];
+      $joins[$contactType] = array_merge($joins[$contactType], $joins['Contact']);
+    }
     return $joins;
   }
 

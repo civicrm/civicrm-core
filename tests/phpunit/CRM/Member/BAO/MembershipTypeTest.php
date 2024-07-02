@@ -182,7 +182,12 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
    */
   public function testGetMembershipTypeDetails(): void {
     $membershipTypeID = $this->createGeneralMembershipType();
-    $result = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($membershipTypeID);
+    $result = MembershipType::get(FALSE)
+      ->addSelect('id', 'name', 'duration_unit')
+      ->addWhere('id', '=', $membershipTypeID)
+      ->addWhere('is_active', '=', TRUE)
+      ->execute()
+      ->first();
 
     $this->assertEquals('General', $result['name'], 'Verify membership type details.');
     $this->assertEquals('year', $result['duration_unit'], 'Verify membership types details.');

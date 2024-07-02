@@ -121,9 +121,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Optional verbose description for the relationship.'),
       'add' => '1.5',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'is_permission_a_b' => [
       'title' => ts('Contact A has Permission Over Contact B'),

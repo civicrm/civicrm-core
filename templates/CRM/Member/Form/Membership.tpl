@@ -48,7 +48,7 @@
   {/if}
   {if $membershipMode}
   <div class="help">
-    {ts 1=$displayName 2=$registerMode}Use this form to submit Membership Record on behalf of %1. <strong>A %2 transaction will be submitted</strong> using the selected payment processor.{/ts}
+    {ts 1=$displayName|escape 2=$registerMode}Use this form to submit Membership Record on behalf of %1. <strong>A %2 transaction will be submitted</strong> using the selected payment processor.{/ts}
   </div>
   {/if}
   <div class="crm-block crm-form-block crm-membership-form-block">
@@ -602,16 +602,17 @@
       if (!priceSetId) {
         priceSetId = cj("#price_set_id").val();
       }
-        var fname = '#priceset';
+
         if ( !priceSetId ) {
         cj('#membership_type_id_1').val(0);
         CRM.buildCustomData('Membership', null);
 
         // hide price set fields.
-        cj( fname ).hide( );
+        cj('#priceset').empty();
 
         // show/hide price set amount and total amount.
         cj( "#mem_type_id").show( );
+
         var choose = "{/literal}{ts escape='js'}Choose price set{/ts}{literal}";
         cj("#price_set_id option[value='']").html( choose );
         cj( "#totalAmountORPriceSet" ).show( );
@@ -635,7 +636,7 @@
         async: false
       }).responseText;
 
-      cj( fname ).show( ).html( response );
+      cj('#priceset').show( ).html( response );
       // freeze total amount text field.
 
       cj( "#totalAmountORPriceSet" ).hide( );

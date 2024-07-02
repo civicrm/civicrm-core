@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Timezone'),
     'title_plural' => ts('Timezones'),
-    'description' => ts('FIXME'),
+    'description' => ts('Table containing a list of known timezones'),
     'add' => '1.8',
   ],
   'getFields' => fn() => [
@@ -27,9 +27,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Timezone full name'),
       'add' => '1.8',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'abbreviation' => [
       'title' => ts('Timezone Abbreviation'),
@@ -37,9 +34,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('ISO Code for timezone abbreviation'),
       'add' => '1.8',
-      'input_attrs' => [
-        'maxlength' => 3,
-      ],
     ],
     'gmt' => [
       'title' => ts('GMT Name of Timezone'),
@@ -47,9 +41,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('GMT name of the timezone'),
       'add' => '1.8',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'offset' => [
       'title' => ts('GMT Offset'),

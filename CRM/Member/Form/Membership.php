@@ -1496,7 +1496,7 @@ DESC limit 1");
     foreach ($this->getCreatedMemberships() as $membership) {
       $endDate = $membership['end_date'] ?? NULL;
     }
-    $statusMsg = ts('Membership for %1 has been updated.', [1 => $this->_memberDisplayName]);
+    $statusMsg = ts('Membership for %1 has been updated.', [1 => htmlentities($this->_memberDisplayName)]);
     if ($endDate) {
       $endDate = CRM_Utils_Date::customFormat($endDate);
       $statusMsg .= ' ' . ts('The Membership Expiration Date is %1.', [1 => $endDate]);
@@ -1514,7 +1514,7 @@ DESC limit 1");
     foreach ($this->getCreatedMemberships() as $membership) {
       $statusMsg[$membership['membership_type_id']] = ts('%1 membership for %2 has been added.', [
         1 => $this->allMembershipTypeDetails[$membership['membership_type_id']]['name'],
-        2 => $this->_memberDisplayName,
+        2 => htmlentities($this->_memberDisplayName),
       ]);
 
       $memEndDate = $membership['end_date'] ?? NULL;

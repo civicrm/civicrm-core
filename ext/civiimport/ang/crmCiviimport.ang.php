@@ -20,5 +20,4 @@ return [
     'ngRoute',
     'api4',
   ],
-  'settings' => [],
 ];

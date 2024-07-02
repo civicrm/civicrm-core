@@ -10,6 +10,7 @@
  */
 
 use Civi\Api4\Event\AuthorizeRecordEvent;
+use Civi\Api4\UFGroup;
 
 /**
  *
@@ -1296,150 +1297,21 @@ WHERE civicrm_event.is_active = 1
       $profileIds = $id;
     }
 
-    $val = $groupTitles = NULL;
-    foreach ($profileIds as $gid) {
-      if (CRM_Core_BAO_UFGroup::filterUFGroups($gid, $cid)) {
-        $values = [];
-        $fields = CRM_Core_BAO_UFGroup::getFields($gid, FALSE, CRM_Core_Action::VIEW,
-          NULL, NULL, FALSE, NULL,
-          FALSE, NULL, CRM_Core_Permission::CREATE,
-          'field_name', TRUE
-        );
+    $groups = $participantParams['group'] ?? NULL;
+    $note = $participantParams['note'] ?? NULL;
+    $displayValues = self::getProfileDisplay($profileIds, $cid, $participantId, $isTest, $groups, $note);
 
-        //this condition is added, since same contact can have multiple event registrations..
-        $params = [['participant_id', '=', $participantId, 0, 0]];
+    $groupTitles = UFGroup::get(FALSE)
+      ->addWhere('id', 'IN', $profileIds)
+      ->addSelect('frontend_title')
+      ->execute()->column('frontend_title');
 
-        //add participant id
-        $fields['participant_id'] = [
-          'name' => 'participant_id',
-          'title' => ts('Participant ID'),
-        ];
-        //check whether its a text drive
-        if ($isTest) {
-          $params[] = ['participant_test', '=', 1, 0, 0];
-        }
-
-        //display campaign on thankyou page.
-        if (array_key_exists('participant_campaign_id', $fields)) {
-          if ($participantId) {
-            $campaignId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant',
-              $participantId,
-              'campaign_id'
-            );
-            $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns($campaignId);
-            $values[$fields['participant_campaign_id']['title']] = CRM_Utils_Array::value($campaignId,
-              $campaigns
-            );
-          }
-          unset($fields['participant_campaign_id']);
-        }
-
-        $groupTitle = NULL;
-        foreach ($fields as $k => $v) {
-          if (!$groupTitle) {
-            $groupTitle = $v['groupDisplayTitle'];
-          }
-          // suppress all file fields from display
-          if (
-            CRM_Utils_Array::value('data_type', $v, '') == 'File' ||
-            CRM_Utils_Array::value('name', $v, '') == 'image_URL' ||
-            ($v['field_type'] ?? NULL) == 'Formatting'
-          ) {
-            unset($fields[$k]);
-          }
-        }
-
-        if ($groupTitle) {
-          $groupTitles[] = $groupTitle;
-        }
-        //display profile groups those are subscribed by participant.
-        if (($groups = CRM_Utils_Array::value('group', $participantParams)) &&
-          is_array($groups)
-        ) {
-          $grpIds = [];
-          foreach ($groups as $grpId => $isSelected) {
-            if ($isSelected) {
-              $grpIds[] = $grpId;
-            }
-          }
-          if (!empty($grpIds)) {
-            //get the group titles.
-            $grpTitles = [];
-            $query = 'SELECT title FROM civicrm_group where id IN ( ' . implode(',', $grpIds) . ' )';
-            $grp = CRM_Core_DAO::executeQuery($query);
-            while ($grp->fetch()) {
-              $grpTitles[] = $grp->title;
-            }
-            if (!empty($grpTitles) && !empty($fields['group']['title'])) {
-              $values[$fields['group']['title']] = implode(', ', $grpTitles);
-            }
-            unset($fields['group']);
-          }
-        }
-
-        CRM_Core_BAO_UFGroup::getValues($cid, $fields, $values, FALSE, $params);
-
-        //dev/event#10
-        //If the event profile includes a note field and the submitted value of
-        //that field is "", then remove the old note returned by getValues.
-        if (isset($participantParams['note']) && empty($participantParams['note'])) {
-          $noteKeyPos = array_search('note', array_keys($fields));
-          $valuesKeys = array_keys($values);
-          $values[$valuesKeys[$noteKeyPos]] = "";
-        }
-
-        if (isset($fields['participant_status_id']['title']) &&
-          isset($values[$fields['participant_status_id']['title']]) &&
-          is_numeric($values[$fields['participant_status_id']['title']])
-        ) {
-          $status = [];
-          $status = CRM_Event_PseudoConstant::participantStatus();
-          $values[$fields['participant_status_id']['title']] = $status[$values[$fields['participant_status_id']['title']]];
-        }
-
-        if (isset($fields['participant_role_id']['title']) &&
-          isset($values[$fields['participant_role_id']['title']]) &&
-          is_numeric($values[$fields['participant_role_id']['title']])
-        ) {
-          $roles = [];
-          $roles = CRM_Event_PseudoConstant::participantRole();
-          $values[$fields['participant_role_id']['title']] = $roles[$values[$fields['participant_role_id']['title']]];
-        }
-
-        if (isset($fields['participant_register_date']['title']) &&
-          isset($values[$fields['participant_register_date']['title']])
-        ) {
-          $values[$fields['participant_register_date']['title']] = CRM_Utils_Date::customFormat($values[$fields['participant_register_date']['title']]);
-        }
-
-        //handle fee_level for price set
-        if (isset($fields['participant_fee_level']['title']) &&
-          isset($values[$fields['participant_fee_level']['title']])
-        ) {
-          $feeLevel = explode(CRM_Core_DAO::VALUE_SEPARATOR,
-            $values[$fields['participant_fee_level']['title']]
-          );
-          foreach ($feeLevel as $key => $value) {
-            if (!$value) {
-              unset($feeLevel[$key]);
-            }
-          }
-          $values[$fields['participant_fee_level']['title']] = implode(',', $feeLevel);
-        }
-
-        unset($values[$fields['participant_id']['title']]);
-
-        $val[] = $values;
-      }
-    }
-
-    $template->assign($name, $val);
     $template->assign($name . '_grouptitle', $groupTitles);
 
     //return if we only require array of participant's info.
     if ($returnResults) {
-      if ($val) {
-        return [$val, $groupTitles];
+      if ($displayValues) {
+        return [$displayValues, $groupTitles];
       }
       return NULL;
     }
@@ -2116,24 +1988,21 @@ WHERE  ce.loc_block_id = $locBlockId";
    */
   private static function checkPermissionGetInfo($eventId = NULL) {
     $params = [
-      'check_permissions' => 1,
-      'return' => 'id, created_id',
-      'options' => ['limit' => 0],
+      'select' => ['id', 'created_id'],
     ];
     if ($eventId) {
-      $params['id'] = $eventId;
+      $params['where'] = [['id', '=', $eventId]];
     }
 
     $allEvents = [];
     $createdEvents = [];
-    $eventResult = civicrm_api3('Event', 'get', $params);
-    if ($eventResult['count'] > 0) {
-      $contactId = CRM_Core_Session::getLoggedInContactID();
-      foreach ($eventResult['values'] as $eventId => $eventDetail) {
-        $allEvents[$eventId] = $eventId;
-        if (isset($eventDetail['created_id']) && $contactId == $eventDetail['created_id']) {
-          $createdEvents[$eventId] = $eventId;
-        }
+    $eventResult = civicrm_api4('Event', 'get', $params);
+    $contactId = CRM_Core_Session::getLoggedInContactID();
+    foreach ($eventResult as $eventDetail) {
+      $eventId = $eventDetail['id'];
+      $allEvents[$eventId] = $eventId;
+      if (isset($eventDetail['created_id']) && $contactId == $eventDetail['created_id']) {
+        $createdEvents[$eventId] = $eventId;
       }
     }
     return [$allEvents, $createdEvents];
@@ -2470,6 +2339,149 @@ WHERE  ce.loc_block_id = $locBlockId";
     }
 
     return $return;
+  }
+
+  /**
+   * @param array $profileIds
+   * @param int $cid
+   * @param int $participantId
+   * @param bool $isTest Probably not required, even when true.
+   * @param array|null $groups group values from session
+   * @param string|null $note note values from session
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\Core\Exception\DBQueryException
+   */
+  public static function getProfileDisplay(array $profileIds, int $cid, int $participantId, bool $isTest = FALSE, ?array $groups = NULL, ?string $note = NULL): array {
+    foreach ($profileIds as $gid) {
+      if (CRM_Core_BAO_UFGroup::filterUFGroups($gid, $cid)) {
+        $values = [];
+        $fields = CRM_Core_BAO_UFGroup::getFields($gid, FALSE, CRM_Core_Action::VIEW,
+          NULL, NULL, FALSE, NULL,
+          FALSE, NULL, CRM_Core_Permission::CREATE,
+          'field_name', TRUE
+        );
+
+        //this condition is added, since same contact can have multiple event registrations..
+        $params = [['participant_id', '=', $participantId, 0, 0]];
+
+        //add participant id
+        $fields['participant_id'] = [
+          'name' => 'participant_id',
+          'title' => ts('Participant ID'),
+        ];
+        //check whether its a text drive
+        if ($isTest) {
+          $params[] = ['participant_test', '=', 1, 0, 0];
+        }
+
+        //display campaign on thankyou page.
+        if (array_key_exists('participant_campaign_id', $fields)) {
+          if ($participantId) {
+            $campaignId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant',
+              $participantId,
+              'campaign_id'
+            );
+            $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns($campaignId);
+            $values[$fields['participant_campaign_id']['title']] = CRM_Utils_Array::value($campaignId,
+              $campaigns
+            );
+          }
+          unset($fields['participant_campaign_id']);
+        }
+
+        foreach ($fields as $k => $v) {
+          // suppress all file fields from display
+          if (
+            ($v['data_type'] ?? '') == 'File' ||
+            ($v['name'] ?? '') == 'image_URL' ||
+            ($v['field_type'] ?? NULL) == 'Formatting'
+          ) {
+            unset($fields[$k]);
+          }
+        }
+
+        //display profile groups those are subscribed by participant.
+        if ($groups &&
+          is_array($groups)
+        ) {
+          $grpIds = [];
+          foreach ($groups as $grpId => $isSelected) {
+            if ($isSelected) {
+              $grpIds[] = $grpId;
+            }
+          }
+          if (!empty($grpIds)) {
+            //get the group titles.
+            $grpTitles = [];
+            $query = 'SELECT title FROM civicrm_group where id IN ( ' . implode(',', $grpIds) . ' )';
+            $grp = CRM_Core_DAO::executeQuery($query);
+            while ($grp->fetch()) {
+              $grpTitles[] = $grp->title;
+            }
+            if (!empty($grpTitles) && !empty($fields['group']['title'])) {
+              $values[$fields['group']['title']] = implode(', ', $grpTitles);
+            }
+            unset($fields['group']);
+          }
+        }
+
+        CRM_Core_BAO_UFGroup::getValues($cid, $fields, $values, FALSE, $params);
+
+        //dev/event#10
+        //If the event profile includes a note field and the submitted value of
+        //that field is "", then remove the old note returned by getValues.
+        if ($note === '') {
+          $noteKeyPos = array_search('note', array_keys($fields));
+          $valuesKeys = array_keys($values);
+          $values[$valuesKeys[$noteKeyPos]] = "";
+        }
+
+        if (isset($fields['participant_status_id']['title']) &&
+          isset($values[$fields['participant_status_id']['title']]) &&
+          is_numeric($values[$fields['participant_status_id']['title']])
+        ) {
+          // @todo - is this a thing?
+          $statusID = $values[$fields['participant_status_id']['title']];
+          $values[$fields['participant_status_id']['title']] = CRM_Core_PseudoConstant::getLabel('CRM_Event_BAO_Participant', 'status_id', $statusID);
+        }
+
+        if (isset($fields['participant_role_id']['title']) &&
+          isset($values[$fields['participant_role_id']['title']]) &&
+          is_numeric($values[$fields['participant_role_id']['title']])
+        ) {
+          $roleID = $values[$fields['participant_role_id']['title']];
+          $values[$fields['participant_role_id']['title']] = CRM_Core_PseudoConstant::getLabel('CRM_Event_BAO_Participant', 'role_id', $roleID);
+        }
+
+        if (isset($fields['participant_register_date']['title']) &&
+          isset($values[$fields['participant_register_date']['title']])
+        ) {
+          $values[$fields['participant_register_date']['title']] = CRM_Utils_Date::customFormat($values[$fields['participant_register_date']['title']]);
+        }
+
+        //handle fee_level for price set
+        if (isset($fields['participant_fee_level']['title']) &&
+          isset($values[$fields['participant_fee_level']['title']])
+        ) {
+          $feeLevel = explode(CRM_Core_DAO::VALUE_SEPARATOR,
+            $values[$fields['participant_fee_level']['title']]
+          );
+          foreach ($feeLevel as $key => $value) {
+            if (!$value) {
+              unset($feeLevel[$key]);
+            }
+          }
+          $values[$fields['participant_fee_level']['title']] = implode(',', $feeLevel);
+        }
+
+        unset($values[$fields['participant_id']['title']]);
+
+        $val[] = $values;
+      }
+    }
+    return $val;
   }
 
 }

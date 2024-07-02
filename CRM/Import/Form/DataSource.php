@@ -43,6 +43,10 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
    */
   protected $templateValues = [];
 
+  public function getTemplateFileName(): string {
+    return 'CRM/Import/Form/DataSource.tpl';
+  }
+
   /**
    * Set variables up before form is built.
    */

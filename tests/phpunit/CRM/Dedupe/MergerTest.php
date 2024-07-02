@@ -1481,9 +1481,6 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
       'civicrm_event' => [
         0 => 'created_id',
       ],
-      'civicrm_event_carts' => [
-        0 => 'user_id',
-      ],
       'civicrm_financial_account' => [
         0 => 'contact_id',
       ],
@@ -1567,6 +1564,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
         0 => 'created_id',
       ],
       'civicrm_saved_search' => ['created_id', 'modified_id'],
+      'civicrm_site_token' => ['created_id', 'modified_id'],
       'civicrm_relationship' => [
         0 => 'contact_id_a',
         1 => 'contact_id_b',

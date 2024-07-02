@@ -6,6 +6,7 @@
   angular.module('afGuiEditor').directive('afGuiFieldValue', function(afGui) {
     return {
       bindToController: {
+        op: '<?',
         field: '<afGuiFieldValue'
       },
       require: {
@@ -23,13 +24,18 @@
             $el = $($element),
             inputType = field.input_type,
             dataType = field.data_type;
-          multi = field.serialize || dataType === 'Array';
-          $el.crmAutocomplete('destroy').crmDatepicker('destroy');
-          // Allow input_type to override dataType
-          if (inputType) {
+
+          // Decide whether the input should be multivalued
+          if (ctrl.op) {
+            multi = ['IN', 'NOT IN'].includes(ctrl.op);
+          } else if (inputType) {
             multi = (dataType !== 'Boolean' &&
               (inputType === 'CheckBox' || (field.input_attrs && field.input_attrs.multiple)));
+          } else {
+            multi = field.serialize || dataType === 'Array';
           }
+          $el.crmAutocomplete('destroy').crmDatepicker('destroy');
+          // Allow input_type to override dataType
           if (inputType === 'Date') {
             $el.crmDatepicker({time: (field.input_attrs && field.input_attrs.time) || false});
           }

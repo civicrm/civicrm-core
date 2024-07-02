@@ -37,9 +37,6 @@ return [
       'required' => TRUE,
       'description' => ts('Name of table where item being referenced is stored.'),
       'add' => '1.5',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'entity_id' => [
       'title' => ts('Entity ID'),

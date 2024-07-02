@@ -78,7 +78,6 @@ return [
       ],
       'input_attrs' => [
         'label' => ts('Name'),
-        'maxlength' => 255,
       ],
     ],
     'title' => [
@@ -94,7 +93,6 @@ return [
       ],
       'input_attrs' => [
         'label' => ts('Title'),
-        'maxlength' => 255,
       ],
     ],
     'description' => [
@@ -192,7 +190,6 @@ return [
       ],
       'input_attrs' => [
         'label' => ts('External ID'),
-        'maxlength' => 32,
       ],
     ],
     'parent_id' => [

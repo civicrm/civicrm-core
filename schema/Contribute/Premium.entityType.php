@@ -28,9 +28,6 @@ return [
       'required' => TRUE,
       'description' => ts('Joins these premium settings to another object. Always civicrm_contribution_page for now.'),
       'add' => '1.4',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
       'pseudoconstant' => [
         'callback' => 'CRM_Contribute_BAO_Premium::entityTables',
       ],
@@ -62,9 +59,6 @@ return [
       'localizable' => TRUE,
       'description' => ts('Title for Premiums section.'),
       'add' => '1.4',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'premiums_intro_text' => [
       'title' => ts('Premium Introductory Text'),
@@ -80,9 +74,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('This email address is included in receipts if it is populated and a premium has been selected.'),
       'add' => '1.4',
-      'input_attrs' => [
-        'maxlength' => 100,
-      ],
     ],
     'premiums_contact_phone' => [
       'title' => ts('Premiums Contact Phone'),
@@ -90,9 +81,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('This phone number is included in receipts if it is populated and a premium has been selected.'),
       'add' => '1.4',
-      'input_attrs' => [
-        'maxlength' => 50,
-      ],
     ],
     'premiums_display_min_contribution' => [
       'title' => ts('Display Minimum Contribution?'),
@@ -110,9 +98,6 @@ return [
       'localizable' => TRUE,
       'description' => ts('Label displayed for No Thank-you option in premiums block (e.g. No thank you)'),
       'add' => '4.3',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'premiums_nothankyou_position' => [
       'title' => ts('No Thank-you Position'),

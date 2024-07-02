@@ -31,6 +31,8 @@ class CRM_Contact_Form_Task_Map_Event extends CRM_Contact_Form_Task_Map {
       $this, FALSE
     );
     $type = 'Event';
+    $this->assign('profileGID');
+    $this->assign('showDirectly', FALSE);
     self::createMapXML($ids, $lid, $this, TRUE, $type);
     $this->assign('single', FALSE);
     $this->assign('skipLocationType', TRUE);

@@ -56,6 +56,13 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
   }
 
   /**
+   * @return array
+   */
+  protected function getFieldsToExcludeFromPurification(): array {
+    return ['body_html', 'html_message'];
+  }
+
+  /**
    * Because `CRM_Mailing_BAO_Mailing::commonCompose` uses different fieldNames than `CRM_Core_DAO_ActionSchedule`.
    * @var array
    */

@@ -81,13 +81,13 @@
       <tr ng-repeat="(index, row) in data.importMappings">
         <td ng-if="data.showColumnNames" >{{ row['header'] }}</td>
         <td ng-repeat="(rowNumber, rowValues) in data.rows" class="odd-row">
-          <span ng-repeat="rowValue in rowValues track by $index"><span ng-if="index == $index">{{ rowValue }}</span></span>
+          <span ng-repeat="rowValue in rowValues track by $index"><span ng-if="index == $index && row['header']">{{ rowValue }}</span></span>
         </td>
         <td class="even-row">
           <div>
             <div>
               <label>
-                <input id='mapper[{{index}}][0]' name='mapper[{{index}}][0]' class="big" crm-ui-select='{data: getFields, allowClear: true, placeholder: "do not import"}' ng-model="row['selectedField']" />
+                <input ng-change="alterRow(index, row)" id='mapper[{{index}}][0]' name='mapper[{{index}}][0]' class="big" crm-ui-select='{data: getFields, allowClear: true, placeholder: "do not import"}' ng-model="row['selectedField']" />
               </label>
             </div>
           </div>
@@ -103,6 +103,7 @@
         </td>
       </tr>
     </table>
+    <button ng-click="addRow()" type="button" class="crm-button"><i aria-hidden="true" class="crm-i fa-plus"></i>{{:: ts('Add Row') }}</button>
   </div>
 
 </div>

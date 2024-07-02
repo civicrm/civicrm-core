@@ -23,10 +23,10 @@ class CRM_Event_Form_SearchTest extends CiviUnitTestCase {
     $priceFieldValues = $priceFieldValues['values'];
     $this->participantPrice = reset($priceFieldValues);
 
-    $this->participantCreate([
+    $this->callAPISuccess('Participant', 'create', [
       'event_id'  => $event['id'],
       'contact_id' => $individualID,
-      'status_id' => 1,
+      'status_id.name' => 'Registered',
       'fee_level' => $this->participantPrice['label'],
       'fee_amount' => $this->participantPrice['amount'],
       'fee_currency' => 'USD',

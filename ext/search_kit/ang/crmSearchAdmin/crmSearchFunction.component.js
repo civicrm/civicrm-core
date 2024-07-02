@@ -103,9 +103,24 @@
       this.getFunctions = function() {
         var allowedTypes = [], functions = [];
         if (ctrl.expr && ctrl.fieldArg) {
+          // Field in select clause that can be aggregated
           if (ctrl.mode !== 'groupBy' && ctrl.crmSearchAdmin.canAggregate(ctrl.expr)) {
             allowedTypes.push('aggregate');
+            // In addition to aggregate functions, also permit a function used in the groupBy clause
+            ctrl.crmSearchAdmin.savedSearch.api_params.groupBy.forEach(function(fieldStr) {
+              if (fieldStr.includes(ctrl.fieldArg.field.name) && fieldStr.includes('(')) {
+                let fieldExpr = searchMeta.parseExpr(fieldStr);
+                let field = _.findWhere(fieldExpr.args, {type: 'field'});
+                if (fieldExpr.fn && fieldExpr.fn.name !== 'e' && field && field.field.name === ctrl.fieldArg.field.name) {
+                  functions.push({
+                    text: allTypes[fieldExpr.fn.category],
+                    children: formatForSelect2([fieldExpr.fn], 'name', 'title', ['description'])
+                  });
+                }
+              }
+            });
           }
+          // Field in groupBy clause or field in select clause that isn't required to be aggregated
           if (ctrl.mode === 'groupBy' || !ctrl.crmSearchAdmin.mustAggregate(ctrl.expr)) {
             allowedTypes.push('comparison', 'string');
             if (_.includes(['Integer', 'Float', 'Date', 'Timestamp', 'Money'], ctrl.fieldArg.field.data_type)) {

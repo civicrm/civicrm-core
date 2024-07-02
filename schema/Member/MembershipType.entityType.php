@@ -72,7 +72,6 @@ return [
       ],
       'input_attrs' => [
         'label' => ts('Name'),
-        'maxlength' => 128,
       ],
     ],
     'description' => [
@@ -86,7 +85,6 @@ return [
         'rows' => 6,
         'cols' => 50,
         'label' => ts('Description'),
-        'maxlength' => 255,
       ],
     ],
     'member_of_contact_id' => [
@@ -108,7 +106,7 @@ return [
     'financial_type_id' => [
       'title' => ts('Financial Type ID'),
       'sql_type' => 'int unsigned',
-      'input_type' => 'EntityRef',
+      'input_type' => 'Select',
       'required' => TRUE,
       'description' => ts('If membership is paid by a contribution - what financial type should be used. FK to civicrm_financial_type.id'),
       'add' => '4.3',
@@ -143,9 +141,6 @@ return [
       'required' => TRUE,
       'description' => ts('Unit in which membership period is expressed.'),
       'add' => '1.5',
-      'input_attrs' => [
-        'maxlength' => 8,
-      ],
       'pseudoconstant' => [
         'callback' => 'CRM_Core_SelectValues::membershipTypeUnitList',
       ],
@@ -164,9 +159,6 @@ return [
       'required' => TRUE,
       'description' => ts('Rolling membership period starts on signup date. Fixed membership periods start on fixed_period_start_day.'),
       'add' => '1.5',
-      'input_attrs' => [
-        'maxlength' => 8,
-      ],
       'pseudoconstant' => [
         'callback' => 'CRM_Core_SelectValues::periodType',
       ],
@@ -192,9 +184,6 @@ return [
       'description' => ts('FK to Relationship Type ID'),
       'add' => '1.5',
       'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_TRIMMED,
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'relationship_direction' => [
       'title' => ts('Relationship Direction'),
@@ -204,7 +193,6 @@ return [
       'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_TRIMMED,
       'input_attrs' => [
         'label' => ts('Relationship Direction'),
-        'maxlength' => 128,
       ],
     ],
     'max_related' => [
@@ -222,9 +210,6 @@ return [
       'sql_type' => 'varchar(64)',
       'input_type' => 'Select',
       'add' => '1.5',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
       'pseudoconstant' => [
         'callback' => 'CRM_Core_SelectValues::memberVisibility',
       ],
@@ -244,7 +229,6 @@ return [
       'input_attrs' => [
         'rows' => 6,
         'cols' => 50,
-        'maxlength' => 255,
       ],
     ],
     'receipt_text_renewal' => [
@@ -256,7 +240,6 @@ return [
       'input_attrs' => [
         'rows' => 6,
         'cols' => 50,
-        'maxlength' => 255,
       ],
     ],
     'auto_renew' => [

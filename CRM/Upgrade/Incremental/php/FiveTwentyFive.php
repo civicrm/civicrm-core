@@ -37,7 +37,7 @@ class CRM_Upgrade_Incremental_php_FiveTwentyFive extends CRM_Upgrade_Incremental
     $reports = CRM_Core_DAO::executeQuery("SELECT id FROM civicrm_report_instance WHERE form_values like '%relative%'");
     while ($reports->fetch()) {
       $report = civicrm_api3('ReportInstance', 'getsingle', ['id' => $reports->id]);
-      $reportFormValues = unserialize($report['form_values']);
+      $reportFormValues = @unserialize($report['form_values']);
       foreach ($reportFormValues as $index => $value) {
         if (strpos($index, '_relative') !== FALSE) {
           $date_fields[] = str_replace('_relative', '', $index);

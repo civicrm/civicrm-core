@@ -24,18 +24,12 @@ return [
       'input_type' => 'Text',
       'required' => TRUE,
       'description' => ts('Type of bounce'),
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'description' => [
       'title' => ts('Bounce Type Description'),
       'sql_type' => 'varchar(2048)',
       'input_type' => 'Text',
       'description' => ts('A description of this bounce type'),
-      'input_attrs' => [
-        'maxlength' => 2048,
-      ],
     ],
     'hold_threshold' => [
       'title' => ts('Hold Threshold'),

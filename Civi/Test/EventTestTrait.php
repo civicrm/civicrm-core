@@ -293,7 +293,7 @@ trait EventTestTrait {
         'module' => $additionalSuffix ? 'CiviEvent_Additional' : 'CiviEvent',
         'entity_table' => 'civicrm_event',
         'uf_group_id:name' => $profileName,
-        'entity_table' => 'civicrm_event',
+        'weight' => $profile['weight'],
         'entity_id' => $this->getEventID($identifier),
       ])->execute()->first(), $profileIdentifier);
     }

@@ -78,6 +78,10 @@ abstract class CRM_Utils_System_Base {
    *   or equal 0 if not in print mode.
    */
   public static function getContentTemplate($print = 0): string {
+    if ($print === CRM_Core_Smarty::PRINT_JSON) {
+      return 'CRM/common/snippet.tpl';
+    }
+
     switch ($print) {
       case 0:
         // Not a print context.

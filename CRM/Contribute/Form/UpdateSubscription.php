@@ -65,7 +65,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
 
     $this->assign('contactId', $this->getSubscriptionContactID());
     $this->assign('membershipID', $this->getMembershipID());
-    $this->assign('membershipName', $this->getMembershipValue('name'));
+    $this->assign('membershipName', $this->getMembershipValue('membership_type_id.name'));
 
     $this->assign('self_service', $this->isSelfService());
     $this->assign('recur_frequency_interval', $this->getContributionRecurValue('frequency_interval'));

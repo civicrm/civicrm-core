@@ -688,7 +688,7 @@
      <title>Price Sets</title>
      <page_callback>CRM_Price_Page_Set</page_callback>
      <desc>Price sets allow you to offer multiple options with associated fees (e.g. pre-conference workshops, additional meals, etc.). Configure Price Sets for events which need more than a single set of fee levels.</desc>
-     <access_arguments>access CiviCRM,access CiviEvent</access_arguments>
+     <access_arguments>access CiviCRM</access_arguments>
      <adminGroup>Customize</adminGroup>
      <weight>380</weight>
   </item>
@@ -697,14 +697,14 @@
      <title>New Price Set</title>
      <page_callback>CRM_Price_Page_Set</page_callback>
      <desc>Price sets allow you to offer multiple options with associated fees (e.g. pre-conference workshops, additional meals, etc.). Configure Price Sets for events which need more than a single set of fee levels.</desc>
-     <access_arguments>access CiviCRM,access CiviEvent</access_arguments>
+     <access_arguments>access CiviCRM</access_arguments>
      <path_arguments>action=add</path_arguments>
   </item>
   <item>
      <path>civicrm/admin/price/edit</path>
      <title>Price Sets</title>
      <page_callback>CRM_Price_Page_Set</page_callback>
-     <access_arguments>access CiviCRM,access CiviEvent</access_arguments>
+     <access_arguments>access CiviCRM</access_arguments>
   </item>
   <item>
      <path>civicrm/admin/price/field</path>

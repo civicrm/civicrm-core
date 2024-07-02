@@ -134,9 +134,6 @@ return [
       'description' => ts('3 character string, value from config setting or input via user.'),
       'add' => '3.2',
       'default' => NULL,
-      'input_attrs' => [
-        'maxlength' => 3,
-      ],
       'pseudoconstant' => [
         'table' => 'civicrm_currency',
         'key_column' => 'name',
@@ -154,9 +151,6 @@ return [
       'add' => '2.1',
       'unique_name' => 'pledge_frequency_unit',
       'default' => 'month',
-      'input_attrs' => [
-        'maxlength' => 8,
-      ],
       'pseudoconstant' => [
         'option_group_name' => 'recur_frequency_units',
         'key_column' => 'name',

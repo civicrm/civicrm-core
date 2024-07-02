@@ -46,7 +46,7 @@ class FinancialTypeTest extends BaseTestClass {
       'delete' => ts('delete'),
     ];
     $financialTypes = \CRM_Contribute_BAO_Contribution::buildOptions('financial_type_id', 'validate');
-    foreach ($financialTypes as $id => $type) {
+    foreach ($financialTypes as $type) {
       foreach ($actions as $action => $action_ts) {
         $this->assertEquals(
           [
@@ -55,6 +55,7 @@ class FinancialTypeTest extends BaseTestClass {
               2 => $type,
             ]),
             'description' => ts('%1 contributions of type %2', [1 => $action_ts, 2 => $type]),
+            'implied_by' => [ts('%1 contributions of all types', [1 => $action_ts])],
           ],
           $permissions[$action . ' contributions of type ' . $type]
         );

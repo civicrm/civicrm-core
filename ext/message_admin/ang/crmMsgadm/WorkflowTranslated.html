@@ -21,6 +21,9 @@
     <tbody>
     <tr ng-repeat="record in $ctrl.records | filter:filters.text | filter:{_is_visible: true} | orderBy:['msg_title','!_is_primary','tx_language_label']">
       <td>{{record.msg_title}}</td>
+      <td  class="text-right">
+        <a ng-show="record.master_id" class="btn btn-xs btn-default" ng-click="$ctrl.revert(record)">{{:: ts('Revert') }}</a>
+      </td>
       <td>{{record.tx_language_label || ts('Standard')}}</td>
       <td>
         <span ng-if="!record.tx_language || !!record.tx_statuses.active">

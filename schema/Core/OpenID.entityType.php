@@ -77,9 +77,6 @@ return [
         'export',
         'duplicate_matching',
       ],
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'allowed_to_login' => [
       'title' => ts('Allowed to login?'),

@@ -28,9 +28,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Name for Membership Status'),
       'add' => '1.5',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'entity_id' => [
       'title' => ts('Entity ID'),
@@ -54,9 +51,6 @@ return [
       'description' => ts('Membership types to be exposed by this block'),
       'add' => '1.5',
       'serialize' => CRM_Core_DAO::SERIALIZE_PHP,
-      'input_attrs' => [
-        'maxlength' => 1024,
-      ],
     ],
     'membership_type_default' => [
       'title' => ts('Default Type ID'),
@@ -97,9 +91,6 @@ return [
       'localizable' => TRUE,
       'description' => ts('Title to display at top of block'),
       'add' => '1.5',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'new_text' => [
       'title' => ts('Membership Block New Text'),
@@ -116,9 +107,6 @@ return [
       'localizable' => TRUE,
       'description' => ts('Title for renewal'),
       'add' => '1.5',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'renewal_text' => [
       'title' => ts('Membership Block Renewal Text'),

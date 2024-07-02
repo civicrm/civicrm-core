@@ -38,9 +38,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('mime type of the document'),
       'add' => '1.5',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'uri' => [
       'title' => ts('Path'),
@@ -48,9 +45,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('uri of the file on disk'),
       'add' => '1.5',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'document' => [
       'title' => ts('File Contents'),
@@ -65,9 +59,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Additional descriptive text regarding this attachment (optional).'),
       'add' => '1.5',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'upload_date' => [
       'title' => ts('File Upload Date'),

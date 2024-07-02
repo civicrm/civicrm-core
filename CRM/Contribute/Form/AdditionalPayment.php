@@ -25,6 +25,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
   use CRM_Contact_Form_ContactFormTrait;
   use CRM_Contribute_Form_ContributeFormTrait;
   use CRM_Event_Form_EventFormTrait;
+  use CRM_Custom_Form_CustomDataTrait;
 
   /**
    * Id of the component entity
@@ -229,6 +230,13 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $this->assign('displayName', $this->getContactValue('display_name'));
     $this->assign('component', $this->_component);
     $this->assign('email', $this->_contributorEmail);
+    if ($this->isSubmitted()) {
+      // The custom data fields are added to the form by an ajax form.
+      // However, if they are not present in the element index they will
+      // not be available from `$this->getSubmittedValue()` in post process.
+      // We do not have to set defaults or otherwise render - just add to the element index.
+      $this->addCustomDataFieldsToForm('FinancialTrxn');
+    }
 
     $js = NULL;
     // render backoffice payment fields only on offline mode
@@ -295,8 +303,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
    * @throws \CRM_Core_Exception
    */
   public function postProcess() {
-    $submittedValues = $this->controller->exportValues($this->_name);
-    $this->submit($submittedValues);
+    $this->submit($this->getSubmittedValues());
     $session = CRM_Core_Session::singleton();
     $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view',
       "reset=1&cid={$this->_contactId}&selectedChild=" . $this->getParticipantID() ? 'participant' : 'contribute'
@@ -339,7 +346,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       'trxn_date' => $this->getSubmittedValue('trxn_date'),
       // This form sends payment notification only, for historical reasons.
       'is_send_contribution_notification' => FALSE,
-    ];
+    ] + $this->getSubmittedCustomFields();
     $paymentID = civicrm_api3('Payment', 'create', $trxnsData)['id'];
     $contributionAddressID = CRM_Contribute_BAO_Contribution::createAddress($this->getSubmittedValues());
     if ($contributionAddressID) {
@@ -392,6 +399,22 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     ]);
 
     if ($paymentParams['amount'] > 0.0) {
+      if (!empty($this->contributionID)) {
+        if (empty($paymentParams['description'])) {
+          $paymentParams['description'] = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $this->_contributionId, 'source');
+        }
+
+        if (empty($paymentParams['financial_type_id'])) {
+          $financialTypeID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $this->_contributionId, 'financial_type_id');
+          $paymentParams['financial_type_id'] = CRM_Financial_BAO_FinancialAccount::getAccountingCode($financialTypeID);
+        }
+
+        if (empty($paymentParams['contributionType_accounting_code'])) {
+          // anticipate standardizing on 'financial_type_id' but until the payment processor code is updated, we need to set this param
+          $paymentParams['contributionType_accounting_code'] = $paymentParams['financial_type_id'];
+        }
+      }
+
       try {
         // Re-retrieve the payment processor in case the form changed it, CRM-7179
         $payment = \Civi\Payment\System::singleton()->getById($this->getPaymentProcessorID());

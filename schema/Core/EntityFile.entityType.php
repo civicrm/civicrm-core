@@ -40,9 +40,6 @@ return [
       'required' => TRUE,
       'description' => ts('physical tablename for entity being joined to file, e.g. civicrm_contact'),
       'add' => '1.5',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
       'pseudoconstant' => [
         'callback' => 'CRM_Core_BAO_File::getEntityTables',
       ],

@@ -47,7 +47,6 @@ return [
       'add' => '1.1',
       'input_attrs' => [
         'label' => ts('Reference Type'),
-        'maxlength' => 64,
       ],
       'pseudoconstant' => [
         'option_group_name' => 'note_used_for',
@@ -144,7 +143,6 @@ return [
       'add' => '1.5',
       'input_attrs' => [
         'size' => '60',
-        'maxlength' => 255,
       ],
     ],
     'privacy' => [
@@ -155,9 +153,6 @@ return [
       'description' => ts('Foreign Key to Note Privacy Level (which is an option value pair and hence an implicit FK)'),
       'add' => '3.3',
       'default' => '0',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
       'pseudoconstant' => [
         'option_group_name' => 'note_privacy',
       ],

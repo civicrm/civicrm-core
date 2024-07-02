@@ -52,7 +52,6 @@ return [
       ],
       'input_attrs' => [
         'label' => ts('Entity Type'),
-        'maxlength' => 64,
       ],
       'pseudoconstant' => [
         'callback' => 'CRM_Financial_BAO_EntityFinancialAccount::entityTables',
