@@ -128,7 +128,7 @@ class Authenticator extends AutoService implements HookInterface {
     ]);
 
     if (isset($tgt->cred)) {
-      if ($principal = $this->checkCredential($tgt)) {
+      if ($principal = $this->checkCredential($tgt, implode('/', $e->args))) {
         $tgt->setPrincipal($principal);
       }
     }
@@ -163,7 +163,7 @@ class Authenticator extends AutoService implements HookInterface {
       'useSession' => $details['useSession'] ?? FALSE,
     ]);
 
-    if ($principal = $this->checkCredential($tgt)) {
+    if ($principal = $this->checkCredential($tgt, implode('/', $e->args))) {
       $tgt->setPrincipal($principal);
     }
 
@@ -175,18 +175,20 @@ class Authenticator extends AutoService implements HookInterface {
    * Assess the credential ($tgt->cred) and determine the matching principal.
    *
    * @param \Civi\Authx\AuthenticatorTarget $tgt
+   * @param string $requestPath
+   *   Ex: 'civicrm/dashboard'
    * @return array|NULL
    *   Array describing the authenticated principal represented by this credential.
    *   Ex: ['userId' => 123]
    *   Format should match setPrincipal().
    * @see \Civi\Authx\AuthenticatorTarget::setPrincipal()
    */
-  protected function checkCredential($tgt) {
+  protected function checkCredential($tgt, $requestPath) {
     // In order of priority, each subscriber will either:
     // 1. Accept the cred, which stops event propagation and further checks;
     // 2. Reject the cred, which stops event propagation and further checks;
     // 3. Neither accept nor reject, letting the event continue on to the next.
-    $checkEvent = new CheckCredentialEvent($tgt->cred);
+    $checkEvent = new CheckCredentialEvent($tgt->cred, $requestPath);
     \Civi::dispatcher()->dispatch('civi.authx.checkCredential', $checkEvent);
 
     if ($checkEvent->getRejection()) {
