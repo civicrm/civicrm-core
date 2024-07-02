@@ -119,6 +119,10 @@ trait ArrayQueryActionTrait {
     if (isset($index) && is_array($value) && $operator !== 'IN' && $operator !== 'NOT IN') {
       $value = $value[$index] ?? NULL;
     }
+    return self::compareValues($value, $operator, $expected);
+  }
+
+  public static function compareValues($value, string $operator, $expected): bool {
     switch ($operator) {
       case '=':
       case '!=':

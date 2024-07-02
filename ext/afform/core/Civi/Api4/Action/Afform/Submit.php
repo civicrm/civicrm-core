@@ -2,6 +2,7 @@
 
 namespace Civi\Api4\Action\Afform;
 
+use Civi\Api4\Generic\Traits\ArrayQueryActionTrait;
 use CRM_Afform_ExtensionUtil as E;
 use Civi\Afform\Event\AfformSubmitEvent;
 use Civi\Afform\Event\AfformValidateEvent;
@@ -15,6 +16,8 @@ use Civi\Api4\Utils\CoreUtil;
  * @package Civi\Api4\Action\Afform
  */
 class Submit extends AbstractProcessor {
+
+  use ArrayQueryActionTrait;
 
   /**
    * @deprecated - You may simply use the event name directly. dev/core#1744
@@ -108,19 +111,19 @@ class Submit extends AbstractProcessor {
    * @param \Civi\Afform\Event\AfformValidateEvent $event
    */
   public static function validateRequiredFields(AfformValidateEvent $event): void {
-    foreach ($event->getFormDataModel()->getEntities() as $entityName => $entity) {
-      $entityValues = $event->getEntityValues()[$entityName] ?? [];
+    foreach ($event->getFormDataModel()->getEntities() as $afEntityName => $afEntity) {
+      $entityValues = $event->getEntityValues()[$afEntityName] ?? [];
       foreach ($entityValues as $values) {
-        foreach ($entity['fields'] as $fieldName => $attributes) {
-          $error = self::getRequiredFieldError($entity['type'], $fieldName, $attributes, $values['fields'][$fieldName] ?? NULL);
+        foreach ($afEntity['fields'] as $fieldName => $attributes) {
+          $error = self::getRequiredFieldError($event, $afEntity['type'], $fieldName, $attributes, $values['fields'][$fieldName] ?? NULL);
           if ($error) {
             $event->setError($error);
           }
         }
-        foreach ($entity['joins'] as $joinEntity => $join) {
+        foreach ($afEntity['joins'] as $joinEntity => $join) {
           foreach ($values['joins'][$joinEntity] ?? [] as $joinIndex => $joinValues) {
             foreach ($join['fields'] ?? [] as $fieldName => $attributes) {
-              $error = self::getRequiredFieldError($joinEntity, $fieldName, $attributes, $joinValues[$fieldName] ?? NULL);
+              $error = self::getRequiredFieldError($event, $joinEntity, $fieldName, $attributes, $joinValues[$fieldName] ?? NULL, $joinEntity);
               if ($error) {
                 $event->setError($error);
               }
@@ -129,6 +132,61 @@ class Submit extends AbstractProcessor {
         }
       }
     }
+  }
+
+  /**
+   * PHP interpretation of the "af-if" directive to determine conditional status.
+   * @return bool - Is this conditional true or not.
+   */
+  public static function checkAfformConditional(array $conditional, array $allEntityValues) : bool {
+    foreach ($conditional as $clause) {
+      $clauseResult = self::checkAfformConditionalClause($clause, $allEntityValues);
+      if (!$clauseResult) {
+        return FALSE;
+      }
+    }
+    return TRUE;
+  }
+
+  private static function checkAfformConditionalClause(array $clause, array $allEntityValues) {
+    if ($clause[0] == 'OR') {
+      // recurse here.
+      $orResult = FALSE;
+      foreach ($clause[1] as $subClause) {
+        $orResult = $orResult || self::checkAfformConditionalClause($subClause, $allEntityValues);
+      }
+      return $orResult;
+    }
+    else {
+      $submittedValue = self::getValueFromEntity($clause[0], $allEntityValues);
+      // `==` is deprecated in favor of `=`
+      $op = $clause[1] === '==' ? '=' : $clause[1];
+      $expected = isset($clause[2]) ? \CRM_Utils_JS::decode($clause[2]) : NULL;
+      return self::compareValues($submittedValue, $op, $expected);
+    }
+  }
+
+  /**
+   * Given a value like "Individual1[0][fields][Volunteer_Info.Residency_History]", searches a multi-dimensional array for the corresponding value if it exists.
+   */
+  private static function getValueFromEntity(string $getThisValue, array $allEntityValues) {
+    $keys = explode('[', str_replace(']', '', $getThisValue));
+
+    // Initialize the value to the original array
+    $value = $allEntityValues;
+
+    foreach ($keys as $key) {
+      // Strip quotes from array key
+      $key = trim($key, '\'"');
+      if (isset($value[$key])) {
+        $value = $value[$key];
+      }
+      else {
+        // If any key is not found, return null
+        return NULL;
+      }
+    }
+    return $value;
   }
 
   /**
@@ -164,13 +222,14 @@ class Submit extends AbstractProcessor {
   /**
    * If a required field is missing a value, return an error message
    *
+   * @param \Civi\Afform\Event\AfformValidateEvent $event
    * @param string $apiEntity
    * @param string $fieldName
    * @param array $attributes
    * @param mixed $value
    * @return string|null
    */
-  private static function getRequiredFieldError(string $apiEntity, string $fieldName, $attributes, $value) {
+  private static function getRequiredFieldError(AfformValidateEvent $event, string $apiEntity, string $fieldName, $attributes, $value) {
     // If we have a value, no need to check if required
     if ($value || is_numeric($value) || is_bool($value)) {
       return NULL;
@@ -187,7 +246,17 @@ class Submit extends AbstractProcessor {
     }
 
     $isRequired = $attributes['defn']['required'] ?? $fullDefn['required'] ?? FALSE;
+    $isVisible = TRUE;
     if ($isRequired) {
+      $conditionals = $attributes['af-if'] ?? [];
+      foreach ($conditionals as $conditional) {
+        $isVisible = self::checkAfformConditional($conditional, $event->getEntityValues());
+        if (!$isVisible) {
+          break;
+        }
+      }
+    }
+    if ($isRequired && $isVisible) {
       $label = $attributes['defn']['label'] ?? $fullDefn['label'] ?? $fieldName;
       return E::ts('%1 is a required field.', [1 => $label]);
     }
