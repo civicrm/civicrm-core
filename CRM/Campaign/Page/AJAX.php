@@ -21,6 +21,7 @@
 class CRM_Campaign_Page_AJAX {
 
   public static function registerInterview() {
+    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
     $fields = [
       'result',
       'voter_id',

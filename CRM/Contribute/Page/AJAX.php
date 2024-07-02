@@ -24,6 +24,7 @@ class CRM_Contribute_Page_AJAX {
    * Get Soft credit to list in DT
    */
   public static function getSoftContributionRows() {
+    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
     $requiredParameters = [
       'cid' => 'Integer',
       'context' => 'String',

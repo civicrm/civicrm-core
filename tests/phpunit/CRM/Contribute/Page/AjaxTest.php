@@ -37,6 +37,7 @@ class CRM_Contribute_Page_AjaxTest extends CiviUnitTestCase {
     foreach ([0, 1, 2] as $seq) {
       $this->individualCreate([], 'individual_' . $seq);
     }
+    $_SERVER['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest';
   }
 
   /**
