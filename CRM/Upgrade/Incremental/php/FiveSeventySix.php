@@ -43,6 +43,9 @@ class CRM_Upgrade_Incremental_php_FiveSeventySix extends CRM_Upgrade_Incremental
     if (!CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_extension WHERE full_name = "eventcart"')) {
       $this->addTask('Remove data related to disabled even cart extension', 'removeEventCartAssets');
     }
+    else {
+      $this->addTask('Migrate event cart ID', 'migrateEventCartID');
+    }
     $this->addTask('Update civicrm_mailing to permit deleting records from civicrm_mailing_job', 'updateNewCiviMailFields');
   }
 
@@ -97,6 +100,40 @@ class CRM_Upgrade_Incremental_php_FiveSeventySix extends CRM_Upgrade_Incremental
         \CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_participant', 'FK_civicrm_participant_cart_id');
         CRM_Core_DAO::executeQuery('DROP table civicrm_event_carts');
       }
+      if (!CRM_Core_DAO::singleValueQuery('SELECT cart_id FROM civicrm_participant WHERE cart_id > 0 LIMIT 1')) {
+        \CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_participant', 'cart_id', FALSE, TRUE);
+      }
+    }
+    catch (CRM_Core_Exception $e) {
+      // hmm what could possibly go wrong. A few stray artifacts is not as bad as a fail here I guess.
+    }
+    return TRUE;
+  }
+
+  /**
+   * Drop tables, disable the message template as they relate to event carts.
+   *
+   * It would be nice to delete the message template but who knows there could be a gotcha.
+   *
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  public static function migrateEventCartID(): bool {
+    try {
+      CRM_Core_DAO::executeQuery("CREATE TABLE IF NOT EXISTS `civicrm_event_cart_participant` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Event Cart Participant ID',
+  `participant_id` int(10) unsigned DEFAULT NULL COMMENT 'FK to Participant ID',
+  `cart_id` int(10) unsigned DEFAULT NULL COMMENT 'FK to Event Cart ID',
+  PRIMARY KEY (`id`),
+  KEY `FK_civicrm_event_cart_participant_participant_id` (`participant_id`),
+  KEY `FK_civicrm_event_cart_participant_cart_id` (`cart_id`),
+  CONSTRAINT `FK_civicrm_event_cart_participant_cart_id` FOREIGN KEY (`cart_id`) REFERENCES `civicrm_event_carts` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `FK_civicrm_event_cart_participant_participant_id` FOREIGN KEY (`participant_id`) REFERENCES `civicrm_participant` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC");
+
+      CRM_Core_DAO::executeQuery('INSERT INTO civicrm_event_cart_participant (participant_id, cart_id)
+       SELECT id as participant_id, cart_id FROM civicrm_participant WHERE cart_id > 0');
+      \CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_participant', 'cart_id', FALSE, TRUE);
     }
     catch (CRM_Core_Exception $e) {
       // hmm what could possibly go wrong. A few stray artifacts is not as bad as a fail here I guess.

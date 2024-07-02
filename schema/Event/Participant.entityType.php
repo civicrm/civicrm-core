@@ -321,16 +321,6 @@ return [
       'description' => ts('Discount Amount'),
       'add' => '4.1',
     ],
-    'cart_id' => [
-      'title' => ts('Event Cart ID'),
-      'sql_type' => 'int unsigned',
-      'input_type' => 'EntityRef',
-      'description' => ts('To be moved to event cart extension'),
-      'add' => '4.1',
-      'input_attrs' => [
-        'label' => ts('Event Cart'),
-      ],
-    ],
     'must_wait' => [
       'title' => ts('Must Wait on List'),
       'sql_type' => 'int',

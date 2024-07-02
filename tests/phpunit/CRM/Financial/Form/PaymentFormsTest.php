@@ -110,7 +110,10 @@ class CRM_Financial_Form_PaymentFormsTest extends CiviUnitTestCase {
       ->addWhere('status_id:name', '=', 'Registered')
       ->execute()
       ->first();
-    $this->assertEquals($cart->id, $participant['cart_id']);
+    $cartID = \Civi\Api4\EventCartParticipant::get()
+      ->addWhere('participant_id', '=', $participant['id'])
+      ->execute()->single()['cart_id'];
+    $this->assertEquals($cart->id, $cartID);
     $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'Registered'), $participant['status_id']);
     $this->assertRequestValid(['x_city' => 'The+Shire', 'x_state' => 'IL', 'x_amount' => 300.0]);
   }
