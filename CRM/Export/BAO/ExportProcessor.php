@@ -2308,7 +2308,7 @@ LIMIT $offset, $limit
     if ($isDate) {
       $formatType = $fieldMetaData['html']['formatType'] ?? NULL;
       $formattedValue = CRM_Utils_Date::setDateDefaults($value, $formatType);
-      if (!($formatType & CRM_Utils_Type::T_TIMESTAMP)) {
+      if (!($fieldType & CRM_Utils_Type::T_TIMESTAMP)) {
         if (!($fieldType & CRM_Utils_Type::T_DATE)) {
           unset($formattedValue[0]);
         }
