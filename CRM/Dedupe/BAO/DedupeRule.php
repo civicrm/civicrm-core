@@ -154,13 +154,8 @@ class CRM_Dedupe_BAO_DedupeRule extends CRM_Dedupe_DAO_DedupeRule {
       foreach ($contactIDs as $cid) {
         $cids[] = CRM_Utils_Type::escape($cid, 'Integer');
       }
-      if (count($cids) == 1) {
-        $query .= " AND (t1.$id = {$cids[0]}) UNION $query AND t2.$id = {$cids[0]}";
-      }
-      else {
-        $query .= " AND t1.$id IN (" . implode(',', $cids) . ")
-        UNION $query AND  t2.$id IN (" . implode(',', $cids) . ")";
-      }
+      $query .= " AND t1.$id IN (" . implode(',', $cids) . ")
+      UNION $query AND  t2.$id IN (" . implode(',', $cids) . ")";
       // The `weight` is ambiguous in the context of the union; put the whole
       // thing in a subquery.
       $query = "SELECT $subSelect FROM ($query) subunion";
