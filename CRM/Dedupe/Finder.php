@@ -45,7 +45,9 @@ class CRM_Dedupe_Finder {
       throw new CRM_Core_Exception('Dedupe rule not found for selected contacts');
     }
 
-    $rgBao->fillTable($rgid, $cids, []);
+    if (!$rgBao->fillTable($rgid, $cids, [])) {
+      return [];
+    }
     $dao = CRM_Core_DAO::executeQuery($rgBao->thresholdQuery($checkPermissions));
     $dupes = [];
     while ($dao->fetch()) {
@@ -120,7 +122,9 @@ class CRM_Dedupe_Finder {
       $params['civicrm_phone']['phone_numeric'] = preg_replace('/[^\d]/', '', $orig);
     }
 
-    $rgBao->fillTable($rgBao->id, [], $params);
+    if (!$rgBao->fillTable($rgBao->id, [], $params)) {
+      return [];
+    }
 
     $dao = CRM_Core_DAO::executeQuery($rgBao->thresholdQuery($checkPermission));
     $dupes = [];

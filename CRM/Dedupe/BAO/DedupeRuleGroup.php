@@ -398,10 +398,10 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
    * @param array $contactIDs
    * @param array $params
    *
-   * @return void
+   * @return bool
    * @throws \Civi\Core\Exception\DBQueryException
    */
-  public function fillTable(int $id, array $contactIDs, array $params): void {
+  public function fillTable(int $id, array $contactIDs, array $params): bool {
     $this->contactIds = $contactIDs;
     $this->params = $params;
     $this->id = $id;
@@ -413,11 +413,15 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
     // if there are no rules in this rule group
     // add an empty query fulfilling the pattern
     if (!$tableQueries) {
-      // Yeah not too sure why but ....,
+      // Just for the hook.... (which is deprecated).
       $this->noRules = TRUE;
     }
+    CRM_Utils_Hook::dupeQuery($this, 'table', $tableQueries);
+    if (empty($tableQueries)) {
+      return FALSE;
+    }
 
-    if ($params && !empty($tableQueries)) {
+    if ($params) {
       $this->temporaryTables['dedupe'] = CRM_Utils_SQL_TempTable::build()
         ->setCategory('dedupe')
         ->createWithColumns("id1 int, weight int, UNIQUE UI_id1 (id1)")->getName();
@@ -441,8 +445,6 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
     }
     $patternColumn = '/t1.(\w+)/';
     $exclWeightSum = [];
-
-    CRM_Utils_Hook::dupeQuery($this, 'table', $tableQueries);
 
     while (!empty($tableQueries)) {
       [$isInclusive, $isDie] = self::isQuerySetInclusive($tableQueries, $this->threshold, $exclWeightSum);
@@ -518,6 +520,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
         break;
       }
     }
+    return TRUE;
   }
 
   /**
@@ -605,7 +608,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
     $aclFrom = '';
     $aclWhere = '';
 
-    if ($this->params && !$this->noRules) {
+    if ($this->params) {
       if ($checkPermission) {
         [$aclFrom, $aclWhere] = CRM_Contact_BAO_Contact_Permission::cacheClause('civicrm_contact');
         $aclWhere = $aclWhere ? "AND {$aclWhere}" : '';
