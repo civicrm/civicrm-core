@@ -216,10 +216,6 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
    * @throws \CRM_Core_Exception
    */
   private function tableQuery($params) {
-    // make sure we've got a fetched dbrecord, not sure if this is enforced
-    if (!$this->name == NULL || $this->is_reserved == NULL) {
-      $this->find(TRUE);
-    }
     $contactType = $this->contact_type;
 
     // Reserved Rule Groups can optionally get special treatment by
@@ -414,6 +410,9 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
     $this->contactIds = $contactIDs;
     $this->params = $params;
     $this->id = $id;
+    // make sure we've got a fetched dbrecord, not sure if this is enforced
+    $this->find(TRUE);
+
     // get the list of queries handy
     $tableQueries = $this->tableQuery($params);
     // if there are no rules in this rule group
