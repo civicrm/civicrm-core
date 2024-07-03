@@ -14,7 +14,9 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
+use Civi\API\EntityLookupTrait;
 use Civi\Api4\DedupeRule;
+use Civi\Api4\Generic\Result;
 
 /**
  * Class to determine the combinations of queries to be used.
@@ -22,6 +24,7 @@ use Civi\Api4\DedupeRule;
  * @internal subject to change.
  */
 class CRM_Dedupe_FinderQueryOptimizer {
+  use EntityLookupTrait;
 
   private array $queries;
 
@@ -39,7 +42,7 @@ class CRM_Dedupe_FinderQueryOptimizer {
    * @throws \CRM_Core_Exception
    */
   public function __construct(int $dedupeRuleGroupID) {
-    $this->dedupeRuleGroupID = $dedupeRuleGroupID;
+    $this->define('DedupeRuleGroup', 'RuleGroup', ['id' => $dedupeRuleGroupID]);
     $this->rules = DedupeRule::get(FALSE)
       ->addSelect('*', 'dedupe_rule_group_id.threshold')
       ->addWhere('dedupe_rule_group_id', '=', $dedupeRuleGroupID)
@@ -58,8 +61,32 @@ class CRM_Dedupe_FinderQueryOptimizer {
     }
   }
 
-  public function getRules(): \Civi\Api4\Generic\Result {
+  public function getRules(): Result {
     return $this->rules;
+  }
+
+  /**
+   * Is a file based reserved query configured.
+   *
+   * File based reserved queries were an early idea about how to optimise the dedupe queries.
+   *
+   * In theory extensions could implement them although there is no evidence any of them have.
+   * However, if these are implemented by core or by extensions we should not attempt to optimise
+   * the query by (e.g.) combining queries.
+   *
+   * In practice the queries implemented only return one query anyway
+   *
+   * @internal for core use only.
+   *
+   * @return bool
+   * @throws \CRM_Core_Exception
+   *
+   * @see \CRM_Dedupe_BAO_QueryBuilder_IndividualGeneral
+   * @see \CRM_Dedupe_BAO_QueryBuilder_IndividualSupervised
+   */
+  public function isUseReservedQuery(): bool {
+    return $this->lookup('RuleGroup', 'is_reserved') &&
+      CRM_Utils_File::isIncludable('CRM/Dedupe/BAO/QueryBuilder/' . $this->lookup('RuleGroup', 'name') . '.php');
   }
 
 }
