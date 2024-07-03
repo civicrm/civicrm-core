@@ -30,6 +30,14 @@ class CRM_Upgrade_Incremental_php_SixFour extends CRM_Upgrade_Incremental_Base {
   public function upgrade_6_4_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Rename multisite_is_enabled setting', 'renameMultisiteSetting');
+    $this->addTask('Remove Foreign Key References from cache tables', 'removeForeignKeyReferencesCacheTables');
+  }
+
+  public static function removeForeignKeyReferencesCacheTables(): bool {
+    CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_group_contact_cache', 'FK_civicrm_group_contact_cache_contact_id');
+    CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_group_contact_cache', 'FK_civicrm_group_contact_cache_group_id');
+    CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_acl_cache', 'FK_civicrm_acl_cache_acl_id');
+    return TRUE;
   }
 
   public static function renameMultisiteSetting(): bool {
