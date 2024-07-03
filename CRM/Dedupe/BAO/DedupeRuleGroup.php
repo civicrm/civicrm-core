@@ -603,29 +603,29 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
    * @return string
    */
   public function thresholdQuery($checkPermission = TRUE) {
-    $this->_aclFrom = '';
+    $aclFrom = '';
     $aclWhere = '';
 
     if ($this->params && !$this->noRules) {
       if ($checkPermission) {
-        [$this->_aclFrom, $aclWhere] = CRM_Contact_BAO_Contact_Permission::cacheClause('civicrm_contact');
+        [$aclFrom, $aclWhere] = CRM_Contact_BAO_Contact_Permission::cacheClause('civicrm_contact');
         $aclWhere = $aclWhere ? "AND {$aclWhere}" : '';
       }
       $query = "SELECT {$this->temporaryTables['dedupe']}.id1 as id
-                FROM {$this->temporaryTables['dedupe']} JOIN civicrm_contact ON {$this->temporaryTables['dedupe']}.id1 = civicrm_contact.id {$this->_aclFrom}
+                FROM {$this->temporaryTables['dedupe']} JOIN civicrm_contact ON {$this->temporaryTables['dedupe']}.id1 = civicrm_contact.id {$aclFrom}
                 WHERE contact_type = '{$this->contact_type}' AND is_deleted = 0 $aclWhere
                 AND weight >= {$this->threshold}";
     }
     else {
       $aclWhere = '';
       if ($checkPermission) {
-        [$this->_aclFrom, $aclWhere] = CRM_Contact_BAO_Contact_Permission::cacheClause(['c1', 'c2']);
+        [$aclFrom, $aclWhere] = CRM_Contact_BAO_Contact_Permission::cacheClause(['c1', 'c2']);
         $aclWhere = $aclWhere ? "AND {$aclWhere}" : '';
       }
       $query = "SELECT IF({$this->temporaryTables['dedupe']}.id1 < {$this->temporaryTables['dedupe']}.id2, {$this->temporaryTables['dedupe']}.id1, {$this->temporaryTables['dedupe']}.id2) as id1,
                 IF({$this->temporaryTables['dedupe']}.id1 < {$this->temporaryTables['dedupe']}.id2, {$this->temporaryTables['dedupe']}.id2, {$this->temporaryTables['dedupe']}.id1) as id2, {$this->temporaryTables['dedupe']}.weight
                 FROM {$this->temporaryTables['dedupe']} JOIN civicrm_contact c1 ON {$this->temporaryTables['dedupe']}.id1 = c1.id
-                            JOIN civicrm_contact c2 ON {$this->temporaryTables['dedupe']}.id2 = c2.id {$this->_aclFrom}
+                            JOIN civicrm_contact c2 ON {$this->temporaryTables['dedupe']}.id2 = c2.id {$aclFrom}
                        LEFT JOIN civicrm_dedupe_exception exc ON {$this->temporaryTables['dedupe']}.id1 = exc.contact_id1 AND {$this->temporaryTables['dedupe']}.id2 = exc.contact_id2
                 WHERE c1.contact_type = '{$this->contact_type}' AND
                       c2.contact_type = '{$this->contact_type}'
