@@ -208,16 +208,16 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
 
   /**
    * Return a set of SQL queries whose cummulative weights will mark matched
-   * records for the RuleGroup::threasholdQuery() to retrieve.
+   * records for the RuleGroup::thresholdQuery() to retrieve.
    *
+   * @param CRM_Dedupe_FinderQueryOptimizer $optimizer
    * @param array|null $params
    *
    * @return array
    * @throws \CRM_Core_Exception
    */
-  private function tableQuery($params) {
+  private function tableQuery(CRM_Dedupe_FinderQueryOptimizer $optimizer, $params) {
     $contactType = $this->contact_type;
-    $optimizer = new CRM_Dedupe_FinderQueryOptimizer($this->id);
     // Reserved Rule Groups can optionally get special treatment by
     // implementing an optimization class and returning a query array.
     if ($optimizer->isUseReservedQuery()) {
@@ -262,9 +262,9 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
     $this->id = $id;
     // make sure we've got a fetched dbrecord, not sure if this is enforced
     $this->find(TRUE);
-
+    $optimizer = new CRM_Dedupe_FinderQueryOptimizer($this->id, $contactIDs, $params);
     // get the list of queries handy
-    $tableQueries = $this->tableQuery($params);
+    $tableQueries = $this->tableQuery($optimizer, $params);
     // if there are no rules in this rule group
     // add an empty query fulfilling the pattern
     if (!$tableQueries) {
