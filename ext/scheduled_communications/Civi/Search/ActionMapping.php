@@ -111,6 +111,21 @@ class ActionMapping extends \Civi\ActionSchedule\MappingBase {
     return $fieldNames;
   }
 
+  public static function getLimitToOptions(): array {
+    return [
+      [
+        'id' => 3,
+        'name' => 'copy',
+        'label' => ts('Send copy to'),
+      ],
+      [
+        'id' => 4,
+        'name' => 'reroute',
+        'label' => ts('Send instead to'),
+      ],
+    ];
+  }
+
   /**
    * @param $schedule
    * @return bool
@@ -175,6 +190,10 @@ class ActionMapping extends \Civi\ActionSchedule\MappingBase {
       $sqlSelect['casDateField'] = $this->getSelectExpression($schedule->start_action_date)['expr']->render($apiQuery);
     }
     return $sqlSelect;
+  }
+
+  public function sendToAdditional($entityId): bool {
+    return FALSE;
   }
 
 }
