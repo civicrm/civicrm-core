@@ -98,14 +98,14 @@
 }
 .crm-container .crm-button i.crm-i,
 .crm-container a.button i.crm-i,
-#crm-container button i.crm-i,
+.crm-container button i.crm-i,
 .crm-container a.button:link i.crm-i,
 .crm-container a.button:visited i.crm-i,
 .crm-container input.form-submit i.crm-i,
-#crm-container input[type="button"] i.crm-i,
+.crm-container input[type="button"] i.crm-i,
 .crm-container input[type="submit"] i.crm-i,
-#crm-container input.form-submit-inline i.crm-i,
-#crm-container .crm-button i.crm-i,
+.crm-container input.form-submit-inline i.crm-i,
+.crm-container .crm-button i.crm-i,
 .crm-container .ui-dialog-buttonset .ui-button .ui-icon,
 .crm-container .btn i.crm-i {
     background-color: var(--crm-btn-icon-bg);
@@ -120,15 +120,17 @@
     height: calc(var(--crm-btn-height) - 2px);
     min-width: var(--crm-btn-height);
 }
-.crm-container .btn-xs .crm-i {
+.crm-container .btn.btn-xs .crm-i {
     padding: var(--crm-btn-small-padding) !important;
     height: auto !important;
     min-width: auto !important;
+    margin-right: calc(var(--crm-btn-icon-spacing) * 0.7);
 }
 .crm-container a.button:has(i.crm-i), 
 .crm-container button:has(i.crm-i),
 .crm-button > input[type="button"]:has(i.crm-i), 
 .crm-button > input[type="submit"]:has(i.crm-i),
+.crm-container button.dropdown-toggle.btn-xs:has(i.crm-i),
 .crm-button:has(i.crm-i),
 .crm-container .btn:has(i.crm-i),
 .crm-container .btn-group > .btn + .dropdown-toggle:has(i.crm-i),

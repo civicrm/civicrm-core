@@ -265,14 +265,11 @@ a.crm-expand-row:hover,a.crm-expand-row:focus {
 .crm-container .ui-button-icon-space {
     display: none;
 }
-.crm-container a.btn i.crm-i,
-.crm-container button.btn i.crm-i {
-    margin-right: var(--crm-btn-icon-spacing);
-}
 
 /* Small buttons */
 
-.crm-container .btn-xs, 
+.crm-container .btn-xs,
+.crm-container button.dropdown-toggle.btn-xs,
 .crm-container .crm-accordion-header a.crm-hover-button,
 .crm-container .crm-form-date-wrapper a.crm-hover-button, 
 .crm-container .btn-group-xs > .btn, 

@@ -168,3 +168,12 @@
 .api4-explorer-page .api4-add-where-group-menu a {
     padding: var(--crm-s) var(--crm-m);
 }
+/* Responsive (move to own file at some point) */
+
+@media (max-width: 989px) {
+    /* base/position */ .crm-container .crm-flex-box,
+    /* sections/api4-explorer */ .api4-input {
+       flex-direction: column;
+    }
+ }
+ 

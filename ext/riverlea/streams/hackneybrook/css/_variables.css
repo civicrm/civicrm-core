@@ -349,11 +349,11 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 
 /* Button dropdowns */
 --crm-dropdown-padding: var(--crm-s);
---crm-dropdown-bg: var(--crm-c-secondary-hover);
+--crm-dropdown-bg: var(--crm-c-page-background);
 --crm-dropdown-col: var(--crm-c-text);
 --crm-dropdown-hover: var(--crm-c-text);
---crm-dropdown-hover-bg: var(--crm-c-page-background);
---crm-dropdown-border: 0;
+--crm-dropdown-hover-bg: var(--crm-c-secondary-hover);
+--crm-dropdown-border: var(--crm-btn-border);
 --crm-dropdown-width: 180px;
 --crm-dropdown-2-bg: var(--crm-c-background3);
 --crm-dropdown-2-col: var(--crm-c-text);
