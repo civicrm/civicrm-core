@@ -209,8 +209,13 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
   /**
    * Return a set of SQL queries whose cummulative weights will mark matched
    * records for the RuleGroup::threasholdQuery() to retrieve.
+   *
+   * @param array|null $params
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
    */
-  private function tableQuery() {
+  private function tableQuery($params) {
     // make sure we've got a fetched dbrecord, not sure if this is enforced
     if (!$this->name == NULL || $this->is_reserved == NULL) {
       $this->find(TRUE);
@@ -220,7 +225,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
     // Reserved Rule Groups can optionally get special treatment by
     // implementing an optimization class and returning a query array.
     if ($this->isUseReservedQuery()) {
-      $command = empty($this->params) ? 'internal' : 'record';
+      $command = empty($params) ? 'internal' : 'record';
       $queries = call_user_func(["CRM_Dedupe_BAO_QueryBuilder_{$this->name}", $command], $this);
     }
     else {
@@ -234,9 +239,9 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
       $queries = [];
       foreach ($rules as $rule) {
         $key = "{$rule['rule_table']}.{$rule['rule_field']}.{$rule['rule_weight']}";
-        // Skipping empty rules? Empty rules shouldn't exist; why check?
-        if ($query = self::sql($this->params, $this->contactIds, $rule, $contactType)) {
-          $queries[$key] = $query;
+        // if params is present and doesn't have an entry for a field, don't construct the clause.
+        if (!$params || (array_key_exists($rule['rule_table'], $params) && array_key_exists($rule['rule_field'], $params[$rule['rule_table']]))) {
+          $queries[$key] = self::sql($params, $this->contactIds, $rule, $contactType);
         }
       }
     }
@@ -271,14 +276,6 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
    *
    */
   private static function sql($params, $contactIDs, array $rule, string $contactType): ?string {
-    if ($params &&
-      (!array_key_exists($rule['rule_table'], $params) ||
-        !array_key_exists($rule['rule_field'], $params[$rule['rule_table']])
-      )
-    ) {
-      // if params is present and doesn't have an entry for a field, don't construct the clause.
-      return NULL;
-    }
 
     $filter = self::getRuleTableFilter($rule['rule_table'], $contactType);
     $contactIDFieldName = self::getContactIDFieldName($rule['rule_table']);
@@ -425,7 +422,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
     $this->params = $params;
     $this->id = $id;
     // get the list of queries handy
-    $tableQueries = $this->tableQuery();
+    $tableQueries = $this->tableQuery($params);
 
     if ($params && !empty($tableQueries)) {
       $this->temporaryTables['dedupe'] = CRM_Utils_SQL_TempTable::build()
