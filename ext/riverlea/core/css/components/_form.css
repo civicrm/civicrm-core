@@ -430,8 +430,10 @@ input.crm-form-checkbox) + label {
     background: var(--crm-input-background);
     border-left-color: var(--crm-input-border-color);  
     border-radius: 0 var(--crm-input-border-radius) var(--crm-input-border-radius) 0;
-    text-align: center;
     width: var(--crm-r3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 .crm-container .select2-container .select2-choice .select2-arrow b {
     display: none;
@@ -444,12 +446,6 @@ input.crm-form-checkbox) + label {
     color: var(--crm-c-text);
     background: none;
     content: var(--crm-input-dropdown-icon);
-    right: 0;
-    top: var(--crm-s);
-    display: block;
-    height: var(--crm-r);
-    position: absolute;
-    width: var(--crm-r2);
 }
 .crm-container .select2-container .select2-choice .select2-arrow::before {
     top: var(--crm-xs);
