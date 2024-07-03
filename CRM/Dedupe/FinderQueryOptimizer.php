@@ -33,8 +33,6 @@ class CRM_Dedupe_FinderQueryOptimizer {
    */
   private int $threshold;
 
-  private int $dedupeRuleGroupID;
-
   private Civi\Api4\Generic\Result $rules;
 
   private array $contactIDs;
@@ -237,6 +235,30 @@ class CRM_Dedupe_FinderQueryOptimizer {
       return \CRM_Core_DAO::getReferencesToContactTable()[$tableName][0];
     }
     throw new CRM_Core_Exception('invalid field');
+  }
+
+  /**
+   * Get the reserved query based on a static class.
+   *
+   * This was an early idea about optimisation & extendability. It is likely
+   * there are no implementations of rules this way outside the 3 core files.
+   *
+   * It is also likely the core files can go once we are optimising the queries based on the
+   * rule.
+   *
+   * @internal  Do not call from outside of core.
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  public function getReservedQuery(): array {
+    $bao = new CRM_Dedupe_BAO_DedupeRuleGroup();
+    $bao->id = $this->lookup('RuleGroup', 'id');
+    $bao->find(TRUE);
+    $bao->params = $this->lookupParameters;
+    $bao->contactIds = $this->contactIDs;
+    $command = empty($this->lookupParameters) ? 'internal' : 'record';
+    return call_user_func(["CRM_Dedupe_BAO_QueryBuilder_" . $this->lookup('RuleGroup', 'name'), $command], $bao);
   }
 
 }
