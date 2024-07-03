@@ -1027,6 +1027,29 @@ class CRM_Utils_String {
    * @throws \CRM_Core_Exception
    */
   public static function parseOneOffStringThroughSmarty($templateString, $templateVars = []) {
+    return self::parseUserStringThroughSmartyWithOptionalCaching($templateString, $templateVars, FALSE);
+  }
+
+  /**
+   * Parse a string through smarty, caching a compiled template file. Use this instead of
+   * parseOneOffStringThroughSmarty() if you expect to call the function many times with the same
+   * $templateString.
+   *
+   * @param $templateString
+   * @param $templateVars
+   *
+   * @return string
+   * @throws \CRM_Core_Exception
+   */
+  public static function parseUserStringThroughSmarty($templateString, $templateVars = []) {
+    return self::parseUserStringThroughSmartyWithOptionalCaching($templateString, $templateVars, TRUE);
+  }
+
+  private static function parseUserStringThroughSmartyWithOptionalCaching(
+    string $templateString,
+    array $templateVars,
+    bool $useCache
+  ): string {
     if (!CRM_Utils_String::stringContainsTokens($templateString)) {
       // Skip expensive smarty processing.
       return $templateString;
@@ -1034,7 +1057,9 @@ class CRM_Utils_String {
     $smarty = CRM_Core_Smarty::singleton();
     $cachingValue = $smarty->caching;
     set_error_handler([$smarty, 'handleSmartyError'], E_USER_ERROR);
-    $smarty->caching = 0;
+    if (!$useCache) {
+      $smarty->caching = 0;
+    }
     $useSecurityPolicy = ($smarty->getVersion() > 2) ? !$smarty->security_policy : !$smarty->security;
     // For Smarty v2, policy is applied at lower level.
     if ($useSecurityPolicy) {
@@ -1050,7 +1075,10 @@ class CRM_Utils_String {
       // is invalid in Windows, causing failure.
       // Adding this is preparatory to smarty 3. The original PR failed some
       // tests so we check for the function.
-      if (!function_exists('smarty_function_eval') && (!defined('SMARTY_DIR') || !file_exists(SMARTY_DIR . '/plugins/function.eval.php'))) {
+      $canUseEvalResourceType = !function_exists('smarty_function_eval')
+        && (!defined('SMARTY_DIR')
+          || !file_exists(SMARTY_DIR . '/plugins/function.eval.php'));
+      if (!$useCache && $canUseEvalResourceType) {
         if (!empty($templateVars)) {
           $templateString = (string) $smarty->fetchWith('eval:' . $templateString, $templateVars);
         }
