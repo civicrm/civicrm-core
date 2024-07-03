@@ -390,6 +390,30 @@ color-scheme: light dark;
 --crm-wizard-active-bg: var(--crm-c-page-background);
 --crm-wizard-border-col: var(--crm-c-page-background);
 --crm-wizard-bg: var(--crm-c-background);
+
+/* Frontend */
+--crm-f-form-width: 700px;
+--crm-f-box-shadow: var(--crm-block-shadow);
+--crm-f-fieldset-bg: var(--crm-c-background);
+--crm-f-fieldset-padding: var(--crm-r);
+--crm-f-fieldset-margin: 0 0 var(--crm-padding-reg) 0;
+--crm-f-fieldset-border: 0;
+--crm-f-legend-align: ;
+--crm-f-legend-size: var(--crm-r2);
+--crm-f-form-padding: var(--crm-padding-reg);
+--crm-f-form-layout: block; /* 'grid' = inline, 'block' = stacked */
+--crm-f-label-position: ;
+--crm-f-label-align: left;
+--crm-f-label-width: 200px;
+--crm-f-label-weight: bold;
+--crm-f-input-radius: var(--crm-roundness);
+--crm-f-input-padding: var(--crm-r2) var(--crm-m2);
+--crm-f-input-font-size: var(--crm-r1);
+--crm-f-input-width: 100%;
+--crm-f-form-focus-bg: var(--crm-c-green);
+--crm-f-form-error-bg: var(--crm-c-red);
+--crm-f-logo-height: 40px;
+--crm-f-logo-align: center; /* left, right or center */
 }
 
 /* light/dark mode settings */
