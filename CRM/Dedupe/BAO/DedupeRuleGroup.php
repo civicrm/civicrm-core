@@ -246,13 +246,6 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
       }
     }
 
-    // if there are no rules in this rule group
-    // add an empty query fulfilling the pattern
-    if (!$queries) {
-      $this->noRules = TRUE;
-      return [];
-    }
-
     return $queries;
   }
 
@@ -423,6 +416,12 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
     $this->id = $id;
     // get the list of queries handy
     $tableQueries = $this->tableQuery($params);
+    // if there are no rules in this rule group
+    // add an empty query fulfilling the pattern
+    if (!$tableQueries) {
+      // Yeah not too sure why but ....,
+      $this->noRules = TRUE;
+    }
 
     if ($params && !empty($tableQueries)) {
       $this->temporaryTables['dedupe'] = CRM_Utils_SQL_TempTable::build()
