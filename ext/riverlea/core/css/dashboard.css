@@ -12,7 +12,7 @@
     border-radius: var(--crm-dashlet-radius);
     background-color: var(--crm-dashlet-bg);
     padding: var(--crm-dashlet-padding);
-    box-shadow: var(--crm-block-shadow);
+    box-shadow: var(--crm-popup-shadow);
     margin-bottom: var(--crm-padding-reg);
     border: var(--crm-dashlet-border);
 }
@@ -136,7 +136,8 @@ crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
 .crm-container #civicrm-news-feed ul.ui-tabs-nav {
     background: var(--crm-dashlet-tabs-bg);
     margin-bottom: var(--crm-dashlet-padding);
-    border-radius: var(--crm-dashlet-radius);
+    border-radius: var(--crm-tab-roundness);
+    border: var(--crm-dashlet-border);
 }
 .crm-container #civicrm-news-feed ul.ui-tabs-nav a {
     border-radius: var(--crm-tab-roundness);

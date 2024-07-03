@@ -335,7 +335,7 @@ color-scheme: light dark;
 --crm-dialog-body-padding: var(--crm-m);
 
 /* Dashlet */
---crm-dashlet-border: ;
+--crm-dashlet-border: 1px solid var(--crm-tab-border-col);
 --crm-dashlet-bg: var(--crm-c-background);
 --crm-dashlet-padding: 0;
 --crm-dashlet-content-padding: var(--crm-m);
