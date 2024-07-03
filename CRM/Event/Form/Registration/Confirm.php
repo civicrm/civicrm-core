@@ -1028,7 +1028,10 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $fields['email-Primary'] = 1;
 
     //if its pay later or additional participant set email address as primary.
-    if ((!empty($params['is_pay_later']) || empty($params['is_primary']) ||
+    // Note that it seems this function may have been broken and then
+    // accidentally started working - causing https://lab.civicrm.org/dev/core/-/issues/5330 was
+    // I can't see what changed...
+    if (empty($params['email-Primary']) && (!empty($params['is_pay_later']) || empty($params['is_primary']) ||
         !$form->_values['event']['is_monetary'] ||
         $form->_allowWaitlist ||
         $form->_requireApproval
