@@ -425,6 +425,8 @@ input.crm-form-checkbox) + label {
     padding: var(--crm-xs1) var(--crm-r2) var(--crm-xs1) var(--crm-m);
     font-size: var(--crm-input-font-size);
     color: var(--crm-input-color);
+    display: flex;
+    align-items: center;
 }
 .crm-container .select2-container .select2-choice .select2-arrow {
     background: var(--crm-input-background);
@@ -438,6 +440,12 @@ input.crm-form-checkbox) + label {
 .crm-container .select2-container .select2-choice .select2-arrow b {
     display: none;
 }
+.select2-container.select2-allowclear .select2-choice abbr {
+    position: relative;
+    margin-left: auto;
+    right: var(--crm-r);
+    top: auto;
+}
 .crm-container .select2-container-multi .select2-choices::before,
 .crm-container .select2-container .select2-choice .select2-arrow::before {
     font-family: "FontAwesome";
@@ -447,8 +455,9 @@ input.crm-form-checkbox) + label {
     background: none;
     content: var(--crm-input-dropdown-icon);
 }
-.crm-container .select2-container .select2-choice .select2-arrow::before {
-    top: var(--crm-xs);
+.crm-container .select2-container-multi .select2-choices::before {
+    margin-left: auto;
+    order: 1;
 }
 .crm-container .select2-dropdown-open .select2-choice, 
 .crm-container .select2-dropdown-open .select2-choices {

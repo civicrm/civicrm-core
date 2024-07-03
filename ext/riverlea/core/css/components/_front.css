@@ -32,6 +32,13 @@
     font-size: var(--crm-f-input-font-size);
     width: var(--crm-f-input-width);
 }
+.crm-container.crm-public .select2-search input {
+    padding: var(--crm-s) var(--crm-r1) var(--crm-s);
+}
+.crm-container.crm-public .select2-dropdown-open .select2-choice, 
+.crm-container.crm-public .select2-dropdown-open .select2-choices {
+    border-radius: 0;
+}
 @media (min-width: 480px) {
     .crm-container.crm-public .crm-section .label {
       float: none;
