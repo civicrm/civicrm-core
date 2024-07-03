@@ -373,6 +373,7 @@ input.crm-form-checkbox + label,
     accent-color: var(--crm-input-radio-color);
     margin: -2px 4px 0 0;
     width: inherit;
+    appearance: auto;
 }
 /* Checkbox/radio fields with n-per-line. See https://lab.civicrm.org/dev/core/-/issues/4985 */
 .crm-container .crm-multiple-checkbox-radio-options {
