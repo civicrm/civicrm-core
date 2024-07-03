@@ -264,6 +264,9 @@ class CRM_Dedupe_FinderQueryOptimizer {
   /**
    * Get the queries to fill the table for the various rules.
    *
+   * Return a set of SQL queries whose cummulative weights will mark matched
+   * records for the RuleGroup::thresholdQuery() to retrieve.
+   *
    * @return array
    * @throws \CRM_Core_Exception
    */
