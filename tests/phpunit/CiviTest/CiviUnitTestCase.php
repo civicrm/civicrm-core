@@ -31,6 +31,8 @@ use Civi\Api4\CiviCase;
 use Civi\Api4\Contribution;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
+use Civi\Api4\DedupeRuleGroup;
+use Civi\Api4\DedupeRule;
 use Civi\Api4\ExampleData;
 use Civi\Api4\FinancialAccount;
 use Civi\Api4\FinancialType;
@@ -550,6 +552,10 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     unset($this->mut);
     if (!empty($this->ids['UFGroup'])) {
       UFGroup::delete(FALSE)->addWhere('id', 'IN', $this->ids['UFGroup'])->execute();
+    }
+    if (!empty($this->ids['DedupeRuleGroup'])) {
+      DedupeRule::delete(FALSE)->addWhere('dedupe_rule_group_id', 'IN', $this->ids['DedupeRuleGroup'])->execute();
+      DedupeRuleGroup::delete(FALSE)->addWhere('id', 'IN', $this->ids['DedupeRuleGroup'])->execute();
     }
     unset(CRM_Core_Config::singleton()->userPermissionClass->permissions);
     parent::tearDown();
@@ -3514,14 +3520,15 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   /**
    * @return array|int
    */
-  protected function createRuleGroup() {
-    return $this->callAPISuccess('RuleGroup', 'create', [
+  protected function createRuleGroup(): array {
+    return $this->createTestEntity('DedupeRuleGroup', [
       'contact_type' => 'Individual',
       'threshold' => 8,
       'used' => 'General',
       'title' => 'TestRule',
       'is_reserved' => 0,
-    ]);
+      'name' => 'TestRule',
+    ], 'individual_general');
   }
 
   /**
