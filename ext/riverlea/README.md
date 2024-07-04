@@ -13,6 +13,7 @@ The extension is licensed under [AGPL-3.0](LICENSE.txt).
 - 0.5 - Over 50 UI and accessibility issues fixed following testing in CiviCamp Hamburg - with many thanks to Guillaume Sorel, Thomas Renner, Rositza Dikova, Luciano Spiegel & Peter Reck and the organisers - as well as Rich Lott and the Core Team. Instances of `#crm-container` removed or replaced with `.crm-container` which changes some cascade order. Preparation for overwriting other core CiviCRM CSS files from v0.6 which will require CiviCRM 5.75. Version compatibility raised to 5.72 from 5.69 because of Search Kit Builder interface changes: if that interface isn't used then compatibility before 5.69 should be fine.
 - 0.6 - NEW VARIABLES. Adds basic dark-mode support. Adds new stream: Hackney Brook, based on Finsbury Park (~90% port). Adds new CSS variables to all streams to support Finsbury Park's two main differences to Shoreditch and Greenwich: button icon styling (unique colours, background, border), and contact dashboard side tabs with active/hover border, similar to the 5.72 SearchKit UI, as well as some extra useful variables (e.g. dialog header border, notification border radius, etc).
 - 0.7 - NEW VARIBLES. Improves dark-mode across all three streams. Improves Hackney Brooke. More responsive tables. Many small fixes. Thanks SarahFG, Rich Lott & Guillaume Sorel.
+- 0.8 - NEW VARIABLES. Adds broader front-end support to each variation. Adds CSS Variables for front end with `--crm-f` prefix, including to choose between inline and stacked label/inputs, to create a focus background, to limit the form width.
 
 ## Installation (CLI, Zip)
 
@@ -60,7 +61,7 @@ Contains CSS files in:
 ## Roadmap
 
 - Restructure files to overwrite CiviCRM core & angular module CSS Frontend following (https://github.com/civicrm/civicrm-core/pull/30397). This should reduce overall CSS loads/file size and the use of `!Important` declarations. Will require CiviCRM 5.75.
-- Front-end testing & fixes.
+- ~~Front-end testing & fixes.~~
 - Document streams.
 - ~~Darkmode~~.
 - ~~Migrate Finsbury Park~~ (and others) to a stream.
