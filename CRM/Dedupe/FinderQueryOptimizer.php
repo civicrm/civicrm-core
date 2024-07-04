@@ -37,12 +37,18 @@ class CRM_Dedupe_FinderQueryOptimizer {
 
   private Civi\Api4\Generic\Result $rules;
 
+  private array $contactIDs;
+
+  private array $lookupParameters;
+
   /**
    * @throws \Civi\API\Exception\UnauthorizedException
    * @throws \CRM_Core_Exception
    */
-  public function __construct(int $dedupeRuleGroupID) {
+  public function __construct(int $dedupeRuleGroupID, array $contactIDs, array $params) {
     $this->define('DedupeRuleGroup', 'RuleGroup', ['id' => $dedupeRuleGroupID]);
+    $this->contactIDs = $contactIDs;
+    $this->lookupParameters = $params;
     $this->rules = DedupeRule::get(FALSE)
       ->addSelect('*', 'dedupe_rule_group_id.threshold')
       ->addWhere('dedupe_rule_group_id', '=', $dedupeRuleGroupID)
