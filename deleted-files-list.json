@@ -113,6 +113,7 @@
     "CRM/Core/Payment/PaymentExpressUtils.php",
     "CRM/Core/Payment/eWAY.php",
     "CRM/Core/Permission/Drupal6.php",
+    "CRM/Core/Smarty/Security.php",
     "CRM/Core/Smarty/plugins/block.serialize.php",
     "CRM/Core/Smarty/plugins/function.crmDBTpl.php",
     "CRM/Core/Smarty/plugins/function.crmNavigationMenu.php",
