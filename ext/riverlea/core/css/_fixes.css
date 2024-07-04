@@ -324,7 +324,7 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
     border-top: 0 solid transparent;
     border-radius: 0 0 var(--crm-roundness) var(--crm-roundness);
 	background: var(--crm-tab-bg-active);
-	overflow-x: auto;
+	/* overflow-x: auto; */
 }
 .crm-search > .ng-scope > .form-inline {
     border: 1px solid var(--crm-tab-border-col);
@@ -1086,6 +1086,11 @@ details + .crm-content-block:has(.dataTables_wrapper) {
 #afGuiEditor-canvas  {
 	flex: 1;
 }
+#afGuiEditor-canvas {
+	--crm-btn-height: 32px;
+	--crm-btn-padding-block: var(--crm-s);
+	--crm-btn-padding-inline: var(--crm-m);
+}
 #afGuiEditor-palette input, 
 #afGuiEditor-palette textarea, 
 #afGuiEditor-palette select {
@@ -1216,6 +1221,12 @@ details + .crm-content-block:has(.dataTables_wrapper) {
 	box-shadow: var(--crm-block-shadow) !important;
 	margin-bottom: var(--crm-padding-small) !important;
 }
+#afGuiEditor-canvas .panel-heading .pull-right .btn {
+	max-height: var(--crm-l);
+	padding-right: var(--crm-btn-padding-block);
+	display: flex;
+	align-items: center;
+}
 .af-gui-edit-options-bar h4 {
 	font-size: var(--crm-font-size) !important;
 	margin: 0 !important;
@@ -1235,7 +1246,11 @@ details + .crm-content-block:has(.dataTables_wrapper) {
 	padding: 0;
 	--crm-btn-height: 32px;
 }
-#afGuiEditor-canvas .af-gui-canvas-control-buttons button.btn-default i.crm-i {
+#afGuiEditor-canvas .dropdown-toggle {
+	padding: 1px;
+}
+#afGuiEditor-canvas .af-gui-canvas-control-buttons button.btn-default i.crm-i,
+#afGuiEditor-canvas .dropdown-toggle i.crm-i {
 	margin: 0;
 	border: 0;
 	padding: var(--crm-s);
@@ -1288,4 +1303,18 @@ af-gui-container > .af-gui-bar,
 }
 #afGuiEditor .af-gui-layout.af-layout-inline > div {
 	margin-right: var(--crm-m);
+}
+.af-admin-edit-form-link .btn.dropdown-toggle { /* the cog icon to edit forms */
+	background: transparent;
+	color: var(--crm-c-text);
+	height: unset;
+	padding: 0 !important;
+	border: 0;
+}
+.af-admin-edit-form-link .btn.dropdown-toggle i.crm-i {
+	background: transparent;
+	border: 0;
+}
+.af-container.af-layout-cols { /* vs afCore */
+	column-gap: var(--crm-m);
 }
