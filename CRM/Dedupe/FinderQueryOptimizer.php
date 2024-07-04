@@ -59,7 +59,7 @@ class CRM_Dedupe_FinderQueryOptimizer {
           'weight' => $rule['rule_weight'],
           'key' => $key,
           'order' => $index + 1,
-          'query' => $this->getQuery($this->lookupParameters, $this->contactIDs, $rule, $this->lookup('RuleGroup', 'contact_type')),
+          'query' => $this->getQuery($this->lookupParameters, $this->contactIDs, $rule),
         ];
       }
       $this->threshold = $rule['dedupe_rule_group_id.threshold'];
@@ -99,7 +99,6 @@ class CRM_Dedupe_FinderQueryOptimizer {
    * @param array $contactIDs
    *   Ids of the contacts to limit the SQL queries (whole-database queries otherwise)
    * @param array $rule
-   * @param string $contactType
    *
    * @return string
    *   SQL query performing the search
@@ -109,9 +108,9 @@ class CRM_Dedupe_FinderQueryOptimizer {
    * @internal do not call from outside tested core code. No universe uses Feb 2024.
    *
    */
-  public function getQuery($params, $contactIDs, array $rule, string $contactType): ?string {
+  public function getQuery($params, $contactIDs, array $rule): ?string {
 
-    $filter = $this->getRuleTableFilter($rule['rule_table'], $contactType);
+    $filter = $this->getRuleTableFilter($rule['rule_table']);
     $contactIDFieldName = $this->getContactIDFieldName($rule['rule_table']);
 
     // build FROM (and WHERE, if it's a parametrised search)
@@ -167,13 +166,12 @@ class CRM_Dedupe_FinderQueryOptimizer {
    * although for the contact table it could be the id restriction.
    *
    * @param string $tableName
-   * @param string $contactType
    *
    * @return string
    */
-  private function getRuleTableFilter(string $tableName, string $contactType): string {
+  private function getRuleTableFilter(string $tableName): string {
     if ($tableName === 'civicrm_contact') {
-      return "contact_type = '{$contactType}'";
+      return "contact_type = '" . $this->lookup('RuleGroup', 'contact_type') . "'";
     }
     $dynamicReferences = CRM_Core_DAO::getDynamicReferencesToTable('civicrm_contact')[$tableName] ?? NULL;
     if (!$dynamicReferences) {
