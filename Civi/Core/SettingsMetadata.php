@@ -110,7 +110,7 @@ class SettingsMetadata {
    */
   protected static function getBootMetadata() {
     if (!is_array(self::$bootCache)) {
-      self::$bootCache = self::loadSettingsMetadata(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'settings', '*.boot.setting.php');
+      self::$bootCache = self::loadSettingsMetadata(dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'settings', '*.boot.setting.php');
     }
     return self::$bootCache;
   }
