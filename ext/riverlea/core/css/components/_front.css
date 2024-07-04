@@ -10,7 +10,8 @@
 }
 .crm-container.crm-public fieldset:not(.collapsed, .crm-inactive-dashlet-fieldset),
 .crm-container.crm-public .crm-event-info-form-block,
-.crm-container.crm-public #crm-profile-block {
+.crm-container.crm-public #crm-profile-block,
+.crm-container.crm-public .af-container {
     background-color: var(--crm-f-fieldset-bg);
     margin: var(--crm-f-fieldset-margin);
     padding: var(--crm-f-fieldset-padding);

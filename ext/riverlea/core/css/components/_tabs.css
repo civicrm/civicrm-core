@@ -18,8 +18,8 @@
     flex-wrap: wrap;
     gap: var(--crm-tabs-gap);
     padding: var(--crm-tabs-padding);
-    border: var(--crm-tabs-border);
-    margin: 0 !important;
+    border-bottom: var(--crm-tabs-border);
+    margin: 0 !important;  
 }
 /* .crm-container .ui-tabs ul.ui-tabs-nav li.ui-state-active, */
 .crm-container .ui-state-default, 

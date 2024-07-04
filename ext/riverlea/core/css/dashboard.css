@@ -137,7 +137,7 @@ crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
     background: var(--crm-dashlet-tabs-bg);
     margin-bottom: var(--crm-dashlet-padding);
     border-radius: var(--crm-tab-roundness);
-    border: var(--crm-dashlet-border);
+    border-bottom: var(--crm-dashlet-border);
 }
 .crm-container #civicrm-news-feed ul.ui-tabs-nav a {
     border-radius: var(--crm-tab-roundness);
