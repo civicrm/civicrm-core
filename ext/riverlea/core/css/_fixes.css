@@ -1085,8 +1085,6 @@ details + .crm-content-block:has(.dataTables_wrapper) {
 #afGuiEditor-palette,
 #afGuiEditor-canvas  {
 	flex: 1;
-}
-#afGuiEditor-canvas {
 	--crm-btn-height: 32px;
 	--crm-btn-padding-block: var(--crm-s);
 	--crm-btn-padding-inline: var(--crm-m);
@@ -1130,14 +1128,6 @@ details + .crm-content-block:has(.dataTables_wrapper) {
 	height: auto !important; /* vs api4-explorer.css */
 	min-height: 39px;
 }
-/*#afGuiEditor fieldset legend {
-	padding-top: var(--crm-s);
-	font-size: var(--crm-r2)
-	margin-bottom: var(--crm-m);
-	color: var(--crm-c-text);
-	border-bottom: 1px solid var(--crm-c-divider);
-	line-height: 1;
-} */
 #afGuiEditor .af-gui-columns {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
@@ -1223,7 +1213,6 @@ details + .crm-content-block:has(.dataTables_wrapper) {
 }
 #afGuiEditor-canvas .panel-heading .pull-right .btn {
 	max-height: var(--crm-l);
-	padding-right: var(--crm-btn-padding-block);
 	display: flex;
 	align-items: center;
 }
