@@ -403,7 +403,8 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch implements
       );
       // Check each group search for valid groups.
       foreach ($groupSearches as $groupSearch) {
-        if (!empty($groupSearch[2]) && in_array($groupID, $groupSearch[2])) {
+        $groupFormValues = (array) ($groupSearch[2]['IN'] ?? $groupSearch[2] ?? []);
+        if (!empty($groupFormValues) && in_array($groupID, $groupFormValues)) {
           $smartGroups[$group['id']] = [
             'title' => $group['title'],
             'editSearchURL' => self::getEditSearchUrl($group['saved_search_id']),
