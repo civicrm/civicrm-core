@@ -195,8 +195,8 @@
 
 {*Confirmation Block*}
 <details id="confirm" {if !$defaultsEmpty}open{/if}>
-  <summary class="collapsible-title">{ts}Confirmation Screen{/ts}</summary>
-  <div id="confirm_screen_settings" class="crm-accordion-body">
+  <summary>{ts}Confirmation Screen{/ts}</summary>
+  <div class="crm-accordion-body">
     {if !$is_monetary}
     <table class="form-layout-compressed">
       <tr class="crm-event-manage-registration-form-block-is_confirm_enabled">
@@ -254,7 +254,7 @@
 
 {* Confirmation Email Block *}
 <details id="mail" {if !$defaultsEmpty}open{/if}>
-  <summary class="collapsible-title">{ts}Confirmation Email{/ts}</summary>
+  <summary >{ts}Confirmation Email{/ts}</summary>
   <div class="crm-accordion-wrapper">
     <table class="form-layout-compressed">
       <tr class="crm-event-manage-registration-form-block-is_email_confirm">
