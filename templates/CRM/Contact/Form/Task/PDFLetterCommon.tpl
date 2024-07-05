@@ -190,7 +190,7 @@ function showBindFormatChkBox()
         document.getElementById("bindFormat").style.display = "block";
     } else if ( formatExists && document.getElementById("saveTemplate") != null && document.getElementById("saveTemplate").checked ) {
         document.getElementById("bindFormat").style.display = "block";
-        var yes = confirm( '{/literal}{$useThisPageFormat}{literal}' );
+        var yes = confirm( "{/literal}{$useThisPageFormat}{literal}" );
         if ( yes ) {
             document.getElementById("bind_format").checked = true;
         }
@@ -312,7 +312,7 @@ function showSaveDetails(chkbox)  {
         document.getElementById("saveTemplateName").disabled = false;
         if ( formatSelected && ! templateSelected ) {
             document.getElementById("bindFormat").style.display = "block";
-            var yes = confirm( '{/literal}{$useSelectedPageFormat}{literal}' );
+            var yes = confirm( "{/literal}{$useSelectedPageFormat}{literal}" );
             if ( yes ) {
                 document.getElementById("bind_format").checked = true;
             }
