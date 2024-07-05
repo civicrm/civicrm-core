@@ -529,10 +529,12 @@ class SettingsBag {
     foreach (['host', 'name', 'user', 'password', 'port'] as $componentKey) {
       $value = $this->get($prefix . '_db_' . $componentKey);
       if (!$value) {
-        // missing a required key to compose the dsn - so give up
+        // if missing a required key to compose the dsn, give up trying to interpolate
+        // (we have defaults for all keys but password, so this is likely to be unset password
+        // (but could be one of the other components has been explicitly nulled))
         return [];
       }
-      $componentValues[$componentKey] = $value;
+      $componentValues[$componentKey] = urlencode($value);
     }
 
     $dsn = "mysql://{$componentValues['user']}:{$componentValues['password']}@{$componentValues['host']}:{$componentValues['port']}/{$componentValues['name']}?new_link=true";
