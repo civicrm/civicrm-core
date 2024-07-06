@@ -1856,7 +1856,7 @@ DESC limit 1");
     // be called on ADD
     foreach ($this->order->getMembershipLineItems() as $membershipLineItem) {
       if ($this->getAction() === CRM_Core_Action::ADD && $this->isQuickConfig()) {
-        $memTypeNumTerms = $this->getSubmittedValue('num_terms');
+        $memTypeNumTerms = $this->getSubmittedValue('num_terms') ?: 1;
       }
       else {
         // The submitted value is hidden when a price set is selected so
