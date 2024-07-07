@@ -75,6 +75,23 @@ class CRM_Upgrade_Incremental_php_FiveSeventyFive extends CRM_Upgrade_Incrementa
     $this->addTask(ts('Disable financial ACL extension if unused'), 'disableFinancialAcl');
   }
 
+  /**
+   * Upgrade step; adds tasks including 'runSql'.
+   *
+   * @param string $rev
+   *   The version number matching this function name
+   */
+  public function upgrade_5_75_1($rev): void {
+    $this->addTask(ts('Update the Import Participant menu item'), 'updateImportParticipantMenu');
+  }
+
+  public static function updateImportParticipantMenu($rev): bool {
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_navigation SET url = %1 WHERE url = %2', [
+      1 => ['civicrm/import/participant?reset=1', 'String'],
+      2 => ['civicrm/event/import?reset=1', 'String'],
+    ]);
+  }
+
   public static function disableFinancialAcl($rev): bool {
     $setting = CRM_Core_DAO::singleValueQuery('SELECT value FROM civicrm_setting WHERE name = "acl_financial_type"');
     if ($setting) {
