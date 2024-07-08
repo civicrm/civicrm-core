@@ -26,6 +26,8 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
   use CRMTraits_Custom_CustomDataTrait;
 
   public function tearDown(): void {
+    $this->cleanupCustomGroups();
+    $this->quickCleanup(['civicrm_custom_group', 'civicrm_custom_field']);
     $this->quickCleanUpFinancialEntities();
     $this->revertTemplateToReservedTemplate();
     parent::tearDown();
@@ -87,6 +89,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     $this->createCustomGroupWithFieldOfType(['extends' => 'Contribution']);
     MessageTemplate::update()
       ->addWhere('is_default', '=', TRUE)
+      ->addWhere('is_reserved', '=', FALSE)
       ->addWhere('workflow_name', '=', 'event_offline_receipt')
       ->setValues(['msg_subject' => 'hey {contribution.' . $this->getCustomFieldName() . '}you'])
       ->execute();
