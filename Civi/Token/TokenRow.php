@@ -183,6 +183,9 @@ class TokenRow {
    */
   public function customToken($entity, $customFieldID, $entityID) {
     $customFieldName = 'custom_' . $customFieldID;
+    if (empty($entityID)) {
+      return $this->format('text/html')->tokens($entity, $customFieldName, '');
+    }
     $record = civicrm_api3($entity, 'getSingle', [
       'return' => $customFieldName,
       'id' => $entityID,
