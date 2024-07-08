@@ -2295,9 +2295,9 @@ LIMIT $offset, $limit
    * @param string $fieldName Field name
    *
    * @return mixed|string
-   *  Returns formatted value or mysql value if field isn't localizable.
+   *   Returns formatted value or mysql value if field isn't localizable.
    */
-  protected function formatLocal(mixed $value, string $fieldName): mixed {
+  protected function formatLocal($value, string $fieldName) {
     $fieldMetaData = $this->getMetaDataForField($fieldName);
 
     if (!isset($fieldMetaData['type']) || empty($value)) {
