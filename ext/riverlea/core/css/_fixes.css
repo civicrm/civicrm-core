@@ -887,6 +887,10 @@ details + .crm-content-block:has(.dataTables_wrapper) {
 	background-color: var(--crm-tab-bg-active);
 	border-radius: 0 0 var(--crm-tab-roundness) var(--crm-tab-roundness);
 }
+.select2-drop.select2-drop-active.crm-container {
+    max-width: var(--crm-huge-input); /* Mosaico fix - https://lab.civicrm.org/extensions/riverlea/-/issues/23 */
+}
+
 /******************
 	CORE EXTENSIONS
 *******************/
