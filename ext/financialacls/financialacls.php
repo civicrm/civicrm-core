@@ -85,6 +85,9 @@ function financialacls_civicrm_pre($op, $objectName, $id, &$params) {
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_selectWhereClause
  */
 function financialacls_civicrm_selectWhereClause($entity, &$clauses) {
+  if (CRM_Core_Permission::check([['all CiviCRM permissions and ACLs', 'administer CiviCRM Financial Types']])) {
+    return;
+  }
 
   switch ($entity) {
     case 'LineItem':
@@ -128,7 +131,6 @@ function _financialacls_civicrm_get_accounts_clause(): string {
       $clause = '= 0';
       Civi::$statics['financial_acls'][__FUNCTION__][CRM_Core_Session::getLoggedInContactID()] = &$clause;
       $accounts = (array) EntityFinancialAccount::get()
-        ->addWhere('account_relationship:name', '=', 'Income Account is')
         ->addWhere('entity_table', '=', 'civicrm_financial_type')
         ->addSelect('entity_id', 'financial_account_id')
         ->addJoin('FinancialType AS financial_type', 'LEFT', [
