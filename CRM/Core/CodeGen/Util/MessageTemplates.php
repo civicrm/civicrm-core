@@ -248,18 +248,12 @@ class CRM_Core_CodeGen_Util_MessageTemplates {
    * @return string
    */
   protected static function getDirectory($smarty) {
-    if (method_exists($smarty, 'getTemplateDir')) {
-      $directories = $smarty->getTemplateDir();
-    }
-    else {
-      $directories = (array) $smarty->template_dir;
-    }
+    $directories = $smarty->getTemplateDir();
     foreach ($directories as $directory) {
       if (file_exists($directory . '/message_templates/')) {
         return $directory . '/message_templates/';
       }
     }
-
     return $directory . '/message_templates/';
   }
 
