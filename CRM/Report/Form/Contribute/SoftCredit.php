@@ -139,6 +139,10 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
             'name' => 'sort_name',
             'title' => ts('Soft Credit Name'),
           ],
+          'id_creditor' => [
+            'name' => 'id',
+            'title' => ts('Soft Credit Contact ID'),
+          ],
           'gender_id' => [
             'title' => ts('Gender'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
