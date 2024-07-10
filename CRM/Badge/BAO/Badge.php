@@ -365,6 +365,8 @@ class CRM_Badge_BAO_Badge {
       $y = $this->pdf->GetY();
     }
 
+    $imgRes = 300;
+
     if ($img) {
       [$w, $h] = self::getImageProperties($img, 300, $w, $h);
       $this->pdf->Image($img, $x, $y, $w, $h, '', '', '', FALSE, 72, '', FALSE,
