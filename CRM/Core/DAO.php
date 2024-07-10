@@ -3577,12 +3577,15 @@ SELECT contact_id
 
   /**
    * Check if component is enabled for this DAO class
-   *
+   * @deprecated
    * @return bool
    */
   public static function isComponentEnabled(): bool {
-    $daoName = static::class;
-    return !defined("$daoName::COMPONENT") || CRM_Core_Component::isEnabled($daoName::COMPONENT);
+    $entityName = CRM_Core_DAO_AllCoreTables::getEntityNameForClass(static::class);
+    if (!$entityName) {
+      return FALSE;
+    }
+    return \Civi\Api4\Utils\CoreUtil::entityExists($entityName);
   }
 
   /**
