@@ -261,7 +261,9 @@ if (!defined('CIVICRM_UF_BASEURL')) {
  */
 if (!defined('CIVICRM_SMARTY_AUTOLOAD_PATH') && getenv('CIVICRM_SMARTY_AUTOLOAD_PATH') === FALSE) {
   // enable by default for dev & demo sites for now - will soon enable by default for all new installs.
-  if (strpos(CIVICRM_UF_BASEURL, 'localhost') !== FALSE || strpos(CIVICRM_UF_BASEURL, 'demo.civicrm.org') !== FALSE) {
+  if (CIVICRM_UF === 'UnitTests' || strpos(CIVICRM_UF_BASEURL, 'localhost') !== FALSE || strpos(CIVICRM_UF_BASEURL, 'demo.civicrm.org') !== FALSE
+    || strpos(CIVICRM_UF_BASEURL, 'http://build') !== FALSE
+  ) {
     if (is_dir($civicrm_root . '/packages')) {
       define('CIVICRM_SMARTY_AUTOLOAD_PATH', $civicrm_root . '/packages/smarty5/Smarty.php');
     }
