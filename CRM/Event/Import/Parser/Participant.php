@@ -135,7 +135,27 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
           throw new CRM_Core_Exception('No matching Contact found for (' . $disp . ')');
         }
       }
-      $newParticipant = $this->deprecated_create_participant_formatted($formatted);
+      if ($this->isIgnoreDuplicates()) {
+        CRM_Core_Error::reset();
+        if (CRM_Event_BAO_Participant::checkDuplicate($formatted, $result)) {
+          $participantID = array_pop($result);
+
+          $error = CRM_Core_Error::createError("Found matching participant record.",
+            CRM_Core_Error::DUPLICATE_PARTICIPANT,
+            'Fatal', $participantID
+          );
+
+          $newParticipant = civicrm_api3_create_error($error->pop(),
+            [
+              'contactID' => $formatted['contact_id'],
+              'participantID' => $participantID,
+            ]
+          );
+        }
+      }
+      else {
+        $newParticipant = civicrm_api3('Participant', 'create', $formatted);
+      }
 
       if (is_array($newParticipant) && civicrm_error($newParticipant)) {
         if ($this->isSkipDuplicates()) {
@@ -163,38 +183,6 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
       return;
     }
     $this->setImportStatus($rowNumber, 'IMPORTED', '', $newParticipant['id']);
-  }
-
-  /**
-   * @param array $params
-   *
-   * @return array|bool
-   *   <type>
-   * @throws \CRM_Core_Exception
-   * @deprecated - this is part of the import parser not the API & needs to be
-   *   moved on out
-   *
-   */
-  protected function deprecated_create_participant_formatted($params) {
-    if ($this->isIgnoreDuplicates()) {
-      CRM_Core_Error::reset();
-      if (CRM_Event_BAO_Participant::checkDuplicate($params, $result)) {
-        $participantID = array_pop($result);
-
-        $error = CRM_Core_Error::createError("Found matching participant record.",
-          CRM_Core_Error::DUPLICATE_PARTICIPANT,
-          'Fatal', $participantID
-        );
-
-        return civicrm_api3_create_error($error->pop(),
-          [
-            'contactID' => $params['contact_id'],
-            'participantID' => $participantID,
-          ]
-        );
-      }
-    }
-    return civicrm_api3('Participant', 'create', $params);
   }
 
   /**
