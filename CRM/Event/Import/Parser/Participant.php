@@ -83,8 +83,8 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
         }
         //@todo calling api functions directly is not supported
         $this->deprecated_participant_check_params($formatted);
-        $newParticipant = CRM_Event_BAO_Participant::create($formatted);
-        $this->setImportStatus($rowNumber, 'IMPORTED', '', $newParticipant->id);
+        $newParticipant = civicrm_api3('Participant', 'create', $formatted);
+        $this->setImportStatus($rowNumber, 'IMPORTED', '', $newParticipant['id']);
         return;
       }
 
