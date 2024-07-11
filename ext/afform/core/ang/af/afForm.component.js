@@ -175,15 +175,17 @@
 
           case 'CONTAINS':
           case 'NOT CONTAINS':
-            if (typeof val1 === 'string' || Array.isArray(val1)) {
-              return val1.includes(val2);
+            if (Array.isArray(val1)) {
+              return val1.includes(val2) === yes;
+            } else if (typeof val1 === 'string' && typeof val2 === 'string') {
+              return val1.toLowerCase().includes(val2.toLowerCase()) === yes;
             }
             return !yes;
 
           case 'IN':
           case 'NOT IN':
             if (Array.isArray(val2)) {
-              return val2.includes(val1);
+              return val2.includes(val1) === yes;
             }
             return !yes;
 
