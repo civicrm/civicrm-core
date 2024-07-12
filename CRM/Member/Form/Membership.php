@@ -224,7 +224,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     }
 
     $this->assign('customDataType', 'Membership');
-    $this->assign('customDataSubType', $this->_memType);
+    $this->assign('customDataSubType', $this->getMembershipValue('membership_type_id'));
 
     $this->setPageTitle(ts('Membership'));
   }
