@@ -84,8 +84,8 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
         if (!$this->isUpdateExisting()) {
           throw new CRM_Core_Exception(ts('% record found and update not selected', [1 => 'Participant']));
         }
-        $newParticipant = CRM_Event_BAO_Participant::create($formatted);
-        $this->setImportStatus($rowNumber, 'IMPORTED', '', $newParticipant->id);
+        $newParticipant = civicrm_api3('Participant', 'create', $formatted);
+        $this->setImportStatus($rowNumber, 'IMPORTED', '', $newParticipant['id']);
         return;
       }
 
