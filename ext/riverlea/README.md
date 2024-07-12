@@ -14,7 +14,7 @@ The extension is licensed under [AGPL-3.0](LICENSE.txt).
 - 0.6 - NEW VARIABLES. Adds basic dark-mode support. Adds new stream: Hackney Brook, based on Finsbury Park (~90% port). Adds new CSS variables to all streams to support Finsbury Park's two main differences to Shoreditch and Greenwich: button icon styling (unique colours, background, border), and contact dashboard side tabs with active/hover border, similar to the 5.72 SearchKit UI, as well as some extra useful variables (e.g. dialog header border, notification border radius, etc).
 - 0.7 - NEW VARIBLES. Improves dark-mode across all three streams. Improves Hackney Brooke. More responsive tables. Many small fixes. Thanks SarahFG, Rich Lott & Guillaume Sorel.
 - 0.8 - NEW VARIABLES. Adds front-end support for each stream.  Adds CiviCRM logo for front-end pages as inline SVG. Adds CSS Variables for front end with `--crm-f` prefix, including to choose between inline and stacked label/inputs, to create a focus background, to limit the form width and adjust the logo size.Some fixes. NB v0.8 will be the last major version of RiverLea to work on CiviCRM < 5.75, due to file structure changes enabled by that release. Small fixes can be added as v0.8.1, v0.8.2, etc.
-- 0.9 - Works on 5.75+ only as it utilisies angular css overwrites added in https://github.com/civicrm/civicrm-core/pull/30397 to overwrite the css in Search Kit, Form Builder and some other files in the theme. Adds avatar support on contact dashboard.  NEW VARIABLES (crm-c-code-background, crm-dash-image-size, crm-dash-image-radius, crm-dash-image-justify, crm-dash-image-direction).
+- 0.9 - NEW VARIABLES. Works on 5.75+ only as it uses Angular css overwrites added in https://github.com/civicrm/civicrm-core/pull/30397 to replace the css in Search Kit, Form Builder and some other files, so that CSS variables can be applied to them and fewer '!important' tags used. Adds avatar support on contact dashboard. New variables: crm-c-code-background, crm-dash-image-size, crm-dash-image-radius, crm-dash-image-justify, crm-dash-image-direction.
 
 ## Installation (CLI, Zip)
 
@@ -66,6 +66,7 @@ Contains CSS files in:
 - ~~Darkmode~~.
 - ~~Migrate Finsbury Park~~ (and others) to a stream.
 - Document streams.
+- Tidy/simplify Bootstrap
 
 ## Creating new 'streams'
 
