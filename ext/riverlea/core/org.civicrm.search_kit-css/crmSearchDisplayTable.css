@@ -1,0 +1,32 @@
+/* Style rules for SearchKit Admin
+   Forked on 12 June 24. Called on SearchKit Admin pages
+   Status: not merged (theme edits at foot) */
+
+.crm-search-display-table > table.table > thead > tr > th {
+  white-space: nowrap;
+}
+.crm-search-display-table > table.table > thead > tr > th.crm-search-result-select {
+  padding-left: 0;
+  padding-right: 0;
+  text-transform: none;
+  color: initial;
+  /* Don't allow button to be split on 2 lines */
+  min-width: 86px;
+}
+.crm-search-display.crm-search-display-table tfoot > tr > td {
+  font-weight: bold;
+}
+table.crm-sticky-header > thead > tr {
+  position: sticky !important;
+  top: var(--crm-menubar-bottom, 0px);
+}
+
+/* RiverLea Aditions */
+
+.crm-search-display-table > table.table > thead > tr > th i.crm-search-table-column-sort-icon {
+	position: unset !important;
+	line-height: var(--crm-r1);
+}
+.crm-search-display-table > table.table > thead > tr > th i.crm-search-table-column-sort-icon + .crm-search-display-table-column-label {
+	margin-left: 0 !important;
+}
