@@ -1,7 +1,7 @@
 /*
     Name: Empty stream;
     Description: duplicate this to create a new stream; 
-    Riverlea version: 0.8;
+    Riverlea version: 0.9;
 */
 
 :root { 
@@ -65,6 +65,7 @@ color-scheme: light dark;
 --crm-c-background4: var(--crm-c-gray-200);
 --crm-c-background5: var(--crm-c-gray-500);
 --crm-c-drag-background: var(--crm-c-background3);
+--crm-c-code-background: var(--crm-c-background3);
 --crm-c-primary: var(--crm-c-gray-700); 
 --crm-c-primary-hover: var(--crm-c-gray-800); 
 --crm-c-primary-text: var(--crm-c-light-text);
@@ -318,6 +319,9 @@ color-scheme: light dark;
 --crm-dash-header-col: var(--crm-c-text);
 --crm-dash-header-size: var(--crm-r3);
 --crm-dash-header-padding: 0 0 var(--crm-r) 0; 
+--crm-dash-image-size: 100px;
+--crm-dash-image-radius: 200px;
+--crm-dash-image-float: right;
 
 /* Dialog */
 --crm-dialog-bg: var(--crm-c-page-background);
@@ -427,6 +431,7 @@ color-scheme: light dark;
     --crm-c-background2:var(--crm-c-gray-800); 
     --crm-c-background3: var(--crm-c-gray-700);
     --crm-c-background4: var(--crm-c-gray-600);
+    --crm-c-code-background: var(--crm-c-gray-200);
     --crm-c-success: #58a458;
     --crm-red-alert: #B24B4F;
     --crm-c-alert: #ff899a;

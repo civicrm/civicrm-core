@@ -1,6 +1,6 @@
 /*
     Name: Minetta;
-    Riverlea version: 0.8;
+    Riverlea version: 0.9;
     Front, back or both: both; 
     Description: Generic CiviCRM UI, somewhat familiar to users of CiviCRM since 2014. Named after Minetta Creek, which runs under Greenwich, New York;
 */
@@ -66,6 +66,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-c-background4: var(--crm-c-gray-200);
 --crm-c-background5: var(--crm-c-gray-500);
 --crm-c-drag-background: var(--crm-c-background3);
+--crm-c-code-background: var(--crm-c-background3);
 --crm-c-primary: var(--crm-c-gray-700); 
 --crm-c-primary-hover: var(--crm-c-gray-800); 
 --crm-c-primary-text: var(--crm-c-light-text);
@@ -319,6 +320,10 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-dash-header-col: var(--crm-c-text);
 --crm-dash-header-size: var(--crm-r3);
 --crm-dash-header-padding: 0 0 var(--crm-r) 0; 
+--crm-dash-image-size: 100px;
+--crm-dash-image-radius: 200px;
+--crm-dash-image-justify: space-between; /* choose from start (left), end (right), center, and space-between (spread out) */
+--crm-dash-image-direction: row-reverse; /* choose from row and row-reverse to get the image on the right, column stacks it */
 
 /* Dialog */
 --crm-dialog-bg: var(--crm-c-page-background);
@@ -428,6 +433,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
     --crm-c-background2:var(--crm-c-gray-800); 
     --crm-c-background3: var(--crm-c-gray-700);
     --crm-c-background4: var(--crm-c-gray-600);
+    --crm-c-code-background: var(--crm-c-gray-200);
     --crm-c-success: #58a458;
     --crm-red-alert: #B24B4F;
     --crm-c-alert: #ff899a;
