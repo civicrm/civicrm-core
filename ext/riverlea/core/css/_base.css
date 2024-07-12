@@ -147,7 +147,10 @@
 }
 .crm-container .strikethrough {
     text-decoration: line-through;
-  }
+}
+.crm-container .upper {
+    text-transform: uppercase;
+}
 .crm-container h3,
 #bootstrap-theme h3 {
     background-color: var(--crm-heading-bg);
@@ -332,7 +335,7 @@
 	color: var(--crm-c-text);
 	word-break: break-all;
 	word-wrap: break-word;
-    background-color: var(--crm-c-background3);
+    background-color: var(--crm-c-code-background);
 	border: 1px solid var(--crm-c-background4);
 	border-radius: var(--crm-roundness);
 }
@@ -379,7 +382,11 @@
     display: flex;
     flex-wrap: wrap;
 }
+.crm-container {
+    --crm-flex-gap: 0.5rem;
+}
 .crm-container .crm-flex-box > * {
+    gap: var(--crm-flex-gap);
     flex: 1;
     min-width: 0;
 }

@@ -2,13 +2,6 @@
    The end goal would be to remove these once the markup is
    consistent, and another  */
 
-/* Pre-5.76 fix for Core CSS files - 
-this can be removed/commented out from 5.76 onwards */
-
-@import url(admin.css);
-@import url(api4-explorer.css);
-@import url(dashboard.css);
-
 /******************
     ACCORDIONS
     From Civi 5.72 these are only needed for extensions
@@ -363,94 +356,12 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
 	height: auto;
 }
 
-/* Contact dashboard page */
-.page-civicrm-contact #crm-container {
-	padding: var(--crm-m1) var(--crm-r);
-}
-.crm-container div.contact_panel {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	column-gap: var(--crm-dash-panel-padding);
-}
-.crm-container div.contactCardLeft,
-.crm-container div.contactCardRight {
-	width: 100%;
-	display: block;
-	float: none;
-	clear: none;
-}  
-#mainTabContainer .crm-summary-block .crm-container-snippet table {
-	box-shadow: none;
-	border: 0;
-	padding: 0;
-	margin: 0;
-}
-#crm-main-content-wrapper:has(.crm-contact-page) {
-    box-shadow: var(--crm-block-shadow);
-}
-.crm-container div.crm-summary-contactname-block {
-    background: var(--crm-dash-header-bg);
-    color: var(--crm-dash-header-col);
-    min-height: 60px;
-    padding: var(--crm-dash-header-padding);
-    position: relative;
-	margin-left: var(--crm-dash-heading-inset);
-	overflow-x: auto;
-	margin-top: 0 !important /* vs contactSummary.css */;
-}
-.crm-container #crm-contactname-content .crm-summary-display_name {
-    padding: var(--crm-dash-header-padding);
-    font-size: var(--crm-dash-header-size);
-    padding-inline: 0;
-}
-div.crm-summary-contactname-block + .crm-actions-ribbon {
-    color: var(--crm-dash-header-col);
-    background-color: var(--crm-dash-header-bg2);
-    margin-bottom: 0;
-    clear: both;
-	margin-left: var(--crm-dash-heading-inset);
-}
-.crm-container #crm-contactname-content > .crm-inline-block-content {
-    display: flex;
-    gap: var(--crm-r);
-    align-items: center;
-}
-.crm-container #crm-contactname-content .crm-edit-help {
-    order: 2;
-	margin-left: auto;
-	color: transparent;
-	padding: 0;
-}
-.crm-container #crm-contactname-content .crm-edit-help .crm-i {
-	color: var(--crm-c-light-text);
-	float: right;
-	margin: var(--crm-xs) 0 0 var(--crm-m);
-}
-.crm-container #crm-contactname-content .crm-edit-help:hover,
-.crm-edit-ready .crm-summary-block .crm-inline-edit:hover .crm-edit-help {
-	color: var(--crm-c-light-text);
-	background-color: transparent !important; /* vs contactSummary.css */
-}
-.crm-actions-ribbon ul#actions {
-    list-style: none;
-    display: grid;
-    grid-template-columns: min-content min-content auto min-content min-content;
-    gap: var(--crm-m);
-    margin: 0;
-    padding: var(--crm-dash-header-padding);
-}
-.crm-search-col-type-field  span.ng-scope a {
-    display: flex;
-    gap: var(--crm-btn-icon-spacing);
-    align-items: center;   
-}
+/* Tag mgmt page */
+
 #mainTabContainer #tagtree {
 	max-height: 100%;
 	overflow: inherit;
 }
-
-/* Tag mgmt page */
-
 .crm-container .tag-tree-wrapper {
     display: grid;
     grid-template-columns: 2fr 1fr;
