@@ -1422,7 +1422,7 @@ DESC limit 1");
         $this->getMembershipID(),
         'membership',
         $contributionID,
-        $priceSetDetails['fields']
+        $this
       );
       CRM_Core_Session::setStatus(ts('Associated contribution is updated on membership type change.'), ts('Success'), 'success');
     }
