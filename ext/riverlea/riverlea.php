@@ -10,6 +10,19 @@ use CRM_riverlea_ExtensionUtil as E;
  */
 function riverlea_civicrm_config(&$config) {
   _riverlea_civix_civicrm_config($config);
+
+  $themeKey = Civi::service('themes')->getActiveThemeKey();
+  $themeExt = Civi::service('themes')->get($themeKey)['ext'];
+  if ($themeExt !== 'riverlea') {
+    return;
+  }
+
+  // A riverlea theme is active
+  if (Civi::settings()->get('riverlea_hide_cms_menubar')) {
+    // If CMS is not WordPress/Joomla the setting won't exist so we won't get here
+    // @todo: Uncomment the below line when we have one (see example in theisland theme)
+    // Civi::resources()->addStyle(file_get_contents(E::path('css/' . mb_strtolower(CIVICRM_UF) . '-menubar.css')));
+  }
 }
 
 /**
