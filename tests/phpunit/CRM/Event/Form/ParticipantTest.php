@@ -5,6 +5,7 @@ use Civi\Api4\Address;
 use Civi\Api4\Event;
 use Civi\Api4\LineItem;
 use Civi\Api4\LocBlock;
+use Civi\Api4\MessageTemplate;
 use Civi\Api4\Participant;
 use Civi\Api4\Phone;
 use Civi\Test\FormTrait;
@@ -75,6 +76,28 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       $this->getCustomFieldName() => 'Random thing',
     ])->postProcess()->getFirstMailBody();
     $this->assertStringContainsStrings($email, ['Enter text here', 'Random thing', 'Group with field text']);
+  }
+
+  /**
+   * Test that a contribution custom token does not cause a crash when there is no contribution.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSubmitUnpaidPriceChangeWithContributionToken(): void {
+    $this->createCustomGroupWithFieldOfType(['extends' => 'Contribution']);
+    MessageTemplate::update()
+      ->addWhere('is_default', '=', TRUE)
+      ->addWhere('workflow_name', '=', 'event_offline_receipt')
+      ->setValues(['msg_subject' => 'hey {contribution.' . $this->getCustomFieldName() . '}you'])
+      ->execute();
+    $this->getForm(['is_monetary' => FALSE], [
+      'register_date' => date('Ymd'),
+      'status_id' => 1,
+      'send_receipt' => '1',
+      'from_email_address' => '"mailer" <mail@example.org>',
+      'role_id' => [CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'role_id', 'Attendee')],
+    ])->postProcess();
+    $this->assertMailSentContainingHeaderString('hey you');
   }
 
   /**
