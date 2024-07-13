@@ -28,11 +28,10 @@ trait EntityBridge {
   public static function getInfo() {
     $info = parent::getInfo();
     $bridgeFields = [];
-    if (!empty($info['dao'])) {
-      foreach (($info['dao'])::fields() as $field) {
-        if (!empty($field['FKClassName']) || $field['name'] === 'entity_id') {
-          $bridgeFields[] = $field['name'];
-        }
+    $entity = \Civi::entity(self::getEntityName());
+    foreach ($entity->getFields() as $fieldName => $field) {
+      if (!empty($field['entity_reference'])) {
+        $bridgeFields[] = $fieldName;
       }
     }
     if (count($bridgeFields) === 2) {
