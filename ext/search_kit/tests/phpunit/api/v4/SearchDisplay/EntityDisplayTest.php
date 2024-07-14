@@ -86,6 +86,9 @@ class EntityDisplayTest extends Api4TestBase {
     $rows = \CRM_Core_DAO::executeQuery('SELECT * FROM civicrm_sk_my_new_entity')->fetchAll();
     $this->assertCount(0, $rows);
 
+    $getFields = civicrm_api4('SK_MyNewEntity', 'getFields', ['loadOptions' => TRUE])->indexBy('name');
+    $this->assertNotEmpty($getFields['prefix_id']['options'][1]);
+
     civicrm_api4('SK_MyNewEntity', 'refresh');
 
     $rows = \CRM_Core_DAO::executeQuery('SELECT * FROM civicrm_sk_my_new_entity ORDER BY `_row`')->fetchAll();
@@ -121,6 +124,85 @@ class EntityDisplayTest extends Api4TestBase {
     catch (UnauthorizedException $e) {
     }
     $this->assertStringContainsString('SK_MyNewEntity', $e->getMessage());
+  }
+
+  public function testEntityDisplayWithJoin() {
+
+    $lastName = uniqid(__FUNCTION__);
+    $contacts = (array) $this->saveTestRecords('Individual', [
+      'records' => [
+        ['last_name' => $lastName, 'first_name' => 'c'],
+        ['last_name' => $lastName, 'first_name' => 'b'],
+        ['last_name' => $lastName, 'first_name' => 'a'],
+      ],
+    ]);
+    $event1 = $this->createTestRecord('Event', ['title' => __FUNCTION__]);
+    $event2 = $this->createTestRecord('Event', ['title' => __FUNCTION__ . '2']);
+    $participants = $this->saveTestRecords('Participant', [
+      'records' => [
+        ['contact_id' => $contacts[0]['id'], 'event_id' => $event1['id']],
+        ['contact_id' => $contacts[1]['id'], 'event_id' => $event2['id']],
+      ],
+    ]);
+
+    $savedSearch = $this->createTestRecord('SavedSearch', [
+      'label' => __FUNCTION__,
+      'api_entity' => 'Contact',
+      'api_params' => [
+        'version' => 4,
+        'select' => ['id', 'Contact_Participant_contact_id_01.event_id', 'Contact_Participant_contact_id_01.id'],
+        'where' => [['last_name', '=', $lastName]],
+        'join' => [
+          ['Participant AS Contact_Participant_contact_id_01', 'LEFT', ['id', '=', 'Contact_Participant_contact_id_01.contact_id']],
+        ],
+      ],
+    ]);
+
+    SearchDisplay::create(FALSE)
+      ->addValue('saved_search_id', $savedSearch['id'])
+      ->addValue('type', 'entity')
+      ->addValue('label', 'MyNewEntityWithJoin')
+      ->addValue('name', 'MyNewEntityWithJoin')
+      ->addValue('settings', [
+        'columns' => [
+          [
+            'key' => 'id',
+            'label' => 'Contact ID',
+            'type' => 'field',
+          ],
+          [
+            'key' => 'Contact_Participant_contact_id_01.event_id',
+            'label' => 'Event ID',
+            'type' => 'field',
+          ],
+          [
+            'key' => 'Contact_Participant_contact_id_01.id',
+            'label' => 'Participant ID',
+            'type' => 'field',
+          ],
+        ],
+        'sort' => [
+          ['id', 'ASC'],
+        ],
+      ])
+      ->execute();
+
+    civicrm_api4('SK_MyNewEntityWithJoin', 'refresh');
+    $rows = (array) civicrm_api4('SK_MyNewEntityWithJoin', 'get', [
+      'select' => ['*', 'Contact_Participant_contact_id_01_event_id.title'],
+      'orderBy' => ['_row' => 'ASC'],
+    ]);
+    $this->assertCount(3, $rows);
+    $this->assertEquals(array_column($contacts, 'id'), array_column($rows, 'id'));
+    $this->assertEquals($event1['id'], $rows[0]['Contact_Participant_contact_id_01_event_id']);
+    $this->assertEquals($event2['id'], $rows[1]['Contact_Participant_contact_id_01_event_id']);
+    $this->assertNull($rows[2]['Contact_Participant_contact_id_01_event_id']);
+    $this->assertEquals($participants[0]['id'], $rows[0]['Contact_Participant_contact_id_01_id']);
+    $this->assertEquals($participants[1]['id'], $rows[1]['Contact_Participant_contact_id_01_id']);
+    $this->assertNull($rows[2]['Contact_Participant_contact_id_01_id']);
+    $this->assertEquals(__FUNCTION__, $rows[0]['Contact_Participant_contact_id_01_event_id.title']);
+    $this->assertEquals(__FUNCTION__ . '2', $rows[1]['Contact_Participant_contact_id_01_event_id.title']);
+
   }
 
 }
