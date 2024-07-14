@@ -41,6 +41,35 @@ class ImportSpecProvider extends AutoService implements SpecProviderInterface {
       // table is deleted - & hence we get an error.
       return;
     }
+    // Common fields
+    $field = new FieldSpec('_id', $spec->getEntity(), 'Int');
+    $field->setTitle(E::ts('Import row ID'));
+    $field->setType('Field');
+    $field->setInputType('Number');
+    $field->setReadonly(TRUE);
+    $field->setNullable(FALSE);
+    $field->setColumnName('_id');
+    $spec->addFieldSpec($field);
+
+    $field = new FieldSpec('_status', $spec->getEntity(), 'String');
+    $field->setTitle(E::ts('Import row status'));
+    $field->setType('Field');
+    $field->setInputType('Text');
+    $field->setReadonly(TRUE);
+    $field->setRequired(TRUE);
+    $field->setNullable(FALSE);
+    $field->setColumnName('_status');
+    $spec->addFieldSpec($field);
+
+    $field = new FieldSpec('_status_message', $spec->getEntity(), 'String');
+    $field->setTitle(E::ts('Import row message'));
+    $field->setType('Field');
+    $field->setInputType('Text');
+    $field->setReadonly(TRUE);
+    $field->setNullable(TRUE);
+    $field->setColumnName('_status_message');
+    $spec->addFieldSpec($field);
+
     $userJobType = $this->getJobType($spec);
     foreach ($columns as $column) {
       $isInternalField = strpos($column['name'], '_') === 0;
