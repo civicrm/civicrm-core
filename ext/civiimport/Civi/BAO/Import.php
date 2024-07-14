@@ -62,54 +62,6 @@ class Import extends CRM_Core_DAO {
   }
 
   /**
-   * Returns fields generic to all imports, indexed by name.
-   *
-   * This function could arguably go, leaving it to the `ImportSpecProvider`
-   * which adds all the other fields. But it does have the nice side effect of
-   * putting these three fields first in a natural sort.
-   *
-   * @param bool $checkPermissions
-   *   Filter by field permissions.
-   * @return array
-   */
-  public static function getSupportedFields($checkPermissions = FALSE): array {
-    return [
-      '_id' => [
-        'type' => 'Field',
-        'required' => FALSE,
-        'nullable' => FALSE,
-        'readonly' => TRUE,
-        'name' => '_id',
-        'title' => E::ts('Import row ID'),
-        'data_type' => 'Integer',
-        'input_type' => 'Number',
-        'column_name' => '_id',
-      ],
-      '_status' => [
-        'type' => 'Field',
-        'required' => TRUE,
-        // We should add a requeue action or just define an option group but for now..
-        'readonly' => TRUE,
-        'nullable' => FALSE,
-        'name' => '_status',
-        'title' => E::ts('Row status'),
-        'data_type' => 'String',
-        'column_name' => '_status_message',
-      ],
-      '_status_message' => [
-        'type' => 'Field',
-        'nullable' => TRUE,
-        'readonly' => TRUE,
-        'name' => '_status_message',
-        'title' => E::ts('Row import message'),
-        'description' => '',
-        'data_type' => 'String',
-        'column_name' => '_status_message',
-      ],
-    ];
-  }
-
-  /**
    * Over-ride the parent to prevent a NULL return.
    *
    * Metadata otherwise handled in `table()`, `writeRecord` and `ImportSpecProvider`
