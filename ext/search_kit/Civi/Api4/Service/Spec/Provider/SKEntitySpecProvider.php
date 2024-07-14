@@ -12,7 +12,6 @@
 
 namespace Civi\Api4\Service\Spec\Provider;
 
-use Civi\Api4\Service\Spec\FieldSpec;
 use Civi\Api4\Service\Spec\Provider\Generic\SpecProviderInterface;
 use Civi\Api4\Service\Spec\RequestSpec;
 use Civi\Core\Service\AutoService;
@@ -34,24 +33,12 @@ class SKEntitySpecProvider extends AutoService implements SpecProviderInterface 
       if ($entityDisplay['entityName'] !== $entityName) {
         continue;
       }
-      // Primary key field
-      $field = new FieldSpec('_row', $entityName, 'Int');
-      $field->setTitle(E::ts('Row'));
-      $field->setLabel(E::ts('Row'));
-      $field->setType('Field');
-      $field->setDescription('Search result row number');
-      $field->setColumnName('_row');
-      $spec->addFieldSpec($field);
-
       foreach ($entityDisplay['settings']['columns'] as $column) {
-        $field = new FieldSpec($column['spec']['name'], $entityName, $column['spec']['data_type']);
-        $field->setTitle($column['label']);
-        $field->setLabel($column['label']);
-        $field->setType('Field');
-        $field->setFkEntity($column['spec']['fk_entity']);
-        $field->setColumnName($column['spec']['name']);
-        $field->setSuffixes($column['spec']['suffixes']);
+        // Add pseudoconstant options
+        // TODO: This could probably be handled in SkEntityMetaProvider
         if (!empty($column['spec']['options'])) {
+          $field = $spec->getFieldByName($column['spec']['name']);
+          $field->setSuffixes($column['spec']['suffixes']);
           if (is_array($column['spec']['options'])) {
             $field->setOptions($column['spec']['options']);
           }
@@ -59,7 +46,6 @@ class SKEntitySpecProvider extends AutoService implements SpecProviderInterface 
             $field->setOptionsCallback([__CLASS__, 'getOptionsForSKEntityField'], $column['spec']);
           }
         }
-        $spec->addFieldSpec($field);
       }
     }
   }
