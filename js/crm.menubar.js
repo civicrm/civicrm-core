@@ -287,6 +287,7 @@
     initializeSearch: function() {
       $('input[name=qfKey]', '#crm-qsearch').attr('value', CRM.menubar.qfKey);
       $('#crm-qsearch-input')
+        .attr('title', ts('Name/Email'))
         .autocomplete({
           source: function(request, response) {
             //start spinning the civi logo
@@ -392,7 +393,7 @@
           $('#crm-qsearch-input').focus();
           CRM.menubar.close();
         }
-      });
+      }).attr('aria-label', ts('Quick search'));
       $('#crm-qsearch form[name=search_block]').on('submit', function() {
         if (!$('#crm-qsearch-input').val()) {
           return false;
@@ -482,7 +483,7 @@
       '</li>',
     drillTpl:
       '<li class="crm-menu-border-bottom" data-name="MenubarDrillDown">' +
-        '<a href="#"><input type="text" id="crm-menubar-drilldown" placeholder="' + _.escape(ts('Find menu item...')) + '"></a>' +
+        '<a href="#"><input type="text" id="crm-menubar-drilldown" placeholder="' + _.escape(ts('Find menu item...')) + '" aria-label="' + _.escape(ts('Find menu item...')) + '"></a>' +
         '<ul></ul>' +
       '</li>',
     branchTpl:
