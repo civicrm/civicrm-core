@@ -162,7 +162,7 @@ class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_
         ]
       );
 
-      if (CRM_Campaign_BAO_Campaign::isComponentEnabled()) {
+      if (CRM_Core_Component::isEnabled('CiviCampaign')) {
         self::$_columnHeaders[] = [
           'name' => ts('Campaign'),
           'sort' => 'campaign_id',

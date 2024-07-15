@@ -242,7 +242,7 @@ Order By  camp.title";
 
       //do check for component.
       if ($doCheckForComponent) {
-        $campaigns['isCampaignEnabled'] = $isValid = self::isComponentEnabled();
+        $campaigns['isCampaignEnabled'] = $isValid = CRM_Core_Component::isEnabled('CiviCampaign');
       }
 
       //do check for permissions.

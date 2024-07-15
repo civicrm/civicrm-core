@@ -440,7 +440,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     // 'not a real field' offered up by case - seems like an oddity
     // we should skip at the top level for now.
     $fields = ['tags'];
-    if (!CRM_Campaign_BAO_Campaign::isComponentEnabled()) {
+    if (!CRM_Core_Component::isEnabled('CiviCampaign')) {
       $fields[] = 'campaign_id';
     }
     return $fields;
