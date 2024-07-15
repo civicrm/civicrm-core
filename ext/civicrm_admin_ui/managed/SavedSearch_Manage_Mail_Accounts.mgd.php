@@ -76,6 +76,7 @@ return [
               'dataType' => 'String',
               'label' => E::ts('Name'),
               'sortable' => TRUE,
+              'editable' => TRUE,
             ],
             [
               'type' => 'field',
@@ -83,6 +84,7 @@ return [
               'dataType' => 'String',
               'label' => E::ts('Server'),
               'sortable' => TRUE,
+              'editable' => TRUE,
             ],
             [
               'type' => 'field',
@@ -90,6 +92,7 @@ return [
               'dataType' => 'String',
               'label' => E::ts('Username'),
               'sortable' => TRUE,
+              'editable' => TRUE,
             ],
             [
               'type' => 'field',
@@ -97,6 +100,7 @@ return [
               'dataType' => 'String',
               'label' => E::ts('Localpart'),
               'sortable' => TRUE,
+              'editable' => TRUE,
             ],
             [
               'type' => 'field',
@@ -104,6 +108,7 @@ return [
               'dataType' => 'String',
               'label' => E::ts('Domain'),
               'sortable' => TRUE,
+              'editable' => TRUE,
             ],
             [
               'type' => 'field',
@@ -111,6 +116,7 @@ return [
               'dataType' => 'String',
               'label' => E::ts('Return-Path'),
               'sortable' => TRUE,
+              'editable' => TRUE,
             ],
             [
               'type' => 'field',
@@ -118,6 +124,7 @@ return [
               'dataType' => 'String',
               'label' => E::ts('Protocol'),
               'sortable' => TRUE,
+              'editable' => TRUE,
             ],
             [
               'type' => 'field',
@@ -125,6 +132,7 @@ return [
               'dataType' => 'String',
               'label' => E::ts('Mail Folder'),
               'sortable' => TRUE,
+              'editable' => TRUE,
             ],
             [
               'type' => 'field',
@@ -132,6 +140,7 @@ return [
               'dataType' => 'Boolean',
               'label' => E::ts('Use SSL?'),
               'sortable' => TRUE,
+              'editable' => TRUE,
             ],
             [
               'type' => 'html',
@@ -139,6 +148,7 @@ return [
               'dataType' => 'Boolean',
               'label' => E::ts('Used For'),
               'sortable' => TRUE,
+              'editable' => TRUE,
               'rewrite' => '{if "[is_default]" == "' . E::ts('Yes') . '"}' . E::ts('Bounce Processing <strong>(Default)</strong>') . '{else}' . E::ts('Email-to-Activity') . '{/if}',
             ],
             [
