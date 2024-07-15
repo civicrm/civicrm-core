@@ -59,10 +59,11 @@ class CRM_Dedupe_FinderQueryOptimizer {
           'table' => $rule['rule_table'],
           'field' => $rule['rule_field'],
           'weight' => $rule['rule_weight'],
+          'length' => $rule['rule_length'],
           'key' => $key,
           'order' => $index + 1,
-          'query' => $this->getQuery($this->lookupParameters, $rule),
         ];
+        $this->queries[$key]['query'] = $this->getQuery($this->lookupParameters, $this->queries[$key]);
       }
       $this->threshold = $rule['dedupe_rule_group_id.threshold'];
     }
@@ -110,50 +111,50 @@ class CRM_Dedupe_FinderQueryOptimizer {
    */
   public function getQuery($params, array $rule): ?string {
 
-    $filter = $this->getRuleTableFilter($rule['rule_table']);
-    $contactIDFieldName = $this->getContactIDFieldName($rule['rule_table']);
+    $filter = $this->getRuleTableFilter($rule['table']);
+    $contactIDFieldName = $this->getContactIDFieldName($rule['table']);
 
     // build FROM (and WHERE, if it's a parametrised search)
     // based on whether the rule is about substrings or not
     if ($params) {
-      $select = "t1.$contactIDFieldName id1, {$rule['rule_weight']} weight";
+      $select = "t1.$contactIDFieldName id1, {$rule['weight']} weight";
       $subSelect = 'id1, weight';
       $where = $filter ? ['t1.' . $filter] : [];
-      $from = "{$rule['rule_table']} t1";
+      $from = "{$rule['table']} t1";
       $str = 'NULL';
-      if (isset($params[$rule['rule_table']][$rule['rule_field']])) {
-        $str = trim(CRM_Utils_Type::escape($params[$rule['rule_table']][$rule['rule_field']], 'String'));
+      if (isset($params[$rule['table']][$rule['field']])) {
+        $str = trim(CRM_Utils_Type::escape($params[$rule['table']][$rule['field']], 'String'));
       }
-      if ($rule['rule_length']) {
-        $where[] = "SUBSTR(t1.{$rule['rule_field']}, 1, {$rule['rule_length']}) = SUBSTR('$str', 1, {$rule['rule_length']})";
-        $where[] = "t1.{$rule['rule_field']} IS NOT NULL";
+      if ($rule['length']) {
+        $where[] = "SUBSTR(t1.{$rule['field']}, 1, {$rule['length']}) = SUBSTR('$str', 1, {$rule['length']})";
+        $where[] = "t1.{$rule['field']} IS NOT NULL";
       }
       else {
-        $where[] = "t1.{$rule['rule_field']} = '$str'";
+        $where[] = "t1.{$rule['field']} = '$str'";
       }
     }
     else {
-      $select = "t1.$contactIDFieldName id1, t2.$contactIDFieldName id2, {$rule['rule_weight']} weight";
+      $select = "t1.$contactIDFieldName id1, t2.$contactIDFieldName id2, {$rule['weight']} weight";
       $subSelect = 'id1, id2, weight';
       $where = $filter ? [
         't1.' . $filter,
         't2.' . $filter,
       ] : [];
       $where[] = "t1.$contactIDFieldName < t2.$contactIDFieldName";
-      $from = "{$rule['rule_table']} t1 INNER JOIN {$rule['rule_table']} t2 ON (" . self::getRuleFieldFilter($rule) . ")";
+      $from = "{$rule['table']} t1 INNER JOIN {$rule['table']} t2 ON (" . self::getRuleFieldFilter($rule) . ")";
     }
 
-    $query = "SELECT $select FROM $from WHERE " . implode(' AND ', $where);
+    $sql = "SELECT $select FROM $from WHERE " . implode(' AND ', $where);
     if ($this->contactIDs) {
       $cids = $this->contactIDs;
-      $query .= " AND t1.$contactIDFieldName IN (" . implode(',', $cids) . ")
-        UNION $query AND  t2.$contactIDFieldName IN (" . implode(',', $cids) . ")";
+      $sql .= " AND t1.$contactIDFieldName IN (" . implode(',', $cids) . ")
+        UNION $sql AND  t2.$contactIDFieldName IN (" . implode(',', $cids) . ")";
 
       // The `weight` is ambiguous in the context of the union; put the whole
       // thing in a subquery.
-      $query = "SELECT $subSelect FROM ($query) subunion";
+      $sql = "SELECT $subSelect FROM ($sql) subunion";
     }
-    return $query;
+    return $sql;
   }
 
   /**
@@ -187,19 +188,19 @@ class CRM_Dedupe_FinderQueryOptimizer {
    * @throws \CRM_Core_Exception
    */
   private function getRuleFieldFilter(array $rule): string {
-    if ($rule['rule_length']) {
-      $on = ["SUBSTR(t1.{$rule['rule_field']}, 1, {$rule['rule_length']}) = SUBSTR(t2.{$rule['rule_field']}, 1, {$rule['rule_length']})"];
+    if ($rule['length']) {
+      $on = ["SUBSTR(t1.{$rule['field']}, 1, {$rule['length']}) = SUBSTR(t2.{$rule['field']}, 1, {$rule['length']})"];
       return "(" . implode(' AND ', $on) . ")";
     }
     $innerJoinClauses = [
-      "t1.{$rule['rule_field']} IS NOT NULL",
-      "t2.{$rule['rule_field']} IS NOT NULL",
-      "t1.{$rule['rule_field']} = t2.{$rule['rule_field']}",
+      "t1.{$rule['field']} IS NOT NULL",
+      "t2.{$rule['field']} IS NOT NULL",
+      "t1.{$rule['field']} = t2.{$rule['field']}",
     ];
 
-    if (in_array(CRM_Dedupe_BAO_DedupeRule::getFieldType($rule['rule_field'], $rule['rule_table']), CRM_Utils_Type::getTextTypes(), TRUE)) {
-      $innerJoinClauses[] = "t1.{$rule['rule_field']} <> ''";
-      $innerJoinClauses[] = "t2.{$rule['rule_field']} <> ''";
+    if (in_array(CRM_Dedupe_BAO_DedupeRule::getFieldType($rule['field'], $rule['table']), CRM_Utils_Type::getTextTypes(), TRUE)) {
+      $innerJoinClauses[] = "t1.{$rule['field']} <> ''";
+      $innerJoinClauses[] = "t2.{$rule['field']} <> ''";
     }
     return "(" . implode(' AND ', $innerJoinClauses) . ")";
   }
