@@ -2595,7 +2595,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       INNER JOIN civicrm_msg_template m2
         ON m2.workflow_name = m.workflow_name AND m2.is_reserved = 1
         AND m.is_default = 1
-      SET m.msg_html = m2.msg_html, m.msg_text = m2.msg_text
+      SET m.msg_html = m2.msg_html, m.msg_text = m2.msg_text, m.msg_subject = m2.msg_subject
     ');
   }
 
