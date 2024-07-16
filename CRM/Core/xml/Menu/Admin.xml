@@ -298,7 +298,6 @@
      <title>Schedule Reminders</title>
      <desc>Schedule Reminders.</desc>
      <page_callback>CRM_Admin_Page_ScheduleReminders</page_callback>
-     <access_callback>1</access_callback>
      <access_arguments>administer CiviCRM data</access_arguments>
      <adminGroup>Communications</adminGroup>
      <weight>40</weight>
@@ -307,7 +306,6 @@
      <path>civicrm/admin/scheduleReminders/edit</path>
      <title>Schedule Reminders</title>
      <page_callback>CRM_Admin_Form_ScheduleReminders</page_callback>
-     <access_callback>1</access_callback>
      <access_arguments>administer CiviCRM data;edit all events</access_arguments>
   </item>
   <item>
