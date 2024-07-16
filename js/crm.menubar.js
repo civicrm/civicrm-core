@@ -417,7 +417,7 @@
           label = $selection.parent().text(),
           // Set name because the mini-form submits directly to adv search
           value = $selection.data('advSearchLegacy') || $selection.val();
-        $('#crm-qsearch-input').attr({name: value, placeholder: '\uf002 ' + label});
+        $('#crm-qsearch-input').attr({name: value, placeholder: '\uf002 ' + label, title: label});
       }
       $('.crm-quickSearchField').click(function() {
         var input = $('input', this);
