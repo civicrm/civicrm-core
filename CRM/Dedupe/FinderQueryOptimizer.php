@@ -63,7 +63,7 @@ class CRM_Dedupe_FinderQueryOptimizer {
           'key' => $key,
           'order' => $index + 1,
         ];
-        $this->queries[$key]['query'] = $this->getQuery($this->lookupParameters, $this->queries[$key]);
+        $this->queries[$key]['query'] = $this->getQuery($this->queries[$key]);
       }
       $this->threshold = $rule['dedupe_rule_group_id.threshold'];
     }
@@ -97,8 +97,6 @@ class CRM_Dedupe_FinderQueryOptimizer {
    * Return the SQL query for the given rule - either for finding matching
    * pairs of contacts, or for matching against the $params variable (if set).
    *
-   * @param array|null $params
-   *   Params to dedupe against (queries against the whole contact set otherwise)
    * @param array $rule
    *
    * @return string
@@ -109,21 +107,21 @@ class CRM_Dedupe_FinderQueryOptimizer {
    * @internal do not call from outside tested core code. No universe uses Feb 2024.
    *
    */
-  public function getQuery($params, array $rule): ?string {
+  public function getQuery(array $rule): ?string {
 
     $filter = $this->getRuleTableFilter($rule['table']);
     $contactIDFieldName = $this->getContactIDFieldName($rule['table']);
 
     // build FROM (and WHERE, if it's a parametrised search)
     // based on whether the rule is about substrings or not
-    if ($params) {
+    if ($this->lookupParameters) {
       $select = "t1.$contactIDFieldName id1, {$rule['weight']} weight";
       $subSelect = 'id1, weight';
       $where = $filter ? ['t1.' . $filter] : [];
       $from = "{$rule['table']} t1";
       $str = 'NULL';
-      if (isset($params[$rule['table']][$rule['field']])) {
-        $str = trim(CRM_Utils_Type::escape($params[$rule['table']][$rule['field']], 'String'));
+      if (isset($this->lookupParameters[$rule['table']][$rule['field']])) {
+        $str = trim(CRM_Utils_Type::escape($this->lookupParameters[$rule['table']][$rule['field']], 'String'));
       }
       if ($rule['length']) {
         $where[] = "SUBSTR(t1.{$rule['field']}, 1, {$rule['length']}) = SUBSTR('$str', 1, {$rule['length']})";
