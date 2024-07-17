@@ -91,14 +91,9 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
 
   /**
    * Process the form after the input has been submitted and validated.
-   *
-   * @param array|null $params
    */
-  public function postProcess($params = NULL) {
-    if (!empty($params)) {
-      CRM_Core_Error::deprecatedWarning('params parameter is deprecated');
-    }
-    $fv = $params ?: $this->controller->exportValues($this->_name);
+  public function postProcess() {
+    $fv = $this->controller->exportValues($this->_name);
     $locName = NULL;
 
     $addressReturnProperties = CRM_Contact_Form_Task_LabelCommon::getAddressReturnProperties();
