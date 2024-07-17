@@ -218,7 +218,9 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     switch ($column['type']) {
       case 'field':
       case 'html':
-        $rawValue = $data[$column['key']] ?? NULL;
+        // Fix keys for pseudo-fields like "CURDATE()"
+        $key = str_replace('()', ':', $column['key']);
+        $rawValue = $data[$key] ?? NULL;
         if (!$this->hasValue($rawValue) && isset($column['empty_value'])) {
           $out['val'] = $this->replaceTokens($column['empty_value'], $data, 'view');
         }
@@ -226,8 +228,8 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
           $out['val'] = $this->rewrite($column, $data);
         }
         else {
-          $dataType = $this->getSelectExpression($column['key'])['dataType'] ?? NULL;
-          $out['val'] = $this->formatViewValue($column['key'], $rawValue, $data, $dataType, $column['format'] ?? NULL);
+          $dataType = $this->getSelectExpression($key)['dataType'] ?? NULL;
+          $out['val'] = $this->formatViewValue($key, $rawValue, $data, $dataType, $column['format'] ?? NULL);
         }
         if ($this->hasValue($column['label']) && (!empty($column['forceLabel']) || $this->hasValue($out['val']))) {
           $out['label'] = $this->replaceTokens($column['label'], $data, 'view');
