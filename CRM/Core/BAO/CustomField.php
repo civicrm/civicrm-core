@@ -562,6 +562,9 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @throws CRM_Core_Exception
    */
   public static function getFieldObject($fieldID) {
+    if (empty(self::getField($fieldID))) {
+      return;
+    }
     $field = new CRM_Core_BAO_CustomField();
     $field->copyValues(self::getField($fieldID));
     return $field;
