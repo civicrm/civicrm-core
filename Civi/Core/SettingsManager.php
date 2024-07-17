@@ -428,11 +428,7 @@ class SettingsManager {
     if (file_exists($settingsPath)) {
       if (!defined('CIVICRM_SETTINGS_PATH')) {
         define('CIVICRM_SETTINGS_PATH', $settingsPath);
-      }
-      $error = include_once $settingsPath;
-      if ($error === FALSE) {
-        echo "Could not load the settings file at: {$settingsFile}\n";
-        exit();
+        require_once $settingsPath;
       }
     }
 
