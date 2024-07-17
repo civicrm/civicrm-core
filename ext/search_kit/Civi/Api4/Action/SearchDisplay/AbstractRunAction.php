@@ -227,7 +227,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         }
         else {
           $dataType = $this->getSelectExpression($column['key'])['dataType'] ?? NULL;
-          $out['val'] = $this->formatViewValue($column['key'], $rawValue, $data, $dataType);
+          $out['val'] = $this->formatViewValue($column['key'], $rawValue, $data, $dataType, $column['format'] ?? NULL);
         }
         if ($this->hasValue($column['label']) && (!empty($column['forceLabel']) || $this->hasValue($out['val']))) {
           $out['label'] = $this->replaceTokens($column['label'], $data, 'view');
@@ -1153,9 +1153,10 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @param mixed $rawValue
    * @param array $data
    * @param string $dataType
+   * @param string|null $format
    * @return array|string
    */
-  protected function formatViewValue($key, $rawValue, $data, $dataType) {
+  protected function formatViewValue($key, $rawValue, $data, $dataType, $format = NULL) {
     if (is_array($rawValue)) {
       return array_map(function($val) use ($key, $data, $dataType) {
         return $this->formatViewValue($key, $val, $data, $dataType);
@@ -1179,7 +1180,10 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
 
       case 'Date':
       case 'Timestamp':
-        $formatted = \CRM_Utils_Date::customFormat($rawValue);
+        if ($format) {
+          $dateFormat = \Civi::settings()->get($format);
+        }
+        $formatted = \CRM_Utils_Date::customFormat($rawValue, $dateFormat ?? NULL);
     }
 
     return $formatted;

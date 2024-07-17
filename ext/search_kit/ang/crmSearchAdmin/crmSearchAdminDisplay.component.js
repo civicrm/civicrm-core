@@ -79,6 +79,8 @@
         }
       };
 
+      this.dateFormats = CRM.crmSearchAdmin.dateFormats;
+
       // Drag-n-drop settings for reordering columns
       this.sortableOptions = {
         connectWith: '.crm-search-admin-edit-columns',
@@ -121,6 +123,17 @@
         } else {
           ctrl.display.settings.columns.push(searchMeta.fieldToColumn(key, initDefaults));
         }
+      };
+
+      this.getDataType = function(key) {
+        const expr = ctrl.getExprFromSelect(key);
+        const info = searchMeta.parseExpr(expr);
+        const field = (_.findWhere(info.args, {type: 'field'}) || {}).field || {};
+        return (info.fn && info.fn.data_type) || field.data_type;
+      };
+
+      this.isDate = function(key) {
+        return ['Date', 'Timestamp'].includes(this.getDataType(key));
       };
 
       this.getExprFromSelect = function(key) {
