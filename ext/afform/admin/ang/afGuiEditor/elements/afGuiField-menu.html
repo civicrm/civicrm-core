@@ -6,6 +6,12 @@
     </select>
   </div>
 </li>
+<li ng-if="$ctrl.fieldDefn.input_type === 'Date' && $ctrl.getDefn().input_attrs.time">
+  <a href ng-click="toggleAttr('input_attrs.time'); $event.stopPropagation(); $event.target.blur();" title="{{:: ts('Input date + time') }}">
+    <i class="crm-i fa-{{ getProp('input_attrs.time') ? 'check-' : '' }}square-o"></i>
+    {{:: ts('Show Time') }}
+  </a>
+</li>
 <li ng-if="$ctrl.fieldDefn.input_type === 'Number' && $ctrl.fieldDefn.data_type === 'Float'">
   <div href ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown">
     <label>{{:: ts('Decimal places:') }}</label>
