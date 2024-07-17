@@ -244,7 +244,6 @@ class CRM_Report_Form extends CRM_Core_Form {
 
   protected $_instanceButtonName = NULL;
   protected $_createNewButtonName = NULL;
-  protected $_groupButtonName = NULL;
   protected $_chartButtonName = NULL;
   protected $_csvSupported = TRUE;
   protected $_add2groupSupported = TRUE;
@@ -767,7 +766,6 @@ class CRM_Report_Form extends CRM_Core_Form {
 
     $this->_instanceButtonName = $this->getButtonName('submit', 'save');
     $this->_createNewButtonName = $this->getButtonName('submit', 'next');
-    $this->_groupButtonName = $this->getButtonName('submit', 'group');
     $this->_chartButtonName = $this->getButtonName('submit', 'chart');
   }
 
@@ -1724,11 +1722,6 @@ class CRM_Report_Form extends CRM_Core_Form {
       );
       $this->assign('group', TRUE);
     }
-
-    $this->addElement('xbutton', $this->_groupButtonName, '', [
-      'type' => 'submit',
-      'style' => 'display: none;',
-    ]);
 
     $this->addChartOptions();
     $showResultsLabel = $this->getResultsLabel();
