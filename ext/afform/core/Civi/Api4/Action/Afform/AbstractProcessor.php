@@ -176,12 +176,31 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
         $data = ['fields' => $result[$id]];
         foreach ($entity['joins'] ?? [] as $joinEntity => $join) {
           $joinIdField = CoreUtil::getIdFieldName($joinEntity);
-          $data['joins'][$joinEntity] = array_values($this->apiGet($api4, $joinEntity, $join['fields'], [
+          $multipleLocationBlocks = is_array($join['data']['location_type_id'] ?? NULL);
+          $limit = 1;
+          // Repeating blocks - set limit according to `max`, if set, otherwise 0 for unlimited
+          if (!empty($join['af-repeat'])) {
+            $limit = $join['max'] ?? 0;
+          }
+          // Remove limit when handling multiple location blocks
+          if ($multipleLocationBlocks) {
+            $limit = 0;
+          }
+          $joinResult = $this->apiGet($api4, $joinEntity, $join['fields'] + ($join['data'] ?? []), [
             'where' => self::getJoinWhereClause($this->_formDataModel, $entity['name'], $joinEntity, $id),
-            'limit' => !empty($join['af-repeat']) ? $join['max'] ?? 0 : 1,
+            'limit' => $limit,
             'orderBy' => self::getEntityField($joinEntity, 'is_primary') ? ['is_primary' => 'DESC'] : [],
-          ]));
-          $this->_entityIds[$entity['name']][$index]['joins'][$joinEntity] = \CRM_Utils_Array::filterColumns($data['joins'][$joinEntity], [$joinIdField]);
+          ]);
+          // Sort into multiple location blocks
+          if ($multipleLocationBlocks) {
+            $items = array_column($joinResult, NULL, 'location_type_id');
+            $joinResult = [];
+            foreach ($join['data']['location_type_id'] as $locationType) {
+              $joinResult[] = $items[$locationType] ?? [];
+            }
+          }
+          $data['joins'][$joinEntity] = array_values($joinResult);
+          $this->_entityIds[$entity['name']][$index]['joins'][$joinEntity] = \CRM_Utils_Array::filterColumns($joinResult, [$joinIdField]);
         }
         $this->_entityValues[$entity['name']][$index] = $data;
       }
@@ -274,7 +293,8 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
 
     // Add data as clauses e.g. `is_primary: true`
     foreach ($entity['joins'][$joinEntityType]['data'] ?? [] as $key => $val) {
-      $params[] = [$key, '=', $val];
+      $op = is_array($val) ? 'IN' : '=';
+      $params[] = [$key, $op, $val];
     }
 
     // Figure out the FK field between the join entity and the main entity
