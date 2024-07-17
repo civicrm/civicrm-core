@@ -833,6 +833,116 @@ WHERE  civicrm_participant.id = {$participantId}
   }
 
   /**
+   * Retrieves existing participants.
+   *
+   * @param int $contactId
+   *   The contact ID of participants to find.
+   * @param int $eventId
+   *   The event ID of participants to find.
+   * @param bool $onlyCounted
+   *   Whether to only consider registrations with a status with "is_counted".
+   * @param bool $includeOnWaitlist
+   *   Whether to consider registrations with status "On waitlist" when restricing to "is_counted".
+   * @param array $excludeStatus
+   *   A list of registration status to not consider (e.g. for ignoring cancelled registrations).
+   * @param array $filterRoleIds
+   *   A list of participant role IDs to filter for. Registrations with other roles will not be considered.
+   * @param bool $includeTest
+   *   Whether to include test participants.
+   *
+   * @return array<int>
+   *   An array of participant IDs matching the given criteria.
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public static function findExistingParticipants(
+    int $contactId,
+    int $eventId,
+    bool $onlyCounted = TRUE,
+    bool $includeOnWaitlist = TRUE,
+    array $excludeStatus = ['Cancelled'],
+    array $filterRoleIds = [],
+    bool $includeTest = FALSE
+  ) {
+    $query = \Civi\Api4\Participant::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('contact_id', '=', $contactId)
+      ->addWhere('event_id', '=', $eventId);
+
+    if ($onlyCounted) {
+      $query
+        ->addJoin('ParticipantStatusType AS participant_status_type', 'LEFT');
+      $clauses = [
+        ['participant_status_type.is_counted', '=', TRUE],
+      ];
+      if ($includeOnWaitlist) {
+        $clauses = ['participant_status_type.name', '=', 'On waitlist'];
+      }
+      $query->addClause('OR', $clauses);
+    }
+
+    if ([] !== $excludeStatus) {
+      $query->addWhere('status_id:name', 'NOT IN', $excludeStatus);
+    }
+
+    if ([] !== $filterRoleIds) {
+      $query->addWhere('role_id', 'IN', $filterRoleIds);
+    }
+
+    if (!$includeTest) {
+      $query->addWhere('is_test', '=', FALSE);
+    }
+
+    $result = $query->execute();
+    return $result->column('id');
+  }
+
+  /**
+   * Checks for existing participants.
+   * Can be used during validation of new event registrations to check for duplicates.
+   *
+   * @param int $contactId
+   *    The contact ID of participants to find.
+   * @param int $eventId
+   *    The event ID of participants to find.
+   * @param bool $onlyCounted
+   *    Whether to only consider registrations with a status with "is_counted".
+   * @param bool $includeOnWaitlist
+   *    Whether to consider registrations with status "On waitlist" when restricing to "is_counted".
+   * @param array $excludeStatus
+   *    A list of registration status to not consider (e.g. for ignoring cancelled registrations).
+   * @param array $filterRoleIds
+   *    A list of participant role IDs to filter for. Registrations with other roles will not be considered.
+   * @param bool $includeTest
+   *    Whether to include test participants.
+   *
+   * @return bool
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public static function exists(
+    int $contactId,
+    int $eventId,
+    bool $onlyCounted = TRUE,
+    bool $includeOnWaitlist = TRUE,
+    array $excludeStatus = ['Cancelled'],
+    array $filterRoleIds = [],
+    bool $includeTest = FALSE
+  ) {
+    return count(
+        self::findExistingParticipants(
+          $contactId,
+          $eventId,
+          $onlyCounted,
+          $includeOnWaitlist,
+          $excludeStatus,
+          $filterRoleIds,
+          $includeTest
+        )
+      ) > 0;
+  }
+
+  /**
    * Checks duplicate participants.
    *
    * @param array $input
