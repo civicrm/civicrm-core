@@ -427,8 +427,10 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
    *   name of the relevant table.
    * @param array $cols
    *   Mixed array of columns to add or null (to check for the missing columns).
+   * @param bool $resetTableCache
+   *   Refresh the cache for table before calculating the differences with log table.
    */
-  public function fixSchemaDifferencesFor(string $table, array $cols = []): void {
+  public function fixSchemaDifferencesFor(string $table, array $cols = [], bool $resetTableCache = FALSE): void {
     if (!in_array($table, $this->tables, TRUE)) {
       // Create the table if the log table does not exist and
       // the table is in 'this->tables'. This latter array
@@ -441,13 +443,17 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
       return;
     }
 
+    if ($resetTableCache) {
+      $this->resetSchemaCacheForTable($table);
+    }
+    $this->resetSchemaCacheForTable("log_$table");
+
     if (empty($cols)) {
       $cols = $this->columnsWithDiffSpecs($table, "log_$table");
     }
 
     // If a column that already exists on logging table is being added, we
     // should treat it as a modification.
-    $this->resetSchemaCacheForTable("log_$table");
     $logTableSchema = $this->columnSpecsOf("log_$table");
     if (!empty($cols['ADD'])) {
       foreach ($cols['ADD'] as $colKey => $col) {
