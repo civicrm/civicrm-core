@@ -480,13 +480,35 @@ class SettingsBag {
   }
 
   /**
-   * Compute a DSN from its component parts or vice versa
+   * Compute a missing DSN from its component parts or vice versa
+   *
+   * Note: defaults for civicrm_db_XXX will be used
    *
    * @param string $prefix
-   *   The prefix of the DB setting group - e.g. "civicrm" or "civicrm_uf"
+   *   The prefix of the DB setting group - ex: 'civicrm' or 'civicrm_uf'
    *
    * @return array
-   *   Interpolated values
+   *   Ex 1:
+   *
+   *   $prefix = 'civicrm'
+   *   civicrm_db_dsn is NOT already set
+   *   civicrm_db_user set to 'james'
+   *   civicrm_db_password set to 'i<3#browns'
+   *
+   *    returns [
+   *     'civicrm_db_dsn' => 'mysql://james:i%3C3%23browns@localhost:3306/civicrm',
+   *   ]
+   *
+   *   Ex 2:
+   *
+   *   $prefix = 'civicrm_uf', civicrm_uf_db_dsn is set to 'mysql://my_user!:pass#word@host.name/db_name'
+   *
+   *    returns [
+   *     'civicrm_uf_db_user' => 'my_user!',
+   *     'civicrm_uf_db_password' => 'pass#word',
+   *     'civicrm_uf_db_host' => 'host.name',
+   *     'civicrm_uf_db_database' => 'db_name',
+   *   ]
    */
   protected function interpolateDsnSettings(string $prefix): array {
     $computed = [];
@@ -495,8 +517,8 @@ class SettingsBag {
 
     if ($dsn) {
       // if dsn is set explicitly, use this as the source of truth.
-      // set the component parts in case anyone wants to AppSettings::get them
-      $urlComponents = \parse_url($dsn);
+      // set the component parts in case anyone wants to read them individually
+      $urlComponents = \DB::parseDSN($dsn);
 
       if (!$urlComponents) {
         // couldn't parse the dsn so we dont set the components
@@ -504,9 +526,17 @@ class SettingsBag {
         return [];
       }
 
-      foreach (['user', 'password', 'host', 'port'] as $componentKey) {
-        $settingName = $prefix . '_db_' . $componentKey;
-        $value = $urlComponents[$componentKey] ?? NULL;
+      $componentKeyMap = [
+        'hostspec' => 'host',
+        'database' => 'name',
+        'username' => 'user',
+        'password' => 'password',
+        'port' => 'port',
+      ];
+
+      foreach ($componentKeyMap as $theirKey => $ourKey) {
+        $settingName = $prefix . '_db_' . $ourKey;
+        $value = $urlComponents[$theirKey] ?? NULL;
 
         if ($value) {
           $computed[$settingName] = $value;
