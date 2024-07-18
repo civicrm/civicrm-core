@@ -850,8 +850,8 @@ WHERE  civicrm_participant.id = {$participantId}
    * @param bool $includeTest
    *   Whether to include test participants.
    *
-   * @return array<int>
-   *   An array of participant IDs matching the given criteria.
+   * @return array<int, array{id: int, "status_id:name": string}>
+   *   An array of participants (a subset of attributes) matching the given criteria, keyed by ID.
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
@@ -865,7 +865,7 @@ WHERE  civicrm_participant.id = {$participantId}
     bool $includeTest = FALSE
   ) {
     $query = \Civi\Api4\Participant::get(FALSE)
-      ->addSelect('id')
+      ->addSelect('id', 'status_id:name')
       ->addWhere('contact_id', '=', $contactId)
       ->addWhere('event_id', '=', $eventId);
 
@@ -894,7 +894,7 @@ WHERE  civicrm_participant.id = {$participantId}
     }
 
     $result = $query->execute();
-    return $result->column('id');
+    return $result->getArrayCopy();
   }
 
   /**

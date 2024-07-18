@@ -954,7 +954,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
     if (
       $contactID
-      && CRM_Event_BAO_Participant::exists(
+      && count($existingParticipants = CRM_Event_BAO_Participant::findExistingParticipants(
         $contactID,
         $form->_values['event']['id'],
         TRUE,
@@ -965,7 +965,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
             ? $fields['participant_role']
             : $form->_values['event']['default_role_id'],
         ]
-      )
+      )) > 0
     ) {
       if (!$isAdditional && !$form->_values['event']['allow_same_participant_emails']) {
         $registerUrl = CRM_Utils_System::url('civicrm/event/register',
@@ -974,7 +974,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         if ($form->_pcpId) {
           $registerUrl .= '&pcpId=' . $form->_pcpId;
         }
-        $registrationType = (CRM_Event_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'participant_status_id', 'On waitlist') == $participant->status_id) ? 'waitlisted' : 'registered';
+        $registrationType = (CRM_Event_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'participant_status_id', 'On waitlist') == reset($existingParticipants)['status_id:name']) ? 'waitlisted' : 'registered';
         if ($registrationType == 'waitlisted') {
           $status = ts("It looks like you are already waitlisted for this event. If you want to change your registration, or you feel that you've received this message in error, please contact the site administrator.");
         }
