@@ -1570,7 +1570,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         $participantParams['fee_amount'] = $order->getTotalAmount();
       }
     }
-    $participantParams['discount_id'] = $this->getSubmittedValue('discount_id');
+    if ($this->getSubmittedValue('discount_id')) {
+      $participantParams['discount_id'] = $this->getSubmittedValue('discount_id');
+    }
     $participant = CRM_Event_BAO_Participant::create($participantParams);
 
     // Add custom data for participant
