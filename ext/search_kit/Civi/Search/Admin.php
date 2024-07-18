@@ -56,6 +56,7 @@ class Admin {
         ->addWhere('used_for', 'CONTAINS', 'civicrm_saved_search')
         ->execute(),
       'myName' => \CRM_Core_Session::singleton()->getLoggedInContactDisplayName(),
+      'dateFormats' => self::getDateFormats(),
     ];
     $perms = \Civi\Api4\Permission::get()
       ->addWhere('group', 'IN', ['civicrm', 'cms'])
@@ -573,6 +574,14 @@ class Admin {
       return $a['title'] <=> $b['title'];
     });
     return $functions;
+  }
+
+  private static function getDateFormats(): array {
+    return \Civi\Api4\Setting::getFields(FALSE)
+      ->addWhere('name', 'LIKE', 'dateformat%')
+      ->execute()
+      ->indexBy('name')
+      ->column('title');
   }
 
 }

@@ -127,16 +127,16 @@ class Download extends AbstractRunAction {
    * Return raw value if it is a single date, otherwise return parent
    * {@inheritDoc}
    */
-  protected function formatViewValue($key, $rawValue, $data, $dataType) {
+  protected function formatViewValue($key, $rawValue, $data, $dataType, $format = NULL) {
     if (is_array($rawValue)) {
-      return parent::formatViewValue($key, $rawValue, $data, $dataType);
+      return parent::formatViewValue($key, $rawValue, $data, $dataType, $format);
     }
 
     if (($dataType === 'Date' || $dataType === 'Timestamp') && in_array($this->format, ['csv', 'xlsx', 'ods'])) {
       return $rawValue;
     }
     else {
-      return parent::formatViewValue($key, $rawValue, $data, $dataType);
+      return parent::formatViewValue($key, $rawValue, $data, $dataType, $format);
     }
   }
 
