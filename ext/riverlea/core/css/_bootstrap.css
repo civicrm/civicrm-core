@@ -116,7 +116,7 @@
 	color: var(--crm-input-color);
 	text-align: left;
 	background-color: var(--crm-input-background);
-	width: 100%;
+	/* width: 100%; */
 	border-radius: var(--crm-roundness);
 }
 #bootstrap-theme .has-success .form-control {

@@ -22,9 +22,6 @@
     left: 0;
     z-index: 5;
 }
-#crm-contact-actions-list {
-    width: 495px;
-}
 .ac_results-inner, 
 .crm-participant-list-inner, 
 .crm-event-links-list-inner, 
@@ -325,15 +322,16 @@
 	right: auto;
 	left: 0;
 }
-.crm-container .dropdown-header {
+.crm-container li.dropdown-header {
 	display: block;
 	padding: var(--crm-dropdown-padding);
 	white-space: nowrap;
     color: var(--crm-dropdown-col);
     font-family: var(--crm-font-bold);
     font-weight: var(--crm-bold-weight);
-    padding: var(--crm-m2) var(--crm-xs) var(--crm-xs) !important;
+    padding: var(--crm-m) var(--crm-xs) var(--crm-xs) !important;
     border-bottom: 1px solid var(--crm-dropdown-col);
+    border-radius: 0;
 }
 .crm-container .pull-right > .dropdown-menu {
 	right: 0;

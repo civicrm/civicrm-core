@@ -359,7 +359,7 @@ input.crm-form-checkbox) + label {
 }
 .crm-container .select2-container.select2-container-disabled .select2-choice {
     background-color: var(--crm-c-background);
-    border: 1px solid var(--crm-c-inactive);
+    border: 1px dotted var(--crm-c-inactive);
     cursor: default;
 }
 .select2-container.select2-container-disabled .select2-choice .select2-arrow {

@@ -212,42 +212,6 @@
     border: 0 solid transparent;
 } 
 
-/* SearchKit tabs */
-
-.crm-search .crm-flex-box.crm-search-admin-outer {
-    display: grid;
-    grid-template-columns: 280px auto;
-}
-.crm-search .crm-flex-box.crm-search-admin-outer:first-of-type {
-    grid-template-columns: 33% auto;
-}
-.crm-search .crm-search-admin-outer ul.nav-stacked > li > a {
-    display: inline-block;
-    width: 100%;
-    border: 1px solid transparent;
-    border-radius: var(--crm-roundness) 0 0 var(--crm-roundness) !important;
-    right: -1px
-}  
-.crm-search .crm-search-admin-outer ul.nav-stacked {
-    display: flex;
-    gap: var(--crm-s);
-    position: relative;
-    margin-top: var(--crm-r);
-}
-.crm-search .crm-search-admin-outer ul.nav-stacked li.active a {
-    background-color: var(--crm-tab-bg-active) !important; /* vs crmSearchAdmin.css */
-    color: var(--crm-tab-col) !important;
-    border: 1px solid var(--crm-c-gray-300) !important;
-    border-right: 0 none !important;
-}
-.crm-search .crm-search-admin-outer .crm-flex-4.panel {
-    border: 1px solid var(--crm-c-gray-300);
-}
-.crm-search .crm-search-admin-outer .crm-flex-4.panel .panel-body {
-    border-radius: var(--crm-roundness);
-    height: 100%;
-}
-
 /* Responsive - using Bootstrap viewports */
 
 @media (max-width: 768px) {

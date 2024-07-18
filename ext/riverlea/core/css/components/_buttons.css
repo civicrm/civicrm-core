@@ -25,8 +25,8 @@
 .crm-container .btn:focus,
 .crm-container .crm-button:hover,
 .crm-container .crm-button:focus,
-.crm-container .btn:hover,
-.crm-container .btn:focus {
+[type="button"]:hover, [type="reset"]:hover, [type="submit"]:hover,
+[type="button"]:focus, [type="reset"]:focus, [type="submit"]:focus  {
     background: var(--crm-c-primary-hover);
     color: var(--crm-c-primary-text);
     text-decoration: none;
@@ -99,7 +99,6 @@
 .crm-container .crm-button i.crm-i,
 .crm-container a.button i.crm-i,
 .crm-container button i.crm-i,
-.crm-container a.button:link i.crm-i,
 .crm-container a.button:visited i.crm-i,
 .crm-container input.form-submit i.crm-i,
 .crm-container input[type="button"] i.crm-i,
@@ -111,14 +110,17 @@
     background-color: var(--crm-btn-icon-bg);
     border-radius: var(--crm-btn-radius) 0 0 var(--crm-btn-radius);
     border-right: var(--crm-btn-icon-border);
-    height: auto;
     line-height: inherit;
     margin: 0 var(--crm-btn-icon-spacing) 0 0;
     opacity: 1;
     text-shadow: none;
     padding: var(--crm-btn-padding-block) var(--crm-btn-icon-spacing) var(--crm-btn-padding-block) var(--crm-btn-padding-inline);
-    height: calc(var(--crm-btn-height) - 2px);
+    height: auto;
     min-width: var(--crm-btn-height);
+}
+.crm-container a.button i.crm-i,
+.crm-container .btn i.crm-i {
+    height: calc(var(--crm-btn-height) - 2px);
 }
 .crm-container .btn.btn-xs .crm-i {
     padding: var(--crm-btn-small-padding) !important;
@@ -201,11 +203,17 @@
 	font-size: var(--crm-m2);
 	line-height: 1.5;
 	border-radius: var(--crm-btn-radius);
+    height: auto;
 }
 .crm-container .btn-xs, .crm-container .btn-group-xs > .btn {
 	padding: var(--crm-xs) var(--crm-s2);
 	font-size: var(--crm-m2);
 	border-radius: var(--crm-btn-radius);
+    height: auto;
+}
+.crm-container .btn-sm i.crm-i, .crm-container .btn-group-sm > .btn i.crm-i,
+.crm-container .btn-xs i.crm-i, .crm-container .btn-group-xs > .btn i.crm-i {
+    height: auto;
 }
 .crm-container .btn-block {
 	display: block;

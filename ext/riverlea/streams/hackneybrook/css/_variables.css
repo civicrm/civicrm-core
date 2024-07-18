@@ -111,8 +111,8 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-l: 2rem;
 --crm-xl: 3rem;
 --crm-xxl: 4rem;
---crm-big-input: 15em;
---crm-huge-input: 25em;
+--crm-big-input: 15rem;
+--crm-huge-input: 25rem;
 --crm-padding-reg: var(--crm-r);
 --crm-padding-small: var(--crm-s);
 --crm-padding-inset: var(--crm-m);

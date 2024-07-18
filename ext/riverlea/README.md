@@ -80,7 +80,7 @@ E.g. to add a stream called "Vimur", you would name the directory 'vimur', and a
 
 ```
  function riverlea_civicrm_themes(&$themes) {
-  $themes['minetta'] = array(
+  $themes['vimur'] = array(
     'ext' => 'riverlea',
     'title' => 'Riverlea: Vimur',
     'prefix' => 'streams/vimur/',
@@ -93,3 +93,5 @@ E.g. to add a stream called "Vimur", you would name the directory 'vimur', and a
   … 
  }
 ```
+
+Use of the [ThemeTest extension](https://lab.civicrm.org/extensions/themetest) is recommended to more quickly identify which CSS variables match which UI element, and test multiple variations for each.

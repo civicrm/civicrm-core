@@ -184,8 +184,8 @@ a.crm-expand-row:hover,a.crm-expand-row:focus {
 	  For buttons not using .crm-button or .btn or <button>
 *******************/
 
-.crm-container a.button,
-.crm-container button,
+/* .crm-container a.button,
+.crm-container button, */
 .crm-container .ui-button:not(.ui-button-icon-only) {
 	display: inline-block;
 	text-align: var(--crm-btn-align);
@@ -210,9 +210,7 @@ a.crm-expand-row:hover,a.crm-expand-row:focus {
 	gap: var(--crm-btn-icon-spacing); /* last four lines centre icons */
 }
 .crm-container .ui-button:hover,
-.crm-container .ui-button:focus,
-[type="button"]:hover, [type="reset"]:hover, [type="submit"]:hover,
-[type="button"]:focus, [type="reset"]:focus, [type="submit"]:focus {
+.crm-container .ui-button:focus {
     background: var(--crm-c-primary-hover);
 	color: var(--crm-c-primary-text);
 	text-decoration: none;
@@ -224,17 +222,14 @@ a.crm-expand-row:hover,a.crm-expand-row:focus {
     padding: 0;
 	border: 0;
 }
-.crm-container a.button,
-.crm-container [type="button"] {
+.crm-container a.button {
     background: var(--crm-c-secondary);
     color: var(--crm-c-secondary-text);
     font-weight: normal;
 	text-decoration: none;
 }
 .crm-container a.button:hover,
-.crm-container a.button:focus,
-.crm-container [type="button"]:hover,
-.crm-container [type="button"]:focus {
+.crm-container a.button:focus {
     background: var(--crm-c-secondary-hover);
 	color: var(--crm-c-secondary-text);
 }
@@ -310,14 +305,12 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
 *******************/
 
 .afadmin-list .nav-tabs + .form-inline + table,
-/* .crm-search-nav-tabs ~ .ng-scope, */
 .afadmin-list > .form-inline,
-.crm-search .crm-search-display.crm-search-display-table {
+crm-search-admin-search-listing .crm-search-display.crm-search-display-table {
     border: 1px solid var(--crm-tab-border-col);
     border-top: 0 solid transparent;
     border-radius: 0 0 var(--crm-roundness) var(--crm-roundness);
 	background: var(--crm-tab-bg-active);
-	/* overflow-x: auto; */
 }
 .crm-search > .ng-scope > .form-inline {
     border: 1px solid var(--crm-tab-border-col);
@@ -806,158 +799,6 @@ details + .crm-content-block:has(.dataTables_wrapper) {
 	CORE EXTENSIONS
 *******************/
 
-/* SEARCH KIT 
-   .crm-search-admin */
-
-.crm-search-admin-search-listing-buttons {
-	display: flex !important; /* vs .crmSearchAdmin */
-}
-.crm-search-admin-search-listing-buttons .btn-primary {
-	background-color: var(--crm-c-secondary);
-	color: var(--crm-c-secondary-text);
-}
-.crm-search-admin-search-listing-buttons .btn-primary:hover {
-	background-color: var(--crm-c-secondary-hover);
-}
-.crm-search .crm-search-nav-tabs > div.btn-group {
-    top: calc(-1 * var(--crm-m));
-}
-
-.crm-search .dropdown-menu li .form-inline {
-	padding: 0;
-}
-.crm-search .crm-search-admin-relative textarea {
-    width: 100%;
-}
-.crm-search .crm-search-admin-relative .api4-clause-group-sortable {
-    margin: var(--crm-r) 0;
-}
-.crm-search .crm-search-admin-relative details { /* only way to target settings accordions */
-    border: var(--crm-expand-body-border);
-    border-radius: var(--crm-roundness);
-}
-.crm-search .crm-search-admin-relative details > summary {
-    background: var(--crm-expand-header-bg);
-    color: var(--crm-expand-header-color);
-    padding: var(--crm-padding-small) var(--crm-padding-reg);
-}
-.crm-search .crm-search-admin-relative details > fieldset {
-    padding: 0;
-    border: 0 solid transparent;
-}
-.crm-search fieldset legend {
-	padding: 0 !important /* vs crmSearchAdmin.css */;
-	font-size: inherit !important;
-	background-color: transparent !important;
-}
-.crm-search .crm-search-admin-relative details > fieldset .form-inline:not(td) {
-    background: var(--crm-c-drag-background);
-    border-radius: var(--crm-roundness);
-    margin-bottom: var(--crm-s2);
-    padding: var(--crm-padding-small) var(--crm-padding-reg);
-}
-.crm-search .crm-search-admin-relative details > fieldset fieldset,
-.crm-search crm-search-admin-display fieldset .form-inline > fieldset {
-    margin: 0;
-    padding: 0;
-    border: 0 solid transparent;
-}
-.crm-search crm-search-admin-link-group {
-    background: var(--crm-c-background2);
-}
-.crm-search crm-search-admin-link-group table {
-    margin: var(--crm-padding-reg);
-	max-width: calc(100% - var(--crm-padding-reg) - var(--crm-padding-reg));
-	box-shadow: none;
-}
-.crm-search ul.nav-stacked li:last-of-type {
-    margin-top: var(--crm-r);
-}
-.crm-search ul.nav-stacked li:has(.btn-xs) a {
-    padding-right: 5ch;
-}
-.crm-search .crm-search-admin-edit-columns {
-    padding: 0;
-    border: 0 solid transparent;
-}
-.crm-search fieldset.crm-draggable {
-    background-color: var(--crm-c-drag-background) !important;
-    border-radius: var(--crm-roundness);
-    border: 0 solid transparent !important;
-    padding: var(--crm-padding-small) !important;
-    margin: var(--crm-m)0 ;
-}
-.crm-search .crm-search-admin-edit-columns details {
-    background-color: var(--crm-c-page-background);
-    border-radius: var(--crm-roundness);
-    border: 0;
-}
-.crm-search .crm-search-admin-edit-columns details summary {
-    background: var(--crm-expand-header2-bg);
-    color: var(--crm-expand-header2-color);
-    padding: var(--crm-padding-reg);
-}
-.crm-search .crm-search-admin-edit-columns details > *:not(summary) {
-    padding-inline: var(--crm-padding-reg);
-}
-.crm-search .crm-search-admin-edit-columns details > *:first-child {
-    padding-bottom: var(--crm-padding-reg);
-}
-.crm-search .crm-search-admin-edit-columns details > *:last-child {
-    padding-bottom: var(--crm-padding-reg);
-}
-.crm-search details label {
-    min-width: var(--crm-input-label-width);
-}
-.crm-search details label:has(~ a.helpicon) {
-	min-width: calc(var(--crm-input-label-width) - 19px);
-}
-.crm-search-admin-main-tabs button.btn-xs {
-	background: transparent;
-	color: var(--crm-c-text);
-	font-size: var(--crm-font-size);
-}
-#bootstrap-theme .crm-search-display-control {
-	right: 4px !important;
-}
-#bootstrap-theme .crm-search-display-control + .crm-search-display-control {
-	right: 28px !important;
-}
-#bootstrap-theme.crm-search .api4-clause-badge,
-#bootstrap-theme.crm-search .api4-clause-badge .btn {
-	font-size: var(--crm-input-font-size);
-}
-/* .crmSearchDisplay */
-.crm-search-display th.crm-sortable-col {
-	cursor: pointer;
-	vertical-align: middle;
-}
-.crm-search-display th i.fa-sort-desc,
-.crm-search-display th i.fa-sort-asc {
-	color: var(--crm-c-primary);
-}
-.crm-search-display th:not(:hover) i.fa-sort {
-	opacity: .5;
-}
-.crm-search input.ng-invalid,
-.crm-search-display input.ng-invalid,
-.crm-search-task-dialog input.ng-invalid {
-	border-color: var(--crm-c-warning);
-}
-#crm-search-results-page-size {
-	width: 60px;
-}
-.crm-search-display button.dropdown-toggle {
-	white-space: nowrap;
-	font-size: var(--crm-font-size);
-}
-.crm-contact-page .crm-search-display .form-group.pull-right {
-	display: flex !important;
-	gap: var(--crm-m);
-}
-.crm-contact-page .crm-search-display-pager {
-    padding: 0 var(--crm-r) var(--crm-r) var(--crm-r);
-}
 .af-container.af-layout-cols { /* vs afCore */
 	column-gap: var(--crm-m);
 }

@@ -321,7 +321,9 @@ color-scheme: light dark;
 --crm-dash-header-padding: 0 0 var(--crm-r) 0; 
 --crm-dash-image-size: 100px;
 --crm-dash-image-radius: 200px;
---crm-dash-image-float: right;
+--crm-dash-image-justify: space-between; /* choose from start (left), end (right), center, and space-between (spread out) */
+--crm-dash-image-direction: row-reverse; /* choose from row and row-reverse to get the image on the right, column stacks it */
+
 
 /* Dialog */
 --crm-dialog-bg: var(--crm-c-page-background);

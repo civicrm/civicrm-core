@@ -2974,7 +2974,7 @@
 	border-bottom-color: transparent;
 } */
 
-#bootstrap-theme .nav-pills > li {
+/* #bootstrap-theme .nav-pills > li {
 	float: left;
 }
 #bootstrap-theme .nav-pills > li > a {
@@ -2982,18 +2982,18 @@
 }
 #bootstrap-theme .nav-pills > li + li {
 	margin-left: 2px;
-}
+} */
 /* #bootstrap-theme .nav-pills > li.active > a, #bootstrap-theme .nav-pills > li.active > a:hover, #bootstrap-theme .nav-pills > li.active > a:focus {
 	color: white;
 	background-color: black;
 } */
-#bootstrap-theme .nav-stacked > li {
+/* #bootstrap-theme .nav-stacked > li {
 	float: none;
 }
 #bootstrap-theme .nav-stacked > li + li {
 	margin-top: 2px;
 	margin-left: 0;
-}
+} */
 #bootstrap-theme .nav-justified, #bootstrap-theme .nav-tabs.nav-justified {
 	width: 100%;
 }
