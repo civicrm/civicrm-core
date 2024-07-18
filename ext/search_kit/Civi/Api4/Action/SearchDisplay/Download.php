@@ -180,6 +180,7 @@ class Download extends AbstractRunAction {
     // Header row
     foreach (array_values($columns) as $index => $col) {
       $sheet->setCellValueByColumnAndRow($index + 1, 1, $col['label']);
+      $sheet->getColumnDimensionByColumn($index)->setAutoSize(TRUE);
     }
 
     foreach ($rows as $rowNum => $data) {
