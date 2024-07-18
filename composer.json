@@ -295,5 +295,8 @@
     },
     "compile-includes": ["ext/greenwich/composer.compile.json"],
     "compile-whitelist": ["civicrm/composer-compile-lib"]
+  },
+  "require-dev": {
+    "clagiordano/phpunit-result-printer": "^3.0"
   }
 }
