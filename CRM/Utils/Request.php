@@ -133,6 +133,16 @@ class CRM_Utils_Request {
     foreach (($method ?? []) as $key => $value) {
       if (strpos($key, 'amp;') !== FALSE) {
         $method[str_replace('amp;', '', $key)] = $method[$key];
+        if ($method === '$_POST' && $_SERVER['CONTENT_TYPE'] === 'application/json') {
+          static $post = NULL;
+          if (!isset($post)) {
+            $rawPost = file_get_contents('php://input');
+            $post = json_decode($rawPost, TRUE) ?? [];
+          }
+          if (isset($post[$name])) {
+            return $post[$name];
+          }
+        }
         if (isset($method[$name])) {
           return $method[$name];
         }
@@ -166,6 +176,11 @@ class CRM_Utils_Request {
     }
     if ($_POST) {
       $result = array_merge($result, $_POST);
+    }
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_SERVER['CONTENT_TYPE'] === 'application/json') {
+      $rawPost = file_get_contents('php://input');
+      $jsonPost = json_decode($rawPost, TRUE) ?? [];
+      $result = array_merge($result, $jsonPost);
     }
     return $result;
   }
