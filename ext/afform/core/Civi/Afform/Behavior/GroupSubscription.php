@@ -2,6 +2,7 @@
 namespace Civi\Afform\Behavior;
 
 use Civi\Afform\AbstractBehavior;
+use Civi\Afform\Event\AfformEntitySortEvent;
 use Civi\Afform\Event\AfformPrefillEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use CRM_Afform_ExtensionUtil as E;
@@ -17,6 +18,7 @@ class GroupSubscription extends AbstractBehavior implements EventSubscriberInter
    */
   public static function getSubscribedEvents() {
     return [
+      'civi.afform.sort.prefill' => 'onAfformSortPrefill',
       'civi.afform.prefill' => ['onAfformPrefill', 99],
     ];
   }
@@ -62,7 +64,58 @@ class GroupSubscription extends AbstractBehavior implements EventSubscriberInter
     return $modes;
   }
 
+  public static function onAfformSortPrefill(AfformEntitySortEvent $event): void {
+    $formEntities = $event->getFormDataModel()->getEntities();
+    foreach ($formEntities as $entityName => $entity) {
+      if ($entity['type'] === 'GroupSubscription') {
+        if (isset($formEntities[$entity['data']['contact_id']])) {
+          $event->addDependency($entityName, $entity['data']['contact_id']);
+        }
+      }
+    }
+  }
+
   public static function onAfformPrefill(AfformPrefillEvent $event): void {
+    if ($event->getEntityType() !== 'GroupSubscription') {
+      return;
+    }
+    $subscriptionEntity = $event->getEntity();
+    $subscriptionMode = $subscriptionEntity['group-subscription'];
+    // Defaults are only needed for modes that allow opt-in, right Kurund?
+    if (!in_array($subscriptionMode, ['normal', 'opt-in'], TRUE)) {
+      return;
+    }
+    $contact = $subscriptionEntity['data']['contact_id'];
+    if ($contact === 'user_contact_id') {
+      $cid = \CRM_Core_Session::getLoggedInContactID();
+    }
+    elseif ($contact && \CRM_Utils_Rule::positiveInteger($contact)) {
+      $cid = $contact;
+    }
+    else {
+      $cid = $event->getEntityIds($contact)[0] ?? NULL;
+    }
+    if ($cid) {
+      $groupsToFill = [];
+      foreach (array_keys($subscriptionEntity['fields']) as $fieldName) {
+        if (str_starts_with($fieldName, 'group_')) {
+          $groupsToFill[] = explode('_', $fieldName)[1];
+        }
+      }
+      if (!$groupsToFill) {
+        return;
+      }
+      $currentContactGroups = \Civi\Api4\GroupContact::get(FALSE)
+        ->addSelect('group_id')
+        ->addWhere('contact_id', '=', $contactId)
+        ->addWhere('status', '!=', 'Removed')
+        ->addWhere('group_id', 'IN', $groupsToFill)
+        ->execute()->column('group_id');
+
+      // HMM, I got this far and now I think the above logic needs to be moved into the
+      // GroupSubscription::get action, but I also think that entity could be standardized a bit
+      // more and ought to extend BasicEntity so it has all the expected CRUD actions...
+    }
   }
 
 }
