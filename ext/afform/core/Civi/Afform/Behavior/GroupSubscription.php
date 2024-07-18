@@ -33,6 +33,10 @@ class GroupSubscription extends AbstractBehavior implements EventSubscriberInter
     return E::ts('Configue subscription behavior.');
   }
 
+  public static function getDefaultMode(): string {
+    return 'normal';
+  }
+
   public static function getModes(string $contactType):array {
     $modes = [
       [

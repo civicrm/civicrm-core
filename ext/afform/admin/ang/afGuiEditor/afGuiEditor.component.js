@@ -238,6 +238,14 @@
         }));
 
         function addToCanvas() {
+          // Set default mode of behaviors
+          if (afGui.meta.behaviors[meta.entity]) {
+            afGui.meta.behaviors[meta.entity].forEach(behavior => {
+              if (behavior.default_mode) {
+                $scope.entities[type + num][behavior.key] = behavior.default_mode;
+              }
+            });
+          }
           // Add this af-entity tag after the last existing one
           var pos = 1 + _.findLastIndex(editor.layout['#children'], {'#tag': 'af-entity'});
           editor.layout['#children'].splice(pos, 0, $scope.entities[type + num]);

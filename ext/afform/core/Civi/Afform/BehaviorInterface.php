@@ -54,4 +54,11 @@ interface BehaviorInterface {
    */
   public static function getModes(string $entityName): array;
 
+  /**
+   * Default mode. If set then mode will not be de-selectable.
+   *
+   * @return string|null
+   */
+  public static function getDefaultMode(): ?string;
+
 }
