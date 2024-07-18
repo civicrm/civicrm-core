@@ -1,6 +1,6 @@
 <?php
 
-use CRM_Stripe_ExtensionUtil as E;
+use CRM_riverlea_ExtensionUtil as E;
 
 return [
   [
