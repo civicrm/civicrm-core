@@ -13,6 +13,9 @@ use Civi\Test;
 use Civi\Test\Api3TestTrait;
 use Civi\Test\CiviEnvBuilder;
 use Civi\Test\ContactTestTrait;
+use Civi\Test\HeadlessInterface;
+use Civi\Test\TransactionalInterface;
+use PHPUnit\Framework\TestCase;
 
 /**
  *  Test APIv3 civicrm_grant* functions
@@ -21,15 +24,15 @@ use Civi\Test\ContactTestTrait;
  * @subpackage API_Grant
  * @group headless
  */
-class api_v3_GrantTest extends \PHPUnit\Framework\TestCase implements \Civi\Test\HeadlessInterface, \Civi\Test\TransactionalInterface {
+class api_v3_GrantTest extends TestCase implements HeadlessInterface, TransactionalInterface {
   use Api3TestTrait;
   use ContactTestTrait;
   use Test\EntityTrait;
 
   protected $_apiversion = 3;
-  protected $params;
+  protected array $params;
   protected $ids = [];
-  protected $_entity = 'Grant';
+  protected string $_entity = 'Grant';
 
   /**
    * @throws \CRM_Extension_Exception_ParseException
@@ -158,7 +161,7 @@ class api_v3_GrantTest extends \PHPUnit\Framework\TestCase implements \Civi\Test
     $this->assertGreaterThanOrEqual(1, $result['count']);
   }
 
-  public function testGrantGetDoesNotInterfereWithContributionGet() {
+  public function testGrantGetDoesNotInterfereWithContributionGet(): void {
     $this->individualCreate();
     $this->createTestEntity('Contribution', [
       'contact_id' => $this->individualCreate(),
