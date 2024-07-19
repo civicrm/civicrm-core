@@ -9,6 +9,11 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Test;
+use Civi\Test\Api3TestTrait;
+use Civi\Test\CiviEnvBuilder;
+use Civi\Test\ContactTestTrait;
+
 /**
  *  Test APIv3 civicrm_grant* functions
  *
@@ -17,16 +22,20 @@
  * @group headless
  */
 class api_v3_GrantTest extends \PHPUnit\Framework\TestCase implements \Civi\Test\HeadlessInterface, \Civi\Test\TransactionalInterface {
-  use \Civi\Test\Api3TestTrait;
-  use \Civi\Test\ContactTestTrait;
+  use Api3TestTrait;
+  use ContactTestTrait;
+  use Test\EntityTrait;
 
   protected $_apiversion = 3;
   protected $params;
   protected $ids = [];
   protected $_entity = 'Grant';
 
-  public function setUpHeadless() {
-    return \Civi\Test::headless()
+  /**
+   * @throws \CRM_Extension_Exception_ParseException
+   */
+  public function setUpHeadless(): CiviEnvBuilder {
+    return Test::headless()
       ->install(['org.civicrm.afform', 'org.civicrm.search_kit'])
       ->installMe(__DIR__)
       ->apply();
@@ -53,6 +62,13 @@ class api_v3_GrantTest extends \PHPUnit\Framework\TestCase implements \Civi\Test
       'value' => 1,
       'is_active' => 1,
     ]);
+    // Currently Civi Contribute is always enabled but if that changes the get
+    // test might become invalid so let's pick up any future change.
+    $civiContribute = $this->callAPISuccess('Extension', 'get', [
+      'sequential' => 1,
+      'full_name' => "civi_contribute",
+    ])['values'][0];
+    $this->assertEquals('installed', $civiContribute['status']);
   }
 
   /**
@@ -69,9 +85,9 @@ class api_v3_GrantTest extends \PHPUnit\Framework\TestCase implements \Civi\Test
     parent::tearDown();
   }
 
-  public function testCreateGrant() {
-    $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
-    $this->ids['grant'][0] = $result['id'];
+  public function testCreateGrant(): void {
+    $result = $this->callAPISuccess('Grant', 'create', $this->params);
+    $this->ids['Grant'][0] = $result['id'];
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
   }
@@ -80,8 +96,10 @@ class api_v3_GrantTest extends \PHPUnit\Framework\TestCase implements \Civi\Test
    * Check checkbox type custom fields are created correctly.
    *
    * We want to ensure they are saved with separators as appropriate
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testCreateCustomCheckboxGrant() {
+  public function testCreateCustomCheckboxGrant(): void {
     $cg = $this->callAPISuccess('customGroup', 'create', [
       'title' => 'Grant custom group',
       'extends' => 'Grant',
@@ -133,14 +151,27 @@ class api_v3_GrantTest extends \PHPUnit\Framework\TestCase implements \Civi\Test
     $this->assertEquals($expectedValue, $savedValue);
   }
 
-  public function testGetGrant() {
-    $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
+  public function testGetGrant(): void {
+    $result = $this->callAPISuccess('Grant', 'create', $this->params);
     $this->ids['grant'][0] = $result['id'];
     $result = $this->callAPISuccess($this->_entity, 'get', ['rationale' => 'Just Because']);
     $this->assertGreaterThanOrEqual(1, $result['count']);
   }
 
-  public function testDeleteGrant() {
+  public function testGrantGetDoesNotInterfereWithContributionGet() {
+    $this->individualCreate();
+    $this->createTestEntity('Contribution', [
+      'contact_id' => $this->individualCreate(),
+      'currency' => 'NZD',
+      'total_amount' => 5,
+      'financial_type_id:name' => 'Donation',
+    ]);
+    $this->createTestEntity('Grant', $this->params);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', []);
+    $this->assertEquals('NZD', $contribution['currency']);
+  }
+
+  public function testDeleteGrant(): void {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $this->callAPISuccess($this->_entity, 'delete', ['id' => $result['id']]);
     $checkDeleted = $this->callAPISuccess($this->_entity, 'get', ['id' => $result['id']]);
@@ -150,7 +181,7 @@ class api_v3_GrantTest extends \PHPUnit\Framework\TestCase implements \Civi\Test
   /**
    * Test Grant status with `0` value.
    */
-  public function testGrantWithZeroStatus() {
+  public function testGrantWithZeroStatus(): void {
     $params = [
       'action' => 'create',
       'grant_type_id' => "Emergency",
@@ -172,10 +203,8 @@ class api_v3_GrantTest extends \PHPUnit\Framework\TestCase implements \Civi\Test
 
   /**
    * Test contact subtype filter on grant report.
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function testGrantReportSeparatedFilter() {
+  public function testGrantReportSeparatedFilter(): void {
     $this->ids['contact'][] = $contactID = $this->individualCreate(['contact_sub_type' => ['Student', 'Parent']]);
     $this->ids['contact'][] = $contactID2 = $this->individualCreate();
     $this->ids['grant'][] = $this->callAPISuccess('Grant', 'create', ['contact_id' => $contactID, 'status_id' => 1, 'grant_type_id' => 1, 'amount_total' => 1])['id'];
