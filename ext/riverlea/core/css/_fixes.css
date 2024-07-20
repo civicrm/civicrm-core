@@ -280,8 +280,17 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
     padding: var(--crm-xs) var(--crm-s);
     font-size: var(--crm-small-font-size);
 }
+/* select all 'checkbox' on table th */
 .crm-container button.btn:has(.fa-square-o) {
-	padding-inline: var(--crm-m);
+	padding-inline: 0;
+	border-right: 0;
+}
+.crm-container i.crm-i.fa-square-o {
+	margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 /******************

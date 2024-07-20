@@ -1,6 +1,6 @@
 /* Style rules for SearchKit Admin
-   Forked on 12 June 24. Called on SearchKit Admin pages
-   Status: not merged (theme edits at foot) */
+   Forked on 19 July 24. Called on SearchKit pages
+   Status: merged */
 
 /* Sortable headers */
 .crm-search-display th.crm-sortable-col {
@@ -60,17 +60,12 @@
   margin: 0;
 }
 
-/* Dropdowns */
-
-.crm-search-display .btn-xs.dropdown-toggle {
-  font-size: inherit;
-}
-
 /* RiverLea Aditions */
 
-.crm-contact-page .crm-search-display .form-group.pull-right {
+.crm-contact-page .crm-search-display .form-group.pull-right,
+.afform-directive .btn-group.pull-right {
 	display: flex !important;
-	gap: var(--crm-m);
+	gap: var(--crm-flex-gap);
 }
 .crm-contact-page .crm-search-display-pager {
     padding: 0 var(--crm-r) var(--crm-r) var(--crm-r);
