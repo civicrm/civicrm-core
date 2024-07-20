@@ -225,9 +225,15 @@ a.crm-expand-row:hover,a.crm-expand-row:focus {
 .crm-container a.button {
     background: var(--crm-c-secondary);
     color: var(--crm-c-secondary-text);
+	border: var(--crm-btn-border);
     font-weight: normal;
 	text-decoration: none;
 	line-height: inherit;
+}
+.crm-container a.button span {
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 .crm-container a.button:hover,
 .crm-container a.button:focus {

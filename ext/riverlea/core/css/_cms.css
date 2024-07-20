@@ -149,6 +149,7 @@ body.wp-admin #wpcontent {
 body.wp-admin .crm-container li {
     margin: 0; /* resets WP li bottom margin */
     list-style: none;
+    white-space: inherit;
 }
 body.wp-admin div.ui-notify-message .notify-content li {
     list-style: unset;

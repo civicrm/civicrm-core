@@ -118,9 +118,15 @@
     height: auto;
     min-width: var(--crm-btn-height);
 }
-.crm-container a.button i.crm-i,
+.crm-container button i.crm-i,
 .crm-container .btn i.crm-i {
     height: calc(var(--crm-btn-height) - 2px);
+}
+.crm-container a.button i.crm-i,
+.crm-container .crm-button:not(.btn) i.crm-i {
+    height: calc(var(--crm-btn-height) - 2px);
+    display: flex;
+    align-items: center;
 }
 .crm-container .btn.btn-xs .crm-i {
     padding: var(--crm-btn-small-padding) !important;
@@ -128,21 +134,37 @@
     min-width: auto !important;
     margin-right: calc(var(--crm-btn-icon-spacing) * 0.7);
 }
-.crm-container a.button:has(i.crm-i), 
+/* .crm-container a.button:has(i.crm-i), 
 .crm-container button:has(i.crm-i),
 .crm-button > input[type="button"]:has(i.crm-i), 
-.crm-button > input[type="submit"]:has(i.crm-i),
+.crm-button > input[type="submit"]:has(i.crm-i), */
 .crm-container button.dropdown-toggle.btn-xs:has(i.crm-i),
-.crm-button:has(i.crm-i),
 .crm-container .btn:has(i.crm-i),
 .crm-container .btn-group > .btn + .dropdown-toggle:has(i.crm-i),
 .crm-container button.ui-button:has(.ui-button-icon) {
     padding: 0 var(--crm-btn-padding-inline) 0 0;
     display: inline-block;
 }
+.crm-container a.button:has(i.crm-i), 
+.crm-container button:has(i.crm-i),
+.crm-button:has(i.crm-i),
+.crm-button > input[type="button"]:has(i.crm-i), 
+.crm-button > input[type="submit"]:has(i.crm-i),
+.form-inline .btn-success.pull-right:has(i.crm-i) /* Api4exp */ {
+    padding: 0 var(--crm-btn-padding-inline) 0 0;
+    display: flex;
+    width: fit-content;
+    justify-content: center;
+    align-items: center;
+}
+.crm-button > input[type="button"]:has(i.crm-i), 
+.crm-button > input[type="submit"]:has(i.crm-i) {
+    padding: 0;
+}
 .crm-container .form-inline .btn-group button:has(i.crm-i),
 .crm-search-admin-main-tabs li .btn.btn-secondary.dropdown-toggle,
 .crm-container .form-inline .btn-group button i.crm-i,
+.form-inline .btn-success.pull-right i.crm-i,
 .crm-search-admin-main-tabs li .btn.btn-secondary.dropdown-toggle i.crm-i {
     display: flex;
     justify-content: center;
