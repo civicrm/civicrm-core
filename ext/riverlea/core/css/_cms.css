@@ -163,9 +163,10 @@ body.wp-admin .crm-container select {
 body.wp-admin #crm-container {
     background: var(--crm-c-page-background);
 }
-
-body.wp-admin .crm-container:has(.crm-contact-page) .breadcrumb {
-
+body.wp-admin .button {
+    line-height: inherit;
+    font-size: inherit;
+    border: inherit;
 }
 body.wp-admin.page-civicrm-contact .breadcrumb {
     display: none; /* Hides breadcrumb on contact dashboard */

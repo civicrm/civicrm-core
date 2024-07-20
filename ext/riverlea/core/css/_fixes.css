@@ -227,6 +227,7 @@ a.crm-expand-row:hover,a.crm-expand-row:focus {
     color: var(--crm-c-secondary-text);
     font-weight: normal;
 	text-decoration: none;
+	line-height: inherit;
 }
 .crm-container a.button:hover,
 .crm-container a.button:focus {
