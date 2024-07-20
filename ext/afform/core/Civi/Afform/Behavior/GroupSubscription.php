@@ -4,6 +4,7 @@ namespace Civi\Afform\Behavior;
 use Civi\Afform\AbstractBehavior;
 use Civi\Afform\Event\AfformEntitySortEvent;
 use Civi\Afform\Event\AfformPrefillEvent;
+use Civi\Afform\Event\AfformSubmitEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use CRM_Afform_ExtensionUtil as E;
 
@@ -20,6 +21,7 @@ class GroupSubscription extends AbstractBehavior implements EventSubscriberInter
     return [
       'civi.afform.sort.prefill' => 'onAfformSortPrefill',
       'civi.afform.prefill' => ['onAfformPrefill', 99],
+      'civi.afform.submit' => ['onAfformSubmit', 101],
     ];
   }
 
@@ -81,7 +83,6 @@ class GroupSubscription extends AbstractBehavior implements EventSubscriberInter
     }
     $subscriptionEntity = $event->getEntity();
     $subscriptionMode = $subscriptionEntity['group-subscription'];
-    // Defaults are only needed for modes that allow opt-in, right Kurund?
     if (!in_array($subscriptionMode, ['normal', 'opt-in'], TRUE)) {
       return;
     }
@@ -105,17 +106,36 @@ class GroupSubscription extends AbstractBehavior implements EventSubscriberInter
       if (!$groupsToFill) {
         return;
       }
-      $currentContactGroups = \Civi\Api4\GroupContact::get(FALSE)
-        ->addSelect('group_id')
-        ->addWhere('contact_id', '=', $contactId)
-        ->addWhere('status', '!=', 'Removed')
-        ->addWhere('group_id', 'IN', $groupsToFill)
-        ->execute()->column('group_id');
+
+      // $currentContactGroups = \Civi\Api4\GroupContact::get(FALSE)
+      //   ->addSelect('group_id')
+      //   ->addWhere('contact_id', '=', $contactId)
+      //   ->addWhere('status', '!=', 'Removed')
+      //   ->addWhere('group_id', 'IN', $groupsToFill)
+      //   ->execute()->column('group_id');
+
+      $groupSubscriptions = \Civi\Api4\GroupSubscription::get(FALSE)
+        ->addWhere('contact_id', '=', $cid)
+        ->execute()
+        ->first();
 
       // HMM, I got this far and now I think the above logic needs to be moved into the
       // GroupSubscription::get action, but I also think that entity could be standardized a bit
       // more and ought to extend BasicEntity so it has all the expected CRUD actions...
     }
+  }
+
+  public static function onAfformSubmit(AfformSubmitEvent $event) {
+    if ($event->getEntityType() !== 'GroupSubscription') {
+      return;
+    }
+
+    $subscriptionEntity = $event->getEntity();
+    $subscriptionMode = $subscriptionEntity['group-subscription'];
+
+    $submittedValues = $event->getRecords();
+    $submittedValues['subscription-mode'] = $subscriptionMode;
+    $event->setRecords($submittedValues);
   }
 
 }
