@@ -206,6 +206,7 @@ return [
       'sql_type' => 'varchar(3)',
       'input_type' => 'Select',
       'required' => TRUE,
+      'unique_name' => 'grant_currency',
       'description' => E::ts('3 character string, value from config setting or input via user.'),
       'add' => '3.2',
       'input_attrs' => [
@@ -263,6 +264,7 @@ return [
       'input_type' => 'Select',
       'description' => E::ts('FK to Financial Type.'),
       'add' => '4.3',
+      'unique_name' => 'grant_financial_type_id',
       'default' => NULL,
       'input_attrs' => [
         'label' => E::ts('Financial Type'),
