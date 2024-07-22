@@ -381,6 +381,10 @@ class CRM_Core_BAO_CustomValueTable {
           $cvParam['type'] = 'Timestamp';
         }
 
+        // Some form-layer forms (including FB) will pass a scalar for a serialized value, trust the data model over the form.
+        if ($cvParam['serialize'] !== 0 && !is_array($cvParam['value'])) {
+          $cvParam['value'] = CRM_Core_DAO::serializeField($cvParam['value'], $cvParam['serialize']);
+        }
         if (!empty($customValue['id'])) {
           $cvParam['id'] = $customValue['id'];
         }
