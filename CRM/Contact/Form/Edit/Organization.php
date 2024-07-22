@@ -36,18 +36,18 @@ class CRM_Contact_Form_Edit_Organization {
 
     if (!$inlineEditMode || $inlineEditMode == 1) {
       // Organization_name
-      $form->addField('organization_name');
+      $form->addField('organization_name', ['title' => ts('Organization Name')]);
     }
 
     if (!$inlineEditMode || $inlineEditMode == 2) {
       // legal_name
-      $form->addField('legal_name');
+      $form->addField('legal_name', ['title' => ts('Legal Name')]);
 
       // nick_name
-      $form->addField('nick_name');
+      $form->addField('nick_name', ['title' => ts('Nickname')]);
 
       // sic_code
-      $form->addField('sic_code');
+      $form->addField('sic_code', ['title' => ts('SIC Code')]);
       $form->addField('contact_source');
     }
 
