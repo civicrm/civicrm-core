@@ -149,7 +149,8 @@ class PseudoconstantTest extends CustomTestBase {
   public function testCustomOptions(): void {
     $technicolor = [
       ['id' => 'r', 'name' => 'red', 'label' => 'RED', 'color' => '#ff0000', 'description' => 'Red color', 'icon' => 'fa-red'],
-      ['id' => 'g', 'name' => 'green', 'label' => 'GREEN', 'color' => '#00ff00', 'description' => 'Green color', 'icon' => 'fa-green'],
+      // String '2' gets checked below via `assertSame` to ensure it doesn't get cast to int
+      ['id' => '2', 'name' => 'green', 'label' => 'GREEN', 'color' => '#00ff00', 'description' => 'Green color', 'icon' => 'fa-green'],
       ['id' => 'b', 'name' => 'blue', 'label' => 'BLUE', 'color' => '#0000ff', 'description' => 'Blue color', 'icon' => 'fa-blue'],
     ];
 
@@ -175,7 +176,7 @@ class PseudoconstantTest extends CustomTestBase {
 
     foreach ($technicolor as $index => $option) {
       foreach ($option as $prop => $val) {
-        $this->assertEquals($val, $fields['myPseudoconstantTest.Multicolor']['options'][$index][$prop]);
+        $this->assertSame($val, $fields['myPseudoconstantTest.Multicolor']['options'][$index][$prop]);
       }
     }
 
