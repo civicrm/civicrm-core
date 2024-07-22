@@ -600,6 +600,8 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
                 [$vval['actId']], TRUE, FALSE
               );
               $mailStatus .= ' ' . ts("A copy of the activity has also been sent to assignee contact(s).");
+            } else {
+              continue;
             }
           }
           //build an associative array with unique email addresses.
