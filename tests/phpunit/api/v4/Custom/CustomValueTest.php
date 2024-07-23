@@ -166,6 +166,8 @@ class CustomValueTest extends CustomTestBase {
     $created = [
       CustomValue::create($group)
         ->addValue($colorFieldName, 'g')
+        // Test that failing to pass value as array will still serialize correctly
+        ->addValue($multiFieldName, 'r')
         ->addValue($refFieldName, $address1)
         ->addValue("entity_id", $cid)
         ->execute()->first(),
@@ -176,7 +178,7 @@ class CustomValueTest extends CustomTestBase {
     ];
     // fetch custom values using API4 CustomValue::get
     $result = CustomValue::get($group)
-      ->addSelect('id', 'entity_id', $colorFieldName, $colorFieldName . ':label', $refFieldName)
+      ->addSelect('id', 'entity_id', $colorFieldName, $colorFieldName . ':label', $refFieldName, $multiFieldName)
       ->addOrderBy($colorFieldName, 'ASC')
       ->execute();
 
@@ -187,6 +189,7 @@ class CustomValueTest extends CustomTestBase {
         'id' => 1,
         $colorFieldName => 'g',
         $colorFieldName . ':label' => 'Green',
+        $multiFieldName => ['r'],
         $refFieldName => $address1,
         'entity_id' => $cid,
       ],
@@ -206,6 +209,10 @@ class CustomValueTest extends CustomTestBase {
         }
       }
     }
+
+    // Ensure serialization really did happen correctly in the DB
+    $serializedValue = \CRM_Core_DAO::singleValueQuery("SELECT {$multiField['column_name']} FROM {$customGroup['table_name']} WHERE id = 1");
+    $this->assertSame(\CRM_Core_DAO::VALUE_SEPARATOR . 'r' . \CRM_Core_DAO::VALUE_SEPARATOR, $serializedValue);
 
     // CASE 2: Test CustomValue::update
     // Update a records whose id is 1 and change the custom field (name = Color) value to 'Blue' from 'Green'

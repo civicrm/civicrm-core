@@ -69,16 +69,14 @@ class CRM_Core_BAO_CustomValueTable {
 
         foreach ($fields as $field) {
           // fix the value before we store it
-          $value = $field['value'];
+          $serialize = $field['serialize'] ?? NULL;
+          $value = $serialize ? CRM_Core_DAO::serializeField($field['value'], $serialize) : $field['value'];
           $type = $field['type'];
+
           switch ($type) {
             case 'StateProvince':
-              $type = 'Integer';
-              if (is_array($value)) {
-                $value = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $value) . CRM_Core_DAO::VALUE_SEPARATOR;
-                $type = 'String';
-              }
-              elseif (!is_numeric($value) && !strstr($value, CRM_Core_DAO::VALUE_SEPARATOR)) {
+              $type = $serialize ? 'String' : 'Integer';
+              if (!$serialize && !is_numeric($value)) {
                 //fix for multi select state, CRM-3437
                 $mulValues = explode(',', $value);
                 $validStates = [];
@@ -108,18 +106,11 @@ class CRM_Core_BAO_CustomValueTable {
                 $value = NULL;
                 $type = 'Timestamp';
               }
-              else {
-                $type = 'String';
-              }
               break;
 
             case 'Country':
-              $type = 'Integer';
-              if (is_array($value)) {
-                $value = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $value) . CRM_Core_DAO::VALUE_SEPARATOR;
-                $type = 'String';
-              }
-              elseif (!is_numeric($value) && !strstr($value, CRM_Core_DAO::VALUE_SEPARATOR)) {
+              $type = $serialize ? 'String' : 'Integer';
+              if (!$serialize && !is_numeric($value)) {
                 //fix for multi select country, CRM-3437
                 $mulValues = explode(',', $value);
                 $validCountries = [];
@@ -147,9 +138,6 @@ class CRM_Core_BAO_CustomValueTable {
                 // gross but effective hack
                 $value = NULL;
                 $type = 'Timestamp';
-              }
-              else {
-                $type = 'String';
               }
               break;
 
@@ -190,7 +178,7 @@ class CRM_Core_BAO_CustomValueTable {
                 $type = 'Timestamp';
                 $value = NULL;
               }
-              elseif (strpos($value, $VS) !== FALSE) {
+              if ($serialize) {
                 $type = 'String';
                 // Validate the string contains only integers and value-separators
                 $validChars = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, $VS];
