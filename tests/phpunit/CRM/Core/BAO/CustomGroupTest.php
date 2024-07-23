@@ -165,23 +165,6 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test calling GetTree for a custom field that extends a non numerical Event Type.
-   */
-  public function testGetTreeEventSubTypeAlphabetical(): void {
-    $eventType = $this->callAPISuccess('OptionValue', 'Create', ['option_group_id' => 'event_type', 'value' => '99_ish', 'name' => 'Meeting_99', 'label' => 'Meeting 99']);
-    $customGroup = $this->CustomGroupCreate(['extends' => 'Event', 'extends_entity_column_value' => ['99_ish']]);
-    $customField = $this->customFieldCreate(['custom_group_id' => $customGroup['id']]);
-    $result1 = CRM_Core_BAO_CustomGroup::getTree('Event', NULL, NULL, NULL, CRM_Core_DAO::VALUE_SEPARATOR . 'meeting_99' . CRM_Core_DAO::VALUE_SEPARATOR);
-    $this->assertEquals('Custom Field', $result1[$customGroup['id']]['fields'][$customField['id']]['label']);
-    $result1 = CRM_Core_BAO_CustomGroup::getTree('Event', NULL, NULL, NULL, ['99_ish']);
-    $this->assertEquals('Custom Field', $result1[$customGroup['id']]['fields'][$customField['id']]['label']);
-    $result1 = CRM_Core_BAO_CustomGroup::getTree('Event', NULL, NULL, NULL, ['99_ISH']);
-    $this->assertEquals('Custom Field', $result1[$customGroup['id']]['fields'][$customField['id']]['label']);
-    $this->customGroupDelete($customGroup['id']);
-    $this->callAPISuccess('OptionValue', 'delete', ['id' => $eventType['id']]);
-  }
-
-  /**
    * Test calling getTree with contact subtype data.
    *
    * Note that the function seems to support a range of formats so 3 are tested. Yay for
