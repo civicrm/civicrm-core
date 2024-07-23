@@ -290,7 +290,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       $this->find(TRUE);
     }
     $id = (int) $this->id;
-    $dataType = $this->data_type;
+    $dataType = (string) $this->data_type;
     $optionGroupID = $this->option_group_id ? (int) $this->option_group_id : NULL;
     $entity = $this->getEntity();
 
