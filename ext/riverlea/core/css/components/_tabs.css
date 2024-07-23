@@ -113,6 +113,7 @@
 
 /* Dashboard */
 
+
 .crm-contact-page #mainTabContainer.ui-tabs {
     border: var(--crm-dash-border);
     display: var(--crm-dash-direction);
