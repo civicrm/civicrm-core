@@ -1,4 +1,3 @@
-
 /* Front-end specific */
 
 /* General */
@@ -18,10 +17,6 @@
     border: var(--crm-f-fieldset-border);
     box-shadow: var(--crm-f-box-shadow);
 }
-/* .crm-container.crm-public .crm-event-info-form-block,
-.crm-container.crm-public #crm-profile-block {
-    padding: var(--crm-f-fieldset-padding);
-} */
 .crm-container.crm-public fieldset legend {
     position: relative;
     top: calc(2 * var(--crm-f-fieldset-padding));
@@ -47,8 +42,13 @@
 .crm-container.crm-public fieldset:has(> fieldset) {
     padding-top: 0 !important;
 }
+.crm-container.crm-public .af-container .af-container,
 .crm-container.crm-public fieldset .crm-form-block {
     box-shadow: none !important; /* vs _page.css */
+}
+.crm-container.crm-public h3 {
+    background: transparent;
+    padding: 0;
 }
 /* Input */
 .crm-container.crm-public .crm-section:has( > .label) {

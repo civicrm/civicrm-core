@@ -1,6 +1,6 @@
 /* Style rules for SearchKit Admin
-   Forked on 12 June 24. Called on SearchKit Admin pages
-   Status: not merged (theme edits at foot) */
+   Forked on 23 July 24. Called on SearchKit Admin pages
+   Status: merged */
 
 /* Searchkit listing */
 
@@ -91,7 +91,7 @@
 }
 .crm-search-display-control {
     position: absolute;
-    right: 4px;
+    right: var(--crm-s);
     top: 25%;
 }
 .crm-search-display-control+.crm-search-display-control {
@@ -124,6 +124,9 @@
 .crm-search .api4-clause-badge .caret {
     margin: 0;
 }
+
+/* Fieldsets */
+
 .crm-container .crm-search fieldset {
     padding: var(--crm-s);
     border-top: 1px solid var(--crm-c-divider);
@@ -145,7 +148,7 @@
 /* Icon only shown while dragging */
 .crm-search .api4-clause-badge .crm-i {
     display: none;
-    padding: 0 6px;
+    padding: 0 var(--crm-s2);
 }
 .crm-search .ui-sortable-helper .api4-clause-badge .badge span {
     display: none;
@@ -251,7 +254,7 @@ i.crm-i.crm-search-move-icon {
 .crm-search input[type=number] {
     width: 90px;
 }
-  /* For display.settings.limit field */
+/* For display.settings.limit field */
 .crm-search .checkbox-inline.form-control input[type=number] {
     position: relative;
     top: -5px;
@@ -263,7 +266,7 @@ i.crm-i.crm-search-move-icon {
     background-color: rgba(186, 225, 251, 0.94);
 }
 .crm-search .api4-add-where-group-menu a {
-    padding: 5px 10px;
+    padding: var(--crm-s) var(--crm-m);
 }
 .crm-search .btn.form-control {
     height: 36px;
@@ -274,20 +277,14 @@ i.crm-i.crm-search-move-icon {
 .crm-search-admin-edit-columns > fieldset {
     background-color: rgba(255, 255, 255, .8);
 }
-  
-  /* A flex-row arranges elements inline, with the 'crm-flex-*' item(s) taking up all remaining space */
 .crm-search-admin-flex-row {
     display: flex;
     align-items: center;
+    column-gap: var(--crm-s3);
 }
-.crm-search-admin-flex-row > *:not(:first-child) {
-    margin-left: 6px;
-}
-  
 .crm-search-admin-unused-columns fieldset {
     min-height: 60px;
 }
-  
 .crm-search .crm-editable-enabled {
     display: inline-block;
     padding: 0 4px !important;
@@ -297,12 +294,6 @@ i.crm-i.crm-search-move-icon {
 .crm-search .crm-editable-enabled:hover:not(:focus) {
     border: 2px dashed grey !important;
 }
-/* Undo Shoreditch add-ons
-.crm-search .crm-editable-enabled:before,
-.crm-search .crm-editable-enabled:after {
-    content: '';
-    display: none;
-} */
 .crm-search-admin-icon-col {
     width: 24px;
 }
@@ -319,10 +310,10 @@ tbody .crm-search-admin-icon-col {
 crm-search-admin-tags.btn-group-xs .crm-search-admin-tags-btn-label {
     display: none;
 }
-.dropdown-menu li > * > label {
+/* .dropdown-menu li > * > label {
     font-weight: normal;
     cursor: pointer;
-}
+} */
 .crm-container .crm-container .dropdown-menu li .form-inline > select {
     max-width: 120px;
     padding-left: 5px;
@@ -340,22 +331,16 @@ crm-search-admin-export,
 crm-search-admin-import {
     display: block;
 }
-.crm-search-admin-relative {
-    position: relative;
-    display: block;
-}
 .crm-search-admin-right {
     position: absolute;
     top: 1px;
     right: 0;
     background-color: white;
 }
-.crm-search-admin-edit-columns details summary {
-    font-size: inherit;
+.crm-search-admin-relative {
+    position: relative;
+    display: block;
 }
-
-/* RiverLea additions (not merged) */
-
 .crm-search .crm-search-admin-relative details { /* only way to target settings accordions */
     border: var(--crm-expand-body-border);
     border-radius: var(--crm-roundness);
@@ -373,26 +358,23 @@ crm-search-admin-import {
 	max-width: calc(100% - var(--crm-padding-reg) - var(--crm-padding-reg));
 	box-shadow: none;
 }
-.crm-search .crm-search-admin-edit-columns {
+.crm-search-admin-edit-columns {
     padding: 0;
     border: 0 solid transparent;
 }
-.crm-search .crm-search-admin-edit-columns details {
+.crm-search-admin-edit-columns details {
     background-color: var(--crm-c-page-background);
     border-radius: var(--crm-roundness);
     border: 0;
 }
-.crm-search .crm-search-admin-edit-columns details summary {
+.crm-search-admin-edit-columns details summary {
     background: var(--crm-expand-header2-bg);
     color: var(--crm-expand-header2-color);
     padding: var(--crm-padding-reg);
+    font-size: inherit;
 }
-.crm-search .crm-search-admin-edit-columns details > *:not(summary) {
-    padding-inline: var(--crm-padding-reg);
-}
-.crm-search .crm-search-admin-edit-columns details > *:first-child {
-    padding-bottom: var(--crm-padding-reg);
-}
+.crm-search .crm-search-admin-edit-columns details > *:not(summary),
+.crm-search .crm-search-admin-edit-columns details > *:first-child,
 .crm-search .crm-search-admin-edit-columns details > *:last-child {
     padding-bottom: var(--crm-padding-reg);
 }

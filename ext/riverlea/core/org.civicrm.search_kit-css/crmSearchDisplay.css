@@ -60,11 +60,11 @@
   margin: 0;
 }
 
-/* RiverLea Aditions */
+/* Contact page */
 
 .crm-contact-page .crm-search-display .form-group.pull-right,
 .afform-directive .btn-group.pull-right {
-	display: flex !important;
+	display: flex;
 	gap: var(--crm-flex-gap);
 }
 .crm-contact-page .crm-search-display-pager {

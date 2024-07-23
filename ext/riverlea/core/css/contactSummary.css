@@ -381,12 +381,16 @@ div.crm-summary-contactname-block + .crm-actions-ribbon {
 	margin-left: var(--crm-dash-heading-inset);
 }
 .crm-actions-ribbon ul#actions {
-    list-style: none;
     display: grid;
     grid-template-columns: min-content min-content auto min-content min-content;
     gap: var(--crm-m);
     margin: 0;
     padding: var(--crm-dash-header-padding);
+}
+.crm-actions-ribbon ul#actions > * {
+    width: max-content;
+    display: flex;
+    list-style: none;
 }
 .crm-search-col-type-field span.ng-scope a {
     display: flex;

@@ -67,6 +67,9 @@ tbody.scrollContent tr.alternateRow {
 .crm-container .CRM_Event_Form_SearchEvent .action-link {
     padding: 0 0 var(--crm-padding-reg) 0;
 }
+.crm-container .action-link:has(.crm-uplang-refresh) {
+    padding-top: 0;
+}
 
 /* Advanced multi-select */
 
