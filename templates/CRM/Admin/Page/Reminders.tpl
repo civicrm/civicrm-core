@@ -22,7 +22,7 @@
       <th >{ts}While{/ts}</th>
       <th >{ts}Repeat{/ts}</th>
       <th >{ts}Active?{/ts}</th>
-      <th ><span class="sr-only">{ts}Actions{/ts}</span></th>
+      <th id="nosort"><span class="sr-only">{ts}Actions{/ts}</span></th>
     </tr>
     </thead>
     {if $rows and is_array($rows)}
