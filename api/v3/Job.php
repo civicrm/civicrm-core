@@ -140,6 +140,8 @@ function _civicrm_api3_job_execute_spec(&$params) {
  *   API Result Array
  */
 function civicrm_api3_job_geocode($params) {
+  // We are in api v3, so version has already done it's job.
+  unset($params['version']);
   $gc = new CRM_Utils_Address_BatchUpdate($params);
 
   $result = $gc->run();
