@@ -544,7 +544,7 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
 
     $updatedUser = User::get(FALSE)
       ->addWhere('id', 'IN', [$this->nonAdminUserID, $this->adminUserID, $newUserID])
-      ->execute()->indexBy('id')->column('username');
+      ->execute()->column('username', 'id');
     $this->assertEquals([
       $this->nonAdminUserID => 'nonadmin2',
       $this->adminUserID => 'admin2',

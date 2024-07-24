@@ -32,8 +32,7 @@ class CRM_Event_ActionMapping_ByTemplate extends CRM_Event_ActionMapping {
       ->addWhere('is_template', '=', TRUE)
       ->addWhere('is_active', '=', TRUE)
       ->execute()
-      ->indexBy('id')
-      ->column('template_title');
+      ->column('template_title', 'id');
   }
 
 }

@@ -380,8 +380,7 @@ class CRM_Utils_Recent {
       ->addWhere('is_active', '=', TRUE)
       ->addOrderBy('weight', 'ASC')
       ->execute()
-      ->indexBy('value')
-      ->column('label');
+      ->column('label', 'value');
   }
 
 }

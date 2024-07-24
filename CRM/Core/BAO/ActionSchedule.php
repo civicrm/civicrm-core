@@ -461,7 +461,7 @@ FROM civicrm_action_schedule cas
         ->addWhere('do_not_email', '=', FALSE)
         ->addWhere('email_primary.on_hold', '=', FALSE)
         ->execute();
-      Civi::$statics[__CLASS__]['email'][$cacheKey] = $emails->indexBy('id')->column('email_primary.email');
+      Civi::$statics[__CLASS__]['email'][$cacheKey] = $emails->column('email_primary.email', 'id');
     }
     return Civi::$statics[__CLASS__]['email'][$cacheKey];
   }

@@ -1910,7 +1910,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
         ->addWhere('option_group_id:name', '=', 'cg_extend_objects')
         ->addWhere('grouping', 'IS NOT EMPTY')
         ->addWhere('is_active', '=', TRUE)
-        ->execute()->indexBy('value')->column('grouping');
+        ->execute()->column('grouping', 'value');
 
       foreach ($extendObjs as $entityName => $grouping) {
         try {

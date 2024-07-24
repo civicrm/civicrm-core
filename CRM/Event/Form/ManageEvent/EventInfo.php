@@ -124,8 +124,7 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
         ->addWhere('is_template', '=', TRUE)
         ->addWhere('is_active', '=', TRUE)
         ->execute()
-        ->indexBy('id')
-        ->column('template_title');
+        ->column('template_title', 'id');
       if (CRM_Utils_System::isNull($eventTemplates) && !$this->_isTemplate) {
         $url = CRM_Utils_System::url('civicrm/admin/eventTemplate', ['reset' => 1]);
         CRM_Core_Session::setStatus(ts('If you find that you are creating multiple events with similar settings, you may want to use the <a href="%1">Event Templates</a> feature to streamline your workflow.', [1 => $url]), ts('Tip'), 'info');

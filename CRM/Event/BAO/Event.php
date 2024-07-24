@@ -330,8 +330,7 @@ WHERE  ( civicrm_event.is_template  = 0 )";
         ->addSelect('id', 'title')
         ->addWhere('is_active', '=', TRUE)
         ->execute()
-        ->indexBy('id')
-        ->column('title');
+        ->column('title', 'id');
     }
     return $options;
   }

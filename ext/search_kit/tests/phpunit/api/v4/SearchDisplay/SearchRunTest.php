@@ -841,7 +841,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     ];
     $sampleData = Contact::save(FALSE)
       ->setRecords($sampleData)->execute()
-      ->indexBy('first_name')->column('id');
+      ->column('id', 'first_name');
 
     // Create logged-in user
     UFMatch::delete(FALSE)
