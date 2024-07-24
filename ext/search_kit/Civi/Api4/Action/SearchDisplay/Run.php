@@ -87,6 +87,14 @@ class Run extends AbstractRunAction {
             $tally[$col['key']] = $dao->$alias ?? NULL;
           }
         }
+        $formatFunctions = ['AVG', 'GROUP_FIRST', 'GROUP_LAST', 'MIN', 'MAX', 'SUM'];
+        foreach ($settings['columns'] as $col) {
+          $key = $col['key'];
+          if (array_key_exists($key, $tally) && in_array($col['tally']['fn'], $formatFunctions)) {
+            $dataType = $this->getSelectExpression($key)['dataType'] ?? NULL;
+            $tally[$key] = $this->formatViewValue($key, $tally[$key], $tally, $dataType);
+          }
+        }
         $result[] = $tally;
         return;
 
