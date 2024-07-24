@@ -374,8 +374,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch implements
       ->addSelect('name', 'title_plural')
       ->addOrderBy('title_plural')
       ->execute()
-      ->indexBy('name')
-      ->column('title_plural');
+      ->column('title_plural', 'name');
   }
 
   /**

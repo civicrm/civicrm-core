@@ -24,8 +24,7 @@ class CRM_Search_BAO_SearchSegment extends CRM_Search_DAO_SearchSegment {
       ->addOrderBy('title_plural')
       ->addWhere('type', 'CONTAINS', 'DAOEntity')
       ->execute()
-      ->indexBy('name')
-      ->column('title_plural');
+      ->column('title_plural', 'name');
   }
 
 }

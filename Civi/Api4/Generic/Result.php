@@ -189,11 +189,12 @@ class Result extends \ArrayObject implements \JsonSerializable {
   /**
    * Reduce each result to one field
    *
-   * @param $name
+   * @param string $columnName
+   * @param string|null $indexBy
    * @return array
    */
-  public function column($name): array {
-    return array_column($this->getArrayCopy(), $name, $this->indexedBy);
+  public function column($columnName, $indexBy = NULL): array {
+    return array_column($this->getArrayCopy(), $columnName, $indexBy ?? $this->indexedBy);
   }
 
   /**

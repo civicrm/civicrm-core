@@ -162,7 +162,7 @@ class CRM_Core_ManagedEntities {
       'action' => 'create',
       'where' => $condition,
     ]);
-    $defaultValues = $getFields->indexBy('name')->column('default_value');
+    $defaultValues = $getFields->column('default_value', 'name');
     $item['params']['values'] += $defaultValues;
   }
 

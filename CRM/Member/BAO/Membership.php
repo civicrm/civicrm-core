@@ -1573,8 +1573,7 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
     try {
       $membershipTypes = MembershipType::get(TRUE)
         ->execute()
-        ->indexBy('id')
-        ->column('name');
+        ->column('name', 'id');
       $addWhere = " AND membership_type_id IN (0)";
       if (!empty($membershipTypes)) {
         $addWhere = " AND membership_type_id IN (" . implode(',', array_keys($membershipTypes)) . ")";

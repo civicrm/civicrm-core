@@ -226,7 +226,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
       'action' => 'create',
       'select' => ['name'],
       'where' => [['name', 'IN', array_keys($entityFields)], ['fk_entity', '=', 'File']],
-    ])->indexBy('name')->column('name');
+    ])->column('name', 'name');
   }
 
   /**
