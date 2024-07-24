@@ -505,32 +505,3 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
 		border-bottom: 0;
 	}
 }
-
-/* Afform tables (in addition to BS tables */
-
-.crm-container table td.crm-search-col-type-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--crm-s);
-}
-.crm-container table td.crm-search-col-type-buttons.text-right {
-    flex-direction: row-reverse;
-}
-th.crm-search-result-select button.btn,
-th.crm-search-result-select button.btn:hover,
-th.crm-search-result-select button.btn:focus {
-    background: transparent;
-    padding: var(--crm-xs1) var(--crm-m1);
-}
-th.crm-search-result-select button.btn i.crm-i {
-    color: var(--crm-c-text);
-}
-th.crm-search-result-select button.btn.dropdown-toggle {
-    border-radius: var(--crm-roundness);
-    background-color: var(--crm-c-background4);
-    padding: var(--crm-xs1) var(--crm-m1);
-}
-.crm-search-display-table table {
-    border: var(--crm-table-outside-border);
-    box-shadow: var(--crm-block-shadow);
-}

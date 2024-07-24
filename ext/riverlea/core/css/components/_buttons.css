@@ -91,11 +91,16 @@
     height: var(--crm-r);
     display: inline-block;
 }
-.crm-container #crmIconPicker {
+#crmIconPicker .icons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--crm-m);
+}
+/* .crm-container #crmIconPicker {
     display: grid;
     grid-template-columns: repeat(30,1fr);
     gap: var(--crm-m);
-}
+} */
 .crm-container .crm-button i.crm-i,
 .crm-container a.button i.crm-i,
 .crm-container button i.crm-i,

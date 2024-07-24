@@ -194,6 +194,10 @@ input.crm-form-entityref {
 }
 .crm-icon-picker-button {
     margin: 0 0 var(--crm-s);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    float: left;
 }
 .crm-container .crm-form-number {
     width: 8ch;

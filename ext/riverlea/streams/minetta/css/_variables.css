@@ -66,7 +66,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-c-background4: var(--crm-c-gray-200);
 --crm-c-background5: var(--crm-c-gray-500);
 --crm-c-drag-background: var(--crm-c-background3);
---crm-c-code-background: var(--crm-c-background3);
+--crm-c-code-background: var(--crm-c-background2);
 --crm-c-primary: var(--crm-c-gray-700); 
 --crm-c-primary-hover: var(--crm-c-gray-800); 
 --crm-c-primary-text: var(--crm-c-light-text);

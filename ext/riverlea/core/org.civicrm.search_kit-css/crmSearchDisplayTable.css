@@ -15,14 +15,42 @@ table.crm-sticky-header > thead > tr {
   color: initial;
   min-width: 86px; /* Don't allow button to be split on 2 lines */
 }
-.crm-search-display-table > table.table > thead > tr > th i.crm-search-table-column-sort-icon {
+/* .crm-search-display-table > table.table > thead > tr > th i.crm-search-table-column-sort-icon {
 	position: unset;
 	line-height: var(--crm-r1);
-}
+} */
 .crm-search-display-table > table.table > thead > tr > th i.crm-search-table-column-sort-icon + .crm-search-display-table-column-label {
 	margin-left: 0 !important;
 }
 .crm-search-display.crm-search-display-table tfoot > tr > td {
   font-weight: var(--crm-bold-weight);
   font-family: var(--crm-font-bold);
+}
+/* Afform tables */
+
+td.crm-search-col-type-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--crm-s);
+}
+td.crm-search-col-type-buttons.text-right {
+  flex-direction: row-reverse;
+}
+th.crm-search-result-select button.btn,
+th.crm-search-result-select button.btn:hover,
+th.crm-search-result-select button.btn:focus {
+  background: transparent;
+  padding: var(--crm-xs1) var(--crm-m1);
+}
+th.crm-search-result-select button.btn i.crm-i {
+  color: var(--crm-c-text);
+}
+th.crm-search-result-select button.btn.dropdown-toggle {
+  border-radius: var(--crm-roundness);
+  background-color: var(--crm-c-background4);
+  padding: var(--crm-xs1) var(--crm-m1);
+}
+.crm-search-display-table table {
+  border: var(--crm-table-outside-border);
+  box-shadow: var(--crm-block-shadow);
 }

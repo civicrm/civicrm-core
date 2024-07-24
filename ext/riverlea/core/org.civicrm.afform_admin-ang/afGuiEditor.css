@@ -1,53 +1,81 @@
 /* Style rules for Form Builder Admin
-   Forked on 12 June 24. Called on Form Builder
-   Status: not merged (theme edits at foot) */
+   Forked on 24 July 24. Called on Form Builder
+   Status: merged */
 
+/* List page */
 .afadmin-list th[ng-click] {
     cursor: pointer;
 }
 .afadmin-list th i.fa-sort-desc,
 .afadmin-list th i.fa-sort-asc {
-    color: #1a5a82;
+    color: var(--crm-c-link);
 }
 .afadmin-list th:not(:hover) i.fa-sort {
     opacity: .5;
 }
-#afGuiEditor #afGuiEditor-palette {
-    margin-right: 5px;
-    height: 100%;
+/* Editor */
+
+#afGuiEditor {
+    gap: var(--crm-r);
+    height: 100% !important /* vs inline fixed height */;
 }
-#afGuiEditor #afGuiEditor-canvas {
-    margin-left: 5px;
-    height: 100%;
+#afGuiEditor .af-gui-columns {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: var(--crm-r);
 }
-/* #afGuiEditor fieldset legend {
-    padding-top: 5px;
-    font-size: 16px;
-    margin-bottom: 5px !important;
+#afGuiEditor fieldset {
+	min-width: 0;
+	padding: 0;
+	margin: 0;
+	border: 0;
 }
-#afGuiEditor-palette fieldset legend {
-    height: 30px;
-} */
+#afGuiEditor fieldset legend {
+	padding: var(--crm-s) 0 0 0;
+	border-bottom: 1px solid var(--crm-c-divider);
+	width: 100%;
+    margin-bottom: var(--crm-m);
+}
 #afGuiEditor hr {
-    margin-top: 15px;
-    margin-bottom: 10px;
+    margin-block: var(--crm-m);
 }
-#afGuiEditor .panel {
+#afGuiEditor af-gui-container,
+#afGuiEditor af-gui-markup,
+#afGuiEditor af-gui-field,
+#afGuiEditor .af-gui-block-label,
+#afGuiEditor af-gui-edit-options {
+    display: block;
+}
+#afGuiEditor [ui-sortable] .af-gui-bar:before,
+#afGuiEditor .af-gui-entity-palette-select-list [ui-sortable] > div:not(.disabled):hover:before,
+#afGuiEditor af-gui-edit-options.af-gui-content-editing-area [ui-sortable] li:before {
+    background-size: cover;
+    background: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSIjODg4Ij48L3JlY3Q+Cjwvc3ZnPg==");
+    width: var(--crm-m);
+    height: calc(100% - var(--crm-m));
+    content: ' ';
+    display: block;
+    position: absolute;
+    left: var(--crm-s);
+    top: var(--crm-s);
+}
+/* Panel */
+
+#afGuiEditor .panel,
+#afGuiEditor-canvas-body {
     height: 100%;
 }
 #afGuiEditor .panel-heading {
-    height: 44px;
-    padding: 5px 10px 10px 10px;
-    border-bottom: 1px solid #ddd;
+	padding: var(--crm-m) var(--crm-m) 0;
+	border-bottom: 1px solid var(--crm-c-divider);
     position: relative;
 }
 #afGuiEditor .panel-heading ul.nav-tabs {
     border-bottom: 0 none;
-    padding: 0!important;
+    margin-bottom: -1px;
 }
 #afGuiEditor .panel-heading ul.nav-tabs li {
-    top: 6px;
-    margin: 0;
+    width: fit-content 
 }
 #afGuiEditor .panel-heading ul.nav-tabs li.fluid-width-tab {
     white-space: nowrap;
@@ -57,93 +85,158 @@
     max-width: 50%;
 }
 #afGuiEditor .panel-heading ul.nav-tabs li > a {
-    padding: 5px 3px 5px 8px;
-    height: 33px;
-    font-size: 12px;
-    margin: 0;
+    padding: var(--crm-s1) var(--crm-m2);
+    height: 100%;
 }
-#afGuiEditor .form-inline.af-gui-canvas-control-buttons {
-    position: absolute;
-    left: 48%;
+#afGuiEditor .panel-heading .af-gui-canvas-control-buttons button {
+	padding: 0; /* icon-only button */
 }
 #afGuiEditor .panel-body {
-    padding: 5px 12px;
+    padding: var(--crm-padding-reg);
     position: relative;
-    height: calc(100% - 44px);
     overflow-y: scroll;
     overflow-x: hidden;
     border-top: none!important;
+} 
+
+/* Edit palette (left side) */
+
+#afGuiEditor-palette input, 
+#afGuiEditor-palette textarea, 
+#afGuiEditor-palette select {
+	width: 100%;
 }
-#afGuiEditor .af-gui-columns {
-    position: relative;
+#afGuiEditor-palette input[type="checkbox"],
+#afGuiEditor-palette input[type="radio"] {
+	width: auto;
 }
-#afGuiEditor .af-gui-columns > * {
-    min-width: 200px;
+#afGuiEditor-palette .form-group label {
+	width: 100%;
+	display: block;
 }
-#afGuiEditor .af-gui-remove-entity {
-    position: absolute;
-    right: 3px;
-    top: 3px;
+#afGuiEditor-palette .checkbox label {
+	padding: 0;
 }
-#afGuiEditor .crm-editable-enabled,
-#afGuiEditor .panel-heading ul.nav-tabs li > a > span {
-    display: inline-block;
-    padding: 0 4px !important;
-    border: 2px solid transparent !important;
-    min-width: 21px;
+#afGuiEditor-palette .input-group:has(#af_config_redirect) {
+	display: grid;
+	grid-template-columns: 1fr 250px;
 }
-#afGuiEditor .crm-editable-enabled:hover:not(:focus) {
-    border: 2px dashed grey !important;
-}/* Undo Shoreditch add-ons */
-#afGuiEditor .crm-editable-enabled:before,
-#afGuiEditor .crm-editable-enabled:after {
-    content: '';
-    display: none;
+#afGuiEditor-palette input.select2-input {
+    min-width: 100%;
 }
-#afGuiEditor-palette-config .af-gui-entity-values .form-inline {
-    margin-bottom: 10px;
+#afGuiEditor-palette #af_config_form_permission_operator {
+	width: 60px;
 }
-#afGuiEditor-palette-config .af-gui-entity-palette [type=search] {
-    width: 120px;
-    padding: 3px 3px 3px 5px;
-    height: 25px;
+#afGuiEditor-palette #s2id_af_config_form_permission {
+	width: calc(100% - 66px) !important /* vs inline */;
+}
+ /* #afGuiEditor-palette input[type=number] {
+    width: 6em;
+} */
+/* search kit settings */
+#afGuiEditor-palette .af-gui-entity-values .form-inline {
+    margin-bottom: var(--crm-m);
+}
+#afGuiEditor-palette .af-gui-entity-values .select2-container {
+    width: 100% !important /* vs inline */;
+    margin-bottom: var(--crm-s2);
+}
+#afGuiEditor-palette .af-gui-entity-values .input-group {
+    width: 100%;
+    display: flex;
+}
+#afGuiEditor-palette .af-gui-entity-values .input-group > span {
+    width: 100%;
+}
+#afGuiEditor-palette .af-gui-entity-values .input-group .btn {
+    height: calc(var(--crm-btn-height) + 4px);
+}
+#afGuiEditor-palette .af-gui-entity-palette legend {
+    margin-bottom: 0;
+    padding-bottom: 0;
+	border-bottom: 0;
+}
+#afGuiEditor-palette .af-gui-entity-palette .input-group {
+	margin-top: var(--crm-s);
+}
+#afGuiEditor-palette .af-gui-entity-palette [type="search"] {
+	width: 100%;
+	border-radius: var(--crm-roundness) var(--crm-roundness) 0 0;
+	border-color: var(--crm-c-divider);
+	padding: var(--crm-s2);
     font-weight: normal;
     position: relative;
-    top: -3px;
-    font-size: 12px;
+	margin: 0;
+	border-bottom: 0;
 }
- input[type=search]::placeholder {
-    font-family: FontAwesome;
-    text-align: right;
+.af-gui-entity-palette-select-list {
+	border: 1px solid var(--crm-c-divider);
+	border-radius: 0 0 var(--crm-roundness) var(--crm-roundness);
+	padding: 0 var(--crm-s) var(--crm-s);
+    max-height: 400px;
+    overflow-y: auto;
 }
- input[type=search]:-ms-input-placeholder {
-    font-family: FontAwesome;
-    text-align: right;
-}
- input[type=search]::-ms-input-placeholder {
-    font-family: FontAwesome;
-    text-align: right;
-}
-#afGuiEditor-canvas .af-gui-bar {
-    height: 22px;
-    width: 100%;
-    transition: opacity .2s;
+.af-gui-entity-palette-select-list [ui-sortable] > div {
+    cursor: move;
+    padding: var(--crm-xs) var(--crm-m) var(--crm-xs) var(--crm-r);
     position: relative;
-    font-family: "Courier New", Courier, monospace;
-    font-size: 12px;
+}
+.af-gui-entity-palette-select-list [ui-sortable] > div.disabled {
+    cursor: auto;
+}
+.af-gui-entity-palette-select-list [ui-sortable] > div:not(.disabled):hover {
+    background-color: var(--crm-c-background3);
+}
+
+/* Edit canvas (right side) */
+
+#afGuiEditor-canvas .form-inline {
+	padding: 0;
+}
+#afGuiEditor-canvas:not(.af-gui-menu-open) .af-gui-container:hover,
+.af-gui-dragging #afGuiEditor .af-gui-container {
+    border: 2px dashed var(--crm-c-gray-700);
+}
+#afGuiEditor-canvas .af-entity-selected {
+    border: 2px dashed var(--crm-c-blue-dark);
+}
+#afGuiEditor-canvas .af-entity-selected > .af-gui-bar {
+    background-color:  var(--crm-c-blue-dark);
+    opacity: 1;
+    transition: opacity 0s;
+}
+#afGuiEditor .af-gui-container {
+    border: 2px solid var(--crm-c-background2);
+    border-radius: var(--crm-roundness);
+    position: relative;
+    padding: var(--crm-m);
+}
+#afGuiEditor-canvas .af-gui-container-type-fieldset,
+#afGuiEditor-canvas .af-gui-container,
+#afGuiEditor-canvas .af-gui-markup,
+#afGuiEditor-canvas .af-gui-text,
+#afGuiEditor-canvas .af-gui-button {
+	box-shadow: var(--crm-block-shadow) !important;
+	margin-bottom: var(--crm-padding-small) !important;
+}
+
+
+/* Canvas gui bar */
+
+#afGuiEditor-canvas .af-gui-bar {
+	height: var(--crm-l);
+    width: 100%;
+	border-radius: var(--crm-roundness) var(--crm-roundness) 0 0;
+    transition: opacity .2s;
+    background-color: var(--crm-c-background2);
+    padding: var(--crm-s) var(--crm-s) var(--crm-s) var(--crm-r2);
+    position: inherit;
+    cursor: move;
 }
 #afGuiEditor-canvas:not(.af-gui-menu-open) .af-gui-bar,
 #afGuiEditor-canvas:not(.af-gui-menu-open) .af-gui-container-title span:empty {
     opacity: 0;
-}
-#afGuiEditor-canvas [ui-sortable] .af-gui-bar {
-    cursor: move;
-    background-color: #f2f2f2;
-    position: absolute;
-    top: 0;
-    left: 0;
-    padding-left: 15px;
-}
+} 
 #afGuiEditor:not(.af-gui-dragging *) #afGuiEditor-canvas:hover .af-gui-bar,
 #afGuiEditor:not(.af-gui-dragging *) #afGuiEditor-canvas:hover .af-gui-container-title span:empty {
     opacity: 1;
@@ -156,10 +249,11 @@
     transition: opacity .1s;
 }
 /* Disable menu while dragging */
-  body.af-gui-dragging #civicrm-menu {
+body.af-gui-dragging #civicrm-menu {
     pointer-events: none;
-}/* Disable scrollbars while dragging */
-  body.af-gui-dragging {
+}
+/* Disable scrollbars while dragging */
+body.af-gui-dragging {
     overflow-x: hidden;
     overflow-y: hidden;
 }
@@ -180,27 +274,79 @@
     display: block;
     min-height: 21px;
 }
-#afGuiEditor .af-gui-container {
-    border: 2px dashed transparent;
-    position: relative;
-    padding: 22px 3px 3px;
-    min-height: 40px;
-    margin-bottom: 10px;
-    margin-top: 10px;
+.af-layout-inline .af-gui-bar {
+	margin: 0 -4px;
+	width: calc(100% + 8px) !important;
 }
+af-gui-container > .af-gui-bar,
+.af-gui-container-type-div > .af-gui-bar {
+	margin: calc(-1 * var(--crm-m)) calc(-1 * var(--crm-m)) var(--crm-m) calc(-1 * var(--crm-m));
+	width: calc(100% + var(--crm-r)) !important;
+}
+
+#afGuiEditor-canvas [ui-sortable] .af-gui-bar:has(~ .af-gui-field-input) {
+	border-radius: var(--crm-roundness) var(--crm-roundness) 0 0;
+}
+
+#afGuiEditor .af-gui-node-title {
+	position: absolute;
+	top: 0;
+}
+#afGuiEditor .af-gui-node-title + * {
+	padding-top: var(--crm-m);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+#afGuiEditor .af-gui-container.af-gui-dragtarget {
+    border: 2px solid var(--crm-c-blue-dark);
+    box-shadow: 0 0 5px var(--crm-c-blue-dark);
+}
+
+#afGuiEditor .form-inline.af-gui-canvas-control-buttons {
+    position: absolute;
+    left: 48%;
+}
+
+#afGuiEditor .af-gui-remove-entity {
+    position: absolute;
+    right: 3px;
+    top: 3px;
+}
+#afGuiEditor .crm-editable-enabled,
+#afGuiEditor .panel-heading ul.nav-tabs li > a > span {
+    display: inline-block;
+    padding: 0 4px !important;
+    border: 2px solid transparent !important;
+    min-width: 21px;
+}
+#afGuiEditor .crm-editable-enabled:hover:not(:focus) {
+    border: 2px dashed grey !important;
+}/* Undo Shoreditch add-ons */
+#afGuiEditor .crm-editable-enabled:before,
+#afGuiEditor .crm-editable-enabled:after {
+    content: '';
+    display: none;
+}
+
+
+
   /* Card style */
 #afGuiEditor .af-gui-container.af-container-style-pane {
     box-shadow: 1px 2px 8px 1px rgb(0, 0, 0, .3);
     background: linear-gradient(to bottom, #f2f2f2 0 22px, transparent 22px 100%) no-repeat;
     border-radius: 4px;
 }
-#afGuiEditor af-gui-container,
-#afGuiEditor af-gui-markup,
-#afGuiEditor af-gui-field,
-#afGuiEditor .af-gui-block-label,
-#afGuiEditor af-gui-edit-options {
-    display: block;
-}
+
 #afGuiEditor .af-gui-search-display {
     border: 1px dotted gray;
     color: gray;
@@ -211,14 +357,6 @@
     box-shadow: 0 0 5px #bbbbbb;
     margin-top: 20px;
     margin-bottom: 20px;
-}
-#afGuiEditor-canvas:not(.af-gui-menu-open) .af-gui-container:hover,
-  .af-gui-dragging #afGuiEditor .af-gui-container {
-    border: 2px dashed #757575;
-}
-#afGuiEditor .af-gui-container.af-gui-dragtarget {
-    border: 2px solid #0071bd;
-    box-shadow: 0 0 5px #0071bd;
 }
 #afGuiEditor .af-gui-markup {
     padding: 22px 3px 3px;
@@ -239,14 +377,8 @@
 #afGuiEditor .af-gui-markup-content:hover .af-gui-markup-content-overlay {
     background-color: rgba(255, 255, 255, .2);
 }
-#afGuiEditor #afGuiEditor-canvas .af-entity-selected {
-    border: 2px dashed #0071bd;
-}
-#afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar {
-    background-color: #0071bd;
-    opacity: 1;
-    transition: opacity 0s;
-}/* Fix button colors when bar is highlighted */
+
+/* Fix button colors when bar is highlighted */
 #afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > .btn-group > .btn-group > button > span,
 #afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > span,
 #afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-node-title {
@@ -255,12 +387,9 @@
 #afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > .btn-group > .btn-group > button:hover > span,
 #afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > .btn-group > .btn-group > button[aria-expanded=true] > span,
 #afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > .btn-group > .btn-group > button:focus > span {
-    color: #0071bd;
+    color: var(--crm-c-blue-dark);
 }
-#afGuiEditor-canvas [ui-sortable] {
-    min-height: 60px;
-    margin-top: 10px;
-}
+
 #afGuiEditor .ui-sortable-helper {
     height: 20px !important;
     opacity: .5;
@@ -269,42 +398,8 @@
 #afGuiEditor .ui-sortable-helper > * {
     background-color: #d5d5d5;
 }
-#afGuiEditor .ui-sortable-helper .af-gui-palette-item {
-    height: 30px;
-    width: 300px;
-    border: 2px dashed #0071bd;
-}
-#afGuiEditor .af-gui-entity-palette-select-list {
-    max-height: 400px;
-    overflow-y: auto;
-}
-#afGuiEditor .af-gui-entity-palette-select-list label {
-    margin-top: 10px;
-}
-#afGuiEditor .af-gui-entity-palette-select-list [ui-sortable] > div {
-    cursor: move;
-    padding-left: 10px;
-    position: relative;
-}
-#afGuiEditor .af-gui-entity-palette-select-list [ui-sortable] > div.disabled {
-    cursor: auto;
-}
-#afGuiEditor .af-gui-entity-palette-select-list [ui-sortable] > div:not(.disabled):hover {
-    background-color: #efefef;
-}/* grip handle */
-#afGuiEditor [ui-sortable] .af-gui-bar:before,
-#afGuiEditor .af-gui-entity-palette-select-list [ui-sortable] > div:not(.disabled):hover:before,
-#afGuiEditor af-gui-edit-options.af-gui-content-editing-area [ui-sortable] li:before {
-    background-size: cover;
-    background: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSIjODg4Ij48L3JlY3Q+Cjwvc3ZnPg==");
-    width: 10px;
-    height: 15px;
-    content: ' ';
-    display: block;
-    position: absolute;
-    left: 4px;
-    top: 5px;
-}
+/* grip handle */
+
 #afGuiEditor .af-gui-add-element-button {
     background-color: transparent;
 }
@@ -312,17 +407,9 @@
     display: inline-block;
     width: 18px;
     height: 18px;
-    color: #0071bd;
+    color: var(--crm-c-blue-dark);
 }
-#afGuiEditor #af_config_form_permission {
-    width: calc(100% - 55px);
-}
-#afGuiEditor #af_config_form_permission_operator {
-    width: 45px;
-}
-#afGuiEditor #afGuiEditor-palette input[type=number] {
-    width: 6em;
-}
+
 #afGuiEditor .af-gui-layout-icon {
     width: 12px;
     height: 11px;
@@ -378,34 +465,6 @@
     position: relative;
     left: -4px;
 }
-#afGuiEditor .dropdown-menu li {
-    cursor: default;
-}
-#afGuiEditor .dropdown-menu li .af-gui-field-select-in-dropdown {
-    padding: 2px 19px 2px 21px;
-    clear: both;
-    font-weight: 400;
-    line-height: 1.5384615385;
-    color: #4d4d69;
-    white-space: nowrap;
-}
-#afGuiEditor .dropdown-menu li > * > label {
-    font-weight: normal;
-    cursor: pointer;
-}
-#afGuiEditor .dropdown-menu li .af-gui-field-select-in-dropdown > select {
-    max-width: 120px;
-    padding-left: 5px;
-    padding-right: 5px;
-}
-#afGuiEditor li .af-gui-field-select-in-dropdown input[type=color] {
-    width: 30px;
-    padding: 2px 4px;
-}
-#afGuiEditor li .af-gui-field-select-in-dropdown input[type=number] {
-    width: 50px;
-    padding-right: 0;
-}
   /* For editing field placeholder text */
 #afGuiEditor .af-gui-field-input input[type=text].form-control {
     color: #9a9a9a;
@@ -443,30 +502,18 @@
 #afGuiEditor .input-group-addon {
     padding: 0;
 }
-#afGuiEditor .af-gui-text-h1 {
-    font-weight: bolder;
-    font-size: 16px;
-}
-#afGuiEditor .af-gui-text-h2 {
-    font-weight: bold;
-    font-size: 15px;
-}
-/* #afGuiEditor .af-gui-text-legend, */
-#afGuiEditor .af-gui-text-h3 {
-    font-weight: bold;
-    font-size: 14px;
-}
+
 #afGuiEditor .af-gui-text-legend {
     text-decoration: underline;
 }
-#afGuiEditor .af-gui-text-h4 {
-    font-weight: bold;
-}
-#afGuiEditor .af-gui-text-h5 {
-    font-weight: 600;
-}
+#afGuiEditor .af-gui-text-h1,
+#afGuiEditor .af-gui-text-h2,
+#afGuiEditor .af-gui-text-h3,
+#afGuiEditor .af-gui-text-h4,
+#afGuiEditor .af-gui-text-h5,
 #afGuiEditor .af-gui-text-h6 {
-    font-weight: 500;
+    font-weight: var(--crm-bold-weight);
+    font-family: var(--crm-font-bold);
 }
 #afGuiEditor .af-gui-field-help {
     font-style: italic;
@@ -632,143 +679,14 @@
 
 /* RiverLea additions (not yet merged) */
 
-#afGuiEditor fieldset {
-	min-width: 0;
-	padding: 0;
-	margin: 0;
-	border: 0;
-}
-#afGuiEditor fieldset legend {
-	padding: var(--crm-s) 0 0 0;
-	margin-bottom: var(--crm-s);
-	border-bottom: 1px solid var(--crm-c-divider);
-	width: 100%;
-	font-size: var(--crm-font-size);
-}
-#afGuiEditor .panel-heading {
-	height: auto;
-	padding: var(--crm-m) var(--crm-m) 0 !important;
-	border-bottom: 1px solid var(--crm-c-divider) !important;
-}
-#afGuiEditor .panel-heading ul.nav-tabs {
-	margin-bottom: -1px;
-}
-#afGuiEditor .panel-heading ul.nav-tabs li {
-	top: 0;
-}
 /* Editor Palette */
 
-#afGuiEditor-palette,
-#afGuiEditor-canvas  {
-	flex: 1;
-	--crm-btn-height: 32px;
-	--crm-btn-padding-block: var(--crm-s);
-	--crm-btn-padding-inline: var(--crm-m);
-}
-#afGuiEditor-palette input, 
-#afGuiEditor-palette textarea, 
-#afGuiEditor-palette select {
-	width: 100%;
-}
-#afGuiEditor-palette input[type="checkbox"],
-#afGuiEditor-palette input[type="radio"] {
-	width: auto;
-}
-#afGuiEditor-palette .form-group label {
-	width: 100%;
-	display: block;
-}
-#afGuiEditor-palette .checkbox label {
-	padding: 0;
-}
-#afGuiEditor-palette .input-group:has(#af_config_redirect) {
-	display: grid;
-	grid-template-columns: 1fr 250px;
-}
-#afGuiEditor-palette #s2id_autogen3 {
-	min-width: 100% !important;
-}
-#afGuiEditor #af_config_form_permission_operator {
-	width: 60px !important;
-}
-#afGuiEditor #s2id_af_config_form_permission {
-	width: calc(100% - 66px) !important;
-}
-#afGuiEditor .panel-heading ul.nav-tabs li {
-	top: unset !important;
-	width: fit-content !important;
-}
-#afGuiEditor .panel-heading ul.nav-tabs li > a {
-	font-size: var(--crm-font-size) !important; /* vs api4-explorer.css */
-	padding: var(--crm-s1) var(--crm-m2) !important; /* vs api4-explorer.css */
-	height: auto !important; /* vs api4-explorer.css */
-	min-height: 39px;
-}
-#afGuiEditor .af-gui-columns {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	gap: var(--crm-r);
-}
-/* #afGuiEditor .af-gui-columns fieldset:last-of-type {
-	grid-column: 1 / span 2;
-} */
-#afGuiEditor-palette-config .panel-body {
-	padding: var(--crm-padding-reg) !important;
-}
-#afGuiEditor-palette-config .af-gui-entity-values hr {
-	display: none;
-}
-#afGuiEditor .af-gui-entity-palette legend {
-	margin: 0 !important;
-	border-bottom: 0;
-}
-#afGuiEditor-palette-config .af-gui-entity-palette [type="search"] {
-	top: 0 !important;
-	width: 100% !important;
-	border-radius: var(--crm-roundness) var(--crm-roundness) 0 0;
-	border-color: var(--crm-c-divider);
-	padding: var(--crm-s2) !important;
-	height: unset !important;
-	font-size: var(--crm-input-font-size) !important;
-	margin: 0;
-	border-bottom: 0;
-}
-.af-gui-entity-palette-select-list {
-	border: 1px solid var(--crm-c-divider);
-	border-radius: 0 0 var(--crm-roundness) var(--crm-roundness);
-	padding: var(--crm-s);
-}
-#afGuiEditor .af-gui-entity-palette-select-list [ui-sortable] > div:not(.disabled):hover {
-	background-color: var(--crm-c-background4);
-}
-#afGuiEditor-palette-config .af-gui-entity-palette .input-group {
-	margin-top: var(--crm-s);
-}
-#afGuiEditor .af-gui-field-input-type-chainselect .input-group .dropdown-toggle, 
-#afGuiEditor .af-gui-field-input-type-select .input-group .dropdown-toggle, 
-#afGuiEditor-palette-config .af-gui-entity-palette .input-group .btn,
-#afGuiEditor-canvas-body .af-gui-field-input .input-group .btn {
-	padding: var(--crm-s) var(--crm-m1);
-}
-#afGuiEditor .panel-body {
-	width: 100%;
-}
 /* AfEditor builder */
 
 #afGuiEditor .dropdown-menu li .af-gui-field-select-in-dropdown {
 	color: var(--crm-dropdown-col) !important;
 }
-#afGuiEditor .af-gui-text-legend, 
-#afGuiEditor .af-gui-text-h3 {
-	font-size: var(--crm-font-size);
-}
-#afGuiEditor-canvas [ui-sortable] {
-	margin-top: 5px !important;
-}
-#afGuiEditor .af-gui-container {
-	padding: var(--crm-m) !important;
-	margin-top: 0 !important;
-}
+
 #afGuiEditor .af-gui-container.af-container-style-pane {
 	background: linear-gradient(to bottom, #f2f2f2 0 var(--crm-l), transparent var(--crm-l) 100%) no-repeat;
 	border-radius: var(--crm-roundness);
@@ -779,38 +697,13 @@
 	font-size: var(--crm-font-size) !important;
 	padding: var(--crm-s);
 }
-#afGuiEditor .af-gui-container-type-fieldset,
-#afGuiEditor .af-gui-container,
-#afGuiEditor .af-gui-markup,
-#afGuiEditor .af-gui-text,
-#afGuiEditor .af-gui-button {
-	box-shadow: var(--crm-block-shadow) !important;
-	margin-bottom: var(--crm-padding-small) !important;
-}
-#afGuiEditor-canvas .panel-heading .pull-right .btn {
-	max-height: var(--crm-l);
-	display: flex;
-	align-items: center;
-}
+
 .af-gui-edit-options-bar h4 {
 	font-size: var(--crm-font-size) !important;
 	margin: 0 !important;
 }
-#afGuiEditor-canvas [ui-sortable] .af-gui-bar {
-	font-family: inherit;
-	height: var(--crm-l);
-	border-radius: var(--crm-roundness);
-	background-color: var(--crm-c-background3) !important;
-	padding-left: var(--crm-r2);
-	position: inherit !important;
-}
-#afGuiEditor-canvas .form-inline {
-	padding: 0;
-}
-#afGuiEditor-canvas .panel-heading .af-gui-canvas-control-buttons button.btn-default {
-	padding: 0;
-	--crm-btn-height: 32px;
-}
+
+
 #afGuiEditor-canvas .dropdown-toggle {
 	padding: 1px;
 }
@@ -820,33 +713,7 @@
 	border: 0;
 	padding: var(--crm-s);
 }
-.af-layout-inline .af-gui-bar {
-	margin: 0 -4px;
-	width: calc(100% + 8px) !important;
-}
-af-gui-container > .af-gui-bar,
-.af-gui-container-type-div > .af-gui-bar {
-	margin: calc(-1 * var(--crm-m)) calc(-1 * var(--crm-m)) var(--crm-m) calc(-1 * var(--crm-m));
-	width: calc(100% + var(--crm-r)) !important;
-}
-#afGuiEditor-canvas [ui-sortable] .af-gui-bar:has(~ .af-gui-field-input) {
-	border-radius: var(--crm-roundness) var(--crm-roundness) 0 0;
-}
-#afGuiEditor [ui-sortable] .af-gui-bar::before, 
-#afGuiEditor .af-gui-entity-palette-select-list [ui-sortable] > div:not(.disabled):hover::before, 
-#afGuiEditor af-gui-edit-options.af-gui-content-editing-area [ui-sortable] li::before {
-	height: var(--crm-r3) !important;
-	left: 5px !important;
-}
-#afGuiEditor .af-gui-node-title {
-	position: absolute !important;
-	top: 0 !important;
-	font-size: var(--crm-font-size) !important;
-	color: inherit !important;
-}
-#afGuiEditor .af-gui-node-title + * {
-	padding-top: var(--crm-m);
-}
+
 #afGuiEditor .af-gui-element {
 	padding: 0 var(--crm-s) var(--crm-s) !important;
 	min-height: var(--crm-l) !important;
@@ -879,4 +746,51 @@ af-gui-container > .af-gui-bar,
 .af-admin-edit-form-link .btn.dropdown-toggle i.crm-i {
 	background: transparent;
 	border: 0;
+}
+
+
+/* Dropdown buttons */
+
+#afGuiEditor .af-gui-field-input-type-chainselect .input-group .dropdown-toggle, 
+#afGuiEditor .af-gui-field-input-type-select .input-group .dropdown-toggle, 
+#afGuiEditor-palette-config .af-gui-entity-palette .input-group .btn,
+#afGuiEditor-canvas-body .af-gui-field-input .input-group .btn {
+	padding: var(--crm-s) var(--crm-m1);
+}
+#afGuiEditor .dropdown-menu li {
+    cursor: default;
+}
+#afGuiEditor .dropdown-menu li .af-gui-field-select-in-dropdown {
+    padding: 2px 19px 2px 21px;
+    clear: both;
+    font-weight: 400;
+    line-height: 1.5384615385;
+    color: #4d4d69;
+    white-space: nowrap;
+}
+#afGuiEditor .dropdown-menu li > * > label {
+    font-weight: normal;
+    cursor: pointer;
+}
+#afGuiEditor .dropdown-menu li .af-gui-field-select-in-dropdown > select {
+    max-width: 120px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+#afGuiEditor li .af-gui-field-select-in-dropdown input[type=color] {
+    width: 30px;
+    padding: 2px 4px;
+}
+#afGuiEditor li .af-gui-field-select-in-dropdown input[type=number] {
+    width: 50px;
+    padding-right: 0;
+}
+
+
+/* various */
+
+#afGuiEditor .ui-sortable-helper .af-gui-palette-item {
+    height: 30px;
+    width: 300px;
+    border: 2px dashed #0071bd;
 }

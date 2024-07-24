@@ -1369,7 +1369,7 @@
 	font-style: normal;
 	line-height: 1.428571429;
 }
-#bootstrap-theme code, #bootstrap-theme kbd, #bootstrap-theme pre, #bootstrap-theme samp {
+/*#bootstrap-theme code, #bootstrap-theme kbd, #bootstrap-theme pre, #bootstrap-theme samp {
 	font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 #bootstrap-theme code {
@@ -1378,7 +1378,7 @@
 	color: #c7254e;
 	background-color: #f9f2f4;
 	border-radius: 4px;
-}
+}  */
 #bootstrap-theme kbd {
 	padding: 2px 4px;
 	font-size: 90%;
