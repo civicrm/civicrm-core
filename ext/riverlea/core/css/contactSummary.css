@@ -75,9 +75,8 @@
 }
 .crm-container #crm-contactname-content .crm-edit-help:hover,
 .crm-edit-ready .crm-summary-block .crm-inline-edit:hover .crm-edit-help {
-	color: var(--crm-c-light-text);
+	color: var(--crm-c-text);
     display: block;
-	background-color: transparent;
 }
 #contact-summary .crm-edit-help .crm-i.fa-pencil {
     float: right;

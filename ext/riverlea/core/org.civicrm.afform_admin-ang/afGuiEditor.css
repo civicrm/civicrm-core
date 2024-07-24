@@ -64,6 +64,7 @@
 #afGuiEditor .panel,
 #afGuiEditor-canvas-body {
     height: 100%;
+    width: 100%;
 }
 #afGuiEditor .panel-heading {
 	padding: var(--crm-m) var(--crm-m) 0;

@@ -16,3 +16,8 @@
 @import url(components/_page.css);
 @import url(components/_components.css);
 @import url(components/_front.css);
+
+/* Font Awesome 6 */
+@import url(../../fa/css/v4-font-face.min.css);
+@import url(../../fa/css/fontawesome.min.css);
+@import url(../../fa/css/solid.min.css);

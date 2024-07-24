@@ -43,6 +43,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 .crm-container .messages.crm-empty-table::before {
     font-family: "FontAwesome";
     font-style: normal;
+    font-weight: normal ;
     text-rendering: auto;
     font-size: var(--crm-font-size);
     margin: 0 var(--crm-m) 0 0;
