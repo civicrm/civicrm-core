@@ -8,6 +8,7 @@
   <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-click="row.menuOpen = true">
     <i class="crm-i fa-bars"></i>
     <span class="caret"></span>
+    <span class="sr-only">{{:: ts('Row Actions')}}</span>
   </button>
   <ul class="dropdown-menu dropdown-menu-right" ng-if=":: row.menuOpen">
     <li ng-if=":: row.permissionToEdit" title="{{:: ts('Edit search and displays') }}">

@@ -24,6 +24,7 @@
       </a>
       <button type="button" ng-click="$ctrl.getPrimaryEntities()" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <span class="caret"></span>
+        <span class="sr-only">{{:: ts('Add New Search with entity')}}</span>
       </button>
       <ul class="dropdown-menu dropdown-menu-right">
         <li ng-repeat="entity in $ctrl.primaryEntities">
@@ -44,6 +45,7 @@
       </a>
       <button type="button" ng-click="$ctrl.getPrimaryEntities()" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <span class="caret"></span>
+        <span class="sr-only">{{:: ts('Select Base Entity for new data segment')}}</span>
       </button>
       <ul class="dropdown-menu dropdown-menu-right">
         <li ng-repeat="entity in $ctrl.primaryEntities">
@@ -61,14 +63,17 @@
 
   <div role="tabpanel" ng-repeat="tab in $ctrl.tabs" ng-show="$ctrl.tab === tab.name">
     <div class="form-inline">
-      <input class="form-control" type="search" ng-model="tab.filters.label" placeholder="{{:: ts('Filter by label...') }}">
-      <input class="form-control" type="search" ng-if="tab.name === 'custom'" ng-model="tab.filters['created_id.display_name,modified_id.display_name']" placeholder="{{:: ts('Filter by author...') }}">
+      <input class="form-control" type="search" ng-model="tab.filters.label" title="{{:: ts('Filter by label') }}" placeholder="{{:: ts('Filter by label...') }}">
+      <input class="form-control" type="search" ng-if="tab.name === 'custom'" ng-model="tab.filters['created_id.display_name,modified_id.display_name']" title="{{:: ts('Filter by author') }}" placeholder="{{:: ts('Filter by author...') }}">
       <span ng-if="tab.name === 'packaged'">
-        <input class="form-control" ng-model="tab.filters.base_module" ng-list crm-ui-select="{multiple: true, data: $ctrl.modules, placeholder: ts('Filter by package...')}">
+        <label for="filter-package-{{tab.name}}" class="sr-only">{{:: ts('Filter by package')}}</label>
+        <input id="filter-package-{{tab.name}}" class="form-control" ng-model="tab.filters.base_module" ng-list crm-ui-select="{multiple: true, data: $ctrl.modules, placeholder: ts('Filter by package...')}">
       </span>
-      <input class="form-control collapsible-optgroups" ng-model="tab.filters.api_entity" ng-list crm-ui-select="{multiple: true, data: $ctrl.entitySelect, placeholder: ts('Filter by entity...')}">
+      <label for="filter-api-entity-{{tab.name}}" class="sr-only">{{:: ts('Filter by entity')}}</label>
+      <input id="filter-api-entity-{{tab.name}}" class="form-control collapsible-optgroups" ng-model="tab.filters.api_entity" ng-list crm-ui-select="{multiple: true, data: $ctrl.entitySelect, placeholder: ts('Filter by entity...')}">
       <span ng-if="$ctrl.getTags().results.length">
-        <input class="form-control" ng-model="tab.filters.tags" ng-list crm-ui-select="{multiple: true, data: $ctrl.getTags, placeholder: ts('Filter by tags...')}">
+        <label for="filter-tags-{{tab.name}}" class="sr-only">{{:: ts('Filter by tags') }}</label>
+        <input id="filter-tags-{{tab.name}}" class="form-control" ng-model="tab.filters.tags" ng-list crm-ui-select="{multiple: true, data: $ctrl.getTags, placeholder: ts('Filter by tags...')}">
       </span>
       <a class="btn btn-secondary btn-sm pull-right" ng-if="tab.name === 'custom'" href crm-dialog-popup="crmSearchAdminImport" popup-tpl="~/crmSearchAdmin/searchListing/import.html">
         <i class="crm-i fa-upload"></i>

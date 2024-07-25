@@ -3,6 +3,7 @@
     <i ng-if=":: $ctrl.settings.columns[colIndex].icon" class="crm-i {{:: $ctrl.settings.columns[colIndex].icon }}"></i>
     {{:: colData.text }}
     <span class="caret"></span>
+    <span class="sr-only">{{:: ts('Row Actions')}}</span>
   </button>
   <ul class="dropdown-menu {{ $ctrl.settings.columns[colIndex].alignment === 'text-right' ? 'dropdown-menu-right' : '' }}" ng-if=":: colData.open">
     <li ng-repeat="link in colData.links" class="bg-{{:: link.style }}">

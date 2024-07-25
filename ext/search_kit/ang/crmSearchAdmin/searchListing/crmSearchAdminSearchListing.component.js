@@ -212,29 +212,34 @@
               searchMeta.fieldToColumn('label', {
                 label: true,
                 title: ts('Edit Label'),
-                editable: true
+                editable: true,
+                label_hidden: false
               }),
               searchMeta.fieldToColumn('description', {
                 label: true,
                 title: ts('Edit Description'),
-                editable: true
+                editable: true,
+                label_hidden: false
               }),
               searchMeta.fieldToColumn('api_entity:label', {
                 label: true,
                 empty_value: ts('Missing'),
                 cssRules: [
                   ['font-italic', 'api_entity:label', 'IS EMPTY']
-                ]
+                ],
+                label_hidden: false
               }),
               {
                 type: 'include',
                 label: ts('Tags'),
-                path: '~/crmSearchAdmin/searchListing/tags.html'
+                path: '~/crmSearchAdmin/searchListing/tags.html',
+                label_hidden: false
               },
               {
                 type: 'include',
                 label: ts('Displays'),
-                path: '~/crmSearchAdmin/searchListing/displays.html'
+                path: '~/crmSearchAdmin/searchListing/displays.html',
+                label_hidden: false
               }
             ]
           }
@@ -243,7 +248,8 @@
           ctrl.display.settings.columns.push({
             type: 'include',
             label: ts('Forms'),
-            path: '~/crmSearchAdmin/searchListing/afforms.html'
+            path: '~/crmSearchAdmin/searchListing/afforms.html',
+            label_hidden: false
           });
         }
         // Add scheduled communication column if user is allowed to use them
@@ -251,17 +257,18 @@
           ctrl.display.settings.columns.push({
             type: 'include',
             label: ts('Communications'),
-            path: '~/crmSearchAdmin/searchListing/communications.html'
+            path: '~/crmSearchAdmin/searchListing/communications.html',
+            label_hidden: false
           });
         }
         if (!ctrl.filters.is_template) {
           ctrl.display.settings.columns.push(
             searchMeta.fieldToColumn('GROUP_CONCAT(UNIQUE group.title) AS groups', {
-              label: ts('Smart Group')
+              label: ts('Smart Group'),
+              label_hidden: false
             })
           );
         }
-        if (ctrl.filters.has_base || ctrl.filters.is_template) {
           ctrl.display.settings.columns.push(
             searchMeta.fieldToColumn('base_module:label', {
               label: ts('Package'),
@@ -269,7 +276,8 @@
               empty_value: ctrl.filters.has_base ? ts('Missing') : null,
               cssRules: [
                 ['font-italic', 'base_module:label', 'IS EMPTY']
-              ]
+              ],
+              label_hidden: false
             })
           );
           ctrl.display.settings.columns.push(
@@ -282,7 +290,8 @@
               rewrite: ts('%1 by %2', {1: '[date_modified]', 2: '[modified_id.display_name]'}),
               cssRules: [
                 ['font-italic', 'local_modified_date', 'IS EMPTY']
-              ]
+              ],
+              label_hidden: false
             })
           );
         } else {
@@ -290,14 +299,16 @@
             searchMeta.fieldToColumn('created_date', {
               label: ts('Created'),
               title: '[created_date]',
-              rewrite: ts('%1 by %2', {1: '[date_created]', 2: '[created_id.display_name]'})
+              rewrite: ts('%1 by %2', {1: '[date_created]', 2: '[created_id.display_name]'}),
+              label_hidden: false
             })
           );
           ctrl.display.settings.columns.push(
             searchMeta.fieldToColumn('modified_date', {
               label: ts('Modified'),
               title: '[modified_date]',
-              rewrite: ts('%1 by %2', {1: '[date_modified]', 2: '[modified_id.display_name]'})
+              rewrite: ts('%1 by %2', {1: '[date_modified]', 2: '[modified_id.display_name]'}),
+              label_hidden: false
             })
           );
         }
@@ -306,14 +317,17 @@
             searchMeta.fieldToColumn('expires_date', {
               label: ts('Expires'),
               title: '[expires_date]',
-              rewrite: '[expires]'
+              rewrite: '[expires]',
+              label_hidden : false
             })
           );
         }
         ctrl.display.settings.columns.push({
           type: 'include',
           alignment: 'text-right',
-          path: '~/crmSearchAdmin/searchListing/buttons.html'
+          path: '~/crmSearchAdmin/searchListing/buttons.html',
+          label: ts('Row Actions'),
+          label_hidden: true,
         });
         ctrl.settings = ctrl.display.settings;
       }

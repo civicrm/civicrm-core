@@ -63,12 +63,14 @@
               {
                 key: 'label',
                 label: ts('Label'),
-                type: 'field'
+                type: 'field',
+                label_hidden: false
               },
               {
                 key: 'description',
                 label: ts('Description'),
-                type: 'field'
+                type: 'field',
+                label_hidden: false
               },
               {
                 key: 'entity_name:label',
@@ -77,17 +79,20 @@
                 empty_value: ts('Missing'),
                 cssRules: [
                   ['font-italic', 'entity_name:label', 'IS EMPTY']
-                ]
+                ],
+                label_hidden: false
               },
               {
                 type: 'include',
                 label: ts('Items'),
-                path: '~/crmSearchAdmin/searchSegmentListing/segments.html'
+                path: '~/crmSearchAdmin/searchSegmentListing/segments.html',
+                label_hidden: false
               },
               {
                 type: 'include',
-                label: '',
-                path: '~/crmSearchAdmin/searchSegmentListing/buttons.html'
+                label: ts('Row Actions'),
+                path: '~/crmSearchAdmin/searchSegmentListing/buttons.html',
+                label_hidden: true
               }
             ]
           }
