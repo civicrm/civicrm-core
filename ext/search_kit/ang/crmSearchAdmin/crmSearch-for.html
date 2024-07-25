@@ -4,8 +4,10 @@
 </div>
 <div ng-if=":: $ctrl.paramExists('join')" class="crm-search-joins">
   <fieldset ng-repeat="join in $ctrl.savedSearch.api_params.join" class="crm-search-join">
+    <legend class="sr-only">{{:: ts('Join %1', {1: $index + 1})}}</legend>
     <div class="form-inline">
-      <select class="form-control" ng-model="join[1]" ng-change="$ctrl.changeJoinType(join)" ng-options="o.k as o.v for o in ::joinTypes" ></select>
+      <label for="crm-search-join-type-{{ $index }}" class="sr-only">{{:: ts('Join Type')}}</label>
+      <select id="crm-search-join-type-{{ $index }}" class="form-control" ng-model="join[1]" ng-change="$ctrl.changeJoinType(join)" ng-options="o.k as o.v for o in ::joinTypes" ></select>
       <div class="input-group">
         <span class="input-group-addon" title="{{:: getJoin(join[0]).defaultLabel }}"><i class="crm-i {{:: getJoin(join[0]).icon }}"></i></span>
         <input class="form-control crm-search-join-label huge" ng-model="$ctrl.getSetJoinLabel(join[0])" ng-model-options="{getterSetter: true, updateOn: 'blur'}" placeholder="{{:: getJoin(join[0]).defaultLabel }}" title="{{:: ts('Optional label for this join') }}">
@@ -19,8 +21,11 @@
     </div>
   </fieldset>
   <fieldset class="crm-search-join-add">
+    <legend class="sr-only">add Join</legend>
     <div class="form-inline">
-      <select class="form-control" ng-model="controls.joinType" ng-options="o.k as o.v for o in ::joinTypes" ></select>
+      <label for="crm-search-add-join" class="sr-only">{{:: ts('Join Type')}}</label>
+      <select id="crm-search-add-join-type" class="form-control" ng-model="controls.joinType" ng-options="o.k as o.v for o in ::joinTypes" ></select>
+      <label for="crm-search-add-join" class="sr-only">{{:: ts('Join Entity')}}</label>
       <input id="crm-search-add-join"
              class="form-control crm-action-menu fa-plus"
              crm-ui-select="{placeholder: ts('Entity'), data: getJoinEntities, dropdownCss: {width: '275px'}}"
@@ -29,6 +34,7 @@
   </fieldset>
 </div>
 <fieldset ng-if=":: $ctrl.paramExists('groupBy')" class="crm-search-groupbys">
+  <legend class="sr-only">{{:: ts('Group By')}}</legend>
   <div class="form-inline" ng-repeat="groupBy in $ctrl.savedSearch.api_params.groupBy" class="crm-search-groupby">
     <label for="crm-search-groupBy-{{ $index }}">{{:: ts('Group By') }}</label>
     <crm-search-function class="form-group" expr="$ctrl.savedSearch.api_params.groupBy[$index]" mode="groupBy"></crm-search-function>
@@ -38,6 +44,7 @@
     <hr>
   </div>
   <div class="form-inline crm-search-groupby-add">
+    <label for="crm-search-add-groupBy" class="sr-only">{{:: ts('Add Group By')}}</label>
     <input id="crm-search-add-groupBy"
            class="form-control crm-action-menu fa-plus"
            crm-ui-select="{placeholder: ts('Group By'), data: fieldsForGroupBy, dropdownCss: {width: '300px'}}"
