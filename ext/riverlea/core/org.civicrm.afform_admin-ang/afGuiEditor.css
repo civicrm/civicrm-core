@@ -122,6 +122,7 @@
 	display: grid;
 	grid-template-columns: 1fr 250px;
 }
+#afGuiEditor-palette .input-group:has(#af_config_redirect) .input-group-addon
 #afGuiEditor-palette input.select2-input {
     min-width: 100%;
 }

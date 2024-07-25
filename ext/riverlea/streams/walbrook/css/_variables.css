@@ -323,7 +323,7 @@ color-scheme: light dark;
 --crm-dash-image-size: 100px;
 --crm-dash-image-radius: 200px;
 --crm-dash-image-justify: space-between; /* choose from start (left), end (right), center, and space-between (spread out) */
---crm-dash-image-direction: row-reverse; /* choose from row and row-reverse to get the image on the right, column stacks it */
+--crm-dash-image-direction: row; /* choose from row and row-reverse to get the image on the right, column stacks it */
 
 
 /* Dialog */
