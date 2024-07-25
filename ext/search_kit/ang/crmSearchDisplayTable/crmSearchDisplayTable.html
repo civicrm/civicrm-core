@@ -10,11 +10,12 @@
     <thead>
       <tr>
         <th ng-class="{'crm-search-result-select': $ctrl.settings.actions}" ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTaskHeader.html'" ng-if=":: $ctrl.hasExtraFirstColumn()">
-          <span class="sr-only">{{:: ts('Bulk row actions')}}</span>
+          <span class="sr-only">{{:: ts('Row Selected')}}</span>
         </th>
         <th ng-repeat="col in $ctrl.settings.columns" ng-click="$ctrl.setSort(col, $event)" class="{{:: $ctrl.getHeaderClass(col) }}" title="{{:: $ctrl.isSortable(col) ? ts('Click to sort results (shift-click to sort by multiple).') : '' }}">
           <i ng-if=":: $ctrl.isSortable(col)" class="crm-i crm-search-table-column-sort-icon {{ $ctrl.getSort(col) }}"></i>
-          <span class="crm-search-display-table-column-label">{{:: col.label }}</span>
+          <span class="crm-search-display-table-column-label" ng-if="!col.label_hidden">{{:: col.label }}</span>
+          <span class="sr-only" ng-if="((col.type == 'buttons' || col.type == 'links' || col.type == 'menu') && col.label_hidden && !col.label)">{{:: col.label}}</span>
         </th>
       </tr>
     </thead>
