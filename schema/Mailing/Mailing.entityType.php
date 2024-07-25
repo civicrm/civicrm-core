@@ -424,7 +424,7 @@ return [
       'title' => ts('Mailing Status'),
       'sql_type' => 'varchar(32)',
       'description' => ts('The status of this mailing'),
-      'maxlength' => 12,
+      'maxlength' => 32,
       'size' => CRM_Utils_Type::TWELVE,
       'usage' => [
         'import' => FALSE,
