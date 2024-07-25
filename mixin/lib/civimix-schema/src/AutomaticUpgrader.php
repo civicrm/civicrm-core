@@ -53,7 +53,12 @@ return new class() implements \CRM_Extension_Upgrader_Interface {
     }
 
     if ($this->customUpgrader) {
-      $this->customUpgrader->notify($event, $params);
+      $result = $this->customUpgrader->notify($event, $params);
+      // for upgrade checks, we need to pass check results up to the caller
+      // (for now - could definitely be more elegant!)
+      if ($event === 'upgrade') {
+        return $result;
+      }
     }
 
     if ($event === 'uninstall') {
