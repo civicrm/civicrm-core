@@ -2,9 +2,9 @@
 
 namespace Civi\Api4\Action\GroupSubscription;
 
-use Civi\Api4\Generic\BasicSaveAction;
+use Civi\Api4\Generic\BasicUpdateAction;
 
-class Save extends BasicSaveAction {
+class Update extends BasicUpdateAction {
   use GroupSubscriptionProcessor;
 
 }

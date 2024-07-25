@@ -165,7 +165,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
       return;
     }
     $result = $this->apiGet($api4, $entity['type'], $entity['fields'], [
-      'where' => [['id', 'IN', $ids]],
+      'where' => [[$idField, 'IN', $ids]],
     ]);
     foreach ($ids as $index => $id) {
       $this->_entityIds[$entity['name']][$index] = [

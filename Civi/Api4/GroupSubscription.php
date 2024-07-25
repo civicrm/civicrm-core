@@ -4,25 +4,29 @@ namespace Civi\Api4;
 /**
  * GroupSubscription entity.
  *
+ * @searchable none
+ * @since 5.77
  * @package Civi\Api4
  */
 class GroupSubscription extends Generic\AbstractEntity {
 
-  /**
-   * @param bool $checkPermissions
-   * @return Action\GroupSubscription\Get
-   */
   public static function get($checkPermissions = TRUE) {
-    return (new Action\GroupSubscription\Get(__CLASS__, __FUNCTION__))
+    return (new Action\GroupSubscription\Get('GroupSubscription', __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 
-  /**
-   * @param bool $checkPermissions
-   * @return Action\GroupSubscription\Save
-   */
+  public static function create($checkPermissions = TRUE) {
+    return (new Action\GroupSubscription\Create('GroupSubscription', __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
   public static function save($checkPermissions = TRUE) {
-    return (new Action\GroupSubscription\Save(__CLASS__, __FUNCTION__))
+    return (new Action\GroupSubscription\Save('GroupSubscription', __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  public static function update($checkPermissions = TRUE) {
+    return (new Action\GroupSubscription\Update('GroupSubscription', __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 
@@ -40,37 +44,45 @@ class GroupSubscription extends Generic\AbstractEntity {
           'fk_entity' => 'Contact',
           'fk_column' => 'id',
           'input_type' => 'EntityRef',
-          'label' => 'Contact',
+          'label' => ts('Contact'),
         ],
       ];
 
-      // loop through pubic group and build the checkboxes
-      // get all public groups
-      $publicGroups = \Civi\Api4\Group::get(FALSE)
-        ->addWhere('visibility', '=', 'Public Pages')
-        ->execute();
+      // Loop through visible groups and add checkbox fields
+      $groups = Action\GroupSubscription\Save::getEnabledGroups();
 
-      foreach ($publicGroups as $group) {
-
-        $title = $group['frontend_title'] ?? $group['title'];
-        $description = $group['frontend_description'] ?? $group['description'];
-        $label = $title;
-        if ($description) {
-          $label .= " - {$description}";
-        }
-
+      foreach ($groups as $group) {
         $fields[] = [
-          'name' => "group_" . $group['id'],
+          'name' => $group['name'],
           'data_type' => 'Boolean',
           'title' => $group['title'],
           'required' => FALSE,
-          "input_type" => "CheckBox",
-          'label' => $label,
+          'default_value' => FALSE,
+          'input_type' => 'CheckBox',
+          'label' => $group['frontend_title'] ?: $group['title'],
+          'description' => $group['frontend_description'] ?: $group['description'],
         ];
       }
 
       return $fields;
     }))->setCheckPermissions($checkPermissions);
+  }
+
+  public static function getInfo() {
+    $info = parent::getInfo();
+    $info['primary_key'] = ['contact_id'];
+    return $info;
+  }
+
+  protected static function getEntityTitle(bool $plural = FALSE): string {
+    return $plural ? ts('Group Subscriptions') : ts('Group Subscription');
+  }
+
+  public static function permissions() {
+    // Permission checks are passed-through to the underlying APIs
+    return [
+      'default' => [],
+    ];
   }
 
 }

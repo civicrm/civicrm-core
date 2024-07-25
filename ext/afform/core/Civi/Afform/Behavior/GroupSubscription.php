@@ -45,21 +45,23 @@ class GroupSubscription extends AbstractBehavior implements EventSubscriberInter
     $modes = [
       [
         'name' => 'normal',
-        'label' => E::ts('Opts in and out'),
+        'label' => E::ts('Opt-In & Out'),
         'description' => E::ts('Double optin for sign up'),
       ],
       [
         'name' => 'opt-in',
-        'label' => E::ts('Only allows opting in'),
+        'label' => E::ts('Opt-In Only'),
         'description' => E::ts('Double optin for sign up'),
       ],
       [
         'name' => 'auto-add',
-        'label' => E::ts('Adds contact on submission'),
+        'label' => E::ts('Auto-Add'),
+        'description' => E::ts('Adds contact to group(s) on submission'),
       ],
       [
         'name' => 'auto-remove',
-        'label' => E::ts('Removes contact on submission'),
+        'label' => E::ts('Auto-Remove'),
+        'description' => E::ts('Removes contact from group(s) on submission'),
       ],
 
     ];
@@ -83,7 +85,7 @@ class GroupSubscription extends AbstractBehavior implements EventSubscriberInter
     }
     $subscriptionEntity = $event->getEntity();
     $subscriptionMode = $subscriptionEntity['group-subscription'];
-    if (!in_array($subscriptionMode, ['normal', 'opt-in'], TRUE)) {
+    if ($subscriptionMode !== 'normal') {
       return;
     }
     $contact = $subscriptionEntity['data']['contact_id'];
@@ -97,31 +99,7 @@ class GroupSubscription extends AbstractBehavior implements EventSubscriberInter
       $cid = $event->getEntityIds($contact)[0] ?? NULL;
     }
     if ($cid) {
-      $groupsToFill = [];
-      foreach (array_keys($subscriptionEntity['fields']) as $fieldName) {
-        if (str_starts_with($fieldName, 'group_')) {
-          $groupsToFill[] = explode('_', $fieldName)[1];
-        }
-      }
-      if (!$groupsToFill) {
-        return;
-      }
-
-      // $currentContactGroups = \Civi\Api4\GroupContact::get(FALSE)
-      //   ->addSelect('group_id')
-      //   ->addWhere('contact_id', '=', $contactId)
-      //   ->addWhere('status', '!=', 'Removed')
-      //   ->addWhere('group_id', 'IN', $groupsToFill)
-      //   ->execute()->column('group_id');
-
-      $groupSubscriptions = \Civi\Api4\GroupSubscription::get(FALSE)
-        ->addWhere('contact_id', '=', $cid)
-        ->execute()
-        ->first();
-
-      // HMM, I got this far and now I think the above logic needs to be moved into the
-      // GroupSubscription::get action, but I also think that entity could be standardized a bit
-      // more and ought to extend BasicEntity so it has all the expected CRUD actions...
+      $event->getApiRequest()->loadEntity($subscriptionEntity, [$cid]);
     }
   }
 
@@ -129,13 +107,38 @@ class GroupSubscription extends AbstractBehavior implements EventSubscriberInter
     if ($event->getEntityType() !== 'GroupSubscription') {
       return;
     }
+    $event->stopPropagation();
 
     $subscriptionEntity = $event->getEntity();
     $subscriptionMode = $subscriptionEntity['group-subscription'];
 
-    $submittedValues = $event->getRecords();
-    $submittedValues['subscription-mode'] = $subscriptionMode;
-    $event->setRecords($submittedValues);
+    $submittedValues = $event->getRecords()[0]['fields'] ?? [];
+    // Treat contact_id as multivalued in case contact uses af-repeat on the form
+    $contactIds = array_filter((array) ($submittedValues['contact_id'] ?? []));
+    unset($submittedValues['contact_id']);
+
+    // Only "normal" mode allows both opt-in & out. In other modes, discard FALSE values.
+    if ($subscriptionMode !== 'normal') {
+      $submittedValues = array_filter($submittedValues);
+    }
+    if (!$contactIds || !$submittedValues) {
+      // Nothing to do
+      return;
+    }
+    // Invert values in "auto-remove" mode
+    if ($subscriptionMode === 'auto-remove') {
+      $submittedValues = array_fill_keys(array_keys($submittedValues), FALSE);
+    }
+    $contactSubscriptions = [];
+    foreach ($contactIds as $cid) {
+      $submittedValues['contact_id'] = $cid;
+      $contactSubscriptions[] = $submittedValues;
+    }
+
+    \Civi\Api4\GroupSubscription::save(FALSE)
+      ->setRecords($contactSubscriptions)
+      ->setDoubleOptin($subscriptionMode === 'normal' || $subscriptionMode === 'opt-in')
+      ->execute();
   }
 
 }
