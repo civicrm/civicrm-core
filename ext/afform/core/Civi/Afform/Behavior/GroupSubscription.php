@@ -25,45 +25,38 @@ class GroupSubscription extends AbstractBehavior implements EventSubscriberInter
     ];
   }
 
-  public static function getEntities():array {
+  public static function getEntities(): array {
     return ['GroupSubscription'];
   }
 
-  public static function getTitle():string {
-    return E::ts('Configuration');
+  public static function getTitle(): string {
+    return E::ts('Email Verification');
   }
 
-  public static function getDescription():string {
-    return E::ts('Configue subscription behavior.');
+  public static function getDescription(): string {
+    if (!\CRM_Core_Component::isEnabled('CiviMail')) {
+      return E::ts('Email verification is not available because CiviMail is disabled.');
+    }
+    return E::ts("Verify the contact's email by sending them a link to confirm their subscription (recommended for public forms, requires an email input on the form).");
   }
 
   public static function getDefaultMode(): string {
-    return 'normal';
+    return \CRM_Core_Component::isEnabled('CiviMail') ? 'double-opt-in' : 'no-confirm';
   }
 
-  public static function getModes(string $contactType):array {
-    $modes = [
-      [
-        'name' => 'normal',
-        'label' => E::ts('Opt-In & Out'),
-        'description' => E::ts('Double optin for sign up'),
-      ],
-      [
-        'name' => 'opt-in',
-        'label' => E::ts('Opt-In Only'),
-        'description' => E::ts('Double optin for sign up'),
-      ],
-      [
-        'name' => 'auto-add',
-        'label' => E::ts('Auto-Add'),
-        'description' => E::ts('Adds contact to group(s) on submission'),
-      ],
-      [
-        'name' => 'auto-remove',
-        'label' => E::ts('Auto-Remove'),
-        'description' => E::ts('Removes contact from group(s) on submission'),
-      ],
-
+  public static function getModes(string $contactType): array {
+    $modes = [];
+    if (\CRM_Core_Component::isEnabled('CiviMail')) {
+      $modes[] = [
+        'name' => 'double-opt-in',
+        'label' => E::ts('Send Confirmation Email'),
+        'description' => E::ts('Double opt-in for sign up'),
+      ];
+    }
+    $modes[] = [
+      'name' => 'no-confirm',
+      'label' => E::ts('No Confirmation'),
+      'description' => E::ts('Contact added to group immediately'),
     ];
     return $modes;
   }
@@ -84,8 +77,7 @@ class GroupSubscription extends AbstractBehavior implements EventSubscriberInter
       return;
     }
     $subscriptionEntity = $event->getEntity();
-    $subscriptionMode = $subscriptionEntity['group-subscription'];
-    if ($subscriptionMode !== 'normal') {
+    if (empty($subscriptionEntity['actions']['update'])) {
       return;
     }
     $contact = $subscriptionEntity['data']['contact_id'];
@@ -111,23 +103,25 @@ class GroupSubscription extends AbstractBehavior implements EventSubscriberInter
 
     $subscriptionEntity = $event->getEntity();
     $subscriptionMode = $subscriptionEntity['group-subscription'];
+    $optInAllowed = !empty($subscriptionEntity['actions']['create']);
+    $optOutAllowed = !empty($subscriptionEntity['actions']['update']);
+    if (!$optOutAllowed && !$optInAllowed) {
+      // Read-only, nothing to do
+      return;
+    }
 
     $submittedValues = $event->getRecords()[0]['fields'] ?? [];
     // Treat contact_id as multivalued in case contact uses af-repeat on the form
     $contactIds = array_filter((array) ($submittedValues['contact_id'] ?? []));
     unset($submittedValues['contact_id']);
 
-    // Only "normal" mode allows both opt-in & out. In other modes, discard FALSE values.
-    if ($subscriptionMode !== 'normal') {
+    // If opt-out is not allowed, discard FALSE values.
+    if (!$optOutAllowed) {
       $submittedValues = array_filter($submittedValues);
     }
     if (!$contactIds || !$submittedValues) {
       // Nothing to do
       return;
-    }
-    // Invert values in "auto-remove" mode
-    if ($subscriptionMode === 'auto-remove') {
-      $submittedValues = array_fill_keys(array_keys($submittedValues), FALSE);
     }
     $contactSubscriptions = [];
     foreach ($contactIds as $cid) {
@@ -137,7 +131,7 @@ class GroupSubscription extends AbstractBehavior implements EventSubscriberInter
 
     \Civi\Api4\GroupSubscription::save(FALSE)
       ->setRecords($contactSubscriptions)
-      ->setDoubleOptin($subscriptionMode === 'normal' || $subscriptionMode === 'opt-in')
+      ->setDoubleOptin($subscriptionMode === 'double-opt-in')
       ->execute();
   }
 

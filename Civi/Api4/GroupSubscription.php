@@ -2,7 +2,11 @@
 namespace Civi\Api4;
 
 /**
- * GroupSubscription entity.
+ * Group Subscriptions.
+ *
+ * This API is used to facilitate opt-in and opt-out of groups on forms.
+ * "GroupSubscription" is not a real entity in the database; this API
+ * wraps the GroupContact and MailingEventSubscribe entities for convenience.
  *
  * @searchable none
  * @since 5.77
@@ -59,6 +63,10 @@ class GroupSubscription extends Generic\AbstractEntity {
           'required' => FALSE,
           'default_value' => FALSE,
           'input_type' => 'CheckBox',
+          'options' => [
+            TRUE => ts('Subscribe'),
+            FALSE => ts('Unsubscribe'),
+          ],
           'label' => $group['frontend_title'] ?: $group['title'],
           'description' => $group['frontend_description'] ?: $group['description'],
         ];
