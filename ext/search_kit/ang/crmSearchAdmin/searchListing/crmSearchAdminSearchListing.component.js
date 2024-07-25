@@ -5,7 +5,8 @@
   angular.module('crmSearchAdmin').component('crmSearchAdminSearchListing', {
     bindings: {
       filters: '<',
-      tabCount: '='
+      tabCount: '=',
+      tabId: '<'
     },
     templateUrl: '~/crmSearchDisplayTable/crmSearchDisplayTable.html',
     controller: function($scope, $element, $q, crmApi4, crmStatus, searchMeta, searchDisplayBaseTrait, searchDisplaySortableTrait, searchDisplayEditableTrait) {
