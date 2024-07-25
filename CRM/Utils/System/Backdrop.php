@@ -657,6 +657,10 @@ AND    u.status = 1
       return $civicrm_paths['cms.root']['path'];
     }
 
+    if (defined('BACKDROP_ROOT')) {
+      return BACKDROP_ROOT;
+    }
+
     $cmsRoot = NULL;
     $valid = NULL;
 
