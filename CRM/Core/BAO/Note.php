@@ -112,6 +112,9 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note implements \Civi\Core\HookInte
    * @throws \CRM_Core_Exception
    */
   public static function add(&$params, $ids = []) {
+    if (!empty($ids)) {
+      CRM_Core_Error::deprecatedWarning('ids is deprecated');
+    }
     $dataExists = self::dataExists($params);
     if (!$dataExists) {
       return NULL;
