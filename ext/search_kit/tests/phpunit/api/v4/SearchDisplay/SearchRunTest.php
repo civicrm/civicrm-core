@@ -2119,6 +2119,65 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(2, $result[1]['columns'][1]['val']);
   }
 
+  public function testLinkConditions() {
+    $activities = $this->saveTestRecords('Activity', [
+      'records' => [
+        ['activity_date_time' => 'now - 1 day'],
+        ['activity_date_time' => 'now + 1 day'],
+      ],
+    ]);
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Activity',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['id'],
+          'where' => [['id', 'IN', $activities->column('id')]],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => 'testDisplay',
+        'settings' => [
+          'actions' => TRUE,
+          'pager' => [],
+          'sort' => [['id', 'ASC']],
+          'columns' => [
+            [
+              'type' => 'field',
+              'key' => 'id',
+              'label' => 'ID',
+            ],
+            [
+              'type' => 'buttons',
+              'links' => [
+                [
+                  'entity' => 'Activity',
+                  'task' => 'update',
+                  'icon' => 'fa-pencil',
+                  'condition' => [
+                    'activity_date_time',
+                    '>',
+                    'now',
+                  ],
+                ],
+              ],
+            ],
+          ],
+        ],
+      ],
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(2, $result);
+
+    // Link should appear for 2nd activity but not the first
+    $this->assertCount(0, $result[0]['columns'][1]['links']);
+    $this->assertCount(1, $result[1]['columns'][1]['links']);
+  }
+
   public function testContactTypeIcons(): void {
     $this->createTestRecord('ContactType', [
       'label' => 'Star',

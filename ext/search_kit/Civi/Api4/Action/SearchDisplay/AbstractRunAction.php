@@ -762,8 +762,14 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       }
       return \CRM_Core_Permission::check($permissions) == ($op !== '!=');
     }
+    $field = $this->getField($condition[0]);
+    // Handle date/time-based conditionals
+    $dataType = $field['data_type'] ?? NULL;
+    if (in_array($dataType, ['Timestamp', 'Date'], TRUE) && !empty($condition[2])) {
+      $condition[2] = date('Y-m-d H:i:s', strtotime($condition[2]));
+    }
     // Convert the conditional value of 'current_domain' into an actual value that filterCompare can work with
-    if (($condition[2] ?? '') === 'current_domain') {
+    if ((($field['fk_entity'] ?? NULL) === 'Domain') && ($condition[2] ?? '') === 'current_domain') {
       if (str_ends_with($condition[0], ':label') !== FALSE) {
         $condition[2] = \CRM_Core_BAO_Domain::getDomain()->name;
       }
