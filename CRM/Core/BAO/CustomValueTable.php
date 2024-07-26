@@ -75,64 +75,9 @@ class CRM_Core_BAO_CustomValueTable {
 
           switch ($type) {
             case 'StateProvince':
-              $type = $serialize ? 'String' : 'Integer';
-              if (!$serialize && !is_numeric($value)) {
-                //fix for multi select state, CRM-3437
-                $mulValues = explode(',', $value);
-                $validStates = [];
-                foreach ($mulValues as $key => $stateVal) {
-                  $states = [];
-                  $states['state_province'] = trim($stateVal);
-
-                  CRM_Utils_Array::lookupValue($states, 'state_province',
-                    CRM_Core_PseudoConstant::stateProvince(), TRUE
-                  );
-                  if (empty($states['state_province_id'])) {
-                    CRM_Utils_Array::lookupValue($states, 'state_province',
-                      CRM_Core_PseudoConstant::stateProvinceAbbreviation(), TRUE
-                    );
-                  }
-                  $validStates[] = $states['state_province_id'] ?? NULL;
-                }
-                $value = implode(CRM_Core_DAO::VALUE_SEPARATOR,
-                  $validStates
-                );
-                $type = 'String';
-              }
-              elseif (!$value) {
-                // CRM-3415
-                // using type of timestamp allows us to sneak in a null into db
-                // gross but effective hack
-                $value = NULL;
-                $type = 'Timestamp';
-              }
-              break;
-
             case 'Country':
               $type = $serialize ? 'String' : 'Integer';
-              if (!$serialize && !is_numeric($value)) {
-                //fix for multi select country, CRM-3437
-                $mulValues = explode(',', $value);
-                $validCountries = [];
-                foreach ($mulValues as $key => $countryVal) {
-                  $countries = [];
-                  $countries['country'] = trim($countryVal);
-                  CRM_Utils_Array::lookupValue($countries, 'country',
-                    CRM_Core_PseudoConstant::country(), TRUE
-                  );
-                  if (empty($countries['country_id'])) {
-                    CRM_Utils_Array::lookupValue($countries, 'country',
-                      CRM_Core_PseudoConstant::countryIsoCode(), TRUE
-                    );
-                  }
-                  $validCountries[] = $countries['country_id'] ?? NULL;
-                }
-                $value = implode(CRM_Core_DAO::VALUE_SEPARATOR,
-                  $validCountries
-                );
-                $type = 'String';
-              }
-              elseif (!$value) {
+              if (!$value) {
                 // CRM-3415
                 // using type of timestamp allows us to sneak in a null into db
                 // gross but effective hack
