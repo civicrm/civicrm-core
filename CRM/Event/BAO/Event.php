@@ -323,7 +323,10 @@ WHERE  ( civicrm_event.is_template  = 0 )";
    * @return array
    */
   public static function getEventsForSelect2() {
-    $options = ['all' => ts('- all -')];
+    $options = [
+      'all' => ts('- all -'),
+      'multiparticipant' => ts('- All multi-participant events -'),
+    ];
     // Check that CiviEvent is enabled before calling the api
     if (class_exists('\Civi\Api4\Event')) {
       $options += \Civi\Api4\Event::get(FALSE)
