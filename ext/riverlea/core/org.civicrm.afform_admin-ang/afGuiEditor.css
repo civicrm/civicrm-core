@@ -39,13 +39,7 @@
 #afGuiEditor hr {
     margin-block: var(--crm-m);
 }
-#afGuiEditor af-gui-container,
-#afGuiEditor af-gui-markup,
-#afGuiEditor af-gui-field,
-#afGuiEditor .af-gui-block-label,
-#afGuiEditor af-gui-edit-options {
-    display: block;
-}
+
 /* Panel */
 
 #afGuiEditor .panel,
@@ -204,6 +198,12 @@
 #afGuiEditor-canvas .af-gui-button {
 	margin-bottom: var(--crm-padding-small);
     border: 2px solid transparent;
+    display: block;
+}
+#afGuiEditor af-gui-field,
+#afGuiEditor .af-gui-block-label,
+#afGuiEditor af-gui-edit-options {
+    display: block;
 }
 #afGuiEditor .af-gui-container {
     border-radius: var(--crm-roundness);
@@ -216,28 +216,16 @@
 #afGuiEditor-canvas .form-inline {
 	padding: 0;
 }
-#afGuiEditor-canvas:not(.af-gui-menu-open) .af-gui-container:hover,
-.af-gui-dragging #afGuiEditor .af-gui-container {
-    border: 2px dashed var(--crm-c-gray-700);
-}
-#afGuiEditor-canvas .af-entity-selected {
-    border: 2px dashed var(--crm-c-blue-dark);
-}
-#afGuiEditor-canvas .af-entity-selected > .af-gui-bar {
-    background-color:  var(--crm-c-blue-dark);
-    opacity: 1;
-    transition: opacity 0s;
-}
 
 /* Canvas gui bar */
 
 #afGuiEditor-canvas .af-gui-bar {
 	height: var(--crm-l);
     width: 100%;
-	border-radius: var(--crm-roundness) var(--crm-roundness) 0 0;
+	border-radius: 0;
     transition: opacity .2s;
     background-color: var(--crm-c-background2);
-    padding: var(--crm-xs);
+    padding-inline: var(--crm-xs);
     cursor: move;
     display: flex;
     justify-content: space-between;
@@ -259,7 +247,7 @@
 }
 #afGuiEditor .af-gui-node-title {
     position: absolute;
-    top: 2px;
+    top: 1px;
 }
 #afGuiEditor-canvas:not(.af-gui-menu-open) .af-gui-bar,
 #afGuiEditor-canvas:not(.af-gui-menu-open) .af-gui-container-title span:empty {
@@ -269,6 +257,12 @@
 #afGuiEditor:not(.af-gui-dragging *) #afGuiEditor-canvas:hover .af-gui-container-title span:empty {
     opacity: 1;
     transition: opacity .2s;
+}
+#afGuiEditor:not(.af-gui-dragging *) #afGuiEditor-canvas:hover .af-gui-container:not(.af-gui-container-type-fieldset),
+#afGuiEditor:not(.af-gui-dragging *) #afGuiEditor-canvas:hover .af-gui-markup,
+#afGuiEditor:not(.af-gui-dragging *) #afGuiEditor-canvas:hover .af-gui-element,
+ {
+    border: 2px solid var(--crm-c-background2);
 }
 #afGuiEditor #afGuiEditor-canvas .af-gui-dragtarget > .af-gui-bar,
 #afGuiEditor #afGuiEditor-canvas .af-gui-dragtarget > .af-gui-container-title span:empty {
@@ -296,12 +290,6 @@ body.af-gui-dragging {
     height: 21px;
     min-height: 21px;
 }
-#afGuiEditor .af-gui-element {
-    position: relative;
-    padding: 0 3px 3px;
-    display: block;
-    min-height: 21px;
-}
 .af-layout-inline .af-gui-bar {
 	margin: 0 -4px;
 	width: calc(100% + 8px) !important;
@@ -311,11 +299,55 @@ af-gui-container > .af-gui-bar,
 	margin: calc(-1 * var(--crm-m)) calc(-1 * var(--crm-m)) var(--crm-m) calc(-1 * var(--crm-m));
 	width: calc(100% + var(--crm-r)) !important;
 }
-
 #afGuiEditor-canvas [ui-sortable] .af-gui-bar:has(~ .af-gui-field-input) {
 	border-radius: var(--crm-roundness) var(--crm-roundness) 0 0;
 }
+/* Canvas layout */
 
+#afGuiEditor .af-gui-layout.af-layout-cols {
+    display: flex;
+    gap: var(--crm-m);
+}
+#afGuiEditor .af-gui-layout.af-layout-cols > div {
+    flex: 1;
+}
+#afGuiEditor .af-gui-layout.af-layout-inline > div {
+    display: inline-block;
+    width: 300px;
+    vertical-align: top;
+}
+#afGuiEditor .af-gui-element {
+    position: relative;
+    padding: 0 3px 3px;
+    display: block;
+    min-height: 21px;
+}
+
+#afGuiEditor .af-gui-element {
+	padding: 0 var(--crm-s) var(--crm-s) !important;
+	min-height: var(--crm-l) !important;
+	background: var(--crm-c-background2);
+	border-radius: var(--crm-roundness);
+	margin-bottom: var(--crm-s2);
+}
+/* Canvas elements */
+
+#afGuiEditor-canvas:not(.af-gui-menu-open) .af-gui-container:hover,
+.af-gui-dragging #afGuiEditor .af-gui-container,
+#afGuiEditor:not(.af-gui-dragging *) #afGuiEditor-canvas:hover .af-gui-container:hover {
+    border: 2px dashed var(--crm-c-gray-700);
+}
+#afGuiEditor-canvas .af-entity-selected {
+    border: 2px dashed var(--crm-c-blue-dark);
+}
+#afGuiEditor-canvas .af-entity-selected > .af-gui-bar {
+    background-color: var(--crm-c-background5);
+    opacity: 1;
+    transition: opacity 0s;
+}
+#afGuiEditor .af-layout-cols .af-gui-markup {
+	padding: 0;
+}
 /* #afGuiEditor .af-gui-content-editing-area .af-gui-edit-options-bar,
 #afGuiEditor-canvas [ui-sortable] .af-gui-bar  {
 	font-family: inherit !important /* vs afGuiEditor.css;
@@ -419,9 +451,6 @@ af-gui-container > .af-gui-bar,
 }
 /* grip handle */
 
-#afGuiEditor .af-gui-add-element-button {
-    background-color: transparent;
-}
 #afGuiEditor .af-gui-add-element-button span {
     display: inline-block;
     width: 18px;
@@ -429,31 +458,6 @@ af-gui-container > .af-gui-bar,
     color: var(--crm-c-blue-dark);
 }
 
-#afGuiEditor .af-gui-layout-icon {
-    width: 12px;
-    height: 11px;
-    display: block;
-    background-image: url('../images/icons.png');
-    background-repeat: no-repeat;
-    margin: 4px 1px;
-}
-#afGuiEditor .af-gui-layout-icon.af-layout-cols {
-    background-position: -12px 0;
-}
-#afGuiEditor .af-gui-layout-icon.af-layout-rows {
-    background-position: -24px 0;
-}
-#afGuiEditor .af-gui-layout.af-layout-cols {
-    display: flex;
-}
-#afGuiEditor .af-gui-layout.af-layout-cols > div {
-    flex: 1;
-}
-#afGuiEditor .af-gui-layout.af-layout-inline > div {
-    display: inline-block;
-    width: 300px;
-    vertical-align: top;
-}
 #afGuiEditor .af-gui-button {
     padding-left: 15px;
 }
@@ -502,14 +506,7 @@ af-gui-container > .af-gui-bar,
 #afGuiEditor .af-gui-field-input-type-select .input-group-btn {
     position: initial;
 }
-#afGuiEditor .af-gui-field-input-type-chainselect .input-group .dropdown-toggle,
-#afGuiEditor .af-gui-field-input-type-select .input-group .dropdown-toggle {
-    padding: 3px 11px;
-}
-#afGuiEditor .af-gui-field-input-type-select .input-group .dropdown-menu {
-    width: 100%;
-    right: 0;
-}
+
 #afGuiEditor .input-group-addon {
     padding: 0;
 }
@@ -694,9 +691,8 @@ af-gui-container > .af-gui-bar,
 
 /* AfEditor builder */
 
-#afGuiEditor .dropdown-menu li .af-gui-field-select-in-dropdown {
-	color: var(--crm-dropdown-col) !important;
-}
+
+
 
 #afGuiEditor .af-gui-container.af-container-style-pane {
 	background: linear-gradient(to bottom, #f2f2f2 0 var(--crm-l), transparent var(--crm-l) 100%) no-repeat;
@@ -708,34 +704,85 @@ af-gui-container > .af-gui-bar,
 	font-size: var(--crm-font-size) !important;
 	margin: 0 !important;
 }
-
-
-#afGuiEditor-canvas .dropdown-toggle {
-	padding: 1px;
-}
-
-
-#afGuiEditor .af-gui-element {
-	padding: 0 var(--crm-s) var(--crm-s) !important;
-	min-height: var(--crm-l) !important;
-	background: var(--crm-c-background2);
-	border-radius: var(--crm-roundness);
-	margin-bottom: var(--crm-s2);
-}
 #afGuiEditor .af-gui-content-editing-area:has(.ng-hide) {
 	padding-top: 0;
 }
-#afGuiEditor .af-gui-markup {
-	padding: var(--crm-s) !important;
-}
-#afGuiEditor .dropdown-menu li .af-gui-field-select-in-dropdown {
-	color: var(--crm-dropdown-col) !important;
-}
-#afGuiEditor .af-gui-layout.af-layout-cols {
-	column-gap: var(--crm-r);
-}
 #afGuiEditor .af-gui-layout.af-layout-inline > div {
 	margin-right: var(--crm-m);
+}
+
+
+
+/* Dropdown buttons */
+
+#afGuiEditor-canvas .dropdown-toggle,
+#afGuiEditor .af-gui-add-element-button {
+	padding: 0;
+    background-color: transparent;
+    border: 0;
+    box-shadow: none;
+}
+#afGuiEditor .dropdown-menu-right::before {
+    right: 5px;
+}
+#afGuiEditor .dropdown-menu-left::before {
+    left: 5px;
+}
+#afGuiEditor .dropdown-menu li {
+    cursor: default;
+    margin: 0;
+}
+#afGuiEditor .dropdown-menu li .af-gui-field-select-in-dropdown {
+    padding: var(--crm-s) var(--crm-xs);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+#afGuiEditor .dropdown-menu li .af-gui-field-select-in-dropdown label,
+#afGuiEditor .dropdown-menu li > * > label {
+    font-weight: normal;
+    cursor: pointer;
+    color: var(--crm-dropdown-col);
+}
+#afGuiEditor .dropdown-menu li .af-gui-field-select-in-dropdown > select {
+    padding-inline: var(--crm-m);
+    width: 110px;
+    margin-left: var(--crm-xs2);
+    border: 0;
+    border-radius: 2px;
+}
+#afGuiEditor li .af-gui-field-select-in-dropdown input[type="color"] {
+    width: 32px;
+    padding: 1px;
+    margin-left: var(--crm-xs2);
+}
+#afGuiEditor li .af-gui-field-select-in-dropdown input[type=number] {
+    width: 50px;
+    padding-right: 0;
+}
+#afGuiEditor .dropdown-menu li.ng-binding:has(> .fa-square-o, > .fa-check-square-o) {
+    display: flex !important;
+    align-items: center;
+    padding: 0 !important;
+    align-items: center;
+    gap: var(--crm-s);
+  }
+
+#afGuiEditor .af-gui-field-input-type-chainselect .input-group .dropdown-toggle, 
+#afGuiEditor .af-gui-field-input-type-select .input-group .dropdown-toggle, 
+#afGuiEditor-palette-config .af-gui-entity-palette .input-group .btn,
+#afGuiEditor-canvas-body .af-gui-field-input .input-group .btn {
+	padding: var(--crm-s) var(--crm-m1);
+}
+
+#afGuiEditor  .af-gui-bar .dropdown-menu a:has(.text-danger) {
+    display: flex;
+    justify-content: center;
+    background: var(--crm-c-alert);
+}
+#afGuiEditor  .af-gui-bar .dropdown-menu .text-danger {
+    color: var(--crm-dropdown-col);
 }
 .af-admin-edit-form-link .btn.dropdown-toggle { /* the cog icon to edit forms */
 	background: transparent;
@@ -748,43 +795,24 @@ af-gui-container > .af-gui-bar,
 	background: transparent;
 	border: 0;
 }
-
-
-/* Dropdown buttons */
-
-#afGuiEditor .af-gui-field-input-type-chainselect .input-group .dropdown-toggle, 
-#afGuiEditor .af-gui-field-input-type-select .input-group .dropdown-toggle, 
-#afGuiEditor-palette-config .af-gui-entity-palette .input-group .btn,
-#afGuiEditor-canvas-body .af-gui-field-input .input-group .btn {
-	padding: var(--crm-s) var(--crm-m1);
+#afGuiEditor .af-gui-field-input-type-select .input-group .dropdown-menu {
+    width: 100%;
+    right: 0;
 }
-#afGuiEditor .dropdown-menu li {
-    cursor: default;
+#afGuiEditor .af-gui-layout-icon {
+    width: 16px;
+    height: 16px;
+    display: block;
+    background-image: url('data:image/svg+xml,<%3Fxml version="1.0" encoding="UTF-8"%3F><svg fill="none" viewBox="0 0 64 61" xmlns="http://www.w3.org/2000/svg"><mask id="d" fill="white"><rect y="33" width="40" height="28" rx="4"/></mask><rect y="33" width="40" height="28" rx="4" mask="url(%23d)" stroke="%23000" stroke-linejoin="round" stroke-width="10"/><mask id="c" fill="white"><rect x="45" y="33" width="19" height="28" rx="4"/></mask><rect x="45" y="33" width="19" height="28" rx="4" mask="url(%23c)" stroke="%23000" stroke-linejoin="round" stroke-width="10"/><mask id="b" fill="white"><rect width="24" height="28" rx="4"/></mask><rect width="24" height="28" rx="4" mask="url(%23b)" stroke="%23000" stroke-linejoin="round" stroke-width="10"/><mask id="a" fill="white"><rect x="29" width="24" height="28" rx="4"/></mask><rect x="29" width="24" height="28" rx="4" mask="url(%23a)" stroke="%23000" stroke-linejoin="round" stroke-width="10"/></svg>');
+    background-repeat: no-repeat;
+    margin: 0;
+    background-size: contain;
 }
-#afGuiEditor .dropdown-menu li .af-gui-field-select-in-dropdown {
-    padding: 2px 19px 2px 21px;
-    clear: both;
-    font-weight: 400;
-    line-height: 1.5384615385;
-    color: #4d4d69;
-    white-space: nowrap;
+#afGuiEditor .af-gui-layout-icon.af-layout-cols {
+    background-image: url('data:image/svg+xml,<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="22" height="58" rx="3" stroke="black" stroke-width="6" stroke-linejoin="round"/><rect x="39" y="3" width="22" height="58" rx="3" stroke="black" stroke-width="6" stroke-linejoin="round"/></svg>');
 }
-#afGuiEditor .dropdown-menu li > * > label {
-    font-weight: normal;
-    cursor: pointer;
-}
-#afGuiEditor .dropdown-menu li .af-gui-field-select-in-dropdown > select {
-    max-width: 120px;
-    padding-left: 5px;
-    padding-right: 5px;
-}
-#afGuiEditor li .af-gui-field-select-in-dropdown input[type=color] {
-    width: 30px;
-    padding: 2px 4px;
-}
-#afGuiEditor li .af-gui-field-select-in-dropdown input[type=number] {
-    width: 50px;
-    padding-right: 0;
+#afGuiEditor .af-gui-layout-icon.af-layout-rows {
+    background-image: url('data:image/svg+xml,<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2.5" y="2.5" width="59" height="13" rx="3.5" stroke="black" stroke-width="5" stroke-linejoin="round"/><rect x="2.5" y="25.5" width="59" height="13" rx="3.5" stroke="black" stroke-width="5" stroke-linejoin="round"/><rect x="2.5" y="48.5" width="59" height="13" rx="3.5" stroke="black" stroke-width="5" stroke-linejoin="round"/></svg>');
 }
 
 

@@ -701,14 +701,6 @@ details + .crm-content-block:has(.dataTables_wrapper) {
 .crm-container .crm-case-filter-upcoming {
 	padding-bottom: var(--crm-padding-reg);
 }
-/* Contrib dashboard / form builder
-#ContributionCharts .ui-tabs-nav .button,
-#afGuiEditor-canvas .panel-heading .form-inline .btn {
-	padding: var(--crm-btn-small-padding);
-} */
-#afGuiEditor .dropdown-menu li .af-gui-field-select-in-dropdown {
-	padding: var(--crm-dropdown-padding) !important;
-}
 
 /******************
 	RESPONSIVE
