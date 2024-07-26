@@ -761,14 +761,13 @@ af-gui-container > .af-gui-bar,
     width: 50px;
     padding-right: 0;
 }
-#afGuiEditor .dropdown-menu li.ng-binding:has(> .fa-square-o, > .fa-check-square-o) {
+#afGuiEditor .dropdown-menu li .ng-binding:has(> .fa-square-o, > .fa-check-square-o) {
     display: flex !important;
     align-items: center;
     padding: 0 !important;
     align-items: center;
     gap: var(--crm-s);
-  }
-
+}
 #afGuiEditor .af-gui-field-input-type-chainselect .input-group .dropdown-toggle, 
 #afGuiEditor .af-gui-field-input-type-select .input-group .dropdown-toggle, 
 #afGuiEditor-palette-config .af-gui-entity-palette .input-group .btn,
