@@ -219,13 +219,9 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant implements \Ci
           'entity_table' => 'civicrm_participant',
           'note' => $noteValue,
           'entity_id' => $participant->id,
-          'contact_id' => $id,
+          'id' => $noteId,
         ];
-        $noteIDs = [];
-        if ($noteId) {
-          $noteIDs['id'] = $noteId;
-        }
-        CRM_Core_BAO_Note::add($noteParams, $noteIDs);
+        CRM_Core_BAO_Note::add($noteParams);
       }
       elseif ($noteId && $hasNoteField) {
         CRM_Core_BAO_Note::deleteRecord(['id' => $noteId]);
