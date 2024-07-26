@@ -169,6 +169,16 @@
 
       function inputTypeCanBe(type) {
         var defn = ctrl.getDefn();
+        if (defn.readonly) {
+          switch (type) {
+            case 'DisplayOnly':
+            case 'Hidden':
+              return true;
+
+            default:
+              return false;
+          }
+        }
         if (defn.input_type === type) {
           return true;
         }
