@@ -652,3 +652,14 @@ fieldset[disabled] #bootstrap-theme .checkbox-inline {
 	margin-top: 0;
 	margin-left: var(--crm-m);
 }
+
+/* Nav search box 
+
+#crm-qsearch-input::placeholder {
+    font-family: var(--crm-font) !important;
+    overflow: hidden  !important;
+    text-indent: -10px !important;
+}
+#crm-qsearch-input::placeholder::first-letter {
+    font: normal normal normal 14px/1 FontAwesome !important;
+}

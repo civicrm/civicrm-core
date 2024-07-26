@@ -46,19 +46,6 @@
 #afGuiEditor af-gui-edit-options {
     display: block;
 }
-#afGuiEditor [ui-sortable] .af-gui-bar:before,
-#afGuiEditor .af-gui-entity-palette-select-list [ui-sortable] > div:not(.disabled):hover:before,
-#afGuiEditor af-gui-edit-options.af-gui-content-editing-area [ui-sortable] li:before {
-    background-size: cover;
-    background: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSIjODg4Ij48L3JlY3Q+Cjwvc3ZnPg==");
-    width: var(--crm-m);
-    height: calc(100% - var(--crm-m));
-    content: ' ';
-    display: block;
-    position: absolute;
-    left: var(--crm-s);
-    top: var(--crm-s);
-}
 /* Panel */
 
 #afGuiEditor .panel,
@@ -91,6 +78,22 @@
 }
 #afGuiEditor .panel-heading .af-gui-canvas-control-buttons button {
 	padding: 0; /* icon-only button */
+    max-height: 32px;
+    aspect-ratio: 1 / 1;
+}
+#afGuiEditor-canvas .af-gui-canvas-control-buttons button.btn-default i.crm-i {
+	margin: 0;
+	border: 0;
+	padding: var(--crm-s);
+    height: 100%;
+    aspect-ratio: 1 / 1;
+    min-width: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#afGuiEditor .panel-heading .form-inline.pull-right button {
+    max-height: 32px;
 }
 #afGuiEditor .panel-body {
     padding: var(--crm-padding-reg);
@@ -120,11 +123,16 @@
 }
 #afGuiEditor-palette .input-group:has(#af_config_redirect) {
 	display: grid;
+    gap: var(--crm-s);
 	grid-template-columns: 1fr 250px;
 }
-#afGuiEditor-palette .input-group:has(#af_config_redirect) .input-group-addon
+#afGuiEditor-palette .input-group:has(#af_config_redirect) .input-group-addon,
 #afGuiEditor-palette input.select2-input {
+    width: 100%;
     min-width: 100%;
+}
+#afGuiEditor-palette #s2id_autogen3 {
+    width: 100% !important /* vs inline */;
 }
 #afGuiEditor-palette #af_config_form_permission_operator {
 	width: 60px;
@@ -132,10 +140,8 @@
 #afGuiEditor-palette #s2id_af_config_form_permission {
 	width: calc(100% - 66px) !important /* vs inline */;
 }
- /* #afGuiEditor-palette input[type=number] {
-    width: 6em;
-} */
-/* search kit settings */
+
+/* builder settings */
 #afGuiEditor-palette .af-gui-entity-values .form-inline {
     margin-bottom: var(--crm-m);
 }
@@ -192,6 +198,21 @@
 
 /* Edit canvas (right side) */
 
+#afGuiEditor-canvas .af-gui-container,
+#afGuiEditor-canvas .af-gui-markup,
+#afGuiEditor-canvas .af-gui-text,
+#afGuiEditor-canvas .af-gui-button {
+	margin-bottom: var(--crm-padding-small);
+    border: 2px solid transparent;
+}
+#afGuiEditor .af-gui-container {
+    border-radius: var(--crm-roundness);
+    position: relative;
+    padding: var(--crm-m);
+}
+#afGuiEditor .af-gui-container-type-fieldset {
+    box-shadow: 0 0 5px var(--crm-c-gray-300);
+}
 #afGuiEditor-canvas .form-inline {
 	padding: 0;
 }
@@ -207,21 +228,6 @@
     opacity: 1;
     transition: opacity 0s;
 }
-#afGuiEditor .af-gui-container {
-    border: 2px solid var(--crm-c-background2);
-    border-radius: var(--crm-roundness);
-    position: relative;
-    padding: var(--crm-m);
-}
-#afGuiEditor-canvas .af-gui-container-type-fieldset,
-#afGuiEditor-canvas .af-gui-container,
-#afGuiEditor-canvas .af-gui-markup,
-#afGuiEditor-canvas .af-gui-text,
-#afGuiEditor-canvas .af-gui-button {
-	box-shadow: var(--crm-block-shadow) !important;
-	margin-bottom: var(--crm-padding-small) !important;
-}
-
 
 /* Canvas gui bar */
 
@@ -231,9 +237,29 @@
 	border-radius: var(--crm-roundness) var(--crm-roundness) 0 0;
     transition: opacity .2s;
     background-color: var(--crm-c-background2);
-    padding: var(--crm-s) var(--crm-s) var(--crm-s) var(--crm-r2);
-    position: inherit;
+    padding: var(--crm-xs);
     cursor: move;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+#afGuiEditor [ui-sortable] .af-gui-bar:before,
+#afGuiEditor .af-gui-entity-palette-select-list [ui-sortable] > div:not(.disabled):hover:before,
+#afGuiEditor af-gui-edit-options.af-gui-content-editing-area [ui-sortable] li:before {
+    background: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSIjODg4Ij48L3JlY3Q+Cjwvc3ZnPg==");
+    width: var(--crm-m);
+    height: calc(100% - var(--crm-m));
+    content: ' ';
+}
+#afGuiEditor-canvas .af-gui-bar .form-inline {
+    margin-left: auto;
+}
+#afGuiEditor-canvas .dropdown-toggle i.crm-i {
+    padding: 0 !important;
+}
+#afGuiEditor .af-gui-node-title {
+    position: absolute;
+    top: 2px;
 }
 #afGuiEditor-canvas:not(.af-gui-menu-open) .af-gui-bar,
 #afGuiEditor-canvas:not(.af-gui-menu-open) .af-gui-container-title span:empty {
@@ -290,16 +316,12 @@ af-gui-container > .af-gui-bar,
 	border-radius: var(--crm-roundness) var(--crm-roundness) 0 0;
 }
 
-#afGuiEditor .af-gui-node-title {
-	position: absolute;
-	top: 0;
-}
-#afGuiEditor .af-gui-node-title + * {
-	padding-top: var(--crm-m);
-}
-
-
-
+/* #afGuiEditor .af-gui-content-editing-area .af-gui-edit-options-bar,
+#afGuiEditor-canvas [ui-sortable] .af-gui-bar  {
+	font-family: inherit !important /* vs afGuiEditor.css;
+	font-size: var(--crm-font-size) !important;
+	padding: var(--crm-s);
+} */
 
 
 
@@ -355,11 +377,6 @@ af-gui-container > .af-gui-bar,
     padding: 3em;
     background-color: #f9f9f9;
 }
-#afGuiEditor .af-gui-container-type-fieldset {
-    box-shadow: 0 0 5px #bbbbbb;
-    margin-top: 20px;
-    margin-bottom: 20px;
-}
 #afGuiEditor .af-gui-markup {
     padding: 22px 3px 3px;
     position: relative;
@@ -381,11 +398,11 @@ af-gui-container > .af-gui-bar,
 }
 
 /* Fix button colors when bar is highlighted */
-#afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > .btn-group > .btn-group > button > span,
+/* #afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > .btn-group > .btn-group > button > span,
 #afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > span,
 #afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-node-title {
     color: white;
-}
+} */
 #afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > .btn-group > .btn-group > button:hover > span,
 #afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > .btn-group > .btn-group > button[aria-expanded=true] > span,
 #afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > .btn-group > .btn-group > button:focus > span {
@@ -449,14 +466,6 @@ af-gui-container > .af-gui-bar,
 }
 #afGuiEditor .af-gui-button > .btn-default.disabled {
     background-color: lightgrey !important;
-}
-#afGuiEditor .af-gui-node-title {
-    margin-left: 5px;
-    margin-right: 20px;
-    position: relative;
-}
-#afGuiEditor .af-gui-container-title {
-    top: -21px;
 }
 #afGuiEditor .af-gui-container-title span:empty {
     font-weight: lighter;
@@ -693,12 +702,7 @@ af-gui-container > .af-gui-bar,
 	background: linear-gradient(to bottom, #f2f2f2 0 var(--crm-l), transparent var(--crm-l) 100%) no-repeat;
 	border-radius: var(--crm-roundness);
 }
-#afGuiEditor .af-gui-content-editing-area .af-gui-edit-options-bar,
-#afGuiEditor-canvas [ui-sortable] .af-gui-bar  {
-	font-family: inherit !important /* vs afGuiEditor.css */;
-	font-size: var(--crm-font-size) !important;
-	padding: var(--crm-s);
-}
+
 
 .af-gui-edit-options-bar h4 {
 	font-size: var(--crm-font-size) !important;
@@ -709,12 +713,7 @@ af-gui-container > .af-gui-bar,
 #afGuiEditor-canvas .dropdown-toggle {
 	padding: 1px;
 }
-#afGuiEditor-canvas .af-gui-canvas-control-buttons button.btn-default i.crm-i,
-#afGuiEditor-canvas .dropdown-toggle i.crm-i {
-	margin: 0;
-	border: 0;
-	padding: var(--crm-s);
-}
+
 
 #afGuiEditor .af-gui-element {
 	padding: 0 var(--crm-s) var(--crm-s) !important;
