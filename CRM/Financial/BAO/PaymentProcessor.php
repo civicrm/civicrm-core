@@ -130,8 +130,8 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event): void {
     if ($event->action === 'create') {
       // Supply defaults for `title` and `frontend_title`
-      if (!isset($event->params['title'])) {
-        $event->params['title'] = $event->params['name'];
+      if (!isset($event->params['name'])) {
+        $event->params['name'] = $event->params['title'];
       }
       if (!isset($event->params['frontend_title'])) {
         $event->params['frontend_title'] = $event->params['title'];
