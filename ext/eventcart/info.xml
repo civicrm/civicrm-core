@@ -36,5 +36,5 @@
     <namespace>CRM/Event/Cart</namespace>
     <format>23.02.1</format>
   </civix>
-  <upgrader>CiviMix\Schema\EventCart\AutomaticUpgrader</upgrader>
+  <upgrader>CiviMix\Schema\Eventcart\AutomaticUpgrader</upgrader>
 </extension>

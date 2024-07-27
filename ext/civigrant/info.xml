@@ -27,7 +27,7 @@
     <psr0 prefix="CRM_" path="."/>
     <psr4 prefix="Civi\" path="Civi"/>
   </classloader>
-  <upgrader>CiviMix\Schema\CiviGrant\AutomaticUpgrader</upgrader>
+  <upgrader>CiviMix\Schema\Civigrant\AutomaticUpgrader</upgrader>
   <mixins>
     <mixin>menu-xml@1.0.0</mixin>
     <mixin>mgd-php@1.0.0</mixin>
