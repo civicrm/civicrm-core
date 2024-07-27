@@ -293,6 +293,10 @@
 	text-decoration: none;
     border-radius: var(--crm-roundness);
 }
+.crm-container .dropdown-menu > li > a:hover i.crm-i,
+.crm-container .dropdown-menu > li > a:focus i.crm-i  {
+    color: var(--crm-dropdown-hover);
+}
 .crm-container .dropdown-menu > .disabled > a, 
 .crm-container .dropdown-menu > .disabled > a:hover, 
 .crm-container .dropdown-menu > .disabled > a:focus {

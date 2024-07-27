@@ -7,8 +7,8 @@
 
 :root { 
 
+--crm-release: '0.9.19';
 --crm-version: 'Minetta, v' var(--crm-release);
---crm-version: '0.9.18';
 
 /* FONTS */
 --crm-system-fonts:;

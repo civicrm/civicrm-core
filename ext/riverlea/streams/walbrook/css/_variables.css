@@ -8,7 +8,7 @@
 @import url('_fonts.css'); 
 :root {    
 
---crm-release: '0.9.18';
+--crm-release: '0.9.19';
 --crm-version: 'Walbrook, v' var(--crm-release);
 
 /* FONTS */
