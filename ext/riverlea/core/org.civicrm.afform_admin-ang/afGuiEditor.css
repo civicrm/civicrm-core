@@ -348,15 +348,13 @@ af-gui-container > .af-gui-bar,
     border: 2px solid var(--crm-c-blue-dark);
     box-shadow: 0 0 5px var(--crm-c-blue-dark);
 }
- 
-
-#afGuiEditor .crm-editable-enabled,
+/* #afGuiEditor .crm-editable-enabled,
 #afGuiEditor .panel-heading ul.nav-tabs li > a > span {
     display: inline-block;
     padding: 0 4px !important;
     border: 2px solid transparent !important;
     min-width: 21px;
-}
+} */
 #afGuiEditor .crm-editable-enabled:hover:not(:focus) {
     border: 2px dashed grey !important;
 }/* Undo Shoreditch add-ons */
@@ -366,15 +364,12 @@ af-gui-container > .af-gui-bar,
     display: none;
 }
 
-
-
-  /* Card style */
+/* Card style */
 #afGuiEditor .af-gui-container.af-container-style-pane {
     box-shadow: 1px 2px 8px 1px rgb(0, 0, 0, .3);
     background: linear-gradient(to bottom, #f2f2f2 0 22px, transparent 22px 100%) no-repeat;
     border-radius: 4px;
 }
-
 #afGuiEditor .af-gui-search-display {
     border: 1px dotted gray;
     color: gray;
@@ -408,15 +403,14 @@ af-gui-container > .af-gui-bar,
 #afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > .btn-group > .btn-group > button:focus > span {
     color: var(--crm-c-blue-dark);
 }
-
-#afGuiEditor .ui-sortable-helper {
+/* #afGuiEditor .ui-sortable-helper {
     height: 20px !important;
     opacity: .5;
     overflow: visible;
 }
 #afGuiEditor .ui-sortable-helper > * {
     background-color: #d5d5d5;
-}
+} */
 /* grip handle */
 
 #afGuiEditor .af-gui-add-element-button span {
@@ -427,7 +421,7 @@ af-gui-container > .af-gui-bar,
 }
 #afGuiEditor #afGuiEditor-canvas-body .btn[disabled] {
     cursor: default;
-    color: white;
+    color: var(--crm-c-inactive);
 }
 #afGuiEditor .af-gui-button > .btn.disabled .crm-editable-enabled:hover:not(:focus) {
     border-color: #f4f4f4 !important;
@@ -635,17 +629,10 @@ af-gui-container > .af-gui-bar,
 .af-gui-conditional-dialog .api4-operator {
     width: 110px;
 }
-
-
-
-
-
 #afGuiEditor .af-gui-container.af-container-style-pane {
 	background: linear-gradient(to bottom, #f2f2f2 0 var(--crm-l), transparent var(--crm-l) 100%) no-repeat;
 	border-radius: var(--crm-roundness);
 }
-
-
 .af-gui-edit-options-bar h4 {
 	font-size: var(--crm-font-size) !important;
 	margin: 0 !important;
@@ -657,8 +644,6 @@ af-gui-container > .af-gui-bar,
 	margin-right: var(--crm-m);
 }
 
-
-
 /* Dropdown buttons */
 
 #afGuiEditor-canvas .dropdown-toggle,
@@ -668,18 +653,12 @@ af-gui-container > .af-gui-bar,
     border: 0;
     box-shadow: none;
 }
-#afGuiEditor-canvas .pull-right > .dropdown-menu:not(.dropdown-menu-right),
-#afGuiEditor-canvas .pull-right > .dropdown-menu:not(.dropdown-menu-right)::before {
-    right: unset;
-}
 #afGuiEditor-canvas .dropdown-toggle i.crm-i {
     padding: 0 !important;
-}
-#afGuiEditor .dropdown-menu-right::before {
-    right: 5px;
-}
-#afGuiEditor .dropdown-menu-left::before {
-    left: 5px;
+    background: transparent;
+    border: 0;
+    height: 0;
+    min-width: 0;
 }
 #afGuiEditor .dropdown-menu li {
     cursor: default;
@@ -727,7 +706,6 @@ af-gui-container > .af-gui-bar,
 #afGuiEditor-canvas-body .af-gui-field-input .input-group .btn {
 	padding: var(--crm-s) var(--crm-m1);
 }
-
 #afGuiEditor  .af-gui-bar .dropdown-menu a:has(.text-danger) {
     display: flex;
     justify-content: center;
@@ -743,10 +721,10 @@ af-gui-container > .af-gui-bar,
 	padding: 0 !important;
 	border: 0;
 }
-.af-admin-edit-form-link .btn.dropdown-toggle i.crm-i {
+/* .af-admin-edit-form-link .btn.dropdown-toggle i.crm-i {
 	background: transparent;
 	border: 0;
-}
+} */
 #afGuiEditor .af-gui-field-input-type-select .input-group .dropdown-menu {
     width: 100%;
     right: 0;
@@ -766,7 +744,6 @@ af-gui-container > .af-gui-bar,
 #afGuiEditor .af-gui-layout-icon.af-layout-rows {
     background-image: url('data:image/svg+xml,<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2.5" y="2.5" width="59" height="13" rx="3.5" stroke="black" stroke-width="5" stroke-linejoin="round"/><rect x="2.5" y="25.5" width="59" height="13" rx="3.5" stroke="black" stroke-width="5" stroke-linejoin="round"/><rect x="2.5" y="48.5" width="59" height="13" rx="3.5" stroke="black" stroke-width="5" stroke-linejoin="round"/></svg>');
 }
-
 
 /* various */
 
