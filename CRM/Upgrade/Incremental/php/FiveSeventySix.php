@@ -33,7 +33,7 @@ class CRM_Upgrade_Incremental_php_FiveSeventySix extends CRM_Upgrade_Incremental
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Add start_date to civicrm_mailing table', 'addColumn', 'civicrm_mailing', 'start_date', "timestamp NULL DEFAULT NULL COMMENT 'date on which this mailing was started.'");
     $this->addTask('Add end_date to civicrm_mailing table', 'addColumn', 'civicrm_mailing', 'end_date', "timestamp NULL DEFAULT NULL COMMENT 'date on which this mailing was completed.'");
-    $this->addTask('Add status to civicrm_mailing table', 'addColumn', 'civicrm_mailing', 'status', "varchar(12) DEFAULT NULL COMMENT 'The status of this Mailing'");
+    $this->addTask('Add status to civicrm_mailing table', 'addColumn', 'civicrm_mailing', 'status', "varchar(32) DEFAULT 'Draft' COMMENT 'The status of this Mailing'");
     $this->addTask('Alter translation to make string non-required', 'alterColumn', 'civicrm_translation', 'string',
       "longtext NULL COMMENT 'Translated string'"
     );
@@ -47,6 +47,19 @@ class CRM_Upgrade_Incremental_php_FiveSeventySix extends CRM_Upgrade_Incremental
       $this->addTask('Migrate event cart ID', 'migrateEventCartID');
     }
     $this->addTask('Update civicrm_mailing to permit deleting records from civicrm_mailing_job', 'updateNewCiviMailFields');
+  }
+
+  /**
+   * Upgrade step; adds tasks including 'runSql'.
+   *
+   * @param string $rev
+   *   The version number matching this function name
+   */
+  public function upgrade_5_76_beta1($rev): void {
+    $this->addTask('Fix default for status in civicrm_mailing table', 'alterColumn', 'civicrm_mailing', 'status', "varchar(12) DEFAULT 'Draft' COMMENT 'The status of this Mailing'");
+    if (CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_mailing WHERE `status` = NULL')) {
+      $this->addTask('Update civicrm_mailing to permit deleting records from civicrm_mailing_job', 'updateNewCiviMailFields');
+    }
   }
 
   public static function create_mesage_header_token() {
@@ -149,6 +162,7 @@ LEFT JOIN
 ON job.mailing_id = m.id
 SET m.start_date = job.start_date
 WHERE m.id BETWEEN %1 AND %2
+AND m.start_date IS NULL
    ', [1 => [$startId, 'Integer'], 2 => [$endId, 'Integer']]);
 
     CRM_Core_DAO::executeQuery('
@@ -162,6 +176,7 @@ ON job.mailing_id = m.id
 SET m.end_date = job.end_date, m.status = "Complete"
 WHERE m.is_completed = 1
    AND m.id BETWEEN %1 AND %2
+   AND (m.status IS NULL OR m.status = "Draft")
    ', [1 => [$startId, 'Integer'], 2 => [$endId, 'Integer']]);
 
     CRM_Core_DAO::executeQuery('
@@ -175,7 +190,7 @@ INNER JOIN
 as job
 ON job.mailing_id = m.id
 SET m.status = "Paused"
-WHERE m.status = "Draft"
+WHERE (m.status IS NULL OR m.status = "Draft")
    AND m.id BETWEEN %1 AND %2', [1 => [$startId, 'Integer'], 2 => [$endId, 'Integer']]);
 
     CRM_Core_DAO::executeQuery('
@@ -190,7 +205,7 @@ INNER JOIN
 
 ON job.mailing_id = m.id
 SET m.status = "Canceled"
-WHERE m.status = "Draft"
+WHERE (m.status IS NULL OR m.status = "Draft")
    AND m.id BETWEEN %1 AND %2', [1 => [$startId, 'Integer'], 2 => [$endId, 'Integer']]);
 
     CRM_Core_DAO::executeQuery('
@@ -204,7 +219,7 @@ INNER JOIN
 as job
 ON job.mailing_id = m.id
 SET m.status = "Running"
-WHERE m.status = "Draft"
+WHERE (m.status IS NULL OR m.status = "Draft")
    AND m.id BETWEEN %1 AND %2', [1 => [$startId, 'Integer'], 2 => [$endId, 'Integer']]);
 
     CRM_Core_DAO::executeQuery('
@@ -218,8 +233,34 @@ INNER JOIN
 as job
 ON job.mailing_id = m.id
 SET m.status = "Scheduled"
-WHERE m.status = "Draft"
+WHERE (m.status IS NULL OR m.status = "Draft")
    AND m.id BETWEEN %1 AND %2', [1 => [$startId, 'Integer'], 2 => [$endId, 'Integer']]);
+
+    // It seems some older records are missing the is_completed so any that have not yet been
+    // picked up with a different status but have completed records should be completed.
+    CRM_Core_DAO::executeQuery('
+UPDATE  civicrm_mailing m
+INNER JOIN
+    (SELECT MIN(job.start_date) as start_date, MAX(job.end_date) as end_date,
+  job.mailing_id FROM civicrm_mailing_job job
+  WHERE job.status = "Complete"
+  GROUP BY job.mailing_id
+)
+as job
+ON job.mailing_id = m.id
+SET m.status = "Complete",
+    start_date = job.start_date,
+    end_date = job.end_date,
+    is_completed = 1
+WHERE (m.status IS NULL OR m.status = "Draft")
+   AND m.id BETWEEN %1 AND %2', [1 => [$startId, 'Integer'], 2 => [$endId, 'Integer']]);
+
+    // For sites that upgraded to the rc the default of status will have been NULL
+    // initially so we need to set those to Draft.
+    CRM_Core_DAO::executeQuery('
+UPDATE  civicrm_mailing m
+SET `status` = "Draft" WHERE `status` IS NULL
+AND m.id BETWEEN %1 AND %2', [1 => [$startId, 'Integer'], 2 => [$endId, 'Integer']]);
     return TRUE;
   }
 

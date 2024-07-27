@@ -154,6 +154,13 @@
         });
       };
 
+      // When this field is removed by afIf, also remove its value from the data model.
+      $scope.$on('afIfDestroy', function() {
+        if (ctrl.defn.input_type !== 'DisplayOnly') {
+          delete $scope.dataProvider.getFieldData()[ctrl.fieldName];
+        }
+      });
+
       // correct the type for the value, make sure numbers are numbers and not string
       function correctValueType(value, dataType) {
         // let's skip type correction for null values
