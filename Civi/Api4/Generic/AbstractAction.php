@@ -536,9 +536,11 @@ abstract class AbstractAction implements \ArrayAccess {
       $record[$info['name']] = FormattingUtil::replacePseudoconstant($options, $info['val'], TRUE);
     }
     // The DAO works better with ints than booleans. See https://github.com/civicrm/civicrm-core/pull/23970
-    foreach ($record as $key => $value) {
-      if (is_bool($value)) {
-        $record[$key] = (int) $value;
+    if (CoreUtil::getInfoItem($this->getEntityName(), 'table_name')) {
+      foreach ($record as $key => $value) {
+        if (is_bool($value)) {
+          $record[$key] = (int) $value;
+        }
       }
     }
   }

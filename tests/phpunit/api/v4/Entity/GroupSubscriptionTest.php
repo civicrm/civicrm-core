@@ -34,15 +34,22 @@ class GroupSubscriptionTest extends Api4TestBase {
     $group = $this->createTestRecord('Group', ['visibility' => 'User and User Admin Only']);
     $groupName = $group['name'];
 
-    // Check contact has not been subscried to group
+    // Check contact has not been subscribed to group
     $subscription = GroupSubscription::get(FALSE)
       ->addWhere('contact_id', '=', $contact['id'])
       ->execute()->first();
     $this->assertFalse($subscription[$groupName]);
 
+    // Subscribe
     GroupSubscription::create(FALSE)
       ->addValue('contact_id', $contact['id'])
       ->addValue($groupName, TRUE)
+      ->execute();
+
+    // Call again with NULL - should have no effect
+    GroupSubscription::create(FALSE)
+      ->addValue('contact_id', $contact['id'])
+      ->addValue($groupName, NULL)
       ->execute();
 
     // Check contact has been subscribed to group
@@ -51,17 +58,19 @@ class GroupSubscriptionTest extends Api4TestBase {
       ->execute()->first();
     $this->assertTrue($subscription[$groupName]);
 
+    // Unsubscribe
     GroupSubscription::create(FALSE)
       ->addValue('contact_id', $contact['id'])
       ->addValue($groupName, FALSE)
       ->execute();
 
-    // Check contact has not been unsubscried
+    // Check contact has been unsubscribed
     $subscription = GroupSubscription::get(FALSE)
       ->addWhere('contact_id', '=', $contact['id'])
       ->execute()->first();
     $this->assertFalse($subscription[$groupName]);
 
+    // Re-subscribe
     GroupSubscription::create(FALSE)
       ->addValue('contact_id', $contact['id'])
       ->addValue($groupName, TRUE)
@@ -76,7 +85,6 @@ class GroupSubscriptionTest extends Api4TestBase {
 
   public function testDoubleOptIn(): void {
     \CRM_Core_BAO_ConfigSetting::enableComponent('CiviMail');
-    \Civi::settings()->set('profile_double_optin', TRUE);
 
     $contact = $this->createTestRecord('Contact', ['email_primary.email' => 'ex@m.ple']);
     $publicGroup = $this->createTestRecord('Group', ['visibility' => 'Public Pages'])['name'];

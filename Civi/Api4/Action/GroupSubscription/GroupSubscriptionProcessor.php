@@ -77,7 +77,8 @@ trait GroupSubscriptionProcessor {
           self::triggerDoubleOptin($contactId, $groupName, $contactPrimaryEmail);
         }
       }
-      else {
+      // FALSE will be treated as an unsubscribe request, but NULL and '' will be ignored.
+      elseif ($optIn === FALSE) {
         // Remove contact from group
         if ($currentStatus && $currentStatus !== 'Removed') {
           self::saveGroupStatus($contactId, $groupName, 'Removed');
