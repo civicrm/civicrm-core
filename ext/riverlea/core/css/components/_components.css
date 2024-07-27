@@ -357,6 +357,10 @@ table.advmultiselect {
     text-align: center;
     font-size: var(--crm-m2);
 }
+#civicrm-footer::after {
+    content: var(--crm-version);
+    float: right;
+}
 .crm-container #civicrm-footer .status {
     border-radius: var(--crm-roundness);
     padding: var(--crm-btn-small-padding);

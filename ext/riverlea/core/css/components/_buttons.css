@@ -267,7 +267,7 @@
     padding: var(--crm-s);
     display: flex;
     align-items: center;
-    gap: var(--crm-s);
+    gap: var(--crm-flex-gap);
 }
 
 /* Hover buttons (plain text, button shows on hover) */

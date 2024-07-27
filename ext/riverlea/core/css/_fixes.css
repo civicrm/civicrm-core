@@ -254,6 +254,10 @@ a.crm-expand-row:hover,a.crm-expand-row:focus {
     background: var(--crm-c-primary-hover);
 	text-decoration: none;
 }
+.crm-config-backend-form-block > div { /* makes cleanup cache buttons flow inline */
+	display: flex;
+	gap: var(--crm-flex-gap);
+}
 
 /* Icon alignment */
 
