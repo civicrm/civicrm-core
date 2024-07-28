@@ -316,6 +316,7 @@ class BasicGetFieldsAction extends BasicGetAction {
           'Date' => ts('Date'),
           'Float' => ts('Float'),
           'Integer' => ts('Integer'),
+          'Money' => ts('Money'),
           'String' => ts('String'),
           'Text' => ts('Text'),
           'Timestamp' => ts('Timestamp'),

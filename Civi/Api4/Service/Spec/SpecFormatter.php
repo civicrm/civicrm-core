@@ -176,7 +176,7 @@ class SpecFormatter {
       $options = FALSE;
     }
     else {
-      $options = \CRM_Utils_Array::makeNonAssociative($optionLabels, 'id', 'label');
+      $options = self::formatOptionList($field, $optionLabels);
       if (is_array($returnFormat) && $options) {
         self::addOptionProps($options, $field, $bao, $fieldName, $values, $returnFormat);
       }
@@ -189,6 +189,28 @@ class SpecFormatter {
         'label' => ts('Current Domain'),
         'icon' => 'fa-sign-in',
       ]);
+    }
+    return $options;
+  }
+
+  private static function formatOptionList(array $field, array $optionLabels) {
+    $options = \CRM_Utils_Array::makeNonAssociative($optionLabels, 'id', 'label');
+    foreach ($options as &$option) {
+      switch ($field['data_type']) {
+        case 'String':
+        case 'Text':
+          $option['id'] = (string) $option['id'];
+          break;
+
+        case 'Float':
+        case 'Money':
+          $option['id'] = (float) $option['id'];
+          break;
+
+        case 'Integer':
+          $option['id'] = (int) $option['id'];
+          break;
+      }
     }
     return $options;
   }
