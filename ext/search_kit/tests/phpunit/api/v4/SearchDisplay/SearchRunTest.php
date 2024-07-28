@@ -2050,6 +2050,134 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(3, $result[2]['columns'][1]['val']);
   }
 
+  public function testSelectPseudoFields() {
+    $activities = $this->saveTestRecords('Activity', [
+      'records' => 2,
+    ]);
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Activity',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['id', 'NOW()', 'CURDATE()', 'result_row_num'],
+          'where' => [['id', 'IN', $activities->column('id')]],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => 'testDisplay',
+        'settings' => [
+          'actions' => TRUE,
+          'pager' => [],
+          'columns' => [
+            [
+              'type' => 'field',
+              'key' => 'id',
+              'label' => 'ID',
+            ],
+            [
+              'type' => 'field',
+              'key' => 'result_row_num',
+              'label' => 'Row',
+            ],
+            [
+              'type' => 'field',
+              'key' => 'CURDATE()',
+              'label' => 'Date',
+            ],
+            [
+              'type' => 'field',
+              'key' => 'NOW()',
+              'label' => 'Date + Time',
+            ],
+          ],
+        ],
+      ],
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(2, $result);
+
+    $date = date('Y-m-d');
+
+    // Check CURDATE()
+    $this->assertEquals($date, $result[0]['data']['CURDATE:']);
+    $this->assertEquals($date, $result[1]['data']['CURDATE:']);
+    $this->assertEquals(\CRM_Utils_Date::customFormat($date), $result[0]['columns'][2]['val']);
+    $this->assertEquals(\CRM_Utils_Date::customFormat($date), $result[1]['columns'][2]['val']);
+
+    // Check NOW()
+    $this->assertStringStartsWith("$date ", $result[0]['data']['NOW:']);
+    $this->assertStringStartsWith("$date ", $result[1]['data']['NOW:']);
+    $this->assertEquals(\CRM_Utils_Date::customFormat($result[0]['data']['NOW:']), $result[0]['columns'][3]['val']);
+    $this->assertEquals(\CRM_Utils_Date::customFormat($result[1]['data']['NOW:']), $result[1]['columns'][3]['val']);
+
+    // Check result_row_num
+    $this->assertEquals(1, $result[0]['columns'][1]['val']);
+    $this->assertEquals(2, $result[1]['columns'][1]['val']);
+  }
+
+  public function testLinkConditions() {
+    $activities = $this->saveTestRecords('Activity', [
+      'records' => [
+        ['activity_date_time' => 'now - 1 day'],
+        ['activity_date_time' => 'now + 1 day'],
+      ],
+    ]);
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Activity',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['id'],
+          'where' => [['id', 'IN', $activities->column('id')]],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => 'testDisplay',
+        'settings' => [
+          'actions' => TRUE,
+          'pager' => [],
+          'sort' => [['id', 'ASC']],
+          'columns' => [
+            [
+              'type' => 'field',
+              'key' => 'id',
+              'label' => 'ID',
+            ],
+            [
+              'type' => 'buttons',
+              'links' => [
+                [
+                  'entity' => 'Activity',
+                  'task' => 'update',
+                  'icon' => 'fa-pencil',
+                  'condition' => [
+                    'activity_date_time',
+                    '>',
+                    'now',
+                  ],
+                ],
+              ],
+            ],
+          ],
+        ],
+      ],
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(2, $result);
+
+    // Link should appear for 2nd activity but not the first
+    $this->assertCount(0, $result[0]['columns'][1]['links']);
+    $this->assertCount(1, $result[1]['columns'][1]['links']);
+  }
+
   public function testContactTypeIcons(): void {
     $this->createTestRecord('ContactType', [
       'label' => 'Star',
