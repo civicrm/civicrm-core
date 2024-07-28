@@ -412,7 +412,7 @@ LEFT  JOIN civicrm_membership_payment mp  ON ( mp.contribution_id = con.id )
 
     // Retrieve the most recently added contribution
     $mostRecentContribution = Contribution::get(FALSE)
-      ->addSelect('custom.*', 'id', 'contact_id', 'campaign_id', 'financial_type_id', 'currency', 'source', 'amount_level', 'address_id', 'on_behalf', 'source_contact_id', 'tax_amount', 'contribution_page_id', 'total_amount', 'is_test')
+      ->addSelect('custom.*', 'id', 'contact_id', 'campaign_id', 'financial_type_id', 'payment_instrument_id', 'currency', 'source', 'amount_level', 'address_id', 'on_behalf', 'source_contact_id', 'tax_amount', 'contribution_page_id', 'total_amount', 'is_test')
       ->addWhere('contribution_recur_id', '=', $id)
       ->addWhere('is_template', '=', 0)
       // we need this line otherwise the is test contribution don't work.
