@@ -260,7 +260,7 @@
       }
 
       function setFieldDefn() {
-        ctrl.fieldDefn = angular.extend({}, ctrl.getDefn(), ctrl.node.defn);
+        ctrl.fieldDefn = angular.merge({}, ctrl.getDefn(), ctrl.node.defn);
       }
 
       function setDateOptions() {
