@@ -269,6 +269,7 @@
             })
           );
         }
+        if (ctrl.filters.has_base || ctrl.filters.is_template) {
           ctrl.display.settings.columns.push(
             searchMeta.fieldToColumn('base_module:label', {
               label: ts('Package'),
