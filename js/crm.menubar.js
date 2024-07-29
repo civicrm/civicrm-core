@@ -482,7 +482,7 @@
       '</li>',
     drillTpl:
       '<li class="crm-menu-border-bottom" data-name="MenubarDrillDown">' +
-        '<a href="#"><input type="text" id="crm-menubar-drilldown" placeholder="' + _.escape(ts('Find menu item...')) + '"></a>' +
+        '<a href="#"><input type="text" id="crm-menubar-drilldown" placeholder="' + _.escape(ts('Find menu item...')) + '"><span class="sr-only">' + _.escape(ts('Find menu item...')) + '></a>' +
         '<ul></ul>' +
       '</li>',
     branchTpl:
@@ -494,6 +494,8 @@
             '<% } %>' +
             '<% if (item.label) { %>' +
               '<span><%- item.label %></span>' +
+            '<% } else { %>' +
+              '<span class="sr-only"><%- item.name %></span>' +
             '<% } %>' +
           '</a>' +
           '<% if (item.child) { %>' +
