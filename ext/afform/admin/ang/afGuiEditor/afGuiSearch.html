@@ -18,7 +18,7 @@
             <li>
               <a href ng-click="filter.mode = 'val'; filter.value = ''">{{:: ts('Fixed value') }}</a>
             </li>
-            <li ng-if="$ctrl.editor.afform.contact_summary">
+            <li ng-if="$ctrl.editor.isContactSummary()">
               <a href ng-click="filter.mode = 'options'; filter.value = 'contact_id';">{{:: ts('Current Contact') }}</a>
             </li>
           </ul>

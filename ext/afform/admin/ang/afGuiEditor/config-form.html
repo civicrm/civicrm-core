@@ -76,7 +76,7 @@
       <p class="help-block disabled" ng-if="!editor.afform.server_route">{{:: ts('Requires a page route') }}</p>
     </div>
 
-    <div class="form-group" ng-show="!!editor.afform.navigation || editor.afform.contact_summary === 'tab'">
+    <div class="form-group" ng-show="!!editor.afform.navigation || editor.isContactSummary()">
       <div class="form-inline">
         <label for="afform_icon">{{:: ts('Icon') }}</label>
         <input required id="afform_icon" ng-model="editor.afform.icon" crm-ui-icon-picker class="form-control">
