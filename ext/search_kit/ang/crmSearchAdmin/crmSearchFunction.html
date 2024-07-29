@@ -1,6 +1,5 @@
 <span title="{{:: ts('Transform field using a function') }}">
-  <label for="group-by-function-{{ $index }}" class="sr-only">{{:: ts('Transform field using a function') }}</label>
-  <input id="group-by-function-{{ $index }}" class="form-control fa-crm-formula" style="min-width: 20px" ng-model="$ctrl.fnName" crm-ui-select="{data: $ctrl.getFunctions, placeholder: ' ', width: 'off', dropdownCss: {width: '275px'}}" ng-change="$ctrl.selectFunction()">
+  <input id="group-by-function-{{ $index }}" class="form-control fa-crm-formula" style="min-width: 20px" ng-model="$ctrl.fnName" crm-ui-select="{data: $ctrl.getFunctions, placeholder: ' ', width: 'off', dropdownCss: {width: '275px'}}" ng-change="$ctrl.selectFunction()" title="{{:: ts('Transform field using a function') }}">
 </span>
 <label ng-hide="$ctrl.mode !== 'select' && !$ctrl.fn">{{ $ctrl.fieldArg.field.label }}</label>
 
