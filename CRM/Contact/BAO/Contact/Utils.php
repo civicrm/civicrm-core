@@ -88,7 +88,7 @@ class CRM_Contact_BAO_Contact_Utils {
         "reset=1&gid={$summaryOverlayProfileId}&id={$contactId}&snippet=4&is_show_email_task=1"
       );
 
-      $imageInfo['summary-link'] = '<a href="' . $contactURL . '" data-tooltip-url="' . $profileURL . '" class="crm-summary-link">' . $imageInfo['image'] . '</a>';
+      $imageInfo['summary-link'] = '<a href="' . $contactURL . '" data-tooltip-url="' . $profileURL . '" class="crm-summary-link" aria-labelledby="crm-contactname-content">' . $imageInfo['image'] . '</a>';
     }
     else {
       $imageInfo['summary-link'] = $imageInfo['image'];
