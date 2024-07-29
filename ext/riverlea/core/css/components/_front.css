@@ -7,17 +7,17 @@
     margin-inline: auto;
     width: clamp(calc(var(--crm-f-form-width) / 2),100%,var(--crm-f-form-width));
 }
-.crm-container.crm-public fieldset:not(.collapsed, .crm-inactive-dashlet-fieldset),
+.crm-container.crm-public fieldset:not(.collapsed, .crm-inactive-dashlet-fieldset, .af-container-style-pane),
 .crm-container.crm-public .crm-event-info-form-block,
 .crm-container.crm-public #crm-profile-block,
-.crm-container.crm-public .af-container {
+.crm-container.crm-public .af-container:not(.af-container-style-pane) {
     background-color: var(--crm-f-fieldset-bg);
     margin: var(--crm-f-fieldset-margin);
     padding: var(--crm-f-fieldset-padding);
     border: var(--crm-f-fieldset-border);
     box-shadow: var(--crm-f-box-shadow);
 }
-.crm-container.crm-public fieldset legend {
+.crm-container.crm-public fieldset legend:not(.af-title) {
     position: relative;
     top: calc(2 * var(--crm-f-fieldset-padding));
     padding-block: var(--crm-f-fieldset-padding);
@@ -40,9 +40,9 @@
 }
 .crm-container.crm-public fieldset > fieldset,
 .crm-container.crm-public fieldset:has(> fieldset) {
-    padding-top: 0 !important;
+    padding-top: 0;
 }
-.crm-container.crm-public .af-container .af-container,
+.crm-container.crm-public .af-container:not(.af-container-style-pane) .af-container:not(.af-container-style-pane),
 .crm-container.crm-public fieldset .crm-form-block {
     box-shadow: none !important; /* vs _page.css */
 }

@@ -50,24 +50,23 @@ af-form {
 }
   
 /* Card style */
-#bootstrap-theme .af-container-style-pane {
-    background-color: white;
-    border-radius: var(--crm-roundness);
-    box-shadow: var(--crm-block-shadow);
-    /* margin: 10px; */
-    padding: var(--crm-padding-small);
-}
-#bootstrap-theme .af-container-style-pane > .af-title {
-    background-color: #70716b;
-    color: white;
-    padding: var(--crm-padding-small);
-    border-radius: var(--crm-roundness) var(--crm-roundness) 0 0;
+.af-container-style-pane {
+    background-color: var(--crm-form-block-background);
+    border-radius: var(--crm-form-block-border-radius);
+    box-shadow: var(--crm-form-block-box-shadow);
     position: relative;
-    top: cacl(-1 * var(--crm-padding-small));
-    left: cacl(-1 * var(--crm-padding-small));
-    width: calc(100% + var(--crm-padding-small) + var(--crm-padding-small));
-    margin-top: 0;
-    margin-bottom: var(--crm-m);
+    padding: var(--crm-form-block-padding);
+    padding-top: 50px !important;
+}
+.af-container-style-pane > .af-title {
+    background-color: var(--crm-c-background5);
+    color: var(--crm-c-light-text);
+    border-radius: var(--crm-form-block-border-radius) var(--crm-form-block-border-radius) 0 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: var(--crm-m) var(--crm-r);
 }
 
 /* Admin edit links */

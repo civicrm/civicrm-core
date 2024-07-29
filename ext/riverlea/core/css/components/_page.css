@@ -2,13 +2,12 @@
 
 /* Page backgrounds - default */
 
-.crm-container .crm-form-block,
-#bootstrap-theme .af-container-style-pane { /* darkened page bg style */
-    box-shadow: var(--crm-form-block-box-shadow) !important /* vs afCore.css */;
-    background-color: var(--crm-form-block-background) !important /* vs afCore.css */;
-    border-radius: var(--crm-form-block-border-radius) !important /* vs afCore.css */;
-    padding: var(--crm-form-block-padding) !important /* vs afCore.css */;
-    margin: 0 !important /* vs afCore.css */;
+.crm-container .crm-form-block { /* darkened page bg style */
+    box-shadow: var(--crm-form-block-box-shadow);
+    background-color: var(--crm-form-block-background);
+    border-radius: var(--crm-form-block-border-radius);
+    padding: var(--crm-form-block-padding);
+    margin: 0
 }
 .crm-container .ui-tabs-panel .crm-form-block {
     box-shadow: none;

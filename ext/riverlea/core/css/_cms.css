@@ -184,8 +184,9 @@ body.wp-admin.wp-core-ui .crm-container select {
 html.crm-standalone {
     --crm-page-width: 100%;
     --crm-page-padding: 1px 1vw;
-    --crm-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue",sans-serif; /* Adds fallback for base font */
 }
 html.crm-standalone body {
     margin: unset;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue",sans-serif; /* Adds fallback for base font */
+    font-family: var(--crm-font);
 }
