@@ -2,6 +2,7 @@
 
 namespace Civi\Entity;
 
+use Civi\Api4\Participant;
 use Civi\Test;
 use Civi\Test\CiviEnvBuilder;
 use Civi\Test\EventTestTrait;
@@ -46,20 +47,37 @@ class ParticipantTest extends TestCase implements HeadlessInterface, HookInterfa
       ->apply();
   }
 
-  public function setUp(): void {
-    parent::setUp();
-  }
-
-  public function tearDown(): void {
-    parent::tearDown();
-  }
-
+  /**
+   * @throws \CRM_Core_Exception
+   */
   public function testGetDuplicates(): void {
-    $fields = \Civi\Api4\Participant::getFields()
+    $fields = Participant::getFields()
       ->setAction('getduplicates')
       ->execute()
       ->indexBy('name');
-    $e = 1;
+    $this->assertTrue($fields['contact_id']['required']);
+    $this->assertTrue($fields['event_id']['required']);
+
+    $this->eventCreateUnpaid();
+    $this->createTestEntity('Contact', ['first_name' => 'Donald', 'last_name' => 'Duck', 'contact_type' => 'Individual']);
+    $duplicate = Participant::getDuplicates(FALSE)
+      ->setValues([
+        'event_id' => $this->ids['Event']['event'],
+        'contact_id' => $this->ids['Contact']['default'],
+      ])->execute();
+    $this->assertCount(0, $duplicate);
+
+    $this->createTestEntity('Participant', [
+      'event_id' => $this->ids['Event']['event'],
+      'contact_id' => $this->ids['Contact']['default'],
+    ]);
+
+    $duplicate = Participant::getDuplicates(FALSE)
+      ->setValues([
+        'event_id' => $this->ids['Event']['event'],
+        'contact_id' => $this->ids['Contact']['default'],
+      ])->execute();
+    $this->assertCount(1, $duplicate);
   }
 
 }
