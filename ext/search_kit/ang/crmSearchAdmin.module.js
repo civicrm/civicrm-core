@@ -496,7 +496,7 @@
 
   // Shoehorn in a non-angular widget for picking icons
   $(function() {
-    $('#crm-container').append('<div style="display:none"><input id="crm-search-admin-icon-picker"></div>');
+    $('#crm-container').append('<div style="display:none"><input id="crm-search-admin-icon-picker" title="' + ts('Icon Picker') + '"></div>');
     CRM.loadScript(CRM.config.resourceBase + 'js/jquery/jquery.crmIconPicker.js').then(function() {
       $('#crm-search-admin-icon-picker').crmIconPicker();
     });
