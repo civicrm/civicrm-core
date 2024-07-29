@@ -6,8 +6,7 @@
     </label>
   </span>
   <span ng-switch-when="select">
-    <label for="{{ ctr.flag }}-{{ $index }}" class="sr-only">{{:: ts('Function Flag')}}</label>
-    <select id="{{ ctr.flag }}-{{ $index }}" class="form-control" ng-model="$ctrl.arg[$ctrl.flag]" ng-change="$ctrl.writeExpr();">
+    <select id="{{ ctr.flag }}-{{ $index }}" class="form-control" ng-model="$ctrl.arg[$ctrl.flag]" ng-change="$ctrl.writeExpr();" title="{{:: ts('Function Flag')}}">
       <option ng-repeat="(val, label) in $ctrl.param[$ctrl.flag]" value="{{ val }}">
         {{ label }}
       </option>

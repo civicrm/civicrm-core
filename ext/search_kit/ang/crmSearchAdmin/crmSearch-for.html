@@ -6,8 +6,7 @@
   <fieldset ng-repeat="join in $ctrl.savedSearch.api_params.join" class="crm-search-join">
     <legend class="sr-only">{{:: ts('Join %1', {1: $index + 1})}}</legend>
     <div class="form-inline">
-      <label for="crm-search-join-type-{{ $index }}" class="sr-only">{{:: ts('Join Type')}}</label>
-      <select id="crm-search-join-type-{{ $index }}" class="form-control" ng-model="join[1]" ng-change="$ctrl.changeJoinType(join)" ng-options="o.k as o.v for o in ::joinTypes" ></select>
+      <select id="crm-search-join-type-{{ $index }}" class="form-control" ng-model="join[1]" ng-change="$ctrl.changeJoinType(join)" ng-options="o.k as o.v for o in ::joinTypes"  title="{{:: ts('Join Type')}}"></select>
       <div class="input-group">
         <span class="input-group-addon" title="{{:: getJoin(join[0]).defaultLabel }}"><i class="crm-i {{:: getJoin(join[0]).icon }}"></i></span>
         <input class="form-control crm-search-join-label huge" ng-model="$ctrl.getSetJoinLabel(join[0])" ng-model-options="{getterSetter: true, updateOn: 'blur'}" placeholder="{{:: getJoin(join[0]).defaultLabel }}" title="{{:: ts('Optional label for this join') }}">
@@ -23,13 +22,12 @@
   <fieldset class="crm-search-join-add">
     <legend class="sr-only">add Join</legend>
     <div class="form-inline">
-      <label for="crm-search-add-join" class="sr-only">{{:: ts('Join Type')}}</label>
-      <select id="crm-search-add-join-type" class="form-control" ng-model="controls.joinType" ng-options="o.k as o.v for o in ::joinTypes" ></select>
-      <label for="crm-search-add-join" class="sr-only">{{:: ts('Join Entity')}}</label>
+      <select id="crm-search-add-join-type" class="form-control" ng-model="controls.joinType" ng-options="o.k as o.v for o in ::joinTypes" title="{{:: ts('Join Type')}}"></select>
       <input id="crm-search-add-join"
              class="form-control crm-action-menu fa-plus"
              crm-ui-select="{placeholder: ts('Entity'), data: getJoinEntities, dropdownCss: {width: '275px'}}"
-             on-crm-ui-select="$ctrl.addJoin(selection)">
+             on-crm-ui-select="$ctrl.addJoin(selection)"
+             title="{{:: ts('Join Entity')}}">
     </div>
   </fieldset>
 </div>

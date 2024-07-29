@@ -45,5 +45,6 @@
   </div>
   <input class="form-control collapsible-optgroups"
          on-crm-ui-select="$ctrl.addClause(selection)"
-         crm-ui-select="{data: $ctrl.fields, placeholder: $ctrl.placeholder || ts('Select field')}" >
+         crm-ui-select="{data: $ctrl.fields, placeholder: $ctrl.placeholder || ts('Select field')}"
+         title="{{:: $ctrl.placeholder || ts('Select field') }}" >
 </div>
