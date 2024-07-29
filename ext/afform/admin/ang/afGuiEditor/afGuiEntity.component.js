@@ -46,6 +46,10 @@
         buildElementList(search);
       };
 
+      this.getOptionsTpl = function() {
+        return $scope.getMeta().options_tpl || '~/afGuiEditor/entityConfig/EntityOptionsGeneric.html';
+      };
+
       function buildFieldList(search) {
         $scope.fieldList.length = 0;
         $scope.fieldList.push({
