@@ -73,10 +73,12 @@
     font-size: var(--crm-f-input-font-size);
     width: var(--crm-f-input-width);
 }
-.crm-container.crm-public input[type="checkbox"], 
 .crm-container.crm-public input[type="radio"] {
-    float: left;
     margin: var(--crm-s2) var(--crm-s3) 0 0;
+}
+.crm-container.crm-public input[type="checkbox"] {
+    margin: var(--crm-s2) var(--crm-s3) 0 0;
+    float: left;
 }
 .crm-container.crm-public .big {
     width: var(--crm-f-input-width);

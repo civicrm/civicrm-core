@@ -280,7 +280,7 @@
 	white-space: nowrap;
 }
 .crm-container .dropdown-menu > li > a i.crm-i {
-    width: 2.5ch;
+    padding-right: var(--crm-s);
     color: var(--crm-dropdown-col);
 }
 .crm-container .dropdown-menu > li > a:hover,

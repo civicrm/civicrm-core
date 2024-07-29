@@ -1,0 +1,83 @@
+/* Style rules for Form Builder Admin
+   Forked on 29 July 24. Called on Form Builder front-end
+   Status: not currently loading */
+
+.af-api4-action-running {
+    cursor: not-allowed;
+    color: var(--crm-c-darkest);
+}
+a.af-api4-action-idle {
+    cursor: pointer;
+} 
+.af-container.af-layout-cols {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--crm-m);
+}
+.af-container.af-layout-cols > * {
+    flex: 1;
+}
+.af-container.af-layout-inline > * {
+    display: inline-block;
+    vertical-align: top;
+}
+.af-container.af-layout-cols > .af-title {
+    flex: 0 0 100%;
+  }
+.af-container.af-layout-inline > .af-title {
+    display: block;
+    width: 100%;
+} 
+.afform-directive,
+af-form {
+    display: block;
+    position: relative;
+}
+#bootstrap-theme .input-group .crm-af-field {
+    display: inline-block;
+}  
+#bootstrap-theme .input-group .afform-search-operator {
+    width: 6rem;
+}  
+[af-repeat-item] {
+    position: relative;
+}
+#bootstrap-theme [af-repeat-item] .af-repeat-remove-btn {
+    min-width: 30px;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+  
+/* Card style */
+#bootstrap-theme .af-container-style-pane {
+    background-color: white;
+    border-radius: var(--crm-roundness);
+    box-shadow: var(--crm-block-shadow);
+    /* margin: 10px; */
+    padding: var(--crm-padding-small);
+}
+#bootstrap-theme .af-container-style-pane > .af-title {
+    background-color: #70716b;
+    color: white;
+    padding: var(--crm-padding-small);
+    border-radius: var(--crm-roundness) var(--crm-roundness) 0 0;
+    position: relative;
+    top: cacl(-1 * var(--crm-padding-small));
+    left: cacl(-1 * var(--crm-padding-small));
+    width: calc(100% + var(--crm-padding-small) + var(--crm-padding-small));
+    margin-top: 0;
+    margin-bottom: var(--crm-m);
+}
+
+/* Admin edit links */
+.afform-directive .af-admin-edit-form-link {
+    position: absolute !important;
+    right: 0;
+    top: 0;
+    opacity: .5;
+}
+.afform-directive .af-admin-edit-form-link.open,
+.afform-directive:hover .af-admin-edit-form-link {
+    opacity: 1;
+}

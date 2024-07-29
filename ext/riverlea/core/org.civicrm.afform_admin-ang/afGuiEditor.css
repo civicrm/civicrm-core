@@ -266,9 +266,10 @@
 #afGuiEditor:not(.af-gui-dragging *) #afGuiEditor-canvas:hover .af-gui-markup  {
     border: 2px solid var(--crm-c-background2);
 }
+/* Dragging related */
 #afGuiEditor #afGuiEditor-canvas .af-gui-dragtarget > .af-gui-bar,
 #afGuiEditor #afGuiEditor-canvas .af-gui-dragtarget > .af-gui-container-title span:empty {
-    background-color: #d7e6ff;
+    background-color: var(--crm-c-background4);
     opacity: 1;
     transition: opacity .1s;
 }
@@ -280,17 +281,6 @@ body.af-gui-dragging #civicrm-menu {
 body.af-gui-dragging {
     overflow-x: hidden;
     overflow-y: hidden;
-}
-#afGuiEditor .af-gui-bar .btn.active {
-    background-color: #b3b3b3;
-}
-#afGuiEditor .af-gui-bar > .form-inline > span {
-    color: #696969;
-    font-style: italic;
-}
-#afGuiEditor .af-gui-bar > .form-inline > select {
-    height: 21px;
-    min-height: 21px;
 }
 af-gui-container > .af-gui-bar,
 .af-gui-element > .af-gui-bar,
@@ -304,9 +294,13 @@ af-gui-container > .af-gui-bar,
 }
 /* Canvas layout */
 
-#afGuiEditor .af-gui-layout.af-layout-cols {
+#afGuiEditor .af-gui-layout.af-layout-cols,
+#afGuiEditor .af-gui-layout.af-layout-inline {
     display: flex;
     gap: var(--crm-m);
+}
+#afGuiEditor .af-gui-layout.af-layout-inline {
+    flex-flow: wrap;
 }
 #afGuiEditor .af-gui-layout.af-layout-cols > div {
     flex: 1;
@@ -343,44 +337,23 @@ af-gui-container > .af-gui-bar,
 #afGuiEditor .af-entity-selected > .af-gui-bar .af-gui-add-element-button span {
     color: var(--crm-c-primary-text);
 }
-
 #afGuiEditor .af-gui-container.af-gui-dragtarget {
     border: 2px solid var(--crm-c-blue-dark);
     box-shadow: 0 0 5px var(--crm-c-blue-dark);
 }
-/* #afGuiEditor .crm-editable-enabled,
-#afGuiEditor .panel-heading ul.nav-tabs li > a > span {
-    display: inline-block;
-    padding: 0 4px !important;
-    border: 2px solid transparent !important;
-    min-width: 21px;
-} */
 #afGuiEditor .crm-editable-enabled:hover:not(:focus) {
-    border: 2px dashed grey !important;
-}/* Undo Shoreditch add-ons */
-#afGuiEditor .crm-editable-enabled:before,
-#afGuiEditor .crm-editable-enabled:after {
-    content: '';
-    display: none;
+    border: 2px dashed var(--crm-c-background5) !important;
 }
 
 /* Card style */
-#afGuiEditor .af-gui-container.af-container-style-pane {
-    box-shadow: 1px 2px 8px 1px rgb(0, 0, 0, .3);
-    background: linear-gradient(to bottom, #f2f2f2 0 22px, transparent 22px 100%) no-repeat;
-    border-radius: 4px;
-}
 #afGuiEditor .af-gui-search-display {
     border: 1px dotted gray;
     color: gray;
     padding: 3em;
     background-color: #f9f9f9;
 }
-#afGuiEditor div.af-gui-markup-content {
-    display: block;
-    position: relative;
-    padding: 0 !important;
-}
+
+/* Markup area */
 #afGuiEditor .af-gui-markup-content-overlay {
     position: absolute;
     top: 0;
@@ -391,28 +364,28 @@ af-gui-container > .af-gui-bar,
 #afGuiEditor .af-gui-markup-content:hover .af-gui-markup-content-overlay {
     background-color: rgba(255, 255, 255, .2);
 }
-
-/* Fix button colors when bar is highlighted */
-/* #afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > .btn-group > .btn-group > button > span,
-#afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > span,
-#afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-node-title {
-    color: white;
-} */
+#afGuiEditor .af-gui-content-editing-area .af-gui-edit-options-bar {
+    width: 100%;
+    background-color: #f2f2f2;
+    display: flex;
+    align-items: center;
+    height: 35px;
+    padding-inline: var(--crm-padding-inset);
+    justify-content: space-between;
+}
+.af-gui-edit-options-bar h4 {
+	font-size: var(--crm-font-size);
+	margin: 0;
+}
+#afGuiEditor .af-gui-content-editing-area {
+    pointer-events: auto;
+    cursor: auto;
+}
 #afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > .btn-group > .btn-group > button:hover > span,
 #afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > .btn-group > .btn-group > button[aria-expanded=true] > span,
 #afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > .btn-group > .btn-group > button:focus > span {
     color: var(--crm-c-blue-dark);
 }
-/* #afGuiEditor .ui-sortable-helper {
-    height: 20px !important;
-    opacity: .5;
-    overflow: visible;
-}
-#afGuiEditor .ui-sortable-helper > * {
-    background-color: #d5d5d5;
-} */
-/* grip handle */
-
 #afGuiEditor .af-gui-add-element-button span {
     display: inline-block;
     width: 18px;
@@ -438,7 +411,7 @@ af-gui-container > .af-gui-bar,
     position: relative;
     left: -4px;
 }
-  /* For editing field placeholder text */
+/* For editing field placeholder text */
 #afGuiEditor .af-gui-field-input input[type=text].form-control {
     color: #9a9a9a;
 }
@@ -464,11 +437,9 @@ af-gui-container > .af-gui-bar,
 #afGuiEditor .af-gui-field-input-type-select .input-group-btn {
     position: initial;
 }
-
 #afGuiEditor .input-group-addon {
     padding: 0;
 }
-
 #afGuiEditor .af-gui-text-legend {
     text-decoration: underline;
 }
@@ -503,30 +474,8 @@ af-gui-container > .af-gui-bar,
 #afGuiEditor.af-gui-editing-content .af-gui-bar:before {
     background: none;
 }
-#afGuiEditor .af-gui-content-editing-area {
-    pointer-events: auto;
-    cursor: auto;
-    padding-top: 35px;
-    position: relative;
-}
 #afGuiEditor af-gui-edit-options.af-gui-content-editing-area {
     border: 2px solid #0071bd;
-}
-#afGuiEditor .af-gui-content-editing-area .af-gui-edit-options-bar {
-    height: 30px;
-    font-family: "Courier New", Courier, monospace;
-    font-size: 12px;
-    width: 100%;
-    background-color: #f2f2f2;
-    position: absolute;
-    top: 0;
-    left: 0;
-    padding-left: 15px;
-}
-#afGuiEditor .af-gui-edit-options-bar .btn-group-sm {
-    position: absolute;
-    top: 0;
-    right: 0;
 }
 #afGuiEditor af-gui-edit-options.af-gui-content-editing-area ul[ui-sortable] {
     padding: 5px 20px 0;
@@ -577,27 +526,10 @@ af-gui-container > .af-gui-bar,
     right: 0;
     top: 0;
 }
-.af-gui-conditional-dialog fieldset div.api4-input {
-    margin-bottom: 10px;
-}
-.af-gui-conditional-dialog fieldset div.api4-input.ui-sortable-helper {
-    background-color: rgba(255, 255, 255, .9);
-}
-.af-gui-conditional-dialog .api4-clause-fieldset fieldset {
-    float: right;
-    width: calc(100% - 58px);
-    margin-top: -8px;
-}
-.af-gui-conditional-dialog .api4-clause-fieldset.api4-sorting fieldset .api4-clause-group-sortable {
-    min-height: 3.5em;
-}
 .af-gui-conditional-dialog legend[ng-click] {
     cursor: pointer;
 }
-.af-gui-conditional-dialog .api4-input-group {
-    display: inline-block;
-}
- i.crm-i.af-gui-conditional-dialog-move-icon {
+i.crm-i.af-gui-conditional-dialog-move-icon {
     opacity: .5;
 }
  .crm-draggable:hover > i.crm-i.af-gui-conditional-dialog-move-icon,
@@ -626,26 +558,8 @@ af-gui-container > .af-gui-bar,
 .af-gui-conditional-dialog .ui-sortable-helper .api4-clause-badge .crm-i {
     display: inline-block;
 }
-.af-gui-conditional-dialog .api4-operator {
-    width: 110px;
-}
-#afGuiEditor .af-gui-container.af-container-style-pane {
-	background: linear-gradient(to bottom, #f2f2f2 0 var(--crm-l), transparent var(--crm-l) 100%) no-repeat;
-	border-radius: var(--crm-roundness);
-}
-.af-gui-edit-options-bar h4 {
-	font-size: var(--crm-font-size) !important;
-	margin: 0 !important;
-}
-#afGuiEditor .af-gui-content-editing-area:has(.ng-hide) {
-	padding-top: 0;
-}
-#afGuiEditor .af-gui-layout.af-layout-inline > div {
-	margin-right: var(--crm-m);
-}
 
 /* Dropdown buttons */
-
 #afGuiEditor-canvas .dropdown-toggle,
 #afGuiEditor .af-gui-add-element-button {
 	padding: 0;
@@ -721,10 +635,6 @@ af-gui-container > .af-gui-bar,
 	padding: 0 !important;
 	border: 0;
 }
-/* .af-admin-edit-form-link .btn.dropdown-toggle i.crm-i {
-	background: transparent;
-	border: 0;
-} */
 #afGuiEditor .af-gui-field-input-type-select .input-group .dropdown-menu {
     width: 100%;
     right: 0;
@@ -745,10 +655,44 @@ af-gui-container > .af-gui-bar,
     background-image: url('data:image/svg+xml,<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2.5" y="2.5" width="59" height="13" rx="3.5" stroke="black" stroke-width="5" stroke-linejoin="round"/><rect x="2.5" y="25.5" width="59" height="13" rx="3.5" stroke="black" stroke-width="5" stroke-linejoin="round"/><rect x="2.5" y="48.5" width="59" height="13" rx="3.5" stroke="black" stroke-width="5" stroke-linejoin="round"/></svg>');
 }
 
-/* various */
-
+/* Misc - aka stuff I can't identify but don't want to risk removing*/
+#afGuiEditor .af-gui-bar .btn.active {
+    background-color: var(--crm-c-background5);
+}
+#afGuiEditor .af-gui-bar > .form-inline > span {
+    color: var(--crm-c-background5);
+    font-style: italic;
+}
+#afGuiEditor .af-gui-bar > .form-inline > select {
+    height: 21px;
+    min-height: 21px;
+}
 #afGuiEditor .ui-sortable-helper .af-gui-palette-item {
     height: 30px;
     width: 300px;
-    border: 2px dashed #0071bd;
+    border: 2px dashed var(--crm-c-blue-dark);
+}
+.af-gui-conditional-dialog .api4-operator {
+    width: 110px;
+}
+.af-gui-conditional-dialog fieldset div.api4-input {
+    margin-bottom: 10px;
+}
+.af-gui-conditional-dialog fieldset div.api4-input.ui-sortable-helper {
+    background-color: rgba(255, 255, 255, .9);
+}
+.af-gui-conditional-dialog .api4-clause-fieldset fieldset {
+    float: right;
+    width: calc(100% - 58px);
+    margin-top: -8px;
+}
+.af-gui-conditional-dialog .api4-clause-fieldset.api4-sorting fieldset .api4-clause-group-sortable {
+    min-height: 3.5em;
+}
+.af-gui-conditional-dialog .api4-input-group {
+    display: inline-block;
+}
+#afGuiEditor .af-gui-container.af-container-style-pane {
+	background: linear-gradient(to bottom, #f2f2f2 0 var(--crm-l), transparent var(--crm-l) 100%) no-repeat;
+	border-radius: var(--crm-roundness);
 }
