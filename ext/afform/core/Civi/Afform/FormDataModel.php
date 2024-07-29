@@ -179,7 +179,17 @@ class FormDataModel {
         }
       }
       elseif ($entity && !empty($node['af-join'])) {
-        $this->entities[$entity]['joins'][$node['af-join']] = AHQ::getProps($node);
+        $joinProps = AHQ::getProps($node);
+        // If the join is declared > once, merge data
+        $existingJoin = $this->entities[$entity]['joins'][$node['af-join']] ?? [];
+        if (!empty($existingJoin['data']) && !empty($joinProps['data'])) {
+          foreach ($joinProps['data'] as $key => $value) {
+            if (!empty($existingJoin['data'][$key]) && $existingJoin['data'][$key] !== $value) {
+              $joinProps['data'][$key] = array_unique(array_merge((array) $existingJoin['data'][$key], (array) $value));
+            }
+          }
+        }
+        $this->entities[$entity]['joins'][$node['af-join']] = $joinProps;
         $this->parseFields($node['#children'] ?? [], $entity, $node['af-join'], NULL, $afIfConditions);
       }
       elseif (!empty($node['#children'])) {
