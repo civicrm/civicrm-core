@@ -1,0 +1,2820 @@
+/*!
+ * Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com
+ * License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License)
+ * Copyright 2024 Fonticons, Inc.
+ *
+ * Copy of bower_components/font-awesome/css/v4-shims.css with .fa replaced with .crm-i
+ */
+.crm-i.fa-glass:before {
+  content: "\f000";
+}
+
+.crm-i.fa-envelope-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-envelope-o:before {
+  content: "\f0e0";
+}
+
+.crm-i.fa-star-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-star-o:before {
+  content: "\f005";
+}
+
+.crm-i.fa-remove:before {
+  content: "\f00d";
+}
+
+.crm-i.fa-close:before {
+  content: "\f00d";
+}
+
+.crm-i.fa-gear:before {
+  content: "\f013";
+}
+
+.crm-i.fa-trash-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-trash-o:before {
+  content: "\f2ed";
+}
+
+.crm-i.fa-home:before {
+  content: "\f015";
+}
+
+.crm-i.fa-file-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-file-o:before {
+  content: "\f15b";
+}
+
+.crm-i.fa-clock-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-clock-o:before {
+  content: "\f017";
+}
+
+.crm-i.fa-arrow-circle-o-down {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-arrow-circle-o-down:before {
+  content: "\f358";
+}
+
+.crm-i.fa-arrow-circle-o-up {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-arrow-circle-o-up:before {
+  content: "\f35b";
+}
+
+.crm-i.fa-play-circle-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-play-circle-o:before {
+  content: "\f144";
+}
+
+.crm-i.fa-repeat:before {
+  content: "\f01e";
+}
+
+.crm-i.fa-rotate-right:before {
+  content: "\f01e";
+}
+
+.crm-i.fa-refresh:before {
+  content: "\f021";
+}
+
+.crm-i.fa-list-alt {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-list-alt:before {
+  content: "\f022";
+}
+
+.crm-i.fa-dedent:before {
+  content: "\f03b";
+}
+
+.crm-i.fa-video-camera:before {
+  content: "\f03d";
+}
+
+.crm-i.fa-picture-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-picture-o:before {
+  content: "\f03e";
+}
+
+.crm-i.fa-photo {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-photo:before {
+  content: "\f03e";
+}
+
+.crm-i.fa-image {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-image:before {
+  content: "\f03e";
+}
+
+.crm-i.fa-map-marker:before {
+  content: "\f3c5";
+}
+
+.crm-i.fa-pencil-square-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-pencil-square-o:before {
+  content: "\f044";
+}
+
+.crm-i.fa-edit {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-edit:before {
+  content: "\f044";
+}
+
+.crm-i.fa-share-square-o:before {
+  content: "\f14d";
+}
+
+.crm-i.fa-check-square-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-check-square-o:before {
+  content: "\f14a";
+}
+
+.crm-i.fa-arrows:before {
+  content: "\f0b2";
+}
+
+.crm-i.fa-times-circle-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-times-circle-o:before {
+  content: "\f057";
+}
+
+.crm-i.fa-check-circle-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-check-circle-o:before {
+  content: "\f058";
+}
+
+.crm-i.fa-mail-forward:before {
+  content: "\f064";
+}
+
+.crm-i.fa-expand:before {
+  content: "\f424";
+}
+
+.crm-i.fa-compress:before {
+  content: "\f422";
+}
+
+.crm-i.fa-eye {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-eye-slash {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-warning:before {
+  content: "\f071";
+}
+
+.crm-i.fa-calendar:before {
+  content: "\f073";
+}
+
+.crm-i.fa-arrows-v:before {
+  content: "\f338";
+}
+
+.crm-i.fa-arrows-h:before {
+  content: "\f337";
+}
+
+.crm-i.fa-bar-chart:before {
+  content: "\e0e3";
+}
+
+.crm-i.fa-bar-chart-o:before {
+  content: "\e0e3";
+}
+
+.crm-i.fa-twitter-square {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-twitter-square:before {
+  content: "\f081";
+}
+
+.crm-i.fa-facebook-square {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-facebook-square:before {
+  content: "\f082";
+}
+
+.crm-i.fa-gears:before {
+  content: "\f085";
+}
+
+.crm-i.fa-thumbs-o-up {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-thumbs-o-up:before {
+  content: "\f164";
+}
+
+.crm-i.fa-thumbs-o-down {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-thumbs-o-down:before {
+  content: "\f165";
+}
+
+.crm-i.fa-heart-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-heart-o:before {
+  content: "\f004";
+}
+
+.crm-i.fa-sign-out:before {
+  content: "\f2f5";
+}
+
+.crm-i.fa-linkedin-square {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-linkedin-square:before {
+  content: "\f08c";
+}
+
+.crm-i.fa-thumb-tack:before {
+  content: "\f08d";
+}
+
+.crm-i.fa-external-link:before {
+  content: "\f35d";
+}
+
+.crm-i.fa-sign-in:before {
+  content: "\f2f6";
+}
+
+.crm-i.fa-github-square {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-github-square:before {
+  content: "\f092";
+}
+
+.crm-i.fa-lemon-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-lemon-o:before {
+  content: "\f094";
+}
+
+.crm-i.fa-square-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-square-o:before {
+  content: "\f0c8";
+}
+
+.crm-i.fa-bookmark-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-bookmark-o:before {
+  content: "\f02e";
+}
+
+.crm-i.fa-twitter {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-facebook {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-facebook:before {
+  content: "\f39e";
+}
+
+.crm-i.fa-facebook-f {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-facebook-f:before {
+  content: "\f39e";
+}
+
+.crm-i.fa-github {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-credit-card {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-feed:before {
+  content: "\f09e";
+}
+
+.crm-i.fa-hdd-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-hdd-o:before {
+  content: "\f0a0";
+}
+
+.crm-i.fa-hand-o-right {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-hand-o-right:before {
+  content: "\f0a4";
+}
+
+.crm-i.fa-hand-o-left {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-hand-o-left:before {
+  content: "\f0a5";
+}
+
+.crm-i.fa-hand-o-up {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-hand-o-up:before {
+  content: "\f0a6";
+}
+
+.crm-i.fa-hand-o-down {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-hand-o-down:before {
+  content: "\f0a7";
+}
+
+.crm-i.fa-globe:before {
+  content: "\f57d";
+}
+
+.crm-i.fa-tasks:before {
+  content: "\f828";
+}
+
+.crm-i.fa-arrows-alt:before {
+  content: "\f31e";
+}
+
+.crm-i.fa-group:before {
+  content: "\f0c0";
+}
+
+.crm-i.fa-chain:before {
+  content: "\f0c1";
+}
+
+.crm-i.fa-cut:before {
+  content: "\f0c4";
+}
+
+.crm-i.fa-files-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-files-o:before {
+  content: "\f0c5";
+}
+
+.crm-i.fa-floppy-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-floppy-o:before {
+  content: "\f0c7";
+}
+
+.crm-i.fa-save {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-save:before {
+  content: "\f0c7";
+}
+
+.crm-i.fa-navicon:before {
+  content: "\f0c9";
+}
+
+.crm-i.fa-reorder:before {
+  content: "\f0c9";
+}
+
+.crm-i.fa-magic:before {
+  content: "\e2ca";
+}
+
+.crm-i.fa-pinterest {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-pinterest-square {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-pinterest-square:before {
+  content: "\f0d3";
+}
+
+.crm-i.fa-google-plus-square {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-google-plus-square:before {
+  content: "\f0d4";
+}
+
+.crm-i.fa-google-plus {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-google-plus:before {
+  content: "\f0d5";
+}
+
+.crm-i.fa-money:before {
+  content: "\f3d1";
+}
+
+.crm-i.fa-unsorted:before {
+  content: "\f0dc";
+}
+
+.crm-i.fa-sort-desc:before {
+  content: "\f0dd";
+}
+
+.crm-i.fa-sort-asc:before {
+  content: "\f0de";
+}
+
+.crm-i.fa-linkedin {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-linkedin:before {
+  content: "\f0e1";
+}
+
+.crm-i.fa-rotate-left:before {
+  content: "\f0e2";
+}
+
+.crm-i.fa-legal:before {
+  content: "\f0e3";
+}
+
+.crm-i.fa-tachometer:before {
+  content: "\f625";
+}
+
+.crm-i.fa-dashboard:before {
+  content: "\f625";
+}
+
+.crm-i.fa-comment-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-comment-o:before {
+  content: "\f075";
+}
+
+.crm-i.fa-comments-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-comments-o:before {
+  content: "\f086";
+}
+
+.crm-i.fa-flash:before {
+  content: "\f0e7";
+}
+
+.crm-i.fa-clipboard:before {
+  content: "\f0ea";
+}
+
+.crm-i.fa-lightbulb-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-lightbulb-o:before {
+  content: "\f0eb";
+}
+
+.crm-i.fa-exchange:before {
+  content: "\f362";
+}
+
+.crm-i.fa-cloud-download:before {
+  content: "\f0ed";
+}
+
+.crm-i.fa-cloud-upload:before {
+  content: "\f0ee";
+}
+
+.crm-i.fa-bell-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-bell-o:before {
+  content: "\f0f3";
+}
+
+.crm-i.fa-cutlery:before {
+  content: "\f2e7";
+}
+
+.crm-i.fa-file-text-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-file-text-o:before {
+  content: "\f15c";
+}
+
+.crm-i.fa-building-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-building-o:before {
+  content: "\f1ad";
+}
+
+.crm-i.fa-hospital-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-hospital-o:before {
+  content: "\f0f8";
+}
+
+.crm-i.fa-tablet:before {
+  content: "\f3fa";
+}
+
+.crm-i.fa-mobile:before {
+  content: "\f3cd";
+}
+
+.crm-i.fa-mobile-phone:before {
+  content: "\f3cd";
+}
+
+.crm-i.fa-circle-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-circle-o:before {
+  content: "\f111";
+}
+
+.crm-i.fa-mail-reply:before {
+  content: "\f3e5";
+}
+
+.crm-i.fa-github-alt {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-folder-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-folder-o:before {
+  content: "\f07b";
+}
+
+.crm-i.fa-folder-open-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-folder-open-o:before {
+  content: "\f07c";
+}
+
+.crm-i.fa-smile-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-smile-o:before {
+  content: "\f118";
+}
+
+.crm-i.fa-frown-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-frown-o:before {
+  content: "\f119";
+}
+
+.crm-i.fa-meh-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-meh-o:before {
+  content: "\f11a";
+}
+
+.crm-i.fa-keyboard-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-keyboard-o:before {
+  content: "\f11c";
+}
+
+.crm-i.fa-flag-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-flag-o:before {
+  content: "\f024";
+}
+
+.crm-i.fa-mail-reply-all:before {
+  content: "\f122";
+}
+
+.crm-i.fa-star-half-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-star-half-o:before {
+  content: "\f5c0";
+}
+
+.crm-i.fa-star-half-empty {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-star-half-empty:before {
+  content: "\f5c0";
+}
+
+.crm-i.fa-star-half-full {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-star-half-full:before {
+  content: "\f5c0";
+}
+
+.crm-i.fa-code-fork:before {
+  content: "\f126";
+}
+
+.crm-i.fa-chain-broken:before {
+  content: "\f127";
+}
+
+.crm-i.fa-unlink:before {
+  content: "\f127";
+}
+
+.crm-i.fa-calendar-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-calendar-o:before {
+  content: "\f133";
+}
+
+.crm-i.fa-maxcdn {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-html5 {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-css3 {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-unlock-alt:before {
+  content: "\f09c";
+}
+
+.crm-i.fa-minus-square-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-minus-square-o:before {
+  content: "\f146";
+}
+
+.crm-i.fa-level-up:before {
+  content: "\f3bf";
+}
+
+.crm-i.fa-level-down:before {
+  content: "\f3be";
+}
+
+.crm-i.fa-pencil-square:before {
+  content: "\f14b";
+}
+
+.crm-i.fa-external-link-square:before {
+  content: "\f360";
+}
+
+.crm-i.fa-compass {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-caret-square-o-down {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-caret-square-o-down:before {
+  content: "\f150";
+}
+
+.crm-i.fa-toggle-down {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-toggle-down:before {
+  content: "\f150";
+}
+
+.crm-i.fa-caret-square-o-up {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-caret-square-o-up:before {
+  content: "\f151";
+}
+
+.crm-i.fa-toggle-up {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-toggle-up:before {
+  content: "\f151";
+}
+
+.crm-i.fa-caret-square-o-right {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-caret-square-o-right:before {
+  content: "\f152";
+}
+
+.crm-i.fa-toggle-right {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-toggle-right:before {
+  content: "\f152";
+}
+
+.crm-i.fa-eur:before {
+  content: "\f153";
+}
+
+.crm-i.fa-euro:before {
+  content: "\f153";
+}
+
+.crm-i.fa-gbp:before {
+  content: "\f154";
+}
+
+.crm-i.fa-usd:before {
+  content: "\24";
+}
+
+.crm-i.fa-dollar:before {
+  content: "\24";
+}
+
+.crm-i.fa-inr:before {
+  content: "\e1bc";
+}
+
+.crm-i.fa-rupee:before {
+  content: "\e1bc";
+}
+
+.crm-i.fa-jpy:before {
+  content: "\f157";
+}
+
+.crm-i.fa-cny:before {
+  content: "\f157";
+}
+
+.crm-i.fa-rmb:before {
+  content: "\f157";
+}
+
+.crm-i.fa-yen:before {
+  content: "\f157";
+}
+
+.crm-i.fa-rub:before {
+  content: "\f158";
+}
+
+.crm-i.fa-ruble:before {
+  content: "\f158";
+}
+
+.crm-i.fa-rouble:before {
+  content: "\f158";
+}
+
+.crm-i.fa-krw:before {
+  content: "\f159";
+}
+
+.crm-i.fa-won:before {
+  content: "\f159";
+}
+
+.crm-i.fa-btc {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-bitcoin {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-bitcoin:before {
+  content: "\f15a";
+}
+
+.crm-i.fa-file-text:before {
+  content: "\f15c";
+}
+
+.crm-i.fa-sort-alpha-asc:before {
+  content: "\f15d";
+}
+
+.crm-i.fa-sort-alpha-desc:before {
+  content: "\f881";
+}
+
+.crm-i.fa-sort-amount-asc:before {
+  content: "\f884";
+}
+
+.crm-i.fa-sort-amount-desc:before {
+  content: "\f160";
+}
+
+.crm-i.fa-sort-numeric-asc:before {
+  content: "\f162";
+}
+
+.crm-i.fa-sort-numeric-desc:before {
+  content: "\f886";
+}
+
+.crm-i.fa-youtube-square {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-youtube-square:before {
+  content: "\f431";
+}
+
+.crm-i.fa-youtube {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-xing {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-xing-square {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-xing-square:before {
+  content: "\f169";
+}
+
+.crm-i.fa-youtube-play {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-youtube-play:before {
+  content: "\f167";
+}
+
+.crm-i.fa-dropbox {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-stack-overflow {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-instagram {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-flickr {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-adn {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-bitbucket {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-bitbucket-square {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-bitbucket-square:before {
+  content: "\f171";
+}
+
+.crm-i.fa-tumblr {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-tumblr-square {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-tumblr-square:before {
+  content: "\f174";
+}
+
+.crm-i.fa-long-arrow-down:before {
+  content: "\f309";
+}
+
+.crm-i.fa-long-arrow-up:before {
+  content: "\f30c";
+}
+
+.crm-i.fa-long-arrow-left:before {
+  content: "\f30a";
+}
+
+.crm-i.fa-long-arrow-right:before {
+  content: "\f30b";
+}
+
+.crm-i.fa-apple {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-windows {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-android {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-linux {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-dribbble {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-skype {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-foursquare {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-trello {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-gratipay {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-gittip {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-gittip:before {
+  content: "\f184";
+}
+
+.crm-i.fa-sun-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-sun-o:before {
+  content: "\f185";
+}
+
+.crm-i.fa-moon-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-moon-o:before {
+  content: "\f186";
+}
+
+.crm-i.fa-vk {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-weibo {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-renren {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-pagelines {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-stack-exchange {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-arrow-circle-o-right {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-arrow-circle-o-right:before {
+  content: "\f35a";
+}
+
+.crm-i.fa-arrow-circle-o-left {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-arrow-circle-o-left:before {
+  content: "\f359";
+}
+
+.crm-i.fa-caret-square-o-left {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-caret-square-o-left:before {
+  content: "\f191";
+}
+
+.crm-i.fa-toggle-left {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-toggle-left:before {
+  content: "\f191";
+}
+
+.crm-i.fa-dot-circle-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-dot-circle-o:before {
+  content: "\f192";
+}
+
+.crm-i.fa-vimeo-square {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-vimeo-square:before {
+  content: "\f194";
+}
+
+.crm-i.fa-try:before {
+  content: "\e2bb";
+}
+
+.crm-i.fa-turkish-lira:before {
+  content: "\e2bb";
+}
+
+.crm-i.fa-plus-square-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-plus-square-o:before {
+  content: "\f0fe";
+}
+
+.crm-i.fa-slack {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-wordpress {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-openid {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-institution:before {
+  content: "\f19c";
+}
+
+.crm-i.fa-bank:before {
+  content: "\f19c";
+}
+
+.crm-i.fa-mortar-board:before {
+  content: "\f19d";
+}
+
+.crm-i.fa-yahoo {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-google {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-reddit {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-reddit-square {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-reddit-square:before {
+  content: "\f1a2";
+}
+
+.crm-i.fa-stumbleupon-circle {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-stumbleupon {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-delicious {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-digg {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-pied-piper-pp {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-pied-piper-alt {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-drupal {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-joomla {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-behance {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-behance-square {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-behance-square:before {
+  content: "\f1b5";
+}
+
+.crm-i.fa-steam {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-steam-square {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-steam-square:before {
+  content: "\f1b7";
+}
+
+.crm-i.fa-automobile:before {
+  content: "\f1b9";
+}
+
+.crm-i.fa-cab:before {
+  content: "\f1ba";
+}
+
+.crm-i.fa-spotify {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-deviantart {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-soundcloud {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-file-pdf-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-file-pdf-o:before {
+  content: "\f1c1";
+}
+
+.crm-i.fa-file-word-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-file-word-o:before {
+  content: "\f1c2";
+}
+
+.crm-i.fa-file-excel-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-file-excel-o:before {
+  content: "\f1c3";
+}
+
+.crm-i.fa-file-powerpoint-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-file-powerpoint-o:before {
+  content: "\f1c4";
+}
+
+.crm-i.fa-file-image-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-file-image-o:before {
+  content: "\f1c5";
+}
+
+.crm-i.fa-file-photo-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-file-photo-o:before {
+  content: "\f1c5";
+}
+
+.crm-i.fa-file-picture-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-file-picture-o:before {
+  content: "\f1c5";
+}
+
+.crm-i.fa-file-archive-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-file-archive-o:before {
+  content: "\f1c6";
+}
+
+.crm-i.fa-file-zip-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-file-zip-o:before {
+  content: "\f1c6";
+}
+
+.crm-i.fa-file-audio-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-file-audio-o:before {
+  content: "\f1c7";
+}
+
+.crm-i.fa-file-sound-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-file-sound-o:before {
+  content: "\f1c7";
+}
+
+.crm-i.fa-file-video-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-file-video-o:before {
+  content: "\f1c8";
+}
+
+.crm-i.fa-file-movie-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-file-movie-o:before {
+  content: "\f1c8";
+}
+
+.crm-i.fa-file-code-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-file-code-o:before {
+  content: "\f1c9";
+}
+
+.crm-i.fa-vine {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-codepen {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-jsfiddle {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-life-bouy:before {
+  content: "\f1cd";
+}
+
+.crm-i.fa-life-buoy:before {
+  content: "\f1cd";
+}
+
+.crm-i.fa-life-saver:before {
+  content: "\f1cd";
+}
+
+.crm-i.fa-support:before {
+  content: "\f1cd";
+}
+
+.crm-i.fa-circle-o-notch:before {
+  content: "\f1ce";
+}
+
+.crm-i.fa-rebel {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-ra {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-ra:before {
+  content: "\f1d0";
+}
+
+.crm-i.fa-resistance {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-resistance:before {
+  content: "\f1d0";
+}
+
+.crm-i.fa-empire {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-ge {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-ge:before {
+  content: "\f1d1";
+}
+
+.crm-i.fa-git-square {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-git-square:before {
+  content: "\f1d2";
+}
+
+.crm-i.fa-git {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-hacker-news {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-y-combinator-square {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-y-combinator-square:before {
+  content: "\f1d4";
+}
+
+.crm-i.fa-yc-square {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-yc-square:before {
+  content: "\f1d4";
+}
+
+.crm-i.fa-tencent-weibo {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-qq {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-weixin {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-wechat {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-wechat:before {
+  content: "\f1d7";
+}
+
+.crm-i.fa-send:before {
+  content: "\f1d8";
+}
+
+.crm-i.fa-paper-plane-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-paper-plane-o:before {
+  content: "\f1d8";
+}
+
+.crm-i.fa-send-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-send-o:before {
+  content: "\f1d8";
+}
+
+.crm-i.fa-circle-thin {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-circle-thin:before {
+  content: "\f111";
+}
+
+.crm-i.fa-header:before {
+  content: "\f1dc";
+}
+
+.crm-i.fa-futbol-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-futbol-o:before {
+  content: "\f1e3";
+}
+
+.crm-i.fa-soccer-ball-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-soccer-ball-o:before {
+  content: "\f1e3";
+}
+
+.crm-i.fa-slideshare {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-twitch {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-yelp {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-newspaper-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-newspaper-o:before {
+  content: "\f1ea";
+}
+
+.crm-i.fa-paypal {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-google-wallet {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-cc-visa {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-cc-mastercard {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-cc-discover {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-cc-amex {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-cc-paypal {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-cc-stripe {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-bell-slash-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-bell-slash-o:before {
+  content: "\f1f6";
+}
+
+.crm-i.fa-trash:before {
+  content: "\f2ed";
+}
+
+.crm-i.fa-copyright {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-eyedropper:before {
+  content: "\f1fb";
+}
+
+.crm-i.fa-area-chart:before {
+  content: "\f1fe";
+}
+
+.crm-i.fa-pie-chart:before {
+  content: "\f200";
+}
+
+.crm-i.fa-line-chart:before {
+  content: "\f201";
+}
+
+.crm-i.fa-lastfm {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-lastfm-square {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-lastfm-square:before {
+  content: "\f203";
+}
+
+.crm-i.fa-ioxhost {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-angellist {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-cc {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-cc:before {
+  content: "\f20a";
+}
+
+.crm-i.fa-ils:before {
+  content: "\f20b";
+}
+
+.crm-i.fa-shekel:before {
+  content: "\f20b";
+}
+
+.crm-i.fa-sheqel:before {
+  content: "\f20b";
+}
+
+.crm-i.fa-buysellads {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-connectdevelop {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-dashcube {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-forumbee {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-leanpub {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-sellsy {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-shirtsinbulk {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-simplybuilt {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-skyatlas {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-diamond {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-diamond:before {
+  content: "\f3a5";
+}
+
+.crm-i.fa-transgender:before {
+  content: "\f224";
+}
+
+.crm-i.fa-intersex:before {
+  content: "\f224";
+}
+
+.crm-i.fa-transgender-alt:before {
+  content: "\f225";
+}
+
+.crm-i.fa-facebook-official {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-facebook-official:before {
+  content: "\f09a";
+}
+
+.crm-i.fa-pinterest-p {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-whatsapp {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-hotel:before {
+  content: "\f236";
+}
+
+.crm-i.fa-viacoin {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-medium {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-y-combinator {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-yc {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-yc:before {
+  content: "\f23b";
+}
+
+.crm-i.fa-optin-monster {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-opencart {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-expeditedssl {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-battery-4:before {
+  content: "\f240";
+}
+
+.crm-i.fa-battery:before {
+  content: "\f240";
+}
+
+.crm-i.fa-battery-3:before {
+  content: "\f241";
+}
+
+.crm-i.fa-battery-2:before {
+  content: "\f242";
+}
+
+.crm-i.fa-battery-1:before {
+  content: "\f243";
+}
+
+.crm-i.fa-battery-0:before {
+  content: "\f244";
+}
+
+.crm-i.fa-object-group {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-object-ungroup {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-sticky-note-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-sticky-note-o:before {
+  content: "\f249";
+}
+
+.crm-i.fa-cc-jcb {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-cc-diners-club {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-clone {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-hourglass-o:before {
+  content: "\f254";
+}
+
+.crm-i.fa-hourglass-1:before {
+  content: "\f251";
+}
+
+.crm-i.fa-hourglass-2:before {
+  content: "\f252";
+}
+
+.crm-i.fa-hourglass-3:before {
+  content: "\f253";
+}
+
+.crm-i.fa-hand-rock-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-hand-rock-o:before {
+  content: "\f255";
+}
+
+.crm-i.fa-hand-grab-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-hand-grab-o:before {
+  content: "\f255";
+}
+
+.crm-i.fa-hand-paper-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-hand-paper-o:before {
+  content: "\f256";
+}
+
+.crm-i.fa-hand-stop-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-hand-stop-o:before {
+  content: "\f256";
+}
+
+.crm-i.fa-hand-scissors-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-hand-scissors-o:before {
+  content: "\f257";
+}
+
+.crm-i.fa-hand-lizard-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-hand-lizard-o:before {
+  content: "\f258";
+}
+
+.crm-i.fa-hand-spock-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-hand-spock-o:before {
+  content: "\f259";
+}
+
+.crm-i.fa-hand-pointer-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-hand-pointer-o:before {
+  content: "\f25a";
+}
+
+.crm-i.fa-hand-peace-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-hand-peace-o:before {
+  content: "\f25b";
+}
+
+.crm-i.fa-registered {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-creative-commons {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-gg {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-gg-circle {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-odnoklassniki {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-odnoklassniki-square {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-odnoklassniki-square:before {
+  content: "\f264";
+}
+
+.crm-i.fa-get-pocket {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-wikipedia-w {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-safari {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-chrome {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-firefox {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-opera {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-internet-explorer {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-television:before {
+  content: "\f26c";
+}
+
+.crm-i.fa-contao {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-500px {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-amazon {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-calendar-plus-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-calendar-plus-o:before {
+  content: "\f271";
+}
+
+.crm-i.fa-calendar-minus-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-calendar-minus-o:before {
+  content: "\f272";
+}
+
+.crm-i.fa-calendar-times-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-calendar-times-o:before {
+  content: "\f273";
+}
+
+.crm-i.fa-calendar-check-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-calendar-check-o:before {
+  content: "\f274";
+}
+
+.crm-i.fa-map-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-map-o:before {
+  content: "\f279";
+}
+
+.crm-i.fa-commenting:before {
+  content: "\f4ad";
+}
+
+.crm-i.fa-commenting-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-commenting-o:before {
+  content: "\f4ad";
+}
+
+.crm-i.fa-houzz {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-vimeo {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-vimeo:before {
+  content: "\f27d";
+}
+
+.crm-i.fa-black-tie {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-fonticons {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-reddit-alien {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-edge {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-credit-card-alt:before {
+  content: "\f09d";
+}
+
+.crm-i.fa-codiepie {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-modx {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-fort-awesome {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-usb {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-product-hunt {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-mixcloud {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-scribd {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-pause-circle-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-pause-circle-o:before {
+  content: "\f28b";
+}
+
+.crm-i.fa-stop-circle-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-stop-circle-o:before {
+  content: "\f28d";
+}
+
+.crm-i.fa-bluetooth {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-bluetooth-b {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-gitlab {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-wpbeginner {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-wpforms {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-envira {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-wheelchair-alt {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-wheelchair-alt:before {
+  content: "\f368";
+}
+
+.crm-i.fa-question-circle-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-question-circle-o:before {
+  content: "\f059";
+}
+
+.crm-i.fa-volume-control-phone:before {
+  content: "\f2a0";
+}
+
+.crm-i.fa-asl-interpreting:before {
+  content: "\f2a3";
+}
+
+.crm-i.fa-deafness:before {
+  content: "\f2a4";
+}
+
+.crm-i.fa-hard-of-hearing:before {
+  content: "\f2a4";
+}
+
+.crm-i.fa-glide {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-glide-g {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-signing:before {
+  content: "\f2a7";
+}
+
+.crm-i.fa-viadeo {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-viadeo-square {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-viadeo-square:before {
+  content: "\f2aa";
+}
+
+.crm-i.fa-snapchat {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-snapchat-ghost {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-snapchat-ghost:before {
+  content: "\f2ab";
+}
+
+.crm-i.fa-snapchat-square {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-snapchat-square:before {
+  content: "\f2ad";
+}
+
+.crm-i.fa-pied-piper {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-first-order {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-yoast {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-themeisle {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-google-plus-official {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-google-plus-official:before {
+  content: "\f2b3";
+}
+
+.crm-i.fa-google-plus-circle {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-google-plus-circle:before {
+  content: "\f2b3";
+}
+
+.crm-i.fa-font-awesome {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-fa {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-fa:before {
+  content: "\f2b4";
+}
+
+.crm-i.fa-handshake-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-handshake-o:before {
+  content: "\f2b5";
+}
+
+.crm-i.fa-envelope-open-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-envelope-open-o:before {
+  content: "\f2b6";
+}
+
+.crm-i.fa-linode {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-address-book-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-address-book-o:before {
+  content: "\f2b9";
+}
+
+.crm-i.fa-vcard:before {
+  content: "\f2bb";
+}
+
+.crm-i.fa-address-card-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-address-card-o:before {
+  content: "\f2bb";
+}
+
+.crm-i.fa-vcard-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-vcard-o:before {
+  content: "\f2bb";
+}
+
+.crm-i.fa-user-circle-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-user-circle-o:before {
+  content: "\f2bd";
+}
+
+.crm-i.fa-user-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-user-o:before {
+  content: "\f007";
+}
+
+.crm-i.fa-id-badge {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-drivers-license:before {
+  content: "\f2c2";
+}
+
+.crm-i.fa-id-card-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-id-card-o:before {
+  content: "\f2c2";
+}
+
+.crm-i.fa-drivers-license-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-drivers-license-o:before {
+  content: "\f2c2";
+}
+
+.crm-i.fa-quora {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-free-code-camp {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-telegram {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-thermometer-4:before {
+  content: "\f2c7";
+}
+
+.crm-i.fa-thermometer:before {
+  content: "\f2c7";
+}
+
+.crm-i.fa-thermometer-3:before {
+  content: "\f2c8";
+}
+
+.crm-i.fa-thermometer-2:before {
+  content: "\f2c9";
+}
+
+.crm-i.fa-thermometer-1:before {
+  content: "\f2ca";
+}
+
+.crm-i.fa-thermometer-0:before {
+  content: "\f2cb";
+}
+
+.crm-i.fa-bathtub:before {
+  content: "\f2cd";
+}
+
+.crm-i.fa-s15:before {
+  content: "\f2cd";
+}
+
+.crm-i.fa-window-maximize {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-window-restore {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-times-rectangle:before {
+  content: "\f410";
+}
+
+.crm-i.fa-window-close-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-window-close-o:before {
+  content: "\f410";
+}
+
+.crm-i.fa-times-rectangle-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-times-rectangle-o:before {
+  content: "\f410";
+}
+
+.crm-i.fa-bandcamp {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-grav {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-etsy {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-imdb {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-ravelry {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-eercast {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-eercast:before {
+  content: "\f2da";
+}
+
+.crm-i.fa-snowflake-o {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+
+.crm-i.fa-snowflake-o:before {
+  content: "\f2dc";
+}
+
+.crm-i.fa-superpowers {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-wpexplorer {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
+
+.crm-i.fa-meetup {
+  font-family: 'Font Awesome 6 Brands';
+  font-weight: 400;
+}
