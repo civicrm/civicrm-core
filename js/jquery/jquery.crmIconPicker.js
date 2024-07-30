@@ -72,7 +72,7 @@
           $.each(icons, function(i, icon) {
             if (!term.length || icon.replace(/-/g, '').indexOf(term) > -1) {
               var item = $('<a href="#" title="' + icon + '"/>').button({
-                icons: {primary: icon + ' ' + $style.val()}
+                icons: {primary: 'crm-i ' + icon + ' ' + $style.val()}
               });
               $place.append(item);
             }
