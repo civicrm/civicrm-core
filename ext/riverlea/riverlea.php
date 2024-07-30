@@ -54,6 +54,14 @@ function riverlea_civicrm_alterBundle(CRM_Core_Resources_Bundle $bundle) {
       'translate' => FALSE,
     ]);
   }
+  if ($bundle->name === 'coreResources') {
+    $bundle->filter(function ($res) {
+        if (strpos($res['name'] ?? '', 'bower_components/font-awesome') !== FALSE) {
+            return FALSE;
+        }
+        return TRUE;
+    });
+  }
 }
 /**
  * Implements hook_civicrm_install().
