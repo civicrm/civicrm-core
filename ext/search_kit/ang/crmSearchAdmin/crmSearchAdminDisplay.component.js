@@ -48,6 +48,7 @@
           label: ts('Links'),
           icon: 'fa-link',
           defaults: {
+            label_hidden: false,
             links: []
           }
         },
@@ -56,6 +57,7 @@
           icon: 'fa-square-o',
           defaults: {
             size: 'btn-xs',
+            label_hidden: false,
             links: []
           }
         },
@@ -67,6 +69,7 @@
             style: 'default',
             size: 'btn-xs',
             icon: 'fa-bars',
+            label_hidden: false,
             links: []
           }
         },
@@ -336,6 +339,11 @@
               ctrl.removeCol(activeColumns.length - 1 - index);
             }
           });
+          ctrl.display.settings.columns.forEach((col, colKey) => {
+            if (!col.hasOwnProperty('label_hidden')) {
+              ctrl.display.settings.columns[colKey].label_hidden = false;
+            }
+          })
         }
       };
 
