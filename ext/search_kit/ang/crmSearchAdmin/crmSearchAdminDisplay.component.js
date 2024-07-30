@@ -340,7 +340,8 @@
             }
           });
           ctrl.display.settings.columns.forEach((col, colKey) => {
-            if (!col.hasOwnProperty('label_hidden')) {
+            let columnTypesToHide = ['buttons', 'menu', 'links'];
+            if (!col.hasOwnProperty('label_hidden') && columnTypesToHide.includes(col.type)) {
               ctrl.display.settings.columns[colKey].label_hidden = false;
             }
           })
