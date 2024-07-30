@@ -31,6 +31,7 @@
         <strong><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$contactId"}" title="{ts}View contact record{/ts}">{$displayName|escape}</a></strong>
         <div>
             <a class="action-item crm-hover-button" href="{crmURL p='civicrm/event/badge' q="reset=1&context=view&id=$participantId&cid=$contactId"}"><i class="crm-i fa-print" aria-hidden="true"></i> {ts}Print Name Badge{/ts}</a>
+            <a class="action-item crm-hover-button" href="{crmURL p='civicrm/event/participant/print' q="reset=1&context=view&id=$participantId&cid=$contactId"}"><i class="crm-i fa-print" aria-hidden="true"></i> {ts}PDF letter - print for participant{/ts}</a>
         </div>
       </td>
   </tr>
