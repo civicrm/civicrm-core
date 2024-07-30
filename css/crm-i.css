@@ -1,16 +1,19 @@
-/* Direct copy of .fa from font-awesome.css
+/* Copy of .fa rules from all/fontawesome.css
 This is separate to avoid conflict with a site theme's implementation of FA.  It
-is loaded before font-awesome.css so that .fa-XXX classes can modify it. */
+is loaded before fontawesome.css so that .fa-XXX classes can modify it. */
 .ui-icon[class*=" fa-"],
 .crm-container a.helpicon,
 .crm-container .replace-plain:before,
 .crm-i {
-  display: inline-block;
-  font: normal normal normal 14px/1 FontAwesome;
-  font-size: inherit;
-  text-rendering: auto;
+  display: var(--fa-display, inline-block);
+  font-family: var(--fa-style-family, "Font Awesome 6 Free");
+  font-weight: var(--fa-style, 900);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-style: normal;
+  font-variant: normal;
+  line-height: 1;
+  text-rendering: auto;
 }
 
 i.crm-i {
