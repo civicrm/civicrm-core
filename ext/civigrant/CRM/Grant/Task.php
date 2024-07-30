@@ -65,6 +65,14 @@ class CRM_Grant_Task extends CRM_Core_Task {
           'class' => 'CRM_Grant_Form_Task_Update',
           'result' => FALSE,
         ],
+        self::PDF_LETTER => [
+          'title' => ts('Print/merge document'),
+          'class' => 'CRM_Grant_Form_Task_PDF',
+          'result' => FALSE,
+          'key' => 'receipt',
+          'url' => 'civicrm/grant/task?reset=1&task_item=receipt',
+          'icon' => 'fa-envelope-o',
+        ],
       ];
 
       if (!CRM_Core_Permission::check('delete in CiviGrant')) {
