@@ -26,9 +26,9 @@ trait GroupSubscriptionProcessor {
    *
    * @param array $submittedData
    *
-   * @return void
+   * @return array
    */
-  protected function writeRecord($submittedData) {
+  protected function writeRecord($submittedData): array {
     // get all visible groups
     $allGroups = self::getEnabledGroups();
 
@@ -97,10 +97,8 @@ trait GroupSubscriptionProcessor {
    * @param string $groupName
    * @param string $status
    * @param string $method
-   *
-   * @return void
    */
-  private static function saveGroupStatus($contactId, $groupName, $status, $method) {
+  private static function saveGroupStatus(int $contactId, string $groupName, string $status, string $method): void {
     \Civi\Api4\GroupContact::save(FALSE)
       ->addRecord([
         'group_id.name' => $groupName,
@@ -118,10 +116,8 @@ trait GroupSubscriptionProcessor {
    * @param int $contactId
    * @param string $groupName
    * @param string $email
-   *
-   * @return void
    */
-  private static function triggerDoubleOptin($contactId, $groupName, $email) {
+  private static function triggerDoubleOptin(int $contactId, string $groupName, string $email): void {
     // FIXME: Implement this in APIv4
     $groupId = \CRM_Contact_DAO_Group::getDbVal('id', $groupName, 'name');
     civicrm_api3('MailingEventSubscribe', 'create', [
@@ -136,9 +132,9 @@ trait GroupSubscriptionProcessor {
    *
    * @param int $contactId
    *
-   * @return string
+   * @return string|null
    */
-  private static function getContactPrimaryEmail($contactId) {
+  private static function getContactPrimaryEmail(int $contactId): ?string {
     $emails = \Civi\Api4\Email::get(FALSE)
       ->addSelect('email')
       ->addWhere('contact_id', '=', $contactId)
