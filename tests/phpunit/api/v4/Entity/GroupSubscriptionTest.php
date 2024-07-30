@@ -23,6 +23,7 @@ use api\v4\Api4TestBase;
 use Civi\Api4\GroupContact;
 use Civi\Api4\GroupSubscription;
 use Civi\Api4\MailingEventSubscribe;
+use Civi\Api4\SubscriptionHistory;
 
 /**
  * @group headless
@@ -44,12 +45,14 @@ class GroupSubscriptionTest extends Api4TestBase {
     GroupSubscription::create(FALSE)
       ->addValue('contact_id', $contact['id'])
       ->addValue($groupName, TRUE)
+      ->setMethod('Web')
       ->execute();
 
     // Call again with NULL - should have no effect
     GroupSubscription::create(FALSE)
       ->addValue('contact_id', $contact['id'])
       ->addValue($groupName, NULL)
+      ->setMethod('Form')
       ->execute();
 
     // Check contact has been subscribed to group
@@ -58,10 +61,18 @@ class GroupSubscriptionTest extends Api4TestBase {
       ->execute()->first();
     $this->assertTrue($subscription[$groupName]);
 
+    // Verify subscription history
+    $history = SubscriptionHistory::get(FALSE)
+      ->addWhere('contact_id', '=', $contact['id'])
+      ->execute()->single();
+    $this->assertEquals('Web', $history['method']);
+    $this->assertEquals('Added', $history['status']);
+
     // Unsubscribe
     GroupSubscription::create(FALSE)
       ->addValue('contact_id', $contact['id'])
       ->addValue($groupName, FALSE)
+      ->setMethod('Form')
       ->execute();
 
     // Check contact has been unsubscribed
@@ -69,6 +80,13 @@ class GroupSubscriptionTest extends Api4TestBase {
       ->addWhere('contact_id', '=', $contact['id'])
       ->execute()->first();
     $this->assertFalse($subscription[$groupName]);
+
+    // Verify subscription history
+    $history = SubscriptionHistory::get(FALSE)
+      ->addWhere('contact_id', '=', $contact['id'])
+      ->addWhere('status', '=', 'Removed')
+      ->execute()->single();
+    $this->assertEquals('Form', $history['method']);
 
     // Re-subscribe
     GroupSubscription::create(FALSE)
@@ -81,6 +99,15 @@ class GroupSubscriptionTest extends Api4TestBase {
       ->addWhere('contact_id', '=', $contact['id'])
       ->execute()->first();
     $this->assertTrue($subscription[$groupName]);
+
+    // Verify subscription history
+    $history = SubscriptionHistory::get(FALSE)
+      ->addWhere('contact_id', '=', $contact['id'])
+      ->addWhere('status', '=', 'Added')
+      ->addOrderBy('id', 'DESC')
+      ->execute();
+    $this->assertEquals('API', $history[0]['method']);
+    $this->assertEquals('Added', $history[0]['status']);
   }
 
   public function testDoubleOptIn(): void {

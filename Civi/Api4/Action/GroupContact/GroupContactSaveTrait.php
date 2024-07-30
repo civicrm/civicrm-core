@@ -26,6 +26,7 @@ trait GroupContactSaveTrait {
    * String to indicate who added/removed the group.
    *
    * @var string
+   * @optionsCallback getSubscriptionHistoryMethods
    */
   protected $method = 'API';
 
@@ -45,6 +46,10 @@ trait GroupContactSaveTrait {
       $item['tracking'] = $this->tracking;
     }
     return \CRM_Contact_BAO_GroupContact::writeRecords($items);
+  }
+
+  public static function getSubscriptionHistoryMethods(): array {
+    return array_keys(\CRM_Core_SelectValues::getSubscriptionHistoryMethods());
   }
 
 }

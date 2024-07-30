@@ -3,6 +3,7 @@
 namespace Civi\Api4\Action\GroupSubscription;
 
 trait GroupSubscriptionProcessor {
+  use \Civi\Api4\Action\GroupContact\GroupContactSaveTrait;
 
   /**
    * Toggle behavior of confirming subscriptions via email.
@@ -71,7 +72,7 @@ trait GroupSubscriptionProcessor {
           $newStatus = 'Added';
         }
 
-        self::saveGroupStatus($contactId, $groupName, $newStatus);
+        self::saveGroupStatus($contactId, $groupName, $newStatus, $this->method);
 
         if ($doConfirm) {
           self::triggerDoubleOptin($contactId, $groupName, $contactPrimaryEmail);
@@ -81,7 +82,7 @@ trait GroupSubscriptionProcessor {
       elseif ($optIn === FALSE) {
         // Remove contact from group
         if ($currentStatus && $currentStatus !== 'Removed') {
-          self::saveGroupStatus($contactId, $groupName, 'Removed');
+          self::saveGroupStatus($contactId, $groupName, 'Removed', $this->method);
         }
       }
     }
@@ -95,16 +96,18 @@ trait GroupSubscriptionProcessor {
    * @param int $contactId
    * @param string $groupName
    * @param string $status
+   * @param string $method
    *
    * @return void
    */
-  private static function saveGroupStatus($contactId, $groupName, $status) {
+  private static function saveGroupStatus($contactId, $groupName, $status, $method) {
     \Civi\Api4\GroupContact::save(FALSE)
       ->addRecord([
         'group_id.name' => $groupName,
         'contact_id' => $contactId,
         'status' => $status,
       ])
+      ->setMethod($method)
       ->setMatch(['contact_id', 'group_id'])
       ->execute();
   }
