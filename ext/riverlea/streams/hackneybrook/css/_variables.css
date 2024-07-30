@@ -82,7 +82,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-c-alert-text: var(--crm-c-text);
 --crm-c-warning: var(--crm-c-amber);
 --crm-c-warning-text:var(--crm-c-text);
---crm-c-info: var(--crm-c-blue-dark);
+--crm-c-info: var(--crm-c-blue-darker);
 --crm-c-info-text: var(--crm-c-text);
 --crm-c-focus: var(--crm-c-blue-dark);
 --crm-c-inactive: #696969;
