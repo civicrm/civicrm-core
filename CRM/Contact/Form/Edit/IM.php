@@ -40,9 +40,9 @@ class CRM_Contact_Form_Edit_IM {
     $form->applyFilter('__ALL__', 'trim');
 
     //IM provider select
-    $form->addField("im[$blockId][provider_id]", ['entity' => 'im', 'class' => 'eight', 'placeholder' => NULL]);
+    $form->addField("im[$blockId][provider_id]", ['entity' => 'im', 'class' => 'eight', 'placeholder' => NULL, 'title' => ts('IM Type %1', [1 => $blockId])]);
     //Block type select
-    $form->addField("im[$blockId][location_type_id]", ['entity' => 'im', 'class' => 'eight', 'placeholder' => NULL, 'option_url' => NULL]);
+    $form->addField("im[$blockId][location_type_id]", ['entity' => 'im', 'class' => 'eight', 'placeholder' => NULL, 'option_url' => NULL, 'title' => ts('IM Location %1', [1 => $blockId])]);
 
     //IM box
     $form->addField("im[$blockId][name]", ['entity' => 'im', 'aria-label' => ts('Instant Messenger %1', [1 => $blockId])]);
