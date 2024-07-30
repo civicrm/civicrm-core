@@ -7,7 +7,7 @@
 
 :root { 
 
---crm-release: '0.9.23'; 
+--crm-release: '0.9.24'; 
 --crm-version: 'Hackney, v' var(--crm-release);
 
 /* FONTS */
