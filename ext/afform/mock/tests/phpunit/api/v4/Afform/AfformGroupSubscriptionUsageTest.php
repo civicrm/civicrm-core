@@ -75,6 +75,7 @@ EOHTML;
       ->execute()->single();
     $this->assertEquals('Form', $history['method']);
     $this->assertEquals('Added', $history['status']);
+    $this->assertEquals('127.0.0.1', $history['tracking']);
 
     // Prefill - afform will show group checkbox checked
     $prefill = Afform::prefill()
@@ -99,6 +100,7 @@ EOHTML;
       ->addWhere('contact_id.last_name', '=', $lastName)
       ->addWhere('status', '=', 'Removed')
       ->execute()->single();
+    $this->assertEquals('127.0.0.1', $history['tracking']);
     $this->assertEquals('Form', $history['method']);
   }
 

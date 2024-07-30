@@ -72,7 +72,7 @@ trait GroupSubscriptionProcessor {
           $newStatus = 'Added';
         }
 
-        self::saveGroupStatus($contactId, $groupName, $newStatus, $this->method);
+        self::saveGroupStatus($contactId, $groupName, $newStatus, $this->method, $this->tracking);
 
         if ($doConfirm) {
           self::triggerDoubleOptin($contactId, $groupName, $contactPrimaryEmail);
@@ -82,7 +82,7 @@ trait GroupSubscriptionProcessor {
       elseif ($optIn === FALSE) {
         // Remove contact from group
         if ($currentStatus && $currentStatus !== 'Removed') {
-          self::saveGroupStatus($contactId, $groupName, 'Removed', $this->method);
+          self::saveGroupStatus($contactId, $groupName, 'Removed', $this->method, $this->tracking);
         }
       }
     }
@@ -97,8 +97,9 @@ trait GroupSubscriptionProcessor {
    * @param string $groupName
    * @param string $status
    * @param string $method
+   * @param string|null $tracking
    */
-  private static function saveGroupStatus(int $contactId, string $groupName, string $status, string $method): void {
+  private static function saveGroupStatus(int $contactId, string $groupName, string $status, string $method, ?string $tracking): void {
     \Civi\Api4\GroupContact::save(FALSE)
       ->addRecord([
         'group_id.name' => $groupName,
@@ -106,6 +107,7 @@ trait GroupSubscriptionProcessor {
         'status' => $status,
       ])
       ->setMethod($method)
+      ->setTracking($tracking)
       ->setMatch(['contact_id', 'group_id'])
       ->execute();
   }
