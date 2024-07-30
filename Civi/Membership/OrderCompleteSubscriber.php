@@ -42,7 +42,7 @@ class OrderCompleteSubscriber extends AutoService implements EventSubscriberInte
     }
 
     try {
-      self::updateMembershipBasedOnCompletionOfContribution($event->contributionID, $event->dateTodayForDatesCalculations);
+      self::updateMembershipBasedOnCompletionOfContribution($event->contributionID, $event->params['effective_date'] ?? NULL);
     }
     catch (\Exception $e) {
       \Civi::log()->error('civi_membership_order_complete: Error updating membership for contributionID: ' . $event->contributionID . ': ' . $e->getMessage());
@@ -57,12 +57,14 @@ class OrderCompleteSubscriber extends AutoService implements EventSubscriberInte
    *
    * @param int $contributionID
    *   The Contribution ID that was Completed
-   * @param string $changeDate
+   * @param string|null $changeDate
    *   If provided, specify an alternative date to use as "today" calculation of membership dates
    *
+   * @return void
    * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  private static function updateMembershipBasedOnCompletionOfContribution(int $contributionID, string $changeDate) {
+  private static function updateMembershipBasedOnCompletionOfContribution(int $contributionID, ?string $changeDate) {
 
     $memberships = self::getRelatedMemberships($contributionID);
     if (empty($memberships)) {

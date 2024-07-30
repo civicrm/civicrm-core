@@ -21,6 +21,7 @@ use Civi\Api4\MembershipLog;
 use Civi\Api4\PaymentProcessor;
 use Civi\Api4\UFJoin;
 use Civi\Core\Event\PostEvent;
+use Civi\Order\Event\OrderCompleteEvent;
 
 /**
  *
@@ -3661,8 +3662,10 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
 
     if ($contributionParams['contribution_status_id'] === $completedContributionStatusID && !$disableActionsOnCompleteOrder) {
-      $dateTodayForDatesCalculations = $input['trxn_date'] ?? date('YmdHis');
-      \Civi::dispatcher()->dispatch('civi.order.complete', new \Civi\Order\Event\OrderCompleteEvent($contributionID, $dateTodayForDatesCalculations));
+      $orderCompleteEventParams = [
+        'effective_date' => $input['trxn_date'] ?? date('YmdHis'),
+      ];
+      \Civi::dispatcher()->dispatch('civi.order.complete', new OrderCompleteEvent($contributionID, $orderCompleteEventParams));
     }
 
     $participantPayments = civicrm_api3('ParticipantPayment', 'get', ['contribution_id' => $contributionID, 'return' => 'participant_id', 'sequential' => 1])['values'];
