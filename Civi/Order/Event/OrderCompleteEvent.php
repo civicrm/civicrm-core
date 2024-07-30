@@ -28,28 +28,55 @@ class OrderCompleteEvent extends GenericHookEvent {
   public int $contributionID;
 
   /**
-   * If provided, specify an alternative date to use as "today" calculation of membership dates
+   * Optional array of additional parameters that can be passed in.
+   * We needed this for the "effectiveDate" parameter because it's currently too hard to work out if it's actually needed
+   *   and would otherwise stop us from adding the OrderCompleteEvent.
+   * It should be assumed that accepted parameters may change in the future or be removed altogether.
+   * All parameters are passed through an internal function and deprecated warnings emitted if unknown parameters are passed in.
+   * Currently we ONLY support:
+   *   - effective_date: If provided, specify an alternative date to use as "today" calculation of membership dates
    *
-   * @var string
+   * @var array
    */
-  public string $dateTodayForDatesCalculations;
+  public array $params = [];
 
   /**
    * Class constructor
    *
    * @param int $contributionID
-   * @param string $dateTodayForDatesCalculations
+   * @param array $params
    */
-  public function __construct(int $contributionID, string $dateTodayForDatesCalculations) {
+  public function __construct(int $contributionID, array $params = []) {
     $this->contributionID = $contributionID;
-    $this->dateTodayForDatesCalculations = $dateTodayForDatesCalculations;
+    $this->params = $this->validateParams($params);
   }
 
   /**
    * @inheritDoc
    */
   public function getHookValues() {
-    return [$this->contributionID, $this->dateTodayForDatesCalculations];
+    return [$this->contributionID, $this->params];
+  }
+
+  /**
+   * Allow us to strictly limit (and deprecate/introduce) accepted parameters
+   *
+   * @param array $params
+   *
+   * @return array
+   */
+  private function validateParams(array $params): array {
+    $paramsWhitelist = [
+      'effective_date',
+    ];
+
+    foreach ($params as $key => $value) {
+      if (!in_array($key, $paramsWhitelist)) {
+        unset($params[$key]);
+        \CRM_Core_Error::deprecatedWarning('OrderCompleteEvent does not support param: ' . $key);
+      }
+    }
+    return $params;
   }
 
 }
