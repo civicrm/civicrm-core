@@ -563,20 +563,17 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       $numRenewTerms = $this->_params['num_terms'];
     }
 
-    //if contribution status is pending then set pay later
-    $this->_params['is_pay_later'] = FALSE;
-    if ($this->_params['contribution_status_id'] == array_search('Pending', CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label'))) {
-      $this->_params['is_pay_later'] = 1;
-    }
-
     $pending = ($this->_params['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'));
+
+    // if contribution status is pending then set pay later
+    $this->_params['is_pay_later'] = $pending;
 
     $membershipParams = [
       'id' => $this->getMembershipID(),
       'membership_type_id' => $this->_params['membership_type_id'][1],
       'modified_id' => $this->_contactID,
       'custom' => $customFieldsFormatted,
-      'membership_activity_status' => ($pending || $this->_params['is_pay_later']) ? 'Scheduled' : 'Completed',
+      'membership_activity_status' => $pending ? 'Scheduled' : 'Completed',
       // Since we are renewing, make status override false.
       'is_override' => FALSE,
     ];
