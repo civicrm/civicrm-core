@@ -131,6 +131,8 @@ class GroupSubscription extends AbstractBehavior implements EventSubscriberInter
 
     \Civi\Api4\GroupSubscription::save(FALSE)
       ->setRecords($contactSubscriptions)
+      ->setMethod('Form')
+      ->setTracking(\CRM_Utils_System::ipAddress(FALSE))
       ->setDoubleOptin($subscriptionMode === 'double-opt-in')
       ->execute();
   }

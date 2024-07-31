@@ -3,6 +3,7 @@
 namespace Civi\Api4\Action\GroupSubscription;
 
 trait GroupSubscriptionProcessor {
+  use \Civi\Api4\Action\GroupContact\GroupContactSaveTrait;
 
   /**
    * Toggle behavior of confirming subscriptions via email.
@@ -25,9 +26,9 @@ trait GroupSubscriptionProcessor {
    *
    * @param array $submittedData
    *
-   * @return void
+   * @return array
    */
-  protected function writeRecord($submittedData) {
+  protected function writeRecord($submittedData): array {
     // get all visible groups
     $allGroups = self::getEnabledGroups();
 
@@ -71,7 +72,7 @@ trait GroupSubscriptionProcessor {
           $newStatus = 'Added';
         }
 
-        self::saveGroupStatus($contactId, $groupName, $newStatus);
+        self::saveGroupStatus($contactId, $groupName, $newStatus, $this->method, $this->tracking);
 
         if ($doConfirm) {
           self::triggerDoubleOptin($contactId, $groupName, $contactPrimaryEmail);
@@ -81,7 +82,7 @@ trait GroupSubscriptionProcessor {
       elseif ($optIn === FALSE) {
         // Remove contact from group
         if ($currentStatus && $currentStatus !== 'Removed') {
-          self::saveGroupStatus($contactId, $groupName, 'Removed');
+          self::saveGroupStatus($contactId, $groupName, 'Removed', $this->method, $this->tracking);
         }
       }
     }
@@ -95,16 +96,18 @@ trait GroupSubscriptionProcessor {
    * @param int $contactId
    * @param string $groupName
    * @param string $status
-   *
-   * @return void
+   * @param string $method
+   * @param string|null $tracking
    */
-  private static function saveGroupStatus($contactId, $groupName, $status) {
+  private static function saveGroupStatus(int $contactId, string $groupName, string $status, string $method, ?string $tracking): void {
     \Civi\Api4\GroupContact::save(FALSE)
       ->addRecord([
         'group_id.name' => $groupName,
         'contact_id' => $contactId,
         'status' => $status,
       ])
+      ->setMethod($method)
+      ->setTracking($tracking)
       ->setMatch(['contact_id', 'group_id'])
       ->execute();
   }
@@ -115,10 +118,8 @@ trait GroupSubscriptionProcessor {
    * @param int $contactId
    * @param string $groupName
    * @param string $email
-   *
-   * @return void
    */
-  private static function triggerDoubleOptin($contactId, $groupName, $email) {
+  private static function triggerDoubleOptin(int $contactId, string $groupName, string $email): void {
     // FIXME: Implement this in APIv4
     $groupId = \CRM_Contact_DAO_Group::getDbVal('id', $groupName, 'name');
     civicrm_api3('MailingEventSubscribe', 'create', [
@@ -133,9 +134,9 @@ trait GroupSubscriptionProcessor {
    *
    * @param int $contactId
    *
-   * @return string
+   * @return string|null
    */
-  private static function getContactPrimaryEmail($contactId) {
+  private static function getContactPrimaryEmail(int $contactId): ?string {
     $emails = \Civi\Api4\Email::get(FALSE)
       ->addSelect('email')
       ->addWhere('contact_id', '=', $contactId)

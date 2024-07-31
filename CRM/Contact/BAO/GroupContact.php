@@ -64,6 +64,8 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact implemen
             'group_id' => $event->object->group_id,
             'contact_id' => $event->object->contact_id,
             'status' => $event->object->status,
+            'method' => $event->params['method'] ?? 'API',
+            'tracking' => $event->params['tracking'] ?? NULL,
           ],
         ])->execute();
       }

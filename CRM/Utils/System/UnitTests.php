@@ -213,4 +213,9 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Base {
     return (bool) $enableWorkflow;
   }
 
+  public function ipAddress(): ?string {
+    // Placeholder address for unit testing
+    return '127.0.0.1';
+  }
+
 }
