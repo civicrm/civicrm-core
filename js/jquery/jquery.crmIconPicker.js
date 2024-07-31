@@ -80,14 +80,7 @@
         }
 
         function displayDialog() {
-          dialog.append('<style type="text/css">' +
-            '#crmIconPicker {font-size: 20px;}' +
-            '#crmIconPicker .icon-ctrls input::placeholder {font-family: FontAwesome; padding-left: .5em; margin-bottom: 1em;}' +
-            '#crmIconPicker .icon-ctrls > * {display: inline-block; vertical-align: top; margin-right: 1em;}' +
-            '#crmIconPicker .icon-ctrls > button {float: right; margin-right: 0;}' +
-            '#crmIconPicker a.ui-button {width: 1em; height: 1em; color: #222;}' +
-            '#crmIconPicker a.ui-button .ui-icon {margin-top: -0.5em; width: auto; height: auto;}' +
-            '</style>' +
+          dialog.append(
             '<div class="icon-ctrls crm-clearfix">' +
             '<input class="crm-form-text" name="search" placeholder="&#xf002"/>' +
             '<select class="crm-form-select"></select>' +
