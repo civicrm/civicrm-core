@@ -44,7 +44,7 @@
         var split = val.split(' ');
         $button.button('option', {
           label: split[0] || ts('None'),
-          icons: {primary: val ? val : 'fa-'}
+          icons: {primary: val ? val + ' crm-i' : 'fa-'}
         });
         $style.toggle(!!split[0]).val(split[1] || '');
       }
