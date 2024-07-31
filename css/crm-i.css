@@ -6,7 +6,7 @@ is loaded before fontawesome.css so that .fa-XXX classes can modify it. */
 .crm-container .replace-plain:before,
 .crm-i {
   display: var(--fa-display, inline-block);
-  font-family: var(--fa-style-family, "Font Awesome 6 Free");
+  font-family: var(--fa-style-family, "Font Awesome 6 Free", "Font Awesome 6 Brands");
   font-weight: var(--fa-style, 900);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
