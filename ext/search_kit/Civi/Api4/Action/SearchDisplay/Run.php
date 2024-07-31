@@ -83,8 +83,12 @@ class Run extends AbstractRunAction {
         $tally = [];
         foreach ($settings['columns'] as $col) {
           if (!empty($col['tally']['fn']) && !empty($col['key'])) {
-            $alias = str_replace('.', '_', $col['key']);
-            $tally[$col['key']] = $dao->$alias ?? NULL;
+            $key = $col['key'];
+            $alias = str_replace('.', '_', $key);
+            // Format value according to data type of function/field
+            $sqlFnClass = '\Civi\Api4\Query\SqlFunction' . $col['tally']['fn'];
+            $dataType = $sqlFnClass::getDataType() ?? $this->getSelectExpression($key)['dataType'] ?? NULL;
+            $tally[$key] = $this->formatViewValue($key, $dao->$alias ?? NULL, $tally, $dataType);
           }
         }
         $result[] = $tally;
