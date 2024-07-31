@@ -283,11 +283,11 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
       $this->fail('should not be reachable');
     }
     catch (\CRM_Core_Exception $e) {
-      $this->assertEquals('civiExit called', $e->getMessage());
+      $this->assertEquals('Outbound mail has been disabled', substr($e->getMessage(), 0, 31));
       $statuses = CRM_Core_Session::singleton()->getStatus();
       $hasExpectedMessage = FALSE;
       foreach ($statuses as $status) {
-        if (str_contains($status['text'], 'Outbound mail has been disabled')) {
+        if (str_contains($status['text'], 'Outbound emails have been disabled')) {
           $hasExpectedMessage = TRUE;
           break;
         }
