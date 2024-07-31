@@ -29,6 +29,8 @@ class CRM_Upgrade_Incremental_php_FiveSeventySeven extends CRM_Upgrade_Increment
    */
   public function upgrade_5_77_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Alter Queue.name length', 'alterColumn', 'civicrm_queue', 'name', "varchar(128)  NOT NULL COMMENT 'Name of the queue'", FALSE);
+    $this->addTask('Alter QueueItem.queue_name length', 'alterColumn', 'civicrm_queue_item', 'queue_name', "varchar(128) NOT NULL COMMENT 'Name of the queue which includes this item'", FALSE);
   }
 
 }
