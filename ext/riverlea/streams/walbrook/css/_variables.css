@@ -68,7 +68,7 @@ color-scheme: light dark;
 --crm-c-background2: var(--crm-c-gray-050);
 --crm-c-background3: var(--crm-c-gray-100);
 --crm-c-background4: var(--crm-c-gray-200);
---crm-c-background5: var(--crm-c-gray-500);
+--crm-c-background5: var(--crm-c-gray-700);
 --crm-c-drag-background: var(--crm-c-background3);
 --crm-c-code-background: var(--crm-c-background3);
 --crm-c-primary: var(--crm-c-blue); 
