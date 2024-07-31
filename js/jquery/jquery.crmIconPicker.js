@@ -11,9 +11,14 @@
         loaded = $.Deferred();
         CRM.$.get(CRM.config.resourceBase + 'bower_components/font-awesome/css/all.css').done(function(data) {
           var match,
-            regex = /\.(fa-[-a-zA-Z0-9]+):{1,2}before {/g;
+            prev,
+            regex = /\.(fa-[-a-zA-Z0-9]+):+before\s*\{\s*content:\s*"([^"]+)"/g;
           while((match = regex.exec(data)) !== null) {
-            icons.push(match[1]);
+            // Eliminate duplicates if icon is same as previous class
+            if (match[2] !== prev) {
+              icons.push(match[1]);
+            }
+            prev = match[2];
           }
           loaded.resolve();
         });
