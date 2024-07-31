@@ -783,14 +783,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         !$event->allow_same_participant_emails
         && !empty($contactId)
         && !empty($eventId)
-        && CRM_Event_BAO_Participant::exists(
+        && CRM_Event_BAO_Participant::existsCounted(
           $contactId,
-          $eventId,
-          FALSE,
-          TRUE,
-          ['Cancelled'],
-          [],
-          TRUE
+          $eventId
         )
       ) {
         $errorMsg['event_id'] = ts('This contact has already been assigned to this event.');

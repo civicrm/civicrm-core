@@ -116,14 +116,9 @@ class CRM_Event_Form_Task_Register extends CRM_Event_Form_Participant {
       foreach ($this->_contactIds as $k => $dupeCheckContactId) {
         // Eliminate contacts that have already been assigned to this event.
         if (
-          CRM_Event_BAO_Participant::exists(
+          CRM_Event_BAO_Participant::existsCounted(
             $dupeCheckContactId,
-            $event_id,
-            FALSE,
-            TRUE,
-            [],
-            [],
-            TRUE
+            $event_id
           )
         ) {
           $duplicateContacts++;

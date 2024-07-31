@@ -839,12 +839,6 @@ WHERE  civicrm_participant.id = {$participantId}
    *   The contact ID of participants to find.
    * @param int $eventId
    *   The event ID of participants to find.
-   * @param bool $onlyCounted
-   *   Whether to only consider registrations with a status with "is_counted".
-   * @param bool $includeOnWaitlist
-   *   Whether to consider registrations with status "On waitlist" when restricing to "is_counted".
-   * @param array $excludeStatus
-   *   A list of registration status to not consider (e.g. for ignoring cancelled registrations).
    * @param array $filterRoleIds
    *   A list of participant role IDs to filter for. Registrations with other roles will not be considered.
    * @param bool $includeTest
@@ -855,35 +849,18 @@ WHERE  civicrm_participant.id = {$participantId}
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public static function findExistingParticipants(
+  public static function findCountedParticipants(
     int $contactId,
     int $eventId,
-    bool $onlyCounted = TRUE,
-    bool $includeOnWaitlist = TRUE,
-    array $excludeStatus = ['Cancelled'],
     array $filterRoleIds = [],
     bool $includeTest = FALSE
   ) {
     $query = \Civi\Api4\Participant::get(FALSE)
       ->addSelect('id', 'status_id:name')
       ->addWhere('contact_id', '=', $contactId)
-      ->addWhere('event_id', '=', $eventId);
-
-    if ($onlyCounted) {
-      $query
-        ->addJoin('ParticipantStatusType AS participant_status_type', 'LEFT');
-      $clauses = [
-        ['participant_status_type.is_counted', '=', TRUE],
-      ];
-      if ($includeOnWaitlist) {
-        $clauses = ['participant_status_type.name', '=', 'On waitlist'];
-      }
-      $query->addClause('OR', $clauses);
-    }
-
-    if ([] !== $excludeStatus) {
-      $query->addWhere('status_id:name', 'NOT IN', $excludeStatus);
-    }
+      ->addWhere('event_id', '=', $eventId)
+      ->addJoin('ParticipantStatusType AS participant_status_type', 'INNER')
+      ->addWhere('participant_status_type.is_counted', '=', TRUE);
 
     if ([] !== $filterRoleIds) {
       $query->addWhere('role_id', 'IN', $filterRoleIds);
@@ -905,14 +882,6 @@ WHERE  civicrm_participant.id = {$participantId}
    *    The contact ID of participants to find.
    * @param int $eventId
    *    The event ID of participants to find.
-   * @param bool $onlyCounted
-   *    Whether to only consider registrations with a status with "is_counted".
-   * @param bool $includeOnWaitlist
-   *    Whether to consider registrations with status "On waitlist" when restricing to "is_counted".
-   * @param array $excludeStatus
-   *    A list of registration status to not consider (e.g. for ignoring cancelled registrations).
-   * @param array $filterRoleIds
-   *    A list of participant role IDs to filter for. Registrations with other roles will not be considered.
    * @param bool $includeTest
    *    Whether to include test participants.
    *
@@ -920,23 +889,16 @@ WHERE  civicrm_participant.id = {$participantId}
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public static function exists(
+  public static function existsCounted(
     int $contactId,
     int $eventId,
-    bool $onlyCounted = TRUE,
-    bool $includeOnWaitlist = TRUE,
-    array $excludeStatus = ['Cancelled'],
-    array $filterRoleIds = [],
     bool $includeTest = FALSE
   ) {
     return count(
-        self::findExistingParticipants(
+        self::findCountedParticipants(
           $contactId,
           $eventId,
-          $onlyCounted,
-          $includeOnWaitlist,
-          $excludeStatus,
-          $filterRoleIds,
+          [],
           $includeTest
         )
       ) > 0;

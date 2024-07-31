@@ -954,12 +954,9 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
     if (
       $contactID
-      && count($existingParticipants = CRM_Event_BAO_Participant::findExistingParticipants(
+      && count($existingParticipants = CRM_Event_BAO_Participant::findCountedParticipants(
         $contactID,
         $form->_values['event']['id'],
-        TRUE,
-        TRUE,
-        [],
         [
           is_numeric($fields['participant_role'] ?? NULL)
             ? $fields['participant_role']
