@@ -4090,3 +4090,34 @@ INSERT INTO civicrm_state_province (country_id, abbreviation, name) VALUES
 (1016, "14", "Al Janūbīyah"),
 (1016, "16", "Al Wusţá"),
 (1016, "17", "Ash Shamālīyah");
+
+-- Add missing provinces for Moldova
+(NULL, 1142, 'AN', 'Anenii Noi'),
+(NULL, 1142, 'BS', 'Basarabeasca'),
+(NULL, 1142, 'BR', 'Briceni'),
+(NULL, 1142, 'CT', 'Cantemir'),
+(NULL, 1142, 'CL', 'Călărași'),
+(NULL, 1142, 'CS', 'Căușeni'),
+(NULL, 1142, 'CM', 'Cimislia'),
+(NULL, 1142, 'CR', 'Criuleni'),
+(NULL, 1142, 'DO', 'Dondușeni'),
+(NULL, 1142, 'DR', 'Drochia'),
+(NULL, 1142, 'DU', 'Dubăsari'),
+(NULL, 1142, 'FA', 'Fălești'),
+(NULL, 1142, 'FL', 'Florești'),
+(NULL, 1142, 'GL', 'Glodeni'),
+(NULL, 1142, 'HI', 'Hîncești'),
+(NULL, 1142, 'IA', 'Ialoveni'),
+(NULL, 1142, 'LE', 'Leova'),
+(NULL, 1142, 'NI', 'Nisporeni'),
+(NULL, 1142, 'OC', 'Ocnița'),
+(NULL, 1142, 'RE', 'Rezina'),
+(NULL, 1142, 'RI', 'Rîșcani'),
+(NULL, 1142, 'SI', 'Sîngerei'),
+(NULL, 1142, 'ST', 'Strășeni'),
+(NULL, 1142, 'SD', 'Șoldănești'),
+(NULL, 1142, 'SV', 'Ștefan Vodă'),
+(NULL, 1142, 'TE', 'Telenești'),
+
+-- end of statement:
+;
