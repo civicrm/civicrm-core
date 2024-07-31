@@ -3700,11 +3700,16 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
 
     if (self::isEmailReceipt($input, $contributionID, $recurringContributionID)) {
-      civicrm_api3('Contribution', 'sendconfirmation', [
-        'id' => $contributionID,
-        'payment_processor_id' => $paymentProcessorId,
-      ]);
-      \Civi::log()->info("Contribution {$contributionParams['id']} Receipt sent");
+      try {
+        civicrm_api3('Contribution', 'sendconfirmation', [
+          'id' => $contributionID,
+          'payment_processor_id' => $paymentProcessorId,
+        ]);
+        \Civi::log()->info("Contribution {$contributionParams['id']} Receipt sent");
+      }
+      catch (Exception $e) {
+        \Civi::log()->warning("Contribution {$contributionParams['id']} Failed to send receipt: " . $e->getMessage());
+      }
     }
 
     return $contributionResult;
