@@ -18,7 +18,7 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
   /**
    * Minimum size of MySQL's thread_stack option
    *
-   * @see install/index.php MINIMUM_THREAD_STACK
+   * @see CRM_Upgrade_Form::MINIMUM_THREAD_STACK
    */
   const MINIMUM_THREAD_STACK = 192;
 
