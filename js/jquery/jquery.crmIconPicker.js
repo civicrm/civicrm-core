@@ -2,21 +2,35 @@
 (function($, _) {
   "use strict";
   /* jshint validthis: true */
-  var icons = [], loaded;
+  const icons = [];
+  const aliases = {};
+  let loaded;
 
   $.fn.crmIconPicker = function() {
 
     function loadIcons() {
       if (!loaded) {
         loaded = $.Deferred();
-        CRM.$.get(CRM.config.resourceBase + 'bower_components/font-awesome/css/all.css').done(function(data) {
-          var match,
-            prev,
-            regex = /\.(fa-[-a-zA-Z0-9]+):+before\s*\{\s*content:\s*"([^"]+)"/g;
+        // Load iconPicker stylesheet
+        let stylesheet = document.createElement('link');
+        stylesheet.rel = 'stylesheet';
+        stylesheet.type = 'text/css';
+        stylesheet.href = CRM.config.resourceBase + 'css/crm-iconPicker.css';
+        document.head.appendChild(stylesheet);
+        // Load icons
+        $.get(CRM.config.resourceBase + 'bower_components/font-awesome/css/all.css').done(function(data) {
+          let match;
+          let prev;
+          let last;
+          const regex = /\.(fa-[-a-zA-Z0-9]+):+before\s*\{\s*content:\s*"([^"]+)"/g;
           while((match = regex.exec(data)) !== null) {
-            // Eliminate duplicates if icon is same as previous class
+            // If icon is same as previous class, it's an alias
             if (match[2] !== prev) {
               icons.push(match[1]);
+              last = match[1];
+            } else if (last) {
+              aliases[last] = aliases[last] || [];
+              aliases[last].push(match[1].replace(/-/g, ''));
             }
             prev = match[2];
           }
@@ -31,7 +45,7 @@
         return;
       }
 
-      var $input = $(this),
+      let $input = $(this),
         classes = ($input.attr('class') || '').replace('crm-icon-picker', ''),
         $button = $('<a class="crm-icon-picker-button" href="#" />').button().removeClass('ui-corner-all').attr('title', $input.attr('title')),
         $style = $('<select class="crm-form-select"></select>').addClass(classes),
@@ -44,9 +58,9 @@
         ];
 
       function formatButton() {
-        var val = $input.val().replace('fa ', '');
+        let val = $input.val().replace('fa ', '');
         val = val.replace('crm-i ', '');
-        var split = val.split(' ');
+        const split = val.split(' ');
         $button.button('option', {
           label: split[0] || ts('None'),
           icons: {primary: val ? val + ' crm-i' : 'fa-'}
@@ -62,21 +76,32 @@
 
       $style.change(function() {
         if ($input.val()) {
-          var split = $input.val().split(' '),
+          const split = $input.val().split(' '),
             style = $style.val();
           $input.val(split[0] + (style ? ' ' + style : '')).change();
         }
       });
 
       $button.click(function(e) {
-        var dialog;
+        let dialog;
 
         function displayIcons() {
-          var term = $('input[name=search]', dialog).val().replace(/-/g, '').toLowerCase(),
-            $place = $('div.icons', dialog).html('');
+          const term = $('input[name=search]', dialog).val().replace(/-/g, '').toLowerCase();
+          const $place = $('div.icons', dialog).html('');
+          let matches = [];
+          if (term.length) {
+            // Match icon classes
+            matches = icons.filter((i) => (i.replace(/-/g, '').indexOf(term) > -1));
+            // Match icon aliases
+            for (let [icon, iconAliases] of Object.entries(aliases)) {
+              if (iconAliases.filter((i) => (i.replace(/-/g, '').indexOf(term) > -1)).length) {
+                matches.push(icon);
+              }
+            }
+          }
           $.each(icons, function(i, icon) {
-            if (!term.length || icon.replace(/-/g, '').indexOf(term) > -1) {
-              var item = $('<a href="#" title="' + icon + '"/>').button({
+            if (!term.length || matches.indexOf(icon) > -1) {
+              const item = $('<a href="#" title="' + icon + '"/>').button({
                 icons: {primary: 'crm-i ' + icon + ' ' + $style.val()}
               });
               $place.append(item);
@@ -94,7 +119,7 @@
             '</div>' +
             '<div class="icons"></div>'
           );
-          var $styleSelect = $('.icon-ctrls select', dialog);
+          let $styleSelect = $('.icon-ctrls select', dialog);
           CRM.utils.setOptions($styleSelect, options, ts('Normal'));
           $styleSelect.val($style.val());
           $styleSelect.change(function() {
@@ -107,7 +132,7 @@
         }
 
         function pickIcon(e) {
-          var newIcon = $(this).attr('title'),
+          const newIcon = $(this).attr('title'),
             style = newIcon ? $style.val() : '';
           $input.val(newIcon + (style ? ' ' + style : '')).change();
           dialog.dialog('close');
