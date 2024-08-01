@@ -42,9 +42,6 @@
     {/if}
   {/if}
   <div class="crm-block crm-form-block crm-member-membershiprenew-form-block">
-    <div id="help" class="description">
-      {ts}Renewing will add the normal membership period to the End Date of the previous period for members whose status is Current or Grace. For Expired memberships, renewing will create a membership period commencing from the 'Date Renewal Entered'. This date can be adjusted including being set to the day after the previous End Date - if continuous membership is required.{/ts}
-    </div>
     <div>{include file="CRM/common/formButtons.tpl" location="top"}</div>
     <table class="form-layout">
       <tr class="crm-member-membershiprenew-form-block-contact-id">
@@ -76,11 +73,9 @@
       </tr>
       <tr class="crm-member-membershiprenew-form-block-renewal_date">
         <td class="label">{$form.renewal_date.label}</td>
-        <td>{$form.renewal_date.html}
-          <div id="defaultNumTerms" class="crm-member-membershiprenew-form-block-default-num_terms description">
-            {ts}Renewal extends Membership Expiration Date by one membership period{/ts}
-            &nbsp;<a id="changeTermsLink" href='#' onclick='changeNumTerms(); return false;'>{ts}change{/ts}</a>
-          </div>
+        <td>{$form.renewal_date.html}<br/>
+          <span class="description">{ts}Renewing will add the normal membership period to the End Date of the previous period for members whose status is Current or Grace and 'Date Renewal Entered' will have no effect.
+<br/>For Expired memberships, renewing will create a membership period commencing from the 'Date Renewal Entered' - if no date is set it will renew from the previous End Date.{/ts}</span>
         </td>
       </tr>
       <tr id="changeNumTerms" class="crm-member-membershiprenew-form-block-change-num_terms">
@@ -172,7 +167,6 @@
   <script type="text/javascript">
     CRM.$(function($) {
       $('#membershipOrgType').hide();
-      $('#changeNumTerms').hide();
     });
 
     function checkPayment() {
@@ -193,11 +187,6 @@
     function adjustMembershipOrgType() {
       cj('#membershipOrgType').show();
       cj('#changeMembershipOrgType').hide();
-    }
-
-    function changeNumTerms() {
-      cj('#changeNumTerms').show();
-      cj('#defaultNumTerms').hide();
     }
 
     CRM.$(function($) {
