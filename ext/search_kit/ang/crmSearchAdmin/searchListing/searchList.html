@@ -75,7 +75,7 @@
         {{:: ts('Import') }}
       </a>
     </div>
-    <crm-search-admin-search-listing filters="tab.filters" tab-count="tab.rowCount"></crm-search-admin-search-listing>
+    <crm-search-admin-search-listing filters="tab.filters" tab-count="tab.rowCount" tab-id="$index"></crm-search-admin-search-listing>
   </div>
   <div ng-show="$ctrl.tab === 'segment'">
     <crm-search-admin-segment-listing total-count="$ctrl.searchSegmentCount"></crm-search-admin-segment-listing>
