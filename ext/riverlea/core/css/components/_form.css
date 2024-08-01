@@ -50,10 +50,6 @@
     font-family: inherit;
     font-weight: inherit;
 }
-.crm-container .advanced-search-fields {
-    column-gap: var(--crm-r);
-    row-gap: var(--crm-s);
-}
 .crm-container .form-layout label,
 .crm-container .form-layout-compressed label, 
 .crm-container .form-item label, 
@@ -621,14 +617,6 @@ input.crm-form-checkbox) + label {
 	font-weight: 400;
 	cursor: pointer;
 }
-/* #bootstrap-theme .radio input[type="radio"], 
-#bootstrap-theme .radio-inline input[type="radio"], 
-#bootstrap-theme .checkbox input[type="checkbox"], 
-#bootstrap-theme .checkbox-inline input[type="checkbox"] {
-	/* position: absolute;
-	margin-top: 4px; */
-	/* margin-left: -20px; */
-} */
 #bootstrap-theme .radio + .radio, #bootstrap-theme .checkbox + .checkbox {
 	margin-top: -5px;
 }
@@ -651,15 +639,4 @@ fieldset[disabled] #bootstrap-theme .checkbox-inline {
 #bootstrap-theme .checkbox-inline + .checkbox-inline {
 	margin-top: 0;
 	margin-left: var(--crm-m);
-}
-
-/* Nav search box 
-
-#crm-qsearch-input::placeholder {
-    font-family: var(--crm-font) !important;
-    overflow: hidden  !important;
-    text-indent: -10px !important;
-}
-#crm-qsearch-input::placeholder::first-letter {
-    font: normal normal normal 14px/1 FontAwesome !important;
 }

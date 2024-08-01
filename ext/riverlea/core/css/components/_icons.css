@@ -1,17 +1,3 @@
-.crm-container .ui-icon[class*=" fa-"],
-.crm-container a.helpicon,
-.crm-container .replace-plain::before,
-.crm-container .crm-i {
-    display: inline-block;
-    /* font: normal normal normal 14px/1 FontAwesome; */
-    font-size: inherit;
-    text-rendering: auto;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
-.crm-container .ui-icon[class*=" fa-"] {
-    margin: 0;
-}
 .crm-container .messages .crm-i {
     padding: var(--crm-s) var(--crm-m) var(--crm-s) 0;
     float: left;
@@ -27,6 +13,9 @@
 .crm-container .select2-container[class*=" fa-"]::before,
 .crm-container .messages.crm-empty-table > img /* removes inform.gif icon */ {
     display: none;
+}
+input#crm-qsearch-input::placeholder {
+    font-family: sans-serif, 'FontAwesome'; /* Fix for type in placeholders */
 }
 
 /* Notification icons */

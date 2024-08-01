@@ -4,7 +4,10 @@
     Riverlea version: 0.9;
 */
 
+
 :root { 
+
+--crm-version: 'Unnamed stream, v' var(--crm-release);
 
 /* FONTS */
 --crm-system-fonts:;
@@ -16,7 +19,7 @@
 --crm-font-bold-italic:;
     
 /* COLOUR */
-color-scheme: light dark;
+color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Safari)
 
 /* COLOUR NAMES */
 --crm-c-darkest: #0a0a0a;
@@ -65,7 +68,7 @@ color-scheme: light dark;
 --crm-c-background4: var(--crm-c-gray-200);
 --crm-c-background5: var(--crm-c-gray-700);
 --crm-c-drag-background: var(--crm-c-background3);
---crm-c-code-background: var(--crm-c-background3);
+--crm-c-code-background: var(--crm-c-background2);
 --crm-c-primary: var(--crm-c-gray-700); 
 --crm-c-primary-hover: var(--crm-c-gray-800); 
 --crm-c-primary-text: var(--crm-c-light-text);
@@ -322,8 +325,7 @@ color-scheme: light dark;
 --crm-dash-image-size: 100px;
 --crm-dash-image-radius: 200px;
 --crm-dash-image-justify: space-between; /* choose from start (left), end (right), center, and space-between (spread out) */
---crm-dash-image-direction: row-reverse; /* choose from row and row-reverse to get the image on the right, column stacks it */
-
+--crm-dash-image-direction: row; /* choose from row and row-reverse to get the image on the right, column stacks it */
 
 /* Dialog */
 --crm-dialog-bg: var(--crm-c-page-background);
@@ -490,4 +492,3 @@ color-scheme: light dark;
     --crm-form-block-background: var(--crm-c-background2);
     }
 }
-    

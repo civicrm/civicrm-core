@@ -189,7 +189,7 @@ div.crm-inline-edit-form div.crm-clear {
     width: 100%;
 }
 .crm-container div.contact_panel td.grouplabel {
-    border-bottom: 2px solid #d7d7d0 !important;
+    border-bottom: 2px solid var(--crm-c-divider);
 }
 .crm-container div.contact_panel .crm-address-block {
     margin-bottom: 6px;
@@ -258,7 +258,7 @@ div.crm-inline-edit-form div.crm-clear {
     margin-bottom: .25em;
 }
 
-/* Responsive layout changes - IS THIS STILL BEING CALLED ANYWHERE? 
+/* Responsive layout changes - Possibly Deprecated
   
 .crm-container .contact_basic_information-section.narrowform table.form-layout-compressed,
 .crm-container .contact_basic_information-section.narrowform table.form-layout-compressed tbody,
@@ -345,9 +345,6 @@ div.crm-inline-edit-form div.crm-clear {
     padding: 0 var(--crm-s);
     background-color: var(--crm-c-background2);
 }
-
-/* 2024 Additions */
-
 #crm-main-content-wrapper:has(.crm-contact-page) {
     box-shadow: var(--crm-block-shadow);
 }

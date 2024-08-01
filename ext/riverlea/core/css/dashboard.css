@@ -59,7 +59,7 @@ crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
     height: calc(100% - 1em);
 }
 .crm-container .crm-dashlet-content {
-    background: var(--crm-dashlet-bg) !important /*vs dashboard.css*/;
+    background: var(--crm-dashlet-bg);
     padding: var(--crm-dashlet-content-padding);
     overflow: auto;
 }

@@ -65,12 +65,14 @@
 .crm-container.ui-dialog .ui-dialog-titlebar .ui-button-icon.ui-icon[class*=" fa-"] {
     font-size: var(--crm-r1);
     height: 2ch;
-    background-image: none;
     color: var(--crm-dialog-header-col);
+    opacity: 0.8;
+    width: auto;
 }
 .crm-container.ui-dialog .ui-dialog-titlebar .ui-button-icon.ui-icon[class*=" fa-"]:hover,
 .crm-container.ui-dialog .ui-dialog-titlebar .ui-button-icon.ui-icon[class*=" fa-"]:focus {
-    color: var(--crm-c-link);
+    color: var(--crm-dialog-header-col);
+    opacity: 1;
 }
 
 /* Body */
