@@ -212,7 +212,7 @@
         "ignore": ["fonts", "test", "tasks", "lib"]
       },
       "font-awesome": {
-        "url": "https://github.com/FortAwesome/Font-Awesome/archive/v4.7.0.zip",
+        "url": "https://github.com/FortAwesome/Font-Awesome/releases/download/6.6.0/fontawesome-free-6.6.0-web.zip",
         "ignore": ["*/.*", "*.json", "src", "*.yml", "Gemfile", "Gemfile.lock", "*.md"]
       },
       "marked": {
