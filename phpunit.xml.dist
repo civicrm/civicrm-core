@@ -13,6 +13,7 @@
          beStrictAboutTestsThatDoNotTestAnything="false"
          bootstrap="tests/phpunit/CiviTest/bootstrap.php"
          cacheResult="false"
+         printerClass="clagiordano\PhpunitResultPrinter\ResultPrinter"
          xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
   <testsuites>
     <testsuite name="api_v3_AllTests">

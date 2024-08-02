@@ -26,7 +26,9 @@ switch ($phpunitCmd) {
     $argFilters[] = function ($argv) {
       $pos = array_search('--tap', $argv);
       if ($pos !== FALSE) {
-        array_splice($argv, $pos, 1, ['--printer', '\Civi\Test\TAP']);
+        // @todo - remove this - we don't need a forked printer - we can use
+        // a library - see https://lab.civicrm.org/dev/core/-/issues/5351
+        array_splice($argv, $pos, 1, ['--printer', 'clagiordano\PhpunitResultPrinter\ResultPrinter']);
       }
       return $argv;
     };

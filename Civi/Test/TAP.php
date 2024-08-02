@@ -12,6 +12,7 @@
 
 namespace Civi\Test;
 
+// @deprecated - see https://lab.civicrm.org/dev/core/-/issues/5351
 if (version_compare(\PHPUnit\Runner\Version::id(), '7.0.0', '<')) {
   class_alias('Civi\Test\TAPLegacy', 'Civi\Test\TAP');
 }
