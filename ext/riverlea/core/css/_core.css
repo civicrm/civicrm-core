@@ -3,8 +3,6 @@
    css as possible. For dev purposes each components is its own file, these
    can be merged later. */
 
-:root {--crm-release: '0.9.26';}
-
 @import url(components/_accordion.css);
 @import url(components/_alerts.css);
 @import url(components/_buttons.css);
@@ -18,3 +16,5 @@
 @import url(components/_page.css);
 @import url(components/_components.css);
 @import url(components/_front.css);
+
+:root {--crm-release: '0.9.26';}
