@@ -6,7 +6,7 @@ is loaded before font-awesome.css so that .fa-XXX classes can modify it. */
 .crm-container .replace-plain::before,
 .crm-container .crm-i {
     display: var(--fa-display, inline-block);
-    font-family: var(--fa-style-family, "Font Awesome 6 Free", "Font Awesome 6 Brands");
+    font-family: var(--fa-style-family, "Font Awesome 6 Free", "Font Awesome 6 Brands", "FontAwesome"); /* FA6 works from Civi 5.77+ */
     font-weight: var(--fa-style, 900);
     font-size: inherit;
     font-style: normal;
