@@ -68,7 +68,7 @@ function riverlea_civicrm_alterBundle(CRM_Core_Resources_Bundle $bundle) {
   }
   if ($bundle->name === 'bootstrap3') {
     $bundle->clear();
-    $bundle->addStyleFile('riverlea', 'css/bootstrap3.css');
+    $bundle->addStyleFile('riverlea', 'core/css/_bootstrap.css');
     $bundle->addScriptFile('riverlea', 'js/bootstrap.min.js', [
       'translate' => FALSE,
     ]);
