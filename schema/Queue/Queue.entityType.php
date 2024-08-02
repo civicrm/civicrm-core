@@ -31,7 +31,7 @@ return [
     ],
     'name' => [
       'title' => ts('Name'),
-      'sql_type' => 'varchar(64)',
+      'sql_type' => 'varchar(128)',
       'input_type' => 'Text',
       'required' => TRUE,
       'description' => ts('Name of the queue'),

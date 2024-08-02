@@ -183,7 +183,7 @@ class StandaloneRouter {
       // The base URL for loading resource files (images/javascripts) for this project. Includes trailing slash.
       'res'              => $coreUrl . '/setup/res/',
       'jquery.js'        => $coreUrl . '/bower_components/jquery/dist/jquery.min.js',
-      'font-awesome.css' => $coreUrl . '/bower_components/font-awesome/css/font-awesome.min.css',
+      'font-awesome.css' => $coreUrl . '/bower_components/font-awesome/css/all.min.css',
     ]);
     \Civi\Setup\BasicRunner::run($ctrl);
     exit();

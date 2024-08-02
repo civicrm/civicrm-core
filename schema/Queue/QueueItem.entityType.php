@@ -30,7 +30,7 @@ return [
     ],
     'queue_name' => [
       'title' => ts('Queue Name'),
-      'sql_type' => 'varchar(64)',
+      'sql_type' => 'varchar(128)',
       'input_type' => 'Text',
       'required' => TRUE,
       'description' => ts('Name of the queue which includes this item'),
