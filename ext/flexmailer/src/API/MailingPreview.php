@@ -52,6 +52,7 @@ class MailingPreview {
     };
     $job->mailing_id = $mailing->id ?: NULL;
     $job->status = 'Complete';
+    $job->find(TRUE);
 
     $flexMailer = new FlexMailer([
       'is_preview' => TRUE,
