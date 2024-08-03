@@ -1208,7 +1208,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     if (CRM_Core_Session::singleton()
       ->get('userID') == $contactID || CRM_Core_Permission::checkAnyPerm(['cms:administer users'])
     ) {
-      return CRM_Core_Config::singleton()->userFrameworkBaseURL . "wp-admin/user-edit.php?user_id=" . $uid;
+      return Civi::paths()->getVariable('wp.backend.base', 'url') . 'user-edit.php?user_id=' . $uid;
     }
   }
 
