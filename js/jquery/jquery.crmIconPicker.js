@@ -54,7 +54,8 @@
           {key: 'fa-rotate-270', value: ts('Rotate left')},
           {key: 'fa-rotate-180', value: ts('Rotate 180')},
           {key: 'fa-flip-horizontal', value: ts('Flip horizontal')},
-          {key: 'fa-flip-vertical', value: ts('Flip vertical')}
+          {key: 'fa-flip-vertical', value: ts('Flip vertical')},
+          {key: 'fa-flip-both', value: ts('Flip both')},
         ];
 
       function formatButton() {
