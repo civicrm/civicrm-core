@@ -1,4 +1,4 @@
-<label class="crm-af-field-label" ng-if=":: $ctrl.defn.label && $ctrl.defn.input_type != 'CheckBox' && $ctrl.defn.data_type != 'Boolean'" for="{{:: fieldId }}">
+<label class="crm-af-field-label" ng-if=":: $ctrl.defn.label && !($ctrl.defn.input_type == 'CheckBox' && $ctrl.defn.data_type == 'Boolean')" for="{{:: fieldId }}">
   {{:: $ctrl.defn.label }}
   <span class="crm-marker" title="{{:: ts('Required') }}" ng-if=":: $ctrl.defn.required">*</span>
 </label>
