@@ -74,7 +74,7 @@ class Bundle extends CRM_Core_Resources_Bundle implements EventSubscriberInterfa
     $files = [
       'crossfilter' => E::path('packages/crossfilter/crossfilter.min.js'),
       'd3' => E::path('packages/d3/d3.min.js'),
-      'dc' => E::path('packages/dc/dc.min.js'),
+      'dc' => E::path('packages/dc/dist/dc.min.js'),
     ];
 
     $content = [];
@@ -112,7 +112,7 @@ class Bundle extends CRM_Core_Resources_Bundle implements EventSubscriberInterfa
     }
 
     $files = [
-      E::path('packages/dc/dc.min.css'),
+      E::path('packages/dc/dist/style/dc.min.css'),
     ];
 
     $content = [];
