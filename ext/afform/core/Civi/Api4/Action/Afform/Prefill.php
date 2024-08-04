@@ -6,6 +6,9 @@ use Civi\Api4\Utils\CoreUtil;
 
 /**
  * Class Prefill
+ *
+ * @method $this setMatchField(bool $matchField)
+ * @method bool getMatchField()
  * @package Civi\Api4\Action\Afform
  */
 class Prefill extends AbstractProcessor {
