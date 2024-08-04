@@ -1,0 +1,31 @@
+<div class="crm-chart-kit-composite-admin">
+
+  <div ng-include="'~/crmChartKit/chartKitAdminColumns.html'"></div>
+
+  <div class="crm-chart-kit-admin-presentation">
+
+    <div ng-include="'~/crmChartKit/chartKitAdminCanvas.html'"></div>
+
+    <fieldset>
+      <legend>{{:: ts('Series options') }}</legend>
+        <div ng-if="$ctrl.chartType.isGroupedBar($ctrl)" class="form-inline">
+          <div class="form-inline">
+            <label>
+              {{:: ts('Bar Width') }}
+            </label>
+            <input type="number" class="form-control" ng-model="$ctrl.display.settings.barWidth" />
+          </div>
+          <div class="form-inline">
+            <label>
+              {{:: ts('Bar Gap') }}
+            </label>
+            <input type="number" class="form-control" ng-model="$ctrl.display.settings.barGap" />
+          </div>
+        </div>
+        <div ng-include="'~/crmChartKit/chartKitAdminLegend.html'" />
+    </fieldset>
+
+
+  </div>
+
+</div>
