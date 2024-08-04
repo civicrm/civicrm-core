@@ -106,6 +106,9 @@ class Bundle extends CRM_Core_Resources_Bundle implements EventSubscriberInterfa
     }
     $content[] = "})();";
 
+    // add CRM.visual.createChart function
+    $content[] = file_get_contents(Civi::paths()->getPath('[civicrm.root]/js/crm.visual.createChart.js'));
+
     $event->mimeType = 'application/javascript';
     $event->content = implode("\n", $content);
   }
