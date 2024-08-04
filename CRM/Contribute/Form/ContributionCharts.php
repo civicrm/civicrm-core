@@ -31,6 +31,8 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
   protected $_chartType = NULL;
 
   public function preProcess() {
+    \Civi::resources()->addBundle('visual');
+
     $this->_year = CRM_Utils_Request::retrieve('year', 'Int', $this);
     $this->_chartType = CRM_Utils_Request::retrieve('type', 'String', $this);
 

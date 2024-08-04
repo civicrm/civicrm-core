@@ -769,6 +769,9 @@ class CRM_Report_Form extends CRM_Core_Form {
     $this->_createNewButtonName = $this->getButtonName('submit', 'next');
     $this->_groupButtonName = $this->getButtonName('submit', 'group');
     $this->_chartButtonName = $this->getButtonName('submit', 'chart');
+
+    // graphs require the visual bundle
+    \Civi::resources()->addBundle('visual');
   }
 
   /**

@@ -7,10 +7,6 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-<script src="{$config->resourceBase}/bower_components/d3/d3.min.js"></script>
-<script src="{$config->resourceBase}/bower_components/crossfilter2/crossfilter.min.js"></script>
-<script src="{$config->resourceBase}/bower_components/dc-2.1.x/dc.min.js"></script>
-<style src="{$config->resourceBase}/bower_components/dc-2.1.x/dc.min.css"></style>
 {literal}
 <style>
   .dc-chart path.domain {
@@ -101,20 +97,20 @@ function createChart( chartID, divName, xSize, ySize, data ) {
   links.appendChild(linkPNG);
 
   var crossfilterData, ndx, dataDimension, dataGroup, chart;
-  ndx = crossfilter(data.values[0]);
+  ndx = CRM.visual.crossfilter(data.values[0]);
   dataDimension = ndx.dimension(d => d.label);
   dataGroup = dataDimension.group().reduceSum(d => d.value);
   var ordinals = data.values[0].map(d => d.label);
 
   if (data.type === 'barchart') {
-    chart = dc.barChart(chartNode)
+    chart = CRM.visual.dc.barChart(chartNode)
       .width(w)
       .height(h)
       .dimension(dataDimension)
       .group(dataGroup)
       .gap(4) // px
-      .x(d3.scale.ordinal(ordinals).domain(ordinals))
-      .xUnits(dc.units.ordinal)
+      .x(CRM.visual.d3.scale.ordinal(ordinals).domain(ordinals))
+      .xUnits(CRM.visual.dc.units.ordinal)
       .margins({top: 10, right: 30, bottom: 30, left: 90})
       .elasticY(true)
       .renderLabel(false)
@@ -124,13 +120,13 @@ function createChart( chartID, divName, xSize, ySize, data ) {
       .renderTitle(true);
   }
   else if (data.type === 'piechart') {
-    chart = dc.pieChart(chartNode)
+    chart = CRM.visual.dc.pieChart(chartNode)
       .width(w)
       .height(h)
       .radius(parseInt(h / 2) - 5) // define pie radius
       .innerRadius(parseInt(h / 4) - 5) // optional
       .externalRadiusPadding(5)
-      .legend(dc.legend().legendText(d => d.name).y(5))
+      .legend(CRM.visual.dc.legend().legendText(d => d.name).y(5))
       .dimension(dataDimension)
       .group(dataGroup)
       .renderLabel(false)
@@ -142,7 +138,7 @@ function createChart( chartID, divName, xSize, ySize, data ) {
   div.appendChild(chartNode);
   div.appendChild(links);
 
-  dc.renderAll();
+  CRM.visual.dc.renderAll();
 }
 </script>
 {/literal}
