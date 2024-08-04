@@ -126,12 +126,6 @@
           .renderTitle(true);
       }
 
-      // this was previously added using an inline stylesheet
-      // but unclear of the significance
-      chart.renderlet((chart) => {
-          chart.selectAll('path.domain').attr('style', "fill: 'none'; stroke: 'black';");
-      });
-
       div.appendChild(heading);
       div.appendChild(chartNode);
       div.appendChild(links);
