@@ -9,6 +9,13 @@
  +--------------------------------------------------------------------+
  */
 
+namespace Civi\Visual;
+
+use Civi;
+use CRM_Core_Resources_Bundle;
+use CRM_Utils_Hook;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+
 /**
  * This class defines the `visual-bundle.js` asset, which combines `dc.js`,
  * `d3.js`, and `crossfilter.js` into one asset -- and puts the services
@@ -16,12 +23,39 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
+ *
+ * @service bundle.visual
  */
-class CRM_Utils_VisualBundle {
+class Bundle extends CRM_Core_Resources_Bundle implements EventSubscriberInterface, Civi\Core\Service\AutoServiceInterface {
 
-  public static function register() {
-    Civi::resources()->addScriptUrl(Civi::service('asset_manager')->getUrl('visual-bundle.js'));
-    Civi::resources()->addStyleUrl(Civi::service('asset_manager')->getUrl('visual-bundle.css'));
+  use Civi\Core\Service\AutoServiceTrait;
+
+  const NAME = 'visual';
+  const JS_FILE = 'visual-bundle.js';
+  const CSS_FILE = 'visual-bundle.css';
+
+  protected $initialized;
+
+  public static function getSubscribedEvents() {
+    return [
+      'hook_civicrm_buildAsset' => [['buildAssetJs', 0], ['buildAssetCss', 0]],
+    ];
+  }
+
+  public function __construct() {
+    parent::__construct(static::NAME,
+      ['script', 'scriptFile', 'scriptUrl', 'settings', 'style', 'styleFile', 'styleUrl', 'markup']);
+  }
+
+  public function getAll(): iterable {
+    if (!$this->initialized) {
+      $this->addScriptUrl(Civi::service('asset_builder')->getUrl(static::JS_FILE));
+      $this->addStyleUrl(Civi::service('asset_builder')->getUrl(static::CSS_FILE));
+
+      CRM_Utils_Hook::alterBundle($this);
+      $this->fillDefaults();
+    }
+    return parent::getAll();
   }
 
   /**
@@ -32,28 +66,41 @@ class CRM_Utils_VisualBundle {
    * @see \Civi\Core\AssetBuilder
    */
   public static function buildAssetJs($event) {
-    if ($event->asset !== 'visual-bundle.js') {
+    if ($event->asset !== static::JS_FILE) {
       return;
     }
 
     $files = [
-      'crossfilter' => '[civicrm.bower]/crossfilter-1.3.x/crossfilter.min.js',
+      'crossfilter' => '[civicrm.bower]/crossfilter-1.4.x/crossfilter.min.js',
       'd3' => '[civicrm.bower]/d3-3.5.x/d3.min.js',
       'dc' => '[civicrm.bower]/dc-2.1.x/dc.min.js',
     ];
 
     $content = [];
+
     $content[] = "(function(){";
-    $content[] = "var backups = {d3: window.d3, crossfilter: window.crossfilter, dc: window.dc}";
+
+    // ensure our namespace objects exist
     $content[] = 'window.CRM = window.CRM || {};';
     $content[] = 'CRM.visual = CRM.visual || {};';
+
+    // backup any existing objects in the global namespace
+    $content[] = "var backups = {";
+    foreach ($files as $var => $file) {
+      $content[] = "$var: window.$var,";
+    }
+    $content[] = "};";
+
+    // include external scripts
     foreach ($files as $var => $file) {
       $content[] = "// File: $file";
       $content[] = file_get_contents(Civi::paths()->getPath($file));
     }
+
     foreach ($files as $var => $file) {
       $content[] = "CRM.visual.$var = $var;";
     }
+    // restore backups to the global namespace
     foreach ($files as $var => $file) {
       $content[] = "window.$var = backups.$var;";
     }
@@ -71,7 +118,7 @@ class CRM_Utils_VisualBundle {
    * @see \Civi\Core\AssetBuilder
    */
   public static function buildAssetCss($event) {
-    if ($event->asset !== 'visual-bundle.css') {
+    if ($event->asset !== static::CSS_FILE) {
       return;
     }
 
