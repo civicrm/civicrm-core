@@ -1,4 +1,11 @@
 <div class="form-inline">
+  <label for="crm-search-admin-hide-label--{{$index}}">
+    {{:: ts('Hide header field')}}
+  </label>
+  <select id="crm-search-admin-hide-label--{{$index}}" class="form-control" ng-model="col.label_hidden">
+    <option ng-value="true">{{:: ts('Yes')}}</option>
+    <option ng-value="false">{{:: ts('No')}}</option>
+  </select>
   <label for="crm-search-admin-col-size-{{$index}}">
     {{:: ts('Button Size') }}
   </label>
