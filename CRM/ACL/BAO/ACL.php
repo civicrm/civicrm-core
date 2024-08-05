@@ -236,30 +236,72 @@ SELECT count( a.id )
         if (self::matchType($type, $dao->operation)) {
           if (!$dao->deny) {
             if (empty($dao->object_id)) {
+              // We have an all include that is higher priority
+              if ($allExclude) {
+                $allExclude = FALSE;
+              }
               $allInclude = TRUE;
             }
             else {
-              $ids[] = $dao->object_id;
+              // We have an allow rule on the same group that has a higher priority
+              if (in_array($dao->object_id, $excludeIds)) {
+                unset($dao->object_id);
+              }
+              $ids[$dao->object_id] = ['id' => $dao->object_id, 'priority' => $dao->priority];
             }
           }
           else {
             if (empty($dao->object_id)) {
+              // We have an all exclude that is higher priority than all include
+              if ($allInclude) {
+                $allInclude = FALSE;
+              }
               $allExclude = TRUE;
             }
             else {
-              $excludeIds[] = $dao->object_id;
+              // We have a specific exclude rule that is of higher weighting than the include for this group id.
+              if (in_array($dao->object_id, $ids)) {
+                unset($ids[$dao->object_id]);
+              }
+              $excludeIds[$dao->object_id] = ['id' => $dao->object_id, 'priority' => $dao->priority];
             }
           }
         }
       }
-      if (!empty($excludeIds) && !$allInclude) {
-        $ids = array_diff($ids, $excludeIds);
+      // If we have some excluded IDs and we don't have an allInclude and an AllExclude.
+      if (!empty($excludeIds) && !$allInclude && !$allExclude) {
+        $orderedGroups = [];
+        if (!empty($ids)) {
+          foreach ($ids as $group) {
+            $orderedGroups[$group['priority']] = ['id' => $group['id'], 'deny' => 0];
+          }
+          foreach ($excludeIds as $eGroup) {
+            $orderedGroups[$eGroup['priority']] = ['id' => $eGroup['id'], 'deny' => 1];
+          }
+          // Sort the combined list by the priority asending;
+          ksort($orderedGroups);
+          $temporaryTable = CRM_Utils_SQL_TempTable::build()->createWithColumns('contact_id int unsigned')->getName();
+          foreach ($orderedGroups as $orderedGroup) {
+            if (!$orderedGroup['deny']) {
+              CRM_Core_DAO::executeQuery("INSERT INTO {$temporaryTable} (contact_id) SELECT contact_a.id FROM civicrm_contact contact_a WHERE " . self::getGroupClause([$orderedGroup['id']], 'IN'));
+            }
+            else {
+              CRM_Core_DAO::executeQuery("DELETE FROM {$temporaryTable} WHERE contact_id IN (SELECT contact_a.id FROM civicrm_contact contact_a WHERE " . self::getGroupClause([$orderedGroup['id']], 'IN') . ')');
+            }
+          }
+          $clauses[] = "contact_a.id IN (SELECT contact_id FROM {$temporaryTable})";
+        }
+        else {
+          $clauses[] = self::getGroupClause($excludeIds, 'NOT IN');
+        }
       }
       elseif (!empty($excludeIds) && $allInclude) {
         $ids = [];
+        $excludeIds = array_column($excludeIds, 'id');
         $clauses[] = self::getGroupClause($excludeIds, 'NOT IN');
       }
-      if (!empty($ids) && !$allInclude) {
+      if (!empty($ids) && !$allExclude && empty($excludeIds) && !$allInclude) {
+        $ids = array_column($ids, 'id');
         $clauses[] = self::getGroupClause($ids, 'IN');
       }
       elseif ($allInclude && empty($excludeIds)) {
@@ -489,7 +531,7 @@ SELECT count( a.id )
         $orderBy = "a.priority, $orderBy";
       }
       $query = "
-SELECT   a.operation, a.object_id, a.deny
+SELECT   a.operation, a.object_id, a.deny, a.priority
   FROM   civicrm_acl_cache c, civicrm_acl a
  WHERE   c.acl_id       =  a.id
    AND   a.is_active    =  1
