@@ -151,7 +151,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 .crm-container table.dataTable thead th.sorting_asc::before,
 .crm-container table.dataTable thead th.sorting_desc::before,
 .jstree-default .jstree-icon {
-    font-family: "FontAwesome";
+    font-family: "Font Awesome 6 Free", "FontAwesome";
     font-style: normal;
     text-rendering: auto;
     font-size: var(--crm-dash-icon-size);

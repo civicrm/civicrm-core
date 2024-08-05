@@ -64,7 +64,7 @@
 .crm-container .ui-widget textarea, 
 .crm-container .ui-widget button {
     font-family: inherit !important;
-    font-size: inherit !important;
+    font-size: inherit;
 }
 .crm-container .ui-button-icon-only .ui-icon {
     position: initial;

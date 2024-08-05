@@ -373,3 +373,35 @@ table.advmultiselect {
 .crm-container #civicrm-footer .status.crm-error a {
     color: var(--crm-c-alert-text);
 }
+
+/* Upgrade screen (overwrites inline css) */
+
+.crm-upgrade-box-outer.crm-upgrade-success {
+    margin: var(--crm-page-padding);
+    background: var(--crm-alert-background-help);
+    border: 1px solid var(--crm-alert-border-help);
+}
+.crm-upgrade-box-inner {
+    padding: 1rem;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    row-gap: 1rem;
+    background-color: transparent;
+}
+p.crm-upgrade-large-text {
+    grid-column: 2;
+}
+p.crm-upgrade-large-text:first-of-type {
+    font-size: var(--crm-r1);
+    color: var(--crm-c-green-dark);
+    font-family: var(--crm-font-bold);
+    font-weight: var(--crm-bold-weight);
+}
+.crm-success-flex {
+    display: unset;
+    padding: 0;
+    font-size: 3rem;
+    color: var(--crm-c-green-dark);
+    grid-column: 1;
+    grid-row: 1 / span 3;
+}

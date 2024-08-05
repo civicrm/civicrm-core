@@ -321,7 +321,7 @@ input.crm-form-checkbox) + label {
 }
 .crm-container .select2-container-multi .select2-choices::before,
 .crm-container .select2-container .select2-choice .select2-arrow::before {
-    font-family: "FontAwesome";
+    font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands", "FontAwesome";
     font-style: normal;
     text-rendering: auto;
     color: var(--crm-c-text);
@@ -345,6 +345,7 @@ input.crm-form-checkbox) + label {
     margin: 0;
     padding: 0;
     min-height: unset;
+    height: unset;
     color: var(--crm-input-color);
 }
 .crm-container .select2-container-multi .select2-choices .select2-search-field input.select2-default {
@@ -372,6 +373,12 @@ input.crm-form-checkbox) + label {
     gap: var(--crm-s);
     padding: 2px var(--crm-s);
     align-items: center;
+    font-size: var(--crm-input-font-size);
+    min-height: var(--crm-input-height);
+    height: auto !important;
+}
+.select2-container-multi .select2-choices .select2-search-field {
+    max-width: calc(100% - 2rem);
 }
 .select2-container-multi .select2-choices .select2-search-choice {
     padding: 1px var(--crm-m) 1px var(--crm-r1);
@@ -394,8 +401,11 @@ input.crm-form-checkbox) + label {
 .select2-container .crm-select2-row-description {
     display: none;
 }
+.select2-input.select2-default {
+    width: auto;
+}
 
-/* Select dropdwon */
+/* Select dropdown */
 
 .select2-drop.select2-drop-active.crm-container {
     background: var(--crm-input-background);
