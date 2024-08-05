@@ -84,7 +84,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
             $countRow = 0;
             foreach ($options as $optionId => $optionValue) {
               $countRow++;
-              $defaults['value'][$countRow] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($optionValue['amount']);
+              $defaults['value'][$countRow] = isset($optionValue['amount']) ? CRM_Utils_Money::formatLocaleNumericRoundedByOptionalPrecision($optionValue['amount'], 9) : '';
               $defaults['label'][$countRow] = $optionValue['label'];
               $defaults['name'][$countRow] = $optionValue['name'];
               $defaults['weight'][$countRow] = $optionValue['weight'];
@@ -124,7 +124,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
 
         foreach ($discountFields['options'] as $discountFieldsval) {
           $defaults['discounted_label'][$discountFieldsval['weight']] = $discountFieldsval['label'];
-          $defaults['discounted_value'][$discountFieldsval['weight']][$rowCount] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($discountFieldsval['amount']);
+          $defaults['discounted_value'][$discountFieldsval['weight']][$rowCount] = isset($discountFieldsval['amount']) ? CRM_Utils_Money::formatLocaleNumericRoundedByOptionalPrecision($discountFieldsval['amount'], 9) : '';
           $defaults['discount_option_id'][$rowCount][$discountFieldsval['weight']] = $discountFieldsval['id'];
           if (!empty($discountFieldsval['is_default'])) {
             $defaults['discounted_default'] = $discountFieldsval['weight'];
