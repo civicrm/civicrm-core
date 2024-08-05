@@ -148,7 +148,7 @@
               {elseif $n|substr:0:5 eq 'phone'}
                 {assign var="phone_ext_field" value=$n|replace:'phone':'phone_ext'}
                 {$form.$n.html}
-                {if $form.$phone_ext_field.html}
+                {if array_key_exists($phone_ext_field, $form)}
                 &nbsp;{$form.$phone_ext_field.html}
                 {/if}
               {else}
