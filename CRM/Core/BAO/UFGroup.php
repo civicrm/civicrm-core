@@ -900,6 +900,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
         $controller->run();
 
         $template = CRM_Core_Smarty::singleton();
+        $template->ensureVariablesAreAssigned(['activeComponent']);
 
         // Hide CRM error messages if they are set by the CMS.
         if (!empty($_POST)) {
