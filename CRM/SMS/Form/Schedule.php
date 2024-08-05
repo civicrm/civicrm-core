@@ -28,6 +28,9 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
     if (!$this->_mailingID) {
       $this->_mailingID = CRM_Utils_Request::retrieve('mid', 'Integer', $this, TRUE);
     }
+    //when user come from search context.
+    $ssID = $this->get('ssID');
+    $this->assign('ssid',$ssID);
   }
 
   /**
