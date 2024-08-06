@@ -28,7 +28,7 @@ trait FinalHelperTrait {
    * @see \Civi\WorkflowMessage\WorkflowMessageInterface::export()
    * @see \Civi\WorkflowMessage\Traits\ReflectiveWorkflowTrait::export()
    */
-  abstract public function export(string $format = NULL): ?array;
+  abstract public function export(?string $format = NULL): ?array;
 
   /**
    * @see \Civi\WorkflowMessage\WorkflowMessageInterface::validate()

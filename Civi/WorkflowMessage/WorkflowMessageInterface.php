@@ -26,14 +26,14 @@ interface WorkflowMessageInterface {
   public function getFields(): array;
 
   /**
-   * @param string $format
+   * @param string|null $format
    *   Ex: 'tplParams', 'tokenContext', 'modelProps', 'envelope'
    * @return array|null
    *   A list of field-values that are used in the given format, keyed by their name in that format.
    *   If the implementation does not understand a specific format, return NULL.
    * @see \Civi\WorkflowMessage\Traits\ReflectiveWorkflowTrait::export()
    */
-  public function export(string $format = NULL): ?array;
+  public function export(?string $format = NULL): ?array;
 
   /**
    * Import values from some scope.
