@@ -321,17 +321,20 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
       'Anderson',
       'Email Address',
       'anthony_anderson@civicrm.org',
-      'Honor',
       'This membership will be automatically renewed every',
       'Dear Anthony',
       'Thanks for your auto renew membership sign-up',
       'In Memory of',
     ]);
+    $mails = $mut->getAllMessages();
+    foreach ($mails as $mail) {
+      $mut->checkMailForStrings([], ['Honor'], '', $mail);
+    }
     $mut->clearMessages();
     $this->_contactID = $this->individualCreate(['first_name' => 'Antonia', 'prefix_id' => 'Mrs.', 'email' => 'antonia_anderson@civicrm.org']);
 
-    // Note, the second contribution is not in honor of anyone and the
-    // receipt should not mention honor at all.
+    // Note, the second contribution is not in memory of anyone and the
+    // receipt should not mention memory at all.
     $this->setupMembershipRecurringPaymentProcessorTransaction(['is_email_receipt' => TRUE], ['invoice_id' => '345']);
     $IPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurTransaction(['x_trans_id' => 'hers']));
     $IPN->main();
