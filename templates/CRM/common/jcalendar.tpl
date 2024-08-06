@@ -7,6 +7,10 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
+{* Deprecation notice - this file is slated for remove and has not been used from
+  core for some years - replaced by datepicker. eg at the php layer ....
+  $this->add('datepicker', 'start_date', ts('Campaign Start Date'), [], FALSE, ['time' => FALSE]);
+*}
 {if $batchUpdate}
     {assign var='elementId'   value=$form.field.$elementIndex.$elementName.id}
     {assign var="tElement" value=$elementName|cat:"_time"}
