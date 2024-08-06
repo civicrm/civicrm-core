@@ -85,13 +85,13 @@ class CRM_Extension_Container_BasicTest extends CiviUnitTestCase {
   }
 
   /**
-   * @param CRM_Utils_Cache_Interface $cache
+   * @param CRM_Utils_Cache_Interface|null $cache
    * @param null $cacheKey
    * @param string $appendPathGarbage
    *
    * @return array
    */
-  public function _createContainer(CRM_Utils_Cache_Interface $cache = NULL, $cacheKey = NULL, $appendPathGarbage = '') {
+  public function _createContainer(?CRM_Utils_Cache_Interface $cache = NULL, $cacheKey = NULL, $appendPathGarbage = '') {
     $basedir = rtrim($this->createTempDir('ext-'), '/');
     mkdir("$basedir/foo");
     mkdir("$basedir/foo/bar");
