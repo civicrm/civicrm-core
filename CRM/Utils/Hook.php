@@ -648,7 +648,7 @@ abstract class CRM_Utils_Hook {
    * @param array $conditions
    *   Values from WHERE or ON clause
    */
-  public static function selectWhereClause($entity, array &$clauses, int $userId = NULL, array $conditions = []): void {
+  public static function selectWhereClause($entity, array &$clauses, ?int $userId = NULL, array $conditions = []): void {
     $entityName = is_object($entity) ? CRM_Core_DAO_AllCoreTables::getEntityNameForClass(get_class($entity)) : $entity;
     $null = NULL;
     $userId ??= (int) CRM_Core_Session::getLoggedInContactID();
@@ -1680,7 +1680,7 @@ abstract class CRM_Utils_Hook {
    *
    * @return mixed
    */
-  public static function emailProcessor($type, &$params, $mail, &$result, $action = NULL, int $mailSettingId = NULL) {
+  public static function emailProcessor($type, &$params, $mail, &$result, $action = NULL, ?int $mailSettingId = NULL) {
     $null = NULL;
     return self::singleton()
       ->invoke(['type', 'params', 'mail', 'result', 'action', 'mailSettingId'], $type, $params, $mail, $result, $action, $mailSettingId, 'civicrm_emailProcessor');
@@ -2196,7 +2196,7 @@ abstract class CRM_Utils_Hook {
    *   TRUE, if $op is 'check' and upgrades are pending.
    *   FALSE, if $op is 'check' and upgrades are not pending.
    */
-  public static function upgrade($op, CRM_Queue_Queue $queue = NULL) {
+  public static function upgrade($op, ?CRM_Queue_Queue $queue = NULL) {
     $null = NULL;
     return self::singleton()->invoke(['op', 'queue'], $op, $queue,
       $null, $null, $null, $null,

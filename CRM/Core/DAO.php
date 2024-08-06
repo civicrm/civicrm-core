@@ -3179,7 +3179,7 @@ SELECT contact_id
    *   Can be used for optimization/deduping of clauses.
    * @return array
    */
-  public function addSelectWhereClause(string $entityName = NULL, int $userId = NULL, array $conditions = []): array {
+  public function addSelectWhereClause(?string $entityName = NULL, ?int $userId = NULL, array $conditions = []): array {
     $clauses = [];
     $fields = $this::getSupportedFields();
     foreach ($fields as $fieldName => $field) {
@@ -3467,11 +3467,11 @@ SELECT contact_id
    * @param string $entityName
    *   Short name of the entity. This may seem redundant because the entity name can usually be inferred
    *   from the BAO class being called, but not always. Some virtual entities share a BAO class.
-   * @param int $entityId
+   * @param int|null $entityId
    *   Id of the entity.
    * @throws CRM_Core_Exception
    */
-  public static function getEntityIcon(string $entityName, int $entityId = NULL): ?string {
+  public static function getEntityIcon(string $entityName, ?int $entityId = NULL): ?string {
     // By default, just return the icon representing this entity. If there's more complex lookup to do,
     // the BAO for this entity should override this method.
     return static::$_icon;
