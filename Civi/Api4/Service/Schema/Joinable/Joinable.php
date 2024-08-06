@@ -299,7 +299,7 @@ class Joinable {
    * @param string|null $deprecatedBy
    * @return $this
    */
-  public function setDeprecatedBy(string $deprecatedBy = NULL) {
+  public function setDeprecatedBy(?string $deprecatedBy = NULL) {
     $this->deprecatedBy = $deprecatedBy ?? $this->alias . '_id';
     return $this;
   }

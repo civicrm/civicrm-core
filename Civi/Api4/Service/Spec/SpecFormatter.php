@@ -20,7 +20,7 @@ class SpecFormatter {
   /**
    * Convert array from BAO::fields() or CustomGroup::getAll() into a FieldSpec object
    */
-  public static function arrayToField(array $data, string $entityName, array $customGroup = NULL): FieldSpec {
+  public static function arrayToField(array $data, string $entityName, ?array $customGroup = NULL): FieldSpec {
     $dataTypeName = self::getDataType($data);
 
     $hasDefault = isset($data['default']) && $data['default'] !== '';
