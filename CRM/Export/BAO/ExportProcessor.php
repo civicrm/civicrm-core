@@ -871,6 +871,9 @@ class CRM_Export_BAO_ExportProcessor {
       if ($key === 'im') {
         $entityLabel = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_IM', 'provider_id', $entityTypeID);
       }
+      if ($key === 'website') {
+        $entityLabel = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_Website', 'website_type_id', $entityTypeID);
+      }
     }
 
     // These oddly constructed keys are for legacy reasons. Altering them will affect test success
@@ -1667,7 +1670,7 @@ class CRM_Export_BAO_ExportProcessor {
     $outputColumns = [];
     $queryFields = $this->getQueryFields();
     foreach ($this->getReturnProperties() as $key => $value) {
-      if (($key != 'location' || !is_array($value)) && !$this->isRelationshipTypeKey($key)) {
+      if ((($key != 'location' && $key !== 'website') || !is_array($value)) && !$this->isRelationshipTypeKey($key)) {
         $outputColumns[$key] = $value;
         $this->addOutputSpecification($key);
       }
@@ -1687,6 +1690,12 @@ class CRM_Export_BAO_ExportProcessor {
               }
             }
           }
+        }
+      }
+      elseif ($key === 'website') {
+        foreach ($value as $websiteTypeID => $websiteValues) {
+          $this->addOutputSpecification('website', NULL, NULL, $websiteTypeID);
+          $outputColumns['website-' . $websiteTypeID . '-url'] = TRUE;
         }
       }
       else {
@@ -1760,7 +1769,7 @@ class CRM_Export_BAO_ExportProcessor {
         }
 
         if ($this->isRelationshipTypeKey($relationshipTypeKey)) {
-          $returnProperties[$relationshipTypeKey] = $this->setRelationshipReturnProperties($value, $relationshipTypeKey);
+          $returnPropertgetQueryies[$relationshipTypeKey] = $this->setRelationshipReturnProperties($value, $relationshipTypeKey);
         }
         elseif ($locationName) {
           if ($fieldName === 'phone') {
@@ -1772,6 +1781,9 @@ class CRM_Export_BAO_ExportProcessor {
           else {
             $returnProperties['location'][$locationName][$fieldName] = 1;
           }
+        }
+        elseif ($fieldName === 'url') {
+          $returnProperties['website'][$value['website_type_id']] = ['url' => TRUE];
         }
         else {
           //hack to fix component fields
