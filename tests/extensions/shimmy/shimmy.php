@@ -64,7 +64,7 @@ function shimmy_civicrm_disable() {
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_upgrade
  */
-function shimmy_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
+function shimmy_civicrm_upgrade($op, ?CRM_Queue_Queue $queue = NULL) {
   return _shimmy_civix_civicrm_upgrade($op, $queue);
 }
 
