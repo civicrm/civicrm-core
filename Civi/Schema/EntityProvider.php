@@ -44,7 +44,7 @@ final class EntityProvider {
     return $this->getFields()[$fieldName] ?? NULL;
   }
 
-  public function getOptions(string $fieldName, array $values = NULL): ?array {
+  public function getOptions(string $fieldName, ?array $values = NULL): ?array {
     return $this->getMetaProvider()->getOptions($fieldName, $values);
   }
 

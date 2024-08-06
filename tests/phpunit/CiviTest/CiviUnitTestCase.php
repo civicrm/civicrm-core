@@ -1311,7 +1311,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @return int
    *   $id of created UF Join
    */
-  public function ufjoinCreate(array $params = NULL): int {
+  public function ufjoinCreate(?array $params = NULL): int {
     if ($params === NULL) {
       $params = [
         'is_active' => 1,

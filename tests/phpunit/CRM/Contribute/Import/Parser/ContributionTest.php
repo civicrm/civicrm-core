@@ -759,7 +759,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  protected function runImport(array $originalValues, int $onDuplicateAction, array $mappings = [], array $fields = NULL): void {
+  protected function runImport(array $originalValues, int $onDuplicateAction, array $mappings = [], ?array $fields = NULL): void {
     if (!$fields) {
       $fields = array_keys($originalValues);
     }

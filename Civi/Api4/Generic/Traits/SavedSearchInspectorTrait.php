@@ -58,7 +58,7 @@ trait SavedSearchInspectorTrait {
    * @throws UnauthorizedException
    * @throws \CRM_Core_Exception
    */
-  protected function loadSavedSearch(int $id = NULL) {
+  protected function loadSavedSearch(?int $id = NULL) {
     if ($id || is_string($this->savedSearch)) {
       $this->savedSearch = SavedSearch::get(FALSE)
         ->addWhere($id ? 'id' : 'name', '=', $id ?: $this->savedSearch)

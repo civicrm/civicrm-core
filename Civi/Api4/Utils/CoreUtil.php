@@ -239,7 +239,7 @@ class CoreUtil {
    * @return bool|null
    * @throws \CRM_Core_Exception
    */
-  public static function checkAccessRecord(AbstractAction $apiRequest, array $record, int $userID = NULL): ?bool {
+  public static function checkAccessRecord(AbstractAction $apiRequest, array $record, ?int $userID = NULL): ?bool {
     $userID ??= \CRM_Core_Session::getLoggedInContactID() ?? 0;
     $idField = self::getIdFieldName($apiRequest->getEntityName());
 

@@ -103,12 +103,12 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
   /**
    * Get or set the single instance of CRM_Core_Resources.
    *
-   * @param CRM_Core_Resources $instance
+   * @param CRM_Core_Resources|null $instance
    *   New copy of the manager.
    *
    * @return CRM_Core_Resources
    */
-  public static function singleton(CRM_Core_Resources $instance = NULL) {
+  public static function singleton(?CRM_Core_Resources $instance = NULL) {
     if ($instance !== NULL) {
       self::$_singleton = $instance;
     }

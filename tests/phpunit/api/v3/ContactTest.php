@@ -4766,7 +4766,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  protected function validateContactField(string $fieldName, $expected, ?int $contactID, array $criteria = NULL): void {
+  protected function validateContactField(string $fieldName, $expected, ?int $contactID, ?array $criteria = NULL): void {
     $api = Contact::get()->addSelect($fieldName);
     if ($criteria) {
       $api->setWhere([$criteria]);

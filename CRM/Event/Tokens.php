@@ -169,7 +169,7 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
    *
    * @internal
    */
-  protected function getEventTokenValues(int $eventID = NULL): array {
+  protected function getEventTokenValues(?int $eventID = NULL): array {
     if (!$eventID) {
       return [];
     }

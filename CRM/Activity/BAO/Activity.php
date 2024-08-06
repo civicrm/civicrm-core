@@ -804,7 +804,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    * @param array $conditions
    * @inheritDoc
    */
-  public function addSelectWhereClause(string $entityName = NULL, int $userId = NULL, array $conditions = []): array {
+  public function addSelectWhereClause(?string $entityName = NULL, ?int $userId = NULL, array $conditions = []): array {
     $clauses = [];
     $permittedActivityTypeIDs = self::getPermittedActivityTypes();
     if (!empty($conditions['activity_type_id'])) {
@@ -2731,7 +2731,7 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
    *   Id of the activity.
    * @throws CRM_Core_Exception
    */
-  public static function getEntityIcon(string $entityName, int $entityId = NULL): ?string {
+  public static function getEntityIcon(string $entityName, ?int $entityId = NULL): ?string {
     $default = parent::getEntityIcon($entityName);
     if (!$entityId) {
       return $default;

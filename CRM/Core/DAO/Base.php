@@ -81,7 +81,7 @@ abstract class CRM_Core_DAO_Base extends CRM_Core_DAO {
   /**
    * @inheritDoc
    */
-  public static function getEntityIcon(string $entityName, int $entityId = NULL): ?string {
+  public static function getEntityIcon(string $entityName, ?int $entityId = NULL): ?string {
     return static::getEntityInfo()['icon'] ?? NULL;
   }
 
