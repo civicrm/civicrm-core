@@ -820,7 +820,7 @@ HEREDOC;
    * @param array $conditions
    * @inheritDoc
    */
-  public function addSelectWhereClause(string $entityName = NULL, int $userId = NULL, array $conditions = []): array {
+  public function addSelectWhereClause(?string $entityName = NULL, ?int $userId = NULL, array $conditions = []): array {
     // TODO: This seemded like a good idea... piggybacking off the ACL clause of EntityFile
     // however that's too restrictive because entityFile ACLs are limited to just attachments,
     // so this would prevent access to other file fields (e.g. custom fields)

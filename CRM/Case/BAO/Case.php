@@ -3030,7 +3030,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    * @param array $conditions
    * @inheritDoc
    */
-  public function addSelectWhereClause(string $entityName = NULL, int $userId = NULL, array $conditions = []): array {
+  public function addSelectWhereClause(?string $entityName = NULL, ?int $userId = NULL, array $conditions = []): array {
     $administerCases = CRM_Core_Permission::check('administer CiviCase', $userId);
     $viewMyCases = CRM_Core_Permission::check('access my cases and activities', $userId);
     $viewAllCases = CRM_Core_Permission::check('access all cases and activities', $userId);
@@ -3063,7 +3063,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
     return $clauses;
   }
 
-  private static function getAccessMyCasesClause(int $userId = NULL): string {
+  private static function getAccessMyCasesClause(?int $userId = NULL): string {
     $user = $userId ?? (int) CRM_Core_Session::getLoggedInContactID();
     return "IN (
       SELECT r.case_id FROM civicrm_relationship r, civicrm_case_contact cc WHERE r.is_active = 1 AND cc.case_id = r.case_id AND (

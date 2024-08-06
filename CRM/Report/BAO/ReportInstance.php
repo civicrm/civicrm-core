@@ -290,7 +290,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance implem
    *
    * @inheritDoc
    */
-  public function addSelectWhereClause(string $entityName = NULL, int $userId = NULL, array $conditions = []): array {
+  public function addSelectWhereClause(?string $entityName = NULL, ?int $userId = NULL, array $conditions = []): array {
     $permissions = CRM_Core_DAO::executeQuery('SELECT DISTINCT permission FROM civicrm_report_instance');
     $validPermissions = [];
     while ($permissions->fetch()) {

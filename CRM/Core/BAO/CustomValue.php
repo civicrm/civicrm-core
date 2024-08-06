@@ -219,7 +219,7 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO implements \Civi\Core\HookIn
    * @param array $conditions
    * @return array
    */
-  public function addSelectWhereClause(string $entityName = NULL, int $userId = NULL, array $conditions = []): array {
+  public function addSelectWhereClause(?string $entityName = NULL, ?int $userId = NULL, array $conditions = []): array {
     // Some legacy code omits $entityName, in which case fall-back on 'Contact' which until 2023
     // was the only type of entity that could be extended by multi-record custom groups.
     $groupName = \Civi\Api4\Utils\CoreUtil::getCustomGroupName((string) $entityName);
