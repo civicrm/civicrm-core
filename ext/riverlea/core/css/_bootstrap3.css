@@ -104,7 +104,7 @@
 }
 #bootstrap-theme button, #bootstrap-theme html input[type="button"], #bootstrap-theme input[type="reset"], #bootstrap-theme input[type="submit"] {
 	-webkit-appearance: button;
-	cursor: pointer;
+	cursor: var(--crm-hover-clickable);
 }
 #bootstrap-theme button[disabled], #bootstrap-theme html input[disabled] {
 	cursor: default;
@@ -1112,7 +1112,7 @@
 	clip: auto;
 }
 #bootstrap-theme [role="button"] {
-	cursor: pointer;
+	cursor: var(--crm-hover-clickable);
 }
 #bootstrap-theme h1, #bootstrap-theme h2, #bootstrap-theme h3, #bootstrap-theme h4, #bootstrap-theme h5, #bootstrap-theme h6, #bootstrap-theme .h1, #bootstrap-theme .h2, #bootstrap-theme .h3, #bootstrap-theme .h4, #bootstrap-theme .h5, #bootstrap-theme .h6 {
 	line-height: 1.2;
@@ -2504,7 +2504,7 @@
 	white-space: nowrap;
 	vertical-align: middle;
 	touch-action: manipulation;
-	cursor: pointer;
+	cursor: var(--crm-hover-clickable);
 	background-image: none;
 	border: 1px solid transparent;
 	padding: 4px 8px;
@@ -3611,7 +3611,7 @@
 #bootstrap-theme a.badge:hover, #bootstrap-theme a.badge:focus {
 	color: white;
 	text-decoration: none;
-	cursor: pointer;
+	cursor: var(--crm-hover-clickable);
 } */
 
 #bootstrap-theme .jumbotron {
@@ -4003,14 +4003,14 @@
 #bootstrap-theme .close:hover, #bootstrap-theme .close:focus {
 	color: black;
 	text-decoration: none;
-	cursor: pointer;
+	cursor: var(--crm-hover-clickable);
 	-webkit-filter: alpha(opacity=50);
 	filter: alpha(opacity=50);
 	opacity: .5;
 }
 #bootstrap-theme button.close {
 	padding: 0;
-	cursor: pointer;
+	cursor: var(--crm-hover-clickable);
 	background: transparent;
 	border: 0;
 	-webkit-appearance: none;
@@ -4568,7 +4568,7 @@
 	height: 10px;
 	margin: 1px;
 	text-indent: -999px;
-	cursor: pointer;
+	cursor: var(--crm-hover-clickable);
 	background-color: #000 \9;
 	background-color: rgba(0, 0, 0, 0);
 	border: 1px solid white;

@@ -248,7 +248,7 @@ input.crm-form-checkbox + label,
 .crm-container input[type="radio"] {
     accent-color: var(--crm-input-radio-color);
     margin: -2px 4px 0 0;
-    width: inherit;
+    width: auto;
     appearance: auto;
     height: auto;
 }
@@ -392,7 +392,7 @@ input.crm-form-checkbox) + label {
     line-height: unset;
     color: var(--crm-c-text);
     cursor: default;
-    border: 1px solid var(--crm-c-divider);
+    border: var(--crm-c-divider);
     border-radius: var(--crm-roundness);
     background-clip: padding-box;
     user-select: none;
@@ -630,7 +630,7 @@ input.crm-form-checkbox) + label {
 	padding-left: 20px;
 	margin-bottom: 0;
 	font-weight: 400;
-	cursor: pointer;
+	cursor: var(--crm-hover-clickable);
 }
 #bootstrap-theme .radio + .radio, #bootstrap-theme .checkbox + .checkbox {
 	margin-top: -5px;
@@ -642,7 +642,7 @@ input.crm-form-checkbox) + label {
 	margin-bottom: 0;
 	font-weight: 400;
 	vertical-align: middle;
-	cursor: pointer;
+	cursor: var(--crm-hover-clickable);
 }
 #bootstrap-theme .radio-inline.disabled, 
 fieldset[disabled] #bootstrap-theme .radio-inline, 

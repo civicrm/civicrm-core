@@ -134,7 +134,7 @@ a.crm-expand-row:hover,a.crm-expand-row:focus {
 
 .crm-container .crm-accordion-wrapper .crm-accordion-body {
 	border-radius: 0 0 var(--crm-roundness) var(--crm-roundness);
-	border: var(--crm-expand-body-border);
+	border: var(--crm-expand-border);
 	padding: var(--crm-expand-body-padding);
 	background-color: var(--crm-expand-body-bg);
 	box-shadow: var(--crm-expand-body-box-shadow);
@@ -192,7 +192,7 @@ a.crm-expand-row:hover,a.crm-expand-row:focus {
 	white-space: nowrap;
 	vertical-align: middle;
 	touch-action: manipulation;
-	cursor: pointer;
+	cursor: var(--crm-hover-clickable);
 	background-image: none;
 	border: var(--crm-btn-border);
 	padding: var(--crm-btn-padding-block) var(--crm-btn-padding-inline);
@@ -258,6 +258,9 @@ a.crm-expand-row:hover,a.crm-expand-row:focus {
 .crm-config-backend-form-block > div { /* makes cleanup cache buttons flow inline */
 	display: flex;
 	gap: var(--crm-flex-gap);
+}
+#ckeditor_config {
+	display: flex !important; /* odd inline styled button on display preferences page */
 }
 
 /* Icon alignment */
@@ -328,13 +331,13 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
 .afadmin-list .nav-tabs + .form-inline + table,
 .afadmin-list > .form-inline,
 crm-search-admin-search-listing .crm-search-display.crm-search-display-table {
-    border: 1px solid var(--crm-tab-border-col);
+    border: var(--crm-tab-border);
     border-top: 0 solid transparent;
     border-radius: 0 0 var(--crm-roundness) var(--crm-roundness);
 	background: var(--crm-tab-bg-active);
 }
 .crm-search > .ng-scope > .form-inline {
-    border: 1px solid var(--crm-tab-border-col);
+    border: var(--crm-tab-border);
 	border-radius: 0;
 	border-width: 0 1px 0 1px;;
 }
@@ -405,7 +408,7 @@ crm-search-admin-search-listing .crm-search-display.crm-search-display-table {
     padding: 0;
 }
 .crm-container .tag-tree-wrapper .tag-tree a.crm-tag-item {
-    font-size: var(--crm-r);
+    font-size: var(--crm-font-size);
     font-family: var(--crm-font);
     height: auto;
     padding: var(--crm-padding-small);
@@ -505,7 +508,7 @@ crm-search-admin-search-listing .crm-search-display.crm-search-display-table {
 	width: 100%;
 }
 .crmMailing .preview-popup, .crmMailing .preview-contact {
-	border-right: 1px solid var(--crm-c-divider);
+	border-right: var(--crm-c-divider);
 }
 .crm-container .crmMailing-preview .clear {
 	display: none;
@@ -769,7 +772,6 @@ details + .crm-content-block:has(.dataTables_wrapper) {
 	padding: var(--crm-btn-padding-block) var(--crm-btn-padding-inline);
 }
 
-
 /* Mosaico (all importants vs the extension css) */
 
 .crm-mosaico-wizard .crm_wizard__body .form-group {
@@ -798,7 +800,7 @@ details + .crm-content-block:has(.dataTables_wrapper) {
 	border: 0;
 }
 .ui-widget-content.modal-dialog .crm-mosaico-page .panel .tab-pane {
-	border: 1px solid var(--crm-tab-border-col);
+	border: var(--crm-tab-border);
 	border-top: 0;
 	padding: var(--crm-tab-padding);
 	background-color: var(--crm-tab-bg-active);
@@ -807,7 +809,26 @@ details + .crm-content-block:has(.dataTables_wrapper) {
 .select2-drop.select2-drop-active.crm-container {
     max-width: var(--crm-huge-input); /* Mosaico fix - https://lab.civicrm.org/extensions/riverlea/-/issues/23 */
 }
-
+.crmb-wizard-button-right {
+	display: flex;
+	justify-content: end;
+}
+.crm-mosaico-wizard .from-group {
+	display: flex;
+	gap: var(--crm-flex-gap);
+}
+.crm-mosaico-wizard .crm_wizard__title .nav-pills li {
+	padding: var(--crm-btn-padding-block) var(--crm-btn-padding-inline);
+}
+.crm-mosaico-wizard .crm_wizard__title .nav-pills li.active,
+.crm-mosaico-wizard .crm_wizard__title .nav-pills li.active:hover,
+.crm-mosaico-wizard .crm_wizard__title .nav-pills li.active a:hover {
+	background: var(--crm-c-primary-hover);
+	border-radius: var(--crm-btn-radius);
+}
+.crm-mosaico-wizard .crm_wizard__title .nav-pills li.active a{ 
+	color: var(--crm-c-primary-text);
+}
 /******************
 	CORE EXTENSIONS
 *******************/

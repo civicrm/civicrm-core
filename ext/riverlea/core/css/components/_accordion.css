@@ -50,7 +50,7 @@
 }
 .crm-container details.crm-accordion-bold > .crm-accordion-body {
 	padding: var(--crm-expand-body-padding);
-	border: var(--crm-expand-body-border);
+	border: var(--crm-expand-border);
 	border-width: var(--crm-expand-border-width);
 	border-radius: 0 0 var(--crm-roundness) var(--crm-roundness);
 	box-shadow: var(--crm-expand-body-box-shadow);
@@ -58,7 +58,7 @@
 }
 /* Simple fix for details without a summary element */
 .crm-container details.crm-accordion-bold:not( > summary) {
-	border: var(--crm-expand-body-border);
+	border: var(--crm-expand-border);
 	padding: var(--crm-expand-body-padding);
 }
 .crm-container details.crm-accordion-bold:not( > summary) {

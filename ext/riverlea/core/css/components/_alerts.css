@@ -60,7 +60,7 @@
     float: right;
 	padding: 0;
 	border: 0;
-	cursor: pointer;
+	cursor: var(--crm-hover-clickable);
 	background: transparent;
 	appearance: none;
     font-size: var(--crm-r1);

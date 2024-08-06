@@ -40,7 +40,7 @@
     background: var(--crm-tab-bg-hover);
 }
 .ui-tabs .ui-tabs-nav {
-    border-bottom: 1px solid var(--crm-tab-border-col);
+    border-bottom: var(--crm-tab-border);
 }
 .crm-container .ui-tabs ul.ui-tabs-nav li.ui-tabs-selected,
 .crm-container .ui-tabs .ui-tabs-nav li.ui-tabs-active {
@@ -112,7 +112,7 @@
 /* Bootstrap tabs */
 
 .crm-container .nav-tabs {
-	border-bottom: 1px solid var(--crm-tab-border-col);
+	border-bottom: var(--crm-tab-border);
     gap: var(--crm-tabs-gap);
     margin: 0;
 }
@@ -129,7 +129,7 @@
 .crm-container .nav-tabs > li.active > a:focus {
 	color: var(--crm-c-text);
 	background-color: var(--crm-tab-bg-hover) !important /* vs api4-explorer.css */;
-	border: 1px solid var(--crm-tab-border-col);
+	border: var(--crm-tab-border);
 	border-bottom-color: transparent;
 }
 .crm-container .nav-tabs > li.active > a {
@@ -226,7 +226,7 @@
 }
 @media (max-width: 500px) { /* shows only icons for contact dashboard */
     .crm-container #mainTabContainer .ui-tabs-nav li .ui-tabs-anchor i {
-        font-size: var(--crm-r);
+        font-size: var(--crm-font-size);
     }
     .crm-container #mainTabContainer ul.ui-tabs-nav a span {
         display: none;

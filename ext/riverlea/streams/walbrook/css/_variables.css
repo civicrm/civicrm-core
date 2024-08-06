@@ -61,7 +61,7 @@ color-scheme: light dark;
 --crm-c-dark-text: var(--crm-c-text);
 --crm-c-link: var(--crm-c-blue);
 --crm-c-link-hover: var(--crm-c-blue-dark);
---crm-c-divider: rgba(142, 146, 156, 0.5);
+--crm-c-divider: 1px solid var(--crm-c-gray-300);
 --crm-c-page-background: #e8eef0;
 --crm-c-background: #fff;
 --crm-c-background2: var(--crm-c-gray-050);
@@ -159,14 +159,14 @@ color-scheme: light dark;
 --crm-btn-icon-border: ;
 
 /* TABLES */
---crm-table-outside-border: 1px solid var(--crm-c-gray-100);
+--crm-table-outside-border: var(--crm-c-divider);
 --crm-table-background: var(--crm-c-background);
---crm-table-row-border: 1px solid var(--crm-c-gray-300);
+--crm-table-row-border: var(--crm-c-divider);
 --crm-table-column-border: 0 solid transparent;
 --crm-table-font-size: var(--crm-font-size);
 --crm-table-padding: var(--crm-m);
 --crm-table-header-border: 1px solid transparent;
---crm-table-header-bottom: 1px solid var(--crm-c-gray-300);
+--crm-table-header-bottom: var(--crm-c-divider);
 --crm-table-header-bg: var(--crm-c-background3);
 --crm-table-header-txt: inherit;
 --crm-table-even-row: transparent;
@@ -185,8 +185,7 @@ color-scheme: light dark;
 /* PANELS */
 --crm-panel-shadow: var(--crm-block-shadow);
 --crm-panel-background: var(--crm-c-background);
---crm-panel-border: 0;
---crm-panel-border-col: ;
+--crm-panel-border: var(--crm-c-divider);
 --crm-panel-head-margin: var(--crm-m2);
 
 /* ACCORDIONS */
@@ -200,11 +199,11 @@ color-scheme: light dark;
 --crm-expand-header-color: var(--crm-c-text);
 --crm-expand-header-padding: var(--crm-m2) var(--crm-m3);
 --crm-expand-header-weight: bold;
---crm-expand-header-border: 1px solid var(--crm-c-gray-300);
+--crm-expand-header-border: var(--crm-c-divider);
 --crm-expand-header-border-width: 0 0 1px 0;
 --crm-expand-body-bg: transparent;
 --crm-expand-body-box-shadow: var(--crm-body-inset);
---crm-expand-body-border:;
+--crm-expand-border:;
 --crm-expand-border-width:;
 --crm-expand-body-padding: var(--crm-padding-reg);
 --crm-expand-body2-bg: transparent;
@@ -267,7 +266,7 @@ color-scheme: light dark;
 /* TABS */
 --crm-tabs-bg: var(--crm-c-background2);
 --crm-tabs-padding: var(--crm-m) var(--crm-m) 0 var(--crm-m);
---crm-tabs-border: 1px solid var(--crm-c-gray-300);
+--crm-tabs-border: var(--crm-c-divider);
 --crm-tabs-gap: var(--crm-s);
 --crm-tab-bg: var(--crm-c-background2);
 --crm-tab-bg-hover: var(--crm-c-background);
@@ -280,8 +279,8 @@ color-scheme: light dark;
 --crm-tab-count-bg: transparent;
 --crm-tab-count-col: var(--crm-c-text);
 --crm-tab-roundness: var(--crm-roundness);
---crm-tab-border-col: var(--crm-c-gray-300);
---crm-tab-border-active: 1px solid var(--crm-c-gray-300);
+--crm-tab-border: var(--crm-c-divider);
+--crm-tab-border-active: var(--crm-c-divider);
 --crm-tabs-2-border: 0 solid transparent;
 
 /* CONTACT DASHBOARD */
@@ -328,12 +327,11 @@ color-scheme: light dark;
 --crm-dash-image-justify: space-between; /* choose from start (left), end (right), center, and space-between (spread out) */
 --crm-dash-image-direction: row; /* choose from row and row-reverse to get the image on the right, column stacks it */
 
-
 /* Dialog */
 --crm-dialog-bg: var(--crm-c-background);
 --crm-dialog-padding: 0;
 --crm-dialog-radius: var(--crm-roundness);
---crm-dialog-line: 1px solid var(--crm-c-gray-300);
+--crm-dialog-line: var(--crm-c-divider);
 --crm-dialog-header-bg: var(--crm-c-background2);
 --crm-dialog-header-col: var(--crm-c-text);
 --crm-dialog-header-size: var(--crm-r1);
@@ -344,7 +342,7 @@ color-scheme: light dark;
 --crm-dialog-body-padding: var(--crm-m);
 
 /* Dashlet */
---crm-dashlet-border: 1px solid var(--crm-tab-border-col);
+--crm-dashlet-border: var(--crm-tab-border);
 --crm-dashlet-bg: var(--crm-c-background);
 --crm-dashlet-padding: 0;
 --crm-dashlet-header-bg: var(--crm-c-secondary);
@@ -396,7 +394,7 @@ color-scheme: light dark;
 --crm-wizard-angle: 20px; 
 --crm-wizard-active-col: var(--crm-c-link);
 --crm-wizard-active-bg: var(--crm-c-page-background);
---crm-wizard-border-col: var(--crm-c-page-background);
+--crm-wizard-border: 1px solid var(--crm-c-page-background);
 --crm-wizard-bg: var(--crm-c-background);
 
 /* Frontend */
@@ -434,7 +432,7 @@ color-scheme: light dark;
     --crm-c-text-light: var(--crm-c-darkest);
     --crm-c-background: var(--crm-c-gray-900);
     --crm-c-page-background: var(--crm-c-darkest); 
-    --crm-c-code-background: var(--crm-c-gray-200);
+    --crm-c-code-background: var(--crm-c-background2);
     --crm-c-background2: var(--crm-c-gray-900); 
     --crm-c-background3: var(--crm-c-gray-800);
     --crm-c-background4: var(--crm-c-gray-700);
@@ -450,6 +448,7 @@ color-scheme: light dark;
     --crm-c-gray-700: #535252;
     --crm-c-gray-600: #67676a;
     --crm-c-gray-500: #6c6c6c;
+    --crm-c-divider: 1px solid var(--crm-c-gray-500);
 
     /* And others */
     --crm-block-shadow: 0 3px 18px 0 rgb(0,0,0);
@@ -468,12 +467,8 @@ color-scheme: light dark;
     --crm-dash-tab-bg-hover: var(--crm-c-background2);
     --crm-dropdown-bg: var(--crm-c-background);
     --crm-dropdown-2-bg: var(--crm-c-background);
-    --crm-expand-border: 1px solid var(--crm-c-gray-500);
-    --crm-tabs-border: 1px solid var(--crm-c-gray-500);
     --crm-tabs-2-border: 0;
     --crm-tabs-bg: var(--crm-c-background3);
-    --crm-table-outside-border: 1px solid var(--crm-c-gray-500);
-    --crm-table-row-border: 1px solid var(--crm-c-gray-500);
     --crm-panel-border-col: var(--crm-c-gray-500);
     --crm-input-border-color: var(--crm-c-gray-500);
     --crm-table-odd-row: var(--crm-c-gray-800);

@@ -74,6 +74,10 @@ body.page-civicrm .breadcrumb__link {
 #block-claro-content .button:not(:focus) {
     box-shadow: none;
 }
+#block-claro-content .required-mark::after {
+    background-image: unset;
+    display: inherit;
+}
 @media (max-width: 959px) {
     #block-claro-content {
         --crm-page-padding: 1rem;

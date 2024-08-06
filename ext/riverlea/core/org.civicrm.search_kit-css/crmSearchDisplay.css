@@ -4,7 +4,7 @@
 
 /* Sortable headers */
 .crm-search-display th.crm-sortable-col {
-  cursor: pointer;
+  cursor: var(--crm-hover-clickable);
   white-space: nowrap;
 	vertical-align: middle;
 }

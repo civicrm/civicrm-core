@@ -129,12 +129,12 @@
 
 .crm-container .crm-search fieldset {
     padding: var(--crm-s);
-    border-top: 1px solid var(--crm-c-divider);
+    border-top: var(--crm-c-divider);
     margin-block: var(--crm-s);
 } 
 .crm-search fieldset fieldset {
     padding-top: 0;
-    border: 1px solid var(--crm-c-divider);
+    border: var(--crm-c-divider);
     border-width: 0 1px 1px 1px;
 }
 .crm-search fieldset legend {
@@ -239,7 +239,7 @@
 } 
 .crm-search .form-control label,
 .crm-search legend[ng-click] {
-    cursor: pointer;
+    cursor: var(--crm-hover-clickable);
 } 
 .crm-search .api4-input-group {
     display: inline-block;
@@ -312,7 +312,7 @@ crm-search-admin-tags.btn-group-xs .crm-search-admin-tags-btn-label {
 }
 /* .dropdown-menu li > * > label {
     font-weight: normal;
-    cursor: pointer;
+    cursor: var(--crm-hover-clickable);
 } */
 .crm-container .crm-container .dropdown-menu li .form-inline > select {
     max-width: 120px;
@@ -342,7 +342,7 @@ crm-search-admin-import {
     display: block;
 }
 .crm-search .crm-search-admin-relative details { /* only way to target settings accordions */
-    border: var(--crm-expand-body-border);
+    border: var(--crm-expand-border);
     border-radius: var(--crm-roundness);
 }
 .crm-search .crm-search-admin-relative details > summary {

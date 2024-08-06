@@ -203,7 +203,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-expand-header-border-width: 0 0 1px 0;
 --crm-expand-body-bg:;
 --crm-expand-body-box-shadow:;
---crm-expand-body-border: 1px solid var(--crm-c-gray-500);
+--crm-expand-border: 1px solid var(--crm-c-gray-500);
 --crm-expand-border-width: 0 1px 1px 1px;
 --crm-expand-body-padding: var(--crm-padding-reg);
 --crm-expand-body2-bg:;
@@ -394,7 +394,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-wizard-angle: 0px; 
 --crm-wizard-active-col: var(--crm-c-light-text);
 --crm-wizard-active-bg: var(--crm-c-link);
---crm-wizard-border-col: var(--crm-c-divider);
+--crm-wizard-border: var(--crm-c-divider);
 --crm-wizard-bg: var(--crm-c-page-background);
 
 /* Frontend */

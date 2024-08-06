@@ -86,7 +86,7 @@
     display: none;
 }
 .crm-container span.crm-custom-greeting {
-    font-size: 9px;
+    font-size: var(--crm-small-font-size);
 }
 .crm-container table.crm-inline-edit-form td,
 .crm-container div.crm-inline-edit-form {
@@ -185,7 +185,8 @@ div.crm-inline-edit-form div.crm-clear {
     width: 100%;
 }
 .crm-container div.contact_panel td.grouplabel {
-    border-bottom: 2px solid var(--crm-c-divider);
+    border-bottom: var(--crm-c-divider);
+    border-width: 2px;
 }
 .crm-container div.contact_panel .crm-address-block {
     margin-bottom: 6px;
@@ -315,7 +316,7 @@ div.crm-inline-edit-form div.crm-clear {
     margin-top: 5px;
 }
 #tagtree ins.jstree-icon {
-    cursor: pointer;
+    cursor: var(--crm-hover-clickable);
     position: relative;
     top: -3px;
 }

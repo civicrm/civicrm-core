@@ -9,11 +9,11 @@
     white-space: nowrap;
     vertical-align: middle;
     touch-action: manipulation;
-    cursor: pointer;
+    cursor: var(--crm-hover-clickable);
     background-image: none;
     border: var(--crm-btn-border);
     padding: var(--crm-btn-padding-block) var(--crm-btn-padding-inline);
-    font-size: var(--crm-r);
+    font-size: var(--crm-font-size);
     border-radius: var(--crm-btn-radius);
     user-select: none;
     margin-bottom: 0;
@@ -366,8 +366,10 @@
 
 /* BS3 Button groups and dropdowns  */
 
-.crm-search-col-type-buttons {
+.crm-search-col-type-buttons,
+.crm-container td.text-right:has(.btn) {
     display: flex;
+    gap: var(--crm-s);
 }
 .crm-actions-ribbon #actions {
     padding: 0;

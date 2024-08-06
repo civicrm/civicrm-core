@@ -111,7 +111,7 @@
 	color: var(--crm-c-link);
 	text-decoration: none;
 	background-color: var(--crm-c-page-background);
-	border: 1px solid var(--crm-c-divider);
+	border: var(--crm-c-divider);
 }
 .crm-container .pagination > li > a:hover, 
 .crm-container .pagination > li > a:focus, 
@@ -143,7 +143,7 @@
 	color: var(--crm-c-primary-text);
 	cursor: default;
 	background-color: var(--crm-c-primary);
-	border-color: var(--crm-c-divider);
+	border: var(--crm-c-divider);
 }
 .crm-container .pagination > .disabled > span, 
 .crm-container .pagination > .disabled > span:hover, 
@@ -154,7 +154,7 @@
 	color: var(--crm-c-inactive);
 	cursor: not-allowed;
 	background-color: transparent;
-	border-color: var(--crm-c-divider);
+	border: var(--crm-c-divider);
 }
 .crm-container .pagination-lg > li > a, 
 .crm-container .pagination-lg > li > span {

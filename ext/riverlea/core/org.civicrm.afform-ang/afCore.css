@@ -7,7 +7,7 @@
     color: var(--crm-c-darkest);
 }
 a.af-api4-action-idle {
-    cursor: pointer;
+    cursor: var(--crm-hover-clickable);
 } 
 .af-container.af-layout-cols {
     display: flex;

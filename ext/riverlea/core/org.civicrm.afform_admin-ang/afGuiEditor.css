@@ -4,7 +4,7 @@
 
 /* List page */
 .afadmin-list th[ng-click] {
-    cursor: pointer;
+    cursor: var(--crm-hover-clickable);
 }
 .afadmin-list th i.fa-sort-desc,
 .afadmin-list th i.fa-sort-asc {
@@ -32,7 +32,7 @@
 }
 #afGuiEditor fieldset legend {
 	padding: var(--crm-s) 0 0 0;
-	border-bottom: 1px solid var(--crm-c-divider);
+	border-bottom: var(--crm-c-divider);
 	width: 100%;
     margin-bottom: var(--crm-m);
 }
@@ -67,7 +67,6 @@
 
 #afGuiEditor .panel-heading {
 	padding: 0 var(--crm-m);
-	border-bottom: 1px solid var(--crm-c-divider);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -194,7 +193,7 @@
     font-family: sans-serif,'FontAwesome';
 }
 .af-gui-entity-palette-select-list {
-	border: 1px solid var(--crm-c-divider);
+	border: var(--crm-c-divider);
 	border-radius: 0 0 var(--crm-roundness) var(--crm-roundness);
 	padding: 0 var(--crm-s) var(--crm-s);
     max-height: 400px;
@@ -240,7 +239,7 @@
     width: 100%;
 	border-radius: 0;
     transition: opacity .2s;
-    background-color: var(--crm-c-background2);
+    background-color: var(--crm-c-background3);
     padding-inline: var(--crm-xs);
     cursor: move;
     display: flex;
@@ -261,6 +260,10 @@
     gap: var(--crm-flex-gap);
     align-items: center;
 } 
+#afGuiEditor-canvas af-gui-container-multi-toggle .btn .ng-binding {
+    display: flex;
+    margin-right: var(--crm-m);
+}
 #afGuiEditor .af-gui-node-title {
     position: absolute;
     top: 1px;
@@ -397,23 +400,23 @@ af-gui-container > .af-gui-bar,
 #afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > .btn-group > .btn-group > button:hover > span,
 #afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > .btn-group > .btn-group > button[aria-expanded=true] > span,
 #afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > .btn-group > .btn-group > button:focus > span {
-    color: var(--crm-c-blue-dark);
+    color: var(--crm-c-info);
 }
 #afGuiEditor .af-gui-add-element-button span {
     display: inline-block;
     width: 18px;
     height: 18px;
-    color: var(--crm-c-blue-dark);
+    color: var(--crm-c-info);
 }
 #afGuiEditor #afGuiEditor-canvas-body .btn[disabled] {
     cursor: default;
-    color: var(--crm-c-inactive);
+    opacity: 0.5;
 }
 #afGuiEditor .af-gui-button > .btn.disabled .crm-editable-enabled:hover:not(:focus) {
-    border-color: #f4f4f4 !important;
+    border-color: var(--crm-c-background2) !important;
 }
 #afGuiEditor .af-gui-button > .btn-default.disabled {
-    background-color: lightgrey !important;
+    background-color: var(--crm-c-background2) !important;
 }
 #afGuiEditor .af-gui-container-title span:empty {
     font-weight: lighter;
@@ -426,7 +429,7 @@ af-gui-container > .af-gui-bar,
 }
 /* For editing field placeholder text */
 #afGuiEditor .af-gui-field-input input[type=text].form-control {
-    color: #9a9a9a;
+    color: var(--crm-c-background5);
 }
 #afGuiEditor .af-gui-field-input-type-number input[type=text].form-control {
     background-image: url('../images/number.png');
@@ -478,7 +481,7 @@ af-gui-container > .af-gui-bar,
     background: none;
 }
 #afGuiEditor af-gui-edit-options.af-gui-content-editing-area {
-    border: 2px solid #0071bd;
+    border: 2px solid var(--crm-c-info);
 }
 #afGuiEditor af-gui-edit-options.af-gui-content-editing-area ul[ui-sortable] {
     padding: 5px 20px 0;
@@ -507,8 +510,8 @@ af-gui-container > .af-gui-bar,
     margin-left: 20px;
 }
 #afGuiEditor .af-gui-dropzone {
-    background-color: #e9eeff;
-    border: 2px solid #0071bd;
+    background-color: var(--crm-c-background2);
+    border: 2px solid var(--crm-c-info);
     min-height: 30px;
 }
 /* Rules for Conditional dialog */
@@ -530,7 +533,7 @@ af-gui-container > .af-gui-bar,
     top: 0;
 }
 .af-gui-conditional-dialog legend[ng-click] {
-    cursor: pointer;
+    cursor: var(--crm-hover-clickable);
 }
 i.crm-i.af-gui-conditional-dialog-move-icon {
     opacity: .5;
@@ -590,7 +593,7 @@ i.crm-i.af-gui-conditional-dialog-move-icon {
 #afGuiEditor .dropdown-menu li .af-gui-field-select-in-dropdown label,
 #afGuiEditor .dropdown-menu li > * > label {
     font-weight: normal;
-    cursor: pointer;
+    cursor: var(--crm-hover-clickable);
     color: var(--crm-dropdown-col);
 }
 #afGuiEditor .dropdown-menu li .af-gui-field-select-in-dropdown > select {

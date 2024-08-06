@@ -192,7 +192,7 @@
 #bootstrap-theme a.label:hover, #bootstrap-theme a.label:focus {
 	color: var(--crm-c-light-text);
 	text-decoration: none;
-	cursor: pointer;
+	cursor: var(--crm-hover-clickable);
 }
 #bootstrap-theme .label-default {
 	background-color: var(--crm-c-text);

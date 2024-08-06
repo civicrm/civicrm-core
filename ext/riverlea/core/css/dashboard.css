@@ -37,15 +37,15 @@
     text-overflow: ellipsis;
     overflow: hidden;
     color: var(--crm-dashlet-header-col);
-    font-size: var(--crm-r);
+    font-size: var(--crm-font-size);
 }
 .crm-container .crm-dashlet-header a {
     color: var(--crm-dashlet-header-col);
     padding: var(--crm-xs) var(--crm-s);
 	text-decoration: none;
-    font-size: var(--crm-r);
+    font-size: var(--crm-font-size);
     font-weight: normal;
-    cursor: pointer;
+    cursor: var(--crm-hover-clickable);
     opacity: .7;
     float: right;
 }
@@ -65,7 +65,7 @@ crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
 }
 .crm-container .crm-dashlet .crm-accordion-body {
     padding: 0;
-    border-bottom: var(--crm-expand-body-border);
+    border-bottom: var(--crm-expand-border);
 }
 .crm-container .crm-dashlet .crm-accordion-body table {
     margin: 0;
