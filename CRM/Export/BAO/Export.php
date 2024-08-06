@@ -160,7 +160,6 @@ class CRM_Export_BAO_Export {
 
     $count = -1;
 
-    $sqlColumns = $processor->getSQLColumns();
     $processor->createTempTable();
     $limitReached = FALSE;
 
@@ -187,7 +186,7 @@ class CRM_Export_BAO_Export {
 
         // output every $tempRowCount rows
         if ($count % $tempRowCount == 0) {
-          self::writeDetailsToTable($processor, $componentDetails, $sqlColumns);
+          self::writeDetailsToTable($processor, $componentDetails);
           $componentDetails = [];
         }
       }
