@@ -61,7 +61,12 @@
           var path = $rootScope.$eval(task.crmPopup.path, data),
             query = task.crmPopup.query && $rootScope.$eval(task.crmPopup.query, data);
           CRM.loadForm(CRM.url(path, query, 'back'), {post: task.crmPopup.data && $rootScope.$eval(task.crmPopup.data, data)})
-            .on('crmFormSuccess', mngr.refreshAfterTask);
+            .on('crmFormSuccess', (e) => {
+                // refreshAfterTask emits its own
+                // crmPopupFormSuccess event
+                e.stopPropagation();
+                mngr.refreshAfterTask();
+            });
         }
         else if (task.redirect) {
           var redirectPath = $rootScope.$eval(task.redirect.path, data),
