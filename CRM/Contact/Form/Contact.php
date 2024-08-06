@@ -1496,6 +1496,10 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       CRM_Contact_Form_Edit_OpenID::buildQuickForm($this);
       return;
     }
+    if ($name === 'Email') {
+      CRM_Contact_Form_Edit_Email::buildQuickForm($this, $this->get('Email_Block_Count') ?: 1);
+      return;
+    }
     CRM_Core_Error::deprecatedWarning('unused?');
     $this->buildBlock($name);
   }
