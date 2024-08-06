@@ -13,6 +13,9 @@
 .afadmin-list th:not(:hover) i.fa-sort {
     opacity: .5;
 }
+#afform-list-filter {
+    font-family: sans-serif,'FontAwesome';
+}
 /* Editor */
 
 #afGuiEditor {
@@ -90,7 +93,7 @@
     order: 3;
 }
 #afGuiEditor .panel-heading ul.nav-tabs li {
-    height: 100%;
+    height: 101%;
 }
 #afGuiEditor .panel-heading ul.nav-tabs li.fluid-width-tab {
     white-space: nowrap;

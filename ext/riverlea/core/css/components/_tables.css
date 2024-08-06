@@ -1,4 +1,4 @@
-.crm-container table {
+.crm-container table:not(.crm-inline-edit-form) {
     border: var(--crm-table-outside-border);
     background: var(--crm-table-background);
     box-shadow: var(--crm-block-shadow);
