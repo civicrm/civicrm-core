@@ -33,7 +33,8 @@
           $scope.data.dedupeRules = CRM.vars.crmImportUi.dedupeRules;
           // Used for select contact type select-options.
           $scope.data.contactTypes = CRM.vars.crmImportUi.contactTypes;
-
+          // The headers from the data-source + any previously added user-defined rows.
+          $scope.data.columnHeaders = CRM.vars.crmImportUi.columnHeaders;
           $scope.data.entities = {};
           // Available entities is entityMetadata mapped to a form-friendly format
           $scope.entitySelection = [];
@@ -72,7 +73,7 @@
           function buildImportMappings() {
             $scope.data.importMappings = [];
             var importMappings = $scope.userJob.metadata.import_mappings;
-            _.each($scope.userJob.metadata.DataSource.column_headers, function (header, index) {
+            _.each($scope.data.columnHeaders, function (header, index) {
               var fieldName = $scope.data.defaults['mapper[' + index + ']'][0];
               if (Boolean(fieldName)) {
                 fieldName = fieldName.replace('__', '.');
