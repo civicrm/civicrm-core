@@ -66,6 +66,9 @@
     font-family: inherit !important;
     font-size: inherit;
 }
+.crm-container .ui-icon:hover {
+    background-image: none;
+}
 .crm-container .ui-button-icon-only .ui-icon {
     position: initial;
     top: auto;

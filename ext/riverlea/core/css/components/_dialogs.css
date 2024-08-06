@@ -139,7 +139,11 @@
     padding: var(--crm-m);
     justify-content: flex-end;
 }
-.ui-dialog .ui-dialog-buttonpane button {
+.crm-container.ui-dialog .buttons.pull-right {
+    display: flex;
+    gap: var(--crm-flex-gap);
+}
+.crm-container.ui-dialog .ui-dialog-buttonpane button {
     margin: 0;
 }
 

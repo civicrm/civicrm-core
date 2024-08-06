@@ -149,11 +149,11 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-btn-height: 31px;
 --crm-btn-icon-spacing: var(--crm-m1);
 --crm-btn-icon-size: var(--crm-btn-height);
---crm-btn-cancel-bg: ;
---crm-btn-info-bg: ;
---crm-btn-warning-bg: ;
---crm-btn-success-bg: ;
---crm-btn-alert-bg: ;
+--crm-btn-cancel-bg: var(--crm-c-gray-025);
+--crm-btn-info-bg: var(--crm-c-gray-025);
+--crm-btn-warning-bg: var(--crm-c-gray-025);
+--crm-btn-success-bg: var(--crm-c-gray-025);
+--crm-btn-alert-bg: var(--crm-c-gray-025);
 --crm-btn-icon-bg: var(--crm-c-gray-100);
 --crm-btn-icon-border: var(--crm-btn-border);
 

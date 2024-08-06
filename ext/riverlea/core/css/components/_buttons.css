@@ -1,4 +1,5 @@
 .crm-container .btn,
+.crm-container button,
 .crm-container .crm-button,
 .crm-container [type="button"],
 .crm-container [type="reset"],
@@ -20,6 +21,9 @@
     color: var(--crm-c-primary-text);
     text-transform: var(--crm-btn-txt-transform);
     height: var(--crm-btn-height);
+    display: flex;
+    max-width: fit-content;
+    align-items: center;
 }
 .crm-container .btn:hover,
 .crm-container .btn:focus,
@@ -122,6 +126,8 @@
     padding: var(--crm-btn-padding-block) var(--crm-btn-icon-spacing) var(--crm-btn-padding-block) var(--crm-btn-padding-inline);
     height: auto;
     min-width: var(--crm-btn-height);
+    display: flex;
+    align-items: center;
 }
 .crm-container button i.crm-i,
 .crm-container .btn i.crm-i {
@@ -148,7 +154,7 @@
 .crm-container .btn-group > .btn + .dropdown-toggle:has(i.crm-i),
 .crm-container button.ui-button:has(.ui-button-icon) {
     padding: 0 var(--crm-btn-padding-inline) 0 0;
-    display: inline-block;
+    /* display: inline-block; */
 }
 .crm-container a.button:has(i.crm-i), 
 .crm-container button:has(i.crm-i),
