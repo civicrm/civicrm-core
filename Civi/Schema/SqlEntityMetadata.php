@@ -40,7 +40,7 @@ class SqlEntityMetadata extends EntityMetadataBase {
     return $this->getEntity()['getFields']();
   }
 
-  public function getOptions(string $fieldName, array $values = NULL): ?array {
+  public function getOptions(string $fieldName, ?array $values = NULL): ?array {
     // TODO: Implement getOptions() method.
   }
 

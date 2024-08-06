@@ -186,7 +186,7 @@ class LegacySqlEntityMetadata extends EntityMetadataBase {
     return $usage;
   }
 
-  public function getOptions(string $fieldName, array $values = NULL): ?array {
+  public function getOptions(string $fieldName, ?array $values = NULL): ?array {
     // TODO: Implement getOptions() method.
   }
 
