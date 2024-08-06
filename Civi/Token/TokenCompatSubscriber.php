@@ -66,6 +66,42 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
       return '';
     });
 
+    $e->string = self::renderConditionalPunctuation($e->string);
+
+    if ($useSmarty) {
+      $smartyVars = [];
+      foreach ($e->context['smartyTokenAlias'] ?? [] as $smartyName => $tokenName) {
+        $tokenParts = explode('|', $tokenName);
+        $modifier = $tokenParts[1] ?? '';
+        $smartyVars[$smartyName] = \CRM_Utils_Array::pathGet($e->row->tokens, explode('.', $tokenParts[0]), '');
+        if ($smartyVars[$smartyName] instanceof \Brick\Money\Money) {
+          // TODO: We should reuse the filters from TokenProcessor::filterTokenValue()
+          if ($modifier === 'crmMoney') {
+            $smartyVars[$smartyName] = \Civi::format()
+              ->money($smartyVars[$smartyName]->getAmount(), $smartyVars[$smartyName]->getCurrency());
+          }
+          else {
+            $smartyVars[$smartyName] = $smartyVars[$smartyName]->getAmount();
+          }
+        }
+      }
+      \CRM_Core_Smarty::singleton()->pushScope($smartyVars);
+      try {
+        $e->string = \CRM_Utils_String::parseOneOffStringThroughSmarty($e->string);
+      }
+      finally {
+        \CRM_Core_Smarty::singleton()->popScope();
+      }
+    }
+  }
+
+  /**
+   * Handle conditional punctuation
+   *
+   * @param string $string
+   * @return string
+   */
+  public static function renderConditionalPunctuation(string $string = '') : string {
     // This removes the pattern used in greetings of having bits of text that
     // depend on the tokens around them - ie '{first_name}{ }{last_name}
     // has an extra construct '{ }' which will resolve what is inside the {} if the
@@ -123,33 +159,7 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
     // Finally replace curlies with the inner content
     $regexes[] = ["/$curly_inner/", '$1'];
 
-    $e->string = preg_replace(array_column($regexes, 0), array_column($regexes, 1), $e->string);
-
-    if ($useSmarty) {
-      $smartyVars = [];
-      foreach ($e->context['smartyTokenAlias'] ?? [] as $smartyName => $tokenName) {
-        $tokenParts = explode('|', $tokenName);
-        $modifier = $tokenParts[1] ?? '';
-        $smartyVars[$smartyName] = \CRM_Utils_Array::pathGet($e->row->tokens, explode('.', $tokenParts[0]), '');
-        if ($smartyVars[$smartyName] instanceof \Brick\Money\Money) {
-          // TODO: We should reuse the filters from TokenProcessor::filterTokenValue()
-          if ($modifier === 'crmMoney') {
-            $smartyVars[$smartyName] = \Civi::format()
-              ->money($smartyVars[$smartyName]->getAmount(), $smartyVars[$smartyName]->getCurrency());
-          }
-          else {
-            $smartyVars[$smartyName] = $smartyVars[$smartyName]->getAmount();
-          }
-        }
-      }
-      \CRM_Core_Smarty::singleton()->pushScope($smartyVars);
-      try {
-        $e->string = \CRM_Utils_String::parseOneOffStringThroughSmarty($e->string);
-      }
-      finally {
-        \CRM_Core_Smarty::singleton()->popScope();
-      }
-    }
+    return preg_replace(array_column($regexes, 0), array_column($regexes, 1), $string);
   }
 
 }
