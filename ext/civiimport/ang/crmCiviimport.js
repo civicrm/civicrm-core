@@ -277,6 +277,7 @@
          * @type {$scope.save}
          */
         $scope.save = (function ($event) {
+          $event.preventDefault();
           $scope.userJob.metadata.entity_configuration = {};
           $scope.userJob.metadata.import_mappings = [];
           _.each($scope.entitySelection, function (entity) {
@@ -300,7 +301,16 @@
               entity_data: entityConfig
             });
           });
-          crmApi4('UserJob', 'save', {records: [$scope.userJob]});
+          crmApi4('UserJob', 'save', {records: [$scope.userJob]})
+            .then(function(result) {
+              // Only post the form if the save succeeds.
+              document.getElementById("MapField").submit();
+            },
+            function(failure) {
+              // @todo add more error handling - for now, at least we waited...
+              document.getElementById("MapField").submit();
+            }
+          );
         });
 
         $scope.load();
