@@ -279,7 +279,7 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
 
 /* BOOTSTRAP tables */
 
-.crm-container table col[class*="col-"] {
+/* .crm-container table col[class*="col-"] {
 	position: static;
 	display: table-column;
 	float: none;
@@ -289,7 +289,7 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
 	position: static;
 	display: table-cell;
 	float: none;
-}
+} */
 .crm-container .table {
 	width: 100%;
 	max-width: 100%;

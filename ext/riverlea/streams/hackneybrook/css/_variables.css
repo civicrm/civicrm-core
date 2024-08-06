@@ -60,7 +60,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-c-dark-text: var(--crm-c-text);
 --crm-c-link: var(--crm-c-blue-dark);
 --crm-c-link-hover: var(--crm-c-blue-darker);
---crm-c-divider: rgba(142, 146, 156, 0.5);
+--crm-c-divider: 1px solid var(--crm-c-gray-200);
 --crm-c-page-background: #fff;
 --crm-c-background: var(--crm-c-gray-025);
 --crm-c-background2: var(--crm-c-gray-050);
@@ -149,18 +149,18 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-btn-height: 31px;
 --crm-btn-icon-spacing: var(--crm-m1);
 --crm-btn-icon-size: var(--crm-btn-height);
---crm-btn-cancel-bg: var(--crm-c-gray-025);
---crm-btn-info-bg: var(--crm-c-gray-025);
---crm-btn-warning-bg: var(--crm-c-gray-025);
---crm-btn-success-bg: var(--crm-c-gray-025);
---crm-btn-alert-bg: var(--crm-c-gray-025);
---crm-btn-icon-bg: var(--crm-c-gray-100);
+--crm-btn-cancel-bg: var(--crm-c-primary);
+--crm-btn-info-bg: var(--crm-c-primary);
+--crm-btn-warning-bg: var(--crm-c-primary);
+--crm-btn-success-bg: var(--crm-c-primary);
+--crm-btn-alert-bg: var(--crm-c-primary);
+--crm-btn-icon-bg: var(--crm-c-primary);
 --crm-btn-icon-border: var(--crm-btn-border);
 
 /* TABLES */
---crm-table-outside-border: 1px solid var(--crm-c-background3);
+--crm-table-outside-border: var(--crm-c-divider);
 --crm-table-background: var(--crm-c-page-background);
---crm-table-row-border: 1px solid var(--crm-c-gray-300);
+--crm-table-row-border: var(--crm-c-divider);
 --crm-table-column-border: 0 solid transparent;
 --crm-table-font-size: var(--crm-font-size);
 --crm-table-padding: var(--crm-m);
@@ -178,7 +178,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-table-compressed-width: auto;
 --crm-table-nested-padding: var(--crm-r) var(--crm-m);
 --crm-table-nested-head-border: 0 solid transparent;
---crm-table-nested-border: 1px solid var(--crm-c-gray-300);
+--crm-table-nested-border: var(--crm-c-divider);
 --crm-table-inset-bg: var(--crm-c-background3);
 
 /* PANELS */
@@ -203,7 +203,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-expand-header-border-width: 0 0 1px 0;
 --crm-expand-body-bg:;
 --crm-expand-body-box-shadow:;
---crm-expand-body-border: 1px solid var(--crm-c-gray-200);
+--crm-expand-body-border: var(--crm-c-divider);
 --crm-expand-border-width: 0 1px 1px 1px;
 --crm-expand-body-padding: var(--crm-padding-reg);
 --crm-expand-body2-bg:;
@@ -266,7 +266,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 /* Tabs */
 --crm-tabs-bg: var(--crm-c-background4);
 --crm-tabs-padding: var(--crm-s);
---crm-tabs-border: 1px solid var(--crm-c-divider);
+--crm-tabs-border: var(--crm-c-divider);
 --crm-tabs-gap: var(--crm-s);
 --crm-tab-bg: var(--crm-c-background2);
 --crm-tab-bg-hover: var(--crm-c-page-background);
@@ -296,7 +296,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-dash-tab-bg-hover: var(--crm-c-background);
 --crm-dash-tab-padding: var(--crm-m2) var(--crm-m1) var(--crm-m2) var(--crm-r);
 --crm-dash-tab-border: 1px solid transparent;
---crm-dash-tab-border-hover: 1px solid var(--crm-c-gray-200);
+--crm-dash-tab-border-hover: var(--crm-c-divider);
 --crm-dash-tab-border-width: 1px 0 1px 1px; /* to remove border on one side for hanging tabs */
 --crm-dash-tab-col: var(--crm-tab-col);
 --crm-dash-tab-count-bg: rgba(0,0,0,0.1);
@@ -311,7 +311,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-dash-heading-inset: var(--crm-side-tabs-width);
 --crm-dash-panel-padding: var(--crm-r);
 --crm-dash-panel-bg: var(--crm-c-background);
---crm-dash-panel-border: 1px solid var(--crm-c-gray-200);
+--crm-dash-panel-border: var(--crm-c-divider);
 --crm-dash-edit-border: 2px dashed var(--crm-c-gray-300);
 --crm-dash-block-padding: 0;
 --crm-dash-block-bg: ;
@@ -326,7 +326,6 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-dash-image-radius: 200px;
 --crm-dash-image-justify: start; /* choose from start (left), end (right), center, and space-between (spread out) */
 --crm-dash-image-direction: row; /* choose from row and row-reverse to get the image on the right, column stacks it */
-
 
 /* Dialog */
 --crm-dialog-bg: var(--crm-c-page-background);
@@ -343,7 +342,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-dialog-body-padding: var(--crm-r);
 
 /* Dashlet */
---crm-dashlet-border: 1px solid var(--crm-c-gray-200);
+--crm-dashlet-border: var(--crm-c-divider);
 --crm-dashlet-bg: var(--crm-c-page-background);
 --crm-dashlet-padding: 0;
 --crm-dashlet-header-bg: var(--crm-expand-header-bg);
@@ -442,25 +441,27 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
         --crm-c-primary-hover: var(--crm-c-gray-900);
         --crm-c-secondary-hover: var(--crm-c-gray-900);
         --crm-c-success: #58a458;
-        --crm-red-alert: #B24B4F;
         --crm-c-alert: #ff899a;
-        --crm-blue-info: #2C99A4;
+        --crm-c-info: #2C99A4;
+        --crm-c-teal: #28ae9f;
         --crm-c-green-light: #468847;
         --crm-c-green: #55aa57;
         --crm-c-green-dark: #dff0d8;
         --crm-c-gray-700: #535252;
         --crm-c-gray-600: #67676a;
         --crm-c-gray-500: #6c6c6c;
+        --crm-c-divider: 1px solid var(--crm-c-gray-500);
 
         /* And others */
+        --crm-c-focus: var(--crm-c-amber);
         --crm-btn-icon-bg: var(--crm-c-gray-700);
-        --crm-btn-border: 1px solid var(--crm-c-gray-500);
         --crm-block-shadow: 0;
         --crm-popup-shadow: 0 3px 18px 0 rgb(0,0,0);
         --crm-heading-bg: var(--crm-c-blue-dark);
         --crm-dashlet-bg: var(--crm-c-background2);
         --crm-dashlet-header-bg: var(--crm-c-background3);
         --crm-expand-header-bg: var(--crm-c-background4);
+        --crm-expand-header-bg-active: var(--crm-c-background5);
         --crm-expand-body-bg: var(--crm-c-background3);
         --crm-expand-body-border: 0;
         --crm-dash-header-bg: transparent;
@@ -471,12 +472,8 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
         --crm-dash-tab-bg-hover: var(--crm-c-background2);
         --crm-dropdown-bg: var(--crm-c-background);
         --crm-dropdown-2-bg: var(--crm-c-background);
-        --crm-expand-border: 1px solid var(--crm-c-gray-500);
-        --crm-tabs-border: 1px solid var(--crm-c-gray-500);
         --crm-tabs-2-border: 0;
         --crm-tabs-bg: var(--crm-c-background3);
-        --crm-table-outside-border: 1px solid var(--crm-c-gray-500);
-        --crm-table-row-border: 1px solid var(--crm-c-gray-500);
         --crm-panel-border-col: var(--crm-c-gray-500);
         --crm-input-border-color: var(--crm-c-gray-500);
         --crm-table-odd-row: var(--crm-c-gray-800);

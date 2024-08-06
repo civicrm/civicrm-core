@@ -366,6 +366,16 @@
 
 /* BS3 Button groups and dropdowns  */
 
+.crm-search-col-type-buttons {
+    display: flex;
+}
+.crm-actions-ribbon #actions {
+    padding: 0;
+    margin: 0 0 var(--crm-padding-reg);
+    display: flex;
+    gap: var(--crm-flex-gap);
+    align-items: center;
+}
 .crm-container .btn-group, .crm-container .btn-group-vertical {
 	position: relative;
 	display: inline-block;

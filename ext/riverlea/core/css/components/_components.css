@@ -390,10 +390,14 @@ table.advmultiselect {
 }
 p.crm-upgrade-large-text {
     grid-column: 2;
+    color: var(--crm-c-success);
+}
+.crm-upgrade-box-inner a {
+    color: var(--crm-c-link) !important;
 }
 p.crm-upgrade-large-text:first-of-type {
     font-size: var(--crm-r1);
-    color: var(--crm-c-green-dark);
+    color: var(--crm-c-success);
     font-family: var(--crm-font-bold);
     font-weight: var(--crm-bold-weight);
 }
@@ -401,7 +405,18 @@ p.crm-upgrade-large-text:first-of-type {
     display: unset;
     padding: 0;
     font-size: 3rem;
-    color: var(--crm-c-green-dark);
+    color: var(--crm-c-success);
     grid-column: 1;
     grid-row: 1 / span 3;
+}
+
+/* Community message */
+
+div.civicrm-community-messages {
+    border: 2px solid var(--crm-c-success);
+    background: var(--crm-c-green-light);
+    padding: var(--crm-padding-inset);
+}
+div.civicrm-community-messages .crm-collapsible .collapsible-title {
+    color: var(--crm-c-green-dark) !important /* vs inline */;
 }

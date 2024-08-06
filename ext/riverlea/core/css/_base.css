@@ -62,9 +62,13 @@
 .crm-container .ui-widget input, 
 .crm-container .ui-widget select, 
 .crm-container .ui-widget textarea, 
-.crm-container .ui-widget button {
+.crm-container .ui-widget button,
+.ui-widget.ui-autocomplete {
     font-family: inherit !important;
     font-size: inherit;
+}
+.crm-container .ui-icon {
+    width: inherit;
 }
 .crm-container .ui-icon:hover {
     background-image: none;

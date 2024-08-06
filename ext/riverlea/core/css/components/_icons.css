@@ -127,6 +127,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 .crm-container table.dataTable thead th.sorting_desc  {
     background-image: none;
     color: var(--crm-c-text);
+    box-shadow: none;
 }
 .crm-container th a:hover,
 .crm-container th a:focus {

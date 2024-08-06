@@ -15,10 +15,6 @@ table.crm-sticky-header > thead > tr {
   color: initial;
   min-width: 86px; /* Don't allow button to be split on 2 lines */
 }
-/* .crm-search-display-table > table.table > thead > tr > th i.crm-search-table-column-sort-icon {
-	position: unset;
-	line-height: var(--crm-r1);
-} */
 .crm-search-display-table > table.table > thead > tr > th i.crm-search-table-column-sort-icon + .crm-search-display-table-column-label {
 	margin-left: 0 !important;
 }
@@ -28,7 +24,7 @@ table.crm-sticky-header > thead > tr {
 }
 /* Afform tables */
 
-td.crm-search-col-type-buttons {
+.crm-container td.crm-search-col-type-buttons {
   display: flex;
   flex-wrap: wrap;
   gap: var(--crm-s);

@@ -226,6 +226,7 @@ a.crm-expand-row:hover,a.crm-expand-row:focus {
     background: var(--crm-c-secondary);
     color: var(--crm-c-secondary-text);
 	border: var(--crm-btn-border);
+	padding: var(--crm-btn-padding-block) var(--crm-btn-padding-inline);
     font-weight: normal;
 	text-decoration: none;
 	line-height: inherit;

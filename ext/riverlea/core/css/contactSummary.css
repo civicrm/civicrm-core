@@ -41,10 +41,6 @@
     background: none;
     position: relative;
 }
-.crm-edit-ready .crm-inline-edit:hover {
-    cursor: pointer;
-    border: 2px dashed lightgrey;
-}
 .crm-inline-edit.form {
     cursor: default;
     border: 1px solid var(--crm-c-focus);
