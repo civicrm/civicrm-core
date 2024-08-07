@@ -315,7 +315,7 @@ class SettingsManager {
       $fqn = $spec['global_name'] ?? NULL;
       if ($fqn) {
         $envValue = getenv($fqn);
-        if ($envValue) {
+        if ($envValue !== FALSE) {
           $settings[$key] = $envValue;
         }
       }
