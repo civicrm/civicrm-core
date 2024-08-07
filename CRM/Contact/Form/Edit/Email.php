@@ -71,10 +71,14 @@ class CRM_Contact_Form_Edit_Email {
 
       //Bulkmail checkbox
       $form->assign('multipleBulk', $multipleBulk);
-      $js = ['id' => 'Email_' . $blockId . '_IsBulkmail', 'aria-label' => ts('Bulk Mailing for Email %1?', [1 => $blockId])];
-      if (!$blockEdit && !$multipleBulk) {
-        $js['onClick'] = 'singleSelect( this.id );';
-      }
+      $js = [
+        'id' => 'Email_' . $blockId . '_IsBulkmail',
+        'aria-label' => ts('Bulk Mailing for Email %1?', [1 => $blockId]),
+        'onChange' => "if (CRM.$(this).is(':checked')) {
+          CRM.$('.crm-email-bulkmail input').not(this).prop('checked', false);
+        }"
+      ];
+
       $form->addElement('advcheckbox', "email[$blockId][is_bulkmail]", NULL, '', $js);
 
       //is_Primary radio

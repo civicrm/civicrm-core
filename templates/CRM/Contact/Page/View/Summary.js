@@ -243,12 +243,6 @@
           $('[class$=is_primary] input', $(this).closest('form')).not(this).prop('checked', false);
         }
       })
-      // make sure only one builk_mail radio is checked
-      .on('change', '.crm-email-bulkmail input', function(){
-        if ($(this).is(':checked')) {
-          $('.crm-email-bulkmail input').not(this).prop('checked', false);
-        }
-      })
       // handle delete link within blocks
       .on('click', '.crm-delete-inline', function(e) {
         var row = $(this).closest('tr');
