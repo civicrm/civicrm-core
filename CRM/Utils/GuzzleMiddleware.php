@@ -227,7 +227,7 @@ class CRM_Utils_GuzzleMiddleware {
 
     $curlFmt = new class() extends \GuzzleHttp\MessageFormatter {
 
-      public function format(RequestInterface $request, ResponseInterface $response = NULL, \Exception $error = NULL) {
+      public function format(RequestInterface $request, ?ResponseInterface $response = NULL, ?\Throwable $error = NULL): string {
         $cmd = '$ curl';
         if ($request->getMethod() !== 'GET') {
           $cmd .= ' -X ' . escapeshellarg($request->getMethod());

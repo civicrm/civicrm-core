@@ -47,11 +47,20 @@ class CheckCredentialEvent extends \Civi\Core\Event\GenericHookEvent {
   protected $rejection = NULL;
 
   /**
+   * @var string
+   *   Ex: 'civicrm/dashboard'
+   */
+  protected $requestPath;
+
+  /**
    * @param string $cred
    *   Ex: 'Basic ABCD1234' or 'Bearer ABCD1234'
+   * @param string $requestPath
+   *   Ex: 'civicrm/dashboard'
    */
-  public function __construct(string $cred) {
+  public function __construct(string $cred, string $requestPath) {
     [$this->credFormat, $this->credValue] = explode(' ', $cred, 2);
+    $this->requestPath = $requestPath;
   }
 
   /**
@@ -121,6 +130,14 @@ class CheckCredentialEvent extends \Civi\Core\Event\GenericHookEvent {
 
   public function getRejection(): ?string {
     return $this->rejection;
+  }
+
+  /**
+   * @return string
+   *   Ex: 'civicrm/dashboard'
+   */
+  public function getRequestPath(): string {
+    return $this->requestPath;
   }
 
 }
