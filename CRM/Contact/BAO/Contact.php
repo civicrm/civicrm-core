@@ -2167,9 +2167,22 @@ ORDER BY civicrm_email.is_primary DESC";
           }
         }
         elseif ($fieldName == 'email') {
+          // This bit of code ensures is_primary is set.
+          // It probably dates back to when the BAO
+          // could not be relied upon to manage
+          // that at least one email had is_primary
+          // & would ideally be removed.
           $data['email'][$loc]['email'] = $value;
           if (empty($contactID)) {
-            $data['email'][$loc]['is_primary'] = 1;
+            $hasPrimary = FALSE;
+            foreach ($data['email'] ?? [] as $email) {
+              if (!empty($email['is_primary'])) {
+                $hasPrimary = TRUE;
+              }
+            }
+            if (!$hasPrimary) {
+              $data['email'][$loc]['is_primary'] = 1;
+            }
           }
         }
         elseif ($fieldName == 'im') {
