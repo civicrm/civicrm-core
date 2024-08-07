@@ -46,13 +46,19 @@ class CRM_Afform_AfformScanner {
       }
     }
 
+    $basePaths = [];
+
     $paths = [];
 
     $mapper = CRM_Extension_System::singleton()->getMapper();
     foreach ($mapper->getModules() as $module) {
       try {
         if ($module->is_active) {
-          $this->appendFilePaths($paths, dirname($mapper->keyToPath($module->name)) . DIRECTORY_SEPARATOR . 'ang', $module->name);
+          $basePaths[] = [
+            'weight' => 0,
+            'path' => dirname($mapper->keyToPath($module->name)) . DIRECTORY_SEPARATOR . 'ang',
+            'module' => $module->name,
+          ];
         }
       }
       catch (CRM_Extension_Exception_MissingException $e) {
@@ -61,9 +67,26 @@ class CRM_Afform_AfformScanner {
     }
 
     // Scan core ang/afform directory
-    $this->appendFilePaths($paths, Civi::paths()->getPath('[civicrm.root]/ang/afform'), 'civicrm');
+    $basePaths[] = [
+      'weight' => 100,
+      'path' => Civi::paths()->getPath('[civicrm.root]/ang/afform'),
+      'module' => 'civicrm',
+    ];
     // Scan uploads/files directory
-    $this->appendFilePaths($paths, $this->getSiteLocalPath(), '');
+    $basePaths[] = [
+      'weight' => 200,
+      'path' => $this->getSiteLocalPath(),
+      'module' => '',
+    ];
+
+    usort($basePaths, fn($a, $b) =>
+      $a['weight'] === $b['weight']
+        ? $a['module'] <=> $b['module']
+        : $a['weight'] <=> $b['weight']
+    );
+    foreach ($basePaths as $folderPath) {
+      $this->appendFilePaths($paths, $folderPath['path'], $folderPath['module']);
+    }
 
     if ($this->isUseCachedPaths()) {
       $this->cache->set('afformAllPaths', $paths);
