@@ -33,7 +33,7 @@ return [
     'is_contact' => 0,
     'help_text' => NULL,
     'is_constant' => TRUE,
-    'load_from_env' => TRUE,
+    'is_env_var' => TRUE,
     'global_name' => 'CIVICRM_DSN',
   ],
   'civicrm_db_name' => [
@@ -50,7 +50,7 @@ return [
     'is_contact' => 0,
     'help_text' => NULL,
     'is_constant' => TRUE,
-    'load_from_env' => TRUE,
+    'is_env_var' => TRUE,
     'global_name' => 'CIVICRM_DB_NAME',
   ],
   'civicrm_db_user' => [
@@ -67,7 +67,7 @@ return [
     'is_contact' => 0,
     'help_text' => NULL,
     'is_constant' => TRUE,
-    'load_from_env' => TRUE,
+    'is_env_var' => TRUE,
     'global_name' => 'CIVICRM_DB_USER',
   ],
   'civicrm_db_password' => [
@@ -84,7 +84,7 @@ return [
     'is_contact' => 0,
     'help_text' => NULL,
     'is_constant' => TRUE,
-    'load_from_env' => TRUE,
+    'is_env_var' => TRUE,
     'global_name' => 'CIVICRM_DB_PASSWORD',
   ],
   'civicrm_db_host' => [
@@ -101,7 +101,7 @@ return [
     'is_contact' => 0,
     'help_text' => NULL,
     'is_constant' => TRUE,
-    'load_from_env' => TRUE,
+    'is_env_var' => TRUE,
     'global_name' => 'CIVICRM_DB_HOST',
   ],
   'civicrm_db_port' => [
@@ -118,7 +118,7 @@ return [
     'is_contact' => 0,
     'help_text' => NULL,
     'is_constant' => TRUE,
-    'load_from_env' => TRUE,
+    'is_env_var' => TRUE,
     'global_name' => 'CIVICRM_DB_PORT',
   ],
 ];

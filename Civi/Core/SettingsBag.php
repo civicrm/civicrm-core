@@ -373,7 +373,7 @@ class SettingsBag {
     if ($metadata['is_constant'] ?? FALSE) {
       $error = "{$metadata['title']} is a system constant. It can only be set in civicrm.settings.php";
 
-      if ($metadata['load_from_env'] ?? FALSE) {
+      if ($metadata['is_env_var'] ?? FALSE) {
         $fqn = $metadata['global_name'] ?? '(ENV VAR NAME MISSING)';
         $error .= " or using the environment variable {$fqn}";
       }
