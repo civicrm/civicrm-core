@@ -80,6 +80,9 @@ class CRM_Afform_AfformScanner {
       'module' => '',
     ];
 
+    $event = \Civi\Core\Event\GenericHookEvent::create(['paths' => &$basePaths]);
+    \Civi::dispatcher()->dispatch('civi.afform.searchPaths', $event);
+
     usort($basePaths, fn($a, $b) =>
       $a['weight'] === $b['weight']
         ? $a['module'] <=> $b['module']
