@@ -85,7 +85,7 @@ return [
     'description' => ts('Base URL for extension resources (images, stylesheets, etc). This should correspond to the extensionsDir path.'),
     'help_text' => NULL,
     'validate_callback' => 'CRM_Utils_Rule::urlish',
-    'load_from_env' => TRUE,
+    'is_env_var' => TRUE,
     'global_name' => 'CIVICRM_SETTING_EXTENSIONS_URL',
   ],
 ];

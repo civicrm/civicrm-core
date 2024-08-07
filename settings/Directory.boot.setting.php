@@ -127,7 +127,7 @@ return [
     'description' => ts('Path where CiviCRM extensions are stored.'),
     'help_text' => NULL,
     'settings_pages' => ['path' => ['weight' => 90]],
-    'load_from_env' => TRUE,
+    'is_env_var' => TRUE,
     'global_name' => 'CIVICRM_SETTING_EXTENSIONS_DIR',
   ],
 
