@@ -428,8 +428,8 @@ class SettingsManager {
     if (file_exists($settingsPath)) {
       if (!defined('CIVICRM_SETTINGS_PATH')) {
         define('CIVICRM_SETTINGS_PATH', $settingsPath);
-        require_once $settingsPath;
       }
+      require_once $settingsPath;
     }
 
     // get all effective values from the settings bag (resolving defaults etc)
