@@ -40,15 +40,16 @@ class CRM_Afform_AfformScanner {
    */
   public function findFilePaths(): array {
     if ($this->isUseCachedPaths()) {
-      $paths = $this->cache->get('afformAllPaths');
-      if ($paths !== NULL) {
-        return $paths;
+      $formPaths = $this->cache->get('afformAllPaths');
+      if ($formPaths !== NULL) {
+        return $formPaths;
       }
     }
 
+    // List of folders to search
     $basePaths = [];
-
-    $paths = [];
+    // List of specific forms that we found
+    $formPaths = [];
 
     $mapper = CRM_Extension_System::singleton()->getMapper();
     foreach ($mapper->getModules() as $module) {
@@ -84,14 +85,14 @@ class CRM_Afform_AfformScanner {
         ? $a['module'] <=> $b['module']
         : $a['weight'] <=> $b['weight']
     );
-    foreach ($basePaths as $folderPath) {
-      $this->appendFilePaths($paths, $folderPath['path'], $folderPath['module']);
+    foreach ($basePaths as $basePath) {
+      $this->appendFilePaths($formPaths, $basePath['path'], $basePath['module']);
     }
 
     if ($this->isUseCachedPaths()) {
-      $this->cache->set('afformAllPaths', $paths);
+      $this->cache->set('afformAllPaths', $formPaths);
     }
-    return $paths;
+    return $formPaths;
   }
 
   /**
