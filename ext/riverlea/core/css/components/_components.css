@@ -452,3 +452,22 @@ div.civicrm-community-messages .crm-collapsible .collapsible-title {
 .crm-status-box-outer.status-error .crm-status-box-inner {
     background: var(--crm-c-alert);
 }
+/* CKEditor Config */
+
+#CKEditorConfig .cke_ltr.cke_button.cke_toolgroup {
+    width: 30px;
+    height: 30px;
+    border-radius: var(--crm-roundness);
+    background: var(--crm-c-background);
+}
+#CKEditorConfig .move {
+    background-color: var(--crm-c-primary);
+    color: var(--crm-c-primary-text);
+    border: 0;
+    margin-block: 1px;
+}
+#CKEditorConfig .move:focus,
+#CKEditorConfig .move:hover {
+    background-color: var(--crm-c-primary-hover);
+    border: 0;
+}

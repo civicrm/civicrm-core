@@ -1,7 +1,6 @@
 /* JQuery UI tabs */
 
-.crm-container #mainTabContainer.ui-tabs,
-.crm-container .crm-tabset.ui-tabs {
+.crm-container .ui-tabs {
     border: var(--crm-tabs-border);
     border-radius: var(--crm-roundness);
     margin-bottom: var(--crm-r1);
