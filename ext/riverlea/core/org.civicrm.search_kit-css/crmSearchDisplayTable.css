@@ -6,9 +6,6 @@ table.crm-sticky-header > thead > tr {
   position: sticky !important;
   top: var(--crm-menubar-bottom, 0px);
 }
-/* .crm-search-display-table > table.table > thead > tr > th {
-  white-space: nowrap;
-} */
 .crm-search-display-table > table.table > thead > tr > th.crm-search-result-select {
   padding-inline: 0;
   text-transform: none;
