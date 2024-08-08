@@ -197,15 +197,15 @@ trait CRM_Admin_Form_SettingTrait {
             $props['html_type'],
             $setting,
             $props['title'],
-            ($options !== NULL) ? $options : CRM_Utils_Array::value('html_attributes', $props, []),
-            ($options !== NULL) ? CRM_Utils_Array::value('html_attributes', $props, []) : NULL
+            ($options !== NULL) ? $options : $props['html_attributes'] ?? [],
+            ($options !== NULL) ? $props['html_attributes'] ?? [] : NULL
           );
         }
         elseif ($add === 'addSelect') {
-          $this->addElement('select', $setting, $props['title'], $options, CRM_Utils_Array::value('html_attributes', $props));
+          $this->addElement('select', $setting, $props['title'], $options, $props['html_attributes'] ?? NULL);
         }
         elseif ($add === 'addCheckBox') {
-          $this->addCheckBox($setting, '', $options, NULL, CRM_Utils_Array::value('html_attributes', $props), NULL, NULL, ['&nbsp;&nbsp;']);
+          $this->addCheckBox($setting, '', $options, NULL, $props['html_attributes'] ?? NULL, NULL, NULL, ['&nbsp;&nbsp;']);
         }
         elseif ($add === 'addCheckBoxes') {
           $newOptions = array_flip($options);
@@ -232,7 +232,7 @@ trait CRM_Admin_Form_SettingTrait {
           $this->$add($setting, $props['title'], $props['entity_reference_options']);
         }
         elseif ($add === 'addYesNo' && ($props['type'] === 'Boolean')) {
-          $this->addRadio($setting, $props['title'], [1 => ts('Yes'), 0 => ts('No')], CRM_Utils_Array::value('html_attributes', $props), '&nbsp;&nbsp;');
+          $this->addRadio($setting, $props['title'], [1 => ts('Yes'), 0 => ts('No')], $props['html_attributes'] ?? NULL, '&nbsp;&nbsp;');
         }
         elseif ($add === 'add') {
           $this->add($props['html_type'], $setting, $props['title'], $options, FALSE, $props['html_extra'] ?? NULL);
