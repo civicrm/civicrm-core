@@ -753,15 +753,22 @@
 
             // Write oop code
             code.oop = '$' + results + " = " + formatOOP(entity, action, params, 2) + "\n  ->execute()";
-            if (_.isNumber(index)) {
+            // Index: numeric input = itemAt()
+            if (typeof index === 'number') {
               code.oop += !index ? '\n  ->first()' : (index === -1 ? '\n  ->last()' : '\n  ->itemAt(' + index + ')');
-            } else if (index) {
-              if (_.isString(index) || (_.isPlainObject(index) && !index[0] && !index['0'])) {
-                code.oop += "\n  ->indexBy('" + (_.isPlainObject(index) ? _.keys(index)[0] : index) + "')";
-              }
-              if (_.isArray(index) || _.isPlainObject(index)) {
-                code.oop += "\n  ->column('" + (_.isArray(index) ? index[0] : _.values(index)[0]) + "')";
-              }
+            }
+            // Index: string input = indexBy()
+            else if (typeof index === 'string' && index.length) {
+              code.oop += "\n  ->indexBy(" + phpFormat(index) + ")";
+            }
+            // Index: array input = column() with 1 arg
+            else if (Array.isArray(index)) {
+              code.oop += "\n  ->column(" + phpFormat(index[0]) + ")";
+            }
+            // Index: object input = column() with 2 args
+            else if (typeof index === 'object') {
+              let indexKey = Object.keys(index)[0];
+              code.oop += "\n  ->column(" + phpFormat(index[indexKey]) + ", " + phpFormat(indexKey) + ")";
             }
             code.oop += ";\n";
             if (!_.isNumber(index)) {
