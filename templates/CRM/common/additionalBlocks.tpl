@@ -75,7 +75,7 @@ function buildAdditionalBlocks( blockName, className ) {
     }
 }
 
-//select single for is_bulk & is_primary
+//select single for is_primary, although we are moving away from this - e.g on Email.
 function singleSelect( object ) {
     var element = object.split( '_', 3 );
 

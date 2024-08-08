@@ -238,15 +238,11 @@
         return false;
       })
       // make sure only one is_primary radio is checked
+      // Note this is no longer required for the email block
+      // & similar changes to phone, address, im, openid would allow removal from them as well.
       .on('change', '[class$=is_primary] input', function() {
         if ($(this).is(':checked')) {
           $('[class$=is_primary] input', $(this).closest('form')).not(this).prop('checked', false);
-        }
-      })
-      // make sure only one builk_mail radio is checked
-      .on('change', '.crm-email-bulkmail input', function(){
-        if ($(this).is(':checked')) {
-          $('.crm-email-bulkmail input').not(this).prop('checked', false);
         }
       })
       // handle delete link within blocks
