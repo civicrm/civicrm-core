@@ -685,6 +685,7 @@
     "ext/afform/admin/ang/afGuiEditor/entityConfig/Activity.html",
     "ext/afform/admin/ang/afGuiEditor/entityConfig/Contact.html",
     "ext/afform/admin/ang/afGuiEditor/entityConfig/Generic.html",
+    "ext/afform/admin/ang/afGuiEditor/entityConfig/Options.html",
     "ext/afform/admin/ang/afGuiEditor/entityDefaults/*",
     "ext/afform/admin/ang/afGuiEditor/field-menu.html",
     "ext/afform/admin/ang/afGuiEditor/field.html",
