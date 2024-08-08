@@ -368,7 +368,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
           ],
         ],
       ],
-    ] + $this->addAddressFields(FALSE);
+    ] + $this->getAddressColumns(['group_bys' => FALSE]);
 
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
