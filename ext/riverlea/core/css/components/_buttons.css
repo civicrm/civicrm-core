@@ -367,7 +367,7 @@
 /* BS3 Button groups and dropdowns  */
 
 .crm-search-col-type-buttons,
-.crm-container td.text-right:has(.btn),
+/* .crm-container td.text-right:has(.btn), */
 #contact-summary .crm-inline-button,
 #contact-summary .crm-submit-buttons {
     display: flex;

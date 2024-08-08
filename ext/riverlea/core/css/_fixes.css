@@ -301,7 +301,8 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
 	padding-inline: 0;
 	border-right: 0;
 }
-.crm-container i.ui-icon.fa-square-o {
+.crm-container i.ui-icon.fa-square-o,
+.crm-container .btn i.fa-square-o {
 	margin: 0;
     padding: 0;
     display: flex;
@@ -331,11 +332,12 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
 
 .afadmin-list .nav-tabs + .form-inline + table,
 .afadmin-list > .form-inline,
-crm-search-admin-search-listing .crm-search-display.crm-search-display-table {
+.crm-search-display.crm-search-display-table {
     border: var(--crm-tab-border);
     border-top: 0 solid transparent;
     border-radius: 0 0 var(--crm-roundness) var(--crm-roundness);
 	background: var(--crm-tab-bg-active);
+	overflow-x: auto;
 }
 .crm-search > .ng-scope > .form-inline {
     border: var(--crm-tab-border);
@@ -397,7 +399,7 @@ crm-search-admin-search-listing .crm-search-display.crm-search-display-table {
     padding: var(--crm-padding-reg);
     font-family: var(--crm-font);
     border-radius: var(--crm-roundness);
-    top: 0;
+    top: 0;;
 }
 .crm-container .tag-tree-wrapper div.tag-info .tdl {
     font-weight: var(--crm-bold-weight);

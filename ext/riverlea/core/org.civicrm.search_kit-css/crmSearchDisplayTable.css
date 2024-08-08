@@ -6,9 +6,9 @@ table.crm-sticky-header > thead > tr {
   position: sticky !important;
   top: var(--crm-menubar-bottom, 0px);
 }
-.crm-search-display-table > table.table > thead > tr > th {
+/* .crm-search-display-table > table.table > thead > tr > th {
   white-space: nowrap;
-}
+} */
 .crm-search-display-table > table.table > thead > tr > th.crm-search-result-select {
   padding-inline: 0;
   text-transform: none;
@@ -32,11 +32,13 @@ table.crm-sticky-header > thead > tr {
 td.crm-search-col-type-buttons.text-right {
   flex-direction: row-reverse;
 }
-th.crm-search-result-select button.btn,
+th.crm-search-result-select button.btn {
+  background: transparent;
+  padding: var(--crm-xs1) var(--crm-m1);
+}
 th.crm-search-result-select button.btn:hover,
 th.crm-search-result-select button.btn:focus {
   background: transparent;
-  padding: var(--crm-xs1) var(--crm-m1);
 }
 th.crm-search-result-select button.btn i.crm-i {
   color: var(--crm-c-text);

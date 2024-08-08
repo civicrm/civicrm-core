@@ -353,6 +353,9 @@ input.crm-form-checkbox) + label {
     height: unset;
     color: var(--crm-input-color);
 }
+.crm-container .select2-default {
+    color: var(--crm-input-color) !important /* vs important in select2.min.css */;
+}
 .crm-container .select2-container-multi .select2-choices .select2-search-field input.select2-default {
     color: var(--crm-input-color);
 }

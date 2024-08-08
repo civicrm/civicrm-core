@@ -5,8 +5,12 @@
 /* Sortable headers */
 .crm-search-display th.crm-sortable-col {
   cursor: var(--crm-hover-clickable);
-  white-space: nowrap;
+  white-space: nowrap; 
 	vertical-align: middle;
+}
+.crm-search-display th.crm-sortable-col span {
+  white-space: break-spaces;
+  word-wrap: initial;
 }
 .crm-search-display th i.fa-sort-desc,
 .crm-search-display th i.fa-sort-asc {

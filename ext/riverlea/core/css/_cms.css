@@ -71,6 +71,9 @@ body.page-civicrm .breadcrumb__link {
 #block-claro-content .crm-container .button {
     margin: 0;
 }
+body.page-civicrm .page-content:has(#block-claro-content) {
+    margin-top: 0;
+}
 #block-claro-content .button:not(:focus) {
     box-shadow: none;
 }

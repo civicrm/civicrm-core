@@ -184,8 +184,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 /* PANELS */
 --crm-panel-shadow: var(--crm-block-shadow);
 --crm-panel-background: var(--crm-c-page-background);
---crm-panel-border: 1px;
---crm-panel-border-col: var(--crm-c-gray-300);
+--crm-panel-border: var(--crm-c-divider);
 --crm-panel-head-margin: 0px;
 
 /* ACCORDIONS */
