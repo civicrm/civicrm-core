@@ -54,6 +54,7 @@ class Api4Generator extends AutoService implements EventSubscriberInterface {
     $builder->addExpectedArguments('\Civi\Api4\Utils\CoreUtil::getTableName()', 0, 'api4Entities');
     $builder->addExpectedArguments('\Civi\Api4\Utils\CoreUtil::getCustomGroupExtends()', 0, 'api4Entities');
     $builder->addExpectedArguments('\Civi\Api4\Utils\CoreUtil::getRefCount()', 0, 'api4Entities');
+    $builder->addExpectedArguments('\Civi\Api4\Utils\CoreUtil::getRefCountTotal()', 0, 'api4Entities');
     $builder->addExpectedArguments('\Civi\Api4\Utils\CoreUtil::isType()', 0, 'api4Entities');
     $builder->addExpectedArguments('\Civi\Api4\Utils\CoreUtil::isType()', 1, 'api4EntityTypes');
     $builder->addExpectedArguments('\Civi\Api4\Utils\CoreUtil::checkAccessDelegated()', 0, 'api4Entities');
