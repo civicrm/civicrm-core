@@ -68,9 +68,9 @@ class SpecFormatter {
       $field->setType('Field');
       $field->setColumnName($name);
       $field->setNullable(empty($data['required']));
-      $field->setRequired(!empty($data['required']) && !$hasDefault && $name !== 'id');
+      $field->setRequired(!empty($data['required']) && !$hasDefault && empty($data['primary_key']));
       $field->setTitle($data['title'] ?? NULL);
-      $field->setLabel($data['html']['label'] ?? NULL);
+      $field->setLabel($data['input_attrs']['label'] ?? NULL);
       $field->setLocalizable($data['localizable'] ?? FALSE);
       if (!empty($data['DFKEntities'])) {
         $field->setDfkEntities($data['DFKEntities']);
@@ -87,21 +87,21 @@ class SpecFormatter {
         else {
           // These suffixes are always supported if a field has options
           $suffixes = ['name', 'label'];
-          // Add other columns specified in schema (e.g. 'abbrColumn')
+          // Add other columns specified in schema (e.g. 'abbr_column')
           foreach (array_diff(FormattingUtil::$pseudoConstantSuffixes, $suffixes) as $suffix) {
-            if (!empty($data['pseudoconstant'][$suffix . 'Column'])) {
+            if (!empty($data['pseudoconstant'][$suffix . '_column'])) {
               $suffixes[] = $suffix;
             }
           }
-          if (!empty($data['pseudoconstant']['optionGroupName'])) {
-            $suffixes = CoreUtil::getOptionValueFields($data['pseudoconstant']['optionGroupName'], 'name');
+          if (!empty($data['pseudoconstant']['option_group_name'])) {
+            $suffixes = CoreUtil::getOptionValueFields($data['pseudoconstant']['option_group_name'], 'name');
           }
         }
         $field->setSuffixes($suffixes);
       }
       $field->setReadonly(!empty($data['readonly']));
       if (isset($data['usage'])) {
-        $field->setUsage(array_keys(array_filter($data['usage'])));
+        $field->setUsage($data['usage']);
       }
     }
     if ($hasDefault) {
@@ -113,13 +113,12 @@ class SpecFormatter {
     self::setInputTypeAndAttrs($field, $data, $dataTypeName);
 
     $field->setPermission($data['permission'] ?? NULL);
-    $fkAPIName = $data['FKApiName'] ?? NULL;
-    $fkClassName = $data['FKClassName'] ?? NULL;
-    if ($fkAPIName || $fkClassName) {
-      $field->setFkEntity($fkAPIName ?: CoreUtil::getApiNameFromBAO($fkClassName));
+    $fkAPIName = $data['FKApiName'] ?? $data['entity_reference']['entity'] ?? NULL;
+    if ($fkAPIName) {
+      $field->setFkEntity($fkAPIName);
     }
     // For pseudo-fk fields like `civicrm_group.parents`
-    elseif (($data['html']['type'] ?? NULL) === 'EntityRef' && !empty($data['pseudoconstant']['table'])) {
+    elseif (($data['input_type'] ?? NULL) === 'EntityRef' && !empty($data['pseudoconstant']['table'])) {
       $field->setFkEntity(CoreUtil::getApiNameFromTableName($data['pseudoconstant']['table']));
     }
     if (!empty($data['FKColumnName'])) {
@@ -138,12 +137,12 @@ class SpecFormatter {
    * @return string
    */
   private static function getDataType(array $data) {
-    $dataType = $data['data_type'] ?? $data['dataType'] ?? NULL;
+    $dataType = $data['data_type'] ?? NULL;
     if (isset($dataType)) {
       return !empty($data['time_format']) ? 'Timestamp' : $dataType;
     }
 
-    $dataTypeInt = $data['type'] ?? NULL;
+    $dataTypeInt = \CRM_Utils_Schema::getCrmTypeFromSqlType($data['sql_type']);
     $dataTypeName = \CRM_Utils_Type::typeToString($dataTypeInt);
 
     return $dataTypeName === 'Int' ? 'Integer' : $dataTypeName;
@@ -309,9 +308,8 @@ class SpecFormatter {
    * @param string $dataTypeName
    */
   public static function setInputTypeAndAttrs(FieldSpec $fieldSpec, $data, $dataTypeName) {
-    $inputType = $data['html']['type'] ?? $data['html_type'] ?? NULL;
-    $inputAttrs = $data['html'] ?? [];
-    unset($inputAttrs['type']);
+    $inputType = $data['input_type'] ?? $data['html_type'] ?? NULL;
+    $inputAttrs = $data['input_attrs'] ?? [];
     // Custom field EntityRef or ContactRef filters
     if (is_string($data['filter'] ?? NULL) && strpos($data['filter'], '=')) {
       $filters = explode('&', $data['filter']);
