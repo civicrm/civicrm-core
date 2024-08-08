@@ -13,13 +13,13 @@
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
   <releaseDate>2024-08-08</releaseDate>
-  <version>5.77.beta1</version>
+  <version>5.78.alpha1</version>
   <tags>
     <tag>mgmt:hidden</tag>
   </tags>
   <develStage>stable</develStage>
   <compatibility>
-    <ver>5.77</ver>
+    <ver>5.78</ver>
   </compatibility>
   <classloader>
     <psr0 prefix="CRM_" path="."/>
