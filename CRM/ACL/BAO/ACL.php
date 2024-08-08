@@ -243,9 +243,13 @@ SELECT count( a.id )
               $allInclude = TRUE;
             }
             else {
+              // If we already have an all exclude rule and now specific rule to permit access remove all Exclude
+              if ($allExclude) {
+                $allExclude = FALSE;
+              }
               // We have an allow rule on the same group that has a higher priority
-              if (in_array($dao->object_id, $excludeIds)) {
-                unset($dao->object_id);
+              if (array_key_exists($dao->object_id, $excludeIds)) {
+                unset($excludeIds[$dao->object_id]);
               }
               $ids[$dao->object_id] = ['id' => $dao->object_id, 'priority' => $dao->priority];
             }
@@ -259,8 +263,12 @@ SELECT count( a.id )
               $allExclude = TRUE;
             }
             else {
+              // If we have an all include rule we need to disable it here as we now have a specific exclusion
+              if ($allInclude) {
+                $allInclude = FALSE;
+              }
               // We have a specific exclude rule that is of higher weighting than the include for this group id.
-              if (in_array($dao->object_id, $ids)) {
+              if (array_key_exists($dao->object_id, $ids)) {
                 unset($ids[$dao->object_id]);
               }
               $excludeIds[$dao->object_id] = ['id' => $dao->object_id, 'priority' => $dao->priority];
@@ -292,6 +300,7 @@ SELECT count( a.id )
           $clauses[] = "contact_a.id IN (SELECT contact_id FROM {$temporaryTable})";
         }
         else {
+          $excludeIds = array_column($excludeIds, 'id');
           $clauses[] = self::getGroupClause($excludeIds, 'NOT IN');
         }
       }
