@@ -55,7 +55,7 @@
                     // just rerender on the front end
                     this.renderChart();
                 }
-            }
+            };
 
             // this provides the common render steps - which chart types can then hook
             // into at different points
@@ -235,7 +235,7 @@
 
                     // load in cap if implemented by chart type
                     if (this.chart.cap) {
-                        this.chart.cap(this.settings.maxSegments ?? null);
+                        this.chart.cap(this.settings.maxSegments ? this.settings.maxSegments : null);
                     }
                     // load in ordering if implement by chart type
                     if (this.chart.ordering) {
@@ -278,8 +278,6 @@
                     // that would be amazing but very non-trivial
                     .brushOn(false)
                     .mouseZoomable(xCol.scaleType !== 'categorical');
-
-                console.log(this.chart);
             };
 
             this.loadChartData = () => {
@@ -311,7 +309,7 @@
                         chart.selectAll('text').attr('fill', this.settings.format.labelColor);
                         // we need to add the background here as well as to the containing div
                         // in order for inclusion in exports
-                        chart.svg().style('background', this.settings.format.backgroundColor)
+                        chart.svg().style('background', this.settings.format.backgroundColor);
                     });
 
                 if (this.chartType.hasCoordinateGrid()) {
@@ -337,9 +335,8 @@
                         this.chart.xAxis().tickFormat((v) => this.renderDataValue(v, xCols[0]));
                     }
                 }
-                this.chart.xAxisLabel(this.settings.format.xAxisLabel
-                    ? this.settings.format.xAxisLabel
-                    : xCols.map((col) => col.label).join(' - ')
+                this.chart.xAxisLabel(
+                    this.settings.format.xAxisLabel ? this.settings.format.xAxisLabel : xCols.map((col) => col.label).join(' - ')
                 );
 
                 // for Y axis, we need to work out whether this is split left and right
@@ -352,21 +349,18 @@
                 if (leftYCols.length === 1) {
                     this.chart.yAxis().tickFormat((v) => this.renderDataValue(v, leftYCols[0]));
                 }
-                this.chart.yAxisLabel(this.settings.format.yAxisLabel
-                    ? this.settings.format.yAxisLabel
-                    : leftYCols.map((col) => col.label).join(' - ')
+                this.chart.yAxisLabel(
+                    this.settings.format.yAxisLabel ? this.settings.format.yAxisLabel : leftYCols.map((col) => col.label).join(' - ')
                 );
 
                 if (supportsRightYAxis) {
                     const rightYCols = allYCols.filter((col) => col.useRightAxis);
-                    console.log(rightYCols)
                     if (rightYCols.length === 1) {
                         this.chart.rightYAxis().tickFormat((v) => this.renderDataValue(v, rightYCols[0]));
                     }
                     if (rightYCols) {
-                        this.chart.rightYAxisLabel(this.settings.format.rightYAxisLabel
-                            ? this.settings.format.rightYAxisLabel
-                            : rightYCols.map((col) => col.label).join(' - ')
+                        this.chart.rightYAxisLabel(
+                            this.settings.format.rightYAxisLabel ? this.settings.format.rightYAxisLabel : rightYCols.map((col) => col.label).join(' - ')
                         );
                     }
                 }
@@ -377,7 +371,7 @@
 
                 this.chart
                     .margins(this.settings.format.padding)
-                    .clipPadding(this.settings.format.padding.clip ?? 20);
+                    .clipPadding(this.settings.format.padding.clip ? this.settings.format.padding.clip : 20);
             };
 
 
@@ -391,7 +385,11 @@
                 legend.highlightSelected(true);
 
                 if (this.settings.showLegend === 'right') {
-                    legend.x(this.settings.format.width - legend.itemWidth() - (this.settings.format.padding.right ?? this.settings.format.padding.outer))
+                    // depends on chart type which padding keys are set
+                    // (potential bug: if you set right padding on an axis chart, then switch to a chart without a right axis setting,
+                    // it will keep using the right padding value, which you can no longer edit
+                    const rightPadding = this.settings.format.padding.right ? this.settings.format.padding.right : this.settings.format.padding.outer;
+                    legend.x(this.settings.format.width - legend.itemWidth() - rightPadding);
                 }
                 this.chart.legend(legend);
             };
@@ -408,9 +406,9 @@
 
             this.getXColumn = () => this.getColumnsForAxis('x')[0];
 
-            this.getOrderColumn = () => this.getColumns()[parseInt(this.settings.chartOrderColIndex ?? 0)];
+            this.getOrderColumn = () => this.getColumns()[parseInt(this.settings.chartOrderColIndex ? this.settings.chartOrderColIndex : 0)];
 
-            this.getOrderDirection = () => (this.settings.chartOrderDir ?? 'ASC');
+            this.getOrderDirection = () => (this.settings.chartOrderDir ? this.settings.chartOrderDir : 'ASC');
 
             this.getOrderAccessor = () => {
                 const orderColValueAccessor = this.getValueAccessor(this.getOrderColumn());
@@ -489,7 +487,7 @@
             };
 
             this.renderColumnValue = (dataPointValue, col) => {
-                const value = dataPointValue[col.index] ?? null;
+                const value = dataPointValue[col.index] ? dataPointValue[col.index] : null;
 
                 if (!value && value !== 0) {
                     return null;
@@ -576,7 +574,7 @@
 
                 columns.forEach((col) => {
                     // use user-assigned color or pick one from the default color scheme
-                    finalColors[col.label] = col.color ?? defaultColors(col.label);
+                    finalColors[col.label] = col.color ? col.color : defaultColors(col.label);
                 });
 
                 // mapping function from our dict
@@ -584,7 +582,7 @@
             };
 
             this.downloadImageUrl = (mime, url, ext) => {
-                const filename = (this.settings.format.title ?? 'chart').replace(/[^a-zA-Z0-9-]+/g, '') + '.' + ext;
+                const filename = (this.settings.format.title ? this.settings.format.title : 'chart').replace(/[^a-zA-Z0-9-]+/g, '') + '.' + ext;
                 const downloadLink = document.createElement('a');
                 downloadLink.download = filename;
                 downloadLink.href = url;

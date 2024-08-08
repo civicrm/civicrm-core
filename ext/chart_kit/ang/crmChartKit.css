@@ -1,7 +1,7 @@
 /* chart canvas */
 .crm-chart-kit-chart-title,
 .crm-chart-kit-download-links {
-    text-align: center;
+  text-align: center;
 }
 
 /* admin panel */
@@ -9,20 +9,23 @@
 .crm-chart-kit-admin,
 .crm-chart-kit-admin-columns,
 .crm-chart-kit-admin-presentation {
-    display: flex;
-    flex-flow: row wrap;
-    align-items: flex-start;
-    gap: 1rem;
+  display: flex;
+  flex-flow: row wrap;
+  align-items: flex-start;
+  gap: 1rem;
 }
+
 @media (max-width: 40rem) {
-    .crm-chart-kit-admin,
-    .crm-chart-kit-admin-columns,
-    .crm-chart-kit-admin-presentation {
-        flex-direction: column;
-    }
+
+  .crm-chart-kit-admin,
+  .crm-chart-kit-admin-columns,
+  .crm-chart-kit-admin-presentation {
+    flex-direction: column;
+  }
 }
+
 .crm-chart-kit-admin input {
-    max-width: 40rem;
+  max-width: 40rem;
 }
 .crm-chart-kit-admin .select2-container {
   /* fix select2 collapsing boxes in RiverLea */
@@ -30,17 +33,16 @@
 }
 
 .crm-chart-kit-admin input[type='color'] {
-    min-width: 3rem;
+  min-width: 3rem;
 }
 
 .crm-chart-kit-admin-chart-type {
-    display: flex;
-    flex-flow: row wrap;
-    gap: 0.5rem;
+  display: flex;
+  flex-flow: row wrap;
+  gap: 0.5rem;
 }
+
 .crm-chart-kit-admin-chart-type label {
-	padding: 2rem;
-	border: 1px solid;
+  padding: 2rem;
+  border: 1px solid;
 }
-
-

@@ -35,9 +35,7 @@
 
         showLegend: (displayCtrl) => (displayCtrl.getColumnsForAxis('y').length > 1 && displayCtrl.settings.showLegend && displayCtrl.settings.showLegend !== 'none'),
 
-        getChartConstructor: (displayCtrl) => (displayCtrl.settings.chartType === 'bar')
-            ? dc.barChart
-            : dc.lineChart,
+        getChartConstructor: (displayCtrl) => (displayCtrl.settings.chartType === 'bar') ? dc.barChart : dc.lineChart,
 
         loadChartData: (displayCtrl) => {
             displayCtrl.chart

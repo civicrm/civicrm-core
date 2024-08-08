@@ -29,11 +29,7 @@
       showLegend: (displayCtrl) => (displayCtrl.settings.showLegend && displayCtrl.settings.showLegend !== 'none'),
 
       // for pie chart the legend is showing column values, which benefit from rendering
-      legendTextAccessor: (displayCtrl) => ((d) => {
-        return d.name === 'Others'
-            ? 'Others'
-            : displayCtrl.renderColumnValue(d.data, displayCtrl.getXColumn());
-      }),
+      legendTextAccessor: (displayCtrl) => ((d) => (d.name === 'Others') ? 'Others' : displayCtrl.renderColumnValue(d.data, displayCtrl.getXColumn())),
 
       getInitialDisplaySettings: () => ({
         showLegend: 'left',

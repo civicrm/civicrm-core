@@ -66,7 +66,7 @@
                 }
 
                 $scope.$watch('$ctrl.display.settings.chartType', () => this.onSetChartType(), true);
-            }
+            };
 
             this.onSetChartType = () => {
                 if (!this.display.settings.chartType) {
@@ -83,7 +83,7 @@
             this.initChartType = () => {
                 const type = chartKitTypes.find((type) => type.key === this.display.settings.chartType);
                 this.chartType = type.service;
-            }
+            };
 
             this.getAxes = () => this.axes;
 
@@ -92,10 +92,7 @@
 
                 // merge axis defaults into the axes array
                 Object.keys(axes).forEach((key) => {
-                    axes[key] = {
-                        ...this.axisDefaults(),
-                        ...axes[key]
-                    };
+                    axes[key] = Object.assign({}, this.axisDefaults(), axes[key]);
                 });
 
                 this.axes = axes;
@@ -107,18 +104,19 @@
                 const baseSettings = this.getInitialDisplaySettings();
                 const typeSettings = this.getInitialDisplaySettingsForChartType();
 
-                this.display.settings = {
-                    ...baseSettings,
-                    ...typeSettings,
-                    ...this.display.settings
-                };
+                this.display.settings = Object.assign(
+                    {},
+                    baseSettings,
+                    typeSettings,
+                    this.display.settings
+                );
 
-                // merge in at format level too
-                this.display.settings.format = {
-                    ...baseSettings.format,
-                    ...typeSettings.format,
-                    ...this.display.settings.format
-                };
+                this.display.settings.format = Object.assign(
+                    {},
+                    baseSettings.format,
+                    typeSettings.format,
+                    this.display.settings.format
+                );
 
                 // populate starting column for each axis
                 Object.keys(this.getAxes()).forEach(axisKey => {
@@ -128,7 +126,7 @@
                     if (this.getColumnSlots().some((col) => (col.axis === axisKey))) {
                         return;
                     }
-                    this.initColumn(axisKey)
+                    this.initColumn(axisKey);
                 });
             };
 
@@ -157,7 +155,7 @@
             };
 
             this.getAxisLabel = (axisKey) => {
-                return this.getAxis(axisKey).label
+                return this.getAxis(axisKey).label;
             };
 
             this.getAxisSourceDataTypes = (axisKey) => {
@@ -206,7 +204,7 @@
                     if (searchCol.key.includes(':label')) {
                         searchCol.dataType = 'Option';
                     }
-                    return allowedTypes.includes(searchCol.dataType)
+                    return allowedTypes.includes(searchCol.dataType);
                 })
                     .map((searchCol) => searchCol.key);
             };
@@ -252,7 +250,7 @@
             };
 
             this.getColumnReduceTypeOptions = (col) => {
-                let options = this.getAxisReduceTypeOptions(col.axis)
+                let options = this.getAxisReduceTypeOptions(col.axis);
 
                 switch (col.scaleType) {
                     case 'categorical':
@@ -265,7 +263,7 @@
             };
 
             this.getColumnSeriesTypeOptions = (col) => {
-                return this.getAxisSeriesTypeOptions(col.axis)
+                return this.getAxisSeriesTypeOptions(col.axis);
             };
 
             this.getColumnDataLabelTypeOptions = (col) => {
@@ -310,7 +308,7 @@
                         return;
                     }
                     const optionKeys = this.getColumnConfigOptionKeys(col, configKey);
-                    this.display.settings.columns[colIndex][configKey] = optionKeys[0] ?? null;
+                    this.display.settings.columns[colIndex][configKey] = optionKeys.length ? optionKeys[0] : null;
                 });
             };
 
@@ -335,9 +333,7 @@
                 .filter((details) => !!details);
 
             this.getAllOptionDetails = (configKey) =>
-                (configKey === 'searchColumn')
-                ? this.searchColumns
-                : chartKitColumnConfig[configKey];
+                (configKey === 'searchColumn') ? this.searchColumns : chartKitColumnConfig[configKey];
 
             this.getOptionDetailsForKey = (configKey, optionKey) => this.getAllOptionDetails(configKey).find((option) => option.key === optionKey);
 
@@ -369,7 +365,7 @@
                 searchColumnOptions = searchColumnOptions.filter((key) => !alreadyUsedKeys.includes(key));
 
                 // if there are any left, set the first
-                this.display.settings.columns[colIndex].key = searchColumnOptions[0] ?? null;
+                this.display.settings.columns[colIndex].key = searchColumnOptions.length ? searchColumnOptions[0] : null;
 
                 // trigger loading column settings
                 this.onColumnSearchColumnChange(colIndex);
