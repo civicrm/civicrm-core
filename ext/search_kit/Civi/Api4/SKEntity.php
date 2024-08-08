@@ -2,6 +2,8 @@
 
 namespace Civi\Api4;
 
+use CRM_Core_DAO;
+
 /**
  * Virtual API entities provided by SearchDisplays of type "entity"
  * @package Civi\Api4
@@ -84,12 +86,32 @@ class SKEntity {
   /**
    * @return array
    */
-  public static function permissions(): array {
-    return [
+  public static function permissions($entityName): array {
+    $permissions = [
       'meta' => ['access CiviCRM'],
+      'default' => ['administer CiviCRM'],
       'refresh' => ['administer search_kit'],
       'getRefreshDate' => ['administer search_kit'],
     ];
+    // Permissions based on search display
+    [, $displayName] = explode('_', $entityName, 2);
+    $query = \CRM_Utils_SQL_Select::from('civicrm_search_display');
+    $query->select(['settings']);
+    $query->where('type = "entity"');
+    $query->where('name = @name', ['@name' => $displayName]);
+    $settings = CRM_Core_DAO::singleValueQuery($query->toSQL());
+    if ($settings) {
+      $settings = json_decode($settings, TRUE);
+    }
+    if (!empty($settings['entity_permission'])) {
+      $permissions['default'] = (array) $settings['entity_permission'];
+      // If the operator is OR, use a nested array per `CRM_Core_Permission::check`
+      if (($settings['entity_permission_operator'] ?? 'AND') === 'OR') {
+        $permissions['default'] = [$permissions['default']];
+      }
+    }
+
+    return $permissions;
   }
 
 }

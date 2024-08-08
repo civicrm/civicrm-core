@@ -11,9 +11,12 @@
       parent: '^crmSearchAdminDisplay'
     },
     templateUrl: '~/crmSearchAdmin/displays/searchAdminDisplayEntity.html',
-    controller: function($scope, crmApi4) {
+    controller: function($scope, crmApi4, crmUiHelp) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
+      $scope.hs = crmUiHelp({file: 'CRM/Search/Help/DisplayTypeEntity'});
+
+      this.permissions = CRM.crmSearchAdmin.permissions;
 
       this.$onInit = function () {
         ctrl.jobFrequency = CRM.crmSearchAdmin.jobFrequency;
@@ -39,6 +42,14 @@
           ctrl.display._job = defaultJobParams();
         }
         ctrl.parent.initColumns({label: true});
+      };
+
+      this.onChangeEntityPermission = function() {
+        if (ctrl.display.settings.entity_permission.length > 1) {
+          ctrl.display.settings.entity_permission_operator = ctrl.display.settings.entity_permission_operator || 'AND';
+        } else {
+          delete ctrl.display.settings.entity_permission_operator;
+        }
       };
 
       function defaultJobParams() {

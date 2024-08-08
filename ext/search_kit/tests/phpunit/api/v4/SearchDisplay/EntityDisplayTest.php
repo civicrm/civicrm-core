@@ -6,6 +6,7 @@ namespace api\v4\SearchDisplay;
 require_once __DIR__ . '/../../../../../../../tests/phpunit/api/v4/Api4TestBase.php';
 
 use api\v4\Api4TestBase;
+use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\SearchDisplay;
 use Civi\Test\CiviEnvBuilder;
 
@@ -69,6 +70,7 @@ class EntityDisplayTest extends Api4TestBase {
             'type' => 'field',
           ],
         ],
+        'entity_permission' => ['view all contacts'],
         'sort' => [
           ['first_name', 'ASC'],
         ],
@@ -98,6 +100,7 @@ class EntityDisplayTest extends Api4TestBase {
     ]);
     civicrm_api4('SK_MyNewEntity', 'refresh');
 
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['view all contacts'];
     $rows = civicrm_api4('SK_MyNewEntity', 'get', [
       'select' => ['first_name', 'prefix_id:label'],
       'orderBy' => ['_row' => 'ASC'],
@@ -109,6 +112,15 @@ class EntityDisplayTest extends Api4TestBase {
     $this->assertEquals('b2', $rows[2]['first_name']);
     $this->assertEquals('c', $rows[3]['first_name']);
     $this->assertEquals('Ms.', $rows[3]['prefix_id:label']);
+
+    // Ensure entity_permission setting is enforced
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM'];
+    try {
+      $noRows = civicrm_api4('SK_MyNewEntity', 'get');
+    }
+    catch (UnauthorizedException $e) {
+    }
+    $this->assertStringContainsString('SK_MyNewEntity', $e->getMessage());
   }
 
 }

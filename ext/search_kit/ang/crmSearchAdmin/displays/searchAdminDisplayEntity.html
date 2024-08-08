@@ -8,7 +8,7 @@
 <div class="form-inline">
   <label for="crm-search-admin-display-api">{{:: ts('API Name') }} <span class="crm-marker">*</span></label>
   <div class="input-group">
-    <span class="input-group-addon" id="basic-addon1">SK_</span>
+    <span class="input-group-addon">SK_</span>
     <input id="crm-search-admin-display-api" type="text" class="form-control" ng-model="$ctrl.display.name" required />
   </div>
 </div>
@@ -26,6 +26,15 @@
   </div>
   <select class="form-control" ng-if="$ctrl.display._job.is_active" ng-model="$ctrl.display._job.run_frequency">
     <option ng-repeat="opt in $ctrl.jobFrequency" value="{{:: opt.id }}">{{:: opt.label }}</option>
+  </select>
+</div>
+<div class="form-inline">
+  <label for="display_entity_permission">{{:: ts('API Permission') }}</label>
+  <a crm-ui-help="hs({id: 'entity_permission', title: ts('API Permission')})"></a>
+  <input id="display_entity_permission" class="form-control" crm-ui-select="{data: $ctrl.permissions, multiple: true, placeholder: ts('administer CiviCRM')}" ng-model="$ctrl.display.settings.entity_permission" ng-list ng-change="$ctrl.onChangeEntityPermission()">
+  <select ng-if="$ctrl.display.settings.entity_permission.length > 1" title="{{:: ts('Permission operator') }}" ng-model="$ctrl.display.settings.entity_permission_operator">
+    <option value="AND">{{:: ts('And') }}</option>
+    <option value="OR">{{:: ts('Or') }}</option>
   </select>
 </div>
 <fieldset ng-include="'~/crmSearchAdmin/crmSearchAdminDisplaySort.html'"></fieldset>

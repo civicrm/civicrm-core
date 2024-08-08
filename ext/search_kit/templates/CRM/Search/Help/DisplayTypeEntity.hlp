@@ -1,0 +1,4 @@
+{htxt id="entity_permission"}
+  <p>{ts}Set the permission level needed to view this entity.{/ts}</p>
+  <p>{ts}Users without this permission will not be able to see this entity in SearchKit.{/ts}</p>
+{/htxt}
