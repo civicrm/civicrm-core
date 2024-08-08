@@ -56,7 +56,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
   protected function setUp(): void {
     parent::setUp();
     $originalExtensions = array_column(CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(), 'fullName');
-    $this->assertEquals(['civiimport'], array_values(array_intersect($originalExtensions, $this->toggleExtensions)), 'These extensions may be enabled and disabled during the test. The start-state and end-state should be the same. It appears that we have an unexpected start-state. Perhaps another test left us with a weird start-state?');
+    $this->assertEquals([], array_values(array_intersect($originalExtensions, $this->toggleExtensions)), 'These extensions may be enabled and disabled during the test. The start-state and end-state should be the same. It appears that we have an unexpected start-state. Perhaps another test left us with a weird start-state?');
     $this->enableBackgroundQueueOriginalValue = Civi::settings()->get('enableBackgroundQueue');
   }
 
@@ -73,7 +73,8 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ->addWhere('rule_table', '!=', 'civicrm_email')
       ->addWhere('dedupe_rule_group_id.name', '=', 'IndividualUnsupervised')->execute();
     foreach ($this->toggleExtensions as $ext) {
-      CRM_Extension_System::singleton()->getManager()->install([$ext]);
+      CRM_Extension_System::singleton()->getManager()->disable([$ext]);
+      CRM_Extension_System::singleton()->getManager()->uninstall([$ext]);
     }
     Civi::settings()->set('enableBackgroundQueue', $this->enableBackgroundQueueOriginalValue);
     parent::tearDown();
