@@ -356,6 +356,15 @@ trait CRM_Admin_Form_SettingTrait {
         // This will be an array with one value.
         $settings[$setting] = (bool) reset($settings[$setting]);
       }
+      elseif ($settingMetaData['type'] === 'Integer') {
+        // QuickForm is pretty slack when it comes to types, cast to an integer.
+        if (is_numeric($settingValue)) {
+          $settings[$setting] = (int) $settingValue;
+        }
+        if (!$settingValue && empty($settingMetaData['is_required'])) {
+          $settings[$setting] = NULL;
+        }
+      }
     }
     Setting::set(FALSE)->setValues($settings)->execute();
   }
