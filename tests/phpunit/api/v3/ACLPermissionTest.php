@@ -1845,6 +1845,81 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Ensure that if there is no specific allow all contacts that contacts in exclude groups are correctly filtered out.
+   */
+  public function testAllowAndDenySameGroupWihtAllowHigherPriority(): void {
+    $this->callAPISuccess('OptionValue', 'create', [
+      'option_group_id' => 'acl_role',
+      'label' => 'Test allow Specific Groups ACL Role and Disallow Specfic',
+      'value' => 12,
+      'is_active' => 1,
+    ]);
+    $contact1 = $this->individualCreate();
+    $excludeGroup = $this->groupCreate(['title' => 'exclude group deny', 'name' => 'exclude group deny']);
+    $this->callAPISuccess('GroupContact', 'create', [
+      'contact_id' => $contact1,
+      'group_id' => $excludeGroup,
+      'status' => 'Added',
+    ]);
+    $aclGroup = $this->groupCreate();
+    ACLEntityRole::create(FALSE)->setValues([
+      'acl_role_id' => 12,
+      'entity_table' => 'civicrm_group',
+      'entity_id' => $aclGroup,
+      'is_active' => 1,
+    ])->execute();
+    $this->callAPISuccess('Acl', 'create', [
+      'name' => 'Test Postive Allow all ACL',
+      'priority' => 1,
+      'entity_table' => 'civicrm_acl_role',
+      'entity_id' => 12,
+      'operation' => 'Edit',
+      'object_table' => 'civicrm_group',
+      'object_id' => 0,
+    ]);
+    $this->callAPISuccess('Acl', 'create', [
+      'name' => 'Test Postive Allow Groups ACL',
+      'priority' => 3,
+      'entity_table' => 'civicrm_acl_role',
+      'entity_id' => 12,
+      'operation' => 'Edit',
+      'object_table' => 'civicrm_group',
+      'object_id' => $excludeGroup,
+    ]);
+    $this->callAPISuccess('Acl', 'create', [
+      'name' => 'Test Negative Specific Group ACL',
+      'priority' => 2,
+      'entity_table' => 'civicrm_acl_role',
+      'entity_id' => 12,
+      'operation' => 'Edit',
+      'object_table' => 'civicrm_group',
+      'object_id' => $excludeGroup,
+      'deny' => 1,
+    ]);
+    $userID = $this->createLoggedInUser();
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'view my contact',
+    ];
+    $this->callAPISuccess('GroupContact', 'create', [
+      'contact_id' => $userID,
+      'group_id' => $aclGroup,
+      'status' => 'Added',
+    ]);
+    $this->cleanupCachedPermissions();
+    Civi::cache('metadata')->clear();
+    Civi::$statics['CRM_ACL_BAO_ACL'] = [];
+    $contacts = Contact::get()->addWhere('id', 'IN', [$contact1])->execute();
+    $this->assertCount(1, $contacts);
+    $this->assertEquals($contact1, $contacts[0]['id']);
+    $groups = CRM_ACL_API::group(CRM_ACL_API::EDIT);
+    // Check that the deny group isn't in the list of permissiable groups.
+    $this->assertTrue(in_array($excludeGroup, $groups));
+    Civi::cache('metadata')->clear();
+    Civi::$statics['CRM_ACL_BAO_ACL'] = [];
+  }
+
+  /**
    * @throws \CRM_Core_Exception
    */
   public function aclGroupHookAllResults($action, $contactID, $tableName, &$allGroups, &$currentGroups) {
