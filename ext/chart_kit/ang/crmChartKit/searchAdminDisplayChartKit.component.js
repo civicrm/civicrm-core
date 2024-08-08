@@ -140,7 +140,7 @@
                 return {
                     // by default allow all types we know
                     reduceTypes: chartKitColumnConfig.reduceType.map((type) => type.key),
-                    dataValueTypes: chartKitColumnConfig.dataValueType.map((type) => type.key),
+                    scaleTypes: chartKitColumnConfig.scaleType.map((type) => type.key),
                     dataLabelTypes: chartKitColumnConfig.dataLabelType.map((type) => type.key),
                     // by default no option
                     seriesTypes: [],
@@ -164,8 +164,8 @@
                 return this.getAxis(axisKey).sourceDataTypes;
             };
 
-            this.getAxisDataValueTypeOptions = (axisKey) => {
-                return this.getAxis(axisKey).dataValueTypes;
+            this.getAxisscaleTypeOptions = (axisKey) => {
+                return this.getAxis(axisKey).scaleTypes;
             };
 
             this.getAxisReduceTypeOptions = (axisKey) => {
@@ -225,8 +225,8 @@
                 return dataType && ['Date', 'Time', 'Timestamp'].includes(dataType);
             };
 
-            this.getColumnDataValueTypeOptions = (col) => {
-                let options = this.getAxisDataValueTypeOptions(col.axis);
+            this.getColumnscaleTypeOptions = (col) => {
+                let options = this.getAxisscaleTypeOptions(col.axis);
 
                 // date is only valid if the column type is date
                 if (this.getColumnSourceDataTypeIsDate(col)) {
@@ -254,7 +254,7 @@
             this.getColumnReduceTypeOptions = (col) => {
                 let options = this.getAxisReduceTypeOptions(col.axis)
 
-                switch (col.dataValueType) {
+                switch (col.scaleType) {
                     case 'categorical':
                     case 'date':
                         options = options.filter((item) => ['count', 'list'].includes(item));
@@ -277,7 +277,7 @@
 
                 // categorical will often be rendered to string, which
                 // dont like being formatted
-                if (col.dataValueType === 'categorical') {
+                if (col.scaleType === 'categorical') {
                     return ['none', 'round', 'formatMoney'];
                 }
                 // default to money for money columns
@@ -285,7 +285,7 @@
                     return ['formatMoney', 'round', 'none'];
                 }
 
-                if (col.dataValueType === 'date') {
+                if (col.scaleType === 'date') {
                     // TODO support fancy date formatting?
                     return ['none'];
                 }
@@ -343,7 +343,7 @@
 
             this.getColumnConfigOptionGetters = () => ({
                 searchColumn: this.getColumnSearchColumnOptions,
-                dataValueType: this.getColumnDataValueTypeOptions,
+                scaleType: this.getColumnscaleTypeOptions,
                 datePrecision: this.getColumnDatePrecisionOptions,
                 reduceType: this.getColumnReduceTypeOptions,
                 seriesType: this.getColumnSeriesTypeOptions,

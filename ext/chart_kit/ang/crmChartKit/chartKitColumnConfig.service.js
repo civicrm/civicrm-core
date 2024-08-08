@@ -32,18 +32,18 @@
                     label: ts('List')
                 }
             ],
-            dataValueType: [
+            scaleType: [
                 {
                     key: 'numeric',
                     label: ts('Numeric'),
                 },
                 {
                     key: 'categorical',
-                    label: ts('Categories'),
+                    label: ts('Categorical'),
                 },
                 {
                     key: 'date',
-                    label: ts('Dates'),
+                    label: ts('Datetime'),
                 },
             ],
             datePrecision: [

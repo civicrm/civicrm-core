@@ -116,7 +116,7 @@
                             break;
                     }
 
-                    switch (col.dataValueType) {
+                    switch (col.scaleType) {
                         case 'categorical':
                             // initialise the category list for this column if it doesnt exist yet
                             if (!this.categories[col.index]) {
@@ -256,7 +256,7 @@
                 const min = Math.min(...xDomainValues);
                 const max = Math.max(...xDomainValues);
 
-                switch (xCol.dataValueType) {
+                switch (xCol.scaleType) {
                     case 'date':
                         // timescale
                         this.chart.x(d3.scaleTime().domain([min, max]).nice());
@@ -277,7 +277,7 @@
                     // if we could pass that back up to the search kit filters
                     // that would be amazing but very non-trivial
                     .brushOn(false)
-                    .mouseZoomable(xCol.dataValueType !== 'categorical');
+                    .mouseZoomable(xCol.scaleType !== 'categorical');
 
                 console.log(this.chart);
             };
@@ -333,7 +333,7 @@
 
                 if (xCols.length === 1) {
 
-                    if (xCols[0].dataValueType !== 'date') {
+                    if (xCols[0].scaleType !== 'date') {
                         this.chart.xAxis().tickFormat((v) => this.renderDataValue(v, xCols[0]));
                     }
                 }
@@ -518,7 +518,7 @@
 
             this.renderDataValue = (value, col) => {
                 // convert timestamp crossfilter back to date string
-                switch (col.dataValueType) {
+                switch (col.scaleType) {
                     case 'categorical':
                         // convert categorical indexes back to label
                         value = this.categories[col.index][value];

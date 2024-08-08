@@ -12,7 +12,7 @@
             return ({
             'x': {
                 label: ts('X-Axis'),
-                dataValueTypes: ['date', 'numeric', 'categorical'],
+                scaleTypes: ['date', 'numeric', 'categorical'],
                 reduceTypes: []
             },
             'y': {

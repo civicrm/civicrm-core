@@ -8,7 +8,7 @@
         'x': {
           label: ts('Category'),
           reduceTypes: [],
-          dataValueTypes: ['categorical'],
+          scaleTypes: ['categorical'],
           // label is default to show what things are
           dataLabelTypes: ['label', 'title', 'none'],
         },

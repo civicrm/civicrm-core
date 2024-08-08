@@ -88,16 +88,16 @@
           </label>
           <span>{{ col.sourceDataType }}</span>
         </div>
-        <div class="form-inline crm-chart-kit-axis-data-type" ng-if="$ctrl.getColumnConfigOptionDetails(col, 'dataValueType').length > 1">
+        <div class="form-inline crm-chart-kit-axis-data-type" ng-if="$ctrl.getColumnConfigOptionDetails(col, 'scaleType').length > 1">
           <label>
-              {{:: ts('Data Type')}}
+              {{:: ts('Scale type')}}
           </label>
           <select
               class="form-control"
-              ng-model="$ctrl.display.settings.columns[col.index].dataValueType"
+              ng-model="$ctrl.display.settings.columns[col.index].scaleType"
               >
               <option
-                  ng-repeat="option in $ctrl.getColumnConfigOptionDetails(col, 'dataValueType')"
+                  ng-repeat="option in $ctrl.getColumnConfigOptionDetails(col, 'scaleType')"
                   value="{{:: option.key}}"
                   >
                   {{:: option.label }}
