@@ -14,4 +14,5 @@ return [
   'requires' => ['crmUi', 'crmUtil', 'ui.sortable', 'dialogService', 'api4'],
   'settingsFactory' => ['CRM_Contact_Page_DashBoard', 'angularSettings'],
   'permissions' => ['administer CiviCRM'],
+  'bundles' => ['visual'],
 ];

@@ -39,8 +39,6 @@
 {/if}
 
 {if $hasChart}
-{include file="CRM/common/chart.tpl" contriChart=true}
-
 {literal}
 <script type="text/javascript">
 
@@ -49,7 +47,7 @@
 
     $.each( allData, function( chartID, chartValues ) {
         var divName = "chart_" + chartID;
-        createChart( chartID, divName, 300, 300, allData[chartID].object );
+        CRM.visual.createChart( chartID, divName, allData[chartID].object );
         });
 
     function byMonthOnClick( barIndex ) {

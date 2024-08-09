@@ -299,6 +299,10 @@ WHERE {$this->_aliases['civicrm_grant']}.amount_total IS NOT NULL
     }
   }
 
+  public function preProcess() {
+    \Civi::resources()->addBundle('visual');
+  }
+
   public function postProcess() {
     // get ready with post process params
     $this->beginPostProcess();
