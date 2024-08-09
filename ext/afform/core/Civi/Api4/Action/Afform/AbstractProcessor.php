@@ -95,17 +95,27 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     }
 
     foreach ($sortedEntities as $entityName) {
+      $ids = (array) ($this->args[$entityName] ?? []);
+
       $entity = $this->_formDataModel->getEntity($entityName);
       $this->_entityIds[$entityName] = [];
-      $matchField = $this->matchField ?? CoreUtil::getIdFieldName($entity['type']);
-      $matchFieldDefn = $this->_formDataModel->getField($entity['type'], $matchField, 'create');
-      if (!empty($entity['actions'][$matchFieldDefn['input_attrs']['autofill']])) {
-        if (
-          !empty($this->args[$entityName]) &&
-          (!empty($entity['url-autofill']) || isset($entity['fields'][$matchField]))
-        ) {
-          $ids = (array) $this->args[$entityName];
-          $this->loadEntity($entity, $ids);
+      $idField = CoreUtil::getIdFieldName($entity['type']);
+
+      foreach ($ids as $num => $id) {
+        // Url args may be scalar - convert to array format
+        if (is_scalar($id)) {
+          $ids[$num] = [$idField => $id];
+        }
+      }
+      if ($ids) {
+        // If 'update' (or 'create' in special cases like 'template_id') is allowed, load entity.
+        $matchField = self::getNestedKey($ids) ?: $idField;
+        $matchFieldDefn = $this->_formDataModel->getField($entity['type'], $matchField, 'create');
+        $autofillMode = $matchFieldDefn['input_attrs']['autofill'] ?? NULL;
+        if (!empty($entity['actions'][$autofillMode])) {
+          if (!empty($entity['url-autofill']) || isset($entity['fields'][$matchField])) {
+            $this->loadEntity($entity, $ids, $autofillMode);
+          }
         }
       }
       $event = new AfformPrefillEvent($this->_afform, $this->_formDataModel, $this, $entity['type'], $entityName, $this->_entityIds);
@@ -143,37 +153,65 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    * Fetch all data needed to display a given entity on this form
    *
    * @param array $entity
-   * @param array $ids
+   *   Afform entity definition
+   * @param array[] $values
+   *   Array of value arrays. Each must be the primary key, e.g.
+   *   ```
+   *   [
+   *     ['id' => 123],
+   *     ['id' => 456],
+   *   ]
+   *   ```
+   *   In theory we could include other stuff in the values, but it's not currently supported.
+   * @param string $mode
+   *   'update' or 'create' ('create' is only used in special cases like `Event.template_id`)
    */
-  public function loadEntity(array $entity, array $ids) {
+  public function loadEntity(array $entity, array $values, string $mode = 'update'): void {
     // Limit number of records based on af-repeat settings
     // If 'min' is set then it is repeatable, and max will either be a number or NULL for unlimited.
     if (isset($entity['min']) && isset($entity['max'])) {
-      foreach (array_keys($ids) as $index) {
-        if ($index >= $entity['max']) {
-          unset($ids[$index]);
+      foreach (array_keys($values) as $count => $index) {
+        if ($count >= $entity['max']) {
+          unset($values[$index]);
         }
       }
     }
-
-    $api4 = $this->_formDataModel->getSecureApi4($entity['name']);
-    $idField = CoreUtil::getIdFieldName($entity['type']);
-    if ($ids && !empty($entity['fields'][$idField]['defn']['saved_search'])) {
-      $ids = $this->validateBySavedSearch($entity, $ids);
-    }
-    if (!$ids) {
+    $matchField = self::getNestedKey($values);
+    if (!$matchField) {
       return;
     }
-    $result = $this->apiGet($api4, $entity['type'], $entity['fields'], [
-      'where' => [[$idField, 'IN', $ids]],
+    $keys = array_combine(array_keys($values), array_column($values, $matchField));
+    // In create mode, use id as the key
+    $keyField = $mode === 'create' ? CoreUtil::getIdFieldName($entity['name']) : $matchField;
+
+    $api4 = $this->_formDataModel->getSecureApi4($entity['name']);
+    if ($keys && !empty($entity['fields'][$keyField]['defn']['saved_search'])) {
+      $keys = $this->validateBySavedSearch($entity, $keys, $matchField);
+    }
+    if (!$keys) {
+      return;
+    }
+    $result = $this->apiGet($api4, $entity['type'], $entity['fields'], $keyField, [
+      'where' => [[$keyField, 'IN', $keys]],
     ]);
-    foreach ($ids as $index => $id) {
-      $this->_entityIds[$entity['name']][$index] = [
-        $idField => isset($result[$id]) ? $id : NULL,
-        'joins' => [],
-      ];
-      if (isset($result[$id])) {
-        $data = ['fields' => $result[$id]];
+    $idField = CoreUtil::getIdFieldName($entity['type']);
+    foreach ($keys as $index => $key) {
+      $entityId = $result[$key][$idField] ?? NULL;
+      // In create mode, swap id with matchField
+      if ($mode === 'create') {
+        if (isset($result[$key][$idField])) {
+          $result[$key][$matchField] = $result[$key][$idField];
+          unset($result[$key][$idField]);
+        }
+      }
+      else {
+        $this->_entityIds[$entity['name']][$index] = [
+          $idField => $entityId,
+          'joins' => [],
+        ];
+      }
+      if (!empty($result[$key])) {
+        $data = ['fields' => $result[$key]];
         foreach ($entity['joins'] ?? [] as $joinEntity => $join) {
           $joinIdField = CoreUtil::getIdFieldName($joinEntity);
           $multipleLocationBlocks = is_array($join['data']['location_type_id'] ?? NULL);
@@ -186,9 +224,9 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
           if ($multipleLocationBlocks) {
             $limit = 0;
           }
-          $where = self::getJoinWhereClause($this->_formDataModel, $entity['name'], $joinEntity, $id);
+          $where = self::getJoinWhereClause($this->_formDataModel, $entity['name'], $joinEntity, $entityId);
           if ($where) {
-            $joinResult = $this->apiGet($api4, $joinEntity, $join['fields'] + ($join['data'] ?? []), [
+            $joinResult = $this->apiGet($api4, $joinEntity, $join['fields'] + ($join['data'] ?? []), $joinIdField, [
               'where' => $where,
               'limit' => $limit,
               'orderBy' => self::getEntityField($joinEntity, 'is_primary') ? ['is_primary' => 'DESC'] : [],
@@ -216,16 +254,18 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   /**
    * Delegated by loadEntity to call API.get and fill in additioal info
    *
-   * @param $api4
-   * @param $entityName
-   * @param $entityFields
-   * @param $params
+   * @param callable $api4
+   * @param string $entityName
+   * @param array $entityFields
+   * @param string $keyField
+   * @param array $params
    * @return array
    */
-  private function apiGet($api4, $entityName, $entityFields, $params) {
+  private function apiGet($api4, $entityName, $entityFields, string $keyField, $params) {
     $idField = CoreUtil::getIdFieldName($entityName);
+    // Ensure 'id' is selected
     $params['select'] = array_unique(array_merge([$idField], array_keys($entityFields)));
-    $result = (array) $api4($entityName, 'get', $params)->indexBy($idField);
+    $result = (array) $api4($entityName, 'get', $params)->indexBy($keyField);
     // Fill additional info about file fields
     $fileFields = $this->getFileFields($entityName, $entityFields);
     foreach ($fileFields as $fieldName => $fieldDefn) {
@@ -257,18 +297,18 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   /**
    * Validate that given id(s) are actually returned by the Autocomplete API
    *
-   * @param $entity
+   * @param array $entity
    * @param array $ids
+   * @param string $matchField
    * @return array
    * @throws \CRM_Core_Exception
    */
-  private function validateBySavedSearch($entity, array $ids) {
-    $idField = CoreUtil::getIdFieldName($entity['type']);
+  private function validateBySavedSearch(array $entity, array $ids, string $matchField) {
     $fetched = civicrm_api4($entity['type'], 'autocomplete', [
       'ids' => $ids,
       'formName' => 'afform:' . $this->name,
-      'fieldName' => $entity['name'] . ':' . $idField,
-    ])->indexBy($idField);
+      'fieldName' => $entity['name'] . ':' . $matchField,
+    ])->indexBy($matchField);
     $validIds = [];
     // Preserve keys
     foreach ($ids as $index => $id) {
@@ -557,6 +597,17 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
       $event = new AfformSubmitEvent($this->_afform, $this->_formDataModel, $this, $records, $entityType, $entityName, $this->_entityIds);
       \Civi::dispatcher()->dispatch('civi.afform.submit', $event);
     }
+  }
+
+  /**
+   * Given a nested array like `[0 => ['id' => 123]]`,
+   * this returns the first key from the inner array, e.g. `'id'`.
+   * @param array $values
+   * @return int|string|null
+   */
+  protected static function getNestedKey(array $values) {
+    $firstValue = \CRM_Utils_Array::first(array_filter($values));
+    return is_array($firstValue) && $firstValue ? array_keys($firstValue)[0] : NULL;
   }
 
 }

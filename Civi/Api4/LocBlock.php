@@ -16,6 +16,7 @@ namespace Civi\Api4;
  * Links addresses, emails & phones to Events.
  *
  * @searchable secondary
+ * @searchFields address_id.street_address,address_id.city,email_id.email
  * @since 5.31
  * @package Civi\Api4
  */
