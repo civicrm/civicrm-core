@@ -9,6 +9,8 @@
 !/ext/civigrant
 !/ext/civicrm_admin_ui
 !/ext/civicrm_search_ui
+!/ext/chart_kit
+/ext/chart_kit/packages
 !/ext/sequentialcreditnotes
 !/ext/flexmailer
 !/ext/eventcart

@@ -1,0 +1,18 @@
+<div ng-include="'~/crmSearchAdmin/crmSearchAdminDisplayHeader.html'"></div>
+
+<div class="crm-chart-kit-admin">
+
+  <div>
+    <div class="crm-chart-kit-admin-chart-type">
+        <label ng-repeat="type in $ctrl.chartTypeOptions">
+            <input type="radio" name="occurrences" ng-value="type.key" ng-model="$ctrl.display.settings.chartType" />
+            <i class="crm-i {{:: type.icon}}" />
+            {{:: type.label }}
+        </label>
+    </div>
+
+  </div>
+
+  <div ng-if="$ctrl.display.settings.chartType" ng-include="$ctrl.getChartTypeAdminTemplate()"></div>
+
+</div>

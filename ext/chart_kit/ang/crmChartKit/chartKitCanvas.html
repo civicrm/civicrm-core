@@ -1,0 +1,18 @@
+<div class="crm-chart-kit-canvas" ng-style="$ctrl.getCanvasStyle()">
+
+    <div class="crm-chart-kit-chart-title" ng-if="$ctrl.settings.format.title" ng-style="{color: $ctrl.settings.format.labelColor}">
+        {{:: $ctrl.settings.format.title }}
+    </div>
+
+    <div class="crm-chart-kit-chart-container" ng-style="$ctrl.getContainerStyle()"></div>
+
+    <div class="crm-chart-kit-download-links" ng-if="$ctrl.settings.showDownloadLinks">
+        <a class="btn btn-sm crm-chart-kit-download-svg" ng-click="$ctrl.downloadSVG()">
+            {{:: ts('Download (SVG)') }}
+        </a>
+        <a class="btn btn-sm crm-chart-kit-download-png" ng-click="$ctrl.downloadPNG()">
+            {{:: ts('Download (PNG)') }}
+        </a>
+    </div>
+
+</div>

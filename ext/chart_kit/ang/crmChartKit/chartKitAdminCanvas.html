@@ -1,0 +1,127 @@
+<fieldset class="crm-chart-kit-admin-format-canvas">
+  <legend>
+    {{:: ts('Canvas') }}
+  </legend>
+
+  <div class="form-inline">
+    <label>{{:: ts('Title') }}</label>
+    <input type="text" class="form-control" ng-model="$ctrl.display.settings.format.title">
+  </div>
+  <div class="form-inline">
+    <label>{{:: ts('Background color') }}</label>
+    <input type="color" class="form-control" ng-model="$ctrl.display.settings.format.backgroundColor">
+  </div>
+  <div class="form-inline">
+    <label>{{:: ts('Text color') }}</label>
+    <input type="color" class="form-control" ng-model="$ctrl.display.settings.format.labelColor">
+  </div>
+  <div class="form-inline">
+    <label>{{:: ts('Width') }}</label>
+    <input type="number" class="form-control" ng-model="$ctrl.display.settings.format.width">
+    <label>{{:: ts('Height') }}</label>
+    <input type="number" class="form-control" ng-model="$ctrl.display.settings.format.height">
+  </div>
+
+  <details>
+    <summary>{{:: ts('Padding') }}</summary>
+
+    <div class="form-inline">
+      <label>
+        {{:: ts('Inner') }}
+      </label>
+      <input type="number" class="form-control" ng-model="$ctrl.display.settings.format.padding.inner" />
+      <label>
+        {{:: ts('Outer') }}
+      </label>
+      <input type="number" class="form-control" ng-model="$ctrl.display.settings.format.padding.outer" />
+    </div>
+
+
+    <div ng-if="$ctrl.chartType.hasCoordinateGrid()" class="form-inline">
+        <label>
+          {{:: ts('Top') }}
+        </label>
+        <input type="number" class="form-control" ng-model="$ctrl.display.settings.format.padding.top" />
+        <label>
+          {{:: ts('Bottom') }}
+        </label>
+        <input type="number" class="form-control" ng-model="$ctrl.display.settings.format.padding.bottom" />
+        <label>
+          {{:: ts('Left') }}
+        </label>
+        <input type="number" class="form-control" ng-model="$ctrl.display.settings.format.padding.left" />
+        <label>
+          {{:: ts('Right') }}
+        </label>
+        <input type="number" class="form-control" ng-model="$ctrl.display.settings.format.padding.right" />
+        <label>
+          {{:: ts('Clipping') }}
+        </label>
+        <!-- todo: not needed? used to allow data labels to spill over the edges of the chart area, but can maybe be set automatically -->
+        <input type="number" class="form-control" ng-model="$ctrl.display.settings.format.padding.clip" />
+    </div>
+
+  </details>
+
+  <details ng-if="$ctrl.chartType.hasCoordinateGrid()">
+    <summary>{{:: ts('Axes')}}</summary>
+      <div class="form-inline">
+        <label>
+          {{:: ts('X-axis label')}}
+        </label>
+        <input
+          class="form-control crm-search-display-chart-axis-label-x"
+          ng-model="$ctrl.display.settings.format.xAxisLabel"
+          />
+      </div>
+      <div class="form-inline">
+        <label>
+          {{:: ts('Show X gridlines?')}}
+        </label>
+        <input
+            type="checkbox"
+            class="form-control crm-search-display-chart-gridlines"
+            ng-model="$ctrl.display.settings.format.xAxisGridlines"
+            />
+      </div>
+      <div class="form-inline">
+        <label>
+          {{:: ts('Y-axis label')}}
+        </label>
+        <input
+          class="form-control crm-search-display-chart-axis-label-y"
+          ng-model="$ctrl.display.settings.format.yAxisLabel"
+          />
+      </div>
+      <div class="form-inline">
+        <label>
+          {{:: ts('Show Y gridlines?')}}
+        </label>
+        <input
+            type="checkbox"
+            class="form-control crm-search-display-chart-gridlines"
+            ng-model="$ctrl.display.settings.format.yAxisGridlines"
+            />
+      </div>
+      <div class="form-inline">
+        <label>
+          {{:: ts('Right Y-axis label')}}
+        </label>
+        <input
+          class="form-control crm-search-display-chart-axis-label-y-right"
+          ng-model="$ctrl.display.settings.format.rightYAxisLabel"
+          />
+      </div>
+  </details>
+
+  <div class="form-inline">
+    <label>
+      {{:: ts('Show download links?')}}
+    </label>
+    <input
+      type="checkbox"
+      class="form-control crm-search-display-chart-show-download-links"
+      ng-model="$ctrl.display.settings.showDownloadLinks"
+      />
+  </div>
+</fieldset>
