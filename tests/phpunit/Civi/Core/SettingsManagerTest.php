@@ -50,7 +50,7 @@ class SettingsManagerTest extends \CiviUnitTestCase {
     $da = \CRM_Core_DAO::createTestObject('CRM_Core_DAO_Domain');
     $db = \CRM_Core_DAO::createTestObject('CRM_Core_DAO_Domain');
 
-    $manager = $this->createManager()->useDefaults();
+    $manager = $this->createManager()->bootComplete();
 
     $daSettings = $manager->getBagByDomain($da->id);
     $daSettings->set('d1', 'un');
@@ -63,7 +63,7 @@ class SettingsManagerTest extends \CiviUnitTestCase {
     $this->assertEquals('beta', $dbSettings->get('d2'));
     $this->assertEquals('GAMMA!', $dbSettings->get('d3'));
 
-    $managerRedux = $this->createManager()->useDefaults();
+    $managerRedux = $this->createManager()->bootComplete();
 
     $daSettingsRedux = $managerRedux->getBagByDomain($da->id);
     $this->assertEquals('un', $daSettingsRedux->get('d1'));
@@ -79,7 +79,7 @@ class SettingsManagerTest extends \CiviUnitTestCase {
     $ca = \CRM_Core_DAO::createTestObject('CRM_Contact_DAO_Contact');
     $cb = \CRM_Core_DAO::createTestObject('CRM_Contact_DAO_Contact');
 
-    $manager = $this->createManager()->useDefaults();
+    $manager = $this->createManager()->bootComplete();
 
     $caSettings = $manager->getBagByContact($domain->id, $ca->id);
     $caSettings->set('c1', 'un');
@@ -93,7 +93,7 @@ class SettingsManagerTest extends \CiviUnitTestCase {
     $this->assertEquals('GAMMA MAN!', $cbSettings->get('c3'));
 
     // Read settings from freshly initialized objects.
-    $manager = $this->createManager()->useDefaults();
+    $manager = $this->createManager()->bootComplete();
 
     $caSettingsRedux = $manager->getBagByContact($domain->id, $ca->id);
     $this->assertEquals('un', $caSettingsRedux->get('c1'));
@@ -105,7 +105,7 @@ class SettingsManagerTest extends \CiviUnitTestCase {
     $domain = \CRM_Core_DAO::createTestObject('CRM_Core_DAO_Domain');
     $contact = \CRM_Core_DAO::createTestObject('CRM_Contact_DAO_Contact');
 
-    $manager = $this->createManager()->useDefaults();
+    $manager = $this->createManager()->bootComplete();
 
     // Store different values for the 'monkeywrench' setting on domain and contact
 
@@ -118,7 +118,7 @@ class SettingsManagerTest extends \CiviUnitTestCase {
     $this->assertEquals('from contact', $contactSettings->get('monkeywrench'));
 
     // Read settings from freshly initialized objects.
-    $manager = $this->createManager()->useDefaults();
+    $manager = $this->createManager()->bootComplete();
 
     $domainSettings = $manager->getBagByDomain($domain->id);
     $this->assertEquals('from domain', $domainSettings->get('monkeywrench'));
@@ -149,7 +149,7 @@ class SettingsManagerTest extends \CiviUnitTestCase {
   public function testArraySetting(): void {
     $domain = \CRM_Core_DAO::createTestObject('CRM_Core_DAO_Domain');
 
-    $manager = $this->createManager()->useDefaults();
+    $manager = $this->createManager()->bootComplete();
     $dSettings = $manager->getBagByDomain($domain->id);
     $dSettings->set('test_setting', ['hello' => 'World']);
     $test_setting = $dSettings->get('test_setting');

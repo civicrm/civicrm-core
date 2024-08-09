@@ -48,7 +48,7 @@ return [
       'size' => 4,
       'maxlength' => 8,
     ],
-    'default' => NULL,
+    'default' => \CRM_Extension_System::DEFAULT_MAX_DEPTH,
     'add' => '5.55',
     'title' => ts('Extension Depth'),
     'is_domain' => 1,
