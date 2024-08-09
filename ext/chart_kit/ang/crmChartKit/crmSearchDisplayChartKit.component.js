@@ -103,16 +103,16 @@
 
                     switch (col.datePrecision) {
                         case 'year':
-                            value = d3.timeYear.round(Date.parse(value)).valueOf();
+                            value = d3.timeYear.floor(Date.parse(value)).valueOf();
                             break;
                         case 'month':
-                            value = d3.timeMonth.round(Date.parse(value)).valueOf();
+                            value = d3.timeMonth.floor(Date.parse(value)).valueOf();
                             break;
                         case 'day':
-                            value = d3.timeDay.round(Date.parse(value)).valueOf();
+                            value = d3.timeDay.floor(Date.parse(value)).valueOf();
                             break;
                         case 'hour':
-                            value = d3.timeHour.round(Date.parse(value)).valueOf();
+                            value = d3.timeHour.floor(Date.parse(value)).valueOf();
                             break;
                     }
 
