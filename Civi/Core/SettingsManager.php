@@ -308,7 +308,7 @@ class SettingsManager {
 
     $specs = SettingsMetadata::getMetadata([
       'is_contact' => ($entity === 'contact' ? 1 : 0),
-      'is_env_var' => TRUE,
+      'is_env_loadable' => TRUE,
     ], NULL, FALSE, $this->preBoot);
 
     foreach ($specs as $key => $spec) {
