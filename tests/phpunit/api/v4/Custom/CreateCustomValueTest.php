@@ -19,6 +19,7 @@
 
 namespace api\v4\Custom;
 
+use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
 use Civi\Api4\CustomValue;
@@ -43,11 +44,12 @@ class CreateCustomValueTest extends CustomTestBase {
       ->addValue('label', 'Color')
       ->addValue('option_values', $optionValues)
       ->addValue('custom_group_id', $customGroup['id'])
-      ->addValue('html_type', 'Select')
+      ->addValue('html_type', 'CheckBox')
       ->addValue('data_type', 'String')
       ->execute();
 
     $customField = CustomField::get(FALSE)
+      ->addWhere('custom_group_id', '=', $customGroup['id'])
       ->addWhere('label', '=', 'Color')
       ->execute()
       ->first();
@@ -72,6 +74,21 @@ class CreateCustomValueTest extends CustomTestBase {
     $createdOptionValues = array_combine($values, $labels);
 
     $this->assertEquals($optionValues, $createdOptionValues);
+
+    $fieldName = $customGroup['name'] . '.' . $customField['name'];
+
+    // Test that failing to pass value as array will still serialize correctly
+    $contact = $this->createTestRecord('Contact', [$fieldName => 'r']);
+
+    $contact = Contact::get(FALSE)
+      ->addSelect($fieldName)
+      ->addWhere('id', '=', $contact['id'])
+      ->execute()->single();
+    $this->assertSame(['r'], $contact[$fieldName]);
+
+    // Ensure serialization really did happen correctly in the DB
+    $serializedValue = \CRM_Core_DAO::singleValueQuery("SELECT {$customField['column_name']} FROM {$customGroup['table_name']} WHERE id = 1");
+    $this->assertSame(\CRM_Core_DAO::VALUE_SEPARATOR . 'r' . \CRM_Core_DAO::VALUE_SEPARATOR, $serializedValue);
   }
 
   /**

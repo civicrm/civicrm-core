@@ -3342,7 +3342,7 @@ SELECT contact_id
     }
     switch ($serializationType) {
       case self::SERIALIZE_SEPARATOR_BOOKEND:
-        return $value === [] ? '' : CRM_Utils_Array::implodePadded($value);
+        return ($value === [] || $value === '') ? '' : CRM_Utils_Array::implodePadded($value);
 
       case self::SERIALIZE_SEPARATOR_TRIMMED:
         return is_array($value) ? implode(self::VALUE_SEPARATOR, $value) : $value;
