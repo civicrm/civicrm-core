@@ -107,7 +107,8 @@
     "behat/mink": "^1.10",
     "dmore/chrome-mink-driver": "^2.9",
     "pontedilana/php-weasyprint": "^0.13.0 || ^1",
-    "knplabs/knp-snappy": "^1.4"
+    "knplabs/knp-snappy": "^1.4",
+    "xemlock/htmlpurifier-html5": "^0.1.11"
   },
   "scripts": {
     "post-install-cmd": [
