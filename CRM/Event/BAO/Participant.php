@@ -833,6 +833,78 @@ WHERE  civicrm_participant.id = {$participantId}
   }
 
   /**
+   * Retrieves existing participants.
+   *
+   * @param int $contactId
+   *   The contact ID of participants to find.
+   * @param int $eventId
+   *   The event ID of participants to find.
+   * @param array $filterRoleIds
+   *   A list of participant role IDs to filter for. Registrations with other roles will not be considered.
+   * @param bool $includeTest
+   *   Whether to include test participants.
+   *
+   * @return array<int, array{id: int, "status_id:name": string}>
+   *   An array of participants (a subset of attributes) matching the given criteria, keyed by ID.
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public static function findCountedParticipants(
+    int $contactId,
+    int $eventId,
+    array $filterRoleIds = [],
+    bool $includeTest = FALSE
+  ) {
+    $query = \Civi\Api4\Participant::get(FALSE)
+      ->addSelect('id', 'status_id:name')
+      ->addWhere('contact_id', '=', $contactId)
+      ->addWhere('event_id', '=', $eventId)
+      ->addJoin('ParticipantStatusType AS participant_status_type', 'INNER')
+      ->addWhere('participant_status_type.is_counted', '=', TRUE);
+
+    if ([] !== $filterRoleIds) {
+      $query->addWhere('role_id', 'IN', $filterRoleIds);
+    }
+
+    if (!$includeTest) {
+      $query->addWhere('is_test', '=', FALSE);
+    }
+
+    $result = $query->execute();
+    return $result->getArrayCopy();
+  }
+
+  /**
+   * Checks for existing participants.
+   * Can be used during validation of new event registrations to check for duplicates.
+   *
+   * @param int $contactId
+   *    The contact ID of participants to find.
+   * @param int $eventId
+   *    The event ID of participants to find.
+   * @param bool $includeTest
+   *    Whether to include test participants.
+   *
+   * @return bool
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public static function existsCounted(
+    int $contactId,
+    int $eventId,
+    bool $includeTest = FALSE
+  ) {
+    return count(
+        self::findCountedParticipants(
+          $contactId,
+          $eventId,
+          [],
+          $includeTest
+        )
+      ) > 0;
+  }
+
+  /**
    * Checks duplicate participants.
    *
    * @param array $input
