@@ -24,6 +24,11 @@
 .crm-chart-kit-admin input {
     max-width: 40rem;
 }
+.crm-chart-kit-admin .select2-container {
+  /* fix select2 collapsing boxes in RiverLea */
+  width: var(--crm-big-input)!important;
+}
+
 .crm-chart-kit-admin input[type='color'] {
     min-width: 3rem;
 }
