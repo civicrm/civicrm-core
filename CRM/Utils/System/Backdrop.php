@@ -917,6 +917,21 @@ AND    u.status = 1
   }
 
   /**
+   * Commit the session before exiting.
+   * Similar to drupal_exit().
+   */
+  public function onCiviExit() {
+    if (function_exists('module_invoke_all')) {
+      if (!defined('MAINTENANCE_MODE') || MAINTENANCE_MODE != 'update') {
+        module_invoke_all('exit');
+      }
+      if (!defined('_CIVICRM_FAKE_SESSION')) {
+        backdrop_session_commit();
+      }
+    }
+  }
+
+  /**
    * @inheritDoc
    */
   public function clearResourceCache() {
