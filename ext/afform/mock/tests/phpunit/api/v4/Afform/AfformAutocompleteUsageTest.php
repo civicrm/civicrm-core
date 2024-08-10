@@ -16,6 +16,13 @@ use Civi\Api4\SavedSearch;
  */
 class AfformAutocompleteUsageTest extends AfformUsageTestCase {
 
+  public function tearDown(): void {
+    CustomGroup::delete(FALSE)
+      ->addWhere('id', '>', 0)
+      ->execute();
+    parent::tearDown();
+  }
+
   /**
    * Ensure that Afform restricts autocomplete results when it's set to use a SavedSearch
    */

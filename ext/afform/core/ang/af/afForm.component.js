@@ -45,15 +45,22 @@
       // With no arguments this will prefill the entire form based on url args
       // and also check if the form is open for submissions.
       // With selectedEntity, selectedIndex & selectedId provided this will prefill a single entity
-      this.loadData = function(selectedEntity, selectedIndex, selectedId, selectedField) {
+      this.loadData = function(selectedEntity, selectedIndex, selectedId, selectedField, joinEntity, joinIndex) {
         let toLoad = true;
         const params = {name: ctrl.getFormMeta().name, args: {}};
         // Load single entity
         if (selectedEntity) {
           toLoad = !!selectedId;
-          params.matchField = selectedField;
           params.args[selectedEntity] = {};
-          params.args[selectedEntity][selectedIndex] = selectedId;
+          params.args[selectedEntity][selectedIndex] = {};
+          if (joinEntity) {
+            params.args[selectedEntity][selectedIndex].joins = {};
+            params.args[selectedEntity][selectedIndex].joins[joinEntity] = {};
+            params.args[selectedEntity][selectedIndex].joins[joinEntity][joinIndex] = {};
+            params.args[selectedEntity][selectedIndex].joins[joinEntity][joinIndex][selectedField] = selectedId;
+          } else {
+            params.args[selectedEntity][selectedIndex][selectedField] = selectedId;
+          }
         }
         // Prefill entire form
         else {

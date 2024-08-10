@@ -110,11 +110,16 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
       if ($ids) {
         // If 'update' (or 'create' in special cases like 'template_id') is allowed, load entity.
         $matchField = self::getNestedKey($ids) ?: $idField;
-        $matchFieldDefn = $this->_formDataModel->getField($entity['type'], $matchField, 'create');
-        $autofillMode = $matchFieldDefn['input_attrs']['autofill'] ?? NULL;
-        if (!empty($entity['actions'][$autofillMode])) {
-          if (!empty($entity['url-autofill']) || isset($entity['fields'][$matchField])) {
-            $this->loadEntity($entity, $ids, $autofillMode);
+        if ($matchField === 'joins') {
+          $this->loadJoin($entity, $ids);
+        }
+        else {
+          $matchFieldDefn = $this->_formDataModel->getField($entity['type'], $matchField, 'create');
+          $autofillMode = $matchFieldDefn['input_attrs']['autofill'] ?? NULL;
+          if (!empty($entity['actions'][$autofillMode])) {
+            if (!empty($entity['url-autofill']) || isset($entity['fields'][$matchField])) {
+              $this->loadEntity($entity, $ids, $autofillMode);
+            }
           }
         }
       }
@@ -184,14 +189,13 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     // In create mode, use id as the key
     $keyField = $mode === 'create' ? CoreUtil::getIdFieldName($entity['name']) : $matchField;
 
-    $api4 = $this->_formDataModel->getSecureApi4($entity['name']);
     if ($keys && !empty($entity['fields'][$keyField]['defn']['saved_search'])) {
-      $keys = $this->validateBySavedSearch($entity, $keys, $matchField);
+      $keys = $this->validateBySavedSearch($entity['name'], $entity['type'], $keys, $matchField);
     }
     if (!$keys) {
       return;
     }
-    $result = $this->apiGet($api4, $entity['type'], $entity['fields'], $keyField, [
+    $result = $this->apiGet($entity['name'], $entity['type'], $entity['fields'], $keyField, [
       'where' => [[$keyField, 'IN', $keys]],
     ]);
     $idField = CoreUtil::getIdFieldName($entity['type']);
@@ -213,38 +217,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
       if (!empty($result[$key])) {
         $data = ['fields' => $result[$key]];
         foreach ($entity['joins'] ?? [] as $joinEntity => $join) {
-          $joinIdField = CoreUtil::getIdFieldName($joinEntity);
-          $multipleLocationBlocks = is_array($join['data']['location_type_id'] ?? NULL);
-          $limit = 1;
-          // Repeating blocks - set limit according to `max`, if set, otherwise 0 for unlimited
-          if (!empty($join['af-repeat'])) {
-            $limit = $join['max'] ?? 0;
-          }
-          // Remove limit when handling multiple location blocks
-          if ($multipleLocationBlocks) {
-            $limit = 0;
-          }
-          $where = self::getJoinWhereClause($this->_formDataModel, $entity['name'], $joinEntity, $entityId);
-          if ($where) {
-            $joinResult = $this->apiGet($api4, $joinEntity, $join['fields'] + ($join['data'] ?? []), $joinIdField, [
-              'where' => $where,
-              'limit' => $limit,
-              'orderBy' => self::getEntityField($joinEntity, 'is_primary') ? ['is_primary' => 'DESC'] : [],
-            ]);
-          }
-          else {
-            $joinResult = [];
-          }
-          // Sort into multiple location blocks
-          if ($multipleLocationBlocks) {
-            $items = array_column($joinResult, NULL, 'location_type_id');
-            $joinResult = [];
-            foreach ($join['data']['location_type_id'] as $locationType) {
-              $joinResult[] = $items[$locationType] ?? [];
-            }
-          }
-          $data['joins'][$joinEntity] = array_values($joinResult);
-          $this->_entityIds[$entity['name']][$index]['joins'][$joinEntity] = \CRM_Utils_Array::filterColumns($joinResult, [$joinIdField]);
+          $data['joins'][$joinEntity] = $this->loadJoins($joinEntity, $join, $entity, $entityId, $index);
         }
         $this->_entityValues[$entity['name']][$index] = $data;
       }
@@ -252,22 +225,99 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   }
 
   /**
+   * Finds all joins after loading an entity.
+   */
+  public function loadJoins($joinEntity, $join, $afEntity, $entityId, $index): array {
+    $joinIdField = CoreUtil::getIdFieldName($joinEntity);
+    $multipleLocationBlocks = is_array($join['data']['location_type_id'] ?? NULL);
+    $limit = 1;
+    // Repeating blocks - set limit according to `max`, if set, otherwise 0 for unlimited
+    if (!empty($join['af-repeat'])) {
+      $limit = $join['max'] ?? 0;
+    }
+    // Remove limit when handling multiple location blocks
+    if ($multipleLocationBlocks) {
+      $limit = 0;
+    }
+    $where = self::getJoinWhereClause($this->_formDataModel, $afEntity['name'], $joinEntity, $entityId);
+    if ($where) {
+      $joinResult = $this->getJoinResult($afEntity, $joinEntity, $join, $where, $limit);
+    }
+    else {
+      $joinResult = [];
+    }
+    // Sort into multiple location blocks
+    if ($multipleLocationBlocks) {
+      $items = array_column($joinResult, NULL, 'location_type_id');
+      $joinResult = [];
+      foreach ($join['data']['location_type_id'] as $locationType) {
+        $joinResult[] = $items[$locationType] ?? [];
+      }
+    }
+    $this->_entityIds[$afEntity['name']][$index]['joins'][$joinEntity] = \CRM_Utils_Array::filterColumns($joinResult, [$joinIdField]);
+    return array_values($joinResult);
+  }
+
+  /**
+   * Directly loads a join entity e.g. from an autocomplete field in the join block.
+   */
+  private function loadJoin(array $afEntity, array $values): array {
+    $joinResult = [];
+    foreach ($values as $entityIndex => $value) {
+      foreach ($value['joins'] as $joinEntity => $joins) {
+        $joinIdField = CoreUtil::getIdFieldName($joinEntity);
+        $joinInfo = $afEntity['joins'][$joinEntity] ?? [];
+        foreach ($joins as $joinIndex => $join) {
+          foreach ($join as $fieldName => $fieldValue) {
+            if (!empty($joinInfo['fields'][$fieldName])) {
+              $where = [[$fieldName, '=', $fieldValue]];
+              $joinResult = $this->getJoinResult($afEntity, $joinEntity, $joinInfo, $where, 1);
+              $this->_entityIds[$afEntity['name']][$entityIndex]['joins'][$joinEntity] = \CRM_Utils_Array::filterColumns($joinResult, [$joinIdField]);
+              $this->_entityValues[$afEntity['name']][$entityIndex]['joins'][$joinEntity] = array_values($joinResult);
+            }
+          }
+        }
+      }
+    }
+    return array_values($joinResult);
+  }
+
+  public function getJoinResult(array $afEntity, string $joinEntity, array $join, array $where, int $limit): array {
+    $joinIdField = CoreUtil::getIdFieldName($joinEntity);
+    $joinResult = $this->apiGet($afEntity['name'], $joinEntity, $join['fields'] + ($join['data'] ?? []), $joinIdField, [
+      'where' => $where,
+      'limit' => $limit,
+      'orderBy' => self::getEntityField($joinEntity, 'is_primary') ? ['is_primary' => 'DESC'] : [],
+    ]);
+    // Validate autocomplete fields
+    if ($joinResult && !empty($entity['joins'][$joinEntity]['fields'][$joinIdField]['defn']['saved_search'])) {
+      $keys = array_combine(array_keys($joinResult), array_column($joinResult, $joinIdField));
+      $keys = $this->validateBySavedSearch($entity['name'], $joinEntity, $keys, $joinIdField);
+      $joinResult = array_intersect_key($joinResult, $keys);
+    }
+    return $joinResult;
+  }
+
+  /**
    * Delegated by loadEntity to call API.get and fill in additioal info
    *
-   * @param callable $api4
-   * @param string $entityName
+   * @param string $afEntityName
+   *   e.g. Individual1
+   * @param string $apiEntityName
+   *   Not necessarily the api of the afEntity, in the case of joins it will be different.
    * @param array $entityFields
    * @param string $keyField
    * @param array $params
    * @return array
    */
-  private function apiGet($api4, $entityName, $entityFields, string $keyField, $params) {
-    $idField = CoreUtil::getIdFieldName($entityName);
+  private function apiGet($afEntityName, $apiEntityName, $entityFields, string $keyField, $params) {
+    $api4 = $this->_formDataModel->getSecureApi4($afEntityName);
+    $idField = CoreUtil::getIdFieldName($apiEntityName);
     // Ensure 'id' is selected
     $params['select'] = array_unique(array_merge([$idField], array_keys($entityFields)));
-    $result = (array) $api4($entityName, 'get', $params)->indexBy($keyField);
+    $result = (array) $api4($apiEntityName, 'get', $params)->indexBy($keyField);
     // Fill additional info about file fields
-    $fileFields = $this->getFileFields($entityName, $entityFields);
+    $fileFields = $this->getFileFields($apiEntityName, $entityFields);
     foreach ($fileFields as $fieldName => $fieldDefn) {
       foreach ($result as &$item) {
         if (!empty($item[$fieldName])) {
@@ -297,17 +347,18 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   /**
    * Validate that given id(s) are actually returned by the Autocomplete API
    *
-   * @param array $entity
+   * @param string $afEntityName
+   * @param string $apiEntity
    * @param array $ids
    * @param string $matchField
    * @return array
    * @throws \CRM_Core_Exception
    */
-  private function validateBySavedSearch(array $entity, array $ids, string $matchField) {
-    $fetched = civicrm_api4($entity['type'], 'autocomplete', [
+  private function validateBySavedSearch(string $afEntityName, string $apiEntity, array $ids, string $matchField) {
+    $fetched = civicrm_api4($apiEntity, 'autocomplete', [
       'ids' => $ids,
       'formName' => 'afform:' . $this->name,
-      'fieldName' => $entity['name'] . ':' . $matchField,
+      'fieldName' => $afEntityName . ':' . $matchField,
     ])->indexBy($matchField);
     $validIds = [];
     // Preserve keys
