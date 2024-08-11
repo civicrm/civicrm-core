@@ -47,13 +47,10 @@ class SkEntityMetaProvider extends SqlEntityMetadata {
       $field = [
         'title' => $column['label'],
         'data_type' => $column['spec']['data_type'],
+        'entity_reference' => $column['spec']['entity_reference'] ?? NULL,
+        'input_type' => $column['spec']['input_type'] ?? NULL,
         'usage' => [],
       ];
-      if (!empty($column['spec']['fk_entity'])) {
-        $field['entity_reference'] = [
-          'entity' => $column['spec']['fk_entity'],
-        ];
-      }
       $fields[$column['spec']['name']] = $field;
     }
     return $fields;

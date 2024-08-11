@@ -142,7 +142,18 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
     ];
     if ($expr['expr']->getType() === 'SqlField') {
       $field = \CRM_Utils_Array::first($expr['fields']);
-      $spec['fk_entity'] = $field['fk_entity'] ?? NULL;
+      // An entity id counts as a FK
+      if (!$field['fk_entity'] && $field['name'] === CoreUtil::getIdFieldName($field['entity'])) {
+        $spec['entity_reference'] = [
+          'entity' => $field['entity'],
+        ];
+        $spec['input_type'] = 'EntityRef';
+      }
+      else {
+        $originalField = \Civi::entity($field['entity'])->getField($field['name']);
+        $spec['input_type'] = $originalField['input_type'] ?? NULL;
+        $spec['entity_reference'] = $originalField['entity_reference'] ?? NULL;
+      }
       $spec['original_field_name'] = $field['name'];
       $spec['original_field_entity'] = $field['entity'];
       if ($suffix) {
@@ -153,6 +164,10 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
     elseif ($expr['expr']->getType() === 'SqlFunction') {
       if ($suffix) {
         $spec['options'] = CoreUtil::formatOptionList($expr['expr']::getOptions(), $spec['suffixes']);
+        $spec['input_type'] = 'Select';
+      }
+      else {
+        $spec['input_type'] = $this->getInputTypeFromDataType($spec['data_type']);
       }
     }
     return $spec;
@@ -211,6 +226,20 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
       \CRM_Core_DAO_AllCoreTables::flush();
       \Civi::cache('metadata')->clear();
     }
+  }
+
+  private function getInputTypeFromDataType(string $dataType): ?string {
+    $dataTypeToInputType = [
+      'Boolean' => 'Radio',
+      'Date' => 'Date',
+      'Float' => 'Number',
+      'Integer' => 'Number',
+      'Money' => 'Number',
+      'String' => 'Text',
+      'Text' => 'TextArea',
+      'Timestamp' => 'Date',
+    ];
+    return $dataTypeToInputType[$dataType] ?? NULL;
   }
 
   /**

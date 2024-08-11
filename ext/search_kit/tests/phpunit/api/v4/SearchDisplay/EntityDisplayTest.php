@@ -8,6 +8,7 @@ require_once __DIR__ . '/../../../../../../../tests/phpunit/api/v4/Api4TestBase.
 use api\v4\Api4TestBase;
 use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\SearchDisplay;
+use Civi\Search\Admin;
 use Civi\Test\CiviEnvBuilder;
 
 /**
@@ -88,6 +89,15 @@ class EntityDisplayTest extends Api4TestBase {
 
     $getFields = civicrm_api4('SK_MyNewEntity', 'getFields', ['loadOptions' => TRUE])->indexBy('name');
     $this->assertNotEmpty($getFields['prefix_id']['options'][1]);
+    $this->assertSame('Integer', $getFields['id']['data_type']);
+    $this->assertSame('EntityRef', $getFields['id']['input_type']);
+    $this->assertSame('Contact', $getFields['id']['fk_entity']);
+    $this->assertSame('String', $getFields['first_name']['data_type']);
+    $this->assertSame('Text', $getFields['first_name']['input_type']);
+    $this->assertNull($getFields['first_name']['fk_entity']);
+    $this->assertSame('Integer', $getFields['prefix_id']['data_type']);
+    $this->assertSame('Select', $getFields['prefix_id']['input_type']);
+    $this->assertNull($getFields['prefix_id']['fk_entity']);
 
     civicrm_api4('SK_MyNewEntity', 'refresh');
 
@@ -164,6 +174,8 @@ class EntityDisplayTest extends Api4TestBase {
       ->addValue('label', 'MyNewEntityWithJoin')
       ->addValue('name', 'MyNewEntityWithJoin')
       ->addValue('settings', [
+        // Additional column data will be filled in automatically
+        // @see SKEntitySubscriber::formatFieldSpec
         'columns' => [
           [
             'key' => 'id',
@@ -187,13 +199,26 @@ class EntityDisplayTest extends Api4TestBase {
       ])
       ->execute();
 
+    $fields = civicrm_api4('SK_MyNewEntityWithJoin', 'getFields', [], 'name');
+    $this->assertCount(4, $fields);
+    $this->assertSame('Integer', $fields['id']['data_type']);
+    $this->assertSame('EntityRef', $fields['id']['input_type']);
+    $this->assertSame('Contact', $fields['id']['fk_entity']);
+    $this->assertSame('Integer', $fields['Contact_Participant_contact_id_01_event_id']['data_type']);
+    $this->assertSame('EntityRef', $fields['Contact_Participant_contact_id_01_event_id']['input_type']);
+    $this->assertSame('Event', $fields['Contact_Participant_contact_id_01_event_id']['fk_entity']);
+    $this->assertSame('Integer', $fields['Contact_Participant_contact_id_01_id']['data_type']);
+    $this->assertSame('EntityRef', $fields['Contact_Participant_contact_id_01_id']['input_type']);
+    $this->assertSame('Participant', $fields['Contact_Participant_contact_id_01_id']['fk_entity']);
+
     civicrm_api4('SK_MyNewEntityWithJoin', 'refresh');
     $rows = (array) civicrm_api4('SK_MyNewEntityWithJoin', 'get', [
-      'select' => ['*', 'Contact_Participant_contact_id_01_event_id.title'],
+      'select' => ['*', 'Contact_Participant_contact_id_01_event_id.title', 'id.first_name'],
       'orderBy' => ['_row' => 'ASC'],
     ]);
     $this->assertCount(3, $rows);
     $this->assertEquals(array_column($contacts, 'id'), array_column($rows, 'id'));
+    $this->assertEquals(array_column($contacts, 'first_name'), array_column($rows, 'id.first_name'));
     $this->assertEquals($event1['id'], $rows[0]['Contact_Participant_contact_id_01_event_id']);
     $this->assertEquals($event2['id'], $rows[1]['Contact_Participant_contact_id_01_event_id']);
     $this->assertNull($rows[2]['Contact_Participant_contact_id_01_event_id']);
@@ -203,6 +228,23 @@ class EntityDisplayTest extends Api4TestBase {
     $this->assertEquals(__FUNCTION__, $rows[0]['Contact_Participant_contact_id_01_event_id.title']);
     $this->assertEquals(__FUNCTION__ . '2', $rows[1]['Contact_Participant_contact_id_01_event_id.title']);
 
+    // Ensure joins are picked up by SearchKit
+    $allowedEntities = Admin::getSchema();
+    $joins = Admin::getJoins($allowedEntities);
+
+    // Check forward-joins
+    $joinsFromEntity = $joins['SK_MyNewEntityWithJoin'];
+    $expected = [
+      'SK_MyNewEntityWithJoin_Contact_id',
+      'SK_MyNewEntityWithJoin_Event_Contact_Participant_contact_id_01_event_id',
+      'SK_MyNewEntityWithJoin_Participant_Contact_Participant_contact_id_01_id',
+    ];
+    $this->assertEquals($expected, array_column($joinsFromEntity, 'alias'));
+
+    // Check reverse-joins
+    $eventJoin = \CRM_Utils_Array::findAll($joins['Event'], ['entity' => 'SK_MyNewEntityWithJoin']);
+    $this->assertCount(1, $eventJoin);
+    $this->assertSame('Event_SK_MyNewEntityWithJoin_Contact_Participant_contact_id_01_event_id', $eventJoin[0]['alias']);
   }
 
 }
