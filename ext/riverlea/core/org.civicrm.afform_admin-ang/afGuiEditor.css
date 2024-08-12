@@ -313,6 +313,9 @@ af-gui-container > .af-gui-bar,
 }
 
 /* Canvas layout */
+#afGuiEditor .af-gui-layout {
+    min-height: 2rem;
+}
 #afGuiEditor .af-gui-layout.af-layout-cols,
 #afGuiEditor .af-gui-layout.af-layout-inline {
     display: flex;
