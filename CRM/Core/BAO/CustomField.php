@@ -1408,23 +1408,21 @@ SELECT id
 
     //fix checkbox, now check box always submits values
     if ($customFields[$customFieldId]['html_type'] == 'CheckBox') {
-      if ($value) {
-        // Note that only during merge this is not an array, and you can directly use value
-        if (is_array($value)) {
-          $selectedValues = [];
-          foreach ($value as $selId => $val) {
-            if ($val) {
-              $selectedValues[] = $selId;
-            }
+      // Note that only during merge this is not an array, and you can directly use value
+      if (is_array($value)) {
+        $selectedValues = [];
+        foreach ($value as $selId => $val) {
+          if ($val) {
+            $selectedValues[] = $selId;
           }
-          if (!empty($selectedValues)) {
-            $value = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
-                $selectedValues
-              ) . CRM_Core_DAO::VALUE_SEPARATOR;
-          }
-          else {
-            $value = '';
-          }
+        }
+        if (!empty($selectedValues)) {
+          $value = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
+              $selectedValues
+            ) . CRM_Core_DAO::VALUE_SEPARATOR;
+        }
+        else {
+          $value = '';
         }
       }
     }
