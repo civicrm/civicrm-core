@@ -22,11 +22,11 @@ dm_install_packages "$SRC/packages" "$TRG/civicrm/web/core/packages"
 dm_install_vendor "$SRC/vendor" "$TRG/civicrm/web/core/vendor"
 dm_install_bower "$SRC/bower_components" "$TRG/civicrm/web/core/bower_components"
 dm_install_cvext com.iatspayments.civicrm "$TRG/civicrm/web/core/ext/iatspayments"
-$SRC/tools/standalone/bin/scaffold $TRG/civicrm
+$SRC/tools/standalone/bin/scaffold $TRG/civicrm/web
 
 # gen tarball
 cd $TRG/civicrm
-tar czf $DM_TARGETDIR/civicrm-$DM_VERSION-standalone.tar.gz .
+tar czf $DM_TARGETDIR/civicrm-$DM_VERSION-standalone.tar.gz web
 
 # clean up
 rm -rf $TRG
