@@ -49,6 +49,7 @@ class SkEntityMetaProvider extends SqlEntityMetadata {
         'data_type' => $column['spec']['data_type'],
         'entity_reference' => $column['spec']['entity_reference'] ?? NULL,
         'input_type' => $column['spec']['input_type'] ?? NULL,
+        'serialize' => $column['spec']['serialize'] ?? NULL,
         'usage' => [],
       ];
       $fields[$column['spec']['name']] = $field;

@@ -247,4 +247,146 @@ class EntityDisplayTest extends Api4TestBase {
     $this->assertSame('Event_SK_MyNewEntityWithJoin_Contact_Participant_contact_id_01_event_id', $eventJoin[0]['alias']);
   }
 
+  public function testEntityWithSqlFunctions(): void {
+    $cids = $this->saveTestRecords('Individual', [
+      'records' => [
+        ['first_name' => 'A', 'last_name' => 'A'],
+        ['first_name' => 'B', 'last_name' => 'B'],
+        ['first_name' => 'C', 'last_name' => 'C'],
+      ],
+    ])
+      ->column('id');
+
+    $this->saveTestRecords('Contribution', [
+      'records' => [
+        ['contact_id' => $cids[0], 'total_amount' => 50, 'receive_date' => '2020-01-01', 'financial_type_id:name' => 'Donation'],
+        ['contact_id' => $cids[1], 'total_amount' => 65, 'receive_date' => '2020-02-02', 'financial_type_id:name' => 'Member Dues'],
+        ['contact_id' => $cids[0], 'total_amount' => 55, 'receive_date' => '2021-01-01', 'financial_type_id:name' => 'Campaign Contribution'],
+        ['contact_id' => $cids[2], 'total_amount' => 175, 'receive_date' => '2022-01-01', 'financial_type_id:name' => 'Donation'],
+      ],
+    ]);
+
+    $this->createTestRecord('SavedSearch', [
+      'name' => 'Major_Donors_entity_test',
+      'label' => 'Major Donors - entity test',
+      'api_entity' => 'Contribution',
+      'api_params' => [
+        'version' => 4,
+        'select' => [
+          'YEAR(receive_date) AS YEAR_receive_date',
+          'COUNT(id) AS COUNT_id',
+          'GROUP_CONCAT(DISTINCT contact_id.sort_name) AS GROUP_CONCAT_contact_id_sort_name',
+          'SUM(total_amount) AS SUM_total_amount',
+          'GROUP_CONCAT(DISTINCT financial_type_id:label) AS GROUP_CONCAT_financial_type_id_label',
+        ],
+        'where' => [
+          ['contact_id', 'IN', $cids],
+        ],
+        'groupBy' => [
+          'YEAR(receive_date)',
+        ],
+        'having' => [
+          [
+            'SUM_total_amount',
+            '>=',
+            '100',
+          ],
+        ],
+      ],
+    ]);
+    $this->createTestRecord('SearchDisplay', [
+      'name' => 'MajorDonorsEntityTestDbEntity1',
+      'label' => 'Major Donors - entity test DB Entity 1',
+      'saved_search_id.name' => 'Major_Donors_entity_test',
+      'type' => 'entity',
+      'settings' => [
+        'sort' => [
+          ['YEAR_receive_date', 'ASC'],
+        ],
+        'columns' => [
+          [
+            'type' => 'field',
+            'key' => 'YEAR_receive_date',
+            'label' => 'Year',
+          ],
+          [
+            'type' => 'field',
+            'key' => 'COUNT_id',
+            'label' => '(Count) Contribution ID',
+          ],
+          [
+            'type' => 'field',
+            'key' => 'GROUP_CONCAT_contact_id_sort_name',
+            'label' => '(List) Contact Sort Name',
+          ],
+          [
+            'type' => 'field',
+            'key' => 'SUM_total_amount',
+            'label' => '(Sum) Total Amount',
+          ],
+          [
+            'type' => 'field',
+            'key' => 'GROUP_CONCAT_financial_type_id_label',
+            'label' => '(List) Financial Type',
+          ],
+        ],
+      ],
+    ]);
+
+    // Validate schema
+    $schema = \CRM_Core_DAO::executeQuery('DESCRIBE civicrm_sk_major_donors_entity_test_db_entity1')->fetchAll();
+    $this->assertCount(6, $schema);
+    $this->assertEquals('_row', $schema[0]['Field']);
+    $this->assertStringStartsWith('int', $schema[0]['Type']);
+    $this->assertStringStartsWith('int', $schema[1]['Type']);
+    $this->assertStringStartsWith('int', $schema[2]['Type']);
+    $this->assertStringStartsWith('text', $schema[3]['Type']);
+    $this->assertStringStartsWith('decimal', $schema[4]['Type']);
+    $this->assertStringStartsWith('text', $schema[3]['Type']);
+
+    civicrm_api4('SK_MajorDonorsEntityTestDbEntity1', 'refresh');
+
+    $fields = civicrm_api4('SK_MajorDonorsEntityTestDbEntity1', 'getFields', ['loadOptions' => TRUE], 'name');
+    $this->assertCount(6, $fields);
+
+    $this->assertSame('Integer', $fields['YEAR_receive_date']['data_type']);
+    $this->assertSame('Number', $fields['YEAR_receive_date']['input_type']);
+    $this->assertFalse($fields['YEAR_receive_date']['options']);
+
+    $this->assertSame('Integer', $fields['COUNT_id']['data_type']);
+    $this->assertSame('Number', $fields['COUNT_id']['input_type']);
+    $this->assertFalse($fields['COUNT_id']['options']);
+
+    $this->assertSame('Money', $fields['SUM_total_amount']['data_type']);
+    $this->assertSame('Number', $fields['SUM_total_amount']['input_type']);
+    $this->assertFalse($fields['SUM_total_amount']['options']);
+
+    $this->assertSame('String', $fields['GROUP_CONCAT_contact_id_sort_name']['data_type']);
+    $this->assertSame('Text', $fields['GROUP_CONCAT_contact_id_sort_name']['input_type']);
+    $this->assertFalse($fields['GROUP_CONCAT_contact_id_sort_name']['options']);
+    $this->assertEquals(\CRM_Core_DAO::SERIALIZE_SEPARATOR_TRIMMED, $fields['GROUP_CONCAT_contact_id_sort_name']['serialize']);
+
+    $this->assertSame('Integer', $fields['GROUP_CONCAT_financial_type_id_label']['data_type']);
+    $this->assertSame('Select', $fields['GROUP_CONCAT_financial_type_id_label']['input_type']);
+    $this->assertContains('Donation', $fields['GROUP_CONCAT_financial_type_id_label']['options']);
+    $this->assertEquals(\CRM_Core_DAO::SERIALIZE_SEPARATOR_TRIMMED, $fields['GROUP_CONCAT_financial_type_id_label']['serialize']);
+
+    $result = civicrm_api4('SK_MajorDonorsEntityTestDbEntity1', 'get', [
+      'select' => ['*', 'GROUP_CONCAT_financial_type_id_label:name'],
+    ]);
+    $this->assertCount(2, $result);
+    $this->assertSame(2020, $result[0]['YEAR_receive_date']);
+    $this->assertSame(115.0, $result[0]['SUM_total_amount']);
+    $this->assertCount(2, $result[0]['GROUP_CONCAT_financial_type_id_label']);
+    $this->assertTrue(is_int($result[0]['GROUP_CONCAT_financial_type_id_label'][0]));
+    $this->assertTrue(is_int($result[0]['GROUP_CONCAT_financial_type_id_label'][1]));
+    $this->assertEquals(['Donation', 'Member Dues'], $result[0]['GROUP_CONCAT_financial_type_id_label:name']);
+
+    $this->assertSame(2022, $result[1]['YEAR_receive_date']);
+    $this->assertSame(175.0, $result[1]['SUM_total_amount']);
+    $this->assertCount(1, $result[1]['GROUP_CONCAT_financial_type_id_label']);
+    $this->assertTrue(is_int($result[1]['GROUP_CONCAT_financial_type_id_label'][0]));
+    $this->assertEquals(['Donation'], $result[1]['GROUP_CONCAT_financial_type_id_label:name']);
+  }
+
 }
