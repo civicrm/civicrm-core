@@ -260,7 +260,7 @@ END AS 'relType'
         // comment is a qualifier for the relationship - now just job_title
         $select = "
 SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
-       rt.name_x_y as relation, r.start_date, r.end_date,
+       rt.label_x_y as relation, r.start_date, r.end_date,
        m.id as mid, ms.is_current_member, ms.label as status
   FROM civicrm_relationship r
   LEFT JOIN civicrm_relationship_type rt ON rt.id = r.relationship_type_id
