@@ -524,7 +524,121 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     $groupTree = CRM_Core_BAO_CustomGroup::getTree($entity, NULL, $idValue, NULL, [],
       NULL, TRUE, NULL, FALSE, CRM_Core_Permission::VIEW);
     // we setting the prefix to dnc_ below so that we don't overwrite smarty's grouptree var.
-    return CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, "dnc_");
+    return self::buildCustomDataView($this, $groupTree, FALSE, NULL, "dnc_");
+  }
+
+  /**
+   * Build custom data view.
+   *
+   * @param CRM_Core_Form|CRM_Core_Page $form
+   *   Page object.
+   * @param array $groupTree
+   * @param bool $returnCount
+   *   True if customValue count needs to be returned.
+   * @param int $gID
+   * @param null $prefix
+   * @param int $customValueId
+   * @param int $entityId
+   * @param bool $checkEditPermission
+   *
+   * @return array|int
+   * @throws \CRM_Core_Exception
+   */
+  private static function buildCustomDataView($form, $groupTree, $returnCount = FALSE, $gID = NULL, $prefix = NULL, $customValueId = NULL, $entityId = NULL, $checkEditPermission = FALSE) {
+    // Filter out pesky extra info
+    unset($groupTree['info']);
+
+    $details = [];
+
+    $editableGroups = [];
+    if ($checkEditPermission) {
+      $editableGroups = \CRM_Core_Permission::customGroup(CRM_Core_Permission::EDIT);
+    }
+
+    foreach ($groupTree as $key => $group) {
+
+      foreach ($group['fields'] as $k => $properties) {
+        $groupID = $group['id'];
+        if (!empty($properties['customValue'])) {
+          foreach ($properties['customValue'] as $values) {
+            if (!empty($customValueId) && $customValueId != $values['id']) {
+              continue;
+            }
+            $details[$groupID][$values['id']]['title'] = $group['title'] ?? NULL;
+            $details[$groupID][$values['id']]['name'] = $group['name'] ?? NULL;
+            $details[$groupID][$values['id']]['help_pre'] = $group['help_pre'] ?? NULL;
+            $details[$groupID][$values['id']]['help_post'] = $group['help_post'] ?? NULL;
+            $details[$groupID][$values['id']]['collapse_display'] = $group['collapse_display'] ?? NULL;
+            $details[$groupID][$values['id']]['collapse_adv_display'] = $group['collapse_adv_display'] ?? NULL;
+            $details[$groupID][$values['id']]['style'] = $group['style'] ?? NULL;
+            $details[$groupID][$values['id']]['fields'][$k] = [
+              'field_title' => $properties['label'] ?? NULL,
+              'field_type' => $properties['html_type'] ?? NULL,
+              'field_data_type' => $properties['data_type'] ?? NULL,
+              'field_value' => CRM_Core_BAO_CustomField::displayValue($values['data'], $properties['id'], $entityId),
+              'options_per_line' => $properties['options_per_line'] ?? NULL,
+              'data' => $values['data'],
+            ];
+            // editable = whether this set contains any non-read-only fields
+            if (!isset($details[$groupID][$values['id']]['editable'])) {
+              $details[$groupID][$values['id']]['editable'] = FALSE;
+            }
+            if (empty($properties['is_view']) && in_array($key, $editableGroups)) {
+              $details[$groupID][$values['id']]['editable'] = TRUE;
+            }
+            // also return contact reference contact id if user has view all or edit all contacts perm
+            if ($details[$groupID][$values['id']]['fields'][$k]['field_data_type'] === 'ContactReference'
+              && CRM_Core_Permission::check([['view all contacts', 'edit all contacts']])
+            ) {
+              $details[$groupID][$values['id']]['fields'][$k]['contact_ref_links'] = [];
+              $path = CRM_Contact_DAO_Contact::getEntityPaths()['view'];
+              foreach (CRM_Utils_Array::explodePadded($values['data'] ?? []) as $contactId) {
+                $displayName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactId, 'display_name');
+                if ($displayName) {
+                  $url = CRM_Utils_System::url(str_replace('[id]', $contactId, $path));
+                  $details[$groupID][$values['id']]['fields'][$k]['contact_ref_links'][] = '<a href="' . $url . '" title="' . ts('View Contact', ['escape' => 'htmlattribute']) . '">' .
+                    $displayName . '</a>';
+                }
+              }
+            }
+          }
+        }
+        else {
+          $details[$groupID][0]['title'] = $group['title'] ?? NULL;
+          $details[$groupID][0]['name'] = $group['name'] ?? NULL;
+          $details[$groupID][0]['help_pre'] = $group['help_pre'] ?? NULL;
+          $details[$groupID][0]['help_post'] = $group['help_post'] ?? NULL;
+          $details[$groupID][0]['collapse_display'] = $group['collapse_display'] ?? NULL;
+          $details[$groupID][0]['collapse_adv_display'] = $group['collapse_adv_display'] ?? NULL;
+          $details[$groupID][0]['style'] = $group['style'] ?? NULL;
+          $details[$groupID][0]['fields'][$k] = ['field_title' => $properties['label'] ?? NULL];
+        }
+      }
+    }
+
+    if ($returnCount) {
+      // return a single value count if group id is passed to function
+      // else return a groupId and count mapped array
+      if (!empty($gID)) {
+        return count($details[$gID]);
+      }
+      else {
+        $countValue = [];
+        foreach ($details as $key => $value) {
+          $countValue[$key] = count($details[$key]);
+        }
+        return $countValue;
+      }
+    }
+    else {
+      $form->addExpectedSmartyVariables([
+        'multiRecordDisplay',
+        'groupId',
+        'skipTitle',
+      ]);
+      $form->assign("{$prefix}viewCustomData", $details);
+      return $details;
+    }
   }
 
 }
