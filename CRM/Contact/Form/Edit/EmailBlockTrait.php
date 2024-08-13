@@ -25,6 +25,7 @@ use Civi\Api4\Generic\Result;
  *  code has adequate unit test cover.
  */
 trait CRM_Contact_Form_Edit_EmailBlockTrait {
+  use CRM_Contact_Form_Edit_BlockCustomDataTrait;
 
   /**
    * @var \Civi\Api4\Generic\Result
@@ -38,6 +39,7 @@ trait CRM_Contact_Form_Edit_EmailBlockTrait {
   public function getExistingEmails() : Result {
     if (!isset($this->existingEmails)) {
       $this->existingEmails = Email::get()
+        ->addSelect('*', 'custom.*')
         ->addOrderBy('is_primary', 'DESC')
         ->addWhere('contact_id', '=', $this->getContactID())
         ->execute();
@@ -115,6 +117,7 @@ trait CRM_Contact_Form_Edit_EmailBlockTrait {
         }",
     ];
     $this->addElement('radio', "email[$blockNumber][is_primary]", '', '', '1', $js);
+    $this->addCustomDataFieldBlock('Email', $blockNumber);
   }
 
   /**
