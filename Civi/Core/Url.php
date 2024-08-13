@@ -684,6 +684,9 @@ final class Url implements \JsonSerializable {
     if ($preferFormat === 'relative') {
       $result = \CRM_Utils_Url::toRelative($result);
     }
+    elseif ($preferFormat === 'absolute') {
+      $result = \CRM_Utils_Url::toAbsolute($result);
+    }
 
     // TODO decide if the current default is good enough for future
     $ssl = $this->getSsl() ?: \CRM_Utils_System::isSSL();
