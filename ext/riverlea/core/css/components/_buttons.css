@@ -247,15 +247,24 @@
 	border-radius: var(--crm-btn-radius);
     height: auto;
 }
+.crm-container .btn-sm:has(i.crm-i), .crm-container .btn-group-sm > .btn:has(i.crm-i) {
+    padding: 0 var(--crm-m1) 0 0;
+}
 .crm-container .btn-xs, .crm-container .btn-group-xs > .btn {
 	padding: var(--crm-xs) var(--crm-s2);
 	font-size: var(--crm-m2);
 	border-radius: var(--crm-btn-radius);
     height: auto;
 }
-.crm-container .btn-sm i.crm-i, .crm-container .btn-group-sm > .btn i.crm-i,
-.crm-container .btn-xs i.crm-i, .crm-container .btn-group-xs > .btn i.crm-i {
+.crm-container .btn-sm i.crm-i, .crm-container .btn-group-sm > .btn i.crm-i {
+    min-width: auto;
     height: auto;
+    padding: var(--crm-s2) var(--crm-btn-icon-spacing) var(--crm-s2) var(--crm-m1);
+}
+.crm-container .btn-xs i.crm-i, .crm-container .btn-group-xs > .btn i.crm-i {
+    min-width: auto;
+    height: auto;
+    padding: var(--crm-xs) var(--crm-btn-icon-spacing) var(--crm-xs) var(--crm-s2);
 }
 .crm-container .btn-block {
 	display: block;
@@ -367,11 +376,14 @@
 /* BS3 Button groups and dropdowns  */
 
 .crm-search-col-type-buttons,
-/* .crm-container td.text-right:has(.btn), */
+.crm-container td.text-right:has(.btn + .btn),
 #contact-summary .crm-inline-button,
 #contact-summary .crm-submit-buttons {
     display: flex;
     gap: var(--crm-s);
+}
+.crm-container td.text-right:has(.btn + .btn) {
+    justify-content: end;
 }
 .crm-actions-ribbon #actions {
     padding: 0;

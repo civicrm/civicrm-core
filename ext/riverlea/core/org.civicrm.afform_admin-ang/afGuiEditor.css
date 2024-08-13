@@ -187,7 +187,6 @@
 #afGuiEditor-palette .af-gui-entity-palette [type="search"] {
 	width: 100%;
 	border-radius: var(--crm-roundness) var(--crm-roundness) 0 0;
-	border-color: var(--crm-c-divider);
 	padding: var(--crm-s2);
     font-weight: normal;
     position: relative;
@@ -270,7 +269,7 @@
 #afGuiEditor .af-gui-node-title {
     position: absolute;
     top: 1px;
-    padding-right: var(--crm-r4);
+    width: calc(100% - var(--crm-r4));
 }
 #afGuiEditor-canvas:not(.af-gui-menu-open) .af-gui-bar,
 #afGuiEditor-canvas:not(.af-gui-menu-open) .af-gui-container-title span:empty {
@@ -586,6 +585,9 @@ i.crm-i.af-gui-conditional-dialog-move-icon {
     background: transparent;
     border: 0;
 }
+#afGuiEditor .dropdown-menu {
+    min-width: 220px;
+}
 #afGuiEditor .dropdown-menu li {
     cursor: default;
     margin: 0;
@@ -617,12 +619,12 @@ i.crm-i.af-gui-conditional-dialog-move-icon {
 }
 #afGuiEditor li .af-gui-field-select-in-dropdown input[type=number] {
     width: 50px;
-    padding-right: 0;
+    padding-inline: var(--crm-s) 0;
+    height: auto;
 }
 #afGuiEditor .dropdown-menu li .ng-binding:has(> .fa-square-o, > .fa-check-square-o) {
-    display: flex !important;
-    align-items: center;
-    padding: 0 !important;
+    display: flex;
+    padding-block: 0;
     align-items: center;
     gap: var(--crm-s);
 }
