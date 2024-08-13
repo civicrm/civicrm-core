@@ -161,24 +161,6 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
       $this->assign('langSwitch', CRM_Core_I18n::uiLanguages());
     }
 
-    if (CRM_Utils_Constant::value('CIVICRM_SMARTY_DEFAULT_ESCAPE')
-      && !CRM_Utils_Constant::value('CIVICRM_SMARTY3_AUTOLOAD_PATH')
-      && !CRM_Utils_Constant::value('CIVICRM_SMARTY_AUTOLOAD_PATH')
-    ) {
-      // Currently DEFAULT escape does not work with Smarty3
-      // dunno why - thought it would be the default with Smarty3 - but
-      // getting onto Smarty 3 is higher priority.
-      // The include below loads the v2 version which is why id doesn't work.
-      // When default escape is enabled if the core escape is called before
-      // any custom escaping is done the modifier_escape function is not
-      // found, so require_once straight away. Note this was hit on the basic
-      // contribution dashboard from RecentlyViewed.tpl
-      require_once 'Smarty/plugins/modifier.escape.php';
-      if (!isset($this->_plugins['modifier']['escape'])) {
-        $this->registerPlugin('modifier', 'escape', ['CRM_Core_Smarty', 'escape']);
-      }
-      $this->default_modifiers[] = 'escape:"htmlall"';
-    }
     $this->loadFilter('pre', 'resetExtScope');
     $this->loadFilter('pre', 'htxtFilter');
 
