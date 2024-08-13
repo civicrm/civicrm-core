@@ -1596,16 +1596,9 @@ SELECT $columnName
    * @return array
    */
   public static function defaultCustomTableSchema($params) {
-    // add the id and extends_id
-    $collation = CRM_Core_BAO_SchemaHandler::getInUseCollation();
-    $characterSet = 'utf8';
-    if (stripos($collation, 'utf8mb4') !== FALSE) {
-      $characterSet = 'utf8mb4';
-    }
     $table = [
       'name' => $params['name'],
       'is_multiple' => $params['is_multiple'],
-      'attributes' => "ENGINE=InnoDB DEFAULT CHARACTER SET {$characterSet} COLLATE {$collation}",
       'fields' => [
         [
           'name' => 'id',
@@ -1626,12 +1619,6 @@ SELECT $columnName
         ],
       ],
     ];
-
-    // If on MySQL 5.6 include ROW_FORMAT=DYNAMIC to fix unit tests
-    $databaseVersion = CRM_Utils_SQL::getDatabaseVersion();
-    if (version_compare($databaseVersion, '5.7', '<') && version_compare($databaseVersion, '5.6', '>=')) {
-      $table['attributes'] = $table['attributes'] . ' ROW_FORMAT=DYNAMIC';
-    }
 
     if (!$params['is_multiple']) {
       $table['indexes'] = [
