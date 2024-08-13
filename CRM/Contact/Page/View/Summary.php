@@ -211,10 +211,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
         if (!empty($blockVal['master_id'])) {
           $idValue = $blockVal['master_id'];
         }
-        $groupTree = CRM_Core_BAO_CustomGroup::getTree(ucfirst('address'), NULL, $idValue, NULL, [],
-          NULL, TRUE, NULL, FALSE, CRM_Core_Permission::VIEW);
-        // we setting the prefix to dnc_ below so that we don't overwrite smarty's grouptree var.
-        $defaults['address'][$blockId]['custom'] = CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, "dnc_");
+        $defaults['address'][$blockId]['custom'] = $this->addBlockCustomData($entity, $idValue);
       }
       // reset template variable since that won't be of any use, and could be misleading
       $this->assign("dnc_viewCustomData", NULL);
@@ -514,6 +511,20 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
       }
     }
     return $locationEntities;
+  }
+
+  /**
+   * @param $idValue
+   * @param $entity
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  private function addBlockCustomData($entity, $idValue): array {
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree($entity, NULL, $idValue, NULL, [],
+      NULL, TRUE, NULL, FALSE, CRM_Core_Permission::VIEW);
+    // we setting the prefix to dnc_ below so that we don't overwrite smarty's grouptree var.
+    return CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, "dnc_");
   }
 
 }
