@@ -19,12 +19,6 @@
 	margin: var(--crm-s) 0 var(--crm-m);
 	font-size: var(--crm-font-small-size);
 }
-/* #bootstrap-theme h1, #bootstrap-theme .h1, #bootstrap-theme h2, #bootstrap-theme .h2, #bootstrap-theme h3, #bootstrap-theme .h3 {
-	margin-top: var(--crm-r2);
-	margin-bottom: var(--crm-m1);
-	font-weight: var(--crm-bold-weight);
-	font-family: var(--crm-font-bold);
-} */
 #bootstrap-theme h1 small, #bootstrap-theme h1 .small, #bootstrap-theme .h1 small, #bootstrap-theme .h1 .small, #bootstrap-theme h2 small, #bootstrap-theme h2 .small, #bootstrap-theme .h2 small, #bootstrap-theme .h2 .small, #bootstrap-theme h3 small, #bootstrap-theme h3 .small, #bootstrap-theme .h3 small, #bootstrap-theme .h3 .small {
 	font-size: 65%;
 }
