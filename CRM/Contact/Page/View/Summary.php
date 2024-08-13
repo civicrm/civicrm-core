@@ -211,7 +211,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
         if (!empty($blockVal['master_id'])) {
           $idValue = $blockVal['master_id'];
         }
-        $defaults['address'][$blockId]['custom'] = $this->addBlockCustomData($entity, $idValue);
+        $defaults['address'][$blockId]['custom'] = $this->addBlockCustomData('Address', $idValue);
       }
       // reset template variable since that won't be of any use, and could be misleading
       $this->assign("dnc_viewCustomData", NULL);
