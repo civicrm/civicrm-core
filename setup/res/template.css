@@ -63,7 +63,8 @@ body {
 
 /* Header End */
 
-.civicrm-setup-body #All {
+.civicrm-setup-body #All,
+.civicrm-setup-body.complete {
   font-family: Arial, sans-serif;
   width: auto;
   margin: 0.5em auto;
