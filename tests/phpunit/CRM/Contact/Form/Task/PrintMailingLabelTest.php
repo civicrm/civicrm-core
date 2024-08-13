@@ -59,20 +59,14 @@ class CRM_Contact_Form_Task_PrintMailingLabelTest extends CiviUnitTestCase {
       }
     }
 
-    /** @var CRM_Contact_Form_Task_Label $form */
-    $form = $this->getFormObject('CRM_Contact_Form_Task_Label', [
-      'label_name' => 3475,
-      'location_type_id' => NULL,
-      'do_not_mail' => 1,
-    ]);
-    $form->_contactIds = $contactIDs;
-    try {
-      $rows = $form->postProcess();
-      $this->fail('PrematureExitException expected');
-    }
-    catch (CRM_Core_Exception_PrematureExitException $e) {
-      $rows = $e->errorData['contactRows'];
-    }
+    $form = $this->getTestForm('CRM_Contact_Form_Search_Basic', ['radio_ts' => 'ts_all'])
+      ->addSubsequentForm('CRM_Contact_Form_Task_Label', [
+        'label_name' => 3475,
+        'location_type_id' => NULL,
+        'do_not_mail' => 1,
+      ]);
+    $form->processForm();
+    $rows = $form->getException()->errorData['contactRows'];
     $this->assertEquals('Mr. Antonia J. D`souza II
 Main Street 23
 Brummen, 6971 BN
