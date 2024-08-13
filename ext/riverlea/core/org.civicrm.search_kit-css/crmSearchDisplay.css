@@ -66,7 +66,7 @@
 
 /* Contact page */
 
-.crm-contact-page .crm-search-display .form-group.pull-right,
+#mainTabContainer .crm-search-display .form-group.pull-right,
 .afform-directive .btn-group.pull-right {
 	display: flex;
 	gap: var(--crm-flex-gap);

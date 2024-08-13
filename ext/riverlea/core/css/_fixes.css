@@ -339,6 +339,9 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
 	background: var(--crm-tab-bg-active);
 	overflow-x: auto;
 }
+.ui-tabs-panel .crm-search-display.crm-search-display-table {
+    border: 0;
+}
 .crm-search > .ng-scope > .form-inline {
     border: var(--crm-tab-border);
 	border-radius: 0;

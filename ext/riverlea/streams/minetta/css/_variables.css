@@ -61,14 +61,14 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-c-link: var(--crm-c-blue-dark);
 --crm-c-link-hover: var(--crm-c-blue-darker);
 --crm-c-divider: 1px solid var(--crm-c-gray-300);
---crm-c-page-background: #fff;
---crm-c-background: #f4f4ed;
---crm-c-background2:var(--crm-c-gray-050);
+--crm-c-page-background: #fff; /* background to page body */
+--crm-c-background: #f4f4ed; /* background to page header, often form block & dialog bg */
+--crm-c-background2: var(--crm-c-gray-050); /* 2-5 = progressively darker backgrounds */
 --crm-c-background3: var(--crm-c-gray-100);
 --crm-c-background4: var(--crm-c-gray-200);
 --crm-c-background5: var(--crm-c-gray-700);
---crm-c-drag-background: var(--crm-c-background3);
---crm-c-code-background: var(--crm-c-background2);
+--crm-c-drag-background: var(--crm-c-background3); /* background for drag/drop regions, select2 highlight */
+--crm-c-code-background: var(--crm-c-background2); /* background for code regions */
 --crm-c-primary: var(--crm-c-gray-700); 
 --crm-c-primary-hover: var(--crm-c-gray-800); 
 --crm-c-primary-text: var(--crm-c-light-text);

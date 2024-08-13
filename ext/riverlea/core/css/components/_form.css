@@ -461,7 +461,7 @@ input.crm-form-checkbox) + label {
     background: var(--crm-input-background);
   }
 .select2-drop.select2-drop-active.crm-container .select2-results .select2-highlighted {
-    background: var(--crm-c-background3);
+    background: var(--crm-c-drag-background);
 }
 .select2-drop.select2-drop-active.crm-container .crm-entityref-filters select,
 .select2-drop.select2-drop-active.crm-container .crm-entityref-filters input {

@@ -7,7 +7,7 @@
 
 :root { 
 
---crm-version: 'Unnamed stream, v' var(--crm-release);
+--crm-version: 'Minetta, v' var(--crm-release);
 
 /* FONTS */
 --crm-system-fonts:;
@@ -60,15 +60,15 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-c-dark-text: var(--crm-c-text);
 --crm-c-link: var(--crm-c-blue-dark);
 --crm-c-link-hover: var(--crm-c-blue-darker);
---crm-c-divider: rgba(142, 146, 156, 0.5);
---crm-c-page-background: #fff;
---crm-c-background: #f4f4ed;
---crm-c-background2:var(--crm-c-gray-050);
+--crm-c-divider: 1px solid var(--crm-c-gray-300);
+--crm-c-page-background: #fff; /* background to page body */
+--crm-c-background: #f4f4ed; /* background to page header */
+--crm-c-background2: var(--crm-c-gray-050); /* 2-5 = progressively darker backgrounds */
 --crm-c-background3: var(--crm-c-gray-100);
 --crm-c-background4: var(--crm-c-gray-200);
 --crm-c-background5: var(--crm-c-gray-700);
---crm-c-drag-background: var(--crm-c-background3);
---crm-c-code-background: var(--crm-c-background2);
+--crm-c-drag-background: var(--crm-c-background3); /* background for drag/drop regions, select2 highlight */
+--crm-c-code-background: var(--crm-c-background2); /* background for code regions */
 --crm-c-primary: var(--crm-c-gray-700); 
 --crm-c-primary-hover: var(--crm-c-gray-800); 
 --crm-c-primary-text: var(--crm-c-light-text);
@@ -160,7 +160,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 /* TABLES */
 --crm-table-outside-border: 1px solid var(--crm-c-background3);
 --crm-table-background: var(--crm-c-page-background);
---crm-table-row-border: 1px solid var(--crm-c-gray-300);
+--crm-table-row-border: var(--crm-c-divider);
 --crm-table-column-border: 0 solid transparent;
 --crm-table-font-size: var(--crm-font-size);
 --crm-table-padding: var(--crm-m);
@@ -178,14 +178,13 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-table-compressed-width: auto;
 --crm-table-nested-padding: var(--crm-r) var(--crm-m);
 --crm-table-nested-head-border: 0 solid transparent;
---crm-table-nested-border: 1px solid var(--crm-c-gray-300);
+--crm-table-nested-border: var(--crm-c-divider);
 --crm-table-inset-bg: var(--crm-c-background3);
 
 /* PANELS */
 --crm-panel-shadow: var(--crm-block-shadow);
 --crm-panel-background: var(--crm-c-page-background);
---crm-panel-border: 1px;
---crm-panel-border-col: var(--crm-c-gray-300);
+--crm-panel-border: var(--crm-c-divider);
 --crm-panel-head-margin: 0px;
 
 /* ACCORDIONS */
@@ -203,7 +202,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-expand-header-border-width: 0 0 1px 0;
 --crm-expand-body-bg:;
 --crm-expand-body-box-shadow:;
---crm-expand-border: 1px solid var(--crm-c-gray-500);
+--crm-expand-border: var(--crm-c-divider);
 --crm-expand-border-width: 0 1px 1px 1px;
 --crm-expand-body-padding: var(--crm-padding-reg);
 --crm-expand-body2-bg:;
@@ -264,7 +263,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-checkbox-list-col: var(--crm-c-text);
 
 /* Tabs */
---crm-tabs-bg: var(--crm-c-background4);
+--crm-tabs-bg: var(--crm-c-background3);
 --crm-tabs-padding: var(--crm-s);
 --crm-tabs-border: var(--crm-dash-border);
 --crm-tabs-gap: var(--crm-s);
@@ -279,12 +278,12 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-tab-count-bg: var(--crm-c-info-text);
 --crm-tab-count-col: var(--crm-c-info);
 --crm-tab-roundness: var(--crm-roundness);
---crm-tab-border-col: var(--crm-c-gray-400);
+--crm-tab-border: var(--crm-c-divider);
 --crm-tab-border-active: 0 solid transparent;
 --crm-tabs-2-border: var(--crm-tabs-border);
 
 /* Contact dashboard */
---crm-dash-border: 1px solid var(--crm-tab-border-col);
+--crm-dash-border: var(--crm-tab-border);
 --crm-dash-roundness: var(--crm-roundness);
 --crm-dash-direction: flex; /* choose 'flex' for tabs at top, or 'grid' for tabs at side */
 --crm-side-tabs-width: ; 
@@ -446,6 +445,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
     --crm-c-gray-700: #535252;
     --crm-c-gray-600: #67676a;
     --crm-c-gray-500: #6c6c6c;
+    --crm-c-divider: 1px solid var(--crm-c-gray-500);
 
     /* And others */
     --crm-block-shadow: 0;
@@ -455,15 +455,12 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
     --crm-dashlet-header-bg: var(--crm-c-background3);
     --crm-expand-header-bg: var(--crm-c-background4);
     --crm-expand-body-bg: var(--crm-c-background3);
-    --crm-expand-body-border: 0;
     --crm-dash-header-bg: transparent;
     --crm-dash-block-bg: var(--crm-c-background2);
     --crm-dash-label-bg: transparent;
-    --crm-dash-tabs-bg: var(--crm-c-gray-800);
     --crm-dash-panel-bg: var(--crm-c-background3);
     --crm-dropdown-bg: var(--crm-c-background);
     --crm-dropdown-2-bg: var(--crm-c-background);
-    --crm-expand-border: 1px solid var(--crm-c-gray-500);
     --crm-tabs-border: 1px solid var(--crm-c-gray-500);
     --crm-tabs-2-border: 0;
     --crm-tabs-bg: var(--crm-c-background3);
