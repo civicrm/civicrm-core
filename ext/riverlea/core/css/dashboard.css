@@ -87,7 +87,6 @@ crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
 }
 .crm-dashlet table.dataTable {
     overflow: scroll;
-    display: block;
     padding: 0;
     border-bottom: 0 solid transparent;
     width: 99% !important;

@@ -397,7 +397,7 @@ af-gui-container > .af-gui-bar,
 }
 .af-gui-edit-options-bar h4 {
 	font-size: var(--crm-font-size);
-	margin: 0;
+	margin: 0 !important; /* vs bootstrap.css */
 }
 #afGuiEditor .af-gui-content-editing-area {
     pointer-events: auto;
@@ -593,7 +593,7 @@ i.crm-i.af-gui-conditional-dialog-move-icon {
     margin: 0;
 }
 #afGuiEditor .dropdown-menu li .af-gui-field-select-in-dropdown {
-    padding: var(--crm-s) var(--crm-xs);
+    padding: var(--crm-xs);
     margin: 0;
     display: flex;
     align-items: center;
