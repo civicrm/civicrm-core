@@ -28,6 +28,10 @@
     border-color: var(--crm-alert-border-warning);
     color: var(--crm-alert-text-warning);
 }
+.crm-container .status.crm-ok {
+    background-color: var(--crm-alert-background-help);
+    color: var(--crm-alert-text-info);
+}
 #civicrm-footer .status a {
     color: var(--crm-alert-text-warning);
 }
