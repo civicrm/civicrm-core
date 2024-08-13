@@ -303,7 +303,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
         $row['preferred_communication_method'] = implode(', ', $temp);
       }
       $row['id'] = $id;
-      $formatted = CRM_Utils_Address::formatMailingLabel($row, 'mailing_format', FALSE, TRUE, $tokenFields);
+      $formatted = CRM_Utils_Address::formatMailingLabel($row);
       $rows[$id] = [$formatted];
     }
 
