@@ -299,6 +299,7 @@ class CRM_Utils_Token {
     $knownTokens = NULL,
     $escapeSmarty = FALSE
   ) {
+    CRM_Core_Error::deprecatedFunctionWarning('');
     $key = 'mailing';
     if (!$knownTokens || !isset($knownTokens[$key])) {
       return $str;
