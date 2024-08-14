@@ -260,7 +260,8 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
         [$row->context['contactId']],
         empty($row->context['mailingJobId']) ? NULL : $row->context['mailingJobId'],
         $messageTokens,
-        $row->context['controller']
+        $row->context['controller'],
+        TRUE
       );
       foreach ($this->getHookTokens() as $category => $hookToken) {
         if (!empty($messageTokens[$category])) {
