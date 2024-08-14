@@ -227,7 +227,7 @@ class CRM_Mailing_MultilingualSystemTest extends CiviUnitTestCase {
 
     // Now test unsubscribe groups.
     $groups = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing(
-      $matches[1],
+      NULL,
       $matches[2],
       $matches[3],
       TRUE
@@ -249,7 +249,7 @@ class CRM_Mailing_MultilingualSystemTest extends CiviUnitTestCase {
       $dbLocale = '_fr_FR';
       // Now test unsubscribe groups.
       $groups = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing(
-        $matches[1],
+        NULL,
         $matches[2],
         $matches[3],
         TRUE
