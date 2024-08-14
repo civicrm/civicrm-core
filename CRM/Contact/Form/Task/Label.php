@@ -238,34 +238,6 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
         foreach ($contact as $field => $fieldValue) {
           $rows[$value][$field] = $fieldValue;
         }
-
-        $valuesothers = [];
-        $paramsothers = ['contact_id' => $value];
-        $valuesothers = CRM_Core_BAO_Location::getValues($paramsothers, $valuesothers);
-        if (!empty($fv['location_type_id'])) {
-          foreach ($valuesothers as $vals) {
-            if (($vals['location_type_id'] ?? NULL) ==
-              ($fv['location_type_id'] ?? NULL)
-            ) {
-              foreach ($vals as $k => $v) {
-                if (in_array($k, [
-                  'email',
-                  'phone',
-                  'im',
-                  'openid',
-                ])) {
-                  if ($k === 'im') {
-                    $rows[$value][$k] = $v['1']['name'];
-                  }
-                  else {
-                    $rows[$value][$k] = $v['1'][$k];
-                  }
-                  $rows[$value][$k . '_id'] = $v['1']['id'];
-                }
-              }
-            }
-          }
-        }
       }
       else {
         if (!self::tokenIsFound($contact, $mailingFormatProperties, $tokenFields)) {
