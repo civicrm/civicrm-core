@@ -278,6 +278,15 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
       }
       // now create the rows for generating mailing labels
       foreach ($contact as $field => $fieldValue) {
+        if ($field === 'state_province_id') {
+          $field = 'state_province_id:label';
+        }
+        if ($field === 'country_id') {
+          $field = 'country_id:label';
+        }
+        if ($field === 'county_id') {
+          $field = 'county_id:label';
+        }
         $rows[$value][$field] = $fieldValue;
       }
     }
