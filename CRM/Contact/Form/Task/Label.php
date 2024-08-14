@@ -196,15 +196,6 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
       'CRM_Contact_Form_Task_Label'
     );
 
-    $tokens = [];
-    CRM_Utils_Hook::tokens($tokens);
-    $tokenFields = [];
-    foreach ($tokens as $category => $catTokens) {
-      foreach ($catTokens as $token => $tokenName) {
-        $tokenFields[] = $token;
-      }
-    }
-
     foreach ($this->_contactIds as $value) {
       foreach ($custom as $cfID) {
         if (isset($details[$value]["custom_{$cfID}"])) {
