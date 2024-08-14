@@ -752,15 +752,15 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $hash = CRM_Core_DAO::getFieldValue('CRM_Mailing_Event_DAO_MailingEventQueue', $jobId, 'hash', 'job_id');
     $queueId = CRM_Core_DAO::getFieldValue('CRM_Mailing_Event_DAO_MailingEventQueue', $jobId, 'id', 'job_id');
     // This gets the list of groups to unsubscribe but does NOT actually unsubcribe from groups (because return=TRUE)
-    $beforeUnsubscribeGroups = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing($jobId, $queueId, $hash, TRUE);
+    $beforeUnsubscribeGroups = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing(NULL, $queueId, $hash, TRUE);
     // Assert that there are two groups in the unsubscribe list.
     $this->assertCount(2, $beforeUnsubscribeGroups);
     $this->assertArrayHasKey($groupID3, $beforeUnsubscribeGroups);
     $this->assertArrayHasKey($groupID4, $beforeUnsubscribeGroups);
     // Do the actual unsubscribe
-    CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing($jobId, $queueId, $hash, FALSE);
+    CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing(NULL, $queueId, $hash, FALSE);
     // Assert that there are now no groups in the unsubscribe list.
-    $afterUnsubscribeGroups = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing($jobId, $queueId, $hash, TRUE);
+    $afterUnsubscribeGroups = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing(NULL, $queueId, $hash, TRUE);
     $this->assertCount(0, $afterUnsubscribeGroups);
   }
 
