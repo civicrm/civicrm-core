@@ -604,48 +604,6 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing implements \Civi\C
   }
 
   /**
-   * Prepares the text and html templates
-   * for generating the emails and returns a copy of the
-   * prepared templates
-   *
-   * @deprecated
-   *   This is used by CiviMail but will be made redundant by FlexMailer/TokenProcessor.
-   */
-  private function getPreparedTemplates() {
-    if (!$this->preparedTemplates) {
-      $patterns['html'] = $this->getPatterns(TRUE);
-      $patterns['subject'] = $patterns['text'] = $this->getPatterns();
-      $templates = $this->getTemplates();
-
-      $this->preparedTemplates = [];
-
-      foreach (['html', 'text', 'subject'] as $key) {
-        if (!isset($templates[$key])) {
-          continue;
-        }
-
-        $matches = [];
-        $tokens = [];
-        $split_template = [];
-
-        $email = $templates[$key];
-        preg_match_all($patterns[$key], $email, $matches, PREG_PATTERN_ORDER);
-        foreach ($matches[0] as $idx => $token) {
-          $preg_token = '/' . preg_quote($token, '/') . '/im';
-          [$split_template[], $email] = preg_split($preg_token, $email, 2);
-          array_push($tokens, $this->getDataFunc($token));
-        }
-        if ($email) {
-          $split_template[] = $email;
-        }
-        $this->preparedTemplates[$key]['template'] = $split_template;
-        $this->preparedTemplates[$key]['tokens'] = $tokens;
-      }
-    }
-    return ($this->preparedTemplates);
-  }
-
-  /**
    * Retrieve a ref to an array that holds the email and text templates for this email
    * assembles the complete template including the header and footer
    * that the user has uploaded or declared (if they have done that)
