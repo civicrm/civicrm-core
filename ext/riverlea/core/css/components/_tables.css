@@ -73,8 +73,11 @@ table.dataTable.order-column.stripe tbody tr.even > .sorting_1 {
 .crm-container .extension-installed summary {
     color: var(--crm-alert-text-help);
 }
-.crm-container .extension-installed.odd {
-    background: linear-gradient(to top,rgba(256,256,256,0.25),rgba(256,256,256,0.25)) var(--crm-c-green-light) !important; /* vs jquery.datatables.min.css */
+table.dataTable.display tbody tr.extension-installed.odd {
+    background: linear-gradient(to top,rgba(256,256,256,0.25),rgba(256,256,256,0.25)) var(--crm-c-green-light);
+}
+table.dataTable.display tbody tr.extension-installed.odd:hover {
+    background-color: var(--crm-table-odd-hover);
 }
 table.dataTable.display tbody tr.extension-installed.odd > .sorting_1, 
 table.dataTable.order-column.stripe tbody tr.extension-installed.odd > .sorting_1 {
