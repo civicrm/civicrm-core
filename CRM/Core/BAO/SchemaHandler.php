@@ -97,8 +97,28 @@ class CRM_Core_BAO_SchemaHandler {
         $sql .= self::buildForeignKeySQL($field, $separator, '', $params['name']);
       }
     }
+    $params['attributes'] ??= '';
+    if (!str_contains(strtoupper($params['attributes']), 'COLLATE')) {
+      $params['attributes'] .= self::defaultAttributes();
+    }
     $sql .= "\n) {$params['attributes']};";
     return $sql;
+  }
+
+  public static function defaultAttributes(): string {
+    $collation = self::getInUseCollation();
+    $characterSet = 'utf8';
+    if (stripos($collation, 'utf8mb4') !== FALSE) {
+      $characterSet = 'utf8mb4';
+    }
+    $attributes = " ENGINE=InnoDB DEFAULT CHARACTER SET {$characterSet} COLLATE {$collation}";
+
+    // If on MySQL 5.6 include ROW_FORMAT=DYNAMIC to fix unit tests
+    $databaseVersion = CRM_Utils_SQL::getDatabaseVersion();
+    if (version_compare($databaseVersion, '5.7', '<') && version_compare($databaseVersion, '5.6', '>=')) {
+      $attributes .= ' ROW_FORMAT=DYNAMIC';
+    }
+    return $attributes;
   }
 
   /**
