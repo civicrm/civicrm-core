@@ -1389,28 +1389,6 @@ class CRM_Utils_Token {
   }
 
   /**
-   * @deprecated
-   *
-   * @param int $caseId
-   * @param string $str
-   * @param array $knownTokens
-   * @param bool $escapeSmarty
-   * @return string
-   * @throws \CRM_Core_Exception
-   */
-  public static function replaceCaseTokens($caseId, $str, $knownTokens = NULL, $escapeSmarty = FALSE): string {
-    CRM_Core_Error::deprecatedFunctionWarning('token processor');
-    if (strpos($str, '{case.') === FALSE) {
-      return $str;
-    }
-    if (!$knownTokens) {
-      $knownTokens = self::getTokens($str);
-    }
-    $case = civicrm_api3('case', 'getsingle', ['id' => $caseId]);
-    return self::replaceEntityTokens('case', $case, $str, $knownTokens, $escapeSmarty);
-  }
-
-  /**
    * Generic function for formatting token replacement for an api field
    *
    * @deprecated
