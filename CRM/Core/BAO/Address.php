@@ -1056,7 +1056,7 @@ SELECT is_primary,
       // fill uniqueAddress array with last/first name tree
       if (isset($uniqueAddress[$address])) {
         $uniqueAddress[$address]['names'][$name][$firstNameWithPrefix]['first_name'] = $rows[$rowID]['first_name'];
-        $uniqueAddress[$address]['names'][$name][$firstNameWithPrefix]['addressee_display'] = $rows[$rowID]['addressee_display'];
+        $uniqueAddress[$address]['names'][$name][$firstNameWithPrefix]['addressee_display'] = $rows[$rowID]['addressee_display'] ?? '';
         // drop unnecessary rows
         unset($rows[$rowID]);
         // this is the first listing at this address
@@ -1064,7 +1064,7 @@ SELECT is_primary,
       else {
         $uniqueAddress[$address]['ID'] = $rowID;
         $uniqueAddress[$address]['names'][$name][$firstNameWithPrefix]['first_name'] = $rows[$rowID]['first_name'];
-        $uniqueAddress[$address]['names'][$name][$firstNameWithPrefix]['addressee_display'] = $rows[$rowID]['addressee_display'];
+        $uniqueAddress[$address]['names'][$name][$firstNameWithPrefix]['addressee_display'] = $rows[$rowID]['addressee_display'] ?? '';
       }
     }
     foreach ($uniqueAddress as $address => $data) {
