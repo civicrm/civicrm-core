@@ -149,10 +149,6 @@ class CRM_Contact_Form_Task_LabelCommon {
       }
       $contact = $details[$value] ?? NULL;
 
-      if (is_a($contact, 'CRM_Core_Error')) {
-        return NULL;
-      }
-
       // we need to remove all the "_id"
       unset($contact['contact_id']);
 
@@ -165,10 +161,6 @@ class CRM_Contact_Form_Task_LabelCommon {
         if (!empty($contact['county_id'])) {
           unset($contact['county_id']);
         }
-
-        foreach ($contact as $field => $fieldValue) {
-          $rows[$value][$field] = $fieldValue;
-        }
       }
       else {
 
@@ -178,11 +170,10 @@ class CRM_Contact_Form_Task_LabelCommon {
         if (!empty($contact['addressee'])) {
           $contact['addressee'] = $contact['addressee_display'];
         }
-
-        // now create the rows for generating mailing labels
-        foreach ($contact as $field => $fieldValue) {
-          $rows[$value][$field] = $fieldValue;
-        }
+      }
+      // now create the rows for generating mailing labels
+      foreach ($contact as $field => $fieldValue) {
+        $rows[$value][$field] = $fieldValue;
       }
     }
     // sigh couldn't extract out tokenfields yet

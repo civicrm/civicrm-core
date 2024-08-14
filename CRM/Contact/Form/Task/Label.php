@@ -213,10 +213,6 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
       }
       $contact = $details[$value] ?? NULL;
 
-      if (is_a($contact, 'CRM_Core_Error')) {
-        return NULL;
-      }
-
       // we need to remove all the "_id"
       unset($contact['contact_id']);
 
@@ -224,25 +220,14 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
         // If location type is not primary, $contact contains
         // one more array as "$contact[$locName] = array( values... )"
 
-        if (!self::tokenIsFound($contact, $mailingFormatProperties, $tokenFields)) {
-          continue;
-        }
-
         $contact = array_merge($contact, $contact[$locName]);
         unset($contact[$locName]);
 
         if (!empty($contact['county_id'])) {
           unset($contact['county_id']);
         }
-
-        foreach ($contact as $field => $fieldValue) {
-          $rows[$value][$field] = $fieldValue;
-        }
       }
       else {
-        if (!self::tokenIsFound($contact, $mailingFormatProperties, $tokenFields)) {
-          continue;
-        }
 
         if (!empty($contact['addressee_display'])) {
           $contact['addressee_display'] = trim($contact['addressee_display']);
@@ -250,11 +235,11 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
         if (!empty($contact['addressee'])) {
           $contact['addressee'] = $contact['addressee_display'];
         }
+      }
 
-        // now create the rows for generating mailing labels
-        foreach ($contact as $field => $fieldValue) {
-          $rows[$value][$field] = $fieldValue;
-        }
+      // now create the rows for generating mailing labels
+      foreach ($contact as $field => $fieldValue) {
+        $rows[$value][$field] = $fieldValue;
       }
     }
 
@@ -291,9 +276,11 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
    * @param array $mailingFormatProperties
    * @param array $tokenFields
    *
+   * @deprecated since 5.78 will be removed around 5.84
    * @return bool
    */
   public static function tokenIsFound($contact, $mailingFormatProperties, $tokenFields) {
+    CRM_Core_Error::deprecatedFunctionWarning('');
     foreach (array_merge($mailingFormatProperties, array_fill_keys($tokenFields, 1)) as $key => $dontCare) {
       //we should not consider addressee for data exists, CRM-6025
       if ($key != 'addressee' && !empty($contact[$key])) {
