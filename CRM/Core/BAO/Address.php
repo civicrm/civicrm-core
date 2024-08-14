@@ -1032,11 +1032,11 @@ SELECT is_primary,
     $uniqueAddress = [];
     foreach (array_keys($rows) as $rowID) {
       // load complete address as array key
-      $address = trim($rows[$rowID]['street_address'])
-        . trim($rows[$rowID]['city'])
-        . trim($rows[$rowID]['state_province'])
-        . trim($rows[$rowID]['postal_code'])
-        . trim($rows[$rowID]['country']);
+      $address = trim((string) $rows[$rowID]['street_address'])
+        . trim((string) $rows[$rowID]['city'])
+        . trim((string) $rows[$rowID]['state_province'])
+        . trim((string) $rows[$rowID]['postal_code'])
+        . trim((string) $rows[$rowID]['country']);
       if (isset($rows[$rowID]['last_name'])) {
         $name = $rows[$rowID]['last_name'];
       }
