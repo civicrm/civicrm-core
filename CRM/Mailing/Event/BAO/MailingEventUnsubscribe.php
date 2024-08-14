@@ -230,7 +230,7 @@ WHERE  email = %2
      * how a UNION would work.
      */
     $groupsCachedSQL = "
-            SELECT      grp.id as group_id,
+            SELECT      grp.id as id,
                         grp.title as title,
                         grp.frontend_title as frontend_title,
                         grp.frontend_description as frontend_description,
@@ -246,7 +246,7 @@ WHERE  email = %2
                         ) GROUP BY grp.id";
 
     $groupsAddedSQL = "
-            SELECT      grp.id as group_id,
+            SELECT      grp.id as id,
                         grp.title as title,
                         grp.frontend_title as frontend_title,
                         grp.frontend_description as frontend_description,
@@ -266,30 +266,19 @@ WHERE  email = %2
     ];
     $doCached = CRM_Core_DAO::executeQuery($groupsCachedSQL, $groupsParams);
     $doAdded = CRM_Core_DAO::executeQuery($groupsAddedSQL, $groupsParams);
-
+    $allGroups = $doAdded->fetchAll() + $doCached->fetchAll();
     if ($return) {
       $returnGroups = [];
-      while ($doCached->fetch()) {
-        $returnGroups[$doCached->group_id] = [
-          'title' => !empty($doCached->frontend_title) ? $doCached->frontend_title : $doCached->title,
-          'description' => !empty($doCached->frontend_description) ? $doCached->frontend_description : $doCached->description,
-        ];
-      }
-      while ($doAdded->fetch()) {
-        $returnGroups[$doAdded->group_id] = [
-          'title' => $doAdded->frontend_title,
-          'description' => $doAdded->frontend_description,
+      foreach ($allGroups as $group) {
+        $returnGroups[$group['id']] = [
+          'title' => $group['frontend_title'],
+          'description' => $group['frontend_description'],
         ];
       }
       return $returnGroups;
     }
-    else {
-      while ($doCached->fetch()) {
-        $groups[$doCached->group_id] = $doCached->frontend_title;
-      }
-      while ($doAdded->fetch()) {
-        $groups[$doAdded->group_id] = $doAdded->frontend_title;
-      }
+    foreach ($allGroups as $group) {
+      $groups[$group['id']] = $group['frontend_title'];
     }
     $transaction = new CRM_Core_Transaction();
     $contacts = [$contact_id];
