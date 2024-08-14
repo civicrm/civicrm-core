@@ -43,6 +43,20 @@ class CRM_Contact_Form_Task_PrintMailingLabelTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test tokens are rendered in the mailing labels when declared via deprecated hooks.
+   */
+  public function testMailingLabelTokens(): void {
+    \Civi::settings()->set('mailing_format', $this->getDefaultMailingFormat() . ' {test.last_initial}');
+    $this->hookClass->setHook('civicrm_tokenValues', [$this, 'hookTokenValues']);
+    $this->hookClass->setHook('civicrm_tokens', [$this, 'hook_tokens']);
+    $this->createTestAddresses();
+    $rows = $this->submitForm([]);
+    $this->assertCount(2, $rows);
+    $this->assertEquals($this->getExpectedAddress('collins') . ' C', $rows[$this->ids['Contact']['collins']][0]);
+    $this->assertEquals($this->getExpectedAddress('souza') . ' S', $rows[$this->ids['Contact']['souza']][0]);
+  }
+
+  /**
    * Test the mailing label rows contain the primary addresses when
    * location_type_id = none (as primary) is chosen in form.
    *
@@ -125,6 +139,24 @@ NETHERLANDS';
       }
     }
     return $addresses;
+  }
+
+  /**
+   * Implement token values hook.
+   *
+   * @param array $details
+   */
+  public function hookTokenValues(array &$details): void {
+    foreach ($details as $index => $detail) {
+      $details[$index]['last_initial'] = str_contains($detail['display_name'], 'souza') ? 'S' : 'C';
+    }
+  }
+
+  /**
+   * Implements civicrm_tokens().
+   */
+  public function hook_tokens(&$tokens): void {
+    $tokens['test'] = ['last_initial' => 'last_initial'];
   }
 
   /**
