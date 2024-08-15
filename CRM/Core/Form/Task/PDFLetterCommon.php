@@ -327,6 +327,7 @@ class CRM_Core_Form_Task_PDFLetterCommon {
    * @param string $message
    */
   public static function formatMessage(&$message) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     $newLineOperators = [
       'p' => [
         'oper' => '<p>',
