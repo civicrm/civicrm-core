@@ -253,12 +253,7 @@ WHERE  email = %2
     foreach ($groups as $group_id => $group_name) {
       $notremoved = FALSE;
       if ($group_name) {
-        if (in_array($group_id, $baseGroupIds)) {
-          [$total, $removed, $notremoved] = CRM_Contact_BAO_GroupContact::addContactsToGroup($contacts, $group_id, 'Email', 'Removed');
-        }
-        else {
-          [$total, $removed, $notremoved] = CRM_Contact_BAO_GroupContact::removeContactsFromGroup($contacts, $group_id, 'Email');
-        }
+        [$total, $removed, $notremoved] = CRM_Contact_BAO_GroupContact::removeContactsFromGroup($contacts, $group_id, 'Email');
       }
       if ($notremoved) {
         unset($groups[$group_id]);
