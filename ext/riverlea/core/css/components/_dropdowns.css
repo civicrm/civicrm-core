@@ -2,9 +2,10 @@
 
 #crm-create-new-list {
     position: absolute;
-    top: 45px;
+    display: none;
     width: 220px;
     left: 0;
+    z-index: 2;
 }
 #crm-contribpage-links-wrapper,
 #crm-event-links-wrapper,
@@ -28,6 +29,7 @@
 .crm-contribpage-links-list-inner, 
 .crm-contact-actions-list-inner,
 .crm-participant-list-inner,
+.crm-create-new-list-inner ul.ui-widget,
 .vakata-context {
     background-color: var(--crm-dropdown-2-bg);
     color: var(--crm-dropdown-2-col);
@@ -36,7 +38,8 @@
     padding: var(--crm-dropdown-2-padding);
     min-width: var(--crm-dropdown-width);
 }
-.ac_results::before {
+.ac_results::before,
+.crm-create-new-list-inner::before {
     content: '';
     display: inline-block;
     position: absolute;
@@ -48,6 +51,9 @@
     top: -5px;
     left: 12px;
 }
+.crm-create-new-list-inner::before {
+    top: 3px
+}
 #crm-contact-actions-list ul, 
 .crm-contribpage-links-list-inner ul,
 .crm-event-links-list-inner ul,
@@ -58,7 +64,8 @@
 #crm-contact-actions-list ul a, 
 .crm-contribpage-links-list-inner ul a,
 .crm-event-links-list-inner ul a,
-.crm-participant-list-inner ul a {
+.crm-participant-list-inner ul a,
+#crm-create-new-list ul a {
     color: var(--crm-c-secondary-text);
     padding-inline: var(--crm-s);
     border-radius: var(--crm-roundness);
@@ -71,7 +78,9 @@
 .crm-event-links-list-inner ul a:hover,
 .crm-event-links-list-inner ul a:focus,
 .crm-participant-list-inner ul a:hover, 
-.crm-participant-list-inner ul a:focus {
+.crm-participant-list-inner ul a:focus,
+#crm-create-new-list ul a:hover,
+#crm-create-new-list ul a:focus {
     text-decoration: none;
     color: var(--crm-c-text);
     background-color: var(--crm-c-page-background);

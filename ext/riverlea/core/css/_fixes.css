@@ -230,6 +230,7 @@ a.crm-expand-row:hover,a.crm-expand-row:focus {
     font-weight: normal;
 	text-decoration: none;
 	line-height: inherit;
+	border-radius: var(--crm-btn-radius);
 	display: flex !important; /* vs contact dashboard edit */
 }
 .crm-container a.button span {

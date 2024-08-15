@@ -18,7 +18,8 @@
 .crm-container th,
 .crm-container tr,
 .crm-container td,
-.crm-container details {
+.crm-container details,
+.crm-container input {
 	background-color: transparent;
     background: transparent;
     border: 0;
@@ -29,6 +30,7 @@
     color: inherit;
     line-height: inherit;
     font-family: inherit;
+    font: inherit;
     font-size: inherit;
 }
 .crm-container tr:hover, 

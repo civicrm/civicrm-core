@@ -72,6 +72,7 @@
   border: 1px solid var(--crm-alert-border-warning);
   padding: var(--crm-padding-small);
   border-radius: var(--crm-roundness);
+  color: var(--crm-alert-text-warning);
 }
 .crm-container .crm-extensions-version {
   white-space: nowrap;

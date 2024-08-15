@@ -471,3 +471,24 @@ div.civicrm-community-messages .crm-collapsible .collapsible-title {
     background-color: var(--crm-c-primary-hover);
     border: 0;
 }
+/* Blocks (D7/Joomla) */
+
+#crm-recently-viewed ul,
+#crm-recently-viewed li {
+    padding: 0;
+    margin: 0;
+    font-size: 0.9rem;
+}
+#crm-recently-viewed li.crm-recently-viewed {
+    margin-block: var(--crm-xs);
+    padding: var(--crm-s);
+    border: var(--crm-c-divider);
+    background-color: var(--crm-input-background);
+    white-space: nowrap;
+    list-style-type: none;
+    position: relative;
+    border-radius: var(--crm-roundness);
+}
+#crm-quick-create input {
+    max-width: 100%;
+}

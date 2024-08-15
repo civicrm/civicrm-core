@@ -25,13 +25,13 @@ html.admin-bar #admin-bar-menu .civicrm .admin-bar-link-icon {
 
 /* Drupal - body.page-civicrm */
 
-/* D7 */
+/* D7 Garland */
 body.page-civicrm > #page {
     padding: 0;
     margin: 0;
     --crm-page-padding: 1rem 3rem;
 }
-body.page-civicrm div.status {
+body.page-civicrm .crm-container div.status {
     background-image: none;
 }
 
@@ -48,6 +48,18 @@ body.page-civicrm header + div.layout-container {
     background-color: var(--crm-c-page-background) !important;
     margin: 0 !important; /* use of important vs some themes */
 }
+/* D7 Garland */
+body.page-civicrm #squeeze #crm-container,
+.region-sidebar-first .block-civicrm {
+    padding: 0;
+    --crm-page-padding: 0;
+    --crm-c-page-background: transparent;
+}
+body.page-civicrm #squeeze .crm-container ul li {
+    margin: 0;
+    padding: 0;
+}
+
 /* D7 Seven */
 body.page-civicrm > #branding {
     background-color: var(--crm-c-page-background);

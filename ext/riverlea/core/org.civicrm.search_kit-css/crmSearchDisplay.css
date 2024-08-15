@@ -6,7 +6,6 @@
 .crm-search-display th.crm-sortable-col {
   cursor: var(--crm-hover-clickable);
   white-space: nowrap; 
-	vertical-align: middle;
 }
 .crm-search-display th.crm-sortable-col span {
   white-space: break-spaces;
