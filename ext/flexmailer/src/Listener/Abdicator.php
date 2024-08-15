@@ -65,12 +65,15 @@ class Abdicator extends AutoService {
    * @param \Civi\FlexMailer\Event\CheckSendableEvent $e
    */
   public function onCheckSendable($e) {
-    if (self::isFlexmailPreferred($e->getMailing())) {
+    $mailing = $e->getMailing();
+    if (empty($mailing->sms_provider_id)) {
       // OK, we'll continue running.
       return;
     }
 
     $e->stopPropagation();
+    // @todo - just do the one tiny sms field check here & don't call the
+    // other function.
     $errors = \CRM_Mailing_BAO_Mailing::checkSendable($e->getMailing());
     if (is_array($errors)) {
       foreach ($errors as $key => $message) {

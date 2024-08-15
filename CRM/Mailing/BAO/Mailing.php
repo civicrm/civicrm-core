@@ -1225,7 +1225,10 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
   /**
    * @deprecated
-   *   This is used by CiviMail but will be made redundant by FlexMailer.
+   *
+   * @todo - this just does an sms has-body-text check now - it would be clearer just
+   * to do this in the sms function that calls this & remove it.
+   *
    * @param CRM_Mailing_DAO_Mailing|array $mailing
    *   The mailing which may or may not be sendable.
    * @return array
@@ -1242,41 +1245,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $mailing->copyValues($params);
     }
     $errors = [];
-    if ($mailing->sms_provider_id) {
-      if (empty($mailing->body_text)) {
-        $errors['body'] = ts('Field "body_text" is required.');
-      }
-    }
-    else {
-      foreach (['subject', 'name', 'from_name', 'from_email'] as $field) {
-        if (empty($mailing->{$field})) {
-          $errors[$field] = ts('Field "%1" is required.', [
-            1 => $field,
-          ]);
-        }
-      }
-      if (empty($mailing->body_html) && empty($mailing->body_text)) {
-        $errors['body'] = ts('Field "body_html" or "body_text" is required.');
-      }
-
-      if (!Civi::settings()->get('disable_mandatory_tokens_check')) {
-        $header = $mailing->header_id && $mailing->header_id !== 'null' ? CRM_Mailing_BAO_MailingComponent::findById($mailing->header_id) : NULL;
-        $footer = $mailing->footer_id && $mailing->footer_id !== 'null' ? CRM_Mailing_BAO_MailingComponent::findById($mailing->footer_id) : NULL;
-        foreach (['body_html', 'body_text'] as $field) {
-          if (empty($mailing->{$field})) {
-            continue;
-          }
-          $str = ($header ? $header->{$field} : '') . $mailing->{$field} . ($footer ? $footer->{$field} : '');
-          $err = CRM_Utils_Token::requiredTokens($str);
-          if ($err !== TRUE) {
-            foreach ($err as $token => $desc) {
-              $errors["{$field}:{$token}"] = ts('This message is missing a required token - {%1}: %2',
-                [1 => $token, 2 => $desc]
-              );
-            }
-          }
-        }
-      }
+    if (empty($mailing->body_text)) {
+      $errors['body'] = ts('Field "body_text" is required.');
     }
     return $errors;
   }
