@@ -161,6 +161,9 @@ AND    TABLE_NAME LIKE 'civicrm_%'
     // Don't log sessions
     $this->tables = preg_grep('/^civicrm_session/', $this->tables, PREG_GREP_INVERT);
 
+    // Don't log entity tables.
+    $this->tables = preg_grep('/^civicrm_sk_/', $this->tables, PREG_GREP_INVERT);
+
     // do not log civicrm_mailing_recipients table, CRM-16193
     $this->tables = array_diff($this->tables, ['civicrm_mailing_recipients']);
     $this->logTableSpec = array_fill_keys($this->tables, []);
