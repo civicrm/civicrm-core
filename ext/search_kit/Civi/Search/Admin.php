@@ -279,10 +279,14 @@ class Admin {
   public static function getJoins(array $allowedEntities):array {
     $joins = [];
     foreach ($allowedEntities as $entity) {
-      $isMultiValueCustomEntity = in_array('CustomValue', $entity['type'], TRUE);
+      $isVirtualEntity = (bool) array_intersect(['CustomValue', 'SavedSearch'], $entity['type']);
 
-      // Normal DAO entities (excludes multi-value custom field entities)
-      if (!empty($entity['dao']) && !$isMultiValueCustomEntity) {
+      // Normal DAO entities (excludes virtual entities)
+      // FIXME: At this point DAO entities have enough metadata that using getReferenceColumns()
+      // is no longer necessary and they could be handled the same as virtual entities.
+      // So this entire block could, in theory, be removed in favor of the foreach loop below.
+      // Just need a solid before/after comparison to ensure the output stays stable.
+      if (!empty($entity['dao']) && !$isVirtualEntity) {
         /** @var \CRM_Core_DAO $daoClass */
         $daoClass = $entity['dao'];
         $references = $daoClass::getReferenceColumns();
@@ -392,9 +396,12 @@ class Admin {
         }
       }
 
-      // Custom EntityRef joins
+      // This handles joins for custom fields and virtual entities which don't have a DAO.
       foreach ($entity['fields'] as $field) {
-        if (($field['type'] === 'Custom' || $isMultiValueCustomEntity) && $field['fk_entity'] && $field['input_type'] === 'EntityRef') {
+        // FIXME: See comment above: this loop should be able to handle every entity.
+        // Above block could be removed and the first part of this conditional
+        // `($field['type'] === 'Custom' || $isVirtualEntity)` can be removed.
+        if (($field['type'] === 'Custom' || $isVirtualEntity) && $field['fk_entity'] && $field['input_type'] === 'EntityRef') {
           $entityRefJoins = self::getEntityRefJoins($entity, $field);
           foreach ($entityRefJoins as $joinEntity => $joinInfo) {
             $joins[$joinEntity][] = $joinInfo;
@@ -434,7 +441,7 @@ class Admin {
       $alias = "{$field['fk_entity']}_{$entity['name']}_$bareFieldName";
       $joins[$field['fk_entity']] = [
         'label' => $entity['title_plural'],
-        'description' => $entity['description'],
+        'description' => $entity['description'] ?? '',
         'entity' => $entity['name'],
         'conditions' => self::getJoinConditions('id', "$alias.{$field['name']}"),
         'defaults' => [],

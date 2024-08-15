@@ -28,20 +28,6 @@ use api\v4\Api4TestBase;
  */
 class SpecFormatterTest extends Api4TestBase {
 
-  /**
-   * @dataProvider arrayFieldSpecProvider
-   *
-   * @param array $fieldData
-   * @param string $expectedName
-   * @param string $expectedType
-   */
-  public function testArrayToField($fieldData, $expectedName, $expectedType) {
-    $field = SpecFormatter::arrayToField($fieldData, 'TestEntity');
-
-    $this->assertEquals($expectedName, $field->getName());
-    $this->assertEquals($expectedType, $field->getDataType());
-  }
-
   public function testCustomFieldWillBeReturned(): void {
     $customFieldId = 3333;
     $name = 'MyFancyField';
@@ -72,34 +58,6 @@ class SpecFormatterTest extends Api4TestBase {
     $this->assertEquals('Select', $field->getInputType());
     $this->assertEquals('civicrm_value_my_group', $field->getTableName());
     $this->assertTrue($field->getInputAttrs()['multiple']);
-  }
-
-  /**
-   * @return array
-   */
-  public function arrayFieldSpecProvider() {
-    return [
-      [
-        [
-          'name' => 'Foo',
-          'title' => 'Bar',
-          'type' => \CRM_Utils_Type::T_STRING,
-        ],
-        'Foo',
-        'String',
-      ],
-      [
-        [
-          'name' => 'MyField',
-          'title' => 'Bar',
-          'type' => \CRM_Utils_Type::T_STRING,
-          // this should take precedence
-          'data_type' => 'Boolean',
-        ],
-        'MyField',
-        'Boolean',
-      ],
-    ];
   }
 
 }

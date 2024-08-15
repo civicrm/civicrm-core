@@ -90,6 +90,7 @@ function search_kit_civicrm_entityTypes(array &$entityTypes): void {
       'name' => $display['entityName'],
       'class' => \Civi\BAO\SK_Entity::class,
       'table' => $display['tableName'],
+      'metaProvider' => \Civi\Schema\SkEntityMetaProvider::class,
     ];
   }
 }
@@ -110,12 +111,15 @@ function _getSearchKitDisplayTableName(string $displayName): string {
  * @return array
  * @throws CRM_Core_Exception
  */
-function _getSearchKitEntityDisplays(): array {
+function _getSearchKitEntityDisplays($name = NULL): array {
   $displays = [];
   // Can't use the API to fetch search displays because this is called by pre-boot hooks
   $select = CRM_Utils_SQL_Select::from('civicrm_search_display')
     ->where('type = "entity"')
     ->select(['id', 'name', 'label', 'settings']);
+  if ($name) {
+    $select->where('name = @name', ['@name' => $name]);
+  }
   try {
     $display = CRM_Core_DAO::executeQuery($select->toSQL());
     while ($display->fetch()) {

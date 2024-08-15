@@ -19,6 +19,7 @@ use Civi\Api4\Service\Schema\Joinable\Joinable;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Service\AutoService;
 use Civi\Core\CiviEventDispatcherInterface;
+use Civi\Schema\EntityRepository;
 use CRM_Core_DAO_AllCoreTables as AllCoreTables;
 
 /**
@@ -64,10 +65,14 @@ class SchemaMapBuilder extends AutoService {
    */
   private function loadTables(SchemaMap $map) {
     /** @var \CRM_Core_DAO $daoName */
-    foreach (AllCoreTables::getEntities() as $name => $data) {
+    foreach (EntityRepository::getEntities() as $name => $data) {
+      if (empty($data['table'])) {
+        continue;
+      }
       $table = new Table($data['table']);
-      foreach ($data['class']::fields() as $fieldData) {
-        $this->addJoins($table, $fieldData['name'], $fieldData);
+      $entity = \Civi::entity($name);
+      foreach ($entity->getFields() as $fieldName => $fieldData) {
+        $this->addJoins($table, $fieldName, $fieldData);
       }
       $map->addTable($table);
       if (in_array($name, $this->apiEntities)) {
@@ -78,19 +83,20 @@ class SchemaMapBuilder extends AutoService {
 
   /**
    * @param Table $table
-   * @param string $field
+   * @param string $fieldName
    * @param array $data
    */
-  private function addJoins(Table $table, $field, array $data) {
-    $fkClass = $data['FKClassName'] ?? NULL;
-
-    // can there be multiple methods e.g. pseudoconstant and fkclass
-    if ($fkClass) {
-      $tableName = AllCoreTables::getTableForClass($fkClass);
-      $fkKey = $data['FKKeyColumn'] ?? 'id';
-      $joinable = new Joinable($tableName, $fkKey, $field);
+  private function addJoins(Table $table, $fieldName, array $data) {
+    $fkEntity = $data['entity_reference']['entity'] ?? NULL;
+    if (!$fkEntity) {
+      return;
+    }
+    $tableName = AllCoreTables::getTableForEntityName($fkEntity);
+    if ($tableName) {
+      $fkKey = $data['entity_reference']['key'] ?? 'id';
+      $joinable = new Joinable($tableName, $fkKey, $fieldName);
       $joinable->setJoinType($joinable::JOIN_TYPE_MANY_TO_ONE);
-      $table->addTableLink($field, $joinable);
+      $table->addTableLink($fieldName, $joinable);
     }
   }
 

@@ -58,7 +58,7 @@ class LegacySqlEntityMetadata extends EntityMetadataBase {
     foreach ($this->getClassName()::fields() as $uniqueName => $legacyField) {
       $fieldName = $legacyField['name'];
       $field = [
-        'title' => $legacyField['title'],
+        'title' => $legacyField['title'] ?? $fieldName,
         'sql_type' => $this->getSqlType($legacyField),
         'input_type' => $legacyField['html']['type'] ?? NULL,
         'description' => $legacyField['description'] ?? NULL,

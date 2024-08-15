@@ -157,18 +157,26 @@ class SpecGatherer extends AutoService implements EventSubscriberInterface {
    * @param \Civi\Api4\Service\Spec\RequestSpec $spec
    */
   private function addDAOFields(string $entityName, RequestSpec $spec) {
-    $DAOFields = $this->getDAOFields($entityName);
+    $entity = \Civi::entity(CoreUtil::isContact($entityName) ? 'Contact' : $entityName);
+    $daoClass = $entity->getMeta('class');
+    if ($daoClass) {
+      $baoClass = \CRM_Core_DAO_AllCoreTables::getBAOClassName($daoClass);
+    }
 
-    foreach ($DAOFields as $DAOField) {
-      if (isset($DAOField['contactType']) && $spec->getValue('contact_type') && $DAOField['contactType'] !== $spec->getValue('contact_type')) {
+    foreach ($entity->getSupportedFields() as $name => $field) {
+      if (isset($field['contact_type']) && $spec->getValue('contact_type') && $field['contact_type'] !== $spec->getValue('contact_type')) {
         continue;
       }
-      if (!empty($DAOField['component']) && !\CRM_Core_Component::isEnabled($DAOField['component'])) {
+      if (!empty($field['component']) && !\CRM_Core_Component::isEnabled($field['component'])) {
         continue;
       }
-      $this->setDynamicFk($DAOField, $spec);
-      $field = SpecFormatter::arrayToField($DAOField, $entityName);
-      $spec->addFieldSpec($field);
+      $field['name'] = $name;
+      if (!empty($baoClass)) {
+        $field['bao'] = $baoClass;
+      }
+      $this->setDynamicFk($field, $spec);
+      $fieldSpec = SpecFormatter::arrayToField($field, $entityName);
+      $spec->addFieldSpec($fieldSpec);
     }
   }
 
@@ -181,17 +189,17 @@ class SpecGatherer extends AutoService implements EventSubscriberInterface {
    * Additionally, if $values contains a value for e.g. `entity_table`,
    * then getFields will also output the corresponding `fk_entity` for the `entity_id` field.
    */
-  private function setDynamicFk(array &$DAOField, RequestSpec $spec): void {
-    if (empty($DAOField['FKClassName']) && !empty($DAOField['bao']) && $DAOField['type'] == \CRM_Utils_Type::T_INT) {
+  private function setDynamicFk(array &$field, RequestSpec $spec): void {
+    if (!empty($field['entity_reference']['dynamic_entity']) && !empty($field['bao'])) {
       // Check if this field is a key for a dynamic FK
-      foreach ($DAOField['bao']::getReferenceColumns() ?? [] as $reference) {
-        if ($reference instanceof \CRM_Core_Reference_Dynamic && $reference->getReferenceKey() === $DAOField['name']) {
-          $entityTableColumn = $reference->getTypeColumn();
-          $DAOField['DFKEntities'] = $reference->getTargetEntities();
-          $DAOField['html']['controlField'] = $entityTableColumn;
+      foreach ($field['bao']::getReferenceColumns() ?? [] as $reference) {
+        if ($reference instanceof \CRM_Core_Reference_Dynamic && $reference->getReferenceKey() === $field['name']) {
+          $entityTableColumn = $field['entity_reference']['dynamic_entity'];
+          $field['DFKEntities'] = $reference->getTargetEntities();
+          $field['input_attrs']['controlField'] = $entityTableColumn;
           // If we have a value for entity_table then this field can pretend to be a single FK too.
-          if ($spec->hasValue($entityTableColumn) && $DAOField['DFKEntities']) {
-            $DAOField['FKClassName'] = \CRM_Core_DAO_AllCoreTables::getDAONameForEntity($DAOField['DFKEntities'][$spec->getValue($entityTableColumn)]);
+          if ($spec->hasValue($entityTableColumn) && $field['DFKEntities']) {
+            $field['entity_reference']['entity'] = $field['DFKEntities'][$spec->getValue($entityTableColumn)];
           }
           break;
         }
@@ -309,20 +317,6 @@ class SpecGatherer extends AutoService implements EventSubscriberInterface {
         return;
       }
     }
-  }
-
-  /**
-   * @param string $entityName
-   *
-   * @return array
-   * @throws \CRM_Core_Exception
-   */
-  private function getDAOFields(string $entityName): array {
-    $bao = CoreUtil::getBAOFromApiName($entityName);
-    if (!$bao) {
-      throw new \CRM_Core_Exception('Entity not loaded: ' . $entityName);
-    }
-    return $bao::getSupportedFields();
   }
 
 }
