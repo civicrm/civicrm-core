@@ -124,8 +124,7 @@ function dm_install_coreext() {
 ## Get a list of default/core extension directories (space-delimited)
 ## reldirs=$(dm_core_exts)
 function dm_core_exts() {
-  ## grep to exclude comments and blank lines
-  grep '^[a-zA-Z]' "$DM_SOURCEDIR"/distmaker/core-ext.txt
+  bash "$DM_SOURCEDIR/tools/bin/scripts/ls-core-ext" "$DM_SOURCEDIR/ext"
 }
 
 ## Copy all packages
