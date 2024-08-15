@@ -141,9 +141,6 @@ class CRM_Contact_Form_Task_LabelCommon {
     // except it also handles multiple locations
     [$details] = CRM_Contact_BAO_Query::apiQuery($params, $returnProperties, NULL, NULL, 0, $numberofContacts);
 
-    // $details is an array of [ contactID => contactDetails ]
-    $tokenFields = CRM_Contact_Form_Task_LabelCommon::getTokenData($details);
-
     foreach ($contactIDs as $value) {
       foreach ($custom as $cfID) {
         if (isset($details[$value]["custom_{$cfID}"])) {
@@ -163,10 +160,6 @@ class CRM_Contact_Form_Task_LabelCommon {
         // If location type is not primary, $contact contains
         // one more array as "$contact[$locName] = array( values... )"
 
-        if (!CRM_Contact_Form_Task_Label::tokenIsFound($contact, $mailingFormatProperties, $tokenFields)) {
-          continue;
-        }
-
         unset($contact[$locName]);
 
         if (!empty($contact['county_id'])) {
@@ -178,9 +171,6 @@ class CRM_Contact_Form_Task_LabelCommon {
         }
       }
       else {
-        if (!CRM_Contact_Form_Task_Label::tokenIsFound($contact, $mailingFormatProperties, $tokenFields)) {
-          continue;
-        }
 
         if (!empty($contact['addressee_display'])) {
           $contact['addressee_display'] = trim($contact['addressee_display']);
@@ -196,7 +186,7 @@ class CRM_Contact_Form_Task_LabelCommon {
       }
     }
     // sigh couldn't extract out tokenfields yet
-    return [$rows, $tokenFields];
+    return [$rows];
   }
 
   /**
@@ -216,35 +206,6 @@ class CRM_Contact_Form_Task_LabelCommon {
       $addressReturnProperties['postal_code_suffix'] = 1;
     }
     return $addressReturnProperties;
-  }
-
-  /**
-   * Get token list from mailing format & contacts
-   * @param array $contacts
-   * @return array
-   */
-  public static function getTokenData(&$contacts) {
-    $mailingFormat = Civi::settings()->get('mailing_format');
-    $tokens = $tokenFields = [];
-    $messageToken = CRM_Utils_Token::getTokens($mailingFormat);
-
-    // also get all token values
-    CRM_Utils_Hook::tokenValues($contacts,
-      array_keys($contacts),
-      NULL,
-      $messageToken,
-      'CRM_Contact_Form_Task_LabelCommon'
-    );
-
-    CRM_Utils_Hook::tokens($tokens);
-
-    foreach ($tokens as $category => $catTokens) {
-      foreach ($catTokens as $token => $tokenName) {
-        $tokenFields[] = $token;
-      }
-    }
-    return $tokenFields;
-
   }
 
   /**
