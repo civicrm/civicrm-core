@@ -26,6 +26,7 @@ recaptcha
 search_kit
 sequentialcreditnotes
 standaloneusers
+tellafriend
 legacycustomsearches
 elavon
 civi_campaign
