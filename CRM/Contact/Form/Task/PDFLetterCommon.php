@@ -17,21 +17,9 @@
 
 /**
  * This class provides the common functionality for creating PDF letter for one or a group of contact ids.
+ *
+ * @deprecated since 5.59 will be removed around 5.89.
  */
 class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetterCommon {
-
-  /**
-   * @return array
-   *   Array(string $machineName => string $label).
-   */
-  public static function getLoggingOptions() {
-    return [
-      'none' => ts('Do not record'),
-      'multiple' => ts('Multiple activities (one per contact)'),
-      'combined' => ts('One combined activity'),
-      'combined-attached' => ts('One combined activity plus one file attachment'),
-      // 'multiple-attached' <== not worth the work
-    ];
-  }
 
 }
