@@ -195,7 +195,7 @@ and has two consecutive lines.
 And one blank line.
 ENDDETAILS
         ],
-        '<span class="crm-frozen-field">This is text only<br />and has two consecutive lines.<br /><br />And one blank line.</span>',
+        '<span class="crm-frozen-field">This is text only<br>and has two consecutive lines.<br><br>And one blank line.</span>',
       ],
 
       'bulkemail-text' => [
@@ -210,7 +210,7 @@ And one blank line.
 ENDDETAILS
         ],
         // Note this is the summary of the actual bulk mailing text. The above details are a bit irrelevant for what we're testing here.
-        '<td class="label nowrap">Text Message</td><td>This<br />address<br /><br />is not ours:...<br />',
+        '<td class="label nowrap">Text Message</td><td>This<br>address<br><br>is not ours:...<br>',
       ],
 
       'email-text' => [
@@ -224,7 +224,7 @@ and has two consecutive lines.
 And one blank line.
 ENDDETAILS
         ],
-        '<td class="view-value report">                   This is text only<br />and has two consecutive lines.<br /><br />And one blank line.',
+        '<td class="view-value report">                   This is text only<br>and has two consecutive lines.<br><br>And one blank line.',
       ],
 
       'inbound-text' => [
@@ -238,7 +238,7 @@ and has two consecutive lines.
 And one blank line.
 ENDDETAILS
         ],
-        '<span class="crm-frozen-field">This is text only<br />and has two consecutive lines.<br /><br />And one blank line.</span>',
+        '<span class="crm-frozen-field">This is text only<br>and has two consecutive lines.<br><br>And one blank line.</span>',
       ],
 
       // Now html only
@@ -270,7 +270,7 @@ ENDDETAILS
 ENDDETAILS
         ],
         // Note this is the summary of the actual bulk mailing text. The above details are a bit irrelevant for what we're testing here.
-        '<td class="label nowrap">Text Message</td><td>This<br />address<br /><br />is not ours:...<br />',
+        '<td class="label nowrap">Text Message</td><td>This<br>address<br><br>is not ours:...<br>',
       ],
 
       'email-html' => [
@@ -316,14 +316,14 @@ and has two consecutive lines.
 
 And one blank line.
 -ALTERNATIVE ITEM 1-
-<p>This is mixed<br />
+<p>This is mixed<br>
 and has two consecutive lines.</p>
 
 <p>And one blank line.</p>
 -ALTERNATIVE END-
 ENDDETAILS
         ],
-        'This is mixed<br />and has two consecutive lines.<br /><br />And one blank line.',
+        'This is mixed<br>and has two consecutive lines.<br><br>And one blank line.',
       ],
 
       'bulkemail-mixed-text' => [
@@ -337,7 +337,7 @@ and has two consecutive lines.
 
 And one blank line.
 -ALTERNATIVE ITEM 1-
-<p>This is mixed<br />
+<p>This is mixed<br>
 and has two consecutive lines.</p>
 
 <p>And one blank line.</p>
@@ -345,7 +345,7 @@ and has two consecutive lines.</p>
 ENDDETAILS
         ],
         // Note this is the summary of the actual bulk mailing text. The above details are a bit irrelevant for what we're testing here.
-        '<td class="label nowrap">Text Message</td><td>This<br />address<br /><br />is not ours:...<br />',
+        '<td class="label nowrap">Text Message</td><td>This<br>address<br><br>is not ours:...<br>',
       ],
 
       'email-mixed-text' => [
@@ -359,14 +359,14 @@ and has two consecutive lines.
 
 And one blank line.
 -ALTERNATIVE ITEM 1-
-<p>This is mixed<br />
+<p>This is mixed<br>
 and has two consecutive lines.</p>
 
 <p>And one blank line.</p>
 -ALTERNATIVE END-
 ENDDETAILS
         ],
-        '<td class="view-value report">                   <br />This is mixed<br />and has two consecutive lines.<br /><br />And one blank line.<br />',
+        '<td class="view-value report">                   <br>This is mixed<br>and has two consecutive lines.<br><br>And one blank line.<br>',
       ],
 
       'inbound-mixed-text' => [
@@ -380,14 +380,14 @@ and has two consecutive lines.
 
 And one blank line.
 -ALTERNATIVE ITEM 1-
-<p>This is mixed<br />
+<p>This is mixed<br>
 and has two consecutive lines.</p>
 
 <p>And one blank line.</p>
 -ALTERNATIVE END-
 ENDDETAILS
         ],
-        '<td class="view-value">       <br />This is mixed<br />and has two consecutive lines.<br /><br />And one blank line.<br />',
+        '<td class="view-value">       <br>This is mixed<br>and has two consecutive lines.<br><br>And one blank line.<br>',
       ],
 
       // Now mixed with html first
@@ -397,7 +397,7 @@ ENDDETAILS
           'url' => 'civicrm/activity?atype=%%atype%%&action=view&reset=1&id=%%id%%&cid=%%cid%%&context=activity',
           'details' => <<<'ENDDETAILS'
 -ALTERNATIVE ITEM 0-
-<p>This is mixed<br />
+<p>This is mixed<br>
 and has two consecutive lines.</p>
 
 <p>And one blank line.</p>
@@ -409,7 +409,7 @@ And one blank line.
 -ALTERNATIVE END-
 ENDDETAILS
         ],
-        '<td class="view-value">       <p>This is mixed<br />and has two consecutive lines.</p><p>And one blank line.</p>',
+        '<td class="view-value">       <p>This is mixed<br>and has two consecutive lines.</p><p>And one blank line.</p>',
       ],
 
       'bulkemail-mixed-html' => [
@@ -418,7 +418,7 @@ ENDDETAILS
           'url' => 'civicrm/activity/view?atype=%%atype%%&action=view&reset=1&id=%%id%%&cid=%%cid%%&context=activity',
           'details' => <<<'ENDDETAILS'
 -ALTERNATIVE ITEM 0-
-<p>This is mixed<br />
+<p>This is mixed<br>
 and has two consecutive lines.</p>
 
 <p>And one blank line.</p>
@@ -431,7 +431,7 @@ And one blank line.
 ENDDETAILS
         ],
         // Note this is the summary of the actual bulk mailing text. The above details are a bit irrelevant for what we're testing here.
-        '<td class="label nowrap">Text Message</td><td>This<br />address<br /><br />is not ours:...<br />',
+        '<td class="label nowrap">Text Message</td><td>This<br>address<br><br>is not ours:...<br>',
       ],
 
       'email-mixed-html' => [
@@ -440,7 +440,7 @@ ENDDETAILS
           'url' => 'civicrm/activity/view?atype=%%atype%%&action=view&reset=1&id=%%id%%&cid=%%cid%%&context=activity',
           'details' => <<<'ENDDETAILS'
 -ALTERNATIVE ITEM 0-
-<p>This is mixed<br />
+<p>This is mixed<br>
 and has two consecutive lines.</p>
 
 <p>And one blank line.</p>
@@ -452,7 +452,7 @@ And one blank line.
 -ALTERNATIVE END-
 ENDDETAILS
         ],
-        '<p>This is mixed<br />and has two consecutive lines.</p><p>And one blank line.</p>',
+        '<p>This is mixed<br>and has two consecutive lines.</p><p>And one blank line.</p>',
       ],
 
       'inbound-mixed-html' => [
@@ -461,7 +461,7 @@ ENDDETAILS
           'url' => 'civicrm/contact/view/activity?atype=%%atype%%&action=view&reset=1&id=%%id%%&cid=%%cid%%&context=activity',
           'details' => <<<'ENDDETAILS'
 -ALTERNATIVE ITEM 0-
-<p>This is mixed<br />
+<p>This is mixed<br>
 and has two consecutive lines.</p>
 
 <p>And one blank line.</p>
@@ -473,7 +473,7 @@ And one blank line.
 -ALTERNATIVE END-
 ENDDETAILS
         ],
-        '<p>This is mixed<br />and has two consecutive lines.</p><p>And one blank line.</p>',
+        '<p>This is mixed<br>and has two consecutive lines.</p><p>And one blank line.</p>',
       ],
     ];
 
@@ -501,10 +501,10 @@ ENDDETAILS
       $newData['case-' . $key][0]['url'] = 'civicrm/case/activity/view?reset=1&aid=%%id%%&cid=%%cid%%&caseid=%%caseid%%';
     }
     $newData['case-meeting-text'][0]['skip'] = FALSE;
-    $newData['case-meeting-text'][1] = 'This is text only<br />and has two consecutive lines.<br /><br />And one blank line.';
-    $newData['case-bulkemail-text'][1] = 'This is text only<br />and has two consecutive lines.<br /><br />And one blank line.';
-    $newData['case-email-text'][1] = 'This is text only<br />and has two consecutive lines.<br /><br />And one blank line.';
-    $newData['case-inbound-text'][1] = 'This is text only<br />and has two consecutive lines.<br /><br />And one blank line.';
+    $newData['case-meeting-text'][1] = 'This is text only<br>and has two consecutive lines.<br><br>And one blank line.';
+    $newData['case-bulkemail-text'][1] = 'This is text only<br>and has two consecutive lines.<br><br>And one blank line.';
+    $newData['case-email-text'][1] = 'This is text only<br>and has two consecutive lines.<br><br>And one blank line.';
+    $newData['case-inbound-text'][1] = 'This is text only<br>and has two consecutive lines.<br><br>And one blank line.';
 
     $newData['case-meeting-html'][1] = "<p>This is html only</p><p>And it usually looks like this.</p><p>With p's and newlines between the p's.</p>";
     $newData['case-bulkemail-html'][1] = "<p>This is html only</p><p>And it usually looks like this.</p><p>With p's and newlines between the p's.</p>";
@@ -512,15 +512,15 @@ ENDDETAILS
     $newData['case-inbound-html'][1] = "<p>This is html only</p><p>And it usually looks like this.</p><p>With p's and newlines between the p's.</p>";
 
     $newData['case-meeting-mixed-text'][0]['skip'] = FALSE;
-    $newData['case-meeting-mixed-text'][1] = 'This is mixed<br />and has two consecutive lines.<br /><br />And one blank line.';
-    $newData['case-bulkemail-mixed-text'][1] = 'This is mixed<br />and has two consecutive lines.<br /><br />And one blank line.';
-    $newData['case-email-mixed-text'][1] = 'This is mixed<br />and has two consecutive lines.<br /><br />And one blank line.';
-    $newData['case-inbound-mixed-text'][1] = 'This is mixed<br />and has two consecutive lines.<br /><br />And one blank line.';
+    $newData['case-meeting-mixed-text'][1] = 'This is mixed<br>and has two consecutive lines.<br><br>And one blank line.';
+    $newData['case-bulkemail-mixed-text'][1] = 'This is mixed<br>and has two consecutive lines.<br><br>And one blank line.';
+    $newData['case-email-mixed-text'][1] = 'This is mixed<br>and has two consecutive lines.<br><br>And one blank line.';
+    $newData['case-inbound-mixed-text'][1] = 'This is mixed<br>and has two consecutive lines.<br><br>And one blank line.';
 
-    $newData['case-meeting-mixed-html'][1] = '<p>This is mixed<br />and has two consecutive lines.</p><p>And one blank line.</p>';
-    $newData['case-bulkemail-mixed-html'][1] = '<p>This is mixed<br />and has two consecutive lines.</p><p>And one blank line.</p>';
-    $newData['case-email-mixed-html'][1] = '<p>This is mixed<br />and has two consecutive lines.</p><p>And one blank line.</p>';
-    $newData['case-inbound-mixed-html'][1] = '<p>This is mixed<br />and has two consecutive lines.</p><p>And one blank line.</p>';
+    $newData['case-meeting-mixed-html'][1] = '<p>This is mixed<br>and has two consecutive lines.</p><p>And one blank line.</p>';
+    $newData['case-bulkemail-mixed-html'][1] = '<p>This is mixed<br>and has two consecutive lines.</p><p>And one blank line.</p>';
+    $newData['case-email-mixed-html'][1] = '<p>This is mixed<br>and has two consecutive lines.</p><p>And one blank line.</p>';
+    $newData['case-inbound-mixed-html'][1] = '<p>This is mixed<br>and has two consecutive lines.</p><p>And one blank line.</p>';
 
     return $newData;
   }
