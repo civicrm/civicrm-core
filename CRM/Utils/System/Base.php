@@ -749,16 +749,40 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * Set timezone in mysql so that timestamp fields show the correct time.
+   * Set MySQL timezone so that timestamp fields show the correct time.
+   *
+   * @param ?string $timeZone
+   *    Timezone string - if none provided will be fetched from system
    */
-  public function setMySQLTimeZone() {
-    $timeZoneOffset = $this->getTimeZoneOffset();
+  public function setMySQLTimeZone(?string $timeZone = NULL) {
+    $timeZone = $timeZone ?? $this->getTimeZoneString();
+    $timeZoneOffset = \CRM_Utils_Time::getTimeZoneOffsetFromString($timeZone);
     if ($timeZoneOffset) {
       $sql = "SET time_zone = '$timeZoneOffset'";
       CRM_Core_DAO::executeQuery($sql);
     }
   }
 
+  /**
+   * Set PHP timezone
+   *
+   * @param ?string $timeZone
+   *    Timezone string - if none provided will be fetched from system
+   */
+  public function setPhpTimeZone(?string $timeZone = NULL) {
+    $timeZone = $timeZone ?? $this->getTimeZoneString();
+    date_default_timezone_set($timeZone);
+  }
+
+  /**
+   * Set system timezone (both PHP + MySQL)
+   */
+  public function setTimeZone(?string $timeZone = NULL) {
+    $timeZone = $timeZone ?? $this->getTimeZoneString();
+
+    $this->setPhpTimeZone($timeZone);
+    $this->setMySQLTimeZone($timeZone);
+  }
 
   /**
    * Get timezone from CMS as a string.
