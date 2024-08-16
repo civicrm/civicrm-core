@@ -12,6 +12,9 @@ return [
     'add' => '2.2',
     'label_field' => 'title',
   ],
+  'getPaths' => fn() => [
+    'update' => 'civicrm/pcp/info?reset=1&action=update&id=[id]',
+  ],
   'getFields' => fn() => [
     'id' => [
       'title' => ts('Personal Campaign Page ID'),
