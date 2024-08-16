@@ -1250,4 +1250,11 @@ abstract class CRM_Utils_System_Base {
     return $profile;
   }
 
+  /**
+   * Hook for further system boot once the main CiviCRM
+   * Container is up (only used in Standalone currently)
+   */
+  public function postContainerBoot(): void {
+  }
+
 }
