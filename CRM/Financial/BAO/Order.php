@@ -980,8 +980,6 @@ class CRM_Financial_BAO_Order {
       // requires it for line retrieval but we want to fix that as it
       // should not be required at that point.
       $this->setPriceSetIDFromSelectedField($lineItem['price_field_id']);
-      // Set any pre-calculation to zero as we will calculate.
-      $lineItem['tax_amount'] = 0;
       if ($this->isOverrideLineItemFinancialType($lineItem['financial_type_id']) !== FALSE) {
         $lineItem['financial_type_id'] = $this->getOverrideFinancialTypeID();
       }
@@ -990,7 +988,7 @@ class CRM_Financial_BAO_Order {
         $this->addTotalsToLineBasedOnOverrideTotal((int) $lineItem['financial_type_id'], $lineItem);
       }
       elseif ($taxRate) {
-        $lineItem['tax_amount'] = ($taxRate / 100) * $lineItem['line_total'];
+        $lineItem['tax_amount'] = $lineItem['tax_amount'] ?? (($taxRate / 100) * $lineItem['line_total']);
       }
       $lineItem['membership_type_id'] ??= NULL;
       if ($lineItem['membership_type_id']) {
@@ -1014,9 +1012,9 @@ class CRM_Financial_BAO_Order {
 
       }
       elseif ($taxRate) {
-        $lineItem['tax_amount'] = ($taxRate / 100) * $lineItem['line_total'];
+        $lineItem['tax_amount'] = $lineItem['tax_amount'] ?? (($taxRate / 100) * $lineItem['line_total']);
       }
-      $lineItem['line_total_inclusive'] = $lineItem['line_total_inclusive'] ?? ($lineItem['line_total'] + $lineItem['tax_amount']);
+      $lineItem['line_total_inclusive'] = $lineItem['line_total_inclusive'] ?? ($lineItem['line_total'] + ($lineItem['tax_amount'] ?? 0));
     }
     return $lineItems;
   }
