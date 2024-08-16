@@ -25,6 +25,7 @@ use Civi\Api4\CustomGroup;
 use Civi\Api4\CustomValue;
 use Civi\Api4\OptionGroup;
 use Civi\Api4\OptionValue;
+use Civi\Api4\Activity;
 
 /**
  * @group headless
@@ -135,6 +136,53 @@ class CreateCustomValueTest extends CustomTestBase {
     $this->assertEquals('2022-02-02', $result['date_field']);
     $this->assertEquals('2022-02-02 12:07:31', $result['date_time_field']);
 
+  }
+
+  public function testEmptyValueArrayForCustomFields(): void {
+    $contactID = $this->createTestRecord('Contact')['id'];
+    CustomGroup::create(FALSE)
+      ->addValue('title', 'MyActivityFields')
+      ->addValue('name', 'MyActivityFields')
+      ->addValue('extends', 'Activity')
+      ->execute();
+
+    $optionValues = ['r' => 'Red', 'g' => 'Green', 'b' => 'Blue'];
+    CustomField::create(FALSE)
+      ->addValue('custom_group_id:name', 'MyActivityFields')
+      ->addValue('label', 'Activity Checkbox Field')
+      ->addValue('name', 'activity_checkbox_field')
+      ->addValue('data_type', 'String')
+      ->addValue('html_type', 'CheckBox')
+      ->addValue('option_values', $optionValues)
+      ->execute();
+
+    $optionValues = ['o' => 'Orange', 'p' => 'Purple', 'c' => 'Crimson'];
+    CustomField::create(FALSE)
+      ->addValue('custom_group_id:name', 'MyActivityFields')
+      ->addValue('label', 'Activity Select Field')
+      ->addValue('name', 'activity_select_field')
+      ->addValue('data_type', 'String')
+      ->addValue('html_type', 'CheckBox')
+      ->addValue('option_values', $optionValues)
+      ->execute();
+    Activity::create()
+      ->setValues([
+        'source_contact_id' => $contactID,
+        'target_contact_id' => $contactID,
+        'subject' => 'Test Empty Custom Field Test Checkbox',
+        'activity_type_id:name' => 'Meeting',
+        'MyActivityFields.activity_checkbox_field' => [],
+      ])
+      ->execute();
+    Activity::create()
+      ->setValues([
+        'source_contact_id' => $contactID,
+        'target_contact_id' => $contactID,
+        'subject' => 'Test Empty Custom Field Test Select',
+        'activity_type_id:name' => 'Meeting',
+        'MyActivityFields.activity_select_field' => [],
+      ])
+      ->execute();
   }
 
 }
