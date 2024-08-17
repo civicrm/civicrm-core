@@ -81,6 +81,7 @@ class CRM_Utils_Token {
    * @return array
    */
   public static function getRequiredTokens() {
+    CRM_Core_Error::deprecatedFunctionWarning('token processor');
     if (self::$_requiredTokens == NULL) {
       self::$_requiredTokens = [
         'domain.address' => ts("Domain address - displays your organization's postal address."),
@@ -106,8 +107,7 @@ class CRM_Utils_Token {
    *    else an array of the missing tokens
    */
   public static function requiredTokens(&$str) {
-    // FlexMailer is a refactoring of CiviMail which provides new hooks/APIs/docs. If the sysadmin has opted to enable it, then use that instead of CiviMail.
-    $requiredTokens = defined('CIVICRM_FLEXMAILER_HACK_REQUIRED_TOKENS') ? Civi\Core\Resolver::singleton()->call(CIVICRM_FLEXMAILER_HACK_REQUIRED_TOKENS, []) : CRM_Utils_Token::getRequiredTokens();
+    $requiredTokens = Civi\Core\Resolver::singleton()->call('call://civi_flexmailer_required_tokens/getRequiredTokens', []);
 
     $missing = [];
     foreach ($requiredTokens as $token => $value) {

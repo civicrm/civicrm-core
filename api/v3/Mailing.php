@@ -41,11 +41,7 @@ function civicrm_api3_mailing_create($params) {
     && $params['scheduled_date'] !== 'null'
     // This might have been passed in as empty to prevent us validating, is set skip.
     && !isset($params['_evil_bao_validator_'])) {
-
-    // FlexMailer is a refactoring of CiviMail which provides new hooks/APIs/docs. If the sysadmin has opted to enable it, then use that instead of CiviMail.
-    $function = \CRM_Utils_Constant::value('CIVICRM_FLEXMAILER_HACK_SENDABLE', 'CRM_Mailing_BAO_Mailing::checkSendable');
-    $validationFunction = Civi\Core\Resolver::singleton()->get($function);
-    $errors = call_user_func($validationFunction, $params);
+    $errors = \Civi\FlexMailer\Validator::createAndRun($params);
     if (!empty($errors)) {
       $fields = implode(',', array_keys($errors));
       throw new CRM_Core_Exception("Mailing cannot be sent. There are missing or invalid fields ($fields).", 'cannot-send', $errors);
