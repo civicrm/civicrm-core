@@ -21,16 +21,6 @@ return [
     ],
   ],
   'getFields' => fn() => [
-    'id' => [
-      'title' => ts('Group Contact Cache ID'),
-      'sql_type' => 'int unsigned',
-      'input_type' => 'Number',
-      'required' => TRUE,
-      'description' => ts('primary key'),
-      'add' => '2.1',
-      'primary_key' => TRUE,
-      'auto_increment' => TRUE,
-    ],
     'group_id' => [
       'title' => ts('Group ID'),
       'sql_type' => 'int unsigned',
