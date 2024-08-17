@@ -14,7 +14,7 @@ fi
 SRC=$DM_SOURCEDIR
 TRG=$DM_TMPDIR/civicrm
 
-# copy all the rest of the stuff
+dm_h1 "Prepare files (civicrm-*-joomla.zip)"
 dm_reset_dirs "$TRG" "$DM_TMPDIR/com_civicrm"
 cp $SRC/civicrm.config.php $TRG
 dm_generate_version "$TRG/civicrm-version.php" Joomla

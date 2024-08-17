@@ -14,7 +14,7 @@ fi
 SRC=$DM_SOURCEDIR
 TRG=$DM_TMPDIR/civicrm
 
-# copy all the stuff
+dm_h1 "Prepare files (civicrm-*-l10n.tar.gz)"
 dm_reset_dirs "$TRG"
 dm_install_l10n "$SRC/l10n" "$TRG/l10n"
 
@@ -23,9 +23,9 @@ for F in $SRC/sql/civicrm_*.??_??.mysql; do
 	cp $F $TRG/sql
 done
 
-# gen tarball
+dm_h1 "Generate archive (civicrm-*-l10n.tar.gz)"
 cd $TRG/..
 tar czf $DM_TARGETDIR/civicrm-$DM_VERSION-l10n.tar.gz --exclude '*.po' --exclude pot civicrm
 
-# clean up
+dm_h1 "Clean up"
 rm -rf $TRG

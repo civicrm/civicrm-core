@@ -14,7 +14,7 @@ fi
 SRC=$DM_SOURCEDIR
 REPORT="$DM_TARGETDIR/civicrm-$DM_VERSION.json"
 
-dm_note "repo-report"
+dm_h1 "Generate repo report"
 env \
   DM_VERSION="$DM_VERSION" \
   DM_SOURCEDIR="$DM_SOURCEDIR" \
