@@ -350,3 +350,9 @@ function dm_preg_edit() {
   env RPAT="$1" RREPL="$2" RFILE="$3" \
     php -r '$c = file_get_contents(getenv("RFILE")); $c = preg_replace(getenv("RPAT"), getenv("RREPL"), $c); file_put_contents(getenv("RFILE"), $c);'
 }
+
+## Wrapper for 'zip' cli
+function dm_zip() {
+  dm_note "dm_zip: $@"
+  ${DM_ZIP:-zip} -q -r -9 "$@"
+}
