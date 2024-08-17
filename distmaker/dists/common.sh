@@ -1,5 +1,11 @@
 #!/bin/bash
 
+function dm_title() {
+  echo
+  echo "====[[ $@ ]]===="
+  echo
+}
+
 function dm_h1() {
   echo
   echo "# $@"
