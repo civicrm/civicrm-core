@@ -23,16 +23,6 @@ return [
     ],
   ],
   'getFields' => fn() => [
-    'id' => [
-      'title' => ts('ACL Contact Cache ID'),
-      'sql_type' => 'int unsigned',
-      'input_type' => 'Number',
-      'required' => TRUE,
-      'description' => ts('primary key'),
-      'add' => '3.1',
-      'primary_key' => TRUE,
-      'auto_increment' => TRUE,
-    ],
     'user_id' => [
       'title' => ts('Contact ID'),
       'sql_type' => 'int unsigned',
