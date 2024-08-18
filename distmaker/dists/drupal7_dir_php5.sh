@@ -1,5 +1,5 @@
 #!/bin/bash
-set -ex
+set -e
 
 P=`dirname $0`
 CFFILE=$P/../distmaker.conf
@@ -21,7 +21,7 @@ if [ -z $DM_DRUPALDIR ] ; then
   DM_DRUPALDIR="$SRC/drupal"
 fi
 
-# copy all the stuff
+dm_h1 "Prepare files (civicrm-*-drupal dir)"
 dm_reset_dirs "$TRG"
 cp $DM_DRUPALDIR/civicrm.config.php.drupal $TRG/civicrm.config.php
 dm_generate_version "$TRG/civicrm-version.php" Drupal
@@ -33,10 +33,10 @@ dm_install_bower "$SRC/bower_components" "$TRG/bower_components"
 dm_install_drupal "$DM_DRUPALDIR" "$TRG/drupal"
 dm_install_cvext com.iatspayments.civicrm "$TRG/ext/iatspayments"
 
-# gen tarball
+dm_h1 "Generate archive (civicrm-*-drupal dir)"
 cd $TRG
 rm -r $DM_OUTPUTDIR/*
 mv * $DM_OUTPUTDIR
 
-# clean up
+dm_h1 "Clean up"
 rm -rf $TRG
