@@ -105,8 +105,11 @@ class CRM_Utils_Token {
    * @return bool|array
    *   true if all required tokens are found,
    *    else an array of the missing tokens
+   *
+   * @deprecated since 5.78 will be removed around 5.90
    */
   public static function requiredTokens(&$str) {
+    CRM_Core_Error::deprecatedFunctionWarning('use flexmailer');
     $requiredTokens = Civi\Core\Resolver::singleton()->call('call://civi_flexmailer_required_tokens/getRequiredTokens', []);
 
     $missing = [];
