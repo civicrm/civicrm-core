@@ -3,6 +3,7 @@
 return [
   'standaloneusers_session_max_lifetime' => [
     'name'        => 'standaloneusers_session_max_lifetime',
+    'group'       => 'standaloneusers',
     'type'        => 'Integer',
     'title'       => ts('Maxiumum Session Lifetime'),
     'description' => ts('Duration (in seconds) until a user session expires'),
