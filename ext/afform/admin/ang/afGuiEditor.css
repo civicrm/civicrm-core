@@ -135,7 +135,7 @@
   text-align: right;
 }
 
-#afGuiEditor-canvas .af-gui-bar {
+#afGuiEditor-canvas-body.af-gui-mode-layout .af-gui-bar {
   height: 22px;
   width: 100%;
   transition: opacity .2s;
@@ -143,11 +143,11 @@
   font-family: "Courier New", Courier, monospace;
   font-size: 12px;
 }
-#afGuiEditor-canvas:not(.af-gui-menu-open) .af-gui-bar,
-#afGuiEditor-canvas:not(.af-gui-menu-open) .af-gui-container-title span:empty {
+#afGuiEditor-canvas:not(.af-gui-menu-open) .af-gui-mode-layout .af-gui-bar,
+#afGuiEditor-canvas:not(.af-gui-menu-open) .af-gui-mode-layout .af-gui-container-title span:empty {
   opacity: 0;
 }
-#afGuiEditor-canvas [ui-sortable] .af-gui-bar {
+#afGuiEditor-canvas-body.af-gui-mode-layout [ui-sortable] .af-gui-bar {
   cursor: move;
   background-color: #f2f2f2;
   position: absolute;
@@ -190,14 +190,14 @@ body.af-gui-dragging {
   min-height: 21px;
 }
 
-#afGuiEditor .af-gui-element {
+#afGuiEditor-canvas-body.af-gui-mode-layout .af-gui-element {
   position: relative;
   padding: 0 3px 3px;
   display: block;
   min-height: 21px;
 }
 
-#afGuiEditor .af-gui-container {
+#afGuiEditor-canvas-body.af-gui-mode-layout .af-gui-container {
   border: 2px dashed transparent;
   position: relative;
   padding: 22px 3px 3px;
@@ -207,7 +207,7 @@ body.af-gui-dragging {
 }
 
 /* Card style */
-#afGuiEditor .af-gui-container.af-container-style-pane {
+#afGuiEditor-canvas-body.af-gui-mode-layout .af-gui-container.af-container-style-pane {
   box-shadow: 1px 2px 8px 1px rgb(0, 0, 0, .3);
   background: linear-gradient(to bottom, #f2f2f2 0 22px, transparent 22px 100%) no-repeat;
   border-radius: 4px;
@@ -221,14 +221,14 @@ body.af-gui-dragging {
   display: block;
 }
 
-#afGuiEditor .af-gui-search-display {
+#afGuiEditor-canvas-body.af-gui-mode-layout .af-gui-search-display {
   border: 1px dotted gray;
   color: gray;
   padding: 3em;
   background-color: #f9f9f9;
 }
 
-#afGuiEditor .af-gui-container-type-fieldset {
+#afGuiEditor-canvas-body.af-gui-mode-layout .af-gui-container-type-fieldset {
   box-shadow: 0 0 5px #bbbbbb;
   margin-top: 20px;
   margin-bottom: 20px;
@@ -266,10 +266,10 @@ body.af-gui-dragging {
   background-color: rgba(255, 255, 255, .2);
 }
 
-#afGuiEditor #afGuiEditor-canvas .af-entity-selected {
+#afGuiEditor #afGuiEditor-canvas-body.af-gui-mode-layout .af-entity-selected {
   border: 2px dashed #0071bd;
 }
-#afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar {
+#afGuiEditor #afGuiEditor-canvas-body.af-gui-mode-layout .af-entity-selected > .af-gui-bar {
   background-color: #0071bd;
   opacity: 1;
   transition: opacity 0s;
@@ -373,13 +373,13 @@ body.af-gui-dragging {
   background-position: -24px 0;
 }
 
-#afGuiEditor .af-gui-layout.af-layout-cols {
+#afGuiEditor-canvas-body.af-gui-mode-layout .af-gui-layout.af-layout-cols {
   display: flex;
 }
-#afGuiEditor .af-gui-layout.af-layout-cols > div {
+#afGuiEditor-canvas-body.af-gui-mode-layout .af-gui-layout.af-layout-cols > div {
   flex: 1;
 }
-#afGuiEditor .af-gui-layout.af-layout-inline > div {
+#afGuiEditor-canvas-body.af-gui-mode-layout .af-gui-layout.af-layout-inline > div {
   display: inline-block;
   width: 300px;
   vertical-align: top;

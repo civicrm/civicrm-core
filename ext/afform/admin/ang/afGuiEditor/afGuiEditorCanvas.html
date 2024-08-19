@@ -30,8 +30,14 @@
     <ul class="nav nav-tabs">
       <li role="presentation" ng-class="{active: canvasTab === 'layout'}">
         <a href ng-click="canvasTab = 'layout'">
-          <i class="crm-i fa-list-alt"></i>
+          <i class="crm-i fa-table-cells-large"></i>
           <span>{{:: ts('Form Layout') }}</span>
+        </a>
+      </li>
+      <li role="presentation" ng-class="{active: canvasTab === 'list'}">
+        <a href ng-click="canvasTab = 'list'">
+          <i class="crm-i fa-list"></i>
+          <span>{{:: ts('List Elements') }}</span>
         </a>
       </li>
       <li role="presentation" ng-class="{active: canvasTab === 'markup'}">
@@ -43,7 +49,7 @@
     </ul>
 
   </div>
-  <div id="afGuiEditor-canvas-body" class="panel-body" ng-if="canvasTab === 'layout'">
+  <div id="afGuiEditor-canvas-body" class="panel-body af-gui-mode-{{ canvasTab }}" ng-if="canvasTab === 'layout' || canvasTab === 'list'">
     <af-gui-container ng-if="editor.layout" node="editor.layout" entity-name="editor.blockEntity" data-entity="{{ editor.blockEntity }}" ></af-gui-container>
   </div>
   <div class="panel-body" ng-if="canvasTab === 'markup'">
