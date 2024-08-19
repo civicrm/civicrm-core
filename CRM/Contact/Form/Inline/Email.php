@@ -19,18 +19,20 @@
  * Form helper class for an Email object.
  */
 class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
+  use CRM_Contact_Form_Edit_EmailBlockTrait;
+  use CRM_Contact_Form_ContactFormTrait;
 
   /**
    * Email addresses of the contact that is been viewed.
    * @var array
    */
-  private $_emails = [];
+  private array $_emails = [];
 
   /**
    * No of email blocks for inline edit.
    * @var int
    */
-  private $_blockCount = 6;
+  private int $_blockCount = 6;
 
   /**
    * Whether this contact has a first/last/organization/household name
@@ -41,30 +43,32 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
 
   /**
    * Call preprocess.
+   * @throws CRM_Core_Exception
    */
   public function preProcess() {
     parent::preProcess();
+    $this->_contactId = $this->getContactID();
 
-    //get all the existing email addresses
-    $email = new CRM_Core_BAO_Email();
-    $email->contact_id = $this->_contactId;
-
-    $this->_emails = CRM_Core_BAO_Block::retrieveBlock($email);
+    // Get all the existing email addresses, The array historically starts
+    // with 1 not 0 so we do something nasty to continue that.
+    $this->_emails = array_merge([0 => 1], (array) $this->getExistingEmails());
+    unset($this->_emails[0]);
 
     // Check if this contact has a first/last/organization/household name
-    if ($this->_contactType == 'Individual') {
-      $this->contactHasName = (bool) (CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactId, 'last_name')
-        || CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactId, 'first_name'));
+    if ($this->getContactValue('contact_type') === 'Individual') {
+      $this->contactHasName = (bool) ($this->getContactValue('last_name')
+        || $this->getContactValue('first_name'));
     }
     else {
-      $this->contactHasName = (bool) CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactId, strtolower($this->_contactType) . '_name');
+      $this->contactHasName = (bool) $this->getContactValue(strtolower($this->getContactValue('contact_type')) . '_name');
     }
   }
 
   /**
    * Build the form object elements for an email object.
+   * @throws CRM_Core_Exception
    */
-  public function buildQuickForm() {
+  public function buildQuickForm(): void {
     parent::buildQuickForm();
 
     $totalBlocks = $this->_blockCount;
@@ -87,7 +91,7 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
     $this->applyFilter('__ALL__', 'trim');
 
     for ($blockId = 1; $blockId < $totalBlocks; $blockId++) {
-      CRM_Contact_Form_Edit_Email::buildQuickForm($this, $blockId, TRUE);
+      $this->addEmailBlockFields($blockId);
     }
 
     $this->addFormRule(['CRM_Contact_Form_Inline_Email', 'formRule'], $this);
@@ -146,8 +150,7 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
     }
     else {
       // get the default location type
-      $locationType = CRM_Core_BAO_LocationType::getDefault();
-      $defaults['email'][1]['location_type_id'] = $locationType->id;
+      $defaults['email'][1]['location_type_id'] = CRM_Core_BAO_LocationType::getDefault()->id;
     }
 
     return $defaults;
@@ -155,20 +158,19 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
 
   /**
    * Process the form.
+   *
+   * @throws CRM_Core_Exception
    */
-  public function postProcess() {
+  public function postProcess(): void {
     $params = $this->exportValues();
 
     // Process / save emails
-    $params['contact_id'] = $this->_contactId;
-    $params['updateBlankLocInfo'] = TRUE;
-    $params['email']['isIdSet'] = TRUE;
     foreach ($this->_emails as $count => $value) {
       if (!empty($value['id']) && isset($params['email'][$count])) {
         $params['email'][$count]['id'] = $value['id'];
       }
     }
-    CRM_Core_BAO_Block::create('email', $params);
+    $this->saveEmails($params['email']);
 
     // Changing email might change a contact's display_name so refresh name block content
     if (!$this->contactHasName) {
