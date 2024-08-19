@@ -40,7 +40,7 @@ class Utils {
       foreach ($entityValues[$entityName] as $record) {
         foreach ($record['fields'] as $fieldName => $fieldValue) {
           foreach ((array) $fieldValue as $value) {
-            if (array_key_exists($value, $formEntities) && $value !== $entityName) {
+            if (!is_bool($value) && array_key_exists($value, $formEntities) && $value !== $entityName) {
               $references[$value] = $value;
             }
           }
