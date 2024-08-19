@@ -537,9 +537,6 @@ class CRM_Extension_Mapper {
     if ($this->cache) {
       $this->cache->delete($this->cacheKey . '_moduleFiles');
     }
-    // FIXME: How can code so code wrong be so right?
-    CRM_Extension_System::singleton()->getClassLoader()->refresh();
-    CRM_Extension_System::singleton()->getMixinLoader()->run(TRUE);
   }
 
   /**
