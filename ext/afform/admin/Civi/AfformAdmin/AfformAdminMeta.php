@@ -121,7 +121,8 @@ class AfformAdminMeta {
     $fields = array_column($fields, NULL, 'name');
     $idField = CoreUtil::getIdFieldName($entityName);
     // Convert ID field to existing entity field
-    if (isset($fields[$idField])) {
+    // Unless it already references another entity (e.g. GroupSubscription)
+    if (isset($fields[$idField]) && empty($fields[$idField]['fk_entity'])) {
       $fields[$idField]['readonly'] = FALSE;
       $fields[$idField]['input_type'] = 'EntityRef';
       // Afform-only (so far) metadata tells the form to update an existing entity autofilled from this value

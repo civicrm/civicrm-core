@@ -536,9 +536,11 @@ abstract class AbstractAction implements \ArrayAccess {
       $record[$info['name']] = FormattingUtil::replacePseudoconstant($options, $info['val'], TRUE);
     }
     // The DAO works better with ints than booleans. See https://github.com/civicrm/civicrm-core/pull/23970
-    foreach ($record as $key => $value) {
-      if (is_bool($value)) {
-        $record[$key] = (int) $value;
+    if (CoreUtil::getInfoItem($this->getEntityName(), 'table_name')) {
+      foreach ($record as $key => $value) {
+        if (is_bool($value)) {
+          $record[$key] = (int) $value;
+        }
       }
     }
   }
@@ -561,7 +563,7 @@ abstract class AbstractAction implements \ArrayAccess {
       throw new \CRM_Core_Exception('Illegal character in expression');
     }
     $tpl = "{if $expr}1{else}0{/if}";
-    return (bool) trim(\CRM_Core_Smarty::singleton()->fetchWith('string:' . $tpl, $vars));
+    return (bool) trim(\CRM_Utils_String::parseOneOffStringThroughSmarty($tpl, $vars));
   }
 
   /**

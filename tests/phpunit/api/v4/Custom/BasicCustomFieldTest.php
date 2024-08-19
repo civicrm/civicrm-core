@@ -457,7 +457,7 @@ class BasicCustomFieldTest extends CustomTestBase {
       return CustomField::get(FALSE)
         ->addWhere('custom_group_id.name', '=', $groupName)
         ->addOrderBy('weight')
-        ->execute()->indexBy('name')->column('weight');
+        ->execute()->column('weight', 'name');
     };
 
     // Create 2 custom groups. Control group is to ensure updating one doesn't affect the other

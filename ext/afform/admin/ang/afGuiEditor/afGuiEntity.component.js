@@ -46,6 +46,10 @@
         buildElementList(search);
       };
 
+      this.getOptionsTpl = function() {
+        return $scope.getMeta().options_tpl || '~/afGuiEditor/entityConfig/EntityOptionsGeneric.html';
+      };
+
       function buildFieldList(search) {
         $scope.fieldList.length = 0;
         $scope.fieldList.push({
@@ -159,7 +163,7 @@
       // Note that if a block contains no fields it can be used repeatedly, so this will always return false for those.
       $scope.blockInUse = function(block) {
         if (block['af-join']) {
-          return check(ctrl.editor.layout['#children'], {'af-join': block['af-join']});
+          return check(ctrl.editor.layout['#children'], (item) => item['af-join'] === block['af-join'] && !(item.data && item.data.location_type_id));
         }
         var fieldsInBlock = _.pluck(afGui.findRecursive(afGui.meta.blocks[block['#tag']].layout, {'#tag': 'af-field'}), 'name');
         return check(ctrl.editor.layout['#children'], function(item) {

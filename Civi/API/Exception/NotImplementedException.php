@@ -17,7 +17,7 @@ class NotImplementedException extends \CRM_Core_Exception {
    * @param \Exception|null $previous
    *   A previous exception which caused this new exception.
    */
-  public function __construct($message, $extraParams = [], \Exception $previous = NULL) {
+  public function __construct($message, $extraParams = [], ?\Exception $previous = NULL) {
     parent::__construct($message, \CRM_Core_Exception::NOT_IMPLEMENTED, $extraParams, $previous);
   }
 

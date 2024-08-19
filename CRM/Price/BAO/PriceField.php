@@ -301,7 +301,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
         $count = CRM_Utils_Array::value('count', $customOption[$optionKey], '');
         $max_value = CRM_Utils_Array::value('max_value', $customOption[$optionKey], '');
         $taxAmount = $customOption[$optionKey]['tax_amount'] ?? NULL;
-        if (isset($taxAmount) && $displayOpt && $invoicing) {
+        if (isset($taxAmount) && $taxAmount && $displayOpt && $invoicing) {
           $qf->assign('displayOpt', $displayOpt);
           $qf->assign('taxTerm', $taxTerm);
           $qf->assign('invoicing', $invoicing);
@@ -496,7 +496,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
         $check = [];
         foreach ($customOption as $opId => $opt) {
           $priceOptionText = self::buildPriceOptionText($opt, $field->is_display_amounts, $valueFieldName);
-          $check[$opId] = &$qf->createElement('checkbox', $opt['id'], NULL, $priceOptionText['label'],
+          $check[$opId] = &$qf->createElement('checkbox', $opt['id'], NULL, CRM_Utils_String::purifyHTML($priceOptionText['label']),
             [
               'price' => json_encode([$opt['id'], $priceOptionText['priceVal']]),
               'data-amount' => $opt[$valueFieldName],

@@ -180,7 +180,7 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
       // should be moved to the php layer - with financialacls using hooks.
       $this->assign('noACL', !CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus());
 
-      $membershipType = \Civi\Api4\Membership::get(FALSE)
+      $membershipType = \Civi\Api4\MembershipType::get(FALSE)
         ->addSelect('relationship_direction', 'relationship_type_id')
         ->addWhere('id', '=', $values['membership_type_id'])
         ->execute()
@@ -226,7 +226,7 @@ SELECT relationship_type_id,
   WHEN  contact_id_b = {$values['owner_contact_id']} AND contact_id_a = {$values['contact_id']} THEN 'a_b'
 END AS 'relType'
   FROM civicrm_relationship
- WHERE relationship_type_id IN ({$membershipType['relationship_type_id']})";
+ WHERE relationship_type_id IN (" . implode(',', $membershipType['relationship_type_id']) . ")";
         $dao = CRM_Core_DAO::executeQuery($sql);
         $values['relationship'] = NULL;
         while ($dao->fetch()) {
@@ -260,7 +260,7 @@ END AS 'relType'
         // comment is a qualifier for the relationship - now just job_title
         $select = "
 SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
-       rt.name_x_y as relation, r.start_date, r.end_date,
+       rt.label_x_y as relation, r.start_date, r.end_date,
        m.id as mid, ms.is_current_member, ms.label as status
   FROM civicrm_relationship r
   LEFT JOIN civicrm_relationship_type rt ON rt.id = r.relationship_type_id
@@ -280,7 +280,7 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
         $query .= " ORDER BY is_current_member DESC";
         $dao = CRM_Core_DAO::executeQuery($query);
         $related = [];
-        $relatedRemaining = CRM_Utils_Array::value('max_related', $values, PHP_INT_MAX);
+        $relatedRemaining = $values['max_related'] ?? PHP_INT_MAX;
         $rowElememts = [
           'id',
           'cid',

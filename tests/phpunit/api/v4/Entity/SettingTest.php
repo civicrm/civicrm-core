@@ -34,7 +34,7 @@ class SettingTest extends Api4TestBase implements TransactionalInterface {
     $setting = Setting::get()->addSelect('menubar_position')->setCheckPermissions(FALSE)->execute()->first();
     $this->assertEquals('above-crm-container', $setting['value']);
 
-    $setting = Setting::revert()->addSelect('menubar_position')->setCheckPermissions(FALSE)->execute()->indexBy('name')->column('value');
+    $setting = Setting::revert()->addSelect('menubar_position')->setCheckPermissions(FALSE)->execute()->column('value', 'name');
     $this->assertEquals(['menubar_position' => 'over-cms-menu'], $setting);
     $setting = civicrm_api4('Setting', 'get', ['select' => ['menubar_position'], 'checkPermissions' => FALSE], 0);
     $this->assertEquals('over-cms-menu', $setting['value']);

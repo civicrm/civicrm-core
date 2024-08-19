@@ -683,7 +683,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
   }
 
   /**
-   * Does the price Set extend events.
+   * Does the price Set extend memberships.
    *
    * @return bool
    */

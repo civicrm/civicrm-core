@@ -304,6 +304,7 @@ class CRM_Grant_BAO_Query extends CRM_Contact_BAO_Query_Interface {
       'grant_decision_date',
       'grant_money_transfer_date',
       'grant_due_date',
+      'grant_status_id',
     ];
     $metadata = civicrm_api3('Grant', 'getfields', [])['values'];
     return array_intersect_key($metadata, array_flip($fields));

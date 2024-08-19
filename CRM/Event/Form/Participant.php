@@ -866,7 +866,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     if ($this->_isPaidEvent) {
       $params = $this->preparePaidEventProcessing($params);
     }
-    $lineItem = [$this->getPriceSetID() => $this->getLineItems()];
+
     // @todo - stop assigning these - pass financial_trxnId in token context
     // and swap template to use tokens.
     $this->assign('credit_card_type', $this->getSubmittedValue('credit_card_type'));
@@ -1402,9 +1402,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @throws \CRM_Core_Exception
    */
   protected function preparePaidEventProcessing($params): array {
-    $participantStatus = CRM_Event_PseudoConstant::participantStatus();
-    $lineItem = [];
-
     if ($this->isPaymentOnExistingContribution()) {
       //re-enter the values for UPDATE mode
       $params['fee_level'] = $params['amount_level'] = $this->getParticipantValue('fee_level');
@@ -1413,20 +1410,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     else {
       //lets carry currency, CRM-4453
       $params['fee_currency'] = $this->getCurrency();
-      if (!isset($lineItem[0])) {
-        $lineItem[0] = [];
-      }
-      //CRM-11529 for quick config backoffice transactions
-      //when financial_type_id is passed in form, update the
-      //lineitems with the financial type selected in form
-      $submittedFinancialType = $params['financial_type_id'] ?? NULL;
-      $isPaymentRecorded = $this->getSubmittedValue('record_contribution');
-      if ($isPaymentRecorded && $this->isQuickConfig() && $submittedFinancialType) {
-        foreach ($lineItem[0] as &$values) {
-          $values['financial_type_id'] = $submittedFinancialType;
-        }
-      }
-
       $params['fee_level'] = $this->getOrder()->getAmountLevel();
       $params['fee_amount'] = $this->getOrder()->getTotalAmount();
       $params['amount'] = $this->getOrder()->getTotalAmount();
@@ -1570,7 +1553,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         $participantParams['fee_amount'] = $order->getTotalAmount();
       }
     }
-    $participantParams['discount_id'] = $this->getSubmittedValue('discount_id');
+    if ($this->getSubmittedValue('discount_id')) {
+      $participantParams['discount_id'] = $this->getSubmittedValue('discount_id');
+    }
     $participant = CRM_Event_BAO_Participant::create($participantParams);
 
     // Add custom data for participant

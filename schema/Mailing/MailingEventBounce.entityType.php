@@ -55,9 +55,6 @@ return [
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'description' => ts('The reason the email bounced.'),
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'time_stamp' => [
       'title' => ts('Timestamp'),

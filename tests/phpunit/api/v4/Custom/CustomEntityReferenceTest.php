@@ -108,7 +108,7 @@ class CustomEntityReferenceTest extends CustomTestBase {
         ['contact_type' => 'Individual'],
         ['contact_type' => 'Household'],
       ],
-    ])->indexBy('contact_type')->column('id');
+    ])->column('id', 'contact_type');
     // Autocomplete by id
     $result = (array) Organization::autocomplete(FALSE)
       ->setFieldName("Contact.EntityRefFields.TestOrgRef")

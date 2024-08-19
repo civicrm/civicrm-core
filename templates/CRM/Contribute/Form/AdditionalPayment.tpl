@@ -105,6 +105,7 @@
       {include file='CRM/Core/BillingBlockWrapper.tpl' currency=false}
     </details>
 
+    {include file="CRM/common/customDataBlock.tpl" customDataType='FinancialTrxn'}
     {literal}
     <script type="text/javascript">
       CRM.$(function($) {

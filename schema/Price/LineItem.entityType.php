@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Line Item'),
     'title_plural' => ts('Line Items'),
-    'description' => ts('FIXME'),
+    'description' => ts('Line Items for Contributions'),
     'log' => TRUE,
     'add' => '1.7',
     'label_field' => 'label',
@@ -30,9 +30,6 @@ return [
       'required' => TRUE,
       'description' => ts('May contain civicrm_contribution, civicrm_participant or civicrm_membership'),
       'add' => '1.7',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
       'pseudoconstant' => [
         'callback' => 'CRM_Price_BAO_LineItem::entityTables',
       ],
@@ -92,9 +89,6 @@ return [
       'description' => ts('descriptive label for item - from price_field_value.label'),
       'add' => '1.7',
       'default' => NULL,
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'qty' => [
       'title' => ts('Line Item Quantity'),

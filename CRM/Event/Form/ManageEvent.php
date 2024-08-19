@@ -481,9 +481,6 @@ WHERE      e.id = %1
       if (!$dao->is_monetary) {
         $tabs['fee']['valid'] = FALSE;
       }
-      if (!$dao->is_active) {
-        $tabs['friend']['valid'] = FALSE;
-      }
       if (!$dao->is_pcp) {
         $tabs['pcp']['valid'] = FALSE;
       }

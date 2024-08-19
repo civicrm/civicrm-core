@@ -122,7 +122,7 @@ VALUES
     ( @domainID, 'civicrm/group&reset=1',                                   'Manage Groups',          'Manage Groups',        'access CiviCRM',   '',             @contactlastID, '1', '1',   9 ),
     ( @domainID, 'civicrm/admin/tag&reset=1&action=add',                    'New Tag',                'New Tag',              'administer CiviCRM', '',           @contactlastID, '1', NULL, 10 ),
     ( @domainID, 'civicrm/admin/tag&reset=1',                               'Manage Tags (Categories)', 'Manage Tags (Categories)', 'administer CiviCRM', '',     @contactlastID, '1','1', 11 ),
-    ( @domainID, 'civicrm/contact/deduperules&reset=1',  'Find and Merge Duplicate Contacts', 'Find and Merge Duplicate Contacts', 'administer dedupe rules,merge duplicate contacts', 'OR', @contactlastID, '1', NULL, 12 );
+    ( @domainID, 'civicrm/contact/deduperules&reset=1',  'Merge Duplicate Contacts', 'Merge Duplicate Contacts', 'administer dedupe rules,merge duplicate contacts', 'OR', @contactlastID, '1', NULL, 12 );
 
 INSERT INTO civicrm_navigation
     ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
@@ -907,4 +907,4 @@ INSERT INTO civicrm_navigation
 VALUES
     ( @domainID, CONCAT('civicrm/report/instance/', @instanceID,'&reset=1'), 'Mailing Detail Report', 'Mailing Detail Report', 'administer CiviMail', 'OR', @reportlastID, '1', NULL, @instanceID+2 );
 UPDATE civicrm_report_instance SET navigation_id = LAST_INSERT_ID() WHERE id = @instanceID;
-UPDATE civicrm_domain SET version = '5.76.alpha1';
+UPDATE civicrm_domain SET version = '5.78.alpha1';

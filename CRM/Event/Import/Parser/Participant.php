@@ -76,15 +76,16 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
         $formatValues[$key] = $field;
       }
 
+      if (!empty($params['contact_id'])) {
+        $this->validateContactID($params['contact_id'], $this->getContactType());
+      }
       if (!empty($params['id'])) {
         $this->checkEntityExists('Participant', $params['id']);
         if (!$this->isUpdateExisting()) {
           throw new CRM_Core_Exception(ts('% record found and update not selected', [1 => 'Participant']));
         }
-        //@todo calling api functions directly is not supported
-        $this->deprecated_participant_check_params($formatted);
-        $newParticipant = CRM_Event_BAO_Participant::create($formatted);
-        $this->setImportStatus($rowNumber, 'IMPORTED', '', $newParticipant->id);
+        $newParticipant = civicrm_api3('Participant', 'create', $formatted);
+        $this->setImportStatus($rowNumber, 'IMPORTED', '', $newParticipant['id']);
         return;
       }
 
@@ -93,12 +94,13 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
 
         if (CRM_Core_Error::isAPIError($error, CRM_Core_Error::DUPLICATE_CONTACT)) {
           $matchedIDs = (array) $error['error_message']['params'];
-          if (count($matchedIDs) >= 1) {
+          if (count($matchedIDs) === 1) {
             foreach ($matchedIDs as $contactId) {
               $formatted['contact_id'] = $contactId;
-              $formatted['version'] = 3;
-              $newParticipant = $this->deprecated_create_participant_formatted($formatted);
             }
+          }
+          elseif ($matchedIDs > 1) {
+            throw new CRM_Core_Exception(ts('Record duplicates multiple contacts: ') . implode(',', $matchedIDs));
           }
         }
         else {
@@ -133,8 +135,26 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
           throw new CRM_Core_Exception('No matching Contact found for (' . $disp . ')');
         }
       }
+      if ($this->isIgnoreDuplicates()) {
+        CRM_Core_Error::reset();
+        if (CRM_Event_BAO_Participant::checkDuplicate($formatted, $result)) {
+          $participantID = array_pop($result);
+
+          $error = CRM_Core_Error::createError("Found matching participant record.",
+            CRM_Core_Error::DUPLICATE_PARTICIPANT,
+            'Fatal', $participantID
+          );
+
+          $newParticipant = civicrm_api3_create_error($error->pop(),
+            [
+              'contactID' => $formatted['contact_id'],
+              'participantID' => $participantID,
+            ]
+          );
+        }
+      }
       else {
-        $newParticipant = $this->deprecated_create_participant_formatted($formatted);
+        $newParticipant = civicrm_api3('Participant', 'create', $formatted);
       }
 
       if (is_array($newParticipant) && civicrm_error($newParticipant)) {
@@ -163,67 +183,6 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
       return;
     }
     $this->setImportStatus($rowNumber, 'IMPORTED', '', $newParticipant['id']);
-  }
-
-  /**
-   * @param array $params
-   *
-   * @return array|bool
-   *   <type>
-   * @throws \CRM_Core_Exception
-   * @deprecated - this is part of the import parser not the API & needs to be
-   *   moved on out
-   *
-   */
-  protected function deprecated_create_participant_formatted($params) {
-    if ($this->isIgnoreDuplicates()) {
-      CRM_Core_Error::reset();
-      $error = $this->deprecated_participant_check_params($params, TRUE);
-      if (civicrm_error($error)) {
-        return $error;
-      }
-    }
-    return civicrm_api3('Participant', 'create', $params);
-  }
-
-  /**
-   * Formatting that was written a long time ago and may not make sense now.
-   *
-   * @param array $params
-   *
-   * @param bool $checkDuplicate
-   *
-   * @return array|bool
-   */
-  protected function deprecated_participant_check_params($params, $checkDuplicate = FALSE) {
-
-    // check if contact id is valid or not
-    if (!empty($params['contact_id'])) {
-      $contact = new CRM_Contact_BAO_Contact();
-      $contact->id = $params['contact_id'];
-      if (!$contact->find(TRUE)) {
-        throw new CRM_Core_Exception(ts('Contact id is not valid'));
-      }
-    }
-
-    $result = [];
-    if ($checkDuplicate) {
-      if (CRM_Event_BAO_Participant::checkDuplicate($params, $result)) {
-        $participantID = array_pop($result);
-
-        $error = CRM_Core_Error::createError("Found matching participant record.",
-          CRM_Core_Error::DUPLICATE_PARTICIPANT,
-          'Fatal', $participantID
-        );
-
-        return civicrm_api3_create_error($error->pop(),
-          [
-            'contactID' => $params['contact_id'],
-            'participantID' => $participantID,
-          ]
-        );
-      }
-    }
   }
 
   /**

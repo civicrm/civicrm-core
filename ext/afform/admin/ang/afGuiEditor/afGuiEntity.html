@@ -72,7 +72,7 @@
 
 <fieldset ng-if="!$ctrl.entity.loading && $ctrl.editor.allowEntityConfig">
   <legend>{{:: ts('Options') }}</legend>
-  <div ng-include="'~/afGuiEditor/entityConfig/Options.html'"></div>
+  <div ng-include="$ctrl.getOptionsTpl()"></div>
 </fieldset>
 
 <fieldset ng-repeat="behavior in $ctrl.behaviors">

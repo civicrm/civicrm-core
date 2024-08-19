@@ -31,7 +31,7 @@
             <tr>
               <th>{ts 1=$contactTypes.$contactType}%1 Rules{/ts}</th>
               <th>{ts}Usage{/ts}</th>
-              <th></th>
+              <th id="nosort"><span class="sr-only">{ts}Actions{/ts}</span></th>
             </tr>
             </thead>
             {foreach from=$rows item=row}

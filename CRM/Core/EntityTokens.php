@@ -363,9 +363,13 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @return bool
    */
   public function checkActive(TokenProcessor $processor) {
+    $isEntityEnabled = in_array($this->getApiEntityName(), array_keys(\Civi::service('action_object_provider')->getEntities()));
+    if (!$isEntityEnabled) {
+      return FALSE;
+    }
     return ((!empty($processor->context['actionMapping'])
         // This makes the 'schema context compulsory - which feels accidental
-      && $processor->context['actionMapping']->getEntityName()) || in_array($this->getEntityIDField(), $processor->context['schema'])) && in_array($this->getApiEntityName(), array_keys(\Civi::service('action_object_provider')->getEntities()));
+      && $processor->context['actionMapping']->getEntityName()) || in_array($this->getEntityIDField(), $processor->context['schema']));
   }
 
   /**
@@ -436,7 +440,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     // 'not a real field' offered up by case - seems like an oddity
     // we should skip at the top level for now.
     $fields = ['tags'];
-    if (!CRM_Campaign_BAO_Campaign::isComponentEnabled()) {
+    if (!CRM_Core_Component::isEnabled('CiviCampaign')) {
       $fields[] = 'campaign_id';
     }
     return $fields;

@@ -14,6 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
+use Civi\Api4\Setting;
 
 /**
  * This trait allows us to consolidate Preferences & Settings forms.
@@ -196,15 +197,15 @@ trait CRM_Admin_Form_SettingTrait {
             $props['html_type'],
             $setting,
             $props['title'],
-            ($options !== NULL) ? $options : CRM_Utils_Array::value('html_attributes', $props, []),
-            ($options !== NULL) ? CRM_Utils_Array::value('html_attributes', $props, []) : NULL
+            ($options !== NULL) ? $options : $props['html_attributes'] ?? [],
+            ($options !== NULL) ? $props['html_attributes'] ?? [] : NULL
           );
         }
         elseif ($add === 'addSelect') {
-          $this->addElement('select', $setting, $props['title'], $options, CRM_Utils_Array::value('html_attributes', $props));
+          $this->addElement('select', $setting, $props['title'], $options, $props['html_attributes'] ?? NULL);
         }
         elseif ($add === 'addCheckBox') {
-          $this->addCheckBox($setting, '', $options, NULL, CRM_Utils_Array::value('html_attributes', $props), NULL, NULL, ['&nbsp;&nbsp;']);
+          $this->addCheckBox($setting, '', $options, NULL, $props['html_attributes'] ?? NULL, NULL, NULL, ['&nbsp;&nbsp;']);
         }
         elseif ($add === 'addCheckBoxes') {
           $newOptions = array_flip($options);
@@ -231,7 +232,7 @@ trait CRM_Admin_Form_SettingTrait {
           $this->$add($setting, $props['title'], $props['entity_reference_options']);
         }
         elseif ($add === 'addYesNo' && ($props['type'] === 'Boolean')) {
-          $this->addRadio($setting, $props['title'], [1 => ts('Yes'), 0 => ts('No')], CRM_Utils_Array::value('html_attributes', $props), '&nbsp;&nbsp;');
+          $this->addRadio($setting, $props['title'], [1 => ts('Yes'), 0 => ts('No')], $props['html_attributes'] ?? NULL, '&nbsp;&nbsp;');
         }
         elseif ($add === 'add') {
           $this->add($props['html_type'], $setting, $props['title'], $options, FALSE, $props['html_extra'] ?? NULL);
@@ -355,8 +356,17 @@ trait CRM_Admin_Form_SettingTrait {
         // This will be an array with one value.
         $settings[$setting] = (bool) reset($settings[$setting]);
       }
+      elseif ($settingMetaData['type'] === 'Integer') {
+        // QuickForm is pretty slack when it comes to types, cast to an integer.
+        if (is_numeric($settingValue)) {
+          $settings[$setting] = (int) $settingValue;
+        }
+        if (!$settingValue && empty($settingMetaData['is_required'])) {
+          $settings[$setting] = NULL;
+        }
+      }
     }
-    civicrm_api3('setting', 'create', $settings);
+    Setting::set(FALSE)->setValues($settings)->execute();
   }
 
   /**

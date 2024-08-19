@@ -565,7 +565,16 @@ class CRM_Import_Forms extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   protected function getColumnHeaders(): array {
-    return $this->getDataSourceObject()->getColumnHeaders();
+    $headers = $this->getDataSourceObject()->getColumnHeaders();
+    $mappedFields = $this->getUserJob()['metadata']['import_mappings'] ?? [];
+    if (!empty($mappedFields) && count($mappedFields) > count($headers)) {
+      // The user has mapped one or more non-database fields, add those in.
+      $userMappedFields = array_diff_key($mappedFields, $headers);
+      foreach ($userMappedFields as $field) {
+        $headers[] = '';
+      }
+    }
+    return $headers;
   }
 
   /**
@@ -597,7 +606,21 @@ class CRM_Import_Forms extends CRM_Core_Form {
    */
   protected function getDataRows($statuses = [], int $limit = 0): array {
     $statuses = (array) $statuses;
-    return $this->getDataSourceObject()->setLimit($limit)->setStatuses($statuses)->getRows();
+    $rows = $this->getDataSourceObject()->setLimit($limit)->setStatuses($statuses)->getRows();
+    $headers = $this->getColumnHeaders();
+    $mappings = $this->getUserJob()['metadata']['import_mappings'] ?? [];
+    foreach ($rows as &$row) {
+      foreach ($headers as $index => $header) {
+        if (!$header) {
+          // Our rows are sequential lists of the values in the database table but the database
+          // table has some non-mapping related rows (`_status`, `_statusMessage` etc)
+          // and our mappings have some virtual rows, which do not have headers
+          // so, we populate our virtual values here.
+          $row[$index] = $mappings[$index]['default_value'] ?? '';
+        }
+      }
+    }
+    return $rows;
   }
 
   /**
@@ -949,6 +972,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
       'entityMetadata' => $this->getFieldOptions(),
       'dedupeRules' => $parser->getAllDedupeRules(),
       'userJob' => $this->getUserJob(),
+      'columnHeaders' => $this->getColumnHeaders(),
     ]);
   }
 

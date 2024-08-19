@@ -41,7 +41,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
    * @return array|null
    *   Result includes all custom fields in addition to group info.
    */
-  public static function getGroup(array $filter, int $permissionType = NULL, int $userId = NULL): ?array {
+  public static function getGroup(array $filter, ?int $permissionType = NULL, ?int $userId = NULL): ?array {
     $allGroups = self::getAll([], $permissionType, $userId);
     if (isset($filter['id']) && count($filter) === 1) {
       return $allGroups[$filter['id']] ?? NULL;
@@ -69,7 +69,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
    *   User contact id for permission check (defaults to current user)
    * @return array[]
    */
-  public static function getAll(array $filters = [], int $permissionType = NULL, int $userId = NULL): array {
+  public static function getAll(array $filters = [], ?int $permissionType = NULL, ?int $userId = NULL): array {
     $allGroups = self::loadAll();
     if (isset($permissionType)) {
       if (!in_array($permissionType, [CRM_Core_Permission::EDIT, CRM_Core_Permission::VIEW], TRUE)) {
@@ -1910,7 +1910,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
         ->addWhere('option_group_id:name', '=', 'cg_extend_objects')
         ->addWhere('grouping', 'IS NOT EMPTY')
         ->addWhere('is_active', '=', TRUE)
-        ->execute()->indexBy('value')->column('grouping');
+        ->execute()->column('grouping', 'value');
 
       foreach ($extendObjs as $entityName => $grouping) {
         try {
@@ -2022,11 +2022,11 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
   /**
    * Loads pseudoconstant option values for the `extends_entity_column_id` field.
    *
-   * @param string $fieldName
+   * @param string|null $fieldName
    * @param array $params
    * @return array
    */
-  public static function getExtendsEntityColumnIdOptions(string $fieldName = NULL, array $params = []) {
+  public static function getExtendsEntityColumnIdOptions(?string $fieldName = NULL, array $params = []) {
     $props = $params['values'] ?? [];
     $ogId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'custom_data_type', 'id', 'name');
     $optionValues = CRM_Core_BAO_OptionValue::getOptionValuesArray($ogId);

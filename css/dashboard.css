@@ -51,7 +51,6 @@ crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
 .crm-container .crm-dashlet-header a {
   font-size: 14px;
   padding: 0 6px;
-  font-weight: normal;
   float: right;
   cursor: pointer;
   color: #fcfcfc;

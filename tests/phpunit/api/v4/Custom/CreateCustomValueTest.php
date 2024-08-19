@@ -19,11 +19,13 @@
 
 namespace api\v4\Custom;
 
+use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
 use Civi\Api4\CustomValue;
 use Civi\Api4\OptionGroup;
 use Civi\Api4\OptionValue;
+use Civi\Api4\Activity;
 
 /**
  * @group headless
@@ -43,11 +45,12 @@ class CreateCustomValueTest extends CustomTestBase {
       ->addValue('label', 'Color')
       ->addValue('option_values', $optionValues)
       ->addValue('custom_group_id', $customGroup['id'])
-      ->addValue('html_type', 'Select')
+      ->addValue('html_type', 'CheckBox')
       ->addValue('data_type', 'String')
       ->execute();
 
     $customField = CustomField::get(FALSE)
+      ->addWhere('custom_group_id', '=', $customGroup['id'])
       ->addWhere('label', '=', 'Color')
       ->execute()
       ->first();
@@ -72,6 +75,21 @@ class CreateCustomValueTest extends CustomTestBase {
     $createdOptionValues = array_combine($values, $labels);
 
     $this->assertEquals($optionValues, $createdOptionValues);
+
+    $fieldName = $customGroup['name'] . '.' . $customField['name'];
+
+    // Test that failing to pass value as array will still serialize correctly
+    $contact = $this->createTestRecord('Contact', [$fieldName => 'r']);
+
+    $contact = Contact::get(FALSE)
+      ->addSelect($fieldName)
+      ->addWhere('id', '=', $contact['id'])
+      ->execute()->single();
+    $this->assertSame(['r'], $contact[$fieldName]);
+
+    // Ensure serialization really did happen correctly in the DB
+    $serializedValue = \CRM_Core_DAO::singleValueQuery("SELECT {$customField['column_name']} FROM {$customGroup['table_name']} WHERE id = 1");
+    $this->assertSame(\CRM_Core_DAO::VALUE_SEPARATOR . 'r' . \CRM_Core_DAO::VALUE_SEPARATOR, $serializedValue);
   }
 
   /**
@@ -118,6 +136,53 @@ class CreateCustomValueTest extends CustomTestBase {
     $this->assertEquals('2022-02-02', $result['date_field']);
     $this->assertEquals('2022-02-02 12:07:31', $result['date_time_field']);
 
+  }
+
+  public function testEmptyValueArrayForCustomFields(): void {
+    $contactID = $this->createTestRecord('Contact')['id'];
+    CustomGroup::create(FALSE)
+      ->addValue('title', 'MyActivityFields')
+      ->addValue('name', 'MyActivityFields')
+      ->addValue('extends', 'Activity')
+      ->execute();
+
+    $optionValues = ['r' => 'Red', 'g' => 'Green', 'b' => 'Blue'];
+    CustomField::create(FALSE)
+      ->addValue('custom_group_id:name', 'MyActivityFields')
+      ->addValue('label', 'Activity Checkbox Field')
+      ->addValue('name', 'activity_checkbox_field')
+      ->addValue('data_type', 'String')
+      ->addValue('html_type', 'CheckBox')
+      ->addValue('option_values', $optionValues)
+      ->execute();
+
+    $optionValues = ['o' => 'Orange', 'p' => 'Purple', 'c' => 'Crimson'];
+    CustomField::create(FALSE)
+      ->addValue('custom_group_id:name', 'MyActivityFields')
+      ->addValue('label', 'Activity Select Field')
+      ->addValue('name', 'activity_select_field')
+      ->addValue('data_type', 'String')
+      ->addValue('html_type', 'CheckBox')
+      ->addValue('option_values', $optionValues)
+      ->execute();
+    Activity::create()
+      ->setValues([
+        'source_contact_id' => $contactID,
+        'target_contact_id' => $contactID,
+        'subject' => 'Test Empty Custom Field Test Checkbox',
+        'activity_type_id:name' => 'Meeting',
+        'MyActivityFields.activity_checkbox_field' => [],
+      ])
+      ->execute();
+    Activity::create()
+      ->setValues([
+        'source_contact_id' => $contactID,
+        'target_contact_id' => $contactID,
+        'subject' => 'Test Empty Custom Field Test Select',
+        'activity_type_id:name' => 'Meeting',
+        'MyActivityFields.activity_select_field' => [],
+      ])
+      ->execute();
   }
 
 }

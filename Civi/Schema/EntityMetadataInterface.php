@@ -17,6 +17,6 @@ interface EntityMetadataInterface {
 
   public function getFields(): array;
 
-  public function getOptions(string $fieldName, array $values = NULL): ?array;
+  public function getOptions(string $fieldName, ?array $values = NULL): ?array;
 
 }

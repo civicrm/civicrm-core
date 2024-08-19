@@ -141,7 +141,9 @@ AND civicrm_contact.id IN $idString ";
       CRM_Utils_String::append($address, '<br /> ',
         [$dao->country]
       );
-      $location['address'] = addslashes($address);
+      // OpenLayers throws an error if they get an unexpected line break in the
+      // address.
+      $location['address'] = addslashes(str_replace(["\n", "\r"], ' ', $address));
       $location['displayAddress'] = str_replace('<br />', ', ', addslashes($address));
       $location['url'] = CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=' . $dao->contact_id);
       $location['location_type'] = $dao->location_type;

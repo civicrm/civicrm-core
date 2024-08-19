@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('World Region'),
     'title_plural' => ts('World Regions'),
-    'description' => ts('FIXME'),
+    'description' => ts('List of World Regions'),
     'add' => '1.8',
   ],
   'getFields' => fn() => [
@@ -30,9 +30,6 @@ return [
       'unique_name' => 'world_region',
       'usage' => [
         'export',
-      ],
-      'input_attrs' => [
-        'maxlength' => 128,
       ],
     ],
   ],

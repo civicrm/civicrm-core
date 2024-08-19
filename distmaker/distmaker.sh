@@ -1,4 +1,4 @@
-#!/bin/bash -v
+#!/usr/bin/env bash
 set -e
 
 # This is distmaker script for CiviCRM
@@ -93,7 +93,7 @@ check_conf()
 
   if [ -z $DM_SOURCEDIR ] ; then
     DM_SOURCEDIR="$THIS_DIR/..";
-    echo "Setting source dir to $DM_SOURCEDIR";
+    dm_note "Setting source dir to $DM_SOURCEDIR";
   fi
 
   if [ -z $DM_TMPDIR ] && [ -e $TMPDIR ] ; then
@@ -149,67 +149,67 @@ check_conf
 case $1 in
   # L10N PHP5
   l10n)
-  echo; echo "Generating L10N module"; echo;
+  dm_note "Enable CiviCRM L10N"
   L10NPACK=1
   ;;
 
   # BACKDROP PHP5
   Backdrop)
-  echo; echo "Generating Backdrop PHP5 module"; echo;
+  dm_note "Enable CiviCRM-Backdrop"
   BPACK=1
   ;;
 
   # DRUPAL7 PHP5
   d5|Drupal)
-  echo; echo "Generating Drupal7 PHP5 module"; echo;
+  dm_note "Enable CiviCRM-Drupal 7"
   D5PACK=1
   ;;
 
   # Drupal 7 - Output to directory
   d7_dir)
-  echo; echo "Generating Drupal7 Directory"; echo;
+  dm_note "Enable CiviCRM-Drupal 7 (directory)"
   D7DIR=1
   ;;
 
   # DRUPAL7 PHP5 StarterKit package
   sk)
-  echo; echo "Generating Drupal7 PHP5 starter kit minimal module"; echo;
+  dm_note "Enable CiviCRM-Drupal 7 (StarterKit version)"
   SKPACK=1
   ;;
 
   # JOOMLA PHP5
   j5|Joomla)
-  echo; echo "Generating Joomla PHP5 module"; echo;
+  dm_note "Enable CiviCRM-Joomla"
   J5PACK=1
   ;;
 
   # WORDPRESS PHP5
   wp5|WordPress)
-  echo; echo "Generating Wordpress PHP5 module"; echo;
+  dm_note "Enable CiviCRM-Wordpress"
   WP5PACK=1
   ;;
 
   # STANDALONE
   standalone|Standalone)
-  echo; echo "Generating CiviCRM Standalone"; echo;
+  dm_note "Enable CiviCRM (Standalone)"
   STANDALONEPACK=1
   ;;
 
   ## PATCHSET export
   patchset)
-  echo; echo "Generating patchset"; echo;
+  dm_note "Enable CiviCRM (Patchset)"
   PATCHPACK=1
   ;;
 
   # REPO REPORT PHP5
   report)
-  echo; echo "Generating repo report module"; echo;
+  dm_note "Enable repo report"
   REPOREPORT=1
   ;;
 
   # ALL
   all)
-  echo; echo "Generating all the tarballs we've got (not the directories). "; echo;
+  dm_note "Enable all the tarballs we've got (not the directories). "
   BPACK=1
   D5PACK=1
   J5PACK=1
@@ -229,6 +229,7 @@ case $1 in
 
 esac
 
+dm_title "Update source"
 ## Make sure we have the right branch or tag
 dm_git_checkout "$DM_SOURCEDIR" "$DM_REF_CORE"
 dm_git_checkout "$DM_PACKAGESDIR" "$DM_REF_PACKAGES"
@@ -257,58 +258,58 @@ fi
 cd $ORIGPWD
 
 if [ "$L10NPACK" = 1 ]; then
-  echo; echo "Packaging for L10N"; echo;
+  dm_title "Build CiviCRM-L10N"
   bash $P/dists/l10n.sh
 fi
 
 if [ "$BPACK" = 1 ]; then
-  echo; echo "Packaging for Backdrop, PHP5 version"; echo;
+  dm_title "Build CiviCRM-Backdrop"
   dm_git_checkout "$DM_SOURCEDIR/backdrop" "$DM_REF_BACKDROP"
   bash $P/dists/backdrop_php5.sh
 fi
 
 if [ "$D5PACK" = 1 ]; then
-  echo; echo "Packaging for Drupal7, PHP5 version"; echo;
+  dm_title "Build CiviCRM-Drupal 7"
   dm_git_checkout "$DM_SOURCEDIR/drupal" "$DM_REF_DRUPAL"
   bash $P/dists/drupal_php5.sh
 fi
 
 if [ "$D7DIR" = 1 ]; then
-  echo; echo "Packaging for Drupal7, Directory not tarball, PHP5 version"; echo;
+  dm_title "Build CiviCRM-Drupal 7 (directory)"
   dm_git_checkout "$DM_SOURCEDIR/drupal" "$DM_REF_DRUPAL"
   bash $P/dists/drupal7_dir_php5.sh
 fi
 
 if [ "$SKPACK" = 1 ]; then
-  echo; echo "Packaging for Drupal7, PHP5 StarterKit version"; echo;
+  dm_title "Build CiviCRM-Drupal 7 (StarterKit version)"
   dm_git_checkout "$DM_SOURCEDIR/drupal" "$DM_REF_DRUPAL"
   bash $P/dists/drupal_sk_php5.sh
 fi
 
 if [ "$J5PACK" = 1 ]; then
-  echo; echo "Packaging for Joomla, PHP5 version"; echo;
+  dm_title "Build CiviCRM-Joomla"
   dm_git_checkout "$DM_SOURCEDIR/joomla" "$DM_REF_JOOMLA"
   bash $P/dists/joomla_php5.sh
 fi
 
 if [ "$WP5PACK" = 1 ]; then
-  echo; echo "Packaging for Wordpress, PHP5 version"; echo;
+  dm_title "Build CiviCRM-Wordpress"
   dm_git_checkout "$DM_SOURCEDIR/WordPress" "$DM_REF_WORDPRESS"
   bash $P/dists/wordpress_php5.sh
 fi
 
 if [ "$STANDALONEPACK" = 1 ]; then
-  echo; echo "Packaging for CiviCRM Standalone"; echo;
+  dm_title "Build CiviCRM (Standalone)"
   bash $P/dists/standalone.sh
 fi
 
 if [ "$PATCHPACK" = 1 ]; then
-  echo; echo "Packaging for patchset tarball"; echo;
+  dm_title "Build CiviCRM (Patchset)"
   bash $P/dists/patchset.sh
 fi
 
 if [ "$REPOREPORT" = 1 ]; then
-  echo; echo "Preparing repository report"; echo;
+  dm_title "Prepare repository report"
   env \
     L10NPACK="$L10NPACK" \
     BPACK="$BPACK" \
@@ -322,4 +323,4 @@ if [ "$REPOREPORT" = 1 ]; then
 fi
 
 unset DM_SOURCEDIR DM_GENFILESDIR DM_TARGETDIR DM_TMPDIR DM_PHP DM_RSYNC DM_VERSION DM_ZIP
-echo;echo "DISTMAKER Done.";echo;
+dm_title "DISTMAKER Done."

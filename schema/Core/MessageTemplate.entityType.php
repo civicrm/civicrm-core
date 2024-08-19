@@ -35,9 +35,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Descriptive title of message'),
       'add' => '1.6',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'msg_subject' => [
       'title' => ts('Message Template Subject'),
@@ -91,9 +88,6 @@ return [
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'add' => '5.26',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'is_default' => [
       'title' => ts('Message Template Is Default?'),

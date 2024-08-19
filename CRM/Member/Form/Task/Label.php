@@ -81,7 +81,7 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
     // so no-one is tempted to refer to this again after relevant values are extracted
     unset($formValues);
 
-    [$rows, $tokenFields] = CRM_Contact_Form_Task_LabelCommon::getRows($this->_contactIds, $locationTypeID, $respectDoNotMail, $mergeSameAddress, $mergeSameHousehold);
+    [$rows] = CRM_Contact_Form_Task_LabelCommon::getRows($this->_contactIds, $locationTypeID, $respectDoNotMail, $mergeSameAddress, $mergeSameHousehold);
 
     if ($mergeSameAddress) {
       CRM_Core_BAO_Address::mergeSameAddress($rows);
@@ -102,7 +102,7 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
         $row['preferred_communication_method'] = implode(', ', $temp);
       }
       $row['id'] = $id;
-      $formatted = CRM_Utils_Address::formatMailingLabel($row, 'mailing_format', FALSE, TRUE, $tokenFields);
+      $formatted = CRM_Utils_Address::formatMailingLabel($row);
       $rows[$id] = [$formatted];
     }
     if ($isPerMembership) {

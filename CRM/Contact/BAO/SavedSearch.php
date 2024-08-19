@@ -374,8 +374,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch implements
       ->addSelect('name', 'title_plural')
       ->addOrderBy('title_plural')
       ->execute()
-      ->indexBy('name')
-      ->column('title_plural');
+      ->column('title_plural', 'name');
   }
 
   /**
@@ -403,7 +402,8 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch implements
       );
       // Check each group search for valid groups.
       foreach ($groupSearches as $groupSearch) {
-        if (!empty($groupSearch[2]) && in_array($groupID, (array) $groupSearch[2])) {
+        $groupFormValues = (array) ($groupSearch[2]['IN'] ?? $groupSearch[2] ?? []);
+        if (!empty($groupFormValues) && in_array($groupID, (array) $groupFormValues)) {
           $smartGroups[$group['id']] = [
             'title' => $group['title'],
             'editSearchURL' => self::getEditSearchUrl($group['saved_search_id']),

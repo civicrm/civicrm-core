@@ -36,9 +36,12 @@
       _.each(ctrl.editor.getEntities(), function(entity) {
         var entityFields = ctrl.editor.getEntityFields(entity.name),
           items = _.transform(entityFields.fields, function(items, field) {
-            var key = entity.name + "[0][fields][" + field.name + "]";
-            ctrl.fieldDefns[key] = field;
-            items.push({id: key, text: field.label});
+            // Conditional in case field is missing
+            if (field) {
+              var key = entity.name + "[0][fields][" + field.name + "]";
+              ctrl.fieldDefns[key] = field;
+              items.push({id: key, text: field.label});
+            }
           });
         _.each(entityFields.joins, function(join) {
           items.push({

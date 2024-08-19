@@ -1245,6 +1245,13 @@ class CRM_Report_Form extends CRM_Core_Form {
   }
 
   /**
+   * @return array
+   */
+  protected function getFieldsToExcludeFromPurification(): array {
+    return ['report_header', 'report_footer'];
+  }
+
+  /**
    * Remove any temporary tables.
    */
   public function cleanUpTemporaryTables() {
@@ -5986,7 +5993,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    *
    * @param string $tableName
    * @param string $fieldName
-   * @param string $field
+   * @param array $field
    * @return string
    */
   protected function getSelectClauseWithGroupConcatIfNotGroupedBy($tableName, &$fieldName, &$field) {

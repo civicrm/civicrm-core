@@ -108,10 +108,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
     //set defaults in create mode
     if (!$contributionID) {
       CRM_Core_DAO::setCreateDefaults($params, self::getDefaults());
-      if (empty($params['invoice_number']) && \Civi::settings()->get('invoicing')) {
-        $nextContributionID = CRM_Core_DAO::singleValueQuery("SELECT COALESCE(MAX(id) + 1, 1) FROM civicrm_contribution");
-        $params['invoice_number'] = self::getInvoiceNumber($nextContributionID);
-      }
     }
 
     $contributionStatusID = $params['contribution_status_id'] ?? NULL;
@@ -203,6 +199,13 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
     }
 
     $result = $contribution->save();
+    // Save invoice number if appropriate. Note we used to try to
+    // avoid a second save but check https://lab.civicrm.org/dev/core/-/issues/5004
+    // to see how that worked out....
+    if ($action === 'create' && empty($params['invoice_number']) && \Civi::settings()->get('invoicing')) {
+      $contribution->invoice_number = self::getInvoiceNumber($contribution->id);
+      $contribution->save();
+    }
 
     // Add financial_trxn details as part of fix for CRM-4724
     $contribution->trxn_result_code = $params['trxn_result_code'] ?? NULL;
@@ -2260,17 +2263,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $this->find(TRUE);
     }
 
-    $paymentProcessorID = $input['payment_processor_id'] ?? $ids['paymentProcessor'] ?? NULL;
+    $paymentProcessorID = $input['payment_processor_id'] ?? NULL;
 
-    if (!isset($input['payment_processor_id']) && !$paymentProcessorID && $this->contribution_page_id) {
-      $paymentProcessorID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage',
-        $this->contribution_page_id,
-        'payment_processor'
-      );
-      if ($paymentProcessorID) {
-        $intentionalEnotice = $CRM16923AnUnreliableMethodHasBeenUserToDeterminePaymentProcessorFromContributionPage;
-      }
-    }
     $ids['contributionType'] = $this->financial_type_id;
     $ids['financialType'] = $this->financial_type_id;
     if ($this->contribution_page_id) {
@@ -2293,20 +2287,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     if (!empty($ids['contributionRecur']) && !$paymentProcessorID) {
       $paymentProcessorID = $this->_relatedObjects['contributionRecur']->payment_processor_id;
-    }
-
-    if (!empty($ids['pledge_payment'])) {
-      foreach ($ids['pledge_payment'] as $key => $paymentID) {
-        if (empty($paymentID)) {
-          continue;
-        }
-        $payment = new CRM_Pledge_BAO_PledgePayment();
-        $payment->id = $paymentID;
-        if (!$payment->find(TRUE)) {
-          throw new CRM_Core_Exception("Could not find pledge payment record: " . $paymentID);
-        }
-        $this->_relatedObjects['pledge_payment'][] = $payment;
-      }
     }
 
     // These are probably no longer accessed from anywhere
@@ -2341,39 +2321,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
     }
 
-    if ($this->_component != 'contribute') {
-      // we are in event mode
-      // make sure event exists and is valid
-      $event = new CRM_Event_BAO_Event();
-      $event->id = $ids['event'];
-      if ($ids['event'] &&
-        !$event->find(TRUE)
-      ) {
-        throw new CRM_Core_Exception("Could not find event: " . $ids['event']);
-      }
-
-      $this->_relatedObjects['event'] = &$event;
-
-      $participant = new CRM_Event_BAO_Participant();
-      $participant->id = $ids['participant'];
-      if ($ids['participant'] &&
-        !$participant->find(TRUE)
-      ) {
-        throw new CRM_Core_Exception("Could not find participant: " . $ids['participant']);
-      }
-      $participant->register_date = CRM_Utils_Date::isoToMysql($participant->register_date);
-
-      $this->_relatedObjects['participant'] = &$participant;
-    }
-
-    $relatedContact = CRM_Contribute_BAO_Contribution::getOnbehalfIds($this->id);
-    if (!empty($relatedContact['individual_id'])) {
-      $ids['related_contact'] = $relatedContact['individual_id'];
-    }
-
     $eventID = isset($ids['event']) ? (int) $ids['event'] : NULL;
     $participantID = isset($ids['participant']) ? (int) $ids['participant'] : NULL;
-    $relatedContactID = isset($ids['related_contact']) ? (int) $ids['related_contact'] : NULL;
     $contributionID = (int) $this->id;
     $contactID = (int) $ids['contact'];
     $onbehalfDedupeAlert = $ids['onbehalf_dupe_alert'] ?? NULL;
@@ -2382,6 +2331,31 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     // line having loaded an array
     $membershipIDs = !empty($ids['membership']) ? (array) $ids['membership'] : NULL;
     unset($ids);
+
+    if ($this->_component != 'contribute') {
+      // we are in event mode
+      // make sure event exists and is valid
+      $event = new CRM_Event_BAO_Event();
+      $event->id = $eventID;
+      if ($eventID &&
+        !$event->find(TRUE)
+      ) {
+        throw new CRM_Core_Exception("Could not find event: " . $eventID);
+      }
+
+      $this->_relatedObjects['event'] = &$event;
+
+      $participant = new CRM_Event_BAO_Participant();
+      $participant->id = $participantID;
+      if ($participantID &&
+        !$participant->find(TRUE)
+      ) {
+        throw new CRM_Core_Exception("Could not find participant: " . $participantID);
+      }
+      $participant->register_date = CRM_Utils_Date::isoToMysql($participant->register_date);
+
+      $this->_relatedObjects['participant'] = &$participant;
+    }
 
     //not really sure what params might be passed in but lets merge em into values
     $values = array_merge($this->_gatherMessageValues($values, $eventID, $participantID), $values);
@@ -2463,6 +2437,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
     else {
       $values['contribution_id'] = $this->id;
+      $relatedContactID = CRM_Contribute_BAO_Contribution::getOnbehalfIds($this->id)['individual_id'] ?? NULL;
       if ($relatedContactID) {
         $values['related_contact'] = $relatedContactID;
         if ($onbehalfDedupeAlert) {
@@ -2481,6 +2456,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       if ($this->is_test) {
         $isTest = TRUE;
       }
+      $values['modelProps'] = $input['modelProps'] ?? [];
       if (!empty($this->_relatedObjects['membership'])) {
         foreach ($this->_relatedObjects['membership'] as $membership) {
           if ($membership->id) {
@@ -2513,7 +2489,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         }
       }
       else {
-        $values['modelProps'] = $input['modelProps'] ?? [];
         return CRM_Contribute_BAO_ContributionPage::sendMail($contactID, $values, $isTest, $returnMessageText);
       }
     }
@@ -3725,11 +3700,16 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
 
     if (self::isEmailReceipt($input, $contributionID, $recurringContributionID)) {
-      civicrm_api3('Contribution', 'sendconfirmation', [
-        'id' => $contributionID,
-        'payment_processor_id' => $paymentProcessorId,
-      ]);
-      \Civi::log()->info("Contribution {$contributionParams['id']} Receipt sent");
+      try {
+        civicrm_api3('Contribution', 'sendconfirmation', [
+          'id' => $contributionID,
+          'payment_processor_id' => $paymentProcessorId,
+        ]);
+        \Civi::log()->info("Contribution {$contributionParams['id']} Receipt sent");
+      }
+      catch (Exception $e) {
+        \Civi::log()->warning("Contribution {$contributionParams['id']} Failed to send receipt: " . $e->getMessage());
+      }
     }
 
     return $contributionResult;

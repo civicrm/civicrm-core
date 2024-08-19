@@ -60,7 +60,7 @@
         }
 
         // Popup forms in this display or surrounding Afform trigger a refresh
-        $element.closest('form').on('crmPopupFormSuccess', function() {
+        $element.closest('form').on('crmPopupFormSuccess crmFormSuccess', function() {
           ctrl.rowCount = null;
           ctrl.getResultsPronto();
         });
@@ -171,11 +171,7 @@
             // If there are no results on initial load, open an "autoOpen" toolbar link
             ctrl.toolbar.forEach((link) => {
               if (link.autoOpen && requestId === 1 && !ctrl.results.length) {
-                CRM.loadForm(link.url)
-                  .on('crmFormSuccess', () => {
-                    ctrl.rowCount = null;
-                    ctrl.getResultsPronto();
-                  });
+                CRM.loadForm(link.url);
               }
             });
           }

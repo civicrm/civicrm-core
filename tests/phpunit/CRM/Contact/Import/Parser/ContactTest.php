@@ -155,7 +155,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   public function testImportParserWithUpdateWithCustomRule(): void {
     $this->createCustomGroupWithFieldsOfAllTypes();
 
-    $ruleGroup = $this->callAPISuccess('RuleGroup', 'create', [
+    $ruleGroup = $this->createTestEntity('DedupeRuleGroup', [
       'contact_type' => 'Individual',
       'threshold' => 10,
       'used' => 'General',
@@ -163,7 +163,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       'title' => 'TestRule',
       'is_reserved' => 0,
     ]);
-    $this->callAPISuccess('Rule', 'create', [
+    $this->createTestEntity('DedupeRule', [
       'dedupe_rule_group_id' => $ruleGroup['id'],
       'rule_table' => $this->getCustomGroupTable(),
       'rule_weight' => 10,
@@ -205,14 +205,14 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   public function testImportParserWithUpdateWithCustomRuleNoExternalIDMatch(): void {
     $this->createCustomGroupWithFieldsOfAllTypes();
 
-    $ruleGroup = $this->callAPISuccess('RuleGroup', 'create', [
+    $ruleGroup = $this->createTestEntity('DedupeRuleGroup', [
       'contact_type' => 'Individual',
       'threshold' => 10,
       'used' => 'General',
       'title' => 'TestRule',
       'is_reserved' => 0,
     ]);
-    $this->callAPISuccess('Rule', 'create', [
+    $this->createTestEntity('DedupeRule', [
       'dedupe_rule_group_id' => $ruleGroup['id'],
       'rule_table' => $this->getCustomGroupTable(),
       'rule_weight' => 10,
@@ -323,6 +323,28 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $newAddress = $this->callAPISuccessGetSingle('Address', ['contact_id' => $this->ids['Contact']['billy-the-dad']]);
     $this->assertEquals($address['id'], $newAddress['master_id']);
     $this->assertEquals('out yonder', $newAddress['street_address']);
+  }
+
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportNonDefaultCountryState(): void {
+    \Civi::settings()->set('defaultContactCountry', 1228);
+    $csv = 'individual_country_state.csv';
+    $mapper = [
+      ['first_name'],
+      ['last_name'],
+      ['state_province', 'Primary'],
+      ['country', 'Primary'],
+    ];
+    $this->validateCSV($csv, $mapper);
+    $this->importCSV($csv, $mapper);
+    $address = Address::get(FALSE)
+      ->addWhere('country_id.name', '=', 'Canada')
+      ->addWhere('state_province_id.name', '=', 'Alberta')
+      ->addSelect('contact_id.display_name')
+      ->execute()->single();
+    $this->assertEquals('Bob Smith', $address['contact_id.display_name']);
   }
 
   /**
@@ -732,13 +754,13 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   public function testIgnoreLocationTypeId(): void {
     // Create a rule that matches on last name and street address.
     $ruleGroupID = $this->createRuleGroup()['id'];
-    $this->callAPISuccess('Rule', 'create', [
+    $this->createTestEntity('DedupeRule', [
       'dedupe_rule_group_id' => $ruleGroupID,
       'rule_field' => 'last_name',
       'rule_table' => 'civicrm_contact',
       'rule_weight' => 4,
     ]);
-    $this->callAPISuccess('Rule', 'create', [
+    $this->createTestEntity('DedupeRule', [
       'dedupe_rule_group_id' => $ruleGroupID,
       'rule_field' => 'street_address',
       'rule_table' => 'civicrm_address',
@@ -1889,7 +1911,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  protected function runImport(array $originalValues, int $onDuplicateAction, int $expectedResult, ?array $fieldMapping = [], array $fields = NULL, int $ruleGroupId = NULL): void {
+  protected function runImport(array $originalValues, int $onDuplicateAction, int $expectedResult, ?array $fieldMapping = [], ?array $fields = NULL, ?int $ruleGroupId = NULL): void {
     $values = array_values($originalValues);
     // Stand in for row number.
     $values[] = 1;

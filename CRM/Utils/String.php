@@ -638,10 +638,15 @@ class CRM_Utils_String {
       $config = HTMLPurifier_Config::createDefault();
       $config->set('Core.Encoding', 'UTF-8');
       $config->set('Attr.AllowedFrameTargets', ['_blank', '_self', '_parent', '_top']);
-
       // Disable the cache entirely
       $config->set('Cache.DefinitionImpl', NULL);
-
+      $config->set('HTML.DefinitionID', 'enduser-customize.html tutorial');
+      $config->set('HTML.DefinitionRev', 1);
+      $def = $config->maybeGetRawHTMLDefinition();
+      if (!empty($def)) {
+        $def->addElement('figcaption', 'Block', 'Flow', 'Common');
+        $def->addElement('figure', 'Block', 'Optional: (figcaption, Flow) | (Flow, figcaption) | Flow', 'Common');
+      }
       $_filter = new HTMLPurifier($config);
     }
 
@@ -1018,6 +1023,7 @@ class CRM_Utils_String {
    * many times it is run. This compares to it otherwise creating one file for every parsed string.
    *
    * @param string $templateString
+   * @param array $templateVars
    *
    * @return string
    *
@@ -1025,7 +1031,7 @@ class CRM_Utils_String {
    *
    * @throws \CRM_Core_Exception
    */
-  public static function parseOneOffStringThroughSmarty($templateString) {
+  public static function parseOneOffStringThroughSmarty($templateString, $templateVars = []) {
     if (!CRM_Utils_String::stringContainsTokens($templateString)) {
       // Skip expensive smarty processing.
       return $templateString;
@@ -1034,6 +1040,12 @@ class CRM_Utils_String {
     $cachingValue = $smarty->caching;
     set_error_handler([$smarty, 'handleSmartyError'], E_USER_ERROR);
     $smarty->caching = 0;
+    $useSecurityPolicy = ($smarty->getVersion() > 2) ? !$smarty->security_policy : !$smarty->security;
+    // For Smarty v2, policy is applied at lower level.
+    if ($useSecurityPolicy) {
+      // $smarty->enableSecurity('CRM_Core_Smarty_Security');
+      Civi::service('civi.smarty.userContent')->enable();
+    }
     $smarty->assign('smartySingleUseString', $templateString);
     try {
       // Do not escape the smartySingleUseString as that is our smarty template
@@ -1044,10 +1056,20 @@ class CRM_Utils_String {
       // Adding this is preparatory to smarty 3. The original PR failed some
       // tests so we check for the function.
       if (!function_exists('smarty_function_eval') && (!defined('SMARTY_DIR') || !file_exists(SMARTY_DIR . '/plugins/function.eval.php'))) {
-        $templateString = (string) $smarty->fetch('eval:' . $templateString);
+        if (!empty($templateVars)) {
+          $templateString = (string) $smarty->fetchWith('eval:' . $templateString, $templateVars);
+        }
+        else {
+          $templateString = (string) $smarty->fetch('eval:' . $templateString);
+        }
       }
       else {
-        $templateString = (string) $smarty->fetch('string:{eval var=$smartySingleUseString|smarty:nodefaults}');
+        if (!empty($templateVars)) {
+          $templateString = (string) $smarty->fetchWith('string:{eval var=$smartySingleUseString|smarty:nodefaults}', $templateVars);
+        }
+        else {
+          $templateString = (string) $smarty->fetch('string:{eval var=$smartySingleUseString|smarty:nodefaults}');
+        }
       }
     }
     catch (Exception $e) {
@@ -1060,6 +1082,10 @@ class CRM_Utils_String {
       $smarty->caching = $cachingValue;
       $smarty->assign('smartySingleUseString');
       restore_error_handler();
+      if ($useSecurityPolicy) {
+        // $smarty->disableSecurity();
+        Civi::service('civi.smarty.userContent')->disable();
+      }
     }
     return $templateString;
   }

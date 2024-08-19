@@ -224,7 +224,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     }
 
     $this->assign('customDataType', 'Membership');
-    $this->assign('customDataSubType', $this->_memType);
+    $this->assign('customDataSubType', $this->getMembershipValue('membership_type_id'));
 
     $this->setPageTitle(ts('Membership'));
   }
@@ -341,7 +341,7 @@ DESC limit 1");
           continue;
         }
         foreach ($pField['options'] as $opId => $opValues) {
-          $optionsMembershipTypes[$opId] = CRM_Utils_Array::value('membership_type_id', $opValues, 0);
+          $optionsMembershipTypes[$opId] = $opValues['membership_type_id'] ?: 0;
         }
       }
 
@@ -1422,7 +1422,7 @@ DESC limit 1");
         $this->getMembershipID(),
         'membership',
         $contributionID,
-        $priceSetDetails['fields']
+        $this
       );
       CRM_Core_Session::setStatus(ts('Associated contribution is updated on membership type change.'), ts('Success'), 'success');
     }
@@ -1496,7 +1496,7 @@ DESC limit 1");
     foreach ($this->getCreatedMemberships() as $membership) {
       $endDate = $membership['end_date'] ?? NULL;
     }
-    $statusMsg = ts('Membership for %1 has been updated.', [1 => $this->_memberDisplayName]);
+    $statusMsg = ts('Membership for %1 has been updated.', [1 => htmlentities($this->_memberDisplayName)]);
     if ($endDate) {
       $endDate = CRM_Utils_Date::customFormat($endDate);
       $statusMsg .= ' ' . ts('The Membership Expiration Date is %1.', [1 => $endDate]);
@@ -1514,7 +1514,7 @@ DESC limit 1");
     foreach ($this->getCreatedMemberships() as $membership) {
       $statusMsg[$membership['membership_type_id']] = ts('%1 membership for %2 has been added.', [
         1 => $this->allMembershipTypeDetails[$membership['membership_type_id']]['name'],
-        2 => $this->_memberDisplayName,
+        2 => htmlentities($this->_memberDisplayName),
       ]);
 
       $memEndDate = $membership['end_date'] ?? NULL;
@@ -1856,7 +1856,7 @@ DESC limit 1");
     // be called on ADD
     foreach ($this->order->getMembershipLineItems() as $membershipLineItem) {
       if ($this->getAction() === CRM_Core_Action::ADD && $this->isQuickConfig()) {
-        $memTypeNumTerms = $this->getSubmittedValue('num_terms');
+        $memTypeNumTerms = $this->getSubmittedValue('num_terms') ?: 1;
       }
       else {
         // The submitted value is hidden when a price set is selected so

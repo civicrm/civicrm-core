@@ -103,9 +103,6 @@ return [
       'input_type' => 'Text',
       'required' => TRUE,
       'description' => ts('Security hash'),
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'phone_id' => [
       'title' => ts('Phone ID'),

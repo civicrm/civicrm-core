@@ -433,42 +433,49 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch implements \Civi\Core\Hook
           'url' => 'civicrm/batchtransaction',
           'qs' => 'reset=1&bid=%%id%%',
           'title' => ts('View/Add Transactions to Batch'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::VIEW),
         ],
         'edit' => [
           'name' => ts('Edit'),
           'url' => 'civicrm/financial/batch',
           'qs' => 'reset=1&action=update&id=%%id%%&context=1',
           'title' => ts('Edit Batch'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::EDIT),
         ],
         'close' => [
           'name' => ts('Close'),
           'title' => ts('Close Batch'),
           'url' => '#',
           'extra' => 'rel="close"',
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::CLOSE),
         ],
         'export' => [
           'name' => ts('Export'),
           'title' => ts('Export Batch'),
           'url' => 'civicrm/financial/batch/export',
           'qs' => 'reset=1&id=%%id%%&status=1',
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::EXPORT),
         ],
         'reopen' => [
           'name' => ts('Re-open'),
           'title' => ts('Re-open Batch'),
           'url' => '#',
           'extra' => 'rel="reopen"',
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::REOPEN),
         ],
         'delete' => [
           'name' => ts('Delete'),
           'title' => ts('Delete Batch'),
           'url' => '#',
           'extra' => 'rel="delete"',
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
         ],
         'download' => [
           'name' => ts('Download'),
           'url' => 'civicrm/file',
           'qs' => 'reset=1&id=%%fid%%&eid=%%eid%%&fcs=%%fcs%%',
           'title' => ts('Download Batch'),
+          'weight' => 30,
         ],
       ];
     }
@@ -479,18 +486,21 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch implements \Civi\Core\Hook
           'url' => 'civicrm/batch/entry',
           'qs' => 'id=%%id%%&reset=1',
           'title' => ts('Batch Data Entry'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::COPY),
         ],
         CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => 'civicrm/batch',
           'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit Batch'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/batch',
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete Batch'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
         ],
       ];
     }

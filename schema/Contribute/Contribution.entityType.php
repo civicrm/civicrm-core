@@ -270,9 +270,6 @@ return [
         'export',
         'duplicate_matching',
       ],
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'invoice_id' => [
       'title' => ts('Invoice Reference'),
@@ -286,9 +283,6 @@ return [
         'export',
         'duplicate_matching',
       ],
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'invoice_number' => [
       'title' => ts('Invoice Number'),
@@ -300,9 +294,6 @@ return [
         'import',
         'export',
         'duplicate_matching',
-      ],
-      'input_attrs' => [
-        'maxlength' => 255,
       ],
     ],
     'currency' => [
@@ -319,7 +310,6 @@ return [
       ],
       'input_attrs' => [
         'label' => ts('Currency'),
-        'maxlength' => 3,
       ],
       'pseudoconstant' => [
         'table' => 'civicrm_currency',
@@ -401,9 +391,6 @@ return [
         'import',
         'export',
         'duplicate_matching',
-      ],
-      'input_attrs' => [
-        'maxlength' => 255,
       ],
     ],
     'amount_level' => [
@@ -511,7 +498,6 @@ return [
       ],
       'input_attrs' => [
         'size' => '6',
-        'maxlength' => 255,
       ],
     ],
     'campaign_id' => [
@@ -552,9 +538,6 @@ return [
         'import',
         'export',
         'duplicate_matching',
-      ],
-      'input_attrs' => [
-        'maxlength' => 255,
       ],
     ],
     'tax_amount' => [

@@ -32,7 +32,7 @@ function smarty_function_crmSetting($params, &$smarty) {
     $result = civicrm_api3('setting', 'getvalue', $params);
   }
   catch (Exception $e) {
-    $smarty->trigger_error('{crmAPI} ' . $e->getMessage());
+    trigger_error('{crmSetting} ' . htmlentities($e->getMessage()), E_USER_ERROR);
     return NULL;
   }
 

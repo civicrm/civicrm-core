@@ -13,7 +13,7 @@
 
     {if !empty($annual.count)}
         <tr>
-            <th class="contriTotalLeft right">{ts}Current Year-to-Date{/ts} &ndash; {$annual.amount|smarty:nodefaults}</th>
+            <th class="contriTotalLeft right">{ts}Current Fiscal Year-to-Date{/ts} &ndash; {$annual.amount|smarty:nodefaults}</th>
             <th class="right"> &nbsp; {ts}# Completed Contributions{/ts} &ndash; {$annual.count|smarty:nodefaults}</th>
             <th class="right contriTotalRight"> &nbsp; {ts}Avg Amount{/ts} &ndash; {$annual.avg|smarty:nodefaults}</th>
             {if $contributionSummary.cancel.amount|smarty:nodefaults}

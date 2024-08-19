@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Price Set'),
     'title_plural' => ts('Price Sets'),
-    'description' => ts('FIXME'),
+    'description' => ts('A set of Price Fields'),
     'log' => TRUE,
     'add' => '1.8',
     'label_field' => 'title',
@@ -70,7 +70,6 @@ return [
       'add' => '1.8',
       'input_attrs' => [
         'label' => ts('Name'),
-        'maxlength' => 255,
       ],
     ],
     'title' => [
@@ -81,9 +80,6 @@ return [
       'localizable' => TRUE,
       'description' => ts('Displayed title for the Price Set.'),
       'add' => '1.8',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'is_active' => [
       'title' => ts('Price Set Is Active?'),
@@ -127,9 +123,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Optional Javascript script function(s) included on the form with this price_set. Can be used for conditional'),
       'add' => '1.8',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'extends' => [
       'title' => ts('Price Set Extends'),
@@ -139,9 +132,6 @@ return [
       'description' => ts('What components are using this price set?'),
       'add' => '3.1',
       'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND,
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
       'pseudoconstant' => [
         'callback' => 'CRM_Price_BAO_PriceSet::getExtendsOptions',
       ],

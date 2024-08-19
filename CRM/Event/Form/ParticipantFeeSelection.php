@@ -547,9 +547,7 @@ SELECT  id, html_type
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
-
-    $feeBlock = $this->_values['fee'];
-    CRM_Price_BAO_LineItem::changeFeeSelections($params, $this->_participantId, 'participant', $this->getContributionID(), $feeBlock);
+    CRM_Price_BAO_LineItem::changeFeeSelections($params, $this->_participantId, 'participant', $this->getContributionID(), $this);
     $this->contributionAmt = CRM_Core_DAO::getFieldValue('CRM_Contribute_BAO_Contribution', $this->getContributionID(), 'total_amount');
     // email sending
     if (!empty($params['send_receipt'])) {

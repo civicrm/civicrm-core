@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Location Type'),
     'title_plural' => ts('Location Types'),
-    'description' => ts('FIXME'),
+    'description' => ts('Location types that are available for address, email, phone etc.'),
     'log' => TRUE,
     'add' => '1.1',
     'label_field' => 'display_name',
@@ -45,9 +45,6 @@ return [
       'required' => TRUE,
       'description' => ts('Location Type Name.'),
       'add' => '1.1',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'display_name' => [
       'title' => ts('Display Name'),
@@ -57,9 +54,6 @@ return [
       'localizable' => TRUE,
       'description' => ts('Location Type Display Name.'),
       'add' => '4.1',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'vcard_name' => [
       'title' => ts('vCard Location Type'),
@@ -67,9 +61,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('vCard Location Type Name.'),
       'add' => '1.1',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'description' => [
       'title' => ts('Description'),
@@ -77,9 +68,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Location Type Description.'),
       'add' => '1.1',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'is_reserved' => [
       'title' => ts('Location Type is Reserved?'),

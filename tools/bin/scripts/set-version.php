@@ -278,7 +278,17 @@ function parseArgs($argv) {
  *   Ex: ['ext/afform/html/info.xml', 'ext/search_kit/info.xml']
  */
 function findCoreInfoXml() {
-  $lines = explode("\n", file_get_contents('distmaker/core-ext.txt'));
+  $cmd = sprintf("bash %s %s",
+    escapeshellarg(__DIR__ . DIRECTORY_SEPARATOR . 'ls-core-ext'),
+    escapeshellarg(getcwd() . DIRECTORY_SEPARATOR . '/ext'));
+  exec($cmd, $lines, $result);
+  if ($result !== 0 ) {
+    throw new \RuntimeException("Failed to find core extensions");
+  }
+  $lines = array_map(fn($s) => trim($s), $lines);
+
+  #$lines = explode("\n", file_get_contents('distmaker/core-ext.txt'));
+
   $exts = preg_grep(";^#;", $lines, PREG_GREP_INVERT);
   $exts = preg_grep(';[a-z-A-Z];', $exts);
 

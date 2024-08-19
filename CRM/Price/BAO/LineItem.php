@@ -554,7 +554,7 @@ WHERE li.contribution_id = %1";
    * @param int $entityID
    * @param int $entity
    * @param int $contributionId
-   * @param $feeBlock
+   * @param \CRM_Core_Form|null $form
    *
    * @throws \CRM_Core_Exception
    */
@@ -563,18 +563,21 @@ WHERE li.contribution_id = %1";
     $entityID,
     $entity,
     $contributionId,
-    $feeBlock
+    $form = NULL
   ) {
+    $order = new CRM_Financial_BAO_Order();
+    $order->setPriceSelectionFromUnfilteredInput($params);
+    if ($form) {
+      // This will cause the buildAmount hook to be called.
+      $order->setForm($form);
+    }
+    unset($params);
+    $feeAmount = $updatedAmount = $order->getTotalAmount();
+    $taxAmount = $order->getTotalTaxAmount();
+    $submittedLineItems = $order->getLineItems();
     $entityTable = 'civicrm_' . $entity;
-    $newLineItems = [];
-    CRM_Price_BAO_PriceSet::processAmount($feeBlock,
-      $params, $newLineItems
-    );
     // initialize empty Lineitem instance to call protected helper functions
     $lineItemObj = new CRM_Price_BAO_LineItem();
-
-    // fetch submitted LineItems from input params and feeBlock information
-    $submittedLineItems = $lineItemObj->getSubmittedLineItems($params, $feeBlock);
 
     $requiredChanges = $lineItemObj->getLineItemsToAlter($submittedLineItems, $entityID, $entity);
 
@@ -619,15 +622,6 @@ WHERE li.contribution_id = %1";
     }
     if ($count > 1) {
       $updatedAmount = CRM_Price_BAO_LineItem::getLineTotal($contributionId);
-    }
-    else {
-      $updatedAmount = $params['amount'] ?? $params['total_amount'] ?? NULL;
-    }
-    if (strlen($params['tax_amount']) != 0) {
-      $taxAmount = $params['tax_amount'];
-    }
-    else {
-      $taxAmount = "NULL";
     }
     $displayParticipantCount = '';
     if ($totalParticipant > 0) {
@@ -674,7 +668,7 @@ WHERE li.contribution_id = %1";
     $lineItemObj->addFinancialItemsOnLineItemsChange(array_merge($requiredChanges['line_items_to_add'], $requiredChanges['line_items_to_resurrect']), $entityID, $entityTable, $contributionId, $trxn->id ?? NULL);
 
     // update participant fee_amount column
-    $lineItemObj->updateEntityRecordOnChangeFeeSelection($params, $entityID, $entity);
+    $lineItemObj->updateEntityRecordOnChangeFeeSelection($feeAmount, $entityID, $entity);
   }
 
   /**
@@ -950,12 +944,12 @@ WHERE li.contribution_id = %1";
   /**
    * Helper function to update entity record on change fee selection
    *
-   * @param array $inputParams
+   * @param int|float $feeAmount
    * @param int $entityID
    * @param string $entity
    *
    */
-  protected function updateEntityRecordOnChangeFeeSelection($inputParams, $entityID, $entity) {
+  protected function updateEntityRecordOnChangeFeeSelection($feeAmount, $entityID, $entity) {
     $entityTable = "civicrm_{$entity}";
 
     if ($entity == 'participant') {
@@ -970,7 +964,7 @@ WHERE li.contribution_id = %1";
       }
 
       $partUpdateFeeAmt['fee_level'] = $line;
-      $partUpdateFeeAmt['fee_amount'] = $inputParams['amount'];
+      $partUpdateFeeAmt['fee_amount'] = $feeAmount;
       CRM_Event_BAO_Participant::add($partUpdateFeeAmt);
 
       //activity creation
@@ -1221,7 +1215,7 @@ WHERE li.contribution_id = %1";
    * @param array $conditions
    * @inheritDoc
    */
-  public function addSelectWhereClause(string $entityName = NULL, int $userId = NULL, array $conditions = []): array {
+  public function addSelectWhereClause(?string $entityName = NULL, ?int $userId = NULL, array $conditions = []): array {
     $clauses['contribution_id'] = CRM_Utils_SQL::mergeSubquery('Contribution');
     CRM_Utils_Hook::selectWhereClause($this, $clauses, $userId, $conditions);
     return $clauses;

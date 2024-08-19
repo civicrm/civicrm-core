@@ -29,8 +29,12 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    *
    * @return object
    *   activity contact object
+   *
+   * @deprecated since 5.76 will be removed around 5.90.
+   * Non-core users should all use the api.
    */
   public static function create(&$params) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return self::add($params);
   }
 
@@ -46,49 +50,31 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    *
    * @return \CRM_Contribute_BAO_ContributionRecur
    * @throws \CRM_Core_Exception
-   * @todo move hook calls / extended logic to create - requires changing calls
-   *   to call create not add
+   * @deprecated since 5.76 will be removed around 5.96.
+   * Non-core users should all use the api. As of writing there
+   * are some core users.
    */
   public static function add(&$params) {
-    if (!empty($params['id'])) {
-      CRM_Utils_Hook::pre('edit', 'ContributionRecur', $params['id'], $params);
-    }
-    else {
-      CRM_Utils_Hook::pre('create', 'ContributionRecur', NULL, $params);
-    }
+    return self::writeRecord($params);
+  }
 
-    // make sure we're not creating a new recurring contribution with the same transaction ID
-    // or invoice ID as an existing recurring contribution
-    $duplicates = [];
-    if (self::checkDuplicate($params, $duplicates)) {
-      throw new CRM_Core_Exception('Found matching recurring contribution(s): ' . implode(', ', $duplicates));
+  /**
+   * Event fired before modifying an IM.
+   * @param \Civi\Core\Event\PreEvent $event
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if (in_array($event->action, ['create', 'edit'])) {
+      // make sure we're not creating a new recurring contribution with the same transaction ID
+      // or invoice ID as an existing recurring contribution
+      $duplicates = [];
+      if (self::checkDuplicate($event->params, $duplicates)) {
+        throw new CRM_Core_Exception('Found matching recurring contribution(s): ' . implode(', ', $duplicates));
+      }
+      if ($event->action === 'create' && empty($event->params['currency'])) {
+        // set currency for CRM-1496
+        $event->params['currency'] = \Civi::settings()->get('defaultCurrency');
+      }
     }
-
-    $recurring = new CRM_Contribute_BAO_ContributionRecur();
-    $recurring->copyValues($params);
-    $recurring->id = $params['id'] ?? NULL;
-
-    // set currency for CRM-1496
-    if (empty($params['id']) && !isset($recurring->currency)) {
-      $config = CRM_Core_Config::singleton();
-      $recurring->currency = $config->defaultCurrency;
-    }
-    $recurring->save();
-
-    if (!empty($params['id'])) {
-      CRM_Utils_Hook::post('edit', 'ContributionRecur', $recurring->id, $recurring);
-    }
-    else {
-      CRM_Utils_Hook::post('create', 'ContributionRecur', $recurring->id, $recurring);
-    }
-
-    if (!empty($params['custom']) &&
-      is_array($params['custom'])
-    ) {
-      CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_contribution_recur', $recurring->id);
-    }
-
-    return $recurring;
   }
 
   /**
@@ -426,7 +412,7 @@ LEFT  JOIN civicrm_membership_payment mp  ON ( mp.contribution_id = con.id )
 
     // Retrieve the most recently added contribution
     $mostRecentContribution = Contribution::get(FALSE)
-      ->addSelect('custom.*', 'id', 'contact_id', 'campaign_id', 'financial_type_id', 'currency', 'source', 'amount_level', 'address_id', 'on_behalf', 'source_contact_id', 'tax_amount', 'contribution_page_id', 'total_amount', 'is_test')
+      ->addSelect('custom.*', 'id', 'contact_id', 'campaign_id', 'financial_type_id', 'payment_instrument_id', 'currency', 'source', 'amount_level', 'address_id', 'on_behalf', 'source_contact_id', 'tax_amount', 'contribution_page_id', 'total_amount', 'is_test')
       ->addWhere('contribution_recur_id', '=', $id)
       ->addWhere('is_template', '=', 0)
       // we need this line otherwise the is test contribution don't work.

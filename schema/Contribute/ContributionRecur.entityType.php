@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Recurring Contribution'),
     'title_plural' => ts('Recurring Contributions'),
-    'description' => ts('FIXME'),
+    'description' => ts('Table of Recurring Contributions'),
     'log' => TRUE,
     'add' => '1.6',
   ],
@@ -82,9 +82,6 @@ return [
       'description' => ts('3 character string, value from config setting or input via user.'),
       'add' => '3.2',
       'default' => NULL,
-      'input_attrs' => [
-        'maxlength' => 3,
-      ],
       'pseudoconstant' => [
         'table' => 'civicrm_currency',
         'key_column' => 'name',
@@ -100,9 +97,6 @@ return [
       'description' => ts('Time units for recurrence of payment.'),
       'add' => '1.6',
       'default' => 'month',
-      'input_attrs' => [
-        'maxlength' => 8,
-      ],
       'pseudoconstant' => [
         'option_group_name' => 'recur_frequency_units',
         'key_column' => 'name',
@@ -209,9 +203,6 @@ return [
       'description' => ts('Possibly needed to store a unique identifier for this recurring payment order - if this is available from the processor??'),
       'add' => '1.6',
       'unique_name' => 'contribution_recur_processor_id',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'payment_token_id' => [
       'title' => ts('Payment Token ID'),
@@ -235,9 +226,6 @@ return [
       'description' => ts('unique transaction id (deprecated - use processor_id)'),
       'add' => '1.6',
       'unique_name' => 'contribution_recur_trxn_id',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'invoice_id' => [
       'title' => ts('Invoice ID'),
@@ -245,9 +233,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('unique invoice id, system generated or passed in'),
       'add' => '1.6',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'contribution_status_id' => [
       'title' => ts('Status'),

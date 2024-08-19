@@ -5,6 +5,7 @@ use Civi\Api4\Address;
 use Civi\Api4\Event;
 use Civi\Api4\LineItem;
 use Civi\Api4\LocBlock;
+use Civi\Api4\MessageTemplate;
 use Civi\Api4\Participant;
 use Civi\Api4\Phone;
 use Civi\Test\FormTrait;
@@ -25,6 +26,8 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
   use CRMTraits_Custom_CustomDataTrait;
 
   public function tearDown(): void {
+    $this->cleanupCustomGroups();
+    $this->quickCleanup(['civicrm_custom_group', 'civicrm_custom_field']);
     $this->quickCleanUpFinancialEntities();
     $this->revertTemplateToReservedTemplate();
     parent::tearDown();
@@ -75,6 +78,29 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       $this->getCustomFieldName() => 'Random thing',
     ])->postProcess()->getFirstMailBody();
     $this->assertStringContainsStrings($email, ['Enter text here', 'Random thing', 'Group with field text']);
+  }
+
+  /**
+   * Test that a contribution custom token does not cause a crash when there is no contribution.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSubmitUnpaidPriceChangeWithContributionToken(): void {
+    $this->createCustomGroupWithFieldOfType(['extends' => 'Contribution']);
+    MessageTemplate::update()
+      ->addWhere('is_default', '=', TRUE)
+      ->addWhere('is_reserved', '=', FALSE)
+      ->addWhere('workflow_name', '=', 'event_offline_receipt')
+      ->setValues(['msg_subject' => 'hey {contribution.' . $this->getCustomFieldName() . '}you'])
+      ->execute();
+    $this->getForm(['is_monetary' => FALSE], [
+      'register_date' => date('Ymd'),
+      'status_id' => 1,
+      'send_receipt' => '1',
+      'from_email_address' => '"mailer" <mail@example.org>',
+      'role_id' => [CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'role_id', 'Attendee')],
+    ])->postProcess();
+    $this->assertMailSentContainingHeaderString('hey you');
   }
 
   /**
@@ -134,7 +160,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     $priceSetID = $this->ids['PriceSet']['PaidEvent'];
     $eventFeeBlock = CRM_Price_BAO_PriceSet::getSetDetail($priceSetID)[$priceSetID]['fields'];
     $priceSetParams[$this->getPriceFieldKey()] = $this->ids['PriceFieldValue']['PaidEvent_family_package'];
-    CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $participant['id'], 'participant', $contribution['id'], $eventFeeBlock);
+    CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $participant['id'], 'participant', $contribution['id']);
     // Check that no payment records have been created.
     // In https://lab.civicrm.org/dev/financial/issues/94 we had an issue where payments were created when none happened.
     $payments = $this->callAPISuccess('Payment', 'get', [])['values'];
@@ -215,7 +241,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     ];
     $participant = $this->callAPISuccess('Participant', 'get', []);
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
-    CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $participant['id'], 'participant', $contribution['id'], $priceSetBlock);
+    CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $participant['id'], 'participant', $contribution['id']);
 
     $financialItems = $this->callAPISuccess('FinancialItem', 'get', [])['values'];
     $sum = 0;

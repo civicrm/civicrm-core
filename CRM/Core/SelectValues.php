@@ -774,6 +774,7 @@ class CRM_Core_SelectValues {
     return [
       'Admin' => ts('Admin'),
       'Email' => ts('Email'),
+      'Form' => ts('Form'),
       'Web' => ts('Web'),
       'API' => ts('API'),
     ];
@@ -1304,6 +1305,20 @@ class CRM_Core_SelectValues {
       }
     }
     return $options;
+  }
+
+  /**
+   * @return array
+   *   Array(string $machineName => string $label).
+   */
+  public static function getPDFLoggingOptions() {
+    return [
+      'none' => ts('Do not record'),
+      'multiple' => ts('Multiple activities (one per contact)'),
+      'combined' => ts('One combined activity'),
+      'combined-attached' => ts('One combined activity plus one file attachment'),
+      // 'multiple-attached' <== not worth the work
+    ];
   }
 
 }

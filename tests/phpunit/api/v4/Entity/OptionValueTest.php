@@ -60,7 +60,7 @@ class OptionValueTest extends Api4TestBase implements TransactionalInterface {
       return OptionValue::get(FALSE)
         ->addWhere('option_group_id.name', '=', $groupName)
         ->addOrderBy('weight')
-        ->execute()->indexBy('value')->column('weight');
+        ->execute()->column('weight', 'value');
     };
 
     // Create 2 option groups. Control group is to ensure updating one doesn't affect the other

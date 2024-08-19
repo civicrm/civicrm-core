@@ -11,6 +11,7 @@
 
 namespace Civi\ActionSchedule;
 
+use Civi\Api4\Contact;
 use Civi\Api4\Service\Spec\RequestSpec;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Service\AutoSubscriber;
@@ -113,6 +114,35 @@ abstract class MappingBase extends AutoSubscriber implements MappingInterface {
   final public function applies(string $entity, string $action): bool {
     return $entity === 'ActionSchedule' &&
       in_array($action, ['create', 'get', 'update', 'save'], TRUE);
+  }
+
+  public function getBccRecipients(\CRM_Core_DAO_ActionSchedule $schedule): ?array {
+    if ($schedule->limit_to == 3) {
+      return $this->getFixedRecipients($schedule);
+    }
+    return NULL;
+  }
+
+  public function getAlternateRecipients(\CRM_Core_DAO_ActionSchedule $schedule): ?array {
+    if ($schedule->limit_to == 4) {
+      return $this->getFixedRecipients($schedule);
+    }
+    return NULL;
+  }
+
+  protected function getFixedRecipients(\CRM_Core_DAO_ActionSchedule $schedule): ?array {
+    if ($schedule->recipient === 'manual' && $schedule->recipient_manual) {
+      $cids = \CRM_Core_DAO::unSerializeField($schedule->recipient_manual, \CRM_Core_DAO::SERIALIZE_COMMA);
+      return $cids;
+    }
+    if ($schedule->recipient === 'group' && $schedule->group_id) {
+      $contacts = Contact::get(FALSE)
+        ->addSelect('id')
+        ->addWhere('groups', 'IN', $schedule->group_id)
+        ->execute();
+      return $contacts->column('id');
+    }
+    return NULL;
   }
 
 }

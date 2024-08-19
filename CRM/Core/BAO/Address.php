@@ -1032,11 +1032,11 @@ SELECT is_primary,
     $uniqueAddress = [];
     foreach (array_keys($rows) as $rowID) {
       // load complete address as array key
-      $address = trim($rows[$rowID]['street_address'])
-        . trim($rows[$rowID]['city'])
-        . trim($rows[$rowID]['state_province'])
-        . trim($rows[$rowID]['postal_code'])
-        . trim($rows[$rowID]['country']);
+      $address = trim((string) $rows[$rowID]['street_address'])
+        . trim((string) $rows[$rowID]['city'])
+        . trim((string) $rows[$rowID]['state_province'])
+        . trim((string) $rows[$rowID]['postal_code'])
+        . trim((string) $rows[$rowID]['country']);
       if (isset($rows[$rowID]['last_name'])) {
         $name = $rows[$rowID]['last_name'];
       }
@@ -1056,7 +1056,7 @@ SELECT is_primary,
       // fill uniqueAddress array with last/first name tree
       if (isset($uniqueAddress[$address])) {
         $uniqueAddress[$address]['names'][$name][$firstNameWithPrefix]['first_name'] = $rows[$rowID]['first_name'];
-        $uniqueAddress[$address]['names'][$name][$firstNameWithPrefix]['addressee_display'] = $rows[$rowID]['addressee_display'];
+        $uniqueAddress[$address]['names'][$name][$firstNameWithPrefix]['addressee_display'] = $rows[$rowID]['addressee_display'] ?? '';
         // drop unnecessary rows
         unset($rows[$rowID]);
         // this is the first listing at this address
@@ -1064,7 +1064,7 @@ SELECT is_primary,
       else {
         $uniqueAddress[$address]['ID'] = $rowID;
         $uniqueAddress[$address]['names'][$name][$firstNameWithPrefix]['first_name'] = $rows[$rowID]['first_name'];
-        $uniqueAddress[$address]['names'][$name][$firstNameWithPrefix]['addressee_display'] = $rows[$rowID]['addressee_display'];
+        $uniqueAddress[$address]['names'][$name][$firstNameWithPrefix]['addressee_display'] = $rows[$rowID]['addressee_display'] ?? '';
       }
     }
     foreach ($uniqueAddress as $address => $data) {

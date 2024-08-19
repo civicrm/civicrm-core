@@ -7,9 +7,10 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Financial Account'),
     'title_plural' => ts('Financial Accounts'),
-    'description' => ts('FIXME'),
+    'description' => ts('Financial Accounts'),
     'log' => TRUE,
     'add' => '3.2',
+    'label_field' => 'name',
   ],
   'getPaths' => fn() => [
     'add' => 'civicrm/admin/financial/financialAccount/edit?action=add&reset=1',
@@ -44,9 +45,6 @@ return [
       'required' => TRUE,
       'description' => ts('Financial Account Name.'),
       'add' => '3.2',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'contact_id' => [
       'title' => ts('Contact ID'),
@@ -85,9 +83,6 @@ return [
       'usage' => [
         'export',
       ],
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'account_type_code' => [
       'title' => ts('Account Type Code'),
@@ -98,9 +93,6 @@ return [
       'usage' => [
         'export',
       ],
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'description' => [
       'title' => ts('Financial Account Description'),
@@ -108,9 +100,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Financial Type Description.'),
       'add' => '4.3',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'parent_id' => [
       'title' => ts('Parent ID'),

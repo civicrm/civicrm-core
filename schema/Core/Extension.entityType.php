@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Extension'),
     'title_plural' => ts('Extensions'),
-    'description' => ts('FIXME'),
+    'description' => ts('Table of extensions'),
     'log' => FALSE,
     'add' => '4.2',
     'label_field' => 'label',
@@ -44,9 +44,6 @@ return [
       'input_type' => 'Select',
       'required' => TRUE,
       'add' => '4.2',
-      'input_attrs' => [
-        'maxlength' => 8,
-      ],
       'pseudoconstant' => [
         'callback' => 'CRM_Core_SelectValues::getExtensionTypes',
       ],
@@ -58,9 +55,6 @@ return [
       'required' => TRUE,
       'description' => ts('Fully qualified extension name'),
       'add' => '4.2',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'name' => [
       'title' => ts('Name'),
@@ -72,9 +66,6 @@ return [
         'import',
         'export',
         'duplicate_matching',
-      ],
-      'input_attrs' => [
-        'maxlength' => 255,
       ],
     ],
     'label' => [
@@ -88,9 +79,6 @@ return [
         'export',
         'duplicate_matching',
       ],
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'file' => [
       'title' => ts('File'),
@@ -103,9 +91,6 @@ return [
         'export',
         'duplicate_matching',
       ],
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'schema_version' => [
       'title' => ts('Schema Version'),
@@ -117,9 +102,6 @@ return [
         'import',
         'export',
         'duplicate_matching',
-      ],
-      'input_attrs' => [
-        'maxlength' => 63,
       ],
     ],
     'is_active' => [

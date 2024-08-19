@@ -161,24 +161,6 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
       $this->assign('langSwitch', CRM_Core_I18n::uiLanguages());
     }
 
-    if (CRM_Utils_Constant::value('CIVICRM_SMARTY_DEFAULT_ESCAPE')
-      && !CRM_Utils_Constant::value('CIVICRM_SMARTY3_AUTOLOAD_PATH')
-      && !CRM_Utils_Constant::value('CIVICRM_SMARTY_AUTOLOAD_PATH')
-    ) {
-      // Currently DEFAULT escape does not work with Smarty3
-      // dunno why - thought it would be the default with Smarty3 - but
-      // getting onto Smarty 3 is higher priority.
-      // The include below loads the v2 version which is why id doesn't work.
-      // When default escape is enabled if the core escape is called before
-      // any custom escaping is done the modifier_escape function is not
-      // found, so require_once straight away. Note this was hit on the basic
-      // contribution dashboard from RecentlyViewed.tpl
-      require_once 'Smarty/plugins/modifier.escape.php';
-      if (!isset($this->_plugins['modifier']['escape'])) {
-        $this->registerPlugin('modifier', 'escape', ['CRM_Core_Smarty', 'escape']);
-      }
-      $this->default_modifiers[] = 'escape:"htmlall"';
-    }
     $this->loadFilter('pre', 'resetExtScope');
     $this->loadFilter('pre', 'htxtFilter');
 
@@ -193,6 +175,7 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
       'str_starts_with',
       // Trim is used on the extensions page.
       'trim',
+      'mb_substr',
       'is_numeric',
       'array_key_exists',
       'strstr',
@@ -553,17 +536,27 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
   }
 
   public function getVersion (): int {
-    $path = (string) crm_smarty_compatibility_get_path();
-    if (str_contains($path, 'smarty3')) {
-      return 3;
+    static $version;
+    if ($version === NULL) {
+      if (class_exists('Smarty\Smarty')) {
+        $version = 5;
+      }
+      else {
+        $class = new ReflectionClass('Smarty');
+        $path = $class->getFileName();
+        if (str_contains($path, 'smarty3')) {
+          $version = 3;
+        }
+        elseif (str_contains($path, 'smarty4')) {
+          $version = 4;
+        }
+        else {
+          $version = 2;
+        }
+      }
     }
-    if (str_contains($path, 'smarty4')) {
-      return 4;
-    }
-    if (str_contains($path, 'smarty5')) {
-      return 5;
-    }
-    return 2;
+    return $version;
+
   }
 
 }

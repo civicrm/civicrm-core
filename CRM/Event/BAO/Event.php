@@ -330,8 +330,7 @@ WHERE  ( civicrm_event.is_template  = 0 )";
         ->addSelect('id', 'title')
         ->addWhere('is_active', '=', TRUE)
         ->execute()
-        ->indexBy('id')
-        ->column('title');
+        ->column('title', 'id');
     }
     return $options;
   }
@@ -1988,24 +1987,21 @@ WHERE  ce.loc_block_id = $locBlockId";
    */
   private static function checkPermissionGetInfo($eventId = NULL) {
     $params = [
-      'check_permissions' => 1,
-      'return' => 'id, created_id',
-      'options' => ['limit' => 0],
+      'select' => ['id', 'created_id'],
     ];
     if ($eventId) {
-      $params['id'] = $eventId;
+      $params['where'] = [['id', '=', $eventId]];
     }
 
     $allEvents = [];
     $createdEvents = [];
-    $eventResult = civicrm_api3('Event', 'get', $params);
-    if ($eventResult['count'] > 0) {
-      $contactId = CRM_Core_Session::getLoggedInContactID();
-      foreach ($eventResult['values'] as $eventId => $eventDetail) {
-        $allEvents[$eventId] = $eventId;
-        if (isset($eventDetail['created_id']) && $contactId == $eventDetail['created_id']) {
-          $createdEvents[$eventId] = $eventId;
-        }
+    $eventResult = civicrm_api4('Event', 'get', $params);
+    $contactId = CRM_Core_Session::getLoggedInContactID();
+    foreach ($eventResult as $eventDetail) {
+      $eventId = $eventDetail['id'];
+      $allEvents[$eventId] = $eventId;
+      if (isset($eventDetail['created_id']) && $contactId == $eventDetail['created_id']) {
+        $createdEvents[$eventId] = $eventId;
       }
     }
     return [$allEvents, $createdEvents];
@@ -2345,18 +2341,10 @@ WHERE  ce.loc_block_id = $locBlockId";
   }
 
   /**
-   * @param array $profileIds
-   * @param int $cid
-   * @param int $participantId
-   * @param bool $isTest Probably not required, even when true.
-   * @param array|null $groups group values from session
-   * @param string|null $note note values from session
-   *
-   * @return array
    * @throws \CRM_Core_Exception
    * @throws \Civi\Core\Exception\DBQueryException
    */
-  public static function getProfileDisplay(array $profileIds, int $cid, int $participantId, bool $isTest = FALSE, ?array $groups = NULL, ?string $note = NULL): array {
+  public static function getProfileDisplay(array $profileIds, int $cid, int $participantId, bool $isTest = FALSE, ?array $groups = NULL, ?string $note = NULL): ?array {
     foreach ($profileIds as $gid) {
       if (CRM_Core_BAO_UFGroup::filterUFGroups($gid, $cid)) {
         $values = [];

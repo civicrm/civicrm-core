@@ -155,7 +155,7 @@ class CRM_Extension_Upgrader_Base implements CRM_Extension_Upgrader_Interface {
   /**
    * @see https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_upgrade
    */
-  public function onUpgrade($op, CRM_Queue_Queue $queue = NULL) {
+  public function onUpgrade($op, ?CRM_Queue_Queue $queue = NULL) {
     switch ($op) {
       case 'check':
         return [$this->hasPendingRevisions()];

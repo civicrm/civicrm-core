@@ -144,20 +144,28 @@ class FormDataModel {
    * @param string $entity
    * @param string $join
    * @param string $searchDisplay
+   * @param array $afIfConditions
    */
-  protected function parseFields($nodes, $entity = NULL, $join = NULL, $searchDisplay = NULL) {
+  protected function parseFields($nodes, $entity = NULL, $join = NULL, $searchDisplay = NULL, $afIfConditions = []) {
     foreach ($nodes as $node) {
       if (!is_array($node) || !isset($node['#tag'])) {
         continue;
       }
-      elseif (isset($node['af-fieldset'])) {
+      if (!empty($node['af-if'])) {
+        $conditional = substr($node['af-if'], 1, -1);
+        $afIfConditions[] = json_decode(html_entity_decode($conditional));
+      }
+      if ($node['#tag'] === 'af-field' && $afIfConditions) {
+        $node['af-if'] = $afIfConditions;
+      }
+      if (isset($node['af-fieldset'])) {
         $entity = $node['af-fieldset'] ?? NULL;
         $searchDisplay = $entity ? NULL : $this->findSearchDisplay($node);
         if ($entity && isset($node['af-repeat'])) {
           $this->entities[$entity]['min'] = $node['min'] ?? 0;
           $this->entities[$entity]['max'] = $node['max'] ?? NULL;
         }
-        $this->parseFields($node['#children'] ?? [], $node['af-fieldset'], $join, $searchDisplay);
+        $this->parseFields($node['#children'] ?? [], $node['af-fieldset'], $join, $searchDisplay, $afIfConditions);
       }
       elseif ($searchDisplay && $node['#tag'] === 'af-field') {
         $this->searchDisplays[$searchDisplay]['fields'][$node['name']] = AHQ::getProps($node);
@@ -171,11 +179,21 @@ class FormDataModel {
         }
       }
       elseif ($entity && !empty($node['af-join'])) {
-        $this->entities[$entity]['joins'][$node['af-join']] = AHQ::getProps($node);
-        $this->parseFields($node['#children'] ?? [], $entity, $node['af-join']);
+        $joinProps = AHQ::getProps($node);
+        // If the join is declared > once, merge data
+        $existingJoin = $this->entities[$entity]['joins'][$node['af-join']] ?? [];
+        if (!empty($existingJoin['data']) && !empty($joinProps['data'])) {
+          foreach ($joinProps['data'] as $key => $value) {
+            if (!empty($existingJoin['data'][$key]) && $existingJoin['data'][$key] !== $value) {
+              $joinProps['data'][$key] = array_unique(array_merge((array) $existingJoin['data'][$key], (array) $value));
+            }
+          }
+        }
+        $this->entities[$entity]['joins'][$node['af-join']] = $joinProps;
+        $this->parseFields($node['#children'] ?? [], $entity, $node['af-join'], NULL, $afIfConditions);
       }
       elseif (!empty($node['#children'])) {
-        $this->parseFields($node['#children'], $entity, $join, $searchDisplay);
+        $this->parseFields($node['#children'], $entity, $join, $searchDisplay, $afIfConditions);
       }
       // Recurse into embedded blocks
       if (isset($this->blocks[$node['#tag']])) {
@@ -183,7 +201,7 @@ class FormDataModel {
           $this->blocks[$node['#tag']] = Afform::get(FALSE)->setSelect(['name', 'layout'])->addWhere('name', '=', $this->blocks[$node['#tag']]['name'])->execute()->first();
         }
         if (!empty($this->blocks[$node['#tag']]['layout'])) {
-          $this->parseFields($this->blocks[$node['#tag']]['layout'], $entity, $join, $searchDisplay);
+          $this->parseFields($this->blocks[$node['#tag']]['layout'], $entity, $join, $searchDisplay, $afIfConditions);
         }
       }
     }

@@ -190,23 +190,15 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
       $defaults["mapper[$i]"] = [];
       if ($this->getSubmittedValue('savedMapping')) {
         $fieldMapping = $fieldMappings[$i] ?? NULL;
-        if ($fieldMapping) {
-          if ($fieldMapping['name'] !== ts('do_not_import')) {
-            // $mapping contact_type is not really a contact type - the 'about this entity' data has been mangled
-            // into that field - see https://lab.civicrm.org/dev/core/-/issues/654
-            $softCreditTypeID = '';
-            $entityData = json_decode($fieldMapping['contact_type'] ?? '', TRUE);
-            if (!empty($entityData)) {
-              $softCreditTypeID = (int) $entityData['soft_credit']['soft_credit_type_id'];
-            }
-            $fieldName = $this->isQuickFormMode ? str_replace('.', '__', $fieldMapping['name']) : $fieldMapping['name'];
-            $defaults["mapper[$i]"] = [$fieldName, $softCreditTypeID];
-          }
-        }
+        $this->addMappingToDefaults($defaults, $fieldMapping, $i);
       }
       elseif ($this->getSubmittedValue('skipColumnHeader')) {
         $defaults["mapper[$i]"][0] = $this->guessMappingBasedOnColumns($columnHeader);
       }
+    }
+    $userDefinedMappings = array_diff_key($this->getFieldMappings(), $this->getColumnHeaders());
+    foreach ($userDefinedMappings as $index => $mapping) {
+      $this->addMappingToDefaults($defaults, $mapping, $index);
     }
 
     return $defaults;
@@ -230,6 +222,11 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
       // not cope with a . the quick form layer will use a double underscore
       // as a stand in (the angular layer will not)
       $fieldName = str_replace('__', '.', $mapping[0]);
+      if (str_contains($fieldName, '.')) {
+        // If the field name contains a . - eg. address_primary.street_address
+        // we just want the part after the .
+        $fieldName = substr($fieldName, strpos($fieldName, '.') + 1);
+      }
       if ($fieldName === 'external_identifier' || $fieldName === 'contribution_contact_id' || $fieldName === 'contact__id') {
         // It is enough to have external identifier mapped.
         $weightSum = $threshold;
@@ -243,6 +240,31 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
       return $rule['rule_message'];
     }
     return NULL;
+  }
+
+  /**
+   * Add the saved mapping to the defaults.
+   *
+   * @param array $defaults
+   * @param array $fieldMapping
+   * @param int $rowNumber
+   *
+   * @return void
+   */
+  public function addMappingToDefaults(array &$defaults, array $fieldMapping, int $rowNumber): void {
+    if ($fieldMapping) {
+      if ($fieldMapping['name'] !== ts('do_not_import')) {
+        // $mapping contact_type is not really a contact type - the 'about this entity' data has been mangled
+        // into that field - see https://lab.civicrm.org/dev/core/-/issues/654
+        $softCreditTypeID = '';
+        $entityData = json_decode($fieldMapping['contact_type'] ?? '', TRUE);
+        if (!empty($entityData)) {
+          $softCreditTypeID = (int) $entityData['soft_credit']['soft_credit_type_id'];
+        }
+        $fieldName = $this->isQuickFormMode ? str_replace('.', '__', $fieldMapping['name']) : $fieldMapping['name'];
+        $defaults["mapper[$rowNumber]"] = [$fieldName, $softCreditTypeID];
+      }
+    }
   }
 
   /**

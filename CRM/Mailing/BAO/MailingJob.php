@@ -11,6 +11,7 @@
 use Civi\Api4\ActivityContact;
 use Civi\Api4\Mailing;
 use Civi\Api4\MailingJob;
+use Civi\FlexMailer\FlexMailer;
 
 /**
  *
@@ -172,7 +173,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
         $job->id = $result->id;
         $job->find(TRUE);
         $mailer = \Civi::service('pear_mail');
-        $isComplete = Civi\Core\Resolver::singleton()->call(CIVICRM_FLEXMAILER_HACK_DELIVER, [$job, $mailer, $testParams]);
+        $isComplete = FlexMailer::createAndRun($job, $mailer, $testParams);
       }
       elseif ($mode === 'sms') {
         $smsJob = new CRM_Mailing_BAO_SMSJob();

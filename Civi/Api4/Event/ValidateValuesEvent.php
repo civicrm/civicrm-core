@@ -127,7 +127,7 @@ class ValidateValuesEvent extends GenericHookEvent {
    * @param string|null $message
    * @return $this
    */
-  public function addError($recordKey, $field, string $name, string $message = NULL): self {
+  public function addError($recordKey, $field, string $name, ?string $message = NULL): self {
     $this->errors[] = [
       'record' => $recordKey,
       'fields' => (array) $field,

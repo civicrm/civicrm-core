@@ -46,7 +46,7 @@ class CRM_Core_ManagedEntities {
    * Perform an asynchronous reconciliation when the transaction ends.
    * @param array|null $modules
    */
-  public static function scheduleReconciliation(array $modules = NULL) {
+  public static function scheduleReconciliation(?array $modules = NULL) {
     CRM_Core_Transaction::addCallback(
       CRM_Core_Transaction::PHASE_POST_COMMIT,
       function ($modules) {
@@ -162,7 +162,7 @@ class CRM_Core_ManagedEntities {
       'action' => 'create',
       'where' => $condition,
     ]);
-    $defaultValues = $getFields->indexBy('name')->column('default_value');
+    $defaultValues = $getFields->column('default_value', 'name');
     $item['params']['values'] += $defaultValues;
   }
 

@@ -115,12 +115,6 @@ class CRM_Core_CodeGen_Util_MessageTemplates {
         'weight' => 2,
         'value' => 2,
       ],
-      'event_registration_receipt' => [
-        'option_group_name' => 'event',
-        'title' => ts('Events - Receipt only', ['escape' => 'sql']),
-        'weight' => 3,
-        'value' => 3,
-      ],
       'participant_cancelled' => [
         'option_group_name' => 'event',
         'title' => ts('Events - Registration Cancellation Notice', ['escape' => 'sql']),
@@ -254,18 +248,12 @@ class CRM_Core_CodeGen_Util_MessageTemplates {
    * @return string
    */
   protected static function getDirectory($smarty) {
-    if (method_exists($smarty, 'getTemplateDir')) {
-      $directories = $smarty->getTemplateDir();
-    }
-    else {
-      $directories = (array) $smarty->template_dir;
-    }
+    $directories = $smarty->getTemplateDir();
     foreach ($directories as $directory) {
       if (file_exists($directory . '/message_templates/')) {
         return $directory . '/message_templates/';
       }
     }
-
     return $directory . '/message_templates/';
   }
 

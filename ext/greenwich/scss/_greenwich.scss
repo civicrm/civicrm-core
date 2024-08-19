@@ -78,8 +78,13 @@ $headings-color: rgb(0, 0, 0);
 //
 //## Specify custom location and filename of the included Glyphicons icon font. Useful for those including Bootstrap via Bower.
 
+// (dev/release#22) The licensing around Bootstrap3 and glyphicons-halflings is confusing/FUDdy.  It's _probably_ OK to redistribute these font files under
+// MIT-compatible licensing, but that's not clear.  Regardless, `glyphicons` are deprecated within CiviCRM, so we generally don't need them.  Using the CDN
+// means we don't have to distribute them -- but there's still a fallback for old/oddball addons which still reference glyphicons.
+
 //** Load fonts from this directory.
-$icon-font-path: "../extern/bootstrap3/assets/fonts/bootstrap/";
+$icon-font-path: 'https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/fonts/';
+// $icon-font-path: "../extern/bootstrap3/assets/fonts/bootstrap/";
 //** File name for all font files.
 $icon-font-name: "glyphicons-halflings-regular";
 //** Element ID within SVG icon file.

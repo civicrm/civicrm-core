@@ -16,7 +16,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
   protected $adhocProvider;
 
   /**
-   * @var String[]
+   * @var CRM_Core_Module[]
    */
   protected $modules;
 

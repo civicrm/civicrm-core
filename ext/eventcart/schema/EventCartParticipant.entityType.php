@@ -1,49 +1,48 @@
 <?php
 
 return [
-  'name' => 'EventInCart',
-  'table' => 'civicrm_events_in_carts',
-  'class' => 'CRM_Event_Cart_DAO_EventInCart',
+  'name' => 'EventCartParticipant',
+  'table' => 'civicrm_event_cart_participant',
+  'class' => 'CRM_Event_Cart_DAO_EventCartParticipant',
   'getInfo' => fn() => [
-    'title' => ts('Event In Cart'),
-    'title_plural' => ts('Event In Carts'),
-    'description' => ts('FIXME'),
+    'title' => ts('Event Cart Participant'),
+    'title_plural' => ts('Event Cart Participants'),
+    'description' => ts('Event Cart Participant'),
   ],
   'getFields' => fn() => [
     'id' => [
-      'title' => ts('Event In Cart'),
+      'title' => ts('Event Cart Participant ID'),
       'sql_type' => 'int unsigned',
       'input_type' => 'Number',
       'required' => TRUE,
-      'description' => ts('Event In Cart ID'),
-      'add' => '4.1',
-      'unique_name' => 'event_in_cart_id',
+      'description' => ts('Event Cart Participant ID'),
+      'add' => '5.76',
       'primary_key' => TRUE,
       'auto_increment' => TRUE,
     ],
-    'event_id' => [
-      'title' => ts('Event ID'),
+    'participant_id' => [
+      'title' => ts('Participant ID'),
       'sql_type' => 'int unsigned',
       'input_type' => 'EntityRef',
-      'description' => ts('FK to Event ID'),
-      'add' => '4.1',
+      'description' => ts('FK to Participant ID'),
+      'add' => '5.76',
       'input_attrs' => [
-        'label' => ts('Event'),
+        'label' => ts('Participant'),
       ],
       'entity_reference' => [
-        'entity' => 'Event',
+        'entity' => 'Participant',
         'key' => 'id',
         'on_delete' => 'CASCADE',
       ],
     ],
-    'event_cart_id' => [
+    'cart_id' => [
       'title' => ts('Event Cart ID'),
       'sql_type' => 'int unsigned',
       'input_type' => 'EntityRef',
       'description' => ts('FK to Event Cart ID'),
-      'add' => '4.1',
+      'add' => '5.67',
       'input_attrs' => [
-        'label' => ts('Event In Cart'),
+        'label' => ts('Event Cart'),
       ],
       'entity_reference' => [
         'entity' => 'Cart',

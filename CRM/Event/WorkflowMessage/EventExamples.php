@@ -33,7 +33,7 @@ class CRM_Event_WorkflowMessage_EventExamples extends WorkflowMessageExample {
    * @throws \CRM_Core_Exception
    */
   public function getExamples(): iterable {
-    $workflows = ['event_online_receipt', 'event_offline_receipt', 'participant_cancelled', 'participant_confirm', 'participant_expired', 'participant_transferred', 'event_registration_receipt'];
+    $workflows = ['event_online_receipt', 'event_offline_receipt', 'participant_cancelled', 'participant_confirm', 'participant_expired', 'participant_transferred'];
     foreach ($workflows as $workflow) {
       $priceSets = $this->getPriceSets();
       foreach ($priceSets as $priceSet) {

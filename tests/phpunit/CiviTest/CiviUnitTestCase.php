@@ -31,6 +31,8 @@ use Civi\Api4\CiviCase;
 use Civi\Api4\Contribution;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
+use Civi\Api4\DedupeRuleGroup;
+use Civi\Api4\DedupeRule;
 use Civi\Api4\ExampleData;
 use Civi\Api4\FinancialAccount;
 use Civi\Api4\FinancialType;
@@ -551,6 +553,10 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     if (!empty($this->ids['UFGroup'])) {
       UFGroup::delete(FALSE)->addWhere('id', 'IN', $this->ids['UFGroup'])->execute();
     }
+    if (!empty($this->ids['DedupeRuleGroup'])) {
+      DedupeRule::delete(FALSE)->addWhere('dedupe_rule_group_id', 'IN', $this->ids['DedupeRuleGroup'])->execute();
+      DedupeRuleGroup::delete(FALSE)->addWhere('id', 'IN', $this->ids['DedupeRuleGroup'])->execute();
+    }
     unset(CRM_Core_Config::singleton()->userPermissionClass->permissions);
     parent::tearDown();
   }
@@ -572,7 +578,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $errorHandlerAtEndOfTest = set_error_handler(function($errno, $errstr, $errfile, $errline) {});
     restore_error_handler();
     if ($this->errorHandlerAtStartOfTest != $errorHandlerAtEndOfTest) {
-      $this->fail('Error handler is not the same at the end of the test as when it started. Start: ' . print_r($this->errorHandlerAtStartOfTest, TRUE) . "\nEnd: " . print_r($errorHandlerAtEndOfTest, TRUE));
+      $this->fail('Error handler is not the same at the end of the test as when it started. Did you forget to call parent::setUp or parent::tearDown? Start: ' . print_r($this->errorHandlerAtStartOfTest, TRUE) . "\nEnd: " . print_r($errorHandlerAtEndOfTest, TRUE));
     }
 
     // Reset to version 3 as not all (e.g payments) work on v4
@@ -1305,7 +1311,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @return int
    *   $id of created UF Join
    */
-  public function ufjoinCreate(array $params = NULL): int {
+  public function ufjoinCreate(?array $params = NULL): int {
     if ($params === NULL) {
       $params = [
         'is_active' => 1,
@@ -2589,7 +2595,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       INNER JOIN civicrm_msg_template m2
         ON m2.workflow_name = m.workflow_name AND m2.is_reserved = 1
         AND m.is_default = 1
-      SET m.msg_html = m2.msg_html, m.msg_text = m2.msg_text
+      SET m.msg_html = m2.msg_html, m.msg_text = m2.msg_text, m.msg_subject = m2.msg_subject
     ');
   }
 
@@ -3514,14 +3520,15 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   /**
    * @return array|int
    */
-  protected function createRuleGroup() {
-    return $this->callAPISuccess('RuleGroup', 'create', [
+  protected function createRuleGroup(): array {
+    return $this->createTestEntity('DedupeRuleGroup', [
       'contact_type' => 'Individual',
       'threshold' => 8,
       'used' => 'General',
       'title' => 'TestRule',
       'is_reserved' => 0,
-    ]);
+      'name' => 'TestRule',
+    ], 'individual_general');
   }
 
   /**

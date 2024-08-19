@@ -3401,7 +3401,7 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
    * @param array $conditions
    * @inheritDoc
    */
-  public function addSelectWhereClause(string $entityName = NULL, int $userId = NULL, array $conditions = []): array {
+  public function addSelectWhereClause(?string $entityName = NULL, ?int $userId = NULL, array $conditions = []): array {
     // We always return an array with these keys, even if they are empty,
     // because this tells the query builder that we have considered these fields for acls
     $clauses = [
@@ -3622,11 +3622,11 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
    *
    * @param string $entityName
    *   Always "Contact".
-   * @param int $entityId
+   * @param int|null $entityId
    *   Id of the contact.
    * @throws CRM_Core_Exception
    */
-  public static function getEntityIcon(string $entityName, int $entityId = NULL): ?string {
+  public static function getEntityIcon(string $entityName, ?int $entityId = NULL): ?string {
     $default = parent::getEntityIcon($entityName);
     if (!$entityId) {
       return $default;

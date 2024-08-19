@@ -137,12 +137,11 @@
         {/if}
 
       {if ($event.is_map && $config->mapProvider &&
-          array_key_exists('address', $location)  && (is_numeric($location.address.1.geo_code_1) ||
-          ($location.address.1.city AND $location.address.1.state_province)))}
+          array_key_exists('address', $location)  && (is_numeric($location.address.1.geo_code_1)))}
           <div class="crm-section event_map-section">
               <div class="content">
                     {assign var=showDirectly value="1"}
-                    {include file="CRM/Contact/Form/Task/Map/`$config->mapProvider`.tpl" fields=$showDirectly}
+                    {include file="CRM/Contact/Form/Task/Map/`$config->mapProvider`.tpl" fields=$showDirectly profileGID=false}
                     <a href="{$mapURL}" title="{ts}Show large map{/ts}">{ts}Show large map{/ts}</a>
               </div>
               <div class="clear"></div>

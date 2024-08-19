@@ -1,9 +1,29 @@
 <?php
 
-// Auto-install core extension.
-// Note this is a limited interim technique for installing core extensions -  the goal is that core extensions would be installed
-// in the setup routine based on their tags & using the standard extension install api.
-// do not try this at home folks.
+// Auto-install core extension (low-level; avoid if you can)
+//
+// There are MULTIPLE PLACES where you can install extensions by default. Compare:
+//
+// + `sql/civicrm_data/civicrm_extension.sqldata.php`
+//      - Only safe for -very basic- extensions (no dependencies, no new tables, no install-routines)
+//      - BYPASSES dependencies (activation/ordering/validation)
+//      - BYPASSES hooks (hook_install, hook_enable, etc)
+//      - Goes into the raw template for all databases
+//      - Affects modern installers... and also ancient installers and *ALL* headless tests.
+//      - Difficult to alter programmatically
+//
+// + `setup/plugins/init/DefaultExtension.civi-setup.php`
+//      - Safe for many extensions
+//      - RESPECTS dependencies (activating them in topological order)
+//      - RESPECTS hooks (hook_install, hook_enable, etc)
+//      - During installation, it triggers the regular ext-install logic
+//      - Affects modern installers
+//      - Amenable to programmatic alteration
+//
+// Generally, if you're just tweaking policy preferences, then `DefaultExtension` is a better place.
+//
+// Historically, some policy preferences were put here before Setup API was introduced across-the-board.
+// We should look at changing those.
 
 return CRM_Core_CodeGen_SqlData::create('civicrm_extension', 'INSERT IGNORE INTO')
   ->addDefaults([

@@ -253,13 +253,12 @@ class CRM_Contribute_Form_AdditionalInfo {
       'note' => $params['note'],
       'entity_id' => $contributionID,
       'contact_id' => $contactID,
+      'id' => $contributionNoteID,
     ];
-    $noteID = [];
     if ($contributionNoteID) {
-      $noteID = ["id" => $contributionNoteID];
       $noteParams['note'] = $noteParams['note'] ?: "null";
     }
-    CRM_Core_BAO_Note::add($noteParams, $noteID);
+    CRM_Core_BAO_Note::add($noteParams);
   }
 
   /**

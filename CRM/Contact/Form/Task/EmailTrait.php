@@ -931,8 +931,13 @@ trait CRM_Contact_Form_Task_EmailTrait {
       'attachments' => $attachments,
     ];
 
-    if (!CRM_Utils_Mail::send($mailParams)) {
-      return FALSE;
+    try {
+      if (!CRM_Utils_Mail::send($mailParams)) {
+        return FALSE;
+      }
+    }
+    catch (\Exception $e) {
+      CRM_Core_Error::statusBounce($e->getMessage());
     }
 
     // add activity target record for every mail that is send

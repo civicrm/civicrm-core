@@ -30,7 +30,7 @@
             <th class='crm-custom_option-default_value'>{ts}Default{/ts}</th>
             <th class='crm-custom_option-is_active'>{ts}Enabled?{/ts}</th>
             <th class='crm-custom_option-links'>&nbsp;</th>
-            <th class='hiddenElement'>&nbsp;</th>
+            <th class='hiddenElement'><span class="sr-only">{ts}Actions{/ts}</span></th>
           </tr>
         </thead>
       </table>

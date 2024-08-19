@@ -91,14 +91,9 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
 
   /**
    * Process the form after the input has been submitted and validated.
-   *
-   * @param array|null $params
    */
-  public function postProcess($params = NULL) {
-    if (!empty($params)) {
-      CRM_Core_Error::deprecatedWarning('params parameter is deprecated');
-    }
-    $fv = $params ?: $this->controller->exportValues($this->_name);
+  public function postProcess() {
+    $fv = $this->controller->exportValues($this->_name);
     $locName = NULL;
 
     $addressReturnProperties = CRM_Contact_Form_Task_LabelCommon::getAddressReturnProperties();
@@ -243,34 +238,6 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
         foreach ($contact as $field => $fieldValue) {
           $rows[$value][$field] = $fieldValue;
         }
-
-        $valuesothers = [];
-        $paramsothers = ['contact_id' => $value];
-        $valuesothers = CRM_Core_BAO_Location::getValues($paramsothers, $valuesothers);
-        if (!empty($fv['location_type_id'])) {
-          foreach ($valuesothers as $vals) {
-            if (($vals['location_type_id'] ?? NULL) ==
-              ($fv['location_type_id'] ?? NULL)
-            ) {
-              foreach ($vals as $k => $v) {
-                if (in_array($k, [
-                  'email',
-                  'phone',
-                  'im',
-                  'openid',
-                ])) {
-                  if ($k === 'im') {
-                    $rows[$value][$k] = $v['1']['name'];
-                  }
-                  else {
-                    $rows[$value][$k] = $v['1'][$k];
-                  }
-                  $rows[$value][$k . '_id'] = $v['1']['id'];
-                }
-              }
-            }
-          }
-        }
       }
       else {
         if (!self::tokenIsFound($contact, $mailingFormatProperties, $tokenFields)) {
@@ -308,7 +275,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
         $row['preferred_communication_method'] = implode(', ', $temp);
       }
       $row['id'] = $id;
-      $formatted = CRM_Utils_Address::formatMailingLabel($row, 'mailing_format', FALSE, TRUE, $tokenFields);
+      $formatted = CRM_Utils_Address::formatMailingLabel($row);
       $rows[$id] = [$formatted];
     }
 

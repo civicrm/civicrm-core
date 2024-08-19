@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Contribution Product'),
     'title_plural' => ts('Contribution Products'),
-    'description' => ts('FIXME'),
+    'description' => ts('Products for Contributions'),
     'log' => TRUE,
     'add' => '1.4',
   ],
@@ -56,9 +56,6 @@ return [
       'add' => '1.4',
       'usage' => [
         'export',
-      ],
-      'input_attrs' => [
-        'maxlength' => 255,
       ],
     ],
     'quantity' => [

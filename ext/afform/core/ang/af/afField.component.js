@@ -154,6 +154,13 @@
         });
       };
 
+      // When this field is removed by afIf, also remove its value from the data model.
+      $scope.$on('afIfDestroy', function() {
+        if (ctrl.defn.input_type !== 'DisplayOnly') {
+          delete $scope.dataProvider.getFieldData()[ctrl.fieldName];
+        }
+      });
+
       // correct the type for the value, make sure numbers are numbers and not string
       function correctValueType(value, dataType) {
         // let's skip type correction for null values
@@ -185,6 +192,10 @@
 
       // Set default value; ensure data type matches input type
       function setValue(value) {
+        // For values passed from the url, split
+        if (typeof value === 'string' && ctrl.isMultiple()) {
+          value = value.split(',');
+        }
         // correct the value type
         if (ctrl.defn.input_type !== 'DisplayOnly') {
           value = correctValueType(value, ctrl.defn.data_type);
@@ -212,9 +223,6 @@
             '>=': ('' + value).split('-')[0],
             '<=': ('' + value).split('-')[1] || '',
           };
-        }
-        else if (_.isString(value) && ctrl.isMultiple()) {
-          value = value.split(',');
         }
         $scope.getSetValue(value);
       }
