@@ -57,6 +57,29 @@ class CRM_Contact_Form_Task_PrintMailingLabelTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test tokens are rendered in the mailing labels when declared via deprecated hooks.
+   */
+  public function testMailingLabelAddressMergeWithTokens(): void {
+    \Civi::settings()->set('mailing_format', $this->getDefaultMailingFormat() . ' {test.last_initial}');
+    $this->hookClass->setHook('civicrm_tokenValues', [$this, 'hookTokenValues']);
+    $this->hookClass->setHook('civicrm_tokens', [$this, 'hook_tokens']);
+    $this->createTestAddresses();
+    $rows = $this->submitForm([
+      'merge_same_address' => TRUE,
+    ]);
+    $this->assertCount(1, $rows);
+    // The address has been combined. Note both names appear.
+    // No merge handling is done on the token - this test was added to lock
+    // in token merge handling as at the time of writing, not to weigh in on
+    // or change behaviour.
+    $this->assertEquals('Mr. Anthony J. Collins II
+Mr. Antonia J. D`souza II
+Main Street 231
+Brummen, 6971 BN
+NETHERLANDS S', $rows[$this->ids['Contact']['collins']][0]);
+  }
+
+  /**
    * Test the mailing label rows contain the primary addresses when
    * location_type_id = none (as primary) is chosen in form.
    *
