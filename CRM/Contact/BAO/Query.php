@@ -429,7 +429,7 @@ class CRM_Contact_BAO_Query {
    * Set to 1 if Search in Trash selected.
    */
   public $_onlyDeleted = 0;
-  
+
   /**
    * Class constructor which also does all the work.
    *
