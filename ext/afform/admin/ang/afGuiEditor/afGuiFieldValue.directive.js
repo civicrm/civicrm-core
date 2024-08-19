@@ -26,7 +26,7 @@
             if (typeof value === 'boolean') {
               return value ? '1' : '0';
             }
-            return value;
+            return '' + value;
           }
           ctrls.ngModel.$formatters.push(formatViewValue);
         }
