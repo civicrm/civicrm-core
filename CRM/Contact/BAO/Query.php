@@ -429,6 +429,7 @@ class CRM_Contact_BAO_Query {
    * Set to 1 if Search in Trash selected.
    */
   public $_onlyDeleted = 0;
+  
   /**
    * Class constructor which also does all the work.
    *
@@ -449,7 +450,6 @@ class CRM_Contact_BAO_Query {
    *
    * @throws \CRM_Core_Exception
    */
-
   public function __construct(
     $params = NULL, $returnProperties = NULL, $fields = NULL,
     $includeContactIds = FALSE, $strict = FALSE, $mode = 1,
