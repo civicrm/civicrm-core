@@ -424,7 +424,7 @@ class CRM_Contact_BAO_Query {
   public $_groupUniqueKey;
   public $_groupKeys = [];
 
-  /*
+  /**
    * @var int
    * Set to 1 if Search in Trash selected.
    */
@@ -449,6 +449,7 @@ class CRM_Contact_BAO_Query {
    *
    * @throws \CRM_Core_Exception
    */
+
   public function __construct(
     $params = NULL, $returnProperties = NULL, $fields = NULL,
     $includeContactIds = FALSE, $strict = FALSE, $mode = 1,
@@ -609,7 +610,7 @@ class CRM_Contact_BAO_Query {
     $this->_fromClause = self::fromClause($this->_tables, NULL, NULL,
       $this->_primaryLocation, $this->_mode, $apiEntity, $this->_onlyDeleted);
     $this->_simpleFromClause = self::fromClause($this->_whereTables, NULL,
-      NULL, $this->_primaryLocation, $this->_mode, null, $this->_onlyDeleted);
+      NULL, $this->_primaryLocation, $this->_mode, NULL, $this->_onlyDeleted);
     $this->openedSearchPanes(TRUE);
   }
 
@@ -2570,7 +2571,7 @@ class CRM_Contact_BAO_Query {
    * @return string
    *   the from clause
    */
-  public static function fromClause(&$tables, $inner = NULL, $right = NULL, 
+  public static function fromClause(&$tables, $inner = NULL, $right = NULL,
     $primaryLocation = TRUE, $mode = 1, $apiEntity = NULL, $onlyDeleted = 0) {
 
     $from = ' FROM civicrm_contact contact_a';
