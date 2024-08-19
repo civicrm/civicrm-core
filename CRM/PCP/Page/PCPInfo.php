@@ -35,9 +35,8 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
     $config = CRM_Core_Config::singleton();
     $permissionCheck = FALSE;
     $statusMessage = '';
-    if ($config->userFramework != 'Joomla') {
-      $permissionCheck = CRM_Core_Permission::check('administer CiviCRM');
-    }
+
+    $permissionCheck = CRM_Core_Permission::check('administer CiviCRM');
     //get the pcp id.
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
 
