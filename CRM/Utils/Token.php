@@ -1426,46 +1426,6 @@ class CRM_Utils_Token {
   }
 
   /**
-   * Do not use - unused in core.
-   *
-   * Replace Contribution tokens in html.
-   *
-   * @param string $str
-   * @param array $contribution
-   * @param bool|string $html
-   * @param string $knownTokens
-   * @param bool|string $escapeSmarty
-   *
-   * @deprecated
-   *
-   * @return mixed
-   */
-  public static function replaceContributionTokens($str, &$contribution, $html = FALSE, $knownTokens = NULL, $escapeSmarty = FALSE) {
-    CRM_Core_Error::deprecatedFunctionWarning('use the token processor');
-    $key = 'contribution';
-    if (!$knownTokens || empty($knownTokens[$key])) {
-      //early return
-      return $str;
-    }
-
-    // here we intersect with the list of pre-configured valid tokens
-    // so that we remove anything we do not recognize
-    // I hope to move this step out of here soon and
-    // then we will just iterate on a list of tokens that are passed to us
-
-    $str = preg_replace_callback(
-      self::tokenRegex($key),
-      function ($matches) use (&$contribution, $html, $escapeSmarty) {
-        return CRM_Utils_Token::getContributionTokenReplacement($matches[1], $contribution, $html, $escapeSmarty);
-      },
-      $str
-    );
-
-    $str = preg_replace('/\\\\|\{(\s*)?\}/', ' ', $str);
-    return $str;
-  }
-
-  /**
    * Get replacement strings for any membership tokens (only a small number of tokens are implemnted in the first instance
    * - this is used by the pdfLetter task from membership search
    *
