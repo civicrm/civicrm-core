@@ -114,6 +114,10 @@
               ts('Saved'),
               'success'
             );
+            // Refresh admin settings (if a db entity was saved the list of entities will be changed)
+            fetch(CRM.url('civicrm/ajax/admin/search'))
+              .then(response => response.json())
+              .then(data => CRM.crmSearchAdmin = data);
             dialogService.close('crmSearchAdminImport');
           }, function(error) {
             ctrl.running = false;
