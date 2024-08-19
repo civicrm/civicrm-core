@@ -393,11 +393,7 @@ class CRM_Core_Invoke {
     $config = CRM_Core_Config::singleton();
     $config->clearModuleList();
 
-    // dev/core#3660 - Activate any new classloaders/mixins/etc before re-hydrating any data-structures.
-    CRM_Extension_System::singleton()->getClassLoader()->refresh();
-    CRM_Extension_System::singleton()->getMixinLoader()->run(TRUE);
-
-    // also cleanup all caches
+    // cleanup all caches
     $config->cleanupCaches($sessionReset || CRM_Utils_Request::retrieve('sessionReset', 'Boolean', CRM_Core_DAO::$_nullObject, FALSE, 0, 'GET'));
 
     CRM_Core_Menu::store();

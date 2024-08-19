@@ -284,7 +284,14 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
   public function cleanupCaches($sessionReset = FALSE) {
     // cleanup templates_c directory
     $this->cleanup(1, FALSE);
+
+    // we need to do this  before we start updating the classes, which destabilises API4
     UserJob::delete(FALSE)->addWhere('expires_date', '<', 'now')->execute();
+
+    // dev/core#3660 - Activate any new classloaders/mixins/etc before re-hydrating any data-structures.
+    CRM_Extension_System::singleton()->getClassLoader()->refresh();
+    CRM_Extension_System::singleton()->getMixinLoader()->run(TRUE);
+
     // clear all caches
     self::clearDBCache();
     // Avoid clearing QuickForm sessions unless explicitly requested
