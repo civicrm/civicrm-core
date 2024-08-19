@@ -284,7 +284,6 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
   public function cleanupCaches($sessionReset = FALSE) {
     // cleanup templates_c directory
     $this->cleanup(1, FALSE);
-    UserJob::delete(FALSE)->addWhere('expires_date', '<', 'now')->execute();
     // clear all caches
     self::clearDBCache();
     // Avoid clearing QuickForm sessions unless explicitly requested
@@ -294,6 +293,10 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
     Civi::cache('metadata')->clear();
     CRM_Core_DAO_AllCoreTables::flush();
     CRM_Utils_System::flushCache();
+
+    // note this used to be earlier, but was crashing because of api4 instability
+    // during extension install
+    UserJob::delete(FALSE)->addWhere('expires_date', '<', 'now')->execute();
 
     if ($sessionReset) {
       $session = CRM_Core_Session::singleton();
