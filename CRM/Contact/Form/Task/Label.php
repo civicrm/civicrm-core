@@ -185,25 +185,6 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
     //get the total number of contacts to fetch from database.
     $numberofContacts = count($this->_contactIds);
     [$details] = CRM_Contact_BAO_Query::apiQuery($params, $returnProperties, NULL, NULL, 0, $numberofContacts, TRUE, FALSE, TRUE, CRM_Contact_BAO_Query::MODE_CONTACTS, NULL, $primaryLocationOnly);
-    $messageToken = CRM_Utils_Token::getTokens($mailingFormat);
-
-    // $details is an array of [ contactID => contactDetails ]
-    // also get all token values
-    CRM_Utils_Hook::tokenValues($details,
-      $this->_contactIds,
-      NULL,
-      $messageToken,
-      'CRM_Contact_Form_Task_Label'
-    );
-
-    $tokens = [];
-    CRM_Utils_Hook::tokens($tokens);
-    $tokenFields = [];
-    foreach ($tokens as $category => $catTokens) {
-      foreach ($catTokens as $token => $tokenName) {
-        $tokenFields[] = $token;
-      }
-    }
 
     foreach ($this->_contactIds as $value) {
       foreach ($custom as $cfID) {
