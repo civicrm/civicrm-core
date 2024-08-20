@@ -660,6 +660,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     self::generateLogFileName($prefix);
     $log = Log::singleton('file', \Civi::$statics[__CLASS__]['logger_file' . $prefix], '', [
       'timeFormat' => 'Y-m-d H:i:sO',
+      'mode' => CRM_Utils_Constant::value('CIVICRM_LOG_FILE_PERMISSIONS', '0664'),
+      'dirmode' => CRM_Utils_Constant::value('CIVICRM_LOG_FILE_DIR_PERMISSIONS', '0775'),
     ]);
     return $log;
   }
