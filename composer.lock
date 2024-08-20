@@ -5761,21 +5761,23 @@
         },
         {
             "name": "zetacomponents/base",
-            "version": "1.9.3",
+            "version": "1.9.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zetacomponents/Base.git",
-                "reference": "2f432f4117a5aa2164d4fb1784f84db91dbdd3b8"
+                "reference": "b6ae5f6177f6e51c5fc3514800e1c3fb076ec4be"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zetacomponents/Base/zipball/2f432f4117a5aa2164d4fb1784f84db91dbdd3b8",
-                "reference": "2f432f4117a5aa2164d4fb1784f84db91dbdd3b8",
+                "url": "https://api.github.com/repos/zetacomponents/Base/zipball/b6ae5f6177f6e51c5fc3514800e1c3fb076ec4be",
+                "reference": "b6ae5f6177f6e51c5fc3514800e1c3fb076ec4be",
                 "shasum": ""
             },
             "require-dev": {
-                "phpunit/phpunit": "~8.0",
-                "zetacomponents/unit-test": "*"
+                "phpunit/php-invoker": "^2.0|^3.1",
+                "phpunit/phpunit": "~9.0",
+                "zetacomponents/coding-standard": "dev-main",
+                "zetacomponents/unit-test": "~1.2.3"
             },
             "type": "library",
             "autoload": {
@@ -5823,22 +5825,22 @@
             "homepage": "https://github.com/zetacomponents",
             "support": {
                 "issues": "https://github.com/zetacomponents/Base/issues",
-                "source": "https://github.com/zetacomponents/Base/tree/1.9.3"
+                "source": "https://github.com/zetacomponents/Base/tree/1.9.4"
             },
-            "time": "2021-07-25T15:46:08+00:00"
+            "time": "2022-11-30T16:16:25+00:00"
         },
         {
             "name": "zetacomponents/mail",
-            "version": "1.9.4",
+            "version": "1.9.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zetacomponents/Mail.git",
-                "reference": "83ba646f36f753c0bbc8b2189c88d41ece326ea0"
+                "reference": "17b57e916e5fa7844abb48a22b4ff873aef0d148"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zetacomponents/Mail/zipball/83ba646f36f753c0bbc8b2189c88d41ece326ea0",
-                "reference": "83ba646f36f753c0bbc8b2189c88d41ece326ea0",
+                "url": "https://api.github.com/repos/zetacomponents/Mail/zipball/17b57e916e5fa7844abb48a22b4ff873aef0d148",
+                "reference": "17b57e916e5fa7844abb48a22b4ff873aef0d148",
                 "shasum": ""
             },
             "require": {
@@ -5903,9 +5905,9 @@
             "homepage": "https://github.com/zetacomponents",
             "support": {
                 "issues": "https://github.com/zetacomponents/Mail/issues",
-                "source": "https://github.com/zetacomponents/Mail/tree/1.9.4"
+                "source": "https://github.com/zetacomponents/Mail/tree/1.9.6"
             },
-            "time": "2022-09-14T10:13:21+00:00"
+            "time": "2023-09-14T13:17:11+00:00"
         }
     ],
     "packages-dev": [],
@@ -5925,5 +5927,5 @@
     "platform-overrides": {
         "php": "7.4.0"
     },
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.3.0"
 }
