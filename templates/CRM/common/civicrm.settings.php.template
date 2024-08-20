@@ -387,6 +387,16 @@ if (!defined('CIVICRM_MAIL_SMARTY')) {
 // }
 
 /**
+ * If needed to modify the file nad directory permissions for any LogFiles / directories created by Pear/log package
+ */
+// if (!defined('CIVICRM_LOG_FILE_PERMISSIONS')) {
+//   define('CIVICRM_LOG_FILE_PERMISSIONS', '0664');
+// }
+// if (!defined('CIVICRM_LOG_FILE_DIR_PERMISSIONS')) {
+//   define('CIVICRM_LOG_FILE_DIR_PERMISSIONS', '775');
+// }
+
+/**
  * This setting will only work if CIVICRM_MAIL_LOG is defined.  Mail will be logged and then sent.
  */
 //if (!defined('CIVICRM_MAIL_LOG_AND_SEND')) {
