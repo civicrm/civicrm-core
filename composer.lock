@@ -5831,16 +5831,16 @@
         },
         {
             "name": "zetacomponents/mail",
-            "version": "1.9.6",
+            "version": "1.9.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zetacomponents/Mail.git",
-                "reference": "17b57e916e5fa7844abb48a22b4ff873aef0d148"
+                "reference": "1ba2285540771646fa7c3c881e8b6f97663a6d4a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zetacomponents/Mail/zipball/17b57e916e5fa7844abb48a22b4ff873aef0d148",
-                "reference": "17b57e916e5fa7844abb48a22b4ff873aef0d148",
+                "url": "https://api.github.com/repos/zetacomponents/Mail/zipball/1ba2285540771646fa7c3c881e8b6f97663a6d4a",
+                "reference": "1ba2285540771646fa7c3c881e8b6f97663a6d4a",
                 "shasum": ""
             },
             "require": {
@@ -5905,9 +5905,9 @@
             "homepage": "https://github.com/zetacomponents",
             "support": {
                 "issues": "https://github.com/zetacomponents/Mail/issues",
-                "source": "https://github.com/zetacomponents/Mail/tree/1.9.6"
+                "source": "https://github.com/zetacomponents/Mail/tree/1.9.7"
             },
-            "time": "2023-09-14T13:17:11+00:00"
+            "time": "2024-08-20T08:42:42+00:00"
         }
     ],
     "packages-dev": [],
