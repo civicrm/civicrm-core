@@ -126,7 +126,6 @@ return [
             [
               'type' => 'field',
               'key' => 'activity_type_id:label',
-              'dataType' => 'Integer',
               'label' => ts('Type'),
               'sortable' => TRUE,
               'icons' => [
@@ -139,7 +138,6 @@ return [
             [
               'type' => 'field',
               'key' => 'subject',
-              'dataType' => 'String',
               'label' => ts('Subject'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -147,14 +145,12 @@ return [
             [
               'type' => 'field',
               'key' => 'activity_date_time',
-              'dataType' => 'Timestamp',
               'label' => ts('Date'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'status_id:label',
-              'dataType' => 'Integer',
               'label' => ts('Status'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -162,7 +158,6 @@ return [
             [
               'type' => 'field',
               'key' => 'GROUP_CONCAT_Activity_ActivityContact_Contact_02_sort_name',
-              'dataType' => 'String',
               'label' => ts('Added By'),
               'sortable' => TRUE,
               'link' => [
@@ -175,7 +170,6 @@ return [
             [
               'type' => 'field',
               'key' => 'GROUP_CONCAT_Activity_ActivityContact_Contact_03_sort_name',
-              'dataType' => 'String',
               'label' => ts('With'),
               'sortable' => TRUE,
               'link' => [
@@ -188,7 +182,6 @@ return [
             [
               'type' => 'field',
               'key' => 'GROUP_CONCAT_Activity_ActivityContact_Contact_04_sort_name',
-              'dataType' => 'String',
               'label' => ts('Assigned'),
               'sortable' => TRUE,
               'link' => [

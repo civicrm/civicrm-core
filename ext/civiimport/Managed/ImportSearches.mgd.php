@@ -86,7 +86,6 @@ foreach ($importEntities as $importEntity) {
     $columns[] = [
       'type' => 'field',
       'key' => $field['name'],
-      'dataType' => $field['data_type'] ?? 'String',
       'label' => $field['title'] ?? $field['label'],
       'sortable' => TRUE,
       'editable' => strpos($field['name'], '_') !== 0,
@@ -156,7 +155,6 @@ foreach ($importEntities as $importEntity) {
             [
               'type' => 'field',
               'key' => '_status',
-              'dataType' => 'String',
               'label' => 'Row status',
               'sortable' => TRUE,
               'link' => [
@@ -171,7 +169,6 @@ foreach ($importEntities as $importEntity) {
             [
               'type' => 'field',
               'key' => 'COUNT_id',
-              'dataType' => 'Integer',
               'label' => E::ts('Number of rows'),
               'sortable' => TRUE,
             ],

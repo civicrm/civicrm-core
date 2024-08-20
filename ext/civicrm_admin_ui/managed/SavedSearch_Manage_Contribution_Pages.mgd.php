@@ -82,7 +82,6 @@ return [
             [
               'type' => 'field',
               'key' => 'title',
-              'dataType' => 'String',
               'label' => E::ts('Title'),
               'sortable' => TRUE,
               'cssRules' => [
@@ -97,7 +96,6 @@ return [
             [
               'type' => 'field',
               'key' => 'id',
-              'dataType' => 'Integer',
               'label' => E::ts('ID'),
               'sortable' => TRUE,
               'cssRules' => [
@@ -112,7 +110,6 @@ return [
             [
               'type' => 'field',
               'key' => 'is_active',
-              'dataType' => 'Boolean',
               'label' => E::ts('Enabled?'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -128,7 +125,6 @@ return [
             [
               'type' => 'field',
               'key' => 'financial_type_id:label',
-              'dataType' => 'Integer',
               'label' => E::ts('Financial Type'),
               'sortable' => TRUE,
               'cssRules' => [

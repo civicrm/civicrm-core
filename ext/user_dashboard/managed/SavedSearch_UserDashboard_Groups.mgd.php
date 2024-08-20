@@ -106,21 +106,18 @@ return [
             [
               'type' => 'field',
               'key' => 'frontend_title',
-              'dataType' => 'String',
               'label' => E::ts('Group'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'Group_GroupContact_Contact_01.status:label',
-              'dataType' => 'String',
               'label' => E::ts('Status'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'MAX_Group_SubscriptionHistory_group_id_01_date',
-              'dataType' => 'Timestamp',
               'label' => E::ts('Since'),
               'sortable' => TRUE,
             ],

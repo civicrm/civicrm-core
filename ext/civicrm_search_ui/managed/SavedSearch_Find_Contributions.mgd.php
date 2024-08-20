@@ -95,7 +95,6 @@ return [
             [
               'type' => 'field',
               'key' => 'Contribution_Contact_contact_id_01.display_name',
-              'dataType' => 'String',
               'label' => E::ts('Name'),
               'sortable' => TRUE,
               'link' => [
@@ -116,42 +115,36 @@ return [
             [
               'type' => 'field',
               'key' => 'total_amount',
-              'dataType' => 'Money',
               'label' => E::ts('Amount'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'financial_type_id:label',
-              'dataType' => 'Integer',
               'label' => E::ts('Type'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'source',
-              'dataType' => 'String',
               'label' => E::ts('Contribution Source'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'receive_date',
-              'dataType' => 'Timestamp',
               'label' => E::ts('Contribution Date'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'thankyou_date',
-              'dataType' => 'Timestamp',
               'label' => E::ts('Thank-you Sent'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'contribution_status_id:label',
-              'dataType' => 'Integer',
               'label' => E::ts('Status'),
               'sortable' => TRUE,
             ],
