@@ -2352,15 +2352,17 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   protected function getAllContactFields(string $prefix = 'Contact.'): array {
     $allContactFields = (array) Contact::getFields()
       ->addWhere('readonly', '=', FALSE)
-      ->addWhere('type', 'IN', ['Field', 'Custom'])
+      ->addWhere('usage', 'CONTAINS', 'import')
       ->addWhere('fk_entity', 'IS EMPTY')
+      ->setAction('save')
       ->addOrderBy('title')
       ->execute()->indexBy('name');
 
     $contactTypeFields['Individual'] = (array) Contact::getFields()
       ->addWhere('readonly', '=', FALSE)
-      ->addWhere('type', 'IN', ['Field', 'Custom'])
+      ->addWhere('usage', 'CONTAINS', 'import')
       ->addWhere('fk_entity', 'IS EMPTY')
+      ->setAction('save')
       ->setSelect(['name'])
       ->addValue('contact_type', 'Individual')
       ->addOrderBy('title')
@@ -2368,8 +2370,9 @@ abstract class CRM_Import_Parser implements UserJobInterface {
 
     $contactTypeFields['Organization'] = (array) Contact::getFields()
       ->addWhere('readonly', '=', FALSE)
-      ->addWhere('type', 'IN', ['Field', 'Custom'])
+      ->addWhere('usage', 'CONTAINS', 'import')
       ->addWhere('fk_entity', 'IS EMPTY')
+      ->setAction('save')
       ->setSelect(['name'])
       ->addValue('contact_type', 'Organization')
       ->addOrderBy('title')
@@ -2377,8 +2380,9 @@ abstract class CRM_Import_Parser implements UserJobInterface {
 
     $contactTypeFields['Household'] = (array) Contact::getFields()
       ->addWhere('readonly', '=', FALSE)
-      ->addWhere('type', 'IN', ['Field', 'Custom'])
+      ->addWhere('usage', 'CONTAINS', 'import')
       ->addWhere('fk_entity', 'IS EMPTY')
+      ->setAction('save')
       ->setSelect(['name'])
       ->addOrderBy('title')
       ->execute()->indexBy('name');
@@ -2400,7 +2404,9 @@ abstract class CRM_Import_Parser implements UserJobInterface {
 
     $addressFields = (array) Address::getFields()
       ->addWhere('readonly', '=', FALSE)
-      ->addWhere('type', 'IN', ['Field', 'Custom'])
+      ->addWhere('usage', 'CONTAINS', 'import')
+      ->addWhere('fk_entity', 'IS EMPTY')
+      ->setAction('save')
       ->addOrderBy('title')
       // Exclude these fields to keep it simpler for now - we just map to primary
       ->addWhere('name', 'NOT IN', ['id', 'location_type_id', 'master_id'])
@@ -2415,7 +2421,9 @@ abstract class CRM_Import_Parser implements UserJobInterface {
 
     $phoneFields = (array) Phone::getFields()
       ->addWhere('readonly', '=', FALSE)
-      ->addWhere('type', 'IN', ['Field', 'Custom'])
+      ->addWhere('usage', 'CONTAINS', 'import')
+      ->addWhere('fk_entity', 'IS EMPTY')
+      ->setAction('save')
       // Exclude these fields to keep it simpler for now - we just map to primary
       ->addWhere('name', 'NOT IN', ['id', 'location_type_id', 'phone_type_id'])
       ->addOrderBy('title')
@@ -2429,7 +2437,9 @@ abstract class CRM_Import_Parser implements UserJobInterface {
 
     $emailFields = (array) Email::getFields()
       ->addWhere('readonly', '=', FALSE)
-      ->addWhere('type', 'IN', ['Field', 'Custom'])
+      ->addWhere('usage', 'CONTAINS', 'import')
+      ->addWhere('fk_entity', 'IS EMPTY')
+      ->setAction('save')
       // Exclude these fields to keep it simpler for now - we just map to primary
       ->addWhere('name', 'NOT IN', ['id', 'location_type_id'])
       ->addOrderBy('title')
