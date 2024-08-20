@@ -279,7 +279,7 @@
    {foreach from=$tagSetTags item=displayTagset}
      <p class="crm-block crm-content-block crm-case-caseview-display-tagset">
        &nbsp;&nbsp;<strong>{$displayTagset.label}:</strong>
-       {', '|implode:$displayTagset.items|escape}
+       {$displayTagset.items|join:', '|escape}
      </p>
    {/foreach}
 
