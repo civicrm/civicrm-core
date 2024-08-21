@@ -94,6 +94,7 @@ NETHERLANDS S', $rows[$this->ids['Contact']['collins']][0]);
     ]);
     // Check that the non-primary phone has been appended - ie the one with 0 for non-primary at the end.
     $this->assertEquals($this->getExpectedAddress('souza', FALSE) . ' 1230', $rows[$this->ids['Contact']['souza']][0]);
+    $this->assertEquals($this->getExpectedAddress('collins', FALSE) . ' 1230', $rows[$this->ids['Contact']['collins']][0]);
   }
 
   /**
