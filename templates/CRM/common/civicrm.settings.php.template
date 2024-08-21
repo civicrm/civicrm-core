@@ -243,7 +243,7 @@ if (!defined('CIVICRM_UF_BASEURL')) {
  * the near future - this opt-in setting is transitional.
  */
 if (!defined('CIVICRM_SMARTY_AUTOLOAD_PATH') && getenv('CIVICRM_SMARTY_AUTOLOAD_PATH') === FALSE) {
-  // If not set we should default the Smarty version to Smarty4 which is our stable version.
+  // If not set we should default the Smarty version to Smarty5 which is our stable version.
   // This will not work for all composer-based installs @todo.
   if (is_dir($civicrm_root . '/packages')) {
     define('CIVICRM_SMARTY_AUTOLOAD_PATH', $civicrm_root . '/packages/smarty5/Smarty.php');
