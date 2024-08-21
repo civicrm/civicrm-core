@@ -261,8 +261,6 @@ class CRM_Afform_AfformScanner {
       $fileBase = preg_replace(self::FILE_REGEXP, '', $file);
       $name = basename($fileBase);
       $formPaths[$name][$module] = $fileBase;
-      // Local files get top priority
-      ksort($formPaths[$name]);
     }
   }
 
