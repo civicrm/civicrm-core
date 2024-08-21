@@ -75,7 +75,7 @@
       </tr>
       {foreach from=$lineItems item=line}
         <tr>
-          <td style="text-align:left;nowrap"><font size="1">
+          <td style="text-align:left;white-space: nowrap"><font size="1">
             {$line.title}
           </font></td>
           <td style="text-align:right;"><font size="1">{$line.qty}</font></td>
