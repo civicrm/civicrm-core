@@ -251,10 +251,12 @@
       // ngChange callback from Existing entity field
       ctrl.onSelectEntity = function() {
         if (ctrl.defn.input_attrs && ctrl.defn.input_attrs.autofill) {
-          var val = $scope.getSetSelect();
-          var entity = ctrl.afFieldset.modelName;
-          var index = ctrl.getEntityIndex();
-          ctrl.afFieldset.afFormCtrl.loadData(entity, index, val, ctrl.defn.name);
+          const val = $scope.getSetSelect();
+          const entity = ctrl.afFieldset.modelName;
+          const entityIndex = ctrl.getEntityIndex();
+          const joinEntity = ctrl.afJoin ? ctrl.afJoin.entity : null;
+          const joinIndex = ctrl.afJoin && $scope.dataProvider.repeatIndex || 0;
+          ctrl.afFieldset.afFormCtrl.loadData(entity, entityIndex, val, ctrl.defn.name, joinEntity, joinIndex);
         }
       };
 
@@ -270,9 +272,15 @@
       };
 
       ctrl.getAutocompleteParams = function() {
+        let fieldName = ctrl.afFieldset.getName();
+        // Append join name which will be unpacked by AfformAutocompleteSubscriber::processAfformAutocomplete
+        if (ctrl.afJoin) {
+          fieldName += '+' + ctrl.afJoin.entity;
+        }
+        fieldName += ':' + ctrl.fieldName;
         return {
           formName: 'afform:' + ctrl.afFieldset.getFormName(),
-          fieldName: ctrl.afFieldset.getName() + ':' + ctrl.fieldName,
+          fieldName: fieldName,
           values: $scope.dataProvider.getFieldData()
         };
       };
