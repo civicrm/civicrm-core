@@ -28,14 +28,14 @@ class CRM_Upgrade_Incremental_General {
    * The point release will be dropped in recommendations unless it's .1 or
    * higher.
    */
-  const RECOMMENDED_PHP_VER = '8.1.0';
+  const RECOMMENDED_PHP_VER = '8.3.0';
 
   /**
    * The minimum recommended PHP version.
    *
    * A site running an earlier version will be told to upgrade.
    */
-  const MIN_RECOMMENDED_PHP_VER = '8.0.0';
+  const MIN_RECOMMENDED_PHP_VER = '8.1.0';
 
   /**
    * The minimum PHP version required to install Civi.
