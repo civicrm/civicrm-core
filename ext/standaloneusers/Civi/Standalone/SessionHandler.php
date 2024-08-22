@@ -145,7 +145,7 @@ class SessionHandler implements SessionHandlerInterface, SessionIdInterface, Ses
     $this->data = $session['data'];
     $maxLifetime = \Civi::settings()->get('standaloneusers_session_max_lifetime');
 
-    return strtotime($session['last_accessed']) >= strtotime("-$maxLifetime seconds");
+    return strtotime($session['last_accessed']) >= strtotime("-$maxLifetime minutes");
   }
 
   /**
