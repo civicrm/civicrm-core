@@ -40,19 +40,26 @@ class CRM_Afform_AfformScanner {
    */
   public function findFilePaths(): array {
     if ($this->isUseCachedPaths()) {
-      $paths = $this->cache->get('afformAllPaths');
-      if ($paths !== NULL) {
-        return $paths;
+      $formPaths = $this->cache->get('afformAllPaths');
+      if ($formPaths !== NULL) {
+        return $formPaths;
       }
     }
 
-    $paths = [];
+    // List of folders to search
+    $basePaths = [];
+    // List of specific forms that we found
+    $formPaths = [];
 
     $mapper = CRM_Extension_System::singleton()->getMapper();
     foreach ($mapper->getModules() as $module) {
       try {
         if ($module->is_active) {
-          $this->appendFilePaths($paths, dirname($mapper->keyToPath($module->name)) . DIRECTORY_SEPARATOR . 'ang', $module->name);
+          $basePaths[] = [
+            'weight' => 0,
+            'path' => dirname($mapper->keyToPath($module->name)) . DIRECTORY_SEPARATOR . 'ang',
+            'module' => $module->name,
+          ];
         }
       }
       catch (CRM_Extension_Exception_MissingException $e) {
@@ -61,14 +68,34 @@ class CRM_Afform_AfformScanner {
     }
 
     // Scan core ang/afform directory
-    $this->appendFilePaths($paths, Civi::paths()->getPath('[civicrm.root]/ang/afform'), 'civicrm');
+    $basePaths[] = [
+      'weight' => 100,
+      'path' => Civi::paths()->getPath('[civicrm.root]/ang/afform'),
+      'module' => 'civicrm',
+    ];
     // Scan uploads/files directory
-    $this->appendFilePaths($paths, $this->getSiteLocalPath(), '');
+    $basePaths[] = [
+      'weight' => 200,
+      'path' => $this->getSiteLocalPath(),
+      'module' => '',
+    ];
+
+    $event = \Civi\Core\Event\GenericHookEvent::create(['paths' => &$basePaths]);
+    \Civi::dispatcher()->dispatch('civi.afform.searchPaths', $event);
+
+    usort($basePaths, fn($a, $b) =>
+      $a['weight'] === $b['weight']
+        ? $b['module'] <=> $a['module']
+        : $b['weight'] <=> $a['weight']
+    );
+    foreach ($basePaths as $basePath) {
+      $this->appendFilePaths($formPaths, $basePath['path'], $basePath['module']);
+    }
 
     if ($this->isUseCachedPaths()) {
-      $this->cache->set('afformAllPaths', $paths);
+      $this->cache->set('afformAllPaths', $formPaths);
     }
-    return $paths;
+    return $formPaths;
   }
 
   /**
@@ -234,8 +261,6 @@ class CRM_Afform_AfformScanner {
       $fileBase = preg_replace(self::FILE_REGEXP, '', $file);
       $name = basename($fileBase);
       $formPaths[$name][$module] = $fileBase;
-      // Local files get top priority
-      ksort($formPaths[$name]);
     }
   }
 
