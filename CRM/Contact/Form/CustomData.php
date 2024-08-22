@@ -367,8 +367,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
    */
   public function postProcess() {
     // Get the form values and groupTree
-    //CRM-18183
-    $params = $this->controller->exportValues($this->_name);
+    $params = $this->getSubmittedValues();
 
     CRM_Core_BAO_CustomValueTable::postProcess($params,
       'civicrm_contact',
