@@ -31,7 +31,7 @@ if (!defined('CIVI_SETUP')) {
 
     // Note: We know WP is bootstrapped, but we don't know if the `civicrm` plugin is active,
     // so we have to make an educated guess.
-    $civicrmPluginFile = implode(DIRECTORY_SEPARATOR, [WP_PLUGIN_DIR, 'civicrm', 'civicrm.php']);
+    $civicrmPluginFile = _civicrm_wordpress_plugin_file();
 
     // Compute settingsPath.
     $uploadDir = wp_upload_dir();
@@ -70,3 +70,25 @@ if (!defined('CIVI_SETUP')) {
     $wpLang = get_locale();
     $model->lang = isset($langs[$wpLang]) ? $wpLang : 'en_US';
   });
+
+\Civi\Setup::dispatcher()
+  ->addListener('civi.setup.installDatabase', function (\Civi\Setup\Event\InstallDatabaseEvent $e) {
+    $model = $e->getModel();
+    if ($model->cms !== 'WordPress') {
+      return;
+    }
+    \Civi\Setup::log()->info(sprintf('[%s] Activate CiviCRM plugin', basename(__FILE__)));
+
+    if (!function_exists('activate_plugin')) {
+      require_once ABSPATH . 'wp-admin/includes/admin.php';
+    }
+
+    $plugin = _civicrm_wordpress_plugin_file();
+    if (!is_plugin_active($plugin)) {
+      activate_plugin($plugin);
+    }
+  }, \Civi\Setup::PRIORITY_MAIN - 100);
+
+function _civicrm_wordpress_plugin_file(): string {
+  return implode(DIRECTORY_SEPARATOR, [WP_PLUGIN_DIR, 'civicrm', 'civicrm.php']);
+}
