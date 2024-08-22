@@ -383,6 +383,20 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
     //need to assign subtype to the template
     $this->assign('customDataSubType', $this->_gid);
     $this->assign('entityID', $this->_id);
+
+    if (($this->_action & CRM_Core_Action::ADD) || ($this->_action & CRM_Core_Action::UPDATE)) {
+      $this->addButtons([
+        [
+          'type' => 'upload',
+          'name' => ts('Save'),
+          'isDefault' => TRUE,
+        ],
+        [
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ],
+      ]);
+    }
   }
 
   /**
