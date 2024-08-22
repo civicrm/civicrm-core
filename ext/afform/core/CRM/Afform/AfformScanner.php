@@ -85,8 +85,8 @@ class CRM_Afform_AfformScanner {
 
     usort($basePaths, fn($a, $b) =>
       $a['weight'] === $b['weight']
-        ? $a['module'] <=> $b['module']
-        : $a['weight'] <=> $b['weight']
+        ? $b['module'] <=> $a['module']
+        : $b['weight'] <=> $a['weight']
     );
     foreach ($basePaths as $basePath) {
       $this->appendFilePaths($formPaths, $basePath['path'], $basePath['module']);
