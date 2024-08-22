@@ -1,0 +1,13 @@
+      <div class="form-inline">
+        <label>
+          {{:: ts('Show legend?')}}
+        </label>
+        <select
+          class="form-control crm-search-display-chart-show-legend"
+          ng-model="$ctrl.display.settings.showLegend"
+          >
+          <option value="none">{{:: ts('None') }}</option>
+          <option value="left">{{:: ts('Left') }}</option>
+          <option value="right">{{:: ts('Right') }}</option>
+        </select>
+      </div>

@@ -205,6 +205,21 @@
         "path": "bower_components/es-module-shims/dist/es-module-shims.js",
         "_comment": "See also https://github.com/guybedford/es-module-shims/. MIT license."
       },
+      "ext-chart_kit-crossfilter": {
+        "url": "https://github.com/crossfilter/crossfilter/archive/refs/tags/1.5.4.zip",
+        "path": "ext/chart_kit/packages/crossfilter",
+        "ignore": [".*", "node_modules", "bower_components", "src", "lib", "test", "component.json", "package.json", "index.js", "main.js", "Makefile"]
+      },
+      "ext-chart_kit-d3": {
+        "url": "https://github.com/d3/d3/releases/download/v6.7.0/d3.zip",
+        "path": "ext/chart_kit/packages/d3",
+        "ignore": [".DS_Store", ".git", ".gitignore", ".npmignore", ".travis.yml", "Makefile", "bin", "component.json", "index.js", "lib", "node_modules", "package.json", "src", "test"]
+      },
+      "ext-chart_kit-dc": {
+        "url": "https://registry.npmjs.org/dc/-/dc-4.2.7.tgz",
+        "path": "ext/chart_kit/packages/dc",
+        "ignore": [".*", "web", "*.json", "regression", "scripts", "spec", "src", "docs", "grunt", "Gruntfile.js", "Changelog.md", "welcome.md", "class-hierarchy.dot", "index.js", "CONTRIBUTING.md", "LICENSE_BANNER", "AUTHORS"]
+      },
       "ext-greenwich-bootstrap3": {
         "url": "https://github.com/twbs/bootstrap-sass/archive/v{$version}.zip",
         "path": "ext/greenwich/extern/bootstrap3",
