@@ -61,9 +61,15 @@
 
 /* Navigation menu editor */
 .crm-container .navigation-tree {
- /* background-color: #ffffff; */
- height: auto; 
- border-collapse: separate;
+  height: auto;
+  border-collapse: separate;
+}
+/* reduce the default hover/clicked background colors to tints for more downstream compatibility */
+.crm-container .navigation-tree .jstree-hovered {
+  background: #ffffff50;
+}
+.crm-container .navigation-tree .jstree-clicked {
+  background: #beebff50;
 }
 
 @media screen and (min-width: 480px) {
