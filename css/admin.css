@@ -59,6 +59,13 @@
   color: #00994d;
 }
 
+/* Navigation menu editor */
+.crm-container .navigation-tree {
+ /* background-color: #ffffff; */
+ height: auto; 
+ border-collapse: separate;
+}
+
 @media screen and (min-width: 480px) {
   #crm-container .admin-section-items {
     column-count: 2;
