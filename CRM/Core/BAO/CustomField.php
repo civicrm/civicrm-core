@@ -99,6 +99,31 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   }
 
   /**
+   * Converts the 'data_type' property to the format used by Api4 and EntityRepository
+   *
+   * @param array $customField
+   * @return string
+   */
+  public static function getDataTypeString(array $customField): string {
+    $map = [
+      'Int' => 'Integer',
+      'Memo' => 'Text',
+      'Boolean' => 'Boolean',
+      'StateProvince' => 'Integer',
+      'Country' => 'Integer',
+      'File' => 'Integer',
+      'Link' => 'String',
+      'ContactReference' => 'Integer',
+      'EntityReference' => 'Integer',
+    ];
+    $dataType = $map[$customField['data_type']] ?? $customField['data_type'];
+    if ($dataType === 'Date' && !empty($customField['time_format'])) {
+      $dataType = 'Timestamp';
+    }
+    return $dataType;
+  }
+
+  /**
    * Build the map of custom field's data types and there respective Util type
    *
    * @return array

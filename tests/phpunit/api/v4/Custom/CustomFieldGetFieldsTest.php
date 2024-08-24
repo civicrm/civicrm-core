@@ -52,6 +52,298 @@ class CustomFieldGetFieldsTest extends CustomTestBase {
       ->execute();
   }
 
+  public function testCustomFieldTypes(): void {
+    $customGroupName = CustomGroup::create(FALSE)
+      ->addValue('extends', 'Activity')
+      ->addValue('title', __FUNCTION__)
+      ->execute()->single()['name'];
+
+    $customFields = $this->saveTestRecords('CustomField', [
+      'records' => [
+        [
+          'name' => 'dateonly',
+          'data_type' => 'Date',
+          'html_type' => 'Select Date',
+          'date_format' => 'mm/dd/yy',
+        ],
+        [
+          'name' => 'datetime',
+          'data_type' => 'Date',
+          'html_type' => 'Select Date',
+          'date_format' => 'mm/dd/yy',
+          'time_format' => '1',
+        ],
+        [
+          'name' => 'int',
+          'data_type' => 'Int',
+          'html_type' => 'Text',
+        ],
+        [
+          'name' => 'float',
+          'data_type' => 'Float',
+          'html_type' => 'Text',
+        ],
+        [
+          'name' => 'money',
+          'data_type' => 'Money',
+          'html_type' => 'Text',
+        ],
+        [
+          'name' => 'memo',
+          'data_type' => 'Memo',
+          'html_type' => 'TextArea',
+          'note_columns' => 55,
+        ],
+        [
+          'name' => 'str',
+          'data_type' => 'String',
+          'html_type' => 'Text',
+          'default_value' => 'Hello',
+          'text_length' => 123,
+        ],
+        [
+          'name' => 'multiselect',
+          'data_type' => 'String',
+          'html_type' => 'Select',
+          'option_values' => [
+            'red' => 'Red',
+            'blue' => 'Blue',
+          ],
+          'serialize' => 1,
+        ],
+        [
+          'name' => 'autocomplete',
+          'data_type' => 'String',
+          'html_type' => 'Autocomplete-Select',
+          'option_values' => [
+            'red' => 'Red',
+            'blue' => 'Blue',
+          ],
+        ],
+        [
+          'name' => 'bool',
+          'data_type' => 'Boolean',
+          'html_type' => 'Radio',
+        ],
+        [
+          'name' => 'state',
+          'data_type' => 'StateProvince',
+          'html_type' => 'Select',
+        ],
+        [
+          'name' => 'country',
+          'data_type' => 'Country',
+          'html_type' => 'Select',
+          'serialize' => 1,
+        ],
+        [
+          'name' => 'file',
+          'data_type' => 'File',
+          'html_type' => 'File',
+        ],
+        [
+          'name' => 'entityref',
+          'data_type' => 'EntityReference',
+          'html_type' => 'Autocomplete-Select',
+          'fk_entity' => 'Activity',
+          'fk_entity_on_delete' => 'cascade',
+        ],
+        [
+          'name' => 'contactref',
+          'data_type' => 'ContactReference',
+          'html_type' => 'Autocomplete-Select',
+          'filter' => 'action=get&group=123',
+        ],
+      ],
+      'defaults' => ['custom_group_id.name' => $customGroupName],
+    ])->indexBy('name');
+
+    $fields = Activity::getFields(FALSE)
+      ->addWhere('name', 'LIKE', $customGroupName . '.%')
+      ->setAction('create')
+      ->execute()->indexBy('name');
+
+    // Check date field
+    $field = $fields["$customGroupName.dateonly"];
+    $this->assertSame('Date', $field['input_type']);
+    $this->assertSame('Date', $field['data_type']);
+    $this->assertFalse($field['input_attrs']['time']);
+    $this->assertSame('mm/dd/yy', $field['input_attrs']['date']);
+    $this->assertFalse($field['options']);
+    $this->assertNull($field['operators']);
+    $this->assertNull($field['serialize']);
+
+    // Check datetime field
+    $field = $fields["$customGroupName.datetime"];
+    $this->assertSame('Date', $field['input_type']);
+    $this->assertSame('Timestamp', $field['data_type']);
+    $this->assertSame(12, $field['input_attrs']['time']);
+    $this->assertSame('mm/dd/yy', $field['input_attrs']['date']);
+    $this->assertFalse($field['options']);
+    $this->assertNull($field['operators']);
+    $this->assertNull($field['serialize']);
+
+    // Check int field
+    $field = $fields["$customGroupName.int"];
+    $this->assertSame('Number', $field['input_type']);
+    $this->assertSame('Integer', $field['data_type']);
+    $this->assertSame(1, $field['input_attrs']['step']);
+    $this->assertFalse($field['options']);
+    $this->assertNull($field['operators']);
+    $this->assertNull($field['serialize']);
+
+    // Check float field
+    $field = $fields["$customGroupName.float"];
+    $this->assertSame('Number', $field['input_type']);
+    $this->assertSame('Float', $field['data_type']);
+    $this->assertSame(.01, $field['input_attrs']['step']);
+    $this->assertFalse($field['options']);
+    $this->assertNull($field['operators']);
+    $this->assertNull($field['serialize']);
+
+    // Check money field
+    $field = $fields["$customGroupName.money"];
+    $this->assertSame('Text', $field['input_type']);
+    $this->assertSame('Money', $field['data_type']);
+    $this->assertArrayNotHasKey('step', $field['input_attrs']);
+    $this->assertFalse($field['options']);
+    $this->assertNull($field['operators']);
+    $this->assertNull($field['serialize']);
+
+    // Check memo field
+    $field = $fields["$customGroupName.memo"];
+    $this->assertSame('TextArea', $field['input_type']);
+    $this->assertSame('Text', $field['data_type']);
+    $this->assertSame(4, $field['input_attrs']['rows']);
+    $this->assertSame(55, $field['input_attrs']['cols']);
+    $this->assertArrayNotHasKey('step', $field['input_attrs']);
+    $this->assertFalse($field['options']);
+    $this->assertNull($field['operators']);
+    $this->assertNull($field['serialize']);
+
+    // Check str field
+    $field = $fields["$customGroupName.str"];
+    $this->assertSame('Text', $field['input_type']);
+    $this->assertSame('String', $field['data_type']);
+    $this->assertEquals('Hello', $field['default_value']);
+    $this->assertSame(123, $field['input_attrs']['maxlength']);
+    $this->assertArrayNotHasKey('step', $field['input_attrs']);
+    $this->assertArrayNotHasKey('rows', $field['input_attrs']);
+    $this->assertArrayNotHasKey('cols', $field['input_attrs']);
+    $this->assertFalse($field['options']);
+    $this->assertNull($field['operators']);
+    $this->assertNull($field['serialize']);
+
+    // Check multiselect field
+    $field = $fields["$customGroupName.multiselect"];
+    $this->assertSame('Select', $field['input_type']);
+    $this->assertSame('String', $field['data_type']);
+    $this->assertNull($field['default_value']);
+    $this->assertArrayNotHasKey('step', $field['input_attrs']);
+    $this->assertArrayNotHasKey('rows', $field['input_attrs']);
+    $this->assertArrayNotHasKey('cols', $field['input_attrs']);
+    $this->assertTrue($field['options']);
+    $this->assertNull($field['operators']);
+    $this->assertSame(1, $field['serialize']);
+    $this->assertTrue($field['input_attrs']['multiple']);
+
+    // Check autocomplete field
+    $field = $fields["$customGroupName.autocomplete"];
+    $this->assertSame('EntityRef', $field['input_type']);
+    $this->assertSame('String', $field['data_type']);
+    $this->assertEquals('OptionValue', $field['fk_entity']);
+    $this->assertEquals('value', $field['fk_column']);
+    $this->assertNull($field['default_value']);
+    $this->assertArrayNotHasKey('step', $field['input_attrs']);
+    $this->assertArrayNotHasKey('rows', $field['input_attrs']);
+    $this->assertArrayNotHasKey('cols', $field['input_attrs']);
+    $this->assertFalse($field['options']);
+    $this->assertNull($field['operators']);
+    $this->assertNull($field['serialize']);
+    $this->assertTrue(empty($field['input_attrs']['multiple']));
+    $this->assertEquals(['option_group_id' => $customFields['autocomplete']['option_group_id']], $field['input_attrs']['filter']);
+
+    // Check bool field
+    $field = $fields["$customGroupName.bool"];
+    $this->assertSame('Radio', $field['input_type']);
+    $this->assertSame('Boolean', $field['data_type']);
+    $this->assertNull($field['default_value']);
+    $this->assertArrayNotHasKey('step', $field['input_attrs']);
+    $this->assertArrayNotHasKey('rows', $field['input_attrs']);
+    $this->assertArrayNotHasKey('cols', $field['input_attrs']);
+    $this->assertFalse($field['options']);
+    $this->assertNull($field['operators']);
+    $this->assertNull($field['serialize']);
+
+    // Check state field
+    $field = $fields["$customGroupName.state"];
+    $this->assertSame('Select', $field['input_type']);
+    $this->assertSame('Integer', $field['data_type']);
+    $this->assertNull($field['default_value']);
+    $this->assertArrayNotHasKey('step', $field['input_attrs']);
+    $this->assertArrayNotHasKey('rows', $field['input_attrs']);
+    $this->assertArrayNotHasKey('cols', $field['input_attrs']);
+    $this->assertTrue($field['options']);
+    $this->assertNull($field['operators']);
+    $this->assertNull($field['serialize']);
+
+    // Check country field
+    $field = $fields["$customGroupName.country"];
+    $this->assertSame('Select', $field['input_type']);
+    $this->assertSame('Integer', $field['data_type']);
+    $this->assertNull($field['default_value']);
+    $this->assertArrayNotHasKey('step', $field['input_attrs']);
+    $this->assertArrayNotHasKey('rows', $field['input_attrs']);
+    $this->assertArrayNotHasKey('cols', $field['input_attrs']);
+    $this->assertTrue($field['options']);
+    $this->assertNull($field['operators']);
+    $this->assertSame(1, $field['serialize']);
+    $this->assertTrue($field['input_attrs']['multiple']);
+
+    // Check file field
+    $field = $fields["$customGroupName.file"];
+    $this->assertSame('File', $field['input_type']);
+    $this->assertSame('Integer', $field['data_type']);
+    $this->assertEquals('File', $field['fk_entity']);
+    $this->assertEquals('id', $field['fk_column']);
+    $this->assertNull($field['default_value']);
+    $this->assertArrayNotHasKey('step', $field['input_attrs']);
+    $this->assertArrayNotHasKey('rows', $field['input_attrs']);
+    $this->assertArrayNotHasKey('cols', $field['input_attrs']);
+    $this->assertFalse($field['options']);
+    $this->assertNull($field['operators']);
+    $this->assertNull($field['serialize']);
+
+    // Check entityref field
+    $field = $fields["$customGroupName.entityref"];
+    $this->assertSame('EntityRef', $field['input_type']);
+    $this->assertSame('Integer', $field['data_type']);
+    $this->assertEquals('Activity', $field['fk_entity']);
+    $this->assertEquals('id', $field['fk_column']);
+    $this->assertNull($field['default_value']);
+    $this->assertArrayNotHasKey('step', $field['input_attrs']);
+    $this->assertArrayNotHasKey('rows', $field['input_attrs']);
+    $this->assertArrayNotHasKey('cols', $field['input_attrs']);
+    $this->assertFalse($field['options']);
+    $this->assertNull($field['operators']);
+    $this->assertNull($field['serialize']);
+
+    // Check contactref field
+    $field = $fields["$customGroupName.contactref"];
+    $this->assertSame('EntityRef', $field['input_type']);
+    $this->assertSame('Integer', $field['data_type']);
+    $this->assertEquals('Contact', $field['fk_entity']);
+    $this->assertEquals('id', $field['fk_column']);
+    $this->assertNull($field['default_value']);
+    $this->assertArrayNotHasKey('step', $field['input_attrs']);
+    $this->assertArrayNotHasKey('rows', $field['input_attrs']);
+    $this->assertArrayNotHasKey('cols', $field['input_attrs']);
+    $this->assertFalse($field['options']);
+    $this->assertNull($field['operators']);
+    $this->assertNull($field['serialize']);
+    $this->assertEquals(['groups' => 123], $field['input_attrs']['filter']);
+  }
+
   public function testDisabledAndHiddenFields(): void {
     // Create a custom group with one enabled and one disabled field
     CustomGroup::create(FALSE)
@@ -337,6 +629,13 @@ class CustomFieldGetFieldsTest extends CustomTestBase {
     $getField = Activity::getFields(FALSE)
       ->addWhere('custom_field_id', '=', $field['id'])
       ->execute()->single();
+    $this->assertSame('Custom', $getField['type']);
+    $this->assertSame('Activity', $getField['entity']);
+    $this->assertSame('EntityRef', $getField['input_type']);
+    $this->assertSame($grp['table_name'], $getField['table_name']);
+    $this->assertSame($field['column_name'], $getField['column_name']);
+    $this->assertFalse($getField['required']);
+    $this->assertSame($grp['name'] . '.' . $field['name'], $getField['name']);
     $this->assertEquals(['contact_type' => 'Household', 'groups' => 2], $getField['input_attrs']['filter']);
   }
 

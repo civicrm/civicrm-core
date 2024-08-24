@@ -2048,8 +2048,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
       case 'EntityRef':
         // Auto-apply filters from field metadata
-        foreach ($fieldSpec['html']['filter'] ?? [] as $filter) {
-          [$k, $v] = explode('=', $filter);
+        foreach ($fieldSpec['html']['filter'] ?? [] as $k => $v) {
           $props['api']['params'][$k] = $v;
         }
         return $this->addEntityRef($name, $label, $props, $required);

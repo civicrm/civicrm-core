@@ -67,9 +67,9 @@ class AutocompleteFieldSubscriber extends AutoService implements EventSubscriber
           $apiRequest->addFilter($key, $value);
         }
 
-        // Autocomplete for field with option values
-        if ($apiRequest->getEntityName() === 'OptionValue' && !empty($fieldSpec['custom_field_id'])) {
-          $apiRequest->setKey('value');
+        // Use FK key from fieldSpec, e.g. custom Autocomplete field keys by 'value' not 'id'
+        if (!$apiRequest->getKey() && !empty($fieldSpec['fk_column'])) {
+          $apiRequest->setKey($fieldSpec['fk_column']);
         }
 
         if ($formType === 'qf') {

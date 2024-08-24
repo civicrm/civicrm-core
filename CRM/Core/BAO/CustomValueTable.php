@@ -248,7 +248,7 @@ class CRM_Core_BAO_CustomValueTable {
         return "varchar($maxLength)";
 
       case 'Boolean':
-        return 'tinyint';
+        return 'boolean';
 
       case 'Int':
         return 'int';

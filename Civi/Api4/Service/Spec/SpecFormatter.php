@@ -18,91 +18,73 @@ use Civi\Api4\Utils\FormattingUtil;
 class SpecFormatter {
 
   /**
-   * Convert array from BAO::fields() or CustomGroup::getAll() into a FieldSpec object
+   * Convert array from `$entity->getFields()` or `$entity->getCustomFields()` into a FieldSpec object
    */
-  public static function arrayToField(array $data, string $entityName, ?array $customGroup = NULL): FieldSpec {
+  public static function arrayToField(string $fieldName, array $data, string $entityName): FieldSpec {
     $dataTypeName = self::getDataType($data);
 
+    $isCustom = !empty($data['custom_field_id']);
     $hasDefault = isset($data['default']) && $data['default'] !== '';
     // Custom field
-    if ($customGroup) {
-      $field = new CustomFieldSpec($data['name'], $entityName, $dataTypeName);
-      if (!str_starts_with($entityName, 'Custom_')) {
-        $field->setName($customGroup['name'] . '.' . $data['name']);
-      }
-      else {
-        // Fields belonging to custom entities are treated as normal; type = Field instead of Custom
-        $field->setType('Field');
-      }
-      $field->setTableName($customGroup['table_name']);
-      if ($dataTypeName === 'EntityReference') {
-        $field->setFkEntity($data['fk_entity']);
-      }
+    if ($isCustom) {
+      $field = new CustomFieldSpec($fieldName, $entityName, $dataTypeName);
       $field->setColumnName($data['column_name']);
-      $field->setNullable(empty($data['is_required']));
-      $field->setCustomFieldId($data['id'] ?? NULL);
-      $field->setCustomGroupName($customGroup['name']);
-      $field->setTitle($data['label']);
-      $field->setLabel($customGroup['title'] . ': ' . $data['label']);
+      [$groupName, $fieldName] = explode('.', $fieldName);
+      // Fields belonging to custom entities are treated as normal
+      if (str_starts_with($entityName, 'Custom_')) {
+        // Set type = Field instead of Custom
+        $field->setType('Field');
+        // Remove customGroupName prefix
+        $field->setName($fieldName);
+      }
+      $field->setTableName($data['table_name']);
+      $field->setCustomFieldId($data['custom_field_id']);
+      $field->setCustomGroupName($groupName);
       $field->setHelpPre($data['help_pre'] ?? NULL);
       $field->setHelpPost($data['help_post'] ?? NULL);
-      if (\CRM_Core_BAO_CustomField::hasOptions($data)) {
-        $field->setOptionsCallback([__CLASS__, 'getOptions']);
-        $suffixes = ['label'];
-        if (!empty($data['option_group_id'])) {
-          $suffixes = CoreUtil::getOptionValueFields($data['option_group_id'], 'id');
-        }
-        $field->setSuffixes($suffixes);
-      }
-      $field->setReadonly($data['is_view']);
-      $usage = ['export', 'duplicate_matching', 'token'];
-      if (empty($data['is_view'])) {
-        $usage[] = 'import';
-      }
-      $field->setUsage($usage);
     }
     // Core field
     else {
-      $name = $data['name'] ?? NULL;
-      $field = new FieldSpec($name, $entityName, $dataTypeName);
+      $field = new FieldSpec($fieldName, $entityName, $dataTypeName);
+      $field->setColumnName($fieldName);
       $field->setType('Field');
-      $field->setColumnName($name);
-      $field->setNullable(empty($data['required']));
       $field->setRequired(!empty($data['required']) && !$hasDefault && empty($data['primary_key']));
-      $field->setTitle($data['title'] ?? NULL);
-      $field->setLabel($data['input_attrs']['label'] ?? NULL);
-      $field->setLocalizable($data['localizable'] ?? FALSE);
-      if (!empty($data['DFKEntities'])) {
-        $field->setDfkEntities($data['DFKEntities']);
+    }
+    // Either
+    $field->setNullable(empty($data['required']));
+    $field->setTitle($data['title'] ?? NULL);
+    $field->setLabel($data['input_attrs']['label'] ?? NULL);
+    $field->setLocalizable($data['localizable'] ?? FALSE);
+    if (!empty($data['DFKEntities'])) {
+      $field->setDfkEntities($data['DFKEntities']);
+    }
+    if (!empty($data['pseudoconstant'])) {
+      // Do not load options if 'prefetch' is disabled
+      if (($data['pseudoconstant']['prefetch'] ?? NULL) !== 'disabled') {
+        $field->setOptionsCallback([__CLASS__, 'getOptions']);
       }
-      if (!empty($data['pseudoconstant'])) {
-        // Do not load options if 'prefetch' is disabled
-        if (($data['pseudoconstant']['prefetch'] ?? NULL) !== 'disabled') {
-          $field->setOptionsCallback([__CLASS__, 'getOptions']);
-        }
-        // Explicitly declared suffixes
-        if (!empty($data['pseudoconstant']['suffixes'])) {
-          $suffixes = $data['pseudoconstant']['suffixes'];
-        }
-        else {
-          // These suffixes are always supported if a field has options
-          $suffixes = ['name', 'label'];
-          // Add other columns specified in schema (e.g. 'abbr_column')
-          foreach (array_diff(FormattingUtil::$pseudoConstantSuffixes, $suffixes) as $suffix) {
-            if (!empty($data['pseudoconstant'][$suffix . '_column'])) {
-              $suffixes[] = $suffix;
-            }
+      // Explicitly declared suffixes
+      if (!empty($data['pseudoconstant']['suffixes'])) {
+        $suffixes = $data['pseudoconstant']['suffixes'];
+      }
+      else {
+        // These suffixes are always supported if a field has options
+        $suffixes = ['name', 'label'];
+        // Add other columns specified in schema (e.g. 'abbr_column')
+        foreach (array_diff(FormattingUtil::$pseudoConstantSuffixes, $suffixes) as $suffix) {
+          if (!empty($data['pseudoconstant'][$suffix . '_column'])) {
+            $suffixes[] = $suffix;
           }
-          if (!empty($data['pseudoconstant']['option_group_name'])) {
-            $suffixes = CoreUtil::getOptionValueFields($data['pseudoconstant']['option_group_name'], 'name');
-          }
         }
-        $field->setSuffixes($suffixes);
+        if (!empty($data['pseudoconstant']['option_group_name'])) {
+          $suffixes = CoreUtil::getOptionValueFields($data['pseudoconstant']['option_group_name'], 'name');
+        }
       }
-      $field->setReadonly(!empty($data['readonly']));
-      if (isset($data['usage'])) {
-        $field->setUsage($data['usage']);
-      }
+      $field->setSuffixes($suffixes);
+    }
+    $field->setReadonly(!empty($data['readonly']));
+    if (isset($data['usage'])) {
+      $field->setUsage($data['usage']);
     }
     if ($hasDefault) {
       $field->setDefaultValue(FormattingUtil::convertDataType($data['default'], $dataTypeName));
@@ -110,19 +92,17 @@ class SpecFormatter {
     $field->setSerialize($data['serialize'] ?? NULL);
     $field->setDescription($data['description'] ?? NULL);
     $field->setDeprecated($data['deprecated'] ?? FALSE);
-    self::setInputTypeAndAttrs($field, $data, $dataTypeName);
+    self::setInputTypeAndAttrs($field, $data);
 
     $field->setPermission($data['permission'] ?? NULL);
-    $fkAPIName = $data['FKApiName'] ?? $data['entity_reference']['entity'] ?? NULL;
+    $fkAPIName = $data['entity_reference']['entity'] ?? NULL;
     if ($fkAPIName) {
       $field->setFkEntity($fkAPIName);
+      $field->setFkColumn($data['entity_reference']['key'] ?? CoreUtil::getIdFieldName($fkAPIName));
     }
     // For pseudo-fk fields like `civicrm_group.parents`
     elseif (($data['input_type'] ?? NULL) === 'EntityRef' && !empty($data['pseudoconstant']['table'])) {
       $field->setFkEntity(CoreUtil::getApiNameFromTableName($data['pseudoconstant']['table']));
-    }
-    if (!empty($data['FKColumnName'])) {
-      $field->setFkColumn($data['FKColumnName']);
     }
 
     return $field;
@@ -130,18 +110,18 @@ class SpecFormatter {
 
   /**
    * Get the data type from an array. Defaults to 'data_type' with fallback to
-   * mapping for the integer value 'type'
+   * mapping based on the 'sql_type'.
    *
    * @param array $data
    *
    * @return string
    */
   private static function getDataType(array $data) {
-    $dataType = $data['data_type'] ?? NULL;
-    if (isset($dataType)) {
-      return !empty($data['time_format']) ? 'Timestamp' : $dataType;
+    if (isset($data['data_type'])) {
+      return $data['data_type'];
     }
 
+    // If no data_type provided, look it up from the sql_type
     $dataTypeInt = \CRM_Utils_Schema::getCrmTypeFromSqlType($data['sql_type']);
     $dataTypeName = \CRM_Utils_Type::typeToString($dataTypeInt);
 
@@ -305,88 +285,24 @@ class SpecFormatter {
   /**
    * @param \Civi\Api4\Service\Spec\FieldSpec $fieldSpec
    * @param array $data
-   * @param string $dataTypeName
    */
-  public static function setInputTypeAndAttrs(FieldSpec $fieldSpec, $data, $dataTypeName) {
-    $inputType = $data['input_type'] ?? $data['html_type'] ?? NULL;
+  public static function setInputTypeAndAttrs(FieldSpec $fieldSpec, $data) {
+    $inputType = $data['input_type'] ?? NULL;
     $inputAttrs = $data['input_attrs'] ?? [];
-    // Custom field EntityRef or ContactRef filters
-    if (is_string($data['filter'] ?? NULL) && strpos($data['filter'], '=')) {
-      $filters = explode('&', $data['filter']);
-      $inputAttrs['filter'] = $filters;
-    }
 
-    $map = [
-      'Select Date' => 'Date',
-      'Link' => 'Url',
-      'Autocomplete-Select' => 'EntityRef',
-    ];
-    $inputType = $map[$inputType] ?? $inputType;
-    if ($dataTypeName === 'ContactReference' || $dataTypeName === 'EntityReference') {
-      $inputType = 'EntityRef';
-    }
     if (in_array($inputType, ['Select', 'EntityRef'], TRUE) && !empty($data['serialize'])) {
       $inputAttrs['multiple'] = TRUE;
     }
     if ($inputType == 'Date' && !empty($inputAttrs['formatType'])) {
       self::setLegacyDateFormat($inputAttrs);
     }
-    // Number input for numeric fields
-    if ($inputType === 'Text' && in_array($dataTypeName, ['Integer', 'Float'], TRUE)) {
-      $inputType = 'Number';
-      // Todo: make 'step' configurable for the custom field
-      $inputAttrs['step'] = $dataTypeName === 'Integer' ? 1 : .01;
-    }
-    // Date/time settings from custom fields
-    if ($inputType == 'Date' && is_a($fieldSpec, CustomFieldSpec::class)) {
-      $inputAttrs['time'] = empty($data['time_format']) ? FALSE : ($data['time_format'] == 1 ? 12 : 24);
-      $inputAttrs['date'] = $data['date_format'];
-      $inputAttrs['start_date_years'] = isset($data['start_date_years']) ? (int) $data['start_date_years'] : NULL;
-      $inputAttrs['end_date_years'] = isset($data['end_date_years']) ? (int) $data['end_date_years'] : NULL;
-    }
     if ($inputType == 'Text' && !empty($data['maxlength'])) {
       $inputAttrs['maxlength'] = (int) $data['maxlength'];
     }
-    if ($inputType == 'TextArea') {
-      foreach (['rows', 'cols', 'note_rows', 'note_columns'] as $prop) {
-        if (!empty($data[$prop])) {
-          $key = str_replace('note_', '', $prop);
-          // per @colemanw https://github.com/civicrm/civicrm-core/pull/28388#issuecomment-1835717428
-          $key = str_replace('columns', 'cols', $key);
-          $inputAttrs[$key] = (int) $data[$prop];
-        }
-      }
-    }
     // Ensure all keys use lower_case not camelCase
-    foreach ($inputAttrs as $key => $val) {
-      if ($key !== strtolower($key)) {
-        unset($inputAttrs[$key]);
-        $key = \CRM_Utils_String::convertStringToSnakeCase($key);
-        $inputAttrs[$key] = $val;
-      }
-      // Format EntityRef filter property (core and custom fields)
-      if ($key === 'filter' && is_array($val)) {
-        $filters = [];
-        foreach ($val as $filter) {
-          [$k, $v] = explode('=', $filter);
-          // Explode comma-separated values
-          $filters[$k] = strpos($v, ',') ? explode(',', $v) : $v;
-        }
-        // Legacy APIv3 custom field stuff
-        if ($dataTypeName === 'ContactReference') {
-          if (!empty($filters['group'])) {
-            $filters['groups'] = $filters['group'];
-          }
-          unset($filters['action'], $filters['group']);
-        }
-        $inputAttrs['filter'] = $filters;
-      }
-    }
-    // Custom autocompletes
-    if (!empty($data['option_group_id']) && $inputType === 'EntityRef') {
-      $fieldSpec->setFkEntity('OptionValue');
-      $inputAttrs['filter']['option_group_id'] = $data['option_group_id'];
-    }
+    $snakeKeys = array_map('CRM_Utils_String::convertStringToSnakeCase', array_keys($inputAttrs));
+    $inputAttrs = array_combine($snakeKeys, $inputAttrs);
+
     $fieldSpec
       ->setInputType($inputType)
       ->setInputAttrs($inputAttrs);
