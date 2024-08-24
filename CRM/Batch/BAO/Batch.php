@@ -440,7 +440,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch implements \Civi\Core\Hook
           'url' => 'civicrm/financial/batch',
           'qs' => 'reset=1&action=update&id=%%id%%&context=1',
           'title' => ts('Edit Batch'),
-          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::EDIT),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
         ],
         'close' => [
           'name' => ts('Close'),
