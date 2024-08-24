@@ -476,7 +476,7 @@ class Admin {
    * @param string|null $dynamicCol
    * @return array[]
    */
-  private static function getJoinConditions(string $nearCol, string $farCol, string $dynamicValue = NULL, string $dynamicCol = NULL):array {
+  private static function getJoinConditions(string $nearCol, string $farCol, ?string $dynamicValue = NULL, ?string $dynamicCol = NULL):array {
     $conditions = [
       [
         $nearCol,

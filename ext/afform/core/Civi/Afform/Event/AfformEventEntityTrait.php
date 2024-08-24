@@ -90,7 +90,7 @@ trait AfformEventEntityTrait {
    * @param string|null $entityName
    * @return array
    */
-  public function getEntityIds(string $entityName = NULL): array {
+  public function getEntityIds(?string $entityName = NULL): array {
     $entityName = $entityName ?: $this->entityName;
     $apiEntity = $this->getFormDataModel()->getEntity($entityName)['type'];
     $idField = CoreUtil::getIdFieldName($apiEntity);
