@@ -71,7 +71,7 @@
     "zetacomponents/base": "1.9.*",
     "zetacomponents/mail": "~1.9.4",
     "marcj/topsort": "~1.1",
-    "phpoffice/phpword": "^0.18.0",
+    "phpoffice/phpword": "^1.2",
     "pear/validate_finance_creditcard": "0.7.0",
     "civicrm/civicrm-cxn-rpc": "~0.20.12.01 || ~0.19.01.10",
     "pear/auth_sasl": "1.2.0",
@@ -299,9 +299,6 @@
       },
       "pear/net_smtp": {
         "Add in CiviCRM custom error message for CRM-8744": "https://raw.githubusercontent.com/civicrm/civicrm-core/a6a0ff13d2a155ad962529595dceaef728116f96/tools/scripts/composer/patches/net-smtp-patch.patch"
-      },
-      "phpoffice/phpword": {
-        "PHP8.1 fix for passing null value into strlen": "https://patch-diff.githubusercontent.com/raw/PHPOffice/PHPWord/pull/2272.patch"
       },
       "zetacomponents/mail": {
         "CiviCRM Custom Patches for ZetaCompoents mail": "https://raw.githubusercontent.com/civicrm/civicrm-core/9d93748a36c7c5d44422911db1c98fb2f7067b34/tools/scripts/composer/patches/civicrm-custom-patches-zetacompoents-mail.patch",
