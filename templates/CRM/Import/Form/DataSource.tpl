@@ -145,9 +145,15 @@
 
     function buildSubTypes( )
     {
-      element = cj('input[name="contactType"]:checked').val( );
-      var postUrl = {/literal}"{crmURL p='civicrm/ajax/subtype' h=0}"{literal};
-      var param = 'parentId='+ element;
+      const element = cj('input[name="contactType"]:checked');
+      if (!element.length) {
+        // There are no contact fields on some import forms (e.g. import of activities)
+        return;
+      }
+
+      const elementVal = element.val( );
+      const postUrl = {/literal}"{crmURL p='civicrm/ajax/subtype' h=0}"{literal};
+      const param = 'parentId='+ elementVal;
       cj.ajax({ type: "POST", url: postUrl, data: param, async: false, dataType: 'json',
         success: function(subtype)
         {
