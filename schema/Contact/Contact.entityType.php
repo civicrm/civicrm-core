@@ -878,7 +878,7 @@ return [
       ],
       'input_attrs' => [
         'label' => ts('Current Employer'),
-        'filter' => ['contact_type=Organization'],
+        'filter' => ['contact_type' => 'Organization'],
       ],
       'entity_reference' => [
         'entity' => 'Contact',
