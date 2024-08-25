@@ -355,10 +355,10 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    *
    * @param array[] $styleRules
    * @param array $data
-   * @param int $index
+   * @param int|null $index
    * @return array
    */
-  protected function getCssStyles(array $styleRules, array $data, int $index = NULL) {
+  protected function getCssStyles(array $styleRules, array $data, ?int $index = NULL) {
     $classes = [];
     foreach ($styleRules as $clause) {
       $cssClass = $clause[0] ?? '';
@@ -558,7 +558,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @return array|null
    * @throws \CRM_Core_Exception
    */
-  protected function formatLink(array $link, array $data, bool $allowMultiple = FALSE, string $text = NULL, $index = 0): ?array {
+  protected function formatLink(array $link, array $data, bool $allowMultiple = FALSE, ?string $text = NULL, $index = 0): ?array {
     $useApi = (!empty($link['entity']) && !empty($link['action']));
     if (isset($index)) {
       foreach ($data as $key => $value) {
