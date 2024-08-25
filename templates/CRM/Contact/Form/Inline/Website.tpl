@@ -8,7 +8,6 @@
  +--------------------------------------------------------------------+
 *}
 {* This file provides the template for inline editing of websites *}
-{$form.oplock_ts.html}
 <table class="crm-inline-edit-form">
     <tr>
       <td colspan="5">
