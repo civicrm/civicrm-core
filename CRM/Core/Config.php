@@ -93,12 +93,11 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
           // initialized before calling applyLocale.
           $sess = \CRM_Core_Session::singleton();
           $sess->initialize();
-          if ($sess->getLoggedInContactID()) {
-            // Apply user's timezone.
-            if (is_callable([self::$_singleton->userSystem, 'setMySQLTimeZone'])) {
-              self::$_singleton->userSystem->setMySQLTimeZone();
-            }
-          }
+          // Apply timezone for this session (will use logged in user's timezone if set)
+          $sessionTime = self::$_singleton->userSystem->getTimeZoneString();
+          date_default_timezone_set($sessionTime);
+          // setMySQLTimeZone uses getTimeZoneString internally
+          self::$_singleton->userSystem->setMySQLTimeZone();
         }
         \CRM_Core_BAO_ConfigSetting::applyLocale(\Civi::settings($domain->id), $domain->locales);
 

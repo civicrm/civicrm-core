@@ -515,15 +515,19 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function getTimeZoneString() {
-    $timezone = date_default_timezone_get();
+    // This method is called one time in the install, before we have Standaloneusers
+    // to check timezone against
+    if (!class_exists(\Civi\Standalone\Security::class)) {
+      return date_default_timezone_get();
+    }
     $userId = Security::singleton()->getLoggedInUfID();
     if ($userId) {
       $user = Security::singleton()->loadUserByID($userId);
       if ($user && !empty($user['timezone'])) {
-        $timezone = $user['timezone'];
+        return $user['timezone'];
       }
     }
-    return $timezone;
+    return date_default_timezone_get();
   }
 
   /**
