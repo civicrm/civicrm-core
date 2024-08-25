@@ -2992,6 +2992,20 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
       ];
     }
 
+    if (CRM_Core_Permission::check('delete contacts')) {
+      $menu['otherActions']['delete'] = [
+        'title' => ts('Delete'),
+        'description' => ts('Delete Contact'),
+        'weight' => 90,
+        'ref' => 'crm-contact-delete',
+        'key' => 'delete',
+        'tab' => 'delete',
+        'class' => 'delete',
+        'href' => CRM_Utils_System::url('civicrm/contact/view/delete', "reset=1&delete=1&id=$contactId"),
+        'icon' => 'crm-i fa-trash',
+      ];
+    }
+
     $uid = CRM_Core_BAO_UFMatch::getUFId($contactId);
     if ($uid) {
       $menu['otherActions']['user-record'] = [
