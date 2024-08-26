@@ -68,7 +68,7 @@ color-scheme: light dark;
 --crm-c-background3: var(--crm-c-gray-100);
 --crm-c-background4: var(--crm-c-gray-200);
 --crm-c-background5: var(--crm-c-gray-700);
---crm-c-drag-background: var(--crm-c-background3); /* background for drag/drop regions, select2 highlight */
+--crm-c-drag-background: var(--crm-c-background4); /* background for drag/drop regions, select2 highlight */
 --crm-c-code-background: var(--crm-c-background3); /* background for code regions */
 --crm-c-primary: var(--crm-c-blue); 
 --crm-c-primary-hover: var(--crm-c-blue-dark);

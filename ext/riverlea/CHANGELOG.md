@@ -1,3 +1,7 @@
+0.9.45 
+ - FIXES - missing delete icon in SK admin table editor
+ - CHANGED - multiple SK admin editor UI improvements
+ - FIXES - crm-iconPicker.css isn't being loaded by theme, so overwrites added to _icon.css
 
 0.9.44
  - CHANGED logo icon in navbar to SVG image (higher resolution).

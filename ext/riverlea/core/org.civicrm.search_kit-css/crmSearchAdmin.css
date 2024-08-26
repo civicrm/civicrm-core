@@ -197,7 +197,14 @@
 }
 .crm-search-admin-edit-columns fieldset.crm-draggable {
     display: grid;
-    grid-template-columns: 2ch 0 auto;
+    grid-template-columns: 2ch auto;
+}
+.crm-search-admin-edit-columns fieldset.crm-draggable .btn.btn-xs.pull-right {
+    line-height: 1.45rem;
+    display: block;
+    z-index: 1;
+    position: absolute;
+    right: 15px;
 }
 i.crm-i.crm-search-move-icon {
     opacity: .5;
@@ -213,7 +220,63 @@ i.crm-i.crm-search-move-icon {
 .crm-draggable details > div:last-of-type {
     padding-bottom: var(--crm-expand-body-padding);
 }
-
+#bootstrap-theme .crm-search-admin-edit-columns .input-group-btn {
+    display: flex;
+    flex-direction: row;
+}
+.crm-search-admin-edit-columns .crm-draggable > td {
+    white-space: nowrap;
+    vertical-align: middle;
+}
+.crm-search-admin-edit-columns .crm-draggable > td input {
+    max-width: 125px;
+}
+.crm-search-admin-edit-columns .crm-draggable > td.form-inline {
+    font-size: 0;
+    padding-right: var(--crm-s);
+}
+.crm-search-admin-edit-columns .crm-draggable tfoot td.form-inline {
+    padding: var(--crm-padding-reg);
+}
+.crm-search-admin-relative {
+    position: relative;
+    display: block;
+}
+.crm-search .crm-search-admin-relative details > summary {
+    background: var(--crm-expand-header2-bg);
+    color: var(--crm-expand-header2-color);
+    padding: var(--crm-padding-small) var(--crm-padding-reg);
+}
+.crm-search crm-search-admin-link-group {
+    background: var(--crm-c-background2);
+}
+.crm-search crm-search-admin-link-group table {
+    margin: var(--crm-padding-reg);
+	max-width: calc(100% - var(--crm-padding-reg) - var(--crm-padding-reg));
+	box-shadow: none;
+}
+.crm-search-admin-edit-columns {
+    padding: 0;
+    border: 0 solid transparent;
+}
+.crm-search-admin-edit-columns details,
+.crm-search .crm-search-admin-relative details {
+    background-color: var(--crm-c-page-background);
+    border-radius: var(--crm-roundness);
+    border: 0;
+}
+.crm-search-admin-edit-columns details > summary {
+    background: var(--crm-expand-header2-bg);
+    color: var(--crm-expand-header2-color);
+    padding: var(--crm-padding-reg);
+    font-size: inherit;
+}
+.crm-search details label {
+    min-width: var(--crm-input-label-width);
+}
+.crm-search details label:has(~ a.helpicon) {
+	min-width: calc(var(--crm-input-label-width) - 19px);
+}
 /* Various */
 
 .crm-search .help-block.bg-warning {
@@ -269,7 +332,7 @@ i.crm-i.crm-search-move-icon {
     opacity: 1;
 }
 .crm-search input[type=number] {
-    width: 90px;
+    width: 90px !important /* vs Bootstrap3.css */;
 }
 /* For display.settings.limit field */
 .crm-search .checkbox-inline.form-control input[type=number] {
@@ -353,51 +416,4 @@ crm-search-admin-import {
     top: 1px;
     right: 0;
     background-color: white;
-}
-.crm-search-admin-relative {
-    position: relative;
-    display: block;
-}
-.crm-search .crm-search-admin-relative details { /* only way to target settings accordions */
-    border: var(--crm-expand-border);
-    border-radius: var(--crm-roundness);
-}
-.crm-search .crm-search-admin-relative details > summary {
-    background: var(--crm-expand-header-bg);
-    color: var(--crm-expand-header-color);
-    padding: var(--crm-padding-small) var(--crm-padding-reg);
-}
-.crm-search crm-search-admin-link-group {
-    background: var(--crm-c-background2);
-}
-.crm-search crm-search-admin-link-group table {
-    margin: var(--crm-padding-reg);
-	max-width: calc(100% - var(--crm-padding-reg) - var(--crm-padding-reg));
-	box-shadow: none;
-}
-.crm-search-admin-edit-columns {
-    padding: 0;
-    border: 0 solid transparent;
-}
-.crm-search-admin-edit-columns details {
-    background-color: var(--crm-c-page-background);
-    border-radius: var(--crm-roundness);
-    border: 0;
-}
-.crm-search-admin-edit-columns details summary {
-    background: var(--crm-expand-header2-bg);
-    color: var(--crm-expand-header2-color);
-    padding: var(--crm-padding-reg);
-    font-size: inherit;
-}
-/* .crm-search .crm-search-admin-edit-columns details > *:not(summary),
-.crm-search .crm-search-admin-edit-columns details > *:first-child,
-.crm-search .crm-search-admin-edit-columns details > *:last-child {
-    padding-bottom: var(--crm-padding-reg);
-} */
-.crm-search details label {
-    min-width: var(--crm-input-label-width);
-}
-.crm-search details label:has(~ a.helpicon) {
-	min-width: calc(var(--crm-input-label-width) - 19px);
 }
