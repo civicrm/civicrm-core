@@ -2731,7 +2731,6 @@ WHERE      f.id IN ($ids)";
       elseif ($dataType === 'Boolean') {
         $options = $context === 'validate' ? [0, 1] : CRM_Core_SelectValues::boolean();
       }
-      CRM_Utils_Hook::customFieldOptions($id, $options);
       CRM_Utils_Hook::fieldOptions($entity, "custom_{$id}", $options, ['context' => $context]);
       $cache->set($cacheKey, $options);
     }
