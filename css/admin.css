@@ -59,11 +59,7 @@
   color: #00994d;
 }
 
-/* Navigation menu editor */
-.crm-container .navigation-tree {
-  height: auto;
-  border-collapse: separate;
-}
+/* Navigation Menu Editor */
 /* reduce the default hover/clicked background colors to tints for more downstream compatibility */
 .crm-container .navigation-tree .jstree-hovered {
   background: #ffffff50;
