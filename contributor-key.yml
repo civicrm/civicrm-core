@@ -31,6 +31,10 @@
   name        : Francis Whittle
   organization: Agileware
 
+- github      : agileware-iris
+  name        : Iris
+  organization: Agileware
+
 - github      : agileware-justin
   name        : Justin Freeman
   organization: Agileware
@@ -735,6 +739,9 @@
 - github      : jackrabbithanna
   name        : Mark Hanna
   organization: Skvare
+
+- github      : JadeGaunt
+  name        : Jade Gaunt
 
 - github      : jamienovick
   name        : Jamie Novick
