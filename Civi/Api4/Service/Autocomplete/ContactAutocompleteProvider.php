@@ -95,20 +95,29 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
         7 => 'address_primary.country_id:label',
         8 => 'address_primary.postal_code',
       ];
+      $filterFields = [];
       // If doing a search by a field other than the default,
       // add that field to the main column
       if (!empty($e->context['filters'])) {
-        $filterField = array_keys($e->context['filters'])[0];
+        $filterFields[] = array_keys($e->context['filters'])[0];
       }
-      elseif (\Civi::settings()->get('includeEmailInName')) {
-        $filterField = 'email_primary.email';
+      else {
+        if (\Civi::settings()->get('includeEmailInName')) {
+          $filterFields[] = 'email_primary.email';
+        }
+        if (\Civi::settings()->get('includeNickNameInName')) {
+          $filterFields[] = 'nick_name';
+        }
       }
-      // Search on name + filter/email
-      if (!empty($filterField)) {
-        $column['key'] = $filterField;
-        $column['rewrite'] = "[sort_name] :: [$filterField]";
+      if (!empty($filterFields)) {
+        // Take the first one as the key.
+        $column['key'] = $filterFields[0];
         $column['empty_value'] = '[sort_name]';
-        $autocompleteOptionsMap = array_diff($autocompleteOptionsMap, [$filterField]);
+        $column['rewrite'] = "[sort_name]";
+        foreach ($filterFields as $filterField) {
+          $column['rewrite'] .= " :: [$filterField]";
+          $autocompleteOptionsMap = array_diff($autocompleteOptionsMap, [$filterField]);
+        }
       }
       // No filter & email search disabled: search on name only
       else {
