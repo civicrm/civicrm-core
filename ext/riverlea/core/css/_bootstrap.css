@@ -168,8 +168,8 @@
 #bootstrap-theme .label-info,
 #bootstrap-theme .label-danger {
 	display: inline;
-	padding: var(--crm-btn-small-padding);
-	font-weight: var(--crm-bold-weight);
+	padding: var(--crm-btn-padding-block) var(--crm-padding-inset);
+	font-weight: normal;
 	color: var(--crm-c-light-text);
 	text-align: center;
 	white-space: nowrap;

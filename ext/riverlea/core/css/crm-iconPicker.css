@@ -1,0 +1,27 @@
+/* icon picker styles */
+
+#crmIconPicker .icon-ctrls input::placeholder {
+    font-family: FontAwesome;
+}
+#crmIconPicker .icon-ctrls > * {
+    margin-right: 1rem;
+}
+#crmIconPicker .icon-ctrls > button {
+    float: right;
+    margin-right: 0;
+}
+#crmIconPicker .icons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--crm-m);
+    margin-top; 2rem;
+}
+#crmIconPicker a.ui-button {
+    color: var(--crm-c-text) !important;
+    background: transparent;
+    width: var(--crm-r2);
+    height: var(--crm-r2);
+    border: 0;
+    padding: 0;
+    display: inline-block;
+}

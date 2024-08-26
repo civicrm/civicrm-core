@@ -2,10 +2,11 @@
     padding: var(--crm-s) var(--crm-m) var(--crm-s) 0;
     float: left;
 }
+/* Causes some button+icon issues but should icons have a hover state if they're not links? 
 .crm-container .crm-i:hover,
 .crm-container .crm-i:focus {
-    color: var(--crm-c-text);
-}
+    color: var(--crm-c-text); 
+} */
 .crm-container button.btn-xs:has(.fa-times),
 .crm-container .crm-hover-button:has(.crm-i),
 .crm-container .crm-hover-button:has(.crm-i):hover,

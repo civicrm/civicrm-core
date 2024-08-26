@@ -1,6 +1,6 @@
 /*
     Name: Minetta;
-    Riverlea version: 0.9;
+    Riverlea version: 0.9.44;
     Front, back or both: both; 
     Description: Generic CiviCRM UI, somewhat familiar to users of CiviCRM since 2014. Named after Minetta Creek, which runs under Greenwich, New York;
 */
@@ -150,12 +150,18 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-btn-icon-spacing: var(--crm-xs);
 --crm-btn-icon-size: auto;
 --crm-btn-cancel-bg: var(--crm-c-alert);
+--crm-btn-cancel-text: var(--crm-c-alert-text);
 --crm-btn-info-bg: var(--crm-c-info);
+--crm-btn-info-text: var(--crm-c-info-text);
 --crm-btn-warning-bg: var(--crm-c-warning);
+--crm-btn-warning-text: var(--crm-c-warning-text);
 --crm-btn-success-bg: var(--crm-c-success);
+--crm-btn-success-text: var(--crm-c-success-text);
 --crm-btn-alert-bg: var(--crm-c-alert);
+--crm-btn-alert-text: var(--crm-c-alert-text);
 --crm-btn-icon-bg: ;
 --crm-btn-icon-border: ;
+
 
 /* TABLES */
 --crm-table-outside-border: 1px solid var(--crm-c-background3);

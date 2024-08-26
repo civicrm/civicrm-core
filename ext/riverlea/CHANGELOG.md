@@ -1,3 +1,19 @@
+
+0.9.44
+ - CHANGED logo icon in navbar to SVG image (higher resolution).
+ - CHANGED Standalone inline padding set to 3vw, matching default (https://lab.civicrm.org/extensions/riverlea/-/issues/26#note_169213).
+ - ADDED alert background colour to delete link on contact summary action dropdown (https://lab.civicrm.org/dev/user-interface/-/issues/54#note_169299).
+ - ADDED matching bg colour for SK 'select all' checkbox and dropdown
+ - REMOVES column line for contact summary action dropdown
+ - REMOVES bounding border for SearchKit tables, other than the main SK admin list (https://lab.civicrm.org/extensions/riverlea/-/issues/36)
+ - FIXES double border on SK admin list (https://lab.civicrm.org/extensions/riverlea/-/issues/36)
+ - FIXES SK table head 'select all' checkbox padding (differed for checked/unchecked)
+ - ADDED crm-iconPicker.css theme override
+ - FIXES icon picker layout
+ - CHANGED SK editor layout view table: align drag icons, add padding to details body
+ - FIXES multiple contrast issues with info/success/warning/danger button + background colour/text combos (https://lab.civicrm.org/extensions/riverlea/-/issues/38)
+ - NEW CSS VARIABLES (5) - 5 new variables for above fix:  --crm-btn-cancel-text, --crm-btn-info-text, --crm-btn-warning-text, --crm-btn-success-text, --crm-btn-alert-text
+
 0.9.43
  - ADDED Operating System font fallbacks for Hackney Brook
  - FIXES Second conditional dropdown not showing: https://lab.civicrm.org/extensions/riverlea/-/issues/35
@@ -10,7 +26,7 @@
  - FIXES Mosaico: wizard button padding, inactive colour and thumbnail bg (last two fix darkmode issue: https://lab.civicrm.org/extensions/riverlea/-/issues/34)
 
 0.9.42
- - CHANGED metadata files (readme, info.xml)
+ - CHANGED metadata files (readme, info.xml). Version 0.9 package released
  - ADDED history to changelog
 
 0.9.41

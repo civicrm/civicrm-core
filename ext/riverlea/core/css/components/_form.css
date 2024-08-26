@@ -94,7 +94,7 @@
 .crm-container fieldset {
     border: var(--crm-c-divider);
 }
-.crm-container fieldset:not(.collapsed, .crm-inactive-dashlet-fieldset) {
+.crm-container fieldset:not(.collapsed, .crm-inactive-dashlet-fieldset, .crm-search-admin-edit-columns) {
     padding: var(--crm-fieldset-padding);
     margin: var(--crm-padding-reg) 0;
     border: 1px solid var(--crm-fieldset-border-color);

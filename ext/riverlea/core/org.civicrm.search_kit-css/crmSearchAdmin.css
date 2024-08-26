@@ -131,6 +131,7 @@
     padding: var(--crm-s);
     border-top: var(--crm-c-divider);
     margin-block: var(--crm-s);
+    border-radius: var(--crm-roundness);
 } 
 .crm-search fieldset fieldset {
     padding-top: 0;
@@ -169,6 +170,7 @@
     border-radius: var(--crm-roundness);
     border: 0 solid transparent;
 }
+
 /* Tab: Configure Settings */
 
 .crm-search .crm-search-admin-relative textarea {
@@ -192,6 +194,24 @@
     margin: 0;
     padding: 0;
     border: 0 solid transparent;
+}
+.crm-search-admin-edit-columns fieldset.crm-draggable {
+    display: grid;
+    grid-template-columns: 2ch 0 auto;
+}
+i.crm-i.crm-search-move-icon {
+    opacity: .5;
+    margin-top: 0.5rem;
+}
+.crm-draggable details > *, 
+.crm-draggable details > .form-inline {
+    padding-inline: var(--crm-expand-body-padding);
+}
+.crm-draggable details > div:first-of-type {
+    padding-top: var(--crm-expand-body-padding);
+}
+.crm-draggable details > div:last-of-type {
+    padding-bottom: var(--crm-expand-body-padding);
 }
 
 /* Various */
@@ -244,9 +264,6 @@
 .crm-search .api4-input-group {
     display: inline-block;
 } 
-i.crm-i.crm-search-move-icon {
-    opacity: .5;
-}
 .crm-draggable:hover > i.crm-i.crm-search-move-icon,
 .crm-draggable:hover > * > i.crm-i.crm-search-move-icon {
     opacity: 1;
@@ -373,11 +390,11 @@ crm-search-admin-import {
     padding: var(--crm-padding-reg);
     font-size: inherit;
 }
-.crm-search .crm-search-admin-edit-columns details > *:not(summary),
+/* .crm-search .crm-search-admin-edit-columns details > *:not(summary),
 .crm-search .crm-search-admin-edit-columns details > *:first-child,
 .crm-search .crm-search-admin-edit-columns details > *:last-child {
     padding-bottom: var(--crm-padding-reg);
-}
+} */
 .crm-search details label {
     min-width: var(--crm-input-label-width);
 }

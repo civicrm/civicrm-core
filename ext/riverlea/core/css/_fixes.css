@@ -298,12 +298,15 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
     font-size: var(--crm-small-font-size);
 }
 /* select all 'checkbox' on table th */
-.crm-container button.btn:has(.fa-square-o) {
+.crm-container button.btn:has(.fa-square-o),
+.crm-container button.btn:has(.fa-check-square-o) {
 	padding-inline: 0;
 	border-right: 0;
 }
 .crm-container i.ui-icon.fa-square-o,
-.crm-container .btn i.fa-square-o {
+.crm-container i.ui-icon.fa-check-square-o,
+.crm-container .btn i.fa-square-o,
+.crm-container .btn i.fa-check-square-o {
 	margin: 0;
     padding: 0;
     display: flex;
@@ -333,13 +336,14 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
 
 .afadmin-list .nav-tabs + .form-inline + table,
 .afadmin-list > .form-inline,
-.crm-search-display.crm-search-display-table {
+.crm-search:has(.crm-search-nav-tabs) .crm-search-display.crm-search-display-table {
     border: var(--crm-tab-border);
     border-top: 0 solid transparent;
     border-radius: 0 0 var(--crm-roundness) var(--crm-roundness);
 	background: var(--crm-tab-bg-active);
 	overflow-x: auto;
 }
+.crm-search:has(.crm-search-nav-tabs) .crm-search-display.crm-search-display-table table,
 .ui-tabs-panel .crm-search-display.crm-search-display-table {
     border: 0;
 }

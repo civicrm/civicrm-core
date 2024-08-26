@@ -73,6 +73,7 @@
 .crm-container a.button.delete-button, 
 .crm-container a.button.delete{
     background: var(--crm-btn-cancel-bg);
+    color: var(--crm-btn-cancel-text);
 }
 .crm-container a.button.delete-button:hover,
 .crm-container a.button.delete-button:focus,
@@ -88,18 +89,6 @@
 
 /* Icons */
 
-.crm-container #crmIconPicker a.ui-button {
-    color: var(--crm-c-text) !important;
-    background: transparent;
-    width: var(--crm-r);
-    height: var(--crm-r);
-    display: inline-block;
-}
-#crmIconPicker .icons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--crm-m);
-}
 /* .crm-container #crmIconPicker {
     display: grid;
     grid-template-columns: repeat(30,1fr);
@@ -199,39 +188,39 @@
 }
 .crm-container .btn-info {
     background: var(--crm-btn-info-bg); 
-    color: var(--crm-c-info-text);
+    color: var(--crm-btn-info-text);
 }
 .crm-container .btn.btn-info:hover,
 .crm-container .btn.btn-info:focus {
     background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-btn-info-bg);
-    color: var(--crm-c-info-text);
+    color: var(--crm-btn-info-text);
 }
 .crm-container .btn-warning {
     background: var(--crm-btn-warning-bg); 
-    color: var(--crm-c-warning-text);
+    color: var(--crm-btn-warning-text);
 }
 .crm-container .btn.btn-warning:hover,
 .crm-container .btn.btn-warning:focus {
     background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-btn-warning-bg);
-    color: var(--crm-c-warning-text);
+    color: var(--crm-btn-warning-text);
 }
 .crm-container .btn-success {
     background: var(--crm-btn-success-bg); 
-    color: var(--crm-c-success-text);
+    color: var(--crm-btn-success-text);
 }
 .crm-container .btn.btn-success:hover,
 .crm-container .btn.btn-success:focus {
     background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-btn-success-bg);
-    color: var(--crm-c-success-text);
+    color: var(--crm-btn-success-text);
 }
 .crm-container .btn-danger {
     background: var(--crm-btn-alert-bg); 
-    color: var(--crm-c-alert-text);
+    color: var(--crm-btn-alert-text);
 }
 .crm-container .btn.btn-danger:hover,
 .crm-container .btn.btn-danger:focus {
     background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-btn-alert-bg);
-    color: var(--crm-c-alert-text);
+    color: var(--crm-btn-alert-text);
 }
 
 /* BS3 size options */
@@ -371,7 +360,8 @@
 .crm-container .btn-secondary.dropdown-toggle:focus {
     background: var(--crm-c-secondary-hover);
 }
-.crm-container .crm-search-display button.dropdown-toggle:not(.btn-default):not(.btn-secondary) {
+.crm-container .crm-search-display button.dropdown-toggle:not(.btn-default):not(.btn-secondary),
+.crm-container .crm-search-display th .btn-group .btn {
     background-color: var(--crm-c-background4);
     color: var(--crm-c-text) !important;
 }

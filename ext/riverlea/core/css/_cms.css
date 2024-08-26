@@ -204,8 +204,8 @@ body.wp-admin.wp-core-ui .crm-container select {
 *******************/
 
 html.crm-standalone {
-    --crm-page-width: 100%;
-    --crm-page-padding: 1px 1vw;
+    --crm-page-width: 94vw;
+    --crm-page-padding: 1px 3vw 1rem;
 }
 html.crm-standalone body {
     margin: unset;

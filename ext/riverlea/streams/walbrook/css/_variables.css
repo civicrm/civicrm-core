@@ -1,6 +1,6 @@
 /*
     Name: Walbrook;
-    Riverlea version: 0.9;
+    Riverlea version: 0.9.44;
     Front, back or both: back; 
     Description: Based on Shoreditch theme. Named after after River Walbrook, which runs under Shoreditch, London;
 */
@@ -151,10 +151,15 @@ color-scheme: light dark;
 --crm-btn-icon-spacing: var(--crm-s);
 --crm-btn-icon-size: auto;
 --crm-btn-cancel-bg: var(--crm-c-alert);
+--crm-btn-cancel-text: var(--crm-c-alert-text);
 --crm-btn-info-bg: var(--crm-c-info);
+--crm-btn-info-text: var(--crm-c-info-text);
 --crm-btn-warning-bg: var(--crm-c-warning);
+--crm-btn-warning-text: var(--crm-c-warning-text);
 --crm-btn-success-bg: var(--crm-c-success);
+--crm-btn-success-text: var(--crm-c-success-text);
 --crm-btn-alert-bg: var(--crm-c-alert);
+--crm-btn-alert-text: var(--crm-c-alert-text);
 --crm-btn-icon-bg: ;
 --crm-btn-icon-border: ;
 
