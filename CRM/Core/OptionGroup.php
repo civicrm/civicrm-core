@@ -39,6 +39,93 @@ class CRM_Core_OptionGroup {
   }
 
   /**
+   * Retrieves values for a given option group.
+   *
+   * This is the new (2024) preferred optionValue getter function.
+   * (several others exist in various stages of deprecation - avoid them).
+   *
+   * @param string $groupName
+   * @param bool $includeDisabled
+   *   Whether to include disabled options. Default is FALSE.
+   * @param array $where
+   *    Array of sql-safe where-clause strings
+   * @param string $valueAlias
+   *   The alias for the option value in the returned array.
+   *   It's commonly aliased as 'id' by psuedoconstant functions.
+   *
+   * @return array[]
+   *   List keyed by value, containing all properties declared by optionGroup.option_value_fields
+   *
+   * @throws Exception If there is an error retrieving the option values.
+   */
+  public static function getValues(string $groupName, bool $includeDisabled = FALSE, array $where = [], string $valueAlias = 'id'): array {
+    $isDomain = self::isDomainOptionGroup($groupName);
+    if ($isDomain) {
+      $where[] = 'domain_id = ' . CRM_Core_Config::domainID();
+    }
+    $cacheKey = __CLASS__ . __FUNCTION__ . $groupName . CRM_Utils_String::munge(implode('_', $where));
+    $cache = Civi::cache('metadata');
+    $options = $cache->get($cacheKey);
+    if (!isset($options)) {
+      $options = [];
+      // Get meta properties of option group
+      $optionGroup = self::getGroupMetadata($groupName);
+      $select = CRM_Utils_SQL_Select::from('civicrm_option_value');
+      $select->where('option_group_id = #id', ['#id' => $optionGroup['id']]);
+      $select->where($where);
+      $select->select(array_merge(['value', 'is_active', 'component_id'], $optionGroup['option_value_fields']));
+      $select->orderBy('weight ASC');
+      $result = $select->execute()->fetchAll();
+      foreach ($result as $option) {
+        $value = $option['value'];
+        // Convert value to data_type declared by the optionGroup
+        $option['value'] = \Civi\Api4\Utils\FormattingUtil::convertDataType($value, $optionGroup['data_type']);
+        // Key the array by the original string value (otherwise php will convert floats to ints and mess up the keys if data_type == "Float")
+        $options[$value] = $option;
+      }
+      $cache->set($cacheKey, $options);
+    }
+    foreach ($options as $value => $option) {
+      if (!$includeDisabled) {
+        // Remove disabled options
+        if (!$option['is_active']) {
+          unset($options[$value]);
+        }
+        // Filter based on enabled component (this is legacy, the new way for extensions to add options is via hook)
+        elseif ($option['component_id'] && !CRM_Core_Component::isIdEnabled($option['component_id'])) {
+          unset($options[$value]);
+        }
+      }
+      if (isset($options[$value])) {
+        // `is_active` & `component_id` are only used for filtering and do not need to be returned
+        unset($options[$value]['is_active'], $options[$value]['component_id'], $options[$value]['value']);
+        // Apply value alias if used
+        $options[$value][$valueAlias] = $value;
+      }
+    }
+    return $options;
+  }
+
+  /**
+   * Get the metadata of an option group needed for option value retrieval.
+   *
+   * Retrieves the ID, data_type, and option_value_fields
+   * of the specified option group. The option_value_fields
+   * default to ['name', 'label', 'description'] if not set.
+   *
+   * @param string $groupName
+   * @return array
+   */
+  private static function getGroupMetadata(string $groupName) {
+    return [
+      'id' => (int) CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $groupName, 'id', 'name'),
+      'data_type' => CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $groupName, 'data_type', 'name'),
+      // getDbVal will format the serialized field correctly, and will also guard against sql errors if this (relatively new) column hasn't been added yet by the upgrader
+      'option_value_fields' => CRM_Core_DAO_OptionGroup::getDbVal('option_value_fields', $groupName, 'name') ?: ['name', 'label', 'description'],
+    ];
+  }
+
+  /**
    * @param CRM_Core_DAO $dao
    * @param bool $flip
    * @param bool $grouping

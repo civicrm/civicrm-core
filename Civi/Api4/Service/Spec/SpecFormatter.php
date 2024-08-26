@@ -21,7 +21,7 @@ class SpecFormatter {
    * Convert array from `$entity->getFields()` or `$entity->getCustomFields()` into a FieldSpec object
    */
   public static function arrayToField(string $fieldName, array $data, string $entityName): FieldSpec {
-    $dataTypeName = self::getDataType($data);
+    $dataTypeName = \CRM_Utils_Schema::getDataType($data);
 
     $isCustom = !empty($data['custom_field_id']);
     $hasDefault = isset($data['default']) && $data['default'] !== '';
@@ -106,26 +106,6 @@ class SpecFormatter {
     }
 
     return $field;
-  }
-
-  /**
-   * Get the data type from an array. Defaults to 'data_type' with fallback to
-   * mapping based on the 'sql_type'.
-   *
-   * @param array $data
-   *
-   * @return string
-   */
-  private static function getDataType(array $data) {
-    if (isset($data['data_type'])) {
-      return $data['data_type'];
-    }
-
-    // If no data_type provided, look it up from the sql_type
-    $dataTypeInt = \CRM_Utils_Schema::getCrmTypeFromSqlType($data['sql_type']);
-    $dataTypeName = \CRM_Utils_Type::typeToString($dataTypeInt);
-
-    return $dataTypeName === 'Int' ? 'Integer' : $dataTypeName;
   }
 
   /**

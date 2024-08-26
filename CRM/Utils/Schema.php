@@ -165,6 +165,27 @@ class CRM_Utils_Schema {
   }
 
   /**
+   * Get the data type from a field array. Defaults to 'data_type' with fallback to
+   * mapping based on the 'sql_type'.
+   *
+   * @param array $field
+   *   Field array as returned from EntityMetadataInterface::getField()
+   *
+   * @return string
+   */
+  public static function getDataType(array $field): string {
+    if (isset($field['data_type'])) {
+      return $field['data_type'];
+    }
+
+    // If no data_type provided, look it up from the sql_type
+    $dataTypeInt = self::getCrmTypeFromSqlType($field['sql_type']);
+    $dataTypeName = CRM_Utils_Type::typeToString($dataTypeInt);
+
+    return $dataTypeName === 'Int' ? 'Integer' : $dataTypeName;
+  }
+
+  /**
    * Fallback used when field in schema xml is missing a title.
    *
    * TODO: Trigger a deprecation notice when this happens.

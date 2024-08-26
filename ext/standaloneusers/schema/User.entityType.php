@@ -104,7 +104,7 @@ return [
       'input_attrs' => [
         'label' => E::ts('Contact'),
         'filter' => [
-          'contact_type=Individual',
+          'contact_type' => 'Individual',
         ],
       ],
       'entity_reference' => [

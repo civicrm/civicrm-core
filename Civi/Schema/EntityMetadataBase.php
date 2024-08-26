@@ -29,6 +29,115 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
     return EntityRepository::getEntity($this->entityName);
   }
 
+  public function getField(string $fieldName): ?array {
+    $field = $this->getFields()[$fieldName] ?? NULL;
+    if (!$field && str_contains($fieldName, '.')) {
+      [$customGroupName] = explode('.', $fieldName);
+      $field = $this->getCustomFields(['name' => $customGroupName])[$fieldName] ?? NULL;
+    }
+    return $field;
+  }
+
+  public function getOptions(string $fieldName, array $values = [], bool $includeDisabled = FALSE, bool $checkPermissions = FALSE, ?int $userId = NULL): ?array {
+    $field = $this->getField($fieldName);
+    $options = NULL;
+    $hookParams = [
+      'context' => 'full',
+      'values' => $values,
+      'include_disabled' => $includeDisabled,
+      'check_permissions' => $checkPermissions,
+      'user_id' => $userId,
+    ];
+    if (!empty($field['pseudoconstant']['callback'])) {
+      $callbackValues = call_user_func(\Civi\Core\Resolver::singleton()->get($field['pseudoconstant']['callback']), $fieldName, $hookParams);
+      $options = self::formatOptionValues($callbackValues);
+    }
+    elseif (!empty($field['pseudoconstant']['option_group_name'])) {
+      $options = \CRM_Core_OptionGroup::getValues($field['pseudoconstant']['option_group_name'], $includeDisabled, $field['pseudoconstant']['condition'] ?? []);
+    }
+    elseif (!empty($field['pseudoconstant']['table'])) {
+      $options = self::getSqlOptions($field['pseudoconstant'], $includeDisabled);
+    }
+    $preHookOptions = $options;
+    // Allow hooks to alter or overwrite the option list
+    \CRM_Utils_Hook::fieldOptions($this->entityName, $fieldName, $options, $hookParams);
+    // If options were altered via hook, re-normalize the format
+    if ($preHookOptions !== $options && is_array($options)) {
+      $options = self::formatOptionValues($options);
+    }
+    return isset($options) ? array_values($options) : NULL;
+  }
+
+  private function formatOptionValues(array $optionValues): array {
+    foreach ($optionValues as $id => $optionValue) {
+      if (!is_array($optionValue)) {
+        $optionValues[$id] = [
+          'id' => $id,
+          'name' => $id,
+          'label' => $optionValue,
+        ];
+      }
+    }
+    return $optionValues;
+  }
+
+  private function getSqlOptions(array $pseudoconstant, bool $includeDisabled = FALSE): array {
+    $cacheKey = 'EntityMetadataGetSqlOptions' . md5(json_encode($pseudoconstant));
+    $entity = \Civi::table($pseudoconstant['table']);
+    $fields = $entity->getFields();
+    if (isset($fields['domain_id'])) {
+      $cacheKey .= \CRM_Core_Config::domainID();
+    }
+    $cache = \Civi::cache('metadata');
+    $options = $cache->get($cacheKey);
+    if (!isset($options)) {
+      $options = [];
+      $select = \CRM_Utils_SQL_Select::from($pseudoconstant['table']);
+      $idCol = $pseudoconstant['key_column'] ?? $entity->getMeta('primary_keys')[0];
+      $nameCol = $pseudoconstant['name_column'] ?? (isset($fields['name']) ? 'name' : $idCol);
+      $select->select(["$idCol AS id", "$nameCol AS name"]);
+      foreach (['label', 'abbr', 'color', 'icon'] as $prop) {
+        if (!empty($pseudoconstant["{$prop}_column"])) {
+          $propColumn = $pseudoconstant["{$prop}_column"];
+          $select->select("$propColumn AS $prop");
+        }
+      }
+      if (isset($fields['is_active'])) {
+        $select->select('is_active');
+      }
+      // Order by: prefer order_column or 'weight' column
+      if (!empty($pseudoconstant['order_column']) || isset($fields['weight'])) {
+        $select->orderBy($pseudoconstant['order_column'] ?? 'weight');
+      }
+      // Fall back on label_column or id if nothing else
+      else {
+        $select->orderBy($pseudoconstant['label_column'] ?? $idCol);
+      }
+      if (isset($fields['domain_id'])) {
+        $select->where('domain_id = #dom', ['#dom' => \CRM_Core_Config::domainID()]);
+      }
+      if (!empty($pseudoconstant['condition'])) {
+        $select->where($pseudoconstant['condition']);
+      }
+      $result = $select->execute()->fetchAll();
+      foreach ($result as $option) {
+        if (\CRM_Utils_Schema::getDataType($fields[$idCol]) === 'Integer') {
+          $option['id'] = (int) $option['id'];
+        }
+        $options[$option['id']] = $option;
+      }
+      $cache->set($cacheKey, $options);
+    }
+    if (!$includeDisabled && isset($fields['is_active'])) {
+      foreach ($options as $id => $option) {
+        if (!$option['is_active']) {
+          unset($options[$id]);
+        }
+      }
+    }
+    return $options;
+  }
+
   /**
    * Retrieves the custom fields associated with the entity, in the same format as returned by `getFields()`
    *
