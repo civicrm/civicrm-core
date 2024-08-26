@@ -67,9 +67,11 @@
 
 #mainTabContainer .crm-search-display .form-group.pull-right,
 .afform-directive .btn-group.pull-right {
-	display: flex;
-	gap: var(--crm-flex-gap);
+  display: flex;
+  gap: var(--crm-flex-gap);
+  justify-content: end;
+  float: inherit;
 }
 .crm-contact-page .crm-search-display-pager {
-    padding: 0 var(--crm-r) var(--crm-r) var(--crm-r);
+  padding: 0 var(--crm-r) var(--crm-r) var(--crm-r);
 }

@@ -212,3 +212,9 @@
 #crm-notification-container div.ui-notify-message .notify-content p {
     color: var(--crm-notify-col);
 }
+#crm-notification-container div.ui-notify-message-style a.ui-button.ui-widget,
+#crm-notification-container div.ui-notify-message-style a.ui-button.ui-widget:hover,
+#crm-notification-container div.ui-notify-message-style a.ui-button.ui-widget:focus {
+    background: var(--crm-c-alert);
+    border: 0;
+}

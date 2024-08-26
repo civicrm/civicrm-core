@@ -11,7 +11,7 @@
 
 /* FONTS */
 --crm-system-fonts:;
---crm-font:;
+--crm-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue",sans-serif;
 --crm-font-bold:;
 --crm-bold-weight: bold;
 --crm-font-italic:;

@@ -36,7 +36,6 @@ body.page-civicrm .crm-container div.status {
 }
 
 /* D8+ */
-
 body.page-civicrm header.content-header {
     margin-bottom: 0;
     background-color: var(--crm-c-background);
@@ -48,6 +47,10 @@ body.page-civicrm header + div.layout-container {
     background-color: var(--crm-c-page-background) !important;
     margin: 0 !important; /* use of important vs some themes */
 }
+body.page-civicrm .button {
+    -webkit-font-smoothing: initial;
+}
+
 /* D7 Garland */
 body.page-civicrm #squeeze #crm-container,
 .region-sidebar-first .block-civicrm {
@@ -64,8 +67,8 @@ body.page-civicrm #squeeze .crm-container ul li {
 body.page-civicrm > #branding {
     background-color: var(--crm-c-page-background);
 }
-/* D9 Claro */
 
+/* D9 Claro */
 body.page-civicrm {
     color: unset;
 }
@@ -98,8 +101,8 @@ body.page-civicrm .page-content:has(#block-claro-content) {
         --crm-page-padding: 1rem;
     }
 }
-/* D9 Seven */
 
+/* D9 Seven */
 #block-seven-content {
     --crm-page-padding: 2rem;
 }
@@ -115,8 +118,8 @@ body.page-civicrm .page-content:has(#block-claro-content) {
 #block-seven-content .label {
     font-weight: inherit;
 }
-/* Bootstrap 4 */
 
+/* Bootstrap 4 */
 body.page-civicrm main > .container:has(#block-bootstrap4-content) {
     max-width: 100%;
     background: var(--crm-c-page-background);

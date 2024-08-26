@@ -1,3 +1,14 @@
+0.9.43
+ - ADDED Operating System font fallbacks for Hackney Brook
+ - FIXES Second conditional dropdown not showing: https://lab.civicrm.org/extensions/riverlea/-/issues/35
+ - FIXES JQuery UI background images appearing on some UI icon classes. NB - this fix remvoes all JQuery UI icon background images so if icons vanish, it'll be linked to this, and need further work.
+ - FIXES select2 inplace search too wide
+ - FIXES notification dialog 'restore' button matches theme style rather than JQueryUI.
+ - FIXES removes webkit font-smoothing on .button in Drupal8+
+ - FIXES icon padding when button has an internal span
+ - CHANGED .pull-right handling: removes from Bootstrap & adds to base, creates Flexbox override for SearchKit: https://lab.civicrm.org/extensions/riverlea/-/issues/5#note_169180.
+ - FIXES Mosaico: wizard button padding, inactive colour and thumbnail bg (last two fix darkmode issue: https://lab.civicrm.org/extensions/riverlea/-/issues/34)
+
 0.9.42
  - CHANGED metadata files (readme, info.xml)
  - ADDED history to changelog

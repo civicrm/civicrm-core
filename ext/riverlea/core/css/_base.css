@@ -7,7 +7,9 @@
 .crm-container *::after {
     box-sizing: border-box;
 }
-.crm-container .hiddenElement,
+.crm-container .hiddenElement {
+    display: none 
+}
 .crm-container .collapse {
 	display: none !important /* needs to hide items further down the cascade */;
 } 
@@ -71,6 +73,7 @@
 }
 .crm-container .ui-icon {
     width: inherit;
+    background-image: none !important;
 }
 .crm-container .ui-icon:hover {
     background-image: none;
@@ -416,7 +419,8 @@
     flex: 5;
 }
 .crm-container .css_right,
-.crm-container .float-right {
+.crm-container .float-right,
+.crm-container .pull-right {
     float: right;
 }
 /* Responsive  */

@@ -2960,12 +2960,6 @@
 	margin-right: auto;
 	margin-left: auto;
 }
-#bootstrap-theme .pull-right {
-	float: right !important;
-}
-#bootstrap-theme .pull-left {
-	float: left !important;
-}
 #bootstrap-theme .hide {
 	display: none !important;
 }

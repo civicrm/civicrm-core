@@ -833,8 +833,17 @@ details + .crm-content-block:has(.dataTables_wrapper) {
 	background: var(--crm-c-primary-hover);
 	border-radius: var(--crm-btn-radius);
 }
-.crm-mosaico-wizard .crm_wizard__title .nav-pills li.active a{ 
+.crm-mosaico-wizard .crm_wizard__title .nav-pills li.active a { 
 	color: var(--crm-c-primary-text);
+	padding: 0;
+}
+.crm-mosaico-wizard .crm-mosaico-template-item.thumbnail {
+	background: var(--crm-c-background2) !important /* vs uk.co.vedaconsulting.mosaico/sass/mosaico-bootstrap/_template-item.scss */;
+	border: var(--crm-c-divider) !important /* vs uk.co.vedaconsulting.mosaico/sass/mosaico-bootstrap/_template-item.scss */;
+	border-radius: var(--crm-roundness) !important /* vs uk.co.vedaconsulting.mosaico/sass/mosaico-bootstrap/_template-item.scss */;
+}
+.crm-mosaico-wizard .crm_wizard__title .nav-pills li.disabled a {
+	color: var(--crm-c-inactive) !important /* vs uk.co.vedaconsulting.mosaico/sass/mosaico-bootstrap/_template-item.scss */;
 }
 /******************
 	CORE EXTENSIONS

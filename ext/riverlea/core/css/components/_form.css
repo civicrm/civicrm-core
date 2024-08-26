@@ -442,8 +442,9 @@ input.crm-form-checkbox) + label {
 .select2-search input {
     background-image: none !important;
     border-color: #66afe9;
-    font-family: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-family: var(--crm-font);
     line-height: 20px;
+    max-width: 100%;
 }
 .crm-container .select2-results {
     font-size: var(--crm-m2);
