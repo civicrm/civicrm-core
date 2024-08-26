@@ -2715,20 +2715,21 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $softDAO = new CRM_Contribute_DAO_ContributionSoft();
       $softDAO->contribution_id = $this->id;
       if ($softDAO->find(TRUE)) {
-        $pcpParams['pcpBlock'] = TRUE;
         $pcpParams['pcp_display_in_roll'] = $softDAO->pcp_display_in_roll;
         $pcpParams['pcp_roll_nickname'] = $softDAO->pcp_roll_nickname;
         $pcpParams['pcp_personal_note'] = $softDAO->pcp_personal_note;
 
         //assign the pcp page title for email subject
-        $pcpDAO = new CRM_PCP_DAO_PCP();
-        $pcpDAO->id = $softDAO->pcp_id;
-        if ($pcpDAO->find(TRUE)) {
-          $pcpParams['title'] = $pcpDAO->title;
+        if ($softDAO->pcp_id) {
+          $pcpDAO = new CRM_PCP_DAO_PCP();
+          $pcpDAO->id = $softDAO->pcp_id;
+          if ($pcpDAO->find(TRUE)) {
+            $pcpParams['title'] = $pcpDAO->title;
 
-          // do not display PCP block in receipt if not enabled for the PCP poge
-          if (empty($pcpDAO->is_honor_roll)) {
-            $pcpParams['pcpBlock'] = FALSE;
+            // Only display PCP block in receipt if enabled for the PCP page
+            if (!empty($pcpDAO->is_honor_roll)) {
+              $pcpParams['pcpBlock'] = TRUE;
+            }
           }
         }
       }
