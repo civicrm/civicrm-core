@@ -228,21 +228,21 @@
         },
         {
             "name": "civicrm/civicrm-cxn-rpc",
-            "version": "v0.20.12.01",
+            "version": "v0.20.12.02",
             "source": {
                 "type": "git",
                 "url": "https://github.com/civicrm/civicrm-cxn-rpc.git",
-                "reference": "b097258a642dc3e0dd9c264cb75b72d5274cac2f"
+                "reference": "72ae98b79f04048ed03c4325b5fa4ad501bcec59"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/civicrm/civicrm-cxn-rpc/zipball/b097258a642dc3e0dd9c264cb75b72d5274cac2f",
-                "reference": "b097258a642dc3e0dd9c264cb75b72d5274cac2f",
+                "url": "https://api.github.com/repos/civicrm/civicrm-cxn-rpc/zipball/72ae98b79f04048ed03c4325b5fa4ad501bcec59",
+                "reference": "72ae98b79f04048ed03c4325b5fa4ad501bcec59",
                 "shasum": ""
             },
             "require": {
                 "phpseclib/phpseclib": "~2.0",
-                "psr/log": "~1.1"
+                "psr/log": "~1.1 || ~2.0 || ~3.0"
             },
             "type": "library",
             "autoload": {
@@ -263,29 +263,29 @@
             "description": "RPC library for CiviConnect",
             "support": {
                 "issues": "https://github.com/civicrm/civicrm-cxn-rpc/issues",
-                "source": "https://github.com/civicrm/civicrm-cxn-rpc/tree/v0.20.12.01"
+                "source": "https://github.com/civicrm/civicrm-cxn-rpc/tree/v0.20.12.02"
             },
-            "time": "2020-12-16T02:35:45+00:00"
+            "time": "2022-05-10T22:59:48+00:00"
         },
         {
             "name": "civicrm/composer-compile-lib",
-            "version": "v0.7",
+            "version": "v0.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/civicrm/composer-compile-lib.git",
-                "reference": "658230901ee3fc2830e9f93239a635a086b6816d"
+                "reference": "553efbc9c227cc00e03b654ddb37c97b2db21de3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/civicrm/composer-compile-lib/zipball/658230901ee3fc2830e9f93239a635a086b6816d",
-                "reference": "658230901ee3fc2830e9f93239a635a086b6816d",
+                "url": "https://api.github.com/repos/civicrm/composer-compile-lib/zipball/553efbc9c227cc00e03b654ddb37c97b2db21de3",
+                "reference": "553efbc9c227cc00e03b654ddb37c97b2db21de3",
                 "shasum": ""
             },
             "require": {
                 "civicrm/composer-compile-plugin": "~0.19 || ~1.0",
                 "padaliyajay/php-autoprefixer": "~1.2",
                 "scssphp/scssphp": "^1.8.1",
-                "symfony/filesystem": "~2.8 || ~3.4 || ~4.0 || ~5.0 || ~6.0",
+                "symfony/filesystem": "~2.8 || ~3.4 || ~4.0 || ~5.0 || ~6.0 || ~7.0",
                 "tubalmartin/cssmin": "^4.1"
             },
             "type": "library",
@@ -330,9 +330,9 @@
             "description": "Small library of compilation helpers",
             "support": {
                 "issues": "https://github.com/civicrm/composer-compile-lib/issues",
-                "source": "https://github.com/civicrm/composer-compile-lib/tree/v0.7"
+                "source": "https://github.com/civicrm/composer-compile-lib/tree/v0.8"
             },
-            "time": "2022-12-19T21:16:16+00:00"
+            "time": "2024-05-29T21:50:30+00:00"
         },
         {
             "name": "civicrm/composer-compile-plugin",
