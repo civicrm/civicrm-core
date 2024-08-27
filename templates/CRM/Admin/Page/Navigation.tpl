@@ -24,7 +24,7 @@
     </div>
     <div class="spacer"></div>
     <div style="padding-left: 48px;"><img src="{$config->resourceBase}i/logo_sm.png" /></div>
-    <div id="navigation-tree" class="navigation-tree" style="height:auto; border-collapse:separate; background-color:#FFFFFF;"></div>
+    <div id="navigation-tree" class="navigation-tree"></div>
     <div class="spacer"></div>
     <div>
       <a href="#" class="nav-reset crm-hover-button">
