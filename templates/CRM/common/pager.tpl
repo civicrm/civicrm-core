@@ -47,7 +47,7 @@
             numPages = {$pager->_response.numPages},
             currentPage = {$pager->_response.currentPage},
             perPageCount = {$pager->_perPage},
-            currentLocation = {$pager->_response.currentLocation|json_encode},
+            currentLocation = {$pager->_response.currentLocation|json_encode nofilter},
             spinning = null,
             refreshing = false;
           {literal}
