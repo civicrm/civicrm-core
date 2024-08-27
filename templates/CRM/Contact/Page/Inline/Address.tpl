@@ -42,7 +42,7 @@
           {$add.display|purify|nl2br nofilter}
         </div>
       </div>
-    {include file="CRM/Contact/Page/Inline/BlockCustomData.tpl" entity='address' customFields=$add.custom identifier=$locationIndex}
+    {include file="CRM/Contact/Page/Inline/BlockCustomData.tpl" entity='address' customGroups=$add.custom identifier=$locationIndex}
     {/if}
   </div>
 </div>
