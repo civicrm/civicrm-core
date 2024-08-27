@@ -53,10 +53,12 @@
     <tr>
       <td>{$form.email.1.email.label}</td>
       <td>{$form.email.1.email.html|crmAddClass:email}</td>
+      {include file="CRM/Contact/Form/Inline/BlockCustomData.tpl" entity=email customFields=$custom_fields_email blockId=1 actualBlockCount=2}
     </tr>
     <tr>
       <td>{$form.email.2.email.label}</td>
       <td>{$form.email.2.email.html|crmAddClass:email}</td>
+      {include file="CRM/Contact/Form/Inline/BlockCustomData.tpl" entity=email customFields=$custom_fields_email blockId=2 actualBlockCount=2}
     </tr>
     <tr>
       <td>{$form.phone.1.phone.label}</td>
