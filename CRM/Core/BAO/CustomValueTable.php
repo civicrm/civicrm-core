@@ -119,10 +119,6 @@ class CRM_Core_BAO_CustomValueTable {
               break;
 
             case 'ContactReference':
-              if ($value == NULL || $value === '' || $value === $VS . $VS) {
-                $type = 'Timestamp';
-                $value = NULL;
-              }
               if ($serialize) {
                 $type = 'String';
                 // Validate the string contains only integers and value-separators
@@ -130,6 +126,10 @@ class CRM_Core_BAO_CustomValueTable {
                 if (str_replace($validChars, '', $value)) {
                   throw new CRM_Core_Exception('Contact ID must be of type Integer');
                 }
+              }
+              elseif ($value == NULL || $value === '') {
+                $type = 'Timestamp';
+                $value = NULL;
               }
               else {
                 $type = 'Integer';
