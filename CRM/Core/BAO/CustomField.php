@@ -323,22 +323,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   }
 
   /**
-   * @inheritDoc
-   */
-  public static function buildOptions($fieldName, $context = NULL, $props = []) {
-    $options = parent::buildOptions($fieldName, $context, $props);
-    // This provides legacy support for APIv3, allowing no-longer-existent html types
-    if ($fieldName == 'html_type' && isset($props['version']) && $props['version'] == 3) {
-      $options['Multi-Select'] = 'Multi-Select';
-      $options['Select Country'] = 'Select Country';
-      $options['Multi-Select Country'] = 'Multi-Select Country';
-      $options['Select State/Province'] = 'Select State/Province';
-      $options['Multi-Select State/Province'] = 'Multi-Select State/Province';
-    }
-    return $options;
-  }
-
-  /**
    * Crufty function makes getting custom fields unnecessarily difficult.
    * @deprecated since 5.71
    * @see CRM_Core_BAO_CustomGroup::getAll
