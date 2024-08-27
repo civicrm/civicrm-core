@@ -32,8 +32,8 @@
                     {include file="CRM/Core/DatePickerRangeCustomField.tpl" fieldName=$element_name to='' from='' colspan='' class='' hideRelativeLabel=0}<td>
                   {/if}
             {else}
-                <td class="label">{$form.$element_name.label}</td><td>
-                  {$form.$element_name.html}
+              <td class="label">{if array_key_exists($element_name, $form)}{$form.$element_name.label}{/if})</td><td>
+                {if array_key_exists($element_name, $form)}{$form.$element_name.html}{/if}
                 {if !empty($form.$operator_name)}
                   <span class="crm-multivalue-search-op" for="{$element_name}">{$form.$operator_name.html}</span>
                   {assign var="add_multivalue_js" value=true}
