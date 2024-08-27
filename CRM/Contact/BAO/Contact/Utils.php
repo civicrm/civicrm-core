@@ -863,7 +863,7 @@ INNER JOIN civicrm_contact contact_target ON ( contact_target.id = act.contact_i
    * @return array
    *   associated array of contact names
    */
-  public static function getAddressShareContactNames(&$addresses) {
+  public static function getAddressShareContactNames($addresses) {
     $contactNames = [];
     // get the list of master id's for address
     $masterAddressIds = [];
