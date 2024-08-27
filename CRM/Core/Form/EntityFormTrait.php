@@ -35,7 +35,7 @@ trait CRM_Core_Form_EntityFormTrait {
    * Deletion message to be assigned to the form.
    *
    * Depending on the screen, the deletionMessage may be plain-text (`{$deletionMessage|escape}`)
-   * or HTML (`{$deletionMessage|smarty:nodefaults}`). Be sure your controller+template agree.
+   * or HTML (`{$deletionMessage nofilter}`). Be sure your controller+template agree.
    *
    * @var string
    */
