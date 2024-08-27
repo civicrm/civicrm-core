@@ -255,7 +255,8 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
       'CRM_Campaign_DAO_Survey' => [
         [
           'fieldName' => 'activity_type_id',
-          'sample' => 'Phone Call',
+          'sample' => 'Survey',
+          'exclude' => 'Phone Call',
           'max' => 100,
         ],
       ],

@@ -11,6 +11,8 @@
 
 namespace Civi\Schema;
 
+use Civi\Core\Resolver;
+
 abstract class EntityMetadataBase implements EntityMetadataInterface {
 
   /**
@@ -42,18 +44,23 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
     $field = $this->getField($fieldName);
     $options = NULL;
     $hookParams = [
+      'entity' => $this->entityName,
       'context' => 'full',
       'values' => $values,
       'include_disabled' => $includeDisabled,
       'check_permissions' => $checkPermissions,
       'user_id' => $userId,
     ];
+    if (!empty($field['pseudoconstant']['condition_provider'])) {
+      $this->getConditionFromProvider($fieldName, $field, $hookParams);
+    }
     if (!empty($field['pseudoconstant']['callback'])) {
-      $callbackValues = call_user_func(\Civi\Core\Resolver::singleton()->get($field['pseudoconstant']['callback']), $fieldName, $hookParams);
+      $callbackValues = call_user_func(Resolver::singleton()->get($field['pseudoconstant']['callback']), $fieldName, $hookParams);
       $options = self::formatOptionValues($callbackValues);
     }
     elseif (!empty($field['pseudoconstant']['option_group_name'])) {
-      $options = \CRM_Core_OptionGroup::getValues($field['pseudoconstant']['option_group_name'], $includeDisabled, $field['pseudoconstant']['condition'] ?? []);
+      $where = (array) ($field['pseudoconstant']['condition'] ?? []);
+      $options = \CRM_Core_OptionGroup::getValues($field['pseudoconstant']['option_group_name'], $includeDisabled, $where);
     }
     elseif (!empty($field['pseudoconstant']['table'])) {
       $options = self::getSqlOptions($field['pseudoconstant'], $includeDisabled);
@@ -66,6 +73,14 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
       $options = self::formatOptionValues($options);
     }
     return isset($options) ? array_values($options) : NULL;
+  }
+
+  private function getConditionFromProvider(string $fieldName, array &$field, array $hookParams) {
+    $fragment = \CRM_Utils_SQL_Select::fragment();
+    $callback = Resolver::singleton()->get($field['pseudoconstant']['condition_provider']);
+    $callback($fieldName, $fragment, $hookParams);
+    $field['pseudoconstant']['condition'] = array_values($fragment->getWhere());
+    unset($field['pseudoconstant']['condition_provider']);
   }
 
   private function formatOptionValues(array $optionValues): array {
