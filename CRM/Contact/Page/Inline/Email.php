@@ -20,6 +20,8 @@
  */
 class CRM_Contact_Page_Inline_Email extends CRM_Core_Page {
 
+  use CRM_Custom_Page_CustomDataTrait;
+
   /**
    * Run the page.
    *
@@ -36,6 +38,7 @@ class CRM_Contact_Page_Inline_Email extends CRM_Core_Page {
     if (!empty($emails)) {
       foreach ($emails as &$value) {
         $value['location_type'] = $locationTypes[$value['location_type_id']];
+        $value['custom'] = $this->getCustomDataFieldsForEntityDisplay('Email', $value['id']);
       }
     }
 

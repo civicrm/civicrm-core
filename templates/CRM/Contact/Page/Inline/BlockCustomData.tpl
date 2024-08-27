@@ -8,25 +8,24 @@
  +--------------------------------------------------------------------+
 *}
 {* template adding block-specific custom data *}
-{foreach from=$customFields item=customGroup key=cgId} {* start of outer foreach *}
-  {foreach from=$customGroup item=customValue key=cvId}
-    <details id="{$entity}_custom_{$cgId}_{$identifier}" class="crm-{$entity}-custom-{$cgId}-{$identifier}-accordion crm-accordion-light" {if $customValue.collapse_display}{else}open{/if}>
+{foreach from=$customGroups item=customGroup key=customGroupID} {* start of customGroup foreach *}
+  {if (!empty($customGroup.fields))}
+    <details id="{$entity}_custom_{$customGroupID}_{$identifier}" class="crm-{$entity}-custom-{$customGroupID}-{$identifier}-accordion crm-accordion-light" {if $customGroup.collapse_display}{else}open{/if}>
       <summary class="collapsible-title">
-        {$customValue.title}
+        {$customGroup.title}
       </summary>
       <div class="crm-summary-block">
-        {foreach from=$customValue.fields item=customField key=cfId}
-          <div class="crm-summary-row">
-            <div class="crm-label">
-              {$customField.field_title}
+        {foreach from=$customGroup.fields item=customField}
+          {* We only expect one value in this loop because as of writing only single fields custom groups are supported
+          for the entities that use this -address, email~ *}
+          {foreach from=$customField item=instance}
+            <div class="crm-summary-row">
+            {include file="CRM/Contact/Page/Inline/CustomDataFieldInstance.tpl" instance=$instance}
             </div>
-            <div class="crm-content">
-              {$customField.field_value}
-            </div>
-          </div>
+          {/foreach}
         {/foreach}
       </div>
     </details>
-  {/foreach}
+  {/if}
 {/foreach} {* end of outer custom group foreach *}
 <!-- end custom data -->
