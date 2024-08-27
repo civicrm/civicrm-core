@@ -458,7 +458,7 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
     // If a column that already exists on logging table is being added, we
     // should treat it as a modification.
     $logTableSchema = $this->columnSpecsOf("log_$table");
-    if (!empty($cols['ADD'])) {
+    if (!empty($cols['ADD']) && !empty($logTableSchema)) {
       foreach ($cols['ADD'] as $colKey => $col) {
         if (array_key_exists($col, $logTableSchema)) {
           $cols['MODIFY'][] = $col;
