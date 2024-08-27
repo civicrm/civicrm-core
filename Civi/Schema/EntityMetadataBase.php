@@ -243,7 +243,7 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
           // Options for Select, Radio, Checkbox
           else {
             $field['pseudoconstant'] = [
-              'option_group_id' => $customField['option_group_id'],
+              'option_group_name' => \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $customField['option_group_id']),
             ];
           }
         }

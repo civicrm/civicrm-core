@@ -2890,6 +2890,10 @@ SELECT contact_id
   public static function buildOptions($fieldName, $context = NULL, $values = []) {
     $entityName = CRM_Core_DAO_AllCoreTables::getEntityNameForClass(get_called_class());
     $entity = Civi::entity($entityName);
+    // Legacy handling for custom field names in `custom_123` format
+    if (str_starts_with($fieldName, 'custom_') && is_numeric($fieldName[7] ?? '')) {
+      $fieldName = CRM_Core_BAO_CustomField::getLongNameFromShortName($fieldName) ?? $fieldName;
+    }
     $checkPermissions = (bool) ($values['check_permissions'] ?? TRUE);
     $includeDisabled = ($context == 'validate' || $context == 'get');
     $options = $entity->getOptions($fieldName, $values, $includeDisabled, $checkPermissions);

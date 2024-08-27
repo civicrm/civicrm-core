@@ -597,6 +597,36 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   }
 
   /**
+   * Converts `custom_123` to `GroupName.FieldName`.
+   */
+  public static function getLongNameFromShortName(string $shortName): ?string {
+    [, $id] = explode('_', $shortName);
+    foreach (CRM_Core_BAO_CustomGroup::getAll() as $customGroup) {
+      if (isset($customGroup['fields'][$id])) {
+        return $customGroup['name'] . '.' . $customGroup['fields'][$id]['name'];
+      }
+    }
+    return NULL;
+  }
+
+  /**
+   * Converts `GroupName.FieldName` to `custom_123`.
+   */
+  public static function getShortNameFromLongName(string $longName): ?string {
+    [$groupName, $fieldName] = explode('.', $longName);
+    foreach (CRM_Core_BAO_CustomGroup::getAll() as $customGroup) {
+      if ($customGroup['name'] === $groupName) {
+        foreach ($customGroup['fields'] as $id => $field) {
+          if ($field['name'] === $fieldName) {
+            return "custom_$id";
+          }
+        }
+      }
+    }
+    return NULL;
+  }
+
+  /**
    * Add a custom field to an existing form.
    *
    * @param CRM_Core_Form $qf
