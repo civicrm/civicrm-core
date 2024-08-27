@@ -2069,18 +2069,6 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
   }
 
   /**
-   * @inheritDoc
-   */
-  public static function buildOptions($fieldName, $context = NULL, $props = []) {
-    // Legacy support for APIv3 which also needs the ParticipantEventName etc pseudo-selectors
-    if ($fieldName === 'extends' && ($props['version'] ?? NULL) == 3) {
-      $options = CRM_Core_SelectValues::customGroupExtends();
-      return CRM_Core_PseudoConstant::formatArrayOptions($context, $options);
-    }
-    return parent::buildOptions($fieldName, $context, $props);
-  }
-
-  /**
    * Returns TRUE if this is a multivalued group which has reached the max for a given entity.
    *
    * @param int $customGroupId
