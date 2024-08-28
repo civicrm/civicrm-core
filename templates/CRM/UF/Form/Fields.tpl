@@ -123,13 +123,23 @@
             {elseif $field.html_type eq 'File' && $viewOnlyFileValues}
               {$viewOnlyFileValues.$profileFieldName}
             {elseif $field.html_type eq 'Radio' or $field.html_type eq 'CheckBox'}
-              <div class="crm-multiple-checkbox-radio-options" >
+              {if array_key_exists('options_per_line', $field) && $field.options_per_line == 0}
+                <div class="crm-multiple-checkbox-radio-options" >
                 {foreach name=outer key=key item=item from=$formElement}
-                  {if is_array($item) && array_key_exists('html', $item)}
-                    <div class="crm-option-label-pair" >{$formElement.$key.html}</div>
+                    {if is_array($item) && array_key_exists('html', $item)}
+                      <div class="crm-option-label-pair" >{$formElement.$key.html}</div>
+                    {/if}
+                {/foreach}
+                </div>
+              {else}
+                <div class="crm-checkbox-radio-option" >
+                {foreach name=outer key=key item=item from=$formElement}
+                  {if $key == 'html'}
+                    <div class="crm-option-label-pair" >{$item}</div>
                   {/if}
                 {/foreach}
-              </div>
+                </div>
+              {/if}
               {* Include the edit options list for admins *}
               {if $formElement.html|strstr:"crm-option-edit-link"}
                 {$formElement.html|regex_replace:"@^.*(<a href=.*? class=.crm-option-edit-link.*?</a>)$@":"$1"}
