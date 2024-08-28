@@ -1,3 +1,7 @@
+0.9.46
+ - ADDED - basics for dark-mode settings screen (menu link, navigation menu / setting.php, etc). Not yet functioning
+ - REVERTS - button icon spacing fix from 0.9.43 as it caused new problems.
+
 0.9.45 
  - FIXES - missing delete icon in SK admin table editor
  - CHANGED - multiple SK admin editor UI improvements
@@ -30,7 +34,7 @@
  - FIXES Mosaico: wizard button padding, inactive colour and thumbnail bg (last two fix darkmode issue: https://lab.civicrm.org/extensions/riverlea/-/issues/34)
 
 0.9.42
- - CHANGED metadata files (readme, info.xml). Version 0.9 package released
+ - CHANGED metadata files (readme, info.xml). Package released
  - ADDED history to changelog
 
 0.9.41

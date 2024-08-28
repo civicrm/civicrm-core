@@ -57,6 +57,25 @@ function riverlea_civicrm_themes(&$themes) {
 }
 
 /**
+ * Add setting for darkmode
+ */
+
+function riverlea_civicrm_config(&$config) {
+  _riverlea_civix_civicrm_config($config);
+
+  $themeKey = Civi::service('themes')->getActiveThemeKey();
+  $themeExt = Civi::service('themes')->get($themeKey)['ext'];
+  if ($themeExt !== 'riverlea') {
+    return;
+  }
+
+  // A riverlea theme is active
+  if (Civi::settings()->get('riverlea_dark_mode')) {
+  }
+}
+
+
+/**
  * Implements hook_civicrm_alterBundle(). Add Bootstrap JS.
  */
 

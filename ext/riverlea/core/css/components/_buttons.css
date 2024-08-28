@@ -118,9 +118,9 @@
     display: flex;
     align-items: center;
 }
-.crm-container a.button span i.crm-i {
+/* .crm-container a.button span i.crm-i {
     margin: 0;
-}
+} */
 .crm-container button i.crm-i,
 .crm-container .btn i.crm-i {
     height: calc(var(--crm-btn-height) - 2px);
