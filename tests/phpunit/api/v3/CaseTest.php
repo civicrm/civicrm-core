@@ -966,4 +966,9 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     $this->assertNotEquals($case_2['created_date'], $case_2['modified_date']);
   }
 
+  public function testGetOptions(): void {
+    $options = civicrm_api3('Case', 'getoptions', ['field' => 'medium_id']);
+    $this->assertContains('Phone', $options['values']);
+  }
+
 }

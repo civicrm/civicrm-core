@@ -46,13 +46,14 @@ class CaseCreationSpecProvider extends \Civi\Core\Service\AutoService implements
 
     $location = new FieldSpec('location', $spec->getEntity(), 'String');
     $location->setTitle(ts('Activity Location'));
+    $location->setInputType('Text');
     $location->setDescription('Open Case activity location.');
     $spec->addFieldSpec($location);
 
     $medium_id = new FieldSpec('medium_id', $spec->getEntity(), 'Integer');
     $medium_id->setTitle(ts('Activity Medium'));
     $medium_id->setDescription('Open Case activity medium.');
-    $medium_id->setOptionsCallback(['Civi\Api4\Service\Spec\SpecFormatter', 'getOptions']);
+    $medium_id->setOptionsCallback([__CLASS__, 'getMediumOptions']);
     $suffixes = CoreUtil::getOptionValueFields('encounter_medium', 'name');
     $medium_id->setSuffixes($suffixes);
     $spec->addFieldSpec($medium_id);
@@ -81,6 +82,10 @@ class CaseCreationSpecProvider extends \Civi\Core\Service\AutoService implements
    */
   public function applies($entity, $action) {
     return $entity === 'Case' && $action === 'create';
+  }
+
+  public static function getMediumOptions($fieldName, $values, $loadOptions, $checkPermissions): array {
+    return \Civi::entity('Activity')->getOptions('medium_id', $values, FALSE, $checkPermissions);
   }
 
 }

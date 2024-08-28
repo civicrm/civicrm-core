@@ -36,6 +36,22 @@ class CaseTest extends Api4TestBase {
     \CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
   }
 
+  public function testGetFields(): void {
+    $fields = CiviCase::getFields(FALSE)
+      ->setAction('create')
+      ->setLoadOptions(['id', 'name', 'label'])
+      ->execute()->indexBy('name');
+
+    $encounterMediums = array_column($fields['medium_id']['options'], NULL, 'name');
+    $this->assertArrayHasKey('in_person', $encounterMediums);
+    $this->assertEquals(['name', 'label', 'description'], $fields['medium_id']['suffixes']);
+
+    $this->assertSame('Number', $fields['duration']['input_type']);
+    $this->assertSame('Text', $fields['location']['input_type']);
+    $this->assertSame('EntityRef', $fields['creator_id']['input_type']);
+    $this->assertSame('user_contact_id', $fields['creator_id']['default_value']);
+  }
+
   public function testCreateUsingLoggedInUser(): void {
     $uid = $this->createLoggedInUser();
 

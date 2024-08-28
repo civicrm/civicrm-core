@@ -2988,10 +2988,9 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
     $className = __CLASS__;
     $params = [];
     switch ($fieldName) {
-      // This field is not part of this object but the api supports it
+      // This field is not part of this object but legacy forms use it
       case 'medium_id':
-        $className = 'CRM_Activity_BAO_Activity';
-        break;
+        return CRM_Activity_BAO_Activity::buildOptions($fieldName, $context, $props);
 
       // Filter status id by case type id
       case 'status_id':
