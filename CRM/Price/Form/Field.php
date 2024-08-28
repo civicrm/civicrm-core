@@ -619,7 +619,9 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     // store the submitted values in an array
     $params = $this->controller->exportValues('Field');
     $params['id'] = $this->getEntityId();
-    $this->submit($params);
+    $submitResult = $this->submit($params);
+    // Update _fid property to match the saved id especially important in add mode so extensions can reliably call getEntityID()
+    $this->_fid = $submitResult->id;
     $buttonName = $this->controller->getButtonName();
     $session = CRM_Core_Session::singleton();
     if ($buttonName == $this->getButtonName('next', 'new')) {
@@ -704,6 +706,17 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
       return FALSE;
     }
     return in_array(CRM_Core_Component::getComponentID('CiviEvent'), array_filter($this->_extendComponentId));
+  }
+
+  /**
+   * Get id of Price Field being acted on.
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   */
+  public function getPriceFieldID(): ?int {
+    return $this->_fid;
   }
 
 }
