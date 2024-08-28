@@ -71,6 +71,8 @@ return [
         'key_column' => 'id',
         'name_column' => 'name',
         'label_column' => 'label',
+        'description_column' => 'description',
+        'color_column' => 'color',
       ],
       'entity_reference' => [
         'entity' => 'Tag',

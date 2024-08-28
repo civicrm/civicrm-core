@@ -431,6 +431,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
     }
 
     CRM_Core_PseudoConstant::flush();
+    Civi::cache('metadata')->clear();
 
     return $tag;
   }
