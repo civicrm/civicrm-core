@@ -87,6 +87,33 @@ class CaseTest extends Api4TestBase {
     $this->assertContains('Test Case Type', $field['options']);
   }
 
+  public function testGetStatusIdPerCaseType(): void {
+    $this->createTestRecord('OptionValue', [
+      'option_group_id:name' => 'case_status',
+      'label' => 'Testing',
+      'name' => 'Testing',
+      'grouping' => 'Opened',
+    ]);
+
+    $caseType = $this->createTestRecord('CaseType', [
+      'title' => 'Test Case Type',
+      'name' => 'test_case_type2',
+      'definition' => [
+        'statuses' => ['Testing', 'Closed'],
+      ],
+    ]);
+
+    $field = CiviCase::getFields(FALSE)
+      ->setLoadOptions(['id', 'label', 'name'])
+      ->addValue('case_type_id:name', 'test_case_type2')
+      ->addWhere('name', '=', 'status_id')
+      ->execute()
+      ->first();
+    $options = array_column($field['options'], 'name');
+
+    $this->assertEquals(['Closed', 'Testing'], $options);
+  }
+
   public function testCaseActivity(): void {
     $case1 = $this->createTestRecord('Case');
     $case2 = $this->createTestRecord('Case');
