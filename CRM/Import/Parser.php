@@ -2405,7 +2405,6 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     $addressFields = (array) Address::getFields()
       ->addWhere('readonly', '=', FALSE)
       ->addWhere('usage', 'CONTAINS', 'import')
-      ->addWhere('fk_entity', 'IS EMPTY')
       ->setAction('save')
       ->addOrderBy('title')
       // Exclude these fields to keep it simpler for now - we just map to primary
@@ -2422,7 +2421,6 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     $phoneFields = (array) Phone::getFields()
       ->addWhere('readonly', '=', FALSE)
       ->addWhere('usage', 'CONTAINS', 'import')
-      ->addWhere('fk_entity', 'IS EMPTY')
       ->setAction('save')
       // Exclude these fields to keep it simpler for now - we just map to primary
       ->addWhere('name', 'NOT IN', ['id', 'location_type_id', 'phone_type_id'])
@@ -2438,7 +2436,6 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     $emailFields = (array) Email::getFields()
       ->addWhere('readonly', '=', FALSE)
       ->addWhere('usage', 'CONTAINS', 'import')
-      ->addWhere('fk_entity', 'IS EMPTY')
       ->setAction('save')
       // Exclude these fields to keep it simpler for now - we just map to primary
       ->addWhere('name', 'NOT IN', ['id', 'location_type_id'])
