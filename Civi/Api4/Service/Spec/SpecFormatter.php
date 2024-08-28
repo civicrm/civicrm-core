@@ -155,21 +155,8 @@ class SpecFormatter {
   private static function formatOptionList(array $field, array $optionLabels) {
     $options = \CRM_Utils_Array::makeNonAssociative($optionLabels, 'id', 'label');
     foreach ($options as &$option) {
-      switch ($field['data_type']) {
-        case 'String':
-        case 'Text':
-          $option['id'] = (string) $option['id'];
-          break;
-
-        case 'Float':
-        case 'Money':
-          $option['id'] = (float) $option['id'];
-          break;
-
-        case 'Integer':
-          $option['id'] = (int) $option['id'];
-          break;
-      }
+      // Cast option id according to field data_type
+      $option['id'] = FormattingUtil::convertDataType($option['id'], $field['data_type']);
     }
     return $options;
   }
