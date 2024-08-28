@@ -451,17 +451,6 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag implements \Civi\Cor
     }
 
     $options = CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
-
-    // Special formatting for validate/match context
-    if ($fieldName == 'entity_table' && in_array($context, ['validate', 'match'])) {
-      $options = [];
-      foreach (self::buildOptions($fieldName) as $tableName => $label) {
-        $bao = CRM_Core_DAO_AllCoreTables::getClassForTable($tableName);
-        $apiName = CRM_Core_DAO_AllCoreTables::getEntityNameForClass($bao);
-        $options[$tableName] = $apiName;
-      }
-    }
-
     return $options;
   }
 
