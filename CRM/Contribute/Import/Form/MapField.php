@@ -261,7 +261,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
         if (!empty($entityData)) {
           $softCreditTypeID = (int) $entityData['soft_credit']['soft_credit_type_id'];
         }
-        $fieldName = $this->isQuickFormMode ? str_replace('.', '__', $fieldMapping['name']) : $fieldMapping['name'];
+        $fieldName = $this->isQuickFormMode ? str_replace('.', '__', (string) $fieldMapping['name']) : $fieldMapping['name'];
         $defaults["mapper[$rowNumber]"] = [$fieldName, $softCreditTypeID];
       }
     }
