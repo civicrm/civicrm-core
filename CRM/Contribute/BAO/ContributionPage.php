@@ -799,34 +799,6 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
   }
 
   /**
-   * Get options for a given field.
-   * @see CRM_Core_DAO::buildOptions
-   *
-   * @param string $fieldName
-   * @param string $context : @see CRM_Core_DAO::buildOptionsContext
-   * @param array $props : whatever is known about this dao object
-   *
-   * @return array|bool
-   */
-  public static function buildOptions($fieldName, $context = NULL, $props = []) {
-    $params = [];
-    // Special logic for fields whose options depend on context or properties
-    switch ($fieldName) {
-      case 'financial_type_id':
-        // https://lab.civicrm.org/dev/core/issues/547 if CiviContribute not enabled this causes an invalid query
-        // @todo - the component is enabled check should be done within getIncomeFinancialType
-        // It looks to me like test cover was NOT added to cover the change
-        // that added this so we need to assume there is no test cover
-        if (CRM_Core_Component::isEnabled('CiviContribute')) {
-          // if check_permission has been passed in (not Null) then restrict.
-          return CRM_Financial_BAO_FinancialType::getIncomeFinancialType($props['check_permissions'] ?? TRUE);
-        }
-        return [];
-    }
-    return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
-  }
-
-  /**
    * Get or Set honor/on_behalf params for processing module_data or setting default values.
    *
    * @param array $params :

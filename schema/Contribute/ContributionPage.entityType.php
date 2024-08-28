@@ -89,6 +89,7 @@ return [
         'table' => 'civicrm_financial_type',
         'key_column' => 'id',
         'label_column' => 'name',
+        'condition_provider' => ['CRM_Financial_BAO_FinancialType', 'alterIncomeFinancialTypes'],
       ],
       'entity_reference' => [
         'entity' => 'FinancialType',
