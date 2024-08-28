@@ -39,8 +39,6 @@ class CRM_Upgrade_Incremental_General {
 
   /**
    * The minimum PHP version required to install Civi.
-   *
-   * @see install/index.php
    */
   const MIN_INSTALL_PHP_VER = '7.4.0';
 
@@ -53,8 +51,6 @@ class CRM_Upgrade_Incremental_General {
 
   /**
    * The minimum MySQL version required to install Civi.
-   *
-   * @see install/index.php
    */
   const MIN_INSTALL_MYSQL_VER = '5.7';
 
