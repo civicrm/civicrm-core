@@ -77,12 +77,10 @@ trait DAOActionTrait {
    */
   protected function fillDefaults(&$params) {
     $fields = $this->entityFields();
-    $bao = $this->getBaoName();
-    $coreFields = array_column($bao::fields(), NULL, 'name');
-
+    $coreFields = \Civi::entity($this->getEntityName())->getFields();
     foreach ($fields as $name => $field) {
       // If a default value in the api field is different than in core, the api should override it.
-      if (!isset($params[$name]) && !empty($field['default_value']) && $field['default_value'] != \CRM_Utils_Array::pathGet($coreFields, [$name, 'default'])) {
+      if (!isset($params[$name]) && !empty($field['default_value']) && $field['default_value'] != ($coreFields[$name]['default'] ?? NULL)) {
         $params[$name] = $field['default_value'];
       }
     }
@@ -171,7 +169,7 @@ trait DAOActionTrait {
       }
     }
     else {
-      $saved = $baoName::writeRecords($items);
+      $saved = \Civi::entity($this->getEntityName())->writeRecords($items);
     }
     return $saved;
   }
@@ -203,10 +201,10 @@ trait DAOActionTrait {
       if (!$field || empty($field['fk_entity'])) {
         continue;
       }
-      $fkDao = CoreUtil::getBAOFromApiName($field['fk_entity']);
       // Constrain search to the domain of the current entity
       $domainConstraint = NULL;
-      if (isset($fkDao::getSupportedFields()['domain_id'])) {
+      $fkDao = CoreUtil::getBAOFromApiName($field['fk_entity']);
+      if (isset(\Civi::entity($field['fk_entity'])->getSupportedFields()['domain_id'])) {
         if (!empty($record['domain_id'])) {
           $domainConstraint = $record['domain_id'] === 'current_domain' ? \CRM_Core_Config::domainID() : $record['domain_id'];
         }

@@ -37,6 +37,10 @@ class EntityRepository {
    */
   public static function getEntity(string $entityName): ?array {
     self::loadAll();
+    // special handling for entities like Individual, CustomValue etc.
+    if (!array_key_exists($entityName, self::$entities) && ($className = \Civi\Api4\Utils\CoreUtil::getBAOFromApiName($entityName)) !== FALSE) {
+      $entityName = \CRM_Core_DAO_AllCoreTables::getEntityNameForClass($className);
+    }
     return self::$entities[$entityName] ?? NULL;
   }
 
