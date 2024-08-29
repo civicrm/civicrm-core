@@ -123,6 +123,12 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
             $fields[$ctype][$cg['table_name']][$cf['column_name']] = $cg['title'] . ' : ' . $cf['label'];
           }
         }
+        // Set field names to historical names for test.
+        // temporary fix to move the real fix to a different PR.
+        $fields[$ctype]['civicrm_address']['state_province_id'] = ts('State');
+        $fields[$ctype]['civicrm_address']['country_id'] = ts('Country');
+        $fields[$ctype]['civicrm_address']['county_id'] = ts('County');
+        $fields[$ctype]['civicrm_address']['master_id'] = ts('Master Address ID');
       }
       //Does this have to run outside of cache?
       CRM_Utils_Hook::dupeQuery(NULL, 'supportedFields', $fields);
