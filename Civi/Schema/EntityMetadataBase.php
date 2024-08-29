@@ -65,6 +65,9 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
     elseif (!empty($field['pseudoconstant']['table'])) {
       $options = self::getSqlOptions($field['pseudoconstant'], $includeDisabled);
     }
+    elseif (\CRM_Utils_Schema::getDataType($field) === 'Boolean') {
+      $options = self::formatOptionValues(\CRM_Core_SelectValues::boolean());
+    }
     $preHookOptions = $options;
     // Allow hooks to alter or overwrite the option list
     \CRM_Utils_Hook::fieldOptions($this->entityName, $fieldName, $options, $hookParams);
