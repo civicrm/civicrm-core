@@ -1245,9 +1245,9 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $lastName = uniqid(__FUNCTION__);
     $sampleContacts = [
       ['first_name' => 'Zero', 'last_name' => $lastName, 'is_deceased' => TRUE],
-      ['first_name' => 'One', 'last_name' => $lastName],
-      ['first_name' => 'Two', 'last_name' => $lastName],
-      ['first_name' => 'Three', 'last_name' => $lastName],
+      ['first_name' => 'One', 'last_name' => $lastName, 'birth_date' => 'now - 10 years'],
+      ['first_name' => 'Two', 'last_name' => $lastName, 'birth_date' => 'now - 20 years'],
+      ['first_name' => 'Three', 'last_name' => $lastName, 'birth_date' => 'now - 30 years'],
     ];
     $contacts = Contact::save(FALSE)->setRecords($sampleContacts)->execute();
     $sampleEmails = [
@@ -1268,6 +1268,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
           'id',
           'display_name',
           'GROUP_CONCAT(DISTINCT Contact_Email_contact_id_01.email) AS GROUP_CONCAT_Contact_Email_contact_id_01_email',
+          'birth_date',
         ],
         'where' => [['last_name', '=', $lastName]],
         'groupBy' => ['id'],
@@ -1339,6 +1340,27 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
             'rewrite' => '',
             'title' => NULL,
           ],
+          [
+            'type' => 'field',
+            'key' => 'birth_date',
+            'dataType' => 'String',
+            'label' => 'Birthday',
+            'sortable' => TRUE,
+            'cssRules' => [
+              [
+                'bg-danger',
+                'birth_date',
+                '>',
+                'now - 15 years',
+              ],
+              [
+                'bg-warning',
+                'birth_date',
+                '<',
+                'now - 15 years',
+              ],
+            ],
+          ],
         ],
         'cssRules' => [
           ['strikethrough', 'is_deceased', '=', TRUE],
@@ -1369,6 +1391,10 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     // 3rd column gets static + conditional style
     $this->assertStringContainsString('text-right', $result[2]['columns'][2]['cssClass']);
     $this->assertStringContainsString('bg-warning', $result[2]['columns'][2]['cssClass']);
+    // 4th column gets relative-date rule
+    $this->assertStringContainsString('bg-danger', $result[1]['columns'][3]['cssClass']);
+    $this->assertStringContainsString('bg-warning', $result[2]['columns'][3]['cssClass']);
+    $this->assertStringContainsString('bg-warning', $result[3]['columns'][3]['cssClass']);
   }
 
   /**
