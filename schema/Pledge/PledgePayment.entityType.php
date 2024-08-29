@@ -171,7 +171,8 @@ return [
         'duplicate_matching',
       ],
       'pseudoconstant' => [
-        'option_group_name' => 'contribution_status',
+        'option_group_name' => 'pledge_status',
+        'condition_provider' => ['CRM_Pledge_BAO_PledgePayment', 'alterStatus'],
       ],
     ],
   ],
