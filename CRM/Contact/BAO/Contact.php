@@ -3298,24 +3298,12 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
   }
 
   /**
-   * Get options for a given contact field.
+   * Legacy option getter
    *
-   * @param string $fieldName
-   * @param string $context
-   * @param array $props
-   *   whatever is known about this dao object.
-   *
-   * @return array|bool
-   * @see CRM_Core_DAO::buildOptions
-   *
-   * TODO: Should we always assume chainselect? What fn should be responsible for controlling that flow?
-   * TODO: In context of chainselect, what to return if e.g. a country has no states?
-   *
-   * @see CRM_Core_DAO::buildOptionsContext
+   * @deprecated
+   * @inheritDoc
    */
   public static function buildOptions($fieldName, $context = NULL, $props = []) {
-    $params = [];
-    // Special logic for fields whose options depend on context or properties
     switch ($fieldName) {
       case 'contact_type':
         if ($context == 'search') {
@@ -3346,7 +3334,7 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
         return CRM_Core_BAO_Address::buildOptions($fieldName, 'get', $props);
 
     }
-    return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
+    return parent::buildOptions($fieldName, $context, $props);
   }
 
   /**
