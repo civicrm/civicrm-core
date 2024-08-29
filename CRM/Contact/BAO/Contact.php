@@ -3317,14 +3317,6 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
     $params = [];
     // Special logic for fields whose options depend on context or properties
     switch ($fieldName) {
-      case 'contact_sub_type':
-        if (!empty($props['contact_type'])) {
-          $params['condition'] = CRM_Core_DAO::composeQuery('parent_id = (SELECT id FROM civicrm_contact_type WHERE name = %1)', [
-            1 => [$props['contact_type'], 'String'],
-          ]);
-        }
-        break;
-
       case 'contact_type':
         if ($context == 'search') {
           // CRM-15495 - EntityRef filters and basic search forms expect this format
@@ -3355,6 +3347,16 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
 
     }
     return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
+  }
+
+  /**
+   * Pseudoconstant condition_provider for contact_sub_type field.
+   * @see \Civi\Schema\EntityMetadataBase::getConditionFromProvider
+   */
+  public static function alterContactSubType(string $fieldName, CRM_Utils_SQL_Select $conditions, $params) {
+    if (!empty($params['values']['contact_type'])) {
+      $conditions->where('parent_id = (SELECT id FROM civicrm_contact_type WHERE name = @contactSubType)', ['contactSubType' => $params['values']['contact_type']]);
+    }
   }
 
   /**

@@ -241,6 +241,7 @@ return [
         'label_column' => 'label',
         'icon_column' => 'icon',
         'condition' => 'parent_id IS NOT NULL',
+        'condition_provider' => ['CRM_Contact_BAO_Contact', 'alterContactSubType'],
       ],
     ],
     'first_name' => [
