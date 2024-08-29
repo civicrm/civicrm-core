@@ -1014,6 +1014,10 @@ LEFT  JOIN civicrm_membership_payment mp  ON ( mp.contribution_id = con.id )
   }
 
   /**
+   * Legacy option getter
+   *
+   * @deprecated
+   *
    * @inheritDoc
    */
   public static function buildOptions($fieldName, $context = NULL, $props = []) {
@@ -1043,7 +1047,7 @@ LEFT  JOIN civicrm_membership_payment mp  ON ( mp.contribution_id = con.id )
         \Civi::$statics[__CLASS__]['buildoptions_payment_processor_id'][$context] = $allProcessors;
         return $allProcessors;
     }
-    return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
+    return parent::buildOptions($fieldName, $context, $props);
   }
 
   /**
