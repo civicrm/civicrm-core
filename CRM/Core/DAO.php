@@ -2894,6 +2894,11 @@ SELECT contact_id
     if (str_starts_with($fieldName, 'custom_') && is_numeric($fieldName[7] ?? '')) {
       $fieldName = CRM_Core_BAO_CustomField::getLongNameFromShortName($fieldName) ?? $fieldName;
     }
+    // Legacy handling for field "unique name"
+    elseif (!$entity->getField($fieldName)) {
+      $uniqueNames = static::fieldKeys();
+      $fieldName = array_search($fieldName, $uniqueNames) ?: $fieldName;
+    }
     $checkPermissions = (bool) ($values['check_permissions'] ?? TRUE);
     $includeDisabled = ($context == 'validate' || $context == 'get');
     $options = $entity->getOptions($fieldName, $values, $includeDisabled, $checkPermissions);
