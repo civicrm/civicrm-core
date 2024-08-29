@@ -97,6 +97,7 @@ function _standalone_setup_scheme(): string {
     $model->paths['civicrm.l10n']['path'] = $privatePath . '/l10n';
     $model->mandatorySettings['customFileUploadDir'] = '[cms.root]/private/attachment';
     $model->mandatorySettings['uploadDir'] = '[cms.root]/private/tmp';
+    $model->mandatorySettings['dompdf_font_dir'] = '[cms.root]/private';
 
     // public directories
     $model->paths['civicrm.files']['path'] = $appRootPath . '/public';
