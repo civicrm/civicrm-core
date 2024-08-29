@@ -377,6 +377,10 @@ table.advmultiselect {
 
 /* Upgrade screen (overwrites inline css) */
 
+.crm-container.crm-upgrade-box-outer,
+.page-civicrm-upgrade .crm-queue-runner-form-block {
+	margin: var(--crm-page-padding); /* Padding on upgrade screen */
+}
 .crm-upgrade-box-outer.crm-upgrade-success {
     margin: var(--crm-page-padding);
     background: var(--crm-alert-background-help);
@@ -394,7 +398,7 @@ p.crm-upgrade-large-text {
     color: var(--crm-c-success);
 }
 .crm-upgrade-box-inner a {
-    color: var(--crm-c-link) !important;
+    color: var(--crm-c-link) !important  /* vs inline */;
 }
 p.crm-upgrade-large-text:first-of-type {
     font-size: var(--crm-r1);
@@ -404,8 +408,9 @@ p.crm-upgrade-large-text:first-of-type {
 }
 .crm-success-flex {
     display: unset;
-    padding: 0;
-    font-size: 3rem;
+    padding: 0 2rem 0 0 !important /* vs inline */;
+    font-size: var(--crm-l);
+    line-height: 1.35;
     color: var(--crm-c-success);
     grid-column: 1;
     grid-row: 1 / span 3;

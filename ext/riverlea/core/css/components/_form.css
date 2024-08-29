@@ -413,6 +413,17 @@ input.crm-form-checkbox) + label {
 .select2-input.select2-default {
     width: auto;
 }
+.select2-container-multi.loading .select2-choices::before,
+.select2-container.loading .select2-choice .select2-arrow b {
+    content: "\f110";
+    position: absolute;
+    right: var(--crm-m);
+    top: var(--crm-s);
+    animation-name: fa-spin;
+    animation-duration: var(--fa-animation-duration,2s);
+    animation-iteration-count: var(--fa-animation-iteration-count,infinite);
+    animation-timing-function: var(--fa-animation-timing,linear);
+}
 
 /* Select dropdown */
 

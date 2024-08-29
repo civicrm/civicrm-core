@@ -26,6 +26,7 @@
     display: flex;
     align-items: center;
     flex-direction: row-reverse;
+    cursor: move;
 }
 .crm-container .crm-dashlet-header h3 {
     background: transparent;
@@ -63,7 +64,7 @@ crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
     padding: var(--crm-dashlet-content-padding);
     overflow: auto;
 }
-.crm-container .crm-dashlet .crm-accordion-body {
+.crm-container .crm-dashlet details.crm-accordion-bold > .crm-accordion-body {
     padding: 0;
     border-bottom: var(--crm-expand-border);
 }
@@ -184,7 +185,7 @@ fieldset.crm-inactive-dashlet-fieldset {
     margin-bottom: var(--crm-r);
 }
 fieldset.crm-inactive-dashlet-fieldset > div {
-    background-color: var(--crm-c-background2) !important
+    background-color: var(--crm-c-background) !important;
     box-shadow: var(--crm-popup-shadow);
     border-radius: var(--crm-dashlet-radius);
     display: flex;

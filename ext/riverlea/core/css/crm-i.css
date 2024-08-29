@@ -3,6 +3,7 @@ This is separate to avoid conflict with a site theme's implementation of FA.  It
 is loaded before font-awesome.css so that .fa-XXX classes can modify it. */
 .crm-container .ui-icon[class*=" fa-"],
 .crm-container a.helpicon,
+.crm-container .help a.helpicon,
 .crm-container .replace-plain::before,
 .crm-i {
     display: inline-block;
@@ -13,6 +14,7 @@ is loaded before font-awesome.css so that .fa-XXX classes can modify it. */
     font-variant: normal;
     line-height: 1;
     text-rendering: auto;
+    text-decoration: none;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }

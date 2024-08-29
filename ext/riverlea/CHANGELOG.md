@@ -1,3 +1,10 @@
+0.9.47
+ - ADDED - page padding for database upgrade screens. minor type fixes to upgrade complete screen
+ - FIXES - missing bg on dashlet selector, table padding for dashlet filter table, grab cursor on dashlet header.
+ - FIXES - notifcation alert type colour. 
+ - FIXES - removes text decoration from notification icon links
+ - ADDED - icon spinner for select2 loading (https://lab.civicrm.org/extensions/riverlea/-/issues/35#note_169442)
+
 0.9.46
  - ADDED - basics for dark-mode settings screen (menu link, navigation menu / setting.php, etc). Not yet functioning
  - REVERTS - button icon spacing fix from 0.9.43 as it caused new problems.
