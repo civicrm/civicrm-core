@@ -121,7 +121,6 @@ return [
       'usage' => [
         'import',
         'export',
-        'duplicate_matching',
       ],
       'input_attrs' => [
         'label' => ts('Phone'),
@@ -149,8 +148,11 @@ return [
       'readonly' => TRUE,
       'description' => ts('Phone number stripped of all whitespace, letters, and punctuation.'),
       'add' => '4.3',
+      'usage' => [
+        'duplicate_matching',
+      ],
       'input_attrs' => [
-        'label' => ts('Numeric'),
+        'label' => ts('Phone (Numbers only)'),
       ],
     ],
     'phone_type_id' => [
