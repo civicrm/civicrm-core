@@ -1245,71 +1245,21 @@ SELECT is_primary,
   }
 
   /**
-   * Get options for a given address field.
-   * @see CRM_Core_DAO::buildOptions
+   * Legacy option getter
    *
-   * TODO: Should we always assume chainselect? What fn should be responsible for controlling that flow?
-   * TODO: In context of chainselect, what to return if e.g. a country has no states?
-   *
-   * @param string $fieldName
-   * @param string $context
-   * @see CRM_Core_DAO::buildOptionsContext
-   * @param array $props
-   *   whatever is known about this dao object.
-   *
-   * @return array|bool
+   * @deprecated
+   * @inheritDoc
    */
   public static function buildOptions($fieldName, $context = NULL, $props = []) {
-    $params = [];
-    // Special logic for fields whose options depend on context or properties
+    // Convert legacy fieldnames for Api3 and old quickforms
     switch ($fieldName) {
-      // Filter state_province list based on chosen country or site defaults
-      case 'state_province_id':
       case 'state_province_name':
       case 'state_province':
-        // change $fieldName to DB specific names.
         $fieldName = 'state_province_id';
-        if (empty($props['country_id']) && $context !== 'validate') {
-          $config = CRM_Core_Config::singleton();
-          if (!empty($config->provinceLimit)) {
-            $props['country_id'] = $config->provinceLimit;
-          }
-          else {
-            $props['country_id'] = $config->defaultContactCountry;
-          }
-        }
-        if (!empty($props['country_id'])) {
-          if (!CRM_Utils_Rule::commaSeparatedIntegers(implode(',', (array) $props['country_id']))) {
-            throw new CRM_Core_Exception(ts('Province limit or default country setting is incorrect'));
-          }
-          $params['condition'] = 'country_id IN (' . implode(',', (array) $props['country_id']) . ')';
-        }
         break;
 
-      // Filter country list based on site defaults
-      case 'country_id':
       case 'country':
-        // change $fieldName to DB specific names.
         $fieldName = 'country_id';
-        if ($context != 'get' && $context != 'validate') {
-          $config = CRM_Core_Config::singleton();
-          if (!empty($config->countryLimit) && is_array($config->countryLimit)) {
-            if (!CRM_Utils_Rule::commaSeparatedIntegers(implode(',', $config->countryLimit))) {
-              throw new CRM_Core_Exception(ts('Available Country setting is incorrect'));
-            }
-            $params['condition'] = 'id IN (' . implode(',', $config->countryLimit) . ')';
-          }
-        }
-        break;
-
-      // Filter county list based on chosen state
-      case 'county_id':
-        if (!empty($props['state_province_id'])) {
-          if (!CRM_Utils_Rule::commaSeparatedIntegers(implode(',', (array) $props['state_province_id']))) {
-            throw new CRM_Core_Exception(ts('Can only accept Integers for state_province_id filtering'));
-          }
-          $params['condition'] = 'state_province_id IN (' . implode(',', (array) $props['state_province_id']) . ')';
-        }
         break;
 
       // Not a real field in this entity
@@ -1318,7 +1268,46 @@ SELECT is_primary,
       case 'worldregion_id':
         return CRM_Core_BAO_Country::buildOptions('region_id', $context, $props);
     }
-    return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
+    return parent::buildOptions($fieldName, $context, $props);
+  }
+
+  /**
+   * Pseudoconstant condition_provider for state_province_id field.
+   * @see \Civi\Schema\EntityMetadataBase::getConditionFromProvider
+   */
+  public static function alterStateProvince(string $fieldName, CRM_Utils_SQL_Select $conditions, $params) {
+    // Filter state_province list based on chosen country or site defaults
+    if (empty($params['values']['country_id']) && !$params['include_disabled']) {
+      $params['values']['country_id'] = Civi::settings()->get('provinceLimit') ?: Civi::settings()->get('defaultContactCountry');
+    }
+    if (!empty($params['values']['country_id'])) {
+      $conditions->where('country_id IN (#countryLimit)', ['countryLimit' => $params['values']['country_id']]);
+    }
+  }
+
+  /**
+   * Pseudoconstant condition_provider for country_id field.
+   * @see \Civi\Schema\EntityMetadataBase::getConditionFromProvider
+   */
+  public static function alterCountry(string $fieldName, CRM_Utils_SQL_Select $conditions, $params) {
+    // Filter country list based on site defaults
+    if (!$params['include_disabled']) {
+      $countryLimit = Civi::settings()->get('countryLimit');
+      if ($countryLimit) {
+        $conditions->where('id IN (#countryLimit)', ['countryLimit' => $countryLimit]);
+      }
+    }
+  }
+
+  /**
+   * Pseudoconstant condition_provider for county_id field.
+   * @see \Civi\Schema\EntityMetadataBase::getConditionFromProvider
+   */
+  public static function alterCounty(string $fieldName, CRM_Utils_SQL_Select $conditions, $params) {
+    // Filter county list based on chosen state
+    if (!empty($params['values']['state_province_id'])) {
+      $conditions->where('state_province_id IN (#stateProvince)', ['stateProvince' => $params['values']['state_province_id']]);
+    }
   }
 
   /**
