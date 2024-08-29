@@ -4,6 +4,7 @@ namespace E2E\Core;
 
 use Civi;
 use Civi\Core\Url;
+use Civi\Test\RemoteTestFunction;
 
 /**
  * Test generation of URLs via `Civi::url()` (`Civi\Core\Url`).
@@ -30,27 +31,42 @@ class UrlFacadeTest extends \CiviEndToEndTestCase {
     \CRM_Utils_GlobalStack::singleton()->pop();
   }
 
-  public function testAbsoluteRelative() {
-    $absolutes = [];
-    $absolutes['flag'] = Civi::url('backend://civicrm/admin', 'a');
-    $absolutes['method'] = Civi::url('backend://civicrm/admin')->setPreferFormat('absolute');
-    $absolutes['ext'] = Civi::url('ext://org.civicrm.search_kit/js/foobar.js', 'a');
-    $absolutes['asset'] = Civi::url('asset://[civicrm.packages]/js/foobar.js', 'a');
-    $absolutes['http'] = Civi::url('http://example.com/foo', 'a');
-    $absolutes['https'] = Civi::url('https://example.com/foo', 'a');
+  public function testAbsoluteRelative(): void {
+    $absolutes = $this->remote('getAbsolutes', function () {
+      $absolutes = [];
+      $absolutes['flag'] = Civi::url('backend://civicrm/admin', 'a');
+      $absolutes['method'] = Civi::url('backend://civicrm/admin')->setPreferFormat('absolute');
+      $absolutes['ext'] = Civi::url('ext://org.civicrm.search_kit/js/foobar.js', 'a');
+      $absolutes['asset'] = Civi::url('asset://[civicrm.packages]/js/foobar.js', 'a');
+      $absolutes['http'] = Civi::url('http://example.com/foo', 'a');
+      $absolutes['https'] = Civi::url('https://example.com/foo', 'a');
 
-    $relatives = [];
-    $relatives['default'] = Civi::url('backend://civicrm/admin');
-    $relatives['flag'] = Civi::url('backend://civicrm/admin', 'r');
-    $relatives['method'] = Civi::url('backend://civicrm/admin')->setPreferFormat('relative');
-    $relatives['ext'] = Civi::url('ext://org.civicrm.search_kit/js/foobar.js', 'r');
-    $relatives['asset'] = Civi::url('asset://[civicrm.packages]/js/foobar.js', 'r');
+      // Return both raw object and server-rendered string.
+      return array_map(fn($u) => ['obj' => $u, 'str' => (string) $u], $absolutes);
+    });
 
+    $relatives = $this->remote('getRelatives', function () {
+      $relatives = [];
+      $relatives['default'] = Civi::url('backend://civicrm/admin');
+      $relatives['flag'] = Civi::url('backend://civicrm/admin', 'r');
+      $relatives['method'] = Civi::url('backend://civicrm/admin')->setPreferFormat('relative');
+      $relatives['ext'] = Civi::url('ext://org.civicrm.search_kit/js/foobar.js', 'r');
+      $relatives['asset'] = Civi::url('asset://[civicrm.packages]/js/foobar.js', 'r');
+
+      // Return both raw object and server-rendered string.
+      return array_map(fn($u) => ['obj' => $u, 'str' => (string) $u], $relatives);
+    });
+
+    $this->assertTrue(count($absolutes) > 4, 'Response should provide some well-formed examples');
     foreach ($absolutes as $key => $url) {
-      $this->assertMatchesRegularExpression(';^https?://;', (string) $url, "absolutes[$key] should be absolute URL");
+      $this->assertMatchesRegularExpression(';^https?://;', (string) $url['obj'], "(Local render) absolutes[$key] should be absolute URL");
+      $this->assertMatchesRegularExpression(';^https?://;', $url['str'], "(Remote render) absolutes[$key] should be absolute URL");
     }
+
+    $this->assertTrue(count($relatives) > 4, 'Response should provide some well-formed examples');
     foreach ($relatives as $key => $url) {
-      $this->assertDoesNotMatchRegularExpression(';^https?://;', (string) $url, "relatives[$key] should be relative URL");
+      $this->assertDoesNotMatchRegularExpression(';^https?://;', (string) $url['obj'], "(Local render) relatives[$key] should be relative URL");
+      $this->assertDoesNotMatchRegularExpression(';^https?://;', $url['str'], "(Remote render) relatives[$key] should be relative URL");
     }
   }
 
@@ -65,88 +81,114 @@ class UrlFacadeTest extends \CiviEndToEndTestCase {
 
     foreach ($examples as $example) {
       // Do a round-trip parse and re-encode
-      $output = (string) Civi::url($example);
-      $this->assertEquals($example, $output);
+      $localRender = (string) Civi::url($example);
+      $this->assertEquals($example, $localRender, '(Local render) Value should match');
+
+      $remoteRender = $this->remote(__FUNCTION__, fn($e) => (string) Civi::url($e), [$example]);
+      $this->assertEquals($example, $remoteRender, '(Local render) Value should match');
     }
   }
 
   public function testPath() {
-    $examples = [];
-    $examples[] = ['civicrm/ajax/api4', Civi::url('service://civicrm/ajax/api4')];
-    $examples[] = ['civicrm/ajax/api4/Contact/get+stuff', Civi::url('service://civicrm/ajax/api4/Contact/get+stuff')];
-    $examples[] = ['civicrm/ajax/api4/Contact/get+stuff', Civi::url('service://civicrm/ajax/api4')->addPath(['Contact', 'get stuff'])];
-    $examples[] = ['civicrm/ajax/api4/Contact/get+stuff', Civi::url('service://civicrm/ajax/api4/Contact')->addPath('get+stuff')];
-    $examples[] = ['civicrm/ajax/api4/Contact/get+stuff', Civi::url('service://civicrm/ajax/api4/Contact')->addPath(['get stuff'])];
-    $examples[] = ['civicrm/new-path', Civi::url('service://civicrm/old-path')->setPath('civicrm/new-path')];
+    $examples = $this->remote(__FUNCTION__, function() {
+      $examples = [];
+      $examples[] = ['civicrm/ajax/api4', Civi::url('service://civicrm/ajax/api4')];
+      $examples[] = ['civicrm/ajax/api4/Contact/get+stuff', Civi::url('service://civicrm/ajax/api4/Contact/get+stuff')];
+      $examples[] = ['civicrm/ajax/api4/Contact/get+stuff', Civi::url('service://civicrm/ajax/api4')->addPath(['Contact', 'get stuff'])];
+      $examples[] = ['civicrm/ajax/api4/Contact/get+stuff', Civi::url('service://civicrm/ajax/api4/Contact')->addPath('get+stuff')];
+      $examples[] = ['civicrm/ajax/api4/Contact/get+stuff', Civi::url('service://civicrm/ajax/api4/Contact')->addPath(['get stuff'])];
+      $examples[] = ['civicrm/new-path', Civi::url('service://civicrm/old-path')->setPath('civicrm/new-path')];
+      return array_map(fn($u) => $u + [2 => (string) $u[1]], $examples);
+    });
 
+    $this->assertTrue(count($examples) > 4, 'Response should provide some well-formed examples');
     foreach ($examples as $key => $example) {
-      /** @var \Civi\Core\Url $url */
-      [$expected, $url] = $example;
-      $this->assertEquals($expected, $url->getPath(), sprintf("%s at %d should be have matching property", __FUNCTION__, $key));
-      $this->assertUrlComponentContains('path', $expected, $url, sprintf('%s at %d: ', __FUNCTION__, $key));
+      /** @var \Civi\Core\Url $urlObj */
+      [$expected, $urlObj, $urlStr] = $example;
+      $this->assertEquals($expected, $urlObj->getPath(), sprintf("%s at %d should be have matching property", __FUNCTION__, $key));
+      $this->assertUrlComponentContains('path', $expected, $urlObj, sprintf('(Local render) %s at %d: ', __FUNCTION__, $key));
+      $this->assertUrlComponentContains('path', $expected, $urlStr, sprintf('(Remote render) %s at %d: ', __FUNCTION__, $key));
     }
   }
 
   public function testQuery() {
-    $examples = [];
-    $examples[] = ['reset=1&id=9', Civi::url('frontend://civicrm/profile/view?reset=1&id=9')];
-    $examples[] = ['reset=1&id=9', Civi::url('frontend://civicrm/profile/view')->addQuery('reset=1&id=9')];
-    $examples[] = ['reset=1&id=9', Civi::url('frontend://civicrm/profile/view')->addQuery(['reset' => 1, 'id' => 9])];
-    $examples[] = ['noise=Hello+world%3F', Civi::url('frontend://civicrm/profile/view?noise=Hello+world%3F')];
-    $examples[] = ['noise=Hello+world%3F', Civi::url('frontend://civicrm/profile/view')->addQuery('noise=Hello+world%3F')];
-    $examples[] = ['noise=Hello+world%3F', Civi::url('frontend://civicrm/profile/view')->addQuery(['noise' => 'Hello world?'])];
-    $examples[] = ['reset=1&id=9', Civi::url('frontend://civicrm/profile/view?forget=this')->setQuery('reset=1&id=9')];
-    $examples[] = ['reset=1&id=9', Civi::url('frontend://civicrm/profile/view?forget=this')->setQuery(['reset' => 1, 'id' => 9])];
-    $examples[] = ['reset=1&id=9', Civi::url('frontend://civicrm/profile/view?forget=this')->setQuery('reset=1')->addQuery('id=9')];
-    $examples[] = ['reset=1&id=9&foo=1', Civi::url('https://example.com/base?reset=1&id=9&foo=1')];
-    $examples[] = ['reset=1&id=9&foo=2', Civi::url('http://example.com/base?reset=1&id=9&foo=2')];
+    $examples = $this->remote(__FUNCTION__, function() {
+      $examples = [];
+      $examples[] = ['reset=1&id=9', Civi::url('frontend://civicrm/profile/view?reset=1&id=9')];
+      $examples[] = ['reset=1&id=9', Civi::url('frontend://civicrm/profile/view')->addQuery('reset=1&id=9')];
+      $examples[] = ['reset=1&id=9', Civi::url('frontend://civicrm/profile/view')->addQuery(['reset' => 1, 'id' => 9])];
+      $examples[] = ['noise=Hello+world%3F', Civi::url('frontend://civicrm/profile/view?noise=Hello+world%3F')];
+      $examples[] = ['noise=Hello+world%3F', Civi::url('frontend://civicrm/profile/view')->addQuery('noise=Hello+world%3F')];
+      $examples[] = ['noise=Hello+world%3F', Civi::url('frontend://civicrm/profile/view')->addQuery(['noise' => 'Hello world?'])];
+      $examples[] = ['reset=1&id=9', Civi::url('frontend://civicrm/profile/view?forget=this')->setQuery('reset=1&id=9')];
+      $examples[] = ['reset=1&id=9', Civi::url('frontend://civicrm/profile/view?forget=this')->setQuery(['reset' => 1, 'id' => 9])];
+      $examples[] = ['reset=1&id=9', Civi::url('frontend://civicrm/profile/view?forget=this')->setQuery('reset=1')->addQuery('id=9')];
+      $examples[] = ['reset=1&id=9&foo=1', Civi::url('https://example.com/base?reset=1&id=9&foo=1')];
+      $examples[] = ['reset=1&id=9&foo=2', Civi::url('http://example.com/base?reset=1&id=9&foo=2')];
+      return array_map(fn($u) => $u + [2 => (string) $u[1]], $examples);
+    });
 
     foreach ($examples as $key => $example) {
-      /** @var \Civi\Core\Url $url */
-      [$expected, $url] = $example;
-      $this->assertEquals($expected, $url->getQuery(), sprintf("%s at %d should be have matching property", __FUNCTION__, $key));
-      $this->assertUrlComponentContains('query', $expected, $url, sprintf('%s at %d: ', __FUNCTION__, $key));
+      /** @var \Civi\Core\Url $urlObj */
+      [$expected, $urlObj, $urlStr] = $example;
+      $this->assertEquals($expected, $urlObj->getQuery(), sprintf("%s at %d should be have matching property", __FUNCTION__, $key));
+      $this->assertUrlComponentContains('query', $expected, $urlObj, sprintf('(Local render) %s at %d: ', __FUNCTION__, $key));
+      $this->assertUrlComponentContains('query', $expected, $urlStr, sprintf('(Remote render) %s at %d: ', __FUNCTION__, $key));
     }
   }
 
-  public function testFragment() {
-    $examples = [];
-    $examples[] = ['/mailing/new', Civi::url('frontend://civicrm/a/#/mailing/new')];
-    $examples[] = ['/mailing/new', Civi::url('frontend://civicrm/a/#/')->addFragment('mailing/new')];
-    $examples[] = ['/mailing/new', Civi::url('frontend://civicrm/a/#/')->addFragment('/mailing/new')];
-    $examples[] = ['/mailing/new', Civi::url('frontend://civicrm/a/#/')->addFragment(['mailing', 'new'])];
-    $examples[] = [NULL, Civi::url('frontend://civicrm/a/#/mailing/new')->setFragment(NULL)];
-    $examples[] = ['/mailing/new+stuff', Civi::url('frontend://civicrm/a/#/mailing/new+stuff?extra=1')];
-    $examples[] = ['/mailing/new+stuff', Civi::url('frontend://civicrm/a/#/mailing?extra=1')->addFragment('new+stuff')];
-    $examples[] = ['/mailing/new+stuff', Civi::url('frontend://civicrm/a/#/mailing?extra=1')->addFragment(['new stuff'])];
-    $examples[] = ['/mailing/new+stuff', Civi::url('frontend://civicrm/a/#/ignore?extra=1')->setFragment('/mailing/new+stuff')];
-    $examples[] = ['/mailing/new+stuff', Civi::url('frontend://civicrm/a/#/ignore?extra=1')->setFragment(['', 'mailing', 'new stuff'])];
+  public function testFragment(): void {
+    $examples = $this->remote(__FUNCTION__, function () {
+      $examples = [];
+      $examples[] = ['/mailing/new', Civi::url('frontend://civicrm/a/#/mailing/new')];
+      $examples[] = ['/mailing/new', Civi::url('frontend://civicrm/a/#/')->addFragment('mailing/new')];
+      $examples[] = ['/mailing/new', Civi::url('frontend://civicrm/a/#/')->addFragment('/mailing/new')];
+      $examples[] = ['/mailing/new', Civi::url('frontend://civicrm/a/#/')->addFragment(['mailing', 'new'])];
+      $examples[] = [NULL, Civi::url('frontend://civicrm/a/#/mailing/new')->setFragment(NULL)];
+      $examples[] = ['/mailing/new+stuff', Civi::url('frontend://civicrm/a/#/mailing/new+stuff?extra=1')];
+      $examples[] = ['/mailing/new+stuff', Civi::url('frontend://civicrm/a/#/mailing?extra=1')->addFragment('new+stuff')];
+      $examples[] = ['/mailing/new+stuff', Civi::url('frontend://civicrm/a/#/mailing?extra=1')->addFragment(['new stuff'])];
+      $examples[] = ['/mailing/new+stuff', Civi::url('frontend://civicrm/a/#/ignore?extra=1')->setFragment('/mailing/new+stuff')];
+      $examples[] = ['/mailing/new+stuff', Civi::url('frontend://civicrm/a/#/ignore?extra=1')->setFragment(['', 'mailing', 'new stuff'])];
+      return array_map(fn($u) => $u + [2 => (string) $u[1]], $examples);
+    });
 
+    $this->assertTrue(count($examples) > 4, 'Response should provide some well-formed examples');
     foreach ($examples as $key => $example) {
       /** @var \Civi\Core\Url $url */
-      [$expected, $url] = $example;
-      $this->assertEquals($expected, $url->getFragment(), sprintf("%s at %d should be have matching property", __FUNCTION__, $key));
+      [$expected, $urlObj, $urlStr] = $example;
+      $this->assertEquals($expected, $urlObj->getFragment(), sprintf("%s at %d should be have matching property", __FUNCTION__, $key));
       if ($expected !== NULL) {
-        $this->assertStringContainsString($expected, (string) $url, sprintf("%s at %d should be have matching output", __FUNCTION__, $key));
+        $this->assertStringContainsString($expected, (string) $urlObj, sprintf("On E2E thread, %s at %d should be have matching output", __FUNCTION__, $key));
+        $this->assertStringContainsString($expected, $urlStr, sprintf("On HTTP thread, %s at %d should be have matching output", __FUNCTION__, $key));
+      }
+      else {
+        $this->assertStringNotContainsString('#', (string) $urlObj);
+        $this->assertStringNotContainsString('#', $urlStr);
       }
     }
   }
 
   public function testFragmentQuery() {
-    $examples = [];
-    $examples[] = ['angularDebug=1&extra=hello+world%3F', Civi::url('frontend://civicrm/a/#/mailing/new?angularDebug=1&extra=hello+world%3F')];
-    $examples[] = ['angularDebug=1&extra=hello+world%3F', Civi::url('frontend://civicrm/a/#/mailing/new?angularDebug=1')->addFragmentQuery('extra=hello+world%3F')];
-    $examples[] = ['angularDebug=1&extra=hello+world%3F', Civi::url('frontend://civicrm/a/#/mailing/new')->addFragmentQuery('angularDebug=1&extra=hello+world%3F')];
-    $examples[] = ['angularDebug=1&extra=hello+world%3F', Civi::url('frontend://civicrm/a/#/mailing/new')->addFragmentQuery(['angularDebug' => 1, 'extra' => 'hello world?'])];
-    $examples[] = ['angularDebug=1&extra=hello+world%3F', Civi::url('frontend://civicrm/a/#/mailing/new')->setFragmentQuery('angularDebug=1&extra=hello+world%3F')];
-    $examples[] = ['angularDebug=1&extra=hello+world%3F', Civi::url('frontend://civicrm/a/#/mailing/new')->setFragmentQuery(['angularDebug' => 1, 'extra' => 'hello world?'])];
+    $examples = $this->remote(__FUNCTION__, function () {
+      $examples = [];
+      $examples[] = ['angularDebug=1&extra=hello+world%3F', Civi::url('frontend://civicrm/a/#/mailing/new?angularDebug=1&extra=hello+world%3F')];
+      $examples[] = ['angularDebug=1&extra=hello+world%3F', Civi::url('frontend://civicrm/a/#/mailing/new?angularDebug=1')->addFragmentQuery('extra=hello+world%3F')];
+      $examples[] = ['angularDebug=1&extra=hello+world%3F', Civi::url('frontend://civicrm/a/#/mailing/new')->addFragmentQuery('angularDebug=1&extra=hello+world%3F')];
+      $examples[] = ['angularDebug=1&extra=hello+world%3F', Civi::url('frontend://civicrm/a/#/mailing/new')->addFragmentQuery(['angularDebug' => 1, 'extra' => 'hello world?'])];
+      $examples[] = ['angularDebug=1&extra=hello+world%3F', Civi::url('frontend://civicrm/a/#/mailing/new')->setFragmentQuery('angularDebug=1&extra=hello+world%3F')];
+      $examples[] = ['angularDebug=1&extra=hello+world%3F', Civi::url('frontend://civicrm/a/#/mailing/new')->setFragmentQuery(['angularDebug' => 1, 'extra' => 'hello world?'])];
+      return array_map(fn($u) => $u + [2 => (string) $u[1]], $examples);
+    });
 
     foreach ($examples as $key => $example) {
-      /** @var \Civi\Core\Url $url */
-      [$expected, $url] = $example;
-      $this->assertEquals($expected, $url->getFragmentQuery(), sprintf("%s at %d should be have matching property", __FUNCTION__, $key));
+      /** @var \Civi\Core\Url $urlObj */
+      [$expected, $urlObj, $urlStr] = $example;
+      $this->assertEquals($expected, $urlObj->getFragmentQuery(), sprintf("%s at %d should be have matching property", __FUNCTION__, $key));
       if ($expected !== NULL) {
-        $this->assertStringContainsString($expected, (string) $url, sprintf("%s at %d should be have matching output", __FUNCTION__, $key));
+        $this->assertStringContainsString($expected, (string) $urlObj, sprintf("%s at %d should be have matching output", __FUNCTION__, $key));
+        $this->assertStringContainsString($expected, $urlStr, sprintf("%s at %d should be have matching output", __FUNCTION__, $key));
+
       }
     }
   }
@@ -174,34 +216,44 @@ class UrlFacadeTest extends \CiviEndToEndTestCase {
   }
 
   public function testFunkyStartPoints(): void {
-    $baseline = (string) \Civi::url('frontend://civicrm/event/info?id=1');
+    $alternatives = $this->remote(__FUNCTION__, function () {
+      $alternatives = [
+        // Fully formed
+        \Civi::url('frontend://civicrm/event/info?id=1'),
+
+        // Start with nothing!
+        \Civi::url()
+          ->setScheme('frontend')
+          ->setPath(['civicrm', 'event', 'info'])
+          ->addQuery(['id' => 1]),
+
+        // Start with nothing! And build it backwards!
+        \Civi::url()
+          ->addQuery(['id' => 1])
+          ->addPath('civicrm')->addPath('event')->addPath('info')
+          ->setScheme('frontend'),
+
+        // Start with just the scheme
+        \Civi::url('frontend:')
+          ->addPath('civicrm/event/info')
+          ->addQuery('id=1'),
+
+        // Start with just the path
+        \Civi::url('civicrm/event/info')
+          ->setScheme('frontend')
+          ->addQuery(['id' => 1]),
+      ];
+      return array_map(fn($u) => ['obj' => $u, 'str' => (string) $u], $alternatives);
+    });
+
+    $baseline = $alternatives[0]['str'];
+
     $this->assertUrlComponentContains('path', 'civicrm/event/info', $baseline);
-
-    $alternatives = [
-      // Start with nothing!
-      \Civi::url()
-        ->setScheme('frontend')
-        ->setPath(['civicrm', 'event', 'info'])
-        ->addQuery(['id' => 1]),
-
-      // Start with nothing! And build it backwards!
-      \Civi::url()
-        ->addQuery(['id' => 1])
-        ->addPath('civicrm')->addPath('event')->addPath('info')
-        ->setScheme('frontend'),
-
-      // Start with just the scheme
-      \Civi::url('frontend:')
-        ->addPath('civicrm/event/info')
-        ->addQuery('id=1'),
-
-      // Start with just the path
-      \Civi::url('civicrm/event/info')
-        ->setScheme('frontend')
-        ->addQuery(['id' => 1]),
-    ];
-    foreach ($alternatives as $key => $alternative) {
-      $this->assertEquals($baseline, (string) $alternative, "Alternative #$key should match baseline");
+    foreach ($alternatives as $key => $example) {
+      $this->assertUrlComponentContains('path', 'civicrm/event/info', $example['str']);
+      $this->assertUrlComponentContains('path', 'civicrm/event/info', (string) $example['obj']);
+      $this->assertUrlComponentContains('query', 'id=1', $example['str']);
+      $this->assertUrlComponentContains('query', 'id=1', (string) $example['obj']);
     }
   }
 
@@ -243,6 +295,32 @@ class UrlFacadeTest extends \CiviEndToEndTestCase {
       $actualValue = strtr($actualValue, $replace);
     }
     $this->assertStringContainsString($expectValue, $actualValue, $message . sprintf("Field \"%s\" should contain \"%s\". (Full URL: %s)", $expectField, $expectValue, $renderedUrl));
+  }
+
+  /**
+   * @param string $name
+   *   Logical name of the remote function.
+   *   Most tests only have one, so they tend to use eponymous __FUNCTION__. But if you have multiple RFCs, they should differ.
+   * @param \Closure $closure
+   *   Function to call.
+   *   Note: For debugging, you may look to the adjacent file ("myFunction.rfc.php").
+   * @param array $args
+   *   Data to pass into the function.
+   * @return mixed
+   */
+  protected function remote(string $name, \Closure $closure, array $args = []) {
+    $rtf = RemoteTestFunction::register(get_class($this), $name, $closure);
+
+    // For UrlFacadeTest, it's handy to get back "Url" objects.
+    $rtf->setResponseType('application/php-serialized')
+      /**
+       * @param \Psr\Http\Message\ResponseInterface $r
+       */
+      ->setResponseDecoder(function($r) {
+        return unserialize((string) $r->getBody(), ['allowed_classes' => [Url::class]]);
+      });
+
+    return $rtf->execute($args);
   }
 
 }
