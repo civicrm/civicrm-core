@@ -6,17 +6,19 @@ The extension is licensed under [AGPL-3.0](LICENSE.txt).
 
 ## [Changelog](CHANGELOG.md)
 
-- 0.1 - **Proof-of-concept**, basic variables.
-- 0.2 - **Establishes structure**, adds Bootstrap3, components - accordion.
-- 0.3 - **Two streams, 6 CMS setups tested:** adds Minetta and Walbrook streams. Backdrop, D7 (Seven), D9 (Claro + Seven), Joomla 4, Standalone & WordPress. 
-- 0.4 - **CSS files restructure** core and stream directories, version numbering of variables files with new variables.
-- 0.5 - **Extensive UI and accessibility fixes** following testing in/around CiviCamp Hamburg.
-- 0.6 - **Adds third stream** Hackney Brook (Finsbury Park).
-- 0.7 -**Dark-mode**. Dark-mode working across all three streams.
-- 0.8 - **Front-end layouts**. Front-end support for each stream.
 - 0.9 - **Overwrites civi core CSS**. 5.75 only - overwrites core css like SearchKit & FormBuilder with extensive work on both. D7 Garland support.
+- 0.8 - **Front-end layouts**. Front-end support for each stream.
+- 0.7 - **Dark-mode**. Dark-mode working across all three streams.
+- 0.6 - **Adds third stream** Hackney Brook (Finsbury Park).
+- 0.5 - **Extensive UI and accessibility fixes** following testing in/around CiviCamp Hamburg.
+- 0.4 - **CSS files restructure** core and stream directories, version numbering of variables files with new variables.
+- 0.3 - **Two streams, 6 CMS setups tested:** adds Minetta and Walbrook streams. Backdrop, D7 (Seven), D9 (Claro + Seven), Joomla 4, Standalone & WordPress. 
+- 0.2 - **Establishes structure**, adds Bootstrap3, components - accordion.
+- 0.1 - **Proof-of-concept**, basic variables.
 
-## Installation (CLI, Zip)
+## Installation 
+
+### With (CLI, Zip)
 
 Sysadmins and developers may download the `.zip` file for this extension and
 install it with the command-line tool [cv](https://github.com/civicrm/cv).
@@ -27,7 +29,7 @@ wget https://lab.civicrm.org/extensions/riverlea/-/archive/main/riverlea-main.zi
 unzip riverlea-main.zip
 ```
 
-## Installation (CLI, Git)
+### With (CLI, Git)
 
 Sysadmins and developers may clone the [Git](https://en.wikipedia.org/wiki/Git) repo for this extension and
 install it with the command-line tool [cv](https://github.com/civicrm/cv).
@@ -37,7 +39,7 @@ git clone https://lab.civicrm.org/extensions/riverlea.git
 cv en riverlea
 ```
 
-## Usage
+### After installation
 
 After installing the extension, go to Nav menu > Administer > Customize Data and Screens > Display Preferences, and select which theme variation/stream you want (they start with the name 'Riverlea').
 

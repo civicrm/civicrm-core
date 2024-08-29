@@ -1,6 +1,6 @@
 /*
     Name: Minetta;
-    Riverlea version: 0.9.44;
+    Riverlea version: 0.9.48;
     Front, back or both: both; 
     Description: Generic CiviCRM UI, somewhat familiar to users of CiviCRM since 2014. Named after Minetta Creek, which runs under Greenwich, New York;
 */
@@ -162,7 +162,6 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-btn-icon-bg: ;
 --crm-btn-icon-border: ;
 
-
 /* TABLES */
 --crm-table-outside-border: 1px solid var(--crm-c-background3);
 --crm-table-background: var(--crm-c-page-background);
@@ -244,10 +243,10 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-input-background: var(--crm-c-page-background);
 --crm-input-background-image: linear-gradient(top, #eee 1%, #fff 15%);
 --crm-input-color: var(--crm-c-text);
---crm-input-border-color: var(--crm-c-gray-500);
---crm-input-border-radius: 0;
+--crm-input-border-color: var(--crm-c-gray-400);
+--crm-input-border-radius: 3px;
 --crm-input-active-ani: border-color .15s ease-in-out 0s;
---crm-input-box-shadow: inset 0 1px 2px 0 rgba(0,0,0,.2);
+--crm-input-box-shadow: inset 0 1px 2px 0 rgba(0,0,0,.1);
 --crm-input-padding: var(--crm-xs1) var(--crm-s2);
 --crm-input-padding-large: var(--crm-s) var(--crm-m1);
 --crm-input-height: var(--crm-l);

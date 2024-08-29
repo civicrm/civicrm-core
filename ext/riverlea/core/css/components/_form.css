@@ -181,14 +181,6 @@ select.crm-error {
     box-shadow: none;
     border: 1px solid var(--crm-c-focus);
 }
-.crm-container .big {
-    width: var(--crm-big-input);
-}
-.crm-container .huge, 
-input.crm-form-autocomplete, 
-input.crm-form-entityref {
-    width: var(--crm-huge-input);
-}
 .crm-container input.crm-placeholder-icon::placeholder {
     font-family: "FontAwesome";
     text-align: right;
@@ -202,6 +194,36 @@ input.crm-form-entityref {
 }
 .crm-container .crm-form-number {
     width: 8ch;
+}
+
+/* Input size modifiers */
+
+.crm-container .two {
+    width: 2rem;
+}
+.crm-container .four {
+    width: 4rem;
+}
+.crm-container .six {
+    width: 6rem;
+}
+.crm-container .eight {
+    width: 8rem;
+}
+.crm-container .twelve,
+.crm-container .medium {
+    width: 12rem;
+}
+.crm-container .twenty {
+    width: 20rem;
+}
+.crm-container .big {
+    width: var(--crm-big-input);
+}
+.crm-container .huge, 
+input.crm-form-autocomplete, 
+input.crm-form-entityref {
+    width: var(--crm-huge-input);
 }
 
 /* Inline edit */

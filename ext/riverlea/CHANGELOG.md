@@ -1,3 +1,7 @@
+0.9.48 
+ - CHANGED - Minetta input styles to be closer to Bootstrap (ref https://lab.civicrm.org/extensions/riverlea/-/issues/18)
+ - ADDED - input size modifiers (e.g. for shorter inputs, such as 'prefix')
+
 0.9.47
  - ADDED - page padding for database upgrade screens. minor type fixes to upgrade complete screen
  - FIXES - missing bg on dashlet selector, table padding for dashlet filter table, grab cursor on dashlet header.
