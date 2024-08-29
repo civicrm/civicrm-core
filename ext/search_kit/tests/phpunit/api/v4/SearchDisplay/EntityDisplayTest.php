@@ -38,7 +38,7 @@ class EntityDisplayTest extends Api4TestBase {
       'api_entity' => 'Contact',
       'api_params' => [
         'version' => 4,
-        'select' => ['id', 'first_name', 'last_name', 'prefix_id:label'],
+        'select' => ['id', 'first_name', 'last_name', 'prefix_id:label', 'created_date', 'modified_date'],
         'where' => [['last_name', '=', $lastName]],
       ],
     ]);
@@ -70,6 +70,16 @@ class EntityDisplayTest extends Api4TestBase {
             'label' => 'Prefix',
             'type' => 'field',
           ],
+          [
+            'key' => 'created_date',
+            'label' => 'Created Date',
+            'type' => 'field',
+          ],
+          [
+            'key' => 'modified_date',
+            'label' => 'Modified Date',
+            'type' => 'field',
+          ],
         ],
         'entity_permission' => ['view all contacts'],
         'sort' => [
@@ -79,10 +89,18 @@ class EntityDisplayTest extends Api4TestBase {
       ->execute()->first();
 
     $schema = \CRM_Core_DAO::executeQuery('DESCRIBE civicrm_sk_my_new_entity')->fetchAll();
-    $this->assertCount(5, $schema);
+    $this->assertCount(7, $schema);
     $this->assertEquals('_row', $schema[0]['Field']);
     $this->assertStringStartsWith('int', $schema[0]['Type']);
     $this->assertEquals('PRI', $schema[0]['Key']);
+
+    // created_date and modified_date should be NULLable and have no default/extra
+    $this->assertEmpty($schema[5]['Default']);
+    $this->assertEmpty($schema[5]['Extra']);
+    $this->assertEquals('YES', $schema[5]['Null']);
+    $this->assertEmpty($schema[6]['Default']);
+    $this->assertEmpty($schema[6]['Extra']);
+    $this->assertEquals('YES', $schema[5]['Null']);
 
     $rows = \CRM_Core_DAO::executeQuery('SELECT * FROM civicrm_sk_my_new_entity')->fetchAll();
     $this->assertCount(0, $rows);
@@ -98,6 +116,9 @@ class EntityDisplayTest extends Api4TestBase {
     $this->assertSame('Integer', $getFields['prefix_id']['data_type']);
     $this->assertSame('Select', $getFields['prefix_id']['input_type']);
     $this->assertNull($getFields['prefix_id']['fk_entity']);
+    $this->assertSame('Timestamp', $getFields['created_date']['data_type']);
+    $this->assertSame('Select Date', $getFields['created_date']['input_type']);
+    $this->assertNull($getFields['created_date']['fk_entity']);
 
     civicrm_api4('SK_MyNewEntity', 'refresh');
 
