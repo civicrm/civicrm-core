@@ -223,27 +223,28 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     $fields = CRM_Core_BAO_UFField::getAvailableFields($this->getUFGroupID(), $defaults);
 
     $noSearchable = $hasWebsiteTypes = [];
+    $mapperFields = [];
 
     foreach ($fields as $key => $value) {
       foreach ($value as $key1 => $value1) {
         //CRM-2676, replacing the conflict for same custom field name from different custom group.
         if ($customFieldId = CRM_Core_BAO_CustomField::getKeyID($key1)) {
           $customGroupName = CRM_Core_BAO_CustomField::getField($customFieldId)['custom_group']['title'];
-          $this->_mapperFields[$key][$key1] = $value1['title'] . ' :: ' . $customGroupName;
+          $mapperFields[$key][$key1] = $value1['title'] . ' :: ' . $customGroupName;
           if (in_array($key1, $addressCustomFields)) {
             $noSearchable[] = $value1['title'] . ' :: ' . $customGroupName;
           }
         }
         else {
-          $this->_mapperFields[$key][$key1] = $value1['title'];
+          $mapperFields[$key][$key1] = $value1['title'];
         }
         $hasLocationTypes[$key][$key1] = $value1['hasLocationType'] ?? NULL;
         $hasWebsiteTypes[$key][$key1] = $value1['hasWebsiteType'] ?? NULL;
         // hide the 'is searchable' field for 'File' custom data
         if (isset($value1['data_type']) &&
           isset($value1['html_type']) &&
-          (($value1['data_type'] == 'File' && $value1['html_type'] == 'File')
-            || ($value1['data_type'] == 'Link' && $value1['html_type'] == 'Link')
+          (($value1['data_type'] === 'File' && $value1['html_type'] === 'File')
+            || ($value1['data_type'] === 'Link' && $value1['html_type'] === 'Link')
           )
         ) {
           if (!in_array($value1['title'], $noSearchable)) {
@@ -305,7 +306,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
     foreach ($sel1 as $key => $sel) {
       if ($key) {
-        $sel2[$key] = $this->_mapperFields[$key];
+        $sel2[$key] = $mapperFields[$key];
       }
     }
     $sel3[''] = NULL;
@@ -323,8 +324,8 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
     foreach ($sel1 as $k => $sel) {
       if ($k) {
-        if (is_array($this->_mapperFields[$k])) {
-          foreach ($this->_mapperFields[$k] as $key => $value) {
+        if (is_array($mapperFields[$k])) {
+          foreach ($mapperFields[$k] as $key => $value) {
             if ($hasLocationTypes[$k][$key]) {
               $sel3[$k][$key] = $this->_location_types;
             }
