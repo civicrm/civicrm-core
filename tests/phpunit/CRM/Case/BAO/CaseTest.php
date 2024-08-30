@@ -311,7 +311,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
 
     $entityFiles = new CRM_Core_DAO_EntityFile();
     $entityFiles->entity_id = $newCase[0];
-    $entityFiles->entity_table = $customGroup['table_name'];
+    $entityFiles->entity_table = 'civicrm_case';
     $entityFiles->find();
 
     $totalEntityFiles = 0;
