@@ -222,7 +222,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
     $fields = CRM_Core_BAO_UFField::getAvailableFields($this->getUFGroupID(), $defaults);
 
-    $noSearchable = $hasWebsiteTypes = [];
+    $noSearchable = $hasWebsiteTypes = $hasLocationTypes = [];
     $mapperFields = [];
 
     foreach ($fields as $key => $value) {
@@ -254,23 +254,6 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       }
     }
     $this->assign('noSearchable', $noSearchable);
-
-    $this->_location_types = CRM_Core_DAO_Address::buildOptions('location_type_id');
-    $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
-    /**
-     * FIXME: dirty hack to make the default option show up first.  This
-     * avoids a mozilla browser bug with defaults on dynamically constructed
-     * selector widgets.
-     */
-    if ($defaultLocationType) {
-      $defaultLocation = $this->_location_types[$defaultLocationType->id];
-      unset($this->_location_types[$defaultLocationType->id]);
-      $this->_location_types = [
-        $defaultLocationType->id => $defaultLocation,
-      ] + $this->_location_types;
-    }
-
-    $this->_location_types = ['Primary'] + $this->_location_types;
 
     // since we need a hierarchical list to display contact types & subtypes,
     // this is what we going to display in first selector
@@ -312,10 +295,10 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     $sel3[''] = NULL;
     $phoneTypes = CRM_Core_DAO_Phone::buildOptions('phone_type_id');
     ksort($phoneTypes);
-
+    $locationTypes = $this->getLocationTypes();
     foreach ($sel1 as $k => $sel) {
       if ($k) {
-        foreach ($this->_location_types as $key => $value) {
+        foreach ($locationTypes as $key => $value) {
           $sel4[$k]['phone'][$key] = &$phoneTypes;
           $sel4[$k]['phone_and_ext'][$key] = &$phoneTypes;
         }
@@ -327,7 +310,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
         if (is_array($mapperFields[$k])) {
           foreach ($mapperFields[$k] as $key => $value) {
             if ($hasLocationTypes[$k][$key]) {
-              $sel3[$k][$key] = $this->_location_types;
+              $sel3[$k][$key] = $locationTypes;
             }
             elseif ($hasWebsiteTypes[$k][$key]) {
               $options = \Civi::entity('Website')->getOptions('website_type_id');
@@ -1034,6 +1017,22 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
         }
       }
     }
+  }
+
+  /**
+   * @return array
+   */
+  private function getLocationTypes(): array {
+    $locationTypes = \Civi::entity('Address')->getOptions('location_type_id');
+    $defaultLocationTypeID = CRM_Core_BAO_LocationType::getDefault()->id;
+    $firstTypes = [0 => 'Primary'];
+    // Make the default option show up first.
+    if ($defaultLocationTypeID) {
+      $firstTypes[(int) $defaultLocationTypeID] = $locationTypes[$defaultLocationTypeID]['label'];
+      unset($locationTypes[$defaultLocationTypeID]);
+    }
+
+    return $firstTypes + array_column($locationTypes, 'label', 'id');
   }
 
 }
