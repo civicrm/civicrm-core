@@ -109,7 +109,7 @@ class SpecFormatter {
   }
 
   /**
-   * Callback function to build option lists for all DAO & custom fields.
+   * Callback function to build option lists for all entities.
    *
    * @param array $field
    * @param array $values
@@ -118,28 +118,8 @@ class SpecFormatter {
    * @return array|false
    */
   public static function getOptions($field, $values, $returnFormat, $checkPermissions) {
-    $fieldName = $field['name'];
+    $options = FormattingUtil::getFieldOptions($field, $values, FALSE, $checkPermissions);
 
-    if (!empty($field['custom_field_id'])) {
-      // buildOptions relies on the custom_* type of field names
-      $fieldName = sprintf('custom_%d', $field['custom_field_id']);
-    }
-
-    // BAO::buildOptions returns a single-dimensional list, we call that first because of the hook contract,
-    // @see CRM_Utils_Hook::fieldOptions
-    // We then supplement the data with additional properties if requested.
-    $bao = CoreUtil::getBAOFromApiName($field['entity']);
-    $optionLabels = $bao::buildOptions($fieldName, NULL, $values);
-
-    if (!is_array($optionLabels)) {
-      $options = FALSE;
-    }
-    else {
-      $options = self::formatOptionList($field, $optionLabels);
-      if (is_array($returnFormat) && $options) {
-        self::addOptionProps($options, $field, $bao, $fieldName, $values, $returnFormat);
-      }
-    }
     // Special 'current_domain' option
     if ($field['fk_entity'] === 'Domain') {
       array_unshift($options, [
@@ -150,103 +130,6 @@ class SpecFormatter {
       ]);
     }
     return $options;
-  }
-
-  private static function formatOptionList(array $field, array $optionLabels) {
-    $options = \CRM_Utils_Array::makeNonAssociative($optionLabels, 'id', 'label');
-    foreach ($options as &$option) {
-      // Cast option id according to field data_type
-      $option['id'] = FormattingUtil::convertDataType($option['id'], $field['data_type']);
-    }
-    return $options;
-  }
-
-  /**
-   * Augment the 2 values returned by BAO::buildOptions (id, label) with extra properties (name, description, color, icon, etc).
-   *
-   * We start with BAO::buildOptions in order to respect hooks which may be adding/removing items, then we add the extra data.
-   *
-   * @param array $options
-   * @param array $field
-   * @param \CRM_Core_DAO $baoName
-   * @param string $fieldName
-   * @param array $values
-   * @param array $returnFormat
-   */
-  private static function addOptionProps(&$options, $field, $baoName, $fieldName, $values, $returnFormat) {
-    // FIXME: For now, call the buildOptions function again and then combine the arrays. Not an ideal approach.
-    // TODO: Teach CRM_Core_Pseudoconstant to always load multidimensional option lists so we can get more properties like 'color' and 'icon',
-    // however that might require a change to the hook_civicrm_fieldOptions signature so that's a bit tricky.
-    if (in_array('name', $returnFormat)) {
-      $props['name'] = $baoName::buildOptions($fieldName, 'validate', $values);
-    }
-    $returnFormat = array_diff($returnFormat, ['id', 'name', 'label']);
-    // CRM_Core_Pseudoconstant doesn't know how to fetch extra stuff like icon, description, color, etc., so we have to invent that wheel here...
-    if ($returnFormat) {
-      $optionIndex = array_flip(array_column($options, 'id'));
-      if (!empty($field['custom_field_id'])) {
-        $optionGroupId = \CRM_Core_BAO_CustomField::getField($field['custom_field_id'])['option_group_id'];
-      }
-      else {
-        $dao = new $baoName();
-        $fieldSpec = $dao->getFieldSpec($fieldName);
-        $pseudoconstant = $fieldSpec['pseudoconstant'] ?? NULL;
-        $optionGroupName = $pseudoconstant['optionGroupName'] ?? NULL;
-        $optionGroupId = $optionGroupName ? \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $optionGroupName, 'id', 'name') : NULL;
-      }
-      if (!empty($optionGroupId)) {
-        $extraStuff = \CRM_Core_BAO_OptionValue::getOptionValuesArray($optionGroupId);
-        $keyColumn = $pseudoconstant['keyColumn'] ?? 'value';
-        foreach ($extraStuff as $item) {
-          if (isset($optionIndex[$item[$keyColumn]])) {
-            foreach ($returnFormat as $ret) {
-              // Note: our schema is inconsistent about whether `description` fields allow html,
-              // but it's usually assumed to be plain text, so we strip_tags() to standardize it.
-              $options[$optionIndex[$item[$keyColumn]]][$ret] = ($ret === 'description' && isset($item[$ret])) ? strip_tags($item[$ret]) : $item[$ret] ?? NULL;
-            }
-          }
-        }
-      }
-      else {
-        // Fetch the abbr if requested using context: abbreviate
-        if (in_array('abbr', $returnFormat)) {
-          $props['abbr'] = $baoName::buildOptions($fieldName, 'abbreviate', $values);
-          $returnFormat = array_diff($returnFormat, ['abbr']);
-        }
-        // Fetch anything else (color, icon, description)
-        if ($returnFormat && !empty($pseudoconstant['table'])) {
-          $idCol = $pseudoconstant['keyColumn'] ?? 'id';
-          $optionIds = \CRM_Core_DAO::escapeStrings(array_column($options, 'id'));
-          $sql = "SELECT * FROM {$pseudoconstant['table']} WHERE `$idCol` IN ($optionIds)";
-          $query = \CRM_Core_DAO::executeQuery($sql);
-          while ($query->fetch()) {
-            foreach ($returnFormat as $ret) {
-              $retCol = $pseudoconstant[$ret . 'Column'] ?? $ret;
-              if (property_exists($query, $retCol)) {
-                // Note: our schema is inconsistent about whether `description` fields allow html,
-                // but it's usually assumed to be plain text, so we strip_tags() to standardize it.
-                $options[$optionIndex[$query->$idCol]][$ret] = isset($query->$retCol) ? strip_tags($query->$retCol) : NULL;
-              }
-            }
-          }
-        }
-        elseif ($returnFormat && !empty($pseudoconstant['callback'])) {
-          $callbackOptions = call_user_func(\Civi\Core\Resolver::singleton()->get($pseudoconstant['callback']), $fieldName, ['values' => $values]);
-          foreach ($callbackOptions as $callbackOption) {
-            if (is_array($callbackOption) && !empty($callbackOption['id']) && isset($optionIndex[$callbackOption['id']])) {
-              $options[$optionIndex[$callbackOption['id']]] += $callbackOption;
-            }
-          }
-        }
-      }
-    }
-    if (isset($props)) {
-      foreach ($options as &$option) {
-        foreach ($props as $name => $prop) {
-          $option[$name] = $prop[$option['id']] ?? NULL;
-        }
-      }
-    }
   }
 
   /**
