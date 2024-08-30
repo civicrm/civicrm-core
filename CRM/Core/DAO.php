@@ -2892,9 +2892,11 @@ SELECT contact_id
   /**
    * Populate option labels for this object's fields.
    *
+   * @deprecated
    * @throws exception if called directly on the base class
    */
   public function getOptionLabels() {
+    CRM_Core_Error::deprecatedFunctionWarning('Civi::entity()->getOptions');
     $fields = $this->fields();
     if ($fields === NULL) {
       throw new Exception('Cannot call getOptionLabels on CRM_Core_DAO');
