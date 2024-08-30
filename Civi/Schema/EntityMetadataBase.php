@@ -116,11 +116,17 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
   private function formatOptionValues(array $optionValues): array {
     foreach ($optionValues as $id => $optionValue) {
       if (!is_array($optionValue)) {
+        // Convert scalar values to array format
         $optionValues[$id] = [
           'id' => $id,
           'name' => $id,
           'label' => $optionValue,
         ];
+      }
+      else {
+        // Ensure each option has a name and label
+        $optionValues[$id]['name'] ??= $optionValue['id'];
+        $optionValues[$id]['label'] ??= $optionValue['name'];
       }
     }
     return $optionValues;
