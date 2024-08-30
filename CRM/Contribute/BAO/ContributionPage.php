@@ -49,6 +49,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    */
   public static function self_hook_civicrm_post(PostEvent $event): void {
     CRM_Core_PseudoConstant::flush();
+    Civi::cache('metadata')->clear();
   }
 
   /**
