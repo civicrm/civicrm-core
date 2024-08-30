@@ -84,21 +84,13 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
       $errorScope = CRM_Core_TemporaryErrorScope::create(['CRM_Core_Error', 'simpleHandler']);
 
       self::$_singleton = new CRM_Core_Config();
+
       \Civi\Core\Container::boot($loadFromDB);
+
       if ($loadFromDB && self::$_singleton->dsn) {
+        self::$_singleton->userSystem->postContainerBoot();
+
         $domain = \CRM_Core_BAO_Domain::getDomain();
-        if (CIVICRM_UF === 'Standalone') {
-          // Standalone's session cannot be initialized until CiviCRM is booted,
-          // since it is defined in an extension, and we need the session
-          // initialized before calling applyLocale.
-          $sess = \CRM_Core_Session::singleton();
-          $sess->initialize();
-          // Apply timezone for this session (will use logged in user's timezone if set)
-          $sessionTime = self::$_singleton->userSystem->getTimeZoneString();
-          date_default_timezone_set($sessionTime);
-          // setMySQLTimeZone uses getTimeZoneString internally
-          self::$_singleton->userSystem->setMySQLTimeZone();
-        }
         \CRM_Core_BAO_ConfigSetting::applyLocale(\Civi::settings($domain->id), $domain->locales);
 
         unset($errorScope);
