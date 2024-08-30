@@ -327,10 +327,12 @@ class FormattingUtil {
     try {
       $options = self::getFieldOptions($field, $entityValues, TRUE);
     }
-    // Fallback for option lists that only exist in the api but not the BAO
     catch (\CRM_Core_Exception $e) {
-      $options = civicrm_api4($field['entity'], 'getFields', ['checkPermissions' => FALSE, 'action' => $action, 'loadOptions' => ['id', $valueType], 'where' => [['name', '=', $field['name']]]])[0]['options'] ?? NULL;
+      // Entity not in Civi (api-only) will use fallback below
     }
+    // Fallback for option lists that only exist in the api but not in core
+    $options ??= civicrm_api4($field['entity'], 'getFields', ['checkPermissions' => FALSE, 'action' => $action, 'loadOptions' => ['id', $valueType], 'where' => [['name', '=', $field['name']]]])[0]['options'] ?? NULL;
+
     $options = $options ? array_column($options, $valueType, 'id') : $options;
     if (is_array($options)) {
       return $options;

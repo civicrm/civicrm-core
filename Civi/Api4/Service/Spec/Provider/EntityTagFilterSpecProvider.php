@@ -12,8 +12,6 @@
 
 namespace Civi\Api4\Service\Spec\Provider;
 
-use Civi\API\Request;
-use Civi\Api4\Generic\Result;
 use Civi\Api4\Query\Api4SelectQuery;
 use Civi\Api4\Service\Spec\FieldSpec;
 use Civi\Api4\Service\Spec\RequestSpec;
@@ -91,17 +89,8 @@ class EntityTagFilterSpecProvider extends \Civi\Core\Service\AutoService impleme
    * @return array
    */
   public static function getTagList($field, $values, $returnFormat, $checkPermissions) {
-    $table = CoreUtil::getTableName($field['entity']);
-    $result = new Result();
-    Request::create('EntityTag', 'getFields', [
-      'version' => 4,
-      'loadOptions' => $returnFormat,
-      'values' => ['entity_table' => $table],
-      'select' => ['options'],
-      'where' => [['name', '=', 'tag_id']],
-      'checkPermissions' => $checkPermissions,
-    ])->_run($result);
-    return $result->first()['options'];
+    $values = ['entity_table' => CoreUtil::getTableName($field['entity'])];
+    return \Civi::entity('EntityTag')->getOptions('tag_id', $values, FALSE, $checkPermissions);
   }
 
 }
