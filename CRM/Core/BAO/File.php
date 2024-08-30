@@ -856,6 +856,7 @@ HEREDOC;
   public static function getEntityTables(): array {
     return [
       'civicrm_activity' => ts('Activity'),
+      'civicrm_contact' => ts('Contact'),
       'civicrm_case' => ts('Case'),
       'civicrm_note' => ts('Note'),
     ];
