@@ -290,7 +290,7 @@ class CRM_Utils_PDF_Utils {
     foreach (['font_dir', 'chroot', 'log_output_file'] as $setting) {
       $value = \Civi::settings()->get("dompdf_$setting");
       if (isset($value)) {
-        $settings[$setting] = $value;
+        $settings[$setting] = Civi::paths()->getPath($value);
       }
     }
 
