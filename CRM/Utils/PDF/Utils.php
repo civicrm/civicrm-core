@@ -315,7 +315,7 @@ class CRM_Utils_PDF_Utils {
       $cacheDir = $settings['font_dir'] . DIRECTORY_SEPARATOR . 'font_cache';
     }
     else {
-      $cacheDir = Civi::paths()->getPath('[civicrm.files]/upload/font_cache');
+      $cacheDir = CRM_Core_Config::singleton()->uploadDir . '/font_cache';
     }
     // Try to create dir if it doesn't exist or return empty string
     if ((!is_dir($cacheDir)) && (!mkdir($cacheDir))) {
