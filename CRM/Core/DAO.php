@@ -2119,38 +2119,12 @@ LIKE %1
     $entity = CRM_Core_DAO_AllCoreTables::getEntityNameForClass(get_class($this));
     $tableName = CRM_Core_DAO_AllCoreTables::getTableForClass(get_class($this));
     // Obtain custom values for the old entity.
-    $customParams = $htmlType = [];
-    $customValues = CRM_Core_BAO_CustomValueTable::getEntityValues($entityID, $entity);
+    $customParams = [];
+    $customValues = CRM_Core_BAO_CustomValueTable::getEntityValues($entityID, $entity) ?: [];
 
     // If custom values present, we copy them
-    if (!empty($customValues)) {
-      // Get Field ID's and identify File type attributes, to handle file copying.
-      $fieldIds = implode(', ', array_keys($customValues));
-      $sql = "SELECT id FROM civicrm_custom_field WHERE html_type = 'File' AND id IN ( {$fieldIds} )";
-      $result = CRM_Core_DAO::executeQuery($sql);
-
-      // Build array of File type fields
-      while ($result->fetch()) {
-        $htmlType[] = $result->id;
-      }
-
-      // Build params array of custom values
-      foreach ($customValues as $field => $value) {
-        if ($value !== NULL) {
-          // Handle File type attributes
-          if (in_array($field, $htmlType)) {
-            $fileValues = CRM_Core_BAO_File::path($value, $entityID);
-            $customParams["custom_{$field}_-1"] = [
-              'name' => CRM_Utils_File::duplicate($fileValues[0]),
-              'type' => $fileValues[1],
-            ];
-          }
-          // Handle other types
-          else {
-            $customParams["custom_{$field}_-1"] = $value;
-          }
-        }
-      }
+    foreach ($customValues as $field => $value) {
+      $customParams["custom_{$field}_-1"] = $value;
 
       // Save Custom Fields for new Entity.
       CRM_Core_BAO_CustomValueTable::postProcess($customParams, $tableName, $newEntityID, $entity, $parentOperation ?? 'create');
