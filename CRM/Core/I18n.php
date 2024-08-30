@@ -689,6 +689,7 @@ class CRM_Core_I18n {
     global $tsLocale;
     $tsLocale = $civicrmLocale->ts;
 
+    Civi::cache('metadata')->clear();
     CRM_Core_I18n::singleton()->reactivate();
   }
 
