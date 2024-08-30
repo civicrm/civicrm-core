@@ -136,9 +136,9 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
       $fields = $entity->getFields();
       $select = \CRM_Utils_SQL_Select::from($pseudoconstant['table']);
       $idCol = $pseudoconstant['key_column'] ?? $entity->getMeta('primary_keys')[0];
-      $nameCol = $pseudoconstant['name_column'] ?? (isset($fields['name']) ? 'name' : $idCol);
-      $select->select(["$idCol AS id", "$nameCol AS name"]);
-      foreach (['label', 'abbr', 'color', 'icon'] as $prop) {
+      $pseudoconstant['name_column'] ??= (isset($fields['name']) ? 'name' : $idCol);
+      $select->select(["$idCol AS id"]);
+      foreach (\Civi\Api4\Utils\FormattingUtil::$pseudoConstantSuffixes as $prop) {
         if (!empty($pseudoconstant["{$prop}_column"])) {
           $propColumn = $pseudoconstant["{$prop}_column"];
           $select->select("$propColumn AS $prop");
@@ -281,6 +281,10 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
           ];
         }
         if ($customField['option_group_id']) {
+          // Options for Select, Radio, Checkbox
+          $field['pseudoconstant'] = [
+            'option_group_name' => \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $customField['option_group_id']),
+          ];
           // Autocomplete-select
           if ($field['input_type'] === 'EntityRef') {
             $field['entity_reference'] = [
@@ -288,12 +292,8 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
               'key' => 'value',
             ];
             $field['input_attrs']['filter']['option_group_id'] = $customField['option_group_id'];
-          }
-          // Options for Select, Radio, Checkbox
-          else {
-            $field['pseudoconstant'] = [
-              'option_group_name' => \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $customField['option_group_id']),
-            ];
+            // Retain option list but don't prefetch since the widget is autocomplete
+            $field['pseudoconstant']['prefetch'] = 'disabled';
           }
         }
         $customFields[$fieldName] = $field;

@@ -18,7 +18,7 @@
 use Civi\Api4\Utils\CoreUtil;
 
 /**
- * Business objects for managing custom data fields.
+ * Class CRM_Core_BAO_CustomField
  */
 class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
@@ -1988,6 +1988,7 @@ WHERE  id IN ( %1, %2 )
           // Don't set reserved as it's not a built-in option group and may be useful for other custom fields.
           'is_reserved' => 0,
           'data_type' => $dataType,
+          'option_value_fields' => self::getOptionValueFields($params),
         ]);
         $params['option_group_id'] = $optionGroup->id;
         if (!empty($params['option_value']) && is_array($params['option_value'])) {
@@ -2026,6 +2027,23 @@ WHERE  id IN ( %1, %2 )
       $params['attributes'] = 'rows=4, cols=60';
     }
     return $params;
+  }
+
+  /**
+   * Get option_value_fields for auto-creating a group
+   *
+   * This checks option values to see if any contain
+   * extra fields like description, color, icon, etc.
+   */
+  private static function getOptionValueFields(array $params): array {
+    $fields = ['name', 'label'];
+    $extras = array_diff(array_keys(CRM_Core_SelectValues::optionValueFields()), $fields);
+    foreach ($extras as $extra) {
+      if (!empty($params["option_$extra"]) && array_filter($params["option_$extra"])) {
+        $fields[] = $extra;
+      }
+    }
+    return $fields;
   }
 
   /**
