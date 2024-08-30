@@ -1,3 +1,8 @@
+0.9.49
+ - CHANGED - Button icon colour scope broaden - for any stream that sets them, e.g. Hackney Brook (https://lab.civicrm.org/extensions/riverlea/-/issues/37)
+ - FIXES - multiple button padding & alignment fixes, all streams
+ - FIXES - multiple button icon padding/alignment fixes, all streams
+
 0.9.48 
  - CHANGED - Minetta input styles to be closer to Bootstrap (ref https://lab.civicrm.org/extensions/riverlea/-/issues/18)
  - ADDED - input size modifiers (e.g. for shorter inputs, such as 'prefix')

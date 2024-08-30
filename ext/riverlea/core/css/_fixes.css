@@ -184,11 +184,7 @@ a.crm-expand-row:hover,a.crm-expand-row:focus {
 	  For buttons not using .crm-button or .btn or <button>
 *******************/
 
-/* .crm-container a.button,
-.crm-container button, */
 .crm-container .ui-button:not(.ui-button-icon-only) {
-	display: inline-block;
-	text-align: var(--crm-btn-align);
 	white-space: nowrap;
 	vertical-align: middle;
 	touch-action: manipulation;
@@ -201,13 +197,12 @@ a.crm-expand-row:hover,a.crm-expand-row:focus {
 	user-select: none;
 	margin-bottom: 0;
 	background-color: var(--crm-c-primary);
-	color: var(--crm-c-primary-text); /* Somewhere this needs to be !important but removing for now */
+	color: var(--crm-c-primary-text);
 	line-height: 1.5;
 	display: flex;
-	/* align-items: center; */
 	height: var(--crm-btn-height);
 	width: fit-content;
-	gap: var(--crm-btn-icon-spacing); /* last four lines centre icons */
+	gap: var(--crm-btn-icon-spacing);
 }
 .crm-container .ui-button:hover,
 .crm-container .ui-button:focus {
@@ -221,6 +216,7 @@ a.crm-expand-row:hover,a.crm-expand-row:focus {
     color: inherit;
     padding: 0;
 	border: 0;
+	box-shadow: none;
 }
 .crm-container a.button {
     background: var(--crm-c-secondary);
@@ -232,6 +228,7 @@ a.crm-expand-row:hover,a.crm-expand-row:focus {
 	line-height: inherit;
 	border-radius: var(--crm-btn-radius);
 	display: flex !important; /* vs contact dashboard edit */
+	gap: var(--crm-btn-icon-spacing);
 }
 .crm-container a.button span {
 	display: flex;
@@ -263,12 +260,6 @@ a.crm-expand-row:hover,a.crm-expand-row:focus {
 }
 #ckeditor_config {
 	display: flex !important; /* odd inline styled button on display preferences page */
-}
-
-/* Icon alignment */
-
-.crm-container .ui-button-icon-space {
-    display: none;
 }
 
 /* Small buttons */

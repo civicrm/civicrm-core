@@ -2,11 +2,6 @@
     padding: var(--crm-s) var(--crm-m) var(--crm-s) 0;
     float: left;
 }
-/* Causes some button+icon issues but should icons have a hover state if they're not links? 
-.crm-container .crm-i:hover,
-.crm-container .crm-i:focus {
-    color: var(--crm-c-text); 
-} */
 .crm-container button.btn-xs:has(.fa-times),
 .crm-container .crm-hover-button:has(.crm-i),
 .crm-container .crm-hover-button:has(.crm-i):hover,
@@ -68,12 +63,9 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 }
 
 /* Check icon */
-
-.crm-container .crm-button .crm-i.fa-check::before,
-.crm-container .btn .crm-i.fa-check::before,
-.crm-container .crm-button .crm-i.fa-check-circle::before,
-.crm-container .btn .crm-i.fa-check-circle::before,
-.crm-container .btn-success .crm-i::before {
+.crm-container .crm-i.fa-check,
+.crm-container .crm-i.fa-check-circle,
+.crm-container .btn-success .crm-i {
     color: var(--crm-icon-success-color);
 }
 
@@ -105,20 +97,20 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
     opacity: 1;
     transition: 0.2s;
 }
-.crm-container .crm-button .crm-i.fa-times::before,
-.crm-container .btn-danger .crm-i::before {
+.crm-container .crm-i.fa-times,
+.crm-container .btn-danger .crm-i,
+.crm-container button .fa-times {
     color: var(--crm-icon-alert-color);
 }
 
 /* Info icon */
-
-.crm-container .crm-button .crm-i.fa-info::before,
+.crm-container .crm-i.fa-info,
 .crm-container .btn-info .crm-i::before {
     color: var(--crm-icon-info-color);
 }
 
 /* Warning icon */  
-
+.crm-container .crm-i.fa-warning,
 .crm-container .btn-warning .crm-i::before {
     color: var(--crm-icon-warning-color);
 }
@@ -181,7 +173,6 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 }
 
 /* Trash icons */
-
 .crm-container .delete-icon {
     background-image: none;
 }
@@ -196,7 +187,6 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 }
 
 /* Jqueery UI icons (tags) */
-
 .crm-container .jstree-wholerow-ul {
     display: flex;
     flex-direction: column;
@@ -241,11 +231,13 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 .crm-container #navigation-tree li.jstree-node {
     background-image: none;
 }
+
 /* Resets icons with unwanted backgrounds */
 .crm-container a.crm-hover-button:has(span.icon) {
     background-color: transparent;
     padding: 0;
 }
+
 /* Spinners */
 .crm-container button i.crm-i.fa-spinner,
 .crm-container .btn i.crm-i.fa-spinner {

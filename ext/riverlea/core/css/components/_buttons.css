@@ -4,8 +4,6 @@
 .crm-container [type="button"],
 .crm-container [type="reset"],
 .crm-container [type="submit"] {
-    display: inline-block;
-    text-align: var(--crm-btn-align);
     white-space: nowrap;
     vertical-align: middle;
     touch-action: manipulation;
@@ -24,6 +22,9 @@
     display: flex;
     max-width: fit-content;
     align-items: center;
+    gap: var(--crm-btn-icon-spacing);
+    width: auto;
+    box-shadow: none;
 }
 .crm-container .btn:hover,
 .crm-container .btn:focus,
@@ -85,93 +86,6 @@
 .crm-container button.ui-button:has(.fa-times):hover,
 .crm-container button.ui-button:has(.fa-times):focus {
     background: var(--crm-c-secondary-hover);
-}
-
-/* Icons */
-
-/* .crm-container #crmIconPicker {
-    display: grid;
-    grid-template-columns: repeat(30,1fr);
-    gap: var(--crm-m);
-} */
-.crm-container .crm-button i.crm-i,
-.crm-container a.button i.crm-i,
-.crm-container button i.crm-i,
-.crm-container a.button:visited i.crm-i,
-.crm-container input.form-submit i.crm-i,
-.crm-container input[type="button"] i.crm-i,
-.crm-container input[type="submit"] i.crm-i,
-.crm-container input.form-submit-inline i.crm-i,
-.crm-container .crm-button i.crm-i,
-.crm-container .ui-dialog-buttonset .ui-button .ui-icon,
-.crm-container .btn i.crm-i {
-    background-color: var(--crm-btn-icon-bg);
-    border-radius: var(--crm-btn-radius) 0 0 var(--crm-btn-radius);
-    border-right: var(--crm-btn-icon-border);
-    line-height: inherit;
-    margin: 0 var(--crm-btn-icon-spacing) 0 0;
-    opacity: 1;
-    text-shadow: none;
-    padding: var(--crm-btn-padding-block) var(--crm-btn-icon-spacing) var(--crm-btn-padding-block) var(--crm-btn-padding-inline);
-    height: auto;
-    min-width: var(--crm-btn-height);
-    display: flex;
-    align-items: center;
-}
-/* .crm-container a.button span i.crm-i {
-    margin: 0;
-} */
-.crm-container button i.crm-i,
-.crm-container .btn i.crm-i {
-    height: calc(var(--crm-btn-height) - 2px);
-}
-.crm-container a.button i.crm-i,
-.crm-container .crm-button:not(.btn) i.crm-i {
-    height: calc(var(--crm-btn-height) - 2px);
-    display: flex;
-    align-items: center;
-}
-.crm-container .btn.btn-xs .crm-i {
-    padding: var(--crm-btn-small-padding) !important;
-    height: auto !important;
-    min-width: auto !important;
-    margin-right: calc(var(--crm-btn-icon-spacing) * 0.7);
-}
-/* .crm-container a.button:has(i.crm-i), 
-.crm-container button:has(i.crm-i),
-.crm-button > input[type="button"]:has(i.crm-i), 
-.crm-button > input[type="submit"]:has(i.crm-i), */
-.crm-container button.dropdown-toggle.btn-xs:has(i.crm-i),
-.crm-container .btn:has(i.crm-i),
-.crm-container .btn-group > .btn + .dropdown-toggle:has(i.crm-i),
-.crm-container button.ui-button:has(.ui-button-icon) {
-    padding: 0 var(--crm-btn-padding-inline) 0 0;
-    /* display: inline-block; */
-}
-.crm-container a.button:has(i.crm-i), 
-.crm-container button:has(i.crm-i),
-.crm-button:has(i.crm-i),
-.crm-button > input[type="button"]:has(i.crm-i), 
-.crm-button > input[type="submit"]:has(i.crm-i),
-.form-inline .btn-success.pull-right:has(i.crm-i) /* Api4exp */ {
-    padding: 0 var(--crm-btn-padding-inline) 0 0;
-    display: flex;
-    width: fit-content;
-    justify-content: center;
-    align-items: center;
-}
-.crm-button > input[type="button"]:has(i.crm-i), 
-.crm-button > input[type="submit"]:has(i.crm-i) {
-    padding: 0;
-}
-.crm-container .form-inline .btn-group button:has(i.crm-i),
-.crm-search-admin-main-tabs li .btn.btn-secondary.dropdown-toggle,
-.crm-container .form-inline .btn-group button i.crm-i,
-.form-inline .btn-success.pull-right i.crm-i,
-.crm-search-admin-main-tabs li .btn.btn-secondary.dropdown-toggle i.crm-i {
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
 /* BS3 colour options */
@@ -239,24 +153,12 @@
 	border-radius: var(--crm-btn-radius);
     height: auto;
 }
-.crm-container .btn-sm:has(i.crm-i), .crm-container .btn-group-sm > .btn:has(i.crm-i) {
-    padding: 0 var(--crm-m1) 0 0;
-}
-.crm-container .btn-xs, .crm-container .btn-group-xs > .btn {
+.crm-container .btn-xs,
+.crm-container .btn-group-xs > .btn {
 	padding: var(--crm-xs) var(--crm-s2);
 	font-size: var(--crm-m2);
 	border-radius: var(--crm-btn-radius);
     height: auto;
-}
-.crm-container .btn-sm i.crm-i, .crm-container .btn-group-sm > .btn i.crm-i {
-    min-width: auto;
-    height: auto;
-    padding: var(--crm-s2) var(--crm-btn-icon-spacing) var(--crm-s2) var(--crm-m1);
-}
-.crm-container .btn-xs i.crm-i, .crm-container .btn-group-xs > .btn i.crm-i {
-    min-width: auto;
-    height: auto;
-    padding: var(--crm-xs) var(--crm-btn-icon-spacing) var(--crm-xs) var(--crm-s2);
 }
 .crm-container .btn-block {
 	display: block;
@@ -481,9 +383,6 @@
 .crm-container .btn-group.open .dropdown-toggle.btn-link {
 	box-shadow: none;
 }
-/* .crm-container .btn .caret {
-	margin-left: 0;
-} */
 .crm-container .btn-lg .caret, .crm-container .btn-group-lg > .btn .caret {
 	border-width: 5px 5px 0;
 	border-bottom-width: 0;
@@ -561,3 +460,123 @@
 .crm-container .btn-group-justified > .btn-group .dropdown-menu {
 	left: auto;
 }
+.crm-container .btn-group .btn + .btn.dropdown-toggle {
+    border-left: 1px solid var(--crm-c-page-background);
+}
+
+/* Icons (for ease, include .button & .ui-button icons) */
+
+.crm-container .crm-button i.crm-i,
+.crm-container a.button i.crm-i,
+.crm-container button i.crm-i,
+.crm-container a.button:visited i.crm-i,
+.crm-container input.form-submit i.crm-i,
+.crm-container input[type="button"] i.crm-i,
+.crm-container input[type="submit"] i.crm-i,
+.crm-container input.form-submit-inline i.crm-i,
+.crm-container .ui-dialog-buttonset .ui-button .ui-icon,
+.crm-container .btn i.crm-i {
+    background-color: var(--crm-btn-icon-bg);
+    border-radius: var(--crm-btn-radius) 0 0 var(--crm-btn-radius);
+    border-right: var(--crm-btn-icon-border);
+    line-height: inherit;
+    opacity: 1;
+    text-shadow: none;
+    padding: var(--crm-btn-padding-block) var(--crm-btn-icon-spacing) var(--crm-btn-padding-block) var(--crm-btn-padding-inline);
+    height: auto;
+    min-width: var(--crm-btn-height);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+/* .crm-container a.button span i.crm-i {
+    margin: 0;
+} */
+.crm-container button i.crm-i,
+.crm-container .btn i.crm-i {
+    height: calc(var(--crm-btn-height) - 2px);
+}
+.crm-container a.button i.crm-i,
+.crm-container .crm-button:not(.btn) i.crm-i {
+    height: calc(var(--crm-btn-height) - 2px);
+    display: flex;
+    align-items: center;
+}
+/* .crm-container a.button:has(i.crm-i), 
+.crm-container button:has(i.crm-i),
+.crm-button > input[type="button"]:has(i.crm-i), 
+.crm-button > input[type="submit"]:has(i.crm-i), 
+.crm-container button.dropdown-toggle.btn-xs:has(i.crm-i), */
+.crm-container .btn:has(i.crm-i),
+.crm-container .btn-group > .btn + .dropdown-toggle:has(i.crm-i),
+.crm-container button.ui-button:has(.ui-button-icon) {
+    padding: 0 var(--crm-btn-padding-inline) 0 0;
+}
+.crm-container a.button:has(i.crm-i), 
+.crm-container button:has(i.crm-i),
+.crm-button:has(i.crm-i),
+.crm-button > input[type="button"]:has(i.crm-i), 
+.crm-button > input[type="submit"]:has(i.crm-i),
+.form-inline .btn-success.pull-right:has(i.crm-i) /* Api4exp */ {
+    padding: 0 var(--crm-btn-padding-inline) 0 0;
+    display: flex;
+    width: fit-content;
+    justify-content: center;
+    align-items: center;
+}
+.crm-button > input[type="button"]:has(i.crm-i), 
+.crm-button > input[type="submit"]:has(i.crm-i) {
+    padding: 0;
+}
+.crm-container .form-inline .btn-group button:has(i.crm-i),
+.crm-search-admin-main-tabs li .btn.btn-secondary.dropdown-toggle,
+.crm-container .form-inline .btn-group button i.crm-i,
+.form-inline .btn-success.pull-right i.crm-i,
+.crm-search-admin-main-tabs li .btn.btn-secondary.dropdown-toggle i.crm-i {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.crm-container .ui-button-icon-space {
+    display: none;
+}
+.crm-container .btn-group-xs button .caret,
+.crm-container .btn-group button.btn-xs .caret {
+    margin: 0 4px 0 -4px;
+}
+/* Buttons with only icons */
+
+/* Small buttons with icons */
+
+.crm-container .btn-sm:has(i.crm-i),
+.crm-container .btn-group-sm > .btn:has(i.crm-i) {
+    padding: 0 var(--crm-m1) 0 0;
+}
+.crm-container .btn-sm i.crm-i,
+.crm-container .btn-group-sm > .btn i.crm-i {
+    min-width: fit-content;
+    height: auto;
+    padding: var(--crm-s2) var(--crm-btn-icon-spacing) var(--crm-s2) var(--crm-m1);
+}
+.crm-container .btn-xs:has(i.crm-i),
+.crm-container .btn-group-xs > .btn:has(i.crm-i),
+.crm-container .btn-group-xs > .btn + .dropdown-toggle:has(i.crm-i),
+.crm-container button.dropdown-toggle.btn-xs:has(i.crm-i) {
+    padding: 0;
+}
+.crm-container .btn-group-xs button:has(i.crm-i) {
+    padding: 0 var(--crm-s2) 0 0; 
+}
+.crm-container .btn-xs i.crm-i, 
+.crm-container .btn-group-xs > .btn i.crm-i {
+    width: auto;
+    height: auto;
+    /* padding: var(--crm-xs) var(--crm-btn-icon-spacing) var(--crm-xs) var(--crm-s2); */
+    padding: var(--crm-btn-small-padding);
+}
+/* .crm-container .btn.btn-xs .crm-i {
+    padding: var(--crm-btn-small-padding) !important;
+    height: auto !important;
+    min-width: auto !important;
+    margin-right: calc(var(--crm-btn-icon-spacing) * 0.7);
+} */

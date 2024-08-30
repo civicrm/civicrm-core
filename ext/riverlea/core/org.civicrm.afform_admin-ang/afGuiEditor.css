@@ -584,6 +584,7 @@ i.crm-i.af-gui-conditional-dialog-move-icon {
     padding: 0 !important;
     background: transparent;
     border: 0;
+    min-width: auto;
 }
 #afGuiEditor .dropdown-menu {
     min-width: 220px;
