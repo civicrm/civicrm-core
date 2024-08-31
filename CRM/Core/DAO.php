@@ -2899,7 +2899,7 @@ SELECT contact_id
       $uniqueNames = static::fieldKeys();
       $fieldName = array_search($fieldName, $uniqueNames) ?: $fieldName;
     }
-    $checkPermissions = (bool) ($values['check_permissions'] ?? TRUE);
+    $checkPermissions = (bool) ($values['check_permissions'] ?? ($context == 'create' || $context == 'search'));
     $includeDisabled = ($context == 'validate' || $context == 'get');
     $options = $entity->getOptions($fieldName, $values, $includeDisabled, $checkPermissions);
     return $options ? CRM_Core_PseudoConstant::formatArrayOptions($context, $options) : $options;
