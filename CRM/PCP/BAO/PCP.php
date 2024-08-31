@@ -504,7 +504,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
       return FALSE;
     }
 
-    $pcpStatus = CRM_Core_PseudoConstant::get('CRM_PCP_BAO_PCP', 'status_id');
+    $pcpStatus = CRM_PCP_BAO_PCP::buildOptions('status_id');
     $approvedId = array_search('Approved', $pcpStatus);
 
     $params = ['id' => $pcpId];

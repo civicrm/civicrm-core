@@ -290,7 +290,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       // if not set and not 0
       empty($params['id'])
     ) {
-      $priority = CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id');
+      $priority = CRM_Activity_DAO_Activity::buildOptions('priority_id');
       $params['priority_id'] = array_search('Normal', $priority);
     }
 

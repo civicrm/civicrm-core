@@ -426,7 +426,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
           $this->action($object, $action, $values[$object->id], $links, $permission);
 
           if (isset($object->mapping_type_id)) {
-            $mappintTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Mapping', 'mapping_type_id');
+            $mappintTypes = CRM_Core_DAO_Mapping::buildOptions('mapping_type_id');
             $values[$object->id]['mapping_type'] = $mappintTypes[$object->mapping_type_id];
           }
         }

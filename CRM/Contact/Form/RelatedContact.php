@@ -153,7 +153,7 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
       default:
         // individual
         $form->addElement('select', 'prefix_id', ts('Prefix'),
-          ['' => ts('- prefix -')] + CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id')
+          ['' => ts('- prefix -')] + CRM_Contact_DAO_Contact::buildOptions('prefix_id')
         );
         $form->addElement('text', 'first_name', ts('First Name'),
           $attributes['first_name']
@@ -165,7 +165,7 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
           $attributes['last_name']
         );
         $form->addElement('select', 'suffix_id', ts('Suffix'),
-          ['' => ts('- suffix -')] + CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id')
+          ['' => ts('- suffix -')] + CRM_Contact_DAO_Contact::buildOptions('suffix_id')
         );
     }
 

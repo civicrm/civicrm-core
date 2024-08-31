@@ -211,7 +211,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
       $fields = $subset;
     }
     else {
-      $ufGroups = CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id');
+      $ufGroups = CRM_Core_DAO_UFField::buildOptions('uf_group_id');
 
       $fields = [];
       foreach ($ufGroups as $id => $title) {
@@ -1873,12 +1873,12 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
             $providerName = substr($name, 0, -1) . '-provider_id]';
           }
           $form->add('select', $providerName, NULL,
-            CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id'), $required
+            CRM_Core_DAO_IM::buildOptions('provider_id'), $required
           );
         }
         else {
           $form->add('select', $name . '-provider_id', $title,
-            CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id'), $required
+            CRM_Core_DAO_IM::buildOptions('provider_id'), $required
           );
         }
 
@@ -1979,7 +1979,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       );
     }
     elseif ($fieldName === 'preferred_communication_method') {
-      $communicationFields = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method');
+      $communicationFields = CRM_Contact_DAO_Contact::buildOptions('preferred_communication_method');
       foreach ($communicationFields as $key => $var) {
         if ($key == '') {
           continue;
@@ -2434,7 +2434,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    */
   public static function getProfiles($types, $onlyPure = FALSE) {
     $profiles = [];
-    $ufGroups = CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id');
+    $ufGroups = CRM_Core_DAO_UFField::buildOptions('uf_group_id');
 
     CRM_Utils_Hook::aclGroup(CRM_Core_Permission::ADMIN, NULL, 'civicrm_uf_group', $ufGroups, $ufGroups);
 
@@ -2468,7 +2468,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     }
 
     $profiles = [];
-    $ufGroups = CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id');
+    $ufGroups = CRM_Core_DAO_UFField::buildOptions('uf_group_id');
 
     CRM_Utils_Hook::aclGroup(CRM_Core_Permission::ADMIN, NULL, 'civicrm_uf_group', $ufGroups, $ufGroups);
 

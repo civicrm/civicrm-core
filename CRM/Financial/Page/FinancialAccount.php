@@ -87,7 +87,7 @@ class CRM_Financial_Page_FinancialAccount extends CRM_Core_Page_Basic {
     $dao = new CRM_Financial_DAO_FinancialAccount();
     $dao->orderBy('financial_account_type_id, name');
     $dao->find();
-    $financialAccountType = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialAccount', 'financial_account_type_id');
+    $financialAccountType = CRM_Financial_DAO_FinancialAccount::buildOptions('financial_account_type_id');
 
     while ($dao->fetch()) {
       $contributionType[$dao->id] = [];

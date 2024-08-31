@@ -284,7 +284,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
         ],
       ];
 
-      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+      $locationTypes = CRM_Core_DAO_Address::buildOptions('location_type_id');
 
       foreach ($this->_fields as $name => $field) {
         // skip pseudo fields

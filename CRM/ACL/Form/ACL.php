@@ -141,12 +141,12 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
     $customGroup = [
       '-1' => ts('- select set of custom fields -'),
       '0' => ts('All Custom Groups'),
-    ] + CRM_Core_PseudoConstant::get('CRM_Core_DAO_CustomField', 'custom_group_id');
+    ] + CRM_Core_DAO_CustomField::buildOptions('custom_group_id');
 
     $ufGroup = [
       '-1' => ts('- select profile -'),
       '0' => ts('All Profiles'),
-    ] + CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id');
+    ] + CRM_Core_DAO_UFField::buildOptions('uf_group_id');
 
     $event = [
       '-1' => ts('- select event -'),

@@ -233,8 +233,8 @@ class CRM_Contact_Form_Search_Criteria {
 
     // Phone search
     $form->addElement('text', 'phone_numeric', ts('Phone'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_Phone', 'phone'));
-    $locationType = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
-    $phoneType = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
+    $locationType = CRM_Core_DAO_Address::buildOptions('location_type_id');
+    $phoneType = CRM_Core_DAO_Phone::buildOptions('phone_type_id');
     $form->add('select', 'phone_location_type_id', ts('Phone Location'), ['' => ts('- any -')] + $locationType, FALSE, ['class' => 'crm-select2']);
     $form->add('select', 'phone_phone_type_id', ts('Phone Type'), ['' => ts('- any -')] + $phoneType, FALSE, ['class' => 'crm-select2']);
   }
@@ -480,7 +480,7 @@ class CRM_Contact_Form_Search_Criteria {
     $form->addSelect('world_region', ['entity' => 'address', 'context' => 'search']);
 
     // select for location type
-    $locationType = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+    $locationType = CRM_Core_DAO_Address::buildOptions('location_type_id');
     $form->add('select', 'location_type', ts('Address Location'), $locationType, FALSE, [
       'multiple' => TRUE,
       'class' => 'crm-select2',
@@ -563,7 +563,7 @@ class CRM_Contact_Form_Search_Criteria {
     $form->addFormFieldsFromMetadata();
     // radio button for gender
     $genderOptionsAttributes = [];
-    $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
+    $gender = CRM_Contact_DAO_Contact::buildOptions('gender_id');
     foreach ($gender as $key => $var) {
       $genderOptionsAttributes[$key] = ['id' => "civicrm_gender_{$var}_{$key}"];
     }

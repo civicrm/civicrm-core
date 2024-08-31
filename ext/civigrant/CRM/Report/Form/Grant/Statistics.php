@@ -83,14 +83,14 @@ class CRM_Report_Form_Grant_Statistics extends CRM_Report_Form {
             'name' => 'grant_type_id',
             'title' => ts('Grant Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'grant_type_id'),
+            'options' => CRM_Grant_DAO_Grant::buildOptions('grant_type_id'),
           ],
           'status_id' => [
             'name' => 'status_id',
             'title' => ts('Grant Status'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'status_id'),
+            'options' => CRM_Grant_DAO_Grant::buildOptions('status_id'),
           ],
           'amount_requested' => [
             'name' => 'amount_requested',
@@ -134,7 +134,7 @@ class CRM_Report_Form_Grant_Statistics extends CRM_Report_Form {
             'name' => 'gender_id',
             'title' => ts('Gender'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'),
+            'options' => CRM_Contact_DAO_Contact::buildOptions('gender_id'),
           ],
           'contact_type' => [
             'name' => 'contact_type',
@@ -335,9 +335,9 @@ WHERE {$this->_aliases['civicrm_grant']}.amount_total IS NOT NULL
     $awardedGrantsAmount = $grantsReceived = $totalAmount = $awardedGrants = $grantReportsReceived = 0;
     $grantStatistics = [];
 
-    $grantTypes = CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'grant_type_id');
+    $grantTypes = CRM_Grant_DAO_Grant::buildOptions('grant_type_id');
     $countries = CRM_Core_PseudoConstant::country();
-    $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
+    $gender = CRM_Contact_DAO_Contact::buildOptions('gender_id');
 
     $grantAmountTotal = "
 SELECT COUNT({$this->_aliases['civicrm_grant']}.id) as count ,

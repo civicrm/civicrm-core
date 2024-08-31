@@ -977,7 +977,7 @@ class CRM_Export_BAO_ExportProcessor {
     if ($this->isHouseholdToSkip($iterationDAO->contact_id)) {
       return FALSE;
     }
-    $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
+    $imProviders = CRM_Core_DAO_IM::buildOptions('provider_id');
 
     $row = [];
     $householdMergeRelationshipType = $this->getHouseholdMergeTypeForRow($iterationDAO->contact_id);
@@ -2122,8 +2122,8 @@ WHERE  id IN ( $deleteIDString )
    * @throws \Exception
    */
   public function fetchRelationshipDetails($relDAO, $value, $field, &$row) {
-    $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
-    $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
+    $phoneTypes = CRM_Core_DAO_Phone::buildOptions('phone_type_id');
+    $imProviders = CRM_Core_DAO_IM::buildOptions('provider_id');
     $i18n = CRM_Core_I18n::singleton();
     $field = $field . '_';
 

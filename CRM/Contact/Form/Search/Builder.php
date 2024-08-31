@@ -593,7 +593,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
       }
     }
 
-    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+    $locationTypes = CRM_Core_DAO_Address::buildOptions('location_type_id');
 
     $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
 
@@ -628,8 +628,8 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
 
     $sel3[''] = NULL;
     $sel5[''] = NULL;
-    $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
-    $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
+    $phoneTypes = CRM_Core_DAO_Phone::buildOptions('phone_type_id');
+    $imProviders = CRM_Core_DAO_IM::buildOptions('provider_id');
     asort($phoneTypes);
 
     foreach ($sel1 as $k => $sel) {

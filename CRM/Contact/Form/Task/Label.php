@@ -52,7 +52,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
     $form->addElement('select', 'location_type_id', ts('Select Location'),
       [
         '' => ts('Primary'),
-      ] + CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id'), TRUE
+      ] + CRM_Core_DAO_Address::buildOptions('location_type_id'), TRUE
     );
 
     // checkbox for SKIP contacts with Do Not Mail privacy option
@@ -144,7 +144,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
     //get the contacts information
     $params = [];
     if (!empty($fv['location_type_id'])) {
-      $locType = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+      $locType = CRM_Core_DAO_Address::buildOptions('location_type_id');
       $locName = $locType[$fv['location_type_id']];
       $location = ['location' => ["{$locName}" => $addressReturnProperties]];
       $returnProperties = array_merge($returnProperties, $location);
@@ -233,7 +233,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
       $commMethods = $row['preferred_communication_method'] ?? NULL;
       if ($commMethods) {
         $val = array_filter(explode(CRM_Core_DAO::VALUE_SEPARATOR, $commMethods));
-        $comm = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method');
+        $comm = CRM_Contact_DAO_Contact::buildOptions('preferred_communication_method');
         $temp = [];
         foreach ($val as $vals) {
           $temp[] = $comm[$vals];
