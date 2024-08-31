@@ -208,7 +208,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     $addresses = (array) CRM_Core_BAO_Address::getValues(['contact_id' => $this->_contactId], TRUE);
     foreach ($addresses as $blockId => &$blockVal) {
       // Does this do anything?
-      CRM_Utils_Array::lookupValue($blockVal, 'location_type', CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', ['labelColumn' => 'display_name']), FALSE);
+      CRM_Utils_Array::lookupValue($blockVal, 'location_type', CRM_Core_BAO_Address::buildOptions('location_type_id'), FALSE);
 
       $idValue = $blockVal['id'];
       if (!empty($blockVal['master_id'])) {

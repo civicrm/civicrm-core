@@ -31,7 +31,7 @@ class CRM_Contact_Page_Inline_Email extends CRM_Core_Page {
     // get the emails for this contact
     $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', NULL, TRUE);
 
-    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', ['labelColumn' => 'display_name']);
+    $locationTypes = CRM_Core_BAO_Address::buildOptions('location_type_id');
 
     $entityBlock = ['contact_id' => $contactId];
     $emails = CRM_Core_BAO_Email::getValues($entityBlock);
