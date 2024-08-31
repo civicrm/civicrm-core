@@ -14,23 +14,25 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
+use Civi\API\EntityLookupTrait;
 
 /**
  * Form to process actions on the field aspect of Custom.
  */
 class CRM_UF_Form_Field extends CRM_Core_Form {
+  use EntityLookupTrait;
 
   /**
    * The uf group id saved to the session for an update.
    *
-   * @var int
+   * @var int|false
    */
   public $_gid;
 
   /**
    * The field id, used when editing the field.
    *
-   * @var int
+   * @var int|false
    */
   protected $_id;
 
@@ -75,17 +77,10 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
    *
    * @return void
    */
-  public function preProcess() {
-    $this->_gid = CRM_Utils_Request::retrieve('gid', 'Positive', $this);
-    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
-
-    if (!$this->_gid && $this->_id) {
-      $this->_gid = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFField', $this->_id, 'uf_group_id');
-      $this->set('_gid', $this->_gid);
-    }
-    if ($this->_gid) {
-      $this->_title = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $this->_gid, 'title');
-
+  public function preProcess(): void {
+    $this->assign('fieldId', $this->getUFFieldID());
+    $this->assign('fieldTitle', $this->getUFFieldValue('title'));
+    if ($this->getUFGroupID()) {
       $this->setPageTitle(ts('Profile Field'));
 
       $url = CRM_Utils_System::url('civicrm/admin/uf/group/field',
@@ -156,12 +151,6 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
     //CRM-4363 check for in selector or searchable fields.
     $this->_hasSearchableORInSelector = CRM_Core_BAO_UFField::checkSearchableORInSelector($this->_gid);
-
-    $this->assign('fieldId', $this->_id);
-    if ($this->_id) {
-      $fieldTitle = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFField', $this->_id, 'label');
-      $this->assign('fieldTitle', $fieldTitle);
-    }
   }
 
   /**
@@ -209,7 +198,6 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
         ($defaults['field_name'] == "url") ? $defaults['website_type_id'] : $defaults['location_type_id'],
         CRM_Utils_Array::value('phone_type_id', $defaults),
       ];
-      $this->_gid = $defaults['uf_group_id'];
     }
     else {
       $defaults['is_active'] = 1;
@@ -235,27 +223,28 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     $fields = CRM_Core_BAO_UFField::getAvailableFields($this->_gid, $defaults);
 
     $noSearchable = $hasWebsiteTypes = [];
+    $mapperFields = [];
 
     foreach ($fields as $key => $value) {
       foreach ($value as $key1 => $value1) {
         //CRM-2676, replacing the conflict for same custom field name from different custom group.
         if ($customFieldId = CRM_Core_BAO_CustomField::getKeyID($key1)) {
           $customGroupName = CRM_Core_BAO_CustomField::getField($customFieldId)['custom_group']['title'];
-          $this->_mapperFields[$key][$key1] = $value1['title'] . ' :: ' . $customGroupName;
+          $mapperFields[$key][$key1] = $value1['title'] . ' :: ' . $customGroupName;
           if (in_array($key1, $addressCustomFields)) {
             $noSearchable[] = $value1['title'] . ' :: ' . $customGroupName;
           }
         }
         else {
-          $this->_mapperFields[$key][$key1] = $value1['title'];
+          $mapperFields[$key][$key1] = $value1['title'];
         }
         $hasLocationTypes[$key][$key1] = $value1['hasLocationType'] ?? NULL;
         $hasWebsiteTypes[$key][$key1] = $value1['hasWebsiteType'] ?? NULL;
         // hide the 'is searchable' field for 'File' custom data
         if (isset($value1['data_type']) &&
           isset($value1['html_type']) &&
-          (($value1['data_type'] == 'File' && $value1['html_type'] == 'File')
-            || ($value1['data_type'] == 'Link' && $value1['html_type'] == 'Link')
+          (($value1['data_type'] === 'File' && $value1['html_type'] === 'File')
+            || ($value1['data_type'] === 'Link' && $value1['html_type'] === 'Link')
           )
         ) {
           if (!in_array($value1['title'], $noSearchable)) {
@@ -266,24 +255,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     }
     $this->assign('noSearchable', $noSearchable);
 
-    $this->_location_types = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
-    $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
-    $this->_website_types = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id');
-
-    /**
-     * FIXME: dirty hack to make the default option show up first.  This
-     * avoids a mozilla browser bug with defaults on dynamically constructed
-     * selector widgets.
-     */
-    if ($defaultLocationType) {
-      $defaultLocation = $this->_location_types[$defaultLocationType->id];
-      unset($this->_location_types[$defaultLocationType->id]);
-      $this->_location_types = [
-        $defaultLocationType->id => $defaultLocation,
-      ] + $this->_location_types;
-    }
-
-    $this->_location_types = ['Primary'] + $this->_location_types;
+    $locationTypes = $this->getLocationTypes();
 
     // since we need a hierarchical list to display contact types & subtypes,
     // this is what we going to display in first selector
@@ -319,7 +291,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
     foreach ($sel1 as $key => $sel) {
       if ($key) {
-        $sel2[$key] = $this->_mapperFields[$key];
+        $sel2[$key] = $mapperFields[$key];
       }
     }
     $sel3[''] = NULL;
@@ -328,7 +300,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
     foreach ($sel1 as $k => $sel) {
       if ($k) {
-        foreach ($this->_location_types as $key => $value) {
+        foreach ($locationTypes as $key => $value) {
           $sel4[$k]['phone'][$key] = &$phoneTypes;
           $sel4[$k]['phone_and_ext'][$key] = &$phoneTypes;
         }
@@ -337,13 +309,13 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
     foreach ($sel1 as $k => $sel) {
       if ($k) {
-        if (is_array($this->_mapperFields[$k])) {
-          foreach ($this->_mapperFields[$k] as $key => $value) {
+        if (is_array($mapperFields[$k])) {
+          foreach ($mapperFields[$k] as $key => $value) {
             if ($hasLocationTypes[$k][$key]) {
-              $sel3[$k][$key] = $this->_location_types;
+              $sel3[$k][$key] = $locationTypes;
             }
             elseif ($hasWebsiteTypes[$k][$key]) {
-              $sel3[$k][$key] = $this->_website_types;
+              $sel3[$k][$key] = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id');
             }
             else {
               $sel3[$key] = NULL;
@@ -469,6 +441,68 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     $this->addFormRule(['CRM_UF_Form_Field', 'formRule'], $this);
 
     $this->setDefaults($defaults);
+  }
+
+  /**
+   * Get the Field ID being acted on.
+   *
+   * @spi supported for external use.
+   *
+   * @return int|null
+   */
+  public function getUFFieldID(): ?int {
+    if (!isset($this->_id)) {
+      $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this) ?: FALSE;
+    }
+    return $this->_id ?: NULL;
+  }
+
+  /**
+   * Get the Field ID being acted on.
+   *
+   * @spi supported for external use.
+   *
+   * @return int|null
+   */
+  public function getUFFieldValue(string $fieldName) {
+    if (!$this->getUFFieldID()) {
+      return NULL;
+    }
+    if (!$this->isDefined('UFField')) {
+      $this->define('UFField', 'UFField', ['id' => $this->getUFFieldID()]);
+    }
+    return $this->lookup('UFField', $fieldName);
+  }
+
+  /**
+   * Get the Field ID being acted on.
+   *
+   * @spi supported for external use.
+   *
+   * @return int|null
+   */
+  public function getUFGroupValue(string $fieldName) {
+    if (!$this->isDefined('UFGroup')) {
+      $this->define('UFGroup', 'UFGroup', ['id' => $this->getUFGroupID()]);
+    }
+    return $this->lookup('UFGroup', $fieldName);
+  }
+
+  /**
+   * Get the Field ID being acted on.
+   *
+   * @spi supported for external use.
+   *
+   * @return int|null
+   */
+  public function getUFGroupID(): ?int {
+    if (!isset($this->_gid)) {
+      $this->_gid = CRM_Utils_Request::retrieve('gid', 'Positive', $this) ?: FALSE;
+      if (!$this->_gid) {
+        $this->_gid = $this->getUFFieldValue('uf_group_id') ?: FALSE;
+      }
+    }
+    return $this->_gid ?: NULL;
   }
 
   /**
@@ -984,6 +1018,28 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
         }
       }
     }
+  }
+
+  /**
+   * @return array|bool|int[]|string[]
+   */
+  public function getLocationTypes() {
+    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+    $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
+    /**
+     * FIXME: dirty hack to make the default option show up first.  This
+     * avoids a mozilla browser bug with defaults on dynamically constructed
+     * selector widgets.
+     */
+    if ($defaultLocationType) {
+      $defaultLocation = $locationTypes[$defaultLocationType->id];
+      unset($locationTypes[$defaultLocationType->id]);
+      $locationTypes = [
+          $defaultLocationType->id => $defaultLocation,
+        ] + $locationTypes;
+    }
+
+    return ['Primary'] + $locationTypes;
   }
 
 }
