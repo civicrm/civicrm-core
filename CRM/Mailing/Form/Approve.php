@@ -77,7 +77,7 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
 
     $this->addElement('textarea', 'approval_note', ts('Approve/Reject Note'));
 
-    $mailApprovalStatus = CRM_Core_PseudoConstant::get('CRM_Mailing_BAO_Mailing', 'approval_status_id');
+    $mailApprovalStatus = CRM_Mailing_BAO_Mailing::buildOptions('approval_status_id');
 
     // eliminate the none option
     $noneOptionID = CRM_Core_PseudoConstant::getKey('CRM_Mailing_BAO_Mailing', 'approval_status_id', 'None');

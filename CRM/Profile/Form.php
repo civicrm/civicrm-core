@@ -823,7 +823,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
             CRM_Core_Permission::EDIT,
             NULL,
             'civicrm_uf_group',
-            CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id')
+            CRM_Core_DAO_UFField::buildOptions('uf_group_id')
           )
         )
       ) {
