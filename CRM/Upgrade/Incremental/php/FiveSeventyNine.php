@@ -29,6 +29,11 @@ class CRM_Upgrade_Incremental_php_FiveSeventyNine extends CRM_Upgrade_Incrementa
    */
   public function upgrade_5_79_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+
+    $tables = ['civicrm_acl_contact_cache', 'civicrm_group_contact_cache'];
+    foreach ($tables as $table) {
+      $this->addTask("dev/core#2290 - Remove id column from '$table' table", 'dropColumn', $table, 'id');
+    }
   }
 
 }
