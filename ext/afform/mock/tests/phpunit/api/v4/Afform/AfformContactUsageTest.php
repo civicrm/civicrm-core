@@ -92,6 +92,9 @@ EOHTML;
     // Autofill form with current user. See `Civi\Afform\Behavior\ContactAutofill`
     $prefill = Afform::prefill()
       ->setName($this->formName)
+      ->setFillMode('form')
+      // This should be ignored and not mess up the prefill
+      ->setArgs(['dummy_distraction' => ['id' => 1]])
       ->execute()
       ->indexBy('name');
     $this->assertEquals('Logged In', $prefill['me']['values'][0]['fields']['first_name']);
@@ -238,6 +241,7 @@ EOHTML;
     try {
       Afform::prefill()
         ->setName($this->formName)
+        ->setFillMode('form')
         ->setArgs([])
         ->execute()
         ->indexBy('name');
@@ -552,7 +556,10 @@ EOHTML;
       ->execute();
 
     // Autofilling form works because limit hasn't been reached
-    Afform::prefill()->setName($this->formName)->execute();
+    Afform::prefill()
+      ->setName($this->formName)
+      ->setFillMode('form')
+      ->execute();
 
     // Last time
     Afform::submit()
@@ -571,7 +578,10 @@ EOHTML;
 
     // Prefilling and submitting are no longer allowed.
     try {
-      Afform::prefill()->setName($this->formName)->execute();
+      Afform::prefill()
+        ->setName($this->formName)
+        ->setFillMode('entity')
+        ->execute();
       $this->fail();
     }
     catch (\Civi\API\Exception\UnauthorizedException $e) {

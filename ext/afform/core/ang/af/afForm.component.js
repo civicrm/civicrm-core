@@ -54,16 +54,19 @@
           params.args[selectedEntity] = {};
           params.args[selectedEntity][selectedIndex] = {};
           if (joinEntity) {
+            params.fillMode = 'join';
             params.args[selectedEntity][selectedIndex].joins = {};
             params.args[selectedEntity][selectedIndex].joins[joinEntity] = {};
             params.args[selectedEntity][selectedIndex].joins[joinEntity][joinIndex] = {};
             params.args[selectedEntity][selectedIndex].joins[joinEntity][joinIndex][selectedField] = selectedId;
           } else {
+            params.fillMode = 'entity';
             params.args[selectedEntity][selectedIndex][selectedField] = selectedId;
           }
         }
         // Prefill entire form
         else {
+          params.fillMode = 'form';
           args = _.assign({}, $scope.$parent.routeParams || {}, $scope.$parent.options || {});
           _.each(schema, function (entity, entityName) {
             if (args[entityName] && typeof args[entityName] === 'string') {

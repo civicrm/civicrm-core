@@ -35,6 +35,16 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   protected $args = [];
 
   /**
+   * Mode indicates what is being prefilled.
+   *
+   * Either the entire form, or a specific entity, or a join for an entity.
+   *
+   * @var string
+   * @options form,entity,join
+   */
+  protected $fillMode = 'form';
+
+  /**
    * @var array
    */
   protected $_afform;
@@ -84,17 +94,25 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    * Load all entities
    */
   protected function loadEntities() {
-    $sorter = new AfformEntitySortEvent($this->_afform, $this->_formDataModel, $this);
-    \Civi::dispatcher()->dispatch('civi.afform.sort.prefill', $sorter);
-    $sortedEntities = $sorter->getSortedEnties();
-
     // if submission id is passed then we should display the submission data
-    if (!empty($this->args['sid'])) {
-      $this->prePopulateSubmissionData($sortedEntities);
+    if ($this->fillMode === 'form' && !empty($this->args['sid'])) {
+      $this->prePopulateSubmissionData();
       return;
     }
 
-    foreach ($sortedEntities as $entityName) {
+    // When loading a single join for an entity, only that entity needs to be processed
+    if ($this->fillMode === 'join') {
+      $entityNames = array_keys(array_intersect_key($this->args, $this->_formDataModel->getEntities()));
+    }
+    // When loading the whole form, process every entity in order of dependencies.
+    // also when filling a single entity from an autocomplete, as that may affect other entities.
+    else {
+      $sorter = new AfformEntitySortEvent($this->_afform, $this->_formDataModel, $this);
+      \Civi::dispatcher()->dispatch('civi.afform.sort.prefill', $sorter);
+      $entityNames = $sorter->getSortedEnties();
+    }
+
+    foreach ($entityNames as $entityName) {
       $ids = (array) ($this->args[$entityName] ?? []);
 
       $entity = $this->_formDataModel->getEntity($entityName);
@@ -108,14 +126,16 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
         }
       }
       if ($ids) {
-        // If 'update' (or 'create' in special cases like 'template_id') is allowed, load entity.
-        $matchField = self::getNestedKey($ids) ?: $idField;
-        if ($matchField === 'joins') {
+        // Load entity join via autocomplete e.g. Address.id
+        if ($this->fillMode === 'join') {
           $this->loadJoin($entity, $ids);
         }
+        // Load entity via url arg or autocomplete input
         else {
+          $matchField = self::getNestedKey($ids) ?: $idField;
           $matchFieldDefn = $this->_formDataModel->getField($entity['type'], $matchField, 'create');
           $autofillMode = $matchFieldDefn['input_attrs']['autofill'] ?? NULL;
+          // If 'update' (or 'create' in special cases like 'template_id') is allowed, load entity.
           if (!empty($entity['actions'][$autofillMode])) {
             if (!empty($entity['url-autofill']) || isset($entity['fields'][$matchField])) {
               $this->loadEntity($entity, $ids, $autofillMode);
@@ -131,7 +151,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   /**
    * Load the data from submission table
    */
-  protected function prePopulateSubmissionData($sortedEntities) {
+  protected function prePopulateSubmissionData() {
     // if submission id is passed then get the data from submission
     // we should prepopulate only pending submissions
     $afformSubmissionData = \Civi\Api4\AfformSubmission::get(FALSE)
@@ -140,18 +160,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
       ->addWhere('afform_name', '=', $this->name)
       ->execute()->first();
 
-    // do nothing and return early
-    if (empty($afformSubmissionData)) {
-      return;
-    }
-
-    foreach ($sortedEntities as $entityName) {
-      foreach ($afformSubmissionData['data'] as $entity => $data) {
-        if ($entity == $entityName) {
-          $this->_entityValues[$entityName] = $data;
-        }
-      }
-    }
+    $this->_entityValues = array_intersect_key($this->_formDataModel->getEntities(), $afformSubmissionData['data'] ?? []);
   }
 
   /**

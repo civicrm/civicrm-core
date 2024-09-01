@@ -102,8 +102,8 @@ class ContactAutofill extends AbstractBehavior implements EventSubscriberInterfa
       $id = $event->getEntityId();
       $autoFillMode = $entity['autofill'] ?? '';
       $relatedContact = $entity['autofill-relationship'] ?? NULL;
-      // Autofill with current user, but only if this is an "entire form" prefill (no entity-specific args)
-      if (!$id && $autoFillMode === 'user' && !$event->getApiRequest()->getArgs()) {
+      // Autofill with current user, but only if this is an "entire form" prefill
+      if (!$id && $autoFillMode === 'user' && $event->getApiRequest()->getFillMode() === 'form') {
         $id = \CRM_Core_Session::getLoggedInContactID();
         if ($id) {
           $event->getApiRequest()->loadEntity($entity, [['id' => $id]]);

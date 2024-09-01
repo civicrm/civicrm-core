@@ -55,6 +55,7 @@ EOHTML;
     // Prefill from template
     $prefill = Afform::prefill()
       ->setName($this->formName)
+      ->setFillMode('entity')
       ->setArgs(['Event1' => [['template_id' => $eventTemplate['id']]]])
       ->execute()->single();
     $this->assertSame('Test Me', $prefill['values'][0]['fields']['title']);
@@ -67,6 +68,7 @@ EOHTML;
     // Prefill just the locBlock
     $prefill = Afform::prefill()
       ->setName($this->formName)
+      ->setFillMode('join')
       ->setArgs(['Event1' => [['joins' => ['LocBlock' => [['id' => $locBlock2['id']]]]]]])
       ->execute()->single();
     $this->assertSame('2@te.st', $prefill['values'][0]['joins']['LocBlock'][0]['email_id.email']);
