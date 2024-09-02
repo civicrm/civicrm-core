@@ -464,7 +464,7 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
    * anything coming in with this be happening because of the default modifier.
    *
    * Also note the right way to opt a field OUT of escaping is
-   * ``{$fieldName|smarty:nodefaults}``
+   * ``{$fieldName nofilter}``
    * This should be used for fields with known html AND for fields where
    * we are doing empty or isset checks - as otherwise the value is passed for
    * escaping first so you still get an enotice for 'empty' or a fatal for 'isset'

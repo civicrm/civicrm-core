@@ -199,7 +199,7 @@ if (!defined('CIVICRM_TEMPLATE_COMPILEDIR')) {
  * (see above).
  *
  * This tells smarty to pass all variables through the escape function
- * unless they are piped to smarty:nodefaults (eg. {$myScript|smarty:nodefaults}
+ * unless they are marked with nofilter (eg. {$myScript nofilter}
  * At this stage it should only be enabled on development sites.
  * @see https://github.com/civicrm/civicrm-core/pull/21935
  */
