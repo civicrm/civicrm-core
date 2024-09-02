@@ -831,19 +831,23 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
     $idName = "{$table}_id";
     $fieldName = "{$table}_{$column}";
     $dataType = $groupTree[$groupID]['fields'][$fieldID]['data_type'];
-    if ($dataType == 'File') {
-      if (isset($dao->$fieldName)) {
+    $fieldData = $dao->$fieldName ?? NULL;
+    $id = $dao->$idName;
+    $entityIDName = "{$table}_entity_id";
+    $entityIDFieldValue = $dao->$entityIDName;
+    if ($dataType === 'File') {
+      if ($fieldData) {
         $config = CRM_Core_Config::singleton();
         $fileDAO = new CRM_Core_DAO_File();
-        $fileDAO->id = $dao->$fieldName;
+        $fileDAO->id = $fieldData;
 
         if ($fileDAO->find(TRUE)) {
-          $entityIDName = "{$table}_entity_id";
-          $fileHash = CRM_Core_BAO_File::generateFileHash($dao->$entityIDName, $fileDAO->id);
-          $customValue['id'] = $dao->$idName;
+
+          $fileHash = CRM_Core_BAO_File::generateFileHash($entityIDFieldValue, $fileDAO->id);
+          $customValue['id'] = $id;
           $customValue['data'] = $fileDAO->uri;
           $customValue['fid'] = $fileDAO->id;
-          $customValue['fileURL'] = CRM_Utils_System::url('civicrm/file', "reset=1&id={$fileDAO->id}&eid={$dao->$entityIDName}&fcs=$fileHash");
+          $customValue['fileURL'] = CRM_Utils_System::url('civicrm/file', "reset=1&id={$fileDAO->id}&eid={$entityIDFieldValue}&fcs=$fileHash");
           $customValue['displayURL'] = NULL;
           $deleteExtra = ts('Are you sure you want to delete attached file.');
           $deleteURL = [
@@ -860,7 +864,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
             CRM_Core_Action::DELETE,
             [
               'id' => $fileDAO->id,
-              'eid' => $dao->$entityIDName,
+              'eid' => $entityIDFieldValue,
               'fid' => $fieldID,
               'fcs' => $fileHash,
             ],
@@ -870,13 +874,13 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
             'File',
             $fileDAO->id
           );
-          $customValue['deleteURLArgs'] = CRM_Core_BAO_File::deleteURLArgs($table, $dao->$entityIDName, $fileDAO->id);
+          $customValue['deleteURLArgs'] = CRM_Core_BAO_File::deleteURLArgs($table, $entityIDFieldValue, $fileDAO->id);
           $customValue['fileName'] = CRM_Utils_File::cleanFileName(basename($fileDAO->uri));
-          if ($fileDAO->mime_type == "image/jpeg" ||
-            $fileDAO->mime_type == "image/pjpeg" ||
-            $fileDAO->mime_type == "image/gif" ||
-            $fileDAO->mime_type == "image/x-png" ||
-            $fileDAO->mime_type == "image/png"
+          if ($fileDAO->mime_type === "image/jpeg" ||
+            $fileDAO->mime_type === "image/pjpeg" ||
+            $fileDAO->mime_type === "image/gif" ||
+            $fileDAO->mime_type === "image/x-png" ||
+            $fileDAO->mime_type === "image/png"
           ) {
             $customValue['displayURL'] = $customValue['fileURL'];
             $entityId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_EntityFile',
@@ -898,15 +902,15 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
       }
       else {
         $customValue = [
-          'id' => $dao->$idName,
+          'id' => $id,
           'data' => '',
         ];
       }
     }
     else {
       $customValue = [
-        'id' => $dao->$idName,
-        'data' => $dao->$fieldName,
+        'id' => $id,
+        'data' => $fieldData,
       ];
     }
 
