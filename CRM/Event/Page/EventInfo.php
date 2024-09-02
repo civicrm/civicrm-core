@@ -249,10 +249,16 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
       $this->getEventID(), 'register for events'
     );
     if ($hasPermission && $this->isAvailableForOnlineRegistration()) {
+      // Copy over the checksum, if one was present
+      $checksum_query = CRM_Utils_Request::retrieveValue('cs', 'String');
+      if ($checksum_query) {
+        $checksum_query = '&cs=' . $checksum_query . '&cid=' . CRM_Utils_Request::retrieveValue('cid', 'Positive');
+      }
+
       // we always generate urls for the front end in joomla
       $action_query = $action === CRM_Core_Action::PREVIEW ? "&action=$action" : '';
       $url = CRM_Utils_System::url('civicrm/event/register',
-        "id={$this->_id}&reset=1{$action_query}",
+        "id={$this->_id}&reset=1{$action_query}{$checksum_query}",
         FALSE, NULL, TRUE,
         TRUE
       );
