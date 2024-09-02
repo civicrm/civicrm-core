@@ -1,4 +1,4 @@
-<input ng-if=":: !$ctrl.defn.search_range" class="form-control" crm-ui-datepicker=":: $ctrl.defn.input_attrs" id="{{:: fieldId }}" ng-model="getSetValue" ng-model-options="{getterSetter: true}" title="{{:: ts('Search Range')}}" />
+<input ng-if=":: !$ctrl.defn.search_range" class="form-control" ng-required="$ctrl.defn.required" crm-ui-datepicker=":: $ctrl.defn.input_attrs" id="{{:: fieldId }}" ng-model="getSetValue" ng-model-options="{getterSetter: true}" title="{{:: ts('Search Range')}}" />
 <div ng-if=":: $ctrl.defn.search_range" class="form-inline">
   <input class="form-control" ng-required="$ctrl.defn.required" crm-ui-datepicker=":: $ctrl.inputAttrs[1]" id="{{:: fieldId }}1" ng-model="dataProvider.getFieldData()[$ctrl.fieldName]['>=']"/>
   <span class="af-field-range-sep">-</span>
