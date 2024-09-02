@@ -126,7 +126,7 @@ trait CRM_Custom_Form_CustomDataTrait {
       // We can handle those here - although is that enough to handle blanking on
       // multiple field radios?
       $field = CRM_Core_BAO_CustomField::getField($id);
-      if ($field['html_type'] === 'Radio') {
+      if ($field['html_type'] === 'Radio' || $field['html_type'] === 'Select') {
         $group = CRM_Core_BAO_CustomGroup::getGroup(['id' => $field['custom_group_id']]);
         if (!$group['is_multiple']) {
           $instances[] = 'custom_' . $id;
