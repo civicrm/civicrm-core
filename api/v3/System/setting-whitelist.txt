@@ -13,7 +13,6 @@ disable_core_css
 disable_mandatory_tokens_check
 editor_id
 enableSSL
-enable_cart
 includeAlphabeticalPager
 includeEmailInName
 includeNickNameInName

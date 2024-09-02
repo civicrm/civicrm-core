@@ -1757,13 +1757,6 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
   public static function buildOptions($fieldName, $context = NULL, $props = []) {
     $params = ['condition' => []];
 
-    if ($fieldName === 'status_id' && $context !== 'validate') {
-      // Get rid of cart-related option if disabled
-      // FIXME: Why does this option even exist if cart is disabled?
-      if (!Civi::settings()->get('enable_cart')) {
-        $params['condition'][] = "name <> 'Pending in cart'";
-      }
-    }
     if ($fieldName === 'status_id' && isset($props['is_counted'])) {
       $params['condition'][] = 'is_counted = ' . $props['is_counted'];
     }
