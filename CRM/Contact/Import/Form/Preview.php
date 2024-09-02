@@ -60,7 +60,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
     $this->addElement('text', 'newTagName', ts('Tag'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_Tag', 'name'));
     $this->addElement('text', 'newTagDesc', ts('Description'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_Tag', 'description'));
 
-    $tag = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', ['onlyActive' => FALSE]);
+    $tag = CRM_Core_DAO_EntityTag::buildOptions('tag_id', 'get');
     if (!empty($tag)) {
       $this->addElement('select', 'tag', ts(' Tag imported records'), $tag, [
         'multiple' => 'multiple',

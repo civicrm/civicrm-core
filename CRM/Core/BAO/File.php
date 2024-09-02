@@ -330,7 +330,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
     }
 
     //fix tag names
-    $tags = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', ['onlyActive' => FALSE]);
+    $tags = CRM_Core_DAO_EntityTag::buildOptions('tag_id', 'get');
 
     foreach ($results as &$values) {
       if (!empty($values['tag'])) {
