@@ -5,7 +5,6 @@ use Civi\Test\EventTestTrait;
 class CRM_Event_Page_EventInfoTest extends CiviUnitTestCase {
   use EventTestTrait;
 
-
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
     parent::tearDown();

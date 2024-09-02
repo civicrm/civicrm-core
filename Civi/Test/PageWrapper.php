@@ -11,8 +11,6 @@
 
 namespace Civi\Civi\Test;
 
-use Civi\Api4\Utils\ReflectionUtils;
-
 class PageWrapper {
 
   /**
