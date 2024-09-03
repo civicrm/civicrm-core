@@ -362,26 +362,15 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
    * @param array $groupArr
    *   (mimic CRM_UF_DAO_UFGroup).
    * @param array $fieldArrs
-   *   List of fields (each mimics CRM_UF_DAO_UFField).
-   * @param bool $visibility
-   *   Visibility of fields we are interested in.
-   * @param bool $searchable
-   * @param bool $showAll
-   * @param null $ctype
-   * @param int $permissionType
    *
    * @return array
    * @see self::getFields
    */
   public static function formatUFFields(
     $groupArr,
-    $fieldArrs,
-    $visibility = NULL,
-    $searchable = NULL,
-    $showAll = FALSE,
-    $ctype = NULL,
-    $permissionType = CRM_Core_Permission::CREATE
+    $fieldArrs
   ) {
+    $showAll = FALSE;
     // $group = new CRM_Core_DAO_UFGroup();
     // $group->copyValues($groupArr); // no... converts string('') to string('null')
     $group = (object) $groupArr;
@@ -392,17 +381,17 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
     $ufGroupType = self::_calculateGroupType($fieldArrs);
     $profileType = CRM_Core_BAO_UFField::calculateProfileType(implode(',', $ufGroupType));
     $contactActivityProfile = CRM_Core_BAO_UFField::checkContactActivityProfileTypeByGroupType(implode(',', $ufGroupType));
-    $importableFields = self::getImportableFields($showAll, $profileType, $contactActivityProfile);
-    [$customFields, $addressCustomFields] = self::getCustomFields($ctype, $permissionType);
+    $importableFields = self::getImportableFields(FALSE, $profileType, $contactActivityProfile);
+    [$customFields, $addressCustomFields] = self::getCustomFields(NULL, CRM_Core_Permission::CREATE);
 
     $formattedFields = [];
     foreach ($fieldArrs as $fieldArr) {
       $field = (object) $fieldArr;
-      if (!self::filterUFField($field, $searchable, $showAll, $visibility)) {
+      if (!empty($fieldArr['is_active'])) {
         continue;
       }
 
-      [$name, $formattedField] = self::formatUFField($group, $field, $customFields, $addressCustomFields, $importableFields, $permissionType);
+      [$name, $formattedField] = self::formatUFField($group, $field, $customFields, $addressCustomFields, $importableFields, CRM_Core_Permission::CREATE);
       if ($formattedField !== NULL) {
         $formattedFields[$name] = $formattedField;
       }
@@ -575,48 +564,6 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
       return $query;
     }
     return $query;
-  }
-
-  /**
-   * Create a query to find all visible UFFields in a UFGroup.
-   *
-   * This is the PHP in-memory variant of createUFFieldQuery().
-   *
-   * @param CRM_Core_DAO_UFField|CRM_Core_DAO $field
-   * @param bool $searchable
-   * @param bool $showAll
-   * @param int $visibility
-   *
-   * @return bool
-   *   TRUE if field is displayable
-   */
-  protected static function filterUFField($field, $searchable, $showAll, $visibility) {
-    if ($searchable && $field->is_searchable != 1) {
-      return FALSE;
-    }
-
-    if (!$showAll && $field->is_active != 1) {
-      return FALSE;
-    }
-
-    if ($visibility) {
-      $allowedVisibilities = [];
-      if ($visibility & self::PUBLIC_VISIBILITY) {
-        $allowedVisibilities[] = 'Public Pages';
-      }
-      if ($visibility & self::ADMIN_VISIBILITY) {
-        $allowedVisibilities[] = 'User and User Admin Only';
-      }
-      if ($visibility & self::LISTINGS_VISIBILITY) {
-        $allowedVisibilities[] = 'Public Pages and Listings';
-      }
-      // !empty($allowedVisibilities) seems silly to me, but it is equivalent to the pre-existing SQL
-      if (!empty($allowedVisibilities) && !in_array($field->visibility, $allowedVisibilities)) {
-        return FALSE;
-      }
-    }
-
-    return TRUE;
   }
 
   /**
