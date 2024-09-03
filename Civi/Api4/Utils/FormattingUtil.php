@@ -126,7 +126,8 @@ class FormattingUtil {
     }
 
     // Special handling for 'current_user' and user lookups
-    if ($fk === 'Contact' && isset($value) && !is_numeric($value)) {
+    $exactMatch = [NULL, '=', '!=', '<>', 'IN', 'NOT IN'];
+    if ($fk === 'Contact' && isset($value) && !is_numeric($value) && in_array($operator, $exactMatch, TRUE)) {
       $value = \_civicrm_api3_resolve_contactID($value);
       if ('unknown-user' === $value) {
         throw new \CRM_Core_Exception("\"{$fieldSpec['name']}\" \"{$value}\" cannot be resolved to a contact ID", 2002, ['error_field' => $fieldSpec['name'], "type" => "integer"]);
