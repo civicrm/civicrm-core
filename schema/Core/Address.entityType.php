@@ -242,6 +242,7 @@ return [
       'add' => '1.1',
       'usage' => [
         'import',
+        'duplicate_matching',
       ],
       'input_attrs' => [
         'control_field' => 'state_province_id',
@@ -271,6 +272,7 @@ return [
       'add' => '1.1',
       'usage' => [
         'import',
+        'duplicate_matching',
       ],
       'localize_context' => 'province',
       'input_attrs' => [
@@ -339,6 +341,7 @@ return [
       'add' => '1.1',
       'usage' => [
         'import',
+        'duplicate_matching',
       ],
       'localize_context' => 'country',
       'input_attrs' => [

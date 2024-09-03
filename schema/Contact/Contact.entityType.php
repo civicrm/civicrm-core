@@ -414,6 +414,7 @@ return [
       'description' => ts('Name used for sorting different contact types'),
       'add' => '1.1',
       'usage' => [
+        'duplicate_matching',
         'export',
       ],
       'input_attrs' => [
