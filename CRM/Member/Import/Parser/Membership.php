@@ -95,7 +95,11 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
     $params = $this->getMappedRow($values);
     $errors = [];
     foreach ($params as $key => $value) {
-      $errors = array_merge($this->getInvalidValues($value, $key), $errors);
+      // The values in the 'Membership' or 'Contact' key duplicate the main values
+      // (the goal is to get to the point where all values are keyed by entity.
+      if ($key !== 'Membership' && $key !== 'Contact') {
+        $errors = array_merge($this->getInvalidValues($value, $key), $errors);
+      }
     }
 
     if (empty($params['membership_type_id'])) {

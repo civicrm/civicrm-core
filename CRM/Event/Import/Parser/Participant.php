@@ -59,11 +59,16 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
     $rowNumber = (int) ($values[array_key_last($values)]);
     try {
       $params = $this->getMappedRow($values);
-      if (!empty($params['external_identifier'])) {
-        $params['contact_id'] = $this->lookupExternalIdentifier($params['external_identifier'], $this->getContactType(), $params['contact_id'] ?? NULL);
+      if (!empty($params['id'])) {
+        $existingParticipant = $this->checkEntityExists('Participant', $params['id']);
+        if (!$this->isUpdateExisting()) {
+          throw new CRM_Core_Exception(ts('% record found and update not selected', [1 => 'Participant']));
+        }
+        $params['contact_id'] = !empty($params['contact_id']) ? (int) $params['contact_id'] : $existingParticipant['contact_id'];
       }
-
       $formatted = $params;
+      $formatted['contact_id'] = $params['Contact']['id'] = $this->getContactID($params['Contact'] ?? [], $params['contact_id'] ?? NULL, 'Contact', $this->getDedupeRulesForEntity('Contact'));
+
       // don't add to recent items, CRM-4399
       $formatted['skipRecentView'] = TRUE;
 
@@ -89,52 +94,6 @@ class CRM_Event_Import_Parser_Participant extends CRM_Import_Parser {
         return;
       }
 
-      if (empty($params['contact_id'])) {
-        $error = $this->checkContactDuplicate($formatValues);
-
-        if (CRM_Core_Error::isAPIError($error, CRM_Core_Error::DUPLICATE_CONTACT)) {
-          $matchedIDs = (array) $error['error_message']['params'];
-          if (count($matchedIDs) === 1) {
-            foreach ($matchedIDs as $contactId) {
-              $formatted['contact_id'] = $contactId;
-            }
-          }
-          elseif ($matchedIDs > 1) {
-            throw new CRM_Core_Exception(ts('Record duplicates multiple contacts: ') . implode(',', $matchedIDs));
-          }
-        }
-        else {
-          // Using new Dedupe rule.
-          $ruleParams = [
-            'contact_type' => $this->_contactType,
-            'used' => 'Unsupervised',
-          ];
-          $fieldsArray = CRM_Dedupe_BAO_DedupeRule::dedupeRuleFields($ruleParams);
-
-          $disp = '';
-          foreach ($fieldsArray as $value) {
-            if (array_key_exists(trim($value), $params)) {
-              $paramValue = $params[trim($value)];
-              if (is_array($paramValue)) {
-                $disp .= $params[trim($value)][0][trim($value)] . " ";
-              }
-              else {
-                $disp .= $params[trim($value)] . " ";
-              }
-            }
-          }
-
-          if (!empty($params['external_identifier'])) {
-            if ($disp) {
-              $disp .= "AND {$params['external_identifier']}";
-            }
-            else {
-              $disp = $params['external_identifier'];
-            }
-          }
-          throw new CRM_Core_Exception('No matching Contact found for (' . $disp . ')');
-        }
-      }
       if ($this->isIgnoreDuplicates()) {
         CRM_Core_Error::reset();
         if (CRM_Event_BAO_Participant::checkDuplicate($formatted, $result)) {

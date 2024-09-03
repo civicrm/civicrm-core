@@ -1765,6 +1765,11 @@ abstract class CRM_Import_Parser implements UserJobInterface {
         $fields[$value] = $contactFields[$value] ?? NULL;
         $title = $fields[$value]['title'] . ' (match to contact)';
         $fields[$value]['title'] = $title;
+        $fields[$value]['entity'] = 'Contact';
+        if ($customFieldId) {
+          $fieldSpec = CRM_Core_BAO_CustomField::getField($customFieldId);
+          $fields[$value]['apiv4_name'] = $fieldSpec['custom_group']['name'] . '.' . $fieldSpec['name'];
+        }
       }
     }
     return $fields;
@@ -2027,7 +2032,29 @@ abstract class CRM_Import_Parser implements UserJobInterface {
         continue;
       }
       if ($mappedField['name']) {
-        $params[$this->getFieldMetadata($mappedField['name'])['name']] = $this->getTransformedFieldValue($mappedField['name'], $values[$i]);
+        $fieldSpec = $this->getFieldMetadata($mappedField['name']);
+        $params[$fieldSpec['name']] = $this->getTransformedFieldValue($mappedField['name'], $values[$i]);
+        $entity = $fieldSpec['entity_instance'] ?? $fieldSpec['entity'] ?? $fieldSpec['extends'] ?? NULL;
+        if ($entity) {
+          // Split out Contact values into a separate array for look-ups.
+          // This is similar to the function on Contribution_Parser but
+          // that also handles soft credits & splitting out the contribution.
+          // We still return contact in the main array as the parsers still expect that.
+          if (!isset($params[$entity])) {
+            $params[$entity] = [];
+            if ($entity === 'Contact') {
+              $params[$entity]['contact_type'] = $this->getContactTypeForEntity($entity) ?: $this->getContactType();
+            }
+          }
+          if (!empty($fieldSpec['custom_field_id'])) {
+            // Use apiv4 style here as it is used for passing to the getDuplicates function (as of writing that is
+            // the only use but as we add create / update support to non-contribution imports it will be used there too).
+            $params[$entity][$fieldSpec['apiv4_name'] ?? $fieldSpec['name']] = $this->getTransformedFieldValue($mappedField['name'], $values[$i]);
+          }
+          else {
+            $params[$entity][$fieldSpec['name']] = $this->getTransformedFieldValue($mappedField['name'], $values[$i]);
+          }
+        }
       }
     }
     return $params;
@@ -2253,10 +2280,12 @@ abstract class CRM_Import_Parser implements UserJobInterface {
 
   /**
    * @throws \CRM_Core_Exception
+   *
+   * @return array
    */
-  protected function checkEntityExists(string $entity, int $id) {
+  protected function checkEntityExists(string $entity, int $id): array {
     try {
-      civicrm_api4($entity, 'get', ['where' => [['id', '=', $id]], 'select' => ['id']])->single();
+      return civicrm_api4($entity, 'get', ['where' => [['id', '=', $id]], 'select' => ['id']])->single();
     }
     catch (CRM_Core_Exception $e) {
       throw new CRM_Core_Exception(ts('%1 record not found for id %2', [
