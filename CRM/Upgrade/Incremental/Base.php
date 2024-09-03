@@ -212,6 +212,22 @@ class CRM_Upgrade_Incremental_Base {
   }
 
   /**
+   * Add a task to uninstall an extension. It will use the full, uninstallation process
+   * (invoking `hook_uninstall`, `hook_disable`, and so on).
+   *
+   * @param string $title
+   * @param string[] $keys
+   *   List of extensions to uninstall.
+   * @param int $weight
+   */
+  protected function addUninstallTask(string $title, array $keys, int $weight = 1000): void {
+    Civi::queue(CRM_Upgrade_Form::QUEUE_NAME)->createItem(
+      new CRM_Queue_Task([static::CLASS, 'uninstallExtension'], [$keys], $title),
+      ['weight' => $weight]
+    );
+  }
+
+  /**
    * Add a task to activate an extension. It will use a simple (low-tech) installation process
    * (skipping events like `hook_install`; instead, it merely updates `civicrm_extension` and
    * `CRM_Extension_ClassLoader`). The extension should not now (or in the future) use
@@ -316,6 +332,26 @@ class CRM_Upgrade_Incremental_Base {
     if ($schema->isEnabled()) {
       $schema->fixSchemaDifferences();
     }
+
+    CRM_Core_Invoke::rebuildMenuAndCaches(FALSE, FALSE);
+    // sessionReset is FALSE because upgrade status/postUpgradeMessages are needed by the page. We reset later in doFinish().
+
+    return TRUE;
+  }
+
+  /**
+   * @param \CRM_Queue_TaskContext $ctx
+   * @param string[] $extensionKeys
+   *   List of extensions to enable.
+   * @return bool
+   */
+  public static function uninstallExtension(CRM_Queue_TaskContext $ctx, array $extensionKeys): bool {
+    // Assert this task was run with sufficient weight to use high-level services.
+    CRM_Upgrade_DispatchPolicy::assertActive('upgrade.finish');
+
+    $manager = CRM_Extension_System::singleton()->getManager();
+    $manager->disable($extensionKeys);
+    $manager->uninstall($extensionKeys);
 
     CRM_Core_Invoke::rebuildMenuAndCaches(FALSE, FALSE);
     // sessionReset is FALSE because upgrade status/postUpgradeMessages are needed by the page. We reset later in doFinish().

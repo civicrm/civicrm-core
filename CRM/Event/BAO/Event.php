@@ -903,14 +903,6 @@ WHERE civicrm_event.is_active = 1
         $info['location'] = $address;
         $info['url'] = CRM_Utils_System::url('civicrm/event/info', 'reset=1&id=' . $dao->event_id, TRUE, NULL, FALSE);
 
-        // @todo Move to eventcart extension
-        // check if we're in shopping cart mode for events
-        if ((bool) Civi::settings()->get('enable_cart')) {
-          $reg = CRM_Event_Cart_BAO_EventInCart::get_registration_link($dao->event_id);
-          $info['registration_link'] = CRM_Utils_System::url($reg['path'], $reg['query'], TRUE);
-          $info['registration_link_text'] = $reg['label'];
-        }
-
         $all[] = $info;
       }
     }

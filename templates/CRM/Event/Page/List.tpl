@@ -42,7 +42,6 @@
         <td>{if $event.is_show_location EQ 1 AND $event.location}{$event.location}{else}{ts}(not available){/ts}{/if}</td>
         <td>{if $event.event_type}{$event.event_type}{else}&nbsp;{/if}</td>
         <td>{if $event.contact_email}<a href="mailto:{$event.contact_email}">{$event.contact_email}</a>{else}&nbsp;{/if}</td>
-        {if $registration_links}<td><a href="{$event.registration_link}">{$event.registration_link_text}</a></td>{/if}
       </tr>
     {/foreach}
   </table>
