@@ -935,10 +935,21 @@ abstract class CRM_Utils_Hook {
    * @param array $tokens
    *   The list of tokens that can be used for the contact.
    *
+   * @param bool $squashDeprecation
+   *    Suppress the deprecation message - this should ONLY EVER BE CALLED
+   *    from the backward compatibilty adapter in `evaluateLegacyHookTokens`.
+   *    We are deprecating both this function, and the implementation of the hook
+   *    but for now we ensure that the hook is still rendered for
+   *    sites that implement it, via the TokenProcessor methodology
+   *    https://docs.civicrm.org/dev/en/latest/framework/token/#compose-batch
+   *
    * @return null
    */
-  public static function tokens(&$tokens) {
+  public static function tokens(&$tokens, bool $squashDeprecation = FALSE) {
     $null = NULL;
+    if (!$squashDeprecation) {
+      CRM_Core_Error::deprecatedFunctionWarning('call the token processor');
+    }
     return self::singleton()->invoke(['tokens'], $tokens,
       $null, $null, $null, $null, $null, 'civicrm_tokens'
     );
@@ -968,25 +979,36 @@ abstract class CRM_Utils_Hook {
    *   The array to store the token values indexed by contactIDs.
    * @param array $contactIDs
    *   An array of contactIDs.
-   * @param int $jobID
+   * @param null $jobID
    *   The jobID if this is associated with a CiviMail mailing.
    * @param array $tokens
    *   The list of tokens associated with the content.
-   * @param string $className
+   * @param null $className
    *   The top level className from where the hook is invoked.
-   *
-   * @deprecated since 5.71 will be removed sometime after all core uses are fully removed.
+   * @param bool $squashDeprecation
+   *   Suppress the deprecation message - this should ONLY EVER BE CALLED
+   *   from the backward compatibilty adapter in `evaluateLegacyHookTokens`.
+   *   We are deprecating both this function, and the implementation of the hook
+   *   but for now we ensure that the hook is still rendered for
+   *   sites that implement it, via the TokenProcessor methodology
+   *   https://docs.civicrm.org/dev/en/latest/framework/token/#compose-batch
    *
    * @return null
+   * @deprecated since 5.71 will be removed sometime after all core uses are fully removed.
+   *
    */
   public static function tokenValues(
     &$details,
     $contactIDs,
     $jobID = NULL,
     $tokens = [],
-    $className = NULL
+    $className = NULL,
+    $squashDeprecation = FALSE
   ) {
     $null = NULL;
+    if (!$squashDeprecation) {
+      CRM_Core_Error::deprecatedFunctionWarning('call the token processor');
+    }
     return self::singleton()
       ->invoke(['details', 'contactIDs', 'jobID', 'tokens', 'className'], $details, $contactIDs, $jobID, $tokens, $className, $null, 'civicrm_tokenValues');
   }
