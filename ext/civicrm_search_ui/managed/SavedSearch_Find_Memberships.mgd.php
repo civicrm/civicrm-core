@@ -95,7 +95,6 @@ return [
             [
               'type' => 'field',
               'key' => 'contact_id.sort_name',
-              'dataType' => 'String',
               'label' => E::ts('Name'),
               'sortable' => TRUE,
               'link' => [
@@ -110,7 +109,6 @@ return [
             [
               'type' => 'field',
               'key' => 'membership_type_id:label',
-              'dataType' => 'Integer',
               'label' => E::ts('Type'),
               'sortable' => TRUE,
               'rewrite' => "[membership_type_id:label] {if '[is_primary_member]' === 'No'} (by relationship) {/if}",
@@ -118,42 +116,36 @@ return [
             [
               'type' => 'field',
               'key' => 'join_date',
-              'dataType' => 'Date',
               'label' => E::ts('Member Since'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'start_date',
-              'dataType' => 'Date',
               'label' => E::ts('Membership Start Date'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'end_date',
-              'dataType' => 'Date',
               'label' => E::ts('Membership Expiration Date'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'source',
-              'dataType' => 'String',
               'label' => E::ts('Membership Source'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'status_id:label',
-              'dataType' => 'Integer',
               'label' => E::ts('Status'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'Membership_ContributionRecur_contribution_recur_id_01.auto_renew',
-              'dataType' => 'Boolean',
               'label' => E::ts('Auto Renew'),
               'sortable' => FALSE,
               'alignment' => '',

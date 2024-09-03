@@ -66,21 +66,18 @@ return [
             [
               'type' => 'field',
               'key' => 'role_label',
-              'dataType' => 2,
               'label' => E::ts('Role'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'permission_group',
-              'dataType' => 2,
               'label' => E::ts('Component / Extension'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'html',
               'key' => 'permission_title',
-              'dataType' => 2,
               'label' => E::ts('Permission'),
               'sortable' => TRUE,
               'rewrite' => '[permission_title]
@@ -90,7 +87,6 @@ return [
             [
               'type' => 'field',
               'key' => 'permission_granted',
-              'dataType' => 16,
               'label' => E::ts('Granted'),
               'sortable' => TRUE,
               'rewrite' => '',

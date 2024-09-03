@@ -77,25 +77,21 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
             [
               'key' => 'id',
               'label' => 'Contact ID',
-              'dataType' => 'Integer',
               'type' => 'field',
             ],
             [
               'key' => 'display_name',
               'label' => 'Display Name',
-              'dataType' => 'String',
               'type' => 'field',
             ],
             [
               'key' => 'GROUP_CONCAT_Contact_Email_contact_id_01_email',
               'label' => 'Emails',
-              'dataType' => 'String',
               'type' => 'field',
             ],
             [
               'key' => 'YEAR_birth_date',
               'label' => 'Contact ID',
-              'dataType' => 'Integer',
               'type' => 'field',
             ],
           ],
@@ -275,19 +271,16 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
             [
               'key' => 'id',
               'label' => 'Contact ID',
-              'dataType' => 'Integer',
               'type' => 'field',
             ],
             [
               'key' => 'display_name',
               'label' => 'Display Name',
-              'dataType' => 'String',
               'type' => 'field',
             ],
             [
               'key' => 'GROUP_CONCAT_Contact_Email_contact_id_01_email',
               'label' => 'Emails',
-              'dataType' => 'String',
               'type' => 'field',
             ],
           ],
@@ -379,7 +372,6 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
             [
               'key' => 'id',
               'label' => 'Contact ID',
-              'dataType' => 'Integer',
               'type' => 'field',
             ],
           ],

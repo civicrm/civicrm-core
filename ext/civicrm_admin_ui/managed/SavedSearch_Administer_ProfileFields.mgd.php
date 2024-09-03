@@ -72,14 +72,12 @@ return [
             [
               'type' => 'field',
               'key' => 'label',
-              'dataType' => 'String',
               'label' => E::ts('Field Name'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'visibility:label',
-              'dataType' => 'String',
               'label' => E::ts('Visibility'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -87,7 +85,6 @@ return [
             [
               'type' => 'field',
               'key' => 'is_searchable',
-              'dataType' => 'Boolean',
               'label' => E::ts('Searchable'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -95,7 +92,6 @@ return [
             [
               'type' => 'field',
               'key' => 'is_required',
-              'dataType' => 'Boolean',
               'label' => E::ts('Required'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -103,7 +99,6 @@ return [
             [
               'type' => 'field',
               'key' => 'is_active',
-              'dataType' => 'Boolean',
               'label' => E::ts('Enabled'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -111,7 +106,6 @@ return [
             [
               'type' => 'field',
               'key' => 'is_view',
-              'dataType' => 'Boolean',
               'label' => E::ts('View Only'),
               'sortable' => TRUE,
               'editable' => TRUE,
@@ -119,7 +113,6 @@ return [
             [
               'type' => 'field',
               'key' => 'is_reserved',
-              'dataType' => 'Boolean',
               'label' => E::ts('Reserved'),
               'sortable' => TRUE,
               'rewrite' => ' ',

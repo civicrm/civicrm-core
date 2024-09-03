@@ -58,7 +58,6 @@ class SearchDownloadTest extends \PHPUnit\Framework\TestCase implements Headless
             [
               'key' => 'subject',
               'label' => 'Duration Subject',
-              'dataType' => 'String',
               'type' => 'field',
               'rewrite' => '[duration] [subject]',
             ],
@@ -70,7 +69,6 @@ class SearchDownloadTest extends \PHPUnit\Framework\TestCase implements Headless
             [
               'key' => 'details',
               'label' => 'Details',
-              'dataType' => 'String',
               'type' => 'html',
             ],
           ],
@@ -142,7 +140,6 @@ class SearchDownloadTest extends \PHPUnit\Framework\TestCase implements Headless
             [
               'key' => 'last_name',
               'label' => 'First Last',
-              'dataType' => 'String',
               'type' => 'field',
               'rewrite' => '[first_name] [last_name]',
             ],

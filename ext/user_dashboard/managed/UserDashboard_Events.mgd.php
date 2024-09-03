@@ -64,28 +64,24 @@ return [
             [
               'type' => 'field',
               'key' => 'event_id.title',
-              'dataType' => 'String',
               'label' => E::ts('Event'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'event_id.start_date',
-              'dataType' => 'Date',
               'label' => E::ts('Event Date'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'role_id:label',
-              'dataType' => 'String',
               'label' => E::ts('Role'),
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'status_id:label',
-              'dataType' => 'String',
               'label' => E::ts('Status'),
               'sortable' => TRUE,
             ],
