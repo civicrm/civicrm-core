@@ -187,6 +187,7 @@ EOHTML;
 
     $prefill = Afform::prefill(FALSE)
       ->setName($this->formName)
+      ->setFillMode('entity')
       ->setArgs(['Organization1' => $contact[3]])
       ->execute()
       ->indexBy('name');

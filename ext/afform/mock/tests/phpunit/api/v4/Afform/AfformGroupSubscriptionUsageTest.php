@@ -80,6 +80,7 @@ EOHTML;
     // Prefill - afform will show group checkbox checked
     $prefill = Afform::prefill()
       ->setName($this->formName)
+      ->setFillMode('form')
       ->setArgs(['Individual1' => $cid])
       ->execute()
       ->indexBy('name');
