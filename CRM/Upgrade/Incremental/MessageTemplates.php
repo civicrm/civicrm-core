@@ -542,7 +542,14 @@ class CRM_Upgrade_Incremental_MessageTemplates {
       $workFlowID = CRM_Core_DAO::singleValueQuery('SELECT MAX(id) as id FROM civicrm_option_value WHERE name = %1', [
         1 => [$template['name'], 'String'],
       ]);
-      $content = file_get_contents(\Civi::paths()->getPath('[civicrm.root]/xml/templates/message_templates/' . $template['name'] . '_' . $template['type'] . '.tpl'));
+      if ($template['type'] === 'text') {
+        // We no longer ship text templates.
+        $content = '';
+      }
+      else {
+        $content = file_get_contents(\Civi::paths()
+          ->getPath('[civicrm.root]/xml/templates/message_templates/' . $template['name'] . '_' . $template['type'] . '.tpl'));
+      }
       $templatesToUpdate = [];
       if (!empty($workFlowID)) {
         // This could be empty if the template was deleted. It should not happen,
