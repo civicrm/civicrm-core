@@ -1023,7 +1023,7 @@ abstract class CRM_Utils_Hook {
    */
   public static function copy($objectName, &$object, $original_id = NULL) {
     $null = NULL;
-    return self::singleton()->invoke(['objectName', 'object'], $objectName, $object, $original_id,
+    return self::singleton()->invoke(['objectName', 'object', 'original_id'], $objectName, $object, $original_id,
       $null, $null, $null,
       'civicrm_copy'
     );
