@@ -77,10 +77,16 @@
                 value = $scope.dataProvider.getFieldData()[ctrl.fieldName];
               if (_.isArray(value)) {
                 _.remove(value, function(item) {
-                  return !_.find(options, function(option) {return option.id == item;});
+                  return !_.find(options, (option) => option.id == item);
                 });
-              } else if (value && !_.find(options, function(option) {return option.id == value;})) {
-                $scope.dataProvider.getFieldData()[ctrl.fieldName] = '';
+              } else {
+                if (value && !_.find(options, (option) => option.id == value)) {
+                  value = '';
+                }
+                // Hack: Because the option list changed, Select2 sometimes fails to update the value.
+                // Manual updates like this shouldn't be necessary with ngModel binding, but can't find a better fix yet:
+                // See https://lab.civicrm.org/dev/core/-/issues/5415
+                $('input[crm-ui-select]', $element).val(value).change();
               }
             }
             if (val && (typeof val === 'number' || val.length)) {
