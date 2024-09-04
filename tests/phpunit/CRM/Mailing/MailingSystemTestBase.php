@@ -97,41 +97,49 @@ abstract class CRM_Mailing_MailingSystemTestBase extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * Send an email-blast. Check the `List-Unsubscribe` hyperlinks -- and click on them.
+   * People should become un-subscribed.
+   */
   public function testHttpUnsubscribe(): void {
     $client = new Civi\Test\LocalHttpClient(['reboot' => TRUE, 'htmlHeader' => FALSE]);
 
+    // Send an example mail-blast. We'll read the `List-Unsubscribe` links from each message.
     $allMessages = $this->runMailingSuccess([
       'subject' => 'Yellow Unsubmarine',
       'body_text' => 'In the {domain.address} where I was born, lived a man who sailed to sea',
     ]);
 
-    $getMembers = fn($status) => Civi\Api4\GroupContact::get(FALSE)
+    // Utility: Find how many people are in the test group -- by $status (Added/Removed)
+    $getMembers = fn(string $status) => Civi\Api4\GroupContact::get(FALSE)
       ->addWhere('group_id', '=', $this->_groupID)
       ->addWhere('status', '=', $status)
       ->execute();
 
+    // Start condition: We have a few people "Added"
     $this->assertEquals(2, $getMembers('Added')->count());
     $this->assertEquals(0, $getMembers('Removed')->count());
 
     foreach ($allMessages as $k => $message) {
+      // Extract the unsubscribe URL(s)
       $this->assertNotEmpty($message->headers['List-Unsubscribe'][0]);
       $this->assertEquals('List-Unsubscribe=One-Click', $message->headers['List-Unsubscribe-Post'][0]);
 
       $urls = array_map(
         fn($s) => trim($s, '<>'),
         preg_split('/[,\s]+/', $message->headers['List-Unsubscribe'][0])
-
       );
       $url = CRM_Utils_Array::first(preg_grep('/^http/', $urls));
       $this->assertMatchesRegularExpression(';civicrm/mailing/unsubscribe;', $url);
 
-      // Older clients (RFC 2369 only): Open a browser for the unsubscribe page
-      // FIXME: This works locally, but in CI complains about ckeditor4. Smells like compatibility issue between LocalHttpClient and $unclear.
+      // Older clients (RFC 2369 only) will open a browser for the unsubscribe page.
+      // Let's make sure it shows a suitable web-page.
       $get = $client->sendRequest(new Request('GET', $url));
       $this->assertEquals(200, $get->getStatusCode());
       $this->assertMatchesRegularExpression(';You are requesting to unsubscribe;', (string) $get->getBody());
 
-      // Newer clients (RFC 8058): Send headless HTTP POST
+      // Newer clients (RFC 8058) will send headless HTTP POST.
+      // This is how we will actually unsubscribe.
       $post = $client->sendRequest(new Request('POST', $url, [], $message->headers['List-Unsubscribe-Post'][0]));
       $this->assertEquals(200, $post->getStatusCode());
       $this->assertEquals('OK', trim((string) $post->getBody()));
@@ -143,7 +151,7 @@ abstract class CRM_Mailing_MailingSystemTestBase extends CiviUnitTestCase {
   }
 
   /**
-   * @throws \CRM_Core_Exception
+   * Similar to testHttpUnsubscribe(), except we have system with a different VERP configuration.
    */
   public function testHttpUnsubscribeChangedVerpSeparator(): void {
     MailSettings::update(FALSE)->setValues(['localpart' => "aeiou.aeiou-"])->addWhere('id', '>', 0)->execute();
