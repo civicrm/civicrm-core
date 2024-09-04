@@ -19,7 +19,7 @@
   <style type="text/css" media="screen">
     @import url({$config->resourceBase}css/civicrm.css);
     @import url({$config->resourceBase}css/crm-i.css);
-    @import url({$config->resourceBase}bower_components/font-awesome/css/font-awesome.min.css);
+    @import url({$config->resourceBase}bower_components/font-awesome/css/all.min.css);
   </style>
 </head>
 <body>
@@ -29,7 +29,7 @@
   <style type="text/css" media="screen">
     @import url({$config->resourceBase}css/civicrm.css);
     @import url({$config->resourceBase}css/crm-i.css);
-    @import url({$config->resourceBase}bower_components/font-awesome/css/font-awesome.min.css);
+    @import url({$config->resourceBase}bower_components/font-awesome/css/all.min.css);
   </style>
 {/if}
 <div class="messages status no-popup">  <i class="crm-i fa-exclamation-triangle crm-i-red" aria-hidden="true"></i>
