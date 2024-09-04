@@ -15,8 +15,6 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-use GuzzleHttp\Psr7\Response;
-
 /**
  * Event Info Page - Summary about the event
  */
@@ -348,9 +346,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
         $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
       }
       catch (CRM_Core_Exception $e) {
-        CRM_Utils_System::sendResponse(
-          new Response(400, [], ts('Missing Event ID'))
-        );
+        CRM_Utils_System::sendInvalidRequestResponse(ts('Missing Event ID'));
       }
       $this->_id = $id;
     }

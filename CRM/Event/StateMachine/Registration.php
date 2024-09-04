@@ -9,8 +9,6 @@
  +--------------------------------------------------------------------+
  */
 
-use GuzzleHttp\Psr7\Response;
-
 /**
  * State machine for managing different states of the EventWizard process.
  */
@@ -30,9 +28,7 @@ class CRM_Event_StateMachine_Registration extends CRM_Core_StateMachine {
       $id = CRM_Utils_Request::retrieve('id', 'Positive', $controller, TRUE);
     }
     catch (CRM_Core_Exception $e) {
-      CRM_Utils_System::sendResponse(
-        new Response(400, [], ts('Missing Event ID'))
-      );
+      CRM_Utils_System::sendInvalidRequestResponse(ts('Missing Event ID'));
     }
     $is_monetary = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $id, 'is_monetary');
     $is_confirm_enabled = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $id, 'is_confirm_enabled');
