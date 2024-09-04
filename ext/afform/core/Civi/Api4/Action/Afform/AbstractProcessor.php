@@ -153,14 +153,20 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    */
   protected function prePopulateSubmissionData() {
     // if submission id is passed then get the data from submission
-    // we should prepopulate only pending submissions
-    $afformSubmissionData = \Civi\Api4\AfformSubmission::get(FALSE)
+    $afformSubmissionData = \Civi\Api4\AfformSubmission::get(TRUE)
       ->addSelect('data')
       ->addWhere('id', '=', $this->args['sid'])
       ->addWhere('afform_name', '=', $this->name)
       ->execute()->first();
 
-    $this->_entityValues = array_intersect_key($this->_formDataModel->getEntities(), $afformSubmissionData['data'] ?? []);
+    $this->_entityValues = $this->_formDataModel->getEntities();
+    foreach ($this->_entityValues as $entity => &$values) {
+      foreach ($afformSubmissionData['data'] as $e => $submission) {
+        if ($entity === $e) {
+          $values = $submission ?? [];
+        }
+      }
+    }
   }
 
   /**
