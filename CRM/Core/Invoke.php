@@ -324,7 +324,12 @@ class CRM_Core_Invoke {
             $object = new CRM_Import_Controller($title, $pageArgs ?? []);
           }
           else {
-            $object = new $item['page_callback']($title, TRUE, $mode, NULL, $addSequence);
+            try {
+              $object = new $item['page_callback']($title, TRUE, $mode, NULL, $addSequence);
+            }
+            catch (CRM_Core_Exception_UnavailableFormException $e) {
+              CRM_Utils_System::sendInvalidRequestResponse($e->getMessage());
+            }
           }
         }
         else {
