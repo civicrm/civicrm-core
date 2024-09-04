@@ -14,8 +14,6 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-use GuzzleHttp\Psr7\Response;
-
 /**
  * This class generates form components for processing Event.
  */
@@ -62,9 +60,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         $this->_eventId = (int) CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
       }
       catch (CRM_Core_Exception $e) {
-        CRM_Utils_System::sendResponse(
-          new Response(400, [], ts('Missing Event ID'))
-        );
+        CRM_Utils_System::sendInvalidRequestResponse(ts('Missing Event ID'));
       }
       // this is the first time we are hitting this, so check for permissions here
       if (!CRM_Core_Permission::event(CRM_Core_Permission::EDIT, $this->_eventId, 'register for events')) {
