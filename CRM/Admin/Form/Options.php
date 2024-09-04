@@ -137,7 +137,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
    * Get the form-specific delete message.
    */
   public function setDeleteMessage(): void {
-    $this->deleteMessage = ts('WARNING: Deleting this option will result in the loss of all %1 related records which use the option.', [1 => $this->_gLabel]) . ts('This may mean the loss of a substantial amount of data, and the action cannot be undone.') . ts('Do you want to continue?');
+    $this->deleteMessage = ts('WARNING: Deleting this option will result in the loss of all %1 related records which use the option.', [1 => $this->_gLabel]) . ' ' . ts('This may mean the loss of a substantial amount of data, and the action cannot be undone.') . ' ' . ts('Do you want to continue?');
   }
 
   /**
