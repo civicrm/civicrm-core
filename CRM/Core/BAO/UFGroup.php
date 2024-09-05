@@ -1362,6 +1362,15 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
   }
 
   /**
+   * Callback for hook_civicrm_post().
+   * @param \Civi\Core\Event\PostEvent $event
+   * @throws CRM_Core_Exception
+   */
+  public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
+    Civi::cache('metadata')->clear();
+  }
+
+  /**
    * Add the UF Group.
    *
    * @param array $params

@@ -2868,10 +2868,14 @@ SELECT contact_id
   }
 
   /**
-   * Get options for the called BAO object's field.
+   * Legacy field options getter.
    *
-   * This function can be overridden by each BAO to add more logic related to context.
-   * The overriding function will generally call the lower-level CRM_Core_PseudoConstant::get
+   * @deprecated in favor of `EntityProvider::getOptions()`
+   *
+   * Overriding this function is no longer recommended as a way to customize options.
+   * Instead, option lists can be customized by either:
+   * 1. Using a pseudoconstant callback
+   * 2. Implementing hook_civicrm_fieldOptions
    *
    * @param string $fieldName
    * @param string $context
@@ -2884,9 +2888,21 @@ SELECT contact_id
    * @return array|bool
    */
   public static function buildOptions($fieldName, $context = NULL, $values = []) {
-    // If a given bao does not override this function
-    $baoName = get_called_class();
-    return CRM_Core_PseudoConstant::get($baoName, $fieldName, ['values' => $values], $context);
+    $entityName = CRM_Core_DAO_AllCoreTables::getEntityNameForClass(get_called_class());
+    $entity = Civi::entity($entityName);
+    // Legacy handling for custom field names in `custom_123` format
+    if (str_starts_with($fieldName, 'custom_') && is_numeric($fieldName[7] ?? '')) {
+      $fieldName = CRM_Core_BAO_CustomField::getLongNameFromShortName($fieldName) ?? $fieldName;
+    }
+    // Legacy handling for field "unique name"
+    elseif (!$entity->getField($fieldName)) {
+      $uniqueNames = static::fieldKeys();
+      $fieldName = array_search($fieldName, $uniqueNames) ?: $fieldName;
+    }
+    $checkPermissions = (bool) ($values['check_permissions'] ?? ($context == 'create' || $context == 'search'));
+    $includeDisabled = ($context == 'validate' || $context == 'get');
+    $options = $entity->getOptions($fieldName, $values, $includeDisabled, $checkPermissions);
+    return $options ? CRM_Core_PseudoConstant::formatArrayOptions($context, $options) : $options;
   }
 
   /**

@@ -71,7 +71,9 @@ return [
         'key_column' => 'id',
         'name_column' => 'name',
         'label_column' => 'label',
-        'condition' => 'is_tagset != 1',
+        'description_column' => 'description',
+        'color_column' => 'color',
+        'condition_provider' => ['CRM_Core_BAO_EntityTag', 'alterTagOptions'],
       ],
       'entity_reference' => [
         'entity' => 'Tag',

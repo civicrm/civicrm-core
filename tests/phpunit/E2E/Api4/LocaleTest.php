@@ -79,7 +79,8 @@ class LocaleTest extends \CiviEndToEndTestCase {
     $actualStrings = [];
     $actualLocales = [];
     \Civi::dispatcher()->addListener('civi.api.respond', function (RespondEvent $e) use (&$actualStrings, &$actualLocales, $translator, $inputString, $civiLocale) {
-      $isTranslatedRequest = ($e->getApiRequest()->getLanguage() === $civiLocale);
+      $request = $e->getApiRequest();
+      $isTranslatedRequest = ($request['version'] == 4 && $request->getLanguage() === $civiLocale);
       if ($isTranslatedRequest) {
         $actualLocales[] = \CRM_Utils_System::getUFLocale();
         $actualStrings[] = call_user_func($translator, $inputString);

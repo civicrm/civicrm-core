@@ -88,4 +88,45 @@ class TagTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals($contact2['id'], $shouldReturnContact2->first()['id']);
   }
 
+  public function testEntityTagGetFields(): void {
+    $this->saveTestRecords('Tag', [
+      'records' => [
+        ['name' => 'c-1', 'used_for' => 'civicrm_contact'],
+        ['name' => 'c-2', 'used_for:name' => 'Contact'],
+        ['name' => 'a-1', 'used_for:name' => 'Activity'],
+        ['name' => 'tagset', 'used_for' => 'civicrm_activity', 'is_tagset' => TRUE],
+      ],
+    ]);
+
+    $getFields = EntityTag::getFields(FALSE)
+      ->addWhere('name', '=', 'tag_id')
+      ->setLoadOptions(TRUE);
+
+    // No filter
+    $options = $getFields
+      ->execute()[0]['options'];
+    $this->assertContains('c-1', $options);
+    $this->assertContains('c-2', $options);
+    $this->assertContains('a-1', $options);
+    $this->assertNotContains('tagset', $options);
+
+    // Filter: Contact
+    $options = $getFields
+      ->setValues(['entity_table:name' => 'Contact'])
+      ->execute()[0]['options'];
+    $this->assertContains('c-1', $options);
+    $this->assertContains('c-2', $options);
+    $this->assertNotContains('a-1', $options);
+    $this->assertNotContains('tagset', $options);
+
+    // Filter: Activity
+    $options = $getFields
+      ->setValues(['entity_table:name' => 'Activity'])
+      ->execute()[0]['options'];
+    $this->assertNotContains('c-1', $options);
+    $this->assertNotContains('c-2', $options);
+    $this->assertContains('a-1', $options);
+    $this->assertNotContains('tagset', $options);
+  }
+
 }

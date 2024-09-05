@@ -253,6 +253,7 @@ return [
         'key_column' => 'id',
         'label_column' => 'name',
         'abbr_column' => 'abbreviation',
+        'condition_provider' => ['CRM_Core_BAO_Address', 'alterCounty'],
         'suffixes' => [
           'label',
           'abbr',
@@ -284,6 +285,7 @@ return [
         'key_column' => 'id',
         'label_column' => 'name',
         'abbr_column' => 'abbreviation',
+        'condition_provider' => ['CRM_Core_BAO_Address', 'alterStateProvince'],
         'suffixes' => [
           'label',
           'abbr',
@@ -353,6 +355,7 @@ return [
         'label_column' => 'name',
         'name_column' => 'iso_code',
         'abbr_column' => 'iso_code',
+        'condition_provider' => ['CRM_Core_BAO_Address', 'alterCountry'],
         'suffixes' => [
           'label',
           'abbr',

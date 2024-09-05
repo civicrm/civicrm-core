@@ -241,6 +241,7 @@ return [
         'label_column' => 'label',
         'icon_column' => 'icon',
         'condition' => 'parent_id IS NOT NULL',
+        'condition_provider' => ['CRM_Contact_BAO_Contact', 'alterContactSubType'],
       ],
     ],
     'first_name' => [
@@ -879,7 +880,9 @@ return [
       ],
       'input_attrs' => [
         'label' => ts('Current Employer'),
-        'filter' => ['contact_type' => 'Organization'],
+        'filter' => [
+          'contact_type' => 'Organization',
+        ],
       ],
       'entity_reference' => [
         'entity' => 'Contact',

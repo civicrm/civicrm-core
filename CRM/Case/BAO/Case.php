@@ -2970,58 +2970,49 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
   }
 
   /**
-   * Get options for a given case field.
-   *
-   * @param string $fieldName
-   * @param string $context
-   * @param array $props
-   *   Whatever is known about this dao object.
-   *
-   * @return array|bool
-   * @throws \CRM_Core_Exception
-   *
-   * @see CRM_Core_DAO::buildOptionsContext
-   * @see CRM_Core_DAO::buildOptions
-   *
+   * Legacy option getter
+   * @deprecated
+   * @inheritDoc
    */
   public static function buildOptions($fieldName, $context = NULL, $props = []) {
-    $className = __CLASS__;
-    $params = [];
     switch ($fieldName) {
-      // This field is not part of this object but the api supports it
+      // This field is not part of this object but legacy forms use it
       case 'medium_id':
-        $className = 'CRM_Activity_BAO_Activity';
-        break;
-
-      // Filter status id by case type id
-      case 'status_id':
-        if (!empty($props['case_type_id'])) {
-          // cast single values to a single value array
-          $caseTypeIdValues = (array) $props['case_type_id'];
-
-          $idField = is_numeric($caseTypeIdValues[0]) ? 'id' : 'name';
-          $caseTypeDefs = (array) \Civi\Api4\CaseType::get(FALSE)
-            ->addSelect('definition')
-            ->addWhere($idField, 'IN', $caseTypeIdValues)
-            ->execute()->column('definition');
-
-          $allowAll = FALSE;
-          $statuses = [];
-          foreach ($caseTypeDefs as $definition) {
-            if (empty($definition['statuses'])) {
-              // if any case type has no status restrictions, we want to allow all options
-              $allowAll = TRUE;
-              break;
-            }
-            $statuses = array_unique(array_merge($statuses, $definition['statuses']));
-          }
-          if (!$allowAll) {
-            $params['condition'] = 'v.name IN ("' . implode('","', $statuses) . '")';
-          }
-        }
-        break;
+        return CRM_Activity_BAO_Activity::buildOptions($fieldName, $context, $props);
     }
-    return CRM_Core_PseudoConstant::get($className, $fieldName, $params, $context);
+    return parent::buildOptions($fieldName, $context, $props);
+  }
+
+  /**
+   * Pseudoconstant condition_provider for status_id field.
+   * @see \Civi\Schema\EntityMetadataBase::getConditionFromProvider
+   */
+  public static function alterStatusOptions(string $fieldName, CRM_Utils_SQL_Select $conditions, $params) {
+    // Filter status id by case type id
+    if (!empty($params['values']['case_type_id'])) {
+      // cast single values to a single value array
+      $caseTypeIdValues = (array) $params['values']['case_type_id'];
+
+      $idField = is_numeric($caseTypeIdValues[0]) ? 'id' : 'name';
+      $caseTypeDefs = (array) \Civi\Api4\CaseType::get(FALSE)
+        ->addSelect('definition')
+        ->addWhere($idField, 'IN', $caseTypeIdValues)
+        ->execute()->column('definition');
+
+      $allowAll = FALSE;
+      $statuses = [];
+      foreach ($caseTypeDefs as $definition) {
+        if (empty($definition['statuses'])) {
+          // if any case type has no status restrictions, we want to allow all options
+          $allowAll = TRUE;
+          break;
+        }
+        $statuses = array_unique(array_merge($statuses, $definition['statuses']));
+      }
+      if (!$allowAll) {
+        $conditions->where('name IN (@statuses)', ['statuses' => $statuses]);
+      }
+    }
   }
 
   /**

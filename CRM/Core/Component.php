@@ -415,6 +415,10 @@ class CRM_Core_Component {
     return in_array($component, Civi::settings()->get('enable_components'), TRUE);
   }
 
+  public static function isIdEnabled(int $id): bool {
+    return self::isEnabled(self::getComponentName($id));
+  }
+
   /**
    * Callback for the "enable_components" setting (pre change)
    *

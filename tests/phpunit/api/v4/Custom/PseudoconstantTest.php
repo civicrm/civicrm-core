@@ -169,7 +169,18 @@ class PseudoconstantTest extends CustomTestBase {
         ->addValue('html_type', 'CheckBox')
       )->execute();
 
-    $fields = Contact::getFields()
+    // Ensure option_value_fields were correctly set based on provided values
+    $customFields = CustomField::get(FALSE)
+      ->addWhere('custom_group_id:name', '=', 'myPseudoconstantTest')
+      ->addSelect('name', 'option_group_id.option_value_fields')
+      ->execute()->indexBy('name');
+    sort($customFields['Color']['option_group_id.option_value_fields']);
+    $this->assertEquals(['label', 'name'], $customFields['Color']['option_group_id.option_value_fields']);
+    sort($customFields['Multicolor']['option_group_id.option_value_fields']);
+    $this->assertEquals(['color', 'description', 'icon', 'label', 'name'], $customFields['Multicolor']['option_group_id.option_value_fields']);
+
+    $fields = Contact::getFields(FALSE)
+      ->addWhere('name', 'IN', ['myPseudoconstantTest.Color', 'myPseudoconstantTest.Multicolor'])
       ->setLoadOptions(array_keys($technicolor[0]))
       ->execute()
       ->indexBy('name');

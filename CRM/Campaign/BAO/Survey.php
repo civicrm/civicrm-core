@@ -949,27 +949,12 @@ UPDATE  civicrm_activity
   }
 
   /**
-   * Get options for a given field.
-   * @see CRM_Core_DAO::buildOptions
-   *
-   * @param string $fieldName
-   * @param string $context : @see CRM_Core_DAO::buildOptionsContext
-   * @param array $props : whatever is known about this dao object
-   *
-   * @return array|bool
+   * Pseudoconstant condition_provider for activity_type_id field.
+   * @see \Civi\Schema\EntityMetadataBase::getConditionFromProvider
    */
-  public static function buildOptions($fieldName, $context = NULL, $props = []) {
-    $params = [];
-    // Special logic for fields whose options depend on context or properties
-    switch ($fieldName) {
-      case 'activity_type_id':
-        $campaignCompId = CRM_Core_Component::getComponentID('CiviCampaign');
-        if ($campaignCompId) {
-          $params['condition'] = ["component_id={$campaignCompId}"];
-        }
-        break;
-    }
-    return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
+  public static function alterActivityTypes(string $fieldName, CRM_Utils_SQL_Select $conditions) {
+    $campaignCompId = (int) CRM_Core_Component::getComponentID('CiviCampaign');
+    $conditions->where('component_id = #comp', ['comp' => $campaignCompId]);
   }
 
 }

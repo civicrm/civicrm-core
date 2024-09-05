@@ -127,6 +127,7 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
    */
   public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
     CRM_Core_PseudoConstant::flush();
+    Civi::cache('metadata')->clear();
   }
 
   /**

@@ -61,16 +61,11 @@ final class EntityProvider {
   }
 
   public function getField(string $fieldName): ?array {
-    $field = $this->getFields()[$fieldName] ?? NULL;
-    if (!$field && str_contains($fieldName, '.')) {
-      [$customGroupName] = explode('.', $fieldName);
-      $field = $this->getCustomFields(['name' => $customGroupName])[$fieldName] ?? NULL;
-    }
-    return $field;
+    return $this->getMetaProvider()->getField($fieldName);
   }
 
-  public function getOptions(string $fieldName, ?array $values = NULL): ?array {
-    return $this->getMetaProvider()->getOptions($fieldName, $values);
+  public function getOptions(string $fieldName, array $values = [], bool $includeDisabled = FALSE, bool $checkPermissions = FALSE, ?int $userId = NULL): ?array {
+    return $this->getMetaProvider()->getOptions($fieldName, $values, $includeDisabled, $checkPermissions, $userId);
   }
 
   public function writeRecords(array $records): array {
