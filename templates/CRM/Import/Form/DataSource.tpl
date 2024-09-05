@@ -70,13 +70,13 @@
       {if array_key_exists('onDuplicate', $form)}
         <tr class="crm-import-uploadfile-from-block-onDuplicate">
           <td class="label">{$form.onDuplicate.label}</td>
-          <td>{$form.onDuplicate.html} {help id="dupes"}</td>
+          <td>{$form.onDuplicate.html} {help id="dupes" file="CRM/Contact/Import/Form/DataSource.hlp"}</td>
         </tr>
       {/if}
       {if array_key_exists('dedupe_rule_id', $form)}
         <tr class="crm-import-datasource-form-block-dedupe">
           <td class="label">{$form.dedupe_rule_id.label}</td>
-          <td><span id="contact-dedupe_rule_id">{$form.dedupe_rule_id.html}</span> {help id='id-dedupe_rule'}</td>
+          <td><span id="contact-dedupe_rule_id">{$form.dedupe_rule_id.html}</span> {help id='id-dedupe_rule' file="CRM/Contact/Import/Form/DataSource.hlp"}</td>
         </tr>
       {/if}
       {if array_key_exists('multipleCustomData', $form)}
