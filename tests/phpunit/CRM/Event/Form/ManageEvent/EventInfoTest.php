@@ -7,7 +7,7 @@ class CRM_Event_Form_ManageEvent_EventInfoTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  private function getCorrectFormFields() {
+  private function getCorrectFormFields(): array {
     return [
       'title' => 'A test event',
       'event_type_id' => 1,
@@ -50,7 +50,8 @@ class CRM_Event_Form_ManageEvent_EventInfoTest extends CiviUnitTestCase {
   }
 
   /**
-   * dataprovider to test both regular events and event templates
+   * Data Provider to test both regular events and event templates.
+   *
    * @return array
    */
   public function isTemplateProvider(): array {
