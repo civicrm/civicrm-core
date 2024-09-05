@@ -77,6 +77,9 @@ class PageTokenCredential extends AutoService implements EventSubscriberInterfac
           // This is not an afform JWT. Proceed to check any other token sources.
           return;
         }
+        if (empty($claims['exp'])) {
+          $check->reject('Malformed JWT. Must specify an expiration time.');
+        }
         if (empty($claims['sub']) || substr($claims['sub'], 0, 4) !== 'cid:') {
           $check->reject('Malformed JWT. Must specify the contact ID.');
         }
