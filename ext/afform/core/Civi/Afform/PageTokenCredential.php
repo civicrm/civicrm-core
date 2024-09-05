@@ -179,7 +179,7 @@ class PageTokenCredential extends AutoService implements EventSubscriberInterfac
         'nameField' => 'name',
       ],
       ';^civicrm/ajax/api4/\w+/autocomplete$;' => [
-        'allowFields' => ['formName'], /* FIXME */
+        'allowFields' => ['fieldName', 'filters', 'formName', 'input', 'page', 'values'],
         'nameField' => 'formName',
       ],
     ];
