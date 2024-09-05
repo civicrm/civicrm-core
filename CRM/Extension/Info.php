@@ -123,6 +123,18 @@ class CRM_Extension_Info {
   public $develStage;
 
   /**
+   * @var string|null
+   *   Ex: 'ready', 'not_ready'
+   */
+  public $ready;
+
+  /**
+   * @var int|null
+   *   Ex: 1234
+   */
+  public $usage;
+
+  /**
    * Full URL of the zipball for this extension/version.
    *
    * This property is (usually) only provided on the feed of new/available extensions.
