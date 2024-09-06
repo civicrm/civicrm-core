@@ -131,9 +131,12 @@ class PageTokenCredential extends AutoService implements EventSubscriberInterfac
           return FALSE;
         }
 
-        $actualForm = $parsed[$routeInfo['nameField']] ?? NULL;
-        if ($actualForm !== $allowedForm) {
-          \Civi::log()->warning("Malformed request. Requested form ($actualForm) does not match allowed name ($allowedForm).");
+        if (empty($routeInfo['checkRequest'])) {
+          throw new \LogicException("Route ($regex) doesn't define checkRequest.");
+        }
+        $checkRequest = $routeInfo['checkRequest'];
+        if (!$checkRequest($parsed, $jwt)) {
+          \Civi::log()->warning("Malformed request. Requested form does not match allowed name ($allowedForm).");
           return FALSE;
         }
 
@@ -157,6 +160,9 @@ class PageTokenCredential extends AutoService implements EventSubscriberInterfac
    * @return array[]
    */
   protected function getAllowedRoutes(): array {
+    // These params are common to many Afform actions.
+    $abstractProcessorParams = ['name', 'args', 'fillMode'];
+
     return [
       // ';civicrm/path/to/some/page;' => [
       //
@@ -164,27 +170,33 @@ class PageTokenCredential extends AutoService implements EventSubscriberInterfac
       //    // N.B. Fields like "chain" are NOT allowed.
       //    'allowFields' => ['field_1', 'field_2', ...]
       //
-      //    // The specific field which identifies the target form. Must match our page-token.
-      //    'nameField' => 'field_1',
+      //    // Inspect the API-request and assert that the JWT allows these values.
+      //    // Generally, check that the JWT's allowed-form-name matches REST's actual-form-name.
+      //    'checkRequest' => function(array $request, array $jwt): bool,
       //
       // ],
 
       ';^civicrm/ajax/api4/Afform/prefill$;' => [
-        'allowFields' => ['name', 'args'],
-        'nameField' => 'name',
+        'allowFields' => $abstractProcessorParams,
+        'checkRequest' => fn($request, $jwt) => ($request['name'] === $jwt['afform']),
       ],
       ';^civicrm/ajax/api4/Afform/submit$;' => [
-        'allowFields' => ['name', 'args', 'values'],
-        'nameField' => 'name',
+        'allowFields' => [...$abstractProcessorParams, 'values'],
+        'checkRequest' => fn($request, $jwt) => ($request['name'] === $jwt['afform']),
       ],
       ';^civicrm/ajax/api4/Afform/submitFile$;' => [
-        'allowFields' => ['name'], /* FIXME */
-        'nameField' => 'name',
+        'allowFields' => $abstractProcessorParams,
+        'checkRequest' => fn($request, $jwt) => ($request['name'] === $jwt['afform']),
       ],
       ';^civicrm/ajax/api4/\w+/autocomplete$;' => [
-        'allowFields' => ['fieldName', 'filters', 'formName', 'input', 'page', 'values'],
-        'nameField' => 'formName',
+        'allowFields' => ['fieldName', 'filters', 'formName', 'ids', 'input', 'page', 'values'],
+        'checkRequest' => fn($request, $jwt) => ('afform:' . $jwt['afform']) === $request['formName'],
       ],
+      // It's been hypothesized that we'll also need this. Haven't seen it yet.
+      // ';^civicrm/ajax/api4/Afform/getFields;' => [
+      //   'allowFields' => [],
+      //   'checkRequest' => fn($expected, $request) => TRUE,
+      // ],
     ];
   }
 
