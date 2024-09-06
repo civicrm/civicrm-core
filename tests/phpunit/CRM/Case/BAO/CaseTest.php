@@ -289,7 +289,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     ]);
 
     // Create two files to attach to the new case
-    $filepath = Civi::paths()->getPath('[civicrm.files]/custom');
+    $filepath = Civi::paths()->getPath(\CRM_Core_Config::singleton()->customFileUploadDir);
 
     CRM_Utils_File::createFakeFile($filepath, 'Bananas do not bend themselves without a little help.', 'i_bend_bananas.txt');
     $fileA = $this->callAPISuccess('File', 'create', ['uri' => "$filepath/i_bend_bananas.txt"]);
@@ -311,7 +311,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
 
     $entityFiles = new CRM_Core_DAO_EntityFile();
     $entityFiles->entity_id = $newCase[0];
-    $entityFiles->entity_table = $customGroup['table_name'];
+    $entityFiles->entity_table = 'civicrm_case';
     $entityFiles->find();
 
     $totalEntityFiles = 0;

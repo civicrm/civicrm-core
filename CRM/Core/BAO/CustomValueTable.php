@@ -97,7 +97,8 @@ class CRM_Core_BAO_CustomValueTable {
               $entityFileDAO->file_id = $field['file_id'];
               $entityFileDAO->find(TRUE);
 
-              $entityFileDAO->entity_table = $field['table_name'];
+              // some older callers dont pass the entity table here, so we have to fetch it based on the Entity listed in 'extends'
+              $entityFileDAO->entity_table = $field['entity_table'] ?? \Civi\Schema\EntityRepository::getEntity($field['extends'])['table'];
               $entityFileDAO->entity_id = $field['entity_id'];
               $entityFileDAO->file_id = $field['file_id'];
               $entityFileDAO->save();
