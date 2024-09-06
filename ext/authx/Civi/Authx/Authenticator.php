@@ -251,6 +251,33 @@ class Authenticator extends AutoService implements HookInterface {
   }
 
   /**
+   * Check for a pre-existing login
+   *
+   * @param AuthenticatorTarget $tgt
+   * @return bool
+   */
+  protected function checkAlreadyLoggedIn(AuthenticatorTarget $tgt) {
+    if (!\CRM_Core_Session::getLoggedInContactID() && !$this->authxUf->getCurrentUserId()) {
+      return FALSE;
+    }
+
+    if (
+        \CRM_Core_Session::getLoggedInContactID()
+        && $this->authxUf->getCurrentUserId()
+        && ((string) \CRM_Core_Session::getLoggedInContactID() === (string) $tgt->contactId)
+        && ((string) $this->authxUf->getCurrentUserId() === (string) $tgt->userId)
+        ) {
+      return TRUE;
+    }
+
+    // This is plausible if you have a dev or admin experimenting.
+    // We should probably show a more useful page - e.g. ask if they want
+    // logout and/or suggest using private browser window.
+    $this->reject('Cannot login. A mismatched session is already active.');
+    // @see \Civi\Authx\AllFlowsTest::testStatefulStatelessOverlap()
+  }
+
+  /**
    * Update Civi and UF to recognize the authenticated user.
    *
    * @param AuthenticatorTarget $tgt
@@ -258,23 +285,10 @@ class Authenticator extends AutoService implements HookInterface {
    * @throws \Exception
    */
   protected function login(AuthenticatorTarget $tgt) {
-    $isSameValue = function($a, $b) {
-      return !empty($a) && (string) $a === (string) $b;
-    };
-
-    if (\CRM_Core_Session::getLoggedInContactID() || $this->authxUf->getCurrentUserId()) {
-      if ($isSameValue(\CRM_Core_Session::getLoggedInContactID(), $tgt->contactId)  && $isSameValue($this->authxUf->getCurrentUserId(), $tgt->userId)) {
-        // Already logged in. Post-condition met - but by unusual means.
-        \CRM_Core_Session::singleton()->set('authx', $tgt->createAlreadyLoggedIn());
-        return;
-      }
-      else {
-        // This is plausible if you have a dev or admin experimenting.
-        // We should probably show a more useful page - e.g. ask if they want
-        // logout and/or suggest using private browser window.
-        $this->reject('Cannot login. Session already active.');
-        // @see \Civi\Authx\AllFlowsTest::testStatefulStatelessOverlap()
-      }
+    if ($this->checkAlreadyLoggedIn($tgt)) {
+      // Already logged in. Post-condition met - but by unusual means.
+      \CRM_Core_Session::singleton()->set('authx', $tgt->createAlreadyLoggedIn());
+      return;
     }
 
     if (empty($tgt->contactId)) {
