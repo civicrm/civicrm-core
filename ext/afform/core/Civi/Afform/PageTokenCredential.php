@@ -3,6 +3,7 @@
 namespace Civi\Afform;
 
 use Civi\Authx\CheckCredentialEvent;
+use Civi\Core\Event\GenericHookEvent;
 use Civi\Core\Service\AutoService;
 use Civi\Crypto\Exception\CryptoException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -22,7 +23,7 @@ class PageTokenCredential extends AutoService implements EventSubscriberInterfac
 
   public static function getSubscribedEvents(): array {
     $events = [];
-    $events['&civi.invoke.auth'][] = ['onInvoke', 105];
+    $events['civi.invoke.auth'][] = ['onInvoke', 105];
     $events['civi.authx.checkCredential'][] = ['afformPageToken', -400];
     return $events;
   }
@@ -31,18 +32,30 @@ class PageTokenCredential extends AutoService implements EventSubscriberInterfac
    * If you visit a top-level page like "civicrm/my-custom-form?_aff=XXX", then
    * all embedded AJAX calls should "_authx=XXX".
    *
-   * @param array $path
+   * @param \Civi\Core\Event\GenericHookEvent $e
    * @return void
    */
-  public function onInvoke(array $path) {
+  public function onInvoke(GenericHookEvent $e) {
     $token = $_REQUEST['_aff'] ?? NULL;
 
     if (empty($token)) {
       return;
     }
+
     if (!preg_match(';^[a-zA-Z0-9\.\-_ ]+$;', $token)) {
       throw new \CRM_Core_Exception("Malformed page token");
     }
+
+    // FIXME: This would authenticate requests to the main page, but it also has the side-effect
+    // of making the user login.
+
+    // \CRM_Core_Session::useFakeSession();
+    // $params = ($_SERVER['REQUEST_METHOD'] === 'GET') ? $_GET : $_POST;
+    // $authenticated = \Civi::service('authx.authenticator')->auth($e, ['flow' => 'param', 'cred' => $params['_aff'], 'siteKey' => NULL]);
+    // _authx_redact(['_aff']);
+    // if (!$authenticated) {
+    //   return;
+    // }
 
     \CRM_Core_Region::instance('page-header')->add([
       'callback' => function() use ($token) {
