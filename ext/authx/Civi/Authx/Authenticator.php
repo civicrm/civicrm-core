@@ -257,15 +257,18 @@ class Authenticator extends AutoService implements HookInterface {
    * @return bool
    */
   protected function checkAlreadyLoggedIn(AuthenticatorTarget $tgt) {
-    if (!\CRM_Core_Session::getLoggedInContactID() && !$this->authxUf->getCurrentUserId()) {
+    $existingContact = \CRM_Core_Session::getLoggedInContactID();
+    $existingUser = $this->authxUf->getCurrentUserId();
+
+    if (!$existingContact && !$existingUser) {
       return FALSE;
     }
 
     if (
-        \CRM_Core_Session::getLoggedInContactID()
-        && $this->authxUf->getCurrentUserId()
-        && ((string) \CRM_Core_Session::getLoggedInContactID() === (string) $tgt->contactId)
-        && ((string) $this->authxUf->getCurrentUserId() === (string) $tgt->userId)
+        $existingContact
+        && $existingUser
+        && ((string) $existingContact === (string) $tgt->contactId)
+        && ((string) $existingUser === (string) $tgt->userId)
         ) {
       return TRUE;
     }
