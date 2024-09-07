@@ -247,9 +247,6 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
 
   /**
    * Immediately stop script execution, log out the user and redirect to the home page.
-   *
-   * @deprecated
-   *   This function should be removed in favor of linking to the CMS's logout page
    */
   public function logout() {
     return Security::singleton()->logoutUser();
