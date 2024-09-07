@@ -224,7 +224,9 @@ class CRM_Extension_Browser {
     catch (GuzzleException $e) {
       throw new CRM_Extension_Exception(ts('The CiviCRM public extensions directory at %1 could not be contacted - please check your webserver can make external HTTP requests', [1 => $this->getRepositoryUrl()]), 'connection_error');
     }
-    restore_error_handler();
+    finally {
+      restore_error_handler();
+    }
 
     if ($response->getStatusCode() !== 200) {
       throw new CRM_Extension_Exception(ts('The CiviCRM public extensions directory at %1 could not be contacted - please check your webserver can make external HTTP requests', [1 => $this->getRepositoryUrl()]), 'connection_error');
