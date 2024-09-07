@@ -520,14 +520,16 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
 
   /**
    * Start a new session.
+   *
+   * Generally this uses the SessionHander provided by Standaloneusers
+   * extension - but we fallback to a default PHP session to:
+   * a) allow the installer to work (early in the Standalone install, we dont have Standaloneusers yet)
+   * b) avoid unhelpfully hard crash if the ExtensionSystem goes down (without the fallback, the crash
+   * here swallows whatever error is actually causing the crash)
    */
   public function sessionStart() {
-    if (defined('CIVI_SETUP')) {
-      // during installation we can't use the session
-      // handler from the extension yet so we just
-      // use a default php session
-      // use a different cookie name to avoid any nasty clash
-      $session_cookie_name = 'SESSCIVISOINSTALL';
+    if (!class_exists(SessionHandler::class)) {
+      $session_cookie_name = 'SESSCIVISOFALLBACK';
     }
     else {
       $session_handler = new SessionHandler();
