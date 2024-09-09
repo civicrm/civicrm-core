@@ -43,7 +43,12 @@ class CRM_Core_DAO_AllCoreTables {
    *   [EntityName => [table => table_name, class => CRM_DAO_ClassName]][]
    */
   public static function getEntities(): array {
-    return EntityRepository::getEntities();
+    $allEntities = EntityRepository::getEntities();
+    // Filter out entities without a table
+    $tables = EntityRepository::getTableIndex();
+    // Filter out entities without a class
+    $classes = EntityRepository::getClassIndex();
+    return array_intersect_key($allEntities, array_flip($tables), array_flip($classes));
   }
 
   /**
@@ -166,7 +171,8 @@ class CRM_Core_DAO_AllCoreTables {
    *   [EntityName => CRM_DAO_ClassName]
    */
   public static function daoToClass() {
-    return array_combine(array_keys(self::getEntities()), array_column(self::getEntities(), 'class'));
+    $entities = self::getEntities();
+    return array_combine(array_keys($entities), array_column($entities, 'class'));
   }
 
   /**

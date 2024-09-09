@@ -48,7 +48,8 @@ return new class() {
   }
 
   public function __construct(array $entities = [], ?callable $findExternalTable = NULL) {
-    $this->entities = $entities;
+    // Filter out entities without a sql table (e.g. Afform)
+    $this->entities = array_filter($entities, fn($entity) => !empty($entity['table']));
     $this->findExternalTable = $findExternalTable ?: function() {
       return NULL;
     };
