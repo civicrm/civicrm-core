@@ -13,9 +13,7 @@
         <div class="messages help">{$priceSet.help_pre|purify}</div>
     {/if}
 
-    {assign var='adminFld' value=false}
     {crmPermission has='administer CiviCRM'}
-      {assign var='adminFld' value=true}
       {if $priceSet.id && !$priceSet.is_quick_config}
         <div class='float-right'>
           <a class="crm-hover-button" target="_blank" href="{crmURL p="civicrm/admin/price/field" q="reset=1&action=browse&sid=`$priceSet.id`" fb=1}">
