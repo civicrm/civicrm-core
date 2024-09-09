@@ -18,7 +18,7 @@
     <div class="help">
         <p>{ts 1=$displayName}This page lists all event registrations for %1 since inception.{/ts}
         {capture assign="link"}class="action-item" href="{$newEventURL nofilter}"{/capture}
-        {if $permission EQ 'edit'}{ts 1=$link nofilter}Click <a %1>Add Event Registration</a> to register this contact for an event.{/ts}{/if}
+        {if $permission EQ 'edit'}{ts 1=$link}Click <a %1>Add Event Registration</a> to register this contact for an event.{/ts}{/if}
         {if $accessContribution and $newCredit}
             {capture assign=newCreditURL}{crmURL p="civicrm/contact/view/participant" q="reset=1&action=add&cid=`$contactId`&context=participant&mode=live"}{/capture}
             {capture assign="link"}class="action-item" href="{$newCreditURL|smarty:nodefaults}"{/capture}
