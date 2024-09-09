@@ -1,5 +1,4 @@
 <?php
-
 namespace Civi\Standalone\PasswordAlgorithms;
 
 class Drupal7 implements AlgorithmInterface {
@@ -181,4 +180,5 @@ class Drupal7 implements AlgorithmInterface {
     $expected = 12 + ceil((8 * $len) / 6);
     return (strlen($output) == $expected) ? substr($output, 0, self::$hashLength) : FALSE;
   }
+
 }
