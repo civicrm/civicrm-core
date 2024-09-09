@@ -320,9 +320,9 @@ class Security {
       ^
       \$([a-z0-9-]{1,32})  # Match 1 algorithm identifier
       (\$v=[0-9+])?        # Match 2 optional version
-      (\$[a-z0-9-]{1,32}=[a-zA-Z0-9/+.-]*(?:,[a-z0-9-]{1,32}=[a-zA-Z0-9/+.-]*)*)? # 3: optional parameters
-      \$([a-zA-Z0-9/+.-]+) # Match 4 salt
-      \$([a-zA-Z0-9/+]+)   # Match 5 B64 encoded hash
+      (\$[a-z0-9-]{1,32}=[a-zA-Z0-9\/+.-]*(?:,[a-z0-9-]{1,32}=[a-zA-Z0-9\/+.-]*)*)? # 3: optional parameters
+      \$([a-zA-Z0-9\/+.-]+) # Match 4 salt
+      \$([a-zA-Z0-9\/+]+)   # Match 5 B64 encoded hash
       $/x', $storedHashedPassword, $matches)) {
 
       Civi::log()->warning("Denying access to user whose stored password is not in a format we can parse.");
