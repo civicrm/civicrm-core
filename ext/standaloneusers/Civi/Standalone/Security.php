@@ -23,11 +23,11 @@ class Security {
   const PASSWORD_RESET_SCOPE = 'pw_reset';
 
   /**
-   * @return static
+   * @return Security
    */
   public static function singleton() {
     if (!isset(\Civi::$statics[__METHOD__])) {
-      \Civi::$statics[__METHOD__] = new static();
+      \Civi::$statics[__METHOD__] = new Security();
     }
     return \Civi::$statics[__METHOD__];
   }
