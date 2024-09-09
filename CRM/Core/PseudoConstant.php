@@ -106,14 +106,9 @@ class CRM_Core_PseudoConstant {
   private static $accountOptionValues;
 
   /**
-   * Low-level option getter, rarely accessed directly.
-   * NOTE: Rather than calling this function directly use CRM_*_BAO_*::buildOptions()
-   * @see https://docs.civicrm.org/dev/en/latest/framework/pseudoconstant/
+   * Legacy option getter.
    *
-   * NOTE: If someone undertakes a refactoring of this, please consider the use-case of
-   * the Setting.getoptions API. There is no DAO/field, but it would be nice to use the
-   * same 'pseudoconstant' struct in *.settings.php. This means loosening the coupling
-   * between $field lookup and the $pseudoconstant evaluation.
+   * @deprecated in favor of `Civi::entity()->getOptions()`
    *
    * @param string $daoName
    * @param string $fieldName

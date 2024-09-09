@@ -2870,7 +2870,7 @@ SELECT contact_id
   /**
    * Legacy field options getter.
    *
-   * @deprecated in favor of `EntityProvider::getOptions()`
+   * @deprecated in favor of `Civi::entity()->getOptions()`
    *
    * Overriding this function is no longer recommended as a way to customize options.
    * Instead, option lists can be customized by either:
