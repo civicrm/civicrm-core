@@ -1193,6 +1193,15 @@ class CRM_Utils_System {
   }
 
   /**
+   * Set the html header to direct robots not to index the page.
+   *
+   * @return void
+   */
+  public static function setNoRobotsFlag(): void {
+    CRM_Utils_System::addHTMLHead('<META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">');
+  }
+
+  /**
    * Wraps or emulates PHP's getallheaders() function.
    */
   public static function getAllHeaders() {
