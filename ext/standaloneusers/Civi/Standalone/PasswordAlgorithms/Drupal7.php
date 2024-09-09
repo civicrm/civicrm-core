@@ -1,4 +1,5 @@
 <?php
+
 namespace Civi\Standalone\PasswordAlgorithms;
 
 class Drupal7 implements AlgorithmInterface {
@@ -168,7 +169,7 @@ class Drupal7 implements AlgorithmInterface {
 
     // Convert the base 2 logarithm into an integer.
     $count = 1 << $count_log2;
-    $hash = hash($algo, $password, TRUE);
+    $hash = hash($algo, $salt . $password, TRUE);
     do {
       $hash = hash($algo, $hash . $password, TRUE);
     } while (--$count);
@@ -180,5 +181,4 @@ class Drupal7 implements AlgorithmInterface {
     $expected = 12 + ceil((8 * $len) / 6);
     return (strlen($output) == $expected) ? substr($output, 0, self::$hashLength) : FALSE;
   }
-
 }
