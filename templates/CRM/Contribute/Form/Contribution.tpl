@@ -10,7 +10,7 @@
 {* this template is used for adding/editing/deleting contributions and pledge payments *}
 
 {if $priceSetId}
-  {include file="CRM/Price/Form/PriceSet.tpl" context="standalone" extends="Contribution" hideTotal=false}
+  {include file="CRM/Price/Form/PriceSet.tpl" extends="Contribution" hideTotal=false isShowAdminVisibilityFields=true}
 {elseif !empty($showAdditionalInfo) and !empty($formType)}
   {include file="CRM/Contribute/Form/AdditionalInfo/$formType.tpl"}
 {else}
