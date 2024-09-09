@@ -403,6 +403,12 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $this->_isBillingAddressRequiredForPayLater = $this->_values['event']['is_billing_required'] ?? NULL;
       $this->assign('isBillingAddressRequiredForPayLater', $this->_isBillingAddressRequiredForPayLater);
     }
+
+    // set the noindex metatag for non-public events
+    if ($values['event']['is_public'] == 0) {
+      CRM_Utils_System::addHTMLHead('<META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">');
+    }
+
   }
 
   /**
