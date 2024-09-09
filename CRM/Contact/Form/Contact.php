@@ -171,11 +171,11 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       }
 
       $this->_gid = CRM_Utils_Request::retrieve('gid', 'Integer',
-        CRM_Core_DAO::$_nullObject,
+        NULL,
         FALSE, NULL, 'GET'
       );
       $this->_tid = CRM_Utils_Request::retrieve('tid', 'Integer',
-        CRM_Core_DAO::$_nullObject,
+        NULL,
         FALSE, NULL, 'GET'
       );
       $typeLabel = CRM_Contact_BAO_ContactType::contactTypePairs(TRUE, $this->_contactSubType ?
