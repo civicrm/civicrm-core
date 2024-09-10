@@ -1868,7 +1868,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     }
     elseif (in_array($fieldName, ['gender_id', 'communication_style_id'])) {
       $options = [];
-      $pseudoValues = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', $fieldName);
+      $pseudoValues = CRM_Contact_DAO_Contact::buildOptions($fieldName);
       $form->addRadio($name, ts('%1', [1 => $title]), $pseudoValues, ['allowClear' => !$required], NULL, $required);
     }
     elseif ($fieldName === 'prefix_id' || $fieldName === 'suffix_id') {
