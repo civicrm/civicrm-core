@@ -448,61 +448,49 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     $config = CRM_Core_Config::singleton();
     foreach ($allBlocks as $blockName => $label) {
       $name = strtolower($blockName);
-      $hasPrimary = $updateMode = FALSE;
+      $hasPrimary = FALSE;
 
       // user is in update mode.
-      if (array_key_exists($name, $defaults) &&
-        !CRM_Utils_System::isNull($defaults[$name])
-      ) {
-        $updateMode = TRUE;
+      $updateMode = array_key_exists($name, $defaults) && !CRM_Utils_System::isNull($defaults[$name]);
+      if ($updateMode) {
+        foreach ($defaults[$name] as $locationEntity) {
+          $hasPrimary = $locationEntity['is_primary'] ?: $hasPrimary;
+        }
       }
-
-      for ($instance = 1; $instance <= $this->get($blockName . '_Block_Count'); $instance++) {
-        // make we require one primary block, CRM-5505
-        if ($updateMode) {
-          if (!$hasPrimary) {
-            $hasPrimary = !empty($defaults[$name][$instance]['is_primary']);
-          }
-          continue;
-        }
-
+      else {
+        $instance = 1;
         //set location to primary for first one.
-        if ($instance == 1) {
-          $hasPrimary = TRUE;
-          $defaults[$name][$instance]['is_primary'] = TRUE;
-          $defaults[$name][$instance]['location_type_id'] = $locationType->id;
-        }
-        else {
-          $locTypeId = $locationTypeKeys[$instance - 1] ?? $locationType->id;
-          $defaults[$name][$instance]['location_type_id'] = $locTypeId;
-        }
+        $defaults[$name][$instance]['is_primary'] = TRUE;
+        $defaults[$name][$instance]['location_type_id'] = $locationType->id;
 
         //set default country
-        if ($name == 'address' && $config->defaultContactCountry) {
+        if ($name === 'address' && $config->defaultContactCountry) {
           $defaults[$name][$instance]['country_id'] = $config->defaultContactCountry;
         }
 
         //set default state/province
-        if ($name == 'address' && $config->defaultContactStateProvince) {
+        if ($name === 'address' && $config->defaultContactStateProvince) {
           $defaults[$name][$instance]['state_province_id'] = $config->defaultContactStateProvince;
         }
 
         //set default phone type.
-        if ($name == 'phone' && $defPhoneTypeId) {
+        if ($name === 'phone' && $defPhoneTypeId) {
           $defaults[$name][$instance]['phone_type_id'] = $defPhoneTypeId;
         }
         //set default website type.
-        if ($name == 'website' && $defWebsiteTypeId) {
+        if ($name === 'website' && $defWebsiteTypeId) {
           $defaults[$name][$instance]['website_type_id'] = $defWebsiteTypeId;
         }
 
         //set default im provider.
-        if ($name == 'im' && $defIMProviderId) {
+        if ($name === 'im' && $defIMProviderId) {
           $defaults[$name][$instance]['provider_id'] = $defIMProviderId;
         }
       }
 
-      if (!$hasPrimary) {
+      // This is a very old pre-caution against bad data where
+      // no email is marked as primary. The BAO probably prevents this effectively now.
+      if ($updateMode && !$hasPrimary) {
         $defaults[$name][1]['is_primary'] = TRUE;
       }
     }
