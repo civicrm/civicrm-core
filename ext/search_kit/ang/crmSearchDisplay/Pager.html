@@ -12,6 +12,7 @@
         ng-change="$ctrl.getResultsPronto()"
         items-per-page="$ctrl.limit"
         max-size="6"
+        num-pages="$ctrl.numPages"
         force-ellipses="true"
         previous-text="&lsaquo;"
         next-text="&rsaquo;"
@@ -25,6 +26,12 @@
         {{:: ts('Page Size') }}
       </label>
       <input class="form-control" id="crm-search-results-page-size" type="number" ng-model="$ctrl.limit" min="10" step="10">
+    </div>
+    <div class="form-inline text-right" ng-if="$ctrl.rowCount > $ctrl.limit">
+      <label for="crm-search-results-page-number" >
+        {{:: ts('Page') }}
+      </label>
+      <input class="form-control" id="crm-search-results-page-number" type="number" ng-model="$ctrl.page" ng-change="$ctrl.getResultsPronto()"> of {{ $ctrl.numPages }}
     </div>
   </div>
 </div>

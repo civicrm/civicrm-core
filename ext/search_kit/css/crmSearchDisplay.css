@@ -16,7 +16,8 @@
   border-color: #8a1f11;
 }
 
-#bootstrap-theme #crm-search-results-page-size {
+#bootstrap-theme #crm-search-results-page-size,
+#bootstrap-theme #crm-search-results-page-number {
   width: 60px;
 }
 
