@@ -186,7 +186,7 @@ class CRM_Financial_Page_AJAX {
             $params = $totals[$recordID];
           case 'reopen':
             $status = $op == 'close' ? 'Closed' : 'Reopened';
-            $batchStatus = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id', ['labelColumn' => 'name']);
+            $batchStatus = CRM_Batch_DAO_Batch::buildOptions('status_id', 'validate');
             $params['status_id'] = CRM_Utils_Array::key($status, $batchStatus);
             $session = CRM_Core_Session::singleton();
             $params['modified_date'] = date('YmdHis');
@@ -335,8 +335,7 @@ class CRM_Financial_Page_AJAX {
     }
     $financialitems = [];
     if ($statusID) {
-      $batchStatuses = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id', ['labelColumn' => 'name', 'condition' => " v.value={$statusID}"]);
-      $batchStatus = $batchStatuses[$statusID];
+      $batchStatus = CRM_Core_PseudoConstant::getName('CRM_Batch_DAO_Batch', 'status_id', $statusID);
     }
     while ($financialItem->fetch()) {
       $row[$financialItem->id] = [];
