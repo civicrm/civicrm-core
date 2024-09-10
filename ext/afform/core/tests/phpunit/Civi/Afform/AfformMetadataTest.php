@@ -3,6 +3,7 @@ namespace Civi\Afform;
 
 use Civi\Api4\Afform;
 use Civi\Test\HeadlessInterface;
+use CRM_Afform_ExtensionUtil as E;
 
 /**
  * @group headless
@@ -16,12 +17,28 @@ class AfformMetadataTest extends \PHPUnit\Framework\TestCase implements Headless
   public function testGetFields():void {
     $fields = Afform::getFields(FALSE)
       ->setAction('get')
+      ->setLoadOptions(TRUE)
       ->execute()->indexBy('name');
-    $this->assertTrue($fields['type']['options']);
+    $this->assertArrayHasKey('form', $fields['type']['options']);
     $this->assertEquals(['name', 'label', 'icon', 'description'], $fields['type']['suffixes']);
 
-    $this->assertTrue($fields['base_module']['options']);
-    $this->assertTrue($fields['placement']['options']);
+    $this->assertArrayHasKey('Individual', $fields['summary_contact_type']['options']);
+    $this->assertEquals(['name', 'label', 'icon'], $fields['summary_contact_type']['suffixes']);
+
+    $this->assertArrayHasKey(E::LONG_NAME, $fields['base_module']['options']);
+    $this->assertArrayHasKey('dashboard_dashlet', $fields['placement']['options']);
+
+    $this->assertEquals('Afform', $fields['name']['entity']);
+    $this->assertEquals('Boolean', $fields['has_base']['data_type']);
+    $this->assertTrue($fields['submission_date']['readonly']);
+  }
+
+  public function testGetMeta():void {
+    $entity = \Civi::entity('Afform');
+    $this->assertEquals(['name'], $entity->getMeta('primary_keys'));
+    $this->assertEquals('civicrm/admin/afform#/edit/[name]', $entity->getMeta('paths')['edit']);
+    $this->assertNull($entity->getMeta('table'));
+    $this->assertNull($entity->getMeta('class'));
   }
 
   public function testGetIndividualFields():void {

@@ -302,9 +302,11 @@ class CRM_Core_DAO_AllCoreTables {
   public static function getBaoClasses() {
     $r = [];
     foreach (self::getEntities() as $name => $entity) {
-      $baoClass = str_replace('_DAO_', '_BAO_', $entity['class']);
-      if (class_exists($baoClass)) {
-        $r[$name] = $baoClass;
+      if (!empty($entity['class'])) {
+        $baoClass = str_replace('_DAO_', '_BAO_', $entity['class']);
+        if (class_exists($baoClass)) {
+          $r[$name] = $baoClass;
+        }
       }
     }
     return $r;
