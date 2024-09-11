@@ -144,7 +144,7 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
       $idCol = $pseudoconstant['key_column'] ?? $entity->getMeta('primary_key');
       $pseudoconstant['name_column'] ??= (isset($fields['name']) ? 'name' : $idCol);
       $select->select(["$idCol AS id"]);
-      foreach (\Civi\Api4\Utils\FormattingUtil::$pseudoConstantSuffixes as $prop) {
+      foreach (array_keys(\CRM_Core_SelectValues::optionAttributes()) as $prop) {
         if (!empty($pseudoconstant["{$prop}_column"])) {
           $propColumn = $pseudoconstant["{$prop}_column"];
           $select->select("$propColumn AS $prop");

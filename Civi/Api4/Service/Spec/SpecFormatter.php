@@ -76,7 +76,7 @@ class SpecFormatter {
         // These suffixes are always supported if a field has options
         $suffixes = ['name', 'label'];
         // Add other columns specified in schema (e.g. 'abbr_column')
-        foreach (array_diff(FormattingUtil::$pseudoConstantSuffixes, $suffixes) as $suffix) {
+        foreach (array_diff(array_keys(\CRM_Core_SelectValues::optionAttributes()), $suffixes) as $suffix) {
           if (!empty($data['pseudoconstant'][$suffix . '_column'])) {
             $suffixes[] = $suffix;
           }

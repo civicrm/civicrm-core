@@ -22,6 +22,28 @@ use Civi\Token\TokenProcessor;
 class CRM_Core_SelectValues {
 
   /**
+   * The possible attributes of each item in an option list
+   *
+   * APIv4 refers to these as "suffixes".
+   *
+   * @return array
+   */
+  public static function optionAttributes():array {
+    static $attributes;
+    $attributes ??= [
+      'label' => ts('Label'),
+      'name' => ts('Internal Name'),
+      'description' => ts('Description'),
+      'abbr' => ts('Abbreviation'),
+      'icon' => ts('Icon'),
+      'color' => ts('Color'),
+      'grouping' => ts('Grouping'),
+      'url' => ts('Url'),
+    ];
+    return $attributes;
+  }
+
+  /**
    * Yes/No options
    *
    * @return array
@@ -1274,6 +1296,9 @@ class CRM_Core_SelectValues {
   /**
    * Columns from the option_value table which may or may not be used by each option_group.
    *
+   * This is a subset of the full list of optionAttributes
+   * @see self::optionAttributes()
+   *
    * Note: Value is not listed here as it is not optional.
    *
    * @return string[]
@@ -1285,6 +1310,7 @@ class CRM_Core_SelectValues {
       'description' => 'description',
       'icon' => 'icon',
       'color' => 'color',
+      'grouping' => 'grouping',
     ];
   }
 

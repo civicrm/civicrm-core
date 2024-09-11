@@ -28,11 +28,6 @@ class FormattingUtil {
   ];
 
   /**
-   * @var string[]
-   */
-  public static $pseudoConstantSuffixes = ['name', 'abbr', 'label', 'color', 'description', 'icon', 'grouping', 'url'];
-
-  /**
    * Massage values into the format the BAO expects for a write operation
    *
    * @param array $params
@@ -319,7 +314,7 @@ class FormattingUtil {
     $context = self::$pseudoConstantContexts[$valueType] ?? NULL;
     // For create actions, only unique identifiers can be used.
     // For get actions any valid suffix is ok.
-    if (($action === 'create' && !$context) || !in_array($valueType, self::$pseudoConstantSuffixes, TRUE)) {
+    if (($action === 'create' && !$context) || !array_key_exists($valueType, \CRM_Core_SelectValues::optionAttributes())) {
       throw new \CRM_Core_Exception('Illegal expression');
     }
 
@@ -460,7 +455,7 @@ class FormattingUtil {
           \Civi::$statics[__CLASS__][__FUNCTION__][$contactType][] = $field['name'];
           // Include suffixed variants like prefix_id:label
           if (!empty($field['pseudoconstant'])) {
-            foreach (self::$pseudoConstantSuffixes as $suffix) {
+            foreach (array_keys(\CRM_Core_SelectValues::optionAttributes()) as $suffix) {
               \Civi::$statics[__CLASS__][__FUNCTION__][$contactType][] = $field['name'] . ':' . $suffix;
             }
           }
