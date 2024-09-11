@@ -33,6 +33,8 @@ class GroupTest extends Api4TestBase {
       ->execute()->indexBy('name');
 
     $this->assertTrue($fields['title']['required']);
+    $this->assertFalse($fields['frontend_title']['required']);
+    $this->assertSame('empty($values.title)', $fields['frontend_title']['required_if']);
   }
 
   public function testSmartGroupCache(): void {
