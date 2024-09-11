@@ -14,7 +14,5 @@ return CRM_Core_CodeGen_OptionGroup::create('website_type', 'a/0045')
     ['SnapChat', 9],
     ['Tumblr', 10],
     ['Twitter', 11],
-    ['Vine ', 12, 'label' => 'Vine'],
-    // This appears to be locking-in a typo on the 'name' side, but they fixed the 'label'.
   ])
   ->syncColumns('fill', ['value' => 'weight', 'name' => 'label']);
