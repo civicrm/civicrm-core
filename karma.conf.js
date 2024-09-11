@@ -22,7 +22,8 @@ module.exports = function(config) {
     autoWatch: true,
     browsers: ['ChromeHeadless'],
     exclude: [
-      'ang/api4Explorer/Explorer.js'
+      'ang/api4Explorer/Explorer.js',
+      'ext/civi_mail/ang/crmMailingAB/Stats.js'
     ],
     files: [
       'bower_components/jquery/dist/jquery.min.js',
