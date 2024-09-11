@@ -1,3 +1,7 @@
+0.9.51
+ - CHANGED - cleans-up & merges two Bootstrap files: removes some un-used/duplicates, adds CSS variables, sorts into sub-headings
+ - REMOVES - bootstrap3.css file
+
 0.9.50
  - FIXES - more icon button padding issues
  - ADDED - text colour to headings so H1, H2, etc display correctly in darkmode
