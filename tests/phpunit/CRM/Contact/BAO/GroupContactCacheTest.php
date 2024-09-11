@@ -498,7 +498,7 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
     $ssParams = ['form_values' => $params['formValues'], 'is_active' => 1];
     $savedSearch = CRM_Contact_BAO_SavedSearch::create($ssParams);
     $params['saved_search_id'] = $savedSearch->id;
-    return CRM_Contact_BAO_Group::create($params);
+    return CRM_Contact_BAO_Group::writeRecord($params);
   }
 
 }

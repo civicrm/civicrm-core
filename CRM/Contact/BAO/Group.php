@@ -329,6 +329,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group implements HookInterfa
   }
 
   /**
+   * @deprecated
    * Create a new group.
    *
    * @param array $params
@@ -337,7 +338,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group implements HookInterfa
    *   The new group BAO (if created)
    */
   public static function create(&$params) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return self::writeRecord($params);
   }
 
@@ -1286,12 +1286,12 @@ WHERE {$whereClause}";
     /** @var CRM_Contact_DAO_Group $contactType */
     $group = $event->object;
     $params = $event->params;
-    if (empty($params['id']) && substr($params['name'], -4) == '_tmp') {
+    if (empty($params['id']) && !empty($params['name']) && substr($params['name'], -4) == '_tmp') {
       $group->name = substr($group->name, 0, -4) . "_{$group->id}";
-    }
-    // in order to avoid race condition passing $hook = FALSE
-    $group->save(FALSE);
 
+      // in order to avoid race condition passing $hook = FALSE
+      $group->save(FALSE);
+    }
 
     // Process group nesting
     // first deal with removed parents
@@ -1305,8 +1305,8 @@ WHERE {$whereClause}";
     }
 
     // then add missing parents
-    if (!CRM_Utils_System::isNull($params['parents'])) {
-      foreach ($params['parents'] as $parentId) {
+    if (array_key_exists('parents', $params) && !CRM_Utils_System::isNull($params['parents'])) {
+      foreach ((array) $params['parents'] as $parentId) {
         if ($parentId && !CRM_Contact_BAO_GroupNesting::isParentChild($parentId, $group->id)) {
           CRM_Contact_BAO_GroupNesting::add($parentId, $group->id);
         }
@@ -1315,7 +1315,7 @@ WHERE {$whereClause}";
 
     // refresh cache if parents param was provided
     if (array_key_exists('parents', $params) || !empty($params['parents'])) {
-     CRM_Contact_BAO_GroupNestingCache::update();
+      CRM_Contact_BAO_GroupNestingCache::update();
     }
 
     // update group contact cache for all parent groups
@@ -1373,7 +1373,7 @@ WHERE {$whereClause}";
   public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event): void {
     if (in_array($event->action, ['create', 'edit'])) {
       // convert params if array type
-      if (!CRM_Utils_System::isNull($event->params['group_type']) || is_array($event->params['group_type'])) {
+      if (array_key_exists('group_type', $event->params) && (!CRM_Utils_System::isNull($event->params['group_type']) || is_array($event->params['group_type']))) {
         $event->params['group_type'] = CRM_Utils_Array::convertCheckboxFormatToArray((array) $event->params['group_type']);
       }
 
@@ -1381,7 +1381,7 @@ WHERE {$whereClause}";
 
       // CRM-19068.
       // Validate parents parameter when creating group.
-      if (!CRM_Utils_System::isNull($event->params['parents'])) {
+      if (array_key_exists('parents', $event->params) && !CRM_Utils_System::isNull($event->params['parents'])) {
         $parents = is_array($event->params['parents']) ? array_keys($event->params['parents']) : (array) $event->params['parents'];
         foreach ($parents as $parent) {
           CRM_Utils_Type::validate($parent, 'Integer');
@@ -1455,7 +1455,7 @@ WHERE {$whereClause}";
       if (!empty($event->params['parents'])) {
         $event->params['parents'] = CRM_Utils_Array::convertCheckboxFormatToArray((array) $event->params['parents']);
         // failsafe: forbid adding itself as parent
-        if (($key = array_search($$event->params['id'], $event->params['parents'])) !== FALSE) {
+        if (($key = array_search($event->params['id'], $event->params['parents'])) !== FALSE) {
           unset($event->params['parents'][$key]);
         }
       }

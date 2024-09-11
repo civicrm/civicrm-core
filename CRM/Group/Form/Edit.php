@@ -332,7 +332,7 @@ WHERE  title = %1
         $params['organization_id'] = empty($params['organization_id']) ? 'null' : $params['organization_id'];
       }
 
-      $group = CRM_Contact_BAO_Group::create($params);
+      $group = CRM_Contact_BAO_Group::writeRecord($params);
       // Set the entity id so it is available to postProcess hook consumers
       $this->setEntityId($group->id);
 
