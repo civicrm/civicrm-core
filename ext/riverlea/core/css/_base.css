@@ -8,7 +8,7 @@
     box-sizing: border-box;
 }
 .crm-container .hiddenElement {
-    display: none
+    display: none;
 }
 .crm-container .collapse {
 	display: none !important /* needs to hide items further down the cascade */;
