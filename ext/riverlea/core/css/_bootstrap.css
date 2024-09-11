@@ -1,9 +1,8 @@
 /* The Bootstrap typically bundled has been re-structured in River Lea:
 	- Some of it that wasn't being used (e.g. Glyphicons, Carousels) is deleted / commented out
-	- Some of it is taken out of the #bootstrap-theme namespace and added to /components/ typically marked, e.g. 'BS alerts'
+	- Some of it is taken out of the #bootstrap-theme namespace and added to /components/ typically marked, e.g. 'BS buttons'
 	- Some of it has been taken out and put below with as much integration with the rest of River Lea's CSS variables.
-  It is arranged as follows:
-   - Resets
+  It is structured as:
    - Type
    - Print
    - Image
@@ -34,12 +33,6 @@
    - Panels (with tables & list elements)
    - Hiding elements
    */
-
-/* Resets */
-
-#bootstrap-theme article, #bootstrap-theme aside, #bootstrap-theme details, #bootstrap-theme figcaption, #bootstrap-theme figure, #bootstrap-theme footer, #bootstrap-theme header, #bootstrap-theme hgroup, #bootstrap-theme main, #bootstrap-theme menu, #bootstrap-theme nav, #bootstrap-theme section, #bootstrap-theme summary {
-	display: block;
-}
 
 /* Type */
 
