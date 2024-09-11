@@ -1045,6 +1045,8 @@ class CRM_Core_DAO extends DB_DataObject {
       return $value === 'null' ? '' : $value;
     }, $record);
 
+    self::addDefaultFallbackValues($entityName, $record);
+
     \CRM_Utils_Hook::pre($op, $entityName, $record[$idField] ?? NULL, $record);
     $fields = static::getSupportedFields();
     $instance = new static();
@@ -1053,16 +1055,6 @@ class CRM_Core_DAO extends DB_DataObject {
     $instance->copyValues($values);
     if (empty($values[$idField]) && array_key_exists('name', $fields) && empty($values['name'])) {
       $instance->makeNameFromLabel();
-    }
-    if (empty($values[$idField]) && array_key_exists('frontend_title', $fields) && empty($values['frontend_title'])) {
-      $instance->frontend_title = $instance->title;
-    }
-    if (empty($values[$idField]) && array_key_exists('frontend_title', $fields) && !$instance->frontend_title) {
-      // Still empty? Fall back to name.
-      $instance->frontend_title = $instance->name;
-    }
-    if (empty($values[$idField]) && array_key_exists('title', $fields) && empty($values['title']) && array_key_exists('frontend_title', $fields) && $instance->frontend_title) {
-      $instance->title = $instance->frontend_title;
     }
     $instance->save();
 
@@ -1140,6 +1132,26 @@ class CRM_Core_DAO extends DB_DataObject {
       $results[] = static::deleteRecord($record);
     }
     return $results;
+  }
+
+  private static function addDefaultFallbackValues(string $entityName, array &$record): void {
+    $entity = Civi::entity($entityName);
+    $idField = $entity->getMeta('primary_key');
+    // Only fill values for create operations
+    if (!empty($record[$idField])) {
+      return;
+    }
+    foreach ($entity->getFields() as $fieldName => $field) {
+      // Check if value is empty using `strlen()` to avoid php quirk of '0' == false.
+      if (!empty($field['default_fallback']) && !strlen((string) ($record[$fieldName] ?? ''))) {
+        foreach ($field['default_fallback'] as $defaultFieldName) {
+          if (strlen((string) ($record[$defaultFieldName] ?? ''))) {
+            $record[$fieldName] = $record[$defaultFieldName];
+            break;
+          }
+        }
+      }
+    }
   }
 
   /**

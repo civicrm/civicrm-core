@@ -287,6 +287,7 @@ return [
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'required' => TRUE,
+      'default_fallback' => ['title'],
       'localizable' => TRUE,
       'description' => ts('Alternative public title for this Group.'),
       'add' => '5.31',
