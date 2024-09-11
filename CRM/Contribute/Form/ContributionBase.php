@@ -355,6 +355,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     $this->getContributionPageID();
     $this->_ccid = CRM_Utils_Request::retrieve('ccid', 'Positive', $this);
     $this->_emailExists = $this->get('emailExists') ?? FALSE;
+    $this->assign('isShowAdminVisibilityFields', CRM_Core_Permission::check('administer CiviCRM'));
 
     $this->_contactID = $this->_membershipContactID = $this->getContactID();
 

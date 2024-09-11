@@ -248,7 +248,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     //CRM-4320
     $this->_participantId = CRM_Utils_Request::retrieve('participantId', 'Positive', $this);
     $this->setPaymentMode();
-
+    $this->assign('isShowAdminVisibilityFields', CRM_Core_Permission::check('administer CiviCRM'));
     $this->_values = $this->get('values');
     $this->_fields = $this->get('fields');
     $this->_bltID = $this->get('bltID');
