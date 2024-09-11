@@ -130,7 +130,7 @@ div.crm-inline-edit-form div.crm-clear {
     display: table-cell;
     padding: 0;
 }
-#contact-summary .crm-inline-button, 
+#contact-summary .crm-inline-button,
 #contact-summary .crm-submit-buttons {
     margin-bottom: 0;
     padding-bottom: var(--crm-m2);
@@ -164,7 +164,7 @@ div.crm-inline-edit-form div.crm-clear {
 .crm-container div.contactCardLeft,
 .crm-container div.contactCardRight {
 	width: 100%;
-}  
+}
 .crm-container div.contact_panel table {
     margin-bottom: 0;
     width: auto;
@@ -230,7 +230,7 @@ div.crm-inline-edit-form div.crm-clear {
 }
 
 /* contact actions menu */
-  
+
 #crm-contact-actions-list {
     width: 495px;
 }
@@ -277,7 +277,7 @@ div.crm-inline-edit-form div.crm-clear {
 
 
 /* Responsive layout changes - Possibly Deprecated
-  
+
 .crm-container .contact_basic_information-section.narrowform table.form-layout-compressed,
 .crm-container .contact_basic_information-section.narrowform table.form-layout-compressed tbody,
 .crm-container .contact_basic_information-section.narrowform.xnarrowform table.form-layout-compressed tr {
@@ -409,5 +409,5 @@ div.crm-summary-contactname-block + .crm-actions-ribbon {
 .crm-search-col-type-field span.ng-scope a {
     display: flex;
     gap: var(--crm-btn-icon-spacing);
-    align-items: center;   
+    align-items: center;
 }

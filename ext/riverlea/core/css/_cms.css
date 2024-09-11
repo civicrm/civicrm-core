@@ -72,7 +72,7 @@ body.page-civicrm > #branding {
 body.page-civicrm {
     color: unset;
 }
-body.page-civicrm .breadcrumb__item, 
+body.page-civicrm .breadcrumb__item,
 body.page-civicrm .breadcrumb__link {
     color: var(--crm-c-text);
 }
@@ -80,9 +80,9 @@ body.page-civicrm .breadcrumb__link {
     --crm-page-padding: 3rem;
     --crm-page-width: calc(100% - var(--crm-page-padding) - var(--crm-page-padding));
 }
-#block-claro-content .crm-container .form-item, 
+#block-claro-content .crm-container .form-item,
 #block-claro-content .crm-container p,
-#block-claro-content .crm-container .help p, 
+#block-claro-content .crm-container .help p,
 #block-claro-content .crm-container .button {
     margin: 0;
 }
@@ -114,7 +114,7 @@ body.page-civicrm .page-content:has(#block-claro-content) {
     text-shadow: none;
     margin-left: 0;
 }
-#block-seven-content .form-composite > legend, 
+#block-seven-content .form-composite > legend,
 #block-seven-content .label {
     font-weight: inherit;
 }
@@ -167,7 +167,7 @@ body.wp-admin {
 }
 body.wp-admin #wpcontent {
     padding-left: 0; /* resets WP padding */
-} 
+}
 body.wp-admin .crm-container {
     background: var(--crm-c-page-background);
 }

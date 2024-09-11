@@ -1,4 +1,4 @@
-.crm-container .help, 
+.crm-container .help,
 .crm-container #help,
 .crm-container .status,
 .crm-container .messages,
@@ -51,7 +51,7 @@
     text-decoration: underline;
 }
 .crm-container .help a:hover,
-.crm-container .messages a:hover, 
+.crm-container .messages a:hover,
 .crm-container .help a:focus,
 .crm-container .messages a:focus {
     color: inherit;
@@ -80,11 +80,11 @@
     background: transparent;
     opacity: 0.4;
 }
-.crm-container .alert-dismissable, 
+.crm-container .alert-dismissable,
 .crm-container .alert-dismissible {
     padding-right: 35px;
 }
-.crm-container .alert-dismissable .close, 
+.crm-container .alert-dismissable .close,
 .crm-container .alert-dismissible .close {
     position: relative;
     top: -2px;

@@ -1,4 +1,4 @@
-/* civicrm-core/css/admin.css - branched on 7 Jun 24 
+/* civicrm-core/css/admin.css - branched on 7 Jun 24
    Styles specific to certain admin pages/forms
    Status: merged. */
 
@@ -6,7 +6,7 @@
 .crm-container td.tasklist a {
     font-weight: var(--crm-bold-weight);
     font-family: var(--crm-font-bold);
-}  
+}
 .crm-container table.selector td.tasklist {
   border-right: var(--crm-table-row-border);
   width: 20%;

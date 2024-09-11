@@ -109,15 +109,15 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
     color: var(--crm-icon-info-color);
 }
 
-/* Warning icon */  
+/* Warning icon */
 .crm-container .crm-i.fa-warning,
 .crm-container .btn-warning .crm-i::before {
     color: var(--crm-icon-warning-color);
 }
 
 /* Table sorting icons */
-.crm-container tr a.sorting, 
-.crm-container tr a.sorting_asc, 
+.crm-container tr a.sorting,
+.crm-container tr a.sorting_asc,
 .crm-container tr a.sorting_desc,
 .crm-container table.dataTable thead th.sorting,
 .crm-container table.dataTable thead th.sorting_asc,
@@ -130,7 +130,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 .crm-container th a:focus {
     text-decoration: none;
 }
-.crm-search-display-table > table.table > thead > tr > th i.crm-search-table-column-sort-icon { 
+.crm-search-display-table > table.table > thead > tr > th i.crm-search-table-column-sort-icon {
     /* Bootstrap & SearchKit sort resets */
     position: initial;
     float: var(--crm-table-sort-float);
@@ -142,7 +142,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
     font: normal normal normal var(--crm-dash-icon-size)/inherit FontAwesome;
 }
 .crm-container a.sorting::after,
-.crm-container a.sorting_asc::after, 
+.crm-container a.sorting_asc::after,
 .crm-container a.sorting_desc::after,
 .crm-container th.crm-sortable-col i.crm-search-table-column-sort-icon::before,
 .crm-container table.dataTable thead th.sorting::before,
@@ -167,7 +167,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 }
 .crm-container a.sorting_desc::after,
 .crm-container th.crm-sortable-col i.crm-search-table-column-sort-icon.fa-sort-desc::before,
-.crm-container table.dataTable thead th.sorting_desc::before {  
+.crm-container table.dataTable thead th.sorting_desc::before {
     content: var(--crm-icon-sort-desc);
     color: var(--crm-c-link);
 }
@@ -207,7 +207,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 .crm-container .jstree-default .jstree-checkbox::before {
     content: '\f096';
 }
-.crm-container .jstree-default.jstree-checkbox-selection .jstree-clicked > .jstree-checkbox::before, 
+.crm-container .jstree-default.jstree-checkbox-selection .jstree-clicked > .jstree-checkbox::before,
 .crm-container .jstree-default .jstree-checked > .jstree-checkbox::before {
     content: '\f046';
     color: var(--crm-c-success);

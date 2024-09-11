@@ -15,7 +15,7 @@
 .crm-container .nav > li > a {
 	padding: var(--crm-m) var(--crm-r);
 }
-.crm-container .nav > li > a:hover, 
+.crm-container .nav > li > a:hover,
 .crm-container .nav > li > a:focus {
 	text-decoration: none;
 	background-color: var(--crm-c-background2);
@@ -23,15 +23,15 @@
 .crm-container .nav > li.disabled > a {
 	color: var(--crm-c-inactive);
 }
-.crm-container .nav > li.disabled > a:hover, 
+.crm-container .nav > li.disabled > a:hover,
 .crm-container .nav > li.disabled > a:focus {
     color: var(--crm-c-inactive);
 	text-decoration: none;
 	cursor: not-allowed;
 	background-color: transparent;
 }
-.crm-container .nav .open > a, 
-.crm-container .nav .open > a:hover, 
+.crm-container .nav .open > a,
+.crm-container .nav .open > a:hover,
 .crm-container .nav .open > a:focus {
 	background-color: var(--crm-c-background2);
 	border-color: var(--crm-c-link);

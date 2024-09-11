@@ -1,6 +1,6 @@
 /* Checkbox lists */
 
-.crm-container .listing-box, 
+.crm-container .listing-box,
 .crm-container .listing-box-tall,
 .crm-container ul.crm-checkbox-list {
     width: auto;
@@ -145,7 +145,7 @@ table.advmultiselect {
     border-left: calc(1.25 * var(--crm-wizard-angle)) solid var(--crm-wizard-active-bg);
 }
 .crm-container ul.wizard-bar > li::before {
-    border-bottom: var(--crm-wizard-height) solid rgba(0,0,0,0);  
+    border-bottom: var(--crm-wizard-height) solid rgba(0,0,0,0);
     border-left: var(--crm-wizard-angle) solid var(--crm-wizard-bg);
     border-top: var(--crm-wizard-height) solid rgba(0,0,0,0);
     content: "";
@@ -220,10 +220,10 @@ table.advmultiselect {
 	font-size: var(--crm-font-size);
 	color: inherit;
 }
-.crm-container .panel-title > a, 
-.crm-container .panel-title > small, 
-.crm-container .panel-title > .small, 
-.crm-container .panel-title > small > a, 
+.crm-container .panel-title > a,
+.crm-container .panel-title > small,
+.crm-container .panel-title > .small,
+.crm-container .panel-title > small > a,
 .crm-container .panel-title > .small > a {
 	color: inherit;
 }
@@ -320,12 +320,12 @@ table.advmultiselect {
 .crm-container .badge:empty {
 	display: none;
 }
-.crm-container .btn-xs .badge, 
+.crm-container .btn-xs .badge,
 .crm-container .btn-group-xs > .btn .badge {
 	top: 0;
 	padding: 1px 5px;
 }
-.list-group-item.active > .badge, 
+.list-group-item.active > .badge,
 .nav-pills > .active > a > .badge {
 	color: var(--crm-c-link);
 	background-color: var(--crm-c-page-background);
@@ -333,7 +333,7 @@ table.advmultiselect {
 .nav-pills > li > a > .badge {
 	margin-left: 3px;
 }
-.crm-container a.badge:hover, 
+.crm-container a.badge:hover,
 .crm-container a.badge:focus {
 	color: white;
 	text-decoration: none;
@@ -465,7 +465,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before {
 	background-color: var(--crm-c-primary);
     color: var(--crm-c-primary-text);
 }
-.crm-container a.bg-primary:hover, 
+.crm-container a.bg-primary:hover,
 .crm-container a.bg-primary:focus {
 	background-color: var(--crm-c-primary-hover);
 }
@@ -473,7 +473,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before {
 	background-color: var(--crm-c-secondary);
     color: var(--crm-c-secondary-text);
 }
-.crm-container a.bg-secondary:hover, 
+.crm-container a.bg-secondary:hover,
 .crm-container a.bg-secondary:focus {
 	background-color: var(--crm-c-secondary-hover);
 }
@@ -483,7 +483,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before {
 	background-color: var(--crm-c-success);
     color: var(--crm-c-success-text);
 }
-.crm-container a.bg-success:hover, 
+.crm-container a.bg-success:hover,
 .crm-container a.bg-success:focus,
 .crm-container .dropdown-menu a.bg-success:hover,
 .crm-container .dropdown-menu .bg-success a:hover {
@@ -496,7 +496,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before {
 	background-color: var(--crm-c-info);
     color: var(--crm-c-info-text);
 }
-.crm-container a.bg-info:hover, 
+.crm-container a.bg-info:hover,
 .crm-container a.bg-info:focus,
 .crm-container .dropdown-menu .bg-info a:hover,
 .crm-container .dropdown-menu a.bg-info:hover {
@@ -509,7 +509,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before {
 	background-color: var(--crm-c-warning);
     color: var(--crm-c-warning-text) !important /* FormBuilder vs .disabled */;
 }
-.crm-container a.bg-warning:hover, 
+.crm-container a.bg-warning:hover,
 .crm-container a.bg-warning:focus,
 .crm-container .dropdown-menu .bg-warning a:hover,
 .crm-container .dropdown-menu a.bg-warning:hover {
@@ -522,7 +522,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before {
 	background-color: var(--crm-c-alert);
     color: var(--crm-c-alert-text);
 }
-.crm-container a.bg-danger:hover, 
+.crm-container a.bg-danger:hover,
 .crm-container a.bg-danger:focus,
 .crm-container .dropdown-menu .bg-danger a:hover,
 .crm-container .dropdown-menu a.bg-danger:hover {

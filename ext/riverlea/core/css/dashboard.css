@@ -6,7 +6,7 @@
 #civicrm-dashboard > .crm-flex-box {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: var(--crm-r); 
+    gap: var(--crm-r);
 }
 .crm-container .crm-dashlet {
     border-radius: var(--crm-dashlet-radius);
@@ -55,7 +55,7 @@
 }
 .crm-container .crm-dashlet-header a.crm-dashlet-collapse {
     order: 1;
-}  
+}
 crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
     height: calc(100% - 1em);
 }
@@ -198,7 +198,7 @@ fieldset.crm-inactive-dashlet-fieldset legend {
     display: block;
     margin-bottom: var(--crm-r);
     top: var(--crm-s)
-} 
+}
 fieldset.crm-inactive-dashlet-fieldset legend .crm-hover-button {
     padding: var(--crm-btn-large-padding);
     margin-right: var(--crm-r);

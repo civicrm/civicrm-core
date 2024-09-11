@@ -63,9 +63,9 @@
 .crm-container.crm-public .crm-section:has(> div > input.crm-inline-error) {
     background-color: var(--crm-f-form-error-bg);
 }
-.crm-container.crm-public input[type="text"], 
-.crm-container.crm-public input[type="password"], 
-.crm-container.crm-public input[type="email"], 
+.crm-container.crm-public input[type="text"],
+.crm-container.crm-public input[type="password"],
+.crm-container.crm-public input[type="email"],
 .crm-container.crm-public select,
 .crm-container.crm-public .select2-container .select2-choice {
     border-radius: var(--crm-f-input-radius);
@@ -88,7 +88,7 @@
 .crm-container.crm-public .select2-results input {
     padding: var(--crm-s) var(--crm-r1) var(--crm-s);
 }
-.crm-container.crm-public .select2-dropdown-open .select2-choice, 
+.crm-container.crm-public .select2-dropdown-open .select2-choice,
 .crm-container.crm-public .select2-dropdown-open .select2-choices {
     border-radius: 0;
 }
@@ -101,7 +101,7 @@
 }
 .crm-container.crm-public table#membership-listings {
     border: 0;
-} 
+}
 .crm-container.crm-public .amount_display-group .display-block,
 .crm-container.crm-public .event_fees-group > .crm-section {
     padding: var(--crm-f-form-padding);

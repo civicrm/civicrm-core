@@ -71,7 +71,7 @@
     background: var(--crm-c-secondary);
     color: var(--crm-c-secondary-text);
 }
-.crm-container a.button.delete-button, 
+.crm-container a.button.delete-button,
 .crm-container a.button.delete{
     background: var(--crm-btn-cancel-bg);
     color: var(--crm-btn-cancel-text);
@@ -91,7 +91,7 @@
 /* BS3 colour options */
 
 .crm-container .btn-secondary {
-    background: var(--crm-c-secondary); 
+    background: var(--crm-c-secondary);
     color: var(--crm-c-secondary-text);
 }
 .crm-container .btn.btn-secondary:hover,
@@ -101,7 +101,7 @@
     color: var(--crm-c-secondary-text);
 }
 .crm-container .btn-info {
-    background: var(--crm-btn-info-bg); 
+    background: var(--crm-btn-info-bg);
     color: var(--crm-btn-info-text);
 }
 .crm-container .btn.btn-info:hover,
@@ -110,7 +110,7 @@
     color: var(--crm-btn-info-text);
 }
 .crm-container .btn-warning {
-    background: var(--crm-btn-warning-bg); 
+    background: var(--crm-btn-warning-bg);
     color: var(--crm-btn-warning-text);
 }
 .crm-container .btn.btn-warning:hover,
@@ -119,7 +119,7 @@
     color: var(--crm-btn-warning-text);
 }
 .crm-container .btn-success {
-    background: var(--crm-btn-success-bg); 
+    background: var(--crm-btn-success-bg);
     color: var(--crm-btn-success-text);
 }
 .crm-container .btn.btn-success:hover,
@@ -128,7 +128,7 @@
     color: var(--crm-btn-success-text);
 }
 .crm-container .btn-danger {
-    background: var(--crm-btn-alert-bg); 
+    background: var(--crm-btn-alert-bg);
     color: var(--crm-btn-alert-text);
 }
 .crm-container .btn.btn-danger:hover,
@@ -139,7 +139,7 @@
 
 /* BS3 size options */
 
-.crm-container .btn-lg, 
+.crm-container .btn-lg,
 .crm-container .btn-group-lg > .btn {
 	padding: var(--crm-m3) var(--crm-r);
 	font-size: var(--crm-r1);
@@ -167,8 +167,8 @@
 .crm-container .btn-block + .btn-block {
 	margin-top: 5px;
 }
-.crm-container input[type="submit"].btn-block, 
-.crm-container input[type="reset"].btn-block, 
+.crm-container input[type="submit"].btn-block,
+.crm-container input[type="reset"].btn-block,
 .crm-container input[type="button"].btn-block {
 	width: 100%;
 }
@@ -188,7 +188,7 @@
     background-color: var(--crm-c-primary);
     color: var(--crm-c-primary-text);
 }
-.crm-container a.crm-hover-button.action-item, 
+.crm-container a.crm-hover-button.action-item,
 .crm-container .crm-hover-button.btn-slide,
 .crm-container .crm-submit-buttons .crm-hover-button {
     background-color: transparent;
@@ -215,9 +215,9 @@
     padding: 0;
     background: unset;
 }
-.crm-container .crm-hover-button:hover, 
-.crm-container a.crm-hover-button:hover, 
-.crm-container a.crm-hover-button:focus, 
+.crm-container .crm-hover-button:hover,
+.crm-container a.crm-hover-button:hover,
+.crm-container a.crm-hover-button:focus,
 .crm-container a.crm-hover-button:active,
 .crm-container .crm-submit-buttons .crm-hover-button:hover,
 .crm-container .crm-submit-buttons .crm-hover-button:focus {
@@ -292,7 +292,7 @@
 	display: inline-block;
 	vertical-align: middle;
 }
-.crm-container .btn-group > .btn, 
+.crm-container .btn-group > .btn,
 .crm-container .btn-group-vertical > .btn {
 	position: relative;
 	float: left;
@@ -316,7 +316,7 @@
 .crm-container .btn-toolbar {
 	margin-left: -5px;
 }
-.crm-container .btn-toolbar:before, 
+.crm-container .btn-toolbar:before,
 .crm-container .btn-toolbar:after {
 	display: table;
 	content: " ";
@@ -324,13 +324,13 @@
 .crm-container .btn-toolbar:after {
 	clear: both;
 }
-.crm-container .btn-toolbar .btn, 
-.crm-container .btn-toolbar .btn-group, 
+.crm-container .btn-toolbar .btn,
+.crm-container .btn-toolbar .btn-group,
 .crm-container .btn-toolbar .input-group {
 	float: left;
 }
-.crm-container .btn-toolbar > .btn, 
-.crm-container .btn-toolbar > .btn-group, 
+.crm-container .btn-toolbar > .btn,
+.crm-container .btn-toolbar > .btn-group,
 .crm-container .btn-toolbar > .input-group {
 	margin-left: 5px;
 }
@@ -355,7 +355,7 @@
 .crm-container .btn-group > .btn-group:not(:first-child):not(:last-child) > .btn {
 	border-radius: 0;
 }
-.crm-container .btn-group > .btn-group:first-child:not(:last-child) > .btn:last-child, 
+.crm-container .btn-group > .btn-group:first-child:not(:last-child) > .btn:last-child,
 .crm-container .btn-group > .btn-group:first-child:not(:last-child) > .dropdown-toggle {
 	border-top-right-radius: 0;
 	border-bottom-right-radius: 0;
@@ -371,8 +371,8 @@
 	padding-right: 8px;
 	padding-left: 8px;
 }
-.crm-container .btn-group > .btn-lg + .dropdown-toggle, 
-.crm-container .btn-group-lg.btn-group > .btn + .dropdown-toggle, 
+.crm-container .btn-group > .btn-lg + .dropdown-toggle,
+.crm-container .btn-group-lg.btn-group > .btn + .dropdown-toggle,
 .crm-container .btn-group-lg > .btn-group > .btn + .dropdown-toggle {
 	padding-right: 12px;
 	padding-left: 12px;
@@ -390,15 +390,15 @@
 .crm-container .dropup .btn-lg .caret, .crm-container .dropup .btn-group-lg > .btn .caret {
 	border-width: 0 5px 5px;
 }
-.crm-container .btn-group-vertical > .btn, 
-.crm-container .btn-group-vertical > .btn-group, 
+.crm-container .btn-group-vertical > .btn,
+.crm-container .btn-group-vertical > .btn-group,
 .crm-container .btn-group-vertical > .btn-group > .btn {
 	display: block;
 	float: none;
 	width: 100%;
 	max-width: 100%;
 }
-.crm-container .btn-group-vertical > .btn-group:before, 
+.crm-container .btn-group-vertical > .btn-group:before,
 .crm-container .btn-group-vertical > .btn-group:after {
 	display: table;
 	content: " ";
@@ -504,10 +504,10 @@
 .crm-container button.ui-button:has(.ui-button-icon) {
     padding: 0 var(--crm-btn-padding-inline) 0 0;
 }
-.crm-container a.button:has(i.crm-i), 
+.crm-container a.button:has(i.crm-i),
 .crm-container button:has(i.crm-i),
 .crm-button:has(i.crm-i),
-.crm-button > input[type="button"]:has(i.crm-i), 
+.crm-button > input[type="button"]:has(i.crm-i),
 .crm-button > input[type="submit"]:has(i.crm-i),
 .form-inline .btn-success.pull-right:has(i.crm-i) /* Api4exp */ {
     padding: 0 var(--crm-btn-padding-inline) 0 0;
@@ -516,7 +516,7 @@
     justify-content: center;
     align-items: center;
 }
-.crm-button > input[type="button"]:has(i.crm-i), 
+.crm-button > input[type="button"]:has(i.crm-i),
 .crm-button > input[type="submit"]:has(i.crm-i) {
     padding: 0;
 }
@@ -555,9 +555,9 @@
     padding: 0;
 }
 .crm-container .btn-group-xs button:has(i.crm-i) {
-    padding: 0 var(--crm-s2) 0 0; 
+    padding: 0 var(--crm-s2) 0 0;
 }
-.crm-container .btn-xs i.crm-i, 
+.crm-container .btn-xs i.crm-i,
 .crm-container .btn-group-xs > .btn i.crm-i {
     width: auto;
     height: auto;

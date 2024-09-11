@@ -1,11 +1,11 @@
 /*
     Name: Empty stream;
-    Description: duplicate this to create a new stream; 
+    Description: duplicate this to create a new stream;
     Riverlea version: 0.9.44;
 */
 
 
-:root { 
+:root {
 
 --crm-version: 'Minetta, v' var(--crm-release);
 
@@ -17,7 +17,7 @@
 --crm-font-italic:;
 --crm-italic-style: italic;
 --crm-font-bold-italic:;
-    
+
 /* COLOUR */
 color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Safari)
 
@@ -69,8 +69,8 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-c-background5: var(--crm-c-gray-700);
 --crm-c-drag-background: var(--crm-c-background3); /* background for drag/drop regions, select2 highlight */
 --crm-c-code-background: var(--crm-c-background2); /* background for code regions */
---crm-c-primary: var(--crm-c-gray-700); 
---crm-c-primary-hover: var(--crm-c-gray-800); 
+--crm-c-primary: var(--crm-c-gray-700);
+--crm-c-primary-hover: var(--crm-c-gray-800);
 --crm-c-primary-text: var(--crm-c-light-text);
 --crm-c-secondary: #5d677b;
 --crm-c-secondary-hover: #3e485b;
@@ -197,7 +197,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-expand-icon-color: var(--text);
 --crm-expand-icon-spacing: var(--crm-m);
 --crm-expand-transform: rotate(90deg);
---crm-expand-transition: transform .3s; 
+--crm-expand-transition: transform .3s;
 --crm-expand-header-bg: var(--crm-c-secondary);
 --crm-expand-header-bg-active: var(--crm-c-gray-900);
 --crm-expand-header-color: var(--crm-c-light-text);
@@ -276,7 +276,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-tab-bg-hover: var(--crm-c-page-background);
 --crm-tab-bg-active: var(--crm-c-page-background);
 --crm-tab-hang: 0; /* lip to extend tab flush with active region - set to 0 for no lip */
---crm-tab-padding: var(--crm-s3) var(--crm-m) var(--crm-s) var(--crm-m); 
+--crm-tab-padding: var(--crm-s3) var(--crm-m) var(--crm-s) var(--crm-m);
 --crm-tab-col: var(--crm-c-text);
 --crm-tab-weight: normal;
 --crm-tab-font:;
@@ -291,8 +291,8 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-dash-border: var(--crm-tab-border);
 --crm-dash-roundness: var(--crm-roundness);
 --crm-dash-direction: flex; /* choose 'flex' for tabs at top, or 'grid' for tabs at side */
---crm-side-tabs-width: ; 
---crm-dash-tabs-flow: row; /* choose 'row' for tabs at top, or 'column' for tabs at side */ 
+--crm-side-tabs-width: ;
+--crm-dash-tabs-flow: row; /* choose 'row' for tabs at top, or 'column' for tabs at side */
 --crm-dash-tabs-gap: var(--crm-tabs-gap);
 --crm-dash-tabs-bg: var(--crm-tabs-bg);
 --crm-dash-tabs-padding: var(--crm-tabs-padding);
@@ -325,7 +325,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-dash-header-bg2: transparent;
 --crm-dash-header-col: var(--crm-c-text);
 --crm-dash-header-size: var(--crm-r3);
---crm-dash-header-padding: 0 0 var(--crm-r) 0; 
+--crm-dash-header-padding: 0 0 var(--crm-r) 0;
 --crm-dash-image-size: 100px;
 --crm-dash-image-radius: 200px;
 --crm-dash-image-justify: space-between; /* choose from start (left), end (right), center, and space-between (spread out) */
@@ -395,7 +395,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-wizard-margin: 0 auto;
 --crm-wizard-height: 30px;
 --crm-wizard-radius: var(--crm-l);
---crm-wizard-angle: 0px; 
+--crm-wizard-angle: 0px;
 --crm-wizard-active-col: var(--crm-c-light-text);
 --crm-wizard-active-bg: var(--crm-c-link);
 --crm-wizard-border: var(--crm-c-divider);
@@ -435,8 +435,8 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
     --crm-c-link-hover: var(--crm-c-yellow);
     --crm-c-text-light: var(--crm-c-darkest);
     --crm-c-background:  var(--crm-c-gray-900);
-    --crm-c-page-background: var(--crm-c-gray-900); 
-    --crm-c-background2:var(--crm-c-gray-800); 
+    --crm-c-page-background: var(--crm-c-gray-900);
+    --crm-c-background2:var(--crm-c-gray-800);
     --crm-c-background3: var(--crm-c-gray-700);
     --crm-c-background4: var(--crm-c-gray-600);
     --crm-c-code-background: var(--crm-c-gray-200);

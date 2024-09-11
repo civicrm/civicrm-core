@@ -5,7 +5,7 @@
 /* Sortable headers */
 .crm-search-display th.crm-sortable-col {
   cursor: var(--crm-hover-clickable);
-  white-space: nowrap; 
+  white-space: nowrap;
 }
 .crm-search-display th.crm-sortable-col span {
   white-space: break-spaces;

@@ -8,7 +8,7 @@
 }
 a.af-api4-action-idle {
     cursor: var(--crm-hover-clickable);
-} 
+}
 .af-container.af-layout-cols {
     display: flex;
     flex-wrap: wrap;
@@ -28,7 +28,7 @@ a.af-api4-action-idle {
 .af-container.af-layout-inline > .af-title {
     display: block;
     width: 100%;
-} 
+}
 .afform-directive,
 af-form {
     display: block;
@@ -36,10 +36,10 @@ af-form {
 }
 #bootstrap-theme .input-group .crm-af-field {
     display: inline-block;
-}  
+}
 #bootstrap-theme .input-group .afform-search-operator {
     width: 6rem;
-}  
+}
 [af-repeat-item] {
     position: relative;
 }
@@ -49,7 +49,7 @@ af-form {
     top: 0;
     right: 0;
 }
-  
+
 /* Card style */
 .af-container-style-pane {
     background-color: var(--crm-form-block-background);

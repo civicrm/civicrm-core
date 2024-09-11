@@ -31,7 +31,7 @@
 .crm-container .crm-accordion-bold > summary {
 	background-color: var(--crm-expand-header-bg);
 	color: var(--crm-expand-header-color);
-	border-radius: var(--crm-roundness);	
+	border-radius: var(--crm-roundness);
 	border: var(--crm-expand-header-border);
 	border-width: var(--crm-expand-header-border-width);
 	font-weight: var(--crm-expand-header-weight);
@@ -41,7 +41,7 @@
 	color: var(--crm-expand-header-color);
 }
 .crm-container .crm-accordion-bold[open] > summary { /* open version of that */
-	border-radius: var(--crm-roundness) var(--crm-roundness) 0 0; 
+	border-radius: var(--crm-roundness) var(--crm-roundness) 0 0;
 }
 .crm-container .crm-accordion-bold > summary.active,
 .crm-container .crm-accordion-bold > summary:hover,
@@ -109,7 +109,7 @@
 }
 #contact-summary summary {
 	padding: var(--crm-m) !important;
-} 
+}
 #contact-summary details .crm-accordion-body {
 	box-shadow: none;
 }

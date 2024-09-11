@@ -1,4 +1,4 @@
-/* The Bootstrap typically bundled has been re-structured in River Lea:	
+/* The Bootstrap typically bundled has been re-structured in River Lea:
 	- Some of it that wasn't being used (e.g. Glyphicons, Carousels) is deleted / commented out
 	- Some of it is taken out of the #bootstrap-theme namespace and added to /components/ typically marked, e.g. 'BS alerts'
 	- Some of it has been taken out and put below with as much integration with the rest of River Lea's CSS variables.
@@ -7,8 +7,8 @@
 
 @import url(_bootstrap3.css);
 
-/* 
-	  TYPE 
+/*
+	  TYPE
 	  		*/
 
 #bootstrap-theme .help-block {
@@ -33,7 +33,7 @@
 	font-size: 75%;
 }
 
-/* 
+/*
       ALERTS
             	*/
 
@@ -157,7 +157,7 @@
 	color:  var(--crm-c-alert);
 }
 
-/* 
+/*
     LABELS
             */
 
@@ -320,19 +320,19 @@
 #bootstrap-theme .panel > .table-bordered > thead > tr > th:last-child, #bootstrap-theme .panel > .table-bordered > thead > tr > td:last-child, #bootstrap-theme .panel > .table-bordered > tbody > tr > th:last-child, #bootstrap-theme .panel > .table-bordered > tbody > tr > td:last-child, #bootstrap-theme .panel > .table-bordered > tfoot > tr > th:last-child, #bootstrap-theme .panel > .table-bordered > tfoot > tr > td:last-child, #bootstrap-theme .panel > .table-responsive > .table-bordered > thead > tr > th:last-child, #bootstrap-theme .panel > .table-responsive > .table-bordered > thead > tr > td:last-child, #bootstrap-theme .panel > .table-responsive > .table-bordered > tbody > tr > th:last-child, #bootstrap-theme .panel > .table-responsive > .table-bordered > tbody > tr > td:last-child, #bootstrap-theme .panel > .table-responsive > .table-bordered > tfoot > tr > th:last-child, #bootstrap-theme .panel > .table-responsive > .table-bordered > tfoot > tr > td:last-child {
 	border-right: 0;
 }
-#bootstrap-theme .panel > .table-bordered > thead > tr:first-child > td, #bootstrap-theme .panel > .table-bordered > thead > tr:first-child > th, 
-#bootstrap-theme .panel > .table-bordered > tbody > tr:first-child > td, #bootstrap-theme .panel > .table-bordered > tbody > tr:first-child > th, 
-#bootstrap-theme .panel > .table-responsive > .table-bordered > thead > tr:first-child > td, 
-#bootstrap-theme .panel > .table-responsive > .table-bordered > thead > tr:first-child > th, 
-#bootstrap-theme .panel > .table-responsive > .table-bordered > tbody > tr:first-child > td, 
+#bootstrap-theme .panel > .table-bordered > thead > tr:first-child > td, #bootstrap-theme .panel > .table-bordered > thead > tr:first-child > th,
+#bootstrap-theme .panel > .table-bordered > tbody > tr:first-child > td, #bootstrap-theme .panel > .table-bordered > tbody > tr:first-child > th,
+#bootstrap-theme .panel > .table-responsive > .table-bordered > thead > tr:first-child > td,
+#bootstrap-theme .panel > .table-responsive > .table-bordered > thead > tr:first-child > th,
+#bootstrap-theme .panel > .table-responsive > .table-bordered > tbody > tr:first-child > td,
 #bootstrap-theme .panel > .table-responsive > .table-bordered > tbody > tr:first-child > th,
-#bootstrap-theme .panel > .table-bordered > tbody > tr:last-child > td, 
-#bootstrap-theme .panel > .table-bordered > tbody > tr:last-child > th, 
-#bootstrap-theme .panel > .table-bordered > tfoot > tr:last-child > td, 
-#bootstrap-theme .panel > .table-bordered > tfoot > tr:last-child > th, 
-#bootstrap-theme .panel > .table-responsive > .table-bordered > tbody > tr:last-child > td, 
-#bootstrap-theme .panel > .table-responsive > .table-bordered > tbody > tr:last-child > th, 
-#bootstrap-theme .panel > .table-responsive > .table-bordered > tfoot > tr:last-child > td, 
+#bootstrap-theme .panel > .table-bordered > tbody > tr:last-child > td,
+#bootstrap-theme .panel > .table-bordered > tbody > tr:last-child > th,
+#bootstrap-theme .panel > .table-bordered > tfoot > tr:last-child > td,
+#bootstrap-theme .panel > .table-bordered > tfoot > tr:last-child > th,
+#bootstrap-theme .panel > .table-responsive > .table-bordered > tbody > tr:last-child > td,
+#bootstrap-theme .panel > .table-responsive > .table-bordered > tbody > tr:last-child > th,
+#bootstrap-theme .panel > .table-responsive > .table-bordered > tfoot > tr:last-child > td,
 #bootstrap-theme .panel > .table-responsive > .table-bordered > tfoot > tr:last-child > th {
 	border-bottom: 0;
 }

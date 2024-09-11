@@ -18,14 +18,14 @@
     gap: var(--crm-tabs-gap);
     padding: var(--crm-tabs-padding);
     border-bottom: var(--crm-tabs-border);
-    margin: 0 !important;  
+    margin: 0 !important;
 }
 /* .crm-container .ui-tabs ul.ui-tabs-nav li.ui-state-active, */
-.crm-container .ui-state-default, 
-.crm-container .ui-widget-content .ui-state-default, 
-.crm-container .ui-widget-header .ui-state-default, 
+.crm-container .ui-state-default,
+.crm-container .ui-widget-content .ui-state-default,
+.crm-container .ui-widget-header .ui-state-default,
 .crm-container .ui-button,
-.crm-container .ui-button.ui-state-disabled:hover, 
+.crm-container .ui-button.ui-state-disabled:hover,
 .crm-container .ui-button.ui-state-disabled:active {
     background: var(--crm-tab-bg);
     border-radius: var(--crm-tab-roundness);
@@ -44,12 +44,12 @@
 .crm-container .ui-tabs ul.ui-tabs-nav li.ui-tabs-selected,
 .crm-container .ui-tabs .ui-tabs-nav li.ui-tabs-active {
     background: var(--crm-tab-bg-active);
-    border: var(--crm-tab-border-active); 
+    border: var(--crm-tab-border-active);
     border-bottom: 0 solid transparent;
     margin: var(--crm-tab-hang);
     padding: 0;
 }
-.crm-container .ui-helper-clearfix::before, 
+.crm-container .ui-helper-clearfix::before,
 .crm-container .ui-helper-clearfix::after {
     display: none;
 }
@@ -85,7 +85,7 @@
     background: var(--crm-dash-tab-count-bg);
     color: var(--crm-dash-tab-count-col);
 }
-.crm-container li.crm-count-0 a.ui-tabs-anchor, 
+.crm-container li.crm-count-0 a.ui-tabs-anchor,
 .crm-container li.crm-count-0 a.ui-tabs-anchor em {
     color: var(--crm-tab-col);
 }
@@ -96,11 +96,11 @@
 }
 .crm-container .ui-tabs ul li em:empty,
 .crm-container .nav-tabs .badge:empty { /* this is to keep the height of tabs with empty badges */
-    min-width: 1px !important; 
+    min-width: 1px !important;
     visibility: hidden;
     width: 0 !important;
     padding: 0
-} 
+}
 .crm-container .ui-tabs .ui-tabs-panel {
     background: var(--crm-tab-bg-active);
     padding: var(--crm-tab-padding);
@@ -126,7 +126,7 @@
 .crm-container .nav-tabs > li > a:hover,
 .crm-container .nav-tabs > li > a:focus,
 .crm-container .nav-tabs > li.active > a, /* using # to occlude BS */
-.crm-container .nav-tabs > li.active > a:hover, 
+.crm-container .nav-tabs > li.active > a:hover,
 .crm-container .nav-tabs > li.active > a:focus {
 	color: var(--crm-c-text);
 	background-color: var(--crm-tab-bg-hover) !important /* vs api4-explorer.css */;
@@ -200,7 +200,7 @@
 }
 .crm-contact-page #mainTabContainer .ui-tabs-nav.crm-contact-tabs-list li.ui-tabs-active {
     border: 0 solid transparent;
-} 
+}
 
 /* Responsive - using Bootstrap viewports */
 
@@ -220,7 +220,7 @@
         display: flex;
         flex-wrap: wrap;
     }
-    .crm-actions-ribbon .crm-next-action, 
+    .crm-actions-ribbon .crm-next-action,
     .crm-actions-ribbon .crm-previous-action {
         margin-left: 0;
     }

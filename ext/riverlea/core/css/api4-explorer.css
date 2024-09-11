@@ -74,7 +74,7 @@
 .api4-explorer-page .form-control.twenty {
     width: 20em;
 }
- 
+
 /* Code panel */
 .api4-explorer-row .explorer-code-panel .panel-heading {
 	align-items: end;
@@ -176,4 +176,3 @@
        flex-direction: column;
     }
  }
- 

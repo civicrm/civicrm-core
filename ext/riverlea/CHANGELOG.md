@@ -8,14 +8,14 @@
  - FIXES - multiple button padding & alignment fixes, all streams
  - FIXES - multiple button icon padding/alignment fixes, all streams
 
-0.9.48 
+0.9.48
  - CHANGED - Minetta input styles to be closer to Bootstrap (ref https://lab.civicrm.org/extensions/riverlea/-/issues/18)
  - ADDED - input size modifiers (e.g. for shorter inputs, such as 'prefix')
 
 0.9.47
  - ADDED - page padding for database upgrade screens. minor type fixes to upgrade complete screen
  - FIXES - missing bg on dashlet selector, table padding for dashlet filter table, grab cursor on dashlet header.
- - FIXES - notifcation alert type colour. 
+ - FIXES - notifcation alert type colour.
  - FIXES - removes text decoration from notification icon links
  - ADDED - icon spinner for select2 loading (https://lab.civicrm.org/extensions/riverlea/-/issues/35#note_169442)
 
@@ -23,7 +23,7 @@
  - ADDED - basics for dark-mode settings screen (menu link, navigation menu / setting.php, etc). Not yet functioning
  - REVERTS - button icon spacing fix from 0.9.43 as it caused new problems.
 
-0.9.45 
+0.9.45
  - FIXES - missing delete icon in SK admin table editor
  - CHANGED - multiple SK admin editor UI improvements
  - FIXES - crm-iconPicker.css isn't being loaded by theme, so overwrites added to _icon.css
@@ -63,10 +63,10 @@
  - ADDED Drupal 7 Garland support
 
 0.9.0 - 0.9.40
- - ADDED overwrites for civi core CSS, e.g. SearchKit & FormBuilder. (Works on 5.75+ only as it uses Angular css overwrites added in https://github.com/civicrm/civicrm-core/pull/30397 to replace the css for Search Kit, Form Builder and some other files, so that CSS variables can be applied to them, fewer '!important' tags used and file size is shurnk). 
+ - ADDED overwrites for civi core CSS, e.g. SearchKit & FormBuilder. (Works on 5.75+ only as it uses Angular css overwrites added in https://github.com/civicrm/civicrm-core/pull/30397 to replace the css for Search Kit, Form Builder and some other files, so that CSS variables can be applied to them, fewer '!important' tags used and file size is shurnk).
  - ADDED avatar support on contact dashboard
  - ADDED visible version-numbering to support development
- - FIXED many issues. Adds on-screen commit-version-numbering. 
+ - FIXED many issues. Adds on-screen commit-version-numbering.
  - NEW CSS VARIBLES: crm-c-code-background, crm-dash-image-size, crm-dash-image-radius, crm-dash-image-justify, crm-dash-image-direction, & metadata variables - crm-version, crm-release.
 
 0.8
@@ -77,7 +77,7 @@ Front-end layouts. Adds front-end support for each stream.  Adds CiviCRM logo fo
 
 Dark-mode. Improves dark-mode across all three streams. Improves Hackney Brook. More responsive tables. Many small fixes. Thanks SarahFG, Rich Lott & Guillaume Sorel. NEW VARIBLES
 
-0.6 
+0.6
 
 Adds third stream (Finsbury Park / Hackney Brook). Adds basic dark-mode support. Adds new stream: Hackney Brook, based on Finsbury Park (~90% port). Adds new CSS variables to all streams to support Finsbury Park's two main differences to Shoreditch and Greenwich: button icon styling (unique colours, background, border), and contact dashboard side tabs with active/hover border, similar to the 5.72 SearchKit UI, as well as some extra useful variables (e.g. dialog header border, notification border radius, etc). NEW VARIBLES
 

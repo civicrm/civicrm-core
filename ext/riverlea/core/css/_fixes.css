@@ -11,8 +11,8 @@
 
 .crm-container .widget-content .crm-accordion-wrapper.collapsed .crm-accordion-header,
 .crm-container .widget-content .crm-accordion-header,
-.crm-container .crm-accordion-inner .crm-accordion-header, 
-.crm-container .crm-accordion-wrapper .crm-master-accordion-header, 
+.crm-container .crm-accordion-inner .crm-accordion-header,
+.crm-container .crm-accordion-wrapper .crm-master-accordion-header,
 .crm-container .crm-collapsible .collapsible-title,
 .crm-container .collapsed .crm-accordion-header,
 .crm-container .crm-accordion-header{
@@ -31,7 +31,7 @@
 
 /* Expand/collapse icons */
 
-.crm-container .crm-accordion-header::before, 
+.crm-container .crm-accordion-header::before,
 details.af-collapsible > .af-title::before,
 .crm-dashlet-header .crm-dashlet-collapse.fa-caret-down::before,
 .crm-dashlet-header .crm-dashlet-collapse.fa-caret-right::before,
@@ -54,10 +54,10 @@ details.af-collapsible > .af-title::before,
 	cursor: var(--crm-hover-clickable);
 }
 .crm-container .collapsed .collapsible-title::before,
-.crm-container .collapsed .crm-accordion-header::before, 
+.crm-container .collapsed .crm-accordion-header::before,
 .crm-accordion-wrapper.collapsed .crm-master-accordion-header:before,
 .crm-dashlet-header .crm-dashlet-collapse.fa-caret-right::before,
-details.af-collapsible.af-collapsed > .af-title::before, 
+details.af-collapsible.af-collapsed > .af-title::before,
 .crm-container a.collapsed:not(.expanded)::before,
 .crm-container a.crm-expand-row::before,
 .crm-container .civicrm-community-messages .crm-collapsible.collapsed .collapsible-title::before {
@@ -65,7 +65,7 @@ details.af-collapsible.af-collapsed > .af-title::before,
 	transform-origin: center center;
 	transition: var(--crm-expand-transition);
 }
-.crm-container .crm-accordion-header::before, 
+.crm-container .crm-accordion-header::before,
 details.af-collapsible[open] > .af-title::before,
 .crm-dashlet-header .crm-dashlet-collapse.fa-caret-down::before,
 .crm-container .crm-master-accordion-header:before,
@@ -101,7 +101,7 @@ a.crm-expand-row:hover,a.crm-expand-row:focus {
 	background-color: var(--crm-expand-header-bg);
 	font-weight: var(--crm-expand-header-weight);
 	color: var(--crm-expand-header-color);
-} 
+}
 .crm-container .crm-accordion-wrapper.collapsed .crm-accordion-header,
 /* .af-collapsible.af-collapsed > .af-title, */
 .crm-container .crm-collapsible.collapsed .collapsible-title {
@@ -161,16 +161,16 @@ a.crm-expand-row:hover,a.crm-expand-row:focus {
     ALERTS
 *******************/
 
-.crm-container del, 
-.crm-container .ui-icons_deleted, 
-.crm-container table.caseSelector td.status-urgent, 
-.crm-container .font-red, 
-.crm-container .status-removed, 
-.crm-container .status-overdue, 
-.crm-container .status-fatal, 
-.crm-container .status-hold, 
-.crm-container .status-past, 
-.crm-contact-deceased, 
+.crm-container del,
+.crm-container .ui-icons_deleted,
+.crm-container table.caseSelector td.status-urgent,
+.crm-container .font-red,
+.crm-container .status-removed,
+.crm-container .status-overdue,
+.crm-container .status-fatal,
+.crm-container .status-hold,
+.crm-container .status-past,
+.crm-contact-deceased,
 .crm-container .status-warning {
 	color: var(--crm-c-alert);
 }
@@ -267,23 +267,23 @@ a.crm-expand-row:hover,a.crm-expand-row:focus {
 .crm-container .btn-xs,
 .crm-container button.dropdown-toggle.btn-xs,
 .crm-container .crm-accordion-header a.crm-hover-button,
-.crm-container .crm-form-date-wrapper a.crm-hover-button, 
-.crm-container .btn-group-xs > .btn, 
-body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLink.btn-group-xs > .form-link, 
-.crm-container .crm-search-form-block.btn-group-xs > a, 
-.crm-container .crm-search-form-block.btn-group-xs > span, 
-.page-civicrm-admin.page-civicrm-a .crmCaseType .btn-group-xs > .crm-button, 
-.page-civicrm-a.page-civicrm-a .crmCaseType .btn-group-xs > .crm-button, 
-.crm-container #crm-submit-buttons .btn-group-xs > button.crm-form-submit, 
-.crm-container .btn-group-xs > button.crm-button.crm-form-submit, 
-.crm-container .btn-group-xs > .crm-hover-button, 
-.crm-container .ui-dialog-buttonset .btn-group-xs > .ui-button, .crm-container .btn-group-xs > a.button, 
+.crm-container .crm-form-date-wrapper a.crm-hover-button,
+.crm-container .btn-group-xs > .btn,
+body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLink.btn-group-xs > .form-link,
+.crm-container .crm-search-form-block.btn-group-xs > a,
+.crm-container .crm-search-form-block.btn-group-xs > span,
+.page-civicrm-admin.page-civicrm-a .crmCaseType .btn-group-xs > .crm-button,
+.page-civicrm-a.page-civicrm-a .crmCaseType .btn-group-xs > .crm-button,
+.crm-container #crm-submit-buttons .btn-group-xs > button.crm-form-submit,
+.crm-container .btn-group-xs > button.crm-button.crm-form-submit,
+.crm-container .btn-group-xs > .crm-hover-button,
+.crm-container .ui-dialog-buttonset .btn-group-xs > .ui-button, .crm-container .btn-group-xs > a.button,
 .crm-container .btn-group-xs > input[type="button"] {
     padding: var(--crm-xs) var(--crm-s);
     font-size: var(--crm-small-font-size);
     border-radius: var(--crm-roundness);
 	height: auto;
-} 
+}
 .crm-container .btn-group-xs button {
     padding: var(--crm-xs) var(--crm-s);
     font-size: var(--crm-small-font-size);
@@ -419,7 +419,7 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
 @media (max-width: 768px) {
     .crm-container .tag-tree-wrapper {
         display: block;
-    }  
+    }
 }
 /* Dedupe change usage */
 .crm-container label:has(.dedupe-rules-dialog-desc) input {
@@ -545,7 +545,7 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
 }
 #api-generated tr td:first-of-type {
 	width: var(--crm-input-label-width);
-} 
+}
 /* Display Preferences */
 
 tr.crm-preferences-display-form-block-contact_edit_options td:has(table) {
@@ -623,7 +623,7 @@ tr.crm-preferences-display-form-block-contact_edit_options td table {
 .crm-container > #crm-main-content-wrapper > fieldset > * {
 	margin: 0;
 }
-					
+
 /******************
 	PADDING FIXES
 *******************/
@@ -828,7 +828,7 @@ details + .crm-content-block:has(.dataTables_wrapper) {
 	background: var(--crm-c-primary-hover);
 	border-radius: var(--crm-btn-radius);
 }
-.crm-mosaico-wizard .crm_wizard__title .nav-pills li.active a { 
+.crm-mosaico-wizard .crm_wizard__title .nav-pills li.active a {
 	color: var(--crm-c-primary-text);
 	padding: 0;
 }

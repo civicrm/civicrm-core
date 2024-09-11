@@ -3,7 +3,7 @@
 .crm-container div.crm-field-wrapper {
     margin-bottom: var(--crm-r);
 }
-.crm-container table.form-layout td, 
+.crm-container table.form-layout td,
 .crm-container table.form-layout-compressed td,
 .crm-form-block .crm-section {
     padding: var(--crm-m) var(--crm-s);
@@ -21,9 +21,9 @@
 }
 
 /* Labels */
-.crm-container .form-layout td.label, 
-.crm-container .form-layout-compressed td.label, 
-.crm-container .selector td.label, 
+.crm-container .form-layout td.label,
+.crm-container .form-layout-compressed td.label,
+.crm-container .selector td.label,
 .crm-container .form-layout-compressed th.label {
     width: var(--crm-input-label-width);
     text-align: var(--crm-input-label-align);
@@ -45,16 +45,16 @@
 .crm-container .crm-summary-group .crm-section .label {
     width: 40%;
 }
-.crm-container .radio-inline label, 
+.crm-container .radio-inline label,
 .crm-container .checkbox-inline label {
     font-family: inherit;
     font-weight: inherit;
 }
 .crm-container .form-layout label,
-.crm-container .form-layout-compressed label, 
-.crm-container .form-item label, 
-.crm-container .crm-accordion-body label, 
-.crm-container .crm-form-block label, 
+.crm-container .form-layout-compressed label,
+.crm-container .form-item label,
+.crm-container .crm-accordion-body label,
+.crm-container .crm-form-block label,
 .crm-container #task-section label {
     color: var(--crm-c-text);
     font-family: var(--crm-input-label-font);
@@ -115,15 +115,15 @@
 /* Input */
 
 .crm-container input.form-control,
-input.crm-form-text, 
-.crm-icon-picker-button, 
-.crm-container input.dateplugin, 
+input.crm-form-text,
+.crm-icon-picker-button,
+.crm-container input.dateplugin,
 input.crm-form-password,
 .crm-container .replace-plain,
 .crm-container input,
-.crm-container textarea, 
+.crm-container textarea,
 select.crm-form-multiselect,
-select.crm-form-select, 
+select.crm-form-select,
 .crm-container .ui-widget input,
 .crm-container select[aria-controls],
 .ui-datepicker .ui-datepicker-header select {
@@ -140,8 +140,8 @@ select.crm-form-select,
     width: var(--crm-big-input);
     font-family: inherit; /* for extra JQuery UI protection */
 }
-.crm-container .replace-plain, 
-.crm-container textarea, 
+.crm-container .replace-plain,
+.crm-container textarea,
 select.crm-form-multiselect {
     padding: var(--crm-input-padding-large);
     height: auto;
@@ -157,14 +157,14 @@ select.crm-form-multiselect {
     min-width: var(--crm-huge-input);
 }
 .crm-container input.form-control:focus,
-input.crm-form-text:focus, 
-.crm-icon-picker-button:focus, 
-.crm-container input.dateplugin:focus, 
+input.crm-form-text:focus,
+.crm-icon-picker-button:focus,
+.crm-container input.dateplugin:focus,
 input.crm-form-password:focus,
 .crm-container .replace-plain:focus,
 .crm-container textarea:focus,
 select.crm-form-multiselect:focus,
-select.crm-form-select:focus, 
+select.crm-form-select:focus,
 .crm-container select[aria-controls]:focus,
 .crm-container .select2-container-active *:focus {
     border-color: var(--crm-c-focus);
@@ -176,7 +176,7 @@ input.crm-error,
 select.crm-error {
     border-color: var(--crm-c-alert);
 }
-.crm-container :focus, 
+.crm-container :focus,
 .crm-container .ui-dialog :focus {
     box-shadow: none;
     border: 1px solid var(--crm-c-focus);
@@ -220,8 +220,8 @@ select.crm-error {
 .crm-container .big {
     width: var(--crm-big-input);
 }
-.crm-container .huge, 
-input.crm-form-autocomplete, 
+.crm-container .huge,
+input.crm-form-autocomplete,
 input.crm-form-entityref {
     width: var(--crm-huge-input);
 }
@@ -259,15 +259,15 @@ input.crm-form-entityref {
 
 /* Checkboxes & radios */
 
-input.crm-form-radio + label, 
+input.crm-form-radio + label,
 input.crm-form-checkbox + label,
-.crm-container input[type="checkbox"] + label[for], 
+.crm-container input[type="checkbox"] + label[for],
 .crm-container input[type="radio"] + label[for] {
     margin: 0 var(--crm-m) 0 var(--crm-s);
     cursor: var(--crm-hover-clickable);
     width: unset;
 }
-.crm-container input[type="checkbox"], 
+.crm-container input[type="checkbox"],
 .crm-container input[type="radio"] {
     accent-color: var(--crm-input-radio-color);
     margin: -2px 4px 0 0;
@@ -319,7 +319,7 @@ input.crm-form-checkbox) + label {
 .crm-container .select2-container-multi .select2-choices,
 .crm-container .select2-container .select2-choice {
     background: var(--crm-input-background);
-    border: 1px solid var(--crm-input-border-color);   
+    border: 1px solid var(--crm-input-border-color);
     border-radius: var(--crm-input-border-radius);
     box-shadow: var(--crm-input-box-shadow);
     height: var(--crm-input-height) !important /* vs select2.min.css */;
@@ -331,7 +331,7 @@ input.crm-form-checkbox) + label {
 }
 .crm-container .select2-container .select2-choice .select2-arrow {
     background: var(--crm-input-background);
-    border-left-color: var(--crm-input-border-color);  
+    border-left-color: var(--crm-input-border-color);
     border-radius: 0 var(--crm-input-border-radius) var(--crm-input-border-radius) 0;
     width: var(--crm-r3);
     display: flex;
@@ -360,7 +360,7 @@ input.crm-form-checkbox) + label {
     margin-left: auto;
     order: 1;
 }
-.crm-container .select2-dropdown-open .select2-choice, 
+.crm-container .select2-dropdown-open .select2-choice,
 .crm-container .select2-dropdown-open .select2-choices {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
@@ -489,7 +489,7 @@ input.crm-form-checkbox) + label {
     padding: var(--crm-s);
     margin: 0;
 }
-.select2-results .select2-ajax-error, 
+.select2-results .select2-ajax-error,
 .select2-results .select2-no-results,
 .select2-results .select2-searching,
 .select2-results .select2-selection-limit {
@@ -549,7 +549,7 @@ input.crm-form-checkbox) + label {
     width: 9ch;
     margin-left: 1em;
 }
-.crm-container input.dateplugin, 
+.crm-container input.dateplugin,
 .crm-container input.crm-form-date {
     width: 14ch;
 }
@@ -568,7 +568,7 @@ input.crm-form-checkbox) + label {
     min-width: 30ch;
     padding: var(--crm-m1);
     width: auto;
-    z-index: 100001 !important; /* vs menubar for datepickers in modals */ 
+    z-index: 100001 !important; /* vs menubar for datepickers in modals */
 }
 .ui-datepicker .ui-datepicker-header {
     border: 0;
@@ -578,7 +578,7 @@ input.crm-form-checkbox) + label {
     background: none !important;
     border: 0 solid transparent !important;
 }
-.ui-datepicker .ui-datepicker-header .ui-datepicker-prev, 
+.ui-datepicker .ui-datepicker-header .ui-datepicker-prev,
 .ui-datepicker .ui-datepicker-header .ui-datepicker-next {
     border-radius: var(--crm-roundness);
     box-shadow: none !important;
@@ -592,7 +592,7 @@ input.crm-form-checkbox) + label {
     background: var(--crm-c-gray-100) !important;
     border: 0 solid transparent;
   }
-.ui-datepicker .ui-datepicker-header .ui-datepicker-prev::before, 
+.ui-datepicker .ui-datepicker-header .ui-datepicker-prev::before,
 .ui-datepicker .ui-datepicker-header .ui-datepicker-next::before {
     font-family: "FontAwesome";
     color: var(--crm-c-text);
@@ -623,7 +623,7 @@ input.crm-form-checkbox) + label {
 .ui-datepicker-calendar tr {
     border-bottom: none;
 }
-.ui-datepicker-calendar [data-handler], 
+.ui-datepicker-calendar [data-handler],
 .ui-datepicker-calendar .ui-state-disabled {
     background-color: var(--crm-gray-50) !important;
     border: 0;
@@ -634,12 +634,12 @@ input.crm-form-checkbox) + label {
 .ui-datepicker-calendar .ui-state-disabled {
     opacity: 0.35;
 }
-.ui-datepicker-calendar [data-handler] .ui-state-active, 
+.ui-datepicker-calendar [data-handler] .ui-state-active,
 .ui-datepicker-calendar .ui-state-disabled .ui-state-active {
-    background-color: var(--crm-c-primary) !important; 
+    background-color: var(--crm-c-primary) !important;
     color: var(--crm-c-primary-text) !important;
 }
-.ui-datepicker-calendar [data-handler] a, 
+.ui-datepicker-calendar [data-handler] a,
 .ui-datepicker-calendar .ui-state-disabled a {
     border: 0;
     border-radius: 20px;
@@ -656,13 +656,13 @@ input.crm-form-checkbox) + label {
 	margin-top: 10px;
 	margin-bottom: 10px;
 }
-#bootstrap-theme .radio.disabled label, 
-#bootstrap-theme fieldset[disabled].radio label, 
-#bootstrap-theme .checkbox.disabled label, 
+#bootstrap-theme .radio.disabled label,
+#bootstrap-theme fieldset[disabled].radio label,
+#bootstrap-theme .checkbox.disabled label,
 #bootstrap-theme fieldset[disabled] .checkbox label {
 	cursor: not-allowed;
 }
-#bootstrap-theme .radio label, 
+#bootstrap-theme .radio label,
 #bootstrap-theme .checkbox label {
 	min-height: 20px;
 	padding-left: 20px;
@@ -673,7 +673,7 @@ input.crm-form-checkbox) + label {
 #bootstrap-theme .radio + .radio, #bootstrap-theme .checkbox + .checkbox {
 	margin-top: -5px;
 }
-#bootstrap-theme .radio-inline, 
+#bootstrap-theme .radio-inline,
 #bootstrap-theme .checkbox-inline {
 	position: relative;
 	display: inline-block;
@@ -682,13 +682,13 @@ input.crm-form-checkbox) + label {
 	vertical-align: middle;
 	cursor: var(--crm-hover-clickable);
 }
-#bootstrap-theme .radio-inline.disabled, 
-fieldset[disabled] #bootstrap-theme .radio-inline, 
-#bootstrap-theme .checkbox-inline.disabled, 
+#bootstrap-theme .radio-inline.disabled,
+fieldset[disabled] #bootstrap-theme .radio-inline,
+#bootstrap-theme .checkbox-inline.disabled,
 fieldset[disabled] #bootstrap-theme .checkbox-inline {
 	cursor: not-allowed;
 }
-#bootstrap-theme .radio-inline + .radio-inline, 
+#bootstrap-theme .radio-inline + .radio-inline,
 #bootstrap-theme .checkbox-inline + .checkbox-inline {
 	margin-top: 0;
 	margin-left: var(--crm-m);

@@ -1,12 +1,12 @@
 /*
     Name: Walbrook;
     Riverlea version: 0.9.44;
-    Front, back or both: back; 
+    Front, back or both: back;
     Description: Based on Shoreditch theme. Named after after River Walbrook, which runs under Shoreditch, London;
 */
 
-@import url('_fonts.css'); 
-:root {    
+@import url('_fonts.css');
+:root {
 
 --crm-version: 'Walbrook, v' var(--crm-release);
 
@@ -70,7 +70,7 @@ color-scheme: light dark;
 --crm-c-background5: var(--crm-c-gray-700);
 --crm-c-drag-background: var(--crm-c-background4); /* background for drag/drop regions, select2 highlight */
 --crm-c-code-background: var(--crm-c-background3); /* background for code regions */
---crm-c-primary: var(--crm-c-blue); 
+--crm-c-primary: var(--crm-c-blue);
 --crm-c-primary-hover: var(--crm-c-blue-dark);
 --crm-c-primary-text: var(--crm-c-light-text); /* text colour when on top of primary */
 --crm-c-secondary: var(--crm-c-purple);
@@ -198,7 +198,7 @@ color-scheme: light dark;
 --crm-expand-icon-color: ;
 --crm-expand-icon-spacing: var(--crm-m3);
 --crm-expand-transform: rotate(90deg);
---crm-expand-transition: transform .3s; 
+--crm-expand-transition: transform .3s;
 --crm-expand-header-bg: var(--crm-c-background2);
 --crm-expand-header-bg-active: var(--crm-c-background3);
 --crm-expand-header-color: var(--crm-c-text);
@@ -292,8 +292,8 @@ color-scheme: light dark;
 --crm-dash-border: 0 solid transparent;
 --crm-dash-roundness: 0;
 --crm-dash-direction: grid; /* choose 'flex' for tabs at top, or 'grid' for tabs at side */
---crm-side-tabs-width: 220px; 
---crm-dash-tabs-flow: column; /* choose 'row' for tabs at top, or 'column' for tabs at side */ 
+--crm-side-tabs-width: 220px;
+--crm-dash-tabs-flow: column; /* choose 'row' for tabs at top, or 'column' for tabs at side */
 --crm-dash-tabs-gap: 0;
 --crm-dash-tabs-bg: var(--crm-c-background);
 --crm-dash-tabs-padding: ;
@@ -396,7 +396,7 @@ color-scheme: light dark;
 --crm-wizard-margin: calc(-1 * var(--crm-form-block-padding)) calc(-1 * var(--crm-form-block-padding)) 0;
 --crm-wizard-height: 62px;
 --crm-wizard-radius: 0;
---crm-wizard-angle: 20px; 
+--crm-wizard-angle: 20px;
 --crm-wizard-active-col: var(--crm-c-link);
 --crm-wizard-active-bg: var(--crm-c-page-background);
 --crm-wizard-border: 1px solid var(--crm-c-page-background);
@@ -436,9 +436,9 @@ color-scheme: light dark;
     --crm-c-link-hover: var(--crm-c-amber-light);
     --crm-c-text-light: var(--crm-c-darkest);
     --crm-c-background: var(--crm-c-gray-900);
-    --crm-c-page-background: var(--crm-c-darkest); 
+    --crm-c-page-background: var(--crm-c-darkest);
     --crm-c-code-background: var(--crm-c-background2);
-    --crm-c-background2: var(--crm-c-gray-900); 
+    --crm-c-background2: var(--crm-c-gray-900);
     --crm-c-background3: var(--crm-c-gray-800);
     --crm-c-background4: var(--crm-c-gray-700);
     --crm-c-success: #58a458;

@@ -8,11 +8,11 @@
     box-sizing: border-box;
 }
 .crm-container .hiddenElement {
-    display: none 
+    display: none
 }
 .crm-container .collapse {
 	display: none !important /* needs to hide items further down the cascade */;
-} 
+}
 .crm-container .clear {
 	clear: both;
 }
@@ -35,9 +35,9 @@
     font: inherit;
     font-size: inherit;
 }
-.crm-container tr:hover, 
+.crm-container tr:hover,
 .crm-container tr:focus,
-.crm-container table.dataTable.hover tbody tr:hover, 
+.crm-container table.dataTable.hover tbody tr:hover,
 .crm-container table.dataTable.display tbody tr:hover {
 	background-color: transparent;
 }
@@ -63,9 +63,9 @@
     padding: 0;
 }
 .crm-container .ui-widget,
-.crm-container .ui-widget input, 
-.crm-container .ui-widget select, 
-.crm-container .ui-widget textarea, 
+.crm-container .ui-widget input,
+.crm-container .ui-widget select,
+.crm-container .ui-widget textarea,
 .crm-container .ui-widget button,
 .ui-widget.ui-autocomplete {
     font-family: inherit !important;
@@ -111,7 +111,7 @@
 	overflow: hidden;
 	padding: 0;
 	position: absolute;
-}	
+}
 .crm-container .crm-draggable {
     cursor: move;
 }
@@ -129,7 +129,7 @@
     background: var(--crm-c-page-background);
 }
 .crm-container table,
-.crm-container tr, 
+.crm-container tr,
 .crm-container tr td,
 .crm-container p,
 .crm-container ul {
@@ -141,18 +141,18 @@
 /* Core type */
 
 .crm-container strong,
-.crm-container b, 
+.crm-container b,
 .crm-container .bold,
 .crm-container .font-bold {
     font-family: var(--crm-font-bold);
     font-weight: var(--crm-bold-weight);
 }
-.crm-container em, 
+.crm-container em,
 .crm-container .font-italic {
     font-family: var(--crm-font-italic);
     font-style: var(--crm-italic-style);
 }
-.crm-container strong em, 
+.crm-container strong em,
 .crm-container em strong {
     font-family: var(--crm-font-bold-italic);
     font-weight: var(--crm-bold-weight);
@@ -178,28 +178,28 @@
 
 /* Practical colors */
 
-.crm-container .del, 
-.crm-container .crm-is_deleted, 
-.crm-container table.caseSelector td.status-urgent, 
+.crm-container .del,
+.crm-container .crm-is_deleted,
+.crm-container table.caseSelector td.status-urgent,
 .crm-container p.error,
-.crm-container .status-removed, 
-.crm-container .status-overdue, 
-.crm-container .status-fatal, 
-.crm-container .status-hold, 
-.crm-container .status-past, 
-.crm-contact-deceased, 
+.crm-container .status-removed,
+.crm-container .status-overdue,
+.crm-container .status-fatal,
+.crm-container .status-hold,
+.crm-container .status-past,
+.crm-contact-deceased,
 .crm-container .status-warning,
 .crm-container .crm-error,
 .crm-container td.tasklist a:link,
-#bootstrap-theme .has-error .help-block, 
-#bootstrap-theme .has-error .control-label, 
-#bootstrap-theme .has-error .radio, 
-#bootstrap-theme .has-error .checkbox, 
-#bootstrap-theme .has-error .radio-inline, 
-#bootstrap-theme .has-error .checkbox-inline, 
-#bootstrap-theme .has-error.radio label, 
-#bootstrap-theme .has-error.checkbox label, 
-#bootstrap-theme .has-error.radio-inline label, 
+#bootstrap-theme .has-error .help-block,
+#bootstrap-theme .has-error .control-label,
+#bootstrap-theme .has-error .radio,
+#bootstrap-theme .has-error .checkbox,
+#bootstrap-theme .has-error .radio-inline,
+#bootstrap-theme .has-error .checkbox-inline,
+#bootstrap-theme .has-error.radio label,
+#bootstrap-theme .has-error.checkbox label,
+#bootstrap-theme .has-error.radio-inline label,
 #bootstrap-theme .has-error.checkbox-inline label {
     color: var(--crm-c-alert);
 }
@@ -207,35 +207,35 @@
     color: var(--crm-c-red-dark);
 }
 .crm-container td.tasklist a:visited,
-#bootstrap-theme .has-success .help-block, 
-#bootstrap-theme .has-success .control-label, 
-#bootstrap-theme .has-success .radio, 
-#bootstrap-theme .has-success .checkbox, 
-#bootstrap-theme .has-success .radio-inline, 
-#bootstrap-theme .has-success .checkbox-inline, 
-#bootstrap-theme .has-success.radio label, 
-#bootstrap-theme .has-success.checkbox label, 
-#bootstrap-theme .has-success.radio-inline label, 
+#bootstrap-theme .has-success .help-block,
+#bootstrap-theme .has-success .control-label,
+#bootstrap-theme .has-success .radio,
+#bootstrap-theme .has-success .checkbox,
+#bootstrap-theme .has-success .radio-inline,
+#bootstrap-theme .has-success .checkbox-inline,
+#bootstrap-theme .has-success.radio label,
+#bootstrap-theme .has-success.checkbox label,
+#bootstrap-theme .has-success.radio-inline label,
 #bootstrap-theme .has-success.checkbox-inline label {
     color: var(--crm-c-success);
 }
-#bootstrap-theme .has-warning .help-block, 
-#bootstrap-theme .has-warning .control-label, 
-#bootstrap-theme .has-warning .radio, 
-#bootstrap-theme .has-warning .checkbox, 
-#bootstrap-theme .has-warning .radio-inline, 
-#bootstrap-theme .has-warning .checkbox-inline, 
-#bootstrap-theme .has-warning.radio label, 
-#bootstrap-theme .has-warning.checkbox label, 
-#bootstrap-theme .has-warning.radio-inline label, 
+#bootstrap-theme .has-warning .help-block,
+#bootstrap-theme .has-warning .control-label,
+#bootstrap-theme .has-warning .radio,
+#bootstrap-theme .has-warning .checkbox,
+#bootstrap-theme .has-warning .radio-inline,
+#bootstrap-theme .has-warning .checkbox-inline,
+#bootstrap-theme .has-warning.radio label,
+#bootstrap-theme .has-warning.checkbox label,
+#bootstrap-theme .has-warning.radio-inline label,
 #bootstrap-theme .has-warning.checkbox-inline label {
 	color: var(--crm-c-warning);
 }
-.crm-container .disabled, 
-.crm-container .crm-disabled, 
-.crm-container .disabled *, 
-.crm-container .cancelled, 
-.crm-container .cancelled td, 
+.crm-container .disabled,
+.crm-container .crm-disabled,
+.crm-container .disabled *,
+.crm-container .cancelled,
+.crm-container .cancelled td,
 .crm-container li.disabled a.ui-tabs-anchor {
     color: var(--crm-c-inactive);
 }
@@ -261,7 +261,7 @@
 .crm-container .text-lowercase {
 	text-transform: lowercase;
 }
-.crm-container .text-uppercase, 
+.crm-container .text-uppercase,
 .crm-container .initialism {
 	text-transform: uppercase;
 }
@@ -297,8 +297,8 @@
 .crm-container h6 {
     color: var(--crm-c-text);
 }
-.crm-container code, 
-.crm-container kbd, 
+.crm-container code,
+.crm-container kbd,
 .crm-container samp,
 .crm-container pre {
 	display: block;
@@ -320,21 +320,21 @@
 	white-space: pre-wrap;
 	background-color: transparent;
 	border-radius: 0;
-} 
+}
 .crm-container .pre-scrollable {
 	max-height: 340px;
 	overflow-y: scroll;
 }
 
 /******************
-   LINK 
+   LINK
 *******************/
 
 .crm-container a {
 	color: var(--crm-c-link);
 	text-decoration: var(--crm-link-decoration);
 }
-.crm-container a:hover, 
+.crm-container a:hover,
 .crm-container a:focus {
 	color: var(--crm-c-link-hover);
 	text-decoration: var(--crm-link-decoration-hover);
@@ -342,13 +342,13 @@
 .crm-container a:focus {
 	outline: 5px auto -webkit-focus-ring-color;
 	outline-offset: -2px;
-} 
+}
 
 /******************
    POSITION
 *******************/
 
-#crm-container /* applied to #crm not .crm to apply only once */ { 
+#crm-container /* applied to #crm not .crm to apply only once */ {
 	max-width: 100%;
 	padding: var(--crm-page-padding);
 }
@@ -392,4 +392,3 @@
        flex-direction: column;
     }
  }
- 

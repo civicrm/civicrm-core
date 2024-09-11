@@ -113,12 +113,12 @@
     overflow-x: hidden; Turning off for dropdown menu clipping */
     border-top: none !important;
     height: 100%;
-} 
+}
 
 /* Edit palette (left side) */
 
-#afGuiEditor-palette input, 
-#afGuiEditor-palette textarea, 
+#afGuiEditor-palette input,
+#afGuiEditor-palette textarea,
 #afGuiEditor-palette select {
 	width: 100%;
 }
@@ -261,7 +261,7 @@
     display: flex;
     gap: var(--crm-flex-gap);
     align-items: center;
-} 
+}
 #afGuiEditor-canvas af-gui-container-multi-toggle .btn .ng-binding {
     display: flex;
     margin-right: var(--crm-m);
@@ -274,7 +274,7 @@
 #afGuiEditor-canvas:not(.af-gui-menu-open) .af-gui-bar,
 #afGuiEditor-canvas:not(.af-gui-menu-open) .af-gui-container-title span:empty {
     opacity: 0;
-} 
+}
 #afGuiEditor:not(.af-gui-dragging *) #afGuiEditor-canvas:hover .af-gui-bar,
 #afGuiEditor:not(.af-gui-dragging *) #afGuiEditor-canvas:hover .af-gui-container-title span:empty {
     opacity: 1;
@@ -629,8 +629,8 @@ i.crm-i.af-gui-conditional-dialog-move-icon {
     align-items: center;
     gap: var(--crm-s);
 }
-#afGuiEditor .af-gui-field-input-type-chainselect .input-group .dropdown-toggle, 
-#afGuiEditor .af-gui-field-input-type-select .input-group .dropdown-toggle, 
+#afGuiEditor .af-gui-field-input-type-chainselect .input-group .dropdown-toggle,
+#afGuiEditor .af-gui-field-input-type-select .input-group .dropdown-toggle,
 #afGuiEditor-palette-config .af-gui-entity-palette .input-group .btn,
 #afGuiEditor-canvas-body .af-gui-field-input .input-group .btn {
 	padding: var(--crm-s) var(--crm-m1);
