@@ -198,6 +198,9 @@ body.wp-admin.wp-core-ui .crm-container select {
     appearance: auto; /* Resets WP's own select UI */
     margin: 0;
 }
+body.wp-admin.wp-core-ui select:hover {
+    color: var(--crm-input-color);
+}
 
 /******************
    STANDALONE

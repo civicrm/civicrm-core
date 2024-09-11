@@ -290,6 +290,13 @@
 .crm-container .text-danger {
 	color: var(--crm-c-alert);
 }
+.crm-container h1,
+.crm-container h2,
+.crm-container h4,
+.crm-container h5,
+.crm-container h6 {
+    color: var(--crm-c-text);
+}
 .crm-container code, 
 .crm-container kbd, 
 .crm-container samp,

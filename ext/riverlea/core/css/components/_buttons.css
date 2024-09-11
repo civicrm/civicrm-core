@@ -534,7 +534,7 @@
 }
 .crm-container .btn-group-xs button .caret,
 .crm-container .btn-group button.btn-xs .caret {
-    margin: 0 4px 0 -4px;
+    margin: 0 8px 0 0;
 }
 
 /* Small buttons with icons */
@@ -548,7 +548,7 @@
     height: auto;
     padding: var(--crm-s2) var(--crm-btn-icon-spacing) var(--crm-s2) var(--crm-m1);
 }
-.crm-container .btn-xs:has(i.crm-i),
+/*.crm-container .btn-group .btn-xs:has(i.crm-i), */
 .crm-container .btn-group-xs > .btn:has(i.crm-i),
 .crm-container .btn-group-xs > .btn + .dropdown-toggle:has(i.crm-i),
 .crm-container button.dropdown-toggle.btn-xs:has(i.crm-i) {
@@ -562,4 +562,5 @@
     width: auto;
     height: auto;
     padding: var(--crm-btn-small-padding);
+    min-width: 1rem;
 }

@@ -1,3 +1,8 @@
+0.9.50
+ - FIXES - more icon button padding issues
+ - ADDED - text colour to headings so H1, H2, etc display correctly in darkmode
+ - FIXES - WordPress override 
+
 0.9.49
  - CHANGED - Button icon colour scope broaden - for any stream that sets them, e.g. Hackney Brook (https://lab.civicrm.org/extensions/riverlea/-/issues/37)
  - FIXES - multiple button padding & alignment fixes, all streams
