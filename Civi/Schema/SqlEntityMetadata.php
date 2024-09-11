@@ -24,6 +24,14 @@ class SqlEntityMetadata extends EntityMetadataBase {
         }
         return $keys;
 
+      case 'primary_key':
+        foreach ($this->getFields() as $name => $field) {
+          if (!empty($field['primary_key'])) {
+            return $name;
+          }
+        }
+        return NULL;
+
       case 'paths':
         if (isset($this->getEntity()['getPaths'])) {
           return $this->getEntity()['getPaths']();

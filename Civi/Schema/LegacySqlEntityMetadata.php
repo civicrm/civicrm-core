@@ -44,6 +44,9 @@ class LegacySqlEntityMetadata extends EntityMetadataBase {
       case 'primary_keys':
         return $this->getClassName()::$_primaryKey ?? ['id'];
 
+      case 'primary_key':
+        return $this->getClassName()::$_primaryKey[0] ?? 'id';
+
       case 'description':
         return $this->getClassName()::getEntityDescription();
 
