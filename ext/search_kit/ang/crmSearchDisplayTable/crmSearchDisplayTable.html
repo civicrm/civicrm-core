@@ -21,7 +21,7 @@
     <tbody ng-if="$ctrl.loading" ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTableLoading.html'"></tbody>
     <tbody ng-if="!$ctrl.loading && !$ctrl.settings.draggable" ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTableBody.html'"></tbody>
     <tbody ng-if="!$ctrl.loading && $ctrl.settings.draggable" ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTableBody.html'" ui-sortable="$ctrl.draggableOptions" ng-model="$ctrl.results"></tbody>
-    <tfoot ng-if="!$ctrl.loading && $ctrl.settings.tally" ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTally.html'"></tfoot>
+    <tfoot ng-if="!$ctrl.loading && $ctrl.results.length && $ctrl.settings.tally" ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTally.html'"></tfoot>
   </table>
   <div ng-include="'~/crmSearchDisplay/Pager.html'"></div>
 </div>
