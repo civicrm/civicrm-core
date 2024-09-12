@@ -19,7 +19,7 @@
 {/if}
 <div class="spacer"></div>
 {if $priceSetId}
-  {include file="CRM/Price/Form/PriceSet.tpl" context="standalone" extends="Membership"  hideTotal=false}
+  {include file="CRM/Price/Form/PriceSet.tpl" isShowAdminVisibilityFields=true extends="Membership"  hideTotal=false}
   {literal}
   <script type="text/javascript">
   CRM.$(function($) {
@@ -89,7 +89,7 @@
               <span id='totalAmountORPriceSet'> {ts}OR{/ts}</span>
               <span id='selectPriceSet'>{$form.price_set_id.html}</span>
               {if $buildPriceSet && $priceSet}
-                <div id="priceset"><br/>{include file="CRM/Price/Form/PriceSet.tpl" extends="Membership" hideTotal=false}</div>
+                <div id="priceset"><br/>{include file="CRM/Price/Form/PriceSet.tpl" extends="Membership" hideTotal=false isShowAdminVisibilityFields=true}</div>
                 {else}
                 <div id="priceset" class="hiddenElement"></div>
               {/if}
