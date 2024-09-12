@@ -7,9 +7,7 @@
 .crm-container *::after {
     box-sizing: border-box;
 }
-.crm-container .hiddenElement {
-    display: none;
-}
+.crm-container .hiddenElement,
 .crm-container .collapse {
 	display: none !important /* needs to hide items further down the cascade */;
 }
@@ -20,8 +18,7 @@
 .crm-container th,
 .crm-container tr,
 .crm-container td,
-.crm-container details
-/* .crm-container input { */
+.crm-container details {
 	background-color: transparent;
     background: transparent;
     border: 0;
@@ -56,7 +53,7 @@
     border-collapse: collapse;
 }
 
-/* JQueryUI resets (!important vs JQuery UI css) */
+/* JQueryUI resets */
 
 .crm-container .ui-tabs .ui-tabs-panel,
 .crm-container .ui-tabs {
@@ -73,7 +70,6 @@
 }
 .crm-container .ui-icon {
     width: inherit;
-    background-image: none !important;
 }
 .crm-container .ui-icon:hover {
     background-image: none;
@@ -290,12 +286,51 @@
 .crm-container .text-danger {
 	color: var(--crm-c-alert);
 }
-.crm-container h1,
-.crm-container h2,
-.crm-container h4,
-.crm-container h5,
-.crm-container h6 {
-    color: var(--crm-c-text);
+.crm-container .bg-primary {
+	background-color: var(--crm-c-primary);
+}
+.crm-container a.bg-primary:hover,
+.crm-container a.bg-primary:focus {
+	background-color: var(--crm-c-primary-hover);
+}
+.crm-container .bg-secondary {
+	background-color: var(--crm-c-secondary);
+}
+.crm-container a.bg-secondary:hover,
+.crm-container a.bg-secondary:focus {
+	background-color: var(--crm-c-secondary-hover);
+}
+.crm-container .bg-success {
+	background-color: var(--crm-c-success);
+    color: var(--crm-c-success-text);
+}
+.crm-container a.bg-success:hover,
+.crm-container a.bg-success:focus {
+    background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-success);
+}
+.crm-container .bg-info {
+	background-color: var(--crm-c-info);
+    color: var(--crm-c-info-text);
+}
+.crm-container a.bg-info:hover,
+.crm-container a.bg-info:focus {
+    background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-info-text);
+}
+.crm-container .bg-warning {
+	background-color: var(--crm-c-warning);
+    color: var(--crm-c-warning-text) !important /* FormBuilder vs .disabled */;
+}
+.crm-container a.bg-warning:hover,
+.crm-container a.bg-warning:focus {
+    background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-warning);
+}
+.crm-container .bg-danger {
+	background-color: var(--crm-c-alert);
+    color: var(--crm-c-alert-text);
+}
+.crm-container a.bg-danger:hover,
+.crm-container a.bg-danger:focus {
+    background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-alert);
 }
 .crm-container code,
 .crm-container kbd,
@@ -348,7 +383,7 @@
    POSITION
 *******************/
 
-#crm-container /* applied to #crm not .crm to apply only once */ {
+#crm-container { /* applied to #crm not .crm to apply only once */
 	max-width: 100%;
 	padding: var(--crm-page-padding);
 }
@@ -380,8 +415,7 @@
     flex: 5;
 }
 .crm-container .css_right,
-.crm-container .float-right,
-.crm-container .pull-right {
+.crm-container .float-right {
     float: right;
 }
 /* Responsive  */

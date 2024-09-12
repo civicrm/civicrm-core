@@ -33,7 +33,7 @@
     cursor: move;
     margin: 0 auto 0 0 !important;
     padding: 0;
-    color: #fcfcfc;
+    color: var(--crm-dashlet-header-col);
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;

@@ -171,6 +171,10 @@ body.wp-admin #wpcontent {
 body.wp-admin .crm-container {
     background: var(--crm-c-page-background);
 }
+body.wp-admin .crm-title {
+    line-height: 1.1;
+    margin-bottom: 8px;
+}
 body.wp-admin .crm-container p {
     margin: 0;
 }
@@ -189,6 +193,9 @@ body.wp-admin .crm-container .button {
     line-height: inherit;
     font-size: inherit;
     border: inherit;
+}
+body.wp-admin .breadcrumb .crm-i {
+    font-size: smaller;
 }
 body.wp-admin.page-civicrm-contact .breadcrumb {
     display: none; /* Hides breadcrumb on contact dashboard */

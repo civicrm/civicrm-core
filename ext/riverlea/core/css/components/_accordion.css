@@ -4,9 +4,9 @@
 .crm-container details ~ details {
 	margin: var(--crm-expand-gap);
 }
-.crm-container details details {
+/*.crm-container details details {
 	padding: 0 var(--crm-expand-gap);
-}
+}*/
 .crm-container summary { /* default summary setting*/
 	display: list-item;
 	list-style: none;

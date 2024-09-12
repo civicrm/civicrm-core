@@ -30,21 +30,27 @@ function riverlea_civicrm_config(&$config) {
  */
 
 function riverlea_civicrm_themes(&$themes) {
+  $themes['wellow'] = array(
+    'ext' => 'riverlea',
+    'title' => 'RL: Wellow Brook (~Radstock)',
+    'prefix' => 'streams/wellow/',
+    'search_order' => array('wellow', '_riverlea_core_', '_fallback_'),
+  );
   $themes['minetta'] = array(
     'ext' => 'riverlea',
-    'title' => 'Riverlea: Minetta (~Greenwich)',
+    'title' => 'RL: Minetta (~Greenwich)',
     'prefix' => 'streams/minetta/',
     'search_order' => array('minetta', '_riverlea_core_', '_fallback_'),
   );
   $themes['walbrook'] = array(
     'ext' => 'riverlea',
-    'title' => 'Riverlea: Walbrook (~Shoreditch/Island)',
+    'title' => 'RL: Walbrook (~Shoreditch/Island)',
     'prefix' => 'streams/walbrook/',
     'search_order' => array('walbrook', '_riverlea_core_', '_fallback_'),
   );
   $themes['hackneybrook'] = array(
     'ext' => 'riverlea',
-    'title' => 'Riverlea: Hackney Brook (~Finsbury Park)',
+    'title' => 'RL: Hackney Brook (~Finsbury Park)',
     'prefix' => 'streams/hackneybrook/',
     'search_order' => array('hackneybrook', '_riverlea_core_', '_fallback_'),
   );
