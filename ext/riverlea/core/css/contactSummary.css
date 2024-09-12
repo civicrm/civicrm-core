@@ -16,7 +16,6 @@
     padding: var(--crm-dash-header-padding);
     position: relative;
 	margin-left: var(--crm-dash-heading-inset);
-	overflow-x: auto;
     align-items: center;
     display: flex;
     gap: var(--crm-m);

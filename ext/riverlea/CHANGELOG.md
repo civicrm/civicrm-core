@@ -1,3 +1,6 @@
+0.9.52
+ - FIXED - contact summary dashboard, hidden popup. Removed unnecessary definition and adjusted caret colour.
+
 0.9.51
  - CHANGED - cleans-up & merges two Bootstrap files: removes some un-used/duplicates, adds CSS variables, sorts into sub-headings
  - REMOVES - bootstrap3.css file
