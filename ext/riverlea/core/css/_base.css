@@ -176,6 +176,13 @@
     margin: var(--crm-heading-margin);
 }
 
+/* Definition lists */
+
+dl dd, dl dl {
+    margin-block-end: var(--crm-m1);
+    margin-inline-start: var(--crm-r1);
+}
+
 /* Practical colors */
 
 .crm-container .del,

@@ -536,6 +536,9 @@
 .crm-container .btn-group button.btn-xs .caret {
     margin: 0 8px 0 0;
 }
+.crm-container .button span i.crm-i {
+    margin-right: var(--crm-btn-icon-spacing);
+}
 
 /* Small buttons with icons */
 .crm-container .btn-sm:has(i.crm-i),

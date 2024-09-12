@@ -3,6 +3,9 @@
 .crm-container div.crm-field-wrapper {
     margin-bottom: var(--crm-r);
 }
+.crm-section {
+    padding: var(--crm-s);
+}
 .crm-container table.form-layout td,
 .crm-container table.form-layout-compressed td,
 .crm-form-block .crm-section {

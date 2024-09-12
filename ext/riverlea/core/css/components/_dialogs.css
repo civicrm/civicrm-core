@@ -209,6 +209,10 @@
     color: var(--crm-notify-col);
     list-style: unset;
 }
+#crm-notification-container div.ui-notify-message .notify-content ul li,
+#crm-notification-container div.ui-notify-message.alert .notify-content ul li {
+    color: var(--crm-notify-col);
+}
 #crm-notification-container div.ui-notify-message .notify-content p {
     color: var(--crm-notify-col);
 }

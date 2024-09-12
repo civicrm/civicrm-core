@@ -1,3 +1,13 @@
+0.9.53
+ - ADDED - BG colour for standalone login screen
+ - FIXED - Hackney icon alignment on .button, z-index on tabs.
+ - FIXED - dashlet close icon inheriting wrong color
+ - REMOVED - resets on input in base.css
+ - FIXED - colour of lists on notify alerts matches alert colour
+ - FIXED - restored list bullets to notification lists
+ - ADDED - margin reset to top element in notification text, to remove extra padding.
+ - ADDED - block padding to crm-section divs to separate form elements
+
 0.9.52
  - FIXED - contact summary dashboard, hidden popup - https://lab.civicrm.org/extensions/riverlea/-/issues/41. Removed unnecessary definition and adjusted caret colour.
  - FIXED - Mosaico wizard uses custom markup, but the wizard now matches the stream wizard settings - https://lab.civicrm.org/extensions/riverlea/-/issues/12. Also makes the hover buttons always visible for accessibility.

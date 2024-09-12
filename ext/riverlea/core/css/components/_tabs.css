@@ -142,7 +142,6 @@
 
 /* Dashboard */
 
-
 .crm-contact-page #mainTabContainer.ui-tabs {
     border: var(--crm-dash-border);
     display: var(--crm-dash-direction);
@@ -156,6 +155,7 @@
     gap: var(--crm-dash-tabs-gap);
     padding: var(--crm-dash-tabs-padding);
     border: 0 solid transparent;
+    z-index: 1;
 }
 #mainTabContainer .crm-contact-tabs-list ~ .ui-tabs-panel {
     box-shadow: var(--crm-dash-box-shadow);

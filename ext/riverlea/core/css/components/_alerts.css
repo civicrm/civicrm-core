@@ -11,15 +11,21 @@
     padding: var(--crm-alert-padding);
     border-radius: var(--crm-roundness);
 }
+.crm-container .help > *:first-child {
+    margin-top: 0;
+}
 .crm-container .help p,
 .crm-container .status p,
 .crm-container .messages p,
-.crm-container .alert p,
+.crm-container .alert p {
+    color: var(--crm-alert-text-help);
+}
 .crm-container .help li,
 .crm-container .status li,
 .crm-container .messages li,
 .crm-container .alert li {
     color: var(--crm-alert-text-help);
+    list-style: initial;
 }
 .crm-container .status,
 .crm-container .alert-warning,
