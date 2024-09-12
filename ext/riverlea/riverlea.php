@@ -74,15 +74,6 @@ function _riverlea_is_active() {
 
 function riverlea_civicrm_config(&$config) {
   _riverlea_civix_civicrm_config($config);
-
-  if (!_riverlea_is_active()) {
-    return;
-  }
-
-  Civi::resources()->addVars('riverlea', [
-    'dark_mode' => Civi::settings()->get('riverlea_dark_mode')
-  ]);
-  Civi::resources()->addScriptFile('riverlea', 'js/dark-mode.js');
 }
 
 /**
