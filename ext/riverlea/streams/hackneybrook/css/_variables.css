@@ -2,7 +2,7 @@
     Name: HackneyBrook;
     Front, back or both: both;
     Description: named after the Hackney Brook, a tributary of the River Lea that ran through Finsbury Park;
-    Riverlea version: 0.9.44;
+    Riverlea version: 0.9.54;
 */
 
 :root {
@@ -46,7 +46,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-c-red: #eed3d7;
 --crm-c-red-light: #f2dede;
 --crm-c-red-dark: #b94a48 ;
---crm-c-amber: #dd5600;;
+--crm-c-amber: #dd5600;
 --crm-c-amber-light: #fbf0e2;
 --crm-c-yellow: #fcfc5a;
 --crm-c-yellow-light: #ffffcc;
@@ -198,25 +198,36 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-expand-icon-spacing: var(--crm-m);
 --crm-expand-transform: rotate(90deg);
 --crm-expand-transition: transform .3s;
+--crm-expand-radius: var(--crm-roundness);
+--crm-expand-gap: var(--crm-xs2) 0 0;
+/* .crm-accordion-bold */
 --crm-expand-header-bg: var(--crm-c-gray-200);
 --crm-expand-header-bg-active: var(--crm-c-gray-300);
 --crm-expand-header-color: var(--crm-c-text);
 --crm-expand-header-padding: var(--crm-s) var(--crm-m);
---crm-expand-header-weight: bold;
+--crm-expand-header-weight: var(--crm-bold-weight);
+--crm-expand-header-font: var(--crm-font-bold);
 --crm-expand-header-border: 0 solid transparent;
 --crm-expand-header-border-width: 0 0 1px 0;
---crm-expand-body-bg:;
---crm-expand-body-box-shadow:;
 --crm-expand-border: var(--crm-c-divider);
 --crm-expand-border-width: 0 1px 1px 1px;
+--crm-expand-body-bg:;
+--crm-expand-body-box-shadow:;
 --crm-expand-body-padding: var(--crm-padding-reg);
---crm-expand-body2-bg:;
---crm-expand-header2-bg:;
---crm-expand-header2-color: var(--crm-c-text);
---crm-expand-header2-weight: normal;
---crm-expand-2-border:;
---crm-expand-2-body-padding: var(--crm-s);
---crm-expand-gap: var(--crm-xs2) 0 0;
+/* .crm-accordion-light */
+--crm-expand2-header-bg:;
+--crm-expand2-header-bg-active: var(--crm-c-background-2);
+--crm-expand2-header-weight: normal;
+--crm-expand2-header-font:;
+--crm-expand2-header-color: var(--crm-c-text);
+--crm-expand2-header-border:;
+--crm-expand2-header-border-width: ;
+--crm-expand2-header-padding: var(--crm-s) var(--crm-m);
+--crm-expand2-border:;
+--crm-expand2-border-width:;
+--crm-expand2-body-bg:;
+--crm-expand2-body-padding: var(--crm-s);
+
 
 /* ALERTS */
 --crm-alert-padding: var(--crm-r);

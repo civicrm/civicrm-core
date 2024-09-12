@@ -38,6 +38,7 @@ details.af-collapsible > .af-title::before,
 .crm-container .crm-master-accordion-header:before,
 .crm-container .expanded::before,
 .crm-container a.collapsed::before,
+.crm-container .crm-collapsible .collapsible-title::before,
 .crm-container a.crm-expand-row:not(.expanded)::before,
 .crm-container .civicrm-community-messages .crm-collapsible .collapsible-title::before,
 .crm-container .show-children.collapsed::before {
@@ -53,13 +54,13 @@ details.af-collapsible > .af-title::before,
 	content: var(--crm-expand-icon);
 	cursor: var(--crm-hover-clickable);
 }
-.crm-container .collapsed .collapsible-title::before,
 .crm-container .collapsed .crm-accordion-header::before,
 .crm-accordion-wrapper.collapsed .crm-master-accordion-header:before,
 .crm-dashlet-header .crm-dashlet-collapse.fa-caret-right::before,
 details.af-collapsible.af-collapsed > .af-title::before,
 .crm-container a.collapsed:not(.expanded)::before,
 .crm-container a.crm-expand-row::before,
+.crm-container .crm-collapsible.collapsed .collapsible-title::before,
 .crm-container .civicrm-community-messages .crm-collapsible.collapsed .collapsible-title::before {
     transform: none;
 	transform-origin: center center;
@@ -67,6 +68,7 @@ details.af-collapsible.af-collapsed > .af-title::before,
 }
 .crm-container .crm-accordion-header::before,
 details.af-collapsible[open] > .af-title::before,
+.crm-container .crm-collapsible .collapsible-title::before,
 .crm-dashlet-header .crm-dashlet-collapse.fa-caret-down::before,
 .crm-container .crm-master-accordion-header:before,
 .crm-container a.collapsed::before,
@@ -97,15 +99,14 @@ a.crm-expand-row:hover,a.crm-expand-row:focus {
 .crm-container span.collapsed:not(.show-children) {
 	cursor: var(--crm-hover-clickable);
 	padding: var(--crm-expand-header-padding);
-	border-radius: var(--crm-roundness) var(--crm-roundness) 0 0;
+	border-radius: var(--crm-expand-radius) var(--crm-expand-radius) 0 0;
 	background-color: var(--crm-expand-header-bg);
 	font-weight: var(--crm-expand-header-weight);
 	color: var(--crm-expand-header-color);
 }
 .crm-container .crm-accordion-wrapper.collapsed .crm-accordion-header,
-/* .af-collapsible.af-collapsed > .af-title, */
 .crm-container .crm-collapsible.collapsed .collapsible-title {
-	border-radius: var(--crm-roundness);
+	border-radius: var(--crm-expand-radius);
 }
 .crm-container .widget-content .crm-accordion-header,
 .crm-container .crm-accordion-inner .crm-accordion-header,
@@ -122,31 +123,37 @@ a.crm-expand-row:hover,a.crm-expand-row:focus {
 	background-color: var(--crm-expand-header-bg-active);
 }
 .crm-container .crm-accordion-wrapper .crm-master-accordion-header {
-	background-color: var(--crm-expand-header2-bg);
-	font-weight: var(--crm-expand-header2-weight);
-	color: var(--crm-expand-header2-color);
+	font-family: var(--crm-expand2-header-font);
+	font-weight: var(--crm-expand2-header-weight);
+	background-color: var(--crm-expand2-header-bg);
+	color: var(--crm-expand2-header-color);
+	border: var(--crm-expand2-header-border);
+	border-width: var(--crm-expand2-header-border-width);
+	padding: var(--crm-expand2-header-padding);
 }
 .crm-container .crm-accordion-wrapper .crm-master-accordion-header:hover,
 .crm-container .crm-accordion-wrapper .crm-master-accordion-header:focus {
-	background-color: var(--crm-expand-header2-bg);
+	background-color: var(--crm-expand2-header-bg-active);
 }
 /* Body */
 
 .crm-container .crm-accordion-wrapper .crm-accordion-body {
-	border-radius: 0 0 var(--crm-roundness) var(--crm-roundness);
+	border-radius: 0 0 var(--crm-expand-radius) var(--crm-expand-radius);
 	border: var(--crm-expand-border);
 	padding: var(--crm-expand-body-padding);
 	background-color: var(--crm-expand-body-bg);
 	box-shadow: var(--crm-expand-body-box-shadow);
-	animation: crm-details-show .3s ease-in-out;
 }
 .crm-container .widget-content .crm-accordion-body,
 .crm-container .crm-collapsible .crm-summary-block {
 	padding: var(--crm-expand-body-padding);
 }
 .crm-container .crm-master-accordion-header + .crm-accordion-body {
-	border: var(--crm-expand-body2-border);
-	background-color: var(--crm-expand-body2-bg);
+	padding: var(--crm-expand2-body-padding);
+	background: var(--crm-expand2-body-bg);
+	border: var(--crm-expand2-border);
+	border-width: var(--crm-expand2-border-width);
+	border-radius: 0 0 var(--crm-expand-radius) var(--crm-expand-radius);
 }
 .crm-container summary label {
 	color: inherit;

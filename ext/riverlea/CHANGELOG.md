@@ -1,3 +1,22 @@
+0.9.54
+ - CHANGED - reworking of accordions with new variables to support full .crm-accordion-light styling.
+ - CHANGED - listing of new CSS variables in changelog
+ - NEW CSS VARIABLES (8 new, 6 renamed):
+    added: --crm-expand-radius (border radius for accordion)
+    added: --crm-expand-header-font (for setting bold/font pair)
+    added: --crm-expand2-header-bg-active
+    added: --crm-expand2-header-font
+    added: --crm-expand2-header-border
+    added: --crm-expand2-header-border-width
+    added: --crm-expand2-header-padding
+    added: --crm-expand2-border-width
+    renamed: --crm-expand-header2-bg => --crm-expand2-header-bg
+    renamed: --crm-expand-header2-weight => --crm-expand2-header-weight
+    renamed: --crm-expand-header2-color => --crm-expand2-header-color
+    renamed: --crm-expand-2-border => --crm-expand2-border
+    renamed: --crm-expand-body2-bg => --crm-expand2-body-bg
+    renamed: --crm-expand-2-body-padding => --crm-expand2-body-padding
+
 0.9.53
  - ADDED - BG colour for standalone login screen
  - FIXED - Hackney icon alignment on .button, z-index on tabs.
@@ -60,7 +79,12 @@
  - FIXES icon picker layout
  - CHANGED SK editor layout view table: align drag icons, add padding to details body
  - FIXES multiple contrast issues with info/success/warning/danger button + background colour/text combos (https://lab.civicrm.org/extensions/riverlea/-/issues/38)
- - NEW CSS VARIABLES (5) - 5 new variables for above fix:  --crm-btn-cancel-text, --crm-btn-info-text, --crm-btn-warning-text, --crm-btn-success-text, --crm-btn-alert-text
+ - NEW CSS VARIABLES (5) - 5 new variables for above fix:
+    added: --crm-btn-cancel-text
+    added: --crm-btn-info-text
+    added: --crm-btn-warning-text
+    added: --crm-btn-success-text
+    added: --crm-btn-alert-text
 
 0.9.43
  - ADDED Operating System font fallbacks for Hackney Brook
@@ -86,7 +110,14 @@
  - ADDED avatar support on contact dashboard
  - ADDED visible version-numbering to support development
  - FIXED many issues. Adds on-screen commit-version-numbering.
- - NEW CSS VARIBLES: crm-c-code-background, crm-dash-image-size, crm-dash-image-radius, crm-dash-image-justify, crm-dash-image-direction, & metadata variables - crm-version, crm-release.
+ - NEW CSS VARIBLES:
+    added: --crm-c-code-background
+    added: --crm-dash-image-size
+    added: --crm-dash-image-radius
+    added: --crm-dash-image-justify
+    added: --crm-dash-image-direction
+    added: --crm-version (metadata)
+    added: --crm-release (meetadata)
 
 0.8
 

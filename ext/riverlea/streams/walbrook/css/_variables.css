@@ -1,6 +1,6 @@
 /*
     Name: Walbrook;
-    Riverlea version: 0.9.44;
+    Riverlea version: 0.9.54;
     Front, back or both: back;
     Description: Based on Shoreditch theme. Named after after River Walbrook, which runs under Shoreditch, London;
 */
@@ -199,25 +199,35 @@ color-scheme: light dark;
 --crm-expand-icon-spacing: var(--crm-m3);
 --crm-expand-transform: rotate(90deg);
 --crm-expand-transition: transform .3s;
+--crm-expand-radius: var(--crm-roundness);
+--crm-expand-gap: 0;
+/* .crm-accordion-bold */
 --crm-expand-header-bg: var(--crm-c-background2);
 --crm-expand-header-bg-active: var(--crm-c-background3);
 --crm-expand-header-color: var(--crm-c-text);
 --crm-expand-header-padding: var(--crm-m2) var(--crm-m3);
---crm-expand-header-weight: bold;
+--crm-expand-header-weight: var(--crm-bold-weight);
+--crm-expand-header-font: var(--crm-font-bold);
 --crm-expand-header-border: var(--crm-c-divider);
 --crm-expand-header-border-width: 0 0 1px 0;
---crm-expand-body-bg: transparent;
---crm-expand-body-box-shadow: var(--crm-body-inset);
 --crm-expand-border:;
 --crm-expand-border-width:;
+--crm-expand-body-bg: transparent;
+--crm-expand-body-box-shadow: var(--crm-body-inset);
 --crm-expand-body-padding: var(--crm-padding-reg);
---crm-expand-body2-bg: transparent;
---crm-expand-header2-bg: var(--crm-c-primary);
---crm-expand-header2-color: var(--crm-c-light-text);
---crm-expand-header2-weight: bold;
---crm-expand-2-border: 0 solid transparent;
---crm-expand-2-body-padding: 0;
---crm-expand-gap: 0;
+/* .crm-accordion-light */
+--crm-expand2-header-bg: var(--crm-c-primary);
+--crm-expand2-header-bg-active: var(--crm-c-primary-hover);
+--crm-expand2-header-weight: var(--crm-bold-weight);
+--crm-expand2-header-font: var(--crm-font-bold);
+--crm-expand2-header-color: var(--crm-c-primary-text);
+--crm-expand2-header-border:;
+--crm-expand2-header-border-width: ;
+--crm-expand2-header-padding: var(--crm-s) var(--crm-m);
+--crm-expand2-border: 0;
+--crm-expand2-border-width:;
+--crm-expand2-body-bg: transparent;
+--crm-expand2-body-padding: 0;
 
 /* ALERTS */
 --crm-alert-padding: var(--crm-r) var(--crm-r2);
