@@ -44,11 +44,9 @@ class CRM_Core_DAO_AllCoreTables {
    */
   public static function getEntities(): array {
     $allEntities = EntityRepository::getEntities();
-    // Filter out entities without a table
-    $tables = EntityRepository::getTableIndex();
-    // Filter out entities without a class
-    $classes = EntityRepository::getClassIndex();
-    return array_intersect_key($allEntities, array_flip($tables), array_flip($classes));
+    // Filter out entities without a table or class
+
+    return array_filter($allEntities, fn($entity) => (!empty($entity['table']) && !empty($entity['class'])));
   }
 
   /**
