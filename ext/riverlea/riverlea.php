@@ -63,34 +63,36 @@ function riverlea_civicrm_themes(&$themes) {
 }
 
 /**
- * Add setting for darkmode
+ * Check if current active theme is a Riverlea theme
+ * @return bool
  */
+function _riverlea_is_active() {
+  $themeKey = Civi::service('themes')->getActiveThemeKey();
+  $themeExt = Civi::service('themes')->get($themeKey)['ext'];
+  return ($themeExt === 'riverlea');
+}
 
 function riverlea_civicrm_config(&$config) {
   _riverlea_civix_civicrm_config($config);
 
-  $themeKey = Civi::service('themes')->getActiveThemeKey();
-  $themeExt = Civi::service('themes')->get($themeKey)['ext'];
-  if ($themeExt !== 'riverlea') {
+  if (!_riverlea_is_active()) {
     return;
   }
 
-  // A riverlea theme is active
-  if (Civi::settings()->get('riverlea_dark_mode')) {
-  }
+  Civi::resources()->addVars('riverlea', [
+    'dark_mode' => Civi::settings()->get('riverlea_dark_mode')
+  ]);
+  Civi::resources()->addScriptFile('riverlea', 'js/dark-mode.js');
 }
-
 
 /**
  * Implements hook_civicrm_alterBundle(). Add Bootstrap JS.
  */
-
 function riverlea_civicrm_alterBundle(CRM_Core_Resources_Bundle $bundle) {
-  $themeKey = Civi::service('themes')->getActiveThemeKey();
-  $themeExt = Civi::service('themes')->get($themeKey)['ext'];
-  if ($themeExt !== 'riverlea') {
+  if (!_riverlea_is_active()) {
     return;
   }
+
   if ($bundle->name === 'bootstrap3') {
     $bundle->clear();
     $bundle->addStyleFile('riverlea', 'core/css/_bootstrap.css');
@@ -102,6 +104,8 @@ function riverlea_civicrm_alterBundle(CRM_Core_Resources_Bundle $bundle) {
     ]);
   }
 }
+
+
 /**
  * Implements hook_civicrm_install().
  *

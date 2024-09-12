@@ -439,8 +439,7 @@ color-scheme: light dark;
 
 /* light/dark mode settings */
 
-@media (prefers-color-scheme: dark) {
-:root {
+.crm-dark {
     --crm-c-text: #fff;
     --crm-c-link: var(--crm-c-amber);
     --crm-c-link-hover: var(--crm-c-amber-light);
@@ -507,5 +506,4 @@ color-scheme: light dark;
     --crm-form-block-background: var(--crm-c-background2);
     --crm-btn-cancel-bg: #9b3d4b;
     --crm-panel-border: 1px;
-    }
 }

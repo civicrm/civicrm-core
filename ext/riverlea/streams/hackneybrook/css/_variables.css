@@ -438,9 +438,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 }
 
 /* light/dark mode settings */
-
-@media (prefers-color-scheme: dark) {
-    :root {
+.crm-dark {
         --crm-c-text: #fff;
         --crm-c-link: var(--crm-c-teal);
         --crm-c-link-hover: var(--crm-c-yellow);
@@ -510,5 +508,4 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
         --crm-notify-background: var(--crm-c-darkest);
         --crm-wizard-active-bg: var(--crm-c-dark-teal);
         --crm-form-block-background: var(--crm-c-background2);
-    }
 }
