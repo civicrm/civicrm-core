@@ -28,6 +28,15 @@ use Civi\Api4\Group;
  */
 class GroupTest extends Api4TestBase {
 
+  public function testGetFields(): void {
+    $fields = Group::getFields(FALSE)
+      ->execute()->indexBy('name');
+
+    $this->assertTrue($fields['title']['required']);
+    $this->assertFalse($fields['frontend_title']['required']);
+    $this->assertSame('empty($values.title)', $fields['frontend_title']['required_if']);
+  }
+
   public function testSmartGroupCache(): void {
     \Civi::settings()->set('smartGroupCacheTimeout', 5);
     $savedSearch = $this->createTestRecord('SavedSearch', [

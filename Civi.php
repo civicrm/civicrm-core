@@ -320,7 +320,7 @@ class Civi {
    * @return \Civi\Schema\EntityProvider
    */
   public static function table(string $tableName): \Civi\Schema\EntityProvider {
-    $entityName = CRM_Core_DAO_AllCoreTables::getEntityNameForTable($tableName);
+    $entityName = \Civi\Schema\EntityRepository::getTableIndex()[$tableName];
     return new \Civi\Schema\EntityProvider($entityName);
   }
 
