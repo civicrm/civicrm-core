@@ -3293,23 +3293,21 @@ SELECT contact_id
    *
    * With acls from related entities + additional clauses from hook_civicrm_selectWhereClause
    *
-   * DO NOT OVERRIDE THIS FUNCTION
-   *
-   * @TODO: ADD `final` keyword to function signature
-   *
    * @param string|null $tableAlias
    * @param string|null $entityName
    * @param array $conditions
    *   Values from WHERE or ON clause
-   * @return array
+   * @param int|null $userId
+   *
+   * @return string[]
    */
-  public static function getSelectWhereClause($tableAlias = NULL, $entityName = NULL, $conditions = []) {
+  final public static function getSelectWhereClause(?string $tableAlias = NULL, ?string $entityName = NULL, array $conditions = [], ?int $userId = NULL) {
     $bao = new static();
     $tableAlias ??= $bao->tableName();
     $entityName ??= CRM_Core_DAO_AllCoreTables::getEntityNameForClass(get_class($bao));
     $finalClauses = [];
     $fields = static::getSupportedFields();
-    $selectWhereClauses = $bao->addSelectWhereClause($entityName, NULL, $conditions);
+    $selectWhereClauses = $bao->addSelectWhereClause($entityName, $userId, $conditions);
     foreach ($selectWhereClauses as $fieldName => $fieldClauses) {
       $finalClauses[$fieldName] = NULL;
       if ($fieldClauses) {
