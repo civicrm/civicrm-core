@@ -562,6 +562,12 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
           $idData['joins'] = $this->combineValuesAndIds($val['joins'] ?? [], $idData['joins'] ?? [], TRUE);
         }
         // $item = array_merge($isJoin ? $val : ($val['fields'] ?? []), $idData);
+        // if (!is_array($val) && !is_null($val)) {
+        //   $val = [$val];
+        // }
+        if ($idx === "recaptcha2") {
+          $val = [$val];
+        }
         $item = array_merge(($val ?? []), $idData);
         $combined[$name][$idx] = $item;
       }
