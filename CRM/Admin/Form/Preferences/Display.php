@@ -20,26 +20,7 @@
  */
 class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
 
-  protected $_settings = [
-    'contact_view_options' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-    'contact_smart_group_display' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-    'contact_edit_options' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-    'advanced_search_options' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-    'user_dashboard_options' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-    'contact_ajax_check_similar' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-    'activity_assignee_notification' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-    'activity_assignee_notification_ics' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-    'do_not_notify_assignees_for' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-    'preserve_activity_tab_filter' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-    'editor_id' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-    'ajaxPopupsEnabled' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-    'display_name_format' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-    'sort_name_format' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-    'menubar_position' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-    'menubar_color' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-    'theme_backend' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-    'theme_frontend' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-  ];
+  protected array $_settings;
 
   /**
    * Build the form object.
