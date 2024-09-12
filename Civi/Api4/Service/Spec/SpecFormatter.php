@@ -144,7 +144,9 @@ class SpecFormatter {
   public static function setInputTypeAndAttrs(FieldSpec $fieldSpec, $data) {
     $inputType = $data['input_type'] ?? NULL;
     $inputAttrs = $data['input_attrs'] ?? [];
-
+    if ($inputType === 'Select Date') {
+      $inputType = 'Date';
+    }
     if (in_array($inputType, ['Select', 'EntityRef'], TRUE) && !empty($data['serialize'])) {
       $inputAttrs['multiple'] = TRUE;
     }
