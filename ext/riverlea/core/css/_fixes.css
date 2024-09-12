@@ -776,6 +776,9 @@ details + .crm-content-block:has(.dataTables_wrapper) {
 
 /* Mosaico (all importants vs the extension css) */
 
+.crm-mosaico-wizard .crm_wizard__title .panel-body {
+	padding: 0 1rem;
+}
 .crm-mosaico-wizard .crm_wizard__body .form-group {
 	max-width: 100% !important;
 }
@@ -819,26 +822,21 @@ details + .crm-content-block:has(.dataTables_wrapper) {
 	display: flex;
 	gap: var(--crm-flex-gap);
 }
-.crm-mosaico-wizard .crm_wizard__title .nav-pills li {
-	padding: var(--crm-btn-padding-block) var(--crm-btn-padding-inline);
-}
-.crm-mosaico-wizard .crm_wizard__title .nav-pills li.active,
-.crm-mosaico-wizard .crm_wizard__title .nav-pills li.active:hover,
-.crm-mosaico-wizard .crm_wizard__title .nav-pills li.active a:hover {
-	background: var(--crm-c-primary-hover);
-	border-radius: var(--crm-btn-radius);
-}
-.crm-mosaico-wizard .crm_wizard__title .nav-pills li.active a {
-	color: var(--crm-c-primary-text);
-	padding: 0;
-}
 .crm-mosaico-wizard .crm-mosaico-template-item.thumbnail {
-	background: var(--crm-c-background2) !important /* vs uk.co.vedaconsulting.mosaico/sass/mosaico-bootstrap/_template-item.scss */;
-	border: var(--crm-c-divider) !important /* vs uk.co.vedaconsulting.mosaico/sass/mosaico-bootstrap/_template-item.scss */;
-	border-radius: var(--crm-roundness) !important /* vs uk.co.vedaconsulting.mosaico/sass/mosaico-bootstrap/_template-item.scss */;
+	background: var(--crm-c-background2) !important /* vs _template-item.scss */;
+	border: var(--crm-c-divider) !important /* vs _template-item.scss */;
+	border-radius: var(--crm-roundness) !important /* vs _template-item.scss */;
 }
 .crm-mosaico-wizard .crm_wizard__title .nav-pills li.disabled a {
-	color: var(--crm-c-inactive) !important /* vs uk.co.vedaconsulting.mosaico/sass/mosaico-bootstrap/_template-item.scss */;
+	color: var(--crm-c-inactive) !important /* vs _template-item.scss */;
+}
+#bootstrap-theme .crm-mosaico-template-item .crm-mosaico-template-actions {
+	display: flex !important /* vs _template-item.scss */;
+	opacity: 1 !important /* vs _template-item.scss */;
+	justify-content: center;
+	flex-direction: column;
+	padding-top: 50%;
+	align-items: center;
 }
 /******************
 	CORE EXTENSIONS

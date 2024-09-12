@@ -1,5 +1,6 @@
 0.9.52
- - FIXED - contact summary dashboard, hidden popup. Removed unnecessary definition and adjusted caret colour.
+ - FIXED - contact summary dashboard, hidden popup - https://lab.civicrm.org/extensions/riverlea/-/issues/41. Removed unnecessary definition and adjusted caret colour.
+ - FIXED - Mosaico wizard uses custom markup, but the wizard now matches the stream wizard settings - https://lab.civicrm.org/extensions/riverlea/-/issues/12. Also makes the hover buttons always visible for accessibility.
 
 0.9.51
  - CHANGED - cleans-up & merges two Bootstrap files: removes some un-used/duplicates, adds CSS variables, sorts into sub-headings

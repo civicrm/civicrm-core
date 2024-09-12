@@ -87,9 +87,11 @@ table.advmultiselect {
     width: auto;
 }
 
-/* Wizard steps */
+/* Wizard steps.
+   .crm_wizard__title is from Mosaico, to be removed someday */
 
-.crm-container ul.wizard-bar {
+.crm-container ul.wizard-bar,
+.crm_wizard__title ul {
     border-collapse: collapse;
     white-space: nowrap;
     list-style: none;
@@ -104,14 +106,16 @@ table.advmultiselect {
     width: 100%;
 }
 .crm-container #wizard-steps,
-.crm-container ul.crm-wizard-nav {
-    margin: var(--crm-wizard-margin);
+.crm-container ul.crm-wizard-nav,
+.crm-mosaico-wizard .crm_wizard__title ul {
+    margin: var(--crm-wizard-margin) !important;
     width: var(--crm-wizard-width);
 }
 .crm-container ul.crm-wizard-nav {
     margin-bottom: var(--crm-r);
 }
-.crm-container ul.wizard-bar li {
+.crm-container ul.wizard-bar li,
+.crm_wizard__title ul > li {
     margin: -2px;
     text-decoration: none;
     background-image: none;
@@ -126,10 +130,12 @@ table.advmultiselect {
     padding: 0 var(--crm-l) 0 var(--crm-xl);
     position: relative;
 }
-.crm-container ul.wizard-bar > li:first-child {
+.crm-container ul.wizard-bar > li:first-child,
+.crm_wizard__title ul > li:first-child  {
     padding-left: var(--crm-l);
 }
-.crm-container ul.wizard-bar > li::after {
+.crm-container ul.wizard-bar > li::after,
+.crm_wizard__title ul > li::after {
     border-bottom: var(--crm-wizard-height) solid rgba(0,0,0,0);
     border-left: calc(1px + var(--crm-wizard-angle)) solid var(--crm-wizard-active-bg);
     border-top: var(--crm-wizard-height) solid rgba(0,0,0,0);
@@ -141,10 +147,12 @@ table.advmultiselect {
     width: 20px;
     z-index: 10;
 }
-.crm-container ul.crm-wizard-nav > li::after {
+.crm-container ul.crm-wizard-nav > li::after,
+.crm_wizard__title ul > li::after {
     border-left: calc(1.25 * var(--crm-wizard-angle)) solid var(--crm-wizard-active-bg);
 }
-.crm-container ul.wizard-bar > li::before {
+.crm-container ul.wizard-bar > li::before,
+.crm_wizard__title ul > li::before {
     border-bottom: var(--crm-wizard-height) solid rgba(0,0,0,0);
     border-left: var(--crm-wizard-angle) solid var(--crm-wizard-bg);
     border-top: var(--crm-wizard-height) solid rgba(0,0,0,0);
@@ -156,17 +164,22 @@ table.advmultiselect {
     width: 0;
     z-index: 11;
 }
-.crm-container ul.crm-wizard-nav > li::before {
+.crm-container ul.crm-wizard-nav > li::before,
+.crm_wizard__title ul > li::before {
     border-left: calc(1.25 * var(--crm-wizard-angle)) solid var(--crm-wizard-bg);
 }
-.crm-container ul.wizard-bar > li.current-step {
+.crm-container ul.wizard-bar > li.current-step,
+.crm_wizard__title ul > li.active,
+.crm_wizard__title ul > li.active a {
     background-color: var(--crm-wizard-active-bg);
     color: var(--crm-wizard-active-col);
 }
-.crm-container ul.wizard-bar > li.current-step::before {
+.crm-container ul.wizard-bar > li.current-step::before,
+.crm_wizard__title ul > li.active::before {
     border-left-color: var(--crm-wizard-active-bg);
 }
-.crm-container ul.wizard-bar > li:not(:first-child) {
+.crm-container ul.wizard-bar > li:not(:first-child),
+.crm_wizard__title ul > li:not(:first-child) {
     padding-left: calc(var(--crm-l) + var(--crm-wizard-angle)) !important;
 }
 .crm-wizard-buttons {
