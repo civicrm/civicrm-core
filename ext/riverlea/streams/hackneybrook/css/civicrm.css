@@ -1,4 +1,3 @@
-@import url(_variables.css); /* quick customisable values used across the theme */
 @import url(../../../core/css/_base.css); /* resets and civi wide styles */
 @import url(../../../core/css/_cms.css); /* CMS-specific hacks/workarounds */
 @import url(../../../core/css/_core.css); /* components and utility classes */
