@@ -52,14 +52,20 @@ class WebEntrypoint {
 
     // Add CSS, JS, etc. that is required for this page.
     \CRM_Core_Resources::singleton()->addCoreResources();
+
     $parts = explode('?', $requestUri);
     $args = explode('/', $parts[0] ?? '');
     // Remove empty path segments, a//b becomes equivalent to a/b
     $args = array_values(array_filter($args));
     if (!$args) {
       // This is a request for the site's homepage. See if we have one.
-      $item = \CRM_Core_Invoke::getItem('/');
-      if (!$item) {
+
+      $homepage = \CRM_Core_Invoke::getItem('civicrm/home') ? '/civicrm/home' : NULL;
+
+      if ($homepage) {
+        \CRM_Utils_System::redirect($homepage);
+      }
+      else {
         // We have no public homepage, so send them to login.
         // This doesn't allow for /civicrm itself to be public,
         // but that's got to be a pretty edge case, right?!
