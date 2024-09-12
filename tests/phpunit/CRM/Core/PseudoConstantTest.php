@@ -640,7 +640,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
       'CRM_Core_DAO_Website' => [
         [
           'fieldName' => 'website_type_id',
-          'sample' => 'Facebook',
+          'sample' => 'Social',
         ],
       ],
       'CRM_Core_DAO_WordReplacement' => [
@@ -656,7 +656,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
       'CRM_Core_DAO_MappingField' => [
         [
           'fieldName' => 'website_type_id',
-          'sample' => 'Facebook',
+          'sample' => 'Social',
         ],
         [
           'fieldName' => 'im_provider_id',
