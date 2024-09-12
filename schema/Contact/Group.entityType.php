@@ -72,6 +72,7 @@ return [
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'required' => TRUE,
+      'default_fallback' => ['frontend_title', 'name'],
       'localizable' => TRUE,
       'description' => ts('Name of Group.'),
       'add' => '1.1',
