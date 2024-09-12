@@ -7,6 +7,8 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: var(--crm-r);
+    /* avoid total collapse else no droppable area if all widgets removed */
+    min-height: var(--crm-r);
 }
 .crm-container .crm-dashlet {
     border-radius: var(--crm-dashlet-radius);
