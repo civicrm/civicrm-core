@@ -59,6 +59,8 @@ class DynamicCss implements \Symfony\Component\EventDispatcher\EventSubscriberIn
 
     $stream = $params['stream'] ?? 'empty';
 
+    // TODO: enable fetching variable files from streams
+    // outside of the Riverlea extension directory
     $streamDir = E::path("streams/{$stream}/css/");
 
     $content = [];
