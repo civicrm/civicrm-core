@@ -29,7 +29,7 @@ return [
       'maxlength' => 128,
     ],
     'html_type' => 'text',
-    'default' => 'https://civicrm.org/extdir/ver={ver}|cms={uf}',
+    'default' => 'https://civicrm.org/extdir/ver={ver}',
     'add' => '4.3',
     'title' => ts('Extension Repo URL'),
     'is_domain' => 1,

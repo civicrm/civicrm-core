@@ -324,8 +324,8 @@ function dm_install_cvext() {
     return
   fi
   dm_h2 "dm_install_cvext: $@"
-  # cv dl -b '@https://civicrm.org/extdir/ver=4.7.25|cms=Drupal/com.iatspayments.civicrm.xml' --destination=$PWD/iatspayments
-  cv dl -b "@https://civicrm.org/extdir/ver=$DM_VERSION|cms=Drupal/$1.xml" --to="$2"
+  # cv dl -b '@https://civicrm.org/extdir/ver=4.7.25/com.iatspayments.civicrm.xml' --destination=$PWD/iatspayments
+  cv dl -b "@https://civicrm.org/extdir/ver=$DM_VERSION/$1.xml" --to="$2"
 }
 
 ## Export a list of patch files from a git repo
