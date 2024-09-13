@@ -1,3 +1,8 @@
+0.9.55
+ - ADDED - functional darkmode settings screen for front and backend. This includes multiple changes, described on the MR: https://lab.civicrm.org/extensions/riverlea/-/merge_requests/22
+ - ADDED - each stream has a _dark.css file for darkmode variables, which no longer appear in _variables.css
+ - FIXED - page title on Drupal 10 doesn't match dark-mode.
+
 0.9.54
  - CHANGED - reworking of accordions with new variables to support full .crm-accordion-light styling.
  - CHANGED - listing of new CSS variables in changelog
