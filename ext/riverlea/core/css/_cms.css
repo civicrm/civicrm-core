@@ -50,6 +50,9 @@ body.page-civicrm header + div.layout-container {
 body.page-civicrm .button {
     -webkit-font-smoothing: initial;
 }
+body.page-civicrm .page-title {
+    color: var(--crm-c-text);
+}
 
 /* D7 Garland */
 body.page-civicrm #squeeze #crm-container,
