@@ -192,7 +192,6 @@ body.wp-admin .crm-container div.ui-notify-message .notify-content li {
 body.wp-admin .crm-container .button {
     line-height: inherit;
     font-size: inherit;
-    border: inherit;
 }
 body.wp-admin .breadcrumb .crm-i {
     font-size: smaller;
