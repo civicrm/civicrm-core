@@ -160,7 +160,8 @@ class CRM_Core_BAO_ConfigSetting {
     }
 
     // When there is a choice of permitted languages.
-    // Q: why would this be different from the locales?
+    // Why would this be different from the locales?
+    // @see https://github.com/civicrm/civicrm-core/pull/30533#discussion_r1756400531
     $permittedLanguages = CRM_Core_I18n::uiLanguages(TRUE);
     if (count($permittedLanguages) >= 2) {
 
