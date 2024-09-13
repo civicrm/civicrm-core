@@ -1166,8 +1166,8 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    */
   protected function formatViewValue($key, $rawValue, $data, $dataType, $format = NULL) {
     if (is_array($rawValue)) {
-      return array_map(function($val) use ($key, $data, $dataType) {
-        return $this->formatViewValue($key, $val, $data, $dataType);
+      return array_map(function($val) use ($key, $data, $dataType, $format) {
+        return $this->formatViewValue($key, $val, $data, $dataType, $format);
       }, $rawValue);
     }
 
