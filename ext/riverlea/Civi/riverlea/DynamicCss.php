@@ -35,9 +35,13 @@ class DynamicCss implements \Symfony\Component\EventDispatcher\EventSubscriberIn
   }
 
   public static function getCssParams(): array {
+    $darkModeSetting = \CRM_Utils_System::isFrontendPage() ?
+      \Civi::settings()->get('riverlea_dark_mode_frontend') :
+      \Civi::settings()->get('riverlea_dark_mode_backend');
+
     return [
       'stream' => \Civi::service('themes')->getActiveThemeKey(),
-      'dark' => \Civi::settings()->get('riverlea_dark_mode'),
+      'dark' => $darkModeSetting,
     ];
   }
 
