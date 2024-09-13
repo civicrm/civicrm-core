@@ -20,8 +20,7 @@
 .crm-container th,
 .crm-container tr,
 .crm-container td,
-.crm-container details
-/* .crm-container input { */
+.crm-container details {
 	background-color: transparent;
     background: transparent;
     border: 0;

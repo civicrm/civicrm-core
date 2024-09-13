@@ -359,8 +359,13 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-dashlet-border: ;
 --crm-dashlet-bg: var(--crm-c-page-background);
 --crm-dashlet-padding: var(--crm-s2);
+--crm-dashlet-box-shadow: var(--crm-popup-shadow);
+--crm-dashlet-dashlets-bg: var(--crm-c-backgrond);
 --crm-dashlet-header-bg: var(--crm-expand-header-bg);
 --crm-dashlet-header-col: var(--crm-expand-header-color);
+--crm-dashlet-header-border:;
+--crm-dashlet-header-border-width:;
+--crm-dashlet-header-font-size: var(--crm-font-size);
 --crm-dashlet-header-padding: var(--crm-s);
 --crm-dashlet-content-padding: var(--crm-dashlet-padding) 0;
 --crm-dashlet-tabs-bg: var(--crm-tabs-bg);

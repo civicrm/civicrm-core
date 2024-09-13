@@ -14,7 +14,7 @@
     border-radius: var(--crm-dashlet-radius);
     background-color: var(--crm-dashlet-bg);
     padding: var(--crm-dashlet-padding);
-    box-shadow: var(--crm-popup-shadow);
+    box-shadow: var(--crm-dashlet-box-shadow);
     margin-bottom: var(--crm-padding-reg);
     border: var(--crm-dashlet-border);
 }
@@ -24,6 +24,8 @@
 .crm-container #civicrm-dashboard .crm-dashlet-header {
     background-color: var(--crm-dashlet-header-bg);
     border-radius: var(--crm-dashlet-radius);
+    border: var(--crm-dashlet-header-border);
+    border-width: var(--crm-dashlet-header-border-width);
     padding: var(--crm-dashlet-header-padding);
     display: flex;
     align-items: center;
@@ -40,7 +42,7 @@
     text-overflow: ellipsis;
     overflow: hidden;
     color: var(--crm-dashlet-header-col);
-    font-size: var(--crm-font-size);
+    font-size: var(--crm-dashlet-header-font-size);
 }
 .crm-container .crm-dashlet-header a {
     color: var(--crm-dashlet-header-col);
@@ -107,7 +109,7 @@ crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
     height: var(--crm-xxl);
     margin: 10px;
     box-shadow: 1px 1px 4px 1px rgba(0,0,0,0.2);
-    box-shadow: var(--crm-block-shadow);
+    box-shadow: var(--crm-popup-shadow);
     background-color: var(--crm-c-background4);
     border-radius: var(--crm-dashlet-radius);
     margin: 0;
@@ -187,8 +189,8 @@ fieldset.crm-inactive-dashlet-fieldset {
     margin-bottom: var(--crm-r);
 }
 fieldset.crm-inactive-dashlet-fieldset > div {
-    background-color: var(--crm-c-background) !important;
-    box-shadow: var(--crm-popup-shadow);
+    background-color: var(--crm-dashlet-dashlets-bg) !important;
+    box-shadow: var(--crm-dashlet-box-shadow);
     border-radius: var(--crm-dashlet-radius);
     display: flex;
     flex-wrap: wrap;

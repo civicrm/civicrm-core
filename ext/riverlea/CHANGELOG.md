@@ -1,3 +1,12 @@
+0.9.56
+ - CHANGED - reworking of dashlets to support more style variations
+ - NEW CSS VARIABLES
+    added: --crm-dashlet-header-border
+    added: --crm-dashlet-header-border-width
+    added: --crm-dashlet-header-font-size
+    added: --crm-dashlet-box-shadow
+    added: --crm-dashlet-dashlets-bg
+
 0.9.55
  - ADDED - functional darkmode settings screen for front and backend. This includes multiple changes, described on the MR: https://lab.civicrm.org/extensions/riverlea/-/merge_requests/22
  - ADDED - each stream has a _dark.css file for darkmode variables, which no longer appear in _variables.css

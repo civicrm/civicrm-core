@@ -62,7 +62,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-c-dark-text: var(--crm-c-text);
 --crm-c-link: var(--crm-c-blue-dark);
 --crm-c-link-hover: var(--crm-c-blue-darker);
---crm-c-divider: rgba(142, 146, 156, 0.5);
+--crm-c-divider: 1px solid #e5e5e5; /* common border pattern */
 --crm-c-page-background: transparent;
 --crm-c-background: #fafafa;
 --crm-c-background2:var(--crm-c-gray-050);
@@ -124,7 +124,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-page-width: 100%; /* Default that CMS can overwrite */
 
 /* TYPE */
---crm-font-size: inherit;
+--crm-font-size: 13px;
 --crm-small-font-size: var(--crm-m2);
 --crm-type-line-height: 1.5;
 --crm-link-decoration: revert;
@@ -201,28 +201,28 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-expand-transform: rotate(90deg);
 --crm-expand-transition: transform .3s;
 --crm-expand-radius: 0;
---crm-expand-gap: 0 0 var(--crm-r);
+--crm-expand-gap: 0 0 var(--crm-m2);
 /* .crm-accordion-bold */
---crm-expand-header-bg: var(--crm-c-background);
---crm-expand-header-bg-active: #eee;
+--crm-expand-header-bg: #eee;
+--crm-expand-header-bg-active: #ddd;
 --crm-expand-header-color: var(--crm-c-text);
 --crm-expand-header-padding: var(--crm-m);
 --crm-expand-header-weight: bold;
 --crm-expand-header-font: var(--crm-font-bold);
---crm-expand-header-border: 1px solid #e5e5e5;
+--crm-expand-header-border: var(--crm-c-divider);
 --crm-expand-header-border-width: 0 0 1px 0;
---crm-expand-border: 1px solid var(--crm-c-gray-500);
+--crm-expand-border: var(--crm-c-divider);
 --crm-expand-border-width: 0 1px 1px 1px;
 --crm-expand-body-bg: #fff;
 --crm-expand-body-box-shadow:;
---crm-expand-body-padding: var(--crm-padding-small);
+--crm-expand-body-padding: 1px 8px 12px 8px;
 /* .crm-accordion-light */
 --crm-expand2-header-bg: var(--crm-c-background);
---crm-expand2-header-bg-active: var(--crm-expand-header-bg-active);
+--crm-expand2-header-bg-active: #eee;
 --crm-expand2-header-weight: bold;
 --crm-expand2-header-font: var(--crm-font-bold);
 --crm-expand2-header-color: var(--crm-c-text);
---crm-expand2-header-border: var(--crm-expand-header-border);
+--crm-expand2-header-border: var(--crm-c-divider);
 --crm-expand2-header-border-width: var(--crm-expand-header-border-width);
 --crm-expand2-header-padding: var(--crm-expand-header-padding);
 --crm-expand2-border: var(--crm-expand-border);
@@ -359,17 +359,22 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-dialog-body-padding: var(--crm-m);
 
 /* Dashlet */
---crm-dashlet-border: ;
---crm-dashlet-bg: var(--crm-c-page-background);
+--crm-dashlet-border: var(--crm-c-divider);
+--crm-dashlet-bg: #fff;
 --crm-dashlet-padding: 0;
---crm-dashlet-header-bg: var(--crm-c-background3);
+--crm-dashlet-box-shadow:;
+--crm-dashlet-dashlets-bg: var(--crm-c-background3);
+--crm-dashlet-header-bg: var(--crm-c-background);
 --crm-dashlet-header-col: var(--crm-expand-header-color);
---crm-dashlet-header-padding: var(--crm-r);
+--crm-dashlet-header-border: var(--crm-c-divider);
+--crm-dashlet-header-border-width: 0 0 1px 0;
+--crm-dashlet-header-font-size: var(--crm-r1);
+--crm-dashlet-header-padding: 12px 8px;
 --crm-dashlet-content-padding: var(--crm-m);
 --crm-dashlet-tabs-bg: var(--crm-tabs-bg);
 --crm-dashlet-tab-bg: var(--crm-tab-bg);
 --crm-dashlet-tab-active: var(--crm-tab-bg-active);
---crm-dashlet-radius: var(--crm-roundness);
+--crm-dashlet-radius: 0;
 
 /* Button dropdowns */
 --crm-dropdown-padding: var(--crm-s);
