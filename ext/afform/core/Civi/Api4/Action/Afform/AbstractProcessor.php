@@ -562,8 +562,10 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
           $idData['joins'] = $this->combineValuesAndIds($val['joins'] ?? [], $idData['joins'] ?? [], TRUE);
         }
         // $item = array_merge($isJoin ? $val : ($val['fields'] ?? []), $idData);
-        $item = array_merge(($val ?? []), $idData);
-        $combined[$name][$idx] = $item;
+        if (is_array($val) || empty($val)) {
+          $item = array_merge(($val ?? []), $idData);
+          $combined[$name][$idx] = $item;
+        }
       }
     }
     return $combined;
