@@ -5,6 +5,7 @@ use CRM_riverlea_ExtensionUtil as E;
 return [
   'riverlea_dark_mode_backend' => [
     'name' => 'riverlea_dark_mode_backend',
+    'group' => 'riverlea',
     'type' => 'String',
     'default' => 'inherit',
     'html_type' => 'select',
@@ -26,6 +27,7 @@ return [
   ],
   'riverlea_dark_mode_frontend' => [
     'name' => 'riverlea_dark_mode_frontend',
+    'group' => 'riverlea',
     'type' => 'String',
     'default' => 'inherit',
     'html_type' => 'select',
