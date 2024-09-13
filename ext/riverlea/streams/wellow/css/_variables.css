@@ -9,7 +9,7 @@
 
 :root {
 
---crm-version: 'Minetta, v' var(--crm-release);
+--crm-version: 'Wellow, v' var(--crm-release);
 
 /* FONTS */
 --crm-system-fonts: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue",sans-serif;
@@ -152,10 +152,15 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-btn-icon-spacing: var(--crm-xs);
 --crm-btn-icon-size: auto;
 --crm-btn-cancel-bg: var(--crm-c-alert);
+--crm-btn-cancel-text: var(--crm-c-alert-text);
 --crm-btn-info-bg: var(--crm-c-info);
+--crm-btn-info-text: var(--crm-c-info-text);
 --crm-btn-warning-bg: var(--crm-c-warning);
+--crm-btn-warning-text: var(--crm-c-warning-text);
 --crm-btn-success-bg: var(--crm-c-success);
+--crm-btn-success-text: var(--crm-c-success-text);
 --crm-btn-alert-bg: var(--crm-c-alert);
+--crm-btn-alert-text: var(--crm-c-alert-text);
 --crm-btn-icon-bg: ;
 --crm-btn-icon-border: ;
 
@@ -186,8 +191,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 /* PANELS */
 --crm-panel-shadow: var(--crm-block-shadow);
 --crm-panel-background: var(--crm-c-page-background);
---crm-panel-border: 1px;
---crm-panel-border-col: var(--crm-c-gray-300);
+--crm-panel-border: 1px solid var(--crm-c-gray-300);
 --crm-panel-head-margin: 0px;
 
 /* ACCORDIONS */
@@ -196,26 +200,35 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-expand-icon-spacing: var(--crm-m);
 --crm-expand-transform: rotate(90deg);
 --crm-expand-transition: transform .3s;
+--crm-expand-radius: 0;
+--crm-expand-gap: 0 0 var(--crm-r);
+/* .crm-accordion-bold */
 --crm-expand-header-bg: var(--crm-c-background);
 --crm-expand-header-bg-active: #eee;
 --crm-expand-header-color: var(--crm-c-text);
 --crm-expand-header-padding: var(--crm-m);
 --crm-expand-header-weight: bold;
+--crm-expand-header-font: var(--crm-font-bold);
 --crm-expand-header-border: 1px solid #e5e5e5;
 --crm-expand-header-border-width: 0 0 1px 0;
+--crm-expand-border: 1px solid var(--crm-c-gray-500);
+--crm-expand-border-width: 0 1px 1px 1px;
 --crm-expand-body-bg: #fff;
 --crm-expand-body-box-shadow:;
---crm-expand-body-border: 1px solid var(--crm-c-gray-500);
---crm-expand-border-width: 0 1px 1px 1px;
 --crm-expand-body-padding: var(--crm-padding-small);
---crm-expand-gap: 0 0 var(--crm-r);
-/* .crm-accordion-light style: */
---crm-expand-body2-bg: #fff;
---crm-expand-header2-bg: var(--crm-c-background);
---crm-expand-header2-color: var(--crm-c-text);
---crm-expand-header2-weight: bold;
---crm-expand-2-border: 1px solid #e5e5e5;
---crm-expand-2-body-padding: var(--crm-padding-reg);
+/* .crm-accordion-light */
+--crm-expand2-header-bg: var(--crm-c-background);
+--crm-expand2-header-bg-active: var(--crm-expand-header-bg-active);
+--crm-expand2-header-weight: bold;
+--crm-expand2-header-font: var(--crm-font-bold);
+--crm-expand2-header-color: var(--crm-c-text);
+--crm-expand2-header-border: var(--crm-expand-header-border);
+--crm-expand2-header-border-width: var(--crm-expand-header-border-width);
+--crm-expand2-header-padding: var(--crm-expand-header-padding);
+--crm-expand2-border: var(--crm-expand-border);
+--crm-expand2-border-width: var(--crm-expand-border-width);
+--crm-expand2-body-bg: #fff;
+--crm-expand2-body-padding: var(--crm-padding-reg);
 
 /* ALERTS */
 --crm-alert-padding: var(--crm-m) var(--crm-m2);
@@ -285,7 +298,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-tab-border: 1px solid var(--crm-tab-border-col);
 --crm-tab-border-active: 0 solid transparent;
 --crm-tabs-2-border: var(--crm-tabs-border);
---crm-tabs-panel-border: 1px solid #aaa;
+--crm-tabs-panel-border: 1px solid #aaa; /* Wellow addition */
 
 /* Contact dashboard */
 --crm-dash-border: var(--crm-tab-border);
