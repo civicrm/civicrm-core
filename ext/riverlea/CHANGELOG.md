@@ -6,6 +6,8 @@
     added: --crm-dashlet-header-font-size
     added: --crm-dashlet-box-shadow
     added: --crm-dashlet-dashlets-bg
+    added: --crm-dialog-inner-shadow
+    added: --crm-dropdown-radius
 
 0.9.55
  - ADDED - functional darkmode settings screen for front and backend. This includes multiple changes, described on the MR: https://lab.civicrm.org/extensions/riverlea/-/merge_requests/22

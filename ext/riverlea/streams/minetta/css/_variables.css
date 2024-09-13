@@ -345,7 +345,8 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-dialog-bg: var(--crm-c-page-background);
 --crm-dialog-padding: var(--crm-s);
 --crm-dialog-radius: var(--crm-roundness);
---crm-dialog-line: ;
+--crm-dialog-line:;
+--crm-dialog-inner-shadow: var(--crm-bottom-shadow);
 --crm-dialog-header-bg: var(--crm-c-secondary);
 --crm-dialog-header-col: var(--crm-c-light-text);
 --crm-dialog-header-size: var(--crm-r1);
@@ -375,6 +376,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 
 /* Button dropdowns */
 --crm-dropdown-padding: var(--crm-s);
+--crm-dropdown-radius: var(--crm-roundness);
 --crm-dropdown-bg: var(--crm-c-secondary-hover);
 --crm-dropdown-col: var(--crm-c-light-text);
 --crm-dropdown-hover: var(--crm-c-text);

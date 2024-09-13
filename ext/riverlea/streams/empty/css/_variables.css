@@ -345,7 +345,8 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-dialog-bg: var(--crm-c-page-background);
 --crm-dialog-padding: var(--crm-s);
 --crm-dialog-radius: var(--crm-roundness);
---crm-dialog-line: ;
+--crm-dialog-line:;
+--crm-dialog-inner-shadow: var(--crm-bottom-shadow);
 --crm-dialog-header-bg: var(--crm-c-secondary);
 --crm-dialog-header-col: var(--crm-c-light-text);
 --crm-dialog-header-size: var(--crm-r1);

@@ -71,8 +71,8 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-c-background5: var(--crm-c-gray-700);
 --crm-c-drag-background: var(--crm-c-background3);
 --crm-c-code-background: var(--crm-c-background2);
---crm-c-primary: var(--crm-c-gray-700);
---crm-c-primary-hover: var(--crm-c-gray-800);
+--crm-c-primary: #2271b1;
+--crm-c-primary-hover: #165b92;
 --crm-c-primary-text: var(--crm-c-light-text);
 --crm-c-secondary: #5d677b;
 --crm-c-secondary-hover: #3e485b;
@@ -345,17 +345,18 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-dash-image-direction: row; /* choose from row and row-reverse to get the image on the right, column stacks it */
 
 /* Dialog */
---crm-dialog-bg: var(--crm-c-page-background);
---crm-dialog-padding: var(--crm-s);
---crm-dialog-radius: var(--crm-roundness);
---crm-dialog-line: ;
---crm-dialog-header-bg: var(--crm-c-secondary);
---crm-dialog-header-col: var(--crm-c-light-text);
---crm-dialog-header-size: var(--crm-r1);
---crm-dialog-header-padding: var(--crm-m1) var(--crm-r);
---crm-dialog-header-radius: var(--crm-dialog-radius);
---crm-dialog-header-border-col: transparent transparent var(--crm-c-gray-300) transparent; /* set a border color for each side of the header */
---crm-dialog-body-bg: var(--crm-c-background);
+--crm-dialog-bg: #eee;
+--crm-dialog-padding: 0;
+--crm-dialog-radius: 0;
+--crm-dialog-line: var(--crm-c-divider);
+--crm-dialog-inner-shadow:;
+--crm-dialog-header-bg: #eee;
+--crm-dialog-header-col: var(--crm-c-text);
+--crm-dialog-header-size: var(--crm-r);
+--crm-dialog-header-padding: 10px var(--crm-r);
+--crm-dialog-header-radius: 0;
+--crm-dialog-header-border-col: transparent transparent #e5e5e5 transparent; /* set a border color for each side of the header */
+--crm-dialog-body-bg: #fff;
 --crm-dialog-body-padding: var(--crm-m);
 
 /* Dashlet */
@@ -377,11 +378,12 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-dashlet-radius: 0;
 
 /* Button dropdowns */
---crm-dropdown-padding: var(--crm-s);
---crm-dropdown-bg: var(--crm-c-secondary-hover);
---crm-dropdown-col: var(--crm-c-light-text);
+--crm-dropdown-padding: 0;
+--crm-dropdown-radius: 0;
+--crm-dropdown-bg: #fff;
+--crm-dropdown-col: var(--crm-c-text);
 --crm-dropdown-hover: var(--crm-c-text);
---crm-dropdown-hover-bg: var(--crm-c-page-background);
+--crm-dropdown-hover-bg: #eee;
 --crm-dropdown-border: 0;
 --crm-dropdown-width: 180px;
 --crm-dropdown-2-bg: var(--crm-c-secondary);

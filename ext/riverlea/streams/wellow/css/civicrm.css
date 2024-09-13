@@ -286,15 +286,15 @@ Table amends.
 */
 
 /* Tables */
-.crm-container th,
+/* NEEDED? .crm-container th,
 .crm-container table thead.sticky th,
 .crm-container table.dataTable thead th,
 .crm-container tr.columnheader td
 {
 	vertical-align: middle;
-}
+} */
 
-.crm-container tr a.sorting,
+/* ADDED .crm-container tr a.sorting,
 .crm-container tr a.sorting_asc,
 .crm-container tr a.sorting_desc,
 .crm-container table.dataTable thead th.sorting,
@@ -302,7 +302,7 @@ Table amends.
 .crm-container table.dataTable thead th.sorting_desc
 {
 	line-height: 1;
-}
+} */
 
 /* Sticky table headers. */
 .crm-container table thead.sticky .sticky-header

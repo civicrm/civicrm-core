@@ -128,6 +128,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
     background-image: none;
     color: var(--crm-c-text);
     box-shadow: none;
+    line-height: 1;
 }
 .crm-container th a:hover,
 .crm-container th a:focus {

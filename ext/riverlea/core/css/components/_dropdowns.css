@@ -107,6 +107,7 @@
     background: var(--crm-dropdown-bg);
     border-radius: var(--crm-roundness);
 	border: var(--crm-dropdown-border);
+    box-shadow: var(--crm-popup-shadow);
 }
 .crm-container .btn-slide ul.panel::before,
 .crm-container .btn-group .dropdown-menu::before {
@@ -131,13 +132,13 @@
     left: auto;
 }
 .crm-container .btn-slide ul.panel li {
-    padding: var(--crm-s);
+    padding: var(--crm-dropdown-padding);
     list-style: none;
     width: auto;
 }
 .crm-container .btn-slide ul.panel li a {
     text-decoration: none;
-    padding: var(--crm-dropdown-padding);
+    padding: var(--crm-s);
     display: block;
     cursor: var(--crm-hover-clickable);
     color: var(--crm-dropdown-col);

@@ -42,11 +42,11 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-c-purple-dark: #3e3e54;
 --crm-c-green: #d6e9c6;
 --crm-c-green-light: #cff0be;
---crm-c-green-dark: #468847;
+--crm-c-green-dark: #46b450;
 --crm-c-red: #eed3d7;
 --crm-c-red-light: #f2dede;
---crm-c-red-dark: #b94a48 ;
---crm-c-amber: #dd5600;
+--crm-c-red-dark: #dc3232 ;
+--crm-c-amber: #ffb900;
 --crm-c-amber-light: #fbf0e2;
 --crm-c-yellow: #fcfc5a;
 --crm-c-yellow-light: #ffffcc;
@@ -347,6 +347,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-dialog-padding: 0;
 --crm-dialog-radius: var(--crm-roundness);
 --crm-dialog-line: ;
+--crm-dialog-inner-shadow: var(--crm-bottom-shadow);
 --crm-dialog-header-bg: var(--crm-c-background4);
 --crm-dialog-header-col: var(--crm-c-text);
 --crm-dialog-header-size: var(--crm-r);
@@ -376,6 +377,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 
 /* Button dropdowns */
 --crm-dropdown-padding: var(--crm-s);
+--crm-dropdown-radius: var(--crm-roundness);
 --crm-dropdown-bg: var(--crm-c-page-background);
 --crm-dropdown-col: var(--crm-c-text);
 --crm-dropdown-hover: var(--crm-c-text);
@@ -388,9 +390,9 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 
 /* Notifications */
 --crm-notify-background: rgb(0,0,0);
---crm-notify-padding: var(--crm-m2);
+--crm-notify-padding: 10px 10px 15px 15px;
 --crm-notify-col: var(--crm-c-light-text);
---crm-notify-accent-border: 0 3px 0 0; /* adds a border to one/several sides of the notification - set to 0 for none */
+--crm-notify-accent-border: 0 0 0 4px; /* adds a border to one/several sides of the notification - set to 0 for none */
 --crm-notify-radius: 0;
 
 /* Icons */

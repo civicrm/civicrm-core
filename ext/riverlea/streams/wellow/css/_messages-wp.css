@@ -194,7 +194,7 @@ WordPress style status message boxes.
 
 
 
-/* Footer status */
+/* Footer status *
 .crm-container #civicrm-footer .status
 {
 	padding: 3px 4px 3px 6px;
@@ -253,7 +253,7 @@ WordPress style notification popover.
 	top: 45px;
 	right: 15px;
 }
-
+/*
 #crm-notification-container div.ui-notify-message
 {
 	padding: 10px 10px 15px 15px;
@@ -277,7 +277,7 @@ WordPress style notification popover.
 #crm-notification-container div.ui-notify-message.warning
 {
 	border-left: 4px solid #ffb900;
-}
+} */
 
 .crm-container #crm-notification-container div.ui-notify-message.info h1::before,
 .crm-container .messages.crm-empty-table::before
@@ -326,7 +326,7 @@ WordPress style notification popover.
 	margin-bottom: 0;
 }
 
-#crm-notification-container div.ui-notify-message-style
+/* #crm-notification-container div.ui-notify-message-style
 {
 	background: #fff;
 	box-shadow: 0 3px 18px 0 rgba(48,40,40,0.25);
@@ -337,7 +337,7 @@ WordPress style notification popover.
 #crm-notification-container div.error.ui-notify-message-style
 {
 	border-left: 4px solid #d63638;
-}
+} */
 
 .crm-container div.ui-notify-message-style a,
 .crm-container div.ui-notify-message-style a:link
@@ -355,7 +355,7 @@ WordPress style notification popover.
 	color: #edce5c;
 	text-decoration: none;
 }
-
+/*
 #crm-notification-container .ui-notify-message .ui-notify-close
 {
 	cursor: pointer;
@@ -390,7 +390,7 @@ WordPress style notification popover.
 	width: 18px;
 	height: 18px;
 	margin-left: 3px;
-}
+}*/
 
 .crm-container div.ui-notify-message table,
 .crm-container div.ui-notify-message tbody,
@@ -456,11 +456,11 @@ WordPress style notification popover.
 .crm-container div.ui-notify-message.none div.icon {
 	display: none;
 }
-*/
+
 #crm-notification-container .ui-notify-message .icon.ui-notify-close
 {
 	display: none;
-}
+}*/
 
 span.crm-status-icon
 {
