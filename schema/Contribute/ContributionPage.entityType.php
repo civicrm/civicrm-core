@@ -52,6 +52,7 @@ return [
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'required' => TRUE,
+      'default_fallback' => ['title'],
       'localizable' => TRUE,
       'description' => ts('Contribution Page Public title'),
       'add' => '5.20',
@@ -89,6 +90,7 @@ return [
         'table' => 'civicrm_financial_type',
         'key_column' => 'id',
         'label_column' => 'name',
+        'condition_provider' => ['CRM_Financial_BAO_FinancialType', 'alterIncomeFinancialTypes'],
       ],
       'entity_reference' => [
         'entity' => 'FinancialType',

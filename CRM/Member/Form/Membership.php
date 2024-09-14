@@ -208,8 +208,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         $resources->addScriptFile('civicrm', 'templates/CRM/Member/Form/MembershipStandalone.js');
         $passthru = [
           'typeorgs' => CRM_Member_BAO_MembershipType::getMembershipTypeOrganization(),
-          'memtypes' => CRM_Core_PseudoConstant::get('CRM_Member_BAO_Membership', 'membership_type_id'),
-          'statuses' => CRM_Core_PseudoConstant::get('CRM_Member_BAO_Membership', 'status_id'),
+          'memtypes' => CRM_Member_BAO_Membership::buildOptions('membership_type_id'),
+          'statuses' => CRM_Member_BAO_Membership::buildOptions('status_id'),
         ];
         $resources->addSetting(['existingMems' => $passthru]);
       }
@@ -341,7 +341,7 @@ DESC limit 1");
           continue;
         }
         foreach ($pField['options'] as $opId => $opValues) {
-          $optionsMembershipTypes[$opId] = CRM_Utils_Array::value('membership_type_id', $opValues, 0);
+          $optionsMembershipTypes[$opId] = $opValues['membership_type_id'] ?: 0;
         }
       }
 

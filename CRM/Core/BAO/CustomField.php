@@ -18,7 +18,7 @@
 use Civi\Api4\Utils\CoreUtil;
 
 /**
- * Business objects for managing custom data fields.
+ * Class CRM_Core_BAO_CustomField
  */
 class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
@@ -96,6 +96,31 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         'label' => ts('Entity Reference'),
       ],
     ];
+  }
+
+  /**
+   * Converts the 'data_type' property to the format used by Api4 and EntityRepository
+   *
+   * @param array $customField
+   * @return string
+   */
+  public static function getDataTypeString(array $customField): string {
+    $map = [
+      'Int' => 'Integer',
+      'Memo' => 'Text',
+      'Boolean' => 'Boolean',
+      'StateProvince' => 'Integer',
+      'Country' => 'Integer',
+      'File' => 'Integer',
+      'Link' => 'String',
+      'ContactReference' => 'Integer',
+      'EntityReference' => 'Integer',
+    ];
+    $dataType = $map[$customField['data_type']] ?? $customField['data_type'];
+    if ($dataType === 'Date' && !empty($customField['time_format'])) {
+      $dataType = 'Timestamp';
+    }
+    return $dataType;
   }
 
   /**
@@ -295,22 +320,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     $entity = $this->getEntity();
 
     return self::getFieldOptions($id, $optionGroupID, $dataType, $entity, $context);
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public static function buildOptions($fieldName, $context = NULL, $props = []) {
-    $options = parent::buildOptions($fieldName, $context, $props);
-    // This provides legacy support for APIv3, allowing no-longer-existent html types
-    if ($fieldName == 'html_type' && isset($props['version']) && $props['version'] == 3) {
-      $options['Multi-Select'] = 'Multi-Select';
-      $options['Select Country'] = 'Select Country';
-      $options['Multi-Select Country'] = 'Multi-Select Country';
-      $options['Select State/Province'] = 'Select State/Province';
-      $options['Multi-Select State/Province'] = 'Multi-Select State/Province';
-    }
-    return $options;
   }
 
   /**
@@ -582,6 +591,36 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       if (isset($customGroup['fields'][$id])) {
         $customGroup['fields'][$id]['custom_group'] = array_diff_key($customGroup, ['fields' => 1]);
         return $customGroup['fields'][$id];
+      }
+    }
+    return NULL;
+  }
+
+  /**
+   * Converts `custom_123` to `GroupName.FieldName`.
+   */
+  public static function getLongNameFromShortName(string $shortName): ?string {
+    [, $id] = explode('_', $shortName);
+    foreach (CRM_Core_BAO_CustomGroup::getAll() as $customGroup) {
+      if (isset($customGroup['fields'][$id])) {
+        return $customGroup['name'] . '.' . $customGroup['fields'][$id]['name'];
+      }
+    }
+    return NULL;
+  }
+
+  /**
+   * Converts `GroupName.FieldName` to `custom_123`.
+   */
+  public static function getShortNameFromLongName(string $longName): ?string {
+    [$groupName, $fieldName] = explode('.', $longName);
+    foreach (CRM_Core_BAO_CustomGroup::getAll() as $customGroup) {
+      if ($customGroup['name'] === $groupName) {
+        foreach ($customGroup['fields'] as $id => $field) {
+          if ($field['name'] === $fieldName) {
+            return "custom_$id";
+          }
+        }
       }
     }
     return NULL;
@@ -1596,16 +1635,9 @@ SELECT $columnName
    * @return array
    */
   public static function defaultCustomTableSchema($params) {
-    // add the id and extends_id
-    $collation = CRM_Core_BAO_SchemaHandler::getInUseCollation();
-    $characterSet = 'utf8';
-    if (stripos($collation, 'utf8mb4') !== FALSE) {
-      $characterSet = 'utf8mb4';
-    }
     $table = [
       'name' => $params['name'],
       'is_multiple' => $params['is_multiple'],
-      'attributes' => "ENGINE=InnoDB DEFAULT CHARACTER SET {$characterSet} COLLATE {$collation}",
       'fields' => [
         [
           'name' => 'id',
@@ -1626,12 +1658,6 @@ SELECT $columnName
         ],
       ],
     ];
-
-    // If on MySQL 5.6 include ROW_FORMAT=DYNAMIC to fix unit tests
-    $databaseVersion = CRM_Utils_SQL::getDatabaseVersion();
-    if (version_compare($databaseVersion, '5.7', '<') && version_compare($databaseVersion, '5.6', '>=')) {
-      $table['attributes'] = $table['attributes'] . ' ROW_FORMAT=DYNAMIC';
-    }
 
     if (!$params['is_multiple']) {
       $table['indexes'] = [
@@ -1962,6 +1988,7 @@ WHERE  id IN ( %1, %2 )
           // Don't set reserved as it's not a built-in option group and may be useful for other custom fields.
           'is_reserved' => 0,
           'data_type' => $dataType,
+          'option_value_fields' => self::getOptionValueFields($params),
         ]);
         $params['option_group_id'] = $optionGroup->id;
         if (!empty($params['option_value']) && is_array($params['option_value'])) {
@@ -2000,6 +2027,23 @@ WHERE  id IN ( %1, %2 )
       $params['attributes'] = 'rows=4, cols=60';
     }
     return $params;
+  }
+
+  /**
+   * Get option_value_fields for auto-creating a group
+   *
+   * This checks option values to see if any contain
+   * extra fields like description, color, icon, etc.
+   */
+  private static function getOptionValueFields(array $params): array {
+    $fields = ['name', 'label'];
+    $extras = array_diff(array_keys(CRM_Core_SelectValues::optionValueFields()), $fields);
+    foreach ($extras as $extra) {
+      if (!empty($params["option_$extra"]) && array_filter($params["option_$extra"])) {
+        $fields[] = $extra;
+      }
+    }
+    return $fields;
   }
 
   /**
@@ -2719,7 +2763,6 @@ WHERE      f.id IN ($ids)";
       elseif ($dataType === 'Boolean') {
         $options = $context === 'validate' ? [0, 1] : CRM_Core_SelectValues::boolean();
       }
-      CRM_Utils_Hook::customFieldOptions($id, $options);
       CRM_Utils_Hook::fieldOptions($entity, "custom_{$id}", $options, ['context' => $context]);
       $cache->set($cacheKey, $options);
     }

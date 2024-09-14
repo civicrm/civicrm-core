@@ -37,7 +37,11 @@
  * @return string|null
  */
 function crm_smarty_compatibility_get_path() {
-  return CRM_Utils_Constant::value('CIVICRM_SMARTY_AUTOLOAD_PATH') ?: CRM_Utils_Constant::value('CIVICRM_SMARTY3_AUTOLOAD_PATH');
+  $path = CRM_Utils_Constant::value('CIVICRM_SMARTY_AUTOLOAD_PATH') ?: CRM_Utils_Constant::value('CIVICRM_SMARTY3_AUTOLOAD_PATH');
+  if ($path) {
+    $path = str_replace('smarty3', 'smarty4', $path);
+  }
+  return $path;
 }
 
 /**

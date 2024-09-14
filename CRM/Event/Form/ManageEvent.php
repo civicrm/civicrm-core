@@ -159,7 +159,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
     $this->assign('isRepeatingEntity', $this->_isRepeatingEvent);
 
     // CRM-16776 - show edit/copy/create buttons for Profiles if user has required permission.
-    $ufGroups = CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id');
+    $ufGroups = CRM_Core_DAO_UFField::buildOptions('uf_group_id');
     $ufCreate = CRM_ACL_API::group(CRM_Core_Permission::CREATE, NULL, 'civicrm_uf_group', $ufGroups);
     $ufEdit = CRM_ACL_API::group(CRM_Core_Permission::EDIT, NULL, 'civicrm_uf_group', $ufGroups);
     $checkPermission = [
@@ -480,9 +480,6 @@ WHERE      e.id = %1
       }
       if (!$dao->is_monetary) {
         $tabs['fee']['valid'] = FALSE;
-      }
-      if (!$dao->is_active) {
-        $tabs['friend']['valid'] = FALSE;
       }
       if (!$dao->is_pcp) {
         $tabs['pcp']['valid'] = FALSE;

@@ -306,7 +306,7 @@ class CRM_Core_Permission {
    * @return array
    */
   public static function ufGroup($type = CRM_Core_Permission::VIEW) {
-    $ufGroups = CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id');
+    $ufGroups = CRM_Core_DAO_UFField::buildOptions('uf_group_id');
 
     $allGroups = array_keys($ufGroups);
 

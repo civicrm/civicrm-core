@@ -47,7 +47,7 @@ class CRM_Mailing_MailStore {
       throw new Exception("Could not find entry named $name in civicrm_mail_settings");
     }
 
-    $protocols = CRM_Core_PseudoConstant::get('CRM_Core_DAO_MailSettings', 'protocol', [], 'validate');
+    $protocols = CRM_Core_DAO_MailSettings::buildOptions('protocol', 'validate');
 
     // Prepare normalized/hookable representation of the mail settings.
     $mailSettings = $dao->toArray();

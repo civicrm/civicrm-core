@@ -20,7 +20,7 @@ table.form-layout th {
 }
 #crm-container {
   overflow: visible !important;
-  font-family: DejaVu Sans, serif;
+  font-family: DejaVu Sans, sans-serif;
   margin: 0px 10px 0px 10px;
 }
 

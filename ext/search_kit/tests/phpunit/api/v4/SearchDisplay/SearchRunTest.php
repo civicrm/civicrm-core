@@ -1977,6 +1977,122 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('$250.00', $result[3]['columns'][0]['val']);
   }
 
+  public function testTally(): void {
+    \Civi::settings()->set('dateformatshortdate', '%m/%d/%Y');
+    $contacts = $this->saveTestRecords('Individual', [
+      'records' => [
+        ['first_name' => 'A', 'last_name' => 'A'],
+        ['first_name' => 'B', 'last_name' => 'B'],
+        ['first_name' => 'C', 'last_name' => 'C'],
+      ],
+    ]);
+
+    $contributions = $this->saveTestRecords('Contribution', [
+      'records' => [
+        ['total_amount' => 100, 'contact_id' => $contacts[0]['id'], 'receive_date' => '2024-02-02'],
+        ['total_amount' => 200, 'contact_id' => $contacts[0]['id'], 'receive_date' => '2021-02-02'],
+        ['total_amount' => 300, 'contact_id' => $contacts[1]['id'], 'receive_date' => '2022-02-02'],
+        ['total_amount' => 400, 'contact_id' => $contacts[2]['id'], 'receive_date' => '2023-02-02'],
+      ],
+    ]);
+
+    $this->createTestRecord('SavedSearch', [
+      'name' => __FUNCTION__,
+      'label' => __FUNCTION__,
+      'api_entity' => 'Contribution',
+      'api_params' => [
+        'version' => 4,
+        'select' => [
+          'COUNT(id) AS COUNT_id',
+          'GROUP_CONCAT(DISTINCT contact_id.sort_name) AS GROUP_CONCAT_contact_id_sort_name',
+          'SUM(total_amount) AS SUM_total_amount',
+          'GROUP_FIRST(receive_date ORDER BY receive_date ASC) AS GROUP_FIRST_receive_date',
+        ],
+        'orderBy' => [],
+        'where' => [
+          ['id', 'IN', $contributions->column('id')],
+        ],
+        'groupBy' => [
+          'contact_id',
+        ],
+        'join' => [],
+        'having' => [],
+      ],
+    ]);
+
+    $this->createTestRecord('SearchDisplay', [
+      'name' => __FUNCTION__,
+      'label' => __FUNCTION__,
+      'saved_search_id.name' => __FUNCTION__,
+      'type' => 'table',
+      'settings' => [
+        'description' => NULL,
+        'sort' => [],
+        'limit' => 50,
+        'pager' => [],
+        'placeholder' => 5,
+        'columns' => [
+          [
+            'type' => 'field',
+            'key' => 'COUNT_id',
+            'label' => '(Count) Contribution ID',
+            'sortable' => TRUE,
+            'tally' => [
+              'fn' => 'SUM',
+            ],
+          ],
+          [
+            'type' => 'field',
+            'key' => 'GROUP_CONCAT_contact_id_sort_name',
+            'label' => '(List) Contact Sort Name',
+            'sortable' => TRUE,
+            'tally' => [
+              'fn' => 'GROUP_CONCAT',
+            ],
+          ],
+          [
+            'type' => 'field',
+            'key' => 'SUM_total_amount',
+            'label' => '(Sum) Total Amount',
+            'sortable' => TRUE,
+            'tally' => [
+              'fn' => 'SUM',
+            ],
+          ],
+          [
+            'type' => 'field',
+            'key' => 'GROUP_FIRST_receive_date',
+            'label' => 'First Contribution Date',
+            'sortable' => TRUE,
+            'tally' => [
+              'fn' => 'GROUP_FIRST',
+            ],
+            'format' => 'dateformatshortdate',
+          ],
+        ],
+        'actions' => TRUE,
+        'classes' => [
+          'table',
+          'table-striped',
+        ],
+        'tally' => [
+          'label' => 'Total',
+        ],
+      ],
+    ]);
+
+    $tally = SearchDisplay::run(FALSE)
+      ->setReturn('tally')
+      ->setDisplay(__FUNCTION__)
+      ->setSavedSearch(__FUNCTION__)
+      ->execute()->single();
+
+    $this->assertSame('4', $tally['COUNT_id']);
+    $this->assertEquals(['A, A', 'B, B', 'C, C'], $tally['GROUP_CONCAT_contact_id_sort_name']);
+    $this->assertSame('$1,000.00', $tally['SUM_total_amount']);
+    $this->assertSame('02/02/2021', $tally['GROUP_FIRST_receive_date']);
+  }
+
   public function testContributionTotalCountWithTestAndTemplateContributions():void {
     // Add a source here for the where below, as if we use id, we get the test and template contributions
     $contributions = $this->saveTestRecords('Contribution', [

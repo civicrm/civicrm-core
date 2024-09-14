@@ -542,7 +542,7 @@ return [
     'description' => ts('When generating a letter (PDF/Word) via mail-merge, how should the letter be recorded?'),
     'help_text' => NULL,
     'pseudoconstant' => [
-      'callback' => 'CRM_Contact_Form_Task_PDFLetterCommon::getLoggingOptions',
+      'callback' => 'CRM_Core_SelectValues::getPDFLoggingOptions',
     ],
   ],
   'dompdf_font_dir' => [

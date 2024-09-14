@@ -1525,6 +1525,11 @@ class CRM_Utils_System {
 
     CRM_Core_OptionGroup::flushAll();
     CRM_Utils_PseudoConstant::flushAll();
+
+    if (Civi\Core\Container::isContainerBooted()) {
+      Civi::dispatcher()->dispatch('civi.core.clearcache');
+    }
+
   }
 
   /**

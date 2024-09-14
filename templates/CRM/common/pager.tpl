@@ -7,21 +7,21 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{if $pager|smarty:nodefaults and $pager->_response|smarty:nodefaults}
+{if $pager && $pager->_response}
     {if $pager->_response.numPages > 1}
         <div class="crm-pager">
             <span class="element-right">
             {if $location eq 'top'}
-              {$pager->_response.titleTop|smarty:nodefaults}
+              {$pager->_response.titleTop nofilter}
             {else}
-              {$pager->_response.titleBottom|smarty:nodefaults}
+              {$pager->_response.titleBottom nofilter}
             {/if}
             </span>
           <span class="crm-pager-nav">
-          {$pager->_response.first|smarty:nodefaults}&nbsp;
-          {$pager->_response.back|smarty:nodefaults}&nbsp;
-          {$pager->_response.next|smarty:nodefaults}&nbsp;
-          {$pager->_response.last|smarty:nodefaults}&nbsp;
+          {$pager->_response.first nofilter}&nbsp;
+          {$pager->_response.back nofilter}&nbsp;
+          {$pager->_response.next nofilter}&nbsp;
+          {$pager->_response.last nofilter}&nbsp;
           {$pager->_response.status}
           </span>
 
@@ -47,7 +47,7 @@
             numPages = {$pager->_response.numPages},
             currentPage = {$pager->_response.currentPage},
             perPageCount = {$pager->_perPage},
-            currentLocation = {$pager->_response.currentLocation|json_encode},
+            currentLocation = {$pager->_response.currentLocation|json_encode nofilter},
             spinning = null,
             refreshing = false;
           {literal}

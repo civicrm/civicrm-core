@@ -1315,6 +1315,17 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->customGroupDelete($ids['custom_group_id']);
   }
 
+  public function testGetOptions(): void {
+    $options = $this->callAPISuccess($this->_entity, 'getoptions', ['field' => 'worldregion_id']);
+    $this->assertContains('Europe and Central Asia', $options['values']);
+
+    $options = $this->callAPISuccess($this->_entity, 'getoptions', ['field' => 'country']);
+    $this->assertContains('France', $options['values']);
+
+    $options = $this->callAPISuccess($this->_entity, 'getoptions', ['field' => 'state_province']);
+    $this->assertContains('Alaska', $options['values']);
+  }
+
   /**
    * Tests that using 'return' with a custom field not of type contact does not inappropriately filter.
    *
@@ -4766,7 +4777,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  protected function validateContactField(string $fieldName, $expected, ?int $contactID, array $criteria = NULL): void {
+  protected function validateContactField(string $fieldName, $expected, ?int $contactID, ?array $criteria = NULL): void {
     $api = Contact::get()->addSelect($fieldName);
     if ($criteria) {
       $api->setWhere([$criteria]);

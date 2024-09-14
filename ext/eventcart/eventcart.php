@@ -13,10 +13,7 @@ function eventcart_civicrm_config(&$config) {
     return;
   }
   Civi::$statics[__FUNCTION__] = 1;
-  // Since as a hidden extension it's always enabled, until this is a "real" extension you can turn off we need to check the legacy setting.
-  if ((bool) Civi::settings()->get('enable_cart')) {
-    Civi::dispatcher()->addListener('hook_civicrm_pageRun', 'CRM_Event_Cart_PageCallback::run');
-  }
+  Civi::dispatcher()->addListener('hook_civicrm_pageRun', 'CRM_Event_Cart_PageCallback::run');
 
   _eventcart_civix_civicrm_config($config);
 }
@@ -53,7 +50,7 @@ function eventcart_civicrm_enable() {
 }
 
 function eventcart_civicrm_tabset($name, &$tabs) {
-  if ($name === 'civicrm/event/manage' && Civi::settings()->get('enable_cart')) {
+  if ($name === 'civicrm/event/manage') {
     $tabs['conference'] = [
       'title' => E::ts('Conference Slots'),
       'link' => NULL,

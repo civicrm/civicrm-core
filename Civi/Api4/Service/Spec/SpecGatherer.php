@@ -121,7 +121,7 @@ class SpecGatherer extends AutoService implements EventSubscriberInterface {
 
     // Real entities
     if (!str_starts_with($entityName, 'Custom_')) {
-      $this->addDAOFields($entityName, $specification);
+      $this->addCoreFields($entityName, $specification);
       $this->addCustomFields($entityName, $specification);
     }
     // Custom pseudo-entities
@@ -156,19 +156,26 @@ class SpecGatherer extends AutoService implements EventSubscriberInterface {
    * @param string $entityName
    * @param \Civi\Api4\Service\Spec\RequestSpec $spec
    */
-  private function addDAOFields(string $entityName, RequestSpec $spec) {
-    $DAOFields = $this->getDAOFields($entityName);
+  private function addCoreFields(string $entityName, RequestSpec $spec) {
+    $entity = \Civi::entity(CoreUtil::isContact($entityName) ? 'Contact' : $entityName);
+    $daoClass = $entity->getMeta('class');
+    if ($daoClass) {
+      $baoClass = \CRM_Core_DAO_AllCoreTables::getBAOClassName($daoClass);
+    }
 
-    foreach ($DAOFields as $DAOField) {
-      if (isset($DAOField['contactType']) && $spec->getValue('contact_type') && $DAOField['contactType'] !== $spec->getValue('contact_type')) {
+    foreach ($entity->getSupportedFields() as $name => $field) {
+      if (isset($field['contact_type']) && $spec->getValue('contact_type') && $field['contact_type'] !== $spec->getValue('contact_type')) {
         continue;
       }
-      if (!empty($DAOField['component']) && !\CRM_Core_Component::isEnabled($DAOField['component'])) {
+      if (!empty($field['component']) && !\CRM_Core_Component::isEnabled($field['component'])) {
         continue;
       }
-      $this->setDynamicFk($DAOField, $spec);
-      $field = SpecFormatter::arrayToField($DAOField, $entityName);
-      $spec->addFieldSpec($field);
+      if (!empty($baoClass)) {
+        $field['bao'] = $baoClass;
+      }
+      $this->setDynamicFk($name, $field, $spec);
+      $fieldSpec = SpecFormatter::arrayToField($name, $field, $entityName);
+      $spec->addFieldSpec($fieldSpec);
     }
   }
 
@@ -181,17 +188,17 @@ class SpecGatherer extends AutoService implements EventSubscriberInterface {
    * Additionally, if $values contains a value for e.g. `entity_table`,
    * then getFields will also output the corresponding `fk_entity` for the `entity_id` field.
    */
-  private function setDynamicFk(array &$DAOField, RequestSpec $spec): void {
-    if (empty($DAOField['FKClassName']) && !empty($DAOField['bao']) && $DAOField['type'] == \CRM_Utils_Type::T_INT) {
+  private function setDynamicFk(string $fieldName, array &$field, RequestSpec $spec): void {
+    if (!empty($field['entity_reference']['dynamic_entity']) && !empty($field['bao'])) {
       // Check if this field is a key for a dynamic FK
-      foreach ($DAOField['bao']::getReferenceColumns() ?? [] as $reference) {
-        if ($reference instanceof \CRM_Core_Reference_Dynamic && $reference->getReferenceKey() === $DAOField['name']) {
-          $entityTableColumn = $reference->getTypeColumn();
-          $DAOField['DFKEntities'] = $reference->getTargetEntities();
-          $DAOField['html']['controlField'] = $entityTableColumn;
+      foreach ($field['bao']::getReferenceColumns() ?? [] as $reference) {
+        if ($reference instanceof \CRM_Core_Reference_Dynamic && $reference->getReferenceKey() === $fieldName) {
+          $entityTableColumn = $field['entity_reference']['dynamic_entity'];
+          $field['DFKEntities'] = $reference->getTargetEntities();
+          $field['input_attrs']['controlField'] = $entityTableColumn;
           // If we have a value for entity_table then this field can pretend to be a single FK too.
-          if ($spec->hasValue($entityTableColumn) && $DAOField['DFKEntities']) {
-            $DAOField['FKClassName'] = \CRM_Core_DAO_AllCoreTables::getDAONameForEntity($DAOField['DFKEntities'][$spec->getValue($entityTableColumn)]);
+          if ($spec->hasValue($entityTableColumn) && $field['DFKEntities']) {
+            $field['entity_reference']['entity'] = $field['DFKEntities'][$spec->getValue($entityTableColumn)];
           }
           break;
         }
@@ -202,23 +209,23 @@ class SpecGatherer extends AutoService implements EventSubscriberInterface {
   /**
    * Get custom fields that extend this entity
    *
-   * @param string $entity
+   * @param string $entityName
    * @param \Civi\Api4\Service\Spec\RequestSpec $spec
    * @throws \CRM_Core_Exception
    * @see \CRM_Core_SelectValues::customGroupExtends
    */
-  private function addCustomFields(string $entity, RequestSpec $spec) {
+  private function addCustomFields(string $entityName, RequestSpec $spec) {
     // If contact type is given, treat it as the api entity
-    if ($entity === 'Contact' && $spec->getValue('contact_type')) {
-      $entity = $spec->getValue('contact_type');
+    if ($entityName === 'Contact' && $spec->getValue('contact_type')) {
+      $entityName = $spec->getValue('contact_type');
     }
 
-    $customInfo = \Civi\Api4\Utils\CoreUtil::getCustomGroupExtends($entity);
+    $customInfo = \Civi\Api4\Utils\CoreUtil::getCustomGroupExtends($entityName);
     if (!$customInfo) {
       return;
     }
     $grouping = $customInfo['grouping'];
-    if (CoreUtil::isContact($entity)) {
+    if (CoreUtil::isContact($entityName)) {
       $grouping = 'contact_sub_type';
     }
 
@@ -227,27 +234,34 @@ class SpecGatherer extends AutoService implements EventSubscriberInterface {
       'extends' => $customInfo['extends'],
       'is_multiple' => FALSE,
     ];
+    // Filter single grouping (e.g. `activity_type_id`)
     if (is_string($grouping) && $spec->hasValue($grouping)) {
       $filters['extends_entity_column_value'] = array_merge([NULL], (array) $spec->getValue($grouping));
     }
-    // Gather values to filter multiple groupings (Participant entity)
-    $groupingValues = [];
-    if (is_array($grouping)) {
+    // Filter multiple groupings (e.g. Participant entity)
+    elseif (is_array($grouping)) {
+      $groupingValues = [];
       foreach ($grouping as $groupingKey) {
         if ($spec->hasValue($groupingKey)) {
           $groupingValues[$groupingKey] = $spec->getValue($groupingKey);
         }
       }
-    }
-
-    $customGroups = \CRM_Core_BAO_CustomGroup::getAll($filters);
-    foreach ($customGroups as $customGroup) {
-      if (!$groupingValues || $this->customGroupBelongsTo($customGroup, $groupingValues, $grouping)) {
-        foreach ($customGroup['fields'] as $fieldArray) {
-          $field = SpecFormatter::arrayToField($fieldArray, $entity, $customGroup);
-          $spec->addFieldSpec($field);
+      $ids = [];
+      if ($groupingValues) {
+        foreach (\CRM_Core_BAO_CustomGroup::getAll($filters) as $customGroup) {
+          if ($this->customGroupBelongsTo($customGroup, $groupingValues, $grouping)) {
+            $ids[] = $customGroup['id'];
+          }
         }
+        $filters['id'] = $ids;
       }
+    }
+    $entity = \Civi::entity(CoreUtil::isContact($entityName) ? 'Contact' : $entityName);
+    $customFields = $entity->getCustomFields($filters);
+    foreach ($customFields as $name => $customField) {
+      $customField['name'] = $name;
+      $field = SpecFormatter::arrayToField($name, $customField, $entityName);
+      $spec->addFieldSpec($field);
     }
   }
 
@@ -298,31 +312,18 @@ class SpecGatherer extends AutoService implements EventSubscriberInterface {
    * @param \Civi\Api4\Service\Spec\RequestSpec $specification
    */
   private function getCustomGroupFields($customGroupName, RequestSpec $specification): void {
-    foreach (\CRM_Core_BAO_CustomGroup::getAll() as $customGroup) {
-      if ($customGroup['name'] === $customGroupName) {
-        foreach ($customGroup['fields'] as $fieldArray) {
-          if ($fieldArray['is_active']) {
-            $field = SpecFormatter::arrayToField($fieldArray, 'Custom_' . $customGroupName, $customGroup);
-            $specification->addFieldSpec($field);
-          }
-        }
-        return;
-      }
+    $customGroup = \CRM_Core_BAO_CustomGroup::getGroup(['name' => $customGroupName]);
+    $baseEntityName = $customGroup['extends'];
+    $filters = [
+      'is_active' => TRUE,
+      'id' => $customGroup['id'],
+    ];
+    $entity = \Civi::entity(CoreUtil::isContact($baseEntityName) ? 'Contact' : $baseEntityName);
+    $customFields = $entity->getCustomFields($filters);
+    foreach ($customFields as $name => $customField) {
+      $field = SpecFormatter::arrayToField($name, $customField, 'Custom_' . $customGroupName);
+      $specification->addFieldSpec($field);
     }
-  }
-
-  /**
-   * @param string $entityName
-   *
-   * @return array
-   * @throws \CRM_Core_Exception
-   */
-  private function getDAOFields(string $entityName): array {
-    $bao = CoreUtil::getBAOFromApiName($entityName);
-    if (!$bao) {
-      throw new \CRM_Core_Exception('Entity not loaded: ' . $entityName);
-    }
-    return $bao::getSupportedFields();
   }
 
 }

@@ -14,14 +14,25 @@
             evaluate(item['#children']);
             _.each(item, function(prop, key) {
               if (_.isString(prop) && !_.includes(doNotEval, key)) {
-                var str = _.trim(prop);
-                if (str[0] === '{' || str[0] === '[' || str.slice(0, 3) === 'ts(') {
-                  item[key] = $parse(str)({ts: CRM.ts('afform')});
+                if (looksLikeJs(prop)) {
+                  try {
+                    item[key] = $parse(prop)({ts: CRM.ts('afform')});
+                  } catch (e) {
+                  }
                 }
               }
             });
           }
         });
+      }
+
+      function looksLikeJs(str) {
+        str = _.trim(str);
+        let firstChar = str.charAt(0);
+        let lastChar = str.slice(-1);
+        return (firstChar === '{' && lastChar === '}') ||
+          (firstChar === '[' && lastChar === ']') ||
+          str.slice(0, 3) === 'ts(';
       }
 
       function getStyles(node) {

@@ -3613,7 +3613,7 @@ WHERE  $smartGroupClause
   public function phone_option_group($values) {
     [$name, $op, $value, $grouping, $wildcard] = $values;
     $option = ($name == 'phone_phone_type_id' ? 'phone_type_id' : 'location_type_id');
-    $options = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', $option);
+    $options = CRM_Core_DAO_Phone::buildOptions($option);
     $optionName = $options[$value];
     $this->_qill[$grouping][] = ts('Phone') . ' ' . ($name == 'phone_phone_type_id' ? ts('type') : ('location')) . " $op $optionName";
     $this->_where[$grouping][] = self::buildClause('civicrm_phone.' . substr($name, 6), $op, $value, 'Integer');
@@ -3784,7 +3784,7 @@ WHERE  $smartGroupClause
       $this->_tables['civicrm_address'] = 1;
       $this->_whereTables['civicrm_address'] = 1;
 
-      $locationType = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+      $locationType = CRM_Core_DAO_Address::buildOptions('location_type_id');
       $names = [];
       foreach ($value as $id) {
         $names[] = $locationType[$id];
@@ -6033,7 +6033,7 @@ AND   displayRelType.is_active = 1
           $viewValues = explode(CRM_Core_DAO::VALUE_SEPARATOR, $val);
 
           if ($value['pseudoField'] == 'participant_role') {
-            $pseudoOptions = CRM_Core_PseudoConstant::get('CRM_Event_DAO_Participant', 'role_id');
+            $pseudoOptions = CRM_Event_DAO_Participant::buildOptions('role_id');
             foreach ($viewValues as $k => $v) {
               $viewValues[$k] = $pseudoOptions[$v];
             }

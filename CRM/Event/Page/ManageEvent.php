@@ -182,14 +182,6 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
             'field' => 'reminder',
           ];
       }
-      if (!function_exists('tellafriend_civicrm_config')) {
-        self::$_tabLinks[$cacheKey]['friend']
-          = [
-            'title' => ts('Tell a Friend'),
-            'url' => 'civicrm/event/manage/friend',
-            'field' => 'friend',
-          ];
-      }
       self::$_tabLinks[$cacheKey]['pcp']
         = [
           'title' => ts('Personal Campaign Pages'),

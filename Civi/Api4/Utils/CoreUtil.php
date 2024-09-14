@@ -239,7 +239,7 @@ class CoreUtil {
    * @return bool|null
    * @throws \CRM_Core_Exception
    */
-  public static function checkAccessRecord(AbstractAction $apiRequest, array $record, int $userID = NULL): ?bool {
+  public static function checkAccessRecord(AbstractAction $apiRequest, array $record, ?int $userID = NULL): ?bool {
     $userID ??= \CRM_Core_Session::getLoggedInContactID() ?? 0;
     $idField = self::getIdFieldName($apiRequest->getEntityName());
 
@@ -324,6 +324,22 @@ class CoreUtil {
     $dao = new $daoName();
     $dao->id = $entityId;
     return $dao->getReferenceCounts();
+  }
+
+  /**
+   * Gets total number of references
+   *
+   * @param string $entityName
+   * @param $entityId
+   * @return int
+   * @throws NotImplementedException
+   */
+  public static function getRefCountTotal(string $entityName, $entityId): int {
+    $total = 0;
+    foreach ((array) self::getRefCount($entityName, $entityId) as $ref) {
+      $total += $ref['count'] ?? 0;
+    }
+    return $total;
   }
 
   /**

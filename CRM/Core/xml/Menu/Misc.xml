@@ -284,4 +284,14 @@
     <page_callback>CRM_Note_Form_Note</page_callback>
     <access_arguments>access CiviCRM</access_arguments>
   </item>
+  <item>
+    <path>civicrm/task/delete-permanently</path>
+    <page_callback>CRM_Contact_Form_Task_Delete</page_callback>
+    <access_arguments>access deleted contacts</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/task/restore-contact</path>
+    <page_callback>CRM_Contact_Form_Task_Delete</page_callback>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
 </menu>

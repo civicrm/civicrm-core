@@ -20,7 +20,7 @@
  */
 class CRM_Queue_BAO_Queue extends CRM_Queue_DAO_Queue implements \Civi\Core\HookInterface {
 
-  public function addSelectWhereClause(string $entityName = NULL, int $userId = NULL, array $conditions = []): array {
+  public function addSelectWhereClause(?string $entityName = NULL, ?int $userId = NULL, array $conditions = []): array {
     $clauses = [];
     if (!\CRM_Core_Permission::check('administer queues')) {
       $cid = (int) CRM_Core_Session::getLoggedInContactID();

@@ -16,4 +16,12 @@
     <page_type>1</page_type>
     <weight>16</weight>
   </item>
+  <item>
+    <path>civicrm/admin/options/custom_search</path>
+    <title>Manage Custom Searches</title>
+    <desc>Developers and accidental techies with a bit of PHP and SQL knowledge can create new search forms to handle specific search and reporting needs which aren't covered by the built-in Advanced Search and Search Builder features.</desc>
+    <page_callback>CRM_Admin_Page_Options</page_callback>
+    <adminGroup>Customize Data and Screens</adminGroup>
+    <weight>110</weight>
+ </item>
 </menu>

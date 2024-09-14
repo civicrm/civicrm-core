@@ -77,6 +77,7 @@ class AfformAutocompleteSubscriber extends AutoService implements EventSubscribe
     $formDataModel = new FormDataModel($afform['layout']);
     [$entityName, $joinEntity] = array_pad(explode('+', $entityName), 2, NULL);
     $entity = $formDataModel->getEntity($entityName);
+    $isId = FALSE;
 
     // If no model entity, it's a search display
     if (!$entity) {
@@ -88,7 +89,6 @@ class AfformAutocompleteSubscriber extends AutoService implements EventSubscribe
     // If using a join (e.g. Contact -> Email)
     elseif ($joinEntity) {
       $apiEntity = $joinEntity;
-      $isId = FALSE;
       $formField = $entity['joins'][$joinEntity]['fields'][$fieldName]['defn'] ?? [];
     }
     else {

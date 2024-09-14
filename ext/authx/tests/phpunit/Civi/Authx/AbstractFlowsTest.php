@@ -8,7 +8,7 @@ use GuzzleHttp\Psr7\AppendStream;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Uri;
 use Psr\Http\Message\ResponseInterface;
-use function GuzzleHttp\Psr7\stream_for;
+use GuzzleHttp\Psr7\Utils;
 
 class AbstractFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface {
 
@@ -220,7 +220,7 @@ class AbstractFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndI
   public function authLogin(Request $request, $cred) {
     return $request->withMethod('POST')
       ->withBody(new AppendStream([
-        stream_for('_authx=' . urlencode($cred) . '&'),
+        Utils::streamFor('_authx=' . urlencode($cred) . '&'),
         $request->getBody(),
       ]));
   }

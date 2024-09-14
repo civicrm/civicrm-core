@@ -86,6 +86,7 @@ return [
       ],
       'pseudoconstant' => [
         'option_group_name' => 'activity_type',
+        'condition_provider' => ['CRM_Campaign_BAO_Survey', 'alterActivityTypes'],
       ],
     ],
     'instructions' => [

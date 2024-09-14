@@ -11,34 +11,34 @@
 {* This file should only contain strings and settings which rarely change *}
 (function($) {ldelim}
   // Config settings
-  CRM.config.userFramework = {$config->userFramework|@json_encode};
+  CRM.config.userFramework = {$config->userFramework|@json_encode nofilter};
   {* resourceBase: The URL of `civicrm-core` assets. Ends with "/". *}
-  CRM.config.resourceBase = {$config->userFrameworkResourceURL|@json_encode};
+  CRM.config.resourceBase = {$config->userFrameworkResourceURL|@json_encode nofilter};
   {* packageseBase: The URL of `civicrm-packages` assets. Ends with "/". *}
-  CRM.config.packagesBase = {capture assign=packagesBase}{crmResURL expr='[civicrm.packages]/'}{/capture}{$packagesBase|@json_encode};
-  CRM.config.lcMessages = {$lcMessages|@json_encode};
-  CRM.config.locale = {$locale|@json_encode};
-  CRM.config.cid = {$cid|@json_encode};
-  $.datepicker._defaults.dateFormat = CRM.config.dateInputFormat = {$dateInputFormat|@json_encode};
+  CRM.config.packagesBase = {capture assign=packagesBase}{crmResURL expr='[civicrm.packages]/'}{/capture}{$packagesBase|@json_encode nofilter};
+  CRM.config.lcMessages = {$lcMessages|@json_encode nofilter};
+  CRM.config.locale = {$locale|@json_encode nofilter};
+  CRM.config.cid = {$cid|@json_encode nofilter};
+  $.datepicker._defaults.dateFormat = CRM.config.dateInputFormat = {$dateInputFormat|@json_encode nofilter};
   CRM.config.timeIs24Hr = {if $timeInputFormat eq 2}true{else}false{/if};
-  CRM.config.ajaxPopupsEnabled = {$ajaxPopupsEnabled|@json_encode};
-  CRM.config.allowAlertAutodismissal = {$allowAlertAutodismissal|@json_encode};
-  CRM.config.resourceCacheCode = {$resourceCacheCode|@json_encode};
-  CRM.config.quickAdd = {$quickAdd|@json_encode};
+  CRM.config.ajaxPopupsEnabled = {$ajaxPopupsEnabled|@json_encode nofilter};
+  CRM.config.allowAlertAutodismissal = {$allowAlertAutodismissal|@json_encode nofilter};
+  CRM.config.resourceCacheCode = {$resourceCacheCode|@json_encode nofilter};
+  CRM.config.quickAdd = {$quickAdd|@json_encode nofilter};
 
   // Merge entityRef settings
-  CRM.config.entityRef = $.extend({ldelim}{rdelim}, {$entityRef|@json_encode}, CRM.config.entityRef || {ldelim}{rdelim});
+  CRM.config.entityRef = $.extend({ldelim}{rdelim}, {$entityRef|@json_encode nofilter}, CRM.config.entityRef || {ldelim}{rdelim});
 
   // Initialize CRM.url and CRM.formatMoney
   CRM.url({ldelim}back: '{crmURL p="civicrm/crmajax-placeholder-url-path" q="civicrm-placeholder-url-query=1" h=0 fb=1}', front: '{crmURL p="civicrm/crmajax-placeholder-url-path" q="civicrm-placeholder-url-query=1" h=0 fe=1}'{rdelim});
-  CRM.formatMoney('init', false, {$moneyFormat|@json_encode});
+  CRM.formatMoney('init', false, {$moneyFormat|@json_encode nofilter});
 
   // Localize select2
   $.fn.select2.defaults.formatNoMatches = "{ts escape='js'}None found.{/ts}";
   $.fn.select2.defaults.formatLoadMore = "{ts escape='js'}Loading...{/ts}";
   $.fn.select2.defaults.formatSearching = "{ts escape='js'}Searching...{/ts}";
   $.fn.select2.defaults.formatInputTooShort = function() {ldelim}
-    return ($(this).data('api-entity') === 'contact' || $(this).data('api-entity') === 'Contact') ? {$contactSearch|smarty:nodefaults} : {$otherSearch|smarty:nodefaults};
+    return ($(this).data('api-entity') === 'contact' || $(this).data('api-entity') === 'Contact') ? {$contactSearch nofilter} : {$otherSearch nofilter};
   {rdelim};
 
   // Localize jQuery UI
@@ -56,7 +56,7 @@
       "infoEmpty": "{ts escape='js'}Showing 0 to 0 of 0 entries{/ts}",
       "infoFiltered": "{ts escape='js' 1=_MAX_}(filtered from %1 total entries){/ts}",
       "infoPostFix": "",
-      "thousands": {$config->monetaryThousandSeparator|json_encode},
+      "thousands": {$config->monetaryThousandSeparator|json_encode nofilter},
       "lengthMenu": "{ts escape='js' 1=_MENU_}Show %1 entries{/ts}",
       "loadingRecords": " ",
       "processing": " ",

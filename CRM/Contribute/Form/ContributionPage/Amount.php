@@ -259,17 +259,17 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
 
         // CRM-4038: fix value display
         foreach ($defaults['value'] as & $amount) {
-          $amount = trim(CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($amount));
+          $amount = trim(CRM_Utils_Money::formatLocaleNumericRoundedByOptionalPrecision($amount, 9));
         }
       }
     }
 
     // fix the display of the monetary value, CRM-4038
     if (isset($defaults['min_amount'])) {
-      $defaults['min_amount'] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($defaults['min_amount']);
+      $defaults['min_amount'] = CRM_Utils_Money::formatLocaleNumericRoundedByOptionalPrecision($defaults['min_amount'], 9);
     }
     if (isset($defaults['max_amount'])) {
-      $defaults['max_amount'] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($defaults['max_amount']);
+      $defaults['max_amount'] = CRM_Utils_Money::formatLocaleNumericRoundedByOptionalPrecision($defaults['max_amount'], 9);
     }
 
     if (!empty($defaults['payment_processor'])) {

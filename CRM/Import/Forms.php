@@ -565,7 +565,16 @@ class CRM_Import_Forms extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   protected function getColumnHeaders(): array {
-    return $this->getDataSourceObject()->getColumnHeaders();
+    $headers = $this->getDataSourceObject()->getColumnHeaders();
+    $mappedFields = $this->getUserJob()['metadata']['import_mappings'] ?? [];
+    if (!empty($mappedFields) && count($mappedFields) > count($headers)) {
+      // The user has mapped one or more non-database fields, add those in.
+      $userMappedFields = array_diff_key($mappedFields, $headers);
+      foreach ($userMappedFields as $field) {
+        $headers[] = '';
+      }
+    }
+    return $headers;
   }
 
   /**
@@ -963,6 +972,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
       'entityMetadata' => $this->getFieldOptions(),
       'dedupeRules' => $parser->getAllDedupeRules(),
       'userJob' => $this->getUserJob(),
+      'columnHeaders' => $this->getColumnHeaders(),
     ]);
   }
 

@@ -114,7 +114,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
 
     $session->pushUserContext(CRM_Utils_System::url($url, $params));
     $this->assign('id', $this->_id);
-    $this->setDeleteMessage(ts('WARNING: Deleting this option will result in the loss of all %1 related records which use the option.', [1 => $this->_gLabel]) . ts('This may mean the loss of a substantial amount of data, and the action cannot be undone.') . ts('Do you want to continue?'));
+    $this->setDeleteMessage();
     if ($this->_id && CRM_Core_OptionGroup::isDomainOptionGroup($this->_gName)) {
       $domainID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', $this->_id, 'domain_id', 'id');
       if (CRM_Core_Config::domainID() != $domainID) {
@@ -131,6 +131,13 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
         'option_group_id' => $this->_gid,
       ]));
     }
+  }
+
+  /**
+   * Get the form-specific delete message.
+   */
+  public function setDeleteMessage(): void {
+    $this->deleteMessage = ts('WARNING: Deleting this option will result in the loss of all %1 related records which use the option.', [1 => $this->_gLabel]) . ' ' . ts('This may mean the loss of a substantial amount of data, and the action cannot be undone.') . ' ' . ts('Do you want to continue?');
   }
 
   /**
@@ -383,6 +390,20 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
     //need to assign subtype to the template
     $this->assign('customDataSubType', $this->_gid);
     $this->assign('entityID', $this->_id);
+
+    if (($this->_action & CRM_Core_Action::ADD) || ($this->_action & CRM_Core_Action::UPDATE)) {
+      $this->addButtons([
+        [
+          'type' => 'upload',
+          'name' => ts('Save'),
+          'isDefault' => TRUE,
+        ],
+        [
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ],
+      ]);
+    }
   }
 
   /**

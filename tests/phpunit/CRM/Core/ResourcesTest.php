@@ -388,6 +388,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
   public function ajaxModeData(): array {
     return [
       [['q' => 'civicrm/ajax/foo'], TRUE],
+      [['q' => 'civicrm/case/ajax/foo'], TRUE],
       [['q' => 'civicrm/angularprofiles/template'], TRUE],
       [['q' => 'civicrm/asset/builder'], TRUE],
       [['q' => 'civicrm/test/page'], FALSE],

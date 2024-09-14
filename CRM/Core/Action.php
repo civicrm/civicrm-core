@@ -309,11 +309,7 @@ class CRM_Core_Action {
     }
 
     if ($op && $objectName && $objectId) {
-      $oldLinks = $seqLinks;
       CRM_Utils_Hook::links($op, $objectName, $objectId, $seqLinks, $mask, $values);
-      if ($oldLinks !== $seqLinks) {
-        Civi::log()->warning('Tabular screens that call hook_civicrm_links are being replaced by SearchKit. See https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_links/#notes', ['civi.tag' => 'deprecated']);
-      }
     }
 
     $url = [];

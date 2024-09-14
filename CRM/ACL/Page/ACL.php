@@ -65,11 +65,11 @@ class CRM_ACL_Page_ACL extends CRM_Core_Page_Basic {
     $customGroup = [
       '-1' => ts('- select -'),
       '0' => ts('All Custom Groups'),
-    ] + CRM_Core_PseudoConstant::get('CRM_Core_DAO_CustomField', 'custom_group_id');
+    ] + CRM_Core_DAO_CustomField::buildOptions('custom_group_id');
     $ufGroup = [
       '-1' => ts('- select -'),
       '0' => ts('All Profiles'),
-    ] + CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id');
+    ] + CRM_Core_DAO_UFField::buildOptions('uf_group_id');
 
     $event = [
       '-1' => ts('- select -'),

@@ -102,7 +102,7 @@ class CRM_Contact_Form_Search_Custom_Proximity extends CRM_Contact_Form_Search_C
     $group = ['' => ts('- any group -')] + CRM_Core_PseudoConstant::nestedGroup();
     $form->addElement('select', 'group', ts('Group'), $group, ['class' => 'crm-select2 huge']);
 
-    $tag = ['' => ts('- any tag -')] + CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', ['onlyActive' => FALSE]);
+    $tag = ['' => ts('- any tag -')] + CRM_Core_DAO_EntityTag::buildOptions('tag_id', 'get');
     $form->addElement('select', 'tag', ts('Tag'), $tag, ['class' => 'crm-select2 huge']);
 
     /**

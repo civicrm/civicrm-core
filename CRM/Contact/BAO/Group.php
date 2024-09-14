@@ -317,7 +317,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group implements HookInterfa
    * @param array $conditions
    * @inheritDoc
    */
-  public function addSelectWhereClause(string $entityName = NULL, int $userId = NULL, array $conditions = []): array {
+  public function addSelectWhereClause(?string $entityName = NULL, ?int $userId = NULL, array $conditions = []): array {
     $clauses = [];
     if (!CRM_Core_Permission::check([['edit all contacts', 'view all contacts']])) {
       $allowedGroups = CRM_Core_Permission::group(NULL, FALSE);

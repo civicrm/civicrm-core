@@ -2715,20 +2715,21 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $softDAO = new CRM_Contribute_DAO_ContributionSoft();
       $softDAO->contribution_id = $this->id;
       if ($softDAO->find(TRUE)) {
-        $pcpParams['pcpBlock'] = TRUE;
         $pcpParams['pcp_display_in_roll'] = $softDAO->pcp_display_in_roll;
         $pcpParams['pcp_roll_nickname'] = $softDAO->pcp_roll_nickname;
         $pcpParams['pcp_personal_note'] = $softDAO->pcp_personal_note;
 
         //assign the pcp page title for email subject
-        $pcpDAO = new CRM_PCP_DAO_PCP();
-        $pcpDAO->id = $softDAO->pcp_id;
-        if ($pcpDAO->find(TRUE)) {
-          $pcpParams['title'] = $pcpDAO->title;
+        if ($softDAO->pcp_id) {
+          $pcpDAO = new CRM_PCP_DAO_PCP();
+          $pcpDAO->id = $softDAO->pcp_id;
+          if ($pcpDAO->find(TRUE)) {
+            $pcpParams['title'] = $pcpDAO->title;
 
-          // do not display PCP block in receipt if not enabled for the PCP poge
-          if (empty($pcpDAO->is_honor_roll)) {
-            $pcpParams['pcpBlock'] = FALSE;
+            // Only display PCP block in receipt if enabled for the PCP page
+            if (!empty($pcpDAO->is_honor_roll)) {
+              $pcpParams['pcpBlock'] = TRUE;
+            }
           }
         }
       }
@@ -3282,24 +3283,20 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
   }
 
   /**
-   * Get options for a given contribution field.
+   * Legacy option getter
+   *
+   * @deprecated
    *
    * @param string $fieldName
-   * @param string $context see CRM_Core_DAO::buildOptionsContext.
-   * @param array $props whatever is known about this dao object.
+   * @param string $context
+   * @param array $props
    *
    * @return array|bool
-   * @see CRM_Core_DAO::buildOptions
-   *
    */
   public static function buildOptions($fieldName, $context = NULL, $props = []) {
-    $className = __CLASS__;
-    $params = [];
-    if (isset($props['orderColumn'])) {
-      $params['orderColumn'] = $props['orderColumn'];
-    }
     switch ($fieldName) {
       // This field is not part of this object but the api supports it
+      // TODO: Legacy APIv3 support. Could be moved to Api3 & out of the BAO.
       case 'payment_processor':
         $className = 'CRM_Contribute_BAO_ContributionPage';
         // Filter results by contribution page
@@ -3311,28 +3308,37 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           $types = (array) $page['payment_processor'] ?? 0;
           $params['condition'] = 'id IN (' . implode(',', $types) . ')';
         }
-        break;
+        return CRM_Core_PseudoConstant::get($className, $fieldName, $params, $context);
 
       // CRM-13981 This field was combined with soft_credits in 4.5 but the api still supports it
+      // TODO: Legacy APIv3 support. Could be moved to Api3 & out of the BAO.
       case 'honor_type_id':
         $className = 'CRM_Contribute_BAO_ContributionSoft';
         $fieldName = 'soft_credit_type_id';
         $params['condition'] = "v.name IN ('in_honor_of','in_memory_of')";
-        break;
-
-      case 'contribution_status_id':
-        if ($context !== 'validate') {
-          $params['condition'] = "v.name <> 'Template'";
-        }
-        break;
-
-      case 'payment_instrument_id':
-        if (isset($props['filter'])) {
-          $params['condition'] = "v.filter = " . $props['filter'];
-        }
-        break;
+        return CRM_Core_PseudoConstant::get($className, $fieldName, $params, $context);
     }
-    return CRM_Core_PseudoConstant::get($className, $fieldName, $params, $context);
+    return parent::buildOptions($fieldName, $context, $props);
+  }
+
+  /**
+   * Pseudoconstant condition_provider for contribution_status_id field.
+   * @see \Civi\Schema\EntityMetadataBase::getConditionFromProvider
+   */
+  public static function alterStatus(string $fieldName, CRM_Utils_SQL_Select $conditions, $params) {
+    if (!$params['include_disabled']) {
+      $conditions->where("name <> 'Template'");
+    }
+  }
+
+  /**
+   * Pseudoconstant condition_provider for payment_instrument_id field.
+   * @see \Civi\Schema\EntityMetadataBase::getConditionFromProvider
+   */
+  public static function alterPaymentInstrument(string $fieldName, CRM_Utils_SQL_Select $conditions, $params) {
+    if (isset($params['values']['filter'])) {
+      $conditions->where('filter = #filter', ['filter' => (int) $params['values']['filter']]);
+    }
   }
 
   /**

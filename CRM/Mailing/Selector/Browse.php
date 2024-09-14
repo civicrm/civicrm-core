@@ -366,8 +366,11 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
         $actionMask = NULL;
         if ($row['sms_provider_id']) {
           $actionLinks[CRM_Core_Action::PREVIEW]['url'] = 'civicrm/sms/send';
+          $actionLinks[CRM_Core_Action::PREVIEW]['title'] = ts('Continue SMS');
+          $actionLinks[CRM_Core_Action::UPDATE]['url'] = 'civicrm/sms/send';
+          $actionLinks[CRM_Core_Action::UPDATE]['title'] = ts('Copy SMS');
+          $actionLinks[CRM_Core_Action::VIEW]['title'] = ts('View SMS Report');
         }
-
         if (!($row['status'] === 'Not scheduled') && !$row['sms_provider_id']) {
           if ($allAccess || $showCreateLinks) {
             $actionMask = CRM_Core_Action::VIEW;

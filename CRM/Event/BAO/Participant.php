@@ -1743,35 +1743,23 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
   }
 
   /**
-   * Get options for a given field.
-   * @see CRM_Core_DAO::buildOptions
-   *
-   * @param string $fieldName
-   * @param string $context
-   * @see CRM_Core_DAO::buildOptionsContext
-   * @param array $props
-   *   whatever is known about this dao object.
-   *
-   * @return array|bool
+   * Pseudoconstant condition_provider for role_id field.
+   * @see \Civi\Schema\EntityMetadataBase::getConditionFromProvider
    */
-  public static function buildOptions($fieldName, $context = NULL, $props = []) {
-    $params = ['condition' => []];
+  public static function alterRole(string $fieldName, CRM_Utils_SQL_Select $conditions, $params) {
+    if (isset($params['values']['filter'])) {
+      $conditions->where('filter = #filter', ['filter' => (int) $params['values']['filter']]);
+    }
+  }
 
-    if ($fieldName === 'status_id' && $context !== 'validate') {
-      // Get rid of cart-related option if disabled
-      // FIXME: Why does this option even exist if cart is disabled?
-      if (!Civi::settings()->get('enable_cart')) {
-        $params['condition'][] = "name <> 'Pending in cart'";
-      }
+  /**
+   * Pseudoconstant condition_provider for status_id field.
+   * @see \Civi\Schema\EntityMetadataBase::getConditionFromProvider
+   */
+  public static function alterStatus(string $fieldName, CRM_Utils_SQL_Select $conditions, $params) {
+    if (isset($params['values']['is_counted'])) {
+      $conditions->where('is_counted = #counted', ['counted' => (int) $params['values']['is_counted']]);
     }
-    if ($fieldName === 'status_id' && isset($props['is_counted'])) {
-      $params['condition'][] = 'is_counted = ' . $props['is_counted'];
-    }
-    if ($fieldName === 'role_id' && isset($props['filter'])) {
-      $params['condition'][] = 'filter = ' . $props['filter'];
-    }
-
-    return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }
 
   /**

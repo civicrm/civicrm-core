@@ -16,6 +16,13 @@ use Civi\Api4\SavedSearch;
  */
 class AfformAutocompleteUsageTest extends AfformUsageTestCase {
 
+  public function tearDown(): void {
+    CustomGroup::delete(FALSE)
+      ->addWhere('id', '>', 0)
+      ->execute();
+    parent::tearDown();
+  }
+
   /**
    * Ensure that Afform restricts autocomplete results when it's set to use a SavedSearch
    */
@@ -145,7 +152,7 @@ EOHTML;
       ->addChain('fields', CustomField::save()
         ->addDefault('custom_group_id', '$id')
         ->setRecords([
-          ['label' => 'contact_ref', 'data_type' => 'ContactReference', 'html_type' => 'Autocomplete', 'filter' => 'action=get&group=' . $group['id']],
+          ['label' => 'contact_ref', 'data_type' => 'ContactReference', 'html_type' => 'Autocomplete-Select', 'filter' => 'action=get&group=' . $group['id']],
         ])
       )
       ->execute();
@@ -236,7 +243,7 @@ EOHTML;
       ->addChain('fields', CustomField::save()
         ->addDefault('custom_group_id', '$id')
         ->setRecords([
-          ['label' => 'contact_ref', 'data_type' => 'ContactReference', 'html_type' => 'Autocomplete', 'filter' => 'action=get&source=in'],
+          ['label' => 'contact_ref', 'data_type' => 'ContactReference', 'html_type' => 'Autocomplete-Select', 'filter' => 'action=get&source=in'],
         ])
       )
       ->execute();

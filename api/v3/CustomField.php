@@ -338,3 +338,22 @@ function civicrm_api3_custom_field_setvalue($params) {
   }
   return $result;
 }
+
+function civicrm_api3_custom_field_getoptions($params) {
+  $result = civicrm_api3_generic_getoptions(['entity' => 'CustomField', 'params' => $params]);
+  // This provides legacy support for APIv3, allowing no-longer-existent html types
+  if ($params['field'] === 'html_type') {
+    $extras = [
+      'Multi-Select' => 'Multi-Select',
+      'Select Country' => 'Select Country',
+      'Multi-Select Country' => 'Multi-Select Country',
+      'Select State/Province' => 'Select State/Province',
+      'Multi-Select State/Province' => 'Multi-Select State/Province',
+    ];
+    if (!empty($params['sequential'])) {
+      $extras = CRM_Utils_Array::makeNonAssociative($extras);
+    }
+    $result['values'] = array_merge($result['values'], $extras);
+  }
+  return $result;
+}

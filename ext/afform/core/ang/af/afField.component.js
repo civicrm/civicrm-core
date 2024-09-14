@@ -77,10 +77,16 @@
                 value = $scope.dataProvider.getFieldData()[ctrl.fieldName];
               if (_.isArray(value)) {
                 _.remove(value, function(item) {
-                  return !_.find(options, function(option) {return option.id == item;});
+                  return !_.find(options, (option) => option.id == item);
                 });
-              } else if (value && !_.find(options, function(option) {return option.id == value;})) {
-                $scope.dataProvider.getFieldData()[ctrl.fieldName] = '';
+              } else {
+                if (value && !_.find(options, (option) => option.id == value)) {
+                  value = '';
+                }
+                // Hack: Because the option list changed, Select2 sometimes fails to update the value.
+                // Manual updates like this shouldn't be necessary with ngModel binding, but can't find a better fix yet:
+                // See https://lab.civicrm.org/dev/core/-/issues/5415
+                $('input[crm-ui-select]', $element).val(value).change();
               }
             }
             if (val && (typeof val === 'number' || val.length)) {
@@ -251,10 +257,12 @@
       // ngChange callback from Existing entity field
       ctrl.onSelectEntity = function() {
         if (ctrl.defn.input_attrs && ctrl.defn.input_attrs.autofill) {
-          var val = $scope.getSetSelect();
-          var entity = ctrl.afFieldset.modelName;
-          var index = ctrl.getEntityIndex();
-          ctrl.afFieldset.afFormCtrl.loadData(entity, index, val, ctrl.defn.name);
+          const val = $scope.getSetSelect();
+          const entity = ctrl.afFieldset.modelName;
+          const entityIndex = ctrl.getEntityIndex();
+          const joinEntity = ctrl.afJoin ? ctrl.afJoin.entity : null;
+          const joinIndex = ctrl.afJoin && $scope.dataProvider.repeatIndex || 0;
+          ctrl.afFieldset.afFormCtrl.loadData(entity, entityIndex, val, ctrl.defn.name, joinEntity, joinIndex);
         }
       };
 
@@ -270,9 +278,15 @@
       };
 
       ctrl.getAutocompleteParams = function() {
+        let fieldName = ctrl.afFieldset.getName();
+        // Append join name which will be unpacked by AfformAutocompleteSubscriber::processAfformAutocomplete
+        if (ctrl.afJoin) {
+          fieldName += '+' + ctrl.afJoin.entity;
+        }
+        fieldName += ':' + ctrl.fieldName;
         return {
           formName: 'afform:' + ctrl.afFieldset.getFormName(),
-          fieldName: ctrl.afFieldset.getName() + ':' + ctrl.fieldName,
+          fieldName: fieldName,
           values: $scope.dataProvider.getFieldData()
         };
       };

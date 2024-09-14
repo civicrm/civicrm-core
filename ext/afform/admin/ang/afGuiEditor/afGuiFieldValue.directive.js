@@ -26,7 +26,7 @@
             if (typeof value === 'boolean') {
               return value ? '1' : '0';
             }
-            return value;
+            return '' + value;
           }
           ctrls.ngModel.$formatters.push(formatViewValue);
         }
@@ -109,6 +109,13 @@
         function getDataType() {
           if (ctrl.field) {
             dataType = ctrl.field.data_type;
+            // FK Entities can use a mix of numeric & string values (see `"static": options` above)
+            if (ctrl.field.fk_entity) {
+              dataType = 'String';
+            }
+          }
+          else {
+            dataType = null;
           }
         }
 

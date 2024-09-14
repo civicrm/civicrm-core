@@ -304,6 +304,7 @@ return [
       ],
       'pseudoconstant' => [
         'option_group_name' => 'pledge_status',
+        'condition_provider' => ['CRM_Pledge_BAO_Pledge', 'alterStatus'],
       ],
     ],
     'is_test' => [

@@ -41,7 +41,7 @@
     {/if}
   </td>
   <td align="center">{$form.email.$blockId.on_hold.html}</td>
-  <td align="center" id="Email-Bulkmail-html">{$form.email.$blockId.is_bulkmail.html}</td>
+  <td align="center" id="Email-Bulkmail-html" {if !$multipleBulk}class="crm-email-bulkmail"{/if}>{$form.email.$blockId.is_bulkmail.html}</td>
   <td align="center" id="Email-Primary-html" {if $blockId eq 1}class="hiddenElement"{/if}>
     {$form.email.$blockId.is_primary.1.html}
   </td>

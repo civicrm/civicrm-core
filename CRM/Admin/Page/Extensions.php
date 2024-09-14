@@ -240,7 +240,7 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
     }
     catch (CRM_Extension_Exception $e) {
       $remoteExtensions = [];
-      CRM_Core_Session::setStatus($e->getMessage(), ts('Extension download error'), 'error');
+      CRM_Core_Session::setStatus($e->getMessage(), ts('Extension download error'), 'warning');
     }
 
     // build list of available downloads

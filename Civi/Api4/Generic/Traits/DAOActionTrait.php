@@ -189,7 +189,7 @@ trait DAOActionTrait {
    *
    * @param array $record
    */
-  private function resolveFKValues(array &$record): void {
+  protected function resolveFKValues(array &$record): void {
     // Resolve domain id first
     uksort($record, function($a, $b) {
       return substr($a, 0, 9) == 'domain_id' ? -1 : 1;

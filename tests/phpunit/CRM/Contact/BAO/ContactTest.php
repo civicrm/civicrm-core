@@ -1163,8 +1163,8 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     //get display name.
     $dbDisplayName = CRM_Contact_BAO_Contact::displayName($contactId);
 
-    $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
-    $suffix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id');
+    $prefix = CRM_Contact_DAO_Contact::buildOptions('prefix_id');
+    $suffix = CRM_Contact_DAO_Contact::buildOptions('suffix_id');
 
     //build display name
     $paramsDisplayName = $prefix[$params['prefix_id']] . ' ' . $params['first_name'] . ' ' . $params['last_name'] . ' ' . $suffix[$params['suffix_id']];
@@ -1192,8 +1192,8 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
 
     $checkImage = CRM_Contact_BAO_Contact_Utils::getImage($params['contact_type'], FALSE, $contactId);
 
-    $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
-    $suffix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id');
+    $prefix = CRM_Contact_DAO_Contact::buildOptions('prefix_id');
+    $suffix = CRM_Contact_DAO_Contact::buildOptions('suffix_id');
 
     //build display name
     $paramsDisplayName = $prefix[$params['prefix_id']] . ' ' . $params['first_name'] . ' ' . $params['last_name'] . ' ' . $suffix[$params['suffix_id']];

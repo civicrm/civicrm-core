@@ -22,18 +22,15 @@
       // Initialize or rebuild form field
       this.$onChanges = function(changes) {
         if (changes.selectedType) {
-          var selectedType = _.find(ctrl.relTypes, {name: ctrl.selectedType});
-          if (!ctrl.relatedContactField || ctrl.relatedContactField.input_attrs.filter.contact_type !== selectedType.contact_type) {
+          let selectedType = _.find(ctrl.relTypes, {name: ctrl.selectedType});
+          let contactType = selectedType.contact_type || 'Contact';
+          if (!ctrl.relatedContactField || ctrl.relatedContactField.fk_entity !== contactType) {
             // Replacing the variable with a new object will trigger the afGuiFieldValue to refresh
             ctrl.relatedContactField = {
               input_type: 'EntityRef',
               data_type: 'Integer',
-              fk_entity: 'Contact',
-              input_attrs: {filter: {}}
+              fk_entity: contactType,
             };
-            if (selectedType.contact_type) {
-              ctrl.relatedContactField.input_attrs.filter.contact_type = selectedType.contact_type;
-            }
           }
         }
       };

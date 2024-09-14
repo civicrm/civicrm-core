@@ -1014,6 +1014,10 @@ LEFT  JOIN civicrm_membership_payment mp  ON ( mp.contribution_id = con.id )
   }
 
   /**
+   * Legacy option getter
+   *
+   * @deprecated
+   *
    * @inheritDoc
    */
   public static function buildOptions($fieldName, $context = NULL, $props = []) {
@@ -1043,7 +1047,26 @@ LEFT  JOIN civicrm_membership_payment mp  ON ( mp.contribution_id = con.id )
         \Civi::$statics[__CLASS__]['buildoptions_payment_processor_id'][$context] = $allProcessors;
         return $allProcessors;
     }
-    return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
+    return parent::buildOptions($fieldName, $context, $props);
+  }
+
+  /**
+   * @implements CRM_Utils_Hook::fieldOptions
+   */
+  public static function hook_civicrm_fieldOptions($entity, $field, &$options, $params) {
+    // This faithfully recreates the hack in the above buildOptions() function, appending _test to the name of test processors,
+    // which allows `CRM_Utils_TokenConsistencyTest::testContributionRecurTokenConsistency` to pass.
+    // But one has to wonder: if we are doing this, why only do it for ContributionRecur, why not for all
+    // option lists containing payment processors?
+    if ($entity === 'ContributionRecur' && $field === 'payment_processor_id' && $params['context'] === 'full') {
+      foreach ($options as $id => &$option) {
+        $isTest = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessor', $id, 'is_test');
+        if ($isTest) {
+          $option['name'] .= '_test';
+          $option['label'] = CRM_Core_TestEntity::appendTestText($option['label']);
+        }
+      }
+    }
   }
 
   /**

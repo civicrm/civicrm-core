@@ -62,7 +62,7 @@ class SqlFunctionGROUP_CONCAT extends SqlFunction {
   public function formatOutputValue(?string &$dataType, array &$values, string $key): void {
     $exprArgs = $this->getArgs();
     // By default, values are split into an array and formatted according to the field's dataType
-    if (isset($exprArgs[2]['expr'][0]->expr) && $exprArgs[2]['expr'][0]->expr === \CRM_Core_DAO::VALUE_SEPARATOR) {
+    if ($this->getSerialize()) {
       $values[$key] = explode(\CRM_Core_DAO::VALUE_SEPARATOR, $values[$key]);
       // If the first expression is a SqlFunction/SqlEquation, allow it to control the dataType
       if (method_exists($exprArgs[0]['expr'][0], 'formatOutputValue')) {
@@ -86,6 +86,14 @@ class SqlFunctionGROUP_CONCAT extends SqlFunction {
     else {
       $dataType = 'String';
     }
+  }
+
+  public function getSerialize(): ?int {
+    $exprArgs = $this->getArgs();
+    if (($exprArgs[2]['expr'][0]->expr ?? NULL) === \CRM_Core_DAO::VALUE_SEPARATOR) {
+      return \CRM_Core_DAO::SERIALIZE_SEPARATOR_TRIMMED;
+    }
+    return NULL;
   }
 
   /**

@@ -111,7 +111,7 @@ trait ReflectiveWorkflowTrait {
    * @inheritDoc
    * @see \Civi\WorkflowMessage\WorkflowMessageInterface::export()
    */
-  public function export(string $format = NULL): ?array {
+  public function export(?string $format = NULL): ?array {
     switch ($format) {
       case 'modelProps':
       case 'envelope':

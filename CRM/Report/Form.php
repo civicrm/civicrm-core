@@ -2705,7 +2705,7 @@ class CRM_Report_Form extends CRM_Core_Form {
    * @return mixed
    */
   protected function alterCommunicationtMethod($value, &$row, $fieldname) {
-    $communicationMethods = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method');
+    $communicationMethods = CRM_Contact_DAO_Contact::buildOptions('preferred_communication_method');
 
     // Explode padded values.
     $values = CRM_Utils_Array::explodePadded($value);
@@ -4970,7 +4970,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       'gender_id' => [
         'title' => ts('Gender'),
         'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-        'options' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'),
+        'options' => CRM_Contact_DAO_Contact::buildOptions('gender_id'),
       ],
       'birth_date' => [
         'title' => ts('Birth Date'),

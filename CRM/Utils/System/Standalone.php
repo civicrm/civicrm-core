@@ -515,15 +515,14 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function getTimeZoneString() {
-    $timezone = date_default_timezone_get();
     $userId = Security::singleton()->getLoggedInUfID();
     if ($userId) {
       $user = Security::singleton()->loadUserByID($userId);
       if ($user && !empty($user['timezone'])) {
-        $timezone = $user['timezone'];
+        return $user['timezone'];
       }
     }
-    return $timezone;
+    return date_default_timezone_get();
   }
 
   /**
@@ -588,7 +587,8 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
       $session_cookie_name = 'SESSCIVISO';
     }
 
-    $session_max_lifetime = Civi::settings()->get('standaloneusers_session_max_lifetime') ?? 1440;
+    // session lifetime in seconds (default = 24 minutes)
+    $session_max_lifetime = (Civi::settings()->get('standaloneusers_session_max_lifetime') ?? 24) * 60;
 
     session_start([
       'cookie_httponly'  => 1,
@@ -599,6 +599,31 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
       'use_only_cookies' => 1,
       'use_strict_mode'  => 1,
     ]);
+  }
+
+  /**
+   * Standalone's session cannot be initialized until CiviCRM is booted,
+   * since it is defined in an extension,
+   *
+   * This is also when we set timezone
+   */
+  public function postContainerBoot(): void {
+    $sess = \CRM_Core_Session::singleton();
+    $sess->initialize();
+
+    // We want to apply timezone for this session
+    // However - our implementation relies on checks against standaloneusers
+    // so we need a guard if this is called in install
+    //
+    // Doesn't the session handler started above also need standalonusers?
+    // Yes it does - but we put in some guards further into those functions
+    // to use a fake session instead for this install bit.
+    // Maybe they could get moved up here
+    if (class_exists(\Civi\Standalone\Security::class)) {
+      $sessionTime = $this->getTimeZoneString();
+      date_default_timezone_set($sessionTime);
+      $this->setMySQLTimeZone();
+    }
   }
 
 }

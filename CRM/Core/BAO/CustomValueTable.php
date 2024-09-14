@@ -69,87 +69,20 @@ class CRM_Core_BAO_CustomValueTable {
 
         foreach ($fields as $field) {
           // fix the value before we store it
-          $value = $field['value'];
+          $serialize = $field['serialize'] ?? NULL;
+          $value = $serialize ? CRM_Core_DAO::serializeField($field['value'], $serialize) : $field['value'];
           $type = $field['type'];
+
           switch ($type) {
             case 'StateProvince':
-              $type = 'Integer';
-              if (is_array($value)) {
-                $value = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $value) . CRM_Core_DAO::VALUE_SEPARATOR;
-                $type = 'String';
-              }
-              elseif (!is_numeric($value) && !strstr($value, CRM_Core_DAO::VALUE_SEPARATOR)) {
-                //fix for multi select state, CRM-3437
-                $mulValues = explode(',', $value);
-                $validStates = [];
-                foreach ($mulValues as $key => $stateVal) {
-                  $states = [];
-                  $states['state_province'] = trim($stateVal);
-
-                  CRM_Utils_Array::lookupValue($states, 'state_province',
-                    CRM_Core_PseudoConstant::stateProvince(), TRUE
-                  );
-                  if (empty($states['state_province_id'])) {
-                    CRM_Utils_Array::lookupValue($states, 'state_province',
-                      CRM_Core_PseudoConstant::stateProvinceAbbreviation(), TRUE
-                    );
-                  }
-                  $validStates[] = $states['state_province_id'] ?? NULL;
-                }
-                $value = implode(CRM_Core_DAO::VALUE_SEPARATOR,
-                  $validStates
-                );
-                $type = 'String';
-              }
-              elseif (!$value) {
-                // CRM-3415
-                // using type of timestamp allows us to sneak in a null into db
-                // gross but effective hack
-                $value = NULL;
-                $type = 'Timestamp';
-              }
-              else {
-                $type = 'String';
-              }
-              break;
-
             case 'Country':
-              $type = 'Integer';
-              if (is_array($value)) {
-                $value = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $value) . CRM_Core_DAO::VALUE_SEPARATOR;
-                $type = 'String';
-              }
-              elseif (!is_numeric($value) && !strstr($value, CRM_Core_DAO::VALUE_SEPARATOR)) {
-                //fix for multi select country, CRM-3437
-                $mulValues = explode(',', $value);
-                $validCountries = [];
-                foreach ($mulValues as $key => $countryVal) {
-                  $countries = [];
-                  $countries['country'] = trim($countryVal);
-                  CRM_Utils_Array::lookupValue($countries, 'country',
-                    CRM_Core_PseudoConstant::country(), TRUE
-                  );
-                  if (empty($countries['country_id'])) {
-                    CRM_Utils_Array::lookupValue($countries, 'country',
-                      CRM_Core_PseudoConstant::countryIsoCode(), TRUE
-                    );
-                  }
-                  $validCountries[] = $countries['country_id'] ?? NULL;
-                }
-                $value = implode(CRM_Core_DAO::VALUE_SEPARATOR,
-                  $validCountries
-                );
-                $type = 'String';
-              }
-              elseif (!$value) {
+              $type = $serialize ? 'String' : 'Integer';
+              if (!$value) {
                 // CRM-3415
                 // using type of timestamp allows us to sneak in a null into db
                 // gross but effective hack
                 $value = NULL;
                 $type = 'Timestamp';
-              }
-              else {
-                $type = 'String';
               }
               break;
 
@@ -186,17 +119,17 @@ class CRM_Core_BAO_CustomValueTable {
               break;
 
             case 'ContactReference':
-              if ($value == NULL || $value === '' || $value === $VS . $VS) {
-                $type = 'Timestamp';
-                $value = NULL;
-              }
-              elseif (strpos($value, $VS) !== FALSE) {
+              if ($serialize) {
                 $type = 'String';
                 // Validate the string contains only integers and value-separators
                 $validChars = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, $VS];
                 if (str_replace($validChars, '', $value)) {
                   throw new CRM_Core_Exception('Contact ID must be of type Integer');
                 }
+              }
+              elseif ($value == NULL || $value === '') {
+                $type = 'Timestamp';
+                $value = NULL;
               }
               else {
                 $type = 'Integer';
@@ -315,7 +248,7 @@ class CRM_Core_BAO_CustomValueTable {
         return "varchar($maxLength)";
 
       case 'Boolean':
-        return 'tinyint';
+        return 'boolean';
 
       case 'Int':
         return 'int';

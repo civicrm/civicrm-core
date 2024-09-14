@@ -9,7 +9,6 @@
 *}
 {* This file provides the plugin for the communication preferences in all the three types of contact *}
 {* @var $form Contains the array for the form elements and other form associated information assigned to the template by the controller *}
-{$form.oplock_ts.html}
 
  <div class="crm-inline-edit-form">
     <div class="crm-inline-button">

@@ -114,6 +114,7 @@ return [
         'table' => 'civicrm_participant_status_type',
         'key_column' => 'id',
         'label_column' => 'label',
+        'condition_provider' => ['CRM_Event_BAO_Participant', 'alterStatus'],
       ],
       'entity_reference' => [
         'entity' => 'ParticipantStatusType',
@@ -140,6 +141,7 @@ return [
       ],
       'pseudoconstant' => [
         'option_group_name' => 'participant_role',
+        'condition_provider' => ['CRM_Event_BAO_Participant', 'alterRole'],
       ],
     ],
     'register_date' => [

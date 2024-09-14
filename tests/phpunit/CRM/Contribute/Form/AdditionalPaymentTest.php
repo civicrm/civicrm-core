@@ -353,7 +353,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function submitPayment(float $amount, string $mode = NULL, bool $isEmailReceipt = FALSE): void {
+  public function submitPayment(float $amount, ?string $mode = NULL, bool $isEmailReceipt = FALSE): void {
     $submitParams = [
       'contact_id' => $this->ids['Contact']['order'] ?? $this->_individualId,
       'total_amount' => $amount,

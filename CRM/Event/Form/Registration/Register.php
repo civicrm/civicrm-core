@@ -984,6 +984,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
             }
             $status .= ' ' . ts('You can also <a href="%1">register another participant</a>.', [1 => $registerUrl]);
             CRM_Core_Session::singleton()->setStatus($status, '', 'alert');
+            // @todo - pass cid=0 in the url & remove noFullMsg here.
             $url = CRM_Utils_System::url('civicrm/event/info',
               "reset=1&id={$form->_values['event']['id']}&noFullMsg=true"
             );

@@ -47,8 +47,11 @@ class CRM_Core_CodeGen_Util_Smarty {
    */
   public function createSmarty(): Smarty {
     $base = dirname(__DIR__, 4);
-    $pkgs = file_exists(dirname($base) . "/civicrm-packages") ? dirname($base) . "/civicrm-packages" : "$base/packages";
-    require_once $pkgs . '/smarty5/Smarty.php';
+    if (!class_exists('Smarty', FALSE)) {
+      // Prefer Smarty v5; but if we get here in some scenario with another Smarty, use that.
+      $pkgs = file_exists(dirname($base) . "/civicrm-packages") ? dirname($base) . "/civicrm-packages" : "$base/packages";
+      require_once $pkgs . '/smarty5/Smarty.php';
+    }
     $smarty = new Smarty();
     $smarty->setTemplateDir("$base/xml/templates");
     // Doesn't seem to work very well.... since I still need require_once below

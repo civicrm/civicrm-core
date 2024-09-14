@@ -249,8 +249,8 @@ INNER JOIN
 as job
 ON job.mailing_id = m.id
 SET m.status = "Complete",
-    start_date = job.start_date,
-    end_date = job.end_date,
+    m.start_date = job.start_date,
+    m.end_date = job.end_date,
     is_completed = 1
 WHERE (m.status IS NULL OR m.status = "Draft")
    AND m.id BETWEEN %1 AND %2', [1 => [$startId, 'Integer'], 2 => [$endId, 'Integer']]);

@@ -183,6 +183,7 @@ return [
       ],
       'pseudoconstant' => [
         'option_group_name' => 'payment_instrument',
+        'condition_provider' => ['CRM_Contribute_BAO_Contribution', 'alterPaymentInstrument'],
       ],
     ],
     'receive_date' => [
@@ -464,6 +465,7 @@ return [
       ],
       'pseudoconstant' => [
         'option_group_name' => 'contribution_status',
+        'condition_provider' => ['CRM_Contribute_BAO_Contribution', 'alterStatus'],
       ],
     ],
     'address_id' => [

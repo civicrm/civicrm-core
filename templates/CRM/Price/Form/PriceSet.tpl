@@ -13,9 +13,7 @@
         <div class="messages help">{$priceSet.help_pre|purify}</div>
     {/if}
 
-    {assign var='adminFld' value=false}
     {crmPermission has='administer CiviCRM'}
-      {assign var='adminFld' value=true}
       {if $priceSet.id && !$priceSet.is_quick_config}
         <div class='float-right'>
           <a class="crm-hover-button" target="_blank" href="{crmURL p="civicrm/admin/price/field" q="reset=1&action=browse&sid=`$priceSet.id`" fb=1}">
@@ -27,7 +25,7 @@
 
     {foreach from=$priceSet.fields item=element key=field_id}
         {* Skip 'Admin' visibility price fields WHEN this tpl is used in online registration unless user has administer CiviCRM permission. *}
-        {if $element.visibility EQ 'public' || ($element.visibility EQ 'admin' && $adminFld EQ true) || $context eq 'standalone' || $context eq 'advanced' || $context eq 'search' || $context eq 'participant' || $context eq 'dashboard'}
+        {if $element.visibility !== 'admin' || isShowAdminVisibilityFields}
             {if $element.help_pre}<span class="content description">{$element.help_pre|purify}</span><br />{/if}
             <div class="crm-section {$element.name|escape}-section crm-price-field-id-{$field_id}">
             {if ($element.html_type eq 'CheckBox' || $element.html_type == 'Radio') && $element.options_per_line}
