@@ -286,7 +286,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-tabs-gap: var(--crm-s);
 --crm-tab-bg: var(--crm-c-background2);
 --crm-tab-bg-hover: var(--crm-c-page-background);
---crm-tab-bg-active: var(--crm-c-page-background);
+--crm-tab-bg-active: #fff;
 --crm-tab-hang: 0; /* lip to extend tab flush with active region - set to 0 for no lip */
 --crm-tab-padding: var(--crm-s3) var(--crm-m) var(--crm-s) var(--crm-m);
 --crm-tab-col: #777;
@@ -294,34 +294,34 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-tab-font:;
 --crm-tab-count-bg: var(--crm-c-info-text);
 --crm-tab-count-col: var(--crm-c-info);
---crm-tab-roundness: var(--crm-roundness);
---crm-tab-border: 1px solid var(--crm-tab-border-col);
---crm-tab-border-active: 0 solid transparent;
+--crm-tab-roundness: var(--crm-roundness) var(--crm-roundness) 0 0;
+--crm-tab-border: 1px solid #ccc;
+--crm-tab-border-active: 1px solid #aaa;
 --crm-tabs-2-border: var(--crm-tabs-border);
 --crm-tabs-panel-border: 1px solid #aaa; /* Wellow addition */
 
 /* Contact dashboard */
---crm-dash-border: var(--crm-tab-border);
+--crm-dash-border: 0;
 --crm-dash-roundness: var(--crm-roundness);
 --crm-dash-direction: flex; /* choose 'flex' for tabs at top, or 'grid' for tabs at side */
 --crm-side-tabs-width: ;
 --crm-dash-tabs-flow: row; /* choose 'row' for tabs at top, or 'column' for tabs at side */
 --crm-dash-tabs-gap: var(--crm-tabs-gap);
 --crm-dash-tabs-bg: var(--crm-tabs-bg);
---crm-dash-tabs-padding: var(--crm-tabs-padding);
+--crm-dash-tabs-padding: 0;
 --crm-dash-tab-bg: var(--crm-tab-bg);
---crm-dash-tab-bg-hover: var(--crm-tab-bg-hover);
+--crm-dash-tab-bg-hover: #fff;
 --crm-dash-tab-padding: var(--crm-m);
---crm-dash-tab-border: 0 solid transparent;
---crm-dash-tab-border-hover: 0 solid transparent;
---crm-dash-tab-border-width: 0; /* to remove border on one side for hanging tabs */
+--crm-dash-tab-border: 1px solid #ccc;
+--crm-dash-tab-border-hover: 1px solid #aaa;
+--crm-dash-tab-border-width: 1px 1px 0 1px; /* to remove border on one side for hanging tabs */
 --crm-dash-tab-col: var(--crm-tab-col);
 --crm-dash-tab-count-bg: rgba(0,0,0,0.1);
 --crm-dash-tab-count-col: var(--crm-c-text);
 --crm-dash-tab-width: 100%;
 --crm-dash-tab-align: none;
---crm-dash-tab-hang: 0; /* lip to extend tab flush with active region - set to 0 for no lip */
---crm-dash-tab-radius: var(--crm-dash-roundness);
+--crm-dash-tab-hang: 0 0 -1px; /* lip to extend tab flush with active region - set to 0 for no lip */
+--crm-dash-tab-radius: var(--crm-tab-roundness);
 --crm-dash-icon-size: var(--crm-r);
 --crm-dash-summary-row-bg: var(--crm-c-background);
 --crm-dash-box-shadow: 0;

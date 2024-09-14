@@ -189,6 +189,7 @@
     border-radius: var(--crm-dash-tab-radius);
     padding: var(--crm-dash-tab-padding);
     border: var(--crm-dash-tab-border);
+    /* border-width: var(--crm-dash-tab-border-width); */
 }
 .crm-contact-page #mainTabContainer .ui-tabs-nav.crm-contact-tabs-list li.ui-tabs-active a,
 .crm-contact-page #mainTabContainer .ui-tabs-nav.crm-contact-tabs-list li:hover a,

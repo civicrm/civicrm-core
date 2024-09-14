@@ -6,14 +6,14 @@
  * @package CiviCRM
  */
 
-#crm-container #mainTabContainer,
+/* #crm-container #mainTabContainer,
 #crm-container #secondaryTabContainer
 {
     border: none;
     background: transparent;
-}
+} */
 
-.crm-contact-page #mainTabContainer .crm-contact-tabs-list,
+/* .crm-contact-page #mainTabContainer .crm-contact-tabs-list,
 #crm-container #secondaryTabContainer .ui-tabs-nav
 {
 	position: relative;
@@ -21,9 +21,9 @@
 	z-index: 1;
 	border-bottom: none;
 	border-radius: 0;
-}
+} */
 
-.crm-contact-page #mainTabContainer .ui-tabs-nav.crm-contact-tabs-list li,
+/* .crm-contact-page #mainTabContainer .ui-tabs-nav.crm-contact-tabs-list li,
 #crm-container #secondaryTabContainer .ui-tabs-nav li
 {
 	margin: 0;
@@ -32,9 +32,9 @@
 	border-top-left-radius: var(--crm-roundness);
 	border-top-right-radius: var(--crm-roundness);
 	border-bottom-width: 0;
-}
+} */
 
-.crm-contact-page #mainTabContainer .ui-tabs-nav.crm-contact-tabs-list li.ui-tabs-active,
+/* .crm-contact-page #mainTabContainer .ui-tabs-nav.crm-contact-tabs-list li.ui-tabs-active,
 #crm-container #secondaryTabContainer .ui-tabs-nav li.ui-tabs-active
 {
 	border: 1px solid #aaa;
@@ -42,7 +42,7 @@
 	background: var(--crm-c-light-text);
 	padding-bottom: 1px;
 	margin-bottom: -1px;
-}
+} */
 
 /* Fix padding on secondary tabs */
 .crm-container #secondaryTabContainer.ui-tabs ul.ui-tabs-nav a:not(.button)
@@ -51,14 +51,14 @@
 	padding-bottom: 0.5em;
 }
 
-.crm-container .ui-tabs .ui-tabs-nav li a,
+/* .crm-container .ui-tabs .ui-tabs-nav li a,
 .crm-container .ui-tabs .ui-tabs-nav li a:hover,
 .crm-container .ui-tabs .ui-tabs-nav li a:active
 {
 	outline: 0;
 	box-shadow: none;
 	text-decoration: none;
-}
+} */
 
 .crm-contact-page #mainTabContainer .ui-tabs-nav.crm-contact-tabs-list li.ui-tabs-active a,
 .crm-contact-page #mainTabContainer .ui-tabs-nav.crm-contact-tabs-list li:hover a,
