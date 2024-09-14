@@ -66,41 +66,6 @@ class CRM_Core_ManagedEntities {
   }
 
   /**
-   * Read a managed entity using APIv3.
-   *
-   * @deprecated
-   *
-   * @param string $moduleName
-   *   The name of the module which declared entity.
-   * @param string $name
-   *   The symbolic name of the entity.
-   * @return array|NULL
-   *   API representation, or NULL if the entity does not exist
-   */
-  public function get($moduleName, $name) {
-    CRM_Core_Error::deprecatedFunctionWarning('api');
-    $dao = new CRM_Core_DAO_Managed();
-    $dao->module = $moduleName;
-    $dao->name = $name;
-    if ($dao->find(TRUE)) {
-      $params = [
-        'id' => $dao->entity_id,
-      ];
-      $result = NULL;
-      try {
-        $result = civicrm_api3($dao->entity_type, 'getsingle', $params);
-      }
-      catch (Exception $e) {
-        $this->onApiError($dao->module, $dao->name, 'getsingle', $result['error_message'], $e);
-      }
-      return $result;
-    }
-    else {
-      return NULL;
-    }
-  }
-
-  /**
    * Identify any enabled/disabled modules. Add new entities, update
    * existing entities, and remove orphaned (stale) entities.
    *
