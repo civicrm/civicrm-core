@@ -357,7 +357,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-dialog-body-padding: var(--crm-m);
 
 /* Dashlet */
---crm-dashlet-border: ;
+--crm-dashlet-border:;
 --crm-dashlet-bg: var(--crm-c-page-background);
 --crm-dashlet-padding: var(--crm-s2);
 --crm-dashlet-box-shadow: var(--crm-popup-shadow);
@@ -370,8 +370,14 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-dashlet-header-padding: var(--crm-s);
 --crm-dashlet-content-padding: var(--crm-dashlet-padding) 0;
 --crm-dashlet-tabs-bg: var(--crm-tabs-bg);
+--crm-dashlet-tabs-border:0;
 --crm-dashlet-tab-bg: var(--crm-tab-bg);
+--crm-dashlet-tab-border:;
+--crm-dashlet-tab-color:;
 --crm-dashlet-tab-active: var(--crm-tab-bg-active);
+--crm-dashlet-tab-border-active: var(--crm-tab-border-active);
+--crm-dashlet-tab-body-border:;
+--crm-dashlet-tab-body-padding:;
 --crm-dashlet-radius: var(--crm-roundness);
 
 /* Button dropdowns */

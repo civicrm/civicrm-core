@@ -371,8 +371,14 @@ color-scheme: light dark;
 --crm-dashlet-header-padding: var(--crm-padding-reg);
 --crm-dashlet-content-padding: var(--crm-dashlet-padding) 0;
 --crm-dashlet-tabs-bg: var(--crm-c-background);
+--crm-dashlet-tabs-border: var(--crm-tabs-border);
 --crm-dashlet-tab-bg: var(--crm-c-background);
+--crm-dashlet-tab-border: var(--crm-tab-border);
+--crm-dashlet-tab-color:;
 --crm-dashlet-tab-active: var(--crm-expand-header-bg);
+--crm-dashlet-tab-border-active: var(--crm-tab-border-active);
+--crm-dashlet-tab-body-border:0;
+--crm-dashlet-tab-body-padding:0;
 --crm-dashlet-radius: var(--crm-roundness);
 
 /* Button dropdowns */

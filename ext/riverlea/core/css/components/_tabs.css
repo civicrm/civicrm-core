@@ -119,7 +119,7 @@
 }
 .crm-container .nav-tabs > li > a {
 	border: 1px solid transparent;
-	border-radius: var(--crm-tab-roundness) var(--crm-tab-roundness) 0 0;
+	border-radius: var(--crm-tab-roundness);
     display: block;
     margin-bottom: -1px;
 }
