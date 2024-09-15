@@ -1195,10 +1195,10 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => ts('Theme to use on frontend pages'),
-    'help_text' => ts('
-        The theme system allows you to change CiviCRM\'s appearance by replacing important CSS files.
-        On WordPress, Joomla, or a similar CMS, the frontend theme determines the appearance on user-facing screens, such as the "Event Registration" screen.
-    '),
+    'help_text' => implode('\n', [
+      ts('The theme system allows you to change CiviCRM\'s appearance by replacing important CSS files.'),
+      ts('On WordPress, Joomla, or a similar CMS, the frontend theme determines the appearance on user-facing screens, such as the "Event Registration" screen.'),
+    ]),
     'settings_pages' => ['display' => ['weight' => 920]],
   ],
   'theme_backend' => [
@@ -1220,10 +1220,10 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => ts('Theme to use on backend pages'),
-    'help_text' => ts('
-        The theme system allows you to change CiviCRM\'s appearance by replacing important CSS files.
-        The backend theme determines the appearance on administrative screens, such as the "Manage Event" screen.
-    '),
+    'help_text' => implode('\n', [
+      ts('The theme system allows you to change CiviCRM\'s appearance by replacing important CSS files.'),
+      ts('The backend theme determines the appearance on administrative screens, such as the "Manage Event" screen.'),
+    ]),
     'settings_pages' => ['display' => ['weight' => 900]],
   ],
   'http_timeout' => [
