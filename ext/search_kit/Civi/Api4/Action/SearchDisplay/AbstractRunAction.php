@@ -1323,6 +1323,9 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       $possibleTokens .= ($column['title'] ?? '');
       $possibleTokens .= ($column['empty_value'] ?? '');
 
+      if (!empty($column['key'])) {
+        $this->addSelectExpression($column['key']);
+      }
       if (!empty($column['link'])) {
         foreach ($this->getLinkTokens($column['link']) as $token) {
           $this->addSelectExpression($token);
