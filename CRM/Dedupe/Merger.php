@@ -937,6 +937,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
             $type = CRM_Utils_Array::explodePadded($data['contact_sub_type']);
           }
 
+          $includeViewOnly = TRUE;
           CRM_Core_BAO_CustomField::formatCustomField($customFieldId,
             $data['custom'],
             $value,
@@ -944,7 +945,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
             $valueId,
             $contactID,
             FALSE,
-            FALSE
+            FALSE,
+            $includeViewOnly,
           );
         }
         elseif ($key === 'edit') {
@@ -1746,8 +1748,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       $submitted = [];
     }
 
-    // Move view only custom fields CRM-5362
-    $viewOnlyCustomFields = [];
     foreach ($submitted as $key => $value) {
       if (strpos($key, 'custom_') === 0) {
         $fieldID = (int) substr($key, 7);
@@ -1757,17 +1757,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           $isSerialized = $fieldMetadata['serialize'];
           $isView = $fieldMetadata['is_view'];
           $submitted = self::processCustomFields($mainId, $key, $submitted, $value, $fieldID, $isView, $htmlType, $isSerialized);
-          if ($isView) {
-            $viewOnlyCustomFields[$key] = $submitted[$key];
-          }
         }
       }
-    }
-
-    // special case to set values for view only, CRM-5362
-    if (!empty($viewOnlyCustomFields)) {
-      $viewOnlyCustomFields['entityID'] = $mainId;
-      CRM_Core_BAO_CustomValueTable::setValues($viewOnlyCustomFields);
     }
 
     // dev/core#996 Ensure that the earliest created date is stored against the kept contact id
