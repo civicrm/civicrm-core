@@ -20,7 +20,6 @@ return [
     'ngRoute',
     'ui.bootstrap',
     'crmSearchDisplay',
-    'crmSearchAdmin',
   ],
   'basePages' => ['civicrm/admin/search'],
   'bundles' => ['bootstrap3', 'chart_kit'],
