@@ -295,6 +295,7 @@ color-scheme: light dark;
 --crm-tab-count-col: var(--crm-c-text);
 --crm-tab-roundness: var(--crm-roundness);
 --crm-tab-border: var(--crm-c-divider);
+--crm-tab-border-width: 0;
 --crm-tab-border-active: var(--crm-c-divider);
 --crm-tabs-2-border: 0 solid transparent;
 

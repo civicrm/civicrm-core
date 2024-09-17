@@ -295,6 +295,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-tab-count-col: var(--crm-c-light-text);
 --crm-tab-roundness: var(--crm-roundness);
 --crm-tab-border: 1px solid var(--crm-c-gray-400);
+--crm-tab-border-width: 0;
 --crm-tab-border-active: 0 solid transparent;
 --crm-tabs-2-border: var(--crm-tabs-border);
 
