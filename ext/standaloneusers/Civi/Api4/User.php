@@ -2,9 +2,10 @@
 namespace Civi\Api4;
 
 use Civi\Api4\Action\User\Create;
+use Civi\Api4\Action\User\Login;
 use Civi\Api4\Action\User\Save;
-use Civi\Api4\Action\User\Update;
 use Civi\Api4\Action\User\SendPasswordReset;
+use Civi\Api4\Action\User\Update;
 
 /**
  * User entity.
@@ -14,6 +15,15 @@ use Civi\Api4\Action\User\SendPasswordReset;
  * @package Civi\Api4
  */
 class User extends Generic\DAOEntity {
+
+  /**
+   * @param bool $checkPermissions
+   * @return \Civi\Api4\Action\User\Login
+   */
+  public static function login($checkPermissions = TRUE): Login {
+    return (new Login(static::getEntityName(), __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
 
   /**
    * @param bool $checkPermissions
