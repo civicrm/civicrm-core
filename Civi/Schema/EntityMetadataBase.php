@@ -205,7 +205,6 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
     $customFields = [];
     $customGroupFilters += ['extends' => $this->entityName, 'is_active' => TRUE];
     $inputTypeMap = [
-      'Select Date' => 'Date',
       'Link' => 'Url',
       'Autocomplete-Select' => 'EntityRef',
     ];
@@ -242,7 +241,7 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
           $field['input_attrs']['cols'] = (int) ($customField['note_columns'] ?? 60);
         }
         // Date/time settings
-        if ($field['input_type'] == 'Date') {
+        if ($field['input_type'] == 'Select Date') {
           $field['input_attrs']['time'] = empty($customField['time_format']) ? FALSE : ($customField['time_format'] == 1 ? 12 : 24);
           $field['input_attrs']['date'] = $customField['date_format'];
           $field['input_attrs']['start_date_years'] = isset($customField['start_date_years']) ? (int) $customField['start_date_years'] : NULL;
