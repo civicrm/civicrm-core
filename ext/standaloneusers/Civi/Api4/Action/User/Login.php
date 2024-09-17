@@ -4,6 +4,7 @@ namespace Civi\Api4\Action\User;
 use Civi;
 use Civi\Api4\Generic\AbstractAction;
 use Civi\Api4\Generic\Result;
+use Civi\Standalone\MFA\Base as MFABase;
 use Civi\Standalone\Security;
 
 class Login extends AbstractAction {
@@ -34,12 +35,42 @@ class Login extends AbstractAction {
    */
   protected ?string $mfaClass = NULL;
 
+  /**
+   * MFA data.
+   *
+   * Used when trying to complete a login via an MFA class.
+   *
+   * @default NULL
+   */
+  protected $mfaData = NULL;
+
   public function _run(Result $result) {
     if (empty($this->mfaClass)) {
       return $this->passwordCheck($result);
     }
     else {
-      // return $this->mfaCheck($result);
+      $mfaClass = \Civi\Standalone\MFA\Base::classIsAvailable($this->mfaClass);
+      if (!$mfaClass) {
+        \CRM_Core_Session::singleton()->set('pendingLogin', []);
+        throw new \API_Exception("MFA method not available");
+      }
+      $pending = MFABase::getPendingLogin();
+      if (!$pending) {
+        throw new \API_Exception("MFA method not available");
+        // Invalid, send user back to login.
+        // CRM_Utils_System::redirect('/civicrm/login');
+      }
+
+      $mfa = new $mfaClass($pending['userID']);
+      \CRM_Core_Session::singleton()->set('pendingLogin', []);
+      if ($mfa->checkMFAData($this->mfaData)) {
+        // OK!
+        $result['url'] = '/civicrm';
+        $this->loginUser($pending['userID']);
+      }
+      else {
+        throw new \API_Exception("MFA failed verification");
+      }
     }
   }
 
@@ -62,7 +93,8 @@ class Login extends AbstractAction {
     // users can login without it.
     $mfaClasses = [];
     foreach (explode(',', Civi::settings()->get('standalone_mfa_enabled')) as $mfaClass) {
-      if (is_subclass_of($mfaClass, 'Civi\\Standalone\\MFA\\MFAInterface') && class_exists($mfaClass)) {
+      $mfaClass = \Civi\Standalone\MFA\Base::classIsAvailable($mfaClass);
+      if ($mfaClass) {
         $mfaClasses[] = $mfaClass;
       }
     }

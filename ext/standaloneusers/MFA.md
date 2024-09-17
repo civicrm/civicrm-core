@@ -34,3 +34,7 @@ Server: User.login (with mfa)
 
 Store seed encrypted.
 $encrypted = Civi::service('crypto.token')->encrypt('t0ps3cr37', 'CRED');
+
+- Generate TOTP seed for user: returns unencrypted value, encrypts and stores.
+- Check the TOTP
+- Provide means to supply totp and check it and then login (hard)

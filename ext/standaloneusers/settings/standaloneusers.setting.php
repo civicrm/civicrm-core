@@ -13,4 +13,16 @@ return [
     'is_domain'   => 1,
     'is_contact'  => 0,
   ],
+  // Example value: 'TOTP', not 'Civi\Standalone\MFA\TOTP'
+  'standalone_mfa_enabled' => [
+    'name'        => 'standalone_mfa_enabled',
+    'group'       => 'standaloneusers',
+    'type'        => 'String',
+    'title'       => ts('Multi-Factor Authentication classes'),
+    'description' => ts('Comma separated list of classes of MFA that are required/accepted.'),
+    'default'     => '',
+    'html_type'   => 'text',
+    'is_domain'   => 1,
+    'is_contact'  => 0,
+  ],
 ];

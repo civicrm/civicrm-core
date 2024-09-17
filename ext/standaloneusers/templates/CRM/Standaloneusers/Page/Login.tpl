@@ -1,6 +1,6 @@
 <div class="standalone-auth-form">
   <div class="standalone-auth-box">
-    <form>
+    <form id=login-form>
       <img class="crm-logo" src="{$logoUrl}" alt="logo for CiviCRM, with an intersecting blue and green triangle">
       {if $justLoggedOut}<div class="help message info">{ts}You have been logged out.{/ts}</div>{/if}
       {if $anonAccessDenied}<div class="help message warning">{ts}You do not have permission to access that, you may
@@ -26,11 +26,11 @@
 <script>
   document.addEventListener('DOMContentLoaded', () => {
 
-    const submitBtn = document.getElementById('loginSubmit'),
+    const form = document.getElementById('login-form'),
       username = document.getElementById('usernameInput'),
       password = document.getElementById('passwordInput');
 
-    submitBtn.addEventListener('click', async e => {
+    form.addEventListener('submit', async e => {
       e.preventDefault();
 
       let errorMsg = 'Unexpected error';

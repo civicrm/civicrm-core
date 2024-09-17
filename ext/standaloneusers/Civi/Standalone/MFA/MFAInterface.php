@@ -5,4 +5,6 @@ interface MFAInterface {
 
   public function getFormUrl(): string;
 
+  public function checkMFAData($data):bool;
+
 }
