@@ -392,6 +392,13 @@
                     legend.x(this.settings.format.width - legend.itemWidth() - rightPadding);
                 }
                 this.chart.legend(legend);
+
+                // Correct vertical alignment of legend labels on Chrome
+                // Should be fixed upstream and therefore unnecessary in DCv5
+                this.chart.on('pretransition', (chart) =>
+                  chart.selectAll('.dc-legend-item text')
+                    .attr('y', legend.itemHeight() - 2)
+                );
             };
 
             // TODO: move everything from here down  to a util service?
