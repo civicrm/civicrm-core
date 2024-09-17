@@ -88,6 +88,7 @@ class User extends Generic\DAOEntity {
       'delete'            => ['cms:administer users'],
       'passwordReset'     => ['access password resets'],
       'sendPasswordReset' => ['access password resets'],
+      'login'             => ['access password resets'],
     ];
   }
 

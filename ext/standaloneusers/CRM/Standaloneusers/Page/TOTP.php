@@ -1,9 +1,15 @@
 <?php
+
 use CRM_Standaloneusers_ExtensionUtil as E;
 
+/**
+ * Page for /civicrm/mfa/totp
+ */
 class CRM_Standaloneusers_Page_TOTP extends CRM_Core_Page {
 
   public function run() {
+    // Nb. Get SQL from schema like so:
+    // echo E::schema('totp')->generateInstallSql(); exit;
 
     if (CRM_Core_Session::getLoggedInContactID()) {
       // Already logged in.
@@ -16,27 +22,13 @@ class CRM_Standaloneusers_Page_TOTP extends CRM_Core_Page {
     ) {
       // Invalid, send user back to login.
       $pending = CRM_Core_Session::singleton()->set('pendingLogin', []);
-      CRM_Utils_System::redirect('/login');
+      CRM_Utils_System::redirect('/civicrm/login');
     }
 
     $this->assign('logoUrl', E::url('images/civicrm-logo.png'));
-    $this->assign('pageTitle', '');
-    $this->assign('forgottenPasswordURL', CRM_Utils_System::url('civicrm/login/password'));
-    // Remove breadcrumb for login page.
+    $this->assign('pageTitle', 'Multi Factor Authentication');
     $this->assign('breadcrumb', NULL);
-
-    $this->assign('justLoggedOut', isset($_GET['justLoggedOut']));
-
     parent::run();
-  }
-
-  /**
-   * Log out.
-   */
-  public static function logout() {
-    Security::singleton()->logoutUser();
-    // Dump them back on the log-IN page.
-    CRM_Utils_System::redirect('/civicrm/login?justLoggedOut');
   }
 
 }

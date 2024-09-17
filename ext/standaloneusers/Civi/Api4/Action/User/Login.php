@@ -46,12 +46,14 @@ class Login extends AbstractAction {
   protected function passwordCheck(Result $result) {
     // Check user+password
     if (empty($this->username) || empty($this->password)) {
-      throw new \API_Exception("Missing password/username");
+      $result['publicError'] = "Missing password/username";
+      return;
     }
     $security = Security::singleton();
     $user = $security->loadUserByName($this->username);
     if (!$security->checkPassword($this->password, $user['hashed_password'] ?? '')) {
-      throw new \API_Exception("Invalid credentials");
+      $result['publicError'] = "Invalid credentials";
+      return;
     }
     // Password is ok. Do we have mfa configured?
 
@@ -88,6 +90,11 @@ class Login extends AbstractAction {
         // Currently unsupported and this codepath is never reached.
     }
 
+  }
+
+  protected function loginUser(int $userID) {
+    $authx = new \Civi\Authx\Standalone();
+    $authx->loginSession($userID);
   }
 
 }

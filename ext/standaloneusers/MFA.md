@@ -31,3 +31,6 @@ Server: User.login (with mfa)
   pendingLoginUserID, return /civicrm**
 - reject: clear session send back to /civicrm/login
 
+
+Store seed encrypted.
+$encrypted = Civi::service('crypto.token')->encrypt('t0ps3cr37', 'CRED');
