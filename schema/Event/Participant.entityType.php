@@ -136,7 +136,7 @@ return [
         'duplicate_matching',
       ],
       'input_attrs' => [
-        'multiple' => '1',
+        'multiple' => TRUE,
         'label' => ts('Participant Role'),
       ],
       'pseudoconstant' => [

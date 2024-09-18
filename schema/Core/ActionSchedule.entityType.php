@@ -471,7 +471,7 @@ return [
       'add' => '4.7',
       'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_TRIMMED,
       'input_attrs' => [
-        'multiple' => '1',
+        'multiple' => TRUE,
         'label' => ts('Recipients Language'),
       ],
       'pseudoconstant' => [

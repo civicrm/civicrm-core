@@ -232,7 +232,7 @@ return [
         'duplicate_matching',
       ],
       'input_attrs' => [
-        'multiple' => '1',
+        'multiple' => TRUE,
         'control_field' => 'contact_type',
       ],
       'pseudoconstant' => [
@@ -483,7 +483,7 @@ return [
         'duplicate_matching',
       ],
       'input_attrs' => [
-        'multiple' => '1',
+        'multiple' => TRUE,
       ],
       'pseudoconstant' => [
         'option_group_name' => 'preferred_communication_method',
