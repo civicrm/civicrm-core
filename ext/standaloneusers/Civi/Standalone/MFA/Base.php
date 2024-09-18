@@ -34,17 +34,29 @@ class Base {
   }
 
   /**
-   * Returns an array of fully qualified class names that are available.
+   * Does the class exist on the system.
    */
-  public static function getAvailableClasses(): array {
-    $fullClassNames = [];
+  public static function classIsMFA(string $shortClassName): ?string {
+    $mfaClass = "Civi\\Standalone\\MFA\\$shortClassName";
+    return (is_subclass_of($mfaClass, 'Civi\\Standalone\\MFA\\MFAInterface') && class_exists($mfaClass));
+  }
+
+  /**
+   * Returns an array of fully qualified or short class names that are available.
+   *
+   * Available here means:
+   * - is configured in settings as available to users
+   * - is actually an MFA class.
+   */
+  public static function getAvailableClasses(bool $short = FALSE): array {
+    $list = [];
     foreach (explode(',', \Civi::settings()->get('standalone_mfa_enabled')) as $shortClassName) {
       $fqcn = Base::classIsAvailable($shortClassName);
       if ($fqcn) {
-        $fullClassNames[] = $fqcn;
+        $list[] = $short ? $shortClassName : $fqcn;
       }
     }
-    return $fullClassNames;
+    return $list;
   }
 
   /**
