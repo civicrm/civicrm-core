@@ -5,7 +5,7 @@
 
       <div class="input-wrapper">
         <label for="totpcode" name=totp class="form-label">{ts}Enter the code from your authenticator app{/ts}</label>
-        <input type="text" class="form-control" id="totpcode">
+        <input type="text" class="form-control" id="totpcode" maxlength=6>
       </div>
       <div>
         <button id="submit" type="submit" class="btn crm-button">{ts}Submit{/ts}</button>
