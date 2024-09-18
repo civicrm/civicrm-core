@@ -10,7 +10,11 @@
 {if $groupTree}
 {foreach from=$groupTree item=cd_edit key=group_id}
 
-  <details class="crm-accordion-bold crm-contactDetails-accordion" id="{$cd_edit.name}"  {if $form.formName eq 'Advanced' AND $cd_edit.collapse_adv_display eq 1}{else}open{/if}>
+  <details
+    class="crm-accordion-bold crm-contactDetails-accordion"
+    id="{$cd_edit.name}"
+    {if $cd_edit.collapse_adv_display eq 1}{else}open{/if}
+    >
     <summary>
         {$cd_edit.title}
     </summary>
