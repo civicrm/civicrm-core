@@ -89,4 +89,26 @@ class TOTP extends Base implements MFAInterface {
     return $this->verifyCode($seed, $data);
   }
 
+  /**
+   */
+  public function processMFAAttempt(array $pending, $code): bool {
+
+    // Either: we are checking an existing TOTP, OR verifying that
+    // the user has successfully imported the new seed to their authenticator
+    if (!empty($pending['seed'])) {
+      // We are trying to verify a new authenticator.
+      if ($this->verifyCode($pending['seed'], $code)) {
+        // Good! Store the seed against the user.
+        $this->storeSeed($pending['userID'], $pending['seed']);
+        return TRUE;
+      }
+    }
+    else {
+      // Normal login check.
+      return $this->checkMFAData($code);
+    }
+
+    return FALSE;
+  }
+
 }

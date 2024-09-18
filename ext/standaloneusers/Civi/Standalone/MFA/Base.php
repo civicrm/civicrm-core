@@ -13,12 +13,38 @@ class Base {
     CRM_Core_Session::singleton()->set('pendingLogin', ['userID' => $userID, 'expiry' => time() + 120]);
   }
 
+  /**
+   * Checks if a given token is an enabled MFA class, and returns
+   * the fully qualified class name (or NULL)
+   */
   public static function classIsAvailable(string $shortClassName): ?string {
+
+    if (!in_array($shortClassName, explode(',', \Civi::settings()->get('standalone_mfa_enabled')))) {
+      // Class is not configured for use.
+      return NULL;
+    }
+
     $mfaClass = "Civi\\Standalone\\MFA\\$shortClassName";
     if (is_subclass_of($mfaClass, 'Civi\\Standalone\\MFA\\MFAInterface') && class_exists($mfaClass)) {
+      // The code is available, all good.
       return $mfaClass;
     }
+
     return NULL;
+  }
+
+  /**
+   * Returns an array of fully qualified class names that are available.
+   */
+  public static function getAvailableClasses(): array {
+    $fullClassNames = [];
+    foreach (explode(',', \Civi::settings()->get('standalone_mfa_enabled')) as $shortClassName) {
+      $fqcn = Base::classIsAvailable($shortClassName);
+      if ($fqcn) {
+        $fullClassNames[] = $fqcn;
+      }
+    }
+    return $fullClassNames;
   }
 
   /**

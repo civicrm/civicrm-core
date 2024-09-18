@@ -29,4 +29,10 @@
     <title>Multi Factor Authentication: TOTP</title>
     <access_arguments>*always allow*</access_arguments>
   </item>
+  <item>
+    <path>civicrm/mfa/totp-setup</path>
+    <page_callback>CRM_Standaloneusers_Page_TOTPAuth</page_callback>
+    <title>Multi Factor Authentication: TOTPAuth</title>
+    <access_arguments>*always allow*</access_arguments>
+  </item>
 </menu>

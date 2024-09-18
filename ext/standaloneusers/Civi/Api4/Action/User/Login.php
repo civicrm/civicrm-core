@@ -1,7 +1,6 @@
 <?php
 namespace Civi\Api4\Action\User;
 
-use Civi;
 use Civi\Api4\Generic\AbstractAction;
 use Civi\Api4\Generic\Result;
 use Civi\Standalone\MFA\Base as MFABase;
@@ -49,29 +48,32 @@ class Login extends AbstractAction {
       return $this->passwordCheck($result);
     }
     else {
-      $mfaClass = \Civi\Standalone\MFA\Base::classIsAvailable($this->mfaClass);
+      $mfaClass = MFABase::classIsAvailable($this->mfaClass);
       if (!$mfaClass) {
         \CRM_Core_Session::singleton()->set('pendingLogin', []);
-        throw new \API_Exception("MFA method not available");
+        $result['publicError'] = "MFA method not available. Please contact the site administrators.";
+        return;
       }
       $pending = MFABase::getPendingLogin();
       if (!$pending) {
-        throw new \API_Exception("MFA method not available");
+        // $result['publicError'] = "Session lost, possibly expired. Please login again."; @todo
         // Invalid, send user back to login.
-        // CRM_Utils_System::redirect('/civicrm/login');
+        \CRM_Utils_System::redirect('/civicrm/login?sessionLost');
       }
 
       $mfa = new $mfaClass($pending['userID']);
-      \CRM_Core_Session::singleton()->set('pendingLogin', []);
-      if ($mfa->checkMFAData($this->mfaData)) {
+      $okToLogin = $mfa->processMFAAttempt($pending, $this->mfaData);
+      if ($okToLogin) {
         // OK!
+        \CRM_Core_Session::singleton()->set('pendingLogin', []);
         $result['url'] = '/civicrm';
         $this->loginUser($pending['userID']);
       }
       else {
-        throw new \API_Exception("MFA failed verification");
+        $result['publicError'] = "MFA failed verification";
       }
     }
+
   }
 
   protected function passwordCheck(Result $result) {
@@ -91,13 +93,7 @@ class Login extends AbstractAction {
     // Collect configured and present MFA classes.
     // This check means if an MFA extension is removed without changing config,
     // users can login without it.
-    $mfaClasses = [];
-    foreach (explode(',', Civi::settings()->get('standalone_mfa_enabled')) as $mfaClass) {
-      $mfaClass = \Civi\Standalone\MFA\Base::classIsAvailable($mfaClass);
-      if ($mfaClass) {
-        $mfaClasses[] = $mfaClass;
-      }
-    }
+    $mfaClasses = MFABase::getAvailableClasses();
 
     // @todo remove this line if/when we implement a user choice of MFAs.
     $mfaClasses = array_slice($mfaClasses, 0, 1);

@@ -25,8 +25,8 @@ class CRM_Standaloneusers_Page_TOTP extends CRM_Core_Page {
       CRM_Utils_System::redirect('/civicrm/login');
     }
 
+    $this->assign('pageTitle', '');
     $this->assign('logoUrl', E::url('images/civicrm-logo.png'));
-    $this->assign('pageTitle', 'Multi Factor Authentication');
     $this->assign('breadcrumb', NULL);
     parent::run();
   }
