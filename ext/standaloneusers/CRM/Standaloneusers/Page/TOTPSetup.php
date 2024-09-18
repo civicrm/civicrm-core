@@ -5,7 +5,7 @@ use Civi\Standalone\MFA\Base as MFABase;
 /**
  * Page for /civicrm/mfa/totp-setup
  */
-class CRM_Standaloneusers_Page_TOTPAuth extends CRM_Core_Page {
+class CRM_Standaloneusers_Page_TOTPSetup extends CRM_Core_Page {
 
   public function run() {
 
