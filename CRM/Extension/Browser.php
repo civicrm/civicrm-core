@@ -21,15 +21,6 @@ use GuzzleHttp\Exception\GuzzleException;
 class CRM_Extension_Browser {
 
   /**
-   * An URL for public extensions repository.
-   *
-   * Note: This default is now handled through setting/*.php.
-   *
-   * @deprecated
-   */
-  const DEFAULT_EXTENSIONS_REPOSITORY = 'https://civicrm.org/extdir/ver={ver}|cms={uf}';
-
-  /**
    * Relative path below remote repository URL for single extensions file.
    */
   const SINGLE_FILE_PATH = '/single';

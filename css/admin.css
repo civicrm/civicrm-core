@@ -51,11 +51,13 @@
   margin-left: 5px;
 }
 
-.crm-container .crm-extensions-stage.fa-flask {
+.crm-container .crm-extensions-stage.fa-flask,
+.crm-container .crm-extensions-stage.fa-warning {
   color: #eba12d;
 }
 
-.crm-container .crm-extensions-stage.fa-check-circle {
+.crm-container .crm-extensions-stage.fa-check-circle,
+.crm-container .crm-extensions-stage.fa-trophy {
   color: #00994d;
 }
 
