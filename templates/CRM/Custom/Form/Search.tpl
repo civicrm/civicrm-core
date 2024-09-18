@@ -13,12 +13,8 @@
   <details
     class="crm-accordion-bold crm-contactDetails-accordion"
     id="{$cd_edit.name}"
-    {if $form.formName eq 'Advanced'}
-        {if $cd_edit.collapse_adv_display eq 1}{else}open{/if}
-    {else}
-        {if $cd_edit.collapse_display eq 1}{else}open{/if}
-    {/if}
-        >
+    {if $cd_edit.collapse_adv_display eq 1}{else}open{/if}
+    >
     <summary>
         {$cd_edit.title}
     </summary>
