@@ -1,6 +1,7 @@
 <?php
 
 use CRM_Standaloneusers_ExtensionUtil as E;
+use Civi\Standalone\MFA\Base as MFABase;
 
 /**
  * Page for /civicrm/mfa/totp
@@ -16,7 +17,7 @@ class CRM_Standaloneusers_Page_TOTP extends CRM_Core_Page {
       CRM_Utils_System::redirect('/civicrm');
     }
 
-    $pending = CRM_Core_Session::singleton()->get('pendingLogin');
+    $pending = MFABase::getPendingLogin();
     if (!$pending || !is_array($pending)
       || (($pending['expiry'] ?? 0) < time())
     ) {

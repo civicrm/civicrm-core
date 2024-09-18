@@ -3,6 +3,8 @@ namespace Civi\Api4\Action\Totp;
 
 use Civi\Api4\Generic\AbstractAction;
 use Civi\Api4\Generic\Result;
+use Civi\Standalone\MFA\Base as MFABase;
+use Civi\Api4\Totp;
 
 /**
  * Verify that the user correctly applied the seed to their authenticator app.
@@ -28,7 +30,7 @@ class ConfirmSeed extends AbstractAction {
 
   public function _run(Result $result) {
 
-    $pending = \CRM_Core_Session::singleton()->get('pendingLogin');
+    $pending = MFABase::getPendingLogin();
     if (!$pending || !is_array($pending)
       || (($pending['expiry'] ?? 0) < time())
     ) {
@@ -40,6 +42,21 @@ class ConfirmSeed extends AbstractAction {
     }
 
     $userID = $pending['userID'];
+
+    // Check that the pending UserID does not have TOTP already set up,
+    // to prevent them being able to access this URL and set up a new one,
+    // thereby bypassing MFA!
+    $preExistingTotp = Totp::get(FALSE)
+      ->addWhere('user_id', '=', $pending['userID'])
+      ->execute()->first();
+    if ($preExistingTotp) {
+      \Civi::log()->notice("Possibly malicious: Attempt to access Totp.ConfirmSeed API, when TOTP is already set up.", [
+        'pendingLogin' => $pending,
+      ]);
+      $result['error'] = 'TOTP already enabled.';
+      return;
+    }
+
     $t = new \Civi\Standalone\MFA\TOTP($userID);
     $result['success'] = $t->verifyCode($this->seed, $this->code);
     if ($result['success']) {

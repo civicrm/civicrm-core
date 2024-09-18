@@ -67,7 +67,8 @@ class Login extends AbstractAction {
       $pending = MFABase::getPendingLogin();
       if (!$pending) {
         // Invalid, send user back to login.
-        \CRM_Utils_System::redirect('/civicrm/login?sessionLost');
+        $result['url'] = '/civicrm/login?sessionLost';
+        return;
       }
 
       $mfa = new $mfaClass($pending['userID']);
@@ -129,10 +130,17 @@ class Login extends AbstractAction {
         return;
 
       case 1:
-        // MFA enabled.
+        // MFA enabled. Store data in a pendingLogin key on session.
+        // @todo expose the 120s timeout to config?
+        \CRM_Core_Session::singleton()->set('pendingLogin', [
+          'userID' => $user['id'],
+          'username' => $this->username,
+          'expiry' => time() + 120,
+          'successUrl' => $successUrl,
+        ]);
         $mfaClass = $mfaClasses[0];
         $mfa = new $mfaClass($user['id']);
-        $mfa->updatePendingLogin(['successUrl' => $successUrl]);
+        // Return the URL for the MFA form.
         $result['url'] = $mfa->getFormUrl();
         break;
 
