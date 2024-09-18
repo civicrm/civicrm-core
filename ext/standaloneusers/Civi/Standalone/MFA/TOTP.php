@@ -80,7 +80,7 @@ class TOTP extends Base implements MFAInterface {
   }
 
   public function getAuthenticator(): \CiviGoogleAuthenticator {
-    require_once \Civi::paths()->getPath('[civicrm.root]/packages/PHPGangsta/CiviGoogleAuthenticator.php');
+    require_once \Civi::paths()->getPath('[civicrm.packages]/PHPGangsta/CiviGoogleAuthenticator.php');
     return new \CiviGoogleAuthenticator();
   }
 
