@@ -12,10 +12,10 @@
 /* FONTS */
 /* --crm-system-fonts:; */
 --crm-font:Lato;
-/* --crm-font-bold:; */
-/* --crm-bold-weight: bold; */
+/* --crm-font-bold:Lato; */
+--crm-bold-weight: bold;
 /* --crm-font-italic:; */
-/* --crm-italic-style: italic; */
+--crm-italic-style: italic;
 /* --crm-font-bold-italic:; */
 
 /* COLOUR */
@@ -36,8 +36,8 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 /* --crm-c-gray-025: #fbfafa; */
 /* --crm-c-blue: #bce8f1; */
 /* --crm-c-blue-light: #d9edf7; */
-/* --crm-c-blue-dark: #297292; */
-/* --crm-c-blue-darker: #215c76; */
+--crm-c-blue-dark:#2c98ed ;
+--crm-c-blue-darker: #02477d;
 /* --crm-c-purple: #4d4d69; */
 /* --crm-c-purple-dark: #3e3e54; */
 /* --crm-c-green: #d6e9c6; */
@@ -62,13 +62,13 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 /* --crm-c-link-hover: var(--crm-c-blue-darker); */
 --crm-c-divider: 1px solid #bad0df45; /*var(--crm-c-gray-300);*/
 --crm-c-page-background: #f3f2ed; /* background to page body */
-/* --crm-c-background: #f4f4ed; /* background to page header */ */
-/* --crm-c-background2: var(--crm-c-gray-050); /* 2-5 = progressively darker backgrounds */ */
+/* --crm-c-background: #f4f4ed; /* background to page header */
+/* --crm-c-background2: var(--crm-c-gray-050); /* 2-5 = progressively darker backgrounds */
 /* --crm-c-background3: var(--crm-c-gray-100); */
 /* --crm-c-background4: var(--crm-c-gray-200); */
 /* --crm-c-background5: var(--crm-c-gray-700); */
-/* --crm-c-drag-background: var(--crm-c-background3); /* background for drag/drop regions, select2 highlight */ */
-/* --crm-c-code-background: var(--crm-c-background2); /* background for code regions */ */
+/* --crm-c-drag-background: var(--crm-c-background3); /* background for drag/drop regions, select2 highlight */
+/* --crm-c-code-background: var(--crm-c-background2); /* background for code regions */
 /* --crm-c-primary: var(--crm-c-gray-700); */
 /* --crm-c-primary-hover: var(--crm-c-gray-800); */
 /* --crm-c-primary-text: var(--crm-c-light-text); */
@@ -93,10 +93,10 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 /* --crm-body-inset:; */
 
 /* SIZES - temporary */
-/* --crm-roundness: 0.25rem; */
+--crm-roundness: 0.25rem;
 /* --crm-xs: 0.1rem; */
 /* --crm-xs1: 0.125rem; */
-/* --crm-xs2: 0.15rem; */
+--crm-xs2: 0.15rem;
 /* --crm-s: 0.25rem; */
 /* --crm-s1: 0.275rem; */
 /* --crm-s2: 0.325rem; */
@@ -120,7 +120,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 /* --crm-padding-inset: var(--crm-m); */
 /* thames: on standalone the following is overridden in cms.css */
 --crm-page-padding: clamp(0.5rem 2vw 4rem); /* Margin left/right */
-/* --crm-page-width: 100%; /* Default that CMS can overwrite */ */
+/* --crm-page-width: 100%; /* Default that CMS can overwrite */
 
 /* TYPE */
 /* --crm-font-size: var(--crm-r); */
@@ -142,8 +142,8 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 /* --crm-btn-border: 0 solid transparent; */
 /* --crm-btn-txt-transform: inherit; */
 /* --crm-btn-radius: 3px; */
-/* --crm-btn-padding-block: var(--crm-xs1); /* padding for top and bottom, one value */ */
-/* --crm-btn-padding-inline: var(--crm-m1); /* padding for left and right, one value */ */
+/* --crm-btn-padding-block: var(--crm-xs1); /* padding for top and bottom, one value */
+/* --crm-btn-padding-inline: var(--crm-m1); /* padding for left and right, one value */
 /* --crm-btn-small-padding: var(--crm-xs) var(--crm-s); */
 /* --crm-btn-large-padding: var(--crm-m) var(--crm-r); */
 /* --crm-btn-align: center; */
@@ -179,7 +179,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 /* --crm-table-odd-row: var(--crm-c-gray-025); */
 /* --crm-table-odd-hover: var(--crm-c-yellow-light); */
 /* --crm-table-sort-col: var(--crm-c-gray-300); */
-/* --crm-table-sort-float: left; /* 'left', 'right' or 'none' */ */
+/* --crm-table-sort-float: left; /* 'left', 'right' or 'none' */
 /* --crm-table-sort-active-col: var(--crm-c-link); */
 /* --crm-table-compressed-width: auto; */
 /* --crm-table-nested-padding: var(--crm-r) var(--crm-m); */
@@ -194,40 +194,41 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 /* --crm-panel-head-margin: 0px; */
 
 /* ACCORDIONS */
---crm-expand-icon: "\f0da"; /* unicode value for FontAwesome icon */
---crm-expand-icon-color: var(--text);
+/* --crm-expand-icon: "\f0da"; unicode value for FontAwesome icon */
+--crm-expand-icon-color: var(--crm-c-blue-dark);
 --crm-expand-icon-spacing: var(--crm-m);
 --crm-expand-transform: rotate(90deg);
 --crm-expand-transition: transform .3s;
-/* --crm-expand-radius: var(--crm-roundness); */
-/* --crm-expand-gap: var(--crm-xs2) 0 0; /* space between multiple accordions */ */
+--crm-expand-radius: var(--crm-roundness);
+--crm-expand-gap: var(--crm-xs2) 0 0; /* space between multiple accordions */
 /* .crm-accordion-bold */
 --crm-expand-header-bg: #bad0df45;
-/* --crm-expand-header-bg-active: var(--crm-c-gray-900); */
-/* --crm-expand-header-color: var(--crm-c-light-text); */
---crm-expand-header-padding: .8rem 1.6rem .8rem 3rem; /*var(--crm-s) var(--crm-m); */
-/* --crm-expand-header-weight: var(--crm-bold-weight); */
-/* --crm-expand-header-font: var(--crm-font-bold); */
---crm-expand-header-border: var(--crm-c-divider);
---crm-expand-header-border-width: 0 0 1px 0;
---crm-expand-border: var(--crm-c-divider);
---crm-expand-border-width: 0 1px 1px 1px;
---crm-expand-body-bg:#bad0df45;
-/* --crm-expand-body-box-shadow:; */
---crm-expand-body-padding: var(--crm-padding-reg);
+--crm-expand-header-bg-active: var(--crm-c-gray-900);
+--crm-expand-header-color: var(--crm-c-blue-darker);
+--crm-expand-header-padding: 0.6rem 1.6rem 0.6rem 2.8rem;
+--crm-expand-header-weight: var(--crm-bold-weight);
+--crm-expand-header-font: var(--crm-font-bold);
+--crm-expand-header-border: ;/*var(--crm-c-divider);*/
+--crm-expand-header-border-width: /*0 0 1px 0*/;
+--crm-expand-border:;
+--crm-expand-border-width:;
+/* --crm-expand-body-bg:#bad0df45; */
+--crm-expand-body-box-shadow:;
+--crm-expand-body-padding: 0.25rem 2.8rem;
 /* .crm-accordion-light */
-/* --crm-expand2-header-bg:; */
-/* --crm-expand2-header-bg-active: var(--crm-c-background-2); */
-/* --crm-expand2-header-weight: normal; */
-/* --crm-expand2-header-font:; */
-/* --crm-expand2-header-color: var(--crm-c-text); */
-/* --crm-expand2-header-border:; */
-/* --crm-expand2-header-border-width: ; */
-/* --crm-expand2-header-padding: var(--crm-s) var(--crm-m); */
-/* --crm-expand2-border:; */
-/* --crm-expand2-border-width:; */
-/* --crm-expand2-body-bg:; */
-/* --crm-expand2-body-padding: var(--crm-s); */
+--crm-expand2-header-bg:;
+--crm-expand2-header-bg-active: var(--crm-c-background-2);
+--crm-expand2-header-weight: normal;
+--crm-expand2-header-font:;
+--crm-expand2-header-color: var(--crm-c-text);
+/* 1px solid #bad0df45  */
+--crm-expand2-header-border: ;
+--crm-expand2-header-border-width:;
+--crm-expand2-header-padding: .6rem 1.6rem 0.6rem 2.8rem; /*var(--crm-s) var(--crm-m); */
+--crm-expand2-border: ;
+--crm-expand2-border-width:;
+--crm-expand2-body-bg:;
+--crm-expand2-body-padding: 0.25rem 2.8rem;
 
 /* ALERTS */
 /* --crm-alert-padding: var(--crm-m) var(--crm-m2); */
@@ -286,7 +287,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 /* --crm-tab-bg: var(--crm-c-background2); */
 /* --crm-tab-bg-hover: var(--crm-c-page-background); */
 /* --crm-tab-bg-active: var(--crm-c-page-background); */
-/* --crm-tab-hang: 0; /* lip to extend tab flush with active region - set to 0 for no lip */ */
+/* --crm-tab-hang: 0; /* lip to extend tab flush with active region - set to 0 for no lip */
 /* --crm-tab-padding: var(--crm-s3) var(--crm-m) var(--crm-s) var(--crm-m); */
 /* --crm-tab-col: var(--crm-c-text); */
 /* --crm-tab-weight: normal; */
@@ -302,9 +303,9 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 /* Contact dashboard */
 /* --crm-dash-border: var(--crm-tab-border); */
 /* --crm-dash-roundness: var(--crm-roundness); */
-/* --crm-dash-direction: flex; /* choose 'flex' for tabs at top, or 'grid' for tabs at side */ */
+/* --crm-dash-direction: flex; /* choose 'flex' for tabs at top, or 'grid' for tabs at side */
 /* --crm-side-tabs-width: ; */
-/* --crm-dash-tabs-flow: row; /* choose 'row' for tabs at top, or 'column' for tabs at side */ */
+/* --crm-dash-tabs-flow: row; /* choose 'row' for tabs at top, or 'column' for tabs at side */
 /* --crm-dash-tabs-gap: var(--crm-tabs-gap); */
 /* --crm-dash-tabs-bg: var(--crm-tabs-bg); */
 /* --crm-dash-tabs-padding: var(--crm-tabs-padding); */
@@ -313,13 +314,13 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 /* --crm-dash-tab-padding: var(--crm-s3) var(--crm-m2); */
 /* --crm-dash-tab-border: 0 solid transparent; */
 /* --crm-dash-tab-border-hover: 0 solid transparent; */
-/* --crm-dash-tab-border-width: 0; /* to remove border on one side for hanging tabs */ */
+/* --crm-dash-tab-border-width: 0; /* to remove border on one side for hanging tabs */
 /* --crm-dash-tab-col: var(--crm-tab-col); */
 /* --crm-dash-tab-count-bg: rgba(0,0,0,0.1); */
 /* --crm-dash-tab-count-col: var(--crm-c-text); */
 /* --crm-dash-tab-width: 100%; */
 /* --crm-dash-tab-align: none; */
-/* --crm-dash-tab-hang: 0; /* lip to extend tab flush with active region - set to 0 for no lip */ */
+/* --crm-dash-tab-hang: 0; /* lip to extend tab flush with active region - set to 0 for no lip */
 /* --crm-dash-tab-radius: var(--crm-dash-roundness); */
 /* --crm-dash-icon-size: var(--crm-r); */
 /* --crm-dash-summary-row-bg: var(--crm-c-background); */
@@ -340,8 +341,8 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 /* --crm-dash-header-padding: 0 0 var(--crm-r) 0; */
 /* --crm-dash-image-size: 100px; */
 /* --crm-dash-image-radius: 200px; */
-/* --crm-dash-image-justify: space-between; /* choose from start (left), end (right), center, and space-between (spread out) */ */
-/* --crm-dash-image-direction: row; /* choose from row and row-reverse to get the image on the right, column stacks it */ */
+/* --crm-dash-image-justify: space-between; /* choose from start (left), end (right), center, and space-between (spread out) */
+/* --crm-dash-image-direction: row; /* choose from row and row-reverse to get the image on the right, column stacks it */
 
 /* Dialog */
 /* --crm-dialog-bg: var(--crm-c-page-background); */
@@ -354,7 +355,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 /* --crm-dialog-header-size: var(--crm-r1); */
 /* --crm-dialog-header-padding: var(--crm-m1) var(--crm-r); */
 /* --crm-dialog-header-radius: var(--crm-dialog-radius); */
-/* --crm-dialog-header-border-col: transparent transparent var(--crm-c-gray-300) transparent; /* set a border color for each side of the header */ */
+/* --crm-dialog-header-border-col: transparent transparent var(--crm-c-gray-300) transparent; /* set a border color for each side of the header */
 /* --crm-dialog-body-bg: var(--crm-c-background); */
 /* --crm-dialog-body-padding: var(--crm-m); */
 
@@ -398,7 +399,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 /* --crm-notify-background: rgba(0,0,0,0.85); */
 /* --crm-notify-padding: var(--crm-m2); */
 /* --crm-notify-col: var(--crm-c-light-text); */
-/* --crm-notify-accent-border: 2px 0 0 0; /* adds a border to one/several sides of the notification - set to 0 for none */ */
+/* --crm-notify-accent-border: 2px 0 0 0; /* adds a border to one/several sides of the notification - set to 0 for none */
 /* --crm-notify-radius: var(--crm-roundness); */
 
 /* Icons */
@@ -435,7 +436,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 /* --crm-f-legend-align: center; */
 /* --crm-f-legend-size: var(--crm-r3); */
 /* --crm-f-form-padding: var(--crm-padding-reg); */
-/* --crm-f-form-layout: block; /* 'grid' = inline, 'block' = stacked */ */
+/* --crm-f-form-layout: block; /* 'grid' = inline, 'block' = stacked */
 /* --crm-f-label-position: ; */
 /* --crm-f-label-align: left; */
 /* --crm-f-label-width: 200px; */
@@ -447,5 +448,5 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 /* --crm-f-form-focus-bg: var(--crm-c-green); */
 /* --crm-f-form-error-bg: var(--crm-c-red); */
 /* --crm-f-logo-height: 40px; */
-/* --crm-f-logo-align: center; /* left, right or center */ */
+/* --crm-f-logo-align: center; /* left, right or center */
 }

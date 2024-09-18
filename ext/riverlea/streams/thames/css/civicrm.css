@@ -3,4 +3,43 @@
 @import url(../../../core/css/_core.css); /* components and utility classes */
 @import url(../../../core/css/_fixes.css); /* deprecated-Civi handling, hacks/workarounds. one day this will go. */
 
-body { min-height: 100vh; background-color:var(--crm-c-page-background); }
+body {
+  min-height: 100vh; /* ensure we don't leave a white gap at the bottom of short pages */
+  background-color:var(--crm-c-page-background); /* novar */
+}
+.crm-container details {
+  background-color: #bad0df45;
+  border: var(--crm-c-divider);
+}
+
+.crm-container summary {
+  color: var(--crm-c-blue-darker); /* novar */
+  cursor: pointer; /* show it's clickable */
+}
+.crm-container summary:hover {
+  background-color: #b8daf4; /* novar */
+}
+
+/* Replace Riverlea's FontAwesome icon with our own shape. */
+.crm-container details > summary::before {
+	content: "";
+	border: .4rem solid transparent;
+	border-left-color: var(--crm-expand-icon-color);
+	position: absolute;
+  margin-left: -1.5rem;
+	margin-top: 0.2rem;
+	transform: rotate(0);
+	transform-origin: .2rem 50%;
+	transition: transform .25s ease;
+}
+
+/* Apply subtle animation */
+@keyframes crm-details-show {
+  from { opacity: 0; transform: translateY(-0.5rem); }
+  50% { transform: translateY(-0.1rem); }
+}
+.crm-container details > .crm-accordion-body {
+	padding: var(--crm-expand-body-padding);
+  animation: crm-details-show 240ms ease-in-out;
+}
+
