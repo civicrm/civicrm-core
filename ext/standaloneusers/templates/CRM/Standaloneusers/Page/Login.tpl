@@ -6,7 +6,7 @@
       {if $anonAccessDenied}<div class="help message warning">{ts}You do not have permission to access that, you may
         need to login.{/ts}</div>{/if}
       <div class="input-wrapper">
-        <label for="usernameInput" name=username class="form-label">Username1</label>
+        <label for="usernameInput" name=username class="form-label">Username</label>
         <input type="text" class="form-control" id="usernameInput">
       </div>
       <div class="input-wrapper">
