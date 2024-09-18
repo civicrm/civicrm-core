@@ -28,7 +28,6 @@ function riverlea_civicrm_config(&$config) {
 /**
  * Supports multiple theme variations/streams.
  */
-
 function riverlea_civicrm_themes(&$themes) {
   $themes['minetta'] = array(
     'ext' => 'riverlea',
@@ -53,6 +52,12 @@ function riverlea_civicrm_themes(&$themes) {
     'title' => 'Riverlea: base theme',
     'prefix' => 'core/',
     'search_order' => array('_riverlea_core_', '_fallback_'),
+  );
+  $themes['thames'] = array(
+    'ext' => 'riverlea',
+    'title' => 'RL: Thames (~Aah)',
+    'prefix' => 'streams/thames/',
+    'search_order' => array('thames', '_riverlea_core_', '_fallback_'),
   );
 }
 
