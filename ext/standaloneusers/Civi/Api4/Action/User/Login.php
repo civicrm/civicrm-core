@@ -43,11 +43,21 @@ class Login extends AbstractAction {
    */
   protected $mfaData = NULL;
 
+  /**
+   * URL that was used to access the login page.
+   *
+   * @default NULL
+   * @var string
+   */
+  protected ?string $originalUrl = NULL;
+
   public function _run(Result $result) {
     if (empty($this->mfaClass)) {
+      // Initial call with username, password.
       return $this->passwordCheck($result);
     }
     else {
+      // This call is from an MFA class, needing to check the mfaData.
       $mfaClass = MFABase::classIsAvailable($this->mfaClass);
       if (!$mfaClass) {
         \CRM_Core_Session::singleton()->set('pendingLogin', []);
@@ -56,7 +66,6 @@ class Login extends AbstractAction {
       }
       $pending = MFABase::getPendingLogin();
       if (!$pending) {
-        // $result['publicError'] = "Session lost, possibly expired. Please login again."; @todo
         // Invalid, send user back to login.
         \CRM_Utils_System::redirect('/civicrm/login?sessionLost');
       }
@@ -66,8 +75,8 @@ class Login extends AbstractAction {
       if ($okToLogin) {
         // OK!
         \CRM_Core_Session::singleton()->set('pendingLogin', []);
-        $result['url'] = '/civicrm';
         $this->loginUser($pending['userID']);
+        $result['url'] = $pending['successUrl'];
       }
       else {
         $result['publicError'] = "MFA failed verification";
@@ -76,7 +85,20 @@ class Login extends AbstractAction {
 
   }
 
+  /**
+   * Handle the initial API call which checks username and password.
+   *
+   * It sets $result['url'] to either the success URL,
+   * or the URL of the enabled MFA.
+   */
   protected function passwordCheck(Result $result) {
+
+    $successUrl = '/civicrm';
+    if (!empty($this->originalUrl) && parse_url($this->originalUrl, PHP_URL_PATH) !== '/civicrm/login') {
+      // We will return to this URL on success.
+      $successUrl = $this->originalUrl;
+    }
+
     // Check user+password
     if (empty($this->username) || empty($this->password)) {
       $result['publicError'] = "Missing password/username";
@@ -103,13 +125,14 @@ class Login extends AbstractAction {
       case 0:
         // MFA not enabled.
         $this->loginUser($user['id']);
-        $result['url'] = '/civicrm';
+        $result['url'] = $successUrl;
         return;
 
       case 1:
         // MFA enabled.
         $mfaClass = $mfaClasses[0];
         $mfa = new $mfaClass($user['id']);
+        $mfa->updatePendingLogin(['successUrl' => $successUrl]);
         $result['url'] = $mfa->getFormUrl();
         break;
 

@@ -1,6 +1,7 @@
 <?php
 namespace Civi\Standalone\MFA;
 
+use Civi\Api4\User;
 use CRM_Core_Session;
 
 class Base {
@@ -9,8 +10,20 @@ class Base {
 
   public function __construct(int $userID) {
     $this->userID = $userID;
+    $username = User::get(FALSE)->addWhere('id', '=', $userID)->execute()->single()['username'];
     // @todo expose the 120s timeout to config?
-    CRM_Core_Session::singleton()->set('pendingLogin', ['userID' => $userID, 'expiry' => time() + 120]);
+    CRM_Core_Session::singleton()->set('pendingLogin', ['userID' => $userID, 'expiry' => time() + 120, 'username' => $username]);
+  }
+
+  public function updatePendingLogin(array $changes): array {
+    $p = CRM_Core_Session::singleton()->get('pendingLogin') ?? [];
+    $p = array_merge($p, $changes);
+    CRM_Core_Session::singleton()->set('pendingLogin', $p);
+    return $p;
+  }
+
+  public function clearPendingLogin() {
+    CRM_Core_Session::singleton()->set('pendingLogin', []);
   }
 
   /**
