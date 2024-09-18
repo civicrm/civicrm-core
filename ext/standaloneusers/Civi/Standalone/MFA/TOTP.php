@@ -52,6 +52,10 @@ class TOTP extends Base implements MFAInterface {
    */
   public function storeSeed(int $userID, string $seed) {
     $encrypted = \Civi::service('crypto.token')->encrypt($seed, 'CRED');
+    // Ensure only one per user is stored.
+    TotpEntity::delete(FALSE)
+      ->addWhere('user_id', '=', $userID)
+      ->execute();
     TotpEntity::create(FALSE)
       ->addValue('user_id', $userID)
       ->addValue('seed', $encrypted)
