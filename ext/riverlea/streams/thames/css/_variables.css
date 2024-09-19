@@ -45,9 +45,9 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-c-green-dark: #468847;
 --crm-c-red: #eed3d7;
 --crm-c-red-light: #f2dede;
---crm-c-red-dark: #b94a48 ;
-/* --crm-c-amber: #dd5600; */
-/* --crm-c-amber-light: #fbf0e2; */
+--crm-c-red-dark: #740f0f;
+--crm-c-amber: #bb912c;
+--crm-c-amber-light: #ecd9ac;
 /* --crm-c-yellow: #fcfc5a; */
 --crm-c-yellow-light: #f2deb9;
 /* --crm-c-yellow-less-light: #fffdb2; */
@@ -55,11 +55,11 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 /* --crm-c-dark-teal: #3e8079; */
 
 /* PRACTICAL COLOURS */
-/* --crm-c-text: #464354; */
-/* --crm-c-light-text: #fff; */
-/* --crm-c-dark-text: var(--crm-c-text); */
-/* --crm-c-link: var(--crm-c-blue-dark); */
-/* --crm-c-link-hover: var(--crm-c-blue-darker); */
+--crm-c-text: #000000dd;
+--crm-c-light-text: #fff;
+--crm-c-dark-text: var(--crm-c-text);
+--crm-c-link: var(--crm-c-blue-dark);
+--crm-c-link-hover: var(--crm-c-blue-darker);
 --crm-c-divider: 1px solid #bad0df45; /*var(--crm-c-gray-300);*/
 --crm-c-page-background: #f3f2ed; /* background to page body */
 /* --crm-c-background: #f4f4ed; /* background to page header */
@@ -69,20 +69,20 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 /* --crm-c-background5: var(--crm-c-gray-700); */
 /* --crm-c-drag-background: var(--crm-c-background3); /* background for drag/drop regions, select2 highlight */
 /* --crm-c-code-background: var(--crm-c-background2); /* background for code regions */
-/* --crm-c-primary: var(--crm-c-gray-700); */
-/* --crm-c-primary-hover: var(--crm-c-gray-800); */
-/* --crm-c-primary-text: var(--crm-c-light-text); */
-/* --crm-c-secondary: #5d677b; */
-/* --crm-c-secondary-hover: #3e485b; */
-/* --crm-c-secondary-text: var(--crm-c-light-text); */
---crm-c-success: var(--crm-c-green-dark);
+--crm-c-primary: var(--crm-c-blue-dark); /* primary button bgs */
+--crm-c-primary-hover: var(--crm-c-blue-darker);
+--crm-c-primary-text: var(--crm-c-light-text);
+--crm-c-secondary: #c9e1f1; /* buttons */
+--crm-c-secondary-hover: #a1cef3;
+--crm-c-secondary-text: var(--crm-c-blue-darker);
+--crm-c-success: var(--crm-c-green);
 --crm-c-success-text: var(--crm-c-light-text);
-/* --crm-c-alert: var(--crm-c-red-dark); */
-/* --crm-c-alert-text: var(--crm-c-light-text); */
-/* --crm-c-warning: var(--crm-c-amber); */
-/* --crm-c-warning-text: var(--crm-c-light-text); */
-/* --crm-c-info: var(--crm-c-blue-dark); */
-/* --crm-c-info-text: var(--crm-c-light-text); */
+--crm-c-alert: var(--crm-c-red-dark);
+--crm-c-alert-text: var(--crm-c-light-text);
+--crm-c-warning: var(--crm-c-amber);
+--crm-c-warning-text: var(--crm-c-light-text);
+--crm-c-info: var(--crm-c-blue-dark);
+--crm-c-info-text: var(--crm-c-light-text);
 /* --crm-c-focus: var(--crm-c-blue-dark); */
 /* --crm-c-inactive: #696969; */
 
@@ -93,16 +93,16 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 /* --crm-body-inset:; */
 
 /* SIZES - temporary */
---crm-roundness: 0.25rem;
-/* --crm-xs: 0.1rem; */
-/* --crm-xs1: 0.125rem; */
+--crm-roundness: 0;
+--crm-xs: 0.1rem;
+--crm-xs1: 0.125rem;
 --crm-xs2: 0.15rem;
-/* --crm-s: 0.25rem; */
+--crm-s: 0.25rem;
 /* --crm-s1: 0.275rem; */
 /* --crm-s2: 0.325rem; */
 /* --crm-s3: 0.375rem; */
 --crm-m: 0.5rem;
-/* --crm-m1: 0.625rem; */
+--crm-m1: 0.625rem;
 --crm-m2: 0.75rem;
 /* --crm-m3: 0.875rem; */
 --crm-r: 1rem;
@@ -115,9 +115,9 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 /* --crm-xxl: 4rem; */
 /* --crm-big-input: 15em; */
 /* --crm-huge-input: 25em; */
-/* --crm-padding-reg: var(--crm-r); */
-/* --crm-padding-small: var(--crm-s); */
-/* --crm-padding-inset: var(--crm-m); */
+--crm-padding-reg: var(--crm-r);
+--crm-padding-small: var(--crm-s);
+--crm-padding-inset: var(--crm-m);
 /* thames: on standalone the following is overridden in cms.css */
 --crm-page-padding: clamp(0.5rem 2vw 4rem); /* Margin left/right */
 /* --crm-page-width: 100%; /* Default that CMS can overwrite */
@@ -141,25 +141,25 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 /* --crm-btn-box-shadow: none; */
 /* --crm-btn-border: 0 solid transparent; */
 /* --crm-btn-txt-transform: inherit; */
-/* --crm-btn-radius: 3px; */
-/* --crm-btn-padding-block: var(--crm-xs1); /* padding for top and bottom, one value */
-/* --crm-btn-padding-inline: var(--crm-m1); /* padding for left and right, one value */
-/* --crm-btn-small-padding: var(--crm-xs) var(--crm-s); */
-/* --crm-btn-large-padding: var(--crm-m) var(--crm-r); */
-/* --crm-btn-align: center; */
-/* --crm-btn-height: 28px; */
-/* --crm-btn-icon-spacing: var(--crm-xs); */
-/* --crm-btn-icon-size: auto; */
-/* --crm-btn-cancel-bg: var(--crm-c-alert); */
-/* --crm-btn-cancel-text: var(--crm-c-alert-text); */
-/* --crm-btn-info-bg: var(--crm-c-info); */
-/* --crm-btn-info-text: var(--crm-c-info-text); */
-/* --crm-btn-warning-bg: var(--crm-c-warning); */
-/* --crm-btn-warning-text: var(--crm-c-warning-text); */
---crm-btn-success-bg: var(--crm-c-success);
---crm-btn-success-text: var(--crm-c-success-text);
-/* --crm-btn-alert-bg: var(--crm-c-alert); */
-/* --crm-btn-alert-text: var(--crm-c-alert-text); */
+--crm-btn-radius: 3px;
+--crm-btn-padding-block: var(--crm-s); /* padding for top and bottom, one value */
+--crm-btn-padding-inline: var(--crm-m2); /* padding for left and right, one value */
+--crm-btn-small-padding: var(--crm-xs) var(--crm-s);
+--crm-btn-large-padding: var(--crm-m) var(--crm-r);
+--crm-btn-align: center;
+--crm-btn-height: 1.625rem;
+--crm-btn-icon-spacing: var(--crm-xs2);
+--crm-btn-icon-size: auto;
+--crm-btn-cancel-bg: var(--crm-c-alert);
+--crm-btn-cancel-text: var(--crm-c-alert-text);
+--crm-btn-info-bg: var(--crm-c-secondary);
+--crm-btn-info-text: var(--crm-c-secondary-text);
+--crm-btn-warning-bg: var(--crm-c-warning);
+--crm-btn-warning-text: var(--crm-c-warning-text);
+--crm-btn-success-bg: var(--crm-c-info);
+--crm-btn-success-text: #fff;
+--crm-btn-alert-bg: var(--crm-c-alert);
+--crm-btn-alert-text: var(--crm-c-alert-text);
 /* --crm-btn-icon-bg: ; */
 /* --crm-btn-icon-border: ; */
 
@@ -199,7 +199,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-expand-icon-spacing: var(--crm-m);
 --crm-expand-transform: rotate(90deg);
 --crm-expand-transition: transform .3s;
---crm-expand-radius: var(--crm-roundness);
+--crm-expand-radius: 4px;
 --crm-expand-gap: var(--crm-xs2) 0 0; /* space between multiple accordions */
 /* .crm-accordion-bold */
 --crm-expand-header-bg: #bad0df45;
@@ -242,7 +242,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-alert-text-warning: var(--crm-c-text);
 --crm-alert-background-info: var(--crm-c-blue-light);
 --crm-alert-border-info: var(--crm-c-blue);
---crm-alert-text-info: var(--crm-c-blue-dark);
+--crm-alert-text-info: var(--crm-c-blue-darker);
 --crm-alert-background-danger: var(--crm-c-red-light);
 --crm-alert-border-danger: var(--crm-c-red);
 --crm-alert-text-danger: var(--crm-c-red-dark);

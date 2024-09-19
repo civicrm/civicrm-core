@@ -11,8 +11,13 @@ Accordions:
 Alert 
 
 - OK: help
-- failing: alert3
-- failing: alert4
-- failing: alert5
-- failing: alert6
-- failing: alert7
+- OK: alert3
+- OK: alert4
+- OK: alert5
+- OK: alert6
+- OK: alert7
+
+Buttons
+
+- mostly ok now but what about inline-block? All stack vertically (and with no 
+  margin)

@@ -62,3 +62,7 @@ body {
 	position: absolute;
 	text-rendering: auto;
 }
+
+.crm-container .alert-success {
+  background-color: var(--crm-c-green);
+}
