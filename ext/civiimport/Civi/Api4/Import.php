@@ -131,7 +131,6 @@ class Import {
    *
    * @return \Civi\Api4\Import\Import
    *
-   * @throws \API_Exception
    */
   public static function import(int $userJobID, bool $checkPermissions = TRUE): ImportAction {
     return (new ImportAction('Import_' . $userJobID, __FUNCTION__))
@@ -143,7 +142,6 @@ class Import {
    * @param bool $checkPermissions
    *
    * @return \Civi\Api4\Import\Validate
-   * @throws \API_Exception
    */
   public static function validate(int $userJobID, bool $checkPermissions = TRUE): Validate {
     return (new Validate('Import_' . $userJobID, __FUNCTION__))->setCheckPermissions($checkPermissions);
