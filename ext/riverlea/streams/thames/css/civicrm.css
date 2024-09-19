@@ -66,3 +66,33 @@ body {
 .crm-container .alert-success {
   background-color: var(--crm-c-green);
 }
+
+/* BUTTONS */
+
+.crm-container .btn, .crm-container button, .crm-container .crm-button, .crm-container [type="button"], .crm-container [type="reset"], .crm-container [type="submit"] {
+  /* Riverlea uses flex, which means the buttons stack vertically. this makes them go inline. */
+  display: inline-flex;
+  /* Sometimes we have lots of buttons and they wrap to a 2nd line. This puts some vertical space betwixt. */
+  margin: var(--crm-m) 0;
+}
+
+/* DIALOGS */
+
+/* I feel title, resize, close is a better order for buttons bs modal dialogs */
+.ui-dialog-title { flex: 1 1 auto; order: 1; }
+.crm-dialog-titlebar-resize { order: 2; }
+.crm-dialog-titlebar-print { display: none; }
+.modal-header .close { order: 3; }
+.crm-container  .modal-header .ui-icon[class*=" fa-"] { font-size: 1rem; }
+/* I don't know what problem this solved, but it creates an undesired left padding */
+#bootstrap-theme .modal-header::before, #bootstrap-theme .modal-header::after {
+  display: none !important;
+}
+
+#bootstrap-theme .modal-header {
+  border:none;
+}
+
+.crm-container button.close {
+  color: var(--crm-c-blue-darker) !important;
+}
