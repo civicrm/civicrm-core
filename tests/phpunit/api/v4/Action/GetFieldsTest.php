@@ -83,6 +83,9 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
     $this->assertNull($fields['id']['default_value']);
 
     $this->assertEquals(['import', 'export', 'duplicate_matching'], $fields['id']['usage']);
+
+    $this->assertSame('contact_type', $fields['contact_sub_type']['input_attrs']['control_field']);
+    $this->assertTrue($fields['contact_sub_type']['input_attrs']['multiple']);
   }
 
   public function testComponentFields(): void {

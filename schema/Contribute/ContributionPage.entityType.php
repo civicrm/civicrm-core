@@ -157,7 +157,7 @@ return [
       'add' => '2.1',
       'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_TRIMMED,
       'input_attrs' => [
-        'multiple' => '1',
+        'multiple' => TRUE,
       ],
       'pseudoconstant' => [
         'option_group_name' => 'recur_frequency_units',
