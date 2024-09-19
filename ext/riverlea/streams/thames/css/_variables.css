@@ -46,6 +46,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-c-red: #eed3d7;
 --crm-c-red-light: #f2dede;
 --crm-c-red-dark: #740f0f;
+--crm-c-red-bright: #f14141; /* thames only */
 --crm-c-amber: #bb912c;
 --crm-c-amber-light: #ecd9ac;
 /* --crm-c-yellow: #fcfc5a; */
@@ -88,7 +89,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 
 /* SHADOWS */
 /* --crm-block-shadow:; */
-/* --crm-popup-shadow: 0 3px 18px 0 rgba(48,40,40,.25); */
+--crm-popup-shadow: 3px 3px 18px 0 rgba(0, 0, 0,.25);
 /* --crm-bottom-shadow: 0 0 16px 1px rgba(0,0,0,.1); */
 /* --crm-body-inset:; */
 
@@ -114,7 +115,8 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-xl: 3rem;
 --crm-xxl: 4rem;
 --crm-big-input: 15em;
---crm-huge-input: 25em;
+--crm-huge-input: 100%;
+/* --crm-huge-input: 25em; */
 --crm-padding-reg: var(--crm-r);
 --crm-padding-small: var(--crm-s);
 --crm-padding-inset: var(--crm-m);
@@ -252,13 +254,13 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-form-block-background: var(--crm-c-background);
 --crm-form-block-padding: var(--crm-m);
 --crm-form-block-border-radius: var(--crm-roundness);
---crm-input-background: var(--crm-c-page-background);
+--crm-input-background: white;
 --crm-input-background-image: linear-gradient(top, #eee 1%, #fff 15%);
 --crm-input-color: var(--crm-c-text);
---crm-input-border-color: var(--crm-c-gray-500);
---crm-input-border-radius: 0;
+--crm-input-border-color: #0000001a;
+--crm-input-border-radius: 3px;
 --crm-input-active-ani: border-color .15s ease-in-out 0s;
---crm-input-box-shadow: inset 0 1px 2px 0 rgba(0,0,0,.2);
+--crm-input-box-shadow: none;
 --crm-input-padding: var(--crm-xs1) var(--crm-s2);
 --crm-input-padding-large: var(--crm-s) var(--crm-m1);
 --crm-input-height: var(--crm-l);
@@ -385,22 +387,22 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 
 /* Button dropdowns */
 --crm-dropdown-padding: var(--crm-s);
---crm-dropdown-bg: var(--crm-c-secondary-hover);
---crm-dropdown-col: var(--crm-c-light-text);
---crm-dropdown-hover: var(--crm-c-text);
---crm-dropdown-hover-bg: var(--crm-c-page-background);
+--crm-dropdown-bg: white;
+--crm-dropdown-col: var(--crm-c-blue-darker);
+--crm-dropdown-hover: var(--crm-c-blue-dark);
+--crm-dropdown-hover-bg: var(--crm-c-blue-light);
 --crm-dropdown-border: 0;
---crm-dropdown-width: 180px;
+--crm-dropdown-width: 23ch;
 --crm-dropdown-2-bg: var(--crm-c-secondary);
 --crm-dropdown-2-col: var(--crm-c-text);
 --crm-dropdown-2-padding: var(--crm-padding-small);
 
 /* Notifications */
---crm-notify-background: rgba(0,0,0,0.85);
+--crm-notify-background: white;
 --crm-notify-padding: var(--crm-m2);
---crm-notify-col: var(--crm-c-light-text);
---crm-notify-accent-border: 2px 0 0 0; /* adds a border to one/several sides of the notification - set to 0 for none */
---crm-notify-radius: var(--crm-roundness);
+--crm-notify-col: var(--crm-c-text);
+--crm-notify-accent-border: 0.875rem 0 0 0; /* adds a border to one/several sides of the notification - set to 0 for none */
+--crm-notify-radius: 4px;
 
 /* Icons */
 --crm-icon-success: "\f058";

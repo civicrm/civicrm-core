@@ -76,6 +76,16 @@ body {
   margin: var(--crm-m) 0;
 }
 
+/* Riverlea assumes that var(--crm-c-secondary-text) is light but in Aah it is dark; these buttons have a dark bg. */
+.crm-container a.button:hover, .crm-container a.button:focus {
+  color:white;
+}
+/* Make it clear when you're hovering delete. */
+.crm-container .btn.btn-danger:hover, .crm-container .btn.btn-danger:focus,
+.crm-container a.button.delete-button:hover, .crm-container a.button.delete-button:focus, .crm-container a.button.delete:hover {
+  color: var(--crm-c-red-bright);
+}
+
 /* DIALOGS */
 
 /* I feel title, resize, close is a better order for buttons bs modal dialogs */
@@ -96,3 +106,31 @@ body {
 .crm-container button.close {
   color: var(--crm-c-blue-darker) !important;
 }
+
+/* DROPDOWNS */
+.crm-container .btn-group .dropdown-menu, .crm-container .btn.dropdown-toggle + .dropdown-menu {
+  border-radius: 4px;
+}
+
+/* FORMS */
+
+/* textareas should always fill the available width */
+.crm-container .replace-plain, .crm-container textarea, select.crm-form-multiselect {
+  width: 100%;
+}
+
+/* NOTIFICATIONS */
+.crm-container .notify-content { padding-left: 1.6rem; }
+/* Riverlea assumes crm-c-success to be a background color which is not how we're using it. */
+#crm-notification-container div.ui-notify-message-style.success { border-color: var(--crm-c-green-dark); }
+.crm-container #crm-notification-container div.ui-notify-message.success h1::before, .crm-container span.batch-valid::before {
+	color: var(--crm-c-green-dark);
+}
+/* Thames theme does hanging indent for the little <i>con, but happy for the list bullets to be outside of main text block as is narrow column. */
+#crm-notification-container div.ui-notify-message .notify-content ul, #crm-notification-container div.ui-notify-message .alert.notify-content ul {
+  margin: 1rem 0 0;
+  padding: 0;
+}
+/* Only include the margin under the h1 (h1!) when it's not empty. When it's empty the h1 only contains the <i>con and adding a margin messes up vertical alignment of the message. */
+#crm-notification-container div.ui-notify-message h1:not(:empty) { margin-bottom: 1rem; }
+
