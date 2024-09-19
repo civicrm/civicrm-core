@@ -28,7 +28,7 @@
             },
             'z': {
               label: ts('Additional labels'),
-              dataLabelTypes: ['label', 'title'],
+              dataLabelTypes: ['title', 'label'],
               multiColumn: true,
               prepopulate: false,
             }
@@ -55,7 +55,7 @@
 
                 // we use a string separator rather than array to
                 // not corrupt ordering on xValue
-                return `${xValue}\x00${seriesVal}`;
+                return [xValue, seriesVal];
             });
         },
 
@@ -63,15 +63,9 @@
             displayCtrl.chart
                 .dimension(displayCtrl.dimension)
                 .group(displayCtrl.group)
-                // value is the y axis
                 .valueAccessor(displayCtrl.getValueAccessor(displayCtrl.getColumnsForAxis('y')[0]))
-                .keyAccessor((d) => d.key.split('\x00')[0]);
-
-            const seriesCol = displayCtrl.getColumnsForAxis('w').length ? displayCtrl.getColumnsForAxis('w')[0] : null;
-
-            if (seriesCol) {
-                displayCtrl.chart.seriesAccessor((d) => d.key.split('\x00')[1])
-            }
+                .keyAccessor((d) => d.key[0])
+                .seriesAccessor((d) => d.key[1]);
 
             displayCtrl.buildCoordinateGrid();
         }
