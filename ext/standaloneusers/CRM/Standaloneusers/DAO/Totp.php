@@ -12,7 +12,6 @@ use CRM_Standaloneusers_ExtensionUtil as E;
  */
 class CRM_Standaloneusers_DAO_Totp extends CRM_Standaloneusers_DAO_Base {
 
-  // Required by some versions of CiviCRM.
   public static $_tableName = 'civicrm_totp';
 
 }
