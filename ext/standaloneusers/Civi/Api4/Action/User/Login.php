@@ -11,16 +11,16 @@ class Login extends AbstractAction {
   /**
    * Username to authenticate.
    *
-   * @default NULL
    * @var string
+   * @default NULL
    */
   protected ?string $username = NULL;
 
   /**
    * Password to authenticate.
    *
-   * @default NULL
    * @var string
+   * @default NULL
    */
   protected ?string $password = NULL;
 
@@ -29,8 +29,8 @@ class Login extends AbstractAction {
    *
    * Used when trying to complete a login via an MFA class.
    *
-   * @default NULL
    * @var string
+   * @default NULL
    */
   protected ?string $mfaClass = NULL;
 
@@ -39,6 +39,7 @@ class Login extends AbstractAction {
    *
    * Used when trying to complete a login via an MFA class.
    *
+   * @var mixed
    * @default NULL
    */
   protected $mfaData = NULL;
@@ -46,8 +47,8 @@ class Login extends AbstractAction {
   /**
    * URL that was used to access the login page.
    *
-   * @default NULL
    * @var string
+   * @default NULL
    */
   protected ?string $originalUrl = NULL;
 
