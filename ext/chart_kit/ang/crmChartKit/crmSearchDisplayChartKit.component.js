@@ -74,6 +74,12 @@
                 // loads search results data into crossfilter
                 this.buildCrossfilter();
 
+                // adds dimension to the crossfilter
+                this.buildDimension();
+
+                // adds group to the crossfilter
+                this.buildGroup();
+
                 // creates the dc chart object
                 this.buildChart();
 
@@ -93,6 +99,12 @@
             };
 
             this.buildCrossfilter = () => {
+
+                if (this.chartType.buildCrossfilter) {
+                    this.chartType.buildCrossfilter(this);
+                    return;
+                }
+
                 // place to store values from each categorical column in the order from the results
                 // (which is useful for canonical ordering)
                 this.categories = {};
@@ -138,8 +150,28 @@
                     }
                 }));
 
-
                 this.ndx = crossfilter(this.chartData);
+            };
+
+            this.buildDimension = () => {
+
+                if (this.chartType.buildDimension) {
+                    this.chartType.buildDimension(this);
+                    return;
+                }
+
+                // 99 times out of 100 the x axis will be column 0, but let's be sure
+                // (assume there's only one x axis column)
+                const xColumnIndex = this.getXColumn().index;
+                this.dimension = this.ndx.dimension((d) => d[xColumnIndex]);
+            };
+
+            this.buildGroup = () => {
+
+                if (this.chartType.buildGroup) {
+                    this.chartType.buildGroup(this);
+                    return;
+                }
 
                 // define our custom reducer functions based on the reduceType of each column
                 const reduceAdd = (p, v) => this.getColumns().map((col) => {
@@ -211,14 +243,11 @@
                     }
                 });
 
+
+                this.group = this.dimension.group().reduce(reduceAdd, reduceSub, reduceStart);
+
                 // find totals in each column
                 this.columnTotals = this.ndx.groupAll().reduce(reduceAdd, reduceSub, reduceStart).value();
-
-                // 99 times out of 100 the x axis will be column 0, but let's be sure
-                // (assume there's only one x axis column)
-                const xColumnIndex = this.getXColumn().index;
-                this.dimension = this.ndx.dimension((d) => d[xColumnIndex]);
-                this.group = this.dimension.group().reduce(reduceAdd, reduceSub, reduceStart);
             };
 
             this.buildChart = () => {
@@ -226,7 +255,10 @@
                 // based on chartType.getChartConstructor
                 if (this.chartType.buildChart) {
                     this.chartType.buildChart(this);
-                } else if (this.chartType.getChartConstructor) {
+                    return;
+                }
+
+                if (this.chartType.getChartConstructor) {
                     this.chart = this.chartType.getChartConstructor(this)(this.chartContainer);
 
                     if (this.chartType.hasCoordinateGrid()) {
@@ -241,9 +273,11 @@
                     if (this.chart.ordering) {
                         this.chart.ordering(this.getOrderAccessor());
                     }
-                } else {
-                    throw new Error('Chart type should implement buildChart or getChartConstructor');
+
+                    return;
                 }
+
+                throw new Error('Chart type should implement buildChart or getChartConstructor');
             };
 
             this.buildCoordinateGrid = () => {
