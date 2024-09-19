@@ -8,6 +8,7 @@
 
         getInitialDisplaySettings: () => ({
           showLegend: 'right',
+          seriesDisplayType: 'line',
         }),
 
         getAxes: function () {
@@ -60,6 +61,7 @@
         },
 
         loadChartData: (displayCtrl) => {
+            displayCtrl.chart.chart((displayCtrl.settings.seriesDisplayType === 'bar') ? dc.barChart : dc.lineChart);
             displayCtrl.chart
                 .dimension(displayCtrl.dimension)
                 .group(displayCtrl.group)
