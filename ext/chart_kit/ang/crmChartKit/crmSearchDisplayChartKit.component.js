@@ -108,6 +108,9 @@
                         case 'month':
                             value = d3.timeMonth.floor(Date.parse(value)).valueOf();
                             break;
+                        case 'week':
+                            value = d3.timeWeek.floor(Date.parse(value)).valueOf();
+                            break;
                         case 'day':
                             value = d3.timeDay.floor(Date.parse(value)).valueOf();
                             break;
@@ -536,8 +539,10 @@
                     case 'month':
                         value = new Date(value).toLocaleString(undefined, {year: 'numeric', month: 'long'});
                         break;
+                    case 'week':
+                        value = new Date(value).toLocaleString(undefined, {year: 'numeric', month: 'long', day: 'numeric'});
+                        break;
                     case 'day':
-                        //value = (new Date(value)).toLocaleDateString();
                         value = new Date(value).toLocaleString(undefined, {year: 'numeric', month: 'long', day: 'numeric'});
                         break;
                     case 'hour':
