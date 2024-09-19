@@ -189,7 +189,7 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
     foreach ($this->getColumnHeaders() as $i => $columnHeader) {
       $defaults["mapper[$i]"] = [];
       if ($this->getSubmittedValue('savedMapping')) {
-        $fieldMapping = $fieldMappings[$i] ?? NULL;
+        $fieldMapping = $fieldMappings[$i] ?? [];
         $this->addMappingToDefaults($defaults, $fieldMapping, $i);
       }
       elseif ($this->getSubmittedValue('skipColumnHeader')) {
