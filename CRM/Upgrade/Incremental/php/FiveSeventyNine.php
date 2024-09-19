@@ -29,6 +29,28 @@ class CRM_Upgrade_Incremental_php_FiveSeventyNine extends CRM_Upgrade_Incrementa
    */
   public function upgrade_5_79_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Update "Website Type" options', 'updateWebsiteType');
+  }
+
+  /**
+   * Delete branded website-type options that are not in use.
+   * Add new "Social" option.
+   */
+  public static function updateWebsiteType() {
+    $query = CRM_Core_DAO::executeQuery("SELECT `id`, `value` FROM `civicrm_option_value`
+      WHERE `option_group_id` = (SELECT `id` FROM `civicrm_option_group` WHERE `name` = 'website_type')
+      AND `name` NOT IN ('Work', 'Main', 'Social')
+      AND `value` NOT IN (SELECT `website_type_id` FROM `civicrm_website`)");
+    $types = $query->fetchMap('value', 'id');
+    if ($types) {
+      CRM_Core_DAO::executeQuery('DELETE FROM `civicrm_option_value` WHERE `id` IN (' . implode(', ', $types) . ')');
+    }
+    \CRM_Core_BAO_OptionValue::ensureOptionValueExists([
+      'option_group_id' => 'website_type',
+      'name' => 'Social',
+      'label' => ts('Social'),
+    ]);
+    return TRUE;
   }
 
 }
