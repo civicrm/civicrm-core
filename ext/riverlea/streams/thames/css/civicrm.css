@@ -118,6 +118,7 @@ body {
 .crm-container .replace-plain, .crm-container textarea, select.crm-form-multiselect {
   width: 100%;
 }
+.crm-container .replace-plain { background: #fff; }
 
 /* NOTIFICATIONS */
 .crm-container .notify-content { padding-left: 1.6rem; }
@@ -134,3 +135,6 @@ body {
 /* Only include the margin under the h1 (h1!) when it's not empty. When it's empty the h1 only contains the <i>con and adding a margin messes up vertical alignment of the message. */
 #crm-notification-container div.ui-notify-message h1:not(:empty) { margin-bottom: 1rem; }
 
+/* OTHER */
+.crm-container #alpha-filter ul { margin: 0; display: flex; justify-content: space-between; gap: var(--crm-m); color: #0002; padding: 0 1rem; }
+.crm-container .description:not(#help), .crm-container td.description { font-size: 0.875rem; }
