@@ -1237,7 +1237,7 @@ WHERE {$whereClause}";
    * @return int
    */
   public static function filterActiveGroups($parentArray) {
-    if (count($parentArray) > 1) {
+    if (count($parentArray) >= 1) {
       $result = civicrm_api3('Group', 'get', [
         'id' => ['IN' => $parentArray],
         'is_active' => TRUE,
@@ -1287,7 +1287,7 @@ WHERE {$whereClause}";
     $group = $event->object;
     if (in_array($event->action, ['create', 'edit'])) {
       $params = $event->params;
-      if (empty($params['id']) && !empty($params['name']) && substr($params['name'], -4) == '_tmp') {
+      if ($params['name_empty']) {
         $group->name = substr($group->name, 0, -4) . "_{$group->id}";
 
         // in order to avoid race condition passing $hook = FALSE
@@ -1376,6 +1376,7 @@ WHERE {$whereClause}";
     if (in_array($event->action, ['create', 'edit'])) {
       $event->params += [
         'parents_param_provided' => array_key_exists('parents', $event->params),
+        'name_empty' => ($event->action == 'create' && empty($event->params['name'])),
         'group_type' => NULL,
         'parents' => NULL,
       ];
