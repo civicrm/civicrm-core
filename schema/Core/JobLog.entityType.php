@@ -47,6 +47,8 @@ return [
       'sql_type' => 'timestamp',
       'input_type' => NULL,
       'description' => ts('Log entry date'),
+      'required' => TRUE,
+      'default' => 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
       'add' => '4.1',
     ],
     'job_id' => [
