@@ -34,22 +34,22 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 /* --crm-c-gray-100: #e2e1e1; */
 /* --crm-c-gray-050: #eaeaea; */
 /* --crm-c-gray-025: #fbfafa; */
-/* --crm-c-blue: #bce8f1; */
-/* --crm-c-blue-light: #d9edf7; */
+--crm-c-blue: #c5e4fc;
+--crm-c-blue-light: #d8edfe;
 --crm-c-blue-dark:#2c98ed ;
 --crm-c-blue-darker: #02477d;
 /* --crm-c-purple: #4d4d69; */
 /* --crm-c-purple-dark: #3e3e54; */
-/* --crm-c-green: #d6e9c6; */
-/* --crm-c-green-light: #dff0d8; */
-/* --crm-c-green-dark: #468847; */
-/* --crm-c-red: #eed3d7; */
-/* --crm-c-red-light: #f2dede; */
-/* --crm-c-red-dark: #b94a48 ; */
+--crm-c-green: #d6e9c6;
+--crm-c-green-light: #dff0d8;
+--crm-c-green-dark: #468847;
+--crm-c-red: #eed3d7;
+--crm-c-red-light: #f2dede;
+--crm-c-red-dark: #b94a48 ;
 /* --crm-c-amber: #dd5600; */
 /* --crm-c-amber-light: #fbf0e2; */
 /* --crm-c-yellow: #fcfc5a; */
-/* --crm-c-yellow-light: #ffffcc; */
+--crm-c-yellow-light: #f2deb9;
 /* --crm-c-yellow-less-light: #fffdb2; */
 /* --crm-c-teal: #63c4b9; */
 /* --crm-c-dark-teal: #3e8079; */
@@ -75,8 +75,8 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 /* --crm-c-secondary: #5d677b; */
 /* --crm-c-secondary-hover: #3e485b; */
 /* --crm-c-secondary-text: var(--crm-c-light-text); */
-/* --crm-c-success: var(--crm-c-green-dark); */
-/* --crm-c-success-text: var(--crm-c-light-text); */
+--crm-c-success: var(--crm-c-green-dark);
+--crm-c-success-text: var(--crm-c-light-text);
 /* --crm-c-alert: var(--crm-c-red-dark); */
 /* --crm-c-alert-text: var(--crm-c-light-text); */
 /* --crm-c-warning: var(--crm-c-amber); */
@@ -103,9 +103,9 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 /* --crm-s3: 0.375rem; */
 --crm-m: 0.5rem;
 /* --crm-m1: 0.625rem; */
-/* --crm-m2: 0.75rem; */
+--crm-m2: 0.75rem;
 /* --crm-m3: 0.875rem; */
-/* --crm-r: 1rem; */
+--crm-r: 1rem;
 /* --crm-r1: 1.125rem; */
 /* --crm-r2: 1.25rem; */
 /* --crm-r3: 1.375rem; */
@@ -156,8 +156,8 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 /* --crm-btn-info-text: var(--crm-c-info-text); */
 /* --crm-btn-warning-bg: var(--crm-c-warning); */
 /* --crm-btn-warning-text: var(--crm-c-warning-text); */
-/* --crm-btn-success-bg: var(--crm-c-success); */
-/* --crm-btn-success-text: var(--crm-c-success-text); */
+--crm-btn-success-bg: var(--crm-c-success);
+--crm-btn-success-text: var(--crm-c-success-text);
 /* --crm-btn-alert-bg: var(--crm-c-alert); */
 /* --crm-btn-alert-text: var(--crm-c-alert-text); */
 /* --crm-btn-icon-bg: ; */
@@ -231,21 +231,21 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-expand2-body-padding: 0.25rem 2.8rem;
 
 /* ALERTS */
-/* --crm-alert-padding: var(--crm-m) var(--crm-m2); */
-/* --crm-alert-margin: 0 0 var(--crm-m); */
-/* --crm-alert-border-width: 1px; */
-/* --crm-alert-background-help: var(--crm-c-green-light); */
-/* --crm-alert-border-help: var(--crm-c-green); */
-/* --crm-alert-text-help: var(--crm-c-green-dark); */
-/* --crm-alert-background-warning: var(--crm-c-yellow-light); */
-/* --crm-alert-border-warning: var(--crm-c-yellow); */
-/* --crm-alert-text-warning: var(--crm-c-text); */
-/* --crm-alert-background-info: var(--crm-c-blue-light); */
-/* --crm-alert-border-info: var(--crm-c-blue); */
-/* --crm-alert-text-info: var(--crm-c-blue-dark); */
-/* --crm-alert-background-danger: var(--crm-c-red-light); */
-/* --crm-alert-border-danger: var(--crm-c-red); */
-/* --crm-alert-text-danger: var(--crm-c-red-dark); */
+--crm-alert-padding: var(--crm-r);
+--crm-alert-margin: 0 0 var(--crm-m);
+--crm-alert-border-width:0;
+--crm-alert-background-help: var(--crm-c-blue-light);
+--crm-alert-border-help: ;
+--crm-alert-text-help: ;
+--crm-alert-background-warning: var(--crm-c-yellow-light);
+--crm-alert-border-warning: var(--crm-c-yellow);
+--crm-alert-text-warning: var(--crm-c-text);
+--crm-alert-background-info: var(--crm-c-blue-light);
+--crm-alert-border-info: var(--crm-c-blue);
+--crm-alert-text-info: var(--crm-c-blue-dark);
+--crm-alert-background-danger: var(--crm-c-red-light);
+--crm-alert-border-danger: var(--crm-c-red);
+--crm-alert-text-danger: var(--crm-c-red-dark);
 
 /* FORM */
 /* --crm-form-block-box-shadow: var(--crm-block-shadow); */
@@ -404,14 +404,14 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 
 /* Icons */
 /* --crm-icon-alert: "\f06a"; */
-/* --crm-icon-success: "\f058"; */
+--crm-icon-success: "\f058";
 /* --crm-icon-info: "\f05a"; */
 /* --crm-icon-close: "\f00d"; */
 /* --crm-icon-sort: "\f0dc"; */
 /* --crm-icon-sort-desc: "\f0dd"; */
 /* --crm-icon-sort-asc: "\f0de"; */
 /* --crm-icon-alert-color: inherit; */
-/* --crm-icon-success-color: inherit; */
+--crm-icon-success-color: inherit;
 /* --crm-icon-warning-color: inherit; */
 /* --crm-icon-info-color: inherit; */
 

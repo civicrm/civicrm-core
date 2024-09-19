@@ -43,3 +43,22 @@ body {
   animation: crm-details-show 240ms ease-in-out;
 }
 
+/* ALERTS */
+
+/* put stripe down left with icon in it. */
+.crm-container #help, .crm-container .help {
+	border: none;
+	border-left: 2rem solid #7cb5e1;
+	border-radius: 0;
+}
+.crm-container #help::before, .crm-container .help::before {
+	color: #fff;
+	content: "\f0eb";
+	display: inline-block;
+	font-size: 2rem;
+	font: normal normal normal 14px/1 FontAwesome;
+	font-size: inherit;
+	margin-left: -2.3rem;
+	position: absolute;
+	text-rendering: auto;
+}
