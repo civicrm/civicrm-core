@@ -56,6 +56,10 @@
                     label: ts('Month'),
                 },
                 {
+                    key: 'week',
+                    label: ts('Week'),
+                },
+                {
                     key: 'day',
                     label: ts('Day'),
                 },
