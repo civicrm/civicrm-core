@@ -36,6 +36,11 @@ class CRM_Standaloneusers_Page_TOTPSetup extends CRM_Core_Page {
       CRM_Utils_System::redirect('/civicrm/mfa/totp');
     }
 
+    // CRM_Core_Session::setStatus('hello', 'oi!', 'success');
+    // statusMessages are usually at top of page but in login forms they look much better
+    // inside the main box.
+    $this->assign('statusMessages', CRM_Core_Smarty::singleton()->fetch("CRM/common/status.tpl"));
+
     $totp = new \Civi\Standalone\MFA\TOTP($pending['userID']);
 
     $seed = $totp->generateNew();
@@ -54,7 +59,7 @@ class CRM_Standaloneusers_Page_TOTPSetup extends CRM_Core_Page {
         'issuer' => $domain,
       ]);
     $barcodeobj = new TCPDF2DBarcode($url, 'QRCODE,H');
-    $this->assign('totpqr', $barcodeobj->getBarcodeHTML(6, 6, 'black'));
+    $this->assign('totpqr', $barcodeobj->getBarcodeHTML(4, 4, 'black'));
 
     $this->assign('logoUrl', E::url('images/civicrm-logo.png'));
     $this->assign('pageTitle', '');
