@@ -279,7 +279,17 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   /**
    * Bootstrap Standalone.
    *
+   * In CRM_Utils_System context, this function is used by cv/civix/? to bootstrap
+   * the CMS *after* CiviCRM is already loaded (as compared to normal web requests,
+   * which load the CMS then CiviCRM)
+   *
+   * For Standalone there shouldn't be anything additional to load at this
+   * stage in terms of system services.
+   *
+   *
    * This is used by cv and civix, but not I (artfulrobot) think, in the main http requests.
+   * External scripts may assume loading a users requires the CMS bootstrap
+   * - so we keep support for logging in a user now
    *
    * @param array $params
    *   Either uid, or name & pass.
@@ -287,7 +297,8 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    *   Boolean Require CMS user load.
    * @param bool $throwError
    *   If true, print error on failure and exit.
-   * @param bool|string $realPath path to script
+   * @param bool|string $realPath
+   *   Not used in Standalone context
    *
    * @return bool
    * @Todo Handle setting cleanurls configuration for CiviCRM?
@@ -301,21 +312,6 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
     else {
       return TRUE;
     }
-
-    global $civicrm_paths;
-    require_once $civicrm_paths['civicrm.vendor']['path'] . '/autoload.php';
-
-    // seems like we've bootstrapped drupal
-    $config = CRM_Core_Config::singleton();
-    $config->cleanURL = 1;
-
-    // I don't *think* this applies to Standalone:
-    //
-    // we need to call the config hook again, since we now know
-    // all the modules that are listening on it, does not apply
-    // to J! and WP as yet
-    // CRM-8655
-    // CRM_Utils_Hook::config($config);
 
     if (!$loadUser) {
       return TRUE;
