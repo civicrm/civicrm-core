@@ -47,8 +47,10 @@ class Standalone implements AuthxInterface {
    * @inheritDoc
    */
   public function logoutSession() {
+    global $loggedInUserId;
+    $loggedInUserId = NULL;
     \CRM_Core_Session::singleton()->reset();
-    session_destroy();
+   // session_destroy();
   }
 
   /**
