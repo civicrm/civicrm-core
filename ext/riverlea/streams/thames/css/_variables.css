@@ -47,7 +47,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-c-red-light: #f2dede;
 --crm-c-red-dark: #740f0f;
 --crm-c-red-bright: #f14141; /* thames only */
---crm-c-amber: #bb912c;
+--crm-c-amber: #eeb153;
 --crm-c-amber-light: #ecd9ac;
 /* --crm-c-yellow: #fcfc5a; */
 --crm-c-yellow-light: #f2deb9;
@@ -116,7 +116,6 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-xxl: 4rem;
 --crm-big-input: 15em;
 --crm-huge-input: 100%;
-/* --crm-huge-input: 25em; */
 --crm-padding-reg: var(--crm-r);
 --crm-padding-small: var(--crm-s);
 --crm-padding-inset: var(--crm-m);
