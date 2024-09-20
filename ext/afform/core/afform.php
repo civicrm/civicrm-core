@@ -410,7 +410,7 @@ function afform_civicrm_alterMenu(&$items) {
   foreach ($afforms as $name => $meta) {
     if (!empty($meta['server_route'])) {
       $items[$meta['server_route']] = [
-        'title' => $meta['title'],
+        'title' => $meta['title'] ?? NULL,
         'page_callback' => 'CRM_Afform_Page_AfformBase',
         'page_arguments' => 'afform=' . urlencode($name),
         'access_arguments' => [["@afform:$name"], 'and'],
