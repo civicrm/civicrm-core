@@ -2,7 +2,6 @@
 
 namespace E2E\AfformMock;
 
-use Civi;
 use CRM_Core_DAO;
 
 /**
@@ -17,11 +16,6 @@ use CRM_Core_DAO;
 class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
 
   protected $formName = 'mockPublicForm';
-
-  protected function setUp(): void {
-    parent::setUp();
-    Civi::settings()->revert('afform_mail_auth_token');
-  }
 
   public function testGetPage() {
     $r = $this->createGuzzle()->get('civicrm/mock-public-form');
@@ -112,25 +106,10 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
   }
 
   /**
-   * Evaluate the email token `{afform.mockPublicFormUrl}`. The output should be a session-level auth token.
-   */
-  public function testAuthenticatedUrlToken_Session() {
-    $this->assertTrue(function_exists('authx_civicrm_config'), 'Cannot test without authx');
-    Civi::settings()->set('afform_mail_auth_token', 'session');
-
-    $lebowski = $this->getLebowskiCID();
-    $url = $this->renderTokens($lebowski, '{afform.mockPublicFormUrl}', 'text/plain');
-    $this->assertMatchesRegularExpression(';^https?:.*civicrm/mock-public-form.*;', $url, "URL should look plausible");
-
-    $this->assertUrlStartsSession($url, $lebowski);
-  }
-
-  /**
    * Evaluate the email token `{afform.mockPublicFormUrl}`. The output should be a page-level auth token.
    */
   public function testAuthenticatedUrlToken_Page() {
     $this->assertTrue(function_exists('authx_civicrm_config'), 'Cannot test without authx');
-    Civi::settings()->set('afform_mail_auth_token', 'page');
 
     $lebowski = $this->getLebowskiCID();
     $url = $this->renderTokens($lebowski, '{afform.mockPublicFormUrl}', 'text/plain');
@@ -200,28 +179,6 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
     $j = json_decode((string) $response->getBody(), 1);
     $formattedFailure = $this->formatFailure($response);
     $this->assertEquals($cid, $j['contact_id'], "Response did not give expected contact ID\n" . $formattedFailure);
-  }
-
-  /**
-   * Opening $url may generate a session-cookie. Does that cookie authenticate you as $contactId?
-   *
-   * @param string $url
-   * @param int|null $contactId
-   * @return void
-   * @throws \GuzzleHttp\Exception\GuzzleException
-   */
-  protected function assertUrlStartsSession(string $url, ?int $contactId): void {
-    $http = $this->createGuzzle([
-      'http_errors' => FALSE,
-      'cookies' => new \GuzzleHttp\Cookie\CookieJar(),
-    ]);
-    $response = $http->get($url);
-    $r = (string) $response->getBody();
-    $this->assertStatusCode(200, $response);
-
-    // We make another request in the same session. Is it the expected contact?
-    $response = $http->get('civicrm/authx/id');
-    $this->assertContactJson($contactId, $response);
   }
 
   protected function callApi4AuthTokenSuccess(array $auth, string $entity, string $action, $params = []) {

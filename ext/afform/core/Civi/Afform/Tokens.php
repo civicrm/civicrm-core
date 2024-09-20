@@ -211,42 +211,13 @@ class Tokens extends AutoService implements EventSubscriberInterface {
       ->setPath($afform['server_route'])
       ->setPreferFormat('absolute');
 
-    switch (static::getTokenType($afform, $contactId)) {
-      case 'session':
-        $bearerToken = "Bearer " . $jwt->encode([
-          'exp' => $expires,
-          'sub' => "cid:" . $contactId,
-          'scope' => 'authx',
-        ]);
-        return $url->addQuery(['_authx' => $bearerToken, '_authxSes' => 1]);
-
-      case 'page':
-        $bearerToken = "Bearer " . $jwt->encode([
-          'exp' => $expires,
-          'sub' => "cid:" . $contactId,
-          'scope' => 'afform',
-          'afform' => $afform['name'],
-        ]);
-        return $url->addQuery(['_aff' => $bearerToken]);
-
-      default:
-        throw new \CRM_Core_Exception("Unrecognized authentication token type");
-    }
-
-    return $url;
-  }
-
-  /**
-   * Determine what kind of authentication-token to use for the given form/contact.
-   *
-   * @param array $afform
-   * @param int $contactId
-   * @return string
-   *   One of: 'session', 'page'
-   */
-  public static function getTokenType(array $afform, int $contactId): string {
-    return \Civi::settings()->get('afform_mail_auth_token');
-    // Or maybe... read the $afform and determine its specific settings...
+    $bearerToken = "Bearer " . $jwt->encode([
+      'exp' => $expires,
+      'sub' => "cid:" . $contactId,
+      'scope' => 'afform',
+      'afform' => $afform['name'],
+    ]);
+    return $url->addQuery(['_aff' => $bearerToken]);
   }
 
 }

@@ -22,15 +22,6 @@ class MockPublicFormBrowserTest extends Civi\Test\MinkBase {
       ->apply();
   }
 
-  protected function setUp(): void {
-    parent::setUp();
-  }
-
-  protected function tearDown(): void {
-    parent::tearDown();
-    Civi::settings()->revert('afform_mail_auth_token');
-  }
-
   /**
    * Create a contact with middle name "Donald". Use the custom form to change the middle
    * name to "Donny".
@@ -40,8 +31,6 @@ class MockPublicFormBrowserTest extends Civi\Test\MinkBase {
    * @throws \CRM_Core_Exception
    */
   public function testUpdateMiddleName() {
-    Civi::settings()->set('afform_mail_auth_token', 'page');
-
     $donny = $this->initializeTheodoreKerabatsos();
     $this->assertEquals('Donald', $this->getContact($donny)['middle_name'], 'Middle name has original value');
 
