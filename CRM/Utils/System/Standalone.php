@@ -36,9 +36,8 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    */
   public function getDefaultFileStorage() {
     return [
-      'url' => 'upload',
-      // @todo Not sure if this is wise - what about CLI invocation?
-      'path' => $_SERVER['DOCUMENT_ROOT'],
+      'path' => \Civi::paths()->getPath('[cms.root]/public'),
+      'url' => \Civi::paths()->getUrl('[cms.root]/public'),
     ];
   }
 
@@ -361,31 +360,22 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @inheritdoc
    */
   public function getCiviSourceStorage(): array {
-    global $civicrm_root;
-
-    if (!defined('CIVICRM_UF_BASEURL')) {
-      throw new RuntimeException('Undefined constant: CIVICRM_UF_BASEURL');
-    }
-
     return [
-      'url' => CRM_Utils_File::addTrailingSlash(CIVICRM_UF_BASEURL, '/') . 'core/',
-      'path' => CRM_Utils_File::addTrailingSlash($civicrm_root),
+      'path' => Civi::paths()->getPath('[cms.root]/core'),
+      'url' => Civi::paths()->getUrl('[cms.root]/core'),
     ];
   }
 
   /**
-   * Determine the location of the CMS root.
+   * In Standalone, this returns the app root
    *
-   * @param string $path
+   * The $appRootPath global is set in civicrm.standalone.php
    *
    * @return NULL|string
    */
-  public function cmsRootPath($path = NULL) {
-    global $civicrm_paths;
-    if (!empty($civicrm_paths['cms.root']['path'])) {
-      return $civicrm_paths['cms.root']['path'];
-    }
-    throw new \RuntimeException("Standalone requires the path is set for now. Set \$civicrm_paths['cms.root']['path'] in civicrm.settings.php to the webroot.");
+  public function cmsRootPath() {
+    global $appRootPath;
+    return $appRootPath;
   }
 
   public function isFrontEndPage() {
@@ -599,6 +589,38 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
       'use_only_cookies' => 1,
       'use_strict_mode'  => 1,
     ]);
+  }
+
+  public function initialize() {
+    parent::initialize();
+    $this->registerDefaultPaths();
+  }
+
+  /**
+   * Specify the default computation for various paths/URLs.
+   */
+  protected function registerDefaultPaths(): void {
+    \Civi::paths()
+      ->register('civicrm.private', function () {
+          return [
+            'path' => \Civi::paths()->getPath('[cms.root]/private'),
+          ];
+      })
+      ->register('civicrm.compile', function () {
+        return [
+          'path' => \Civi::paths()->getPath('[civicrm.private]/cache'),
+        ];
+      })
+      ->register('civicrm.log', function () {
+        return [
+          'path' => \Civi::paths()->getPath('[civicrm.private]/log'),
+        ];
+      })
+      ->register('civicrm.l10n', function () {
+        return [
+          'path' => \Civi::paths()->getPath('[civicrm.private]/l10n'),
+        ];
+      });
   }
 
   /**
