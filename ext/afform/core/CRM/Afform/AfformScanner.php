@@ -29,9 +29,11 @@ class CRM_Afform_AfformScanner extends \Civi\Core\Service\AutoService {
 
   /**
    * CRM_Afform_AfformScanner constructor.
+   *
+   * @param \CRM_Utils_Cache_Interface $cache
    */
-  public function __construct() {
-    $this->cache = Civi::cache('long');
+  public function __construct($cache = NULL) {
+    $this->cache = $cache ?: Civi::cache('long');
   }
 
   /**
