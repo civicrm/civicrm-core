@@ -123,6 +123,21 @@ class CRM_Standaloneusers_Upgrader extends CRM_Extension_Upgrader_Base {
       ->execute();
   }
 
+  public function upgrade_5692(): bool {
+    CRM_Core_DAO::executeQuery(<<<SQL
+      CREATE TABLE IF NOT EXISTS `civicrm_totp` (
+        `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique TOTP ID',
+        `user_id` int(10) unsigned NOT NULL COMMENT 'Reference to User (UFMatch) ID',
+        `seed` varchar(512) NOT NULL,
+        `hash` varchar(20) NOT NULL DEFAULT '\"sha1\"',
+        `period` INT(1) UNSIGNED NOT NULL DEFAULT '30',
+        `length` INT(1) UNSIGNED NOT NULL DEFAULT '6',
+        PRIMARY KEY (`id`)
+      )
+      SQL);
+    return TRUE;
+  }
+
   /**
    * Example: Run a couple simple queries.
    *
