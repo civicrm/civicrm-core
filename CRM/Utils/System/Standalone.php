@@ -55,8 +55,10 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
-   * @internal
-   * @return bool
+   * @inheritdoc
+   *
+   * In Standalone the UF is CiviCRM, so we're never
+   * running without it
    */
   public function isLoaded(): bool {
     return TRUE;
@@ -74,18 +76,6 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
 
   /**
    * @inheritDoc
-   *
-   * Create a user in the CMS.
-   *
-   * @param array $params keys:
-   *    - 'cms_name'
-   *    - 'cms_pass' plaintext password
-   *    - 'notify' boolean
-   * @param string $emailParam
-   *   Name of the $param which contains the email address.
-   *
-   * @return int|bool
-   *   uid if user was created, false otherwise
    */
   public function createUser(&$params, $emailParam) {
     try {
@@ -102,11 +92,6 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
       \Civi::log()->warning("Failed to create user '$email': " . $e->getMessage());
       return FALSE;
     }
-
-    // @todo This next line is what Drupal does, but it's unclear why.
-    // I think it assumes we want to be logged in as this contact, and as there's no uf match, it's not in civi.
-    // But I'm not sure if we are always becomming this user; I'm not sure waht calls this function.
-    // CRM_Core_Config::singleton()->inCiviCRM = FALSE;
 
     return (int) $userID;
   }
