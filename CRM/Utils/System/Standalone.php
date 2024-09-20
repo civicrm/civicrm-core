@@ -220,7 +220,18 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @throws \CRM_Core_Exception.
    */
   public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
-    return Security::singleton()->authenticate($name, $password, $loadCMSBootstrap, $realPath);
+    $authxLogin = authx_login(['flow' => 'login', 'cred' => 'Basic ' . base64_encode("{$name}:{$password}")]);
+
+    $user = \Civi\Api4\User::get(FALSE)
+      ->addWhere('id', '=', $authxLogin['userId'])
+      ->addWhere('is_active', '=', TRUE)
+      ->execute()->single();
+
+    Security::singleton()->applyLocaleFromUser($user);
+
+    // // Note: random_int is more appropriate for cryptographical use than mt_rand
+    // // The long number is the max 32 bit value.
+    return [$authxLogin['contactId'], $authxLogin['userId'], random_int(0, 2147483647)];
   }
 
   /**
