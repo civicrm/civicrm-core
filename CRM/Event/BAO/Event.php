@@ -2349,8 +2349,8 @@ WHERE  ce.loc_block_id = $locBlockId";
         //dev/event#10
         //If the event profile includes a note field and the submitted value of
         //that field is "", then remove the old note returned by getValues.
-        if ($note === '') {
-          $noteKeyPos = array_search('note', array_keys($fields));
+        if ($note === '' && array_key_exists('note', $fields)) {
+          $noteKeyPos = array_search('note', array_keys($fields), TRUE);
           $valuesKeys = array_keys($values);
           $values[$valuesKeys[$noteKeyPos]] = "";
         }
