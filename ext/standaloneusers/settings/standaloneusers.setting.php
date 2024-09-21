@@ -20,7 +20,7 @@ return [
     'group'       => 'standaloneusers',
     'type'        => 'String',
     'title'       => ts('Multi-Factor Authentication classes'),
-    'description' => ts('Comma separated list of classes of MFA that are required/accepted. Leave blank to disable MFA. TOTP is Time-based One-Time Password which requires an authenticator app to provide a code.'),
+    'description' => ts('Choose which multi-factor options are required/accepted. Leave blank to disable MFA. TOTP is Time-based One-Time Password which requires an authenticator app to provide a code.'),
     'default'     => '',
     'is_domain'   => 1,
     'is_contact'  => 0,
