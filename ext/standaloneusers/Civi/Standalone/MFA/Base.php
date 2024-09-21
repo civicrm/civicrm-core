@@ -92,7 +92,7 @@ class Base {
   }
 
   /**
-   * Fetch the array of pending login data (userID, expiry)
+   * Fetch the array of pending login data (userID, expiry, ...)
    * if it exists and has not expired.
    *
    * If it's expired, drop it from the session.
