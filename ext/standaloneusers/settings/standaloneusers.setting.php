@@ -16,9 +16,8 @@ return [
   // Example value: 'TOTP', not 'Civi\Standalone\MFA\TOTP'
   'standalone_mfa_enabled' => [
     'name'        => 'standalone_mfa_enabled',
-    'serialize'   => CRM_Core_DAO::SERIALIZE_JSON,
     'group'       => 'standaloneusers',
-    'type'        => 'String',
+    'type'        => 'Array',
     'title'       => ts('Multi-Factor Authentication classes'),
     'description' => ts('Choose which multi-factor options are required/accepted. Leave blank to disable MFA. TOTP is Time-based One-Time Password which requires an authenticator app to provide a code.'),
     'default'     => '',
