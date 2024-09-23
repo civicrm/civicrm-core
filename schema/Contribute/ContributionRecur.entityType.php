@@ -155,6 +155,7 @@ return [
       'add' => '1.6',
       'unique_name' => 'contribution_recur_modified_date',
       'unique_title' => 'Recurring Contribution Modified Date',
+      'required' => TRUE,
       'default' => 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
       'input_attrs' => [
         'format_type' => 'activityDateTime',
