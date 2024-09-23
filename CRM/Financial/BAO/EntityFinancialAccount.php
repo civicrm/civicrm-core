@@ -198,7 +198,7 @@ class CRM_Financial_BAO_EntityFinancialAccount extends CRM_Financial_DAO_EntityF
     $existingFinancialAccount = [];
     if (!$dao->N) {
       $params = [
-        'name' => $financialType->name,
+        'label' => $financialType->label,
         'contact_id' => CRM_Core_BAO_Domain::getDomain()->contact_id,
         'financial_account_type_id' => array_search('Revenue', $financialAccountTypeID),
         'description' => $financialType->description,

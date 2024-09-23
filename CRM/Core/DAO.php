@@ -2855,7 +2855,6 @@ SELECT contact_id
         elseif (
           !empty($field['FKClassName'])
           && ($pseudoConstant['keyColumn'] ?? NULL) === 'id'
-          && ($pseudoConstant['labelColumn'] ?? NULL) === 'name'
         ) {
           $pseudoFieldName = str_replace('_' . $pseudoConstant['keyColumn'], '', $field['name']);
           // This if is just an extra caution when adding change.

@@ -273,7 +273,7 @@ class CRM_Financial_Page_AJAX {
       'contact_a.contact_sub_type',
       'civicrm_financial_trxn.trxn_date as transaction_date',
       'civicrm_contribution.receive_date as receive_date',
-      'civicrm_financial_type.name',
+      'civicrm_financial_type.label',
       'civicrm_financial_trxn.currency as currency',
       'civicrm_financial_trxn.status_id as status',
       'civicrm_financial_trxn.check_number as check_number',
@@ -290,7 +290,7 @@ class CRM_Financial_Page_AJAX {
       'receive_date' => ts('Contribution Date'),
       'payment_method' => ts('Payment Method'),
       'status' => ts('Status'),
-      'name' => ts('Type'),
+      'label' => ts('Type'),
     ];
 
     if ($sort && $sortOrder) {
@@ -446,7 +446,7 @@ class CRM_Financial_Page_AJAX {
       'receive_date',
       'payment_method',
       'status',
-      'name',
+      'label',
       'action',
     ];
 

@@ -58,6 +58,8 @@ class CRM_Upgrade_Incremental_php_FiveSeventyNine extends CRM_Upgrade_Incrementa
    *   The version number matching this function name
    */
   public function upgrade_5_79_alpha1($rev): void {
+    $this->addTask('Add Financial Type.label field', 'addColumn', 'civicrm_financial_type', 'label', "varchar(64) NOT NULL COMMENT 'User-facing financial type label' AFTER `name`", TRUE);
+    $this->addTask('Add Financial Account.label field', 'addColumn', 'civicrm_financial_account', 'label', "varchar(64) NOT NULL COMMENT 'User-facing financial account label' AFTER `name`", TRUE);
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Update "Website Type" options', 'updateWebsiteType');
   }
