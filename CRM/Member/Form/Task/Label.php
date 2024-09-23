@@ -91,16 +91,6 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
     }
     // format the addresses according to CIVICRM_ADDRESS_FORMAT (CRM-1327)
     foreach ((array) $rows as $id => $row) {
-      $commMethods = $row['preferred_communication_method'] ?? NULL;
-      if ($commMethods) {
-        $val = array_filter(explode(CRM_Core_DAO::VALUE_SEPARATOR, $commMethods));
-        $comm = CRM_Contact_DAO_Contact::buildOptions('preferred_communication_method');
-        $temp = [];
-        foreach ($val as $vals) {
-          $temp[] = $comm[$vals];
-        }
-        $row['preferred_communication_method'] = implode(', ', $temp);
-      }
       $row['id'] = $id;
       $formatted = CRM_Utils_Address::formatMailingLabel($row);
       $rows[$id] = [$formatted];
