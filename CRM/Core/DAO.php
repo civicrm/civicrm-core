@@ -1045,9 +1045,10 @@ class CRM_Core_DAO extends DB_DataObject {
       return $value === 'null' ? '' : $value;
     }, $record);
 
-    self::addDefaultFallbackValues($entityName, $record);
-
     \CRM_Utils_Hook::pre($op, $entityName, $record[$idField] ?? NULL, $record);
+
+    //Reason to call after pre hook is to accept any label/title/frontend_title modification
+    self::addDefaultFallbackValues($entityName, $record);
     $fields = static::getSupportedFields();
     $instance = new static();
     // Ensure fields exist before attempting to write to them
