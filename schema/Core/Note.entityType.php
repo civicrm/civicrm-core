@@ -104,6 +104,7 @@ return [
       'input_type' => 'Select Date',
       'description' => ts('Date attached to the note'),
       'add' => '5.36',
+      'required' => TRUE,
       'default' => 'CURRENT_TIMESTAMP',
       'input_attrs' => [
         'format_type' => 'activityDateTime',
@@ -129,6 +130,7 @@ return [
       'readonly' => TRUE,
       'description' => ts('When was this note last modified/edited'),
       'add' => '1.1',
+      'required' => TRUE,
       'default' => 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
       'input_attrs' => [
         'label' => ts('Modified Date'),
