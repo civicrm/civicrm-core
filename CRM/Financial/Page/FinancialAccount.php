@@ -85,7 +85,7 @@ class CRM_Financial_Page_FinancialAccount extends CRM_Core_Page_Basic {
     // get all custom groups sorted by weight
     $contributionType = [];
     $dao = new CRM_Financial_DAO_FinancialAccount();
-    $dao->orderBy('financial_account_type_id, name');
+    $dao->orderBy('financial_account_type_id, label');
     $dao->find();
     $financialAccountType = CRM_Financial_DAO_FinancialAccount::buildOptions('financial_account_type_id');
 

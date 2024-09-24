@@ -6514,10 +6514,9 @@ AND   displayRelType.is_active = 1
       return FALSE;
     }
     $pseudoConstant = $realField['pseudoconstant'];
-    if (empty($pseudoConstant['optionGroupName']) &&
-      ($pseudoConstant['labelColumn'] ?? NULL) !== 'name') {
+
+    if (empty($pseudoConstant['optionGroupName']) && ((($pseudoConstant['prefetch'] ?? NULL) === 'disabled') || !empty($pseudoConstant['abbrColumn']))) {
       // We are increasing our pseudoconstant handling - but still very cautiously,
-      // hence the check for labelColumn === name
       return FALSE;
     }
 
@@ -6949,8 +6948,7 @@ AND   displayRelType.is_active = 1
    */
   protected function isPseudoFieldAnFK($fieldSpec) {
     if (empty($fieldSpec['FKClassName'])
-      || ($fieldSpec['pseudoconstant']['keyColumn'] ?? NULL) !== 'id'
-      || ($fieldSpec['pseudoconstant']['labelColumn'] ?? NULL) !== 'name') {
+      || ($fieldSpec['pseudoconstant']['keyColumn'] ?? NULL) !== 'id') {
       return FALSE;
     }
     return TRUE;

@@ -43,8 +43,22 @@ return [
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'required' => TRUE,
+      'default_fallback' => ['label'],
       'description' => ts('Financial Account Name.'),
       'add' => '3.2',
+    ],
+    'label' => [
+      'title' => ts('Financial Account Label'),
+      'sql_type' => 'varchar(64)',
+      'input_type' => 'Text',
+      'description' => ts('User-facing financial account label'),
+      'required' => TRUE,
+      'default_fallback' => ['name'],
+      'localizable' => TRUE,
+      'add' => '5.79',
+      'input_attrs' => [
+        'label' => ts('Financial Account'),
+      ],
     ],
     'contact_id' => [
       'title' => ts('Contact ID'),
