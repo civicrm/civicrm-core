@@ -120,9 +120,9 @@ class CRM_Event_Form_Registration_RegisterTest extends CiviUnitTestCase {
         'is_active' => 'The event you requested is currently unavailable (contact the site administrator for assistance).',
         'is_online_registration' => 'Online registration is not currently available for this event (contact the site administrator for assistance).',
         'is_template' => 'Event templates are not meant to be registered.',
-        'registration_start_date' => 'Registration for this event begins on ' . CRM_Utils_Date::customFormat(date('Ymd000000', strtotime('+ 1 day'))),
-        'registration_end_date' => 'Registration for this event ended on ' . CRM_Utils_Date::customFormat(date('Ymd000000', strtotime('- 1 day'))),
-        'event_end_date' => 'Registration for this event ended on ' . CRM_Utils_Date::customFormat(date('Ymd000000', strtotime('- 1 day'))),
+        'registration_start_date' => 'Registration for this event begins on ' . CRM_Utils_Date::customFormat(date('YmdH0000', strtotime('+ 1 day'))),
+        'registration_end_date' => 'Registration for this event ended on ' . CRM_Utils_Date::customFormat(date('YmdH0000', strtotime('- 1 day'))),
+        'event_end_date' => 'Registration for this event ended on ' . CRM_Utils_Date::customFormat(date('YmdHi', strtotime('- 1 day'))),
       ] as $parameter => $errorMessage) {
         $check = ($parameter === 'is_template');
         if (isset($formValues[$parameter]) && $formValues[$parameter] === $check) {
@@ -138,7 +138,7 @@ class CRM_Event_Form_Registration_RegisterTest extends CiviUnitTestCase {
     }
   }
 
-  public static function eventDataProvider(): array {
+  public function eventDataProvider(): array {
     return [
       'inactive_event' => [
         'form_values' => ['is_active' => FALSE],
@@ -150,13 +150,13 @@ class CRM_Event_Form_Registration_RegisterTest extends CiviUnitTestCase {
         'form_values' => ['is_template' => TRUE],
       ],
       'start_date_in_future' => [
-        'form_values' => ['registration_start_date' => date('Ymd000000', strtotime('+ 1 day'))],
+        'form_values' => ['registration_start_date' => date('YmdH0000', strtotime('+ 1 day'))],
       ],
       'registration_end_date_in_past' => [
-        'form_values' => ['registration_end_date' => date('Ymd000000', strtotime('- 1 day'))],
+        'form_values' => ['registration_end_date' => date('YmdH0000', strtotime('- 1 day'))],
       ],
       'event_end_date_in_past' => [
-        'form_values' => ['event_end_date' => date('Ymd000000', strtotime('- 1 day'))],
+        'form_values' => ['event_end_date' => date('YmdH0000', strtotime('- 1 day'))],
       ],
     ];
   }

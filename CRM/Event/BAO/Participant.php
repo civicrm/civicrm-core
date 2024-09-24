@@ -997,7 +997,6 @@ WHERE  civicrm_participant.id = {$participantId}
    */
   public static function validateEvent(int $eventId): array {
     $event = \Civi\Api4\Event::get(FALSE)
-      ->addSelect('has_waitlist', 'max_participants')
       ->addWhere('id', '=', $eventId)
       ->execute()
       ->single();
