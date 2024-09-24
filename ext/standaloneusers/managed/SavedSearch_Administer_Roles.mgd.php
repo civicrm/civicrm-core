@@ -144,7 +144,7 @@ return [
             [
               'path' => 'civicrm/admin/rolepermissions',
               'icon' => 'fa-external-link',
-              'text' => E::ts('Permissions'),
+              'text' => E::ts('User Permissions'),
               'style' => 'info',
               'condition' => [],
               'task' => '',

@@ -17,28 +17,30 @@ class Get extends BasicGetAction {
 
   protected function getRecords() {
     $permissions = \Civi\Api4\Permission::get(FALSE)
-      ->addSelect('*', 'group:label')
       ->addWhere('is_synthetic', '=', FALSE)
-      ->addOrderBy('group', 'ASC')
+      ->addWhere('is_active', '=', TRUE)
       ->execute();
     $roles = \Civi\Api4\Role::get(FALSE)
+      ->addSelect('name', 'permissions')
       ->addWhere('name', '!=', 'admin')
-      ->execute();
+      ->execute()->column('permissions', 'name');
     $result = [];
     foreach ($permissions as $permission) {
-      foreach ($roles as $role) {
-        $row = [
-          'id' => $role['id'] . '_' . $permission['name'],
-          'role_id' => $role['id'],
-          'role_name' => $role['name'],
-          'role_label' => $role['label'],
-          'permission_group' => $permission['group:label'],
-          'permission_name' => $permission['name'],
-          'permission_title' => $permission['title'],
-          'permission_description' => $permission['description'],
-          'permission_granted' => in_array($permission['name'], $role['permissions']),
-        ];
-        $result[] = $row;
+      $row = $permission;
+      foreach ($roles as $role => $rolePermissions) {
+        $row["granted_$role"] = in_array($permission['name'], $rolePermissions);
+        $row["implied_$role"] = FALSE;
+      }
+      $result[$permission['name']] = $row;
+    }
+    // Add implied permissions
+    foreach ($permissions as $permission) {
+      foreach ($permission['implies'] ?? [] as $impliedName) {
+        foreach ($roles as $role => $rolePermissions) {
+          if (in_array($permission['name'], $rolePermissions) && isset($result[$impliedName])) {
+            $result[$impliedName]["implied_$role"] = TRUE;
+          }
+        }
       }
     }
     return $result;

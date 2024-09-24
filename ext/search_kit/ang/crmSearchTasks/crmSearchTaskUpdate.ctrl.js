@@ -18,10 +18,10 @@
         loadOptions: ['id', 'name', 'label', 'description', 'color', 'icon'],
         where: [['deprecated', '=', false], ["readonly", "=", false]],
       }],
-      getInfo: ['Entity', 'get', {select: ['primary_key'], where: [['name', '=', this.entity]]}, 0]
+      entityInfo: ['Entity', 'get', {select: ['primary_key'], where: [['name', '=', this.entity]]}, 0]
     }).then(function(results) {
         ctrl.fields = results.getFields;
-        ctrl.idField = results.getInfo.primary_key[0];
+        ctrl.idField = results.entityInfo.primary_key[0];
       });
 
     this.updateField = function(index) {
