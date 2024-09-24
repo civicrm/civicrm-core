@@ -60,8 +60,28 @@ class CRM_Upgrade_Incremental_php_FiveSeventyNine extends CRM_Upgrade_Incrementa
   public function upgrade_5_79_alpha1($rev): void {
     $this->addTask('Add Financial Type.label field', 'addColumn', 'civicrm_financial_type', 'label', "varchar(64) NOT NULL COMMENT 'User-facing financial type label' AFTER `name`", TRUE);
     $this->addTask('Add Financial Account.label field', 'addColumn', 'civicrm_financial_account', 'label', "varchar(64) NOT NULL COMMENT 'User-facing financial account label' AFTER `name`", TRUE);
+    $this->addTask('Populate financial labels', 'populateFinancialLabels');
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Update "Website Type" options', 'updateWebsiteType');
+  }
+
+  /**
+   * Even though we just added the label field, if the upgrade is rerun later
+   * we don't want to clobber any changes, so only update if blank.
+   */
+  public static function populateFinancialLabels() {
+    $locales = CRM_Core_I18n::getMultilingual();
+    if ($locales) {
+      foreach ($locales as $locale) {
+        CRM_Core_DAO::executeQuery("UPDATE `civicrm_financial_type` SET label_{$locale} = `name` WHERE label_{$locale} = ''", [], TRUE, NULL, FALSE, FALSE);
+        CRM_Core_DAO::executeQuery("UPDATE `civicrm_financial_account` SET label_{$locale} = `name` WHERE label_{$locale} = ''", [], TRUE, NULL, FALSE, FALSE);
+      }
+    }
+    else {
+      CRM_Core_DAO::executeQuery("UPDATE `civicrm_financial_type` SET  `label` = `name` WHERE label = ''", [], TRUE, NULL, FALSE, FALSE);
+      CRM_Core_DAO::executeQuery("UPDATE `civicrm_financial_account` SET  `label` = `name` WHERE label = ''", [], TRUE, NULL, FALSE, FALSE);
+    }
+    return TRUE;
   }
 
   /**
