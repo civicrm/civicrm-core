@@ -84,4 +84,68 @@ class CRM_Event_Form_Registration_RegisterTest extends CiviUnitTestCase {
     $this->fail('Wait listed users shouldn\'t be allowed to re-register.');
   }
 
+  /**
+   * Test that current event is valid or not.
+   *
+   * @dataProvider eventDataProvider
+   *
+   * @return void
+   */
+  public function testValidEvent(array $formValues): void {
+    $event = $this->eventCreateUnpaid();
+    $this->updateEvent($formValues);
+    $form = $this->getTestForm('CRM_Event_Form_Registration_Register', [], [
+      'id' => $this->getEventID(),
+    ]);
+
+    try {
+      $form->processForm(FormWrapper::PREPROCESSED);
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $message = CRM_Core_Session::singleton()->getStatus();
+      foreach ([
+        'is_active' => 'The event you requested is currently unavailable (contact the site administrator for assistance).',
+        'is_online_registration' => 'Online registration is not currently available for this event (contact the site administrator for assistance).',
+        'is_template' => 'Event templates are not meant to be registered.',
+        'registration_start_date' => 'Registration for this event begins on ' . CRM_Utils_Date::customFormat(date('Ymd000000', strtotime('+ 1 day'))),
+        'registration_end_date' => 'Registration for this event ended on ' . CRM_Utils_Date::customFormat(date('Ymd000000', strtotime('- 1 day'))),
+        'event_end_date' => 'Registration for this event ended on ' . CRM_Utils_Date::customFormat(date('Ymd000000', strtotime('- 1 day'))),
+      ] as $parameter => $errorMessage) {
+        $check = ($parameter === 'is_template');
+        if (isset($formValues[$parameter]) && $formValues[$parameter] === $check) {
+          $this->assertEquals($errorMessage, $message[0]['text']);
+        }
+        elseif ($parameter == 'registration_start_date' && !empty($formValues[$parameter])) {
+          $this->assertEquals($errorMessage, $message[0]['text']);
+        }
+        elseif ($parameter == 'registration_end_date' && !empty($formValues[$parameter])) {
+          $this->assertEquals($errorMessage, $message[0]['text']);
+        }
+      }
+    }
+  }
+
+  public function eventDataProvider(): array {
+    return [
+      'inactive_event' => [
+        'form_values' => ['is_active' => FALSE],
+      ],
+      'online_registration_disabled' => [
+        'form_values' => ['is_online_registration' => FALSE],
+      ],
+      'event_is_template' => [
+        'form_values' => ['is_template' => TRUE],
+      ],
+      'start_date_in_future' => [
+        'form_values' => ['registration_start_date' => date('Ymd000000', strtotime('+ 1 day'))],
+      ],
+      'registration_end_date_in_past' => [
+        'form_values' => ['registration_end_date' => date('Ymd000000', strtotime('- 1 day'))],
+      ],
+      'event_end_date_in_past' => [
+        'form_values' => ['event_end_date' => date('Ymd000000', strtotime('- 1 day'))],
+      ],
+    ];
+  }
+
 }
