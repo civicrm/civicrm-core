@@ -115,11 +115,10 @@ trait CRM_Event_Form_EventFormTrait {
    * @throws \CRM_Core_Exception
    */
   protected function getAvailableSpaces(): int {
-    $availableSpaces = CRM_Event_BAO_Participant::eventFull($this->getEventID(),
-      TRUE,
+    return CRM_Event_BAO_Participant::getAvailableSpaces(
+      $this->getEventID(),
       $this->getEventValue('has_waitlist')
     );
-    return is_numeric($availableSpaces) ? (int) $availableSpaces : 0;
   }
 
   /**

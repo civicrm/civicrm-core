@@ -1646,40 +1646,11 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    *
    */
   protected function checkValidEvent(): void {
-    // is the event active (enabled)?
-    if (!$this->_values['event']['is_active']) {
-      // form is inactive, die a fatal death
-      CRM_Core_Error::statusBounce(ts('The event you requested is currently unavailable (contact the site administrator for assistance).'));
-    }
-
-    // is online registration is enabled?
-    if (!$this->_values['event']['is_online_registration']) {
-      CRM_Core_Error::statusBounce(ts('Online registration is not currently available for this event (contact the site administrator for assistance).'), $this->getInfoPageUrl());
-    }
-
-    // is this an event template ?
-    if (!empty($this->_values['event']['is_template'])) {
-      CRM_Core_Error::statusBounce(ts('Event templates are not meant to be registered.'), $this->getInfoPageUrl());
-    }
-
-    $now = date('YmdHis');
-    $startDate = CRM_Utils_Date::processDate($this->_values['event']['registration_start_date'] ?? NULL);
-
-    if ($startDate && ($startDate >= $now)) {
-      CRM_Core_Error::statusBounce(ts('Registration for this event begins on %1',
-        [1 => CRM_Utils_Date::customFormat($this->_values['event']['registration_start_date'] ?? NULL)]),
-        $this->getInfoPageUrl(),
-        ts('Sorry'));
-    }
-
-    $regEndDate = CRM_Utils_Date::processDate($this->_values['event']['registration_end_date'] ?? NULL);
-    $eventEndDate = CRM_Utils_Date::processDate($this->_values['event']['event_end_date'] ?? NULL);
-    if (($regEndDate && ($regEndDate < $now)) || (empty($regEndDate) && !empty($eventEndDate) && ($eventEndDate < $now))) {
-      $endDate = CRM_Utils_Date::customFormat($this->_values['event']['registration_end_date'] ?? NULL);
-      if (empty($regEndDate)) {
-        $endDate = CRM_Utils_Date::customFormat($this->_values['event']['event_end_date'] ?? NULL);
-      }
-      CRM_Core_Error::statusBounce(ts('Registration for this event ended on %1', [1 => $endDate]), $this->getInfoPageUrl(), ts('Sorry'));
+    foreach (CRM_Event_BAO_Participant::validateEvent($this->getEventID()) as $error) {
+      CRM_Core_Error::statusBounce(
+        $error,
+        $this->_values['event']['is_active'] ? $this->getInfoPageUrl() : NULL
+      );
     }
   }
 
