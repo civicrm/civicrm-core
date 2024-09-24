@@ -368,7 +368,7 @@
           return (currentVal || {})[ctrl.search_operator];
         }
         // Convert false to "false" and 0 to "0"
-        else if (!ctrl.isMultiple() && typeof currentVal !== 'string') {
+        else if (!ctrl.isMultiple() && (typeof currentVal === 'boolean' || typeof currentVal === 'number')) {
           return JSON.stringify(currentVal);
         }
         return currentVal;
