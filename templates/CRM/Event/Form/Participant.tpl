@@ -232,12 +232,11 @@
             }
           });
         }
-
         {/literal}
+        CRM.buildCustomData( '{$customDataType}', null, null );
         {if $eventID}
-          CRM.buildCustomData( '{$customDataType}', {$eventID}, {$eventNameCustomDataTypeID} );
-        {else}
-          CRM.buildCustomData( '{$customDataType}', null, null );
+          var onlySubType = true;
+          CRM.buildCustomData( '{$customDataType}', {$eventID}, {$eventNameCustomDataTypeID}, null, null, null, onlySubType );
         {/if}
         {if $eventTypeID}
           CRM.buildCustomData( '{$customDataType}', {$eventTypeID}, {$eventTypeCustomDataTypeID} );
