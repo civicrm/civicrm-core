@@ -18,7 +18,7 @@
         {if $extension.ready == 'ready'}
           {icon icon="fa-trophy crm-extensions-stage"}{ts}This extension has been reviewed by the community.{/ts}{/icon}
         {elseif $extension.develStage == 'stable' && $extension.ready == 'not_ready'}
-          {icon icon="fa-warning crm-extensions-stage"}{ts}This extension has not been reviewed by the community. Proceed with caution.{/ts}{/icon}
+          {icon icon="fa-warning crm-extensions-stage"}{ts}This extension has not been reviewed by the community.{/ts} {ts}Please proceed with caution.{/ts}{/icon}
         {/if}
       </td>
     </tr>
@@ -29,7 +29,7 @@
         {if $extension.ready == 'ready'}
           {ts}This extension has been reviewed by the community.{/ts}
         {elseif $extension.develStage == 'stable' && $extension.ready == 'not_ready'}
-          <div class="crm-error alert alert-danger">{ts}This extension has not been reviewed by the community.{/ts} {ts}Please proceed with caution.{/ts} {ts}The number of active installs, the date of the latest release and the CiviCRM version compatibility should be good indicators. If a support link is listed below, it should point to the list of known issues.{/ts} {docURL page="dev/extensions/lifecycle"}</div>
+          <div class="crm-error alert alert-danger">{ts}Please proceed with caution.{/ts} {ts}This extension has not been reviewed by the community and therefore may conflict with your configuration.{/ts} {ts}Consider evaluating the stated version compatibility, the total number of active installations and the date of the latest release of the extension as these may be good indicators of the extension's stability. If a support link is listed, please consult their issue queue to review any known issues.{/ts} {docURL page="dev/extensions/lifecycle"}</div>
         {else}
           {$extension.develStage_formatted|escape}
         {/if}
