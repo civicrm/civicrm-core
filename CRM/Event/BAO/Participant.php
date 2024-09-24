@@ -218,6 +218,18 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant implements \Ci
   }
 
   /**
+   * @internal
+   */
+  public static function getAvailableSpaces(int $eventId, bool $includeWaitlist = TRUE): int {
+    $availableSpaces = self::eventFull(
+      $eventId,
+      TRUE,
+      $includeWaitlist
+    );
+    return is_numeric($availableSpaces) ? (int) $availableSpaces : 0;
+  }
+
+  /**
    * Check whether the event is full for participation and return as.
    * per requirements.
    *
@@ -754,6 +766,322 @@ WHERE  civicrm_participant.id = {$participantId}
     CRM_Utils_Hook::post('delete', 'Participant', $participant->id, $participant);
 
     return $participant;
+  }
+
+  /**
+   * Retrieves existing participants for a given event and contact.
+   *
+   * @param int $contactId
+   *   The contact ID of participants to find.
+   * @param int $eventId
+   *   The event ID of participants to find.
+   * @param bool $onlyCounted
+   *   Whether to only consider registrations with a status with "is_counted".
+   * @param bool $includeOnWaitlist
+   *   Whether to consider registrations with status "On waitlist" when restricting to "is_counted".
+   * @param array $excludeStatus
+   *   A list of registration status to not consider (e.g. for ignoring cancelled registrations).
+   * @param array $filterRoleIds
+   *   A list of participant role IDs to filter for. Registrations with other roles will not be considered.
+   * @param bool $includeTest
+   *   Whether to include test participants.
+   *
+   * @return array<int,array{id:int,"status_id:name":string}>
+   *   An array of participants (a subset of attributes) matching the given criteria, keyed by ID.
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   *
+   * @internal
+   */
+  public static function getExistingParticipants(
+    int $contactId,
+    int $eventId,
+    bool $onlyCounted = TRUE,
+    bool $includeOnWaitlist = TRUE,
+    array $excludeStatus = ['Cancelled'],
+    array $filterRoleIds = [],
+    bool $includeTest = FALSE
+  ) {
+    $query = \Civi\Api4\Participant::get(FALSE)
+      ->addSelect('id', 'status_id:name')
+      ->addWhere('contact_id', '=', $contactId)
+      ->addWhere('event_id', '=', $eventId);
+
+    if ($onlyCounted) {
+      $query->addJoin('ParticipantStatusType AS participant_status_type', 'LEFT');
+      $clauses[] = ['participant_status_type.is_counted', '=', TRUE];
+      if ($includeOnWaitlist) {
+        $clauses[] = ['participant_status_type.name', '=', 'On waitlist'];
+      }
+      $query->addClause('OR', $clauses);
+    }
+
+    if ([] !== $excludeStatus) {
+      $query->addWhere('status_id:name', 'NOT IN', $excludeStatus);
+    }
+
+    if ([] !== $filterRoleIds) {
+      $query->addWhere('role_id', 'IN', $filterRoleIds);
+    }
+
+    if (!$includeTest) {
+      $query->addWhere('is_test', '=', FALSE);
+    }
+
+    $result = $query->execute();
+    return $result->getArrayCopy();
+  }
+
+  /**
+   * Checks whether a participant for a given event and contact exists.
+   * Can be used during validation of new event registrations to check for duplicates.
+   *
+   * @param int $contactId
+   *    The contact ID of participants to find.
+   * @param int $eventId
+   *    The event ID of participants to find.
+   * @param bool $onlyCounted
+   *    Whether to only consider registrations with a status with "is_counted".
+   * @param bool $includeOnWaitlist
+   *    Whether to consider registrations with status "On waitlist" when restricing to "is_counted".
+   * @param array $excludeStatus
+   *    A list of registration status to not consider (e.g. for ignoring cancelled registrations).
+   * @param array $filterRoleIds
+   *    A list of participant role IDs to filter for. Registrations with other roles will not be considered.
+   * @param bool $includeTest
+   *    Whether to include test participants.
+   *
+   * @return bool
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   *
+   * @internal
+   */
+  public static function exists(
+    int $contactId,
+    int $eventId,
+    bool $onlyCounted = TRUE,
+    bool $includeOnWaitlist = TRUE,
+    array $excludeStatus = ['Cancelled'],
+    array $filterRoleIds = [],
+    bool $includeTest = FALSE
+  ) {
+    return count(
+        self::getExistingParticipants(
+          $contactId,
+          $eventId,
+          $onlyCounted,
+          $includeOnWaitlist,
+          $excludeStatus,
+          $filterRoleIds,
+          $includeTest
+        )
+      ) > 0;
+  }
+
+  /**
+   * @param int $contactId
+   * @param int $eventId
+   * @param string $context
+   *   Either "admin" or "public" depending on the context of the validation/form.
+   * @param bool $isAdditional
+   *   Whether to validate for an additional participant.
+   *
+   * @return array<int|string,string>
+   *   A list of validation errors, possibly keyed by attribute name the error corresponds to.
+   * @throws \CRM_Core_Exception
+   *
+   * @internal
+   */
+  public static function validateExistingRegistration(
+    int $contactId,
+    int $eventId,
+    string $context = 'public',
+    bool $isAdditional = FALSE
+  ): array {
+    $event = \Civi\Api4\Event::get(FALSE)
+      ->addSelect(
+        'default_role_id',
+        'allow_same_participant_emails'
+      )
+      ->addWhere('id')
+      ->execute()
+      ->single();
+    $excludeStatus = 'admin' === $context ? ['Cancelled'] : [];
+    $participantRoleIds = 'public' === $context ? [$participantRoleId ?? $event['default_role_id']] : [];
+    $existingParticipants = CRM_Event_BAO_Participant::getExistingParticipants(
+      $contactID,
+      $eventId,
+      TRUE,
+      TRUE,
+      $excludeStatus,
+      $participantRoleIds
+    );
+    $errors = [];
+
+    if (count($existingParticipants) > 0) {
+      if ($isAdditional) {
+        $errors[] = ts("It looks like this participant is already registered for this event. If you want to change your registration, or you feel that you've received this message in error, please contact the site administrator.");
+      }
+      elseif (!(bool) $event['allow_same_participant_emails']) {
+        if ('admin' === $context) {
+          $errors['event_id'] = ts('This contact has already been assigned to this event.');
+        }
+        else {
+          if ('On waitlist' === reset($existingParticipants)['status_id:name']) {
+            $errors[] = ts("It looks like you are already waitlisted for this event. If you want to change your registration, or you feel that you've received this message in error, please contact the site administrator.");
+          }
+          else {
+            $errors[] = ts("It looks like you are already registered for this event. If you want to change your registration, or you feel that you've received this message in error, please contact the site administrator.");
+          }
+        }
+      }
+    }
+
+    return $errors;
+  }
+
+  /**
+   * @param array $values
+   *   A list of values to validate, keyed by participant properties/field names.
+   * @param string $context
+   *   The context for which to create error messages. Either "public" or "admin".
+   *
+   * @return array<int|string,string>
+   *   A list of validation error messages, possibly keyed by affected participant properties/field names.
+   *
+   * @internal
+   */
+  public static function validateAvailableSpaces(
+    array $values,
+    string $context = 'public'
+  ): array {
+    $errors = [];
+    $eventId = $values['event_id'];
+    $event = \Civi\Api4\Event::get(FALSE)
+      ->addSelect('has_waitlist', 'max_participants')
+      ->addWhere('id', '=', $eventId)
+      ->execute()
+      ->single();
+
+    $availableSpaces = CRM_Event_BAO_Participant::eventFull(
+      $eventId,
+      TRUE,
+      $event['has_waitlist']
+    );
+    $spacesAvailable = is_numeric($availableSpaces) ? (int) $availableSpaces : 0;
+
+    //check for availability of registrations.
+    if ($event['max_participants'] !== NULL
+      && !empty($values['additional_participants'])
+      && empty($values['bypass_payment']) &&
+      ((int) $values['additional_participants']) >= $spacesAvailable
+    ) {
+      $errors['additional_participants'] = ts(
+        'There is only enough space left on this event for %1 participant(s).',
+        [1 => $spacesAvailable]
+      );
+    }
+
+    return $errors;
+  }
+
+  /**
+   * @param int $eventId
+   *
+   * @return array<int|string,string>
+   *   A list of validation error messages, possibly keyed by affected participant properties/field names.
+   * @throws \CRM_Core_Exception
+   *
+   * @internal
+   */
+  public static function validateEvent(int $eventId): array {
+    $event = \Civi\Api4\Event::get(FALSE)
+      ->addSelect('has_waitlist', 'max_participants')
+      ->addWhere('id', '=', $eventId)
+      ->execute()
+      ->single();
+    $errors = [];
+
+    // is the event active (enabled)?
+    if (!$event['is_active']) {
+      // form is inactive, die a fatal death
+      $errors[] = ts('The event you requested is currently unavailable (contact the site administrator for assistance).');
+    }
+
+    // is online registration is enabled?
+    if (!$event['is_online_registration']) {
+      $errors[] = ts('Online registration is not currently available for this event (contact the site administrator for assistance).');
+    }
+
+    // is this an event template ?
+    if (!empty($event['is_template'])) {
+      $errors[] = ts('Event templates are not meant to be registered.');
+    }
+
+    $now = date('YmdHis');
+    $startDate = CRM_Utils_Date::processDate($event['registration_start_date'] ?? NULL);
+
+    if ($startDate && ($startDate >= $now)) {
+      $errors[] = ts(
+        'Registration for this event begins on %1',
+        [1 => CRM_Utils_Date::customFormat($event['registration_start_date'] ?? NULL)]
+      );
+    }
+
+    $regEndDate = CRM_Utils_Date::processDate($event['registration_end_date'] ?? NULL);
+    $eventEndDate = CRM_Utils_Date::processDate($event['event_end_date'] ?? NULL);
+    if (($regEndDate && ($regEndDate < $now)) || (empty($regEndDate) && !empty($eventEndDate) && ($eventEndDate < $now))) {
+      $endDate = CRM_Utils_Date::customFormat($event['registration_end_date'] ?? NULL);
+      if (empty($regEndDate)) {
+        $endDate = CRM_Utils_Date::customFormat($event['event_end_date'] ?? NULL);
+      }
+      $errors[] = ts('Registration for this event ended on %1', [1 => $endDate]);
+    }
+
+    return $errors;
+  }
+
+  /**
+   * @param array $values
+   *   A list of values to validate, keyed by participant properties/field names.
+   * @param string $context
+   *   The context for which to create error messages. Either "public" or "admin".
+   * @param bool $isAdditional
+   *   Whether to validate an additional participant.
+   *
+   * @return array<int|string,string>
+   *   A list of validation error messages, possibly keyed by affected participant properties/field names.
+   *
+   * @internal
+   */
+  public static function validateEventRegistration(
+    array $values,
+    string $context = 'public',
+    bool $isAdditional = FALSE
+  ): array {
+    if (!isset($values['event_id'])) {
+      throw new CRM_Core_Exception('Event ID is required for validating event registrations.');
+    }
+    if (!isset($values['contact_id'])) {
+      // TODO: Support validating without a contact?
+      throw new CRM_Core_Exception('Contact ID is required for validating event registrations.');
+    }
+
+    $errors = [];
+
+    // Validate event (status, registration period, etc.).
+    $errors += self::validateEvent($values['event_id']);
+
+    // Validate existing participants for the registering contact.
+    $errors += self::validateExistingRegistration($values['contact_id'], $values['event_id'], $context, $isAdditional);
+
+    // Validate available spaces.
+    $errors += self::validateAvailableSpaces($values, $context);
+
+    // TODO: Validate against available price options.
+
+    return $errors;
   }
 
   /**
