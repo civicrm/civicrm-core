@@ -1,3 +1,12 @@
+0.10.1
+ - ADDED - accordion summary background colour changes if it contains a required input error message (to help find input errors on forms with multiple accordions, such as add new contact)
+ - FIXES - overflow scroll on import screens due to margin resets on import screens
+ - FIXES - padding on Mailing screen wizard (walbrook)
+ - FIXES - next/previous button order on dashboard (https://lab.civicrm.org/extensions/riverlea/-/issues/48)
+ - FIXES - inlines contact dashboard editor button, handles hover state better
+ - FIXES - icon bg colour for Hackney.
+ - CHANGES - buttons from flex to inline-flex with related cleanups
+
 0.10.0
  - version jump to reflect functional maturity, shift to focus on integrating two new streams, and preparation for stable 1.0.0 release.
  - REMOVED - contact dashboard page padding distinct from other pages

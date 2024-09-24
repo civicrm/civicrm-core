@@ -159,7 +159,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-btn-success-text: var(--crm-c-text);
 --crm-btn-alert-bg: var(--crm-c-primary);
 --crm-btn-alert-text: var(--crm-c-text);
---crm-btn-icon-bg: var(--crm-c-primary);
+--crm-btn-icon-bg: var(--crm-c-background2);
 --crm-btn-icon-border: var(--crm-btn-border);
 
 /* TABLES */

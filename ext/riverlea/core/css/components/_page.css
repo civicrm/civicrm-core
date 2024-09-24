@@ -37,9 +37,8 @@
 .crm-container .crm-pledge-form-block details,
 .crm-container .crm-payment-form-block details,
 .crm-container .crm-import-preview-form-block details,
-.crm-form-block.crm-import-datasource-form-block h3,
 .crm-container .crm-event-manage-eventinfo-form-block details,
-.crm-container .crm-wizard-step details,
+.crm-container .crm-wizard-step,
 .crm-container .CRM_Admin_Form_MessageTemplates details,
 .crm-container .crm-case-caseview-form-block details,
 .crm-container .crm-case-activity-form-block details {

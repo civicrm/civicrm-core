@@ -8,7 +8,7 @@
 .crm-container .crm-hover-button:has(.crm-i):focus {
     background: transparent;
     color: var(--crm-c-link) !important;
-    padding: var(--crm-padding-small);
+    padding: var(--crm-btn-small-padding);
 }
 .crm-container .select2-container[class*=" fa-"]::before,
 .crm-container .messages.crm-empty-table > img /* removes inform.gif icon */ {

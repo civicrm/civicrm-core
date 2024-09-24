@@ -114,6 +114,9 @@ table.advmultiselect {
 .crm-container ul.crm-wizard-nav {
     margin-bottom: var(--crm-r);
 }
+.crm-wizard-step .ui-tabs {
+    margin-bottom: var(--crm-m);
+}
 .crm-container ul.wizard-bar li,
 .crm_wizard__title ul > li {
     margin: -2px;

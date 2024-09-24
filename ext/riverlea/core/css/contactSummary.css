@@ -28,6 +28,7 @@
     display: block;
     background-size: cover;
     border-radius: var(--crm-dash-image-radius);
+    box-shadow: var(--crm-bottom-shadow);
 }
 .crm-container div.contact_panel {
     display: block;
@@ -117,9 +118,11 @@
 div.crm-inline-edit-form div.crm-clear {
     padding: var(--crm-m) 0 0;
 }
+#contactname-block,
 #contactname-block .crm-inline-edit,
 .crm-inline-edit-form div.crm-summary-row {
     border: 0 solid transparent;
+    width: 100%;
 }
 .crm-inline-edit-form div.crm-summary-row div.crm-label,
 .crm-inline-edit-form div.crm-summary-row .label {

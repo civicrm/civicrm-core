@@ -762,20 +762,27 @@ details + .crm-content-block:has(.dataTables_wrapper) {
 
 /* Contact Dashboard Editor */
 
-.crm-contact-summary-edit-layout {
-	grid-column: 1 / span 5;
-	text-align: right;
+.crm-actions-ribbon ul#actions:has(.crm-contact-summary-edit-layout) {
+	grid-template-columns: min-content min-content min-content auto min-content min-content;
 }
 .crm-container .crm-contact-summary-edit-layout a.crm-hover-button {
 	background: var(--crm-c-primary);
 	color: var(--crm-c-primary-text) !important;
 	padding: 0 var(--crm-btn-padding-inline);
 	line-height: var(--crm-btn-height);
+	border: var(--crm-btn-border);
 }
-.crm-contact-summary-edit-layout a.crm-hover-button:hover {
+.crm-container .crm-contact-summary-edit-layout a.crm-hover-button:hover,
+.crm-container .crm-contact-summary-edit-layout a.crm-hover-button:focus {
 	background: var(--crm-c-primary-hover);
 	color: var(--crm-c-primary-text) !important;
-	padding: var(--crm-btn-padding-block) var(--crm-btn-padding-inline);
+	padding: 0 var(--crm-btn-padding-inline);
+}
+.crm-previous-action {
+	order: 3;
+}
+.crm-next-action {
+	order: 4;
 }
 #contactLayoutEditor .panel-heading .btn {
 	padding: var(--crm-btn-padding-block) var(--crm-btn-padding-inline);

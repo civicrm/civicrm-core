@@ -93,6 +93,10 @@
 	border: 0;
 	padding: 0;
 }
+.crm-container details:has(input.crm-inline-error) summary,
+.crm-container details:has(input.crm-inline-error) summary.active {
+	background-color: var(--crm-alert-background-danger);
+}
 /* Contact dashboard */
 
 #contact-summary details,

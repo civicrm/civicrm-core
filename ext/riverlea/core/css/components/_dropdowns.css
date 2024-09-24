@@ -67,7 +67,7 @@
 .crm-participant-list-inner ul a,
 #crm-create-new-list ul a {
     color: var(--crm-c-secondary-text);
-    padding-inline: var(--crm-s);
+    padding: var(--crm-xs2) var(--crm-s);
     border-radius: var(--crm-roundness);
     display: unset;
 }
