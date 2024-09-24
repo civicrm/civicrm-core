@@ -274,7 +274,6 @@ div.crm-inline-edit-form div.crm-clear {
     background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-alert);
 }
 
-
 /* Responsive layout changes - Possibly Deprecated
 
 .crm-container .contact_basic_information-section.narrowform table.form-layout-compressed,
@@ -376,9 +375,6 @@ div.crm-inline-edit-form div.crm-clear {
 }
 #contact-summary div.crm-clear {
     padding: var(--crm-dash-block-padding);
-}
-.page-civicrm-contact #crm-container {
-	padding: var(--crm-m1) var(--crm-r);
 }
 #mainTabContainer .crm-summary-block .crm-container-snippet table {
 	box-shadow: none;

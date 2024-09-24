@@ -429,6 +429,36 @@ p.crm-upgrade-large-text:first-of-type {
     grid-row: 1 / span 3;
 }
 
+/* Upgrade extensions runner */
+
+#crm-queue-runner-progress {
+    width: 100%;
+    background: var(--crm-c-background3);
+}
+#crm-queue-runner-desc {
+    background: var(--crm-c-background2);
+    padding: var(--crm-padding-reg);
+    margin-block: var(--crm-r);
+    border-radius: var(--crm-roundness);
+    display: inline-flex;
+    flex-direction: row-reverse;
+    justify-content: space-between;
+    align-items: center;
+}
+#crm-queue-runner-buttonset {
+    position: inherit !important;
+}
+#crm-queue-runner-buttonset button {
+    background: transparent;
+    height: inherit;
+    padding: 0 0 0 var(--crm-r);
+    color: var(--crm-c-text)
+}
+#crm-queue-runner-buttonset button:hover,
+#crm-queue-runner-buttonset button:focus {
+    color: var(--crm-c-text)
+}
+
 /* Community message */
 
 div.civicrm-community-messages {

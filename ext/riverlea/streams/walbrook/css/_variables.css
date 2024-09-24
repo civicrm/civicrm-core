@@ -140,7 +140,7 @@ color-scheme: light dark;
 /* BUTTONS */
 --crm-btn-box-shadow: none;
 --crm-btn-border: 0 solid transparent;
---crm-btn-txt-transform: uppercase;
+--crm-btn-txt-transform: none;
 --crm-btn-radius: 2px;
 --crm-btn-padding-block: var(--crm-m); /* padding for top and bottom, one value */
 --crm-btn-padding-inline: var(--crm-r2); /* padding for left and right, one value */

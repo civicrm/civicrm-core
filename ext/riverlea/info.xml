@@ -14,7 +14,7 @@
   </urls>
   <releaseDate>2024-09-16</releaseDate>
   <version>1.0.0-alpha</version>
-  <develStage>stable</develStage>
+  <develStage>Work in Progress</develStage>
   <compatibility>
     <ver>5.75</ver>
   </compatibility>

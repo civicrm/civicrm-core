@@ -12,11 +12,11 @@ The extension is licensed under [AGPL-3.0](LICENSE.txt).
 - 0.6 - **Adds third stream** Hackney Brook (Finsbury Park).
 - 0.5 - **Extensive UI and accessibility fixes** following testing in/around CiviCamp Hamburg.
 - 0.4 - **CSS files restructure** core and stream directories, version numbering of variables files with new variables.
-- 0.3 - **Two streams, 6 CMS setups tested:** adds Minetta and Walbrook streams. Backdrop, D7 (Seven), D9 (Claro + Seven), Joomla 4, Standalone & WordPress. 
+- 0.3 - **Two streams, 6 CMS setups tested:** adds Minetta and Walbrook streams. Backdrop, D7 (Seven), D9 (Claro + Seven), Joomla 4, Standalone & WordPress.
 - 0.2 - **Establishes structure**, adds Bootstrap3, components - accordion.
 - 0.1 - **Proof-of-concept**, basic variables.
 
-## Installation 
+## Installation
 
 ### With (CLI, Zip)
 
@@ -58,7 +58,7 @@ Contains CSS files in:
   - core/css/_cms.css – resets and fixes specific to different CMSs
   - core/css/_fixes.css - CSS that’s necessary *for now* but one day could go.
   - core/css/_core.css - links to the UI components in the components directory:
-- in the **components** directory are reusable anywhere UI elements, such as `_accordions` or `_tables.css`; 
+- in the **components** directory are reusable anywhere UI elements, such as `_accordions` or `_tables.css`;
 - Also in the **core/css** directory are over-rides for core CiviCRM CSS files. such as `admin.css` or `dashboard.css` and in **core** are CSS overwrites for css used in Civi extensions, such as FormBuilder and SearchKit.
 
 ## Roadmap
@@ -92,7 +92,7 @@ E.g. to add a stream called "Vimur", you would name the directory 'vimur', and a
     'title' => 'Riverlea: Minetta (~Greenwich)',
     'prefix' => 'streams/minetta/',
   );
-  … 
+  …
  }
 ```
 

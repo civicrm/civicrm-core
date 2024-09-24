@@ -766,10 +766,10 @@ details + .crm-content-block:has(.dataTables_wrapper) {
 	grid-column: 1 / span 5;
 	text-align: right;
 }
-.crm-contact-summary-edit-layout a.crm-hover-button {
+.crm-container .crm-contact-summary-edit-layout a.crm-hover-button {
 	background: var(--crm-c-primary);
 	color: var(--crm-c-primary-text) !important;
-	padding: var(--crm-btn-padding-block) var(--crm-btn-padding-inline);
+	padding: 0 var(--crm-btn-padding-inline);
 	line-height: var(--crm-btn-height);
 }
 .crm-contact-summary-edit-layout a.crm-hover-button:hover {

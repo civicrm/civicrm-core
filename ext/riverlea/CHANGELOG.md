@@ -1,3 +1,10 @@
+0.10.0
+ - version jump to reflect functional maturity, shift to focus on integrating two new streams, and preparation for stable 1.0.0 release.
+ - REMOVED - contact dashboard page padding distinct from other pages
+ - CHANGED - Walbrook buttons text no longer uppercase.
+ - ADDED - styling for the extensions dbse upgrade 'queue runner' screen
+ - FIXES - missing action button styling for links on contact dashboard header (e.g. contact dashboard editor)
+
 0.9.56
  - CHANGED - reworking of dashlets, modals and tabs to support more style variations
  - NEW CSS VARIABLES (11)
