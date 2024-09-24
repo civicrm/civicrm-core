@@ -59,17 +59,26 @@ class BasicSaveAction extends AbstractSaveAction {
       $this->matchExisting($record);
     }
     $this->validateValues();
-    foreach ($this->records as $item) {
-      $result[] = $this->writeRecord($item);
-    }
+    $savedRecords = $this->updateRecords($this->records);
     if ($this->reload) {
       /** @var BasicGetAction $get */
       $get = \Civi\API\Request::create($this->getEntityName(), 'get', ['version' => 4]);
       $get
         ->setCheckPermissions($this->getCheckPermissions())
-        ->addWhere($idField, 'IN', (array) $result->column($idField));
+        ->addWhere($idField, 'IN', array_column($savedRecords, $idField));
       $result->exchangeArray((array) $get->execute());
     }
+    else {
+      $result->exchangeArray(array_values($savedRecords));
+    }
+  }
+
+  /**
+   * @param array $items
+   * @return array
+   */
+  protected function updateRecords(array $items): array {
+    return array_map([$this, 'writeRecord'], $items);
   }
 
   /**
