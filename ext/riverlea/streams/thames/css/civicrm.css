@@ -15,6 +15,7 @@ body {
 .crm-container summary {
   color: var(--crm-c-blue-darker); /* novar */
   cursor: pointer; /* show it's clickable */
+  position: relative; /* so our animated triangle doesn't go walkies */
 }
 .crm-container summary:hover {
   background-color: #b8daf4; /* novar */
@@ -89,23 +90,23 @@ body {
 /* DIALOGS */
 
 /* I feel title, resize, close is a better order for buttons bs modal dialogs */
-.ui-dialog-title { flex: 1 1 auto; order: 1; }
-.crm-dialog-titlebar-resize { order: 2; }
-.crm-dialog-titlebar-print { display: none; }
-.modal-header .close { order: 3; }
-.crm-container  .modal-header .ui-icon[class*=" fa-"] { font-size: 1rem; }
+/* .ui-dialog-title { flex: 1 1 auto; order: 1; } */
+/* .crm-dialog-titlebar-resize { order: 2; } */
+.crm-container.ui-dialog .ui-dialog-titlebar .ui-button.crm-dialog-titlebar-print { display: none; }
+/* .modal-header .close { order: 3; } */
+/* .crm-container  .modal-header .ui-icon[class*=" fa-"] { font-size: 1rem; } */
 /* I don't know what problem this solved, but it creates an undesired left padding */
-#bootstrap-theme .modal-header::before, #bootstrap-theme .modal-header::after {
-  display: none !important;
-}
-
-#bootstrap-theme .modal-header {
-  border:none;
-}
-
-.crm-container button.close {
-  color: var(--crm-c-blue-darker) !important;
-}
+/* #bootstrap-theme .modal-header::before, #bootstrap-theme .modal-header::after { */
+/*   display: none !important; */
+/* } */
+/**/
+/* #bootstrap-theme .modal-header { */
+/*   border:none; */
+/* } */
+/**/
+/* .crm-container button.close { */
+/*   color: var(--crm-c-blue-darker) !important; */
+/* } */
 
 /* DROPDOWNS */
 .crm-container .btn-group .dropdown-menu, .crm-container .btn.dropdown-toggle + .dropdown-menu {
@@ -138,3 +139,41 @@ body {
 /* OTHER */
 .crm-container #alpha-filter ul { margin: 0; display: flex; justify-content: space-between; gap: var(--crm-m); color: #0002; padding: 0 1rem; }
 .crm-container .description:not(#help), .crm-container td.description { font-size: 0.875rem; }
+
+/* Get rid of the ugly black overlay during loading */
+@keyframes aahblockoverlay {
+  0% { background-color: var(--crm-c-blue-overlay); }
+  50% { background-color: var(--crm-c-page-background); }
+  100% { background-color: var(--crm-c-blue-overlay); }
+}
+.crm-container .blockUI.blockOverlay {
+  animation: aahblockoverlay 10s infinite;
+}
+
+/* CONTACT SUMMARY */
+/* put border radius around the complete block of tabs(on left) and content (right) so it looks like one unit */
+.crm-contact-page #mainTabContainer .crm-contact-tabs-list {
+  border-radius: var(--crm-dash-roundness) 0 0 var(--crm-dash-roundness);
+  overflow: hidden;
+}
+#mainTabContainer .crm-contact-tabs-list ~ .ui-tabs-panel {
+  border-radius: 0 var(--crm-dash-roundness) var(--crm-dash-roundness) 0;
+}
+
+/* make count badges more readable */
+.crm-container .ui-tabs ul.ui-tabs-nav a em, .crm-container .nav-tabs a .badge {
+	padding: 0 0.2rem;
+}
+
+
+/* INLINE EDIT */
+.crm-editable.crm-editable-editing {
+  background: white;
+  padding: 0.5em;
+  border-radius: 0.25em;
+  border:solid 1px var(--crm-c-blue);
+}
+.crm-container .crm-editable-form [type="submit"] {
+  color: var(--crm-c-green-dark) !important;
+}
+
