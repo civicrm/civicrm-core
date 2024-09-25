@@ -73,6 +73,7 @@ return [
       'input_type' => 'EntityRef',
       'description' => ts('FK to civicrm_contact, who uploaded this file'),
       'add' => '5.3',
+      'default_callback' => ['CRM_Core_Session', 'getLoggedInContactID'],
       'input_attrs' => [
         'label' => ts('Created By'),
       ],
