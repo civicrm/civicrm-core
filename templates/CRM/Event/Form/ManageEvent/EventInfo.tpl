@@ -11,6 +11,12 @@
 
 <div class="crm-block crm-form-block crm-event-manage-eventinfo-form-block">
   <table class="form-layout-compressed">
+    {if !empty($form.template_id)}
+      <tr class="crm-event-manage-eventinfo-form-block-template_id">
+        <td class="label">{$form.template_id.label} {help id="id-select-template" isTemplate=$isTemplate}</td>
+        <td>{$form.template_id.html}</td>
+      </tr>
+    {/if}
     <tr class="crm-event-manage-eventinfo-form-block-title">
       <td class="label">{$form.title.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='title' id=$eventID}{/if}</td>
       <td>{$form.title.html}</td>
@@ -29,12 +35,6 @@
       <tr class="crm-event-manage-eventinfo-form-block-end_date">
         <td class="label">{$form.end_date.label}</td>
         <td>{$form.end_date.html}</td>
-      </tr>
-    {/if}
-    {if !empty($form.template_id)}
-      <tr class="crm-event-manage-eventinfo-form-block-template_id">
-        <td class="label">{$form.template_id.label} {help id="id-select-template" isTemplate=$isTemplate}</td>
-        <td>{$form.template_id.html}</td>
       </tr>
     {/if}
     <tr class="crm-event-manage-eventinfo-form-block-event_type_id">
