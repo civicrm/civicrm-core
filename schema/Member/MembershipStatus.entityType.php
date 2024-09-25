@@ -60,7 +60,7 @@ return [
         'label' => ts('Start Event'),
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::eventDate',
+        'callback' => ['CRM_Core_SelectValues', 'eventDate'],
       ],
     ],
     'start_event_adjust_unit' => [
@@ -73,7 +73,7 @@ return [
         'label' => ts('Start Event Adjust Unit'),
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::unitList',
+        'callback' => ['CRM_Core_SelectValues', 'unitList'],
       ],
     ],
     'start_event_adjust_interval' => [
@@ -96,7 +96,7 @@ return [
         'label' => ts('End Event'),
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::eventDate',
+        'callback' => ['CRM_Core_SelectValues', 'eventDate'],
       ],
     ],
     'end_event_adjust_unit' => [
@@ -109,7 +109,7 @@ return [
         'label' => ts('End Event Adjust Unit'),
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::unitList',
+        'callback' => ['CRM_Core_SelectValues', 'unitList'],
       ],
     ],
     'end_event_adjust_interval' => [

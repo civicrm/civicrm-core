@@ -143,7 +143,7 @@ return [
       'description' => ts('SQL WHERE operator for search-builder mapping fields (search criteria).'),
       'add' => '1.5',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::getSearchBuilderOperators',
+        'callback' => ['CRM_Core_SelectValues', 'getSearchBuilderOperators'],
       ],
     ],
     'value' => [

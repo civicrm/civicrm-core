@@ -101,7 +101,7 @@ return [
         'multiple' => '1',
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Report_BAO_ReportInstance::getGrouproleOptions',
+        'callback' => ['CRM_Report_BAO_ReportInstance', 'getGrouproleOptions'],
       ],
     ],
     'form_values' => [

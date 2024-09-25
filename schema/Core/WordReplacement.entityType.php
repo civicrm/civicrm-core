@@ -66,7 +66,7 @@ return [
       'add' => '4.4',
       'default' => 'wildcardMatch',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::getWordReplacementMatchType',
+        'callback' => ['CRM_Core_SelectValues', 'getWordReplacementMatchType'],
       ],
     ],
     'domain_id' => [

@@ -76,7 +76,7 @@ return [
       'description' => ts('status of contact relative to membership in group'),
       'add' => '1.1',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::groupContactStatus',
+        'callback' => ['CRM_Core_SelectValues', 'groupContactStatus'],
       ],
     ],
     'location_id' => [

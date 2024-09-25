@@ -946,7 +946,7 @@ return [
         'label' => ts('Preferred Mail Format'),
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::pmf',
+        'callback' => ['CRM_Core_SelectValues', 'pmf'],
       ],
     ],
   ],

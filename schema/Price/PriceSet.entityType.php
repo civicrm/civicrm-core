@@ -133,7 +133,7 @@ return [
       'add' => '3.1',
       'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND,
       'pseudoconstant' => [
-        'callback' => 'CRM_Price_BAO_PriceSet::getExtendsOptions',
+        'callback' => ['CRM_Price_BAO_PriceSet', 'getExtendsOptions'],
       ],
     ],
     'financial_type_id' => [

@@ -56,7 +56,7 @@ return [
       'description' => ts('the general group of status type this one belongs to'),
       'add' => '3.0',
       'pseudoconstant' => [
-        'callback' => 'CRM_Event_PseudoConstant::participantStatusClassOptions',
+        'callback' => ['CRM_Event_PseudoConstant', 'participantStatusClassOptions'],
       ],
     ],
     'is_reserved' => [

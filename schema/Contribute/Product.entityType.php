@@ -163,7 +163,7 @@ return [
       'add' => '1.4',
       'default' => 'rolling',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::periodType',
+        'callback' => ['CRM_Core_SelectValues', 'periodType'],
       ],
     ],
     'fixed_period_start_day' => [
@@ -181,7 +181,7 @@ return [
       'add' => '1.4',
       'default' => 'year',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::getPremiumUnits',
+        'callback' => ['CRM_Core_SelectValues', 'getPremiumUnits'],
       ],
     ],
     'duration_interval' => [
@@ -199,7 +199,7 @@ return [
       'add' => '1.4',
       'default' => 'month',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::getPremiumUnits',
+        'callback' => ['CRM_Core_SelectValues', 'getPremiumUnits'],
       ],
     ],
     'frequency_interval' => [

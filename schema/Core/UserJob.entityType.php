@@ -110,7 +110,7 @@ return [
         'label' => ts('Job Status'),
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_BAO_UserJob::getStatuses',
+        'callback' => ['CRM_Core_BAO_UserJob', 'getStatuses'],
       ],
     ],
     'job_type' => [
@@ -124,7 +124,7 @@ return [
         'label' => ts('Job Type'),
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_BAO_UserJob::getTypes',
+        'callback' => ['CRM_Core_BAO_UserJob', 'getTypes'],
         'suffixes' => [
           'name',
           'label',

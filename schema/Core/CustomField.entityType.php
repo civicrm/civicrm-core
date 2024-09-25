@@ -96,7 +96,7 @@ return [
         'label' => ts('Data Type'),
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_BAO_CustomField::dataType',
+        'callback' => ['CRM_Core_BAO_CustomField', 'dataType'],
       ],
     ],
     'html_type' => [
@@ -110,7 +110,7 @@ return [
         'label' => ts('Field Input Type'),
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::customHtmlType',
+        'callback' => ['CRM_Core_SelectValues', 'customHtmlType'],
       ],
     ],
     'default_value' => [
@@ -233,7 +233,7 @@ return [
       'description' => ts('date format for custom date'),
       'add' => '3.1',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::getDatePluginInputFormats',
+        'callback' => ['CRM_Core_SelectValues', 'getDatePluginInputFormats'],
       ],
     ],
     'time_format' => [
@@ -243,7 +243,7 @@ return [
       'description' => ts('time format for custom date'),
       'add' => '3.1',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::getTimeFormats',
+        'callback' => ['CRM_Core_SelectValues', 'getTimeFormats'],
       ],
     ],
     'note_columns' => [
@@ -296,7 +296,7 @@ return [
       'add' => '5.27',
       'default' => 0,
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::fieldSerialization',
+        'callback' => ['CRM_Core_SelectValues', 'fieldSerialization'],
       ],
     ],
     'filter' => [
@@ -332,7 +332,7 @@ return [
       'add' => '5.71',
       'default' => 'set_null',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_BAO_CustomField::getFkEntityOnDeleteOptions',
+        'callback' => ['CRM_Core_BAO_CustomField', 'getFkEntityOnDeleteOptions'],
       ],
     ],
   ],

@@ -50,7 +50,7 @@ return [
       'description' => ts('Type of Group.'),
       'default' => NULL,
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::getCampaignGroupTypes',
+        'callback' => ['CRM_Core_SelectValues', 'getCampaignGroupTypes'],
       ],
     ],
     'entity_table' => [

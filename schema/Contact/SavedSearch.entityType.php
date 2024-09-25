@@ -102,7 +102,7 @@ return [
         'label' => ts('For'),
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Contact_BAO_SavedSearch::getApiEntityOptions',
+        'callback' => ['CRM_Contact_BAO_SavedSearch', 'getApiEntityOptions'],
       ],
     ],
     'api_params' => [

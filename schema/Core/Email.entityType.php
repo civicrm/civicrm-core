@@ -125,7 +125,7 @@ return [
         'export',
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_PseudoConstant::emailOnHoldOptions',
+        'callback' => ['CRM_Core_PseudoConstant', 'emailOnHoldOptions'],
       ],
     ],
     'is_bulkmail' => [
