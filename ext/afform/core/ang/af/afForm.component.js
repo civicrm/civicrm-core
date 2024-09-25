@@ -95,7 +95,11 @@
               disableForm(error.error_message);
             });
         }
-        // Clear existing contact selection
+        // Clear existing join selection
+        else if (joinEntity) {
+          data[selectedEntity][selectedIndex].joins[joinEntity][joinIndex] = {};
+        }
+        // Clear existing entity selection
         else if (selectedEntity) {
           // Delete object keys without breaking object references
           Object.keys(data[selectedEntity][selectedIndex].fields).forEach(key => delete data[selectedEntity][selectedIndex].fields[key]);
