@@ -34,12 +34,6 @@ class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
       return NULL;
     }
 
-    if (empty($params['id'])) {
-      if (empty($params['created_id'])) {
-        $params['created_id'] = CRM_Core_Session::getLoggedInContactID();
-      }
-    }
-
     /** @var \CRM_Campaign_DAO_Campaign $campaign */
     $campaign = self::writeRecord($params);
 
