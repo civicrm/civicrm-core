@@ -20,7 +20,6 @@ character. And watch out for editors that add spaces/tabs at the end of lines.
 ****************** BE CAREFUL !!!!!!!!!! ***********************
 
 *}
-{assign var='tabchar' value=9|chr}
 {if !empty($accounts)}
 !ACCNT{$tabchar}NAME{$tabchar}REFNUM{$tabchar}TIMESTAMP{$tabchar}ACCNTTYPE{$tabchar}OBAMOUNT{$tabchar}DESC{$tabchar}ACCNUM
 {* I don't think we need these fields - SCD  BANKNUM  EXTRA  HIDDEN  DELCOUNT  USEID  WKPAPERREF
