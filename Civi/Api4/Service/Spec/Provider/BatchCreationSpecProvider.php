@@ -25,9 +25,7 @@ class BatchCreationSpecProvider extends \Civi\Core\Service\AutoService implement
    */
   public function modifySpec(RequestSpec $spec) {
     $spec->getFieldByName('created_id')->setDefaultValue('user_contact_id');
-    $spec->getFieldByName('created_date')->setDefaultValue('now');
     $spec->getFieldByName('modified_id')->setDefaultValue('user_contact_id');
-    $spec->getFieldByName('modified_date')->setDefaultValue('now');
   }
 
   /**

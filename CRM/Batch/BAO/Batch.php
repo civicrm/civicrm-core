@@ -629,7 +629,6 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch implements \Civi\Core\Hook
     $batchStatus = CRM_Batch_DAO_Batch::buildOptions('status_id');
     $params['status_id'] = CRM_Utils_Array::key($status, $batchStatus);
     $session = CRM_Core_Session::singleton();
-    $params['modified_date'] = date('YmdHis');
     $params['modified_id'] = $session->get('userID');
     foreach ($batchIds as $id) {
       $params['id'] = $id;
