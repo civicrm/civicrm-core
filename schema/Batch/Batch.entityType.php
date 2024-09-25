@@ -64,6 +64,7 @@ return [
       'input_type' => 'EntityRef',
       'description' => ts('FK to Contact ID'),
       'add' => '3.3',
+      'default_callback' => ['CRM_Core_Session', 'getLoggedInContactID'],
       'input_attrs' => [
         'label' => ts('Created By'),
       ],
@@ -92,6 +93,7 @@ return [
       'input_type' => 'EntityRef',
       'description' => ts('FK to Contact ID'),
       'add' => '3.3',
+      'default_callback' => ['CRM_Core_Session', 'getLoggedInContactID'],
       'input_attrs' => [
         'label' => ts('Modified By'),
       ],

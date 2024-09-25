@@ -37,9 +37,6 @@ function civicrm_api3_batch_create($params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_batch_create_spec(&$params) {
-  $params['created_id']['api.default'] = 'user_contact_id';
-  $params['modified_id']['api.default'] = 'user_contact_id';
-  $params['status_id']['api.required'] = 1;
   $params['title']['api.required'] = 1;
   $params['status_id']['api.required'] = 1;
 }
