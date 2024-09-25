@@ -1,14 +1,13 @@
-/*
-    Name: Empty stream;
-    Description: duplicate this to create a new stream;
-    Riverlea version: 0.9.55;
-*/
+/***************************
+   CORE VARIABLES
+   override in each stream
+****************************/
 
 :root {
 
---crm-version: 'Empty, v' var(--crm-release);
+--crm-version: 'v' var(--crm-release);
 
-/* Fonts *
+/* Fonts */
 --crm-system-fonts:;
 --crm-font:;
 --crm-font-bold:;
@@ -17,10 +16,10 @@
 --crm-italic-style: italic;
 --crm-font-bold-italic:;
 
-/* Colour scheme *
-color-scheme: light dark;
+/* Colour scheme */
+color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Safari)
 
-/* Colour names *
+/* Colour names */
 --crm-c-darkest: #0a0a0a;
 --crm-c-gray-900: #2f2f2e;
 --crm-c-gray-800: #3e3e3e;
@@ -53,21 +52,21 @@ color-scheme: light dark;
 --crm-c-teal: #63c4b9;
 --crm-c-dark-teal: #3e8079;
 
-/* Practical colours *
+/* Practical colours */
 --crm-c-text: #464354;
 --crm-c-light-text: #fff;
 --crm-c-dark-text: var(--crm-c-text);
 --crm-c-link: var(--crm-c-blue-dark);
 --crm-c-link-hover: var(--crm-c-blue-darker);
 --crm-c-divider: 1px solid var(--crm-c-gray-300);
---crm-c-page-background: #fff; /* background to page body *
---crm-c-background: #f4f4ed; /* background to page header, often form block & dialog bg *
---crm-c-background2: var(--crm-c-gray-050); /* 2-5 = progressively darker backgrounds *
+--crm-c-page-background: #fff; /* background to page body */
+--crm-c-background: #f4f4ed; /* background to page header, often form block & dialog bg */
+--crm-c-background2: var(--crm-c-gray-050); /* 2-5 = progressively darker backgrounds */
 --crm-c-background3: var(--crm-c-gray-100);
 --crm-c-background4: var(--crm-c-gray-200);
 --crm-c-background5: var(--crm-c-gray-700);
---crm-c-drag-background: var(--crm-c-background3); /* background for drag/drop regions, select2 highlight *
---crm-c-code-background: var(--crm-c-background2); /* background for code regions *
+--crm-c-drag-background: var(--crm-c-background3); /* background for drag/drop regions, select2 highlight */
+--crm-c-code-background: var(--crm-c-background2); /* background for code regions */
 --crm-c-primary: var(--crm-c-gray-700);
 --crm-c-primary-hover: var(--crm-c-gray-800);
 --crm-c-primary-text: var(--crm-c-light-text);
@@ -85,13 +84,13 @@ color-scheme: light dark;
 --crm-c-focus: var(--crm-c-blue-dark);
 --crm-c-inactive: #696969;
 
-/* Shadows *
+/* Shadows */
 --crm-block-shadow:;
 --crm-popup-shadow: 0 3px 18px 0 rgba(48,40,40,.25);
 --crm-bottom-shadow: 0 0 16px 1px rgba(0,0,0,.1);
 --crm-body-inset:;
 
-/* Sizes *
+/* Sizes */
 --crm-roundness: 0.25rem;
 --crm-xs: 0.1rem;
 --crm-xs1: 0.125rem;
@@ -117,10 +116,10 @@ color-scheme: light dark;
 --crm-padding-reg: var(--crm-r);
 --crm-padding-small: var(--crm-s);
 --crm-padding-inset: var(--crm-m);
---crm-page-padding: var(--crm-xl); /* Margin left/right *
+--crm-page-padding: var(--crm-xl); /* Margin left/right */
 --crm-page-width: 100%; /* Default that CMS can overwrite */
 
-/* Type *
+/* Type */
 --crm-font-size: var(--crm-r);
 --crm-small-font-size: var(--crm-m2);
 --crm-type-line-height: 1.5;
@@ -132,16 +131,16 @@ color-scheme: light dark;
 --crm-heading-margin: var(--crm-m) 0;
 --crm-heading-radius: var(--crm-roundness);
 
-/* Mouse events *
+/* Mouse events */
 --crm-hover-clickable: pointer;
 
-/* Buttons *
+/* Buttons */
 --crm-btn-box-shadow: none;
 --crm-btn-border: 0 solid transparent;
 --crm-btn-txt-transform: inherit;
 --crm-btn-radius: 3px;
---crm-btn-padding-block: var(--crm-xs1); /* padding for top and bottom, one value *
---crm-btn-padding-inline: var(--crm-m1); /* padding for left and right, one value *
+--crm-btn-padding-block: var(--crm-xs1); /* padding for top and bottom, one value */
+--crm-btn-padding-inline: var(--crm-m1); /* padding for left and right, one value */
 --crm-btn-small-padding: var(--crm-xs) var(--crm-s);
 --crm-btn-large-padding: var(--crm-m) var(--crm-r);
 --crm-btn-align: center;
@@ -161,7 +160,7 @@ color-scheme: light dark;
 --crm-btn-icon-bg: ;
 --crm-btn-icon-border: ;
 
-/* Tables *
+/* Tables */
 --crm-table-outside-border: 1px solid var(--crm-c-background3);
 --crm-table-background: var(--crm-c-page-background);
 --crm-table-row-border: var(--crm-c-divider);
@@ -177,7 +176,7 @@ color-scheme: light dark;
 --crm-table-odd-row: var(--crm-c-gray-025);
 --crm-table-odd-hover: var(--crm-c-yellow-light);
 --crm-table-sort-col: var(--crm-c-gray-300);
---crm-table-sort-float: left; /* 'left', 'right' or 'none' *
+--crm-table-sort-float: left; /* 'left', 'right' or 'none' */
 --crm-table-sort-active-col: var(--crm-c-link);
 --crm-table-compressed-width: auto;
 --crm-table-nested-padding: var(--crm-r) var(--crm-m);
@@ -185,21 +184,21 @@ color-scheme: light dark;
 --crm-table-nested-border: var(--crm-c-divider);
 --crm-table-inset-bg: var(--crm-c-background3);
 
-/* Panels *
+/* Panels */
 --crm-panel-shadow: var(--crm-block-shadow);
 --crm-panel-background: var(--crm-c-page-background);
 --crm-panel-border: var(--crm-c-divider);
 --crm-panel-head-margin: 0px;
 
-/* Accordions *
---crm-expand-icon: "\f0da"; /* unicode value for FontAwesome icon *
+/* Accordions */
+--crm-expand-icon: "\f0da"; /* unicode value for FontAwesome icon */
 --crm-expand-icon-color: var(--text);
 --crm-expand-icon-spacing: var(--crm-m);
 --crm-expand-transform: rotate(90deg);
 --crm-expand-transition: transform .3s;
 --crm-expand-radius: var(--crm-roundness);
 --crm-expand-gap: var(--crm-xs2) 0 0; /* space between multiple accordions */
-/* .crm-accordion-bold *
+/* .crm-accordion-bold */
 --crm-expand-header-bg: var(--crm-c-secondary);
 --crm-expand-header-bg-active: var(--crm-c-gray-900);
 --crm-expand-header-color: var(--crm-c-light-text);
@@ -213,7 +212,7 @@ color-scheme: light dark;
 --crm-expand-body-bg:;
 --crm-expand-body-box-shadow:;
 --crm-expand-body-padding: var(--crm-padding-reg);
-/* .crm-accordion-light *
+/* .crm-accordion-light */
 --crm-expand2-header-bg:;
 --crm-expand2-header-bg-active: var(--crm-c-background-2);
 --crm-expand2-header-weight: normal;
@@ -227,7 +226,7 @@ color-scheme: light dark;
 --crm-expand2-body-bg:;
 --crm-expand2-body-padding: var(--crm-s);
 
-/* Alerts *
+/* Alerts */
 --crm-alert-padding: var(--crm-m) var(--crm-m2);
 --crm-alert-margin: 0 0 var(--crm-m);
 --crm-alert-border-width: 1px;
@@ -244,7 +243,7 @@ color-scheme: light dark;
 --crm-alert-border-danger: var(--crm-c-red);
 --crm-alert-text-danger: var(--crm-c-red-dark);
 
-/* Form *
+/* Form */
 --crm-form-block-box-shadow: var(--crm-block-shadow);
 --crm-form-block-background: var(--crm-c-background);
 --crm-form-block-padding: var(--crm-m);
@@ -276,7 +275,7 @@ color-scheme: light dark;
 --crm-fieldset-padding: var(--crm-padding-reg) var(--crm-padding-small);
 --crm-checkbox-list-col: var(--crm-c-text);
 
-/* Tabs *
+/* Tabs */
 --crm-tabs-bg: var(--crm-c-background4);
 --crm-tabs-padding: var(--crm-s);
 --crm-tabs-border: var(--crm-dash-border);
@@ -284,7 +283,7 @@ color-scheme: light dark;
 --crm-tab-bg: var(--crm-c-background2);
 --crm-tab-bg-hover: var(--crm-c-page-background);
 --crm-tab-bg-active: var(--crm-c-page-background);
---crm-tab-hang: 0; /* lip to extend tab flush with active region - set to 0 for no lip *
+--crm-tab-hang: 0; /* lip to extend tab flush with active region - set to 0 for no lip */
 --crm-tab-padding: var(--crm-s3) var(--crm-m) var(--crm-s) var(--crm-m);
 --crm-tab-col: var(--crm-c-text);
 --crm-tab-weight: normal;
@@ -297,12 +296,12 @@ color-scheme: light dark;
 --crm-tab-border-active: 0 solid transparent;
 --crm-tabs-2-border: var(--crm-tabs-border);
 
-/* Contact dashboard *
+/* Contact dashboard */
 --crm-dash-border: var(--crm-tab-border);
 --crm-dash-roundness: var(--crm-roundness);
---crm-dash-direction: flex; /* choose 'flex' for tabs at top, or 'grid' for tabs at side *
+--crm-dash-direction: flex; /* choose 'flex' for tabs at top, or 'grid' for tabs at side */
 --crm-side-tabs-width: ;
---crm-dash-tabs-flow: row; /* choose 'row' for tabs at top, or 'column' for tabs at side *
+--crm-dash-tabs-flow: row; /* choose 'row' for tabs at top, or 'column' for tabs at side */
 --crm-dash-tabs-gap: var(--crm-tabs-gap);
 --crm-dash-tabs-bg: var(--crm-tabs-bg);
 --crm-dash-tabs-padding: var(--crm-tabs-padding);
@@ -311,13 +310,13 @@ color-scheme: light dark;
 --crm-dash-tab-padding: var(--crm-s3) var(--crm-m2);
 --crm-dash-tab-border: 0 solid transparent;
 --crm-dash-tab-border-hover: 0 solid transparent;
---crm-dash-tab-border-width: 0; /* to remove border on one side for hanging tabs *
+--crm-dash-tab-border-width: 0; /* to remove border on one side for hanging tabs */
 --crm-dash-tab-col: var(--crm-tab-col);
 --crm-dash-tab-count-bg: rgba(0,0,0,0.1);
 --crm-dash-tab-count-col: var(--crm-c-text);
 --crm-dash-tab-width: 100%;
 --crm-dash-tab-align: none;
---crm-dash-tab-hang: 0; /* lip to extend tab flush with active region - set to 0 for no lip *
+--crm-dash-tab-hang: 0; /* lip to extend tab flush with active region - set to 0 for no lip */
 --crm-dash-tab-radius: var(--crm-dash-roundness);
 --crm-dash-icon-size: var(--crm-r);
 --crm-dash-summary-row-bg: var(--crm-c-background);
@@ -338,10 +337,10 @@ color-scheme: light dark;
 --crm-dash-header-padding: 0 0 var(--crm-r) 0;
 --crm-dash-image-size: 100px;
 --crm-dash-image-radius: 200px;
---crm-dash-image-justify: space-between; /* choose from start (left), end (right), center, and space-between (spread out) *
+--crm-dash-image-justify: space-between; /* choose from start (left), end (right), center, and space-between (spread out) */
 --crm-dash-image-direction: row; /* choose from row and row-reverse to get the image on the right, column stacks it */
 
-/* Dialog *
+/* Dialog */
 --crm-dialog-bg: var(--crm-c-page-background);
 --crm-dialog-padding: var(--crm-s);
 --crm-dialog-radius: var(--crm-roundness);
@@ -352,11 +351,11 @@ color-scheme: light dark;
 --crm-dialog-header-size: var(--crm-r1);
 --crm-dialog-header-padding: var(--crm-m1) var(--crm-r);
 --crm-dialog-header-radius: var(--crm-dialog-radius);
---crm-dialog-header-border-col: transparent transparent var(--crm-c-gray-300) transparent; /* set a border color for each side of the header *
+--crm-dialog-header-border-col: transparent transparent var(--crm-c-gray-300) transparent; /* set a border color for each side of the header */
 --crm-dialog-body-bg: var(--crm-c-background);
 --crm-dialog-body-padding: var(--crm-m);
 
-/* Dashlet *
+/* Dashlet */
 --crm-dashlet-border:;
 --crm-dashlet-bg: var(--crm-c-page-background);
 --crm-dashlet-padding: var(--crm-s2);
@@ -380,7 +379,7 @@ color-scheme: light dark;
 --crm-dashlet-tab-body-padding:0;
 --crm-dashlet-radius: var(--crm-roundness);
 
-/* Button dropdowns *
+/* Button dropdowns */
 --crm-dropdown-padding: var(--crm-s);
 --crm-dropdown-radius: var(--crm-roundness);
 --crm-dropdown-bg: var(--crm-c-secondary-hover);
@@ -393,14 +392,14 @@ color-scheme: light dark;
 --crm-dropdown-2-col: var(--crm-c-text);
 --crm-dropdown-2-padding: var(--crm-padding-small);
 
-/* Notifications *
+/* Notifications */
 --crm-notify-background: rgba(0,0,0,0.85);
 --crm-notify-padding: var(--crm-m2);
 --crm-notify-col: var(--crm-c-light-text);
---crm-notify-accent-border: 2px 0 0 0; /* adds a border to one/several sides of the notification - set to 0 for none *
+--crm-notify-accent-border: 2px 0 0 0; /* adds a border to one/several sides of the notification - set to 0 for none */
 --crm-notify-radius: var(--crm-roundness);
 
-/* Icons *
+/* Icons */
 --crm-icon-alert: "\f06a";
 --crm-icon-success: "\f058";
 --crm-icon-info: "\f05a";
@@ -413,7 +412,7 @@ color-scheme: light dark;
 --crm-icon-warning-color: inherit;
 --crm-icon-info-color: inherit;
 
-/* Wizard *
+/* Wizard */
 --crm-wizard-width: fit-content;
 --crm-wizard-margin: 0.5rem auto;
 --crm-wizard-height: 30px;
@@ -424,7 +423,7 @@ color-scheme: light dark;
 --crm-wizard-border: var(--crm-c-divider);
 --crm-wizard-bg: var(--crm-c-page-background);
 
-/* Frontend *
+/* Frontend */
 --crm-f-form-width: 700px;
 --crm-f-box-shadow: var(--crm-block-shadow);
 --crm-f-fieldset-bg: var(--crm-c-background);
@@ -434,7 +433,7 @@ color-scheme: light dark;
 --crm-f-legend-align: center;
 --crm-f-legend-size: var(--crm-r3);
 --crm-f-form-padding: var(--crm-padding-reg);
---crm-f-form-layout: block; /* 'grid' = inline, 'block' = stacked *
+--crm-f-form-layout: block; /* 'grid' = inline, 'block' = stacked */
 --crm-f-label-position: ;
 --crm-f-label-align: left;
 --crm-f-label-width: 200px;

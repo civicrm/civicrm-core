@@ -2904,7 +2904,7 @@
 #bootstrap-theme .label-info,
 #bootstrap-theme .label-danger {
 	display: inline;
-	padding: var(--crm-btn-padding-block) var(--crm-padding-inset);
+	padding: var(--crm-btn-padding-block) var(--crm-btn-padding-inline);
 	font-weight: normal;
 	color: var(--crm-c-light-text);
 	text-align: center;

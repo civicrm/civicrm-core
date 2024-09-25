@@ -21,7 +21,7 @@
     font-weight: var(--crm-bold-weight);
     padding: var(--crm-table-padding);
 	text-align: left;
-    vertical-align: bottom;
+    /* vertical-align: bottom; */
 }
 .crm-container table:not(thead) tr {
     border-bottom: var(--crm-table-row-border);
@@ -90,8 +90,8 @@ table.dataTable.order-column.stripe tbody tr.extension-installed.even > .sorting
 .crm-container td,
 .crm-container table.dataTable thead td {
     padding: var(--crm-table-padding);
-    vertical-align: top;
-  }
+    /* vertical-align: top; */
+}
 .crm-container table.selector td {
     border-right: var(--crm-table-column-border);
 }

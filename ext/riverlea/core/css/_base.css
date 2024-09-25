@@ -1,7 +1,16 @@
 /******************
+   VARIABLES
+*******************/
+
+@import url(_variables.css); /* default variables */
+
+/******************
    RESETS
 *******************/
 
+body {
+    min-height: 100vh;
+}
 .crm-container *,
 .crm-container *::before,
 .crm-container *::after {
@@ -69,6 +78,7 @@
 .crm-container .ui-widget textarea,
 .crm-container .ui-widget select,
 .crm-container.ui-widget button,
+.crm-container .ui-widget button,
 .ui-widget.ui-autocomplete {
     font-family: inherit !important;
     font-size: inherit;

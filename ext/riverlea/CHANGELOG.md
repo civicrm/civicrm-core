@@ -1,3 +1,8 @@
+0.10.2
+ - FIXES - alignment of table sort headers
+ - ADDED - min height to body (via Thames)
+ - CHANGES - Significant change to variables (described https://lab.civicrm.org/extensions/riverlea/-/issues/43). Minetta variables put in core as default variables. Stream variables loaded only when they are different to Minetta, shrinking those files. Empty ('starter') stream variables now copy of core _variables.css, but with everything commented out (build a stream by gradually uncommenting).
+
 0.10.1
  - ADDED - accordion summary background colour changes if it contains a required input error message (to help find input errors on forms with multiple accordions, such as add new contact)
  - FIXES - overflow scroll on import screens due to margin resets on import screens
@@ -5,7 +10,7 @@
  - FIXES - next/previous button order on dashboard (https://lab.civicrm.org/extensions/riverlea/-/issues/48)
  - FIXES - inlines contact dashboard editor button, handles hover state better
  - FIXES - icon bg colour for Hackney.
- - CHANGES - buttons from flex to inline-flex with related cleanups
+ - CHANGES - buttons from flex to inline-flex with related cleanups (https://lab.civicrm.org/extensions/riverlea/-/issues/45)
 
 0.10.0
  - version jump to reflect functional maturity, shift to focus on integrating two new streams, and preparation for stable 1.0.0 release.

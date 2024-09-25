@@ -122,6 +122,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 .crm-container tr a.sorting,
 .crm-container tr a.sorting_asc,
 .crm-container tr a.sorting_desc,
+.crm-search-display th.crm-sortable-col,
 .crm-container table.dataTable thead th.sorting,
 .crm-container table.dataTable thead th.sorting_asc,
 .crm-container table.dataTable thead th.sorting_desc  {
@@ -129,6 +130,15 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
     color: var(--crm-c-text);
     box-shadow: none;
     line-height: 1;
+}
+.crm-container tr a.sorting,
+.crm-container tr a.sorting_asc,
+.crm-container tr a.sorting_desc {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: start;
+    gap: var(--crm-flex-gap);
+    align-items: center;
 }
 .crm-container th a:hover,
 .crm-container th a:focus {
@@ -159,9 +169,13 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
     font-size: var(--crm-dash-icon-size);
     content:  var(--crm-icon-sort);
     color: var(--crm-table-sort-col);
-    float: var(--crm-table-sort-float);
-    margin: var(--crm-xs1) var(--crm-m) 0 0;
-    position: relative;
+}
+.crm-container th.crm-sortable-col i.crm-search-table-column-sort-icon::before,
+.crm-container table.dataTable thead th.sorting::before,
+.crm-container table.dataTable thead th.sorting_asc::before,
+.crm-container table.dataTable thead th.sorting_desc::before,
+.jstree-default .jstree-icon {
+    margin-right: 0.5rem;
 }
 .crm-container a.sorting_asc::after,
 .crm-container th.crm-sortable-col i.crm-search-table-column-sort-icon.fa-sort-asc::before,
