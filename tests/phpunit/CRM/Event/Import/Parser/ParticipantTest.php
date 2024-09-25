@@ -249,6 +249,40 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test for duplicate fields
+   *
+   * Ensure importing participants doesn't result in duplicate
+   * fields displayed to the user.
+   *
+   */
+  public function testImportParticipantDuplicateFields(): void {
+    $this->createCustomGroupWithFieldOfType(
+      [
+        'extends' => 'Participant',
+        'extends_entity_column_id:name' => 'ParticipantEventName',
+      ],
+      'radio',
+      '',
+      [
+        'data_type' => 'Boolean',
+        'label' => 'My Custom Field only should appear once',
+      ]
+    );
+    $parser = new CRM_Event_Import_Parser_Participant();
+    $parser->setUserJobID($this->getUserJobID());
+    $parser->init();
+    $fields = $parser->getFieldsMetaData();
+    $seen = [];
+    foreach ($fields as $key => $field) {
+      $title = $field['title'] ?? NULL;
+      if ($title) {
+        $this->assertFalse(in_array($title, $seen), 'Imported field does not show up more than once');
+        $seen[] = $title;
+      }
+    }
+  }
+
+  /**
    * @param array $submittedValues
    *
    * @return int
@@ -268,7 +302,7 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
         ], $submittedValues),
       ],
       'status_id:name' => 'draft',
-      'type_id:name' => 'participant_import',
+      'job_type' => 'participant_import',
     ])->execute()->first()['id'];
     if ($submittedValues['dataSource'] ?? NULL === 'CRM_Import_DataSource') {
       $dataSource = new CRM_Import_DataSource_CSV($userJobID);
