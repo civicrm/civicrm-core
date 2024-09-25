@@ -1461,8 +1461,9 @@ $text
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testSendSmsLandLinePhoneNumber(): void {
-    $sent = $this->createSendSmsTest(FALSE, 1);
-    $this->assertEquals('Recipient phone number is invalid or recipient does not want to receive SMS', $sent[0], "Expected error doesn't match");
+    // Since PR#31180 this is now be allowed
+    $sent = $this->createSendSmsTest(TRUE, 1);
+    $this->assertEquals(TRUE, $sent[0]);
   }
 
   /**
@@ -1567,7 +1568,7 @@ $text
         break;
 
       case 1:
-        // Create a fixed phone number
+        // Create a fixed phone number (since PR#31180 this should now be allowed)
         $phone = civicrm_api3('Phone', 'create', [
           'contact_id' => $contactId,
           'phone' => 654321,
@@ -1581,7 +1582,7 @@ $text
     }
 
     // Now run the actual test
-    [$sent, $activityId, $success] = CRM_Activity_BAO_Activity::sendSms(
+    [$sent, $activityId, $success] = CRM_Activity_BAO_Activity::sendSMS(
       $contactDetails,
       $activityParams,
       $smsProviderParams,

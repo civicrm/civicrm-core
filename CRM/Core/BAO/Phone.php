@@ -80,6 +80,8 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone implements Civi\Core\HookInt
    *
    * @return array
    *   the array of phone ids which are potential numbers
+   * @deprecated
+   *   Use getContactMobileOrPrimary() if possible
    */
   public static function allPhones($id, $updateBlankLocInfo = FALSE, $type = NULL, $filters = []) {
     if (!$id) {
@@ -138,6 +140,53 @@ ORDER BY civicrm_phone.is_primary DESC,  phone_id ASC ";
       }
     }
     return $numbers;
+  }
+
+  /**
+   * Get the Mobile number of a contact if available, if not Primary, or first
+   * available phone.
+   *
+   * @param int $contactID
+   *   The contact id.
+   *
+   * @return string|null
+   */
+  public static function getContactMobileOrPrimary(int $contactID): ?string {
+    // Check the health of the contact first (is_deleted is implicit)
+    $contact = \Civi\Api4\Contact::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('id', '=', $contactID)
+      ->addWhere('is_deceased', '=', FALSE)
+      ->addWhere('do_not_sms', '=', FALSE)
+      ->execute()
+      ->first();
+    if (empty($contact['id'])) {
+      return NULL;
+    }
+    // Start by checking for a Mobile number, prioritize the Primary
+    $phone = \Civi\Api4\Phone::get(FALSE)
+      ->addWhere('contact_id', '=', $contactID)
+      ->addWhere('phone_type_id:name', '=', 'Mobile')
+      ->addOrderBy('is_primary', 'DESC')
+      ->execute()
+      ->first();
+    // Fallback on the Primary phone number
+    if (empty($phone['id'])) {
+      $phone = \Civi\Api4\Phone::get(FALSE)
+        ->addWhere('contact_id', '=', $contactID)
+        ->addWhere('is_primary', '=', TRUE)
+        ->execute()
+        ->first();
+    }
+    // Fallback on the first available phone
+    if (empty($phone['id'])) {
+      $phone = \Civi\Api4\Phone::get(FALSE)
+        ->addWhere('contact_id', '=', $contactID)
+        ->addOrderBy('id', 'ASC')
+        ->execute()
+        ->first();
+    }
+    return $phone['phone'] ?? NULL;
   }
 
   /**

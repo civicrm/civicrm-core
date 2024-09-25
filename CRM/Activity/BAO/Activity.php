@@ -1225,15 +1225,8 @@ WHERE entity_id =%1 AND entity_table = %2";
     foreach ($contactDetails as $contact) {
       $contactId = $contact['contact_id'];
       $tokenText = CRM_Core_BAO_MessageTemplate::renderTemplate(['messageTemplate' => ['msg_text' => $text], 'contactId' => $contactId, 'disableSmarty' => TRUE])['text'];
-
-      // Only send if the phone is of type mobile
-      if ($contact['phone_type_id'] == CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'phone_type_id', 'Mobile')) {
-        $smsProviderParams['To'] = $contact['phone'];
-      }
-      else {
-        $smsProviderParams['To'] = '';
-      }
-
+      // As of CiviCRM 5.77, we always send, regardless of the phone type
+      $smsProviderParams['To'] = $contact['phone'] ?? '';
       $doNotSms = $contact['do_not_sms'] ?? 0;
 
       if ($doNotSms) {
@@ -1302,18 +1295,9 @@ WHERE entity_id =%1 AND entity_table = %2";
     }
     elseif ($toID) {
       // No phone number specified, so find a suitable one for the contact
-      $filters = ['is_deceased' => 0, 'is_deleted' => 0, 'do_not_sms' => 0];
-      $toPhoneNumbers = CRM_Core_BAO_Phone::allPhones($toID, FALSE, 'Mobile', $filters);
-      // To get primary mobile phonenumber, if not get the first mobile phonenumber
-      if (!empty($toPhoneNumbers)) {
-        $toPhoneNumberDetails = reset($toPhoneNumbers);
-        $toPhoneNumber = $toPhoneNumberDetails['phone'] ?? NULL;
-        // Contact allows to send sms
-      }
+      $toPhoneNumber = CRM_Core_BAO_Phone::getContactMobileOrPrimary($toID);
     }
 
-    // make sure both phone are valid
-    // and that the recipient wants to receive sms
     if (empty($toPhoneNumber)) {
       throw new CRM_Core_Exception('Recipient phone number is invalid or recipient does not want to receive SMS');
     }

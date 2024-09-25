@@ -177,16 +177,14 @@ class CRM_Contact_Form_Task_SMSCommon {
         $mobilePhone = NULL;
         $contactDetails = $form->_contactDetails[$contactId];
 
-        //to check if the phone type is "Mobile"
+        // To prioritize the "Mobile" phone type
         $phoneTypes = CRM_Core_OptionGroup::values('phone_type', TRUE, FALSE, FALSE, NULL, 'name');
 
         if (CRM_Utils_System::getClassName($form) == 'CRM_Activity_Form_Task_SMS') {
-          //to check for "if the contact id belongs to a specified activity type"
+          // To check for "if the contact id belongs to a specified activity type"
           // @todo use the api instead - function is deprecated.
           $actDetails = CRM_Activity_BAO_Activity::getContactActivity($contactId);
-          if (self::RECIEVED_SMS_ACTIVITY_SUBJECT !=
-            CRM_Utils_Array::retrieveValueRecursive($actDetails, 'subject')
-          ) {
+          if (self::RECIEVED_SMS_ACTIVITY_SUBJECT != CRM_Utils_Array::retrieveValueRecursive($actDetails, 'subject')) {
             $suppressedSms++;
             unset($form->_contactDetails[$contactId]);
             continue;
@@ -200,7 +198,9 @@ class CRM_Contact_Form_Task_SMSCommon {
           continue;
         }
         elseif ($contactDetails['phone_type_id'] != ($phoneTypes['Mobile'] ?? NULL)) {
-          //if phone is not primary check if non-primary phone is "Mobile"
+          // if phone is not primary check if non-primary phone is "Mobile"
+          // @todo It's not clear what the aim here is, and allPhones is deprecated
+          // We could use getContactMobileOrPrimary, but not sure if the phone_id/etc is needed?
           $filter = ['do_not_sms' => 0];
           $contactPhones = CRM_Core_BAO_Phone::allPhones($contactId, FALSE, 'Mobile', $filter);
           if (count($contactPhones) > 0) {
@@ -208,11 +208,6 @@ class CRM_Contact_Form_Task_SMSCommon {
             $form->_contactDetails[$contactId]['phone_id'] = CRM_Utils_Array::retrieveValueRecursive($contactPhones, 'id');
             $form->_contactDetails[$contactId]['phone'] = $mobilePhone;
             $form->_contactDetails[$contactId]['phone_type_id'] = $phoneTypes['Mobile'] ?? NULL;
-          }
-          else {
-            $suppressedSms++;
-            unset($form->_contactDetails[$contactId]);
-            continue;
           }
         }
 

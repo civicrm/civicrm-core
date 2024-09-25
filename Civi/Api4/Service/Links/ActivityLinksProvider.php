@@ -111,7 +111,6 @@ class ActivityLinksProvider extends \Civi\Core\Service\AutoSubscriber {
         try {
           $phone = civicrm_api3('Phone', 'getsingle', [
             'contact_id' => $contactId,
-            'phone_type_id' => \CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'phone_type_id', 'Mobile'),
             'return' => ['phone', 'contact_id'],
             'options' => ['limit' => 1, 'sort' => "is_primary DESC"],
             'api.Contact.getsingle' => [
