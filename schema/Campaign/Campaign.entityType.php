@@ -231,6 +231,7 @@ return [
       'input_type' => 'EntityRef',
       'description' => ts('FK to civicrm_contact, who created this Campaign.'),
       'add' => '3.3',
+      'default_callback' => ['CRM_Core_Session', 'getLoggedInContactID'],
       'input_attrs' => [
         'label' => ts('Created By'),
       ],

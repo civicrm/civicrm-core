@@ -1047,8 +1047,8 @@ class CRM_Core_DAO extends DB_DataObject {
 
     \CRM_Utils_Hook::pre($op, $entityName, $record[$idField] ?? NULL, $record);
 
-    //Reason to call after pre hook is to accept any label/title/frontend_title modification
-    self::addDefaultFallbackValues($entityName, $record);
+    // Fill defaults after pre hook to accept any hook modifications
+    self::setDefaultsFromCallback($entityName, $record);
     $fields = static::getSupportedFields();
     $instance = new static();
     // Ensure fields exist before attempting to write to them
@@ -1135,7 +1135,16 @@ class CRM_Core_DAO extends DB_DataObject {
     return $results;
   }
 
-  private static function addDefaultFallbackValues(string $entityName, array &$record): void {
+  /**
+   * Set default values for fields based on callback functions
+   *
+   * @param string $entityName
+   *   The entity name
+   * @param array &$record
+   *   The record array to set default values for
+   * @return void
+   */
+  private static function setDefaultsFromCallback(string $entityName, array &$record): void {
     $entity = Civi::entity($entityName);
     $idField = $entity->getMeta('primary_key');
     // Only fill values for create operations
@@ -1143,16 +1152,32 @@ class CRM_Core_DAO extends DB_DataObject {
       return;
     }
     foreach ($entity->getFields() as $fieldName => $field) {
+      if (!empty($field['default_fallback'])) {
+        $field += ['default_callback' => [__CLASS__, 'getDefaultFallbackValues']];
+      }
       // Check if value is empty using `strlen()` to avoid php quirk of '0' == false.
-      if (!empty($field['default_fallback']) && !strlen((string) ($record[$fieldName] ?? ''))) {
-        foreach ($field['default_fallback'] as $defaultFieldName) {
-          if (strlen((string) ($record[$defaultFieldName] ?? ''))) {
-            $record[$fieldName] = $record[$defaultFieldName];
-            break;
-          }
-        }
+      if (!empty($field['default_callback']) && !strlen((string) ($record[$fieldName] ?? ''))) {
+        $record[$fieldName] = \Civi\Core\Resolver::singleton()->call($field['default_callback'], [$record, $entityName, $fieldName, $field]);
       }
     }
+  }
+
+  /**
+   * Callback for `default_fallback` field values
+   *
+   * @param array $record
+   * @param string $entityName
+   * @param string $fieldName
+   * @param array $field
+   * @return mixed
+   */
+  public static function getDefaultFallbackValues(array $record, string $entityName, string $fieldName, array $field) {
+    foreach ($field['default_fallback'] as $defaultFieldName) {
+      if (strlen((string) ($record[$defaultFieldName] ?? ''))) {
+        return $record[$defaultFieldName];
+      }
+    }
+    return NULL;
   }
 
   /**

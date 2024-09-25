@@ -48,10 +48,9 @@ class SpecFormatter {
       $field = new FieldSpec($fieldName, $entityName, $dataTypeName);
       $field->setColumnName($fieldName);
       $field->setType('Field');
-      $field->setRequired(!empty($data['required']) && !$hasDefault && empty($data['primary_key']));
+      $field->setRequired(!empty($data['required']) && !$hasDefault && empty($data['primary_key']) && empty($data['default_fallback']) && empty($data['default_callback']));
       // Translate 'default_fallback' into 'required_if' rules:
       if (!empty($data['default_fallback'])) {
-        $field->setRequired(FALSE);
         $field->setRequiredIf('empty($values.' . implode(') && empty($values.', $data['default_fallback']) . ')');
       }
     }
