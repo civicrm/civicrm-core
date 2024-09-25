@@ -8,25 +8,31 @@
  +--------------------------------------------------------------------+
 *}
 {if $pager && $pager->_response}
-    {if $pager->_response.numPages > 1}
-        <div class="crm-pager">
-            <span class="element-right">
-            {if $location eq 'top'}
-              {$pager->_response.titleTop nofilter}
-            {else}
-              {$pager->_response.titleBottom nofilter}
-            {/if}
-            </span>
+  {if $pager->_response.numPages > 1}
+    <div class="crm-pager">
+      {if $location eq 'top'}
+        <span class="element-right">
           <span class="crm-pager-nav">
+            {$pager->_response.back nofilter}
+            {$pager->_response.next nofilter}
+          </span>
+        </span>
+        <span class="crm-pager-nav">
+          {$pager->_response.status}
+        </span>
+      {else}
+        <span class="element-right">
+          {$pager->_response.titleBottom nofilter}
+        </span>
+        <span class="crm-pager-nav">
           {$pager->_response.first nofilter}&nbsp;
           {$pager->_response.back nofilter}&nbsp;
           {$pager->_response.next nofilter}&nbsp;
           {$pager->_response.last nofilter}&nbsp;
-          {$pager->_response.status}
-          </span>
-
-        </div>
-    {/if}
+        </span>
+      {/if}
+    </div>
+  {/if}
 
     {* Controller for 'Rows Per Page' *}
     {if $location eq 'bottom' and $pager->_totalItems > 25}
