@@ -84,6 +84,7 @@ return [
       'input_type' => NULL,
       'description' => ts('When was the cache item created'),
       'add' => '2.1',
+      'required' => TRUE,
       'default' => 'CURRENT_TIMESTAMP',
     ],
     'expired_date' => [
