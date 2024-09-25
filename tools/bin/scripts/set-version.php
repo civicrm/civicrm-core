@@ -92,36 +92,12 @@ updateFile("js/version.json", function () use ($newVersion) {
   return json_encode($newVersion) . "\n";
 });
 
-// Update core extensions if this is a stable release
-$infoXmls = isPreReleaseIncrement($newVersion) ? [] : findCoreInfoXml();
-foreach ($infoXmls as $infoXml) {
-  updateXmlFile($infoXml, function (DOMDocument $dom) use ($newVersion, $releaseDate) {
-    // Update extension version
-    /** @var \DOMNode $tag */
-    foreach ($dom->getElementsByTagName('version') as $tag) {
-      $tag->textContent = $newVersion;
-    }
-    // Update release date
-    foreach ($dom->getElementsByTagName('releaseDate') as $tag) {
-      $tag->textContent = $releaseDate;
-    }
-    // Update compatability - set to major version of core
-    /** @var \DOMNode $compat */
-    foreach ($dom->getElementsByTagName('compatibility') as $compat) {
-      /** @var \DOMNode $tag */
-      foreach ($compat->getElementsByTagName('ver') as $tag) {
-        $tag->textContent = implode('.', array_slice(explode('.', $newVersion), 0, 2));
-      }
-    }
-  });
-}
-
 // Update deleted-files-list.json
 `php tools/scripts/generate-deleted-files-list.php`;
 
 if ($doCommit) {
   $files = array_filter(
-    array_merge(['xml/version.xml', 'js/version.json', 'deleted-files-list.json', 'sql/civicrm_generated.mysql', 'sql/test_data_second_domain.mysql', $phpFile, $sqlFile], $infoXmls),
+    array_merge(['xml/version.xml', 'js/version.json', 'deleted-files-list.json', 'sql/civicrm_generated.mysql', 'sql/test_data_second_domain.mysql', $phpFile, $sqlFile]),
     function($file) {
       return $file && file_exists($file);
     }
@@ -205,10 +181,6 @@ function isVersionValid($v) {
   return $v && preg_match('/^[0-9a-z\.\-]+$/', $v);
 }
 
-function isPreReleaseIncrement(string $v): bool {
-  return (bool) preg_match('/(alpha|beta)/', $v) && !preg_match('/(beta1|alpha1)$/', $v);
-}
-
 /**
  * @param $error
  */
@@ -278,34 +250,4 @@ function parseArgs($argv) {
   }
 
   return $parsed;
-}
-
-/**
- * @return array
- *   Ex: ['ext/afform/html/info.xml', 'ext/search_kit/info.xml']
- */
-function findCoreInfoXml() {
-  $cmd = sprintf("bash %s %s",
-    escapeshellarg(__DIR__ . DIRECTORY_SEPARATOR . 'ls-core-ext'),
-    escapeshellarg(getcwd() . DIRECTORY_SEPARATOR . '/ext'));
-  exec($cmd, $lines, $result);
-  if ($result !== 0 ) {
-    throw new \RuntimeException("Failed to find core extensions");
-  }
-  $lines = array_map(fn($s) => trim($s), $lines);
-
-  #$lines = explode("\n", file_get_contents('distmaker/core-ext.txt'));
-
-  $exts = preg_grep(";^#;", $lines, PREG_GREP_INVERT);
-  $exts = preg_grep(';[a-z-A-Z];', $exts);
-
-  $infoXmls = [];
-  foreach ($exts as $coreExtDir) {
-    $infoXmls = array_merge($infoXmls, (array) glob("ext/$coreExtDir/*/info.xml"));
-    if (file_exists("ext/$coreExtDir/info.xml")) {
-      $infoXmls[] = "ext/$coreExtDir/info.xml";
-    }
-  }
-
-  return $infoXmls;
 }
