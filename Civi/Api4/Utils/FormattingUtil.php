@@ -122,11 +122,8 @@ class FormattingUtil {
 
     // Special handling for 'current_user' and user lookups
     $exactMatch = [NULL, '=', '!=', '<>', 'IN', 'NOT IN'];
-    if ($fk === 'Contact' && isset($value) && !is_numeric($value) && in_array($operator, $exactMatch, TRUE)) {
-      $value = \_civicrm_api3_resolve_contactID($value);
-      if ('unknown-user' === $value) {
-        throw new \CRM_Core_Exception("\"{$fieldSpec['name']}\" \"{$value}\" cannot be resolved to a contact ID", 2002, ['error_field' => $fieldSpec['name'], "type" => "integer"]);
-      }
+    if (is_string($fk) && CoreUtil::isContact($fk) && in_array($operator, $exactMatch, TRUE)) {
+      $value = self::resolveContactID($fieldSpec['name'], $value);
     }
 
     switch ($fieldSpec['data_type'] ?? NULL) {
@@ -502,6 +499,30 @@ class FormattingUtil {
   public static function filterByPath(array $values, string $fieldPath, string $fieldName): array {
     $prefix = substr($fieldPath, 0, strrpos($fieldPath, $fieldName));
     return \CRM_Utils_Array::filterByPrefix($values, $prefix);
+  }
+
+  /**
+   * A contact ID field passed in to the API may contain values such as "user_contact_id"
+   *   which need to be resolved to the actual contact ID.
+   * This function resolves those strings to the actual contact ID or throws an exception on "unknown user"
+   *
+   * @param string $fieldName
+   * @param string|int|null $fieldValue
+   *
+   * @return int|null
+   * @throws \CRM_Core_Exception
+   */
+  public static function resolveContactID(string $fieldName, $fieldValue): ?int {
+    // Special handling for 'current_user' and user lookups
+    if (isset($fieldValue) && !is_numeric($fieldValue)) {
+      // FIXME decouple from v3 API
+      require_once 'api/v3/utils.php';
+      $fieldValue = \_civicrm_api3_resolve_contactID($fieldValue);
+      if ('unknown-user' === $fieldValue) {
+        throw new \CRM_Core_Exception("\"{$fieldName}\" \"{$fieldValue}\" cannot be resolved to a contact ID", 2002, ['error_field' => $fieldName, 'type' => 'integer']);
+      }
+    }
+    return $fieldValue;
   }
 
 }
