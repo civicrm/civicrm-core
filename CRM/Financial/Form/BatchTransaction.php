@@ -35,6 +35,12 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form_Search {
    */
   protected $_batchStatus = 'open';
 
+  /**
+   * Batch values
+   * @var array
+   */
+  public $_values;
+
   public function preProcess() {
     // This reuses some styles from search forms
     CRM_Core_Resources::singleton()->addStyleFile('civicrm', 'css/searchForm.css', 1, 'html-header');
