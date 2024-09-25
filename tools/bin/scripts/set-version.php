@@ -64,8 +64,14 @@ else {
   $sqlFile = NULL;
 }
 
-updateFile("xml/version.xml", function ($content) use ($newVersion, $oldVersion) {
-  return str_replace($oldVersion, $newVersion, $content);
+updateXmlFile("xml/version.xml", function(DOMDocument $dom) use ($newVersion, $releaseDate) {
+  foreach ($dom->getElementsByTagName('version_no') as $tag) {
+    $tag->textContent = $newVersion;
+  }
+  $date = preg_match('/(alpha|beta)/', $newVersion) ? '(unreleased)' : $releaseDate;
+  foreach ($dom->getElementsByTagName('releaseDate') as $tag) {
+    $tag->textContent = $date;
+  }
 });
 
 if (file_exists("civicrm-version.php")) {
@@ -89,7 +95,7 @@ updateFile("js/version.json", function () use ($newVersion) {
 // Update core extensions if this is a stable release
 $infoXmls = isPreReleaseIncrement($newVersion) ? [] : findCoreInfoXml();
 foreach ($infoXmls as $infoXml) {
-  updateXmlFile($infoXml, function (DOMDocument $dom) use ($newVersion) {
+  updateXmlFile($infoXml, function (DOMDocument $dom) use ($newVersion, $releaseDate) {
     // Update extension version
     /** @var \DOMNode $tag */
     foreach ($dom->getElementsByTagName('version') as $tag) {
@@ -97,7 +103,7 @@ foreach ($infoXmls as $infoXml) {
     }
     // Update release date
     foreach ($dom->getElementsByTagName('releaseDate') as $tag) {
-      $tag->textContent = date('Y-m-d');
+      $tag->textContent = $releaseDate;
     }
     // Update compatability - set to major version of core
     /** @var \DOMNode $compat */
@@ -208,7 +214,7 @@ function isPreReleaseIncrement(string $v): bool {
  */
 function fatal($error) {
   echo $error;
-  echo "usage: set-version.php <new-version> [--sql|--no-sql] [--commit|--no-commit]\n";
+  echo "usage: set-version.php <new-version> [<new-date>] [--sql|--no-sql] [--commit|--no-commit]\n";
   echo "  --sql        A placeholder *.sql file will be created.\n";
   echo "  --no-sql     A placeholder *.sql file will not be created.\n";
   echo "  --commit     Any changes will be committed automatically the current git branch.\n";
@@ -224,12 +230,13 @@ function fatal($error) {
  * @param array $argv
  *  Ex: ['myscript.php', '--no-commit', '5.6.7']
  * @return array
- *   Ex: ['scriptFile' => 'myscript.php', 'doCommit' => FALSE, 'newVersion' => '5.6.7']
+ *   Ex: ['scriptFile' => 'myscript.php', 'doCommit' => FALSE, 'newVersion' => '5.6.7', 'releaseDate' => '2039-01-01']
  */
 function parseArgs($argv) {
   $parsed = [];
   $parsed['doSql'] = 'auto';
-  $positions = ['scriptFile', 'newVersion'];
+  $parsed['releaseDate'] = date('Y-m-d');
+  $positions = ['scriptFile', 'newVersion', 'releaseDate'];
   $positional = [];
 
   foreach ($argv as $arg) {
