@@ -25,7 +25,7 @@ UPDATE `civicrm_note` c
   SET c.`modified_date` = COALESCE(c.`created_date`, current_timestamp())
   WHERE c.`modified_date` IS NULL;
 ALTER TABLE `civicrm_note` MODIFY COLUMN `note_date` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'Date attached to the note';
-ALTER TABLE `civicrm_note` MODIFY COLUMN `modified_date` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'When was this note last modified/edited';
+ALTER TABLE `civicrm_note` MODIFY COLUMN `modified_date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT 'When was this note last modified/edited';
 
 -- Not accurate but we need to set it to SOMETHING before changing to NOT NULL
 UPDATE `civicrm_payment_token` c
