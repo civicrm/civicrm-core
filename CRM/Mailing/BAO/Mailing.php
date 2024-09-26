@@ -1510,7 +1510,9 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $report['jobs'][] = $row;
     }
 
-    $report['event_totals']['queue'] = CRM_Mailing_BAO_MailingRecipients::mailingSize($mailing_id);
+    if (empty($report['event_totals']['queue'])) {
+      $report['event_totals']['queue'] = CRM_Mailing_BAO_MailingRecipients::mailingSize($mailing_id);
+    }
 
     if (!empty($report['event_totals']['queue'])) {
       $report['event_totals']['delivered_rate'] = (100.0 * $report['event_totals']['delivered']) / $report['event_totals']['queue'];
