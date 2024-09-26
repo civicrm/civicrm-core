@@ -158,7 +158,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch implements \Civi\Core\Hook
 
     // get batch totals for open batches
     $fetchTotals = [];
-    $batchStatus = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id', ['labelColumn' => 'name']);
+    $batchStatus = CRM_Batch_DAO_Batch::buildOptions('status_id', 'validate');
     $batchStatus = [
       array_search('Open', $batchStatus),
       array_search('Reopened', $batchStatus),
@@ -257,7 +257,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch implements \Civi\Core\Hook
 
     $batchTypes = CRM_Batch_DAO_Batch::buildOptions('type_id');
     $batchStatus = CRM_Batch_DAO_Batch::buildOptions('status_id');
-    $batchStatusByName = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id', ['labelColumn' => 'name']);
+    $batchStatusByName = CRM_Batch_DAO_Batch::buildOptions('status_id', 'validate');
     $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
 
     $results = [];
@@ -370,7 +370,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch implements \Civi\Core\Hook
   public static function whereClause($params) {
     $clauses = [];
     // Exclude data-entry batches
-    $batchStatus = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id', ['labelColumn' => 'name']);
+    $batchStatus = CRM_Batch_DAO_Batch::buildOptions('status_id', 'validate');
     if (empty($params['status_id'])) {
       $clauses['status_id'] = ['NOT IN' => ["Data Entry"]];
     }
