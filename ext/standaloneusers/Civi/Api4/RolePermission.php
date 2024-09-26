@@ -13,6 +13,7 @@
 namespace Civi\Api4;
 
 use Civi\Api4\Generic\BasicGetFieldsAction;
+use Civi\Api4\Generic\Traits\HierarchicalEntity;
 use CRM_Standaloneusers_ExtensionUtil as E;
 
 /**
@@ -21,9 +22,11 @@ use CRM_Standaloneusers_ExtensionUtil as E;
  * @searchable secondary
  * @labelField title
  * @primaryKey name
+ * @parentField parent
  * @package standaloneusers
  */
 class RolePermission extends Generic\AbstractEntity {
+  use HierarchicalEntity;
 
   /**
    * @param bool $checkPermissions
@@ -103,6 +106,26 @@ class RolePermission extends Generic\AbstractEntity {
           'input_attrs' => [
             'label' => E::ts('Description'),
           ],
+        ],
+        [
+          'name' => 'parent',
+          'title' => 'Parent',
+          'description' => 'Permission that implies this one',
+          'data_type' => 'String',
+          'fk_entity' => 'RolePermission',
+          'fk_column' => 'name',
+          'readonly' => TRUE,
+        ],
+        [
+          'name' => '_depth',
+          'type' => 'Extra',
+          'readonly' => TRUE,
+          'title' => E::ts('Depth'),
+          'description' => E::ts('Depth in the nested hierarchy'),
+          'data_type' => 'Integer',
+          'default_value' => 0,
+          'label' => E::ts('Depth'),
+          'input_type' => 'Number',
         ],
       ];
       foreach ($roles as $roleName => $roleLabel) {
