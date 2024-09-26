@@ -640,7 +640,7 @@ i.crm-i.af-gui-conditional-dialog-move-icon {
     background: var(--crm-c-alert);
 }
 #afGuiEditor  .af-gui-bar .dropdown-menu .text-danger {
-    color: var(--crm-dropdown-col);
+    color:var(--crm-c-alert-text);
 }
 #afGuiEditor .af-gui-field-input-type-select .input-group .dropdown-menu {
     width: 100%;

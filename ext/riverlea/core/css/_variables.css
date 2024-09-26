@@ -70,9 +70,11 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-c-primary: var(--crm-c-gray-700);
 --crm-c-primary-hover: var(--crm-c-gray-800);
 --crm-c-primary-text: var(--crm-c-light-text);
+--crm-c-primary-hover-text: var(--crm-c-light-text);
 --crm-c-secondary: #5d677b;
 --crm-c-secondary-hover: #3e485b;
 --crm-c-secondary-text: var(--crm-c-light-text);
+--crm-c-secondary-hover-text: var(--crm-c-light-text);
 --crm-c-success: var(--crm-c-green-dark);
 --crm-c-success-text: var(--crm-c-light-text);
 --crm-c-alert: var(--crm-c-red-dark);
@@ -305,6 +307,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-dash-tabs-gap: var(--crm-tabs-gap);
 --crm-dash-tabs-bg: var(--crm-tabs-bg);
 --crm-dash-tabs-padding: var(--crm-tabs-padding);
+--crm-dash-tabs-roundness: var(--crm-dash-roundness) var(--crm-dash-roundness) 0 0;
 --crm-dash-tab-bg: var(--crm-tab-bg);
 --crm-dash-tab-bg-hover: var(--crm-tab-bg-hover);
 --crm-dash-tab-padding: var(--crm-s3) var(--crm-m2);
@@ -325,6 +328,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-dash-panel-padding: var(--crm-m);
 --crm-dash-panel-bg: transparent;
 --crm-dash-panel-border: 0;
+--crn-dash-panel-radius: 0 0 var(--crm-dash-roundness) var(--crm-dash-roundness);
 --crm-dash-edit-border: 2px dashed var(--crm-c-gray-300);
 --crm-dash-block-padding: 0;
 --crm-dash-block-bg: ;

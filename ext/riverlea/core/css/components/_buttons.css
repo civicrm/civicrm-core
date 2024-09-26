@@ -33,7 +33,7 @@
 [type="button"]:hover, [type="reset"]:hover, [type="submit"]:hover,
 [type="button"]:focus, [type="reset"]:focus, [type="submit"]:focus  {
     background: var(--crm-c-primary-hover);
-    color: var(--crm-c-primary-text);
+    color: var(--crm-c-primary-hover-text);
     text-decoration: none;
 }
 .crm-button:focus,
@@ -86,6 +86,7 @@
 .crm-container button.ui-button:has(.fa-times):hover,
 .crm-container button.ui-button:has(.fa-times):focus {
     background: var(--crm-c-secondary-hover);
+    color: var(--crm-c-secondary-hover-text);
 }
 
 /* BS3 colour options */

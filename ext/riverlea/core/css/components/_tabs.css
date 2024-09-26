@@ -151,7 +151,7 @@
 .crm-contact-page #mainTabContainer .crm-contact-tabs-list {
     background: var(--crm-dash-tabs-bg);
     flex-direction: var(--crm-dash-tabs-flow);
-    border-radius: var(--crm-dash-roundness) var(--crm-dash-roundness) 0 0;
+    border-radius: var(--crm-dash-tabs-roundness);
     gap: var(--crm-dash-tabs-gap);
     padding: var(--crm-dash-tabs-padding);
     border: 0 solid transparent;
@@ -173,7 +173,7 @@
     flex-grow: 1;
     padding: var(--crm-dash-panel-padding);
     border: var(--crm-dash-panel-border);
-    border-radius: var(--crm-dash-roundness);
+    border-radius: var(--crn-dash-panel-radius);
 }
 .crm-contact-page #mainTabContainer .crm-contact-tabs-list li {
     background: var(--crm-dash-tab-bg);

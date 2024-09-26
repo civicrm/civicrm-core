@@ -1,3 +1,11 @@
+0.10.4
+- NEW CSS VARIABLES to support different text hover colour, and allow contact dashboard roundness of tabs to work left/right as well as top/bottom
+    added: --crm-c-primary-hover-text
+    added: --crm-c-secondary-hover-text
+    added: --crm-dash-tabs-roundness - for the tabs group radius on the contact dashboard
+    added: --crn-dash-panel-radius - for the tab panel radius on the contact dashboard
+- FIXED text area 100% width
+
 0.10.3
  - ADDED - JQueery spinner styling (number counter with arrows used on pagination)
  - FIXED - contact tooltip position in search results

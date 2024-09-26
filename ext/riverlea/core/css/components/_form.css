@@ -149,7 +149,7 @@ select.crm-form-multiselect {
     padding: var(--crm-input-padding-large);
     height: auto;
     min-height: var(--crm-input-height);
-    width: auto;
+    width: 100%;
 }
 .crm-container input.crm-form-color {
     width: var(--crm-input-height);
