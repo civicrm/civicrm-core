@@ -49,8 +49,7 @@
           if (ctrl.op) {
             multi = ['IN', 'NOT IN'].includes(ctrl.op);
           } else if (inputType) {
-            multi = (dataType !== 'Boolean' &&
-              (inputType === 'CheckBox' || (field.input_attrs && field.input_attrs.multiple)));
+            multi = _.contains(['CheckBox', 'Radio', 'Select', 'Hidden'], inputType);
           } else {
             multi = field.serialize || dataType === 'Array';
           }
