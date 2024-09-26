@@ -192,8 +192,10 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
           $details[$value]["custom_{$cfID}"] = CRM_Core_BAO_CustomField::displayValue($details[$value]["custom_{$cfID}"], $cfID);
         }
       }
-      $contact = $details[$value] ?? NULL;
-
+      if (empty($details[$value])) {
+        continue;
+      }
+      $contact = $details[$value];
       // we need to remove all the "_id"
       unset($contact['contact_id']);
 
