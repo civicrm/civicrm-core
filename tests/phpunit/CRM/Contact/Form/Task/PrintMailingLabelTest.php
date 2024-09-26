@@ -16,17 +16,21 @@
   */
 class CRM_Contact_Form_Task_PrintMailingLabelTest extends CiviUnitTestCase {
 
+  use CRMTraits_Custom_CustomDataTrait;
+
   private string $mailingFormat;
 
   public function setUp(): void {
     $this->mailingFormat = Civi::settings()->get('mailing_format') ?? '';
     Civi::settings()->set('mailing_format', $this->getDefaultMailingFormat());
+    $this->createCustomGroupWithFieldOfType();
     parent::setUp();
   }
 
   public function tearDown(): void {
     Civi::settings()->set('mailing_format', $this->mailingFormat);
     Civi::settings()->set('searchPrimaryDetailsOnly', TRUE);
+    $this->quickCleanup(['civicrm_contact'], TRUE);
     parent::tearDown();
   }
 
@@ -46,14 +50,14 @@ class CRM_Contact_Form_Task_PrintMailingLabelTest extends CiviUnitTestCase {
    * Test tokens are rendered in the mailing labels when declared via deprecated hooks.
    */
   public function testMailingLabelTokens(): void {
-    \Civi::settings()->set('mailing_format', $this->getDefaultMailingFormat() . ' {test.last_initial}');
+    \Civi::settings()->set('mailing_format', $this->getDefaultMailingFormat() . ' {test.last_initial} . {contact.' . $this->getCustomFieldName() . '}');
     $this->hookClass->setHook('civicrm_tokenValues', [$this, 'hookTokenValues']);
     $this->hookClass->setHook('civicrm_tokens', [$this, 'hook_tokens']);
     $this->createTestAddresses();
     $rows = $this->submitForm([]);
     $this->assertCount(2, $rows);
-    $this->assertEquals($this->getExpectedAddress('collins') . ' C', $rows[$this->ids['Contact']['collins']][0]);
-    $this->assertEquals($this->getExpectedAddress('souza') . ' S', $rows[$this->ids['Contact']['souza']][0]);
+    $this->assertEquals($this->getExpectedAddress('collins') . ' C . Ho', $rows[$this->ids['Contact']['collins']][0]);
+    $this->assertEquals($this->getExpectedAddress('souza') . ' S . Hey', $rows[$this->ids['Contact']['souza']][0]);
   }
 
   /**
@@ -135,11 +139,13 @@ NETHERLANDS';
         'first_name' => 'Antonia',
         'last_name' => 'D`souza',
         'middle_name' => 'J.',
+        $this->getCustomFieldName() => 'Hey',
       ], 'souza'),
       $this->individualCreate([
         'first_name' => 'Anthony',
         'last_name' => 'Collins',
         'middle_name' => 'J.',
+        $this->getCustomFieldName() => 'Ho',
       ], 'collins'),
     ];
     $addresses = [];
