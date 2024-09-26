@@ -89,25 +89,29 @@
         <td>{$form.waitlist_text.html}</td>
       {/if}
     </tr>
-    <tr class="crm-event-manage-eventinfo-form-block-is_map">
+    <tr class="crm-event-manage-eventinfo-form-block-is_active">
       <td>&nbsp;</td>
-      <td>{$form.is_map.html} {$form.is_map.label} {help id="id-is_map"}</td>
+      <td>{$form.is_active.html} {$form.is_active.label} {help id="id-is_active"}</td>
     </tr>
     <tr class="crm-event-manage-eventinfo-form-block-is_public">
       <td>&nbsp;</td>
       <td>{$form.is_public.html} {$form.is_public.label} {help id="id-is_public"}</td>
     </tr>
-    <tr class="crm-event-manage-eventinfo-form-block-is_share">
+    <tr class="crm-event-manage-eventinfo-form-block-separator">
       <td>&nbsp;</td>
-      <td>{$form.is_share.html} {$form.is_share.label} {help id="id-is_share"}
+      <td>{ts}Display event information:{/ts}</td>
     </tr>
-    <tr class="crm-event-manage-eventinfo-form-block-is_active">
+    <tr class="crm-event-manage-eventinfo-form-block-is_map">
       <td>&nbsp;</td>
-      <td>{$form.is_active.html} {$form.is_active.label}</td>
+      <td>{$form.is_map.html} {$form.is_map.label} {help id="id-is_map"}</td>
     </tr>
     <tr class="crm-event-manage-eventinfo-form-block-is_show_calendar_links">
       <td>&nbsp;</td>
-      <td>{$form.is_show_calendar_links.html} {$form.is_show_calendar_links.label}</td>
+      <td>{$form.is_show_calendar_links.html} {$form.is_show_calendar_links.label} {help id="id-is_show_calendar_links"}</td>
+    </tr>
+    <tr class="crm-event-manage-eventinfo-form-block-is_share">
+      <td>&nbsp;</td>
+      <td>{$form.is_share.html} {$form.is_share.label} {help id="id-is_share"}
     </tr>
 
     {if $eventID AND !$isTemplate}
