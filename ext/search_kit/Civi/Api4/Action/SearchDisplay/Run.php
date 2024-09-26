@@ -46,7 +46,7 @@ class Run extends AbstractRunAction {
     $pagerMode = NULL;
 
     $this->preprocessLinks();
-    $this->augmentSelectClause($apiParams);
+    $this->augmentSelectClause($apiParams, $settings);
     $this->applyFilters();
 
     switch ($this->return) {
