@@ -85,8 +85,8 @@ abstract class CRM_Utils_System_Base {
     switch ($print) {
       case 0:
         // Not a print context.
-        $config = CRM_Core_Config::singleton();
-        return 'CRM/common/' . strtolower($config->userFramework) . '.tpl';
+        // Despite what the template is called
+        return 'CRM/common/CMSPrint.tpl';
 
       case CRM_Core_Smarty::PRINT_PAGE:
         return 'CRM/common/print.tpl';
