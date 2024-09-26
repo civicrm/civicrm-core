@@ -90,6 +90,9 @@ body {
 .crm-container .ui-icon:hover {
     background-image: none;
 }
+.crm-container .ui-corner-all {
+    border-radius: 0;
+}
 .crm-container .ui-button-icon-only .ui-icon {
     position: initial;
     top: auto;
@@ -400,7 +403,8 @@ dl dd, dl dl {
 }
 .crm-container .css_right,
 .crm-container .float-right,
-.crm-container .pull-right {
+.crm-container .pull-right,
+.crm-container .element-right {
     float: right;
 }
 /* Responsive  */

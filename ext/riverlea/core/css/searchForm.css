@@ -5,9 +5,9 @@
 /* Alpha filter */
 
 .crm-container div#alpha-filter {
-  background-color: var(--crm-c-blue-light);
+  background-color: var(--crm-filter-bg);
   margin: var(--crm-r) 0;
-  padding: var(--crm-s);
+  padding: var(--crm-filter-padding);
   text-align: left;
   box-shadow: var(--crm-block-shadow);
   border-radius: var(--crm-roundness);
@@ -15,20 +15,16 @@
 #crm-container #alpha-filter ul {
   margin: 0;
   display: flex;
-  gap: 1.125rem;
+  gap: var(--crm-flex-gap);
 }
 .crm-container #alpha-filter li {
-  color: var(--crm-c-background5);
+  color: var(--crm-c-text);
 }
 .crm-container #alpha-filter a {
-  border-bottom: 1px dotted var(--crm-c-link);
   font-weight: normal;
-}
-.crm-container #alpha-filter a.active {
-  border-bottom: none;
-  color: 1px dotted var(--crm-c-link-hover);
-  font-weight: var(--crm-bold-weight);
-  font-family: var(--crm-font-bold);
+  background: var(--crm-filter-item-bg);
+  padding: var(--crm-s) var(--crm-m);
+  box-shadow: 0px 0px 3px rgba(0,0,0,0.1);
 }
 
 /* Advanced Search - basic criteria */

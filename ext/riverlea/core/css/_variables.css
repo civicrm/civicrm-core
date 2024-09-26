@@ -423,6 +423,12 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-wizard-border: var(--crm-c-divider);
 --crm-wizard-bg: var(--crm-c-page-background);
 
+/* Alpha filter */
+--crm-filter-bg: var(--crm-c-blue-light);
+--crm-filter-padding: var(--crm-m);
+--crm-filter-item-bg:  #fafafa;
+--crm-filter-item-shadow: 0px 0px 3px rgba(0,0,0,0.1);
+
 /* Frontend */
 --crm-f-form-width: 700px;
 --crm-f-box-shadow: var(--crm-block-shadow);
@@ -441,7 +447,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-f-input-radius: var(--crm-roundness);
 --crm-f-input-padding: var(--crm-r2) var(--crm-m2);
 --crm-f-input-font-size: var(--crm-r1);
---crm-f-input-width: 100%;
+--crm-f-input-width: auto;
 --crm-f-form-focus-bg: var(--crm-c-green);
 --crm-f-form-error-bg: var(--crm-c-red);
 --crm-f-logo-height: 40px;

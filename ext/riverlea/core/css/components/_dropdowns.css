@@ -157,7 +157,11 @@
     z-index: 10000;
     background: none;
     padding-bottom: 0;
+    margin: -12px;
     display: none;
+}
+.crm-container .crm-summary-display_name .crm-tooltip-wrapper {
+    margin: -10px -5px;
 }
 .crm-container .crm-tooltip-active .crm-tooltip-wrapper {
     display: block;
@@ -176,7 +180,10 @@
     content: "";
     left: var(--crm-m2);
     position: relative;
-    top: -12px;
+    top: -7px;
+}
+.crm-container .crm-summary-display_name .crm-tooltip-wrapper::before {
+    top: -11px;
 }
 .crm-container .crm-tooltip .crm-summary-group {
     width: 700px;

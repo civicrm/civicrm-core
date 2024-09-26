@@ -67,6 +67,7 @@
 .crm-container.crm-public input[type="password"],
 .crm-container.crm-public input[type="email"],
 .crm-container.crm-public select,
+.crm-container.crm-public textarea,
 .crm-container.crm-public .select2-container .select2-choice {
     border-radius: var(--crm-f-input-radius);
     padding: var(--crm-f-input-padding);

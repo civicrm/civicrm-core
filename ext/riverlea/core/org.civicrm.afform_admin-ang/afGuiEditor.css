@@ -109,10 +109,9 @@
 #afGuiEditor .panel-body {
     padding: var(--crm-padding-reg);
     position: relative;
-    /* overflow-y: scroll;
-    overflow-x: hidden; Turning off for dropdown menu clipping */
     border-top: none !important;
     height: 100%;
+    background: var(--crm-tab-bg-active);
 }
 
 /* Edit palette (left side) */

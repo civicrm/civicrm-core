@@ -9,7 +9,7 @@
 .crm-container table.form-layout td,
 .crm-container table.form-layout-compressed td,
 .crm-form-block .crm-section {
-    padding: var(--crm-m) var(--crm-s);
+    padding: var(--crm-m) var(--crm-s2);
     border: none !important /* vs contactSummary.css */;
     height: auto;
 }
@@ -149,6 +149,7 @@ select.crm-form-multiselect {
     padding: var(--crm-input-padding-large);
     height: auto;
     min-height: var(--crm-input-height);
+    width: auto;
 }
 .crm-container input.crm-form-color {
     width: var(--crm-input-height);
@@ -231,14 +232,15 @@ input.crm-form-entityref {
 
 /* Inline edit */
 
-.crm-edit-ready .crm-inline-edit:hover {
-    cursor: var(--crm-hover-clickable);
-    border: var(--crm-dash-edit-border);
-}
 .crm-inline-edit {
     border: var(--crm-dash-edit-border);
     border-color: transparent;
     background: none;
+    position: relative;
+}
+.crm-edit-ready .crm-inline-edit:hover {
+    cursor: var(--crm-hover-clickable);
+    border: var(--crm-dash-edit-border);
 }
 .crm-container .crm-editable-form {
     display: flex;
@@ -649,6 +651,47 @@ input.crm-form-checkbox) + label {
     cursor: var(--crm-hover-clickable);
     padding: var(--crm-s);
     text-align: center;
+}
+
+/* JQ spinner */
+
+.crm-container .ui-spinner input,
+#crm-search-results-page-size /* SK pagination */ {
+    width: 8ch;
+}
+.crm-container .ui-spinner a.ui-spinner-button {
+    width: var(--crm-r2);
+    margin: 1px;
+    cursor: var(--crm-hover-clickable);
+    color: var(--crm-c-link);
+    border-radius: 0;
+    border-left: 1px solid var(--crm-input-border-color);
+}
+.crm-container .ui-spinner a.ui-spinner-button:hover,
+.crm-container .ui-spinner a.ui-spinner-button:focus {
+    color: var(--crm-c-light-text);
+}
+.crm-container .ui-spinner a.ui-spinner-button span::before {
+    font-family: "FontAwesome";
+    font-style: normal;
+    font-weight: normal;
+    font-size: var(--crm-m3);
+    text-indent: 0;
+    display: block;
+}
+.crm-container .ui-spinner a.ui-spinner-up {
+    border-top-right-radius: var(--crm-input-border-radius);
+}
+.crm-container .ui-spinner a.ui-spinner-down {
+    border-bottom-right-radius: var(--crm-input-border-radius);
+}
+.crm-container .ui-spinner a.ui-spinner-up span::before {
+    content: var(--crm-icon-sort-asc);
+    margin-top: 3px;
+}
+.crm-container .ui-spinner a.ui-spinner-down span::before {
+    content: var(--crm-icon-sort-desc);
+    margin-top: -4px;
 }
 
 /* BS3 radio/checklbox */

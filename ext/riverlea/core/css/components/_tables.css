@@ -145,6 +145,11 @@ table.dataTable.order-column.stripe tbody tr.extension-installed.even > .sorting
 .crm-container .form-item:has(> table) { /* simple fix-all for making many tables scroll when needed */
     overflow-x: auto;
 }
+.crm-selection-reset {
+    padding: var(--crm-m) 0;
+    margin-bottom: var(--crm-m);
+    display: block;
+}
 
 /* Data Tables */
 

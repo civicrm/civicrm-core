@@ -1,3 +1,15 @@
+0.10.3
+ - ADDED - JQueery spinner styling (number counter with arrows used on pagination)
+ - FIXED - contact tooltip position in search results
+ - FIXED - pagination/etc on search results
+ - FIXED - button wrapping on dialogs https://lab.civicrm.org/extensions/riverlea/-/issues/5
+ - ADDED - hover state for contact dashboard main name
+ - NEW CSS VARIABLES - for alpha-filter (Wellow inspired)
+    added: --crm-filter-bg
+    added: --crm-filter-padding
+    added: --crm-filter-item-bg
+    added: --crm-filter-item-shadow
+
 0.10.2
  - FIXES - alignment of table sort headers
  - ADDED - min height to body (via Thames)

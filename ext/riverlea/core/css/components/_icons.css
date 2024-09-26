@@ -30,7 +30,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 .crm-container span.batch-valid,
 .crm-container span.batch-invalid,
 .crm-container .messages.crm-empty-table::before {
-    font-family: "FontAwesome";
+    font-family: "Font Awesome 6 Free", "FontAwesome";
     font-style: normal;
     font-weight: normal ;
     text-rendering: auto;
@@ -147,13 +147,14 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 .crm-search-display-table > table.table > thead > tr > th i.crm-search-table-column-sort-icon {
     /* Bootstrap & SearchKit sort resets */
     position: initial;
-    float: var(--crm-table-sort-float);
-    opacity: 1;
-    color: inherit;
+    color: var(--crm-table-sort-col);
     line-height: inherit;
     font-style: normal;
     text-rendering: auto;
-    font: normal normal normal var(--crm-dash-icon-size)/inherit FontAwesome;
+    font-family: "Font Awesome 6 Free", "FontAwesome";
+    font-style: normal;
+    font-weight: normal;
+    cursor: var(--crm-hover-clickable);
 }
 .crm-container a.sorting::after,
 .crm-container a.sorting_asc::after,
@@ -169,6 +170,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
     font-size: var(--crm-dash-icon-size);
     content:  var(--crm-icon-sort);
     color: var(--crm-table-sort-col);
+    cursor: var(--crm-hover-clickable);
 }
 .crm-container th.crm-sortable-col i.crm-search-table-column-sort-icon::before,
 .crm-container table.dataTable thead th.sorting::before,

@@ -137,6 +137,7 @@
     gap: var(--crm-m);
     padding: var(--crm-m);
     justify-content: flex-end;
+    flex-wrap: wrap;
 }
 .crm-container.ui-dialog .buttons.pull-right {
     display: flex;

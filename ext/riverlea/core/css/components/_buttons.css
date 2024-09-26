@@ -197,7 +197,7 @@
     margin: 0;
     cursor: var(--crm-hover-clickable);
     border-radius: var(--crm-btn-radius);
-    display: inline-block;
+    display: inline;
     line-height: 1.5;
 }
 .crm-container td a.crm-hover-button + .crm-hover-button:not(:last-of-type) {

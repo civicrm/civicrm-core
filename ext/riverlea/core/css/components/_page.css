@@ -89,6 +89,31 @@
     background: var(--crm-c-secondary-hover);
 }
 
+/* Pagination quickforms */
+
+.crm-pager {
+	display: flex;
+	flex-direction: column-reverse;
+}
+.crm-pager .crm-pager-nav {
+	margin: 0 auto;
+}
+.crm-container .crm-pager-nav a.crm-hover-button {
+	background: var(--crm-c-secondary);
+	color: var(--crm-c-secondary-text);
+	padding: var(--crm-btn-padding-block) var(--crm-btn-padding-inline);
+}
+.crm-container .crm-pager-nav a.crm-hover-button:hover,
+.crm-container .crm-pager-nav a.crm-hover-button:focus {
+	background: var(--crm-c-secondary-hover);
+}
+.crm-search-results > .crm-pager:first-of-type {
+	display: none; /* removes second top pager */
+}
+.crm-search-results .form-item.float-right {
+	margin-block: -2rem 1rem; /* positions rows-per-page block somewhat in line with page counter */
+}
+
 /*  Pagination - from BS3 */
 
 .crm-container .pagination {
