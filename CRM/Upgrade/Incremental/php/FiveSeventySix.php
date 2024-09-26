@@ -47,6 +47,7 @@ class CRM_Upgrade_Incremental_php_FiveSeventySix extends CRM_Upgrade_Incremental
       $this->addTask('Migrate event cart ID', 'migrateEventCartID');
     }
     $this->addTask('Update civicrm_mailing to permit deleting records from civicrm_mailing_job', 'updateNewCiviMailFields');
+    $this->addTask('Remove Foreign Key References from cache tables', 'removeForiegnKeyReferencesCacheTables');
   }
 
   /**
@@ -261,6 +262,13 @@ WHERE (m.status IS NULL OR m.status = "Draft")
 UPDATE  civicrm_mailing m
 SET `status` = "Draft" WHERE `status` IS NULL
 AND m.id BETWEEN %1 AND %2', [1 => [$startId, 'Integer'], 2 => [$endId, 'Integer']]);
+    return TRUE;
+  }
+
+  public static function removeForiegnKeyReferencesCacheTables(): bool {
+    CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_group_contact_cache', 'FK_civicrm_group_contact_cache_contact_id');
+    CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_group_contact_cache', 'FK_civicrm_group_contact_cache_group_id');
+    CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_acl_cache', 'FK_civicrm_acl_cache_acl_id');
     return TRUE;
   }
 
