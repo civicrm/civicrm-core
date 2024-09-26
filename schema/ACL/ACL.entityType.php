@@ -81,7 +81,7 @@ return [
       'description' => ts('What operation does this ACL entry control?'),
       'add' => '1.6',
       'pseudoconstant' => [
-        'callback' => 'CRM_ACL_BAO_ACL::operation',
+        'callback' => ['CRM_ACL_BAO_ACL', 'operation'],
       ],
     ],
     'object_table' => [
@@ -94,7 +94,7 @@ return [
         'label' => ts('Type of Data'),
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_ACL_BAO_ACL::getObjectTableOptions',
+        'callback' => ['CRM_ACL_BAO_ACL', 'getObjectTableOptions'],
       ],
     ],
     'object_id' => [
@@ -108,7 +108,7 @@ return [
         'control_field' => 'object_table',
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_ACL_BAO_ACL::getObjectIdOptions',
+        'callback' => ['CRM_ACL_BAO_ACL', 'getObjectIdOptions'],
         'prefetch' => 'disabled',
       ],
     ],

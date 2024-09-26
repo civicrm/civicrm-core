@@ -48,7 +48,7 @@ return [
         'duplicate_matching',
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Financial_BAO_EntityFinancialTrxn::entityTables',
+        'callback' => ['CRM_Financial_BAO_EntityFinancialTrxn', 'entityTables'],
       ],
     ],
     'entity_id' => [

@@ -130,7 +130,7 @@ return [
       'add' => '1.2',
       'default' => 'User and User Admin Only',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::groupVisibility',
+        'callback' => ['CRM_Core_SelectValues', 'groupVisibility'],
       ],
     ],
     'where_clause' => [

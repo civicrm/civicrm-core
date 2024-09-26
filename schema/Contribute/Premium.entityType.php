@@ -29,7 +29,7 @@ return [
       'description' => ts('Joins these premium settings to another object. Always civicrm_contribution_page for now.'),
       'add' => '1.4',
       'pseudoconstant' => [
-        'callback' => 'CRM_Contribute_BAO_Premium::entityTables',
+        'callback' => ['CRM_Contribute_BAO_Premium', 'entityTables'],
       ],
     ],
     'entity_id' => [

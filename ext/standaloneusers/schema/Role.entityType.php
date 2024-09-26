@@ -54,7 +54,7 @@ return [
       'description' => E::ts('List of permissions granted by this role'),
       'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND,
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::permissions',
+        'callback' => ['CRM_Core_SelectValues', 'permissions'],
       ],
     ],
     'is_active' => [

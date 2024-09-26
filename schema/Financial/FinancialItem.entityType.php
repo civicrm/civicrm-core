@@ -150,7 +150,7 @@ return [
       'description' => ts('May contain civicrm_line_item, civicrm_financial_trxn etc'),
       'add' => '4.3',
       'pseudoconstant' => [
-        'callback' => 'CRM_Financial_BAO_FinancialItem::entityTables',
+        'callback' => ['CRM_Financial_BAO_FinancialItem', 'entityTables'],
       ],
     ],
     'entity_id' => [

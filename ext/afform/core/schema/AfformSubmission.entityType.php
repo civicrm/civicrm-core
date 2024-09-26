@@ -46,7 +46,7 @@ return [
         'maxlength' => 255,
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Afform_BAO_AfformSubmission::getAllAfformsByName',
+        'callback' => ['CRM_Afform_BAO_AfformSubmission', 'getAllAfformsByName'],
         'suffixes' => [
           'name',
           'label',

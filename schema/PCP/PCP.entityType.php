@@ -108,7 +108,7 @@ return [
       'add' => '2.2',
       'default' => 'contribute',
       'pseudoconstant' => [
-        'callback' => 'CRM_PCP_BAO_PCP::pageTypeOptions',
+        'callback' => ['CRM_PCP_BAO_PCP', 'pageTypeOptions'],
       ],
     ],
     'pcp_block_id' => [
