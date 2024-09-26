@@ -67,7 +67,7 @@ return [
       'description' => ts('Payment Processor Name.'),
       'add' => '1.8',
       'input_attrs' => [
-        'label' => ts('Machine Name'),
+        'label' => ts('Machine name'),
       ],
     ],
     'title' => [

@@ -11,9 +11,9 @@
 
 namespace Civi\Api4\Action\RolePermission;
 
-use Civi\Api4\Generic\BasicUpdateAction;
+use Civi\Api4\Generic\BasicSaveAction;
 
-class Update extends BasicUpdateAction {
+class Save extends BasicSaveAction {
   use RolePermissionSaveTrait;
 
 }

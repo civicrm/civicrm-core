@@ -20,10 +20,10 @@ class CRM_Standaloneusers_Upgrader extends CRM_Extension_Upgrader_Base {
   public function preInstall() {
     $config = \CRM_Core_Config::singleton();
     // We generally only want to run on standalone. In theory, we might also run headless tests.
-    if (!in_array(get_class($config->userPermissionClass), ['CRM_Core_Permission_Standalone', 'CRM_Core_Permission_Headless'])) {
+    if (!in_array(get_class($config->userPermissionClass), ['CRM_Core_Permission_Standalone', 'CRM_Core_Permission_UnitTests'])) {
       throw new \CRM_Core_Exception("standaloneusers can only be installed on standalone");
     }
-    if (!in_array(get_class($config->userSystem), ['CRM_Utils_System_Standalone', 'CRM_Utils_System_Headless'])) {
+    if (!in_array(get_class($config->userSystem), ['CRM_Utils_System_Standalone', 'CRM_Utils_System_UnitTests'])) {
       throw new \CRM_Core_Exception("standaloneusers can only be installed on standalone");
     }
     CRM_Core_DAO::executeQuery('DROP TABLE civicrm_uf_match');

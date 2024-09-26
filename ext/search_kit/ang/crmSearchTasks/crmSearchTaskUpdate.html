@@ -10,7 +10,7 @@
     </div>
     <div ng-if="$ctrl.run" class="crm-search-task-progress">
       <h5>{{:: ts('Updating %1 %2...', {1: model.ids.length, 2: $ctrl.entityTitle}) }}</h5>
-      <crm-search-batch-runner entity="model.entity" action="update" params="$ctrl.run" ids="model.ids" success="$ctrl.onSuccess()" error="$ctrl.onError()" ></crm-search-batch-runner>
+      <crm-search-batch-runner entity="model.entity" action="update" params="$ctrl.run" ids="model.ids" success="$ctrl.onSuccess()" error="$ctrl.onError()" id-field="{{:: $ctrl.idField }}"></crm-search-batch-runner>
     </div>
 
     <crm-dialog-button text="ts('Cancel')" icons="{primary: 'fa-times'}" on-click="$ctrl.cancel()" disabled="$ctrl.run" ></crm-dialog-button>

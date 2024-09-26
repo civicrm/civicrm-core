@@ -19,9 +19,11 @@ use CRM_Standaloneusers_ExtensionUtil as E;
  * RolePermission - Virtual Entity for retrieving the permissions of a user role.
  *
  * @searchable secondary
+ * @labelField title
+ * @primaryKey name
  * @package standaloneusers
  */
-class RolePermission extends Generic\BasicEntity {
+class RolePermission extends Generic\AbstractEntity {
 
   /**
    * @param bool $checkPermissions
@@ -37,88 +39,90 @@ class RolePermission extends Generic\BasicEntity {
       ->setCheckPermissions($checkPermissions);
   }
 
+  public static function save($checkPermissions = TRUE) {
+    return (new Action\RolePermission\Save(static::getEntityName(), __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
   /**
    * @return \Civi\Api4\Generic\BasicGetFieldsAction
    */
   public static function getFields($checkPermissions = TRUE) {
-    return (new BasicGetFieldsAction(static::getEntityName(), __FUNCTION__, function() {
-      $permissions = \Civi\Api4\Permission::get(FALSE)
-        ->addSelect('*', 'group:label')
-        ->addWhere('is_synthetic', '=', FALSE)
-        ->addOrderBy('group', 'ASC')
-        ->execute();
-      $groups = [];
-      foreach ($permissions as $permission) {
-        if (!isset($groups[$permission['group:label']])) {
-          $groups[$permission['group:label']] = $permission['group:label'];
-        }
-      }
+    return (new BasicGetFieldsAction(static::getEntityName(), __FUNCTION__, function($getFields) {
       $roles = \Civi\Api4\Role::get(FALSE)
+        ->addSelect('name', 'label')
         ->addWhere('name', '!=', 'admin')
-        ->execute();
-      $roleOptions = [];
-      foreach ($roles as $role) {
-        $roleOptions[$role['name']] = $role['label'];
-      }
+        ->execute()
+        ->column('label', 'name');
 
-      return [
-        'id' => [
-          'name' => 'id',
+      $fields = [
+        [
+          'name' => 'group',
+          'title' => 'Group',
           'data_type' => 'String',
-          'label' => E::ts('ID'),
-          'input_type' => 'Text',
-        ],
-        'role_id' => [
-          'name' => 'role_id',
-          'data_type' => 'Integer',
-          'label' => E::ts('Role ID'),
-        ],
-        'role_name' => [
-          'name' => 'role_name',
-          'data_type' => 'String',
-          'label' => E::ts('Role Name'),
           'input_type' => 'Select',
-          'options' => $roleOptions,
+          'readonly' => TRUE,
+          'options' => [
+            'civicrm' => 'civicrm',
+            'cms' => 'cms',
+            'const' => 'const',
+            'afform' => 'afform',
+            'afformGeneric' => 'afformGeneric',
+            'unknown' => 'unknown',
+          ],
+          'input_attrs' => [
+            'label' => E::ts('Group'),
+          ],
         ],
-        'role_label' => [
-          'name' => 'role_label',
+        [
+          'name' => 'name',
+          'title' => 'Name',
           'data_type' => 'String',
-          'label' => E::ts('Role Label'),
           'input_type' => 'Text',
+          'readonly' => TRUE,
+          'input_attrs' => [
+            'label' => E::ts('Machine name'),
+          ],
         ],
-        'permission_group' => [
-          'name' => 'permission_group',
+        [
+          'name' => 'title',
+          'title' => 'Permission Title',
           'data_type' => 'String',
-          'label' => E::ts('Permission Group'),
-          'input_type' => 'Select',
-          'options' => $groups,
-        ],
-        'permission_name' => [
-          'name' => 'permission_name',
-          'data_type' => 'String',
-          'label' => E::ts('Permission Name'),
           'input_type' => 'Text',
+          'readonly' => TRUE,
+          'input_attrs' => [
+            'label' => E::ts('Permission'),
+          ],
         ],
-        'permission_title' => [
-          'name' => 'permission_title',
+        [
+          'name' => 'description',
+          'title' => 'Description',
           'data_type' => 'String',
-          'label' => E::ts('Permission Title'),
           'input_type' => 'Text',
-        ],
-        'permission_description' => [
-          'name' => 'permission_description',
-          'data_type' => 'String',
-          'label' => E::ts('Permission Description'),
-          'input_type' => 'Text',
-        ],
-        'permission_granted' => [
-          'name' => 'permission_granted',
-          'data_type' => 'Boolean',
-          'label' => E::ts('Permission Granted'),
-          'input_type' => 'CheckBox',
-          'entity' => 'RolePermission',
+          'readonly' => TRUE,
+          'input_attrs' => [
+            'label' => E::ts('Description'),
+          ],
         ],
       ];
+      foreach ($roles as $roleName => $roleLabel) {
+        $fields[] = [
+          'name' => 'granted_' . $roleName,
+          'title' => $roleLabel,
+          'data_type' => 'Boolean',
+          'input_type' => 'CheckBox',
+          'description' => E::ts('Permission explicitly granted to the "%1" role.', [1 => $roleLabel]),
+        ];
+        $fields[] = [
+          'name' => 'implied_' . $roleName,
+          'title' => $roleLabel . ' (' . E::ts('implied') . ')',
+          'data_type' => 'Boolean',
+          'input_type' => 'CheckBox',
+          'readonly' => TRUE,
+          'description' => E::ts('Permission implied to the "%1" role.', [1 => $roleLabel]),
+        ];
+      }
+      return $fields;
     }))->setCheckPermissions($checkPermissions);
   }
 
@@ -129,6 +133,10 @@ class RolePermission extends Generic\BasicEntity {
     return [
       'default' => ['cms:administer users'],
     ];
+  }
+
+  protected static function getEntityTitle(bool $plural = FALSE): string {
+    return $plural ? E::ts('User Permissions') : E::ts('User Permission');
   }
 
 }
