@@ -63,4 +63,20 @@ return function ($mixInfo, $bootCache) {
     $event->classes = array_merge($event->classes, $all);
   });
 
+  /**
+   * @param \Civi\Core\Event\GenericHookEvent $event
+   */
+  Civi::dispatcher()->addListener('civi.api4.entityTypes', function ($event) use ($mixInfo) {
+    if (!$mixInfo->isActive()) {
+      return;
+    }
+
+    foreach (glob("$mixInfo->path/Civi/Api4/*.php") as $file) {
+      $className = 'Civi\Api4\\' . basename($file, '.php');
+      if (is_a($className, 'Civi\Api4\Generic\AbstractEntity', TRUE)) {
+        $info = $className::getInfo();
+        $event->entities[$info['name']] = $info;
+      }
+    }
+  });
 };
