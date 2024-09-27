@@ -160,10 +160,81 @@ body {
   border-radius: 0 var(--crm-dash-roundness) var(--crm-dash-roundness) 0;
 }
 
+.crm-contact-page #mainTabContainer .ui-tabs-nav li .ui-tabs-anchor:has(.crm-i) {
+  grid-template-columns: var(--crm-dash-icon-size) 1fr auto;
+  gap: 1ch;
+}
+.crm-contact-page #mainTabContainer .ui-tabs-nav li .ui-tabs-anchor .crm-i:first-child {
+  justify-self: center;
+}
+
 /* make count badges more readable */
 .crm-container .ui-tabs ul.ui-tabs-nav a em, .crm-container .nav-tabs a .badge {
 	padding: 0 0.2rem;
 }
+
+/* RL has no margin-bottom so the actions ribbon touches the main contact block */
+div.crm-summary-contactname-block + .crm-actions-ribbon {
+  margin-bottom: var(--crm-r1) !important;
+}
+
+/* Use subgrid? No. Not responsive enough. */
+/* #contact-summary { grid-template-columns: 1fr 1fr; display: grid; } */
+/* .crm-container div.contact_panel { display: grid; grid-template-columns: subgrid; grid-column: 1 / 3; } */
+/* .contact_details { grid-template-columns: subgrid; grid-column: 1/ 3; } */
+
+/* Decorations to indicate an editable chunk. */
+#contact-summary .crm-edit-help {
+	color: transparent;
+  transition: 0.3s color;
+  opacity: 1;
+  font-size: 0.875rem;
+}
+#contact-summary .crm-edit-help .crm-i.fa-pencil {
+  color: var(--crm-c-blue) !important; /* important overrides contactSummary.css */
+}
+
+#contact-summary .crm-inline-edit:hover .crm-edit-help {
+  color: var(--crm-c-blue-dark);
+}
+#contact-summary .crm-inline-edit:hover .crm-edit-help .crm-i.fa-pencil {
+	color: var(--crm-c-blue-dark) !important;
+}
+.crm-container div.crm-summary-row {
+  display: grid;
+  grid-template-columns: var(--crm-input-label-width) 1fr;
+}
+/* unbold the labels */
+.crm-container div.crm-summary-row div.crm-label {
+  font-weight: normal !important; /* important overrides contactSummary.css that comes after this stylesheet */
+}
+/* instead bold the values */
+.crm-container div.crm-summary-row div.crm-label + div {
+  font-weight: bold;
+}
+
+/* drop the ugly mahusive roadsign-atop unreadable icon for things like do not email */
+.fa-stack .crm-i.fa-stack-2x {
+  font-size: 1rem;
+}
+.fa-stack .crm-i.fa-stack-1x:first-child {
+  display: none;
+}
+
+/* all.min.css | http://sa1.localhost:8100/core/bower_components/font-awesome/css/all.min.css */
+
+#contact-summary div.crm-summary-row div.crm-label .fa-stack {
+  height: auto;
+  line-height: inherit;
+  vertical-align: baseline;
+  width: auto;
+}
+
+#contact-summary div.crm-summary-row div.crm-label :where(.fa-stack-1x, .fa-stack-2x) {
+  position: static;
+  width: auto;
+}
+
 
 
 /* INLINE EDIT */
@@ -176,4 +247,5 @@ body {
 .crm-container .crm-editable-form [type="submit"] {
   color: var(--crm-c-green-dark) !important;
 }
+
 
