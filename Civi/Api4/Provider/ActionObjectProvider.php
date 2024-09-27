@@ -50,6 +50,10 @@ class ActionObjectProvider extends AutoService implements EventSubscriberInterfa
   public function onApiResolve(ResolveEvent $event) {
     $apiRequest = $event->getApiRequest();
     if ($apiRequest instanceof AbstractAction) {
+      $entityName = $apiRequest->getEntityName();
+      if (!isset($this->getEntities()[$entityName])) {
+        throw new \CRM_Core_Exception("Unrecognised entity in Api4 ActionObjectProvider: $entityName");
+      }
       $event->setApiRequest($apiRequest);
       $event->setApiProvider($this);
       $event->stopPropagation();
