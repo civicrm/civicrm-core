@@ -137,7 +137,13 @@ class AfformAutocompleteSubscriber extends AutoService implements EventSubscribe
     }
     switch ($fieldName) {
       case 'autocompleteSavedSearch':
-        $apiRequest->addFilter('api_entity', $apiRequest->getFilters()['api_entity']);
+        if (CoreUtil::isContact($apiRequest->getFilters()['api_entity'])) {
+          $filter = ['Contact', $apiRequest->getFilters()['api_entity']];
+          $apiRequest->addFilter('api_entity', $filter);
+        }
+        else {
+          $apiRequest->addFilter('api_entity', $apiRequest->getFilters()['api_entity']);
+        }
         return;
 
       case 'autocompleteDisplay':
