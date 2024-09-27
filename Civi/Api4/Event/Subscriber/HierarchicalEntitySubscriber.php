@@ -88,10 +88,14 @@ class HierarchicalEntitySubscriber extends AutoService implements EventSubscribe
         // This guards against a loop getting "stuck" - if there's no progress after an iteration, abandon the orphaned children
         $childCount = count($children);
         foreach (array_reverse($children, TRUE) as $index => $child) {
-          if (isset($records[$child[$parentName]])) {
-            $child['_depth'] = $records[$child[$parentName]]['_depth'] + 1;
-            $records = self::array_insert_after($records, $child[$parentName], [$child[$idName] => $child]);
-            unset($children[$index]);
+          // If the child has more than one parent (Groups entity), just pick the 1st valid one
+          foreach ((array) $child[$parentName] as $parentId) {
+            if (isset($records[$parentId])) {
+              $child['_depth'] = $records[$parentId]['_depth'] + 1;
+              $records = self::array_insert_after($records, $parentId, [$child[$idName] => $child]);
+              unset($children[$index]);
+              break;
+            }
           }
         }
       }
@@ -114,9 +118,10 @@ class HierarchicalEntitySubscriber extends AutoService implements EventSubscribe
   }
 
   private function getParentField(string $entityName): array {
+    $parentField = CoreUtil::getInfoItem($entityName, 'parent_field');
     return civicrm_api4($entityName, 'getFields', [
       'checkPermissions' => FALSE,
-      'where' => [['name', '=', CoreUtil::getInfoItem($entityName, 'parent_field')]],
+      'where' => [['name', '=', $parentField]],
     ])->first();
   }
 
