@@ -162,7 +162,7 @@ class ActionObjectProvider extends AutoService implements EventSubscriberInterfa
 
     if (!$entities) {
       // Load entities declared in API files
-      foreach ($this->getAllApiClasses() as $className) {
+      foreach ($this->getCoreApiClasses() as $className) {
         $info = $className::getInfo();
         $entities[$info['name']] = $info;
       }
@@ -186,23 +186,16 @@ class ActionObjectProvider extends AutoService implements EventSubscriberInterfa
   }
 
   /**
-   * Scan all api directories to discover entities
+   * Scan core api4 directory to discover entities
    * @return \Civi\Api4\Generic\AbstractEntity[]
    */
-  public function getAllApiClasses(): array {
+  public function getCoreApiClasses(): array {
     $classNames = [];
-    $locations = array_merge([\Civi::paths()->getPath('[civicrm.root]/Civi.php')],
-      array_column(\CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(), 'filePath')
-    );
-    foreach ($locations as $location) {
-      $dir = \CRM_Utils_File::addTrailingSlash(dirname($location ?? '')) . 'Civi/Api4';
-      if (is_dir($dir)) {
-        foreach (glob("$dir/*.php") as $file) {
-          $className = 'Civi\Api4\\' . basename($file, '.php');
-          if (is_a($className, 'Civi\Api4\Generic\AbstractEntity', TRUE)) {
-            $classNames[] = $className;
-          }
-        }
+    $dir = \Civi::paths()->getPath('[civicrm.root]/Civi/Api4');
+    foreach (glob("$dir/*.php") as $file) {
+      $className = 'Civi\Api4\\' . basename($file, '.php');
+      if (is_a($className, 'Civi\Api4\Generic\AbstractEntity', TRUE)) {
+        $classNames[] = $className;
       }
     }
     return $classNames;
