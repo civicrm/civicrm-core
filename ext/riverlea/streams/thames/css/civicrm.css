@@ -17,8 +17,15 @@ body {
   cursor: pointer; /* show it's clickable */
   position: relative; /* so our animated triangle doesn't go walkies */
 }
-.crm-container summary:hover {
+.crm-container :where(summary:hover, summary:focus) {
   background-color: #b8daf4; /* novar */
+}
+
+/* RL introduces a border on focus which causes layout shift 
+ * https://lab.civicrm.org/extensions/riverlea/-/issues/49
+ */
+.crm-container :focus, .crm-container .ui-dialog :focus {
+  border: none;
 }
 
 /* Replace Riverlea's FontAwesome icon with our own shape. */
@@ -121,6 +128,7 @@ body {
 }
 .crm-container .replace-plain { background: #fff; }
 
+
 /* NOTIFICATIONS */
 .crm-container .notify-content { padding-left: 1.6rem; }
 /* Riverlea assumes crm-c-success to be a background color which is not how we're using it. */
@@ -139,6 +147,7 @@ body {
 /* OTHER */
 .crm-container #alpha-filter ul { margin: 0; display: flex; justify-content: space-between; gap: var(--crm-m); color: #0002; padding: 0 1rem; }
 .crm-container .description:not(#help), .crm-container td.description { font-size: 0.875rem; }
+
 
 /* Get rid of the ugly black overlay during loading */
 @keyframes aahblockoverlay {
@@ -246,6 +255,46 @@ div.crm-summary-contactname-block + .crm-actions-ribbon {
 }
 .crm-container .crm-editable-form [type="submit"] {
   color: var(--crm-c-green-dark) !important;
+}
+
+/* nice rounded tables. Pretty niche. */
+.crm-container table:not(.crm-inline-edit-form) {
+  border-radius: 0.4rem;
+  clip-path: inset(0 0 0 0 round 0.4rem);
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.crm-container table tr:first-child th:first-child {
+  border-radius: 0.4rem 0 0 0;
+}
+.crm-container table tr:first-child th:last-child {
+  border-radius: 0 0.4rem 0 0;
+}
+.crm-container table tr:last-child td:first-child {
+  border-radius: 0 0 0 0.4rem ;
+}
+.crm-container table tr:last-child td:last-child {
+  border-radius: 0 0 0.4rem 0  ;
+}
+/* ensure thing that wrap tables allow scrolling in case the table overflows. */
+div:has(> table) {
+	overflow: auto;
+	max-width: 100%;
+}
+
+/* prevent the select-all UI from being crammed up against left side */
+.crm-container .crm-search-display-table > table.table > thead > tr > th.crm-search-result-select {
+  padding-inline: 0.5em;
+}
+/* ...and adjust the individual row checkboxes to be in line */
+.crm-container .table > thead > tr > th, .crm-container .table > thead > tr > td, .crm-container .table > tbody > tr > th, .crm-container .table > tbody > tr > td, .crm-container .table > tfoot > tr > th, .crm-container .table > tfoot > tr > td {
+  padding: 0.2rem 0.8rem;
+}
+/* apply hanging indent to sorting buttons */
+.crm-container :is(tr a, table.dataTable thead th):is(.sorting, .sorting_asc, .sorting_desc),
+.crm-search-display th.crm-sortable-col {
+  padding-left: calc(var(--crm-table-padding, 0) + 1em);
+  &:before { position: absolute; margin-left: -1em; }
 }
 
 

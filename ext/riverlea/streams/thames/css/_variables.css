@@ -214,7 +214,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-expand-gap: var(--crm-xs2) 0 0; /* space between multiple accordions */
 /* .crm-accordion-bold */
 --crm-expand-header-bg: var(--crm-c-blue-overlay); /* thames */
---crm-expand-header-bg-active: var(--crm-c-gray-900);
+--crm-expand-header-bg-active: var(--crm-c-blue); /* thames */
 --crm-expand-header-color: var(--crm-c-blue-darker); /* thames */
 --crm-expand-header-padding: 0.6rem 1.6rem 0.6rem 2.8rem; /* thames */
 --crm-expand-header-weight: var(--crm-bold-weight);
