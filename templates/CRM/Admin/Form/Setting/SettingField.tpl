@@ -2,7 +2,7 @@
 <tr class="crm-setting-form-block-{$setting_name}">
   <td class="label">
     {$form.$setting_name.label}
-    {if $fieldSpec.help_text}
+    {if array_key_exists('help_text', $fieldSpec) && $fieldSpec.help_text}
       {* @todo the appended -id here appears to be inconsistent in the hlp files *}
       {assign var='tplhelp_id' value = $setting_name|cat:'-id'|replace:'_':'-'}{help id="$tplhelp_id"}
     {/if}
