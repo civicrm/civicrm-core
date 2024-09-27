@@ -63,14 +63,15 @@ class DynamicCss implements \Symfony\Component\EventDispatcher\EventSubscriberIn
 
     $stream = $params['stream'] ?? 'empty';
 
-    // TODO: enable fetching variable files from streams
-    // outside of the Riverlea extension directory
-    $streamDir = E::path("streams/{$stream}/css/");
+    // Get the stream directory (could be in core, this extension or another extension that provides a riverlea stream)
+    $theme = \Civi::service('themes')->get($stream);
+    $extRootDir = \CRM_Core_Resources::singleton()->getPath($theme['ext']);
+    $streamDir = $extRootDir . '/css';
 
     $content = [];
 
     // add base vars for the stream
-    $content[] = file_get_contents($streamDir . '_variables.css');
+    $content[] = self::getCSSFromFile($streamDir . '/_variables.css');
 
     switch ($params['dark'] ?? NULL) {
       case 'light':
@@ -79,19 +80,33 @@ class DynamicCss implements \Symfony\Component\EventDispatcher\EventSubscriberIn
 
       case 'dark':
         // add dark vars unconditionally
-        $content[] = file_get_contents($streamDir . '_dark.css');
+        $content[] = self::getCSSFromFile($streamDir . '/_dark.css');
         break;
 
       case 'inherit':
       default:
         // add dark vars wrapped inside a media query
         $content[] = '@media (prefers-color-scheme: dark) {';
-        $content[] = file_get_contents($streamDir . '_dark.css');
+        $content[] = self::getCSSFromFile($streamDir . '/_dark.css');
         $content[] = '}';
         break;
     }
 
     $e->content = implode("\n", $content);
+  }
+
+  /**
+   * Check file exists and return contents or empty string
+   *
+   * @param string $file
+   *
+   * @return string
+   */
+  private static function getCSSFromFile(string $file): string {
+    if (is_file($file)) {
+      return file_get_contents($file) ?? '';
+    }
+    return '';
   }
 
 }
