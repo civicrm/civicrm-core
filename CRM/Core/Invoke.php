@@ -387,7 +387,9 @@ class CRM_Core_Invoke {
     CRM_Core_BAO_Navigation::resetNavigation();
 
     // also cleanup module permissions
-    $config->cleanupPermissions();
+    if (!CRM_Core_Config::isUpgradeMode()) {
+      $config->cleanupPermissions();
+    }
 
     // rebuild word replacement cache - pass false to prevent operations redundant with this fn
     CRM_Core_BAO_WordReplacement::rebuild(FALSE);
@@ -409,7 +411,9 @@ class CRM_Core_Invoke {
       $config->userSystem->invalidateRouteCache();
     }
 
-    CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
+    if (!CRM_Core_Config::isUpgradeMode()) {
+      CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
+    }
   }
 
 }
