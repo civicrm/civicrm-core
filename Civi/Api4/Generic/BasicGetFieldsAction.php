@@ -109,6 +109,8 @@ class BasicGetFieldsAction extends BasicGetAction {
    *
    * Format option lists.
    *
+   * Configure read-only input fields based on the action.
+   *
    * In most cases it's not necessary to override this function, even if your entity is really weird.
    * Instead just override $this->fields and this function will respect that.
    *
@@ -143,6 +145,9 @@ class BasicGetFieldsAction extends BasicGetAction {
       }
       if (isset($defaults['options'])) {
         $this->formatOptionList($field);
+      }
+      if ($this->getAction() === 'create' && $field['readonly'] === TRUE) {
+        $field['input_type'] = 'DisplayOnly';
       }
       $field = array_diff_key($field, $internalProps);
     }
@@ -329,6 +334,7 @@ class BasicGetFieldsAction extends BasicGetAction {
           'ChainSelect' => ts('Chain-Select'),
           'CheckBox' => ts('Checkboxes'),
           'Date' => ts('Date Picker'),
+          'DisplayOnly' => ts('Display Only'),
           'Email' => ts('Email'),
           'EntityRef' => ts('Autocomplete Entity'),
           'File' => ts('File'),
