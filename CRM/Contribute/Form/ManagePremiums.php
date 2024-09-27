@@ -40,16 +40,12 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
       $tempDefaults = Product::get()->addWhere('id', '=', $this->_id)->execute()->first();
       if (isset($tempDefaults['image']) && isset($tempDefaults['thumbnail'])) {
         $defaults['imageUrl'] = $tempDefaults['image'];
-        $defaults['thumbnailUrl'] = $tempDefaults['thumbnail'];
         $defaults['imageOption'] = 'thumbnail';
-        // assign thumbnailUrl to template so we can display current image in update mode
-        $this->assign('thumbnailUrl', $defaults['thumbnailUrl']);
       }
       else {
         $defaults['imageOption'] = 'noImage';
       }
       if (isset($tempDefaults['thumbnail']) && isset($tempDefaults['image'])) {
-        $this->assign('thumbURL', $tempDefaults['thumbnail']);
         $this->assign('imageURL', $tempDefaults['image']);
       }
       if (isset($tempDefaults['period_type'])) {
@@ -101,10 +97,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
     $this->addRule('imageOption', ts('Please select an option for the premium image.'), 'required');
 
     $this->addElement('text', 'imageUrl', ts('Image URL'));
-    $this->addElement('text', 'thumbnailUrl', ts('Thumbnail URL'));
-
     $this->add('file', 'uploadFile', ts('Image File Name'), ['onChange' => 'select_option();']);
-
     $this->add('text', 'price', ts('Market Value'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Product', 'price'), TRUE);
     $this->addRule('price', ts('Please enter the Market Value for this product.'), 'money');
 
@@ -206,9 +199,6 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
       if (!$params['imageUrl']) {
         $errors['imageUrl'] = ts('Image URL is Required');
       }
-      if (!$params['thumbnailUrl']) {
-        $errors['thumbnailUrl'] = ts('Thumbnail URL is Required');
-      }
     }
 
     // CRM-13231 financial type required if product has cost
@@ -309,7 +299,6 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
       'image' => '',
       'thumbnail' => '',
       'imageUrl' => '',
-      'thumbnailUrl' => '',
     ];
     $params = array_merge($defaults, $params);
 
@@ -318,11 +307,9 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
       $imageFile = $params['uploadFile']['name'];
       try {
         $params['image'] = CRM_Utils_File::resizeImage($imageFile, 200, 200, "_full");
-        $params['thumbnail'] = CRM_Utils_File::resizeImage($imageFile, 50, 50, "_thumb");
       }
       catch (CRM_Core_Exception $e) {
         $params['image'] = self::_defaultImage();
-        $params['thumbnail'] = self::_defaultThumbnail();
         $msg = ts('The product has been configured to use a default image.');
         CRM_Core_Session::setStatus($e->getMessage() . " $msg", ts('Notice'), 'alert');
       }
@@ -331,13 +318,11 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
     // User is specifying existing URLs for the images
     elseif ($params['imageOption'] == 'thumbnail') {
       $params['image'] = $params['imageUrl'];
-      $params['thumbnail'] = $params['thumbnailUrl'];
     }
 
     // User wants a default image
     elseif ($params['imageOption'] == 'default_image') {
       $params['image'] = self::_defaultImage();
-      $params['thumbnail'] = self::_defaultThumbnail();
     }
   }
 
@@ -348,15 +333,6 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
   protected static function _defaultImage() {
     $config = CRM_Core_Config::singleton();
     return $config->resourceBase . 'i/contribute/default_premium.jpg';
-  }
-
-  /**
-   * Returns the path to the default premium thumbnail
-   * @return string
-   */
-  protected static function _defaultThumbnail() {
-    $config = CRM_Core_Config::singleton();
-    return $config->resourceBase . 'i/contribute/default_premium_thumb.jpg';
   }
 
 }
