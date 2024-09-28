@@ -1386,8 +1386,6 @@ WHERE {$whereClause}";
         $event->params['group_type'] = CRM_Utils_Array::convertCheckboxFormatToArray((array) $event->params['group_type']);
       }
 
-      $cid = CRM_Core_Session::singleton()->get('userID');
-
       // CRM-19068.
       // Validate parents parameter when creating group.
       if (!CRM_Utils_System::isNull($event->params['parents'])) {
@@ -1398,16 +1396,8 @@ WHERE {$whereClause}";
       }
     }
 
-    if ($event->action === 'create') {
-      // this action is add
-      if ($cid) {
-        $event->params['created_id'] = $cid;
-      }
-    }
-    elseif ($event->action === 'edit') {
-      if ($cid) {
-        $event->params['modified_id'] = $cid;
-      }
+    if ($event->action === 'edit') {
+      $event->params['modified_id'] ??= CRM_Core_Session::getLoggedInContactID();
 
       // If title isn't specified, retrieve it because we use it later, e.g.
       // for RecentItems. But note we use array_key_exists not isset or empty
