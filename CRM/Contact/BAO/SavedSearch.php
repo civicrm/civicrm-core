@@ -234,7 +234,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch implements
    * @param array $params
    * @return CRM_Contact_DAO_SavedSearch
    */
-  public static function create(&$params) {
+  public static function create($params) {
     return self::writeRecord($params);
   }
 
@@ -247,13 +247,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch implements
    */
   public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event): void {
     if ($event->action === 'create' || $event->action === 'edit') {
-      $loggedInContactID = CRM_Core_Session::getLoggedInContactID();
-      if ($loggedInContactID) {
-        if ($event->action === 'create') {
-          $event->params['created_id'] ??= $loggedInContactID;
-        }
-        $event->params['modified_id'] ??= $loggedInContactID;
-      }
+      $event->params['modified_id'] ??= CRM_Core_Session::getLoggedInContactID();
       // Set by mysql
       unset($event->params['modified_date']);
 
