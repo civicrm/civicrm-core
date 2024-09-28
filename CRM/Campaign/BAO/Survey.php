@@ -31,36 +31,18 @@ class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey implements Civi\Co
   }
 
   /**
-   * Takes an associative array and creates a Survey object based on the
-   * supplied values.
+   * @deprecated
    *
    * @param array $params
    *
    * @return bool|CRM_Campaign_DAO_Survey
    */
-  public static function create(&$params) {
+  public static function create($params) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     if (empty($params)) {
       return FALSE;
     }
-
-    if (!empty($params['is_default'])) {
-      $query = "UPDATE civicrm_survey SET is_default = 0";
-      CRM_Core_DAO::executeQuery($query);
-    }
-
-    if (empty($params['id'])) {
-      if (empty($params['created_id'])) {
-        $params['created_id'] = CRM_Core_Session::getLoggedInContactID();
-      }
-
-      if (empty($params['created_date'])) {
-        $params['created_date'] = date('YmdHis');
-      }
-    }
-
-    $dao = self::writeRecord($params);
-
-    return $dao;
+    return self::writeRecord($params);
   }
 
   /**
@@ -234,6 +216,13 @@ SELECT  survey.id    as id,
       if ($reportId) {
         CRM_Report_BAO_ReportInstance::deleteRecord(['id' => $reportId]);
       }
+    }
+    if ($event->action === 'edit') {
+      if (!empty($event->params['is_default'])) {
+        $query = "UPDATE civicrm_survey SET is_default = 0";
+        CRM_Core_DAO::executeQuery($query);
+      }
+      $event->params['last_modified_id'] ??= CRM_Core_Session::getLoggedInContactID();
     }
   }
 

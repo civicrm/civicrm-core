@@ -151,15 +151,8 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
 
     $session = CRM_Core_Session::singleton();
 
-    $params['last_modified_id'] = $session->get('userID');
-    $params['last_modified_date'] = date('YmdHis');
-
     if ($this->_surveyId) {
       $params['id'] = $this->_surveyId;
-    }
-    else {
-      $params['created_id'] = $session->get('userID');
-      $params['created_date'] = date('YmdHis');
     }
 
     $params['is_active'] ??= 0;
@@ -167,7 +160,7 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
 
     $params['custom'] = CRM_Core_BAO_CustomField::postProcess($this->getSubmittedValues(), $this->getSurveyID(), 'Survey');
 
-    $survey = CRM_Campaign_BAO_Survey::create($params);
+    $survey = CRM_Campaign_BAO_Survey::writeRecord($params);
     $this->_surveyId = $survey->id;
 
     if (!empty($this->_values['result_id'])) {

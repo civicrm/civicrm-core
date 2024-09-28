@@ -384,7 +384,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
       }
     }
 
-    $survey = CRM_Campaign_BAO_Survey::create($params);
+    $survey = CRM_Campaign_BAO_Survey::writeRecord($params);
 
     // create report if required.
     if (!$this->_reportId && $survey->id && !empty($params['create_report'])) {
