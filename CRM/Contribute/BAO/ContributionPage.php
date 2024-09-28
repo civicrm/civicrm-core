@@ -26,17 +26,12 @@ use Civi\Core\HookInterface;
 class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_ContributionPage implements HookInterface {
 
   /**
-   * Creates a contribution page.
-   *
+   * @deprecated
    * @param array $params
-   *
    * @return CRM_Contribute_DAO_ContributionPage
    */
   public static function create($params) {
-    // @todo  - this implode is probably handled by writeRecord - test & remove.
-    if (isset($params['payment_processor']) && is_array($params['payment_processor'])) {
-      $params['payment_processor'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $params['payment_processor']);
-    }
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return self::writeRecord($params);
   }
 
