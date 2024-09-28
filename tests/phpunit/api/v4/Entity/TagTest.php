@@ -32,7 +32,7 @@ class TagTest extends Api4TestBase implements TransactionalInterface {
 
   public function testTagFilter(): void {
     // Ensure bypassing permissions works correctly by giving none to the logged-in user
-    $this->createLoggedInUser();
+    $cid = $this->createLoggedInUser();
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
 
     $conTag = Tag::create(FALSE)
@@ -57,6 +57,8 @@ class TagTest extends Api4TestBase implements TransactionalInterface {
       ->addValue('name', uniqid('child'))
       ->addValue('parent_id', $tagSet['id'])
       ->execute()->first();
+    $this->assertEquals($cid, $conTag['created_id']);
+    $this->assertEquals($cid, $setChild['created_id']);
 
     $contact1 = Contact::create(FALSE)
       ->execute()->first();
