@@ -53,6 +53,7 @@ class RolePermissionTest extends \PHPUnit\Framework\TestCase implements Headless
     $this->assertFalse($rolePermissions['view all contacts']["granted_$role2"]);
     $this->assertFalse($rolePermissions['access CiviCRM']["granted_$role2"]);
     $this->assertTrue($rolePermissions['access CiviCRM']["implied_$role2"]);
+    $this->assertTrue($rolePermissions['edit message templates']["implied_$role2"]);
 
     RolePermission::save(FALSE)
       ->addRecord(['name' => 'view all contacts', "granted_$role1" => FALSE, "granted_$role2" => TRUE])
@@ -65,7 +66,7 @@ class RolePermissionTest extends \PHPUnit\Framework\TestCase implements Headless
 
     $this->assertFalse($rolePermissions['view all contacts']["granted_$role1"]);
     $this->assertFalse($rolePermissions['view my contact']["granted_$role1"]);
-    $this->assertFalse($rolePermissions['view my contact']["implied_$role1"]);
+    $this->assertTrue($rolePermissions['view my contact']["implied_$role1"]);
     $this->assertFalse($rolePermissions['administer CiviCRM']["granted_$role1"]);
     $this->assertTrue($rolePermissions['view all contacts']["granted_$role2"]);
     $this->assertFalse($rolePermissions['view my contact']["granted_$role2"]);

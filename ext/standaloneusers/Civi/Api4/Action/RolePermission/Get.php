@@ -16,34 +16,43 @@ use Civi\Api4\Generic\BasicGetAction;
 class Get extends BasicGetAction {
 
   protected function getRecords() {
-    $permissions = \Civi\Api4\Permission::get(FALSE)
+    $permissions = (array) \Civi\Api4\Permission::get(FALSE)
       ->addWhere('is_synthetic', '=', FALSE)
       ->addWhere('is_active', '=', TRUE)
-      ->execute();
+      ->execute()->indexBy('name');
     $roles = \Civi\Api4\Role::get(FALSE)
       ->addSelect('name', 'permissions')
       ->addWhere('name', '!=', 'admin')
       ->execute()->column('permissions', 'name');
     $result = [];
-    foreach ($permissions as $permission) {
+    foreach ($permissions as $permissionName => $permission) {
       $row = $permission;
       foreach ($roles as $role => $rolePermissions) {
-        $row["granted_$role"] = in_array($permission['name'], $rolePermissions);
+        $row["granted_$role"] = in_array($permissionName, $rolePermissions);
         $row["implied_$role"] = FALSE;
       }
-      $result[$permission['name']] = $row;
+      $result[$permissionName] = $row;
     }
     // Add implied permissions
-    foreach ($permissions as $permission) {
-      foreach ($permission['implies'] ?? [] as $impliedName) {
-        foreach ($roles as $role => $rolePermissions) {
-          if (in_array($permission['name'], $rolePermissions) && isset($result[$impliedName])) {
-            $result[$impliedName]["implied_$role"] = TRUE;
-          }
-        }
+    foreach ($permissions as $permissionName => $permission) {
+      if ($permission['implies']) {
+        self::addImpliedPermissions($result, $permissions, $roles, $permissionName, $permission['implies']);
       }
     }
     return $result;
+  }
+
+  private static function addImpliedPermissions(array &$result, array $permissions, array $roles, string $permissionName, array $impliedPermissions) {
+    foreach ($impliedPermissions as $impliedName) {
+      foreach ($roles as $role => $rolePermissions) {
+        if (in_array($permissionName, $rolePermissions) && isset($result[$impliedName])) {
+          $result[$impliedName]["implied_$role"] = TRUE;
+        }
+      }
+      if (!empty($permissions[$impliedName]['implies'])) {
+        self::addImpliedPermissions($result, $permissions, $roles, $permissionName, $permissions[$impliedName]['implies']);
+      }
+    }
   }
 
 }
