@@ -135,9 +135,10 @@ class CRM_Core_BAO_SchemaHandler {
     $sql .= $prefix;
     $sql .= "`{$params['name']}` {$params['type']}";
 
-    if (!empty($params['required'])) {
-      $sql .= " NOT NULL";
-    }
+    // explicitly set NULL attribute for non-required fields to work around
+    // MySQL's special handling of timestamp columns
+    // see https://dev.mysql.com/doc/refman/8.4/en/timestamp-initialization.html
+    $sql .= empty($params['required']) ? ' NULL' : ' NOT NULL';
 
     if (!empty($params['attributes'])) {
       $sql .= " {$params['attributes']}";
