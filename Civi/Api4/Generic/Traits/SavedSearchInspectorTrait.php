@@ -229,6 +229,16 @@ trait SavedSearchInspectorTrait {
       return FALSE;
     }
 
+    // If this is an implicit join, use the parent field
+    if (str_ends_with($fieldPath, '.' . $field['name'])) {
+      $baseFieldPath = substr($fieldPath, 0, -strlen('.' . $field['name']));
+      $baseField = $this->getField($baseFieldPath);
+      if ($baseField) {
+        $fieldPath = $baseFieldPath;
+        $field = $baseField;
+      }
+    }
+
     // If the entity this column belongs to is being grouped by id, then also no
     $idField = substr($fieldPath, 0, 0 - strlen($field['name'])) . CoreUtil::getIdFieldName($field['entity']);
     return !in_array($idField, $apiParams['groupBy']);
