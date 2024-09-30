@@ -29,7 +29,7 @@ class AfformAutocompleteUsageTest extends AfformUsageTestCase {
   public function testAutocompleteWithSavedSearchFilter(): void {
     $layout = <<<EOHTML
 <af-form ctrl="afform">
-  <af-entity data="{contact_type: 'Individual'}" type="Contact" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" />
+  <af-entity type="Individual" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" />
   <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
     <div class="af-container">
       <af-field name="id" defn="{saved_search: 'the_unit_test_search', input_attrs: {}}" />
@@ -159,7 +159,7 @@ EOHTML;
 
     $layout = <<<EOHTML
 <af-form ctrl="afform">
-  <af-entity data="{contact_type: 'Individual'}" type="Contact" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" />
+  <af-entity type="Individual" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" />
   <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
     <div class="af-container">
       <af-field name="first_name" />
@@ -250,7 +250,7 @@ EOHTML;
 
     $layout = <<<EOHTML
 <af-form ctrl="afform">
-  <af-entity data="{contact_type: 'Individual'}" type="Contact" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" />
+  <af-entity type="Individual" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" />
   <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
     <div class="af-container">
       <af-field name="first_name" />
