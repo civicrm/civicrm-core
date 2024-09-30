@@ -8,16 +8,6 @@
  +--------------------------------------------------------------------+
 *}
 {htxt id="accesskeys"}
-  {php}
-    $ua = strtolower($_SERVER['HTTP_USER_AGENT']);
-    if (strstr($ua, 'mac')) {
-      $key = '<span>CTRL</span>+<span>ALT</span>';
-    }
-    else {
-      $key = strstr($ua, 'firefox') ? '<span>ALT</span>+<span>SHIFT</span>' : '<span>ALT</span>';
-    }
-    $this->assign('accessKey', $key);
-  {/php}
   <p></p>
   <ul id="crmAccessKeyList">
     <li>{$accessKey}+<span>E</span> - {ts}Edit Contact (View Contact Summary Page){/ts}</li>

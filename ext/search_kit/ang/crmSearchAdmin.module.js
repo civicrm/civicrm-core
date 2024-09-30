@@ -403,7 +403,7 @@
               entity = getEntity(joinInfo.entity),
               prefix = joinInfo.alias ? joinInfo.alias + '.' : '';
             _.each(entity.fields, function(field) {
-              if ((entity.name === 'Contact' && field.name === 'id') || (field.fk_entity === 'Contact' && joinInfo.baseEntity !== 'Contact')) {
+              if (['Contact', 'Individual', 'Household', 'Organization'].includes(entity.name) && field.name === 'id' || field.fk_entity === 'Contact') {
                 columns.push({
                   id: prefix + field.name,
                   text: (joinInfo.label ? joinInfo.label + ': ' : '') + field.label,
