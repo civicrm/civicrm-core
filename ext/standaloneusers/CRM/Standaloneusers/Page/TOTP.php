@@ -23,8 +23,14 @@ class CRM_Standaloneusers_Page_TOTP extends CRM_Core_Page {
     ) {
       // Invalid, send user back to login.
       $pending = CRM_Core_Session::singleton()->set('pendingLogin', []);
+      CRM_Core_Session::setStatus('Please try again.', 'Session expired', 'warning');
       CRM_Utils_System::redirect('/civicrm/login');
     }
+
+    // CRM_Core_Session::setStatus('hello', 'oi!', 'success');
+    // statusMessages are usually at top of page but in login forms they look much better
+    // inside the main box.
+    $this->assign('statusMessages', CRM_Core_Smarty::singleton()->fetch("CRM/common/status.tpl"));
 
     $this->assign('pageTitle', '');
     $this->assign('logoUrl', E::url('images/civicrm-logo.png'));

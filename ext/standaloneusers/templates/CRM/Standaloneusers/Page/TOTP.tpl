@@ -2,6 +2,7 @@
   <div class="standalone-auth-box">
     <form id=totp-form>
       <img class="crm-logo" src="{$logoUrl}" alt="logo for CiviCRM, with an intersecting blue and green triangle">
+      {$statusMessages}
 
       <div class="input-wrapper">
         <label for="totpcode" name=totp class="form-label">{ts}Enter the code from your authenticator app{/ts}</label>
@@ -36,6 +37,7 @@
         console.error('caught', e);
       }
       alert(errorMsg);
+      totpcodeInput.value = '';
     }
 
     form.addEventListener('submit', submit);
@@ -44,6 +46,9 @@
         submit(e);
       }
     });
+
+    // Get ready for user to type code.
+    totpcodeInput.focus();
 
   });
 </script>
