@@ -48,6 +48,10 @@ namespace Civi\Core;
  */
 class SettingsManager {
 
+  protected const BOOT_PHASE_EARLY = 0;
+  protected const BOOT_PHASE_MID = 1;
+  protected const BOOT_PHASE_COMPLETE = 2;
+
   /**
    * @var \CRM_Utils_Cache_Interface
    */
@@ -75,13 +79,20 @@ class SettingsManager {
   protected $mandatory = NULL;
 
   /**
-   * During bootstrap we run a limited version of the SettingsManager because
-   * we don't have metadata from the extension system or setting values
-   * from the database.
+   * The SettingsManager boots through 3 phases:
    *
-   * @var bool
+   * 0. during early boot, we load metadata for a limited subset of settings
+   *    in core *.boot.setting.php files. Setting values come only from
+   *    environment variables, $civicrm_setting global, or default
+   *
+   * 1. once the database is loaded, we can load database values
+   *
+   * 2. once the extension system is booted, we have full and final settings
+   *    metadata (including from extensions)
+   *
+   * @var int
    */
-  protected $preBoot = TRUE;
+  protected $bootPhase = self::BOOT_PHASE_EARLY;
 
   /**
    * @param \CRM_Utils_Cache_Interface $cache
@@ -92,16 +103,36 @@ class SettingsManager {
   }
 
   /**
+   * Signal that the SettingsManager can now load
+   * values from the DB
+   *
+   * @return SettingsManager
+   */
+  public function dbAvailable() {
+    // we only need to move on the boot phase if we are
+    // currently in BOOT_PHASE_EARLY
+    if ($this->bootPhase === self::BOOT_PHASE_EARLY) {
+      $this->bootPhase = self::BOOT_PHASE_MID;
+
+      // if DB is newly available, reload DB values
+      // for all bags
+      $this->reloadValues();
+    }
+    return $this;
+  }
+
+  /**
    * Remove pre-boot restrictions and reload defaults/mandatory
    *
    * @return SettingsManager
    */
   public function bootComplete() {
-    if ($this->preBoot) {
-      $this->preBoot = FALSE;
+    if ($this->bootPhase !== self::BOOT_PHASE_COMPLETE) {
+      $this->bootPhase = self::BOOT_PHASE_COMPLETE;
 
-      // if the boot state has changed, we need to reload
-      // all the value layers
+      // on this transition, we need to reload all
+      // the value layers as the metadata might have
+      // changed
       $this->reloadValues()->reloadDefaults()->useMandatory();
     }
     return $this;
@@ -194,7 +225,7 @@ class SettingsManager {
 
     if (!isset($this->bagsByDomain[$domainId])) {
       $this->bagsByDomain[$domainId] = new SettingsBag($domainId, NULL);
-      if (!$this->preBoot) {
+      if ($this->bootPhase !== self::BOOT_PHASE_EARLY) {
         $this->bagsByDomain[$domainId]->loadValues();
       }
       $this->bagsByDomain[$domainId]
@@ -231,7 +262,7 @@ class SettingsManager {
     $key = "$domainId:$contactId";
     if (!isset($this->bagsByContact[$key])) {
       $this->bagsByContact[$key] = new SettingsBag($domainId, $contactId);
-      if (!$this->preBoot) {
+      if ($this->bootPhase !== self::BOOT_PHASE_EARLY) {
         $this->bagsByContact[$key]->loadValues();
       }
       $this->bagsByContact[$key]
@@ -250,7 +281,7 @@ class SettingsManager {
    *   Array(string $settingName => mixed $value).
    */
   protected function getDefaults($entity) {
-    $cacheKey = ($this->preBoot ? 'preboot_' : '') . 'defaults_' . $entity;
+    $cacheKey = 'phase' . $this->bootPhase . '_defaults_' . $entity;
     $defaults = $this->cache->get($cacheKey);
 
     if (!is_array($defaults)) {
@@ -258,7 +289,7 @@ class SettingsManager {
 
       $specs = SettingsMetadata::getMetadata([
         'is_contact' => ($entity === 'contact' ? 1 : 0),
-      ], NULL, FALSE, $this->preBoot);
+      ], NULL, FALSE, $this->bootPhase !== self::BOOT_PHASE_COMPLETE);
 
       foreach ($specs as $key => $spec) {
         $defaults[$key] = $spec['default'] ?? NULL;
@@ -309,7 +340,7 @@ class SettingsManager {
     $specs = SettingsMetadata::getMetadata([
       'is_contact' => ($entity === 'contact' ? 1 : 0),
       'is_env_loadable' => TRUE,
-    ], NULL, FALSE, $this->preBoot);
+    ], NULL, FALSE, $this->bootPhase !== self::BOOT_PHASE_COMPLETE);
 
     foreach ($specs as $key => $spec) {
       $fqn = $spec['global_name'] ?? NULL;

@@ -691,6 +691,7 @@ class Container {
 
     if ($loadFromDB && $runtime->dsn) {
       \CRM_Core_DAO::init($runtime->dsn);
+      $bootServices['settings_manager']->dbAvailable();
       \CRM_Utils_Hook::singleton(TRUE);
       \CRM_Extension_System::singleton(TRUE);
       \CRM_Extension_System::singleton()->getClassLoader()->register();
