@@ -219,6 +219,8 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant implements \Ci
 
   /**
    * @internal
+   *     Do not call this from outside core code. It is expected to change multiple times in the course of refactoring
+   *     participant validation out of the QuickForm layer. Eventually, there will be an API action for validation.
    */
   public static function getAvailableSpaces(int $eventId, bool $includeWaitlist = TRUE): int {
     $availableSpaces = self::eventFull(
@@ -792,6 +794,8 @@ WHERE  civicrm_participant.id = {$participantId}
    * @throws \Civi\API\Exception\UnauthorizedException
    *
    * @internal
+   *    Do not call this from outside core code. It is expected to change multiple times in the course of refactoring
+   *    participant validation out of the QuickForm layer. Eventually, there will be an API action for validation.
    */
   public static function getExistingParticipants(
     int $contactId,
@@ -892,6 +896,8 @@ WHERE  civicrm_participant.id = {$participantId}
    * @throws \CRM_Core_Exception
    *
    * @internal
+   *    Do not call this from outside core code. It is expected to change multiple times in the course of refactoring
+   *    participant validation out of the QuickForm layer. Eventually, there will be an API action for validation.
    */
   public static function validateExistingRegistration(
     int $contactId,
@@ -951,6 +957,8 @@ WHERE  civicrm_participant.id = {$participantId}
    *   A list of validation error messages, possibly keyed by affected participant properties/field names.
    *
    * @internal
+   *    Do not call this from outside core code. It is expected to change multiple times in the course of refactoring
+   *    participant validation out of the QuickForm layer. Eventually, there will be an API action for validation.
    */
   public static function validateAvailableSpaces(
     array $values,
@@ -994,6 +1002,8 @@ WHERE  civicrm_participant.id = {$participantId}
    * @throws \CRM_Core_Exception
    *
    * @internal
+   *   Do not call this from outside core code. It is expected to change multiple times in the course of refactoring
+   *   participant validation out of the QuickForm layer. Eventually, there will be an API action for validation.
    */
   public static function validateEvent(int $eventId): array {
     $event = \Civi\Api4\Event::get(FALSE)
@@ -1053,6 +1063,8 @@ WHERE  civicrm_participant.id = {$participantId}
    *   A list of validation error messages, possibly keyed by affected participant properties/field names.
    *
    * @internal
+   *     Do not call this from outside core code. It is expected to change multiple times in the course of refactoring
+   *     participant validation out of the QuickForm layer. Eventually, there will be an API action for validation.
    */
   public static function validateEventRegistration(
     array $values,
