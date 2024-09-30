@@ -85,21 +85,15 @@ class CRM_Extension_System {
    */
   public function __construct($parameters = []) {
     $config = CRM_Core_Config::singleton();
-    $parameters['maxDepth'] = CRM_Utils_Array::value('maxDepth', $parameters, \Civi::settings()->get('ext_max_depth'));
-    $parameters['extensionsDir'] = CRM_Utils_Array::value('extensionsDir', $parameters, $config->extensionsDir);
-    $parameters['extensionsURL'] = CRM_Utils_Array::value('extensionsURL', $parameters, $config->extensionsURL);
-    $parameters['resourceBase'] = CRM_Utils_Array::value('resourceBase', $parameters, $config->resourceBase);
-    $parameters['uploadDir'] = CRM_Utils_Array::value('uploadDir', $parameters, $config->uploadDir);
-    $parameters['userFrameworkBaseURL'] = CRM_Utils_Array::value('userFrameworkBaseURL', $parameters, $config->userFrameworkBaseURL);
-    if (!array_key_exists('civicrm_root', $parameters)) {
-      $parameters['civicrm_root'] = $GLOBALS['civicrm_root'];
-    }
-    if (!array_key_exists('cmsRootPath', $parameters)) {
-      $parameters['cmsRootPath'] = $config->userSystem->cmsRootPath();
-    }
-    if (!array_key_exists('domain_id', $parameters)) {
-      $parameters['domain_id'] = CRM_Core_Config::domainID();
-    }
+    $parameters['maxDepth'] ??= \Civi::settings()->get('ext_max_depth');
+    $parameters['extensionsDir'] ??= $config->extensionsDir;
+    $parameters['extensionsURL'] ??= $config->extensionsURL;
+    $parameters['resourceBase'] ??= $config->resourceBase;
+    $parameters['uploadDir'] ??= $config->uploadDir;
+    $parameters['userFrameworkBaseURL'] ??= $config->userFrameworkBaseURL;
+    $parameters['civicrm_root'] ??= $GLOBALS['civicrm_root'];
+    $parameters['cmsRootPath'] ??= $config->userSystem->cmsRootPath();
+    $parameters['domain_id'] ??= CRM_Core_Config::domainID();
     // guaranteed ordering - useful for md5(serialize($parameters))
     ksort($parameters);
 
