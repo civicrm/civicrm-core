@@ -17,12 +17,17 @@ return [
   'standalone_mfa_enabled' => [
     'name'        => 'standalone_mfa_enabled',
     'group'       => 'standaloneusers',
-    'type'        => 'String',
+    'type'        => 'Array',
     'title'       => ts('Multi-Factor Authentication classes'),
-    'description' => ts('Comma separated list of classes of MFA that are required/accepted.'),
+    'description' => ts('Choose which multi-factor options are required/accepted. Leave blank to disable MFA. TOTP is Time-based One-Time Password which requires an authenticator app to provide a code.'),
     'default'     => '',
-    'html_type'   => 'text',
     'is_domain'   => 1,
     'is_contact'  => 0,
+    'html_type' => 'select',
+    'html_attributes' => [
+      'class' => 'crm-select2',
+      'multiple' => 1,
+    ],
+    'pseudoconstant' => ['callback' => '\\Civi\\Standalone\\MFA\\Base::getMFAclasses'],
   ],
 ];

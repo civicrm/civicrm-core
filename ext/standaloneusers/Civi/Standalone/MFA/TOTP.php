@@ -12,8 +12,14 @@ class TOTP extends Base implements MFAInterface {
 
   public function getFormUrl(): string {
     // Is TOTP set up for this user?
-    $totp = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_totp WHERE {$this->userID}")->fetch();
-    return $totp ? "/civicrm/mfa/totp" : '/civicrm/mfa/totp-setup';
+    return $this->userHasCompletedSetup() ? "/civicrm/mfa/totp" : '/civicrm/mfa/totp-setup';
+  }
+
+  /**
+   * Returns whether this MFA is configured for the user.
+   */
+  public function userHasCompletedSetup(): bool {
+    return (bool) CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_totp WHERE user_id = {$this->userID}")->fetch();
   }
 
   /**
