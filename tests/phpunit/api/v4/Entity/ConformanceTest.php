@@ -109,7 +109,11 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
   public function getEntitiesLotech(): array {
     $entityNames = [];
 
-    $locations = array_merge([\Civi::paths()->getPath('[civicrm.root]/Civi.php')],
+    $locations = array_merge(
+      [
+        \Civi::paths()->getPath('[civicrm.root]/Civi.php'),
+        \Civi::paths()->getPath('[civicrm.root]/tests/phpunit/AllTests.php'),
+      ],
       array_column(\CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(), 'filePath')
     );
     foreach ($locations as $location) {
