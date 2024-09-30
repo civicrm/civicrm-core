@@ -208,7 +208,7 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
     // save enabled currencies and default currency in option group 'currencies_enabled'
     // CRM-1496
     $currencyLimit = $values['currencyLimit'] ? explode(',', $values['currencyLimit']) : [];
-    if (!in_array($values['defaultCurrency'], $values['currencyLimit'])) {
+    if (!in_array($values['defaultCurrency'], $currencyLimit)) {
       $currencyLimit[] = $values['defaultCurrency'];
     }
     self::updateEnabledCurrencies($currencyLimit, $values['defaultCurrency']);
