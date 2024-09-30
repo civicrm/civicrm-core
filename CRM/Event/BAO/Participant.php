@@ -837,53 +837,6 @@ WHERE  civicrm_participant.id = {$participantId}
   }
 
   /**
-   * Checks whether a participant for a given event and contact exists.
-   * Can be used during validation of new event registrations to check for duplicates.
-   *
-   * @param int $contactId
-   *    The contact ID of participants to find.
-   * @param int $eventId
-   *    The event ID of participants to find.
-   * @param bool $onlyCounted
-   *    Whether to only consider registrations with a status with "is_counted".
-   * @param bool $includeOnWaitlist
-   *    Whether to consider registrations with status "On waitlist" when restricing to "is_counted".
-   * @param array $excludeStatus
-   *    A list of registration status to not consider (e.g. for ignoring cancelled registrations).
-   * @param array $filterRoleIds
-   *    A list of participant role IDs to filter for. Registrations with other roles will not be considered.
-   * @param bool $includeTest
-   *    Whether to include test participants.
-   *
-   * @return bool
-   * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
-   *
-   * @internal
-   */
-  public static function exists(
-    int $contactId,
-    int $eventId,
-    bool $onlyCounted = TRUE,
-    bool $includeOnWaitlist = TRUE,
-    array $excludeStatus = ['Cancelled'],
-    array $filterRoleIds = [],
-    bool $includeTest = FALSE
-  ) {
-    return count(
-        self::getExistingParticipants(
-          $contactId,
-          $eventId,
-          $onlyCounted,
-          $includeOnWaitlist,
-          $excludeStatus,
-          $filterRoleIds,
-          $includeTest
-        )
-      ) > 0;
-  }
-
-  /**
    * @param int $contactId
    * @param int $eventId
    * @param string $context
