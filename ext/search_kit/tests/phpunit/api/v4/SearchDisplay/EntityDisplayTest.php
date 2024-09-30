@@ -117,7 +117,7 @@ class EntityDisplayTest extends Api4TestBase {
     $this->assertSame('Select', $getFields['prefix_id']['input_type']);
     $this->assertNull($getFields['prefix_id']['fk_entity']);
     $this->assertSame('Timestamp', $getFields['created_date']['data_type']);
-    $this->assertSame('Select Date', $getFields['created_date']['input_type']);
+    $this->assertSame('Date', $getFields['created_date']['input_type']);
     $this->assertNull($getFields['created_date']['fk_entity']);
 
     civicrm_api4('SK_MyNewEntity', 'refresh');
