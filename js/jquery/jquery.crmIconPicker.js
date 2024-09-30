@@ -139,12 +139,12 @@
           e.preventDefault();
         }
 
-        dialog = $('<div id="crmIconPicker"/>').dialog({
+        dialog = $('<div id="crmIconPicker"/>').dialog(CRM.utils.adjustDialogDefaults({
           title: $input.attr('title'),
           width: '80%',
           height: '90%',
           modal: true
-        }).block()
+        })).block()
           .on('click', 'a', pickIcon)
           .on('keyup', 'input[name=search]', displayIcons)
           .on('dialogclose', function() {
