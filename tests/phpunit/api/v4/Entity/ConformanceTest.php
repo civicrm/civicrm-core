@@ -26,7 +26,6 @@ use Civi\Api4\CustomGroup;
 use Civi\Api4\Entity;
 use api\v4\Api4TestBase;
 use Civi\Api4\Event\ValidateValuesEvent;
-use Civi\Api4\Provider\ActionObjectProvider;
 use Civi\Api4\Service\Spec\CustomFieldSpec;
 use Civi\Api4\Service\Spec\FieldSpec;
 use Civi\Api4\Utils\CoreUtil;
@@ -108,11 +107,23 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
    * @return array
    */
   public function getEntitiesLotech(): array {
-    $provider = new ActionObjectProvider();
     $entityNames = [];
-    foreach ($provider->getAllApiClasses() as $className) {
-      $entityNames[] = $className::getEntityName();
+
+    $locations = array_merge([\Civi::paths()->getPath('[civicrm.root]/Civi.php')],
+      array_column(\CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(), 'filePath')
+    );
+    foreach ($locations as $location) {
+      $dir = \CRM_Utils_File::addTrailingSlash(dirname($location ?? '')) . 'Civi/Api4';
+      if (is_dir($dir)) {
+        foreach (glob("$dir/*.php") as $file) {
+          $className = 'Civi\Api4\\' . basename($file, '.php');
+          if (is_a($className, 'Civi\Api4\Generic\AbstractEntity', TRUE)) {
+            $entityNames[] = $className::getEntityName();
+          }
+        }
+      }
     }
+
     return $this->toDataProviderArray($entityNames);
   }
 
