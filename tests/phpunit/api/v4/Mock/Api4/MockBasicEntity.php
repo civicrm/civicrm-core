@@ -25,11 +25,10 @@ use api\v4\Mock\MockEntityDataStorage;
  * MockBasicEntity entity.
  *
  * @labelField foo
+ * @primaryKey identifier
  * @package Civi\Api4
  */
 class MockBasicEntity extends Generic\BasicEntity {
-
-  protected static $idField = 'identifier';
 
   protected static $getter = [MockEntityDataStorage::CLASS, 'get'];
   protected static $setter = [MockEntityDataStorage::CLASS, 'write'];
