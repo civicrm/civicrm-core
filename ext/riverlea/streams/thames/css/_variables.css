@@ -39,13 +39,17 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-c-gray-300: #c2c0c0;
 --crm-c-gray-200: #d5d5d5;
 --crm-c-gray-100: #e2e1e1;
---crm-c-gray-050: #eaeaea;
---crm-c-gray-025: #fbfafa;
---crm-c-blue: #c5e4fc; /* thames */
---crm-c-blue-light: #d8edfe; /* thames */
---crm-c-blue-dark:#2c98ed ; /* thames */
---crm-c-blue-darker: #02477d; /* thames */
---crm-c-blue-overlay: #bad0df45; /* thames only */
+--crm-c-gray-050: #f8f8f8;
+--crm-c-gray-025: #fcfbfb;
+/* --crm-c-blue-overlay: #bad0df45; /* thames only */ 
+/* --crm-c-blue-overlay: #aee8f273; /* thames only */
+/* --crm-c-blue-overlay: #d2ecffb5; /* thames only */
+--crm-c-blue-overlay2: #edf4f7; /* thames only */
+--crm-c-blue-overlay:  #dce9ef; /* thames only */
+--crm-c-blue-light:    #d8edfe; /* thames */
+--crm-c-blue:          #c5e4fc; /* thames */
+--crm-c-blue-dark:     #2c98ed ; /* thames */
+--crm-c-blue-darker:   #02477d; /* thames */
 --crm-c-purple: #4d4d69;
 --crm-c-purple-dark: #3e3e54;
 --crm-c-green: #d6e9c6;
@@ -186,9 +190,9 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-table-header-bg: var(--crm-c-page-background);
 --crm-table-header-txt: inherit;
 --crm-table-even-row: var(--crm-c-background2);
---crm-table-even-hover: var(--crm-c-yellow-less-light);
+--crm-table-even-hover: var(--crm-c-blue-overlay);
 --crm-table-odd-row: var(--crm-c-gray-025);
---crm-table-odd-hover: var(--crm-c-yellow-light);
+--crm-table-odd-hover: var(--crm-c-blue-overlay);
 --crm-table-sort-col: var(--crm-c-gray-300);
 --crm-table-sort-float: left; /* 'left', 'right' or 'none' */
 --crm-table-sort-active-col: var(--crm-c-link);
@@ -214,7 +218,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-expand-gap: var(--crm-xs2) 0 0; /* space between multiple accordions */
 /* .crm-accordion-bold */
 --crm-expand-header-bg: var(--crm-c-blue-overlay); /* thames */
---crm-expand-header-bg-active: var(--crm-c-blue); /* thames */
+--crm-expand-header-bg-active: var(--crm-c-blue-overlay); /* thames */
 --crm-expand-header-color: var(--crm-c-blue-darker); /* thames */
 --crm-expand-header-padding: 0.6rem 1.6rem 0.6rem 2.8rem; /* thames */
 --crm-expand-header-weight: var(--crm-bold-weight);
@@ -223,11 +227,11 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-expand-header-border-width: /*0 0 1px 0*/; /* thames */
 --crm-expand-border:; /* thames */
 --crm-expand-border-width:; /* thames */
-/* --crm-expand-body-bg:var(--crm-c-blue-overlay); */ /* thames  todo check */
+--crm-expand-body-bg:var(--crm-c-blue-overlay); /* thames  todo check*/
 --crm-expand-body-box-shadow:;
 --crm-expand-body-padding: 0.25rem 2.8rem; /* thames */
 /* .crm-accordion-light */
---crm-expand2-header-bg:;
+--crm-expand2-header-bg:transparent;
 --crm-expand2-header-bg-active: var(--crm-c-background-2);
 --crm-expand2-header-weight: normal;
 --crm-expand2-header-font:;
@@ -237,7 +241,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-expand2-header-padding: .6rem 1.6rem 0.6rem 2.8rem; /*var(--crm-s) var(--crm-m); */ /* thames */
 --crm-expand2-border:;
 --crm-expand2-border-width:;
---crm-expand2-body-bg:;
+--crm-expand2-body-bg:transparent;
 --crm-expand2-body-padding: 0.25rem 2.8rem; /* thames */
 
 /* Alerts */
@@ -442,10 +446,11 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-wizard-bg: var(--crm-c-page-background);
 
 /* Alpha filter */
---crm-filter-bg: var(--crm-c-blue-light);
+--crm-filter-bg: var(--crm-c-blue-overlay);
 --crm-filter-padding: var(--crm-m);
 --crm-filter-item-bg:  #fafafa;
---crm-filter-item-shadow: 0px 0px 3px rgba(0,0,0,0.1);
+/* --crm-filter-item-shadow: 0px 0px 3px rgba(0,0,0,0.1); */
+--crm-filter-item-shadow: none;
 
 /* Frontend */
 --crm-f-form-width: 700px;

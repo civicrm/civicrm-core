@@ -29,7 +29,13 @@ body {
 }
 
 /* Replace Riverlea's FontAwesome icon with our own shape. */
-.crm-container details > summary::before {
+/* This rule is really sensitive to specificity. */
+/* .crm-container :where(details, .crm-accordion-wrapper)>:is(summary,.crm-accordion-header)::before {  */
+
+.crm-container details>summary::before /* accordion8 (recommended) */,
+.crm-container .crm-accordion-header::before, /* accordion1, accordion2, accordion6 */
+.crm-container .crm-collapsible .collapsible-title::before /* accordion3 */
+{ 
 	content: "";
 	border: .4rem solid transparent;
 	border-left-color: var(--crm-expand-icon-color);
@@ -40,16 +46,37 @@ body {
 	transform-origin: .2rem 50%;
 	transition: transform .25s ease;
 }
+/* we have to sort of re-state these rules because the specificity of the above overrules the 'open' state 
+ * note that a lot of non-recommended patterns use .collapsed, whereas details uses [open] - reverse logic.
+ * This covers accordion1, accordion2, accordion6.
+ */
+.crm-container .crm-accordion-wrapper.collapsed>.crm-accordion-header::before { transform: none; transform-origin: .2rem 50%;}
+.crm-container .crm-accordion-wrapper:not(.collapsed)>.crm-accordion-header::before { transform:rotate(90deg); }
+/* the following 2 rules are for accordion3 and accordion4(still bit weird) */
+.crm-container .crm-collapsible.collapsed>.collapsible-title::before { transform: none; transform-origin: .2rem 50%;}
+.crm-container .crm-collapsible:not(.collapsed)>.collapsible-title::before { transform:rotate(90deg); }
 
 /* Apply subtle animation */
 @keyframes crm-details-show {
   from { opacity: 0; transform: translateY(-0.5rem); }
   50% { transform: translateY(-0.1rem); }
 }
-.crm-container details > .crm-accordion-body {
+.crm-container :is(details, .crm-accordion-wrapper)>.crm-accordion-body {
 	padding: var(--crm-expand-body-padding);
   animation: crm-details-show 240ms ease-in-out;
 }
+/* We don't want a different colour header bg on 'active' (open) but we do on hover
+ * This does't work yet.*/
+.crm-container .crm-accordion-bold > summary:is(:hover,:focus) {
+  background-color: var(--crm-c-blue-overlay2);
+}
+
+
+/* Alternate backgrounds */
+/* .crm-container details:not(.crm-accordion-light) details:not(.crm-accordion-light) { */
+/*   --crm-expand-header-bg: var(--crm-c-blue-overlay2); */
+/* } */
+
 
 /* ALERTS */
 
@@ -297,4 +324,9 @@ div:has(> table) {
   &:before { position: absolute; margin-left: -1em; }
 }
 
+
+/* Advanced search: override searchForm.css for slightly better aligned fields */
+.advanced-search-fields {
+  align-items: end;
+}
 
