@@ -863,13 +863,13 @@ WHERE  civicrm_participant.id = {$participantId}
         'default_role_id',
         'allow_same_participant_emails'
       )
-      ->addWhere('id')
+      ->addWhere('id', '=', $eventId)
       ->execute()
       ->single();
     $excludeStatus = 'admin' === $context ? ['Cancelled'] : [];
     $participantRoleIds = 'public' === $context ? [$participantRoleId ?? $event['default_role_id']] : [];
     $existingParticipants = CRM_Event_BAO_Participant::getExistingParticipants(
-      $contactID,
+      $contactId,
       $eventId,
       TRUE,
       TRUE,

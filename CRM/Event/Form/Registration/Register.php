@@ -556,8 +556,9 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       self::checkRegistration($fields, $form);
     }
 
+    $spacesAvailable = $form->getEventValue('available_spaces');
     if (!$form->_allowConfirmation) {
-      $errors += CRM_Event_BAO_Participant::validateAvailableSpaces($fields);
+      $errors += CRM_Event_BAO_Participant::validateAvailableSpaces($fields + ['event_id' => $form->getEventID()]);
     }
 
     $numberAdditionalParticipants = $fields['additional_participants'] ?? 0;
@@ -964,7 +965,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       $errors = CRM_Event_BAO_Participant::validateExistingRegistration(
         $contactID,
         $form->_values['event']['id'],
-        NULL,
+        'public',
         $isAdditional
       );
       $status = reset($errors);
