@@ -42,9 +42,6 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-c-gray-100: #e2e1e1;
 --crm-c-gray-050: #f8f8f8;
 --crm-c-gray-025: #fcfbfb;
-/* --crm-c-blue-overlay: #bad0df45; /* thames only */ 
-/* --crm-c-blue-overlay: #aee8f273; /* thames only */
-/* --crm-c-blue-overlay: #d2ecffb5; /* thames only */
 --crm-c-blue-overlay2: #edf4f7; /* thames only */
 --crm-c-blue-overlay:  #dce9ef; /* thames only */
 --crm-c-blue-light:    #d8edfe; /* thames */
@@ -86,7 +83,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-c-primary: var(--crm-c-blue-dark); /* primary button bgs */ /* thames */
 --crm-c-primary-hover: var(--crm-c-blue-darker); /* thames */
 --crm-c-primary-text: var(--crm-c-light-text);
---crm-c-primary-hover-text: var(--crm-c-light-text); /* thames todo */
+--crm-c-primary-hover-text: white; /* thames */
 --crm-c-secondary: #c9e1f1; /* buttons */ /* thames */
 --crm-c-secondary-hover: #a1cef3; /* thames */
 --crm-c-secondary-text: var(--crm-c-blue-darker); /* thames */
