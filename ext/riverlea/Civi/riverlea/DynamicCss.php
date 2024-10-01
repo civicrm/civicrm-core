@@ -63,14 +63,10 @@ class DynamicCss implements \Symfony\Component\EventDispatcher\EventSubscriberIn
 
     $stream = $params['stream'] ?? 'empty';
 
-    // TODO: enable fetching variable files from streams
-    // outside of the Riverlea extension directory
-    $streamDir = E::path("streams/{$stream}/css/");
-
     $content = [];
 
     // add base vars for the stream
-    $content[] = file_get_contents($streamDir . '_variables.css');
+    $content[] = self::getCSSFromFile('_variables.css', $stream);
 
     switch ($params['dark'] ?? NULL) {
       case 'light':
@@ -79,19 +75,48 @@ class DynamicCss implements \Symfony\Component\EventDispatcher\EventSubscriberIn
 
       case 'dark':
         // add dark vars unconditionally
-        $content[] = file_get_contents($streamDir . '_dark.css');
+        $content[] = self::getCSSFromFile('_dark.css', $stream);
         break;
 
       case 'inherit':
       default:
         // add dark vars wrapped inside a media query
         $content[] = '@media (prefers-color-scheme: dark) {';
-        $content[] = file_get_contents($streamDir . '_dark.css');
+        $content[] = self::getCSSFromFile('_dark.css', $stream);
         $content[] = '}';
         break;
     }
 
     $e->content = implode("\n", $content);
+  }
+
+  /**
+   * Check file exists and return contents or empty string
+   *
+   * @param string $cssFileName The name of the css file (eg. _variables.css)
+   * @param string $stream The name of the riverlea stream (eg. walbrook)
+   *
+   * @return string
+   */
+  private static function getCSSFromFile(string $cssFileName, string $stream): string {
+    $res = \Civi::resources();
+    $theme = \Civi::service('themes')->get($stream);
+    $file = '';
+    // For riverlea themes CSS should be located in stream/streamname/css - prefix="stream/streamname/"
+    if (isset($theme['prefix'])) {
+      $file .= $theme['prefix'];
+    }
+    // Append css dir and filename so we end up with stream/streamname/css/filename.css
+    $file .= 'css/' . $cssFileName;
+    $file = $res->filterMinify($theme['ext'], $file);
+
+    // Now get the full path for the css file
+    $filePath = $res->getPath($theme['ext'], $file);
+    if (is_file($filePath)) {
+      // File exists and is a file? Return it!
+      return file_get_contents($filePath) ?? '';
+    }
+    return '';
   }
 
 }
