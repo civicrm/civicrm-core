@@ -116,6 +116,23 @@ trait EventTestTrait {
   }
 
   /**
+   * Update an event.
+   *
+   * @param array $eventParameters
+   *   Values to
+   *
+   * @param string $identifier
+   *   Index for storing event ID in ids array.
+   *
+   */
+  protected function updateEvent(array $eventParameters = [], string $identifier = 'event'): void {
+    Event::update(FALSE)
+      ->addWhere('id', '=', $this->getEventID($identifier))
+      ->setValues($eventParameters)
+      ->execute();
+  }
+
+  /**
    * Get the event id of the event created in set up.
    *
    * If only one has been created it will be selected. Otherwise
