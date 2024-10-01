@@ -27,7 +27,6 @@
 <div id="event_status_id" class="crm-block crm-manage-events">
   {strip}
   {include file="CRM/common/pager.tpl" location="top"}
-  {include file="CRM/common/pagerAToZ.tpl"}
   {* handle enable/disable actions*}
   {include file="CRM/common/enableDisableApi.tpl"}
   {include file="CRM/common/jsortable.tpl"}
@@ -131,6 +130,7 @@
         {/if}
       {/foreach}
     </table>
+  {include file="CRM/common/pagerAToZ.tpl"}
   {include file="CRM/common/pager.tpl" location="bottom"}
   {/strip}
 </div>

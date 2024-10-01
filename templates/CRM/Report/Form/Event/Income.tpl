@@ -66,7 +66,7 @@
         {/foreach}
 
     <div class="report-pager">
-            {include file="CRM/common/pager.tpl"}
+            {include file="CRM/common/pager.tpl" location="bottom"}
         </div>
         {if !$section}
             {*Statistics at the bottom of the page*}

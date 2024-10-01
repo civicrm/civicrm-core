@@ -27,7 +27,6 @@
              {strip}
 
        {include file="CRM/common/pager.tpl" location="top"}
-             {include file="CRM/common/pagerAToZ.tpl"}
              {* handle enable/disable actions *}
              {include file="CRM/common/enableDisableApi.tpl"}
        {include file="CRM/common/jsortable.tpl"}
@@ -80,7 +79,7 @@
          </tr>
          {/foreach}
       </table>
-
+        {include file="CRM/common/pagerAToZ.tpl"}
         {/strip}
         {include file="CRM/common/pager.tpl" location="bottom"}
       </div>

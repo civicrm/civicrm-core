@@ -8,10 +8,6 @@
  +--------------------------------------------------------------------+
 *}
 {include file="CRM/common/pager.tpl" location="top"}
-
-{include file="CRM/common/pagerAToZ.tpl"}
-<a href="#" class="crm-selection-reset crm-hover-button"><i class="crm-i fa-times-circle-o" aria-hidden="true"></i> {ts}Reset all selections{/ts}</a>
-
 <table summary="{ts}Search results listings.{/ts}" class="selector row-highlight">
   <thead class="sticky">
     <tr>
@@ -123,7 +119,8 @@
     {/foreach}
   {/if}
 </table>
-
+{include file="CRM/common/pagerAToZ.tpl"}
+{include file="CRM/common/pager.tpl" location="bottom"}
 <script type="text/javascript">
   {literal}
   CRM.$(function($) {
@@ -135,6 +132,5 @@
       $('#mark_x_' + cids.join(',#mark_x_') + ',input[name=radio_ts][value=ts_sel]').prop('checked', true);
     }
   });
-{/literal}
+  {/literal}
 </script>
-{include file="CRM/common/pager.tpl" location="bottom"}
