@@ -962,27 +962,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
               }
             }
           }
-          if ($key === 'phone' && isset($params['phone_ext'])) {
-            CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
-            $data[$key] = $value;
-            foreach ($value as $cnt => $phoneBlock) {
-              if ($params[$key][$cnt]['location_type_id'] == $params['phone_ext'][$cnt]['location_type_id']) {
-                $data[$key][$cnt]['phone_ext'] = CRM_Utils_Array::retrieveValueRecursive($params['phone_ext'][$cnt], 'phone_ext');
-              }
-            }
-          }
-          elseif (in_array($key, ['nick_name', 'job_title', 'middle_name', 'birth_date', 'gender_id', 'current_employer', 'prefix_id', 'suffix_id'])
-            && ($value == '' || !isset($value)) &&
-            ($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0 ||
-            ($key === 'current_employer' && empty($params['current_employer']))) {
-            // CRM-10128: if auth source is not checksum / login && $value is blank, do not fill $data with empty value
-            // to avoid update with empty values
-            CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
-            continue;
-          }
-          else {
-            $data[$key] = $value;
-          }
+          $data[$key] = $value;
         }
       }
     }
