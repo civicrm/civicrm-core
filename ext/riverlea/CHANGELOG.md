@@ -1,5 +1,15 @@
+0.10.6
+- ADDED - HackneyBrook primary & secondary hover text variables (ref 0.10.4)
+- ADDED - Advanced search layout optimisations (brings closer to original Greenwich/Shoreditch)
+- ADDED - table select-icon padding (https://lab.civicrm.org/artfulrobot/riverlea/-/blob/thames/streams/thames/css/civicrm.css#L363)
+- FIXED - focus state causes layout shift: https://lab.civicrm.org/extensions/riverlea/-/issues/49
+- FIXED - table cell alignment issue for form layouts
+- FIXED - hover state for even table rows in SearchKit: https://lab.civicrm.org/extensions/riverlea/-/issues/50
+- NEW CSS VARIABLE - for alpha-filter spacing (Thames inspired)
+    added: --crm-filter-spacing (defaults 'start')
+
 0.10.5
-- FIXED - issue with CSS rewriting happening when the theme isn't enabled: https://lab.civicrm.org/extensions/riverlea/-/merge_requests/26
+- FIXED - issue with CSS rewrite happening even if the theme isn't selected: https://lab.civicrm.org/extensions/riverlea/-/merge_requests/26
 
 0.10.4
 - NEW CSS VARIABLES to support different text hover colour, and allow contact dashboard roundness of tabs to work left/right as well as top/bottom

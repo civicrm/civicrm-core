@@ -432,6 +432,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-filter-padding: var(--crm-m);
 --crm-filter-item-bg:  #fafafa;
 --crm-filter-item-shadow: 0px 0px 3px rgba(0,0,0,0.1);
+--crm-filter-spacing: start; /* choose 'space-between' to spread out evenly, or 'end' to right align. */
 
 /* Frontend */
 --crm-f-form-width: 700px;

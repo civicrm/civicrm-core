@@ -16,6 +16,7 @@
   margin: 0;
   display: flex;
   gap: var(--crm-flex-gap);
+  justify-content: var(--crm-filter-spacing);
 }
 .crm-container #alpha-filter li {
   color: var(--crm-c-text);

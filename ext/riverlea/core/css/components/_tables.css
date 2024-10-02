@@ -240,6 +240,28 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
     background: transparent;
 }
 
+/* Advance search compressed table */
+
+#search-status table.form-layout-compressed {
+    border: 0;
+    background: var(--crm-c-background);
+    width: 100%;
+    border: 0;
+    padding: var(--crm-padding-reg);
+    border-radius: var(--crm-roundness);
+    margin: 0;
+}
+#search-status table.form-layout-compressed tr {
+    border: 0;
+}
+#search-status table.form-layout-compressed td {
+    padding-inline: var(--crm-padding-reg);
+}
+#search-status table.form-layout-compressed tr:first-of-type td,
+#search-status table.form-layout-compressed tr:last-of-type td {
+    padding-block: var(--crm-padding-reg);
+}
+
 /* Report table */
 
 .crm-container table.report {
@@ -312,7 +334,7 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
 	padding: var(--crm-table-padding);
 }
 .crm-container .crm-search-display-table > table.table > thead > tr > th.crm-search-result-select {
-    padding-inline: 0;
+    padding-inline: 0.5em;
 }
 .crm-container .table > tbody + tbody {
 	border-top: var(--crm-table-header-bottom);
@@ -346,7 +368,7 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
 .crm-container .table-striped > tbody > tr:nth-of-type(2n+1) {
 	background-color: var(--crm-table-odd-row);
 }
-.crm-container .table-hover > tbody > tr:hover {
+.crm-container .table-striped > tbody > tr:hover {
 	background-color: var(--crm-table-even-hover);
 }
 .crm-container .table-striped > tbody > tr:nth-of-type(2n+1):hover {

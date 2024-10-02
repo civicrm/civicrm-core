@@ -195,17 +195,6 @@ table.advmultiselect {
     gap: var(--crm-flex-gap);
 }
 
-/* Alpha filter */
-
-.crm-container div#alpha-filter {
-    background-color: var(--crm-c-blue-light);
-    margin: var(--crm-r) 0;
-    padding: var(--crm-s2) 0;
-    text-align: left;
-    box-shadow: var(--crm-block-shadow);
-    border-radius: var(--crm-roundness);
-}
-
 /* Panels (taken from Bootstrap3) */
 
 .crm-container .panel {

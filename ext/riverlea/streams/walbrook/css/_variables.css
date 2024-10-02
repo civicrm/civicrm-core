@@ -27,7 +27,7 @@
 --crm-c-gray-200: #d3dee2;
 --crm-c-gray-100: #ebeff0;
 --crm-c-gray-050: #f3f6f7;
---crm-c-gray-025: #f9faff;
+--crm-c-gray-025: #fcfcfc;
 --crm-c-blue: #0071bd;
 --crm-c-blue-light: #dff0f4;
 --crm-c-blue-dark: #66afe9;
@@ -89,9 +89,10 @@
 --crm-table-background: var(--crm-c-background);
 --crm-table-header-bottom: var(--crm-c-divider);
 --crm-table-header-bg: var(--crm-c-background3);
---crm-table-even-row: transparent;
---crm-table-even-hover: transparent;
---crm-table-odd-hover: var(--crm-c-gray-050);
+--crm-table-even-row: #fff;
+--crm-table-odd-row: var(--crm-c-gray-050);
+--crm-table-even-hover: var(--crm-c-gray-025);
+--crm-table-odd-hover: var(--crm-c-gray-100);
 --crm-table-sort-col: var(--crm-c-gray-500);
 --crm-table-nested-padding: 0 0 var(--crm-r) 0;
 --crm-table-nested-head-border: 2px solid var(--crm-c-gray-300);

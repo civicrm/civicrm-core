@@ -12,6 +12,7 @@
     padding: var(--crm-m) var(--crm-s2);
     border: none !important /* vs contactSummary.css */;
     height: auto;
+    vertical-align: top;
 }
 .crm-container div.form-layout-compressed {
     display: flex;
@@ -182,8 +183,8 @@ select.crm-error {
 }
 .crm-container :focus,
 .crm-container .ui-dialog :focus {
+    border-color: var(--crm-c-focus);
     box-shadow: none;
-    border: 1px solid var(--crm-c-focus);
 }
 .crm-container input.crm-placeholder-icon::placeholder {
     font-family: "FontAwesome";
