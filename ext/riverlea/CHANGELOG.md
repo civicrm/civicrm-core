@@ -1,3 +1,6 @@
+0.10.5
+- FIXED - issue with CSS rewriting happening when the theme isn't enabled: https://lab.civicrm.org/extensions/riverlea/-/merge_requests/26
+
 0.10.4
 - NEW CSS VARIABLES to support different text hover colour, and allow contact dashboard roundness of tabs to work left/right as well as top/bottom
     added: --crm-c-primary-hover-text
