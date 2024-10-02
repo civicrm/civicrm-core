@@ -2336,7 +2336,7 @@ abstract class CRM_Utils_Hook {
    *     - description: string (ex: "Register for events online")
    *     - is_synthetic: bool (TRUE for synthetic permissions with a bespoke evaluation. FALSE for concrete permissions that registered+granted in the UF user-management layer.
    *        Default TRUE iff name begins with '@')
-   *     - is_active: bool (TRUE if this permission is defined by. Default: TRUE)
+   *     - is_active: bool (FALSE for permissions belonging to disabled components, TRUE otherwise)
    *
    * @return null
    *   The return value is ignored

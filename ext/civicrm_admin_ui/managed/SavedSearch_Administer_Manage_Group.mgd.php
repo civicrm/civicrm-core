@@ -13,9 +13,6 @@ return [
       'values' => [
         'name' => 'Manage_groups',
         'label' => E::ts('Manage groups'),
-        'form_values' => NULL,
-        'mapping_id' => NULL,
-        'search_custom_id' => NULL,
         'api_entity' => 'Group',
         'api_params' => [
           'version' => 4,
@@ -31,7 +28,6 @@ return [
             'is_active',
             'frontend_title',
             'name',
-            'parents:label',
           ],
           'orderBy' => [],
           'where' => [
@@ -68,8 +64,6 @@ return [
           ],
           'having' => [],
         ],
-        'expires_date' => NULL,
-        'description' => NULL,
       ],
       'match' => [
         'name',
@@ -79,7 +73,7 @@ return [
   [
     'name' => 'SavedSearch_Manage_groups_SearchDisplay_Manage_groups',
     'entity' => 'SearchDisplay',
-    'cleanup' => 'unused',
+    'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
@@ -112,16 +106,7 @@ return [
               'sortable' => TRUE,
               'rewrite' => '',
               'editable' => TRUE,
-              'icons' => [
-                [
-                  'icon' => 'fa-wpforms',
-                  'side' => 'left',
-                  'if' => [
-                    'saved_search_id',
-                    'IS NOT EMPTY',
-                  ],
-                ],
-              ],
+              'icons' => [],
             ],
             [
               'type' => 'field',
@@ -134,29 +119,11 @@ return [
             ],
             [
               'type' => 'field',
-              'key' => 'is_active',
-              'dataType' => 'Boolean',
-              'label' => E::ts('Enabled'),
+              'key' => 'description',
+              'dataType' => 'Text',
+              'label' => E::ts('Description'),
               'sortable' => TRUE,
               'editable' => TRUE,
-            ],
-            [
-              'type' => 'field',
-              'key' => 'COUNT_Group_GroupContact_Contact_01_display_name',
-              'dataType' => 'Integer',
-              'label' => E::ts('Count'),
-              'sortable' => TRUE,
-              'rewrite' => '{if "[saved_search_id]"}{else}[COUNT_Group_GroupContact_Contact_01_display_name]{/if}',
-              'icons' => [
-                [
-                  'icon' => 'fa-question',
-                  'side' => 'left',
-                  'if' => [
-                    'saved_search_id',
-                    'IS NOT EMPTY',
-                  ],
-                ],
-              ],
             ],
             [
               'type' => 'field',
@@ -172,14 +139,6 @@ return [
                 'target' => '_blank',
               ],
               'title' => E::ts('View Contact'),
-            ],
-            [
-              'type' => 'field',
-              'key' => 'description',
-              'dataType' => 'Text',
-              'label' => E::ts('Description'),
-              'sortable' => TRUE,
-              'editable' => TRUE,
             ],
             [
               'type' => 'field',
@@ -199,20 +158,42 @@ return [
             ],
             [
               'type' => 'field',
-              'key' => 'parents:label',
-              'dataType' => 'Text',
-              'label' => E::ts('Parents'),
+              'key' => 'is_active',
+              'dataType' => 'Boolean',
+              'label' => E::ts('Enabled'),
               'sortable' => TRUE,
               'editable' => TRUE,
             ],
             [
+              'type' => 'field',
+              'key' => 'COUNT_Group_GroupContact_Contact_01_display_name',
+              'dataType' => 'Integer',
+              'label' => E::ts('Count'),
+              'sortable' => TRUE,
+              'rewrite' => '{if "[saved_search_id]"}{else}[COUNT_Group_GroupContact_Contact_01_display_name]{/if}',
+              'icons' => [
+                [
+                  'icon' => 'fa-lightbulb',
+                  'side' => 'left',
+                  'if' => [
+                    'saved_search_id',
+                    'IS NOT EMPTY',
+                  ],
+                ],
+              ],
+            ],
+            [
+              'text' => '',
+              'style' => 'default',
+              'size' => 'btn-xs',
+              'icon' => 'fa-bars',
               'links' => [
                 [
                   'entity' => '',
                   'action' => '',
                   'join' => '',
                   'target' => '',
-                  'icon' => 'fa-external-link',
+                  'icon' => 'fa-users',
                   'text' => E::ts('Contacts'),
                   'style' => 'default',
                   'path' => 'civicrm/group/search?reset=1&force=1&context=smog&gid=[id]&component_mode=1',
@@ -229,16 +210,6 @@ return [
                   'join' => '',
                   'target' => 'crm-popup',
                 ],
-              ],
-              'type' => 'buttons',
-              'alignment' => 'text-right',
-            ],
-            [
-              'text' => '',
-              'style' => 'default',
-              'size' => 'btn-xs',
-              'icon' => 'fa-bars',
-              'links' => [
                 [
                   'task' => 'enable',
                   'entity' => 'Group',
@@ -296,6 +267,7 @@ return [
               FALSE,
             ],
           ],
+          'hierarchical' => TRUE,
         ],
         'acl_bypass' => FALSE,
       ],

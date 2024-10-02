@@ -10,6 +10,8 @@
  */
 namespace Civi\Api4;
 
+use Civi\Api4\Generic\Traits\HierarchicalEntity;
+
 /**
  * (Read-only) Available permissions
  *
@@ -19,10 +21,12 @@ namespace Civi\Api4;
  *
  * @searchable none
  * @primaryKey name
+ * @parentField parent
  * @since 5.34
  * @package Civi\Api4
  */
 class Permission extends Generic\AbstractEntity {
+  use HierarchicalEntity;
 
   /**
    * @param bool $checkPermissions
@@ -99,7 +103,7 @@ class Permission extends Generic\AbstractEntity {
           'name' => 'is_active',
           'title' => 'Enabled',
           'description' => '',
-          'default' => TRUE,
+          'default_value' => TRUE,
           'data_type' => 'Boolean',
           'input_type' => 'CheckBox',
           'readonly' => TRUE,
@@ -113,6 +117,26 @@ class Permission extends Generic\AbstractEntity {
           'description' => 'List of sub-permissions automatically granted by this one',
           'data_type' => 'Array',
           'readonly' => TRUE,
+        ],
+        [
+          'name' => 'parent',
+          'title' => 'Parent',
+          'description' => 'Higher permission that implies this one',
+          'data_type' => 'String',
+          'fk_entity' => 'Permission',
+          'fk_column' => 'name',
+          'readonly' => TRUE,
+        ],
+        [
+          'name' => '_depth',
+          'type' => 'Extra',
+          'readonly' => TRUE,
+          'title' => ts('Depth'),
+          'description' => ts('Depth in the nested hierarchy'),
+          'data_type' => 'Integer',
+          'default_value' => 0,
+          'label' => ts('Depth'),
+          'input_type' => 'Number',
         ],
       ];
     }))->setCheckPermissions($checkPermissions);

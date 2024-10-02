@@ -3,6 +3,7 @@ namespace Civi\Api4\Action;
 
 use Civi\Api4\Role;
 use Civi\Api4\RolePermission;
+use Civi\Api4\Utils\CoreUtil;
 use Civi\Test\HeadlessInterface;
 
 /**
@@ -14,6 +15,10 @@ class RolePermissionTest extends \PHPUnit\Framework\TestCase implements Headless
     return \Civi\Test::headless()
       ->installMe(__DIR__)
       ->apply();
+  }
+
+  public function testMetadata(): void {
+    $this->assertEquals('parent', CoreUtil::getInfoItem('RolePermission', 'parent_field'));
   }
 
   /**

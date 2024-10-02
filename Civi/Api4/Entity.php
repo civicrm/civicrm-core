@@ -89,6 +89,10 @@ class Entity extends Generic\AbstractEntity {
       'description' => 'Default column to sort results',
     ],
     [
+      'name' => 'parent_field',
+      'description' => 'Field linking a hierarchical entity to its parent',
+    ],
+    [
       'name' => 'searchable',
       'description' => 'How should this entity be presented in search UIs',
       'pseudoconstant' => ['callback' => ['Civi\Api4\Utils\CoreUtil', 'getSearchableOptions']],

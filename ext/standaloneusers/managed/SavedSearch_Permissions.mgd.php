@@ -70,6 +70,7 @@ $items = [
             'table-striped',
             'crm-sticky-header',
           ],
+          'hierarchical' => TRUE,
         ],
       ],
       'match' => [
