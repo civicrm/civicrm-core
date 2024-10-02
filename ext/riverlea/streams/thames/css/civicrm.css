@@ -3,10 +3,16 @@
 @import url(../../../core/css/_core.css); /* components and utility classes */
 @import url(../../../core/css/_fixes.css); /* deprecated-Civi handling, hacks/workarounds. one day this will go. */
 
-body {
+/* Only affect body colour in standalone */
+html.cms-standalone body {
   background-color: var(--crm-c-page-background);
-  /* novar */
 }
+
+#crm-container {
+  min-height: 100vh;
+  background-color: var(--crm-c-page-background);
+}
+
 .crm-container details {
   background-color: #bad0df45;
   border: var(--crm-c-divider);
