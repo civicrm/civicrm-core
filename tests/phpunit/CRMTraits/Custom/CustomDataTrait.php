@@ -455,6 +455,18 @@ trait CRMTraits_Custom_CustomDataTrait {
   }
 
   /**
+   * Create a custom field of type money.
+   *
+   * @param array $params
+   *
+   * @return array
+   */
+  protected function createMoneyTextCustomField(array $params): array {
+    $params = array_merge($this->getFieldsValuesByType('Money'), $params);
+    return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
+  }
+
+  /**
    * Get default field values for the type of field.
    *
    * @param string $dataType
