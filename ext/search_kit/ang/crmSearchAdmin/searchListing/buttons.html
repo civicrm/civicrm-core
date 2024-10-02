@@ -20,7 +20,7 @@
       </a>
     </li>
     <li title="{{:: ts('Create a new search based on this one') }}">
-      <a ng-href="#/create/{{:: row.data.api_entity + '?params=' + $ctrl.encode(row.data.api_params) }}">
+      <a ng-href="#/clone/{{:: row.data.id }}">
         <i class="crm-i fa-copy"></i>
         {{:: ts('Clone...') }}
       </a>
