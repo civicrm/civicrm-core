@@ -374,7 +374,9 @@
             // Try to avoid adding duplicate columns
             const simpleName = _.last(fieldName.split('.'));
             if (!ctrl.savedSearch.api_params.select.join(',').includes(simpleName)) {
-              ctrl.savedSearch.api_params.select.push(join.alias + '.' + fieldName);
+              if (searchMeta.getField(fieldName, join.entity)) {
+                ctrl.savedSearch.api_params.select.push(join.alias + '.' + fieldName);
+              }
             }
           });
         }
