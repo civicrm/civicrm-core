@@ -461,9 +461,11 @@ class SettingsManager {
     // file in order to:
     // a) ensure the env values take precedence over define('CIVICRM_DSN'...) in the settings file
     // b) provide the right source value for CIVICRM_LOGGING_DSN (set from CIVICRM_DSN in the settings file template)
-    $composedDsn = $bootSettingsManager->getBagByDomain(NULL)->get('civicrm_db_dsn');
-    if ($composedDsn) {
-      define('CIVICRM_DSN', $composedDsn);
+    if (!defined('CIVICRM_DSN')) {
+      $composedDsn = $bootSettingsManager->getBagByDomain(NULL)->get('civicrm_db_dsn');
+      if ($composedDsn) {
+        define('CIVICRM_DSN', $composedDsn);
+      }
     }
 
     if (file_exists($settingsPath)) {
