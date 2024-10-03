@@ -1989,10 +1989,10 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
 
     $contributions = $this->saveTestRecords('Contribution', [
       'records' => [
-        ['total_amount' => 100, 'contact_id' => $contacts[0]['id'], 'receive_date' => '2024-02-02'],
-        ['total_amount' => 200, 'contact_id' => $contacts[0]['id'], 'receive_date' => '2021-02-02'],
-        ['total_amount' => 300, 'contact_id' => $contacts[1]['id'], 'receive_date' => '2022-02-02'],
-        ['total_amount' => 400, 'contact_id' => $contacts[2]['id'], 'receive_date' => '2023-02-02'],
+        ['total_amount' => 100, 'contact_id' => $contacts[0]['id'], 'receive_date' => '2024-02-02', 'financial_type_id:name' => 'Donation'],
+        ['total_amount' => 200, 'contact_id' => $contacts[0]['id'], 'receive_date' => '2021-02-02', 'financial_type_id:name' => 'Campaign Contribution'],
+        ['total_amount' => 300, 'contact_id' => $contacts[1]['id'], 'receive_date' => '2022-02-02', 'financial_type_id:name' => 'Member Dues'],
+        ['total_amount' => 400, 'contact_id' => $contacts[2]['id'], 'receive_date' => '2023-02-02', 'financial_type_id:name' => 'Donation'],
       ],
     ]);
 
@@ -2007,6 +2007,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
           'GROUP_CONCAT(DISTINCT contact_id.sort_name) AS GROUP_CONCAT_contact_id_sort_name',
           'SUM(total_amount) AS SUM_total_amount',
           'GROUP_FIRST(receive_date ORDER BY receive_date ASC) AS GROUP_FIRST_receive_date',
+          'GROUP_FIRST(financial_type_id:label ORDER BY receive_date ASC) AS GROUP_FIRST_financial_type_id_label',
         ],
         'orderBy' => [],
         'where' => [
@@ -2069,6 +2070,15 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
             ],
             'format' => 'dateformatshortdate',
           ],
+          [
+            'type' => 'field',
+            'key' => 'GROUP_FIRST_financial_type_id_label',
+            'label' => '(First) Financial Type',
+            'sortable' => TRUE,
+            'tally' => [
+              'fn' => 'GROUP_FIRST',
+            ],
+          ],
         ],
         'actions' => TRUE,
         'classes' => [
@@ -2091,6 +2101,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(['A, A', 'B, B', 'C, C'], $tally['GROUP_CONCAT_contact_id_sort_name']);
     $this->assertSame('$1,000.00', $tally['SUM_total_amount']);
     $this->assertSame('02/02/2021', $tally['GROUP_FIRST_receive_date']);
+    $this->assertSame('Donation', $tally['GROUP_FIRST_financial_type_id_label']);
   }
 
   public function testContributionTotalCountWithTestAndTemplateContributions():void {
