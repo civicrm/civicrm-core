@@ -141,7 +141,7 @@
     flex-grow: 1;
     padding: var(--crm-dash-panel-padding);
     border: var(--crm-dash-panel-border);
-    border-radius: var(--crn-dash-panel-radius);
+    border-radius: var(--crm-dash-panel-radius);
 }
 .crm-contact-page #mainTabContainer .crm-contact-tabs-list li {
     background: var(--crm-dash-tab-bg);

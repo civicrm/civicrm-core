@@ -180,14 +180,12 @@ html.cms-standalone body {
 
 /* OTHER */
 /* 'alpha-filter' is the alphabetical pager you see, for example, on adv search results */
-/* .crm-container #alpha-filter ul { */
-/*   margin: 0; */
-/*   display: flex; */
-/*   justify-content: space-between; */
-/*   gap: var(--crm-m); */
-/*   color: #0002; */
-/*   padding: 0 1rem; */
-/* } */
+.crm-container #alpha-filter li {
+  --crm-c-text: #0002; /* referenced in searchForm.css */
+}
+.crm-container #alpha-filter a {
+  box-shadow: none !important; /* override searchForm.css */
+}
 
 .crm-container .description:not(#help),
 .crm-container td.description {
@@ -206,14 +204,9 @@ html.cms-standalone body {
 }
 
 /* CONTACT SUMMARY */
-/* put border radius around the complete block of tabs(on left) and content (right) so it looks like one unit */
-.crm-contact-page #mainTabContainer .crm-contact-tabs-list {
-  border-radius: var(--crm-dash-roundness) 0 0 var(--crm-dash-roundness);
-  overflow: hidden;
-}
-
-#mainTabContainer .crm-contact-tabs-list~.ui-tabs-panel {
-  border-radius: 0 var(--crm-dash-roundness) var(--crm-dash-roundness) 0;
+/* Ensure the Summary tab's top left corner matches the radius of the container */
+.crm-contact-page #mainTabContainer .crm-contact-tabs-list>li:first-child a {
+  border-radius: var(--crm-dash-roundness) 0 0 0;
 }
 
 .crm-contact-page #mainTabContainer .ui-tabs-nav li .ui-tabs-anchor:has(.crm-i) {
@@ -329,7 +322,8 @@ div.crm-summary-contactname-block+.crm-actions-ribbon {
 /* nice rounded tables. Pretty niche. */
 .crm-container table:not(.crm-inline-edit-form) {
   border-radius: 0.4rem;
-  clip-path: inset(0 0 0 0 round 0.4rem);
+  /* Fails when pop-up menus inside table need to extend beyond the table */
+  /* clip-path: inset(0 0 0 0 round 0.4rem); */
   border-collapse: separate;
   border-spacing: 0;
 }
@@ -352,31 +346,21 @@ div.crm-summary-contactname-block+.crm-actions-ribbon {
 
 /* ensure thing that wrap tables allow scrolling in case the table overflows. */
 div:has(> table) {
-  overflow: auto;
+  overflow-x: auto;
   max-width: 100%;
 }
 
-/* prevent the select-all UI from being crammed up against left side */
-.crm-container .crm-search-display-table>table.table>thead>tr>th.crm-search-result-select {
-  padding-inline: 0.5em;
-}
-
-/* ...and adjust the individual row checkboxes to be in line */
-.crm-container .table>thead>tr>th,
-.crm-container .table>thead>tr>td,
-.crm-container .table>tbody>tr>th,
-.crm-container .table>tbody>tr>td,
-.crm-container .table>tfoot>tr>th,
-.crm-container .table>tfoot>tr>td {
-  padding: 0.2rem 0.8rem;
-}
+/* ...and adjust the individual row checkboxes to be in line 
+ * Ah, no we have no way to target these.
+ * Would be nice if core markup identified this type of <td>
+ */
 
 /* apply hanging indent to sorting buttons */
 .crm-container :is(tr a, table.dataTable thead th):is(.sorting, .sorting_asc, .sorting_desc),
 .crm-search-display th.crm-sortable-col {
-  padding-left: calc(var(--crm-table-padding, 0) + 1em);
+  padding-left: calc(var(--crm-table-padding, 0) + 1ch);
 
-  &:before {
+  &:after, &:before {
     position: absolute;
     margin-left: -1em;
   }

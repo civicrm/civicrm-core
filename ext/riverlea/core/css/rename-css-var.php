@@ -66,16 +66,16 @@ $names = explode("\n", <<<TXT
 --crm-yellow            --crm-c-yellow
 --crm-yellow-less-light --crm-c-yellow-less-light
 --crm-yellow-light      --crm-c-yellow-light
---crn-amber-light       --crn-c-amber-light
+--crm-amber-light       --crm-c-amber-light
 TXT);
 $map = [];
 foreach ($names as $pair) {
   [$old, $new] = preg_split('/\s+/', $pair);
   $map[$old] = $new;
 }
-$di = new RecursiveDirectoryIterator(__DIR__,RecursiveDirectoryIterator::SKIP_DOTS);
+$di = new RecursiveDirectoryIterator(__DIR__, RecursiveDirectoryIterator::SKIP_DOTS);
 $it = new RecursiveIteratorIterator($di);
-foreach($it as $filepath) {
+foreach ($it as $filepath) {
   if (pathinfo($filepath, PATHINFO_EXTENSION) == "css") {
     $orig = $css = file_get_contents($filepath);
     foreach ($map as $old => $new) {

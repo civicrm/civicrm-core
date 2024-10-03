@@ -338,7 +338,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 }
 :root {
 
-/* Contact dashboard */
+/* Contact dashboard/summary */
 --crm-dash-border: 0 solid transparent; /* thames */
 --crm-dash-roundness: var(--crm-r-5); /* thames */
 --crm-dash-direction: grid; /* choose 'flex' for tabs at top, or 'grid' for tabs at side */ /* thames */
@@ -348,7 +348,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-dash-tabs-bg: var(--crm-c-blue-overlay); /* thames */
 --crm-dash-tabs-padding: ; /* thames */
 --crm-dash-tab-bg: transparent;
---crm-dash-tabs-roundness: var(--crm-dash-roundness) var(--crm-dash-roundness) 0 0; /* thames todo check */
+--crm-dash-tabs-roundness: var(--crm-dash-roundness) 0 0 var(--crm-dash-roundness);
 --crm-dash-tab-bg-hover: white; /* thames */
 --crm-dash-tab-padding: var(--crm-m2) var(--crm-r1); /* thames */
 --crm-dash-tab-border: var(--crm-dash-border); /* thames */
@@ -368,7 +368,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-dash-panel-padding: var(--crm-r2); /* thames */
 --crm-dash-panel-bg: white; /* thames */
 --crm-dash-panel-border: 0;
---crn-dash-panel-radius: 0 0 var(--crm-dash-roundness) var(--crm-dash-roundness); /* thames todo check */
+--crm-dash-panel-radius: 0 var(--crm-dash-roundness) var(--crm-dash-roundness) 0;
 --crm-dash-edit-border: 1px solid var(--crm-c-blue-dark); /* thames */
 --crm-dash-block-padding: var(--crm-m2); /* thames */
 --crm-dash-block-bg: var(--crm-c-background); /* thames */
@@ -484,8 +484,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 /* Alpha filter */
 --crm-filter-bg: var(--crm-c-blue-overlay);
 --crm-filter-padding: var(--crm-m);
---crm-filter-item-bg:  #fafafa;
-/* --crm-filter-item-shadow: 0px 0px 3px rgba(0,0,0,0.1); */
+--crm-filter-item-bg:  transparent;
 --crm-filter-item-shadow: none;
 --crm-filter-spacing: space-between;
 
