@@ -85,7 +85,7 @@ html.cms-standalone body {
 /* } */
 
 
-/* ALERTS */
+/* ALERTS (these are in-page-flow boxes with info, not the (normally) popup notifications) */
 
 /* put stripe down left with icon in it. */
 .crm-container #help, .crm-container .help {
@@ -164,14 +164,9 @@ html.cms-standalone body {
 }
 
 
-/* NOTIFICATIONS */
+/* NOTIFICATIONS (the popup ones) */
+/* This produces a nicer hanging-indent type thing aligning the title and message to the left. */
 .crm-container .notify-content { padding-left: 1.6rem; }
-/* Riverlea assumes crm-c-success to be a background color which is not how we're using it. */
-#crm-notification-container div.ui-notify-message-style.success { border-color: var(--crm-c-green-dark); }
-.crm-container #crm-notification-container div.ui-notify-message.success h1::before,
-.crm-container span.batch-valid::before {
-  color: var(--crm-c-green-dark);
-}
 
 /* Thames theme does hanging indent for the little <i>con, but happy for the list bullets to be outside of main text block as is narrow column. */
 #crm-notification-container div.ui-notify-message .notify-content ul,
@@ -184,14 +179,15 @@ html.cms-standalone body {
 #crm-notification-container div.ui-notify-message h1:not(:empty) { margin-bottom: 1rem; }
 
 /* OTHER */
-.crm-container #alpha-filter ul {
-  margin: 0;
-  display: flex;
-  justify-content: space-between;
-  gap: var(--crm-m);
-  color: #0002;
-  padding: 0 1rem;
-}
+/* 'alpha-filter' is the alphabetical pager you see, for example, on adv search results */
+/* .crm-container #alpha-filter ul { */
+/*   margin: 0; */
+/*   display: flex; */
+/*   justify-content: space-between; */
+/*   gap: var(--crm-m); */
+/*   color: #0002; */
+/*   padding: 0 1rem; */
+/* } */
 
 .crm-container .description:not(#help),
 .crm-container td.description {

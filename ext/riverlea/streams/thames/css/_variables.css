@@ -88,9 +88,9 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-c-secondary-hover: #a1cef3; /* thames */
 --crm-c-secondary-text: var(--crm-c-blue-darker); /* thames */
 --crm-c-secondary-hover-text: var(--crm-c-light-text); /* thames todo */
---crm-c-success: var(--crm-c-green); /* thames todo, default is green-dark which might be more sensible than setting the main green to dark */
+--crm-c-success: var(--crm-c-green-dark);
 --crm-c-success-text: var(--crm-c-light-text);
---crm-c-alert: transparent;
+--crm-c-alert: var(--crm-c-red-dark);
 --crm-c-alert-text: var(--crm-c-red-dark);
 --crm-c-warning: var(--crm-c-amber);
 --crm-c-warning-text: var(--crm-c-light-text);
@@ -262,8 +262,11 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-alert-padding: var(--crm-r); /* thames */
 --crm-alert-margin: 0 0 var(--crm-m);
 --crm-alert-border-width:0; /* thames */
+
+/* Note 'help' suffix here is for the 'success' boxes. */
 --crm-alert-background-help: var(--crm-c-blue-light); /* thames */
 --crm-alert-border-help: ; /* thames */
+
 --crm-alert-text-help: ; /* thames */
 --crm-alert-background-warning: var(--crm-c-yellow-light);
 --crm-alert-border-warning: var(--crm-c-yellow);
@@ -484,6 +487,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-filter-item-bg:  #fafafa;
 /* --crm-filter-item-shadow: 0px 0px 3px rgba(0,0,0,0.1); */
 --crm-filter-item-shadow: none;
+--crm-filter-spacing: space-between;
 
 }
 :root {
