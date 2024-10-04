@@ -1562,7 +1562,7 @@ input.crm-form-entityref {
   text-decoration: none;
 }
 
-.crm-container ul.panel {
+.crm-container ul.panel:not([popover]) {
   display: none;
   z-index: 9999;
   position: absolute;
@@ -4012,10 +4012,9 @@ html.crm-standalone body {
 
 /* proof of concept styling: positions menu with its top-right corner over the clicked element */
 .crm-container .panel[popover] {
-	background: white;
 	inset: unset;
 	position: absolute;
-	transform: translateX(-100%) translateY(50%);
+	transform: translateX(-100%);
   border-radius: 0.4rem;
 }
 /* proof of concept styling: subtle text-only button. */
@@ -4024,4 +4023,5 @@ html.crm-standalone body {
   background: transparent;
   color: var(--crm-c-text, black);
   padding: 0 var(--crm-s, 0.5ch);
+  border: none;
 }
