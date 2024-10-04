@@ -44,6 +44,10 @@ class LegacySpecScanner implements AutoServiceInterface {
   /**
    * Scan all enabled extensions for files in a certain namespace.
    *
+   * Q: this seems to be adding resources to the container as it goes, rather
+   * than just finding them as per function name? Otherwise could share an implementation
+   * with LegacyEntityScanner
+   *
    * Note: respects dispatch policy for hook_civicrm_scanClasses, for consistency
    *
    * @param string $namespace
