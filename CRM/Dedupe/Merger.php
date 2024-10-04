@@ -949,21 +949,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
             $includeViewOnly,
           );
         }
-        elseif ($key === 'edit') {
-          CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
-          continue;
-        }
         else {
-          if ($key === 'location') {
-            CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
-            foreach ($value as $locationTypeId => $field) {
-              foreach ($field as $block => $val) {
-                if ($block === 'address' && array_key_exists('address_name', $val)) {
-                  $value[$locationTypeId][$block]['name'] = $value[$locationTypeId][$block]['address_name'];
-                }
-              }
-            }
-          }
           $data[$key] = $value;
         }
       }
