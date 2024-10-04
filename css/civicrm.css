@@ -4009,3 +4009,19 @@ html.crm-standalone body {
   font-family: var(--crm-font, sans-serif);
   background-color: var(--crm-c-page-background, #f8f8f8);
 }
+
+/* proof of concept styling: positions menu with its top-right corner over the clicked element */
+.crm-container .panel[popover] {
+	background: white;
+	inset: unset;
+	position: absolute;
+	transform: translateX(-100%) translateY(50%);
+  border-radius: 0.4rem;
+}
+/* proof of concept styling: subtle text-only button. */
+.btn-popover-menu {
+  height: 1.2rem;
+  background: transparent;
+  color: var(--crm-c-text, black);
+  padding: 0 var(--crm-s, 0.5ch);
+}
