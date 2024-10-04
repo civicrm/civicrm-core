@@ -118,6 +118,10 @@ class CRM_Core_BAO_CustomValueTable {
               }
               break;
 
+            case 'String':
+              $value = (is_array($value) && empty($value)) ? '' : $value;
+              break;
+
             case 'ContactReference':
               if ($serialize) {
                 $type = 'String';
