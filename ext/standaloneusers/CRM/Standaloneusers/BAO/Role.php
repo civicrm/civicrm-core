@@ -5,6 +5,7 @@
  */
 
 use Civi\Api4\Event\AuthorizeRecordEvent;
+use CRM_Standaloneusers_ExtensionUtil as E;
 
 class CRM_Standaloneusers_BAO_Role extends CRM_Standaloneusers_DAO_Role implements \Civi\Core\HookInterface {
 
@@ -15,6 +16,14 @@ class CRM_Standaloneusers_BAO_Role extends CRM_Standaloneusers_DAO_Role implemen
   public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
     // Reset cache
     Civi::cache('metadata')->clear();
+    // Rebuild role-based search displays if they will be affected by this action
+    if ($event->action === 'delete' || $event->action === 'create' ||
+      ($event->action === 'edit' && (isset($event->params['label']) || isset($event->params['is_active'])))
+    ) {
+      \Civi\Api4\Managed::reconcile(FALSE)
+        ->addModule(E::LONG_NAME)
+        ->execute();
+    }
   }
 
   /**

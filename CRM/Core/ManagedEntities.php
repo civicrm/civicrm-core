@@ -46,7 +46,7 @@ class CRM_Core_ManagedEntities {
    * Perform an asynchronous reconciliation when the transaction ends.
    * @param array|null $modules
    */
-  public static function scheduleReconciliation(array $modules = NULL) {
+  public static function scheduleReconciliation(?array $modules = NULL) {
     CRM_Core_Transaction::addCallback(
       CRM_Core_Transaction::PHASE_POST_COMMIT,
       function ($modules) {
@@ -63,41 +63,6 @@ class CRM_Core_ManagedEntities {
    */
   public function __construct(array $modules) {
     $this->moduleIndex = $this->createModuleIndex($modules);
-  }
-
-  /**
-   * Read a managed entity using APIv3.
-   *
-   * @deprecated
-   *
-   * @param string $moduleName
-   *   The name of the module which declared entity.
-   * @param string $name
-   *   The symbolic name of the entity.
-   * @return array|NULL
-   *   API representation, or NULL if the entity does not exist
-   */
-  public function get($moduleName, $name) {
-    CRM_Core_Error::deprecatedFunctionWarning('api');
-    $dao = new CRM_Core_DAO_Managed();
-    $dao->module = $moduleName;
-    $dao->name = $name;
-    if ($dao->find(TRUE)) {
-      $params = [
-        'id' => $dao->entity_id,
-      ];
-      $result = NULL;
-      try {
-        $result = civicrm_api3($dao->entity_type, 'getsingle', $params);
-      }
-      catch (Exception $e) {
-        $this->onApiError($dao->module, $dao->name, 'getsingle', $result['error_message'], $e);
-      }
-      return $result;
-    }
-    else {
-      return NULL;
-    }
   }
 
   /**
@@ -162,7 +127,7 @@ class CRM_Core_ManagedEntities {
       'action' => 'create',
       'where' => $condition,
     ]);
-    $defaultValues = $getFields->indexBy('name')->column('default_value');
+    $defaultValues = $getFields->column('default_value', 'name');
     $item['params']['values'] += $defaultValues;
   }
 
@@ -375,7 +340,10 @@ class CRM_Core_ManagedEntities {
         break;
 
       case 'unused':
-        if (CRM_Core_BAO_Managed::isApi4ManagedType($item['entity_type'])) {
+        if (!$item['entity_id']) {
+          $getRefCount = [];
+        }
+        elseif (CRM_Core_BAO_Managed::isApi4ManagedType($item['entity_type'])) {
           $getRefCount = CoreUtil::getRefCount($item['entity_type'], $item['entity_id']);
         }
         else {

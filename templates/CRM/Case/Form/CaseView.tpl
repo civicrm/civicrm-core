@@ -17,6 +17,7 @@
   {* Main case view *}
   {else}
 
+  {crmRegion name="case-view-summary"}
   <h3>{ts}Summary{/ts}</h3>
   <table class="report crm-entity case-summary" data-entity="case" data-id="{$caseID}" data-cid="{$contactID}">
     {if $multiClient}
@@ -82,6 +83,8 @@
       </td>
     </tr>
   </table>
+  {/crmRegion}
+  {crmRegion name="case-view-hook-case-summary"}
   {if $hookCaseSummary}
     <div id="caseSummary" class="crm-clearfix">
       {foreach from=$hookCaseSummary item=val key=div_id}
@@ -89,7 +92,9 @@
       {/foreach}
     </div>
   {/if}
+  {/crmRegion}
 
+  {crmRegion name="case-view-control-panel"}
   <div class="case-control-panel">
     <div>
       <p>
@@ -118,16 +123,20 @@
           </span>
         {/if}
 
-        {if call_user_func(array('CRM_Core_Permission','giveMeAllACLs'))}
+        {if $hasAllACLs}
           <a class="action-item crm-hover-button medium-popup" href="{crmURL p='civicrm/contact/view/case/editClient' h=1 q="reset=1&action=update&id=$caseID&cid=$contactID"}"><i class="crm-i fa-user" aria-hidden="true"></i> {ts}Assign to Another Client{/ts}</a>
         {/if}
       </p>
     </div>
   </div>
+  {/crmRegion}
 
+  {crmRegion name="case-view-custom-data-view"}
   <div class="clear"></div>
   {include file="CRM/Case/Page/CustomDataView.tpl"}
+  {/crmRegion}
 
+  {crmRegion name="case-view-roles"}
   <details class="crm-accordion-bold crm-case-roles-block">
     <summary>
       {ts}Roles{/ts}
@@ -187,7 +196,9 @@
 
    </div>
   </details>
+  {/crmRegion}
 
+  {crmRegion name="case-view-other-relationships"}
   {if $hasAccessToAllCases}
   <details class="crm-accordion-bold crm-case-other-relationships-block">
     <summary>
@@ -256,9 +267,11 @@
 </details>
 
 {/if} {* other relationship section ends *}
+  {/crmRegion}
 {include file="CRM/Case/Form/ActivityToCase.tpl"}
 
 {* pane to display / edit regular tags or tagsets for cases *}
+{crmRegion name="case-view-tags"}
 {if $showTags}
 <details id="casetags" class="crm-accordion-bold  crm-case-tags-block" open>
  <summary>
@@ -279,7 +292,7 @@
    {foreach from=$tagSetTags item=displayTagset}
      <p class="crm-block crm-content-block crm-case-caseview-display-tagset">
        &nbsp;&nbsp;<strong>{$displayTagset.label}:</strong>
-       {', '|implode:$displayTagset.items|escape}
+       {$displayTagset.itemsStr|escape}
      </p>
    {/foreach}
 
@@ -309,8 +322,11 @@
 </div>
 
 {/if} {* end of tag block*}
+{/crmRegion}
 
+{crmRegion name="case-view-activity-tab"}
 {include file="CRM/Case/Form/ActivityTab.tpl"}
+{/crmRegion}
 
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 {/if} {* view related cases if end *}

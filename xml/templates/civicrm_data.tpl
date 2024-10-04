@@ -183,3 +183,4 @@ VALUES ( @fieldID, 'contribution_amount', 'Contribution Amount', '1', '1', '0', 
 {crmSqlData file="sql/civicrm_data/civicrm_extension.sqldata.php"}
 {crmSqlData file="sql/civicrm_data/civicrm_option_group/soft_credit_type.sqldata.php"}
 {crmSqlData file="sql/civicrm_data/civicrm_option_group/recent_items_providers.sqldata.php"}
+{crmSqlData file="sql/civicrm_data/civicrm_site_token.sqldata.php"}

@@ -88,14 +88,14 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
    *   Local path to the container.
    * @param string $baseUrl
    *   Public URL of the container.
-   * @param CRM_Utils_Cache_Interface $cache
+   * @param CRM_Utils_Cache_Interface|null $cache
    *   Cache in which to store extension metadata.
    * @param string $cacheKey
    *   Unique name for this container.
    * @param int|null $maxDepth
    *   Maximum number of subdirectories to search.
    */
-  public function __construct($baseDir, $baseUrl, CRM_Utils_Cache_Interface $cache = NULL, $cacheKey = NULL, ?int $maxDepth = NULL) {
+  public function __construct($baseDir, $baseUrl, ?CRM_Utils_Cache_Interface $cache = NULL, $cacheKey = NULL, ?int $maxDepth = NULL) {
     $this->cache = $cache;
     $this->cacheKey = $cacheKey;
     $this->baseDir = rtrim($baseDir, '/');

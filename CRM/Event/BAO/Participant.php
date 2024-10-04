@@ -110,6 +110,13 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant implements \Ci
 
     $participantBAO->save();
 
+    // add custom field values
+    if (!empty($params['custom']) &&
+      is_array($params['custom'])
+    ) {
+      CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_participant', $participantBAO->id);
+    }
+
     CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
 
     if (!empty($params['id'])) {
@@ -191,13 +198,6 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant implements \Ci
       $id = $params['contact_id'] ?? NULL;
     }
 
-    // add custom field values
-    if (!empty($params['custom']) &&
-      is_array($params['custom'])
-    ) {
-      CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_participant', $participant->id);
-    }
-
     //process note, CRM-7634
     $noteId = NULL;
     if (!empty($params['id'])) {
@@ -219,13 +219,9 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant implements \Ci
           'entity_table' => 'civicrm_participant',
           'note' => $noteValue,
           'entity_id' => $participant->id,
-          'contact_id' => $id,
+          'id' => $noteId,
         ];
-        $noteIDs = [];
-        if ($noteId) {
-          $noteIDs['id'] = $noteId;
-        }
-        CRM_Core_BAO_Note::add($noteParams, $noteIDs);
+        CRM_Core_BAO_Note::add($noteParams);
       }
       elseif ($noteId && $hasNoteField) {
         CRM_Core_BAO_Note::deleteRecord(['id' => $noteId]);
@@ -1747,35 +1743,23 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
   }
 
   /**
-   * Get options for a given field.
-   * @see CRM_Core_DAO::buildOptions
-   *
-   * @param string $fieldName
-   * @param string $context
-   * @see CRM_Core_DAO::buildOptionsContext
-   * @param array $props
-   *   whatever is known about this dao object.
-   *
-   * @return array|bool
+   * Pseudoconstant condition_provider for role_id field.
+   * @see \Civi\Schema\EntityMetadataBase::getConditionFromProvider
    */
-  public static function buildOptions($fieldName, $context = NULL, $props = []) {
-    $params = ['condition' => []];
+  public static function alterRole(string $fieldName, CRM_Utils_SQL_Select $conditions, $params) {
+    if (isset($params['values']['filter'])) {
+      $conditions->where('filter = #filter', ['filter' => (int) $params['values']['filter']]);
+    }
+  }
 
-    if ($fieldName === 'status_id' && $context !== 'validate') {
-      // Get rid of cart-related option if disabled
-      // FIXME: Why does this option even exist if cart is disabled?
-      if (!Civi::settings()->get('enable_cart')) {
-        $params['condition'][] = "name <> 'Pending in cart'";
-      }
+  /**
+   * Pseudoconstant condition_provider for status_id field.
+   * @see \Civi\Schema\EntityMetadataBase::getConditionFromProvider
+   */
+  public static function alterStatus(string $fieldName, CRM_Utils_SQL_Select $conditions, $params) {
+    if (isset($params['values']['is_counted'])) {
+      $conditions->where('is_counted = #counted', ['counted' => (int) $params['values']['is_counted']]);
     }
-    if ($fieldName === 'status_id' && isset($props['is_counted'])) {
-      $params['condition'][] = 'is_counted = ' . $props['is_counted'];
-    }
-    if ($fieldName === 'role_id' && isset($props['filter'])) {
-      $params['condition'][] = 'filter = ' . $props['filter'];
-    }
-
-    return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }
 
   /**

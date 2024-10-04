@@ -187,11 +187,6 @@ FROM   {$this->_componentTable}
     if ($this->_exportMode == self::CONTACT_EXPORT) {
       $this->addRadio('mergeOption', ts('Merge Options'), $mergeOptions, [], '<br/>', FALSE, $mergeOptionsJS);
       $this->addGroup($postalMailing, 'postal_mailing_export', ts('Postal Mailing Export'), '<br/>');
-
-      $this->addElement('select', 'additional_group', ts('Additional Group for Export'),
-        ['' => ts('- select group -')] + CRM_Core_PseudoConstant::nestedGroup(),
-        ['class' => 'crm-select2 huge']
-      );
     }
 
     $this->buildMapping();

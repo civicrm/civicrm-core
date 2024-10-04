@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Component'),
     'title_plural' => ts('Components'),
-    'description' => ts('FIXME'),
+    'description' => ts('Table of Core Components (deprecated - use core extensions instead)'),
     'add' => '2.0',
   ],
   'getFields' => fn() => [
@@ -28,9 +28,6 @@ return [
       'required' => TRUE,
       'description' => ts('Name of the component.'),
       'add' => '2.0',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'namespace' => [
       'title' => ts('Namespace reserved for component.'),
@@ -38,9 +35,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Path to components main directory in a form of a class namespace.'),
       'add' => '2.0',
-      'input_attrs' => [
-        'maxlength' => 128,
-      ],
     ],
   ],
 ];

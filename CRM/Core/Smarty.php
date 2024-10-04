@@ -125,19 +125,16 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
       if (!file_exists($customPluginsDir)) {
         $customPluginsDir = NULL;
       }
+      if ($customPluginsDir) {
+        $this->addPluginsDir($customPluginsDir);
+      }
     }
 
     $pkgsDir = Civi::paths()->getVariable('civicrm.packages', 'path');
     // smarty3/4 have the define, fall back to smarty2. smarty5 deprecates plugins_dir - TBD.
     $smartyPluginsDir = defined('SMARTY_PLUGINS_DIR') ? SMARTY_PLUGINS_DIR : ($pkgsDir . DIRECTORY_SEPARATOR . 'Smarty' . DIRECTORY_SEPARATOR . 'plugins');
     $corePluginsDir = __DIR__ . DIRECTORY_SEPARATOR . 'Smarty' . DIRECTORY_SEPARATOR . 'plugins' . DIRECTORY_SEPARATOR;
-
-    if ($customPluginsDir) {
-      $this->plugins_dir = [$customPluginsDir, $smartyPluginsDir, $corePluginsDir];
-    }
-    else {
-      $this->plugins_dir = [$smartyPluginsDir, $corePluginsDir];
-    }
+    $this->addPluginsDir($corePluginsDir);
 
     $this->compile_check = $this->isCheckSmartyIsCompiled();
 
@@ -164,24 +161,6 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
       $this->assign('langSwitch', CRM_Core_I18n::uiLanguages());
     }
 
-    if (CRM_Utils_Constant::value('CIVICRM_SMARTY_DEFAULT_ESCAPE')
-      && !CRM_Utils_Constant::value('CIVICRM_SMARTY3_AUTOLOAD_PATH')
-      && !CRM_Utils_Constant::value('CIVICRM_SMARTY_AUTOLOAD_PATH')
-    ) {
-      // Currently DEFAULT escape does not work with Smarty3
-      // dunno why - thought it would be the default with Smarty3 - but
-      // getting onto Smarty 3 is higher priority.
-      // The include below loads the v2 version which is why id doesn't work.
-      // When default escape is enabled if the core escape is called before
-      // any custom escaping is done the modifier_escape function is not
-      // found, so require_once straight away. Note this was hit on the basic
-      // contribution dashboard from RecentlyViewed.tpl
-      require_once 'Smarty/plugins/modifier.escape.php';
-      if (!isset($this->_plugins['modifier']['escape'])) {
-        $this->registerPlugin('modifier', 'escape', ['CRM_Core_Smarty', 'escape']);
-      }
-      $this->default_modifiers[] = 'escape:"htmlall"';
-    }
     $this->loadFilter('pre', 'resetExtScope');
     $this->loadFilter('pre', 'htxtFilter');
 
@@ -196,9 +175,8 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
       'str_starts_with',
       // Trim is used on the extensions page.
       'trim',
+      'mb_substr',
       'is_numeric',
-      // used for permission checks although it might be nicer if it wasn't
-      'call_user_func',
       'array_key_exists',
       'strstr',
       'strpos',
@@ -207,11 +185,46 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
       $this->registerPlugin('modifier', $function, $function);
     }
 
+    $this->registerPlugin('modifier', 'call_user_func', [self::class, 'callUserFuncArray']);
+    // This does not appear to be used & feels like the sort of approach that would be phased out.
     $this->assign('crmPermissions', new CRM_Core_Smarty_Permissions());
 
     if ($config->debug || str_contains(CIVICRM_UF_BASEURL, 'localhost') || CRM_Utils_Constant::value('CIVICRM_UF') === 'UnitTests') {
       $this->error_reporting = E_ALL;
     }
+  }
+
+  /**
+   * Call a permitted function from the Smarty layer.
+   *
+   * In general calling functions from the Smarty layer is being made stricter in
+   * Smarty - they need to be registered.
+   *
+   * We can't quite kill off call_user_func from the smarty layer yet but we
+   * can deprecate using it to call anything other than the 3 known patterns.
+   * In Smarty5 this will hard-fail, which is OK as Smarty5 is being phased in
+   * and can err on the side of strictness, at least for now.
+   *
+   * @param callable $callable
+   * @param mixed $args
+   *
+   * @return mixed
+   * @throws \CRM_Core_Exception
+   */
+  public static function callUserFuncArray(callable $callable, ...$args) {
+    $permitted = [
+      ['CRM_Campaign_BAO_Campaign', 'isComponentEnabled'],
+      ['CRM_Case_BAO_Case', 'checkPermission'],
+      ['CRM_Core_Permission', 'check'],
+      ['CRM_Core_Permission', 'access'],
+    ];
+    if (!in_array($callable, $permitted)) {
+      if (CRM_Core_Smarty::singleton()->getVersion() === 5) {
+        throw new CRM_Core_Exception('unsupported function');
+      }
+      CRM_Core_Error::deprecatedWarning('unsupported function. call_user_func array is not generally supported in Smarty5 but we have transitional support for 2 functions that are in common use');
+    }
+    return call_user_func_array($callable, $args ?: []);
   }
 
   /**
@@ -451,7 +464,7 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
    * anything coming in with this be happening because of the default modifier.
    *
    * Also note the right way to opt a field OUT of escaping is
-   * ``{$fieldName|smarty:nodefaults}``
+   * ``{$fieldName nofilter}``
    * This should be used for fields with known html AND for fields where
    * we are doing empty or isset checks - as otherwise the value is passed for
    * escaping first so you still get an enotice for 'empty' or a fatal for 'isset'
@@ -510,7 +523,8 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
       }
     }
 
-    $value = smarty_modifier_escape($string, $esc_type, $char_set);
+    $string = mb_convert_encoding($string, 'UTF-8', $char_set);
+    $value = htmlentities($string, ENT_QUOTES, 'UTF-8');
     if ($value !== $string) {
       Civi::log('smarty')->debug('smarty escaping original {original}, escaped {escaped} type {type} charset {charset}', [
         'original' => $string,
@@ -520,6 +534,30 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
       ]);
     }
     return $value;
+  }
+
+  public function getVersion (): int {
+    static $version;
+    if ($version === NULL) {
+      if (class_exists('Smarty\Smarty')) {
+        $version = 5;
+      }
+      else {
+        $class = new ReflectionClass('Smarty');
+        $path = $class->getFileName();
+        if (str_contains($path, 'smarty3')) {
+          $version = 3;
+        }
+        elseif (str_contains($path, 'smarty4')) {
+          $version = 4;
+        }
+        else {
+          $version = 2;
+        }
+      }
+    }
+    return $version;
+
   }
 
 }

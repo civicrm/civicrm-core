@@ -107,11 +107,11 @@ trait ArrayQueryActionTrait {
   /**
    * @param array $row
    * @param array $condition
-   * @param int $index
+   * @param int|null $index
    * @return bool
    * @throws \Civi\API\Exception\NotImplementedException
    */
-  public static function filterCompare(array $row, array $condition, int $index = NULL): bool {
+  public static function filterCompare(array $row, array $condition, ?int $index = NULL): bool {
     $value = $row[$condition[0]] ?? NULL;
     $operator = $condition[1];
     $expected = $condition[2] ?? NULL;
@@ -119,6 +119,10 @@ trait ArrayQueryActionTrait {
     if (isset($index) && is_array($value) && $operator !== 'IN' && $operator !== 'NOT IN') {
       $value = $value[$index] ?? NULL;
     }
+    return self::compareValues($value, $operator, $expected);
+  }
+
+  public static function compareValues($value, string $operator, $expected): bool {
     switch ($operator) {
       case '=':
       case '!=':

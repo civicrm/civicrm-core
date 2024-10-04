@@ -478,7 +478,7 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
             ->addSelect('label', 'filter')
             ->addWhere('option_group_id', '=', $optionGroupId)
             ->execute()
-            ->indexBy('label')->column('filter');
+            ->column('filter', 'label');
         }
         if ($surveyId &&
           !empty($recontactInterval) &&

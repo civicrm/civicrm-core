@@ -26,17 +26,15 @@ return [
       'required' => TRUE,
       'description' => ts('ID of original financial_type so you can search this table by the financial_type.id and then select the relevant version based on the timestamp'),
       'add' => '1.3',
-      'input_attrs' => [
-        'maxlength' => 10,
-      ],
       'primary_key' => TRUE,
       'auto_increment' => TRUE,
     ],
     'name' => [
-      'title' => ts('Financial Type'),
+      'title' => ts('Financial Type Name'),
       'sql_type' => 'varchar(64)',
       'input_type' => 'Text',
       'required' => TRUE,
+      'default_fallback' => ['label'],
       'description' => ts('Financial Type Name.'),
       'add' => '1.3',
       'unique_name' => 'financial_type',
@@ -47,7 +45,19 @@ return [
       ],
       'input_attrs' => [
         'label' => ts('Name'),
-        'maxlength' => 64,
+      ],
+    ],
+    'label' => [
+      'title' => ts('Financial Type Label'),
+      'sql_type' => 'varchar(64)',
+      'input_type' => 'Text',
+      'description' => ts('User-facing financial type label'),
+      'required' => TRUE,
+      'default_fallback' => ['name'],
+      'localizable' => TRUE,
+      'add' => '5.79',
+      'input_attrs' => [
+        'label' => ts('Financial Type'),
       ],
     ],
     'description' => [
@@ -60,7 +70,6 @@ return [
         'rows' => 6,
         'cols' => 50,
         'label' => ts('Description'),
-        'maxlength' => 255,
       ],
     ],
     'is_deductible' => [
@@ -73,7 +82,6 @@ return [
       'default' => FALSE,
       'input_attrs' => [
         'label' => ts('Tax-Deductible?'),
-        'maxlength' => 4,
       ],
     ],
     'is_reserved' => [
@@ -86,7 +94,6 @@ return [
       'default' => FALSE,
       'input_attrs' => [
         'label' => ts('Reserved?'),
-        'maxlength' => 4,
       ],
     ],
     'is_active' => [
@@ -99,7 +106,6 @@ return [
       'default' => TRUE,
       'input_attrs' => [
         'label' => ts('Enabled'),
-        'maxlength' => 4,
       ],
     ],
   ],

@@ -53,9 +53,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('name of the entity table for the above id, e.g. civicrm_activity, civicrm_participant'),
       'add' => '3.4',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'action_schedule_id' => [
       'title' => ts('Schedule ID'),

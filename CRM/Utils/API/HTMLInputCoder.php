@@ -62,6 +62,8 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
         'html_message',
         'body_html',
         'msg_html',
+        // MessageTemplate subject might contain the < character in a smarty tag
+        'msg_subject',
         'description',
         'intro',
         'thankyou_text',

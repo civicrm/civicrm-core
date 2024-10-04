@@ -14,14 +14,25 @@
             evaluate(item['#children']);
             _.each(item, function(prop, key) {
               if (_.isString(prop) && !_.includes(doNotEval, key)) {
-                var str = _.trim(prop);
-                if (str[0] === '{' || str[0] === '[' || str.slice(0, 3) === 'ts(') {
-                  item[key] = $parse(str)({ts: CRM.ts('afform')});
+                if (looksLikeJs(prop)) {
+                  try {
+                    item[key] = $parse(prop)({ts: CRM.ts('afform')});
+                  } catch (e) {
+                  }
                 }
               }
             });
           }
         });
+      }
+
+      function looksLikeJs(str) {
+        str = _.trim(str);
+        let firstChar = str.charAt(0);
+        let lastChar = str.slice(-1);
+        return (firstChar === '{' && lastChar === '}') ||
+          (firstChar === '[' && lastChar === ']') ||
+          str.slice(0, 3) === 'ts(';
       }
 
       function getStyles(node) {
@@ -127,15 +138,6 @@
               CRM.afGuiEditor.entities[entityName].fields = fields;
             }
           });
-          // Optimization - since contact fields are a combination of these three,
-          // the server doesn't send contact fields if sending contact-type fields
-          if ('Individual' in data.fields || 'Household' in data.fields || 'Organization' in data.fields) {
-            CRM.afGuiEditor.entities.Contact.fields = _.assign({},
-              (CRM.afGuiEditor.entities.Individual || {}).fields,
-              (CRM.afGuiEditor.entities.Household || {}).fields,
-              (CRM.afGuiEditor.entities.Organization || {}).fields
-            );
-          }
           _.each(data.search_displays, function(display) {
             CRM.afGuiEditor.searchDisplays[display['saved_search_id.name'] + (display.name ? '.' + display.name : '')] = display;
           });

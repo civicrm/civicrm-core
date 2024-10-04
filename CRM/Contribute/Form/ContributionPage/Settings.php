@@ -304,9 +304,6 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
       $params['id'] = $this->_id;
     }
     else {
-      $session = CRM_Core_Session::singleton();
-      $params['created_id'] = $session->get('userID');
-      $params['created_date'] = date('YmdHis');
       $config = CRM_Core_Config::singleton();
       $params['currency'] = $config->defaultCurrency;
     }
@@ -316,7 +313,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
     $params['is_active'] ??= FALSE;
     $params['is_credit_card_only'] ??= FALSE;
     $params['honor_block_is_active'] ??= FALSE;
-    $params['is_for_organization'] = !empty($params['is_organization']) ? CRM_Utils_Array::value('is_for_organization', $params, FALSE) : 0;
+    $params['is_for_organization'] ??= FALSE;
     $params['goal_amount'] = CRM_Utils_Rule::cleanMoney($params['goal_amount']);
 
     if (!$params['honor_block_is_active']) {
@@ -324,7 +321,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
       $params['honor_block_text'] = NULL;
     }
 
-    $dao = CRM_Contribute_BAO_ContributionPage::create($params);
+    $dao = CRM_Contribute_BAO_ContributionPage::writeRecord($params);
 
     $ufJoinParams = [
       'is_organization' => [
@@ -352,7 +349,6 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
           $ufJoinParam['id'] = $ufJoinDAO->id;
         }
 
-        $ufJoinParam['uf_group_id'] = $params[$index];
         $ufJoinParam['weight'] = 1;
         $ufJoinParam['is_active'] = 1;
         if ($index == 'honor_block_is_active') {

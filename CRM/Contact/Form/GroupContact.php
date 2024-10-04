@@ -113,7 +113,7 @@ class CRM_Contact_Form_GroupContact extends CRM_Core_Form {
       else {
         $msg = ts('Add to a group');
       }
-
+      $this->assign('groupLabel', $msg);
       $this->addField('group_id', ['class' => 'crm-action-menu fa-plus', 'placeholder' => $msg, 'options' => $groupSelect]);
 
       $this->addButtons([

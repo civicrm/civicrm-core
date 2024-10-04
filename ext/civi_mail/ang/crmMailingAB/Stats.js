@@ -1,4 +1,4 @@
-(function (angular, $, _) {
+(function (angular, $, _, d3) {
 
 
   // FIXME: This code is long and hasn't been fully working for me, but I've moved it into a spot
@@ -277,4 +277,4 @@
       } // link()
     };
   });
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$, CRM._, CRM.visual.d3);

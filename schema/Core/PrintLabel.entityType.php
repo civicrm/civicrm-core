@@ -9,6 +9,7 @@ return [
     'title_plural' => ts('Print Labels'),
     'description' => ts('Table to store the labels created by user.'),
     'add' => '4.4',
+    'label_field' => 'title',
   ],
   'getFields' => fn() => [
     'id' => [
@@ -26,9 +27,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('User title for this label layout'),
       'add' => '4.4',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'name' => [
       'title' => ts('Name'),
@@ -36,9 +34,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('variable name/programmatic handle for this field.'),
       'add' => '4.4',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'description' => [
       'title' => ts('Description'),
@@ -56,9 +51,6 @@ return [
       'input_type' => 'Select',
       'description' => ts('This refers to name column of civicrm_option_value row in name_badge option group'),
       'add' => '4.4',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
       'pseudoconstant' => [
         'option_group_name' => 'name_badge',
       ],

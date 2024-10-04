@@ -21,7 +21,7 @@
   {/if}
   {if $membershipMode}
     <div class="help">
-      {ts 1=$displayName}Use this form to Renew Membership Record on behalf of %1.{/ts}
+      {ts 1=$displayName|escape}Use this form to renew membership on behalf of %1.{/ts}
       {if $registerMode == 'LIVE'}
         {ts}<strong>A LIVE transaction will be submitted</strong> using the selected payment processor.{/ts}
       {else}

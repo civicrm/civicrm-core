@@ -39,9 +39,6 @@ return [
       'input_type' => 'Select',
       'description' => ts('physical tablename for entity being joined to file, e.g. civicrm_contact'),
       'add' => '3.2',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
       'pseudoconstant' => [
         'option_group_name' => 'tag_used_for',
       ],
@@ -74,7 +71,9 @@ return [
         'key_column' => 'id',
         'name_column' => 'name',
         'label_column' => 'label',
-        'condition' => 'is_tagset != 1',
+        'description_column' => 'description',
+        'color_column' => 'color',
+        'condition_provider' => ['CRM_Core_BAO_EntityTag', 'alterTagOptions'],
       ],
       'entity_reference' => [
         'entity' => 'Tag',

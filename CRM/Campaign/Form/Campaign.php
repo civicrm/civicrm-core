@@ -288,6 +288,22 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
       $errors[$validateDates['key']] = $validateDates['message'];
     }
 
+    // Validate that external_identifier is unique
+    if (isset($fields['external_identifier'])) {
+      $campaign = \Civi\Api4\Campaign::get(FALSE)
+        ->addWhere('external_identifier', '=', $fields['external_identifier']);
+
+      // when updating do not include the current campaign
+      if ($fields['id'] != '' && is_numeric($fields['id'])) {
+        $campaign->addWhere('id', '<>', $fields['id']);
+      }
+
+      $result = $campaign->execute()->first();
+      if (isset($result)) {
+        $errors['external_identifier'] = ts('External ID already exists.');
+      }
+    }
+
     return empty($errors) ? TRUE : $errors;
   }
 
@@ -318,8 +334,6 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     }
     // format params
     $params['is_active'] ??= FALSE;
-    $params['last_modified_id'] = $session->get('userID');
-    $params['last_modified_date'] = date('YmdHis');
     $result = self::submit($params, $this);
     if (!$result['is_error']) {
       CRM_Core_Session::setStatus(ts('Campaign %1 has been saved.', [1 => $result['values'][$result['id']]['title']]), ts('Saved'), 'success');

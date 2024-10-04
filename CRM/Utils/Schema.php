@@ -139,29 +139,53 @@ class CRM_Utils_Schema {
     return 'CRM_Utils_Type::HUGE';
   }
 
-  public static function getCrmTypeFromSqlType(string $sqlType) {
+  public static function getCrmTypeFromSqlType(string $sqlType): int {
     [$type] = explode('(', $sqlType);
     switch ($type) {
       case 'varchar':
       case 'char':
-        return 'CRM_Utils_Type::T_STRING';
+        return CRM_Utils_Type::T_STRING;
 
       case 'datetime':
-        return 'CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME';
+        return CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME;
 
       case 'decimal':
-        return 'CRM_Utils_Type::T_MONEY';
+        return CRM_Utils_Type::T_MONEY;
 
       case 'double':
-        return 'CRM_Utils_Type::T_FLOAT';
+        return CRM_Utils_Type::T_FLOAT;
 
       case 'int unsigned':
       case 'tinyint':
-        return 'CRM_Utils_Type::T_INT';
+        return CRM_Utils_Type::T_INT;
 
       default:
-        return 'CRM_Utils_Type::T_' . strtoupper($type);
+        return constant('CRM_Utils_Type::T_' . strtoupper($type));
     }
+  }
+
+  /**
+   * Get the data type from a field array. Defaults to 'data_type' with fallback to
+   * mapping based on the 'sql_type'.
+   *
+   * @param array|null $field
+   *   Field array as returned from EntityMetadataInterface::getField()
+   *
+   * @return string|null
+   */
+  public static function getDataType(?array $field): ?string {
+    if (isset($field['data_type'])) {
+      return $field['data_type'];
+    }
+    if (empty($field['sql_type'])) {
+      return NULL;
+    }
+
+    // If no data_type provided, look it up from the sql_type
+    $dataTypeInt = self::getCrmTypeFromSqlType($field['sql_type']);
+    $dataTypeName = CRM_Utils_Type::typeToString($dataTypeInt) ?: NULL;
+
+    return $dataTypeName === 'Int' ? 'Integer' : $dataTypeName;
   }
 
   /**

@@ -42,6 +42,11 @@ return new class() implements SchemaHelperInterface {
     return file_exists($this->getExtensionDir() . '/schema');
   }
 
+  public function arrayToSql(array $entityDefn): string {
+    $generator = $this->getSqlGenerator();
+    return $generator->generateCreateTableWithConstraintSql($entityDefn);
+  }
+
   // FIXME: You can add more utility methods here
 
   // public function addTables(array $names): void {

@@ -39,6 +39,7 @@ class CRM_Core_Permission_List {
         'description' => $corePerm['description'] ?? NULL,
         'is_active' => empty($corePerm['disabled']),
         'implies' => $corePerm['implies'] ?? NULL,
+        'parent' => $corePerm['parent'] ?? NULL,
       ];
     }
   }

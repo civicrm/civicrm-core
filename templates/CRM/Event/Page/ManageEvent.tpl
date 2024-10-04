@@ -27,7 +27,6 @@
 <div id="event_status_id" class="crm-block crm-manage-events">
   {strip}
   {include file="CRM/common/pager.tpl" location="top"}
-  {include file="CRM/common/pagerAToZ.tpl"}
   {* handle enable/disable actions*}
   {include file="CRM/common/enableDisableApi.tpl"}
   {include file="CRM/common/jsortable.tpl"}
@@ -119,10 +118,10 @@
               </span>
             </div>
             <div class="crm-event-links">
-              {$row.eventlinks|smarty:nodefaults|replace:'xx':$row.id}
+              {$row.eventlinks|replace:'xx':$row.id nofilter}
             </div>
             <div class="crm-event-more">
-              {$row.action|smarty:nodefaults|replace:'xx':$row.id}
+              {$row.action|replace:'xx':$row.id nofilter}
             </div>
           </td>
           <td class="crm-event-start_date hiddenElement">{$row.start_date|crmDate}</td>
@@ -131,6 +130,7 @@
         {/if}
       {/foreach}
     </table>
+  {include file="CRM/common/pagerAToZ.tpl"}
   {include file="CRM/common/pager.tpl" location="bottom"}
   {/strip}
 </div>

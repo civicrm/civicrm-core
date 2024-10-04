@@ -305,45 +305,45 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
    */
   public function testEnableMembershipTypeOnContributionPage(): void {
     $memType = [];
-    $memType[1] = $this->membershipTypeCreate(['member_of_contact_id' => $this->_contactID, 'minimum_fee' => 100]);
-    $priceSet = $this->callAPISuccess('price_set', 'create', [
-      'title' => 'test priceset',
-      'name' => 'test_priceset',
+    $memType[1] = $this->membershipTypeCreate(['member_of_contact_id' => $this->organizationCreate(), 'minimum_fee' => 100]);
+    $priceSet = $this->createTestEntity('PriceSet', [
+      'title' => 'test price_set',
+      'name' => 'test_price_set',
       'extends' => 'CiviMember',
       'is_quick_config' => 1,
-      'financial_type_id' => 'Member Dues',
+      'financial_type_id:name' => 'Member Dues',
     ]);
     $priceSet = $priceSet['id'];
-    $field = $this->callAPISuccess('price_field', 'create', [
+    $field = $this->createTestEntity('PriceField', [
       'price_set_id' => $priceSet,
       'name' => 'membership_amount',
       'label' => 'Membership Amount',
       'html_type' => 'Radio',
     ]);
-    $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', [
+    $priceFieldValue = $this->createTestEntity('PriceFieldValue', [
       'name' => 'membership_amount',
       'label' => 'Membership Amount',
       'amount' => 100,
-      'financial_type_id' => 'Donation',
+      'financial_type_id:name' => 'Donation',
       'format.only_id' => TRUE,
       'membership_type_id' => $memType[1],
       'price_field_id' => $field['id'],
     ]);
 
-    $memType[2] = $this->membershipTypeCreate(['member_of_contact_id' => $this->_contactID, 'minimum_fee' => 200]);
+    $memType[2] = $this->membershipTypeCreate(['member_of_contact_id' => $this->ids['Contact']['organization_0'], 'minimum_fee' => 200]);
     $fieldParams = [
       'id' => $field['id'],
       'label' => 'Membership Amount',
       'html_type' => 'Radio',
     ];
     foreach ($memType as $rowCount => $type) {
-      $membetype = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($type);
-      $fieldParams['option_id'] = [1 => $priceFieldValue];
-      $fieldParams['option_label'][$rowCount] = $membetype['name'] ?? NULL;
-      $fieldParams['option_amount'][$rowCount] = $membetype['minimum_fee'] ?? 0;
-      $fieldParams['option_weight'][$rowCount] = $membetype['weight'] ?? NULL;
-      $fieldParams['option_description'][$rowCount] = $membetype['description'] ?? NULL;
-      $fieldParams['option_financial_type_id'][$rowCount] = $membetype['financial_type_id'] ?? NULL;
+      $membershipType = CRM_Member_BAO_MembershipType::getMembershipType($type);
+      $fieldParams['option_id'] = [1 => $priceFieldValue['id']];
+      $fieldParams['option_label'][$rowCount] = $membershipType['name'] ?? NULL;
+      $fieldParams['option_amount'][$rowCount] = $membershipType['minimum_fee'] ?? 0;
+      $fieldParams['option_weight'][$rowCount] = $membershipType['weight'] ?? NULL;
+      $fieldParams['option_description'][$rowCount] = $membershipType['description'] ?? NULL;
+      $fieldParams['option_financial_type_id'][$rowCount] = $membershipType['financial_type_id'] ?? NULL;
       $fieldParams['membership_type_id'][$rowCount] = $type;
     }
     $priceField = CRM_Price_BAO_PriceField::create($fieldParams);
@@ -373,10 +373,6 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
         $this->assertEquals($value['financial_type_id'], $updateParams['financial_type_id']);
         $this->assertEquals($value['visibility_id'], CRM_Price_BAO_PriceField::getVisibilityOptionID(strtolower($updateParams['visibility'])));
       }
-    }
-
-    foreach ($memType as $type) {
-      $this->callAPISuccess('membership_type', 'delete', ['id' => $type]);
     }
 
   }

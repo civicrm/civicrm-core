@@ -77,7 +77,7 @@ class CRM_Custom_Form_Preview extends CRM_Core_Form {
     // Group preview
     else {
       $this->_groupId = CRM_Utils_Request::retrieve('gid', 'Positive', $this, TRUE);
-      $groupTree = CRM_Core_BAO_CustomGroup::getGroupDetail($this->_groupId);
+      $groupTree = CRM_Core_BAO_CustomGroup::getCustomGroupDetail($this->_groupId);
       $this->_groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, TRUE, $this);
       $this->assign('preview_type', 'group');
     }

@@ -24,12 +24,11 @@
     </div>
     <div class="spacer"></div>
     <div style="padding-left: 48px;"><img src="{$config->resourceBase}i/logo_sm.png" /></div>
-    <div id="navigation-tree" class="navigation-tree" style="height:auto; border-collapse:separate; background-color:#FFFFFF;"></div>
+    <div id="navigation-tree" class="navigation-tree"></div>
     <div class="spacer"></div>
     <div>
       <a href="#" class="nav-reset crm-hover-button">
-        {* TODO: fa-broom would be better, but not implemented yet. https://github.com/FortAwesome/Font-Awesome/issues/239 *}
-        <i class="crm-i fa-undo" aria-hidden="true"></i> {ts}Cleanup reports menu{/ts}
+        <i class="crm-i fa-broom" aria-hidden="true"></i> {ts}Cleanup reports menu{/ts}
       </a>
     </div>
     <div class="spacer"></div>

@@ -16,13 +16,20 @@ use Civi\Api4\SavedSearch;
  */
 class AfformAutocompleteUsageTest extends AfformUsageTestCase {
 
+  public function tearDown(): void {
+    CustomGroup::delete(FALSE)
+      ->addWhere('id', '>', 0)
+      ->execute();
+    parent::tearDown();
+  }
+
   /**
    * Ensure that Afform restricts autocomplete results when it's set to use a SavedSearch
    */
   public function testAutocompleteWithSavedSearchFilter(): void {
     $layout = <<<EOHTML
 <af-form ctrl="afform">
-  <af-entity data="{contact_type: 'Individual'}" type="Contact" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" />
+  <af-entity type="Individual" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" />
   <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
     <div class="af-container">
       <af-field name="id" defn="{saved_search: 'the_unit_test_search', input_attrs: {}}" />
@@ -65,7 +72,7 @@ EOHTML;
     $contacts = Contact::save(FALSE)
       ->setRecords($sampleContacts)
       ->addDefault('last_name', $lastName)
-      ->execute()->indexBy('first_name')->column('id');
+      ->execute()->column('id', 'first_name');
 
     $result = Contact::autocomplete()
       ->setFormName('afform:' . $this->formName)
@@ -129,7 +136,7 @@ EOHTML;
 
     $contacts = Contact::save(FALSE)
       ->setRecords($sampleData)
-      ->execute()->indexBy('first_name')->column('id');
+      ->execute()->column('id', 'first_name');
 
     // Place contacts A & B in the group, but not contact C
     $group = Group::create(FALSE)
@@ -145,14 +152,14 @@ EOHTML;
       ->addChain('fields', CustomField::save()
         ->addDefault('custom_group_id', '$id')
         ->setRecords([
-          ['label' => 'contact_ref', 'data_type' => 'ContactReference', 'html_type' => 'Autocomplete', 'filter' => 'action=get&group=' . $group['id']],
+          ['label' => 'contact_ref', 'data_type' => 'ContactReference', 'html_type' => 'Autocomplete-Select', 'filter' => 'action=get&group=' . $group['id']],
         ])
       )
       ->execute();
 
     $layout = <<<EOHTML
 <af-form ctrl="afform">
-  <af-entity data="{contact_type: 'Individual'}" type="Contact" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" />
+  <af-entity type="Individual" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" />
   <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
     <div class="af-container">
       <af-field name="first_name" />
@@ -228,7 +235,7 @@ EOHTML;
 
     $contacts = Contact::save(FALSE)
       ->setRecords($sampleData)
-      ->execute()->indexBy('first_name')->column('id');
+      ->execute()->column('id', 'first_name');
 
     CustomGroup::create(FALSE)
       ->addValue('title', 'test_address_fields')
@@ -236,14 +243,14 @@ EOHTML;
       ->addChain('fields', CustomField::save()
         ->addDefault('custom_group_id', '$id')
         ->setRecords([
-          ['label' => 'contact_ref', 'data_type' => 'ContactReference', 'html_type' => 'Autocomplete', 'filter' => 'action=get&source=in'],
+          ['label' => 'contact_ref', 'data_type' => 'ContactReference', 'html_type' => 'Autocomplete-Select', 'filter' => 'action=get&source=in'],
         ])
       )
       ->execute();
 
     $layout = <<<EOHTML
 <af-form ctrl="afform">
-  <af-entity data="{contact_type: 'Individual'}" type="Contact" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" />
+  <af-entity type="Individual" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" />
   <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
     <div class="af-container">
       <af-field name="first_name" />

@@ -106,9 +106,9 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     $sel1 = $this->_mapperFields;
     $sel2[''] = NULL;
 
-    $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
-    $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
-    $websiteTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id');
+    $phoneTypes = CRM_Core_DAO_Phone::buildOptions('phone_type_id');
+    $imProviders = CRM_Core_DAO_IM::buildOptions('provider_id');
+    $websiteTypes = CRM_Core_DAO_Website::buildOptions('website_type_id');
 
     foreach ($this->getLocationTypes() as $key => $value) {
       $sel3['phone'][$key] = &$phoneTypes;
@@ -432,7 +432,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @return array
    */
   protected function getLocationTypes(): array {
-    return ['Primary' => ts('Primary')] + CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+    return ['Primary' => ts('Primary')] + CRM_Core_DAO_Address::buildOptions('location_type_id');
   }
 
   /**

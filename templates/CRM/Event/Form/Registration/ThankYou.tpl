@@ -81,7 +81,7 @@
                 {$event.fee_label}
             </div>
             {if $lineItem}
-                {include file="CRM/Price/Page/LineItem.tpl" context="Event"}
+                {include file="CRM/Price/Page/LineItem.tpl" context="Event" displayLineItemFinancialType=false getTaxDetails=$totalTaxAmount hookDiscount=''}
             {elseif $amount || $amount == 0}
               <div class="crm-section no-label amount-item-section">
                     {foreach from=$finalAmount item=amount key=level}
@@ -133,20 +133,6 @@
                     {foreach from=$participantInfo  item=mail key=no}
                         <strong>{$mail}</strong><br />
                     {/foreach}
-                </div>
-            <div class="clear"></div>
-          </div>
-        </div>
-    {/if}
-
-    {if $event.participant_role neq 'Attendee' and $defaultRole}
-        <div class="crm-group participant_role-group">
-            <div class="header-dark">
-                {ts}Participant Role{/ts}
-            </div>
-            <div class="crm-section no-label participant_role-section">
-                <div class="content">
-                    {$event.participant_role}
                 </div>
             <div class="clear"></div>
           </div>

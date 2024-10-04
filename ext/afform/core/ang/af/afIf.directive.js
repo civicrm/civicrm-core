@@ -38,6 +38,8 @@
               previousElements = null;
             }
             if (childScope) {
+              // Alert afFields that they are about to be destroyed
+              childScope.$broadcast('afIfDestroy');
               childScope.$destroy();
               childScope = null;
             }

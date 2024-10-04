@@ -149,7 +149,8 @@ class PseudoconstantTest extends CustomTestBase {
   public function testCustomOptions(): void {
     $technicolor = [
       ['id' => 'r', 'name' => 'red', 'label' => 'RED', 'color' => '#ff0000', 'description' => 'Red color', 'icon' => 'fa-red'],
-      ['id' => 'g', 'name' => 'green', 'label' => 'GREEN', 'color' => '#00ff00', 'description' => 'Green color', 'icon' => 'fa-green'],
+      // String '2' gets checked below via `assertSame` to ensure it doesn't get cast to int
+      ['id' => '2', 'name' => 'green', 'label' => 'GREEN', 'color' => '#00ff00', 'description' => 'Green color', 'icon' => 'fa-green'],
       ['id' => 'b', 'name' => 'blue', 'label' => 'BLUE', 'color' => '#0000ff', 'description' => 'Blue color', 'icon' => 'fa-blue'],
     ];
 
@@ -168,14 +169,25 @@ class PseudoconstantTest extends CustomTestBase {
         ->addValue('html_type', 'CheckBox')
       )->execute();
 
-    $fields = Contact::getFields()
+    // Ensure option_value_fields were correctly set based on provided values
+    $customFields = CustomField::get(FALSE)
+      ->addWhere('custom_group_id:name', '=', 'myPseudoconstantTest')
+      ->addSelect('name', 'option_group_id.option_value_fields')
+      ->execute()->indexBy('name');
+    sort($customFields['Color']['option_group_id.option_value_fields']);
+    $this->assertEquals(['label', 'name'], $customFields['Color']['option_group_id.option_value_fields']);
+    sort($customFields['Multicolor']['option_group_id.option_value_fields']);
+    $this->assertEquals(['color', 'description', 'icon', 'label', 'name'], $customFields['Multicolor']['option_group_id.option_value_fields']);
+
+    $fields = Contact::getFields(FALSE)
+      ->addWhere('name', 'IN', ['myPseudoconstantTest.Color', 'myPseudoconstantTest.Multicolor'])
       ->setLoadOptions(array_keys($technicolor[0]))
       ->execute()
       ->indexBy('name');
 
     foreach ($technicolor as $index => $option) {
       foreach ($option as $prop => $val) {
-        $this->assertEquals($val, $fields['myPseudoconstantTest.Multicolor']['options'][$index][$prop]);
+        $this->assertSame($val, $fields['myPseudoconstantTest.Multicolor']['options'][$index][$prop]);
       }
     }
 

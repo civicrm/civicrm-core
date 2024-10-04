@@ -2065,12 +2065,12 @@ class CRM_Utils_Date {
       $extra['date'] = $field['date_format'];
       $extra['time'] = $field['time_format'];
     }
-    $thisYear = date('Y');
+    $todayMD = date('-m-d');
     if (isset($field['start_date_years'])) {
-      $extra['minDate'] = date('Y-m-d', strtotime((-1 * ($thisYear - $field['start_date_years'])) . ' years'));
+      $extra['minDate'] = $field['start_date_years'] . $todayMD;
     }
     if (isset($field['end_date_years'])) {
-      $extra['maxDate'] = date('Y-m-d', strtotime((-1 * ($thisYear - $field['end_date_years'])) . ' years'));
+      $extra['maxDate'] = $field['end_date_years'] . $todayMD;
     }
     return $extra;
   }
@@ -2494,6 +2494,23 @@ class CRM_Utils_Date {
   protected static function getMonthRegex(): string {
     $months = array_merge(self::getFullMonthNames(), self::getAbbrMonthNames());
     return '(' . implode('|', $months) . ')';
+  }
+
+  /**
+   * Sql expression to calculate the upcoming anniversary of a given date.
+   *
+   * The IF() accounts for the possibility that the date has already passed, & so skips to next year.
+   * The INTERVAL() functions correctly handle leap years.
+   *
+   * @param string $dateColumn
+   * @return string
+   */
+  public static function getAnniversarySql(string $dateColumn): string {
+    return "IF(
+      DATE_ADD($dateColumn, INTERVAL(YEAR(CURDATE()) - YEAR($dateColumn)) YEAR) < CURDATE(),
+      DATE_ADD($dateColumn, INTERVAL(1 + YEAR(CURDATE()) - YEAR($dateColumn)) YEAR),
+      DATE_ADD($dateColumn, INTERVAL(YEAR(CURDATE()) - YEAR($dateColumn)) YEAR)
+    )";
   }
 
 }

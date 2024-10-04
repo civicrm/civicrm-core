@@ -186,6 +186,9 @@ trait EventTestTrait {
    */
   public function eventCreate(array $params = [], string $identifier = 'event'): array {
     try {
+      if ($params['is_template'] ?? NULL && empty($params['template_title'])) {
+        $params['template_title'] = 'template event';
+      }
       $event = Event::create(FALSE)->setValues($params)->execute()->first();
       $this->setTestEntity('Event', $event, $identifier);
       $this->addProfilesToEvent($identifier);
@@ -290,7 +293,7 @@ trait EventTestTrait {
         'module' => $additionalSuffix ? 'CiviEvent_Additional' : 'CiviEvent',
         'entity_table' => 'civicrm_event',
         'uf_group_id:name' => $profileName,
-        'entity_table' => 'civicrm_event',
+        'weight' => $profile['weight'],
         'entity_id' => $this->getEventID($identifier),
       ])->execute()->first(), $profileIdentifier);
     }

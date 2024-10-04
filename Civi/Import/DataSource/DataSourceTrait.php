@@ -42,7 +42,7 @@ trait DataSourceTrait {
    *
    * @param int|null $userJobID
    */
-  public function __construct(int $userJobID = NULL) {
+  public function __construct(?int $userJobID = NULL) {
     if ($userJobID) {
       $this->setUserJobID($userJobID);
     }

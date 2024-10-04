@@ -608,7 +608,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $dao = new CRM_Core_DAO_Cache();
     $fields = $dao->fields();
     $this->assertSame(CRM_Utils_Type::T_TIMESTAMP, $fields['expired_date']['type'], 'Oh somebody changed the type, so this test might not be testing the right type of timestamp anymore. Might need to change the test to have it use a different field.');
-    $this->assertFalse($fields['expired_date']['required'], 'Oh somebody changed the REQUIRED setting, so this test might not be testing the right type of timestamp anymore. Might need to change the test to have it use a different field.');
+    $this->assertFalse(!empty($fields['expired_date']['required']), 'Oh somebody changed the REQUIRED setting, so this test might not be testing the right type of timestamp anymore. Might need to change the test to have it use a different field.');
 
     $dao->group_name = 'mytest';
     $dao->path = 'mypath';

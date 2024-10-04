@@ -9,6 +9,8 @@
   angular.module('crmSearchAdmin', CRM.angRequires('crmSearchAdmin'))
 
     .config(function($routeProvider) {
+      const ts = CRM.ts('org.civicrm.search_kit');
+
       $routeProvider.when('/list', {
         controller: 'searchList',
         reloadOnSearch: false,
@@ -36,6 +38,30 @@
               chain: {
                 groups: ['Group', 'get', {select: ['id', 'title', 'description', 'visibility', 'group_type', 'custom.*'], where: [['saved_search_id', '=', '$id']]}],
                 displays: ['SearchDisplay', 'get', {where: [['saved_search_id', '=', '$id']]}]
+              }
+            }, 0);
+          }
+        }
+      });
+      $routeProvider.when('/clone/:id', {
+        controller: 'searchClone',
+        template: '<crm-search-admin saved-search="$ctrl.savedSearch"></crm-search-admin>',
+        resolve: {
+          // Load saved search
+          savedSearch: function($route, crmApi4) {
+            var params = $route.current.params;
+            return crmApi4('SavedSearch', 'get', {
+              select: ['label', 'description', 'api_entity', 'api_params', 'expires_date', 'GROUP_CONCAT(DISTINCT entity_tag.tag_id) AS tag_id'],
+              where: [['id', '=', params.id]],
+              join: [
+                ['EntityTag AS entity_tag', 'LEFT', ['entity_tag.entity_table', '=', '"civicrm_saved_search"'], ['id', '=', 'entity_tag.entity_id']],
+              ],
+              groupBy: ['id'],
+              chain: {
+                displays: ['SearchDisplay', 'get', {
+                  select: ['label', 'type', 'settings'],
+                  where: [['saved_search_id', '=', '$id']],
+                }]
               }
             }, 0);
           }
@@ -96,6 +122,19 @@
     // Controller for editing a SavedSearch
     .controller('searchEdit', function($scope, savedSearch) {
       searchEntity = savedSearch.api_entity;
+      this.savedSearch = savedSearch;
+      $scope.$ctrl = this;
+    })
+
+    // Controller for cloning a SavedSearch
+    .controller('searchClone', function($scope, savedSearch) {
+      searchEntity = savedSearch.api_entity;
+      savedSearch.label += ' (' + ts('copy') + ')';
+      delete savedSearch.id;
+      savedSearch.displays.forEach(display => {
+        delete display.id;
+        display.label += ' (' + ts('copy') + ')';
+      });
       this.savedSearch = savedSearch;
       $scope.$ctrl = this;
     })
@@ -363,10 +402,25 @@
           return searchTasks[entityName];
         },
         // Supply default aggregate function appropriate to the data_type
-        getDefaultAggregateFn: function(info) {
-          var arg = info.args[0] || {};
+        getDefaultAggregateFn: function(info, apiParams) {
+          let arg = info.args[0] || {};
           if (arg.suffix) {
             return null;
+          }
+          let groupByFn;
+          if (apiParams.groupBy) {
+            apiParams.groupBy.forEach(function(groupBy) {
+              let expr = parseExpr(groupBy);
+              if (expr && expr.fn && expr.args) {
+                let paths = expr.args.map(ex => ex.path);
+                if (paths.includes(arg.path)) {
+                  groupByFn = expr.fn.name;
+                }
+              }
+            });
+          }
+          if (groupByFn) {
+            return groupByFn;
           }
           switch (info.data_type) {
             case 'Integer':
@@ -388,7 +442,7 @@
               entity = getEntity(joinInfo.entity),
               prefix = joinInfo.alias ? joinInfo.alias + '.' : '';
             _.each(entity.fields, function(field) {
-              if ((entity.name === 'Contact' && field.name === 'id') || (field.fk_entity === 'Contact' && joinInfo.baseEntity !== 'Contact')) {
+              if (['Contact', 'Individual', 'Household', 'Organization'].includes(entity.name) && field.name === 'id' || field.fk_entity === 'Contact') {
                 columns.push({
                   id: prefix + field.name,
                   text: (joinInfo.label ? joinInfo.label + ': ' : '') + field.label,
@@ -481,7 +535,7 @@
 
   // Shoehorn in a non-angular widget for picking icons
   $(function() {
-    $('#crm-container').append('<div style="display:none"><input id="crm-search-admin-icon-picker"></div>');
+    $('#crm-container').append('<div style="display:none"><input id="crm-search-admin-icon-picker" title="' + ts('Icon Picker') + '"></div>');
     CRM.loadScript(CRM.config.resourceBase + 'js/jquery/jquery.crmIconPicker.js').then(function() {
       $('#crm-search-admin-icon-picker').crmIconPicker();
     });

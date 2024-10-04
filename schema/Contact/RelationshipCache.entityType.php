@@ -101,11 +101,8 @@ return [
       'readonly' => TRUE,
       'description' => ts('The cache record is a permutation of the original relationship record. The orientation indicates whether it is forward (a_b) or reverse (b_a) relationship.'),
       'add' => '5.29',
-      'input_attrs' => [
-        'maxlength' => 3,
-      ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::relationshipOrientation',
+        'callback' => ['CRM_Core_SelectValues', 'relationshipOrientation'],
       ],
     ],
     'near_contact_id' => [
@@ -134,10 +131,9 @@ return [
       'add' => '5.29',
       'input_attrs' => [
         'label' => ts('Relationship to contact'),
-        'maxlength' => 64,
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_PseudoConstant::relationshipTypeOptions',
+        'callback' => ['CRM_Core_PseudoConstant', 'relationshipTypeOptions'],
       ],
     ],
     'far_contact_id' => [
@@ -166,10 +162,9 @@ return [
       'add' => '5.29',
       'input_attrs' => [
         'label' => ts('Relationship from contact'),
-        'maxlength' => 64,
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_PseudoConstant::relationshipTypeOptions',
+        'callback' => ['CRM_Core_PseudoConstant', 'relationshipTypeOptions'],
       ],
     ],
     'is_active' => [

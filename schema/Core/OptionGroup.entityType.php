@@ -7,9 +7,10 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Option Group'),
     'title_plural' => ts('Option Groups'),
-    'description' => ts('FIXME'),
+    'description' => ts('Table of option groups'),
     'log' => TRUE,
     'add' => '1.5',
+    'label_field' => 'title',
   ],
   'getPaths' => fn() => [
     'add' => 'civicrm/admin/options?action=add&reset=1',
@@ -42,9 +43,6 @@ return [
       'required' => TRUE,
       'description' => ts('Option group name. Used as selection key by class properties which lookup options in civicrm_option_value.'),
       'add' => '1.5',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'title' => [
       'title' => ts('Option Group Title'),
@@ -53,9 +51,6 @@ return [
       'localizable' => TRUE,
       'description' => ts('Option Group title.'),
       'add' => '1.5',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'description' => [
       'title' => ts('Option Group Description'),
@@ -71,11 +66,8 @@ return [
       'input_type' => 'Select',
       'description' => ts('Type of data stored by this option group.'),
       'add' => '4.7',
-      'input_attrs' => [
-        'maxlength' => 128,
-      ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Utils_Type::dataTypes',
+        'callback' => ['CRM_Utils_Type', 'dataTypes'],
       ],
     ],
     'is_reserved' => [
@@ -122,11 +114,8 @@ return [
       'add' => '5.49',
       'default' => 'name,label,description',
       'serialize' => CRM_Core_DAO::SERIALIZE_COMMA,
-      'input_attrs' => [
-        'maxlength' => 128,
-      ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::optionValueFields',
+        'callback' => ['CRM_Core_SelectValues', 'optionValueFields'],
       ],
     ],
   ],

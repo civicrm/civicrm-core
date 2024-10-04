@@ -97,41 +97,49 @@ abstract class CRM_Mailing_MailingSystemTestBase extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * Send an email-blast. Check the `List-Unsubscribe` hyperlinks -- and click on them.
+   * People should become un-subscribed.
+   */
   public function testHttpUnsubscribe(): void {
     $client = new Civi\Test\LocalHttpClient(['reboot' => TRUE, 'htmlHeader' => FALSE]);
 
+    // Send an example mail-blast. We'll read the `List-Unsubscribe` links from each message.
     $allMessages = $this->runMailingSuccess([
       'subject' => 'Yellow Unsubmarine',
       'body_text' => 'In the {domain.address} where I was born, lived a man who sailed to sea',
     ]);
 
-    $getMembers = fn($status) => Civi\Api4\GroupContact::get(FALSE)
+    // Utility: Find how many people are in the test group -- by $status (Added/Removed)
+    $getMembers = fn(string $status) => Civi\Api4\GroupContact::get(FALSE)
       ->addWhere('group_id', '=', $this->_groupID)
       ->addWhere('status', '=', $status)
       ->execute();
 
+    // Start condition: We have a few people "Added"
     $this->assertEquals(2, $getMembers('Added')->count());
     $this->assertEquals(0, $getMembers('Removed')->count());
 
     foreach ($allMessages as $k => $message) {
+      // Extract the unsubscribe URL(s)
       $this->assertNotEmpty($message->headers['List-Unsubscribe'][0]);
       $this->assertEquals('List-Unsubscribe=One-Click', $message->headers['List-Unsubscribe-Post'][0]);
 
       $urls = array_map(
         fn($s) => trim($s, '<>'),
         preg_split('/[,\s]+/', $message->headers['List-Unsubscribe'][0])
-
       );
       $url = CRM_Utils_Array::first(preg_grep('/^http/', $urls));
       $this->assertMatchesRegularExpression(';civicrm/mailing/unsubscribe;', $url);
 
-      // Older clients (RFC 2369 only): Open a browser for the unsubscribe page
-      // FIXME: This works locally, but in CI complains about ckeditor4. Smells like compatibility issue between LocalHttpClient and $unclear.
+      // Older clients (RFC 2369 only) will open a browser for the unsubscribe page.
+      // Let's make sure it shows a suitable web-page.
       $get = $client->sendRequest(new Request('GET', $url));
       $this->assertEquals(200, $get->getStatusCode());
       $this->assertMatchesRegularExpression(';You are requesting to unsubscribe;', (string) $get->getBody());
 
-      // Newer clients (RFC 8058): Send headless HTTP POST
+      // Newer clients (RFC 8058) will send headless HTTP POST.
+      // This is how we will actually unsubscribe.
       $post = $client->sendRequest(new Request('POST', $url, [], $message->headers['List-Unsubscribe-Post'][0]));
       $this->assertEquals(200, $post->getStatusCode());
       $this->assertEquals('OK', trim((string) $post->getBody()));
@@ -143,7 +151,7 @@ abstract class CRM_Mailing_MailingSystemTestBase extends CiviUnitTestCase {
   }
 
   /**
-   * @throws \CRM_Core_Exception
+   * Similar to testHttpUnsubscribe(), except we have system with a different VERP configuration.
    */
   public function testHttpUnsubscribeChangedVerpSeparator(): void {
     MailSettings::update(FALSE)->setValues(['localpart' => "aeiou.aeiou-"])->addWhere('id', '>', 0)->execute();
@@ -451,6 +459,40 @@ abstract class CRM_Mailing_MailingSystemTestBase extends CiviUnitTestCase {
     $this->assertCount(2, $allMessages);
 
     return $allMessages;
+  }
+
+  public function hook_alterMailingReceipientsIgnoreOptOut(&$mailingObject, &$criteria, $context): void {
+    if ($context === 'mailingQuery') {
+      $criteria['contact_join'] = CRM_Utils_SQL_Select::fragment()->join('c', 'INNER JOIN civicrm_contact c ON (c.id = r.contact_id
+        AND c.is_deleted = 0
+        AND c.is_deceased = 0
+        AND c.do_not_email = 0
+      )');
+    }
+    if ($context === 'pre') {
+      unset($criteria['is_opt_out']);
+    }
+  }
+
+  public function testModifyMailingReceipientsIgnoreOptOut(): void {
+    $optOutContact = $this->individualCreate(['is_opt_out' => 1, 'email' => 'testoptout@example.com'], 'opt_out_individual');
+    $this->callAPISuccess('GroupContact', 'create', [
+      'contact_id' => $optOutContact,
+      'group_id' => $this->_groupID,
+      'status' => 'Added',
+    ]);
+    $hooks = \CRM_Utils_Hook::singleton();
+    $hooks->setHook('civicrm_alterMailingRecipients', [$this, 'hook_alterMailingReceipientsIgnoreOptOut']);
+    $mailingParams = array_merge($this->defaultParams, [
+      'subject' => 'Accidents in cars cause children for {contact.display_name}!',
+      'body_text' => 'BEWARE children need regular infusions of toys. Santa knows your {domain.address}. There is no {action.optOutUrl}.',
+    ]);
+    $this->callAPISuccess('Mailing', 'create', $mailingParams);
+    $this->_mut->assertRecipients([]);
+    $this->callAPISuccess('job', 'process_mailing', ['runInNonProductionEnvironment' => TRUE]);
+    $queueItems = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_mailing_event_queue")->fetchAll();
+    $this->assertCount(3, $queueItems);
+    $hooks->reset();
   }
 
 }

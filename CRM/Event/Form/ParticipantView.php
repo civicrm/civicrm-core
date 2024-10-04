@@ -106,8 +106,6 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
     $lineItem = CRM_Price_BAO_LineItem::getLineItems($participantID);
     $this->assign('lineItem', [$lineItem]);
 
-    $this->assign('totalAmount', $this->getParticipantValue('fee_amount'));
-
     // Assign registered_by contact ID and display_name if participant was registered by someone else (CRM-4859)
     $this->assign('registered_by_display_name', $this->getParticipantValue('registered_by_id.contact_id.display_name'));
     $this->assign('registered_by_contact_id', $this->getParticipantValue('registered_by_id.contact_id'));
@@ -160,22 +158,29 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
     }
     if (CRM_Core_Permission::check('delete in CiviEvent')) {
       $recentOther['deleteUrl'] = CRM_Utils_System::url('civicrm/participant/delete',
-        "reset=1&id={$values[$participantID]['id']}}"
+        "reset=1&id={$values[$participantID]['id']}"
       );
     }
 
     $displayName = CRM_Contact_BAO_Contact::displayName($values[$participantID]['contact_id']);
 
     $participantCount = [];
-    $totalTaxAmount = 0;
+    $totalTaxAmount = $totalAmount = 0;
     foreach ($lineItem as $k => $v) {
       if (CRM_Utils_Array::value('participant_count', $lineItem[$k]) > 0) {
         $participantCount[] = $lineItem[$k]['participant_count'];
       }
       $totalTaxAmount = $v['tax_amount'] + $totalTaxAmount;
+      $totalAmount += $v['line_total'];
     }
     $this->assign('currency', $this->getParticipantValue('fee_currency'));
+    // It would be more  correct to assign totalTaxAmount & TotalAmount
+    // from the order object - however, that assumes a contribution exists & there is this
+    // we have this weird possibility of line items against a participant record with
+    // no contribution attached to it - maybe we have eliminated this? But I have a nasty feeling about
+    // webform.
     $this->assign('totalTaxAmount', $totalTaxAmount ?? NULL);
+    $this->assign('totalAmount', $totalAmount);
     $this->assign('pricesetFieldsCount', $participantCount);
     $this->assign('displayName', $displayName);
     // omitting contactImage from title for now since the summary overlay css doesn't work outside of our crm-container

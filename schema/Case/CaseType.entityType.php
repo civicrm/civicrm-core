@@ -10,6 +10,7 @@ return [
     'description' => ts('Case type definition'),
     'log' => TRUE,
     'add' => '4.5',
+    'label_field' => 'title',
   ],
   'getIndices' => fn() => [
     'case_type_name' => [
@@ -38,9 +39,6 @@ return [
       'required' => TRUE,
       'description' => ts('Machine name for Case Type'),
       'add' => '4.5',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'title' => [
       'title' => ts('Case Type Title'),
@@ -50,9 +48,6 @@ return [
       'localizable' => TRUE,
       'description' => ts('Natural language name for Case Type'),
       'add' => '4.5',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'description' => [
       'title' => ts('Case Type Description'),
@@ -61,9 +56,6 @@ return [
       'localizable' => TRUE,
       'description' => ts('Description of the Case Type'),
       'add' => '4.5',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'is_active' => [
       'title' => ts('Case Type Is Active'),

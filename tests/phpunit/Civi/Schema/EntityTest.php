@@ -7,6 +7,7 @@ class EntityTest extends \CiviUnitTestCase {
   public function testGetMeta(): void {
     $entity = \Civi::entity('Activity');
 
+    $this->assertEquals('Activity', $entity->getMeta('name'));
     $this->assertEquals('civicrm_activity', $entity->getMeta('table'));
     $this->assertEquals('CRM_Activity_DAO_Activity', $entity->getMeta('class'));
     $this->assertEquals('Activity', $entity->getMeta('title'));
@@ -14,7 +15,10 @@ class EntityTest extends \CiviUnitTestCase {
     $this->assertEquals('Past or future actions concerning one or more contacts.', $entity->getMeta('description'));
     $this->assertEquals('fa-tasks', $entity->getMeta('icon'));
     $this->assertEquals('subject', $entity->getMeta('label_field'));
-    $this->assertEquals(['id'], $entity->getMeta('primary_keys'));
+    $this->assertSame(['id'], $entity->getMeta('primary_keys'));
+    $this->assertSame('id', $entity->getMeta('primary_key'));
+    $this->assertSame('1.1', $entity->getMeta('add'));
+    $this->assertTrue($entity->getMeta('log'));
     $this->assertNotEmpty($entity->getMeta('paths'));
     foreach ($entity->getMeta('paths') as $path) {
       $this->assertStringStartsWith('civicrm/', $path);
@@ -28,10 +32,11 @@ class EntityTest extends \CiviUnitTestCase {
     $this->assertTrue($fields['id']['primary_key']);
     $this->assertTrue($fields['id']['auto_increment']);
     $this->assertTrue($fields['id']['required']);
-    $this->assertFalse($fields['created_date']['required']);
+    $this->assertTrue(empty($fields['created_date']['required']));
     $this->assertEquals('Relationship', $fields['relationship_id']['entity_reference']['entity']);
     $this->assertEquals('engagement_index', $fields['engagement_level']['pseudoconstant']['option_group_name']);
-    $this->assertEquals([], $fields['weight']['usage']);
+    $this->assertTrue(empty($fields['weight']['usage']));
+    $this->assertEquals('datetime', $fields['activity_date_time']['sql_type']);
     $this->assertEquals('timestamp', $fields['modified_date']['sql_type']);
     $this->assertEquals('CiviCampaign', $fields['campaign_id']['component']);
     $this->assertEquals('EntityRef', $fields['campaign_id']['input_type']);
@@ -39,7 +44,7 @@ class EntityTest extends \CiviUnitTestCase {
     $this->assertEquals('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP', $fields['modified_date']['default']);
     $this->assertTrue($fields['modified_date']['readonly']);
     $this->assertFalse($fields['is_deleted']['default']);
-    $this->assertFalse($fields['is_deleted']['localizable']);
+    $this->assertTrue(empty($fields['is_deleted']['localizable']));
   }
 
 }

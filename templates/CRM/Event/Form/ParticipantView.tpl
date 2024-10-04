@@ -11,16 +11,16 @@
 <div class="crm-block crm-content-block crm-event-participant-view-form-block">
     <div class="action-link">
         <div class="crm-submit-buttons">
-            {if call_user_func(array('CRM_Core_Permission','check'), 'edit event participants')}
+         {crmPermission has='edit event participants'}
          {assign var='editUrlParams' value="reset=1&id=$participantId&cid=$contactId&action=update&context=$context&selectedChild=event"}
          {if ( $context eq 'fulltext' || $context eq 'search' ) && $searchKey}
          {assign var='editUrlParams' value="reset=1&id=$participantId&cid=$contactId&action=update&context=$context&selectedChild=event&key=$searchKey"}
          {/if}
              <a class="button" href="{crmURL p='civicrm/contact/view/participant' q=$editUrlParams}" accesskey="e"><span><i class="crm-i fa-pencil" aria-hidden="true"></i> {ts}Edit{/ts}</span></a>
-          {/if}
-          {if call_user_func(array('CRM_Core_Permission','check'), 'delete in CiviEvent')}
+          {/crmPermission}
+          {crmPermission has='delete in CiviEvent'}
             <a class="button" href="{crmURL p='civicrm/participant/delete' q="reset=1&id=$participantId"}"><span><i class="crm-i fa-trash" aria-hidden="true"></i> {ts}Delete{/ts}</span></a>
-          {/if}
+          {/crmPermission}
 
         </div>
     </div>
@@ -31,6 +31,7 @@
         <strong><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$contactId"}" title="{ts}View contact record{/ts}">{$displayName|escape}</a></strong>
         <div>
             <a class="action-item crm-hover-button" href="{crmURL p='civicrm/event/badge' q="reset=1&context=view&id=$participantId&cid=$contactId"}"><i class="crm-i fa-print" aria-hidden="true"></i> {ts}Print Name Badge{/ts}</a>
+            <a class="action-item crm-hover-button" href="{crmURL p='civicrm/event/participant/print' q="reset=1&context=view&id=$participantId&cid=$contactId"}"><i class="crm-i fa-print" aria-hidden="true"></i> {ts}PDF letter - print for participant{/ts}</a>
         </div>
       </td>
   </tr>
@@ -93,7 +94,7 @@
             {if $lineItem}
                 <td class="label">{ts}Selections{/ts}</td>
                 <td>{include file="CRM/Price/Page/LineItem.tpl" context="Event" displayLineItemFinancialType=false getTaxDetails=$totalTaxAmount hookDiscount=false}
-                {if call_user_func(array('CRM_Core_Permission','check'), 'edit event participants')}
+                {crmPermission has='edit event participants'}
                     {if $hasPayment or $parentHasPayment}
                       <a class="action-item crm-hover-button" href='{crmURL p="civicrm/event/participant/feeselection" q="reset=1&id=`$participantId`&cid=`$contactId`&action=update"}'><i class="crm-i fa-pencil" aria-hidden="true"></i> {ts}Change Selections{/ts}</a>
                     {else}
@@ -102,7 +103,7 @@
                     {if $transferOrCancelLink}
                       <a class="action-item crm-hover-button" href={$transferOrCancelLink}><i class="crm-i fa-times" aria-hidden="true"></i> {ts}Transfer or Cancel{/ts}</a>
                     {/if}
-                {/if}
+                {/crmPermission}
                 </td>
             {else}
                 <td class="label">{ts}Event Level{/ts}</td>
@@ -124,12 +125,12 @@
         {include file="CRM/Contribute/Form/Selector.tpl" context="Search" single=true}
     {/if}
     <div class="crm-submit-buttons">
-      {if call_user_func(array('CRM_Core_Permission','check'), 'edit event participants')}
+      {crmPermission has='edit event participants'}
         <a class="button" href="{crmURL p='civicrm/contact/view/participant' q=$editUrlParams}" accesskey="e"><span><i class="crm-i fa-pencil" aria-hidden="true"></i> {ts}Edit{/ts}</span></a>
-      {/if}
-      {if call_user_func(array('CRM_Core_Permission','check'), 'delete in CiviEvent')}
+      {/crmPermission}
+      {crmPermission has='delete in CiviEvent'}
         <a class="button" href="{crmURL p='civicrm/participant/delete' q="reset=1&id=$participantId"}"><span><i class="crm-i fa-trash" aria-hidden="true"></i> {ts}Delete{/ts}</span></a>
-      {/if}
+      {/crmPermission}
       {include file="CRM/common/formButtons.tpl" location="bottom"}
     </div>
 </div>

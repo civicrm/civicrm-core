@@ -94,7 +94,9 @@
       this.savedSearch.tag_id = this.savedSearch.tag_id || [];
       this.groupExists = !!this.savedSearch.groups.length;
 
-      if (!this.savedSearch.id) {
+      const path = $location.path();
+      // In create mode, set defaults and bind params to route for easy copy/paste
+      if (path.includes('create/')) {
         var defaults = {
           version: 4,
           select: searchMeta.getEntity(ctrl.savedSearch.api_entity).default_columns,
@@ -115,7 +117,7 @@
         });
 
         // Set default label
-        ctrl.savedSearch.label = ts('%1 Search by %2', {
+        ctrl.savedSearch.label = ctrl.savedSearch.label || ts('%1 Search by %2', {
           1: searchMeta.getEntity(ctrl.savedSearch.api_entity).title,
           2: CRM.crmSearchAdmin.myName
         });
@@ -372,7 +374,9 @@
             // Try to avoid adding duplicate columns
             const simpleName = _.last(fieldName.split('.'));
             if (!ctrl.savedSearch.api_params.select.join(',').includes(simpleName)) {
-              ctrl.savedSearch.api_params.select.push(join.alias + '.' + fieldName);
+              if (searchMeta.getField(fieldName, join.entity)) {
+                ctrl.savedSearch.api_params.select.push(join.alias + '.' + fieldName);
+              }
             }
           });
         }
@@ -424,8 +428,8 @@
         if (ctrl.mustAggregate(col)) {
           // Ensure all non-grouped columns are aggregated if using GROUP BY
           if (!info.fn || info.fn.category !== 'aggregate') {
-            var dflFn = searchMeta.getDefaultAggregateFn(info) || 'GROUP_CONCAT',
-              flagBefore = dflFn === 'GROUP_CONCAT' ? 'DISTINCT ' : '';
+            let dflFn = searchMeta.getDefaultAggregateFn(info, ctrl.savedSearch.api_params) || 'GROUP_CONCAT';
+            let flagBefore = dflFn === 'GROUP_CONCAT' ? 'DISTINCT ' : '';
             ctrl.savedSearch.api_params.select[pos] = dflFn + '(' + flagBefore + fieldExpr + ') AS ' + dflFn + '_' + fieldExpr.replace(/[.:]/g, '_');
           }
         } else {

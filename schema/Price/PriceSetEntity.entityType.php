@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Price Set Entity'),
     'title_plural' => ts('Price Set Entities'),
-    'description' => ts('FIXME'),
+    'description' => ts('Price Set Entities'),
     'log' => TRUE,
     'add' => '1.8',
   ],
@@ -39,9 +39,6 @@ return [
       'required' => TRUE,
       'description' => ts('Table which uses this price set'),
       'add' => '1.8',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'entity_id' => [
       'title' => ts('Entity ID'),

@@ -143,7 +143,7 @@ class CRM_Core_Region implements CRM_Core_Resources_CollectionInterface, CRM_Cor
           break;
 
         case 'settings':
-          $settingsData = json_encode($this->getSettings(), JSON_UNESCAPED_SLASHES);
+          $settingsData = json_encode($this->getSettings());
           $js = "(function(vars) {
             if (window.CRM) CRM.$.extend(true, CRM, vars); else window.CRM = vars;
             })($settingsData)";

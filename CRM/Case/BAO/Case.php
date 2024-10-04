@@ -36,7 +36,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements \Civi\Core\HookInte
    */
   public static function enabled() {
     CRM_Core_Error::deprecatedFunctionWarning('isComponentEnabled');
-    return self::isComponentEnabled();
+    return CRM_Core_Component::isEnabled('CiviCase');
   }
 
   /**
@@ -65,7 +65,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements \Civi\Core\HookInte
    */
   public static function on_hook_civicrm_post(\Civi\Core\Event\PostEvent $e): void {
     // FIXME: The EventScanner ought to skip over disabled components when registering HookInterface
-    if (!self::isComponentEnabled()) {
+    if (!CRM_Core_Component::isEnabled('CiviCase')) {
       return;
     }
     if ($e->entity === 'Activity' && in_array($e->action, ['create', 'edit'])) {
@@ -2468,7 +2468,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
     }
 
     //do check for civicase component enabled.
-    if ($checkComponent && !self::isComponentEnabled()) {
+    if ($checkComponent && !CRM_Core_Component::isEnabled('CiviCase')) {
       return $allow;
     }
 
@@ -2705,7 +2705,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    * or 'access all cases and activities'
    */
   public static function accessCiviCase() {
-    if (!self::isComponentEnabled()) {
+    if (!CRM_Core_Component::isEnabled('CiviCase')) {
       return FALSE;
     }
 
@@ -2724,7 +2724,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    * @return bool
    */
   public static function accessCase($caseId, $denyClosed = TRUE) {
-    if (!$caseId || !self::isComponentEnabled()) {
+    if (!$caseId || !CRM_Core_Component::isEnabled('CiviCase')) {
       return FALSE;
     }
 
@@ -2970,58 +2970,49 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
   }
 
   /**
-   * Get options for a given case field.
-   *
-   * @param string $fieldName
-   * @param string $context
-   * @param array $props
-   *   Whatever is known about this dao object.
-   *
-   * @return array|bool
-   * @throws \CRM_Core_Exception
-   *
-   * @see CRM_Core_DAO::buildOptionsContext
-   * @see CRM_Core_DAO::buildOptions
-   *
+   * Legacy option getter
+   * @deprecated
+   * @inheritDoc
    */
   public static function buildOptions($fieldName, $context = NULL, $props = []) {
-    $className = __CLASS__;
-    $params = [];
     switch ($fieldName) {
-      // This field is not part of this object but the api supports it
+      // This field is not part of this object but legacy forms use it
       case 'medium_id':
-        $className = 'CRM_Activity_BAO_Activity';
-        break;
-
-      // Filter status id by case type id
-      case 'status_id':
-        if (!empty($props['case_type_id'])) {
-          // cast single values to a single value array
-          $caseTypeIdValues = (array) $props['case_type_id'];
-
-          $idField = is_numeric($caseTypeIdValues[0]) ? 'id' : 'name';
-          $caseTypeDefs = (array) \Civi\Api4\CaseType::get(FALSE)
-            ->addSelect('definition')
-            ->addWhere($idField, 'IN', $caseTypeIdValues)
-            ->execute()->column('definition');
-
-          $allowAll = FALSE;
-          $statuses = [];
-          foreach ($caseTypeDefs as $definition) {
-            if (empty($definition['statuses'])) {
-              // if any case type has no status restrictions, we want to allow all options
-              $allowAll = TRUE;
-              break;
-            }
-            $statuses = array_unique(array_merge($statuses, $definition['statuses']));
-          }
-          if (!$allowAll) {
-            $params['condition'] = 'v.name IN ("' . implode('","', $statuses) . '")';
-          }
-        }
-        break;
+        return CRM_Activity_BAO_Activity::buildOptions($fieldName, $context, $props);
     }
-    return CRM_Core_PseudoConstant::get($className, $fieldName, $params, $context);
+    return parent::buildOptions($fieldName, $context, $props);
+  }
+
+  /**
+   * Pseudoconstant condition_provider for status_id field.
+   * @see \Civi\Schema\EntityMetadataBase::getConditionFromProvider
+   */
+  public static function alterStatusOptions(string $fieldName, CRM_Utils_SQL_Select $conditions, $params) {
+    // Filter status id by case type id
+    if (!empty($params['values']['case_type_id'])) {
+      // cast single values to a single value array
+      $caseTypeIdValues = (array) $params['values']['case_type_id'];
+
+      $idField = is_numeric($caseTypeIdValues[0]) ? 'id' : 'name';
+      $caseTypeDefs = (array) \Civi\Api4\CaseType::get(FALSE)
+        ->addSelect('definition')
+        ->addWhere($idField, 'IN', $caseTypeIdValues)
+        ->execute()->column('definition');
+
+      $allowAll = FALSE;
+      $statuses = [];
+      foreach ($caseTypeDefs as $definition) {
+        if (empty($definition['statuses'])) {
+          // if any case type has no status restrictions, we want to allow all options
+          $allowAll = TRUE;
+          break;
+        }
+        $statuses = array_unique(array_merge($statuses, $definition['statuses']));
+      }
+      if (!$allowAll) {
+        $conditions->where('name IN (@statuses)', ['statuses' => $statuses]);
+      }
+    }
   }
 
   /**
@@ -3030,7 +3021,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    * @param array $conditions
    * @inheritDoc
    */
-  public function addSelectWhereClause(string $entityName = NULL, int $userId = NULL, array $conditions = []): array {
+  public function addSelectWhereClause(?string $entityName = NULL, ?int $userId = NULL, array $conditions = []): array {
     $administerCases = CRM_Core_Permission::check('administer CiviCase', $userId);
     $viewMyCases = CRM_Core_Permission::check('access my cases and activities', $userId);
     $viewAllCases = CRM_Core_Permission::check('access all cases and activities', $userId);
@@ -3063,7 +3054,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
     return $clauses;
   }
 
-  private static function getAccessMyCasesClause(int $userId = NULL): string {
+  private static function getAccessMyCasesClause(?int $userId = NULL): string {
     $user = $userId ?? (int) CRM_Core_Session::getLoggedInContactID();
     return "IN (
       SELECT r.case_id FROM civicrm_relationship r, civicrm_case_contact cc WHERE r.is_active = 1 AND cc.case_id = r.case_id AND (

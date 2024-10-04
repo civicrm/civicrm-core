@@ -152,29 +152,33 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
     }
 
     $this->_submitValues = array_merge($this->_submitValues, $defaults);
-
     $this->setDefaults($defaults);
 
     $params['entity_id'] = $this->_eventId;
     $params['entity_table'] = 'civicrm_event';
+
     $data = [];
-    CRM_Friend_BAO_Friend::retrieve($params, $data);
-    if (!empty($data['is_active'])) {
-      $friendText = $data['title'];
-      $this->assign('friendText', $friendText);
-      if ($this->_action & CRM_Core_Action::PREVIEW) {
-        $url = CRM_Utils_System::url('civicrm/friend',
-          "eid={$this->_eventId}&reset=1&action=preview&pcomponent=event"
-        );
+    $friendURL = NULL;
+
+    if (function_exists('tellafriend_civicrm_config')) {
+      CRM_Friend_BAO_Friend::retrieve($params, $data);
+      if (!empty($data['is_active'])) {
+        $friendText = $data['title'];
+        $this->assign('friendText', $friendText);
+        if ($this->_action & CRM_Core_Action::PREVIEW) {
+          $friendURL = CRM_Utils_System::url('civicrm/friend',
+            "eid={$this->_eventId}&reset=1&action=preview&pcomponent=event"
+          );
+        }
+        else {
+          $friendURL = CRM_Utils_System::url('civicrm/friend',
+            "eid={$this->_eventId}&reset=1&pcomponent=event"
+          );
+        }
       }
-      else {
-        $url = CRM_Utils_System::url('civicrm/friend',
-          "eid={$this->_eventId}&reset=1&pcomponent=event"
-        );
-      }
-      $this->assign('friendURL', $url);
     }
 
+    $this->assign('friendURL', $friendURL);
     $this->assign('iCal', CRM_Event_BAO_Event::getICalLinks($this->_eventId));
     $this->assign('isShowICalIconsInline', TRUE);
 

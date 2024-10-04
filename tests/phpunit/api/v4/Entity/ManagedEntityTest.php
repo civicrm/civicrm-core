@@ -789,6 +789,57 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
   }
 
   /**
+   * Tests removing a managed record when the underlying entity that has been deleted
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testRemoveDeleted(): void {
+
+    // introduce a managed record
+    $managed = [
+      'module' => 'civicrm',
+      'name' => 'record_on_its_way_out',
+      'entity' => 'Group',
+      'cleanup' => 'unused',
+      'update' => 'always',
+      'params' => [
+        'version' => 4,
+        'values' => [
+          'name' => 'group_on_its_way_out',
+          'title' => 'Not long for this world',
+        ],
+      ],
+    ];
+    $this->_managedEntities = [$managed];
+
+    // first reconcile will create the new Group
+    CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
+
+    // managed record should be created
+    $managedRecords = Managed::get(FALSE)
+      ->addWhere('name', '=', 'record_on_its_way_out')
+      ->execute();
+
+    $this->assertEquals(1, count($managedRecords));
+
+    // delete the group
+    Group::delete(FALSE)
+      ->addWhere('name', '=', 'group_on_its_way_out')
+      ->execute();
+
+    // stop managing it
+    $this->_managedEntities = [];
+    CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
+
+    // the stale managed record should be cleaned up
+    $managedRecords = Managed::get(FALSE)
+      ->addWhere('name', '=', 'record_on_its_way_out')
+      ->execute();
+
+    $this->assertEquals(0, count($managedRecords));
+  }
+
+  /**
    * @dataProvider sampleEntityTypes
    *
    * @param string $entityName

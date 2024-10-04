@@ -43,19 +43,11 @@ class AfformAdminMeta {
   }
 
   /**
-   * Get info about an api entity, with special handling for contact types
+   * Get info about an api entity
    * @param string $entityName
    * @return array|null
    */
   public static function getApiEntity(string $entityName) {
-    $contactTypes = \CRM_Contact_BAO_ContactType::basicTypeInfo();
-    if (isset($contactTypes[$entityName])) {
-      return [
-        'entity' => 'Contact',
-        'contact_type' => $entityName,
-        'label' => $contactTypes[$entityName]['label'],
-      ];
-    }
     $info = \Civi\Api4\Entity::get(FALSE)
       ->addWhere('name', '=', $entityName)
       ->execute()->first();
@@ -99,10 +91,6 @@ class AfformAdminMeta {
       'select' => ['name', 'label', 'input_type', 'input_attrs', 'required', 'options', 'help_pre', 'help_post', 'serialize', 'data_type', 'entity', 'fk_entity', 'readonly', 'operators'],
       'where' => [['deprecated', '=', FALSE], ['input_type', 'IS NOT NULL']],
     ];
-    if (in_array($entityName, \CRM_Contact_BAO_ContactType::basicTypes(TRUE), TRUE)) {
-      $params['values']['contact_type'] = $entityName;
-      $entityName = 'Contact';
-    }
     if ($entityName === 'Address') {
       // The stateProvince option list is waaay too long unless country limits are set
       if (!\Civi::settings()->get('provinceLimit')) {
@@ -110,6 +98,13 @@ class AfformAdminMeta {
         $params['values']['country_id'] = \Civi::settings()->get('defaultContactCountry') ?: 1228;
       }
       $params['values']['state_province_id'] = \Civi::settings()->get('defaultContactStateProvince');
+    }
+    // Exclude LocBlock fields that will be replaced by joins (see below)
+    if ($params['action'] === 'create' && $entityName === 'LocBlock') {
+      $joinParams = $params;
+      // Omit the fk fields (email_id, email_2_id, phone_id, etc)
+      // As we'll add their joined fields below
+      $params['where'][] = ['fk_entity', 'IS NULL'];
     }
     $fields = (array) civicrm_api4($entityName, 'getFields', $params);
     // Add implicit joins to search fields
@@ -129,11 +124,35 @@ class AfformAdminMeta {
         }
       }
     }
+    // Add LocBlock joins (e.g. `email_id.email`, `address_id.street_address`)
+    if ($params['action'] === 'create' && $entityName === 'LocBlock') {
+      // Exclude fields that don't apply to locBlocks
+      $joinParams['where'][] = ['name', 'NOT IN', ['id', 'is_primary', 'is_billing', 'location_type_id', 'contact_id']];
+      foreach (['Address', 'Email', 'Phone', 'IM'] as $joinEntity) {
+        $joinEntityFields = (array) civicrm_api4($joinEntity, 'getFields', $joinParams);
+        $joinEntityLabel = CoreUtil::getInfoItem($joinEntity, 'title');
+        // LocBlock entity includes every join twice (e.g. `email_2_id.email`, `address_2_id.street_address`)
+        foreach ([1 => '', 2 => '_2'] as $number => $suffix) {
+          $joinField = strtolower($joinEntity) . $suffix . '_id';
+          foreach ($joinEntityFields as $joinEntityField) {
+            if (strtolower($joinEntity) === $joinEntityField['name']) {
+              $joinEntityField['label'] .= " $number";
+            }
+            else {
+              $joinEntityField['label'] = "$joinEntityLabel $number {$joinEntityField['label']}";
+            }
+            $joinEntityField['name'] = "$joinField." . $joinEntityField['name'];
+            $fields[] = $joinEntityField;
+          }
+        }
+      }
+    }
     // Index by name
     $fields = array_column($fields, NULL, 'name');
     $idField = CoreUtil::getIdFieldName($entityName);
     // Convert ID field to existing entity field
-    if (isset($fields[$idField])) {
+    // Unless it already references another entity (e.g. GroupSubscription)
+    if (isset($fields[$idField]) && empty($fields[$idField]['fk_entity'])) {
       $fields[$idField]['readonly'] = FALSE;
       $fields[$idField]['input_type'] = 'EntityRef';
       // Afform-only (so far) metadata tells the form to update an existing entity autofilled from this value

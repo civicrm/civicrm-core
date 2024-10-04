@@ -3,9 +3,7 @@
 
   angular.module('crmSearchAdmin').component('crmSearchAdminExport', {
     bindings: {
-      savedSearchId: '<',
-      savedSearchName: '<',
-      displayNames: '<'
+      savedSearch: '<'
     },
     templateUrl: '~/crmSearchAdmin/crmSearchAdminExport.html',
     controller: function ($scope, $element, crmApi4) {
@@ -20,15 +18,19 @@
       ];
 
       this.$onInit = function() {
-        this.apiExplorerLink = CRM.url('civicrm/api4#/explorer/SavedSearch/export?_format=php&cleanup=always&id=' + ctrl.savedSearchId);
+        this.apiExplorerLink = CRM.url('civicrm/api4#/explorer/SavedSearch/export?_format=php&cleanup=always&id=' + ctrl.savedSearch.id);
+        this.simpleLink = CRM.url('civicrm/admin/search#/create/' + ctrl.savedSearch.api_entity + '?params=' + encodeURI(angular.toJson(ctrl.savedSearch.api_params)));
 
-        var findDisplays = _.transform(ctrl.displayNames, function(findDisplays, displayName) {
-          findDisplays.push(['search_displays', 'CONTAINS', ctrl.savedSearchName + '.' + displayName]);
-        }, [['search_displays', 'CONTAINS', ctrl.savedSearchName]]);
-        var apiCalls = [
-          ['SavedSearch', 'export', {id: ctrl.savedSearchId}],
+        let apiCalls = [
+          ['SavedSearch', 'export', {id: ctrl.savedSearch.id}],
         ];
         if (ctrl.afformEnabled) {
+          let findDisplays = [['search_displays', 'CONTAINS', ctrl.savedSearch.name]];
+          if (ctrl.savedSearch.display_name) {
+            ctrl.savedSearch.display_name.forEach(displayName => {
+              findDisplays.push(['search_displays', 'CONTAINS', `${ctrl.savedSearch.name}.${displayName}`]);
+            });
+          }
           apiCalls.push(['Afform', 'get', {layoutFormat: 'html', where: [['type', '=', 'search'], ['OR', findDisplays]]}]);
         }
         crmApi4(apiCalls)

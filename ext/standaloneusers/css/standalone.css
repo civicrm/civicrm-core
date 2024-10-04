@@ -19,7 +19,7 @@ html.crm-standalone  nav.breadcrumb>ol {
   background-color: white;
   border: none;
   border-radius: 3px;
-  padding: 1rem 3vw;;
+  padding: clamp(1rem, 3vw, 2rem);
 }
 .standalone-auth-form img.crm-logo {
   width: 100%;
@@ -32,10 +32,13 @@ html.crm-standalone  nav.breadcrumb>ol {
 }
 .standalone-auth-form label {
   display: block;
+  margin-bottom: 0.25rem;
 }
 .standalone-auth-form input {
   box-sizing: border-box;
   width: 100%;
+  height: 2rem;
+  padding: 0.5rem;
 }
 .standalone-auth-form .login-or-forgot {
   display: grid;

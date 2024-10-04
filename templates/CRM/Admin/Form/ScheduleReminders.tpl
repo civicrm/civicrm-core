@@ -170,8 +170,8 @@
         (function($, _) {
           $(function($) {
             const $form = $('form.{/literal}{$form.formClass}{literal}'),
-              controlFields = {/literal}{$controlFields|@json_encode}{literal},
-              recurringFrequencyOptions = {/literal}{$recurringFrequencyOptions|@json_encode}{literal};
+              controlFields = {/literal}{$controlFields|@json_encode nofilter}{literal},
+              recurringFrequencyOptions = {/literal}{$recurringFrequencyOptions|@json_encode nofilter}{literal};
 
             // Reload metadata when a controlField is changed
             $form.on('change', 'input', function() {
@@ -210,7 +210,7 @@
                     $field.toggleClass('required', fieldSpec.required);
                     $field.removeClass('loading');
                     // Show field and update option list if applicable
-                    if (fieldSpec.options) {
+                    if (fieldSpec.options && fieldSpec.options.length) {
                       fieldSpec.options.forEach(function(option) {
                         option.text = option.label;
                         delete(option.label);

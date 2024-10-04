@@ -292,7 +292,7 @@ input.crm-form-entityref {
   border-top: 1px solid #696969;
 }
 
-/* Size the verticle heights in crm-containers by class. */
+/* Size the vertical heights in crm-containers by class. */
 .crm-container .ht-one {
   height: 1em;
 }
@@ -2327,6 +2327,11 @@ div.crm-master-accordion-header a.helpicon {
   padding: 0 0.25rem; /* adds padding for nested accordions */
 }
 
+.crm-container details table.dataTable {
+  width: 100% !important; /* stops collapsed dataTables: dev/user-interface/-/issues/73 */
+  box-sizing: border-box;
+}
+
 /* Collapse icon */
 
 /* General icon settings for all collapsible things */
@@ -3295,7 +3300,7 @@ span.crm-select-item-color {
   width: 93%;
 }
 
-/* Checkbox gropus */
+/* Checkbox groups */
 .crm-container ul.crm-checkbox-list {
   list-style: none;
   margin: 0;
@@ -3352,6 +3357,27 @@ span.crm-select-item-color {
 }
 .crm-container ul.crm-checkbox-list.crm-sortable-list li input {
   left: 23px;
+}
+/* Checkbox/radio fields with n-per-line. See https://lab.civicrm.org/dev/core/-/issues/4985 */
+.crm-container .crm-multiple-checkbox-radio-options {
+  --gap: 1em;
+  --checkbox-width: 2em;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap);
+}
+/* Override more general styling */
+.crm-container .crm-multiple-checkbox-radio-options :where(input.crm-form-radio,
+input.crm-form-checkbox) + label {
+  margin-left: 0;
+}
+.crm-container .crm-multiple-checkbox-radio-options .crm-option-label-pair {
+  display: grid;
+  grid-template-columns: var(--checkbox-width) 1fr;
+  align-items: baseline;
+}
+.crm-container .crm-multiple-checkbox-radio-options.crm-options-per-line .crm-option-label-pair {
+  flex: 0 0 calc((100% - (var(--crm-opts-per-line) - 1) * var(--gap)) / var(--crm-opts-per-line));
 }
 
 /* classes related to batch entry operation */
@@ -4008,19 +4034,11 @@ span.crm-status-icon {
   margin-left: 30px;
 }
 
+
 /* Standalone-only styles. A minimal set to make it usable out-of-the-box. */
 html.crm-standalone body {
-  --sa-font-family: sans-serif;
-  --roundness: 3px;
-  --error-colour: #a00;
-  --warning-colour: #fbb862;
-  --success-colour: #86c66c;
-  --label-colour: #464354;
-  --background-colour: rgb(242,242,237);
-  --box-padding: 1.6rem;
-  --box-background: #fff;
   margin: 0;
   padding: 0;
-  font-family: var(--sa-font-family);
-  background-color: var(--background-colour);
+  font-family: var(--crm-font, sans-serif);
+  background-color: var(--crm-c-page-background, #f8f8f8);
 }

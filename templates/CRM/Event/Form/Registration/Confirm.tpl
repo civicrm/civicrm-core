@@ -92,7 +92,9 @@
         </div>
       </fieldset>
     {/if}
-        {include file='CRM/Core/BillingBlockWrapper.tpl'}
+    {if $totalAmount > 0}
+      {include file='CRM/Core/BillingBlockWrapper.tpl'}
+    {/if}
     {literal}<script>function calculateTotalFee() { return {/literal}{$totalAmount}{literal} }</script>{/literal}
     </div>
     {/if}
@@ -117,20 +119,6 @@
           <br />
         </div>
     </div>
-    {/if}
-
-    {if $event.participant_role neq 'Attendee' and $defaultRole}
-        <div class="crm-group participant_role-group">
-            <div class="header-dark">
-                {ts}Participant Role{/ts}
-            </div>
-            <div class="crm-section no-label participant_role-section">
-                <div class="content">
-                    {$event.participant_role}
-                </div>
-              <div class="clear"></div>
-            </div>
-        </div>
     {/if}
 
     {include file="CRM/Event/Form/Registration/DisplayProfile.tpl"}

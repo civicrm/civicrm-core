@@ -14,7 +14,7 @@
           prefetch: function(crmApi4, crmStatus) {
             var q = crmApi4({
               records: ['MessageTemplate', 'get', {
-                select: ["id", "msg_title", "is_default", "is_active", "workflow_name"],
+                select: ["id", "msg_title", "is_default", "is_active", "workflow_name", 'master_id'],
                 where: [["workflow_name", "IS NOT EMPTY"], ["is_reserved", "=", "0"]]
               }],
               translations: ['MessageTemplate', 'get', {

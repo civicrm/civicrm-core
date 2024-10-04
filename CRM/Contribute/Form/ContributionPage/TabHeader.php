@@ -77,9 +77,6 @@ class CRM_Contribute_Form_ContributionPage_TabHeader {
       'thankyou' => [
         'title' => ts('Receipt'),
       ] + $default,
-      'friend' => [
-        'title' => ts('Tell a Friend'),
-      ] + $default,
       'custom' => [
         'title' => ts('Profiles'),
       ] + $default,

@@ -654,4 +654,11 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
     return $this->from;
   }
 
+  /**
+   * @return array
+   */
+  public function getWhere(): array {
+    return $this->wheres;
+  }
+
 }

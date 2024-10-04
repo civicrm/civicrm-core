@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Financial Trxn'),
     'title_plural' => ts('Financial Trxns'),
-    'description' => ts('FIXME'),
+    'description' => ts('Table containing Financial Transactions (including Payments)'),
     'log' => TRUE,
     'add' => '1.3',
   ],
@@ -124,15 +124,13 @@ return [
         'export',
         'duplicate_matching',
       ],
-      'input_attrs' => [
-        'maxlength' => 3,
-      ],
       'pseudoconstant' => [
         'table' => 'civicrm_currency',
         'key_column' => 'name',
         'label_column' => 'full_name',
         'name_column' => 'name',
         'abbr_column' => 'symbol',
+        'description_column' => 'IFNULL(CONCAT(name, " (", symbol, ")"), name)',
       ],
     ],
     'is_payment' => [
@@ -157,7 +155,6 @@ return [
       'add' => '1.3',
       'input_attrs' => [
         'size' => '10',
-        'maxlength' => 255,
       ],
     ],
     'trxn_result_code' => [
@@ -166,9 +163,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('processor result code'),
       'add' => '1.3',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'status_id' => [
       'title' => ts('Financial Transaction Status ID'),
@@ -236,7 +230,6 @@ return [
       'unique_name' => 'financial_trxn_check_number',
       'input_attrs' => [
         'size' => '6',
-        'maxlength' => 255,
       ],
     ],
     'pan_truncation' => [
@@ -248,7 +241,6 @@ return [
       'unique_name' => 'financial_trxn_pan_truncation',
       'input_attrs' => [
         'size' => '4',
-        'maxlength' => 4,
       ],
     ],
     'order_reference' => [
@@ -260,7 +252,6 @@ return [
       'unique_name' => 'financial_trxn_order_reference',
       'input_attrs' => [
         'size' => '25',
-        'maxlength' => 255,
       ],
     ],
   ],

@@ -49,7 +49,7 @@
       <details class="crm-accordion-bold">
         <summary>
           <span class="crm-news-feed-item-title">{$article.title|smarty:nodefaults|purify}</span>
-          <span class="crm-news-feed-item-preview"> - {if function_exists('mb_substr')}{$article.description|smarty:nodefaults|strip_tags|mb_substr:0:150}{else}{$article.description|smarty:nodefaults|strip_tags}{/if}</span>
+          <span class="crm-news-feed-item-preview"> - {$article.description|smarty:nodefaults|strip_tags|mb_substr:0:150}</span>
         </summary>
         <div class="crm-accordion-body">
           <div>{$article.description|smarty:nodefaults|purify}</div>

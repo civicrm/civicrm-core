@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<extension key="chart_kit" type="module">
+  <file>chart_kit</file>
+  <name>Chart Kit</name>
+  <description>This extension provides additional Search Display types for Search Kit for making charts, using the dc/d3 library.</description>
+  <license>AGPL-3.0</license>
+  <maintainer>
+    <author>Benjamin Walpole</author>
+    <email>ben@civicrm.org</email>
+  </maintainer>
+  <urls>
+    <url desc="Documentation">https://docs.civicrm.org/user/en/latest/the-user-interface/search-kit/</url>
+    <url desc="Chat">https://chat.civicrm.org/civicrm/channels/search-improvements</url>
+    <url desc="Issues">https://lab.civicrm.org/dev/report/-/issues</url>
+    <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
+  </urls>
+  <releaseDate>[civicrm.releaseDate]</releaseDate>
+  <version>[civicrm.version]</version>
+  <develStage>beta</develStage>
+  <compatibility>
+    <ver>[civicrm.majorVersion]</ver>
+  </compatibility>
+  <comments>Click on the chat link above to discuss development, report problems or ask questions.</comments>
+  <classloader>
+    <psr0 prefix="CRM_" path="."/>
+    <psr4 prefix="Civi\" path="Civi"/>
+  </classloader>
+  <civix>
+    <namespace>CRM/ChartKit</namespace>
+    <format>23.02.1</format>
+  </civix>
+  <mixins>
+    <mixin>mgd-php@1.0.0</mixin>
+    <mixin>ang-php@1.0.0</mixin>
+    <mixin>scan-classes@1.0.0</mixin>
+  </mixins>
+  <requires>
+    <ext>org.civicrm.search_kit</ext>
+  </requires>
+</extension>

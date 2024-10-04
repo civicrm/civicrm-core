@@ -36,12 +36,14 @@ class CRM_Financial_BAO_Payment {
    *   - contribution_id
    *   - total_amount
    *   - line_item
+   * @param bool $disableActionsOnCompleteOrder Disble membership, participant processing when the payment completes the order
+   *   Note this is only set by Payment.Create in APIv4 and should not be used elsewhere and is likely to change.
    *
    * @return \CRM_Financial_DAO_FinancialTrxn
    *
    * @throws \CRM_Core_Exception
    */
-  public static function create(array $params): CRM_Financial_DAO_FinancialTrxn {
+  public static function create(array $params, $disableActionsOnCompleteOrder = FALSE): CRM_Financial_DAO_FinancialTrxn {
     $contribution = Contribution::get(FALSE)
       ->addWhere('id', '=', $params['contribution_id'])
       ->addSelect('*', 'contribution_status_id:name', 'balance_amount', 'paid_amount')
@@ -55,6 +57,9 @@ class CRM_Financial_BAO_Payment {
     $paymentTrxnParams['is_payment'] = 1;
     // Really we should have a DB default.
     $paymentTrxnParams['fee_amount'] ??= 0;
+    if (!empty($params['custom'])) {
+      $paymentTrxnParams['custom'] = $params['custom'];
+    }
 
     if (isset($paymentTrxnParams['payment_processor_id']) && empty($paymentTrxnParams['payment_processor_id'])) {
       // Don't pass 0 - ie the Pay Later processor as it is  a pseudo-processor.
@@ -141,14 +146,20 @@ class CRM_Financial_BAO_Payment {
         );
       }
       else {
-        civicrm_api3('Contribution', 'completetransaction', [
-          'id' => $contribution['id'],
-          'is_post_payment_create' => TRUE,
+        $contributionBAO = new CRM_Contribute_BAO_Contribution();
+        $contributionBAO->id = $contribution['id'];
+        if (!$contributionBAO->find(TRUE)) {
+          throw new CRM_Core_Exception('A valid contribution ID is required', 'invalid_data');
+        }
+        if ($contributionBAO->contribution_status_id == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed')) {
+          throw new CRM_Core_Exception(ts('Contribution already completed'), 'contribution_completed');
+        }
+        CRM_Contribute_BAO_Contribution::completeOrder([
           'is_email_receipt' => $params['is_send_contribution_notification'],
           'trxn_date' => $params['trxn_date'],
           'payment_instrument_id' => $paymentTrxnParams['payment_instrument_id'],
           'payment_processor_id' => $paymentTrxnParams['payment_processor_id'] ?? '',
-        ]);
+        ], $contributionBAO->contribution_recur_id, $contribution['id'], TRUE, $disableActionsOnCompleteOrder);
         // Get the trxn
         $trxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
         $ftParams = ['id' => $trxnId['financialTrxnId']];

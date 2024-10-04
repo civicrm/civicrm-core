@@ -423,9 +423,6 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     );
     $this->addRule('weight', ts('is a numeric field'), 'numeric');
 
-    // is required ?
-    $this->add('advcheckbox', 'is_required', ts('Required?'));
-
     // checkbox / radio options per line
     $this->add('number', 'options_per_line', ts('Options Per Line'), ['min' => 0]);
     $this->addRule('options_per_line', ts('must be a numeric value'), 'numeric');
@@ -441,20 +438,11 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       $attributes['help_post']
     );
 
-    // is active ?
-    $this->add('advcheckbox', 'is_active', ts('Active?'));
-
-    // is active ?
-    $this->add('advcheckbox', 'is_view', ts('View Only?'));
-
-    // is searchable ?
-    $this->addElement('advcheckbox',
-      'is_searchable',
-      ts('Is this Field Searchable?')
-    );
-
-    // is searchable by range?
-    $this->addRadio('is_search_range', ts('Search by Range?'), [ts('No'), ts('Yes')]);
+    $this->add('advcheckbox', 'is_required', ts('Required'));
+    $this->addElement('advcheckbox', 'is_searchable', ts('Optimize for Search'));
+    $this->addRadio('is_search_range', ts('Search by Range'), [ts('No'), ts('Yes')]);
+    $this->add('advcheckbox', 'is_active', ts('Active'));
+    $this->add('advcheckbox', 'is_view', ts('View Only'));
 
     $buttons = [
       [
@@ -851,9 +839,9 @@ AND    option_group_id = %2";
     $params = $this->controller->exportValues($this->_name);
     self::clearEmptyOptions($params);
 
-    //fix for 'is_search_range' field.
+    // Automatically disable 'is_search_range' if the field does not support it
     if (in_array($params['data_type'], ['Int', 'Float', 'Money', 'Date'])) {
-      if (empty($params['is_searchable']) || in_array($params['html_type'], ['Radio', 'Select'])) {
+      if (in_array($params['html_type'], ['Radio', 'Select'])) {
         $params['is_search_range'] = 0;
       }
     }

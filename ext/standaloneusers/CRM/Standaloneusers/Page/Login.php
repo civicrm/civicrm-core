@@ -16,8 +16,8 @@ class CRM_Standaloneusers_Page_Login extends CRM_Core_Page {
     $this->assign('forgottenPasswordURL', CRM_Utils_System::url('civicrm/login/password'));
     // Remove breadcrumb for login page.
     $this->assign('breadcrumb', NULL);
-
     $this->assign('justLoggedOut', isset($_GET['justLoggedOut']));
+    $this->assign('sessionLost', isset($_GET['sessionLost']));
 
     parent::run();
   }

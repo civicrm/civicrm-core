@@ -10,6 +10,7 @@ return [
     'description' => ts('various types of CiviEvent participant statuses'),
     'log' => TRUE,
     'add' => '3.0',
+    'label_field' => 'label',
   ],
   'getPaths' => fn() => [
     'add' => 'civicrm/admin/participant_status?action=add&reset=1',
@@ -39,9 +40,6 @@ return [
         'export',
         'duplicate_matching',
       ],
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'label' => [
       'title' => ts('Participant Status Label'),
@@ -50,9 +48,6 @@ return [
       'localizable' => TRUE,
       'description' => ts('localized label for display of this status type'),
       'add' => '3.0',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'class' => [
       'title' => ts('Participant Status Class'),
@@ -60,11 +55,8 @@ return [
       'input_type' => 'Select',
       'description' => ts('the general group of status type this one belongs to'),
       'add' => '3.0',
-      'input_attrs' => [
-        'maxlength' => 8,
-      ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Event_PseudoConstant::participantStatusClassOptions',
+        'callback' => ['CRM_Event_PseudoConstant', 'participantStatusClassOptions'],
       ],
     ],
     'is_reserved' => [

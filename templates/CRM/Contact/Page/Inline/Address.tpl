@@ -39,34 +39,10 @@
           {if array_key_exists($locationIndex, $sharedAddresses) && !empty($sharedAddresses.$locationIndex.shared_address_display.name)}
             <strong>{ts 1=$sharedAddresses.$locationIndex.shared_address_display.name}Address belongs to %1{/ts}</strong><br />
           {/if}
-          {$add.display|smarty:nodefaults|purify|nl2br}
+          {$add.display|purify|nl2br nofilter}
         </div>
       </div>
-
-    <!-- add custom data -->
-    {foreach from=$add.custom item=customGroup key=cgId} {* start of outer foreach *}
-      {assign var="isAddressCustomPresent" value=1}
-      {foreach from=$customGroup item=customValue key=cvId}
-        <details id="address_custom_{$cgId}_{$locationIndex}" class="crm-address-custom-{$cgId}-{$locationIndex}-accordion crm-accordion-light" {if $customValue.collapse_display}{else}open{/if}>
-          <summary class="collapsible-title">
-            {$customValue.title}
-          </summary>
-          <div class="crm-summary-block">
-            {foreach from=$customValue.fields item=customField key=cfId}
-            <div class="crm-summary-row">
-              <div class="crm-label">
-                {$customField.field_title}
-              </div>
-              <div class="crm-content">
-                {$customField.field_value}
-              </div>
-            </div>
-            {/foreach}
-          </div>
-        </details>
-      {/foreach}
-    {/foreach} {* end of outer custom group foreach *}
-    <!-- end custom data -->
+    {include file="CRM/Contact/Page/Inline/BlockCustomData.tpl" entity='address' customGroups=$add.custom identifier=$locationIndex}
     {/if}
   </div>
 </div>

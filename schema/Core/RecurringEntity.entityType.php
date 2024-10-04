@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Recurring Entity'),
     'title_plural' => ts('Recurring Entities'),
-    'description' => ts('FIXME'),
+    'description' => ts('Recurring entities (used by repeating activities and events)'),
     'log' => TRUE,
     'add' => '4.6',
   ],
@@ -18,9 +18,6 @@ return [
       'input_type' => 'Number',
       'required' => TRUE,
       'add' => '4.6',
-      'input_attrs' => [
-        'maxlength' => 10,
-      ],
       'primary_key' => TRUE,
       'auto_increment' => TRUE,
     ],
@@ -31,9 +28,6 @@ return [
       'required' => TRUE,
       'description' => ts('Recurring Entity Parent ID'),
       'add' => '4.6',
-      'input_attrs' => [
-        'maxlength' => 10,
-      ],
     ],
     'entity_id' => [
       'title' => ts('Entity ID'),
@@ -41,9 +35,6 @@ return [
       'input_type' => 'Number',
       'description' => ts('Recurring Entity Child ID'),
       'add' => '4.6',
-      'input_attrs' => [
-        'maxlength' => 10,
-      ],
     ],
     'entity_table' => [
       'title' => ts('Entity Table'),
@@ -52,9 +43,6 @@ return [
       'required' => TRUE,
       'description' => ts('Physical tablename for entity, e.g. civicrm_event'),
       'add' => '4.6',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'mode' => [
       'title' => ts('Cascade Type'),

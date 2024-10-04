@@ -75,9 +75,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Variable name/programmatic handle for this field.'),
       'add' => '3.3',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'label' => [
       'title' => ts('Custom Field Label'),
@@ -87,9 +84,6 @@ return [
       'localizable' => TRUE,
       'description' => ts('Text for form field label (also friendly name for administering this custom property).'),
       'add' => '1.1',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'data_type' => [
       'title' => ts('Data Type'),
@@ -100,10 +94,9 @@ return [
       'add' => '1.1',
       'input_attrs' => [
         'label' => ts('Data Type'),
-        'maxlength' => 16,
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_BAO_CustomField::dataType',
+        'callback' => ['CRM_Core_BAO_CustomField', 'dataType'],
       ],
     ],
     'html_type' => [
@@ -115,10 +108,9 @@ return [
       'add' => '1.1',
       'input_attrs' => [
         'label' => ts('Field Input Type'),
-        'maxlength' => 32,
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::customHtmlType',
+        'callback' => ['CRM_Core_SelectValues', 'customHtmlType'],
       ],
     ],
     'default_value' => [
@@ -127,9 +119,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Use form_options.is_default for field_types which use options.'),
       'add' => '1.1',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'is_required' => [
       'title' => ts('Custom Field Is Required?'),
@@ -189,9 +178,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Store collection of type-appropriate attributes, e.g. textarea needs rows/cols attributes'),
       'add' => '1.1',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'is_active' => [
       'title' => ts('Custom Field Is Active?'),
@@ -246,11 +232,8 @@ return [
       'input_type' => 'Select',
       'description' => ts('date format for custom date'),
       'add' => '3.1',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::getDatePluginInputFormats',
+        'callback' => ['CRM_Core_SelectValues', 'getDatePluginInputFormats'],
       ],
     ],
     'time_format' => [
@@ -260,7 +243,7 @@ return [
       'description' => ts('time format for custom date'),
       'add' => '3.1',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::getTimeFormats',
+        'callback' => ['CRM_Core_SelectValues', 'getTimeFormats'],
       ],
     ],
     'note_columns' => [
@@ -283,9 +266,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Name of the column that holds the values for this field.'),
       'add' => '2.0',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'option_group_id' => [
       'title' => ts('Field Option Group ID'),
@@ -315,11 +295,8 @@ return [
       'description' => ts('Serialization method - a non-zero value indicates a multi-valued field.'),
       'add' => '5.27',
       'default' => 0,
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::fieldSerialization',
+        'callback' => ['CRM_Core_SelectValues', 'fieldSerialization'],
       ],
     ],
     'filter' => [
@@ -328,9 +305,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Stores Contact Get API params contact reference custom fields. May be used for other filters in the future.'),
       'add' => '4.1',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'in_selector' => [
       'title' => ts('Field Display'),
@@ -348,9 +322,6 @@ return [
       'description' => ts('Name of entity being referenced.'),
       'add' => '5.60',
       'default' => NULL,
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'fk_entity_on_delete' => [
       'title' => ts('On Referenced Entity Delete'),
@@ -360,11 +331,8 @@ return [
       'description' => ts('Behavior if referenced entity is deleted.'),
       'add' => '5.71',
       'default' => 'set_null',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_BAO_CustomField::getFkEntityOnDeleteOptions',
+        'callback' => ['CRM_Core_BAO_CustomField', 'getFkEntityOnDeleteOptions'],
       ],
     ],
   ],

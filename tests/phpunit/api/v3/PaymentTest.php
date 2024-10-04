@@ -76,8 +76,10 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
   /**
    * Test multiple payments for contribution and assert if option
    * and is_payment returns the correct list of payments.
+   * @dataProvider versionThreeAndFour
    */
-  public function testMultiplePaymentsForContribution(): void {
+  public function testMultiplePaymentsForContribution($apiVersion): void {
+    $this->_apiversion = $apiVersion;
     $params = [
       'contact_id' => $this->individualCreate(),
       'total_amount' => 100,
@@ -95,12 +97,11 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
 
     $paymentParams['total_amount'] = 50;
     $this->callAPISuccess('payment', 'create', $paymentParams);
-
     //check if contribution status is set to "Completed".
     $contribution = $this->callAPISuccessGetSingle('Contribution', [
       'id' => $contributionID,
     ]);
-    $this->assertEquals('Completed', $contribution['contribution_status']);
+    $this->assertEquals(1, $contribution['contribution_status_id']);
 
     //Get Payment using options
     $getParams = [
@@ -168,12 +169,13 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
 
   /**
    * Test contribution receipts triggered by Payment.create with is_send_contribution_notification = TRUE.
-   *
+   * @dataProvider versionThreeAndFour
    * @throws \CRM_Core_Exception
    */
-  public function testPaymentSendContributionReceipt(): void {
+  public function testPaymentSendContributionReceipt($apiVersion): void {
     $mut = new CiviMailUtils($this);
     $contribution = $this->createPartiallyPaidParticipantOrder();
+    $this->_apiversion = $apiVersion;
     $event = $this->callAPISuccess('Event', 'get', []);
     $this->addLocationToEvent($event['id']);
     $params = [
@@ -197,10 +199,11 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
 
   /**
    * Test full refund when no payment has actually been record.
-   *
+   * @dataProvider versionThreeAndFour
    * @throws \CRM_Core_Exception
    */
-  public function testFullRefundWithPaymentAlreadyRefunded(): void {
+  public function testFullRefundWithPaymentAlreadyRefunded($apiVersion): void {
+    $this->_apiversion = $apiVersion;
     $contributionID1 = $this->contributionCreate([
       'contact_id' => $this->individualCreate(),
       'trxn_id' => 111111,
@@ -1315,6 +1318,34 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $this->assertEquals($originalReceiveDate, $contribution['receive_date'],
       'Contribution receive date was changed, but should not have been.');
 
+  }
+
+  public function testPaymentGetNonPaymentRecords(): void {
+    $this->_apiversion = 4;
+    Civi::settings()->set('always_post_to_accounts_receivable', 1);
+    $contributionID = $this->contributionCreate([
+      'contact_id'             => $this->individualCreate(),
+      'total_amount'           => 110,
+      'contribution_status_id' => 'Pending',
+      'receive_date'           => date('Y-m-d H:i:s'),
+      'fee_amount' => 0,
+      'financial_type_id' => 1,
+      'is_pay_later' => 1,
+    ]);
+    $trxnID = 'abcd';
+    $this->callAPISuccess('Payment', 'create', [
+      'total_amount' => 100,
+      'order_id'     => $contributionID,
+      'trxn_date'    => date('Y-m-d H:i:s'),
+      'trxn_id'      => $trxnID,
+      'fee_amount' => .2,
+    ]);
+    $payments = $this->callAPISuccess('Payment', 'get', []);
+    $this->assertCount(1, $payments['values']);
+    $payments = $this->callAPISuccess('Payment', 'get', ['is_payment' => ['IN' => [0, 1]]]);
+    // Ensure that we are only returning payments
+    $this->assertCount(1, $payments['values']);
+    Civi::settings()->set('always_post_to_accounts_receivable', 0);
   }
 
 }

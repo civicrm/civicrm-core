@@ -276,8 +276,8 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
         $realPayLater = $this->_params[0]['is_pay_later'] ?? NULL;
       }
 
-      //truly spaces are greater than required.
-      if (is_numeric($spaces) && $spaces >= ($processedCnt + $currentPageMaxCount)) {
+      //truly spaces are less than required.
+      if (is_numeric($spaces) && $spaces <= ($processedCnt + $currentPageMaxCount)) {
         if (CRM_Utils_Array::value('amount', $this->_params[0], 0) == 0 || $this->_requireApproval) {
           $this->_allowWaitlist = FALSE;
           $this->set('allowWaitlist', $this->_allowWaitlist);

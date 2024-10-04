@@ -102,6 +102,7 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
     CRM_Core_PseudoConstant::relationshipType('label', TRUE);
     CRM_Core_PseudoConstant::relationshipType('name', TRUE);
     CRM_Core_PseudoConstant::flush();
+    Civi::cache('metadata')->clear();
   }
 
   /**

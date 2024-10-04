@@ -7,10 +7,13 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Personal Campaign Page'),
     'title_plural' => ts('Personal Campaign Pages'),
-    'description' => ts('FIXME'),
+    'description' => ts('Table containing list of Personal Campaign Pages'),
     'log' => TRUE,
     'add' => '2.2',
     'label_field' => 'title',
+  ],
+  'getPaths' => fn() => [
+    'update' => 'civicrm/pcp/info?reset=1&action=update&id=[id]',
   ],
   'getFields' => fn() => [
     'id' => [
@@ -57,9 +60,6 @@ return [
       'input_type' => 'Text',
       'add' => '2.2',
       'default' => NULL,
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'intro_text' => [
       'title' => ts('Intro Text'),
@@ -87,9 +87,6 @@ return [
       'input_type' => 'Text',
       'add' => '2.2',
       'default' => NULL,
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'page_id' => [
       'title' => ts('Contribution Page'),
@@ -110,11 +107,8 @@ return [
       'description' => ts('The type of PCP this is: contribute or event'),
       'add' => '2.2',
       'default' => 'contribute',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
       'pseudoconstant' => [
-        'callback' => 'CRM_PCP_BAO_PCP::pageTypeOptions',
+        'callback' => ['CRM_PCP_BAO_PCP', 'pageTypeOptions'],
       ],
     ],
     'pcp_block_id' => [
@@ -153,15 +147,13 @@ return [
       'description' => ts('3 character string, value from config setting or input via user.'),
       'add' => '3.2',
       'default' => NULL,
-      'input_attrs' => [
-        'maxlength' => 3,
-      ],
       'pseudoconstant' => [
         'table' => 'civicrm_currency',
         'key_column' => 'name',
         'label_column' => 'full_name',
         'name_column' => 'name',
         'abbr_column' => 'symbol',
+        'description_column' => 'IFNULL(CONCAT(name, " (", symbol, ")"), name)',
       ],
     ],
     'is_active' => [

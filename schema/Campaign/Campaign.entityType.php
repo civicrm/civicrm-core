@@ -78,7 +78,6 @@ return [
       ],
       'input_attrs' => [
         'label' => ts('Name'),
-        'maxlength' => 255,
       ],
     ],
     'title' => [
@@ -94,7 +93,6 @@ return [
       ],
       'input_attrs' => [
         'label' => ts('Title'),
-        'maxlength' => 255,
       ],
     ],
     'description' => [
@@ -192,7 +190,6 @@ return [
       ],
       'input_attrs' => [
         'label' => ts('External ID'),
-        'maxlength' => 32,
       ],
     ],
     'parent_id' => [
@@ -225,10 +222,7 @@ return [
       'add' => '3.3',
       'default' => TRUE,
       'input_attrs' => [
-        'label' => [
-          'Enabled',
-          'Enabled',
-        ],
+        'label' => ts('Enabled'),
       ],
     ],
     'created_id' => [
@@ -237,6 +231,7 @@ return [
       'input_type' => 'EntityRef',
       'description' => ts('FK to civicrm_contact, who created this Campaign.'),
       'add' => '3.3',
+      'default_callback' => ['CRM_Core_Session', 'getLoggedInContactID'],
       'input_attrs' => [
         'label' => ts('Created By'),
       ],
@@ -250,6 +245,7 @@ return [
       'title' => ts('Campaign Created Date'),
       'sql_type' => 'datetime',
       'input_type' => 'Select Date',
+      'required' => TRUE,
       'readonly' => TRUE,
       'description' => ts('Date and time that Campaign was created.'),
       'add' => '3.3',
@@ -265,6 +261,7 @@ return [
       'input_type' => 'EntityRef',
       'description' => ts('FK to civicrm_contact, who recently edited this Campaign.'),
       'add' => '3.3',
+      'default_callback' => ['CRM_Core_Session', 'getLoggedInContactID'],
       'input_attrs' => [
         'label' => ts('Modified By'),
       ],
@@ -279,6 +276,9 @@ return [
       'sql_type' => 'datetime',
       'input_type' => 'Select Date',
       'description' => ts('Date and time that Campaign was edited last time.'),
+      'required' => TRUE,
+      'readonly' => TRUE,
+      'default' => 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
       'add' => '3.3',
     ],
     'goal_general' => [

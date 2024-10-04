@@ -78,7 +78,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
   /**
    * Common pre-processing function.
    *
-   * @param \CRM_Core_Form_Task $form
+   * @param \CRM_Contact_Form_Task|CRM_Contact_Export_Form_Select|CRM_Event_Form_Task_Register $form
    *
    * @throws \CRM_Core_Exception
    */
@@ -102,13 +102,13 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
     // get the submitted values of the search form
     // we'll need to get fv from either search or adv search in the future
     $fragment = 'search';
-    if ($form->_action == CRM_Core_Action::ADVANCED) {
+    if ($form->getAction() === CRM_Core_Action::ADVANCED) {
       $fragment .= '/advanced';
     }
-    elseif ($form->_action == CRM_Core_Action::PROFILE) {
+    elseif ($form->getAction() === CRM_Core_Action::PROFILE) {
       $fragment .= '/builder';
     }
-    elseif ($form->_action == CRM_Core_Action::COPY) {
+    elseif ($form->getAction() === CRM_Core_Action::COPY) {
       $fragment .= '/custom';
     }
     if (!$isStandAlone) {
@@ -459,7 +459,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
           'group_type' => ['2' => 1],
         ];
 
-        $group = CRM_Contact_BAO_Group::create($groupParams);
+        $group = CRM_Contact_BAO_Group::writeRecord($groupParams);
         $grpID = $group->id;
 
         CRM_Contact_BAO_GroupContact::addContactsToGroup($this->_contactIds, $group->id);
@@ -471,7 +471,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
           'title' => $newGroupTitle,
           'group_type' => ['2' => 1],
         ];
-        CRM_Contact_BAO_Group::create($groupParams);
+        CRM_Contact_BAO_Group::writeRecord($groupParams);
       }
 
       // note at this point its a static group

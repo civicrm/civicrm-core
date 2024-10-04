@@ -20,7 +20,6 @@ use CRM_Afform_ExtensionUtil as E;
  * @see https://lab.civicrm.org/extensions/afform
  * @labelField title
  * @iconField type:icon
- * @searchable none
  * @since 5.31
  * @package Civi\Api4
  */

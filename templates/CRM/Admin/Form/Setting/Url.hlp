@@ -46,7 +46,7 @@
 {htxt id='id-extensions_url'}
 {ts}Base URL for extension resources (images, stylesheets, etc).{/ts}<br/>
 {capture assign=civicrmAdminSettingPath}{crmURL p="civicrm/admin/setting/path" q="reset=1"}{/capture}
-{ts 1=$civicrmAdminSettingPath 2="$config->extensionsDir"}This should match the <a href="%1">"CiviCRM Extensions Directory"</a> ("%2").{/ts}
+{ts 1=$civicrmAdminSettingPath 2=$config->extensionsDir}This should match the <a href="%1">"CiviCRM Extensions Directory"</a> ("%2").{/ts}
 {/htxt}
 
 {htxt id='id-css_url-title'}

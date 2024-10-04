@@ -78,7 +78,7 @@ return [
       'pseudoconstant' => [
         'table' => 'civicrm_financial_type',
         'key_column' => 'id',
-        'label_column' => 'name',
+        'label_column' => 'label',
       ],
       'entity_reference' => [
         'entity' => 'FinancialType',
@@ -134,15 +134,13 @@ return [
       'description' => ts('3 character string, value from config setting or input via user.'),
       'add' => '3.2',
       'default' => NULL,
-      'input_attrs' => [
-        'maxlength' => 3,
-      ],
       'pseudoconstant' => [
         'table' => 'civicrm_currency',
         'key_column' => 'name',
         'label_column' => 'full_name',
         'name_column' => 'name',
         'abbr_column' => 'symbol',
+        'description_column' => 'IFNULL(CONCAT(name, " (", symbol, ")"), name)',
       ],
     ],
     'frequency_unit' => [
@@ -154,9 +152,6 @@ return [
       'add' => '2.1',
       'unique_name' => 'pledge_frequency_unit',
       'default' => 'month',
-      'input_attrs' => [
-        'maxlength' => 8,
-      ],
       'pseudoconstant' => [
         'option_group_name' => 'recur_frequency_units',
         'key_column' => 'name',
@@ -310,6 +305,7 @@ return [
       ],
       'pseudoconstant' => [
         'option_group_name' => 'pledge_status',
+        'condition_provider' => ['CRM_Pledge_BAO_Pledge', 'alterStatus'],
       ],
     ],
     'is_test' => [

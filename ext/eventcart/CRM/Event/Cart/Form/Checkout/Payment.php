@@ -18,6 +18,11 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
   public $payer_contact_id;
   public $is_pay_later = FALSE;
   public $pay_later_receipt;
+  public $_price_values;
+  public $_paymentFields;
+  public $sub_trxn_index;
+  public $trxn_id;
+  public $trxn_date;
 
   /**
    * @var array
@@ -323,6 +328,9 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
       $location_params = ['entity_id' => $line_item['event']->id, 'entity_table' => 'civicrm_event'];
       $line_item['location'] = CRM_Core_BAO_Location::getValues($location_params, TRUE);
       CRM_Core_BAO_Address::fixAddress($line_item['location']['address'][1]);
+      if ($line_item['location']['address'][1] === NULL) {
+        $line_item['location']['address'][1] = ['display' => ''];
+      }
     }
     $send_template_params = [
       'table' => 'civicrm_msg_template',
@@ -479,7 +487,6 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     $this->cart->save();
     $this->set('last_event_cart_id', $this->cart->id);
 
-    $contribution_statuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $params['payment_instrument_id'] = NULL;
     if (!empty($params['is_pay_later'])) {
       $params['payment_instrument_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check');
@@ -489,10 +496,10 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
       $params['payment_instrument_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Credit Card');
     }
     if ($this->is_pay_later && empty($params['payment_completed'])) {
-      $params['contribution_status_id'] = array_search('Pending', $contribution_statuses);
+      $params['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
     }
     else {
-      $params['contribution_status_id'] = array_search('Completed', $contribution_statuses);
+      $params['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
       $params['participant_status'] = 'Registered';
       $params['is_pay_later'] = 0;
     }

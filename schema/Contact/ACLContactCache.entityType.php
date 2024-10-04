@@ -57,11 +57,8 @@ return [
       'required' => TRUE,
       'description' => ts('What operation does this user have permission on?'),
       'add' => '1.6',
-      'input_attrs' => [
-        'maxlength' => 8,
-      ],
       'pseudoconstant' => [
-        'callback' => 'CRM_ACL_BAO_ACL::operation',
+        'callback' => ['CRM_ACL_BAO_ACL', 'operation'],
       ],
     ],
   ],

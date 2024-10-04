@@ -858,7 +858,9 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @return array|null
    */
   public function getRoleNames() {
-    return user_role_names();
+    $roles = \Drupal\user\Entity\Role::loadMultiple();
+    $names = array_map(fn(\Drupal\user\RoleInterface $role) => $role->label(), $roles);
+    return $names;
   }
 
   /**
@@ -999,7 +1001,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     // and the fallback to drupal_flush_css_js. Still need the class_exists.
     try {
       // Sometimes metadata gets cleared while the cms isn't bootstrapped.
-      if (class_exists('\Drupal')) {
+      if (class_exists('\Drupal') && \Drupal::hasContainer()) {
         \Drupal::service('asset.query_string')->reset();
         $cleared = TRUE;
       }

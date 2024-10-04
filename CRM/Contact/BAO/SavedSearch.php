@@ -234,7 +234,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch implements
    * @param array $params
    * @return CRM_Contact_DAO_SavedSearch
    */
-  public static function create(&$params) {
+  public static function create($params) {
     return self::writeRecord($params);
   }
 
@@ -247,13 +247,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch implements
    */
   public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event): void {
     if ($event->action === 'create' || $event->action === 'edit') {
-      $loggedInContactID = CRM_Core_Session::getLoggedInContactID();
-      if ($loggedInContactID) {
-        if ($event->action === 'create') {
-          $event->params['created_id'] ??= $loggedInContactID;
-        }
-        $event->params['modified_id'] ??= $loggedInContactID;
-      }
+      $event->params['modified_id'] ??= CRM_Core_Session::getLoggedInContactID();
       // Set by mysql
       unset($event->params['modified_date']);
 
@@ -374,8 +368,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch implements
       ->addSelect('name', 'title_plural')
       ->addOrderBy('title_plural')
       ->execute()
-      ->indexBy('name')
-      ->column('title_plural');
+      ->column('title_plural', 'name');
   }
 
   /**
@@ -403,7 +396,8 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch implements
       );
       // Check each group search for valid groups.
       foreach ($groupSearches as $groupSearch) {
-        if (!empty($groupSearch[2]) && in_array($groupID, $groupSearch[2])) {
+        $groupFormValues = (array) ($groupSearch[2]['IN'] ?? $groupSearch[2] ?? []);
+        if (!empty($groupFormValues) && in_array($groupID, (array) $groupFormValues)) {
           $smartGroups[$group['id']] = [
             'title' => $group['title'],
             'editSearchURL' => self::getEditSearchUrl($group['saved_search_id']),

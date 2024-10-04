@@ -47,6 +47,8 @@ return [
       'sql_type' => 'timestamp',
       'input_type' => NULL,
       'description' => ts('Log entry date'),
+      'required' => TRUE,
+      'default' => 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
       'add' => '4.1',
     ],
     'job_id' => [
@@ -67,9 +69,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Title of the job'),
       'add' => '4.1',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'command' => [
       'title' => ts('Command'),
@@ -77,9 +76,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Full path to file containing job script'),
       'add' => '4.1',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'description' => [
       'title' => ts('Description'),
@@ -87,9 +83,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Title line of log entry'),
       'add' => '4.1',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'data' => [
       'title' => ts('Extended Data'),

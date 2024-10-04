@@ -54,7 +54,6 @@ class CRM_Core_Smarty_plugins_HtxtTest extends CiviUnitTestCase {
    * @param string $input
    */
   public function testUnsupported(string $input): void {
-    $smarty = CRM_Core_Smarty::singleton();
     try {
       CRM_Utils_String::parseOneOffStringThroughSmarty($input);
       $this->fail("That should have thrown an error. Are you working on a better parsing rule?");

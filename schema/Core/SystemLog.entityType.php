@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('System Log'),
     'title_plural' => ts('System Logs'),
-    'description' => ts('FIXME'),
+    'description' => ts('System log table that contains a record of various events (eg. incoming IPN requests)'),
     'add' => '4.5',
   ],
   'getFields' => fn() => [
@@ -28,9 +28,6 @@ return [
       'required' => TRUE,
       'description' => ts('Standardized message'),
       'add' => '4.5',
-      'input_attrs' => [
-        'maxlength' => 128,
-      ],
     ],
     'context' => [
       'title' => ts('Detailed Log Data'),
@@ -46,9 +43,6 @@ return [
       'description' => ts('error level per PSR3'),
       'add' => '4.5',
       'default' => 'info',
-      'input_attrs' => [
-        'maxlength' => 9,
-      ],
     ],
     'timestamp' => [
       'title' => ts('Log Timestamp'),
@@ -56,6 +50,7 @@ return [
       'input_type' => NULL,
       'description' => ts('Timestamp of when event occurred.'),
       'add' => '4.5',
+      'required' => TRUE,
       'default' => 'CURRENT_TIMESTAMP',
     ],
     'contact_id' => [
@@ -64,9 +59,6 @@ return [
       'input_type' => 'Number',
       'description' => ts('Optional Contact ID that created the log. Not an FK as we keep this regardless'),
       'add' => '4.5',
-      'input_attrs' => [
-        'maxlength' => 11,
-      ],
     ],
     'hostname' => [
       'title' => ts('Log Host'),
@@ -74,9 +66,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Optional Name of logging host'),
       'add' => '4.5',
-      'input_attrs' => [
-        'maxlength' => 128,
-      ],
     ],
   ],
 ];

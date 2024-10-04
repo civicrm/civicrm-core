@@ -107,7 +107,7 @@ class BasicGetAction extends AbstractGetAction {
       foreach ($this->entityFields() as $field) {
         $values += [$field['name'] => $field['default_value'] ?? NULL];
         if (!empty($field['options'])) {
-          foreach ($field['suffixes'] ?? FormattingUtil::$pseudoConstantSuffixes as $suffix) {
+          foreach ($field['suffixes'] ?? array_keys(\CRM_Core_SelectValues::optionAttributes()) as $suffix) {
             $pseudofield = $field['name'] . ':' . $suffix;
             if (!isset($values[$pseudofield]) && isset($values[$field['name']]) && $this->_isFieldSelected($pseudofield)) {
               $values[$pseudofield] = $values[$field['name']];

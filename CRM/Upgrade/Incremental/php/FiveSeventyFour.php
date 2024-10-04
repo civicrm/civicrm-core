@@ -31,4 +31,8 @@ class CRM_Upgrade_Incremental_php_FiveSeventyFour extends CRM_Upgrade_Incrementa
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
   }
 
+  public function upgrade_5_74_beta1($rev): void {
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+  }
+
 }

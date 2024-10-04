@@ -6,17 +6,15 @@
   <div ng-if="!$ctrl.settings.pager.hide_single || ($ctrl.rowCount > $ctrl.limit)" class="text-center crm-flex-2">
     <ul uib-pagination
         class="pagination"
-        boundary-links="true"
+        boundary-link-numbers="true"
         total-items="$ctrl.rowCount"
         ng-model="$ctrl.page"
         ng-change="$ctrl.getResultsPronto()"
         items-per-page="$ctrl.limit"
-        max-size="6"
+        max-size="5"
         force-ellipses="true"
-        previous-text="&lsaquo;"
-        next-text="&rsaquo;"
-        first-text="&laquo;"
-        last-text="&raquo;"
+        previous-text="⬅"
+        next-text="⮕"
     ></ul>
   </div>
   <div>

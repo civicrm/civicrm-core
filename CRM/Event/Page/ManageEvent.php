@@ -43,6 +43,10 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
 
   protected $_isTemplate = FALSE;
 
+  protected $_searchResult;
+
+  protected $_force;
+
   /**
    * Get action Links.
    *
@@ -178,12 +182,6 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
             'field' => 'reminder',
           ];
       }
-      self::$_tabLinks[$cacheKey]['friend']
-        = [
-          'title' => ts('Tell a Friend'),
-          'url' => 'civicrm/event/manage/friend',
-          'field' => 'friend',
-        ];
       self::$_tabLinks[$cacheKey]['pcp']
         = [
           'title' => ts('Personal Campaign Pages'),
@@ -297,6 +295,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
     );
     $this->_searchResult = CRM_Utils_Request::retrieve('searchResult', 'Boolean', $this);
 
+    // @todo Does $this->_force get used somewhere deeper down? It doesn't seem used in whereClause()?
     $whereClause = $this->whereClause($params, FALSE, $this->_force);
 
     if (CRM_Core_Config::singleton()->includeAlphabeticalPager) {
@@ -405,7 +404,9 @@ ORDER BY start_date desc
 
         $defaults['location'] = CRM_Core_BAO_Location::getValues($params, TRUE);
 
-        $manageEvent[$dao->id]['friend'] = CRM_Friend_BAO_Friend::getValues($params);
+        if (function_exists('tellafriend_civicrm_config')) {
+          $manageEvent[$dao->id]['friend'] = CRM_Friend_BAO_Friend::getValues($params);
+        }
 
         if (isset($defaults['location']['address'][1]['city'])) {
           $manageEvent[$dao->id]['city'] = $defaults['location']['address'][1]['city'];

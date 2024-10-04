@@ -48,7 +48,8 @@ return new class() {
   }
 
   public function __construct(array $entities = [], ?callable $findExternalTable = NULL) {
-    $this->entities = $entities;
+    // Filter out entities without a sql table (e.g. Afform)
+    $this->entities = array_filter($entities, fn($entity) => !empty($entity['table']));
     $this->findExternalTable = $findExternalTable ?: function() {
       return NULL;
     };
@@ -84,34 +85,35 @@ return new class() {
     return $sql;
   }
 
+  public function generateCreateTableWithConstraintSql(array $entity): string {
+    $definition = $this->getTableDefinition($entity);
+    $constraints = $this->getTableConstraints($entity);
+    $sql = "CREATE TABLE IF NOT EXISTS `{$entity['table']}` (\n  " .
+      implode(",\n  ", $definition);
+    if ($constraints) {
+      $sql .= ",\n  " . implode(",\n  ", $constraints);
+    }
+    $sql .= "\n)\n" . $this->getTableOptions() . ";\n";
+    return $sql;
+  }
+
   private function generateCreateTableSql(array $entity): string {
+    $definition = $this->getTableDefinition($entity);
+    $sql = "CREATE TABLE `{$entity['table']}` (\n  " .
+      implode(",\n  ", $definition) .
+      "\n)\n" .
+      $this->getTableOptions() . ";\n";
+    return $sql;
+  }
+
+  private function getTableDefinition(array $entity): array {
     $definition = [];
     $primaryKeys = [];
     foreach ($entity['getFields']() as $fieldName => $field) {
       if (!empty($field['primary_key'])) {
         $primaryKeys[] = "`$fieldName`";
       }
-      $fieldSql = "`$fieldName` {$field['sql_type']}";
-      if (!empty($field['collate'])) {
-        $fieldSql .= " COLLATE {$field['collate']}";
-      }
-      // Required fields and booleans cannot be null
-      // FIXME: For legacy support this doesn't force boolean fields to be NOT NULL... but it really should.
-      if (!empty($field['required'])) {
-        $fieldSql .= ' NOT NULL';
-      }
-      // Mysql 5.7 requires timestamp to be explicitly declared NULL
-      if (empty($field['required']) && $field['sql_type'] === 'timestamp') {
-        $fieldSql .= ' NULL';
-      }
-      if (!empty($field['auto_increment'])) {
-        $fieldSql .= " AUTO_INCREMENT";
-      }
-      $fieldSql .= self::getDefaultSql($field);
-      if (!empty($field['description'])) {
-        $fieldSql .= " COMMENT '" . \CRM_Core_DAO::escapeString($field['description']) . "'";
-      }
-      $definition[] = $fieldSql;
+      $definition[] = "`$fieldName` " . self::generateFieldSql($field);
     }
     if ($primaryKeys) {
       $definition[] = 'PRIMARY KEY (' . implode(', ', $primaryKeys) . ')';
@@ -124,19 +126,24 @@ return new class() {
       }
       $definition[] = (!empty($index['unique']) ? 'UNIQUE ' : '') . "INDEX `$indexName`(" . implode(', ', $indexFields) . ')';
     }
-
-    $sql = "CREATE TABLE `{$entity['table']}` (\n  " .
-      implode(",\n  ", $definition) .
-      "\n)\n" .
-      $this->getTableOptions() . ";\n";
-    return $sql;
+    return $definition;
   }
 
   private function generateConstraintsSql(array $entity): string {
+    $constraints = $this->getTableConstraints($entity);
+    $sql = '';
+    if ($constraints) {
+      $sql .= "ALTER TABLE `{$entity['table']}`\n  ";
+      $sql .= 'ADD ' . implode(",\n  ADD ", $constraints) . ";\n";
+    }
+    return $sql;
+  }
+
+  private function getTableConstraints(array $entity): array {
     $constraints = [];
     foreach ($entity['getFields']() as $fieldName => $field) {
       if (!empty($field['entity_reference']['entity'])) {
-        $constraint = "ADD CONSTRAINT `FK_{$entity['table']}_$fieldName` FOREIGN KEY (`$fieldName`)" .
+        $constraint = "CONSTRAINT `FK_{$entity['table']}_$fieldName` FOREIGN KEY (`$fieldName`)" .
           " REFERENCES `" . $this->getTableForEntity($field['entity_reference']['entity']) . "`(`{$field['entity_reference']['key']}`)";
         if (!empty($field['entity_reference']['on_delete'])) {
           $constraint .= " ON DELETE {$field['entity_reference']['on_delete']}";
@@ -144,12 +151,30 @@ return new class() {
         $constraints[] = $constraint;
       }
     }
-    $sql = '';
-    if ($constraints) {
-      $sql .= "ALTER TABLE `{$entity['table']}`\n  ";
-      $sql .= implode(",\n  ", $constraints) . ";\n";
+    return $constraints;
+  }
+
+  public static function generateFieldSql(array $field) {
+    $fieldSql = $field['sql_type'];
+    if (!empty($field['collate'])) {
+      $fieldSql .= " COLLATE {$field['collate']}";
     }
-    return $sql;
+    // Required fields and booleans cannot be null
+    // FIXME: For legacy support this doesn't force boolean fields to be NOT NULL... but it really should.
+    if (!empty($field['required'])) {
+      $fieldSql .= ' NOT NULL';
+    }
+    else {
+      $fieldSql .= ' NULL';
+    }
+    if (!empty($field['auto_increment'])) {
+      $fieldSql .= " AUTO_INCREMENT";
+    }
+    $fieldSql .= self::getDefaultSql($field);
+    if (!empty($field['description'])) {
+      $fieldSql .= " COMMENT '" . \CRM_Core_DAO::escapeString($field['description']) . "'";
+    }
+    return $fieldSql;
   }
 
   private static function getDefaultSql(array $field): string {

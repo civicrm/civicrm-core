@@ -248,7 +248,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     //CRM-4320
     $this->_participantId = CRM_Utils_Request::retrieve('participantId', 'Positive', $this);
     $this->setPaymentMode();
-
+    $this->assign('isShowAdminVisibilityFields', CRM_Core_Permission::check('administer CiviCRM'));
     $this->_values = $this->get('values');
     $this->_fields = $this->get('fields');
     $this->_bltID = $this->get('bltID');
@@ -286,7 +286,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     //get the additional participant ids.
     $this->_additionalParticipantIds = $this->get('additionalParticipantIds');
 
-    $this->showPaymentOnConfirm = (in_array($this->_eventId, \Civi::settings()->get('event_show_payment_on_confirm')) || in_array('all', \Civi::settings()->get('event_show_payment_on_confirm')));
+    $this->showPaymentOnConfirm = $this->isShowPaymentOnConfirm();
     $this->assign('showPaymentOnConfirm', $this->showPaymentOnConfirm);
     $priceSetID = $this->getPriceSetID();
     if ($priceSetID) {
@@ -381,7 +381,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
           $isPaidEvent = $this->_values['event']['is_monetary'] ?? NULL;
         }
         if ($isPaidEvent && empty($this->getPriceFieldMetaData())) {
-          CRM_Core_Error::statusBounce(ts('No Fee Level(s) or Price Set is configured for this event.<br />Click <a href=\'%1\'>CiviEvent >> Manage Event >> Configure >> Event Fees</a> to configure the Fee Level(s) or Price Set for this event.', [1 => CRM_Utils_System::url('civicrm/event/manage/fee', 'reset=1&action=update&id=' . $this->_eventId)]));
+          CRM_Core_Error::statusBounce(ts('Click <a href=\'%1\'>CiviEvent >> Manage Event >> Configure >> Event Fees</a> to configure the Fee Level(s) or Price Set for this event.', [1 => CRM_Utils_System::url('civicrm/event/manage/fee', 'reset=1&action=update&id=' . $this->_eventId)]), $this->getInfoPageUrl(), ts('No Fee Level(s) or Price Set is configured for this event.'));
         }
       }
 
@@ -566,7 +566,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @param string $name
    */
   public function buildCustom($id, $name) {
-    if ($name === 'customPost') {
+    if ($name === 'customPost' || $name === 'additionalCustomPost') {
       $this->assign('postPageProfiles', []);
     }
     $this->assign($name, []);
@@ -629,7 +629,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     ) {
       CRM_Core_BAO_Address::checkContactSharedAddressFields($fields, $contactID);
     }
-    if ($name === 'customPost') {
+    if ($name === 'customPost' || $name === 'additionalCustomPost') {
       $postPageProfiles = [];
       foreach ($fields as $fieldName => $field) {
         $postPageProfiles[$field['groupName']][$fieldName] = $field;
@@ -1648,8 +1648,9 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   protected function checkValidEvent(): void {
     // is the event active (enabled)?
     if (!$this->_values['event']['is_active']) {
-      // form is inactive, die a fatal death
-      CRM_Core_Error::statusBounce(ts('The event you requested is currently unavailable (contact the site administrator for assistance).'));
+      // Form is inactive, redirect to the list of events
+      $urlList = CRM_Utils_System::url('civicrm/event/list', FALSE, NULL, FALSE, TRUE);
+      CRM_Core_Error::statusBounce(ts('The event you requested is currently unavailable (contact the site administrator for assistance).'), $urlList);
     }
 
     // is online registration is enabled?
@@ -1771,7 +1772,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
         CRM_Event_Form_Registration_Confirm::fixLocationFields($value, $fields, $this);
         //for free event or additional participant, dont create billing email address.
-        if (empty($value['is_primary']) || !$this->_values['event']['is_monetary']) {
+        if (empty($value['is_primary'])) {
           unset($value["email-{$this->_bltID}"]);
         }
 
@@ -2123,6 +2124,21 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       }
     }
     return FALSE;
+  }
+
+  /**
+   * Is this event configured to show the payment processors on the confirmation form?
+   *
+   * @return bool
+   */
+  protected function isShowPaymentOnConfirm(): bool {
+    $showPaymentOnConfirm = (
+      in_array($this->getEventID(), \Civi::settings()->get('event_show_payment_on_confirm')) ||
+      in_array('all', \Civi::settings()->get('event_show_payment_on_confirm')) ||
+      (in_array('multiparticipant', \Civi::settings()->get('event_show_payment_on_confirm')) && $this->getEventValue('is_multiple_registrations'))
+    );
+
+    return $showPaymentOnConfirm;
   }
 
 }

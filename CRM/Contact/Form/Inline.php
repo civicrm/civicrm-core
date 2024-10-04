@@ -88,7 +88,7 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
    * @noinspection PhpUnhandledExceptionInspection
    * @noinspection PhpDocMissingThrowsInspection
    */
-  public function getContactID(): int {
+  public function getContactID(): ?int {
     if (!isset($this->_contactId)) {
       $this->_contactId = (int) CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
     }

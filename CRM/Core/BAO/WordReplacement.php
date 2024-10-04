@@ -276,9 +276,10 @@ WHERE  domain_id = %1
    */
   private static function _getLocaleCustomStrings($domainId) {
     // TODO: Would it be worthwhile using memcache here?
+    // Disable i18n rewrite in query to avoid infinite recursion as this function is called from ts() and the rewrite fetches the schema which also uses ts()
     $domain = CRM_Core_DAO::executeQuery('SELECT locale_custom_strings FROM civicrm_domain WHERE id = %1', [
       1 => [$domainId, 'Integer'],
-    ]);
+    ], TRUE, NULL, FALSE, FALSE);
     while ($domain->fetch()) {
       return empty($domain->locale_custom_strings) ? [] : CRM_Utils_String::unserialize($domain->locale_custom_strings);
     }

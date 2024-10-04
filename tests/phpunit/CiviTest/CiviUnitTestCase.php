@@ -31,14 +31,16 @@ use Civi\Api4\CiviCase;
 use Civi\Api4\Contribution;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
+use Civi\Api4\DedupeRuleGroup;
+use Civi\Api4\DedupeRule;
 use Civi\Api4\ExampleData;
 use Civi\Api4\FinancialAccount;
 use Civi\Api4\FinancialType;
 use Civi\Api4\LineItem;
-use Civi\Api4\MembershipBlock;
 use Civi\Api4\MembershipType;
 use Civi\Api4\OptionGroup;
 use Civi\Api4\Phone;
+use Civi\Api4\PriceFieldValue;
 use Civi\Api4\PriceSet;
 use Civi\Api4\RelationshipType;
 use Civi\Api4\UFGroup;
@@ -53,6 +55,7 @@ use Civi\Test\FormTrait;
 use Civi\Test\GenericAssertionsTrait;
 use Civi\Test\LocaleTestTrait;
 use Civi\Test\MailingTestTrait;
+use Civi\Test\PageTrait;
 use League\Csv\Reader;
 
 /**
@@ -89,6 +92,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   use MailingTestTrait;
   use LocaleTestTrait;
   use FormTrait;
+  use PageTrait;
 
   /**
    * API version in use.
@@ -108,7 +112,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @var array
    * Array of temporary directory names
    */
-  protected $tempDirs;
+  protected array $tempDirs = [];
 
   /**
    * @var CRM_Core_Transaction
@@ -208,6 +212,11 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @var \CRM_Utils_AutoClean
    */
   private $frozenTime;
+
+  /**
+   * @var mixed
+   */
+  private $errorHandlerAtStartOfTest;
 
   /**
    *  Constructor.
@@ -379,6 +388,12 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $this->ensureMySQLMode(['IGNORE_SPACE', 'ERROR_FOR_DIVISION_BY_ZERO', 'STRICT_TRANS_TABLES']);
     putenv('CIVICRM_SMARTY_DEFAULT_ESCAPE=1');
     $this->originalSettings = \Civi::settings()->all();
+
+    // There doesn't seem to be a better way to get the current error handler.
+    // We want to know it so we can compare at the end of the test to see if
+    // something changed it and then inadvertently didn't restore it.
+    $this->errorHandlerAtStartOfTest = set_error_handler(function($errno, $errstr, $errfile, $errline) {});
+    restore_error_handler();
   }
 
   /**
@@ -540,6 +555,10 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     if (!empty($this->ids['UFGroup'])) {
       UFGroup::delete(FALSE)->addWhere('id', 'IN', $this->ids['UFGroup'])->execute();
     }
+    if (!empty($this->ids['DedupeRuleGroup'])) {
+      DedupeRule::delete(FALSE)->addWhere('dedupe_rule_group_id', 'IN', $this->ids['DedupeRuleGroup'])->execute();
+      DedupeRuleGroup::delete(FALSE)->addWhere('id', 'IN', $this->ids['DedupeRuleGroup'])->execute();
+    }
     unset(CRM_Core_Config::singleton()->userPermissionClass->permissions);
     parent::tearDown();
   }
@@ -557,6 +576,13 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @throws \CRM_Core_Exception
    */
   protected function assertPostConditions(): void {
+    // There doesn't seem to be a better way to get the current error handler.
+    $errorHandlerAtEndOfTest = set_error_handler(function($errno, $errstr, $errfile, $errline) {});
+    restore_error_handler();
+    if ($this->errorHandlerAtStartOfTest != $errorHandlerAtEndOfTest) {
+      $this->fail('Error handler is not the same at the end of the test as when it started. Did you forget to call parent::setUp or parent::tearDown? Start: ' . print_r($this->errorHandlerAtStartOfTest, TRUE) . "\nEnd: " . print_r($errorHandlerAtEndOfTest, TRUE));
+    }
+
     // Reset to version 3 as not all (e.g payments) work on v4
     $this->_apiversion = 3;
     CRM_Core_BAO_ConfigSetting::enableComponent('CiviContribute');
@@ -814,7 +840,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       $params['event_id'] = $event['id'];
     }
     $defaults = [
-      'status_id' => 2,
       'role_id' => 1,
       'register_date' => 20070219,
       'source' => 'Wimbledon',
@@ -823,7 +848,10 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     ];
 
     $params = array_merge($defaults, $params);
-    $result = $this->callAPISuccess('Participant', 'create', $params);
+    if (empty($params['status_id']) && empty($params['status_id.name'])) {
+      $params['status_id.name'] = 'Attended';
+    }
+    $result = $this->createTestEntity('Participant', $params);
     return $result['id'];
   }
 
@@ -1285,7 +1313,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @return int
    *   $id of created UF Join
    */
-  public function ufjoinCreate(array $params = NULL): int {
+  public function ufjoinCreate(?array $params = NULL): int {
     if ($params === NULL) {
       $params = [
         'is_active' => 1,
@@ -1960,10 +1988,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   }
 
   public function cleanTempDirs() {
-    if (!is_array($this->tempDirs)) {
-      // fix test errors where this is not set
-      return;
-    }
     foreach ($this->tempDirs as $tempDir) {
       if (is_dir($tempDir)) {
         CRM_Utils_File::cleanDir($tempDir, TRUE, FALSE);
@@ -2124,7 +2148,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @return int|null
    */
   public function getLoggedInUser(): ?int {
-    return CRM_Core_Session::singleton()->get('userID') ?: NULL;
+    return CRM_Core_Session::getLoggedInContactID();
   }
 
   /**
@@ -2471,7 +2495,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  protected function createPartiallyPaidParticipantOrder() {
+  protected function createPartiallyPaidParticipantOrder(): array {
     $orderParams = $this->getParticipantOrderParams();
     $orderParams['api.Payment.create'] = ['total_amount' => 150];
     return $this->callAPISuccess('Order', 'create', $orderParams);
@@ -2491,9 +2515,9 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $paramsSet['title'] = 'Price Set' . $identifier;
     $paramsSet['name'] = $identifier;
     $paramsSet['is_active'] = TRUE;
-    $paramsSet['financial_type_id'] = 'Event Fee';
+    $paramsSet['financial_type_id:name'] = 'Event Fee';
     $paramsSet['extends'] = 1;
-    $priceSet = $this->callAPISuccess('PriceSet', 'create', $paramsSet);
+    $priceSet = $this->createTestEntity('PriceSet', $paramsSet, $identifier);
     if ($componentID) {
       CRM_Price_BAO_PriceSet::addTo('civicrm_' . $component, $componentID, $priceSet['id']);
     }
@@ -2516,7 +2540,11 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     ], $priceFieldOptions);
 
     $priceField = $this->callAPISuccess('PriceField', 'create', $paramsField);
-    return $this->callAPISuccess('PriceFieldValue', 'get', ['price_field_id' => $priceField['id']]);
+    $this->ids['PriceField'][0] = $priceField['id'];
+    $this->ids['PriceFieldValue'] = array_keys((array) PriceFieldValue::get()
+      ->addWhere('price_field_id', '=', $this->ids['PriceField'][0])
+      ->execute()->indexBy('id'));
+    return $this->callAPISuccess('PriceFieldValue', 'get', ['price_field_id' => $this->ids['PriceField'][0]]);
   }
 
   /**
@@ -2569,7 +2597,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       INNER JOIN civicrm_msg_template m2
         ON m2.workflow_name = m.workflow_name AND m2.is_reserved = 1
         AND m.is_default = 1
-      SET m.msg_html = m2.msg_html, m.msg_text = m2.msg_text
+      SET m.msg_html = m2.msg_html, m.msg_text = m2.msg_text, m.msg_subject = m2.msg_subject
     ');
   }
 
@@ -2843,79 +2871,96 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * Create price set with contribution test for test setup.
    *
    * This could be merged with 4.5 function setup in api_v3_ContributionPageTest::setUpContributionPage
-   * on parent class at some point (fn is not in 4.4).
-   *
-   * @param $entity
-   * @param array $params
+   * on parent class at some point.
    */
-  public function createPriceSetWithPage($entity = NULL, $params = []): void {
-    $membershipTypeID = $this->createTestEntity('MembershipType', [
-      'name' => 'Special',
-      'member_of_contact_id' => CRM_Core_BAO_Domain::getDomain()->contact_id,
-      'financial_type_id:name' => 'Member Dues',
-      'duration_unit' => 'year',
-      'period_type:name' => 'rolling',
-    ], 'special')['id'];
-    $contributionPageID = $this->createTestEntity('ContributionPage', [
-      'title' => 'Test Contribution Page',
-      'financial_type_id' => 1,
-      'currency' => 'NZD',
-      'goal_amount' => 50,
-      'is_pay_later' => 1,
-      'is_monetary' => TRUE,
-      'is_email_receipt' => FALSE,
-    ])['id'];
-    $priceSetID = $this->createTestEntity('PriceSet', [
-      'is_quick_config' => 0,
-      'extends' => 'CiviMember',
-      'financial_type_id' => 1,
-      'title' => 'my Page',
-      'name' => 'member_not_quick_config',
-    ])['id'];
+  public function createPriceSetWithPage(): void {
+    try {
+      $membershipTypeID = $this->createTestEntity('MembershipType', [
+        'name' => 'Special',
+        'member_of_contact_id' => CRM_Core_BAO_Domain::getDomain()->contact_id,
+        'financial_type_id:name' => 'Member Dues',
+        'duration_unit' => 'year',
+        'period_type:name' => 'rolling',
+      ], 'special')['id'];
+      $contributionPageID = $this->createTestEntity('ContributionPage', [
+        'title' => 'Test Contribution Page',
+        'financial_type_id' => 1,
+        'currency' => 'NZD',
+        'goal_amount' => 50,
+        'is_pay_later' => 1,
+        'is_monetary' => TRUE,
+        'is_email_receipt' => FALSE,
+      ])['id'];
+      $priceSetID = $this->createTestEntity('PriceSet', [
+        'is_quick_config' => 0,
+        'extends' => 'CiviMember',
+        'financial_type_id' => 1,
+        'title' => 'my Page',
+        'name' => 'member_not_quick_config',
+      ])['id'];
 
-    CRM_Price_BAO_PriceSet::addTo('civicrm_contribution_page', $contributionPageID, $priceSetID);
-    $priceField = $this->callAPISuccess('price_field', 'create', [
-      'price_set_id' => $priceSetID,
-      'label' => 'Goat Breed',
-      'html_type' => 'Radio',
-    ]);
-    $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', [
-      'price_set_id' => $priceSetID,
-      'price_field_id' => $priceField['id'],
-      'label' => 'Long Haired Goat',
-      'amount' => 20,
-      'financial_type_id' => 'Donation',
-      'membership_type_id' => $membershipTypeID,
-      'membership_num_terms' => 1,
-    ]);
-    $this->_ids['price_field_value'] = [$priceFieldValue['id']];
-    $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', [
-      'price_set_id' => $priceSetID,
-      'price_field_id' => $priceField['id'],
-      'label' => 'Shoe-eating Goat',
-      'amount' => 10,
-      'financial_type_id' => 'Donation',
-      'membership_type_id' => $membershipTypeID,
-      'membership_num_terms' => 2,
-    ]);
-    $this->_ids['price_field_value'][] = $priceFieldValue['id'];
+      $this->createTestEntity('PriceSetEntity', ['entity_table' => 'civicrm_contribution_page', 'entity_id' => $contributionPageID, 'price_set_id' => $priceSetID]);
+      $priceField = $this->createTestEntity('PriceField', [
+        'price_set_id' => $priceSetID,
+        'label' => 'Goat Breed',
+        'html_type' => 'Radio',
+        'name' => 'goat_breed',
+      ]);
+      $addOnPriceField = $this->createTestEntity('PriceField', [
+        'price_set_id' => $priceSetID,
+        'label' => 'Goat Addons',
+        'html_type' => 'CheckBox',
+        'name' => 'goat_addons',
+      ], 'addon');
+      $this->createTestEntity('PriceFieldValue', [
+        'price_set_id' => $priceSetID,
+        'price_field_id' => $priceField['id'],
+        'label' => 'Long Haired Goat',
+        'amount' => 20,
+        'financial_type_id:name' => 'Donation',
+        'membership_type_id' => $membershipTypeID,
+        'membership_num_terms' => 1,
+      ], 'one_term_membership');
+      $this->createTestEntity('PriceFieldValue', [
+        'price_set_id' => $priceSetID,
+        'price_field_id' => $priceField['id'],
+        'label' => 'Shoe-eating Goat',
+        'amount' => 10,
+        'financial_type_id:name' => 'Donation',
+        'membership_type_id' => $membershipTypeID,
+        'membership_num_terms' => 2,
+      ], 'two_term_membership');
 
-    $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', [
-      'price_set_id' => $priceSetID,
-      'price_field_id' => $priceField['id'],
-      'label' => 'Shoe-eating Goat',
-      'amount' => 10,
-      'financial_type_id' => 'Donation',
-    ]);
-    MembershipBlock::create(FALSE)->setValues([
-      'entity_id' => $contributionPageID,
-      'entity_table' => 'civicrm_contribution_page',
-      'is_separate_payment' => FALSE,
-    ])->execute();
-    $this->_ids['price_field_value']['cont'] = $priceFieldValue['id'];
-
-    $this->_ids['contribution_page'] = $contributionPageID;
-    $this->_ids['price_field'] = [$priceField['id']];
+      $this->createTestEntity('PriceFieldValue', [
+        'price_set_id' => $priceSetID,
+        'price_field_id' => $priceField['id'],
+        'label' => 'Shoe-eating Goat',
+        'amount' => 10,
+        'financial_type_id:name' => 'Donation',
+      ], 'donation');
+      $this->createTestEntity('MembershipBlock', [
+        'entity_id' => $contributionPageID,
+        'entity_table' => 'civicrm_contribution_page',
+        'is_separate_payment' => FALSE,
+      ]);
+      $this->createTestEntity('PriceFieldValue', [
+        'price_set_id' => $priceSetID,
+        'price_field_id' => $addOnPriceField['id'],
+        'label' => 'Straw',
+        'amount' => 5,
+        'financial_type_id:name' => 'Donation',
+      ], 'straw');
+      $this->createTestEntity('PriceFieldValue', [
+        'price_set_id' => $priceSetID,
+        'price_field_id' => $addOnPriceField['id'],
+        'label' => 'Feed',
+        'amount' => 30,
+        'financial_type_id:name' => 'Donation',
+      ], 'feed');
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->fail($e->getMessage());
+    }
   }
 
   /**
@@ -3340,10 +3385,11 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    */
   protected function getParticipantOrderParams(): array {
     $this->eventCreatePaid();
+    $contactID = $this->individualCreate();
     return [
       'total_amount' => 300,
       'currency' => 'USD',
-      'contact_id' => $this->individualCreate(),
+      'contact_id' => $contactID,
       'financial_type_id' => 4,
       'line_items' => [
         [
@@ -3383,7 +3429,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
             'role_id' => 1,
             'status_id' => 14,
             'fee_currency' => 'USD',
-            'contact_id' => $this->individualCreate(),
+            'contact_id' => $contactID,
           ],
         ],
       ],
@@ -3426,6 +3472,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $payments = $this->callAPISuccess('Payment', 'get', [
       'return' => ['total_amount', 'tax_amount'],
       'options' => ['limit' => 0],
+      'version' => 3,
     ])['values'];
     $this->validatePayments($payments);
   }
@@ -3475,14 +3522,15 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   /**
    * @return array|int
    */
-  protected function createRuleGroup() {
-    return $this->callAPISuccess('RuleGroup', 'create', [
+  protected function createRuleGroup(): array {
+    return $this->createTestEntity('DedupeRuleGroup', [
       'contact_type' => 'Individual',
       'threshold' => 8,
       'used' => 'General',
       'title' => 'TestRule',
       'is_reserved' => 0,
-    ]);
+      'name' => 'TestRule',
+    ], 'individual_general');
   }
 
   /**

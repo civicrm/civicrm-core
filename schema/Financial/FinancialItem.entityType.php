@@ -39,9 +39,6 @@ return [
       'input_type' => 'Number',
       'required' => TRUE,
       'add' => '4.3',
-      'input_attrs' => [
-        'maxlength' => 10,
-      ],
       'primary_key' => TRUE,
       'auto_increment' => TRUE,
     ],
@@ -87,9 +84,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Human readable description of this item, to ease display without lookup of source item.'),
       'add' => '4.3',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'amount' => [
       'title' => ts('Amount'),
@@ -109,15 +103,13 @@ return [
       'usage' => [
         'export',
       ],
-      'input_attrs' => [
-        'maxlength' => 3,
-      ],
       'pseudoconstant' => [
         'table' => 'civicrm_currency',
         'key_column' => 'name',
         'label_column' => 'full_name',
         'name_column' => 'name',
         'abbr_column' => 'symbol',
+        'description_column' => 'IFNULL(CONCAT(name, " (", symbol, ")"), name)',
       ],
     ],
     'financial_account_id' => [
@@ -158,11 +150,8 @@ return [
       'input_type' => 'Select',
       'description' => ts('May contain civicrm_line_item, civicrm_financial_trxn etc'),
       'add' => '4.3',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Financial_BAO_FinancialItem::entityTables',
+        'callback' => ['CRM_Financial_BAO_FinancialItem', 'entityTables'],
       ],
     ],
     'entity_id' => [

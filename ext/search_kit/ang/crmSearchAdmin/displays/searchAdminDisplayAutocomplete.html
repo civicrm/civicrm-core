@@ -1,4 +1,7 @@
-
+<div class="form-inline">
+  <label for="crm-search-admin-display-label">{{:: ts('Label') }} <span class="crm-marker">*</span></label>
+  <input id="crm-search-admin-display-label" type="text" class="form-control" ng-model="$ctrl.display.label" required placeholder="{{:: ts('Untitled') }}"/>
+</div>
 <fieldset ng-include="'~/crmSearchAdmin/crmSearchAdminDisplaySort.html'"></fieldset>
 
 <fieldset class="crm-search-admin-edit-columns-wrapper">

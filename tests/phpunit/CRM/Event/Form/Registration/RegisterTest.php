@@ -65,7 +65,7 @@ class CRM_Event_Form_Registration_RegisterTest extends CiviUnitTestCase {
     // Add someone to the waitlist.
     $waitlistContact = $this->individualCreate();
 
-    $this->participantCreate(['event_id' => $event['id'], 'contact_id' => $waitlistContact, 'status_id' => 'On waitlist']);
+    $this->participantCreate(['event_id' => $event['id'], 'contact_id' => $waitlistContact, 'status_id.name' => 'On waitlist']);
 
     // We should now have two participants.
     $this->callAPISuccessGetCount('Participant', ['event_id' => $event['id']], 2);

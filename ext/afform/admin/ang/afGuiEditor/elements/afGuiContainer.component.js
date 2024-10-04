@@ -117,7 +117,7 @@
       };
 
       $scope.isRepeatable = function() {
-        return ctrl.join ||
+        return (ctrl.join && $scope.getRepeatMax() !== 1) ||
           (block.directive && afGui.meta.blocks[block.directive].repeat) ||
           (ctrl.node['af-fieldset'] && ctrl.editor.getEntityDefn(ctrl.editor.getEntity(ctrl.node['af-fieldset'])) !== false);
       };

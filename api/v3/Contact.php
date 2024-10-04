@@ -69,7 +69,7 @@ function civicrm_api3_contact_create($params) {
   }
 
   if (!empty($params['home_url'])) {
-    $websiteTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id');
+    $websiteTypes = CRM_Core_DAO_Website::buildOptions('website_type_id');
     $params['website'] = [
       1 => [
         'website_type_id' => key($websiteTypes),

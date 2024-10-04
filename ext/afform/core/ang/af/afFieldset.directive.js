@@ -13,8 +13,9 @@
         self.afFormCtrl = ctrls[1];
       },
       controller: function($scope, $element) {
-        var ctrl = this,
-          localData = [];
+        let ctrl = this;
+        let localData = [];
+        let joinOffsets = {};
 
         this.getData = function() {
           return ctrl.afFormCtrl ? ctrl.afFormCtrl.getData(ctrl.modelName) : localData;
@@ -40,6 +41,11 @@
         };
         this.getFormName = function() {
           return ctrl.afFormCtrl ? ctrl.afFormCtrl.getFormMeta().name : $scope.meta.name;
+        };
+
+        this.getJoinOffset = function(joinEntity) {
+          joinOffsets[joinEntity] = joinEntity in joinOffsets ? joinOffsets[joinEntity] + 1 : 0;
+          return joinOffsets[joinEntity];
         };
 
         // If `storeValue` setting is enabled, field values are cached in localStorage

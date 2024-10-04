@@ -1184,7 +1184,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
         'addressee' => '2',
         'addressee_other' => 'random string {contact.display_name}',
         'mergeOption' => '1',
-        'additional_group' => '',
         'mapping' => '',
       ],
     ]);
@@ -2373,7 +2372,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    */
   protected function getContributeHeaderDefinition(): array {
     return [
-      82 => 'Financial Type',
+      82 => 'Financial Type Label',
       83 => 'Contribution Source',
       84 => 'Contribution Date',
       85 => 'Thank-you Date',

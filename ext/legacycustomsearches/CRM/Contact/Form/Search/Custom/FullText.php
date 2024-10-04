@@ -304,6 +304,8 @@ WHERE      t.table_name = 'Activity' AND
     $form->applyFilter('__ALL__', 'trim');
     $form->add('text', 'text', ts('Find'), NULL, TRUE);
 
+    $form->assign('hasAllACLs', CRM_Core_Permission::giveMeAllACLs());
+
     // also add a select box to allow the search to be constrained
     $tables = ['' => ts('All tables')];
     /** @var CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery $partialQuery */

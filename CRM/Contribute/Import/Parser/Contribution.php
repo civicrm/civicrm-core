@@ -144,7 +144,10 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         continue;
       }
       $fieldSpec = $this->getFieldMetadata($mappedField['name']);
-      $fieldValue = $values[$i];
+      $columnHeader = $this->getUserJob()['metadata']['DataSource']['column_headers'][$i] ?? '';
+      // If there is no column header we are dealing with an added value mapping, do not use
+      // the database value as it will be for (e.g.) `_status`
+      $fieldValue = $columnHeader ? $values[$i] : '';
       if ($fieldValue === '' && isset($mappedField['default_value'])) {
         $fieldValue = $mappedField['default_value'];
       }
@@ -320,13 +323,12 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    */
   public function getImportEntities() : array {
     $softCreditTypes = ContributionSoft::getFields(FALSE)
-      ->setLoadOptions(['id', 'name', 'label', 'description', 'is_default'])
+      ->setLoadOptions(['id', 'name', 'label', 'description'])
       ->addWhere('name', '=', 'soft_credit_type_id')
-      ->selectRowCount()
       ->addSelect('options')->execute()->first()['options'];
-    $defaultSoftCreditTypeID = NULL;
+    $defaultSoftCreditTypeID = CRM_Core_OptionGroup::getDefaultValue('soft_credit_type');
     foreach ($softCreditTypes as &$softCreditType) {
-      if (empty($defaultSoftCreditTypeID) || $softCreditType['is_default']) {
+      if (empty($defaultSoftCreditTypeID)) {
         $defaultSoftCreditTypeID = $softCreditType['id'];
       }
       $softCreditType['text'] = $softCreditType['label'];

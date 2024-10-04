@@ -6,10 +6,7 @@ if (!defined('CIVICRM_HIBP_URL')) {
 }
 
 require_once 'standaloneusers.civix.php';
-// phpcs:disable
 use CRM_Standaloneusers_ExtensionUtil as E;
-// phpcs:enable
-
 
 function standaloneusers_civicrm_alterBundle(CRM_Core_Resources_Bundle $bundle) {
   if ($bundle->name !== 'coreResources') {
@@ -87,4 +84,13 @@ function standaloneusers_civicrm_permission(&$permissions) {
   $permissions['cms:view user account'] = [
     'label' => E::ts('CiviCRM Standalone Users: View user accounts'),
   ];
+}
+
+function standaloneusers_civicrm_navigationMenu(&$menu) {
+  _standaloneusers_civix_insert_navigation_menu($menu, 'Administer/Users and Permissions', [
+    'label' => E::ts('Login settings'),
+    'name' => 'standaloneusers_mfa',
+    'url' => 'civicrm/admin/setting/standaloneusers?reset=1',
+    'permission' => 'cms:administer users',
+  ]);
 }

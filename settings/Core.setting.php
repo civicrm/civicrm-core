@@ -36,6 +36,7 @@ return [
     'description' => ts("Select the tabs that should be displayed when viewing a contact record. EXAMPLE: If your organization does not keep track of 'Relationships', then un-check this option to simplify the screen display. Tabs for Contributions, Pledges, Memberships, Events, Grants and Cases are also hidden if the corresponding component is not enabled. Go to Administer > System Settings > Enable Components to modify the components which are available for your site."),
     'help_text' => NULL,
     'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND,
+    'settings_pages' => ['display' => ['weight' => 100]],
   ],
   'contact_edit_options' => [
     'group_name' => 'CiviCRM Preferences',
@@ -54,6 +55,7 @@ return [
     'description' => ts('Select the sections that should be included when adding or editing a contact record. EXAMPLE: If your organization does not record Gender and Birth Date for individuals, then simplify the form by un-checking this option. Drag interface allows you to change the order of the panes displayed on contact add/edit screen.'),
     'help_text' => NULL,
     'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND,
+    'settings_pages' => ['display' => ['weight' => 140]],
   ],
   'advanced_search_options' => [
     'group_name' => 'CiviCRM Preferences',
@@ -71,6 +73,7 @@ return [
     'is_contact' => 0,
     'description' => ts('Select the sections that should be included in the Basic and Advanced Search forms. EXAMPLE: If you don\'t track Relationships - then you do not need this section included in the advanced search form. Simplify the form by un-checking this option.'),
     'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND,
+    'settings_pages' => ['display' => ['weight' => 160]],
   ],
   'user_dashboard_options' => [
     'group_name' => 'CiviCRM Preferences',
@@ -89,6 +92,7 @@ return [
     'description' => ts('Select the sections that should be included in the Contact Dashboard. EXAMPLE: If you don\'t want constituents to view their own contribution history, un-check that option.'),
     'help_text' => NULL,
     'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND,
+    'settings_pages' => ['display' => ['weight' => 420]],
   ],
   'address_options' => [
     'group_name' => 'CiviCRM Preferences',
@@ -148,6 +152,7 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => ts('Display name format for individual contact display names.'),
+    'settings_pages' => ['display' => ['weight' => 700]],
   ],
   'sort_name_format' => [
     'group_name' => 'CiviCRM Preferences',
@@ -161,6 +166,7 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => ts('Sort name format for individual contact display names.'),
+    'settings_pages' => ['display' => ['weight' => 720]],
   ],
   'remote_profile_submissions' => [
     'group_name' => 'CiviCRM Preferences',
@@ -200,7 +206,7 @@ return [
     'html_type' => 'select',
     'default' => 'CKEditor',
     'add' => '4.1',
-    'title' => ts('Wysiwig Editor'),
+    'title' => ts('Wysiwyg Editor'),
     'pseudoconstant' => [
       'optionGroupName' => 'wysiwyg_editor',
       'keyColumn' => 'name',
@@ -208,7 +214,8 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => NULL,
-    'help_text' => NULL,
+    'help_text' => ts('Choose which rich-text editor to use for editing HTML content in CiviCRM.'),
+    'settings_pages' => ['display' => ['weight' => 500]],
   ],
   'contact_ajax_check_similar' => [
     'group_name' => 'CiviCRM Preferences',
@@ -224,6 +231,7 @@ return [
     'description' => NULL,
     'help_text' => NULL,
     'options' => ['1' => ts('While Typing'), '0' => ts('When Saving'), '2' => ts('Never')],
+    'settings_pages' => ['display' => ['weight' => 200]],
   ],
   'ajaxPopupsEnabled' => [
     'group_name' => 'CiviCRM Preferences',
@@ -236,8 +244,9 @@ return [
     'title' => ts('Enable Popup Forms'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => NULL,
+    'description' => ts('If you disable this option, the CiviCRM interface will be limited to traditional browsing. Opening a form will refresh the page rather than opening a popup dialog.'),
     'help_text' => NULL,
+    'settings_pages' => ['display' => ['weight' => 600]],
   ],
   'enableBackgroundQueue' => [
     'group_name' => 'CiviCRM Preferences',
@@ -286,8 +295,9 @@ return [
     'title' => ts('Notify Activity Assignees'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => NULL,
+    'description' => ts('When enabled, contacts who are assigned activities will automatically receive an email notification with a copy of the activity.'),
     'help_text' => NULL,
+    'settings_pages' => ['display' => ['weight' => 300]],
   ],
   'activity_assignee_notification_ics' => [
     'group_name' => 'CiviCRM Preferences',
@@ -300,8 +310,9 @@ return [
     'title' => ts('Include ICal Invite to Activity Assignees'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => NULL,
+    'description' => ts('When enabled, activity assignee notification emails will also include an ical meeting invite.'),
     'help_text' => NULL,
+    'settings_pages' => ['display' => ['weight' => 340]],
   ],
   'contact_autocomplete_options' => [
     'group_name' => 'CiviCRM Preferences',
@@ -359,6 +370,7 @@ return [
     'pseudoconstant' => [
       'optionGroupName' => 'contact_smart_group_display',
     ],
+    'settings_pages' => ['display' => ['weight' => 120]],
   ],
   'smart_group_cache_refresh_mode' => [
     'group_name' => 'CiviCRM Preferences',
@@ -393,21 +405,6 @@ return [
     ],
     'description' => ts('Should the acl cache be flushed by cron jobs or user actions'),
     'help_text' => ts('In "Opportunistic Flush" mode, caches are flushed in response to user actions; this mode is broadly compatible but may add latency during form-submissions. In "Cron Flush" mode, you should schedule a cron job to flush caches if your site uses ACLs; this can improve latency on form-submissions but requires more setup.'),
-  ],
-  'installed' => [
-    'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
-    'group_name' => 'CiviCRM Preferences',
-    'group' => 'core',
-    'name' => 'installed',
-    'type' => 'Boolean',
-    'quick_form_type' => 'YesNo',
-    'default' => FALSE,
-    'add' => '4.7',
-    'title' => ts('System Installed'),
-    'is_domain' => 1,
-    'is_contact' => 0,
-    'description' => ts('A flag indicating whether this system has run a post-installation routine'),
-    'help_text' => NULL,
   ],
   'max_attachments' => [
     'group_name' => 'CiviCRM Preferences',
@@ -542,7 +539,7 @@ return [
     'description' => ts('When generating a letter (PDF/Word) via mail-merge, how should the letter be recorded?'),
     'help_text' => NULL,
     'pseudoconstant' => [
-      'callback' => 'CRM_Contact_Form_Task_PDFLetterCommon::getLoggingOptions',
+      'callback' => 'CRM_Core_SelectValues::getPDFLoggingOptions',
     ],
   ],
   'dompdf_font_dir' => [
@@ -802,31 +799,6 @@ return [
     'is_contact' => 0,
     'description' => ts("If enabled, contacts with the permission to edit a related contact will inherit that contact's permission to edit other related contacts"),
     'help_text' => NULL,
-  ],
-  'enable_components' => [
-    'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
-    'group_name' => 'CiviCRM Preferences',
-    'group' => 'core',
-    'name' => 'enable_components',
-    'type' => 'Array',
-    'html_type' => 'checkboxes',
-    'default' => NULL,
-    'add' => '4.4',
-    'title' => ts('Enable Components'),
-    'is_domain' => 0,
-    'is_contact' => 0,
-    'description' => NULL,
-    'help_text' => NULL,
-    'on_change' => [
-      'CRM_Case_Info::onToggleComponents',
-      'CRM_Core_Component::preToggleComponents',
-    ],
-    'post_change' => [
-      'CRM_Core_Component::postToggleComponents',
-    ],
-    'pseudoconstant' => [
-      'callback' => 'CRM_Core_SelectValues::getComponentSelectValues',
-    ],
   ],
   'disable_core_css' => [
     'group_name' => 'CiviCRM Preferences',
@@ -1089,6 +1061,7 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => ts('When enabled, any filter settings a user selects on the contact\'s Activity tab will be remembered as they visit other contacts.'),
+    'settings_pages' => ['display' => ['weight' => 400]],
   ],
   'do_not_notify_assignees_for' => [
     'group_name' => 'CiviCRM Preferences',
@@ -1110,6 +1083,7 @@ return [
       'optionGroupName' => 'activity_type',
     ],
     'quick_form_type' => 'Select',
+    'settings_pages' => ['display' => ['weight' => 320]],
   ],
   'menubar_position' => [
     'group_name' => 'CiviCRM Preferences',
@@ -1130,6 +1104,7 @@ return [
       'above-crm-container' => ts('Above content area'),
       'none' => ts('None - disable menu'),
     ],
+    'settings_pages' => ['display' => ['weight' => 800]],
   ],
   'menubar_color' => [
     'group_name' => 'CiviCRM Preferences',
@@ -1145,6 +1120,7 @@ return [
     'description' => ts('Color of the CiviCRM main menu.'),
     'help_text' => NULL,
     'validate_callback' => 'CRM_Utils_Color::normalize',
+    'settings_pages' => ['display' => ['weight' => 820]],
   ],
   'requestableMimeTypes' => [
     'group_name' => 'CiviCRM Preferences',
@@ -1179,7 +1155,11 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => ts('Theme to use on frontend pages'),
-    'help_text' => NULL,
+    'help_text' => implode('\n', [
+      ts('The theme system allows you to change CiviCRM\'s appearance by replacing important CSS files.'),
+      ts('On WordPress, Joomla, or a similar CMS, the frontend theme determines the appearance on user-facing screens, such as the "Event Registration" screen.'),
+    ]),
+    'settings_pages' => ['display' => ['weight' => 920]],
   ],
   'theme_backend' => [
     'group_name' => 'CiviCRM Preferences',
@@ -1200,7 +1180,11 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => ts('Theme to use on backend pages'),
-    'help_text' => NULL,
+    'help_text' => implode('\n', [
+      ts('The theme system allows you to change CiviCRM\'s appearance by replacing important CSS files.'),
+      ts('The backend theme determines the appearance on administrative screens, such as the "Manage Event" screen.'),
+    ]),
+    'settings_pages' => ['display' => ['weight' => 900]],
   ],
   'http_timeout' => [
     'group_name' => 'CiviCRM Preferences',

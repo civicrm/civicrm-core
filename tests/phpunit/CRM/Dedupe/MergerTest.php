@@ -1481,9 +1481,6 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
       'civicrm_event' => [
         0 => 'created_id',
       ],
-      'civicrm_event_carts' => [
-        0 => 'user_id',
-      ],
       'civicrm_financial_account' => [
         0 => 'contact_id',
       ],
@@ -1567,6 +1564,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
         0 => 'created_id',
       ],
       'civicrm_saved_search' => ['created_id', 'modified_id'],
+      'civicrm_site_token' => ['created_id', 'modified_id'],
       'civicrm_relationship' => [
         0 => 'contact_id_a',
         1 => 'contact_id_b',
@@ -1729,12 +1727,48 @@ WHERE
   }
 
   /**
+   * Test that merging a contact with a null money custom field can be merged.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testMergeWithNullMoneyCustomField(): void {
+    $customGroupId = $this->createCustomGroup(['name' => 'mycustomgroup']);
+    $customFieldDetails = $this->createMoneyTextCustomField([
+      'custom_group_id' => $customGroupId,
+      'name' => 'mymoney',
+      'label' => 'mymoney',
+      'is_view' => TRUE,
+    ]);
+
+    // Create contact with money value.
+    $contact1 = $this->individualCreate();
+    \Civi\Api4\Contact::update()
+      ->addWhere('id', '=', $contact1)
+      ->addValue('mycustomgroup.mymoney', '42.00')
+      ->execute();
+
+    // Create contact with NULL for the money value.
+    $contact2 = $this->individualCreate();
+
+    // Merge contact2 into contact1, moving the NULL value over.
+    $params = ["move_custom_{$customFieldDetails['id']}" => 'null'];
+    $this->mergeContacts($contact1, $contact2, $params);
+
+    // Test if we get the NULL value.
+    $mymoney = \Civi\Api4\Contact::get()
+      ->addWhere('id', '=', $contact1)
+      ->addSelect('mycustomgroup.mymoney')
+      ->execute()->first()['mycustomgroup.mymoney'];
+    $this->assertEmpty($mymoney, 'Successfully merged NULL money value.');
+  }
+
+  /**
    * Implements hook_civicrm_entityTypes().
    *
    * Declare a callback to hookLinkCallBack function.
    */
   public function hookEntityTypes(&$entityTypes): void {
-    $entityTypes['CRM_Core_DAO_IM']['links_callback'][] = [$this, 'hookLinkCallBack'];
+    $entityTypes['IM']['links_callback'][] = [$this, 'hookLinkCallBack'];
   }
 
   /**

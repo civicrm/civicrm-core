@@ -952,6 +952,7 @@ United States', $tokenProcessor->getRow(0)->render('message'));
       '{domain.state_province_id:label}' => 'Domain (Organization) State',
       '{domain.country_id:label}' => 'Domain (Organization) Country',
       '{domain.empowered_by_civicrm_image_url}' => 'Empowered By CiviCRM Image',
+      '{site.message_header}' => 'Message Header',
     ];
   }
 
@@ -1151,7 +1152,7 @@ United States', $tokenProcessor->getRow(0)->render('message'));
       'event_id' => $this->ids['Event'][0],
       'fee_amount' => 50,
       'fee_level' => 'steep',
-      $this->getCustomFieldName('participant_int') => '99999',
+      $this->getCustomFieldName('participant_int', 4) => '99999',
     ]);
   }
 
@@ -1193,7 +1194,7 @@ Attendees will need to install the [TeleFoo](http://telefoo.example.com) app.';
    *
    * @return \Civi\Token\TokenProcessor
    */
-  protected function getTokenProcessor(array $override): TokenProcessor {
+  protected function getTokenProcessor(array $override = []): TokenProcessor {
     return new TokenProcessor(\Civi::dispatcher(), array_merge([
       'controller' => __CLASS__,
     ], $override));
@@ -1219,6 +1220,23 @@ Attendees will need to install the [TeleFoo](http://telefoo.example.com) app.';
     $tokenProcessor->addMessage('text', $text, 'text/' . ($isHtml ? 'html' : 'plain'));
     $tokenProcessor->evaluate();
     return $tokenProcessor->getRow(0)->render('text');
+  }
+
+  public function testQuotedTokens(): void {
+    $quoteOptions = [
+      '"',
+      '&lquote;',
+      '&rquote;',
+      '&quot;',
+      '&#8221;',
+      '&#8220;',
+      '&#x22;',
+    ];
+    Civi::settings()->set('dateformatFull', '%B %E%f, %Y');
+    foreach ($quoteOptions as $quote) {
+      $date = CRM_Utils_Date::customFormat(date('Y-m-d H:i:s'), '%B %E%f, %Y');
+      $this->assertEquals($date, $this->renderText([], '{domain.now|crmDate:' . $quote . 'Full' . $quote . '}'), 'render with quote type :' . $quote);
+    }
   }
 
 }

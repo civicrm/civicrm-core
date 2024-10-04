@@ -9,6 +9,7 @@ return [
     'title_plural' => ts('Dashboards'),
     'description' => ts('Table to store dashboard.'),
     'add' => '3.1',
+    'label_field' => 'label',
   ],
   'getFields' => fn() => [
     'id' => [
@@ -47,9 +48,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Internal name of dashlet.'),
       'add' => '4.4',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'label' => [
       'title' => ts('Dashlet Title'),
@@ -58,9 +56,6 @@ return [
       'localizable' => TRUE,
       'description' => ts('dashlet title'),
       'add' => '3.1',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'url' => [
       'title' => ts('Dashlet URL'),
@@ -68,9 +63,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('url in case of external dashlet'),
       'add' => '3.1',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'permission' => [
       'title' => ts('Dashlet Permission'),
@@ -79,9 +71,6 @@ return [
       'description' => ts('Permission for the dashlet'),
       'add' => '3.1',
       'serialize' => CRM_Core_DAO::SERIALIZE_COMMA,
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'permission_operator' => [
       'title' => ts('Dashlet Permission Operator'),
@@ -89,11 +78,8 @@ return [
       'input_type' => 'Select',
       'description' => ts('Permission Operator'),
       'add' => '3.1',
-      'input_attrs' => [
-        'maxlength' => 3,
-      ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::andOr',
+        'callback' => ['CRM_Core_SelectValues', 'andOr'],
       ],
     ],
     'fullscreen_url' => [
@@ -102,9 +88,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('fullscreen url for dashlet'),
       'add' => '3.4',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'is_active' => [
       'title' => ts('Is Dashlet Active?'),
@@ -142,9 +125,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Element name of angular directive to invoke (lowercase hyphenated format)'),
       'add' => '5.33',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
   ],
 ];

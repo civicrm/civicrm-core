@@ -9,5 +9,6 @@ return [
   ],
   'css' => ['ang/crmMailingAB.css'],
   'partials' => ['ang/crmMailingAB'],
-  'requires' => ['ngRoute', 'crmUi', 'crmAttachment', 'crmMailing', 'crmD3', 'crmResource'],
+  'requires' => ['ngRoute', 'crmUi', 'crmAttachment', 'crmMailing', 'crmResource'],
+  'bundles' => ['visual'],
 ];

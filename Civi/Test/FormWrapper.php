@@ -432,8 +432,18 @@ class FormWrapper {
    * @throws \CRM_Core_Exception
    */
   public function checkTemplateVariable(string $name, $value): void {
+    $actual = $this->templateVariables[$name];
     if ($this->templateVariables[$name] !== $value) {
-      throw new \CRM_Core_Exception("Template variable $name not set to " . print_r($value, TRUE) . ' actual value: ' . print_r($this->templateVariables[$name], TRUE));
+      $differences = [];
+      if (is_array($value)) {
+        foreach ($value as $key => $expectedItem) {
+          $actualItem = $this->templateVariables[$name][$key];
+          if ($expectedItem !== $actualItem) {
+            $differences[] = $key;
+          }
+        }
+      }
+      throw new \CRM_Core_Exception("Template variable $name expected " . print_r($value, TRUE) . ' actual value: ' . print_r($this->templateVariables[$name], TRUE) . ($differences ? 'differences in ' . implode(',', $differences) : ''));
     }
   }
 

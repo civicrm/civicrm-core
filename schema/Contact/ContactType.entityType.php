@@ -46,7 +46,6 @@ return [
       'add' => '3.1',
       'input_attrs' => [
         'label' => ts('Name'),
-        'maxlength' => 64,
       ],
     ],
     'label' => [
@@ -58,7 +57,6 @@ return [
       'add' => '3.1',
       'input_attrs' => [
         'label' => ts('Label'),
-        'maxlength' => 64,
       ],
     ],
     'description' => [
@@ -79,9 +77,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('URL of image if any.'),
       'add' => '3.1',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'icon' => [
       'title' => ts('Icon'),
@@ -90,9 +85,6 @@ return [
       'description' => ts('crm-i icon class representing this contact type'),
       'add' => '5.49',
       'default' => NULL,
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'parent_id' => [
       'title' => ts('Parent ID'),

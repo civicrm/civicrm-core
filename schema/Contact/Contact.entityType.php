@@ -164,9 +164,6 @@ return [
       'usage' => [
         'export',
       ],
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
       'pseudoconstant' => [
         'table' => 'civicrm_contact_type',
         'key_column' => 'name',
@@ -189,7 +186,6 @@ return [
       'input_attrs' => [
         'size' => '8',
         'label' => ts('External Identifier'),
-        'maxlength' => 64,
       ],
     ],
     'display_name' => [
@@ -204,7 +200,6 @@ return [
       ],
       'input_attrs' => [
         'size' => '30',
-        'maxlength' => 128,
       ],
     ],
     'organization_name' => [
@@ -222,7 +217,6 @@ return [
       'input_attrs' => [
         'size' => '30',
         'label' => ts('Organization Name'),
-        'maxlength' => 128,
       ],
     ],
     'contact_sub_type' => [
@@ -238,9 +232,8 @@ return [
         'duplicate_matching',
       ],
       'input_attrs' => [
-        'multiple' => '1',
+        'multiple' => TRUE,
         'control_field' => 'contact_type',
-        'maxlength' => 255,
       ],
       'pseudoconstant' => [
         'table' => 'civicrm_contact_type',
@@ -248,6 +241,7 @@ return [
         'label_column' => 'label',
         'icon_column' => 'icon',
         'condition' => 'parent_id IS NOT NULL',
+        'condition_provider' => ['CRM_Contact_BAO_Contact', 'alterContactSubType'],
       ],
     ],
     'first_name' => [
@@ -265,7 +259,6 @@ return [
       'input_attrs' => [
         'size' => '30',
         'label' => ts('First Name'),
-        'maxlength' => 64,
       ],
     ],
     'middle_name' => [
@@ -283,7 +276,6 @@ return [
       'input_attrs' => [
         'size' => '30',
         'label' => ts('Middle Name'),
-        'maxlength' => 64,
       ],
     ],
     'last_name' => [
@@ -301,7 +293,6 @@ return [
       'input_attrs' => [
         'size' => '30',
         'label' => ts('Last Name'),
-        'maxlength' => 64,
       ],
     ],
     'do_not_email' => [
@@ -414,7 +405,6 @@ return [
       ],
       'input_attrs' => [
         'label' => ts('Legal Identifier'),
-        'maxlength' => 32,
       ],
     ],
     'sort_name' => [
@@ -425,11 +415,11 @@ return [
       'description' => ts('Name used for sorting different contact types'),
       'add' => '1.1',
       'usage' => [
+        'duplicate_matching',
         'export',
       ],
       'input_attrs' => [
         'size' => '30',
-        'maxlength' => 128,
       ],
     ],
     'nick_name' => [
@@ -445,7 +435,6 @@ return [
       ],
       'input_attrs' => [
         'size' => '30',
-        'maxlength' => 128,
       ],
     ],
     'legal_name' => [
@@ -463,7 +452,6 @@ return [
       'input_attrs' => [
         'size' => '30',
         'label' => ts('Legal Name'),
-        'maxlength' => 128,
       ],
     ],
     'image_URL' => [
@@ -495,8 +483,7 @@ return [
         'duplicate_matching',
       ],
       'input_attrs' => [
-        'multiple' => '1',
-        'maxlength' => 255,
+        'multiple' => TRUE,
       ],
       'pseudoconstant' => [
         'option_group_name' => 'preferred_communication_method',
@@ -513,9 +500,6 @@ return [
         'export',
         'duplicate_matching',
       ],
-      'input_attrs' => [
-        'maxlength' => 5,
-      ],
       'pseudoconstant' => [
         'option_group_name' => 'languages',
         'key_column' => 'name',
@@ -530,9 +514,6 @@ return [
       'add' => '1.1',
       'usage' => [
         'export',
-      ],
-      'input_attrs' => [
-        'maxlength' => 32,
       ],
     ],
     'api_key' => [
@@ -550,7 +531,6 @@ return [
       ],
       'input_attrs' => [
         'label' => ts('API KEY'),
-        'maxlength' => 32,
       ],
     ],
     'source' => [
@@ -567,7 +547,6 @@ return [
       ],
       'input_attrs' => [
         'size' => '30',
-        'maxlength' => 255,
       ],
     ],
     'prefix_id' => [
@@ -616,7 +595,6 @@ return [
       ],
       'input_attrs' => [
         'label' => ts('Formal Title'),
-        'maxlength' => 64,
       ],
     ],
     'communication_style_id' => [
@@ -659,7 +637,6 @@ return [
       ],
       'input_attrs' => [
         'label' => ts('Email Greeting Custom'),
-        'maxlength' => 128,
       ],
     ],
     'email_greeting_display' => [
@@ -669,9 +646,6 @@ return [
       'readonly' => TRUE,
       'description' => ts('Cache Email Greeting.'),
       'add' => '3.0',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'postal_greeting_id' => [
       'title' => ts('Postal Greeting ID'),
@@ -698,7 +672,6 @@ return [
       ],
       'input_attrs' => [
         'label' => ts('Postal Greeting Custom'),
-        'maxlength' => 128,
       ],
     ],
     'postal_greeting_display' => [
@@ -708,9 +681,6 @@ return [
       'readonly' => TRUE,
       'description' => ts('Cache Postal greeting.'),
       'add' => '3.0',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'addressee_id' => [
       'title' => ts('Addressee ID'),
@@ -737,7 +707,6 @@ return [
       ],
       'input_attrs' => [
         'label' => ts('Addressee Custom'),
-        'maxlength' => 128,
       ],
     ],
     'addressee_display' => [
@@ -747,9 +716,6 @@ return [
       'readonly' => TRUE,
       'description' => ts('Cache Addressee.'),
       'add' => '3.0',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'job_title' => [
       'title' => ts('Job Title'),
@@ -766,7 +732,6 @@ return [
       'input_attrs' => [
         'size' => '30',
         'label' => ts('Job Title'),
-        'maxlength' => 255,
       ],
     ],
     'gender_id' => [
@@ -854,7 +819,6 @@ return [
       'input_attrs' => [
         'size' => '30',
         'label' => ts('Household Name'),
-        'maxlength' => 128,
       ],
     ],
     'primary_contact_id' => [
@@ -888,7 +852,6 @@ return [
       ],
       'input_attrs' => [
         'label' => ts('SIC Code'),
-        'maxlength' => 8,
       ],
     ],
     'user_unique_id' => [
@@ -902,9 +865,6 @@ return [
         'import',
         'export',
         'duplicate_matching',
-      ],
-      'input_attrs' => [
-        'maxlength' => 255,
       ],
     ],
     'employer_id' => [
@@ -920,7 +880,9 @@ return [
       ],
       'input_attrs' => [
         'label' => ts('Current Employer'),
-        'filter' => 'contact_type=Organization',
+        'filter' => [
+          'contact_type' => 'Organization',
+        ],
       ],
       'entity_reference' => [
         'entity' => 'Contact',
@@ -982,10 +944,9 @@ return [
       'default' => 'Both',
       'input_attrs' => [
         'label' => ts('Preferred Mail Format'),
-        'maxlength' => 8,
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::pmf',
+        'callback' => ['CRM_Core_SelectValues', 'pmf'],
       ],
     ],
   ],

@@ -575,7 +575,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       $defaults += $className::setDefaultValues($this);
     }
     if (empty($defaults['priority_id'])) {
-      $priority = CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id');
+      $priority = CRM_Activity_DAO_Activity::buildOptions('priority_id');
       $defaults['priority_id'] = CRM_Core_PseudoConstant::getKey('CRM_Activity_DAO_Activity', 'priority_id', 'Normal');
     }
     if (empty($defaults['status_id'])) {
@@ -660,7 +660,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     // Add engagement level CRM-7775
     $buildEngagementLevel = FALSE;
-    if (CRM_Campaign_BAO_Campaign::isComponentEnabled() &&
+    if (CRM_Core_Component::isEnabled('CiviCampaign') &&
       CRM_Campaign_BAO_Campaign::accessCampaign()
     ) {
       $buildEngagementLevel = TRUE;
@@ -675,7 +675,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     // check for survey activity
     $this->_isSurveyActivity = FALSE;
 
-    if ($this->_activityId && CRM_Campaign_BAO_Campaign::isComponentEnabled() &&
+    if ($this->_activityId && CRM_Core_Component::isEnabled('CiviCampaign') &&
       CRM_Campaign_BAO_Campaign::accessCampaign()
     ) {
 

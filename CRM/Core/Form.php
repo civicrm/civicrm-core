@@ -823,7 +823,15 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $exclude = $this->getFieldsToExcludeFromPurification();
     foreach ($defaults as $index => $default) {
       if (!in_array($index, $exclude, TRUE) && is_string($default) && !is_numeric($default)) {
+        $hasEncodedAmp = str_contains('&amp;', $default);
+        $hasEncodedQuote = str_contains('&quot;', $default);
         $defaults[$index] = CRM_Utils_String::purifyHTML($default);
+        if (!$hasEncodedAmp) {
+          $defaults[$index] = str_replace('&amp;', '&', $defaults[$index]);
+        }
+        if (!$hasEncodedQuote) {
+          $defaults[$index] = str_replace('&quot;', '"', $defaults[$index]);
+        }
       }
     }
     $this->setDefaults($defaults);
@@ -2040,8 +2048,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
       case 'EntityRef':
         // Auto-apply filters from field metadata
-        foreach ($fieldSpec['html']['filter'] ?? [] as $filter) {
-          [$k, $v] = explode('=', $filter);
+        foreach ($fieldSpec['html']['filter'] ?? [] as $k => $v) {
           $props['api']['params'][$k] = $v;
         }
         return $this->addEntityRef($name, $label, $props, $required);
@@ -2901,10 +2908,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * This is like a save point :-). The next status bounce will
    * return the browser to this url unless another is added.
    *
-   * @param string $path
+   * @param string|null $path
    *   Path string e.g. `civicrm/foo/bar?reset=1`, defaults to current path.
    */
-  protected function pushUrlToUserContext(string $path = NULL): void {
+  protected function pushUrlToUserContext(?string $path = NULL): void {
     $url = CRM_Utils_System::url($path ?: CRM_Utils_System::currentPath() . '?reset=1',
       '', FALSE, NULL, FALSE);
     CRM_Core_Session::singleton()->pushUserContext($url);

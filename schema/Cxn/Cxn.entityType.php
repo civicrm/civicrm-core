@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Cxn'),
     'title_plural' => ts('Cxns'),
-    'description' => ts('FIXME'),
+    'description' => ts('Connections - this is no longer used and is not visible in the UI.'),
     'add' => '4.6',
   ],
   'getIndices' => fn() => [
@@ -43,9 +43,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Application GUID'),
       'add' => '4.6',
-      'input_attrs' => [
-        'maxlength' => 128,
-      ],
     ],
     'app_meta' => [
       'title' => ts('Application Metadata (JSON)'),
@@ -60,9 +57,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Connection GUID'),
       'add' => '4.6',
-      'input_attrs' => [
-        'maxlength' => 128,
-      ],
     ],
     'secret' => [
       'title' => ts('Secret'),

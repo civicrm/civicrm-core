@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Token\TokenProcessor;
+
 require_once 'Mail/mime.php';
 
 /**
@@ -194,11 +196,10 @@ class CRM_Mailing_Event_BAO_MailingEventReply extends CRM_Mailing_Event_DAO_Mail
    * @param string $replyto
    *   Optional reply-to from the reply.
    */
-  private static function autoRespond(&$mailing, $queue_id, $replyto) {
+  private static function autoRespond($mailing, $queue_id, $replyto) {
     $eq = CRM_Core_DAO::executeQuery(
       'SELECT
                   email.email as email,
-                  queue.job_id as job_id,
                   queue.hash as hash
         FROM civicrm_contact contact
         INNER JOIN  civicrm_mailing_event_queue queue ON queue.contact_id = contact.id
@@ -213,8 +214,7 @@ class CRM_Mailing_Event_BAO_MailingEventReply extends CRM_Mailing_Event_DAO_Mail
     $component->id = $mailing->reply_id;
     $component->find(TRUE);
 
-    $domain = CRM_Core_BAO_Domain::getDomain();
-    list($domainEmailName, $domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail();
+    [$domainEmailName, $domainEmailAddress] = CRM_Core_BAO_Domain::getNameAndEmail();
 
     $params = [
       'subject' => $component->subject,
@@ -224,28 +224,25 @@ class CRM_Mailing_Event_BAO_MailingEventReply extends CRM_Mailing_Event_DAO_Mail
       'returnPath' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
     ];
 
-    // TODO: do we need reply tokens?
     $html = $component->body_html;
-    if ($component->body_text) {
-      $text = $component->body_text;
+    $text = $component->body_text ?: '';
+
+    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
+      'controller' => __CLASS__,
+      'smarty' => FALSE,
+      'schema' => ['mailingId'],
+    ]);
+
+    $tokenProcessor->addMessage('body_html', $html, 'text/html');
+    $tokenProcessor->addMessage('body_text', $text, 'text/plain');
+    $tokenProcessor->addRow(['mailingId' => $mailing->id]);
+    $tokenProcessor->evaluate();
+    $params['html'] = $tokenProcessor->getRow(0)->render('body_html');
+    if ($text) {
+      $params['text'] = $tokenProcessor->getRow(0)->render('body_text');
     }
-    else {
-      $text = CRM_Utils_String::htmlToText($component->body_html);
-    }
 
-    $bao = new CRM_Mailing_BAO_Mailing();
-    $bao->body_text = $text;
-    $bao->body_html = $html;
-    $tokens = $bao->getTokens();
-
-    $html = CRM_Utils_Token::replaceDomainTokens($html, $domain, TRUE, $tokens['html']);
-    $html = CRM_Utils_Token::replaceMailingTokens($html, $mailing, NULL, $tokens['html']);
-    $text = CRM_Utils_Token::replaceDomainTokens($text, $domain, FALSE, $tokens['text']);
-    $text = CRM_Utils_Token::replaceMailingTokens($text, $mailing, NULL, $tokens['text']);
-    $params['html'] = $html;
-    $params['text'] = $text;
-
-    CRM_Mailing_BAO_Mailing::addMessageIdHeader($params, 'a', $eq->job_id, $queue_id, $eq->hash);
+    CRM_Mailing_BAO_Mailing::addMessageIdHeader($params, 'a', NULL, $queue_id, $eq->hash);
     if (CRM_Core_BAO_MailSettings::includeMessageId()) {
       $params['messageId'] = $params['Message-ID'];
     }

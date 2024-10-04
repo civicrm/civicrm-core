@@ -111,10 +111,10 @@ trait CRM_Upgrade_Incremental_php_TimezoneRevertTrait {
    *
    * But some records may have changed. `convertModifiedEvents()` will address those.
    *
-   * @param \CRM_Queue_TaskContext $ctx
+   * @param \CRM_Queue_TaskContext|null $ctx
    * @return bool
    */
-  public static function revertEventDates(CRM_Queue_TaskContext $ctx = NULL): bool {
+  public static function revertEventDates(?CRM_Queue_TaskContext $ctx = NULL): bool {
     // We only run if the field is timestamp, so don't need to check about that.
 
     // The original 5.47.alpha1 upgrade was executed with SQL helpers in CRM_Utils_File, which use
@@ -153,10 +153,10 @@ trait CRM_Upgrade_Incremental_php_TimezoneRevertTrait {
    * By default, this will borrow the current user (sysadmin)'s timezone as the representative skewTz.
    * This can be overridden with env-var `CIVICRM_TZ_SKEW`.
    *
-   * @param \CRM_Queue_TaskContext $ctx
+   * @param \CRM_Queue_TaskContext|null $ctx
    * @return bool
    */
-  public static function convertModifiedEvents(CRM_Queue_TaskContext $ctx = NULL): bool {
+  public static function convertModifiedEvents(?CRM_Queue_TaskContext $ctx = NULL): bool {
     $skewTz = self::pickSkewTz();
     $mysqlTz = '+0:00';
     $restoreMysqlTz = static::swapTz($mysqlTz);

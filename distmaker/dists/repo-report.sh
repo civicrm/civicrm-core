@@ -1,5 +1,5 @@
 #!/bin/bash
-set -ex
+set -e
 
 P=`dirname $0`
 CFFILE=$P/../distmaker.conf
@@ -14,6 +14,7 @@ fi
 SRC=$DM_SOURCEDIR
 REPORT="$DM_TARGETDIR/civicrm-$DM_VERSION.json"
 
+dm_h1 "Generate repo report"
 env \
   DM_VERSION="$DM_VERSION" \
   DM_SOURCEDIR="$DM_SOURCEDIR" \

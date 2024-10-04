@@ -464,13 +464,16 @@ class CRM_Core_I18n_Schema {
     $columns =& $class::columns();
     $cols = [];
     $tableCols = [];
-    $dao->query("DESCRIBE {$table}", FALSE);
-
+    $db = $dao->_database;
     $lookup_table = $table;
 
     if (substr($table, 0, 4) == 'log_') {
       $lookup_table = substr($table, 4);
+      $dsn = defined('CIVICRM_LOGGING_DSN') ? CRM_Utils_SQL::autoSwitchDSN(CIVICRM_LOGGING_DSN) : CRM_Utils_SQL::autoSwitchDSN(CIVICRM_DSN);
+      $dsn = DB::parseDSN($dsn);
+      $db = $dsn['database'];
     }
+    $dao->query("DESCRIBE `{$db}`.{$table}", FALSE);
 
     while ($dao->fetch()) {
       // view non-internationalized columns directly
@@ -490,7 +493,7 @@ class CRM_Core_I18n_Schema {
         $cols[] = "`{$column}_{$locale}` `{$column}`";
       }
     }
-    return "CREATE OR REPLACE VIEW {$table}_{$locale} AS SELECT " . implode(', ', $cols) . " FROM {$table}";
+    return "CREATE OR REPLACE VIEW `{$db}`.{$table}_{$locale} AS SELECT " . implode(', ', $cols) . " FROM `{$db}`.{$table}";
   }
 
   /**

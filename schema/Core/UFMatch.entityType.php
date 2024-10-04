@@ -87,9 +87,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('UF Name'),
       'add' => '1.9',
-      'input_attrs' => [
-        'maxlength' => 128,
-      ],
     ],
     'contact_id' => [
       'title' => ts('Contact ID'),
@@ -112,9 +109,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('UI language preferred by the given user/contact'),
       'add' => '2.1',
-      'input_attrs' => [
-        'maxlength' => 5,
-      ],
     ],
   ],
 ];

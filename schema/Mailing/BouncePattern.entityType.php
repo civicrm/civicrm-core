@@ -43,9 +43,6 @@ return [
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'description' => ts('A regexp to match a message to a bounce type'),
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
   ],
 ];

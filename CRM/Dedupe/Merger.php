@@ -937,6 +937,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
             $type = CRM_Utils_Array::explodePadded($data['contact_sub_type']);
           }
 
+          $includeViewOnly = TRUE;
           CRM_Core_BAO_CustomField::formatCustomField($customFieldId,
             $data['custom'],
             $value,
@@ -944,45 +945,12 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
             $valueId,
             $contactID,
             FALSE,
-            FALSE
+            FALSE,
+            $includeViewOnly,
           );
         }
-        elseif ($key === 'edit') {
-          CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
-          continue;
-        }
         else {
-          if ($key === 'location') {
-            CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
-            foreach ($value as $locationTypeId => $field) {
-              foreach ($field as $block => $val) {
-                if ($block === 'address' && array_key_exists('address_name', $val)) {
-                  $value[$locationTypeId][$block]['name'] = $value[$locationTypeId][$block]['address_name'];
-                }
-              }
-            }
-          }
-          if ($key === 'phone' && isset($params['phone_ext'])) {
-            CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
-            $data[$key] = $value;
-            foreach ($value as $cnt => $phoneBlock) {
-              if ($params[$key][$cnt]['location_type_id'] == $params['phone_ext'][$cnt]['location_type_id']) {
-                $data[$key][$cnt]['phone_ext'] = CRM_Utils_Array::retrieveValueRecursive($params['phone_ext'][$cnt], 'phone_ext');
-              }
-            }
-          }
-          elseif (in_array($key, ['nick_name', 'job_title', 'middle_name', 'birth_date', 'gender_id', 'current_employer', 'prefix_id', 'suffix_id'])
-            && ($value == '' || !isset($value)) &&
-            ($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0 ||
-            ($key === 'current_employer' && empty($params['current_employer']))) {
-            // CRM-10128: if auth source is not checksum / login && $value is blank, do not fill $data with empty value
-            // to avoid update with empty values
-            CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
-            continue;
-          }
-          else {
-            $data[$key] = $value;
-          }
+          $data[$key] = $value;
         }
       }
     }
@@ -1035,25 +1003,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       // CRM-17556 Get all non-empty fields, to make comparison easier
       if (!empty($main[$validField]) || !empty($other[$validField])) {
         $result['contact'][] = $validField;
-      }
-    }
-
-    $mainEvs = CRM_Core_BAO_CustomValueTable::getEntityValues($main['id']);
-    $otherEvs = CRM_Core_BAO_CustomValueTable::getEntityValues($other['id']);
-    $keys = array_unique(array_merge(array_keys($mainEvs), array_keys($otherEvs)));
-    foreach ($keys as $key) {
-      // Exclude multi-value fields CRM-13836
-      if (strpos($key, '_')) {
-        continue;
-      }
-      $key1 = $mainEvs[$key] ?? NULL;
-      $key2 = $otherEvs[$key] ?? NULL;
-      // We wish to retain '0' as it has a different meaning than NULL on a checkbox.
-      // However I can't think of a case where an empty string is more meaningful than null
-      // or where it would be FALSE or something else nullish.
-      $valuesToIgnore = [NULL, '', []];
-      if (!in_array($key1, $valuesToIgnore, TRUE) || !in_array($key2, $valuesToIgnore, TRUE)) {
-        $result['custom'][] = $key;
       }
     }
     return $result;
@@ -1621,33 +1570,39 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       $mainCustomValues = Contact::get(FALSE)
         ->addWhere('id', '=', $mainID)
         ->addSelect($group['name'] . '.*')
-        ->execute();
+        ->execute()->first();
       $otherCustomValues = Contact::get(FALSE)
         ->addWhere('id', '=', $otherID)
         ->addSelect($group['name'] . '.*')
-        ->execute();
+        ->execute()->first();
       foreach ($group['fields'] as $field) {
         $fid = $field['id'];
         $apiFieldName = "{$group['name']}.{$field['name']}";
-        if (in_array($fid, $compareFields['custom'])) {
+        $mainContactValue = ($mainCustomValues[$apiFieldName] ?? NULL);
+        $otherContactValue = $otherCustomValues[$apiFieldName] ?? NULL;
+        $validEmptyValues = [0, '0', FALSE];
+        // If at least one contact has meaningful data in the field then add it in.
+        if ($mainContactValue || $otherContactValue
+         || in_array($mainContactValue, $validEmptyValues, TRUE)
+         || in_array($otherContactValue, $validEmptyValues, TRUE)
+        ) {
           $rows["custom_group_{$group['id']}"]['title'] ??= $group['title'];
-
-          foreach ($mainCustomValues as $values) {
-            $customValue = $values[$apiFieldName] ?? NULL;
-            $rows["move_custom_$fid"]['main'] = CRM_Core_BAO_CustomField::displayValue($customValue, $fid);
+          $rows["move_custom_$fid"]['main'] = CRM_Core_BAO_CustomField::displayValue($mainContactValue, $fid);
+          $rows["move_custom_$fid"]['other'] = CRM_Core_BAO_CustomField::displayValue($otherContactValue, $fid);
+          // The value assigned to the check box on the quick form is a string that holds the
+          // value to be carried over on submit. It would be a lot simpler if the checkbox
+          // just submitted TRUE or FALSE - but that may be hard to retrofit. The qfKeyBug string
+          // has to be used so that 0 is not treated as 'do not transfer'. One might argue
+          // the bug is in the design not the qfZero... just saying
+          $checkboxValue = in_array($otherContactValue, $validEmptyValues, TRUE) ? $qfZeroBug : $otherContactValue;
+          if (!$checkboxValue) {
+            // if the field does not have meaningful data then we use the word 'null'.
+            // an empty string, an empty array & NULL are all treated as being meaningful
+            // but 0, '0' or FALSE are treated as meaningful.
+            $checkboxValue = 'null';
           }
-          $value = 'null';
-          foreach ($otherCustomValues as $values) {
-            $customValue = $values[$apiFieldName] ?? NULL;
-            $rows["move_custom_$fid"]['other'] = CRM_Core_BAO_CustomField::displayValue($customValue, $fid);
-            if ($customValue === 0 || $customValue === '0' || $customValue === FALSE) {
-              $customValue = $qfZeroBug;
-            }
-            // FIXME: Not changed during refactor but this looks wrong: should be `??` not `?:`
-            $value = $customValue ?: $value;
-          }
-          // FIXME: Underlying code relies on $value to be a string.
-          $value = is_array($value) ? CRM_Utils_Array::implodePadded($value) : (string) $value;
+          // Value could be loaded as an array from the api.
+          $checkboxValue = is_array($checkboxValue) ? CRM_Utils_Array::implodePadded($checkboxValue) : (string) $checkboxValue;
           $rows["move_custom_$fid"]['title'] = $field['label'];
 
           $elements[] = [
@@ -1656,10 +1611,10 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
             2 => NULL,
             3 => NULL,
             4 => NULL,
-            5 => $value,
+            5 => $checkboxValue,
             'is_checked' => (!isset($rows["move_custom_$fid"]['main']) || $rows["move_custom_$fid"]['main'] === ''),
           ];
-          $migrationInfo["move_custom_$fid"] = $value;
+          $migrationInfo["move_custom_$fid"] = $checkboxValue;
         }
       }
     }
@@ -1759,8 +1714,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       $submitted = [];
     }
 
-    // Move view only custom fields CRM-5362
-    $viewOnlyCustomFields = [];
     foreach ($submitted as $key => $value) {
       if (strpos($key, 'custom_') === 0) {
         $fieldID = (int) substr($key, 7);
@@ -1770,17 +1723,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           $isSerialized = $fieldMetadata['serialize'];
           $isView = $fieldMetadata['is_view'];
           $submitted = self::processCustomFields($mainId, $key, $submitted, $value, $fieldID, $isView, $htmlType, $isSerialized);
-          if ($isView) {
-            $viewOnlyCustomFields[$key] = $submitted[$key];
-          }
         }
       }
-    }
-
-    // special case to set values for view only, CRM-5362
-    if (!empty($viewOnlyCustomFields)) {
-      $viewOnlyCustomFields['entityID'] = $mainId;
-      CRM_Core_BAO_CustomValueTable::setValues($viewOnlyCustomFields);
     }
 
     // dev/core#996 Ensure that the earliest created date is stored against the kept contact id

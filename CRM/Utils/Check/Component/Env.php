@@ -594,8 +594,8 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
         $e->getMessage(),
-        ts('Extension download error'),
-        \Psr\Log\LogLevel::ERROR,
+        ts('Unable to get updates to extensions'),
+        \Psr\Log\LogLevel::WARNING,
         'fa-plug'
       );
       return $messages;
@@ -773,7 +773,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       ->addWhere('key', 'LIKE', 'civi_%')
       ->addWhere('status', '=', 'installed')
       ->execute()
-      ->indexBy('key')->column('status');
+      ->column('status', 'key');
     if (empty($setting) || empty($exts)) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,

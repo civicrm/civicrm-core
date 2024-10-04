@@ -54,6 +54,8 @@ class CRM_Contact_Form_Location {
         }
         switch ($blockName) {
           case 'Email':
+            // setDefaults uses this to tell which instance
+            $form->set('Email_Block_Count', $instance);
             CRM_Contact_Form_Edit_Email::buildQuickForm($form, $instance);
             // Only display the signature fields if this contact has a CMS account
             // because they can only send email if they have access to the CRM

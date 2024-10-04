@@ -2234,7 +2234,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $deductible = FinancialType::get(TRUE)
         ->addSelect('is_deductible')
         ->addWhere('id', 'IN', [$toType, $fromType])
-        ->execute()->indexBy('id')->column('is_deductible');
+        ->execute()->column('is_deductible', 'id');
       if ($deductible[$fromType] == FALSE && $deductible[$toType] == TRUE) {
         CRM_Core_Session::setStatus(ts("You've changed the financial type for this %1 contribution from non-tax deductible to tax deductible, but the non-deductible amount of %2 has not been changed. This could prevent a tax receipt from being issued correctly. You may want to edit the non-deductible amount.",
           [1 => Civi::format()->money($submittedValues['total_amount']), 2 => Civi::format()->money($submittedValues['non_deductible_amount'])]),

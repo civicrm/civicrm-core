@@ -164,18 +164,8 @@ class CRM_Core_Page_AJAX {
     if ($session->getStatus(FALSE)) {
       $response['crmMessages'] = $session->getStatus(TRUE);
     }
-    $output = json_encode($response);
-
-    // CRM-11831 @see http://www.malsup.com/jquery/form/#file-upload
-    // COMMENT: Wouldn't the `Accept:` header be more appropriate? Only use `X-Requested-With:` as a
-    // fallback where `Accept:` is missing?
-    if (CRM_Utils_REST::isWebServiceRequest()) {
-      CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
-    }
-    else {
-      $output = "<textarea>$output</textarea>";
-    }
-    echo $output;
+    CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
+    echo json_encode($response);
     CRM_Utils_System::civiExit();
   }
 

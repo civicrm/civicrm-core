@@ -9,6 +9,7 @@ return [
     'title_plural' => ts('SMS Providers'),
     'description' => ts('Table to add different sms providers'),
     'add' => '4.2',
+    'label_field' => 'title',
   ],
   'getPaths' => fn() => [
     'add' => 'civicrm/admin/sms/provider/edit?reset=1&action=add',
@@ -33,9 +34,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Provider internal name points to option_value of option_group sms_provider_name'),
       'add' => '4.2',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'title' => [
       'title' => ts('SMS Provider Title'),
@@ -43,27 +41,18 @@ return [
       'input_type' => 'Text',
       'description' => ts('Provider name visible to user'),
       'add' => '4.2',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'username' => [
       'title' => ts('SMS Provider Username'),
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'add' => '4.2',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'password' => [
       'title' => ts('SMS Provider Password'),
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'add' => '4.2',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'api_type' => [
       'title' => ts('SMS Provider API'),
@@ -81,9 +70,6 @@ return [
       'sql_type' => 'varchar(128)',
       'input_type' => 'Text',
       'add' => '4.2',
-      'input_attrs' => [
-        'maxlength' => 128,
-      ],
     ],
     'api_params' => [
       'title' => ts('SMS Provider API Params'),

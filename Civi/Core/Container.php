@@ -345,6 +345,7 @@ class Container {
       'Civi\Token\TokenCompatSubscriber',
       []
     ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
+
     $container->setDefinition("crm_mailing_action_tokens", new Definition(
       'CRM_Mailing_ActionTokens',
       []
@@ -389,6 +390,16 @@ class Container {
       'CRM_Core_DomainTokens',
       []
     ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
+
+    // For each DAO that supports tokens by declaring the token class...
+    $entities = \CRM_Core_DAO_AllCoreTables::tokenClasses();
+    foreach ($entities as $entity => $class) {
+      $container->setDefinition('crm_entity_token_' . strtolower($entity), new Definition(
+        $class,
+        [$entity]
+      ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
+    }
+
     $container->setDefinition('crm_token_tidy', new Definition(
       '\Civi\Token\TidySubscriber',
       []
@@ -482,8 +493,6 @@ class Container {
     $dispatcher->addListener('hook_civicrm_eventDefs', ['\Civi\Core\Event\SystemInstallEvent', 'hookEventDefs']);
     $dispatcher->addListener('hook_civicrm_buildAsset', ['\Civi\Angular\Page\Modules', 'buildAngularModules']);
     $dispatcher->addListenerService('civi.region.render', ['angularjs.loader', 'onRegionRender']);
-    $dispatcher->addListener('hook_civicrm_buildAsset', ['\CRM_Utils_VisualBundle', 'buildAssetJs']);
-    $dispatcher->addListener('hook_civicrm_buildAsset', ['\CRM_Utils_VisualBundle', 'buildAssetCss']);
     $dispatcher->addListener('hook_civicrm_buildAsset', ['\CRM_Core_Resources', 'renderMenubarStylesheet']);
     $dispatcher->addListener('hook_civicrm_buildAsset', ['\CRM_Core_Resources', 'renderL10nJs']);
     $dispatcher->addListener('hook_civicrm_coreResourceList', ['\CRM_Utils_System', 'appendCoreResources']);
@@ -682,6 +691,7 @@ class Container {
 
     if ($loadFromDB && $runtime->dsn) {
       \CRM_Core_DAO::init($runtime->dsn);
+      $bootServices['settings_manager']->dbAvailable();
       \CRM_Utils_Hook::singleton(TRUE);
       \CRM_Extension_System::singleton(TRUE);
       \CRM_Extension_System::singleton()->getClassLoader()->register();

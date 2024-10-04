@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Pledge Block'),
     'title_plural' => ts('Pledge Blocks'),
-    'description' => ts('FIXME'),
+    'description' => ts('Table containing Pledge blocks'),
     'log' => TRUE,
     'add' => '2.1',
   ],
@@ -37,9 +37,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('physical tablename for entity being joined to pledge, e.g. civicrm_contact'),
       'add' => '2.1',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'entity_id' => [
       'title' => ts('Entity ID'),
@@ -60,9 +57,6 @@ return [
       'description' => ts('Delimited list of supported frequency units'),
       'add' => '2.1',
       'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_TRIMMED,
-      'input_attrs' => [
-        'maxlength' => 128,
-      ],
     ],
     'is_pledge_interval' => [
       'title' => ts('Expose Frequency Interval?'),
@@ -103,9 +97,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('The date the first scheduled pledge occurs.'),
       'add' => '4.7',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'is_pledge_start_date_visible' => [
       'title' => ts('Show Recurring Donation Start Date?'),

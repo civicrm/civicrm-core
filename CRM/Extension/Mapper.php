@@ -73,13 +73,13 @@ class CRM_Extension_Mapper {
   protected $upgraders = [];
 
   /**
-   * @param CRM_Extension_Container_Interface $container
-   * @param CRM_Utils_Cache_Interface $cache
+   * @param CRM_Extension_Container_Interface|null $container
+   * @param CRM_Utils_Cache_Interface|null $cache
    * @param null $cacheKey
    * @param null $civicrmPath
    * @param null $civicrmUrl
    */
-  public function __construct(CRM_Extension_Container_Interface $container, CRM_Utils_Cache_Interface $cache = NULL, $cacheKey = NULL, $civicrmPath = NULL, $civicrmUrl = NULL) {
+  public function __construct(CRM_Extension_Container_Interface $container, ?CRM_Utils_Cache_Interface $cache = NULL, $cacheKey = NULL, $civicrmPath = NULL, $civicrmUrl = NULL) {
     $this->container = $container;
     $this->cache = $cache;
     $this->cacheKey = $cacheKey;

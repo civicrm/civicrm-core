@@ -85,7 +85,6 @@ class CRM_Event_Form_ManageEvent_TabHeader {
       $tabs['reminder'] = ['title' => ts('Schedule Reminders'), 'class' => 'livePage'] + $default;
     }
 
-    $tabs['friend'] = ['title' => ts('Tell a Friend')] + $default;
     $tabs['pcp'] = ['title' => ts('Personal Campaigns')] + $default;
     $tabs['repeat'] = ['title' => ts('Repeat')] + $default;
 

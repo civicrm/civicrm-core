@@ -301,7 +301,12 @@ class SettingsBag {
           break;
       }
     }
-    return ['contribution_invoice_settings' => $contributionSettings];
+    return array_merge(
+        ['contribution_invoice_settings' => $contributionSettings],
+        $this->interpolateDsnSettings('civicrm'),
+        // TODO: provide equivalent component settings for CIVICRM_UF_DSN
+        // $this->interpolateDsnSettings('civicrm_uf')
+    );
   }
 
   /**
@@ -363,6 +368,18 @@ class SettingsBag {
     //}
 
     $metadata = $fields['values'][$name];
+
+    // this should probably be higher in the Setting api layer as well
+    if ($metadata['is_constant'] ?? FALSE) {
+      $error = "{$metadata['title']} is a system constant. It can only be set in civicrm.settings.php";
+
+      if ($metadata['is_env_loadable'] ?? FALSE) {
+        $fqn = $metadata['global_name'] ?? '(ENV VAR NAME MISSING)';
+        $error .= " or using the environment variable {$fqn}";
+      }
+      $error .= ".";
+      throw new \CRM_Core_Exception($error);
+    }
 
     $dao = new \CRM_Core_DAO_Setting();
     $dao->name = $name;
@@ -460,6 +477,104 @@ class SettingsBag {
       'invoicing' => 'invoicing',
     ];
     return $convertedKeys;
+  }
+
+  /**
+   * Compute a missing DSN from its component parts or vice versa
+   *
+   * Note: defaults for civicrm_db_XXX will be used
+   *
+   * @param string $prefix
+   *   The prefix of the DB setting group - ex: 'civicrm' or 'civicrm_uf'
+   *
+   * @return array
+   *   Ex 1:
+   *
+   *   $prefix = 'civicrm'
+   *   civicrm_db_dsn is NOT already set
+   *   civicrm_db_user set to 'james'
+   *   civicrm_db_password set to 'i<3#browns'
+   *
+   *    returns [
+   *     'civicrm_db_dsn' => 'mysql://james:i%3C3%23browns@localhost:3306/civicrm',
+   *   ]
+   *
+   *   Ex 2:
+   *
+   *   $prefix = 'civicrm_uf', civicrm_uf_db_dsn is set to 'mysql://my_user!:pass#word@host.name/db_name'
+   *
+   *    returns [
+   *     'civicrm_uf_db_user' => 'my_user!',
+   *     'civicrm_uf_db_password' => 'pass#word',
+   *     'civicrm_uf_db_host' => 'host.name',
+   *     'civicrm_uf_db_database' => 'db_name',
+   *   ]
+   */
+  protected function interpolateDsnSettings(string $prefix): array {
+    $computed = [];
+
+    $dsn = $this->get($prefix . '_db_dsn');
+
+    if ($dsn) {
+      // if dsn is set explicitly, use this as the source of truth.
+      // set the component parts in case anyone wants to read them individually
+      $urlComponents = \DB::parseDSN($dsn);
+
+      if (!$urlComponents) {
+        // couldn't parse the dsn so we dont set the components
+        // (it could be a socket rather than a url)
+        return [];
+      }
+
+      $componentKeyMap = [
+        'hostspec' => 'host',
+        'database' => 'name',
+        'username' => 'user',
+        'password' => 'password',
+        'port' => 'port',
+      ];
+
+      foreach ($componentKeyMap as $theirKey => $ourKey) {
+        $settingName = $prefix . '_db_' . $ourKey;
+        $value = $urlComponents[$theirKey] ?? NULL;
+
+        if ($value) {
+          $computed[$settingName] = $value;
+        }
+      }
+
+      // for db name we need to parse the path
+      $settingName = $prefix . '_db_name';
+
+      $urlPath = $urlComponents['path'] ?? '';
+      $dbName = trim($urlPath, '/');
+      if ($dbName) {
+        $computed[$settingName] = $dbName;
+      }
+      return $computed;
+    }
+
+    $componentValues = [];
+
+    foreach (['host', 'name', 'user', 'password', 'port'] as $componentKey) {
+      $value = $this->get($prefix . '_db_' . $componentKey);
+      if (!$value) {
+        // if missing a required key to compose the dsn, give up trying to interpolate
+        // (we have defaults for all keys but password, so this is likely to be unset password
+        // (but could be one of the other components has been explicitly nulled))
+        return [];
+      }
+      $componentValues[$componentKey] = urlencode($value);
+    }
+
+    $dsn = "mysql://{$componentValues['user']}:{$componentValues['password']}@{$componentValues['host']}:{$componentValues['port']}/{$componentValues['name']}?new_link=true";
+    $ssl = $this->get($prefix . '_db_ssl');
+    if ($ssl) {
+      $dsn .= '&' . $ssl;
+    }
+    $computed[$prefix . '_db_dsn'] = $dsn;
+
+    return $computed;
   }
 
 }

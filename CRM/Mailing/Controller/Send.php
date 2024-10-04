@@ -53,6 +53,32 @@ class CRM_Mailing_Controller_Send extends CRM_Core_Controller {
         'id' => $clone['id'],
         'name' => ts('Copy of %1', [1 => $clone['values'][$clone['id']]['name']]),
       ]);
+
+      // Remove non active groups from clone
+      $mailingGroups = \Civi\Api4\MailingGroup::get(FALSE)
+        ->addSelect('id', 'group.title', 'group.id')
+        ->addJoin('Group AS group', 'INNER', ['entity_id', '=', 'group.id'], ['group.is_active', '=', FALSE])
+        ->addWhere('mailing_id', '=', $clone['id'])
+        ->execute();
+      $removeGroups = [];
+      foreach ($mailingGroups as $mailingGroup) {
+        // We use the group title to construct HTML for setStatus()
+        $removeGroups[$mailingGroup['id']] = htmlentities($mailingGroup['group.title']);
+      }
+      if (!empty($removeGroups)) {
+        $results = \Civi\Api4\MailingGroup::delete(FALSE)
+          ->addWhere('id', 'IN', array_keys($removeGroups))
+          ->addWhere('mailing_id', '=', $clone['id'])
+          ->execute();
+        CRM_Core_Session::setStatus(
+          ts('Remove %1 disabled group(s) while copying: <ul><li>%2</li></ul>Please check recipients.', [
+            1 => count($removeGroups),
+            2 => implode('</li><li>', $removeGroups),
+          ]),
+          ts('Removed disabled groups')
+        );
+      }
+
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/a/', NULL, TRUE, '/mailing/' . $clone['id']));
     }
   }

@@ -40,12 +40,32 @@ final class EntityProvider {
     return $this->getMetaProvider()->getFields();
   }
 
-  public function getField(string $fieldName): ?array {
-    return $this->getFields()[$fieldName] ?? NULL;
+  public function getCustomFields(array $customGroupFilters = []): array {
+    return $this->getMetaProvider()->getCustomFields($customGroupFilters);
   }
 
-  public function getOptions(string $fieldName, array $values = NULL): ?array {
-    return $this->getMetaProvider()->getOptions($fieldName, $values);
+  public function getSupportedFields(): array {
+    $fields = $this->getMetaProvider()->getFields();
+    if ($this->getMeta('module') === 'civicrm') {
+      // Exclude fields yet not added by pending upgrades
+      $dbVer = \CRM_Core_BAO_Domain::version();
+      $fields = array_filter($fields, function($field) use ($dbVer) {
+        $add = $field['add'] ?? '1.0.0';
+        if (substr_count($add, '.') < 2) {
+          $add .= '.alpha1';
+        }
+        return version_compare($dbVer, $add, '>=');
+      });
+    }
+    return $fields;
+  }
+
+  public function getField(string $fieldName): ?array {
+    return $this->getMetaProvider()->getField($fieldName);
+  }
+
+  public function getOptions(string $fieldName, array $values = [], bool $includeDisabled = FALSE, bool $checkPermissions = FALSE, ?int $userId = NULL): ?array {
+    return $this->getMetaProvider()->getOptions($fieldName, $values, $includeDisabled, $checkPermissions, $userId);
   }
 
   public function writeRecords(array $records): array {

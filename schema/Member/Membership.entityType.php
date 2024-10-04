@@ -149,9 +149,6 @@ return [
         'export',
         'duplicate_matching',
       ],
-      'input_attrs' => [
-        'maxlength' => 128,
-      ],
     ],
     'status_id' => [
       'title' => ts('Status ID'),

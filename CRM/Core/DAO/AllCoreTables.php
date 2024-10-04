@@ -43,7 +43,10 @@ class CRM_Core_DAO_AllCoreTables {
    *   [EntityName => [table => table_name, class => CRM_DAO_ClassName]][]
    */
   public static function getEntities(): array {
-    return EntityRepository::getEntities();
+    $allEntities = EntityRepository::getEntities();
+    // Filter out entities without a table or class
+
+    return array_filter($allEntities, fn($entity) => (!empty($entity['table']) && !empty($entity['class'])));
   }
 
   /**
@@ -88,6 +91,15 @@ class CRM_Core_DAO_AllCoreTables {
    */
   public static function tables() {
     return array_column(self::getEntities(), 'class', 'table');
+  }
+
+  /**
+   * Get the declared token classes.
+   * @return string[]
+   *   [table_name => token class]
+   */
+  public static function tokenClasses() {
+    return array_column(self::getEntities(), 'token_class', 'name');
   }
 
   /**
@@ -157,7 +169,8 @@ class CRM_Core_DAO_AllCoreTables {
    *   [EntityName => CRM_DAO_ClassName]
    */
   public static function daoToClass() {
-    return array_combine(array_keys(self::getEntities()), array_column(self::getEntities(), 'class'));
+    $entities = self::getEntities();
+    return array_combine(array_keys($entities), array_column($entities, 'class'));
   }
 
   /**
@@ -181,12 +194,19 @@ class CRM_Core_DAO_AllCoreTables {
   /**
    * Get the DAO for a BAO class.
    *
-   * @param string $baoName
+   * @param string $className
    *
    * @return string
    */
-  public static function getCanonicalClassName($baoName) {
-    return str_replace('_BAO_', '_DAO_', ($baoName ?? ''));
+  public static function getCanonicalClassName($className) {
+    while (!str_contains($className, '_DAO_')) {
+      $parent = get_parent_class($className);
+      if (!$parent || $parent === 'CRM_Core_DAO') {
+        return $className;
+      }
+      $className = $parent;
+    }
+    return $className;
   }
 
   /**
@@ -338,10 +358,9 @@ class CRM_Core_DAO_AllCoreTables {
   }
 
   /**
-   * @deprecated in 5.72 will be removed in 5.96
+   * @deprecated in 5.72 will be removed in 5.102
    */
   public static function getBriefName($className): ?string {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_DAO_AllCoreTables::getEntityNameForClass');
     return self::getEntityNameForClass((string) $className);
   }
 
@@ -400,7 +419,7 @@ class CRM_Core_DAO_AllCoreTables {
    *   Ex: 'address'.
    * @param bool $prefix
    * @param array $foreignDAOs
-   *   Historically used for... something? Currently never set by any core BAO.
+   *   Will merge in exportable fields from other DAOs.
    * @return array
    * @internal
    */
@@ -418,7 +437,7 @@ class CRM_Core_DAO_AllCoreTables {
       }
     }
 
-    // TODO: Remove this bit; no core DAO actually uses it
+    // Merge in exportable fields from other DAOs
     foreach ($foreignDAOs as $foreignDAO) {
       $exports = array_merge($exports, $foreignDAO::export(TRUE));
     }
@@ -435,8 +454,7 @@ class CRM_Core_DAO_AllCoreTables {
    *   Ex: 'address'.
    * @param bool $prefix
    * @param array $foreignDAOs
-   *   Historically used for... something? Currently never set by any core BAO.
-   * @return array
+   *   Will merge in importable fields from other DAOs.   * @return array
    * @internal
    */
   public static function getImports($dao, $labelName, $prefix, $foreignDAOs = []): array {
@@ -453,7 +471,7 @@ class CRM_Core_DAO_AllCoreTables {
       }
     }
 
-    // TODO: Remove this bit; no core DAO actually uses it
+    // Merge in importable fields from other DAOs
     foreach ($foreignDAOs as $foreignDAO) {
       $imports = array_merge($imports, $foreignDAO::import(TRUE));
     }

@@ -11,13 +11,17 @@
     this.add = null;
     this.fields = null;
 
-    crmApi4(this.entity, 'getFields', {
-      action: 'update',
-      select: ['name', 'label', 'description', 'input_type', 'data_type', 'serialize', 'options', 'fk_entity', 'nullable'],
-      loadOptions: ['id', 'name', 'label', 'description', 'color', 'icon'],
-      where: [['deprecated', '=', false], ["readonly", "=", false]],
-    }).then(function(fields) {
-        ctrl.fields = fields;
+    crmApi4({
+      getFields: [this.entity, 'getFields', {
+        action: 'update',
+        select: ['name', 'label', 'description', 'input_type', 'data_type', 'serialize', 'options', 'fk_entity', 'nullable'],
+        loadOptions: ['id', 'name', 'label', 'description', 'color', 'icon'],
+        where: [['deprecated', '=', false], ["readonly", "=", false]],
+      }],
+      entityInfo: ['Entity', 'get', {select: ['primary_key'], where: [['name', '=', this.entity]]}, 0]
+    }).then(function(results) {
+        ctrl.fields = results.getFields;
+        ctrl.idField = results.entityInfo.primary_key[0];
       });
 
     this.updateField = function(index) {

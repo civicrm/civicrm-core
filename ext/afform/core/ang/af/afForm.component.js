@@ -45,18 +45,28 @@
       // With no arguments this will prefill the entire form based on url args
       // and also check if the form is open for submissions.
       // With selectedEntity, selectedIndex & selectedId provided this will prefill a single entity
-      this.loadData = function(selectedEntity, selectedIndex, selectedId, selectedField) {
+      this.loadData = function(selectedEntity, selectedIndex, selectedId, selectedField, joinEntity, joinIndex) {
         let toLoad = true;
         const params = {name: ctrl.getFormMeta().name, args: {}};
         // Load single entity
         if (selectedEntity) {
           toLoad = !!selectedId;
-          params.matchField = selectedField;
           params.args[selectedEntity] = {};
-          params.args[selectedEntity][selectedIndex] = selectedId;
+          params.args[selectedEntity][selectedIndex] = {};
+          if (joinEntity) {
+            params.fillMode = 'join';
+            params.args[selectedEntity][selectedIndex].joins = {};
+            params.args[selectedEntity][selectedIndex].joins[joinEntity] = {};
+            params.args[selectedEntity][selectedIndex].joins[joinEntity][joinIndex] = {};
+            params.args[selectedEntity][selectedIndex].joins[joinEntity][joinIndex][selectedField] = selectedId;
+          } else {
+            params.fillMode = 'entity';
+            params.args[selectedEntity][selectedIndex][selectedField] = selectedId;
+          }
         }
         // Prefill entire form
         else {
+          params.fillMode = 'form';
           args = _.assign({}, $scope.$parent.routeParams || {}, $scope.$parent.options || {});
           _.each(schema, function (entity, entityName) {
             if (args[entityName] && typeof args[entityName] === 'string') {
@@ -85,7 +95,11 @@
               disableForm(error.error_message);
             });
         }
-        // Clear existing contact selection
+        // Clear existing join selection
+        else if (joinEntity) {
+          data[selectedEntity][selectedIndex].joins[joinEntity][joinIndex] = {};
+        }
+        // Clear existing entity selection
         else if (selectedEntity) {
           // Delete object keys without breaking object references
           Object.keys(data[selectedEntity][selectedIndex].fields).forEach(key => delete data[selectedEntity][selectedIndex].fields[key]);
@@ -131,19 +145,82 @@
           } else {
             // Angular can't handle expressions with quotes inside brackets, so they are omitted
             // Here we add them back to make valid js
-            _.each(clause, function(expr, idx) {
-              if (_.isString(expr) && expr.charAt(0) !== '"') {
-                clause[idx] = expr.replace(/\[/g, "['").replace(/]/g, "']");
-              }
-            });
-            var parser = $parse(clause.join(' '));
-            if (parser(data) === flip) {
+            if (_.isString(clause[0]) && clause[0].charAt(0) !== '"') {
+              clause[0] = clause[0].replace(/\[([^'"])/g, "['$1").replace(/([^'"])]/g, "$1']");
+            }
+            let parser1 = $parse(clause[0]);
+            let parser2 = $parse(clause[2]);
+            let result = compareConditions(parser1(data), clause[1], parser2(data));
+            if (result === flip) {
               ret = flip;
             }
           }
         });
         return op === 'NOT' ? !ret : ret;
       };
+
+      function compareConditions(val1, op, val2) {
+        const yes = (op !== '!=' && !op.includes('NOT '));
+
+        switch (op) {
+          case '=':
+          case '!=':
+          // Legacy operator, changed to '=', but may still exist on older forms.
+          case '==':
+            return angular.equals(val1, val2) === yes;
+
+          case '>':
+            return val1 > val2;
+
+          case '<':
+            return val1 < val2;
+
+          case '>=':
+            return val1 >= val2;
+
+          case '<=':
+            return val1 <= val2;
+
+          case 'IS EMPTY':
+            return !val1;
+
+          case 'IS NOT EMPTY':
+            return !!val1;
+
+          case 'CONTAINS':
+          case 'NOT CONTAINS':
+            if (Array.isArray(val1)) {
+              return val1.includes(val2) === yes;
+            } else if (typeof val1 === 'string' && typeof val2 === 'string') {
+              return val1.toLowerCase().includes(val2.toLowerCase()) === yes;
+            }
+            return angular.equals(val1, val2) === yes;
+
+          case 'IN':
+          case 'NOT IN':
+            if (Array.isArray(val2)) {
+              return val2.includes(val1) === yes;
+            }
+            return angular.equals(val1, val2) === yes;
+
+          case 'LIKE':
+          case 'NOT LIKE':
+            if (typeof val1 === 'string' && typeof val2 === 'string') {
+              return likeCompare(val1, val2) === yes;
+            }
+            return angular.equals(val1, val2) === yes;
+        }
+      }
+
+      function likeCompare(str, pattern) {
+        // Escape regex special characters in the pattern, except for % and _
+        const regexPattern = pattern
+          .replace(/([.+?^=!:${}()|\[\]\/\\])/g, "\\$1")
+          .replace(/%/g, '.*') // Convert % to .*
+          .replace(/_/g, '.'); // Convert _ to .
+        const regex = new RegExp(`^${regexPattern}$`, 'i');
+        return regex.test(str);
+      }
 
       // Called after form is submitted and files are uploaded
       function postProcess() {

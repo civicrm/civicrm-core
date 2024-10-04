@@ -9,6 +9,7 @@ return [
     'title_plural' => ts('Menus'),
     'description' => ts('Table to store menu items for all civicrm components.'),
     'add' => '1.1',
+    'label_field' => 'title',
   ],
   'getIndices' => fn() => [
     'UI_path_domain_id' => [
@@ -56,9 +57,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Path Name'),
       'add' => '2.1',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'path_arguments' => [
       'title' => ts('Arguments'),
@@ -72,9 +70,6 @@ return [
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'add' => '2.1',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'access_callback' => [
       'title' => ts('Access Callback'),
@@ -82,9 +77,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Function to call to check access permissions'),
       'add' => '2.1',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'access_arguments' => [
       'title' => ts('Access Arguments'),
@@ -99,9 +91,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('function to call for this url'),
       'add' => '2.1',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'page_arguments' => [
       'title' => ts('Page Arguments'),
@@ -125,7 +114,6 @@ return [
       'add' => '2.1',
       'input_attrs' => [
         'label' => ts('Return URL'),
-        'maxlength' => 255,
       ],
     ],
     'return_url_args' => [
@@ -136,7 +124,6 @@ return [
       'add' => '2.1',
       'input_attrs' => [
         'label' => ts('Return URL Arguments'),
-        'maxlength' => 255,
       ],
     ],
     'component_id' => [

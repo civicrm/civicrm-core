@@ -105,10 +105,20 @@ class CustomGroupTest extends CustomTestBase {
 
     $result = CustomGroup::get(FALSE)
       ->addWhere('extends_entity_column_value:name', 'CONTAINS', $activityTypeName)
-      ->addWhere('extends:name', '=', 'Activities')
+      ->addWhere('extends:name', '=', 'Activity')
       ->execute()->single();
 
     $this->assertEquals([$activityType['value']], $result['extends_entity_column_value']);
+
+    $customField1 = $this->createTestRecord('CustomField', ['custom_group_id' => $customGroup1['id']]);
+    $customField2 = $this->createTestRecord('CustomField', ['custom_group_id' => $customGroup2['id']]);
+
+    $result = \Civi\Api4\CustomField::get(FALSE)
+      ->addWhere('custom_group_id.extends', '=', 'Activity')
+      ->addWhere('custom_group_id.extends_entity_column_value:name', 'CONTAINS', $activityTypeName)
+      ->execute()->single();
+
+    $this->assertEquals($customField1['id'], $result['id']);
   }
 
 }

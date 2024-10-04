@@ -153,7 +153,7 @@ class TokenProcessor {
     $tokens = [];
     $this->visitTokens($value ?: '', function (?string $fullToken, ?string $entity, ?string $field, ?array $modifier) use (&$tokens) {
       $tokens[$entity][] = $field;
-    });
+    }, $format);
     $this->messages[$name] = [
       'string' => $value,
       'format' => $format,
@@ -393,7 +393,7 @@ class TokenProcessor {
     $event->message = $message;
     $event->context = $row->context;
     $event->row = $row;
-    $event->string = $this->visitTokens($message['string'] ?? '', $getToken);
+    $event->string = $this->visitTokens($message['string'] ?? '', $getToken, $message['format']);
     $this->dispatcher->dispatch('civi.token.render', $event);
     return $event->string;
   }
@@ -408,27 +408,41 @@ class TokenProcessor {
    * @param callable $callback
    *   A function which visits (and substitutes) each token.
    *   function(?string $fullToken, ?string $entity, ?string $field, ?array $modifier)
+   * @param string|null $format
+   *
    * @return string
    */
-  public function visitTokens(string $expression, callable $callback): string {
+  public function visitTokens(string $expression, callable $callback, ?string $format = 'text/html'): string {
     // Regex examples: '{foo.bar}', '{foo.bar|whiz}', '{foo.bar|whiz:"bang"}', '{foo.bar|whiz:"bang":"bang"}'
     // Regex counter-examples: '{foobar}', '{foo bar}', '{$foo.bar}', '{$foo.bar|whiz}', '{foo.bar|whiz{bang}}'
     // Key observations: Civi tokens MUST have a `.` and MUST NOT have a `$`. Civi filters MUST NOT have `{}`s or `$`s.
 
-    static $fullRegex = NULL;
-    if ($fullRegex === NULL) {
-      // The regex is a bit complicated, we so break it down into fragments.
-      // Consider the example '{foo.bar|whiz:"bang":"bang"}'. Each fragment matches the following:
+    $quoteStrings = $format === 'text/html' ? [
+      // Note we just treat left & right quotes as quotes. Our brains are not big enough to enforce them
+      // & maybe user brains are not big enough to use them correctly anyway.
+      '"',
+      '&lquote\;',
+      '&rquote\;',
+      '&quot\;',
+      '&#8221\;',
+      '&#8220\;',
+      '&#x22\;',
+    ] : ['"'];
 
-      $tokenRegex = '([\w]+)\.([\w:\.]+)'; /* MATCHES: 'foo.bar' */
-      $filterArgRegex = ':[\w": %\-_()\[\]\+/#@!,\.\?]*'; /* MATCHES: ':"bang":"bang"' */
-      // Key rule of filterArgRegex is to prohibit '{}'s because they may parse ambiguously. So you *might* relax it to:
-      // $filterArgRegex = ':[^{}\n]*'; /* MATCHES: ':"bang":"bang"' */
-      $filterNameRegex = "\w+"; /* MATCHES: 'whiz' */
-      $filterRegex = "\|($filterNameRegex(?:$filterArgRegex)?)"; /* MATCHES: '|whiz:"bang":"bang"' */
-      $fullRegex = ";\{$tokenRegex(?:$filterRegex)?\};";
-    }
-    return preg_replace_callback($fullRegex, function($m) use ($callback) {
+    // The regex is a bit complicated, we so break it down into fragments.
+    // Consider the example '{foo.bar|whiz:"bang":"bang"}'. Each fragment matches the following:
+
+    $tokenRegex = '([\w]+)\.([\w:\.]+)';
+    $quoteRegex = '(?:' . implode('|', $quoteStrings) . ')';
+    /* MATCHES: 'foo.bar' */
+    $filterArgRegex = ':[\w' . $quoteRegex . ': %\-_()\[\]\+/#@!,\.\?]*'; /* MATCHES: ':"bang":"bang"' */
+    // Key rule of filterArgRegex is to prohibit '{}'s because they may parse ambiguously. So you *might* relax it to:
+    // $filterArgRegex = ':[^{}\n]*'; /* MATCHES: ':"bang":"bang"' */
+    $filterNameRegex = "\w+"; /* MATCHES: 'whiz' */
+    $filterRegex = "\|($filterNameRegex(?:$filterArgRegex)?)"; /* MATCHES: '|whiz:"bang":"bang"' */
+    $fullRegex = ";\{$tokenRegex(?:$filterRegex)?\};";
+
+    return preg_replace_callback($fullRegex, function($m) use ($callback, $quoteStrings) {
       $filterParts = NULL;
       if (isset($m[3])) {
         $filterParts = [];
@@ -436,9 +450,11 @@ class TokenProcessor {
           $filterParts[] = $m[1];
           return '';
         };
+        $quoteOptions = implode('|', $quoteStrings);
+        $quotedRegex = ':' . '(?:' . $quoteOptions . ')' . '(.+?(?=' . $quoteOptions . ')+)' . '(?:' . $quoteOptions . ')';
         $unmatched = preg_replace_callback_array([
           '/^(\w+)/' => $enqueue,
-          '/:"([^"]+)"/' => $enqueue,
+          ';' . $quotedRegex . ';' => $enqueue,
         ], $m[3]);
         if ($unmatched) {
           throw new \CRM_Core_Exception('Malformed token parameters (' . $m[0] . ')');

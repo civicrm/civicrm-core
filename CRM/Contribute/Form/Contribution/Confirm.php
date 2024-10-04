@@ -519,6 +519,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $this->assign('autoRenewOption', 2);
       }
     }
+    $this->assign('membershipBlock', FALSE);
     if (CRM_Core_Component::isEnabled('CiviMember') && empty($this->_ccid)) {
       if (isset($params['selectMembership']) &&
         $params['selectMembership'] !== 'no_thanks'
@@ -527,9 +528,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           $this->_membershipContactID,
           $params['selectMembership']
         );
-      }
-      else {
-        $this->assign('membershipBlock', FALSE);
       }
     }
 
@@ -1323,11 +1321,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param int $contactID
    * @param array $customFieldsFormatted
    * @param array $premiumParams
-   * @param array $membershipLineItems
-   *   Line items specifically relating to memberships.
    */
-  protected function processMembership($membershipParams, $contactID, $customFieldsFormatted, $premiumParams,
-                                $membershipLineItems): void {
+  protected function processMembership($membershipParams, $contactID, $customFieldsFormatted, $premiumParams): void {
 
     $membershipTypeIDs = array_keys($this->order->getMembershipTypes());
     $membershipTypes = CRM_Member_BAO_Membership::buildMembershipTypeValues($this, $membershipTypeIDs);
@@ -1356,8 +1351,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $membershipParams['contribution_source'] = $this->_params['membership_source'];
     }
 
-    $this->postProcessMembership($membershipParams, $contactID, $premiumParams, $customFieldsFormatted, $membershipType, $membershipTypeIDs, $isPaidMembership, $this->_membershipId, $isProcessSeparateMembershipTransaction, $financialTypeID,
-      $membershipLineItems);
+    $this->postProcessMembership($membershipParams, $contactID, $premiumParams, $customFieldsFormatted, $membershipType, $membershipTypeIDs, $isPaidMembership, $this->_membershipId, $financialTypeID,);
 
     $this->set('membershipTypeID', $membershipParams['selectMembership']);
   }
@@ -1380,10 +1374,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param bool $isPaidMembership
    * @param array $membershipID
    *
-   * @param bool $isProcessSeparateMembershipTransaction
-   *
    * @param int $financialTypeID
-   * @param array $unprocessedLineItems
    *   Line items for payment options chosen on the form.
    *
    * @throws \CRM_Core_Exception
@@ -1392,7 +1383,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   protected function postProcessMembership(
     $membershipParams, $contactID, $premiumParams,
     $customFieldsFormatted, $membershipDetails, $membershipTypeIDs, $isPaidMembership, $membershipID,
-    $isProcessSeparateMembershipTransaction, $financialTypeID, $unprocessedLineItems) {
+    $financialTypeID) {
     $membershipContribution = NULL;
     $isTest = $membershipParams['is_test'] ?? FALSE;
     $errors = $paymentResults = [];
@@ -2381,9 +2372,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     if ($this->isMembershipSelected()) {
       // CRM-12233.
       try {
-        $membershipLineItems = [$this->getPriceSetID() => $this->getMainContributionLineItems()];
         $membershipParams['amount'] = $this->getMainContributionAmount();
-        $this->processMembership($membershipParams, $contactID, $customFieldsFormatted, $premiumParams, $membershipLineItems);
+        $this->processMembership($membershipParams, $contactID, $customFieldsFormatted, $premiumParams);
       }
       catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
         CRM_Core_Session::singleton()->setStatus($e->getMessage());
@@ -2610,7 +2600,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       if (!empty($form->_paymentProcessor)) {
         try {
           $payment = Civi\Payment\System::singleton()->getByProcessor($form->_paymentProcessor);
-          if ($this->getPaymentProcessorObject()->supports('noReturn')) {
+          if ($contribution->contribution_recur_id && $this->getPaymentProcessorObject()->supports('noReturnForRecurring')) {
             // We want to get rid of this & make it generic - eg. by making payment processing the last thing
             // and always calling it first.
             $form->postProcessHook();
@@ -2939,7 +2929,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       if (empty($lineItem['membership_type_id']) && $this->isSeparateMembershipPayment()) {
         continue;
       }
-      $lineItemSplit[$lineItem['membership_type_id'] ?: $defaultMembershipTypeID][$lineItem['price_field_id']] = $lineItem;
+      $lineItemSplit[$lineItem['membership_type_id'] ?: $defaultMembershipTypeID]['price_field_value_' . $lineItem['price_field_value_id']] = $lineItem;
     }
     return $lineItemSplit[$membershipTypeID];
   }

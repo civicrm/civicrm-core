@@ -620,7 +620,7 @@
                 var newVal = _.cloneDeep(ngModel.$modelValue);
                 // Fix possible data-type mismatch
                 if (typeof newVal === 'string' && element.select2('container').hasClass('select2-container-multi')) {
-                  newVal = newVal.length ? newVal.split(',') : [];
+                  newVal = newVal.length ? newVal.split(scope.crmUiSelect.separator || ',') : [];
                 }
                 element.select2('val', newVal);
               });
@@ -628,6 +628,10 @@
           }
           function refreshModel() {
             var oldValue = ngModel.$viewValue, newValue = element.select2('val');
+            // Let ng-list do the splitting
+            if (Array.isArray(newValue) && attrs.ngList) {
+              newValue = newValue.join(attrs.ngList);
+            }
             if (oldValue != newValue) {
               scope.$parent.$apply(function () {
                 ngModel.$setViewValue(newValue);

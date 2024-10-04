@@ -59,7 +59,6 @@ return [
       ],
       'input_attrs' => [
         'size' => '45',
-        'maxlength' => 255,
       ],
     ],
     'website_type_id' => [

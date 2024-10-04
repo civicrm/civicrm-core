@@ -196,7 +196,7 @@
 {*Confirmation Block*}
 <details id="confirm" {if !$defaultsEmpty}open{/if}>
   <summary class="collapsible-title">{ts}Confirmation Screen{/ts}</summary>
-  <div id="confirm_screen_settings" class="crm-accordion-body">
+  <div class="crm-accordion-body">
     {if !$is_monetary}
     <table class="form-layout-compressed">
       <tr class="crm-event-manage-registration-form-block-is_confirm_enabled">
@@ -207,7 +207,7 @@
       </tr>
     </table>
     {/if}
-    <table class="form-layout-compressed">
+    <table class="form-layout-compressed" id="confirm_screen_settings">
       <tr class="crm-event-manage-registration-form-block-confirm_title">
         <td scope="row" class="label" width="20%">{$form.confirm_title.label} <span
             class="crm-marker">*</span> {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='confirm_title' id=$eventID}{/if}

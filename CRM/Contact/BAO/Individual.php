@@ -277,8 +277,8 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
    *   the constructed display name
    */
   public function displayName() {
-    $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
-    $suffix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id');
+    $prefix = CRM_Contact_DAO_Contact::buildOptions('prefix_id');
+    $suffix = CRM_Contact_DAO_Contact::buildOptions('suffix_id');
     return str_replace('  ', ' ', trim($prefix[$this->prefix_id] . ' ' . $this->first_name . ' ' . $this->middle_name . ' ' . $this->last_name . ' ' . $suffix[$this->suffix_id]));
   }
 

@@ -78,6 +78,10 @@ abstract class CRM_Utils_System_Base {
    *   or equal 0 if not in print mode.
    */
   public static function getContentTemplate($print = 0): string {
+    if ($print === CRM_Core_Smarty::PRINT_JSON) {
+      return 'CRM/common/snippet.tpl';
+    }
+
     switch ($print) {
       case 0:
         // Not a print context.
@@ -1244,6 +1248,13 @@ abstract class CRM_Utils_System_Base {
     $profile = str_replace('civicrm/admin/uf/group', $urlReplaceWith, $profile);
 
     return $profile;
+  }
+
+  /**
+   * Hook for further system boot once the main CiviCRM
+   * Container is up (only used in Standalone currently)
+   */
+  public function postContainerBoot(): void {
   }
 
 }

@@ -250,17 +250,18 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
     $this->setMonetaryThousandSeparator('.');
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, 'ContactTestTest');
     $datas = [
-      'Int' => ['value' => 2, 'formatted_from' => '1', 'formatted_to' => '2'],
-      'Float' => ['value' => 12.123, 'formatted_from' => '11,123', 'formatted_to' => '12,123'],
-      'Float' => ['value' => 3412.123, 'formatted_from' => '3.411,123', 'formatted_to' => '3.412,123'],
-      'Money' => ['value' => 91.21, 'formatted_from' => '90,21', 'formatted_to' => '91,21'],
-      'Money' => ['value' => 7891.22, 'formatted_from' => '7.890,22', 'formatted_to' => '7.891,22'],
+      ['type' => 'Int', 'value' => 2, 'formatted_from' => '1', 'formatted_to' => '2'],
+      ['type' => 'Float', 'value' => 12.123, 'formatted_from' => '11,123', 'formatted_to' => '12,123'],
+      ['type' => 'Float', 'value' => 3412.123, 'formatted_from' => '3.411,123', 'formatted_to' => '3.412,123'],
+      ['type' => 'Money', 'value' => 91.21, 'formatted_from' => '90,21', 'formatted_to' => '91,21'],
+      ['type' => 'Money', 'value' => 7891.22, 'formatted_from' => '7.890,22', 'formatted_to' => '7.891,22'],
     ];
-    foreach ($datas as $type => $data) {
+    foreach ($datas as $i => $data) {
+      $type = $data['type'];
       $customField = $this->customFieldCreate(
         [
           'custom_group_id' => $ids['custom_group_id'],
-          'label' => "$type field",
+          'label' => "$type $i field",
           'data_type' => $type,
           'html_type' => 'Text',
           'default_value' => NULL,
@@ -283,10 +284,10 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
       $queryObj = new CRM_Contact_BAO_Query($params);
       $queryObj->query();
       $this->assertEquals(
-        'civicrm_value_testlocalized_1.' . strtolower($type) . "_field_{$customField['id']} BETWEEN \"$from\" AND \"$to\"",
+        'civicrm_value_testlocalized_1.' . strtolower($type) . "_{$i}_field_{$customField['id']} BETWEEN \"$from\" AND \"$to\"",
         $queryObj->_where[0][0]
       );
-      $this->assertEquals($queryObj->_qill[0][0], "$type field BETWEEN $formatted_from, $formatted_to");
+      $this->assertEquals($queryObj->_qill[0][0], "$type $i field BETWEEN $formatted_from, $formatted_to");
     }
     $this->setMonetaryDecimalPoint('.');
     $this->setMonetaryThousandSeparator(',');
@@ -300,13 +301,14 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
   public function testSearchCustomDataFromAndTo(): void {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, 'ContactTestTest');
     $dataSet = [
-      'Date' => ['value' => '2015-06-06', 'sql_string' => '"20150606235959"', 'qill_string' => "'June 6th, 2015 11:59 PM'", 'qill_string_greater' => "'June 6th, 2015 12:00 AM'"],
+      ['type' => 'Date', 'value' => '2015-06-06', 'sql_string' => '"20150606235959"', 'qill_string' => "'June 6th, 2015 11:59 PM'", 'qill_string_greater' => "'June 6th, 2015 12:00 AM'"],
       // @todo - investigate the impact of using quotes on what should be an integer field.
-      'Int' => ['value' => 2, 'sql_string' => '"2"'],
-      'Float' => ['value' => 12.123, 'sql_string' => '"12.123"'],
-      'Money' => ['value' => 91.21],
+      ['type' => 'Int', 'value' => 2, 'sql_string' => '"2"'],
+      ['type' => 'Float', 'value' => 12.123, 'sql_string' => '"12.123"'],
+      ['type' => 'Money', 'value' => 91.21],
     ];
-    foreach ($dataSet as $type => $values) {
+    foreach ($dataSet as $values) {
+      $type = $values['type'];
       $data = $values['value'];
       $isDate = ($type === 'Date');
       $customField = $this->customFieldCreate(
@@ -377,21 +379,22 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
     $this->setMonetaryThousandSeparator('.');
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, 'ContactTestTest');
     $dataSet = [
-      'Date' => ['value' => '2015-06-06', 'sql_string' => '"20150606235959"', 'qill_string' => "'June 6th, 2015 11:59 PM'", 'qill_string_greater' => "'June 6th, 2015 12:00 AM'"],
+      ['type' => 'Date', 'value' => '2015-06-06', 'sql_string' => '"20150606235959"', 'qill_string' => "'June 6th, 2015 11:59 PM'", 'qill_string_greater' => "'June 6th, 2015 12:00 AM'"],
       // @todo - investigate the impact of using quotes on what should be an integer field.
-      'Int' => ['value' => 2, 'sql_string' => '"2"'],
-      'Float' => ['value' => 12.123, 'sql_string' => '"12,123"'],
-      'Float' => ['value' => 3412.123, 'sql_string' => '"3412.123"', 'qill_string' => '3.412,123'],
-      'Money' => ['value' => 91.21],
-      'Money' => ['value' => 7891.21, 'qill_string' => '7.891,21'],
+      ['type' => 'Int', 'value' => 2, 'sql_string' => '"2"'],
+      ['type' => 'Float', 'value' => 12.123, 'sql_string' => '"12.123"', 'qill_string' => '12,123'],
+      ['type' => 'Float', 'value' => 3412.123, 'sql_string' => '"3412.123"', 'qill_string' => '3.412,123'],
+      ['type' => 'Money', 'value' => 91.21, 'qill_string' => '91,21'],
+      ['type' => 'Money', 'value' => 7891.21, 'qill_string' => '7.891,21'],
     ];
-    foreach ($dataSet as $type => $values) {
+    foreach ($dataSet as $i => $values) {
+      $type = $values['type'];
       $data = $values['value'];
       $isDate = ($type === 'Date');
       $customField = $this->customFieldCreate(
         [
           'custom_group_id' => $ids['custom_group_id'],
-          'label' => "$type field",
+          'label' => "$type $i field",
           'data_type' => $type,
           'html_type' => ($isDate) ? 'Select Date' : 'Text',
           'default_value' => NULL,
@@ -418,11 +421,11 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
       $queryObj->query();
 
       $this->assertEquals(
-        'civicrm_value_testlocalized_1.' . strtolower($type) . "_field_{$customField['id']} <= $expectedValue",
+        'civicrm_value_testlocalized_1.' . strtolower($type) . "_{$i}_field_{$customField['id']} <= $expectedValue",
         $queryObj->_where[0][0]
       );
       $this->assertEquals($queryObj->_qill[0][0],
-        "$type field $toQillValue"
+        "$type $i field $toQillValue"
       );
 
       //Scenario 2 : FROM date filter
@@ -436,11 +439,11 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
 
       $expectedValue = ($isDate) ? '"20150606000000"' : $expectedValue;
       $this->assertEquals(
-        'civicrm_value_testlocalized_1.' . strtolower($type) . "_field_{$customField['id']} >= $expectedValue",
+        'civicrm_value_testlocalized_1.' . strtolower($type) . "_{$i}_field_{$customField['id']} >= $expectedValue",
         $queryObj->_where[0][0]
       );
       $this->assertEquals(
-        "$type field $fromQillValue",
+        "$type $i field $fromQillValue",
         $queryObj->_qill[0][0]
       );
     }

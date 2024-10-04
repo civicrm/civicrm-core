@@ -57,6 +57,7 @@
         <strong>{ts}Signature Text{/ts}</strong><br />{if !empty($item.signature_text)}{$item.signature_text|nl2br}{/if}</div>
       </div>
     </div>
+      {include file="CRM/Contact/Page/Inline/BlockCustomData.tpl" entity='email' customGroups=$item.custom identifier=$blockId}
     {/if}
   {/foreach}
   </div>

@@ -158,6 +158,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
   protected $_customGroupId = NULL;
 
+  protected $_mail;
+
   protected $_currentUserID = NULL;
   protected $_session = NULL;
 
@@ -485,11 +487,15 @@ class CRM_Profile_Form extends CRM_Core_Form {
           $page = new CRM_Profile_Page_MultipleRecordFieldsListing();
           $cs = $this->get('cs');
           $page->set('pageCheckSum', $cs);
-          $page->set('contactId', $this->_id);
-          $page->set('profileId', $this->_gid);
+          $page->_contactId = $this->_id;
+          $page->setProfileID($this->_gid);
           $page->set('action', CRM_Core_Action::BROWSE);
-          $page->set('multiRecordFieldListing', $multiRecordFieldListing);
-          $page->run();
+          $action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, FALSE);
+          // assign vars to templates
+          $page->assign('action', $action);
+          $page->_pageViewType = 'profileDataView';
+
+          $page->browse();
         }
       }
 
@@ -817,7 +823,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
             CRM_Core_Permission::EDIT,
             NULL,
             'civicrm_uf_group',
-            CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id')
+            CRM_Core_DAO_UFField::buildOptions('uf_group_id')
           )
         )
       ) {

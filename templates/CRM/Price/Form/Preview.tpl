@@ -20,7 +20,7 @@
     {foreach from=$groupTree item=priceSet key=group_id}
       <fieldset>
         {if $preview_type eq 'group'}<legend>{$setTitle}</legend>{/if}
-        {include file="CRM/Price/Form/PriceSet.tpl" hideTotal=false}
+        {include file="CRM/Price/Form/PriceSet.tpl" hideTotal=false isShowAdminVisibilityFields=false}
       </fieldset>
     {/foreach}
   {/strip}

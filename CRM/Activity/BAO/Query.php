@@ -278,7 +278,7 @@ class CRM_Activity_BAO_Query {
         }
 
       case 'activity_tags':
-        $activityTags = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', ['onlyActive' => FALSE]);
+        $activityTags = CRM_Core_DAO_EntityTag::buildOptions('tag_id', 'get');
 
         if (!is_array($value)) {
           $value = explode(',', $value);
@@ -449,17 +449,6 @@ class CRM_Activity_BAO_Query {
     ];
     $form->addRadio('activity_role', NULL, $activityRoles, ['allowClear' => TRUE]);
 
-    $activityStatus = CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'status_id', [
-      'flip' => 1,
-      'labelColumn' => 'name',
-    ]);
-    $ssID = $form->get('ssID');
-    $status = [$activityStatus['Completed'], $activityStatus['Scheduled']];
-    //If status is saved in smart group.
-    if (!empty($ssID) && !empty($form->_formValues['activity_status_id'])) {
-      $status = $form->_formValues['activity_status_id'];
-    }
-
     $form->addElement('text', 'activity_text', ts('Activity Text'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name'));
 
     $form->addRadio('activity_option', '', CRM_Core_SelectValues::activityTextOptions());
@@ -498,7 +487,7 @@ class CRM_Activity_BAO_Query {
     // Add engagement level CRM-7775.
     $buildEngagementLevel = FALSE;
     $buildSurveyResult = FALSE;
-    if (CRM_Campaign_BAO_Campaign::isComponentEnabled() &&
+    if (CRM_Core_Component::isEnabled('CiviCampaign') &&
       CRM_Campaign_BAO_Campaign::accessCampaign()
     ) {
       $buildEngagementLevel = TRUE;

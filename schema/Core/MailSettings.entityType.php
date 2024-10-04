@@ -54,9 +54,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('name of this group of settings'),
       'add' => '2.2',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'is_default' => [
       'title' => ts('Is Default Mail Settings?'),
@@ -76,9 +73,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('email address domain (the part after @)'),
       'add' => '2.2',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'localpart' => [
       'title' => ts('email Local Part'),
@@ -86,9 +80,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('optional local part (like civimail+ for addresses like civimail+s.1.2@example.com)'),
       'add' => '2.2',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'return_path' => [
       'title' => ts('Return Path'),
@@ -96,9 +87,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('contents of the Return-Path header'),
       'add' => '2.2',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'protocol' => [
       'title' => ts('Protocol'),
@@ -106,9 +94,6 @@ return [
       'input_type' => 'Select',
       'description' => ts('name of the protocol to use for polling (like IMAP, POP3 or Maildir)'),
       'add' => '2.2',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
       'pseudoconstant' => [
         'option_group_name' => 'mail_protocol',
       ],
@@ -119,9 +104,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('server to use when polling'),
       'add' => '2.2',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'port' => [
       'title' => ts('Mail Port'),
@@ -136,9 +118,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('username to use when polling'),
       'add' => '2.2',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'password' => [
       'title' => ts('Mail Account Password'),
@@ -146,9 +125,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('password to use when polling'),
       'add' => '2.2',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'is_ssl' => [
       'title' => ts('Mail Account Uses SSL'),
@@ -165,9 +141,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('folder to poll from when using IMAP, path to poll from when using Maildir, etc.'),
       'add' => '2.2',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
     ],
     'activity_status' => [
       'title' => ts('Activity Status'),
@@ -175,9 +148,6 @@ return [
       'input_type' => 'Select',
       'description' => ts('Name of status to use when creating email to activity.'),
       'add' => '4.7',
-      'input_attrs' => [
-        'maxlength' => 255,
-      ],
       'pseudoconstant' => [
         'option_group_name' => 'activity_status',
         'key_column' => 'name',
@@ -248,9 +218,6 @@ return [
       'input_type' => 'Select',
       'description' => ts('Which email recipient to add as the activity source (from, to, cc, bcc).'),
       'add' => '5.66',
-      'input_attrs' => [
-        'maxlength' => 4,
-      ],
     ],
     'activity_targets' => [
       'title' => ts('Activity Targets'),
@@ -259,9 +226,6 @@ return [
       'description' => ts('Which email recipients to add as the activity targets (from, to, cc, bcc).'),
       'add' => '5.66',
       'serialize' => CRM_Core_DAO::SERIALIZE_COMMA,
-      'input_attrs' => [
-        'maxlength' => 16,
-      ],
     ],
     'activity_assignees' => [
       'title' => ts('Activity Assignees'),
@@ -270,9 +234,6 @@ return [
       'description' => ts('Which email recipients to add as the activity assignees (from, to, cc, bcc).'),
       'add' => '5.66',
       'serialize' => CRM_Core_DAO::SERIALIZE_COMMA,
-      'input_attrs' => [
-        'maxlength' => 16,
-      ],
     ],
   ],
 ];

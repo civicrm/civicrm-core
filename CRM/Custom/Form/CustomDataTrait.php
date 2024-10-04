@@ -59,14 +59,13 @@ trait CRM_Custom_Form_CustomDataTrait {
       ],
       'checkPermissions' => TRUE,
     ])->indexBy('custom_field_id');
-
+    $fieldFilters = ['style' => 'Inline'];
     if ($entity === 'Contact') {
       // Ideally this would not be contact specific but the function being
       // called here does not handle the filters as received.
-      $fieldFilters = [
+      $fieldFilters += [
         'extends' => [$entity, $filters['contact_type']],
         'is_multiple' => TRUE,
-        'style' => 'Inline',
       ];
       if (!empty($filters['contact_sub_type'])) {
         $fieldFilters['extends_entity_column_value'] = [NULL, $filters['contact_sub_type']];
@@ -112,9 +111,26 @@ trait CRM_Custom_Form_CustomDataTrait {
    */
   private function getInstancesOfField($id): array {
     $instances = [];
-    foreach ($_POST as $key => $value) {
+    $found = [];
+    foreach (array_merge($_POST, ($_FILES ?? [])) as $key => $value) {
       if (preg_match('/^custom_' . $id . '_?(-?\d+)?$/', $key)) {
         $instances[] = $key;
+        $found[$id] = $key;
+      }
+    }
+    if (!isset($found[$id])) {
+      // I think the _POST check was mostly about multiple fields
+      // see https://github.com/civicrm/civicrm-core/pull/29708
+      // However per https://lab.civicrm.org/dev/core/-/issues/5322
+      // it turns out that radio fields do not show up in the form.
+      // We can handle those here - although is that enough to handle blanking on
+      // multiple field radios?
+      $field = CRM_Core_BAO_CustomField::getField($id);
+      if ($field['html_type'] === 'Radio' || $field['html_type'] === 'Select') {
+        $group = CRM_Core_BAO_CustomGroup::getGroup(['id' => $field['custom_group_id']]);
+        if (!$group['is_multiple']) {
+          $instances[] = 'custom_' . $id;
+        }
       }
     }
     return $instances;
@@ -147,6 +163,24 @@ trait CRM_Custom_Form_CustomDataTrait {
     // CustomDataByType form in it's setDefaultValues() function - otherwise it cannot reload the
     // values that were just entered if validation fails.
     return is_string($this->getSubmitValue($elementName)) ? CRM_Utils_String::purifyHTML($this->getSubmitValue($elementName)) : $this->getSubmitValue($elementName);
+  }
+
+  /**
+   * Get the submitted custom fields.
+   *
+   * This is returned apiv3 style but in future could take
+   * api version as a parameter.
+   *
+   * @return array
+   */
+  protected function getSubmittedCustomFields(): array {
+    $fields = [];
+    foreach ($this->getSubmittedValues() as $label => $field) {
+      if (CRM_Core_BAO_CustomField::getKeyID($label)) {
+        $fields[$label] = $field;
+      }
+    }
+    return $fields;
   }
 
 }

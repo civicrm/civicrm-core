@@ -34,6 +34,7 @@ class CRM_Core_Page_Inline_Help {
         $arg = strip_tags($arg);
       }
       $smarty->assign('params', $args);
+      $smarty->assign('accessKey', $this->getAccessKey());
 
       $output = $smarty->fetch($file);
       $extraoutput = '';
@@ -50,6 +51,14 @@ class CRM_Core_Page_Inline_Help {
     else {
       throw new CRM_Core_Exception('File name is not valid');
     }
+  }
+
+  private function getAccessKey(): string {
+    $ua = strtolower($_SERVER['HTTP_USER_AGENT'] ?? '');
+    if (str_contains($ua, 'mac')) {
+      return '<span>CTRL</span>+<span>OPTION</span>';
+    }
+    return str_contains($ua, 'firefox') ? '<span>ALT</span>+<span>SHIFT</span>' : '<span>ALT</span>';
   }
 
 }

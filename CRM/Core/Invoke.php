@@ -59,31 +59,12 @@ class CRM_Core_Invoke {
       ini_set('display_errors', 0);
     }
 
-    if (!defined('CIVICRM_SYMFONY_PATH')) {
-      // Traditional Civi invocation path
-      // may exit
-      self::hackMenuRebuild($args);
-      self::init($args);
-      Civi::dispatcher()->dispatch('civi.invoke.auth', \Civi\Core\Event\GenericHookEvent::create(['args' => $args]));
-      $item = self::getItem($args);
-      return self::runItem($item);
-    }
-    else {
-      // Symfony-based invocation path
-      require_once CIVICRM_SYMFONY_PATH . '/app/bootstrap.php.cache';
-      require_once CIVICRM_SYMFONY_PATH . '/app/AppKernel.php';
-      $kernel = new AppKernel('dev', TRUE);
-      $kernel->loadClassCache();
-      $response = $kernel->handle(Symfony\Component\HttpFoundation\Request::createFromGlobals());
-      if (preg_match(':^text/html:', $response->headers->get('Content-Type'))) {
-        // let the CMS handle the trappings
-        return $response->getContent();
-      }
-      else {
-        $response->send();
-        exit();
-      }
-    }
+    self::hackMenuRebuild($args);
+    self::init($args);
+    Civi::dispatcher()->dispatch('civi.invoke.auth', \Civi\Core\Event\GenericHookEvent::create(['args' => $args]));
+    $item = self::getItem($args);
+    return self::runItem($item);
+    // NOTE: runItem() may return HTML, or it may call print+exit.
   }
 
   /**

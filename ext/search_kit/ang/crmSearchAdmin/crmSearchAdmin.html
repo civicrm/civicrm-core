@@ -14,7 +14,7 @@
   <form>
     <div class="crm-flex-box crm-search-admin-outer">
       <div class="crm-flex-1">
-        <input id="crm-saved-search-label" class="form-control" ng-model="$ctrl.savedSearch.label" type="text" required placeholder="{{:: ts('Untitled Search') }}" ng-model-options="$ctrl.debounceMode">
+        <input id="crm-saved-search-label" class="form-control" ng-model="$ctrl.savedSearch.label" type="text" required placeholder="{{:: ts('Untitled Search') }}" ng-model-options="$ctrl.debounceMode" title="{{:: ts('Saved Search label')}}">
       </div>
       <div class="crm-flex-1 form-inline">
         <div class="btn-group">
@@ -68,6 +68,7 @@
             </a>
             <button type="button" ng-click="$ctrl.openDisplayMenu = true;" class="btn btn-primary-outline dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <span class="caret"></span>
+              <span class="sr-only">{{:: ts('View results using display')}}</span>
             </button>
             <ul class="dropdown-menu dropdown-menu-right" ng-if=":: $ctrl.openDisplayMenu">
               <li title="{{:: ts('View search results table') }}">

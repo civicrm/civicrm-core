@@ -140,14 +140,6 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
           'uniqueName' => 'thankyou',
           'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::EXPORT),
         ],
-        CRM_Core_Action::BASIC => [
-          'name' => ts('Tell a Friend'),
-          'title' => ts('Tell a Friend'),
-          'url' => $urlString . 'friend',
-          'qs' => $urlParams,
-          'uniqueName' => 'friend',
-          'weight' => 10,
-        ],
         CRM_Core_Action::PROFILE => [
           'name' => ts('Include Profiles'),
           'title' => ts('Include Profiles'),

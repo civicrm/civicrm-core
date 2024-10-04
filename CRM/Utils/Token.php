@@ -81,6 +81,7 @@ class CRM_Utils_Token {
    * @return array
    */
   public static function getRequiredTokens() {
+    CRM_Core_Error::deprecatedFunctionWarning('token processor');
     if (self::$_requiredTokens == NULL) {
       self::$_requiredTokens = [
         'domain.address' => ts("Domain address - displays your organization's postal address."),
@@ -104,10 +105,12 @@ class CRM_Utils_Token {
    * @return bool|array
    *   true if all required tokens are found,
    *    else an array of the missing tokens
+   *
+   * @deprecated since 5.78 will be removed around 5.90
    */
   public static function requiredTokens(&$str) {
-    // FlexMailer is a refactoring of CiviMail which provides new hooks/APIs/docs. If the sysadmin has opted to enable it, then use that instead of CiviMail.
-    $requiredTokens = defined('CIVICRM_FLEXMAILER_HACK_REQUIRED_TOKENS') ? Civi\Core\Resolver::singleton()->call(CIVICRM_FLEXMAILER_HACK_REQUIRED_TOKENS, []) : CRM_Utils_Token::getRequiredTokens();
+    CRM_Core_Error::deprecatedFunctionWarning('use flexmailer');
+    $requiredTokens = Civi\Core\Resolver::singleton()->call('call://civi_flexmailer_required_tokens/getRequiredTokens', []);
 
     $missing = [];
     foreach ($requiredTokens as $token => $value) {
@@ -213,7 +216,7 @@ class CRM_Utils_Token {
   /**
    * Replace all the domain-level tokens in $str
    *
-   * @deprecated
+   * @deprecated since ages ago will be removed around 5.90
    *
    * @param string $str
    *   The string with tokens to be replaced.
@@ -235,6 +238,7 @@ class CRM_Utils_Token {
     $knownTokens = NULL,
     $escapeSmarty = FALSE
   ) {
+    CRM_Core_Error::deprecatedFunctionWarning('use the Token Processor');
     $key = 'domain';
     if (
       !$knownTokens || empty($knownTokens[$key])
@@ -702,9 +706,12 @@ class CRM_Utils_Token {
   /**
    * Get the categories required for rendering tokens.
    *
+   * @deprecated since 5.78 will be removed around 5.90.
+   *
    * @return array
    */
   public static function getTokenCategories(): array {
+    CRM_Core_Error::deprecatedFunctionWarning('token processor');
     if (!isset(\Civi::$statics[__CLASS__]['token_categories'])) {
       $tokens = [];
       \CRM_Utils_Hook::tokens($tokens);
@@ -1388,28 +1395,6 @@ class CRM_Utils_Token {
   }
 
   /**
-   * @deprecated
-   *
-   * @param int $caseId
-   * @param string $str
-   * @param array $knownTokens
-   * @param bool $escapeSmarty
-   * @return string
-   * @throws \CRM_Core_Exception
-   */
-  public static function replaceCaseTokens($caseId, $str, $knownTokens = NULL, $escapeSmarty = FALSE): string {
-    CRM_Core_Error::deprecatedFunctionWarning('token processor');
-    if (strpos($str, '{case.') === FALSE) {
-      return $str;
-    }
-    if (!$knownTokens) {
-      $knownTokens = self::getTokens($str);
-    }
-    $case = civicrm_api3('case', 'getsingle', ['id' => $caseId]);
-    return self::replaceEntityTokens('case', $case, $str, $knownTokens, $escapeSmarty);
-  }
-
-  /**
    * Generic function for formatting token replacement for an api field
    *
    * @deprecated
@@ -1421,6 +1406,7 @@ class CRM_Utils_Token {
    * @throws \CRM_Core_Exception
    */
   public static function getApiTokenReplacement($entity, $token, $entityArray) {
+    CRM_Core_Error::deprecatedFunctionWarning('use the token processor');
     if (!isset($entityArray[$token])) {
       return '';
     }
@@ -1447,46 +1433,6 @@ class CRM_Utils_Token {
   }
 
   /**
-   * Do not use - unused in core.
-   *
-   * Replace Contribution tokens in html.
-   *
-   * @param string $str
-   * @param array $contribution
-   * @param bool|string $html
-   * @param string $knownTokens
-   * @param bool|string $escapeSmarty
-   *
-   * @deprecated
-   *
-   * @return mixed
-   */
-  public static function replaceContributionTokens($str, &$contribution, $html = FALSE, $knownTokens = NULL, $escapeSmarty = FALSE) {
-    CRM_Core_Error::deprecatedFunctionWarning('use the token processor');
-    $key = 'contribution';
-    if (!$knownTokens || empty($knownTokens[$key])) {
-      //early return
-      return $str;
-    }
-
-    // here we intersect with the list of pre-configured valid tokens
-    // so that we remove anything we do not recognize
-    // I hope to move this step out of here soon and
-    // then we will just iterate on a list of tokens that are passed to us
-
-    $str = preg_replace_callback(
-      self::tokenRegex($key),
-      function ($matches) use (&$contribution, $html, $escapeSmarty) {
-        return CRM_Utils_Token::getContributionTokenReplacement($matches[1], $contribution, $html, $escapeSmarty);
-      },
-      $str
-    );
-
-    $str = preg_replace('/\\\\|\{(\s*)?\}/', ' ', $str);
-    return $str;
-  }
-
-  /**
    * Get replacement strings for any membership tokens (only a small number of tokens are implemnted in the first instance
    * - this is used by the pdfLetter task from membership search
    *
@@ -1506,6 +1452,7 @@ class CRM_Utils_Token {
    * @return string token replacement
    */
   public static function getMembershipTokenReplacement($entity, $token, $membership) {
+    CRM_Core_Error::deprecatedFunctionWarning('use the token processor');
     $supportedTokens = [
       'id',
       'status',
@@ -1629,6 +1576,7 @@ class CRM_Utils_Token {
    *   [legacy_token => new_token]
    */
   public static function legacyContactTokens() {
+    CRM_Core_Error::deprecatedFunctionWarning('use the token processor');
     return [
       'individual_prefix' => 'prefix_id',
       'individual_suffix' => 'suffix_id',
@@ -1647,6 +1595,7 @@ class CRM_Utils_Token {
    *   return custom field tokens in array('custom_N' => 'label') format
    */
   public static function getCustomFieldTokens($entity) {
+    CRM_Core_Error::deprecatedFunctionWarning('use the token processor');
     $customTokens = [];
     foreach (CRM_Core_BAO_CustomField::getFields($entity) as $id => $info) {
       $customTokens['custom_' . $id] = $info['label'] . ' :: ' . $info['groupTitle'];
@@ -1760,6 +1709,7 @@ class CRM_Utils_Token {
           '$mem_end_date' => 'membership.end_date',
           '$mem_join_date' => 'membership.join_date',
           '$membership_name' => 'membership.membership_type_id:name',
+          '$mem_type_id' => 'membership.membership_type_id',
           '$mem_status' => 'membership.membership_status_id:name',
           '$receive_date' => 'contribution.receive_date',
           '$currency' => 'contribution.currency',

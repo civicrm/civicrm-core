@@ -41,9 +41,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('ACL Name.'),
       'add' => '1.6',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'deny' => [
       'title' => ts('Deny ACL?'),
@@ -61,9 +58,6 @@ return [
       'required' => TRUE,
       'description' => ts('Table of the object possessing this ACL entry (Contact, Group, or ACL Group)'),
       'add' => '1.6',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'entity_id' => [
       'title' => ts('Entity ID'),
@@ -86,11 +80,8 @@ return [
       'required' => TRUE,
       'description' => ts('What operation does this ACL entry control?'),
       'add' => '1.6',
-      'input_attrs' => [
-        'maxlength' => 8,
-      ],
       'pseudoconstant' => [
-        'callback' => 'CRM_ACL_BAO_ACL::operation',
+        'callback' => ['CRM_ACL_BAO_ACL', 'operation'],
       ],
     ],
     'object_table' => [
@@ -101,10 +92,9 @@ return [
       'add' => '1.6',
       'input_attrs' => [
         'label' => ts('Type of Data'),
-        'maxlength' => 64,
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_ACL_BAO_ACL::getObjectTableOptions',
+        'callback' => ['CRM_ACL_BAO_ACL', 'getObjectTableOptions'],
       ],
     ],
     'object_id' => [
@@ -118,7 +108,7 @@ return [
         'control_field' => 'object_table',
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_ACL_BAO_ACL::getObjectIdOptions',
+        'callback' => ['CRM_ACL_BAO_ACL', 'getObjectIdOptions'],
         'prefetch' => 'disabled',
       ],
     ],
@@ -128,9 +118,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('If this is a grant/revoke entry, what table are we granting?'),
       'add' => '1.6',
-      'input_attrs' => [
-        'maxlength' => 64,
-      ],
     ],
     'acl_id' => [
       'title' => ts('ACL Group ID'),

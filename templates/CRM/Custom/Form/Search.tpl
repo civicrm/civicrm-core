@@ -10,7 +10,11 @@
 {if $groupTree}
 {foreach from=$groupTree item=cd_edit key=group_id}
 
-  <details class="crm-accordion-bold crm-contactDetails-accordion" id="{$cd_edit.name}"  {if $form.formName eq 'Advanced' AND $cd_edit.collapse_adv_display eq 1}{else}open{/if}>
+  <details
+    class="crm-accordion-bold crm-contactDetails-accordion"
+    id="{$cd_edit.name}"
+    {if $cd_edit.collapse_adv_display eq 1}{else}open{/if}
+    >
     <summary>
         {$cd_edit.title}
     </summary>
@@ -32,8 +36,8 @@
                     {include file="CRM/Core/DatePickerRangeCustomField.tpl" fieldName=$element_name to='' from='' colspan='' class='' hideRelativeLabel=0}<td>
                   {/if}
             {else}
-                <td class="label">{$form.$element_name.label}</td><td>
-                  {$form.$element_name.html}
+              <td class="label">{if array_key_exists($element_name, $form)}{$form.$element_name.label}{/if}</td><td>
+                {if array_key_exists($element_name, $form)}{$form.$element_name.html}{/if}
                 {if !empty($form.$operator_name)}
                   <span class="crm-multivalue-search-op" for="{$element_name}">{$form.$operator_name.html}</span>
                   {assign var="add_multivalue_js" value=true}

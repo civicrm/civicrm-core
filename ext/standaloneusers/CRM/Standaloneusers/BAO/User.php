@@ -104,7 +104,7 @@ class CRM_Standaloneusers_BAO_User extends CRM_Standaloneusers_DAO_User implemen
     return $timeZones;
   }
 
-  public function addSelectWhereClause(string $entityName = NULL, int $userId = NULL, array $conditions = []): array {
+  public function addSelectWhereClause(?string $entityName = NULL, ?int $userId = NULL, array $conditions = []): array {
     $clauses = [];
 
     // ↓ The following is copied from parent::addSelectWhereClause(). Is it needed? :shrug:

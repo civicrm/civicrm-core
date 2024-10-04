@@ -4089,4 +4089,35 @@ INSERT INTO civicrm_state_province (country_id, abbreviation, name) VALUES
 (1016, "13", "Al Manāmah (Al ‘Āşimah)"),
 (1016, "14", "Al Janūbīyah"),
 (1016, "16", "Al Wusţá"),
-(1016, "17", "Ash Shamālīyah");
+(1016, "17", "Ash Shamālīyah"),
+
+-- Add missing provinces for Moldova
+(1142, 'AN', 'Anenii Noi'),
+(1142, 'BS', 'Basarabeasca'),
+(1142, 'BR', 'Briceni'),
+(1142, 'CT', 'Cantemir'),
+(1142, 'CL', 'Călărași'),
+(1142, 'CS', 'Căușeni'),
+(1142, 'CM', 'Cimislia'),
+(1142, 'CR', 'Criuleni'),
+(1142, 'DO', 'Dondușeni'),
+(1142, 'DR', 'Drochia'),
+(1142, 'DU', 'Dubăsari'),
+(1142, 'FA', 'Fălești'),
+(1142, 'FL', 'Florești'),
+(1142, 'GL', 'Glodeni'),
+(1142, 'HI', 'Hîncești'),
+(1142, 'IA', 'Ialoveni'),
+(1142, 'LE', 'Leova'),
+(1142, 'NI', 'Nisporeni'),
+(1142, 'OC', 'Ocnița'),
+(1142, 'RE', 'Rezina'),
+(1142, 'RI', 'Rîșcani'),
+(1142, 'SI', 'Sîngerei'),
+(1142, 'ST', 'Strășeni'),
+(1142, 'SD', 'Șoldănești'),
+(1142, 'SV', 'Ștefan Vodă'),
+(1142, 'TE', 'Telenești')
+
+-- end of statement:
+;

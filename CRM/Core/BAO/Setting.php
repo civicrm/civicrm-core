@@ -493,13 +493,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   public static function isAPIJobAllowedToRun($params): void {
     $environment = CRM_Core_Config::environment(NULL, TRUE);
     if ($environment !== 'Production') {
-      if (!empty($params['runInNonProductionEnvironment'])) {
-        $mailing = Civi::settings()->get('mailing_backend_store');
-        if ($mailing) {
-          Civi::settings()->set('mailing_backend', $mailing);
-        }
-      }
-      else {
+      if (empty($params['runInNonProductionEnvironment'])) {
         throw new CRM_Core_Exception(ts('Job has not been executed as it is a %1 (non-production) environment.', [1 => $environment]));
       }
     }
@@ -519,17 +513,13 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    */
   public static function onChangeEnvironmentSetting($oldValue, $newValue, $metadata) {
     if ($newValue !== 'Production') {
-      $mailing = Civi::settings()->get('mailing_backend');
-      if ($mailing['outBound_option'] != CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED) {
-        Civi::settings()->set('mailing_backend_store', $mailing);
-      }
-      Civi::settings()->set('mailing_backend', ['outBound_option' => CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED]);
       CRM_Core_Session::setStatus(ts('Outbound emails have been disabled. Scheduled jobs will not run unless runInNonProductionEnvironment=TRUE is added as a parameter for a specific job'), ts("Non-production environment set"), "success");
+      Civi::settings()->set('mailing_backend', ['outBound_option' => CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED]);
     }
-    else {
-      $mailing = Civi::settings()->get('mailing_backend_store');
-      if ($mailing) {
-        Civi::settings()->set('mailing_backend', $mailing);
+    if ($newValue == 'Production' && $oldValue != 'Production') {
+      $mailing_backend = Civi::settings()->get('mailing_backend');
+      if ($mailing_backend['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED) {
+        CRM_Core_Session::setStatus(ts('Now that your site is in production mode, you may want to enable <a %1>outbound email</a>.', [1 => 'href="' . CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1') . '"']), ts("Production environment set"), "success");
       }
     }
   }
