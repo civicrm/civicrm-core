@@ -2829,7 +2829,7 @@ class CRM_Contact_BAO_Query {
     [$_, $_, $value, $grouping, $_] = $values;
     if ($value) {
       // *prepend* to the relevant grouping as this is quite an important factor
-      array_unshift($this->_qill[$grouping], ts('Search in Trash'));
+      array_unshift($this->_qill[$grouping], ts('Search Deleted Contacts'));
     }
   }
 

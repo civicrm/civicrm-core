@@ -105,7 +105,7 @@ class CRM_Contact_Form_Search_Criteria {
     $form->addElement('text', 'external_identifier', ts('External ID'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'external_identifier'));
 
     if (CRM_Core_Permission::check('access deleted contacts') and Civi::settings()->get('contact_undelete')) {
-      $form->add('checkbox', 'deleted_contacts', ts('Search in Trash') . '<br />' . ts('(deleted contacts)'));
+      $form->add('checkbox', 'deleted_contacts', ts('Search Deleted Contacts'));
     }
 
     // add checkbox for cms users only

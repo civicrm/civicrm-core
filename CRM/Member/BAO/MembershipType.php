@@ -162,7 +162,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
         if (in_array('Membership', $status)) {
           $findMembersURL = CRM_Utils_System::url('civicrm/member/search', 'reset=1');
           $deleteURL = CRM_Utils_System::url('civicrm/contact/search/advanced', 'reset=1');
-          $message .= '<br/>' . ts('%3. There are some contacts who have this membership type assigned to them. Search for contacts with this membership type from <a href=\'%1\'>Find Members</a>. If you are still getting this message after deleting these memberships, there may be contacts in the Trash (deleted) with this membership type. Try using <a href="%2">Advanced Search</a> and checking "Search in Trash".', [
+          $message .= '<br/>' . ts('%3. There are some contacts who have this membership type assigned to them. Search for contacts with this membership type from <a href=\'%1\'>Find Members</a>. If you are still getting this message after deleting these memberships, there may be contacts in the Trash (deleted) with this membership type. Try using <a href="%2">Advanced Search</a> and checking "Search Deleted Contacts".', [
             1 => $findMembersURL,
             2 => $deleteURL,
             3 => $cnt,
