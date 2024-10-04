@@ -766,7 +766,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
 
     //get the button name
     $buttonName = $this->controller->getButtonName();
-    $this->_formValues['uf_group_id'] ??= $this->get('uf_group_id');
+    $this->_formValues['uf_group_id'] ??= $this->get('uf_group_id') ?: CRM_Core_Config::singleton()->defaultSearchProfileID;
 
     if (isset($this->_componentMode) && empty($this->_formValues['component_mode'])) {
       $this->_formValues['component_mode'] = $this->_componentMode;
