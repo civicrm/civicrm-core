@@ -1,6 +1,7 @@
 <?php
 
 use Civi\Api4\ActivityContact;
+use Civi\Api4\File;
 
 /**
  * Class CRM_Utils_Mail_EmailProcessorInboundTest
@@ -180,6 +181,41 @@ class CRM_Utils_Mail_EmailProcessorInboundTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test messed up from.
+   *
+   * This ensures fix for https://issues.civicrm.org/jira/browse/CRM-19215.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testParsedAttachment() :void {
+    $mail = 'text_attached.eml';
+    $string = 'Big Business';
+    $file_contents = file_get_contents(__DIR__ . '/data/inbound/' . $mail);
+    file_put_contents(__DIR__ . '/data/mail/' . $mail, $file_contents);
+    $this->callAPISuccess('Job', 'fetch_activities', []);
+    $attachments = File::get()
+      ->execute();
+    $this->assertCount(3, $attachments);
+    $activity = \Civi\Api4\Activity::get()
+      ->addWhere('activity_type_id:name', '=', 'Inbound Email')
+      ->addSelect('custom.*')
+      ->addSelect('details')
+      ->execute()->single();
+    $this->assertStringContainsString($string, $activity['details']);
+
+  }
+
+  public function attachmentDataProvier(): array {
+    return [
+      ['text_attached.eml', 'Seamus', FALSE],
+      ['ics_gmail_attached.eml', '', TRUE],
+      ['ics_gmail_generated.eml', '', TRUE],
+      ['ics_thunderbird_attached.eml', '', TRUE],
+      ['ics_thunderbird_generated.eml', '', TRUE],
+    ];
+  }
+
+  /**
    * test hook_civicrm_emailProcessor
    */
   public function testHookEmailProcessor(): void {
@@ -268,7 +304,8 @@ class CRM_Utils_Mail_EmailProcessorInboundTest extends CiviUnitTestCase {
   }
 
   /**
-   * test hook_civicrm_emailProcessorContact with catchall but matching individual
+   * test hook_civicrm_emailProcessorContact with catchall but matching
+   * individual
    */
   public function testHookEmailProcessorContactCatchallWithMatch(): void {
     $this->hookClass->setHook('civicrm_emailProcessorContact', [$this, 'hookImplForEmailProcessorContact']);

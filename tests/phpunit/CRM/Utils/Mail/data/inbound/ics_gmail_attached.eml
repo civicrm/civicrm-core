@@ -1,0 +1,189 @@
+Delivered-To: bob@example.com
+Received: by 2002:a59:9450:0:b0:484:73f8:c060 with SMTP id q16csp1839024vqi;
+        Mon, 26 Aug 2024 14:48:00 -0700 (PDT)
+X-Received: by 2002:a05:6512:3f19:b0:52c:e170:9d38 with SMTP id 2adb3069b0e04-5344e3dab0bmr407779e87.31.1724708879882;
+        Mon, 26 Aug 2024 14:47:59 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1724708879; cv=none;
+        d=google.com; s=arc-20160816;
+        b=NQU+A5DyvJxBT5KZ8SjpQVXuGFWOXd+bqJi3AX7MpLC5cZuy9kMvyBMlCF9Z5FOgEt
+         3e9tOieBON9P8cxpN+gmN17bVwdFhpYKaAYmEZDRHvDhDBnCLeXGCA7uw/7HqTCSddqL
+         TRfrNAz8hG7IKQcMQym4AoxhQV7YdtwS7Qv2fJ0eof8pGG7oXXR440nbp8IHm3a/QRv1
+         S1gMjFzDPNvfIH8Xi3CLIDYdzoadEJKyJ8q/uJ1ahLz/hgOjxoOjok/1K2rcSbnqS2Qr
+         8VOWuV0BjAB4HgaghAnRMWuggKTiv5iqRLnPefOJO4NXIz9BHTRWv4fDLbm17OXkFt6d
+         NQmQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20160816;
+        h=to:subject:message-id:date:from:mime-version:dkim-signature;
+        bh=yKD21c8JHA7aJjN0oCxs55FlFD+X1Lz8+OQau8GvEFs=;
+        fh=emDhT3i8Q4zqQCAC8b7ideBoq+/uwZn4ylafxwc5Sg0=;
+        b=oIwgWpljq5UKMLWkH/1X59z+jFSC8R1TCh74Xj/l2f3h0kQLaLka88B2I5lnwyoZYG
+         OPiBH93vTv8EfSrsT5lhhlO+M3QLNycSEmUfXNMZAk0HQgWgablKWmkIdckFQYP3gMgw
+         EKARC4jK6zHBYnfFgQqXCNT1fADn+m+BvZ+nCqzVEJDUimRdHBC+Twc6Hi+ZTZk0/nNI
+         bN71ArLwS9u7Wn0M9Pd2TNFm1t5nICR1YmuHt/JOK0rkTQhKiPrHW54TvzwzAgBH3ptu
+         ZDrzxmlsp8V8QFpTEsD4rKqoS9FTokvCHeNA+2wBzW8Prx872bWQFvs5ONXIJ8wHKXw/
+         e2zg==;
+        dara=google.com
+ARC-Authentication-Results: i=1; mx.google.com;
+       dkim=pass header.i=@example-org.20230601.gappssmtp.com header.s=20230601 header.b=Wap2MeYp;
+       spf=softfail (google.com: domain of transitioning mail@example.org does not designate 209.85.220.41 as permitted sender) smtp.mailfrom=mail@example.org;
+       dara=pass header.i=@example.com
+Return-Path: <mail@example.org>
+Received: from mail-sor-f41.google.com (mail-sor-f41.google.com. [209.85.220.41])
+        by mx.google.com with SMTPS id 2adb3069b0e04-5334ea9b027sor2450363e87.30.2024.08.26.14.47.59
+        for <bob@example.com>
+        (Google Transport Security);
+        Mon, 26 Aug 2024 14:47:59 -0700 (PDT)
+Received-SPF: softfail (google.com: domain of transitioning mail@example.org does not designate 209.85.220.41 as permitted sender) client-ip=209.85.220.41;
+Authentication-Results: mx.google.com;
+       dkim=pass header.i=@example-org.20230601.gappssmtp.com header.s=20230601 header.b=Wap2MeYp;
+       spf=softfail (google.com: domain of transitioning mail@example.org does not designate 209.85.220.41 as permitted sender) smtp.mailfrom=mail@example.org;
+       dara=pass header.i=@example.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=example-org.20230601.gappssmtp.com; s=20230601; t=1724708878; x=1725313678; dara=google.com;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=yKD21c8JHA7aJjN0oCxs55FlFD+X1Lz8+OQau8GvEFs=;
+        b=Wap2MeYptUQlEtFadKHXhKCcQ+0ObTxBCEn5M8vZ5hXqCZS/bJVvxHHHbs+ePXOeH7
+         qsCcNP6vEXkmPV0nNNxi33Sne2LLzg4K4APDfJRvCBjBWN9bOa7ITRx9CtrX8xX5f+yI
+         nze5KANFTbqy1a7/JYHQIrI3u2McsGp2NNOPDSquwC5yUgjgHX+WF+Kk0e53sdZPDPqF
+         /ird+VV+oNfCwAS/+lpywIM3oUqHC2iIP5Okc9ZJdUuIJF5esojEu81Xlk04IR5BNrGQ
+         xpzF+9paCvQoreRUWzitCJyyyUtXf2cD2pkYDwoOkhLykW/wRVQvi68f4LUKRvpGQUK4
+         DpmA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724708878; x=1725313678;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=yKD21c8JHA7aJjN0oCxs55FlFD+X1Lz8+OQau8GvEFs=;
+        b=WMm71tgEHd3eLgY5JlHDZzXRaXZArsotTl09kAhtcwQf40E3OE+CSawMQfTeUMKxep
+         mPWstUBimdOKHpJqrrSk7QZu99jgHF/XiT7Id9ExXtl3dxaXYZe9lmn5Gmo/BRYdIgqU
+         uqxhd3w5GLFP7stjTFBmLTz0yT3+psfj/v1jIoL7KCnLBqBgWLh/UbYYb56FmWzUDVw6
+         xwO19SMvhBlzni4LCqrNG0R0a2OEB9DSPzP92QKAm48vZyTN/URDKaTt9JBIj4Es8ev3
+         lSf8IYZs3NSwBtuhBWfo7+tVWfDns71dlw6YjN95RYVBk0yZCqzh3dk8RyDw+lY750sg
+         mygg==
+X-Gm-Message-State: AOJu0Yx8S8J3wyaMfG7CzHZ5xQzhlx3D7f75H6dJe9/H4XzJauu68I7R 1x3uSHUZAajh4ih9ioO991wcTqJwYprIzAm+uw69UDq6k6eur1yHhxNgol7djqGlLY0tUSpUwHO yH61J3cxfqbuyVJ9ZezdWyomUp4vSAQwKJ1epXxw0gySOBwkNwA==
+X-Google-Smtp-Source: AGHT+IFGqRfbACz6EEQ5gpMVXUVbTPSTzxsiUXEfPpshtdyTzUa0IzO+sYU30s4xKj2d+56fk+UiRfeNV2T2GvgCzgU=
+X-Received: by 2002:a05:6512:230a:b0:52b:9c8a:734f with SMTP id 2adb3069b0e04-5344e500664mr377081e87.50.1724708878141; Mon, 26 Aug 2024 14:47:58 -0700 (PDT)
+MIME-Version: 1.0
+From: mail m <mail@example.org>
+Date: Tue, 27 Aug 2024 09:47:46 +1200
+Message-ID: <CAEGyM2QL92GjJ+qwxrJikXXtLEgTymj4KEikWSarSgZ+Dat+kQ@mail.example.com>
+Subject:
+To: "bob@example.com" <bob@example.com>
+Content-Type: multipart/mixed; boundary="0000000000000606dc06209d1493"
+
+--0000000000000606dc06209d1493
+Content-Type: multipart/alternative; boundary="0000000000000606db06209d1491"
+
+--0000000000000606db06209d1491
+Content-Type: text/plain; charset="UTF-8"
+
+
+
+--0000000000000606db06209d1491
+Content-Type: text/html; charset="UTF-8"
+
+<div dir="ltr"><br></div>
+
+--0000000000000606db06209d1491
+Content-Type: text/calendar; charset="UTF-8"; method=REQUEST
+Content-Transfer-Encoding: 7bit
+
+BEGIN:VCALENDAR
+PRODID:-//Google Inc//Google Calendar 70.9054//EN
+VERSION:2.0
+CALSCALE:GREGORIAN
+METHOD:REQUEST
+BEGIN:VTIMEZONE
+TZID:Pacific/Auckland
+X-LIC-LOCATION:Pacific/Auckland
+BEGIN:STANDARD
+TZOFFSETFROM:+1300
+TZOFFSETTO:+1200
+TZNAME:GMT+12
+DTSTART:19700405T030000
+RRULE:FREQ=YEARLY;BYMONTH=4;BYDAY=1SU
+END:STANDARD
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+1200
+TZOFFSETTO:+1300
+TZNAME:GMT+13
+DTSTART:19700927T020000
+RRULE:FREQ=YEARLY;BYMONTH=9;BYDAY=-1SU
+END:DAYLIGHT
+END:VTIMEZONE
+BEGIN:VEVENT
+DTSTART;TZID=Pacific/Auckland:20240827T130000
+DTEND;TZID=Pacific/Auckland:20240827T140000
+DTSTAMP:20240826T210910Z
+ORGANIZER;CN=Bob Smith:mailto:bob@example.org
+UID:4iuli8d4tu4ib346a0en1gs0r8@google.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=
+ TRUE;CN=eileen@mcnaughty.com;X-NUM-GUESTS=0:mailto:eileen@mcnaughty.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;RSVP=TRUE
+ ;CN=Bob Smith;X-NUM-GUESTS=0:mailto:bob@example.org
+X-GOOGLE-CONFERENCE:https://meet.google.com/rsa-doox-kda
+X-MICROSOFT-CDO-OWNERAPPTID:-1280213206
+CREATED:20240826T210816Z
+DESCRIPTION:-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~
+ :~:~:~:~:~:~:~:~::~:~::-\nJoin with Google Meet: https://meet.google.com/rs
+ a-doox-kda\nOr dial: (US) +1 518-418-5317 PIN: 234935251#\nMore phone numbe
+ rs: https://tel.meet/rsa-doox-kda?pin=2786074988227&hs=7\n\nLearn more abou
+ t Meet at: https://support.google.com/a/users/answer/9282720\n\nPlease do n
+ ot edit this section.\n-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:
+ ~:~:~:~:~:~:~:~:~:~:~:~:~:~::~:~::-
+LAST-MODIFIED:20240826T210908Z
+LOCATION:
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:zeta-hack-unhack
+TRANSP:OPAQUE
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:This is an event reminder
+TRIGGER:-P0DT0H10M0S
+END:VALARM
+END:VEVENT
+END:VCALENDAR
+
+--0000000000000606db06209d1491--
+--0000000000000606dc06209d1493
+Content-Type: text/calendar; charset="US-ASCII"; name="invite.ics"
+Content-Disposition: attachment; filename="invite.ics"
+Content-Transfer-Encoding: base64
+Content-ID: <f_m0bj4gvn0>
+X-Attachment-Id: f_m0bj4gvn0
+
+QkVHSU46VkNBTEVOREFSDQpQUk9ESUQ6LS8vR29vZ2xlIEluYy8vR29vZ2xlIENhbGVuZGFyIDcw
+LjkwNTQvL0VODQpWRVJTSU9OOjIuMA0KQ0FMU0NBTEU6R1JFR09SSUFODQpNRVRIT0Q6UkVRVUVT
+VA0KQkVHSU46VlRJTUVaT05FDQpUWklEOlBhY2lmaWMvQXVja2xhbmQNClgtTElDLUxPQ0FUSU9O
+OlBhY2lmaWMvQXVja2xhbmQNCkJFR0lOOlNUQU5EQVJEDQpUWk9GRlNFVEZST006KzEzMDANClRa
+T0ZGU0VUVE86KzEyMDANClRaTkFNRTpHTVQrMTINCkRUU1RBUlQ6MTk3MDA0MDVUMDMwMDAwDQpS
+UlVMRTpGUkVRPVlFQVJMWTtCWU1PTlRIPTQ7QllEQVk9MVNVDQpFTkQ6U1RBTkRBUkQNCkJFR0lO
+OkRBWUxJR0hUDQpUWk9GRlNFVEZST006KzEyMDANClRaT0ZGU0VUVE86KzEzMDANClRaTkFNRTpH
+TVQrMTMNCkRUU1RBUlQ6MTk3MDA5MjdUMDIwMDAwDQpSUlVMRTpGUkVRPVlFQVJMWTtCWU1PTlRI
+PTk7QllEQVk9LTFTVQ0KRU5EOkRBWUxJR0hUDQpFTkQ6VlRJTUVaT05FDQpCRUdJTjpWRVZFTlQN
+CkRUU1RBUlQ7VFpJRD1QYWNpZmljL0F1Y2tsYW5kOjIwMjQwODI3VDEzMDAwMA0KRFRFTkQ7VFpJ
+RD1QYWNpZmljL0F1Y2tsYW5kOjIwMjQwODI3VDE0MDAwMA0KRFRTVEFNUDoyMDI0MDgyNlQyMTA5
+MTBaDQpPUkdBTklaRVI7Q049RWlsZWVuIE1jTmF1Z2h0b246bWFpbHRvOmVtY25hdWdodG9uQHdp
+a2ltZWRpYS5vcmcNClVJRDo0aXVsaThkNHR1NGliMzQ2YTBlbjFnczByOEBnb29nbGUuY29tDQpB
+VFRFTkRFRTtDVVRZUEU9SU5ESVZJRFVBTDtST0xFPVJFUS1QQVJUSUNJUEFOVDtQQVJUU1RBVD1O
+RUVEUy1BQ1RJT047UlNWUD0NCiBUUlVFO0NOPWVpbGVlbkBtY25hdWdodHkuY29tO1gtTlVNLUdV
+RVNUUz0wOm1haWx0bzplaWxlZW5AbWNuYXVnaHR5LmNvbQ0KQVRURU5ERUU7Q1VUWVBFPUlORElW
+SURVQUw7Uk9MRT1SRVEtUEFSVElDSVBBTlQ7UEFSVFNUQVQ9QUNDRVBURUQ7UlNWUD1UUlVFDQog
+O0NOPUVpbGVlbiBNY05hdWdodG9uO1gtTlVNLUdVRVNUUz0wOm1haWx0bzplbWNuYXVnaHRvbkB3
+aWtpbWVkaWEub3JnDQpYLUdPT0dMRS1DT05GRVJFTkNFOmh0dHBzOi8vbWVldC5nb29nbGUuY29t
+L3JzYS1kb294LWtkYQ0KWC1NSUNST1NPRlQtQ0RPLU9XTkVSQVBQVElEOi0xMjgwMjEzMjA2DQpD
+UkVBVEVEOjIwMjQwODI2VDIxMDgxNloNCkRFU0NSSVBUSU9OOi06On46fjo6fjp+On46fjp+On46
+fjp+On46fjp+On46fjp+On46fjp+On46fjp+On46fjp+On46fjp+On46fg0KIDp+On46fjp+On46
+fjp+On46On46fjo6LVxuSm9pbiB3aXRoIEdvb2dsZSBNZWV0OiBodHRwczovL21lZXQuZ29vZ2xl
+LmNvbS9ycw0KIGEtZG9veC1rZGFcbk9yIGRpYWw6IChVUykgKzEgNTE4LTQxOC01MzE3IFBJTjog
+MjM0OTM1MjUxI1xuTW9yZSBwaG9uZSBudW1iZQ0KIHJzOiBodHRwczovL3RlbC5tZWV0L3JzYS1k
+b294LWtkYT9waW49Mjc4NjA3NDk4ODIyNyZocz03XG5cbkxlYXJuIG1vcmUgYWJvdQ0KIHQgTWVl
+dCBhdDogaHR0cHM6Ly9zdXBwb3J0Lmdvb2dsZS5jb20vYS91c2Vycy9hbnN3ZXIvOTI4MjcyMFxu
+XG5QbGVhc2UgZG8gbg0KIG90IGVkaXQgdGhpcyBzZWN0aW9uLlxuLTo6fjp+Ojp+On46fjp+On46
+fjp+On46fjp+On46fjp+On46fjp+On46fjp+On46fjp+Og0KIH46fjp+On46fjp+On46fjp+On46
+fjp+On46fjo6fjp+OjotDQpMQVNULU1PRElGSUVEOjIwMjQwODI2VDIxMDkwOFoNCkxPQ0FUSU9O
+Og0KU0VRVUVOQ0U6MA0KU1RBVFVTOkNPTkZJUk1FRA0KU1VNTUFSWTp6ZXRhLWhhY2stdW5oYWNr
+DQpUUkFOU1A6T1BBUVVFDQpCRUdJTjpWQUxBUk0NCkFDVElPTjpESVNQTEFZDQpERVNDUklQVElP
+TjpUaGlzIGlzIGFuIGV2ZW50IHJlbWluZGVyDQpUUklHR0VSOi1QMERUMEgxME0wUw0KRU5EOlZB
+TEFSTQ0KRU5EOlZFVkVOVA0KRU5EOlZDQUxFTkRBUg0K
+--0000000000000606dc06209d1493--

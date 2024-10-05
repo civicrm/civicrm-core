@@ -1,0 +1,296 @@
+
+Eileen Someone
+
+
+
+
+
+
+
+
+
+
+Invitation: do the thing
+
+Eileen Someone
+
+<eileen@example.com>
+
+09:15
+
+To:
+someone@example.org
+
+
+
+Aug
+
+28
+
+do the thing
+
+Wed Aug 28 2024 09:30:00 GMT+1200 (New Zealand Standard Time)
+
+Wed Aug 28 2024 10:30:00 GMT+1200 (New Zealand Standard Time)
+
+eileen@example.com(organizer)
+
+someone@example.org
+
+
+
+
+Reply
+
+
+Delivered-To: someone@example.org
+Received: by 2002:a05:7110:4a87:b0:248:bf9:668b with SMTP id cd7csp1871835geb;
+ Mon, 26 Aug 2024 14:15:01 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEkV00sDMzGJxR/Z5l9F39mD6Ue9/vkryDVY33S2OQzKKEsRijfTKSd+2onzMIx2rSNkTCG
+X-Received: by 2002:a05:6830:6710:b0:703:6093:e289 with SMTP id
+ 46e09a7af769-70f4842d2bbmr940114a34.21.1724706901441; Mon, 26 Aug 2024
+ 14:15:01 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1724706901; cv=none; d=google.com;
+ s=arc-20160816;
+ b=NadqrJ+xlO/fAji+k39upAKhSL3qdu7qqN8UsNqKlX1uuPpCOq+94D6v7hioEIcS4Q
+ 4S8yfTM3ChDIxLXu/ntru7g/XBiorWZEVqH2XFx25TI9BqR1Jru9aQGFupRsOw2u+Uda
+ rXN8VU3D4c5kI6k7TojGSGyLt6mBIdPTm9RDxyvHCGm0kyUViaE1G0iIBHC98qy53H2w
+ jvPAnREI6WSZe3m2ZnVqc7zjNkwShKMVCV/7avh4C2Zd9k6hsoKT4k0wMLkXFsBK4oo2
+ z+Ho1sqLR6brcQ3F8teQAXFWEnDpGN79JBF5ZppLX5J1yU27QbfgxPnYe6aXWwP07Spe sppg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com;
+ s=arc-20160816;
+ h=subject:date:to:message-id:from:dkim-signature:mime-version;
+ bh=fZpldkHtSvdvU5/B62WQd5QCGHoR1T1/WPFqFENnVkk=;
+ fh=aNg5svSyJv4ejE7YuI1oIcH0ax6kSviZfBUmjCx7+00=;
+ b=DgtKCR+2Q8gFiXZRKDHJO0kkjfCmMEnBsvnq6AugQGCYED4IjR+Pnjji8U8hFZOSRg
+ Tw1hXDrQw10BET5fzE0EkWQ/gMrg1/3BP13jq3tUEHTgs4PJOiP4rTvsPJ50t0i1DZrb
+ 7P1rPSDWIfGglUTShx1F5Bn/8hadIyL/iMVB1266/xLeptnczEOdVaxFQEHNrntKRLDG
+ mHHHfkaXkJ9rV3UPkIFvVReBsWY/xMnCN9dtBXixiEiHMKH86KjtIfWIxDzJWXFjpg7F
+ 0fLSw6uczXuxwWW92wl62ZyI2kdax+U/1q01WcV0VzQLUKxK40y7VtNk++SBd3u9asSK 5Yrw==;
+ dara=google.com
+ARC-Authentication-Results: i=1; mx.google.com; dkim=pass
+ header.i=@example.com header.s=default header.b=t8lwBDDx; spf=pass
+ (google.com: domain of eileen@example.com designates 2a01:4f8:1c1c:1685::1
+ as permitted sender) smtp.mailfrom=eileen@example.com
+Return-Path: <eileen@example.com>
+Received: from mx-in2001.example.org (mx-in2001.example.org.
+ [208.80.153.75]) by mx.google.com with ESMTPS id
+ 46e09a7af769-70e03a1c9f1si4345268a34.116.2024.08.26.14.15.00 for
+ <someone@example.org> (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384
+ bits=256/256); Mon, 26 Aug 2024 14:15:00 -0700 (PDT)
+Received-SPF: pass (google.com: domain of eileen@example.com designates
+ 2a01:4f8:1c1c:1685::1 as permitted sender) client-ip=2a01:4f8:1c1c:1685::1;
+Authentication-Results: mx.google.com; dkim=pass header.i=@example.com
+ header.s=default header.b=t8lwBDDx; spf=pass (google.com: domain of
+ eileen@example.com designates 2a01:4f8:1c1c:1685::1 as permitted sender)
+ smtp.mailfrom=eileen@example.com
+Received: from smtp.example.net (momo.example.net [IPv6:2a01:4f8:1c1c:1685::1]) by
+ mx-in2001.example.org (Postfix) with ESMTPS id 55E16E1002 for
+ <someone@example.org>; Mon, 26 Aug 2024 21:14:59 +0000 (UTC)
+Authentication-Results: mx-in2001.example.org; dkim=pass
+ header.d=example.com header.s=default header.b=t8lwBDDx; spf=pass
+ (mx-in2001.example.org: domain of eileen@example.com designates
+ 2a01:4f8:1c1c:1685::1 as permitted sender)
+ smtp.mailfrom=eileen@example.com; dmarc=pass (policy=none)
+ header.from=example.com
+MIME-version: 1.0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=example.com;
+ s=default; t=1724706896;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type;
+ bh=fZpldkHtSvdvU5/B62WQd5QCGHoR1T1/WPFqFENnVkk=;
+ b=t8lwBDDxuUN02WVuL+c8pJwAJGrMAOY7YQ5ytwwY/olYg216IH8KDLPpLCThjcelNIhnza
+ 0eLdbq3jJu9RmhKzMKDotwINWXR/Vm9YbGqe8vXnIad8Vc/N9TvUCqdoM1+zngceEeX54n
+ rdw9S6vWzKR3w9bFaLtGKFKKc0IGTrpem5cXj2SFLvsbq7IU+wVOxH9FJxbGKgFHGnQ/cG
+ gCZzqal8BVkYOBvTsE3rsXY6Dhmxoj7jgSG82nb2S4erB93vdpinvT1JpEUqtguwioRcCe
+ Hz6gUuIaVgba5ICaC//FklYoL5eUQDbvlUODHnTKgVEgAUN/ZaeO3nVusRmv0w==
+From: Eileen Someone <eileen@example.com>
+Message-ID: <f7bcce62-000a-48c5-8165-03db9be95206@example.com>
+To: someone@example.org
+Date: Tue, 27 Aug 2024 09:14:51 +1200
+Subject: Invitation: do the thing
+Content-type: multipart/mixed; boundary="Boundary_(ID_qyG4ZdjoAsiZ+Jo19dCbWQ)"
+X-Spam-Status: No, score=-0.00
+
+--Boundary_(ID_qyG4ZdjoAsiZ+Jo19dCbWQ)
+Content-type: multipart/alternative; boundary="Boundary_(ID_ryU4ZdJoASiZ+Jo21dCbwA)"
+
+--Boundary_(ID_ryU4ZdJoASiZ+Jo21dCbwA)
+Content-type: text/plain; charset=UTF-8
+Content-transfer-encoding: 8BIT
+
+Eileen McNaughton <eileen@mcnaughty.com> has invited you to do the thing
+
+
+--Boundary_(ID_ryU4ZdJoASiZ+Jo21dCbwA)
+Content-type: text/calendar; method=REQUEST; charset=UTF-8
+Content-transfer-encoding: 8BIT
+
+BEGIN:VCALENDAR
+PRODID:-//Mozilla.org/NONSGML Mozilla Calendar V1.1//EN
+VERSION:2.0
+METHOD:REQUEST
+BEGIN:VTIMEZONE
+TZID:Pacific/Auckland
+X-TZINFO:Pacific/Auckland[2024a]
+BEGIN:STANDARD
+TZOFFSETTO:+113000
+TZOFFSETFROM:+113904
+TZNAME:Pacific/Auckland(STD)
+DTSTART:18681102T000000
+RDATE:18681102T000000
+END:STANDARD
+BEGIN:DAYLIGHT
+TZOFFSETTO:+123000
+TZOFFSETFROM:+113000
+TZNAME:Pacific/Auckland(DST)
+DTSTART:19271106T020000
+RDATE:19271106T020000
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETTO:+113000
+TZOFFSETFROM:+123000
+TZNAME:Pacific/Auckland(STD)
+DTSTART:19280304T020000
+RDATE:19280304T020000
+END:STANDARD
+BEGIN:STANDARD
+TZOFFSETTO:+113000
+TZOFFSETFROM:+120000
+TZNAME:Pacific/Auckland(STD)
+DTSTART:19290317T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=3SU;UNTIL=19330319T020000
+END:STANDARD
+BEGIN:DAYLIGHT
+TZOFFSETTO:+120000
+TZOFFSETFROM:+113000
+TZNAME:Pacific/Auckland(DST)
+DTSTART:19281014T020000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=2SU;UNTIL=19331008T020000
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETTO:+113000
+TZOFFSETFROM:+120000
+TZNAME:Pacific/Auckland(STD)
+DTSTART:19340429T020000
+RRULE:FREQ=YEARLY;BYMONTH=4;BYDAY=-1SU;UNTIL=19400428T020000
+END:STANDARD
+BEGIN:DAYLIGHT
+TZOFFSETTO:+120000
+TZOFFSETFROM:+113000
+TZNAME:Pacific/Auckland(DST)
+DTSTART:19340930T020000
+RRULE:FREQ=YEARLY;BYMONTH=9;BYDAY=-1SU;UNTIL=19400929T020000
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETTO:+120000
+TZOFFSETFROM:+120000
+TZNAME:Pacific/Auckland(STD)
+DTSTART:19460101T000000
+RDATE:19460101T000000
+END:STANDARD
+BEGIN:DAYLIGHT
+TZOFFSETTO:+130000
+TZOFFSETFROM:+120000
+TZNAME:Pacific/Auckland(DST)
+DTSTART:19741103T020000
+RDATE:19741103T020000
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETTO:+120000
+TZOFFSETFROM:+130000
+TZNAME:Pacific/Auckland(STD)
+DTSTART:19750223T030000
+RDATE:19750223T030000
+END:STANDARD
+BEGIN:DAYLIGHT
+TZOFFSETTO:+130000
+TZOFFSETFROM:+120000
+TZNAME:Pacific/Auckland(DST)
+DTSTART:19751026T020000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU;UNTIL=19881030T020000
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETTO:+120000
+TZOFFSETFROM:+130000
+TZNAME:Pacific/Auckland(STD)
+DTSTART:19760307T030000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=1SU;UNTIL=19890305T030000
+END:STANDARD
+BEGIN:DAYLIGHT
+TZOFFSETTO:+130000
+TZOFFSETFROM:+120000
+TZNAME:Pacific/Auckland(DST)
+DTSTART:19891008T020000
+RDATE:19891008T020000
+END:DAYLIGHT
+BEGIN:DAYLIGHT
+TZOFFSETTO:+130000
+TZOFFSETFROM:+120000
+TZNAME:Pacific/Auckland(DST)
+DTSTART:19901007T020000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=1SU;UNTIL=20061001T020000
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETTO:+120000
+TZOFFSETFROM:+130000
+TZNAME:Pacific/Auckland(STD)
+DTSTART:19900318T030000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=3SU;UNTIL=20070318T030000
+END:STANDARD
+BEGIN:STANDARD
+TZOFFSETTO:+120000
+TZOFFSETFROM:+130000
+TZNAME:Pacific/Auckland(STD)
+DTSTART:20080406T030000
+RDATE:20080406T030000
+END:STANDARD
+BEGIN:DAYLIGHT
+TZOFFSETTO:+130000
+TZOFFSETFROM:+120000
+TZNAME:Pacific/Auckland(DST)
+DTSTART:20070930T020000
+RRULE:FREQ=YEARLY;BYMONTH=9;BYDAY=-1SU;UNTIL=20080928T020000
+END:DAYLIGHT
+BEGIN:DAYLIGHT
+TZOFFSETTO:+130000
+TZOFFSETFROM:+120000
+TZNAME:(DST)
+DTSTART:20090927T020000
+RRULE:FREQ=YEARLY;BYMONTH=9;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETTO:+120000
+TZOFFSETFROM:+130000
+TZNAME:(STD)
+DTSTART:20090405T030000
+RRULE:FREQ=YEARLY;BYMONTH=4;BYDAY=1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+CREATED:20240826T211425Z
+LAST-MODIFIED:20240826T211451Z
+DTSTAMP:20240826T211451Z
+UID:8502a774-0c77-4331-aef2-78b4a1554afe
+SUMMARY:do the thing
+ORGANIZER;CN=Eileen McNaughton;PARTSTAT=NEEDS-ACTION;CUTYPE=INDIVIDUAL:mail
+ to:eileen@mcnaughty.com
+ATTENDEE;RSVP=TRUE;CN=Eileen McNaughton;PARTSTAT=NEEDS-ACTION;CUTYPE=INDIVI
+ DUAL;ROLE=REQ-PARTICIPANT:mailto:eileen@mcnaughty.com
+ATTENDEE;RSVP=TRUE;PARTSTAT=NEEDS-ACTION;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICI
+ PANT:mailto:emcnaughton@wikimedia.org
+DTSTART;TZID=Pacific/Auckland:20240828T093000
+DTEND;TZID=Pacific/Auckland:20240828T103000
+TRANSP:OPAQUE
+END:VEVENT
+END:VCALENDAR
+
+
+--Boundary_(ID_ryU4ZdJoASiZ+Jo21dCbwA)--
+--Boundary_(ID_qyG4ZdjoAsiZ+Jo19dCbWQ)
+Content-type: application/ics; name=invite.ics
+Content-transfer-encoding: 8BIT
+Content-disposition: attachment; filename=invite.ics
+
+
+--Boundary_(ID_qyG4ZdjoAsiZ+Jo19dCbWQ)--
