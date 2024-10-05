@@ -58,9 +58,9 @@ class Tokens extends AutoService implements EventSubscriberInterface {
     $tokenForms = static::getTokenForms();
     foreach ($tokenForms as $tokenName => $afform) {
       $e->entity('afform')
-        ->register("afform.{$tokenName}Url", E::ts('%1 (URL)', [1 => $afform['title'] ?? $afform['name']]));
+        ->register("{$tokenName}Url", E::ts('%1 (URL)', [1 => $afform['title'] ?? $afform['name']]));
       $e->entity('afform')
-        ->register("afform.{$tokenName}Link", E::ts('%1 (Full Hyperlink)', [1 => $afform['title'] ?? $afform['name']]));
+        ->register("{$tokenName}Link", E::ts('%1 (Full Hyperlink)', [1 => $afform['title'] ?? $afform['name']]));
     }
     if (!in_array('contactId', $e->getTokenProcessor()->getContextValues('schema')[0])) {
       return;

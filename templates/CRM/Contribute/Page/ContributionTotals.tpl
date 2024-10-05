@@ -16,7 +16,7 @@
             <th class="contriTotalLeft right">{ts}Current Fiscal Year-to-Date{/ts} &ndash; {$annual.amount nofilter}</th>
             <th class="right"> &nbsp; {ts}# Completed Contributions{/ts} &ndash; {$annual.count nofilter}</th>
             <th class="right contriTotalRight"> &nbsp; {ts}Avg Amount{/ts} &ndash; {$annual.avg nofilter}</th>
-            {if $contributionSummary.cancel.amount nofilter}
+            {if $contributionSummary.cancel.amount}
                 <td>&nbsp;</td>
             {/if}
         </tr>
@@ -29,11 +29,11 @@
             <th class="right"> &nbsp; {ts}# Completed{/ts} &ndash; {$contributionSummary.total.count nofilter}</th>
             <th class="right contriTotalRight"> &nbsp; {ts}Avg{/ts} &ndash; {$contributionSummary.total.avg nofilter}</th>
           {/if}
-          {if $contributionSummary.cancel.amount nofilter}
+          {if $contributionSummary.cancel.amount}
             <th class="disabled right contriTotalRight"> &nbsp; {ts}Cancelled/Refunded{/ts} &ndash; {$contributionSummary.cancel.amount nofilter}</th>
           {/if}
       </tr>
-      {if $contributionSummary.soft_credit.count nofilter}
+      {if $contributionSummary.soft_credit.count}
         {include file="CRM/Contribute/Page/ContributionSoftTotals.tpl" softCreditTotals=$contributionSummary.soft_credit}
       {/if}
     {/if}
