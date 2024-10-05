@@ -767,10 +767,11 @@ abstract class CRM_Utils_System_Base {
    * Set PHP timezone
    *
    * @param ?string $timeZone
-   *    Timezone string - if none provided will be fetched from system
+   *    Timezone string - default value will be fetched
+   *    using getTimeZoneString if not provided or falsey
    */
   public function setPhpTimeZone(?string $timeZone = NULL) {
-    $timeZone = $timeZone ?? $this->getTimeZoneString();
+    $timeZone = $timeZone ?: $this->getTimeZoneString();
     date_default_timezone_set($timeZone);
   }
 
