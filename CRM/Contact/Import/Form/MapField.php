@@ -389,13 +389,10 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     $highlightedFields = $entityFields[$this->getContactType()];
     $highlightedFields[] = 'email';
     $highlightedFields[] = 'external_identifier';
-    if (!$this->isSkipDuplicates()) {
-      $highlightedFields[] = 'id';
-    }
-    $customFields = CRM_Core_BAO_CustomField::getFields($this->getContactType());
-    foreach ($customFields as $key => $attr) {
-      if (!empty($attr['is_required'])) {
-        $highlightedFields[] = "custom_$key";
+    $highlightedFields[] = 'id';
+    foreach ($this->getFields() as $key => $details) {
+      if (!empty($details['custom_field_id']) && !empty($details['is_required'])) {
+        $highlightedFields[] = $key;
       }
     }
     return $highlightedFields;
