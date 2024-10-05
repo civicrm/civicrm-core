@@ -19,7 +19,7 @@
 
 namespace Civi\Api4;
 
-use api\v4\Mock\MockEntityDataStorage;
+use Civi\Mock\MockEntityDataStorage;
 
 /**
  * MockBasicEntity entity.
@@ -31,9 +31,9 @@ use api\v4\Mock\MockEntityDataStorage;
  */
 class MockBasicEntity extends Generic\BasicEntity {
 
-  protected static $getter = [MockEntityDataStorage::CLASS, 'get'];
-  protected static $setter = [MockEntityDataStorage::CLASS, 'write'];
-  protected static $deleter = [MockEntityDataStorage::CLASS, 'delete'];
+  protected static $getter = [MockEntityDataStorage::class, 'get'];
+  protected static $setter = [MockEntityDataStorage::class, 'write'];
+  protected static $deleter = [MockEntityDataStorage::class, 'delete'];
 
   /**
    * @inheritDoc
