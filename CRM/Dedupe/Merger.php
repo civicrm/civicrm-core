@@ -915,21 +915,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           }
 
           $valueId = NULL;
-          if (!empty($params['customRecordValues'])) {
-            CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
-            if (is_array($params['customRecordValues']) && !empty($params['customRecordValues'])) {
-              foreach ($params['customRecordValues'] as $recId => $customFields) {
-                if (is_array($customFields) && !empty($customFields)) {
-                  foreach ($customFields as $customFieldName) {
-                    if ($customFieldName == $key) {
-                      $valueId = $recId;
-                      break;
-                    }
-                  }
-                }
-              }
-            }
-          }
 
           //CRM-13596 - check for contact_sub_type_hidden first
           $type = $data['contact_type'];
