@@ -11,12 +11,12 @@
  - ie email & in the future phone, maybe im, website & openID although those
  may not rise to the top of anyone's to-do *}
 {if array_key_exists($blockId, $customFields)}
-  {foreach item='custom_field' from=$customFields[$blockId] key='custom_field_name'}
+  {foreach item='custom_field' from=$customFields.$blockId key='custom_field_name'}
     <tr class="crm-block-entity-{$entity}-{$blockId} {if $blockId gt $actualBlockCount}hiddenElement{/if}">
-      <td colspan="5">{$form[$entity][$blockId][$custom_field_name]['label']}</td>
+      <td colspan="5">{$form.$entity.$blockId.$custom_field_name.label}</td>
     </tr>
     <tr class="crm-block-entity-{$entity}-{$blockId} {if $blockId gt $actualBlockCount}hiddenElement{/if}">
-      <td colspan="5">{$form[$entity][$blockId][$custom_field_name]['html']}</td>
+      <td colspan="5">{$form.$entity.$blockId.$custom_field_name.html}</td>
     </tr>
   {/foreach}
 {/if}
