@@ -42,6 +42,19 @@ class CRM_Event_Form_Registration_RegisterTest extends CiviUnitTestCase {
     $this->assertValidationError($expectedResult);
   }
 
+  public function testValidateEventWithAvailableSpace(): void {
+    $event = $this->eventCreateUnpaid(['max_participants' => 2]);
+    $form = $this->getTestForm('CRM_Event_Form_Registration_Register', [
+      'additional_participants' => 2,
+      'email-Primary' => 'someone@example.com',
+    ], ['id' => $this->getEventID()]);
+    $form->processForm(FormWrapper::VALIDATED);
+    $expectedResult = [
+      'additional_participants' => 'There is only enough space left on this event for 2 participant(s).',
+    ];
+    $this->assertValidationError($expectedResult);
+  }
+
   /**
    * event#30
    *
