@@ -38,7 +38,6 @@
       <td align="center" class="crm-email-is_primary">{$form.email.$blockId.is_primary.1.html}</td>
       <td><a title="{ts}Delete Email{/ts}" class="crm-delete-inline crm-hover-button" href="#"><span class="icon delete-icon"></span></a></td>
     </tr>
-    {include file="CRM/Contact/Form/Inline/BlockCustomData.tpl" entity=email customFields=$custom_fields_email blockId=$blockId actualBlockCount=$actualBlockCount}
 
   {/section}
 </table>
