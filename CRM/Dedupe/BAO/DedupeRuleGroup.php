@@ -164,9 +164,15 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
       // Just for the hook.... (which is deprecated).
       $this->noRules = TRUE;
     }
+    $originalQueries = $tableQueries;
     CRM_Utils_Hook::dupeQuery($this, 'table', $tableQueries);
     if (empty($tableQueries)) {
       return FALSE;
+    }
+    if ($originalQueries === $tableQueries && !$optimizer->isUseReservedQuery()) {
+      // If the hook didn't mess with the queries we can optimize them. Only do it for
+      // merge searches at this stage, not by params.
+      $tableQueries = $optimizer->getOptimizedQueries();
     }
 
     if ($params) {
@@ -195,6 +201,8 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
     $exclWeightSum = [];
 
     while (!empty($tableQueries)) {
+      // this is pretty confusing but the idea is that a query could be dropped if it is not
+      // possible to reach the final weight.
       [$isInclusive, $isDie] = self::isQuerySetInclusive($tableQueries, $this->threshold, $exclWeightSum);
 
       if ($isInclusive) {

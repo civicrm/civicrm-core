@@ -387,6 +387,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $this->renameLabels();
     $this->ensureMySQLMode(['IGNORE_SPACE', 'ERROR_FOR_DIVISION_BY_ZERO', 'STRICT_TRANS_TABLES']);
     putenv('CIVICRM_SMARTY_DEFAULT_ESCAPE=1');
+    putenv('CIVICRM_DEDUPE_OPTIMIZER=TRUE');
     $this->originalSettings = \Civi::settings()->all();
 
     // There doesn't seem to be a better way to get the current error handler.
@@ -3522,8 +3523,8 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   /**
    * @return array|int
    */
-  protected function createRuleGroup(): array {
-    return $this->createTestEntity('DedupeRuleGroup', [
+  protected function createRuleGroup($params = []): array {
+    return $this->createTestEntity('DedupeRuleGroup', $params + [
       'contact_type' => 'Individual',
       'threshold' => 8,
       'used' => 'General',
