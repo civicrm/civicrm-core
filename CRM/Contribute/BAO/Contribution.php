@@ -19,6 +19,7 @@ use Civi\Api4\LineItem;
 use Civi\Api4\ContributionSoft;
 use Civi\Api4\MembershipLog;
 use Civi\Api4\PaymentProcessor;
+use Civi\Api4\UFJoin;
 use Civi\Core\Event\PostEvent;
 
 /**
@@ -2657,7 +2658,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       if (!empty($values['id'])) {
         $values['honor'] = [
           'honor_profile_values' => [],
-          'honor_profile_id' => CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFJoin', $values['id'], 'uf_group_id', 'entity_id'),
+          'honor_profile_id' => UFJoin::get(FALSE)->addWhere('entity_id', '=', $values['id'])->addWhere('entity_table', '=', 'civicrm_contribution_page')->addWhere('module', '=', 'soft_credit')->execute()->first()['uf_group_id'] ?? 0,
           'honor_id' => $softRecord['soft_credit'][1]['contact_id'],
         ];
 
