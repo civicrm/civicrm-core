@@ -188,48 +188,6 @@ class Security {
   }
 
   /**
-   * Authenticate the user against the CMS db.
-   *
-   * This is the (perhaps temporary location for) the implementation of CRM_Utils_System_Standalone method.
-   *
-   * @param string $name
-   *   The user name.
-   * @param string $password
-   *   The password for the above user.
-   * @param bool $loadCMSBootstrap
-   *   Load cms bootstrap?.
-   * @param string $realPath
-   *   Filename of script
-   *
-   * @return array|bool
-   *   [contactID, ufID, unique string] else false if no auth
-   * @throws \CRM_Core_Exception.
-   */
-  public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
-
-    // this comment + session lines: copied from Drupal's implementation in case it's important...
-    /* Before we do any loading, let's start the session and write to it.
-     * We typically call authenticate only when we need to bootstrap the CMS
-     * directly via Civi and hence bypass the normal CMS auth and bootstrap
-     * process typically done in CLI and cron scripts. See: CRM-12648
-     */
-    $session = CRM_Core_Session::singleton();
-    $session->set('civicrmInitSession', TRUE);
-
-    $user = $this->loadUserByName($name);
-
-    if (!$this->checkPassword($password, $user['password'] ?? '')) {
-      return FALSE;
-    }
-
-    $this->applyLocaleFromUser($user);
-
-    // Note: random_int is more appropriate for cryptographical use than mt_rand
-    // The long number is the max 32 bit value.
-    return [$user['contact_id'], $user['id'], random_int(0, 2147483647)];
-  }
-
-  /**
    * Register the given user as the currently logged in user.
    */
   public function loginAuthenticatedUserRecord(array $user, bool $withSession) {
@@ -458,7 +416,7 @@ class Security {
    * @param array $user
    * @return void
    */
-  private function applyLocaleFromUser(array $user) {
+  public function applyLocaleFromUser(array $user) {
     $session = CRM_Core_Session::singleton();
     if (!empty($user['language'])) {
       $session->set('lcMessages', $user['language']);
