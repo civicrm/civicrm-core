@@ -319,9 +319,9 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
     }
     elseif ($action & CRM_Core_Action::COPY) {
       $key = $_POST['qfKey'] ?? $_GET['qfKey'] ?? $_REQUEST['qfKey'] ?? NULL;
-      CRM_Core_Key::validate($key, CRM_Utils_System::getClassName($this));
-      if (!$key) {
-        CRM_Core_Controller::invalidKeyCommon();
+      $k = CRM_Core_Key::validate($key, CRM_Utils_System::getClassName($this));
+      if (!$k) {
+        $this->invalidKey();
       }
       $this->copy();
       CRM_Core_Session::setStatus(ts('A copy of the contribution page has been created'), ts('Successfully Copied'), 'success');
@@ -498,7 +498,7 @@ ORDER BY is_active desc, title asc
       $sectionsInfo = CRM_Utils_Array::value($dao->id, $contriPageSectionInfo, []);
       $contributions[$dao->id]['configureActionLinks'] = CRM_Core_Action::formLink(self::formatConfigureLinks($sectionsInfo),
         $action,
-        ['id' => $dao->id, 'key' => CRM_Core_Key::get(CRM_Utils_System::getClassName($this))],
+        ['id' => $dao->id],
         ts('Configure'),
         TRUE,
         'contributionpage.configure.actions',
@@ -531,7 +531,7 @@ ORDER BY is_active desc, title asc
       //build the normal action links.
       $contributions[$dao->id]['action'] = CRM_Core_Action::formLink(self::actionLinks(),
         $action,
-        ['id' => $dao->id],
+        ['id' => $dao->id, 'key' => CRM_Core_Key::get(CRM_Utils_System::getClassName($this))],
         ts('more'),
         TRUE,
         'contributionpage.action.links',

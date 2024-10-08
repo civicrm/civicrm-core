@@ -176,9 +176,9 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
       }
       elseif ($action & CRM_Core_Action::COPY) {
         $key = $_POST['qfKey'] ?? $_GET['qfKey'] ?? $_REQUEST['qfKey'] ?? NULL;
-        CRM_Core_Key::validate($key, CRM_Utils_System::getClassName($this));
-        if (!$key) {
-          CRM_Core_Controller::invalidKeyCommon();
+        $k = CRM_Core_Key::validate($key, CRM_Utils_System::getClassName($this));
+        if (!$k) {
+          $this->invalidKey();
         }
         $this->copy();
       }
@@ -337,7 +337,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
       $ufGroup[$id]['group_type'] = self::formatGroupTypes($groupTypes);
 
       $ufGroup[$id]['action'] = CRM_Core_Action::formLink(self::actionLinks(), $action,
-        ['id' => $id, 'key' => CRM_Utils_Key::get(CRM_Utils_System::getClassName($this))],
+        ['id' => $id, 'key' => CRM_Core_Key::get(CRM_Utils_System::getClassName($this))],
         ts('more'),
         FALSE,
         'ufGroup.row.actions',
