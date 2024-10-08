@@ -20,7 +20,7 @@
  */
 return [
   'installed' => [
-    'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
+    'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap.',
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'installed',
@@ -35,7 +35,7 @@ return [
     'help_text' => NULL,
   ],
   'enable_components' => [
-    'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
+    'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap.',
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'enable_components',
