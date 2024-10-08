@@ -5,7 +5,7 @@
 .crm-container [type="reset"],
 .crm-container [type="submit"] {
     white-space: nowrap;
-    vertical-align: middle;
+    /* vertical-align: middle; */
     touch-action: manipulation;
     cursor: var(--crm-hover-clickable);
     background-image: none;
@@ -482,26 +482,26 @@
     opacity: 1;
     text-shadow: none;
     padding: var(--crm-btn-padding-block) var(--crm-btn-icon-spacing) var(--crm-btn-padding-block) var(--crm-btn-padding-inline);
-    height: auto;
+    height: 100%;
     min-width: var(--crm-btn-height);
     display: flex;
     align-items: center;
     justify-content: center;
 }
-.crm-container button i.crm-i,
+/*.crm-container button i.crm-i,
 .crm-container .btn i.crm-i {
     height: calc(var(--crm-btn-height) - 2px);
-}
+}*/
 .crm-container a.button i.crm-i,
 .crm-container .crm-button:not(.btn) i.crm-i {
-    height: calc(var(--crm-btn-height) - 2px);
+    /* height: calc(var(--crm-btn-height) - 2px); */
     display: flex;
     align-items: center;
 }
 .crm-container .btn:has(i.crm-i),
 .crm-container .btn-group > .btn + .dropdown-toggle:has(i.crm-i),
 .crm-container button.ui-button:has(.ui-button-icon) {
-    padding: 0 var(--crm-btn-padding-inline) 0 0;
+    padding: var(--crm-btn-icon-padding) var(--crm-btn-padding-inline) var(--crm-btn-icon-padding) 0;
 }
 .crm-container a.button:has(i.crm-i),
 .crm-container button:has(i.crm-i),
@@ -509,14 +509,14 @@
 .crm-button > input[type="button"]:has(i.crm-i),
 .crm-button > input[type="submit"]:has(i.crm-i),
 .form-inline .btn-success.pull-right:has(i.crm-i) /* Api4exp */ {
-    padding: 0 var(--crm-btn-padding-inline) 0 0;
+    padding: var(--crm-btn-icon-padding) var(--crm-btn-padding-inline) var(--crm-btn-icon-padding) 0;
     width: fit-content;
     justify-content: center;
     align-items: center;
 }
 .crm-button > input[type="button"]:has(i.crm-i),
 .crm-button > input[type="submit"]:has(i.crm-i) {
-    padding: 0;
+    padding: var(--crm-btn-icon-padding) 0;
 }
 .crm-container .form-inline .btn-group button:has(i.crm-i),
 .crm-search-admin-main-tabs li .btn.btn-secondary.dropdown-toggle,

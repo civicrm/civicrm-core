@@ -55,6 +55,7 @@
     --crm-btn-alert-text: var(--crm-c-text);
     --crm-btn-icon-bg: var(--crm-c-background2);
     --crm-btn-icon-border: var(--crm-btn-border);
+    --crm-btn-icon-padding: 0px;
 
     /* Tables */
     --crm-table-outside-border: var(--crm-c-divider);

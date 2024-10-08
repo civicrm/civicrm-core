@@ -1,3 +1,9 @@
+0.10.8
+- CHANGED - Button height handling to allow wrapping double line buttons to keep their padding, but also protect streams that have full-height icon backgrounds (ref: https://lab.civicrm.org/extensions/riverlea/-/issues/55).
+- FIXED - Issue with icon backgrounds on buttons not stretching full height on double-height buttons.
+- NEW CSS VARIABLE -
+    added: --crm-btn-icon-padding (defaults to 'var(--crm-btn-padding-block)'). NB: fine to ignore this variable unless you want distinct button icon backgrounds, when you should set it to `0px`.
+
 0.10.7
 - FIXED - Number field is narrower than browser width.
 - CHANGED - WordPress font-size not set to 100%, padding variable moved.

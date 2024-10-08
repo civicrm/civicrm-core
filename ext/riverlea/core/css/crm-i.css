@@ -12,7 +12,7 @@ is loaded before font-awesome.css so that .fa-XXX classes can modify it. */
     font-size: inherit;
     font-style: normal;
     font-variant: normal;
-    line-height: 1;
+    /* line-height: 1; */
     text-rendering: auto;
     text-decoration: none;
     -webkit-font-smoothing: antialiased;
