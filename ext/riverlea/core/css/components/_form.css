@@ -198,7 +198,7 @@ select.crm-error {
     float: left;
 }
 .crm-container .crm-form-number {
-    width: 8ch;
+    width: auto; /* resets fixed width on input field with browser default */
 }
 
 /* Input size modifiers */

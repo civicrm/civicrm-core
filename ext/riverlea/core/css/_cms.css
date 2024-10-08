@@ -164,14 +164,11 @@ body.admin.com_civicrm.layout-default .crm-container details summary ~ * {
    WORDPRESS
 *******************/
 
-body.wp-admin {
-    --crm-page-padding: 1rem 2rem;
-    font-size: 100%;
-}
-body.wp-admin #wpcontent {
+body.toplevel_page_CiviCRM #wpcontent {
     padding-left: 0; /* resets WP padding */
 }
 body.wp-admin .crm-container {
+    --crm-page-padding: 1rem 2rem;
     background: var(--crm-c-page-background);
 }
 body.wp-admin .crm-title {
@@ -207,7 +204,7 @@ body.wp-admin.wp-core-ui .crm-container select {
     appearance: auto; /* Resets WP's own select UI */
     margin: 0;
 }
-body.wp-admin.wp-core-ui select:hover {
+body.wp-admin.wp-core-ui.toplevel_page_CiviCRM select:hover {
     color: var(--crm-input-color);
 }
 

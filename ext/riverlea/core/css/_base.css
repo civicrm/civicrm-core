@@ -140,6 +140,7 @@ body {
 .crm-container {
     font-family: var(--crm-font);
     font-size: var(--crm-font-size);
+    line-height: 1.4;
     color: var(--crm-c-text);
     background: var(--crm-c-page-background);
 }
