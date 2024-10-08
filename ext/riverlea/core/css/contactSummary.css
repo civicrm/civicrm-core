@@ -44,9 +44,13 @@
     padding: var(--crm-r);
     width: fit-content;
     z-index: 99;
+    position: absolute;
+    left: 0;
 }
 #mainTabContainer:not(.narrowpage) .contactCardRight div.crm-inline-edit.form {
     float: right;
+    right: 0;
+    position: absolute;
 }
 .crm-container .crm-inline-edit.add-new {
     min-height: 2.5em;
@@ -69,6 +73,7 @@
 	color: var(--crm-c-text);
     display: block;
     opacity: 1;
+    background-color: var(--crm-dash-summary-row-bg);
 }
 #contact-summary .crm-edit-help .crm-i.fa-pencil {
     float: right;

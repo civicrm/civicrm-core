@@ -156,7 +156,7 @@
 --crm-btn-success-text: var(--crm-c-success-text);
 --crm-btn-alert-bg: var(--crm-c-alert);
 --crm-btn-alert-text: var(--crm-c-alert-text);
---crm-btn-icon-bg: ; /* btn-icon-* supports distinct border/bg for icons. If applied, set btn-icon-padding to 0 to make the icon bg stretch to the button */
+--crm-btn-icon-bg: ; /* btn-icon-* supports distinct border/bg for icons. If applied, set btn-icon-padding to 0px to make the icon bg stretch to the button */
 --crm-btn-icon-border: ;
 --crm-btn-icon-padding: var(--crm-btn-padding-block);
 

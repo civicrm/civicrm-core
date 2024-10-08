@@ -1,3 +1,9 @@
+0.10.9
+ - FIXED - issue 46.1 - configuration checklist contrast ratio
+ - CHANGED - issue 46.3 - radio and checkbox labels are no longer bold if 'label' is bold
+ - FIXED - issue 46.4 - legibility issue
+ - FIXED - issue 46.5 - positioning issue
+
 0.10.8
 - CHANGED - Button height handling to allow wrapping double line buttons to keep their padding, but also protect streams that have full-height icon backgrounds (ref: https://lab.civicrm.org/extensions/riverlea/-/issues/55).
 - FIXED - Issue with icon backgrounds on buttons not stretching full height on double-height buttons.

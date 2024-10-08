@@ -11,11 +11,8 @@
   border-right: var(--crm-table-row-border);
   width: 20%;
 }
-.crm-container td.tasklist a:link {
-  color: var(--crm-c-red);
-}
 .crm-container td.tasklist a:visited {
-  color: var(--crm-c-green);
+  color: var(--crm-c-success);
 }
 
 /* Class for successful upgrade */

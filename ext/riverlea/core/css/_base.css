@@ -79,7 +79,8 @@ body {
 .crm-container .ui-widget select,
 .crm-container.ui-widget button,
 .crm-container .ui-widget button,
-.ui-widget.ui-autocomplete {
+.ui-widget.ui-autocomplete,
+.crm-quickSearch-results .ui-widget {
     font-family: inherit !important;
     font-size: inherit;
 }
