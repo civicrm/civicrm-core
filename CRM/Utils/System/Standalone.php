@@ -229,8 +229,8 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
 
     Security::singleton()->applyLocaleFromUser($user);
 
-    // // Note: random_int is more appropriate for cryptographical use than mt_rand
-    // // The long number is the max 32 bit value.
+    // Note: random_int is more appropriate for cryptographical use than mt_rand
+    // The long number is the max 32 bit value.
     return [$authxLogin['contactId'], $authxLogin['userId'], random_int(0, 2147483647)];
   }
 
