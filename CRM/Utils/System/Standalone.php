@@ -24,6 +24,38 @@ use Civi\Standalone\SessionHandler;
 class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
 
   /**
+   * Standalone uses a CiviCRM Extension, Standaloneusers, to provide user
+   * functionality
+   *
+   * This is great for modularity - but does mean that there are points in
+   * bootstrap / install / failure where the extension isn't available
+   * and we need to provide fallback/failsafe behaviours
+   *
+   * This function provides a general check for whether we are in such a
+   * scenario
+   *
+   * (In the future, alternative user-providing extensions may be available - in
+   * which case this check might need generalising. One possibility could be
+   * to use the Api4 User interface as a spec for what any extension must provide
+   *
+   * Then maybe the check could be if (class_exists(\Civi\Api4\User::class))?
+   *
+   * @return bool
+   *   Whether user extension is available
+   */
+  protected function isUserExtensionAvailable(): bool {
+    if (!\Civi\Api4\Utils\CoreUtil::entityExists('User')) {
+      return FALSE;
+    }
+    // authx function is required for standalone user system
+    if (!function_exists('_authx_uf')) {
+      return FALSE;
+    }
+
+    return TRUE;
+  }
+
+  /**
    * @internal
    * @return bool
    */
@@ -264,6 +296,9 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @return int|null
    */
   public function getUfId($username) {
+    if (!$this->isUserExtensionAvailable()) {
+      return NULL;
+    }
     return \Civi\Api4\User::get(FALSE)
       ->addWhere('username', '=', $username)
       ->execute()
@@ -402,6 +437,9 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @return array|bool FALSE if not found.
    */
   public function getUserById(int $userID) {
+    if (!$this->isUserExtensionAvailable()) {
+      return FALSE;
+    }
     return \Civi\Api4\User::get(FALSE)
       ->addWhere('id', '=', $userID)
       ->addWhere('is_active', '=', TRUE)
@@ -468,8 +506,14 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
 
   /**
    * @inheritDoc
+   *
+   * If the User extension isn't available
+   * then no one is logged in
    */
   public function getLoggedInUfID() {
+    if (!$this->isUserExtensionAvailable()) {
+      return NULL;
+    }
     return _authx_uf()->getCurrentUserId();
   }
 
@@ -568,7 +612,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * here swallows whatever error is actually causing the crash)
    */
   public function sessionStart() {
-    if (!class_exists(SessionHandler::class)) {
+    if (!$this->isUserExtensionAvailable()) {
       $session_cookie_name = 'SESSCIVISOFALLBACK';
     }
     else {
@@ -633,17 +677,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
     $sess = \CRM_Core_Session::singleton();
     $sess->initialize();
 
-    // We want to apply timezone for this session
-    // However - our implementation relies on checks against standaloneusers
-    // so we need a guard if this is called in install
-    //
-    // Doesn't the session handler started above also need standalonusers?
-    // Yes it does - but we put in some guards further into those functions
-    // to use a fake session instead for this install bit.
-    // Maybe they could get moved up here
-    if (class_exists(\Civi\Standalone\Security::class)) {
-      $this->setTimeZone();
-    }
+    $this->setTimeZone();
   }
 
 }
