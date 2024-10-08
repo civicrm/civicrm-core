@@ -885,18 +885,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         }
       }
       else {
-        if (substr($key, 0, 4) === 'url-') {
-          CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
-          $websiteField = explode('-', $key);
-          $data['website'][$websiteField[1]]['website_type_id'] = $websiteField[1];
-          $data['website'][$websiteField[1]]['url'] = $value;
-        }
-        elseif (in_array($key, CRM_Contact_BAO_Contact::$_greetingTypes, TRUE)) {
-          CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
-          //save email/postal greeting and addressee values if any, CRM-4575
-          $data[$key . '_id'] = $value;
-        }
-        elseif (($customFieldId = CRM_Core_BAO_CustomField::getKeyID($key))) {
+        if (($customFieldId = CRM_Core_BAO_CustomField::getKeyID($key))) {
           // for autocomplete transfer hidden value instead of label
           if ($params[$key] && isset($params[$key . '_id'])) {
             $value = $params[$key . '_id'];
