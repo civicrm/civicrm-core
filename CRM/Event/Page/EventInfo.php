@@ -60,7 +60,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     }
 
     if (!$values['event']['is_public']) {
-      CRM_Utils_System::addHTMLHead('<META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">');
+      CRM_Utils_System::setNoRobotsFlag();
     }
 
     if (!empty($values['event']['is_template'])) {
