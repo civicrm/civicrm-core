@@ -50,22 +50,44 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    *    - 'cms_name'
    *    - 'cms_pass' plaintext password
    *    - 'notify' boolean
-   * @param string $mailParam
-   *   Name of the param which contains the email address.
-   *   Because. Right. OK. That's what it is.
+   * @param string $emailParam
+   *   Name of the $param which contains the email address.
    *
    * @return int|bool
    *   uid if user was created, false otherwise
    */
-  public function createUser(&$params, $mailParam) {
-    return Security::singleton()->createUser($params, $mailParam);
+  public function createUser(&$params, $emailParam) {
+    try {
+      $email = $params[$emailParam];
+      $userID = \Civi\Api4\User::create(FALSE)
+        ->addValue('username', $params['cms_name'])
+        ->addValue('uf_name', $email)
+        ->addValue('password', $params['cms_pass'])
+        ->addValue('contact_id', $params['contact_id'] ?? NULL)
+        // ->addValue('uf_id', 0) // does not work without this.
+        ->execute()->single()['id'];
+    }
+    catch (\Exception $e) {
+      \Civi::log()->warning("Failed to create user '$email': " . $e->getMessage());
+      return FALSE;
+    }
+
+    // @todo This next line is what Drupal does, but it's unclear why.
+    // I think it assumes we want to be logged in as this contact, and as there's no uf match, it's not in civi.
+    // But I'm not sure if we are always becomming this user; I'm not sure waht calls this function.
+    // CRM_Core_Config::singleton()->inCiviCRM = FALSE;
+
+    return (int) $userID;
   }
 
   /**
    * @inheritDoc
    */
   public function updateCMSName($ufID, $email) {
-    return Security::singleton()->updateCMSName($ufID, $email);
+    \Civi\Api4\User::update(FALSE)
+      ->addWhere('id', '=', $ufID)
+      ->addValue('uf_name', $email)
+      ->execute();
   }
 
   /**
@@ -210,9 +232,9 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @param string $password
    *   The password for the above user.
    * @param bool $loadCMSBootstrap
-   *   Load cms bootstrap?.
+   *   Not used in Standalone context
    * @param string $realPath
-   *   Filename of script
+   *   Not used in Standalone context
    *
    * @return array|bool
    *   [contactID, ufID, unique string] else false if no auth
@@ -242,14 +264,20 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @return int|null
    */
   public function getUfId($username) {
-    return Security::singleton()->getUserIDFromUsername($username);
+    return \Civi\Api4\User::get(FALSE)
+      ->addWhere('username', '=', $username)
+      ->execute()
+      ->first()['id'] ?? NULL;
   }
 
   /**
-   * Immediately stop script execution, log out the user and redirect to the home page.
+   * Immediately stop script execution and log out the user
    */
   public function logout() {
-    return Security::singleton()->logoutUser();
+    _authx_uf()->logoutSession();
+    // redirect to the home page?
+    // breaks tests in standaloneusers-e2e
+    // \CRM_Utils_System::redirect('/civicrm/login');
   }
 
   /**
@@ -314,50 +342,71 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   public function loadBootStrap($params = [], $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
     static $runOnce;
 
-    if (!isset($runOnce)) {
-      $runOnce = TRUE;
-    }
-    else {
+    if (isset($runOnce)) {
+      // we've already run
       return TRUE;
     }
+
+    // dont run again
+    $runOnce = TRUE;
 
     if (!$loadUser) {
       return TRUE;
     }
 
-    $security = \Civi\Standalone\Security::singleton();
-    if (!empty($params['uid'])) {
-      $user = $security->loadUserByID($params['uid']);
-    }
-    elseif (!empty($params['name'] && !empty($params['pass']))) {
-      // It seems from looking at the Drupal implementation, that
-      // if given username we expect a correct password.
-      $user = $security->loadUserByName($params['name']);
-      if ($user) {
-        if (!$security->checkPassword($params['pass'], $user['hashed_password'] ?? '')) {
-          return FALSE;
-        }
+    try {
+      if (!empty($params['uid'])) {
+        _authx_uf()->loginStateless($params['uid']);
+        return TRUE;
+      }
+      elseif (!empty($params['name'] && !empty($params['pass']))) {
+        // It seems from looking at the Drupal implementation, that
+        // if given username we expect a correct password.
+
+        /**
+         * @throws CRM_Core_Exception if login unsuccessful
+         */
+        $this->authenticate($params['name'], $params['pass']);
+        return TRUE;
+      }
+      else {
+        return FALSE;
       }
     }
-    if (!$user) {
+    catch (\CRM_Core_Exception $e) {
+      // swallow any errors if $throwError is false
+      // (presume the expectation is these are login errors
+      // - though that isn't guaranteed?)
+      if (!$throwError) {
+        return FALSE;
+      }
+      throw $e;
+    }
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function loadUser($username) {
+    $userID = $this->getUfId($username) ?? NULL;
+    if (!$userID) {
       return FALSE;
     }
-
-    $security->loginAuthenticatedUserRecord($user, FALSE);
-
+    _authx_uf()->loginSession($userID);
     return TRUE;
   }
 
-  public function loadUser($username) {
-    $security = \Civi\Standalone\Security::singleton();
-    $user = $security->loadUserByName($username);
-    if ($user) {
-      $security->loginAuthenticatedUserRecord($user, TRUE);
-      return TRUE;
-    }
-    else {
-      return FALSE;
-    }
+  /**
+   * Load an active user by internal user ID.
+   *
+   * @return array|bool FALSE if not found.
+   */
+  public function getUserById(int $userID) {
+    return \Civi\Api4\User::get(FALSE)
+      ->addWhere('id', '=', $userID)
+      ->addWhere('is_active', '=', TRUE)
+      ->execute()
+      ->first() ?: FALSE;
   }
 
   /**
@@ -390,7 +439,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function isUserLoggedIn() {
-    return Security::singleton()->isUserLoggedIn();
+    return !empty($this->getLoggedInUfID());
   }
 
   /**
@@ -421,7 +470,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function getLoggedInUfID() {
-    return Security::singleton()->getLoggedInUfID();
+    return _authx_uf()->getCurrentUserId();
   }
 
   /**
@@ -463,9 +512,9 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function getTimeZoneString() {
-    $userId = Security::singleton()->getLoggedInUfID();
+    $userId = $this->getLoggedInUfID();
     if ($userId) {
-      $user = Security::singleton()->loadUserByID($userId);
+      $user = $this->getUserById($userId);
       if ($user && !empty($user['timezone'])) {
         return $user['timezone'];
       }
@@ -475,19 +524,10 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
 
   /**
    * @inheritDoc
+   * @todo implement language negotiation for Standalone?
    */
   public function languageNegotiationURL($url, $addLanguagePart = TRUE, $removeLanguagePart = FALSE) {
-    if (empty($url)) {
-      return $url;
-    }
-
-    // This method is called early in the boot process.
-    // Check if the extensions are available yet as our implementation requires Standaloneusers.
-    // Debugging note: calling Civi::log() methods here creates a nasty crash.
-    if (!class_exists(\Civi\Standalone\Security::class)) {
-      return $url;
-    }
-    return Security::singleton()->languageNegotiationURL($url, $addLanguagePart = TRUE, $removeLanguagePart = FALSE);
+    return $url;
   }
 
   /**
@@ -495,7 +535,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @return array
    */
   public function getCMSPermissionsUrlParams() {
-    return Security::singleton()->getCMSPermissionsUrlParams();
+    return ['ufAccessURL' => '/civicrm/admin/roles'];
   }
 
   public function permissionDenied() {

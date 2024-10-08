@@ -5,7 +5,6 @@ use Civi\Standalone\Security;
 class CRM_Standaloneusers_Page_Login extends CRM_Core_Page {
 
   public function run() {
-    Security::singleton()->getLoggedInUfID();
     if (CRM_Core_Session::singleton()->get('ufID')) {
       // Already logged in.
       CRM_Utils_System::redirect('/civicrm');
@@ -26,7 +25,7 @@ class CRM_Standaloneusers_Page_Login extends CRM_Core_Page {
    * Log out.
    */
   public static function logout() {
-    Security::singleton()->logoutUser();
+    _authx_uf()->logoutSession();
     // Dump them back on the log-IN page.
     CRM_Utils_System::redirect('/civicrm/login?justLoggedOut');
   }
