@@ -134,9 +134,9 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
     }
     elseif ($action & CRM_Core_Action::COPY) {
       $key = $_POST['qfKey'] ?? $_GET['qfKey'] ?? $_REQUEST['qfKey'] ?? NULL;
-      CRM_Core_Key::validate($key, CRM_Utils_System::getClassName($this));
-      if (!$key) {
-        CRM_Core_Controller::invalidKeyCommon();
+      $k = CRM_Core_Key::validate($key, CRM_Utils_System::getClassName($this));
+      if (!$k) {
+        $this->invalidKey();
       }
       CRM_Core_Session::setStatus(ts('A copy of the price set has been created'), ts('Saved'), 'success');
       $this->copy();
@@ -148,10 +148,10 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
         $usedBy = CRM_Price_BAO_PriceSet::getUsedBy($sid);
 
         if (empty($usedBy)) {
-          $key = $_POST['qfKey'] ?? $_GET['qfKey'] ?? $_REQUEST['qfKey'] ?? NULL;
+          $k = $_POST['qfKey'] ?? $_GET['qfKey'] ?? $_REQUEST['qfKey'] ?? NULL;
           CRM_Core_Key::validate($key, CRM_Utils_System::getClassName($this));
-          if (!$key) {
-            CRM_Core_Controller::invalidKeyCommon();
+          if (!$k) {
+            $this->invalidKey();
           }
           // prompt to delete
           CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/admin/price', 'action=browse'));
