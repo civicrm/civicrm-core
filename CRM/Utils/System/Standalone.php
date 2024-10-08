@@ -15,7 +15,6 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-use Civi\Standalone\Security;
 use Civi\Standalone\SessionHandler;
 
 /**
@@ -259,6 +258,9 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @inheritDoc
    * Authenticate the user against the CMS db.
    *
+   * I think this is only used by CLI so setting the session
+   * doesn't make sense
+   *
    * @param string $name
    *   The user name.
    * @param string $password
@@ -274,13 +276,6 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    */
   public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
     $authxLogin = authx_login(['flow' => 'login', 'cred' => 'Basic ' . base64_encode("{$name}:{$password}")]);
-
-    $user = \Civi\Api4\User::get(FALSE)
-      ->addWhere('id', '=', $authxLogin['userId'])
-      ->addWhere('is_active', '=', TRUE)
-      ->execute()->single();
-
-    Security::singleton()->applyLocaleFromUser($user);
 
     // Note: random_int is more appropriate for cryptographical use than mt_rand
     // The long number is the max 32 bit value.

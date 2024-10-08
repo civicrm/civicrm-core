@@ -2,7 +2,6 @@
 namespace Civi\Standalone;
 
 use Civi\Crypto\Exception\CryptoException;
-use CRM_Core_Session;
 use Civi;
 use Civi\Api4\User;
 use Civi\Api4\MessageTemplate;
@@ -282,19 +281,6 @@ class Security {
       ->setFrom("\"$domainFromName\" <$domainFromEmail>");
 
     return $workflowMessage;
-  }
-
-  /**
-   * Applies the locale from the user record.
-   *
-   * @param array $user
-   * @return void
-   */
-  public function applyLocaleFromUser(array $user) {
-    $session = CRM_Core_Session::singleton();
-    if (!empty($user['language'])) {
-      $session->set('lcMessages', $user['language']);
-    }
   }
 
 }

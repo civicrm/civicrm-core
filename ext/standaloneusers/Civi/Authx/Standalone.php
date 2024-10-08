@@ -37,10 +37,12 @@ class Standalone implements AuthxInterface {
       ->execute()
       ->single();
 
-
     // Confusingly, Civi stores it's *Contact* ID as *userID* on the session.
     $session->set('userID', $user['contact_id'] ?? NULL);
-    Security::singleton()->applyLocaleFromUser($user);
+
+    if (!empty($user['language'])) {
+      $session->set('lcMessages', $user['language']);
+    }
   }
 
   /**
@@ -50,7 +52,7 @@ class Standalone implements AuthxInterface {
     global $loggedInUserId;
     $loggedInUserId = NULL;
     \CRM_Core_Session::singleton()->reset();
-   // session_destroy();
+    // session_destroy();
   }
 
   /**
