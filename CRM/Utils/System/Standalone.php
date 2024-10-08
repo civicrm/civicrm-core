@@ -43,9 +43,19 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    *   Whether user extension is available
    */
   protected function isUserExtensionAvailable(): bool {
-    if (!\Civi\Api4\Utils\CoreUtil::entityExists('User')) {
+    if (!class_exists(\Civi\Api4\User::class)) {
       return FALSE;
     }
+    // TODO: the following would be be a better check, as sometimes during
+    // upgrade the User class can exist but the entity is not actually loaded
+    //
+    // HOWEVER: it currently causes a crash during the install phase.
+    // https://github.com/civicrm/civicrm-core/pull/31198 may help.
+    //
+    // if (!\Civi\Api4\Utils\CoreUtil::entityExists('User')) {
+    //   return FALSE;
+    // }
+
     // authx function is required for standalone user system
     if (!function_exists('_authx_uf')) {
       return FALSE;
