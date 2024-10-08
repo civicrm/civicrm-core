@@ -584,7 +584,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
 
   public function permissionDenied() {
     // If not logged in, they need to.
-    if (CRM_Core_Session::singleton()->get('ufID')) {
+    if ($this->isUserLoggedIn()) {
       // They are logged in; they're just not allowed this page.
       CRM_Core_Error::statusBounce(ts("Access denied"), CRM_Utils_System::url('civicrm'));
     }
@@ -598,7 +598,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
         return $loginPage->run();
       }
 
-      throw new CRM_Core_Exception('Access denied. Standaloneusers extension not found');
+      throw new CRM_Core_Exception('Access denied. Standaloneusers login page not found');
     }
   }
 

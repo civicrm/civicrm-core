@@ -105,18 +105,7 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
   }
 
   protected function loginUser($userID) {
-    $user = \Civi\Api4\User::get(FALSE)
-      ->addWhere('id', '=', $userID)
-      ->execute()->first();
-
-    $contactID = civicrm_api3('UFMatch', 'get', [
-      'sequential' => 1,
-      'return' => ['contact_id'],
-      'uf_id' => $user['id'],
-    ])['values'][0]['contact_id'] ?? NULL;
-    $this->assertNotNull($contactID);
-
-    \CRM_Core_Config::singleton()->userSystem->loadUser($user['username']);
+    _authx_uf()->loginSession($userID);
   }
 
   /**
