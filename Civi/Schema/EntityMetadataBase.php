@@ -63,7 +63,7 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
       $options = self::formatOptionValues($callbackValues);
     }
     elseif (!empty($field['pseudoconstant']['table'])) {
-      $options = self::getSqlOptions($field['pseudoconstant'], $includeDisabled);
+      $options = self::getSqlOptions($field, $includeDisabled);
     }
     elseif (\CRM_Utils_Schema::getDataType($field) === 'Boolean') {
       $options = self::formatOptionValues(\CRM_Core_SelectValues::boolean());
@@ -132,7 +132,8 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
     return $optionValues;
   }
 
-  private function getSqlOptions(array $pseudoconstant, bool $includeDisabled = FALSE): array {
+  private function getSqlOptions(array $field, bool $includeDisabled = FALSE): array {
+    $pseudoconstant = $field['pseudoconstant'];
     $cacheKey = 'EntityMetadataGetSqlOptions' . md5(json_encode($pseudoconstant));
     $entity = \Civi::table($pseudoconstant['table']);
     $cache = \Civi::cache('metadata');
@@ -175,7 +176,7 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
       }
       $result = $select->execute()->fetchAll();
       foreach ($result as $option) {
-        if (\CRM_Utils_Schema::getDataType($fields[$idCol]) === 'Integer') {
+        if (\CRM_Utils_Schema::getDataType($fields[$idCol]) === 'Integer' || \CRM_Utils_Schema::getDataType($field) === 'Integer') {
           $option['id'] = (int) $option['id'];
         }
         $options[$option['id']] = $option;

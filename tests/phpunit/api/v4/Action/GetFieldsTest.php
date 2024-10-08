@@ -26,6 +26,7 @@ use Civi\Api4\Address;
 use Civi\Api4\Campaign;
 use Civi\Api4\Contact;
 use Civi\Api4\Contribution;
+use Civi\Api4\ContributionSoft;
 use Civi\Api4\CustomGroup;
 use Civi\Api4\Email;
 use Civi\Api4\EntityTag;
@@ -218,9 +219,19 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
       ->setLoadOptions(['id', 'name', 'label', 'description', 'color'])
       ->execute()->single();
     $this->assertCount(1, $tagField['options']);
+    $this->assertIsInt($tagField['options'][0]['id']);
     $this->assertEquals('Act_Tag', $tagField['options'][0]['name']);
     $this->assertEquals('Test tag for activities', $tagField['options'][0]['description']);
     $this->assertEquals('#aaaaaa', $tagField['options'][0]['color']);
+  }
+
+  public function testIdIsInt(): void {
+    $field = ContributionSoft::getFields(FALSE)
+      ->addWhere('name', '=', 'soft_credit_type_id')
+      ->setLoadOptions(['id', 'name'])
+      ->execute()->single();
+
+    $this->assertIsInt($field['options'][0]['id']);
   }
 
   public function testGetSuffixes(): void {
