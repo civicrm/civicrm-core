@@ -651,8 +651,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $config = JFactory::getConfig();
     $timezone = $config->get('offset');
     if ($timezone) {
-      date_default_timezone_set($timezone);
-      CRM_Core_Config::singleton()->userSystem->setMySQLTimeZone();
+      $this->setTimeZone($timezone);
     }
     if (version_compare(JVERSION, '4.0', '>=')) {
       // Boot the DI container

@@ -749,10 +749,14 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * Set timezone in mysql so that timestamp fields show the correct time.
+   * Set MySQL timezone so that timestamp fields show the correct time.
+   *
+   * @param ?string $timeZone
+   *    Timezone string - if none provided will be fetched from system
    */
-  public function setMySQLTimeZone() {
-    $timeZoneOffset = $this->getTimeZoneOffset();
+  public function setMySQLTimeZone(?string $timeZone = NULL) {
+    $timeZone = $timeZone ?? $this->getTimeZoneString();
+    $timeZoneOffset = \CRM_Utils_Time::getTimeZoneOffsetFromString($timeZone);
     if ($timeZoneOffset) {
       $sql = "SET time_zone = '$timeZoneOffset'";
       CRM_Core_DAO::executeQuery($sql);
@@ -760,47 +764,43 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * Get timezone from CMS.
+   * Set PHP timezone
    *
-   * @return string|false|null
+   * @param ?string $timeZone
+   *    Timezone string - default value will be fetched
+   *    using getTimeZoneString if not provided or falsey
    */
-  public function getTimeZoneOffset() {
-    $timezone = $this->getTimeZoneString();
-    if ($timezone) {
-      if ($timezone == 'UTC' || $timezone == 'Etc/UTC') {
-        // CRM-17072 Let's short-circuit all the zero handling & return it here!
-        return '+00:00';
-      }
-      $tzObj = new DateTimeZone($timezone);
-      $dateTime = new DateTime("now", $tzObj);
-      $tz = $tzObj->getOffset($dateTime);
-
-      if ($tz === 0) {
-        // CRM-21422
-        return '+00:00';
-      }
-
-      if (empty($tz)) {
-        return FALSE;
-      }
-
-      $timeZoneOffset = sprintf("%02d:%02d", $tz / 3600, abs(($tz / 60) % 60));
-
-      if ($timeZoneOffset > 0) {
-        $timeZoneOffset = '+' . $timeZoneOffset;
-      }
-      return $timeZoneOffset;
-    }
-    return NULL;
+  public function setPhpTimeZone(?string $timeZone = NULL) {
+    $timeZone = $timeZone ?: $this->getTimeZoneString();
+    date_default_timezone_set($timeZone);
   }
 
   /**
-   * Get timezone as a string.
+   * Set system timezone (both PHP + MySQL)
+   */
+  public function setTimeZone(?string $timeZone = NULL) {
+    $timeZone = $timeZone ?? $this->getTimeZoneString();
+
+    $this->setPhpTimeZone($timeZone);
+    $this->setMySQLTimeZone($timeZone);
+  }
+
+  /**
+   * Get timezone from CMS as a string.
    * @return string
    *   Timezone string e.g. 'America/Los_Angeles'
    */
   public function getTimeZoneString() {
     return date_default_timezone_get();
+  }
+
+  /**
+   * Get timezone offset from CMS
+   *
+   * @return string|false|null
+   */
+  public function getTimeZoneOffset() {
+    return \CRM_Utils_Time::getTimeZoneOffsetFromString($this->getTimeZoneString());
   }
 
   /**

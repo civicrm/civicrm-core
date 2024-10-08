@@ -620,9 +620,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
     // to use a fake session instead for this install bit.
     // Maybe they could get moved up here
     if (class_exists(\Civi\Standalone\Security::class)) {
-      $sessionTime = $this->getTimeZoneString();
-      date_default_timezone_set($sessionTime);
-      $this->setMySQLTimeZone();
+      $this->setTimeZone();
     }
   }
 
