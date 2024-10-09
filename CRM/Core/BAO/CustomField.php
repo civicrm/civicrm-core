@@ -614,6 +614,9 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    */
   public static function getShortNameFromLongName(string $longName): ?string {
     [$groupName, $fieldName] = explode('.', $longName);
+    if (empty($groupName) || empty($fieldName)) {
+      return NULL;
+    }
     foreach (CRM_Core_BAO_CustomGroup::getAll() as $customGroup) {
       if ($customGroup['name'] === $groupName) {
         foreach ($customGroup['fields'] as $id => $field) {

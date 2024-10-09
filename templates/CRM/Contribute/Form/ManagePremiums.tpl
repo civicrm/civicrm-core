@@ -137,7 +137,8 @@
   </details>
   {/crmRegion}
  {/if}
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
+  {include file="CRM/common/customDataBlock.tpl" customDataType='Product' entityID=$productId}
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
 {if $action eq 1 or $action eq 2}
 
