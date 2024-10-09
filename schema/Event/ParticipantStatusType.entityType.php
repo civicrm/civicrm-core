@@ -60,7 +60,7 @@ return [
       ],
     ],
     'is_reserved' => [
-      'title' => ts('Participant Status Is Reserved?>'),
+      'title' => ts('Participant Status Is Reserved?'),
       'sql_type' => 'boolean',
       'input_type' => 'CheckBox',
       'required' => TRUE,
