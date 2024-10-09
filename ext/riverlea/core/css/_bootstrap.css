@@ -1279,7 +1279,6 @@
 	}
 	#bootstrap-theme .form-inline .form-control {
 		display: inline-block;
-		width: auto;
 		vertical-align: middle;
 	}
 	#bootstrap-theme .form-inline .form-control-static {

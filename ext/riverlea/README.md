@@ -67,8 +67,8 @@ Contains CSS files in:
 - ~~Front-end testing & fixes.~~
 - ~~Darkmode~~.
 - ~~Migrate Finsbury Park~~ (and others) to a stream.
+- ~~Tidy/simplify Bootstrap~~
 - Document streams.
-- Tidy/simplify Bootstrap
 
 ## Creating new 'streams'
 

@@ -237,6 +237,7 @@ a.crm-expand-row:hover,a.crm-expand-row:focus {
 	border-radius: var(--crm-btn-radius);
 	display: flex !important; /* vs contact dashboard edit */
 	gap: var(--crm-btn-icon-spacing);
+    align-items: center;
 }
 .crm-container a.button span {
 	display: flex;

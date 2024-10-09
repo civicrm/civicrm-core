@@ -73,6 +73,11 @@
 .crm-container .form-layout label {
     width: var(--crm-input-label-width);
 }
+.crm-contribution_search_form-accordion .form-layout label,
+.crm-advanced_search_form-accordion .form-layout label,
+.crm-search-form-block .form-layout label {
+    width: auto;
+}
 .crm-container .description:not(#help),
 .crm-container td.description {
     color: var(--crm-input-description);
@@ -272,6 +277,8 @@ input.crm-form-checkbox + label,
     margin: 0 var(--crm-m) 0 var(--crm-s);
     cursor: var(--crm-hover-clickable);
     width: unset;
+    font-weight: normal;
+    font-family: var(--crm-font);
 }
 .crm-container input[type="checkbox"],
 .crm-container input[type="radio"] {
@@ -280,8 +287,6 @@ input.crm-form-checkbox + label,
     width: auto;
     appearance: auto;
     height: auto;
-    font-weight: normal;
-    font-family: inherit;
 }
 /* Checkbox/radio fields with n-per-line. See https://lab.civicrm.org/dev/core/-/issues/4985 */
 .crm-container .crm-multiple-checkbox-radio-options {
@@ -319,6 +324,9 @@ input.crm-form-checkbox) + label {
     width: auto;
     max-width: 100%;
 }
+.crm-container .select2-container {
+    width: var(--crm-big-input) !important /* vs inline fixed width */;
+}
 .crm-container .select2-container-multi {
     min-width: 96px;
     max-width: 100%;
@@ -336,6 +344,7 @@ input.crm-form-checkbox) + label {
     color: var(--crm-input-color);
     display: flex;
     align-items: center;
+    margin-right: 0;
 }
 .crm-container .select2-container .select2-choice .select2-arrow {
     background: var(--crm-input-background);
@@ -494,7 +503,8 @@ input.crm-form-checkbox) + label {
 }
 .select2-drop.select2-drop-active.crm-container .select2-results li {
     color: var(--crm-c-text);
-    padding: var(--crm-s);
+    padding-block: var(--crm-s);
+    border-top: 1px solid var(--crm-c-background4);
     margin: 0;
 }
 .select2-results .select2-ajax-error,
@@ -515,9 +525,10 @@ input.crm-form-checkbox) + label {
     height: var(--crm-l);
     margin-top: var(--crm-s);
 }
-.select2-drop.select2-drop-active.crm-container .select2-results li {
+.select2-drop.select2-drop-active.crm-container .select2-results > li {
     color: var(--crm-c-text);
-    padding: var(--crm-s);
+    padding: var(--crm-m);
+    border-top: 0;
 }
 .select2-drop .crm-entityref-links {
     border-top: 1px solid var(--crm-input-border-color);
@@ -530,14 +541,19 @@ input.crm-form-checkbox) + label {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+.crm-container .select2-results > li .select2-result-label  {
+    padding: 0;
+}
 .select2-results li.select2-result-with-children > .select2-result-label {
     font-weight: var(--crm-bold-weight);
     font-family: var(--crm-font-bold);
+    background: var(--crm-c-background3);
+    padding: var(--crm-s);
 }
 .crm-container .crm-select2-row-description p {
     font-weight: normal;
     font-family: var(--crm-font);
-    font-size: var(--crm-input-font-size);
+    font-size: var(--crm-m2);
     margin: 0;
     padding: 0;
   }
@@ -550,16 +566,19 @@ input.crm-form-checkbox) + label {
     gap: var(--crm-xs);
 }
 .crm-form-date-wrapper {
-    display: grid;
-    grid-template-columns: 13ch 9ch;
+    display: flex;
 }
-.crm-container input.crm-form-time:not(.form-control) {
+.crm-container input.crm-form-time {
     width: 9ch;
-    margin-left: 1em;
+    margin-left: var(--crm-flex-gap);
 }
 .crm-container input.dateplugin,
 .crm-container input.crm-form-date {
     width: 14ch;
+}
+.crm-form-date-wrapper a.crm-clear-link {
+    display: flex;
+    align-items: center;
 }
 .crm-container input.crm-placeholder-icon {
     padding-right: var(--crm-m);

@@ -1,3 +1,8 @@
+0.10.10
+ - FIXED - date time input simplified
+ - CHANGED - Select2 dropdown advanced: border line between list elements, smaller description, simplified padding.
+ - FIXED - various issues flagged in https://lab.civicrm.org/extensions/riverlea/-/issues/46
+
 0.10.9
  - FIXED - issue 46.1 - configuration checklist contrast ratio
  - CHANGED - issue 46.3 - radio and checkbox labels are no longer bold if 'label' is bold

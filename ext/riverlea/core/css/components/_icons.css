@@ -77,7 +77,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss,
     float: right;
     text-decoration: none;
     padding: 0 0 0 0.5rem;
-    opacity: 0.25; /* matches Bootstrap */
+    opacity: 0.5; /* matches Bootstrap */
     background-image: none;
     position: relative !important;
     text-indent: 0;
