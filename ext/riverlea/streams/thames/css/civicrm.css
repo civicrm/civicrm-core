@@ -379,3 +379,20 @@ div:has(> table) {
   border-radius: var(--crm-r-3);
   /* overrides #civicrm-news-feed.ui-tabs and .crm-contact-page #secondaryTabContainer */
 }
+/* breadcrumbs - links not accessibile using the nromal blue. */
+#civicrm-footer a,
+nav.breadcrumb a {
+  --crm-c-link: var(--crm-c-blue-darker);
+  --crm-c-link-hover: var(--crm-c-blue-dark);
+}
+#crm-contactname-content .crm-edit-help {
+  color: var(--crm-c-blue-dark) !important; /* override */
+  padding: 0.25rem !important;
+  opacity: 1 !important;
+}
+#crm-contactname-content > .crm-inline-block-content {
+  border: solid 1px transparent !important;
+}
+#crm-contactname-content:hover > .crm-inline-block-content {
+  border-color: var(--crm-c-blue-dark) !important;
+}

@@ -46,7 +46,8 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-c-blue-overlay:  #dce9ef; /* thames only */
 --crm-c-blue-light:    #d8edfe; /* thames */
 --crm-c-blue:          #c5e4fc; /* thames */
---crm-c-blue-dark:     #2c98ed ; /* thames */
+/* non-WCAG-AA --crm-c-blue-dark:     #2c98ed ; /* thames */
+--crm-c-blue-dark:     #127ACA ; /* thames */
 --crm-c-blue-darker:   #02477d; /* thames */
 --crm-c-purple: #4d4d69;
 --crm-c-purple-dark: #3e3e54;
