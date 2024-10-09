@@ -208,7 +208,7 @@
         }
 
         if (ctrl.defn.input_type === 'Date' && typeof value === 'string' && value.startsWith('now')) {
-          value = getRelativeDate(value);
+          value = getRelativeDate(value, ctrl.defn.input_attrs.time);
         }
         if (ctrl.defn.input_type === 'Number' && ctrl.defn.search_range) {
           if (!_.isPlainObject(value)) {
@@ -374,7 +374,7 @@
         return currentVal;
       };
 
-      function getRelativeDate(dateString) {
+      function getRelativeDate(dateString, includeTime) {
         const parts = dateString.split(' ');
         const baseDate = new Date();
         let unit = parts[2] || 'day';
@@ -389,7 +389,11 @@
             offset *= 365;
         }
         let newDate = new Date(baseDate.getTime() + offset * 24 * 60 * 60 * 1000);
-        return newDate.toISOString().split('T')[0];
+        let defaultDate = newDate.toISOString().split('T')[0];
+        if (includeTime) {
+          defaultDate += ' ' + newDate.toTimeString().slice(0,8);
+        }
+        return defaultDate;
       }
 
     }
