@@ -740,7 +740,7 @@ class CRM_Utils_Array {
       return $values;
     }
     // Empty string -> empty array
-    if ($values === '') {
+    if ($values === '' || $values === "$delim$delim") {
       return [];
     }
     return explode($delim, trim((string) $values, $delim));
