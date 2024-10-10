@@ -126,6 +126,10 @@ class CRM_Core_BAO_CustomValueTable {
                 if (str_replace($validChars, '', $value)) {
                   throw new CRM_Core_Exception('Contact ID must be of type Integer');
                 }
+                // Prevent saving an empty "array" which results in a fatal error on render.
+                if ($value === '' || $value === $VS . $VS) {
+                  $value = NULL;
+                }
               }
               elseif ($value == NULL || $value === '') {
                 $type = 'Timestamp';
