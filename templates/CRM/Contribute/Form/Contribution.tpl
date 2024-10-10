@@ -35,7 +35,7 @@
   <div class="crm-block crm-form-block crm-contribution-form-block">
     {if $context neq 'standalone' && !$email and $action neq 8}
       <div class="messages status no-popup">
-        {icon icon="fa-info-circle"}{/icon}{ts}You will not be able to send an automatic email receipt for this contribution because there is no email address recorded for this contact. If you want a receipt to be sent when this contribution is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the contribution.{/ts}
+        {icon icon="fa-info-circle"}{/icon}{ts}You will not be able to send an automatic email receipt for this contribution because there is no valid email address recorded for this contact. If you want a receipt to be sent when this contribution is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the contribution.{/ts}
       </div>
     {/if}
 
