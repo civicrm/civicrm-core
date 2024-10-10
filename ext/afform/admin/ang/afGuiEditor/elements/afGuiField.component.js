@@ -266,7 +266,12 @@
       }
 
       function setFieldDefn() {
+        // Deeply merge defn to include nested settings e.g. `input_attrs.time`.
         ctrl.fieldDefn = angular.merge({}, ctrl.getDefn(), ctrl.node.defn);
+        // Undo deep merge of options array.
+        if (ctrl.node.defn && ctrl.node.defn.options) {
+          ctrl.fieldDefn.options = JSON.parse(JSON.stringify(ctrl.node.defn.options));
+        }
       }
 
       $scope.toggleDefaultValue = function() {
