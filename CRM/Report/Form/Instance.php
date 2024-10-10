@@ -125,6 +125,7 @@ class CRM_Report_Form_Instance {
           'size' => 5,
           'style' => 'width:240px',
           'class' => 'advmultiselect',
+          'title' => ts('ACL Group/Role'),
         ]
       );
       $grouprole->setButtonAttributes('add', ['value' => ts('Add >>')]);

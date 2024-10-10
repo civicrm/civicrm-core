@@ -1478,7 +1478,7 @@ class CRM_Report_Form extends CRM_Core_Form {
           default:
             // default type is string
             $this->addElement('select', "{$fieldName}_op", ts('Operator:'), $operations,
-              ['onchange' => "return showHideMaxMinVal( '$fieldName', this.value );"]
+              ['onchange' => "return showHideMaxMinVal( '$fieldName', this.value );", 'title' => ts('%1 Filter Operator', [1 => $field['title']])]
             );
             // we need text box for value input
             $this->add('text', "{$fieldName}_value", NULL, ['class' => 'huge']);
@@ -1695,8 +1695,8 @@ class CRM_Report_Form extends CRM_Core_Form {
           'ASC' => ts('Ascending'),
           'DESC' => ts('Descending'),
         ]);
-        $this->addElement('checkbox', "order_bys[{$i}][section]", ts('Order by Section'), FALSE, ['id' => "order_by_section_$i"]);
-        $this->addElement('checkbox', "order_bys[{$i}][pageBreak]", ts('Page Break'), FALSE, ['id' => "order_by_pagebreak_$i"]);
+        $this->addElement('checkbox', "order_bys[{$i}][section]", ts('Order by Section'), FALSE, ['id' => "order_by_section_$i", 'title' => ts('Order by Section %1', [1 => $i])]);
+        $this->addElement('checkbox', "order_bys[{$i}][pageBreak]", ts('Page Break'), FALSE, ['id' => "order_by_pagebreak_$i", 'title' => ts('Page Break %1', [1 => $i])]);
       }
     }
   }
@@ -1723,7 +1723,7 @@ class CRM_Report_Form extends CRM_Core_Form {
       $this->addElement('select', 'groups', ts('Group'),
         ['' => ts('Add Contacts to Group')] +
         CRM_Core_PseudoConstant::nestedGroup(),
-        ['class' => 'crm-select2 crm-action-menu fa-plus huge']
+        ['class' => 'crm-select2 crm-action-menu fa-plus huge', 'title' => ts('Add Contacts to Group')]
       );
       $this->assign('group', TRUE);
     }
