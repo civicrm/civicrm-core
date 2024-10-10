@@ -54,12 +54,23 @@ function civicrm_api(string $entity, string $action, array $params) {
  *   automatically reformat the array, depending on the variable type passed:
  *   - **Integer:** return a single result array;
  *     e.g. `$index = 0` will return the first result, 1 will return the second, and -1 will return the last.
+ *
+ *     For APIv4 Explorer, use e.g. `0` in the Index box.
+ *
  *   - **String:** index the results by a field value;
  *     e.g. `$index = "name"` will return an associative array with the field 'name' as keys.
+ *
+ *     For APIv4 Explorer, use e.g. `name` in the Index box.
+ *
  *   - **Non-associative array:** return a single value from each result;
  *     e.g. `$index = ['title']` will return a non-associative array of strings - the 'title' field from each result.
+ *
+ *     For APIv4 Explorer, use e.g. `[title]` in the Index box.
+ *
  *   - **Associative array:** a combination of the previous two modes;
  *     e.g. `$index = ['name' => 'title']` will return an array of strings - the 'title' field keyed by the 'name' field.
+ *
+ *     For APIv4 Explorer, use e.g. `{name: title}` in the Index box.
  *
  * @return \Civi\Api4\Generic\Result
  * @throws \CRM_Core_Exception
