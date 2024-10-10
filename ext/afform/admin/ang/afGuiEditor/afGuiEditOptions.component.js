@@ -6,17 +6,21 @@
     templateUrl: '~/afGuiEditor/afGuiEditOptions.html',
     require: {field: '^^afGuiField'},
     controller: function($scope) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
-        ctrl = this;
+      const ts = $scope.ts = CRM.ts('org.civicrm.afform_admin');
+      const ctrl = this;
 
       this.$onInit = function() {
+        // Currently defined field options (either customized or original)
         $scope.options = JSON.parse(angular.toJson(ctrl.field.getOptions()));
-        var optionKeys = _.map($scope.options, 'id');
-        $scope.deletedOptions = _.filter(JSON.parse(angular.toJson(ctrl.field.getDefn().options || [])), function (item) {
-          return !_.contains(optionKeys, item.id);
-        });
-        $scope.originalLabels = _.transform(ctrl.field.getDefn().options || [], function (originalLabels, item) {
+        const optionKeys = $scope.options.map(option => option.id);
+        // Original options
+        const originalOptions = JSON.parse(angular.toJson(ctrl.field.getDefn().options || []));
+        // Original options that are not in the current set (if customized)
+        $scope.deletedOptions = originalOptions.filter(item => !optionKeys.includes(item.id));
+        // Deleted options have no label so fetch original
+        $scope.originalLabels = (ctrl.field.getDefn().options || []).reduce((originalLabels, item) => {
           originalLabels[item.id] = item.label;
+          return originalLabels;
         }, {});
       };
 
