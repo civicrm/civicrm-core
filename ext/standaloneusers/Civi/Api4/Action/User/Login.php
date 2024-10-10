@@ -153,8 +153,7 @@ class Login extends AbstractAction {
   }
 
   protected function loginUser(int $userID) {
-    $authx = new \Civi\Authx\Standalone();
-    $authx->loginSession($userID);
+    _authx_uf()->loginSession($userID);
   }
 
 }

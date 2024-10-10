@@ -2,18 +2,25 @@
 namespace Civi\Standalone;
 
 use Civi\Crypto\Exception\CryptoException;
-use CRM_Core_Session;
 use Civi;
 use Civi\Api4\User;
 use Civi\Api4\MessageTemplate;
 use CRM_Standaloneusers_WorkflowMessage_PasswordReset;
 
 /**
- * This is a single home for security related functions for Civi Standalone.
+ * Security related functions for Standaloneusers.
  *
- * Things may yet move around in the codebase; at the time of writing this helps
- * keep core PRs to a minimum.
+ * This is closely coupled with CRM_Utils_System_Standalone
+ * Many functions there started life here when Standalone
+ * was being resurrected.
  *
+ * Some of the generic user functions have been moved back to the
+ * System class so that they are more permanently available.
+ *
+ * Things may yet move around in the codebase - particularly if
+ * alternative user extensions to Standaloneusers are developed as
+ * these would then need to share an interface with the System
+ * class
  */
 class Security {
 
@@ -53,7 +60,10 @@ class Security {
     }
 
     // NULL means the current logged-in user
-    $userID ??= $this->getLoggedInUfID() ?? 0;
+    $userID = $userID ?? \CRM_Utils_System::getLoggedInUfID();
+
+    // now any falsey userid is equivalent to userID = 0 = anonymous user
+    $userID = $userID ?: 0;
 
     if (!isset(\Civi::$statics[__METHOD__][$userID])) {
 
@@ -88,162 +98,6 @@ class Security {
   }
 
   /**
-   */
-  public function getUserIDFromUsername(string $username): ?int {
-    return \Civi\Api4\User::get(FALSE)
-      ->addWhere('username', '=', $username)
-      ->execute()
-      ->first()['id'] ?? NULL;
-  }
-
-  /**
-   * Load an active user by username.
-   *
-   * @return array|bool FALSE if not found.
-   */
-  public function loadUserByName(string $username) {
-    $user = \Civi\Api4\User::get(FALSE)
-      ->addWhere('username', '=', $username)
-      ->addWhere('is_active', '=', TRUE)
-      ->execute()->first() ?? [];
-    if ($user) {
-      return $user;
-    }
-    return FALSE;
-  }
-
-  /**
-   * Load an active user by internal user ID.
-   *
-   * @return array|bool FALSE if not found.
-   */
-  public function loadUserByID(int $userID) {
-    $user = \Civi\Api4\User::get(FALSE)
-      ->addWhere('id', '=', $userID)
-      ->addWhere('is_active', '=', TRUE)
-      ->execute()->first() ?? [];
-    if ($user) {
-      return $user;
-    }
-    return FALSE;
-  }
-
-  /**
-   *
-   */
-  public function logoutUser() {
-    // This is the same call as in CRM_Authx_Page_AJAX::logout()
-    _authx_uf()->logoutSession();
-  }
-
-  /**
-   * Create a user in the CMS.
-   *
-   * This is the (perhaps temporary location for) the implementation of CRM_Utils_System_Standalone method.
-   *
-   * @param array $params keys:
-   *    - 'cms_name'
-   *    - 'cms_pass' plaintext password
-   *    - 'notify' boolean
-   * @param string $emailParam
-   *   Name of the $param which contains the email address.
-   *
-   * @return int|bool
-   *   uid if user was created, false otherwise
-   */
-  public function createUser(&$params, $emailParam) {
-    try {
-      $email = $params[$emailParam];
-      $userID = User::create(FALSE)
-        ->addValue('username', $params['cms_name'])
-        ->addValue('uf_name', $email)
-        ->addValue('password', $params['cms_pass'])
-        ->addValue('contact_id', $params['contact_id'] ?? NULL)
-        // ->addValue('uf_id', 0) // does not work without this.
-        ->execute()->single()['id'];
-    }
-    catch (\Exception $e) {
-      \Civi::log()->warning("Failed to create user '$email': " . $e->getMessage());
-      return FALSE;
-    }
-
-    // @todo This next line is what Drupal does, but it's unclear why.
-    // I think it assumes we want to be logged in as this contact, and as there's no uf match, it's not in civi.
-    // But I'm not sure if we are always becomming this user; I'm not sure waht calls this function.
-    // CRM_Core_Config::singleton()->inCiviCRM = FALSE;
-
-    return (int) $userID;
-  }
-
-  /**
-   * Update a user's email
-   *
-   * This is the (perhaps temporary location for) the implementation of CRM_Utils_System_Standalone method.
-   */
-  public function updateCMSName($ufID, $email) {
-    \Civi\Api4\User::update(FALSE)
-      ->addWhere('id', '=', $ufID)
-      ->addValue('uf_name', $email)
-      ->execute();
-  }
-
-  /**
-   * Register the given user as the currently logged in user.
-   */
-  public function loginAuthenticatedUserRecord(array $user, bool $withSession) {
-    global $loggedInUserId, $loggedInUser;
-    $loggedInUserId = $user['id'];
-    $loggedInUser = $user;
-
-    if ($withSession) {
-      $session = \CRM_Core_Session::singleton();
-      $session->set('ufID', $user['id']);
-
-      // Identify the contact
-      $contactID = civicrm_api3('UFMatch', 'get', [
-        'sequential' => 1,
-        'return' => ['contact_id'],
-        'uf_id' => $user['id'],
-      ])['values'][0]['contact_id'] ?? NULL;
-      // Confusingly, Civi stores it's *Contact* ID as *userID* on the session.
-      $session->set('userID', $contactID);
-      $this->applyLocaleFromUser($user);
-    }
-  }
-
-  /**
-   * This is the (perhaps temporary location for) the implementation of CRM_Utils_System_Standalone method.
-   */
-  public function isUserLoggedIn(): bool {
-    return !empty($this->getLoggedInUfID());
-  }
-
-  /**
-   * This is the (perhaps temporary location for) the implementation of CRM_Utils_System_Standalone method.
-   */
-  public function getLoggedInUfID(): ?int {
-    $authX = new \Civi\Authx\Standalone();
-    return $authX->getCurrentUserId();
-  }
-
-  /**
-   * This is the (perhaps temporary location for) the implementation of CRM_Utils_System_Standalone method.
-   */
-  public function languageNegotiationURL($url, $addLanguagePart = TRUE, $removeLanguagePart = FALSE) {
-    // @todo
-    return $url;
-  }
-
-  /**
-   * This is the (perhaps temporary location for) the implementation of CRM_Utils_System_Standalone method.
-   * Return the CMS-specific url for its permissions page
-   * @return array
-   */
-  public function getCMSPermissionsUrlParams() {
-    return ['ufAccessURL' => '/civicrm/admin/roles'];
-  }
-
-  /**
    * High level function to encrypt password using the site-default mechanism.
    */
   public function hashPassword(string $plaintext): string {
@@ -255,9 +109,28 @@ class Security {
   }
 
   /**
-   * Check whether a password matches a hashed version.
+   * Standaloneusers implementation of AuthxInterface::checkPassword
+   * @see \Civi\Authx\Standalone
    */
-  public function checkPassword(string $plaintextPassword, string $storedHashedPassword): bool {
+  public function checkPassword(string $username, string $plaintextPassword): ?int {
+    $user = \Civi\Api4\User::get(FALSE)
+      ->addWhere('username', '=', $username)
+      ->addWhere('is_active', '=', TRUE)
+      ->addSelect('hashed_password', 'id')
+      ->execute()
+      ->first();
+
+    if ($user && $this->checkHashedPassword($plaintextPassword, $user['hashed_password'])) {
+      return $user['id'];
+    }
+    return NULL;
+  }
+
+  /**
+   * Check whether a password matches a hashed version.
+   * @return bool
+   */
+  protected function checkHashedPassword(string $plaintextPassword, string $storedHashedPassword): bool {
 
     if (preg_match('@^\$S\$[A-Za-z./0-9]{52}$@', $storedHashedPassword)) {
       // Looks like a default D7 password.
@@ -408,19 +281,6 @@ class Security {
       ->setFrom("\"$domainFromName\" <$domainFromEmail>");
 
     return $workflowMessage;
-  }
-
-  /**
-   * Applies the locale from the user record.
-   *
-   * @param array $user
-   * @return void
-   */
-  public function applyLocaleFromUser(array $user) {
-    $session = CRM_Core_Session::singleton();
-    if (!empty($user['language'])) {
-      $session->set('lcMessages', $user['language']);
-    }
   }
 
 }

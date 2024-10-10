@@ -15,7 +15,6 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-use Civi\Standalone\Security;
 use Civi\Standalone\SessionHandler;
 
 /**
@@ -24,8 +23,52 @@ use Civi\Standalone\SessionHandler;
 class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
 
   /**
-   * @internal
+   * Standalone uses a CiviCRM Extension, Standaloneusers, to provide user
+   * functionality
+   *
+   * This is great for modularity - but does mean that there are points in
+   * bootstrap / install / failure where the extension isn't available
+   * and we need to provide fallback/failsafe behaviours
+   *
+   * This function provides a general check for whether we are in such a
+   * scenario
+   *
+   * (In the future, alternative user-providing extensions may be available - in
+   * which case this check might need generalising. One possibility could be
+   * to use the Api4 User interface as a spec for what any extension must provide
+   *
+   * Then maybe the check could be if (class_exists(\Civi\Api4\User::class))?
+   *
    * @return bool
+   *   Whether user extension is available
+   */
+  protected function isUserExtensionAvailable(): bool {
+    if (!class_exists(\Civi\Api4\User::class)) {
+      return FALSE;
+    }
+    // TODO: the following would be be a better check, as sometimes during
+    // upgrade the User class can exist but the entity is not actually loaded
+    //
+    // HOWEVER: it currently causes a crash during the install phase.
+    // https://github.com/civicrm/civicrm-core/pull/31198 may help.
+    //
+    // if (!\Civi\Api4\Utils\CoreUtil::entityExists('User')) {
+    //   return FALSE;
+    // }
+
+    // authx function is required for standalone user system
+    if (!function_exists('_authx_uf')) {
+      return FALSE;
+    }
+
+    return TRUE;
+  }
+
+  /**
+   * @inheritdoc
+   *
+   * In Standalone the UF is CiviCRM, so we're never
+   * running without it
    */
   public function isLoaded(): bool {
     return TRUE;
@@ -43,29 +86,34 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
 
   /**
    * @inheritDoc
-   *
-   * Create a user in the CMS.
-   *
-   * @param array $params keys:
-   *    - 'cms_name'
-   *    - 'cms_pass' plaintext password
-   *    - 'notify' boolean
-   * @param string $mailParam
-   *   Name of the param which contains the email address.
-   *   Because. Right. OK. That's what it is.
-   *
-   * @return int|bool
-   *   uid if user was created, false otherwise
    */
-  public function createUser(&$params, $mailParam) {
-    return Security::singleton()->createUser($params, $mailParam);
+  public function createUser(&$params, $emailParam) {
+    try {
+      $email = $params[$emailParam];
+      $userID = \Civi\Api4\User::create(FALSE)
+        ->addValue('username', $params['cms_name'])
+        ->addValue('uf_name', $email)
+        ->addValue('password', $params['cms_pass'])
+        ->addValue('contact_id', $params['contact_id'] ?? NULL)
+        // ->addValue('uf_id', 0) // does not work without this.
+        ->execute()->single()['id'];
+    }
+    catch (\Exception $e) {
+      \Civi::log()->warning("Failed to create user '$email': " . $e->getMessage());
+      return FALSE;
+    }
+
+    return (int) $userID;
   }
 
   /**
    * @inheritDoc
    */
   public function updateCMSName($ufID, $email) {
-    return Security::singleton()->updateCMSName($ufID, $email);
+    \Civi\Api4\User::update(FALSE)
+      ->addWhere('id', '=', $ufID)
+      ->addValue('uf_name', $email)
+      ->execute();
   }
 
   /**
@@ -205,14 +253,17 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @inheritDoc
    * Authenticate the user against the CMS db.
    *
+   * I think this is only used by CLI so setting the session
+   * doesn't make sense
+   *
    * @param string $name
    *   The user name.
    * @param string $password
    *   The password for the above user.
    * @param bool $loadCMSBootstrap
-   *   Load cms bootstrap?.
+   *   Not used in Standalone context
    * @param string $realPath
-   *   Filename of script
+   *   Not used in Standalone context
    *
    * @return array|bool
    *   [contactID, ufID, unique string] else false if no auth
@@ -220,13 +271,6 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    */
   public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
     $authxLogin = authx_login(['flow' => 'login', 'cred' => 'Basic ' . base64_encode("{$name}:{$password}")]);
-
-    $user = \Civi\Api4\User::get(FALSE)
-      ->addWhere('id', '=', $authxLogin['userId'])
-      ->addWhere('is_active', '=', TRUE)
-      ->execute()->single();
-
-    Security::singleton()->applyLocaleFromUser($user);
 
     // Note: random_int is more appropriate for cryptographical use than mt_rand
     // The long number is the max 32 bit value.
@@ -242,17 +286,23 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @return int|null
    */
   public function getUfId($username) {
-    return Security::singleton()->getUserIDFromUsername($username);
+    if (!$this->isUserExtensionAvailable()) {
+      return NULL;
+    }
+    return \Civi\Api4\User::get(FALSE)
+      ->addWhere('username', '=', $username)
+      ->execute()
+      ->first()['id'] ?? NULL;
   }
 
   /**
-   * Immediately stop script execution, log out the user and redirect to the home page.
-   *
-   * @deprecated
-   *   This function should be removed in favor of linking to the CMS's logout page
+   * Immediately stop script execution and log out the user
    */
   public function logout() {
-    return Security::singleton()->logoutUser();
+    _authx_uf()->logoutSession();
+    // redirect to the home page?
+    // breaks tests in standaloneusers-e2e
+    // \CRM_Utils_System::redirect('/civicrm/login');
   }
 
   /**
@@ -317,50 +367,74 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   public function loadBootStrap($params = [], $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
     static $runOnce;
 
-    if (!isset($runOnce)) {
-      $runOnce = TRUE;
-    }
-    else {
+    if (isset($runOnce)) {
+      // we've already run
       return TRUE;
     }
+
+    // dont run again
+    $runOnce = TRUE;
 
     if (!$loadUser) {
       return TRUE;
     }
 
-    $security = \Civi\Standalone\Security::singleton();
-    if (!empty($params['uid'])) {
-      $user = $security->loadUserByID($params['uid']);
-    }
-    elseif (!empty($params['name'] && !empty($params['pass']))) {
-      // It seems from looking at the Drupal implementation, that
-      // if given username we expect a correct password.
-      $user = $security->loadUserByName($params['name']);
-      if ($user) {
-        if (!$security->checkPassword($params['pass'], $user['hashed_password'] ?? '')) {
-          return FALSE;
-        }
+    try {
+      if (!empty($params['uid'])) {
+        _authx_uf()->loginStateless($params['uid']);
+        return TRUE;
+      }
+      elseif (!empty($params['name'] && !empty($params['pass']))) {
+        // It seems from looking at the Drupal implementation, that
+        // if given username we expect a correct password.
+
+        /**
+         * @throws CRM_Core_Exception if login unsuccessful
+         */
+        $this->authenticate($params['name'], $params['pass']);
+        return TRUE;
+      }
+      else {
+        return FALSE;
       }
     }
-    if (!$user) {
+    catch (\CRM_Core_Exception $e) {
+      // swallow any errors if $throwError is false
+      // (presume the expectation is these are login errors
+      // - though that isn't guaranteed?)
+      if (!$throwError) {
+        return FALSE;
+      }
+      throw $e;
+    }
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function loadUser($username) {
+    $userID = $this->getUfId($username) ?? NULL;
+    if (!$userID) {
       return FALSE;
     }
-
-    $security->loginAuthenticatedUserRecord($user, FALSE);
-
+    _authx_uf()->loginSession($userID);
     return TRUE;
   }
 
-  public function loadUser($username) {
-    $security = \Civi\Standalone\Security::singleton();
-    $user = $security->loadUserByName($username);
-    if ($user) {
-      $security->loginAuthenticatedUserRecord($user, TRUE);
-      return TRUE;
-    }
-    else {
+  /**
+   * Load an active user by internal user ID.
+   *
+   * @return array|bool FALSE if not found.
+   */
+  public function getUserById(int $userID) {
+    if (!$this->isUserExtensionAvailable()) {
       return FALSE;
     }
+    return \Civi\Api4\User::get(FALSE)
+      ->addWhere('id', '=', $userID)
+      ->addWhere('is_active', '=', TRUE)
+      ->execute()
+      ->first() ?: FALSE;
   }
 
   /**
@@ -393,7 +467,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function isUserLoggedIn() {
-    return Security::singleton()->isUserLoggedIn();
+    return !empty($this->getLoggedInUfID());
   }
 
   /**
@@ -422,9 +496,15 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
 
   /**
    * @inheritDoc
+   *
+   * If the User extension isn't available
+   * then no one is logged in
    */
   public function getLoggedInUfID() {
-    return Security::singleton()->getLoggedInUfID();
+    if (!$this->isUserExtensionAvailable()) {
+      return NULL;
+    }
+    return _authx_uf()->getCurrentUserId();
   }
 
   /**
@@ -455,52 +535,6 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
-   * I don't know why this needs to be here? Does it even?
-   *
-   * Helper function to extract path, query and route name from Civicrm URLs.
-   *
-   * For example, 'civicrm/contact/view?reset=1&cid=66' will be returned as:
-   *
-   * ```
-   * array(
-   *   'path' => 'civicrm/contact/view',
-   *   'route' => 'civicrm.civicrm_contact_view',
-   *   'query' => array('reset' => '1', 'cid' => '66'),
-   * );
-   * ```
-   *
-   * @param string $url
-   *   The url to parse.
-   *
-   * @return string[]
-   *   The parsed url parts, containing 'path', 'route' and 'query'.
-   */
-  public function parseUrl($url) {
-    $processed = ['path' => '', 'route_name' => '', 'query' => []];
-
-    // Remove leading '/' if it exists.
-    $url = ltrim($url, '/');
-
-    // Separate out the url into its path and query components.
-    $url = parse_url($url);
-    if (empty($url['path'])) {
-      return $processed;
-    }
-    $processed['path'] = $url['path'];
-
-    // Create a route name by replacing the forward slashes in the path with
-    // underscores, civicrm/contact/search => civicrm.civicrm_contact_search.
-    $processed['route_name'] = 'civicrm.' . implode('_', explode('/', $url['path']));
-
-    // Turn the query string (if it exists) into an associative array.
-    if (!empty($url['query'])) {
-      parse_str($url['query'], $processed['query']);
-    }
-
-    return $processed;
-  }
-
-  /**
    * Append any Standalone js to coreResourcesList.
    *
    * @param \Civi\Core\Event\GenericHookEvent $e
@@ -512,9 +546,9 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function getTimeZoneString() {
-    $userId = Security::singleton()->getLoggedInUfID();
+    $userId = $this->getLoggedInUfID();
     if ($userId) {
-      $user = Security::singleton()->loadUserByID($userId);
+      $user = $this->getUserById($userId);
       if ($user && !empty($user['timezone'])) {
         return $user['timezone'];
       }
@@ -524,19 +558,10 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
 
   /**
    * @inheritDoc
+   * @todo implement language negotiation for Standalone?
    */
   public function languageNegotiationURL($url, $addLanguagePart = TRUE, $removeLanguagePart = FALSE) {
-    if (empty($url)) {
-      return $url;
-    }
-
-    // This method is called early in the boot process.
-    // Check if the extensions are available yet as our implementation requires Standaloneusers.
-    // Debugging note: calling Civi::log() methods here creates a nasty crash.
-    if (!class_exists(\Civi\Standalone\Security::class)) {
-      return $url;
-    }
-    return Security::singleton()->languageNegotiationURL($url, $addLanguagePart = TRUE, $removeLanguagePart = FALSE);
+    return $url;
   }
 
   /**
@@ -544,12 +569,12 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @return array
    */
   public function getCMSPermissionsUrlParams() {
-    return Security::singleton()->getCMSPermissionsUrlParams();
+    return ['ufAccessURL' => '/civicrm/admin/roles'];
   }
 
   public function permissionDenied() {
     // If not logged in, they need to.
-    if (CRM_Core_Session::singleton()->get('ufID')) {
+    if ($this->isUserLoggedIn()) {
       // They are logged in; they're just not allowed this page.
       CRM_Core_Error::statusBounce(ts("Access denied"), CRM_Utils_System::url('civicrm'));
     }
@@ -563,20 +588,22 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
         return $loginPage->run();
       }
 
-      throw new CRM_Core_Exception('Access denied. Standaloneusers extension not found');
+      throw new CRM_Core_Exception('Access denied. Standaloneusers login page not found');
     }
   }
 
   /**
    * Start a new session.
+   *
+   * Generally this uses the SessionHander provided by Standaloneusers
+   * extension - but we fallback to a default PHP session to:
+   * a) allow the installer to work (early in the Standalone install, we dont have Standaloneusers yet)
+   * b) avoid unhelpfully hard crash if the ExtensionSystem goes down (without the fallback, the crash
+   * here swallows whatever error is actually causing the crash)
    */
   public function sessionStart() {
-    if (defined('CIVI_SETUP')) {
-      // during installation we can't use the session
-      // handler from the extension yet so we just
-      // use a default php session
-      // use a different cookie name to avoid any nasty clash
-      $session_cookie_name = 'SESSCIVISOINSTALL';
+    if (!$this->isUserExtensionAvailable()) {
+      $session_cookie_name = 'SESSCIVISOFALLBACK';
     }
     else {
       $session_handler = new SessionHandler();
@@ -640,17 +667,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
     $sess = \CRM_Core_Session::singleton();
     $sess->initialize();
 
-    // We want to apply timezone for this session
-    // However - our implementation relies on checks against standaloneusers
-    // so we need a guard if this is called in install
-    //
-    // Doesn't the session handler started above also need standalonusers?
-    // Yes it does - but we put in some guards further into those functions
-    // to use a fake session instead for this install bit.
-    // Maybe they could get moved up here
-    if (class_exists(\Civi\Standalone\Security::class)) {
-      $this->setTimeZone();
-    }
+    $this->setTimeZone();
   }
 
 }

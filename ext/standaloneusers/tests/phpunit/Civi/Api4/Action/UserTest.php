@@ -8,10 +8,9 @@ use Civi\Api4\User;
 use Civi\Api4\Role;
 use Civi\Api4\UserRole;
 use Civi\Api4\Contact;
-use Civi\Standalone\Security;
 
 /**
- * FIXME - Add test description.
+ * Test the Standaloneusers User Api4 actions
  *
  * Tips:
  *  - With HookInterface, you may implement CiviCRM hooks directly in the test class.
@@ -92,41 +91,21 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
     }
   }
 
-  /**
-   * Note I thought I could use \Civi\Authx\Standalone::logoutSession()
-   * but it calls session_destroy which messes up future tests.
-   *
-   * Not sure if there is a generic logout without session destroy.
-   *
-   */
   public function ensureLoggedOut() {
-    global $loggedInUserId, $loggedInUser;
-
-    if (\CRM_Utils_System::getLoggedInUfID()) {
-      \CRM_Core_Session::singleton()->reset();
-      $loggedInUser = $loggedInUserId = NULL;
-    }
+    \CRM_Utils_System::logout();
   }
 
   public function tearDown():void {
-    $this->deleteStuffWeMade();
+    // only tear down if we set up
+    if (CIVICRM_UF === 'Standalone') {
+      $this->ensureLoggedOut();
+      $this->deleteStuffWeMade();
+    }
     parent::tearDown();
   }
 
   protected function loginUser($userID) {
-    $security = Security::singleton();
-    $user = \Civi\Api4\User::get(FALSE)
-      ->addWhere('id', '=', $userID)
-      ->execute()->first();
-
-    $contactID = civicrm_api3('UFMatch', 'get', [
-      'sequential' => 1,
-      'return' => ['contact_id'],
-      'uf_id' => $user['id'],
-    ])['values'][0]['contact_id'] ?? NULL;
-    $this->assertNotNull($contactID);
-    /** @var \Civi\Standalone\Security $security */
-    $security->loginAuthenticatedUserRecord($user, FALSE);
+    _authx_uf()->loginSession($userID);
   }
 
   /**
