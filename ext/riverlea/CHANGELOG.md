@@ -1,10 +1,15 @@
 0.10.11
  - CHANGED - major tabs refactor and simplify (see - https://lab.civicrm.org/extensions/riverlea/-/issues/54)
- - REMOVED CSS VARIABLES:
+ - REMOVED - quite a bit of now redundant tab-related css.
+ - REMOVED 8 CSS VARIABLES:
     --crm-dashlet-tabs-bg
     --crm-dashlet-tab-bg
     --crm-dashlet-tab-border
+    --crm-dashlet-tab-color
     --crm-dashlet-tab-active
+    --crm-dashlet-tab-border-active
+    --crm-dashlet-tab-body-border
+    --crm-dashlet-tab-body-padding  (NB - it was adding these variables that forced the tab rethink)
 
 0.10.10
  - FIXED - date time input simplified

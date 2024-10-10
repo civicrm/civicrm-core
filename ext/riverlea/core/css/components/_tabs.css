@@ -23,24 +23,6 @@
     padding: var(--crm-tabs-padding);
     width: 100%;
 }
-.crm-container .panel-default > .panel-heading:has(.nav-tabs) { /* Fix for default panel heading bg */
-    background-color: var(--crm-tabs-bg)
-}
-.crm-container .panel > .panel-heading .nav.nav-tabs { /* Fix for bootstrap panel heading border */
-    border-bottom: 0;
-}
-.crm-container .panel-heading:has(.nav-tabs) .pull-right {
-    margin-right: var(--crm-m);
-}
-.crm-container .crm-search-nav-tabs { /* Fix for SK tabs border */
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-    margin-bottom: 0;
-    border-bottom: 0;
-}
-/* .crm-container .ui-state-default,
-.crm-container .ui-widget-content .ui-state-default,
-.crm-container .ui-widget-header .ui-state-default, */
 .crm-container .ui-tabs .ui-tabs-nav li,
 .crm-container .ui-button,
 .crm-container .ui-button.ui-state-disabled:hover,
@@ -128,39 +110,6 @@
     background: var(--crm-tab-bg-active);
     padding: var(--crm-tab-padding);
     container-type: inline-size;
-}
-
-/* Bootstrap tabs */
-
-/* .crm-container .nav-tabs {
-	/* border-bottom: var(--crm-tab-border);
-    gap: var(--crm-tabs-gap);
-    margin: 0; *
-}
-.crm-container .nav-tabs > li > a {
-	/* border: 1px solid transparent;
-	border-radius: var(--crm-tab-roundness);
-    display: block;
-    margin-bottom: -1px; *
-}
-.crm-container .nav-tabs > li > a:hover,
-.crm-container .nav-tabs > li > a:focus,
-.crm-container .nav-tabs > li.active > a, /* using # to occlude BS *
-.crm-container .nav-tabs > li.active > a:hover,
-.crm-container .nav-tabs > li.active > a:focus {
-	color: var(--crm-c-text);
-	background-color: var(--crm-tab-bg-hover) !important /* vs api4-explorer.css *;
-	border: var(--crm-tab-border);
-	border-bottom-color: transparent;
-}
-.crm-container .nav-tabs > li.active > a {
-    background-color: var(--crm-tab-bg-active) !important; /* vs api4-explorer.css *
-}*/
-.crm-container .panel-heading:has(.nav-tabs) {
-    padding: 0;
-}
-.crm-container .panel-heading .nav.nav-tabs{
-    background-color: transparent;
 }
 
 /* Dashboard */
