@@ -113,6 +113,10 @@
 
         // Wait for parent controllers to initialize
         $timeout(function() {
+          initializeValue(true);
+        });
+
+        function initializeValue(firstLoad) {
           // Unique field name = entity_name index . join . field_name
           var entityName = ctrl.afFieldset.getName(),
             joinEntity = ctrl.afJoin ? ctrl.afJoin.entity : null,
@@ -130,7 +134,7 @@
           else if (urlArgs && (ctrl.fieldName in urlArgs)) {
             setValue(urlArgs[ctrl.fieldName]);
           }
-          else if (ctrl.afFieldset.getStoredValue(ctrl.fieldName) !== undefined) {
+          else if (firstLoad && ctrl.afFieldset.getStoredValue(ctrl.fieldName) !== undefined) {
             setValue(ctrl.afFieldset.getStoredValue(ctrl.fieldName));
           }
           // Set default value based on field defn
@@ -157,6 +161,12 @@
               }
             }
           }
+        }
+
+        // Reinitialize value when resetting form
+        $scope.$on('afFormReset', function() {
+          delete $scope.dataProvider.getFieldData()[ctrl.fieldName];
+          initializeValue(false);
         });
       };
 
