@@ -87,6 +87,8 @@ class CRM_Upgrade_Incremental_php_SixTwo extends CRM_Upgrade_Incremental_Base {
       'default' => 1,
     ]);
     $this->addTask('Fix Unique index on acl cache table with domain id', 'fixAclUniqueIndex');
+    $this->addTask('Add unsubscribe mode column to civicrm mailing', 'addColumn', 'civicrm_mailing', 'unsubscribe_mode', "VARCHAR(70) NOT NULL DEFAULT 'unsubscribe' COMMENT 'One Click Unsubscribe mode either unsubscribe or opt-out'");
+    $this->addTask('Populate Unsubscribe mode column on civicrm_mailing', 'populateUnsubscribeMode');
   }
 
   public static function setFileUploadDate(): bool {
@@ -115,6 +117,11 @@ class CRM_Upgrade_Incremental_php_SixTwo extends CRM_Upgrade_Incremental_Base {
     CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_acl_contact_cache', 'FK_civicrm_acl_contact_cache_user_id');
     CRM_Core_BAO_SchemaHandler::dropIndexIfExists('civicrm_acl_contact_cache', 'UI_user_contact_operation');
     CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_acl_contact_cache ADD UNIQUE INDEX `UI_user_contact_operation` (`domain_id`, `user_id`, `contact_id`, `operation`)");
+    return TRUE;
+  }
+
+  public static function populateUnsubscribeMode(): bool {
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_mailing SET unsubscribe_mode = 'unsubscribe'");
     return TRUE;
   }
 
