@@ -42,13 +42,28 @@ class LegacySpecScanner implements AutoServiceInterface {
   }
 
   /**
-   * Scan all extensions for files in a certain namespace.
+   * Scan all enabled extensions for files in a certain namespace.
+   *
+   * Q: this seems to be adding resources to the container as it goes, rather
+   * than just finding them as per function name? Otherwise could share an implementation
+   * with LegacyEntityScanner
+   *
+   * Note: respects dispatch policy for hook_civicrm_scanClasses, for consistency
    *
    * @param string $namespace
    * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
    * @return array
    */
   protected static function findClasses($namespace, $container): array {
+    // check for a dispatch policy - if in place then only run if hook
+    // scanClasses is enabled, for consistency with AutoService SpecProviders
+    if (\Civi::dispatcher()->getDispatchPolicy()) {
+      $scanClassPolicy = \Civi::dispatcher()->checkDispatchPolicy('hook_civicrm_scanClasses');
+      if ($scanClassPolicy !== 'run') {
+        return [];
+      }
+    }
+
     $classes = [];
 
     $namespace = \CRM_Utils_File::addTrailingSlash($namespace, '\\');

@@ -17,7 +17,7 @@
  */
 
 
-namespace api\v4\Mock;
+namespace Civi\Mock;
 
 /**
  * Simple data backend for mock basic api.

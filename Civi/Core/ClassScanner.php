@@ -145,6 +145,10 @@ class ClassScanner {
     static::scanFolders($classes, $civicrmRoot, 'CRM', '_', ';(Upgrade|Utils|Exception|_DAO|_Page|_Form|_Controller|_StateMachine|_Selector|_CodeGen|_QuickForm);');
     static::scanFolders($classes, $civicrmRoot, 'Civi', '\\', ';\\\(Security|Test)\\\;');
 
+    if (CIVICRM_UF === 'UnitTests') {
+      static::scanFolders($classes, $civicrmRoot . 'tests/phpunit', 'Civi/Api4', '\\');
+    }
+
     $cache->set($cacheKey, $classes, static::TTL);
     return $classes;
   }

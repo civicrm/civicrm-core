@@ -25,6 +25,7 @@ namespace Civi\Api4;
  * @method static Action\MockArrayEntity\DoNothing doNothing()
  *
  * @package Civi\Api4
+ * @since 5.77
  */
 class MockArrayEntity extends Generic\AbstractEntity {
 

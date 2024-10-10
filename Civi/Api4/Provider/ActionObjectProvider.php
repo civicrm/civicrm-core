@@ -18,6 +18,8 @@ use Civi\API\Events;
 use Civi\Api4\Utils\ReflectionUtils;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Core\Service\AutoService;
+use Civi\Core\ClassScanner;
+use Civi\Api4\Generic\EntityInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -48,6 +50,10 @@ class ActionObjectProvider extends AutoService implements EventSubscriberInterfa
   public function onApiResolve(ResolveEvent $event) {
     $apiRequest = $event->getApiRequest();
     if ($apiRequest instanceof AbstractAction) {
+      $entityName = $apiRequest->getEntityName();
+      if (!isset($this->getEntities()[$entityName])) {
+        throw new \CRM_Core_Exception("Unrecognised entity in Api4 ActionObjectProvider: $entityName");
+      }
       $event->setApiRequest($apiRequest);
       $event->setApiProvider($this);
       $event->stopPropagation();
@@ -162,8 +168,25 @@ class ActionObjectProvider extends AutoService implements EventSubscriberInterfa
 
     if (!$entities) {
       // Load entities declared in API files
-      foreach ($this->getAllApiClasses() as $className) {
-        $info = $className::getInfo();
+      //
+      // NOTE: this is slightly subtle in how it respects the boundary between core
+      // and extensions
+      //
+      // It *should* align with EntityRepository::loadAll which listens to hook_civicrm_entityType
+      //
+      // In restricted circumstances (like upgrade) extension entities are not picked
+      // up there because hook_civicrm_entityType is blocked by the dispatch policy
+      //
+      // They are not picked up here because hook_civicrm_scanClasses is not called, so
+      // their classes are not found by the ClassScanner
+      //
+      // I think it would be *better* if the extension entities always came through
+      // civi.api4.entityTypes here, but can't see how to distinguish extension
+      // classes from core classes with the ClassScanner
+      //
+      $entityClasses = ClassScanner::get(['interface' => EntityInterface::class]);
+      foreach ($entityClasses as $class) {
+        $info = $class::getInfo();
         $entities[$info['name']] = $info;
       }
       // Allow extensions to modify the list of entities
@@ -183,29 +206,6 @@ class ActionObjectProvider extends AutoService implements EventSubscriberInterfa
         $entity['search_fields'] = (array) ($entity['label_field'] ?? NULL);
       }
     }
-  }
-
-  /**
-   * Scan all api directories to discover entities
-   * @return \Civi\Api4\Generic\AbstractEntity[]
-   */
-  public function getAllApiClasses(): array {
-    $classNames = [];
-    $locations = array_merge([\Civi::paths()->getPath('[civicrm.root]/Civi.php')],
-      array_column(\CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(), 'filePath')
-    );
-    foreach ($locations as $location) {
-      $dir = \CRM_Utils_File::addTrailingSlash(dirname($location ?? '')) . 'Civi/Api4';
-      if (is_dir($dir)) {
-        foreach (glob("$dir/*.php") as $file) {
-          $className = 'Civi\Api4\\' . basename($file, '.php');
-          if (is_a($className, 'Civi\Api4\Generic\AbstractEntity', TRUE)) {
-            $classNames[] = $className;
-          }
-        }
-      }
-    }
-    return $classNames;
   }
 
 }

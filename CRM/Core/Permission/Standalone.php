@@ -15,6 +15,7 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Utils\CoreUtil;
 use Civi\Api4\Role;
 
 /**
@@ -89,7 +90,8 @@ class CRM_Core_Permission_Standalone extends CRM_Core_Permission_Base {
     if (empty($permissions)) {
       throw new CRM_Core_Exception("Cannot upgrade permissions: permission list missing");
     }
-    if (class_exists(Role::class)) {
+    // sometimes during upgrade the extension entities aren't available
+    if (CoreUtil::entityExists('User')) {
       $roles = Role::get(FALSE)->addSelect('permissions')->execute();
       $records = [];
       $definedPermissions = array_keys($permissions);

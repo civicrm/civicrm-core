@@ -411,7 +411,7 @@ class CiviEventDispatcher implements CiviEventDispatcherInterface {
    * @return string
    *   Ex: 'run', 'drop', 'fail'
    */
-  protected function checkDispatchPolicy($eventName) {
+  public function checkDispatchPolicy($eventName) {
     if (isset($this->dispatchPolicyExact[$eventName])) {
       return $this->dispatchPolicyExact[$eventName];
     }
