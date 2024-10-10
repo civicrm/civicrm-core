@@ -30,10 +30,17 @@ class CRM_Upgrade_Incremental_php_SixFour extends CRM_Upgrade_Incremental_Base {
   public function upgrade_6_4_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Rename multisite_is_enabled setting', 'renameMultisiteSetting');
+    $this->addTask('Add unsubscribe mode column to civicrm mailing', 'addColumn', 'civicrm_mailing', 'unsubscribe_mode', "VARCHAR(70) NOT NULL DEFAULT 'unsubscribe' COMMENT 'One Click Unsubscribe mode either unsubscribe or opt-out'");
+    $this->addTask('Populate Unsubscribe mode column on civicrm_mailing', 'populateUnsubscribeMode');
   }
 
   public static function renameMultisiteSetting(): bool {
     CRM_Core_DAO::executeQuery('UPDATE civicrm_setting SET name = "multisite_is_enabled" WHERE name = "is_enabled"');
+    return TRUE;
+  }
+
+  public static function populateUnsubscribeMode(): bool {
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_mailing SET unsubscribe_mode = 'unsubscribe'");
     return TRUE;
   }
 

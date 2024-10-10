@@ -488,4 +488,25 @@ return [
     'help' => ['id' => 'smtp_450_is_permanent'],
     'settings_pages' => ['mailing' => ['weight' => 160]],
   ],
+  'civimail_default_unsubscribe_mode' => [
+    'group_name' => 'Mailing Preferences',
+    'group' => 'mailing',
+    'name' => 'civimail_default_unsubscribe_mode',
+    'type' => 'String',
+    'html_type' => 'select',
+    'html_attributes' => [
+      'class' => 'crm-select2',
+    ],
+    'default' => 'unsubscribe',
+    'add' => '5.80',
+    'title' => ts('Default Unsubscribe Mode'),
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => ts("These methods will be offered to email clients for semi-automated unsubscribes. Support for each depends on the recipient's email client.") . $unsubLearnMore,
+    'help_text' => NULL,
+    'pseudoconstant' => [
+      'callback' => 'CRM_Mailing_Service_ListUnsubscribe::unsubscribeModes',
+    ],
+    'settings_pages' => ['mailing' => ['weight' => 200]],
+  ],
 ];
