@@ -42,6 +42,11 @@
       this.getFormMeta = function getFormMeta() {
         return $scope.$parent.meta;
       };
+      this.resetForm = function() {
+        this.ngForm.$setPristine();
+        $scope.$parent.$broadcast('afFormReset');
+        this.loadData();
+      };
       // With no arguments this will prefill the entire form based on url args
       // and also check if the form is open for submissions.
       // With selectedEntity, selectedIndex & selectedId provided this will prefill a single entity
