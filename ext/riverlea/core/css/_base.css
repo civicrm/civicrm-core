@@ -112,6 +112,10 @@ body {
     background: transparent;
     white-space: unset;
 }
+.crm-container .ui-helper-clearfix::before,
+.crm-container .ui-helper-clearfix::after {
+    display: none;
+}
 
 /******************
    ACCESSIBILITY

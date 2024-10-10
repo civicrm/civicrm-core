@@ -158,6 +158,7 @@
 --crm-tabs-bg: var(--crm-c-background2);
 --crm-tabs-padding: var(--crm-m) var(--crm-m) 0 var(--crm-m);
 --crm-tabs-border: var(--crm-c-divider);
+--crm-tab-roundness: 2px 2px 0 0;
 --crm-tab-bg-hover: var(--crm-c-background);
 --crm-tab-bg-active: var(--crm-c-background);
 --crm-tab-hang: 0 0 -1px 0; /* lip to extend tab flush with active region - set to 0 for no lip */
@@ -212,11 +213,7 @@
 --crm-dashlet-header-bg: var(--crm-c-secondary);
 --crm-dashlet-header-col: var(--crm-c-light-text);
 --crm-dashlet-header-padding: var(--crm-padding-reg);
---crm-dashlet-tabs-bg: var(--crm-c-background);
 --crm-dashlet-tabs-border: var(--crm-tabs-border);
---crm-dashlet-tab-bg: var(--crm-c-background);
---crm-dashlet-tab-border: var(--crm-tab-border);
---crm-dashlet-tab-active: var(--crm-expand-header-bg);
 
 /* Notifications */
 --crm-notify-background: var(--crm-c-background);

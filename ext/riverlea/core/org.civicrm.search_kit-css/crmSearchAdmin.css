@@ -9,8 +9,8 @@
 }
 .crm-search-nav-tabs > div.btn-group {
     position: absolute;
-    right: 0;
-    top: calc(-1 * var(--crm-m));
+    right: var(--crm-s);
+    top: var(--crm-s);
 }
 .crm-container .crm-search-admin-search-listing-buttons {
 	display: flex;

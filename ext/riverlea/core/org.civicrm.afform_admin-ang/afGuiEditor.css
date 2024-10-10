@@ -67,18 +67,13 @@
 }
 
 /* Panel */
-
 #afGuiEditor .panel-heading {
-	padding: 0 var(--crm-m);
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 #afGuiEditor .panel-heading > .nav-tabs {
-    order: 1;
-    border-bottom: 0 none;
-    margin-block: var(--crm-m) -1px;
-    align-self: stretch;
+    width: auto;
 }
 #afGuiEditor-canvas .panel-heading > .af-gui-canvas-control-buttons,
 #afGuiEditor-canvas .panel-heading > .pull-right,
@@ -99,10 +94,6 @@
     white-space: nowrap;
     overflow: hidden;
 }
-#afGuiEditor .panel-heading ul.nav-tabs li > a {
-    padding: var(--crm-s1) var(--crm-m2);
-    height: 100%;
-}
 #afGuiEditor .panel-heading .form-inline.pull-right button {
     max-height: 32px;
 }
@@ -115,7 +106,6 @@
 }
 
 /* Edit palette (left side) */
-
 #afGuiEditor-palette input,
 #afGuiEditor-palette textarea,
 #afGuiEditor-palette select {

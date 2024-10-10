@@ -340,14 +340,19 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
 	TABS
 *******************/
 
-.afadmin-list .nav-tabs + .form-inline + table,
-.afadmin-list > .form-inline,
+/* .afadmin-list .nav-tabs + .form-inline + table, */
+/* .afadmin-list > .form-inline, */
 .crm-search:has(.crm-search-nav-tabs) .crm-search-display.crm-search-display-table {
     border: var(--crm-tab-border);
     border-top: 0 solid transparent;
     border-radius: 0 0 var(--crm-roundness) var(--crm-roundness);
 	background: var(--crm-tab-bg-active);
 	overflow-x: auto;
+}
+.crm-container .afadmin-list > table {
+	border: 0;
+    border-top: var(--crm-table-outside-border);
+    margin-bottom: 0;
 }
 .crm-search:has(.crm-search-nav-tabs) .crm-search-display.crm-search-display-table table,
 .ui-tabs-panel .crm-search-display.crm-search-display-table {

@@ -207,7 +207,7 @@ table.advmultiselect {
 .crm-container .panel-heading {
 	padding: var(--crm-padding-reg);
 	border-radius: var(--crm-roundness) var(--crm-roundness) 0 0;
-	border-bottom: 1px solid transparent;
+	border-bottom: var(--crm-panel-border);
     box-shadow: var(--crm-panel-shadow);
 }
 .crm-container .panel-heading > .dropdown .dropdown-toggle {

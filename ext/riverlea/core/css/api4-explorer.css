@@ -15,7 +15,7 @@
     margin: 0;
 }
 .api4-explorer-page .panel-heading {
-    height: 48px;
+    /* height: 48px; */
 	display: flex;
 	align-items: center;
     padding: var(--crm-m);
@@ -36,11 +36,8 @@
 .api4-explorer-row .panel-heading .form-inline .pull-right {
 	margin-left: auto;
 }
-.api4-explorer-row .panel-heading li > a {
-    background-color: rgba(256,256,256,0.5);
-}
-.api4-explorer-row .nav-tabs {
-	border-bottom: 0;
+.api4-explorer-row .panel-body {
+    background: var(--crm-tab-bg-active);
 }
 
 /* General form */
@@ -76,10 +73,6 @@
 }
 
 /* Code panel */
-.api4-explorer-row .explorer-code-panel .panel-heading {
-	align-items: end;
-    padding: 0 var(--crm-m);
-}
 .api4-explorer-page .explorer-code-panel pre {
     word-break: break-all;
     white-space: pre-wrap;

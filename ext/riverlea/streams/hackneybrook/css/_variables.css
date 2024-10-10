@@ -125,7 +125,6 @@
     --crm-dashlet-padding: 0;
     --crm-dashlet-content-padding: var(--crm-m);
     --crm-dashlet-tabs-border: 3px solid #fff;
-    --crm-dashlet-tab-color: #212121;
     --crm-dashlet-radius: var(--crm-roundness) var(--crm-roundness) 0 0;
 
     /* Button dropdowns */

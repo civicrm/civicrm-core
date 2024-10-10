@@ -1,3 +1,11 @@
+0.10.11
+ - CHANGED - major tabs refactor and simplify (see - https://lab.civicrm.org/extensions/riverlea/-/issues/54)
+ - REMOVED CSS VARIABLES:
+    --crm-dashlet-tabs-bg
+    --crm-dashlet-tab-bg
+    --crm-dashlet-tab-border
+    --crm-dashlet-tab-active
+
 0.10.10
  - FIXED - date time input simplified
  - CHANGED - Select2 dropdown advanced: border line between list elements, smaller description, simplified padding.
