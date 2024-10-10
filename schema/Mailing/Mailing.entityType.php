@@ -609,5 +609,20 @@ return [
         'key_column' => 'name',
       ],
     ],
+    'unsubscribe_mode' => [
+      'title' => ts('One Click Unsubscribe Mode'),
+      'sql_type' => 'varchar(70)',
+      'input_type' => 'select',
+      'description' => ts('One Click Unsubscribe mode either unsubscribe or opt-out'),
+      'add' => '6.7',
+      'input_attrs' => [
+        'label' => ts('One Click Unsubscribe Mode'),
+      ],
+      'pseudoconstant' => [
+        'callback' => ['CRM_Mailing_Service_ListUnsubscribe', 'unsubscribeModes'],
+      ],
+      'default' => 'unsubscribe',
+      'required' => TRUE,
+    ],
   ],
 ];
