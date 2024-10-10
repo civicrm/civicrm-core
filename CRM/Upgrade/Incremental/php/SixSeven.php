@@ -29,6 +29,27 @@ class CRM_Upgrade_Incremental_php_SixSeven extends CRM_Upgrade_Incremental_Base 
    */
   public function upgrade_6_7_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Add unsubscribe mode column to civicrm mailing', 'alterSchemaField', 'Mailing', 'unsubscribe_mode', [
+      'title' => ts('One Click Unsubscribe Mode'),
+      'sql_type' => 'varchar(70)',
+      'input_type' => 'select',
+      'description' => ts('One Click Unsubscribe mode either unsubscribe or opt-out'),
+      'add' => '6.7',
+      'input_attrs' => [
+        'label' => ts('One Click Unsubscribe Mode'),
+      ],
+      'pseudoconstant' => [
+        'callback' => ['CRM_Mailing_Service_ListUnsubscribe', 'unsubscribeModes'],
+      ],
+      'default' => 'unsubscribe',
+      'required' => TRUE,
+    ]);
+    $this->addTask('Populate Unsubscribe mode column on civicrm_mailing', 'populateUnsubscribeMode');
+  }
+
+  public static function populateUnsubscribeMode(): bool {
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_mailing SET unsubscribe_mode = 'unsubscribe' WHERE unsubscribe_mode IS NULL");
+    return TRUE;
   }
 
 }
