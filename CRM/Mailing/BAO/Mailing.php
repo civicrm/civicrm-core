@@ -1079,6 +1079,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         'created_date' => date('YmdHis'),
         'scheduled_date' => NULL,
         'approval_date' => NULL,
+        'unsubscribe_mode' => Civi::settings()->get('civimail_default_unsubscribe_mode'),
       ];
 
       // Get the default from email address, if not provided.
@@ -1931,6 +1932,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
       $params['resubscribe_id'] ??= CRM_Mailing_PseudoConstant::defaultComponent('Resubscribe', '');
       $params['unsubscribe_id'] ??= CRM_Mailing_PseudoConstant::defaultComponent('Unsubscribe', '');
       $params['mailing_type'] ??= 'standalone';
+      $params['unsubscribe_mode'] ??= Civi::settings()->get('civimail_default_unsubscribe_mode');
     }
     if ($event->action === 'delete' && $event->id) {
       // Delete all file attachments
