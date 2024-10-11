@@ -13,12 +13,13 @@ html.cms-standalone body {
   background-color: var(--crm-c-page-background);
 }
 
-.crm-container details {
-  background-color: #bad0df45;
+.crm-container details { 
+  background-color: #bad0df45; /* @todo fix this to a var. */
   border: var(--crm-c-divider);
 }
 
 .crm-container summary {
+  background-color: var(--crm-c-green-dark); /* novar */
   color: var(--crm-c-blue-darker); /* novar */
   cursor: pointer; /* show it's clickable */
   position: relative; /* so our animated triangle doesn't go walkies */
