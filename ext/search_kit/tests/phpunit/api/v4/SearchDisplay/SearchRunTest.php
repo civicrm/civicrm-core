@@ -2305,6 +2305,116 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertCount(1, $result[1]['columns'][1]['links']);
   }
 
+  public function testLinksWithGroupBy() {
+    $contacts = $this->saveTestRecords('Individual', [
+      'records' => [
+        ['first_name' => 'A', 'last_name' => 'A'],
+        ['first_name' => 'B', 'last_name' => 'B'],
+      ],
+    ]);
+    $contributions = $this->saveTestRecords('Contribution', [
+      'records' => [
+        ['contact_id' => $contacts[0]['id']],
+        ['contact_id' => $contacts[1]['id']],
+      ],
+    ]);
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Contribution',
+        'api_params' => [
+          'version' => 4,
+          'select' => [
+            'id',
+            'contact_id',
+            'contact_id.sort_name',
+            'total_amount',
+            'financial_type_id:label',
+          ],
+          'orderBy' => [],
+          'where' => [
+            ['id', 'IN', $contributions->column('id')],
+          ],
+          'groupBy' => [
+            'id',
+          ],
+          'join' => [
+            [
+              'Contact AS Contribution_Contact_contact_id_01',
+              'LEFT',
+              [
+                'contact_id',
+                '=',
+                'Contribution_Contact_contact_id_01.id',
+              ],
+            ],
+          ],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => 'testDisplay',
+        'settings' => [
+          'description' => NULL,
+          'sort' => [],
+          'limit' => 50,
+          'pager' => [],
+          'placeholder' => 5,
+          'columns' => [
+            [
+              'type' => 'field',
+              'key' => 'id',
+              'dataType' => 'Integer',
+              'label' => 'Contribution ID',
+              'sortable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'contact_id.sort_name',
+              'dataType' => 'String',
+              'label' => 'Contact Sort Name',
+              'sortable' => TRUE,
+              'link' => [
+                'path' => '',
+                'entity' => 'Contact',
+                'action' => 'view',
+                'join' => 'contact_id',
+                'target' => '',
+              ],
+              'title' => 'View Contact',
+            ],
+            [
+              'type' => 'field',
+              'key' => 'total_amount',
+              'dataType' => 'Money',
+              'label' => 'Total Amount',
+              'sortable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'financial_type_id:label',
+              'dataType' => 'Integer',
+              'label' => 'Financial Type',
+              'sortable' => TRUE,
+            ],
+          ],
+          'actions' => TRUE,
+          'classes' => [
+            'table',
+            'table-striped',
+          ],
+        ],
+      ],
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(2, $result);
+
+    $this->assertCount(1, $result[0]['columns'][1]['links']);
+    $this->assertCount(1, $result[1]['columns'][1]['links']);
+  }
+
   public function testContactTypeIcons(): void {
     $this->createTestRecord('ContactType', [
       'label' => 'Star',
