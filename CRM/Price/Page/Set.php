@@ -148,8 +148,8 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
         $usedBy = CRM_Price_BAO_PriceSet::getUsedBy($sid);
 
         if (empty($usedBy)) {
-          $k = $_POST['qfKey'] ?? $_GET['qfKey'] ?? $_REQUEST['qfKey'] ?? NULL;
-          CRM_Core_Key::validate($key, CRM_Utils_System::getClassName($this));
+          $key = $_POST['qfKey'] ?? $_GET['qfKey'] ?? $_REQUEST['qfKey'] ?? NULL;
+          $k = CRM_Core_Key::validate($key, CRM_Utils_System::getClassName($this));
           if (!$k) {
             $this->invalidKey();
           }
