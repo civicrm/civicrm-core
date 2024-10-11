@@ -379,24 +379,6 @@ div:has(> table) {
   border-radius: var(--crm-r-3);
   /* overrides #civicrm-news-feed.ui-tabs and .crm-contact-page #secondaryTabContainer */
 }
-
-
-/* proof of concept styling: positions menu with its top-right corner over the clicked element */
-.crm-container .panel[popover] {
-	background: white;
-	inset: unset;
-	position: absolute;
-	transform: translateX(-100%) translateY(50%);
-  border-radius: 0.4rem;
-}
-/* proof of concept styling: subtle text-only button. */
-.btn-popover-menu {
-  --crm-btn-height: 1.2rem;
-  --crm-c-primary: transparent;
-  --crm-c-primary-text: var(--crm-c-text);
-  --crm-btn-padding-inline: var(--crm-s);
-}
-
 /* breadcrumbs - links not accessibile using the nromal blue. */
 #civicrm-footer a,
 nav.breadcrumb a {
