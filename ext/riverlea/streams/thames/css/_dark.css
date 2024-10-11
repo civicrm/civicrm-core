@@ -75,6 +75,7 @@
   --crm-dash-tab-count-bg: var(--crm-c-blue-darker);
   --crm-c-page-background: var(--crm-c-dkblue-01);
   --crm-c-code-background: var(--crm-c-dkblue-04);
+  --crm-dashlet-bg: var(--crm-c-dkblue-02);
 
   --crm-c-link: #2c98ed;
   --crm-c-link-hover: color-mix(in srgb, white, var(--crm-c-blue-dark) 70%);
