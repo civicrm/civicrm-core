@@ -41,5 +41,10 @@ return [
       'light' => E::ts('Always use light mode'),
       'dark' => E::ts('Always use dark mode'),
     ],
+    'settings_pages' => [
+      'riverlea' => ['weight' => 110],
+      // show alongside frontend theme selector on Display settings page
+      'display' => ['weight' => 950],
+    ],
   ],
 ];
