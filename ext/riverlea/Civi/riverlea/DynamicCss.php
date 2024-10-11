@@ -27,7 +27,13 @@ class DynamicCss implements \Symfony\Component\EventDispatcher\EventSubscriberIn
     ];
   }
 
+  /**
+   * Adds the Dynamic stream.css to the core bundle if a riverlea stream is active
+   */
   public static function alterCoreBundle(\CRM_Core_Resources_Bundle $bundle) {
+    if (!_riverlea_is_active()) {
+      return;
+    }
     if ($bundle->name !== 'coreResources') {
       return;
     }
