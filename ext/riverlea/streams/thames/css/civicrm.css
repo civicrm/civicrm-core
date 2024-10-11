@@ -87,7 +87,7 @@ html.cms-standalone body {
 
 /* ALERTS (these are in-page-flow boxes with info, not the (normally) popup notifications) */
 
-/* put stripe down left with icon in it. */
+/* help boxes: put stripe down left with icon in it. */
 .crm-container #help, .crm-container .help {
 	border: none;
 	border-left: 2rem solid #7cb5e1;
@@ -107,6 +107,9 @@ html.cms-standalone body {
 
 .crm-container .alert-success {
   background-color: var(--crm-c-green);
+}
+.crm-container :is(.status, .alert-warning, .messages.warning) {
+  --crm-roundness: 0.25rem;
 }
 
 /* BUTTONS */
@@ -243,7 +246,7 @@ div.crm-summary-contactname-block+.crm-actions-ribbon {
 }
 
 #contact-summary .crm-edit-help .crm-i.fa-pencil {
-  color: var(--crm-c-blue) !important; /* important overrides contactSummary.css */
+  color: var(--crm-c-blue-dark) !important; /* important overrides contactSummary.css */
 }
 
 #contact-summary .crm-inline-edit:hover .crm-edit-help {
@@ -396,3 +399,88 @@ nav.breadcrumb a {
 #crm-contactname-content:hover > .crm-inline-block-content {
   border-color: var(--crm-c-blue-dark) !important;
 }
+
+/* Overrides for crmSearchAdmin.css */
+.crm-search-nav-tabs > div.btn-group {
+  top: 0 !important; /* the buttons already have padding, we don't need this. (crmSearchAdmin.css, L10 at time of writing) */
+}
+
+
+/* Make the tags list nicer. */
+.crm-tag-item {
+	padding: 0 1ch;
+	border-radius: 1rem;
+}
+
+/* clickable items in select2 drop downs should be blue like links. */
+.select2-drop.select2-drop-active.crm-container .select2-results > li {
+  color: var(--crm-c-blue-dark);
+}
+
+/* Breadcrumbs */
+html.crm-standalone  nav.breadcrumb>ol {
+  display: flex;
+  gap: var(--crm-m);
+}
+.breadcrumb ol li:not(:first-child)::before {
+	content: " \BB ";
+	margin-inline-end: var(--crm-m);
+	color: var(--crm-c-blue-dark);
+}
+
+/* PHP errors, warnings */
+.standalone-errors {
+  background: #ead2ce;
+}
+
+/* e.g. search buttons followed by count of matches on SK screen */
+.crm-search-display .form-inline {
+    padding: var(--crm-padding-reg) 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--crm-m);
+}
+
+/* Spinner. Replace the fa icon with something nicer. */
+.fa-spinner::before {
+	content: "";
+	width: 1rem;
+	height: 1rem;
+  min-width: 1rem;
+  min-height: 1rem;
+	border: dashed 1px white;
+	border-radius: 1rem;
+  animation: thames-spinner 1s infinite;
+}
+.fa-spin {
+  animation: none; /* placing animation on an odd-shaped item is a PITA for getting it 100% centred. */
+}
+/* Spinner for notifications .status-start notifications e.g. loading/saving. */
+.crm-status-box-outer.status-start .crm-status-box-inner {
+  /* Allow space for spinner.*/
+  padding-left: 2.5ch;
+}
+
+/* The spinner. */
+.crm-status-box-outer.status-start .crm-status-box-inner::before {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: -2.5ch;
+  display: block;
+  content: '';
+  line-height: 1;
+  animation: thames-spinner 1s infinite;
+  transform-origin: center;
+  width: 1.5ch;
+  height: 1.5ch;
+  border: dashed 1px white;
+  border-radius: 2ch;
+}
+
+@keyframes thames-spinner {
+  0% { transform: none; }
+  100% { transform: rotateZ(360deg); }
+}
+

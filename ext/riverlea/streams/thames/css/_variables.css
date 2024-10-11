@@ -59,7 +59,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-c-red-dark: #740f0f; /* thames */
 --crm-c-red-bright: #f14141; /* thames only */
 --crm-c-amber: #eeb153;
---crm-c-amber-light: #ecd9ac;
+--crm-c-amber-light: ##ffebc5;
 --crm-c-yellow: #fcfc5a; /* thames todo change this horrible yellow! */
 --crm-c-yellow-light: #f2deb9;
 --crm-c-yellow-less-light: #fffdb2;
@@ -79,8 +79,8 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-c-background3: var(--crm-c-gray-100);
 --crm-c-background4: var(--crm-c-gray-200);
 --crm-c-background5: var(--crm-c-gray-700);
---crm-c-drag-background: var(--crm-c-background3); /* background for drag/drop regions, select2 highlight */
---crm-c-code-background: var(--crm-c-background2); /* background for code regions */
+--crm-c-drag-background: var(--crm-c-blue-overlay2); /* background for drag/drop regions, select2 highlight */
+--crm-c-code-background: var(--crm-c-blue-overlay2); /* background for code regions */
 --crm-c-primary: var(--crm-c-blue-dark); /* primary button bgs */ /* thames */
 --crm-c-primary-hover: var(--crm-c-blue-darker); /* thames */
 --crm-c-primary-text: var(--crm-c-light-text);
@@ -93,7 +93,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-c-success-text: var(--crm-c-light-text);
 --crm-c-alert: var(--crm-c-red-dark);
 --crm-c-alert-text: var(--crm-c-red-dark);
---crm-c-warning: var(--crm-c-amber);
+--crm-c-warning: var(--crm-c-amber-light);
 --crm-c-warning-text: var(--crm-c-light-text);
 --crm-c-info: var(--crm-c-blue-dark);
 --crm-c-info-text: var(--crm-c-light-text);
