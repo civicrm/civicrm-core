@@ -107,8 +107,8 @@ class Login extends AbstractAction {
       return;
     }
     $security = Security::singleton();
-    $user = $security->loadUserByName($this->username);
-    if (!$security->checkPassword($this->password, $user['hashed_password'] ?? '')) {
+    $userID = $security->checkPassword($this->username, $this->password);
+    if (!$userID) {
       $result['publicError'] = "Invalid credentials";
       return;
     }
@@ -126,7 +126,7 @@ class Login extends AbstractAction {
 
       case 0:
         // MFA not enabled.
-        $this->loginUser($user['id']);
+        $this->loginUser($userID);
         $result['url'] = $successUrl;
         return;
 
@@ -134,13 +134,13 @@ class Login extends AbstractAction {
         // MFA enabled. Store data in a pendingLogin key on session.
         // @todo expose the 120s timeout to config?
         \CRM_Core_Session::singleton()->set('pendingLogin', [
-          'userID' => $user['id'],
+          'userID' => $userID,
           'username' => $this->username,
           'expiry' => time() + 120,
           'successUrl' => $successUrl,
         ]);
         $mfaClass = $mfaClasses[0];
-        $mfa = new $mfaClass($user['id']);
+        $mfa = new $mfaClass($userID);
         // Return the URL for the MFA form.
         $result['url'] = $mfa->getFormUrl();
         break;
