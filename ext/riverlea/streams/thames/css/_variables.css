@@ -18,7 +18,7 @@
 
 /* FONTS */
 /* --crm-system-fonts:; */
---crm-font:Lato;
+--crm-font:Lato, sans-serif;
 /* --crm-font-bold:Lato; */
 --crm-bold-weight: bold;
 /* --crm-font-italic:; */
