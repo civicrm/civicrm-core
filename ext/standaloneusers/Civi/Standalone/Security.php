@@ -110,6 +110,9 @@ class Security {
 
   /**
    * Standaloneusers implementation of AuthxInterface::checkPassword
+   *
+   * @return int|NULL
+   *   The User id, if check was successful, otherwise NULL
    * @see \Civi\Authx\Standalone
    */
   public function checkPassword(string $username, string $plaintextPassword): ?int {
