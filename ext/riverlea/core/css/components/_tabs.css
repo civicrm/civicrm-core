@@ -138,9 +138,6 @@
 .crm-contact-page #mainTabContainer .ui-tabs-nav li .ui-tabs-anchor i {
     font-size: var(--crm-dash-icon-size);
 }
-.crm-contact-page #secondaryTabContainer {
-    border: var(--crm-tabs-2-border);
-}
 #mainTabContainer .crm-contact-tabs-list ~ .ui-tabs-panel {
     flex-grow: 1;
     padding: var(--crm-dash-panel-padding);
