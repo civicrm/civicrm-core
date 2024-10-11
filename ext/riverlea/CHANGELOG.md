@@ -1,5 +1,5 @@
 0.10.13
- - CHANGED radio/checkbox handling for WordPress to inherit more of the WP styling.
+ - CHANGED radio/checkbox handling for WordPress to inherit more of the WordPress styling.
  - REMOVED unused CSS variable
  - ADDED joomla.css into /core/css - and removed Joomla specific css from _cms.css (shrinking the two together)
 
