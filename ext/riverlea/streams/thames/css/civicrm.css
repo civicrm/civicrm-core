@@ -369,6 +369,15 @@ div:has(> table) {
     margin-left: -1em;
   }
 }
+/* ...and in searchkit, this is terribly awkward and could be fixed with a core PR to provide more classes */
+.crm-container .table > thead > tr > th:has(.crm-search-table-column-sort-icon) {
+	padding-left: 1.5ch;
+}
+.crm-search-display-table > table.table > thead > tr > th i.crm-search-table-column-sort-icon {
+  position: absolute;
+  margin-left: -1.5ch;
+}
+
 
 
 /* Advanced search: override searchForm.css for slightly better aligned fields */
