@@ -1,3 +1,8 @@
+0.10.13
+ - CHANGED radio/checkbox handling for WordPress to inherit more of the WP styling.
+ - REMOVED unused CSS variable
+ - ADDED joomla.css into /core/css - and removed Joomla specific css from _cms.css (shrinking the two together)
+
 0.10.12
  - CHANGED - empty.css file to reflect recent changes, removed empty variables from darkmode
  - FIXED - --crm-table-sort-active-col is set but wasn't being called, ref #57 2

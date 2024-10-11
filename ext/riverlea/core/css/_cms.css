@@ -129,38 +129,6 @@ body.page-civicrm main > .container:has(#block-bootstrap4-content) {
 }
 
 /******************
-   JOOMLA
-*******************/
-
-/* Joomla 3 - body.com_civicrm */
-
-body.com_civicrm {
-    font-size: 100%;
-}
-body.admin.com_civicrm {
-    --crm-page-padding: 3rem;
-    --crm-page-width: 100%;
-}
-
-/* J4 resets */
-
-body.admin.com_civicrm.layout-default {
-    --crm-page-padding: 0;
-}
-body.admin.com_civicrm.layout-default .breadcrumb {
-    background: transparent;
-}
-body.admin.com_civicrm.layout-default .crm-container:has(.crm-summary-contactname-block) .breadcrumb {
-    display: none; /* Hides breadcrumb on contact dashboard */
-}
-body.admin.com_civicrm.layout-default .crm-container .dropdown-toggle::after {
-    display: none;
-}
-body.admin.com_civicrm.layout-default .crm-container details summary ~ * {
-    margin-top: 0;
-}
-
-/******************
    WORDPRESS
 *******************/
 
@@ -206,6 +174,16 @@ body.wp-admin.wp-core-ui .crm-container select {
 }
 body.wp-admin.wp-core-ui.toplevel_page_CiviCRM select:hover {
     color: var(--crm-input-color);
+}
+body.wp-admin .crm-container input[type="checkbox"],
+body.wp-admin .crm-container input[type="radio"] {
+    appearance: none;
+    border-radius: 4px;
+    background: #fff;
+    height: 1rem;
+}
+body.wp-admin .crm-container input[type="radio"] {
+    border-radius: 50%;
 }
 
 /******************

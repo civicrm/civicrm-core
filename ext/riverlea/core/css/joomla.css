@@ -1,0 +1,69 @@
+/*  Joomla-specific css directives for CiviCRM.
+    These are namespaced to Joomla so could be loaded on other CMSs. */
+
+/* Joomla 3 - body.com_civicrm */
+
+body.com_civicrm {
+    font-size: 100%;
+}
+body.admin.com_civicrm {
+    --crm-page-padding: 3rem;
+    --crm-page-width: 100%;
+}
+body.admin.com_civicrm #subhead-container,
+body.admin.com_civicrm .subhead-collapse,
+body.admin.com_civicrm.layout-default a[target="_blank"]::before {
+    display: none;
+}
+body.admin.com_civicrm .crm-container details { /* Atum J4 reset */
+    background: inherit;
+    border: none;
+    border-radius: inherit;
+    margin: 0;
+    padding: 0;
+}
+body.admin.com_civicrm .crm-container details + details {
+    margin: 0.25rem 0 0;
+}
+body.admin.com_civicrm .crm-container details summary ~ * { /* Atum J4 reset */
+    margin-top: 0;
+}
+body.admin.com_civicrm .crm-container.ui-dialog {
+    z-index: 100000;
+}
+body.admin.com_civicrm .ui-widget-overlay {
+    z-index: 100001;
+}
+body.admin.com_civicrm .select2-drop {
+    z-index: 100002;
+}
+body.admin.com_civicrm .modal-dialog {
+    max-width: inherit;
+    margin: 0;
+    padding: 0;
+    overflow: scroll;
+    pointer-events: all;
+}
+
+/* Joomla 4 - body.com_civicrm.layout-default */
+
+body.admin.com_civicrm.layout-default {
+    --crm-page-padding: 1rem;
+}
+body.admin.com_civicrm.layout-default .breadcrumb {
+    background: transparent;
+}
+body.admin.com_civicrm.task-civicrmcontactview .breadcrumb, /* Hides breadcrumb on contact dashboard */
+body.admin.com_civicrm.layout-default .crm-container .dropdown-toggle::after {
+    display: none;
+}
+body.admin.com_civicrm.layout-default .container-main {
+    padding-bottom: 0; /* removes bottom space */
+}
+body.admin.com_civicrm.layout-default #content,
+body.admin.com_civicrm.layout-default #content > .row > .col-md-12 {
+    padding: 0;
+}
+body.admin.com_civicrm.layout-default #content > .row {
+    margin-inline: 0;
+}

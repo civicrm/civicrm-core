@@ -144,7 +144,6 @@ select.crm-form-select,
     color: var(--crm-input-color);
     border: 1px solid var(--crm-input-border-color);
     padding: var(--crm-input-padding);
-    background-image: var(--crm-background-image);
     height: var(--crm-input-height);
     width: var(--crm-big-input);
     font-family: inherit; /* for extra JQuery UI protection */

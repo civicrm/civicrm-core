@@ -42,19 +42,4 @@ return [
       'dark' => E::ts('Always use dark mode'),
     ],
   ],
-  'settings_info' => [
-    'name' => 'settings_info',
-    'type' => 'String',
-    'default' => FALSE,
-    //'html_type' => 'radio',
-    'add' => '4.7',
-    'title' => ts('RiverLea is being tests'),
-    'is_domain' => 1,
-    'is_contact' => 0,
-    'description' => ts('Use at your own risk.'),
-    'settings_pages' => ['remote' => ['weight' => 10]],
-    ],
-    'settings_pages' => [
-      'riverlea' => ['weight' => 110],
-    ],
 ];
