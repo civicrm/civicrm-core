@@ -16,7 +16,7 @@
 .crm-container tr.columnheader td {
     background-color:  var(--crm-table-header-bg);
     border-bottom: var(--crm-table-header-bottom);
-    color: var(--crm-c-text);
+    color: var(--crm-table-header-col);
     font-family: var(--crm-font-bold);
     font-weight: var(--crm-bold-weight);
     padding: var(--crm-table-padding);

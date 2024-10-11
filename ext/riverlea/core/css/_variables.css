@@ -170,6 +170,7 @@
 --crm-table-header-border: 1px solid transparent;
 --crm-table-header-bottom: 2px solid var(--crm-c-gray-300);
 --crm-table-header-bg: var(--crm-c-page-background);
+--crm-table-header-col: var(--crm-c-text);
 --crm-table-header-txt: inherit;
 --crm-table-even-row: var(--crm-c-background2);
 --crm-table-even-hover: var(--crm-c-yellow-less-light);

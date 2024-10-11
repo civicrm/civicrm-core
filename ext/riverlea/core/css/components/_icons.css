@@ -183,13 +183,13 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 .crm-container th.crm-sortable-col i.crm-search-table-column-sort-icon.fa-sort-asc::before,
 .crm-container table.dataTable thead th.sorting_asc::before {
     content: var(--crm-icon-sort-asc);
-    color: var(--crm-c-link);
+    color: var(--crm-table-sort-active-col);
 }
 .crm-container a.sorting_desc::after,
 .crm-container th.crm-sortable-col i.crm-search-table-column-sort-icon.fa-sort-desc::before,
 .crm-container table.dataTable thead th.sorting_desc::before {
     content: var(--crm-icon-sort-desc);
-    color: var(--crm-c-link);
+    color: var(--crm-table-sort-active-col);
 }
 
 /* Trash icons */

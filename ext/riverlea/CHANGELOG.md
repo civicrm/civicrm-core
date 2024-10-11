@@ -1,3 +1,11 @@
+0.10.12
+ - CHANGED - empty.css file to reflect recent changes, removed empty variables from darkmode
+ - FIXED - --crm-table-sort-active-col is set but wasn't being called, ref #57 2
+ - REMOVED 1 CSS VARIABLE:
+    --crm-tabs-2-border
+ - ADDED 1 CSS VARIABLE:
+    --crm-table-header-col (to set a custom colour for a table header, ref #57 1)
+
 0.10.11
  - CHANGED - major tabs refactor and simplify (see - https://lab.civicrm.org/extensions/riverlea/-/issues/54)
  - REMOVED - quite a bit of now redundant tab-related css.
