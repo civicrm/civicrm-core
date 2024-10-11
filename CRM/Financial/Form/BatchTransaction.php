@@ -73,6 +73,7 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form_Search {
       $this->assign('columnHeaders', $columnHeaders);
     }
     $this->assign('batchStatus', $this->_batchStatus);
+    $this->assign('financialAJAXQFKey', CRM_Core_key::get('CRM_Financial_Page_AJAX'));
   }
 
   /**
