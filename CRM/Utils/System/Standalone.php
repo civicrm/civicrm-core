@@ -228,13 +228,16 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
     $frontend = FALSE,
     $forceBackend = FALSE
   ) {
-    $fragment = $fragment ? ('#' . $fragment) : '';
-    if ($absolute) {
-      return Civi::paths()->getUrl("[cms.root]/{$path}?{$query}$fragment", 'absolute');
+    // TODO: Add type hints
+    $query = (string) $query;
+    if (strlen($query)) {
+      $query = "?$query";
     }
-    else {
-      return Civi::paths()->getUrl("[cms.root]/{$path}?{$query}$fragment");
+    $fragment = (string) $fragment;
+    if (strlen($fragment)) {
+      $fragment = "#$fragment";
     }
+    return Civi::paths()->getUrl("[cms.root]/$path$query$fragment", $absolute ? 'absolute' : 'relative');
   }
 
   /**
