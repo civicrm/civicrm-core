@@ -109,6 +109,7 @@
     --crm-dash-panel-padding: var(--crm-r);
     --crm-dash-panel-bg: var(--crm-c-background);
     --crm-dash-panel-border: var(--crm-c-divider);
+    --crn-dash-panel-radius: var(--crm-dash-roundness);
 
     /* Dialog */
     --crm-dialog-padding: 0;

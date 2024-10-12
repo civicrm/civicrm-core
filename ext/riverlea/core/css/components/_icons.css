@@ -127,7 +127,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 .crm-container table.dataTable thead th.sorting_asc,
 .crm-container table.dataTable thead th.sorting_desc  {
     background-image: none;
-    color: var(--crm-c-text);
+    color: var(--crm-table-header-col);
     box-shadow: none;
     line-height: 1;
 }
@@ -155,6 +155,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
     font-style: normal;
     font-weight: normal;
     cursor: var(--crm-hover-clickable);
+    opacity: 1;
 }
 .crm-container a.sorting::after,
 .crm-container a.sorting_asc::after,
@@ -181,12 +182,14 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 }
 .crm-container a.sorting_asc::after,
 .crm-container th.crm-sortable-col i.crm-search-table-column-sort-icon.fa-sort-asc::before,
+.crm-search-display-table > table.table > thead > tr > th i.crm-search-table-column-sort-icon.fa-sort-asc::before,
 .crm-container table.dataTable thead th.sorting_asc::before {
     content: var(--crm-icon-sort-asc);
     color: var(--crm-table-sort-active-col);
 }
 .crm-container a.sorting_desc::after,
 .crm-container th.crm-sortable-col i.crm-search-table-column-sort-icon.fa-sort-desc::before,
+.crm-search-display-table > table.table > thead > tr > th i.crm-search-table-column-sort-icon.fa-sort-desc::before,
 .crm-container table.dataTable thead th.sorting_desc::before {
     content: var(--crm-icon-sort-desc);
     color: var(--crm-table-sort-active-col);
@@ -220,7 +223,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
     background: transparent !important;
 }
 .crm-container .jstree-default .jstree-icon {
-    background-image: none;
+    background-image: inherit;
     font-size: var(--crm-r1);
     margin-right: var(--btn-icon-spacing)
 }

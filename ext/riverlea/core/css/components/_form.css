@@ -60,7 +60,7 @@
 .crm-container .crm-accordion-body label,
 .crm-container .crm-form-block label,
 .crm-container #task-section label {
-    color: var(--crm-c-text);
+    color: var(--crm-input-label-color);
     font-family: var(--crm-input-label-font);
     font-weight: var(--crm-input-label-weight);
     font-size: var(--crm-input-label-size) !important; /* vs civiMail/ang/crmMailing.css */

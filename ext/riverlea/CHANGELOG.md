@@ -1,3 +1,11 @@
+0.10.14
+ - FIXED table header/sort colour issues #57
+ - FIXED drop shadown css variable in alpha filter not used
+ - ADDED label colour
+ - ADDED label bold/weight variables to contact dashboard label
+ - ADDED CSS VARIABLE:
+    --crm-input-label-color
+
 0.10.13
  - CHANGED radio/checkbox handling for WordPress to inherit more of the WordPress styling.
  - REMOVED unused CSS variable

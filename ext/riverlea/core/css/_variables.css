@@ -265,6 +265,7 @@
 --crm-input-label-size: var(--crm-font-size);
 --crm-input-label-width: var(--crm-big-input);
 --crm-input-label-align: right;
+--crm-input-label-color: var(--crm-c-text);
 --crm-input-description: var(--crm-c-gray-700);
 --crm-input-dropdown-icon: "\f107";
 --crm-input-radio-color: var(--crm-c-focus);

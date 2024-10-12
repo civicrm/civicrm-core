@@ -68,7 +68,12 @@ Contains CSS files in:
 - ~~Darkmode~~.
 - ~~Migrate Finsbury Park~~ (and others) to a stream.
 - ~~Tidy/simplify Bootstrap~~
-- Document streams.
+- Merge Thames
+- Merge Wellow
+- Minimal customiser
+- Test creating separate extension with RiverLea as parent theme.
+- Create minimal 'inherit everything' front-end theme.
+- Better documentation.
 
 ## Creating new 'streams'
 

@@ -62,7 +62,7 @@
     right: 0;
     top: 0;
     opacity: .6;
-    padding: var(--crm-m);
+    padding: var(--crm-padding-small);
 }
 .crm-container .crm-address-block+.crm-address-block .add-new .crm-edit-help {
     display: block;
@@ -82,6 +82,10 @@
 }
 .crm-container div.crm-inline-edit.form .crm-edit-help {
     display: none !important;
+}
+#crm-contactname-content > .crm-inline-block-content:hover .crm-edit-help,
+#crm-contactname-content > .crm-inline-block-content:focus .crm-edit-help {
+    color: var(--crm-dash-header-col);
 }
 .crm-container .crm-address-block+.crm-address-block .add-new .crm-summary-row {
     display: none;
@@ -153,16 +157,6 @@ div.crm-inline-edit-form div.crm-clear {
 #crm-contactname-content > .crm-inline-block-content:focus {
     border-color: var(--crm-c-gray-200);
 }
-#crm-contactname-content .crm-edit-help {
-    order: 2;
-	margin-left: auto;
-	color: transparent;
-	padding: var(--crm-padding-reg);
-}
-#crm-contactname-content > .crm-inline-block-content:hover .crm-edit-help,
-#crm-contactname-content > .crm-inline-block-content:focus .crm-edit-help {
-    color: var(--crm-dash-header-col);
-}
 #crm-contactname-content .crm-summary-display_name {
     padding: var(--crm-dash-header-padding);
     font-size: var(--crm-dash-header-size);
@@ -220,9 +214,9 @@ div.crm-inline-edit-form div.crm-clear {
 }
 .crm-container div.crm-summary-row div.crm-label {
     background-color: var(--crm-dash-label-bg);
-    color: var(--crm-c-text);
-    font-weight: var(--crm-bold-weight);
-    font-family:  var(--crm-font-bold);
+    color: var(--crm-input-label-color);
+    font-weight: var(--crm-input-label-weight);
+    font-family:  var(--crm-input-label-font);
     font-size: var(--crm-font-size);
     padding: var(--crm-m);
     width: var(--crm-input-label-width);
@@ -309,14 +303,14 @@ div.crm-inline-edit-form div.crm-clear {
 #tagGroup table {
     color: #000;
 }
-#contact-summary #tags {
+.crm-contact-page #tags {
     display: flex;
     gap: var(--crm-s);
     align-items: center;
 }
-#contact-summary .crm-tag-item {
+.crm-contact-page .crm-tag-item {
     border-radius: var(--crm-roundness);
-    padding: 0 var(--crm-s);
+    padding: 0 var(--crm-m);
     background-color: var(--crm-c-background2);
 }
 #crm-main-content-wrapper:has(.crm-contact-page) {

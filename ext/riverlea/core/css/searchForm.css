@@ -25,7 +25,7 @@
   font-weight: normal;
   background: var(--crm-filter-item-bg);
   padding: var(--crm-s) var(--crm-m);
-  box-shadow: 0px 0px 3px rgba(0,0,0,0.1);
+  box-shadow: var(--crm-filter-item-shadow);
 }
 
 /* Advanced Search - basic criteria */
