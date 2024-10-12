@@ -215,6 +215,7 @@ dl dd, dl dl {
 .crm-container .status-fatal,
 .crm-container .status-hold,
 .crm-container .status-past,
+.crm-container .crmMailing-error-link
 .crm-contact-deceased,
 .crm-container .status-warning,
 .crm-container .crm-error,

@@ -1,3 +1,9 @@
+0.10.16
+ - ADDED CiviMail custom CSS override (civi_mail-ang/crmMailing.css)
+ - CHANGED CiviMail custom CSS to integrate with override file, replace fixed values with variables
+ - ADDED crmStatusPage custom CSS override ang/crmStatusPage.css
+ - CHANGED Status page customisations and integration (e.g. colours, dropdwon settings), plus inline flexbox
+
 0.10.15
  - REMOVED Wallbrook SemiBoldItalic font (unused)
  - REMOVED Wallbrook font.css - moved font family definitions into civicrm.css

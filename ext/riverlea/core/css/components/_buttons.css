@@ -5,7 +5,6 @@
 .crm-container [type="reset"],
 .crm-container [type="submit"] {
     white-space: nowrap;
-    /* vertical-align: middle; */
     touch-action: manipulation;
     cursor: var(--crm-hover-clickable);
     background-image: none;
@@ -61,10 +60,6 @@
 .crm-container button.disabled * {
     color: var(--crm-c-primary-text);
 }
-/* .crm-button .crm-i::before,
-.crm-container .btn .crm-i::before {
-    margin-right: var(--crm-btn-icon-spacing);
-} */
 .crm-container .crm-button-type-cancel,
 .crm-form-submit .cancel.crm-button,
 .crm-container button.ui-button:has(.fa-times) {

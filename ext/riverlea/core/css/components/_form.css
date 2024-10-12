@@ -63,7 +63,7 @@
     color: var(--crm-input-label-color);
     font-family: var(--crm-input-label-font);
     font-weight: var(--crm-input-label-weight);
-    font-size: var(--crm-input-label-size) !important; /* vs civiMail/ang/crmMailing.css */
+    font-size: var(--crm-input-label-size);
     display: inline-block;
     margin-bottom: var(--crm-s);
 }
@@ -315,6 +315,12 @@ input.crm-form-checkbox) + label {
 .crm-container .ui-slider .ui-slider-handle {
     border: 0;
     background: var(--crm-c-background5);
+}
+
+/* Input types */
+
+.crm-container input[type="file"] {
+    height: auto;
 }
 
 /* Select2 */

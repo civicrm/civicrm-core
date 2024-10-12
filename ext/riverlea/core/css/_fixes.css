@@ -443,7 +443,7 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
     top: 0;;
 }
 .crm-container .tag-tree-wrapper div.tag-info .tdl {
-    font-weight: bold;
+    font-weight: var(--crm-bold-weight);
     font-family: var(--crm-font-bold);
     color: var(--crm-c-text);
 }
@@ -536,27 +536,6 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
 	padding: 0 0 var(--crm-l) 0;
 }
 
-/* New mailing */
-.crm-container .crmMailing-preview {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-}
-.crm-container .crmMailing-preview .preview-popup,
-.crm-container .crmMailing-preview .preview-contact,
-.crm-container .crmMailing-preview .preview-group {
-	display: flex;
-	flex-direction: column;
-	height: auto;
-	align-items: center;
-	gap: var(--crm-m);
-	width: 100%;
-}
-.crmMailing .preview-popup, .crmMailing .preview-contact {
-	border-right: var(--crm-c-divider);
-}
-.crm-container .crmMailing-preview .clear {
-	display: none;
-}
 /* CiviCase  */
 .crm-container .crm-case-dashboard-switch-view-buttons {
 	margin-left: auto;
@@ -582,7 +561,7 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
 /* API3 explorer */
 
 #api-generated caption {
-	font-weight: bold;
+	font-weight: var(--crm-bold-weight);
 	font-family: var(--crm-font-bold);
 }
 #api-generated tr td:first-of-type {

@@ -1,0 +1,61 @@
+.crmMailing select,
+.crmMailing input[type=text] {
+    width: 36em;
+}
+.crmMailing textarea {
+    height: 20em;
+}
+.crmMailing-recip-est {
+    background: var(--crm-c-yellow-less-light);
+    font-size: var(--crm-small-font-size);
+    padding: var(--crm-padding-small);
+    margin: 0 0 0 var(--crm-m);
+    width: var(--crm-big-input);
+    text-align: center;
+}
+.crmMailing input.crm-form-date,
+.crmMailing input[name=preview_test_email],
+.crmMailing-preview select[name=preview_test_group] {
+    width: var(--crm-big-input);
+}
+.crmMailing .crmMailing-preview {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+}
+.crm-container .crmMailing-preview .preview-popup,
+.crm-container .crmMailing-preview .preview-contact,
+.crm-container .crmMailing-preview .preview-group {
+	display: flex;
+	flex-direction: column;
+	height: auto;
+	align-items: center;
+	gap: var(--crm-m);
+	width: 100%;
+}
+.crmMailing .preview-popup, .crmMailing .preview-contact {
+	border-right: var(--crm-c-divider);
+}
+.crmMailing .preview-popup,
+.crmMailing .preview-contact {
+    text-align: center;
+    border-right: var(--crm-c-divider);
+}
+.crmMailing .crmMailing-schedule-inner {
+    width: var(--crm-huge-input);
+    margin: auto;
+}
+input[name=preview_test_email]::placeholder {
+    text-align: center;
+}
+.crmMailing-inactive {
+    text-decoration: line-through;
+}
+.crm-container #crm-main-content-wrapper a.crmMailing-submit-button {
+    margin-top: var(--crm-r);
+    font-size: var(--crm-r1);
+}
+.crm-container a.crmMailing-submit-button.disabled,
+.crm-container a.crmMailing-submit-button.blocking {
+    opacity: .6;
+    cursor: default;
+}
