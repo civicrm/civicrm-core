@@ -14,7 +14,7 @@
     font-size: var(--crm-font-size);
     border-radius: var(--crm-btn-radius);
     user-select: none;
-    margin-bottom: 0;
+    margin: var(--crm-btn-margin);
     background: var(--crm-c-primary);
     color: var(--crm-c-primary-text);
     text-transform: var(--crm-btn-txt-transform);

@@ -202,7 +202,7 @@ a.crm-expand-row:hover,a.crm-expand-row:focus {
 	font-size: var(--crm-font-size);
 	border-radius: var(--crm-btn-radius);
 	user-select: none;
-	margin-bottom: 0;
+	margin: var(--crm-btn-margin);
 	background-color: var(--crm-c-primary);
 	color: var(--crm-c-primary-text);
 	line-height: 1.5;
@@ -238,6 +238,7 @@ a.crm-expand-row:hover,a.crm-expand-row:focus {
 	display: flex !important; /* vs contact dashboard edit */
 	gap: var(--crm-btn-icon-spacing);
     align-items: center;
+	margin: var(--crm-btn-margin);
 }
 .crm-container a.button span {
 	display: flex;

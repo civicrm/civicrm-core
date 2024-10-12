@@ -5,6 +5,7 @@
  - ADDED label bold/weight variables to contact dashboard label
  - ADDED CSS VARIABLE:
     --crm-input-label-color
+    --crm-btn-margin (for spacing between buttons)
 
 0.10.13
  - CHANGED radio/checkbox handling for WordPress to inherit more of the WordPress styling.
