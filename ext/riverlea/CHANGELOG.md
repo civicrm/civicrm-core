@@ -1,3 +1,12 @@
+0.10.15
+ - REMOVED Wallbrook SemiBoldItalic font (unused)
+ - REMOVED Wallbrook font.css - moved font family definitions into civicrm.css
+ - FIXED min width issue in contact dashboard tabs
+ - CHANGED Wallbrook fonts file removed
+ - REMOVED 2 CSS VARIABLES  (simplification / drops Blackberry, iOS1 support)
+    --crm-italic-style
+    --crm-bold-weight
+
 0.10.14
  - FIXED table header/sort colour issues #57
  - FIXED drop shadown css variable in alpha filter not used

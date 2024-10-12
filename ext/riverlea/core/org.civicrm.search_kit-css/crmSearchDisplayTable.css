@@ -16,7 +16,7 @@ table.crm-sticky-header > thead > tr {
 	margin-left: 0 !important;
 }
 .crm-search-display.crm-search-display-table tfoot > tr > td {
-  font-weight: var(--crm-bold-weight);
+  font-weight: bold;
   font-family: var(--crm-font-bold);
 }
 /* Afform tables */

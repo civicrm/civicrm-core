@@ -4,7 +4,7 @@
 
 /* Config Task List */
 .crm-container td.tasklist a {
-    font-weight: var(--crm-bold-weight);
+    font-weight: bold;
     font-family: var(--crm-font-bold);
 }
 .crm-container table.selector td.tasklist {
@@ -96,7 +96,7 @@
     margin: 0 var(--crm-padding-reg);
   }
   .crm-container .admin-section-items dt {
-    font-weight: var(--crm-bold-weight);
+    font-weight: bold;
     font-family: var(--crm-font-bold);
   }
 }

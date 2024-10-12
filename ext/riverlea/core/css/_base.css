@@ -166,18 +166,18 @@ body {
 .crm-container .bold,
 .crm-container .font-bold {
     font-family: var(--crm-font-bold);
-    font-weight: var(--crm-bold-weight);
+    font-weight: bold;
 }
 .crm-container em,
 .crm-container .font-italic {
     font-family: var(--crm-font-italic);
-    font-style: var(--crm-italic-style);
+    font-style: italic;
 }
 .crm-container strong em,
 .crm-container em strong {
     font-family: var(--crm-font-bold-italic);
-    font-weight: var(--crm-bold-weight);
-    font-style: var(--crm-italic-style);
+    font-weight: bold;
+    font-style: italic;
 }
 .crm-container .strikethrough {
     text-decoration: line-through;
@@ -190,7 +190,7 @@ body {
     background-color: var(--crm-heading-bg);
     font-size: var(--crm-r1);
     font-family: var(--crm-font-bold);
-    font-weight: var(--crm-bold-weight);
+    font-weight: bold;
     color: var(--crm-heading-col);
     padding: var(--crm-heading-padding);
     border-radius: var(--crm-heading-radius);

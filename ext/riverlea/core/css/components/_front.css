@@ -31,7 +31,7 @@
     color: var(--crm-c-light-text);
     padding: var(--crm-m1) var(--crm-f-fieldset-padding);
     font-family: var(--crm-font-bold);
-    font-weight: var(--crm-bold-weight);
+    font-weight: bold;
     font-size: var(--crm-r1);
     border-radius: var(--crm-roundness);
 }

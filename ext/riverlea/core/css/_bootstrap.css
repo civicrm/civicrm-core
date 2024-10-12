@@ -68,7 +68,7 @@
 #bootstrap-theme .help-block {
 	display: block;
 	color: var(--crm-c-text);
-	font-style: var(--crm-italic-style);
+	font-style: italic;
 	font-family: var(--crm-font-italic);
 	margin: var(--crm-s) 0 var(--crm-m);
 	font-size: var(--crm-font-small-size);
@@ -78,7 +78,7 @@
 #bootstrap-theme h6, #bootstrap-theme .h6 {
 	margin-top: var(--crm-m1);
 	margin-bottom: var(--crm-m1);
-	font-weight: var(--crm-bold-weight);
+	font-weight: bold;
 	font-family: var(--crm-font-bold);
 	color: var(--crm-c-text);
 	line-height: 1.2;
@@ -375,7 +375,7 @@
 }
 #bootstrap-theme dfn {
 	font-family: var(--crm-font-italic);
-    font-style: var(--crm-italic-style);
+    font-style: italic;
 }
 #bootstrap-theme hr {
 	box-sizing: content-box;

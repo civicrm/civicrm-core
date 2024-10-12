@@ -269,6 +269,12 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
     border: 0;
 }
 
+/* Ban icon - lower opacity as it's double layered */
+
+.crm-i.fa-ban.fa-stack-2x {
+    opacity: 0.5;
+}
+
 /* Icon picker - vs crm-iconPicker.css */
 #crmIconPicker .icon-ctrls {
     display: flex;

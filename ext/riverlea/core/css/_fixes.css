@@ -443,7 +443,7 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
     top: 0;;
 }
 .crm-container .tag-tree-wrapper div.tag-info .tdl {
-    font-weight: var(--crm-bold-weight);
+    font-weight: bold;
     font-family: var(--crm-font-bold);
     color: var(--crm-c-text);
 }
@@ -582,7 +582,7 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
 /* API3 explorer */
 
 #api-generated caption {
-	font-weight: var(--crm-bold-weight);
+	font-weight: bold;
 	font-family: var(--crm-font-bold);
 }
 #api-generated tr td:first-of-type {

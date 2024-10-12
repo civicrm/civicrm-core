@@ -3,7 +3,7 @@
    Status: merged  */
 
 .crm-container .primary .crm-label {
-    font-weight: var(--crm-bold-weight);
+    font-weight: bold;
     font-family: var(--crm-font-bold);
 }
 

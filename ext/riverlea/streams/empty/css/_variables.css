@@ -12,9 +12,7 @@
 --crm-system-fonts:;
 --crm-font:;
 --crm-font-bold:;
---crm-bold-weight: bold;
 --crm-font-italic:;
---crm-italic-style: italic;
 --crm-font-bold-italic:;
 
 /* Colour names *
@@ -202,7 +200,7 @@
 --crm-expand-header-bg-active: var(--crm-c-gray-900);
 --crm-expand-header-color: var(--crm-c-light-text);
 --crm-expand-header-padding: var(--crm-s) var(--crm-m);
---crm-expand-header-weight: var(--crm-bold-weight);
+--crm-expand-header-weight: bold;
 --crm-expand-header-font: var(--crm-font-bold);
 --crm-expand-header-border: var(--crm-c-divider);
 --crm-expand-header-border-width: 0 0 1px 0;
