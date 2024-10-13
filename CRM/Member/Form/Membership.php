@@ -1885,6 +1885,7 @@ DESC limit 1");
    */
   protected function getContributionSource(): string {
     [$userName] = CRM_Contact_BAO_Contact_Location::getEmailDetails(CRM_Core_Session::getLoggedInContactID());
+    $userName = htmlentities($userName);
     if ($this->_mode) {
       return ts('%1 Membership Signup: Credit card or direct debit (by %2)',
         [1 => $this->getSelectedMembershipLabels(), 2 => $userName]
