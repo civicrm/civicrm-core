@@ -286,6 +286,7 @@ input.crm-form-checkbox + label,
     width: auto;
     appearance: auto;
     height: auto;
+    box-shadow: none;
 }
 /* Checkbox/radio fields with n-per-line. See https://lab.civicrm.org/dev/core/-/issues/4985 */
 .crm-container .crm-multiple-checkbox-radio-options {

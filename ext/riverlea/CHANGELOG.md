@@ -1,3 +1,8 @@
+0.10.17
+ - ADDED civicrm.css to core with default settings. This is primarily to support separate theme extensions using RiverLea as a parent theme.
+ - REMOVED civicrm.css from streams where not custom (e.g. Minetta but not Walbrook)
+ - CHANGED front-end form layout, including hiding Stream name/version on front-end
+
 0.10.16
  - ADDED CiviMail custom CSS override (civi_mail-ang/crmMailing.css)
  - CHANGED CiviMail custom CSS to integrate with override file, replace fixed values with variables

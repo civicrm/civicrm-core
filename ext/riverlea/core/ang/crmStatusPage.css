@@ -41,14 +41,14 @@
     font-size: var(--crm-small-font-size);
     margin-right: var(--crm-r);
 }
-#tab-status-visible-1 .hush-menu {
+#crm-status-list .hush-menu {
     margin-left: auto;
 }
-#tab-status-visible-1 .hush-menu > div {
+#crm-status-list .hush-menu > div {
     position: relative;
 }
 #crm-status-list .hush-menu button {
-    background-color: rgba(256,256,256,0.5);
+    background-color: rgba(256,256,256,0.6);
     color: var(--crm-c-text);
     font-size: initial;
 }

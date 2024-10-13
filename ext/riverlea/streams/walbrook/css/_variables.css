@@ -5,6 +5,8 @@
     Description: Based on Shoreditch theme. Named after after River Walbrook, which runs under Shoreditch, London;
 */
 
+@import url(_font.css);
+
 :root {
 
 --crm-version: 'Walbrook, v' var(--crm-release);

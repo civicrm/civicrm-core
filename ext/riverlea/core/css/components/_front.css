@@ -10,7 +10,9 @@
 .crm-container.crm-public fieldset:not(.collapsed, .crm-inactive-dashlet-fieldset, .af-container-style-pane),
 .crm-container.crm-public .crm-event-info-form-block,
 .crm-container.crm-public #crm-profile-block,
-.crm-container.crm-public .af-container:not(.af-container-style-pane) {
+.crm-container.crm-public
+.crm-container.crm-public .af-container:not(.af-container-style-pane),
+.crm-container.crm-public .email-5-section {
     background-color: var(--crm-f-fieldset-bg);
     margin: var(--crm-f-fieldset-margin);
     padding: var(--crm-f-fieldset-padding);
@@ -38,6 +40,9 @@
 .crm-contribution-confirm-form-block fieldset legend:has(~ .header-dark) {
     display: none; /* fix for duplication on confirmation screen of legend text with Header Dark text */
 }
+.crm-container.crm-public .crm-section {
+    padding: 0;
+}
 .crm-container.crm-public fieldset > fieldset,
 .crm-container.crm-public fieldset:has(> fieldset) {
     padding-top: 0;
@@ -50,17 +55,31 @@
     background: transparent;
     padding: 0;
 }
+.crm-container.crm-public .form-layout-compressed {
+    display: block;
+}
+.crm-container.crm-public span#msgbox {
+    border-radius: var(--crm-roundness);
+    padding: var(--crm-padding-small);
+}
+.crm-container.crm-public #civicrm-footer::after {
+    display: none;
+}
 /* Input */
 .crm-container.crm-public .crm-section:has( > .label) {
     padding: var(--crm-f-form-padding);
     display: var(--crm-f-form-layout);
     grid-template-columns: var(--crm-f-label-width) 1fr 0;
-    margin: 0 calc(-1 * var(--crm-f-form-padding)) !important;
+    margin: 0 calc(-1 * var(--crm-f-form-padding));
 }
-.crm-container.crm-public .crm-section:has(> div > input:focus) {
+.crm-container.crm-public .crm-section:has(> div > input:focus),
+.crm-container.crm-public .crm-section:has(> div > select:focus),
+.crm-container.crm-public .crm-section:has(> div > textarea:focus) {
     background-color: var(--crm-f-form-focus-bg);
 }
-.crm-container.crm-public .crm-section:has(> div > input.crm-inline-error) {
+.crm-container.crm-public .crm-section:has(> div > input.crm-inline-error),
+.crm-container.crm-public .crm-section:has(> div > textarea.crm-inline-error),
+.crm-container.crm-public .crm-section:has(> div > select.crm-inline-error) {
     background-color: var(--crm-f-form-error-bg);
 }
 .crm-container.crm-public input[type="text"],
@@ -72,7 +91,7 @@
     border-radius: var(--crm-f-input-radius);
     padding: var(--crm-f-input-padding);
     font-size: var(--crm-f-input-font-size);
-    width: var(--crm-f-input-width);
+    min-width: var(--crm-f-input-width);
 }
 .crm-container.crm-public input[type="radio"] {
     margin: var(--crm-s2) var(--crm-s3) 0 0;
@@ -91,7 +110,7 @@
 }
 .crm-container.crm-public .select2-dropdown-open .select2-choice,
 .crm-container.crm-public .select2-dropdown-open .select2-choices {
-    border-radius: 0;
+    border-radius: var(--crm-f-input-radius) var(--crm-f-input-radius) 0 0;
 }
 .crm-submit-buttons {
     padding-inline: 0;
