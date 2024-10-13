@@ -71,9 +71,13 @@ Contains CSS files in:
 - Merge Thames
 - Merge Wellow
 - Minimal customiser
-- Test creating separate extension with RiverLea as parent theme.
+- ~~Test creating separate extension with RiverLea as parent theme.~~
 - Create minimal 'inherit everything' front-end theme.
 - Better documentation.
+
+## Use in Front-End CiviCRM
+
+USE AT YOUR OWN RISK. While RiverLea has been widely tested in the backend of CiviCRM, front-end pages have had minimal testing so far, and given the wide number of themes and scenarios front-end pages need to integrate with this will take time to improve. For this reason while RiverLea should work fine applied to the front-end of New CiviCRM websites, for existing sites we would recommend only applying to the front on a Dev site or with extensive testing of your front-end screens. Overwriting CSS variables for the front is straightforward (they can be nested within `.crm-container.crm-public` and there's a number of front-end specific variables, prefixed `--crm-f-`), but testing is essential.
 
 ## Creating new 'streams'
 
