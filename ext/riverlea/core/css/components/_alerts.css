@@ -22,24 +22,30 @@
 }
 .crm-container .help li,
 .crm-container .status li,
-.crm-container .messages li,
-.crm-container .alert li {
+.crm-container .messages li {
     color: var(--crm-alert-text-help);
     list-style: initial;
 }
-.crm-container .status,
+.crm-container .status.alert,
 .crm-container .alert-warning,
 .crm-container .messages.warning {
     background-color: var(--crm-alert-background-warning);
     border-color: var(--crm-alert-border-warning);
     color: var(--crm-alert-text-warning);
 }
+.crm-container .status.error {
+    background-color: var(--crm-alert-background-danger);
+    border-color: var(--crm-alert-border-danger);
+    color: var(--crm-alert-text-danger);
+}
+.crm-container .status.alert li,
+.crm-container .alert-warning li,
+.crm-container .messages.warning li {
+    color: var(--crm-alert-text-warning);
+}
 .crm-container .status.crm-ok {
     background-color: var(--crm-alert-background-help);
     color: var(--crm-alert-text-info);
-}
-#civicrm-footer .status a {
-    color: var(--crm-alert-text-warning);
 }
 .crm-container .alert-info {
     background-color: var(--crm-alert-background-info);
@@ -52,7 +58,8 @@
     color: var(--crm-alert-text-danger);
 }
 .crm-container .help a,
-.crm-container .messages a {
+.crm-container .messages a,
+#civicrm-footer .status a {
     color: inherit;
     text-decoration: underline;
 }

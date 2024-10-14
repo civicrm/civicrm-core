@@ -1,3 +1,9 @@
+0.10.18
+ - CHANGED better front-end handling of form-builder pages
+ - FIXED alert message handling (all was treated as .help, including .error and .warning)
+ - CHANGED alignment of icons in alerts
+ - FIXED - inline edit alignment, styling (https://lab.civicrm.org/extensions/riverlea/-/issues/5#note_170713)
+
 0.10.17
  - ADDED civicrm.css to core with default settings. This is primarily to support separate theme extensions using RiverLea as a parent theme.
  - REMOVED civicrm.css from streams where not custom (e.g. Minetta but not Walbrook)

@@ -72,14 +72,17 @@
     grid-template-columns: var(--crm-f-label-width) 1fr 0;
     margin: 0 calc(-1 * var(--crm-f-form-padding));
 }
-.crm-container.crm-public .crm-section:has(> div > input:focus),
-.crm-container.crm-public .crm-section:has(> div > select:focus),
-.crm-container.crm-public .crm-section:has(> div > textarea:focus) {
+.crm-container.crm-public .crm-section:has(input:focus),
+.crm-container.crm-public .crm-section:has(select:focus),
+.crm-container.crm-public .crm-section:has(textarea:focus) {
     background-color: var(--crm-f-form-focus-bg);
 }
-.crm-container.crm-public .crm-section:has(> div > input.crm-inline-error),
-.crm-container.crm-public .crm-section:has(> div > textarea.crm-inline-error),
-.crm-container.crm-public .crm-section:has(> div > select.crm-inline-error) {
+.crm-container.crm-public .crm-section:has(input.error),
+.crm-container.crm-public .crm-section:has(textarea.error),
+.crm-container.crm-public .crm-section:has(select.error),
+.crm-container.crm-public .crm-section:has(input.crm-inline-error),
+.crm-container.crm-public .crm-section:has(textarea.crm-inline-error),
+.crm-container.crm-public .crm-section:has(select.crm-inline-error) {
     background-color: var(--crm-f-form-error-bg);
 }
 .crm-container.crm-public input[type="text"],
@@ -114,6 +117,10 @@
 }
 .crm-submit-buttons {
     padding-inline: 0;
+}
+af-field {
+    padding-block: var(--crm-flex-gap);
+    display: block;
 }
 /* Contribution pages */
 .crm-container.crm-public .other_amount-section {

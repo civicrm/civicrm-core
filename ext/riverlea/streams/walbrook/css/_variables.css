@@ -188,7 +188,7 @@
 --crm-dash-icon-size: var(--crm-m2);
 --crm-dash-box-shadow: inset 0 3px 18px -5px rgba(0, 0, 0, 0.25);
 --crm-dash-panel-padding: var(--crm-r2);
---crm-dash-edit-border: 1px solid var(--crm-c-gray-900);
+--crm-dash-edit-border: 1px dashed var(--crm-c-gray-900);
 --crm-dash-block-padding: var(--crm-m2);
 --crm-dash-block-bg: var(--crm-c-background);
 --crm-dash-label-bg: var(--crm-c-background);

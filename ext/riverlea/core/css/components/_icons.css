@@ -1,5 +1,5 @@
 .crm-container .messages .crm-i {
-    padding: var(--crm-s) var(--crm-m) var(--crm-s) 0;
+    padding: 0 var(--crm-m) var(--crm-s) 0;
     float: left;
 }
 .crm-container button.btn-xs:has(.fa-times),
