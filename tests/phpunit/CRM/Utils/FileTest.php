@@ -691,20 +691,29 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     symlink("nonexistent", "$a_dir/clean/link1");
     symlink("../external1", "$a_dir/clean/link2");
     symlink("../external2", "$a_dir/clean/link3");
-    posix_mkfifo("$a_dir/clean/fifo1", 0644);
+    if (function_exists('posix_mkfifo')) {
+      posix_mkfifo("$a_dir/clean/fifo1", 0644);
+    }
     touch("$a_dir/externalfile1");
     mkdir("$a_dir/externaldir1");
     touch("$a_dir/externaldir1/file1");
     mkdir("$a_dir/externaldir1/sub1");
 
     CRM_Utils_File::cleanDir("$a_dir/clean", FALSE, FALSE);
-    system('ls -lAR ' . escapeshellarg($a_dir));
+    if (getenv('DEBUG')) {
+      system('ls -lAR ' . escapeshellarg($a_dir));
+    }
 
     $this->assertThat("$a_dir/externalfile1", $this->fileExists());
     $this->assertThat("$a_dir/externaldir1", $this->directoryExists());
     $this->assertThat("$a_dir/externaldir1/sub1", $this->directoryExists());
     $this->assertThat("$a_dir/externaldir1/file1", $this->fileExists());
-    // $this->assertThat("$a_dir/clean", $this->logicalNot($this->directoryExists()));
+    $this->assertThat("$a_dir/clean", $this->directoryExists());
+
+    // The first call to `cleanDir(...$rmdir=FALSE...)` left behind the folder.
+    // But you can also clean it up...
+    CRM_Utils_File::cleanDir("$a_dir/clean", TRUE, FALSE);
+    $this->assertThat("$a_dir/clean", $this->logicalNot($this->directoryExists()));
 
     system('rm -rf ' . escapeshellarg($a_dir));
   }
