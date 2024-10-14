@@ -81,7 +81,7 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/price/edit',
-          'qs' => 'action=delete&reset=1&sid=%%sid%%&qfKey=%%key%%',
+          'qs' => 'action=delete&reset=1&sid=%%sid%%',
           'title' => ts('Delete Price Set'),
           'extra' => 'onclick = "return confirm(\'' . $deleteExtra . '\');"',
           'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
@@ -148,11 +148,6 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
         $usedBy = CRM_Price_BAO_PriceSet::getUsedBy($sid);
 
         if (empty($usedBy)) {
-          $key = $_POST['qfKey'] ?? $_GET['qfKey'] ?? $_REQUEST['qfKey'] ?? NULL;
-          $k = CRM_Core_Key::validate($key, CRM_Utils_System::getClassName($this));
-          if (!$k) {
-            $this->invalidKey();
-          }
           // prompt to delete
           CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/admin/price', 'action=browse'));
           $controller = new CRM_Core_Controller_Simple('CRM_Price_Form_DeleteSet', 'Delete Price Set', NULL);
