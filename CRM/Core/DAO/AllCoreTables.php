@@ -490,7 +490,7 @@ class CRM_Core_DAO_AllCoreTables {
    */
   public static function invoke($className, $event, &$values) {
     $entityName = self::getEntityNameForClass($className);
-    $entityTypes = self::getEntities();
+    $entityTypes = EntityRepository::getEntities();
     if (isset($entityTypes[$entityName][$event])) {
       foreach ($entityTypes[$entityName][$event] as $filter) {
         $args = [$className, &$values];
