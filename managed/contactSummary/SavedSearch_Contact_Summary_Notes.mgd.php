@@ -202,6 +202,8 @@ return [
             ],
             [
               'size' => 'btn-xs',
+              'label' => ts('Row Actions'),
+              'label_hidden' => TRUE,
               'links' => [
                 [
                   'icon' => 'fa-external-link',
