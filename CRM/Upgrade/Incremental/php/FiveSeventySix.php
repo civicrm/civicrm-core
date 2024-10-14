@@ -114,6 +114,7 @@ class CRM_Upgrade_Incremental_php_FiveSeventySix extends CRM_Upgrade_Incremental
         CRM_Core_DAO::executeQuery('DROP table civicrm_event_carts');
       }
       if (!CRM_Core_DAO::singleValueQuery('SELECT cart_id FROM civicrm_participant WHERE cart_id > 0 LIMIT 1')) {
+        \CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_participant', 'FK_civicrm_participant_cart_id');
         \CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_participant', 'cart_id', FALSE, TRUE);
       }
     }
