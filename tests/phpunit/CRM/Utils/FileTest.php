@@ -718,4 +718,30 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     system('rm -rf ' . escapeshellarg($a_dir));
   }
 
+  public function testCleanDir_TopLink(): void {
+    $a_dir = sys_get_temp_dir() . '/testCleanDir';
+    system('rm -rf ' . escapeshellarg($a_dir));
+    mkdir("$a_dir");
+
+    mkdir("$a_dir/externaldir1");
+    touch("$a_dir/externaldir1/file1");
+    mkdir("$a_dir/externaldir1/sub1");
+    symlink("$a_dir/externaldir1", "$a_dir/my_dir");
+
+    $this->assertThat("$a_dir/my_dir", $this->directoryExists());
+    $this->assertThat("$a_dir/my_dir/file1", $this->fileExists());
+    $this->assertThat("$a_dir/my_dir/sub1", $this->directoryExists());
+
+    CRM_Utils_File::cleanDir("$a_dir/my_dir", TRUE, FALSE);
+
+    $this->assertThat("$a_dir/my_dir", $this->logicalNot($this->directoryExists()));
+    $this->assertThat("$a_dir/my_dir/file1", $this->logicalNot($this->fileExists()));
+    $this->assertThat("$a_dir/my_dir/sub1", $this->logicalNot($this->directoryExists()));
+
+    $this->assertThat("$a_dir/externaldir1/file1", $this->fileExists());
+    $this->assertThat("$a_dir/externaldir1/sub1", $this->directoryExists());
+
+    system('rm -rf ' . escapeshellarg($a_dir));
+  }
+
 }

@@ -103,6 +103,24 @@ class CRM_Utils_File {
       throw new CRM_Core_Exception('Overly broad deletion');
     }
 
+    $target = rtrim($target, '/' . DIRECTORY_SEPARATOR);
+
+    if (!file_exists($target) && !is_link($target)) {
+      return;
+    }
+
+    if (!is_dir($target)) {
+      CRM_Core_Session::setStatus(ts('cleanDir() can only remove directories. %1 is not a directory.', [1 => $target]), ts('Warning'), 'error');
+      return;
+    }
+
+    if (is_link($target) /* it's a directory based on a symlink... no need to recurse... */) {
+      if ($rmdir) {
+        static::try_unlink($target, 'symlink');
+      }
+      return;
+    }
+
     if ($dh = @opendir($target)) {
       while (FALSE !== ($sibling = readdir($dh))) {
         if (!in_array($sibling, $exceptions)) {

@@ -150,7 +150,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
 
     if ($value & 1) {
       // clean templates_c
-      CRM_Utils_File::cleanDir($this->templateCompileDir, $rmdir);
+      CRM_Utils_File::cleanDir($this->templateCompileDir, $rmdir, FALSE);
       CRM_Utils_File::createDir($this->templateCompileDir);
     }
     if ($value & 2) {
