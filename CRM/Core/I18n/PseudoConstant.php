@@ -48,6 +48,7 @@ class CRM_Core_I18n_PseudoConstant {
       $longForShortMapping['pt'] = defined("CIVICRM_LANGUAGE_MAPPING_PT") ? CIVICRM_LANGUAGE_MAPPING_PT : 'pt_PT';
       $longForShortMapping['es'] = defined("CIVICRM_LANGUAGE_MAPPING_ES") ? CIVICRM_LANGUAGE_MAPPING_ES : 'es_ES';
       $longForShortMapping['nl'] = defined("CIVICRM_LANGUAGE_MAPPING_NL") ? CIVICRM_LANGUAGE_MAPPING_NL : 'nl_NL';
+      $longForShortMapping['de'] = defined("CIVICRM_LANGUAGE_MAPPING_DE") ? CIVICRM_LANGUAGE_MAPPING_DE : 'de_DE';
     }
     return $longForShortMapping;
   }
