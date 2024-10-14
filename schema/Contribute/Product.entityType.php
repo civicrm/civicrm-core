@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Product'),
     'title_plural' => ts('Products'),
-    'description' => ts('able - stores "product info" for premiums and can be used for non-incentive products'),
+    'description' => ts('Stores "product info" for premiums and can be used for non-incentive products'),
     'log' => TRUE,
     'add' => '1.4',
     'label_field' => 'name',
