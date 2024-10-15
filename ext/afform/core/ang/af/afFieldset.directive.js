@@ -16,6 +16,7 @@
         let ctrl = this;
         let localData = [];
         let joinOffsets = {};
+        let ts = $scope.ts = CRM.ts('org.civicrm.afform');
 
         this.getData = function() {
           return ctrl.afFormCtrl ? ctrl.afFormCtrl.getData(ctrl.modelName) : localData;
