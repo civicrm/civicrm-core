@@ -10,19 +10,19 @@
     font-style: normal;
     font-weight: 400;
     font-display: swap;
-    src: url("../fonts/InterDisplay-Regular.woff2") format("woff2");
+    src: url("../../../fonts/InterDisplay-Regular.woff2") format("woff2");
 }
 @font-face {
     font-family: Civitype-italic;
     font-style: italic;
     font-weight: 400;
     font-display: swap;
-    src: url("../fonts/InterDisplay-Italic.woff2") format("woff2");
+    src: url("../../../fonts/InterDisplay-Italic.woff2") format("woff2");
 }
 @font-face {
     font-family: Civitype-bold;
     font-style: normal;
     font-weight: 600;
     font-display: swap;
-    src: url("../fonts/InterDisplay-SemiBold.woff2") format("woff2");
+    src: url("../../../fonts/InterDisplay-SemiBold.woff2") format("woff2");
 }
