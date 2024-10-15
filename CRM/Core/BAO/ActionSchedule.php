@@ -477,7 +477,7 @@ FROM civicrm_action_schedule cas
     if (!isset(Civi::$statics[__CLASS__]['sms'][$cacheKey])) {
       $numbers = [];
       foreach ($cids as $cid) {
-        $number = self::pickSmsPhoneNumber($cid);
+        $number = CRM_Core_BAO_Phone::getContactMobileOrPrimary($cid);
         if ($number) {
           $numbers[$cid] = $number;
         }
@@ -654,7 +654,7 @@ FROM civicrm_action_schedule cas
       $toPhoneNumbers = self::getSmsNumbers($alternateRecipients);
     }
     else {
-      $toPhoneNumbers = self::pickSmsPhoneNumber($toContactID);
+      $toPhoneNumbers = CRM_Core_BAO_Phone::getContactMobileOrPrimary($toContactID);
       $toPhoneNumbers = $toPhoneNumbers ? [$toContactID => $toPhoneNumbers] : NULL;
     }
     if (!$toPhoneNumbers) {
@@ -807,25 +807,11 @@ FROM civicrm_action_schedule cas
   }
 
   /**
-   * Pick SMS phone number.
-   *
-   * @param int $smsToContactId
-   *
-   * @return NULL|string
+   * @deprecatd
    */
-  protected static function pickSmsPhoneNumber($smsToContactId) {
-    $toPhoneNumbers = CRM_Core_BAO_Phone::allPhones($smsToContactId, FALSE, 'Mobile', [
-      'is_deceased' => 0,
-      'is_deleted' => 0,
-      'do_not_sms' => 0,
-    ]);
-    //to get primary mobile ph,if not get a first mobile phONE
-    if (!empty($toPhoneNumbers)) {
-      $toPhoneNumberDetails = reset($toPhoneNumbers);
-      $toPhoneNumber = $toPhoneNumberDetails['phone'] ?? NULL;
-      return $toPhoneNumber;
-    }
-    return NULL;
+  protected static function pickSmsPhoneNumber($contactID) {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_BAO_Phone::getContactMobileOrPrimary');
+    return CRM_Core_BAO_Phone::getContactMobileOrPrimary($contactID);
   }
 
   /**

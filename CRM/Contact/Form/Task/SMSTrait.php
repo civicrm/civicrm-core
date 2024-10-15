@@ -77,7 +77,6 @@ trait CRM_Contact_Form_Task_SMSTrait {
         ->addWhere('contact_id.do_not_sms', '=', FALSE)
         ->addWhere('contact_id.is_deceased', '=', FALSE)
         ->addWhere('phone_numeric', '>', 0)
-        ->addWhere('phone_type_id:name', '=', 'Mobile')
         ->addOrderBy('is_primary')
         ->addSelect('id', 'contact_id', 'phone', 'phone_type_id:name', 'phone_numeric', 'contact_id.sort_name', 'phone_type_id', 'contact_id.display_name');
       if ($this->getSubmittedValue('to')) {
