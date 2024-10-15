@@ -115,13 +115,13 @@ html.cms-standalone body {
 
 /* BUTTONS */
 
-.crm-container .btn,
+ /*.crm-container .btn,
 .crm-container button,
 .crm-container .crm-button,
 .crm-container [type="button"],
 .crm-container [type="reset"],
 .crm-container [type="submit"] {
-  /* Sometimes we have lots of buttons and they wrap to a 2nd line. This puts some vertical space betwixt. */
+  Sometimes we have lots of buttons and they wrap to a 2nd line. This puts some vertical space betwixt.
   margin: var(--crm-m) 0;
 }
 
@@ -186,9 +186,6 @@ html.cms-standalone body {
 /* 'alpha-filter' is the alphabetical pager you see, for example, on adv search results */
 .crm-container #alpha-filter li {
   --crm-c-text: #0002; /* referenced in searchForm.css */
-}
-.crm-container #alpha-filter a {
-  box-shadow: none !important; /* override searchForm.css */
 }
 
 .crm-container .description:not(#help),

@@ -483,13 +483,8 @@
     align-items: center;
     justify-content: center;
 }
-/*.crm-container button i.crm-i,
-.crm-container .btn i.crm-i {
-    height: calc(var(--crm-btn-height) - 2px);
-}*/
 .crm-container a.button i.crm-i,
 .crm-container .crm-button:not(.btn) i.crm-i {
-    /* height: calc(var(--crm-btn-height) - 2px); */
     display: flex;
     align-items: center;
 }

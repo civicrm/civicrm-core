@@ -185,6 +185,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-btn-alert-text: var(--crm-c-alert-text);
 --crm-btn-icon-bg: ;
 --crm-btn-icon-border: ;
+--crm-btn-margin: var(--crm-m) 0;
 }
 :root {
 /* Tables */

@@ -1,3 +1,7 @@
+1.0.0beta
+ - CHANGED fonts are in shared directory rather than streams' directory
+ - REMOVED duplicate parts of Thames
+
 0.10.20
  - NEW STREAM - Thames, by Rich Lott, @artfulrobot.
 
