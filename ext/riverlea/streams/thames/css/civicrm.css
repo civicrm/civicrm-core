@@ -298,12 +298,11 @@ div.crm-summary-contactname-block+.crm-actions-ribbon {
 
 /* */
 #contact-summary .crm-tag-item {
-  border-radius: var(--crm-r-1) !important; /* important override contactSummary.css */
-  padding: 0 var(--crm-m) !important; /* important override contactSummary.css */
+  border-radius: var(--crm-r-1);
 }
 
 .crm-container div.crm-summary-row div.crm-label {
-  color: var(--crm-c-blue-darker) !important; /* important override contactSummary.css */
+  color: var(--crm-c-blue-darker);
 }
 
 
