@@ -363,7 +363,9 @@ class api_v3_CaseTest extends CiviCaseTestCase {
       'case_id' => $case['id'],
       'is_unit_test' => TRUE,
     ];
+    $_SERVER['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest';
     $ret = CRM_Contact_Page_AJAX::relationship();
+    unset($_SERVER['HTTP_X_REQUESTED_WITH']);
     $this->assertEquals(0, $ret['is_error']);
     //Check if relationship exist for the case.
     $relationship = $this->callAPISuccess('Relationship', 'get', [
@@ -804,8 +806,9 @@ class api_v3_CaseTest extends CiviCaseTestCase {
       'case_id' => $case['id'],
       'is_unit_test' => TRUE,
     ];
+    $_SERVER['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest';
     CRM_Contact_Page_AJAX::relationship();
-
+    unset($_SERVER['HTTP_X_REQUESTED_WITH']);
     $result = $this->callAPISuccess('Case', 'get', [
       'id' => $case['id'],
       'sequential' => 1,

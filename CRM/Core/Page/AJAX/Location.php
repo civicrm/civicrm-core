@@ -31,6 +31,7 @@ class CRM_Core_Page_AJAX_Location {
    * @throws \CRM_Core_Exception
    */
   public static function getPermissionedLocation() {
+    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
     $cid = CRM_Utils_Request::retrieve('cid', 'Integer', CRM_Core_DAO::$_nullObject, TRUE);
     $ufID = CRM_Utils_Request::retrieve('ufID', 'Integer', CRM_Core_DAO::$_nullObject, TRUE);
 
@@ -183,14 +184,17 @@ class CRM_Core_Page_AJAX_Location {
   }
 
   public static function jqState() {
+    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
     CRM_Utils_JSON::output(CRM_Core_BAO_Location::getChainSelectValues($_GET['_value'], 'country'));
   }
 
   public static function jqCounty() {
+    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
     CRM_Utils_JSON::output(CRM_Core_BAO_Location::getChainSelectValues($_GET['_value'], 'stateProvince'));
   }
 
   public static function getLocBlock() {
+    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
     // i wish i could retrieve loc block info based on loc_block_id,
     // Anyway, lets retrieve an event which has loc_block_id set to 'lbid'.
     if ($_REQUEST['lbid']) {

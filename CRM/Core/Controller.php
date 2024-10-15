@@ -229,6 +229,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
       }
       // Respond with JSON if in AJAX context (also support legacy value '6')
       elseif (in_array($snippet, [CRM_Core_Smarty::PRINT_JSON, 6])) {
+        CRM_Core_Page_AJAX::validateAjaxRequestMethod();
         $this->_print = CRM_Core_Smarty::PRINT_JSON;
         $this->_QFResponseType = 'json';
       }
