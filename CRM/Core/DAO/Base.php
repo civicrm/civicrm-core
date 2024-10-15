@@ -113,7 +113,11 @@ abstract class CRM_Core_DAO_Base extends CRM_Core_DAO {
   }
 
   private static function getSchemaFields(): array {
-    return (Civi::$statics[static::class]['fields'] ??= static::loadSchemaFields());
+    if (!isset(Civi::$statics[static::class]['fields'])) {
+      Civi::$statics[static::class]['fields'] = static::loadSchemaFields();
+      CRM_Core_DAO_AllCoreTables::invoke(static::class, 'fields_callback', Civi::$statics[static::class]['fields']);
+    }
+    return Civi::$statics[static::class]['fields'];
   }
 
   private static function loadSchemaFields(): array {
@@ -225,7 +229,6 @@ abstract class CRM_Core_DAO_Base extends CRM_Core_DAO {
       $field['add'] = $fieldSpec['add'] ?? NULL;
       $fields[$fieldName] = $field;
     }
-    CRM_Core_DAO_AllCoreTables::invoke(static::class, 'fields_callback', $fields);
     return $fields;
   }
 
