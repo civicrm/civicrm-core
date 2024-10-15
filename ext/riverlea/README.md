@@ -1,11 +1,17 @@
 # RiverLea Theme Framework
 
-Theme architecture for CiviCRM that separates visual/UI CSS from structural CSS using CSS variables. It currently has two variations, or 'streams': Minetta and Walbrook, named after streams that run under Greenwich, NYC and Shoreditch, London.
+Theme architecture for CiviCRM that separates visual/UI CSS from structural CSS using CSS variables. Installing it provides you with four subthemes or 'Streams':
+ - Minetta, named after the river that runs under Greenwich, NYC. It is based on Civi's default 'Greenwich' theme.
+ - Walbrook, named after the river that runs under Shoreditch, London. It is based on Shoreditch/TheIsland theme.
+ - Hackney, named after the river that runs under Finsbury Park, based on Finsbury Park theme.
+ - Thames, named after the river that runs close to Artful Robot HQ, based on their Aah theme.
+ You can chose between these subthemes via Display Settings
 
 The extension is licensed under [AGPL-3.0](LICENSE.txt).
 
 ## [Changelog](CHANGELOG.md)
 
+- 0.10 - **Adds fourth stream**. Thames (Aah), as well as extensive fixes & adjustments.
 - 0.9 - **Overwrites civi core CSS**. 5.75 only - overwrites core css like SearchKit & FormBuilder with extensive work on both. D7 Garland support.
 - 0.8 - **Front-end layouts**. Front-end support for each stream.
 - 0.7 - **Dark-mode**. Dark-mode working across all three streams.
@@ -41,7 +47,7 @@ cv en riverlea
 
 ### After installation
 
-After installing the extension, go to Nav menu > Administer > Customize Data and Screens > Display Preferences, and select which theme variation/stream you want (they start with the name 'Riverlea').
+After installing the extension, go to Nav menu > Administer > Customize Data and Screens > Display Preferences, and select which subtheme/stream you want.
 
 ## File Structure
 

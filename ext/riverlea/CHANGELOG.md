@@ -1,3 +1,6 @@
+0.10.20
+ - NEW STREAM - Thames, by Rich Lott, @artfulrobot.
+
 0.10.19
  - FIXED FormBuilder List to match SearchKit list (better fix would harmonise markup)
  - FIXED padding on SearchKit Dashlets

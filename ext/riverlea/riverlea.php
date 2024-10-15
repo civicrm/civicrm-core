@@ -31,33 +31,33 @@ function riverlea_civicrm_config(&$config) {
 function riverlea_civicrm_themes(&$themes) {
   $themes['minetta'] = array(
     'ext' => 'riverlea',
-    'title' => 'RL: Minetta (~Greenwich)',
+    'title' => 'Minetta (RiverLea ~Greenwich)',
     'prefix' => 'streams/minetta/',
     'search_order' => array('minetta', '_riverlea_core_', '_fallback_'),
   );
   $themes['walbrook'] = array(
     'ext' => 'riverlea',
-    'title' => 'RL: Walbrook (~Shoreditch/Island)',
+    'title' => 'Walbrook (RiverLea ~Shoreditch/Island)',
     'prefix' => 'streams/walbrook/',
     'search_order' => array('walbrook', '_riverlea_core_', '_fallback_'),
   );
   $themes['hackneybrook'] = array(
     'ext' => 'riverlea',
-    'title' => 'RL: Hackney Brook (~Finsbury Park)',
+    'title' => 'Hackney Brook (RiverLea ~Finsbury Park)',
     'prefix' => 'streams/hackneybrook/',
     'search_order' => array('hackneybrook', '_riverlea_core_', '_fallback_'),
+  );
+  $themes['thames'] = array(
+    'ext' => 'riverlea',
+    'title' => 'Thames (RiverLea ~Aah)',
+    'prefix' => 'streams/thames/',
+    'search_order' => array('thames', '_riverlea_core_', '_fallback_'),
   );
   $themes['_riverlea_core_'] = array(
     'ext' => 'riverlea',
     'title' => 'Riverlea: base theme',
     'prefix' => 'core/',
     'search_order' => array('_riverlea_core_', '_fallback_'),
-  );
-  $themes['thames'] = array(
-    'ext' => 'riverlea',
-    'title' => 'RL: Thames (~Aah)',
-    'prefix' => 'streams/thames/',
-    'search_order' => array('thames', '_riverlea_core_', '_fallback_'),
   );
 }
 
