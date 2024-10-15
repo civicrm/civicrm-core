@@ -109,10 +109,6 @@
         function getDataType() {
           if (ctrl.field) {
             dataType = ctrl.field.data_type;
-            // FK Entities can use a mix of numeric & string values (see `"static": options` above)
-            if (ctrl.field.fk_entity) {
-              dataType = 'String';
-            }
           }
           else {
             dataType = null;
@@ -121,7 +117,12 @@
 
         function convertDataType(val) {
           if (dataType === 'Integer') {
-            return +val;
+            let newVal = +val;
+            // FK Entities can use a mix of numeric & string values (see `"static": options` above)
+            if (ctrl.field.fk_entity && ('' + newVal) !== val) {
+              return val;
+            }
+            return newVal;
           }
           return val;
         }
