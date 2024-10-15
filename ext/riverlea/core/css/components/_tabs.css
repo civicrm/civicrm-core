@@ -2,7 +2,7 @@
 
 .crm-container .ui-tabs,
 .crm-container .crm-search-nav-tabs,
-.crm-container .afadmin-list { /* entire tab region */
+.crm-container .afadmin-list .nav.nav-tabs { /* entire tab region */
     border: var(--crm-tabs-border);
     border-radius: var(--crm-roundness);
     margin-bottom: var(--crm-r1);

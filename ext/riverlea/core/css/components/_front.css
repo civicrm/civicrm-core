@@ -19,7 +19,7 @@
     border: var(--crm-f-fieldset-border);
     box-shadow: var(--crm-f-box-shadow);
 }
-.crm-container.crm-public fieldset legend:not(.af-title) {
+.crm-container.crm-public fieldset legend {
     position: relative;
     top: calc(2 * var(--crm-f-fieldset-padding));
     padding-block: var(--crm-f-fieldset-padding);

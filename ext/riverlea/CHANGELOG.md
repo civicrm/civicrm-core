@@ -1,3 +1,9 @@
+0.10.19
+ - FIXED FormBuilder List to match SearchKit list (better fix would harmonise markup)
+ - FIXED padding on SearchKit Dashlets
+ - ADDED front-end Legend realignment to SK/FB fieldset/legends (all three issues in #5)
+ - FIXED contribution page tabs/button alignment/offset
+
 0.10.18
  - CHANGED better front-end handling of form-builder pages
  - FIXED alert message handling (all was treated as .help, including .error and .warning)

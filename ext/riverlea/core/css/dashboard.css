@@ -193,3 +193,8 @@ fieldset.crm-inactive-dashlet-fieldset legend .crm-hover-button {
     padding: var(--crm-btn-large-padding);
     margin-right: var(--crm-r);
 }
+/* Searchkit Dashlets */
+
+.crm-dashlet .crm-search-display .form-inline {
+    padding: var(--crm-padding-reg);
+}

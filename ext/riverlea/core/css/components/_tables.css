@@ -136,7 +136,6 @@ table.dataTable.order-column.stripe tbody tr.extension-installed.even > .sorting
     background: transparent;
 }
 .crm-container .crm-form-block.crm-report-field-form-block table,
-.crm-container .crm-search-display table,
 .crm-container .CRM_Contribute_Form_ContributionCharts #chartData table,
 .crm-container .crm-case-caseview-form-block table {
     box-shadow: none;

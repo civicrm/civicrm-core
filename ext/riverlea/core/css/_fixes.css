@@ -352,6 +352,11 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
 .crm-container .panel-heading:has(.nav-tabs) .pull-right {
     margin-right: var(--crm-m);
 }
+.crm-container .afadmin-list .nav.nav-tabs { /* Fix for AForm tabs border */
+    border: var(--crm-tabs-border);
+    border-radius: var(--crm-roundness) var(--crm-roundness) 0 0;
+	margin-bottom: 0;
+}
 .crm-container .crm-search-nav-tabs { /* Fix for SK tabs border */
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
@@ -364,22 +369,21 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
 .crm-container .panel-heading .nav.nav-tabs{
     background-color: transparent;
 }
+.crm-container .afadmin-list > table,
 .crm-search:has(.crm-search-nav-tabs) .crm-search-display.crm-search-display-table {
     border: var(--crm-tab-border);
-    border-top: 0 solid transparent;
+	box-shadow: none;
     border-radius: 0 0 var(--crm-roundness) var(--crm-roundness);
 	background: var(--crm-tab-bg-active);
 	overflow-x: auto;
 }
-.crm-container .afadmin-list > table {
-	border: 0;
-    border-top: var(--crm-table-outside-border);
-    margin-bottom: 0;
-}
 .crm-search:has(.crm-search-nav-tabs) .crm-search-display.crm-search-display-table table,
 .ui-tabs-panel .crm-search-display.crm-search-display-table {
-    border: 0;
+    border-width: 1px 0 0 0;
+	box-shadow: none;
+	margin-bottom: 0;
 }
+.crm-container .afadmin-list >  .form-inline,
 .crm-search > .ng-scope > .form-inline {
     border: var(--crm-tab-border);
 	border-radius: 0;
@@ -473,7 +477,6 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
 	font-family: var(--crm-font);
 }
 /* CiviContribute dashboard */
-
 .crm-container #ContributionCharts #mainTabContainer {
     box-shadow: var(--crm-block-shadow);
 }
@@ -491,8 +494,13 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
 #ContributionCharts ul.ui-tabs-nav li.crm-tab-button a {
 	padding: 0;
 }
+#ContributionCharts ul.ui-tabs-nav li.crm-tab-button a span {
+	display: none;
+}
 #ContributionCharts ul.ui-tabs-nav .float-right {
-	margin-left: auto;
+    position: absolute;
+    right: var(--crm-s);
+    top: var(--crm-s);
 }
 #ContributionCharts ul.ui-tabs-nav .float-right table,
 #ContributionCharts ul.ui-tabs-nav .float-right table tr {
@@ -500,6 +508,9 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
 	margin: 0;
 	border: 0 solid transparent;
 	box-shadow: none;
+}
+#ContributionCharts ul.ui-tabs-nav .float-right table a.button {
+	max-height: 36px;
 }
 #ContributionCharts #chartData {
 	padding: var(--crm-padding-reg);
