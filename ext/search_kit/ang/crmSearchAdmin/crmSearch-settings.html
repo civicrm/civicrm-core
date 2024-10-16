@@ -3,7 +3,7 @@
   <label class="sr-only" for="expires_date">{{:: ts('Search Expiry Date') }}</label>
   <div class="input-group">
     <div class="input-group-addon"><i class="crm-i fa-calendar-times-o"></i></div>
-    <input id="expires_date" class="form-control" crm-ui-datepicker="{time: true}" ng-model="$ctrl.savedSearch.expires_date" placeholder="Expires">
+    <input id="expires_date" class="form-control" crm-ui-datepicker="{time: true}" ng-model="$ctrl.savedSearch.expires_date" placeholder="{{:: ts('Expires') }}">
   </div>
 </div>
 <crm-search-admin-tags tag-ids="$ctrl.savedSearch.tag_id" class="btn-group btn-group-sm"></crm-search-admin-tags>
