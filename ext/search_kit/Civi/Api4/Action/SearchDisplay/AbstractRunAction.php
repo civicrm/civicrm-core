@@ -92,6 +92,12 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   private $currencyFields = [];
 
   /**
+   * @var array
+   *   Ex: ['civicrm/foo/bar?id=[id]&widget=gizmo' => 'CRMFooBar1234abcd1234abcd']
+   */
+  private $_qfKeys = [];
+
+  /**
    * Override execute method to change the result object type
    * @return \Civi\Api4\Result\SearchDisplayRunResult
    */
@@ -598,12 +604,16 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       $keys = ['task', 'text', 'title', 'icon', 'style'];
     }
     else {
+      $query = [];
+      if (($link['csrf'] ?? NULL) === 'qfKey') {
+        $query['qfKey'] = $this->getQfKey($link['path']);
+      }
       $path = $this->replaceTokens($link['path'], $data, 'url');
       if (!$path) {
         // Return null if `$link[path]` is empty or if any tokens do not resolve
         return NULL;
       }
-      $link['url'] = $this->getUrl($path);
+      $link['url'] = $this->getUrl($path, $query);
       $keys = ['url', 'text', 'title', 'target', 'icon', 'style', 'autoOpen'];
     }
     $link = array_intersect_key($link, array_flip($keys));
@@ -611,6 +621,31 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       // "0" is a valid title
       return $value || (is_string($value) && strlen($value));
     });
+  }
+
+  /**
+   * @param string $pathExpr
+   *   Path formula. Should specify an explicit path.
+   *   Ex: 'civicrm/foo/bar?id=[id]&widget=gizmo`
+   * @return string|null
+   */
+  private function getQfKey(string $pathExpr): ?string {
+    if (isset($this->_qfKeys[$pathExpr])) {
+      // No point re-computing this for 100x links per page-view - same value works.
+      return $this->_qfKeys[$pathExpr];
+    }
+
+    $result = NULL;
+    if ($routeName = parse_url($pathExpr, PHP_URL_PATH)) {
+      if ($routeItem = \CRM_Core_Menu::get($routeName)) {
+        if (!empty($routeItem['page_callback'])) {
+          $result = \CRM_Core_Key::get($routeItem['page_callback']);
+        }
+      }
+    }
+
+    $this->_qfKeys[$pathExpr] = $result;
+    return $result;
   }
 
   /**
@@ -812,6 +847,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   private function preprocessLink(array &$link): void {
     $link += [
       'path' => '',
+      'csrf' => NULL,
       'target' => '',
       'entity' => '',
       'text' => '',
