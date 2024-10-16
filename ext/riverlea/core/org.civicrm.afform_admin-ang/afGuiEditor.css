@@ -87,9 +87,6 @@
 #afGuiEditor-canvas .panel-heading > .pull-right {
     order: 3;
 }
-#afGuiEditor .panel-heading ul.nav-tabs li {
-    height: 101%;
-}
 #afGuiEditor .panel-heading ul.nav-tabs li.fluid-width-tab {
     white-space: nowrap;
     overflow: hidden;

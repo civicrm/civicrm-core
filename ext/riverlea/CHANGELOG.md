@@ -1,3 +1,6 @@
+1.0.0beta2
+ - ADDED padding to FormBuilder dashlets
+
 1.0.0beta
  - CHANGED fonts are in shared directory rather than streams' directory
  - REMOVED duplicate parts of Thames

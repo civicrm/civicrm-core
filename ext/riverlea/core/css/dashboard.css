@@ -68,6 +68,9 @@ crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
     padding: var(--crm-dashlet-content-padding);
     overflow: auto;
 }
+.crm-container .crm-dashlet-content > .ng-scope { /* for FormBuilder dashlets */
+    padding: var(--crm-dash-block-padding);
+}
 .crm-container .crm-dashlet details.crm-accordion-bold > .crm-accordion-body {
     padding: 0;
     border-bottom: var(--crm-expand-border);
