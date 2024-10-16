@@ -327,7 +327,8 @@ class Admin {
                   'description' => '',
                   'entity' => $targetEntityName,
                   'conditions' => self::getJoinConditions($keyField['name'], $alias . '.' . $reference->getTargetKey(), $dynamicValue, $dynamicCol),
-                  'defaults' => self::getJoinDefaults($alias, $targetEntity),
+                  // No default conditions for straight joins as they ought to be direct 1-1
+                  'defaults' => [],
                   'alias' => $alias,
                   'multi' => FALSE,
                 ];
@@ -506,28 +507,30 @@ class Admin {
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\NotImplementedException
    */
-  private static function getJoinDefaults(string $alias, ...$entities):array {
+  private static function getJoinDefaults(string $alias, ...$entities): array {
     $conditions = [];
     foreach ($entities as $entity) {
-      foreach ($entity['ui_join_filters'] ?? [] as $fieldName) {
-        $field = civicrm_api4($entity['name'], 'getFields', [
-          'select' => ['options', 'data_type'],
-          'where' => [['name', '=', $fieldName]],
+      if (!empty($entity['ui_join_filters'])) {
+        $filterFields = civicrm_api4($entity['name'], 'getFields', [
+          'select' => ['name', 'options', 'data_type'],
+          'where' => [['name', 'IN', $entity['ui_join_filters']]],
           'loadOptions' => ['name'],
-        ])->first();
-        $value = '';
-        if ($field['data_type'] === 'Boolean') {
-          $value = TRUE;
+        ])->indexBy('name');
+        foreach ($filterFields as $fieldName => $field) {
+          $value = '';
+          if ($field['data_type'] === 'Boolean') {
+            $value = TRUE;
+          }
+          elseif (isset($field['options'][0])) {
+            $fieldName .= ':name';
+            $value = json_encode($field['options'][0]['name']);
+          }
+          $conditions[] = [
+            $alias . '.' . $fieldName,
+            '=',
+            $value,
+          ];
         }
-        elseif (isset($field['options'][0])) {
-          $fieldName .= ':name';
-          $value = json_encode($field['options'][0]['name']);
-        }
-        $conditions[] = [
-          $alias . '.' . $fieldName,
-          '=',
-          $value,
-        ];
       }
     }
     return $conditions;
