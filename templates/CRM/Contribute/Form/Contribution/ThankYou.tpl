@@ -116,13 +116,18 @@
           {if !empty($auto_renew)} {* Auto-renew membership confirmation *}
             {crmRegion name="contribution-thankyou-recur-membership"}
               <br />
-              {if !$installments || $installments > 1}
                 {if $frequency_interval > 1}
-                  <strong>{ts 1=$frequency_interval 2=$frequency_unit}This membership will be renewed automatically every %1 %2(s).{/ts}</strong>
+                  {* dev/translation#80 All 'every %1' strings are incorrectly using ts, but focusing on the most important one until we find a better fix. *}
+                  {if $frequency_unit eq 'day'}
+                    <strong>{ts 1=$frequency_interval 2=$frequency_unit}This membership will be renewed automatically every %1 days.{/ts}</strong>
+                  {elseif $frequency_unit eq 'week'}
+                    <strong>{ts 1=$frequency_interval 2=$frequency_unit}This membership will be renewed automatically every %1 weeks.{/ts}</strong>
+                  {elseif $frequency_unit eq 'month'}
+                    <strong>{ts 1=$frequency_interval 2=$frequency_unit}This membership will be renewed automatically every %1 months.{/ts}</strong>
+                  {elseif $frequency_unit eq 'year'}
+                    <strong>{ts 1=$frequency_interval 2=$frequency_unit}This membership will be renewed automatically every %1 years.{/ts}</strong>
+                  {/if}
                 {else}
-                  <strong>{ts 1=$frequency_unit}This membership will be renewed automatically every %1.{/ts}</strong>
-                {/if}
-              {else}
                   {* dev/translation#80 All 'every %1' strings are incorrectly using ts, but focusing on the most important one until we find a better fix. *}
                   {if $frequency_unit eq 'day'}
                     <strong>{ts}This membership will be renewed automatically every day.{/ts}</strong>
@@ -133,14 +138,22 @@
                   {elseif $frequency_unit eq 'year'}
                     <strong>{ts}This membership will be renewed automatically every year.{/ts}</strong>
                   {/if}
-              {/if}
+                {/if}
               <div class="description crm-auto-renew-cancel-info">({ts}You will receive an email receipt which includes information about how to cancel the auto-renewal option.{/ts})</div>
             {/crmRegion}
           {else}
             {crmRegion name="contribution-thankyou-recur"}
               {if $installments > 1}
                 {if $frequency_interval > 1}
-                  <p><strong>{ts 1=$frequency_interval 2=$frequency_unit 3=$installments}This recurring contribution will be automatically processed every %1 %2s for a total %3 installments (including this initial contribution).{/ts}</strong></p>
+                  {if $frequency_unit eq 'day'}
+                    <p><strong>{ts 1=$frequency_interval 2=$frequency_unit 3=$installments}This recurring contribution will be automatically processed every %1 days for a total %3 installments (including this initial contribution).{/ts}</strong></p>
+                  {elseif $frequency_unit eq 'week'}
+                    <p><strong>{ts 1=$frequency_interval 2=$frequency_unit 3=$installments}This recurring contribution will be automatically processed every %1 weeks for a total %3 installments (including this initial contribution).{/ts}</strong></p>
+                  {elseif $frequency_unit eq 'month'}
+                    <p><strong>{ts 1=$frequency_interval 2=$frequency_unit 3=$installments}This recurring contribution will be automatically processed every %1 months for a total %3 installments (including this initial contribution).{/ts}</strong></p>
+                  {elseif $frequency_unit eq 'year'}
+                    <p><strong>{ts 1=$frequency_interval 2=$frequency_unit 3=$installments}This recurring contribution will be automatically processed every %1 years for a total %3 installments (including this initial contribution).{/ts}</strong></p>
+                  {/if}
                 {else}
                   <p><strong>{ts 1=$frequency_unit 2=$installments}This recurring contribution will be automatically processed every %1 for a total %2 installments (including this initial contribution).{/ts}</strong></p>
                 {/if}
