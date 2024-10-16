@@ -110,7 +110,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
         CRM_Core_Action::COPY => [
           'name' => ts('Copy'),
           'url' => 'civicrm/admin/uf/group',
-          'qs' => 'action=copy&gid=%%id%%',
+          'qs' => 'action=copy&gid=%%id%%&qfKey=%%key%%',
           'title' => ts('Make a Copy of CiviCRM Profile Group'),
           'extra' => 'onclick = "return confirm(\'' . $copyExtra . '\');"',
           'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::COPY),
@@ -175,6 +175,11 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
         $this->preview($id, $action);
       }
       elseif ($action & CRM_Core_Action::COPY) {
+        $key = $_POST['qfKey'] ?? $_GET['qfKey'] ?? $_REQUEST['qfKey'] ?? NULL;
+        $k = CRM_Core_Key::validate($key, CRM_Utils_System::getClassName($this));
+        if (!$k) {
+          $this->invalidKey();
+        }
         $this->copy();
       }
       // finally browse the uf groups
@@ -332,7 +337,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
       $ufGroup[$id]['group_type'] = self::formatGroupTypes($groupTypes);
 
       $ufGroup[$id]['action'] = CRM_Core_Action::formLink(self::actionLinks(), $action,
-        ['id' => $id],
+        ['id' => $id, 'key' => CRM_Core_Key::get(CRM_Utils_System::getClassName($this))],
         ts('more'),
         FALSE,
         'ufGroup.row.actions',

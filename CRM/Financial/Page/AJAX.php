@@ -142,6 +142,11 @@ class CRM_Financial_Page_AJAX {
   public static function assignRemove() {
     $op = CRM_Utils_Type::escape($_POST['op'], 'String');
     $recordBAO = CRM_Utils_Type::escape($_POST['recordBAO'], 'String');
+    $key = CRM_Utils_Request::retrieveValue('qfKey', 'String');
+    $k = CRM_Core_Key::validate($key, 'CRM_Financial_Page_AJAX');
+    if (!$k) {
+      CRM_Utils_JSON::output(['status' => 'invalid key']);
+    }
     foreach ($_POST['records'] as $record) {
       $recordID = CRM_Utils_Type::escape($record, 'Positive', FALSE);
       if ($recordID) {
