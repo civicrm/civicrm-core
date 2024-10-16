@@ -77,56 +77,72 @@
         {if $is_recur}
           {if !empty($auto_renew)} {* Auto-renew membership confirmation *}
             {crmRegion name="contribution-confirm-recur-membership"}
-              <br/>
-              <p>
-                <strong>
-                  {if $autoRenewOption == 1}
-                    {ts 1=$frequency_interval 2=$frequency_unit}I want this membership to be renewed automatically every %1 %2(s).{/ts}
-                  {elseif $autoRenewOption == 2}
-                    {ts 1=$frequency_interval 2=$frequency_unit}This membership will be renewed automatically every %1 %2(s).{/ts}
+              <br />
+                {if $frequency_interval > 1}
+                  {* dev/translation#80 All 'every %1' strings are incorrectly using ts, but focusing on the most important one until we find a better fix. *}
+                  {if $frequency_unit eq 'day'}
+                    <strong>{ts 1=$frequency_interval 2=$frequency_unit}This membership will be renewed automatically every %1 days.{/ts}</strong>
+                  {elseif $frequency_unit eq 'week'}
+                    <strong>{ts 1=$frequency_interval 2=$frequency_unit}This membership will be renewed automatically every %1 weeks.{/ts}</strong>
+                  {elseif $frequency_unit eq 'month'}
+                    <strong>{ts 1=$frequency_interval 2=$frequency_unit}This membership will be renewed automatically every %1 months.{/ts}</strong>
+                  {elseif $frequency_unit eq 'year'}
+                    <strong>{ts 1=$frequency_interval 2=$frequency_unit}This membership will be renewed automatically every %1 years.{/ts}</strong>
                   {/if}
-                </strong>
-              </p>
-              <div class="description crm-auto-renew-cancel-info">
-                ({ts}Your initial membership fee will be processed once you complete the confirmation step. You will be able to cancel the auto-renewal option by visiting the web page link that will be included in your receipt.{/ts}
-                )
-              </div>
+                {else}
+                  {* dev/translation#80 All 'every %1' strings are incorrectly using ts, but focusing on the most important one until we find a better fix. *}
+                  {if $frequency_unit eq 'day'}
+                    <strong>{ts}This membership will be renewed automatically every day.{/ts}</strong>
+                  {elseif $frequency_unit eq 'week'}
+                    <strong>{ts}This membership will be renewed automatically every week.{/ts}</strong>
+                  {elseif $frequency_unit eq 'month'}
+                    <strong>{ts}This membership will be renewed automatically every month.{/ts}</strong>
+                  {elseif $frequency_unit eq 'year'}
+                    <strong>{ts}This membership will be renewed automatically every year.{/ts}</strong>
+                  {/if}
+                {/if}
+              <div class="description crm-auto-renew-cancel-info">{ts}Your initial membership fee will be processed once you complete the confirmation step. You will be able to cancel the auto-renewal option by visiting the web page link that will be included in your receipt.{/ts}</div>
             {/crmRegion}
           {else}
             {crmRegion name="contribution-confirm-recur"}
-            {if $installments}
-              {if $frequency_interval > 1}
-                <p>
-                  <strong>{ts 1=$frequency_interval 2=$frequency_unit 3=$installments}I want to contribute this amount every %1 %2s for %3 installments.{/ts}</strong>
-                </p>
-              {else}
-                <p>
-                  <strong>{ts 1=$frequency_unit 2=$installments}I want to contribute this amount every %1 for %2 installments.{/ts}</strong>
-                </p>
-              {/if}
-            {else}
-              {if $frequency_interval > 1}
-                {if $frequency_unit eq 'day'}
-                  <p><strong>{ts 1=$frequency_interval}I want to contribute this amount every %1 days.{/ts}</strong></p>
-                {elseif $frequency_unit eq 'week'}
-                  <p><strong>{ts 1=$frequency_interval}I want to contribute this amount every %1 weeks.{/ts}</strong></p>
-                {elseif $frequency_unit eq 'month'}
-                  <p><strong>{ts 1=$frequency_interval}I want to contribute this amount every %1 months.{/ts}</strong></p>
-                {elseif $frequency_unit eq 'year'}
-                  <p><strong>{ts 1=$frequency_interval}I want to contribute this amount every %1 years.{/ts}</strong></p>
+              {if $installments > 1}
+                {if $frequency_interval > 1}
+                  {if $frequency_unit eq 'day'}
+                    <p><strong>{ts 1=$frequency_interval 2=$frequency_unit 3=$installments}This recurring contribution will be automatically processed every %1 days for a total %3 installments (including this initial contribution).{/ts}</strong></p>
+                  {elseif $frequency_unit eq 'week'}
+                    <p><strong>{ts 1=$frequency_interval 2=$frequency_unit 3=$installments}This recurring contribution will be automatically processed every %1 weeks for a total %3 installments (including this initial contribution).{/ts}</strong></p>
+                  {elseif $frequency_unit eq 'month'}
+                    <p><strong>{ts 1=$frequency_interval 2=$frequency_unit 3=$installments}This recurring contribution will be automatically processed every %1 months for a total %3 installments (including this initial contribution).{/ts}</strong></p>
+                  {elseif $frequency_unit eq 'year'}
+                    <p><strong>{ts 1=$frequency_interval 2=$frequency_unit 3=$installments}This recurring contribution will be automatically processed every %1 years for a total %3 installments (including this initial contribution).{/ts}</strong></p>
+                  {/if}
+                {else}
+                  <p><strong>{ts 1=$frequency_unit 2=$installments}This recurring contribution will be automatically processed every %1 for a total %2 installments (including this initial contribution).{/ts}</strong></p>
                 {/if}
               {else}
-                {if $frequency_unit eq 'day'}
-                  <p><strong>{ts}I want to contribute this amount every day.{/ts}</strong></p>
-                {elseif $frequency_unit eq 'week'}
-                  <p><strong>{ts}I want to contribute this amount every week.{/ts}</strong></p>
-                {elseif $frequency_unit eq 'month'}
-                  <p><strong>{ts}I want to contribute this amount every month.{/ts}</strong></p>
-                {elseif $frequency_unit eq 'year'}
-                  <p><strong>{ts}I want to contribute this amount every year.{/ts}</strong></p>
+                {if $frequency_interval > 1}
+                  {if $frequency_unit eq 'day'}
+                    <p><strong>{ts 1=$frequency_interval}This recurring contribution will be automatically processed every %1 days.{/ts}</strong></p>
+                  {elseif $frequency_unit eq 'week'}
+                    <p><strong>{ts 1=$frequency_interval}This recurring contribution will be automatically processed every %1 weeks.{/ts}</strong></p>
+                  {elseif $frequency_unit eq 'month'}
+                    <p><strong>{ts 1=$frequency_interval}This recurring contribution will be automatically processed every %1 months.{/ts}</strong></p>
+                  {elseif $frequency_unit eq 'year'}
+                    <p><strong>{ts 1=$frequency_interval}This recurring contribution will be automatically processed every %1 years.{/ts}</strong></p>
+                  {/if}
+                {else}
+                  {* dev/translation#32 All 'every %1' strings are incorrectly using ts, but focusing on the most important one until we find a better fix. *}
+                  {if $frequency_unit eq 'day'}
+                    <p><strong>{ts}This contribution will be automatically processed every day.{/ts}</strong></p>
+                  {elseif $frequency_unit eq 'week'}
+                    <p><strong>{ts}This contribution will be automatically processed every week.{/ts}</strong></p>
+                  {elseif $frequency_unit eq 'month'}
+                    <p><strong>{ts}This contribution will be automatically processed every month.{/ts}</strong></p>
+                  {elseif $frequency_unit eq 'year'}
+                    <p><strong>{ts}This contribution will be automatically processed every year.{/ts}</strong></p>
+                  {/if}
                 {/if}
               {/if}
-            {/if}
             <p>{ts}Your initial contribution will be processed once you complete the confirmation step. You will be able to cancel the recurring contribution by visiting the web page link that will be included in your receipt.{/ts}</p>
             {/crmRegion}
           {/if}
