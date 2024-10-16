@@ -166,7 +166,7 @@ function _financialacls_civicrm_get_type_clause(): string {
  */
 function _financialacls_civicrm_get_accessible_financial_types(): array {
   $types = [];
-  CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types);
+  CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types, CRM_Core_Action::VIEW, FALSE, TRUE);
   if (empty($types)) {
     $types = [0];
   }
