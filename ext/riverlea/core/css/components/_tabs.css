@@ -4,7 +4,7 @@
 .crm-container .crm-search-nav-tabs,
 .crm-container .afadmin-list .nav.nav-tabs { /* entire tab region */
     border: var(--crm-tabs-border);
-    border-radius: var(--crm-roundness);
+    border-radius: var(--crm-tabs-radius);
     margin-bottom: var(--crm-r1);
 }
 .crm-container .ui-widget-header,
@@ -13,7 +13,7 @@
     font-family: var(--crm-font);
     background: var(--crm-tabs-bg);
     border: 0 solid transparent;
-    border-radius: var(--crm-roundness) var(--crm-roundness) 0 0;
+    border-radius: var(--crm-tabs-radius) var(--crm-tabs-radius) 0 0;
     border-bottom: var(--crm-tabs-border);
     margin: 0;
     display: flex;

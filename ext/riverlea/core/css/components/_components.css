@@ -302,6 +302,10 @@ table.advmultiselect {
 .crm-container .panel-danger > .panel-heading a {
 	color: var(--crm-c-alert);
 }
+.crm-container .panel:has(.nav.nav-tabs) {
+    border: var(--crm-tabs-border);
+    border-radius: var(--crm-tabs-radius);
+}
 
 /* Badges - from BS3 */
 

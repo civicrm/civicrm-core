@@ -1,5 +1,13 @@
 1.0.0beta2
  - ADDED padding to FormBuilder dashlets
+ - ADDED tabs border fixes to FormBuilder, and SK/FB listings
+ - FIXED inconsistent tabs display
+ - FIXED bold font setting for extensions list accordion
+ - FIXED transparent background for tabs
+ - ADDED separate styling for the 'danger' delete links in dropdowns, created Thames override for default
+ - NEW CSS VARIABLE
+    --crm-tabs-radius
+    --crm-dropdown-alert-bg
 
 1.0.0beta
  - CHANGED fonts are in shared directory rather than streams' directory

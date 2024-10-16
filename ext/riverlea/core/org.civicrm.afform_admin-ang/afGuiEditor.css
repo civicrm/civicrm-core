@@ -49,6 +49,7 @@
 #afGuiEditor .af-gui-remove-entity,
 #afGuiEditor .af-gui-field-select-in-dropdown button /* icon-only buttons */ {
 	padding: 0;
+    margin: 0;
     max-height: 32px;
     aspect-ratio: 1 / 1;
 }
@@ -67,13 +68,15 @@
 }
 
 /* Panel */
-#afGuiEditor .panel-heading {
+#afGuiEditor-canvas .panel-heading {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border-bottom: var(--crm-tabs-border);
 }
-#afGuiEditor .panel-heading > .nav-tabs {
+#afGuiEditor-canvas .panel-heading > .nav-tabs {
     width: auto;
+    border-bottom: 0;
 }
 #afGuiEditor-canvas .panel-heading > .af-gui-canvas-control-buttons,
 #afGuiEditor-canvas .panel-heading > .pull-right,
@@ -93,6 +96,7 @@
 }
 #afGuiEditor .panel-heading .form-inline.pull-right button {
     max-height: 32px;
+    margin: 0;
 }
 #afGuiEditor .panel-body {
     padding: var(--crm-padding-reg);
@@ -620,14 +624,6 @@ i.crm-i.af-gui-conditional-dialog-move-icon {
 #afGuiEditor-palette-config .af-gui-entity-palette .input-group .btn,
 #afGuiEditor-canvas-body .af-gui-field-input .input-group .btn {
 	padding: var(--crm-s) var(--crm-m1);
-}
-#afGuiEditor  .af-gui-bar .dropdown-menu a:has(.text-danger) {
-    display: flex;
-    justify-content: center;
-    background: var(--crm-c-alert);
-}
-#afGuiEditor  .af-gui-bar .dropdown-menu .text-danger {
-    color:var(--crm-c-alert-text);
 }
 #afGuiEditor .af-gui-field-input-type-select .input-group .dropdown-menu {
     width: 100%;

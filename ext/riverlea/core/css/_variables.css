@@ -280,6 +280,7 @@
 --crm-tabs-bg: var(--crm-c-background4);
 --crm-tabs-padding: var(--crm-s);
 --crm-tabs-border: var(--crm-dash-border);
+--crm-tabs-radius: var(--crm-roundness);
 --crm-tabs-gap: var(--crm-s);
 --crm-tab-bg: var(--crm-c-background2);
 --crm-tab-bg-hover: var(--crm-c-page-background);
@@ -382,6 +383,7 @@
 --crm-dropdown-hover-bg: var(--crm-c-page-background);
 --crm-dropdown-border: 0;
 --crm-dropdown-width: 180px;
+--crm-dropdown-alert-bg: var(--crm-c-alert); /* for delete links in dropdowns */
 --crm-dropdown-2-bg: var(--crm-c-secondary);
 --crm-dropdown-2-col: var(--crm-c-text);
 --crm-dropdown-2-padding: var(--crm-padding-small);

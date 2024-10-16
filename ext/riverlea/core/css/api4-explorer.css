@@ -13,6 +13,7 @@
 }
 .api4-explorer-row > .panel {
     margin: 0;
+    background: var(--crm-panel-background);
 }
 .api4-explorer-page .panel-heading {
     /* height: 48px; */
@@ -89,6 +90,9 @@
 }
 
 /* Results panel */
+.crm-container .explorer-result-panel > .panel-heading {
+    border-bottom: var(--crm-tabs-border);
+}
 .explorer-result-panel .form-inline.pull-right {
 	order: 2;
 	justify-content: end;
@@ -96,6 +100,10 @@
 .explorer-result-panel .panel-heading .nav-tabs {
 	width: 100%;
 	align-self: end;
+    border-bottom: 0;
+}
+.explorer-result-panel .nav-tabs i.fa-circle-o {
+    display: none;
 }
 
 /* From original file, unsure of use, leaving intact for now */

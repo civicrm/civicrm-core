@@ -91,7 +91,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-c-secondary-hover-text: var(--crm-c-light-text); /* thames todo */
 --crm-c-success: var(--crm-c-green-dark);
 --crm-c-success-text: var(--crm-c-light-text);
---crm-c-alert: var(--crm-c-red-dark);
+--crm-c-alert: var(--crm-c-red); /* thames */
 --crm-c-alert-text: var(--crm-c-red-dark);
 --crm-c-warning: var(--crm-c-amber-light);
 --crm-c-warning-text: var(--crm-c-light-text);
@@ -440,6 +440,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-dropdown-hover-bg: var(--crm-c-blue-light); /* thames */
 --crm-dropdown-border: 0;
 --crm-dropdown-width: 23ch; /* thames */
+--crm-dropdown-alert-bg: transparent; /* thames */
 --crm-dropdown-2-bg: var(--crm-c-secondary);
 --crm-dropdown-2-col: var(--crm-c-text);
 --crm-dropdown-2-padding: var(--crm-padding-small);

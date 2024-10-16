@@ -404,6 +404,17 @@
 	}
 }
 
+/* Dropdown alert links */
+
+#afGuiEditor  .af-gui-bar .dropdown-menu a:has(.text-danger) {
+    display: flex;
+    justify-content: center;
+    background: var(--crm-dropdown-alert-bg);
+}
+#afGuiEditor  .af-gui-bar .dropdown-menu .text-danger {
+    color:var(--crm-c-alert-text);
+}
+
 /* JsTree Dropdown - all of Vakata Context, from jstree/dist has to be overwritten with !important */
 
 .vakata-context {

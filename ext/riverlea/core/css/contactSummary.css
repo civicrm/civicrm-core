@@ -267,7 +267,7 @@ div.crm-inline-edit-form div.crm-clear {
     margin-bottom: .25em;
 }
 #crm-contact-actions-list a.delete {
-    background: var(--crm-c-alert);
+    background: var(--crm-dropdown-alert-bg);
     color: var(--crm-c-alert-text);
     border-radius: var(--crm-roundness);
 }

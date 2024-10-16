@@ -48,6 +48,7 @@
 	background-color: unset;
 	color: var(--crm-c-text);
 	font-weight: unset;
+  font-family: var(--crm-font);
 }
 .crm-container #extensions table.dataTable summary a,
 .crm-container #extensions-addnew table.dataTable summary a {
