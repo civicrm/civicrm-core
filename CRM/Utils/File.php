@@ -103,18 +103,47 @@ class CRM_Utils_File {
       throw new CRM_Core_Exception('Overly broad deletion');
     }
 
+    $target = rtrim($target, '/' . DIRECTORY_SEPARATOR);
+
+    if (!file_exists($target) && !is_link($target)) {
+      return;
+    }
+
+    if (!is_dir($target)) {
+      CRM_Core_Session::setStatus(ts('cleanDir() can only remove directories. %1 is not a directory.', [1 => $target]), ts('Warning'), 'error');
+      return;
+    }
+
+    if (is_link($target) /* it's a directory based on a symlink... no need to recurse... */) {
+      if ($rmdir) {
+        static::try_unlink($target, 'symlink');
+      }
+      return;
+    }
+
     if ($dh = @opendir($target)) {
       while (FALSE !== ($sibling = readdir($dh))) {
         if (!in_array($sibling, $exceptions)) {
           $object = $target . DIRECTORY_SEPARATOR . $sibling;
-
-          if (is_dir($object)) {
-            CRM_Utils_File::cleanDir($object, $rmdir, $verbose);
+          if (is_link($object)) {
+            // Strangely, symlinks to directories under Windows need special treatment
+            if (PHP_OS_FAMILY === "Windows" && is_dir($object)) {
+              if (!rmdir($object)) {
+                CRM_Core_Session::setStatus(ts('Unable to remove directory symlink %1', [1 => $object]), ts('Warning'), 'error');
+              }
+            }
+            else {
+              CRM_Utils_File::try_unlink($object, "symlink");
+            }
+          }
+          elseif (is_dir($object)) {
+            CRM_Utils_File::cleanDir($object, TRUE, $verbose);
           }
           elseif (is_file($object)) {
-            if (!unlink($object)) {
-              CRM_Core_Session::setStatus(ts('Unable to remove file %1', [1 => $object]), ts('Warning'), 'error');
-            }
+            CRM_Utils_File::try_unlink($object, "file");
+          }
+          else {
+            CRM_Utils_File::try_unlink($object, "other filesystem object");
           }
         }
       }
@@ -131,6 +160,15 @@ class CRM_Utils_File {
           CRM_Core_Session::setStatus(ts('Unable to remove directory %1', [1 => $target]), ts('Warning'), 'error');
         }
       }
+    }
+  }
+
+  /**
+   * Helper function to avoid repetition in cleanDir: execute unlink and produce a warning on failure.
+   */
+  private static function try_unlink($object, $description) {
+    if (!unlink($object)) {
+      CRM_Core_Session::setStatus(ts('Unable to remove %1 %2', [1 => $description, 2 => $object]), ts('Warning'), 'error');
     }
   }
 

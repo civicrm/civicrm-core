@@ -158,6 +158,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
 
     $cases = [];
     try {
+      $_SERVER['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest';
       CRM_Case_Page_AJAX::getCases();
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
@@ -205,6 +206,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
 
     $cases = [];
     try {
+      $_SERVER['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest';
       CRM_Case_Page_AJAX::getCases();
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {

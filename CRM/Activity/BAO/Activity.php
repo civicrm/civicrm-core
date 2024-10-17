@@ -727,7 +727,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       if (!empty($activity['source_contact_id']) &&
         CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $activity['source_contact_id'], 'is_deleted')
       ) {
-        $activities[$id]['source_contact_name'] = sprintf("<del>%s<del>", $activity['source_contact_name']);
+        $activities[$id]['source_contact_name'] = sprintf("<del>%s<del>", htmlentities($activity['source_contact_name']));
       }
       $activities[$id]['is_recurring_activity'] = CRM_Core_BAO_RecurringEntity::getParentFor($id, 'civicrm_activity');
     }
@@ -2354,7 +2354,7 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
               FALSE,
               $values['source_contact_id']);
           }
-          $activity['source_contact_name'] = $srcTypeImage . CRM_Utils_System::href($values['source_contact_name'],
+          $activity['source_contact_name'] = $srcTypeImage . CRM_Utils_System::href(htmlentities($values['source_contact_name']),
               'civicrm/contact/view', "reset=1&cid={$values['source_contact_id']}");
         }
         else {
