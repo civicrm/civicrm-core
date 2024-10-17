@@ -8,6 +8,7 @@
  */
 
 // this file should always be in the project root
+global $appRootPath;
 $appRootPath = __DIR__;
 
 // standard file structure with top-level private, public and extensions dirs.

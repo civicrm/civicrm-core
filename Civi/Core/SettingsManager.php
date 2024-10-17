@@ -487,6 +487,12 @@ class SettingsManager {
       // TODO: should we complain here if there are inconsistent defines
       // from elsewhere?
     }
+
+    // without this cv crashes trying to (re)load CRM/Core/ClassLoader.php
+    // @ \Civi\Cv\Bootstrap::boot
+    // TODO: teach cv not to worry about reloading it if it doesn't need to
+    global $civicrm_root;
+    $civicrm_root = dirname(__FILE__, 3);
   }
 
 }
