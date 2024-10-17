@@ -1,3 +1,8 @@
+1.0.0beta3
+ - REMOVED narrow front-end form width for all Streams other than Hackney
+ - FIXED inline edit button alignment for SearchKit output
+ - CHANGED readme.
+
 1.0.0beta2
  - ADDED padding to FormBuilder dashlets
  - ADDED tabs border fixes to FormBuilder, and SK/FB listings

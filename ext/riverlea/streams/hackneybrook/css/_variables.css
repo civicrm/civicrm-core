@@ -53,7 +53,7 @@
     --crm-btn-success-text: var(--crm-c-text);
     --crm-btn-alert-bg: var(--crm-c-primary);
     --crm-btn-alert-text: var(--crm-c-text);
-    --crm-btn-icon-bg: var(--crm-c-background2);
+    --crm-btn-icon-bg: rgba(256,256,256,0.25);
     --crm-btn-icon-border: var(--crm-btn-border);
     --crm-btn-icon-padding: 0px;
 
@@ -151,4 +151,5 @@
     /* Frontend */
     --crm-f-legend-align: ;
     --crm-f-legend-size: var(--crm-r2);
+    --crm-f-form-width: 50vw;
     }

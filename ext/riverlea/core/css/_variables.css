@@ -283,8 +283,8 @@
 --crm-tabs-radius: var(--crm-roundness);
 --crm-tabs-gap: var(--crm-s);
 --crm-tab-bg: var(--crm-c-background2);
---crm-tab-bg-hover: var(--crm-c-page-background);
---crm-tab-bg-active: var(--crm-c-page-background);
+--crm-tab-bg-hover: var(--crm-c-background);
+--crm-tab-bg-active: var(--crm-c-background);
 --crm-tab-hang: 0; /* lip to extend tab flush with active region - set to 0 for no lip */
 --crm-tab-padding: var(--crm-s3) var(--crm-m) var(--crm-s) var(--crm-m);
 --crm-tab-col: var(--crm-c-text);
@@ -325,7 +325,7 @@
 --crm-dash-box-shadow: 0;
 --crm-dash-heading-inset: ;
 --crm-dash-panel-padding: var(--crm-m);
---crm-dash-panel-bg: transparent;
+--crm-dash-panel-bg: #fff;
 --crm-dash-panel-border: 0;
 --crm-dash-panel-radius: 0 0 var(--crm-dash-roundness) var(--crm-dash-roundness);
 --crm-dash-edit-border: 2px dashed var(--crm-c-gray-300);
@@ -427,7 +427,7 @@
 --crm-filter-spacing: start; /* choose 'space-between' to spread out evenly, or 'end' to right align. */
 
 /* Frontend */
---crm-f-form-width: 700px;
+--crm-f-form-width:;
 --crm-f-box-shadow: var(--crm-block-shadow);
 --crm-f-fieldset-bg: var(--crm-c-background);
 --crm-f-fieldset-padding: var(--crm-r);
@@ -444,7 +444,7 @@
 --crm-f-input-radius: var(--crm-roundness);
 --crm-f-input-padding: var(--crm-r2) var(--crm-m2);
 --crm-f-input-font-size: var(--crm-r1);
---crm-f-input-width: auto;
+--crm-f-input-width: 300px;
 --crm-f-form-focus-bg: var(--crm-c-green);
 --crm-f-form-error-bg: var(--crm-c-red);
 --crm-f-logo-height: 40px;

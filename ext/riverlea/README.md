@@ -7,6 +7,10 @@ Theme architecture for CiviCRM that separates visual/UI CSS from structural CSS 
  - Thames, named after the river that runs close to Artful Robot HQ, based on their Aah theme.
  You can chose between these subthemes via Display Settings
 
+ ## Use in Front-End CiviCRM
+
+**USE AT YOUR OWN RISK.** While RiverLea has been widely tested in the backend of CiviCRM, front-end pages have had minimal testing so far, and given the wide number of themes and scenarios that front-end pages need to integrate with, this will take time. For this reason, while RiverLea should work fine applied to the front-end of a new CiviCRM website, for existing sites we would recommend only applying it  on a Dev site, or with extensive testing of your front-end Civi layouts. Overwriting CSS variables for the front is straightforward (they can be nested within `.crm-container.crm-public` and there's a number of front-end specific variables, prefixed `--crm-f-`), but **testing is essential**.
+
 The extension is licensed under [AGPL-3.0](LICENSE.txt).
 
 ## [Changelog](CHANGELOG.md)
@@ -74,16 +78,12 @@ Contains CSS files in:
 - ~~Darkmode~~.
 - ~~Migrate Finsbury Park~~ (and others) to a stream.
 - ~~Tidy/simplify Bootstrap~~
-- Merge Thames
-- Merge Wellow
-- Minimal customiser
+- ~~Merge Thames~~
 - ~~Test creating separate extension with RiverLea as parent theme.~~
-- Create minimal 'inherit everything' front-end theme.
-- Better documentation.
-
-## Use in Front-End CiviCRM
-
-USE AT YOUR OWN RISK. While RiverLea has been widely tested in the backend of CiviCRM, front-end pages have had minimal testing so far, and given the wide number of themes and scenarios front-end pages need to integrate with, this will take time. For this reason while RiverLea works fine when applied to the front-end of new CiviCRM websites, for existing sites we would recommend only applying to the front on a Dev site or with extensive testing of your front-end screens. Overwriting CSS variables for the front is straightforward (they can be nested within `.crm-container.crm-public` and there's a number of front-end specific variables, prefixed `--crm-f-`), but testing is essential.
+- v1.x - Responsive testing
+- v1.x - Merge Wellow
+- v1.x - Minimal customiser
+- v1.x - Better documentation
 
 ## Creating new 'streams'
 

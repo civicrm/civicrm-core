@@ -83,7 +83,7 @@ body.page-civicrm .breadcrumb__link {
     --crm-page-padding: 3rem;
     --crm-page-width: calc(100% - var(--crm-page-padding) - var(--crm-page-padding));
 }
-#block-claro-content .crm-container .form-item,
+#block-claro-content .crm-container:not(.crm-public) .form-item,
 #block-claro-content .crm-container p,
 #block-claro-content .crm-container .help p,
 #block-claro-content .crm-container .button {

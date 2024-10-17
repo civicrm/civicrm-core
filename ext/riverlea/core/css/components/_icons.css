@@ -2,7 +2,7 @@
     padding: 0 var(--crm-m) var(--crm-s) 0;
     float: left;
 }
-.crm-container button.btn-xs:has(.fa-times),
+.crm-container div:not(.crm-search-display-editable-buttons) > button.btn-xs:has(.fa-times),
 .crm-container .crm-hover-button:has(.crm-i),
 .crm-container .crm-hover-button:has(.crm-i):hover,
 .crm-container .crm-hover-button:has(.crm-i):focus {

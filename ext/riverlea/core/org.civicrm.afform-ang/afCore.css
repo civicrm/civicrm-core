@@ -81,3 +81,9 @@ af-form {
 .afform-directive:hover .af-admin-edit-form-link {
     opacity: 1;
 }
+
+/* Fieldset */
+
+fieldset.af-container.af-layout-inline {
+    border: 0;
+}

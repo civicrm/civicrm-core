@@ -10,14 +10,12 @@
 .crm-search-display.crm-search-display-table td > crm-search-display-editable,
 .crm-search-display.crm-search-display-table td > .crm-editable-disabled,
 .crm-search-display.crm-search-display-table td > .crm-editable-enabled {
-  display: block !important;
+  display: inline-block;
 }
-.crm-search-display crm-search-display-editable {
-  position: relative;
+crm-search-display-editable .form-inline,
+.crm-dashlet .crm-search-display crm-search-display-editable .form-inline {
+  padding:0;
 }
-.crm-search-display .crm-search-display-editable-buttons {
-  position: absolute;
-  bottom: -24px;
-  left: 0;
-  min-width: 50px;
+.crm-search-display-editable-buttons button {
+  padding: var(--crm-padding-small) !important;
 }
