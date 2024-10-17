@@ -29,6 +29,10 @@
         $scope.fieldId = _.kebabCase(ctrl.fieldName) + '-' + id++;
 
         $element.addClass('af-field-type-' + _.kebabCase(ctrl.defn.input_type));
+  
+        if (this.defn.input_attrs && this.defn.input_attrs.multiple) {
+          $element.addClass('af-field-type-multiple');
+        }
 
         if (this.defn.name !== this.fieldName) {
           namePrefix = this.fieldName.substr(0, this.fieldName.length - this.defn.name.length);
