@@ -273,7 +273,10 @@ abstract class CRM_Import_Parser implements UserJobInterface {
    */
   protected function getImportFieldsForEntity(string $entity): array {
     return (array) civicrm_api4($entity, 'getFields', [
-      'where' => [['usage', 'CONTAINS', 'import']],
+      'where' => [
+        ['usage', 'CONTAINS', 'import'],
+        ['type', '!=', 'Custom'],
+      ],
     ])->indexBy('name');
   }
 
