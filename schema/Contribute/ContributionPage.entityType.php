@@ -52,6 +52,7 @@ return [
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'required' => TRUE,
+      'default_fallback' => ['title'],
       'localizable' => TRUE,
       'description' => ts('Contribution Page Public title'),
       'add' => '5.20',
@@ -88,7 +89,8 @@ return [
       'pseudoconstant' => [
         'table' => 'civicrm_financial_type',
         'key_column' => 'id',
-        'label_column' => 'name',
+        'label_column' => 'label',
+        'condition_provider' => ['CRM_Financial_BAO_FinancialType', 'alterIncomeFinancialTypes'],
       ],
       'entity_reference' => [
         'entity' => 'FinancialType',
@@ -155,7 +157,7 @@ return [
       'add' => '2.1',
       'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_TRIMMED,
       'input_attrs' => [
-        'multiple' => '1',
+        'multiple' => TRUE,
       ],
       'pseudoconstant' => [
         'option_group_name' => 'recur_frequency_units',
@@ -433,6 +435,7 @@ return [
       'input_type' => 'EntityRef',
       'description' => ts('FK to civicrm_contact, who created this contribution page'),
       'add' => '3.0',
+      'default_callback' => ['CRM_Core_Session', 'getLoggedInContactID'],
       'input_attrs' => [
         'label' => ts('Created By'),
       ],
@@ -447,6 +450,9 @@ return [
       'sql_type' => 'datetime',
       'input_type' => 'Select Date',
       'description' => ts('Date and time that contribution page was created.'),
+      'required' => TRUE,
+      'readonly' => TRUE,
+      'default' => 'CURRENT_TIMESTAMP',
       'add' => '3.0',
     ],
     'currency' => [
@@ -462,6 +468,7 @@ return [
         'label_column' => 'full_name',
         'name_column' => 'name',
         'abbr_column' => 'symbol',
+        'description_column' => 'IFNULL(CONCAT(name, " (", symbol, ")"), name)',
       ],
     ],
     'campaign_id' => [

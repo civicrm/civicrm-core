@@ -6,7 +6,7 @@ use Civi\Test\TransactionalInterface;
 use Civi\Api4\User;
 
 /**
- * FIXME - Add test description.
+ * Test Security flows in Standalone
  *
  * Tips:
  *  - With HookInterface, you may implement CiviCRM hooks directly in the test class.
@@ -52,7 +52,6 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
   }
 
   protected function loginUser($userID) {
-    $security = Security::singleton();
     $user = \Civi\Api4\User::get(FALSE)
       ->addWhere('id', '=', $userID)
       ->execute()->first();
@@ -63,8 +62,8 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
       'uf_id' => $user['id'],
     ])['values'][0]['contact_id'] ?? NULL;
     $this->assertNotNull($contactID);
-    /** @var \Civi\Standalone\Security $security */
-    $security->loginAuthenticatedUserRecord($user, FALSE);
+
+    \CRM_Core_Config::singleton()->userSystem->loadUser($user['username']);
   }
 
   public function testCheckPassword():void {
@@ -75,8 +74,8 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
       ->execute()->single();
 
     // Test that the password can be checked ok.
-    $this->assertTrue($security->checkPassword('secret1', $user['hashed_password']));
-    $this->assertFalse($security->checkPassword('some other password', $user['hashed_password']));
+    $this->assertTrue((bool) $security->checkPassword($user['username'], 'secret1'));
+    $this->assertFalse((bool) $security->checkPassword($user['username'], 'some other password'));
   }
 
   public function testPerms() {
@@ -209,7 +208,7 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
 
     $this->assertEquals(1, $result['success']);
     $user = User::get(FALSE)->addWhere('id', '=', $userID)->execute()->single();
-    $this->assertTrue($security->checkPassword('fingersCrossed', $user['hashed_password']));
+    $this->assertTrue((bool) $security->checkPassword($user['username'], 'fingersCrossed'));
 
     // Should not work a 2nd time with same token.
     try {
@@ -236,12 +235,6 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     // Fake an expired token
     $token = $this->storeFakePasswordResetToken($userID, time() - 1);
     $this->assertNull($security->checkPasswordResetToken($token));
-  }
-
-  public function testGetUserIDFromUsername() {
-    [$contactID, $adminUserID, $security] = $this->createFixtureContactAndUser();
-    $this->assertEquals($adminUserID, $security->getUserIDFromUsername('user_one'), 'Should return admin user ID');
-    $this->assertNull($security->getUserIDFromUsername('user_unknown'), 'Should return NULL for non-existent user');
   }
 
   protected function deleteStuffWeMade() {

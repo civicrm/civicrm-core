@@ -57,6 +57,9 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch implements \Civi\Core\Hook
         $event->params['title'] = $event->params['name'] ?? self::generateBatchName();
       }
     }
+    if ($event->action === 'edit') {
+      $event->params['modified_id'] ??= CRM_Core_Session::getLoggedInContactID();
+    }
   }
 
   /**
@@ -155,7 +158,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch implements \Civi\Core\Hook
 
     // get batch totals for open batches
     $fetchTotals = [];
-    $batchStatus = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id', ['labelColumn' => 'name']);
+    $batchStatus = CRM_Batch_DAO_Batch::buildOptions('status_id', 'validate');
     $batchStatus = [
       array_search('Open', $batchStatus),
       array_search('Reopened', $batchStatus),
@@ -252,9 +255,9 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch implements \Civi\Core\Hook
       $links = $obj->links();
     }
 
-    $batchTypes = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'type_id');
-    $batchStatus = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id');
-    $batchStatusByName = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id', ['labelColumn' => 'name']);
+    $batchTypes = CRM_Batch_DAO_Batch::buildOptions('type_id');
+    $batchStatus = CRM_Batch_DAO_Batch::buildOptions('status_id');
+    $batchStatusByName = CRM_Batch_DAO_Batch::buildOptions('status_id', 'validate');
     $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
 
     $results = [];
@@ -367,7 +370,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch implements \Civi\Core\Hook
   public static function whereClause($params) {
     $clauses = [];
     // Exclude data-entry batches
-    $batchStatus = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id', ['labelColumn' => 'name']);
+    $batchStatus = CRM_Batch_DAO_Batch::buildOptions('status_id', 'validate');
     if (empty($params['status_id'])) {
       $clauses['status_id'] = ['NOT IN' => ["Data Entry"]];
     }
@@ -440,7 +443,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch implements \Civi\Core\Hook
           'url' => 'civicrm/financial/batch',
           'qs' => 'reset=1&action=update&id=%%id%%&context=1',
           'title' => ts('Edit Batch'),
-          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::EDIT),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
         ],
         'close' => [
           'name' => ts('Close'),
@@ -626,11 +629,8 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch implements \Civi\Core\Hook
    * @param $status
    */
   public static function closeReOpen($batchIds, $status) {
-    $batchStatus = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id');
+    $batchStatus = CRM_Batch_DAO_Batch::buildOptions('status_id');
     $params['status_id'] = CRM_Utils_Array::key($status, $batchStatus);
-    $session = CRM_Core_Session::singleton();
-    $params['modified_date'] = date('YmdHis');
-    $params['modified_id'] = $session->get('userID');
     foreach ($batchIds as $id) {
       $params['id'] = $id;
       self::writeRecord($params);

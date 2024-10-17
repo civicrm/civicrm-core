@@ -77,7 +77,7 @@ class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
     $this->assign('email', $email);
     $this->_email = $email;
 
-    $groups = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing($job_id, $queue_id, $hash, TRUE);
+    $groups = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing(NULL, $queue_id, $hash, TRUE);
     $this->assign('groups', $groups ?? []);
     $groupExist = NULL;
     foreach ($groups as $value) {
@@ -95,7 +95,7 @@ class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
   }
 
   public function buildQuickForm() {
-    CRM_Utils_System::addHTMLHead('<META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">');
+    CRM_Utils_System::setNoRobotsFlag();
     $this->setTitle(ts('Unsubscribe Confirmation'));
 
     $buttons = [
@@ -119,7 +119,7 @@ class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
     CRM_Core_Session::singleton()->pushUserContext($confirmURL);
 
     // Email address verified
-    $groups = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing($this->_job_id, $this->_queue_id, $this->_hash);
+    $groups = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing(NULL, $this->_queue_id, $this->_hash);
 
     if (!empty($groups)) {
       CRM_Mailing_Event_BAO_MailingEventUnsubscribe::send_unsub_response($this->_queue_id, $groups, FALSE, $this->_job_id);

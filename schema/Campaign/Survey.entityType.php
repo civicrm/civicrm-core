@@ -86,6 +86,7 @@ return [
       ],
       'pseudoconstant' => [
         'option_group_name' => 'activity_type',
+        'condition_provider' => ['CRM_Campaign_BAO_Survey', 'alterActivityTypes'],
       ],
     ],
     'instructions' => [
@@ -154,6 +155,7 @@ return [
       'input_type' => 'EntityRef',
       'description' => ts('FK to civicrm_contact, who created this Survey.'),
       'add' => '3.3',
+      'default_callback' => ['CRM_Core_Session', 'getLoggedInContactID'],
       'input_attrs' => [
         'label' => ts('Created By'),
       ],
@@ -168,6 +170,13 @@ return [
       'sql_type' => 'datetime',
       'input_type' => 'Select Date',
       'description' => ts('Date and time that Survey was created.'),
+      'required' => TRUE,
+      'readonly' => TRUE,
+      'default' => 'CURRENT_TIMESTAMP',
+      'input_attrs' => [
+        'format_type' => 'activityDateTime',
+        'label' => ts('Created Date'),
+      ],
       'add' => '3.3',
     ],
     'last_modified_id' => [
@@ -176,6 +185,7 @@ return [
       'input_type' => 'EntityRef',
       'description' => ts('FK to civicrm_contact, who recently edited this Survey.'),
       'add' => '3.3',
+      'default_callback' => ['CRM_Core_Session', 'getLoggedInContactID'],
       'input_attrs' => [
         'label' => ts('Modified By'),
       ],
@@ -190,6 +200,9 @@ return [
       'sql_type' => 'datetime',
       'input_type' => 'Select Date',
       'description' => ts('Date and time that Survey was edited last time.'),
+      'required' => TRUE,
+      'readonly' => TRUE,
+      'default' => 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
       'add' => '3.3',
     ],
     'result_id' => [

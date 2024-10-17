@@ -109,7 +109,7 @@ class CRM_Contribute_Form_ContributionPage_ThankYou extends CRM_Contribute_Form_
       $params['bcc_receipt'] = NULL;
     }
 
-    $dao = CRM_Contribute_BAO_ContributionPage::create($params);
+    CRM_Contribute_BAO_ContributionPage::writeRecord($params);
     parent::endPostProcess();
   }
 

@@ -602,7 +602,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     }
 
     if ($this->_ufGroupID) {
-      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+      $locationTypes = CRM_Core_DAO_Address::buildOptions('location_type_id');
 
       $names = [];
       static $skipFields = ['group', 'tag'];
@@ -690,7 +690,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
         elseif (strpos($property, '-im')) {
           $row[$property] = $result->$property;
           if (!empty($result->$property)) {
-            $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
+            $imProviders = CRM_Core_DAO_IM::buildOptions('provider_id');
             $providerId = $property . "-provider_id";
             $providerName = $imProviders[$result->$providerId];
             $row[$property] = $result->$property . " ({$providerName})";
@@ -716,7 +716,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
           $propertyArray = explode('-', $property);
           $websiteFld = $websiteKey . '-' . array_pop($propertyArray);
           if (!empty($result->$websiteFld)) {
-            $websiteTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id');
+            $websiteTypes = CRM_Core_DAO_Website::buildOptions('website_type_id');
             $websiteType = $websiteTypes[$result->{"$websiteKey-website_type_id"}];
             $websiteValue = $result->$websiteFld;
             $websiteUrl = "<a href=\"{$websiteValue}\">{$websiteValue}  ({$websiteType})</a>";

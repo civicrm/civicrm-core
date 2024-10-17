@@ -48,6 +48,26 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     $this->callAPISuccessGetSingle('Participant', ['id' => $form->getParticipantID()]);
   }
 
+  public function testSubmitWithExistingParticipant(): void {
+    $submittedValues = [
+      'register_date' => date('Ymd'),
+      'status_id' => 1,
+      'role_id' => [CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'role_id', 'Attendee')],
+    ];
+    $form = $this->getForm([], $submittedValues)->postProcess();
+    $this->assertEquals($this->getEventID(), $form->getEventID());
+    $this->callAPISuccessGetSingle('Participant', ['id' => $form->getParticipantID()]);
+
+    $this->getTestForm('CRM_Event_Form_Participant',
+      $submittedValues + [
+        'event_id' => $this->getEventID(),
+        'contact_id' => $this->getContactID(),
+      ],
+      ['action' => 'add']
+    )->processForm(FormWrapper::VALIDATED);
+    $this->assertValidationError(['event_id' => "This contact has already been assigned to this event."]);
+  }
+
   public function testSubmitDualRole(): void {
     $this->getForm([], [
       'status_id' => 1,

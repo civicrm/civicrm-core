@@ -2290,6 +2290,14 @@ div.crm-master-accordion-header a.helpicon {
   display: none;
 }
 
+/* Ex: Advanced Search (but not limited to) */
+.crm-container details.crm-accordion-settings summary {
+  text-align: right;
+}
+.crm-container details.crm-accordion-settings summary::before {
+  content: '\f013';
+}
+
 .crm-container details details {
   padding: 0 0.25rem; /* adds padding for nested accordions */
 }
@@ -2311,7 +2319,7 @@ div.crm-master-accordion-header a.helpicon {
 .crm-container details > summary:before {
   font-family: "FontAwesome";
   display: inline-block;
-  width: 1em;
+  padding-right: 0.5rem;
   content: "\f0da";
   font-size: 13px;
 }
@@ -4004,17 +4012,8 @@ span.crm-status-icon {
 
 /* Standalone-only styles. A minimal set to make it usable out-of-the-box. */
 html.crm-standalone body {
-  --sa-font-family: sans-serif;
-  --roundness: 3px;
-  --error-colour: #a00;
-  --warning-colour: #fbb862;
-  --success-colour: #86c66c;
-  --label-colour: #464354;
-  --background-colour: rgb(242,242,237);
-  --box-padding: 1.6rem;
-  --box-background: #fff;
   margin: 0;
   padding: 0;
-  font-family: var(--sa-font-family);
-  background-color: var(--background-colour);
+  font-family: var(--crm-font, sans-serif);
+  background-color: var(--crm-c-page-background, #f8f8f8);
 }

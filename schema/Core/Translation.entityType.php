@@ -40,7 +40,7 @@ return [
       'description' => ts('Table where referenced item is stored'),
       'add' => '5.39',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_BAO_Translation::getEntityTables',
+        'callback' => ['CRM_Core_BAO_Translation', 'getEntityTables'],
       ],
     ],
     'entity_field' => [
@@ -51,7 +51,7 @@ return [
       'description' => ts('Field where referenced item is stored'),
       'add' => '5.39',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_BAO_Translation::getEntityFields',
+        'callback' => ['CRM_Core_BAO_Translation', 'getEntityFields'],
       ],
     ],
     'entity_id' => [
@@ -88,7 +88,7 @@ return [
       'add' => '5.39',
       'default' => 1,
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_BAO_Translation::getStatuses',
+        'callback' => ['CRM_Core_BAO_Translation', 'getStatuses'],
       ],
     ],
     'string' => [

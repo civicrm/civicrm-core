@@ -210,6 +210,13 @@ abstract class SqlExpression {
   }
 
   /**
+   * Get value serialization method if any.
+   */
+  public function getSerialize(): ?int {
+    return NULL;
+  }
+
+  /**
    * @return string
    */
   abstract public static function getTitle(): string;

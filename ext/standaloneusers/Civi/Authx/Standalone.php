@@ -19,33 +19,48 @@ class Standalone implements AuthxInterface {
    * @inheritDoc
    */
   public function checkPassword(string $username, string $password) {
-    $security = Security::singleton();
-    $user = $security->loadUserByName($username);
-    return $security->checkPassword($password, $user['hashed_password'] ?? '') ? $user['id'] : NULL;
+    return Security::singleton()->checkPassword($username, $password);
   }
 
   /**
    * @inheritDoc
    */
   public function loginSession($userId) {
-    $user = Security::singleton()->loadUserByID($userId);
-    Security::singleton()->loginAuthenticatedUserRecord($user, TRUE);
+    $this->loginStateless($userId);
+
+    $session = \CRM_Core_Session::singleton();
+    $session->set('ufID', $userId);
+
+    // Identify the contact
+    $user = \Civi\Api4\User::get(FALSE)
+      ->addWhere('id', '=', $userId)
+      ->execute()
+      ->single();
+
+    // Confusingly, Civi stores it's *Contact* ID as *userID* on the session.
+    $session->set('userID', $user['contact_id'] ?? NULL);
+
+    if (!empty($user['language'])) {
+      $session->set('lcMessages', $user['language']);
+    }
   }
 
   /**
    * @inheritDoc
    */
   public function logoutSession() {
+    global $loggedInUserId;
+    $loggedInUserId = NULL;
     \CRM_Core_Session::singleton()->reset();
-    session_destroy();
+    // session_destroy();
   }
 
   /**
    * @inheritDoc
    */
   public function loginStateless($userId) {
-    $user = Security::singleton()->loadUserByID($userId);
-    Security::singleton()->loginAuthenticatedUserRecord($user, FALSE);
+    global $loggedInUserId;
+    $loggedInUserId = $userId;
   }
 
   /**

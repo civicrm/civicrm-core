@@ -89,7 +89,7 @@ class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
         CRM_Core_Action::COPY => [
           'name' => ts('Copy'),
           'url' => 'civicrm/admin/job/edit',
-          'qs' => 'action=copy&id=%%id%%',
+          'qs' => 'action=copy&id=%%id%%&qfKey=%%key%%',
           'title' => ts('Copy Scheduled Job'),
           'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::COPY),
         ],
@@ -122,6 +122,11 @@ class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
     );
 
     if (($this->_action & CRM_Core_Action::COPY) && (!empty($this->_id))) {
+      $key = $_POST['qfKey'] ?? $_GET['qfKey'] ?? $_REQUEST['qfKey'] ?? NULL;
+      $k = CRM_Core_Key::validate($key, CRM_Utils_System::getClassName($this));
+      if (!$k) {
+        $this->invalidKey();
+      }
       try {
         $jobResult = civicrm_api3('Job', 'clone', ['id' => $this->_id]);
         if ($jobResult['count'] > 0) {
@@ -176,7 +181,7 @@ class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
       }
 
       $job->action = CRM_Core_Action::formLink($this->links(), $action,
-        ['id' => $job->id],
+        ['id' => $job->id, 'key' => CRM_Core_Key::get(CRM_Utils_System::getClassName($this))],
         ts('more'),
         FALSE,
         'job.manage.action',

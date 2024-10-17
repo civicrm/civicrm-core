@@ -91,7 +91,7 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
     if ($this->groupID) {
       $this->callAPISuccess('group', 'delete', ['id' => $this->groupID]);
     }
-    $this->quickCleanup(['civicrm_contact'], TRUE);
+    $this->quickCleanup(['civicrm_contact', 'civicrm_address'], TRUE);
     CRM_Core_DAO::executeQuery("DELETE r FROM civicrm_dedupe_rule_group rg INNER JOIN civicrm_dedupe_rule r ON rg.id = r.dedupe_rule_group_id WHERE rg.is_reserved = 0 AND used = 'General'");
     CRM_Core_DAO::executeQuery("DELETE FROM civicrm_dedupe_rule_group WHERE is_reserved = 0 AND used = 'General'");
 
@@ -117,10 +117,10 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
           'county_id' => 'County',
           'geo_code_1' => 'Latitude',
           'geo_code_2' => 'Longitude',
-          'master_id' => 'Master Address ID',
+          'master_id' => 'Master Address Belongs To',
           'postal_code' => 'Postal Code',
           'postal_code_suffix' => 'Postal Code Suffix',
-          'state_province_id' => 'State',
+          'state_province_id' => 'State/Province',
           'street_address' => 'Street Address',
           'supplemental_address_1' => 'Supplemental Address 1',
           'supplemental_address_2' => 'Supplemental Address 2',
@@ -139,10 +139,10 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
           'do_not_trade' => 'Do Not Trade',
           'email_greeting_custom' => 'Email Greeting Custom',
           'external_identifier' => 'External Identifier',
-          'image_URL' => 'Image Url',
+          'image_URL' => 'Image',
           'legal_identifier' => 'Legal Identifier',
           'nick_name' => 'Nickname',
-          'is_opt_out' => 'No Bulk Emails (User Opt Out)',
+          'is_opt_out' => 'Is Opt Out',
           'postal_greeting_custom' => 'Postal Greeting Custom',
           'preferred_communication_method' => 'Preferred Communication Method',
           'preferred_language' => 'Preferred Language',
@@ -153,7 +153,7 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
       'civicrm_email' =>
         [
           'email' => 'Email',
-          'signature_html' => 'Signature Html',
+          'signature_html' => 'Signature HTML',
           'signature_text' => 'Signature Text',
         ],
       'civicrm_im' =>
@@ -170,7 +170,7 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
         ],
       'civicrm_phone' =>
         [
-          'phone_numeric' => 'Phone',
+          'phone_numeric' => 'Phone (Numbers only)',
           'phone_ext' => 'Phone Extension',
         ],
       'civicrm_website' =>
@@ -182,15 +182,15 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
       'Organization' => [
         'legal_name' => 'Legal Name',
         'organization_name' => 'Organization Name',
-        'sic_code' => 'Sic Code',
+        'sic_code' => 'SIC Code',
       ],
       'Individual' => [
         'birth_date' => 'Birth Date',
-        'is_deceased' => 'Deceased',
+        'is_deceased' => 'Is Deceased',
         'deceased_date' => 'Deceased Date',
         'first_name' => 'First Name',
         'formal_title' => 'Formal Title',
-        'gender_id' => 'Gender ID',
+        'gender_id' => 'Gender',
         'prefix_id' => 'Individual Prefix',
         'suffix_id' => 'Individual Suffix',
         'job_title' => 'Job Title',
@@ -245,13 +245,14 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
   public function testSupportedCustomFields(): void {
     //Create custom group with fields of all types to test.
     $this->createCustomGroup(['extends' => 'Organization']);
-
     $customGroupID = $this->ids['CustomGroup']['Custom Group'];
     $customField = $this->createTextCustomField(['custom_group_id' => $customGroupID]);
 
-    $fields = $this->getSupportedFields('Organization');
-    $fields[$this->getCustomGroupTable()][$customField['column_name']] = 'Custom Group' . ' : ' . $customField['label'];
+    $this->createCustomGroupWithFieldOfType(['extends' => 'Address'], 'text', 'address_');
 
+    $fields = $this->getSupportedFields('Organization');
+    $fields[$this->getCustomGroupTable()][$customField['column_name']] = 'Custom Group: ' . $customField['label'];
+    $fields[$this->getCustomGroupTable('address_')] = [$this->getCustomFieldColumnName('address_text') => 'address_Group with field text: Enter text here'];
     $this->assertEquals($fields, CRM_Dedupe_BAO_DedupeRuleGroup::supportedFields('Organization'));
   }
 
@@ -272,7 +273,7 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
     $cf = $this->createTextCustomField(['custom_group_id' => $customGroupID]);
 
     $fields = $this->getSupportedFields('Organization');
-    $fields[$this->getCustomGroupTable()][$cf['column_name']] = 'Custom Group' . ' : ' . $cf['label'];
+    $fields[$this->getCustomGroupTable()][$cf['column_name']] = 'Custom Group: ' . $cf['label'];
 
     $this->assertEquals($fields, CRM_Dedupe_BAO_DedupeRuleGroup::supportedFields('Organization'));
   }

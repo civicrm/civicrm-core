@@ -133,7 +133,7 @@ return [
       'pseudoconstant' => [
         'table' => 'civicrm_financial_type',
         'key_column' => 'id',
-        'label_column' => 'name',
+        'label_column' => 'label',
       ],
       'entity_reference' => [
         'entity' => 'FinancialType',
@@ -183,6 +183,7 @@ return [
       ],
       'pseudoconstant' => [
         'option_group_name' => 'payment_instrument',
+        'condition_provider' => ['CRM_Contribute_BAO_Contribution', 'alterPaymentInstrument'],
       ],
     ],
     'receive_date' => [
@@ -317,6 +318,7 @@ return [
         'label_column' => 'full_name',
         'name_column' => 'name',
         'abbr_column' => 'symbol',
+        'description_column' => 'IFNULL(CONCAT(name, " (", symbol, ")"), name)',
       ],
     ],
     'cancel_date' => [
@@ -464,6 +466,7 @@ return [
       ],
       'pseudoconstant' => [
         'option_group_name' => 'contribution_status',
+        'condition_provider' => ['CRM_Contribute_BAO_Contribution', 'alterStatus'],
       ],
     ],
     'address_id' => [

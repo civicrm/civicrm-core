@@ -28,11 +28,6 @@ class FormattingUtil {
   ];
 
   /**
-   * @var string[]
-   */
-  public static $pseudoConstantSuffixes = ['name', 'abbr', 'label', 'color', 'description', 'icon', 'grouping', 'url'];
-
-  /**
    * Massage values into the format the BAO expects for a write operation
    *
    * @param array $params
@@ -126,11 +121,9 @@ class FormattingUtil {
     }
 
     // Special handling for 'current_user' and user lookups
-    if ($fk === 'Contact' && isset($value) && !is_numeric($value)) {
-      $value = \_civicrm_api3_resolve_contactID($value);
-      if ('unknown-user' === $value) {
-        throw new \CRM_Core_Exception("\"{$fieldSpec['name']}\" \"{$value}\" cannot be resolved to a contact ID", 2002, ['error_field' => $fieldSpec['name'], "type" => "integer"]);
-      }
+    $exactMatch = [NULL, '=', '!=', '<>', 'IN', 'NOT IN'];
+    if (is_string($fk) && CoreUtil::isContact($fk) && in_array($operator, $exactMatch, TRUE)) {
+      $value = self::resolveContactID($fieldSpec['name'], $value);
     }
 
     switch ($fieldSpec['data_type'] ?? NULL) {
@@ -280,6 +273,29 @@ class FormattingUtil {
   }
 
   /**
+   * Get options associated with an entity field
+   *
+   * @return void
+   * @throws \CRM_Core_Exception
+   */
+  public static function getFieldOptions(array &$field, array $values = [], bool $includeDisabled = FALSE, bool $checkPermissions = FALSE, ?int $userId = NULL): ?array {
+    $fieldName = $field['name'];
+    $entityName = $field['entity'];
+    $customGroupName = CoreUtil::getCustomGroupName($entityName);
+    if ($customGroupName) {
+      $entityName = \CRM_Core_BAO_CustomGroup::getEntityForGroup($customGroupName);
+      $fieldName = $customGroupName . '.' . $fieldName;
+    }
+    // TODO: Teach Civi::entity to return contact-type pseudo-entities
+    elseif (CoreUtil::isContact($entityName)) {
+      $entityName = 'Contact';
+    }
+
+    $entity = \Civi::entity($entityName);
+    return $entity->getOptions($fieldName, $values, $includeDisabled, $checkPermissions, $userId);
+  }
+
+  /**
    * Retrieves pseudoconstant option list for a field.
    *
    * @param array $field
@@ -296,22 +312,21 @@ class FormattingUtil {
     $context = self::$pseudoConstantContexts[$valueType] ?? NULL;
     // For create actions, only unique identifiers can be used.
     // For get actions any valid suffix is ok.
-    if (($action === 'create' && !$context) || !in_array($valueType, self::$pseudoConstantSuffixes, TRUE)) {
+    if (($action === 'create' && !$context) || !array_key_exists($valueType, \CRM_Core_SelectValues::optionAttributes())) {
       throw new \CRM_Core_Exception('Illegal expression');
     }
-    $baoName = $context ? CoreUtil::getBAOFromApiName($field['entity']) : NULL;
-    // Use BAO::buildOptions if possible
-    if ($baoName) {
-      $fieldName = empty($field['custom_field_id']) ? $field['name'] : 'custom_' . $field['custom_field_id'];
-      $entityValues = self::filterByPath($values, $fieldPath, $field['name']);
-      $entityValues['check_permissions'] = FALSE;
-      $options = $baoName::buildOptions($fieldName, $context, $entityValues);
+
+    $entityValues = self::filterByPath($values, $fieldPath, $field['name']);
+    try {
+      $options = self::getFieldOptions($field, $entityValues, TRUE);
     }
-    // Fallback for option lists that exist in the api but not the BAO
-    if (!isset($options) || $options === FALSE) {
-      $options = civicrm_api4($field['entity'], 'getFields', ['checkPermissions' => FALSE, 'action' => $action, 'loadOptions' => ['id', $valueType], 'where' => [['name', '=', $field['name']]]])[0]['options'] ?? NULL;
-      $options = $options ? array_column($options, $valueType, 'id') : $options;
+    catch (\CRM_Core_Exception $e) {
+      // Entity not in Civi (api-only) will use fallback below
     }
+    // Fallback for option lists that only exist in the api but not in core
+    $options ??= civicrm_api4($field['entity'], 'getFields', ['checkPermissions' => FALSE, 'action' => $action, 'loadOptions' => ['id', $valueType], 'where' => [['name', '=', $field['name']]]])[0]['options'] ?? NULL;
+
+    $options = $options ? array_column($options, $valueType, 'id') : $options;
     if (is_array($options)) {
       return $options;
     }
@@ -438,7 +453,7 @@ class FormattingUtil {
           \Civi::$statics[__CLASS__][__FUNCTION__][$contactType][] = $field['name'];
           // Include suffixed variants like prefix_id:label
           if (!empty($field['pseudoconstant'])) {
-            foreach (self::$pseudoConstantSuffixes as $suffix) {
+            foreach (array_keys(\CRM_Core_SelectValues::optionAttributes()) as $suffix) {
               \Civi::$statics[__CLASS__][__FUNCTION__][$contactType][] = $field['name'] . ':' . $suffix;
             }
           }
@@ -484,6 +499,30 @@ class FormattingUtil {
   public static function filterByPath(array $values, string $fieldPath, string $fieldName): array {
     $prefix = substr($fieldPath, 0, strrpos($fieldPath, $fieldName));
     return \CRM_Utils_Array::filterByPrefix($values, $prefix);
+  }
+
+  /**
+   * A contact ID field passed in to the API may contain values such as "user_contact_id"
+   *   which need to be resolved to the actual contact ID.
+   * This function resolves those strings to the actual contact ID or throws an exception on "unknown user"
+   *
+   * @param string $fieldName
+   * @param string|int|null $fieldValue
+   *
+   * @return int|null
+   * @throws \CRM_Core_Exception
+   */
+  public static function resolveContactID(string $fieldName, $fieldValue): ?int {
+    // Special handling for 'current_user' and user lookups
+    if (isset($fieldValue) && !is_numeric($fieldValue)) {
+      // FIXME decouple from v3 API
+      require_once 'api/v3/utils.php';
+      $fieldValue = \_civicrm_api3_resolve_contactID($fieldValue);
+      if ('unknown-user' === $fieldValue) {
+        throw new \CRM_Core_Exception("\"{$fieldName}\" \"{$fieldValue}\" cannot be resolved to a contact ID", 2002, ['error_field' => $fieldName, 'type' => 'integer']);
+      }
+    }
+    return $fieldValue;
   }
 
 }

@@ -108,7 +108,7 @@
   {/if}
 
   <tr class="crm-activity-form-block-location">
-    <td class="label">{$form.location.label}</td><td class="view-value">{$form.location.html|crmAddClass:huge}</td>
+    <td class="label">{$form.location.label}</td><td class="view-value">{$form.location.html|crmAddClass:huge nofilter}</td>
   </tr>
   <tr class="crm-activity-form-block-activity_date_time">
     <td class="label">{$form.activity_date_time.label}</td>
@@ -263,7 +263,7 @@
     {literal}
     <script type="text/javascript">
       CRM.$(function($) {
-        var doNotNotifyAssigneeFor = {/literal}{$doNotNotifyAssigneeFor|@json_encode}{literal};
+        var doNotNotifyAssigneeFor = {/literal}{$doNotNotifyAssigneeFor|@json_encode nofilter}{literal};
         $('#activity_type_id').change(function() {
           if ($.inArray($(this).val(), doNotNotifyAssigneeFor) != -1) {
             $('#notify_assignee_msg').hide();

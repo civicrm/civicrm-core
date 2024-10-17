@@ -126,7 +126,7 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
 
   /**
    * @param array $column
-   * @param array{fields: array, expr: SqlExpression, dataType: string} $expr
+   * @param array{fields: array, expr: \Civi\Api4\Query\SqlExpression, dataType: string} $expr
    * @return array
    */
   private function formatFieldSpec(array $column, array $expr): array {
@@ -140,19 +140,48 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
       'suffixes' => $suffix ? ['id', $suffix] : NULL,
       'options' => FALSE,
     ];
+    $field = \CRM_Utils_Array::first($expr['fields']);
+    $spec['original_field_name'] = $field['name'] ?? NULL;
+    $spec['original_field_entity'] = $field['entity'] ?? NULL;
     if ($expr['expr']->getType() === 'SqlField') {
-      $field = \CRM_Utils_Array::first($expr['fields']);
-      $spec['fk_entity'] = $field['fk_entity'] ?? NULL;
-      $spec['original_field_name'] = $field['name'];
-      $spec['original_field_entity'] = $field['entity'];
+      // An entity id counts as a FK
+      if (!$field['fk_entity'] && $field['name'] === CoreUtil::getIdFieldName($field['entity'])) {
+        $spec['entity_reference'] = [
+          'entity' => $field['entity'],
+        ];
+        $spec['input_type'] = 'EntityRef';
+      }
+      else {
+        $originalField = \Civi::entity($field['entity'])->getField($field['name']);
+        $spec['input_type'] = $originalField['input_type'] ?? NULL;
+        $spec['serialize'] = $originalField['serialize'] ?? NULL;
+        $spec['entity_reference'] = $originalField['entity_reference'] ?? NULL;
+      }
       if ($suffix) {
         // Options will be looked up by SKEntitySpecProvider::getOptionsForSKEntityField
         $spec['options'] = TRUE;
       }
     }
     elseif ($expr['expr']->getType() === 'SqlFunction') {
+      // For functions that have options, e.g. SqlFunctionDAYOFWEEK
       if ($suffix) {
         $spec['options'] = CoreUtil::formatOptionList($expr['expr']::getOptions(), $spec['suffixes']);
+        $spec['input_type'] = 'Select';
+      }
+      // For field options that pass through the function, e.g. SqlFunctionGROUP_CONCAT
+      elseif (!empty($field['suffixes']) && $spec['data_type'] === $field['data_type']) {
+        $spec['input_type'] = 'Select';
+        $spec['options'] = TRUE;
+        $spec['suffixes'] = $field['suffixes'];
+      }
+      else {
+        $spec['input_type'] = $this->getInputTypeFromDataType($spec['data_type']);
+      }
+      if ($expr['expr']->getSerialize()) {
+        $spec['serialize'] = $expr['expr']->getSerialize();
+      }
+      elseif ($spec['data_type'] === $field['data_type']) {
+        $spec['serialize'] = $field['serialize'] ?? NULL;
       }
     }
     return $spec;
@@ -160,21 +189,23 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
 
   /**
    * @param array $column
-   * @param array{fields: array, expr: SqlExpression, dataType: string} $expr
+   * @param array{fields: array, expr: \Civi\Api4\Query\SqlExpression, dataType: string} $expr
    * @return array
    */
   private function formatSQLSpec(array $column, array $expr): array {
-    // Try to use the exact sql column type as the original field
     $field = \CRM_Utils_Array::first($expr['fields']);
-    if (!empty($field['column_name']) && !empty($field['table_name'])) {
+    // Store serialized values as text
+    if ($expr['expr']->getSerialize()) {
+      $type = 'text';
+    }
+    // Try to use the exact sql column type as the original field
+    elseif (!empty($field['column_name']) && !empty($field['table_name']) && $field['data_type'] === $expr['dataType']) {
       $columns = \CRM_Core_DAO::executeQuery("DESCRIBE `{$field['table_name']}`")
         ->fetchMap('Field', 'Type');
       $type = $columns[$field['column_name']] ?? NULL;
     }
-    // If we can't get the exact data type from the column, take an educated guess
-    if (empty($type) ||
-      ($expr['expr']->getType() !== 'SqlField' && $field['data_type'] !== $expr['dataType'])
-    ) {
+    // If we can't get the data type from the column, take an educated guess
+    if (empty($type)) {
       $map = [
         'Array' => 'text',
         'Boolean' => 'tinyint',
@@ -184,6 +215,7 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
         'String' => 'text',
         'Text' => 'text',
         'Timestamp' => 'datetime',
+        'Money' => 'decimal(20,2)',
       ];
       $type = $map[$expr['dataType']] ?? $type;
     }
@@ -196,8 +228,7 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
     // Add FK indexes
     if ($expr['expr']->getType() === 'SqlField' && !empty($field['fk_entity'])) {
       $defn['fk_table_name'] = CoreUtil::getTableName($field['fk_entity']);
-      // FIXME look up fk_field_name from schema, don't assume it's always "id"
-      $defn['fk_field_name'] = 'id';
+      $defn['fk_field_name'] = $field['fk_column'];
       $defn['fk_attributes'] = ' ON DELETE SET NULL';
     }
     return $defn;
@@ -211,6 +242,21 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
       \CRM_Core_DAO_AllCoreTables::flush();
       \Civi::cache('metadata')->clear();
     }
+  }
+
+  private function getInputTypeFromDataType(string $dataType): ?string {
+    $dataTypeToInputType = [
+      'Array' => 'Text',
+      'Boolean' => 'Radio',
+      'Date' => 'Date',
+      'Float' => 'Number',
+      'Integer' => 'Number',
+      'Money' => 'Number',
+      'String' => 'Text',
+      'Text' => 'TextArea',
+      'Timestamp' => 'Date',
+    ];
+    return $dataTypeToInputType[$dataType] ?? NULL;
   }
 
   /**

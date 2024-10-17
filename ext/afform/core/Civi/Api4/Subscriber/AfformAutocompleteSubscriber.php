@@ -77,6 +77,7 @@ class AfformAutocompleteSubscriber extends AutoService implements EventSubscribe
     $formDataModel = new FormDataModel($afform['layout']);
     [$entityName, $joinEntity] = array_pad(explode('+', $entityName), 2, NULL);
     $entity = $formDataModel->getEntity($entityName);
+    $isId = FALSE;
 
     // If no model entity, it's a search display
     if (!$entity) {
@@ -88,7 +89,6 @@ class AfformAutocompleteSubscriber extends AutoService implements EventSubscribe
     // If using a join (e.g. Contact -> Email)
     elseif ($joinEntity) {
       $apiEntity = $joinEntity;
-      $isId = FALSE;
       $formField = $entity['joins'][$joinEntity]['fields'][$fieldName]['defn'] ?? [];
     }
     else {
@@ -137,7 +137,13 @@ class AfformAutocompleteSubscriber extends AutoService implements EventSubscribe
     }
     switch ($fieldName) {
       case 'autocompleteSavedSearch':
-        $apiRequest->addFilter('api_entity', $apiRequest->getFilters()['api_entity']);
+        if (CoreUtil::isContact($apiRequest->getFilters()['api_entity'])) {
+          $filter = ['Contact', $apiRequest->getFilters()['api_entity']];
+          $apiRequest->addFilter('api_entity', $filter);
+        }
+        else {
+          $apiRequest->addFilter('api_entity', $apiRequest->getFilters()['api_entity']);
+        }
         return;
 
       case 'autocompleteDisplay':

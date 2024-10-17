@@ -1195,6 +1195,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $userSortName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $userID,
         'sort_name'
       );
+      $userSortName = htmlentities($userSortName);
       $submittedValues['source'] = ts('Submit Credit Card Payment by: %1', [1 => $userSortName]);
     }
 

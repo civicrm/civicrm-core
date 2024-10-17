@@ -48,7 +48,7 @@
     {/if}
   {/if}{*End of isShowLocation condition*}
 
-  {if array_key_exists(1, $location.phone) || array(1, $location.email)}
+  {if !empty($location.phone.1.phone) || !empty($location.email.1.email)}
     <tr><td>{ts}Contact{/ts}</td>
         <td>
         {* loop on any phones and emails for this event *}

@@ -56,6 +56,7 @@ class FinancialTypeTest extends BaseTestClass {
             ]),
             'description' => ts('%1 contributions of type %2', [1 => $action_ts, 2 => $type]),
             'implied_by' => [ts('%1 contributions of all types', [1 => $action_ts])],
+            'parent' => $action_ts . ' contributions of all types',
           ],
           $permissions[$action . ' contributions of type ' . $type]
         );

@@ -131,6 +131,7 @@ return [
       'input_type' => 'EntityRef',
       'description' => ts('Contact responsible for creating this token'),
       'add' => '5.76',
+      'default_callback' => ['CRM_Core_Session', 'getLoggedInContactID'],
       'input_attrs' => [
         'label' => ts('Created By'),
       ],
@@ -147,6 +148,7 @@ return [
       'readonly' => TRUE,
       'description' => ts('FK to contact table.'),
       'add' => '5.76',
+      'default_callback' => ['CRM_Core_Session', 'getLoggedInContactID'],
       'input_attrs' => [
         'label' => ts('Modified By'),
       ],

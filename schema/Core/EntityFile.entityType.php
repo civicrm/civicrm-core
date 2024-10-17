@@ -41,7 +41,7 @@ return [
       'description' => ts('physical tablename for entity being joined to file, e.g. civicrm_contact'),
       'add' => '1.5',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_BAO_File::getEntityTables',
+        'callback' => ['CRM_Core_BAO_File', 'getEntityTables'],
       ],
     ],
     'entity_id' => [

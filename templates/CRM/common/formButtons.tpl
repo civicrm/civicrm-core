@@ -24,7 +24,7 @@
       {capture assign=linkname}name="{$linkButton.ref}"{/capture}
     {else}{capture assign=linkname}{if array_key_exists('name', $linkButton)}name="{$linkButton.name}"{/if}{/capture}
     {/if}
-    <a class="button{if array_key_exists('class', $linkButton)} {$linkButton.class}{/if}" {$linkname} href="{crmURL p=$linkButton.url q=$linkButton.qs}" {$accessKey} {if array_key_exists('extra', $linkButton)}{$linkButton.extra}>{/if}<span>{$icon|smarty:nodefaults}{$linkButton.title}</span></a>
+    <a class="button{if array_key_exists('class', $linkButton)} {$linkButton.class}{/if}" {$linkname} href="{crmURL p=$linkButton.url q=$linkButton.qs}" {$accessKey} {if array_key_exists('extra', $linkButton)}{$linkButton.extra}>{/if}<span>{$icon nofilter}{$linkButton.title}</span></a>
   {/foreach}
 {/if}
 {if $form}

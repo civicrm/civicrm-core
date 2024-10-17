@@ -59,7 +59,7 @@ class CRM_Contact_Form_Search_Custom_TagContributions extends CRM_Contact_Form_S
 
     $form->add('datepicker', 'start_date', ts('Contribution Date From'), [], FALSE, ['time' => FALSE]);
     $form->add('datepicker', 'end_date', ts('...through'), [], FALSE, ['time' => FALSE]);
-    $tag = ['' => ts('- any tag -')] + CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', ['onlyActive' => FALSE]);
+    $tag = ['' => ts('- any tag -')] + CRM_Core_DAO_EntityTag::buildOptions('tag_id', 'get');
     $form->addElement('select', 'tag', ts('Tagged'), $tag);
 
     /**

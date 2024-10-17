@@ -18,6 +18,12 @@ namespace Civi\Core;
 class SettingsMetadata {
 
   /**
+   * @var array
+   * Cache for boot settings metadata (which is used before Civi::cache is available)
+   */
+  protected static ?array $bootCache = NULL;
+
+  /**
    * WARNING: This interface may change.
    *
    * This provides information about the setting - similar to the fields concept for DAO information.
@@ -37,6 +43,10 @@ class SettingsMetadata {
    * @param int $domainID
    * @param bool|array $loadOptions
    *
+   * The final param optionally restricts to only boot-time settings
+   *
+   * @param bool $bootOnly - only
+   *
    * @return array
    *   the following information as appropriate for each setting
    *   - name
@@ -49,8 +59,30 @@ class SettingsMetadata {
    *   - help_text
    *   - options
    *   - pseudoconstant
+   *   - global_name (name for php constant / environment variable corresponding to this setting)
+   *   - is_env_loadable (whether this setting should be read from corresponding environment variable)
+   *   - is_constant (whether a PHP constant should be defined for this setting)
    */
-  public static function getMetadata($filters = [], $domainID = NULL, $loadOptions = FALSE) {
+  public static function getMetadata($filters = [], $domainID = NULL, $loadOptions = FALSE, $bootOnly = FALSE) {
+    $settingsMetadata = $bootOnly ? self::getBootMetadata() : self::getFullMetadata($domainID);
+
+    self::_filterSettingsSpecification($filters, $settingsMetadata);
+    if ($loadOptions) {
+      self::fillOptions($settingsMetadata, $loadOptions);
+    }
+
+    return $settingsMetadata;
+  }
+
+  /**
+   * Get the final metadata for all settings
+   *  - sources from extensions etc using alterSettingsFolders / alterSettingsMetadata hooks
+   *
+   * @param ?int $domainID
+   *
+   * @return array all settings metadata
+   */
+  protected static function getFullMetadata($domainID = NULL) {
     if ($domainID === NULL) {
       $domainID = \CRM_Core_Config::domainID();
     }
@@ -68,12 +100,19 @@ class SettingsMetadata {
       $cache->set($cacheString, $settingsMetadata);
     }
 
-    self::_filterSettingsSpecification($filters, $settingsMetadata);
-    if ($loadOptions) {
-      self::fillOptions($settingsMetadata, $loadOptions);
-    }
-
     return $settingsMetadata;
+  }
+
+  /**
+   * Get the starting metadata for boot settings from core. No hooks are called.
+   *
+   * @return array boot settings metadata
+   */
+  protected static function getBootMetadata() {
+    if (!is_array(self::$bootCache)) {
+      self::$bootCache = self::loadSettingsMetadata(dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'settings', '*.boot.setting.php');
+    }
+    return self::$bootCache;
   }
 
   /**
@@ -99,12 +138,13 @@ class SettingsMetadata {
    * Load up settings metadata from files.
    *
    * @param string $metaDataFolder
+   * @param string $filePattern
    *
    * @return array
    */
-  protected static function loadSettingsMetadata($metaDataFolder) {
+  protected static function loadSettingsMetadata($metaDataFolder, $filePattern = '*.setting.php') {
     $settingMetaData = [];
-    $settingsFiles = \CRM_Utils_File::findFiles($metaDataFolder, '*.setting.php');
+    $settingsFiles = \CRM_Utils_File::findFiles($metaDataFolder, $filePattern);
     foreach ($settingsFiles as $file) {
       $settings = include $file;
       $settingMetaData = array_merge($settingMetaData, $settings);

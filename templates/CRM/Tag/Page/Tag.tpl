@@ -9,7 +9,7 @@
 *}
 <div class="crm-content-block">
   <div class="help">
-    {ts 1=', '|implode:$usedFor}Tags are a convenient way to categorize data (%1).{/ts}
+    {ts 1=$usedForStr}Tags are a convenient way to categorize data (%1).{/ts}
     {crmPermission has='administer Tagsets'}
       <br />
       {ts}Create predefined tags in the main tree, or click the <strong>+</strong> to add a set for free tagging.{/ts}
@@ -23,7 +23,7 @@
         <a href="#tree"><i class="crm-i fa-tags" aria-hidden="true"></i> {ts}Tag Tree{/ts}</a>
       </li>
       {foreach from=$tagsets item=set}
-        <li class="ui-corner-all crm-tab-button {if ($set.is_reserved)}is-reserved{/if}" title="{ts 1=', '|implode:$set.used_for_label}Tag Set for %1{/ts}">
+        <li class="ui-corner-all crm-tab-button {if ($set.is_reserved)}is-reserved{/if}" title="{ts 1=$set.used_for_label_str}Tag Set for %1{/ts}">
           <a href="#tagset-{$set.id}">{$set.label}</a>
         </li>
       {/foreach}

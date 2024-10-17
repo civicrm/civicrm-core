@@ -342,7 +342,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
             'title' => ts('Activity Priority'),
             'type' => CRM_Utils_Type::T_STRING,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id'),
+            'options' => CRM_Activity_DAO_Activity::buildOptions('priority_id'),
           ],
         ],
         'order_bys' => [
@@ -932,8 +932,8 @@ GROUP BY civicrm_activity_id $having {$this->_orderBy}";
     $entryFound = FALSE;
     $activityType = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);
     $activityStatus = CRM_Core_PseudoConstant::activityStatus();
-    $priority = CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id');
-    $genders = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
+    $priority = CRM_Activity_DAO_Activity::buildOptions('priority_id');
+    $genders = CRM_Contact_DAO_Contact::buildOptions('gender_id');
     $viewLinks = FALSE;
 
     // Would we ever want to retrieve from the form controller??

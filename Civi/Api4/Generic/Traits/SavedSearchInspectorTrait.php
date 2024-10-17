@@ -58,7 +58,7 @@ trait SavedSearchInspectorTrait {
    * @throws UnauthorizedException
    * @throws \CRM_Core_Exception
    */
-  protected function loadSavedSearch(int $id = NULL) {
+  protected function loadSavedSearch(?int $id = NULL) {
     if ($id || is_string($this->savedSearch)) {
       $this->savedSearch = SavedSearch::get(FALSE)
         ->addWhere($id ? 'id' : 'name', '=', $id ?: $this->savedSearch)
@@ -227,6 +227,16 @@ trait SavedSearchInspectorTrait {
     // If the column is used for a groupBy, no
     if (in_array($fieldPath, $apiParams['groupBy'])) {
       return FALSE;
+    }
+
+    // If this is an implicit join, use the parent field
+    if (str_ends_with($fieldPath, '.' . $field['name'])) {
+      $baseFieldPath = substr($fieldPath, 0, -strlen('.' . $field['name']));
+      $baseField = $this->getField($baseFieldPath);
+      if ($baseField) {
+        $fieldPath = $baseFieldPath;
+        $field = $baseField;
+      }
     }
 
     // If the entity this column belongs to is being grouped by id, then also no

@@ -323,13 +323,12 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    */
   public function getImportEntities() : array {
     $softCreditTypes = ContributionSoft::getFields(FALSE)
-      ->setLoadOptions(['id', 'name', 'label', 'description', 'is_default'])
+      ->setLoadOptions(['id', 'name', 'label', 'description'])
       ->addWhere('name', '=', 'soft_credit_type_id')
-      ->selectRowCount()
       ->addSelect('options')->execute()->first()['options'];
-    $defaultSoftCreditTypeID = NULL;
+    $defaultSoftCreditTypeID = CRM_Core_OptionGroup::getDefaultValue('soft_credit_type');
     foreach ($softCreditTypes as &$softCreditType) {
-      if (empty($defaultSoftCreditTypeID) || $softCreditType['is_default']) {
+      if (empty($defaultSoftCreditTypeID)) {
         $defaultSoftCreditTypeID = $softCreditType['id'];
       }
       $softCreditType['text'] = $softCreditType['label'];

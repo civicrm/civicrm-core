@@ -14,14 +14,14 @@
     <url desc="Support">https://lab.civicrm.org/extensions/sequentialcreditnotes</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
-  <releaseDate>2024-07-04</releaseDate>
-  <version>5.77.alpha1</version>
+  <releaseDate>[civicrm.releaseDate]</releaseDate>
+  <version>[civicrm.version]</version>
   <tags>
     <tag>mgmt:hidden</tag>
   </tags>
   <develStage>stable</develStage>
   <compatibility>
-    <ver>5.77</ver>
+    <ver>[civicrm.majorVersion]</ver>
   </compatibility>
   <mixins>
     <mixin>setting-php@1.0.0</mixin>

@@ -31,7 +31,7 @@ return [
       'description' => ts('May contain civicrm_contribution, civicrm_participant or civicrm_membership'),
       'add' => '1.7',
       'pseudoconstant' => [
-        'callback' => 'CRM_Price_BAO_LineItem::entityTables',
+        'callback' => ['CRM_Price_BAO_LineItem', 'entityTables'],
       ],
     ],
     'entity_id' => [
@@ -161,7 +161,7 @@ return [
       'pseudoconstant' => [
         'table' => 'civicrm_financial_type',
         'key_column' => 'id',
-        'label_column' => 'name',
+        'label_column' => 'label',
       ],
       'entity_reference' => [
         'entity' => 'FinancialType',

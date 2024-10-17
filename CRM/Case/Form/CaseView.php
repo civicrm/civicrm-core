@@ -470,6 +470,10 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
         ];
         $tagSetTags[$tag['tag_id.parent_id']]['items'][] = $tag['tag_id.label'];
       }
+      // Add a displayable string version of the items
+      foreach ($tagSetTags as $tagIndex => $tagData) {
+        $tagSetTags[$tagIndex]['itemsStr'] = implode(', ', $tagData['items']);
+      }
     }
     $this->assign('tagSetTags', $tagSetTags);
     CRM_Core_Form_Tag::buildQuickForm($this, $parentNames, 'civicrm_case', $this->_caseID, FALSE, TRUE);

@@ -317,6 +317,8 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
     if (!empty($this->isBackoffice)) {
       return;
     }
+    // The noFullMsg here is about suppressing the event full message as the person
+    // is potentially just being bounced to that screen.
     $url = CRM_Utils_System::url('civicrm/event/info', "reset=1&id={$this->_event_id}&noFullMsg=true");
     CRM_Utils_System::redirect($url);
   }

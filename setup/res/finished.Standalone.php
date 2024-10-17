@@ -1,7 +1,7 @@
 <?php \Civi\Setup::assertRunning(); ?>
-<h1><?php echo ts('CiviCRM Installed'); ?></h1>
-<div style="padding: 1em;">
-  <p style="background-color: #0C0; border: 1px #070 solid; color: white;">
+<div class="civicrm-setup-body complete">
+  <h1><?php echo ts('CiviCRM Installed'); ?></h1>
+  <p class="good">
     <?php echo ts("CiviCRM has been successfully installed"); ?>
   </p>
   <ul>

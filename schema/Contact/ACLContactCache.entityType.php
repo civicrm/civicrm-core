@@ -58,7 +58,7 @@ return [
       'description' => ts('What operation does this user have permission on?'),
       'add' => '1.6',
       'pseudoconstant' => [
-        'callback' => 'CRM_ACL_BAO_ACL::operation',
+        'callback' => ['CRM_ACL_BAO_ACL', 'operation'],
       ],
     ],
   ],

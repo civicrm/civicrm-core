@@ -7,7 +7,7 @@
     <div ng-if="!$ctrl.tally" class="crm-search-loading-placeholder"></div>
     <div ng-if="$ctrl.tally">
       {{:: col.tally.label }}
-      {{ $ctrl.tally[col.key] }}
+      {{ $ctrl.isArray($ctrl.tally[col.key]) ? $ctrl.tally[col.key].join(', ') : $ctrl.tally[col.key] }}
     </div>
   </td>
 </tr>

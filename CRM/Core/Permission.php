@@ -306,7 +306,7 @@ class CRM_Core_Permission {
    * @return array
    */
   public static function ufGroup($type = CRM_Core_Permission::VIEW) {
-    $ufGroups = CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id');
+    $ufGroups = CRM_Core_DAO_UFField::buildOptions('uf_group_id');
 
     $allGroups = array_keys($ufGroups);
 
@@ -596,6 +596,7 @@ class CRM_Core_Permission {
       foreach ($permission['implied_by'] ?? [] as $parent) {
         if (isset($allPermissions[$parent])) {
           $allPermissions[$parent]['implies'][] = $name;
+          $allPermissions[$name]['parent'] = $parent;
         }
       }
     }
@@ -615,13 +616,17 @@ class CRM_Core_Permission {
    * @param array $metaPermissions
    * @param array $subPermissions
    * @param array $allPermissions
+   * @param int $recursionLevel
    */
-  protected static function setImpliedBy(array $metaPermissions, array $subPermissions, array &$allPermissions): void {
+  protected static function setImpliedBy(array $metaPermissions, array $subPermissions, array &$allPermissions, int $recursionLevel = 0): void {
     foreach ($subPermissions as $name) {
       if (isset($allPermissions[$name])) {
         $allPermissions[$name]['implied_by'] = array_unique(array_merge($allPermissions[$name]['implied_by'] ?? [], $metaPermissions));
+        if (!$recursionLevel) {
+          $allPermissions[$name]['parent'] = $metaPermissions[0];
+        }
         if (!empty($allPermissions[$name]['implies'])) {
-          self::setImpliedBy(array_merge([$name], $metaPermissions), $allPermissions[$name]['implies'], $allPermissions);
+          self::setImpliedBy(array_merge([$name], $metaPermissions), $allPermissions[$name]['implies'], $allPermissions, $recursionLevel + 1);
         }
       }
     }

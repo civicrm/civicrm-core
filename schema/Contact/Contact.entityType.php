@@ -232,7 +232,7 @@ return [
         'duplicate_matching',
       ],
       'input_attrs' => [
-        'multiple' => '1',
+        'multiple' => TRUE,
         'control_field' => 'contact_type',
       ],
       'pseudoconstant' => [
@@ -241,6 +241,7 @@ return [
         'label_column' => 'label',
         'icon_column' => 'icon',
         'condition' => 'parent_id IS NOT NULL',
+        'condition_provider' => ['CRM_Contact_BAO_Contact', 'alterContactSubType'],
       ],
     ],
     'first_name' => [
@@ -414,6 +415,7 @@ return [
       'description' => ts('Name used for sorting different contact types'),
       'add' => '1.1',
       'usage' => [
+        'duplicate_matching',
         'export',
       ],
       'input_attrs' => [
@@ -481,7 +483,7 @@ return [
         'duplicate_matching',
       ],
       'input_attrs' => [
-        'multiple' => '1',
+        'multiple' => TRUE,
       ],
       'pseudoconstant' => [
         'option_group_name' => 'preferred_communication_method',
@@ -878,7 +880,9 @@ return [
       ],
       'input_attrs' => [
         'label' => ts('Current Employer'),
-        'filter' => ['contact_type=Organization'],
+        'filter' => [
+          'contact_type' => 'Organization',
+        ],
       ],
       'entity_reference' => [
         'entity' => 'Contact',
@@ -942,7 +946,7 @@ return [
         'label' => ts('Preferred Mail Format'),
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::pmf',
+        'callback' => ['CRM_Core_SelectValues', 'pmf'],
       ],
     ],
   ],

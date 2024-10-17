@@ -157,10 +157,10 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
 
     $this->add('textarea', 'summary', ts('Event Summary'), $attributes['summary']);
     $this->add('wysiwyg', 'description', ts('Complete Description'), $attributes['event_description'] + ['preset' => 'civievent']);
-    $this->addElement('checkbox', 'is_public', ts('Public Event'));
-    $this->addElement('checkbox', 'is_share', ts('Add footer region with Twitter, Facebook and LinkedIn share buttons and scripts?'));
-    $this->addElement('checkbox', 'is_map', ts('Include Map to Event Location'));
-    $this->addElement('checkbox', 'is_show_calendar_links', ts('Show Calendar Links'));
+    $this->addElement('checkbox', 'is_public', ts('Display the event in public listings'));
+    $this->addElement('checkbox', 'is_share', ts('Social media sharing links'));
+    $this->addElement('checkbox', 'is_map', ts('Map to the event location'));
+    $this->addElement('checkbox', 'is_show_calendar_links', ts('Calendar links'));
 
     $this->add('datepicker', 'start_date', ts('Start'), [], !$this->_isTemplate, ['time' => TRUE]);
     $this->add('datepicker', 'end_date', ts('End'), [], FALSE, ['time' => TRUE]);
@@ -181,7 +181,7 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
 
     $this->add('textarea', 'event_full_text', ts('Message if Event Is Full'), $attributes['event_full_text']);
 
-    $this->addElement('checkbox', 'is_active', ts('Is this Event Active?'));
+    $this->addElement('checkbox', 'is_active', ts('Event is active'));
 
     $this->addFormRule(['CRM_Event_Form_ManageEvent_EventInfo', 'formRule']);
     if ($this->isSubmitted()) {

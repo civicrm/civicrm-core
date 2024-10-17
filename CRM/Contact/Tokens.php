@@ -260,7 +260,8 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
         [$row->context['contactId']],
         empty($row->context['mailingJobId']) ? NULL : $row->context['mailingJobId'],
         $messageTokens,
-        $row->context['controller']
+        $row->context['controller'],
+        TRUE
       );
       foreach ($this->getHookTokens() as $category => $hookToken) {
         if (!empty($messageTokens[$category])) {
@@ -752,7 +753,7 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
       return Civi::$statics[__CLASS__]['hook_tokens'];
     }
     $tokens = [];
-    \CRM_Utils_Hook::tokens($tokens);
+    \CRM_Utils_Hook::tokens($tokens, TRUE);
     Civi::$statics[__CLASS__]['hook_tokens'] = $tokens;
     return $tokens;
   }

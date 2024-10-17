@@ -1215,7 +1215,7 @@ WHERE li.contribution_id = %1";
    * @param array $conditions
    * @inheritDoc
    */
-  public function addSelectWhereClause(string $entityName = NULL, int $userId = NULL, array $conditions = []): array {
+  public function addSelectWhereClause(?string $entityName = NULL, ?int $userId = NULL, array $conditions = []): array {
     $clauses['contribution_id'] = CRM_Utils_SQL::mergeSubquery('Contribution');
     CRM_Utils_Hook::selectWhereClause($this, $clauses, $userId, $conditions);
     return $clauses;

@@ -60,6 +60,7 @@ EOHTML;
 
     $prefill = Afform::prefill()
       ->setName($this->formName)
+      ->setFillMode('entity')
       ->setArgs(['Individual1' => $cid])
       ->execute()
       ->indexBy('name');
@@ -87,6 +88,7 @@ EOHTML;
     // Prefill a specific contact for the af-repeat entity
     $prefill = Afform::prefill()
       ->setName($this->formName)
+      ->setFillMode('entity')
       ->setArgs(['Individual1' => [1 => $cid[3]]])
       ->execute()
       ->indexBy('name');
@@ -99,6 +101,7 @@ EOHTML;
     // Form entity has `max="3"` so a forth contact (index 3) is out-of-bounds
     $prefill = Afform::prefill()
       ->setName($this->formName)
+      ->setFillMode('entity')
       ->setArgs(['Individual1' => [3 => $cid[0]]])
       ->execute();
     $this->assertTrue(empty($prefill['Individual1']['values']));
@@ -155,6 +158,7 @@ EOHTML;
 
     $prefill = Afform::prefill()
       ->setName($this->formName)
+      ->setFillMode('entity')
       ->setArgs(['Individual1' => $cid])
       ->execute()
       ->indexBy('name');
@@ -226,6 +230,7 @@ EOHTML;
 
     $prefill = Afform::prefill()
       ->setName($this->formName)
+      ->setFillMode('form')
       ->execute()
       ->indexBy('name');
 
@@ -284,6 +289,7 @@ EOHTML;
 
     $prefill = Afform::prefill()
       ->setName($this->formName)
+      ->setFillMode('entity')
       ->setArgs(['Individual1' => $cid])
       ->execute()
       ->indexBy('name');

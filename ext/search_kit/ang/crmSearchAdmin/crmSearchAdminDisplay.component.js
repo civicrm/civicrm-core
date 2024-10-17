@@ -137,15 +137,12 @@
       };
 
       this.getExprFromSelect = function(key) {
-        var match;
-        _.each(ctrl.savedSearch.api_params.select, function(expr) {
-          var parts = expr.split(' AS ');
-          if (_.includes(parts, key)) {
-            match = parts[0];
-            return false;
-          }
+        let fieldKey = key.split(':')[0];
+        let match = ctrl.savedSearch.api_params.select.find((expr) => {
+          let parts = expr.split(' AS ');
+          return (parts[1] === fieldKey || parts[0].split(':')[0] === fieldKey);
         });
-        return match;
+        return match ? match.split(' AS ')[0] : null;
       };
 
       this.getFieldLabel = function(key) {
@@ -199,6 +196,39 @@
           delete col.icons;
           col.type = 'html';
         }
+      };
+
+      // Because angular dropdowns must be a by-reference variable
+      const suffixOptionCache = {};
+
+      this.getSuffixOptions = function(col) {
+        let expr = ctrl.getExprFromSelect(col.key),
+          info = searchMeta.parseExpr(expr);
+        if (!info.fn && info.args[0] && info.args[0].field && info.args[0].field.suffixes) {
+          let cacheKey = info.args[0].field.suffixes.join();
+          if (!(cacheKey in suffixOptionCache)) {
+            suffixOptionCache[cacheKey] = Object.keys(CRM.crmSearchAdmin.optionAttributes)
+              .filter(key => info.args[0].field.suffixes.includes(key))
+              .reduce((filteredOptions, key) => {
+                filteredOptions[key] = CRM.crmSearchAdmin.optionAttributes[key];
+                return filteredOptions;
+              }, {});
+          }
+          return suffixOptionCache[cacheKey];
+        }
+      };
+
+      function getSetSuffix(index, val) {
+        let col = ctrl.display.settings.columns[index];
+        if (arguments.length > 1) {
+          col.key = col.key.split(':')[0] + (val ? ':' + val : '');
+        }
+        return col.key.split(':')[1] || '';
+      }
+
+      // Provides getter/setter for the pseudoconstant suffix selector
+      this.getSetSuffix = function(index) {
+        return _.wrap(index, getSetSuffix);
       };
 
       this.canBeImage = function(col) {
@@ -329,10 +359,9 @@
           });
         } else {
           let activeColumns = ctrl.display.settings.columns.map(col => col.key);
-          let selectAliases = ctrl.savedSearch.api_params.select.map(selectExpr => selectToKey(selectExpr));
-          // Delete any column that is no longer in the
+          // Delete any column that is no longer in the search
           activeColumns.reverse().forEach((key, index) => {
-            if (key && !selectAliases.includes(key)) {
+            if (key && !ctrl.getExprFromSelect(key)) {
               ctrl.removeCol(activeColumns.length - 1 - index);
             }
           });

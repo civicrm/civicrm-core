@@ -365,16 +365,6 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
     // export the field values to be used for saving the profile form
     $params = $this->controller->exportValues($this->_name);
 
-    $session = CRM_Core_Session::singleton();
-    // format params
-    $params['last_modified_id'] = $session->get('userID');
-    $params['last_modified_date'] = date('YmdHis');
-
-    if ($this->_action & CRM_Core_Action::ADD) {
-      $params['created_id'] = $session->get('userID');
-      $params['created_date'] = date('YmdHis');
-    }
-
     if (isset($this->_surveyId)) {
       $params['sid'] = $this->_surveyId;
     }

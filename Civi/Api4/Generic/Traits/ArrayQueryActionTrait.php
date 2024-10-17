@@ -107,11 +107,11 @@ trait ArrayQueryActionTrait {
   /**
    * @param array $row
    * @param array $condition
-   * @param int $index
+   * @param int|null $index
    * @return bool
    * @throws \Civi\API\Exception\NotImplementedException
    */
-  public static function filterCompare(array $row, array $condition, int $index = NULL): bool {
+  public static function filterCompare(array $row, array $condition, ?int $index = NULL): bool {
     $value = $row[$condition[0]] ?? NULL;
     $operator = $condition[1];
     $expected = $condition[2] ?? NULL;

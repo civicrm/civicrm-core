@@ -175,7 +175,7 @@ class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custo
 
     $groups = CRM_Core_PseudoConstant::nestedGroup();
 
-    $tags = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', ['onlyActive' => FALSE]);
+    $tags = CRM_Core_DAO_EntityTag::buildOptions('tag_id', 'get');
     if (count($groups) == 0 || count($tags) == 0) {
       CRM_Core_Session::setStatus(ts("At least one Group and Tag must be present for Custom Group / Tag search."), ts('Missing Group/Tag'));
       $url = CRM_Utils_System::url('civicrm/contact/search/custom/list', 'reset=1');

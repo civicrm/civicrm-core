@@ -118,6 +118,9 @@ trait DAOActionTrait {
 
     foreach ($items as &$item) {
       $entityId = $item[$idField] ?? NULL;
+      if (CoreUtil::isContact($this->getEntityName())) {
+        $entityId = FormattingUtil::resolveContactID($idField, $entityId);
+      }
       FormattingUtil::formatWriteParams($item, $this->entityFields());
       $this->formatCustomParams($item, $entityId);
 
@@ -189,7 +192,7 @@ trait DAOActionTrait {
    *
    * @param array $record
    */
-  private function resolveFKValues(array &$record): void {
+  protected function resolveFKValues(array &$record): void {
     // Resolve domain id first
     uksort($record, function($a, $b) {
       return substr($a, 0, 9) == 'domain_id' ? -1 : 1;
@@ -264,13 +267,8 @@ trait DAOActionTrait {
 
       // Match contact id to strings like "user_contact_id"
       // FIXME handle arrays for multi-value contact reference fields, etc.
-      if (in_array($field['data_type'], ['ContactReference', 'EntityReference']) && is_string($value) && !is_numeric($value)) {
-        // FIXME decouple from v3 API
-        require_once 'api/v3/utils.php';
-        $value = \_civicrm_api3_resolve_contactID($value);
-        if ('unknown-user' === $value) {
-          throw new \CRM_Core_Exception("\"{$field['name']}\" \"{$value}\" cannot be resolved to a contact ID", 2002, ['error_field' => $field['name'], "type" => "integer"]);
-        }
+      if (in_array($field['data_type'], ['ContactReference', 'EntityReference']) && is_string($value)) {
+        $value = FormattingUtil::resolveContactID($field['name'], $value);
       }
 
       \CRM_Core_BAO_CustomField::formatCustomField(

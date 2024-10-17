@@ -28,14 +28,12 @@ class CRM_Event_Cart_PageCallback {
 
     $event->page->assign('registerText', $registerText);
     $event->page->assign('registerURL', $url);
-    $event->page->assign('eventCartEnabled', TRUE);
   }
 
   public static function alterEventList($event) {
-    if ((bool) Civi::settings()->get('enable_cart')) {
-      CRM_Core_Region::instance('crm-event-list-pre')
-        ->add(['template' => 'CRM/Event/Cart/eventlistpre.tpl']);
-    }
+    CRM_Core_Region::instance('crm-event-list-pre')
+      ->add(['template' => 'CRM/Event/Cart/eventlistpre.tpl']);
+
   }
 
 }

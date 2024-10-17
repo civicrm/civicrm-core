@@ -81,7 +81,7 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
     // so no-one is tempted to refer to this again after relevant values are extracted
     unset($formValues);
 
-    [$rows, $tokenFields] = CRM_Contact_Form_Task_LabelCommon::getRows($this->_contactIds, $locationTypeID, $respectDoNotMail, $mergeSameAddress, $mergeSameHousehold);
+    [$rows] = CRM_Contact_Form_Task_LabelCommon::getRows($this->_contactIds, $locationTypeID, $respectDoNotMail, $mergeSameAddress, $mergeSameHousehold);
 
     if ($mergeSameAddress) {
       CRM_Core_BAO_Address::mergeSameAddress($rows);
@@ -91,18 +91,8 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
     }
     // format the addresses according to CIVICRM_ADDRESS_FORMAT (CRM-1327)
     foreach ((array) $rows as $id => $row) {
-      $commMethods = $row['preferred_communication_method'] ?? NULL;
-      if ($commMethods) {
-        $val = array_filter(explode(CRM_Core_DAO::VALUE_SEPARATOR, $commMethods));
-        $comm = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method');
-        $temp = [];
-        foreach ($val as $vals) {
-          $temp[] = $comm[$vals];
-        }
-        $row['preferred_communication_method'] = implode(', ', $temp);
-      }
       $row['id'] = $id;
-      $formatted = CRM_Utils_Address::formatMailingLabel($row, 'mailing_format', FALSE, TRUE, $tokenFields);
+      $formatted = CRM_Utils_Address::formatMailingLabel($row);
       $rows[$id] = [$formatted];
     }
     if ($isPerMembership) {

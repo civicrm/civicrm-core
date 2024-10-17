@@ -740,7 +740,7 @@ class CRM_Utils_Array {
       return $values;
     }
     // Empty string -> empty array
-    if ($values === '') {
+    if ($values === '' || $values === "$delim$delim") {
       return [];
     }
     return explode($delim, trim((string) $values, $delim));
@@ -750,8 +750,8 @@ class CRM_Utils_Array {
    * Joins array elements with a string, adding surrounding delimiters.
    *
    * This method works mostly like PHP's built-in implode(), but the generated
-   * string is surrounded by delimiter characters. Also, if NULL is passed as
-   * the $values parameter, NULL is returned.
+   * string is surrounded by delimiter characters. Also, if NULL or '' is passed as
+   * the $values parameter, it is returned unchanged.
    *
    * @param mixed $values
    *   Array to be imploded. If a non-array is passed, it will be cast to an
@@ -764,8 +764,8 @@ class CRM_Utils_Array {
    *   The generated string, or NULL if NULL was passed as $values parameter.
    */
   public static function implodePadded($values, $delim = CRM_Core_DAO::VALUE_SEPARATOR) {
-    if ($values === NULL) {
-      return NULL;
+    if ($values === NULL || $values === '') {
+      return $values;
     }
     // If we already have a string, strip $delim off the ends so it doesn't get added twice
     if (is_string($values)) {

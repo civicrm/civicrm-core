@@ -67,61 +67,52 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
    *   The requested contact type.
    *
    * @return array
-   *   a table-keyed array of field-keyed arrays holding supported fields' titles
+   *   a table-keyed array of field-keyed arrays holding supported fields'
+   *   titles
+   * @throws \CRM_Core_Exception
    */
-  public static function supportedFields($requestedType): array {
+  public static function supportedFields(string $requestedType): array {
     if (!isset(Civi::$statics[__CLASS__]['supportedFields'])) {
-      // this is needed, as we're piggy-backing importableFields() below
-      $replacements = [
-        'civicrm_country.name' => 'civicrm_address.country_id',
-        'civicrm_county.name' => 'civicrm_address.county_id',
-        'civicrm_state_province.name' => 'civicrm_address.state_province_id',
-        'civicrm_phone.phone' => 'civicrm_phone.phone_numeric',
-      ];
-      // the table names we support in dedupe rules - a filter for importableFields()
-      $supportedTables = [
-        'civicrm_address',
-        'civicrm_contact',
-        'civicrm_email',
-        'civicrm_im',
-        'civicrm_note',
-        'civicrm_openid',
-        'civicrm_phone',
-        'civicrm_website',
-      ];
-
-      foreach (CRM_Contact_BAO_ContactType::basicTypes() as $ctype) {
-        // take the table.field pairs and their titles from importableFields() if the table is supported
-        foreach (self::importableFields($ctype) as $iField) {
-          if (isset($iField['where'])) {
-            $where = $iField['where'];
-            if (isset($replacements[$where])) {
-              $where = $replacements[$where];
-            }
-            [$table, $field] = explode('.', $where);
-            if (!in_array($table, $supportedTables)) {
-              continue;
-            }
-            $fields[$ctype][$table][$field] = $iField['title'];
-          }
+      $genericFields = $fields = [];
+      // We have a hard-coded list of entities - as we always have
+      // but if that were to get restrictive we could declare whether dedupe fields are supported
+      // in the entity metadata and maybe get rid of the hook at the end of this function?
+      foreach (['Address', 'Email', 'Phone', 'Website', 'OpenID', 'IM', 'Note'] as $entity) {
+        $entityFields = civicrm_api4($entity, 'getFields', [
+          'where' => [['usage', 'CONTAINS', 'duplicate_matching']],
+          'orderBy' => ['title'],
+          'checkPermissions' => FALSE,
+          // The action is a bit arguable - if not set it would default to 'get'.
+          // At the moment it makes no difference but if someone where to add a
+          // pseudo-field and set duplicate matching to 'true' then it would probably be a
+          // field used when creating/updating & de-duping while saving a contact - so
+          // save feels like a safer guess at future requirements than get.
+          'action' => 'save',
+        ], 'name');
+        foreach ($entityFields as $entityField) {
+          $genericFields[$entityField['table_name']][$entityField['column_name']] = $entityField['input_attrs']['label'] ?? $entityField['title'];
         }
-        // Note that most of the fields available come from 'importable fields' -
-        // I thought about making this field 'importable' but it felt like there might be unknown consequences
-        // so I opted for just adding it in & securing it with a unit test.
-        /// Example usage of sort_name - It is possible to alter sort name via hook so 2 organization names might differ as in
-        // Justice League vs The Justice League but these could have the same sort_name if 'the the'
-        // exension is installed (https://github.com/eileenmcnaughton/org.wikimedia.thethe)
-        $fields[$ctype]['civicrm_contact']['sort_name'] = ts('Sort Name');
+      }
 
-        $customGroups = CRM_Core_BAO_CustomGroup::getAll([
-          'extends' => $ctype,
-          'is_active' => TRUE,
-        ], CRM_Core_Permission::EDIT);
-        // add all custom data fields including those only for sub_types.
-        foreach ($customGroups as $cg) {
-          foreach ($cg['fields'] as $cf) {
-            $fields[$ctype][$cg['table_name']][$cf['column_name']] = $cg['title'] . ' : ' . $cf['label'];
-          }
+      foreach (CRM_Contact_BAO_ContactType::basicTypes() as $contactType) {
+        $fields[$contactType] = $genericFields;
+        $contactFields = civicrm_api4('Contact', 'getFields', [
+          'where' => [['usage', 'CONTAINS', 'duplicate_matching']],
+          'orderBy' => ['title'],
+          'values' => [
+            'contact_type' => $contactType,
+          ],
+          'checkPermissions' => FALSE,
+          // The action is a bit arguable - if not set it would default to 'get'.
+          // At the moment it makes no difference but if someone where to add a
+          // pseudo-field and set duplicate matching to 'true' then it would probably be a
+          // field used when creating/updating & de-duping while saving a contact - so
+          // save feels like a safer guess at future requirements than get.
+          'action' => 'save',
+        ], 'name');
+        // take the table.field pairs and their titles from importableFields() if the table is supported
+        foreach ($contactFields as $entityField) {
+          $fields[$contactType][$entityField['table_name']][$entityField['column_name']] = $entityField['input_attrs']['label'] ?? $entityField['title'];
         }
       }
       //Does this have to run outside of cache?
@@ -131,72 +122,6 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
 
     return Civi::$statics[__CLASS__]['supportedFields'][$requestedType] ?? [];
 
-  }
-
-  /**
-   * Combine all the importable fields from the lower levels object.
-   *
-   * @deprecated - copy of importableFields to unravel.
-   *
-   * The ordering is important, since currently we do not have a weight
-   * scheme. Adding weight is super important
-   *
-   * @param int|string $contactType contact Type
-   *
-   * @return array
-   *   array of importable Fields
-   */
-  private static function importableFields($contactType): array {
-
-    $fields = CRM_Contact_DAO_Contact::import();
-
-    $locationFields = array_merge(CRM_Core_DAO_Address::import(),
-      CRM_Core_DAO_Phone::import(),
-      CRM_Core_DAO_Email::import(),
-      CRM_Core_DAO_IM::import(TRUE),
-      CRM_Core_DAO_OpenID::import()
-    );
-
-    $locationFields = array_merge($locationFields,
-      CRM_Core_BAO_CustomField::getFieldsForImport('Address',
-        FALSE,
-        FALSE,
-        FALSE,
-        FALSE
-      )
-    );
-
-    foreach ($locationFields as $key => $field) {
-      $locationFields[$key]['hasLocationType'] = TRUE;
-    }
-
-    $fields = array_merge($fields, $locationFields);
-
-    $fields = array_merge($fields, CRM_Contact_DAO_Contact::import());
-    $fields = array_merge($fields, CRM_Core_DAO_Note::import());
-
-    //website fields
-    $fields = array_merge($fields, CRM_Core_DAO_Website::import());
-    $fields['url']['hasWebsiteType'] = TRUE;
-
-    $fields = array_merge($fields,
-      CRM_Core_BAO_CustomField::getFieldsForImport($contactType,
-        FALSE,
-        TRUE,
-        FALSE,
-        FALSE,
-        FALSE
-      )
-    );
-    // Unset the fields which are not related to their contact type.
-    foreach (CRM_Contact_DAO_Contact::import() as $name => $value) {
-      if (!empty($value['contactType']) && $value['contactType'] !== $contactType) {
-        unset($fields[$name]);
-      }
-    }
-
-    //Sorting fields in alphabetical order(CRM-1507)
-    return CRM_Utils_Array::crmArraySortByField($fields, 'title');
   }
 
   /**

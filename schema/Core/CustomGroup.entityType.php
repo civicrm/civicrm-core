@@ -71,7 +71,7 @@ return [
       'add' => '1.1',
       'default' => 'Contact',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_BAO_CustomGroup::getCustomGroupExtendsOptions',
+        'callback' => ['CRM_Core_BAO_CustomGroup', 'getCustomGroupExtendsOptions'],
         'suffixes' => [
           'name',
           'label',
@@ -91,7 +91,7 @@ return [
         'control_field' => 'extends',
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_BAO_CustomGroup::getExtendsEntityColumnIdOptions',
+        'callback' => ['CRM_Core_BAO_CustomGroup', 'getExtendsEntityColumnIdOptions'],
         'suffixes' => [
           'name',
           'label',
@@ -110,7 +110,7 @@ return [
         'control_field' => 'extends_entity_column_id',
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_BAO_CustomGroup::getExtendsEntityColumnValueOptions',
+        'callback' => ['CRM_Core_BAO_CustomGroup', 'getExtendsEntityColumnValueOptions'],
       ],
     ],
     'style' => [
@@ -120,7 +120,7 @@ return [
       'description' => ts('Visual relationship between this form and its parent.'),
       'add' => '1.1',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::customGroupStyle',
+        'callback' => ['CRM_Core_SelectValues', 'customGroupStyle'],
       ],
     ],
     'collapse_display' => [

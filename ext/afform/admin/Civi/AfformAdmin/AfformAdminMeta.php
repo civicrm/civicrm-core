@@ -99,6 +99,13 @@ class AfformAdminMeta {
       }
       $params['values']['state_province_id'] = \Civi::settings()->get('defaultContactStateProvince');
     }
+    // Exclude LocBlock fields that will be replaced by joins (see below)
+    if ($params['action'] === 'create' && $entityName === 'LocBlock') {
+      $joinParams = $params;
+      // Omit the fk fields (email_id, email_2_id, phone_id, etc)
+      // As we'll add their joined fields below
+      $params['where'][] = ['fk_entity', 'IS NULL'];
+    }
     $fields = (array) civicrm_api4($entityName, 'getFields', $params);
     // Add implicit joins to search fields
     if ($params['action'] === 'get') {
@@ -113,6 +120,29 @@ class AfformAdminMeta {
             $newField['name'] = $field['name'] . '.' . $newField['name'];
             $newField['label'] = $field['label'] . ' ' . $newField['label'];
             array_splice($fields, $index, 0, [$newField]);
+          }
+        }
+      }
+    }
+    // Add LocBlock joins (e.g. `email_id.email`, `address_id.street_address`)
+    if ($params['action'] === 'create' && $entityName === 'LocBlock') {
+      // Exclude fields that don't apply to locBlocks
+      $joinParams['where'][] = ['name', 'NOT IN', ['id', 'is_primary', 'is_billing', 'location_type_id', 'contact_id']];
+      foreach (['Address', 'Email', 'Phone', 'IM'] as $joinEntity) {
+        $joinEntityFields = (array) civicrm_api4($joinEntity, 'getFields', $joinParams);
+        $joinEntityLabel = CoreUtil::getInfoItem($joinEntity, 'title');
+        // LocBlock entity includes every join twice (e.g. `email_2_id.email`, `address_2_id.street_address`)
+        foreach ([1 => '', 2 => '_2'] as $number => $suffix) {
+          $joinField = strtolower($joinEntity) . $suffix . '_id';
+          foreach ($joinEntityFields as $joinEntityField) {
+            if (strtolower($joinEntity) === $joinEntityField['name']) {
+              $joinEntityField['label'] .= " $number";
+            }
+            else {
+              $joinEntityField['label'] = "$joinEntityLabel $number {$joinEntityField['label']}";
+            }
+            $joinEntityField['name'] = "$joinField." . $joinEntityField['name'];
+            $fields[] = $joinEntityField;
           }
         }
       }

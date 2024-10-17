@@ -168,8 +168,8 @@ abstract class SqlFunction extends SqlExpression {
    * @param string $output
    * @return string
    */
-  protected function renderExpression(string $output): string {
-    return $this->getName() . "($output)";
+  public static function renderExpression(string $output): string {
+    return static::getName() . "($output)";
   }
 
   /**

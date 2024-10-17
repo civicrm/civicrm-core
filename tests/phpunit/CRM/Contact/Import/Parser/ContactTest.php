@@ -1612,7 +1612,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $mobileTypeID = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'phone_type_id', 'Mobile');
     $skypeTypeID = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_IM', 'provider_id', 'Skype');
     $mainWebsiteTypeID = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Website', 'website_type_id', 'Main');
-    $linkedInTypeID = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Website', 'website_type_id', 'LinkedIn');
+    $socialWebsiteTypeID = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Website', 'website_type_id', 'Social');
     $homeID = $locations['Home']['id'];
     $workID = $locations['Work']['id'];
     $mapper = [
@@ -1640,7 +1640,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       [$childKey, 'email', $homeID],
       [$childKey, 'signature_text', $homeID],
       [$childKey, 'im', $homeID, $skypeTypeID],
-      [$childKey, 'url', $linkedInTypeID],
+      [$childKey, 'url', $socialWebsiteTypeID],
       // Same location type, different phone typ in these phones
       [$childKey, 'phone', $homeID, $phoneTypeID],
       [$childKey, 'phone_ext', $homeID, $phoneTypeID],
@@ -1653,8 +1653,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       [$siblingKey, 'email', $homeID],
       [$siblingKey, 'signature_text', $homeID],
       [$siblingKey, 'im', $homeID, $skypeTypeID],
-      // The 2 is website_type_id (yes, small hard-coding cheat)
-      [$siblingKey, 'url', $linkedInTypeID],
+      [$siblingKey, 'url', $socialWebsiteTypeID],
       [$siblingKey, 'phone', $workID, $phoneTypeID],
       [$siblingKey, 'phone_ext', $workID, $phoneTypeID],
       [$employeeKey, 'organization_name'],
@@ -1665,7 +1664,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       [$employeeKey, 'supplemental_address_1', $homeID],
       [$employeeKey, 'do_not_import'],
       // Second website, different type.
-      [$employeeKey, 'url', $linkedInTypeID],
+      [$employeeKey, 'url', $socialWebsiteTypeID],
       ['openid'],
     ];
     $this->validateCSV($csv, $mapper);
@@ -1911,7 +1910,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  protected function runImport(array $originalValues, int $onDuplicateAction, int $expectedResult, ?array $fieldMapping = [], array $fields = NULL, int $ruleGroupId = NULL): void {
+  protected function runImport(array $originalValues, int $onDuplicateAction, int $expectedResult, ?array $fieldMapping = [], ?array $fields = NULL, ?int $ruleGroupId = NULL): void {
     $values = array_values($originalValues);
     // Stand in for row number.
     $values[] = 1;

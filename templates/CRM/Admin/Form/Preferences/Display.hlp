@@ -7,10 +7,10 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{htxt id="editor_id-title"}
+{htxt id="editor-id-id-title"}
   {ts}WYSIWYG Editor{/ts}
 {/htxt}
-{htxt id="editor_id"}
+{htxt id="editor-id-id"}
   <p>
     {ts}A "WYSIWYG" (What You See Is What You Get) is a rich-text editor, like a mini word-processor, for editing HTML content in CiviCRM.{/ts}
   </p>
@@ -25,7 +25,7 @@
   {ts}Invoices / Credit Notes{/ts}
 {/htxt}
 {htxt id="id-invoices_id"}
-  {capture assign=invoiceURL}{crmURL p='civicrm/admin/setting/preferences/contribute' q="reset=1"}{/capture} 
+  {capture assign=invoiceURL}{crmURL p='civicrm/admin/setting/preferences/contribute' q="reset=1"}{/capture}
   {ts 1=$invoiceURL}In order to enable logged in users to download invoices and credit notes from the dashboard, please first enable CiviCRM invoicing functionality <a href='%1'>Administer > CiviContribute > CiviContribute Component Settings</a>{/ts}
 {/htxt}
 
@@ -36,26 +36,11 @@
     {ts}The theme system allows you to change CiviCRM's appearance by replacing important CSS files.{/ts}
   </p>
 {/capture}
-{capture assign=themeAdv}
-  {* TODO: Update when there is a page to link to:
-  <p>
-    {ts 1='http://fixme.example.com'}For more advanced theming options, consult the <a href="%1">theme documentation</a>.{/ts}
-  </p>
-  *}
-{/capture}
 
-{htxt id="theme-title"}
-  {ts}Theme{/ts}
-{/htxt}
-{htxt id="theme"}
-  {$themeDefn}
-  {$themeAdv}
-{/htxt}
-
-{htxt id="theme_backend-title"}
+{htxt id="theme-backend-id-title"}
   {ts}Backend Theme{/ts}
 {/htxt}
-{htxt id="theme_backend"}
+{htxt id="theme-backend-id"}
   {$themeDefn}
   <p>
     {ts}The backend theme determines the appearance on administrative screens, such as the "Manage Event" screen.{/ts}
@@ -63,10 +48,10 @@
   {$themeAdv}
 {/htxt}
 
-{htxt id="theme_frontend-title"}
+{htxt id="theme-frontend-id-title"}
   {ts}Frontend Theme{/ts}
 {/htxt}
-{htxt id="theme_frontend"}
+{htxt id="theme-frontend-id"}
   {$themeDefn}
   <p>
     {ts}On WordPress, Joomla, or a similar CMS, the frontend theme determines the appearance on user-facing screens, such as the "Event Registration" screen.{/ts}

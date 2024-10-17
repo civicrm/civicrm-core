@@ -2002,7 +2002,10 @@ AND cc.sort_name LIKE '%$name%'";
   }
 
   /**
-   * @inheritdoc
+   * Legacy option getter
+   *
+   * @deprecated
+   * @inheritDoc
    */
   public static function buildOptions($fieldName, $context = NULL, $props = []) {
     // Quickform-specific format, for use when editing relationship type options in a popup from the contact relationship form

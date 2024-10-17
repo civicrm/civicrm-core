@@ -102,11 +102,11 @@ class ContactAutofill extends AbstractBehavior implements EventSubscriberInterfa
       $id = $event->getEntityId();
       $autoFillMode = $entity['autofill'] ?? '';
       $relatedContact = $entity['autofill-relationship'] ?? NULL;
-      // Autofill with current user, but only if this is an "entire form" prefill (no entity-specific args)
-      if (!$id && $autoFillMode === 'user' && !$event->getApiRequest()->getArgs()) {
+      // Autofill with current user, but only if this is an "entire form" prefill
+      if (!$id && $autoFillMode === 'user' && $event->getApiRequest()->getFillMode() === 'form') {
         $id = \CRM_Core_Session::getLoggedInContactID();
         if ($id) {
-          $event->getApiRequest()->loadEntity($entity, [$id]);
+          $event->getApiRequest()->loadEntity($entity, [['id' => $id]]);
         }
       }
       // Autofill by relationship
@@ -123,8 +123,12 @@ class ContactAutofill extends AbstractBehavior implements EventSubscriberInterfa
             ->addWhere('far_contact_id', '=', $relatedContact)
             ->addWhere('near_contact_id.is_deleted', '=', FALSE)
             ->addWhere('is_current', '=', TRUE)
-            ->execute()->column('near_contact_id');
-          $event->getApiRequest()->loadEntity($entity, $relations);
+            ->execute();
+          $relatedIds = [];
+          foreach ($relations as $relation) {
+            $relatedIds[] = ['id' => $relation['near_contact_id']];
+          }
+          $event->getApiRequest()->loadEntity($entity, $relatedIds);
         }
       }
     }

@@ -34,10 +34,11 @@ class api_v3_CampaignTest extends CiviUnitTestCase {
    */
   public function testCreateCampaign($version) {
     $this->_apiversion = $version;
+    $cid = $this->createLoggedInUser();
     $result = $this->callAPISuccess('campaign', 'create', $this->params);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
-    $this->getAndCheck(array_merge($this->params, ['created_date' => '2008-07-05 00:00:00']), $result['id'], 'campaign', TRUE);
+    $this->getAndCheck(array_merge($this->params, ['created_date' => '2008-07-05 00:00:00', 'created_id' => $cid]), $result['id'], 'campaign', TRUE);
   }
 
   /**

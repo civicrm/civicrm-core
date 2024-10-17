@@ -256,6 +256,13 @@ class FieldSpec {
   }
 
   /**
+   * @return bool
+   */
+  public function getReadonly(): bool {
+    return $this->readonly;
+  }
+
+  /**
    * @param bool $deprecated
    * @return $this
    */

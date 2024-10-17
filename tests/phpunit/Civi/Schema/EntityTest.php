@@ -7,6 +7,7 @@ class EntityTest extends \CiviUnitTestCase {
   public function testGetMeta(): void {
     $entity = \Civi::entity('Activity');
 
+    $this->assertEquals('Activity', $entity->getMeta('name'));
     $this->assertEquals('civicrm_activity', $entity->getMeta('table'));
     $this->assertEquals('CRM_Activity_DAO_Activity', $entity->getMeta('class'));
     $this->assertEquals('Activity', $entity->getMeta('title'));
@@ -14,7 +15,10 @@ class EntityTest extends \CiviUnitTestCase {
     $this->assertEquals('Past or future actions concerning one or more contacts.', $entity->getMeta('description'));
     $this->assertEquals('fa-tasks', $entity->getMeta('icon'));
     $this->assertEquals('subject', $entity->getMeta('label_field'));
-    $this->assertEquals(['id'], $entity->getMeta('primary_keys'));
+    $this->assertSame(['id'], $entity->getMeta('primary_keys'));
+    $this->assertSame('id', $entity->getMeta('primary_key'));
+    $this->assertSame('1.1', $entity->getMeta('add'));
+    $this->assertTrue($entity->getMeta('log'));
     $this->assertNotEmpty($entity->getMeta('paths'));
     foreach ($entity->getMeta('paths') as $path) {
       $this->assertStringStartsWith('civicrm/', $path);

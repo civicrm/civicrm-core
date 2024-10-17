@@ -63,7 +63,7 @@ class CRM_Mailing_Form_Optout extends CRM_Core_Form {
       );
     }
 
-    list($displayName, $email) = CRM_Mailing_Event_BAO_MailingEventQueue::getContactInfo($queue_id);
+    [$displayName, $email] = CRM_Mailing_Event_BAO_MailingEventQueue::getContactInfo($queue_id);
     $this->assign('display_name', $displayName);
     $emailMasked = CRM_Utils_String::maskEmail($email);
     $this->assign('email_masked', $emailMasked);
@@ -72,7 +72,7 @@ class CRM_Mailing_Form_Optout extends CRM_Core_Form {
   }
 
   public function buildQuickForm() {
-    CRM_Utils_System::addHTMLHead('<META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">');
+    CRM_Utils_System::setNoRobotsFlag();
     $this->setTitle(ts('Opt Out Confirmation'));
 
     $buttons = [

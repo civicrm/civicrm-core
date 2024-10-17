@@ -1,70 +1,11 @@
 body {
   background: #eee;
 }
-/* Header */
-.civicrm-setup-header {
-  height: 300px;
-  width: 100%;
-  display: block;
-}
 
-.civicrm-setup-header .title {
-  width: 25%;
-  position: absolute;
-  overflow: hidden;
-  float: left;
-  margin-left: 10%;
-  margin-top: 50px;
-  margin-right: 20%;
-  display: inline-flex;
-}
-
-.civicrm-setup-header h1 {
-  line-height: 35px;
-  color: #ddd;
-  position: relative;
-  left: 400px;
-  -webkit-animation: slide 1s forwards;
-  -webkit-animation-delay: 0.5s;
-  animation: slide 1s forwards;
-  animation-delay: 0.5s;
-}
-
-@-webkit-keyframes slide {
-  100% {
-    left: 0;
-    color: #555;
-  }
-}
-
-@keyframes slide {
-  100% {
-    left: 0;
-    color: #555;
-  }
-}
-
-.civicrm-setup-header hr {
-  border-bottom: 2px solid #fff;
-  border-top: 2px solid #ddd;
-}
-
-.civicrm-setup-body .civicrm-logo {
-  float: right;
-  width: 30%;
-  display: grid;
-  margin-top: 50px;
-  margin-right: 10%;
-}
-
-.civicrm-setup-body .civicrm-logo img {
-  width: 100%;
-}
-
-/* Header End */
-
-.civicrm-setup-body #All {
-  font-family: Arial, sans-serif;
+.civicrm-setup-body #All,
+.civicrm-setup-body.complete {
+  font-family: sans-serif;
+  line-height: 1.2;
   width: auto;
   margin: 0.5em auto;
   padding: 1em;
@@ -77,6 +18,52 @@ body {
 .civicrm-setup-body form {
   margin: 3%;
 }
+
+/* Header */
+.civicrm-setup-header {
+  width: 100%;
+  display: flex;
+  gap: 2rem;
+}
+
+.civicrm-setup-header > * {
+  flex: 1;
+}
+
+.civicrm-setup-header h1 {
+  margin: 0;
+  color: #fff;
+  position: relative;
+  left: -40px;
+  -webkit-animation: slide 1s forwards;
+  -webkit-animation-delay: 0.25s;
+  animation: slide 1s forwards;
+  animation-delay: 0.25s;
+}
+
+@-webkit-keyframes slide {
+  100% {
+    left: 0;
+    color: #000;
+  }
+}
+
+@keyframes slide {
+  100% {
+    left: 0;
+    color: #000;
+  }
+}
+
+.civicrm-setup-header hr {
+  border: 0;
+}
+
+.civicrm-setup-body .civicrm-logo img {
+  width: 100%;
+}
+
+/* Header End */
 
 .civicrm-setup-body h2 {
   display: inline-block;
@@ -304,11 +291,6 @@ body {
 }
 
 @media only screen and (max-width: 635px) {
-  .civicrm-setup-header .title {
-    width: 45%;
-    margin-left: 5%;
-    margin-top: 30px;
-  }
 
   .civicrm-setup-body .settingsTable {
     display: block;
@@ -316,6 +298,9 @@ body {
     white-space: nowrap;
     width: 95%;
     margin: 10px 2% 10px 2%;
+  }
+  .civicrm-setup-header {
+    flex-direction: column-reverse;
   }
 }
 

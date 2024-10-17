@@ -53,23 +53,13 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   }
 
   /**
-   * Get options for a given contribution field.
-   *
-   * @param string $fieldName
-   * @param string $context see CRM_Core_DAO::buildOptionsContext.
-   * @param array $props whatever is known about this dao object.
-   *
-   * @return array|bool
-   * @see CRM_Core_DAO::buildOptions
-   *
+   * @implements CRM_Utils_Hook::fieldOptions
    */
-  public static function buildOptions($fieldName, $context = NULL, $props = []) {
-    $params = [];
-    if ($fieldName === 'financial_account_id') {
+  public static function hook_civicrm_fieldOptions($entityName, $fieldName, &$options, $params) {
+    if ($entityName === 'PaymentProcessor' && $fieldName === 'financial_account_id') {
       // Pseudo-field - let's help out.
-      return CRM_Core_BAO_FinancialTrxn::buildOptions('to_financial_account_id', $context, $props);
+      $options = Civi::entity('FinancialTrxn')->getOptions('to_financial_account_id', $params['values'], $params['include_disabled'], $params['check_permissions'], $params['user_id']);
     }
-    return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }
 
   /**

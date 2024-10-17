@@ -39,8 +39,7 @@ class PasswordReset extends AbstractAction {
     // todo: some minimum password quality check?
 
     // Only valid change here is password, for a known ID.
-    $security = Security::singleton();
-    $userID = $security->checkPasswordResetToken($this->token);
+    $userID = Security::singleton()->checkPasswordResetToken($this->token);
     if (!$userID) {
       throw new API_Exception("Invalid token.");
     }

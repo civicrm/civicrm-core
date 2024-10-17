@@ -538,114 +538,6 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing implements \Civi\C
   }
 
   /**
-   * Returns an array that denotes the type of token that we are dealing with
-   * we use the type later on when we are doing a token replacement lookup
-   *
-   * @param string $token
-   *   The token for which we will be doing adata lookup.
-   *
-   * @return array
-   *   An array that holds the token itself and the type.
-   *                             the type will tell us which function to use for the data lookup
-   *                             if we need to do a lookup at all
-   */
-  public function &getDataFunc($token) {
-    static $_categories = NULL;
-    static $_categoryString = NULL;
-    if (!$_categories) {
-      $_categories = [
-        'domain' => NULL,
-        'action' => NULL,
-        'mailing' => NULL,
-        'contact' => NULL,
-      ];
-
-      CRM_Utils_Hook::tokens($_categories);
-      $_categoryString = implode('|', array_keys($_categories));
-    }
-
-    $funcStruct = ['type' => NULL, 'token' => $token];
-    $matches = [];
-    if ((preg_match('/^href/i', $token) || preg_match('/^http/i', $token))) {
-      // it is a url so we need to check to see if there are any tokens embedded
-      // if so then call this function again to get the token dataFunc
-      // and assign the type 'embedded'  so that the data retrieving function
-      // will know what how to handle this token.
-      if (preg_match_all('/(\{\w+\.\w+\})/', $token, $matches)) {
-        $funcStruct['type'] = 'embedded_url';
-        $funcStruct['embed_parts'] = $funcStruct['token'] = [];
-        foreach ($matches[1] as $match) {
-          $preg_token = '/' . preg_quote($match, '/') . '/';
-          $list = preg_split($preg_token, $token, 2);
-          $funcStruct['embed_parts'][] = $list[0];
-          $token = $list[1];
-          $funcStruct['token'][] = $this->getDataFunc($match);
-        }
-        // fixed truncated url, CRM-7113
-        if ($token) {
-          $funcStruct['embed_parts'][] = $token;
-        }
-      }
-      else {
-        $funcStruct['type'] = 'url';
-      }
-    }
-    elseif (preg_match('/^\{(' . $_categoryString . ')\.(\w+)\}$/', $token, $matches)) {
-      $funcStruct['type'] = $matches[1];
-      $funcStruct['token'] = $matches[2];
-    }
-    elseif (preg_match('/\\\\\{(\w+\.\w+)\\\\\}|\{\{(\w+\.\w+)\}\}/', $token, $matches)) {
-      // we are an escaped token
-      // so remove the escape chars
-      $unescaped_token = preg_replace('/\{\{|\}\}|\\\\\{|\\\\\}/', '', $matches[0]);
-      $funcStruct['token'] = '{' . $unescaped_token . '}';
-    }
-    return $funcStruct;
-  }
-
-  /**
-   * Prepares the text and html templates
-   * for generating the emails and returns a copy of the
-   * prepared templates
-   *
-   * @deprecated
-   *   This is used by CiviMail but will be made redundant by FlexMailer/TokenProcessor.
-   */
-  private function getPreparedTemplates() {
-    if (!$this->preparedTemplates) {
-      $patterns['html'] = $this->getPatterns(TRUE);
-      $patterns['subject'] = $patterns['text'] = $this->getPatterns();
-      $templates = $this->getTemplates();
-
-      $this->preparedTemplates = [];
-
-      foreach (['html', 'text', 'subject'] as $key) {
-        if (!isset($templates[$key])) {
-          continue;
-        }
-
-        $matches = [];
-        $tokens = [];
-        $split_template = [];
-
-        $email = $templates[$key];
-        preg_match_all($patterns[$key], $email, $matches, PREG_PATTERN_ORDER);
-        foreach ($matches[0] as $idx => $token) {
-          $preg_token = '/' . preg_quote($token, '/') . '/im';
-          [$split_template[], $email] = preg_split($preg_token, $email, 2);
-          array_push($tokens, $this->getDataFunc($token));
-        }
-        if ($email) {
-          $split_template[] = $email;
-        }
-        $this->preparedTemplates[$key]['template'] = $split_template;
-        $this->preparedTemplates[$key]['tokens'] = $tokens;
-      }
-    }
-    return ($this->preparedTemplates);
-  }
-
-  /**
    * Retrieve a ref to an array that holds the email and text templates for this email
    * assembles the complete template including the header and footer
    * that the user has uploaded or declared (if they have done that)
@@ -1267,7 +1159,10 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
   /**
    * @deprecated
-   *   This is used by CiviMail but will be made redundant by FlexMailer.
+   *
+   * @todo - this just does an sms has-body-text check now - it would be clearer just
+   * to do this in the sms function that calls this & remove it.
+   *
    * @param CRM_Mailing_DAO_Mailing|array $mailing
    *   The mailing which may or may not be sendable.
    * @return array
@@ -1284,41 +1179,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $mailing->copyValues($params);
     }
     $errors = [];
-    if ($mailing->sms_provider_id) {
-      if (empty($mailing->body_text)) {
-        $errors['body'] = ts('Field "body_text" is required.');
-      }
-    }
-    else {
-      foreach (['subject', 'name', 'from_name', 'from_email'] as $field) {
-        if (empty($mailing->{$field})) {
-          $errors[$field] = ts('Field "%1" is required.', [
-            1 => $field,
-          ]);
-        }
-      }
-      if (empty($mailing->body_html) && empty($mailing->body_text)) {
-        $errors['body'] = ts('Field "body_html" or "body_text" is required.');
-      }
-
-      if (!Civi::settings()->get('disable_mandatory_tokens_check')) {
-        $header = $mailing->header_id && $mailing->header_id !== 'null' ? CRM_Mailing_BAO_MailingComponent::findById($mailing->header_id) : NULL;
-        $footer = $mailing->footer_id && $mailing->footer_id !== 'null' ? CRM_Mailing_BAO_MailingComponent::findById($mailing->footer_id) : NULL;
-        foreach (['body_html', 'body_text'] as $field) {
-          if (empty($mailing->{$field})) {
-            continue;
-          }
-          $str = ($header ? $header->{$field} : '') . $mailing->{$field} . ($footer ? $footer->{$field} : '');
-          $err = CRM_Utils_Token::requiredTokens($str);
-          if ($err !== TRUE) {
-            foreach ($err as $token => $desc) {
-              $errors["{$field}:{$token}"] = ts('This message is missing a required token - {%1}: %2',
-                [1 => $token, 2 => $desc]
-              );
-            }
-          }
-        }
-      }
+    if (empty($mailing->body_text)) {
+      $errors['body'] = ts('Field "body_text" is required.');
     }
     return $errors;
   }
@@ -1648,7 +1510,9 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $report['jobs'][] = $row;
     }
 
-    $report['event_totals']['queue'] = CRM_Mailing_BAO_MailingRecipients::mailingSize($mailing_id);
+    if (empty($report['event_totals']['queue'])) {
+      $report['event_totals']['queue'] = CRM_Mailing_BAO_MailingRecipients::mailingSize($mailing_id);
+    }
 
     if (!empty($report['event_totals']['queue'])) {
       $report['event_totals']['delivered_rate'] = (100.0 * $report['event_totals']['delivered']) / $report['event_totals']['queue'];

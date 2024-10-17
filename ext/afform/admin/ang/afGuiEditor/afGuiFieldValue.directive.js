@@ -26,7 +26,7 @@
             if (typeof value === 'boolean') {
               return value ? '1' : '0';
             }
-            return value;
+            return '' + value;
           }
           ctrls.ngModel.$formatters.push(formatViewValue);
         }
@@ -110,11 +110,19 @@
           if (ctrl.field) {
             dataType = ctrl.field.data_type;
           }
+          else {
+            dataType = null;
+          }
         }
 
         function convertDataType(val) {
           if (dataType === 'Integer') {
-            return +val;
+            let newVal = +val;
+            // FK Entities can use a mix of numeric & string values (see `"static": options` above)
+            if (ctrl.field.fk_entity && ('' + newVal) !== val) {
+              return val;
+            }
+            return newVal;
           }
           return val;
         }

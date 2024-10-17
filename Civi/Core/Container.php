@@ -493,8 +493,6 @@ class Container {
     $dispatcher->addListener('hook_civicrm_eventDefs', ['\Civi\Core\Event\SystemInstallEvent', 'hookEventDefs']);
     $dispatcher->addListener('hook_civicrm_buildAsset', ['\Civi\Angular\Page\Modules', 'buildAngularModules']);
     $dispatcher->addListenerService('civi.region.render', ['angularjs.loader', 'onRegionRender']);
-    $dispatcher->addListener('hook_civicrm_buildAsset', ['\CRM_Utils_VisualBundle', 'buildAssetJs']);
-    $dispatcher->addListener('hook_civicrm_buildAsset', ['\CRM_Utils_VisualBundle', 'buildAssetCss']);
     $dispatcher->addListener('hook_civicrm_buildAsset', ['\CRM_Core_Resources', 'renderMenubarStylesheet']);
     $dispatcher->addListener('hook_civicrm_buildAsset', ['\CRM_Core_Resources', 'renderL10nJs']);
     $dispatcher->addListener('hook_civicrm_coreResourceList', ['\CRM_Utils_System', 'appendCoreResources']);
@@ -693,6 +691,7 @@ class Container {
 
     if ($loadFromDB && $runtime->dsn) {
       \CRM_Core_DAO::init($runtime->dsn);
+      $bootServices['settings_manager']->dbAvailable();
       \CRM_Utils_Hook::singleton(TRUE);
       \CRM_Extension_System::singleton(TRUE);
       \CRM_Extension_System::singleton()->getClassLoader()->register();

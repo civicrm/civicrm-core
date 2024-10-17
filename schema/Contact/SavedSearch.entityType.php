@@ -102,7 +102,7 @@ return [
         'label' => ts('For'),
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Contact_BAO_SavedSearch::getApiEntityOptions',
+        'callback' => ['CRM_Contact_BAO_SavedSearch', 'getApiEntityOptions'],
       ],
     ],
     'api_params' => [
@@ -116,10 +116,11 @@ return [
     'created_id' => [
       'title' => ts('Created By Contact ID'),
       'sql_type' => 'int unsigned',
-      'input_type' => NULL,
+      'input_type' => 'EntityRef',
       'readonly' => TRUE,
       'description' => ts('FK to contact table.'),
       'add' => '5.36',
+      'default_callback' => ['CRM_Core_Session', 'getLoggedInContactID'],
       'input_attrs' => [
         'label' => ts('Created By'),
       ],
@@ -132,10 +133,11 @@ return [
     'modified_id' => [
       'title' => ts('Modified By Contact ID'),
       'sql_type' => 'int unsigned',
-      'input_type' => NULL,
+      'input_type' => 'EntityRef',
       'readonly' => TRUE,
       'description' => ts('FK to contact table.'),
       'add' => '5.36',
+      'default_callback' => ['CRM_Core_Session', 'getLoggedInContactID'],
       'input_attrs' => [
         'label' => ts('Modified By'),
       ],

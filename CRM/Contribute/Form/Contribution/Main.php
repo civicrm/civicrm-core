@@ -1338,10 +1338,9 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     if (empty($this->getExistingContributionID())) {
       return;
     }
-    // @todo - all this stuff is likely obsolete.
-    if ($taxAmount = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $this->_ccid, 'tax_amount')) {
-      $this->assign('taxAmount', $taxAmount);
-    }
+
+    $this->assign('taxAmount', $this->getContributionValue('tax_amount'));
+    $this->assign('taxTerm', Civi::settings()->get('tax_term'));
 
     $lineItems = $this->getExistingContributionLineItems();
     $this->assign('lineItem', [$this->getPriceSetID() => $lineItems]);

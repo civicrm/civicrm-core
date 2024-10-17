@@ -315,11 +315,9 @@ class TokenProcessorTest extends \CiviUnitTestCase {
 
   /**
    * Check that we can render contribution and contribution_recur tokens when passing a contribution ID.
-   * This checks Bestspoke tokens
+   * This checks Bespoke tokens
    *
-   * @return void
-   * @throws \API_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
+   * @throws \CRM_Core_Exception
    */
   public function testRenderContributionRecurTokenFromContribution(): void {
     $cid = $this->individualCreate();
@@ -354,11 +352,9 @@ class TokenProcessorTest extends \CiviUnitTestCase {
 
   /**
    * Check that we can render membership and contribution_recur tokens when passing a membership ID.
-   * This checks Bestspoke Tokens work correctly
+   * This checks Bespoke Tokens work correctly
    *
-   * @return void
-   * @throws \API_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
+   * @throws \CRM_Core_Exception
    */
   public function testRenderContributionRecurTokenFromMembership(): void {
     $cid = $this->individualCreate();

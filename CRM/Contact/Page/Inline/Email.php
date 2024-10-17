@@ -20,6 +20,8 @@
  */
 class CRM_Contact_Page_Inline_Email extends CRM_Core_Page {
 
+  use CRM_Custom_Page_CustomDataTrait;
+
   /**
    * Run the page.
    *
@@ -29,13 +31,14 @@ class CRM_Contact_Page_Inline_Email extends CRM_Core_Page {
     // get the emails for this contact
     $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', NULL, TRUE);
 
-    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', ['labelColumn' => 'display_name']);
+    $locationTypes = CRM_Core_BAO_Address::buildOptions('location_type_id');
 
     $entityBlock = ['contact_id' => $contactId];
     $emails = CRM_Core_BAO_Email::getValues($entityBlock);
     if (!empty($emails)) {
       foreach ($emails as &$value) {
         $value['location_type'] = $locationTypes[$value['location_type_id']];
+        $value['custom'] = $this->getCustomDataFieldsForEntityDisplay('Email', $value['id']);
       }
     }
 

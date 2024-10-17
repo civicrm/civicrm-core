@@ -114,6 +114,7 @@ class CRM_Upgrade_Incremental_php_FiveSeventySix extends CRM_Upgrade_Incremental
         CRM_Core_DAO::executeQuery('DROP table civicrm_event_carts');
       }
       if (!CRM_Core_DAO::singleValueQuery('SELECT cart_id FROM civicrm_participant WHERE cart_id > 0 LIMIT 1')) {
+        \CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_participant', 'FK_civicrm_participant_cart_id');
         \CRM_Core_BAO_SchemaHandler::dropColumn('civicrm_participant', 'cart_id', FALSE, TRUE);
       }
     }
@@ -249,8 +250,8 @@ INNER JOIN
 as job
 ON job.mailing_id = m.id
 SET m.status = "Complete",
-    start_date = job.start_date,
-    end_date = job.end_date,
+    m.start_date = job.start_date,
+    m.end_date = job.end_date,
     is_completed = 1
 WHERE (m.status IS NULL OR m.status = "Draft")
    AND m.id BETWEEN %1 AND %2', [1 => [$startId, 'Integer'], 2 => [$endId, 'Integer']]);

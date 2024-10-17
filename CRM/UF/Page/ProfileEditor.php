@@ -45,9 +45,9 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
         }
         return [
           'PseudoConstant' => [
-            'locationType' => CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id'),
-            'websiteType' => CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id'),
-            'phoneType' => CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id'),
+            'locationType' => CRM_Core_DAO_Address::buildOptions('location_type_id'),
+            'websiteType' => CRM_Core_DAO_Website::buildOptions('website_type_id'),
+            'phoneType' => CRM_Core_DAO_Phone::buildOptions('phone_type_id'),
           ],
           'initialProfileList' => $ufGroups,
           'contactSubTypes' => CRM_Contact_BAO_ContactType::subTypes(),

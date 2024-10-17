@@ -232,7 +232,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
     $this->addElement('hidden', 'batch_id', $this->_batchId);
 
-    $batchTypes = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'type_id', ['flip' => 1], 'validate');
+    $batchTypes = array_flip(CRM_Batch_DAO_Batch::buildOptions('type_id', 'validate'));
     // get the profile information
     if ($this->_batchInfo['type_id'] == $batchTypes['Contribution']) {
       $this->setTitle(ts('Batch Data Entry for Contributions'));
@@ -382,7 +382,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    */
   public static function formRule($params, $files, $self) {
     $errors = [];
-    $batchTypes = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'type_id', ['flip' => 1], 'validate');
+    $batchTypes = array_flip(CRM_Batch_DAO_Batch::buildOptions('type_id', 'validate'));
     $fields = [
       'total_amount' => ts('Amount'),
       'financial_type' => ts('Financial Type'),
@@ -508,7 +508,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     $params['actualBatchTotal'] = 0;
 
     // get the profile information
-    $batchTypes = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'type_id', ['flip' => 1], 'validate');
+    $batchTypes = array_flip(CRM_Batch_DAO_Batch::buildOptions('type_id', 'validate'));
     if (in_array($this->_batchInfo['type_id'], [$batchTypes['Pledge Payment'], $batchTypes['Contribution']])) {
       $this->processContribution($params);
     }
@@ -667,7 +667,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         if ($retrieveRequired == 1) {
           $contribution->find(TRUE);
         }
-        $batchTypes = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'type_id', ['flip' => 1], 'validate');
+        $batchTypes = array_flip(CRM_Batch_DAO_Batch::buildOptions('type_id', 'validate'));
         if (!empty($this->_batchInfo['type_id']) && ($this->_batchInfo['type_id'] == $batchTypes['Pledge Payment'])) {
           $adjustTotalAmount = FALSE;
           if (isset($params['option_type'][$key])) {

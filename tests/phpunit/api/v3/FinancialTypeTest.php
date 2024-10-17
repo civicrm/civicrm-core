@@ -67,7 +67,7 @@ class api_v3_FinancialTypeTest extends CiviUnitTestCase {
       });
       $this->callAPISuccessGetSingle('FinancialType', [
         'id' => $financialType['id'],
-      ], $expectedResult);
+      ], $expectedResult + ['label' => $financialTypeName]);
 
       // updated financial type with custom field
       $updateCustomFields = [];
@@ -87,7 +87,7 @@ class api_v3_FinancialTypeTest extends CiviUnitTestCase {
       });
       $this->callAPISuccessGetSingle('FinancialType', [
         'id' => $financialType['id'],
-      ], $expectedResult);
+      ], $expectedResult + ['label' => $financialTypeName]);
       $this->callAPISuccess('FinancialType', 'delete', ['id' => $financialType['id']]);
     }
   }

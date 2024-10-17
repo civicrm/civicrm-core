@@ -116,7 +116,7 @@ class CRM_Event_Form_Task_SaveSearch extends CRM_Event_Form_Task {
     if ($this->_id) {
       $params['id'] = CRM_Contact_BAO_SavedSearch::getName($this->_id, 'id');
     }
-    $group = CRM_Contact_BAO_Group::create($params);
+    $group = CRM_Contact_BAO_Group::writeRecord($params);
   }
 
 }

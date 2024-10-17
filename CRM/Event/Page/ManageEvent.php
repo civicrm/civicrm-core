@@ -81,7 +81,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
         CRM_Core_Action::COPY => [
           'name' => ts('Copy'),
           'url' => CRM_Utils_System::currentPath(),
-          'qs' => 'reset=1&action=copy&id=%%id%%',
+          'qs' => 'reset=1&action=copy&id=%%id%%&qfKey=%%key%%',
           'extra' => 'onclick = "return confirm(\'' . $copyExtra . '\');"',
           'title' => ts('Copy Event'),
           'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::COPY),
@@ -182,14 +182,6 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
             'field' => 'reminder',
           ];
       }
-      if (!function_exists('tellafriend_civicrm_config')) {
-        self::$_tabLinks[$cacheKey]['friend']
-          = [
-            'title' => ts('Tell a Friend'),
-            'url' => 'civicrm/event/manage/friend',
-            'field' => 'friend',
-          ];
-      }
       self::$_tabLinks[$cacheKey]['pcp']
         = [
           'title' => ts('Personal Campaign Pages'),
@@ -263,6 +255,11 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
       return $controller->run();
     }
     elseif ($action & CRM_Core_Action::COPY) {
+      $key = $_POST['qfKey'] ?? $_GET['qfKey'] ?? $_REQUEST['qfKey'] ?? NULL;
+      $k = CRM_Core_Key::validate($key, CRM_Utils_System::getClassName($this));
+      if (!$k) {
+        $this->invalidKey();
+      }
       $this->copy();
     }
 
@@ -396,7 +393,7 @@ ORDER BY start_date desc
         );
         $manageEvent[$dao->id]['action'] = CRM_Core_Action::formLink(self::links(),
           $action,
-          ['id' => $dao->id],
+          ['id' => $dao->id, 'key' => CRM_Core_Key::get(CRM_Utils_System::getClassName($this))],
           ts('more'),
           TRUE,
           'event.manage.list',

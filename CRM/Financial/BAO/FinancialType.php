@@ -138,6 +138,16 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
   }
 
   /**
+   * Pseudoconstant condition_provider for financial_type_id field.
+   * @see \Civi\Schema\EntityMetadataBase::getConditionFromProvider
+   */
+  public static function alterIncomeFinancialTypes(string $fieldName, CRM_Utils_SQL_Select $conditions, $params): void {
+    $allowedTypes = self::getIncomeFinancialType($params['check_permissions']);
+    $allowedTypes = array_keys($allowedTypes) ?: 0;
+    $conditions->where('id IN (#financialTypeId)', ['financialTypeId' => $allowedTypes]);
+  }
+
+  /**
    * Fetch financial types having relationship as Income Account is.
    *
    * @return array
@@ -146,6 +156,9 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
    * @throws \CRM_Core_Exception
    */
   public static function getIncomeFinancialType($checkPermissions = TRUE): array {
+    if (!CRM_Core_Component::isEnabled('CiviContribute')) {
+      return [];
+    }
     // Realistically tests are the only place where logged in contact can
     // change during the session at this stage.
     $key = 'income_type' . (int) $checkPermissions;

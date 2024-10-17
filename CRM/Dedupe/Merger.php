@@ -885,18 +885,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         }
       }
       else {
-        if (substr($key, 0, 4) === 'url-') {
-          CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
-          $websiteField = explode('-', $key);
-          $data['website'][$websiteField[1]]['website_type_id'] = $websiteField[1];
-          $data['website'][$websiteField[1]]['url'] = $value;
-        }
-        elseif (in_array($key, CRM_Contact_BAO_Contact::$_greetingTypes, TRUE)) {
-          CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
-          //save email/postal greeting and addressee values if any, CRM-4575
-          $data[$key . '_id'] = $value;
-        }
-        elseif (($customFieldId = CRM_Core_BAO_CustomField::getKeyID($key))) {
+        if (($customFieldId = CRM_Core_BAO_CustomField::getKeyID($key))) {
           // for autocomplete transfer hidden value instead of label
           if ($params[$key] && isset($params[$key . '_id'])) {
             $value = $params[$key . '_id'];
@@ -915,21 +904,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           }
 
           $valueId = NULL;
-          if (!empty($params['customRecordValues'])) {
-            CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
-            if (is_array($params['customRecordValues']) && !empty($params['customRecordValues'])) {
-              foreach ($params['customRecordValues'] as $recId => $customFields) {
-                if (is_array($customFields) && !empty($customFields)) {
-                  foreach ($customFields as $customFieldName) {
-                    if ($customFieldName == $key) {
-                      $valueId = $recId;
-                      break;
-                    }
-                  }
-                }
-              }
-            }
-          }
 
           //CRM-13596 - check for contact_sub_type_hidden first
           $type = $data['contact_type'];
@@ -937,6 +911,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
             $type = CRM_Utils_Array::explodePadded($data['contact_sub_type']);
           }
 
+          $includeViewOnly = TRUE;
           CRM_Core_BAO_CustomField::formatCustomField($customFieldId,
             $data['custom'],
             $value,
@@ -944,45 +919,12 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
             $valueId,
             $contactID,
             FALSE,
-            FALSE
+            FALSE,
+            $includeViewOnly,
           );
         }
-        elseif ($key === 'edit') {
-          CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
-          continue;
-        }
         else {
-          if ($key === 'location') {
-            CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
-            foreach ($value as $locationTypeId => $field) {
-              foreach ($field as $block => $val) {
-                if ($block === 'address' && array_key_exists('address_name', $val)) {
-                  $value[$locationTypeId][$block]['name'] = $value[$locationTypeId][$block]['address_name'];
-                }
-              }
-            }
-          }
-          if ($key === 'phone' && isset($params['phone_ext'])) {
-            CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
-            $data[$key] = $value;
-            foreach ($value as $cnt => $phoneBlock) {
-              if ($params[$key][$cnt]['location_type_id'] == $params['phone_ext'][$cnt]['location_type_id']) {
-                $data[$key][$cnt]['phone_ext'] = CRM_Utils_Array::retrieveValueRecursive($params['phone_ext'][$cnt], 'phone_ext');
-              }
-            }
-          }
-          elseif (in_array($key, ['nick_name', 'job_title', 'middle_name', 'birth_date', 'gender_id', 'current_employer', 'prefix_id', 'suffix_id'])
-            && ($value == '' || !isset($value)) &&
-            ($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0 ||
-            ($key === 'current_employer' && empty($params['current_employer']))) {
-            // CRM-10128: if auth source is not checksum / login && $value is blank, do not fill $data with empty value
-            // to avoid update with empty values
-            CRM_Core_Error::deprecatedWarning('code should be unreachable, slated for removal');
-            continue;
-          }
-          else {
-            $data[$key] = $value;
-          }
+          $data[$key] = $value;
         }
       }
     }
@@ -1746,8 +1688,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       $submitted = [];
     }
 
-    // Move view only custom fields CRM-5362
-    $viewOnlyCustomFields = [];
     foreach ($submitted as $key => $value) {
       if (strpos($key, 'custom_') === 0) {
         $fieldID = (int) substr($key, 7);
@@ -1757,17 +1697,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           $isSerialized = $fieldMetadata['serialize'];
           $isView = $fieldMetadata['is_view'];
           $submitted = self::processCustomFields($mainId, $key, $submitted, $value, $fieldID, $isView, $htmlType, $isSerialized);
-          if ($isView) {
-            $viewOnlyCustomFields[$key] = $submitted[$key];
-          }
         }
       }
-    }
-
-    // special case to set values for view only, CRM-5362
-    if (!empty($viewOnlyCustomFields)) {
-      $viewOnlyCustomFields['entityID'] = $mainId;
-      CRM_Core_BAO_CustomValueTable::setValues($viewOnlyCustomFields);
     }
 
     // dev/core#996 Ensure that the earliest created date is stored against the kept contact id

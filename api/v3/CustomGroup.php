@@ -120,3 +120,17 @@ function civicrm_api3_custom_group_setvalue($params) {
   }
   return $result;
 }
+
+function civicrm_api3_custom_group_getoptions($params) {
+  $result = civicrm_api3_generic_getoptions(['entity' => 'CustomGroup', 'params' => $params]);
+  // This provides legacy support for APIv3, which also needs the ParticipantEventName etc pseudo-selectors
+  if ($params['field'] === 'extends') {
+    $options = CRM_Core_SelectValues::customGroupExtends();
+    $options = CRM_Core_PseudoConstant::formatArrayOptions($params['context'] ?? NULL, $options);
+    if (!empty($params['sequential'])) {
+      $options = CRM_Utils_Array::makeNonAssociative($options);
+    }
+    $result['values'] = $options;
+  }
+  return $result;
+}

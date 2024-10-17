@@ -315,8 +315,6 @@ WHERE  $whereClause
 
     $session = CRM_Core_Session::singleton();
 
-    $params['last_modified_id'] = $session->get('userID');
-    $params['last_modified_date'] = date('YmdHis');
     $params['is_share'] ??= FALSE;
 
     if ($this->_surveyId) {
@@ -341,7 +339,7 @@ WHERE  $whereClause
 
     $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params, $this->getEntityId(), $this->getDefaultEntity());
 
-    $surveyId = CRM_Campaign_BAO_Survey::create($params);
+    $surveyId = CRM_Campaign_BAO_Survey::writeRecord($params);
 
     // also update the ProfileModule tables
     $ufJoinParams = [

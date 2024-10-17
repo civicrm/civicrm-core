@@ -83,7 +83,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
    * Gets session variables for table name, id of entity in table, type of entity and stores them.
    */
   public function preProcess() {
-    $this->_cdType = $_GET['type'] ?? NULL;
+    $this->_cdType = CRM_Utils_Request::retrieve('type', 'String', $this, FALSE, NULL);
     $this->_multiRecordDisplay = CRM_Utils_Request::retrieve('multiRecordDisplay', 'String', $this);
     $isBuildForm = $this->_cdType && $this->_multiRecordDisplay;
     $this->assign('cdType', (bool) $this->_cdType);
@@ -367,8 +367,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
    */
   public function postProcess() {
     // Get the form values and groupTree
-    //CRM-18183
-    $params = $this->controller->exportValues($this->_name);
+    $params = $this->getSubmittedValues();
 
     CRM_Core_BAO_CustomValueTable::postProcess($params,
       'civicrm_contact',

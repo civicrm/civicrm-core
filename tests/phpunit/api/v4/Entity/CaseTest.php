@@ -36,6 +36,22 @@ class CaseTest extends Api4TestBase {
     \CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
   }
 
+  public function testGetFields(): void {
+    $fields = CiviCase::getFields(FALSE)
+      ->setAction('create')
+      ->setLoadOptions(['id', 'name', 'label'])
+      ->execute()->indexBy('name');
+
+    $encounterMediums = array_column($fields['medium_id']['options'], NULL, 'name');
+    $this->assertArrayHasKey('in_person', $encounterMediums);
+    $this->assertEquals(['name', 'label', 'description'], $fields['medium_id']['suffixes']);
+
+    $this->assertSame('Number', $fields['duration']['input_type']);
+    $this->assertSame('Text', $fields['location']['input_type']);
+    $this->assertSame('EntityRef', $fields['creator_id']['input_type']);
+    $this->assertSame('user_contact_id', $fields['creator_id']['default_value']);
+  }
+
   public function testCreateUsingLoggedInUser(): void {
     $uid = $this->createLoggedInUser();
 
@@ -69,6 +85,33 @@ class CaseTest extends Api4TestBase {
       ->first();
 
     $this->assertContains('Test Case Type', $field['options']);
+  }
+
+  public function testGetStatusIdPerCaseType(): void {
+    $this->createTestRecord('OptionValue', [
+      'option_group_id:name' => 'case_status',
+      'label' => 'Testing',
+      'name' => 'Testing',
+      'grouping' => 'Opened',
+    ]);
+
+    $caseType = $this->createTestRecord('CaseType', [
+      'title' => 'Test Case Type',
+      'name' => 'test_case_type2',
+      'definition' => [
+        'statuses' => ['Testing', 'Closed'],
+      ],
+    ]);
+
+    $field = CiviCase::getFields(FALSE)
+      ->setLoadOptions(['id', 'label', 'name'])
+      ->addValue('case_type_id:name', 'test_case_type2')
+      ->addWhere('name', '=', 'status_id')
+      ->execute()
+      ->first();
+    $options = array_column($field['options'], 'name');
+
+    $this->assertEquals(['Closed', 'Testing'], $options);
   }
 
   public function testCaseActivity(): void {

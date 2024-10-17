@@ -48,8 +48,8 @@ class CRM_Financial_Form_FinancialType extends CRM_Core_Form {
    */
   protected function setEntityFields() {
     $this->entityFields = [
-      'name' => [
-        'name' => 'name',
+      'label' => [
+        'name' => 'label',
         'required' => TRUE,
       ],
       'description' => ['name' => 'description'],
@@ -91,7 +91,7 @@ class CRM_Financial_Form_FinancialType extends CRM_Core_Form {
     if ($this->_action == CRM_Core_Action::UPDATE && CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', $this->_id, 'is_reserved')) {
       $this->freeze(['is_active']);
     }
-    $this->addRule('name', ts('A financial type with this name already exists. Please select another name.'), 'objectExists',
+    $this->addRule('label', ts('A financial type with this label already exists. Please select another label.'), 'objectExists',
       ['CRM_Financial_DAO_FinancialType', $this->_id]
     );
   }
@@ -120,16 +120,19 @@ class CRM_Financial_Form_FinancialType extends CRM_Core_Form {
       foreach (['is_active', 'is_reserved', 'is_deductible'] as $field) {
         $params[$field] ??= FALSE;
       }
-      $financialType = civicrm_api3('FinancialType', 'create', $params);
+      $financialType = civicrm_api4('FinancialType', 'save', [
+        'records' => [$params],
+        'checkPermissions' => TRUE,
+      ])->first();
       if ($this->_action & CRM_Core_Action::UPDATE) {
         $url = CRM_Utils_System::url('civicrm/admin/financial/financialType', 'reset=1&action=browse');
-        CRM_Core_Session::setStatus(ts('The financial type "%1" has been updated.', [1 => $params['name']]), ts('Saved'), 'success');
+        CRM_Core_Session::setStatus(ts('The financial type "%1" has been updated.', [1 => $params['label']]), ts('Saved'), 'success');
       }
       else {
         $url = CRM_Utils_System::url('civicrm/admin/financial/financialType/accounts', 'reset=1&action=browse&aid=' . $financialType['id']);
 
         $statusArray = [
-          1 => $params['name'],
+          1 => $params['label'],
         ];
         $financialAccounts = civicrm_api3('EntityFinancialAccount', 'get', [
           'return' => ['financial_account_id.name'],
