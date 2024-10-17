@@ -2,6 +2,9 @@
  - REMOVED narrow front-end form width for all Streams other than Hackney
  - FIXED inline edit button alignment for SearchKit output
  - CHANGED readme.
+ - REMOVED border from form builder fieldset
+ - CHANGED Hackney button icon background to tint to support button colouring
+ - CHANGED Minetta tab body and active state to another value than --crm-page-background
 
 1.0.0beta2
  - ADDED padding to FormBuilder dashlets
