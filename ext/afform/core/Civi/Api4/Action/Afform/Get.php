@@ -196,7 +196,13 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
           if (!$custom['is_multiple']) {
             $nameAttribute = $custom['name'] . "." . $nameAttribute;
           }
-          $item['layout'] .= "<af-field name=\"{$nameAttribute}\" />\n";
+
+          // by default, the AfformMetadataInjector prefixes the field label with the custom group label
+          // but in the context of a group block this is overkill, because the custom group label
+          // prefix is repeated on every field - so override the label defn with the unprefixed field label
+          $label = $field['label'];
+
+          $item['layout'] .= "<af-field name=\"{$nameAttribute}\" defn=\"{label: '{$label}'}\" />\n";
         }
         $item['layout'] .= ($custom['help_post'] ? '<div class="af-markup">' . $custom['help_post'] . "</div>\n" : '');
       }
