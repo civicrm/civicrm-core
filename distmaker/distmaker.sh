@@ -36,13 +36,13 @@ source "$P/dists/common.sh"
 
 # Set no actions by default
 BPACK=0
-D5PACK=0
+D7PACK=0
 D7DIR=0
+J4PACK=0
 J5PACK=0
-JOOMLA5PACK=0
-WP5PACK=0
+WPPACK=0
 PATCHPACK=0
-SK5PACK=0
+SKPACK=0
 STANDALONEPACK=0
 L10NPACK=0
 REPOREPORT=0
@@ -57,11 +57,12 @@ display_usage()
   echo "Options available:"
   echo "  all            - generate all available tarballs"
   echo "  l10n           - generate internationalization data"
-  echo "  Backdrop       - generate Backdrop PHP5 module"
-  echo "  Drupal|d5      - generate Drupal7 PHP5 module"
-  echo "  d7_dir         - generate Drupal7 PHP5 module, but output to a directory, no tarball"
-  echo "  Joomla|j5      - generate Joomla PHP5 module"
-  echo "  WordPress|wp5  - generate Wordpress PHP5 module"
+  echo "  Backdrop       - generate Backdrop module"
+  echo "  Drupal         - generate Drupal7 module"
+  echo "  d7_dir         - generate Drupal7 module, but output to a directory, no tarball"
+  echo "  Joomla4|Joomla - generate Joomla 4 module"
+  echo "  Joomla5        - generate Joomla 5 module"
+  echo "  WordPress      - generate Wordpress module"
   echo "  patchset       - generate a tarball with patch files"
   echo "  sk             - generate Drupal StarterKit module"
   echo "  standalone     - generate CiviCRM Standalone"
@@ -148,22 +149,22 @@ check_conf
 
 # Figure out what to do
 case $1 in
-  # L10N PHP5
+  # L10N
   l10n)
   dm_note "Enable CiviCRM L10N"
   L10NPACK=1
   ;;
 
-  # BACKDROP PHP5
+  # BACKDROP
   Backdrop)
   dm_note "Enable CiviCRM-Backdrop"
   BPACK=1
   ;;
 
-  # DRUPAL7 PHP5
-  d5|Drupal)
+  # DRUPAL7
+  Drupal)
   dm_note "Enable CiviCRM-Drupal 7"
-  D5PACK=1
+  D7PACK=1
   ;;
 
   # Drupal 7 - Output to directory
@@ -172,32 +173,28 @@ case $1 in
   D7DIR=1
   ;;
 
-  # DRUPAL7 PHP5 StarterKit package
+  # DRUPAL7 StarterKit package
   sk)
   dm_note "Enable CiviCRM-Drupal 7 (StarterKit version)"
   SKPACK=1
   ;;
 
-  # JOOMLA PHP5
-  Joomla)
-  dm_note "Enable CiviCRM-Joomla"
+  # JOOMLA4
+  Joomla4|Joomla)
+  dm_note "Enable CiviCRM-Joomla 4"
+  J4PACK=1
+  ;;
+
+  # JOOMLA5
+  Joomla5)
+  dm_note "Enable CiviCRM-Joomla 5"
   J5PACK=1
   ;;
 
-  Joomla5)
-  dm_note "Enable CiviCRM-Joomla 5"; echo;
-  JOOMLA5PACK=1
-  ;;
-
-  j5)
-  echo >&2 "j5 is ambiguous"
-  exit 1
-  ;;
-
-  # WORDPRESS PHP5
-  wp5|WordPress)
+  # WORDPRESS
+  WordPress)
   dm_note "Enable CiviCRM-Wordpress"
-  WP5PACK=1
+  WPPACK=1
   ;;
 
   # STANDALONE
@@ -212,7 +209,7 @@ case $1 in
   PATCHPACK=1
   ;;
 
-  # REPO REPORT PHP5
+  # REPO REPORT
   report)
   dm_note "Enable repo report"
   REPOREPORT=1
@@ -222,10 +219,10 @@ case $1 in
   all)
   dm_note "Enable all the tarballs we've got (not the directories). "
   BPACK=1
-  D5PACK=1
+  D7PACK=1
+  J4PACK=1
   J5PACK=1
-  JOOMLA5PACK=1
-  WP5PACK=1
+  WPPACK=1
   PATCHPACK=1
   SKPACK=1
   STANDALONEPACK=1
@@ -283,7 +280,7 @@ if [ "$BPACK" = 1 ]; then
   bash $P/dists/backdrop_php5.sh
 fi
 
-if [ "$D5PACK" = 1 ]; then
+if [ "$D7PACK" = 1 ]; then
   dm_title "Build CiviCRM-Drupal 7"
   dm_git_checkout "$DM_SOURCEDIR/drupal" "$DM_REF_DRUPAL"
   bash $P/dists/drupal_php5.sh
@@ -301,19 +298,19 @@ if [ "$SKPACK" = 1 ]; then
   bash $P/dists/drupal_sk_php5.sh
 fi
 
-if [ "$J5PACK" = 1 ]; then
+if [ "$J4PACK" = 1 ]; then
   dm_title "Build CiviCRM-Joomla"
   dm_git_checkout "$DM_SOURCEDIR/joomla" "$DM_REF_JOOMLA"
   bash $P/dists/joomla_php5.sh
 fi
 
-if [ "$JOOMLA5PACK" = 1 ]; then
+if [ "$J5PACK" = 1 ]; then
   dm_title "Build CiviCRM-Joomla 5"
   dm_git_checkout "$DM_SOURCEDIR/joomla" "$DM_REF_JOOMLA"
   bash $P/dists/joomla5_php.sh
 fi
 
-if [ "$WP5PACK" = 1 ]; then
+if [ "$WPPACK" = 1 ]; then
   dm_title "Build CiviCRM-Wordpress"
   dm_git_checkout "$DM_SOURCEDIR/WordPress" "$DM_REF_WORDPRESS"
   bash $P/dists/wordpress_php5.sh
@@ -334,11 +331,11 @@ if [ "$REPOREPORT" = 1 ]; then
   env \
     L10NPACK="$L10NPACK" \
     BPACK="$BPACK" \
-    D5PACK="$D5PACK" \
+    D7PACK="$D7PACK" \
     D7DIR="$D7DIR" \
     SKPACK="$SKPACK" \
-    J5PACK="$J5PACK" \
-    WP5PACK="$WP5PACK" \
+    J4PACK="$J4PACK" \
+    WPPACK="$WPPACK" \
     STANDALONEPACK="$STANDALONEPACK" \
     bash $P/dists/repo-report.sh
 fi
