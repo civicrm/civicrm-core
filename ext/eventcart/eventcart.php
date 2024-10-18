@@ -13,7 +13,7 @@ function eventcart_civicrm_config(&$config) {
     return;
   }
   Civi::$statics[__FUNCTION__] = 1;
-  Civi::dispatcher()->addListener('hook_civicrm_pageRun', 'CRM_Event_Cart_PageCallback::run');
+  Civi::dispatcher()->addListener('hook_civicrm_pageRun', ['CRM_Event_Cart_PageCallback', 'run']);
 
   _eventcart_civix_civicrm_config($config);
 }
