@@ -39,7 +39,7 @@ BPACK=0
 D7PACK=0
 D7DIR=0
 J4PACK=0
-J5PACK=0
+J5PACKBC=0
 WPPACK=0
 PATCHPACK=0
 SKPACK=0
@@ -55,17 +55,17 @@ display_usage()
   echo "  distmaker.sh OPTION"
   echo
   echo "Options available:"
-  echo "  all            - generate all available tarballs"
-  echo "  l10n           - generate internationalization data"
-  echo "  Backdrop       - generate Backdrop module"
-  echo "  Drupal         - generate Drupal7 module"
-  echo "  d7_dir         - generate Drupal7 module, but output to a directory, no tarball"
-  echo "  Joomla4|Joomla - generate Joomla 4 module"
-  echo "  Joomla5        - generate Joomla 5 module"
-  echo "  WordPress      - generate Wordpress module"
-  echo "  patchset       - generate a tarball with patch files"
-  echo "  sk             - generate Drupal StarterKit module"
-  echo "  standalone     - generate CiviCRM Standalone"
+  echo "  all               - generate all available tarballs"
+  echo "  l10n              - generate internationalization data"
+  echo "  Backdrop|bd       - generate Backdrop module"
+  echo "  Drupal|d7         - generate Drupal7 module"
+  echo "  d7_dir            - generate Drupal7 module, but output to a directory, no tarball"
+  echo "  Joomla4|Joomla|j4 - generate Joomla 4 module"
+  echo "  Joomla5bc|j5bc    - generate Joomla 5 module requiring the Back Compatibility plugin"
+  echo "  WordPress|wp      - generate Wordpress module"
+  echo "  patchset          - generate a tarball with patch files"
+  echo "  sk                - generate Drupal StarterKit module"
+  echo "  standalone        - generate CiviCRM Standalone"
   echo
   echo "You also need to have distmaker.conf file in place."
   echo "See distmaker.conf.dist for example contents."
@@ -156,13 +156,13 @@ case $1 in
   ;;
 
   # BACKDROP
-  Backdrop)
+  bd|Backdrop)
   dm_note "Enable CiviCRM-Backdrop"
   BPACK=1
   ;;
 
   # DRUPAL7
-  Drupal)
+  d7|Drupal)
   dm_note "Enable CiviCRM-Drupal 7"
   D7PACK=1
   ;;
@@ -180,19 +180,19 @@ case $1 in
   ;;
 
   # JOOMLA4
-  Joomla4|Joomla)
+  j4|Joomla4|Joomla)
   dm_note "Enable CiviCRM-Joomla 4"
   J4PACK=1
   ;;
 
-  # JOOMLA5
-  Joomla5)
-  dm_note "Enable CiviCRM-Joomla 5"
-  J5PACK=1
+  # JOOMLA5BC
+  j5bc|Joomla5bc)
+  dm_note "Enable CiviCRM-Joomla 5 requiring Back Compatibility plugin"
+  J5PACKBC=1
   ;;
 
   # WORDPRESS
-  WordPress)
+  wp|WordPress)
   dm_note "Enable CiviCRM-Wordpress"
   WPPACK=1
   ;;
@@ -221,7 +221,7 @@ case $1 in
   BPACK=1
   D7PACK=1
   J4PACK=1
-  J5PACK=1
+  J5BCPACK=1
   WPPACK=1
   PATCHPACK=1
   SKPACK=1
@@ -277,43 +277,43 @@ fi
 if [ "$BPACK" = 1 ]; then
   dm_title "Build CiviCRM-Backdrop"
   dm_git_checkout "$DM_SOURCEDIR/backdrop" "$DM_REF_BACKDROP"
-  bash $P/dists/backdrop_php5.sh
+  bash $P/dists/backdrop.sh
 fi
 
 if [ "$D7PACK" = 1 ]; then
   dm_title "Build CiviCRM-Drupal 7"
   dm_git_checkout "$DM_SOURCEDIR/drupal" "$DM_REF_DRUPAL"
-  bash $P/dists/drupal_php5.sh
+  bash $P/dists/drupal7.sh
 fi
 
 if [ "$D7DIR" = 1 ]; then
   dm_title "Build CiviCRM-Drupal 7 (directory)"
   dm_git_checkout "$DM_SOURCEDIR/drupal" "$DM_REF_DRUPAL"
-  bash $P/dists/drupal7_dir_php5.sh
+  bash $P/dists/drupal7_dir.sh
 fi
 
 if [ "$SKPACK" = 1 ]; then
   dm_title "Build CiviCRM-Drupal 7 (StarterKit version)"
   dm_git_checkout "$DM_SOURCEDIR/drupal" "$DM_REF_DRUPAL"
-  bash $P/dists/drupal_sk_php5.sh
+  bash $P/dists/drupal7_sk.sh
 fi
 
 if [ "$J4PACK" = 1 ]; then
-  dm_title "Build CiviCRM-Joomla"
+  dm_title "Build CiviCRM-Joomla 4"
   dm_git_checkout "$DM_SOURCEDIR/joomla" "$DM_REF_JOOMLA"
-  bash $P/dists/joomla_php5.sh
+  bash $P/dists/joomla4.sh
 fi
 
-if [ "$J5PACK" = 1 ]; then
-  dm_title "Build CiviCRM-Joomla 5"
+if [ "$J5PACKBC" = 1 ]; then
+  dm_title "Build CiviCRM-Joomla 5 (Back Compatibility)"
   dm_git_checkout "$DM_SOURCEDIR/joomla" "$DM_REF_JOOMLA"
-  bash $P/dists/joomla5_php.sh
+  bash $P/dists/joomla5bc.sh
 fi
 
 if [ "$WPPACK" = 1 ]; then
   dm_title "Build CiviCRM-Wordpress"
   dm_git_checkout "$DM_SOURCEDIR/WordPress" "$DM_REF_WORDPRESS"
-  bash $P/dists/wordpress_php5.sh
+  bash $P/dists/wordpress.sh
 fi
 
 if [ "$STANDALONEPACK" = 1 ]; then
@@ -335,6 +335,7 @@ if [ "$REPOREPORT" = 1 ]; then
     D7DIR="$D7DIR" \
     SKPACK="$SKPACK" \
     J4PACK="$J4PACK" \
+    J5BCPACK="$J5BCPACK" \
     WPPACK="$WPPACK" \
     STANDALONEPACK="$STANDALONEPACK" \
     bash $P/dists/repo-report.sh

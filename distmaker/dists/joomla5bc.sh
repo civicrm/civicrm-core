@@ -14,7 +14,7 @@ fi
 SRC=$DM_SOURCEDIR
 TRG=$DM_TMPDIR/civicrm
 
-dm_h1 "Prepare files (civicrm-*-joomla5.zip)"
+dm_h1 "Prepare files (civicrm-*-joomla5bc.zip)"
 dm_reset_dirs "$TRG" "$DM_TMPDIR/com_civicrm"
 cp $SRC/civicrm.config.php $TRG
 dm_generate_version "$TRG/civicrm-version.php" Joomla
@@ -39,7 +39,7 @@ cd $DM_TMPDIR;
 
 cp -R -p civicrm com_civicrm/admin/civicrm
 ${DM_PHP:-php} "$DM_SOURCEDIR/distmaker/utils/joomlaxml.php" "$DM_SOURCEDIR" com_civicrm "$DM_VERSION" alt
-dm_zip "$DM_TARGETDIR/civicrm-$DM_VERSION-joomla5.zip"  com_civicrm
+dm_zip "$DM_TARGETDIR/civicrm-$DM_VERSION-joomla5bc.zip"  com_civicrm
 rm -rf com_civicrm/admin/civicrm
 
 # clean up
