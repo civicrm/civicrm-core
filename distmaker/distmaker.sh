@@ -277,43 +277,43 @@ fi
 if [ "$BPACK" = 1 ]; then
   dm_title "Build CiviCRM-Backdrop"
   dm_git_checkout "$DM_SOURCEDIR/backdrop" "$DM_REF_BACKDROP"
-  bash $P/dists/backdrop_php5.sh
+  bash $P/dists/backdrop.sh
 fi
 
 if [ "$D7PACK" = 1 ]; then
   dm_title "Build CiviCRM-Drupal 7"
   dm_git_checkout "$DM_SOURCEDIR/drupal" "$DM_REF_DRUPAL"
-  bash $P/dists/drupal_php5.sh
+  bash $P/dists/drupal7.sh
 fi
 
 if [ "$D7DIR" = 1 ]; then
   dm_title "Build CiviCRM-Drupal 7 (directory)"
   dm_git_checkout "$DM_SOURCEDIR/drupal" "$DM_REF_DRUPAL"
-  bash $P/dists/drupal7_dir_php5.sh
+  bash $P/dists/drupal7_dir.sh
 fi
 
 if [ "$SKPACK" = 1 ]; then
   dm_title "Build CiviCRM-Drupal 7 (StarterKit version)"
   dm_git_checkout "$DM_SOURCEDIR/drupal" "$DM_REF_DRUPAL"
-  bash $P/dists/drupal_sk_php5.sh
+  bash $P/dists/drupal7_sk.sh
 fi
 
 if [ "$J4PACK" = 1 ]; then
-  dm_title "Build CiviCRM-Joomla"
+  dm_title "Build CiviCRM-Joomla 4"
   dm_git_checkout "$DM_SOURCEDIR/joomla" "$DM_REF_JOOMLA"
-  bash $P/dists/joomla_php5.sh
+  bash $P/dists/joomla4.sh
 fi
 
 if [ "$J5PACK" = 1 ]; then
   dm_title "Build CiviCRM-Joomla 5"
   dm_git_checkout "$DM_SOURCEDIR/joomla" "$DM_REF_JOOMLA"
-  bash $P/dists/joomla5_php.sh
+  bash $P/dists/joomla5.sh
 fi
 
 if [ "$WPPACK" = 1 ]; then
   dm_title "Build CiviCRM-Wordpress"
   dm_git_checkout "$DM_SOURCEDIR/WordPress" "$DM_REF_WORDPRESS"
-  bash $P/dists/wordpress_php5.sh
+  bash $P/dists/wordpress.sh
 fi
 
 if [ "$STANDALONEPACK" = 1 ]; then
