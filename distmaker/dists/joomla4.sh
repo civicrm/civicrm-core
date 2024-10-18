@@ -36,18 +36,10 @@ cp "$SRC/joomla/admin/admin.civicrm.php" "$DM_TMPDIR/com_civicrm/admin/civicrm.p
 # gen zip file
 cd $DM_TMPDIR;
 
-# generate alt version of package
-if [ -z "$DM_SKIP_ALT" ]; then
-  cp -R -p civicrm com_civicrm/admin/civicrm
-  ${DM_PHP:-php} $DM_SOURCEDIR/distmaker/utils/joomlaxml.php $DM_SOURCEDIR com_civicrm $DM_VERSION alt
-  dm_zip $DM_TARGETDIR/civicrm-$DM_VERSION-joomla-alt.zip com_civicrm
-  rm -rf com_civicrm/admin/civicrm
-fi
-
-# generate zip version of civicrm.xml
-${DM_PHP:-php} $DM_SOURCEDIR/distmaker/utils/joomlaxml.php $DM_SOURCEDIR com_civicrm $DM_VERSION zip
-dm_zip com_civicrm/admin/civicrm.zip civicrm
-dm_zip $DM_TARGETDIR/civicrm-$DM_VERSION-joomla.zip com_civicrm -x 'com_civicrm/admin/civicrm'
+cp -R -p civicrm com_civicrm/admin/civicrm
+${DM_PHP:-php} $DM_SOURCEDIR/distmaker/utils/joomlaxml.php $DM_SOURCEDIR com_civicrm $DM_VERSION alt
+dm_zip $DM_TARGETDIR/civicrm-$DM_VERSION-joomla.zip com_civicrm
+rm -rf com_civicrm/admin/civicrm
 
 # clean up
 rm -rf com_civicrm
