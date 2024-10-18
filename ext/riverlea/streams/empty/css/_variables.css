@@ -66,9 +66,11 @@
 --crm-c-primary: var(--crm-c-gray-700);
 --crm-c-primary-hover: var(--crm-c-gray-800);
 --crm-c-primary-text: var(--crm-c-light-text);
+--crm-c-primary-hover-text: var(--crm-c-light-text);
 --crm-c-secondary: #5d677b;
 --crm-c-secondary-hover: #3e485b;
 --crm-c-secondary-text: var(--crm-c-light-text);
+--crm-c-secondary-hover-text: var(--crm-c-light-text);
 --crm-c-success: var(--crm-c-green-dark);
 --crm-c-success-text: var(--crm-c-light-text);
 --crm-c-alert: var(--crm-c-red-dark);
@@ -153,8 +155,10 @@
 --crm-btn-success-text: var(--crm-c-success-text);
 --crm-btn-alert-bg: var(--crm-c-alert);
 --crm-btn-alert-text: var(--crm-c-alert-text);
---crm-btn-icon-bg: ;
+--crm-btn-icon-bg: ; /* btn-icon-* supports distinct border/bg for icons. If applied, set btn-icon-padding to 0px to make the icon bg stretch to the button *
 --crm-btn-icon-border: ;
+--crm-btn-icon-padding: var(--crm-btn-padding-block);
+--crm-btn-margin: 0; /* used to add padding block between multiple stacked buttons */
 
 /* Tables *
 --crm-table-outside-border: 1px solid var(--crm-c-background3);
@@ -261,6 +265,7 @@
 --crm-input-label-size: var(--crm-font-size);
 --crm-input-label-width: var(--crm-big-input);
 --crm-input-label-align: right;
+--crm-input-label-color: var(--crm-c-text);
 --crm-input-description: var(--crm-c-gray-700);
 --crm-input-dropdown-icon: "\f107";
 --crm-input-radio-color: var(--crm-c-focus);
@@ -276,10 +281,11 @@
 --crm-tabs-bg: var(--crm-c-background4);
 --crm-tabs-padding: var(--crm-s);
 --crm-tabs-border: var(--crm-dash-border);
+--crm-tabs-radius: var(--crm-roundness);
 --crm-tabs-gap: var(--crm-s);
 --crm-tab-bg: var(--crm-c-background2);
---crm-tab-bg-hover: var(--crm-c-page-background);
---crm-tab-bg-active: var(--crm-c-page-background);
+--crm-tab-bg-hover: var(--crm-c-background);
+--crm-tab-bg-active: var(--crm-c-background);
 --crm-tab-hang: 0; /* lip to extend tab flush with active region - set to 0 for no lip *
 --crm-tab-padding: var(--crm-s3) var(--crm-m) var(--crm-s) var(--crm-m);
 --crm-tab-col: var(--crm-c-text);
@@ -301,6 +307,7 @@
 --crm-dash-tabs-gap: var(--crm-tabs-gap);
 --crm-dash-tabs-bg: var(--crm-tabs-bg);
 --crm-dash-tabs-padding: var(--crm-tabs-padding);
+--crm-dash-tabs-roundness: var(--crm-dash-roundness) var(--crm-dash-roundness) 0 0;
 --crm-dash-tab-bg: var(--crm-tab-bg);
 --crm-dash-tab-bg-hover: var(--crm-tab-bg-hover);
 --crm-dash-tab-padding: var(--crm-s3) var(--crm-m2);
@@ -319,8 +326,9 @@
 --crm-dash-box-shadow: 0;
 --crm-dash-heading-inset: ;
 --crm-dash-panel-padding: var(--crm-m);
---crm-dash-panel-bg: transparent;
+--crm-dash-panel-bg: #fff;
 --crm-dash-panel-border: 0;
+--crm-dash-panel-radius: 0 0 var(--crm-dash-roundness) var(--crm-dash-roundness);
 --crm-dash-edit-border: 2px dashed var(--crm-c-gray-300);
 --crm-dash-block-padding: 0;
 --crm-dash-block-bg: ;
@@ -376,6 +384,7 @@
 --crm-dropdown-hover-bg: var(--crm-c-page-background);
 --crm-dropdown-border: 0;
 --crm-dropdown-width: 180px;
+--crm-dropdown-alert-bg: var(--crm-c-alert); /* for delete links in dropdowns *
 --crm-dropdown-2-bg: var(--crm-c-secondary);
 --crm-dropdown-2-col: var(--crm-c-text);
 --crm-dropdown-2-padding: var(--crm-padding-small);
@@ -411,8 +420,15 @@
 --crm-wizard-border: var(--crm-c-divider);
 --crm-wizard-bg: var(--crm-c-page-background);
 
+/* Alpha filter *
+--crm-filter-bg: var(--crm-c-blue-light);
+--crm-filter-padding: var(--crm-m);
+--crm-filter-item-bg:  #fafafa;
+--crm-filter-item-shadow: 0px 0px 3px rgba(0,0,0,0.1);
+--crm-filter-spacing: start; /* choose 'space-between' to spread out evenly, or 'end' to right align. */
+
 /* Frontend *
---crm-f-form-width: 700px;
+--crm-f-form-width:;
 --crm-f-box-shadow: var(--crm-block-shadow);
 --crm-f-fieldset-bg: var(--crm-c-background);
 --crm-f-fieldset-padding: var(--crm-r);
@@ -429,7 +445,7 @@
 --crm-f-input-radius: var(--crm-roundness);
 --crm-f-input-padding: var(--crm-r2) var(--crm-m2);
 --crm-f-input-font-size: var(--crm-r1);
---crm-f-input-width: 100%;
+--crm-f-input-width: 300px;
 --crm-f-form-focus-bg: var(--crm-c-green);
 --crm-f-form-error-bg: var(--crm-c-red);
 --crm-f-logo-height: 40px;

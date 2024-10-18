@@ -1,3 +1,6 @@
+1.0.1
+ - CHANGED updated streams/empty/_variables.css to reflect latest variables list.
+
 1.0.0
  - CHANGED status to stable
 
