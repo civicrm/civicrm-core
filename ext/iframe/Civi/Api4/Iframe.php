@@ -23,6 +23,20 @@ class Iframe extends BasicEntity {
     };
   }
 
+  public static function renderScript(): AbstractAction {
+    return new class('Iframe', __FUNCTION__) extends AbstractAction {
+
+      public function _run(Result $result) {
+        $iframe = \Civi::service('iframe');
+        $scriptMgr = \Civi::service('iframe.script');
+        $result[] = [
+          'content' => $scriptMgr->render($iframe->getTemplate()),
+        ];
+      }
+
+    };
+  }
+
   public static function permissions(): array {
     return [
       'installScript' => ['administer iframe'],
