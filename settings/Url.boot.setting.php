@@ -18,6 +18,22 @@
  * Settings metadata file
  */
 return [
+  'userFrameworkBaseURL' => [
+    'group_name' => 'URL Preferences',
+    'group' => 'url',
+    'name' => 'userFrameworkBaseURL',
+    'type' => 'String',
+    'default' => NULL,
+    'title' => ts('User Framework Base URL'),
+    'description' => ts('The base URL of the user framework or CMS that CiviCRM is running in.'),
+    'help_text' => NULL,
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'is_constant' => TRUE,
+    'is_env_loadable' => TRUE,
+    'global_name' => 'CIVICRM_UF_BASEURL',
+    'add' => '5.80',
+  ],
   'userFrameworkResourceURL' => [
     'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
     'group' => 'url',

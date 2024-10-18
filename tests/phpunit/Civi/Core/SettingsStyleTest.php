@@ -1,7 +1,23 @@
 <?php
 namespace Civi\Core;
 
+use Civi\Api4\PCP;
+
 class SettingsStyleTest extends \CiviUnitTestCase {
+
+  /**
+   * @var array
+   *
+   * Around 5.80 new settings for pre-existing globals were added
+   * to the SettingsManager
+   * However the sensible name keys for these settings don't
+   * follow the group prefix requirement for newly added settings.
+   * This array defines opted out keys
+   */
+  const NEW_SETTINGS_WITH_OLD_NAMES = [
+    'domain',
+    'userFrameworkBaseUrl',
+  ];
 
   protected function setUp(): void {
     parent::setUp();
@@ -38,7 +54,7 @@ class SettingsStyleTest extends \CiviUnitTestCase {
       $assert($key, $key === $name, 'Should have matching name');
       $type = $spec['type'] ?? 'UNKNOWN';
       $assert($key, in_array($type, $validTypes), 'Should have known type. Found: ' . $type);
-      if (version_compare($spec['add'], '5.53', '>=')) {
+      if (version_compare($add, '5.53', '>=') && !in_array($key, self::NEW_SETTINGS_WITH_OLD_NAMES)) {
         $assert($key, preg_match(';^[a-z0-9]+(_[a-z0-9]+)+$;', $key), 'In 5.53+, names should use snake_case with a group/subsystem prefix.');
       }
       else {
