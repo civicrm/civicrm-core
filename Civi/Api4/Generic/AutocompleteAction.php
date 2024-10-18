@@ -139,6 +139,7 @@ class AutocompleteAction extends AbstractAction {
         'savedSearch' => &$this->savedSearch,
         'formName' => $this->formName,
         'fieldName' => $this->fieldName,
+        'filters' => $this->filters,
       ]));
     }
     $this->loadSavedSearch();
