@@ -137,7 +137,7 @@ class CRM_Utils_File {
             }
           }
           elseif (is_dir($object)) {
-            CRM_Utils_File::cleanDir($object, TRUE, $verbose);
+            CRM_Utils_File::cleanDir($object, $rmdir, $verbose);
           }
           elseif (is_file($object)) {
             CRM_Utils_File::try_unlink($object, "file");
