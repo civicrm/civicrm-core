@@ -52,7 +52,22 @@ class ActionObjectProvider extends AutoService implements EventSubscriberInterfa
     if ($apiRequest instanceof AbstractAction) {
       $entityName = $apiRequest->getEntityName();
       if (!isset($this->getEntities()[$entityName])) {
-        throw new \CRM_Core_Exception("Unrecognised entity in Api4 ActionObjectProvider: $entityName");
+        // this certainly seems bad - we're taking an action on an entity that doesn't currently exist
+        //
+        // however some existing behaviours seem to rely on this being possible
+        // @see https://lab.civicrm.org/dev/core/-/issues/5533
+        //
+        // maybe this is reasonable for some kinds of AbstractAction that happen to live
+        // on an entity, but the entity isn't really doing anything (like a static method)?
+        //
+        // for something like DAOEntities, it will definitely fail later when it realises
+        // the entity doesnt exist - and give a more cryptic error message
+        //
+        // unfortunately because the entity doesn't exist we can't check what kind of entity
+        // for now let's just log that something weird is happening
+        //
+        // throw new \CRM_Core_Exception("Unrecognised entity in Api4 ActionObjectProvider: $entityName");
+        \Civi::log()->debug("Unrecognised entity in Api4 ActionObjectProvider: $entityName");
       }
       $event->setApiRequest($apiRequest);
       $event->setApiProvider($this);
