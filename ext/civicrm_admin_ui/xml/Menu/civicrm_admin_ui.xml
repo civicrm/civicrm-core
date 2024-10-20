@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/admin/option</path>
+    <page_callback>CRM_CivicrmAdminUi_Page_AdminOptionValues</page_callback>
+    <title>AdminOptionValues</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+</menu>

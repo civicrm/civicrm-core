@@ -30,6 +30,7 @@
   </civix>
   <mixins>
     <mixin>mgd-php@1.0.0</mixin>
+    <mixin>menu-xml@1.0.0</mixin>
   </mixins>
   <upgrader>CRM_CivicrmAdminUi_Upgrader</upgrader>
 </extension>
