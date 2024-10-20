@@ -22,6 +22,7 @@ dm_install_packages "$SRC/packages" "$TRG/core/packages"
 dm_install_vendor "$SRC/vendor" "$TRG/core/vendor"
 dm_install_bower "$SRC/bower_components" "$TRG/core/bower_components"
 dm_install_cvext com.iatspayments.civicrm "$TRG/core/ext/iatspayments"
+dm_install_cvext riverlea "$TRG/core/ext/riverlea"
 "$SRC/tools/standalone/bin/scaffold" "$TRG"
 
 dm_h1 "Generate archive (civicrm-*-standalone.tar.gz)"
