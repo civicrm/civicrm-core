@@ -65,8 +65,7 @@ class CRM_Report_OutputHandler_Pdf extends OutputHandlerBase implements OutputHa
     return CRM_Utils_PDF_Utils::html2pdf(
       $this->getForm()->compileContent(),
       $this->getFileName(),
-      TRUE,
-      ['orientation' => 'landscape']
+      TRUE
     );
   }
 
@@ -90,8 +89,7 @@ class CRM_Report_OutputHandler_Pdf extends OutputHandlerBase implements OutputHa
     CRM_Utils_PDF_Utils::html2pdf(
       $this->getForm()->compileContent(),
       $this->getFileName(),
-      FALSE,
-      ['orientation' => 'landscape']
+      FALSE
     );
   }
 
