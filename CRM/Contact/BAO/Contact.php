@@ -3034,7 +3034,6 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
       ];
     }
 
-    CRM_Utils_Hook::summaryActions($menu, $contactId);
     //1. check for component is active.
     //2. check for user permissions.
     //3. check for acls.
@@ -3117,6 +3116,7 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
     ksort($contextMenu['moreActions']);
     ksort($contextMenu['otherActions']);
 
+    CRM_Utils_Hook::summaryActions($contextMenu, $contactId);
     return $contextMenu;
   }
 
