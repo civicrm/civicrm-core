@@ -34,8 +34,8 @@
           $element.addClass('af-field-type-multiple');
         }
 
-        if (this.defn.name !== this.fieldName) {
-          namePrefix = this.fieldName.substr(0, this.fieldName.length - this.defn.name.length);
+        if (this.defn.name && this.defn.name !== this.fieldName) {
+          namePrefix = this.fieldName.substring(0, this.fieldName.length - this.defn.name.length);
         }
 
         if (this.defn.search_operator) {
