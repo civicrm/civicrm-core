@@ -125,13 +125,9 @@
 {else}
     <br />
     <div class="messages status no-popup">
-        <table>
-            <tr>{icon icon="fa-info-circle"}{/icon}</tr>
-            <tr>
-                {ts}There are no active Events to display.{/ts}
-                {ts 1=$newEventURL}You can <a href="%1">Create a New Event</a> now.{/ts}
-            </tr>
-        </table>
+      {icon icon="fa-info-circle"}{/icon}
+      {ts}There are no active Events to display.{/ts}
+      {ts 1=$newEventURL}You can <a href="%1">Create a New Event</a> now.{/ts}
     </div>
 {/if}
 
