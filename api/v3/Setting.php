@@ -156,6 +156,7 @@ function civicrm_api3_setting_revert($params) {
   $fields = $fields['values'];
   $domains = _civicrm_api3_setting_getDomainArray($params);
   $result = [];
+  $isError = FALSE;
   foreach ($domains as $domainID) {
     $valuesToRevert = array_intersect_key($defaults['values'][$domainID], $fields);
     if (!empty($valuesToRevert)) {
@@ -163,7 +164,14 @@ function civicrm_api3_setting_revert($params) {
       $valuesToRevert['domain_id'] = $domainID;
       // note that I haven't looked at how the result would appear with multiple domains in play
       $result = array_merge($result, civicrm_api('Setting', 'create', $valuesToRevert));
+      if ($result['is_error'] ?? FALSE) {
+        $isError = TRUE;
+      }
     }
+  }
+
+  if ($isError) {
+    return civicrm_api3_create_error('Error reverting settings');
   }
 
   return civicrm_api3_create_success($result, $params, 'Setting', 'revert');
