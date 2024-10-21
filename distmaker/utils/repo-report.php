@@ -46,13 +46,16 @@ $data = array(
 if (getenv('BPACK')) {
   $data['tar']['Backdrop'] = "civicrm-$DM_VERSION-backdrop-unstable.tar.gz";
 }
-if (getenv('J5PACK')) {
+if (getenv('J4PACK')) {
   $data['tar']['Joomla'] = "civicrm-$DM_VERSION-joomla.zip";
 }
-if (getenv('D5PACK')) {
+if (getenv('J5PACKBC')) {
+  $data['tar']['Joomla'] = "civicrm-$DM_VERSION-joomla5bc.zip";
+}
+if (getenv('D7PACK')) {
   $data['tar']['Drupal'] = "civicrm-$DM_VERSION-drupal.tar.gz";
 }
-if (getenv('WP5PACK')) {
+if (getenv('WPPACK')) {
   $data['tar']['WordPress'] = "civicrm-$DM_VERSION-wordpress.zip";
 }
 if (getenv('L10NPACK')) {
