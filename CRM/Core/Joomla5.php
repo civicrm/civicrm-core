@@ -22,7 +22,7 @@
  *
  * Still used?
  */
-class CRM_Core_Joomla {
+class CRM_Core_Joomla5 {
 
   /**
    * Reuse drupal blocks into a left sidebar.

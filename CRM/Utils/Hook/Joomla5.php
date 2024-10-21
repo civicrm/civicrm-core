@@ -14,7 +14,7 @@
  * @package CiviCRM_Hook
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Utils_Hook_Joomla extends CRM_Utils_Hook {
+class CRM_Utils_Hook_Joomla5 extends CRM_Utils_Hook {
   /**
    * Invoke hooks.
    *

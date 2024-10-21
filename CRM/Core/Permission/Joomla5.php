@@ -18,7 +18,7 @@
 /**
  *
  */
-class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
+class CRM_Core_Permission_Joomla5 extends CRM_Core_Permission_Base {
 
   /**
    * Given a permission string, check for access requirements

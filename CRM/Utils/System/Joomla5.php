@@ -18,7 +18,7 @@
 /**
  * Joomla specific stuff goes here.
  */
-class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
+class CRM_Utils_System_Joomla5 extends CRM_Utils_System_Base {
 
   /**
    * Class constructor.
