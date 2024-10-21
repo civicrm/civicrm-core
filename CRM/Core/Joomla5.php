@@ -16,7 +16,7 @@
  */
 
 /**
- * Joomla class.
+ * Joomla5 class.
  *
  * (clearly copied & pasted from a drupal class).
  *

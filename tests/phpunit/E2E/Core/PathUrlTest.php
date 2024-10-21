@@ -105,6 +105,7 @@ class PathUrlTest extends \CiviEndToEndTestCase {
         break;
 
       case 'Joomla':
+      case 'Joomla5':
         $urlPatterns[] = [';/index.php\?.*task=civicrm/event/info&reset=1&id=9;', \Civi::url('frontend://civicrm/event/info?reset=1')->addQuery('id=9')];
         $urlPatterns[] = [';/administrator/.*task=civicrm/admin/reset=1;', \Civi::url('backend://civicrm/admin')->addQuery('reset=1')];
         break;
@@ -141,7 +142,7 @@ class PathUrlTest extends \CiviEndToEndTestCase {
     $this->assertStringContainsString('profile', $front);
     $this->assertStringContainsString('profile', $back);
     $this->assertStringContainsString('profile', $current);
-    if (CIVICRM_UF === 'WordPress' || CIVICRM_UF === 'Joomla') {
+    if (CIVICRM_UF === 'WordPress' || CIVICRM_UF === 'Joomla' || CIVICRM_UF === 'Joomla5') {
       $this->assertNotEquals($front, $back, "On WordPress/Joomla, some URLs should support frontend+backend flavors.");
     }
     else {

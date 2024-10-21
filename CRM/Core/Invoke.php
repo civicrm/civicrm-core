@@ -175,6 +175,15 @@ class CRM_Core_Invoke {
       CRM_Core_Joomla::sidebarLeft();
     }
 
+    if ($config->userFramework == 'Joomla5' && $item) {
+      $config->userFrameworkURLVar = 'task';
+
+      // joomla 1.5RC1 seems to push this in the POST variable, which messes
+      // QF and checkboxes
+      unset($_POST['option']);
+      CRM_Core_Joomla5::sidebarLeft();
+    }
+
     // set active Component
     $template = CRM_Core_Smarty::singleton();
     $template->assign('activeComponent', 'CiviCRM');

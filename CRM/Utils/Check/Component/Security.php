@@ -26,6 +26,7 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
     $config = CRM_Core_Config::singleton();
     switch ($config->userFramework) {
       case 'Joomla':
+      case 'Joomla5':
         return '/media/';
 
       case 'WordPress':

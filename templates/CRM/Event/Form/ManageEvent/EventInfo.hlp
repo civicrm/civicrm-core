@@ -47,7 +47,7 @@
         {else} {* Creating new event *}
           {ts}After adding your event, create links to the listing page by copying the URL provided in the 'Participant Listing' section of the Configure Event page.{/ts}
         {/if}
-      {elseif $config->userFramework EQ 'Joomla'}
+      {elseif $config->userFramework EQ 'Joomla' || $config->userFramework EQ 'Joomla5'}
           {ts 1=$params.entityId|smarty:nodefaults|escape}Then create front-end links to the Participant Listing page using the Menu Manager. Select <strong>Participant Listing Page</strong> and enter <strong>%1</strong> for the Event ID.{/ts}
       {/if}
     {/if}
@@ -84,14 +84,14 @@
   {ts}Waitlist Text{/ts}
 {/htxt}
 {htxt id="id-help-waitlist_text"}
-{ts}This message is displayed on the event information and event registration pages when the event is full AND the waitlist feature is enabled.{/ts} 
+{ts}This message is displayed on the event information and event registration pages when the event is full AND the waitlist feature is enabled.{/ts}
 {/htxt}
 
 {htxt id="id-is_map-title"}
   {ts}Map{/ts}
 {/htxt}
 {htxt id="id-is_map"}
-{capture assign=mapURL}{crmURL p='civicrm/admin/setting/mapping' q="reset=1"}{/capture} 
+{capture assign=mapURL}{crmURL p='civicrm/admin/setting/mapping' q="reset=1"}{/capture}
 {ts 1=$mapURL}Include map presenting event location on event information page? (A map provider must be configured under <a href='%1'>Administer > System Settings > Mapping and Geocoding</a>){/ts}
 {/htxt}
 
