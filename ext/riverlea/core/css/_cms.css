@@ -168,8 +168,6 @@ body.wp-admin.page-civicrm-contact .breadcrumb {
     display: none; /* Hides breadcrumb on contact dashboard */
 }
 body.wp-admin.wp-core-ui .crm-container select {
-    -webkit-appearance: auto;
-    appearance: auto; /* Resets WP's own select UI */
     margin: 0;
 }
 body.wp-admin.wp-core-ui.toplevel_page_CiviCRM select:hover {

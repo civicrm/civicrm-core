@@ -1,3 +1,6 @@
+1.0.2
+ - REMOVED WordPress select list appearance reset (https://lab.civicrm.org/extensions/riverlea/-/issues/60)
+
 1.0.1
  - CHANGED updated streams/empty/_variables.css to reflect latest variables list.
 
