@@ -162,9 +162,8 @@ class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
       }
     }
 
-    $sj = new CRM_Core_JobManager();
     $rows = [];
-    foreach ($sj->jobs as $job) {
+    foreach ($this->getJobs() as $job) {
       $action = array_sum(array_keys($this->links()));
 
       // update enable/disable links.
@@ -191,6 +190,29 @@ class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
       $rows[] = get_object_vars($job);
     }
     $this->assign('rows', $rows);
+  }
+
+  /**
+   * Retrieves the list of jobs from the database,
+   * populates class param.
+   *
+   * @fixme: Copied from JobManager. We should replace with API
+   *
+   * @return array
+   *   ($id => CRM_Core_ScheduledJob)
+   */
+  private function getJobs(): array {
+    $jobs = [];
+    $dao = new CRM_Core_DAO_Job();
+    $dao->orderBy('name');
+    $dao->domain_id = CRM_Core_Config::domainID();
+    $dao->find();
+    while ($dao->fetch()) {
+      $temp = ['class' => NULL, 'parameters' => NULL, 'last_run' => NULL];
+      CRM_Core_DAO::storeValues($dao, $temp);
+      $jobs[$dao->id] = new CRM_Core_ScheduledJob($temp);
+    }
+    return $jobs;
   }
 
   /**
