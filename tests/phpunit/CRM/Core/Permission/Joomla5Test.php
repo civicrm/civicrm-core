@@ -1,10 +1,10 @@
 <?php
 
 /**
- * Class CRM_Core_Permission_JoomlaTest
+ * Class CRM_Core_Permission_Joomla5Test
  * @group headless
  */
-class CRM_Core_Permission_JoomlaTest extends CiviUnitTestCase {
+class CRM_Core_Permission_Joomla5Test extends CiviUnitTestCase {
 
   /**
    * @return array
@@ -36,7 +36,7 @@ class CRM_Core_Permission_JoomlaTest extends CiviUnitTestCase {
    *   The name of an actual permission (based on translation matrix for "runtime").
    */
   public function testTranslate($input, $expected) {
-    $perm = new CRM_Core_Permission_Joomla();
+    $perm = new CRM_Core_Permission_Joomla5();
     $actual = $perm->translateJoomlaPermission($input);
     $this->assertEquals($expected, $actual);
   }
