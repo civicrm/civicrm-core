@@ -30,18 +30,30 @@ class Refresh extends AbstractAction {
       ->execute()->single();
 
     $apiParams = $display['saved_search_id.api_params'];
+    // Add orderBy to api params
     foreach ($display['settings']['sort'] ?? [] as $item) {
       $apiParams['orderBy'][$item[0]] = $item[1];
     }
+    // Set select clause to match display columns
+    $select = [];
+    foreach ($display['settings']['columns'] as $column) {
+      foreach ($apiParams['select'] as $selectExpr) {
+        if ($selectExpr === $column['key'] || str_ends_with($selectExpr, " AS {$column['key']}")) {
+          $select[] = $selectExpr;
+          continue 2;
+        }
+      }
+    }
+    $apiParams['select'] = $select;
     $api = Request::create($display['saved_search_id.api_entity'], 'get', $apiParams);
     $query = new Api4SelectQuery($api);
     $query->forceSelectId = FALSE;
-    $select = $query->getSql();
+    $sql = $query->getSql();
     $tableName = _getSearchKitDisplayTableName($displayName);
     $columnSpecs = array_column($display['settings']['columns'], 'spec');
     $columns = implode(', ', array_column($columnSpecs, 'name'));
     \CRM_Core_DAO::executeQuery("TRUNCATE TABLE `$tableName`");
-    \CRM_Core_DAO::executeQuery("INSERT INTO `$tableName` ($columns) $select");
+    \CRM_Core_DAO::executeQuery("INSERT INTO `$tableName` ($columns) $sql");
     $result[] = [
       'refresh_date' => \CRM_Core_DAO::singleValueQuery("SELECT NOW()"),
     ];
