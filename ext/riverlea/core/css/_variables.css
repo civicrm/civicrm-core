@@ -429,7 +429,7 @@
 /* Frontend */
 --crm-f-form-width:;
 --crm-f-box-shadow: var(--crm-block-shadow);
---crm-f-fieldset-bg: var(--crm-c-background);
+--crm-f-fieldset-bg: #f8f8f8;
 --crm-f-fieldset-padding: var(--crm-r);
 --crm-f-fieldset-margin: 0 0 var(--crm-padding-reg) 0;
 --crm-f-fieldset-border: 0;

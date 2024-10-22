@@ -143,12 +143,10 @@ body.wp-admin .crm-title {
     line-height: 1.1;
     margin-bottom: 8px;
 }
-body.wp-admin .crm-container p {
+body.wp-admin .crm-container input:not([type=checkbox]):not([type=radio]) {
     margin: 0;
 }
-body.wp-admin .crm-container input {
-    margin: 0;
-}
+body.wp-admin .crm-container p,
 body.wp-admin .crm-container li {
     margin: 0; /* resets WP li bottom margin */
     list-style: none;
@@ -169,6 +167,8 @@ body.wp-admin.page-civicrm-contact .breadcrumb {
 }
 body.wp-admin.wp-core-ui .crm-container select {
     margin: 0;
+    appearance: auto;
+    background-image: none;
 }
 body.wp-admin.wp-core-ui.toplevel_page_CiviCRM select:hover {
     color: var(--crm-input-color);

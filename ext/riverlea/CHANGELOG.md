@@ -1,3 +1,11 @@
+1.0.3
+ - FIXED WordPress FormBuilder checkboxes weren't square
+ - CHANGED WordPress checkbox and radio alignment no longer reset with other WP resets
+ - ADDED flex wrapping to FormBuilder for responsive.
+ - FIXED regression from 1.0.2 on select.form-control elements.
+ - FIXED FormBuilder dropdown arrow alignment.
+ - FIXED FormBuilder flex wrap and input overflow. Various other FormBuider front-end responsive tweaks (ref #62)
+
 1.0.2
  - REMOVED WordPress select list appearance reset (https://lab.civicrm.org/extensions/riverlea/-/issues/60)
 

@@ -20,11 +20,13 @@
     box-shadow: var(--crm-f-box-shadow);
 }
 .crm-container.crm-public fieldset legend {
-    position: relative;
-    top: calc(2 * var(--crm-f-fieldset-padding));
     padding-block: var(--crm-f-fieldset-padding);
     font-size: var(--crm-f-legend-size);
     text-align: var(--crm-f-legend-align);
+}
+af-form > fieldset > legend {
+    position: relative;
+    top: calc(2 * var(--crm-f-fieldset-padding));
     margin-bottom: var(--crm-f-fieldset-padding);
     width: 100%;
 }
@@ -119,7 +121,7 @@
     padding-inline: 0;
 }
 af-field {
-    padding-block: var(--crm-flex-gap);
+    padding-block: var(--crm-f-form-padding);
     display: block;
 }
 /* Contribution pages */
@@ -171,6 +173,9 @@ af-field {
     visibility: hidden;
 }
 @media (min-width: 480px) {
+    .crm-container.crm-public {
+        --crm-page-padding: var(--crm-f-form-padding);
+    }
     .crm-container.crm-public .crm-section .label {
       float: none;
       width: inherit;
@@ -180,4 +185,14 @@ af-field {
     .crm-container.crm-public .crm-section .content {
         margin-left: 0;
       }
-  }
+}
+@media (max-width: 479px) {
+    .crm-container.crm-public {
+        --crm-f-input-width: 100%;
+        --crm-page-padding: 0;
+        width: 100%;
+    }
+    .crm-container af-field {
+        width: 100%;
+    }
+}

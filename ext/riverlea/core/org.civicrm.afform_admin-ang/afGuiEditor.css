@@ -114,7 +114,8 @@
 }
 #afGuiEditor-palette input[type="checkbox"],
 #afGuiEditor-palette input[type="radio"] {
-	width: auto;
+	width: 1rem;
+    height: 1rem;
 }
 #afGuiEditor-palette .form-group label {
 	width: 100%;
@@ -569,6 +570,7 @@ i.crm-i.af-gui-conditional-dialog-move-icon {
     border: 0;
     box-shadow: none;
 	color: var(--crm-c-text);
+    height: auto;
 }
 #afGuiEditor-canvas .dropdown-toggle i.crm-i {
     padding: 0 !important;
@@ -652,10 +654,6 @@ i.crm-i.af-gui-conditional-dialog-move-icon {
 #afGuiEditor .af-gui-bar > .form-inline > span {
     color: var(--crm-c-background5);
     font-style: italic;
-}
-#afGuiEditor .af-gui-bar > .form-inline > select {
-    height: 21px;
-    min-height: 21px;
 }
 #afGuiEditor .ui-sortable-helper .af-gui-palette-item {
     height: 30px;
