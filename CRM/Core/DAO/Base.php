@@ -195,6 +195,9 @@ abstract class CRM_Core_DAO_Base extends CRM_Core_DAO {
           $field['DFKEntityColumn'] = $fieldSpec['entity_reference']['dynamic_entity'];
         }
         $field['FKColumnName'] = $fieldSpec['entity_reference']['key'] ?? 'id';
+        if (isset($fieldSpec['entity_reference']['on_delete'])) {
+          $field['FKOnDelete'] = $fieldSpec['entity_reference']['on_delete'];
+        }
       }
       if (!empty($fieldSpec['component'])) {
         $field['component'] = $fieldSpec['component'];
