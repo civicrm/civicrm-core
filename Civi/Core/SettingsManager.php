@@ -487,6 +487,13 @@ class SettingsManager {
       // TODO: should we complain here if there are inconsistent defines
       // from elsewhere?
     }
+
+    // if in doubt, the root of civicrm-core is 3 steps
+    // up from this file
+    global $civicrm_root;
+    if (!$civicrm_root) {
+      $civicrm_root = dirname(__FILE__, 3) . DIRECTORY_SEPARATOR;
+    }
   }
 
 }
