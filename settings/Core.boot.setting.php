@@ -20,7 +20,6 @@
  */
 return [
   'installed' => [
-    'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap.',
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'installed',
@@ -35,7 +34,6 @@ return [
     'help_text' => NULL,
   ],
   'enable_components' => [
-    'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap.',
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'enable_components',
@@ -59,5 +57,21 @@ return [
     'pseudoconstant' => [
       'callback' => 'CRM_Core_SelectValues::getComponentSelectValues',
     ],
+  ],
+  'domain' => [
+    'group_name' => 'CiviCRM Preferences',
+    'group' => 'core',
+    'name' => 'domain',
+    'type' => 'String',
+    'default' => 1,
+    'title' => ts('CiviCRM Domain ID'),
+    'description' => ts('The current domain if CiviCRM is running multi-site.'),
+    'help_text' => NULL,
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'is_constant' => TRUE,
+    'is_env_loadable' => TRUE,
+    'global_name' => 'CIVICRM_DOMAIN_ID',
+    'add' => '5.80',
   ],
 ];
