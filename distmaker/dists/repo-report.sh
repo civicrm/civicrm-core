@@ -27,11 +27,11 @@ env \
   DM_REF_PACKAGES="$DM_REF_PACKAGES" \
   L10NPACK="$L10NPACK" \
   BPACK="$BPACK" \
-  D56PACK="$D56PACK" \
-  D5PACK="$D5PACK" \
+  D7PACK="$D7PACK" \
   D7DIR="$D7DIR" \
   SKPACK="$SKPACK" \
-  J5PACK="$J5PACK" \
-  WP5PACK="$WP5PACK" \
+  J4PACK="$J4PACK" \
+  J5BCPACK="$J5BCPACK" \
+  WPPACK="$WPPACK" \
   php "$DM_SOURCEDIR/distmaker/utils/repo-report.php" \
   > "$REPORT"
