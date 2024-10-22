@@ -168,7 +168,7 @@ class SpecFormatter {
   /**
    * @param array $inputAttrs
    */
-  private static function setLegacyDateFormat(&$inputAttrs) {
+  public static function setLegacyDateFormat(&$inputAttrs) {
     if (empty(\Civi::$statics['legacyDatePrefs'][$inputAttrs['format_type']])) {
       \Civi::$statics['legacyDatePrefs'][$inputAttrs['format_type']] = [];
       $params = ['name' => $inputAttrs['format_type']];
