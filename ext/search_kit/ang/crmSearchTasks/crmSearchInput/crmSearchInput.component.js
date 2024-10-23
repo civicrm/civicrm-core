@@ -4,15 +4,18 @@
   angular.module('crmSearchTasks').component('crmSearchInput', {
     bindings: {
       field: '<',
-      'op': '<',
-      'format': '<',
-      'optionKey': '<'
+      op: '<',
+      format: '<',
+      optionKey: '<',
+      showLabel: '<',
     },
     require: {ngModel: 'ngModel'},
     templateUrl: '~/crmSearchTasks/crmSearchInput/crmSearchInput.html',
     controller: function($scope) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+      const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
+
+      this.domId = 'search-input-' + Math.random().toString(36).substr(2, 9);
 
       this.$onInit = function() {
 
