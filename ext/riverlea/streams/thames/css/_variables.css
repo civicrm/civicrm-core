@@ -57,7 +57,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-c-red: #eed3d7;
 --crm-c-red-light: #f2dede;
 --crm-c-red-dark: #740f0f; /* thames */
---crm-c-red-bright: #f14141; /* thames only */
+--crm-c-red-bright: #bd0404; /* thames only */
 --crm-c-amber: #eeb153;
 --crm-c-amber-light: #ffebc5;
 --crm-c-yellow: #fcfc5a; /* thames todo change this horrible yellow! */
@@ -91,8 +91,8 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-c-secondary-hover-text: var(--crm-c-light-text); /* thames todo */
 --crm-c-success: var(--crm-c-green-dark);
 --crm-c-success-text: var(--crm-c-light-text);
---crm-c-alert: var(--crm-c-red); /* thames */
---crm-c-alert-text: var(--crm-c-red-dark);
+--crm-c-alert: var(--crm-c-red-dark); /* thames */
+--crm-c-alert-text: var(--crm-c-light-text);
 --crm-c-warning: var(--crm-c-amber); /* bg on .btn-warning, .label-warming but border on notification .alert */
 --crm-c-warning-text: var(--crm-c-text);
 --crm-c-info: var(--crm-c-blue-dark);
@@ -173,16 +173,16 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-btn-height: 1.825rem; /* thames */
 --crm-btn-icon-spacing: var(--crm-xs2); /* thames */
 --crm-btn-icon-size: auto;
---crm-btn-cancel-bg: var(--crm-c-alert);
---crm-btn-cancel-text: var(--crm-c-alert-text);
+--crm-btn-cancel-bg: var(--crm-c-red-light);
+--crm-btn-cancel-text: var(--crm-c-red-dark);
 --crm-btn-info-bg: var(--crm-c-secondary); /* thames */
 --crm-btn-info-text: var(--crm-c-secondary-text); /* thames */
 --crm-btn-warning-bg: var(--crm-c-warning);
 --crm-btn-warning-text: var(--crm-c-warning-text);
 --crm-btn-success-bg: var(--crm-c-info); /* thames */
 --crm-btn-success-text: #fff; /* thames */
---crm-btn-alert-bg: var(--crm-c-alert);
---crm-btn-alert-text: var(--crm-c-alert-text);
+--crm-btn-alert-bg: var(--crm-c-red);
+--crm-btn-alert-text: var(--crm-c-red-dark);
 --crm-btn-icon-bg: ;
 --crm-btn-icon-border: ;
 --crm-btn-margin: var(--crm-m) 0;
