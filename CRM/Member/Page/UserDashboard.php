@@ -79,7 +79,7 @@ class CRM_Member_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard 
    */
   public function buildMemberLinks(&$members) {
     if (!empty($members)) {
-      foreach($members as $id => &$member) {
+      foreach ($members as $id => &$member) {
         if (empty($member['contribution_recur_id'])) {
           continue;
         }
@@ -99,8 +99,8 @@ class CRM_Member_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard 
               ->first();
           }
         }
-        catch(Exception $e) {
-          Civi::log()->warning('Member/UserDashboard: Unable to retrieve recur information '.$e->getMessage());
+        catch (Exception $e) {
+          Civi::log()->warning('Member/UserDashboard: Unable to retrieve recur information ' . $e->getMessage());
           continue;
         }
 
