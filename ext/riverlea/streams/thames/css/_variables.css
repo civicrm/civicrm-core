@@ -59,7 +59,7 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-c-red-dark: #740f0f; /* thames */
 --crm-c-red-bright: #f14141; /* thames only */
 --crm-c-amber: #eeb153;
---crm-c-amber-light: ##ffebc5;
+--crm-c-amber-light: #ffebc5;
 --crm-c-yellow: #fcfc5a; /* thames todo change this horrible yellow! */
 --crm-c-yellow-light: #f2deb9;
 --crm-c-yellow-less-light: #fffdb2;
