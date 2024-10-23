@@ -115,8 +115,8 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
     $url = $this->renderTokens($lebowski, '{afform.mockPublicFormUrl}', 'text/plain');
     $this->assertMatchesRegularExpression(';^https?:.*civicrm/mock-public-form.*;', $url, "URL should look plausible");
 
-    // This URL doesn't specifically log you in to a durable sesion.
-    // $this->assertUrlStartsSession($url, NULL);
+    // This URL doesn't specifically log you in to a durable session.
+    $this->assertUrlSessionContact($url, NULL);
 
     // However, there is an auth token.
     $query = parse_url($url, PHP_URL_QUERY);
@@ -269,6 +269,28 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
       'http_errors' => FALSE,
     ]);
     return $response;
+  }
+
+  /**
+   * Opening $url may generate a session-cookie. Does that cookie authenticate you as $contactId?
+   *
+   * @param string $url
+   * @param int|null $contactId
+   * @return void
+   * @throws \GuzzleHttp\Exception\GuzzleException
+   */
+  protected function assertUrlSessionContact(string $url, ?int $contactId): void {
+    $http = $this->createGuzzle([
+      'http_errors' => FALSE,
+      'cookies' => new \GuzzleHttp\Cookie\CookieJar(),
+    ]);
+    $response = $http->get($url);
+    // $r = (string) $response->getBody();
+    $this->assertStatusCode(200, $response);
+
+    // We make another request in the same session. Is it the expected contact?
+    $response = $http->get('civicrm/authx/id');
+    $this->assertContactJson($contactId, $response);
   }
 
 }
