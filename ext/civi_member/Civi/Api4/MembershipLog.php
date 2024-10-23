@@ -11,7 +11,6 @@
 namespace Civi\Api4;
 
 use Civi\Api4\Generic\DAOEntity;
-use Civi\Api4\Generic\Traits\ReadOnlyEntity;
 
 /**
  * MembershipLog entity.
@@ -20,6 +19,5 @@ use Civi\Api4\Generic\Traits\ReadOnlyEntity;
  * @package Civi\Api4
  */
 class MembershipLog extends DAOEntity {
-  use ReadOnlyEntity;
 
 }
