@@ -662,7 +662,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     foreach ($entityWeights as $entityName) {
       $entityType = $this->_formDataModel->getEntity($entityName)['type'];
       $records = $this->replaceReferences($entityName, $entityValues[$entityName]);
-      $records = $this->replaceRelativeDates($entityName, $entityValues[$entityName]);
+      $records = $this->replaceRelativeDates($records);
       $this->fillIdFields($records, $entityName);
       $event = new AfformSubmitEvent($this->_afform, $this->_formDataModel, $this, $records, $entityType, $entityName, $this->_entityIds);
       \Civi::dispatcher()->dispatch('civi.afform.submit', $event);
@@ -685,7 +685,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    * @param string $entityName
    * @param $records
    */
-  protected function replaceRelativeDates($entityName, $records) {
+  protected function replaceRelativeDates($records) {
     foreach ($records as $key => $record) {
       foreach ($record['fields'] as $field => $value) {
         if (str_contains($field, "date") && str_contains($value, ".")) {
