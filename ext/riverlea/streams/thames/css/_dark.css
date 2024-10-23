@@ -31,7 +31,7 @@
   --crm-alert-background-warning: #383124;
   --crm-input-background: var(--crm-c-blue-darker);
   --crm-inline-edit-bg: var(--crm-c-dkblue-01);
-  --crm-input-color: var(--crm-c-dkblue-01);
+  --crm-input-color: var(--crm-c-blue); /* text */
   --crm-alert-background-info: var(--crm-c-blue-darker);
   --crm-alert-text-info: var(--crm-c-blue-light);
 
