@@ -11,6 +11,7 @@ use Civi\Api4\File;
 use Civi\Api4\Generic\Result;
 use Civi\Api4\Utils\CoreUtil;
 use CRM_Afform_ExtensionUtil as E;
+use CRM_Utils_Date;
 
 /**
  * Shared functionality for form submission pre & post processing.
@@ -661,6 +662,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     foreach ($entityWeights as $entityName) {
       $entityType = $this->_formDataModel->getEntity($entityName)['type'];
       $records = $this->replaceReferences($entityName, $entityValues[$entityName]);
+      $records = $this->replaceRelativeDates($entityName, $entityValues[$entityName]);
       $this->fillIdFields($records, $entityName);
       $event = new AfformSubmitEvent($this->_afform, $this->_formDataModel, $this, $records, $entityType, $entityName, $this->_entityIds);
       \Civi::dispatcher()->dispatch('civi.afform.submit', $event);
@@ -676,6 +678,25 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   protected static function getNestedKey(array $values) {
     $firstValue = \CRM_Utils_Array::first(array_filter($values));
     return is_array($firstValue) && $firstValue ? array_keys($firstValue)[0] : NULL;
+  }
+
+  /**
+   * Replace relative date
+   * @param string $entityName
+   * @param $records
+   */
+  protected function replaceRelativeDates($entityName, $records) {
+    foreach ($records as $key => $record) {
+      foreach ($record['fields'] as $field => $value) {
+        if (str_contains($field, "date") && str_contains($value, ".")) {
+          $dateFormat = explode(".", $value, 2);
+          $dataRange = CRM_Utils_Date::relativeToAbsolute($dateFormat[0], $dateFormat[1]);
+          $records[$key]['fields'][$field] = $dataRange["from"];
+        }
+      }
+    }
+
+    return $records;
   }
 
 }
