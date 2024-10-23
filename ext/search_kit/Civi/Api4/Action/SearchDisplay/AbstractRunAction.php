@@ -325,7 +325,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       // Convert dots to nested arrays which are more Smarty-friendly
       foreach ($data as $key => $value) {
         $parent = &$vars;
-        $allKeys = $keys = array_map('CRM_Utils_String::munge', explode('.', $key));
+        $allKeys = $keys = array_map(fn($s) => \CRM_Utils_String::munge($s, '_', 0), explode('.', $key));
         while (count($keys) > 1) {
           $level = array_shift($keys);
           $parent[$level] = $parent[$level] ?? [];

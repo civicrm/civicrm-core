@@ -278,7 +278,7 @@ class FormattingUtil {
    * @return void
    * @throws \CRM_Core_Exception
    */
-  public static function getFieldOptions(array &$field, array $values = [], bool $includeDisabled = FALSE, bool $checkPermissions = FALSE, ?int $userId = NULL): ?array {
+  public static function getFieldOptions(array $field, array $values = [], bool $includeDisabled = FALSE, bool $checkPermissions = FALSE, ?int $userId = NULL): ?array {
     $fieldName = $field['name'];
     $entityName = $field['entity'];
     $customGroupName = CoreUtil::getCustomGroupName($entityName);

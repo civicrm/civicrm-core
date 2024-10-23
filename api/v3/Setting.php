@@ -152,18 +152,30 @@ function civicrm_api3_setting_getoptions($params) {
  */
 function civicrm_api3_setting_revert($params) {
   $defaults = civicrm_api('Setting', 'getdefaults', $params);
-  $fields = civicrm_api('Setting', 'getfields', $params);
-  $fields = $fields['values'];
+  $allSettings = civicrm_api('Setting', 'getfields', $params)['values'] ?? [];
+  // constant settings can't be set through the API, so can't be reverted
+  // so we must filter them out here
+  $revertable = array_filter($allSettings, function ($settingMeta) {
+    return !($settingMeta['is_constant'] ?? FALSE);
+  });
   $domains = _civicrm_api3_setting_getDomainArray($params);
   $result = [];
+  $isError = FALSE;
   foreach ($domains as $domainID) {
-    $valuesToRevert = array_intersect_key($defaults['values'][$domainID], $fields);
+    $valuesToRevert = array_intersect_key($defaults['values'][$domainID], $revertable);
     if (!empty($valuesToRevert)) {
       $valuesToRevert['version'] = $params['version'];
       $valuesToRevert['domain_id'] = $domainID;
       // note that I haven't looked at how the result would appear with multiple domains in play
       $result = array_merge($result, civicrm_api('Setting', 'create', $valuesToRevert));
+      if ($result['is_error'] ?? FALSE) {
+        $isError = TRUE;
+      }
     }
+  }
+
+  if ($isError) {
+    return civicrm_api3_create_error('Error reverting settings');
   }
 
   return civicrm_api3_create_success($result, $params, 'Setting', 'revert');

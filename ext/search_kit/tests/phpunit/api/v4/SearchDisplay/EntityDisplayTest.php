@@ -38,7 +38,9 @@ class EntityDisplayTest extends Api4TestBase {
       'api_entity' => 'Contact',
       'api_params' => [
         'version' => 4,
-        'select' => ['id', 'first_name', 'last_name', 'prefix_id:label', 'created_date', 'modified_date'],
+        // The select clause is intentionally in a different order than the columns below, and with an extra column
+        // To test the matching between columns and the select clause.
+        'select' => ['id', 'last_name', 'UPPER(first_name) AS first', 'middle_name', 'prefix_id:label', 'created_date', 'modified_date'],
         'where' => [['last_name', '=', $lastName]],
       ],
     ]);
@@ -56,7 +58,7 @@ class EntityDisplayTest extends Api4TestBase {
             'type' => 'field',
           ],
           [
-            'key' => 'first_name',
+            'key' => 'first',
             'label' => 'First Name',
             'type' => 'field',
           ],
@@ -110,9 +112,9 @@ class EntityDisplayTest extends Api4TestBase {
     $this->assertSame('Integer', $getFields['id']['data_type']);
     $this->assertSame('EntityRef', $getFields['id']['input_type']);
     $this->assertSame('Contact', $getFields['id']['fk_entity']);
-    $this->assertSame('String', $getFields['first_name']['data_type']);
-    $this->assertSame('Text', $getFields['first_name']['input_type']);
-    $this->assertNull($getFields['first_name']['fk_entity']);
+    $this->assertSame('String', $getFields['first']['data_type']);
+    $this->assertSame('Text', $getFields['first']['input_type']);
+    $this->assertNull($getFields['first']['fk_entity']);
     $this->assertSame('Integer', $getFields['prefix_id']['data_type']);
     $this->assertSame('Select', $getFields['prefix_id']['input_type']);
     $this->assertNull($getFields['prefix_id']['fk_entity']);
@@ -124,8 +126,9 @@ class EntityDisplayTest extends Api4TestBase {
 
     $rows = \CRM_Core_DAO::executeQuery('SELECT * FROM civicrm_sk_my_new_entity ORDER BY `_row`')->fetchAll();
     $this->assertCount(3, $rows);
-    $this->assertEquals('a', $rows[0]['first_name']);
-    $this->assertEquals('c', $rows[2]['first_name']);
+    $this->assertEquals('A', $rows[0]['first']);
+    $this->assertEquals('C', $rows[2]['first']);
+    $this->assertEquals($lastName, $rows[2]['last_name']);
 
     // Add a contact
     $this->createTestRecord('Contact', [
@@ -136,15 +139,15 @@ class EntityDisplayTest extends Api4TestBase {
 
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['view all contacts'];
     $rows = civicrm_api4('SK_MyNewEntity', 'get', [
-      'select' => ['first_name', 'prefix_id:label'],
+      'select' => ['first', 'prefix_id:label'],
       'orderBy' => ['_row' => 'ASC'],
     ]);
     $this->assertCount(4, $rows);
-    $this->assertEquals('a', $rows[0]['first_name']);
+    $this->assertEquals('A', $rows[0]['first']);
     $this->assertEquals('Dr.', $rows[1]['prefix_id:label']);
-    $this->assertEquals('b', $rows[1]['first_name']);
-    $this->assertEquals('b2', $rows[2]['first_name']);
-    $this->assertEquals('c', $rows[3]['first_name']);
+    $this->assertEquals('B', $rows[1]['first']);
+    $this->assertEquals('B2', $rows[2]['first']);
+    $this->assertEquals('C', $rows[3]['first']);
     $this->assertEquals('Ms.', $rows[3]['prefix_id:label']);
 
     // Ensure entity_permission setting is enforced

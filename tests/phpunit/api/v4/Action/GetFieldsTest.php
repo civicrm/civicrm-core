@@ -87,6 +87,11 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
 
     $this->assertSame('contact_type', $fields['contact_sub_type']['input_attrs']['control_field']);
     $this->assertTrue($fields['contact_sub_type']['input_attrs']['multiple']);
+
+    // Check date format
+    $this->assertTrue($fields['birth_date']['input_attrs']['date']);
+    $this->assertFalse($fields['birth_date']['input_attrs']['time']);
+    $this->assertArrayNotHasKey('format_type', $fields['birth_date']['input_attrs']);
   }
 
   public function testComponentFields(): void {
