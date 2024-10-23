@@ -89,7 +89,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'civicrm_case_activity',
       'civicrm_campaign',
     ]);
-    OptionValue::update(FALSE)->addWhere('name', '=', 'Much Much longer than just phone')->setValues(['label' => 'Mobile'])->execute();
+    OptionValue::update(FALSE)->addWhere('name', '=', 'Mobile')->addWhere('option_group_id:name', '=', 'phone_type')->setValues(['label' => 'Mobile'])->execute();
 
     if (!empty($this->locationTypes)) {
       $this->callAPISuccess('LocationType', 'delete', ['id' => $this->locationTypes['Whare Kai']['id']]);
@@ -850,7 +850,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $this->contactIDs[] = $this->individualCreate();
     $this->contactIDs[] = $this->individualCreate();
 
-    OptionValue::update()->addWhere('name', '=', 'Mobile')->setValues(['label' => 'Much Much longer than just phone'])->execute();
+    OptionValue::update()->addWhere('name', '=', 'Mobile')->addWhere('option_group_id:name', '=', 'phone_type')->setValues(['label' => 'Much Much longer than just phone'])->execute();
     $locationTypes = ['Billing' => 'Billing', 'Home' => 'Home'];
     $phoneTypes = ['Mobile', 'Phone'];
     foreach ($this->contactIDs as $contactID) {
