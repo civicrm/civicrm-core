@@ -43,11 +43,13 @@ class DAOGetFieldsAction extends BasicGetFieldsAction {
     if ($this->loadOptions) {
       $this->loadFieldOptions($fields, $fieldsToGet ?: array_keys($fields));
     }
+    // Add fields across implicit FK joins
     foreach ($fieldsToGet ?? [] as $fieldName) {
       if (empty($fields[$fieldName]) && str_contains($fieldName, '.')) {
         $fkField = $this->getFkFieldSpec($fieldName, $fields);
         if ($fkField) {
           $fkField['name'] = $fieldName;
+          $fkField['required'] = FALSE;
           $fields[] = $fkField;
         }
       }
