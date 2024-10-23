@@ -210,6 +210,19 @@ class Authenticator extends AutoService implements HookInterface {
       'guards' => \Civi::settings()->get('authx_guards'),
     ];
 
+    $checkEvent = new CheckPolicyEvent($policy, $tgt);
+    \Civi::dispatcher()->dispatch('civi.authx.checkPolicy', $checkEvent);
+    $policy = $checkEvent->policy;
+    if ($checkEvent->getRejection()) {
+      $this->reject($checkEvent->getRejection());
+    }
+
+    // TODO: Consider splitting these checks into late-priority listeners.
+    // What follows are a handful of distinct checks in no particular order.
+    // In `checkCredential()`, similar steps were split out into distinct listeners (within `CheckCredential.php`).
+    // For `checkPolicy()`, these could be moved to similar methods (within `CheckPolicy.php`).
+    // They should probably be around priority -2000 (https://docs.civicrm.org/dev/en/latest/hooks/usage/symfony/#priorities).
+
     if (!$tgt->hasPrincipal()) {
       $this->reject('Invalid credential');
     }
