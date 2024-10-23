@@ -93,8 +93,8 @@ color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Saf
 --crm-c-success-text: var(--crm-c-light-text);
 --crm-c-alert: var(--crm-c-red); /* thames */
 --crm-c-alert-text: var(--crm-c-red-dark);
---crm-c-warning: var(--crm-c-amber-light);
---crm-c-warning-text: var(--crm-c-light-text);
+--crm-c-warning: var(--crm-c-amber); /* bg on .btn-warning, .label-warming but border on notification .alert */
+--crm-c-warning-text: var(--crm-c-text);
 --crm-c-info: var(--crm-c-blue-dark);
 --crm-c-info-text: var(--crm-c-light-text);
 --crm-c-focus: var(--crm-c-blue-dark);
