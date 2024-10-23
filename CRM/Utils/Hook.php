@@ -3235,6 +3235,25 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * This hook is called to alter Custom data view before its displayed.
+   *
+   * @param array $details
+   * @param array $groupTree
+   * @param int $entityId
+   *
+   * @return mixed
+   */
+  public static function alterCustomDataView(&$details, $groupTree, $entityId) {
+    $null = NULL;
+    return self::singleton()->invoke(
+      ['details', 'groupTree', 'entityId'],
+      $details, $groupTree, $entityId,
+      $null, $null, $null,
+      'civicrm_alterCustomDataView'
+    );
+  }
+
+  /**
    * Allows an extension to override the checksum validation.
    * For example you may want to invalidate checksums that were sent out/forwarded by mistake. You could also
    * intercept and redirect to a different page in this case - eg. to say "sorry, you tried to use a compromised
