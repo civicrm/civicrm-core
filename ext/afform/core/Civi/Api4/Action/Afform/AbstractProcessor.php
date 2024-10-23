@@ -682,7 +682,6 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
 
   /**
    * Replace relative date
-   * @param string $entityName
    * @param $records
    */
   protected function replaceRelativeDates($records) {
