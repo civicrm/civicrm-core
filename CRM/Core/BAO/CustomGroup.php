@@ -1732,6 +1732,9 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
       }
     }
 
+    // Call hook to alter CustomDataView.
+    CRM_Utils_Hook::alterCustomDataView($details, $groupTree, $entityId);
+
     if ($returnCount) {
       // return a single value count if group id is passed to function
       // else return a groupId and count mapped array
