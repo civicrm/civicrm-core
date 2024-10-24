@@ -161,10 +161,15 @@ WHERE  id IN ( $idString )
     }
 
     if (!$hash) {
-      $hash = md5(uniqid(rand(), TRUE));
-      if ($hashSize) {
-        $hash = substr($hash, 0, $hashSize);
-      }
+      // Ensure we cannot generate numeric hashes
+      // to avoid breaking things elsewhere
+      // See lab issue #5541
+      do {
+        $hash = md5(uniqid(rand(), TRUE));
+        if ($hashSize) {
+          $hash = substr($hash, 0, $hashSize);
+        }
+      } while (is_numeric($hash));
 
       if ($entityType == 'contact') {
         CRM_Core_DAO::setFieldValue('CRM_Contact_DAO_Contact',
