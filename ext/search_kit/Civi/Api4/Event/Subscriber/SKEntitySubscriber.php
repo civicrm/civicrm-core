@@ -133,7 +133,7 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
     // Strip the pseuoconstant suffix
     [$name, $suffix] = array_pad(explode(':', $column['key']), 2, NULL);
     // Sanitize the name
-    $name = \CRM_Utils_String::munge($name, '_', 255);
+    $name = \CRM_Utils_String::munge($name, '_', 64);
     $spec = [
       'name' => $name,
       'data_type' => $expr['dataType'],
