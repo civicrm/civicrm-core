@@ -19,9 +19,17 @@
       ctrl.apiBatch.params.values = ctrl.apiBatch.params.values || {};
       // Set values from field defaults
       ctrl.apiBatch.fields.forEach((field) => {
-        if (field.default_value) {
-          ctrl.apiBatch.params.values[field.name] = field.default_value;
+        let value = '';
+        if ('default_value' in field) {
+          value = field.default_value;
+        } else if (field.serialize || field.data_type === 'Array') {
+          value = [];
+        } else if (field.data_type === 'Boolean') {
+          value = true;
+        } else if (field.options && field.options.length) {
+          value = field.options[0].id;
         }
+        ctrl.apiBatch.params.values[field.name] = value;
       });
     }
 

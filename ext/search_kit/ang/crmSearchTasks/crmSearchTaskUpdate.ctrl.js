@@ -37,7 +37,7 @@
         if (ctrl.add) {
           var field = ctrl.getField(ctrl.add),
             value = '';
-          if (field.serialize) {
+          if (field.serialize || field.data_type === 'Array') {
             value = [];
           } else if (field.data_type === 'Boolean') {
             value = true;
