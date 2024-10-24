@@ -1041,7 +1041,7 @@ class CRM_Core_Permission {
     // (or the entity does not declare permissions at all) - then the action will be used from here
     $permissions['default'] = [
       // applies to getfields, getoptions, etc.
-      'meta' => ['access CiviCRM'],
+      'meta' => [['access CiviCRM', 'access AJAX API']],
       // catch-all, applies to create, get, delete, etc.
       // If an entity declares it's own 'default' action it will override this one
       'default' => ['administer CiviCRM'],
@@ -1057,11 +1057,11 @@ class CRM_Core_Permission {
     // Contact permissions
     $permissions['contact'] = [
       'create' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'add contacts',
       ],
       'delete' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'delete contacts',
       ],
       // managed by query object
@@ -1069,20 +1069,20 @@ class CRM_Core_Permission {
       // managed by _civicrm_api3_check_edit_permissions
       'update' => [],
       'duplicatecheck' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
       ],
       'merge' => ['merge duplicate contacts'],
     ];
 
     $permissions['dedupe'] = [
-      'getduplicates' => ['access CiviCRM'],
-      'getstatistics' => ['access CiviCRM'],
+      'getduplicates' => [['access CiviCRM', 'access AJAX API']],
+      'getstatistics' => [['access CiviCRM', 'access AJAX API']],
     ];
 
     // CRM-16963 - Permissions for country.
     $permissions['country'] = [
       'get' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
       ],
       'default' => [
         'administer CiviCRM',
@@ -1108,9 +1108,9 @@ class CRM_Core_Permission {
     // Allow non-admins to get and create tags to support tagset widget
     // Delete is still reserved for admins
     $permissions['tag'] = [
-      'get' => ['access CiviCRM'],
-      'create' => ['access CiviCRM'],
-      'update' => ['access CiviCRM'],
+      'get' => [['access CiviCRM', 'access AJAX API']],
+      'create' => [['access CiviCRM', 'access AJAX API']],
+      'update' => [['access CiviCRM', 'access AJAX API']],
     ];
 
     //relationship permissions
@@ -1118,11 +1118,11 @@ class CRM_Core_Permission {
       // get is managed by BAO::addSelectWhereClause
       'get' => [],
       'delete' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'edit all contacts',
       ],
       'default' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'edit all contacts',
       ],
     ];
@@ -1135,7 +1135,7 @@ class CRM_Core_Permission {
     // CRM-17741 - Permissions for RelationshipType.
     $permissions['relationship_type'] = [
       'get' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
       ],
       'default' => [
         'administer CiviCRM',
@@ -1145,17 +1145,17 @@ class CRM_Core_Permission {
     // Activity permissions
     $permissions['activity'] = [
       'delete' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'delete activities',
       ],
       'get' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         // Note that view all activities is also required within the api
         // if the id is not passed in. Where the id is passed in the activity
         // specific check functions are used and tested.
       ],
       'default' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'view all activities',
       ],
     ];
@@ -1164,11 +1164,11 @@ class CRM_Core_Permission {
     // Case permissions
     $permissions['case'] = [
       'create' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'add cases',
       ],
       'delete' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'delete in CiviCase',
       ],
       'restore' => [
@@ -1195,7 +1195,7 @@ class CRM_Core_Permission {
 
     // Campaign permissions
     $permissions['campaign'] = [
-      'get' => ['access CiviCRM'],
+      'get' => [['access CiviCRM', 'access AJAX API']],
       'default' => [
         // nested array = OR
         ['administer CiviCampaign', 'manage campaign'],
@@ -1206,11 +1206,11 @@ class CRM_Core_Permission {
     // Financial permissions
     $permissions['contribution'] = [
       'get' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'access CiviContribute',
       ],
       'delete' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'access CiviContribute',
         'delete in CiviContribute',
       ],
@@ -1218,7 +1218,7 @@ class CRM_Core_Permission {
         'edit contributions',
       ],
       'default' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'access CiviContribute',
         'edit contributions',
       ],
@@ -1240,26 +1240,26 @@ class CRM_Core_Permission {
     // Payment permissions
     $permissions['payment'] = [
       'get' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'access CiviContribute',
       ],
       'delete' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'access CiviContribute',
         'delete in CiviContribute',
       ],
       'cancel' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'access CiviContribute',
         'edit contributions',
       ],
       'create' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'access CiviContribute',
         'edit contributions',
       ],
       'default' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'access CiviContribute',
         'edit contributions',
       ],
@@ -1278,22 +1278,22 @@ class CRM_Core_Permission {
     // Event permissions
     $permissions['event'] = [
       'create' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'access CiviEvent',
         'edit all events',
       ],
       'delete' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'access CiviEvent',
         'delete in CiviEvent',
       ],
       'get' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'access CiviEvent',
         'view event info',
       ],
       'update' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'access CiviEvent',
         'edit all events',
       ],
@@ -1323,14 +1323,14 @@ class CRM_Core_Permission {
         ['access CiviEvent', 'access CiviContribute', 'access CiviMember'],
       ],
       'get' => [
-        ['access CiviCRM', 'view event info', 'make online contributions'],
+        [['access CiviCRM', 'access AJAX API'], 'view event info', 'make online contributions'],
       ],
     ];
 
     // File permissions
     $permissions['file'] = [
       'default' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'access uploaded files',
       ],
     ];
@@ -1340,10 +1340,10 @@ class CRM_Core_Permission {
     // Group permissions
     $permissions['group'] = [
       'get' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
       ],
       'default' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'edit groups',
       ],
     ];
@@ -1356,10 +1356,10 @@ class CRM_Core_Permission {
     // @see Civi\Api4\GroupContact::permissions
     $permissions['group_contact'] = [
       'get' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
       ],
       'default' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'edit all contacts',
       ],
     ];
@@ -1375,20 +1375,20 @@ class CRM_Core_Permission {
     ];
     $permissions['mailing'] = [
       'get' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         $civiMailBasePerms,
       ],
       'delete' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         $civiMailBasePerms,
         'delete in CiviMail',
       ],
       'submit' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         ['access CiviMail', 'schedule mailings'],
       ],
       'default' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         $civiMailBasePerms,
       ],
     ];
@@ -1398,20 +1398,20 @@ class CRM_Core_Permission {
 
     $permissions['mailing_a_b'] = [
       'get' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'access CiviMail',
       ],
       'delete' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'access CiviMail',
         'delete in CiviMail',
       ],
       'submit' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         ['access CiviMail', 'schedule mailings'],
       ],
       'default' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'access CiviMail',
       ],
     ];
@@ -1419,16 +1419,16 @@ class CRM_Core_Permission {
     // Membership permissions
     $permissions['membership'] = [
       'get' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'access CiviMember',
       ],
       'delete' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'access CiviMember',
         'delete in CiviMember',
       ],
       'default' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'access CiviMember',
         'edit memberships',
       ],
@@ -1437,26 +1437,26 @@ class CRM_Core_Permission {
     $permissions['membership_type'] = $permissions['membership'];
     $permissions['membership_payment'] = [
       'create' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'access CiviMember',
         'edit memberships',
         'access CiviContribute',
         'edit contributions',
       ],
       'delete' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'access CiviMember',
         'delete in CiviMember',
         'access CiviContribute',
         'delete in CiviContribute',
       ],
       'get' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'access CiviMember',
         'access CiviContribute',
       ],
       'update' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'access CiviMember',
         'edit memberships',
         'access CiviContribute',
@@ -1467,49 +1467,49 @@ class CRM_Core_Permission {
     // Participant permissions
     $permissions['participant'] = [
       'create' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'access CiviEvent',
         'register for events',
       ],
       'delete' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'access CiviEvent',
         'edit event participants',
       ],
       'get' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'access CiviEvent',
         'view event participants',
       ],
       'update' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'access CiviEvent',
         'edit event participants',
       ],
     ];
     $permissions['participant_payment'] = [
       'create' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'access CiviEvent',
         'register for events',
         'access CiviContribute',
         'edit contributions',
       ],
       'delete' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'access CiviEvent',
         'edit event participants',
         'access CiviContribute',
         'delete in CiviContribute',
       ],
       'get' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'access CiviEvent',
         'view event participants',
         'access CiviContribute',
       ],
       'update' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'access CiviEvent',
         'edit event participants',
         'access CiviContribute',
@@ -1520,21 +1520,21 @@ class CRM_Core_Permission {
     // Pledge permissions
     $permissions['pledge'] = [
       'create' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'access CiviPledge',
         'edit pledges',
       ],
       'delete' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'access CiviPledge',
         'delete in CiviPledge',
       ],
       'get' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'access CiviPledge',
       ],
       'update' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'access CiviPledge',
         'edit pledges',
       ],
@@ -1544,7 +1544,7 @@ class CRM_Core_Permission {
     $permissions['action_schedule'] = [
       'update' => [
         [
-          'access CiviCRM',
+          ['access CiviCRM', 'access AJAX API'],
           'edit all events',
         ],
       ],
@@ -1552,26 +1552,26 @@ class CRM_Core_Permission {
 
     $permissions['pledge_payment'] = [
       'create' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'access CiviPledge',
         'edit pledges',
         'access CiviContribute',
         'edit contributions',
       ],
       'delete' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'access CiviPledge',
         'delete in CiviPledge',
         'access CiviContribute',
         'delete in CiviContribute',
       ],
       'get' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'access CiviPledge',
         'access CiviContribute',
       ],
       'update' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         'access CiviPledge',
         'edit pledges',
         'access CiviContribute',
@@ -1582,12 +1582,12 @@ class CRM_Core_Permission {
     // Dashboard permissions
     $permissions['dashboard'] = [
       'get' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
       ],
     ];
     $permissions['dashboard_contact'] = [
       'default' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
       ],
     ];
     $permissions['mapping'] = [
@@ -1609,17 +1609,17 @@ class CRM_Core_Permission {
 
     $permissions['uf_group'] = [
       'create' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         [
           'administer CiviCRM',
           'manage event profiles',
         ],
       ],
       'get' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
       ],
       'update' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
         [
           'administer CiviCRM',
           'manage event profiles',
@@ -1628,7 +1628,7 @@ class CRM_Core_Permission {
     ];
     $permissions['uf_field'] = $permissions['uf_join'] = $permissions['uf_group'];
     $permissions['uf_field']['delete'] = [
-      'access CiviCRM',
+      ['access CiviCRM', 'access AJAX API'],
       [
         'administer CiviCRM',
         'manage event profiles',
@@ -1642,7 +1642,7 @@ class CRM_Core_Permission {
     // as the forms doing the work can set the permission check to FALSE.
     $permissions['user_job'] = [
       'get' => [
-        'access CiviCRM',
+        ['access CiviCRM', 'access AJAX API'],
       ],
       'default' => [
         'administer CiviCRM',
@@ -1650,7 +1650,7 @@ class CRM_Core_Permission {
     ];
 
     $permissions['custom_value'] = [
-      'gettree' => ['access CiviCRM'],
+      'gettree' => [['access CiviCRM', 'access AJAX API']],
     ];
 
     $permissions['location_type'] = [
@@ -1660,7 +1660,7 @@ class CRM_Core_Permission {
     ];
 
     $permissions['message_template'] = [
-      'get' => ['access CiviCRM'],
+      'get' => [['access CiviCRM', 'access AJAX API']],
       'create' => [['edit message templates', 'edit user-driven message templates', 'edit system workflow message templates']],
       'update' => [['edit message templates', 'edit user-driven message templates', 'edit system workflow message templates']],
     ];
