@@ -105,6 +105,19 @@ class CRM_Financial_BAO_Payment {
     }
     $trxn = CRM_Core_BAO_FinancialTrxn::create($paymentTrxnParams);
 
+    if (array_key_exists('fee_amount', $params) && $params['fee_amount'] > 0) {
+      $trxnParams = [
+        'contribution_status_id' => $paymentTrxnParams['status_id'],
+        'trxnParams' => [
+          'trxn_date' => $paymentTrxnParams['trxn_date'],
+          'currency' => $paymentTrxnParams['currency'],
+        ],
+      ];
+
+      $trxnParams = array_merge($paymentTrxnParams, $trxnParams);
+      CRM_Core_BAO_FinancialTrxn::recordFees($trxnParams);
+    }
+
     if ($params['total_amount'] < 0 && !empty($params['cancelled_payment_id'])) {
       // Payment was cancelled. Reverse the financial transactions.
       self::reverseAllocationsFromPreviousPayment($params, $trxn->id);
