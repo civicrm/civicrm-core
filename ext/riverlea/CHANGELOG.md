@@ -5,6 +5,7 @@
  - FIXED regression from 1.0.2 on select.form-control elements.
  - FIXED FormBuilder dropdown arrow alignment.
  - FIXED FormBuilder flex wrap and input overflow. Various other FormBuider front-end responsive tweaks (ref #62)
+ - CHANGED Multiple Thames fixes, including darkmode and alerts (see !34 and !35)
 
 1.0.2
  - REMOVED WordPress select list appearance reset (https://lab.civicrm.org/extensions/riverlea/-/issues/60)
