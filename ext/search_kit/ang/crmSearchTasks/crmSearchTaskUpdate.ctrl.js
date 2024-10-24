@@ -18,10 +18,8 @@
         loadOptions: ['id', 'name', 'label', 'description', 'color', 'icon'],
         where: [['deprecated', '=', false], ["readonly", "=", false]],
       }],
-      entityInfo: ['Entity', 'get', {select: ['primary_key'], where: [['name', '=', this.entity]]}, 0]
     }).then(function(results) {
         ctrl.fields = results.getFields;
-        ctrl.idField = results.entityInfo.primary_key[0];
       });
 
     this.updateField = function(index) {
@@ -39,7 +37,7 @@
         if (ctrl.add) {
           var field = ctrl.getField(ctrl.add),
             value = '';
-          if (field.serialize) {
+          if (field.serialize || field.data_type === 'Array') {
             value = [];
           } else if (field.data_type === 'Boolean') {
             value = true;
