@@ -215,12 +215,12 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
       $this->assign('useForEvent', FALSE);
     }
 
-    $sel = $this->add('select', 'html_type', ts('Input Field Type'),
+    $sel = $this->add('select', 'html_type', ts('Field Type'),
       $htmlTypes, TRUE, $javascript
     );
 
     // price (for text inputs)
-    $this->add('text', 'price', ts('Price'));
+    $this->add('text', 'price', ts('Unit Price'));
     $this->registerRule('price', 'callback', 'money', 'CRM_Utils_Rule');
     $this->addRule('price', ts('must be a monetary value'), 'money');
 
