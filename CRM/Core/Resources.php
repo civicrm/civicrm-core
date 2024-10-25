@@ -290,8 +290,8 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
     // TODO consider caching results
     $base = $this->paths->hasVariable($ext)
       ? $this->paths->getVariable($ext, 'url')
-      : ($this->extMapper->keyToUrl($ext) . '/');
-    return $base . $file;
+      : $this->extMapper->keyToUrl($ext);
+    return rtrim($base, '/') . "/$file";
   }
 
   /**
