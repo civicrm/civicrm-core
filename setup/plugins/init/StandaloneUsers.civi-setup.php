@@ -171,6 +171,12 @@ if (!defined('CIVI_SETUP')) {
       ->addValue('last_name', 'Admin')
       ->execute()->single()['id'];
 
+    // add email to the contact
+    \Civi\Api4\Email::create(FALSE)
+      ->addValue('contact_id', $contactID)
+      ->addValue('email', $adminEmail)
+      ->execute();
+
     // NOTE: normally uf_name would be derived automatically
     // from the contact email, and roles could be provided using
     // the facade on the User entity
