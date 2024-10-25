@@ -271,7 +271,7 @@
         if (url.search(/[&?]snippet=/) < 0) {
           url += (url.indexOf('?') < 0 ? '?' : '&') + 'snippet=' + snippetType;
         } else {
-          url = url.replace(/snippet=[^&]*/, 'snippet=' + snippetType);
+          url = url.replace(/([&?])snippet=[^&]*/, '$1snippet=' + snippetType);
         }
         // See Civi\Angular\AngularLoader
         if (snippetType === 'json' && CRM.angular) {
