@@ -87,8 +87,8 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
       'html' => '<p>url=({afform.mockPublicFormUrl}) link=({afform.mockPublicFormLink})</p>',
     ], ['contactId' => $lebowski]);
 
-    $httpTextUrl = '(https?:[a-zA-Z0-9_/\.\?\-\+:=#&]+)';
-    $httpHtmlUrl = '(https?:[a-zA-Z0-9_/\.\?\-\+:=#&\;]+)';
+    $httpTextUrl = '(https?:[a-zA-Z0-9%_/\.\?\-\+:=#&]+)';
+    $httpHtmlUrl = '(https?:[a-zA-Z0-9%_/\.\?\-\+:=#&\;]+)';
     $textPattern = ";url=\($httpTextUrl\) link=\(\[My public form\]\($httpTextUrl\)\); ";
     $htmlPattern = ";\<p\>url=\($httpHtmlUrl\) link=\(<a href=\"$httpHtmlUrl\">My public form</a>\)\</p\>;";
 
@@ -101,8 +101,8 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
     $this->assertEquals($textMatches[1], html_entity_decode($htmlMatches[1]), 'Text and HTML values of {afform.mockPublicFormUrl} should point to same place');
     $this->assertEquals($textMatches[2], html_entity_decode($htmlMatches[2]), 'Text and HTML values of {afform.mockPublicFormLink} should point to same place');
 
-    $this->assertMatchesRegularExpression(';^https?:.*civicrm/mock-public-form.*;', $textMatches[1], "URL should look plausible");
-    $this->assertMatchesRegularExpression(';^https?:.*civicrm/mock-public-form.*;', $textMatches[2], "URL should look plausible");
+    $this->assertMatchesRegularExpression(';^https?:.*civicrm(/|%2F)mock-public-form.*;', $textMatches[1], "URL should look plausible");
+    $this->assertMatchesRegularExpression(';^https?:.*civicrm(/|%2F)mock-public-form.*;', $textMatches[2], "URL should look plausible");
   }
 
   /**
@@ -113,7 +113,7 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
 
     $lebowski = $this->getLebowskiCID();
     $url = $this->renderTokens($lebowski, '{afform.mockPublicFormUrl}', 'text/plain');
-    $this->assertMatchesRegularExpression(';^https?:.*civicrm/mock-public-form.*;', $url, "URL should look plausible");
+    $this->assertMatchesRegularExpression(';^https?:.*civicrm(/|%2F)mock-public-form.*;', $url, "URL should look plausible");
 
     // This URL doesn't specifically log you in to a durable session.
     $this->assertUrlSessionContact($url, NULL);
@@ -156,7 +156,7 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
       // These patterns are hints to indicate whether the page-view is authenticated in the CMS.
       'Backdrop' => '/<body.* class=".* logged-in[ "]/',
       'Drupal' => '/<body.* class=".* logged-in[ "]/',
-      'Drupal8' => '/<body.* class=".* logged-in[ "]/',
+      'Drupal8' => '/<body.* class=".* user-logged-in[ "]/',
     ];
 
     if (!isset($sessionCues[CIVICRM_UF])) {
