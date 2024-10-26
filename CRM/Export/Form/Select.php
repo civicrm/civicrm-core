@@ -53,6 +53,24 @@ class CRM_Export_Form_Select extends CRM_Core_Form_Task {
   public $_componentTable;
 
   /**
+   * @var bool
+   * @internal
+   */
+  public $_selectAll;
+
+  /**
+   * @var bool
+   * @internal
+   */
+  public $_matchingContacts;
+
+  /**
+   * @var array
+   * @internal
+   */
+  public $_greetingOptions;
+
+  /**
    * Use the form name to create the tpl file name.
    *
    * @return string
