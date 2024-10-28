@@ -3,6 +3,7 @@
 namespace Civi\Afform;
 
 use Civi\Authx\CheckCredentialEvent;
+use Civi\Authx\CheckPolicyEvent;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Core\Service\AutoService;
 use Civi\Crypto\Exception\CryptoException;
@@ -25,6 +26,7 @@ class PageTokenCredential extends AutoService implements EventSubscriberInterfac
     $events = [];
     $events['civi.invoke.auth'][] = ['onInvoke', 105];
     $events['civi.authx.checkCredential'][] = ['afformPageToken', -400];
+    $events['civi.authx.checkPolicy'][] = ['afformPagePolicy', 400];
     return $events;
   }
 
@@ -36,7 +38,7 @@ class PageTokenCredential extends AutoService implements EventSubscriberInterfac
    * @return void
    */
   public function onInvoke(GenericHookEvent $e) {
-    $token = $_REQUEST['_aff'] ?? NULL;
+    $token = $_SERVER['HTTP_X_CIVI_AUTH_AFFORM'] ?? $_REQUEST['_aff'] ?? NULL;
 
     if (empty($token)) {
       return;
@@ -46,21 +48,22 @@ class PageTokenCredential extends AutoService implements EventSubscriberInterfac
       throw new \CRM_Core_Exception("Malformed page token");
     }
 
-    // FIXME: This would authenticate requests to the main page, but it also has the side-effect
-    // of making the user login.
+    $authenticated = \Civi::service('authx.authenticator')->auth($e, [
+      'flow' => 'afformpage',
+      'cred' => $token,
+      'siteKey' => NULL,
+      'useSession' => FALSE,
+    ]);
 
-    // \CRM_Core_Session::useFakeSession();
-    // $params = ($_SERVER['REQUEST_METHOD'] === 'GET') ? $_GET : $_POST;
-    // $authenticated = \Civi::service('authx.authenticator')->auth($e, ['flow' => 'param', 'cred' => $params['_aff'], 'siteKey' => NULL]);
-    // _authx_redact(['_aff']);
-    // if (!$authenticated) {
-    //   return;
-    // }
+    _authx_redact(['_aff']);
+    if (!$authenticated) {
+      return;
+    }
 
     \CRM_Core_Region::instance('page-header')->add([
       'callback' => function() use ($token) {
         $ajaxSetup = [
-          'headers' => ['X-Civi-Auth' => $token],
+          'headers' => ['X-Civi-Auth-Afform' => $token],
 
           // Sending cookies is counter-productive. For same-origin AJAX, there doesn't seem to be an opt-out.
           // The main mitigating factor is that AuthX calls useFakeSession() for our use-case.
@@ -211,6 +214,28 @@ class PageTokenCredential extends AutoService implements EventSubscriberInterfac
       //   'checkRequest' => fn($expected, $request) => TRUE,
       // ],
     ];
+  }
+
+  /**
+   * Afform page-links use a distinct "flow=>afformpage".
+   * Define a built-in policy for how this flow works.
+   *
+   * Listens to civi.authx.checkPolicy (early on - before policy enforcement)
+   */
+  public function afformPagePolicy(CheckPolicyEvent $event): void {
+    $jwt = $event->target->jwt; /* previously validated as per docblock */
+    if ($event->target->flow === 'afformpage' && !empty($jwt['afform'])) {
+      $event->policy['allowCreds'] = ['jwt'];
+      $event->policy['guards'] = [];
+
+      $validUserModes = \Civi\Authx\Meta::getUserModes();
+      if (isset($jwt['userMode'], $validUserModes[$jwt['userMode']])) {
+        $event->policy['userMode'] = $jwt['userMode'];
+      }
+      else {
+        $event->policy['userMode'] = 'ignore';
+      }
+    }
   }
 
 }

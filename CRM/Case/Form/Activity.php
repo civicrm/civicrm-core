@@ -210,35 +210,15 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
    */
   public function setDefaultValues() {
     $this->_defaults = parent::setDefaultValues();
-    $targetContactValues = [];
-    foreach ($this->_caseId as $key => $val) {
-      //get all clients.
-      $clients = CRM_Case_BAO_Case::getContactNames($val);
-      if (isset($this->_activityId) && empty($_POST)) {
-        if (!CRM_Utils_Array::crmIsEmptyArray($this->_defaults['target_contact'])) {
-          $targetContactValues = array_combine(array_unique($this->_defaults['target_contact']),
-            explode(';', trim($this->_defaults['target_contact_value']))
-          );
-          //exclude all clients.
-          foreach ($clients as $clientId => $vals) {
-            if (array_key_exists($clientId, $targetContactValues)) {
-              unset($targetContactValues[$clientId]);
-            }
-          }
-        }
+    if (empty($this->_defaults['medium_id'])) {
+      // set default encounter medium CRM-4816
+      $medium = CRM_Core_OptionGroup::values('encounter_medium', FALSE, FALSE, FALSE, 'AND is_default = 1');
+      if (count($medium) == 1) {
+        $this->_defaults['medium_id'] = key($medium);
       }
-      $this->assign('targetContactValues', empty($targetContactValues) ? FALSE : $targetContactValues);
-
-      if (empty($this->_defaults['medium_id'])) {
-        // set default encounter medium CRM-4816
-        $medium = CRM_Core_OptionGroup::values('encounter_medium', FALSE, FALSE, FALSE, 'AND is_default = 1');
-        if (count($medium) == 1) {
-          $this->_defaults['medium_id'] = key($medium);
-        }
-      }
-
-      return $this->_defaults;
     }
+
+    return $this->_defaults;
   }
 
   public function buildQuickForm() {
