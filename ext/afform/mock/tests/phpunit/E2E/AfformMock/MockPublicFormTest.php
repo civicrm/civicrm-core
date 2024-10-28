@@ -87,8 +87,8 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
       'html' => '<p>url=({afform.mockPublicFormUrl}) link=({afform.mockPublicFormLink})</p>',
     ], ['contactId' => $lebowski]);
 
-    $httpTextUrl = '(https?:[a-zA-Z0-9_/\.\?\-\+:=#&]+)';
-    $httpHtmlUrl = '(https?:[a-zA-Z0-9_/\.\?\-\+:=#&\;]+)';
+    $httpTextUrl = '(https?:[a-zA-Z0-9%_/\.\?\-\+:=#&]+)';
+    $httpHtmlUrl = '(https?:[a-zA-Z0-9%_/\.\?\-\+:=#&\;]+)';
     $textPattern = ";url=\($httpTextUrl\) link=\(\[My public form\]\($httpTextUrl\)\); ";
     $htmlPattern = ";\<p\>url=\($httpHtmlUrl\) link=\(<a href=\"$httpHtmlUrl\">My public form</a>\)\</p\>;";
 
@@ -101,8 +101,8 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
     $this->assertEquals($textMatches[1], html_entity_decode($htmlMatches[1]), 'Text and HTML values of {afform.mockPublicFormUrl} should point to same place');
     $this->assertEquals($textMatches[2], html_entity_decode($htmlMatches[2]), 'Text and HTML values of {afform.mockPublicFormLink} should point to same place');
 
-    $this->assertMatchesRegularExpression(';^https?:.*civicrm/mock-public-form.*;', $textMatches[1], "URL should look plausible");
-    $this->assertMatchesRegularExpression(';^https?:.*civicrm/mock-public-form.*;', $textMatches[2], "URL should look plausible");
+    $this->assertMatchesRegularExpression(';^https?:.*civicrm(/|%2F)mock-public-form.*;', $textMatches[1], "URL should look plausible");
+    $this->assertMatchesRegularExpression(';^https?:.*civicrm(/|%2F)mock-public-form.*;', $textMatches[2], "URL should look plausible");
   }
 
   /**
@@ -113,10 +113,10 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
 
     $lebowski = $this->getLebowskiCID();
     $url = $this->renderTokens($lebowski, '{afform.mockPublicFormUrl}', 'text/plain');
-    $this->assertMatchesRegularExpression(';^https?:.*civicrm/mock-public-form.*;', $url, "URL should look plausible");
+    $this->assertMatchesRegularExpression(';^https?:.*civicrm(/|%2F)mock-public-form.*;', $url, "URL should look plausible");
 
-    // This URL doesn't specifically log you in to a durable sesion.
-    // $this->assertUrlStartsSession($url, NULL);
+    // This URL doesn't specifically log you in to a durable session.
+    $this->assertUrlSessionContact($url, NULL);
 
     // However, there is an auth token.
     $query = parse_url($url, PHP_URL_QUERY);
@@ -145,6 +145,47 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
     $this->assertMatchesRegularExpression('/JWT specifies a different form or route/', $body, 'Response should have error message');
   }
 
+  /**
+   * The prior test checks that Afform Message Tokens are working.
+   *
+   * There are other ways to generate a token - e.g. a custom or future script which produces a JWT.
+   * We do a sniff test to see if a few other exampleswork.
+   */
+  public function testAuthenticatedUrl_CustomJwt(): void {
+    $sessionCues = [
+      // These patterns are hints to indicate whether the page-view is authenticated in the CMS.
+      'Backdrop' => '/<body.* class=".* logged-in[ "]/',
+      'Drupal' => '/<body.* class=".* logged-in[ "]/',
+      'Drupal8' => '/<body.* class=".* user-logged-in[ "]/',
+    ];
+
+    if (!isset($sessionCues[CIVICRM_UF])) {
+      $this->markTestIncomplete(sprintf('Cannot run test for this environment (%s). Need session-cues to identify logged-in page-views.', CIVICRM_UF));
+    }
+
+    // Internal helper - Send HTTP request to GET the form with custom JWT.
+    $sendRequest = function(array $claims) {
+      $basicClaims = [
+        'exp' => \CRM_Utils_Time::time() + (60 * 60),
+        'sub' => "cid:" . $this->getDemoCID(),
+        'scope' => 'afform',
+        'afform' => 'mockPublicForm',
+      ];
+
+      $token = \Civi::service('crypto.jwt')->encode(array_merge($basicClaims, $claims));
+      $url = \Civi::url('frontend://civicrm/mock-public-form', 'a')
+        ->addQuery(['_aff' => 'Bearer ' . $token]);
+      $http = $this->createGuzzle(['http_errors' => FALSE]);
+      return $http->get((string) $url);
+    };
+
+    // This might be nicer as 4 separate tests.
+    $this->assertBodyRegexp('/Invalid credential/', $sendRequest(['scope' => 'wrong-scope']));
+    $this->assertNotBodyRegexp($sessionCues[CIVICRM_UF], $sendRequest(['userMode' => 'ignore']));
+    $this->assertBodyRegexp($sessionCues[CIVICRM_UF], $sendRequest(['userMode' => 'optional']));
+    $this->assertBodyRegexp($sessionCues[CIVICRM_UF], $sendRequest(['userMode' => 'require']));
+  }
+
   protected function renderTokens($cid, $body, $format) {
     $tp = new \Civi\Token\TokenProcessor(\Civi::dispatcher(), []);
     $tp->addRow()->context('contactId', $cid);
@@ -164,6 +205,16 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
       ],
     ]);
     return $contact['id'];
+  }
+
+  protected function getDemoCID(): int {
+    if (!isset(\Civi::$statics[__CLASS__]['demoId'])) {
+      \Civi::$statics[__CLASS__]['demoId'] = (int) \civicrm_api3('Contact', 'getvalue', [
+        'id' => '@user:' . $GLOBALS['_CV']['DEMO_USER'],
+        'return' => 'id',
+      ]);
+    }
+    return \Civi::$statics[__CLASS__]['demoId'];
   }
 
   /**
@@ -218,6 +269,28 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
       'http_errors' => FALSE,
     ]);
     return $response;
+  }
+
+  /**
+   * Opening $url may generate a session-cookie. Does that cookie authenticate you as $contactId?
+   *
+   * @param string $url
+   * @param int|null $contactId
+   * @return void
+   * @throws \GuzzleHttp\Exception\GuzzleException
+   */
+  protected function assertUrlSessionContact(string $url, ?int $contactId): void {
+    $http = $this->createGuzzle([
+      'http_errors' => FALSE,
+      'cookies' => new \GuzzleHttp\Cookie\CookieJar(),
+    ]);
+    $response = $http->get($url);
+    // $r = (string) $response->getBody();
+    $this->assertStatusCode(200, $response);
+
+    // We make another request in the same session. Is it the expected contact?
+    $response = $http->get('civicrm/authx/id');
+    $this->assertContactJson($contactId, $response);
   }
 
 }

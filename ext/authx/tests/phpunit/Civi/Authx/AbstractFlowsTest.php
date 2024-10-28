@@ -112,6 +112,14 @@ class AbstractFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndI
     return $req;
   }
 
+  public function requestMyContactDashboard() {
+    $p = (['reset' => 1]);
+    $uri = (new Uri('civicrm/user'))
+      ->withQuery('params=' . urlencode(json_encode($p)));
+    $req = new Request('GET', $uri);
+    return $req;
+  }
+
   /**
    * Assert the AJAX response provided the expected contact.
    *
