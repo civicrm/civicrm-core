@@ -13,7 +13,7 @@
 .afadmin-list th:not(:hover) i.fa-sort {
     opacity: .5;
 }
-#afform-list-filter {
+#bootstrap-theme #afform-list-filter {
     font-family: sans-serif,'FontAwesome';
 }
 /* Editor */
