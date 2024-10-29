@@ -17,6 +17,16 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
 
   protected $formName = 'mockPublicForm';
 
+  /**
+   * These patterns are hints to indicate whether the page-view is authenticated in the CMS.
+   * @var string[]
+   */
+  private $sessionCues = [
+    'Backdrop' => '/<body.* class=".* logged-in[ "]/',
+    'Drupal' => '/<body.* class=".* logged-in[ "]/',
+    'Drupal8' => '/<body.* class=".* user-logged-in[ "]/',
+  ];
+
   public function testGetPage() {
     $r = $this->createGuzzle()->get('civicrm/mock-public-form');
     $this->assertContentType('text/html', $r);
@@ -152,14 +162,7 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
    * We do a sniff test to see if a few other exampleswork.
    */
   public function testAuthenticatedUrl_CustomJwt(): void {
-    $sessionCues = [
-      // These patterns are hints to indicate whether the page-view is authenticated in the CMS.
-      'Backdrop' => '/<body.* class=".* logged-in[ "]/',
-      'Drupal' => '/<body.* class=".* logged-in[ "]/',
-      'Drupal8' => '/<body.* class=".* user-logged-in[ "]/',
-    ];
-
-    if (!isset($sessionCues[CIVICRM_UF])) {
+    if (!isset($this->sessionCues[CIVICRM_UF])) {
       $this->markTestIncomplete(sprintf('Cannot run test for this environment (%s). Need session-cues to identify logged-in page-views.', CIVICRM_UF));
     }
 
@@ -181,9 +184,9 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
 
     // This might be nicer as 4 separate tests.
     $this->assertBodyRegexp('/Invalid credential/', $sendRequest(['scope' => 'wrong-scope']));
-    $this->assertNotBodyRegexp($sessionCues[CIVICRM_UF], $sendRequest(['userMode' => 'ignore']));
-    $this->assertBodyRegexp($sessionCues[CIVICRM_UF], $sendRequest(['userMode' => 'optional']));
-    $this->assertBodyRegexp($sessionCues[CIVICRM_UF], $sendRequest(['userMode' => 'require']));
+    $this->assertNotBodyRegexp($this->sessionCues[CIVICRM_UF], $sendRequest(['userMode' => 'ignore']));
+    $this->assertBodyRegexp($this->sessionCues[CIVICRM_UF], $sendRequest(['userMode' => 'optional']));
+    $this->assertBodyRegexp($this->sessionCues[CIVICRM_UF], $sendRequest(['userMode' => 'require']));
   }
 
   protected function renderTokens($cid, $body, $format) {
