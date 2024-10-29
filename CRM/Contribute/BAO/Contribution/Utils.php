@@ -65,7 +65,7 @@ INNER JOIN   civicrm_contact AS contact ON ( contact.id = contrib.contact_id )
    *
    * @return array|null
    *   associated array
-
+   *
    * @deprecated since 5.80 will be removed around 5.90
    */
   public static function contributionChartYearly() {

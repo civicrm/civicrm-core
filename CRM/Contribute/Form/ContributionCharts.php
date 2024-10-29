@@ -30,6 +30,11 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
    */
   protected $_chartType = NULL;
 
+  /**
+   * @var array|array[]
+   */
+  private array $contributionsByYear;
+
   public function preProcess() {
     \Civi::resources()->addBundle('visual');
 
@@ -60,20 +65,14 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
 
     //take available years from database to show in drop down
     $currentYear = date('Y');
-    $years = [];
-    if (!empty($this->_years)) {
-      if (!array_key_exists($currentYear, $this->_years)) {
-        $this->_years[$currentYear] = $currentYear;
-        krsort($this->_years);
-      }
-      foreach ($this->_years as $k => $v) {
-        $years[substr($k, 0, 4)] = substr($k, 0, 4);
-      }
+    $years = $this->getContributionTotalsByYear() + [date('Y') => TRUE];
+    ksort($years);
+    foreach (array_keys($years) as $year) {
+      $years[$year] = $year;
     }
-
     $this->addElement('select', 'select_year', ts('Select Year (for monthly breakdown)'), $years);
     $this->setDefaults([
-      'select_year' => ($this->_year) ? $this->_year : $currentYear,
+      'select_year' => $this->_year ?: $currentYear,
     ]);
   }
 
@@ -117,21 +116,17 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
     }
 
     //take contribution information by yearly
-    $chartInfoYearly = $this->contributionChartYearly();
+    $chartInfoYearly = $this->getContributionTotalsByYear();
 
-    //get the years.
-    $this->_years = $chartInfoYearly['By Year'] ?? [];
-    $hasContributions = FALSE;
-    if (is_array($chartInfoYearly)) {
-      $hasContributions = TRUE;
+    if (!empty($chartInfoYearly)) {
       $chartData['by_year']['legend'] = ts('By Year');
-      $chartData['by_year']['values'] = $chartInfoYearly['By Year'];
+      $chartData['by_year']['values'] = $chartInfoYearly;
 
       // handle onclick event.
       $chartData['by_year']['on_click_fun_name'] = 'byYearOnClick';
       $chartData['by_year']['yname'] = ts('Total Amount');
     }
-    $this->assign('hasContributions', $hasContributions);
+    $this->assign('hasContributions', !empty($chartInfoYearly));
 
     // process the data.
     $chartCnt = 1;
@@ -144,7 +139,7 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
       if (!is_array($chartValues) || empty($chartValues)) {
         continue;
       }
-      if ($chartKey == 'by_year') {
+      if ($chartKey === 'by_year') {
         $yearlyChart = TRUE;
         if (!empty($config->fiscalYearStart) && ($config->fiscalYearStart['M'] !== 1 || $config->fiscalYearStart['d'] !== 1)) {
           $values['xLabelAngle'] = 45;
@@ -153,7 +148,7 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
           $values['xLabelAngle'] = 0;
         }
       }
-      if ($chartKey == 'by_month') {
+      if ($chartKey === 'by_month') {
         $monthlyChart = TRUE;
       }
 
@@ -220,7 +215,6 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
     $this->assign('chartData', json_encode($chartData ?? []));
   }
 
-
   /**
    * Get the contribution details by month of the year.
    *
@@ -269,11 +263,12 @@ INNER JOIN   civicrm_contact AS contact ON ( contact.id = contrib.contact_id )
    * @return array|null
    *   associated array
    */
-  private function contributionChartYearly() {
-    $config = CRM_Core_Config::singleton();
-    $yearClause = "year(contrib.receive_date) as contribYear";
-    if (!empty($config->fiscalYearStart) && ($config->fiscalYearStart['M'] != 1 || $config->fiscalYearStart['d'] != 1)) {
-      $yearClause = "CASE
+  private function getContributionTotalsByYear() {
+    if (!isset($this->contributionsByYear)) {
+      $config = CRM_Core_Config::singleton();
+      $yearClause = "year(contrib.receive_date) as contribYear";
+      if (!empty($config->fiscalYearStart) && ($config->fiscalYearStart['M'] != 1 || $config->fiscalYearStart['d'] != 1)) {
+        $yearClause = "CASE
         WHEN (MONTH(contrib.receive_date)>= " . $config->fiscalYearStart['M'] . "
           && DAYOFMONTH(contrib.receive_date)>= " . $config->fiscalYearStart['d'] . " )
           THEN
@@ -281,9 +276,9 @@ INNER JOIN   civicrm_contact AS contact ON ( contact.id = contrib.contact_id )
           ELSE
             concat(YEAR(contrib.receive_date)-1,'-', YEAR(contrib.receive_date))
         END AS contribYear";
-    }
+      }
 
-    $query = "
+      $query = "
     SELECT   sum(contrib.total_amount) AS ctAmt,
              {$yearClause}
       FROM   civicrm_contribution AS contrib
@@ -293,16 +288,16 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
        AND   contact.is_deleted = 0
   GROUP BY   contribYear
   ORDER BY   contribYear";
-    $dao = CRM_Core_DAO::executeQuery($query);
+      $dao = CRM_Core_DAO::executeQuery($query);
 
-    $params = NULL;
-    while ($dao->fetch()) {
-      if (!empty($dao->contribYear)) {
-        $params['By Year'][$dao->contribYear] = $dao->ctAmt;
+      $this->contributionsByYear = [];
+      while ($dao->fetch()) {
+        if (!empty($dao->contribYear)) {
+          $this->contributionsByYear[$dao->contribYear] = $dao->ctAmt;
+        }
       }
     }
-    return $params;
+    return $this->contributionsByYear;
   }
-
 
 }
