@@ -341,7 +341,9 @@ input.crm-form-checkbox + label,
     font-family: var(--crm-font);
 }
 .crm-container input[type="checkbox"],
-.crm-container input[type="radio"] {
+.crm-container input[type="radio"],
+#bootstrap-theme input[type="checkbox"],
+#bootstrap-theme input[type="radio"] {
     accent-color: var(--crm-input-radio-color);
     margin: -2px 4px 0 0;
     width: auto;

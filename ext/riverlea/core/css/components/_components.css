@@ -531,7 +531,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before {
 }
 #bootstrap-theme .dropdown-menu .bg-info a,
 #bootstrap-theme .dropdown-menu a.bg-info,
-#bootstrap-theme {
+#bootstrap-theme .bg-info {
     background-color: var(--crm-c-info);
     color: var(--crm-c-info-text);
 }
