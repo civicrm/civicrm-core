@@ -107,12 +107,12 @@
 }
 
 /* From original file, unsure of use, leaving intact for now */
-.api4-explorer-page crm-api4-clause > .btn-group {
+#bootstrap-theme.api4-explorer-page crm-api4-clause > .btn-group {
     position: absolute;
     right: 0;
     top: 0;
 }
-.api4-explorer-page crm-api4-clause > .btn-group .btn {
+#bootstrap-theme.api4-explorer-page crm-api4-clause > .btn-group .btn {
     border: 0 none;
 }
 .api4-explorer-page fieldset div.api4-input.ui-sortable-helper {

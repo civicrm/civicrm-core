@@ -1,3 +1,10 @@
+1.0.8
+ - FIXES further regressions caused by 1.0.4: removes new #bootstrap-theme applications on input fields
+ - ADDED background colour for SearchKit admin panel to match active tab.
+ - ADDED matches height for SearchKit admin title
+ - ADDED inline flexbox for FormBuilder form-inline.
+ - CHANGED footer status link underline.
+
 1.0.7
  - FIXES further regressions caused by 1.0.4.
 

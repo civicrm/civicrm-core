@@ -380,6 +380,9 @@ table.advmultiselect {
     background-color: var(--crm-c-alert);
     color: var(--crm-c-alert-text);
 }
+#civicrm-footer .status a {
+    color: inherit;
+}
 .crm-container #civicrm-footer .status.crm-error a {
     color: var(--crm-c-alert-text);
 }

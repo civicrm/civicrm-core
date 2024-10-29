@@ -66,7 +66,7 @@
 /* Contact page */
 
 #mainTabContainer .crm-search-display .form-group.pull-right,
-.afform-directive .btn-group.pull-right {
+#bootstrap-theme .afform-directive .btn-group.pull-right {
   display: flex;
   gap: var(--crm-flex-gap);
   justify-content: end;

@@ -58,8 +58,7 @@
     color: var(--crm-alert-text-danger);
 }
 .crm-container .help a,
-.crm-container .messages a,
-#civicrm-footer .status a {
+.crm-container .messages a {
     color: inherit;
     text-decoration: underline;
 }

@@ -7,7 +7,7 @@
 .crm-search-nav-tabs {
     position: relative;
 }
-.crm-search-nav-tabs > div.btn-group {
+#bootstrap-theme .crm-search-nav-tabs > div.btn-group {
     position: absolute;
     right: var(--crm-s);
     top: var(--crm-s);
@@ -30,7 +30,8 @@
     gap: var(--crm-m);
 }
 #crm-saved-search-label {
-    width: 100%
+    width: 100%;
+    height: var(--crm-btn-height);
 }
 
 /* Tabs */
@@ -75,16 +76,16 @@
     cursor: default;
     pointer-events: none;
 }
-.crm-search button.btn-xs:has(i.crm-i) {
+#bootstrap-theme.crm-search button.btn-xs:has(i.crm-i) {
     padding: 0;
 }
 .crm-search ul.nav-stacked li:last-of-type {
     margin-top: var(--crm-r);
 }
-.crm-search ul.nav-stacked li:has(.btn-xs) a {
+#bootstrap-theme.crm-search ul.nav-stacked li:has(.btn-xs) a {
     padding-right: 5ch;
 }
-.crm-search-admin-main-tabs button.btn-xs {
+#bootstrap-theme .crm-search-admin-main-tabs button.btn-xs {
 	background: transparent;
 	color: var(--crm-c-text);
 	font-size: var(--crm-font-size);
@@ -103,6 +104,7 @@
 }
 .crm-search .crm-search-admin-outer .crm-flex-4.panel .panel-body {
     border-radius: var(--crm-roundness);
+    background: var(--crm-tab-bg-active);
     height: 100%;
 }
 
@@ -199,7 +201,7 @@
     display: grid;
     grid-template-columns: 2ch auto;
 }
-.crm-search-admin-edit-columns fieldset.crm-draggable .btn.btn-xs.pull-right {
+#bootstrap-theme .crm-search-admin-edit-columns fieldset.crm-draggable .btn.btn-xs.pull-right {
     line-height: 1.45rem;
     display: block;
     z-index: 1;
@@ -220,7 +222,7 @@ i.crm-i.crm-search-move-icon {
 .crm-draggable details > div:last-of-type {
     padding-bottom: var(--crm-expand-body-padding);
 }
-#bootstrap-theme .crm-search-admin-edit-columns .input-group-btn {
+.crm-search-admin-edit-columns .input-group-btn {
     display: flex;
     flex-direction: row;
 }
@@ -301,7 +303,7 @@ i.crm-i.crm-search-move-icon {
 .crm-search input.ng-invalid::placeholder {
     color: var(--crm-c-warning);
 }
-.crm-search crm-search-clause > .btn-group {
+#bootstrap-theme.crm-search crm-search-clause > .btn-group {
     position: absolute;
     right: 0;
     top: 0;
@@ -332,7 +334,7 @@ i.crm-i.crm-search-move-icon {
     opacity: 1;
 }
 .crm-search input[type=number] {
-    width: 90px !important /* vs Bootstrap3.css */;
+    width: 90px;
 }
 /* For display.settings.limit field */
 .crm-search .checkbox-inline.form-control input[type=number] {
@@ -348,7 +350,7 @@ i.crm-i.crm-search-move-icon {
 .crm-search .api4-add-where-group-menu a {
     padding: var(--crm-s) var(--crm-m);
 }
-.crm-search .btn.form-control {
+#bootstrap-theme.crm-search .btn.form-control {
     height: 36px;
 }
 .crm-search-admin-edit-columns {

@@ -130,14 +130,11 @@ input.crm-form-password,
 .crm-icon-picker-button,
 .crm-container .replace-plain,
 .crm-container input,
-#bootstrap-theme input,
 .crm-container textarea,
-#bootstrap-theme textarea,
 select.crm-form-multiselect,
 select.crm-form-select,
 .crm-container .ui-widget input,
 .crm-container select,
-#bootstrap-theme select,
 .ui-datepicker .ui-datepicker-header select {
     transition: var(--crm-input-active-ani);
     font-size: var(--crm-input-font-size);
@@ -341,9 +338,7 @@ input.crm-form-checkbox + label,
     font-family: var(--crm-font);
 }
 .crm-container input[type="checkbox"],
-.crm-container input[type="radio"],
-#bootstrap-theme input[type="checkbox"],
-#bootstrap-theme input[type="radio"] {
+.crm-container input[type="radio"] {
     accent-color: var(--crm-input-radio-color);
     margin: -2px 4px 0 0;
     width: auto;
@@ -642,7 +637,9 @@ input.crm-form-checkbox) + label {
     margin-left: var(--crm-flex-gap);
 }
 .crm-container input.dateplugin,
-.crm-container input.crm-form-date {
+.crm-container input.crm-form-date,
+#bootstrap-theme input.dateplugin,
+#bootstrap-theme .input-group input.crm-form-date {
     width: 14ch;
 }
 .crm-form-date-wrapper a.crm-clear-link {
