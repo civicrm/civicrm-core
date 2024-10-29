@@ -1,3 +1,6 @@
+1.0.4
+ - ADDED and swapped #bootstrap-theme prefix to button, background and input elements in response to issues with front-end specificity against 3rd party themes #61
+
 1.0.3
  - FIXED WordPress FormBuilder checkboxes weren't square
  - CHANGED WordPress checkbox and radio alignment no longer reset with other WP resets

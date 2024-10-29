@@ -123,18 +123,21 @@
 }
 /* Input */
 
+.crm-container input.dateplugin,
 .crm-container input.form-control,
 input.crm-form-text,
-.crm-icon-picker-button,
-.crm-container input.dateplugin,
 input.crm-form-password,
+.crm-icon-picker-button,
 .crm-container .replace-plain,
 .crm-container input,
+#bootstrap-theme input,
 .crm-container textarea,
+#bootstrap-theme textarea,
 select.crm-form-multiselect,
 select.crm-form-select,
 .crm-container .ui-widget input,
-.crm-container select[aria-controls],
+.crm-container select,
+#bootstrap-theme select,
 .ui-datepicker .ui-datepicker-header select {
     transition: var(--crm-input-active-ani);
     font-size: var(--crm-input-font-size);
@@ -165,15 +168,15 @@ select.crm-form-multiselect {
     background-color: var(--crm-c-background3);
     min-width: var(--crm-huge-input);
 }
-.crm-container input.form-control:focus,
 input.crm-form-text:focus,
-.crm-icon-picker-button:focus,
-.crm-container input.dateplugin:focus,
 input.crm-form-password:focus,
-.crm-container .replace-plain:focus,
-.crm-container textarea:focus,
 select.crm-form-multiselect:focus,
 select.crm-form-select:focus,
+.crm-icon-picker-button:focus,
+.crm-container input.form-control:focus,
+.crm-container input.dateplugin:focus,
+.crm-container .replace-plain:focus,
+.crm-container textarea:focus,
 .crm-container select[aria-controls]:focus,
 .crm-container .select2-container-active *:focus {
     border-color: var(--crm-c-focus);

@@ -1,4 +1,5 @@
 .crm-container .btn,
+#bootstrap-theme .btn,
 .crm-container button,
 .crm-container .crm-button,
 .crm-container [type="button"],
@@ -27,6 +28,8 @@
 }
 .crm-container .btn:hover,
 .crm-container .btn:focus,
+#bootstrap-theme .btn:hover,
+#bootstrap-theme .btn:focus,
 .crm-container .crm-button:hover,
 .crm-container .crm-button:focus,
 [type="button"]:hover, [type="reset"]:hover, [type="submit"]:hover,
@@ -86,86 +89,87 @@
 
 /* BS3 colour options */
 
-.crm-container .btn-secondary {
+#bootstrap-theme .btn-secondary {
     background: var(--crm-c-secondary);
     color: var(--crm-c-secondary-text);
 }
-.crm-container .btn.btn-secondary:hover,
-.crm-container .btn.btn-secondary:focus {
+#bootstrap-theme .btn.btn-secondary:hover,
+#bootstrap-theme .btn.btn-secondary:focus {
     background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-secondary); /* darkening fallback if hover state not set */
     background: var(--crm-c-secondary-hover);
     color: var(--crm-c-secondary-text);
 }
-.crm-container .btn-info {
+#bootstrap-theme .btn-info {
     background: var(--crm-btn-info-bg);
     color: var(--crm-btn-info-text);
 }
-.crm-container .btn.btn-info:hover,
-.crm-container .btn.btn-info:focus {
+#bootstrap-theme .btn.btn-info:hover,
+#bootstrap-theme .btn.btn-info:focus {
     background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-btn-info-bg);
     color: var(--crm-btn-info-text);
 }
-.crm-container .btn-warning {
+#bootstrap-theme .btn-warning {
     background: var(--crm-btn-warning-bg);
     color: var(--crm-btn-warning-text);
 }
-.crm-container .btn.btn-warning:hover,
-.crm-container .btn.btn-warning:focus {
+#bootstrap-theme .btn.btn-warning:hover,
+#bootstrap-theme .btn.btn-warning:focus {
     background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-btn-warning-bg);
     color: var(--crm-btn-warning-text);
 }
-.crm-container .btn-success {
+#bootstrap-theme .btn-success {
     background: var(--crm-btn-success-bg);
     color: var(--crm-btn-success-text);
 }
-.crm-container .btn.btn-success:hover,
-.crm-container .btn.btn-success:focus {
+#bootstrap-theme .btn.btn-success:hover,
+#bootstrap-theme .btn.btn-success:focus {
     background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-btn-success-bg);
     color: var(--crm-btn-success-text);
 }
-.crm-container .btn-danger {
+#bootstrap-theme .btn-danger {
     background: var(--crm-btn-alert-bg);
     color: var(--crm-btn-alert-text);
 }
-.crm-container .btn.btn-danger:hover,
-.crm-container .btn.btn-danger:focus {
+#bootstrap-theme .btn.btn-danger:hover,
+#bootstrap-theme .btn.btn-danger:focus {
     background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-btn-alert-bg);
     color: var(--crm-btn-alert-text);
 }
 
 /* BS3 size options */
 
-.crm-container .btn-lg,
-.crm-container .btn-group-lg > .btn {
+#bootstrap-theme .btn-lg,
+#bootstrap-theme .btn-group-lg > .btn {
 	padding: var(--crm-m3) var(--crm-r);
 	font-size: var(--crm-r1);
 	line-height: 1.3;
 	border-radius: calc(var(--crm-btn-radius) * 2);
 }
-.crm-container .btn-sm, .crm-container .btn-group-sm > .btn {
+#bootstrap-theme.btn-sm,
+#bootstrap-theme .btn-group-sm > .btn {
 	padding: var(--crm-s2) var(--crm-m1);
 	font-size: var(--crm-m2);
 	line-height: 1.5;
 	border-radius: var(--crm-btn-radius);
     height: auto;
 }
-.crm-container .btn-xs,
-.crm-container .btn-group-xs > .btn {
+#bootstrap-theme .btn-xs,
+#bootstrap-theme .btn-group-xs > .btn {
 	padding: var(--crm-xs) var(--crm-s2);
 	font-size: var(--crm-m2);
 	border-radius: var(--crm-btn-radius);
     height: auto;
 }
-.crm-container .btn-block {
+#bootstrap-theme .btn-block {
 	display: block;
 	width: 100%;
 }
-.crm-container .btn-block + .btn-block {
+#bootstrap-theme .btn-block + .btn-block {
 	margin-top: 5px;
 }
-.crm-container input[type="submit"].btn-block,
-.crm-container input[type="reset"].btn-block,
-.crm-container input[type="button"].btn-block {
+#bootstrap-theme input[type="submit"].btn-block,
+#bootstrap-theme input[type="reset"].btn-block,
+#bootstrap-theme input[type="button"].btn-block {
 	width: 100%;
 }
 .crm-submit-buttons {

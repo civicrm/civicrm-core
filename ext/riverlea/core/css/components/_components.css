@@ -500,84 +500,84 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before {
 
 /* Background regions */
 
-.crm-container .bg-primary {
+#bootstrap-theme .bg-primary {
 	background-color: var(--crm-c-primary);
     color: var(--crm-c-primary-text);
 }
-.crm-container a.bg-primary:hover,
-.crm-container a.bg-primary:focus {
+#bootstrap-theme a.bg-primary:hover,
+#bootstrap-theme a.bg-primary:focus {
 	background-color: var(--crm-c-primary-hover);
 }
-.crm-container .bg-secondary {
+#bootstrap-theme .bg-secondary {
 	background-color: var(--crm-c-secondary);
     color: var(--crm-c-secondary-text);
 }
-.crm-container a.bg-secondary:hover,
-.crm-container a.bg-secondary:focus {
+#bootstrap-theme a.bg-secondary:hover,
+#bootstrap-theme a.bg-secondary:focus {
 	background-color: var(--crm-c-secondary-hover);
 }
-.crm-container .dropdown-menu .bg-success a,
-.crm-container .dropdown-menu a.bg-success,
-.crm-container .bg-success {
+#bootstrap-theme .dropdown-menu .bg-success a,
+#bootstrap-theme .dropdown-menu a.bg-success,
+#bootstrap-theme .bg-success {
 	background-color: var(--crm-c-success);
     color: var(--crm-c-success-text);
 }
-.crm-container a.bg-success:hover,
-.crm-container a.bg-success:focus,
-.crm-container .dropdown-menu a.bg-success:hover,
-.crm-container .dropdown-menu .bg-success a:hover {
+#bootstrap-theme a.bg-success:hover,
+#bootstrap-theme a.bg-success:focus,
+#bootstrap-theme .dropdown-menu a.bg-success:hover,
+#bootstrap-theme .dropdown-menu .bg-success a:hover {
     background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-success);
     color: var(--crm-c-success-text);
 }
-.crm-container .dropdown-menu .bg-info a,
-.crm-container .dropdown-menu a.bg-info,
-.crm-container .bg-info {
-	background-color: var(--crm-c-info);
+#bootstrap-theme .dropdown-menu .bg-info a,
+#bootstrap-theme .dropdown-menu a.bg-info,
+#bootstrap-theme {
+    background-color: var(--crm-c-info);
     color: var(--crm-c-info-text);
 }
-.crm-container a.bg-info:hover,
-.crm-container a.bg-info:focus,
-.crm-container .dropdown-menu .bg-info a:hover,
-.crm-container .dropdown-menu a.bg-info:hover {
+#bootstrap-theme a.bg-info:hover,
+#bootstrap-theme a.bg-info:focus,
+#bootstrap-theme .dropdown-menu .bg-info a:hover,
+#bootstrap-theme .dropdown-menu a.bg-info:hover {
     background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-info);
     color: var(--crm-c-info-text);
 }
-.crm-container .bg-warning,
-.crm-container .dropdown-menu .bg-warning a,
-.crm-container .dropdown-menu a.bg-warning {
+#bootstrap-theme .bg-warning,
+#bootstrap-theme .dropdown-menu .bg-warning a,
+#bootstrap-theme .dropdown-menu a.bg-warning {
 	background-color: var(--crm-c-warning);
     color: var(--crm-c-warning-text) !important /* FormBuilder vs .disabled */;
 }
-.crm-container a.bg-warning:hover,
-.crm-container a.bg-warning:focus,
-.crm-container .dropdown-menu .bg-warning a:hover,
-.crm-container .dropdown-menu a.bg-warning:hover {
+#bootstrap-theme a.bg-warning:hover,
+#bootstrap-theme a.bg-warning:focus,
+#bootstrap-theme .dropdown-menu .bg-warning a:hover,
+#bootstrap-theme .dropdown-menu a.bg-warning:hover {
     background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-warning);
     color: var(--crm-c-warning-text);
 }
-.crm-container .bg-danger,
-.crm-container .dropdown-menu .bg-danger a,
-.crm-container .dropdown-menu a.bg-danger {
+#bootstrap-theme .bg-danger,
+#bootstrap-theme .dropdown-menu .bg-danger a,
+#bootstrap-theme .dropdown-menu a.bg-danger {
 	background-color: var(--crm-c-alert);
     color: var(--crm-c-alert-text);
 }
-.crm-container a.bg-danger:hover,
-.crm-container a.bg-danger:focus,
-.crm-container .dropdown-menu .bg-danger a:hover,
-.crm-container .dropdown-menu a.bg-danger:hover {
+#bootstrap-theme a.bg-danger:hover,
+#bootstrap-theme a.bg-danger:focus,
+#bootstrap-theme .dropdown-menu .bg-danger a:hover,
+#bootstrap-theme .dropdown-menu a.bg-danger:hover {
     background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-alert);
     color: var(--crm-c-alert-text);
 }
-.crm-container .dropdown-menu .bg-danger .crm-i::before {
+#bootstrap-theme .dropdown-menu .bg-danger .crm-i::before {
     color: var(--crm-c-alert-text);
 }
-.crm-container .dropdown-menu .bg-warning .crm-i::before {
+#bootstrap-theme .dropdown-menu .bg-warning .crm-i::before {
     color: var(--crm-c-warning-text);
 }
-.crm-container .dropdown-menu .bg-success .crm-i::before {
+#bootstrap-theme .dropdown-menu .bg-success .crm-i::before {
     color: var(--crm-c-success-text);
 }
-.crm-container .dropdown-menu .bg-info .crm-i::before {
+#bootstrap-theme .dropdown-menu .bg-info .crm-i::before {
     color: var(--crm-c-info-text);
 }
 

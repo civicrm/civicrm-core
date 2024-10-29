@@ -73,7 +73,8 @@
 
 /* BS alert close */
 
-.crm-container button.close {
+.crm-container button.close,
+#bootstra-theme button.close {
     float: right;
 	padding: 0;
 	border: 0;
@@ -89,7 +90,9 @@
     opacity: .2;
 }
 .crm-container button.close:hover,
-.crm-container button.close:focus {
+.crm-container button.close:focus,
+#bootstra-theme button.close:hover,
+#bootstra-theme button.close:focus, {
     background: transparent;
     opacity: 0.4;
 }
