@@ -106,9 +106,9 @@ class SubmitFile extends AbstractProcessor {
       $filepath = pathinfo($file['values'][$fileId]['path']);
       $result = civicrm_api4('Contact', 'update', [
         'values' => [
-          'id' => $attachmentParams['entity_id'],
+          'id' => $attachmentParams['entity_id'], 
           'image_URL' => sprintf('/civicrm/contact/imagefile?photo=%s',$filepath['basename']),
-        ]
+        ],
       ]);
     }
 
