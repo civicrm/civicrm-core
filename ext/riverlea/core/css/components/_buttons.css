@@ -199,6 +199,7 @@
     border-radius: var(--crm-btn-radius);
     display: inline;
     line-height: 1.5;
+    white-space: nowrap;
 }
 .crm-container td a.crm-hover-button + .crm-hover-button:not(:last-of-type) {
     margin-inline: var(--crm-m);

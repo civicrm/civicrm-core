@@ -1,3 +1,6 @@
+1.0.5
+ - Added nowrap to action links (#64)
+
 1.0.4
  - ADDED and swapped #bootstrap-theme prefix to button, background and input elements in response to issues with front-end specificity against 3rd party themes #61
 
