@@ -1,3 +1,6 @@
+1.0.7
+ - FIXES further regressions caused by 1.0.4.
+
 1.0.6
  - FIXED regressions caused by 1.0.4.
 
