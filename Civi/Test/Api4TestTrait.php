@@ -102,9 +102,23 @@ trait Api4TestTrait {
     }
     $saved = civicrm_api4($entityName, 'save', $saveParams);
     foreach ($saved as $item) {
-      $this->testRecords[] = [$entityName, [[$idField, '=', $item[$idField]]]];
+      $this->registerTestRecord($entityName, [[$idField, '=', $item[$idField]]]);
     }
     return $saved;
+  }
+
+  /**
+   * Register a record to be automatically cleaned up during tearDown
+   * @param string $entityName
+   * @param string|int|array $where
+   *   Where clause (or for short, just the ID)
+   */
+  public function registerTestRecord(string $entityName, $where): void {
+    if (!is_array($where)) {
+      $idField = CoreUtil::getIdFieldName($entityName);
+      $where = [[$idField, '=', $where]];
+    }
+    $this->testRecords[] = [$entityName, $where];
   }
 
   /**

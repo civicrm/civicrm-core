@@ -5,6 +5,7 @@ namespace Civi\Api4\Action\SearchDisplay;
 use Civi\API\Request;
 use Civi\Api4\Query\Api4SelectQuery;
 use Civi\Api4\Query\SqlExpression;
+use Civi\Api4\Result\SearchDisplayRunResult;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Api4\Utils\FormattingUtil;
 
@@ -20,8 +21,13 @@ use Civi\Api4\Utils\FormattingUtil;
 class Run extends AbstractRunAction {
 
   /**
-   * Should this api call return a page/scroll of results or the row_count or the ids
-   * E.g. "page:1" or "scroll:2" or "row_count" or "id"
+   * What part of the result to return. Possible values are:
+   * - "row_count": just the total number of rows
+   * - "id": the 'key' of every row
+   * - "page:x": a single page
+   * - "scroll:x": one 'page' of autocomplete results
+   * - "tally": summary row
+   * - null: all rows
    * @var string
    */
   protected $return;
@@ -36,14 +42,14 @@ class Run extends AbstractRunAction {
    * @param \Civi\Api4\Result\SearchDisplayRunResult $result
    * @throws \CRM_Core_Exception
    */
-  protected function processResult(\Civi\Api4\Result\SearchDisplayRunResult $result) {
+  protected function processResult(SearchDisplayRunResult $result) {
     $entityName = $this->savedSearch['api_entity'];
     $apiParams =& $this->_apiParams;
     $settings = $this->display['settings'];
     $page = $index = NULL;
     $key = $this->return;
     // Pager can operate in "page" mode for traditional pager, or "scroll" mode for infinite scrolling
-    $pagerMode = NULL;
+    $pagerMode = 'page';
 
     $this->preprocessLinks();
     $this->augmentSelectClause($apiParams, $settings);
@@ -126,17 +132,22 @@ class Run extends AbstractRunAction {
         // Pager mode: `page:n`
         // AJAX scroll mode: `scroll:n`
         // Or NULL for unlimited results
-        if (($settings['pager'] ?? FALSE) !== FALSE && preg_match('/^(page|scroll):\d+$/', $key)) {
+        if (($settings['pager'] ?? FALSE) !== FALSE && $key && preg_match('/^(page|scroll):\d+$/', $key)) {
           [$pagerMode, $page] = explode(':', $key);
+          $limit = !empty($settings['pager']['expose_limit']) && $this->limit ? $this->limit : NULL;
         }
-        $limit = !empty($settings['pager']['expose_limit']) && $this->limit ? $this->limit : NULL;
         $apiParams['debug'] = $this->debug;
         $apiParams['limit'] = $limit ?? $settings['limit'] ?? NULL;
         $apiParams['offset'] = $page ? $apiParams['limit'] * ($page - 1) : 0;
+        // In scroll mode, add one extra to the limit as a lookahead to see if there are more results
         if ($apiParams['limit'] && $pagerMode === 'scroll') {
           $apiParams['limit']++;
         }
         $apiParams['orderBy'] = $this->getOrderByFromSort();
+        // Add metadata needed for inline-editing
+        if ($this->getActionName() === 'run' && $pagerMode === 'page') {
+          $this->addEditableInfo($result);
+        }
     }
 
     $apiResult = civicrm_api4($entityName, 'get', $apiParams, $index);
@@ -158,6 +169,20 @@ class Run extends AbstractRunAction {
       }
       $result->exchangeArray($this->formatResult($apiResult));
       $result->labels = $this->filterLabels;
+    }
+  }
+
+  /**
+   * Add editable information to the SearchDisplayRunResult object.
+   *
+   * @param \Civi\Api4\Result\SearchDisplayRunResult $result
+   *   The SearchDisplayRunResult object to add editable info to.
+   */
+  private function addEditableInfo(SearchDisplayRunResult $result): void {
+    foreach ($this->display['settings']['columns'] as $column) {
+      if (!empty($column['editable'])) {
+        $result->editable[$column['key']] = $this->getEditableInfo($column['key']);
+      }
     }
   }
 
