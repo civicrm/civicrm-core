@@ -22,9 +22,8 @@ class JwtCredsTest extends AbstractFlowsTest {
 
     $cred = $this->credJwt('Bearer thisisnotavalidjwt');
 
-    $flowFunc = 'auth' . ucfirst(preg_replace(';[^a-zA-Z0-9];', '', $flowType));
     /** @var \Psr\Http\Message\RequestInterface $request */
-    $request = $this->$flowFunc($this->requestMyContact(), $cred);
+    $request = (new AuthxRequestBuilder())->applyFlow($this->requestMyContact(), $flowType, $cred);
 
     \Civi::settings()->set("authx_{$flowType}_cred", ['jwt']);
     $response = $http->send($request);
@@ -43,9 +42,8 @@ class JwtCredsTest extends AbstractFlowsTest {
     $http = $this->createGuzzle(['http_errors' => FALSE]);
 
     $cred = $this->credJwt($this->getDemoCID(), TRUE);
-    $flowFunc = 'auth' . ucfirst(preg_replace(';[^a-zA-Z0-9];', '', $flowType));
     /** @var \Psr\Http\Message\RequestInterface $request */
-    $request = $this->$flowFunc($this->requestMyContact(), $cred);
+    $request = (new AuthxRequestBuilder())->applyFlow($this->requestMyContact(), $flowType, $cred);
 
     \Civi::settings()->set("authx_{$flowType}_cred", ['jwt']);
     $response = $http->send($request);
