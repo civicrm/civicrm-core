@@ -56,7 +56,7 @@
         <div ng-if="fieldGroup.fields.length">
           <label>{{ fieldGroup.label }}</label>
           <div ui-sortable="$ctrl.editor.getSortableOptions(fieldGroup.entityName)" ui-sortable-update="buildPaletteLists" ng-model="fieldGroup.fields">
-            <div ng-repeat="field in fieldGroup.fields" ng-class="{disabled: fieldInUse(field.name)}">
+            <div ng-repeat="field in fieldGroup.fields" ng-class="{disabled: fieldInUse(field.name, fieldGroup.afJoin)}">
               <div class="af-gui-palette-item">{{:: getField(fieldGroup.entityType, field.name).label }}</div>
             </div>
           </div>
