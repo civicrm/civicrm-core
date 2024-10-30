@@ -25,6 +25,7 @@
     gap: var(--crm-btn-icon-spacing);
     width: auto;
     box-shadow: none;
+    text-decoration: none;
 }
 .crm-container .btn:hover,
 .crm-container .btn:focus,

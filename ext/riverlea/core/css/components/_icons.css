@@ -147,7 +147,8 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 }
 .crm-search-display-table > table.table > thead > tr > th i.crm-search-table-column-sort-icon {
     /* Bootstrap & SearchKit sort resets */
-    position: initial;
+    position: absolute;
+    margin-left: -1.5ch;
     color: var(--crm-table-sort-col);
     line-height: inherit;
     font-style: normal;
@@ -157,6 +158,9 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
     font-weight: normal;
     cursor: var(--crm-hover-clickable);
     opacity: 1;
+}
+.crm-container .table > thead > tr > th:has(.crm-search-table-column-sort-icon) {
+    padding-left: 2ch;
 }
 .crm-container a.sorting::after,
 .crm-container a.sorting_asc::after,

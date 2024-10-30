@@ -90,7 +90,6 @@ table.dataTable.order-column.stripe tbody tr.extension-installed.even > .sorting
 .crm-container td,
 .crm-container table.dataTable thead td {
     padding: var(--crm-table-padding);
-    /* vertical-align: top; */
 }
 .crm-container table.selector td {
     border-right: var(--crm-table-column-border);
@@ -310,17 +309,6 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
 
 /* BOOTSTRAP tables */
 
-/* .crm-container table col[class*="col-"] {
-	position: static;
-	display: table-column;
-	float: none;
-}
-.crm-container table td[class*="col-"],
-.crm-container table th[class*="col-"] {
-	position: static;
-	display: table-cell;
-	float: none;
-} */
 .crm-container .table {
 	width: 100%;
 	max-width: 100%;

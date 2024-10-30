@@ -1,3 +1,9 @@
+1.0.10
+ - CHANGED sort icons on SK tables sit inline for wrapping labels.
+ - FIXED checkbox for SK table header padding so shouldn't wrap.
+ - CHANGED explicitly set text-decoration to none for buttons
+ - REMOVED broken link to _font.css in Walbrook.
+
 1.0.9
  - FIXES text-wrapping on recently viewed block (D7)
  - ADDED opacity / hover for view/edit links on recently viewed block
