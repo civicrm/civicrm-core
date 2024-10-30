@@ -25,6 +25,7 @@ dm_install_vendor "$SRC/vendor" "$TRG/vendor"
 dm_install_bower "$SRC/bower_components" "$TRG/bower_components"
 dm_install_drupal "$SRC/backdrop" "$TRG/backdrop"
 dm_install_cvext com.iatspayments.civicrm "$TRG/ext/iatspayments"
+dm_install_cvext riverlea "$TRG/ext/riverlea"
 
 dm_h1 "Generate archive (civicrm-*-backdrop.tar.gz)"
 cd $TRG/..
