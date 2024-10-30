@@ -128,7 +128,20 @@ class FormattingUtil {
 
     switch ($fieldSpec['data_type'] ?? NULL) {
       case 'Timestamp':
-        $value = self::formatDateValue('YmdHis', $value, $operator, $index);
+        $format = 'Y-m-d H:i:s';
+        // Using `=` with a Y-m-d timestamp means we really want `BETWEEN` midnight and 11:59:59pm.
+        if ($operator && !array_key_exists($value, \CRM_Core_OptionGroup::values('relative_date_filters'))) {
+          $isYmd = (preg_match('/^\d{4}-\d{2}-\d{2}$/', $value));
+          if ($isYmd && in_array($operator, ['=', '!=', '<>'])) {
+            $operator = $operator === '=' ? 'BETWEEN' : 'NOT BETWEEN';
+            $dateFrom = self::formatDateValue($format, "$value 00:00:00");
+            $dateTo = self::formatDateValue($format, "$value 23:59:59");
+            $value = [self::formatDateValue($format, $dateFrom), self::formatDateValue($format, $dateTo)];
+          }
+        }
+        else {
+          $value = self::formatDateValue($format, $value, $operator, $index);
+        }
         break;
 
       case 'Date':
