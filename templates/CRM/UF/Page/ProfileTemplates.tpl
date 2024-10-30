@@ -99,7 +99,6 @@
 
 <script type="text/template" id="designer_buttons_template">
   <button class="crm-designer-save">{ts}Save{/ts}</button>
-  <button class="crm-designer-preview">{ts}Preview{/ts}</button>
 </script>
 
 <script type="text/template" id="field_canvas_view_template">
