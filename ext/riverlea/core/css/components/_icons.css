@@ -65,7 +65,8 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 /* Check icon */
 .crm-container .crm-i.fa-check,
 .crm-container .crm-i.fa-check-circle,
-.crm-container .btn-success .crm-i {
+.crm-container .btn-success .crm-i,
+.crm-container .crm-i.fa-plus-circle {
     color: var(--crm-icon-success-color);
 }
 

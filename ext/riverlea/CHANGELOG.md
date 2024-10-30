@@ -1,3 +1,12 @@
+1.0.9
+ - FIXES text-wrapping on recently viewed block (D7)
+ - ADDED opacity / hover for view/edit links on recently viewed block
+ - FIXED Garland/D7 li margin reset blocking tab formatting.
+ - FIXED Garland/D7 input label width reset
+ - FIXED Contact summary label width on narrower screens.
+ - ADDED More table overflow scrolls (e.g. Membership table on contact dashboard).
+ - FIXED Link colour for some primary/secondary background coloured regions.
+
 1.0.8
  - FIXES further regressions caused by 1.0.4: removes new #bootstrap-theme applications on input fields
  - ADDED background colour for SearchKit admin panel to match active tab.

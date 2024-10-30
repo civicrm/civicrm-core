@@ -70,6 +70,9 @@ tbody.scrollContent tr.alternateRow {
 .crm-container .action-link:has(.crm-uplang-refresh) {
     padding-top: 0;
 }
+.crm-container .action-link.css_right.crm-link-credit-card-mode {
+    margin-top: -20px; /* prevents narrow screen wrapping */
+}
 
 /* Advanced multi-select */
 
@@ -507,12 +510,18 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before {
 	background-color: var(--crm-c-primary);
     color: var(--crm-c-primary-text);
 }
+#bootstrap-theme .bg-primary a {
+    color: var(--crm-c-primary-text);
+}
 #bootstrap-theme a.bg-primary:hover,
 #bootstrap-theme a.bg-primary:focus {
 	background-color: var(--crm-c-primary-hover);
 }
 #bootstrap-theme .bg-secondary {
 	background-color: var(--crm-c-secondary);
+    color: var(--crm-c-secondary-text);
+}
+#bootstrap-theme .bg-secondary a {
     color: var(--crm-c-secondary-text);
 }
 #bootstrap-theme a.bg-secondary:hover,
@@ -616,10 +625,16 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before {
     padding: var(--crm-s);
     border: var(--crm-c-divider);
     background-color: var(--crm-input-background);
-    white-space: nowrap;
     list-style-type: none;
     position: relative;
     border-radius: var(--crm-roundness);
+}
+#crm-recently-viewed .crm-recentview-wrapper a {
+    opacity: 0.6;
+}
+#crm-recently-viewed .crm-recentview-wrapper a:hover,
+#crm-recently-viewed .crm-recentview-wrapper a:focus {
+    opacity: 1;
 }
 #crm-quick-create input {
     max-width: 100%;

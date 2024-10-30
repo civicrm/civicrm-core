@@ -219,7 +219,7 @@ div.crm-inline-edit-form div.crm-clear {
     font-family:  var(--crm-input-label-font);
     font-size: var(--crm-font-size);
     padding: var(--crm-m);
-    width: var(--crm-input-label-width);
+    min-width: var(--crm-input-label-width);
     text-align: left;
 }
 .crm-container div.crm-summary-row div.crm-content {

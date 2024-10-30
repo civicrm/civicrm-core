@@ -141,8 +141,10 @@ table.dataTable.order-column.stripe tbody tr.extension-installed.even > .sorting
     box-shadow: none;
 }
 .crm-container .dataTables_wrapper,
-.crm-container .form-item:has(> table) { /* simple fix-all for making many tables scroll when needed */
+.crm-container .form-item:has(> table),
+.crm-container div:has(> table) { /* simple fix-all for making many tables scroll when needed */
     overflow-x: auto;
+    max-width: 100%;
 }
 .crm-selection-reset {
     padding: var(--crm-m) 0;

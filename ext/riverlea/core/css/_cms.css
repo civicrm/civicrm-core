@@ -60,8 +60,9 @@ body.page-civicrm #squeeze #crm-container,
     padding: 0;
     --crm-page-padding: 0;
     --crm-c-page-background: transparent;
+    --crm-input-label-width: 12em;
 }
-body.page-civicrm #squeeze .crm-container ul li {
+body.page-civicrm #squeeze .crm-container ul li:not(.ui-tab) {
     margin: 0;
     padding: 0;
 }
