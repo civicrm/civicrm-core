@@ -90,25 +90,13 @@
       <td>{$form.html_type.html}
       </td>
     </tr>
-  {if $action neq 4 and $action neq 2}
-    <tr>
-      <td>&nbsp;</td>
-      <td class="description">{ts}Select the html type used to offer options for this field{/ts}
-      </td>
-    </tr>
-  {/if}
   </table>
-
   <div class="spacer"></div>
   <div id="price-block" {if $action eq 2 && $form.html_type.value.0 eq 'Text'} class="show-block" {else} class="hiddenElement" {/if}>
     <table class="form-layout">
       <tr class="crm-price-field-form-block-price">
-        <td class="label">{$form.price.label|smarty:nodefaults} <span class="crm-marker" title="{ts}This field is required.{/ts}">*</span></td>
-        <td>{$form.price.html}
-        {if $action neq 4}
-          <br /><span class="description">{ts}Unit price.{/ts}</span> {help id="id-negative"}
-        {/if}
-        </td>
+        <td class="label">{$form.price.label|smarty:nodefaults} <span class="crm-marker" title="{ts}This field is required.{/ts}">*</span> {help id="id-negative"}</td>
+        <td>{$form.price.html}</td>
       </tr>
       <tr class="crm-price-field-form-block-non-deductible-amount">
         <td class="label">{$form.non_deductible_amount.label|smarty:nodefaults}</td>
@@ -209,8 +197,8 @@
       <td>&nbsp;{$form.is_required.html}</td>
     </tr>
     <tr class="crm-price-field-form-block-visibility_id">
-      <td class="label">{$form.visibility_id.label}</td>
-      <td>&nbsp;{$form.visibility_id.html}  {help id="id-visibility"}</td>
+      <td class="label">{$form.visibility_id.label} {help id="id-visibility"}</td>
+      <td>&nbsp;{$form.visibility_id.html}</td>
     </tr>
     <tr class="crm-price-field-form-block-is_active">
       <td class="label">{$form.is_active.label}</td>
