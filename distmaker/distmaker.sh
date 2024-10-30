@@ -39,7 +39,7 @@ BPACK=0
 D7PACK=0
 D7DIR=0
 J4PACK=0
-J5PACKBC=0
+J5BCPACK=0
 WPPACK=0
 PATCHPACK=0
 SKPACK=0
@@ -188,7 +188,7 @@ case $1 in
   # JOOMLA5BC
   j5bc|Joomla5bc)
   dm_note "Enable CiviCRM-Joomla 5 requiring Back Compatibility plugin"
-  J5PACKBC=1
+  J5BCPACK=1
   ;;
 
   # WORDPRESS
@@ -304,7 +304,7 @@ if [ "$J4PACK" = 1 ]; then
   bash $P/dists/joomla4.sh
 fi
 
-if [ "$J5PACKBC" = 1 ]; then
+if [ "$J5BCPACK" = 1 ]; then
   dm_title "Build CiviCRM-Joomla 5 (Back Compatibility)"
   dm_git_checkout "$DM_SOURCEDIR/joomla" "$DM_REF_JOOMLA"
   bash $P/dists/joomla5bc.sh
