@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <extension key="afform_login_token" type="module">
   <file>afform_login_token</file>
-  <name>afform_login_token</name>
-  <description>Generate login-tokens for Afform</description>
+  <name>Form Core Login-Tokens</name>
+  <description>Generate emails with portal login-links</description>
   <license>AGPL-3.0</license>
   <authors>
     <author>
@@ -13,8 +13,7 @@
   </authors>
   <urls>
     <url desc="Main Extension Page">https://civicrm.org</url>
-    <url desc="Documentation">https://lab.civicrm.org/extensions/afform_login_token</url>
-    <url desc="Support">https://lab.civicrm.org/extensions/afform_login_token</url>
+    <url desc="Support">https://lab.civicrm.org/dev/core/-/issues</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
   <releaseDate>2024-09-18</releaseDate>
@@ -26,7 +25,7 @@
   <requires>
     <ext>org.civicrm.afform</ext>
   </requires>
-  <comments>This is a new, undeveloped module</comments>
+  <comments></comments>
   <classloader>
     <psr0 prefix="CRM_" path="."/>
     <psr4 prefix="Civi\" path="Civi"/>
