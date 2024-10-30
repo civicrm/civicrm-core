@@ -3,8 +3,9 @@
     <form id=login-form>
       <img class="crm-logo" src="{$logoUrl}" alt="logo for CiviCRM, with an intersecting blue and green triangle">
       {if $justLoggedOut}<div class="help message info">{ts}You have been logged out.{/ts}</div>{/if}
-      {if $anonAccessDenied}<div class="help message warning">{ts}You do not have permission to access that, you may
-        need to login.{/ts}</div>{/if}
+      {if $anonAccessDenied}<div class="help message warning">
+        {ts}You do not have permission to access that. You may need to login.{/ts}
+      </div>{/if}
       {if $sessionLost}<div class="help message warning">{ts}Your session timed out.{/ts}</div>{/if}
       <div class="input-wrapper">
         <label for="usernameInput" name=username class="form-label">Username</label>
