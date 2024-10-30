@@ -39,7 +39,6 @@ class CRM_Core_Payment_Form {
    *   ID of the payment processor.
    */
   public static function setPaymentFieldsByProcessor(&$form, $processor, $billing_profile_id = NULL, $isBackOffice = FALSE, $paymentInstrumentID = NULL) {
-    $form->billingFieldSets = [];
     // Load the pay-later processor
     // @todo load this right up where the other processors are loaded initially.
     if (empty($processor)) {
@@ -55,12 +54,10 @@ class CRM_Core_Payment_Form {
     $form->assign('paymentTypeName', $paymentTypeName);
     $form->assign('paymentTypeLabel', self::getPaymentLabel($processor['object']));
     $form->assign('isBackOffice', $isBackOffice);
-    $form->_paymentFields = $form->billingFieldSets[$paymentTypeName]['fields'] = self::getPaymentFieldMetadata($processor);
-    $form->_paymentFields = array_merge($form->_paymentFields, self::getBillingAddressMetadata($processor, $form->_bltID));
+    $form->_paymentFields = self::getPaymentFieldMetadata($processor);
+    $form->_paymentFields = array_merge($form->_paymentFields, self::getBillingAddressMetadata($processor));
     $form->assign('paymentFields', self::getPaymentFields($processor));
     self::setBillingAddressFields($form, $processor);
-    // @todo - this may be obsolete - although potentially it could be used to re-order things in the form.
-    $form->billingFieldSets['billing_name_address-group']['fields'] = [];
   }
 
   /**
@@ -70,7 +67,7 @@ class CRM_Core_Payment_Form {
    * @param CRM_Core_Payment $processor
    */
   protected static function setBillingAddressFields(&$form, $processor) {
-    $billingID = $form->_bltID;
+    $billingID = CRM_Core_BAO_LocationType::getBilling();
     $smarty = CRM_Core_Smarty::singleton();
     $smarty->assign('billingDetailsFields', self::getBillingAddressFields($processor, $billingID));
   }
@@ -100,7 +97,7 @@ class CRM_Core_Payment_Form {
   protected static function addCommonFields(&$form, $paymentFields) {
     $requiredPaymentFields = $paymentFieldsMetadata = [];
     foreach ($paymentFields as $name => $field) {
-      $field['extra'] = $field['extra'] ?? NULL;
+      $field['extra'] ??= NULL;
       if ($field['htmlType'] == 'chainSelect') {
         $form->addChainSelect($field['name'], ['required' => FALSE]);
       }
@@ -150,27 +147,25 @@ class CRM_Core_Payment_Form {
    * Get the billing fields that apply to this processor.
    *
    * @param array $paymentProcessor
-   * @param int $billingLocationID
-   *   ID of billing location type.
    *
    * @todo sometimes things like the country alter the required fields (e.g postal code). We should possibly
    * set these before calling getPaymentFormFields (as we identify them).
    *
    * @return array
    */
-  public static function getBillingAddressFields($paymentProcessor, $billingLocationID) {
+  public static function getBillingAddressFields($paymentProcessor) {
+    $billingLocationID = CRM_Core_BAO_LocationType::getBilling();
     return $paymentProcessor['object']->getBillingAddressFields($billingLocationID);
   }
 
   /**
    * @param array $paymentProcessor
    *
-   * @param int $billingLocationID
-   *
    * @return array
    * @throws \CRM_Core_Exception
    */
-  public static function getBillingAddressMetadata($paymentProcessor, $billingLocationID) {
+  public static function getBillingAddressMetadata($paymentProcessor) {
+    $billingLocationID = CRM_Core_BAO_LocationType::getBilling();
     $paymentProcessorObject = Civi\Payment\System::singleton()->getByProcessor($paymentProcessor);
     return array_intersect_key(
       $paymentProcessorObject->getBillingAddressFieldsMetadata($billingLocationID),
@@ -214,7 +209,7 @@ class CRM_Core_Payment_Form {
    */
   public static function buildPaymentForm(&$form, $processor, $billing_profile_id, $isBackOffice, $paymentInstrumentID = NULL) {
     //if the form has address fields assign to the template so the js can decide what billing fields to show
-    $form->assign('profileAddressFields', $form->get('profileAddressFields') ?? NULL);
+    $form->assign('profileAddressFields', $form->get('profileAddressFields'));
     $form->addExpectedSmartyVariable('suppressSubmitButton');
     if (!empty($processor['object']) && $processor['object']->buildForm($form)) {
       return;
@@ -271,17 +266,17 @@ class CRM_Core_Payment_Form {
   public static function setDefaultValues(&$form, $contactID) {
     $billingDefaults = $form->getProfileDefaults('Billing', $contactID);
     $form->_defaults = array_merge($form->_defaults, $billingDefaults);
-
+    $billingLocationID = CRM_Core_BAO_LocationType::getBilling();
     // set default country & state from config if no country set
     // note the effect of this is to set the billing country to default to the site default
     // country if the person has an address but no country (for anonymous country is set above)
     // this could have implications if the billing profile is filled but hidden.
     // this behaviour has been in place for a while but the use of js to hide things has increased
-    if (empty($form->_defaults["billing_country_id-{$form->_bltID}"])) {
-      $form->_defaults["billing_country_id-{$form->_bltID}"] = CRM_Core_Config::singleton()->defaultContactCountry;
+    if (empty($form->_defaults["billing_country_id-{$billingLocationID}"])) {
+      $form->_defaults["billing_country_id-{$billingLocationID}"] = CRM_Core_Config::singleton()->defaultContactCountry;
     }
-    if (empty($form->_defaults["billing_state_province_id-{$form->_bltID}"])) {
-      $form->_defaults["billing_state_province_id-{$form->_bltID}"] = CRM_Core_Config::singleton()
+    if (empty($form->_defaults["billing_state_province_id-{$billingLocationID}"])) {
+      $form->_defaults["billing_state_province_id-{$billingLocationID}"] = CRM_Core_Config::singleton()
         ->defaultContactStateProvince;
     }
   }
@@ -318,12 +313,13 @@ class CRM_Core_Payment_Form {
   /**
    * Map address fields.
    *
-   * @param int $id
+   * @param null $id unused
    * @param array $src
    * @param array $dst
    * @param bool $reverse
    */
   public static function mapParams($id, $src, &$dst, $reverse = FALSE) {
+    $id = CRM_Core_BAO_LocationType::getBilling();
     $map = [
       'first_name' => 'billing_first_name',
       'middle_name' => 'billing_middle_name',
@@ -365,7 +361,8 @@ class CRM_Core_Payment_Form {
    * @return int
    */
   public static function getCreditCardExpirationMonth($src) {
-    if ($month = CRM_Utils_Array::value('M', $src['credit_card_exp_date'])) {
+    $month = $src['credit_card_exp_date']['M'] ?? NULL;
+    if ($month) {
       return $month;
     }
 

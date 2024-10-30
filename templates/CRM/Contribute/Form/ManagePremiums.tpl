@@ -17,7 +17,6 @@
   {elseif $action eq 1024}
      {include file="CRM/Contribute/Form/Contribution/PremiumBlock.tpl" context="previewPremium"}
   {else}
-     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   {crmRegion name="contribute-form-managepremiums-standard-fields"}
   <table class="form-layout-compressed">
      <tr class="crm-contribution-form-block-name">
@@ -74,12 +73,12 @@
      <span class="description">{ts}The market value of this premium (e.g. retail price). For tax-deductible contributions, this amount will be used to set the non-deductible amount in the contribution record and receipt.{/ts}</span>
        </td>
     </tr>
-    <tr class="crm-contribution-form-block-cost">
-       <td class="label">{$form.cost.label}</td>
-       <td class="html-adjust">{$form.cost.html}<br />
-        <span class="description">{ts}You may optionally record the actual cost of this premium to your organization. This may be useful when evaluating net return for this incentive.{/ts}</span>
-       </td>
-    </tr>
+      <tr class="crm-contribution-form-block-cost">
+         <td class="label">{$form.cost.label}</td>
+         <td class="html-adjust">{$form.cost.html}<br />
+          <span class="description">{ts}You may optionally record the actual cost of this premium to your organization. This may be useful when evaluating net return for this incentive.{/ts}</span>
+         </td>
+      </tr>
      <tr class="crm-contribution-form-block-financial_type">
        <td class="label">{$form.financial_type_id.label}</td>
        <td class="html-adjust">
@@ -95,7 +94,7 @@
     <tr class="crm-contribution-form-block-options">
        <td class="label">{$form.options.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_product' field='options' id=$productId}{/if}</td>
       <td class="html-adjust">{$form.options.html}<br />
-          <span class="description">{ts}Enter a comma-delimited list of color, size, etc. options for the product if applicable. Contributors will be presented a drop-down menu of these options when they select this product.{/ts}</span>
+          <span class="description">{ts}Enter a comma-delimited list of color, size, etc. options for the product if applicable. Contributors will be presented a drop-down menu of these options when they select this product.{/ts} {ts}You can also use the format key=label, where the key could be the SKU of the option, for example.{/ts}</span>
        </td>
     </tr>
     <tr class="crm-contribution-form-block-is_active">
@@ -105,9 +104,9 @@
   </table>
   {/crmRegion}
   {crmRegion name="contribute-form-managepremiums-other-fields"}
-  <fieldset id="time-delimited" class="crm-collapsible {if empty($showSubscriptions)}collapsed{/if}">
-    <legend class="collapsible-title">{ts}Subscription or Service Settings{/ts}</legend>
-    <div>
+  <details id="time-delimited" class="crm-accordion-light" {if !empty($showSubscriptions)}open{/if}>
+    <summary>{ts}Subscription or Service Settings{/ts}</summary>
+    <div class="crm-accordion-body">
       <table class="form-layout-compressed">
         <tr class="crm-contribution-form-block-period_type">
            <td class="label">{$form.period_type.label}</td>
@@ -135,12 +134,13 @@
         </tr>
       </table>
     </div>
-  </fieldset>
+  </details>
   {/crmRegion}
  {/if}
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
+  {include file="CRM/common/customDataBlock.tpl" customDataType='Product' entityID=$productId}
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
-{if $action eq 1 or $action eq 2 }
+{if $action eq 1 or $action eq 2}
 
 <script type="text/javascript">
 {literal}

@@ -20,6 +20,7 @@
 namespace api\v4\Entity;
 
 use api\v4\Api4TestBase;
+use Civi\Api4\ExampleData;
 
 /**
  * @group headless
@@ -30,15 +31,14 @@ class ExampleDataTest extends Api4TestBase {
    * Basic canary test fetching a specific example.
    *
    * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function testGet() {
+  public function testGet(): void {
     $file = \Civi::paths()->getPath('[civicrm.root]/Civi/WorkflowMessage/GenericWorkflowMessage/Alex.php');
     $name = 'workflow/generic/Alex';
 
-    $this->assertTrue(file_exists($file), "Expect find canary file ($file)");
+    $this->assertFileExists($file, "Expect find canary file ($file)");
 
-    $get = \Civi\Api4\ExampleData::get()
+    $get = ExampleData::get()
       ->addWhere('name', '=', $name)
       ->execute()
       ->single();
@@ -46,7 +46,7 @@ class ExampleDataTest extends Api4TestBase {
     $this->assertTrue(!isset($get['data']), 'Default "get" should not return "data"');
     $this->assertTrue(!isset($get['asserts']), 'Default "get" should not return "asserts"');
 
-    $get = \Civi\Api4\ExampleData::get()
+    $get = ExampleData::get()
       ->addWhere('name', 'LIKE', 'workflow/generic/%')
       ->execute();
     $this->assertTrue($get->count() > 0);
@@ -54,13 +54,13 @@ class ExampleDataTest extends Api4TestBase {
       $this->assertStringStartsWith('workflow/generic/', $gotten['name']);
     }
 
-    $get = \Civi\Api4\ExampleData::get()
+    $get = ExampleData::get()
       ->addWhere('name', '=', $name)
       ->addSelect('workflow', 'data')
       ->execute()
       ->single();
     $this->assertEquals($name, $get['name']);
-    $this->assertEquals(100, $get['data']['modelProps']['contact']['id']);
+    $this->assertEquals(0, $get['data']['modelProps']['contact']['id']);
   }
 
 }

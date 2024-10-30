@@ -90,22 +90,26 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
           'url' => 'civicrm/admin/messageTemplates/add',
           'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit this message template'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
         ],
         CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable this message template'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DISABLE),
         ],
         CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable this message template'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ENABLE),
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/messageTemplates',
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete this message template'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
         ],
         CRM_Core_Action::REVERT => [
           'name' => ts('Revert to Default'),
@@ -113,12 +117,15 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
           'url' => 'civicrm/admin/messageTemplates',
           'qs' => 'action=revert&id=%%id%%&selectedChild=workflow',
           'title' => ts('Revert this workflow message template to the system default'),
+          'weight' => 110,
         ],
         CRM_Core_Action::VIEW => [
           'name' => ts('View Default'),
           'url' => 'civicrm/admin/messageTemplates',
           'qs' => 'action=view&id=%%orig_id%%&reset=1',
           'title' => ts('View the system default for this workflow message template'),
+          // Not the standard view weight as it's not really a standard view action.
+          'weight' => 120,
         ],
       ];
     }
@@ -253,6 +260,10 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
     $messageTemplate->find();
     while ($messageTemplate->fetch()) {
       $values[$messageTemplate->id] = ['class' => ''];
+      // Make the subject a empty string if it isn't defined
+      if (!isset($messageTemplate->msg_subject)) {
+        $messageTemplate->msg_subject = "";
+      }
       CRM_Core_DAO::storeValues($messageTemplate, $values[$messageTemplate->id]);
       // populate action links
       $this->action($messageTemplate, $action, $values[$messageTemplate->id], $links, CRM_Core_Permission::EDIT);
@@ -274,6 +285,7 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
     $this->assign('canEditSystemTemplates', CRM_Core_Permission::check('edit system workflow message templates'));
     $this->assign('canEditMessageTemplates', CRM_Core_Permission::check('edit message templates'));
     $this->assign('canEditUserDrivenMessageTemplates', CRM_Core_Permission::check('edit user-driven message templates'));
+    $this->assign('isCiviMailEnabled', CRM_Core_Component::isEnabled('CiviMail'));
     Civi::resources()
       ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')
       ->addSetting([

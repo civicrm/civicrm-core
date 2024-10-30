@@ -145,7 +145,7 @@ WHERE  v.option_group_id = g.id
       $query .= ' AND  v.is_active = 1 ';
       // Only show options for enabled components
       $componentClause = ' v.component_id IS NULL ';
-      $enabledComponents = CRM_Core_Config::singleton()->enableComponents;
+      $enabledComponents = Civi::settings()->get('enable_components');
       if ($enabledComponents) {
         $enabledComponents = '"' . implode('","', $enabledComponents) . '"';
         $componentClause .= " OR v.component_id IN (SELECT id FROM civicrm_component WHERE name IN ($enabledComponents)) ";
@@ -160,9 +160,12 @@ WHERE  v.option_group_id = g.id
       $query .= $condition;
     }
 
-    $query .= " ORDER BY v.{$orderBy}";
+    $query .= " ORDER BY %2";
 
-    $p = [1 => [$name, 'String']];
+    $p = [
+      1 => [$name, 'String'],
+      2 => ['v.' . $orderBy, 'MysqlOrderBy'],
+    ];
     $dao = CRM_Core_DAO::executeQuery($query, $p);
 
     $var = self::valuesCommon($dao, $flip, $grouping, $localize, $labelColumnName);
@@ -279,7 +282,8 @@ WHERE  v.option_group_id = g.id
   public static function lookupValues(&$params, $names, $flip = FALSE) {
     foreach ($names as $postName => $value) {
       // See if $params field is in $names array (i.e. is a value that we need to lookup)
-      if ($postalName = CRM_Utils_Array::value($postName, $params)) {
+      $postalName = $params[$postName] ?? NULL;
+      if ($postalName) {
         $postValues = [];
         // params[$postName] may be a Ctrl+A separated value list
         if (is_string($postalName) &&
@@ -326,94 +330,6 @@ WHERE  v.option_group_id = g.id
         $params[$value['newName']] = implode(', ', $newValue);
       }
     }
-  }
-
-  /**
-   * @deprecated - use CRM_Core_PseudoConstant::getLabel
-   *
-   * @param string $groupName
-   * @param $value
-   * @param bool $onlyActiveValue
-   *
-   * @return null
-   */
-  public static function getLabel($groupName, $value, $onlyActiveValue = TRUE) {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_PseudoConstant::getLabel');
-    if (empty($groupName) ||
-      empty($value)
-    ) {
-      return NULL;
-    }
-
-    $query = "
-SELECT  v.label as label ,v.value as value
-FROM   civicrm_option_value v,
-       civicrm_option_group g
-WHERE  v.option_group_id = g.id
-  AND  g.name            = %1
-  AND  g.is_active       = 1
-  AND  v.value           = %2
-";
-    if ($onlyActiveValue) {
-      $query .= " AND  v.is_active = 1 ";
-    }
-    $p = [
-      1 => [$groupName, 'String'],
-      2 => [$value, 'Integer'],
-    ];
-    $dao = CRM_Core_DAO::executeQuery($query, $p);
-    if ($dao->fetch()) {
-      return $dao->label;
-    }
-    return NULL;
-  }
-
-  /**
-   * @deprecated
-   *
-   * This function is not cached.
-   *
-   * @param string $groupName
-   * @param $label
-   * @param string $labelField
-   * @param string $labelType
-   * @param string $valueField
-   *
-   * @return null
-   */
-  public static function getValue(
-    $groupName,
-    $label,
-    $labelField = 'label',
-    $labelType = 'String',
-    $valueField = 'value'
-  ) {
-    if (empty($label)) {
-      return NULL;
-    }
-
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_PseudoConstant::getKey');
-
-    $query = "
-SELECT  v.label as label ,v.{$valueField} as value
-FROM   civicrm_option_value v,
-       civicrm_option_group g
-WHERE  v.option_group_id = g.id
-  AND  g.name            = %1
-  AND  v.is_active       = 1
-  AND  g.is_active       = 1
-  AND  v.$labelField     = %2
-";
-
-    $p = [
-      1 => [$groupName, 'String'],
-      2 => [$label, $labelType],
-    ];
-    $dao = CRM_Core_DAO::executeQuery($query, $p);
-    if ($dao->fetch()) {
-      return $dao->value;
-    }
-    return NULL;
   }
 
   /**
@@ -631,7 +547,7 @@ WHERE  v.option_group_id = g.id
       ] as $fld) {
         $row[$fld] = $dao->$fld;
         if ($localize && in_array($fld, ['label', 'description'])) {
-          $row[$fld] = ts($row[$fld]);
+          $row[$fld] = _ts($row[$fld]);
         }
       }
     }

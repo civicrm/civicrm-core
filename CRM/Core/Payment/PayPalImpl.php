@@ -107,6 +107,34 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
+   * Checks if payment processor supports not returning to the form processing.
+   *
+   * The exists to support historical event form logic where emails are sent
+   * & the form postProcess hook is called before redirecting the browser where
+   * the user is redirected.
+   *
+   * @return bool
+   */
+  public function supportsNoReturn(): bool {
+    $billingMode = (int) $this->_paymentProcessor['billing_mode'];
+    return $billingMode === self::BILLING_MODE_NOTIFY;
+  }
+
+  /**
+   * Checks if payment processor supports not returning to the form processing on recurring.
+   *
+   * The exists to support historical event form logic where emails are sent
+   * & the form postProcess hook is called before redirecting the browser where
+   * the user is redirected.
+   *
+   * @return bool
+   */
+  public function supportsNoReturnForRecurring(): bool {
+    $billingMode = (int) $this->_paymentProcessor['billing_mode'];
+    return $billingMode === self::BILLING_MODE_NOTIFY || $billingMode === self::BILLING_MODE_BUTTON;
+  }
+
+  /**
    * Does this processor support pre-approval.
    *
    * This would generally look like a redirect to enter credentials which can then be used in a later payment call.
@@ -255,7 +283,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $args['desc'] = $params['description'] ?? NULL;
     $args['invnum'] = $params['invoiceID'];
     $args['returnURL'] = $this->getReturnSuccessUrl($params['qfKey']);
-    $args['cancelURL'] = $this->getCancelUrl($params['qfKey'], NULL);
+    $args['cancelURL'] = $this->getCancelUrl($params['qfKey'], $params['participantID'] ?? NULL);
     $args['version'] = '56.0';
     $args['SOLUTIONTYPE'] = 'Sole';
 
@@ -500,11 +528,11 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     }
 
     if ($this->_paymentProcessor['billing_mode'] == 4) {
-      $this->doPaymentRedirectToPayPal($params, $component);
+      $this->doPaymentRedirectToPayPal($params);
       // redirect calls CiviExit() so execution is stopped
     }
     else {
-      $result = $this->doPaymentPayPalButton($params, $component);
+      $result = $this->doPaymentPayPalButton($params);
       if (is_array($result) && !isset($result['payment_status_id'])) {
         if (!empty($params['is_recur'])) {
           $result = $this->setStatusPaymentPending($result);
@@ -537,15 +565,14 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * @param array $params
    *   Assoc array of input parameters for this transaction.
    *
-   * @param string $component
    * @return array
    *   the result in an nice formatted array (or an error object)
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
-  public function doPaymentPayPalButton(&$params, $component = 'contribute') {
+  public function doPaymentPayPalButton(&$params) {
     $args = [];
 
-    $result = $this->setStatusPaymentPending([]);
+    $result = [];
 
     $this->initialize($args, 'DoDirectPayment');
 
@@ -572,7 +599,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     // add CiviCRM BN code
     $args['BUTTONSOURCE'] = 'CiviCRM_SP';
 
-    if (CRM_Utils_Array::value('is_recur', $params) == 1) {
+    if (($params['is_recur'] ?? NULL) == 1) {
       $start_time = strtotime(date('m/d/Y'));
       $start_date = date('Y-m-d\T00:00:00\Z', $start_time);
 
@@ -590,7 +617,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       $args['totalbillingcycles'] = $params['installments'] ?? NULL;
       $args['version'] = 56.0;
       $args['PROFILEREFERENCE'] = "" .
-        "i=" . $params['invoiceID'] . "&m=" . $component .
+        "i=" . $params['invoiceID'] . "&m=" . $this->_component .
         "&c=" . $params['contactID'] . "&r=" . $params['contributionRecurID'] .
         "&b=" . $params['contributionID'] . "&p=" . $params['contributionPageID'];
     }
@@ -602,12 +629,11 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
 
     $params['recurr_profile_id'] = NULL;
 
-    if (CRM_Utils_Array::value('is_recur', $params) == 1) {
+    if (($params['is_recur'] ?? NULL) == 1) {
       $params['recurr_profile_id'] = $apiResult['profileid'];
     }
 
     /* Success */
-    $result = $this->setStatusPaymentCompleted($result);
     $doQueryParams = [
       'gross_amount' => $apiResult['amt'] ?? NULL,
       'trxn_id' => $apiResult['transactionid'] ?? NULL,
@@ -915,12 +941,11 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
 
   /**
    * @param array $params
-   * @param string $component
    *
    * @throws Exception
    */
-  public function doPaymentRedirectToPayPal(&$params, $component = 'contribute') {
-    $notifyParameters = ['module' => $component];
+  public function doPaymentRedirectToPayPal(&$params) {
+    $notifyParameters = ['module' => $this->_component];
     $notifyParameterMap = [
       'contactID' => 'contactID',
       'contributionID' => 'contributionID',
@@ -938,30 +963,15 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
         $notifyParameters[$notifyName] = $params[$paramsName];
       }
     }
-    $notifyURL = $this->getNotifyUrl();
-
     $config = CRM_Core_Config::singleton();
-    $url = ($component == 'event') ? 'civicrm/event/register' : 'civicrm/contribute/transact';
-    $cancel = ($component == 'event') ? '_qf_Register_display' : '_qf_Main_display';
-
-    $cancelUrlString = "$cancel=1&cancel=1&qfKey={$params['qfKey']}";
-    if (!empty($params['is_recur'])) {
-      $cancelUrlString .= "&isRecur=1&recurId={$params['contributionRecurID']}&contribId={$params['contributionID']}";
-    }
-
-    $cancelURL = CRM_Utils_System::url(
-      $url,
-      $cancelUrlString,
-      TRUE, NULL, FALSE
-    );
 
     $paypalParams = [
       'business' => $this->_paymentProcessor['user_name'],
-      'notify_url' => $notifyURL,
+      'notify_url' => $this->getNotifyUrl(),
       'item_name' => $this->getPaymentDescription($params, 127),
       'quantity' => 1,
       'undefined_quantity' => 0,
-      'cancel_return' => $cancelURL,
+      'cancel_return' => $this->getCancelUrl($params['qfKey'], $params['participantID'] ?? NULL),
       'no_note' => 1,
       'no_shipping' => 1,
       'return' => $this->getReturnSuccessUrl($params['qfKey']),
@@ -1142,7 +1152,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       $keyPos = strpos($str, '=');
 
       // position of value
-      $valPos = strpos($str, '&') ? strpos($str, '&') : strlen($str);
+      $valPos = strpos($str, '&') ?: strlen($str);
 
       /*getting the Key and Value values and storing in a Associative Array*/
 

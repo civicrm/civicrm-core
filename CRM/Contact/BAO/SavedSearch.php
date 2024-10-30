@@ -18,7 +18,7 @@
 /**
  * Business object for Saved searches.
  */
-class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
+class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch implements \Civi\Core\HookInterface {
 
   /**
    * Retrieve DB object and copy to defaults array.
@@ -157,13 +157,6 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
       }
     }
 
-    if ($customSearchClass = CRM_Utils_Array::value('customSearchClass', $result)) {
-      // check if there is a special function - formatSavedSearchFields defined in the custom search form
-      if (method_exists($customSearchClass, 'formatSavedSearchFields')) {
-        $customSearchClass::formatSavedSearchFields($result);
-      }
-    }
-
     return $result;
   }
 
@@ -224,32 +217,6 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
   }
 
   /**
-   * Contact IDS Sql (whatever that means!).
-   *
-   * @param int $id
-   *
-   * @return string
-   */
-  public static function contactIDsSQL($id) {
-    $params = self::getSearchParams($id);
-    if ($params && !empty($params['customSearchID'])) {
-      return CRM_Contact_BAO_SearchCustom::contactIDSQL(NULL, $id);
-    }
-    else {
-      $tables = $whereTables = ['civicrm_contact' => 1];
-      $where = CRM_Contact_BAO_SavedSearch::whereClause($id, $tables, $whereTables);
-      if (!$where) {
-        $where = '( 1 )';
-      }
-      $from = CRM_Contact_BAO_Query::fromClause($whereTables);
-      return "
-SELECT contact_a.id
-$from
-WHERE  $where";
-    }
-  }
-
-  /**
    * Deprecated function, gets a value from Group entity
    *
    * @deprecated
@@ -263,28 +230,32 @@ WHERE  $where";
   }
 
   /**
-   * Create or update SavedSearch record.
-   *
+   * @deprecated
    * @param array $params
-   *
-   * @return \CRM_Contact_DAO_SavedSearch
+   * @return CRM_Contact_DAO_SavedSearch
    */
-  public static function create(&$params) {
-    $loggedInContactID = CRM_Core_Session::getLoggedInContactID();
-    if ($loggedInContactID) {
-      if (empty($params['id'])) {
-        $params['created_id'] = $loggedInContactID;
-      }
-      $params['modified_id'] = $loggedInContactID;
-    }
-    // Set by mysql
-    unset($params['modified_date']);
-
-    // Flush angular caches to refresh search displays
-    if (isset($params['api_params'])) {
-      Civi::container()->get('angular')->clear();
-    }
+  public static function create($params) {
     return self::writeRecord($params);
+  }
+
+  /**
+   * Callback for hook_civicrm_pre().
+   *
+   * @param \Civi\Core\Event\PreEvent $event
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event): void {
+    if ($event->action === 'create' || $event->action === 'edit') {
+      $event->params['modified_id'] ??= CRM_Core_Session::getLoggedInContactID();
+      // Set by mysql
+      unset($event->params['modified_date']);
+
+      // Flush angular caches to refresh search displays
+      if (isset($event->params['api_params'])) {
+        Civi::container()->get('angular')->clear();
+      }
+    }
   }
 
   /**
@@ -397,8 +368,44 @@ WHERE  $where";
       ->addSelect('name', 'title_plural')
       ->addOrderBy('title_plural')
       ->execute()
-      ->indexBy('name')
-      ->column('title_plural');
+      ->column('title_plural', 'name');
+  }
+
+  /**
+   * Gets all smart groups that filter based on groupID.
+   *
+   * @param int $groupID
+   *     Group Id to search for.
+   * @return array
+   */
+  public static function getSmartGroupsUsingGroup(int $groupID) {
+    $groups = \Civi\Api4\Group::get(FALSE)
+      ->addSelect('id', 'title', 'saved_search_id', 'saved_search_id.form_values')
+      ->addWhere('saved_search_id', 'IS NOT NULL')
+      ->addWhere('saved_search_id.form_values', 'CONTAINS', 'group')
+      ->setLimit(0)
+      ->execute();
+    $smartGroups = [];
+    foreach ($groups as $group) {
+      // Filter out arrays in Form Values which are group searchs.
+      $groupSearches = array_filter(
+        $group['saved_search_id.form_values'],
+        function($v) {
+          return ($v[0] == 'group');
+        }
+      );
+      // Check each group search for valid groups.
+      foreach ($groupSearches as $groupSearch) {
+        $groupFormValues = (array) ($groupSearch[2]['IN'] ?? $groupSearch[2] ?? []);
+        if (!empty($groupFormValues) && in_array($groupID, (array) $groupFormValues)) {
+          $smartGroups[$group['id']] = [
+            'title' => $group['title'],
+            'editSearchURL' => self::getEditSearchUrl($group['saved_search_id']),
+          ];
+        }
+      }
+    }
+    return $smartGroups;
   }
 
 }

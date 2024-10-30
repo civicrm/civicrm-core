@@ -28,7 +28,7 @@ use Civi\Api4\Contact;
  */
 class CreateWithOptionGroupTest extends CustomTestBase {
 
-  public function testGetWithCustomData() {
+  public function testGetWithCustomData(): void {
     $group = uniqid('fava');
     $colorField = uniqid('colora');
     $foodField = uniqid('fooda');
@@ -94,7 +94,7 @@ class CreateWithOptionGroupTest extends CustomTestBase {
     $this->assertEquals(50000, $result['FinancialStuff.Salary']);
   }
 
-  public function testWithCustomDataForMultipleContacts() {
+  public function testWithCustomDataForMultipleContacts(): void {
     $group = uniqid('favb');
     $colorField = uniqid('colorb');
     $foodField = uniqid('foodb');

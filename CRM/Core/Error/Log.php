@@ -59,9 +59,17 @@ class CRM_Core_Error_Log extends \Psr\Log\AbstractLogger {
       if (isset($context['exception'])) {
         $context['exception'] = CRM_Core_Error::formatTextException($context['exception']);
       }
-      $message .= "\n" . print_r($context, 1);
+      $fullContext = "\n" . print_r($context, 1);
+      $seeLog = sprintf(' (<em>%s</em>)', ts('See log for details.'));
     }
-    CRM_Core_Error::debug_log_message($message, FALSE, '', $this->map[$level]);
+    else {
+      $fullContext = $seeLog = '';
+    }
+    $pearPriority = $this->map[$level];
+    CRM_Core_Error::debug_log_message($message . $fullContext, FALSE, '', $pearPriority);
+    if ($pearPriority <= PEAR_LOG_ERR && CRM_Core_Config::singleton()->debug && isset($_SESSION['CiviCRM'])) {
+      CRM_Core_Session::setStatus($message . $seeLog, ts('Error'), 'error');
+    }
   }
 
 }

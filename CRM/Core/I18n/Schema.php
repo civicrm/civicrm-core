@@ -303,9 +303,15 @@ class CRM_Core_I18n_Schema {
     }
 
     // rebuild views
+    $logging_enabled = \Civi::settings()->get('logging');
+
     foreach ($locales as $locale) {
       foreach ($tables as $table) {
         $queries[] = self::createViewQuery($locale, $table, $dao, $class, $isUpgradeMode);
+
+        if ($logging_enabled) {
+          $queries[] = self::createViewQuery($locale, 'log_' . $table, $dao, $class, $isUpgradeMode);
+        }
       }
     }
 
@@ -458,10 +464,20 @@ class CRM_Core_I18n_Schema {
     $columns =& $class::columns();
     $cols = [];
     $tableCols = [];
-    $dao->query("DESCRIBE {$table}", FALSE);
+    $db = $dao->_database;
+    $lookup_table = $table;
+
+    if (substr($table, 0, 4) == 'log_') {
+      $lookup_table = substr($table, 4);
+      $dsn = defined('CIVICRM_LOGGING_DSN') ? CRM_Utils_SQL::autoSwitchDSN(CIVICRM_LOGGING_DSN) : CRM_Utils_SQL::autoSwitchDSN(CIVICRM_DSN);
+      $dsn = DB::parseDSN($dsn);
+      $db = $dsn['database'];
+    }
+    $dao->query("DESCRIBE `{$db}`.{$table}", FALSE);
+
     while ($dao->fetch()) {
       // view non-internationalized columns directly
-      if (!array_key_exists($dao->Field, $columns[$table]) &&
+      if (!in_array($dao->Field, array_keys($columns[$lookup_table])) &&
         !preg_match('/_[a-z][a-z]_[A-Z][A-Z]$/', $dao->Field)
       ) {
         $cols[] = '`' . $dao->Field . '`';
@@ -469,7 +485,7 @@ class CRM_Core_I18n_Schema {
       $tableCols[] = $dao->Field;
     }
     // view internationalized columns through an alias
-    foreach ($columns[$table] as $column => $_) {
+    foreach ($columns[$lookup_table] as $column => $_) {
       if (!$isUpgradeMode) {
         $cols[] = "`{$column}_{$locale}` `{$column}`";
       }
@@ -477,7 +493,7 @@ class CRM_Core_I18n_Schema {
         $cols[] = "`{$column}_{$locale}` `{$column}`";
       }
     }
-    return "CREATE OR REPLACE VIEW {$table}_{$locale} AS SELECT " . implode(', ', $cols) . " FROM {$table}";
+    return "CREATE OR REPLACE VIEW `{$db}`.{$table}_{$locale} AS SELECT " . implode(', ', $cols) . " FROM `{$db}`.{$table}";
   }
 
   /**

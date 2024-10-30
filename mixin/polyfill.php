@@ -92,8 +92,8 @@ return function ($longName, $shortName, $basePath) {
   }
   foreach ($mixins as $mixin) {
     // If there's trickery about installs/uninstalls/resets, then we may need to register a second time.
-    if (!isset(\Civi::$statics[__FUNCTION__][$mixin])) {
-      \Civi::$statics[__FUNCTION__][$mixin] = 1;
+    if (!isset(\Civi::$statics[$longName][$mixin])) {
+      \Civi::$statics[$longName][$mixin] = 1;
       $func = $_CIVIX_MIXIN_POLYFILL[$mixin];
       $func($mixInfo, $bootCache);
     }

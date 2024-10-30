@@ -10,13 +10,13 @@
 <div class="batch-entry form-item">
   <div class="help">
     {ts}Click Validate & Process below when you've entered all items for the batch. You can also Save & Continue Later at any time.{/ts}
-    {if call_user_func(array('CRM_Core_Permission','check'), 'administer CiviCRM')}
+    {crmPermission has='administer CiviCRM'}
       {capture assign=batchEntryProfileURL}{crmURL p="civicrm/admin/uf/group" q="reset=1&selectedChild=reserved-profiles"}{/capture}
       {ts 1=$batchEntryProfileURL}Add, remove or change the order of columns by editing the corresponding <a href="%1" target="_blank">Bulk Entry profile</a>.{/ts}
       {if $batchType EQ 1}
         {ts}Custom fields and a Personal Campaign Page field can be added if needed.{/ts}
       {/if}
-    {/if}
+    {/crmPermission}
   </div>
   {if $batchAmountMismatch}
     <div class="status message status-warning">
@@ -95,7 +95,7 @@
           {elseif $n eq 'total_amount'}
              <div class="compressed crm-grid-cell">
                {$form.field.$rowNumber.$n.html}
-               {if $batchType eq 3 }
+               {if $batchType eq 3}
 		 {ts}<span id={$rowNumber} class="pledge-adjust-option"><a href='#'>adjust payment amount</a></span>{/ts}
                  <span id="adjust-select-{$rowNumber}" class="adjust-selectbox">{$form.option_type.$rowNumber.html}</span>
                {/if}
@@ -112,7 +112,7 @@
       </div>
     {/section}
   </div>
-  <div class="crm-submit-buttons">{if $fields}{$form._qf_Batch_refresh.html}{/if} &nbsp; {$form.buttons.html}</div>
+  <div class="crm-submit-buttons">{if $fields && array_key_exists('_qf_Batch_refresh', $form) && is_array($form._qf_Batch_refresh)}{$form._qf_Batch_refresh.html}{/if} &nbsp; {$form.buttons.html}</div>
 </div>
 {literal}
 <script type="text/javascript">
@@ -155,7 +155,7 @@ CRM.$(function($) {
     calculateActualTotal();
   });
 
-  {/literal}{if $batchType eq 1 }{literal}
+  {/literal}{if $batchType eq 1}{literal}
   // hide all dates if send receipt is checked
   hideSendReceipt();
 

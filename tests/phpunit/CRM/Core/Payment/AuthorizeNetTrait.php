@@ -29,6 +29,36 @@ trait CRM_Core_Payment_AuthorizeNetTrait {
   protected $isRecur = FALSE;
 
   /**
+   * Create test Authorize.net instance.
+   *
+   * @param array $params
+   * @param string $identifier
+   *
+   * @return int
+   */
+  public function paymentProcessorAuthorizeNetCreate(array $params = [], string $identifier = 'authorize_net'): int {
+    $params = array_merge([
+      'name' => 'Authorize',
+      'domain_id' => CRM_Core_Config::domainID(),
+      'payment_processor_type_id:name' => 'AuthNet',
+      'title' => 'AuthNet',
+      'is_active' => 1,
+      'is_default' => 0,
+      'is_test' => 1,
+      'is_recur' => 1,
+      'user_name' => '4y5BfuW7jm',
+      'password' => '4cAmW927n8uLf5J8',
+      'url_site' => 'https://test.authorize.net/gateway/transact.dll',
+      'url_recur' => 'https://apitest.authorize.net/xml/v1/request.api',
+      'class_name' => 'Payment_AuthorizeNet',
+      'billing_mode' => 1,
+    ], $params);
+
+    $result = $this->createTestEntity('PaymentProcessor', $params, $identifier);
+    return (int) $result['id'];
+  }
+
+  /**
    * Get the expected response from Authorize.net.
    *
    * @return string
@@ -88,7 +118,7 @@ trait CRM_Core_Payment_AuthorizeNetTrait {
    *
    * @param array $expected
    */
-  protected function assertRequestValid($expected = []) {
+  protected function assertRequestValid(array $expected = []): void {
     $expected = array_merge([
       'x_card_num' => '4111111111111111',
       'x_card_code' => 123,

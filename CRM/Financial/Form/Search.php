@@ -45,7 +45,7 @@ class CRM_Financial_Form_Search extends CRM_Core_Form {
     $attributes['total']['class'] = $attributes['item_count']['class'] = 'number';
     $this->add('text', 'title', ts('Batch Name'), $attributes['title']);
 
-    $batchStatus = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id', ['labelColumn' => 'name']);
+    $batchStatus = CRM_Batch_DAO_Batch::buildOptions('status_id', 'validate');
     $this->add(
       'select',
       'status_id',

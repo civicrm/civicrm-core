@@ -92,7 +92,7 @@ class PathsTest extends \CiviUnitTestCase {
     unset($civicrm_paths[$varName][$varType]);
   }
 
-  public function testGetUrl_ImplicitBase() {
+  public function testGetUrl_ImplicitBase(): void {
     $p = \Civi::paths();
     $cmsRoot = rtrim($p->getVariable('cms.root', 'url'), '/');
 
@@ -104,7 +104,7 @@ class PathsTest extends \CiviUnitTestCase {
   /**
    * This test demonstrates how to (and how not to) compute a derivative path variable.
    */
-  public function testAbsoluteRelativeConversions() {
+  public function testAbsoluteRelativeConversions(): void {
     $gstack = \CRM_Utils_GlobalStack::singleton();
     $gstack->push(['_SERVER' => ['HTTP_HOST' => 'example.com']]);
     $cleanup = \CRM_Utils_AutoClean::with([$gstack, 'pop']);

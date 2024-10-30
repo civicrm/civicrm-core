@@ -1,0 +1,13 @@
+<div af-fieldset="">
+  <div class="af-markup">
+    <div class="help"><p>{{:: ts('User accounts allow people to access CiviCRM. What they can access is determined by which roles the users have, and what permissions are granted to those roles.') }}</p>
+    </div>
+  </div>
+  <div class="af-container af-layout-cols" af-title="Filters">
+    <af-field name="username" defn="{required: false, input_attrs: {}}" />
+    <af-field name="uf_name" defn="{required: false, input_attrs: {}}" />
+    <af-field name="is_active" defn="{input_type: 'Radio'}" />
+    <af-field name="roles" defn="{input_attrs: {multiple: true}}" />
+  </div>
+  <crm-search-display-table search-name="Users" display-name="Users"></crm-search-display-table>
+</div>

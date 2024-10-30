@@ -5,7 +5,7 @@
     <tag>mock</tag>
   </tags>
   <classloader>
-    <psr0 prefix="CRM_" path="" />
+    <psr0 prefix="CRM_" path="." />
   </classloader>
   <upgrader>CRM_Moduleupgtest_Upgrader</upgrader>
 </extension>

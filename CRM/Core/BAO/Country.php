@@ -87,9 +87,7 @@ class CRM_Core_BAO_Country extends CRM_Core_DAO_Country {
 
     if (!empty($defaultContactCountry) && !$cachedContactCountry) {
       $countryIsoCodes = CRM_Core_PseudoConstant::countryIsoCode();
-      $cachedContactCountry = CRM_Utils_Array::value($defaultContactCountry,
-        $countryIsoCodes
-      );
+      $cachedContactCountry = $countryIsoCodes[$defaultContactCountry] ?? NULL;
     }
     return $cachedContactCountry;
   }
@@ -174,13 +172,10 @@ class CRM_Core_BAO_Country extends CRM_Core_DAO_Country {
   public static function defaultCurrencySymbol($defaultCurrency = NULL) {
     static $cachedSymbol = NULL;
     if (!$cachedSymbol || $defaultCurrency) {
-      $currency = $defaultCurrency ? $defaultCurrency : Civi::settings()->get('defaultCurrency');
+      $currency = $defaultCurrency ?: Civi::settings()->get('defaultCurrency');
       if ($currency) {
-        $currencySymbols = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'currency', [
-          'labelColumn' => 'symbol',
-          'orderColumn' => TRUE,
-        ]);
-        $cachedSymbol = CRM_Utils_Array::value($currency, $currencySymbols, '');
+        $currencySymbols = CRM_Contribute_DAO_Contribution::buildOptions('currency', 'abbreviate');
+        $cachedSymbol = $currencySymbols[$currency] ?? '';
       }
       else {
         $cachedSymbol = '$';

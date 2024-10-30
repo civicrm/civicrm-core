@@ -1,15 +1,7 @@
 <?php
 
 /**
- * Civi v5.19 does not provide all the API's we would need to define
- * FlexMailer in an extension, but you can patch core to simulate them.
- * These define()s tell core to enable any such hacks (if available).
  */
-
-define('CIVICRM_FLEXMAILER_HACK_DELIVER', '\Civi\FlexMailer\FlexMailer::createAndRun');
-define('CIVICRM_FLEXMAILER_HACK_SENDABLE', '\Civi\FlexMailer\Validator::createAndRun');
-define('CIVICRM_FLEXMAILER_HACK_REQUIRED_TOKENS', 'call://civi_flexmailer_required_tokens/getRequiredTokens');
-
 require_once 'flexmailer.civix.php';
 
 use CRM_Flexmailer_ExtensionUtil as E;
@@ -33,66 +25,12 @@ function flexmailer_civicrm_install() {
 }
 
 /**
- * Implements hook_civicrm_postInstall().
- *
- * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_postInstall
- */
-function flexmailer_civicrm_postInstall() {
-  _flexmailer_civix_civicrm_postInstall();
-}
-
-/**
- * Implements hook_civicrm_uninstall().
- *
- * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_uninstall
- */
-function flexmailer_civicrm_uninstall() {
-  _flexmailer_civix_civicrm_uninstall();
-}
-
-/**
  * Implements hook_civicrm_enable().
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_enable
  */
 function flexmailer_civicrm_enable() {
   _flexmailer_civix_civicrm_enable();
-}
-
-/**
- * Implements hook_civicrm_disable().
- *
- * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_disable
- */
-function flexmailer_civicrm_disable() {
-  _flexmailer_civix_civicrm_disable();
-}
-
-/**
- * Implements hook_civicrm_upgrade().
- *
- * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_upgrade
- */
-function flexmailer_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
-  return _flexmailer_civix_civicrm_upgrade($op, $queue);
-}
-
-/**
- * Implements hook_civicrm_navigationMenu().
- *
- * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_navigationMenu
- */
-function flexmailer_civicrm_navigationMenu(&$menu) {
-  _flexmailer_civix_insert_navigation_menu($menu, 'Administer/CiviMail', [
-    'label' => E::ts('Flexmailer Settings'),
-    'name' => 'flexmailer_settings',
-    'permission' => 'administer CiviCRM',
-    'child' => [],
-    'operator' => 'AND',
-    'separator' => 0,
-    'url' => CRM_Utils_System::url('civicrm/admin/setting/flexmailer', 'reset=1', TRUE),
-  ]);
-  _flexmailer_civix_navigationMenu($menu);
 }
 
 /**
@@ -104,15 +42,15 @@ function flexmailer_civicrm_container($container) {
 }
 
 /**
- * Get a list of delivery options for traditional mailings.
- *
- * @return array
- *   Array (string $machineName => string $label).
+ * @see \CRM_Utils_Hook::scanClasses()
  */
-function _flexmailer_traditional_options() {
-  return array(
-    'auto' => E::ts('Automatic'),
-    'bao' => E::ts('CiviMail BAO'),
-    'flexmailer' => E::ts('Flexmailer Pipeline'),
-  );
+function flexmailer_civicrm_scanClasses(array &$classes): void {
+  $prefix = 'Civi\\FlexMailer\\';
+  $dir = __DIR__ . '/src';
+  $delim = '\\';
+
+  foreach (\CRM_Utils_File::findFiles($dir, '*.php', TRUE) as $relFile) {
+    $relFile = str_replace(DIRECTORY_SEPARATOR, '/', $relFile);
+    $classes[] = $prefix . str_replace('/', $delim, substr($relFile, 0, -4));
+  }
 }

@@ -30,7 +30,7 @@ use Civi\Test\TransactionalInterface;
  */
 class UpdateContactTest extends Api4TestBase implements TransactionalInterface {
 
-  public function testUpdateWithIdInWhere() {
+  public function testUpdateWithIdInWhere(): void {
     $contactId = Contact::create(FALSE)
       ->addValue('first_name', 'Johann')
       ->addValue('last_name', 'Tester')
@@ -47,7 +47,7 @@ class UpdateContactTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('Tester', $contact['last_name']);
   }
 
-  public function testUpdateWithIdInValues() {
+  public function testUpdateWithIdInValues(): void {
     $contactId = Contact::create(FALSE)
       ->addValue('first_name', 'Bobby')
       ->addValue('last_name', 'Tester')

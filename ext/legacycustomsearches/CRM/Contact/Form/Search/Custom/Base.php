@@ -23,6 +23,16 @@ class CRM_Contact_Form_Search_Custom_Base {
   protected $_stateID;
 
   /**
+   * Does the search class handle the prev next cache saving.
+   *
+   * This can be set to yes as long as a UI test works, and the deprecation
+   * notice will disappear.
+   *
+   * @var bool
+   */
+  public $searchClassHandlesPrevNextCache = FALSE;
+
+  /**
    * The title of this form
    * @var string
    */
@@ -47,6 +57,7 @@ class CRM_Contact_Form_Search_Custom_Base {
    * @return array
    */
   public function buildTaskList(CRM_Core_Form_Search $form) {
+    CRM_Core_Error::deprecatedFunctionWarning('this does not seem reachable');
     return $form->getVar('_taskList');
   }
 
@@ -69,10 +80,14 @@ class CRM_Contact_Form_Search_Custom_Base {
    * @param int $rowcount
    * @param null $sort
    * @param bool $returnSQL
+   *   Deprecated parameter
    *
    * @return string
    */
   public function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = FALSE) {
+    if ($returnSQL) {
+      CRM_Core_Error::deprecatedWarning('do not pass returnSQL');
+    }
     $sql = $this->sql(
       'contact_a.id as contact_id',
       $offset,
@@ -80,12 +95,7 @@ class CRM_Contact_Form_Search_Custom_Base {
       $sort
     );
     $this->validateUserSQL($sql);
-
-    if ($returnSQL) {
-      return $sql;
-    }
-
-    return CRM_Core_DAO::composeQuery($sql);
+    return $sql;
   }
 
   /**
@@ -186,10 +196,8 @@ class CRM_Contact_Form_Search_Custom_Base {
   /**
    * @param $sql
    * @param bool $onlyWhere
-   *
-   * @throws Exception
    */
-  public function validateUserSQL(&$sql, $onlyWhere = FALSE) {
+  public function validateUserSQL($sql, $onlyWhere = FALSE): void {
     $includeStrings = ['contact_a'];
     $excludeStrings = ['insert', 'delete', 'update'];
 
@@ -259,6 +267,31 @@ class CRM_Contact_Form_Search_Custom_Base {
    */
   public function formRule($fields, $files, $self) {
     return [];
+  }
+
+  /**
+   * Fill the prevNextCache with the found contacts
+   *
+   * @return bool TRUE if the search was able to process it.
+   */
+  public function fillPrevNextCache($cacheKey, $start, $end, $sort): bool {
+    if ($this->searchClassHandlesPrevNextCache) {
+      $sql = $this->sql(
+        '"' . $cacheKey . '"  as cache_key, contact_a.id as id,  contact_a.sort_name',
+        $start,
+        $end,
+        $sort
+      );
+      $this->validateUserSQL($sql);
+      Civi::service('prevnext')->fillWithSql($cacheKey, $sql);
+      if (Civi::service('prevnext') instanceof CRM_Core_PrevNextCache_Sql) {
+        // SQL-backed prevnext cache uses an extra record for pruning the cache.
+        // Also ensure that caches stay alive for 2 days as per previous code
+        Civi::cache('prevNextCache')->set($cacheKey, $cacheKey, 60 * 60 * 24 * CRM_Core_PrevNextCache_Sql::cacheDays);
+      }
+      return TRUE;
+    }
+    return FALSE;
   }
 
 }

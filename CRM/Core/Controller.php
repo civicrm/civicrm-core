@@ -229,6 +229,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
       }
       // Respond with JSON if in AJAX context (also support legacy value '6')
       elseif (in_array($snippet, [CRM_Core_Smarty::PRINT_JSON, 6])) {
+        CRM_Core_Page_AJAX::validateAjaxRequestMethod();
         $this->_print = CRM_Core_Smarty::PRINT_JSON;
         $this->_QFResponseType = 'json';
       }
@@ -603,9 +604,12 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * @param string $var
    * @param mixed $value
    *   (reference) value of variable.
+   *
+   * @deprecated since 5.72 will be removed around 5.84
    */
   public function assign_by_ref($var, &$value) {
-    self::$_template->assign_by_ref($var, $value);
+    CRM_Core_Error::deprecatedFunctionWarning('assign');
+    self::$_template->assign($var, $value);
   }
 
   /**
@@ -623,12 +627,23 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   /**
    * Returns an array containing template variables.
    *
+   * @deprecated since 5.69 will be removed around 5.93. use getTemplateVars.
+   *
    * @param string $name
    *
    * @return array
    */
   public function get_template_vars($name = NULL) {
-    return self::$_template->get_template_vars($name);
+    return $this->getTemplateVars($name);
+  }
+
+  /**
+   * Get the value/s assigned to the Template Engine (Smarty).
+   *
+   * @param string|null $name
+   */
+  public function getTemplateVars($name = NULL) {
+    return self::$_template->getTemplateVars($name);
   }
 
   /**
@@ -751,21 +766,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * @return string
    */
   public function getTemplateFile() {
-    if ($this->_print) {
-      if ($this->_print == CRM_Core_Smarty::PRINT_PAGE) {
-        return 'CRM/common/print.tpl';
-      }
-      elseif ($this->_print === 'xls' || $this->_print === 'doc') {
-        return 'CRM/Contact/Form/Task/Excel.tpl';
-      }
-      else {
-        return 'CRM/common/snippet.tpl';
-      }
-    }
-    else {
-      $config = CRM_Core_Config::singleton();
-      return 'CRM/common/' . strtolower($config->userFramework) . '.tpl';
-    }
+    return CRM_Utils_System::getContentTemplate($this->_print);
   }
 
   /**

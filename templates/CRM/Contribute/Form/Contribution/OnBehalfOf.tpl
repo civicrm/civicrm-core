@@ -35,7 +35,7 @@
           </div>
         </div>
       {/if}
-      {include file="CRM/UF/Form/Block.tpl" fields=$onBehalfOfFields mode=8 prefix='onbehalf'}
+      {include file="CRM/UF/Form/Block.tpl" fields=$onBehalfOfFields mode=8 prefix='onbehalf' hideFieldset=true}
     </fieldset>
   {/if}
   {/crmRegion}

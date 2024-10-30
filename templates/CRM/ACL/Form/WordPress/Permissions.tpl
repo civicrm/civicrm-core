@@ -12,13 +12,8 @@
   <p>{ts}Use this form to Grant access to CiviCRM components and other CiviCRM permissions to WordPress roles.{/ts}</p>
   <p>{ts}<strong>NOTE: Super Admin</strong> and <strong>Administrator</strong> roles will have all permissions in CiviCRM.{/ts}</p>
 </div>
-
 <div class="crm-block crm-form-block crm-export-form-block">
-
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-
   <table>
-
     <tr>
       <td class="label">&nbsp;</td>
       {assign var="num" value=0}
@@ -54,9 +49,5 @@
     {/foreach}
 
   </table>
-
-  <div class="crm-submit-buttons">
-    {include file="CRM/common/formButtons.tpl" location="bottom"}
-  </div>
-
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>

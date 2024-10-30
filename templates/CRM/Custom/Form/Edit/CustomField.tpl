@@ -14,32 +14,29 @@
     <td class="html-adjust description">{$element.help_pre}</td>
   </tr>
 {/if}
-{if $element.options_per_line}
+{if $element.html_type === 'Hidden'}
+  {* Hidden field - render in hidden row *}
+  <tr class="custom_field-row {$element.element_name}-row hiddenElement">
+    <td>{$formElement.html}</td>
+  </tr>
+{elseif $element.options_per_line}
   <tr class="custom_field-row {$element.element_name}-row">
-    <td
-      class="label">{$formElement.label}{if $element.help_post}{help id=$element.id file="CRM/Custom/Form/CustomField.hlp" title=$element.label}{/if}</td>
+    <td class="label">{$formElement.label}{if $element.help_post}{help id=$element.id file="CRM/Custom/Form/CustomField.hlp" title=$element.label}{/if}</td>
     <td class="html-adjust">
-      {assign var="count" value="1"}
-      <table class="form-layout-compressed" style="margin-top: -0.5em;">
-        <tr>
-          {* sort by fails for option per line. Added a variable to iterate through the element array*}
-          {assign var="index" value="1"}
-          {foreach name=outer key=key item=item from=$formElement}
-          {if $index < 10}
-          {assign var="index" value=`$index+1`}
-          {else}
-          <td class="labels font-light">{$formElement.$key.html}</td>
-          {if $count == $element.options_per_line}
-        </tr>
-        <tr>
-          {assign var="count" value="1"}
-          {else}
-          {assign var="count" value=`$count+1`}
+
+      <div class="crm-multiple-checkbox-radio-options crm-options-per-line" style="--crm-opts-per-line:{$element.options_per_line};">
+        {foreach name=outer key=key item=item from=$formElement}
+          {if is_array($item) && array_key_exists('html', $item)}
+            <div class="crm-option-label-pair" >{$formElement.$key.html}</div>
           {/if}
-          {/if}
-          {/foreach}
-        </tr>
-      </table>
+        {/foreach}
+      </div>
+
+      {* Include the edit options list for admins *}
+      {if $formElement.html|strstr:"crm-option-edit-link"}
+        {$formElement.html|regex_replace:"@^.*(<a href=.*? class=.crm-option-edit-link.*?</a>)$@":"$1"}
+      {/if}
+
     </td>
   </tr>
 {else}
@@ -50,7 +47,7 @@
     <td class="html-adjust">
       {$formElement.html}&nbsp;
       {if $element.data_type eq 'File'}
-        {if $element.element_value.data}
+        {if array_key_exists('element_value', $element) && $element.element_value.data}
           <div class="crm-attachment-wrapper crm-entity" id="file_{$element.element_name}">
             <span class="html-adjust"><br/>&nbsp;{ts}Attached File{/ts}: &nbsp;
               {if $element.element_value.displayURL}

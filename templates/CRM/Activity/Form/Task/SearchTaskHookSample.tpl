@@ -8,10 +8,6 @@
  +--------------------------------------------------------------------+
 *}
 {if $rows}
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-
-<div class="spacer"></div>
-
 <div>
 <br />
 <table>
@@ -21,7 +17,6 @@
     <td>{ts}Activity Type{/ts}</td>
     <td>{ts}Activity Date{/ts}</td>
   </tr>
-
   {foreach from=$rows item=row}
     <tr class="{cycle values="odd-row,even-row"}">
         <td>{$row.display_name}</td>
@@ -37,7 +32,7 @@
 
 {else}
    <div class="messages status no-popup">
-          {icon icon="fa-info-circle"}{/icon}
-            {ts}There are no records selected.{/ts}
+     {icon icon="fa-info-circle"}{/icon}
+     {ts}There are no records selected.{/ts}
    </div>
 {/if}

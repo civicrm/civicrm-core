@@ -23,13 +23,6 @@ class CRM_Admin_Page_ContactType extends CRM_Core_Page_Basic {
   public $useLivePageJS = TRUE;
 
   /**
-   * The action links that we need to display for the browse screen.
-   *
-   * @var array
-   */
-  public static $_links = NULL;
-
-  /**
    * Get BAO Name.
    *
    * @return string
@@ -37,42 +30,6 @@ class CRM_Admin_Page_ContactType extends CRM_Core_Page_Basic {
    */
   public function getBAOName() {
     return 'CRM_Contact_BAO_ContactType';
-  }
-
-  /**
-   * Get action Links.
-   *
-   * @return array
-   *   (reference) of action links
-   */
-  public function &links() {
-    if (!(self::$_links)) {
-      self::$_links = [
-        CRM_Core_Action::UPDATE => [
-          'name' => ts('Edit'),
-          'url' => 'civicrm/admin/options/subtype/edit',
-          'qs' => 'action=update&id=%%id%%&reset=1',
-          'title' => ts('Edit Contact Type'),
-        ],
-        CRM_Core_Action::DISABLE => [
-          'name' => ts('Disable'),
-          'ref' => 'crm-enable-disable',
-          'title' => ts('Disable Contact Type'),
-        ],
-        CRM_Core_Action::ENABLE => [
-          'name' => ts('Enable'),
-          'ref' => 'crm-enable-disable',
-          'title' => ts('Enable Contact Type'),
-        ],
-        CRM_Core_Action::DELETE => [
-          'name' => ts('Delete'),
-          'url' => 'civicrm/admin/options/subtype/edit',
-          'qs' => 'action=delete&id=%%id%%',
-          'title' => ts('Delete Contact Type'),
-        ],
-      ];
-    }
-    return self::$_links;
   }
 
   /**
@@ -114,6 +71,7 @@ class CRM_Admin_Page_ContactType extends CRM_Core_Page_Basic {
         'ContactType',
         $value['id']
       );
+      $rows[$key] = array_merge(['class' => ''], $rows[$key]);
     }
     $this->assign('rows', $rows);
   }

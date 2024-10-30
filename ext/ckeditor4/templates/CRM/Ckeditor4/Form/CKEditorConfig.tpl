@@ -47,7 +47,7 @@
 {/literal}</style>
 {* Force the custom config file to reload by appending a new query string *}
 <script type="text/javascript">
-  {if $configUrl}CKEDITOR.config.customConfig = '{$configUrl}?{php}print str_replace(array(' ', '.'), array('', '='), microtime());{/php}'{/if};
+  {if $configUrl}CKEDITOR.config.customConfig = '{$configUrl}?{$smarty.now}'{/if};
 </script>
 
 <div class="ui-tabs">
@@ -66,7 +66,7 @@
       <label for="skin">{ts}Skin{/ts}</label>
       <select id="skin" name="config_skin" class="crm-select2 eight config-param">
         {foreach from=$skins item='s'}
-          <option value="{$s}" {if $s == $skin}selected{/if}>{$s|ucfirst}</option>
+          <option value="{$s}" {if $s == $skin}selected{/if}>{$s|capitalize}</option>
         {/foreach}
       </select>
       &nbsp;&nbsp;

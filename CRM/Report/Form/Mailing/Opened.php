@@ -152,7 +152,7 @@ class CRM_Report_Form_Mailing_Opened extends CRM_Report_Form {
     ];
 
     $this->_columns['civicrm_mailing_event_opened'] = [
-      'dao' => 'CRM_Mailing_Event_DAO_Opened',
+      'dao' => 'CRM_Mailing_Event_DAO_MailingEventOpened',
       'fields' => [
         'id' => [
           'required' => TRUE,

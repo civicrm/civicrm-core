@@ -8,24 +8,19 @@
  +--------------------------------------------------------------------+
 *}
 
-<div class="crm-core-form-recurringentity-block crm-accordion-wrapper{if $recurringFormIsEmbedded && !$scheduleReminderId} collapsed{/if}" id="recurring-entity-block">
-  <div class="crm-accordion-header">
+<details class="crm-core-form-recurringentity-block crm-accordion-bold" id="recurring-entity-block" {if $recurringFormIsEmbedded && !$scheduleReminderId}{else}open{/if}>
+  <summary>
     {ts 1=$recurringEntityType}Repeat %1{/ts}
-  </div>
+  </summary>
   <div class="crm-accordion-body">
-    {if !$recurringFormIsEmbedded}
-      <div class="crm-submit-buttons">
-        {include file="CRM/common/formButtons.tpl" location="top"}
-      </div>
-    {/if}
     <table class="form-layout-compressed">
       <tr class="crm-core-form-recurringentity-block-repetition_frequency">
-        <td class="label">{$form.repetition_frequency_unit.label}&nbsp;<span class="crm-marker">*</span>  {help id="id-repeats" entityType=$recurringEntityType file="CRM/Core/Form/RecurringEntity.hlp"}</td>
+        <td class="label">{$form.repetition_frequency_unit.label}&nbsp;<span class="crm-marker">*</span></td>
         <td>{$form.repetition_frequency_interval.html} {$form.repetition_frequency_unit.html}</td>
       </tr>
       <tr class="crm-core-form-recurringentity-block-start_action_condition">
         <td class="label">
-          <label for="repeats_on">{$form.start_action_condition.label} {help id="id-repeats-on" entityType=$recurringEntityType file="CRM/Core/Form/RecurringEntity.hlp"}</label>
+          <label for="repeats_on">{$form.start_action_condition.label}</label>
         </td>
         <td>
           {$form.start_action_condition.html}
@@ -33,12 +28,12 @@
       </tr>
       <tr class="crm-core-form-recurringentity-block-repeats_by">
         <td class="label">{$form.repeats_by.label}&nbsp;<span class="crm-marker">*</span></td>
-        <td>{help id="id-repeats-by-month" entityType=$recurringEntityType file="CRM/Core/Form/RecurringEntity.hlp"} {$form.repeats_by.1.html} {$form.limit_to.html}
+        <td>{$form.repeats_by.1.html} {$form.limit_to.html}
         </td>
       </tr>
       <tr class="crm-core-form-recurringentity-block-repeats_by">
         <td class="label"></td>
-        <td>{help id="id-repeats-by-week" entityType=$recurringEntityType file="CRM/Core/Form/RecurringEntity.hlp"} {$form.repeats_by.2.html} {$form.entity_status_1.html} {$form.entity_status_2.html}
+        <td>{$form.repeats_by.2.html} {$form.entity_status_1.html} {$form.entity_status_2.html}
         </td>
       </tr>
       <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
@@ -48,14 +43,14 @@
       </tr>
       <tr class="crm-core-form-recurringentity-block-ends">
         <td class="label">{$form.ends.label}&nbsp;<span class="crm-marker">*</span></td>
-        <td>{help id="id-ends-after" entityType=$recurringEntityType file="CRM/Core/Form/RecurringEntity.hlp"} {$form.ends.1.html} {$form.start_action_offset.html} {ts}occurrences{/ts}</td>
+        <td>{$form.ends.1.html} {$form.start_action_offset.html} {ts}occurrences{/ts}</td>
       </tr>
       <tr class="crm-core-form-recurringentity-block-absolute_date">
         <td class="label"> </td>
-        <td>{help id="id-ends-on" entityType=$recurringEntityType file="CRM/Core/Form/RecurringEntity.hlp"} {$form.ends.2.html} {$form.repeat_absolute_date.html}</td>
+        <td>{$form.ends.2.html} {$form.repeat_absolute_date.html}</td>
       </tr>
       <tr class="crm-core-form-recurringentity-block-exclude_date">
-        <td class="label">{$form.exclude_date_list.label} {help id="id-exclude-date" entityType=$recurringEntityType file="CRM/Core/Form/RecurringEntity.hlp"}</td>
+        <td class="label">{$form.exclude_date_list.label}</td>
         <td>{$form.exclude_date_list.html}</td>
       </tr>
     </table>
@@ -65,7 +60,7 @@
       </div>
     {/if}
   </div>
-</div>
+</details>
 {literal}
 <script type="text/javascript">
 (function (_) {
@@ -217,6 +212,10 @@
         if (validate()) {
           previewDialog();
         }
+      }
+      else {
+        // Avoid jquery validation on required fields if they are visible
+        $('#recurring-entity-block :input').removeClass('required');
       }
     });
 

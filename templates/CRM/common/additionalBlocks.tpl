@@ -75,7 +75,7 @@ function buildAdditionalBlocks( blockName, className ) {
     }
 }
 
-//select single for is_bulk & is_primary
+//select single for is_primary, although we are moving away from this - e.g on Email.
 function singleSelect( object ) {
     var element = object.split( '_', 3 );
 
@@ -156,7 +156,7 @@ function clearFirstBlock( blockName , blockId ) {
     cj("#" + element +" input, " + "#" + element + " select").each(function () {
         cj(this).val('');
     });
-    cj("#addressBlockId:not(.collapsed)").crmAccordionToggle();
+    cj("#addressBlockId[open]").prop('open', false);
     cj("#addressBlockId .active").removeClass('active');
 }
 

@@ -20,8 +20,10 @@
         {$form.nick_name.html}
       </td>
       <td>
-        {$form.contact_sub_type.label}<br />
-        {$form.contact_sub_type.html}
+        {if array_key_exists('contact_sub_type', $form)}
+          {$form.contact_sub_type.label}<br />
+          {$form.contact_sub_type.html}
+        {/if}
       </td>
     </tr>
   {/crmRegion}

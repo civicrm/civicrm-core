@@ -11,14 +11,12 @@
     {include file="CRM/Event/Form/Registration/PreviewHeader.tpl"}
 {/if}
 
-{include file="CRM/common/TrackingFields.tpl"}
-
 <div class="crm-event-id-{$event.id} crm-block crm-event-thankyou-form-block">
     {* Don't use "normal" thank-you message for Waitlist and Approval Required registrations - since it will probably not make sense for those situations. dgg *}
-    {if $event.thankyou_text AND (not $isOnWaitlist AND not $isRequireApproval)}
+    {if array_key_exists('thankyou_text', $event) AND (not $isOnWaitlist AND not $isRequireApproval)}
         <div id="intro_text" class="crm-section event_thankyou_text-section">
             <p>
-            {$event.thankyou_text}
+            {$event.thankyou_text|purify}
             </p>
         </div>
     {/if}
@@ -53,11 +51,11 @@
             {if $is_email_confirm}
                 <p>{ts 1=$email}An email with event details has been sent to %1.{/ts}</p>
             {/if}
-        {* PayPal_Standard sets contribution_mode to 'notify'. We don't know if transaction is successful until we receive the IPN (payment notification) *}
-        {elseif $contributeMode EQ 'notify' and $paidEvent}
-            <p>{ts 1=$paymentProcessor.name}Your registration payment has been submitted to %1 for processing.{/ts}</p>
+        {* This text is determined by the payment processor *}
+        {elseif $eventConfirmText}
+            <p>{$eventConfirmText}</p>
             {if $is_email_confirm}
-                <p>{ts 1=$email}A registration confirmation email will be sent to %1 once the transaction is processed successfully.{/ts}</p>
+                <p>{$eventEmailConfirmText}</p>
             {/if}
         {else}
             <p>{ts}Your registration has been processed successfully.{/ts}</p>
@@ -83,27 +81,27 @@
                 {$event.fee_label}
             </div>
             {if $lineItem}
-                {include file="CRM/Price/Page/LineItem.tpl" context="Event"}
+                {include file="CRM/Price/Page/LineItem.tpl" context="Event" displayLineItemFinancialType=false getTaxDetails=$totalTaxAmount hookDiscount=''}
             {elseif $amount || $amount == 0}
               <div class="crm-section no-label amount-item-section">
-                    {foreach from= $finalAmount item=amount key=level}
+                    {foreach from=$finalAmount item=amount key=level}
                   <div class="content">
-                      {$amount.amount|crmMoney}&nbsp;&nbsp;{$amount.label}
+                      {$amount.amount|crmMoney:$currency}&nbsp;&nbsp;{$amount.label}
                   </div>
                   <div class="clear"></div>
                     {/foreach}
                 </div>
                 {if $totalTaxAmount}
-                  <div class="content bold">{ts}Tax Total{/ts}:&nbsp;&nbsp;{$totalTaxAmount|crmMoney}</div>
+                  <div class="content bold">{ts}Tax Total{/ts}:&nbsp;&nbsp;{$totalTaxAmount|crmMoney:$currency}</div>
                   <div class="clear"></div>
                 {/if}
                 {if $totalAmount}
                  <div class="crm-section no-label total-amount-section">
-                    <div class="content bold">{ts}Event Total{/ts}:&nbsp;&nbsp;{$totalAmount|crmMoney}</div>
+                    <div class="content bold">{ts}Total Amount{/ts}:&nbsp;&nbsp;{$totalAmount|crmMoney:$currency}</div>
                     <div class="clear"></div>
                   </div>
 
-                    {if $hookDiscount.message}
+                    {if $hookDiscount}
                         <div class="crm-section hookDiscount-section">
                             <em>({$hookDiscount.message})</em>
                         </div>
@@ -117,7 +115,7 @@
                   <div class="clear"></div>
                 </div>
             {/if}
-            {if $contributeMode ne 'notify' AND $trxn_id}
+            {if $trxn_id}
                 <div class="crm-section no-label trxn_id-section">
                     <div class="content bold">{ts}Transaction #{/ts}: {$trxn_id}</div>
                 <div class="clear"></div>
@@ -141,22 +139,8 @@
         </div>
     {/if}
 
-    {if $event.participant_role neq 'Attendee' and $defaultRole}
-        <div class="crm-group participant_role-group">
-            <div class="header-dark">
-                {ts}Participant Role{/ts}
-            </div>
-            <div class="crm-section no-label participant_role-section">
-                <div class="content">
-                    {$event.participant_role}
-                </div>
-            <div class="clear"></div>
-          </div>
-        </div>
-    {/if}
-
     {include file="CRM/Event/Form/Registration/DisplayProfile.tpl"}
-    {if $contributeMode ne 'notify' and (!$is_pay_later or $isBillingAddressRequiredForPayLater) and $paidEvent and !$isAmountzero and !$isOnWaitlist and !$isRequireApproval}
+    {if $billingName or $address}
         <div class="crm-group billing_name_address-group">
             <div class="header-dark">
                 {ts}Billing Name and Address{/ts}
@@ -188,9 +172,9 @@
       {/crmRegion}
     {/if}
 
-    {if $event.thankyou_footer_text}
+    {if array_key_exists('thankyou_footer_text', $event) && $event.thankyou_footer_text}
         <div id="footer_text" class="crm-section event_thankyou_footer-section">
-            <p>{$event.thankyou_footer_text}</p>
+            <p>{$event.thankyou_footer_text|purify}</p>
         </div>
     {/if}
 
@@ -198,13 +182,13 @@
         <a href="{crmURL p='civicrm/event/info' q="reset=1&id=`$event.id`"}"><i class="crm-i fa-chevron-left" aria-hidden="true"></i> {ts 1=$event.event_title}Back to "%1" event information{/ts}</a>
     </div>
 
-    {if $event.is_public }
+    {if $event.is_public and $event.is_show_calendar_links}
       <div class="action-link section iCal_links-section">
         {include file="CRM/Event/Page/iCalLinks.tpl"}
       </div>
     {/if}
     {if $event.is_share}
-    {capture assign=eventUrl}{crmURL p='civicrm/event/info' q="id=`$event.id`&amp;reset=1" a=1 fe=1 h=1}{/capture}
-    {include file="CRM/common/SocialNetwork.tpl" url=$eventUrl title=$event.title pageURL=$eventUrl}
+      {capture assign=eventUrl}{crmURL p='civicrm/event/info' q="id=`$event.id`&amp;reset=1" a=1 fe=1 h=1}{/capture}
+      {include file="CRM/common/SocialNetwork.tpl" url=$eventUrl title=$event.title pageURL=$eventUrl emailMode=false}
     {/if}
 </div>

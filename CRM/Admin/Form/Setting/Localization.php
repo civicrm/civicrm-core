@@ -23,7 +23,16 @@ use Civi\Api4\OptionValue;
  */
 class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
 
+  /**
+   * Subset of settings on the page as defined using the legacy method.
+   *
+   * @var array
+   *
+   * @deprecated - do not add new settings here - the page to display
+   * settings on should be defined in the setting metadata.
+   */
   protected $_settings = [
+    // @todo remove these, define any not yet defined in the setting metadata.
     'contact_default_language' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
     'countryLimit' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
     'customTranslateFunction' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
@@ -83,17 +92,11 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
     $this->addElement('select', 'contact_default_language', ts('Default Language for users'),
       CRM_Admin_Form_Setting_Localization::getDefaultLanguageOptions());
 
-    $includeCurrency = &$this->addElement('advmultiselect', 'currencyLimit',
-      ts('Available Currencies') . ' ', self::getCurrencySymbols(),
-      [
-        'size' => 5,
-        'style' => 'width:150px',
-        'class' => 'advmultiselect',
-      ]
+    $this->add('select2', 'currencyLimit', ts('Available Currencies'),
+      Civi::entity('Contribution')->getOptions('currency'),
+      FALSE,
+      ['placeholder' => ts('- default currency only -'), 'multiple' => TRUE, 'class' => 'huge']
     );
-
-    $includeCurrency->setButtonAttributes('add', ['value' => ts('Add >>')]);
-    $includeCurrency->setButtonAttributes('remove', ['value' => ts('<< Remove')]);
 
     $this->addFormRule(['CRM_Admin_Form_Setting_Localization', 'formRule']);
 
@@ -107,7 +110,7 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
    */
   public static function formRule($fields) {
     $errors = [];
-    if (CRM_Utils_Array::value('monetaryThousandSeparator', $fields) ==
+    if (($fields['monetaryThousandSeparator'] ?? NULL) ==
       CRM_Utils_Array::value('monetaryDecimalPoint', $fields)
     ) {
       $errors['monetaryThousandSeparator'] = ts('Thousands Separator and Decimal Delimiter can not be the same.');
@@ -204,13 +207,11 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
     $config = CRM_Core_Config::singleton();
     // save enabled currencies and default currency in option group 'currencies_enabled'
     // CRM-1496
-    if (empty($values['currencyLimit'])) {
-      $values['currencyLimit'] = [$values['defaultCurrency']];
+    $currencyLimit = $values['currencyLimit'] ? explode(',', $values['currencyLimit']) : [];
+    if (!in_array($values['defaultCurrency'], $currencyLimit)) {
+      $currencyLimit[] = $values['defaultCurrency'];
     }
-    elseif (!in_array($values['defaultCurrency'], $values['currencyLimit'])) {
-      $values['currencyLimit'][] = $values['defaultCurrency'];
-    }
-    self::updateEnabledCurrencies($values['currencyLimit'], $values['defaultCurrency']);
+    self::updateEnabledCurrencies($currencyLimit, $values['defaultCurrency']);
     // unset currencyLimit so we dont store there
     unset($values['currencyLimit']);
 
@@ -245,7 +246,7 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
     // get labels for all the currencies
     $options = [];
 
-    $currencySymbols = CRM_Admin_Form_Setting_Localization::getCurrencySymbols();
+    $currencySymbols = self::getCurrencySymbols();
     foreach ($currencies as $i => $currency) {
       $options[] = [
         'label' => $currencySymbols[$currency],
@@ -312,10 +313,7 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
    *   Array('USD' => 'USD ($)').
    */
   public static function getCurrencySymbols() {
-    $symbols = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'currency', [
-      'labelColumn' => 'symbol',
-      'orderColumn' => TRUE,
-    ]);
+    $symbols = CRM_Contribute_DAO_Contribution::buildOptions('currency', 'abbreviate');
     $_currencySymbols = [];
     foreach ($symbols as $key => $value) {
       $_currencySymbols[$key] = "$key";

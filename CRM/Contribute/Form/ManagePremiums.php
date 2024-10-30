@@ -21,6 +21,7 @@ use Civi\Api4\Product;
  * This class generates form components for Premiums.
  */
 class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
+  use CRM_Custom_Form_CustomDataTrait;
 
   /**
    * Classes extending CRM_Core_Form should implement this method.
@@ -37,7 +38,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
   public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
     if ($this->_id) {
-      $tempDefaults = Product::get()->addWhere('id', '=', $this->_id)->execute()->first();
+      $tempDefaults = Product::get()->addSelect('*', 'custom.*')->addWhere('id', '=', $this->_id)->execute()->first();
       if (isset($tempDefaults['image']) && isset($tempDefaults['thumbnail'])) {
         $defaults['imageUrl'] = $tempDefaults['image'];
         $defaults['thumbnailUrl'] = $tempDefaults['thumbnail'];
@@ -55,9 +56,38 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
       if (isset($tempDefaults['period_type'])) {
         $this->assign('showSubscriptions', TRUE);
       }
+
+      // Convert api3 field names to custom_xx format
+      foreach ($tempDefaults as $name => $value) {
+        $short = CRM_Core_BAO_CustomField::getShortNameFromLongName($name);
+        if ($short) {
+          $tempDefaults[$short . '_' . $this->_id] = $value;
+          unset($tempDefaults[$name]);
+        }
+      }
     }
 
     return $defaults;
+  }
+
+  /**
+   * Build the form object.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function preProcess() {
+    parent::preProcess();
+
+    // when custom data is included in this page
+    if ($this->isSubmitted()) {
+      // The custom data fields are added to the form by an ajax form.
+      // However, if they are not present in the element index they will
+      // not be available from `$this->getSubmittedValue()` in post process.
+      // We do not have to set defaults or otherwise render - just add to the element index.
+      $this->addCustomDataFieldsToForm('Product', array_filter([
+        'id' => $this->_id,
+      ]));
+    }
   }
 
   /**
@@ -103,7 +133,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
     $this->addElement('text', 'imageUrl', ts('Image URL'));
     $this->addElement('text', 'thumbnailUrl', ts('Thumbnail URL'));
 
-    $this->add('file', 'uploadFile', ts('Image File Name'), ['onChange' => 'select_option();']);
+    $this->add('file', 'uploadFile', ts('Image File Name'), ['onChange' => 'CRM.$("input[name=imageOption][value=image]").prop("checked", true);']);
 
     $this->add('text', 'price', ts('Market Value'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Product', 'price'), TRUE);
     $this->addRule('price', ts('Please enter the Market Value for this product.'), 'money');
@@ -195,14 +225,14 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
   public static function formRule($params, $files) {
 
     // If choosing to upload an image, then an image must be provided
-    if (CRM_Utils_Array::value('imageOption', $params) == 'image'
+    if (($params['imageOption'] ?? NULL) == 'image'
       && empty($files['uploadFile']['name'])
     ) {
       $errors['uploadFile'] = ts('A file must be selected');
     }
 
     // If choosing to use image URLs, then both URLs must be present
-    if (CRM_Utils_Array::value('imageOption', $params) == 'thumbnail') {
+    if (($params['imageOption'] ?? NULL) == 'thumbnail') {
       if (!$params['imageUrl']) {
         $errors['imageUrl'] = ts('Image URL is Required');
       }
@@ -259,12 +289,12 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
     // If deleting, then only delete and skip the rest of the post-processing
     if ($this->_action & CRM_Core_Action::DELETE) {
       try {
-        CRM_Contribute_BAO_Product::del($this->_id);
+        CRM_Contribute_BAO_Product::deleteRecord(['id' => $this->_id]);
       }
       catch (CRM_Core_Exception $e) {
         $message = ts("This Premium is linked to an <a href='%1'>Online Contribution page</a>. Please remove it before deleting this Premium.", [1 => CRM_Utils_System::url('civicrm/admin/contribute', 'reset=1')]);
         CRM_Core_Session::setStatus($message, ts('Cannot delete Premium'), 'error');
-        CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/admin/contribute/managePremiums', 'reset=1&action=browse'));
+        CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/admin/contribute/managePremiums', 'reset=1'));
         return;
       }
       CRM_Core_Session::setStatus(
@@ -287,6 +317,8 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
     }
 
     $this->_processImages($params);
+
+    $params += $this->getSubmittedCustomFieldsForApi4();
 
     // Save the premium product to database
     $premium = Product::save()->addRecord($params)->execute()->first();

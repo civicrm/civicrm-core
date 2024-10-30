@@ -16,29 +16,32 @@
  */
 
 /**
- * Form helper class for an Demographics object.
+ * Form helper class for an Demographics object (ahem).
+ *
+ * @deprecated since 5.73 will be removed around 5.85
  */
 class CRM_Contact_Form_Edit_CustomData {
 
   /**
    * Build all the data structures needed to build the form.
    *
+   * @deprecated since 5.73 will be removed around 5.85
+   *
    * @param CRM_Core_Form $form
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function preProcess(&$form) {
-    $form->_type = CRM_Utils_Request::retrieve('type', 'String');
-    $form->_subType = CRM_Utils_Request::retrieve('subType', 'String');
+    CRM_Core_Error::deprecatedFunctionWarning('maybe take a copy?');
+    $customDataType = CRM_Utils_Request::retrieve('type', 'String');
 
-    //build the custom data as other blocks.
-    //$form->assign( "addBlock", false );
-    if ($form->_type) {
-      $form->_addBlockName = 'CustomData';
-      $form->assign("addBlock", TRUE);
-      $form->assign("blockName", $form->_addBlockName);
+    if ($customDataType) {
+      $form->assign('addBlock', TRUE);
+      $form->assign('blockName', 'CustomData');
     }
 
-    CRM_Custom_Form_CustomData::preProcess($form, NULL, $form->_subType, NULL,
-      ($form->_type) ? $form->_type : $form->_contactType
+    CRM_Custom_Form_CustomData::preProcess($form, NULL, NULL, NULL,
+      $customDataType ?: $form->_contactType
     );
 
     //assign group tree after build.
@@ -48,10 +51,13 @@ class CRM_Contact_Form_Edit_CustomData {
   /**
    * Build the form object elements for CustomData object.
    *
+   * @deprecated since 5.73 will be removed around 5.85
+   *
    * @param CRM_Core_Form $form
    *   Reference to the form object.
    */
   public static function buildQuickForm(&$form) {
+    CRM_Core_Error::deprecatedFunctionWarning('take a copy?');
     $customValueCount = $form->_submitValues['hidden_custom_group_count'] ?? NULL;
     if (is_array($customValueCount)) {
       if (array_key_exists(0, $customValueCount)) {
@@ -60,7 +66,9 @@ class CRM_Contact_Form_Edit_CustomData {
       $form->_customValueCount = $customValueCount;
       $form->assign('customValueCount', $customValueCount);
     }
-    CRM_Custom_Form_CustomData::buildQuickForm($form);
+    $form->addElement('hidden', 'hidden_custom', 1);
+    $form->addElement('hidden', "hidden_custom_group_count[{$form->_groupID}]", $form->_groupCount);
+    CRM_Core_BAO_CustomGroup::buildQuickForm($form, $form->_groupTree);
 
     //build custom data.
     $contactSubType = NULL;
@@ -78,12 +86,15 @@ class CRM_Contact_Form_Edit_CustomData {
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
    *
+   * @deprecated since 5.73 will be removed around 5.85
    *
    * @param CRM_Core_Form $form
    * @param array $defaults
    */
   public static function setDefaultValues(&$form, &$defaults) {
-    $defaults += CRM_Custom_Form_CustomData::setDefaultValues($form);
+    CRM_Core_Error::deprecatedFunctionWarning('take a copy?');
+    CRM_Core_BAO_CustomGroup::setDefaults($form->_groupTree, $defaults, FALSE, FALSE, $form->get('action'));
+    return $defaults;
   }
 
 }

@@ -101,7 +101,7 @@ class CRM_Utils_Address_USPS {
       return FALSE;
     }
 
-    if (array_key_exists('Error', $xml->Address)) {
+    if (property_exists($xml->Address, 'Error')) {
       $session->setStatus(ts('Address not found in USPS database.'));
       return FALSE;
     }
@@ -112,7 +112,7 @@ class CRM_Utils_Address_USPS {
     $values['postal_code'] = (string) $xml->Address->Zip5;
     $values['postal_code_suffix'] = (string) $xml->Address->Zip4;
 
-    if (array_key_exists('Address1', $xml->Address)) {
+    if (property_exists($xml->Address, 'Address1')) {
       $values['supplemental_address_1'] = (string) $xml->Address->Address1;
     }
 

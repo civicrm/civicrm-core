@@ -26,6 +26,7 @@
         <i class="{{ col.icon ? 'crm-i ' + col.icon : '' }}"></i>
       </span>
       <span crm-ui-editable ng-model="col.text">{{ col.text }}</span>
+      <span class="caret disabled"></span>
     </button>
   </div>
   <crm-search-admin-token-select model="col" field="text" suffix=":label"></crm-search-admin-token-select>

@@ -47,10 +47,6 @@ abstract class AbstractGrantAction extends \Civi\Api4\Generic\AbstractBatchActio
    */
   private $clientDef = NULL;
 
-  public function __construct($entityName, $actionName) {
-    parent::__construct($entityName, $actionName, ['*']);
-  }
-
   /**
    * @throws \CRM_Core_Exception
    */

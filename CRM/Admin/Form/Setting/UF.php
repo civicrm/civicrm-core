@@ -20,8 +20,6 @@
  */
 class CRM_Admin_Form_Setting_UF extends CRM_Admin_Form_Setting {
 
-  protected $_settings = [];
-
   protected $_uf = NULL;
 
   /**
@@ -34,62 +32,25 @@ class CRM_Admin_Form_Setting_UF extends CRM_Admin_Form_Setting {
 
     $this->assign('wpBasePageEnabled', FALSE);
     $this->assign('userFrameworkUsersTableNameEnabled', FALSE);
+    $this->assign('viewsIntegration', FALSE);
 
     $this->setTitle(
       ts('Settings - %1 Integration', [1 => $this->_uf])
     );
 
-    if ($this->_uf === 'WordPress') {
+    if ($config->userSystem->canSetBasePage()) {
       $this->_settings['wpBasePage'] = CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME;
       $this->assign('wpBasePageEnabled', TRUE);
     }
 
-    if ($config->userSystem->is_drupal) {
+    if ($config->userSystem->hasUsersTable()) {
       $this->_settings['userFrameworkUsersTableName'] = CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME;
       $this->assign('userFrameworkUsersTableNameEnabled', TRUE);
     }
 
-    // find out if drupal has its database prefixed
-    if ($this->_uf === 'Drupal8') {
-      $databases['default'] = Drupal\Core\Database\Database::getConnectionInfo('default');
-    }
-    else {
-      global $databases;
-    }
-
-    $drupal_prefix = '';
-    if (isset($databases['default']['default']['prefix'])) {
-      if (is_array($databases['default']['default']['prefix'])) {
-        $drupal_prefix = $databases['default']['default']['prefix']['default'];
-      }
-      else {
-        $drupal_prefix = $databases['default']['default']['prefix'];
-      }
-    }
-
-    $this->assign('tablePrefixes', FALSE);
-
-    if ($config->userSystem->viewsExists() &&
-      (
-        $config->dsn != $config->userFrameworkDSN || !empty($drupal_prefix)
-      )
-    ) {
-
-      $dsnArray = DB::parseDSN(CRM_Utils_SQL::autoSwitchDSN($config->dsn));
-      $tableNames = CRM_Core_DAO::getTableNames();
-      asort($tableNames);
-      $tablePrefixes = '$databases[\'default\'][\'default\'][\'prefix\']= [';
-      if ($config->userFramework === 'Backdrop') {
-        $tablePrefixes = '$database_prefix = [';
-      }
-      // add default prefix: the drupal database prefix
-      $tablePrefixes .= "\n  'default' => '$drupal_prefix',";
-      $prefix = $config->userSystem->getCRMDatabasePrefix();
-      foreach ($tableNames as $tableName) {
-        $tablePrefixes .= "\n  '" . str_pad($tableName . "'", 41) . " => '{$prefix}',";
-      }
-      $tablePrefixes .= "\n];";
-      $this->assign('tablePrefixes', $tablePrefixes);
+    $viewsIntegration = $config->userSystem->viewsIntegration();
+    if ($viewsIntegration) {
+      $this->assign('viewsIntegration', $viewsIntegration);
     }
 
     parent::buildQuickForm();

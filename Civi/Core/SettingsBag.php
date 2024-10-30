@@ -115,22 +115,9 @@ class SettingsBag {
     $this->values = [];
     $this->combined = NULL;
 
-    // Ordinarily, we just load values from `civicrm_setting`. But upgrades require care.
-    // In v4.0 and earlier, all values were stored in `civicrm_domain.config_backend`.
-    // In v4.1-v4.6, values were split between `civicrm_domain` and `civicrm_setting`.
-    // In v4.7+, all values are stored in `civicrm_setting`.
-    // Whenever a value is available in civicrm_setting, it will take precedence.
-
     $isUpgradeMode = \CRM_Core_Config::isUpgradeMode();
 
-    if ($isUpgradeMode && empty($this->contactId) && \CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_domain', 'config_backend', FALSE)) {
-      $config_backend = \CRM_Core_DAO::singleValueQuery('SELECT config_backend FROM civicrm_domain WHERE id = %1',
-        [1 => [$this->domainId, 'Positive']]);
-      $oldSettings = \CRM_Upgrade_Incremental_php_FourSeven::convertBackendToSettings($this->domainId, $config_backend);
-      \CRM_Utils_Array::extend($this->values, $oldSettings);
-    }
-
-    // Normal case. Aside: Short-circuit prevents unnecessary query.
+    // Only query table if it exists.
     if (!$isUpgradeMode || \CRM_Core_DAO::checkTableExists('civicrm_setting')) {
       $dao = \CRM_Core_DAO::executeQuery($this->createQuery()->toSQL());
       while ($dao->fetch()) {
@@ -261,8 +248,6 @@ class SettingsBag {
       return $this;
     }
     $this->setDb($key, $value);
-    $this->values[$key] = $value;
-    $this->combined = NULL;
     return $this;
   }
 
@@ -285,6 +270,7 @@ class SettingsBag {
    */
   public function updateVirtual($key, $value) {
     if ($key === 'contribution_invoice_settings') {
+      \CRM_Core_Error::deprecatedWarning('Invoicing settings should be directly accessed - eg Civi::setting()->set("invoicing")');
       foreach (SettingsBag::getContributionInvoiceSettingKeys() as $possibleKeyName => $settingName) {
         $keyValue = $value[$possibleKeyName] ?? '';
         if ($possibleKeyName === 'invoicing' && is_array($keyValue)) {
@@ -315,7 +301,12 @@ class SettingsBag {
           break;
       }
     }
-    return ['contribution_invoice_settings' => $contributionSettings];
+    return array_merge(
+        ['contribution_invoice_settings' => $contributionSettings],
+        $this->interpolateDsnSettings('civicrm'),
+        // TODO: provide equivalent component settings for CIVICRM_UF_DSN
+        // $this->interpolateDsnSettings('civicrm_uf')
+    );
   }
 
   /**
@@ -324,11 +315,11 @@ class SettingsBag {
   protected function createQuery() {
     $select = \CRM_Utils_SQL_Select::from('civicrm_setting')
       ->select('id, name, value, domain_id, contact_id, is_domain, component_id, created_date, created_id')
-      ->where('domain_id = #id', [
+      ->where('(domain_id IS NULL OR domain_id = #id)', [
         'id' => $this->domainId,
       ]);
     if ($this->contactId === NULL) {
-      $select->where('is_domain = 1');
+      $select->where('contact_id IS NULL');
     }
     else {
       $select->where('contact_id = #id', [
@@ -378,17 +369,33 @@ class SettingsBag {
 
     $metadata = $fields['values'][$name];
 
+    // this should probably be higher in the Setting api layer as well
+    if ($metadata['is_constant'] ?? FALSE) {
+      $error = "{$metadata['title']} is a system constant. It can only be set in civicrm.settings.php";
+
+      if ($metadata['is_env_loadable'] ?? FALSE) {
+        $fqn = $metadata['global_name'] ?? '(ENV VAR NAME MISSING)';
+        $error .= " or using the environment variable {$fqn}";
+      }
+      $error .= ".";
+      throw new \CRM_Core_Exception($error);
+    }
+
     $dao = new \CRM_Core_DAO_Setting();
     $dao->name = $name;
-    $dao->domain_id = $this->domainId;
+    $dao->is_domain = 0;
+    // Contact-specific settings
     if ($this->contactId) {
       $dao->contact_id = $this->contactId;
-      $dao->is_domain = 0;
+      $dao->domain_id = $this->domainId;
     }
-    else {
+    // Domain-specific settings. For legacy support this is assumed to be TRUE if not set
+    elseif ($metadata['is_domain'] ?? TRUE) {
       $dao->is_domain = 1;
+      $dao->domain_id = $this->domainId;
     }
     $dao->find(TRUE);
+    $oldValue = \CRM_Utils_String::unserialize($dao->value);
 
     // Call 'on_change' listeners. It would be nice to only fire when there's
     // a genuine change in the data. However, PHP developers have mixed
@@ -398,7 +405,7 @@ class SettingsBag {
       foreach ($metadata['on_change'] as $callback) {
         call_user_func(
           \Civi\Core\Resolver::singleton()->get($callback),
-          \CRM_Utils_String::unserialize($dao->value),
+          $oldValue,
           $value,
           $metadata,
           $this->domainId
@@ -435,6 +442,23 @@ class SettingsBag {
       // to save the field `group_name`, which is required in older schema.
       \CRM_Core_DAO::executeQuery(\CRM_Utils_SQL_Insert::dao($dao)->toSQL());
     }
+
+    $this->values[$name] = $value;
+    $this->combined = NULL;
+
+    // Call 'post_change' listeners after the value has been saved.
+    // Unlike 'on_change', this will only fire if the oldValue and newValue are not equivalent (using == comparison)
+    if ($value != $oldValue && !empty($metadata['post_change'])) {
+      foreach ($metadata['post_change'] as $callback) {
+        call_user_func(
+          \Civi\Core\Resolver::singleton()->get($callback),
+          $oldValue,
+          $value,
+          $metadata,
+          $this->domainId
+        );
+      }
+    }
   }
 
   /**
@@ -453,6 +477,104 @@ class SettingsBag {
       'invoicing' => 'invoicing',
     ];
     return $convertedKeys;
+  }
+
+  /**
+   * Compute a missing DSN from its component parts or vice versa
+   *
+   * Note: defaults for civicrm_db_XXX will be used
+   *
+   * @param string $prefix
+   *   The prefix of the DB setting group - ex: 'civicrm' or 'civicrm_uf'
+   *
+   * @return array
+   *   Ex 1:
+   *
+   *   $prefix = 'civicrm'
+   *   civicrm_db_dsn is NOT already set
+   *   civicrm_db_user set to 'james'
+   *   civicrm_db_password set to 'i<3#browns'
+   *
+   *    returns [
+   *     'civicrm_db_dsn' => 'mysql://james:i%3C3%23browns@localhost:3306/civicrm',
+   *   ]
+   *
+   *   Ex 2:
+   *
+   *   $prefix = 'civicrm_uf', civicrm_uf_db_dsn is set to 'mysql://my_user!:pass#word@host.name/db_name'
+   *
+   *    returns [
+   *     'civicrm_uf_db_user' => 'my_user!',
+   *     'civicrm_uf_db_password' => 'pass#word',
+   *     'civicrm_uf_db_host' => 'host.name',
+   *     'civicrm_uf_db_database' => 'db_name',
+   *   ]
+   */
+  protected function interpolateDsnSettings(string $prefix): array {
+    $computed = [];
+
+    $dsn = $this->get($prefix . '_db_dsn');
+
+    if ($dsn) {
+      // if dsn is set explicitly, use this as the source of truth.
+      // set the component parts in case anyone wants to read them individually
+      $urlComponents = \DB::parseDSN($dsn);
+
+      if (!$urlComponents) {
+        // couldn't parse the dsn so we dont set the components
+        // (it could be a socket rather than a url)
+        return [];
+      }
+
+      $componentKeyMap = [
+        'hostspec' => 'host',
+        'database' => 'name',
+        'username' => 'user',
+        'password' => 'password',
+        'port' => 'port',
+      ];
+
+      foreach ($componentKeyMap as $theirKey => $ourKey) {
+        $settingName = $prefix . '_db_' . $ourKey;
+        $value = $urlComponents[$theirKey] ?? NULL;
+
+        if ($value) {
+          $computed[$settingName] = $value;
+        }
+      }
+
+      // for db name we need to parse the path
+      $settingName = $prefix . '_db_name';
+
+      $urlPath = $urlComponents['path'] ?? '';
+      $dbName = trim($urlPath, '/');
+      if ($dbName) {
+        $computed[$settingName] = $dbName;
+      }
+      return $computed;
+    }
+
+    $componentValues = [];
+
+    foreach (['host', 'name', 'user', 'password', 'port'] as $componentKey) {
+      $value = $this->get($prefix . '_db_' . $componentKey);
+      if (!$value) {
+        // if missing a required key to compose the dsn, give up trying to interpolate
+        // (we have defaults for all keys but password, so this is likely to be unset password
+        // (but could be one of the other components has been explicitly nulled))
+        return [];
+      }
+      $componentValues[$componentKey] = urlencode($value);
+    }
+
+    $dsn = "mysql://{$componentValues['user']}:{$componentValues['password']}@{$componentValues['host']}:{$componentValues['port']}/{$componentValues['name']}?new_link=true";
+    $ssl = $this->get($prefix . '_db_ssl');
+    if ($ssl) {
+      $dsn .= '&' . $ssl;
+    }
+    $computed[$prefix . '_db_dsn'] = $dsn;
+
+    return $computed;
   }
 
 }

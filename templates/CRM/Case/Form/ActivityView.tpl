@@ -9,7 +9,6 @@
 *}
 {* View Case Activities *}
 <div class="crm-block crm-content-block crm-case-activity-view-block">
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top" linkButtons=$actionLinks}</div>
   {if $revs}
     {strip}
       <table class="crm-info-panel">
@@ -41,7 +40,8 @@
                 {if $parentID}<a class="open-inline-noreturn" href="{crmURL p='civicrm/case/activity/view' h=0 q="cid=$contactID&aid=$parentID"}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}Prompted by{/ts}</a>{/if}
               </td>
             {else}
-              <td colspan="2">{if $row.label eq 'Details'}{$row.value|crmStripAlternatives|nl2br|purify}{elseif $row.type eq 'Date'}{$row.value|crmDate}{else}{$row.value}{/if}</td>
+              <td colspan="2">
+                {if $row.label eq 'Details'}{$row.value|crmStripAlternatives|nl2brIfNotHTML|purify}{elseif $row.type eq 'Date'}{$row.value|crmDate}{else}{$row.value}{/if}</td>
             {/if}
           </tr>
         {/foreach}

@@ -1,11 +1,6 @@
 <?php
 
 /**
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
+ * DAO class was renamed in 5.39
  */
-
-/**
- * Database access object for the ACLEntityRole entity.
- */
-class CRM_ACL_DAO_EntityRole extends CRM_ACL_DAO_ACLEntityRole {}
+class_alias('CRM_ACL_DAO_ACLEntityRole', 'CRM_ACL_DAO_EntityRole');

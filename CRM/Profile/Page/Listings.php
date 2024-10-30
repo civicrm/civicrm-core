@@ -171,8 +171,8 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
           $value = '%' . $value . '%';
         }
       }
-      elseif (CRM_Utils_Array::value('html_type', $field) == 'Multi-Select State/Province'
-        || CRM_Utils_Array::value('html_type', $field) == 'Multi-Select Country'
+      elseif (($field['html_type'] ?? NULL) == 'Multi-Select State/Province'
+        || ($field['html_type'] ?? NULL) == 'Multi-Select Country'
       ) {
         $value = CRM_Utils_Request::retrieve($name, 'String', $this, FALSE, NULL, 'REQUEST');
         if (!is_array($value)) {
@@ -483,7 +483,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
    */
   public function getTemplateFileName() {
     $fileName = $this->checkTemplateFileExists();
-    return $fileName ? $fileName : parent::getTemplateFileName();
+    return $fileName ?: parent::getTemplateFileName();
   }
 
   /**
@@ -494,7 +494,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
    */
   public function overrideExtraTemplateFileName() {
     $fileName = $this->checkTemplateFileExists('extra.');
-    return $fileName ? $fileName : parent::overrideExtraTemplateFileName();
+    return $fileName ?: parent::overrideExtraTemplateFileName();
   }
 
 }

@@ -16,7 +16,7 @@
  */
 
 /**
- * Page for displaying list of Gender.
+ * Page for displaying list of option groups and option values.
  */
 class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
 
@@ -83,6 +83,8 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
     }
     // If we don't have a group we will browse all groups
     if (!self::$_gName) {
+      // Ensure that gName is assigned to the template to prevent smarty notice.
+      $this->assign('gName');
       return;
     }
     $this->set('gName', self::$_gName);
@@ -157,26 +159,30 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
           'url' => 'civicrm/admin/options/' . self::$_gName,
           'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit %1', [1 => self::$_gName]),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
         ],
         CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable %1', [1 => self::$_gName]),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DISABLE),
         ],
         CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable %1', [1 => self::$_gName]),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ENABLE),
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/options/' . self::$_gName,
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete %1 Type', [1 => self::$_gName]),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
         ],
       ];
 
-      if (self::$_gName == 'custom_search') {
+      if (self::$_gName === 'custom_search') {
         $runLink = [
           CRM_Core_Action::FOLLOWUP => [
             'name' => ts('Run'),
@@ -184,6 +190,7 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
             'qs' => 'reset=1&csid=%%value%%',
             'title' => ts('Run %1', [1 => self::$_gName]),
             'class' => 'no-popup',
+            'weight' => 10,
           ],
         ];
         self::$_links = $runLink + self::$_links;

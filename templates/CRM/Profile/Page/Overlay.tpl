@@ -7,14 +7,14 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{if $overlayProfile }
+{if $overlayProfile}
 <table class="crm-table-group-summary">
   <tr>
     <td colspan="2">{$displayName}</td>
   </tr>
   <tr>
     <td>
-      {assign var="count" value="0"}
+      {assign var="count" value=0}
       {assign var="totalRows" value=$row|@count}
       <div class="crm-summary-col-0">
     {foreach from=$profileFields item=field key=rowName}
@@ -23,7 +23,7 @@
     </td>
     <td>
       <div class="crm-summary-col-1">
-        {assign var="count" value="1"}
+        {assign var="count" value=1}
         {/if}
       <div class="crm-section {$rowName}-section">
         <div class="label">
@@ -34,7 +34,7 @@
         </div>
         <div class="clear"></div>
       </div>
-      {assign var="count" value=`$count+1`}
+      {assign var="count" value=$count+1}
     {/foreach}
       </div>
     </td>

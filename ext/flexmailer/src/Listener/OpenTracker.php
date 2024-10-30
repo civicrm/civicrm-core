@@ -10,9 +10,15 @@
  */
 namespace Civi\FlexMailer\Listener;
 
+use Civi\Core\Service\AutoService;
 use Civi\FlexMailer\Event\ComposeBatchEvent;
 
-class OpenTracker extends BaseListener {
+/**
+ * @service civi_flexmailer_open_tracker
+ */
+class OpenTracker extends AutoService {
+
+  use IsActiveTrait;
 
   /**
    * Inject open-tracking codes.
@@ -24,20 +30,12 @@ class OpenTracker extends BaseListener {
       return;
     }
 
-    $config = \CRM_Core_Config::singleton();
-
-    // TODO: After v5.21 goes EOL, remove the $isLegacy check.
-    $isLegacy = version_compare(\CRM_Utils_System::version(), '5.23.alpha', '<');
-
     foreach ($e->getTasks() as $task) {
       /** @var \Civi\FlexMailer\FlexMailerTask $task */
       $mailParams = $task->getMailParams();
 
       if (!empty($mailParams) && !empty($mailParams['html'])) {
-        $openUrl = $isLegacy
-          ? $config->userFrameworkResourceURL . "extern/open.php?q=" . $task->getEventQueueId()
-          : \CRM_Utils_System::externUrl('extern/open', "q=" . $task->getEventQueueId());
-
+        $openUrl = \CRM_Utils_System::externUrl('extern/open', 'q=' . $task->getEventQueueId());
         $mailParams['html'] .= "\n" . '<img src="' . htmlentities($openUrl) . "\" width='1' height='1' alt='' border='0'>";
 
         $task->setMailParams($mailParams);

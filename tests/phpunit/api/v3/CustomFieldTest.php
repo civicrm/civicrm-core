@@ -36,7 +36,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   /**
    * Check with no label.
    */
-  public function testCustomFieldCreateWithoutLabel() {
+  public function testCustomFieldCreateWithoutLabel(): void {
     $customGroup = $this->customGroupCreate(['extends' => 'Individual', 'title' => 'text_test_group']);
     $params = [
       'custom_group_id' => $customGroup['id'],
@@ -57,7 +57,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   /**
    * Check with edit.
    */
-  public function testCustomFieldCreateWithEdit() {
+  public function testCustomFieldCreateWithEdit(): void {
     $customGroup = $this->customGroupCreate(['extends' => 'Individual', 'title' => 'text_test_group']);
     $params = [
       'custom_group_id' => $customGroup['id'],
@@ -72,7 +72,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
       'is_active' => 1,
     ];
 
-    $customField = $this->callAPIAndDocument('custom_field', 'create', $params, __FUNCTION__, __FILE__);
+    $customField = $this->callAPISuccess('custom_field', 'create', $params);
     $customField['label'] = 'Name2';
     $customFieldEdited = $this->callAPISuccess('custom_field', 'create', $customField);
 
@@ -82,7 +82,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   /**
    * Check without groupId.
    */
-  public function testCustomFieldCreateWithoutGroupID() {
+  public function testCustomFieldCreateWithoutGroupID(): void {
     $fieldParams = [
       'name' => 'test_textfield1',
       'label' => 'Name',
@@ -103,7 +103,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   /**
    * Check for Each data type: loop through available form input types
    */
-  public function testCustomFieldCreateAllAvailableFormInputs() {
+  public function testCustomFieldCreateAllAvailableFormInputs(): void {
     $gid = $this->customGroupCreate(['extends' => 'Individual', 'title' => 'testAllFormInputs']);
 
     $dtype = $customFieldDataType = array_column(CRM_Core_BAO_CustomField::dataType(), 'id');
@@ -213,7 +213,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   /**
    * Check with non-ascii labels
    */
-  public function testCustomFieldCreateWithNonAsciiLabel() {
+  public function testCustomFieldCreateWithNonAsciiLabel(): void {
     $customGroup = $this->customGroupCreate(['extends' => 'Contact', 'title' => 'select_test_group']);
     $params = [
       'custom_group_id' => $customGroup['id'],
@@ -235,7 +235,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   /**
    * Test custom field with existing option group.
    */
-  public function testCustomFieldExistingOptionGroup() {
+  public function testCustomFieldExistingOptionGroup(): void {
     $customGroup = $this->customGroupCreate(['extends' => 'Organization', 'title' => 'test_group']);
     $params = [
       'custom_group_id' => $customGroup['id'],
@@ -268,7 +268,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testUpdateCustomFieldAddOptionGroup() {
+  public function testUpdateCustomFieldAddOptionGroup(): void {
     $customGroup = $this->customGroupCreate(['extends' => 'Organization', 'title' => 'test_group']);
     $params = [
       'custom_group_id' => $customGroup['id'],
@@ -288,7 +288,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   /**
    * Test custom field get works & return param works
    */
-  public function testCustomFieldGetReturnOptions() {
+  public function testCustomFieldGetReturnOptions(): void {
     $customGroup = $this->customGroupCreate(['extends' => 'Individual', 'title' => 'test_group']);
     $customField = $this->customFieldCreate(['custom_group_id' => $customGroup['id']]);
 
@@ -303,7 +303,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   /**
    * Test custom field get works & return param works
    */
-  public function testCustomFieldGetReturnArray() {
+  public function testCustomFieldGetReturnArray(): void {
     $customGroup = $this->customGroupCreate(['extends' => 'Individual', 'title' => 'test_group']);
     $customField = $this->customFieldCreate(['custom_group_id' => $customGroup['id']]);
 
@@ -318,7 +318,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   /**
    * Test custom field get works & return param works
    */
-  public function testCustomFieldGetReturnTwoOptions() {
+  public function testCustomFieldGetReturnTwoOptions(): void {
     $customGroup = $this->customGroupCreate(['extends' => 'Individual', 'test_group']);
     $customField = $this->customFieldCreate(['custom_group_id' => $customGroup['id']]);
 
@@ -331,7 +331,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     $this->assertFalse(array_key_exists('label', $result));
   }
 
-  public function testCustomFieldCreateWithOptionValues() {
+  public function testCustomFieldCreateWithOptionValues(): void {
     $customGroup = $this->customGroupCreate(['extends' => 'Contact', 'title' => 'select_test_group']);
 
     $option_values = [
@@ -370,17 +370,13 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
       'options' => ['get_options' => 'custom_' . $customField['id']],
       'action' => 'create',
     ];
-    $description = "Demonstrates retrieving metadata with custom field options.";
-    $subfile = "GetFieldsOptions";
-    $fields = $this->callAPIAndDocument('contact', 'getfields', $getFieldsParams, __FUNCTION__, 'ContactTest.php', $description, $subfile);
+    $fields = $this->callAPISuccess('Contact', 'getfields', $getFieldsParams);
     $this->assertArrayHasKey('options', $fields['values']['custom_' . $customField['id']]);
     $this->assertEquals('Label1', $fields['values']['custom_' . $customField['id']]['options'][1]);
     $getOptionsArray = [
       'field' => 'custom_' . $customField['id'],
     ];
-    $description = "Demonstrates retrieving options for a custom field.";
-    $subfile = "GetOptions";
-    $result = $this->callAPIAndDocument('contact', 'getoptions', $getOptionsArray, __FUNCTION__, 'ContactTest.php', $description, '');
+    $result = $this->callAPISuccess('Contact', 'getoptions', $getOptionsArray);
     $this->assertEquals('Label1', $result['values'][1]);
   }
 
@@ -389,7 +385,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   /**
    * Check without Field ID.
    */
-  public function testCustomFieldDeleteWithoutFieldID() {
+  public function testCustomFieldDeleteWithoutFieldID(): void {
     $params = [];
     $customField = $this->callAPIFailure('custom_field', 'delete', $params,
       'Mandatory key(s) missing from params array: id');
@@ -398,7 +394,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   /**
    * Check without valid array.
    */
-  public function testCustomFieldDelete() {
+  public function testCustomFieldDelete(): void {
     $customGroup = $this->customGroupCreate(['extends' => 'Individual', 'title' => 'test_group']);
     $customField = $this->customFieldCreate(['custom_group_id' => $customGroup['id']]);
     $this->assertNotNull($customField['id']);
@@ -406,7 +402,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     $params = [
       'id' => $customField['id'],
     ];
-    $result = $this->callAPIAndDocument('custom_field', 'delete', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('custom_field', 'delete', $params);
 
     $this->assertAPISuccess($result);
   }
@@ -414,7 +410,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   /**
    * Check That any associated Mapping Field Entries are also removed.
    */
-  public function testCustomFieldDeleteWithMappingField() {
+  public function testCustomFieldDeleteWithMappingField(): void {
     $customGroup = $this->customGroupCreate(['extends' => 'Individual', 'title' => 'test_group']);
     $customField = $this->customFieldCreate(['custom_group_id' => $customGroup['id']]);
     $this->assertNotNull($customField['id']);
@@ -442,7 +438,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   /**
    * Check for Option Value.
    */
-  public function testCustomFieldOptionValueDelete() {
+  public function testCustomFieldOptionValueDelete(): void {
     $customGroup = $this->customGroupCreate(['extends' => 'Contact', 'title' => 'ABC']);
     $customOptionValueFields = $this->customFieldOptionValueCreate($customGroup, 'fieldABC');
     $params = [
@@ -457,7 +453,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
    * and "Activity.getfields" should return only their respective fields (not the other's fields),
    * and unrelated entities should return no custom fields.
    */
-  public function testGetfields_CrossEntityPollution() {
+  public function testGetfields_CrossEntityPollution(): void {
     $auxEntities = ['Email', 'Address', 'LocBlock', 'Membership', 'ContributionPage', 'ReportInstance'];
     $allEntities = array_merge(['Contact', 'Activity'], $auxEntities);
 
@@ -519,7 +515,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
    *
    * Uses the "attachment" api for setting value.
    */
-  public function testCustomFileField() {
+  public function testCustomFileField(): void {
     $customGroup = $this->customGroupCreate(['title' => 'attachment_test_group']);
     $params = [
       'custom_group_id' => $customGroup['id'],
@@ -551,7 +547,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     $this->assertEquals($attachment['id'], $result[$cfId]);
   }
 
-  public function testUpdateCustomField() {
+  public function testUpdateCustomField(): void {
     $customGroup = $this->customGroupCreate(['extends' => 'Individual']);
     $params = ['id' => $customGroup['id'], 'is_active' => 0];
     $result = $this->callAPISuccess('CustomGroup', 'create', $params);
@@ -596,7 +592,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   /**
    * @throws \CRM_Core_Exception
    */
-  public function testMakeSearchableContactReferenceFieldUnsearchable() {
+  public function testMakeSearchableContactReferenceFieldUnsearchable(): void {
     $this->customGroupCreate([
       'name' => 'testCustomGroup',
       'title' => 'testCustomGroup',
@@ -621,7 +617,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   /**
    * Test disabling a searchable contact reference field.
    */
-  public function testDisableSearchableContactReferenceField() {
+  public function testDisableSearchableContactReferenceField(): void {
     $customGroup = $this->customGroupCreate([
       'name' => 'testCustomGroup',
       'title' => 'testCustomGroup',
@@ -643,7 +639,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     $this->callAPISuccess('CustomField', 'create', $params);
   }
 
-  public function testLegacyHtmlType() {
+  public function testLegacyHtmlType(): void {
     $customGroup = $this->customGroupCreate([
       'name' => 'testCustomGroup',
       'title' => 'testCustomGroup',
@@ -703,7 +699,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     $this->assertEquals('SingleSelect', $result['values'][0]['label']);
   }
 
-  public function testLegacyStateCountryTypes() {
+  public function testLegacyStateCountryTypes(): void {
     $customGroup = $this->customGroupCreate([
       'name' => 'testCustomGroup',
       'title' => 'testCustomGroup',

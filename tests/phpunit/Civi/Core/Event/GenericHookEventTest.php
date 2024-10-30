@@ -8,7 +8,7 @@ class GenericHookEventTest extends \CiviUnitTestCase {
     parent::tearDown();
   }
 
-  public function testConstructParams() {
+  public function testConstructParams(): void {
     $event = GenericHookEvent::create([
       'ab' => 123,
       'cd' => ['foo' => 'bar'],
@@ -25,10 +25,11 @@ class GenericHookEventTest extends \CiviUnitTestCase {
     $this->assertTrue(isset($event->nothingZero) && empty($event->nothingZero));
   }
 
-  public function testConstructOrdered() {
+  public function testConstructOrdered(): void {
+    $null = NULL;
     $event = GenericHookEvent::createOrdered(
       ['alpha', 'beta', 'nothingNull', 'nothingZero'],
-      [456, ['whiz' => 'bang'], NULL, 0, \CRM_Utils_Hook::$_nullObject]
+      [456, ['whiz' => 'bang'], NULL, 0, $null]
     );
     $this->assertEquals(456, $event->alpha);
     $this->assertEquals('bang', $event->beta['whiz']);
@@ -41,7 +42,7 @@ class GenericHookEventTest extends \CiviUnitTestCase {
     $this->assertEquals(4, count($event->getHookValues()));
   }
 
-  public function testDispatch() {
+  public function testDispatch(): void {
     \CRM_Utils_Hook::singleton()->setHook('civicrm_ghet',
       [$this, 'hook_civicrm_ghet']);
     \Civi::dispatcher()->addListener('hook_civicrm_ghet',

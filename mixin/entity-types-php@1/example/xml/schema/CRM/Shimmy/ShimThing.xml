@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Shimmy</base>
+  <class>ShimThing</class>
+  <name>civicrm_shim_thing</name>
+  <comment>ShimThing Example Entity</comment>
+  <log>true</log>
+  <icon>fa-clone</icon>
+
+  <field>
+    <name>id</name>
+    <title>ShimThing ID</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique ShimThing ID</comment>
+    <add>1.0</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+    <add>1.0</add>
+  </primaryKey>
+
+  <field>
+    <name>name</name>
+    <title>ShimThing Name</title>
+    <comment>Unique name for the shim thing</comment>
+    <required>true</required>
+    <type>varchar</type>
+    <length>255</length>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>1.0</add>
+  </field>
+
+</table>

@@ -40,17 +40,10 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   }
 
   /**
-   * Retrieve DB object and copy to defaults array.
-   *
-   * @param array $params
-   *   Array of criteria values.
-   * @param array $defaults
-   *   Array to be populated with found values.
-   *
-   * @return self|null
-   *   The DAO object, if found.
-   *
    * @deprecated
+   * @param array $params
+   * @param array $defaults
+   * @return self|null
    */
   public static function retrieve($params, &$defaults) {
     return self::commonRetrieve(self::class, $params, $defaults);
@@ -166,13 +159,16 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    * @return CRM_Core_DAO_Domain
    */
   public static function create($params) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return self::writeRecord($params);
   }
 
   /**
+   * @deprecated
    * @return bool
    */
   public static function multipleDomains() {
+    CRM_Core_Error::deprecatedFunctionWarning('API');
     $session = CRM_Core_Session::singleton();
 
     $numberDomains = $session->get('numberDomains');
@@ -237,12 +233,12 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
 
   /**
    * @param int $contactID
-   *
-   * @return bool|null|object|string
-   *
+   * @return bool|int
+   * @deprecated
    * @throws \CRM_Core_Exception
    */
   public static function addContactToDomainGroup($contactID) {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Contact_BAO_GroupContact::addContactsToGroup');
     $groupID = self::getGroupId();
 
     if ($groupID) {
@@ -279,7 +275,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
         $title, 'id', 'title', TRUE
       );
     }
-    return $groupID ? $groupID : FALSE;
+    return $groupID ?: FALSE;
   }
 
   /**
@@ -372,7 +368,9 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    */
   public static function getNoReplyEmailAddress() {
     $emailDomain = CRM_Core_BAO_MailSettings::defaultDomain();
-    return "do-not-reply@$emailDomain";
+    $noReplyAddress = Civi::settings()->get('no_reply_email_address');
+
+    return $noReplyAddress ?: "do-not-reply@$emailDomain";
   }
 
 }

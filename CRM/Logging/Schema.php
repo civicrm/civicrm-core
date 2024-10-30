@@ -50,7 +50,7 @@ class CRM_Logging_Schema {
    * @var array
    */
   private $exceptions = [
-    'civicrm_job' => ['last_run'],
+    'civicrm_job' => ['last_run', 'last_run_end'],
     'civicrm_group' => ['cache_date', 'refresh_date'],
   ];
 
@@ -80,10 +80,6 @@ class CRM_Logging_Schema {
   public static function checkLoggingSupport(&$value, $fieldSpec) {
     if (!(CRM_Core_DAO::checkTriggerViewPermission(FALSE)) && $value) {
       throw new CRM_Core_Exception(ts("In order to use this functionality, the installation's database user must have privileges to create triggers and views (if binary logging is enabled – this means the SUPER privilege). This install does not have the required privilege(s) enabled."));
-    }
-    // dev/core#1812 Disable logging in a multilingual environment.
-    if (CRM_Core_I18n::isMultilingual() && $value) {
-      throw new CRM_Core_Exception(ts("Logging is not supported in a multilingual environment!"));
     }
     return TRUE;
   }
@@ -162,6 +158,12 @@ AND    TABLE_NAME LIKE 'civicrm_%'
     // dev/core#1762 Don't log subscription_history
     $this->tables = preg_grep('/^civicrm_subscription_history/', $this->tables, PREG_GREP_INVERT);
 
+    // Don't log sessions
+    $this->tables = preg_grep('/^civicrm_session/', $this->tables, PREG_GREP_INVERT);
+
+    // Don't log entity tables.
+    $this->tables = preg_grep('/^civicrm_sk_/', $this->tables, PREG_GREP_INVERT);
+
     // do not log civicrm_mailing_recipients table, CRM-16193
     $this->tables = array_diff($this->tables, ['civicrm_mailing_recipients']);
     $this->logTableSpec = array_fill_keys($this->tables, []);
@@ -204,13 +206,11 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
    */
   public function entityCustomDataLogTables($extends) {
     $customGroupTables = [];
-    $customGroupDAO = CRM_Core_BAO_CustomGroup::getAllCustomGroupsByBaseEntity($extends);
-    $customGroupDAO->find();
-    while ($customGroupDAO->fetch()) {
-      // logging is disabled for the table (e.g by hook) then $this->logs[$customGroupDAO->table_name]
+    foreach (CRM_Core_BAO_CustomGroup::getAll(['extends' => $extends]) as $customGroup) {
+      // logging is disabled for the table (e.g by hook) then $this->logs[$customGroup['table_name']]
       // will be empty.
-      if (!empty($this->logs[$customGroupDAO->table_name])) {
-        $customGroupTables[$customGroupDAO->table_name] = $this->logs[$customGroupDAO->table_name];
+      if (!empty($this->logs[$customGroup['table_name']])) {
+        $customGroupTables[$customGroup['table_name']] = $this->logs[$customGroup['table_name']];
       }
     }
     return $customGroupTables;
@@ -337,7 +337,7 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
       $engineChanged = isset($tableSpec['engine']) && (strtoupper($tableSpec['engine']) != $currentEngine);
       $engineConfigChanged = isset($tableSpec['engine_config']) && (strtoupper($tableSpec['engine_config']) != $this->getEngineConfigForLogTable($logTable));
       if ($engineChanged || ($engineConfigChanged && $params['updateChangedEngineConfig'])) {
-        $alterSql[] = "ENGINE=" . $tableSpec['engine'] . " " . CRM_Utils_Array::value('engine_config', $tableSpec);
+        $alterSql[] = "ENGINE=" . $tableSpec['engine'] . " " . ($tableSpec['engine_config'] ?? '');
       }
       if (!empty($tableSpec['indexes'])) {
         $indexes = $this->getIndexesForTable($logTable);
@@ -430,8 +430,10 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
    *   name of the relevant table.
    * @param array $cols
    *   Mixed array of columns to add or null (to check for the missing columns).
+   * @param bool $resetTableCache
+   *   Refresh the cache for table before calculating the differences with log table.
    */
-  public function fixSchemaDifferencesFor(string $table, array $cols = []): void {
+  public function fixSchemaDifferencesFor(string $table, array $cols = [], bool $resetTableCache = FALSE): void {
     if (!in_array($table, $this->tables, TRUE)) {
       // Create the table if the log table does not exist and
       // the table is in 'this->tables'. This latter array
@@ -444,13 +446,17 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
       return;
     }
 
+    if ($resetTableCache) {
+      $this->resetSchemaCacheForTable($table);
+    }
+    $this->resetSchemaCacheForTable("log_$table");
+
     if (empty($cols)) {
       $cols = $this->columnsWithDiffSpecs($table, "log_$table");
     }
 
     // If a column that already exists on logging table is being added, we
     // should treat it as a modification.
-    $this->resetSchemaCacheForTable("log_$table");
     $logTableSchema = $this->columnSpecsOf("log_$table");
     if (!empty($cols['ADD'])) {
       foreach ($cols['ADD'] as $colKey => $col) {
@@ -722,7 +728,7 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
       if (!empty($specDiff) && $col !== 'id' && !in_array($col, $diff['ADD'])) {
         if (empty($colSpecs['EXTRA']) || (!empty($colSpecs['EXTRA']) && $colSpecs['EXTRA'] !== 'auto_increment')) {
           // ignore 'id' column for any spec changes, to avoid any auto-increment mysql errors
-          if ($civiTableSpecs[$col]['DATA_TYPE'] != CRM_Utils_Array::value('DATA_TYPE', $logTableSpecs[$col])
+          if ($civiTableSpecs[$col]['DATA_TYPE'] != ($logTableSpecs[$col]['DATA_TYPE'] ?? NULL)
             // We won't alter the log if the length is decreased in case some of the existing data won't fit.
             || CRM_Utils_Array::value('LENGTH', $civiTableSpecs[$col]) > CRM_Utils_Array::value('LENGTH', $logTableSpecs[$col])
           ) {
@@ -730,12 +736,12 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
             $diff['MODIFY'][] = $col;
           }
           elseif ($civiTableSpecs[$col]['DATA_TYPE'] === 'enum' &&
-            CRM_Utils_Array::value('ENUM_VALUES', $civiTableSpecs[$col]) != CRM_Utils_Array::value('ENUM_VALUES', $logTableSpecs[$col])
+            ($civiTableSpecs[$col]['ENUM_VALUES'] ?? NULL) != ($logTableSpecs[$col]['ENUM_VALUES'] ?? NULL)
           ) {
             // column is enum and the permitted values have changed
             $diff['MODIFY'][] = $col;
           }
-          elseif ($civiTableSpecs[$col]['IS_NULLABLE'] != CRM_Utils_Array::value('IS_NULLABLE', $logTableSpecs[$col]) &&
+          elseif ($civiTableSpecs[$col]['IS_NULLABLE'] != ($logTableSpecs[$col]['IS_NULLABLE'] ?? NULL) &&
             $logTableSpecs[$col]['IS_NULLABLE'] === 'NO'
           ) {
             // if is-null property is different, and log table's column is NOT-NULL, surely consider the column
@@ -743,7 +749,7 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
           }
           elseif (
             $civiTableSpecs[$col]['COLUMN_DEFAULT'] != ($logTableSpecs[$col]['COLUMN_DEFAULT'] ?? NULL)
-            && !stristr($civiTableSpecs[$col]['COLUMN_DEFAULT'], 'timestamp')
+            && !stristr(($civiTableSpecs[$col]['COLUMN_DEFAULT'] ?? ''), 'timestamp')
             && !($civiTableSpecs[$col]['COLUMN_DEFAULT'] === NULL && ($logTableSpecs[$col]['COLUMN_DEFAULT'] ?? NULL) === 'NULL')
           ) {
             // if default property is different, and its not about a timestamp column, consider it
@@ -776,6 +782,15 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
    */
   public function getLogTableSpec() {
     return $this->logTableSpec;
+  }
+
+  /**
+   * Return a list of log table names.
+   *
+   * @return array
+   */
+  public function getLogTableNames() {
+    return array_values($this->logs);
   }
 
   /**

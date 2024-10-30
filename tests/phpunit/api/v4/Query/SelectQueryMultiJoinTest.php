@@ -29,7 +29,7 @@ use api\v4\Api4TestBase;
  */
 class SelectQueryMultiJoinTest extends Api4TestBase {
 
-  public function testManyToOneSelect() {
+  public function testManyToOneSelect(): void {
 
     $contact1 = $this->createTestRecord('Contact', [
       'first_name' => 'First',

@@ -28,7 +28,7 @@ class CRM_Core_Resources_BundleTest extends CiviUnitTestCase {
   /**
    * Create two bundles (parent, child) - and merge the child into the parent.
    */
-  public function testMergeIntoRegion() {
+  public function testMergeIntoRegion(): void {
     $bundle = $this->createEmptyCollection();
     $region = CRM_Core_Region::instance(__FUNCTION__);
 
@@ -59,7 +59,7 @@ class CRM_Core_Resources_BundleTest extends CiviUnitTestCase {
   /**
    * Add some resources - sometimes forgetting to set a 'region'. Fill in missing regions.
    */
-  public function testFillDefaults() {
+  public function testFillDefaults(): void {
     $bundle = new CRM_Core_Resources_Bundle(__FUNCTION__, ['scriptUrl', 'styleUrl', 'markup']);
     $bundle->addScriptUrl('http://example.com/myscript.js');
     $bundle->addStyleUrl('http://example.com/yonder-style.css', ['region' => 'yonder']);
@@ -75,7 +75,7 @@ class CRM_Core_Resources_BundleTest extends CiviUnitTestCase {
   /**
    * Test creation of coreStyles bundle
    */
-  public function testCoreStylesBundle() {
+  public function testCoreStylesBundle(): void {
     $config = CRM_Core_Config::singleton();
     $config->customCSSURL = "http://example.com/css/custom.css";
     $bundle = CRM_Core_Resources_Common::createStyleBundle('coreStyles');

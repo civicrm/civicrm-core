@@ -9,10 +9,10 @@
 *}
 
 <div class="crm-profile-name-{$ufGroupName}">
-{crmRegion name=profile-search-`$ufGroupName`}
+{crmRegion name="profile-search-`$ufGroupName`"}
 
 {* make sure there are some fields in the selector *}
-{if ! empty( $columnHeaders ) || $isReset }
+{if ! empty($columnHeaders) || $isReset}
 
 {if $search}
 <div class="crm-block crm-form-block">

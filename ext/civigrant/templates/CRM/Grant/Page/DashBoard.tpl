@@ -10,7 +10,7 @@
 {* CiviGrant DashBoard (launch page) *}
 <div class="help">
     {capture assign=findContactURL}{crmURL p="civicrm/contact/search/basic" q="reset=1"}{/capture}
-    <p>{ts 1=$findContactURL }CiviGrant allows you to input and track grants to Organizations, Individuals or Households. The grantee must first be entered as a contact in CiviCRM. Use <a href='%1'>Find Contacts</a> to see if there's already a record for the grantee. Once you've located or created the contact record, click <strong>View</strong> to go to their summary page, select the <strong>Grants</strong> tab and click <strong>New Grant</strong>.{/ts}
+    <p>{ts 1=$findContactURL}CiviGrant allows you to input and track grants to Organizations, Individuals or Households. The grantee must first be entered as a contact in CiviCRM. Use <a href='%1'>Find Contacts</a> to see if there's already a record for the grantee. Once you've located or created the contact record, click <strong>View</strong> to go to their summary page, select the <strong>Grants</strong> tab and click <strong>New Grant</strong>.{/ts}
     </p>
 </div>
 <h3>{ts}Grants Summary{/ts}</h3>
@@ -30,8 +30,8 @@ You have {$grantSummary.total_grants} grant(s) registered in your database.
 
 {foreach from=$grantSummary.per_status item=status key=id}
 <tr>
-    <td><a href="{crmURL p="civicrm/grant/search" q="reset=1&status=`$id`&force=1"}">{$status.label}</a></td>
-    <td><a href="{crmURL p="civicrm/grant/search" q="reset=1&status=`$id`&force=1"}">{$status.total}</a></td>
+    <td><a href="{crmURL p="civicrm/grant/search" q="reset=1&grant_status_id=`$id`&force=1"}">{$status.label}</a></td>
+    <td><a href="{crmURL p="civicrm/grant/search" q="reset=1&grant_status_id=`$id`&force=1"}">{$status.total}</a></td>
 </tr>
 {/foreach}
 <tr class="columnfooter">

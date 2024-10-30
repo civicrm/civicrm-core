@@ -17,6 +17,45 @@
 class CRM_Utils_Check_Component_Cms extends CRM_Utils_Check_Component {
 
   /**
+   * For sites running from Composer, ensure public assets have been correctly installed.
+   *
+   * @return CRM_Utils_Check_Message[]
+   */
+  public static function checkPublicAssets(): array {
+    $checks = [];
+    $assetDir = $GLOBALS['civicrm_asset_map']['civicrm/civicrm-core']['dest'] ?? NULL;
+    // No asset directory so this is not a composer-based install
+    if (!$assetDir) {
+      return [];
+    }
+    $errorMsg = NULL;
+    $versionFile = $assetDir . '/js/version.json';
+    if (!file_exists($versionFile)) {
+      $errorMsg = ts('Assets missing from public web directory.');
+    }
+    else {
+      $currentVersion = CRM_Utils_System::version();
+      $assetVersion = json_decode(file_get_contents($versionFile), TRUE);
+      if ($assetVersion !== $currentVersion) {
+        $errorMsg = ts('Wrong version of assets in public web directory: expected %1 but found %2.', [1 => $currentVersion, 2 => $assetVersion]);
+      }
+    }
+    if ($errorMsg) {
+      $checks[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        "$errorMsg " .
+          ts('Use the command %1 to resolve.', [1 => '<code>composer civicrm:publish</code>']) .
+          ' ' .
+          CRM_Utils_System::docURL2('sysadmin/upgrade/drupal8/#additional-cleanup'),
+        ts('Public Assets Not Published'),
+        \Psr\Log\LogLevel::ERROR,
+        'fa-code'
+      );
+    }
+    return $checks;
+  }
+
+  /**
    * For sites running in WordPress, make sure the configured base page exists.
    *
    * @return CRM_Utils_Check_Message[]
@@ -159,6 +198,33 @@ class CRM_Utils_Check_Component_Cms extends CRM_Utils_Check_Component {
     }
 
     return (int) ($basePage->post_status == 'publish');
+  }
+
+  /**
+   * Check if we created unique index on civicrm_uf_match (uf_id,domain_id)
+   *
+   * @return CRM_Utils_Check_Message[]
+   */
+  public static function checkUfMatchUnique(): array {
+    $checks = [];
+
+    if (CRM_Core_BAO_UFMatch::tryToAddUniqueIndexOnUfId()) {
+      // Already done. Success!
+      return $checks;
+    }
+
+    // Your DB has multiple uf_match records! Bad
+    $checks[] = new CRM_Utils_Check_Message(
+      __FUNCTION__,
+      ts('You have multiple records with the same uf_id in civicrm_uf_match. You need to manually fix this in the database so that uf_id is unique') .
+      ' ' .
+      CRM_Utils_System::docURL2('sysadmin/upgrade/todo/#todo'),
+      ts('Duplicate records in UFMatch'),
+      \Psr\Log\LogLevel::ERROR,
+      'fa-database'
+    );
+
+    return $checks;
   }
 
 }

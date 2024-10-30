@@ -38,8 +38,8 @@ class api_v3_SurveyRespondantTest extends CiviUnitTestCase {
   /**
    * Test survey respondent get.
    */
-  public function testGetSurveyRespondants() {
-    $result = $this->callAPIAndDocument("SurveyRespondant", "get", $this->params, __FUNCTION__, __FILE__);
+  public function testGetSurveyRespondants(): void {
+    $result = $this->callAPISuccess("SurveyRespondant", "get", $this->params);
   }
 
 }

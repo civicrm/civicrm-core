@@ -22,5 +22,5 @@
 
 
     <h3>{include file="CRM/Contact/Form/Task.tpl"}</h3>
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location=''}</div>
 </div>

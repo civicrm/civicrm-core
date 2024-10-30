@@ -14,7 +14,7 @@ namespace Civi\FlexMailer\Event;
  * Class BaseEvent
  * @package Civi\FlexMailer\Event
  */
-class BaseEvent extends \Symfony\Component\EventDispatcher\Event {
+class BaseEvent extends \Civi\Core\Event\GenericHookEvent {
   /**
    * @var array
    *   An array which must define options:

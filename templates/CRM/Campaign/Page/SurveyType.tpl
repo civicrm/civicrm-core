@@ -1,6 +1,6 @@
 <div class="crm-content-block crm-block">
-{if ($action eq 1) or ($action eq 2) or ($action eq 8) }
-  {include file="CRM/Campaign/Form/SurveyType.tpl" }
+{if ($action eq 1) or ($action eq 2) or ($action eq 8)}
+  {include file="CRM/Campaign/Form/SurveyType.tpl"}
 {else}
 {if $rows}
 <div class="action-link">

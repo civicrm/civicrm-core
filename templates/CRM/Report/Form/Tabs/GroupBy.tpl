@@ -8,11 +8,11 @@
  +--------------------------------------------------------------------+
 *}
   <div id="report-tab-group-by-elements" class="civireport-criteria">
-    {assign  var="count" value="0"}
+    {assign  var="count" value=0}
     <table class="report-layout">
       <tr class="crm-report crm-report-criteria-groupby">
         {foreach from=$groupByElements item=gbElem key=dnc}
-        {assign var="count" value=`$count+1`}
+        {assign var="count" value=$count+1}
         <td width="25%">
           {$form.group_bys[$gbElem].html}
           {if $form.group_bys_freq && array_key_exists($gbElem, $form.group_bys_freq)}:<br>

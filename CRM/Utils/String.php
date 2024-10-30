@@ -73,8 +73,8 @@ class CRM_Utils_String {
     // CRM-11744
     $name = preg_replace('/[^a-zA-Z0-9]+/', $char, trim($name));
 
-    //If there are no ascii characters present.
-    if ($name == $char) {
+    // If there are no ascii characters present.
+    if (!strlen(trim($name, $char))) {
       $name = self::createRandom($len, self::ALPHANUMERIC);
     }
 
@@ -355,14 +355,11 @@ class CRM_Utils_String {
    *   true if the urls match, else false
    */
   public static function match($url1, $url2) {
-    $url1 = strtolower($url1);
-    $url2 = strtolower($url2);
+    $component1 = parse_url(strtolower($url1));
+    $component2 = parse_url(strtolower($url2));
 
-    $url1Str = parse_url($url1);
-    $url2Str = parse_url($url2);
-
-    if ($url1Str['path'] == $url2Str['path'] &&
-      self::extractURLVarValue(CRM_Utils_Array::value('query', $url1Str)) == self::extractURLVarValue(CRM_Utils_Array::value('query', $url2Str))
+    if ($component1['path'] == $component2['path'] &&
+      self::extractURLVarValue($component1['query'] ?? '') == self::extractURLVarValue($component2['query'] ?? '')
     ) {
       return TRUE;
     }
@@ -448,8 +445,7 @@ class CRM_Utils_String {
    */
   public static function htmlToText($html) {
     $token_html = preg_replace('!\{([a-z_.]+)\}!i', 'token:{$1}', $html);
-    $converter = new \Html2Text\Html2Text($token_html, ['do_links' => 'table', 'width' => 75]);
-    $token_text = $converter->getText();
+    $token_text = \Soundasleep\Html2Text::convert($token_html, ['ignore_errors' => TRUE]);
     $text = preg_replace('!token\:\{([a-z_.]+)\}!i', '{$1}', $token_text);
     return $text;
   }
@@ -642,10 +638,15 @@ class CRM_Utils_String {
       $config = HTMLPurifier_Config::createDefault();
       $config->set('Core.Encoding', 'UTF-8');
       $config->set('Attr.AllowedFrameTargets', ['_blank', '_self', '_parent', '_top']);
-
       // Disable the cache entirely
       $config->set('Cache.DefinitionImpl', NULL);
-
+      $config->set('HTML.DefinitionID', 'enduser-customize.html tutorial');
+      $config->set('HTML.DefinitionRev', 1);
+      $def = $config->maybeGetRawHTMLDefinition();
+      if (!empty($def)) {
+        $def->addElement('figcaption', 'Block', 'Flow', 'Common');
+        $def->addElement('figure', 'Block', 'Optional: (figcaption, Flow) | (Flow, figcaption) | Flow', 'Common');
+      }
       $_filter = new HTMLPurifier($config);
     }
 
@@ -670,8 +671,8 @@ class CRM_Utils_String {
   /**
    * Generate a random string.
    *
-   * @param $len
-   * @param $alphabet
+   * @param int $len
+   * @param string $alphabet
    * @return string
    */
   public static function createRandom($len, $alphabet) {
@@ -692,18 +693,22 @@ class CRM_Utils_String {
    * @param string $string
    *   E.g. "view all contacts". Syntax: "[prefix:]name".
    * @param string|null $defaultPrefix
+   * @param string $validPrefixPattern
+   *   A regular expression used to determine if a prefix is valid.
+   *   To wit: Prefixes MUST be strictly alphanumeric.
    *
    * @return array
    *   (0 => string|NULL $prefix, 1 => string $value)
    */
-  public static function parsePrefix($delim, $string, $defaultPrefix = NULL) {
+  public static function parsePrefix($delim, $string, $defaultPrefix = NULL, $validPrefixPattern = '/^[A-Za-z0-9]+$/') {
     $pos = strpos($string, $delim);
     if ($pos === FALSE) {
       return [$defaultPrefix, $string];
     }
-    else {
-      return [substr($string, 0, $pos), substr($string, 1 + $pos)];
-    }
+
+    $lhs = substr($string, 0, $pos);
+    $rhs = substr($string, 1 + $pos);
+    return preg_match($validPrefixPattern, $lhs) ? [$lhs, $rhs] : [$defaultPrefix, $string];
   }
 
   /**
@@ -875,7 +880,7 @@ class CRM_Utils_String {
   }
 
   /**
-   * Determine if $string starts with $fragment.
+   * @deprecated
    *
    * @param string $string
    *   The long string.
@@ -884,15 +889,12 @@ class CRM_Utils_String {
    * @return bool
    */
   public static function startsWith($string, $fragment) {
-    if ($fragment === '') {
-      return TRUE;
-    }
-    $len = strlen($fragment ?? '');
-    return substr(($string ?? ''), 0, $len) === $fragment;
+    CRM_Core_Error::deprecatedFunctionWarning('str_starts_with');
+    return str_starts_with((string) $string, (string) $fragment);
   }
 
   /**
-   * Determine if $string ends with $fragment.
+   * @deprecated
    *
    * @param string $string
    *   The long string.
@@ -901,11 +903,8 @@ class CRM_Utils_String {
    * @return bool
    */
   public static function endsWith($string, $fragment) {
-    if ($fragment === '') {
-      return TRUE;
-    }
-    $len = strlen($fragment ?? '');
-    return substr(($string ?? ''), -1 * $len) === $fragment;
+    CRM_Core_Error::deprecatedFunctionWarning('str_ends_with');
+    return str_ends_with((string) $string, (string) $fragment);
   }
 
   /**
@@ -919,7 +918,7 @@ class CRM_Utils_String {
     $patterns = (array) $patterns;
     $result = [];
     foreach ($patterns as $pattern) {
-      if (!\CRM_Utils_String::endsWith($pattern, '*')) {
+      if (!str_ends_with($pattern, '*')) {
         if ($allowNew || in_array($pattern, $allStrings)) {
           $result[] = $pattern;
         }
@@ -927,7 +926,7 @@ class CRM_Utils_String {
       else {
         $prefix = rtrim($pattern, '*');
         foreach ($allStrings as $key) {
-          if (\CRM_Utils_String::startsWith($key, $prefix)) {
+          if (str_starts_with($key, $prefix)) {
             $result[] = $key;
           }
         }
@@ -1024,24 +1023,93 @@ class CRM_Utils_String {
    * many times it is run. This compares to it otherwise creating one file for every parsed string.
    *
    * @param string $templateString
+   * @param array $templateVars
    *
    * @return string
+   *
+   * @noinspection PhpDocRedundantThrowsInspection
+   *
+   * @throws \CRM_Core_Exception
    */
-  public static function parseOneOffStringThroughSmarty($templateString) {
+  public static function parseOneOffStringThroughSmarty($templateString, $templateVars = []) {
     if (!CRM_Utils_String::stringContainsTokens($templateString)) {
       // Skip expensive smarty processing.
       return $templateString;
     }
     $smarty = CRM_Core_Smarty::singleton();
     $cachingValue = $smarty->caching;
+    set_error_handler([$smarty, 'handleSmartyError'], E_USER_ERROR);
     $smarty->caching = 0;
+    $useSecurityPolicy = ($smarty->getVersion() > 2) ? !$smarty->security_policy : !$smarty->security;
+    // For Smarty v2, policy is applied at lower level.
+    if ($useSecurityPolicy) {
+      // $smarty->enableSecurity('CRM_Core_Smarty_Security');
+      Civi::service('civi.smarty.userContent')->enable();
+    }
     $smarty->assign('smartySingleUseString', $templateString);
-    // Do not escape the smartySingleUseString as that is our smarty template
-    // and is likely to contain html.
-    $templateString = (string) $smarty->fetch('string:{eval var=$smartySingleUseString|smarty:nodefaults}');
-    $smarty->caching = $cachingValue;
-    $smarty->assign('smartySingleUseString', NULL);
+    try {
+      // Do not escape the smartySingleUseString as that is our smarty template
+      // and is likely to contain html.
+      // The file name generated by
+      // 'string:{eval var=$smartySingleUseString|smarty:nodefaults}'
+      // is invalid in Windows, causing failure.
+      // Adding this is preparatory to smarty 3. The original PR failed some
+      // tests so we check for the function.
+      if (!function_exists('smarty_function_eval') && (!defined('SMARTY_DIR') || !file_exists(SMARTY_DIR . '/plugins/function.eval.php'))) {
+        if (!empty($templateVars)) {
+          $templateString = (string) $smarty->fetchWith('eval:' . $templateString, $templateVars);
+        }
+        else {
+          $templateString = (string) $smarty->fetch('eval:' . $templateString);
+        }
+      }
+      else {
+        if (!empty($templateVars)) {
+          $templateString = (string) $smarty->fetchWith('string:{eval var=$smartySingleUseString|smarty:nodefaults}', $templateVars);
+        }
+        else {
+          $templateString = (string) $smarty->fetch('string:{eval var=$smartySingleUseString|smarty:nodefaults}');
+        }
+      }
+    }
+    catch (Exception $e) {
+      \Civi::log('smarty')->info('parsing smarty template {template}', [
+        'template' => $templateString,
+      ]);
+      throw new \CRM_Core_Exception('Message was not parsed due to invalid smarty syntax : ' . $e->getMessage() . ((CIVICRM_UF === 'UnitTest' || CRM_Utils_Constant::value('SMARTY_DEBUG_STRINGS')) ? $templateString : ''));
+    }
+    finally {
+      $smarty->caching = $cachingValue;
+      $smarty->assign('smartySingleUseString');
+      restore_error_handler();
+      if ($useSecurityPolicy) {
+        // $smarty->disableSecurity();
+        Civi::service('civi.smarty.userContent')->disable();
+      }
+    }
     return $templateString;
+  }
+
+  /**
+   * Parse a string for SearchKit-style [square_bracket] tokens.
+   * @internal
+   * @param string $raw
+   * @return array
+   */
+  public static function getSquareTokens(string $raw): array {
+    $matches = $tokens = [];
+    if (str_contains($raw, '[')) {
+      preg_match_all('/\\[([^]]+)\\]/', $raw, $matches);
+      foreach (array_unique($matches[1]) as $match) {
+        [$field, $suffix] = array_pad(explode(':', $match), 2, NULL);
+        $tokens[$match] = [
+          'token' => "[$match]",
+          'field' => $field,
+          'suffix' => $suffix,
+        ];
+      }
+    }
+    return $tokens;
   }
 
 }

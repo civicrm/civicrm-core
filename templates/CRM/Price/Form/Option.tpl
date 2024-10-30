@@ -28,11 +28,11 @@
         </tr>
       {/if}
       <tr class="crm-price-option-form-block-label">
-        <td class="label">{$form.label.label}</td>
+        <td class="label">{$form.label.label|smarty:nodefaults|purify}</td>
         <td>{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_price_field_value' field='label' id=$optionId}{/if}{$form.label.html}</td>
       </tr>
       <tr class="crm-price-option-form-block-amount">
-        <td class="label">{$form.amount.label}</td>
+        <td class="label">{$form.amount.label|smarty:nodefaults|purify}</td>
         <td>{$form.amount.html}</td>
       </tr>
       <tr class="crm-price-option-form-block-non-deductible-amount">
@@ -44,17 +44,17 @@
         <td>{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_price_field_value' field='description' id=$optionId}{/if}{$form.description.html}</td>
       </tr>
       <tr class="crm-price-option-form-block-help-pre">
-        <td class="label">{$form.help_pre.label}</td>
+        <td class="label">{$form.help_pre.label|smarty:nodefaults|purify}</td>
         <td>{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_price_field_value' field='help_pre' id=$optionId}{/if}{$form.help_pre.html}</td>
       </tr>
       <tr class="crm-price-option-form-block-help-post">
-        <td class="label">{$form.help_post.label}</td>
+        <td class="label">{$form.help_post.label|smarty:nodefaults|purify}</td>
         <td>{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_price_field_value' field='help_post' id=$optionId}{/if}{$form.help_post.html}</td>
       </tr>
       <tr class="crm-price-option-form-block-financial-type">
         <td class="label">{$form.financial_type_id.label}</td>
         <td>
-          {if !$financialType }
+          {if !$financialType}
             {capture assign=ftUrl}{crmURL p='civicrm/admin/financial/financialType' q="reset=1"}{/capture}
             {ts 1=$ftUrl}There are no financial types configured with a linked 'Revenue Account of' account. <a href='%1'>Click here</a> if you want to configure financial types for your site.{/ts}
           {else}
@@ -114,7 +114,7 @@
 
 
   <div class="crm-submit-buttons">
-    {include file="CRM/common/formButtons.tpl"}
+    {include file="CRM/common/formButtons.tpl" location=''}
   </div>
 
 </div>

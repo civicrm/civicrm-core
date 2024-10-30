@@ -17,19 +17,13 @@
 class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Core\HookInterface {
 
   /**
-   * Retrieve DB object and copy to defaults array.
-   *
-   * @param array $params
-   *   Array of criteria values.
-   * @param array $defaults
-   *   Array to be populated with found values.
-   *
-   * @return self|null
-   *   The DAO object, if found.
-   *
    * @deprecated
+   * @param array $params
+   * @param array $defaults
+   * @return self|null
    */
   public static function retrieve($params, &$defaults) {
+    CRM_Core_Error::deprecatedFunctionWarning('API');
     return self::commonRetrieve(self::class, $params, $defaults);
   }
 
@@ -42,28 +36,19 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Core\Ho
    * @return bool
    */
   public static function del($id) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     return (bool) static::deleteRecord(['id' => $id]);
   }
 
   /**
-   * Takes an associative array and creates a contact object.
-   *
-   * The function extract all the params it needs to initialize the create a
-   * contact object. the params array could contain additional unused name/value
-   * pairs
+   * @deprecated
    *
    * @param array $params
-   *   An array of name/value pairs.
-   *
-   * @return object
-   *   CRM_Core_DAO_Mapper object on success, otherwise NULL
+   * @return CRM_Core_DAO_Mapping
    */
   public static function add($params) {
-    $mapping = new CRM_Core_DAO_Mapping();
-    $mapping->copyValues($params);
-    $mapping->save();
-
-    return $mapping;
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
+    return self::writeRecord($params);
   }
 
   /**
@@ -403,7 +388,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Core\Ho
           foreach ([
             'componentPaymentField_total_amount' => ts('Total Amount'),
             'componentPaymentField_contribution_status' => ts('Contribution Status'),
-            'componentPaymentField_received_date' => ts('Date Received'),
+            'componentPaymentField_received_date' => ts('Contribution Date'),
             'componentPaymentField_payment_instrument' => ts('Payment Method'),
             'componentPaymentField_transaction_id' => ts('Transaction ID'),
           ] as $payField => $payTitle) {
@@ -498,14 +483,14 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Core\Ho
           $saveMappingFields['name'] = $v['4'] ?? NULL;
         }
 
-        if (is_numeric(CRM_Utils_Array::value('3', $v))) {
+        if (is_numeric($v['3'] ?? '')) {
           $locationTypeId = $v['3'] ?? NULL;
         }
-        elseif (is_numeric(CRM_Utils_Array::value('5', $v))) {
+        elseif (is_numeric($v['5'] ?? '')) {
           $locationTypeId = $v['5'] ?? NULL;
         }
 
-        if (is_numeric(CRM_Utils_Array::value('4', $v))) {
+        if (is_numeric($v['4'] ?? '')) {
           if ($saveMappingFields['name'] === 'im') {
             $saveMappingFields['im_provider_id'] = $v[4];
           }
@@ -513,7 +498,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Core\Ho
             $saveMappingFields['phone_type_id'] = $v['4'] ?? NULL;
           }
         }
-        elseif (is_numeric(CRM_Utils_Array::value('6', $v))) {
+        elseif (is_numeric($v['6'] ?? '')) {
           $saveMappingFields['phone_type_id'] = $v['6'] ?? NULL;
         }
 
@@ -547,15 +532,16 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Core\Ho
   }
 
   /**
-   * Function returns all  Custom group Names.
+   * Unused function.
+   * @deprecated since 5.71 will be removed around 5.85.
    *
-   * @param int $customfieldId
-   *   Related file id.
+   * @param string $customfieldId
    *
    * @return null|string
    *   $customGroupName all custom group names
    */
   public static function getCustomGroupName($customfieldId) {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_BAO_CustomField::getField');
     if ($customFieldId = CRM_Core_BAO_CustomField::getKeyID($customfieldId)) {
       $customGroupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $customFieldId, 'custom_group_id');
       $customGroupName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroupId, 'title');
@@ -621,7 +607,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Core\Ho
           }
 
           // CRM-14983: verify if values are comma separated convert to array
-          if (!is_array($value) && strstr($params['operator'][$key][$k], 'IN')) {
+          if (!is_array($value) && str_contains($params['operator'][$key][$k], 'IN')) {
             $value = explode(',', $value);
             $value = [$params['operator'][$key][$k] => $value];
           }
@@ -799,6 +785,13 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Core\Ho
       \Civi\Api4\MappingField::delete(FALSE)
         ->addWhere('relationship_type_id', '=', $event->id)
         ->execute();
+    }
+    if ($event->action === 'create' && $event->entity === 'Mapping') {
+      if (CRM_Utils_System::isNull($event->params['name'] ?? NULL)) {
+        CRM_Core_Error::deprecatedWarning('Creating a mapping with no name is deprecated.');
+        $id = 1 + CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_mapping');
+        $event->params['name'] = "mapping_$id";
+      }
     }
   }
 

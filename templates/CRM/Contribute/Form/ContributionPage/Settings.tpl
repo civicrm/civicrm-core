@@ -18,43 +18,39 @@
     {/if}
 </div>
 <div class="crm-block crm-form-block crm-contribution-contributionpage-settings-form-block">
-
-    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-  <table class="form-layout-compressed">
-  <tr class="crm-contribution-contributionpage-settings-form-block-title"><td class="label">{$form.title.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='title' id=$contributionPageID}{/if}</td><td>{$form.title.html}<br/>
-            <span class="description">{ts}This title will be displayed at the top of the page unless the frontend title field is filled out.<br />Please use only alphanumeric, spaces, hyphens and dashes for Title.{/ts}</span></td>
-  </tr>
-  <tr class="crm-contribution-contributionpage-settings-form-block-frontend-title"><td class="label">{$form.contribution_page_frontend_title.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='frontend_title' id=$contributionPageID}{/if}</td><td>{$form.contribution_page_frontend_title.html}<br/>
-            <span class="description">{ts}This title will be displayed at the top of the page.<br />Please use only alphanumeric, spaces, hyphens and dashes for Title.{/ts}</span></td>
-  </tr>
-  <tr class="crm-contribution-contributionpage-settings-form-block-financial_type_id"><td class="label">{$form.financial_type_id.label}</td><td>{$form.financial_type_id.html}<br />
-            <span class="description">{ts}Select the corresponding financial type for contributions made using this page.{/ts}</span> {help id="id-financial_type"}</td>
-  </tr>
+    <table class="form-layout-compressed">
+      <tr class="crm-contribution-contributionpage-settings-form-block-frontend-title">
+        <td class="label">{$form.frontend_title.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='frontend_title' id=$contributionPageID}{/if}</td>
+        <td>{$form.frontend_title.html}</td>
+      </tr>
+      <tr class="crm-contribution-contributionpage-settings-form-block-title">
+        <td class="label">{$form.title.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='title' id=$contributionPageID}{/if}</td>
+        <td>{$form.title.html}</td>
+      </tr>
+        <tr class="crm-contribution-contributionpage-settings-form-block-financial_type_id">
+            <td class="label">{$form.financial_type_id.label} {help id="id-financial_type"}</td>
+            <td>{$form.financial_type_id.html}</td>
+        </tr>
 
   {* CRM-7362 --add campaign to contribution page *}
   {include file="CRM/Campaign/Form/addCampaignToComponent.tpl"
   campaignTrClass="crm-contribution-contributionpage-settings-form-block-campaign_id"}
 
-  <tr class="crm-contribution-contributionpage-settings-form-block-is_organization"><td>&nbsp;</td><td>{$form.is_organization.html} {$form.is_organization.label} {help id="id-is_organization"}</td></tr>
+  <tr class="crm-contribution-contributionpage-settings-form-block-is_organization">
+      <td>&nbsp;</td>
+      <td>{$form.is_organization.html} {$form.is_organization.label} {help id="id-is_organization"}</td>
+  </tr>
   <tr id="for_org_option" class="crm-contribution-form-block-is_organization">
         <td>&nbsp;</td>
         <td>
             <table class="form-layout-compressed">
-            <tr class="crm-contribution-for_organization_help">
-                <td class="description" colspan="2">
-                    {capture assign="profileURL"}{crmURL p='civicrm/admin/uf/group' q='reset=1'}{/capture}
-                    {ts 1=$profileURL}To change the organization data collected use the "On Behalf Of Organization" profile (<a href="%1">Administer > Customize Data and Screens > Profiles</a>).{/ts}
-                </td>
-            </tr>
             <tr class="crm-contribution-onbehalf_profile_id">
               <td class="label">{$form.onbehalf_profile_id.label}</td>
               <td>{$form.onbehalf_profile_id.html}</td>
             </tr>
             <tr id="for_org_text" class="crm-contribution-contributionpage-settings-form-block-for_organization">
-                <td class="label">{$form.for_organization.label}</td>
-                <td>{$form.for_organization.html}<br />
-                    <span class="description">{ts}Text displayed next to the checkbox on the contribution form.{/ts}</span>
-                </td>
+                <td class="label">{$form.for_organization.label} {help id="id-for_organization"}</td>
+                <td>{$form.for_organization.html}</td>
             </tr>
             <tr class="crm-contribution-contributionpage-settings-form-block-is_for_organization">
                 <td>&nbsp;</td>
@@ -83,52 +79,35 @@
       <td>{$form.end_date.html}</td>
     </tr>
   <tr class="crm-contribution-contributionpage-settings-form-block-honor_block_is_active">
-      <td>&nbsp;</td><td>{$form.honor_block_is_active.html}{$form.honor_block_is_active.label} {help id="id-honoree_section"}</td>
+      <td class ="label">{$form.honor_block_is_active.label} {help id="id-honoree_section"}</td>
+      <td>{$form.honor_block_is_active.html}</td>
   </tr>
 </table>
 <table class="form-layout-compressed" id="honor">
     <tr class="crm-contribution-contributionpage-settings-form-block-honor_block_title">
-        <td class="label">
-            {$form.honor_block_title.label}
-       </td>
-       <td>
-           {$form.honor_block_title.html}<br />
-           <span class="description">{ts}Title for the Honoree section (e.g. &quot;Honoree Information&quot;).{/ts}</span>
-       </td>
+        <td class="label">{$form.honor_block_title.label}</td>
+       <td>{$form.honor_block_title.html}</td>
    </tr>
    <tr class="crm-contribution-contributionpage-settings-form-block-honor_block_text">
        <td class="label">
            {crmAPI var='result' entity='OptionGroup' action='get' sequential=1 name='soft_credit_type'}
-           {$form.honor_block_text.label}
+           {$form.honor_block_text.label} {help id="id-honor_block_text"}
        </td>
-       <td>
-           {$form.honor_block_text.html}<br />
-           <span class="description">{ts}Optional explanatory text for the Honoree section (displayed above the Honoree fields).{/ts}</span>
-       </td>
+       <td>{$form.honor_block_text.html}</td>
   </tr>
   <tr class="crm-contribution-contributionpage-settings-form-block-honor_soft_credit_types">
-      <td class="label">
-          {$form.soft_credit_types.label}
-      </td>
-      <td>
-        {$form.soft_credit_types.html}
-      </td>
+      <td class="label">{$form.soft_credit_types.label}</td>
+      <td>{$form.soft_credit_types.html}</td>
   </tr>
   <tr class="crm-contribution-contributionpage-custom-form-block-custom_pre_id">
-      <td class="label">
-          {$form.honoree_profile.label}
-      </td>
-      <td class="html-adjust">
-          {$form.honoree_profile.html}
-          <span class="description">{ts}Profile to be included in the honoree section{/ts}</span>
-      </td>
+      <td class="label">{$form.honoree_profile.label}</td>
+      <td class="html-adjust">{$form.honoree_profile.html}</td>
    </tr>
 </table>
 <table class="form-layout-compressed">
         <tr class="crm-contribution-contributionpage-settings-form-block-is_confirm_enabled">
         <td>&nbsp;</td>
-        <td>{$form.is_confirm_enabled.html} {$form.is_confirm_enabled.label}<br />
-        <span class="description">{ts}If you disable this contributions will be processed immediately after submitting the contribution form.{/ts}</span></td>
+        <td>{$form.is_confirm_enabled.html} {$form.is_confirm_enabled.label} {help id="id-is_confirm_enabled"}</td>
       </tr>
         <tr class="crm-contribution-contributionpage-settings-form-block-is_share">
         <td>&nbsp;</td>

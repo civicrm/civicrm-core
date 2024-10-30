@@ -15,7 +15,7 @@
 {strip}
 <table class="selector row-highlight">
     <thead class="sticky">
-        {if ! $single and $context eq 'Search' }
+        {if ! $single and $context eq 'Search'}
             <th scope="col" title="{ts}Select rows{/ts}">{$form.toggleSelect.html}</th>
         {/if}
             <th></th>
@@ -33,15 +33,15 @@
     {counter start=0 skip=1 print=false}
     {foreach from=$rows item=row}
         {cycle values="odd-row,even-row" assign=rowClass}
-        <tr id='rowid{$row.pledge_id}' class='{$rowClass} {if $row.pledge_status_name eq 'Overdue' } status-overdue{/if}'>
-            {if $context eq 'Search' }
+        <tr id='rowid{$row.pledge_id}' class='{$rowClass} {if $row.pledge_status_name eq 'Overdue'} status-overdue{/if}'>
+            {if $context eq 'Search'}
                 {assign var=cbName value=$row.checkbox}
                 <td>{$form.$cbName.html}</td>
             {/if}
             <td>
                 <a class="crm-expand-row" title="{ts}view payments{/ts}" href="{crmURL p='civicrm/pledge/payment' q="action=browse&context=`$context`&pledgeId=`$row.pledge_id`&cid=`$row.contact_id`"}"></a>
             </td>
-            {if ! $single }
+            {if ! $single}
                 <td>{$row.contact_type}</td>
                 <td>
                     <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}">{$row.sort_name}</a>
@@ -49,7 +49,7 @@
             {/if}
             <td class="right">{$row.pledge_amount|crmMoney:$row.pledge_currency}</td>
             <td class="right">{$row.pledge_total_paid|crmMoney:$row.pledge_currency}</td>
-            <td class="right">{$row.pledge_amount-$row.pledge_total_paid|crmMoney:$row.pledge_currency}</td>
+            <td class="right">{$row.pledge_balance_amount|crmMoney:$row.pledge_currency}</td>
             <td>{$row.pledge_financial_type}</td>
             <td>{$row.pledge_create_date|truncate:10:''|crmDate}</td>
             <td>{$row.pledge_next_pay_date|truncate:10:''|crmDate}</td>
@@ -60,7 +60,7 @@
     {/foreach}
 
     {* Dashboard only lists 10 most recent pledges. *}
-    {if $context EQ 'dashboard' and $limit and $pager->_totalItems GT $limit }
+    {if $context EQ 'dashboard' and $limit and $pager->_totalItems GT $limit}
         <tr class="even-row">
             <td colspan="10"><a href="{crmURL p='civicrm/pledge/search' q='reset=1'}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}Find more pledges{/ts}... </a></td>
         </tr>

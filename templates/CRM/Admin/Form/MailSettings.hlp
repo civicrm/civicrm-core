@@ -1,0 +1,30 @@
+{*
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
+*}
+
+{htxt id="is_non_case_email_skipped"}
+  <p>{ts}CiviCRM has functionality to file emails which contain the Case ID or Case Hash in the subject line in the format [case #1234] against a case record.{/ts}</p>
+  <p>{ts}Where the Case ID or Case Hash is not included CiviCRM will file the email against the contact record, by matching the email addresses on the email with any email addresses of Contact records in CiviCRM.{/ts}</p>
+  <p>{ts}Enabling this option will have CiviCRM skip any emails that do not have the Case ID or Case Hash so that the system will only process emails that can be placed on case records.{/ts}</p>
+  <p>{ts}Any emails that are not processed will be moved to the ignored folder.{/ts}</p>
+  <p>{ts}If email is skipped, no activities or contacts ("from"/"to"/"cc"/"bcc") will be created.{/ts}</p>
+{/htxt}
+
+{htxt id="is_contact_creation_disabled_if_no_match"}
+  <p>{ts}If this option is enabled, CiviCRM will not create new contacts ("from"/"to"/"cc"/"bcc") when filing emails.{/ts}</p>
+  <p>{ts}If the email subject contains a valid Case ID or Case hash, the email will be filed against the case.{/ts}</p>
+{/htxt}
+
+{htxt id="id-activity_type_id"}
+  {ts}The default activity type is Inbound Email, a special type that can only be edited by users with a specific permission to help prevent details of inbound emails from being changed, but you can also use your own activity type as well, bearing in mind that these activities can be edited as usual.{/ts}
+{/htxt}
+
+{htxt id="id-activity_source"}
+  {ts}An activity can only have one source contact, so if you choose a field that can have more than one email (To, CC or BCC), only the first email will be used.{/ts}
+{/htxt}

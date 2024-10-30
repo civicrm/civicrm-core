@@ -277,6 +277,10 @@ class CRM_Core_CodeGen_GenerateData {
 
   private $deceasedContactIds = [];
 
+  private $time;
+
+  private $relTypes;
+
   /*********************************
    * private methods
    * *******************************
@@ -1051,8 +1055,8 @@ class CRM_Core_CodeGen_GenerateData {
    * @return string
    */
   private function _individualEmail($contact, $domain = NULL) {
-    $first = $contact->first_name;
-    $last = $contact->last_name;
+    $first = $contact->first_name ?? ($this->probability(.5) ? $this->randomItem('male_name') : $this->randomItem('female_name'));
+    $last = $contact->last_name ?? $this->randomItem('last_name');
     $f = $first[0];
     $l = $last[0];
     $m = $contact->middle_name ? $contact->middle_name[0] . '.' : '';
@@ -1141,7 +1145,7 @@ class CRM_Core_CodeGen_GenerateData {
     // add the 3 groups first
     foreach ($this->sampleData['group'] as $groupName) {
       $group = new CRM_Contact_BAO_Group();
-      $group->name = $group->title = $groupName;
+      $group->name = $group->title = $group->frontend_title = $groupName;
       $group->group_type = "12";
       $group->visibility = 'Public Pages';
       $group->is_active = 1;
@@ -1253,7 +1257,7 @@ class CRM_Core_CodeGen_GenerateData {
       'name' => 'Advisory Board',
       'label' => 'Advisory Board',
     ])
-      ->execute()->first()['id'];
+      ->execute()->first()['value'];
     $advisoryGroupID = Group::get(FALSE)
       ->addWhere('name', '=', 'Advisory Board')
       ->execute()->first()['id'];
@@ -1270,7 +1274,7 @@ class CRM_Core_CodeGen_GenerateData {
       'name' => 'Advisory board access to volunteers',
       'entity_table' => 'civicrm_acl_role',
       'operation' => 'Edit',
-      'object_table' => 'civicrm_saved_search',
+      'object_table' => 'civicrm_group',
       'entity_id' => $roleID,
       'object_id' => $volunteerID,
     ])->execute();
@@ -1556,6 +1560,9 @@ VALUES
    * @return string
    */
   public static function repairDate($date) {
+    if ($date === NULL) {
+      return '';
+    }
     $dropArray = ['-' => '', ':' => '', ' ' => ''];
     return strtr($date, $dropArray);
   }
@@ -1665,7 +1672,7 @@ VALUES
 
     $this->_query($eventTemplates);
 
-    $ufJoinValues = $tellFriendValues = [];
+    $ufJoinValues = [];
     $profileID = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_uf_group WHERE name ='event_registration'");
 
     // grab id's for all events and event templates
@@ -1678,7 +1685,6 @@ SELECT  id
       if ($profileID) {
         $ufJoinValues[] = "( 1, 'CiviEvent', 'civicrm_event', {$template->id}, 1, {$profileID} )";
       }
-      $tellFriendValues[] = "( 'civicrm_event', {$template->id}, 'Tell A Friend', '<p>Help us spread the word about this event. Use the space below to personalize your email message - let your friends know why you''re attending. Then fill in the name(s) and email address(es) and click ''Send Your Message''.</p>', 'Thought you might be interested in checking out this event. I''m planning on attending.', NULL, 'Thanks for Spreading the Word', '<p>Thanks for spreading the word about this event to your friends.</p>', 1)";
     }
 
     //insert values in civicrm_uf_join for the required event_registration profile - CRM-9587
@@ -1687,15 +1693,6 @@ SELECT  id
                                (is_active, module, entity_table, entity_id, weight, uf_group_id )
                                VALUES " . implode(',', $ufJoinValues);
       $this->_query($includeProfile);
-    }
-
-    //insert values in civicrm_tell_friend
-    if (!empty($tellFriendValues)) {
-      $tellFriend = "INSERT INTO civicrm_tell_friend
-                           (entity_table, entity_id, title, intro, suggested_message,
-                           general_link,  thankyou_title, thankyou_text, is_active)
-                           VALUES " . implode(',', $tellFriendValues);
-      $this->_query($tellFriend);
     }
   }
 
@@ -2181,7 +2178,7 @@ ORDER BY cc.id; ";
     $select = 'SELECT contribution.id contribution_id, cli.id as line_item_id, contribution.contact_id, contribution.receive_date, contribution.total_amount, contribution.currency, cli.label,
       cli.financial_type_id,  cefa.financial_account_id, contribution.payment_instrument_id, contribution.check_number, contribution.trxn_id';
     $where = 'WHERE cefa.account_relationship = 1';
-    $financialAccountId = CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount(4);
+    $financialAccountId = CRM_Financial_BAO_EntityFinancialAccount::getInstrumentFinancialAccount(4);
     foreach ($components as $component) {
       if ($component == 'contribution') {
         $from = 'FROM `civicrm_contribution` contribution';

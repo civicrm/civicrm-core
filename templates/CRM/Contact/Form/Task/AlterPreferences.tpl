@@ -8,11 +8,8 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-form-block crm-block crm-contact-task-addtodonot-form-block">
-<h3>
-{ts}Add 'Do Not...' Contact(s) Preferences{/ts}
-</h3>
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-<table class="form-layout-compressed">
+  <h3>{ts}Communication Preferences{/ts}</h3>
+  <table class="form-layout-compressed">
     <tr><td>{$form.actionTypeOption.html}</td></tr>
     <tr class="crm-contact-task-addtodonot-form-block-pref">
         <td>
@@ -25,8 +22,7 @@
             </div>
         </td>
     </tr>
-
     <tr><td>{include file="CRM/Contact/Form/Task.tpl"}</td></tr>
-</table>
-    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
+  </table>
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>

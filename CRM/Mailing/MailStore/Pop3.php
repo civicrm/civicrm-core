@@ -21,6 +21,20 @@
 class CRM_Mailing_MailStore_Pop3 extends CRM_Mailing_MailStore {
 
   /**
+   * Path to a local directory to store ignored emails
+   *
+   * @var string
+   */
+  private $_ignored;
+
+  /**
+   * Path to a local directory to store ignored emails
+   *
+   * @var string
+   */
+  private $_processed;
+
+  /**
    * Connect to the supplied POP3 server and make sure the two mail dirs exist
    *
    * @param string $host

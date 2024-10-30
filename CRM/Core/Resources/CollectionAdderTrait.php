@@ -62,6 +62,79 @@ trait CRM_Core_Resources_CollectionAdderTrait {
   }
 
   /**
+   * Add an ECMAScript module (ESM) to the current page (<SCRIPT TYPE=MODULE>).
+   *
+   * Ex: addModule('alert("Hello world");', ['weight' => 123]);
+   *
+   * @param string $code
+   *   JavaScript source code.
+   * @param array $options
+   *   Open-ended list of key-value options. See CollectionInterface docs.
+   *   Positional equivalence: addModule(string $code, int $weight, string $region).
+   * @return static
+   * @see CRM_Core_Resources_CollectionInterface
+   * @see CRM_Core_Resources_CollectionAdderInterface::addModule()
+   */
+  public function addModule(string $code, ...$options) {
+    $this->add(self::mergeStandardOptions($options, [
+      'esm' => TRUE,
+      'script' => $code,
+    ]));
+    return $this;
+  }
+
+  /**
+   * Add an ECMAScript Module (ESM) from file to the current page (<SCRIPT TYPE=MODULE SRC=...>).
+   *
+   * Ex: addModuleFile('myextension', 'myscript.js', ['weight' => 123]);
+   *
+   * @param string $ext
+   *   Extension name; use 'civicrm' for core.
+   * @param string $file
+   *   File path -- relative to the extension base dir.
+   * @param array $options
+   *   Open-ended list of key-value options. See CollectionInterface docs.
+   *   Positional equivalence: addModuleFile(string $code, int $weight, string $region, mixed $translate).
+   * @return static
+   * @see CRM_Core_Resources_CollectionInterface
+   * @see CRM_Core_Resources_CollectionAdderInterface::addModuleFile()
+   */
+  public function addModuleFile(string $ext, string $file, ...$options) {
+    $this->add(self::mergeStandardOptions($options, [
+      'esm' => TRUE,
+      'scriptFile' => [$ext, $file],
+      'name' => "$ext:$file",
+      // Setting the name above may appear superfluous, but it preserves a historical quirk
+      // where Region::add() and Resources::addScriptFile() produce slightly different orderings.
+    ]));
+    return $this;
+  }
+
+  /**
+   * Add an ECMAScript Module (ESM) by URL to the current page (<SCRIPT TYPE=MODULE SRC=...>).
+   *
+   * Ex: addModuleUrl('http://example.com/foo.js', ['weight' => 123])
+   *
+   * @param string $url
+   * @param array $options
+   *   Open-ended list of key-value options. See CollectionInterface docs.
+   *   Positional equivalence: addModuleUrl(string $url, int $weight, string $region).
+   * @return static
+   * @see CRM_Core_Resources_CollectionInterface
+   * @see CRM_Core_Resources_CollectionAdderInterface::addModuleUrl()
+   */
+  public function addModuleUrl(string $url, ...$options) {
+    $this->add(self::mergeStandardOptions($options, [
+      'esm' => TRUE,
+      'scriptUrl' => $url,
+      'name' => $url,
+      // Setting the name above may appear superfluous, but it preserves a historical quirk
+      // where Region::add() and Resources::addScriptUrl() produce slightly different orderings.
+    ]));
+    return $this;
+  }
+
+  /**
    * Export permission data to the client to enable smarter GUIs.
    *
    * @param string|iterable $permNames
@@ -187,7 +260,7 @@ trait CRM_Core_Resources_CollectionAdderTrait {
     // TODO: Maybe this should be its own resource type to allow smarter management?
 
     foreach ((array) $text as $str) {
-      $translated = ts($str, [
+      $translated = _ts($str, [
         'domain' => ($domain == 'civicrm') ? NULL : [$domain, NULL],
         'raw' => TRUE,
       ]);

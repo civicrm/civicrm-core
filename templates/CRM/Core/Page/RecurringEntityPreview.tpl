@@ -29,6 +29,7 @@
         {/foreach}
       {/foreach}
     </tbody>
+  </table>
 {/if}
 
 <h3>

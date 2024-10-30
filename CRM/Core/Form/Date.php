@@ -11,6 +11,8 @@
 
 /**
  *
+ * @deprecated since 5.69 will be removed around 5.79
+ *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
@@ -18,17 +20,21 @@ class CRM_Core_Form_Date {
 
   /**
    * Various Date Formats.
+   *
+   * @deprecated since 5.69 will be removed around 5.79
    */
   const DATE_yyyy_mm_dd = 1, DATE_mm_dd_yy = 2, DATE_mm_dd_yyyy = 4, DATE_Month_dd_yyyy = 8, DATE_dd_mon_yy = 16, DATE_dd_mm_yyyy = 32;
 
   /**
    * Build the date-format form.
    *
+   * @deprecated since 5.69 will be removed around 5.79
+   *
    * @param CRM_Core_Form $form
    *   The form object that we are operating on.
    */
   public static function buildAllowedDateFormats(&$form) {
-
+    CRM_Core_Error::deprecatedFunctionWarning('function & entire class will be removed');
     $dateOptions = [];
 
     if (CRM_Utils_System::getClassName($form) == 'CRM_Activity_Import_Form_DataSource') {
@@ -50,51 +56,9 @@ class CRM_Core_Form_Date {
   }
 
   /**
-   * Retrieve the date range - relative or absolute and assign it to the form.
-   *
-   * @deprecated
-   *
-   * @param CRM_Core_Form $form
-   *   The form the dates should be added to.
-   * @param string $fieldName
-   * @param int $count
-   * @param string $from
-   * @param string $to
-   * @param string $fromLabel
-   * @param bool $required
-   * @param array $operators
-   *   Additional value pairs to add.
-   * @param string $dateFormat
-   * @param bool|string $displayTime
-   * @param array $attributes
-   */
-  public static function buildDateRange(
-    &$form, $fieldName, $count = 1,
-    $from = '_from', $to = '_to', $fromLabel = 'From:',
-    $required = FALSE, $operators = [],
-    $dateFormat = 'searchDate', $displayTime = FALSE,
-    $attributes = ['class' => 'crm-select2']
-  ) {
-    CRM_Core_Error::deprecatedFunctionWarning('function will be removed');
-    $selector
-      = CRM_Core_Form_Date::returnDateRangeSelector(
-        $form, $fieldName, $count,
-        $from, $to, $fromLabel,
-        $required, $operators,
-        $dateFormat, $displayTime
-      );
-    CRM_Core_Form_Date::addDateRangeToForm(
-      $form, $fieldName, $selector,
-      $from, $to, $fromLabel,
-      $required, $dateFormat, $displayTime,
-      $attributes
-    );
-  }
-
-  /**
    * Build the date range array that will provide the form option values.
    *
-   * @deprecated
+   * @deprecated since 5.28 will be removed around 5.79
    *
    * It can be - relative or absolute.
    *
@@ -120,7 +84,7 @@ class CRM_Core_Form_Date {
     $required = FALSE, $operators = [],
     $dateFormat = 'searchDate', $displayTime = FALSE
   ) {
-    CRM_Core_Error::deprecatedFunctionWarning('function will be removed');
+    CRM_Core_Error::deprecatedFunctionWarning('function has been deprecated since 5.28 & will be removed around 5.79');
     $selector = [
       '' => ts('- any -'),
       0 => ts('Choose Date Range'),
@@ -145,7 +109,7 @@ class CRM_Core_Form_Date {
   /**
    * Build the date range - relative or absolute.
    *
-   * @deprecated
+   * @deprecated since 5.28 will be removed around 5.79
    *
    * @param CRM_Core_Form $form
    *   The form object that we are operating on.
@@ -173,7 +137,7 @@ class CRM_Core_Form_Date {
     $displayTime,
     $attributes
   ) {
-    CRM_Core_Error::deprecatedFunctionWarning('function will be removed');
+    CRM_Core_Error::deprecatedFunctionWarning('function has been deprecated since 5.28 & will be removed around 5.79');
     $form->add('select',
       "{$fieldName}_relative",
       ts('Relative Date Range'),

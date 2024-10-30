@@ -26,8 +26,18 @@ a.af-api4-action-idle {
   width: 100%;
 }
 
+.afform-directive,
 af-form {
   display: block;
+  position: relative;
+}
+
+#bootstrap-theme .input-group .crm-af-field {
+  display: inline-block;
+}
+
+#bootstrap-theme .input-group .afform-search-operator {
+  width: 6rem;
 }
 
 [af-repeat-item] {
@@ -38,23 +48,6 @@ af-form {
   position: absolute;
   top: 0;
   right: 0;
-}
-
-/* Collapsible containers */
-.af-collapsible > .af-title {
-  cursor: pointer;
-}
-.af-collapsible > .af-title:before {
-  font-family: "FontAwesome";
-  display: inline-block;
-  width: 1em;
-  content: "\f0d7";
-}
-.af-collapsible.af-collapsed > .af-title:before {
-  content: "\f0da";
-}
-.af-collapsible.af-collapsed > .af-title ~ * {
-  display: none !important;
 }
 
 /* Card style */
@@ -77,6 +70,15 @@ af-form {
   margin-top: 0;
   margin-bottom: 10px;
 }
-#bootstrap-theme .af-container-style-pane.af-collapsed > .af-title {
-  margin-bottom: 0;
+
+/* Admin edit links */
+.afform-directive .af-admin-edit-form-link {
+  position: absolute !important;
+  right: 0;
+  top: 0;
+  opacity: .5;
+}
+.afform-directive .af-admin-edit-form-link.open,
+.afform-directive:hover .af-admin-edit-form-link {
+  opacity: 1;
 }

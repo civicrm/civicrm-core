@@ -99,7 +99,7 @@ class ErrorTest extends \CiviEndToEndTestCase {
       'Backdrop' => '/href=.*user\/(login|register)/',
       'Drupal' => '/href=.*user\/register/',
       'Drupal8' => '/href=.*user\/(login|register)/',
-      'WordPress' => '/( role=.navigation.| class=.site-header.)/',
+      'WordPress' => '/( role=.navigation.| class=.site-header.| class=.page-template-default.)/',
     ];
     if (!isset($patterns[CIVICRM_UF])) {
       $this->markTestIncomplete('testErrorChrome() cannot check for chrome on ' . CIVICRM_UF);

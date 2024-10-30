@@ -10,9 +10,8 @@
 {* template to remove tags from contact  *}
 <div class="crm-form-block crm-block crm-contact-task-removefromtag-form-block">
   <h3>
-    {ts}Tag Contact(s) (Remove){/ts}
+    {ts}Remove Tags from Contacts{/ts}
   </h3>
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   <table class="form-layout-compressed">
     <tr class="crm-contact-task-removefromtag-form-block-tag">
       <td>

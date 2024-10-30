@@ -28,7 +28,12 @@ use Civi\Test\TransactionalInterface;
  */
 class DomainTest extends Api4TestBase implements TransactionalInterface {
 
-  public function testActiveDomain() {
+  /**
+   * Test active domain and domain_id.name parameters.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testActiveDomain(): void {
     Domain::create(FALSE)
       ->addValue('name', 'Not current')
       ->addValue('version', \CRM_Utils_System::version())

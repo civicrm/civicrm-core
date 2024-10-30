@@ -105,16 +105,13 @@ function civicrm_api3_membership_status_update($params) {
  * This API is used for deleting a membership status
  *
  * @param array $params
+ *
  * @return array
  * @throws CRM_Core_Exception
- * @throws CRM_Core_Exception
+ * @noinspection PhpUnused
  */
-function civicrm_api3_membership_status_delete($params) {
-
-  $memberStatusDelete = CRM_Member_BAO_MembershipStatus::del($params['id'], TRUE);
-  if ($memberStatusDelete) {
-    throw new CRM_Core_Exception($memberStatusDelete['error_message']);
-  }
+function civicrm_api3_membership_status_delete(array $params): array {
+  CRM_Member_BAO_MembershipStatus::deleteRecord($params);
   return civicrm_api3_create_success();
 }
 
@@ -132,7 +129,8 @@ function civicrm_api3_membership_status_delete($params) {
  *   Array of status id and status name
  */
 function civicrm_api3_membership_status_calc($membershipParams) {
-  if (!($membershipID = CRM_Utils_Array::value('membership_id', $membershipParams))) {
+  $membershipID = $membershipParams['membership_id'] ?? NULL;
+  if (!$membershipID) {
     throw new CRM_Core_Exception('membershipParams do not contain membership_id');
   }
 
@@ -150,7 +148,7 @@ SELECT start_date, end_date, join_date, membership_type_id
   $dao = CRM_Core_DAO::executeQuery($query, $params);
   if ($dao->fetch()) {
     $membershipTypeID = empty($membershipParams['membership_type_id']) ? $dao->membership_type_id : $membershipParams['membership_type_id'];
-    $result = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($dao->start_date, $dao->end_date, $dao->join_date, 'now', CRM_Utils_Array::value('ignore_admin_only', $membershipParams), $membershipTypeID, $membershipParams);
+    $result = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($dao->start_date, $dao->end_date, $dao->join_date, 'now', $membershipParams['ignore_admin_only'] ?? FALSE, $membershipTypeID, $membershipParams);
     //make is error zero only when valid status found.
     if (!empty($result['id'])) {
       $result['is_error'] = 0;

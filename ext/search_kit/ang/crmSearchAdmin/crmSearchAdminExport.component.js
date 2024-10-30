@@ -3,9 +3,7 @@
 
   angular.module('crmSearchAdmin').component('crmSearchAdminExport', {
     bindings: {
-      savedSearchId: '<',
-      savedSearchName: '<',
-      displayNames: '<'
+      savedSearch: '<'
     },
     templateUrl: '~/crmSearchAdmin/crmSearchAdminExport.html',
     controller: function ($scope, $element, crmApi4) {
@@ -20,22 +18,28 @@
       ];
 
       this.$onInit = function() {
-        this.apiExplorerLink = CRM.url('civicrm/api4#/explorer/SavedSearch/export?_format=php&id=' + ctrl.savedSearchId);
+        this.apiExplorerLink = CRM.url('civicrm/api4#/explorer/SavedSearch/export?_format=php&cleanup=always&id=' + ctrl.savedSearch.id);
+        this.simpleLink = CRM.url('civicrm/admin/search#/create/' + ctrl.savedSearch.api_entity + '?params=' + encodeURI(angular.toJson(ctrl.savedSearch.api_params)));
 
-        var findDisplays = _.transform(ctrl.displayNames, function(findDisplays, displayName) {
-          findDisplays.push(['search_displays', 'CONTAINS', ctrl.savedSearchName + '.' + displayName]);
-        }, [['search_displays', 'CONTAINS', ctrl.savedSearchName]]);
-        var apiCalls = [
-          ['SavedSearch', 'export', {id: ctrl.savedSearchId}],
+        let apiCalls = [
+          ['SavedSearch', 'export', {id: ctrl.savedSearch.id}],
         ];
         if (ctrl.afformEnabled) {
+          let findDisplays = [['search_displays', 'CONTAINS', ctrl.savedSearch.name]];
+          if (ctrl.savedSearch.display_name) {
+            ctrl.savedSearch.display_name.forEach(displayName => {
+              findDisplays.push(['search_displays', 'CONTAINS', `${ctrl.savedSearch.name}.${displayName}`]);
+            });
+          }
           apiCalls.push(['Afform', 'get', {layoutFormat: 'html', where: [['type', '=', 'search'], ['OR', findDisplays]]}]);
         }
         crmApi4(apiCalls)
           .then(function(result) {
             _.each(ctrl.types, function (type) {
-              type.values = _.pluck(_.pluck(_.where(result[0], {entity: type.entity}), 'params'), 'values');
-              type.enabled = !!type.values.length;
+              var params = _.pluck(_.where(result[0], {entity: type.entity}), 'params');
+              type.values = _.pluck(params, 'values');
+              type.match = params[0] && params[0].match;
+              type.enabled = !!params.length;
             });
             // Afforms are not included in the export and are fetched separately
             if (ctrl.afformEnabled) {
@@ -50,10 +54,8 @@
         _.each(ctrl.types, function(type) {
           if (type.enabled) {
             var params = {records: type.values};
-            // Afform always matches on 'name', no need to add it to the API 'save' params
-            if (type.entity !== 'Afform') {
-              // Group and SavedSearch match by 'name', SearchDisplay also matches by 'saved_search_id'.
-              params.match = type.entity === 'SearchDisplay' ? ['name', 'saved_search_id'] : ['name'];
+            if (type.match && type.match.length) {
+              params.match = type.match;
             }
             data.push([type.entity, 'save', params]);
           }

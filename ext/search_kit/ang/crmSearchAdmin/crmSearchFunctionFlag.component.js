@@ -5,6 +5,7 @@
     bindings: {
       arg: '<',
       param: '<',
+      flag: '@',
       writeExpr: '&'
     },
     templateUrl: '~/crmSearchAdmin/crmSearchFunctionFlag.html',
@@ -12,13 +13,13 @@
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
 
-      this.$onInit = function() {
-        if (!ctrl.param || !ctrl.param.flag_before) {
-          this.widget = null;
-        } else if (_.keys(ctrl.param.flag_before).length === 2 && '' in ctrl.param.flag_before) {
-          this.widget = 'checkbox';
+      this.getWidget = function() {
+        if (!ctrl.param || !ctrl.param[ctrl.flag]) {
+          return null;
+        } else if (_.keys(ctrl.param[ctrl.flag]).length === 2 && '' in ctrl.param[ctrl.flag]) {
+          return 'checkbox';
         } else {
-          this.widget = 'select';
+          return 'select';
         }
       };
     }

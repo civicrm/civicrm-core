@@ -34,10 +34,10 @@ class CRM_UF_Form_AdvanceSetting extends CRM_UF_Form_Group {
     // should we allow updates on a exisitng contact
     $form->addRadio('is_update_dupe', ts('What to do upon duplicate match'), [ts('Issue warning and do not save'), ts('Update the matching contact'), ts('Allow duplicate contact to be created')]);
     // we do not have any url checks to allow relative urls
-    $form->addElement('text', 'post_URL', ts('Redirect URL'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFGroup', 'post_URL'));
+    $form->addElement('text', 'post_url', ts('Redirect URL'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFGroup', 'post_url'));
 
     $form->add('advcheckbox', 'add_cancel_button', ts('Include Cancel Button?'));
-    $form->addElement('text', 'cancel_URL', ts('Cancel Redirect URL'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFGroup', 'cancel_URL'));
+    $form->addElement('text', 'cancel_url', ts('Cancel Redirect URL'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFGroup', 'cancel_url'));
 
     // add select for groups
     $group = ['' => ts('- select -')] + $form->_group;
@@ -58,13 +58,6 @@ class CRM_UF_Form_AdvanceSetting extends CRM_UF_Form_Group {
     // should we display a link to the website profile
     $config = CRM_Core_Config::singleton();
     $form->addElement('advcheckbox', 'is_uf_link', ts('Include %1 user account information links in search results?', [1 => $config->userFramework]));
-
-    // want to create cms user
-    $session = CRM_Core_Session::singleton();
-    $cmsId = FALSE;
-    if ($form->_cId = $session->get('userID')) {
-      $form->_cmsId = TRUE;
-    }
 
     $form->addRadio('is_cms_user', ts('%1 user account registration option?', [1 => $config->userFramework]), [ts('No account create option'), ts('Give option, but not required'), ts('Account creation required')]);
 

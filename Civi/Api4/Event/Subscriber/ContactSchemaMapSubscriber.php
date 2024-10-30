@@ -2,7 +2,6 @@
 
 namespace Civi\Api4\Event\Subscriber;
 
-use Civi\Api4\Event\Events;
 use Civi\Api4\Event\SchemaMapBuildEvent;
 use Civi\Api4\Service\Schema\Joinable\Joinable;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -17,7 +16,7 @@ class ContactSchemaMapSubscriber extends \Civi\Core\Service\AutoService implemen
    */
   public static function getSubscribedEvents() {
     return [
-      Events::SCHEMA_MAP_BUILD => 'onSchemaBuild',
+      'api.schema_map.build' => 'onSchemaBuild',
     ];
   }
 

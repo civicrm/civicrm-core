@@ -20,7 +20,7 @@
         var tabId = ui.newTab.attr('id');
         if (tabId && tabId.length) {
           tabId = tabId.slice(4); // Remove leading 'tab_'
-          history.replaceState(null, '', updateUrlParameter('selectedChild', tabId));
+          updateUrlParameter('selectedChild', tabId);
         }
       })
       .on('tabsbeforeload', function(e, ui) {
@@ -123,6 +123,9 @@
    * @param count {Number}
    */
   CRM.tabHeader.updateCount = function(tab, count) {
+    if (typeof count === 'boolean') {
+      return;
+    }
     var oldClass = getCountClass(tab);
     if (oldClass) {
       $(tab).removeClass(oldClass);

@@ -33,7 +33,7 @@ class CRM_Export_StateMachine_Standalone extends CRM_Core_StateMachine {
       'CRM_' . $entity . '_Export_Form_Map' => NULL,
     ];
 
-    $this->addSequentialPages($this->_pages, $action);
+    $this->addSequentialPages($this->_pages);
   }
 
   /**

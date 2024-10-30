@@ -139,10 +139,14 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
             'name' => 'sort_name',
             'title' => ts('Soft Credit Name'),
           ],
+          'id_creditor' => [
+            'name' => 'id',
+            'title' => ts('Soft Credit Contact ID'),
+          ],
           'gender_id' => [
             'title' => ts('Gender'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'),
+            'options' => CRM_Contact_DAO_Contact::buildOptions('gender_id'),
           ],
           'birth_date' => [
             'title' => ts('Birth Date'),
@@ -308,11 +312,7 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
     parent::__construct();
   }
 
-  public function preProcess() {
-    parent::preProcess();
-  }
-
-  public function select() {
+  public function select(): void {
     $select = [];
     $this->_columnHeaders = [];
     foreach ($this->_columns as $tableName => $table) {
@@ -376,24 +376,12 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
         }
       }
     }
-    $this->selectClause = $select;
+    $this->_selectClauses = $select;
 
     $this->_select = 'SELECT ' . implode(', ', $select) . ' ';
   }
 
-  /**
-   * @param array $fields
-   * @param array $files
-   * @param CRM_Core_Form $self
-   *
-   * @return array
-   */
-  public static function formRule($fields, $files, $self) {
-    $errors = $grouping = [];
-    return $errors;
-  }
-
-  public function from() {
+  public function from(): void {
     $alias_constituent = 'constituentname';
     $alias_creditor = 'contact_civireport';
     $this->_from = "
@@ -457,7 +445,7 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
 
   public function groupBy() {
     $this->_rollup = 'WITH ROLLUP';
-    $this->_select = CRM_Contact_BAO_Query::appendAnyValueToSelect($this->selectClause, ["{$this->_aliases['civicrm_contribution_soft']}.contact_id", "constituentname.id"]);
+    $this->_select = CRM_Contact_BAO_Query::appendAnyValueToSelect($this->_selectClauses, ["{$this->_aliases['civicrm_contribution_soft']}.contact_id", "constituentname.id"]);
     $this->_groupBy = "
 GROUP BY {$this->_aliases['civicrm_contribution_soft']}.contact_id, constituentname.id {$this->_rollup}";
   }

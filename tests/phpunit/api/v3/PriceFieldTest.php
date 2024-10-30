@@ -78,7 +78,7 @@ class api_v3_PriceFieldTest extends CiviUnitTestCase {
    */
   public function testCreatePriceField(int $version) {
     $this->_apiversion = $version;
-    $result = $this->callAPIAndDocument($this->_entity, 'create', $this->_params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->getAndCheck($this->_params, $result['id'], $this->_entity);
@@ -101,7 +101,7 @@ class api_v3_PriceFieldTest extends CiviUnitTestCase {
     $getParams = [
       'name' => 'contribution_amount',
     ];
-    $getResult = $this->callAPIAndDocument($this->_entity, 'get', $getParams, __FUNCTION__, __FILE__);
+    $getResult = $this->callAPISuccess($this->_entity, 'get', $getParams);
     $this->assertEquals(1, $getResult['count']);
     $this->callAPISuccess('price_field', 'delete', ['id' => $createResult['id']]);
   }
@@ -120,7 +120,7 @@ class api_v3_PriceFieldTest extends CiviUnitTestCase {
     $startCount = $this->callAPISuccess($this->_entity, 'getcount', []);
     $createResult = $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $deleteParams = ['id' => $createResult['id']];
-    $deleteResult = $this->callAPIAndDocument($this->_entity, 'delete', $deleteParams, __FUNCTION__, __FILE__);
+    $deleteResult = $this->callAPISuccess($this->_entity, 'delete', $deleteParams);
     $this->assertAPISuccess($deleteResult);
     $endCount = $this->callAPISuccess($this->_entity, 'getcount', []);
     $this->assertEquals($startCount, $endCount);

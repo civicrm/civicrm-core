@@ -8,23 +8,23 @@
     bindings: {
       row: '<',
       col: '<',
-      cancel: '&',
-      doSave: '&'
+      cancel: '&'
     },
     templateUrl: '~/crmSearchDisplay/crmSearchDisplayEditable.html',
-    controller: function($scope, $element, crmApi4) {
+    controller: function($scope, $element, crmApi4, crmStatus) {
       var ctrl = this,
         initialValue,
         col;
 
       this.$onInit = function() {
         col = this.col;
-        this.value = _.cloneDeep(col.edit.value);
-        initialValue = _.cloneDeep(col.edit.value);
+        this.value = _.cloneDeep(this.row.data[col.edit.value_path]);
+        initialValue = _.cloneDeep(this.row.data[col.edit.value_path]);
 
         this.field = {
           data_type: col.edit.data_type,
           input_type: col.edit.input_type,
+          entity: col.edit.entity,
           name: col.edit.value_key,
           options: col.edit.options,
           fk_entity: col.edit.fk_entity,
@@ -32,11 +32,12 @@
           nullable: col.edit.nullable
         };
 
-        $(document).on('keydown.crmSearchDisplayEditable', function(e) {
+        $(document).on('keydown.crmSearchDisplayEditable', (e) => {
           if (e.key === 'Escape') {
-            $scope.$apply(function() {
-              ctrl.cancel();
-            });
+            $scope.$apply(() => ctrl.cancel());
+          }
+          else if (e.key === 'Enter') {
+            $scope.$apply(() => ctrl.save());
           }
         });
 
@@ -50,15 +51,51 @@
       };
 
       this.save = function() {
-        if (ctrl.value === initialValue) {
-          ctrl.cancel();
-          return;
+        const value = formatDataType(ctrl.value);
+        if (value !== initialValue) {
+          col.edit.record[col.edit.value_key] = value;
+          crmStatus({}, crmApi4(col.edit.entity, col.edit.action, {values: col.edit.record}));
+          ctrl.row.data[col.edit.value_path] = value;
+          col.val = formatDisplayValue(value);
         }
-        var record = _.cloneDeep(col.edit.record);
-        record[col.edit.value_key] = ctrl.value;
-        $('input', $element).attr('disabled', true);
-        ctrl.doSave({apiCall: [col.edit.entity, col.edit.action, {values: record}]});
+        ctrl.cancel();
       };
+
+      function formatDataType(val) {
+        if (_.isArray(val)) {
+          const formatted = angular.copy(val);
+          formatted.forEach((v, i) => formatted[i] = formatDataType(v));
+          return formatted;
+        }
+        if (ctrl.field.data_type === 'Integer') {
+          return +val;
+        }
+        return val;
+      }
+
+      function formatDisplayValue(val) {
+        let displayValue = angular.copy(val);
+        if (_.isArray(displayValue)) {
+          displayValue.forEach((v, i) => displayValue[i] = formatDisplayValue(v));
+          return displayValue;
+        }
+        if (ctrl.field.options) {
+          ctrl.field.options.forEach((option) => {
+            if (('' + option.id) === ('' + val)) {
+              displayValue = option.label;
+            }
+          });
+        } else if (ctrl.field.data_type === 'Boolean' && val === true) {
+          displayValue = ts('Yes');
+        } else if (ctrl.field.data_type === 'Boolean' && val === false) {
+          displayValue = ts('No');
+        } else if (ctrl.field.data_type === 'Date' || ctrl.field.data_type === 'Timestamp') {
+          displayValue = CRM.utils.formatDate(val, null, ctrl.field.data_type === 'Timestamp');
+        } else if (ctrl.field.data_type === 'Money') {
+          displayValue = CRM.formatMoney(displayValue, false, col.edit.currency_format);
+        }
+        return displayValue;
+      }
 
       function loadOptions() {
         var cacheKey = col.edit.entity + ' ' + ctrl.field.name;

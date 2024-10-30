@@ -1,0 +1,15 @@
+Delivered-To: jjj@myorg.org
+Received: by 10.2.13.84 with SMTP id 1234567890;
+        Tue, 08 Aug 2023 10:01:11 +0100 (CET)
+Return-Path: <>
+Message-ID: <abc.def.fhi@test.test>
+Date: Tue, 08 Aug 2023 10:01:07 +0100
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+From: bad-email-placeholder
+To: jjj@myorg.org
+Subject: Subject
+
+Sample body for hook test.

@@ -9,11 +9,11 @@
 *}
 <div class="crm-content-block">
   <div class="help">
-    {ts 1=', '|implode:$usedFor}Tags are a convenient way to categorize data (%1).{/ts}
-    {if call_user_func(array('CRM_Core_Permission','check'), 'administer Tagsets')}
+    {ts 1=$usedForStr}Tags are a convenient way to categorize data (%1).{/ts}
+    {crmPermission has='administer Tagsets'}
       <br />
       {ts}Create predefined tags in the main tree, or click the <strong>+</strong> to add a set for free tagging.{/ts}
-    {/if}
+    {/crmPermission}
     {docURL page="user/organising-your-data/groups-and-tags"}
   </div>
 
@@ -23,15 +23,15 @@
         <a href="#tree"><i class="crm-i fa-tags" aria-hidden="true"></i> {ts}Tag Tree{/ts}</a>
       </li>
       {foreach from=$tagsets item=set}
-        <li class="ui-corner-all crm-tab-button {if ($set.is_reserved)}is-reserved{/if}" title="{ts 1=', '|implode:$set.used_for_label}Tag Set for %1{/ts}">
-          <a href="#tagset-{$set.id}">{$set.name}</a>
+        <li class="ui-corner-all crm-tab-button {if ($set.is_reserved)}is-reserved{/if}" title="{ts 1=$set.used_for_label_str}Tag Set for %1{/ts}">
+          <a href="#tagset-{$set.id}">{$set.label}</a>
         </li>
       {/foreach}
-      {if call_user_func(array('CRM_Core_Permission','check'), 'administer Tagsets')}
+      {crmPermission has='administer Tagsets'}
         <li class="ui-corner-all crm-tab-button" title="{ts}Add Tag Set{/ts}">
           <a href="#new-tagset"><i class="crm-i fa-plus" aria-hidden="true"></i></a>
         </li>
-      {/if}
+      {/crmPermission}
     </ul>
     <div id="tree">
       <div class="help">
@@ -164,7 +164,7 @@
 
         function updateTagset(info) {
           tagSets[tagset].description = info.description;
-          tagSets[tagset].name = info.name;
+          tagSets[tagset].label = info.label;
           tagSets[tagset].used_for = info.used_for;
           tagSets[tagset].is_reserved = info.is_reserved;
           formatTagSet(tagSets[tagset]);
@@ -175,7 +175,7 @@
         function addTagsetHeader() {
           $('.tagset-header', $panel).remove();
           $panel.prepend(tagsetHeaderTpl(tagSets[tagset]));
-          $("a[href='#tagset-" + tagset + "']").text(tagSets[tagset].name)
+          $("a[href='#tagset-" + tagset + "']").text(tagSets[tagset].label)
             .parent().toggleClass('is-reserved', tagSets[tagset].is_reserved == 1)
             .attr('title', ts('{/literal}{ts escape='js' 1='%1'}Tag Set for %1{/ts}{literal}', {'1': tagSets[tagset].used_for_label.join(', ')}));
         }
@@ -188,7 +188,7 @@
           e.preventDefault();
           var sets = [{key: '0', value: '{/literal}{ts escape='js'}Main Tag Tree{/ts}{literal}'}];
           _.each(tagSets, function(tagSet) {
-            sets.push({key: tagSet.id, value: tagSet.name});
+            sets.push({key: tagSet.id, value: tagSet.label});
           });
           CRM.confirm({
             title: '{/literal}{ts escape='js'}Move to Tagset{/ts}{literal}',
@@ -321,7 +321,7 @@
             tagSets[data.tag.id].display_name = user.display_name;
             formatTagSet(tagSets[data.tag.id]);
             $("#new-tagset").before('<div id="tagset-' + data.tag.id + '">');
-            $("a[href='#new-tagset']").parent().before('<li class="ui-corner-all crm-tab-button"><a href="#tagset-' + data.tag.id + '">' + data.tag.name + '</a></li>');
+            $("a[href='#new-tagset']").parent().before('<li class="ui-corner-all crm-tab-button"><a href="#tagset-' + data.tag.id + '">' + data.tag.label + '</a></li>');
             $('#mainTabContainer').tabs('refresh');
             $('#mainTabContainer').tabs('option', 'active', -2);
           });
@@ -410,14 +410,14 @@
   li.is-reserved > a:after {
     content: ' *';
   }
-  {/literal}{if !call_user_func(array('CRM_Core_Permission', 'check'), 'administer reserved tags')}{literal}
+  {/literal}{crmPermission not='administer reserved tags'}{literal}
     #tree li.is-reserved > a.crm-tag-item {
       cursor: not-allowed;
     }
     li.is-reserved > a:after {
       color: #8A1F11;
     }
-  {/literal}{/if}{literal}
+  {/literal}{/crmPermission}{literal}
   .tag-tree-wrapper ul {
     margin: 0;
     padding: 0;
@@ -482,7 +482,7 @@
   <div class="crm-entity" data-entity="Tag" data-id="<%= id %>">
     <h4>
       <input type="color" value="<%= data.color %>" <% if (!data.is_reserved || adminReserved) {ldelim} %>title="{ts}Select color{/ts}" <% {rdelim} else {ldelim} %>disabled<% {rdelim} %> />
-      <span class="<% if (!data.is_reserved || adminReserved) {ldelim} %>crm-editable<% {rdelim} %>" data-field="name"><%- text %></span>
+      <span class="<% if (!data.is_reserved || adminReserved) {ldelim} %>crm-editable<% {rdelim} %>" data-field="label"><%- text %></span>
     </h4>
     <hr />
     <div><span class="tdl">{ts}Description:{/ts}</span>

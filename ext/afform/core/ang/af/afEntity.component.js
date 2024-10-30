@@ -6,8 +6,7 @@
     data: '=',
     actions: '=',
     modelName: '@name',
-    label: '@',
-    autofill: '@'
+    label: '@'
   };
   // Example usage: <af-form><af-entity name="Person" type="Contact" /> ... <fieldset af-fieldset="Person"> ... </fieldset></af-form>
   angular.module('af').component('afEntity', {

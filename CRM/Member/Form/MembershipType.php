@@ -23,23 +23,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
 
   use CRM_Core_Form_EntityFormTrait;
 
-  /**
-   * Fields for the entity to be assigned to the template.
-   *
-   * Fields may have keys
-   *  - name (required to show in tpl from the array)
-   *  - description (optional, will appear below the field)
-   *  - not-auto-addable - this class will not attempt to add the field using addField.
-   *    (this will be automatically set if the field does not have html in it's metadata
-   *    or is not a core field on the form's entity).
-   *  - help (option) add help to the field - e.g ['id' => 'id-source', 'file' => 'CRM/Contact/Form/Contact']]
-   *  - template - use a field specific template to render this field
-   *  - required
-   *  - is_freeze (field should be frozen).
-   *
-   * @var array
-   */
-  protected $entityFields = [];
+  protected $submittableMoneyFields = ['minimum_fee'];
 
   /**
    * Set entity fields to be assigned to the form.
@@ -67,11 +51,13 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
       'financial_type_id' => [
         'name' => 'financial_type_id',
         'description' => ts('Select the financial type assigned to fees for this membership type (for example \'Membership Fees\'). This is required for all membership types - including free or complimentary memberships.'),
+        'required' => TRUE,
       ],
       'auto_renew' => [
         'name' => 'auto_renew',
         'options' => CRM_Core_SelectValues::memberAutoRenew(),
-        'place_holder' => ts('You will need to select and configure a supported payment processor (currently Authorize.Net, PayPal Pro, or PayPal Website Standard) in order to offer automatically renewing memberships.'),
+        // Note this doesn't get used currently because the template has its own code for this field. Note also the documentation link that you see in the template is added later here down below.
+        'description' => ts('You will need to select and configure a supported payment processor (currently Authorize.Net, PayPal Pro, or PayPal Website Standard) in order to offer automatically renewing memberships.'),
       ],
       'duration_interval' => [
         'name' => 'duration_interval',
@@ -91,13 +77,19 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
       'fixed_period_start_day' => [
         'name' => 'fixed_period_start_day',
         'description' => ts("Month and day on which a <strong>fixed</strong> period membership or subscription begins. Example: A fixed period membership with Start Day set to Jan 01 means that membership periods would be 1/1/06 - 12/31/06 for anyone signing up during 2006."),
+        // Not relying on auto-add until we have checked out the options function.
+        'not-auto-addable' => TRUE,
       ],
       'fixed_period_rollover_day' => [
         'name' => 'fixed_period_rollover_day',
         'description' => ts('Membership signups on or after this date cover the following calendar year as well. Example: If the rollover day is November 30, membership period for signups during December will cover the following year.'),
+        // Not relying on auto-add until we have checked out the options function.
+        'not-auto-addable' => TRUE,
       ],
       'relationship_type_id' => [
         'name' => 'relationship_type_id',
+        // Not relying on auto-add until we have checked out the options function.
+        'not-auto-addable' => TRUE,
       ],
       'max_related' => [
         'name' => 'max_related',
@@ -117,16 +109,9 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
 
     if (!CRM_Financial_BAO_PaymentProcessor::hasPaymentProcessorSupporting(['Recurring'])) {
       $this->entityFields['auto_renew']['not-auto-addable'] = TRUE;
-      $this->entityFields['auto_renew']['documentation_link'] = ['page' => 'user/contributions/payment-processors'];
+      $this->entityFields['auto_renew']['documentation_link'] = ['page' => 'user/contributions/payment-processors', 'resource' => ''];
     }
   }
-
-  /**
-   * Deletion message to be assigned to the form.
-   *
-   * @var string
-   */
-  protected $deleteMessage;
 
   /**
    * Explicitly declare the entity api name.
@@ -266,9 +251,6 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
     $this->add('date', 'month_fixed_period_rollover_day', ts('Fixed Period Rollover Day'),
       CRM_Core_SelectValues::date(NULL, 'd'), FALSE
     );
-    $this->add('select', 'financial_type_id', ts('Financial Type'),
-      ['' => ts('- select -')] + CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, $this->_action), TRUE, ['class' => 'crm-select2']
-    );
 
     $relTypeInd = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, NULL, NULL, NULL, TRUE);
     if (is_array($relTypeInd)) {
@@ -283,17 +265,12 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $result = civicrm_api3("Membership", "get", ["membership_type_id" => $this->_id, "options" => ["limit" => 1]]);
       $membershipRecords = ($result["count"] > 0);
-      if ($membershipRecords) {
-        $memberRel->freeze();
-      }
     }
 
     $this->assign('membershipRecordsExists', $membershipRecords);
-
-    $this->addFormRule(['CRM_Member_Form_MembershipType', 'formRule']);
-
     $this->assign('membershipTypeId', $this->_id);
     $this->assign('deferredFinancialType', Civi::settings()->get('deferred_revenue_enabled') ? array_keys(CRM_Financial_BAO_FinancialAccount::getDeferredFinancialType()) : NULL);
+    $this->addFormRule(['CRM_Member_Form_MembershipType', 'formRule']);
   }
 
   /**
@@ -316,7 +293,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
       $errors['financial_type_id'] = ts('Please enter the financial Type.');
     }
 
-    if (empty($params['duration_interval']) and $params['duration_unit'] != 'lifetime') {
+    if (empty($params['duration_interval']) and $params['duration_unit'] !== 'lifetime') {
       $errors['duration_interval'] = ts('Please enter a duration interval.');
     }
 
@@ -324,15 +301,15 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
       1,
       2,
     ])) {
-      if (($params['duration_interval'] > 1 && $params['duration_unit'] == 'year') ||
-        ($params['duration_interval'] > 12 && $params['duration_unit'] == 'month')
+      if (($params['duration_interval'] > 1 && $params['duration_unit'] === 'year') ||
+        ($params['duration_interval'] > 12 && $params['duration_unit'] === 'month')
       ) {
         $errors['duration_unit'] = ts('Automatic renewals are not supported by the currently available payment processors when the membership duration is greater than 1 year / 12 months.');
       }
     }
 
-    if ($params['period_type'] == 'fixed' &&
-      $params['duration_unit'] == 'day'
+    if ($params['period_type'] === 'fixed' &&
+      $params['duration_unit'] === 'day'
     ) {
       $errors['period_type'] = ts('Period type should be Rolling when duration unit is Day');
     }
@@ -383,7 +360,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
       try {
-        CRM_Member_BAO_MembershipType::del($this->_id);
+        CRM_Member_BAO_MembershipType::deleteRecord(['id' => $this->_id]);
       }
       catch (CRM_Core_Exception $e) {
         CRM_Core_Error::statusBounce($e->getMessage(), NULL, ts('Membership Type Not Deleted'));
@@ -391,11 +368,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
       CRM_Core_Session::setStatus(ts('Selected membership type has been deleted.'), ts('Record Deleted'), 'success');
     }
     else {
-      $params = $this->exportValues();
-
-      if ($params['minimum_fee']) {
-        $params['minimum_fee'] = CRM_Utils_Rule::cleanMoney($params['minimum_fee']);
-      }
+      $params = $this->getSubmittedValues();
 
       $hasRelTypeVal = FALSE;
       if (!CRM_Utils_System::isNull($params['relationship_type_id'])) {

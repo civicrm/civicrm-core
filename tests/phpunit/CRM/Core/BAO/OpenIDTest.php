@@ -16,7 +16,7 @@ class CRM_Core_BAO_OpenIDTest extends CiviUnitTestCase {
   /**
    * Add() method (create and update modes)
    */
-  public function testAdd() {
+  public function testAdd(): void {
     $contactId = $this->individualCreate();
     $this->assertDBRowExist('CRM_Contact_DAO_Contact', $contactId);
 
@@ -55,7 +55,7 @@ class CRM_Core_BAO_OpenIDTest extends CiviUnitTestCase {
   /**
    * AllOpenIDs() method - get all OpenIDs for the given contact
    */
-  public function testAllOpenIDs() {
+  public function testAllOpenIDs(): void {
     $contactId = $this->individualCreate();
     $this->assertDBRowExist('CRM_Contact_DAO_Contact', $contactId);
 

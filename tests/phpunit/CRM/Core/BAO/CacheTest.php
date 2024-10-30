@@ -29,7 +29,7 @@ class CRM_Core_BAO_CacheTest extends CiviUnitTestCase {
     );
   }
 
-  public function testMultiVersionDecode() {
+  public function testMultiVersionDecode(): void {
     $encoders = ['serialize', ['CRM_Core_BAO_Cache', 'encode']];
     $values = [NULL, 0, 1, TRUE, FALSE, [], ['abcd'], 'ab;cd', new stdClass()];
     foreach ($encoders as $encoder) {
@@ -76,7 +76,9 @@ class CRM_Core_BAO_CacheTest extends CiviUnitTestCase {
     // read is correct.
 
     CRM_Utils_Cache::$_singleton = NULL;
-    $this->a->values = [];
+    if (property_exists($this->a, 'values')) {
+      $this->a->values = [];
+    }
     $return_2 = $this->a->get('testSetGetItem');
     $this->assertEquals($originalValue, $return_2);
   }

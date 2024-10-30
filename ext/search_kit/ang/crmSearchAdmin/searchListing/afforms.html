@@ -5,12 +5,12 @@
   </button>
   <ul class="dropdown-menu" ng-if=":: row.openAfformMenu">
     <li ng-if="::$ctrl.afformAdminEnabled">
-      <a target="_blank" href="{{:: $ctrl.afformPath + '#/create/search/' + row.data.name }}">
+      <a target="_blank" ng-href="{{:: $ctrl.afformPath + '#/create/search/' + row.data.name }}">
         <i class="fa fa-plus"></i> {{:: ts('Create form for search results table') }}
       </a>
     </li>
     <li ng-repeat="display_name in row.data.display_name" ng-if="::$ctrl.afformAdminEnabled">
-      <a target="_blank" href="{{:: $ctrl.afformPath + '#/create/search/' + row.data.name + '.' + display_name }}">
+      <a target="_blank" ng-href="{{:: $ctrl.afformPath + '#/create/search/' + row.data.name + '.' + display_name }}">
         <i class="fa fa-plus"></i> {{:: ts('Create form for %1', {1: row.data.display_label[$index]}) }}
       </a>
     </li>

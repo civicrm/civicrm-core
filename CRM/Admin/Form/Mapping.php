@@ -21,6 +21,13 @@
 class CRM_Admin_Form_Mapping extends CRM_Admin_Form {
 
   /**
+   * @return string
+   */
+  public function getDefaultEntity(): string {
+    return 'Mapping';
+  }
+
+  /**
    * @var bool
    */
   public $submitOnce = TRUE;
@@ -38,7 +45,6 @@ class CRM_Admin_Form_Mapping extends CRM_Admin_Form {
 
   public function buildQuickForm() {
     parent::buildQuickForm();
-    $this->setPageTitle(ts('Field Mapping'));
 
     if ($this->_action == CRM_Core_Action::DELETE) {
       return;
@@ -58,7 +64,7 @@ class CRM_Admin_Form_Mapping extends CRM_Admin_Form {
         CRM_Core_DAO::getAttribute('CRM_Core_DAO_Mapping', 'description')
       );
 
-      $mappingType = $this->addElement('select', 'mapping_type_id', ts('Mapping Type'), CRM_Core_PseudoConstant::get('CRM_Core_DAO_Mapping', 'mapping_type_id'));
+      $mappingType = $this->addElement('select', 'mapping_type_id', ts('Mapping Type'), CRM_Core_DAO_Mapping::buildOptions('mapping_type_id'));
 
       if ($this->_action == CRM_Core_Action::UPDATE) {
         $mappingType->freeze();
@@ -83,7 +89,7 @@ class CRM_Admin_Form_Mapping extends CRM_Admin_Form {
 
     if ($this->_action == CRM_Core_Action::DELETE) {
       if ($this->_id) {
-        CRM_Core_BAO_Mapping::del($this->_id);
+        CRM_Core_BAO_Mapping::deleteRecord(['id' => $this->_id]);
         CRM_Core_Session::setStatus(ts('Selected mapping has been deleted successfully.'), ts('Deleted'), 'success');
       }
     }
@@ -92,7 +98,7 @@ class CRM_Admin_Form_Mapping extends CRM_Admin_Form {
         $params['id'] = $this->_id;
       }
 
-      CRM_Core_BAO_Mapping::add($params);
+      CRM_Core_BAO_Mapping::writeRecord($params);
     }
   }
 

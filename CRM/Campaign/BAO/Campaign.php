@@ -14,58 +14,50 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
+class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign implements Civi\Core\HookInterface {
 
   /**
-   * Takes an associative array and creates a campaign object.
-   *
-   * the function extract all the params it needs to initialize the create a
-   * contact object. the params array could contain additional unused name/value
-   * pairs
+   * @deprecated
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
    *
-   * @return CRM_Campaign_DAO_Campaign
-   * @throws \CRM_Core_Exception
+   * @return null|CRM_Campaign_DAO_Campaign
    */
-  public static function create(&$params) {
+  public static function create($params) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     if (empty($params)) {
       return NULL;
     }
+    return self::writeRecord($params);
+  }
 
-    if (empty($params['id'])) {
-      if (empty($params['created_id'])) {
-        $params['created_id'] = CRM_Core_Session::getLoggedInContactID();
-      }
-
-      if (empty($params['created_date'])) {
-        $params['created_date'] = date('YmdHis');
-      }
-
-      if (empty($params['name'])) {
-        $params['name'] = CRM_Utils_String::titleToVar($params['title'], 64);
-      }
+  /**
+   * Event fired prior to modifying a Campaign.
+   * @param \Civi\Core\Event\PreEvent $event
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if ($event->action === 'edit') {
+      $event->params['last_modified_id'] ??= CRM_Core_Session::getLoggedInContactID();
     }
+  }
 
-    /** @var \CRM_Campaign_DAO_Campaign $campaign */
-    $campaign = self::writeRecord($params);
-
+  /**
+   * Event fired after modifying a Campaign.
+   * @param \Civi\Core\Event\PostEvent $event
+   */
+  public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
     /* Create the campaign group record */
-    $groupTableName = CRM_Contact_BAO_Group::getTableName();
-
-    if (isset($params['groups']) && !empty($params['groups']['include']) && is_array($params['groups']['include'])) {
+    $params = $event->params;
+    if (in_array($event->action, ['create', 'edit']) && !empty($params['groups']['include']) && is_array($params['groups']['include'])) {
       foreach ($params['groups']['include'] as $entityId) {
         $dao = new CRM_Campaign_DAO_CampaignGroup();
-        $dao->campaign_id = $campaign->id;
-        $dao->entity_table = $groupTableName;
+        $dao->campaign_id = $event->id;
+        $dao->entity_table = 'civicrm_group';
         $dao->entity_id = $entityId;
         $dao->group_type = 'Include';
         $dao->save();
       }
     }
-
-    return $campaign;
   }
 
   /**
@@ -77,6 +69,7 @@ class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
    * @return bool|int
    */
   public static function del($id) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     try {
       self::deleteRecord(['id' => $id]);
     }
@@ -87,19 +80,13 @@ class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
   }
 
   /**
-   * Retrieve DB object and copy to defaults array.
-   *
-   * @param array $params
-   *   Array of criteria values.
-   * @param array $defaults
-   *   Array to be populated with found values.
-   *
-   * @return self|null
-   *   The DAO object, if found.
-   *
    * @deprecated
+   * @param array $params
+   * @param array $defaults
+   * @return self|null
    */
   public static function retrieve($params, &$defaults) {
+    CRM_Core_Error::deprecatedFunctionWarning('API');
     return self::commonRetrieve(self::class, $params, $defaults);
   }
 
@@ -255,7 +242,7 @@ Order By  camp.title";
 
       //do check for component.
       if ($doCheckForComponent) {
-        $campaigns['isCampaignEnabled'] = $isValid = self::isComponentEnabled();
+        $campaigns['isCampaignEnabled'] = $isValid = CRM_Core_Component::isEnabled('CiviCampaign');
       }
 
       //do check for permissions.
@@ -289,160 +276,6 @@ Order By  camp.title";
   public static function isCampaignEnable(): bool {
     CRM_Core_Error::deprecatedFunctionWarning('isComponentEnabled');
     return self::isComponentEnabled();
-  }
-
-  /**
-   * Retrieve campaigns for dashboard.
-   *
-   * @param array $params
-   * @param bool $onlyCount
-   *
-   * @return array|int
-   */
-  public static function getCampaignSummary($params = [], $onlyCount = FALSE) {
-    $campaigns = [];
-
-    //build the limit and order clause.
-    $limitClause = $orderByClause = $lookupTableJoins = NULL;
-    if (!$onlyCount) {
-      $sortParams = [
-        'sort' => 'start_date',
-        'offset' => 0,
-        'rowCount' => 10,
-        'sortOrder' => 'desc',
-      ];
-      foreach ($sortParams as $name => $default) {
-        if (!empty($params[$name])) {
-          $sortParams[$name] = $params[$name];
-        }
-      }
-
-      //need to lookup tables.
-      $orderOnCampaignTable = TRUE;
-      if ($sortParams['sort'] === 'status') {
-        $orderOnCampaignTable = FALSE;
-        $lookupTableJoins = "
- LEFT JOIN civicrm_option_value status ON ( status.value = campaign.status_id OR campaign.status_id IS NULL )
-INNER JOIN civicrm_option_group grp ON ( status.option_group_id = grp.id AND grp.name = 'campaign_status' )";
-        $orderByClause = "ORDER BY status.label {$sortParams['sortOrder']}";
-      }
-      elseif ($sortParams['sort'] === 'campaign_type') {
-        $orderOnCampaignTable = FALSE;
-        $lookupTableJoins = "
- LEFT JOIN civicrm_option_value campaign_type ON ( campaign_type.value = campaign.campaign_type_id
-                                                   OR campaign.campaign_type_id IS NULL )
-INNER JOIN civicrm_option_group grp ON ( campaign_type.option_group_id = grp.id AND grp.name = 'campaign_type' )";
-        $orderByClause = "ORDER BY campaign_type.label {$sortParams['sortOrder']}";
-      }
-      elseif ($sortParams['sort'] === 'isActive') {
-        $sortParams['sort'] = 'is_active';
-      }
-      if ($orderOnCampaignTable) {
-        $orderByClause = "ORDER BY campaign.{$sortParams['sort']} {$sortParams['sortOrder']}";
-      }
-      $orderByClause = ($orderByClause) ? $orderByClause . ", campaign.id {$sortParams['sortOrder']}" : $orderByClause;
-      $limitClause = "LIMIT {$sortParams['offset']}, {$sortParams['rowCount']}";
-    }
-
-    //build the where clause.
-    $queryParams = $where = [];
-    if (!empty($params['id'])) {
-      $where[] = "( campaign.id = %1 )";
-      $queryParams[1] = [$params['id'], 'Positive'];
-    }
-    if (!empty($params['name'])) {
-      $where[] = "( campaign.name LIKE %2 )";
-      $queryParams[2] = ['%' . trim($params['name']) . '%', 'String'];
-    }
-    if (!empty($params['title'])) {
-      $where[] = "( campaign.title LIKE %3 )";
-      $queryParams[3] = ['%' . trim($params['title']) . '%', 'String'];
-    }
-    if (!empty($params['start_date'])) {
-      $startDate = CRM_Utils_Date::processDate($params['start_date']);
-      $where[] = "( campaign.start_date >= %4 OR campaign.start_date IS NULL )";
-      $queryParams[4] = [$startDate, 'String'];
-    }
-    if (!empty($params['end_date'])) {
-      $endDate = CRM_Utils_Date::processDate($params['end_date'], '235959');
-      $where[] = "( campaign.end_date <= %5 OR campaign.end_date IS NULL )";
-      $queryParams[5] = [$endDate, 'String'];
-    }
-    if (!empty($params['description'])) {
-      $where[] = "( campaign.description LIKE %6 )";
-      $queryParams[6] = ['%' . trim($params['description']) . '%', 'String'];
-    }
-    if (!empty($params['campaign_type_id'])) {
-      $where[] = "( campaign.campaign_type_id IN ( %7 ) )";
-      $queryParams[7] = [implode(',', (array) $params['campaign_type_id']), 'CommaSeparatedIntegers'];
-    }
-    if (!empty($params['status_id'])) {
-      $where[] = "( campaign.status_id IN ( %8 ) )";
-      $queryParams[8] = [implode(',', (array) $params['status_id']), 'CommaSeparatedIntegers'];
-    }
-    if (array_key_exists('is_active', $params)) {
-      $active = "( campaign.is_active = 1 )";
-      if (!empty($params['is_active'])) {
-        $active = "( campaign.is_active = 0 OR campaign.is_active IS NULL )";
-      }
-      $where[] = $active;
-    }
-    $whereClause = NULL;
-    if (!empty($where)) {
-      $whereClause = ' WHERE ' . implode(" \nAND ", $where);
-    }
-
-    $properties = [
-      'id',
-      'name',
-      'title',
-      'start_date',
-      'end_date',
-      'status_id',
-      'is_active',
-      'description',
-      'campaign_type_id',
-    ];
-
-    $selectClause = '
-SELECT  campaign.id               as id,
-        campaign.name             as name,
-        campaign.title            as title,
-        campaign.is_active        as is_active,
-        campaign.status_id        as status_id,
-        campaign.end_date         as end_date,
-        campaign.start_date       as start_date,
-        campaign.description      as description,
-        campaign.campaign_type_id as campaign_type_id';
-    if ($onlyCount) {
-      $selectClause = 'SELECT COUNT(*)';
-    }
-    $fromClause = 'FROM  civicrm_campaign campaign';
-
-    $query = "{$selectClause} {$fromClause} {$lookupTableJoins} {$whereClause} {$orderByClause} {$limitClause}";
-
-    //in case of only count.
-    if ($onlyCount) {
-      return (int) CRM_Core_DAO::singleValueQuery($query, $queryParams);
-    }
-
-    $campaign = CRM_Core_DAO::executeQuery($query, $queryParams);
-    while ($campaign->fetch()) {
-      foreach ($properties as $property) {
-        $campaigns[$campaign->id][$property] = $campaign->$property;
-      }
-    }
-
-    return $campaigns;
-  }
-
-  /**
-   * Get the campaign count.
-   *
-   * @return int
-   */
-  public static function getCampaignCount(): int {
-    return (int) CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM civicrm_campaign');
   }
 
   /**
@@ -480,17 +313,13 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
   }
 
   /**
-   * Update the is_active flag in the db.
-   *
+   * @deprecated - this bypasses hooks.
    * @param int $id
-   *   Id of the database record.
    * @param bool $is_active
-   *   Value we want to set the is_active field.
-   *
    * @return bool
-   *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $is_active) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return CRM_Core_DAO::setFieldValue('CRM_Campaign_DAO_Campaign', $id, 'is_active', $is_active);
   }
 

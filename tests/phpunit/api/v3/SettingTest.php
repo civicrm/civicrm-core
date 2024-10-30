@@ -90,8 +90,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
    */
   public function testGetFields(int $version): void {
     $this->_apiversion = $version;
-    $description = 'Demonstrate return from getfields - see sub-folder for variants';
-    $result = $this->callAPIAndDocument('setting', 'getfields', [], __FUNCTION__, __FILE__, $description);
+    $result = $this->callAPISuccess('setting', 'getfields', []);
     $this->assertArrayHasKey('customCSSURL', $result['values']);
 
     $result = $this->callAPISuccess('setting', 'getfields', []);
@@ -222,11 +221,10 @@ class api_v3_SettingTest extends CiviUnitTestCase {
       'domain_id' => $this->domainID2,
       'uniq_email_per_site' => 1,
     ];
-    $this->callAPIAndDocument('setting', 'create', $params, __FUNCTION__, __FILE__);
+    $this->callAPISuccess('setting', 'create', $params);
 
     $params = ['uniq_email_per_site' => 1];
-    $description = 'Shows setting a variable for a current domain.';
-    $result = $this->callAPIAndDocument('setting', 'create', $params, __FUNCTION__, __FILE__, $description, 'CreateSettingCurrentDomain');
+    $result = $this->callAPISuccess('setting', 'create', $params);
     $this->assertArrayHasKey(CRM_Core_Config::domainID(), $result['values']);
   }
 
@@ -310,13 +308,11 @@ class api_v3_SettingTest extends CiviUnitTestCase {
    */
   public function testCreateSettingMultipleDomains(int $version): void {
     $this->_apiversion = $version;
-    $description = 'Shows setting a variable for all domains.';
-
     $params = [
       'domain_id' => 'all',
       'uniq_email_per_site' => 1,
     ];
-    $result = $this->callAPIAndDocument('setting', 'create', $params, __FUNCTION__, __FILE__, $description, 'CreateAllDomains');
+    $result = $this->callAPISuccess('setting', 'create', $params);
 
     $this->assertEquals(1, $result['values'][$this->domainID2]['uniq_email_per_site']);
     $this->assertEquals(1, $result['values'][$this->currentDomain]['uniq_email_per_site']);
@@ -328,8 +324,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
       'return' => 'uniq_email_per_site',
     ];
     // we'll check it with a 'get'
-    $description = 'Shows getting a variable for all domains.';
-    $result = $this->callAPIAndDocument('setting', 'get', $params, __FUNCTION__, __FILE__, $description, 'GetAllDomains');
+    $result = $this->callAPISuccess('setting', 'get', $params);
 
     $this->assertEquals(1, $result['values'][$this->domainID2]['uniq_email_per_site']);
     $this->assertEquals(1, $result['values'][$this->currentDomain]['uniq_email_per_site']);
@@ -339,8 +334,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
       'domain_id' => [$this->currentDomain, $this->domainID3],
       'uniq_email_per_site' => 0,
     ];
-    $description = 'Shows setting a variable for specified domains.';
-    $result = $this->callAPIAndDocument('setting', 'create', $params, __FUNCTION__, __FILE__, $description, 'CreateSpecifiedDomains');
+    $result = $this->callAPISuccess('setting', 'create', $params);
 
     $this->assertEquals(0, $result['values'][$this->domainID3]['uniq_email_per_site']);
     $this->assertEquals(0, $result['values'][$this->currentDomain]['uniq_email_per_site']);
@@ -348,8 +342,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
       'domain_id' => [$this->currentDomain, $this->domainID2],
       'return' => ['uniq_email_per_site'],
     ];
-    $description = 'Shows getting a variable for specified domains.';
-    $result = $this->callAPIAndDocument('setting', 'get', $params, __FUNCTION__, __FILE__, $description, 'GetSpecifiedDomains');
+    $result = $this->callAPISuccess('setting', 'get', $params);
     $this->assertEquals(1, $result['values'][$this->domainID2]['uniq_email_per_site']);
     $this->assertEquals(0, $result['values'][$this->currentDomain]['uniq_email_per_site']);
 
@@ -367,13 +360,12 @@ class api_v3_SettingTest extends CiviUnitTestCase {
       'return' => 'uniq_email_per_site',
     ];
 
-    $this->callAPIAndDocument('Setting', 'get', $params, __FUNCTION__, __FILE__);
+    $this->callAPISuccess('Setting', 'get', $params);
 
     $params = [
       'return' => 'uniq_email_per_site',
     ];
-    $description = 'Shows getting a variable for a current domain.';
-    $result = $this->callAPIAndDocument('Setting', 'get', $params, __FUNCTION__, __FILE__, $description, 'GetSettingCurrentDomain');
+    $result = $this->callAPISuccess('Setting', 'get', $params);
     $this->assertArrayHasKey(CRM_Core_Config::domainID(), $result['values']);
   }
 
@@ -467,9 +459,8 @@ class api_v3_SettingTest extends CiviUnitTestCase {
       'name' => 'petition_contacts',
       'group' => 'Campaign Preferences',
     ];
-    $description = 'Demonstrates getvalue action - intended for runtime use as better caching than get.';
 
-    $result = $this->callAPIAndDocument('setting', 'getvalue', $params, __FUNCTION__, __FILE__, $description);
+    $result = $this->callAPISuccess('setting', 'getvalue', $params);
     $this->assertEquals('Petition Contacts', $result);
   }
 
@@ -477,12 +468,10 @@ class api_v3_SettingTest extends CiviUnitTestCase {
    * V3 only - no api4 equivalent.
    */
   public function testGetDefaults(): void {
-    $description = 'Gets defaults setting a variable for a given domain - if no domain is set current is assumed.';
-
     $params = [
       'name' => 'address_format',
     ];
-    $result = $this->callAPIAndDocument('Setting', 'getdefaults', $params, __FUNCTION__, __FILE__, $description, 'GetDefaults');
+    $result = $this->callAPISuccess('Setting', 'getdefaults', $params);
     $this->assertEquals("{contact.address_name}\n{contact.street_address}\n{contact.supplemental_address_1}\n{contact.supplemental_address_2}\n{contact.supplemental_address_3}\n{contact.city}{, }{contact.state_province}{ }{contact.postal_code}\n{contact.country}", $result['values'][CRM_Core_Config::domainID()]['address_format']);
     $params = ['name' => 'mailing_format'];
     $result = $this->callAPISuccess('setting', 'getdefaults', $params);
@@ -511,8 +500,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('setting', 'get');
     //make sure it's set
     $this->assertEquals('xyz', $result['values'][CRM_Core_Config::domainID()]['address_format']);
-    $description = 'Demonstrates reverting a parameter to default value.';
-    $this->callAPIAndDocument('setting', 'revert', $revertParams, __FUNCTION__, __FILE__, $description, '');
+    $this->callAPISuccess('setting', 'revert', $revertParams);
     //make sure it's reverted
     $result = $this->callAPISuccess('setting', 'get');
     $this->assertEquals("{contact.address_name}\n{contact.street_address}\n{contact.supplemental_address_1}\n{contact.supplemental_address_2}\n{contact.supplemental_address_3}\n{contact.city}{, }{contact.state_province}{ }{contact.postal_code}\n{contact.country}", $result['values'][CRM_Core_Config::domainID()]['address_format']);

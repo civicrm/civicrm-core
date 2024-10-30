@@ -6,7 +6,12 @@
  */
 class CRM_Utils_Mail_FilteredPearMailerTest extends CiviUnitTestCase {
 
-  public function testFilter() {
+  public function setUp(): void {
+    parent::setUp();
+    $this->useTransaction();
+  }
+
+  public function testFilter(): void {
     $mock = new class() extends \Mail {
       public $buf = [];
 
@@ -34,7 +39,7 @@ class CRM_Utils_Mail_FilteredPearMailerTest extends CiviUnitTestCase {
     $this->assertEquals('all the fruits in the basket', $r);
   }
 
-  public function testFilter_shortCircuit() {
+  public function testFilter_shortCircuit(): void {
     $mock = new class() extends \Mail {
 
       public function send($recipients, $headers, $body) {

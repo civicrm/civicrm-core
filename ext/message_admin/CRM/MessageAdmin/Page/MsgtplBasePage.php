@@ -25,9 +25,9 @@ class CRM_MessageAdmin_Page_MsgtplBasePage extends CRM_Core_Page {
     /** @var \Civi\Angular\AngularLoader $loader */
     $loader = \Civi::service('angularjs.loader');
     $loader->addModules(['crmMsgadm']);
-    $loader->useApp(array(
+    $loader->useApp([
       'defaultRoute' => '/user',
-    ));
+    ]);
     parent::run();
   }
 

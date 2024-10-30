@@ -65,6 +65,8 @@ trait CustomValueActionTrait {
    */
   protected function writeObjects($items) {
     $fields = $this->entityFields();
+    // Note: Some parts of this loop mutate $item for purposes of internal processing only
+    // so we do not loop through $items by reference as to preserve the original structure for output.
     foreach ($items as $idx => $item) {
       FormattingUtil::formatWriteParams($item, $fields);
 
@@ -83,8 +85,8 @@ trait CustomValueActionTrait {
         $tableName = CoreUtil::getTableName($this->getEntityName());
         $items[$idx]['id'] = (int) \CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM ' . $tableName);
       }
+      FormattingUtil::formatOutputValues($items[$idx], $fields, 'create');
     }
-    FormattingUtil::formatOutputValues($items, $this->entityFields(), 'create');
     return $items;
   }
 

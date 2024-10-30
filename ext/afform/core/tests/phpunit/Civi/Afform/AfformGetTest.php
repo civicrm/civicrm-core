@@ -13,7 +13,7 @@ class AfformGetTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
   private $formName = 'abc_123_test';
 
   public function setUpHeadless() {
-    return \Civi\Test::headless()->installMe(__DIR__)->apply();
+    return \Civi\Test::headless()->installMe(__DIR__)->install('org.civicrm.search_kit')->apply();
   }
 
   public function tearDown(): void {
@@ -34,6 +34,10 @@ class AfformGetTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
     $this->assertEquals($this->formName, $result['name']);
     $this->assertArrayNotHasKey('directive_name', $result);
     $this->assertArrayNotHasKey('has_base', $result);
+    // Check modified date is reasonable
+    $this->assertGreaterThan('2023-01-01 12:00:00', $result['modified_date']);
+    // Hopefully this test won't need updating for the next 2000 years or so...
+    $this->assertLessThan('4000-01-01 12:00:00', $result['modified_date']);
 
     // Select * should also return regular fields only
     $result = Afform::get()
@@ -55,8 +59,59 @@ class AfformGetTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
     $this->assertArrayNotHasKey('base_module', $result);
   }
 
+  public function testGetLayoutWithEmptyNode() {
+    Afform::create(FALSE)
+      ->addValue('name', $this->formName)
+      ->addValue('title', 'Test Form')
+      ->addValue('layout', '<af-form><af-entity name="a"></af-entity><div></div></af-form>')
+      ->execute();
+
+    $layout = Afform::get(FALSE)
+      ->addWhere('name', '=', $this->formName)
+      ->execute()->single()['layout'];
+
+    // Ensure container elements like <div> always have #children even if empty
+    $this->assertEquals([], $layout[0]['#children'][1]['#children']);
+    $this->assertArrayNotHasKey('#children', $layout[0]['#children'][0]);
+  }
+
+  public function testGetHtmlEncoding(): void {
+    Afform::create(FALSE)
+      ->setLayoutFormat('shallow')
+      ->addValue('name', $this->formName)
+      ->addValue('title', 'Test Form')
+      ->addValue('layout', [
+        [
+          '#tag' => 'af-form',
+          'ctrl' => 'afform',
+          '#children' => [
+            [
+              '#tag' => 'af-entity',
+              'data' => "{source: 'This isn\\'t \"quotes\"'}",
+              'type' => 'Individual',
+              'name' => 'Individual1',
+            ],
+          ],
+        ],
+      ])
+      ->execute();
+
+    $html = Afform::get(FALSE)
+      ->addWhere('name', '=', $this->formName)
+      ->setLayoutFormat('html')
+      ->execute()->single()['layout'];
+
+    $expected = <<<HTML
+data="{source: 'This isn\'t &quot;quotes&quot;'}"
+HTML;
+
+    $this->assertStringContainsString($expected, $html);
+  }
+
   public function testAfformAutocomplete(): void {
-    $title = uniqid();
+    // Use a numeric title to test that the "search by id" feature
+    // doesn't kick in for Afforms (which don't have a numeric "id")
+    $title = (string) rand(1000, 999999);
     Afform::create()
       ->addValue('name', $this->formName)
       ->addValue('title', $title)
@@ -87,6 +142,36 @@ class AfformGetTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
       ->execute()->single();
 
     $this->assertEquals(['foo.foo-bar', 'foo.bar-food'], $result['search_displays']);
+  }
+
+  public function testGetLayoutWithLegacyContactTypeConversion() {
+    Afform::create(FALSE)
+      ->addValue('name', $this->formName)
+      ->addValue('title', 'Test Form')
+      ->addValue('layout', <<<'AFFORM'
+        <af-form>
+          <af-entity type="Contact" data="{'contact_type': 'Organization' num: 1}"></af-entity>
+          <af-entity data="{thing: 2 contact_type: 'Household'}" type="Contact"></af-entity>
+          <af-entity data="{contact_type: 'Individual'}" type='Contact'></af-entity>
+          <fieldset>Hello</fieldset>
+        </af-form>
+        AFFORM
+      )->execute();
+
+    $entity = Afform::get(FALSE)
+      ->addWhere('name', '=', $this->formName)
+      ->setFormatWhitespace(TRUE)
+      ->execute()->single()['layout'][0]['#children'];
+
+    // Legacy contact_type should have been converted to entity type
+    $this->assertEquals('Organization', $entity[0]['type']);
+    $this->assertCount(1, $entity[0]['data']);
+    $this->assertEquals(1, $entity[0]['data']['num']);
+    $this->assertEquals('Household', $entity[1]['type']);
+    $this->assertCount(1, $entity[1]['data']);
+    $this->assertEquals(2, $entity[1]['data']['thing']);
+    $this->assertEquals('Individual', $entity[2]['type']);
+    $this->assertCount(0, $entity[2]['data']);
   }
 
 }

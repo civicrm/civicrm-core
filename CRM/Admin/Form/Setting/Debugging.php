@@ -20,11 +20,21 @@
  */
 class CRM_Admin_Form_Setting_Debugging extends CRM_Admin_Form_Setting {
 
+  /**
+   * Subset of settings on the page as defined using the legacy method.
+   *
+   * @var array
+   *
+   * @deprecated - do not add new settings here - the page to display
+   * settings on should be defined in the setting metadata.
+   */
   protected $_settings = [
+    // @todo remove these, define any not yet defined in the setting metadata.
     'debug_enabled' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
     'backtrace' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
     'fatalErrorHandler' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
     'assetCache' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
+    'esm_loader' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
     'environment' => CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME,
   ];
 

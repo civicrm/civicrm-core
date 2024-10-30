@@ -43,18 +43,23 @@ class CRM_Utils_Array {
   }
 
   /**
-   * Returns $list[$key] if such element exists, or a default value otherwise.
+   * Returns $list[$key] if such element exists, or $default otherwise.
    *
-   * If $list is not actually an array at all, then the default value is
-   * returned. We hope to deprecate this behaviour.
+   * If $list is not an array or ArrayAccess object, $default is returned.
    *
+   * @deprecated
+   * In most cases this can be replaced with
+   *   $list[$key] ?? $default
+   * with the minor difference that when $list[$key] exists and is NULL, this function will always
+   * return NULL.
    *
    * @param string $key
    *   Key value to look up in the array.
    * @param array|ArrayAccess $list
    *   Array from which to look up a value.
    * @param mixed $default
-   *   (optional) Value to return $list[$key] does not exist.
+   *   (optional) Value to return when $list[$key] does not exist. If $default
+   *   is not specified, NULL is used.
    *
    * @return mixed
    *   Can return any type, since $list might contain anything.
@@ -64,11 +69,8 @@ class CRM_Utils_Array {
       return array_key_exists($key, $list) ? $list[$key] : $default;
     }
     if ($list instanceof ArrayAccess) {
-      // ArrayAccess requires offsetExists is implemented for the equivalent to array_key_exists.
       return $list->offsetExists($key) ? $list[$key] : $default;
     }
-    // @todo - eliminate these from core & uncomment this line.
-    // CRM_Core_Error::deprecatedFunctionWarning('You have passed an invalid parameter for the "list"');
     return $default;
   }
 
@@ -530,7 +532,9 @@ class CRM_Utils_Array {
     $fields = (array) $field;
     uasort($array, function ($a, $b) use ($fields) {
       foreach ($fields as $f) {
-        $v = strnatcmp($a[$f], $b[$f]);
+        $f1 = $a[$f] ?? '';
+        $f2 = $b[$f] ?? '';
+        $v = strnatcmp($f1, $f2);
         if ($v !== 0) {
           return $v;
         }
@@ -578,6 +582,10 @@ class CRM_Utils_Array {
 
     if ($lcMessages && $lcMessages != 'en_US' && class_exists('Collator')) {
       $collator = new Collator($lcMessages . '.utf8');
+      $collator->asort($array);
+    }
+    elseif (version_compare(PHP_VERSION, '8', '<') && class_exists('Collator')) {
+      $collator = new Collator('en_US.utf8');
       $collator->asort($array);
     }
     else {
@@ -732,7 +740,7 @@ class CRM_Utils_Array {
       return $values;
     }
     // Empty string -> empty array
-    if ($values === '') {
+    if ($values === '' || $values === "$delim$delim") {
       return [];
     }
     return explode($delim, trim((string) $values, $delim));
@@ -742,8 +750,8 @@ class CRM_Utils_Array {
    * Joins array elements with a string, adding surrounding delimiters.
    *
    * This method works mostly like PHP's built-in implode(), but the generated
-   * string is surrounded by delimiter characters. Also, if NULL is passed as
-   * the $values parameter, NULL is returned.
+   * string is surrounded by delimiter characters. Also, if NULL or '' is passed as
+   * the $values parameter, it is returned unchanged.
    *
    * @param mixed $values
    *   Array to be imploded. If a non-array is passed, it will be cast to an
@@ -756,8 +764,8 @@ class CRM_Utils_Array {
    *   The generated string, or NULL if NULL was passed as $values parameter.
    */
   public static function implodePadded($values, $delim = CRM_Core_DAO::VALUE_SEPARATOR) {
-    if ($values === NULL) {
-      return NULL;
+    if ($values === NULL || $values === '') {
+      return $values;
     }
     // If we already have a string, strip $delim off the ends so it doesn't get added twice
     if (is_string($values)) {
@@ -1407,6 +1415,30 @@ class CRM_Utils_Array {
       }
     }
     return $filtered;
+  }
+
+  /**
+   * Changes array keys to meet the expectations of select2.js
+   *
+   * @param array $options
+   * @param string $label
+   * @param string $id
+   * @return array
+   */
+  public static function formatForSelect2(array $options, string $label = 'label', string $id = 'id'): array {
+    foreach ($options as &$option) {
+      if (isset($option[$label])) {
+        $option['text'] = (string) $option[$label];
+      }
+      if (isset($option[$id])) {
+        $option['id'] = (string) $option[$id];
+      }
+      if (!empty($option['children'])) {
+        $option['children'] = self::formatForSelect2($option['children'], $label, $id);
+      }
+      $option = array_intersect_key($option, array_flip(['id', 'text', 'children', 'color', 'icon', 'description']));
+    }
+    return $options;
   }
 
 }

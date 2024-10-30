@@ -8,10 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 
-{* Displays contribution/event fees when price set is used. *}
-{if !$currency && $fee_currency}
-  {assign var=currency value="$fee_currency"}
-{/if}
+{* Displays contribution/event fees. *}
 
 {foreach from=$lineItem item=value key=priceset}
   {if $value neq 'skip'}
@@ -72,7 +69,7 @@
         <td></td>
         <td></td>
       {/if}
-      <td class="right">{$line.line_total+$line.tax_amount|crmMoney:$currency}</td>
+      <td class="right">{assign var=totalWithTax value=$line.line_total+$line.tax_amount}{$totalWithTax|crmMoney:$currency}</td>
     {/if}
           {if $pricesetFieldsCount}
             <td class="right">{$line.participant_count}</td>
@@ -92,9 +89,10 @@
       {ts}Contribution Total{/ts}:
     {elseif $context EQ "Event"}
       {if $totalTaxAmount}
-        {ts}Event SubTotal: {$totalAmount-$totalTaxAmount|crmMoney:$currency}{/ts}<br />
+        {assign var=eventSubTotal value=$totalAmount-$totalTaxAmount}
+        {ts 1=$eventSubTotal|crmMoney:$currency}Event SubTotal: %1{/ts}<br />
       {/if}
-      {ts}Event Total{/ts}:
+      {ts}Total Amount{/ts}:
     {elseif $context EQ "Membership"}
       {ts}Membership Fee Total{/ts}:
     {else}
@@ -111,10 +109,10 @@
         {assign var="lineItemCount" value=0}
 
         {foreach from=$pcount item=p_count}
-          {assign var="intPCount" value=$p_count.participant_count|intval}
+          {assign var="intPCount" value=$p_count.participant_count|string_format:"%d"}
           {assign var="lineItemCount" value=$lineItemCount+$intPCount}
         {/foreach}
-        {if $lineItemCount < 1 }
+        {if $lineItemCount < 1}
           {assign var="lineItemCount" value=1}
         {/if}
         {assign var="totalcount" value=$totalcount+$lineItemCount}
@@ -131,22 +129,3 @@
     <em>({$hookDiscount.message})</em>
   </div>
 {/if}
-{literal}
-<script type="text/javascript">
-CRM.$(function($) {
-  {/literal}
-    var comma = '{$config->monetaryThousandSeparator}';
-    var dot = '{$config->monetaryDecimalPoint}';
-    var format = '{$config->moneyformat}';
-    var currency = '{$currency}';
-    var currencySymbol = '{$currencySymbol}';
-  {literal}
-  // Todo: This function should be a utility
-  function moneyFormat(amount) {
-    amount = parseFloat(amount).toFixed(2);
-    amount = amount.replace(',', 'comma').replace('.', 'dot');
-    amount = amount.replace('comma', comma).replace('dot', dot);
-    return format.replace('%C', currency).replace('%c', currencySymbol).replace('%a', amount);
-  }});
-</script>
-{/literal}

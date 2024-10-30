@@ -59,9 +59,29 @@ abstract class CRM_Queue_Queue {
    * @throws \CRM_Core_Exception
    */
   public function isActive(): bool {
+    return ($this->getStatus() === 'active');
+  }
+
+  /**
+   * @return string|null
+   * @throws \CRM_Core_Exception
+   * @see \CRM_Queue_BAO_Queue::getStatuses()
+   */
+  public function getStatus() {
+    // Queues work with concurrent processes. We want to make sure status info is up-to-date (never cached).
     $status = CRM_Core_DAO::getFieldValue('CRM_Queue_DAO_Queue', $this->_name, 'status', 'name', TRUE);
-    // Note: In the future, we may want to incorporate other data (like maintenance-mode or upgrade-status) in deciding active queues.
-    return ($status === 'active');
+    if ($status === 'active') {
+      $suspend = CRM_Core_DAO::singleValueQuery('SELECT value FROM civicrm_setting WHERE name = "queue_paused" AND domain_id = %1', [
+        1 => [CRM_Core_BAO_Domain::getDomain()->id, 'Positive'],
+      ]);
+      if (!empty(CRM_Utils_String::unserialize($suspend))) {
+        $status = 'paused';
+      }
+    }
+    CRM_Utils_Hook::queueActive($status, $this->getName(), $this->queueSpec);
+    // Note in future we might want to consider whether an upgrade is in progress.
+    // Should we set the setting at that point?
+    return $status;
   }
 
   /**

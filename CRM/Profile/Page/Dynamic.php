@@ -201,7 +201,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
 
       $this->_isPermissionedChecksum = $allowPermission = FALSE;
       $permissionType = CRM_Core_Permission::VIEW;
-      if (CRM_Core_Permission::check('administer users') || CRM_Core_Permission::check('view all contacts') || CRM_Contact_BAO_Contact_Permission::allow($this->_id)) {
+      if (CRM_Core_Permission::check('cms:administer users') || CRM_Core_Permission::check('view all contacts') || CRM_Contact_BAO_Contact_Permission::allow($this->_id)) {
         $allowPermission = TRUE;
       }
       if ($this->_id != $userID) {
@@ -256,7 +256,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
       //reformat fields array
       foreach ($fields as $name => $field) {
         // also eliminate all formatting fields
-        if (CRM_Utils_Array::value('field_type', $field) == 'Formatting') {
+        if (($field['field_type'] ?? NULL) == 'Formatting') {
           unset($fields[$name]);
         }
 
@@ -270,7 +270,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
         $contactFields = $activityFields = [];
 
         foreach ($fields as $fieldName => $field) {
-          if (CRM_Utils_Array::value('field_type', $field) == 'Activity') {
+          if (($field['field_type'] ?? NULL) == 'Activity') {
             $activityFields[$fieldName] = $field;
           }
           else {
@@ -339,17 +339,15 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
         ];
       }
 
-      $template->assign_by_ref('row', $values);
-      $template->assign_by_ref('profileFields', $profileFields);
+      $template->assign('row', $values);
+      $template->assign('profileFields', $profileFields);
     }
 
     $name = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $this->_gid, 'name');
     $this->assign('ufGroupName', $name);
     CRM_Utils_Hook::viewProfile($name);
 
-    if (strtolower($name) == 'summary_overlay') {
-      $template->assign('overlayProfile', TRUE);
-    }
+    $template->assign('overlayProfile', (strtolower($name) === 'summary_overlay'));
 
     if (($this->_multiRecord & CRM_Core_Action::VIEW) && $this->_recordId && !$this->_allFields) {
       $fieldDetail = reset($fields);
@@ -422,7 +420,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
    */
   public function getTemplateFileName() {
     $fileName = $this->checkTemplateFileExists();
-    return $fileName ? $fileName : parent::getTemplateFileName();
+    return $fileName ?: parent::getTemplateFileName();
   }
 
   /**
@@ -433,7 +431,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
    */
   public function overrideExtraTemplateFileName() {
     $fileName = $this->checkTemplateFileExists('extra.');
-    return $fileName ? $fileName : parent::overrideExtraTemplateFileName();
+    return $fileName ?: parent::overrideExtraTemplateFileName();
   }
 
   /**

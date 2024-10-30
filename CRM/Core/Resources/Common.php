@@ -129,7 +129,7 @@ class CRM_Core_Resources_Common {
       if (is_array($item)) {
         $bundle->addSetting($item);
       }
-      elseif (strpos($item, '.css')) {
+      elseif (preg_match('/(\.css$)|(\.css[?&])/', $item)) {
         Civi::resources()->isFullyFormedUrl($item) ? $bundle->addStyleUrl($item, -100) : $bundle->addStyleFile('civicrm', $item, -100);
       }
       elseif (Civi::resources()->isFullyFormedUrl($item)) {
@@ -189,7 +189,11 @@ class CRM_Core_Resources_Common {
       "packages/jquery/plugins/jquery.mousewheel.min.js",
       "bower_components/select2/select2.min.js",
       "bower_components/select2/select2.min.css",
-      "bower_components/font-awesome/css/font-awesome.min.css",
+      "bower_components/font-awesome/css/all.min.css",
+      // shims for fontawesome 4 - webfonts are loaded from the package
+      "bower_components/font-awesome/css/v4-font-face.min.css",
+      // we load our own version of the shim with crm-i namespace
+      "css/crm-i-v4-shims.css",
       "packages/jquery/plugins/jquery.form.min.js",
       "packages/jquery/plugins/jquery.timeentry.min.js",
       "packages/jquery/plugins/jquery.blockUI.min.js",
@@ -206,18 +210,7 @@ class CRM_Core_Resources_Common {
 
     // Dynamic localization script
     if (!CRM_Core_Config::isUpgradeMode()) {
-      $items[] = Civi::service('asset_builder')->getUrl('crm-l10n.js', [
-        'cid' => $contactID,
-        'includeEmailInName' => (bool) $settings->get('includeEmailInName'),
-        'ajaxPopupsEnabled' => (bool) $settings->get('ajaxPopupsEnabled'),
-        'allowAlertAutodismissal' => (bool) $settings->get('allow_alert_autodismissal'),
-        'resourceCacheCode' => Civi::resources()->getCacheCode(),
-        'locale' => CRM_Core_I18n::getLocale(),
-        'lcMessages' => $settings->get('lcMessages'),
-        'dateInputFormat' => $settings->get('dateInputFormat'),
-        'timeInputFormat' => $settings->get('timeInputFormat'),
-        'moneyFormat' => CRM_Utils_Money::format(1234.56),
-      ]);
+      $items[] = Civi::service('asset_builder')->getUrl('crm-l10n.js', CRM_Core_Resources::getL10nJsParams());
     }
 
     // These scripts are only needed by back-office users

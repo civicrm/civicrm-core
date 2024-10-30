@@ -25,20 +25,6 @@ class CRM_Financial_Form_FinancialType extends CRM_Core_Form {
   protected $_BAOName = 'CRM_Financial_BAO_FinancialType';
 
   /**
-   * Fields for the entity to be assigned to the template.
-   *
-   * @var array
-   */
-  protected $entityFields = [];
-
-  /**
-   * Deletion message to be assigned to the form.
-   *
-   * @var string
-   */
-  protected $deleteMessage;
-
-  /**
    * Set variables up before form is built.
    *
    * @throws \CRM_Core_Exception
@@ -62,8 +48,8 @@ class CRM_Financial_Form_FinancialType extends CRM_Core_Form {
    */
   protected function setEntityFields() {
     $this->entityFields = [
-      'name' => [
-        'name' => 'name',
+      'label' => [
+        'name' => 'label',
         'required' => TRUE,
       ],
       'description' => ['name' => 'description'],
@@ -105,7 +91,7 @@ class CRM_Financial_Form_FinancialType extends CRM_Core_Form {
     if ($this->_action == CRM_Core_Action::UPDATE && CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', $this->_id, 'is_reserved')) {
       $this->freeze(['is_active']);
     }
-    $this->addRule('name', ts('A financial type with this name already exists. Please select another name.'), 'objectExists',
+    $this->addRule('label', ts('A financial type with this label already exists. Please select another label.'), 'objectExists',
       ['CRM_Financial_DAO_FinancialType', $this->_id]
     );
   }
@@ -117,9 +103,11 @@ class CRM_Financial_Form_FinancialType extends CRM_Core_Form {
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
-      $errors = CRM_Financial_BAO_FinancialType::del($this->_id);
-      if (is_array($errors) && !empty($errors)) {
-        CRM_Core_Error::statusBounce($errors['error_message'], CRM_Utils_System::url('civicrm/admin/financial/financialType', "reset=1&action=browse"), ts('Cannot Delete'));
+      try {
+        CRM_Financial_BAO_FinancialType::deleteRecord(['id' => $this->_id]);
+      }
+      catch (CRM_Core_Exception $e) {
+        CRM_Core_Error::statusBounce($e->getMessage(), CRM_Utils_System::url('civicrm/admin/financial/financialType', "reset=1&action=browse"), ts('Cannot Delete'));
       }
       CRM_Core_Session::setStatus(ts('Selected financial type has been deleted.'), ts('Record Deleted'), 'success');
     }
@@ -129,23 +117,22 @@ class CRM_Financial_Form_FinancialType extends CRM_Core_Form {
       if ($this->_id) {
         $params['id'] = $this->_id;
       }
-      foreach ([
-        'is_active',
-        'is_reserved',
-        'is_deductible',
-      ] as $field) {
-        $params[$field] = CRM_Utils_Array::value($field, $params, FALSE);
+      foreach (['is_active', 'is_reserved', 'is_deductible'] as $field) {
+        $params[$field] ??= FALSE;
       }
-      $financialType = civicrm_api3('FinancialType', 'create', $params);
+      $financialType = civicrm_api4('FinancialType', 'save', [
+        'records' => [$params],
+        'checkPermissions' => TRUE,
+      ])->first();
       if ($this->_action & CRM_Core_Action::UPDATE) {
         $url = CRM_Utils_System::url('civicrm/admin/financial/financialType', 'reset=1&action=browse');
-        CRM_Core_Session::setStatus(ts('The financial type "%1" has been updated.', [1 => $params['name']]), ts('Saved'), 'success');
+        CRM_Core_Session::setStatus(ts('The financial type "%1" has been updated.', [1 => $params['label']]), ts('Saved'), 'success');
       }
       else {
         $url = CRM_Utils_System::url('civicrm/admin/financial/financialType/accounts', 'reset=1&action=browse&aid=' . $financialType['id']);
 
         $statusArray = [
-          1 => $params['name'],
+          1 => $params['label'],
         ];
         $financialAccounts = civicrm_api3('EntityFinancialAccount', 'get', [
           'return' => ['financial_account_id.name'],
@@ -163,7 +150,7 @@ class CRM_Financial_Form_FinancialType extends CRM_Core_Form {
         else {
           $text = ts('Your Financial "%1" Type has been created and assigned to an existing financial account with the same title. You should review the assigned account and determine whether additional account relationships are needed.', $statusArray);
         }
-        CRM_Core_Session::setStatus($text, ts('Saved'), 'success', ['expires' => 0]);
+        CRM_Core_Session::setStatus($text, ts('Saved'), 'success', ['expires' => 30000]);
       }
 
       $session = CRM_Core_Session::singleton();

@@ -11,83 +11,198 @@
 
  /**
   * Test class for CRM_Contact_Form_Task_Label.
+  *
   * @group headless
   */
 class CRM_Contact_Form_Task_PrintMailingLabelTest extends CiviUnitTestCase {
 
-  protected $_contactIds;
+  use CRMTraits_Custom_CustomDataTrait;
 
-  protected function setUp(): void {
+  private string $mailingFormat;
+
+  public function setUp(): void {
+    $this->mailingFormat = Civi::settings()->get('mailing_format') ?? '';
+    Civi::settings()->set('mailing_format', $this->getDefaultMailingFormat());
+    $this->createCustomGroupWithFieldOfType();
     parent::setUp();
-    $this->_contactIds = [
-      $this->individualCreate(['first_name' => 'Antonia', 'last_name' => 'D`souza']),
-      $this->individualCreate(['first_name' => 'Anthony', 'last_name' => 'Collins']),
-    ];
   }
 
-  /**
-   * Clean up after test.
-   */
-  protected function tearDown(): void {
-    unset($this->_contactIds);
+  public function tearDown(): void {
+    Civi::settings()->set('mailing_format', $this->mailingFormat);
+    Civi::settings()->set('searchPrimaryDetailsOnly', TRUE);
+    $this->quickCleanup(['civicrm_contact'], TRUE);
     parent::tearDown();
   }
 
   /**
-   * core/issue-1158: Test the mailing label rows contain the primary addresses when location_type_id = none (as primary) is chosen in form
+   * Get the mailing format that we use as a baseline for these tests.
+   *
+   * This is currently also the setting default but that could change and the tests
+   * are not testing that.
+   *
+   * @return string
    */
-  public function testMailingLabel() {
+  protected function getDefaultMailingFormat(): string {
+    return "{contact.addressee}\n{contact.street_address}\n{contact.supplemental_address_1}\n{contact.supplemental_address_2}\n{contact.supplemental_address_3}\n{contact.city}{, }{contact.state_province}{ }{contact.postal_code}\n{contact.country}";
+  }
+
+  /**
+   * Test tokens are rendered in the mailing labels when declared via deprecated hooks.
+   */
+  public function testMailingLabelTokens(): void {
+    \Civi::settings()->set('mailing_format', $this->getDefaultMailingFormat() . ' {test.last_initial} . {contact.' . $this->getCustomFieldName() . '}');
+    $this->hookClass->setHook('civicrm_tokenValues', [$this, 'hookTokenValues']);
+    $this->hookClass->setHook('civicrm_tokens', [$this, 'hook_tokens']);
+    $this->createTestAddresses();
+    $rows = $this->submitForm([]);
+    $this->assertCount(2, $rows);
+    $this->assertEquals($this->getExpectedAddress('collins') . ' C . Ho', $rows[$this->ids['Contact']['collins']][0]);
+    $this->assertEquals($this->getExpectedAddress('souza') . ' S . Hey', $rows[$this->ids['Contact']['souza']][0]);
+  }
+
+  /**
+   * Test tokens are rendered in the mailing labels when declared via deprecated hooks.
+   */
+  public function testMailingLabelAddressMergeWithTokens(): void {
+    \Civi::settings()->set('mailing_format', $this->getDefaultMailingFormat() . ' {test.last_initial}');
+    $this->hookClass->setHook('civicrm_tokenValues', [$this, 'hookTokenValues']);
+    $this->hookClass->setHook('civicrm_tokens', [$this, 'hook_tokens']);
+    $this->createTestAddresses();
+    $rows = $this->submitForm([
+      'merge_same_address' => TRUE,
+    ]);
+    $this->assertCount(1, $rows);
+    // The address has been combined. Note both names appear.
+    // No merge handling is done on the token - this test was added to lock
+    // in token merge handling as at the time of writing, not to weigh in on
+    // or change behaviour.
+    $this->assertEquals('Mr. Anthony J. Collins II
+Mr. Antonia J. D`souza II
+Main Street 231
+Brummen, 6971 BN
+NETHERLANDS S', $rows[$this->ids['Contact']['collins']][0]);
+  }
+
+  /**
+   * Test the mailing label rows contain the primary addresses when
+   * location_type_id = none (as primary) is chosen in form.
+   *
+   * core/issue-1158:
+   */
+  public function testMailingLabel(): void {
+    $addresses = $this->createTestAddresses();
     // Disable searchPrimaryDetailsOnly civi settings so we could test the functionality without it.
     Civi::settings()->set('searchPrimaryDetailsOnly', '0');
 
+    $submitValues = [
+      'location_type_id' => NULL,
+      'do_not_mail' => 1,
+    ];
+    $rows = $this->submitForm($submitValues);
+    $this->assertEquals($this->getExpectedAddress('souza'), $rows[$this->ids['Contact']['souza']][0]);
+    $this->assertEquals($this->getExpectedAddress('collins'), $rows[$this->ids['Contact']['collins']][0]);
+    foreach ([$this->ids['Contact']['souza'], $this->ids['Contact']['collins']] as $contactID) {
+      // ensure that the address printed in the mailing label is always primary if 'location_type_id' - none (as Primary) is chosen
+      $this->assertStringContainsString($addresses[$contactID]['primary']['street_address'], $rows[$contactID][0]);
+    }
+  }
+
+  /**
+   * Get the default address we expect for our test contact with the default string.
+   *
+   * @param string $identifier
+   *
+   * @return string
+   */
+  protected function getExpectedAddress(string $identifier): string {
+    if ($identifier === 'souza') {
+      return 'Mr. Antonia J. D`souza II
+Main Street 231
+Brummen, 6971 BN
+NETHERLANDS';
+    }
+    if ($identifier === 'collins') {
+      return 'Mr. Anthony J. Collins II
+Main Street 231
+Brummen, 6971 BN
+NETHERLANDS';
+    }
+    return '';
+  }
+
+  /**
+   * @return array
+   */
+  public function createTestAddresses(): array {
+    $contactIDs = [
+      $this->individualCreate([
+        'first_name' => 'Antonia',
+        'last_name' => 'D`souza',
+        'middle_name' => 'J.',
+        $this->getCustomFieldName() => 'Hey',
+      ], 'souza'),
+      $this->individualCreate([
+        'first_name' => 'Anthony',
+        'last_name' => 'Collins',
+        'middle_name' => 'J.',
+        $this->getCustomFieldName() => 'Ho',
+      ], 'collins'),
+    ];
     $addresses = [];
-    // create non-primary and primary addresses of each contact
-    foreach ($this->_contactIds as $contactID) {
-      // create the non-primary address first
+    // Create non-primary and primary addresses of each contact.
+    foreach ($contactIDs as $contactID) {
+      // Create the non-primary address first.
       foreach (['non-primary', 'primary'] as $flag) {
-        // @TODO: bug - this doesn't affect as if its the first and only address created for a contact then it always consider it as primary
         $isPrimary = ($flag === 'primary');
-        $streetName = substr(sha1(rand()), 0, 7);
-        $addresses[$contactID][$flag] = $this->callAPISuccess('Address', 'create', [
-          'street_name' => $streetName,
-          'street_number' => '23',
-          'street_address' => "$streetName 23",
+        $addresses[$contactID][$flag] = $this->createTestEntity('Address', [
+          'street_name' => 'Main Street',
+          'street_number' => '23' . (int) $isPrimary,
+          'street_address' => 'Main Street 23' . (int) $isPrimary,
           'postal_code' => '6971 BN',
           'country_id' => '1152',
           'city' => 'Brummen',
           // this doesn't affect for non-primary address so we need to call the Address.update API again, see below at L57
           'is_primary' => $isPrimary,
           'contact_id' => $contactID,
-          'sequential' => 1,
-        ])['values'][0];
-
-        if ($flag === 'non-primary') {
-          $addresses[$contactID][$flag] = $this->callAPISuccess('Address', 'create', [
-            'is_primary' => $isPrimary,
-            'id' => $addresses[$contactID][$flag]['id'],
-            'sequential' => 1,
-          ])['values'][0];
-        }
+        ]);
       }
     }
+    return $addresses;
+  }
 
-    $form = new CRM_Contact_Form_Task_Label();
-    $form->_contactIds = $this->_contactIds;
-    $params = [
-      'label_name' => 3475,
-      'location_type_id' => NULL,
-      'do_not_mail' => 1,
-      'is_unit_testing' => 1,
-    ];
-    $rows = $form->postProcess($params);
-
-    foreach ($this->_contactIds as $contactID) {
-      // ensure that the address printed in the mailing labe is always primary if 'location_type_id' - none (as Primary) is chosen
-      $this->assertStringContainsString($addresses[$contactID]['primary']['street_address'], $rows[$contactID][0]);
+  /**
+   * Implement token values hook.
+   *
+   * @param array $details
+   */
+  public function hookTokenValues(array &$details): void {
+    foreach ($details as $index => $detail) {
+      $details[$index]['last_initial'] = str_contains($detail['display_name'], 'souza') ? 'S' : 'C';
     }
+  }
 
-    // restore setting
-    Civi::settings()->set('searchPrimaryDetailsOnly', '1');
+  /**
+   * Implements civicrm_tokens().
+   */
+  public function hook_tokens(&$tokens): void {
+    $tokens['test'] = ['last_initial' => 'last_initial'];
+  }
+
+  /**
+   * @param array $submitValues
+   *
+   * @return array
+   */
+  public function submitForm(array $submitValues): array {
+    $criteria = ['radio_ts' => 'ts_all', ['contact_id', 'IN', $this->ids['Contact']]];
+    $form = $this->getTestForm('CRM_Contact_Form_Search_Basic', $criteria)
+      ->addSubsequentForm('CRM_Contact_Form_Task_Label',
+        [
+          'label_name' => 3475,
+        ]
+        + $submitValues);
+    $form->processForm();
+    return $form->getException()->errorData['contactRows'];
   }
 
 }

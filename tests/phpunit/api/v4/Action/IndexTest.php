@@ -26,7 +26,7 @@ use api\v4\Api4TestBase;
  */
 class IndexTest extends Api4TestBase {
 
-  public function testIndex() {
+  public function testIndex(): void {
     // Results indexed by name
     $resultByName = civicrm_api4('Activity', 'getActions', [], 'name');
     $this->assertInstanceOf('Civi\Api4\Generic\Result', $resultByName);
@@ -40,7 +40,7 @@ class IndexTest extends Api4TestBase {
     $this->assertEquals($resultByName->first(), (array) $firstResult);
   }
 
-  public function testBadIndexInt() {
+  public function testBadIndexInt(): void {
     $error = '';
     try {
       civicrm_api4('Activity', 'getActions', [], 99);
@@ -51,7 +51,7 @@ class IndexTest extends Api4TestBase {
     $this->assertStringContainsString('not found', $error);
   }
 
-  public function testBadIndexString() {
+  public function testBadIndexString(): void {
     $error = '';
     try {
       civicrm_api4('Activity', 'getActions', [], 'xyz');
@@ -62,12 +62,12 @@ class IndexTest extends Api4TestBase {
     $this->assertStringContainsString('not found', $error);
   }
 
-  public function testIndexWithSelect() {
+  public function testIndexWithSelect(): void {
     $result = civicrm_api4('Activity', 'getFields', ['select' => ['title'], 'where' => [['name', '=', 'subject']]], 'name');
     $this->assertEquals(['subject' => ['title' => 'Subject']], (array) $result);
   }
 
-  public function testArrayIndex() {
+  public function testArrayIndex(): void {
     // Non-associative
     $result = civicrm_api4('Activity', 'getFields', ['where' => [['name', '=', 'subject']]], ['name' => 'title']);
     $this->assertEquals(['subject' => 'Subject'], (array) $result);

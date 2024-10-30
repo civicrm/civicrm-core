@@ -43,7 +43,7 @@ class CRM_Case_ManagedEntities {
             'description' => (string) $xml->description,
             'is_reserved' => 1,
             'is_active' => 1,
-            'weight' => $xml->weight ? $xml->weight : 1,
+            'weight' => $xml->weight ?: 1,
           ],
         ];
       }
@@ -58,12 +58,11 @@ class CRM_Case_ManagedEntities {
    * Get a list of managed activity-types by searching CiviCase XML files.
    *
    * @param \CRM_Case_XMLRepository $xmlRepo
-   * @param \CRM_Core_ManagedEntities $me
    *
    * @return array
    * @see CRM_Utils_Hook::managed
    */
-  public static function createManagedActivityTypes(CRM_Case_XMLRepository $xmlRepo, CRM_Core_ManagedEntities $me) {
+  public static function createManagedActivityTypes(CRM_Case_XMLRepository $xmlRepo): array {
     $result = [];
     $validActTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, TRUE, 'name');
 
@@ -102,12 +101,11 @@ class CRM_Case_ManagedEntities {
    * Get a list of managed relationship-types by searching CiviCase XML files.
    *
    * @param \CRM_Case_XMLRepository $xmlRepo
-   * @param \CRM_Core_ManagedEntities $me
    *
    * @return array
    * @see CRM_Utils_Hook::managed
    */
-  public static function createManagedRelationshipTypes(CRM_Case_XMLRepository $xmlRepo, CRM_Core_ManagedEntities $me) {
+  public static function createManagedRelationshipTypes(CRM_Case_XMLRepository $xmlRepo): array {
     $result = [];
 
     if (!isset(Civi::$statics[__CLASS__]['reltypes'])) {

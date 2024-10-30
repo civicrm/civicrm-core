@@ -11,49 +11,93 @@
     {include file="CRM/Event/Form/Registration/PreviewHeader.tpl"}
 {/if}
 
-{include file="CRM/common/TrackingFields.tpl"}
-
 <div class="crm-event-id-{$event.id} crm-block crm-event-confirm-form-block">
+    <div class="messages status section continue_message-section"><p>
+    {capture assign=register}{ts}Register{/ts}{/capture}
     {if $isOnWaitlist}
-        <div class="help">
-            {ts}Please verify the information below. <span class="bold">Then click 'Continue' to be added to the WAIT LIST for this event</span>. If space becomes available you will receive an email with a link to a web page where you can complete your registration.{/ts}
-        </div>
+        {ts}Please verify your information.{/ts} <strong>{ts}If space becomes available you will receive an email with a link to complete your registration.{/ts}</strong>
+        {ts 1=$register}Click <strong>%1</strong> to be added to the WAIT LIST for this event.{/ts}
     {elseif $isRequireApproval}
-        <div class="help">
-            {ts}Please verify the information below. Then click 'Continue' to submit your registration. <span class="bold">Once approved, you will receive an email with a link to a web page where you can complete the registration process.</span>{/ts}
-        </div>
+        {ts}Please verify your information.{/ts} <strong>{ts}Once approved, you will receive an email with a link to complete the registration process.{/ts}</strong>
+        {ts 1=$register}Click <strong>%1</strong> to submit your registration for approval.{/ts}
     {else}
-        <div class="help">
-        {ts}Please verify the information below. Click the <strong>Go Back</strong> button below if you need to make changes.{/ts}
-        {if $contributeMode EQ 'notify' and !$is_pay_later and ! $isAmountzero }
-          {ts 1=$paymentProcessor.name}Click the <strong>Continue</strong> button to checkout to %1, where you will select your payment method and complete the registration.{/ts}
-        {else}
-            {ts}Otherwise, click the <strong>Continue</strong> button below to complete your registration.{/ts}
-        {/if}
-        </div>
-        {if $is_pay_later and !$isAmountzero}
-            <div class="bold">{$pay_later_receipt}</div>
-        {/if}
+        {ts}Please verify your information.{/ts}
+        {$verifyText}
+    {/if}
+    </p></div>
+    {if $is_pay_later and !$isAmountzero and !$isOnWaitlist and !$isRequireApproval}
+    <div class="bold pay-later-receipt-instructions">{$pay_later_receipt}</div>
     {/if}
 
     <div id="crm-submit-buttons" class="crm-submit-buttons">
       {include file="CRM/common/formButtons.tpl" location="top"}
     </div>
 
-    {if $event.confirm_text}
+    {if $confirm_text}
         <div id="intro_text" class="crm-section event_confirm_text-section">
-          <p>{$event.confirm_text}</p>
+          <p>{$confirm_text|purify}</p>
         </div>
     {/if}
 
+    {if $paidEvent && !$isRequireApproval && !$isOnWaitlist}
+        <div class="crm-group event_fees-group">
+            <div class="header-dark">
+                {$event.fee_label}
+            </div>
+            {if $lineItem}
+                {include file="CRM/Price/Page/LineItem.tpl" context="Event" displayLineItemFinancialType=false getTaxDetails=$totalTaxAmount}
+            {elseif $amounts || $amount == 0}
+          <div class="crm-section no-label amount-item-section">
+                    {foreach from=$amounts item=amount key=level}
+              <div class="content">
+                  {$amount.amount|crmMoney:$currency}&nbsp;&nbsp;{$amount.label}
+              </div>
+                  <div class="clear"></div>
+                    {/foreach}
+            </div>
+                {if $totalTaxAmount}
+                  <div class="crm-section no-label total-amount-section">
+                  <div class="content bold">{ts}Total {$taxTerm} Amount{/ts}:&nbsp;&nbsp;{$totalTaxAmount|crmMoney:$currency}</div>
+                  <div class="clear"></div>
+                  </div>
+                {/if}
+                {if $totalAmount}
+                <div class="crm-section no-label total-amount-section">
+                    <div class="content bold">{ts}Total Amount{/ts}:&nbsp;&nbsp;{$totalAmount|crmMoney:$currency}</div>
+                    <div class="clear"></div>
+                  </div>
+                {/if}
+                {if $hookDiscount}
+                    <div class="crm-section hookDiscount-section">
+                        <em>({$hookDiscount.message})</em>
+                    </div>
+                {/if}
+            {/if}
+
+        </div>
+    {/if}
+
+    {if $showPaymentOnConfirm}
     <div class="crm-group event_info-group">
-        <div class="header-dark">
-            {ts}Event Information{/ts}
+      <div class="header-dark">
+          {ts}Payment details{/ts}
+      </div>
+    {if !empty($form.payment_processor_id.label)}
+      <fieldset class="crm-public-form-item crm-group payment_options-group" style="display:none;">
+        <legend>{ts}Payment Options{/ts}</legend>
+        <div class="crm-section payment_processor-section">
+          <div class="label">{$form.payment_processor_id.label}</div>
+          <div class="content">{$form.payment_processor_id.html}</div>
+          <div class="clear"></div>
         </div>
-        <div class="display-block">
-            {include file="CRM/Event/Form/Registration/EventInfoBlock.tpl"}
-        </div>
+      </fieldset>
+    {/if}
+    {if $totalAmount > 0}
+      {include file='CRM/Core/BillingBlockWrapper.tpl'}
+    {/if}
+    {literal}<script>function calculateTotalFee() { return {/literal}{$totalAmount}{literal} }</script>{/literal}
     </div>
+    {/if}
 
     {if $pcpBlock && $pcp_display_in_roll}
     <div class="crm-group pcp_display-group">
@@ -77,61 +121,9 @@
     </div>
     {/if}
 
-    {if $paidEvent && !$isRequireApproval && !$isOnWaitlist}
-        <div class="crm-group event_fees-group">
-            <div class="header-dark">
-                {$event.fee_label}
-            </div>
-            {if $lineItem}
-                {include file="CRM/Price/Page/LineItem.tpl" context="Event"}
-            {elseif $amounts || $amount == 0}
-          <div class="crm-section no-label amount-item-section">
-                    {foreach from= $amounts item=amount key=level}
-              <div class="content">
-                  {$amount.amount|crmMoney}&nbsp;&nbsp;{$amount.label}
-              </div>
-                  <div class="clear"></div>
-                    {/foreach}
-            </div>
-                {if $totalTaxAmount}
-                  <div class="crm-section no-label total-amount-section">
-                  <div class="content bold">{ts}Total {$taxTerm} Amount{/ts}:&nbsp;&nbsp;{$totalTaxAmount|crmMoney}</div>
-                  <div class="clear"></div>
-                  </div>
-                {/if}
-                {if $totalAmount}
-                <div class="crm-section no-label total-amount-section">
-                    <div class="content bold">{ts}Total Amount{/ts}:&nbsp;&nbsp;{$totalAmount|crmMoney}</div>
-                    <div class="clear"></div>
-                  </div>
-                {/if}
-                {if $hookDiscount.message}
-                    <div class="crm-section hookDiscount-section">
-                        <em>({$hookDiscount.message})</em>
-                    </div>
-                {/if}
-            {/if}
-
-        </div>
-    {/if}
-
-    {if $event.participant_role neq 'Attendee' and $defaultRole}
-        <div class="crm-group participant_role-group">
-            <div class="header-dark">
-                {ts}Participant Role{/ts}
-            </div>
-            <div class="crm-section no-label participant_role-section">
-                <div class="content">
-                    {$event.participant_role}
-                </div>
-              <div class="clear"></div>
-            </div>
-        </div>
-    {/if}
-
     {include file="CRM/Event/Form/Registration/DisplayProfile.tpl"}
 
-    {if $contributeMode ne 'notify' and (!$is_pay_later or $isBillingAddressRequiredForPayLater) and $paidEvent and !$isAmountzero and !$isOnWaitlist and !$isRequireApproval}
+    {if $billingName or $address}
       <div class="crm-group billing_name_address-group">
             <div class="header-dark">
                 {ts}Billing Name and Address{/ts}
@@ -163,22 +155,22 @@
       {/crmRegion}
     {/if}
 
-    {if $contributeMode NEQ 'notify'} {* In 'notify mode, contributor is taken to processor payment forms next *}
-    <div class="messages status section continue_message-section">
-        <p>
-        {ts}Your registration will not be submitted until you click the <strong>Continue</strong> button. Please click the button one time only. If you need to change any details, click the Go Back button below to return to the previous screen.{/ts}
-        </p>
+    <div class="crm-group event_info-group">
+        <div class="header-dark">
+            {ts}Event Information{/ts}
+        </div>
+        <div class="display-block">
+            {include file="CRM/Event/Form/Registration/EventInfoBlock.tpl"}
+        </div>
     </div>
-    {/if}
 
     <div id="crm-submit-buttons" class="crm-submit-buttons">
       {include file="CRM/common/formButtons.tpl" location="bottom"}
     </div>
 
-    {if $event.confirm_footer_text}
+    {if array_key_exists('confirm_footer_text', $event) && $event.confirm_footer_text}
         <div id="footer_text" class="crm-section event_confirm_footer-section">
-            <p>{$event.confirm_footer_text}</p>
+            <p>{$event.confirm_footer_text|purify}</p>
         </div>
     {/if}
 </div>
-{include file="CRM/common/showHide.tpl"}

@@ -97,6 +97,8 @@
     },
     '#editCaseRoleDialog': {
       pre: function(data) {
+        // Clear stale value since this form can be reused multiple times
+        $('[name=edit_role_contact_id]', this).val('');
         prepareRelationshipField(data.rel_type, $('[name=edit_role_contact_id]', this));
       },
       post: function(data) {
@@ -175,6 +177,12 @@
     });
   }
 
+  function showHideInactiveRoles() {
+    let showInactive = $('#role_inactive').prop('checked');
+    $('[id^=caseRoles-selector] tbody tr').not('.disabled').toggle(!showInactive);
+    $('[id^=caseRoles-selector] tbody tr.disabled').toggle(showInactive);
+  }
+
   $('#crm-container').on('crmLoad', '#crm-main-content-wrapper', detachMiniForms);
 
   $(document).ready(function() {
@@ -222,6 +230,9 @@
           $('#case_id_' + id).dataTable().api().draw();
         });
       })
+      // Toggle to show/hide inactive case roles
+      .on('crmLoad', 'table#caseRoles-selector-' + caseId(), showHideInactiveRoles)
+      .on('change', '#role_inactive', showHideInactiveRoles)
       .on('click', 'a.case-miniform', function(e) {
         var dialog,
           $el = $(this),
@@ -274,16 +285,21 @@
       .on('crmBeforeLoad', function(e) {
         if ($(e.target).is(this)) {
           accordionStates = [];
-          $('.crm-accordion-wrapper', this).each(function() {
-            accordionStates.push($(this).hasClass('collapsed'));
+          $('details', this).each(function() {
+            accordionStates.push($(this).prop('open') ? true : false);
           });
         }
       })
       .on('crmLoad', function(e) {
         if ($(e.target).is(this)) {
-          var $targets = $('.crm-accordion-wrapper', this);
-          $.each(accordionStates, function(i, isCollapsed) {
-            $targets.eq(i).toggleClass('collapsed', isCollapsed);
+          var $targets = $('details', this);
+          $.each(accordionStates, function(i, isOpen) {
+            if (isOpen) {
+              $targets.eq(i).prop('open', true);
+            }
+            else {
+              $targets.eq(i).removeProp('open');
+            }
           });
         }
       });

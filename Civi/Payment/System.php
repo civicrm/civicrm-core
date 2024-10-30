@@ -156,7 +156,7 @@ class System {
    *
    * @param string $className
    *
-   * @return \Civi\Payment\CRM_Core_Payment|NULL
+   * @return \CRM_Core_Payment|NULL
    * @throws \CRM_Core_Exception
    */
   public function getByClass($className) {

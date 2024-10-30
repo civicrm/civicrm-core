@@ -15,7 +15,7 @@
  */
 class CRM_Core_BAO_PrevNextCacheTest extends CiviUnitTestCase {
 
-  public function testFlipData() {
+  public function testFlipData(): void {
     $dao = new CRM_Core_BAO_PrevNextCache();
     $dao->entity_id1 = 1;
     $dao->entity_id2 = 2;

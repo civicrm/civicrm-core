@@ -24,7 +24,6 @@
         {ts 1=$msg_title|escape}Do you want to delete the message template '%1'?{/ts}
       </div>
     {else}
-      <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
       <table class="form-layout-compressed">
         <tr>
           <td class="label-left">{$form.msg_title.label}</td>
@@ -43,7 +42,7 @@
           <td>
             {$form.msg_subject.html|crmAddClass:huge}
             <input class="crm-token-selector big" data-field="msg_subject" />
-            {help id="id-token-subject" tplFile=$tplFile isAdmin=$isAdmin file="CRM/Contact/Form/Task/Email.hlp"}
+            {help id="id-token-subject" tplFile=$tplFile file="CRM/Contact/Form/Task/Email.hlp"}
           </td>
         </tr>
         <tr>
@@ -66,28 +65,28 @@
         <tr>
       </table>
 
-      <div id="msg_html_section" class="crm-accordion-wrapper crm-html_email-accordion ">
-        <div class="crm-accordion-header">
+      <details id="msg_html_section" class="crm-accordion-bold crm-html_email-accordion " open>
+        <summary>
           {ts}HTML Format{/ts}
           {help id="id-message-text" file="CRM/Contact/Form/Task/Email.hlp"}
-        </div><!-- /.crm-accordion-header -->
+        </summary>
         <div class="crm-accordion-body">
           <div class="helpIcon" id="helphtml">
             <input class="crm-token-selector big" data-field="msg_html" />
-            {help id="id-token-html" tplFile=$tplFile isAdmin=$isAdmin file="CRM/Contact/Form/Task/Email.hlp"}
+            {help id="id-token-html" tplFile=$tplFile file="CRM/Contact/Form/Task/Email.hlp"}
           </div>
           <div class="clear"></div>
           <div class='html'>
             {$form.msg_html.html|crmAddClass:huge}
-            <div class="description">{ts}An HTML formatted version of this message will be sent to contacts whose Email Format preference is 'HTML' or 'Both'.{/ts}</div>
           </div>
-        </div><!-- /.crm-accordion-body -->
-      </div><!-- /.crm-accordion-wrapper -->
+        </div>
+      </details>
 
-      <div id="msg_text_section" class="crm-accordion-wrapper crm-plaint_text_email-accordion ">
-        <div class="crm-accordion-header">
-          {ts}Plain-Text Format{/ts}
-        </div><!-- /.crm-accordion-header -->
+      <details id="msg_text_section" class="crm-accordion-bold crm-plaint_text_email-accordion " open>
+        <summary>
+          {ts}Optional Plain-Text Format{/ts}
+          {help id="id-message-plain" file="CRM/Contact/Form/Task/Email.hlp"}
+        </summary>
         <div class="crm-accordion-body">
           <div class="helpIcon" id="helptext">
             <input class="crm-token-selector big" data-field="msg_text" />
@@ -96,15 +95,14 @@
           <div class="clear"></div>
           <div class='text'>
             {$form.msg_text.html|crmAddClass:huge}
-            <div class="description">{ts}Text formatted message.{/ts}</div>
           </div>
-        </div><!-- /.crm-accordion-body -->
-      </div><!-- /.crm-accordion-wrapper -->
+        </div>
+      </details>
 
-      <div id="pdf_format" class="crm-accordion-wrapper crm-html_email-accordion ">
-        <div class="crm-accordion-header">
+      <details id="pdf_format" class="crm-accordion-bold crm-html_email-accordion " open>
+        <summary>
           {$form.pdf_format_id.label}
-        </div><!-- /.crm-accordion-header -->
+        </summary>
         <div class="crm-accordion-body">
           <div class="spacer"></div>
           <div class='html'>
@@ -112,8 +110,8 @@
             {help id="id-msg-template" file="CRM/Contact/Form/Task/PDFLetterCommon.hlp"}
             <div class="description">{ts}Page format to use when creating PDF files using this template.{/ts}</div>
           </div>
-        </div><!-- /.crm-accordion-body -->
-      </div><!-- /.crm-accordion-wrapper -->
+        </div>
+      </details>
 
       {if !$isWorkflow}
         <table class="form-layout-compressed">

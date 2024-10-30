@@ -56,7 +56,7 @@ trait CRMTraits_Page_PageTestTrait {
     // Ideally we would validate $content as valid html here.
     // Suppress console output.
     $content = '';
-    $this->smartyVariables = CRM_Core_Smarty::singleton()->get_template_vars();
+    $this->smartyVariables = CRM_Core_Smarty::singleton()->getTemplateVars();
   }
 
   /**

@@ -15,7 +15,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
+class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag implements \Civi\Core\HookInterface {
   use CRM_Core_DynamicFKAccessTrait;
 
   /**
@@ -46,13 +46,9 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
   /**
    * Takes an associative array and creates a entityTag object.
    *
-   * the function extract all the params it needs to initialize the create a
-   * group object. the params array could contain additional unused name/value
-   * pairs
-   *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
    *
+   * @deprecated
    * @return CRM_Core_BAO_EntityTag
    */
   public static function add(&$params) {
@@ -89,7 +85,7 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    * @return bool
    */
   public static function dataExists($params) {
-    return !($params['tag_id'] == 0);
+    return !empty($params['tag_id']);
   }
 
   /**
@@ -252,8 +248,10 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
   /**
    * Takes an associative array and creates tag entity record for all tag entities.
    *
+   * Nonstandard function
+   * @deprecated
+   *
    * @param array $params
-   *   (reference) an assoc array of name/value pairs.
    * @param string $entityTable
    * @param int $entityID
    */
@@ -303,7 +301,7 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
   public static function getContactTags($contactID, $count = FALSE) {
     $contactTags = [];
     if (!$count) {
-      $select = "SELECT ct.id, ct.name ";
+      $select = "SELECT ct.id, ct.label ";
     }
     else {
       $select = "SELECT count(*) as cnt";
@@ -324,7 +322,7 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
     }
 
     while ($dao->fetch()) {
-      $contactTags[$dao->id] = $dao->name;
+      $contactTags[$dao->id] = $dao->label;
     }
 
     return $contactTags;
@@ -421,28 +419,32 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
   }
 
   /**
-   * Get options for a given field.
+   * Pseudoconstant condition_provider for tag_id field.
+   * @see \Civi\Schema\EntityMetadataBase::getConditionFromProvider
+   */
+  public static function alterTagOptions(string $fieldName, CRM_Utils_SQL_Select $conditions, $params) {
+    $conditions->where('is_tagset != 1');
+    if (!empty($params['values']['entity_table'])) {
+      $conditions->where('used_for LIKE @table', ['table' => '%' . $params['values']['entity_table'] . '%']);
+    }
+  }
+
+  /**
+   * Legacy option getter
    *
-   * @see CRM_Core_DAO::buildOptions
-   * @see CRM_Core_DAO::buildOptionsContext
+   * @deprecated
    *
    * @param string $fieldName
    * @param string $context
-   *   As per CRM_Core_DAO::buildOptionsContext.
    * @param array $props
-   *   whatever is known about this dao object.
    *
    * @return array|bool
    */
   public static function buildOptions($fieldName, $context = NULL, $props = []) {
-    $params = [];
-
+    // Legacy formatting used by some forms
+    // TODO: Do any forms still use this? If not, remove this function.
     if ($fieldName == 'tag' || $fieldName == 'tag_id') {
-      $table = 'civicrm_contact';
-      if (!empty($props['entity_table'])) {
-        $table = CRM_Utils_Type::escape($props['entity_table'], 'String');
-        $params['condition'][] = "used_for LIKE '%$table%'";
-      }
+      $table = $props['entity_table'] ?? 'civicrm_contact';
 
       // Output tag list as nested hierarchy
       // TODO: This will only work when api.entity is "entity_tag". What about others?
@@ -451,20 +453,7 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
         return CRM_Core_BAO_Tag::getTags($table, $dummyArray, NULL, '- ');
       }
     }
-
-    $options = CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
-
-    // Special formatting for validate/match context
-    if ($fieldName == 'entity_table' && in_array($context, ['validate', 'match'])) {
-      $options = [];
-      foreach (self::buildOptions($fieldName) as $tableName => $label) {
-        $bao = CRM_Core_DAO_AllCoreTables::getClassForTable($tableName);
-        $apiName = CRM_Core_DAO_AllCoreTables::getBriefName($bao);
-        $options[$tableName] = $apiName;
-      }
-    }
-
-    return $options;
+    return parent::buildOptions($fieldName, $context, $props);
   }
 
   /**
@@ -486,7 +475,7 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
     }
     // This is probably fairly mild in terms of helping performance - a case could be made to check if tags
     // exist before deleting (further down) as delete is a locking action.
-    $entity = CRM_Core_DAO_AllCoreTables::getBriefName(get_class($event->object));
+    $entity = CRM_Core_DAO_AllCoreTables::getEntityNameForClass(get_class($event->object));
     if ($entity && !isset(Civi::$statics[__CLASS__]['tagged_entities'][$entity])) {
       $tableName = CRM_Core_DAO_AllCoreTables::getTableForEntityName($entity);
       $used_for = CRM_Core_OptionGroup::values('tag_used_for');

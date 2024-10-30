@@ -9,6 +9,9 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Country;
+use Civi\Api4\StateProvince;
+
 /**
  *  Test APIv3 civicrm_contribute_* functions
  *
@@ -132,13 +135,14 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
       'From: site@something.com',
       'Dear Anthony,',
       'Payment Details',
-      'Total Fee: $100.00',
-      'This Payment Amount: $70.00',
+      'Total Fee',
+      '$100.00',
+      'This Payment Amount',
+      '$70.00',
       'Billing Name and Address',
-      'Vancouver, AE 1321312',
+      'Vancouver, British Columbia 1321312',
       'Visa',
       '***********1111',
-      'Expires: May 2025',
     ]);
   }
 
@@ -179,8 +183,8 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
       'return' => ['target_contact_id', 'assignee_contact_id', 'subject'],
     ])['values'];
     $this->assertCount(3, $activities);
-    $this->assertEquals('$ 50.00 - Offline Payment for Contribution', $activities[1]['subject']);
-    $this->assertEquals('$ 20.00 - Offline Payment for Contribution', $activities[2]['subject']);
+    $this->assertEquals('$ 50.00 - Payment for Contribution', $activities[1]['subject']);
+    $this->assertEquals('$ 20.00 - Payment for Contribution', $activities[2]['subject']);
     $this->assertEquals(CRM_Core_Session::singleton()->getLoggedInContactID(), $activities[0]['source_contact_id']);
     $this->assertEquals([$this->_individualId], $activities[0]['target_contact_id']);
     $this->assertEquals([], $activities[0]['assignee_contact_id']);
@@ -194,14 +198,6 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
   public function testMultiplePaymentForPartiallyPaidContributionWithOneCreditCardPayment(): void {
     $mut = new CiviMailUtils($this, TRUE);
     $this->createPartiallyPaidOrder();
-    // In general when there is tpl leakage we try to fix. At the moment, however,
-    // the tpl leakage on credit card related things is kind of 'by-design' - or
-    // at least we haven't found a way to replace the way in with Payment.send_confirmation
-    // picks them up from the form process so we will just clear templates here to stop leakage
-    // from previous tests causing a fail.
-    // The reason this is hard to fix is that we save a billing address per contribution not
-    // per payment so it's a problem with the data model
-    CRM_Core_Smarty::singleton()->clearTemplateVars();
 
     // pay additional amount
     $this->submitPayment(50, NULL, TRUE);
@@ -215,11 +211,16 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     $mut->checkMailLog([
       'Dear Anthony,',
       'Below you will find a receipt for this payment.',
-      'Total Fee: $100.00',
-      'This Payment Amount: $50.00',
-      'Balance Owed: $20.00 ',
-      'Paid By: Check',
-      'Check Number: check-12345',
+      'Total Fee',
+      '$100.00',
+      'This Payment Amount',
+      '$50.00',
+      'Balance Owed',
+      '$20.00',
+      'Paid By',
+      'Check',
+      'Check Number',
+      'check-12345',
     ],
     [
       'Billing Name and Address',
@@ -244,14 +245,15 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
 
     $mut->checkMailLog([
       'Below you will find a receipt for this payment.',
-      'Total Fee: $100.00',
-      'This Payment Amount: $100.00',
-      'Paid By: Credit Card',
+      'Total Fee',
+      '$100.00',
+      'This Payment Amount',
+      '$100.00',
+      'Paid By',
+      'Credit Card',
       '***********1111',
       'Billing Name and Address',
-      'Vancouver, AE 1321312',
-      'Expires: May 2025',
-
+      'Vancouver, British Columbia 1321312',
     ]);
     $mut->stop();
     $mut->clearMessages();
@@ -351,7 +353,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function submitPayment(float $amount, string $mode = NULL, bool $isEmailReceipt = FALSE): void {
+  public function submitPayment(float $amount, ?string $mode = NULL, bool $isEmailReceipt = FALSE): void {
     $submitParams = [
       'contact_id' => $this->ids['Contact']['order'] ?? $this->_individualId,
       'total_amount' => $amount,
@@ -364,6 +366,11 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     ];
     if ($mode) {
       $_REQUEST['mode'] = $mode;
+      $stateProvinceID = StateProvince::get()
+        ->addWhere('abbreviation', '=', 'BC')
+        ->addWhere('country_id.name', '=', 'Canada')
+        ->execute()
+        ->single();
       $submitParams += [
         'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments, TRUE),
         'payment_processor_id' => $this->paymentProcessorID,
@@ -372,9 +379,9 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
         'cvv2' => 234,
         'credit_card_type' => 'Visa',
         'billing_city-5' => 'Vancouver',
-        'billing_state_province_id-5' => 1059,
+        'billing_state_province_id-5' => $stateProvinceID['id'],
         'billing_postal_code-5' => 1321312,
-        'billing_country_id-5' => 1228,
+        'billing_country_id-5' => Country::get()->addWhere('name', '=', 'Canada')->execute()->first()['id'],
       ];
     }
     else {
@@ -425,7 +432,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('Order', 'create', $orderParams);
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $contribution['id']]);
     $this->assertEquals('Pending', CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution['contribution_status_id']));
-    $this->_contributionId = $contribution['id'];
+    $this->ids['Contribution']['pending'] = $this->_contributionId = $contribution['id'];
   }
 
   /**
@@ -467,6 +474,35 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
       'api.MembershipStatus.create' => ['name' => $membershipStatusName],
     ];
     $this->callAPISuccess('MembershipStatus', 'get', $params);
+  }
+
+  /**
+   * Test that multiple payment has correct line item allocations.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testMultiplePaymentForPendingPayLaterContributionHasCorrectionAllocation(): void {
+    $this->enableTaxAndInvoicing();
+    $this->addTaxAccountToFinancialType(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'), ['tax_rate' => 20]);
+    $this->createPendingOrder();
+
+    $this->submitPayment(60);
+    $this->submitPayment(30);
+    $result = $this->callAPISuccess('EntityFinancialTrxn', 'get', [
+      'version' => 4,
+      'where' => [
+        ['entity_table', '=', 'civicrm_contribution'],
+        ['entity_id', '=', $this->ids['Contribution']['pending']],
+      ],
+      'chain' => [
+        'line_items' => ['EntityFinancialTrxn', 'get', ['where' => [['financial_trxn_id', '=', '$financial_trxn_id'], ['id', '!=', '$id']]]],
+      ],
+    ])['values'];
+
+    // Assert that the line items have the correct allocations from the paid amount
+    foreach ($result as $entityFnTrxn) {
+      $this->assertEquals(round($entityFnTrxn['amount'], 2), round(array_sum(array_column($entityFnTrxn['line_items'], 'amount')), 2));
+    }
   }
 
 }

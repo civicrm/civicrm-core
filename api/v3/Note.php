@@ -92,7 +92,7 @@ function _civicrm_api3_note_get_spec(&$params) {
  *
  * @param array $params
  *   array; only required 'id' parameter is used.
- *
+ * @deprecated
  * @return array
  *   Nested associative array beginning with direct children of given note.
  */
@@ -110,4 +110,13 @@ function civicrm_api3_note_tree_get($params) {
   }
   $noteTree = CRM_Core_BAO_Note::getNoteTree($params['id'], $params['max_depth'], $params['snippet']);
   return civicrm_api3_create_success($noteTree, $params);
+}
+
+/**
+ * Declare deprecated api functions.
+ *
+ * @return array
+ */
+function _civicrm_api3_note_deprecation() {
+  return ['tree_get' => 'Unused api action.'];
 }

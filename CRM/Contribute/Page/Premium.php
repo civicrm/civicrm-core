@@ -54,12 +54,14 @@ class CRM_Contribute_Page_Premium extends CRM_Core_Page_Basic {
           'url' => 'civicrm/admin/contribute/addProductToPage',
           'qs' => 'action=update&id=%%id%%&pid=%%pid%%&reset=1',
           'title' => ts('Edit Premium'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
         ],
         CRM_Core_Action::PREVIEW => [
           'name' => ts('Preview'),
           'url' => 'civicrm/admin/contribute/addProductToPage',
           'qs' => 'action=preview&id=%%id%%&pid=%%pid%%',
           'title' => ts('Preview Premium'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::PREVIEW),
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Remove'),
@@ -67,6 +69,7 @@ class CRM_Contribute_Page_Premium extends CRM_Core_Page_Basic {
           'qs' => 'action=delete&id=%%id%%&pid=%%pid%%',
           'extra' => 'onclick = "if (confirm(\'' . $deleteExtra . '\') ) this.href+=\'&amp;confirmed=1\'; else return false;"',
           'title' => ts('Disable Premium'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
         ],
       ];
     }
@@ -142,7 +145,7 @@ class CRM_Contribute_Page_Premium extends CRM_Core_Page_Basic {
 
         $action = array_sum(array_keys($this->links()));
 
-        $premiums[$premiumsProductDao->product_id]['action'] = CRM_Core_Action::formLink(self::links(), $action,
+        $premiums[$premiumsProductDao->product_id]['action'] = CRM_Core_Action::formLink($this->links(), $action,
           ['id' => $pageID, 'pid' => $premiumsProductDao->id],
           ts('more'),
           FALSE,

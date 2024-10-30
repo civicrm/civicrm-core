@@ -16,7 +16,10 @@
  */
 class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
 
-  protected $_customClass = NULL;
+  /**
+   * @var CRM_Contact_Form_Search_Custom_Base
+   */
+  protected $_customClass;
 
   public function preProcess() {
     // SearchFormName is deprecated & to be removed - the replacement is for the task to
@@ -30,11 +33,7 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
     $ssID = CRM_Utils_Request::retrieve('ssID', 'Integer', $this);
     $gID = CRM_Utils_Request::retrieve('gid', 'Integer', $this);
 
-    list(
-      $this->_customSearchID,
-      $this->_customSearchClass,
-      $formValues
-      ) = CRM_Contact_BAO_SearchCustom::details($csID, $ssID, $gID);
+    [$this->_customSearchID, $this->_customSearchClass, $formValues] = CRM_Contact_BAO_SearchCustom::details($csID, $ssID, $gID);
 
     if (!$this->_customSearchID) {
       CRM_Core_Error::statusbounce(ts('Could not get details for custom search.'));
@@ -49,14 +48,14 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
     }
 
     // set breadcrumb to return to Custom Search listings page
-    $breadCrumb = array(
-      array(
+    $breadCrumb = [
+      [
         'title' => ts('Custom Searches'),
         'url' => CRM_Utils_System::url('civicrm/contact/search/custom/list',
           'reset=1'
         ),
-      ),
-    );
+      ],
+    ];
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
 
     // use the custom selector
@@ -70,7 +69,7 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
     // instantiate the new class
     $this->_customClass = new $this->_customSearchClass($this->_formValues);
 
-    $this->addFormRule(array($this->_customClass, 'formRule'), $this);
+    $this->addFormRule([$this->_customClass, 'formRule'], $this);
 
     // CRM-12747
     if (isset($this->_customClass->_permissionedComponent) &&
@@ -84,7 +83,7 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
    * Add local and global form rules.
    */
   public function addRules() {
-    $this->addFormRule(array($this->_customClass, 'formRule'));
+    $this->addFormRule([$this->_customClass, 'formRule']);
   }
 
   /**
@@ -107,9 +106,21 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
    */
   public function buildTaskList() {
     // call the parent method to populate $this->_taskList for the custom search
-    parent::buildTaskList();
-
-    return $this->_customClass->buildTaskList($this);
+    // amtg = 'Add members to group'
+    if ($this->_context !== 'amtg') {
+      $taskParams['deletedContacts'] = FALSE;
+      if ($this->_componentMode == CRM_Contact_BAO_Query::MODE_CONTACTS || $this->_componentMode == CRM_Contact_BAO_Query::MODE_CONTACTSRELATED) {
+        $taskParams['deletedContacts'] = $this->_formValues['deleted_contacts'] ?? NULL;
+      }
+      $className = $this->_modeValue['taskClassName'];
+      $taskParams['ssID'] = $this->_ssID ?? NULL;
+      $this->_taskList += $className::permissionedTaskTitles(CRM_Core_Permission::getPermission(), $taskParams);
+    }
+    $reflectionClass = new ReflectionClass($this->_customClass);
+    if ($reflectionClass->getMethod('buildTaskList')->class == get_class($this->_customClass)) {
+      return $this->_customClass->buildTaskList($this);
+    }
+    return $this->_taskList;
   }
 
   public function buildQuickForm() {
@@ -138,7 +149,7 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
       $fileName = $this->_customClass->templateFile();
     }
 
-    return $fileName ? $fileName : parent::getTemplateFileName();
+    return $fileName ?: parent::getTemplateFileName();
   }
 
   public function postProcess() {

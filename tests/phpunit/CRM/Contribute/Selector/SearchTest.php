@@ -19,7 +19,7 @@ class CRM_Contribute_Selector_SearchTest extends CiviUnitTestCase {
   /**
    * CRM-20866 - Soft credit appearance inconsistent in contribution search
    */
-  public function testSoftCreditFieldsSelected() {
+  public function testSoftCreditFieldsSelected(): void {
     $queryParams = [['contribution_or_softcredits', '=', 'both_related', 0, 0]];
     $searchSelector = new CRM_Contribute_Selector_Search($queryParams, CRM_Core_Action::VIEW);
 
@@ -30,7 +30,7 @@ class CRM_Contribute_Selector_SearchTest extends CiviUnitTestCase {
   /**
    * CRM-20866 - Soft credit appearance inconsistent in contribution search
    */
-  public function testSoftCreditFieldNotSelected() {
+  public function testSoftCreditFieldNotSelected(): void {
     $queryParams = [['contribution_or_softcredits', '=', 'only_contribs', 0, 0]];
     $searchSelector = new CRM_Contribute_Selector_Search($queryParams, CRM_Core_Action::VIEW);
 

@@ -24,6 +24,13 @@ class CRM_ACL_Form_EntityRole extends CRM_Admin_Form {
   public $submitOnce = TRUE;
 
   /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity(): string {
+    return 'ACLEntityRole';
+  }
+
+  /**
    * Build the form object.
    */
   public function buildQuickForm() {

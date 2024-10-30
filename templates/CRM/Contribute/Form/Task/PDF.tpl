@@ -21,7 +21,7 @@
   </tr>
   <tr id="selectEmailFrom" style="display: none" class="crm-contactEmail-form-block-fromEmailAddress crm-email-element">
     <td class="label">{$form.from_email_address.label}</td>
-    <td>{$form.from_email_address.html}  {help id="id-from_email" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp"}</td>
+    <td>{$form.from_email_address.html}  {help id="id-from_email" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp" title=$form.from_email_address.label}</td>
   </tr>
   <tr>
     <td>{$form.output.pdf_receipt.html}</td>

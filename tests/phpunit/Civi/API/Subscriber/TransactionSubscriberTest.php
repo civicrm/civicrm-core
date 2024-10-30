@@ -107,7 +107,7 @@ class TransactionSubscriberTest extends \CiviUnitTestCase {
     $this->assertEquals($isNested, $txs->isNested($apiProvider, $apiRequest), 'check isNested');
   }
 
-  public function testForceRollback() {
+  public function testForceRollback(): void {
     $result = $this->callAPISuccess('contact', 'create', [
       'contact_type' => 'Individual',
       'first_name' => 'Me',

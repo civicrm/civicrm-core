@@ -24,12 +24,6 @@ class CRM_Event_Page_List extends CRM_Core_Page {
 
     $this->assign('events', $info);
 
-    // @todo Move this to eventcart extension
-    // check if we're in shopping cart mode for events
-    if ((bool) Civi::settings()->get('enable_cart')) {
-      $this->assign('registration_links', TRUE);
-    }
-
     return parent::run();
   }
 

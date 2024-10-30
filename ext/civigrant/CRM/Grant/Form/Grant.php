@@ -14,13 +14,14 @@
  *
  */
 class CRM_Grant_Form_Grant extends CRM_Core_Form {
+  use CRM_Custom_Form_CustomDataTrait;
 
   /**
-   * The id of the case that we are proceessing.
+   * The id of the grant when ACTION is update or delete.
    *
-   * @var int
+   * @var int|null
    */
-  protected $_id;
+  protected ?int $_id;
 
   /**
    * The id of the contact associated with this contribution.
@@ -30,6 +31,8 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
   protected $_contactID;
 
   protected $_context;
+
+  public $_noteId;
 
   /**
    * Explicitly declare the entity api name.
@@ -43,16 +46,18 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
    */
   public function preProcess() {
 
-    $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
-    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $this->_grantType = NULL;
-    if ($this->_id) {
+    if ($this->getGrantID()) {
       $this->_grantType = CRM_Core_DAO::getFieldValue('CRM_Grant_DAO_Grant', $this->_id, 'grant_type_id');
+      $this->_contactID = CRM_Core_DAO::getFieldValue('CRM_Grant_DAO_Grant', $this->_id, 'contact_id');
     }
-    $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
+    else {
+      $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
+    }
+    // Almost-useless _context variable just tells if we have a contact id
+    $this->_context = $this->_contactID ? 'contact' : 'standalone';
 
     $this->assign('action', $this->_action);
-    $this->assign('context', $this->_context);
 
     // check permission for action.
     $perm = $this->_action & CRM_Core_Action::DELETE ? 'delete in CiviGrant' : 'edit grants';
@@ -60,13 +65,12 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
       CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
     }
 
-    $this->setPageTitle(ts('Grant'));
+    $this->setPageTitle();
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
     }
 
-    $this->_noteId = NULL;
     if ($this->_id) {
       $noteDAO = new CRM_Core_BAO_Note();
       $noteDAO->entity_table = 'civicrm_grant';
@@ -76,16 +80,29 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
       }
     }
 
-    // when custom data is included in this page
-    if (!empty($_POST['hidden_custom'])) {
-      $grantTypeId = empty($_POST['grant_type_id']) ? NULL : $_POST['grant_type_id'];
-      $this->set('type', 'Grant');
-      $this->set('subType', $grantTypeId);
-      $this->set('entityId', $this->_id);
-      CRM_Custom_Form_CustomData::preProcess($this, NULL, $grantTypeId, 1, 'Grant', $this->_id);
-      CRM_Custom_Form_CustomData::buildQuickForm($this);
-      CRM_Custom_Form_CustomData::setDefaultValues($this);
+    if ($this->isSubmitted()) {
+      // The custom data fields are added to the form by an ajax form.
+      // However, if they are not present in the element index they will
+      // not be available from `$this->getSubmittedValue()` in post process.
+      // We do not have to set defaults or otherwise render - just add to the element index.
+      $this->addCustomDataFieldsToForm('Grant', array_filter([
+        'id' => $this->getGrantID(),
+        'grant_type_id' => $this->getSubmittedValue('grant_type_id'),
+      ]));
     }
+  }
+
+  /**
+   * @api supported for external use.
+   *
+   * @return int|null
+   * @throws \CRM_Core_Exception
+   */
+  public function getGrantID(): ?int {
+    if (!isset($this->_id)) {
+      $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    }
+    return $this->_id;
   }
 
   /**
@@ -152,8 +169,7 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
     $attributes = CRM_Core_DAO::getAttribute('CRM_Grant_DAO_Grant');
     $this->addSelect('grant_type_id', ['placeholder' => ts('- select type -'), 'onChange' => "CRM.buildCustomData( 'Grant', this.value );"], TRUE);
 
-    //need to assign custom data type and subtype to the template
-    $this->assign('customDataType', 'Grant');
+    //need to assign custom data subtype to the template
     $this->assign('customDataSubType', $this->_grantType);
     $this->assign('entityID', $this->_id);
 
@@ -186,23 +202,24 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
 
     // make this form an upload since we dont know if the custom data injected dynamically
     // is of type file etc $uploadNames = $this->get( 'uploadNames' );
-    $this->addButtons([
-      [
-        'type' => 'upload',
-        'name' => ts('Save'),
-        'isDefault' => TRUE,
-      ],
-      [
-        'type' => 'upload',
-        'name' => ts('Save and New'),
-        'js' => ['onclick' => "return verify( );"],
-        'subName' => 'new',
-      ],
-      [
-        'type' => 'cancel',
-        'name' => ts('Cancel'),
-      ],
-    ]);
+    if ($this->_action !== CRM_Core_Action::VIEW) {
+      $this->addButtons([
+        [
+          'type' => 'upload',
+          'name' => ts('Save'),
+          'isDefault' => TRUE,
+        ],
+        [
+          'type' => 'upload',
+          'name' => ts('Save and New'),
+          'subName' => 'new',
+        ],
+        [
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ],
+      ]);
+    }
 
     $contactField = $this->addEntityRef('contact_id', ts('Applicant'), ['create' => TRUE], TRUE);
     if ($this->_context != 'standalone') {
@@ -218,19 +235,16 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
-      CRM_Grant_BAO_Grant::del($this->_id);
+      CRM_Grant_BAO_Grant::deleteRecord(['id' => $this->_id]);
       return;
-    }
-
-    if ($this->_action & CRM_Core_Action::UPDATE) {
-      $ids['grant_id'] = $this->_id;
     }
 
     // get the submitted form values.
     $params = $this->controller->exportValues($this->_name);
+    $params['id'] = $this->_id;
 
     if (empty($params['grant_report_received'])) {
-      $params['grant_report_received'] = "null";
+      $params['grant_report_received'] = 0;
     }
 
     // set the contact, when contact is selected
@@ -239,13 +253,9 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
     }
 
     $params['contact_id'] = $this->_contactID;
-    $ids['note'] = [];
-    if ($this->_noteId) {
-      $ids['note']['id'] = $this->_noteId;
-    }
 
     // build custom data array
-    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
+    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($this->getSubmittedValues(),
       $this->_id,
       'Grant'
     );
@@ -267,14 +277,32 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
       }
     }
 
-    $grant = CRM_Grant_BAO_Grant::create($params, $ids);
+    $grant = CRM_Grant_BAO_Grant::writeRecord($params);
+
+    if (!empty($params['note']) || $this->_noteId) {
+      $noteParams = [
+        'id' => $this->_noteId,
+        'entity_table' => 'civicrm_grant',
+        'note' => $params['note'],
+        'entity_id' => $grant->id,
+        'contact_id' => $grant->contact_id,
+      ];
+
+      CRM_Core_BAO_Note::add($noteParams);
+    }
+
+    // check and attach and files as needed
+    CRM_Core_BAO_File::processAttachment($params,
+      'civicrm_grant',
+      $grant->id
+    );
 
     $buttonName = $this->controller->getButtonName();
     $session = CRM_Core_Session::singleton();
     if ($this->_context == 'standalone') {
       if ($buttonName == $this->getButtonName('upload', 'new')) {
         $session->replaceUserContext(CRM_Utils_System::url('civicrm/grant/add',
-          'reset=1&action=add&context=standalone'
+          'reset=1&action=add'
         ));
       }
       else {
@@ -284,8 +312,8 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
       }
     }
     elseif ($buttonName == $this->getButtonName('upload', 'new')) {
-      $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view/grant',
-        "reset=1&action=add&context=grant&cid={$this->_contactID}"
+      $session->replaceUserContext(CRM_Utils_System::url('civicrm/grant/add',
+        "reset=1&action=add&cid={$this->_contactID}"
       ));
     }
   }

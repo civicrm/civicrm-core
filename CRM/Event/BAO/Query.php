@@ -37,7 +37,61 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
    * @return array
    */
   public static function getParticipantFields() {
-    return CRM_Event_BAO_Participant::importableFields('Individual', TRUE, TRUE);
+    $checkPermission = TRUE;
+    $fields = [];
+
+    $tmpFields = CRM_Event_DAO_Participant::import();
+
+    $note = [
+      'participant_note' => [
+        'title' => ts('Participant Note'),
+        'name' => 'participant_note',
+        'headerPattern' => '/(participant.)?note$/i',
+        'data_type' => CRM_Utils_Type::T_TEXT,
+      ],
+    ];
+
+    // Split status and status id into 2 fields
+    // Fixme: it would be better to leave as 1 field and intelligently handle both during import
+    // note import undoes this - it is still here in case the search usage uses it.
+    $participantStatus = [
+      'participant_status' => [
+        'title' => ts('Participant Status'),
+        'name' => 'participant_status',
+        'data_type' => CRM_Utils_Type::T_STRING,
+      ],
+    ];
+    $tmpFields['participant_status_id']['title'] = ts('Participant Status Id');
+
+    // Split role and role id into 2 fields
+    // Fixme: it would be better to leave as 1 field and intelligently handle both during import
+    // note import undoes this - it is still here in case the search usage uses it.
+    $participantRole = [
+      'participant_role' => [
+        'title' => ts('Participant Role'),
+        'name' => 'participant_role',
+        'data_type' => CRM_Utils_Type::T_STRING,
+      ],
+    ];
+    $tmpFields['participant_role_id']['title'] = ts('Participant Role Id');
+
+    $eventType = [
+      'event_type' => [
+        'title' => ts('Event Type'),
+        'name' => 'event_type',
+        'data_type' => CRM_Utils_Type::T_STRING,
+      ],
+    ];
+
+    $tmpContactField = [];
+    $tmpFields['participant_contact_id']['title'] = $tmpFields['participant_contact_id']['title'] . ' (match to contact)';
+
+    $fields = array_merge($fields, $tmpContactField);
+    $fields = array_merge($fields, $tmpFields);
+    $fields = array_merge($fields, $note, $participantStatus, $participantRole, $eventType);
+    $fields = array_merge($fields, CRM_Core_BAO_CustomField::getFieldsForImport('Participant', FALSE, FALSE, FALSE, $checkPermission));
+
+    return $fields;
   }
 
   /**
@@ -270,13 +324,13 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
         $exEventId = '';
         if ($query->_where[$grouping]) {
           foreach ($query->_where[$grouping] as $key => $val) {
-            if (strstr($val, 'civicrm_event.id =')) {
+            if (str_contains($val, 'civicrm_event.id =')) {
               $exEventId = $val;
               $extractEventId = explode(" ", $val);
               $value = $extractEventId[2];
               $where = $query->_where[$grouping][$key];
             }
-            elseif (strstr($val, 'civicrm_event.id IN')) {
+            elseif (str_contains($val, 'civicrm_event.id IN')) {
               //extract the first event id if multiple events are selected
               preg_match('/civicrm_event.id IN \(\"(\d+)/', $val, $matches);
               $value = $matches[1];
@@ -335,6 +389,7 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
           $labels[] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $val, 'label');
         }
         $query->_where[$grouping][] = "civicrm_line_item.price_field_value_id IN (" . implode(', ', $value) . ")";
+        $query->_where[$grouping][] = "civicrm_line_item.qty > 0";
         $query->_qill[$grouping][] = ts("Fee level") . " IN " . implode(', ', $labels);
         $query->_tables['civicrm_participant'] = $query->_tables['civicrm_line_item'] = $query->_whereTables['civicrm_line_item'] = 1;
         return;
@@ -404,8 +459,8 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
           $op = key($value);
           $value = $value[$op];
         }
-        if (!strstr($op, 'NULL') && !strstr($op, 'EMPTY') && !strstr($op, 'LIKE')) {
-          $regexOp = (strstr($op, '!') || strstr($op, 'NOT')) ? 'NOT REGEXP' : 'REGEXP';
+        if (!str_contains($op, 'NULL') && !str_contains($op, 'EMPTY') && !str_contains($op, 'LIKE')) {
+          $regexOp = (str_contains($op, '!') || str_contains($op, 'NOT')) ? 'NOT REGEXP' : 'REGEXP';
           $regexp = "([[:cntrl:]]|^)" . implode('([[:cntrl:]]|$)|([[:cntrl:]]|^)', (array) $value) . "([[:cntrl:]]|$)";
           $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_participant.$name", $regexOp, $regexp, 'String');
         }
@@ -433,11 +488,7 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
       case 'event_type_id':
       case 'event_title':
         $qillName = $name;
-        if (in_array($name, [
-          'event_id',
-          'event_title',
-          'event_is_public',
-        ])) {
+        if (in_array($name, ['event_id', 'event_title', 'event_is_public'])) {
           $name = str_replace('event_', '', $name);
         }
         $dataType = !empty($fields[$qillName]['type']) ? CRM_Utils_Type::typeToString($fields[$qillName]['type']) : 'String';
@@ -639,6 +690,7 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
 
     $form->addRule('participant_fee_amount_low', ts('Please enter a valid money value.'), 'money');
     $form->addRule('participant_fee_amount_high', ts('Please enter a valid money value.'), 'money');
+    $form->add('number', 'participant_id', ts('Participant ID'), ['class' => 'four', 'min' => 1]);
 
     self::addCustomFormFields($form, ['Participant', 'Event']);
 

@@ -49,7 +49,7 @@ class ValidateValuesTest extends Api4TestBase implements TransactionalInterface 
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function testHookData() {
+  public function testHookData(): void {
     $hookCount = 0;
 
     // Step 1: `create()` a record for Ms. Alice Alison.
@@ -131,7 +131,7 @@ class ValidateValuesTest extends Api4TestBase implements TransactionalInterface 
     $this->assertEquals(3, $hookCount);
   }
 
-  public function testRaiseError() {
+  public function testRaiseError(): void {
     $this->setValidator(function (ValidateValuesEvent $e) use (&$hookCount) {
       $this->assertWellFormedEvent($e);
       if ($e->getEntityName() !== 'Contact') {
@@ -162,9 +162,9 @@ class ValidateValuesTest extends Api4TestBase implements TransactionalInterface 
     }
     catch (\CRM_Core_Exception $e) {
       $this->assertEquals(1, $hookCount);
-      $this->assertRegExp(';not sufficiently namey;', $e->getMessage());
-      $this->assertRegExp(';tongue twister;', $e->getMessage());
-      $this->assertRegExp(';disagree with the spelling;', $e->getMessage());
+      $this->assertMatchesRegularExpression(';not sufficiently namey;', $e->getMessage());
+      $this->assertMatchesRegularExpression(';tongue twister;', $e->getMessage());
+      $this->assertMatchesRegularExpression(';disagree with the spelling;', $e->getMessage());
     }
   }
 
@@ -185,8 +185,8 @@ class ValidateValuesTest extends Api4TestBase implements TransactionalInterface 
   }
 
   protected function assertWellFormedEvent(ValidateValuesEvent $e) {
-    $this->assertRegExp('/Contact/', $e->getEntityName());
-    $this->assertRegExp('/create|save|update/', $e->getActionName());
+    $this->assertMatchesRegularExpression('/Contact/', $e->getEntityName());
+    $this->assertMatchesRegularExpression('/create|save|update/', $e->getActionName());
     $this->assertTrue(count($e->records) > 0);
     foreach ($e->records as $record) {
       $this->assertWellFormedFields($record);
@@ -207,7 +207,7 @@ class ValidateValuesTest extends Api4TestBase implements TransactionalInterface 
 
   protected function assertWellFormedFields($record) {
     foreach ($record as $field => $value) {
-      $this->assertRegExp('/^[a-zA-Z0-9_]+$/', $field);
+      $this->assertMatchesRegularExpression('/^[a-zA-Z0-9_]+$/', $field);
     }
   }
 

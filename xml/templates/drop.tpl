@@ -8,11 +8,12 @@
 --
 -- Generated from {$smarty.template}
 -- {$generated}
---{/if}
+--
+{/if}
 -- /*******************************************************
 -- *
--- * Clean up the existing tables{if !$isOutputLicense} - this section generated from {$smarty.template}
-{/if}
+-- * Clean up the existing tables{if !$isOutputLicense} - this section generated from {$smarty.template}{/if}
+
 -- *
 -- *******************************************************/
 

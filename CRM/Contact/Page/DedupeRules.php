@@ -52,6 +52,7 @@ class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
           'url' => 'civicrm/contact/dedupefind',
           'qs' => 'reset=1&rgid=%%id%%&action=preview',
           'title' => ts('Use DedupeRule'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::VIEW),
         ];
       }
       if (CRM_Core_Permission::check('administer dedupe rules')) {
@@ -60,6 +61,7 @@ class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
           'url' => 'civicrm/contact/deduperules',
           'qs' => 'action=update&id=%%id%%',
           'title' => ts('Edit DedupeRule'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
         ];
         $links[CRM_Core_Action::DELETE] = [
           'name' => ts('Delete'),
@@ -67,6 +69,7 @@ class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
           'qs' => 'action=delete&id=%%id%%',
           'extra' => 'onclick = "return confirm(\'' . $deleteExtra . '\');"',
           'title' => ts('Delete DedupeRule'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
         ];
       }
 
@@ -129,7 +132,7 @@ class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
 
       // form all action links
       $action = array_sum(array_keys($this->links()));
-      $links = self::links();
+      $links = $this->links();
 
       if ($dao->is_reserved) {
         unset($links[CRM_Core_Action::DELETE]);

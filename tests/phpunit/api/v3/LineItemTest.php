@@ -102,7 +102,7 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
    */
   public function testCreateLineItem(int $version): void {
     $this->_apiversion = $version;
-    $result = $this->callAPIAndDocument($this->_entity, 'create', $this->params, __FUNCTION__, __FILE__)['values'];
+    $result = $this->callAPISuccess($this->_entity, 'create', $this->params)['values'];
     $this->assertCount(1, $result);
     $this->getAndCheck($this->params, key($result), $this->_entity);
   }
@@ -136,7 +136,7 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
     $getParams = [
       'entity_table' => 'civicrm_contribution',
     ];
-    $getResult = $this->callAPIAndDocument($this->_entity, 'get', $getParams, __FUNCTION__, __FILE__);
+    $getResult = $this->callAPISuccess($this->_entity, 'get', $getParams);
     $this->assertEquals(1, $getResult['count']);
   }
 
@@ -158,7 +158,7 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
     ];
     $getResult = $this->callAPISuccess($this->_entity, 'get', $getParams);
     $deleteParams = ['id' => $getResult['id']];
-    $this->callAPIAndDocument($this->_entity, 'delete', $deleteParams, __FUNCTION__, __FILE__);
+    $this->callAPISuccess($this->_entity, 'delete', $deleteParams);
     $checkDeleted = $this->callAPISuccess($this->_entity, 'get');
     $this->assertEquals(0, $checkDeleted['count']);
   }

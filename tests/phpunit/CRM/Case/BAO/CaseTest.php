@@ -6,28 +6,28 @@
  */
 class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
 
+  const TABLES_TO_TRUNCATE = [
+    'civicrm_activity',
+    'civicrm_group_contact',
+    'civicrm_contact',
+    'civicrm_custom_group',
+    'civicrm_custom_field',
+    'civicrm_case',
+    'civicrm_case_contact',
+    'civicrm_case_activity',
+    'civicrm_case_type',
+    'civicrm_file',
+    'civicrm_entity_file',
+    'civicrm_activity_contact',
+    'civicrm_managed',
+    'civicrm_relationship',
+    'civicrm_relationship_type',
+  ];
+
   public function setUp(): void {
     parent::setUp();
 
-    $this->tablesToTruncate = [
-      'civicrm_activity',
-      'civicrm_group_contact',
-      'civicrm_contact',
-      'civicrm_custom_group',
-      'civicrm_custom_field',
-      'civicrm_case',
-      'civicrm_case_contact',
-      'civicrm_case_activity',
-      'civicrm_case_type',
-      'civicrm_file',
-      'civicrm_entity_file',
-      'civicrm_activity_contact',
-      'civicrm_managed',
-      'civicrm_relationship',
-      'civicrm_relationship_type',
-    ];
-
-    $this->quickCleanup($this->tablesToTruncate);
+    $this->quickCleanup(self::TABLES_TO_TRUNCATE);
 
     $this->loadAllFixtures();
 
@@ -52,24 +52,23 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     $res = CRM_Core_DAO::executeQuery($query);
     $openCaseType = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Open Case');
     while ($res->fetch()) {
-      $message = 'Failed asserting that the case activity query has a activity_type_id property:';
-      $this->assertObjectHasAttribute('activity_type_id', $res, $message . PHP_EOL . print_r($res, TRUE));
       $message = 'Failed asserting that the latest activity from Case ID 1 was "Open Case":';
       $this->assertEquals($openCaseType, $res->activity_type_id, $message . PHP_EOL . print_r($res, TRUE));
     }
   }
 
   protected function tearDown(): void {
-    $this->quickCleanup($this->tablesToTruncate, TRUE);
+    $this->quickCleanup(self::TABLES_TO_TRUNCATE, TRUE);
     parent::tearDown();
   }
 
-  public function testAddCaseToContact() {
+  public function testAddCaseToContact(): void {
+    $this->createLoggedInUser();
     $params = [
       'case_id' => 1,
       'contact_id' => 17,
     ];
-    CRM_Case_BAO_CaseContact::create($params);
+    CRM_Case_BAO_CaseContact::writeRecord($params);
 
     $recent = CRM_Utils_Recent::get();
     $this->assertEquals('Test Contact - Housing Support', $recent[0]['title']);
@@ -110,16 +109,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     $caseRoles = CRM_Case_BAO_Case::getCaseRoles($loggedInUser, $caseId);
 
     $this->assertEquals($caseCount, $upcomingCases, 'Upcoming case count must be ' . $caseCount);
-    if ($caseCount === 0) {
-      // If there really are 0 cases then there won't be any subelements for
-      // status and count, so we get a false error if we use the assertEquals
-      // check since it tries to get a subelement on type int. In this case
-      // the summary rows are just the case type pseudoconstant list.
-      $this->assertSame(array_flip(CRM_Case_PseudoConstant::caseType()), $summary['rows']);
-    }
-    else {
-      $this->assertEquals($caseCount, $summary['rows']['Housing Support']['Ongoing']['count'], 'Housing Support Ongoing case summary must be ' . $caseCount);
-    }
+    $this->assertEquals($caseCount, (int) $summary['rows']['Housing Support']['Ongoing']['count'], 'Housing Support Ongoing case summary must be ' . $caseCount);
     $this->assertEquals($caseCount, count($caseRoles), 'Total case roles for logged in users must be ' . $caseCount);
   }
 
@@ -128,7 +118,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testSortByCaseContact() {
+  public function testSortByCaseContact(): void {
     // delete any cases if present
     $this->callAPISuccess('Case', 'get', ['api.Case.delete' => ['id' => '$value.id']]);
 
@@ -151,7 +141,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
         'contact_id_a'         => $contactID,
         'contact_id_b'         => $loggedInUser,
         'relationship_type_id' => $relationshipType,
-        'case_id'              => $caseID,
+        'case_id'              => $this->ids['Case']['form-created'],
         'is_active'            => TRUE,
       ]);
     }
@@ -168,6 +158,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
 
     $cases = [];
     try {
+      $_SERVER['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest';
       CRM_Case_Page_AJAX::getCases();
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
@@ -215,6 +206,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
 
     $cases = [];
     try {
+      $_SERVER['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest';
       CRM_Case_Page_AJAX::getCases();
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
@@ -236,9 +228,8 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
   /**
    * Test that Case count is exactly one for logged in user for user's active role.
    *
-   * @throws \CRM_Core_Exception
    */
-  public function testActiveCaseRole() {
+  public function testActiveCaseRole(): void {
     $individual = $this->individualCreate();
     $caseObj = $this->createCase($individual);
     $caseId = $caseObj->id;
@@ -250,7 +241,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
   /**
    * Test that case count is zero for logged in user for user's inactive role.
    */
-  public function testInactiveCaseRole() {
+  public function testInactiveCaseRole(): void {
     $individual = $this->individualCreate();
     $caseObj = $this->createCase($individual);
     $caseId = $caseObj->id;
@@ -259,43 +250,45 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     $this->assertCasesOfUser($loggedInUser, $caseId, 0);
   }
 
-  public function testGetCaseType() {
+  public function testGetCaseType(): void {
     $caseTypeLabel = CRM_Case_BAO_Case::getCaseType(1);
     $this->assertEquals('Housing Support', $caseTypeLabel);
   }
 
-  public function testRetrieveCaseIdsByContactId() {
+  public function testRetrieveCaseIdsByContactId(): void {
     $caseIds = CRM_Case_BAO_Case::retrieveCaseIdsByContactId(3, FALSE, 'housing_support');
     $this->assertEquals([1], $caseIds);
   }
 
   /**
    * Test that all custom files are migrated to new case when case is assigned to new client.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testCaseReassignForCustomFiles() {
+  public function testCaseReassignForCustomFiles(): void {
     $individual = $this->individualCreate();
-    $customGroup = $this->customGroupCreate(array(
+    $customGroup = $this->customGroupCreate([
       'extends' => 'Case',
-    ));
+    ]);
     $customGroup = $customGroup['values'][$customGroup['id']];
 
-    $customFileFieldA = $this->customFieldCreate(array(
+    $customFileFieldA = $this->customFieldCreate([
       'custom_group_id' => $customGroup['id'],
       'html_type'       => 'File',
       'is_active'       => 1,
       'default_value'   => 'null',
       'label'           => 'Custom File A',
       'data_type'       => 'File',
-    ));
+    ]);
 
-    $customFileFieldB = $this->customFieldCreate(array(
+    $customFileFieldB = $this->customFieldCreate([
       'custom_group_id' => $customGroup['id'],
       'html_type'       => 'File',
       'is_active'       => 1,
       'default_value'   => 'null',
       'label'           => 'Custom File B',
       'data_type'       => 'File',
-    ));
+    ]);
 
     // Create two files to attach to the new case
     $filepath = Civi::paths()->getPath('[civicrm.files]/custom');
@@ -308,11 +301,11 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
 
     $caseObj = $this->createCase($individual);
 
-    $this->callAPISuccess('Case', 'create', array(
+    $this->callAPISuccess('Case', 'create', [
       'id'                                => $caseObj->id,
       'custom_' . $customFileFieldA['id'] => $fileA['id'],
       'custom_' . $customFileFieldB['id'] => $fileB['id'],
-    ));
+    ]);
 
     $reassignIndividual = $this->individualCreate();
     $this->createLoggedInUser();
@@ -347,7 +340,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
    *   $this->assertEquals(1, $cases[1]['case_type_id']);
    * }
    */
-  public function testGetCasesSummary() {
+  public function testGetCasesSummary(): void {
     $cases = CRM_Case_BAO_Case::getCasesSummary();
     $this->assertEquals(1, $cases['rows']['Housing Support']['Ongoing']['count']);
   }
@@ -356,7 +349,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
    * Test that getRelatedCases() returns the other case when you create a
    * Link Cases activity on one of the cases.
    */
-  public function testGetRelatedCases() {
+  public function testGetRelatedCases(): void {
     $loggedInUser = $this->createLoggedInUser();
     // create some cases
     $client_id_1 = $this->individualCreate([], 0);
@@ -365,7 +358,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     $client_id_2 = $this->individualCreate([], 1);
     $caseObj_2 = $this->createCase($client_id_2, $loggedInUser);
     $case_id_2 = $caseObj_2->id;
-
+    $_REQUEST['action'] = 'add';
     $form = $this->getFormObject('CRM_Case_Form_Activity', [
       'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Link Cases'),
       'link_to_case_id' => $case_id_2,
@@ -397,7 +390,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
   /**
    * Test various things after a case is closed.
    */
-  public function testCaseClosure() {
+  public function testCaseClosure(): void {
     $loggedInUser = $this->createLoggedInUser();
     $client_id = $this->individualCreate();
     $caseObj = $this->createCase($client_id, $loggedInUser);
@@ -507,7 +500,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
   /**
    * Test getGlobalContacts
    */
-  public function testGetGlobalContacts() {
+  public function testGetGlobalContacts(): void {
     //Add contact to case resource.
     $caseResourceContactID = $this->individualCreate();
     $this->callAPISuccess('GroupContact', 'create', [
@@ -535,14 +528,14 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
   /**
    * Test max_instances
    */
-  public function testMaxInstances() {
+  public function testMaxInstances(): void {
     $loggedInUser = $this->createLoggedInUser();
     $client_id = $this->individualCreate();
     $caseObj = $this->createCase($client_id, $loggedInUser);
     $case_id = $caseObj->id;
 
     // Sanity check to make sure we'll be testing what we think we're testing.
-    $this->assertEquals($caseObj->case_type_id, 1);
+    $this->assertEquals(1, $caseObj->case_type_id);
 
     // Get the case type
     $result = $this->callAPISuccess('CaseType', 'get', [
@@ -552,7 +545,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     $caseType = array_shift($result['values']);
     $activityTypeName = $caseType['definition']['activityTypes'][1]['name'];
     // Sanity check to make sure we'll be testing what we think we're testing.
-    $this->assertEquals($activityTypeName, "Medical evaluation");
+    $this->assertEquals('Medical evaluation', $activityTypeName);
 
     // Look up the activity type label - we need it later
     $result = $this->callAPISuccess('OptionValue', 'get', [
@@ -682,7 +675,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
    * At the time this test was written this test would fail, demonstrating
    * one problem with name vs label.
    */
-  public function testCreateCaseWithChangedManagerLabel() {
+  public function testCreateCaseWithChangedManagerLabel(): void {
     // We could just assume the relationship that gets created has
     // relationship_type_id = 1, but let's create a case, see what the
     // id is, then do our actual test.
@@ -742,7 +735,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
    * Test change case status with linked cases choosing the option to
    * update the linked cases.
    */
-  public function testChangeCaseStatusLinkedCases() {
+  public function testChangeCaseStatusLinkedCases(): void {
     $loggedInUser = $this->createLoggedInUser();
     $clientId1 = $this->individualCreate();
     $clientId2 = $this->individualCreate();
@@ -766,7 +759,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     $closedStatus = $closedStatusResult['values'][$closedStatusResult['id']]['value'];
 
     // Go thru the motions to change case status
-    $form = new CRM_Case_Form_Activity_ChangeCaseStatus();
+    $form = new CRM_Case_Form_Activity();
     $form->_caseId = [$case1->id];
     $form->_oldCaseStatus = [$case1->status_id];
     $params = [
@@ -1164,7 +1157,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
    * Test that if you only have "my cases" permission you can still view
    * Manage Case for **closed** cases of yours.
    */
-  public function testCanViewClosedCaseAsNonAdmin() {
+  public function testCanViewClosedCaseAsNonAdmin(): void {
     $loggedInUser = $this->createLoggedInUser();
     CRM_Core_Config::singleton()->userPermissionClass->permissions = [
       'access CiviCRM',
@@ -1201,7 +1194,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
   /**
    * Test a high number of assigned case roles.
    */
-  public function testGoingTo11() {
+  public function testGoingTo11(): void {
     $loggedInUser = $this->createLoggedInUser();
     $individual = $this->individualCreate();
     $caseObj = $this->createCase($individual, $loggedInUser);
@@ -1233,7 +1226,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
    * Test that creating a regular activity with a subject including `[case #X]`
    * gets filed on case X.
    */
-  public function testFileOnCaseBySubject() {
+  public function testFileOnCaseBySubject(): void {
     $loggedInUserId = $this->createLoggedInUser();
     $clientId = $this->individualCreate();
     $caseObj = $this->createCase($clientId, $loggedInUserId);
@@ -1270,7 +1263,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
   /**
    * Same as testFileOnCaseBySubject but editing an existing non-case activity
    */
-  public function testFileOnCaseByEditingSubject() {
+  public function testFileOnCaseByEditingSubject(): void {
     $loggedInUserId = $this->createLoggedInUser();
     $clientId = $this->individualCreate();
     $caseObj = $this->createCase($clientId, $loggedInUserId);
@@ -1312,7 +1305,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
   /**
    * Basic case create test with an Org client
    */
-  public function testOrgClient() {
+  public function testOrgClient(): void {
     $loggedInUserId = $this->createLoggedInUser();
     $clientId = $this->organizationCreate();
     $caseObj = $this->createCase($clientId, $loggedInUserId);
@@ -1331,10 +1324,10 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
   /**
    * Test getRelatedAndGlobalContacts()
    */
-  public function testGetRelatedAndGlobalContacts() {
+  public function testGetRelatedAndGlobalContacts(): void {
     $loggedInUserId = $this->createLoggedInUser();
     $clientId = $this->individualCreate(['first_name' => 'Cli', 'last_name' => 'Ent'], 0, TRUE);
-    $caseObj = $this->createCase($clientId, $loggedInUserId);
+    $this->createCase($clientId, $loggedInUserId);
 
     $gid = $this->callAPISuccess('Group', 'getsingle', ['name' => 'Case_Resources'])['id'];
 
@@ -1352,7 +1345,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
         'contact_id' => $contacts[$i]['id'],
       ]);
     }
-    $retrievedContacts = CRM_Case_BAO_Case::getRelatedAndGlobalContacts($caseObj->id);
+    $retrievedContacts = CRM_Case_BAO_Case::getRelatedAndGlobalContacts($this->ids['Case']['form-created']);
     // 29 because the case manager is also in the list
     $this->assertCount(29, $retrievedContacts);
 
@@ -1375,6 +1368,31 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
         $this->fail("Contact id {$contacts[$i]['id']} not found in list");
       }
     }
+  }
+
+  /**
+   * Test that if there's only recently performed activities in the system
+   * and no future ones then it still shows on dashboard.
+   */
+  public function testOnlyRecent(): void {
+    $loggedInUserId = $this->createLoggedInUser();
+    $clientId = $this->individualCreate([], 0, TRUE);
+    // old start date so there's no upcoming
+    $this->createCase($clientId, $loggedInUserId, ['start_date' => date('Y-m-d', strtotime('-2 years'))]);
+    // quickie hack to make them all completed
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_case_activity ca INNER JOIN civicrm_activity a ON a.id = ca.activity_id SET a.status_id = 2 WHERE ca.case_id = %1", [1 => [$this->ids['Case']['form-created'], 'Integer']]);
+    // Add a recent one
+    $this->callAPISuccess('Activity', 'create', [
+      'source_contact_id' => $loggedInUserId,
+      'target_contact_id' => $clientId,
+      'activity_type_id' => 'Follow up',
+      'status_id' => 'Completed',
+      'activity_date_time' => date('Y-m-d H:i:s', strtotime('-2 days')),
+      'subject' => 'backdated',
+      'case_id' => $this->ids['Case']['form-created'],
+    ]);
+    $this->assertEquals(0, CRM_Case_BAO_Case::getCases(TRUE, ['type' => 'upcoming'], 'dashboard', TRUE));
+    $this->assertEquals(1, CRM_Case_BAO_Case::getCases(TRUE, ['type' => 'recent'], 'dashboard', TRUE));
   }
 
 }

@@ -61,8 +61,16 @@ class Coder {
     return $html;
   }
 
+  /**
+   * Angular is not as strict about special characters inside html attributes as the xhtml spec.
+   *
+   * This unescapes everything that angular expects to be unescaped.
+   *
+   * @param $matches
+   * @return string
+   */
   protected function cleanupAttribute($matches) {
-    list ($full, $attr, $lquote, $value, $rquote) = $matches;
+    [$full, $attr, $lquote, $value, $rquote] = $matches;
 
     switch ($attr) {
       case 'href':
@@ -72,7 +80,9 @@ class Coder {
         break;
 
       default:
-        $value = html_entity_decode($value);
+        $value = html_entity_decode($value, ENT_NOQUOTES);
+        $oppositeQuote = $lquote === '"' ? "'" : '"';
+        $value = str_replace(htmlspecialchars($oppositeQuote, ENT_QUOTES), $oppositeQuote, $value);
         break;
     }
 

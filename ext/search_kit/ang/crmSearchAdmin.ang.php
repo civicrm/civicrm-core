@@ -21,5 +21,7 @@ return [
     'all CiviCRM permissions and ACLs',
     'administer CiviCRM',
     'administer afform',
+    'view debug output',
+    'schedule communications',
   ],
 ];

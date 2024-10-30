@@ -177,12 +177,6 @@
     <page_callback>CRM_Contact_Page_View_ContactSmartGroup</page_callback>
   </item>
   <item>
-     <path>civicrm/contact/view/note</path>
-     <path_arguments>cid=%%cid%%</path_arguments>
-     <title>Notes</title>
-     <page_callback>CRM_Contact_Page_View_Note</page_callback>
-  </item>
-  <item>
      <path>civicrm/contact/view/tag</path>
      <path_arguments>cid=%%cid%%</path_arguments>
      <title>Tags</title>
@@ -229,7 +223,6 @@
   </item>
   <item>
      <path>civicrm/dashlet/getting-started</path>
-     <title>CiviCRM Resources</title>
      <page_callback>CRM_Dashlet_Page_GettingStarted</page_callback>
   </item>
 
@@ -242,11 +235,6 @@
 <item>
      <path>civicrm/ajax/groupTree</path>
      <page_callback>CRM_Contact_Page_AJAX::groupTree</page_callback>
-     <access_arguments>access CiviCRM</access_arguments>
-</item>
-<item>
-     <path>civicrm/ajax/custom</path>
-     <page_callback>CRM_Contact_Page_AJAX::customField</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
 </item>
 <item>
@@ -263,11 +251,6 @@
 <item>
      <path>civicrm/ajax/checkemail</path>
      <page_callback>CRM_Contact_Page_AJAX::getContactEmail</page_callback>
-     <access_callback>1</access_callback>
-</item>
-<item>
-     <path>civicrm/ajax/checkphone</path>
-     <page_callback>CRM_Contact_Page_AJAX::getContactPhone</page_callback>
      <access_callback>1</access_callback>
 </item>
 <item>
@@ -313,7 +296,7 @@
 </item>
 <item>
    <path>civicrm/contact/deduperules</path>
-   <title>Find and Merge Duplicate Contacts</title>
+   <title>Manage Duplicates</title>
    <desc>Manage the rules used to identify potentially duplicate contact records. Scan for duplicates using a selected rule and merge duplicate contact data as needed.</desc>
    <page_callback>CRM_Contact_Page_DedupeRules</page_callback>
    <access_arguments>administer dedupe rules;merge duplicate contacts</access_arguments>
@@ -322,7 +305,7 @@
 </item>
 <item>
    <path>civicrm/contact/dedupefind</path>
-   <title>Find and Merge Duplicate Contacts</title>
+   <title>Manage Duplicates</title>
    <page_callback>CRM_Contact_Page_DedupeFind</page_callback>
    <access_arguments>merge duplicate contacts</access_arguments>
 </item>
@@ -377,6 +360,7 @@
   <page_callback>CRM_Contact_Form_Task_SMS</page_callback>
   <access_arguments>send SMS</access_arguments>
 </item>
+  <!-- DELETEME only-used-by-user-dashboard -->
   <item>
     <path>civicrm/ajax/contactrelationships</path>
     <page_callback>CRM_Contact_Page_AJAX::getContactRelationships</page_callback>

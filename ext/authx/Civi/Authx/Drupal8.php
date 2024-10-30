@@ -19,7 +19,7 @@ class Drupal8 implements AuthxInterface {
   public function checkPassword(string $username, string $password) {
     $uid = \Drupal::service('user.auth')->authenticate($username, $password);
     // Ensure strict nullness.
-    return $uid ? $uid : NULL;
+    return $uid ?: NULL;
   }
 
   /**

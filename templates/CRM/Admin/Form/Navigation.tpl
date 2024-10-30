@@ -9,7 +9,6 @@
 *}
 {* Template for adding/editing a CiviCRM Navigation Menu Item *}
 <div class="crm-block crm-form-block crm-navigation-form-block">
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   <table class="form-layout-compressed">
     <tr class="crm-navigation-form-block-label">
       <td class="label">{$form.label.label}</td><td>{$form.label.html}</td>

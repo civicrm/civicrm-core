@@ -82,15 +82,15 @@
         </fieldset>
         <div class="api4-input form-inline" ng-mouseenter="help('fields', availableParams.fields)" ng-mouseleave="help()" ng-if="::availableParams.fields">
           <label for="api4-param-fields">fields<span class="crm-marker" ng-if="::availableParams.fields.required"> *</span></label>
-          <input class="form-control" ng-list crm-ui-select="::{data: fields, multiple: true}" id="api4-param-fields" ng-model="params.fields" style="width: 85%;"/>
+          <input class="form-control" ng-list="" crm-ui-select="::{data: fields, multiple: true, separator: '\u0001'}" id="api4-param-fields" ng-model="params.fields" style="width: 85%;"/>
         </div>
         <div class="api4-input form-inline" ng-mouseenter="help('action', availableParams.action)" ng-mouseleave="help()"ng-if="::availableParams.action">
           <label for="api4-param-action">action<span class="crm-marker" ng-if="::availableParams.action.required"> *</span></label>
           <input class="form-control" crm-ui-select="{data: actions, allowClear: true, placeholder: 'None'}" id="api4-param-action" ng-model="params.action"/>
         </div>
-        <div class="api4-input form-inline" ng-mouseenter="help(name, param)" ng-mouseleave="help()" ng-repeat="(name, param) in ::getGenericParams(['string', 'int'])">
+        <div class="api4-input form-inline" ng-mouseenter="help(name, param)" ng-mouseleave="help()" ng-repeat="(name, param) in ::getGenericParams(['string', 'int', 'float'])">
           <label for="api4-param-{{:: name }}">{{:: name }}<span class="crm-marker" ng-if="::param.required"> *</span></label>
-          <input class="form-control" ng-if="::!param.options" type="{{:: param.type[0] === 'int' && param.type.length === 1 ? 'number' : 'text' }}" id="api4-param-{{:: name }}" ng-model="params[name]"/>
+          <input class="form-control" ng-if="::!param.options" type="{{:: (param.type[0] === 'int' || param.type[0] === 'float') && param.type.length === 1 ? 'number' : 'text' }}" id="api4-param-{{:: name }}" ng-model="params[name]"/>
           <select class="form-control" ng-if="::param.options" ng-options="o for o in ::param.options" id="api4-param-{{:: name }}" ng-model="params[name]"></select>
           <a href class="crm-hover-button" title="Clear" ng-click="clearParam(name)" ng-show="!!params[name]"><i class="crm-i fa-times" aria-hidden="true"></i></a>
         </div>
@@ -159,6 +159,14 @@
               <input class="form-control" type="number" min="0" id="api4-param-offset" ng-model="params.offset"/>
             </span>
             <a href class="crm-hover-button" title="Clear" ng-click="clearParam('limit');clearParam('offset');" ng-show="!!params.limit || !!params.offset"><i class="crm-i fa-times" aria-hidden="true"></i></a>
+          </div>
+        </fieldset>
+        <fieldset ng-if="::availableParams.sets" ng-mouseenter="help('sets', availableParams.sets)" ng-mouseleave="help()">
+          <legend>sets</legend>
+          <api4-exp-set class="api4-input form-inline" ng-repeat="clause in params.sets" set="clause" entities="entities" delete-row="clearParam('sets', $index)" >
+          </api4-exp-set>
+          <div class="api4-input form-inline">
+            <input class="form-control" ng-model="controls.sets" crm-ui-select="::{data: entities}" placeholder="Add set" />
           </div>
         </fieldset>
         <fieldset ng-if="::availableParams.chain" ng-mouseenter="help('chain', availableParams.chain)" ng-mouseleave="help()">
@@ -258,7 +266,7 @@
               <span>{{:: ts('Result') }}</span>
             </a>
           </li>
-          <li role="presentation" ng-if="::perm.accessDebugOutput" ng-class="{active: selectedTab.result === 'debug'}">
+          <li role="presentation" ng-if="::perm.viewDebugOutput" ng-class="{active: selectedTab.result === 'debug'}">
             <a href ng-click="selectedTab.result = 'debug'">
               <i class="fa fa-fw fa-{{ debug ? (status === 'warning' || status === 'danger' ? 'warning' : 'bug') : 'circle-o' }}"></i>
               <span>{{:: ts('Debug') }}</span>
@@ -278,7 +286,7 @@
             <pre class="prettyprint" id="api4-result-{{ $index }}" ng-bind-html="code"></pre>
           </div>
         </div>
-        <div ng-if="::perm.accessDebugOutput" ng-show="selectedTab.result === 'debug'">
+        <div ng-if="::perm.viewDebugOutput" ng-show="selectedTab.result === 'debug'">
           <pre ng-if="debug" class="prettyprint" ng-bind-html="debug"></pre>
           <div ng-if="!debug">
             <p>

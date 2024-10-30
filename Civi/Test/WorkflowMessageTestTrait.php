@@ -71,6 +71,7 @@ trait WorkflowMessageTestTrait {
     if ($prefix === NULL) {
       $prefix = sprintf('[%s] ', $this->getWorkflowName());
     }
+    $this->assertEquals($refInstance->getWorkflowName(), $cmpInstance->getWorkflowName(), "{$prefix}Should have same workflow name)");
     $this->assertEquals($refInstance->export('tplParams'), $cmpInstance->export('tplParams'), "{$prefix}Should have same export(tplParams)");
     $this->assertEquals($refInstance->export('tokenContext'), $cmpInstance->export('tokenContext'), "{$prefix}should have same export(tokenContext)");
     $this->assertEquals($refInstance->export('envelope'), $cmpInstance->export('envelope'), "{$prefix}Should have same export(envelope)");

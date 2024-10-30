@@ -12,9 +12,6 @@
 
 namespace Civi\Api4\Service\Schema\Joinable;
 
-use Civi\Api4\CustomField;
-use Civi\Api4\Utils\CoreUtil;
-
 class CustomGroupJoinable extends Joinable {
 
   /**
@@ -33,81 +30,22 @@ class CustomGroupJoinable extends Joinable {
    * @param $targetTable
    * @param $alias
    * @param bool $isMultiRecord
-   * @param string $columns
+   * @param string $entityName
    */
-  public function __construct($targetTable, $alias, $isMultiRecord, $columns) {
-    $this->columns = $columns;
+  public function __construct($targetTable, $alias, $isMultiRecord, $entityName) {
+    $this->entity = $entityName;
     parent::__construct($targetTable, 'entity_id', $alias);
     $this->joinType = $isMultiRecord ?
       self::JOIN_TYPE_ONE_TO_MANY : self::JOIN_TYPE_ONE_TO_ONE;
+  }
+
+  /**
+   * @return string|null
+   */
+  public function getEntity() {
     // Only multi-record groups are considered an api "entity"
-    if (!$isMultiRecord) {
-      $this->entity = NULL;
-    }
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public function getEntityFields() {
-    $cacheKey = 'APIv4_CustomGroupJoinable-' . $this->getTargetTable();
-    $entityFields = (array) \Civi::cache('metadata')->get($cacheKey);
-    if (!$entityFields) {
-      $baseEntity = CoreUtil::getApiNameFromTableName($this->getBaseTable());
-      $fields = CustomField::get(FALSE)
-        ->setSelect(['custom_group_id.name', 'custom_group_id.extends', 'custom_group_id.table_name', 'custom_group_id.title', '*'])
-        ->addWhere('custom_group_id.table_name', '=', $this->getTargetTable())
-        ->execute();
-      foreach ($fields as $field) {
-        $entityFields[] = \Civi\Api4\Service\Spec\SpecFormatter::arrayToField($field, $baseEntity);
-      }
-      \Civi::cache('metadata')->set($cacheKey, $entityFields);
-    }
-    return $entityFields;
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public function getField($fieldName) {
-    foreach ($this->getEntityFields() as $field) {
-      $name = $field->getName();
-      if ($name === $fieldName || strrpos($name, '.' . $fieldName) === strlen($name) - strlen($fieldName) - 1) {
-        return $field;
-      }
-    }
-    return NULL;
-  }
-
-  /**
-   * @return string
-   */
-  public function getSqlColumn($fieldName) {
-    if (strpos($fieldName, '.') !== FALSE) {
-      $fieldName = substr($fieldName, 1 + strrpos($fieldName, '.'));
-    }
-    return $this->columns[$fieldName];
-  }
-
-  /**
-   * Translate custom_group.extends to entity name.
-   *
-   * Custom_group.extends pretty much maps 1-1 with entity names, except for a couple oddballs.
-   * @see \CRM_Core_SelectValues::customGroupExtends
-   *
-   * @param $extends
-   * @return string
-   * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
-   */
-  public static function getEntityFromExtends($extends) {
-    if (strpos($extends, 'Participant') === 0) {
-      return 'Participant';
-    }
-    if ($extends === 'Contact' || in_array($extends, \CRM_Contact_BAO_ContactType::basicTypes(TRUE))) {
-      return 'Contact';
-    }
-    return $extends;
+    $isMultiRecord = $this->joinType === self::JOIN_TYPE_ONE_TO_MANY;
+    return $isMultiRecord ? $this->entity : NULL;
   }
 
 }

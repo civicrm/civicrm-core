@@ -18,33 +18,30 @@
 /**
  * This class contain function for Website handling.
  */
-class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
+class CRM_Core_BAO_Website extends CRM_Core_DAO_Website implements Civi\Core\HookInterface {
   use CRM_Contact_AccessTrait;
 
   /**
-   * Create or update Website record.
+   * @deprecated
    *
    * @param array $params
-   *
-   * @deprecated
    * @return CRM_Core_DAO_Website
-   * @throws \CRM_Core_Exception
+   * @throws CRM_Core_Exception
    */
   public static function create($params) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return self::writeRecord($params);
   }
 
   /**
-   * Create website.
+   * @deprecated
    *
    * @param array $params
-   *
    * @return CRM_Core_DAO_Website
-   * @throws \CRM_Core_Exception
-   * @deprecated
+   * @throws CRM_Core_Exception
    */
   public static function add($params) {
-    CRM_Core_Error::deprecatedFunctionWarning('use apiv4');
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return self::writeRecord($params);
   }
 
@@ -81,10 +78,10 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
       }
       if (!empty($values['url'])) {
         $values['contact_id'] = $contactID;
-        self::create($values);
+        self::writeRecord($values);
       }
       elseif ($skipDelete && !empty($values['id'])) {
-        self::del($values['id']);
+        static::deleteRecord($values);
       }
     }
   }
@@ -95,21 +92,12 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    * @param int $id
    *
    * @return bool
+   *
+   * @deprecated
    */
   public static function del($id) {
-    $obj = new self();
-    $obj->id = $id;
-    $obj->find();
-    if ($obj->fetch()) {
-      $params = [];
-      CRM_Utils_Hook::pre('delete', 'Website', $id, $params);
-      $obj->delete();
-    }
-    else {
-      return FALSE;
-    }
-    CRM_Utils_Hook::post('delete', 'Website', $id, $obj);
-    return TRUE;
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
+    return (bool) static::deleteRecord(['id' => $id]);
   }
 
   /**

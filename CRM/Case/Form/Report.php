@@ -42,6 +42,8 @@ class CRM_Case_Form_Report extends CRM_Core_Form {
 
   /**
    * Build the form object.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function preProcess() {
     $this->_caseID = CRM_Utils_Request::retrieve('caseid', 'Integer', $this, TRUE);
@@ -50,7 +52,7 @@ class CRM_Case_Form_Report extends CRM_Core_Form {
 
     $this->_report = $this->get('report');
     if ($this->_report) {
-      $this->assign_by_ref('report', $this->_report);
+      $this->assign('report', $this->_report);
     }
 
     // user context

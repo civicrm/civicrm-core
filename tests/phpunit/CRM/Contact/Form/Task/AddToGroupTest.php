@@ -9,48 +9,38 @@
  +--------------------------------------------------------------------+
  */
 
- /**
-  * @group headless
-  */
+use Civi\Api4\Group;
+use Civi\Api4\GroupContact;
+use Civi\Test\FormTrait;
+
+/**
+ * @group headless
+ */
 class CRM_Contact_Form_Task_AddToGroupTest extends CiviUnitTestCase {
-
-  protected function setUp(): void {
-    parent::setUp();
-  }
-
-  protected function getSearchTaskFormObject(array $formValues) {
-    $_POST = $formValues;
-    $_SERVER['REQUEST_METHOD'] = 'GET';
-    /** @var CRM_Core_Form $form */
-    $form = new CRM_Contact_Form_Task_AddToGroup();
-    $form->controller = new CRM_Contact_Controller_Search();
-    $form->controller->setStateMachine(new CRM_Core_StateMachine($form->controller));
-    $_SESSION['_' . $form->controller->_name . '_container']['values']['Advanced'] = $formValues;
-    return $form;
-  }
+  use FormTrait;
 
   /**
-   * Test delete to trash.
+   * Test add to existing group.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testAddToGroup() {
+  public function testAddToGroup(): void {
     $contact = $this->callAPISuccess('Contact', 'create', [
       'contact_type' => 'Individual',
       'first_name' => 'John',
       'last_name' => 'Doe',
     ]);
-    $contactId = $contact['id'];
     $existingGroupId = $this->groupCreate();
-    $form = $this->getSearchTaskFormObject(['cids' => $contactId, 'group_option' => 0, 'group_id' => $existingGroupId]);
-    $form->preProcess();
-    $form->_contactIds = [$contactId];
-    $form->set('_componentIds', [$contactId]);
-    $form->buildQuickForm();
-    $form->setDefaultValues();
-    $form->postProcess();
-
-    $groupCount = \Civi\Api4\GroupContact::get()
+    $form = $this->getTestForm('CRM_Contact_Form_Search_Basic', ['radio_ts' => 'ts_all'])
+      ->addSubsequentForm('CRM_Contact_Form_Task_AddToGroup', [
+        'group_option' => 0,
+        'group_id' => $existingGroupId,
+      ]);
+    $form->processForm();
+    $groupCount = GroupContact::get()
       ->addWhere('group_id', '=', $existingGroupId)
       ->addWhere('status', '=', 'Added')
+      ->addWhere('contact_id', '=', $contact['id'])
       ->execute()
       ->count();
     $this->assertEquals(1, $groupCount);
@@ -58,33 +48,35 @@ class CRM_Contact_Form_Task_AddToGroupTest extends CiviUnitTestCase {
 
   /**
    * Test delete to trash.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testAddToNewGroupWithCustomField() {
+  public function testAddToNewGroupWithCustomField(): void {
     $contact = $this->callAPISuccess('Contact', 'create', [
       'contact_type' => 'Individual',
       'first_name' => 'Pete',
       'last_name' => 'Johnson',
     ]);
-    $contactId = $contact['id'];
+
     $customGroup = $this->customGroupCreate(['extends' => 'Group']);
     $customField = $this->customFieldCreate(['custom_group_id' => $customGroup['id']]);
     $customFieldId = $customField['id'];
 
-    $form = $this->getSearchTaskFormObject([
-      'cids' => $contactId,
-      'group_option' => 1,
-      'title' => 'Test Group With Custom Field',
-      'description' => '',
-      'custom_' . $customFieldId => 'Custom Value ABC',
-    ]);
-    $form->preProcess();
-    $form->_contactIds = [$contactId];
-    $form->set('_componentIds', [$contactId]);
-    $form->buildQuickForm();
-    $form->setDefaultValues();
-    $form->postProcess();
+    $form = $this->getTestForm(
+      'CRM_Contact_Form_Search_Basic',
+      ['radio_ts' => 'ts_all']
+    )->addSubsequentForm(
+      'CRM_Contact_Form_Task_AddToGroup',
+      [
+        'group_option' => 1,
+        'title' => 'Test Group With Custom Field',
+        'description' => '',
+        'custom_' . $customFieldId => 'Custom Value ABC',
+      ]
+    );
+    $form->processForm();
 
-    $group = \Civi\Api4\Group::get()
+    $group = Group::get()
       ->addSelect('custom.*', 'id')
       ->addWhere('title', '=', 'Test Group With Custom Field')
       ->execute();
@@ -93,9 +85,10 @@ class CRM_Contact_Form_Task_AddToGroupTest extends CiviUnitTestCase {
     $this->assertArrayKeyExists('new_custom_group.Custom_Field', $group);
     $this->assertEquals('Custom Value ABC', $group['new_custom_group.Custom_Field']);
 
-    $groupCount = \Civi\Api4\GroupContact::get()
+    $groupCount = GroupContact::get()
       ->addWhere('group_id', '=', $group['id'])
       ->addWhere('status', '=', 'Added')
+      ->addWhere('contact_id', '=', $contact['id'])
       ->execute()
       ->count();
     $this->assertEquals(1, $groupCount);

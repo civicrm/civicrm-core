@@ -21,11 +21,14 @@ namespace api\v4\Entity;
 
 use api\v4\Api4TestBase;
 use Civi\Api4\ExampleData;
+use Civi\Api4\MessageTemplate;
+use Civi\Api4\Translation;
 use Civi\Api4\WorkflowMessage;
 use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
+ * @group msgtpl
  */
 class WorkflowMessageTest extends Api4TestBase implements TransactionalInterface {
 
@@ -42,9 +45,19 @@ class WorkflowMessageTest extends Api4TestBase implements TransactionalInterface
     $this->assertTrue(isset($result['case_activity']));
   }
 
+  /**
+   * @throws \CRM_Core_Exception
+   */
   public function testRenderDefaultTemplate(): void {
+    \CRM_Core_DAO::executeQuery("
+      INSERT INTO civicrm_msg_template (msg_text, workflow_name, is_active, is_default)
+      VALUES('" . '{foreach from=$activity.fields item=field}
+{$field.label} : {$field.value}
+{/foreach}' . "', 'case_activity_test', 1, 1)
+    ");
+
     $ex = ExampleData::get(FALSE)
-      ->addWhere('name', '=', 'workflow/case_activity/CaseModelExample')
+      ->addWhere('name', '=', 'workflow/case_activity_test/CaseModelExample')
       ->addSelect('data')
       ->addChain('render', WorkflowMessage::render()
         ->setWorkflow('$data.workflow')
@@ -52,27 +65,30 @@ class WorkflowMessageTest extends Api4TestBase implements TransactionalInterface
       ->execute()
       ->single();
     $result = $ex['render'][0];
-    $this->assertRegExp('/Case ID : 1234/', $result['text']);
+    $this->assertMatchesRegularExpression('/Case ID : 1234/', $result['text']);
   }
 
-  public function testRenderCustomTemplate() {
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  public function testRenderCustomTemplate(): void {
     $ex = ExampleData::get(0)
-      ->addWhere('name', '=', 'workflow/case_activity/CaseModelExample')
+      ->addWhere('name', '=', 'workflow/case_activity_test/CaseModelExample')
       ->addSelect('data')
       ->execute()
       ->single();
     $result = WorkflowMessage::render(0)
-      ->setWorkflow('case_activity')
+      ->setWorkflow('case_activity_test')
       ->setValues($ex['data']['modelProps'])
       ->setMessageTemplate([
         'msg_text' => 'The role is {$contact.role}.',
       ])
       ->execute()
       ->single();
-    $this->assertRegExp('/The role is myrole./', $result['text']);
+    $this->assertMatchesRegularExpression('/The role is myrole./', $result['text']);
   }
 
-  public function testRenderExamplesBaseline() {
+  public function testRenderExamplesBaseline(): void {
     $examples = $this->getRenderExamples();
     $this->assertTrue(isset($examples['workflow/contribution_recurring_edit/AlexCancelled']));
   }
@@ -131,12 +147,54 @@ class WorkflowMessageTest extends Api4TestBase implements TransactionalInterface
     foreach ($example['asserts']['default'] as $num => $assert) {
       $msg = sprintf('Check assertion(%s) on example (%s)', $num, $example['name']);
       if (isset($assert['regex'])) {
-        $this->assertRegExp($assert['regex'], $result[$assert['for']], $msg);
+        $this->assertMatchesRegularExpression($assert['regex'], $result[$assert['for']], $msg);
       }
       else {
         $this->fail('Unrecognized assertion: ' . json_encode($assert));
       }
     }
+  }
+
+  /**
+   * Test rendering a translation with no text version.
+   *
+   * In this scenario the parent DOES have a text version.
+   *
+   * The text version should fall back on the translated html,
+   * not the untranslated parent.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testRenderWithoutText(): void {
+    $workflow = 'contribution_dupalert';
+    $id = MessageTemplate::update(FALSE)
+      ->addWhere('workflow_name', '=', $workflow)
+      ->addWhere('is_default', '=', TRUE)
+      ->setValues(['msg_text' => 'hi'])
+      ->execute()->single()['id'];
+
+    Translation::save(FALSE)
+      ->setDefaults(['language' => 'es_ES', 'entity_table' => 'civicrm_msg_template', 'entity_id' => $id])
+      ->setRecords([
+        ['entity_field' => 'msg_html', 'string' => '<b>hola</b>'],
+        ['entity_field' => 'msg_subject', 'string' => 'hola'],
+        ['entity_field' => 'msg_text', 'string' => ''],
+      ])
+      ->setLanguage('es_ES')
+      ->execute();
+    $result = WorkflowMessage::render(FALSE)
+      ->setWorkflow($workflow)
+      ->execute()
+      ->single();
+    $this->assertEquals('hi', $result['text']);
+
+    $result = WorkflowMessage::render(FALSE)
+      ->setWorkflow($workflow)
+      ->setLanguage('es_ES')
+      ->execute()
+      ->single();
+
+    $this->assertArrayNotHasKey('text', $result);
   }
 
 }

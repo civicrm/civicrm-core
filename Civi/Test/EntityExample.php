@@ -24,6 +24,15 @@ abstract class EntityExample implements ExampleDataInterface {
    */
   protected $exName;
 
+  /**
+   * Get the name of the example.
+   *
+   * @return string
+   */
+  protected function getExampleName(): string {
+    return $this->exName;
+  }
+
   public function __construct() {
     if (!preg_match(';^(.*)[_\\\]([a-zA-Z0-9]+)[_\\\]([a-zA-Z0-9]+)$;', static::class, $m)) {
       throw new \RuntimeException("Failed to parse class: " . static::class);
@@ -33,7 +42,7 @@ abstract class EntityExample implements ExampleDataInterface {
   }
 
   protected function dao(): string {
-    return \CRM_Core_DAO_AllCoreTables::getFullName($this->entityName);
+    return \CRM_Core_DAO_AllCoreTables::getDAONameForEntity($this->entityName);
   }
 
   protected function bao(): string {

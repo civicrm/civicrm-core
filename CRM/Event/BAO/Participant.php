@@ -110,6 +110,13 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant implements \Ci
 
     $participantBAO->save();
 
+    // add custom field values
+    if (!empty($params['custom']) &&
+      is_array($params['custom'])
+    ) {
+      CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_participant', $participantBAO->id);
+    }
+
     CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
 
     if (!empty($params['id'])) {
@@ -170,18 +177,13 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant implements \Ci
 
     $participant = self::add($params);
 
-    if (is_a($participant, 'CRM_Core_Error')) {
-      $transaction->rollback();
-      return $participant;
-    }
-
     // Log activity when creating new participant or changing status
     if (empty($params['id']) ||
       (isset($params['status_id']) && $params['status_id'] != $status)
     ) {
       // Default status if not specified
       $participant->status_id = $participant->status_id ?: self::fields()['participant_status_id']['default'];
-      CRM_Activity_BAO_Activity::addActivity($participant, 'Event Registration');
+      CRM_Activity_BAO_Activity::addActivity($participant, 'Event Registration', $participant->contact_id);
     }
 
     //CRM-5403
@@ -196,13 +198,6 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant implements \Ci
       $id = $params['contact_id'] ?? NULL;
     }
 
-    // add custom field values
-    if (!empty($params['custom']) &&
-      is_array($params['custom'])
-    ) {
-      CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_participant', $participant->id);
-    }
-
     //process note, CRM-7634
     $noteId = NULL;
     if (!empty($params['id'])) {
@@ -211,10 +206,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant implements \Ci
     }
     $noteValue = NULL;
     $hasNoteField = FALSE;
-    foreach ([
-      'note',
-      'participant_note',
-    ] as $noteFld) {
+    foreach (['note', 'participant_note'] as $noteFld) {
       if (array_key_exists($noteFld, $params)) {
         $noteValue = $params[$noteFld];
         $hasNoteField = TRUE;
@@ -227,13 +219,9 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant implements \Ci
           'entity_table' => 'civicrm_participant',
           'note' => $noteValue,
           'entity_id' => $participant->id,
-          'contact_id' => $id,
+          'id' => $noteId,
         ];
-        $noteIDs = [];
-        if ($noteId) {
-          $noteIDs['id'] = $noteId;
-        }
-        CRM_Core_BAO_Note::add($noteParams, $noteIDs);
+        CRM_Core_BAO_Note::add($noteParams);
       }
       elseif ($noteId && $hasNoteField) {
         CRM_Core_BAO_Note::deleteRecord(['id' => $noteId]);
@@ -269,8 +257,8 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant implements \Ci
         );
       }
       if (CRM_Core_Permission::check('delete in CiviEvent')) {
-        $recentOther['deleteUrl'] = CRM_Utils_System::url('civicrm/contact/view/participant',
-          "action=delete&reset=1&id={$participant->id}&cid={$participant->contact_id}&context=home"
+        $recentOther['deleteUrl'] = CRM_Utils_System::url('civicrm/participant/delete',
+          "reset=1&id={$participant->id}"
         );
       }
 
@@ -318,8 +306,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant implements \Ci
    *                 calculation or not. (it is for cron job  purpose)
    *
    * @param bool $returnWaitingCount
-   * @param bool $considerTestParticipant
-   *   When TRUE, include participant records where is_test = 1.
+   * @param bool $considerTestParticipant deprecated, unused
    * @param bool $onlyPositiveStatuses
    *   When FALSE, count all participant statuses where is_counted = 1.  This includes
    *   both "Positive" participants (Registered, Attended, etc.) and waitlisted
@@ -328,6 +315,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant implements \Ci
    *
    * @return bool|int|null|string
    *   1. false                 => If event having some empty spaces.
+   * @throws \CRM_Core_Exception
    */
   public static function eventFull(
     $eventId,
@@ -348,28 +336,16 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant implements \Ci
     // It might be case there are some empty spaces and still event
     // is full, as waitlist might represent group require spaces > empty.
 
-    $participantRoles = CRM_Event_PseudoConstant::participantRole(NULL, 'filter = 1');
-    $countedStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 1');
+    $countedStatuses = \CRM_Event_BAO_Participant::buildOptions('status_id', NULL, ['is_counted' => 1]);;
     $positiveStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Positive'");
     $waitingStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Waiting'");
     $onWaitlistStatusId = array_search('On waitlist', $waitingStatuses);
 
-    $where = [' event.id = %1 '];
-    if (!$considerTestParticipant) {
-      $where[] = ' ( participant.is_test = 0 OR participant.is_test IS NULL ) ';
+    $where = [' event.id = %1 ', ' participant.is_test = 0 '];
+    $participantRoleClause = self::getParticipantRoleClause();
+    if ($participantRoleClause) {
+      $where[] = " participant.role_id " . $participantRoleClause;
     }
-
-    // Only count Participant Roles with the "Counted?" flag.
-    if (!empty($participantRoles)) {
-      $escapedRoles = [];
-      foreach (array_keys($participantRoles) as $participantRole) {
-        $escapedRoles[] = CRM_Utils_Type::escape($participantRole, 'String');
-      }
-
-      $regexp = "([[:cntrl:]]|^)" . implode('([[:cntrl:]]|$)|([[:cntrl:]]|^)', $escapedRoles) . "([[:cntrl:]]|$)";
-      $where[] = " participant.role_id REGEXP '{$regexp}'";
-    }
-
     $eventParams = [1 => [$eventId, 'Positive']];
 
     //in case any waiting, straight forward event is full.
@@ -381,22 +357,18 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant implements \Ci
       $eventSeatsWhere = implode(' AND ', $where) . " AND ( participant.status_id = $onWaitlistStatusId )";
 
       $query = "
-    SELECT  participant.id id,
-            event.event_full_text as event_full_text
+    SELECT  participant.id id
       FROM  civicrm_participant participant
 INNER JOIN  civicrm_event event ON ( event.id = participant.event_id )
             {$whereClause}";
 
-      $eventFullText = ts('This event is full.');
-      $participants = CRM_Core_DAO::executeQuery($query, $eventParams);
-      while ($participants->fetch()) {
+      $hasWaitlistedParticipants = CRM_Core_DAO::singleValueQuery($query, $eventParams);
+      if ($hasWaitlistedParticipants) {
         //oops here event is full and we don't want waiting count.
         if ($returnWaitingCount) {
           return CRM_Event_BAO_Event::eventTotalSeats($eventId, $eventSeatsWhere);
         }
-        else {
-          return ($participants->event_full_text) ? $participants->event_full_text : $eventFullText;
-        }
+        return CRM_Core_DAO::singleValueQuery('SELECT event_full_text FROM civicrm_event WHERE id = ' . (int) $eventId) ?: ts('This event is full.');
       }
     }
 
@@ -511,7 +483,7 @@ SELECT  event.event_full_text,
 
     $isTestClause = NULL;
     if (!$considerTestParticipants) {
-      $isTestClause = ' AND ( participant.is_test IS NULL OR participant.is_test = 0 )';
+      $isTestClause = ' AND participant.is_test = 0 ';
     }
 
     $skipParticipantClause = NULL;
@@ -523,7 +495,7 @@ SELECT  event.event_full_text,
     SELECT  line.id as lineId,
             line.entity_id as entity_id,
             line.qty,
-            value.id as valueId,
+            value.id as price_field_value_id,
             value.count,
             field.html_type
       FROM  civicrm_line_item line
@@ -539,34 +511,16 @@ INNER JOIN  civicrm_price_field field       ON ( value.price_field_id = field.id
 
     $lineItem = CRM_Core_DAO::executeQuery($sql, [1 => [$eventId, 'Positive']]);
     while ($lineItem->fetch()) {
-      $count = $lineItem->count;
-      if (!$count) {
-        $count = 1;
-      }
-      if ($lineItem->html_type == 'Text') {
+      $id = (int) $lineItem->price_field_value_id;
+      $optionsCount[$id] ??= 0;
+      $count = $lineItem->count ?: 1;
+      if ($lineItem->html_type === 'Text') {
         $count *= $lineItem->qty;
       }
-      $optionsCount[$lineItem->valueId] = $count + CRM_Utils_Array::value($lineItem->valueId, $optionsCount, 0);
+      $optionsCount[$id] += $count;
     }
 
     return $optionsCount;
-  }
-
-  /**
-   * Get the empty spaces for event those we can allocate
-   * to pending participant to become confirm.
-   *
-   * @deprecated
-   *
-   * @param int $eventId
-   *   Event id.
-   *
-   * @return int
-   *   $spaces  Number of Empty Seats/null.
-   */
-  public static function pendingToConfirmSpaces($eventId) {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Event_BAO_Participant::eventFull');
-    return CRM_Event_BAO_Participant::eventFull($eventId, TRUE, FALSE, TRUE, FALSE, TRUE);
   }
 
   /**
@@ -578,14 +532,13 @@ INNER JOIN  civicrm_price_field field       ON ( value.price_field_id = field.id
    * @param bool $checkPermission
    *   Is this a permissioned retrieval?
    *
-   * @deprecated only called from event search, but without most of the details
-   * returned. Event search should call stop using this & get the metadata
-   * a better way.
+   * @deprecated since 5.74 will be removed around 5.86
    *
    * @return array
    *   array of importable Fields
    */
   public static function &importableFields($contactType = 'Individual', $status = TRUE, $onlyParticipant = FALSE, $checkPermission = TRUE) {
+    CRM_Core_Error::deprecatedFunctionWarning('use apiv4');
     if (!self::$_importableFields) {
       if (!$onlyParticipant) {
         if (!$status) {
@@ -677,7 +630,7 @@ INNER JOIN  civicrm_price_field field       ON ( value.price_field_id = field.id
       $extIdentifier = $contactFields['external_identifier'] ?? NULL;
       if ($extIdentifier) {
         $tmpContactField['external_identifier'] = $extIdentifier;
-        $tmpContactField['external_identifier']['title'] = CRM_Utils_Array::value('title', $extIdentifier) . ' (match to contact)';
+        $tmpContactField['external_identifier']['title'] = ($extIdentifier['title'] ?? '') . ' (match to contact)';
       }
       $tmpFields['participant_contact_id']['title'] = $tmpFields['participant_contact_id']['title'] . ' (match to contact)';
 
@@ -973,31 +926,32 @@ WHERE  civicrm_participant.id = {$participantId}
   /**
    * Get the additional participant ids.
    *
-   * @param int $primaryParticipantId
-   *   Primary partycipant Id.
+   * @param int|null $primaryParticipantID
+   *   Primary participant ID. Null should not be passed in & handling for it
+   *   will be removed.
    * @param bool $excludeCancel
-   *   Do not include participant those are cancelled.
-   *
-   * @param int $oldStatusId
+   *   Do not include cancelled participants.
+   * @param int|null $statusID
+   *   Restrict to the specified status ID.
    *
    * @return array
+   *
+   * @throws \Civi\Core\Exception\DBQueryException
+   * @internal not supported to be called from outside of core.
    */
-  public static function getAdditionalParticipantIds($primaryParticipantId, $excludeCancel = TRUE, $oldStatusId = NULL) {
-    $additionalParticipantIds = [];
-    if (!$primaryParticipantId) {
-      return $additionalParticipantIds;
+  public static function getAdditionalParticipantIds(?int $primaryParticipantID, bool $excludeCancel = TRUE, ?int $statusID = NULL): array {
+    if (!$primaryParticipantID) {
+      CRM_Core_Error::deprecatedWarning('should not be called with no IDs');
+      return [];
     }
-
-    $where = "participant.registered_by_id={$primaryParticipantId}";
+    $where = "participant.registered_by_id={$primaryParticipantID}";
     if ($excludeCancel) {
-      $cancelStatusId = 0;
       $negativeStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Negative'");
-      $cancelStatusId = array_search('Cancelled', $negativeStatuses);
-      $where .= " AND participant.status_id != {$cancelStatusId}";
+      $where .= ' AND participant.status_id != ' . (int) array_search('Cancelled', $negativeStatuses, TRUE);
     }
 
-    if ($oldStatusId) {
-      $where .= " AND participant.status_id = {$oldStatusId}";
+    if ($statusID) {
+      $where .= " AND participant.status_id = {$statusID}";
     }
 
     $query = "
@@ -1005,11 +959,12 @@ WHERE  civicrm_participant.id = {$participantId}
     FROM  civicrm_participant participant
    WHERE  {$where}";
 
+    $additionalParticipantIDs = [];
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
-      $additionalParticipantIds[$dao->id] = $dao->id;
+      $additionalParticipantIDs[$dao->id] = $dao->id;
     }
-    return $additionalParticipantIds;
+    return $additionalParticipantIDs;
   }
 
   /**
@@ -1035,7 +990,6 @@ WHERE cpf.price_set_id = %1 AND cpfv.label = (SELECT label from civicrm_price_fi
       $params[2] = [$discountedPriceFieldOptionID, 'Integer'];
     }
     else {
-      $feeLevel = current($feeLevel);
       $query = "SELECT cpfv.amount FROM `civicrm_price_field_value` cpfv
 LEFT JOIN civicrm_price_field cpf ON cpfv.price_field_id = cpf.id
 WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";
@@ -1426,7 +1380,6 @@ UPDATE  civicrm_participant
         [
           'workflow' => 'participant_' . strtolower($mailType),
           'contactId' => $contactId,
-          'tokenContext' => ['participantId' => $participantId],
           'tplParams' => [
             'participant' => $participantValues,
             'event' => $eventDetails,
@@ -1436,6 +1389,11 @@ UPDATE  civicrm_participant
             'isExpired' => $mailType === 'Expired',
             'isConfirm' => $mailType === 'Confirm',
             'checksumValue' => $checksumValue,
+          ],
+          'modelProps' => [
+            'participantID' => (int) $participantId,
+            'eventID' => (int) $eventDetails['id'],
+            'contactID' => (int) $contactId,
           ],
           'from' => $receiptFrom,
           'toName' => $participantName,
@@ -1459,10 +1417,7 @@ UPDATE  civicrm_participant
           'is_test' => $participantValues['is_test'],
           'status_id' => 2,
         ];
-
-        if (is_a(CRM_Activity_BAO_Activity::create($activityParams), 'CRM_Core_Error')) {
-          throw new CRM_Core_Exception('Failed creating Activity for expiration mail');
-        }
+        CRM_Activity_BAO_Activity::create($activityParams);
       }
     }
 
@@ -1711,6 +1666,10 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
   public static function createDiscountTrxn($eventID, $contributionParams, $feeLevel, $discountedPriceFieldOptionID = NULL) {
     $financialTypeID = $contributionParams['contribution']->financial_type_id;
     $total_amount = $contributionParams['total_amount'];
+    if (is_array($feeLevel)) {
+      CRM_Core_Error::deprecatedFunctionWarning('array passed for string value');
+      $feeLevel = (string) current($feeLevel);
+    }
 
     $checkDiscount = CRM_Core_BAO_Discount::findSet($eventID, 'civicrm_event');
     if (!empty($checkDiscount)) {
@@ -1759,8 +1718,8 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
     $contactId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $participantId, 'contact_id');
 
     $date = CRM_Utils_Date::currentDBDate();
-    $event = CRM_Event_BAO_Event::getEvents(0, $eventId);
-    $subject = sprintf("Registration selections changed for %s", CRM_Utils_Array::value($eventId, $event));
+    $title = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $eventId, 'title');
+    $subject = ts('Registration selections changed for %1', [1 => $title]);
 
     // activity params
     $activityParams = [
@@ -1784,29 +1743,23 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
   }
 
   /**
-   * Get options for a given field.
-   * @see CRM_Core_DAO::buildOptions
-   *
-   * @param string $fieldName
-   * @param string $context
-   * @see CRM_Core_DAO::buildOptionsContext
-   * @param array $props
-   *   whatever is known about this dao object.
-   *
-   * @return array|bool
+   * Pseudoconstant condition_provider for role_id field.
+   * @see \Civi\Schema\EntityMetadataBase::getConditionFromProvider
    */
-  public static function buildOptions($fieldName, $context = NULL, $props = []) {
-    $params = ['condition' => []];
-
-    if ($fieldName == 'status_id' && $context != 'validate') {
-      // Get rid of cart-related option if disabled
-      // FIXME: Why does this option even exist if cart is disabled?
-      if (!Civi::settings()->get('enable_cart')) {
-        $params['condition'][] = "name <> 'Pending in cart'";
-      }
+  public static function alterRole(string $fieldName, CRM_Utils_SQL_Select $conditions, $params) {
+    if (isset($params['values']['filter'])) {
+      $conditions->where('filter = #filter', ['filter' => (int) $params['values']['filter']]);
     }
+  }
 
-    return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
+  /**
+   * Pseudoconstant condition_provider for status_id field.
+   * @see \Civi\Schema\EntityMetadataBase::getConditionFromProvider
+   */
+  public static function alterStatus(string $fieldName, CRM_Utils_SQL_Select $conditions, $params) {
+    if (isset($params['values']['is_counted'])) {
+      $conditions->where('is_counted = #counted', ['counted' => (int) $params['values']['is_counted']]);
+    }
   }
 
   /**
@@ -1820,11 +1773,10 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
     }
     $fields = [];
     if (!empty($form->_fields)) {
-      $removeCustomFieldTypes = ['Participant'];
 
       foreach ($form->_fields as $name => $fieldInfo) {
         if ((substr($name, 0, 7) == 'custom_' && !$form->_allowConfirmation
-          && !CRM_Core_BAO_CustomGroup::checkCustomField(substr($name, 7), $removeCustomFieldTypes))
+          && !CRM_Core_BAO_CustomGroup::checkCustomField(substr($name, 7), ['Participant']))
           || substr($name, 0, 12) == 'participant_') {
           continue;
         }
@@ -1859,7 +1811,7 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
       $details['eligible'] = TRUE;
       $details['status']  = $dao->status;
       $details['role'] = $dao->role;
-      $details['fee_level'] = trim(($dao->fee_level ?? ''), CRM_Core_DAO::VALUE_SEPARATOR);
+      $details['fee_level'] = $dao->fee_level ? implode('<br>', CRM_Core_DAO::unSerializeField($dao->fee_level, CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND)) : NULL;
       $details['fee_amount'] = $dao->fee_amount;
       $details['register_date'] = $dao->register_date;
       $details['event_start_date'] = $dao->start_date;
@@ -1867,38 +1819,40 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
       $eventTitle = $dao->title;
       $eventId = $dao->event_id;
     }
-    if (!$details['allow_selfcancelxfer'] && !$isBackOffice) {
-      $details['eligible'] = FALSE;
-      $details['ineligible_message'] = ts('This event registration can not be transferred or cancelled. Contact the event organizer if you have questions.');
-      return $details;
-    }
-    // Verify participant status is one that can be self-cancelled
-    if (!in_array($details['status'], ['Registered', 'Pending from pay later', 'On waitlist'])) {
-      $details['eligible'] = FALSE;
-      $details['ineligible_message'] = ts('You cannot transfer or cancel your registration for %1 as you are not currently registered for this event.', [1 => $eventTitle]);
-      return $details;
-    }
-    // Determine if it's too late to self-service cancel/transfer.
-    $query = "select start_date as start, selfcancelxfer_time as time from civicrm_event where id = " . $eventId;
-    $dao = CRM_Core_DAO::executeQuery($query);
-    while ($dao->fetch()) {
-      $time_limit  = $dao->time;
-      $start_date = $dao->start;
-    }
-    $timenow = new Datetime();
-    if (!$isBackOffice && isset($time_limit)) {
-      $cancelHours = abs($time_limit);
-      $cancelInterval = new DateInterval("PT{$cancelHours}H");
-      $cancelInterval->invert = $time_limit < 0 ? 1 : 0;
-      $cancelDeadline = (new Datetime($start_date))->sub($cancelInterval);
-      if ($timenow > $cancelDeadline) {
+    if (!$isBackOffice) {
+      if (!$details['allow_selfcancelxfer']) {
         $details['eligible'] = FALSE;
-        // Change the language of the status message based on whether the waitlist time limit is positive or negative.
-        $afterOrPrior = $time_limit <= 0 ? 'after' : 'prior to';
-        $moreOrLess = $time_limit <= 0 ? 'more' : 'fewer';
-        $details['ineligible_message'] = ts("Registration for this event cannot be cancelled or transferred %1 than %2 hours %3 the event's start time. Contact the event organizer if you have questions.",
-        [1 => $moreOrLess, 2 => $cancelHours, 3 => $afterOrPrior]);
+        $details['ineligible_message'] = ts('This event registration can not be transferred or cancelled. Contact the event organizer if you have questions.');
+        return $details;
+      }
+      // Verify participant status is one that can be self-cancelled
+      if (!in_array($details['status'], ['Registered', 'Pending from pay later', 'On waitlist', 'Pending from incomplete transaction'])) {
+        $details['eligible'] = FALSE;
+        $details['ineligible_message'] = ts('You cannot transfer or cancel your registration for %1 as you are not currently registered for this event.', [1 => $eventTitle]);
+        return $details;
+      }
+      // Determine if it's too late to self-service cancel/transfer.
+      $query = "select start_date as start, selfcancelxfer_time as time from civicrm_event where id = " . $eventId;
+      $dao = CRM_Core_DAO::executeQuery($query);
+      while ($dao->fetch()) {
+        $time_limit  = $dao->time;
+        $start_date = $dao->start;
+      }
+      $timenow = new Datetime();
+      if (isset($time_limit)) {
+        $cancelHours = abs($time_limit);
+        $cancelInterval = new DateInterval("PT{$cancelHours}H");
+        $cancelInterval->invert = $time_limit < 0 ? 1 : 0;
+        $cancelDeadline = (new Datetime($start_date))->sub($cancelInterval);
+        if ($timenow > $cancelDeadline) {
+          $details['eligible'] = FALSE;
+          // Change the language of the status message based on whether the waitlist time limit is positive or negative.
+          $afterOrPrior = $time_limit <= 0 ? 'after' : 'prior to';
+          $moreOrLess = $time_limit <= 0 ? 'more' : 'fewer';
+          $details['ineligible_message'] = ts("Registration for this event cannot be cancelled or transferred %1 than %2 hours %3 the event's start time. Contact the event organizer if you have questions.",
+          [1 => $moreOrLess, 2 => $cancelHours, 3 => $afterOrPrior]);
 
+        }
       }
     }
     return $details;
@@ -1910,6 +1864,17 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
    * @throws CRM_Core_Exception
    */
   public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    // Set the default role ID on create.
+    if ($event->entity === 'Participant' && $event->action === 'create' && empty($event->params['role_id'])) {
+      if (!empty($event->params['event_id'])) {
+        $event->params['role_id'] = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $event->params['event_id'], 'default_role_id');
+      }
+      else {
+        $params['role_id'] = CRM_Core_DAO::singleValueQuery('SELECT default_role_id FROM civicrm_event WHERE id = %1', [
+          1 => [$event->params['event_id'], 'Integer'],
+        ]);
+      }
+    }
     if ($event->entity === 'Participant' && $event->action === 'create' && empty($event->params['created_id'])) {
       // Set the "created_id" field if not already set.
       // The created_id should always be the person that actually did the registration.
@@ -1934,6 +1899,34 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
         }
       }
     }
+  }
+
+  /**
+   * Get the clause to exclude uncounted participant roles.
+   *
+   * @internal do not call from outside core code.
+   *
+   * @return string
+   * @throws \CRM_Core_Exception
+   */
+  public static function getParticipantRoleClause(): string {
+    // Only count Participant Roles with the "Counted?" flag.
+    $participantRoles = self::buildOptions('role_id', NULL, ['filter' => TRUE]);
+    $allRoles = self::buildOptions('role_id');
+    if ($participantRoles === $allRoles) {
+      // Don't complicate the query if no roles are excluded.
+      return '';
+    }
+    if (!empty($participantRoles)) {
+      $escapedRoles = [];
+      foreach (array_keys($participantRoles) as $participantRole) {
+        $escapedRoles[] = CRM_Utils_Type::escape($participantRole, 'String');
+      }
+
+      $regexp = "([[:cntrl:]]|^)" . implode('([[:cntrl:]]|$)|([[:cntrl:]]|^)', $escapedRoles) . "([[:cntrl:]]|$)";
+      $participantRoleClause = "REGEXP '{$regexp}'";
+    }
+    return $participantRoleClause ?? '';
   }
 
 }

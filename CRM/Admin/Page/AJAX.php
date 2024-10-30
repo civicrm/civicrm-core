@@ -24,6 +24,7 @@ class CRM_Admin_Page_AJAX {
    * Outputs menubar data (json format) for the current user.
    */
   public static function navMenu() {
+    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
     if (CRM_Core_Session::getLoggedInContactID()) {
 
       $menu = CRM_Core_BAO_Navigation::buildNavigationTree();
@@ -36,7 +37,7 @@ class CRM_Admin_Page_AJAX {
 
       $output = [
         'menu' => $menu,
-        'search' => CRM_Utils_Array::makeNonAssociative(self::getSearchOptions()),
+        'search' => self::getSearchOptions(),
       ];
       // Encourage browsers to cache for a long time - 1 year
       $ttl = 60 * 60 * 24 * 364;
@@ -68,9 +69,9 @@ class CRM_Admin_Page_AJAX {
         $item['url'] = CRM_Utils_System::evalUrl(CRM_Core_BAO_Navigation::makeFullyFormedUrl($props['url']));
       }
       if (!empty($props['label'])) {
-        $item['label'] = ts($props['label'], ['context' => 'menu']);
+        $item['label'] = _ts($props['label'], ['context' => 'menu']);
       }
-      $item['name'] = !empty($props['name']) ? $props['name'] : CRM_Utils_String::munge(CRM_Utils_Array::value('label', $props));
+      $item['name'] = !empty($props['name']) ? $props['name'] : CRM_Utils_String::munge($props['label'] ?? '');
       if (!empty($item['child'])) {
         self::formatMenuItems($item['child']);
       }
@@ -80,15 +81,14 @@ class CRM_Admin_Page_AJAX {
 
   public static function getSearchOptions() {
     $searchOptions = Civi::settings()->get('quicksearch_options');
-    $labels = CRM_Core_SelectValues::quicksearchOptions();
+    $allOptions = array_column(CRM_Core_SelectValues::getQuicksearchOptions(), NULL, 'key');
     $result = [];
     foreach ($searchOptions as $key) {
-      $label = $labels[$key];
-      if (strpos($key, 'custom_') === 0) {
-        $key = 'custom_' . CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', substr($key, 7), 'id', 'name');
-        $label = array_slice(explode(': ', $label, 2), -1);
-      }
-      $result[$key] = $label;
+      $result[] = [
+        'key' => $key,
+        'value' => $allOptions[$key]['label'],
+        'adv_search_legacy' => $allOptions[$key]['adv_search_legacy'] ?? '',
+      ];
     }
     return $result;
   }
@@ -97,6 +97,7 @@ class CRM_Admin_Page_AJAX {
    * Process drag/move action for menu tree.
    */
   public static function menuTree() {
+    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
     CRM_Core_BAO_Navigation::processNavigation($_GET);
   }
 
@@ -104,6 +105,7 @@ class CRM_Admin_Page_AJAX {
    * Build status message while enabling/ disabling various objects.
    */
   public static function getStatusMsg() {
+    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
     require_once 'api/v3/utils.php';
     $recordID = CRM_Utils_Type::escape($_GET['id'], 'Integer');
     $entity = CRM_Utils_Type::escape($_GET['entity'], 'String');
@@ -242,7 +244,21 @@ class CRM_Admin_Page_AJAX {
 
         case 'CRM_Contact_BAO_Group':
           $ret['content'] = ts('Are you sure you want to disable this Group?');
-          $ret['content'] .= '<br /><br /><strong>' . ts('WARNING - Disabling this group will disable all the child groups associated if any.') . '</strong>';
+          $sgContent = '';
+          $sgReferencingThisGroup = CRM_Contact_BAO_SavedSearch::getSmartGroupsUsingGroup($recordID);
+          if (!empty($sgReferencingThisGroup)) {
+            $sgContent .= '<br /><br /><strong>' . ts('WARNING - This Group is currently referenced by %1 smart group(s).', [
+              1 => count($sgReferencingThisGroup),
+            ]) . '</strong><ul>';
+            foreach ($sgReferencingThisGroup as $gid => $group) {
+              $sgContent .= '<li>' . ts('%1 <a class="action-item crm-hover-button" href="%2" target="_blank">Edit Smart Group Criteria</a>', [
+                1 => $group['title'],
+                2 => $group['editSearchURL'],
+              ]) . '</li>';
+            }
+            $sgContent .= '</ul>' . ts('Disabling this group will cause these groups to no longer restrict members based on membership in this group. Please edit and remove this group as a criteria from these smart groups.');
+          }
+          $ret['content'] .= $sgContent . '<br /><br /><strong>' . ts('WARNING - Disabling this group will disable all the child groups associated if any.') . '</strong>';
           break;
 
         case 'CRM_Core_BAO_OptionGroup':
@@ -280,73 +296,18 @@ class CRM_Admin_Page_AJAX {
   }
 
   /**
-   * Get a list of mappings.
-   *
-   * This appears to be only used by scheduled reminders.
-   */
-  public static function mappingList() {
-    if (empty($_GET['mappingID'])) {
-      CRM_Utils_JSON::output(['status' => 'error', 'error_msg' => 'required params missing.']);
-    }
-
-    $mapping = CRM_Core_BAO_ActionSchedule::getMapping($_GET['mappingID']);
-    $dateFieldLabels = $mapping ? $mapping->getDateFields() : [];
-
-    // The UX here is quirky -- for "Activity" types, there's a simple drop "Recipients"
-    // dropdown which is always displayed. For other types, the "Recipients" drop down is
-    // conditional upon the weird isLimit ('Limit To / Also Include / Neither') dropdown.
-    $noThanksJustKidding = !$_GET['isLimit'];
-    if ($mapping instanceof CRM_Activity_ActionMapping || !$noThanksJustKidding) {
-      $entityRecipientLabels = $mapping ? ($mapping->getRecipientTypes() + CRM_Core_BAO_ActionSchedule::getAdditionalRecipients()) : [];
-    }
-    else {
-      $entityRecipientLabels = CRM_Core_BAO_ActionSchedule::getAdditionalRecipients();
-    }
-    $recipientMapping = array_combine(array_keys($entityRecipientLabels), array_keys($entityRecipientLabels));
-
-    $output = [
-      'sel4' => CRM_Utils_Array::makeNonAssociative($dateFieldLabels),
-      'sel5' => CRM_Utils_Array::makeNonAssociative($entityRecipientLabels),
-      'recipientMapping' => $recipientMapping,
-    ];
-
-    CRM_Utils_JSON::output($output);
-  }
-
-  /**
-   * (Scheduled Reminders) Get the list of possible recipient filters.
-   *
-   * Ex: GET /civicrm/ajax/recipientListing?mappingID=contribpage&recipientType=
-   */
-  public static function recipientListing() {
-    $mappingID = filter_input(INPUT_GET, 'mappingID', FILTER_VALIDATE_REGEXP, [
-      'options' => [
-        'regexp' => '/^[a-zA-Z0-9_\-]+$/',
-      ],
-    ]);
-    $recipientType = filter_input(INPUT_GET, 'recipientType', FILTER_VALIDATE_REGEXP, [
-      'options' => [
-        'regexp' => '/^[a-zA-Z0-9_\-]+$/',
-      ],
-    ]);
-
-    CRM_Utils_JSON::output([
-      'recipients' => CRM_Utils_Array::makeNonAssociative(CRM_Core_BAO_ActionSchedule::getRecipientListing($mappingID, $recipientType)),
-    ]);
-  }
-
-  /**
    * Outputs one branch in the tag tree
    *
    * Used by jstree to incrementally load tags
    */
   public static function getTagTree() {
+    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
     $parent = CRM_Utils_Type::escape(($_GET['parent_id'] ?? 0), 'Integer');
     $substring = CRM_Utils_Type::escape(CRM_Utils_Array::value('str', $_GET), 'String');
     $result = [];
 
     $whereClauses = ['is_tagset <> 1'];
-    $orderColumn = 'name';
+    $orderColumn = 'label';
 
     // fetch all child tags in Array('parent_tag' => array('child_tag_1', 'child_tag_2', ...)) format
     $childTagIDs = CRM_Core_BAO_Tag::getChildTags($substring);
@@ -356,7 +317,7 @@ class CRM_Admin_Page_AJAX {
       $whereClauses[] = "parent_id = $parent";
     }
     elseif ($substring) {
-      $whereClauses['substring'] = " name LIKE '%$substring%' ";
+      $whereClauses['substring'] = " label LIKE '%$substring%' ";
       if (!empty($parentIDs)) {
         $whereClauses['substring'] = sprintf(" %s OR id IN (%s) ", $whereClauses['substring'], implode(',', $parentIDs));
       }
@@ -384,7 +345,7 @@ class CRM_Admin_Page_AJAX {
         $usedFor = (array) explode(',', $dao->used_for);
         $tag = [
           'id' => $dao->id,
-          'text' => $dao->name,
+          'text' => $dao->label,
           'a_attr' => [
             'class' => 'crm-tag-item',
           ],
@@ -394,7 +355,7 @@ class CRM_Admin_Page_AJAX {
             'is_selectable' => (bool) $dao->is_selectable,
             'is_reserved' => (bool) $dao->is_reserved,
             'used_for' => $usedFor,
-            'color' => $dao->color ? $dao->color : '#ffffff',
+            'color' => $dao->color ?: '#ffffff',
             'usages' => civicrm_api3('EntityTag', 'getcount', [
               'entity_table' => ['IN' => $usedFor],
               'tag_id' => $dao->id,

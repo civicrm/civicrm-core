@@ -40,7 +40,7 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
    *   Classname of BAO.
    */
   public function getBAOName() {
-    return 'CRM_Financial_BAO_FinancialTypeAccount';
+    return 'CRM_Financial_BAO_EntityFinancialAccount';
   }
 
   /**
@@ -57,12 +57,14 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
           'url' => 'civicrm/admin/financial/financialType/accounts',
           'qs' => 'action=update&id=%%id%%&aid=%%aid%%&reset=1',
           'title' => ts('Edit Financial Type Account'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/financial/financialType/accounts',
           'qs' => 'action=delete&id=%%id%%&aid=%%aid%%',
           'title' => ts('Delete Financial Type Account'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
         ],
       ];
     }
@@ -112,8 +114,8 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
       $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
       $this->_title = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', $this->_aid, 'name');
       CRM_Utils_System::setTitle($this->_title . ' - ' . ts('Assigned Financial Accounts'));
-      $financialAccountType = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialAccount', 'financial_account_type_id');
-      $accountRelationship = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship');
+      $financialAccountType = CRM_Financial_DAO_FinancialAccount::buildOptions('financial_account_type_id');
+      $accountRelationship = CRM_Financial_DAO_EntityFinancialAccount::buildOptions('account_relationship');
       $dao->copyValues($params);
       $dao->find();
       while ($dao->fetch()) {

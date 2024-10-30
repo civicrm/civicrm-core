@@ -28,7 +28,7 @@
             <th>{ts}Type{/ts}</th>
             <th>{ts}Order{/ts}</th>
             <th>{ts}Style{/ts}</th>
-            <th></th>
+            <th><span class="sr-only">{ts}Actions{/ts}</span></th>
           </tr>
         </thead>
         <tbody>

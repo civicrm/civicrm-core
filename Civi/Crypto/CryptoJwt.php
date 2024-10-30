@@ -11,8 +11,10 @@
 
 namespace Civi\Crypto;
 
+use Civi\Core\Service\AutoService;
 use Civi\Crypto\Exception\CryptoException;
 use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 
 /**
  * The "Crypto JWT" service supports a token format suitable for
@@ -24,8 +26,9 @@ use Firebase\JWT\JWT;
  *
  * @package Civi\Crypto
  * @see https://jwt.io/
+ * @service crypto.jwt
  */
-class CryptoJwt {
+class CryptoJwt extends AutoService {
 
   /**
    * @var \Civi\Crypto\CryptoRegistry
@@ -59,6 +62,12 @@ class CryptoJwt {
    * @throws CryptoException
    */
   public function decode($token, $keyTag = 'SIGN') {
+    // TODO: Circa mid-2024, make a hard-requirement on firebase/php-jwt v5.5+.
+    // Then we can remove this guard and simplify the `$keysByAlg` stuff.
+    $useKeyObj = class_exists(Key::class);
+    if (!$useKeyObj) {
+      \CRM_Core_Error::deprecatedWarning('Using deprecated version of firebase/php-jwt. Upgrade to 6.x+.');
+    }
     $keyRows = $this->getRegistry()->findKeysByTag($keyTag);
 
     // We want to call JWT::decode(), but there's a slight mismatch -- the
@@ -73,13 +82,13 @@ class CryptoJwt {
     foreach ($keyRows as $key) {
       if ($alg = $this->suiteToAlg($key['suite'])) {
         // Currently, registry only has symmetric keys in $key['key']. For public key-pairs, might need to change.
-        $keysByAlg[$alg][$key['id']] = $key['key'];
+        $keysByAlg[$alg][$key['id']] = ($useKeyObj ? new Key($key['key'], $alg) : $key['key']);
       }
     }
 
     foreach ($keysByAlg as $alg => $keys) {
       try {
-        return (array) JWT::decode($token, $keys, [$alg]);
+        return ($useKeyObj ? (array) JWT::decode($token, $keys) : (array) JWT::decode($token, $keys, [$alg]));
       }
       catch (\UnexpectedValueException $e) {
         // Depending on the error, we might able to try other algos

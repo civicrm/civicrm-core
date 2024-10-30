@@ -16,24 +16,27 @@
  */
 
 /**
- * Helper class to build navigation links
+ * @deprecated since 5.71 will be removed around 5.77
  */
 class CRM_Campaign_Form_Survey_TabHeader {
 
   /**
    * Build tab header.
    *
+   * @deprecated since 5.71 will be removed around 5.77
+   *
    * @param CRM_Core_Form $form
    *
    * @return array
    */
   public static function build(&$form) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     $tabs = $form->get('tabHeader');
     if (!$tabs || empty($_GET['reset'])) {
       $tabs = self::process($form);
       $form->set('tabHeader', $tabs);
     }
-    $form->assign_by_ref('tabHeader', $tabs);
+    $form->assign('tabHeader', $tabs);
     CRM_Core_Resources::singleton()
       ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')
       ->addSetting([
@@ -48,8 +51,11 @@ class CRM_Campaign_Form_Survey_TabHeader {
    * @param CRM_Core_Form $form
    *
    * @return array
+   *
+   * @deprecated since 5.71 will be removed around 5.77
    */
   public static function process(&$form) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     if ($form->getVar('_surveyId') <= 0) {
       return NULL;
     }
@@ -110,8 +116,11 @@ class CRM_Campaign_Form_Survey_TabHeader {
 
   /**
    * @param CRM_Core_Form $form
+   *
+   * @deprecated since 5.71 will be removed around 5.77
    */
   public static function reset(&$form) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     $tabs = self::process($form);
     $form->set('tabHeader', $tabs);
   }
@@ -120,8 +129,11 @@ class CRM_Campaign_Form_Survey_TabHeader {
    * @param array $tabs
    *
    * @return int|string
+   *
+   * @deprecated since 5.71 will be removed around 5.77
    */
   public static function getCurrentTab($tabs) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     static $current = FALSE;
 
     if ($current) {
@@ -137,7 +149,7 @@ class CRM_Campaign_Form_Survey_TabHeader {
       }
     }
 
-    $current = $current ? $current : 'main';
+    $current = $current ?: 'main';
     return $current;
   }
 
@@ -145,8 +157,11 @@ class CRM_Campaign_Form_Survey_TabHeader {
    * @param CRM_Core_Form $form
    *
    * @return int|string
+   *
+   * @deprecated since 5.71 will be removed around 5.77
    */
   public static function getNextTab(&$form) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     static $next = FALSE;
     if ($next) {
       return $next;
@@ -166,7 +181,7 @@ class CRM_Campaign_Form_Survey_TabHeader {
       }
     }
 
-    $next = $next ? $next : 'main';
+    $next = $next ?: 'main';
     return $next;
   }
 

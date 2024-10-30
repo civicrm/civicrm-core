@@ -46,6 +46,7 @@ class CRM_Contact_Form_Edit_Phone {
       'entity' => 'phone',
       'class' => 'eight',
       'placeholder' => NULL,
+      'title' => ts('Phone Type %1', [1 => $blockId]),
     ]);
     //main phone number with crm_phone class
     $form->addField("phone[$blockId][phone]", [
@@ -66,6 +67,7 @@ class CRM_Contact_Form_Edit_Phone {
         'class' => 'eight',
         'placeholder' => NULL,
         'option_url' => NULL,
+        'title' => ts('Phone Location %1', [1 => $blockId]),
       ]);
 
       //is_Primary radio

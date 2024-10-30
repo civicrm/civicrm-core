@@ -11,7 +11,6 @@
 <h3>
 {ts}Tag Activities{/ts}
 </h3>
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
 <table class="form-layout-compressed">
     <tr class="crm-activity-task-addtotag-form-block-tag">
         <td>

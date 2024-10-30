@@ -2,6 +2,7 @@
 
 namespace Civi\Api4\Utils;
 
+use Civi\Afform\Utils;
 use CRM_Afform_ExtensionUtil as E;
 
 /**
@@ -22,8 +23,8 @@ trait AfformSaveTrait {
       $item['name'] = _afform_angular_module_name($prefix . '-' . \CRM_Utils_String::munge($item['title'], '-'));
       $suffix = '';
       while (
-        file_exists($scanner->createSiteLocalPath($item['name'] . $suffix, \CRM_Afform_AfformScanner::METADATA_FILE))
-        || file_exists($scanner->createSiteLocalPath($item['name'] . $suffix, 'aff.html'))
+        file_exists($scanner->createSiteLocalPath($item['name'] . $suffix, \CRM_Afform_AfformScanner::METADATA_JSON))
+        || file_exists($scanner->createSiteLocalPath($item['name'] . $suffix, \CRM_Afform_AfformScanner::LAYOUT_FILE))
       ) {
         $suffix++;
       }
@@ -53,8 +54,11 @@ trait AfformSaveTrait {
 
     $meta = $item + (array) $orig;
     unset($meta['layout'], $meta['name']);
+    if (isset($meta['permission']) && is_string($meta['permission'])) {
+      $meta['permission'] = explode(',', $meta['permission']);
+    }
     if (!empty($meta)) {
-      $metaPath = $scanner->createSiteLocalPath($item['name'], \CRM_Afform_AfformScanner::METADATA_FILE);
+      $metaPath = $scanner->createSiteLocalPath($item['name'], \CRM_Afform_AfformScanner::METADATA_JSON);
       \CRM_Utils_File::createDir(dirname($metaPath));
       // Add eof newline to make files git-friendly
       file_put_contents($metaPath, json_encode($meta, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n");
@@ -64,24 +68,12 @@ trait AfformSaveTrait {
     // We may have changed list of files covered by the cache.
     _afform_clear();
 
-    $isChanged = function($field) use ($item, $orig) {
-      return ($item[$field] ?? NULL) !== ($orig[$field] ?? NULL);
-    };
-
     // If the dashlet or navigation setting changed, managed entities must be reconciled
-    // TODO: If this list of conditions gets any longer, then
-    // maybe we should unconditionally reconcile and accept the small performance drag.
-    if (
-      $isChanged('is_dashlet') ||
-      $isChanged('navigation') ||
-      (!empty($meta['is_dashlet']) && $isChanged('title')) ||
-      (!empty($meta['navigation']) && ($isChanged('title') || $isChanged('permission') || $isChanged('icon') || $isChanged('server_route')))
-    ) {
+    if (Utils::shouldReconcileManaged($item, $orig ?? [])) {
       \CRM_Core_ManagedEntities::singleton()->reconcile(E::LONG_NAME);
     }
 
-    // Right now, permission-checks are completely on-demand.
-    if ($isChanged('server_route') /* || $isChanged('permission') */) {
+    if (Utils::shouldClearMenuCache($item, $orig ?? [])) {
       \CRM_Core_Menu::store();
     }
 

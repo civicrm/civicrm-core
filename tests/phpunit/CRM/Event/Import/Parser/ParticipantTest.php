@@ -2,29 +2,9 @@
 
 /**
  *  File for the Participant import class
- *
- *  (PHP 5)
- *
- * @package   CiviCRM
- *
- *   This file is part of CiviCRM
- *
- *   CiviCRM is free software; you can redistribute it and/or
- *   modify it under the terms of the GNU Affero General Public License
- *   as published by the Free Software Foundation; either version 3 of
- *   the License, or (at your option) any later version.
- *
- *   CiviCRM is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *   GNU Affero General Public License for more details.
- *
- *   You should have received a copy of the GNU Affero General Public
- *   License along with this program.  If not, see
- *   <http://www.gnu.org/licenses/>.
  */
 
-use Civi\Api4\Mapping;
+use Civi\Api4\Participant;
 use Civi\Api4\UserJob;
 
 /**
@@ -32,20 +12,24 @@ use Civi\Api4\UserJob;
  * @group headless
  * @group import
  */
-class CRM_Participant_Import_Parser_ParticipantTest extends CiviUnitTestCase {
+class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
 
   use CRMTraits_Custom_CustomDataTrait;
 
   protected $entity = 'Participant';
 
   /**
+   * @var int
+   */
+  protected $userJobID;
+
+  /**
    * Tears down the fixture, for example, closes a network connection.
    * This method is called after a test is executed.
    */
   public function tearDown(): void {
+    $this->quickCleanUpFinancialEntities();
     $this->quickCleanup([
-      'civicrm_event',
-      'civicrm_participant',
       'civicrm_contact',
       'civicrm_email',
       'civicrm_user_job',
@@ -53,6 +37,8 @@ class CRM_Participant_Import_Parser_ParticipantTest extends CiviUnitTestCase {
       'civicrm_queue_item',
       'civicrm_mapping',
       'civicrm_mapping_field',
+      'civicrm_uf_field',
+      'civicrm_uf_group',
     ], TRUE);
     parent::tearDown();
   }
@@ -75,7 +61,7 @@ class CRM_Participant_Import_Parser_ParticipantTest extends CiviUnitTestCase {
       'mapper' => $this->getMapperFromFieldMappings($fieldMappings),
       'dataSource' => 'CRM_Import_DataSource_CSV',
       'file' => ['name' => $csv],
-      'dateFormats' => CRM_Core_Form_Date::DATE_yyyy_mm_dd,
+      'dateFormats' => CRM_Utils_Date::DATE_yyyy_mm_dd,
       'onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE,
       'groups' => [],
       'saveMapping' => TRUE,
@@ -130,53 +116,12 @@ class CRM_Participant_Import_Parser_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test the full form-flow import.
-   *
-   * @dataProvider importData
-   */
-  public function testImportCSV($csv, $mapper) :void {
-    $this->campaignCreate(['name' => 'Soccer cup']);
-    $this->eventCreate(['title' => 'Rain-forest Cup Youth Soccer Tournament']);
-    $this->individualCreate(['email' => 'mum@example.com']);
-    $this->importCSV($csv, $mapper);
-    $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
-    $row = $dataSource->getRow();
-    $this->assertEquals('IMPORTED', $row['_status']);
-    $this->callAPISuccessGetSingle('Participant', ['campaign_id' => 'Soccer Cup']);
-    $mapping = Mapping::get()->addWhere('mapping_type_id:name', '=', 'Import Participant')->execute()->first();
-    $this->assertEquals('my mapping', $mapping['name']);
-    $this->assertEquals('new mapping', $mapping['description']);
-  }
-
-  /**
-   * Data provider for importCSV.
-   */
-  public function importData(): array {
-    $defaultMapper = [
-      ['name' => 'event_id'],
-      ['name' => 'campaign_id'],
-      ['name' => 'email'],
-      ['name' => 'fee_amount'],
-      ['name' => 'fee_currency'],
-      ['name' => 'fee_level'],
-      ['name' => 'is_pay_later'],
-      ['name' => 'role_id'],
-      ['name' => 'source'],
-      ['name' => 'status_id'],
-      ['name' => 'register_date'],
-      ['name' => 'do_not_import'],
-    ];
-    return [
-      ['csv' => 'participant.csv', 'mapper' => $defaultMapper],
-      ['csv' => 'participant_with_event_id.csv', 'mapper' => $defaultMapper],
-    ];
-  }
-
-  /**
    * Test that an external id will not match to a deleted contact..
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testImportWithExternalID() :void {
-    $this->eventCreate(['title' => 'Rain-forest Cup Youth Soccer Tournament']);
+    $this->eventCreatePaid(['title' => 'Rain-forest Cup Youth Soccer Tournament']);
     $this->individualCreate(['external_identifier' => 'ref-77', 'is_deleted' => TRUE]);
     $this->importCSV('participant_with_ext_id.csv', [
       ['name' => 'event_id'],
@@ -191,6 +136,7 @@ class CRM_Participant_Import_Parser_ParticipantTest extends CiviUnitTestCase {
       ['name' => 'status_id'],
       ['name' => 'register_date'],
       ['name' => 'do_not_import'],
+      ['name' => 'do_not_import'],
     ]);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $row = $dataSource->getRow();
@@ -198,10 +144,115 @@ class CRM_Participant_Import_Parser_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that we can do an update using the participant ID.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportUpdateUsingID() :void {
+    // Ensure that the next id on the participant table is 1 since that is in the csv.
+    $this->quickCleanup(['civicrm_participant']);
+    $this->individualCreate();
+    $this->createCustomGroupWithFieldOfType(['extends' => 'Participant'], 'radio', '', ['data_type' => 'Boolean']);
+    $this->createTestEntity('Participant', [
+      'status_id:name' => 'Pending from pay later',
+      'contact_id' => $this->individualCreate(),
+      'event_id' => $this->eventCreatePaid()['id'],
+      'role_id:name' => ['Attendee'],
+    ]);
+    $this->importCSV('cancel_participant.csv', [
+      ['name' => 'id'],
+      ['name' => 'status_id'],
+      ['name' => $this->getCustomFieldName('radio')],
+    ]);
+    $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
+    $row = $dataSource->getRow();
+    $this->assertEquals('IMPORTED', $row['_status'], $row['_status_message']);
+    $participant = Participant::get(FALSE)
+      ->addWhere('id', '=', $row['_entity_id'])
+      ->addSelect($this->getCustomFieldName('radio', 4))
+      ->execute()->first();
+    $this->assertEquals(TRUE, $participant[$this->getCustomFieldName('radio', 4)]);
+    $row = $dataSource->getRow();
+    $this->assertEquals('ERROR', $row['_status']);
+    $this->assertEquals('Participant record not found for id 2', $row['_status_message']);
+  }
+
+  /**
+   * Test that we cannot import to a template event.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportToTemplateEvent() :void {
+    // When setting up for the test make sure the IDs match those in the csv.
+    $this->assertEquals(1, $this->eventCreatePaid(['is_template' => TRUE])['id']);
+    $this->assertEquals(3, $this->individualCreate());
+    $this->importCSV('participant_with_event_id.csv', [
+      ['name' => 'event_id'],
+      ['name' => 'do_not_import'],
+      ['name' => 'contact_id'],
+      ['name' => 'fee_amount'],
+      ['name' => 'do_not_import'],
+      ['name' => 'fee_level'],
+      ['name' => 'is_pay_later'],
+      ['name' => 'role_id'],
+      ['name' => 'source'],
+      ['name' => 'status_id'],
+      ['name' => 'register_date'],
+      ['name' => 'do_not_import'],
+      ['name' => 'do_not_import'],
+    ]);
+    $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
+    $row = $dataSource->getRow();
+    $this->assertEquals('ERROR', $row['_status']);
+    $this->assertEquals('Missing required fields: Event ID', $row['_status_message']);
+  }
+
+  /**
+   * Test that imports work generally.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportParticipant() :void {
+    $this->eventCreatePaid(['title' => 'Rain-forest Cup Youth Soccer Tournament']);
+    $this->createCustomGroupWithFieldOfType(['extends' => 'Participant'], 'checkbox');
+    $contactID = $this->individualCreate(['external_identifier' => 'ref-77']);
+    $this->importCSV('participant_with_ext_id.csv', [
+      ['name' => 'event_id'],
+      ['name' => 'do_not_import'],
+      ['name' => 'external_identifier'],
+      ['name' => 'fee_amount'],
+      ['name' => 'fee_currency'],
+      ['name' => 'fee_level'],
+      ['name' => 'is_pay_later'],
+      ['name' => 'role_id'],
+      ['name' => 'source'],
+      ['name' => 'status_id'],
+      ['name' => 'register_date'],
+      ['name' => 'do_not_import'],
+      ['name' => $this->getCustomFieldName('checkbox')],
+    ]);
+    $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
+    $row = $dataSource->getRow();
+    $result = $this->callAPISuccess('Participant', 'get', [
+      'contact_id' => $contactID,
+      'sequential' => TRUE,
+    ])['values'][0];
+
+    $this->assertEquals($row['event_title'], $result['event_title']);
+    $this->assertEquals($row['fee_amount'], $result['participant_fee_amount']);
+    $this->assertEquals($row['participant_source'], $result['participant_source']);
+    $this->assertEquals($row['participant_status'], $result['participant_status']);
+    $this->assertEquals('2022-12-07 00:00:00', $result['participant_register_date']);
+    $this->assertEquals(['Attendee', 'Volunteer'], $result['participant_role']);
+    $this->assertEquals(0, $result['participant_is_pay_later']);
+    $this->assertEquals(['P', 'M'], array_keys($result[$this->getCustomFieldName('checkbox')]));
+  }
+
+  /**
    * @param array $submittedValues
    *
    * @return int
-   * @noinspection PhpDocMissingThrowsInspection
+   * @throws \CRM_Core_Exception
    */
   protected function getUserJobID(array $submittedValues = []): int {
     $userJobID = UserJob::create()->setValues([
@@ -213,7 +264,7 @@ class CRM_Participant_Import_Parser_ParticipantTest extends CiviUnitTestCase {
           'sqlQuery' => 'SELECT first_name FROM civicrm_contact',
           'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
           'dedupe_rule_id' => NULL,
-          'dateFormats' => CRM_Core_Form_Date::DATE_yyyy_mm_dd,
+          'dateFormats' => CRM_Utils_Date::DATE_yyyy_mm_dd,
         ], $submittedValues),
       ],
       'status_id:name' => 'draft',

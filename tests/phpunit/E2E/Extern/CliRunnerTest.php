@@ -36,7 +36,7 @@ class E2E_Extern_CliRunnerTest extends CiviEndToEndTestCase {
   /**
    * Perform permission-checks using "on-behalf-of" mechanics.
    */
-  public function testPermissionLookup() {
+  public function testPermissionLookup(): void {
     $name = 'cv';
     $this->assertNotEmpty($this->findCommand($name), 'The command "$name" does not appear in the PATH.');
     $perms = ['administer CiviCRM', 'profile edit', 'sign CiviCRM Petition'];
@@ -132,12 +132,12 @@ class E2E_Extern_CliRunnerTest extends CiviEndToEndTestCase {
 
     $cv = $GLOBALS['_CV'];
     $this->assertEquals($cv['CIVI_CORE'], $this->callRunnerJson($r, '$GLOBALS[\'civicrm_root\']'));
-    $this->assertEquals($cv['CMS_URL'] . 'foo', $this->callRunnerJson($r, 'Civi::paths()->getUrl(\'[cms.root]/foo\')'));
+    $this->assertEquals($cv['CMS_URL'] . 'foo', $this->callRunnerJson($r, 'Civi::paths()->getUrl(\'[cms.root]/foo\', \'absolute\')'));
     $this->assertEquals($cv['CMS_ROOT'] . 'foo', $this->callRunnerJson($r, 'Civi::paths()->getPath(\'[cms.root]/foo\')'));
     $this->assertEquals($cv['CIVI_CORE'] . 'css/civicrm.css', $this->callRunnerJson($r, 'Civi::paths()->getPath(\'[civicrm.root]/css/civicrm.css\')'));
 
     $ufrUrl = $this->callRunnerJson($r, 'CRM_Core_Config::singleton()->userFrameworkResourceURL');
-    $crmUrl = $this->callRunnerJson($r, 'Civi::paths()->getUrl("[civicrm.root]/.")');
+    $crmUrl = $this->callRunnerJson($r, 'Civi::paths()->getUrl("[civicrm.root]/.", "absolute")');
     $this->assertEquals(rtrim($crmUrl, '/'), rtrim($ufrUrl, '/'));
   }
 
@@ -157,7 +157,7 @@ class E2E_Extern_CliRunnerTest extends CiviEndToEndTestCase {
   public function testPathUrlMatch($name, $r, $fileExpr) {
     $this->assertNotEmpty($this->findCommand($name), 'The command "$name" does not appear in the PATH.');
     $localPath = $this->callRunnerJson($r, "Civi::paths()->getPath('$fileExpr')");
-    $remoteUrl = $this->callRunnerJson($r, "Civi::paths()->getUrl('$fileExpr')");
+    $remoteUrl = $this->callRunnerJson($r, "Civi::paths()->getUrl('$fileExpr', 'absolute')");
     $this->assertFileExists($localPath);
     $localContent = file_get_contents($localPath);
     $this->assertNotEmpty($localContent);

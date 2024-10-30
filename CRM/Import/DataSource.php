@@ -15,14 +15,15 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-use Civi\Api4\UserJob;
+use Civi\Import\DataSource\DataSourceInterface;
+use Civi\Import\DataSource\DataSourceTrait;
 
 /**
  * This class defines the DataSource interface but must be subclassed to be
  * useful.
  */
-abstract class CRM_Import_DataSource {
-
+abstract class CRM_Import_DataSource implements DataSourceInterface {
+  use DataSourceTrait;
   /**
    * @var \CRM_Core_DAO
    */
@@ -33,14 +34,26 @@ abstract class CRM_Import_DataSource {
    */
   private $limit;
 
+  public function getLimit(): int {
+    return $this->limit;
+  }
+
+  public function getOffset(): int {
+    return $this->offset;
+  }
+
+  public function getStatuses(): array {
+    return $this->statuses;
+  }
+
   /**
    * @param int $limit
    *
    * @return CRM_Import_DataSource
    */
-  public function setLimit(int $limit): CRM_Import_DataSource {
+  public function setLimit(int $limit): DataSourceInterface {
     $this->limit = $limit;
-    $this->queryResultObject = NULL;
+    $this->flushQueryResults();
     return $this;
   }
 
@@ -51,7 +64,7 @@ abstract class CRM_Import_DataSource {
    */
   public function setOffset(int $offset): CRM_Import_DataSource {
     $this->offset = $offset;
-    $this->queryResultObject = NULL;
+    $this->flushQueryResults();
     return $this;
   }
 
@@ -134,21 +147,10 @@ abstract class CRM_Import_DataSource {
    *
    * @return self
    */
-  public function setStatuses(array $statuses): self {
+  public function setStatuses(array $statuses): DataSourceInterface {
     $this->statuses = $statuses;
-    $this->queryResultObject = NULL;
+    $this->flushQueryResults();
     return $this;
-  }
-
-  /**
-   * Class constructor.
-   *
-   * @param int|null $userJobID
-   */
-  public function __construct(int $userJobID = NULL) {
-    if ($userJobID) {
-      $this->setUserJobID($userJobID);
-    }
   }
 
   /**
@@ -157,73 +159,6 @@ abstract class CRM_Import_DataSource {
    * @var string[]
    */
   protected $submittableFields = [];
-
-  /**
-   * User job id.
-   *
-   * This is the primary key of the civicrm_user_job table which is used to
-   * track the import.
-   *
-   * @var int
-   */
-  protected $userJobID;
-
-  /**
-   * @return int|null
-   */
-  public function getUserJobID(): ?int {
-    return $this->userJobID;
-  }
-
-  /**
-   * Set user job ID.
-   *
-   * @param int $userJobID
-   */
-  public function setUserJobID(int $userJobID): void {
-    $this->userJobID = $userJobID;
-  }
-
-  /**
-   * User job details.
-   *
-   * This is the relevant row from civicrm_user_job.
-   *
-   * @var array
-   */
-  protected $userJob;
-
-  /**
-   * Get User Job.
-   *
-   * API call to retrieve the userJob row.
-   *
-   * @return array
-   *
-   * @throws \CRM_Core_Exception
-   */
-  protected function getUserJob(): array {
-    if (!$this->userJob) {
-      $this->userJob = UserJob::get()
-        ->addWhere('id', '=', $this->getUserJobID())
-        ->execute()
-        ->first();
-    }
-    return $this->userJob;
-  }
-
-  /**
-   * Get submitted value.
-   *
-   * Get a value submitted on the form.
-   *
-   * @return mixed
-   *
-   * @throws \CRM_Core_Exception
-   */
-  protected function getSubmittedValue(string $valueName) {
-    return $this->getUserJob()['metadata']['submitted_values'][$valueName];
-  }
 
   /**
    * Get rows as an array.
@@ -270,6 +205,19 @@ abstract class CRM_Import_DataSource {
   }
 
   /**
+   * Flush the existing query to retrieve rows.
+   *
+   * The query will be run again, potentially retrieving newly-available rows.
+   * Note the 'newly available' could mean an external process has intervened.
+   * For example the import_extensions lazy-loads into the import table.
+   *
+   * @return void
+   */
+  private function flushQueryResults() {
+    $this->queryResultObject = NULL;
+  }
+
+  /**
    * Get row count.
    *
    * The array has all values.
@@ -284,22 +232,6 @@ abstract class CRM_Import_DataSource {
     $this->statuses = $statuses;
     $query = 'SELECT count(*) FROM ' . $this->getTableName() . ' ' . $this->getStatusClause();
     return CRM_Core_DAO::singleValueQuery($query);
-  }
-
-  /**
-   * Get an array of column headers, if any.
-   *
-   * Null is returned when there are none - ie because a csv file does not
-   * have an initial header row.
-   *
-   * This is presented to the user in the MapField screen so
-   * that can see what fields they are mapping.
-   *
-   * @return array
-   * @throws \CRM_Core_Exception
-   */
-  public function getColumnHeaders(): array {
-    return $this->getUserJob()['metadata']['DataSource']['column_headers'];
   }
 
   /**
@@ -367,7 +299,7 @@ abstract class CRM_Import_DataSource {
   }
 
   /**
-   * Get the table name for the datajob.
+   * Get the table name for the import job.
    *
    * @return string|null
    *
@@ -375,7 +307,7 @@ abstract class CRM_Import_DataSource {
    */
   protected function getTableName(): ?string {
     // The old name is still stored...
-    $tableName = $this->getDataSourceMetadata()['table_name'];
+    $tableName = $this->getDataSourceMetadata()['table_name'] ?? NULL;
     if (!$tableName) {
       return NULL;
     }
@@ -392,98 +324,6 @@ abstract class CRM_Import_DataSource {
    */
   public function getSubmittableFields(): array {
     return $this->submittableFields;
-  }
-
-  /**
-   * Provides information about the data source.
-   *
-   * @return array
-   *   Description of this data source, including:
-   *   - title: string, translated, required
-   *   - permissions: array, optional
-   *
-   */
-  abstract public function getInfo();
-
-  /**
-   * This is function is called by the form object to get the DataSource's form snippet.
-   *
-   * It should add all fields necessary to get the data uploaded to the temporary table in the DB.
-   *
-   * @param CRM_Core_Form $form
-   */
-  abstract public function buildQuickForm(&$form);
-
-  /**
-   * Initialize the datasource, based on the submitted values stored in the user job.
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function initialize(): void {
-
-  }
-
-  /**
-   * Determine if the current user has access to this data source.
-   *
-   * @return bool
-   */
-  public function checkPermission() {
-    $info = $this->getInfo();
-    return empty($info['permissions']) || CRM_Core_Permission::check($info['permissions']);
-  }
-
-  /**
-   * @param string $key
-   * @param array $data
-   *
-   * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
-   */
-  protected function updateUserJobMetadata(string $key, array $data): void {
-    $metaData = array_merge(
-      $this->getUserJob()['metadata'],
-      [$key => $data]
-    );
-    UserJob::update(FALSE)
-      ->addWhere('id', '=', $this->getUserJobID())
-      ->setValues(['metadata' => $metaData])
-      ->execute();
-    $this->userJob['metadata'] = $metaData;
-  }
-
-  /**
-   * Purge any datasource related assets when the datasource is dropped.
-   *
-   * This is the datasource's chance to delete any tables etc that it created
-   * which will now not be used.
-   *
-   * @param array $newParams
-   *   If the dataSource is being updated to another variant of the same
-   *   class (eg. the csv upload was set to no column headers and they
-   *   have resubmitted WITH skipColumnHeader (first row is a header) then
-   *   the dataSource is still CSV and the params for the new intance
-   *   are passed in. When changing from csv to SQL (for example) newParams is
-   *   empty.
-   *
-   * @return array
-   *   The details to update the DataSource key in the userJob metadata to.
-   *   Generally and empty array but it the datasource decided (for example)
-   *   that the table it created earlier is still consistent with the new params
-   *   then it might decided not to drop the table and would want to retain
-   *   some metadata.
-   *
-   * @throws \CRM_Core_Exception
-   *
-   * @noinspection PhpUnusedParameterInspection
-   */
-  public function purge(array $newParams = []) :array {
-    // The old name is still stored...
-    $oldTableName = $this->getTableName();
-    if ($oldTableName) {
-      CRM_Core_DAO::executeQuery('DROP TABLE IF EXISTS ' . $oldTableName);
-    }
-    return [];
   }
 
   /**
@@ -639,6 +479,7 @@ abstract class CRM_Import_DataSource {
       CRM_Contribute_Import_Parser_Contribution::PLEDGE_PAYMENT_ERROR => ['pledge_payment_error'],
       'new' => ['new', 'valid'],
       'valid' => ['valid'],
+      'imported' => ['imported', 'soft_credit_imported', 'pledge_payment_imported', 'warning_unparsed_address'],
     ];
   }
 

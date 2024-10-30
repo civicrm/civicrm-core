@@ -99,7 +99,7 @@ class CRM_Utils_Sort {
    *
    * @return \CRM_Utils_Sort
    */
-  public function __construct(&$vars, $defaultSortOrder = NULL) {
+  public function __construct($vars, $defaultSortOrder = NULL) {
     $this->_vars = [];
     $this->_response = [];
 

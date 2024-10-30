@@ -10,12 +10,13 @@
       allowFunctions: '<',
       skip: '<',
       label: '@',
+      help: '@',
       hideLabel: '@',
       placeholder: '<',
       deleteGroup: '&'
     },
     templateUrl: '~/crmSearchAdmin/crmSearchClause.html',
-    controller: function ($scope, $element, searchMeta) {
+    controller: function ($scope, $element, searchMeta, crmUiHelp) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this,
         meta = {};
@@ -31,6 +32,7 @@
 
       this.$onInit = function() {
         ctrl.hasParent = !!$element.attr('delete-group');
+        $scope.hs = crmUiHelp({file: 'CRM/Search/Help/Compose'});
       };
 
       // Gets the first arg of type "field"

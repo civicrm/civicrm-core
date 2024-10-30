@@ -15,20 +15,21 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Event\AuthorizeRecordEvent;
+use Civi\Api4\Utils\CoreUtil;
+
 /**
  * Trait for with entities with an entity_table + entity_id dynamic FK.
  */
 trait CRM_Core_DynamicFKAccessTrait {
 
   /**
-   * @param string $entityName
-   * @param string $action
-   * @param array $record
-   * @param int $userID
-   * @return bool
-   * @see CRM_Core_DAO::checkAccess
+   * @see \Civi\Api4\Utils\CoreUtil::checkAccessRecord
    */
-  public static function _checkAccess(string $entityName, string $action, array $record, int $userID): bool {
+  public static function self_civi_api4_authorizeRecord(AuthorizeRecordEvent $e): void {
+    $record = $e->getRecord();
+    $userID = $e->getUserID();
+    $delegateAction = $e->getActionName() === 'get' ? 'get' : 'update';
     $eid = $record['entity_id'] ?? NULL;
     $table = $record['entity_table'] ?? NULL;
     if (!$eid && !empty($record['id'])) {
@@ -43,9 +44,8 @@ trait CRM_Core_DynamicFKAccessTrait {
         throw new \CRM_Core_Exception(sprintf('Cannot resolve permissions for dynamic foreign key in "%s". Invalid table reference "%s".',
           static::getTableName(), $table));
       }
-      return \Civi\Api4\Utils\CoreUtil::checkAccessDelegated($targetEntity, 'update', ['id' => $eid], $userID);
+      $e->setAuthorized(CoreUtil::checkAccessDelegated($targetEntity, $delegateAction, ['id' => $eid], $userID));
     }
-    return TRUE;
   }
 
 }

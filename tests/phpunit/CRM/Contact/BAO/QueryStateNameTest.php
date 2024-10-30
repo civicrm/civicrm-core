@@ -12,7 +12,7 @@ class CRM_Contact_BAO_QueryStateNameTest extends CiviUnitTestCase {
    * See CRM-15505: Mailing labels show the state/province name as the abbreviation rather than the full state/province name
    * Change to CRM_Contact_BAO_query::convertToPseudoNames()
    */
-  public function testStateName() {
+  public function testStateName(): void {
     $state_name = 'Norfolk';
     $state_abbreviation = 'NFK';
     $create_params = [

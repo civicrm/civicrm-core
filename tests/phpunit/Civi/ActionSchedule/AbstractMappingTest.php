@@ -173,7 +173,7 @@ abstract class AbstractMappingTest extends \CiviUnitTestCase {
    * Also include recipient Bob.
    */
   public function alsoRecipientBob() {
-    $this->schedule->limit_to = 0;
+    $this->schedule->limit_to = 2;
     $this->schedule->recipient = NULL;
     $this->schedule->recipient_listing = NULL;
     $this->schedule->recipient_manual = $this->contacts['bob']['id'];
@@ -273,12 +273,16 @@ abstract class AbstractMappingTest extends \CiviUnitTestCase {
    *
    * @throws \Exception
    */
-  public function testDefault($targetDate, $setupFuncs, $expectMessages) {
+  public function testDefault(string $targetDate, string $setupFuncs, array $expectMessages) {
     $this->targetDate = $targetDate;
 
     foreach (explode(' ', $setupFuncs) as $setupFunc) {
       $this->{$setupFunc}();
     }
+    $this->runScheduleAndExpectMessages($expectMessages);
+  }
+
+  public function runScheduleAndExpectMessages(array $expectMessages): void {
     $this->schedule->save();
 
     $actualMessages = [];
@@ -313,7 +317,7 @@ abstract class AbstractMappingTest extends \CiviUnitTestCase {
         $this->assertEquals($expectMessage['to'], $actualMessage['to'], $errorText);
       }
       if (isset($expectMessage['subject'])) {
-        $this->assertRegExp($expectMessage['subject'], $actualMessage['subject'], $errorText);
+        $this->assertMatchesRegularExpression($expectMessage['subject'], $actualMessage['subject'], $errorText);
       }
     }
   }

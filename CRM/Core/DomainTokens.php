@@ -88,6 +88,7 @@ class CRM_Core_DomainTokens extends AbstractTokenSubscriber {
    * @throws \CRM_Core_Exception
    * @internal
    *
+   * @todo - make this non-static & protected. Remove last deprecated fn that calls it.
    */
   public static function getDomainTokenValues(?int $domainID = NULL, bool $html = TRUE): array {
     if (!$domainID) {

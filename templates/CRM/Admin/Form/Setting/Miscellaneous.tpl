@@ -8,8 +8,6 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-miscellaneous-form-block">
-   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-
     <table class="form-layout">
       <tr class="crm-miscellaneous-form-block-checksum_timeout">
         <td class="label">{$form.checksum_timeout.label}</td>
@@ -17,7 +15,6 @@
             <span class="description">{ts}The number of days before a personalized (hashed) link will expire.{/ts}</span></td>
       </tr>
     </table>
-
     <table class="form-layout">
       <tr class="crm-miscellaneous-form-block-contact_undelete">
         <td class="label">{$form.contact_undelete.label}</td>
@@ -77,10 +74,16 @@
           <p class="description">{ts}Enable the use of remote images. By default this is enabled, but if not using remote images you may wish to turn it off for security reasons.{/ts}</p>
         </td>
       </tr>
+      <tr class="crm-miscellaneous-form-block-weasyprint_path">
+        <td class="label">{$form.weasyprint_path.label}</td>
+        <td>{$form.weasyprint_path.html}<br />
+          <p class="description">{ts 1="https://weasyprint.org/"}<a href="%1">weasyprint is an alternative utility for generating PDFs</a> which is a successor to the discontinued wkhtmltopdf. Your system administrator will need to download and install this utility, and enter the executable path here.{/ts}</p>
+        </td>
+      </tr>
       <tr class="crm-miscellaneous-form-block-wkhtmltopdfPath">
         <td class="label">{$form.wkhtmltopdfPath.label}</td>
         <td>{$form.wkhtmltopdfPath.html}<br />
-          <p class="description">{ts 1="http://wkhtmltopdf.org/"}<a href="%1">wkhtmltopdf is an alternative utility for generating PDF's</a> which may provide better performance especially if you are generating a large number of PDF letters or receipts. Your system administrator will need to download and install this utility, and enter the executable path here.{/ts}</p>
+          <p class="description">{ts 1="http://wkhtmltopdf.org/"}<a href="%1">wkhtmltopdf is an alternative utility for generating PDFs</a> which may provide better performance especially if you are generating a large number of PDF letters or receipts. Your system administrator will need to download and install this utility, and enter the executable path here.{/ts}</p>
         </td>
       </tr>
       {foreach from=$pure_config_settings item=setting_name}

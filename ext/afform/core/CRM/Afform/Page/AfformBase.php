@@ -1,4 +1,6 @@
 <?php
+
+use Civi\Api4\Navigation;
 use CRM_Afform_ExtensionUtil as E;
 
 class CRM_Afform_Page_AfformBase extends CRM_Core_Page {
@@ -10,7 +12,7 @@ class CRM_Afform_Page_AfformBase extends CRM_Core_Page {
     // The api will throw an exception if afform is not found (because of the index 0 param)
     $afform = civicrm_api4('Afform', 'get', [
       'where' => [['name', '=', $pageArgs['afform']]],
-      'select' => ['title', 'module_name', 'directive_name', 'type', 'is_public'],
+      'select' => ['title', 'module_name', 'directive_name', 'navigation', 'server_route', 'is_public'],
     ], 0);
 
     $this->assign('directive', $afform['directive_name']);
@@ -20,24 +22,25 @@ class CRM_Afform_Page_AfformBase extends CRM_Core_Page {
 
     $isFrontEndPage = !empty($afform['is_public']);
 
-    // If not being shown on the front-end website, append breadcrumb for CiviCRM users
+    // If not being shown on the front-end website, calculate breadcrumbs
     if (!$isFrontEndPage && CRM_Core_Permission::check('access CiviCRM')) {
-      CRM_Utils_System::appendBreadCrumb([['title' => E::ts('CiviCRM'), 'url' => CRM_Utils_System::url('civicrm')]]);
-      // If the user has "admin civicrm" & the admin extension is enabled
-      if (CRM_Core_Permission::check('administer CiviCRM')) {
-        if (($pagePath[1] ?? NULL) === 'admin') {
-          CRM_Utils_System::appendBreadCrumb([['title' => E::ts('Admin'), 'url' => CRM_Utils_System::url('civicrm/admin')]]);
-        }
-        if ($afform['type'] !== 'system' &&
-          \CRM_Extension_System::singleton()->getMapper()->isActiveModule('afform_admin')
-        ) {
-          CRM_Utils_System::appendBreadCrumb([['title' => E::ts('FormBuilder'), 'url' => CRM_Utils_System::url('civicrm/admin/afform')]]);
-          CRM_Utils_System::appendBreadCrumb([['title' => E::ts('Edit Form'), 'url' => CRM_Utils_System::url('civicrm/admin/afform', NULL, FALSE, '/edit/' . $pageArgs['afform'])]]);
+      // CiviCRM has already constructed a breadcrumb based on the server_route (see CRM_Core_Menu::buildBreadcrumb)
+      // But if this afform is in the navigation menu, reset breadcrumb and build on that instead
+      if (!empty($afform['navigation']['parent'])) {
+        $navParent = Navigation::get(FALSE)
+          ->addWhere('name', '=', $afform['navigation']['parent'])
+          ->addWhere('domain_id', '=', 'current_domain')
+          ->execute()->first();
+        if (!empty($navParent['url'])) {
+          CRM_Utils_System::resetBreadCrumb();
+          CRM_Utils_System::appendBreadCrumb([['title' => E::ts('CiviCRM'), 'url' => Civi::url('current://civicrm')]]);
+          CRM_Utils_System::appendBreadCrumb([['title' => $navParent['label'], 'url' => Civi::url('current://' . $navParent['url'])]]);
         }
       }
     }
 
     if (!empty($afform['title'])) {
+      // Add current afform page to breadcrumb
       $title = strip_tags($afform['title']);
       if (!$isFrontEndPage) {
         CRM_Utils_System::appendBreadCrumb([
@@ -47,6 +50,13 @@ class CRM_Afform_Page_AfformBase extends CRM_Core_Page {
           ],
         ]);
       }
+      // 'CiviCRM' be replaced with Afform title via AfformBase.tpl.
+      // @see crmUi.directive(crmPageTitle)
+      CRM_Utils_System::setTitle('CiviCRM');
+    }
+    else {
+      // Afform has no title
+      CRM_Utils_System::setTitle('');
     }
 
     parent::run();

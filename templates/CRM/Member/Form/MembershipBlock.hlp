@@ -7,6 +7,21 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
+{htxt id="id-member_price_set_id-title"}
+  {ts}Membership Price Set{/ts}
+{/htxt}
+{htxt id="id-member_price_set_id"}
+{ts}Price sets allow you to configure more complex membership signup and renewal options, including allowing constituents to sign up for multiple memberships at the same time.{/ts}
+{/htxt}
+
+
+{htxt id="id-is-required-title"}
+  {ts}Require Membership Signup{/ts}
+{/htxt}
+{htxt id="id-is-required"}
+{ts}If checked, user must signup for one of the displayed membership options before continuing.{/ts}
+{/htxt}
+
 {htxt id="id-separate-pay-title"}
   {ts}Separate Payment{/ts}
 {/htxt}

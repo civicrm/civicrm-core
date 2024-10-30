@@ -217,7 +217,7 @@ abstract class SelectQuery {
       }
       $fieldInfo = $fkField['FKApiSpec'][$fieldName] ?? NULL;
 
-      $keyColumn = \CRM_Utils_Array::value('FKKeyColumn', $fkField, 'id');
+      $keyColumn = $fkField['FKKeyColumn'] ?? 'id';
       if (!$fieldInfo || !isset($fkField['FKApiSpec'][$keyColumn])) {
         // Join doesn't exist - might be another param with a dot in it for some reason, we'll just ignore it.
         return NULL;
@@ -267,7 +267,7 @@ abstract class SelectQuery {
       $entityTable = $this->where[$entityTableParam] ?? NULL;
       if ($entityTable && is_string($entityTable) && \CRM_Core_DAO_AllCoreTables::getClassForTable($entityTable)) {
         $fkField['FKClassName'] = \CRM_Core_DAO_AllCoreTables::getClassForTable($entityTable);
-        $fkField['FKApiName'] = \CRM_Core_DAO_AllCoreTables::getBriefName($fkField['FKClassName']);
+        $fkField['FKApiName'] = \CRM_Core_DAO_AllCoreTables::getEntityNameForClass($fkField['FKClassName']);
       }
     }
     if (!empty($fkField['pseudoconstant']['optionGroupName'])) {
@@ -404,7 +404,7 @@ abstract class SelectQuery {
       $words = preg_split("/[\s]+/", $item);
       if ($words) {
         // Direction defaults to ASC unless DESC is specified
-        $direction = strtoupper(\CRM_Utils_Array::value(1, $words, '')) == 'DESC' ? ' DESC' : '';
+        $direction = strtoupper($words[1] ?? '') === 'DESC' ? ' DESC' : '';
         $field = $this->getField($words[0]);
         if ($field) {
           $this->query->orderBy(self::MAIN_TABLE_ALIAS . '.' . $field['name'] . $direction, NULL, $index);

@@ -187,23 +187,7 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
     $this->addRule('weight', ts('Please enter integer value for weight'), 'integer');
     $session->pushUserContext(CRM_Utils_System::url($urlParams, 'action=update&reset=1&id=' . $this->_id));
 
-    if ($this->_single) {
-      $this->addButtons([
-        [
-          'type' => 'next',
-          'name' => ts('Save'),
-          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;',
-          'isDefault' => TRUE,
-        ],
-        [
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ],
-      ]);
-    }
-    else {
-      parent::buildQuickForm();
-    }
+    parent::buildQuickForm();
   }
 
   /**

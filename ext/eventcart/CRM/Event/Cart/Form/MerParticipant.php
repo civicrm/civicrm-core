@@ -34,7 +34,7 @@ class CRM_Event_Cart_Form_MerParticipant extends CRM_Core_Form {
     foreach ($custom_fields_post as $key => $field) {
       CRM_Core_BAO_UFGroup::buildProfile($form, $field, CRM_Profile_Form::MODE_CREATE, $this->participant->id);
     }
-    $custom = CRM_Utils_Array::value('custom', $form->getTemplate()->_tpl_vars, []);
+    $custom = $form->getTemplateVars()['custom'] ?? [];
     $form->assign('custom', array_merge($custom, [
       $this->html_field_name('customPre') => $custom_fields_pre,
       $this->html_field_name('customPost') => $custom_fields_post,

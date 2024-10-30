@@ -25,6 +25,10 @@ if (!defined('CIVI_SETUP')) {
     $e->getModel()->credKeys = [$e->getModel()->credKeys];
   }
 
+  if (empty($e->getModel()->deployID)) {
+    $e->getModel()->deployID = $toAlphanum(random_bytes(10));
+  }
+
     \Civi\Setup::log()->info(sprintf('[%s] Done %s', basename(__FILE__), 'installFiles'));
 
   }, \Civi\Setup::PRIORITY_PREPARE);

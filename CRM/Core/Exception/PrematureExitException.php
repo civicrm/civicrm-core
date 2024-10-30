@@ -40,9 +40,9 @@ class CRM_Core_Exception_PrematureExitException extends RuntimeException {
    * @param string $message [optional] The Exception message to throw.
    * @param array $errorData
    * @param int $error_code
-   * @param throwable $previous [optional] The previous throwable used for the exception chaining.
+   * @param Throwable|null $previous [optional] The previous throwable used for the exception chaining.
    */
-  public function __construct($message = "", $errorData = [], $error_code = 0, throwable $previous = NULL) {
+  public function __construct($message = "", $errorData = [], $error_code = 0, ?Throwable $previous = NULL) {
     parent::__construct($message, $error_code, $previous);
     $this->errorData = $errorData + ['error_code' => $error_code];
   }

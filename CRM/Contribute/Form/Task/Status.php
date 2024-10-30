@@ -127,7 +127,7 @@ AND    co.id IN ( $contribIDs )";
       $this->_rows[] = $row;
     }
 
-    $this->assign_by_ref('rows', $this->_rows);
+    $this->assign('rows', $this->_rows);
     $this->setDefaults($defaults);
     $this->addButtons([
       [

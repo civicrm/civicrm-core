@@ -25,7 +25,13 @@ var isMailing    = false;
   text_message = "mailing_format";
   isMailing = false;
   {/literal}
-{elseif $form.formClass eq 'CRM_SMS_Form_Upload' || $form.formClass eq 'CRM_Contact_Form_Task_SMS'}
+{elseif $form.formClass eq 'CRM_Contact_Form_Task_SMS'}
+  {literal}
+    prefix = "SMS";
+    text_message = "sms_text_message";
+    isMailing = true;
+  {/literal}
+{elseif $form.formClass eq 'CRM_SMS_Form_Upload'}
   {literal}
   prefix = "SMS";
   text_message = "sms_text_message";
@@ -74,7 +80,8 @@ function showSaveUpdateChkBox(prefix) {
     document.getElementById(prefix + "saveDetails").style.display = "none";
     return;
   }
-  if (document.getElementById(prefix + "template") == null) {
+
+  if (cj('#' + prefix + "template").val() === '') {
     if (document.getElementsByName(prefix + "saveTemplate")[0].checked){
       document.getElementById(prefix + "saveDetails").style.display = "block";
       document.getElementById(prefix + "editMessageDetails").style.display = "block";
@@ -93,7 +100,7 @@ function showSaveUpdateChkBox(prefix) {
   else if ( document.getElementsByName(prefix + "saveTemplate")[0].checked &&
     document.getElementsByName(prefix + "updateTemplate")[0].checked ){
     document.getElementById(prefix + "editMessageDetails").style.display = "block";
-    document.getElementById(pefix + "saveDetails").style.display = "block";
+    document.getElementById(prefix + "saveDetails").style.display = "block";
   }
   else if ( document.getElementsByName(prefix + "saveTemplate")[0].checked == false &&
       document.getElementsByName(prefix + "updateTemplate")[0].checked ) {
@@ -102,7 +109,12 @@ function showSaveUpdateChkBox(prefix) {
   }
   else {
     document.getElementById(prefix + "saveDetails").style.display = "none";
-    document.getElementById(prefix + "updateDetails").style.display = "none";
+    if (cj('#' + prefix + "template").val() === '') {
+      document.getElementById(prefix + "updateDetails").style.display = "none";
+    }
+    else {
+      document.getElementById(prefix + "updateDetails").style.display = "block";
+    }
   }
 }
 
@@ -113,20 +125,17 @@ function selectValue( val, prefix) {
     showSaveUpdateChkBox(prefix);
   }
   if ( !val ) {
-    if (document.getElementById("subject").length) {
-      document.getElementById("subject").value ="";
+    // The SMS form has activity_subject not subject which is not
+    // cleared by this as subject is not present. It's unclear if that
+    // is deliberate or not but this does not error if the field is not present.
+    cj('#subject').val('');
+    if (prefix === 'SMS') {
+      document.getElementById("sms_text_message").value ="";
+      return;
     }
-    if (document.getElementById("subject").length) {
-      document.getElementById("subject").value ="";
-    }
+
     if ( !isPDF ) {
-      if (prefix == 'SMS') {
-        document.getElementById("sms_text_message").value ="";
-        return;
-      }
-      else {
-        document.getElementById("text_message").value ="";
-      }
+      document.getElementById("text_message").value ="";
     }
     else {
       cj('.crm-html_email-accordion').show();
@@ -141,7 +150,7 @@ function selectValue( val, prefix) {
     return;
   }
 
-  var dataUrl = {/literal}"{crmURL p='civicrm/ajax/template' h=0 }"{literal};
+  var dataUrl = {/literal}"{crmURL p='civicrm/ajax/template' h=0}"{literal};
 
   cj.post( dataUrl, {tid: val}, function( data ) {
     var hide = (data.document_body && isPDF) ? false : true;
@@ -310,7 +319,7 @@ CRM.$(function($) {
   function setSignature() {
     var emailID = $("#fromEmailAddress").val( );
     if ( !isNaN( emailID ) ) {
-      var dataUrl = {/literal}"{crmURL p='civicrm/ajax/signature' h=0 }"{literal};
+      var dataUrl = {/literal}"{crmURL p='civicrm/ajax/signature' h=0}"{literal};
       $.post( dataUrl, {emailID: emailID}, function( data ) {
 
         if (data.signature_text) {

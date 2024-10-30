@@ -38,10 +38,7 @@ class CRM_Member_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard 
 
       //get the membership status and type values.
       $statusANDType = CRM_Member_BAO_Membership::getStatusANDTypeValues($dao->id);
-      foreach ([
-        'status',
-        'membership_type',
-      ] as $fld) {
+      foreach (['status', 'membership_type'] as $fld) {
         $membership[$dao->id][$fld] = $statusANDType[$dao->id][$fld] ?? NULL;
       }
       if (!empty($statusANDType[$dao->id]['is_current_member'])) {
@@ -68,8 +65,54 @@ class CRM_Member_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard 
     $activeMembers = CRM_Member_BAO_Membership::activeMembers($membership);
     $inActiveMembers = CRM_Member_BAO_Membership::activeMembers($membership, 'inactive');
 
+    // Add Recurring Links (if allowed)
+    $this->buildMemberLinks($activeMembers);
+    $this->buildMemberLinks($inActiveMembers);
+
     $this->assign('activeMembers', $activeMembers);
     $this->assign('inActiveMembers', $inActiveMembers);
+
+  }
+
+  /**
+   * Helper function to build appropriate Member links
+   */
+  public function buildMemberLinks(&$members) {
+    if (!empty($members)) {
+      foreach ($members as $id => &$member) {
+        if (empty($member['contribution_recur_id'])) {
+          continue;
+        }
+
+        $paymentProcessor = NULL;
+        try {
+          $contributionRecur = \Civi\Api4\ContributionRecur::get(FALSE)
+            ->addSelect('payment_processor_id')
+            ->addWhere('id', '=', $member['contribution_recur_id'])
+            ->execute()
+            ->first();
+
+          if (!empty($contributionRecur['payment_processor_id'])) {
+            $paymentProcessor = \Civi\Api4\PaymentProcessor::get(FALSE)
+              ->addWhere('id', '=', $contributionRecur['payment_processor_id'])
+              ->execute()
+              ->first();
+          }
+        }
+        catch (Exception $e) {
+          Civi::log()->warning('Member/UserDashboard: Unable to retrieve recur information ' . $e->getMessage());
+          continue;
+        }
+
+        if (!empty($paymentProcessor)) {
+          $paymentObject = Civi\Payment\System::singleton()->getByProcessor($paymentProcessor);
+          $member['cancelSubscriptionUrl'] = $paymentObject->subscriptionURL($member['membership_id'], 'membership', 'cancel');
+          $member['updateSubscriptionBillingUrl'] = $paymentObject->subscriptionURL($member['membership_id'], 'membership', 'billing');
+          $member['updateSubscriptionUrl'] = $paymentObject->subscriptionURL($member['membership_id'], 'membership', 'update');
+        }
+      }
+    }
+
   }
 
   /**

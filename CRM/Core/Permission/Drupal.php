@@ -104,7 +104,7 @@ class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase {
     // We want to list *only* Drupal perms, so we'll *skip* Civi perms.
     $allCorePerms = \CRM_Core_Permission::basicPermissions(TRUE);
 
-    $permissions = [];
+    $permissions = parent::getAvailablePermissions();
     $modules = system_get_info('module');
     foreach ($modules as $moduleName => $module) {
       $prefix = isset($module['name']) ? ($module['name'] . ': ') : '';

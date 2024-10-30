@@ -26,7 +26,9 @@
 *}
 {* this template is for configuring label formats *}
 <div class="help">
-  {ts}You can configure one or more Label Formats for your CiviCRM installation. Label Formats are used when creating mailing labels.{/ts}
+  {ts}You can configure one or more Label Formats for your CiviCRM installation. Label Formats are used when creating mailing labels.{/ts}<br />
+  {capture assign=addressSettings}href="{crmURL p='civicrm/admin/setting/preferences/address' q='reset=1'}"{/capture}
+  {ts 1=$addressSettings}You can change which fields are printed on each label in <a %1>Address Settings</a>.{/ts}
 </div>
 {if $action eq 1 or $action eq 2 or $action eq 8 or $action eq 16384}
   {include file="CRM/Admin/Form/LabelFormats.tpl"}

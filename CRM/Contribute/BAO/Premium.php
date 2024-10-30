@@ -37,17 +37,13 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
   }
 
   /**
-   * Update the is_active flag in the db.
-   *
+   * @deprecated - this bypasses hooks.
    * @param int $id
-   *   Id of the database record.
    * @param bool $is_active
-   *   Value we want to set the is_active field.
-   *
    * @return bool
-   *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $is_active) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Premium', $id, 'premiums_active ', $is_active);
   }
 
@@ -55,15 +51,29 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
    * Delete financial Types.
    *
    * @param int $premiumID
+   *
+   * @deprecated
    */
   public static function del($premiumID) {
-    $premium = new CRM_Contribute_DAO_Premium();
-    $premium->id = $premiumID;
-    $premium->delete();
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
+    return static::deleteRecord(['id' => $premiumID]);
+  }
+
+  /**
+   * Whitelist of possible values for the entity_table field
+   *
+   * @return array
+   */
+  public static function entityTables(): array {
+    return [
+      'civicrm_contribution_page' => ts('Contribution Page'),
+    ];
   }
 
   /**
    * Build Premium Block im Contribution Pages.
+   *
+   * @deprecated since 5.69 will be removed around 5.75
    *
    * @param CRM_Core_Form $form
    * @param int $pageID
@@ -72,6 +82,7 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
    * @param string $selectedOption
    */
   public static function buildPremiumBlock(&$form, $pageID, $formItems = FALSE, $selectedProductID = NULL, $selectedOption = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     $form->add('hidden', "selectProduct", $selectedProductID, ['id' => 'selectProduct']);
 
     $premiumDao = new CRM_Contribute_DAO_Premium();
@@ -115,25 +126,22 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
             }
           }
           else {
+            // Why? should we not skip if not found?
             CRM_Core_DAO::storeValues($productDAO, $products[$productDAO->id]);
           }
         }
-        $options = $temp = [];
-        $temp = explode(',', $productDAO->options);
-        foreach ($temp as $value) {
-          $options[trim($value)] = trim($value);
-        }
-        if ($temp[0] != '') {
+        $options = self::parseProductOptions($productDAO->options);
+        if (!empty($options)) {
           $form->addElement('select', 'options_' . $productDAO->id, NULL, $options);
         }
       }
       if (count($products)) {
-        $form->assign('showPremium', $formItems);
+        $form->assign('showPremiumSelectionFields', $formItems);
         $form->assign('showSelectOptions', $formItems);
-        $form->assign('products', $products);
         $form->assign('premiumBlock', $premiumBlock);
       }
     }
+    $form->assign('products', $products ?? NULL);
   }
 
   /**
@@ -232,6 +240,27 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
       self::$productInfo = [$products, $options];
     }
     return self::$productInfo;
+  }
+
+  /**
+   * Convert key=val options into an array while keeping
+   * compatibility for values only.
+   */
+  public static function parseProductOptions($string) : array {
+    $options = [];
+    $temp = explode(',', $string);
+
+    foreach ($temp as $value) {
+      $parts = explode('=', $value, 2);
+      if (count($parts) == 2) {
+        $options[trim($parts[0])] = trim($parts[1]);
+      }
+      else {
+        $options[trim($value)] = trim($value);
+      }
+    }
+
+    return $options;
   }
 
 }

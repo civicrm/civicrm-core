@@ -21,10 +21,31 @@
 class CRM_Mailing_MailStore_Maildir extends CRM_Mailing_MailStore {
 
   /**
+   * Directory to operate upon.
+   *
+   * @var string
+   */
+  private $_dir;
+
+  /**
+   * Path to a local directory to store ignored emails
+   *
+   * @var string
+   */
+  private $_ignored;
+
+  /**
+   * Path to a local directory to store ignored emails
+   *
+   * @var string
+   */
+  private $_processed;
+
+  /**
    * Connect to the supplied dir and make sure the two mail dirs exist.
    *
    * @param string $dir
-   *   Dir to operate upon.
+   *   Directory to operate upon.
    *
    * @return \CRM_Mailing_MailStore_Maildir
    */
@@ -61,10 +82,7 @@ class CRM_Mailing_MailStore_Maildir extends CRM_Mailing_MailStore {
     // set property text attachment as file CRM-5408
     $parser->options->parseTextAttachmentsAsFiles = TRUE;
 
-    foreach ([
-      'cur',
-      'new',
-    ] as $subdir) {
+    foreach (['cur', 'new'] as $subdir) {
       $dir = $this->_dir . DIRECTORY_SEPARATOR . $subdir;
       foreach (scandir($dir) as $file) {
         if ($file == '.' or $file == '..') {

@@ -10,6 +10,7 @@
  */
 namespace Civi\FlexMailer\Listener;
 
+use Civi\Core\Service\AutoService;
 use Civi\FlexMailer\Event\ComposeBatchEvent;
 use Civi\FlexMailer\Event\RunEvent;
 use Civi\FlexMailer\FlexMailerTask;
@@ -22,8 +23,12 @@ use Civi\Token\TokenRow;
  *
  * The DefaultComposer uses a TokenProcessor to generate all messages as
  * a batch.
+ *
+ * @service civi_flexmailer_default_composer
  */
-class DefaultComposer extends BaseListener {
+class DefaultComposer extends AutoService {
+
+  use IsActiveTrait;
 
   public function onRun(RunEvent $e) {
     // FIXME: This probably doesn't belong here...
@@ -96,13 +101,13 @@ class DefaultComposer extends BaseListener {
    * @return array
    */
   public function createTokenProcessorContext(ComposeBatchEvent $e) {
-    $context = array(
+    $context = [
       'controller' => get_class($this),
       // FIXME: Use template_type, template_options
       'smarty' => defined('CIVICRM_MAIL_SMARTY') && CIVICRM_MAIL_SMARTY ? TRUE : FALSE,
       'mailing' => $e->getMailing(),
       'mailingId' => $e->getMailing()->id,
-    );
+    ];
     return $context;
   }
 
@@ -119,16 +124,16 @@ class DefaultComposer extends BaseListener {
     ComposeBatchEvent $e,
     FlexMailerTask $task
   ) {
-    return array(
+    return [
       'contactId' => $task->getContactId(),
       'mailingJobId' => $e->getJob()->id,
-      'mailingActionTarget' => array(
+      'mailingActionTarget' => [
         'id' => $task->getEventQueueId(),
         'hash' => $task->getHash(),
         'email' => $task->getAddress(),
-      ),
+      ],
       'flexMailerTask' => $task,
-    );
+    ];
   }
 
   /**
@@ -146,11 +151,11 @@ class DefaultComposer extends BaseListener {
     FlexMailerTask $task,
     TokenRow $row
   ) {
-    return array(
+    return [
       'Subject' => $row->render('subject'),
       'text' => $row->render('body_text'),
       'html' => $row->render('body_html'),
-    );
+    ];
   }
 
   /**

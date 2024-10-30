@@ -10,7 +10,6 @@
 {* this template is used for adding/editing available Payment Processors  *}
 <div class="crm-block crm-form-block crm-paymentProcessor-type-form-block">
 <fieldset><legend>{if $action eq 1}{ts}New Payment Procesor Type{/ts}{elseif $action eq 2}{ts}Edit Payment Procesor Type{/ts}{else}{ts}Delete Payment Procesor Type{/ts}{/if}</legend>
- <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
 {if $action eq 8}
   <div class="messages status no-popup">
       {icon icon="fa-info-circle"}{/icon}

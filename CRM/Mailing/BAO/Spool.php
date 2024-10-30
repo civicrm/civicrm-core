@@ -53,6 +53,8 @@ class CRM_Mailing_BAO_Spool extends CRM_Mailing_DAO_Spool {
       $params['scheduled_id'] = $params['created_id'];
       $params['scheduled_date'] = $params['created_date'];
       $params['is_completed'] = 1;
+      $params['status'] = 'Complete';
+      $params['end_date'] = date('Y-m-d H:i:s');
       $params['is_archived'] = 1;
       $params['body_html'] = htmlspecialchars($headerStr) . "\n\n" . $body;
       $params['subject'] = $headers['Subject'];

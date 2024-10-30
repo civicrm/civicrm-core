@@ -19,10 +19,10 @@ class CRM_Core_Resources_StringsTest extends CiviUnitTestCase {
   /**
    * Get strings from files.
    */
-  public function testGet() {
+  public function testGet(): void {
     $basedir = $this->createExamples();
     $strings = new CRM_Core_Resources_Strings(
-      new CRM_Utils_Cache_Arraycache(NULL)
+      new CRM_Utils_Cache_ArrayCache(NULL)
     );
     $this->assertEquals(
       ['Hello from Javascript'],

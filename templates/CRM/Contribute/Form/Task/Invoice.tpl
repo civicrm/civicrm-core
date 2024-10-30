@@ -16,7 +16,7 @@
     {ts}You may choose to email invoice to contributors OR download a PDF file containing one invoice per page to your local computer by clicking <strong>Process Invoice(s)</strong> . Your browser may display the file for you automatically, or you may need to open it for printing using any PDF reader (such as Adobe&reg; Reader).{/ts}
   </div>
 {/if}
-
+<div class="crm-block crm-form-block">
 <table class="form-layout-compressed">
   {if $selectedOutput ne 'email'}
     <tr>
@@ -26,7 +26,7 @@
   {/if}
   <tr id="selectEmailFrom" style="display: none" class="crm-contactEmail-form-block-fromEmailAddress crm-email-element">
     <td class="label">{$form.from_email_address.label}</td>
-    <td>{$form.from_email_address.html} {help id="id-from_email" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp"}</td>
+    <td>{$form.from_email_address.html} {help id="id-from_email" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp" title=$form.from_email_address.label}</td>
   </tr>
   <tr class="crm-email-element crm-contactEmail-form-block-cc_id">
     <td class="label">{$form.cc_id.label}</td>
@@ -41,7 +41,7 @@
     </td>
   </tr>
   <tr class="crm-email-element">
-    <td class="label">{$form.email_comment.label}</td>
+    <td class="label">{$form.email_comment.label} {help id="id-email_comment"}</td>
     <td>{$form.email_comment.html}</td>
   </tr>
   {if $selectedOutput ne 'email'}
@@ -55,6 +55,7 @@
     <td>{$form.pdf_format_id.html}</td>
   </tr>
 </table>
+</div>
 
 <div class="spacer"></div>
 <div class="crm-submit-buttons">

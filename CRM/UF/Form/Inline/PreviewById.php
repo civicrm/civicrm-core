@@ -27,8 +27,6 @@ class CRM_UF_Form_Inline_PreviewById extends CRM_UF_Form_AbstractPreview {
    *
    * gets session variables for group or field id
    *
-   * @param
-   *
    * @return void
    * @throws \CRM_Core_Exception
    */

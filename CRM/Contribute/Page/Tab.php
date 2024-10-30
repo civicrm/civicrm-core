@@ -55,6 +55,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
         'title' => ts('View Recurring Payment'),
         'url' => 'civicrm/contact/view/contributionrecur',
         'qs' => "reset=1&id=%%crid%%&cid=%%cid%%&context={$context}",
+        'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::VIEW),
       ],
     ];
 
@@ -76,6 +77,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
         'title' => ts('Edit Recurring Payment'),
         'url' => 'civicrm/contribute/updaterecur',
         'qs' => "reset=1&action=update&crid=%%crid%%&cid=%%cid%%&context={$context}",
+        'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
       ];
     }
 
@@ -84,6 +86,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
       'title' => ts('Cancel'),
       'url' => 'civicrm/contribute/unsubscribe',
       'qs' => 'reset=1&crid=%%crid%%&cid=%%cid%%&context=' . $context,
+      'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DISABLE),
     ];
 
     if ($paymentProcessorObj->supports('UpdateSubscriptionBillingInfo')) {
@@ -92,6 +95,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
         'title' => ts('Change Billing Details'),
         'url' => 'civicrm/contribute/updatebilling',
         'qs' => "reset=1&crid=%%crid%%&cid=%%cid%%&context={$context}",
+        'weight' => 110,
       ];
     }
     if (!empty($templateContribution['id']) && $paymentProcessorObj->supportsEditRecurringContribution()) {
@@ -102,6 +106,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
         'title' => ts('View Template Contribution'),
         'url' => 'civicrm/contact/view/contribution',
         'qs' => "reset=1&id={$templateContribution['id']}&cid=%%cid%%&action=view&context={$context}&force_create_template=1",
+        'weight' => 120,
       ];
     }
 
@@ -138,6 +143,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
         'title' => ts('Cancel'),
         // Only display on-site links in a popup.
         'class' => (stripos($url, 'http') !== FALSE) ? 'no-popup' : '',
+        'weight' => -50,
       ];
     }
 
@@ -151,6 +157,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
         'url' => $url,
         // Only display on-site links in a popup.
         'class' => (stripos($url, 'http') !== FALSE) ? 'no-popup' : '',
+        'weight' => -15,
       ];
     }
 
@@ -165,6 +172,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
         'url' => $url,
         // Only display on-site links in a popup.
         'class' => (stripos($url, 'http') !== FALSE) ? 'no-popup' : '',
+        'weight' => -10,
       ];
     }
     return $links;
@@ -261,15 +269,12 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
   private function addRecurringContributionsBlock() {
     [$activeContributions, $activeContributionsCount] = $this->getActiveRecurringContributions();
     [$inactiveRecurringContributions, $inactiveContributionsCount] = $this->getInactiveRecurringContributions();
-
-    if (!empty($activeContributions) || !empty($inactiveRecurringContributions)) {
-      // assign vars to templates
-      $this->assign('action', $this->_action);
-      $this->assign('activeRecurRows', $activeContributions);
-      $this->assign('contributionRecurCount', $activeContributionsCount + $inactiveContributionsCount);
-      $this->assign('inactiveRecurRows', $inactiveRecurringContributions);
-      $this->assign('recur', TRUE);
-    }
+    // assign vars to templates
+    $this->assign('action', $this->_action);
+    $this->assign('activeRecurRows', $activeContributions);
+    $this->assign('contributionRecurCount', $activeContributionsCount + $inactiveContributionsCount);
+    $this->assign('inactiveRecurRows', $inactiveRecurringContributions);
+    $this->assign('recur', !empty($activeContributions) || !empty($inactiveRecurringContributions));
   }
 
   /**
@@ -326,6 +331,9 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
     foreach ($recurContributions as $recurId => $recurDetail) {
       // API3 does not return "installments" if it is not set. But we need it set to avoid PHP notices on ContributionRecurSelector.tpl
       $recurContributions[$recurId]['installments'] = $recurDetail['installments'] ?? NULL;
+      $recurContributions[$recurId]['next_sched_contribution_date'] = $recurDetail['next_sched_contribution_date'] ?? NULL;
+      $recurContributions[$recurId]['cancel_date'] = $recurDetail['cancel_date'] ?? NULL;
+      $recurContributions[$recurId]['end_date'] = $recurDetail['end_date'] ?? NULL;
       // Is recurring contribution active?
       $recurContributions[$recurId]['is_active'] = !in_array(CRM_Contribute_PseudoConstant::contributionStatus($recurDetail['contribution_status_id'], 'name'), CRM_Contribute_BAO_ContributionRecur::getInactiveStatuses());
       if ($recurContributions[$recurId]['is_active']) {
@@ -417,7 +425,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
 
-    if ($context == 'standalone') {
+    if ($context === 'standalone') {
       $this->_action = CRM_Core_Action::ADD;
     }
     else {
@@ -428,11 +436,11 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
           'return' => 'contact_id',
         ]);
       }
-      $this->assign('contactId', $this->_contactId);
 
       // check logged in url permission
       CRM_Contact_Page_View::checkUserPermission($this);
     }
+    $this->assign('contactId', $this->_contactId);
     $this->assign('action', $this->_action);
 
     if ($this->_permission == CRM_Core_Permission::EDIT && !CRM_Core_Permission::check('edit contributions')) {

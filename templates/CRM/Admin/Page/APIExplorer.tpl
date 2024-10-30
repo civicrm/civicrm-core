@@ -23,8 +23,7 @@
     max-height: 50em;
   }
   pre#api-result,
-  div#doc-result,
-  pre#example-result {
+  div#doc-result {
     padding:1em;
     border: 1px solid lightgrey;
     margin-top: 1em;
@@ -195,10 +194,6 @@
     margin-top: 1em;
     border-top: 1px solid #d3d3d3;
   }
-  .api-doc-code .collapsible-title {
-    font-weight: bold;
-    margin-top: .5em;
-  }
   .doc-filename {
     text-align: right;
     font-style: italic;
@@ -234,9 +229,6 @@
     <li class="ui-corner-all" title="GUI to build and execute API calls">
       <a href="#explorer-tab"><i class="crm-i fa-search" aria-hidden="true"></i> {ts}Explorer{/ts}</a>
     </li>
-    <li class="ui-corner-all" title="Auto-generated examples from the test suite">
-      <a href="#examples-tab"><i class="crm-i fa-book" aria-hidden="true"></i> {ts}Examples{/ts}</a>
-    </li>
     <li class="ui-corner-all" title="API source-code and code-level documentation">
       <a href="#docs-tab"><i class="crm-i fa-code" aria-hidden="true"></i> {ts}Code Docs{/ts}</a>
     </li>
@@ -269,8 +261,8 @@
         <input type="checkbox" class="crm-form-checkbox api-param-checkbox api-input" id="sequential-checkbox" name="sequential" checked="checked" value="1">sequential
       </label>
 
-      <div id="api-join" class="crm-form-block crm-collapsible collapsed" style="display:none;">
-        <h4 class="collapsible-title">{ts}Join on:{/ts} {help id='api-join'}</h4>
+      <div id="api-join" class="crm-form-block">
+        <h4>{ts}Join on:{/ts} {help id='api-join'}</h4>
         <div></div>
       </div>
 
@@ -314,30 +306,6 @@
       </div>
 
 <pre id="api-result" class="linenums">
-{ts}Results are displayed here.{/ts}
-</pre>
-    </form>
-  </div>
-  </div>
-
-  <div id="examples-tab">
-    <div class="crm-block crm-form-block">
-    <form id="api-examples">
-      <label for="example-entity">{ts}Entity{/ts}:</label>
-      <select class="crm-form-select big required" id="example-entity" name="entity">
-        <option value="" selected="selected">{ts}Choose{/ts}...</option>
-        {foreach from=$examples item=entity}
-          <option value="{$entity}" {if !empty($entities.deprecated) && in_array($entity, $entities.deprecated)}class="strikethrough"{/if}>
-            {$entity}
-          </option>
-        {/foreach}
-      </select>
-      &nbsp;&nbsp;
-      <label for="example-action">{ts}Example{/ts}:</label>
-      <select class="crm-form-select big crm-select2" id="example-action" name="action">
-        <option value="" selected="selected">{ts}Choose{/ts}...</option>
-      </select>
-<pre id="example-result" class="linenums lang-php" placeholder="{ts escape='html'}Results are displayed here.{/ts}">
 {ts}Results are displayed here.{/ts}
 </pre>
     </form>
@@ -398,7 +366,7 @@
       {/literal}
         <select class="crm-form-select api-param-op">
           {foreach from=$operators item='op'}
-            <option value="{$op|htmlspecialchars}">{$op|htmlspecialchars}</option>
+            <option value="{$op|escape}">{$op|escape}</option>
           {/foreach}
         </select>
       {literal}
@@ -466,13 +434,13 @@
 </script>
 
 <script type="text/template" id="doc-code-tpl">
-  <div class="crm-collapsible collapsed api-doc-code">
-    <div class="collapsible-title">{ts}Source Code{/ts}</div>
-    <div>
+  <details class="api-doc-code">
+    <summary>{ts}Source Code{/ts}</summary>
+    <div class="crm-accordion-body">
       <div class="doc-filename"><%- file %></div>
       <pre class="lang-php linenums"><%- code %></pre>
     </div>
-  </div>
+  </details>
 </script>
 
 <script type="text/template" id="join-tpl">

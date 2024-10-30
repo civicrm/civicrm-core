@@ -8,8 +8,8 @@
 
   var VISIBILITY = [
     {val: 'User and User Admin Only', label: ts('User and User Admin Only'), isInSelectorAllowed: false},
-    {val: 'Public Pages', label: ts('Expose Publicly'), isInSelectorAllowed: true},
-    {val: 'Public Pages and Listings', label: ts('Expose Publicly and for Listings'), isInSelectorAllowed: true}
+    {val: 'Public Pages', label: ts('Public Pages'), isInSelectorAllowed: true},
+    {val: 'Public Pages and Listings', label: ts('Public Pages and Listings'), isInSelectorAllowed: true}
   ];
 
   var LOCATION_TYPES = _.map(CRM.PseudoConstant.locationType, function(value, key) {
@@ -358,12 +358,15 @@
      *
      */
     markDuplicates: function() {
-      var ufFieldModelsByKey = this.groupBy(function(ufFieldModel) {
+      const ufFieldModelsByKey = this.groupBy(function(ufFieldModel) {
         return ufFieldModel.getSignature();
       });
       this.each(function(ufFieldModel){
-        var is_duplicate = ufFieldModelsByKey[ufFieldModel.getSignature()].length > 1;
-        if (is_duplicate != ufFieldModel.get('is_duplicate')) {
+        const length = ufFieldModelsByKey[ufFieldModel.getSignature()].length > 1;
+        // Allow multiple free html fields, but note this would only work on an English install, and only if the field label hasn't been changed.
+        const label = ufFieldModelsByKey[ufFieldModel.getSignature()][0].attributes.label !== 'Free HTML';
+        const is_duplicate = length && label;
+        if (is_duplicate !== ufFieldModel.get('is_duplicate')) {
           ufFieldModel.set('is_duplicate', is_duplicate);
         }
       });
@@ -514,7 +517,7 @@
         help: ts('Select a group if you want contacts to be automatically added to that group when the profile is submitted.'),
         type: 'Number'
       },
-      'cancel_URL': {
+      'cancel_url': {
         title: ts('Cancel Redirect URL'),
         help: ts('If you are using this profile as a contact signup or edit form, and want to redirect the user to a static URL if they click the Cancel button - enter the complete URL here. If this field is left blank, the built-in Profile form will be redisplayed.'),
         type: 'Text'
@@ -605,7 +608,7 @@
         help: ts('If you want member(s) of your organization to receive a notification email whenever this Profile form is used to enter or update contact information, enter one or more email addresses here. Multiple email addresses should be separated by a comma (e.g. jane@example.org, paula@example.org). The first email address listed will be used as the FROM address in the notifications.'),
         type: 'TextArea'
       },
-      'post_URL': {
+      'post_url': {
         title: ts('Redirect URL'),
         help: ts("If you are using this profile as a contact signup or edit form, and want to redirect the user to a static URL after they've submitted the form, you can also use contact tokens in URL - enter the complete URL here. If this field is left blank, the built-in Profile form will be redisplayed with a generic status message - 'Your contact information has been saved.'"),
         type: 'Text'

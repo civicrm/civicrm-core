@@ -20,7 +20,7 @@
 {/if}
 
 {if $status_id eq 4}
-  <p>{ts}You have already signed this petition but we<strong>need to confirm your email address</strong>.{/ts}</p>
+  <p><strong>{ts}You have already signed this petition but we need to confirm your email address.{/ts}</strong></p>
   <b>{ts}IMPORTANT{/ts}</b>
   : {ts}Before we can add your signature, you must validate your email address by clicking on the activation link in the confirmation e-mail. Sometimes our confirmation emails get flagged as spam and are moved to your spam folder.{/ts}
   <br/>
@@ -38,7 +38,7 @@
     </div>
   {/if}
   {if $is_share}
-    {include file="CRM/Campaign/Page/Petition/SocialNetwork.tpl" petition_id=$survey_id petitionTitle=$petitionTitle}
+    {include file="CRM/Campaign/Page/Petition/SocialNetwork.tpl" petition_id=$survey_id petitionTitle=$petitionTitle emailMode=false}
   {/if}
 {/if}
 

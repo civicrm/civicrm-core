@@ -11,13 +11,12 @@
 namespace Civi\Api4;
 
 /**
- * UFMatch entity - links civicrm contacts with users created externally
+ * Matches CiviCRM contacts with their CMS user accounts
  *
  * @searchable secondary
  * @since 5.19
  * @package Civi\Api4
  */
 class UFMatch extends Generic\DAOEntity {
-  use Generic\Traits\EntityBridge;
 
 }

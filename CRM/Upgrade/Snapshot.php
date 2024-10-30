@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Test\Invasive;
+
 /**
  * Provide helpers for recording data snapshots during an upgrade.
  */
@@ -35,14 +37,27 @@ class CRM_Upgrade_Snapshot {
 
   /**
    * Get a list of reasons why the snapshots should not run.
+   *
    * @return array
    *   List of printable messages.
    */
   public static function getActivationIssues(): array {
     if (static::$activationIssues === NULL) {
       $policy = CRM_Utils_Constant::value('CIVICRM_UPGRADE_SNAPSHOT', 'auto');
+      static::$activationIssues = [];
+
+      $version = CRM_Utils_SQL::getDatabaseVersion();
+      if ((stripos($version, 'mariadb') !== FALSE) && version_compare($version, '10.6.0', '>=')) {
+        // MariaDB briefly (10.6.0-10.6.5) flirted with the idea of phasing-out `COMPRESSED`. By default, snapshots won't work on those versions.
+        // https://mariadb.com/kb/en/innodb-compressed-row-format/#read-only
+        $roCompressed = CRM_Core_DAO::singleValueQuery('SELECT @@innodb_read_only_compressed');
+        if (in_array($roCompressed, ['on', 'ON', 1, '1'])) {
+          static::$activationIssues['row_compressed'] = ts('This MariaDB instance does not allow creating compressed snapshots.');
+        }
+      }
+
       if ($policy === TRUE) {
-        return [];
+        return static::$activationIssues;
       }
 
       $limits = [
@@ -54,18 +69,18 @@ class CRM_Upgrade_Snapshot {
         'civicrm_event' => 200 * 1000,
       ];
 
-      static::$activationIssues = [];
       foreach ($limits as $table => $limit) {
         try {
-          $count = CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM `{$table}`");
+          // Use select MAX(id) rather than COUNT as COUNT is slow on large databases.
+          $max = CRM_Core_DAO::singleValueQuery("SELECT MAX(id) FROM `{$table}`");
         }
         catch (\Exception $e) {
-          $count = 0;
+          $max = 0;
         }
-        if ($count > $limit) {
+        if ($max > $limit) {
           static::$activationIssues["count_{$table}"] = ts('Table "%1" has a large number of records (%2 > %3).', [
             1 => $table,
-            2 => $count,
+            2 => $max,
             3 => $limit,
           ]);
         }
@@ -133,7 +148,7 @@ class CRM_Upgrade_Snapshot {
    */
   public static function createTasks(string $owner, string $version, string $name, CRM_Utils_SQL_Select $select): iterable {
     $destTable = static::createTableName($owner, $version, $name);
-    $srcTable = \Civi\Test\Invasive::get([$select, 'from']);
+    $srcTable = Invasive::get([$select, 'from']);
 
     // Sometimes, backups fail and people rollback and try again. Reset prior snapshots.
     CRM_Core_DAO::executeQuery("DROP TABLE IF EXISTS `{$destTable}`");
@@ -162,9 +177,42 @@ class CRM_Upgrade_Snapshot {
   }
 
   /**
+   * Generate the query/queries for storing a snapshot (if the local policy supports snapshotting).
+   *
+   * This method does all updates in one go. It is suitable for small/moderate data-sets. If you need to support
+   * larger data-sets, use createTasks() instead.
+   *
+   * @param string $owner
+   *   Name of the component/module/extension that owns the snapshot.
+   *   Ex: 'civicrm'
+   * @param string $version
+   *   Ex: '5.50'
+   * @param string $name
+   * @param string $select
+   *   Raw SQL SELECT for finding data.
+   * @throws \CRM_Core_Exception
+   * @return string[]
+   *   SQL statements to execute.
+   *   May be array if there no statements to execute.
+   */
+  public static function createSingleTask(string $owner, string $version, string $name, string $select): array {
+    $destTable = static::createTableName($owner, $version, $name);
+    if (!empty(CRM_Upgrade_Snapshot::getActivationIssues())) {
+      return [];
+    }
+
+    $result = [];
+    $result[] = "DROP TABLE IF EXISTS `{$destTable}`";
+    $result[] = "CREATE TABLE `{$destTable}` ROW_FORMAT=COMPRESSED AS {$select}";
+    return $result;
+  }
+
+  /**
    * @param \CRM_Queue_TaskContext $ctx
    * @param string $sql
+   *
    * @return bool
+   * @noinspection PhpUnusedParameterInspection
    */
   public static function insertSnapshotTask(CRM_Queue_TaskContext $ctx, string $sql): bool {
     CRM_Core_DAO::executeQuery($sql);
@@ -182,9 +230,13 @@ class CRM_Upgrade_Snapshot {
    *   The current version of CiviCRM.
    * @param int|null $cleanupAfter
    *   How long should we retain old snapshots?
-   *   Time is measured in terms of MINOR versions - eg "4" means "retain for 4 MINOR versions".
-   *   Thus, on v5.60, you could delete any snapshots predating 5.56.
+   *   Time is measured in terms of MINOR versions - eg "4" means "retain for 4
+   *   MINOR versions". Thus, on v5.60, you could delete any snapshots
+   *   predating 5.56.
+   *
    * @return bool
+   * @throws \CRM_Core_Exception
+   * @noinspection PhpUnusedParameterInspection
    */
   public static function cleanupTask(?CRM_Queue_TaskContext $ctx = NULL, string $owner = 'civicrm', ?string $version = NULL, ?int $cleanupAfter = NULL): bool {
     $version = $version ?: CRM_Core_BAO_Domain::version();
@@ -194,15 +246,14 @@ class CRM_Upgrade_Snapshot {
     $cutoff = $major . '.' . max(0, $minor - $cleanupAfter);
 
     $dao = new CRM_Core_DAO();
-    $query = "
+    $query = '
       SELECT TABLE_NAME as tableName
       FROM   INFORMATION_SCHEMA.TABLES
-      WHERE  TABLE_SCHEMA = %1
-      AND TABLE_NAME LIKE %2
-    ";
+      WHERE  TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME LIKE %1
+    ';
     $tables = CRM_Core_DAO::executeQuery($query, [
-      1 => [$dao->database(), 'String'],
-      2 => ["snap_{$owner}_v%", 'String'],
+      1 => ["snap_{$owner}_v%", 'String'],
     ])->fetchMap('tableName', 'tableName');
 
     $oldTables = array_filter($tables, function($table) use ($owner, $cutoff) {

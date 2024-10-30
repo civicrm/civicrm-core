@@ -22,13 +22,6 @@
 class CRM_Mailing_Page_Component extends CRM_Core_Page_Basic {
 
   /**
-   * The action links that we need to display for the browse screen.
-   *
-   * @var array
-   */
-  public static $_links = NULL;
-
-  /**
    * Get BAO Name.
    *
    * @return string
@@ -36,36 +29,6 @@ class CRM_Mailing_Page_Component extends CRM_Core_Page_Basic {
    */
   public function getBAOName() {
     return 'CRM_Mailing_BAO_MailingComponent';
-  }
-
-  /**
-   * Get action Links.
-   *
-   * @return array
-   *   (reference) of action links
-   */
-  public function &links() {
-    if (!(self::$_links)) {
-      self::$_links = [
-        CRM_Core_Action::UPDATE => [
-          'name' => ts('Edit'),
-          'url' => CRM_Utils_System::currentPath(),
-          'qs' => 'action=update&id=%%id%%',
-          'title' => ts('Edit Mailing Component'),
-        ],
-        CRM_Core_Action::DISABLE => [
-          'name' => ts('Disable'),
-          'ref' => 'crm-enable-disable',
-          'title' => ts('Disable Mailing Component'),
-        ],
-        CRM_Core_Action::ENABLE => [
-          'name' => ts('Enable'),
-          'ref' => 'crm-enable-disable',
-          'title' => ts('Enable Mailing Component'),
-        ],
-      ];
-    }
-    return self::$_links;
   }
 
   /**

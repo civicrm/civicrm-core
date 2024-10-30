@@ -1,0 +1,20 @@
+<div class="af-markup">
+  <div class="help">{{:: ts('CiviContribute allows you to create and maintain any number of Online Contribution Pages. You can create different pages for different programs or campaigns, and you can customize text, amounts, types of information collected from contributors, etc.') }} </div>
+</div>
+<div af-fieldset="">
+  <div class="af-container af-layout-inline">
+    <af-field name="title" defn="{label: 'Title', input_attrs: {}}" />
+    <af-field name="financial_type_id" defn="{input_type: 'CheckBox', input_attrs: {}}" />
+  </div>
+  <div class="btn-group pull-right">
+    <a class="btn btn-primary" ng-href="{{:: crmUrl('civicrm/admin/pcp', {reset: 1}) }}">
+      <i class="crm-i fa-plus"/>
+      {{:: ts('Manage Personal Campaign Pages') }}
+    </a>
+    <a class="btn btn-primary" ng-href="{{:: crmUrl('civicrm/admin/contribute/add', {reset: 1, action: 'add'}) }}">
+      <i class="crm-i fa-plus"/>
+      {{:: ts('Add Contribution Page') }}
+    </a>
+  </div>
+  <crm-search-display-table search-name="Manage_Contribution_Pages" display-name="Manage_Contribution_Pages_Table_1"></crm-search-display-table>
+</div>

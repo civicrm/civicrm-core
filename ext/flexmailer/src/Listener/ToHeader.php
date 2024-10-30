@@ -10,9 +10,15 @@
  */
 namespace Civi\FlexMailer\Listener;
 
+use Civi\Core\Service\AutoService;
 use Civi\FlexMailer\Event\ComposeBatchEvent;
 
-class ToHeader extends BaseListener {
+/**
+ * @service civi_flexmailer_to_header
+ */
+class ToHeader extends AutoService {
+
+  use IsActiveTrait;
 
   /**
    * Inject the "To:" header.
@@ -47,7 +53,7 @@ class ToHeader extends BaseListener {
    *   Array(int $contactId => string $displayName).
    */
   protected function getContactNames($tasks) {
-    $ids = array();
+    $ids = [];
     foreach ($tasks as $task) {
       /** @var \Civi\FlexMailer\FlexMailerTask $task */
       $ids[$task->getContactId()] = $task->getContactId();
@@ -55,14 +61,14 @@ class ToHeader extends BaseListener {
 
     $ids = array_filter($ids, 'is_numeric');
     if (empty($ids)) {
-      return array();
+      return [];
     }
 
     $idString = implode(',', $ids);
 
     $query = \CRM_Core_DAO::executeQuery(
       "SELECT id, display_name FROM civicrm_contact WHERE id in ($idString)");
-    $names = array();
+    $names = [];
     while ($query->fetch()) {
       $names[$query->id] = $query->display_name;
     }

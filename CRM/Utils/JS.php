@@ -163,18 +163,15 @@ class CRM_Utils_JS {
   public static function convertSingleQuoteString(string $str, $throwException) {
     // json_decode can only handle double quotes around strings, so convert single-quoted strings
     $backslash = chr(0) . 'backslash' . chr(0);
-    $str = str_replace(['\\\\', '\\"', '"', '\\&', '\\/', $backslash], [$backslash, '"', '\\"', '&', '/', '\\'], substr($str, 1, -1));
+    $str = str_replace(['\\\\', '\\"', '"', '\\&', '\\/'], [$backslash, '"', '\\"', '&', '/'], substr($str, 1, -1));
     // Ensure the string doesn't terminate early by checking that all single quotes are escaped
-    $pos = -1;
-    while (($pos = strpos($str, "'", $pos + 1)) !== FALSE) {
-      if (($pos - strlen(rtrim(substr($str, 0, $pos)))) % 2) {
-        if ($throwException) {
-          throw new CRM_Core_Exception('Invalid string passed to CRM_Utils_JS::decode');
-        }
-        return NULL;
+    if (preg_match("/[^\\\\]'/", $str)) {
+      if ($throwException) {
+        throw new CRM_Core_Exception('Invalid string passed to CRM_Utils_JS::decode');
       }
+      return NULL;
     }
-    return '"' . $str . '"';
+    return '"' . str_replace(["\\'", $backslash], ["'", '\\\\'], $str) . '"';
   }
 
   /**
@@ -310,8 +307,8 @@ class CRM_Utils_JS {
       if ($brackets[0] == '{') {
         // Enclose the key in quotes unless it is purely alphanumeric
         if (preg_match('/\W/', $key)) {
-          // Prefer single quotes
-          $key = preg_match('/^[\w "]+$/', $key) ? "'" . $key . "'" : json_encode($key, JSON_UNESCAPED_SLASHES);
+          // Prefer single quotes around keys
+          $key = self::encode($key);
         }
         $js[] = "$key: $val";
       }

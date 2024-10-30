@@ -12,23 +12,23 @@ namespace Civi\Shimmy\Mixins;
  */
 class ManagedTest extends \PHPUnit\Framework\Assert {
 
-  public function testPreConditions($cv) {
+  public function testPreConditions($cv): void {
     $this->assertFileExists(static::getPath('/CRM/ShimmyGroup.mgd.php'), 'The shimmy extension must have a Menu XML file.');
   }
 
-  public function testInstalled($cv) {
+  public function testInstalled($cv): void {
     $items = $cv->api4('OptionGroup', 'get', ['where' => [['name', '=', 'shimmy_group']]]);
     $this->assertEquals('Shimmy Group', $items[0]['title']);
     $this->assertEquals(TRUE, $items[0]['is_active']);
   }
 
-  public function testDisabled($cv) {
+  public function testDisabled($cv): void {
     $items = $cv->api4('OptionGroup', 'get', ['where' => [['name', '=', 'shimmy_group']]]);
     $this->assertEquals('Shimmy Group', $items[0]['title']);
     $this->assertEquals(FALSE, $items[0]['is_active']);
   }
 
-  public function testUninstalled($cv) {
+  public function testUninstalled($cv): void {
     $items = $cv->api4('OptionGroup', 'get', ['where' => [['name', '=', 'shimmy_group']]]);
     $this->assertEmpty($items);
   }

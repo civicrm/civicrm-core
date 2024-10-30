@@ -11,6 +11,7 @@
 
 use Civi\Api4\Email;
 use Civi\Api4\PCPBlock;
+use Civi\Api4\UFGroup;
 
 /**
  * Trait CRMTraits_PCP_PCPTestTrait
@@ -25,17 +26,16 @@ trait CRMTraits_PCP_PCPTestTrait {
    * Create the necessary initial objects for a pcpBlock, then return the
    * params needed to create the pcpBlock.
    *
+   * @throws \CRM_Core_Exception
    */
-  public function pcpBlockParams() {
-    $contribPage = CRM_Core_DAO::createTestObject('CRM_Contribute_DAO_ContributionPage');
-    $contribPageId = $contribPage->id;
-    $supporterProfile = CRM_Core_DAO::createTestObject('CRM_Core_DAO_UFGroup');
-    $supporterProfileId = $supporterProfile->id;
+  public function pcpBlockParams(): array {
+    $contributionPageID = CRM_Core_DAO::createTestObject('CRM_Contribute_DAO_ContributionPage')->id;
+    $this->ids['UFGroup']['pcp'] = UFGroup::create()->setValues(['name' => 'pcp', 'title' => 'PCP'])->execute()->first()['id'];
 
     return [
       'entity_table' => 'civicrm_contribution_page',
-      'entity_id' => $contribPageId,
-      'supporter_profile_id' => $supporterProfileId,
+      'entity_id' => $contributionPageID,
+      'supporter_profile_id' => $this->ids['UFGroup']['pcp'],
       'target_entity_id' => 1,
       'is_approval_needed' => 1,
       'is_tellfriend_enabled' => 1,
@@ -52,23 +52,21 @@ trait CRMTraits_PCP_PCPTestTrait {
    * Create the necessary initial objects for a pcp page, then return the
    * params needed to create the pcp page.
    *
-   * @throw CRM_Core_Exception
+   * @throws CRM_Core_Exception
    */
-  public function pcpParams() {
-    $contact = CRM_Core_DAO::createTestObject('CRM_Contact_DAO_Contact');
-    $contactId = $contact->id;
-    Email::create()->setValues(['email' => 'dobby@example.org', 'contact_id' => $contactId])->execute();
-    $contribPage = CRM_Core_DAO::createTestObject('CRM_Contribute_DAO_ContributionPage');
-    $contribPageId = $contribPage->id;
+  public function pcpParams(): array {
+    $contactID = $this->individualCreate();
+    Email::create()->setValues(['email' => 'dobby@example.org', 'contact_id' => $contactID])->execute();
+    $contributionPageID = CRM_Core_DAO::createTestObject('CRM_Contribute_DAO_ContributionPage')->id;
 
     return [
-      'contact_id' => $contactId,
+      'contact_id' => $contactID,
       'status_id' => '1',
       'title' => 'My PCP',
       'intro_text' => 'Hey you, contribute now!',
       'page_text' => 'You better give more.',
       'donate_link_text' => 'Donate Now',
-      'page_id' => $contribPageId,
+      'page_id' => $contributionPageID,
       'is_notify' => TRUE,
       'is_thermometer' => 1,
       'is_honor_roll' => 1,
@@ -83,13 +81,15 @@ trait CRMTraits_PCP_PCPTestTrait {
    * @param array $params
    *
    * @return int
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function createPCPBlock(array $params):int {
     $blockParams = $this->pcpBlockParams();
     $params = array_merge($this->pcpParams(), $params);
     $params['pcp_block_id']  = PCPBlock::create()->setValues($blockParams)->execute()->first()['id'];
 
-    $pcp = CRM_PCP_BAO_PCP::create($params);
+    $pcp = CRM_PCP_BAO_PCP::writeRecord($params);
     return (int) $pcp->id;
   }
 

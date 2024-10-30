@@ -12,17 +12,15 @@
 
 namespace Civi\Api4\Event;
 
+/**
+ * @deprecated
+ */
 class Events {
 
   /**
-   * Build the database schema, allow adding of custom joins and tables.
+   * @deprecated
+   * Just use the string instead of the constant when listening for this event
    */
   const SCHEMA_MAP_BUILD = 'api.schema_map.build';
-
-  /**
-   * Add back POST_SELECT_QUERY const due to Joomla upgrade failure
-   * https://lab.civicrm.org/dev/joomla/-/issues/28#note_39487
-   */
-  const POST_SELECT_QUERY = 'api.select_query.post';
 
 }

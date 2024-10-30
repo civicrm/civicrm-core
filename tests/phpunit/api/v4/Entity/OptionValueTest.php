@@ -28,7 +28,7 @@ use Civi\Test\TransactionalInterface;
  */
 class OptionValueTest extends Api4TestBase implements TransactionalInterface {
 
-  public function testNullDefault() {
+  public function testNullDefault(): void {
     OptionGroup::create(FALSE)
       ->addValue('name', 'myTestGroup')
       ->addValue('title', 'myTestGroup')
@@ -55,12 +55,12 @@ class OptionValueTest extends Api4TestBase implements TransactionalInterface {
     $this->assertTrue(OptionValue::get(FALSE)->addWhere('id', '=', $defaultId)->execute()->first()['is_default']);
   }
 
-  public function testUpdateWeights() {
+  public function testUpdateWeights(): void {
     $getValues = function($groupName) {
       return OptionValue::get(FALSE)
         ->addWhere('option_group_id.name', '=', $groupName)
         ->addOrderBy('weight')
-        ->execute()->indexBy('value')->column('weight');
+        ->execute()->column('weight', 'value');
     };
 
     // Create 2 option groups. Control group is to ensure updating one doesn't affect the other
@@ -121,6 +121,28 @@ class OptionValueTest extends Api4TestBase implements TransactionalInterface {
     // Nothing should have changed
     $this->assertEquals([2 => 1, 3 => 2, 4 => 3, 1 => 4], $getValues('experimentalGroup'));
     $this->assertEquals([1 => 1, 2 => 2, 3 => 3, 4 => 4], $getValues('controlGroup'));
+  }
+
+  public function testEnsureOptionGroupExistsNewValue(): void {
+    OptionGroup::create(FALSE)
+      ->addValue('name', 'Bombed')
+      ->addValue('title', 'Bombed')
+      ->execute();
+    $optionGroups = OptionValue::getFields(FALSE)
+      ->addWhere('name', '=', 'option_group_id')
+      ->setLoadOptions(TRUE)
+      ->execute()->first()['options'];
+    $this->assertContains('Bombed', $optionGroups);
+
+    OptionGroup::create(FALSE)
+      ->addValue('name', 'Bombed Again')
+      ->addValue('title', 'Bombed Again')
+      ->execute();
+    $optionGroups = OptionValue::getFields(FALSE)
+      ->addWhere('name', '=', 'option_group_id')
+      ->setLoadOptions(TRUE)
+      ->execute()->first()['options'];
+    $this->assertContains('Bombed Again', $optionGroups);
   }
 
 }

@@ -42,6 +42,7 @@ class CRM_Event_Page_DashBoard extends CRM_Core_Page {
     $this->assign('actionColumn', $actionColumn);
     $this->assign('eventSummary', $eventSummary);
     $this->assign('iCal', CRM_Event_BAO_Event::getICalLinks());
+    $this->assign('isShowICalIconsInline', FALSE);
   }
 
   /**

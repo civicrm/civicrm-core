@@ -29,18 +29,16 @@ use Civi\Api4\Entity;
  */
 class CustomValueTest extends CustomTestBase {
 
-  protected $contactID;
-
   /**
    * Test CustomValue::GetFields/Get/Create/Update/Replace/Delete
    */
-  public function testCRUD() {
+  public function testCRUD(): void {
     $optionValues = ['r' => 'Red', 'g' => 'Green', 'b' => 'Blue'];
 
     $group = uniqid('groupc');
     $colorFieldName = uniqid('colorc');
     $multiFieldName = uniqid('chkbx');
-    $textFieldName = uniqid('txt');
+    $refFieldName = uniqid('txt');
 
     $customGroup = CustomGroup::create(FALSE)
       ->addValue('title', $group)
@@ -65,24 +63,27 @@ class CustomValueTest extends CustomTestBase {
       ->addValue('data_type', 'String')
       ->execute()->first();
 
-    $textField = CustomField::create(FALSE)
-      ->addValue('label', $textFieldName)
+    $refField = CustomField::create(FALSE)
+      ->addValue('label', $refFieldName)
       ->addValue('custom_group_id', $customGroup['id'])
-      ->addValue('html_type', 'Text')
-      ->addValue('data_type', 'String')
+      ->addValue('html_type', 'Autocomplete-Select')
+      ->addValue('data_type', 'EntityReference')
+      ->addValue('fk_entity', 'Address')
       ->execute()->first();
 
-    $this->contactID = $this->createTestRecord('Contact', [
+    $cid = $this->createTestRecord('Contact', [
       'first_name' => 'Johann',
       'last_name' => 'Tester',
       'contact_type' => 'Individual',
     ])['id'];
+    $address1 = $this->createTestRecord('Address')['id'];
+    $address2 = $this->createTestRecord('Address')['id'];
 
     // Ensure virtual api entity has been created
     $entity = Entity::get(FALSE)
       ->addWhere('name', '=', "Custom_$group")
       ->execute()->single();
-    $this->assertEquals(['CustomValue'], $entity['type']);
+    $this->assertEquals(['CustomValue', 'DAOEntity'], $entity['type']);
     $this->assertEquals(['id'], $entity['primary_key']);
     $this->assertEquals($customGroup['table_name'], $entity['table_name']);
     $this->assertEquals('Civi\Api4\CustomValue', $entity['class']);
@@ -121,13 +122,13 @@ class CustomValueTest extends CustomTestBase {
       [
         'custom_group' => $group,
         'type' => 'Field',
-        'name' => $textFieldName,
-        'title' => $textFieldName,
+        'name' => $refFieldName,
+        'title' => $refFieldName,
         'entity' => "Custom_$group",
         'table_name' => $customGroup['table_name'],
-        'column_name' => $textField['column_name'],
-        'data_type' => 'String',
-        'fk_entity' => NULL,
+        'column_name' => $refField['column_name'],
+        'data_type' => 'Integer',
+        'fk_entity' => 'Address',
         'serialize' => 0,
       ],
       [
@@ -137,6 +138,7 @@ class CustomValueTest extends CustomTestBase {
         'entity' => "Custom_$group",
         'table_name' => $customGroup['table_name'],
         'column_name' => 'id',
+        'nullable' => FALSE,
         'data_type' => 'Integer',
         'fk_entity' => NULL,
       ],
@@ -147,6 +149,7 @@ class CustomValueTest extends CustomTestBase {
         'table_name' => $customGroup['table_name'],
         'column_name' => 'entity_id',
         'entity' => "Custom_$group",
+        'nullable' => FALSE,
         'data_type' => 'Integer',
         'fk_entity' => 'Contact',
       ],
@@ -163,16 +166,19 @@ class CustomValueTest extends CustomTestBase {
     $created = [
       CustomValue::create($group)
         ->addValue($colorFieldName, 'g')
-        ->addValue("entity_id", $this->contactID)
+        // Test that failing to pass value as array will still serialize correctly
+        ->addValue($multiFieldName, 'r')
+        ->addValue($refFieldName, $address1)
+        ->addValue("entity_id", $cid)
         ->execute()->first(),
       CustomValue::create($group)
         ->addValue($colorFieldName . ':label', 'Red')
-        ->addValue("entity_id", $this->contactID)
+        ->addValue("entity_id", $cid)
         ->execute()->first(),
     ];
     // fetch custom values using API4 CustomValue::get
     $result = CustomValue::get($group)
-      ->addSelect('id', 'entity_id', $colorFieldName, $colorFieldName . ':label')
+      ->addSelect('id', 'entity_id', $colorFieldName, $colorFieldName . ':label', $refFieldName, $multiFieldName)
       ->addOrderBy($colorFieldName, 'ASC')
       ->execute();
 
@@ -183,13 +189,15 @@ class CustomValueTest extends CustomTestBase {
         'id' => 1,
         $colorFieldName => 'g',
         $colorFieldName . ':label' => 'Green',
-        'entity_id' => $this->contactID,
+        $multiFieldName => ['r'],
+        $refFieldName => $address1,
+        'entity_id' => $cid,
       ],
       [
         'id' => 2,
         $colorFieldName => 'r',
         $colorFieldName . ':label' => 'Red',
-        'entity_id' => $this->contactID,
+        'entity_id' => $cid,
       ],
     ];
     // match the data
@@ -202,19 +210,25 @@ class CustomValueTest extends CustomTestBase {
       }
     }
 
+    // Ensure serialization really did happen correctly in the DB
+    $serializedValue = \CRM_Core_DAO::singleValueQuery("SELECT {$multiField['column_name']} FROM {$customGroup['table_name']} WHERE id = 1");
+    $this->assertSame(\CRM_Core_DAO::VALUE_SEPARATOR . 'r' . \CRM_Core_DAO::VALUE_SEPARATOR, $serializedValue);
+
     // CASE 2: Test CustomValue::update
     // Update a records whose id is 1 and change the custom field (name = Color) value to 'Blue' from 'Green'
     CustomValue::update($group)
       ->addWhere("id", "=", 1)
       ->addValue($colorFieldName . ':label', 'Blue')
+      ->addValue($refFieldName, NULL)
       ->execute();
 
     // ensure that the value is changed for id = 1
-    $color = CustomValue::get($group)
+    $result = CustomValue::get($group)
       ->addWhere("id", "=", 1)
       ->execute()
-      ->first()[$colorFieldName];
-    $this->assertEquals('b', $color);
+      ->first();
+    $this->assertEquals('b', $result[$colorFieldName]);
+    $this->assertEquals(NULL, $result[$refFieldName]);
 
     // CASE 3: Test CustomValue::replace
     // create a second contact which will be used to replace the custom values, created earlier
@@ -226,13 +240,13 @@ class CustomValueTest extends CustomTestBase {
     // Replace all the records which was created earlier with entity_id = first contact
     //  with custom record [$colorField => 'g', 'entity_id' => $secondContactID]
     CustomValue::replace($group)
-      ->setRecords([[$colorFieldName => 'g', $multiFieldName . ':label' => ['Red', 'Green'], 'entity_id' => $secondContactID]])
-      ->addWhere('entity_id', '=', $this->contactID)
+      ->setRecords([[$colorFieldName => 'g', $multiFieldName . ':label' => ['Red', 'Green'], $refFieldName => $address2, 'entity_id' => $secondContactID]])
+      ->addWhere('entity_id', '=', $cid)
       ->execute();
 
     // Check the two records created earlier is replaced by new contact
     $result = CustomValue::get($group)
-      ->addSelect('id', 'entity_id', $colorFieldName, $colorFieldName . ':label', $multiFieldName, $multiFieldName . ':label')
+      ->addSelect('id', 'entity_id', $colorFieldName, $colorFieldName . ':label', $multiFieldName, $multiFieldName . ':label', $refFieldName)
       ->execute();
     $this->assertEquals(1, count($result));
 
@@ -243,6 +257,7 @@ class CustomValueTest extends CustomTestBase {
         $colorFieldName . ':label' => 'Green',
         $multiFieldName => ['r', 'g'],
         $multiFieldName . ':label' => ['Red', 'Green'],
+        $refFieldName => $address2,
         'entity_id' => $secondContactID,
       ],
     ];
@@ -276,16 +291,16 @@ class CustomValueTest extends CustomTestBase {
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function testEntityRefresh() {
+  public function testEntityRefresh(): void {
     $groupName = uniqid('groupc');
 
     $this->assertNotContains("Custom_$groupName", Entity::get()->execute()->column('name'));
 
-    CustomGroup::create(FALSE)
+    $customGroup = CustomGroup::create(FALSE)
       ->addValue('title', $groupName)
       ->addValue('extends', 'Contact')
       ->addValue('is_multiple', FALSE)
-      ->execute();
+      ->execute()->single();
 
     $this->assertNotContains("Custom_$groupName", Entity::get()->execute()->column('name'));
 
@@ -294,6 +309,12 @@ class CustomValueTest extends CustomTestBase {
       ->addValue('is_multiple', TRUE)
       ->execute();
     $this->assertContains("Custom_$groupName", Entity::get()->execute()->column('name'));
+
+    $links = CustomValue::getLinks($groupName, FALSE)
+      ->addValue('id', 3)
+      ->execute()->indexBy('ui_action');
+    $this->assertStringContainsString('gid=' . $customGroup['id'], $links['view']['path']);
+    $this->assertStringContainsString('recId=3', $links['view']['path']);
 
     CustomGroup::update(FALSE)
       ->addWhere('name', '=', $groupName)

@@ -1,9 +1,9 @@
 Delivered-To: my@example.com
 Received: by 10.2.13.84 with SMTP id 1234567890;
         Wed, 19 Dec 2018 10:01:11 +0100 (CET)
-Return-Path: <>
+Return-Path: <SRS0=z9mA=EY=donate.long-example.org=b.51907682.51575594.57daed525aaca713@example.org>
 From: Postmaster@example.com
-To: b.2.1.aaaaaaaaaaaaaaaa@example.com
+To: b.2.1.aaaaaaaaaaaaaaaz@example.com
 Subject: Delivery Status Notification (Failure)
 Message-ID: <abc.def.fhi@example.com>
 Date: Wed, 19 Dec 2018 10:01:07 +0100

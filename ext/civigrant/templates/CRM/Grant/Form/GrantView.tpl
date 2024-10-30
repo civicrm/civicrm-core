@@ -9,23 +9,6 @@
 *}
 {* this template is used for viewing grants *}
 <div class="crm-block crm-content-block crm-grant-view-block">
-    <div class="crm-submit-buttons">
-        {if call_user_func(array('CRM_Core_Permission','check'), 'edit grants')}
-            {assign var='urlParams' value="reset=1&id=$id&cid=$contactId&action=update&context=$context"}
-            {if ( $context eq 'fulltext' || $context eq 'search' ) && $searchKey}
-                {assign var='urlParams' value="reset=1&id=$id&cid=$contactId&action=update&context=$context&key=$searchKey"}
-            {/if}
-            <a class="button" href="{crmURL p='civicrm/contact/view/grant' q=$urlParams}" accesskey="e"><span><i class="crm-i fa-pencil" aria-hidden="true"></i> {ts}Edit{/ts}</span></a>
-        {/if}
-        {if call_user_func(array('CRM_Core_Permission','check'), 'delete in CiviGrant')}
-          {assign var='urlParams' value="reset=1&id=$id&cid=$contactId&action=delete&context=$context"}
-            {if ( $context eq 'fulltext' || $context eq 'search' ) && $searchKey}
-                {assign var='urlParams' value="reset=1&id=$id&cid=$contactId&action=delete&context=$context&key=$searchKey"}
-            {/if}
-            <a class="button" href="{crmURL p='civicrm/contact/view/grant' q=$urlParams}"><span><i class="crm-i fa-trash" aria-hidden="true"></i> {ts}Delete{/ts}</span></a>
-        {/if}
-        {include file="CRM/common/formButtons.tpl" location="top"}
-    </div>
     <table class="crm-info-panel">
         <tr class="crm-grant-view-form-block-name"><td class="label">{ts}Name{/ts}</td><td class="bold">{$displayName}</td></tr>
         <tr class="crm-grant-view-form-block-status_id"><td class="label">{ts}Grant Status{/ts}</td> <td>{$grantStatus}</td></tr>
@@ -48,19 +31,12 @@
     {include file="CRM/Custom/Page/CustomDataView.tpl"}
     <div class="crm-submit-buttons">
         {if call_user_func(array('CRM_Core_Permission','check'), 'edit grants')}
-            {assign var='urlParams' value="reset=1&id=$id&cid=$contactId&action=update&context=$context"}
-          {if ( $context eq 'fulltext' || $context eq 'search' ) && $searchKey}
-              {assign var='urlParams' value="reset=1&id=$id&cid=$contactId&action=update&context=$context&key=$searchKey"}
-          {/if}
-            <a class="button" href="{crmURL p='civicrm/contact/view/grant' q=$urlParams}" accesskey="e"><span><i class="crm-i fa-pencil" aria-hidden="true"></i> {ts}Edit{/ts}</span></a>
+            {assign var='urlParams' value="reset=1&id=$id&action=update"}
+            <a class="button" href="{crmURL p='civicrm/grant/add' q=$urlParams}" accesskey="e"><span><i class="crm-i fa-pencil" aria-hidden="true"></i> {ts}Edit{/ts}</span></a>
         {/if}
         {if call_user_func(array('CRM_Core_Permission','check'), 'delete in CiviGrant')}
-        {assign var='urlParams' value="reset=1&id=$id&cid=$contactId&action=delete&context=$context"}
-          {if ( $context eq 'fulltext' || $context eq 'search' ) && $searchKey}
-              {assign var='urlParams' value="reset=1&id=$id&cid=$contactId&action=delete&context=$context&key=$searchKey"}
-          {/if}
-            <a class="button" href="{crmURL p='civicrm/contact/view/grant' q=$urlParams}"><span><i class="crm-i fa-trash" aria-hidden="true"></i> {ts}Delete{/ts}</span></a>
+            {assign var='urlParams' value="reset=1&id=$id&action=delete"}
+            <a class="button" href="{crmURL p='civicrm/grant/add' q=$urlParams}"><span><i class="crm-i fa-trash" aria-hidden="true"></i> {ts}Delete{/ts}</span></a>
         {/if}
-        {include file="CRM/common/formButtons.tpl" location="bottom"}
     </div>
 </div>

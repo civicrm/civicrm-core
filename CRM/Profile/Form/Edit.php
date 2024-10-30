@@ -25,7 +25,6 @@
  */
 class CRM_Profile_Form_Edit extends CRM_Profile_Form {
   protected $_postURL = NULL;
-  protected $_cancelURL = NULL;
   protected $_errorURL = NULL;
   protected $_context;
   protected $_blockNo;
@@ -35,14 +34,9 @@ class CRM_Profile_Form_Edit extends CRM_Profile_Form {
   /**
    * Pre processing work done here.
    *
-   * @param
-   *
    */
   public function preProcess() {
     $this->_mode = CRM_Profile_Form::MODE_CREATE;
-
-    $this->_onPopupClose = CRM_Utils_Request::retrieve('onPopupClose', 'String', $this);
-    $this->assign('onPopupClose', $this->_onPopupClose);
 
     //set the context for the profile
     $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
@@ -59,6 +53,7 @@ class CRM_Profile_Form_Edit extends CRM_Profile_Form {
     $this->assign('context', $this->_context);
 
     if ($this->_blockNo) {
+      CRM_Core_Error::deprecatedWarning('code believed to be unreachable');
       $this->assign('blockNo', $this->_blockNo);
       $this->assign('prefix', $this->_prefix);
     }
@@ -150,9 +145,10 @@ SELECT module,is_reserved
 
     $this->assign('recentlyViewed', FALSE);
 
+    $cancelURL = '';
     if ($this->_context !== 'dialog') {
-      $this->_postURL = $this->_ufGroup['post_URL'];
-      $this->_cancelURL = $this->_ufGroup['cancel_URL'];
+      $this->_postURL = $this->_ufGroup['post_url'];
+      $cancelURL = $this->_ufGroup['cancel_url'];
 
       $gidString = $this->_gid;
       if (!empty($this->_profileIds)) {
@@ -176,15 +172,15 @@ SELECT module,is_reserved
         }
       }
 
-      if (!$this->_cancelURL) {
-        $this->_cancelURL = CRM_Utils_System::url('civicrm/profile',
+      if (!$cancelURL) {
+        $cancelURL = CRM_Utils_System::url('civicrm/profile',
           "reset=1&gid={$gidString}"
         );
       }
 
       // we do this gross hack since qf also does entity replacement
       $this->_postURL = str_replace('&amp;', '&', ($this->_postURL ?? ''));
-      $this->_cancelURL = str_replace('&amp;', '&', ($this->_cancelURL ?? ''));
+      $cancelURL = str_replace('&amp;', '&', ($cancelURL ?? ''));
 
       // also retain error URL if set
       $this->_errorURL = $_POST['errorURL'] ?? NULL;
@@ -201,11 +197,11 @@ SELECT module,is_reserved
 
     parent::buildQuickForm();
 
-    $this->assign('cancelURL', $this->_cancelURL);
+    $this->assign('cancelURL', $cancelURL);
 
     $cancelButtonValue = !empty($this->_ufGroup['cancel_button_text']) ? $this->_ufGroup['cancel_button_text'] : ts('Cancel');
     $this->assign('cancelButtonText', $cancelButtonValue);
-    $this->assign('includeCancelButton', CRM_Utils_Array::value('add_cancel_button', $this->_ufGroup));
+    $this->assign('includeCancelButton', $this->_ufGroup['add_cancel_button'] ?? FALSE);
 
     if (($this->_multiRecord & CRM_Core_Action::DELETE) && $this->_recordExists) {
       $this->_deleteButtonName = $this->getButtonName('upload', 'delete');

@@ -33,6 +33,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact implemen
    * @deprecated
    */
   public static function add(array $params): CRM_Contact_DAO_GroupContact {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return self::writeRecord($params);
   }
 
@@ -45,10 +46,13 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact implemen
    * @noinspection UnknownInspectionInspection
    */
   public static function self_hook_civicrm_post(PostEvent $event): void {
-    if (is_object($event->object) && in_array($event->action, ['create', 'edit'], TRUE)) {
+    if (is_object($event->object) && in_array($event->action, ['create', 'edit', 'delete'], TRUE)) {
       // Lookup existing info for the sake of subscription history
       if ($event->action === 'edit') {
         $event->object->find(TRUE);
+      }
+      if ($event->action === 'delete') {
+        $event->object->status = 'Deleted';
       }
 
       try {
@@ -60,6 +64,8 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact implemen
             'group_id' => $event->object->group_id,
             'contact_id' => $event->object->contact_id,
             'status' => $event->object->status,
+            'method' => $event->params['method'] ?? 'API',
+            'tracking' => $event->params['tracking'] ?? NULL,
           ],
         ])->execute();
       }
@@ -126,14 +132,9 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact implemen
     if (empty($contactIds) || empty($groupId)) {
       return [];
     }
-
-    CRM_Utils_Hook::pre('create', 'GroupContact', $groupId, $contactIds);
-
     $result = self::bulkAddContactsToGroup($contactIds, $groupId, $method, $status, $tracking);
     CRM_Contact_BAO_GroupContactCache::invalidateGroupContactCache($groupId);
     CRM_Contact_BAO_Contact_Utils::clearContactCaches();
-
-    CRM_Utils_Hook::post('create', 'GroupContact', $groupId, $contactIds);
 
     return [count($contactIds), $result['count_added'], $result['count_not_added']];
   }
@@ -202,14 +203,15 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact implemen
         CRM_Contact_BAO_GroupContactCache::invalidateGroupContactCache($groupId);
       }
       else {
+        // 'Removed' means we add a history record and ensure the GroupContact record exists with a 'Removed' status.
         $groupContact = new CRM_Contact_DAO_GroupContact();
         $groupContact->group_id = $groupId;
         $groupContact->contact_id = $contactId;
-        // check if the selected contact id already a member, or if this is
+        // check if the selected contact is already listed as Removed
         // an opt-out of a smart group.
         // if not a member remove to groupContact else keep the count of contacts that are not removed
-        if ($groupContact->find(TRUE) || $group->saved_search_id) {
-          // remove the contact from the group
+        if (($groupContact->find(TRUE) || $group->saved_search_id) && $groupContact->status !== $status) {
+          // remove the contact from the group.
           $numContactsRemoved++;
         }
         else {
@@ -335,7 +337,9 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact implemen
                     civicrm_group.id as group_id,
                     civicrm_group.is_hidden as is_hidden,
                     civicrm_subscription_history.date as date,
-                    civicrm_subscription_history.method as method';
+                    civicrm_subscription_history.method as method,
+                    civicrm_group.saved_search_id as saved_search_id';
+
     }
 
     $where = " WHERE contact_a.id = %1 AND civicrm_group.is_active = 1";
@@ -400,6 +404,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact implemen
         $values[$id]['title'] = ($public && !empty($group->group_public_title) ? $group->group_public_title : $dao->group_title);
         $values[$id]['visibility'] = $dao->visibility;
         $values[$id]['is_hidden'] = $dao->is_hidden;
+        $values[$id]['saved_search_id'] = $dao->saved_search_id;
         switch ($dao->status) {
           case 'Added':
             $prefix = 'in_';
@@ -415,11 +420,26 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact implemen
         $values[$id][$prefix . 'date'] = $dao->date;
         $values[$id][$prefix . 'method'] = $dao->method;
         if ($status == 'Removed') {
-          $query = "SELECT `date` as `date_added` FROM civicrm_subscription_history WHERE id = (SELECT max(id) FROM civicrm_subscription_history WHERE contact_id = %1 AND status = \"Added\" AND group_id = $dao->group_id )";
-          $dateDAO = CRM_Core_DAO::executeQuery($query, $params);
-          if ($dateDAO->fetch()) {
-            $values[$id]['date_added'] = $dateDAO->date_added;
-          }
+          $subscriptionHistory = \Civi\Api4\SubscriptionHistory::get()
+            ->addSelect('date', 'status')
+            ->addWhere('contact_id', '=', $contactId)
+            ->addWhere('group_id', '=', $values[$id]['group_id'])
+            ->addWhere('status', 'IN', ['Added', 'Deleted'])
+            ->addOrderBy('date', 'DESC')
+            ->setLimit(1)
+            ->execute()->first();
+          $values[$id]['date_added'] = ($subscriptionHistory && $subscriptionHistory['status'] === 'Added') ? $subscriptionHistory['date'] : NULL;
+
+          $subscriptionRemovedHistory = \Civi\Api4\SubscriptionHistory::get()
+            ->addSelect('date')
+            ->addWhere('date', '>', ($subscriptionHistory) ? $subscriptionHistory['date'] : NULL)
+            ->addWhere('contact_id', '=', $contactId)
+            ->addWhere('group_id', '=', $values[$id]['group_id'])
+            ->addWhere('status', '=', 'Removed')
+            ->addOrderBy('date', 'ASC')
+            ->setLimit(1)
+            ->execute()->first();
+          $values[$id]['out_date'] = ($subscriptionRemovedHistory) ? $subscriptionRemovedHistory['date'] : $values[$id]['out_date'];
         }
       }
       return $values;
@@ -448,8 +468,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact implemen
         LEFT JOIN civicrm_subscription_history
           ON ( civicrm_group_contact.contact_id = civicrm_subscription_history.contact_id
           AND civicrm_subscription_history.group_id = {$groupID} )";
-      $where = "AND civicrm_subscription_history.method ='Email'";
-      $orderBy = "ORDER BY civicrm_subscription_history.id DESC";
+      $orderBy = "ORDER BY civicrm_subscription_history.id DESC LIMIT 1";
     }
     $query = "
 SELECT    *
@@ -457,7 +476,6 @@ SELECT    *
           $leftJoin
   WHERE civicrm_group_contact.contact_id = %1
   AND civicrm_group_contact.group_id = %2
-          $where
           $orderBy
 ";
 
@@ -500,7 +518,7 @@ SELECT    *
     // As of Aug 2020 it's not called from anywhere so we can remove the below code after some time
 
     CRM_Core_Error::deprecatedFunctionWarning('Use the GroupContact API');
-    return self::add($params);
+    return self::writeRecord($params);
   }
 
   /**
@@ -689,23 +707,28 @@ AND    contact_id IN ( $contactStr )
       }
 
       $gcValues = $shValues = [];
-      foreach ($input as $cid) {
+      foreach ($input as $key => $cid) {
         if (isset($presentIDs[$cid])) {
+          unset($input[$key]);
           $numContactsNotAdded++;
-          continue;
         }
-
-        $gcValues[] = "( $groupID, $cid, '$status' )";
-        $shValues[] = "( $groupID, $cid, '$date', '$method', '$status', '$tracking' )";
-        $numContactsAdded++;
+        else {
+          $gcValues[] = "( $groupID, $cid, '$status' )";
+          $shValues[] = "( $groupID, $cid, '$date', '$method', '$status', '$tracking' )";
+          $numContactsAdded++;
+        }
       }
 
       if (!empty($gcValues)) {
+        CRM_Utils_Hook::pre('create', 'GroupContact', $groupID, $input);
+
         $cgSQL = $contactGroupSQL . implode(",\n", $gcValues);
         CRM_Core_DAO::executeQuery($cgSQL);
 
         $shSQL = $subscriptioHistorySQL . implode(",\n", $shValues);
         CRM_Core_DAO::executeQuery($shSQL);
+
+        CRM_Utils_Hook::post('create', 'GroupContact', $groupID, $input);
       }
     }
 
@@ -713,27 +736,25 @@ AND    contact_id IN ( $contactStr )
   }
 
   /**
-   * Get options for a given field.
-   * @see CRM_Core_DAO::buildOptions
+   * Legacy option getter
+   *
+   * @deprecated
    *
    * @param string $fieldName
    * @param string $context
-   * @see CRM_Core_DAO::buildOptionsContext
    * @param array $props
-   *   whatever is known about this dao object.
    *
    * @return array|bool
    */
   public static function buildOptions($fieldName, $context = NULL, $props = []) {
-    $options = CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, [], $context);
-
-    // Sort group list by hierarchy
-    // TODO: This will only work when api.entity is "group_contact". What about others?
+    // Legacy formatting used by some forms
+    // TODO: Do any forms still use this? If not, remove this function.
     if (($fieldName == 'group' || $fieldName == 'group_id') && ($context == 'search' || $context == 'create')) {
-      $options = CRM_Contact_BAO_Group::getGroupsHierarchy($options, NULL, '- ', TRUE);
+      $options = CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, [], $context);
+      return CRM_Contact_BAO_Group::getGroupsHierarchy($options, NULL, '- ', TRUE);
     }
 
-    return $options;
+    return parent::buildOptions($fieldName, $context, $props);
   }
 
 }

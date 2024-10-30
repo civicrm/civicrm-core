@@ -33,26 +33,12 @@ trait OptionsSpecTrait {
   /**
    * @var callable
    */
-  private $optionsCallback;
+  public $optionsCallback;
 
   /**
-   * @param array $values
-   * @param array|bool $return
-   * @param bool $checkPermissions
-   *
-   * @return array
+   * @var array
    */
-  public function getOptions($values = [], $return = TRUE, $checkPermissions = TRUE) {
-    if (!isset($this->options)) {
-      if ($this->optionsCallback) {
-        $this->options = ($this->optionsCallback)($this, $values, $return, $checkPermissions);
-      }
-      else {
-        $this->options = FALSE;
-      }
-    }
-    return $this->options;
-  }
+  public $optionsCallbackParams = [];
 
   /**
    * @param array|bool $options
@@ -76,11 +62,15 @@ trait OptionsSpecTrait {
 
   /**
    * @param callable $callback
-   *
+   *   Function to be called, will receive the following arguments:
+   *   ($this, $values, $returnFormat, $checkPermissions, $params)
+   * @param array $params
+   *   Array of optional extra data; sent as 5th argument to the callback
    * @return $this
    */
-  public function setOptionsCallback($callback) {
+  public function setOptionsCallback($callback, array $params = []) {
     $this->optionsCallback = $callback;
+    $this->optionsCallbackParams = $params;
     return $this;
   }
 

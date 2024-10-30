@@ -1,0 +1,13 @@
+<af-form ctrl="afform">
+  <af-entity password="password123haha" type="User" name="User1" label="User 1" actions="{create: true, update: true}" security="RBAC" url-autofill="1" />
+  <fieldset af-fieldset="User1" class="af-container" af-title="User">
+    <af-field name="roles" />
+    <af-field name="username" />
+    <af-field name="contact_id" defn="{required: true, input_attrs: {quickAdd: ['civicrm/quick-add/Individual']}}" />
+    <af-field name="uf_name" />
+    <af-field name="is_active" />
+    <af-field name="timezone" defn="{help_pre: ts('Set the timezone of the user. Date and times will be shown in this timezone. You can also leave it empty to use the default system timezone (which is a server setting).'), input_attrs: {placeholder: ts('Server default timezone')}}" />
+    <af-field name="language" defn="{help_pre: ts('Set the user interface language of this user. You can also leave it empty to use the default system language.'), input_attrs: {placeholder: ts('System default language')}}" />
+  </fieldset>
+  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
+</af-form>

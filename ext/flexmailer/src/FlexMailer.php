@@ -77,12 +77,12 @@ class FlexMailer {
    *   Array(string $event => string $class).
    */
   public static function getEventTypes() {
-    return array(
+    return [
       self::EVENT_RUN => 'Civi\\FlexMailer\\Event\\RunEvent',
       self::EVENT_WALK => 'Civi\\FlexMailer\\Event\\WalkBatchesEvent',
       self::EVENT_COMPOSE => 'Civi\\FlexMailer\\Event\\ComposeBatchEvent',
       self::EVENT_SEND => 'Civi\\FlexMailer\\Event\\SendBatchEvent',
-    );
+    ];
   }
 
   /**
@@ -112,13 +112,13 @@ class FlexMailer {
    *   TRUE if delivery completed.
    */
   public static function createAndRun($job, $deprecatedMessageMailer, $deprecatedTestParams) {
-    $flexMailer = new \Civi\FlexMailer\FlexMailer(array(
+    $flexMailer = new \Civi\FlexMailer\FlexMailer([
       'mailing' => \CRM_Mailing_BAO_Mailing::findById($job->mailing_id),
       'job' => $job,
       'attachments' => \CRM_Core_BAO_File::getEntityFile('civicrm_mailing', $job->mailing_id),
       'deprecatedMessageMailer' => $deprecatedMessageMailer,
       'deprecatedTestParams' => $deprecatedTestParams,
-    ));
+    ]);
     return $flexMailer->run();
   }
 
@@ -131,9 +131,9 @@ class FlexMailer {
    *     - attachments: array
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
    */
-  public function __construct($context = array(), EventDispatcherInterface $dispatcher = NULL) {
+  public function __construct($context = [], EventDispatcherInterface $dispatcher = NULL) {
     $this->context = $context;
-    $this->dispatcher = $dispatcher ? $dispatcher : \Civi::service('dispatcher');
+    $this->dispatcher = $dispatcher ?: \Civi::service('dispatcher');
   }
 
   /**
@@ -168,7 +168,7 @@ class FlexMailer {
    *   List of error messages
    */
   public function validate() {
-    $errors = array();
+    $errors = [];
     if (empty($this->context['mailing'])) {
       $errors['mailing'] = 'Missing \"mailing\"';
     }

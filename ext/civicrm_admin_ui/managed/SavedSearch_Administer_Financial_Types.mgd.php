@@ -1,11 +1,16 @@
 <?php
 use CRM_CivicrmAdminUi_ExtensionUtil as E;
 
+// Temporary check can be removed when moving this file to the civi_contribute extension.
+if (!CRM_Core_Component::isEnabled('CiviContribute')) {
+  return [];
+}
+
 return [
   [
     'name' => 'SavedSearch_Administer_Financial_Types',
     'entity' => 'SavedSearch',
-    'cleanup' => 'unused',
+    'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
@@ -54,12 +59,15 @@ return [
         'expires_date' => NULL,
         'description' => NULL,
       ],
+      'match' => [
+        'name',
+      ],
     ],
   ],
   [
     'name' => 'SavedSearch_Financial_Types_SearchDisplay_Financial_Types_Table_1',
     'entity' => 'SearchDisplay',
-    'cleanup' => 'unused',
+    'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
@@ -69,13 +77,17 @@ return [
         'saved_search_id.name' => 'Administer_Financial_Types',
         'type' => 'table',
         'settings' => [
-          'actions' => FALSE,
+          'actions' => TRUE,
           'limit' => 50,
           'classes' => [
             'table',
             'table-striped',
           ],
-          'pager' => [],
+          'pager' => [
+            'show_count' => TRUE,
+            'expose_limit' => TRUE,
+            'hide_single' => TRUE,
+          ],
           'placeholder' => 5,
           'sort' => [
             [
@@ -144,6 +156,13 @@ return [
                   'join' => '',
                   'target' => '',
                 ],
+              ],
+              'type' => 'buttons',
+              'alignment' => 'text-right',
+            ],
+            [
+              'size' => 'btn-xs',
+              'links' => [
                 [
                   'icon' => 'fa-pencil',
                   'text' => E::ts('Edit'),
@@ -153,6 +172,24 @@ return [
                   'action' => 'update',
                   'join' => '',
                   'target' => 'crm-popup',
+                ],
+                [
+                  'task' => 'enable',
+                  'entity' => 'FinancialType',
+                  'target' => 'crm-popup',
+                  'icon' => 'fa-toggle-on',
+                  'text' => E::ts('Enable'),
+                  'style' => 'default',
+                  'condition' => [],
+                ],
+                [
+                  'task' => 'disable',
+                  'entity' => 'FinancialType',
+                  'target' => 'crm-popup',
+                  'icon' => 'fa-toggle-off',
+                  'text' => E::ts('Disable'),
+                  'style' => 'default',
+                  'condition' => [],
                 ],
                 [
                   'icon' => 'fa-trash',
@@ -165,14 +202,20 @@ return [
                   'target' => 'crm-popup',
                 ],
               ],
-              'type' => 'buttons',
+              'type' => 'menu',
+              'icon' => 'fa-bars',
               'alignment' => 'text-right',
             ],
           ],
-          'addButton' => [
-            'path' => 'civicrm/admin/financial/financialType/edit?reset=1&action=add',
-            'text' => E::ts('Add Financial Type'),
-            'icon' => 'fa-plus',
+          'toolbar' => [
+            [
+              'entity' => 'FinancialType',
+              'action' => 'add',
+              'target' => 'crm-popup',
+              'style' => 'primary',
+              'text' => E::ts('Add Financial Type'),
+              'icon' => 'fa-plus',
+            ],
           ],
           'cssRules' => [
             [
@@ -184,6 +227,10 @@ return [
           ],
         ],
         'acl_bypass' => FALSE,
+      ],
+      'match' => [
+        'name',
+        'saved_search_id',
       ],
     ],
   ],

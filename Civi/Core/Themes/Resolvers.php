@@ -51,7 +51,7 @@ class Resolvers {
     $file = $res->filterMinify($theme['ext'], $file);
 
     if ($res->getPath($theme['ext'], $file)) {
-      return array($res->getUrl($theme['ext'], $file, TRUE));
+      return [$res->getUrl($theme['ext'], $file, TRUE)];
     }
     else {
       return Civi\Core\Themes::PASSTHRU;
@@ -75,7 +75,7 @@ class Resolvers {
    */
   public static function fallback($themes, $themeKey, $cssExt, $cssFile) {
     $res = Civi::resources();
-    return array($res->getUrl($cssExt, $cssFile, TRUE));
+    return [$res->getUrl($cssExt, $cssFile, TRUE)];
   }
 
 }

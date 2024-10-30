@@ -18,34 +18,39 @@
 /**
  * This class contain function for IM handling
  */
-class CRM_Core_BAO_IM extends CRM_Core_DAO_IM {
+class CRM_Core_BAO_IM extends CRM_Core_DAO_IM implements Civi\Core\HookInterface {
   use CRM_Contact_AccessTrait;
 
   /**
-   * Create or update IM record.
+   * @deprecated
    *
    * @param array $params
-   *
-   * @return \CRM_Core_DAO|\CRM_Core_DAO_IM
-   * @throws \CRM_Core_Exception
+   * @return CRM_Core_DAO_IM
+   * @throws CRM_Core_Exception
    */
   public static function create($params) {
-    CRM_Core_BAO_Block::handlePrimary($params, __CLASS__);
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return self::writeRecord($params);
   }
 
   /**
-   * Create or update IM record.
-   *
+   * Event fired before modifying an IM.
+   * @param \Civi\Core\Event\PreEvent $event
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if (in_array($event->action, ['create', 'edit'])) {
+      CRM_Core_BAO_Block::handlePrimary($event->params, __CLASS__);
+    }
+  }
+
+  /**
    * @deprecated
    *
    * @param array $params
-   *
-   * @return \CRM_Core_DAO|\CRM_Core_DAO_IM
-   * @throws \CRM_Core_Exception
+   * @return CRM_Core_DAO_IM
+   * @throws CRM_Core_Exception
    */
   public static function add($params) {
-    CRM_Core_Error::deprecatedFunctionWarning('use the v4 api');
     return self::create($params);
   }
 
@@ -163,6 +168,7 @@ ORDER BY cim.is_primary DESC, im_id ASC ";
    * @return bool
    */
   public static function del($id) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     return (bool) self::deleteRecord(['id' => $id]);
   }
 

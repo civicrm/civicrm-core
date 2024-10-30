@@ -109,7 +109,7 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
         }
       }
       else {
-        if (CRM_Utils_Array::value('default_value', $fieldDefaults) == CRM_Utils_Array::value('value', $defaults)) {
+        if (($fieldDefaults['default_value'] ?? NULL) == CRM_Utils_Array::value('value', $defaults)) {
           $defaults['default_value'] = 1;
         }
       }

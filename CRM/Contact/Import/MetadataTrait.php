@@ -5,15 +5,20 @@
  *
  * Trait for handling contact import specific metadata so it
  * does not need to be passed from one form to the next.
+ *
+ * @deprecated since 5.69 will be removed around 5.75
  */
 trait CRM_Contact_Import_MetadataTrait {
 
   /**
    * Get metadata for contact importable fields.
    *
+   * @deprecated since 5.69 will be removed around 5.75
+   *
    * @return array
    */
   protected function getContactImportMetadata(): array {
+    CRM_Core_Error::deprecatedWarning('use apiv4');
     $cacheKey = 'importable_contact_field_metadata' . $this->getContactType() . $this->getContactSubType();
     if (Civi::cache('fields')->has($cacheKey)) {
       return Civi::cache('fields')->get($cacheKey);
@@ -37,7 +42,7 @@ trait CRM_Contact_Import_MetadataTrait {
     }
 
     foreach ($this->getRelationships() as $key => $var) {
-      list($type) = explode('_', $key);
+      [$type] = explode('_', $key);
       $relationshipType[$key]['title'] = $var;
       $relationshipType[$key]['headerPattern'] = '/' . preg_quote($var, '/') . '/';
       $relationshipType[$key]['import'] = TRUE;
@@ -60,8 +65,11 @@ trait CRM_Contact_Import_MetadataTrait {
    * Get sorted available relationships.
    *
    * @return array
+   *
+   * @deprecated since 5.69 will be removed around 5.75
    */
   protected function getRelationships(): array {
+    CRM_Core_Error::deprecatedWarning('use apiv4');
     $cacheKey = 'importable_contact_relationship_field_metadata' . $this->getContactType() . $this->getContactSubType();
     if (Civi::cache('fields')->has($cacheKey)) {
       return Civi::cache('fields')->get($cacheKey);
@@ -81,19 +89,23 @@ trait CRM_Contact_Import_MetadataTrait {
    *
    * We should do this work on the form layer.
    *
-   * @deprecated
+   * @deprecated will be removed around 5.75
    * @return array
    */
   public function getHeaderPatterns(): array {
+    CRM_Core_Error::deprecatedWarning('use apiv4');
     return CRM_Utils_Array::collect('headerPattern', $this->getContactImportMetadata());
   }
 
   /**
    * Get an array of header patterns for importable keys.
    *
+   * @deprecated since 5.69 will be removed around 5.75
+   *
    * @return array
    */
   public function getFieldTitles() {
+    CRM_Core_Error::deprecatedWarning('use apiv4');
     return CRM_Utils_Array::collect('title', $this->getContactImportMetadata());
   }
 

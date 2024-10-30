@@ -44,10 +44,6 @@ class Format extends \Civi\Core\Service\AutoService {
     if (!$currency) {
       $currency = Civi::settings()->get('defaultCurrency');
     }
-    if (!isset($locale)) {
-      global $civicrmLocale;
-      $locale = $civicrmLocale->moneyFormat ?? (Civi::settings()->get('format_locale') ?? CRM_Core_I18n::getLocale());
-    }
     $currencyObject = CRM_Utils_Money::getCurrencyObject($currency);
     $money = Money::of($amount, $currencyObject, NULL, RoundingMode::HALF_UP);
     $formatter = $this->getMoneyFormatter($currency, $locale);
@@ -92,7 +88,7 @@ class Format extends \Civi\Core\Service\AutoService {
    * @noinspection PhpDocMissingThrowsInspection
    * @noinspection PhpUnhandledExceptionInspection
    */
-  public function moneyNumber($amount, string $currency, $locale): string {
+  public function moneyNumber($amount, string $currency, $locale = NULL): string {
     if (($amount = $this->checkAndConvertAmount($amount)) === '') {
       return '';
     }
@@ -195,9 +191,7 @@ class Format extends \Civi\Core\Service\AutoService {
   }
 
   /**
-   * Get the money formatter for when we are using configured thousand separators.
-   *
-   * Our intent is to phase out these settings in favour of deriving them from the locale.
+   * Get the cached money formatter.
    *
    * @param string|null $currency
    * @param string|null $locale
@@ -215,7 +209,10 @@ class Format extends \Civi\Core\Service\AutoService {
     if (!$currency) {
       $currency = Civi::settings()->get('defaultCurrency');
     }
-    $locale = $locale ?: \Civi\Core\Locale::detect()->moneyFormat;
+    if (!isset($locale)) {
+      global $civicrmLocale;
+      $locale = $civicrmLocale->moneyFormat ?? (Civi::settings()->get('format_locale') ?? CRM_Core_I18n::getLocale());
+    }
 
     $cacheKey = __CLASS__ . $currency . '_' . $locale . '_' . $style . (!empty($attributes) ? md5(json_encode($attributes)) : '');
     if (!isset(\Civi::$statics[$cacheKey])) {

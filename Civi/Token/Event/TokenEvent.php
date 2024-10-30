@@ -1,13 +1,13 @@
 <?php
 namespace Civi\Token\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Civi\Core\Event\GenericHookEvent;
 
 /**
  * Class TokenListEvent
  * @package Civi\Token\Event
  */
-class TokenEvent extends Event {
+class TokenEvent extends GenericHookEvent {
 
   protected $tokenProcessor;
 

@@ -22,7 +22,7 @@
     {include file="CRM/Contact/Form/GroupContact.tpl"}
   {/if}
 
-  {if $groupIn }
+  {if $groupIn}
     <div class="ht-one"></div>
     <h3>{ts}Regular Groups{/ts}</h3>
     <div class="description">{ts 1=$displayName}%1 has joined or been added to these group(s).{/ts}</div>
@@ -62,17 +62,14 @@
   {if $contactSmartGroupSettings neq 3}
     <div class="spacer" style="height: 1.5em;"></div>
     <div class="accordion ui-accordion ui-widget ui-helper-reset">
-      <div class="crm-accordion-wrapper crm-ajax-accordion crm-smartgroup-accordion {if $contactSmartGroupSettings eq 1}collapsed{/if}">
-        <div class="crm-accordion-header" id="crm-contact_smartgroup" contact_id="{$contactId}">
+      <details class="crm-accordion-bold crm-ajax-accordion crm-smartgroup-accordion" {if $contactSmartGroupSettings eq 1}{else}open{/if}>
+        <summary  id="crm-contact_smartgroup" contact_id="{$contactId}">
           {ts}Smart Groups{/ts}
-        </div>
-        <!-- /.crm-accordion-header -->
+        </summary>
         <div class="crm-accordion-body">
           <div class="crm-contact_smartgroup" style="min-height: 3em;"></div>
         </div>
-        <!-- /.crm-accordion-body -->
-      </div>
-      <!-- /.crm-accordion-wrapper -->
+      </details>
     </div>
   {/if}
 
@@ -115,8 +112,8 @@
 
   {if $groupOut}
     <div class="ht-one"></div>
-    <h3 class="status-removed">{ts}Past Groups{/ts}</h3>
-    <div class="description">{ts 1=$displayName}%1 is no longer part of these group(s).{/ts}</div>
+    <h3 class="status-removed">{ts}Removed Groups{/ts}</h3>
+    <div class="description">{ts 1=$displayName}%1 has been removed from these group(s).{/ts}</div>
     {strip}
       <table id="past_group" class="display">
         <thead>
@@ -125,6 +122,7 @@
           <th>{ts}Status{/ts}</th>
           <th>{ts}Date Added{/ts}</th>
           <th>{ts}Date Removed{/ts}</th>
+          <th>{ts}Actions{/ts} {help id='actions' file='CRM/Contact/Page/View/GroupContact.hlp'}</th>
           <th></th>
         </tr>
         </thead>
@@ -132,17 +130,37 @@
           <tr id="group_contact-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"}">
             <td class="bold">
               <a href="{crmURL p='civicrm/group/search' q="reset=1&force=1&context=smog&gid=`$row.group_id`"}">
-                {$row.title}
+                {if $row.saved_search_id}* {/if}{$row.title}
               </a>
             </td>
             <td class="status-removed">{ts 1=$row.out_method}Removed (by %1){/ts}</td>
             <td data-order="{$row.date_added}">{$row.date_added|crmDate}</td>
             <td data-order="{$row.out_date}">{$row.out_date|crmDate}</td>
-            <td>{if $permission EQ 'edit'}
+            <td>
+              {if $permission EQ 'edit'}
+                {if $row.saved_search_id}
+                <a class="action-item crm-hover-button" href="#Added" title="{ts 1=$displayName 2=$row.title}Add %1 manually into %2, overriding smart group critera?{/ts}">
+                  {ts}Manual Add{/ts}
+                </a>
+                {else}
                 <a class="action-item crm-hover-button" href="#Added" title="{ts 1=$displayName 2=$row.title}Add %1 back into %2?{/ts}">
-                  {ts}Rejoin Group{/ts}</a>
-              <a class="action-item crm-hover-button" href="#Deleted" title="{ts 1=$displayName 2=$row.title}Delete %1 from %2? (this group will no longer be listed under Past Groups).{/ts}">
-                {ts}Delete{/ts}</a>{/if}
+                  {ts}Rejoin Group{/ts}
+                </a>
+                {/if}
+              {/if}
+            </td>
+            <td>
+              {if $permission EQ 'edit'}
+                {if $row.saved_search_id}
+                <a class="action-item crm-hover-button" href="#Deleted" title="{ts 1=$displayName 2=$row.title}Delete %1 from %2?{/ts} {ts}They will be in the smart group or not based on the smart group criteria.{/ts}">
+                  {ts}Delete{/ts}
+                </a>
+                {else}
+                <a class="action-item crm-hover-button" href="#Deleted" title="{ts 1=$displayName 2=$row.title}Delete %1 from %2?{/ts} {ts}This group will no longer be listed under Removed Groups.{/ts}">
+                  {ts}Delete{/ts}
+                </a>
+                {/if}
+              {/if}
             </td>
           </tr>
         {/foreach}
@@ -164,8 +182,8 @@
       }
     }
     // bind first click of accordion header to load crm-accordion-body with snippet
-    $('.view-contact-groups .crm-ajax-accordion.collapsed .crm-accordion-header').one('click', loadPanes);
-    $('.view-contact-groups .crm-ajax-accordion:not(.collapsed) .crm-accordion-header').each(loadPanes);
+    $('.view-contact-groups .crm-ajax-accordion:not([open]) summary').one('click', loadPanes);
+    $('.view-contact-groups .crm-ajax-accordion[open] summary').each(loadPanes);
     // Handle enable/delete links
     var that;
     function refresh() {

@@ -45,7 +45,6 @@ namespace Civi\Core\Service;
  * = REQUIREMENTS / LIMITATIONS =
  *
  * - To scan an extension, one must use `<mixin>scan-classes@1.0.0</mixin>` or `hook_scanClasses`.
- * - At time of writing, `ClassScanner` may not scan all core folders.
  * - AutoServices are part of the container. They cannot be executed until the container has
  *   started. Consequently, the services cannot subscribe to some early/boot-time events
  *   (eg `hook_entityTypes` or `hook_container`).

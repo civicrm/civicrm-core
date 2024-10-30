@@ -9,6 +9,9 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\PriceFieldValue;
+use Civi\Api4\PriceSetEntity;
+
 /**
  *
  * @package CRM
@@ -16,11 +19,21 @@
  */
 class CRM_Contact_Form_Search_Custom_PriceSet extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
 
-  protected $_eventID = NULL;
-  protected $_aclFrom = NULL;
-  protected $_aclWhere = NULL;
-  protected $_tableName = NULL;
+  protected $eventID;
+  protected $_aclFrom;
+  protected $_aclWhere;
+  protected $_tableName;
   public $_permissionedComponent;
+
+  /**
+   * Does the search class handle the prev next cache saving.
+   *
+   * This can be set to yes as long as a UI test works, and the deprecation
+   * notice will disappear.
+   *
+   * @var bool
+   */
+  public $searchClassHandlesPrevNextCache = TRUE;
 
   /**
    * Class constructor.
@@ -30,55 +43,40 @@ class CRM_Contact_Form_Search_Custom_PriceSet extends CRM_Contact_Form_Search_Cu
   public function __construct(&$formValues) {
     parent::__construct($formValues);
 
-    $this->_eventID = CRM_Utils_Array::value('event_id',
+    $this->eventID = (int) CRM_Utils_Array::value('event_id',
       $this->_formValues
     );
 
     $this->setColumns();
 
-    if ($this->_eventID) {
-      $this->buildTempTable();
-      $this->fillTable();
-    }
+    $this->buildTempTable();
+    $this->fillTable();
 
     // define component access permission needed
     $this->_permissionedComponent = 'CiviEvent';
   }
 
-  public function __destruct() {
-    /*
-    if ( $this->_eventID ) {
-    $sql = "DROP TEMPORARY TABLE {$this->_tableName}";
-    CRM_Core_DAO::executeQuery( $sql );
-    }
-     */
-  }
-
-  public function buildTempTable() {
-    $sql = "id int unsigned NOT NULL AUTO_INCREMENT,
+  public function buildTempTable(): void {
+    $sql = 'id int unsigned NOT NULL AUTO_INCREMENT,
   contact_id int unsigned NOT NULL,
   participant_id int unsigned NOT NULL,
-";
+';
 
-    foreach ($this->_columns as $dontCare => $fieldName) {
-      if (in_array($fieldName, [
-        'contact_id',
-        'participant_id',
-        'display_name',
-      ])) {
+    foreach ($this->_columns as $fieldName) {
+      if (in_array($fieldName, ['contact_id', 'participant_id', 'display_name'])) {
         continue;
       }
       $sql .= "{$fieldName} int default 0,\n";
     }
 
-    $sql .= "
+    $sql .= '
       PRIMARY KEY ( id ),
-      UNIQUE INDEX unique_participant_id ( participant_id )";
+      UNIQUE INDEX unique_participant_id ( participant_id )';
 
     $this->_tableName = CRM_Utils_SQL_TempTable::build()->setCategory('priceset')->setMemory()->createWithColumns($sql)->getName();
   }
 
-  public function fillTable() {
+  public function fillTable(): void {
     $sql = "
 REPLACE INTO {$this->_tableName}
 ( contact_id, participant_id )
@@ -91,7 +89,7 @@ WHERE  p.contact_id = c.id
   AND  p.status_id NOT IN (4,11,12)
   AND  ( c.is_deleted = 0 OR c.is_deleted IS NULL )
 ";
-    CRM_Core_DAO::executeQuery($sql, [1 => [$this->_eventID, 'Positive']]);
+    CRM_Core_DAO::executeQuery($sql, [1 => [$this->eventID, 'Positive']]);
 
     $sql = "
       SELECT c.id as contact_id,
@@ -113,12 +111,11 @@ WHERE  p.contact_id = c.id
       ORDER BY c.id, l.price_field_value_id;
     ";
 
-    $dao = CRM_Core_DAO::executeQuery($sql, [1 => [$this->_eventID, 'Positive']]);
+    $dao = CRM_Core_DAO::executeQuery($sql, [1 => [$this->eventID, 'Positive']]);
 
     // first store all the information by option value id
     $rows = [];
     while ($dao->fetch()) {
-      $contactID = $dao->contact_id;
       $participantID = $dao->participant_id;
       if (!isset($rows[$participantID])) {
         $rows[$participantID] = [];
@@ -141,11 +138,10 @@ WHERE participant_id = $participantID;
   }
 
   /**
-   * @param int $eventID
    *
    * @return Object
    */
-  public function priceSetDAO($eventID = NULL) {
+  public function priceSetDAO() {
 
     // get all the events that have a price set associated with it
     $sql = "
@@ -158,17 +154,7 @@ FROM   civicrm_event      e,
 WHERE  p.entity_table = 'civicrm_event'
 AND    p.entity_id    = e.id
 ";
-
-    $params = [];
-    if ($eventID) {
-      $params[1] = [$eventID, 'Integer'];
-      $sql .= " AND e.id = $eventID";
-    }
-
-    $dao = CRM_Core_DAO::executeQuery($sql,
-      $params
-    );
-    return $dao;
+    return CRM_Core_DAO::executeQuery($sql);
   }
 
   /**
@@ -207,42 +193,36 @@ AND    p.entity_id    = e.id
     $form->assign('elements', ['event_id']);
   }
 
-  public function setColumns() {
+  /**
+   * @throws \Civi\API\Exception\UnauthorizedException
+   * @throws \CRM_Core_Exception
+   */
+  public function setColumns(): void {
     $this->_columns = [
       ts('Contact ID') => 'contact_id',
       ts('Participant ID') => 'participant_id',
       ts('Name') => 'display_name',
     ];
 
-    if (!$this->_eventID) {
-      return;
-    }
-
     // for the selected event, find the price set and all the columns associated with it.
     // create a column for each field and option group within it
-    $dao = $this->priceSetDAO($this->_formValues['event_id']);
+    $priceSetEntity = PriceSetEntity::get()
+      ->addWhere('entity_table', '=', 'civicrm_event')
+      ->addWhere('entity_id', '=', $this->eventID)
+      ->addSelect('price_set_id')
+      ->execute()->first();
+    $priceSetID = $priceSetEntity['price_set_id'];
+    $priceFieldValues = PriceFieldValue::get()
+      ->addWhere('price_field_id.price_set_id', '=', $priceSetID)
+      ->addSelect('label', 'price_field_id.html_type', 'price_field_id.label')
+      ->execute();
 
-    if ($dao->fetch() &&
-      !$dao->price_set_id
-    ) {
-      throw new CRM_Core_Exception(ts('There are no events with Price Sets'));
-    }
-
-    // get all the fields and all the option values associated with it
-    $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($dao->price_set_id);
-    if (is_array($priceSet[$dao->price_set_id])) {
-      foreach ($priceSet[$dao->price_set_id]['fields'] as $key => $value) {
-        if (is_array($value['options'])) {
-          foreach ($value['options'] as $oKey => $oValue) {
-            $columnHeader = $value['label'] ?? NULL;
-            if (CRM_Utils_Array::value('html_type', $value) != 'Text') {
-              $columnHeader .= ' - ' . $oValue['label'];
-            }
-
-            $this->_columns[$columnHeader] = "price_field_{$oValue['id']}";
-          }
-        }
+    foreach ($priceFieldValues as $value) {
+      $columnHeader = $value['price_field_id.label'] ?? NULL;
+      if ($value['price_field_id.html_type'] !== 'Text') {
+        $columnHeader .= ' - ' . $value['label'];
       }
+      $this->_columns[$columnHeader] = "price_field_{$value['id']}";
     }
   }
 
@@ -275,10 +255,7 @@ contact_a.id             as contact_id  ,
 contact_a.display_name   as display_name";
 
       foreach ($this->_columns as $dontCare => $fieldName) {
-        if (in_array($fieldName, [
-          'contact_id',
-          'display_name',
-        ])) {
+        if (in_array($fieldName, ['contact_id', 'display_name'])) {
           continue;
         }
         $selectClause .= ",\ntempTable.{$fieldName} as {$fieldName}";
@@ -294,7 +271,7 @@ contact_a.display_name   as display_name";
   /**
    * @return string
    */
-  public function from() {
+  public function from(): string {
     $this->buildACLClause('contact_a');
     $from = "
 FROM       civicrm_contact contact_a
@@ -343,7 +320,7 @@ INNER JOIN {$this->_tableName} tempTable ON ( tempTable.contact_id = contact_a.i
    * @param string $tableAlias
    */
   public function buildACLClause($tableAlias = 'contact') {
-    list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
+    [$this->_aclFrom, $this->_aclWhere] = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
   }
 
 }

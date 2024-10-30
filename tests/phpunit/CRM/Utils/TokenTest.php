@@ -1,10 +1,17 @@
 <?php
 
+use Civi\Token\TokenProcessor;
+
 /**
  * Class CRM_Utils_TokenTest
  * @group headless
  */
 class CRM_Utils_TokenTest extends CiviUnitTestCase {
+
+  public function setUp(): void {
+    parent::setUp();
+    $this->useTransaction();
+  }
 
   /**
    * Test for replaceGreetingTokens.
@@ -27,12 +34,12 @@ class CRM_Utils_TokenTest extends CiviUnitTestCase {
     $className = 'CRM_Contact_BAO_Contact';
     $escapeSmarty = TRUE;
     CRM_Utils_Token::replaceGreetingTokens($tokenString, $contactDetails, $contactId, $className, $escapeSmarty);
-    $this->assertEquals($tokenString, 'First Name: Morticia Last Name: Addams Birth Date:  Prefix: Ms. Suffix: ');
+    $this->assertEquals('First Name: Morticia Last Name: Addams Birth Date:  Prefix: Ms. Suffix: ', $tokenString);
 
     // Test compatibility with custom tokens (#14943)
     $tokenString = 'Custom {custom.custom}';
     CRM_Utils_Token::replaceGreetingTokens($tokenString, $contactDetails, $contactId, $className, $escapeSmarty);
-    $this->assertEquals($tokenString, 'Custom ');
+    $this->assertEquals('Custom ', $tokenString);
   }
 
   /**
@@ -45,9 +52,9 @@ class CRM_Utils_TokenTest extends CiviUnitTestCase {
     $params['contact_id'] = $this->individualCreate();
 
     // Prepare the processor and general context.
-    $tokenProc = new \Civi\Token\TokenProcessor(\Civi::dispatcher(), [
+    $tokenProc = new TokenProcessor(Civi::dispatcher(), [
       // Unique(ish) identifier for our controller/use-case.
-      'controller' => 'civicrm_tokentest',
+      'controller' => 'civicrm_token_test',
 
       // Provide hints about what data will be available for each row.
       // Ex: 'schema' => ['contactId', 'activityId', 'caseId'],
@@ -74,7 +81,6 @@ class CRM_Utils_TokenTest extends CiviUnitTestCase {
 
     $this->assertNotEmpty($tokenProc->getRows());
     foreach ($tokenProc->getRows() as $tokenRow) {
-      /** @var \Civi\Token\TokenRow $tokenRow */
       $html = $tokenRow->render('body_html');
       $text = $tokenRow->render('body_text');
       $this->assertEquals($expect[$params['contact_id']]['html'], $html);

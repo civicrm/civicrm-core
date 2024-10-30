@@ -8,21 +8,12 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-campaign-form-block">
-
-
 {if $action eq 8}
-  <table class="form-layout">
-    <tr>
-      <td colspan="2">
-        <div class="status">{icon icon="fa-info-circle"}{/icon}{ts}Are you sure you want to delete this Campaign?{/ts}</div>
-      </td>
-    </tr>
-  </table>
-{else}
-  <div class="crm-submit-buttons">
-       {include file="CRM/common/formButtons.tpl" location="top"}
+  <div class="messages status no-popup">
+    {icon icon="fa-info-circle"}{/icon}
+    {ts}Are you sure you want to delete this Campaign?{/ts}
   </div>
-
+{else}
   <table class="form-layout-compressed">
   <tr class="crm-campaign-form-block-title">
       <td class="label">{$form.title.label}</td>
@@ -78,10 +69,8 @@
   </tr>
   </table>
 
-  {include file="CRM/common/customDataBlock.tpl"}
+  {include file="CRM/common/customDataBlock.tpl" groupID='' customDataType='Campaign' cid=false}
 
 {/if}
-<div class="crm-submit-buttons">
-     {include file="CRM/common/formButtons.tpl" location="bottom"}
-</div>
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>

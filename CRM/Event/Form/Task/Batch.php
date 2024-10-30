@@ -89,7 +89,6 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
 
     $this->_fields = CRM_Core_BAO_UFGroup::getFields($ufGroupId, FALSE, CRM_Core_Action::VIEW);
     if (array_key_exists('participant_status', $this->_fields)) {
-      $this->assign('statusProfile', 1);
       $this->assignToTemplate();
     }
 
@@ -156,7 +155,7 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
       CRM_Core_BAO_CustomField::getFields('Participant', FALSE, FALSE, NULL, NULL, TRUE)
     );
     $customFields = CRM_Utils_Array::crmArrayMerge($customFieldsEventType, $customFields);
-    $this->_customFields = CRM_Utils_Array::crmArrayMerge($customFieldsEvent, $customFields);
+    $customFields = CRM_Utils_Array::crmArrayMerge($customFieldsEvent, $customFields);
 
     foreach ($this->_participantIds as $participantId) {
       $roleId = CRM_Core_DAO::getFieldValue("CRM_Event_DAO_Participant", $participantId, 'role_id');
@@ -164,7 +163,7 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
       $eventTypeId = CRM_Core_DAO::getFieldValue("CRM_Event_DAO_Event", $eventId, 'event_type_id');
       foreach ($this->_fields as $name => $field) {
         if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($name)) {
-          $customValue = $this->_customFields[$customFieldID] ?? NULL;
+          $customValue = $customFields[$customFieldID] ?? NULL;
           $entityColumnValue = [];
           if (!empty($customValue['extends_entity_column_value'])) {
             $entityColumnValue = explode(CRM_Core_DAO::VALUE_SEPARATOR,
@@ -332,11 +331,7 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
     }
 
     //set values for ipn code.
-    foreach ([
-      'fee_amount',
-      'check_number',
-      'payment_instrument_id',
-    ] as $field) {
+    foreach (['fee_amount', 'check_number', 'payment_instrument_id'] as $field) {
       if (!$input[$field] = CRM_Utils_Array::value($field, $params)) {
         $input[$field] = $contribution->$field;
       }

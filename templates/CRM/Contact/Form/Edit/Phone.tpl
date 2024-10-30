@@ -11,6 +11,7 @@
 {* @var $form Contains the array for the form elements and other form associated information assigned to the template by the controller*}
 {* @var blockId Contains the current block id, and assigned in the CRM/Contact/Form/Location.php file *}
 
+{* note this is only called from CRM_Contact_Form_Contact in core so the className if clauses are not needed & should be phased out *}
 {if !$addBlock}
   <tr>
     <td>{ts}Phone{/ts}</td>
@@ -24,7 +25,7 @@
   </tr>
 {/if}
 <tr id="Phone_Block_{$blockId}">
-  <td>{$form.phone.$blockId.phone.html} {$form.phone.$blockId.phone_ext.label}&nbsp;{$form.phone.$blockId.phone_ext.html|crmAddClass:four}&nbsp;</td>
+  <td>{$form.phone.$blockId.phone.html}<span class="crm-phone-ext">{ts context="phone_ext"}ext.{/ts}&nbsp;{$form.phone.$blockId.phone_ext.html|crmAddClass:four}&nbsp;</span></td>
   {if $className eq 'CRM_Contact_Form_Contact'}
   <td>{$form.phone.$blockId.location_type_id.html}</td>
   {/if}

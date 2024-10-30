@@ -40,13 +40,14 @@ class CRM_Tag_Page_Tag extends CRM_Core_Page {
     }
 
     $result = civicrm_api3('Tag', 'get', [
-      'return' => ["name", "used_for", "description", "created_id.display_name", "created_date", "is_reserved"],
+      'return' => ["name", "label", "used_for", "description", "created_id.display_name", "created_date", "is_reserved"],
       'is_tagset' => 1,
       'options' => ['limit' => 0],
     ]);
     foreach ($result['values'] as $id => $tagset) {
       $used = explode(',', CRM_Utils_Array::value('used_for', $tagset, ''));
       $tagset['used_for_label'] = array_values(array_intersect_key($usedFor, array_flip($used)));
+      $tagset['used_for_label_str'] = implode(', ', $tagset['used_for_label']);
       if (isset($tagset['created_id.display_name'])) {
         $tagset['display_name'] = $tagset['created_id.display_name'];
       }
@@ -55,6 +56,7 @@ class CRM_Tag_Page_Tag extends CRM_Core_Page {
     }
 
     $this->assign('usedFor', $usedFor);
+    $this->assign('usedForStr', implode(', ', $usedFor));
     $this->assign('tagsets', $tagsets);
 
     return parent::run();

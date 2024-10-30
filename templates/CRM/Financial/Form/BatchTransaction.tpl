@@ -10,10 +10,10 @@
 {* this template is used for batch transaction screen, assign/remove transactions to batch  *}
 {if in_array($batchStatus, array('Open', 'Reopened'))}
 <div class="crm-form-block crm-search-form-block">
-  <div class="crm-accordion-wrapper crm-batch_transaction_search-accordion collapsed">
-    <div class="crm-accordion-header crm-master-accordion-header">
+  <details class="crm-accordion-light crm-batch_transaction_search-accordion">
+    <summary>
       {ts}Edit Search Criteria{/ts}
-    </div>
+    </summary>
     <div class="crm-accordion-body">
       <div id="searchForm" class="crm-block crm-form-block crm-contact-custom-search-activity-search-form-block">
         <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
@@ -46,7 +46,7 @@
 	<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
       </div>
     </div>
-  </div>
+  </details>
 </div>
 {if in_array($batchStatus, array('Open', 'Reopened'))}
 <div class="form-layout-compressed">{$form.trans_assign.html}&nbsp;{$form.submit.html}</div><br/>
@@ -81,7 +81,7 @@
 <script type="text/javascript">
 CRM.$(function($) {
   CRM.$('#_qf_BatchTransaction_submit-top, #_qf_BatchTransaction_submit-bottom').click(function() {
-    CRM.$('.crm-batch_transaction_search-accordion:not(.collapsed)').crmAccordionToggle();
+    CRM.$('.crm-batch_transaction_search-accordion[open]').prop('open', false);
   });
   var batchStatus = {/literal}{$statusID}{literal};
   {/literal}{if $validStatus}{literal}
@@ -319,7 +319,7 @@ function selectAction( id, toggleSelectId, checkId ) {
 }
 
 function bulkAssignRemove( action ) {
-  var postUrl = {/literal}"{crmURL p='civicrm/ajax/rest' h=0 q="className=CRM_Financial_Page_AJAX&fnName=bulkAssignRemove&entityID=$entityID" }"{literal};
+  var postUrl = {/literal}"{crmURL p='civicrm/ajax/rest' h=0 q="className=CRM_Financial_Page_AJAX&fnName=bulkAssignRemove&entityID=$entityID"}"{literal};
   var fids = [];
   if (action == 'Assign') {
     CRM.$("input[id^='mark_x_']:checked").each( function () {

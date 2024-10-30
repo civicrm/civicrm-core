@@ -44,7 +44,7 @@ class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
    * Assure CRM_Core_PseudoConstant::get() is working properly for a range of
    * DAO fields having a <pseudoconstant> tag in the XML schema.
    */
-  public function testOptionValues() {
+  public function testOptionValues(): void {
     /**
      * baoName/field combinations to test
      * Format: array[BAO Name] = $properties, where properties is an array whose
@@ -79,7 +79,7 @@ class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
       foreach ($baoFields as $field) {
         $message = "BAO name: '{$baoName}', field: '{$field['fieldName']}'";
 
-        $props = CRM_Utils_Array::value('props', $field, []);
+        $props = ($field['props'] ?? []);
         $optionValues = $baoName::buildOptions($field['fieldName'], 'create', $props);
         $this->assertNotEmpty($optionValues, $message);
 
@@ -92,7 +92,7 @@ class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
         }
 
         // Ensure count of optionValues is not extraordinarily high.
-        $max = CRM_Utils_Array::value('max', $field, 10);
+        $max = ($field['max'] ?? 10);
         $this->assertLessThanOrEqual($max, count($optionValues), $message);
       }
     }
@@ -101,7 +101,7 @@ class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
   /**
    * Ensure hook_civicrm_fieldOptions is working
    */
-  public function testHookFieldOptions() {
+  public function testHookFieldOptions(): void {
     CRM_Core_PseudoConstant::flush();
 
     // Test replacing all options with a hook
@@ -118,7 +118,6 @@ class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
     $this->targetField = 'gender_id';
     $this->appendOptions = ['foo' => 'Foo', 'bar' => 'Bar'];
     $this->replaceOptions = NULL;
-    CRM_Core_PseudoConstant::flush();
     $result = CRM_Contact_BAO_Contact::buildOptions('gender_id');
     $this->assertEquals($result, $originalGender + $this->appendOptions);
   }
@@ -126,7 +125,7 @@ class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
   /**
    * Ensure hook_civicrm_fieldOptions works with custom fields
    */
-  public function testHookFieldOptionsWithCustomFields() {
+  public function testHookFieldOptionsWithCustomFields(): void {
     // Create a custom field group for testing.
     $custom_group_name = md5(microtime());
     $api_params = [
@@ -183,10 +182,10 @@ class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
     $field->id = $customField2;
     $this->assertEquals($this->replaceOptions + $this->appendOptions, $field->getOptions());
 
-    $this->targetField = 'custom_' . $customField3;
+    $this->targetField = "$custom_group_name.{$custom_group_name}3";
     $this->replaceOptions = NULL;
     $this->appendOptions = [2 => 'Maybe'];
-    $options = CRM_Core_PseudoConstant::get('CRM_Core_BAO_CustomField', $this->targetField);
+    $options = CRM_Contact_BAO_Contact::buildOptions($this->targetField);
     $this->assertEquals([1 => 'Yes', 0 => 'No', 2 => 'Maybe'], $options);
   }
 

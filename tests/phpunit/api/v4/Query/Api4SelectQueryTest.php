@@ -28,7 +28,7 @@ use api\v4\Api4TestBase;
  */
 class Api4SelectQueryTest extends Api4TestBase {
 
-  public function testManyToOneJoin() {
+  public function testManyToOneJoin(): void {
     $contact = $this->createTestRecord('Contact', [
       'first_name' => uniqid(),
       'last_name' => uniqid(),

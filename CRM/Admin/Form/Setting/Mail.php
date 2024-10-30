@@ -20,7 +20,16 @@
  */
 class CRM_Admin_Form_Setting_Mail extends CRM_Admin_Form_Setting {
 
+  /**
+   * Subset of settings on the page as defined using the legacy method.
+   *
+   * @var array
+   *
+   * @deprecated - do not add new settings here - the page to display
+   * settings on should be defined in the setting metadata.
+   */
   protected $_settings = [
+    // @todo remove these, define any not yet defined in the setting metadata.
     'mailerBatchLimit' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
     'mailThrottleTime' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
     'mailerJobSize' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
@@ -29,6 +38,7 @@ class CRM_Admin_Form_Setting_Mail extends CRM_Admin_Form_Setting {
     // dev/core#1768 Make this interval configurable.
     'civimail_sync_interval' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
     'replyTo' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
+    'civimail_unsubscribe_methods' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
   ];
 
   /**

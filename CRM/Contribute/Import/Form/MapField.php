@@ -21,38 +21,12 @@
 class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
 
   /**
-   * Set variables up before form is built.
+   * Get the name of the type to be stored in civicrm_user_job.type_id.
+   *
+   * @return string
    */
-  public function preProcess() {
-    parent::preProcess();
-
-    $highlightedFields = ['financial_type_id', 'total_amount'];
-    //CRM-2219 removing other required fields since for updation only
-    //invoice id or trxn id or contribution id is required.
-    if ($this->isUpdateExisting()) {
-      //modify field title only for update mode. CRM-3245
-      foreach ([
-        'contribution_id',
-        'invoice_id',
-        'trxn_id',
-      ] as $key) {
-        $highlightedFields[] = $key;
-      }
-    }
-    elseif ($this->isSkipExisting()) {
-      $highlightedFieldsArray = [
-        'contribution_contact_id',
-        'email',
-        'first_name',
-        'last_name',
-        'external_identifier',
-      ];
-      foreach ($highlightedFieldsArray as $name) {
-        $highlightedFields[] = $name;
-      }
-    }
-
-    $this->assign('highlightedFields', $highlightedFields);
+  public function getUserJobType(): string {
+    return 'contribution_import';
   }
 
   /**
@@ -130,6 +104,10 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
       }
       // Swap out dots for double underscores so as not to break the quick form js.
       // We swap this back on postProcess.
+      // Arg - we need to swap out _. first as it seems some groups end in a trailing underscore,
+      // which is indistinguishable to convert back - ie ___ could be _. or ._.
+      // https://lab.civicrm.org/dev/core/-/issues/4317#note_91322
+      $name = str_replace('_.', '~~', $name);
       $name = str_replace('.', '__', $name);
       if (($field['entity'] ?? '') === 'Contact' && $this->isFilterContactFields() && empty($field['match_rule'])) {
         // Filter out metadata that is intended for create & update - this is not available in the quick-form
@@ -211,23 +189,16 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
     foreach ($this->getColumnHeaders() as $i => $columnHeader) {
       $defaults["mapper[$i]"] = [];
       if ($this->getSubmittedValue('savedMapping')) {
-        $fieldMapping = $fieldMappings[$i] ?? NULL;
-        if ($fieldMapping) {
-          if ($fieldMapping['name'] !== ts('do_not_import')) {
-            // $mapping contact_type is not really a contact type - the 'about this entity' data has been mangled
-            // into that field - see https://lab.civicrm.org/dev/core/-/issues/654
-            $softCreditTypeID = '';
-            $entityData = json_decode($fieldMapping['contact_type'] ?? '', TRUE);
-            if (!empty($entityData)) {
-              $softCreditTypeID = (int) $entityData['soft_credit']['soft_credit_type_id'];
-            }
-            $defaults["mapper[$i]"] = [$fieldMapping['name'], $softCreditTypeID];
-          }
-        }
+        $fieldMapping = $fieldMappings[$i] ?? [];
+        $this->addMappingToDefaults($defaults, $fieldMapping, $i);
       }
       elseif ($this->getSubmittedValue('skipColumnHeader')) {
         $defaults["mapper[$i]"][0] = $this->guessMappingBasedOnColumns($columnHeader);
       }
+    }
+    $userDefinedMappings = array_diff_key($this->getFieldMappings(), $this->getColumnHeaders());
+    foreach ($userDefinedMappings as $index => $mapping) {
+      $this->addMappingToDefaults($defaults, $mapping, $index);
     }
 
     return $defaults;
@@ -247,19 +218,81 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
     $ruleFields = $rule['fields'];
     $weightSum = 0;
     foreach ($mapper as $mapping) {
-      if ($mapping[0] === 'external_identifier' || $mapping[0] === 'contribution_contact_id' || $mapping[0] === 'contact__id') {
+      // Because api v4 style fields have a . and QuickForm multiselect js does
+      // not cope with a . the quick form layer will use a double underscore
+      // as a stand in (the angular layer will not)
+      $fieldName = str_replace('__', '.', $mapping[0]);
+      if (str_contains($fieldName, '.')) {
+        // If the field name contains a . - eg. address_primary.street_address
+        // we just want the part after the .
+        $fieldName = substr($fieldName, strpos($fieldName, '.') + 1);
+      }
+      if ($fieldName === 'external_identifier' || $fieldName === 'contribution_contact_id' || $fieldName === 'contact__id') {
         // It is enough to have external identifier mapped.
         $weightSum = $threshold;
         break;
       }
-      if (array_key_exists($mapping[0], $ruleFields)) {
-        $weightSum += $ruleFields[$mapping[0]];
+      if (array_key_exists($fieldName, $ruleFields)) {
+        $weightSum += $ruleFields[$fieldName];
       }
     }
     if ($weightSum < $threshold) {
       return $rule['rule_message'];
     }
     return NULL;
+  }
+
+  /**
+   * Add the saved mapping to the defaults.
+   *
+   * @param array $defaults
+   * @param array $fieldMapping
+   * @param int $rowNumber
+   *
+   * @return void
+   */
+  public function addMappingToDefaults(array &$defaults, array $fieldMapping, int $rowNumber): void {
+    if ($fieldMapping) {
+      if ($fieldMapping['name'] !== ts('do_not_import')) {
+        // $mapping contact_type is not really a contact type - the 'about this entity' data has been mangled
+        // into that field - see https://lab.civicrm.org/dev/core/-/issues/654
+        $softCreditTypeID = '';
+        $entityData = json_decode($fieldMapping['contact_type'] ?? '', TRUE);
+        if (!empty($entityData)) {
+          $softCreditTypeID = (int) $entityData['soft_credit']['soft_credit_type_id'];
+        }
+        $fieldName = $this->isQuickFormMode ? str_replace('.', '__', $fieldMapping['name']) : $fieldMapping['name'];
+        $defaults["mapper[$rowNumber]"] = [$fieldName, $softCreditTypeID];
+      }
+    }
+  }
+
+  /**
+   * @return string[]
+   */
+  protected function getHighlightedFields(): array {
+    $highlightedFields = ['financial_type_id', 'total_amount'];
+    //CRM-2219 removing other required fields since for updating only
+    //invoice id or trxn id or contribution id is required.
+    if ($this->isUpdateExisting()) {
+      //modify field title only for update mode. CRM-3245
+      foreach (['contribution_id', 'invoice_id', 'trxn_id'] as $key) {
+        $highlightedFields[] = $key;
+      }
+    }
+    elseif ($this->isSkipExisting()) {
+      $highlightedFieldsArray = [
+        'contribution_contact_id',
+        'email',
+        'first_name',
+        'last_name',
+        'external_identifier',
+      ];
+      foreach ($highlightedFieldsArray as $name) {
+        $highlightedFields[] = $name;
+      }
+    }
+    return $highlightedFields;
   }
 
 }

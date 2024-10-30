@@ -93,10 +93,10 @@ class CRM_Utils_Recent {
         return [];
       }
     }
-    $params['title'] = $params['title'] ?? self::getTitle($params['entity_type'], $params['entity_id']);
-    $params['view_url'] = $params['view_url'] ?? self::getUrl($params['entity_type'], $params['entity_id'], 'view');
-    $params['edit_url'] = $params['edit_url'] ?? self::getUrl($params['entity_type'], $params['entity_id'], 'update');
-    $params['delete_url'] = $params['delete_url'] ?? (empty($params['is_deleted']) ? self::getUrl($params['entity_type'], $params['entity_id'], 'delete') : NULL);
+    $params['title'] ??= self::getTitle($params['entity_type'], $params['entity_id']);
+    $params['view_url'] ??= self::getUrl($params['entity_type'], $params['entity_id'], 'view');
+    $params['edit_url'] ??= self::getUrl($params['entity_type'], $params['entity_id'], 'update');
+    $params['delete_url'] ??= (empty($params['is_deleted']) ? self::getUrl($params['entity_type'], $params['entity_id'], 'delete') : NULL);
     self::add($params['title'], $params['view_url'], $params['entity_id'], $params['entity_type'], $params['contact_id'] ?? NULL, NULL, $params);
     return $params;
   }
@@ -221,9 +221,40 @@ class CRM_Utils_Recent {
     }
     $paths = (array) CoreUtil::getInfoItem($entityType, 'paths');
     if (!empty($paths[$action])) {
-      return CRM_Utils_System::url(str_replace('[id]', $entityId, $paths[$action]));
+      // Find tokens used in the path
+      $tokens = self::getTokens($paths[$action]) ?: ['id' => '[id]'];
+      // If the only token is id, no lookup needed
+      if ($tokens === ['id' => '[id]']) {
+        $record = ['id' => $entityId];
+      }
+      else {
+        // Lookup values needed for tokens
+        $record = civicrm_api4($entityType, 'get', [
+          'checkPermissions' => FALSE,
+          'select' => array_keys($tokens),
+          'where' => [['id', '=', $entityId]],
+        ])->first() ?: [];
+      }
+      ksort($tokens);
+      ksort($record);
+      return CRM_Utils_System::url(str_replace($tokens, $record, $paths[$action]));
     }
     return NULL;
+  }
+
+  /**
+   * Get a list of square-bracket tokens from a path string
+   *
+   * @param string $str
+   * @return array
+   */
+  private static function getTokens($str):array {
+    $matches = $tokens = [];
+    preg_match_all('/\\[([^]]+)\\]/', $str, $matches);
+    foreach ($matches[1] as $match) {
+      $tokens[$match] = '[' . $match . ']';
+    }
+    return $tokens;
   }
 
   /**
@@ -233,7 +264,7 @@ class CRM_Utils_Recent {
    */
   private static function getIcon($entityType, $entityId) {
     $icon = NULL;
-    $daoClass = CRM_Core_DAO_AllCoreTables::getFullName($entityType);
+    $daoClass = CRM_Core_DAO_AllCoreTables::getDAONameForEntity($entityType);
     if ($daoClass) {
       $icon = CRM_Core_DAO_AllCoreTables::getBAOClassName($daoClass)::getEntityIcon($entityType, $entityId);
     }
@@ -349,8 +380,7 @@ class CRM_Utils_Recent {
       ->addWhere('is_active', '=', TRUE)
       ->addOrderBy('weight', 'ASC')
       ->execute()
-      ->indexBy('value')
-      ->column('label');
+      ->column('label', 'value');
   }
 
 }

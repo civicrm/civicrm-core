@@ -17,6 +17,17 @@
  */
 
 /**
+ * Get mailing event confirm record.
+ *
+ * @param array $params
+ *
+ * @return array
+ */
+function civicrm_api3_mailing_event_confirm_get($params) {
+  return _civicrm_api3_basic_get('CRM_Mailing_Event_BAO_MailingEventConfirm', $params);
+}
+
+/**
  * Handle a confirm event.
  *
  * @param array $params
@@ -32,7 +43,7 @@ function civicrm_api3_mailing_event_confirm_create($params) {
   $subscribe_id = $params['subscribe_id'];
   $hash         = $params['hash'];
 
-  $confirm = CRM_Mailing_Event_BAO_Confirm::confirm($contact_id, $subscribe_id, $hash) !== FALSE;
+  $confirm = CRM_Mailing_Event_BAO_MailingEventConfirm::confirm($contact_id, $subscribe_id, $hash) !== FALSE;
 
   if (!$confirm) {
     throw new Exception('Confirmation failed');

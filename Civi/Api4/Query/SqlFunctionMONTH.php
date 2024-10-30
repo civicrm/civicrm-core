@@ -43,4 +43,24 @@ class SqlFunctionMONTH extends SqlFunction {
     return ts('The numeric month (1-12) of a date.');
   }
 
+  /**
+   * @return array
+   */
+  public static function getOptions(): ?array {
+    return [
+      1 => ts('January'),
+      2 => ts('February'),
+      3 => ts('March'),
+      4 => ts('April'),
+      5 => ts('May'),
+      6 => ts('June'),
+      7 => ts('July'),
+      8 => ts('August'),
+      9 => ts('September'),
+      10 => ts('October'),
+      11 => ts('November'),
+      12 => ts('December'),
+    ];
+  }
+
 }

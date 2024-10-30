@@ -10,14 +10,14 @@
 
 {foreach from=$address_groupTree.$blockId item=cd_edit key=group_id}
 <div id="{$cd_edit.name}_{$group_id}_{$blockId}" class="form-item">
-    <div class="crm-collapsible crm-{$cd_edit.name}_{$group_id}_{$blockId}-accordion {if $cd_edit.collapse_display}collapsed{/if}">
-        <div class="collapsible-title">
+    <details class="crm-accordion-light crm-{$cd_edit.name}_{$group_id}_{$blockId}-accordion" {if !$cd_edit.collapse_display}open{/if}>
+        <summary>
             {$cd_edit.title}
-        </div>
-        <div>
-        {include file="CRM/Custom/Form/Edit/CustomData.tpl" customDataEntity='address'}
-        </div>
-    </div>
+        </summary>
+        <div class="crm-accordion-body">
+        {include file="CRM/Custom/Form/Edit/CustomData.tpl" customDataEntity='address' isSingleRecordEdit=false prefix=''}
+        </div><!-- crm-accordion-body-->
+    </details>
 
     <div id="custom_group_{$group_id}_{$blockId}"></div>
 </div>

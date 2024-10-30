@@ -1,4 +1,4 @@
-<div class="form-inline" ng-repeat="sort in $ctrl.display.settings.sort">
+<div class="form-inline crm-search-admin-display-sorts" ng-repeat="sort in $ctrl.display.settings.sort">
   <label for="crm-search-display-sort-{{$index}}">{{ $index ? ts('Also by') : ts('Sort by') }}</label>
   <input id="crm-search-display-sort-{{$index}}" class="form-control huge" ng-model="sort[0]" crm-ui-select="{data: $ctrl.parent.fieldsForSort}" />
   <select class="form-control" ng-model="sort[1]" ng-show="sort[0] !== 'RAND()'">
@@ -7,7 +7,7 @@
   </select>
   <a href class="crm-hover-button" title="{{:: ts('Clear') }}" ng-click="$ctrl.display.settings.sort.splice($index, 1)"><i class="crm-i fa-times" aria-hidden="true"></i></a>
 </div>
-<div class="form-inline">
+<div class="form-inline crm-search-admin-display-sort-add">
   <label for="crm-search-display-add-sort">{{ $ctrl.display.settings.sort.length ? ts('Also by') : ts('Sort by') }}</label>
   <input id="crm-search-display-add-sort"
          class="form-control crm-action-menu fa-plus"

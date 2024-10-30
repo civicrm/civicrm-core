@@ -7,12 +7,12 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{if ! empty( $fields )}
-  {if $groupId }
-  <div class="crm-accordion-wrapper crm-group-{$groupId}-accordion {if $rows}collapsed{/if}">
-    <div class="crm-accordion-header crm-master-accordion-header">
+{if ! empty($fields)}
+  {if $groupId}
+  <details class="crm-accordion-light crm-group-{$groupId}-accordion" {if $rows}{else}open{/if}>
+    <summary>
       {ts}Edit Search Criteria{/ts}
-    </div>
+    </summary>
   <div class="crm-accordion-body">
     {else}
   <div>
@@ -49,7 +49,7 @@
             </td>
           {else}
             <td class="description">
-              {if $n|substr:0:5 eq 'phone'}
+              {if $n|str_starts_with:'phone'}
                 {assign var="phone_ext_field" value=$n|replace:'phone':'phone_ext'}
                 {$form.$n.html}
                 {if $form.$phone_ext_field.html}
@@ -75,12 +75,16 @@
       <tr><td colspan="2">{include file="CRM/Contact/Form/Task/ProximityCommon.tpl"}</td></tr>
     {/if}
 
-    <tr><td></td><td>{include file="CRM/common/formButtons.tpl"}</td></tr>
+    <tr><td></td><td>{include file="CRM/common/formButtons.tpl" location=''}</td></tr>
   </table>
 
   {if $groupId}
-  </div><!-- /.crm-accordion-body -->
-  </div><!-- /.crm-accordion-wrapper -->
+  {else}
+  </div>
+  {/if}
+  {if $groupId}
+  </div>
+  </details>
   {/if}
 
 {elseif $statusMessage}

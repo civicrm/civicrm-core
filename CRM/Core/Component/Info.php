@@ -63,7 +63,7 @@ abstract class CRM_Core_Component_Info {
   /**
    * Component settings as key/value pairs.
    *
-   * @var array
+   * @var array{name: string, translatedName: string, title: string, search: bool, showActivitiesInCore: bool, url: string}
    */
   public $info;
 
@@ -73,6 +73,27 @@ abstract class CRM_Core_Component_Info {
    * @var string
    */
   protected $keyword;
+
+  /**
+   * Component Name.
+   *
+   * @var string
+   */
+  public $name;
+
+  /**
+   * Component namespace.
+   * e.g. CRM_Contribute.
+   *
+   * @var string
+   */
+  public $namespace;
+
+  /**
+   * Component ID
+   * @var int
+   */
+  public $componentID;
 
   /**
    * @param string $name
@@ -90,14 +111,11 @@ abstract class CRM_Core_Component_Info {
   }
 
   /**
-   * EXPERIMENTAL: Get a list of AngularJS modules
-   *
-   * @return array
-   *   list of modules; same format as CRM_Utils_Hook::angularModules(&$angularModules)
-   * @see CRM_Utils_Hook::angularModules
+   * Name of the module-extension coupled with this component
+   * @return string
    */
-  public function getAngularModules() {
-    return [];
+  public function getExtensionName(): string {
+    return CRM_Utils_String::convertStringToSnakeCase($this->name);
   }
 
   /**
@@ -111,17 +129,6 @@ abstract class CRM_Core_Component_Info {
   abstract public function getInfo();
 
   /**
-   * Get a list of entities to register via API.
-   *
-   * @return array
-   *   list of entities; same format as CRM_Utils_Hook::managedEntities(&$entities)
-   * @see CRM_Utils_Hook::managedEntities
-   */
-  public function getManagedEntities() {
-    return [];
-  }
-
-  /**
    * Provides permissions that are unwise for Anonymous Roles to have.
    *
    * @return array
@@ -133,19 +140,11 @@ abstract class CRM_Core_Component_Info {
   }
 
   /**
-   * Provides permissions that are used by component.
-   * Needs to be implemented in component's information
-   * class.
+   * Defines permissions that are used by component.
    *
-   * NOTE: if using conditionally permission return,
-   * implementation of $getAllUnconditionally is required.
-   *
-   * @param bool $getAllUnconditionally
-   *
-   * @return array|null
-   *   collection of permissions, null if none
+   * @return array
    */
-  abstract public function getPermissions($getAllUnconditionally = FALSE);
+  abstract public function getPermissions();
 
   /**
    * Determine how many other records refer to a given record.

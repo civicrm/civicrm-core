@@ -21,6 +21,7 @@ namespace api\v4\Action;
 
 use Civi\Api4\MockBasicEntity;
 use api\v4\Api4TestBase;
+use Civi\Test\Invasive;
 use Civi\Test\TransactionalInterface;
 
 /**
@@ -28,11 +29,8 @@ use Civi\Test\TransactionalInterface;
  */
 class EvaluateConditionTest extends Api4TestBase implements TransactionalInterface {
 
-  public function testEvaluateCondition() {
-    $action = MockBasicEntity::get();
-    $reflection = new \ReflectionClass($action);
-    $method = $reflection->getMethod('evaluateCondition');
-    $method->setAccessible(TRUE);
+  public function testEvaluateCondition(): void {
+    $method = [MockBasicEntity::get(), 'evaluateCondition'];
 
     $data = [
       'nada' => 0,
@@ -43,14 +41,14 @@ class EvaluateConditionTest extends Api4TestBase implements TransactionalInterfa
       'values' => ['one' => 1, 'two' => 2, 'three' => 3],
     ];
 
-    $this->assertFalse($method->invoke($action, '$uno > $dos', $data));
-    $this->assertTrue($method->invoke($action, '$uno < $dos', $data));
-    $this->assertTrue($method->invoke($action, '$apple == "red" && $banana != "red"', $data));
-    $this->assertFalse($method->invoke($action, '$apple == "red" && $banana != "yellow"', $data));
-    $this->assertTrue($method->invoke($action, '$values.one == $uno', $data));
-    $this->assertTrue($method->invoke($action, '$values.one + $dos == $values.three', $data));
-    $this->assertTrue($method->invoke($action, 'empty($nada)', $data));
-    $this->assertFalse($method->invoke($action, 'empty($values)', $data));
+    $this->assertFalse(Invasive::call($method, ['$uno > $dos', $data]));
+    $this->assertTrue(Invasive::call($method, ['$uno < $dos', $data]));
+    $this->assertTrue(Invasive::call($method, ['$apple == "red" && $banana != "red"', $data]));
+    $this->assertFalse(Invasive::call($method, ['$apple == "red" && $banana != "yellow"', $data]));
+    $this->assertTrue(Invasive::call($method, ['$values.one == $uno', $data]));
+    $this->assertTrue(Invasive::call($method, ['$values.one + $dos == $values.three', $data]));
+    $this->assertTrue(Invasive::call($method, ['empty($nada)', $data]));
+    $this->assertFalse(Invasive::call($method, ['empty($values)', $data]));
   }
 
 }

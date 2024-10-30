@@ -11,7 +11,6 @@
     {ts}CiviCRM includes plugins for several mapping and geocoding web services. When your users save a contact or event location address, a geocoding service will convert the address into geographical coordinates, which are required for mapping. Mapping services allow your users to display addresses on a map.{/ts} {help id='map-intro-id'}
 </div>
 <div class="crm-block crm-form-block crm-map-form-block">
-    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
     <table class="form-layout-compressed">
          <tr class="crm-map-form-block-mapProvider">
              <td>{$form.mapProvider.label}</td>

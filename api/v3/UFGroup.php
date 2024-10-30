@@ -28,6 +28,8 @@ function _civicrm_api3_uf_group_create_spec(&$params) {
   // Default to the logged in user.
   $params['created_id']['api.default'] = 'user_contact_id';
   $params['created_date']['api.default'] = 'now';
+  $params['post_url']['api.aliases'] = ['post_URL'];
+  $params['cancel_url']['api.aliases'] = ['cancel_URL'];
 }
 
 /**

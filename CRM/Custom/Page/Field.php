@@ -55,28 +55,33 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
           'url' => 'civicrm/admin/custom/group/field/update',
           'qs' => 'action=update&reset=1&gid=%%gid%%&id=%%id%%',
           'title' => ts('Edit Custom Field'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
         ],
         CRM_Core_Action::BROWSE => [
           'name' => ts('Edit Multiple Choice Options'),
           'url' => 'civicrm/admin/custom/group/field/option',
           'qs' => 'reset=1&action=browse&gid=%%gid%%&fid=%%id%%',
           'title' => ts('List Custom Options'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::BROWSE),
         ],
         CRM_Core_Action::PREVIEW => [
           'name' => ts('Preview Field Display'),
           'url' => 'civicrm/admin/custom/group/preview',
           'qs' => 'action=preview&reset=1&fid=%%id%%',
           'title' => ts('Preview Custom Field'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::PREVIEW),
         ],
         CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable Custom Field'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DISABLE),
         ],
         CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable Custom Field'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ENABLE),
         ],
         CRM_Core_Action::EXPORT => [
           'name' => ts('Move'),
@@ -84,12 +89,14 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
           'class' => 'small-popup',
           'qs' => 'reset=1&fid=%%id%%',
           'title' => ts('Move Custom Field'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::EXPORT),
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/custom/group/field/delete',
           'qs' => 'reset=1&id=%%id%%',
           'title' => ts('Delete Custom Field'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
         ],
       ];
     }
@@ -126,27 +133,9 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
         $action -= CRM_Core_Action::DISABLE;
       }
 
-      switch ($customFieldBAO->data_type) {
-        case "String":
-        case "Int":
-        case "Float":
-        case "Money":
-          // if Multi Select field is selected in custom field
-          if ($customFieldBAO->html_type == 'Text') {
-            $action -= CRM_Core_Action::BROWSE;
-          }
-          break;
-
-        case "ContactReference":
-        case "Memo":
-        case "Date":
-        case "Boolean":
-        case "StateProvince":
-        case "Country":
-        case "File":
-        case "Link":
-          $action -= CRM_Core_Action::BROWSE;
-          break;
+      // Remove link to edit option group if there isn't one
+      if (!$customFieldBAO->option_group_id) {
+        $action -= CRM_Core_Action::BROWSE;
       }
 
       $customFieldDataType = array_column(CRM_Core_BAO_CustomField::dataType(), 'label', 'id');

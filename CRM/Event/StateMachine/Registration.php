@@ -70,7 +70,7 @@ class CRM_Event_StateMachine_Registration extends CRM_Core_StateMachine {
       unset($pages['CRM_Event_Form_Registration_Confirm']);
     }
 
-    $this->addSequentialPages($pages, $action);
+    $this->addSequentialPages($pages);
   }
 
 }

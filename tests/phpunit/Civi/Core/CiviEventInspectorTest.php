@@ -7,7 +7,7 @@ namespace Civi\Core;
  */
 class CiviEventInspectorTest extends \CiviUnitTestCase {
 
-  public function testGet() {
+  public function testGet(): void {
     $inspector = new CiviEventInspector();
     $eventDef = $inspector->get('hook_civicrm_alterSettingsMetaData');
     $this->assertEquals('hook_civicrm_alterSettingsMetaData', $eventDef['name']);
@@ -22,7 +22,7 @@ class CiviEventInspectorTest extends \CiviUnitTestCase {
     $this->assertTrue($eventDef['stub']->isStatic());
   }
 
-  public function testGetAll() {
+  public function testGetAll(): void {
     $inspector = new CiviEventInspector();
     $all = $inspector->getAll();
     $this->assertTrue(count($all) > 1);
@@ -37,7 +37,7 @@ class CiviEventInspectorTest extends \CiviUnitTestCase {
     }
   }
 
-  public function testFind() {
+  public function testFind(): void {
     $inspector = new CiviEventInspector();
 
     $result_a = $inspector->find('/^hook_civicrm_post/');

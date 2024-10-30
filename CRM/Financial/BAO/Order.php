@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contribution;
+use Civi\Api4\Generic\Result;
 use Civi\Api4\LineItem;
 use Civi\Api4\PriceField;
 use Civi\Api4\PriceFieldValue;
@@ -77,6 +79,20 @@ class CRM_Financial_BAO_Order {
    * @var int
    */
   protected $overridableFinancialTypeID;
+
+  private $isExcludeExpiredFields = FALSE;
+
+  private array $contributionValues;
+
+  /**
+   * @param bool $isExcludeExpiredFields
+   *
+   * @return CRM_Financial_BAO_Order
+   */
+  public function setIsExcludeExpiredFields(bool $isExcludeExpiredFields): CRM_Financial_BAO_Order {
+    $this->isExcludeExpiredFields = $isExcludeExpiredFields;
+    return $this;
+  }
 
   /**
    * Get overridable financial type id.
@@ -594,6 +610,30 @@ class CRM_Financial_BAO_Order {
   }
 
   /**
+   * Get the default values for line items using this price field value id.
+   *
+   * @param int $id
+   *
+   * @return array
+   */
+  public function getPriceFieldValueDefaults(int $id): array {
+    $valueDefaults = array_intersect_key($this->getPriceFieldValueSpec($id), array_fill_keys([
+      'financial_type_id',
+      'non_deductible_amount',
+      'membership_type_id',
+      'membership_num_terms',
+      'amount',
+      'description',
+      'price_field_id',
+      'label',
+    ], TRUE));
+    $valueDefaults['qty'] = 1;
+    $valueDefaults['unit_price'] = $valueDefaults['amount'];
+    unset($valueDefaults['amount']);
+    return $valueDefaults;
+  }
+
+  /**
    * Get the metadata for the fields in the price set.
    *
    * @internal use in tested core code only.
@@ -634,8 +674,39 @@ class CRM_Financial_BAO_Order {
    *
    * @param array $metadata
    */
-  protected function setPriceFieldMetadata($metadata) {
+  protected function setPriceFieldMetadata(array $metadata): void {
+    foreach ($metadata as $index => $priceField) {
+      $metadata[$index]['supports_auto_renew'] = FALSE;
+      if ($this->isExcludeExpiredFields && !$priceField['is_active']) {
+        unset($metadata[$index]);
+        continue;
+      }
+      if ($this->isExcludeExpiredFields && !empty($priceField['active_on']) && time() < strtotime($priceField['active_on'])) {
+        unset($metadata[$index]);
+        continue;
+      }
+      elseif ($this->isExcludeExpiredFields && !empty($priceField['expire_on']) && strtotime($priceField['expire_on']) < time()) {
+        unset($metadata[$index]);
+        continue;
+      }
+      elseif (!empty($priceField['options'])) {
+        foreach ($priceField['options'] as $optionID => $option) {
+          if (!$option['is_active']) {
+            unset($metadata[$index]['options'][$optionID]);
+          }
+          elseif (!empty($option['membership_type_id'])) {
+            $membershipType = CRM_Member_BAO_MembershipType::getMembershipType((int) $option['membership_type_id']);
+            $metadata[$index]['options'][$optionID]['membership_type_id.auto_renew'] = (int) $membershipType['auto_renew'];
+            $metadata[$index]['supports_auto_renew'] = $metadata[$index]['supports_auto_renew'] ?? $membershipType['auto_renew'] ?: (bool) $membershipType['auto_renew'];
+          }
+          else {
+            $metadata[$index]['options'][$optionID]['membership_type_id.auto_renew'] = NULL;
+          }
+        }
+      }
+    }
     $this->priceFieldMetadata = $metadata;
+
     if ($this->getForm()) {
       CRM_Utils_Hook::buildAmount($this->form->getFormContext(), $this->form, $this->priceFieldMetadata);
     }
@@ -644,18 +715,28 @@ class CRM_Financial_BAO_Order {
   /**
    * Get the metadata for the fields in the price set.
    *
+   * @return array
+   * @throws \CRM_Core_Exception
    * @internal use in tested core code only.
    *
-   * @return array
    */
   public function getPriceSetMetadata(): array {
     if (empty($this->priceSetMetadata)) {
-      $priceSetMetadata = CRM_Price_BAO_PriceSet::getCachedPriceSetDetail($this->getPriceSetID());
-      $this->setPriceFieldMetadata($priceSetMetadata['fields']);
-      unset($priceSetMetadata['fields']);
-      $this->priceSetMetadata = $priceSetMetadata;
+      $this->priceSetMetadata = CRM_Price_BAO_PriceSet::getCachedPriceSetDetail($this->getPriceSetID());
+      $this->priceSetMetadata['id'] = $this->getPriceSetID();
+      $this->setPriceFieldMetadata($this->priceSetMetadata['fields']);
+      unset($this->priceSetMetadata['fields']);
     }
     return $this->priceSetMetadata;
+  }
+
+  public function isMembershipPriceSet() {
+    if (!CRM_Core_Component::isEnabled('CiviMember')) {
+      return FALSE;
+    }
+    // Access the property if set, to avoid a potential loop when the hook is called.
+    $priceSetMetadata = $this->priceSetMetadata ?: $this->getPriceSetMetadata();
+    return in_array(CRM_Core_Component::getComponentID('CiviMember'), $priceSetMetadata['extends'], FALSE);
   }
 
   /**
@@ -745,6 +826,38 @@ class CRM_Financial_BAO_Order {
       $this->lineItems = $this->calculateLineItems();
     }
     return $this->lineItems;
+  }
+
+  /**
+   * Is participant count being used.
+   *
+   * This would be true if at least one price field value
+   * has a count value that is not 0 or NULL. In this case
+   * the row value will be used for the participant.
+   *
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  public function isUseParticipantCount(): bool {
+    foreach ($this->getPriceFieldsMetadata() as $fieldMetadata) {
+      foreach ($fieldMetadata['options'] as $option) {
+        if (($option['count'] ?? 0) > 0) {
+          return TRUE;
+        }
+      }
+    }
+    return FALSE;
+  }
+
+  /**
+   * Recalculate the line items.
+   *
+   * @return void
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function recalculateLineItems(): void {
+    $this->lineItems = $this->calculateLineItems();
   }
 
   /**
@@ -838,15 +951,19 @@ class CRM_Financial_BAO_Order {
       // Set the price set ID from the first line item (we need to set this here
       // to prevent a loop later when we retrieve the price field metadata to
       // set the 'title' (as accessed from workflow message templates).
-      $this->setPriceSetID($lineItems[0]['price_field_id.price_set_id']);
+      // Contributions *should* all have line items, but historically, imports did not create them.
+      if ($lineItems) {
+        $this->setPriceSetID($lineItems[0]['price_field_id.price_set_id']);
+      }
     }
     else {
       foreach ($this->getPriceOptions() as $fieldID => $valueID) {
         if ($valueID !== '') {
           $this->setPriceSetIDFromSelectedField($fieldID);
           $throwAwayArray = [];
+          $temporaryParams = $params;
           // @todo - still using getLine for now but better to bring it to this class & do a better job.
-          $newLines = CRM_Price_BAO_PriceSet::getLine($params, $throwAwayArray, $this->getPriceSetID(), $this->getPriceFieldSpec($fieldID), $fieldID)[1];
+          $newLines = CRM_Price_BAO_PriceSet::getLine($temporaryParams, $throwAwayArray, $this->getPriceSetID(), $this->getPriceFieldSpec($fieldID), $fieldID)[1];
           foreach ($newLines as $newLine) {
             $lineItems[$newLine['price_field_value_id']] = $newLine;
           }
@@ -875,7 +992,31 @@ class CRM_Financial_BAO_Order {
       elseif ($taxRate) {
         $lineItem['tax_amount'] = ($taxRate / 100) * $lineItem['line_total'];
       }
+      $lineItem['membership_type_id'] ??= NULL;
+      if ($lineItem['membership_type_id']) {
+        $lineItem['entity_table'] = 'civicrm_membership';
+        $lineItem['membership_num_terms'] = $lineItem['membership_num_terms'] ?:1;
+      }
       $lineItem['title'] = $this->getLineItemTitle($lineItem);
+      $lineItem['tax_rate'] = $taxRate = $this->getTaxRate((int) $lineItem['financial_type_id']);
+      if ($this->getOverrideTotalAmount() !== FALSE) {
+        $this->addTotalsToLineBasedOnOverrideTotal((int) $lineItem['financial_type_id'], $lineItem);
+      }
+      elseif ($this->getPriceFieldMetadata($lineItem['price_field_id'])['name'] === 'other_amount') {
+        // Other amount is a front end user entered form. It is reasonable to think it would be tax inclusive.
+        $lineItem['line_total_inclusive'] = $lineItem['line_total'];
+        $lineItem['line_total'] = $lineItem['line_total_inclusive'] ? $lineItem['line_total_inclusive'] / (1 + ($lineItem['tax_rate'] / 100)) : 0;
+        $lineItem['tax_amount'] = round($lineItem['line_total_inclusive'] - $lineItem['line_total'], 2);
+        // Make sure they still add up to each other afer the rounding.
+        $lineItem['line_total'] = $lineItem['line_total_inclusive'] - $lineItem['tax_amount'];
+        $lineItem['qty'] = 1;
+        $lineItem['unit_price'] = $lineItem['line_total'];
+
+      }
+      elseif ($taxRate) {
+        $lineItem['tax_amount'] = ($taxRate / 100) * $lineItem['line_total'];
+      }
+      $lineItem['line_total_inclusive'] = $lineItem['line_total_inclusive'] ?? ($lineItem['line_total'] + $lineItem['tax_amount']);
     }
     return $lineItems;
   }
@@ -908,6 +1049,34 @@ class CRM_Financial_BAO_Order {
       $amount += ($lineItem['line_total'] ?? 0.0) + ($lineItem['tax_amount'] ?? 0.0);
     }
     return $amount;
+  }
+
+  /**
+   * Get Amount Level text.
+   *
+   * @return string
+   * @throws \CRM_Core_Exception
+   */
+  public function getAmountLevel() : string {
+    $amount_level = [];
+    $totalParticipant = 0;
+    foreach ($this->getLineItems() as $lineItem) {
+      if ($lineItem['label'] !== ts('Contribution Amount')) {
+        $amount_level[] = $lineItem['label'] . ' - ' . (float) $lineItem['qty'];
+      }
+      $totalParticipant += (float) ($lineItem['participant_count'] ?? 0);
+    }
+    $displayParticipantCount = '';
+    if ($totalParticipant > 0) {
+      $displayParticipantCount = ' Participant Count -' . $totalParticipant;
+    }
+    if (!empty($amount_level)) {
+      $amountString = CRM_Utils_Array::implodePadded($amount_level);
+      if (!empty($displayParticipantCount)) {
+        $amountString = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $amount_level) . $displayParticipantCount . CRM_Core_DAO::VALUE_SEPARATOR;
+      }
+    }
+    return $amountString ?? '';
   }
 
   /**
@@ -984,17 +1153,40 @@ class CRM_Financial_BAO_Order {
       }
     }
     if (!isset($lineItem['financial_type_id'])) {
-      $lineItem['financial_type_id'] = $this->getDefaultFinancialTypeID();
+      if (!empty($lineItem['price_field_value_id'])
+        && $lineItem['price_field_value_id'] !== $this->getDefaultPriceFieldValueID()) {
+        // We have a price field value ID and this value is not the default one used for
+        // 'generic' line items, so we can load the financial type ID from it.
+        $lineItem['financial_type_id'] = $this->getPriceFieldValueSpec($lineItem['price_field_value_id'])['financial_type_id'];
+      }
+      else {
+        $lineItem['financial_type_id'] = $this->getDefaultFinancialTypeID();
+      }
     }
-    if (!is_numeric($lineItem['financial_type_id'])) {
-      $lineItem['financial_type_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', $lineItem['financial_type_id']);
+    if (!isset($lineItem['membership_type_id']) && !empty($lineItem['price_field_value_id'])) {
+      $lineItem['membership_type_id'] = $this->getPriceFieldValueSpec($lineItem['price_field_value_id'])['membership_type_id'];
+    }
+    if (!isset($lineItem['membership_num_terms']) && !empty($lineItem['price_field_value_id'])) {
+      $lineItem['membership_num_terms'] = $this->getPriceFieldValueSpec($lineItem['price_field_value_id'])['membership_num_terms'];
+    }
+    if (!empty($lineItem['membership_type_id']) && !isset($lineItem['membership_num_terms'])) {
+      $lineItem['membership_num_terms'] = 1;
     }
     if ($this->getOverrideTotalAmount()) {
       $this->addTotalsToLineBasedOnOverrideTotal((int) $lineItem['financial_type_id'], $lineItem);
     }
     else {
+      if (!empty($lineItem['price_field_value_id'])) {
+        // Let's make sure it is an integer not '2' for sanity.
+        $lineItem['price_field_value_id'] = (int) $lineItem['price_field_value_id'];
+        $lineItem = array_merge($this->getPriceFieldValueDefaults($lineItem['price_field_value_id']), $lineItem);
+      }
+      if (!isset($lineItem['line_total'])) {
+        $lineItem['line_total'] = $lineItem['qty'] * $lineItem['unit_price'];
+      }
       $lineItem['tax_rate'] = $this->getTaxRate($lineItem['financial_type_id']);
       $lineItem['tax_amount'] = ($lineItem['tax_rate'] / 100) * $lineItem['line_total'];
+      $lineItem['line_total_inclusive'] = $lineItem['tax_amount'] + $lineItem['line_total'];
     }
     if (!empty($lineItem['membership_type_id'])) {
       $lineItem['entity_table'] = 'civicrm_membership';
@@ -1037,6 +1229,18 @@ class CRM_Financial_BAO_Order {
    */
   public function setLineItemValue(string $name, $value, $index): void {
     $this->lineItems[$index][$name] = $value;
+  }
+
+  /**
+   * Set the line item array.
+   *
+   * This is mostly useful when they have been calculated & stored
+   * on the form & we want to rebuild the line item object.
+   *
+   * @param array $lineItems
+   */
+  public function setLineItems(array $lineItems): void {
+    $this->lineItems = $lineItems;
   }
 
   /**
@@ -1087,8 +1291,8 @@ class CRM_Financial_BAO_Order {
       }
     }
     $lineItem['unit_price'] = $lineItem['line_total'] ?? $option['amount'];
-    $lineItem['label'] = $lineItem['label'] ?? $option['label'];
-    $lineItem['field_title'] = $lineItem['field_title'] ?? $option['label'];
+    $lineItem['label'] ??= $option['label'];
+    $lineItem['field_title'] ??= $option['label'];
     $lineItem['financial_type_id'] = $lineItem['financial_type_id'] ?: ($this->getDefaultFinancialTypeID() ?? $option['financial_type_id']);
     return $lineItem;
   }
@@ -1110,6 +1314,8 @@ class CRM_Financial_BAO_Order {
     }
     else {
       $lineItem['line_total'] = $this->getOverrideTotalAmount();
+      $lineItem['tax_amount'] = 0.0;
+      $lineItem['line_total_inclusive'] = $lineItem['line_total'];
     }
     if (!empty($lineItem['qty'])) {
       $lineItem['unit_price'] = $lineItem['line_total'] / $lineItem['qty'];
@@ -1122,7 +1328,7 @@ class CRM_Financial_BAO_Order {
   /**
    * Get the line items from a template.
    *
-   * @return \Civi\Api4\Generic\Result
+   * @return array
    *
    * @throws \CRM_Core_Exception
    */
@@ -1243,7 +1449,79 @@ class CRM_Financial_BAO_Order {
         $lineItemTitle .= ' ' . CRM_Utils_String::ellipsify($description, 30);
       }
     }
-    return $lineItemTitle;
+    return $lineItemTitle ?? '';
+  }
+
+  /**
+   * @param array $contributionValues
+   *
+   * @return \Civi\Api4\Generic\Result
+   *
+   * @internal Access through apiv4 Order api only. Signature subject to change.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function save(array $contributionValues): Result {
+    $this->contributionValues = $contributionValues;
+    foreach ($this->getLineItems() as $index => $lineItem) {
+      // Save entities first, so we can get the Entity ID.
+      if ($lineItem['entity_table'] !== 'civicrm_contribution') {
+        $this->setLineItemValue('entity_id', $this->saveLineItemEntity($lineItem), $index);
+      }
+    }
+    $contributionValues['total_amount'] = $this->getTotalAmount();
+    $contributionValues['tax_amount'] = $this->getTotalTaxAmount();
+    $contributionValues['amount_level'] = $this->getAmountLevel();
+    $contributionValues['contribution_status_id:name'] = 'Pending';
+    $contributionValues['line_item'] = [$this->getLineItems()];
+    return Contribution::create()
+      ->setValues($contributionValues)->execute();
+  }
+
+  /**
+   * Save the entity related to a given line item.
+   *
+   * @param array $lineItem
+   *
+   * @return int
+   * @throws \CRM_Core_Exception
+   */
+  private function saveLineItemEntity(array $lineItem): int {
+    $entity = CRM_Core_DAO_AllCoreTables::getEntityNameForTable($lineItem['entity_table']);
+    $entityValues = empty($lineItem['entity_id']) ? [] : ['id' => $lineItem['entity_id']];
+    foreach ($lineItem as $fieldName => $fieldValue) {
+      if (str_starts_with($fieldName, 'entity_id.')) {
+        $entityValues[substr($fieldName, 10)] = $fieldValue;
+      }
+      if ($fieldName === 'membership_type_id' && $entity === 'Membership') {
+        $entityValues['membership_type_id'] = $fieldValue;
+      }
+    }
+    if (empty($entityValues['id'])) {
+      // Not an update, include any relevant values (e.g. contact_id) from the contribution
+      // entity values if not present already in EntityFields.
+      $fields = (array) civicrm_api4($entity, 'getfields')->indexBy('name');
+      $carryOverFields = array_intersect_key($this->contributionValues, $fields);
+      $entityValues += $carryOverFields;
+      if ($entity === 'Membership' && empty($entityValues['status_id'])) {
+        if (empty($entityValues['join_date'])) {
+          $entityValues['join_date'] = $this->contributionValues['receive_date'];
+        }
+        $entityValues['status_id'] = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate(
+          $entityValues['start_date'] ?? NULL,
+            $entityValues['end_date'] ?? NULL,
+            $entityValues['join_date'] ?? NULL,
+          $this->contributionValues['receive_date'],
+          TRUE,
+          $entityValues['membership_type_id']
+        )['id'];
+      }
+    }
+    if (array_keys($entityValues) === ['id']) {
+      // Nothing to save.
+      return $entityValues['id'];
+    }
+    return civicrm_api4($entity, 'save', ['records' => [$entityValues]])->first()['id'];
   }
 
 }

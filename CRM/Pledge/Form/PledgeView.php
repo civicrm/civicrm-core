@@ -19,101 +19,93 @@
  * This class generates form components for Pledge
  */
 class CRM_Pledge_Form_PledgeView extends CRM_Core_Form {
+  use CRM_Pledge_Form_PledgeFormTrait;
 
   /**
    * Set variables up before form is built.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function preProcess() {
+  public function preProcess(): void {
 
-    $values = $ids = [];
-    $params = ['id' => $this->get('id')];
-    CRM_Pledge_BAO_Pledge::getValues($params,
-      $values,
-      $ids
-    );
-
-    $values['frequencyUnit'] = ts('%1(s)', [1 => $values['frequency_unit']]);
-
-    if (isset($values["honor_contact_id"]) && $values["honor_contact_id"]) {
-      $sql = "SELECT display_name FROM civicrm_contact WHERE id = " . $values["honor_contact_id"];
-      $dao = new CRM_Core_DAO();
-      $dao->query($sql);
-      if ($dao->fetch()) {
-        $url = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid=$values[honor_contact_id]");
-        $values["honor_display"] = "<A href = $url>" . $dao->display_name . "</A>";
-      }
-      $honor = CRM_Core_PseudoConstant::get('CRM_Pledge_DAO_Pledge', 'honor_type_id');
-      $values['honor_type'] = $honor[$values['honor_type_id']];
-    }
-
+    $id = $this->getPledgeID();
+    $contactID = $this->getPledgeValue('contact_id');
+    $params = ['id' => $this->getPledgeID()];
     // handle custom data.
     $groupTree = CRM_Core_BAO_CustomGroup::getTree('Pledge', NULL, $params['id'], NULL, [], NULL,
       TRUE, NULL, FALSE, CRM_Core_Permission::VIEW);
     CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, NULL, NULL, $params['id']);
 
-    if (!empty($values['contribution_page_id'])) {
-      $values['contribution_page'] = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $values['contribution_page_id'], 'title');
-    }
+    $displayName = $this->getPledgeValue('contact_id.display_name');
 
-    $values['financial_type'] = CRM_Utils_Array::value($values['financial_type_id'], CRM_Contribute_PseudoConstant::financialType());
-
-    if ($values['status_id']) {
-      $values['pledge_status'] = CRM_Core_PseudoConstant::getLabel('CRM_Pledge_BAO_Pledge', 'status_id', $values['status_id']);
+    // Check if this is default domain contact CRM-10482
+    if (CRM_Contact_BAO_Contact::checkDomainContact($contactID)) {
+      $displayName .= ' (' . ts('default organization') . ')';
     }
+    // omitting contactImage from title for now since the summary overlay css doesn't work outside of our crm-container
+    $this->setTitle(ts('View Pledge by') . ' ' . $displayName);
+    $this->assign('displayName', $displayName);
+
+    $title = $displayName .
+      ' - (' . ts('Pledged') . ' ' . CRM_Utils_Money::format($this->getPledgeValue('pledge_amount')) .
+      ' - ' . $this->getPledgeValue('financial_type_id:label') . ')';
 
     $url = CRM_Utils_System::url('civicrm/contact/view/pledge',
-      "action=view&reset=1&id={$values['id']}&cid={$values['contact_id']}&context=home"
+      "action=view&reset=1&id={$id}&cid={$contactID}&context=home"
     );
 
     $recentOther = [];
     if (CRM_Core_Permission::checkActionPermission('CiviPledge', CRM_Core_Action::UPDATE)) {
       $recentOther['editUrl'] = CRM_Utils_System::url('civicrm/contact/view/pledge',
-        "action=update&reset=1&id={$values['id']}&cid={$values['contact_id']}&context=home"
+        "action=update&reset=1&id={$id}&cid={$contactID}&context=home"
       );
     }
     if (CRM_Core_Permission::checkActionPermission('CiviPledge', CRM_Core_Action::DELETE)) {
       $recentOther['deleteUrl'] = CRM_Utils_System::url('civicrm/contact/view/pledge',
-        "action=delete&reset=1&id={$values['id']}&cid={$values['contact_id']}&context=home"
+        "action=delete&reset=1&id={$id}&cid={$contactID}&context=home"
       );
     }
-
-    $displayName = CRM_Contact_BAO_Contact::displayName($values['contact_id']);
-    $this->assign('displayName', $displayName);
-
-    $title = $displayName .
-      ' - (' . ts('Pledged') . ' ' . CRM_Utils_Money::format($values['pledge_amount']) .
-      ' - ' . $values['financial_type'] . ')';
-
     // add Pledge to Recent Items
     CRM_Utils_Recent::add($title,
       $url,
-      $values['id'],
+      $this->getPledgeID(),
       'Pledge',
-      $values['contact_id'],
+      $this->getPledgeValue('contact_id'),
       NULL,
       $recentOther
     );
 
-    // Check if this is default domain contact CRM-10482
-    if (CRM_Contact_BAO_Contact::checkDomainContact($values['contact_id'])) {
-      $displayName .= ' (' . ts('default organization') . ')';
-    }
-    // omitting contactImage from title for now since the summary overlay css doesn't work outside of our crm-container
-    $this->setTitle(ts('View Pledge by') . ' ' . $displayName);
-
-    // do check for campaigns
-    if ($campaignId = CRM_Utils_Array::value('campaign_id', $values)) {
-      $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns($campaignId);
-      $values['campaign'] = $campaigns[$campaignId];
-    }
-
-    $this->assign($values);
+    $this->assign('campaign', $this->getPledgeValue('campaign_id:label'));
+    $currentInstallment = $this->getPledgeValue('amount') / $this->getPledgeValue('installments');
+    $this->assign('currentInstallment', $currentInstallment);
+    $this->assign('originalPledgeAmount', $currentInstallment === $this->getPledgeValue('original_installment_amount') ? NULL : $this->getPledgeValue('installments') * $this->getPledgeValue('original_installment_amount'));
+    $this->assign('start_date', $this->getPledgeValue('start_date'));
+    $this->assign('create_date', $this->getPledgeValue('create_date'));
+    $this->assign('end_date', $this->getPledgeValue('end_date'));
+    $this->assign('cancel_date', $this->getPledgeValue('cancel_date'));
+    $this->assign('is_test', $this->getPledgeValue('is_test'));
+    $this->assign('acknowledge_date', $this->getPledgeValue('acknowledge_date'));
+    $this->assign('pledge_status', $this->getPledgeValue('status_id:label'));
+    $this->assign('pledge_status_name', $this->getPledgeValue('status_id:name'));
+    $this->assign('amount', $this->getPledgeValue('amount'));
+    $this->assign('currency', $this->getPledgeValue('currency'));
+    $this->assign('initial_reminder_day', $this->getPledgeValue('initial_reminder_day'));
+    $this->assign('additional_reminder_day', $this->getPledgeValue('additional_reminder_day'));
+    $this->assign('max_reminders', $this->getPledgeValue('max_reminders'));
+    $this->assign('installments', $this->getPledgeValue('installments'));
+    $this->assign('original_installment_amount', $this->getPledgeValue('original_installment_amount'));
+    $this->assign('frequency_interval', $this->getPledgeValue('frequency_interval'));
+    $this->assign('frequency_day', $this->getPledgeValue('frequency_day'));
+    $this->assign('contribution_page', $this->getPledgeValue('contribution_page_id.title'));
+    $this->assign('contact_id', $this->getPledgeValue('contact_id'));
+    $this->assign('financial_type', $this->getPledgeValue('financial_type_id:label'));
+    $this->assign('frequencyUnit', ts('%1(s)', [1 => $this->getPledgeValue('frequency_unit')]));
   }
 
   /**
    * Build the form object.
    */
-  public function buildQuickForm() {
+  public function buildQuickForm(): void {
     $this->addButtons([
         [
           'type' => 'next',
@@ -122,6 +114,17 @@ class CRM_Pledge_Form_PledgeView extends CRM_Core_Form {
           'isDefault' => TRUE,
         ],
     ]);
+  }
+
+  /**
+   * Get id of Pledge being acted on.
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   */
+  public function getPledgeID(): int {
+    return (int) $this->get('id');
   }
 
 }

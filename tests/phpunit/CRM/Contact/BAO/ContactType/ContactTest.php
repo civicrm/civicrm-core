@@ -6,6 +6,26 @@
  */
 class CRM_Contact_BAO_ContactType_ContactTest extends CiviUnitTestCase {
 
+  /**
+   * @var string
+   */
+  protected $student;
+
+  /**
+   * @var string
+   */
+  protected $parent;
+
+  /**
+   * @var string
+   */
+  protected $sponsor;
+
+  /**
+   * @var string
+   */
+  protected $team;
+
   public function setUp(): void {
     parent::setUp();
 
@@ -16,7 +36,7 @@ class CRM_Contact_BAO_ContactType_ContactTest extends CiviUnitTestCase {
       'parent_id' => 1,
       'is_active' => 1,
     ];
-    $result = CRM_Contact_BAO_ContactType::add($params);
+    CRM_Contact_BAO_ContactType::writeRecord($params);
     $this->student = $params['name'];
 
     $params = [
@@ -26,7 +46,7 @@ class CRM_Contact_BAO_ContactType_ContactTest extends CiviUnitTestCase {
       'parent_id' => 1,
       'is_active' => 1,
     ];
-    $result = CRM_Contact_BAO_ContactType::add($params);
+    CRM_Contact_BAO_ContactType::writeRecord($params);
     $this->parent = $params['name'];
 
     $params = [
@@ -36,7 +56,7 @@ class CRM_Contact_BAO_ContactType_ContactTest extends CiviUnitTestCase {
       'parent_id' => 3,
       'is_active' => 1,
     ];
-    $result = CRM_Contact_BAO_ContactType::add($params);
+    CRM_Contact_BAO_ContactType::writeRecord($params);
     $this->sponsor = $params['name'];
 
     $params = [
@@ -46,7 +66,7 @@ class CRM_Contact_BAO_ContactType_ContactTest extends CiviUnitTestCase {
       'parent_id' => 3,
       'is_active' => 1,
     ];
-    $result = CRM_Contact_BAO_ContactType::add($params);
+    CRM_Contact_BAO_ContactType::writeRecord($params);
     $this->team = $params['name'];
   }
 
@@ -64,7 +84,7 @@ DELETE FROM civicrm_contact_type
    *
    * Success expected
    */
-  public function testCreateContact() {
+  public function testCreateContact(): void {
     //check for Type:Individual
     $params = [
       'first_name' => 'Anne',
@@ -74,7 +94,7 @@ DELETE FROM civicrm_contact_type
     try {
       $contact = CRM_Contact_BAO_Contact::add($params);
     }
-    catch (Exception$expected) {
+    catch (Exception $expected) {
     }
     $this->assertEquals($contact->first_name, 'Anne');
     $this->assertEquals($contact->contact_type, 'Individual');
@@ -88,7 +108,7 @@ DELETE FROM civicrm_contact_type
     try {
       $contact = CRM_Contact_BAO_Contact::add($params);
     }
-    catch (Exception$expected) {
+    catch (Exception $expected) {
     }
     $this->assertEquals($contact->organization_name, 'Compumentor');
     $this->assertEquals($contact->contact_type, 'Organization');
@@ -102,7 +122,7 @@ DELETE FROM civicrm_contact_type
     try {
       $contact = CRM_Contact_BAO_Contact::add($params);
     }
-    catch (Exception$expected) {
+    catch (Exception $expected) {
     }
     $this->assertEquals($contact->household_name, 'John Does home');
     $this->assertEquals($contact->contact_type, 'Household');
@@ -118,7 +138,7 @@ DELETE FROM civicrm_contact_type
     try {
       $contact = CRM_Contact_BAO_Contact::add($params);
     }
-    catch (Exception$expected) {
+    catch (Exception $expected) {
     }
     $this->assertEquals($contact->first_name, 'Bill');
     $this->assertEquals($contact->contact_type, 'Individual');
@@ -134,7 +154,7 @@ DELETE FROM civicrm_contact_type
     try {
       $contact = CRM_Contact_BAO_Contact::add($params);
     }
-    catch (Exception$expected) {
+    catch (Exception $expected) {
     }
     $this->assertEquals($contact->organization_name, 'Conservation Corp');
     $this->assertEquals($contact->contact_type, 'Organization');
@@ -147,7 +167,7 @@ DELETE FROM civicrm_contact_type
    *
    * Success expected.
    */
-  public function testUpdateContactNoSubtypeToValid() {
+  public function testUpdateContactNoSubtypeToValid(): void {
     $params = [
       'first_name' => 'Anne',
       'last_name' => 'Grant',
@@ -156,7 +176,7 @@ DELETE FROM civicrm_contact_type
     try {
       $contact = CRM_Contact_BAO_Contact::add($params);
     }
-    catch (Exception$expected) {
+    catch (Exception $expected) {
     }
     $updateParams = [
       'contact_sub_type' => $this->student,
@@ -166,7 +186,7 @@ DELETE FROM civicrm_contact_type
     try {
       $updatedContact = CRM_Contact_BAO_Contact::add($updateParams);
     }
-    catch (Exception$expected) {
+    catch (Exception $expected) {
     }
     $this->assertEquals($updatedContact->id, $contact->id);
     $this->assertEquals($updatedContact->contact_type, 'Individual');
@@ -180,7 +200,7 @@ DELETE FROM civicrm_contact_type
     try {
       $contact = CRM_Contact_BAO_Contact::add($params);
     }
-    catch (Exception$expected) {
+    catch (Exception $expected) {
     }
 
     $updateParams = [
@@ -191,7 +211,7 @@ DELETE FROM civicrm_contact_type
     try {
       $updatedContact = CRM_Contact_BAO_Contact::add($updateParams);
     }
-    catch (Exception$expected) {
+    catch (Exception $expected) {
     }
     $this->assertEquals($updatedContact->id, $contact->id);
     $this->assertEquals($updatedContact->contact_type, 'Organization');
@@ -203,7 +223,7 @@ DELETE FROM civicrm_contact_type
    * Update the contact with subtype to another valid subtype.
    * success expected
    */
-  public function testUpdateContactSubtype() {
+  public function testUpdateContactSubtype(): void {
     $params = [
       'first_name' => 'Anne',
       'last_name' => 'Grant',
@@ -213,7 +233,7 @@ DELETE FROM civicrm_contact_type
     try {
       $contact = CRM_Contact_BAO_Contact::add($params);
     }
-    catch (Exception$expected) {
+    catch (Exception $expected) {
     }
 
     $updateParams = [
@@ -224,7 +244,7 @@ DELETE FROM civicrm_contact_type
     try {
       $updatedContact = CRM_Contact_BAO_Contact::add($updateParams);
     }
-    catch (Exception$expected) {
+    catch (Exception $expected) {
     }
     $this->assertEquals($updatedContact->id, $contact->id);
     $this->assertEquals($updatedContact->contact_type, 'Individual');
@@ -239,7 +259,7 @@ DELETE FROM civicrm_contact_type
     try {
       $contact = CRM_Contact_BAO_Contact::add($params);
     }
-    catch (Exception$expected) {
+    catch (Exception $expected) {
     }
 
     $updateParams = [
@@ -250,7 +270,7 @@ DELETE FROM civicrm_contact_type
     try {
       $updatedContact = CRM_Contact_BAO_Contact::add($updateParams);
     }
-    catch (Exception$expected) {
+    catch (Exception $expected) {
     }
 
     $this->assertEquals($updatedContact->id, $contact->id);
@@ -267,7 +287,7 @@ DELETE FROM civicrm_contact_type
     try {
       $contact = CRM_Contact_BAO_Contact::add($params);
     }
-    catch (Exception$expected) {
+    catch (Exception $expected) {
     }
 
     $updateParams = [
@@ -278,7 +298,7 @@ DELETE FROM civicrm_contact_type
     try {
       $updatedContact = CRM_Contact_BAO_Contact::add($updateParams);
     }
-    catch (Exception$expected) {
+    catch (Exception $expected) {
     }
 
     $this->assertEquals($updatedContact->id, $contact->id);
@@ -293,7 +313,7 @@ DELETE FROM civicrm_contact_type
    *
    * Success expected
    */
-  public function testCRM19133() {
+  public function testCRM19133(): void {
     $subtypesToPreserve = [$this->student, $this->parent];
 
     // Create custom group that extends student and parent subtype

@@ -8,11 +8,6 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-content-block crm-contribution-view-form-block">
-<div class="action-link">
-  <div class="crm-submit-buttons">
-    {include file="CRM/common/formButtons.tpl" location="top"}
-  </div>
-</div>
 <table class="crm-info-panel">
   {if $is_test}
     <div class="help">
@@ -28,12 +23,12 @@
     <td>{$financial_type}{if $is_test} {ts}(test){/ts} {/if}</td>
   </tr>
   <tr class="crm-contribution-form-block-source">
-    <td class="label">{ts}Source{/ts}</td>
-    <td>{$source}</td>
+    <td class="label">{ts}Contribution Source{/ts}</td>
+    <td>{$source|escape}</td>
   </tr>
   {if empty($is_template)}
   <tr class="crm-contribution-form-block-receive_date">
-    <td class="label">{ts}Received{/ts}</td>
+    <td class="label">{ts}Contribution Date{/ts}</td>
     <td>{if $receive_date}{$receive_date|crmDate}{else}({ts}not available{/ts}){/if}</td>
   </tr>
   {/if}
@@ -87,7 +82,7 @@
       <td>{$revenue_recognition_date|crmDate:"%B, %Y"}</td>
     </tr>
   {/if}
-  {if $to_financial_account }
+  {if $to_financial_account}
     <tr class="crm-contribution-form-block-to_financial_account">
       <td class="label">{ts}Received Into{/ts}</td>
       <td>{$to_financial_account}</td>
@@ -151,7 +146,7 @@
     </tr>
   {/if}
   {foreach from=$note item="rec"}
-    {if $rec }
+    {if $rec}
       <tr class="crm-contribution-form-block-note">
         <td class="label">{ts}Note{/ts}</td>
         <td>{$rec}</td>
@@ -199,10 +194,10 @@
 </table>
 
 {if $softContributions && count($softContributions)} {* We show soft credit name with PCP section if contribution is linked to a PCP. *}
-  <div class="crm-accordion-wrapper crm-soft-credit-pane">
-    <div class="crm-accordion-header">
+  <details class="crm-accordion-bold crm-soft-credit-pane" open>
+    <summary>
       {ts}Soft Credit{/ts}
-    </div>
+    </summary>
     <div class="crm-accordion-body">
       <table class="crm-info-panel crm-soft-credit-listing">
         {foreach from=$softContributions item="softCont"}
@@ -221,14 +216,14 @@
         {/foreach}
       </table>
     </div>
-  </div>
+  </details>
 {/if}
 
 {if $premium}
-  <div class="crm-accordion-wrapper ">
-    <div class="crm-accordion-header">
+  <details class="crm-accordion-bold " open>
+    <summary>
       {ts}Premium Information{/ts}
-    </div>
+    </summary>
     <div class="crm-accordion-body">
       <table class="crm-info-panel">
         <td class="label">{ts}Premium{/ts}</td>
@@ -236,17 +231,17 @@
         <td class="label">{ts}Option{/ts}</td>
         <td>{$option}</td>
         <td class="label">{ts}Fulfilled{/ts}</td>
-        <td>{$fulfilled|truncate:10:''|crmDate}</td>
+        <td>{if $fulfilled}{$fulfilled|truncate:10:''|crmDate}{else}{ts}No{/ts}{/if}</td>
       </table>
     </div>
-  </div>
+  </details>
 {/if}
 
 {if $pcp_id}
-  <div id='PCPView' class="crm-accordion-wrapper ">
-    <div class="crm-accordion-header">
+  <details id='PCPView' class="crm-accordion-bold " open>
+    <summary>
       {ts}Personal Campaign Page Contribution Information{/ts}
-    </div>
+    </summary>
     <div class="crm-accordion-body">
       <table class="crm-info-panel">
         <tr>
@@ -278,7 +273,7 @@
         {/if}
       </table>
     </div>
-  </div>
+  </details>
 {/if}
 
 {include file="CRM/Custom/Page/CustomDataView.tpl"}

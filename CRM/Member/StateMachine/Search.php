@@ -49,7 +49,7 @@ class CRM_Member_StateMachine_Search extends CRM_Core_StateMachine {
     if ($result) {
       $this->_pages['CRM_Member_Form_Task_Result'] = NULL;
     }
-    $this->addSequentialPages($this->_pages, $action);
+    $this->addSequentialPages($this->_pages);
   }
 
   /**

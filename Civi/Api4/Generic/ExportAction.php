@@ -23,13 +23,14 @@ use Civi\Api4\Utils\CoreUtil;
  *
  * @method $this setId(int $id)
  * @method int getId()
+ * @method $this setMatch(array $match) Specify fields to match for update.
+ * @method array getMatch()
  * @method $this setCleanup(string $cleanup)
  * @method string getCleanup()
  * @method $this setUpdate(string $update)
  * @method string getUpdate()
  */
 class ExportAction extends AbstractAction {
-  use Traits\MatchParamTrait;
 
   /**
    * Id of $ENTITY to export
@@ -37,6 +38,16 @@ class ExportAction extends AbstractAction {
    * @required
    */
   protected $id;
+
+  /**
+   * Fields to match when managed records are being reconciled.
+   *
+   * By default this will be set automatically based on the entity's unique fields.
+   *
+   * @var array
+   * @optionsCallback getMatchFields
+   */
+  protected $match;
 
   /**
    * Specify rule for auto-updating managed entity
@@ -106,27 +117,12 @@ class ExportAction extends AbstractAction {
     }
     // The get api always returns ID, but it should not be included in an export
     unset($record['id']);
-    // Should references be limited to the current domain?
-    $limitRefsByDomain = $entityType === 'OptionGroup' && \CRM_Core_OptionGroup::isDomainOptionGroup($record['name']) ? \CRM_Core_BAO_Domain::getDomain()->id : FALSE;
-    foreach ($allFields as $fieldName => $field) {
-      if (($field['fk_entity'] ?? NULL) === 'Domain') {
-        $alias = $fieldName . '.name';
-        if (isset($record[$alias])) {
-          // If this entity is for a specific domain, limit references to that same domain
-          if ($fieldName === 'domain_id') {
-            $limitRefsByDomain = \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain', $record[$alias], 'id', 'name');
-          }
-          // Swap current domain for special API keyword
-          if ($record[$alias] === \CRM_Core_BAO_Domain::getDomain()->name) {
-            unset($record[$alias]);
-            $record[$fieldName] = 'current_domain';
-          }
-        }
-      }
-    }
     $name = ($parentName ?? '') . $entityType . '_' . ($record['name'] ?? count($this->exportedEntities[$entityType]));
-    // Ensure safe characters, max length
-    $name = \CRM_Utils_String::munge($name, '_', 127);
+    // Ensure safe characters, max length.
+    // This is used for the value of `civicrm_managed.name` which has a maxlength of 255, but is also used
+    // to generate a file by civix, and many filesystems have a maxlength of 255 including the suffix, so
+    // 255 - strlen('.mgd.php') = 247
+    $name = \CRM_Utils_String::munge($name, '_', 247);
     // Include option group with custom field
     if ($entityType === 'CustomField') {
       if (
@@ -146,6 +142,12 @@ class ExportAction extends AbstractAction {
         unset($record[$fieldName]);
       }
     }
+    // Unset values that match the default
+    foreach ($allFields as $fieldName => $field) {
+      if (($record[$fieldName] ?? NULL) === $field['default_value']) {
+        unset($record[$fieldName]);
+      }
+    }
     $export = [
       'name' => $name,
       'entity' => $entityType,
@@ -156,8 +158,13 @@ class ExportAction extends AbstractAction {
         'values' => $record,
       ],
     ];
-    foreach (array_intersect($this->match, array_keys($allFields)) as $match) {
-      $export['params']['match'][] = $match;
+    $matchFields = $this->match;
+    // Calculate $match param if not passed explicitly
+    if (!isset($matchFields)) {
+      $matchFields = (array) CoreUtil::getInfoItem($entityType, 'match_fields');
+    }
+    if ($matchFields) {
+      $export['params']['match'] = $matchFields;
     }
     $result[] = $export;
     // Export entities that reference this one
@@ -172,15 +179,6 @@ class ExportAction extends AbstractAction {
         // Custom fields don't really "belong" to option groups despite the reference
         if ($refEntity === 'CustomField' && $entityType === 'OptionGroup') {
           continue;
-        }
-        // Limit references by domain
-        if (property_exists($reference, 'domain_id')) {
-          if (!isset($reference->domain_id)) {
-            $reference->find(TRUE);
-          }
-          if (isset($reference->domain_id) && $reference->domain_id != $limitRefsByDomain) {
-            continue;
-          }
         }
         $references[$refEntity][] = $reference;
       }
@@ -250,6 +248,8 @@ class ExportAction extends AbstractAction {
       ['type', 'IN', ['Field', 'Custom']],
       ['readonly', '!=', TRUE],
     ];
+    // Domains are handled automatically
+    $excludeFields[] = 'domain_id';
     if ($excludeFields) {
       $conditions[] = ['name', 'NOT IN', $excludeFields];
     }
@@ -264,6 +264,21 @@ class ExportAction extends AbstractAction {
     catch (NotImplementedException $e) {
       return [];
     }
+  }
+
+  /**
+   * Options callback for $this->match
+   * @return array
+   */
+  protected function getMatchFields() {
+    return (array) civicrm_api4($this->getEntityName(), 'getFields', [
+      'checkPermissions' => FALSE,
+      'action' => 'get',
+      'where' => [
+        ['type', 'IN', ['Field']],
+        ['readonly', '!=', TRUE],
+      ],
+    ], ['name']);
   }
 
 }

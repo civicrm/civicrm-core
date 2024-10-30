@@ -25,7 +25,7 @@ class CryptoRegistryTest extends \CiviUnitTestCase {
     \CRM_Utils_Hook::singleton()->setHook('civicrm_crypto', [$this, 'registerExampleKeys']);
   }
 
-  public function testParseKey() {
+  public function testParseKey(): void {
     $examples = self::getExampleKeys();
     $registry = \Civi::service('crypto.registry');
 
@@ -49,7 +49,7 @@ class CryptoRegistryTest extends \CiviUnitTestCase {
     $this->assertEquals('0ao5eC7C/rwwk2qii4oLd6eG3KJq8ZDX2K9zWbvaLdo=', base64_encode($key3['key']));
   }
 
-  public function testRegisterAndFindKeys() {
+  public function testRegisterAndFindKeys(): void {
     /** @var CryptoRegistry $registry */
     $registry = \Civi::service('crypto.registry');
 
@@ -74,7 +74,7 @@ class CryptoRegistryTest extends \CiviUnitTestCase {
     $this->assertEquals('asdf-key-1', $key['id']);
   }
 
-  public function testValidKeyId() {
+  public function testValidKeyId(): void {
     $valids = ['abc', 'a.b-c_d+e/', 'f\\g:h;i='];
     $invalids = [chr(0), chr(1), chr(1) . 'abc', 'a b', "ab\n", "ab\nc", "\r", "\n"];
 
@@ -90,7 +90,7 @@ class CryptoRegistryTest extends \CiviUnitTestCase {
     }
   }
 
-  public function testAddBadKeyId() {
+  public function testAddBadKeyId(): void {
     /** @var CryptoRegistry $registry */
     $registry = \Civi::service('crypto.registry');
 
@@ -102,7 +102,7 @@ class CryptoRegistryTest extends \CiviUnitTestCase {
       $this->fail("Expected crypto exception");
     }
     catch (CryptoException $e) {
-      $this->assertRegExp(';Malformed key ID;', $e->getMessage());
+      $this->assertMatchesRegularExpression(';Malformed key ID;', $e->getMessage());
     }
   }
 

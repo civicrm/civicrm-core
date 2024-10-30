@@ -72,11 +72,8 @@ class CRM_PCP_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
    * @return void
    */
   public function buildQuickForm() {
-    $this->_last = TRUE;
     CRM_PCP_BAO_PCP::buildPCPForm($this);
-
     $this->addElement('checkbox', 'pcp_active', ts('Enable Personal Campaign Pages? (for this contribution page)'), NULL, ['onclick' => "return showHideByValue('pcp_active',true,'pcpFields','table-row','radio',false);"]);
-
     parent::buildQuickForm();
     $this->addFormRule(['CRM_PCP_Form_Contribute', 'formRule'], $this);
   }
@@ -95,7 +92,7 @@ class CRM_PCP_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
    */
   public static function formRule($params, $files, $self) {
     $errors = [];
-    if (!empty($params['is_active'])) {
+    if (!empty($params['pcp_active'])) {
 
       if (!empty($params['is_tellfriend_enabled']) &&
         (CRM_Utils_Array::value('tellfriend_limit', $params) <= 0)
@@ -111,7 +108,8 @@ class CRM_PCP_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
         }
       }
 
-      if ($emails = CRM_Utils_Array::value('notify_email', $params)) {
+      $emails = $params['notify_email'] ?? NULL;
+      if ($emails) {
         $emailArray = explode(',', $emails);
         foreach ($emailArray as $email) {
           if ($email && !CRM_Utils_Rule::email(trim($email))) {
@@ -146,11 +144,11 @@ class CRM_PCP_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
     $dao->entity_id = $this->_id;
     $dao->find(TRUE);
     $params['id'] = $dao->id;
-    $params['is_active'] = CRM_Utils_Array::value('pcp_active', $params, FALSE);
-    $params['is_approval_needed'] = CRM_Utils_Array::value('is_approval_needed', $params, FALSE);
-    $params['is_tellfriend_enabled'] = CRM_Utils_Array::value('is_tellfriend_enabled', $params, FALSE);
+    $params['is_active'] = $params['pcp_active'] ?? FALSE;
+    $params['is_approval_needed'] ??= FALSE;
+    $params['is_tellfriend_enabled'] ??= FALSE;
 
-    CRM_PCP_BAO_PCPBlock::create($params);
+    CRM_PCP_BAO_PCPBlock::writeRecord($params);
 
     parent::endPostProcess();
   }

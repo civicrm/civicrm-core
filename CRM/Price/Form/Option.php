@@ -42,6 +42,13 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
   protected $_moneyFields = ['amount', 'non_deductible_amount'];
 
   /**
+   * price_set_id being edited
+   *
+   * @var int
+   */
+  protected $_sid;
+
+  /**
    * Set variables up before form is built.
    *
    * @return void
@@ -79,10 +86,9 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
       }
     }
 
-    $memberComponentId = CRM_Core_Component::getComponentID('CiviMember');
     $extendComponentId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_sid, 'extends', 'id');
 
-    if (!isset($defaults['membership_num_terms']) && $memberComponentId == $extendComponentId) {
+    if (!isset($defaults['membership_num_terms']) && $this->isComponentPriceOption($extendComponentId, 'CiviMember')) {
       $defaults['membership_num_terms'] = 1;
     }
     // set financial type used for price set to set default for new option
@@ -148,10 +154,9 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
       ) {
         $this->_sid = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $this->_fid, 'price_set_id', 'id');
       }
-      $this->isEvent = FALSE;
       $extendComponentId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_sid, 'extends', 'id');
       $this->assign('showMember', FALSE);
-      if ($memberComponentId == $extendComponentId) {
+      if ($this->isComponentPriceOption($extendComponentId, 'CiviMember')) {
         $this->assign('showMember', TRUE);
         $membershipTypes = CRM_Member_PseudoConstant::membershipType();
         $this->add('select', 'membership_type_id', ts('Membership Type'), [
@@ -161,10 +166,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
         $this->add('number', 'membership_num_terms', ts('Number of Terms'), $attributes['membership_num_terms']);
       }
       else {
-        $allComponents = explode(CRM_Core_DAO::VALUE_SEPARATOR, $extendComponentId);
-        $eventComponentId = CRM_Core_Component::getComponentID('CiviEvent');
-        if (in_array($eventComponentId, $allComponents)) {
-          $this->isEvent = TRUE;
+        if ($this->isComponentPriceOption($extendComponentId, 'CiviEvent')) {
           // count
           $this->add('number', 'count', ts('Participant Count'));
           $this->addRule('count', ts('Please enter a valid Max Participants.'), 'positiveInteger');
@@ -320,22 +322,20 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
         'label', 'id'
       );
 
-      if (CRM_Price_BAO_PriceFieldValue::del($this->_oid)) {
-        CRM_Core_Session::setStatus(ts('%1 option has been deleted.', [1 => $label]), ts('Record Deleted'), 'success');
-      }
+      CRM_Price_BAO_PriceFieldValue::deleteRecord(['id' => $this->_oid]);
+      CRM_Core_Session::setStatus(ts('%1 option has been deleted.', [1 => $label]), ts('Record Deleted'), 'success');
       return NULL;
     }
     else {
       $params = $this->controller->exportValues('Option');
-      $fieldLabel = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $this->_fid, 'label');
 
       foreach ($this->_moneyFields as $field) {
         $params[$field] = CRM_Utils_Rule::cleanMoney(trim($params[$field]));
       }
       $params['price_field_id'] = $this->_fid;
-      $params['is_default'] = CRM_Utils_Array::value('is_default', $params, FALSE);
-      $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
-      $params['visibility_id'] = CRM_Utils_Array::value('visibility_id', $params, FALSE);
+      $params['is_default'] ??= FALSE;
+      $params['is_active'] ??= FALSE;
+      $params['visibility_id'] ??= FALSE;
       $ids = [];
       if ($this->_oid) {
         $params['id'] = $this->_oid;
@@ -344,6 +344,21 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
 
       CRM_Core_Session::setStatus(ts("The option '%1' has been saved.", [1 => $params['label']]), ts('Value Saved'), 'success');
     }
+  }
+
+  /**
+   * Check to see if this is within a price set that supports the specific component
+   * @var string $extends separator encoded string of Component ids
+   * @var string $component Component name
+   *
+   * @return bool
+   */
+  private function isComponentPriceOption(string $extends, string $component): bool {
+    if (!CRM_Core_Component::isEnabled($component)) {
+      return FALSE;
+    }
+    $extends = CRM_Core_DAO::unSerializeField($extends, CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND);
+    return in_array(CRM_Core_Component::getComponentID($component), $extends, FALSE);
   }
 
 }

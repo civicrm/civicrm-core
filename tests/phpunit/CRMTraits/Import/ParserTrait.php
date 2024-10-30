@@ -38,7 +38,7 @@ trait CRMTraits_Import_ParserTrait {
       'mapper' => $this->getMapperFromFieldMappings($fieldMappings),
       'dataSource' => 'CRM_Import_DataSource_CSV',
       'file' => ['name' => $csv],
-      'dateFormats' => CRM_Core_Form_Date::DATE_yyyy_mm_dd,
+      'dateFormats' => CRM_Utils_Date::DATE_yyyy_mm_dd,
       'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
       'groups' => [],
     ], $submittedValues);
@@ -70,6 +70,9 @@ trait CRMTraits_Import_ParserTrait {
     catch (CRM_Core_Exception_PrematureExitException $e) {
       $queue = Civi::queue('user_job_' . $this->userJobID);
       $this->assertEquals(1, CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM civicrm_queue_item'));
+      $item = $queue->claimItem(0);
+      $this->assertEquals(['contactId' => CRM_Core_Session::getLoggedInContactID(), 'domainId' => CRM_Core_Config::domainID()], $item->data->runAs);
+      $queue->releaseItem($item);
       $runner = new CRM_Queue_Runner([
         'queue' => $queue,
         'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
@@ -119,7 +122,7 @@ trait CRMTraits_Import_ParserTrait {
       'contactType' => 'Individual',
       'dataSource' => 'CRM_Import_DataSource_CSV',
       'file' => ['name' => $csv],
-      'dateFormats' => CRM_Core_Form_Date::DATE_yyyy_mm_dd,
+      'dateFormats' => CRM_Utils_Date::DATE_yyyy_mm_dd,
       'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
       'groups' => [],
     ], $submittedValues);

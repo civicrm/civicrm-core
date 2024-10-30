@@ -2,14 +2,21 @@
 
 namespace Civi\Core\Service;
 
-use Civi\Api4\Service\Spec\Provider\Generic\SpecProviderInterface;
 use Civi\Api4\Utils\ReflectionUtils;
-use Civi\Core\HookInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class AutoDefinition {
+
+  /**
+   * Oddballs - AutoDefinition can apply a tag to a third-party class/interface. But it's better
+   * for classes/interfaces to declare `serviceTags` for themselves.
+   *
+   * @var string[]
+   */
+  protected static $forceServiceTags = [
+    'Symfony\Component\EventDispatcher\EventSubscriberInterface' => 'event_subscriber',
+  ];
 
   /**
    * Identify any/all service-definitions for the given class.
@@ -26,6 +33,10 @@ class AutoDefinition {
     $result = [];
 
     $classDoc = ReflectionUtils::parseDocBlock($class->getDocComment());
+    // AutoSubscriber is an internal service by default
+    if (is_a($className, AutoSubscriber::class, TRUE)) {
+      $classDoc += ['service' => TRUE, 'internal' => TRUE];
+    }
     if (!empty($classDoc['service'])) {
       $serviceName = static::pickName($classDoc, $class->getName());
       $def = static::createBaseline($class, $classDoc);
@@ -79,7 +90,6 @@ class AutoDefinition {
   }
 
   protected static function createBaseline(\ReflectionClass $class, ?array $docBlock = []): Definition {
-    $class = is_string($class) ? new \ReflectionClass($class) : $class;
     $def = new Definition($class->getName());
     $def->setPublic(TRUE);
     self::applyTags($def, $class, $docBlock);
@@ -114,18 +124,49 @@ class AutoDefinition {
     if (!empty($docBlock['internal'])) {
       $def->addTag('internal');
     }
-    if ($class->implementsInterface(HookInterface::class) || $class->implementsInterface(EventSubscriberInterface::class)) {
-      $def->addTag('event_subscriber');
+
+    $tags = static::findTags($class, $docBlock, FALSE);
+    foreach ($tags as $tag) {
+      $def->addTag($tag);
     }
-    if ($class->implementsInterface(SpecProviderInterface::class)) {
-      $def->addTag('spec_provider');
+  }
+
+  /**
+   * Find all `serviceTags` annotations that apply to a class -- either
+   * directly or indirectly (via interface, trait, or parent-class).
+   *
+   * @param \ReflectionClass $class
+   * @param array|null $docBlock
+   * @param bool $isTransitiveLookup
+   * @return array|mixed
+   */
+  public static function findTags(\ReflectionClass $class, ?array $docBlock, bool $isTransitiveLookup) {
+    $className = $class->getName();
+    $cache = &\Civi::$statics[__CLASS__]['tagidx'];
+    if (isset($cache[$className])) {
+      return $cache[$className];
     }
 
-    if (!empty($classDoc['serviceTags'])) {
-      foreach (static::splitSymbols($classDoc['serviceTags']) as $extraTag) {
-        $def->addTag($extraTag);
+    $docBlock = $docBlock ?: ReflectionUtils::parseDocBlock($class->getDocComment());
+    $result = isset($docBlock['serviceTags']) ? static::splitSymbols($docBlock['serviceTags']) : [];
+    if (isset(static::$forceServiceTags[$className])) {
+      $result[] = static::$forceServiceTags[$className];
+    }
+    $parents = array_merge($class->getInterfaces(), $class->getTraits(), [$class->getParentClass()]);
+    foreach ($parents as $parent) {
+      if ($parent) {
+        $result = array_merge($result, static::findTags($parent, NULL, TRUE));
+        // Aside: The recursion might theoretically visit an interface multiple times, but ancestral
+        // lookups are cached... so not really...
       }
     }
+    $result = array_unique($result);
+
+    // We cache info about common/re-usable classes (interfaces, traits, parents).
+    if ($isTransitiveLookup) {
+      $cache[$className] = $result;
+    }
+    return $result;
   }
 
   /**

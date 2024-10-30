@@ -54,7 +54,7 @@ trait Api3TestTrait {
         unset($expected[$value]);
       }
     }
-    $this->assertEquals($result, $expected, "api result array comparison failed " . $prefix . print_r($result, TRUE) . ' was compared to ' . print_r($expected, TRUE));
+    $this->assertEquals($result, $expected, 'api result array comparison failed ' . $prefix . print_r($result, TRUE) . ' was compared to ' . print_r($expected, TRUE));
   }
 
   /**
@@ -74,16 +74,20 @@ trait Api3TestTrait {
    *   Api result.
    * @param string $prefix
    *   Extra test to add to message.
-   * @param null $expectedError
+   * @param string|null $expectedError
    */
-  public function assertAPIFailure($apiResult, $prefix = '', $expectedError = NULL) {
+  public function assertAPIFailure(array $apiResult, string $prefix = '', ?string $expectedError = NULL): void {
     if (!empty($prefix)) {
       $prefix .= ': ';
     }
     if ($expectedError && !empty($apiResult['is_error'])) {
       $this->assertStringContainsString($expectedError, $apiResult['error_message'], 'api error message not as expected' . $prefix);
     }
-    $this->assertEquals(1, $apiResult['is_error'], "api call should have failed but it succeeded " . $prefix . (print_r($apiResult, TRUE)));
+    if (!$apiResult['is_error']) {
+      // This section only called when it is going to fail - that means we don't have to parse the print_r in the message
+      // if it is not going to be used anyway. It's really helpful for debugging when needed, but potentially expensive otherwise.
+      $this->fail('api call should have failed but it succeeded ' . $prefix . (print_r($apiResult, TRUE)));
+    }
     $this->assertNotEmpty($apiResult['error_message']);
   }
 
@@ -121,7 +125,7 @@ trait Api3TestTrait {
    * @param null $extraOutput
    * @return array|int
    */
-  public function callAPIFailure($entity, $action, $params, $expectedErrorMessage = NULL, $extraOutput = NULL) {
+  public function callAPIFailure($entity, $action, $params = [], $expectedErrorMessage = NULL, $extraOutput = NULL) {
     if (is_array($params)) {
       $params += [
         'version' => $this->_apiversion,
@@ -136,6 +140,17 @@ trait Api3TestTrait {
     }
     $this->assertAPIFailure($result, "We expected a failure for $entity $action but got a success", $expectedErrorMessage);
     return $result;
+  }
+
+  /**
+   * @deprecated
+   * @param string $entity
+   * @param string $action
+   * @param array $params
+   * @return array|int
+   */
+  public function callAPIAndDocument($entity, $action, $params) {
+    return $this->callAPISuccess($entity, $action, $params);
   }
 
   /**
@@ -372,7 +387,13 @@ trait Api3TestTrait {
       $v3Fields['version'] = ['name' => 'version', 'api.aliases' => ['domain_version']];
       unset($v3Fields['domain_version']);
     }
-
+    if ($v4Entity == 'Payment') {
+      unset($v3Fields['entity_id']);
+      if (!empty($v3Params['contribution_id']) && $v4Action === 'get') {
+        $v4Params['contributionID'] = $v3Params['contribution_id'];
+        \CRM_Utils_Array::remove($v3Params, 'contribution_id');
+      }
+    }
     foreach ($v3Fields as $name => $field) {
       // Resolve v3 aliases
       foreach ($field['api.aliases'] ?? [] as $alias) {
@@ -405,7 +426,7 @@ trait Api3TestTrait {
         unset($v3Params['option_group_id']);
       }
       if (isset($field['pseudoconstant'], $v3Params[$name]) && $field['type'] === \CRM_Utils_Type::T_INT && !is_numeric($v3Params[$name]) && is_string($v3Params[$name])) {
-        $v3Params[$name] = \CRM_Core_PseudoConstant::getKey(\CRM_Core_DAO_AllCoreTables::getFullName($v4Entity), $name, $v3Params[$name]);
+        $v3Params[$name] = \CRM_Core_PseudoConstant::getKey(\CRM_Core_DAO_AllCoreTables::getDAONameForEntity($v4Entity), $name, $v3Params[$name]);
       }
     }
 
@@ -423,6 +444,11 @@ trait Api3TestTrait {
           // Ensure id field is returned as v3 always expects it
           if ($v4Entity != 'Setting' && !in_array('id', $v4Params['select'])) {
             $v4Params['select'][] = 'id';
+          }
+          // Convert 'custom' to 'custom.*'
+          $selectCustom = array_search('custom', $v4Params['select']);
+          if ($selectCustom !== FALSE) {
+            $v4Params['select'][$selectCustom] = 'custom.*';
           }
         }
         if ($options['limit'] && $v4Entity != 'Setting') {
@@ -495,8 +521,6 @@ trait Api3TestTrait {
       $actionInfo = \civicrm_api4($v4Entity, 'getActions', ['checkPermissions' => FALSE, 'where' => [['name', '=', $v4Action]]]);
     }
     catch (NotImplementedException $e) {
-      // For now we'll mark the test incomplete if a v4 entity doesn't exit yet
-      $this->markTestIncomplete($e->getMessage());
     }
     if (!isset($actionInfo[0])) {
       throw new \Exception("Api4 $v4Entity $v4Action does not exist.");

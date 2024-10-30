@@ -20,18 +20,14 @@ trait CRMTraits_Financial_FinancialACLTrait {
    * Enable financial ACLs.
    */
   protected function enableFinancialACLs() {
-    $this->callAPISuccess('Setting', 'create', [
-      'acl_financial_type' => TRUE,
-    ]);
+    $this->callAPISuccess('extension', 'install', ['key' => 'financialacls']);
   }
 
   /**
    * Disable financial ACLs.
    */
   protected function disableFinancialACLs(): void {
-    $this->callAPISuccess('Setting', 'create', [
-      'acl_financial_type' => FALSE,
-    ]);
+    $this->callAPISuccess('extension', 'disable', ['key' => 'financialacls']);
   }
 
   /**
@@ -82,7 +78,7 @@ trait CRMTraits_Financial_FinancialACLTrait {
    * @param array $permissions
    *   Array of permissions e.g ['access CiviCRM','access CiviContribute'],
    */
-  protected function setPermissions($permissions) {
+  protected function setPermissions(array $permissions): void {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = $permissions;
     if (isset(\Civi::$statics['CRM_Financial_BAO_FinancialType'])) {
       unset(\Civi::$statics['CRM_Financial_BAO_FinancialType']);

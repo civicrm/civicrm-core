@@ -51,7 +51,7 @@ class CRM_Contribute_Form_Task_PDFTest extends CiviUnitTestCase {
       }
     }
 
-    $form = $this->getFormObject('CRM_Contribute_Form_Task_PDF', [
+    $form = $this->getSearchFormObject('CRM_Contribute_Form_Task_PDF', [
       'receipt_update' => 1,
     ], NULL, $searchValues);
     $form->buildForm();

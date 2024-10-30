@@ -81,7 +81,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
       if ($params['contribution']->currency) {
         $currency = $params['contribution']->currency;
       }
-      $previousLineItemTotal = CRM_Utils_Array::value('line_total', CRM_Utils_Array::value($fieldValueId, $previousLineItems), 0);
+      $previousLineItemTotal = CRM_Utils_Array::value('line_total', $previousLineItems[$fieldValueId] ?? NULL, 0);
       $itemParams = [
         'transaction_date' => $receiveDate,
         'contact_id' => $params['prevContribution']->contact_id,
@@ -101,14 +101,14 @@ class CRM_Contribute_BAO_FinancialProcessor {
         $taxAmount = (float) $lineItemDetails['tax_amount'];
         if ($context === 'changeFinancialType' && $lineItemDetails['tax_amount'] === 'null') {
           // reverse the Sale Tax amount if there is no tax rate associated with new Financial Type
-          $taxAmount = CRM_Utils_Array::value('tax_amount', CRM_Utils_Array::value($fieldValueId, $previousLineItems), 0);
+          $taxAmount = CRM_Utils_Array::value('tax_amount', $previousLineItems[$fieldValueId] ?? NULL, 0);
         }
         elseif ($previousLineItemTotal != $lineItemDetails['line_total']) {
-          $taxAmount -= CRM_Utils_Array::value('tax_amount', CRM_Utils_Array::value($fieldValueId, $previousLineItems), 0);
+          $taxAmount -= CRM_Utils_Array::value('tax_amount', $previousLineItems[$fieldValueId] ?? NULL, 0);
         }
         if ($taxAmount != 0) {
           $itemParams['amount'] = CRM_Contribute_BAO_FinancialProcessor::getMultiplier($params['contribution']->contribution_status_id, $context) * $taxAmount;
-          $itemParams['description'] = CRM_Invoicing_Utils::getTaxTerm();
+          $itemParams['description'] = \Civi::settings()->get('tax_term');
           if ($lineItemDetails['financial_type_id']) {
             $itemParams['financial_account_id'] = CRM_Financial_BAO_FinancialAccount::getSalesTaxFinancialAccount($lineItemDetails['financial_type_id']);
           }

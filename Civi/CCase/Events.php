@@ -96,8 +96,8 @@ class Events {
   public static function delegateToXmlListeners(\Civi\CCase\Event\CaseChangeEvent $event) {
     $p = new \CRM_Case_XMLProcessor_Process();
     $listeners = $p->getListeners($event->analyzer->getCaseType());
+    /** @var \Civi\CCase\CaseChangeListener $listener */
     foreach ($listeners as $listener) {
-      /** @var $listener \Civi\CCase\CaseChangeListener */
       $listener->onCaseChange($event);
     }
   }

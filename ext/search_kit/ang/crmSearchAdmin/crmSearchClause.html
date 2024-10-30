@@ -1,4 +1,7 @@
-<legend ng-if="!$ctrl.hideLabel">{{ $ctrl.label || ts('%1 group', {1: $ctrl.conjunctions[$ctrl.op]}) }}</legend>
+<legend ng-if="!$ctrl.hideLabel">
+  {{ $ctrl.label || ts('%1 group', {1: $ctrl.conjunctions[$ctrl.op]}) }}
+  <a ng-if="$ctrl.help" crm-ui-help="hs({id: $ctrl.help, title: $ctrl.label})"></a>
+</legend>
 <div class="btn-group btn-group-xs" ng-if=":: $ctrl.hasParent">
   <button type="button" class="btn btn-danger-outline" ng-click="$ctrl.deleteGroup()" title="{{:: ts('Remove group') }}">
     <i class="crm-i fa-trash" aria-hidden="true"></i>
@@ -19,7 +22,7 @@
         <span ng-if="!$ctrl.hasFunction(clause[0])">
           <input class="form-control collapsible-optgroups" ng-model="clause[0]" crm-ui-select="{data: $ctrl.fields, allowClear: true, placeholder: 'Field'}" ng-change="$ctrl.changeClauseField(clause, index)" />
         </span>
-        <crm-search-condition clause="clause" field="$ctrl.getFieldOrFunction(clause[0])" offset="1" option-key="$ctrl.getOptionKey(clause[0])" format="$ctrl.format" class="form-group"></crm-search-condition>
+        <crm-search-condition clause="clause" field="$ctrl.getFieldOrFunction(clause[0])" fields="$ctrl.fields" offset="1" option-key="$ctrl.getOptionKey(clause[0])" format="$ctrl.format" class="form-group"></crm-search-condition>
       </div>
       <fieldset class="clearfix" ng-if="$ctrl.conjunctions[clause[0]]">
         <crm-search-clause allow-functions="$ctrl.allowFunctions" clauses="clause[1]" format="{{ $ctrl.format }}" op="{{ clause[0] }}" fields="$ctrl.fields" delete-group="$ctrl.deleteRow(index)" ></crm-search-clause>

@@ -45,4 +45,21 @@
     <is_public>true</is_public>
     <is_ssl>false</is_ssl>
   </item>
+  <item>
+    <path>civicrm/admin/options/conference_slot</path>
+    <title>Conference Slot Labels</title>
+    <page_callback>CRM_Admin_Page_Options</page_callback>
+    <desc>Define conference slots and labels.</desc>
+    <access_arguments>administer CiviCRM,access CiviEvent</access_arguments>
+    <adminGroup>CiviEvent</adminGroup>
+    <weight>415</weight>
+  </item>
+  <item>
+    <path>civicrm/event/manage/conference</path>
+    <title>Conference Slots</title>
+    <page_callback>CRM_Event_Form_ManageEvent_Conference</page_callback>
+    <access_arguments>access CiviEvent</access_arguments>
+    <is_ssl>true</is_ssl>
+    <weight>950</weight>
+  </item>
 </menu>

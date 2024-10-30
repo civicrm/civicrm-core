@@ -60,9 +60,18 @@ if ($doSql === TRUE || ($doSql === 'auto' && preg_match(';alpha;', $newVersion))
     return "{* file to handle db changes in $newVersion during upgrade *}\n";
   });
 }
+else {
+  $sqlFile = NULL;
+}
 
-updateFile("xml/version.xml", function ($content) use ($newVersion, $oldVersion) {
-  return str_replace($oldVersion, $newVersion, $content);
+updateXmlFile("xml/version.xml", function(DOMDocument $dom) use ($newVersion, $releaseDate) {
+  foreach ($dom->getElementsByTagName('version_no') as $tag) {
+    $tag->textContent = $newVersion;
+  }
+  $date = preg_match('/(alpha|beta)/', $newVersion) ? '(unreleased)' : $releaseDate;
+  foreach ($dom->getElementsByTagName('releaseDate') as $tag) {
+    $tag->textContent = $date;
+  }
 });
 
 if (file_exists("civicrm-version.php")) {
@@ -79,30 +88,19 @@ updateFile("sql/test_data_second_domain.mysql", function ($content) use ($newVer
   return str_replace($oldVersion, $newVersion, $content);
 });
 
-// Update core extension info
-$infoXmls = findCoreInfoXml();
-foreach ($infoXmls as $infoXml) {
-  updateXmlFile($infoXml, function (DOMDocument $dom) use ($newVersion) {
-    // Update extension version
-    /** @var \DOMNode $tag */
-    foreach ($dom->getElementsByTagName('version') as $tag) {
-      $tag->textContent = $newVersion;
-    }
-    // Update compatability - set to major version of core
-    /** @var \DOMNode $compat */
-    foreach ($dom->getElementsByTagName('compatibility') as $compat) {
-      /** @var \DOMNode $tag */
-      foreach ($compat->getElementsByTagName('ver') as $tag) {
-        $tag->textContent = implode('.', array_slice(explode('.', $newVersion), 0, 2));
-      }
-    }
-  });
-}
+updateFile("js/version.json", function () use ($newVersion) {
+  return json_encode($newVersion) . "\n";
+});
+
+// Update deleted-files-list.json
+`php tools/scripts/generate-deleted-files-list.php`;
 
 if ($doCommit) {
   $files = array_filter(
-    array_merge(['xml/version.xml', 'sql/civicrm_generated.mysql', 'sql/test_data_second_domain.mysql', $phpFile, @$sqlFile], $infoXmls),
-    'file_exists'
+    array_merge(['xml/version.xml', 'js/version.json', 'deleted-files-list.json', 'sql/civicrm_generated.mysql', 'sql/test_data_second_domain.mysql', $phpFile, $sqlFile]),
+    function($file) {
+      return $file && file_exists($file);
+    }
   );
   $filesEsc = implode(' ', array_map('escapeshellarg', $files));
   passthru("git add $filesEsc");
@@ -188,7 +186,7 @@ function isVersionValid($v) {
  */
 function fatal($error) {
   echo $error;
-  echo "usage: set-version.php <new-version> [--sql|--no-sql] [--commit|--no-commit]\n";
+  echo "usage: set-version.php <new-version> [<new-date>] [--sql|--no-sql] [--commit|--no-commit]\n";
   echo "  --sql        A placeholder *.sql file will be created.\n";
   echo "  --no-sql     A placeholder *.sql file will not be created.\n";
   echo "  --commit     Any changes will be committed automatically the current git branch.\n";
@@ -204,12 +202,13 @@ function fatal($error) {
  * @param array $argv
  *  Ex: ['myscript.php', '--no-commit', '5.6.7']
  * @return array
- *   Ex: ['scriptFile' => 'myscript.php', 'doCommit' => FALSE, 'newVersion' => '5.6.7']
+ *   Ex: ['scriptFile' => 'myscript.php', 'doCommit' => FALSE, 'newVersion' => '5.6.7', 'releaseDate' => '2039-01-01']
  */
 function parseArgs($argv) {
   $parsed = [];
   $parsed['doSql'] = 'auto';
-  $positions = ['scriptFile', 'newVersion'];
+  $parsed['releaseDate'] = date('Y-m-d');
+  $positions = ['scriptFile', 'newVersion', 'releaseDate'];
   $positional = [];
 
   foreach ($argv as $arg) {
@@ -251,24 +250,4 @@ function parseArgs($argv) {
   }
 
   return $parsed;
-}
-
-/**
- * @return array
- *   Ex: ['ext/afform/html/info.xml', 'ext/search_kit/info.xml']
- */
-function findCoreInfoXml() {
-  $lines = explode("\n", file_get_contents('distmaker/core-ext.txt'));
-  $exts = preg_grep(";^#;", $lines, PREG_GREP_INVERT);
-  $exts = preg_grep(';[a-z-A-Z];', $exts);
-
-  $infoXmls = [];
-  foreach ($exts as $coreExtDir) {
-    $infoXmls = array_merge($infoXmls, (array) glob("ext/$coreExtDir/*/info.xml"));
-    if (file_exists("ext/$coreExtDir/info.xml")) {
-      $infoXmls[] = "ext/$coreExtDir/info.xml";
-    }
-  }
-
-  return $infoXmls;
 }

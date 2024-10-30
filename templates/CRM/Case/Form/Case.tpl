@@ -13,12 +13,8 @@
 *}
 <div class="crm-block crm-form-block crm-case-form-block">
 
-{if $action neq 8 && $action neq 32768}
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-{/if}
-
 <h3>{if $action eq 8}{ts}Delete Case{/ts}{elseif $action eq 32768}{ts}Restore Case{/ts}{/if}</h3>
-{if $action eq 8 or $action eq 32768 }
+{if $action eq 8 or $action eq 32768}
       <div class="messages status no-popup">
         {icon icon="fa-info-circle"}{/icon}
           {if $action eq 8}
@@ -29,17 +25,17 @@
       </div>
 {else}
 <table class="form-layout">
-    {if $activityTypeDescription }
+    {if $activityTypeDescription}
         <tr>
-            <div class="help">{$activityTypeDescription}</div>
+            <div class="help">{$activityTypeDescription|purify}</div>
         </tr>
     {/if}
-{if !empty($clientName)}
+{if $clientName}
     <tr class="crm-case-form-block-clientName">
       <td class="label">{ts}Client{/ts}</td>
       <td class="bold view-value">{$clientName}</td>
     </tr>
-{elseif empty($clientName) and $action eq 1}
+{elseif $action eq 1}
     {if $context eq 'standalone'}
       <td class="label">{$form.client_id.label}</td>
       <td class="view-value">{$form.client_id.html}</td>
@@ -62,11 +58,11 @@
 
 {* custom data group *}
 {* This shows ACTIVITY custom fields, as opposed to CASE custom fields, so is not a duplicate of the other custom data block below. *}
-{if $groupTree}
-    <tr>
-       <td colspan="2">{include file="CRM/Custom/Form/CustomData.tpl" skipTitle=0}</td>
-    </tr>
-{/if}
+<tr class="crm-activity-form-block-custom_data">
+  <td colspan="2">
+    {include file="CRM/common/customDataBlock.tpl" customDataType='Activity' customDataSubType=$activityTypeID cid=false}
+  </td>
+</tr>
 
 {if !empty($form.activity_subject.html)}
     <tr class="crm-case-form-block-activity_subject">
@@ -101,13 +97,15 @@
 {* This shows CASE custom fields, as opposed to ACTIVITY custom fields, so is not a duplicate of the other custom data block above. *}
 <tr class="crm-case-form-block-custom_data">
     <td colspan="2">
-      {include file="CRM/common/customDataBlock.tpl"}
+      {include file="CRM/common/customDataBlock.tpl" customDataType='Case' customDataSubType=$caseTypeID cid=false}
     </td>
 </tr>
 
+{if $isTagset}
 <tr class="crm-case-form-block-tag_set">
     {include file="CRM/common/Tagset.tpl" tagsetType='case' tableLayout=true}
 </tr>
+{/if}
 
 </table>
 {/if}

@@ -200,7 +200,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    *   - url: string. ex: "http://example.com/sites/all/modules/civicrm"
    *   - path: string. ex: "/var/www/sites/all/modules/civicrm"
    */
-  public function getCiviSourceStorage() {
+  public function getCiviSourceStorage():array {
     global $civicrm_root;
 
     // Don't use $config->userFrameworkBaseURL; it has garbage on it.
@@ -248,8 +248,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       }
     }
 
-    $template = CRM_Core_Smarty::singleton();
-    $template->assign_by_ref('breadcrumb', $breadCrumb);
+    CRM_Core_Smarty::singleton()->assign('breadcrumb', $breadCrumb);
     wp_set_breadcrumb($breadCrumb);
   }
 
@@ -291,25 +290,16 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   /**
    * @inheritDoc
    */
-  public function mapConfigToSSL() {
-    global $base_url;
-    $base_url = str_replace('http://', 'https://', $base_url);
-  }
-
-  /**
-   * @inheritDoc
-   */
   public function url(
     $path = NULL,
     $query = NULL,
     $absolute = FALSE,
     $fragment = NULL,
     $frontend = FALSE,
-    $forceBackend = FALSE,
-    $htmlize = TRUE
+    $forceBackend = FALSE
   ) {
     $config = CRM_Core_Config::singleton();
-    $script = '';
+    $frontend_url = '';
     $separator = '&';
     $fragment = isset($fragment) ? ('#' . $fragment) : '';
     $path = CRM_Utils_String::stripPathChars($path);
@@ -327,8 +317,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       // Try and find the "calling" page/post.
       global $post;
       if ($post) {
-        $script = get_permalink($post->ID);
-        if ($config->wpBasePage == $post->post_name) {
+        $frontend_url = get_permalink($post->ID);
+        if (civi_wp()->basepage->is_match($post->ID)) {
           $basepage = TRUE;
         }
       }
@@ -338,7 +328,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
 
       // Get the Base Page URL for building front-end URLs.
       if ($frontend && !$forceBackend) {
-        $script = $this->getBasePageUrl();
+        $frontend_url = $this->getBasePageUrl();
         $basepage = TRUE;
       }
 
@@ -348,12 +338,22 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     $base = $this->getBaseUrl($absolute, $frontend, $forceBackend);
 
     // Overwrite base URL if we already have a front-end URL.
-    if (!$forceBackend && $script != '') {
-      $base = $script;
+    if (!$forceBackend && $frontend_url != '') {
+      $base = $frontend_url;
     }
 
     $queryParts = [];
     $admin_request = ((is_admin() && !$frontend) || $forceBackend);
+
+    /**
+     * Filter the Base URL.
+     *
+     * @since 5.67
+     *
+     * @param str $base The Base URL.
+     * @param bool $admin_request True if building an admin URL, false otherwise.
+     */
+    $base = apply_filters('civicrm/core/url/base', $base, $admin_request);
 
     if (
       // If not using Clean URLs.
@@ -361,7 +361,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       // Or requesting an admin URL.
       || $admin_request
       // Or this is a Shortcode.
-      || (!$basepage && $script != '')
+      || (!$basepage && $frontend_url != '')
     ) {
 
       // Build URL according to pre-existing logic.
@@ -440,37 +440,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    *   The Base Page URL, or false on failure.
    */
   public function getBasePageUrl() {
-    static $basepage_url = '';
-    if ($basepage_url === '') {
-
-      // Get the Base Page config setting.
-      $config = CRM_Core_Config::singleton();
-      $basepage_slug = $config->wpBasePage;
-
-      // Did we get a value?
-      if (!empty($basepage_slug)) {
-
-        // Query for our Base Page.
-        $pages = get_posts([
-          'post_type' => 'page',
-          'name' => strtolower($basepage_slug),
-          'post_status' => 'publish',
-          'posts_per_page' => 1,
-        ]);
-
-        // Find the Base Page object and set the URL.
-        if (!empty($pages) && is_array($pages)) {
-          $basepage = array_pop($pages);
-          if ($basepage instanceof WP_Post) {
-            $basepage_url = get_permalink($basepage->ID);
-          }
-        }
-
-      }
-
-    }
-
-    return $basepage_url;
+    return civi_wp()->basepage->url_get();
   }
 
   /**
@@ -482,8 +452,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     $absolute = FALSE,
     $fragment = NULL,
     $frontend = FALSE,
-    $forceBackend = FALSE,
-    $htmlize = TRUE
+    $forceBackend = FALSE
   ) {
     $config = CRM_Core_Config::singleton();
     $separator = '&';
@@ -589,15 +558,15 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    */
   public function loadUser($user) {
     $userdata = get_user_by('login', $user);
-    if (!$userdata->data->ID) {
+    if (empty($userdata->ID)) {
       return FALSE;
     }
 
-    $uid = $userdata->data->ID;
+    $uid = $userdata->ID;
     wp_set_current_user($uid);
     $contactID = CRM_Core_BAO_UFMatch::getContactId($uid);
 
-    // lets store contact id and user id in session
+    // Lets store contact id and user id in session.
     $session = CRM_Core_Session::singleton();
     $session->set('ufID', $uid);
     $session->set('userID', $contactID);
@@ -624,10 +593,10 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    */
   public function getUfId($username) {
     $userdata = get_user_by('login', $username);
-    if (!$userdata->data->ID) {
+    if (empty($userdata->ID)) {
       return NULL;
     }
-    return $userdata->data->ID;
+    return $userdata->ID;
   }
 
   /**
@@ -646,11 +615,14 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function getUFLocale() {
-    // Bail early if method is called when WordPress isn't bootstrapped.
-    // Additionally, the function checked here is located in pluggable.php
-    // and is required by wp_get_referer() - so this also bails early if it is
-    // called too early in the request lifecycle.
-    // @see https://core.trac.wordpress.org/ticket/25294
+    /*
+     * Bail early if method is called when WordPress isn't bootstrapped.
+     * Additionally, the function checked here is located in pluggable.php
+     * and is required by wp_get_referer() - so this also bails early if it is
+     * called too early in the request lifecycle.
+     *
+     * @see https://core.trac.wordpress.org/ticket/25294
+     */
     if (!function_exists('wp_validate_redirect')) {
       return NULL;
     }
@@ -672,28 +644,16 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       // Default to WordPress locale.
       $locale = get_locale();
 
-      // Maybe override with the locale that Polylang reports.
-      if (function_exists('pll_current_language')) {
-        $pll_locale = pll_current_language('locale');
-        if (!empty($pll_locale)) {
-          $locale = $pll_locale;
-        }
-      }
-
-      // Maybe override with the locale that WPML reports.
-      elseif (defined('ICL_LANGUAGE_CODE')) {
-        $languages = apply_filters('wpml_active_languages', NULL);
-        foreach ($languages as $language) {
-          if ($language['active']) {
-            $locale = $language['default_locale'];
-            break;
-          }
-        }
-      }
-
-      // TODO: Set locale for other WordPress plugins.
-      // @see https://wordpress.org/plugins/tags/multilingual/
-      // A hook would be nice here.
+      /**
+       * Filter the default WordPress locale.
+       *
+       * The CiviCRM-WordPress plugin supports Polylang and WPML via this filter.
+       *
+       * @since 5.67
+       *
+       * @param str $locale The WordPress locale.
+       */
+      $locale = apply_filters('civicrm/core/locale', $locale);
 
     }
 
@@ -718,7 +678,15 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * Load wordpress bootstrap.
+   * @internal
+   * @return bool
+   */
+  public function isLoaded(): bool {
+    return function_exists('__');
+  }
+
+  /**
+   * Tries to bootstrap WordPress.
    *
    * @param array $params
    *   Optional credentials
@@ -741,6 +709,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       define('WP_USE_THEMES', FALSE);
     }
 
+    // Load bootstrap file.
     $cmsRootPath = $this->cmsRootPath();
     if (!$cmsRootPath) {
       throw new CRM_Core_Exception("Could not find the install directory for WordPress");
@@ -755,16 +724,23 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     else {
       throw new CRM_Core_Exception("Could not find the bootstrap file for WordPress");
     }
-    $wpUserTimezone = get_option('timezone_string');
-    if ($wpUserTimezone) {
-      date_default_timezone_set($wpUserTimezone);
-      CRM_Core_Config::singleton()->userSystem->setMySQLTimeZone();
+
+    // Match CiviCRM timezone to WordPress site timezone.
+    $wpSiteTimezone = $this->getTimeZoneString();
+    if ($wpSiteTimezone) {
+      $this->setTimeZone($wpSiteTimezone);
     }
-    require_once $cmsRootPath . DIRECTORY_SEPARATOR . 'wp-includes/pluggable.php';
+
+    // Make sure pluggable WordPress functions are available.
+    if (!function_exists('wp_set_current_user')) {
+      require_once $cmsRootPath . DIRECTORY_SEPARATOR . 'wp-includes/pluggable.php';
+    }
+
+    // Maybe login user.
     $uid = $params['uid'] ?? NULL;
     if (!$uid) {
-      $name = $name ? $name : trim(CRM_Utils_Array::value('name', $_REQUEST));
-      $pass = $pass ? $pass : trim(CRM_Utils_Array::value('pass', $_REQUEST));
+      $name = $name ?: trim($_REQUEST['name'] ?? '');
+      $pass = $pass ?: trim($_REQUEST['pass'] ?? '');
       if ($name) {
         $uid = wp_authenticate($name, $pass);
         if (!$uid) {
@@ -789,6 +765,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
         return TRUE;
       }
     }
+
     return TRUE;
   }
 
@@ -872,17 +849,20 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   /**
    * @inheritDoc
    */
-  public function createUser(&$params, $mail) {
+  public function createUser(&$params, $mailParam) {
     $user_data = [
       'ID' => '',
       'user_login' => $params['cms_name'],
-      'user_email' => $params[$mail],
+      'user_email' => $params[$mailParam],
       'nickname' => $params['cms_name'],
       'role' => get_option('default_role'),
     ];
 
-    // The notify parameter was ignored on WordPress and default behaviour was to always notify.
-    // Preserve that behaviour but allow the "notify" parameter to be used.
+    /*
+     * The notify parameter was ignored on WordPress and default behaviour
+     * was to always notify. Preserve that behaviour but allow the "notify"
+     * parameter to be used.
+     */
     if (!isset($params['notify'])) {
       $params['notify'] = TRUE;
     }
@@ -892,7 +872,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       $user_data['user_pass'] = $params['cms_pass'];
     }
     else {
-      $user_data['user_pass'] = wp_generate_password(12, FALSE);;
+      $user_data['user_pass'] = wp_generate_password(12, FALSE);
     }
 
     // Assign WordPress User "name" field(s).
@@ -919,46 +899,71 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     }
 
     /**
-     * Broadcast that CiviCRM is about to create a WordPress User.
+     * Fires when CiviCRM is about to create a WordPress User.
      *
      * @since 5.37
+     * @since 5.71 Added $params, $mailParam and $user_data.
+     *
+     * @param array $params The array of source Contact data.
+     * @param string $mailParam The name of the param which contains the email address.
+     * @param array $user_data The array of data to create the WordPress User with.
      */
-    do_action('civicrm_pre_create_user');
+    do_action('civicrm_pre_create_user', $params, $mailParam, $user_data);
 
     // Remove the CiviCRM-WordPress listeners.
     $this->hooks_core_remove();
 
+    // User is not logged in by default.
+    $logged_in = FALSE;
+
     // Now go ahead and create a WordPress User.
     $uid = wp_insert_user($user_data);
-
-    /*
-     * Call wp_signon if we aren't already logged in.
-     * For example, we might be creating a new user from the Contact record.
-     */
-    if (!current_user_can('create_users')) {
-      $creds = [];
-      $creds['user_login'] = $params['cms_name'];
-      $creds['user_password'] = $user_data['user_pass'];
-      $creds['remember'] = TRUE;
-
-      // @todo handle a wp_signon failure
-      wp_signon($creds, FALSE);
+    if (is_wp_error($uid)) {
+      Civi::log()->error("Could not create the user. WordPress returned: " . $uid->get_error_message());
     }
+    else {
 
-    if ($params['notify']) {
-      // Fire the new user action. Sends notification email by default.
-      do_action('register_new_user', $uid);
+      /*
+       * Call wp_signon if we aren't already logged in.
+       * For example, we might be creating a new user from the Contact record.
+       */
+      if (!current_user_can('create_users')) {
+        $creds = [];
+        $creds['user_login'] = $params['cms_name'];
+        $creds['user_password'] = $user_data['user_pass'];
+        $creds['remember'] = TRUE;
+
+        // Authenticate and log the user in.
+        $user = wp_signon($creds, FALSE);
+        if (is_wp_error($user)) {
+          Civi::log()->error("Could not log the user in. WordPress returned: " . $user->get_error_message());
+        }
+        else {
+          $logged_in = TRUE;
+        }
+      }
+
+      if ($params['notify']) {
+        // Fire the new user action. Sends notification email by default.
+        do_action('register_new_user', $uid);
+      }
+
     }
 
     // Restore the CiviCRM-WordPress listeners.
     $this->hooks_core_add();
 
     /**
-     * Broadcast that CiviCRM has creates a WordPress User.
+     * Fires after CiviCRM has tried to create a WordPress User.
      *
      * @since 5.37
+     * @since 5.71 Added $uid and $params.
+     *
+     * @param int|WP_Error $uid The ID of the new WordPress User, or WP_Error on failure.
+     * @param array $params The array of source Contact data.
+     * @param bool $logged_in TRUE when the User has been auto-logged-in, FALSE otherwise.
      */
-    do_action('civicrm_post_create_user');
+    do_action('civicrm_post_create_user', $uid, $params, $logged_in);
 
     return $uid;
   }
@@ -980,17 +985,32 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * @param array $params
-   * @param array $errors
-   * @param string $emailName
+   * @inheritdoc
+   */
+  public function getEmailFieldName(CRM_Core_Form $form, array $fields):string {
+    $emailName = '';
+    $billingLocationTypeID = CRM_Core_BAO_LocationType::getBilling();
+    if (array_key_exists("email-{$billingLocationTypeID}", $fields)) {
+      // this is a transaction related page
+      $emailName = 'email-' . $billingLocationTypeID;
+    }
+    else {
+      // find the email field in a profile page
+      foreach ($fields as $name => $dontCare) {
+        if (str_starts_with($name, 'email')) {
+          $emailName = $name;
+          break;
+        }
+      }
+    }
+
+    return $emailName;
+  }
+
+  /**
+   * @inheritdoc
    */
   public function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
-    $config = CRM_Core_Config::singleton();
-
-    $dao = new CRM_Core_DAO();
-    $name = $dao->escape(CRM_Utils_Array::value('name', $params));
-    $email = $dao->escape(CRM_Utils_Array::value('mail', $params));
-
     if (!empty($params['name'])) {
       if (!validate_username($params['name'])) {
         $errors['cms_name'] = ts("Your username contains invalid characters");
@@ -1146,7 +1166,37 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function getTimeZoneString() {
-    return get_option('timezone_string');
+    // Return the timezone string when set.
+    $tzstring = get_option('timezone_string');
+    if (!empty($tzstring)) {
+      return $tzstring;
+    }
+
+    /*
+     * Try and build a deprecated (but currently valid) timezone string
+     * from the GMT offset value.
+     *
+     * Note: manual offsets should be discouraged. WordPress works more
+     * reliably when setting an actual timezone (e.g. "Europe/London")
+     * because of support for Daylight Saving changes.
+     *
+     * Note: the IANA timezone database that provides PHP's timezone
+     * support uses (reversed) POSIX style signs.
+     *
+     * @see https://www.php.net/manual/en/timezones.others.php
+     */
+    $offset = get_option('gmt_offset');
+    if (0 != $offset && floor($offset) == $offset) {
+      $offset_string = $offset > 0 ? "-$offset" : '+' . abs((int) $offset);
+      $tzstring = 'Etc/GMT' . $offset_string;
+    }
+
+    // Default to "UTC" if the timezone string is still empty.
+    if (empty($tzstring)) {
+      $tzstring = 'UTC';
+    }
+
+    return $tzstring;
   }
 
   /**
@@ -1204,10 +1254,10 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     $contactMatching = 0;
 
     // Previously used the $wpdb global - which means WordPress *must* be bootstrapped.
-    $wpUsers = get_users(array(
+    $wpUsers = get_users([
       'blog_id' => get_current_blog_id(),
       'number' => -1,
-    ));
+    ]);
 
     foreach ($wpUsers as $wpUserData) {
       $contactCount++;
@@ -1282,6 +1332,15 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     if (empty($session_id) && !$wp_cron && !$wp_cli && !$php_cli) {
       session_start();
     }
+  }
+
+  /**
+   * Get role names
+   *
+   * @return array
+   */
+  public function getRoleNames() {
+    return wp_roles()->role_names;
   }
 
   /**
@@ -1522,7 +1581,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     }
     if ($clean == 1) {
       //cleanURLs are enabled in CiviCRM, let's make sure the wordpress permalink settings and cache are actually correct by checking the first active contribution page
-      $contributionPages = \Civi\Api4\ContributionPage::get(FALSE)
+      $contributionPages = !CRM_Core_Component::isEnabled('CiviContribute') ? [] : \Civi\Api4\ContributionPage::get(FALSE)
         ->addSelect('id')
         ->addWhere('is_active', '=', TRUE)
         ->setLimit(1)
@@ -1535,7 +1594,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       }
       else {
         //no active contribution pages, we can check an event page. This probably won't ever happen.
-        $eventPages = \Civi\Api4\Event::get(FALSE)
+        $eventPages = !CRM_Core_Component::isEnabled('CiviEvent') ? [] : \Civi\Api4\Event::get(FALSE)
           ->addSelect('id')
           ->addWhere('is_active', '=', TRUE)
           ->setLimit(1)
@@ -1606,6 +1665,76 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     //sanity
     return [];
 
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function canSetBasePage():bool {
+    return TRUE;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function theme(&$content, $print = FALSE, $maintenance = FALSE) {
+    if (!$print) {
+      if (!function_exists('is_admin')) {
+        throw new \Exception('Function "is_admin()" is missing, even though WordPress is the user framework.');
+      }
+      if (!defined('ABSPATH')) {
+        throw new \Exception('Constant "ABSPATH" is not defined, even though WordPress is the user framework.');
+      }
+      if (is_admin()) {
+        require_once ABSPATH . 'wp-admin/admin-header.php';
+      }
+      else {
+        // FIXME: we need to figure out to replace civicrm content on the frontend pages
+      }
+    }
+
+    print $content;
+    return NULL;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function getContactDetailsFromUser($uf_match):array {
+    $contactParameters = [];
+
+    $user = $uf_match['user'];
+    $contactParameters['email'] = $user->user_email;
+    if ($user->first_name) {
+      $contactParameters['first_name'] = $user->first_name;
+    }
+    if ($user->last_name) {
+      $contactParameters['last_name'] = $user->last_name;
+    }
+
+    return $contactParameters;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function modifyStandaloneProfile($profile, $params):string {
+    $urlReplaceWith = 'civicrm/profile/create&amp;gid=' . $params['gid'] . '&amp;reset=1';
+    $profile = str_replace('civicrm/admin/uf/group', $urlReplaceWith, $profile);
+
+    //@todo remove this part when it is OK to deprecate CIVICRM_UF_WP_BASEPAGE-CRM-15933
+    $config = CRM_Core_Config::singleton();
+    if (defined('CIVICRM_UF_WP_BASEPAGE')) {
+      $wpbase = CIVICRM_UF_WP_BASEPAGE;
+    }
+    elseif (!empty($config->wpBasePage)) {
+      $wpbase = $config->wpBasePage;
+    }
+    else {
+      $wpbase = 'index.php';
+    }
+    $profile = str_replace('/wp-admin/admin.php', '/' . $wpbase . '/', $profile);
+    return $profile;
   }
 
 }

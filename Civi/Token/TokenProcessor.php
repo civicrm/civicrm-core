@@ -116,7 +116,7 @@ class TokenProcessor {
   protected $next = 0;
 
   /**
-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
+   * @param \Civi\Core\CiviEventDispatcher $dispatcher
    * @param array $context
    */
   public function __construct($dispatcher, $context) {
@@ -153,7 +153,7 @@ class TokenProcessor {
     $tokens = [];
     $this->visitTokens($value ?: '', function (?string $fullToken, ?string $entity, ?string $field, ?array $modifier) use (&$tokens) {
       $tokens[$entity][] = $field;
-    });
+    }, $format);
     $this->messages[$name] = [
       'string' => $value,
       'format' => $format,
@@ -377,10 +377,10 @@ class TokenProcessor {
     $useSmarty = !empty($row->context['smarty']);
 
     $tokens = $this->rowValues[$row->tokenRow][$message['format']];
-    $getToken = function(?string $fullToken, ?string $entity, ?string $field, ?array $modifier) use ($tokens, $useSmarty, $row) {
+    $getToken = function(?string $fullToken, ?string $entity, ?string $field, ?array $modifier) use ($tokens, $useSmarty, $row, $message) {
       if (isset($tokens[$entity][$field])) {
         $v = $tokens[$entity][$field];
-        $v = $this->filterTokenValue($v, $modifier, $row);
+        $v = $this->filterTokenValue($v, $modifier, $row, $message['format']);
         if ($useSmarty) {
           $v = \CRM_Utils_Token::tokenEscapeSmarty($v);
         }
@@ -393,7 +393,7 @@ class TokenProcessor {
     $event->message = $message;
     $event->context = $row->context;
     $event->row = $row;
-    $event->string = $this->visitTokens($message['string'] ?? '', $getToken);
+    $event->string = $this->visitTokens($message['string'] ?? '', $getToken, $message['format']);
     $this->dispatcher->dispatch('civi.token.render', $event);
     return $event->string;
   }
@@ -408,27 +408,41 @@ class TokenProcessor {
    * @param callable $callback
    *   A function which visits (and substitutes) each token.
    *   function(?string $fullToken, ?string $entity, ?string $field, ?array $modifier)
+   * @param string|null $format
+   *
    * @return string
    */
-  public function visitTokens(string $expression, callable $callback): string {
+  public function visitTokens(string $expression, callable $callback, ?string $format = 'text/html'): string {
     // Regex examples: '{foo.bar}', '{foo.bar|whiz}', '{foo.bar|whiz:"bang"}', '{foo.bar|whiz:"bang":"bang"}'
     // Regex counter-examples: '{foobar}', '{foo bar}', '{$foo.bar}', '{$foo.bar|whiz}', '{foo.bar|whiz{bang}}'
     // Key observations: Civi tokens MUST have a `.` and MUST NOT have a `$`. Civi filters MUST NOT have `{}`s or `$`s.
 
-    static $fullRegex = NULL;
-    if ($fullRegex === NULL) {
-      // The regex is a bit complicated, we so break it down into fragments.
-      // Consider the example '{foo.bar|whiz:"bang":"bang"}'. Each fragment matches the following:
+    $quoteStrings = $format === 'text/html' ? [
+      // Note we just treat left & right quotes as quotes. Our brains are not big enough to enforce them
+      // & maybe user brains are not big enough to use them correctly anyway.
+      '"',
+      '&lquote\;',
+      '&rquote\;',
+      '&quot\;',
+      '&#8221\;',
+      '&#8220\;',
+      '&#x22\;',
+    ] : ['"'];
 
-      $tokenRegex = '([\w]+)\.([\w:\.]+)'; /* MATCHES: 'foo.bar' */
-      $filterArgRegex = ':[\w": %\-_()\[\]\+/#@!,\.\?]*'; /* MATCHES: ':"bang":"bang"' */
-      // Key rule of filterArgRegex is to prohibit '{}'s because they may parse ambiguously. So you *might* relax it to:
-      // $filterArgRegex = ':[^{}\n]*'; /* MATCHES: ':"bang":"bang"' */
-      $filterNameRegex = "\w+"; /* MATCHES: 'whiz' */
-      $filterRegex = "\|($filterNameRegex(?:$filterArgRegex)?)"; /* MATCHES: '|whiz:"bang":"bang"' */
-      $fullRegex = ";\{$tokenRegex(?:$filterRegex)?\};";
-    }
-    return preg_replace_callback($fullRegex, function($m) use ($callback) {
+    // The regex is a bit complicated, we so break it down into fragments.
+    // Consider the example '{foo.bar|whiz:"bang":"bang"}'. Each fragment matches the following:
+
+    $tokenRegex = '([\w]+)\.([\w:\.]+)';
+    $quoteRegex = '(?:' . implode('|', $quoteStrings) . ')';
+    /* MATCHES: 'foo.bar' */
+    $filterArgRegex = ':[\w' . $quoteRegex . ': %\-_()\[\]\+/#@!,\.\?]*'; /* MATCHES: ':"bang":"bang"' */
+    // Key rule of filterArgRegex is to prohibit '{}'s because they may parse ambiguously. So you *might* relax it to:
+    // $filterArgRegex = ':[^{}\n]*'; /* MATCHES: ':"bang":"bang"' */
+    $filterNameRegex = "\w+"; /* MATCHES: 'whiz' */
+    $filterRegex = "\|($filterNameRegex(?:$filterArgRegex)?)"; /* MATCHES: '|whiz:"bang":"bang"' */
+    $fullRegex = ";\{$tokenRegex(?:$filterRegex)?\};";
+
+    return preg_replace_callback($fullRegex, function($m) use ($callback, $quoteStrings) {
       $filterParts = NULL;
       if (isset($m[3])) {
         $filterParts = [];
@@ -436,9 +450,11 @@ class TokenProcessor {
           $filterParts[] = $m[1];
           return '';
         };
+        $quoteOptions = implode('|', $quoteStrings);
+        $quotedRegex = ':' . '(?:' . $quoteOptions . ')' . '(.+?(?=' . $quoteOptions . ')+)' . '(?:' . $quoteOptions . ')';
         $unmatched = preg_replace_callback_array([
           '/^(\w+)/' => $enqueue,
-          '/:"([^"]+)"/' => $enqueue,
+          ';' . $quotedRegex . ';' => $enqueue,
         ], $m[3]);
         if ($unmatched) {
           throw new \CRM_Core_Exception('Malformed token parameters (' . $m[0] . ')');
@@ -456,10 +472,12 @@ class TokenProcessor {
    * @param array|null $filter
    * @param TokenRow $row
    *   The current target/row.
+   * @param string $messageFormat
+   *   Ex: 'text/plain' or 'text/html'
    * @return string
    * @throws \CRM_Core_Exception
    */
-  private function filterTokenValue($value, ?array $filter, TokenRow $row) {
+  private function filterTokenValue($value, ?array $filter, TokenRow $row, string $messageFormat) {
     // KISS demonstration. This should change... e.g. provide a filter-registry or reuse Smarty's registry...
 
     if ($value instanceof \DateTime && $filter === NULL) {
@@ -470,42 +488,33 @@ class TokenProcessor {
       }
     }
 
+    // TODO: Move this to StandardFilters
     if ($value instanceof Money) {
       switch ($filter[0] ?? NULL) {
         case NULL:
         case 'crmMoney':
-          return \Civi::format()->money($value->getAmount(), $value->getCurrency());
+          return \Civi::format()->money($value->getAmount(), $value->getCurrency(), $filter[1] ?? NULL);
+
+        case 'boolean':
+          // We resolve boolean to 0 or 1 or smarty chokes on FALSE.
+          return (int) $value->getAmount()->isGreaterThan(0);
 
         case 'raw':
           return $value->getAmount();
 
         default:
-          throw new \CRM_Core_Exception("Invalid token filter: " . json_encode($filter, JSON_UNESCAPED_SLASHES));
+          throw new \CRM_Core_Exception('Invalid token filter: ' . json_encode($filter, JSON_UNESCAPED_SLASHES));
       }
     }
 
-    switch ($filter[0] ?? NULL) {
-      case NULL:
-        return $value;
-
-      case 'upper':
-        return mb_strtoupper($value);
-
-      case 'lower':
-        return mb_strtolower($value);
-
-      case 'crmDate':
-        if ($value instanceof \DateTime) {
-          // @todo cludgey.
-          require_once 'CRM/Core/Smarty/plugins/modifier.crmDate.php';
-          return \smarty_modifier_crmDate($value->format('Y-m-d H:i:s'), $filter[1] ?? NULL);
-        }
-        if ($value === '') {
-          return $value;
-        }
-
-      default:
-        throw new \CRM_Core_Exception("Invalid token filter: " . json_encode($filter, JSON_UNESCAPED_SLASHES));
+    if (!isset($filter[0])) {
+      return $value;
+    }
+    elseif (is_callable([StandardFilters::class, $filter[0]])) {
+      return call_user_func([StandardFilters::class, $filter[0]], $value, $filter, $messageFormat);
+    }
+    else {
+      throw new \CRM_Core_Exception('Invalid token filter: ' . json_encode($filter, JSON_UNESCAPED_SLASHES));
     }
   }
 

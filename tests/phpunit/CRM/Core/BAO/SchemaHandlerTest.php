@@ -21,8 +21,6 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
 
   /**
    * Ensure any removed indices are put back.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
     parent::tearDown();
@@ -35,7 +33,7 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
    * We want to be sure it creates an index and exits gracefully if the index
    * already exists.
    */
-  public function testCreateIndex() {
+  public function testCreateIndex(): void {
     $tables = ['civicrm_uf_join' => ['weight']];
     CRM_Core_BAO_SchemaHandler::createIndexes($tables);
     CRM_Core_BAO_SchemaHandler::createIndexes($tables);
@@ -54,9 +52,9 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
   /**
    * Test CRM_Core_BAO_SchemaHandler::getIndexes() function
    */
-  public function testGetIndexes() {
+  public function testGetIndexes(): void {
     $indexes = CRM_Core_BAO_SchemaHandler::getIndexes(['civicrm_contact']);
-    $this->assertTrue(array_key_exists('index_contact_type', $indexes['civicrm_contact']));
+    $this->assertArrayHasKey('index_contact_type', $indexes['civicrm_contact']);
   }
 
   /**
@@ -65,7 +63,7 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
    * We want to be sure it creates an index and exits gracefully if the index
    * already exists.
    */
-  public function testCombinedIndex() {
+  public function testCombinedIndex(): void {
     $tables = ['civicrm_uf_join' => ['weight']];
     CRM_Core_BAO_SchemaHandler::createIndexes($tables);
 
@@ -94,28 +92,28 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
   /**
    * Test the drop index if exists function for a non-existent index.
    */
-  public function testCheckIndexNotExists() {
+  public function testCheckIndexNotExists(): void {
     $this->assertFalse(CRM_Core_BAO_SchemaHandler::checkIfIndexExists('civicrm_contact', 'magic_button'));
   }
 
   /**
    * Test the drop index if exists function for a non-existent index.
    */
-  public function testCheckIndexExists() {
+  public function testCheckIndexExists(): void {
     $this->assertTrue(CRM_Core_BAO_SchemaHandler::checkIfIndexExists('civicrm_contact', 'index_hash'));
   }
 
   /**
    * Test the drop index if exists function for a non-existent index.
    */
-  public function testDropIndexNoneExists() {
+  public function testDropIndexNoneExists(): void {
     CRM_Core_BAO_SchemaHandler::dropIndexIfExists('civicrm_contact', 'magic_button');
   }
 
   /**
    * Test the drop index if exists function.
    */
-  public function testDropIndexExists() {
+  public function testDropIndexExists(): void {
     CRM_Core_BAO_SchemaHandler::dropIndexIfExists('civicrm_contact', 'index_hash');
     $this->assertFalse(CRM_Core_BAO_SchemaHandler::checkIfIndexExists('civicrm_contact', 'index_hash'));
 
@@ -126,7 +124,7 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function columnTests() {
+  public function columnTests(): array {
     $columns = [];
     $columns[] = ['civicrm_contribution', 'total_amount'];
     $columns[] = ['civicrm_contact', 'first_name'];
@@ -135,12 +133,31 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
   }
 
   /**
-   * @param $tableName
-   * @param $columnName
+   * Test the drop index if exists function for a non-existent index.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testGetRowCountForTable(): void {
+    // Hopefully running ANALYZE TABLE will consistently update the 'approximate' values
+    // so we can test them.
+    CRM_Core_DAO::singleValueQuery('ANALYZE TABLE civicrm_domain');
+    CRM_Core_DAO::singleValueQuery('ANALYZE TABLE civicrm_worldregion');
+    CRM_Core_DAO::singleValueQuery('ANALYZE TABLE civicrm_acl');
+    $this->assertEquals([
+      'civicrm_worldregion' => 6,
+      'civicrm_acl' => 1,
+      'civicrm_domain' => 2,
+    ], CRM_Core_BAO_SchemaHandler::getRowCountForTables(['civicrm_domain', 'civicrm_acl', 'random_name', 'civicrm_worldregion']));
+    $this->assertEquals(2, CRM_Core_BAO_SchemaHandler::getRowCountForTable('civicrm_domain'));
+  }
+
+  /**
+   * @param string $tableName
+   * @param string $columnName
    *
    * @dataProvider columnTests
    */
-  public function testCheckIfColumnExists($tableName, $columnName) {
+  public function testCheckIfColumnExists(string $tableName, string $columnName): void {
     if ($columnName === 'xxxx') {
       $this->assertFalse(CRM_Core_BAO_SchemaHandler::checkIfFieldExists($tableName, $columnName));
     }
@@ -152,7 +169,7 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function foreignKeyTests() {
+  public function foreignKeyTests(): array {
     $keys = [];
     $keys[] = ['civicrm_mailing_recipients', 'FK_civicrm_mailing_recipients_email_id'];
     $keys[] = ['civicrm_mailing_recipients', 'FK_civicrm_mailing_recipients_id'];
@@ -166,8 +183,10 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
    *
    * @param string $tableName
    * @param string $key
+   *
+   * @noinspection PhpUnusedParameterInspection
    */
-  public function testSafeDropForeignKey($tableName, $key) {
+  public function testSafeDropForeignKey(string $tableName, string $key): void {
     if ($key === 'FK_civicrm_mailing_recipients_id') {
       $this->assertFalse(CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_mailing_recipients', $key));
     }
@@ -179,7 +198,7 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
   /**
    * Check there are no missing indices
    */
-  public function testGetMissingIndices() {
+  public function testGetMissingIndices(): void {
     $missingIndices = CRM_Core_BAO_SchemaHandler::getMissingIndices();
     $this->assertEmpty($missingIndices);
   }
@@ -187,7 +206,7 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
   /**
    * Test that missing indices are correctly created
    */
-  public function testCreateMissingIndices() {
+  public function testCreateMissingIndices(): void {
     $indices = [
       'test_table' => [
         'test_index1' => [
@@ -222,11 +241,9 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check there are no missing indices
-   *
-   * @throws \CRM_Core_Exception
+   * Check there are no missing indices.
    */
-  public function testReconcileMissingIndices() {
+  public function testReconcileMissingIndices(): void {
     CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_contact DROP INDEX index_sort_name');
     $missingIndices = CRM_Core_BAO_SchemaHandler::getMissingIndices();
     // Check the api also retrieves them.
@@ -248,11 +265,9 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check there are no missing indices
-   *
-   * @throws \CRM_Core_Exception
+   * Check there are no missing indices.
    */
-  public function testGetMissingIndicesWithTableFilter() {
+  public function testGetMissingIndicesWithTableFilter(): void {
     CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_contact DROP INDEX index_sort_name');
     CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_contribution DROP INDEX index_total_amount_receive_date');
     $missingIndices = $this->callAPISuccess('System', 'getmissingindices', [])['values'];
@@ -285,7 +300,7 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
   /**
    * Check for partial indices
    */
-  public function testPartialIndices() {
+  public function testPartialIndices(): void {
     $tables = [
       'index_all' => 'civicrm_prevnext_cache',
       'UI_entity_id_entity_table_tag_id' => 'civicrm_entity_tag',
@@ -300,13 +315,12 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
     //Test incorrect Ordering(correct order defined is entity_id and then entity_table, tag_id).
     CRM_Core_DAO::executeQuery('CREATE INDEX UI_entity_id_entity_table_tag_id ON civicrm_entity_tag (entity_table, entity_id, tag_id)');
     $missingIndices = CRM_Core_BAO_SchemaHandler::getMissingIndices(TRUE);
-    $this->assertNotEmpty($missingIndices);
-    $this->assertEquals(array_values($tables), array_keys($missingIndices));
+    $this->assertEmpty(array_diff($tables, array_keys($missingIndices)));
 
     //Check if both indices are deleted.
     $indices = CRM_Core_BAO_SchemaHandler::getIndexes($tables);
     foreach ($tables as $index => $tableName) {
-      $this->assertFalse(array_key_exists($index, $indices[$tableName]));
+      $this->assertArrayNotHasKey($index, $indices[$tableName]);
     }
     //Drop false index and create again.
     CRM_Core_BAO_SchemaHandler::createMissingIndices($missingIndices);
@@ -318,7 +332,7 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
   /**
    * Test index signatures are added correctly
    */
-  public function testAddIndexSignatures() {
+  public function testAddIndexSignatures(): void {
     $indices = [
       'one' => [
         'field' => ['id', 'name(3)'],
@@ -329,8 +343,8 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
       ],
     ];
     CRM_Core_BAO_SchemaHandler::addIndexSignature('my_table', $indices);
-    $this->assertEquals($indices['one']['sig'], 'my_table::1::id::name(3)');
-    $this->assertEquals($indices['two']['sig'], 'my_table::0::title');
+    $this->assertEquals('my_table::1::id::name(3)', $indices['one']['sig']);
+    $this->assertEquals('my_table::0::title', $indices['two']['sig']);
   }
 
   /**
@@ -374,7 +388,7 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
   /**
    * Tests the function that generates sql to modify fields.
    */
-  public function testBuildFieldChangeSql() {
+  public function testBuildFieldChangeSql(): void {
     $params = [
       'table_name' => 'civicrm_contact',
       'operation' => 'add',
@@ -383,14 +397,14 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
     ];
     $sql = CRM_Core_BAO_SchemaHandler::buildFieldChangeSql($params, FALSE);
     $this->assertEquals('ALTER TABLE civicrm_contact
-        ADD COLUMN `big_bob` text', trim($sql));
+        ADD COLUMN `big_bob` text NULL', trim($sql));
 
     $params['operation'] = 'modify';
     $params['comment'] = 'super big';
     $params['fkName'] = CRM_Core_BAO_SchemaHandler::getIndexName('civicrm_contact', 'big_bob');
     $sql = CRM_Core_BAO_SchemaHandler::buildFieldChangeSql($params, FALSE);
     $this->assertEquals("ALTER TABLE civicrm_contact
-        MODIFY `big_bob` text COMMENT 'super big'", trim($sql));
+        MODIFY `big_bob` text NULL COMMENT 'super big'", trim($sql));
 
     $params['operation'] = 'delete';
     $sql = CRM_Core_BAO_SchemaHandler::buildFieldChangeSql($params, FALSE);

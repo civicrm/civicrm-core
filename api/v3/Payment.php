@@ -42,9 +42,8 @@ function civicrm_api3_payment_get($params) {
     if (empty($eft)) {
       return civicrm_api3_create_success([], $params, 'Payment', 'get');
     }
-    foreach ($eft as $entityFinancialTrxn) {
-      $params['financial_trxn_id']['IN'][] = $entityFinancialTrxn['financial_trxn_id'];
-    }
+    $ftIds = array_column($eft, 'financial_trxn_id');
+    $params['financial_trxn_id'] = ['IN' => $ftIds];
   }
 
   $financialTrxn = civicrm_api3('FinancialTrxn', 'get', array_merge($params, ['sequential' => FALSE]))['values'];
@@ -134,6 +133,7 @@ function civicrm_api3_payment_create($params) {
       }
     }
   }
+  _civicrm_api3_format_params_for_create($params, 'FinancialTrxn');
   // Check if it is an update
   if (!empty($params['id'])) {
     $amount = $params['total_amount'];

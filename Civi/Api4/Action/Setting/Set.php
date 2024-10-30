@@ -22,6 +22,8 @@ use Civi\Api4\Generic\Result;
  */
 class Set extends AbstractSettingAction {
 
+  use \Civi\Api4\Generic\Traits\GetSetValueTrait;
+
   /**
    * Setting names/values to set.
    *
@@ -49,17 +51,6 @@ class Set extends AbstractSettingAction {
         'domain_id' => $domain,
       ];
     }
-  }
-
-  /**
-   * Add an item to the values array
-   * @param string $settingName
-   * @param mixed $value
-   * @return $this
-   */
-  public function addValue($settingName, $value) {
-    $this->values[$settingName] = $value;
-    return $this;
   }
 
 }

@@ -203,7 +203,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
               'default' => TRUE,
             ],
             'contribution_source' => [
-              'title' => ts('Source'),
+              'title' => ts('Contribution Source'),
               'name' => 'source',
             ],
             'id' => [
@@ -221,7 +221,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
             'receive_date' => ['operatorType' => CRM_Report_Form::OP_DATETIME],
             'receipt_date' => ['operatorType' => CRM_Report_Form::OP_DATETIME],
             'contribution_source' => [
-              'title' => ts('Source'),
+              'title' => ts('Contribution Source'),
               'name' => 'source',
               'type' => CRM_Utils_Type::T_STRING,
             ],
@@ -235,7 +235,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
           'order_bys' => [
             'contribution_id' => ['title' => ts('Contribution #')],
             'contribution_status_id' => ['title' => ts('Contribution Status')],
-            'receive_date'  => ['title' => ts('Date Received')],
+            'receive_date'  => ['title' => ts('Contribution Date')],
           ],
           'grouping' => 'contri-fields',
         ],
@@ -558,20 +558,24 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
       }
 
       // handle contribution status id
-      if ($value = CRM_Utils_Array::value('civicrm_contribution_contribution_status_id', $row)) {
+      $value = $row['civicrm_contribution_contribution_status_id'] ?? NULL;
+      if ($value) {
         $rows[$rowNum]['civicrm_contribution_contribution_status_id'] = $contributionStatus[$value];
       }
 
       // handle payment instrument id
-      if ($value = CRM_Utils_Array::value('civicrm_financial_trxn_payment_instrument_id', $row)) {
+      $value = $row['civicrm_financial_trxn_payment_instrument_id'] ?? NULL;
+      if ($value) {
         $rows[$rowNum]['civicrm_financial_trxn_payment_instrument_id'] = $paymentInstruments[$value];
       }
 
       // handle financial type id
-      if ($value = CRM_Utils_Array::value('civicrm_line_item_financial_type_id', $row)) {
+      $value = $row['civicrm_line_item_financial_type_id'] ?? NULL;
+      if ($value) {
         $rows[$rowNum]['civicrm_line_item_financial_type_id'] = $contributionTypes[$value];
       }
-      if ($value = CRM_Utils_Array::value('civicrm_entity_financial_trxn_amount', $row)) {
+      $value = $row['civicrm_entity_financial_trxn_amount'] ?? NULL;
+      if ($value) {
         $rows[$rowNum]['civicrm_entity_financial_trxn_amount'] = CRM_Utils_Money::format($rows[$rowNum]['civicrm_entity_financial_trxn_amount'], $rows[$rowNum]['civicrm_financial_trxn_currency']);
       }
 

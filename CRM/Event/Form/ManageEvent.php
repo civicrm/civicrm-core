@@ -18,6 +18,7 @@
  * This class generates form components for processing Event.
  */
 class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
+  use CRM_Event_Form_EventFormTrait;
 
   /**
    * The id of the event we are processing.
@@ -54,8 +55,6 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
    * @var int
    */
   protected $_templateId;
-
-  protected $_cancelURL = NULL;
 
   /**
    * The campaign id of the existing event, we use this to know if we need to update
@@ -95,41 +94,33 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
 
     $this->assign('action', $this->_action);
 
-    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, NULL, 'GET');
-    if ($this->_id) {
+    if ($this->getEventID()) {
       $this->_isRepeatingEvent = CRM_Core_BAO_RecurringEntity::getParentFor($this->_id, 'civicrm_event');
       $this->assign('eventId', $this->_id);
-      if (!empty($this->_addBlockName) && empty($this->_addProfileBottom) && empty($this->_addProfileBottomAdd)) {
-        $this->add('hidden', 'id', $this->_id);
-      }
       $this->_single = TRUE;
-
-      $params = ['id' => $this->_id];
-      CRM_Event_BAO_Event::retrieve($params, $eventInfo);
 
       // its an update mode, do a permission check
       if (!CRM_Event_BAO_Event::checkPermission($this->_id, CRM_Core_Permission::EDIT)) {
         CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
       }
 
-      $participantListingID = $eventInfo['participant_listing_id'] ?? NULL;
-      //CRM_Core_DAO::getFieldValue( 'CRM_Event_DAO_Event', $this->_id, 'participant_listing_id' );
+      $participantListingID = $this->getEventValue('participant_listing_id');
       if ($participantListingID) {
         $participantListingURL = CRM_Utils_System::url('civicrm/event/participant',
           "reset=1&id={$this->_id}",
-          TRUE, NULL, TRUE, TRUE
+          FALSE, NULL, TRUE, TRUE
         );
-        $this->assign('participantListingURL', $participantListingURL);
       }
-
-      $this->assign('isOnlineRegistration', CRM_Utils_Array::value('is_online_registration', $eventInfo));
+      $this->assign('participantListingURL', $participantListingURL ?? NULL);
+      $this->assign('participantListingID', $participantListingID);
+      $this->assign('isOnlineRegistration', $this->getEventValue('is_online_registration'));
 
       $this->assign('id', $this->_id);
     }
 
     // figure out whether we’re handling an event or an event template
     if ($this->_id) {
-      $this->_isTemplate = $eventInfo['is_template'] ?? NULL;
+      $this->_isTemplate = $this->getEventValue('is_template');
     }
     elseif ($this->_action & CRM_Core_Action::ADD) {
       $this->_isTemplate = CRM_Utils_Request::retrieve('is_template', 'Boolean', $this);
@@ -141,11 +132,11 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
     $title = NULL;
     if ($this->_id) {
       if ($this->_isTemplate) {
-        $title = ts('Edit Event Template') . ' - ' . CRM_Utils_Array::value('template_title', $eventInfo);
+        $title = ts('Edit Event Template') . ' - ' . ($this->getEventValue('template_title'));
       }
       else {
         $configureText = $this->_isRepeatingEvent ? ts('Configure Repeating Event') : ts('Configure Event');
-        $title = $configureText . ' - ' . CRM_Utils_Array::value('title', $eventInfo);
+        $title = $configureText . ' - ' . $this->getEventValue('title');
       }
     }
     elseif ($this->_action & CRM_Core_Action::ADD) {
@@ -165,14 +156,10 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
 
     $this->_templateId = (int) CRM_Utils_Request::retrieve('template_id', 'Integer', $this);
 
-    //Is a repeating event
-    if ($this->_isRepeatingEvent) {
-      $isRepeatingEntity = TRUE;
-      $this->assign('isRepeatingEntity', $isRepeatingEntity);
-    }
+    $this->assign('isRepeatingEntity', $this->_isRepeatingEvent);
 
     // CRM-16776 - show edit/copy/create buttons for Profiles if user has required permission.
-    $ufGroups = CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id');
+    $ufGroups = CRM_Core_DAO_UFField::buildOptions('uf_group_id');
     $ufCreate = CRM_ACL_API::group(CRM_Core_Permission::CREATE, NULL, 'civicrm_uf_group', $ufGroups);
     $ufEdit = CRM_ACL_API::group(CRM_Core_Permission::EDIT, NULL, 'civicrm_uf_group', $ufGroups);
     $checkPermission = [
@@ -184,41 +171,38 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
     if (CRM_Core_Permission::check($checkPermission) || !empty($ufCreate) || !empty($ufEdit)) {
       $this->assign('perm', TRUE);
     }
+    else {
+      $this->assign('perm', FALSE);
+    }
 
     // also set up tabs
-    CRM_Event_Form_ManageEvent_TabHeader::build($this);
+    $this->build();
 
     // Set Done button URL and breadcrumb. Templates go back to Manage Templates,
     // otherwise go to Manage Event for new event or ManageEventEdit if event if exists.
-    $breadCrumb = [];
     if (!$this->_isTemplate) {
       if ($this->_id) {
-        $this->_doneUrl = CRM_Utils_System::url(CRM_Utils_System::currentPath(),
+        $breadCrumb = ['title' => ts('Configure Event')];
+        $breadCrumb['url'] = CRM_Utils_System::url(CRM_Utils_System::currentPath(),
           "action=update&reset=1&id={$this->_id}"
         );
       }
       else {
-        $this->_doneUrl = CRM_Utils_System::url('civicrm/event/manage',
+        $breadCrumb = ['title' => ts('Manage Events')];
+        $breadCrumb['url'] = CRM_Utils_System::url('civicrm/event/manage',
           'reset=1'
         );
-        $breadCrumb = [
-          [
-            'title' => ts('Manage Events'),
-            'url' => $this->_doneUrl,
-          ],
-        ];
       }
+      CRM_Utils_System::appendBreadCrumb([$breadCrumb]);
     }
     else {
-      $this->_doneUrl = CRM_Utils_System::url('civicrm/admin/eventTemplate', 'reset=1');
-      $breadCrumb = [
+      CRM_Utils_System::appendBreadCrumb([
         [
           'title' => ts('Manage Event Templates'),
-          'url' => $this->_doneUrl,
+          'url' => CRM_Utils_System::url('civicrm/admin/eventTemplate', 'reset=1'),
         ],
-      ];
+      ]);
     }
-    CRM_Utils_System::appendBreadCrumb($breadCrumb);
   }
 
   /**
@@ -228,15 +212,15 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
    */
   public function setDefaultValues() {
     $defaults = [];
+    $event = \Civi\Api4\Event::get(FALSE);
     if (isset($this->_id)) {
-      $params = ['id' => $this->_id];
-      CRM_Event_BAO_Event::retrieve($params, $defaults);
-
+      $event->addWhere('id', '=', $this->_id);
+      $defaults = $event->execute()->first();
       $this->_campaignID = $defaults['campaign_id'] ?? NULL;
     }
     elseif ($this->_templateId) {
-      $params = ['id' => $this->_templateId];
-      CRM_Event_BAO_Event::retrieve($params, $defaults);
+      $event->addWhere('id', '=', $this->_templateId);
+      $defaults = $event->execute()->first();
       $defaults['is_template'] = $this->_isTemplate;
       $defaults['template_id'] = $defaults['id'];
       unset($defaults['id']);
@@ -257,23 +241,23 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
   public function buildQuickForm() {
     $session = CRM_Core_Session::singleton();
 
-    $this->_cancelURL = $_POST['cancelURL'] ?? NULL;
+    $cancelURL = $_POST['cancelURL'] ?? NULL;
 
-    if (!$this->_cancelURL) {
+    if (!$cancelURL) {
       if ($this->_isTemplate) {
-        $this->_cancelURL = CRM_Utils_System::url('civicrm/admin/eventTemplate',
+        $cancelURL = CRM_Utils_System::url('civicrm/admin/eventTemplate',
           'reset=1'
         );
       }
       else {
-        $this->_cancelURL = CRM_Utils_System::url('civicrm/event/manage',
+        $cancelURL = CRM_Utils_System::url('civicrm/event/manage',
           'reset=1'
         );
       }
     }
 
-    if ($this->_cancelURL) {
-      $this->addElement('hidden', 'cancelURL', $this->_cancelURL);
+    if ($cancelURL) {
+      $this->addElement('hidden', 'cancelURL', $cancelURL);
     }
 
     if ($this->_single) {
@@ -282,12 +266,6 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
           'type' => 'upload',
           'name' => ts('Save'),
           'isDefault' => TRUE,
-        ],
-        [
-          'type' => 'upload',
-          'name' => ts('Save and Done'),
-          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-          'subName' => 'done',
         ],
         [
           'type' => 'cancel',
@@ -318,7 +296,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
 
       $this->addButtons($buttons);
     }
-    $session->replaceUserContext($this->_cancelURL);
+    $session->replaceUserContext($cancelURL);
     $this->add('hidden', 'is_template', $this->_isTemplate);
   }
 
@@ -330,7 +308,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
       // hack for special cases.
       switch ($className) {
         case 'Event':
-          $attributes = $this->getVar('_attributes');
+          $attributes = $this->_attributes;
           $subPage = CRM_Utils_Request::retrieveComponent($attributes);
           break;
 
@@ -348,7 +326,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
       }
 
       CRM_Core_Session::setStatus(ts("'%1' information has been saved.",
-        [1 => CRM_Utils_Array::value('title', CRM_Utils_Array::value($subPage, $this->get('tabHeader')), $className)]
+        [1 => $this->get('tabHeader')[$subPage]['title'] ?? $className]
       ), $this->getTitle(), 'success');
 
       if (CRM_Core_Component::isEnabled('CiviCampaign')) {
@@ -360,7 +338,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
         }
       }
       $this->postProcessHook();
-      if ($this->controller->getButtonName('submit') == "_qf_{$className}_upload_done") {
+      if ($this->controller->getButtonName('submit') === "_qf_{$className}_upload_done") {
         if ($this->_isTemplate) {
           CRM_Core_Session::singleton()
             ->pushUserContext(CRM_Utils_System::url('civicrm/admin/eventTemplate', 'reset=1'));
@@ -381,7 +359,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
    * @return string
    */
   public function getTemplateFileName() {
-    if ($this->controller->getPrint() || $this->getVar('_id') <= 0 || $this->_action & CRM_Core_Action::DELETE) {
+    if ($this->controller->getPrint() || $this->_id <= 0 || $this->_action & CRM_Core_Action::DELETE) {
       return parent::getTemplateFileName();
     }
     else {
@@ -397,6 +375,207 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
   public static function addProfileEditScripts() {
     CRM_UF_Page_ProfileEditor::registerProfileScripts();
     CRM_UF_Page_ProfileEditor::registerSchemas(['IndividualModel', 'ParticipantModel']);
+  }
+
+  /**
+   * @return int|null
+   * @throws \CRM_Core_Exception
+   */
+  public function getEventID() {
+    if (!$this->_id) {
+      $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, NULL, 'GET');
+    }
+    return $this->_id ? (int) $this->_id : NULL;
+  }
+
+  /**
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  private function build() {
+    $tabs = $this->get('tabHeader');
+    if (!$tabs || empty($_GET['reset'])) {
+      $tabs = $this->processTab();
+      $this->set('tabHeader', $tabs);
+    }
+    $this->assign('tabHeader', $tabs);
+    CRM_Core_Resources::singleton()
+      ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')
+      ->addSetting([
+        'tabSettings' => [
+          'active' => $this->getCurrentTab($tabs),
+        ],
+      ]);
+    CRM_Event_Form_ManageEvent::addProfileEditScripts();
+    return $tabs;
+  }
+
+  /**
+   * @return array
+   * @throws Exception
+   */
+  private function processTab() {
+    if ($this->getEventID() <= 0) {
+      return NULL;
+    }
+
+    $default = [
+      'link' => NULL,
+      'valid' => TRUE,
+      'active' => TRUE,
+      'current' => FALSE,
+      'class' => 'ajaxForm',
+    ];
+
+    $tabs = [];
+    $tabs['settings'] = ['title' => ts('Info and Settings'), 'class' => 'ajaxForm livePage'] + $default;
+    $tabs['location'] = ['title' => ts('Event Location')] + $default;
+    // If CiviContribute is active, create the Fees tab.
+    if (CRM_Core_Component::isEnabled('CiviContribute')) {
+      $tabs['fee'] = ['title' => ts('Fees')] + $default;
+    }
+    $tabs['registration'] = ['title' => ts('Online Registration')] + $default;
+    // @fixme I don't understand the event permissions check here - can we just get rid of it?
+    $permissions = CRM_Event_BAO_Event::getAllPermissions();
+    if (CRM_Core_Permission::check('administer CiviCRM data') || !empty($permissions[CRM_Core_Permission::EDIT])) {
+      $tabs['reminder'] = ['title' => ts('Schedule Reminders'), 'class' => 'livePage'] + $default;
+    }
+
+    $tabs['pcp'] = ['title' => ts('Personal Campaigns')] + $default;
+    $tabs['repeat'] = ['title' => ts('Repeat')] + $default;
+
+    // Repeat tab must refresh page when switching repeat mode so js & vars will get set-up
+    if (!$this->_isRepeatingEvent) {
+      unset($tabs['repeat']['class']);
+    }
+
+    $eventID = $this->getEventID();
+    if ($eventID) {
+      // disable tabs based on their configuration status
+      $sql = "
+SELECT     e.loc_block_id as is_location, e.is_online_registration, e.is_monetary, taf.is_active, pcp.is_active as is_pcp, sch.id as is_reminder, re.id as is_repeating_event
+FROM       civicrm_event e
+LEFT JOIN  civicrm_tell_friend taf ON ( taf.entity_table = 'civicrm_event' AND taf.entity_id = e.id )
+LEFT JOIN  civicrm_pcp_block pcp   ON ( pcp.entity_table = 'civicrm_event' AND pcp.entity_id = e.id )
+LEFT JOIN  civicrm_action_schedule sch ON ( sch.mapping_id = %2 AND sch.entity_value = %1 )
+LEFT JOIN  civicrm_recurring_entity re ON ( e.id = re.entity_id AND re.entity_table = 'civicrm_event' )
+WHERE      e.id = %1
+";
+      //Check if repeat is configured
+      CRM_Core_BAO_RecurringEntity::getParentFor($eventID, 'civicrm_event');
+      $params = [
+        1 => [$eventID, 'Integer'],
+        2 => [CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID, 'Integer'],
+      ];
+      $dao = CRM_Core_DAO::executeQuery($sql, $params);
+      if (!$dao->fetch()) {
+        throw new CRM_Core_Exception('Unable to determine Event information');
+      }
+      if (!$dao->is_location) {
+        $tabs['location']['valid'] = FALSE;
+      }
+      if (!$dao->is_online_registration) {
+        $tabs['registration']['valid'] = FALSE;
+      }
+      if (!$dao->is_monetary) {
+        $tabs['fee']['valid'] = FALSE;
+      }
+      if (!$dao->is_pcp) {
+        $tabs['pcp']['valid'] = FALSE;
+      }
+      if (!$dao->is_reminder) {
+        $tabs['reminder']['valid'] = FALSE;
+      }
+      if (!$dao->is_repeating_event) {
+        $tabs['repeat']['valid'] = FALSE;
+      }
+    }
+
+    // see if any other modules want to add any tabs
+    // note: status of 'valid' flag of any injected tab, needs to be taken care in the hook implementation.
+    CRM_Utils_Hook::tabset('civicrm/event/manage', $tabs,
+      ['event_id' => $eventID]);
+
+    $fullName = $this->_name;
+    $className = CRM_Utils_String::getClassName($fullName);
+    $new = '';
+
+    // hack for special cases.
+    switch ($className) {
+      case 'Event':
+        $attributes = $this->_attributes;
+        $class = CRM_Utils_Request::retrieveComponent($attributes);
+        break;
+
+      case 'EventInfo':
+        $class = 'settings';
+        break;
+
+      case 'ScheduleReminders':
+        $class = 'reminder';
+        break;
+
+      default:
+        $class = strtolower($className);
+        break;
+    }
+
+    if (array_key_exists($class, $tabs)) {
+      $tabs[$class]['current'] = TRUE;
+      $qfKey = $this->get('qfKey');
+      if ($qfKey) {
+        $tabs[$class]['qfKey'] = "&qfKey={$qfKey}";
+      }
+    }
+
+    if ($eventID) {
+      $reset = !empty($_GET['reset']) ? 'reset=1&' : '';
+
+      foreach ($tabs as $key => $value) {
+        if (!isset($tabs[$key]['qfKey'])) {
+          $tabs[$key]['qfKey'] = NULL;
+        }
+
+        $action = 'update';
+        if ($key === 'reminder') {
+          $action = 'browse';
+        }
+
+        $link = "civicrm/event/manage/{$key}";
+        $query = "{$reset}action={$action}&id={$eventID}&component=event{$tabs[$key]['qfKey']}";
+
+        $tabs[$key]['link'] = (isset($value['link']) ? $value['link'] :
+          CRM_Utils_System::url($link, $query));
+      }
+    }
+
+    return $tabs;
+  }
+
+  /**
+   * @param $tabs
+   *
+   * @return int|string
+   */
+  private function getCurrentTab($tabs) {
+    static $current = FALSE;
+
+    if ($current) {
+      return $current;
+    }
+
+    if (is_array($tabs)) {
+      foreach ($tabs as $subPage => $pageVal) {
+        if (($pageVal['current'] ?? NULL) === TRUE) {
+          $current = $subPage;
+          break;
+        }
+      }
+    }
+
+    $current = $current ?: 'settings';
+    return $current;
   }
 
 }

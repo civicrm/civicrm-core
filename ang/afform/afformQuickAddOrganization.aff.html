@@ -1,0 +1,16 @@
+<af-form ctrl="afform">
+  <af-entity type="Organization" name="Organization1" actions="{create: true, update: false}" security="RBAC" />
+  <fieldset af-fieldset="Organization1" class="af-container">
+    <div class="af-container">
+      <div class="af-container af-layout-inline">
+        <af-field name="organization_name" />
+      </div>
+      <div af-join="Email" data="{is_primary: true}">
+        <div class="af-container af-layout-inline">
+          <af-field name="email" defn="{required: false}"/>
+        </div>
+      </div>
+    </div>
+  </fieldset>
+  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()">{{:: ts('Submit') }}</button>
+</af-form>

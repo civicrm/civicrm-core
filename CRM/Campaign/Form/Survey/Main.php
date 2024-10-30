@@ -50,8 +50,15 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
       $this->setTitle(ts('Configure Survey') . ' - ' . $this->_surveyTitle);
     }
 
-    // Add custom data to form
-    CRM_Custom_Form_CustomData::addToForm($this);
+    if ($this->isSubmitted()) {
+      // The custom data fields are added to the form by an ajax form.
+      // However, if they are not present in the element index they will
+      // not be available from `$this->getSubmittedValue()` in post process.
+      // We do not have to set defaults or otherwise render - just add to the element index.
+      $this->addCustomDataFieldsToForm('Survey', array_filter([
+        'id' => $this->getSurveyID(),
+      ]));
+    }
 
     if ($this->_name != 'Petition') {
       $url = CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=survey');
@@ -83,18 +90,6 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
 
     $defaults = $this->_values;
 
-    if ($this->_surveyId) {
-
-      if (!empty($defaults['result_id']) && !empty($defaults['recontact_interval'])) {
-
-        $resultId = $defaults['result_id'];
-        $recontactInterval = CRM_Utils_String::unserialize($defaults['recontact_interval']);
-
-        unset($defaults['recontact_interval']);
-        $defaults['option_group_id'] = $resultId;
-      }
-    }
-
     if (!isset($defaults['is_active'])) {
       $defaults['is_active'] = 1;
     }
@@ -110,7 +105,7 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
   /**
    * Build the form object.
    */
-  public function buildQuickForm() {
+  public function buildQuickForm(): void {
     $this->add('text', 'title', ts('Title'), CRM_Core_DAO::getAttribute('CRM_Campaign_DAO_Survey', 'title'), TRUE);
 
     // Activity Type id
@@ -156,23 +151,16 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
 
     $session = CRM_Core_Session::singleton();
 
-    $params['last_modified_id'] = $session->get('userID');
-    $params['last_modified_date'] = date('YmdHis');
-
     if ($this->_surveyId) {
       $params['id'] = $this->_surveyId;
     }
-    else {
-      $params['created_id'] = $session->get('userID');
-      $params['created_date'] = date('YmdHis');
-    }
 
-    $params['is_active'] = CRM_Utils_Array::value('is_active', $params, 0);
-    $params['is_default'] = CRM_Utils_Array::value('is_default', $params, 0);
+    $params['is_active'] ??= 0;
+    $params['is_default'] ??= 0;
 
-    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params, $this->getEntityId(), $this->getDefaultEntity());
+    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($this->getSubmittedValues(), $this->getSurveyID(), 'Survey');
 
-    $survey = CRM_Campaign_BAO_Survey::create($params);
+    $survey = CRM_Campaign_BAO_Survey::writeRecord($params);
     $this->_surveyId = $survey->id;
 
     if (!empty($this->_values['result_id'])) {
@@ -187,7 +175,7 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
       );
       // delete option group if no any survey is using it.
       if (!$countSurvey) {
-        CRM_Core_BAO_OptionGroup::del($this->_values['result_id']);
+        CRM_Core_BAO_OptionGroup::deleteRecord(['id' => $this->_values['result_id']]);
       }
     }
 

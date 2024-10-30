@@ -79,7 +79,7 @@ class api_v4_OAuthClientTest extends \PHPUnit\Framework\TestCase implements Head
       $this->fail("Expected exception: invalid provider");
     }
     catch (CRM_Core_Exception $e) {
-      $this->assertRegExp(';Invalid provider;', $e->getMessage());
+      $this->assertMatchesRegularExpression(';Invalid provider;', $e->getMessage());
     }
   }
 
@@ -105,7 +105,7 @@ class api_v4_OAuthClientTest extends \PHPUnit\Framework\TestCase implements Head
       $this->fail("Expected exception: invalid provider");
     }
     catch (CRM_Core_Exception $e) {
-      $this->assertRegExp(';Invalid provider;', $e->getMessage());
+      $this->assertMatchesRegularExpression(';Invalid provider;', $e->getMessage());
     }
 
     Civi\Api4\OAuthClient::update()

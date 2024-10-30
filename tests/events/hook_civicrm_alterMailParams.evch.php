@@ -107,7 +107,7 @@ return new class() extends EventCheck implements HookInterface {
     $msg = 'Non-conforming hook_civicrm_alterMailParams(..., $context)';
     $dump = print_r($params, 1);
 
-    $this->assertRegExp('/^(messageTemplate|civimail|singleEmail|flexmailer)$/',
+    $this->assertMatchesRegularExpression('/^(messageTemplate|civimail|singleEmail|flexmailer)$/',
       $context, "$msg: Unrecognized context ($context)\n$dump");
 
     $contexts = [$context];
@@ -131,7 +131,7 @@ return new class() extends EventCheck implements HookInterface {
         $this->assertType($paramSpecs[$key]['type'], $value, "$msg: Bad data-type found in param ($key)\n$dump");
       }
       if (isset($paramSpecs[$key]['regex']) && $value !== NULL) {
-        $this->assertRegExp($paramSpecs[$key]['regex'], $value, "Parameter [$key => $value] should match regex ({$paramSpecs[$key]['regex']})");
+        $this->assertMatchesRegularExpression($paramSpecs[$key]['regex'], $value, "Parameter [$key => $value] should match regex ({$paramSpecs[$key]['regex']})");
       }
     }
 

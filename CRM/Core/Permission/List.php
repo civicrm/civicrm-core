@@ -31,14 +31,15 @@ class CRM_Core_Permission_List {
    * @see \CRM_Utils_Hook::permissionList
    */
   public static function findCiviPermissions(GenericHookEvent $e) {
-    $activeCorePerms = \CRM_Core_Permission::basicPermissions(FALSE);
     $allCorePerms = \CRM_Core_Permission::basicPermissions(TRUE, TRUE);
     foreach ($allCorePerms as $permName => $corePerm) {
       $e->permissions[$permName] = [
         'group' => 'civicrm',
-        'title' => $corePerm['label'] ?? $corePerm[0] ?? $permName,
-        'description' => $corePerm['description'] ?? $corePerm[1] ?? NULL,
-        'is_active' => isset($activeCorePerms[$permName]),
+        'title' => $corePerm['label'],
+        'description' => $corePerm['description'] ?? NULL,
+        'is_active' => empty($corePerm['disabled']),
+        'implies' => $corePerm['implies'] ?? NULL,
+        'parent' => $corePerm['parent'] ?? NULL,
       ];
     }
   }
@@ -54,28 +55,15 @@ class CRM_Core_Permission_List {
     $config = \CRM_Core_Config::singleton();
 
     $ufPerms = $config->userPermissionClass->getAvailablePermissions();
+
     foreach ($ufPerms as $permName => $cmsPerm) {
       $e->permissions[$permName] = [
         'group' => 'cms',
         'title' => $cmsPerm['title'] ?? $permName,
         'description' => $cmsPerm['description'] ?? NULL,
+        'is_synthetic' => $cmsPerm['is_synthetic'] ?? FALSE,
       ];
     }
-
-    // There are a handful of special permissions defined in CRM/Core/Permission/*.php
-    // using the `translatePermission()` mechanism.
-    $e->permissions['cms:view user account'] = [
-      'group' => 'cms',
-      'title' => ts('CMS') . ': ' . ts('View user accounts'),
-      'description' => ts('View user accounts. (Synthetic permission - adapts to local CMS)'),
-      'is_synthetic' => TRUE,
-    ];
-    $e->permissions['cms:administer users'] = [
-      'group' => 'cms',
-      'title' => ts('CMS') . ': ' . ts('Administer user accounts'),
-      'description' => ts('Administer user accounts. (Synthetic permission - adapts to local CMS)'),
-      'is_synthetic' => TRUE,
-    ];
   }
 
   /**
@@ -84,6 +72,7 @@ class CRM_Core_Permission_List {
    */
   public static function findConstPermissions(GenericHookEvent $e) {
     // There are a handful of special permissions defined in CRM/Core/Permission.
+    // Enforcement of them is handled in `CRM_Core_Permission_*::check()`
     $e->permissions[\CRM_Core_Permission::ALWAYS_DENY_PERMISSION] = [
       'group' => 'const',
       'title' => ts('Generic: Deny all users'),
@@ -93,6 +82,9 @@ class CRM_Core_Permission_List {
       'group' => 'const',
       'title' => ts('Generic: Allow all users (including anonymous)'),
       'is_synthetic' => TRUE,
+      // This line is here more as a bit of documentation (so it will show in `Civi\Api4\Permission::get()`).
+      // The functionality that actually handles this pseudo-permission is in `CRM_Core_Permission_*::check()`
+      'implies' => ['*'],
     ];
   }
 

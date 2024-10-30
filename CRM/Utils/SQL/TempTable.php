@@ -116,8 +116,8 @@ class CRM_Utils_SQL_TempTable {
   public function getName() {
     $parts = ['civicrm', 'tmp'];
     $parts[] = ($this->durable ? 'd' : 'e');
-    $parts[] = $this->category ? $this->category : 'dflt';
-    $parts[] = $this->id ? $this->id : 'dflt';
+    $parts[] = $this->category ?: 'dflt';
+    $parts[] = $this->id ?: 'dflt';
     return implode('_', $parts);
   }
 
@@ -156,7 +156,7 @@ class CRM_Utils_SQL_TempTable {
   /**
    * Create the empty table.
    *
-   * @parma string $columns
+   * @param string $columns
    *   SQL column listing.
    *   Ex: 'id int(10), name varchar(64)'.
    * @return CRM_Utils_SQL_TempTable

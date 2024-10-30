@@ -1,1 +1,1 @@
-Thank you for signing {$petition.title} - {contact.display_name}
+Thank you for signing {survey.title} - {contact.display_name}

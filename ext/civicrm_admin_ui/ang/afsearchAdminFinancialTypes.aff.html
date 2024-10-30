@@ -4,11 +4,11 @@
       <p>
         {{:: ts('Financial types are used to categorize contributions for reporting and accounting purposes. You may set up as many as needed, including commonly used types such as Donation, Campaign Contribution or Membership Dues.') }}
         {{:: ts('Additionally, financial types can account for the inventory and expense of premiums.') }}
-        <a href="{{ crmUrl('civicrm/admin/contribute/managePremiums') }}">{{:: ts('View Premiums') }}</a>
+        <a ng-href="{{ crmUrl('civicrm/admin/contribute/managePremiums') }}">{{:: ts('View Premiums') }}</a>
       </p>
       <p>
         {{:: ts('Each financial type relates to a number of financial accounts to track income, accounts receivable, and fees.') }}
-        <a href="{{ crmUrl('civicrm/admin/financial/financialAccount') }}">{{:: ts('View Financial Accounts') }}</a>
+        <a ng-href="{{ crmUrl('civicrm/admin/financial/financialAccount') }}">{{:: ts('View Financial Accounts') }}</a>
       </p>
   </div>
 

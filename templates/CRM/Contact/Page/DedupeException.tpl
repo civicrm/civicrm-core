@@ -8,26 +8,27 @@
  +--------------------------------------------------------------------+
 *}
 {include file="CRM/common/dedupe.tpl"}
-<div class="crm-accordion-header">
-  {ts}Filter Contacts{/ts}
-</div>
-<div class="crm-accordion-body">
-  <form method="get">
-    <table class="no-border form-layout-compressed" id="searchOptions" style="width:100%;">
-      <tr>
-        <td class="crm-contact-form-block-contact1">
-          <label for="search-contact1">{ts}Contact Name{/ts}</label><br />
-          <input class="crm-form-text" type="text" size="50" placeholder="{ts}Search Contacts{/ts}" value="{$searchcontact1}" id="search-contact1" search-column="0" />
-        </td>
-        <td class="crm-contact-form-block-search">
-          <label>&nbsp;</label><br />
-          <button type="submit" class="button crm-button filtercontacts"><span><i class="crm-i fa-search" aria-hidden="true"></i> {ts}Find Contacts{/ts}</span></button>
-        </td>
-      </tr>
-    </table>
-  </form>
-</div>
-
+<details class="crm-accordion-bold" open>
+  <summary>
+    {ts}Filter Contacts{/ts}
+  </summary>
+  <div class="crm-accordion-body">
+    <form method="get">
+      <table class="no-border form-layout-compressed" id="searchOptions" style="width:100%;">
+        <tr>
+          <td class="crm-contact-form-block-contact1">
+            <label for="search-contact1">{ts}Contact Name{/ts}</label><br />
+            <input class="crm-form-text" type="text" size="50" placeholder="{ts}Search Contacts{/ts}" value="{$searchcontact1}" id="search-contact1" search-column="0" />
+          </td>
+          <td class="crm-contact-form-block-search">
+            <label>&nbsp;</label><br />
+            <button type="submit" class="button crm-button filtercontacts"><span><i class="crm-i fa-search" aria-hidden="true"></i> {ts}Find Contacts{/ts}</span></button>
+          </td>
+        </tr>
+      </table>
+    </form>
+  </div>
+</details>
 
 <div class="crm-content-block crm-block">
   {include file="CRM/common/pager.tpl" location="top"}
@@ -53,11 +54,11 @@
 
           <td>
             {assign var="contact1name" value="contact_id1.display_name"}
-            <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$exception.contact_id1`"}" target="_blank">{ $exception.$contact1name }</a>
+            <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$exception.contact_id1`"}" target="_blank">{$exception.$contact1name}</a>
           </td>
           <td>
             {assign var="contact2name" value="contact_id2.display_name"}
-            <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$exception.contact_id2`"}" target="_blank">{ $exception.$contact2name }</a>
+            <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$exception.contact_id2`"}" target="_blank">{$exception.$contact2name}</a>
           </td>
           <td>
             <a id='duplicateContacts' href="#" title={ts}Remove Exception{/ts} onClick="processDupes( {$exception.contact_id1}, {$exception.contact_id2}, 'nondupe-dupe', 'dedupe-exception' );return false;"><i class="crm-i fa-trash" aria-hidden="true"></i> {ts}Remove Exception{/ts}</a>

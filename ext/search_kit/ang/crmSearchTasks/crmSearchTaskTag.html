@@ -28,7 +28,7 @@
         >
       </div>
       <div ng-repeat="tagset in $ctrl.tagsets" class="form-inline">
-        <label>{{:: tagset.name }}</label>
+        <label>{{:: tagset.label }}</label>
         <input
           ng-model="$ctrl.selectedTagsetTags[tagset.name]"
           ng-list

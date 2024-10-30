@@ -27,7 +27,7 @@ class AddressGetSpecProvider extends \Civi\Core\Service\AutoService implements G
    * @param \Civi\Api4\Service\Spec\RequestSpec $spec
    */
   public function modifySpec(RequestSpec $spec) {
-    // Groups field
+    // Proximity search field
     $field = new FieldSpec('proximity', 'Address', 'Boolean');
     $field->setLabel(ts('Address Proximity'))
       ->setTitle(ts('Address Proximity'))

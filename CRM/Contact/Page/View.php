@@ -46,7 +46,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
    *
    * @var string
    */
-  protected $_permission;
+  public $_permission;
 
   /**
    * Heart of the viewing process.
@@ -340,13 +340,6 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
       $obj->assign('userAddUrl', $userAddUrl);
     }
     $obj->assign('userRecordUrl', $userRecordUrl);
-
-    if (CRM_Core_Permission::check('access Contact Dashboard')) {
-      $dashboardURL = CRM_Utils_System::url('civicrm/user',
-        "reset=1&id={$cid}"
-      );
-      $obj->assign('dashboardURL', $dashboardURL);
-    }
 
     // See if other modules want to add links to the activtity bar
     $hookLinks = [];

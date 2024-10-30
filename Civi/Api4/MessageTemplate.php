@@ -14,10 +14,19 @@ namespace Civi\Api4;
  * MsgTemplate entity.
  *
  * This is a collection of MsgTemplate, for reuse in import, export, etc.
- * @searchable none
+ * @searchable secondary
  * @since 5.26
  * @package Civi\Api4
  */
 class MessageTemplate extends Generic\DAOEntity {
+
+  /**
+   * @param bool $checkPermissions
+   * @return Action\MessageTemplate\Revert
+   */
+  public static function revert($checkPermissions = TRUE) {
+    return (new Action\MessageTemplate\Revert('MessageTemplate', __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
 
 }

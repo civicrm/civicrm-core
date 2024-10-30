@@ -31,7 +31,7 @@ class CRM_Core_BAO_StatusPreference extends CRM_Core_DAO_StatusPreference {
     $statusPreference = new CRM_Core_DAO_StatusPreference();
 
     // Default severity level to ignore is 0 (DEBUG).
-    $params['ignore_severity'] = $params['ignore_severity'] ?? 0;
+    $params['ignore_severity'] ??= 0;
 
     // Severity can be either text ('critical') or an integer <= 7.
     // It's a magic number, but based on PSR-3 standards.

@@ -9,6 +9,18 @@ use Civi\Test\Invasive;
 class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
 
   /**
+   * @var string
+   */
+  protected $tempDir;
+
+  public function setUp(): void {
+    parent::setUp();
+    $this->useTransaction();
+    $this->tempDir = sys_get_temp_dir() . '/VersionCheck-' . rand() . rand();
+    mkdir($this->tempDir);
+  }
+
+  /**
    * @var array
    */
   protected $sampleVersionInfo = [
@@ -93,11 +105,14 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
     if (file_exists($vc->cacheFile)) {
       unlink($vc->cacheFile);
     }
+    if (file_exists($this->tempDir)) {
+      CRM_Utils_File::cleanDir($this->tempDir, TRUE, FALSE);
+    }
   }
 
-  public function testCronFallback() {
+  public function testCronFallback(): void {
     // Fake "remote" source data
-    $tmpSrc = '/tmp/versionCheckTestFile.json';
+    $tmpSrc = $this->tempDir . '/versionCheckTestFile.json';
     file_put_contents($tmpSrc, json_encode($this->sampleVersionInfo));
 
     $vc = new CRM_Utils_VersionCheck();
@@ -132,7 +147,7 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
     $this->assertEquals($remoteData, $vc->versionInfo);
   }
 
-  public function testGetSiteStats() {
+  public function testGetSiteStats(): void {
     // Create domain address so the domain country will come up in the stats.
     $country_params = [
       'sequential' => 1,
@@ -217,6 +232,7 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
         'Pledge',
         'PledgeBlock',
         'Delivered',
+        // TIP: If an entity is renamed, then update VersionCheck's $compat list.
       ];
       sort($entity_names);
       sort($expected_entity_names);

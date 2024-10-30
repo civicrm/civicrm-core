@@ -14,8 +14,7 @@
     "jasmine-core": "~3.3.0",
     "karma": "^6.3.16",
     "karma-jasmine": "~2.0.1",
-    "karma-ng-html2js-preprocessor": "^1.0.0",
-    "karma-phantomjs-launcher": "^1.0.4"
+    "karma-ng-html2js-preprocessor": "^1.0.0"
   },
   "scripts": {
     "postinstall": "bash tools/scripts/npm/postinstall.sh",

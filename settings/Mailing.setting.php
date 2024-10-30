@@ -18,6 +18,8 @@
  * Settings metadata file
  */
 
+$unsubLearnMore = '<br/>' . ts('(<a %1">Learn more</a>)', [1 => 'href="https://civicrm.org/redirect/unsubscribe-one-click" target="_blank"']);
+
 return [
   'profile_double_optin' => [
     'group_name' => 'Mailing Preferences',
@@ -32,6 +34,22 @@ return [
     'is_contact' => 0,
     'description' => ts('When CiviMail is enabled, users who "subscribe" to a group from a profile Group(s) checkbox will receive a confirmation email. They must respond (opt-in) before they are added to the group.'),
     'help_text' => NULL,
+  ],
+  'no_reply_email_address' => [
+    'group_name' => 'Mailing Preferences',
+    'group' => 'mailing',
+    'name' => 'no_reply_email_address',
+    'type' => 'String',
+    'html_type' => 'text',
+    'default' => NULL,
+    'add' => '5.63',
+    'title' => ts('No-Reply Address'),
+    'validate_callback' => 'CRM_Utils_Rule::email',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => '',
+    'help_text' => NULL,
+    'help' => ['id' => 'no_reply_email_address'],
   ],
   'track_civimail_replies' => [
     'group_name' => 'Mailing Preferences',
@@ -74,6 +92,28 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'help_text' => NULL,
+  ],
+  'civimail_unsubscribe_methods' => [
+    'group_name' => 'Mailing Preferences',
+    'group' => 'mailing',
+    'name' => 'civimail_unsubscribe_methods',
+    'type' => 'Array',
+    'quick_form_type' => 'Select',
+    'html_type' => 'Select',
+    'html_attributes' => [
+      'multiple' => 1,
+      'class' => 'crm-select2',
+    ],
+    'default' => version_compare(CRM_Utils_System::version(), '5.72', '<=') ? ['mailto'] : ['mailto', 'http', 'oneclick'],
+    'add' => '5.70',
+    'title' => ts('Unsubscribe Methods'),
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => ts("These methods will be offered to email clients for semi-automated unsubscribes. Support for each depends on the recipient's email client.") . $unsubLearnMore,
+    'help_text' => NULL,
+    'pseudoconstant' => [
+      'callback' => 'CRM_Mailing_Service_ListUnsubscribe::getMethods',
+    ],
   ],
   'replyTo' => [
     'group_name' => 'Mailing Preferences',
@@ -391,6 +431,20 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => ts('The frequency that CiviMail updates its sent mail database.'),
+    'help_text' => ts('CiviMail records email sent at the frequency you specify. If you set it to 1, it will update the database every time it sends an email. This ensures that emails are not resent if the batch job fails, but this may cause a performance hit, particularly for large jobs.'),
+  ],
+  'scheduled_reminder_smarty' => [
+    'group_name' => 'Mailing Preferences',
+    'group' => 'mailing',
+    'name' => 'scheduled_reminder_smarty',
+    'type' => 'Boolean',
+    'html_type' => 'checkbox',
+    'default' => 0,
+    'title' => ts('Use Smarty in scheduled reminders'),
+    'add' => '5.60',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => ts('Controls whether scheduled reminders will attempt to process smarty tokens.'),
     'help_text' => NULL,
   ],
 ];

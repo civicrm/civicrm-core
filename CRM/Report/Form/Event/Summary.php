@@ -132,50 +132,48 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form {
     $this->_select = 'SELECT ' . implode(', ', $select);
   }
 
-  public function from() {
+  public function from(): void {
     $this->_from = " FROM civicrm_event {$this->_aliases['civicrm_event']} ";
   }
 
-  public function where() {
+  public function where(): void {
     $clauses = [];
-    $this->_participantWhere = "";
-    foreach ($this->_columns as $tableName => $table) {
+    foreach ($this->_columns as $table) {
       if (array_key_exists('filters', $table)) {
         foreach ($table['filters'] as $fieldName => $field) {
-          $clause = NULL;
-          if (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE) {
+          if (($field['type'] ?? 0) & CRM_Utils_Type::T_DATE) {
             $relative = $this->_params["{$fieldName}_relative"] ?? NULL;
             $from = $this->_params["{$fieldName}_from"] ?? NULL;
             $to = $this->_params["{$fieldName}_to"] ?? NULL;
 
             if ($relative || $from || $to) {
-              $clause = $this->dateClause($field['name'], $relative, $from, $to, $field['type']);
+              $clauses[] = $this->dateClause($field['name'], $relative, $from, $to, $field['type']);
             }
           }
           else {
             $op = $this->_params["{$fieldName}_op"] ?? NULL;
             if ($op) {
-              $clause = $this->whereClause($field,
+              $clauses[] = $this->whereClause($field,
                 $op,
-                CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
+               $this->_params["{$fieldName}_value"] ?? NULL,
+                $this->_params["{$fieldName}_min"] ?? NULL,
+                $this->_params["{$fieldName}_max"] ?? NULL,
               );
             }
-          }
-          if (!empty($this->_params['id_value'])) {
-            $idValue = is_array($this->_params['id_value']) ? implode(',', $this->_params['id_value']) : $this->_params['id_value'];
-            $this->_participantWhere = " AND civicrm_participant.event_id IN ( $idValue ) ";
-          }
-
-          if (!empty($clause)) {
-            $clauses[] = $clause;
           }
         }
       }
     }
     $clauses[] = "{$this->_aliases['civicrm_event']}.is_template = 0";
-    $this->_where = 'WHERE  ' . implode(' AND ', $clauses);
+    $this->_where = 'WHERE  ' . implode(' AND ', array_filter($clauses));
+  }
+
+  public function getEventFilter(): string {
+    $eventID = array_filter((array) $this->_params['id_value']);
+    if (empty($eventID)) {
+      return '';
+    }
+    return ' AND civicrm_participant.event_id IN ( ' . implode(',', $eventID) . ') ';
   }
 
   public function groupBy() {
@@ -192,7 +190,7 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form {
     $statusType1 = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 1');
     $statusType2 = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 0');
 
-    $sql = "
+    $sql = '
           SELECT civicrm_participant.event_id    AS event_id,
                  civicrm_participant.status_id   AS statusId,
                  COUNT( civicrm_participant.id ) AS participant,
@@ -202,11 +200,11 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form {
             FROM civicrm_participant
 
             WHERE civicrm_participant.is_test = 0
-                  $this->_participantWhere
+                  ' . $this->getEventFilter() . '
 
         GROUP BY civicrm_participant.event_id,
                  civicrm_participant.status_id,
-                 civicrm_participant.fee_currency";
+                 civicrm_participant.fee_currency';
 
     $info = CRM_Core_DAO::executeQuery($sql);
     $participant_data = $participant_info = $currency = [];
@@ -306,8 +304,8 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form {
     while ($dao->fetch()) {
       $row = [];
       foreach ($this->_columnHeaders as $key => $value) {
-        if (($key == 'civicrm_event_start_date') ||
-          ($key == 'civicrm_event_end_date')
+        if (($key === 'civicrm_event_start_date') ||
+          ($key === 'civicrm_event_end_date')
         ) {
           //get event start date and end date in custom datetime format
           $row[$key] = CRM_Utils_Date::customFormat($dao->$key);

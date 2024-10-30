@@ -271,7 +271,7 @@
         if (url.search(/[&?]snippet=/) < 0) {
           url += (url.indexOf('?') < 0 ? '?' : '&') + 'snippet=' + snippetType;
         } else {
-          url = url.replace(/snippet=[^&]*/, 'snippet=' + snippetType);
+          url = url.replace(/([&?])snippet=[^&]*/, '$1snippet=' + snippetType);
         }
         // See Civi\Angular\AngularLoader
         if (snippetType === 'json' && CRM.angular) {
@@ -304,7 +304,7 @@
     },
     refresh: function() {
       var that = this,
-        hash = this.options.url.split('#')[1];
+        hash = this.options.url.split('#')[1],
         url = this._formatUrl(this.options.url, 'json');
       $(this.element).data('urlHash', hash);
       if (this.options.crmForm) $('form', this.element).ajaxFormUnbind();
@@ -394,7 +394,7 @@
             $(this).dialog('option', 'title', data.title);
           }
           // Update print url
-          $(this).parent().find('a.crm-dialog-titlebar-print').attr('href', $(this).data('civiCrmSnippet')._formatUrl($(this).crmSnippet('option', 'url'), '2'));
+          $(this).parent().find('a.crm-dialog-titlebar-print').attr('href', $(this).data('civiCrmSnippet')._formatUrl($(this).crmSnippet('option', 'url'), '1'));
         });
     }
     $(settings.target).crmSnippet(settings).crmSnippet('refresh');
@@ -578,7 +578,8 @@
       settings.dialog.height = 300;
     }
     else if ($el.hasClass('medium-popup')) {
-      settings.dialog.width = settings.dialog.height = '50%';
+      settings.dialog.width = '50%';
+      settings.dialog.height = '30%';
     }
     var dialog = popup(url, settings);
     // Trigger events from the dialog on the original link element

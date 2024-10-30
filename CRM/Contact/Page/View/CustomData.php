@@ -28,9 +28,12 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
   public $_groupId;
 
   /**
-   * Add a few specific things to view contact.
+   * Run the page.
+   *
+   * This method is called after the page is created. It checks for the
+   * type of action and executes that action.
    */
-  public function preProcess() {
+  public function run() {
     $this->_groupId = CRM_Utils_Request::retrieve('gid', 'Positive', $this, TRUE);
     $this->assign('groupId', $this->_groupId);
 
@@ -39,7 +42,7 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
 
     // If no cid supplied, look it up
     if (!$this->_contactId && $this->_recId) {
-      $tableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_groupId, 'table_name');
+      $tableName = CRM_Core_BAO_CustomGroup::getGroup(['id' => $this->_groupId])['table_name'] ?? NULL;
       if ($tableName) {
         $this->_contactId = CRM_Core_DAO::singleValueQuery("SELECT entity_id FROM `$tableName` WHERE id = %1", [1 => [$this->_recId, 'Integer']]);
       }
@@ -58,16 +61,6 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
 
     $this->_multiRecordDisplay = CRM_Utils_Request::retrieve('multiRecordDisplay', 'String', $this, FALSE);
     $this->_cgcount = CRM_Utils_Request::retrieve('cgcount', 'Positive', $this, FALSE);
-  }
-
-  /**
-   * Run the page.
-   *
-   * This method is called after the page is created. It checks for the
-   * type of action and executes that action.
-   */
-  public function run() {
-    $this->preProcess();
 
     //set the userContext stack
     $doneURL = 'civicrm/contact/view';
@@ -98,16 +91,16 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
 
         $this->assign('displayStyle', 'tableOriented');
         // here the multi custom data listing code will go
-        $multiRecordFieldListing = TRUE;
         $page = new CRM_Profile_Page_MultipleRecordFieldsListing();
-        $page->set('contactId', $this->_contactId);
-        $page->set('customGroupId', $this->_groupId);
+        $page->_contactId = $this->_contactId;
+        $page->_customGroupId = $this->_groupId;
         $page->set('action', CRM_Core_Action::BROWSE);
-        $page->set('multiRecordFieldListing', $multiRecordFieldListing);
-        $page->set('pageViewType', 'customDataView');
-        $page->set('contactType', $ctype);
+        $page->_pageViewType = 'customDataView';
+        $page->_contactType = $ctype;
         $page->_headersOnly = TRUE;
-        $page->run();
+        // assign vars to templates
+        $this->assign('action', CRM_Core_Action::BROWSE);
+        $page->browse();
       }
       else {
         //Custom Groups Inline

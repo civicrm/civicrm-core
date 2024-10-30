@@ -63,12 +63,12 @@
                   <th>{ts}Type{/ts}</th>
                   <th>{ts}ID{/ts}</th>
                   <th id="nosort">{ts}Used For{/ts}</th>
-                  <th></th>
+                  <th><span class="sr-only">{ts}Actions{/ts}</span></th>
                 </tr>
               </thead>
               <tbody>
                 {foreach from=$rows item=row}
-                {if !$row.is_reserved }
+                {if !$row.is_reserved}
                   <tr id="UFGroup-{$row.id}" data-action="setvalue" class="crm-entity {$row.class}{if NOT $row.is_active} disabled{/if}">
                     <td class="crmf-title crm-editable">{$row.title}</td>
                     <td class="crmf-frontend_title crm-editable">{$row.frontend_title}</td>
@@ -108,7 +108,7 @@
                   <th>{ts}Type{/ts}</th>
                   <th>{ts}ID{/ts}</th>
                   <th id="nosort">{ts}Used For{/ts}</th>
-                  <th></th>
+                  <th><span class="sr-only">{ts}Actions{/ts}</span></th>
                 </tr>
               </thead>
               <tbody>

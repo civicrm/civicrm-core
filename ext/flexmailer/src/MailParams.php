@@ -89,7 +89,7 @@ class MailParams {
           break;
 
         default:
-          $message->headers(array($key => $value), TRUE);
+          $message->headers([$key => $value], TRUE);
       }
     }
 

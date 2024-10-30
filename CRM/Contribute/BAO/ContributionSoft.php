@@ -30,7 +30,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    */
   public static function add(&$params) {
     $hook = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'ContributionSoft', CRM_Utils_Array::value('id', $params), $params);
+    CRM_Utils_Hook::pre($hook, 'ContributionSoft', $params['id'] ?? NULL, $params);
 
     $contributionSoft = new CRM_Contribute_DAO_ContributionSoft();
     $contributionSoft->copyValues($params);
@@ -391,10 +391,10 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
     // This is necessary for dataTables sorting.
     $dataTableMapping = [
       'sct_label' => 'soft_credit_type_id:label',
-      'contributor_name' => 'contact.sort_name',
+      'contributor_name' => 'contact_id.sort_name',
       'financial_type' => 'contribution_id.financial_type_id:label',
       'contribution_status' => 'contribution_id.contribution_status_id:label',
-      'receive_date' => 'contribution.receive_date',
+      'receive_date' => 'contribution_id.receive_date',
       'pcp_title' => 'pcp_id.title',
       'amount' => 'amount',
     ];
@@ -405,11 +405,12 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
         'url' => 'civicrm/contact/view/contribution',
         'qs' => 'reset=1&id=%%contributionid%%&cid=%%contactId%%&action=view&context=contribution&selectedChild=contribute',
         'title' => ts('View related contribution'),
+        'weight' => -20,
       ],
     ];
 
     $contributionSofts = ContributionSoft::get()
-      ->addSelect('*', 'contribution_id.receive_date', 'contribution_id.contact_id', 'contribution_id.contact_id.display_name', 'soft_credit_type_id:label', 'contribution_id.contribution_status_id:label', 'contribution_id.financial_type_id:label', 'pcp_id.title')
+      ->addSelect('*', 'contribution_id.receive_date', 'contribution_id.contact_id', 'contribution_id.contact_id.display_name', 'soft_credit_type_id:label', 'contribution_id.contribution_status_id:label', 'contribution_id.financial_type_id:label', 'pcp_id.title', 'row_count')
       ->addWhere('contact_id', '=', $contact_id)
       ->addWhere('contribution_id.is_test', '=', $isTest);
 
@@ -483,63 +484,15 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
     if (empty($form->_values['honoree_profile_id'])) {
       return;
     }
-    $profileContactType = CRM_Core_BAO_UFGroup::getContactType($form->_values['honoree_profile_id']);
-    $profileFields = CRM_Core_BAO_UFGroup::getFields($form->_values['honoree_profile_id']);
-    $honoreeProfileFields = $values = [];
-    $honorName = NULL;
-
-    if ($honorId) {
-      CRM_Core_BAO_UFGroup::getValues($honorId, $profileFields, $values, FALSE, $params);
-      if (empty($params)) {
-        foreach ($profileFields as $name => $field) {
-          $title = $field['title'];
-          $params[$field['name']] = $values[$title];
-        }
-      }
+    $profileID = $form->_values['honoree_profile_id'];
+    if (!is_array($params)) {
+      CRM_Core_Error::deprecatedWarning('this could indicate a bug - see https://lab.civicrm.org/dev/core/-/issues/4881');
+      $params = [];
     }
+    $honoreeVariables = self::getHonorTemplateVariables($profileID, $honorId, $params);
 
-    //remove name related fields and construct name string with prefix/suffix
-    //which will be later assigned to template
-    switch ($profileContactType) {
-      case 'Individual':
-        if (array_key_exists('prefix_id', $params)) {
-          $honorName = CRM_Utils_Array::value($params['prefix_id'],
-            CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id')
-          );
-          unset($profileFields['prefix_id']);
-        }
-        $honorName .= ' ' . $params['first_name'] . ' ' . $params['last_name'];
-        unset($profileFields['first_name']);
-        unset($profileFields['last_name']);
-        if (array_key_exists('suffix_id', $params)) {
-          $honorName .= ' ' . CRM_Utils_Array::value($params['suffix_id'],
-              CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id')
-            );
-          unset($profileFields['suffix_id']);
-        }
-        break;
-
-      case 'Organization':
-        $honorName = $params['organization_name'];
-        unset($profileFields['organization_name']);
-        break;
-
-      case 'Household':
-        $honorName = $params['household_name'];
-        unset($profileFields['household_name']);
-        break;
-    }
-
-    if ($honorId) {
-      $honoreeProfileFields['Name'] = $honorName;
-      foreach ($profileFields as $name => $field) {
-        $title = $field['title'];
-        $honoreeProfileFields[$title] = $values[$title];
-      }
-      $form->assign('honoreeProfile', $honoreeProfileFields);
-    }
-    else {
-      $form->assign('honorName', $honorName);
+    foreach ($honoreeVariables as $honorField => $honorValue) {
+      $form->assign($honorField, $honorValue);
     }
   }
 
@@ -645,11 +598,91 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
   }
 
   /**
+   * @param int|null $profileID
+   * @param int|null $honorId
+   * @param array $params
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   * @internal temporary function to retrieve template variables for honor profile.
+   *
+   */
+  public static function getHonorTemplateVariables(?int $profileID, ?int $honorId, array $params): array {
+    $honoreeVariables = ['honoreeProfile' => NULL, 'honorName' => NULL];
+    if (!$profileID) {
+      return $honoreeVariables;
+    }
+    $profileContactType = CRM_Core_BAO_UFGroup::getContactType($profileID);
+    $profileFields = CRM_Core_BAO_UFGroup::getFields($profileID);
+    $honoreeProfileFields = $values = [];
+    $honorName = NULL;
+
+    if ($honorId) {
+      CRM_Core_BAO_UFGroup::getValues($honorId, $profileFields, $values, FALSE, $params);
+      if (empty($params)) {
+        foreach ($profileFields as $name => $field) {
+          $title = $field['title'];
+          $params[$field['name']] = $values[$title];
+        }
+      }
+    }
+
+    //remove name related fields and construct name string with prefix/suffix
+    //which will be later assigned to template
+    // This looks like a really drawn out way to get the display name...
+    switch ($profileContactType) {
+      case 'Individual':
+        if (array_key_exists('prefix_id', $params)) {
+          $honorName = CRM_Utils_Array::value($params['prefix_id'],
+            CRM_Contact_DAO_Contact::buildOptions('prefix_id')
+          );
+          unset($profileFields['prefix_id']);
+        }
+        $honorName .= ' ' . $params['first_name'] . ' ' . $params['last_name'];
+        unset($profileFields['first_name']);
+        unset($profileFields['last_name']);
+        if (array_key_exists('suffix_id', $params)) {
+          $honorName .= ' ' . CRM_Utils_Array::value($params['suffix_id'],
+              CRM_Contact_DAO_Contact::buildOptions('suffix_id')
+            );
+          unset($profileFields['suffix_id']);
+        }
+        break;
+
+      case 'Organization':
+        $honorName = $params['organization_name'];
+        unset($profileFields['organization_name']);
+        break;
+
+      case 'Household':
+        $honorName = $params['household_name'];
+        unset($profileFields['household_name']);
+        break;
+    }
+
+    if ($honorId) {
+      $honoreeProfileFields['Name'] = $honorName;
+      foreach ($profileFields as $name => $field) {
+        $title = $field['title'];
+        $honoreeProfileFields[$title] = $values[$title];
+      }
+      $honoreeVariables['honoreeProfile'] = $honoreeProfileFields;
+    }
+    else {
+      $honoreeVariables['honorName'] = $honorName;
+    }
+    return $honoreeVariables;
+  }
+
+  /**
+   * @param string|null $entityName
+   * @param int|null $userId
+   * @param array $conditions
    * @inheritDoc
    */
-  public function addSelectWhereClause(): array {
+  public function addSelectWhereClause(?string $entityName = NULL, ?int $userId = NULL, array $conditions = []): array {
     $clauses['contribution_id'] = CRM_Utils_SQL::mergeSubquery('Contribution');
-    CRM_Utils_Hook::selectWhereClause($this, $clauses);
+    CRM_Utils_Hook::selectWhereClause($this, $clauses, $userId, $conditions);
     return $clauses;
   }
 

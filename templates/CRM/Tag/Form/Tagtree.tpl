@@ -13,7 +13,7 @@
     <li>
       <a id="tag_{$id}" class="{if !$node.is_selectable || $permission neq 'edit'}jstree-disabled{/if} {if $tagged[$id]}jstree-clicked{/if}">
         <span class="crm-tag-item" {if !empty($allTags.$id.color)}style="background-color: {$allTags.$id.color}; color: {$allTags.$id.color|colorContrast};"{/if} title="{$node.description|escape}">
-          {$node.name}
+          {$node.label}
         </span>
       </a>
       {if $node.children}

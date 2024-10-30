@@ -31,16 +31,11 @@ class CRM_Utils_Check_Component_AddressParsing extends CRM_Utils_Check_Component
     if ($addressOptions['street_address_parsing']) {
       if (!CRM_Core_BAO_Address::isSupportedParsingLocale()) {
         $config = CRM_Core_Config::singleton();
+        $url_address = CRM_Utils_System::url('civicrm/admin/setting/preferences/address', 'reset=1');
+        $url_localization = CRM_Utils_System::url('civicrm/admin/setting/localization', 'reset=1');
         $messages[] = new CRM_Utils_Check_Message(
           __FUNCTION__,
-          ts(
-            '<a href=' .
-            CRM_Utils_System::url('civicrm/admin/setting/preferences/address', 'reset=1') .
-            '">Street address parsing</a> is enabled but not supported by <a href="' .
-            CRM_Utils_System::url('civicrm/admin/setting/localization', 'reset=1') .
-            '">your locale</a> (%1).',
-            [1 => $config->lcMessages]
-          ),
+          ts('<a %1>Street address parsing</a> is enabled but not supported by <a %2>your language settings</a> (%3).', [1 => "href='$url_address'", 2 => "href='$url_localization'", 3 => $config->lcMessages]),
           ts('Street address parsing'),
           \Psr\Log\LogLevel::WARNING,
           'fa-address-card'

@@ -36,10 +36,7 @@ class CRM_Admin_Page_Admin extends CRM_Core_Page {
       'System Settings' => ts('System Settings'),
     ];
 
-    $config = CRM_Core_Config::singleton();
-
-    foreach ($config->enableComponents as $component) {
-      $comp = CRM_Core_Component::get($component);
+    foreach (CRM_Core_Component::getEnabledComponents() as $comp) {
       $groups[$comp->info['name']] = $comp->info['translatedName'];
     }
 

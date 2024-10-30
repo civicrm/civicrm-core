@@ -21,7 +21,7 @@
 class CRM_Campaign_Form_Task_Release extends CRM_Campaign_Form_Task {
 
   /**
-   * Survet id
+   * Survey id
    *
    * @var int
    */
@@ -47,16 +47,12 @@ class CRM_Campaign_Form_Task_Release extends CRM_Campaign_Form_Task {
    * Build all the data structures needed to build the form.
    */
   public function preProcess() {
-    $this->_interviewToRelease = $this->get('interviewToRelease');
-    if ($this->_interviewToRelease) {
+    $interviewToRelease = $this->get('interviewToRelease');
+    if ($interviewToRelease) {
       //user came from interview form.
-      foreach ([
-        'surveyId',
-        'contactIds',
-        'interviewerId',
-      ] as $fld) {
-        $this->{"_$fld"} = $this->get($fld);
-      }
+      $this->_surveyId = $this->get('surveyId');
+      $this->_contactIds = $this->get('contactIds');
+      $this->_interviewerId = $this->get('interviewerId');
 
       if (!empty($this->_contactIds)) {
         $this->assign('totalSelectedContacts', count($this->_contactIds));

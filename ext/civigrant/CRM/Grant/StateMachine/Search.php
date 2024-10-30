@@ -51,7 +51,7 @@ class CRM_Grant_StateMachine_Search extends CRM_Core_StateMachine {
       $this->_pages['CRM_Grant_Form_Task_Result'] = NULL;
     }
 
-    $this->addSequentialPages($this->_pages, $action);
+    $this->addSequentialPages($this->_pages);
   }
 
   /**

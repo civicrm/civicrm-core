@@ -31,11 +31,11 @@
       {assign var="showEdit" value=0}
       <tr>
         <td id="{$cd_edit.name}_{$index}" class="section-shown form-item">
-          <div class="crm-accordion-wrapper{if !empty($cd_edit.collapse_display) && empty($skipTitle)} collapsed{/if}">
+          <details class="crm-accordion-bold" {if !empty($cd_edit.collapse_display) && empty($skipTitle)}{else}open{/if}>
             {if !$skipTitle}
-              <div class="crm-accordion-header">
+              <summary>
                 {$cd_edit.title}
-              </div>
+              </summary>
             {/if}
             <div class="crm-accordion-body">
               {if $groupId and $cvID and $editPermission and $cd_edit.editable}
@@ -69,8 +69,6 @@
                           {else}
                             {if $element.field_data_type EQ 'ContactReference' && $element.contact_ref_links}
                               {', '|implode:$element.contact_ref_links}
-                            {elseif $element.field_data_type == 'Memo'}
-                              {$element.field_value|nl2br}
                             {else}
                               {$element.field_value}
                             {/if}
@@ -85,7 +83,7 @@
             </div>
             <!-- end of body -->
             <div class="clear"></div>
-          </div>
+          </details>
           <!-- end of main accordion -->
         </td>
       </tr>
@@ -123,8 +121,6 @@
                   <div class="content">
                     {if $element.field_data_type EQ 'ContactReference' && $element.contact_ref_links}
                       {', '|implode:$element.contact_ref_links}
-                    {elseif $element.field_data_type == 'Memo'}
-                      {if $element.field_value}{$element.field_value|nl2br}{else}<br/>{/if}
                     {else}
                       {if $element.field_value}{$element.field_value} {else}<br/>{/if}
                     {/if}

@@ -25,7 +25,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
    *
    * @var array
    */
-  public static $_links = NULL;
+  public static $_links;
 
   /**
    * The action links that we need to display for the browse screen.
@@ -101,7 +101,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
    *
    * @var string
    */
-  protected $_additionalClause = NULL;
+  protected $_additionalClause;
 
   /**
    * The query object
@@ -115,7 +115,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
    *
    * @param array $queryParams
    *   Array of parameters for query.
-   * @param \const|int $action - action of search basic or advanced.
+   * @param int $action - action of search basic or advanced.
    * @param string $additionalClause
    *   If the caller wants to further restrict the search (used in participations).
    * @param bool $single
@@ -182,6 +182,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
           'qs' => 'reset=1&action=renew&id=%%id%%&cid=%%cid%%&context=%%cxt%%' . $extraParams,
           'ref' => 'restore-case',
           'title' => ts('Restore Case'),
+          'weight' => -30,
         ],
       ];
     }
@@ -194,6 +195,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
           'ref' => 'manage-case',
           'class' => 'no-popup',
           'title' => ts('Manage Case'),
+          'weight' => -20,
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
@@ -201,6 +203,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
           'qs' => 'reset=1&action=delete&id=%%id%%&cid=%%cid%%&context=%%cxt%%' . $extraParams,
           'ref' => 'delete-case',
           'title' => ts('Delete Case'),
+          'weight' => -10,
         ],
         CRM_Core_Action::UPDATE => [
           'name' => ts('Assign to Another Client'),
@@ -209,13 +212,14 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
           'ref' => 'reassign',
           'class' => 'medium-popup',
           'title' => ts('Assign to Another Client'),
+          'weight' => -10,
         ],
       ];
     }
 
     $actionLinks = [];
-    foreach (self::$_links as $key => $value) {
-      $actionLinks['primaryActions'][$key] = $value;
+    foreach (self::$_links as $index => $value) {
+      $actionLinks['primaryActions'][$index] = $value;
     }
 
     return $actionLinks;
@@ -244,12 +248,10 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
   /**
    * Returns total number of rows for the query.
    *
-   * @param
-   *
    * @return int
    *   Total number of rows
    */
-  public function getTotalCount($action) {
+  public function getTotalCount() {
     return $this->_query->searchQuery(0, 0, NULL,
       TRUE, FALSE,
       FALSE, FALSE,
@@ -305,9 +307,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
       $row = [];
       // the columns we are interested in
       foreach (self::$_properties as $property) {
-        if (isset($result->$property)) {
-          $row[$property] = $result->$property;
-        }
+        $row[$property] = $result->$property ?? NULL;
       }
 
       $isDeleted = FALSE;
@@ -335,7 +335,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
         $result->case_id
       );
 
-      $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ? $result->contact_sub_type : $result->contact_type
+      $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ?: $result->contact_type
       );
 
       //adding case manager to case selector.CRM-4510.
@@ -356,15 +356,15 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
 
     //retrieve the scheduled & recent Activity type and date for selector
     if (!empty($scheduledInfo)) {
-      $schdeduledActivity = CRM_Case_BAO_Case::getNextScheduledActivity($scheduledInfo, 'upcoming');
-      foreach ($schdeduledActivity as $key => $value) {
-        $rows[$key]['case_scheduled_activity_date'] = $value['date'];
-        $rows[$key]['case_scheduled_activity_type'] = $value['type'];
+      $scheduledActivity = CRM_Case_BAO_Case::getNextScheduledActivity($scheduledInfo, 'upcoming');
+      foreach ($rows as $key => $row) {
+        $rows[$key]['case_scheduled_activity_date'] = $scheduledActivity[$key]['date'] ?? NULL;
+        $rows[$key]['case_scheduled_activity_type'] = $scheduledActivity[$key]['type'] ?? NULL;
       }
       $recentActivity = CRM_Case_BAO_Case::getNextScheduledActivity($scheduledInfo, 'recent');
-      foreach ($recentActivity as $key => $value) {
-        $rows[$key]['case_recent_activity_date'] = $value['date'];
-        $rows[$key]['case_recent_activity_type'] = $value['type'];
+      foreach ($rows as $key => $row) {
+        $rows[$key]['case_recent_activity_date'] = $recentActivity[$key]['date'] ?? NULL;
+        $rows[$key]['case_recent_activity_type'] = $recentActivity[$key]['type'] ?? NULL;
       }
     }
     return $rows;
@@ -624,6 +624,9 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
           'url' => 'civicrm/case/activity/view',
           'qs' => 'reset=1&cid=%%cid%%&caseid=%%caseid%%&aid=%%aid%%',
           'title' => ts('View'),
+          'accessKey' => '',
+          'ref' => 'View',
+          'weight' => -20,
         ],
         CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
@@ -631,6 +634,9 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
           'qs' => 'reset=1&cid=%%cid%%&caseid=%%caseid%%&id=%%aid%%&action=update%%cxt%%',
           'title' => ts('Edit'),
           'icon' => 'fa-pencil',
+          'accessKey' => '',
+          'ref' => 'Edit',
+          'weight' => -10,
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
@@ -638,6 +644,9 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
           'qs' => 'reset=1&cid=%%cid%%&caseid=%%caseid%%&id=%%aid%%&action=delete%%cxt%%',
           'title' => ts('Delete'),
           'icon' => 'fa-trash',
+          'accessKey' => '',
+          'ref' => 'Delete',
+          'weight' => 100,
         ],
         CRM_Core_Action::RENEW => [
           'name' => ts('Restore'),
@@ -645,6 +654,9 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
           'qs' => 'reset=1&cid=%%cid%%&caseid=%%caseid%%&id=%%aid%%&action=renew%%cxt%%',
           'title' => ts('Restore'),
           'icon' => 'fa-undo',
+          'accessKey' => '',
+          'ref' => 'Restore',
+          'weight' => 90,
         ],
         CRM_Core_Action::DETACH => [
           'name' => ts('Move To Case'),
@@ -652,6 +664,8 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
           'title' => ts('Move To Case'),
           'extra' => 'onclick = "Javascript:fileOnCase( \'move\', %%aid%%, %%caseid%%, this ); return false;"',
           'icon' => 'fa-clipboard',
+          'accessKey' => '',
+          'weight' => 60,
         ],
         CRM_Core_Action::COPY => [
           'name' => ts('Copy To Case'),
@@ -659,6 +673,8 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
           'title' => ts('Copy To Case'),
           'extra' => 'onclick = "Javascript:fileOnCase( \'copy\', %%aid%%, %%caseid%%, this ); return false;"',
           'icon' => 'fa-files-o',
+          'accessKey' => '',
+          'weight' => 70,
         ],
       ];
     }

@@ -25,6 +25,8 @@
  */
 class CRM_Note_Form_Note extends CRM_Core_Form {
 
+  use CRM_Core_Form_EntityFormTrait;
+
   /**
    * The table name, used when editing/creating a note
    *
@@ -39,33 +41,15 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
    */
   protected $_entityId;
 
-  /**
-   * The note id, used when editing the note
-   *
-   * @var int
-   */
-  protected $_id;
-
-  /**
-   * The parent note id, used when adding a comment to a note
-   *
-   * @var int
-   */
-  protected $_parentId;
-
   public function preProcess() {
-    $this->_entityTable = $this->get('entityTable');
-    $this->_entityId = $this->get('entityId');
-    $this->_id = $this->get('id');
-    $this->_parentId = CRM_Utils_Array::value('parentId', $_GET, 0);
-    if ($this->_parentId) {
-      $this->assign('parentId', $this->_parentId);
-    }
+    $this->_id = CRM_Utils_Request::retrieve('id', 'Integer', $this);
+    $this->_entityTable = CRM_Utils_Request::retrieve('entity_table', 'String', $this);
+    $this->_entityId = CRM_Utils_Request::retrieve('entity_id', 'Integer', $this);
 
     if ($this->_id && CRM_Core_BAO_Note::getNotePrivacyHidden($this->_id)) {
       CRM_Core_Error::statusBounce(ts('You do not have access to this note.'));
     }
-    $this->setPageTitle($this->_parentId ? ts('Comment') : ts('Note'));
+    $this->setPageTitle($this->_entityTable === 'civicrm_note' ? ts('Comment') : ts('Note'));
   }
 
   /**
@@ -83,15 +67,12 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
         $params['id'] = $this->_id;
         CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_Note', $params, $defaults);
       }
-      if ($defaults['entity_table'] == 'civicrm_note') {
-        $defaults['parent_id'] = $defaults['entity_id'];
-      }
     }
     elseif ($this->_action & CRM_Core_Action::ADD) {
+      $defaults['privacy'] = '0';
       $defaults['note_date'] = date('Y-m-d H:i:s');
-      if ($this->_parentId) {
-        $defaults['parent_id'] = $this->_parentId;
-        $defaults['subject'] = 'Re: ' . CRM_Core_BAO_Note::getNoteSubject($this->_parentId);
+      if ($this->_entityTable === 'civicrm_note') {
+        $defaults['subject'] = ts('Re: %1', [1 => CRM_Core_BAO_Note::getNoteSubject($this->_entityId)]);
       }
     }
     return $defaults;
@@ -117,6 +98,10 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
    * @return void
    */
   public function buildQuickForm() {
+    if ($this->_action & CRM_Core_Action::VIEW) {
+      $this->view();
+      return;
+    }
     if ($this->_action & CRM_Core_Action::DELETE) {
       $this->addButtons([
           [
@@ -135,8 +120,10 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
     $this->addField('subject');
     $this->addField('note_date', [], TRUE, FALSE);
     $this->addField('note', [], TRUE);
-    $this->addField('privacy');
-    $this->add('hidden', 'parent_id');
+    $this->addField('privacy', [
+      'placeholder' => NULL,
+      'option_url' => NULL,
+    ]);
 
     // add attachments part
     CRM_Core_BAO_File::buildAttachment($this, 'civicrm_note', $this->_id, NULL, TRUE);
@@ -166,11 +153,7 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
     $session = CRM_Core_Session::singleton();
     $params['contact_id'] = $session->get('userID');
 
-    if (!empty($params['parent_id'])) {
-      $params['entity_table'] = 'civicrm_note';
-      $params['entity_id'] = $params['parent_id'];
-    }
-    else {
+    if ($this->_action & CRM_Core_Action::ADD) {
       $params['entity_table'] = $this->_entityTable;
       $params['entity_id'] = $this->_entityId;
     }
@@ -190,10 +173,32 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
     // add attachments as needed
     CRM_Core_BAO_File::formatAttachment($params, $params, 'civicrm_note', $params['id']);
 
-    $ids = [];
-    $note = CRM_Core_BAO_Note::add($params, $ids);
+    $note = CRM_Core_BAO_Note::add($params);
+
+    // Required for postProcess hooks
+    $this->setEntityId($note->id);
 
     CRM_Core_Session::setStatus(ts('Your Note has been saved.'), ts('Saved'), 'success');
+  }
+
+  /**
+   * View details of a note.
+   */
+  private function view() {
+    $note = \Civi\Api4\Note::get()
+      ->addSelect('*', 'privacy:label')
+      ->addWhere('id', '=', $this->_id)
+      ->execute()
+      ->single();
+    $note['privacy'] = $note['privacy:label'];
+    $this->assign('note', $note);
+
+    $comments = CRM_Core_BAO_Note::getNoteTree($this->_id, 1);
+    $this->assign('comments', $comments);
+
+    // add attachments part
+    $currentAttachmentInfo = CRM_Core_BAO_File::getEntityFile('civicrm_note', $this->_id);
+    $this->assign('currentAttachmentInfo', $currentAttachmentInfo);
   }
 
 }

@@ -15,19 +15,21 @@ trait MailingTestTrait {
    * Helper function to create new mailing.
    *
    * @param array $params
+   * @param string $identifier
    *
    * @return int
    */
-  public function createMailing($params = []) {
-    $params = array_merge(array(
+  public function createMailing(array $params = [], string $identifier = 'default'): int {
+    $params = array_merge([
       'subject' => 'maild' . rand(),
       'body_text' => 'bdkfhdskfhduew{domain.address}{action.optOutUrl}',
       'name' => 'mailing name' . rand(),
       'created_id' => 1,
-    ), $params);
+    ], $params);
 
     $result = $this->callAPISuccess('Mailing', 'create', $params);
-    return $result['id'];
+    $this->ids['Mailing'][$identifier] = (int) $result['id'];
+    return (int) $result['id'];
   }
 
   /**
@@ -35,9 +37,9 @@ trait MailingTestTrait {
    * @param $id
    */
   public function deleteMailing($id) {
-    $params = array(
+    $params = [
       'id' => $id,
-    );
+    ];
 
     $this->callAPISuccess('Mailing', 'delete', $params);
   }

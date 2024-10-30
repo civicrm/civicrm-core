@@ -19,14 +19,14 @@ class CRM_Price_BAO_PriceFieldValueTest extends CiviUnitTestCase {
    * Verifies visibility field exists and is configured as a pseudoconstant
    * referencing the 'visibility' option group.
    */
-  public function testVisibilityFieldExists() {
+  public function testVisibilityFieldExists(): void {
     $fields = CRM_Price_DAO_PriceFieldValue::fields();
 
     $this->assertArrayKeyExists('visibility_id', $fields);
     $this->assertEquals('visibility', $fields['visibility_id']['pseudoconstant']['optionGroupName']);
   }
 
-  public function testEmptyStringLabel() {
+  public function testEmptyStringLabel(): void {
     // Put stuff here that should happen before all tests in this unit.
     $priceSetParams = [
       'name' => 'default_goat_priceset',
@@ -41,10 +41,10 @@ class CRM_Price_BAO_PriceFieldValueTest extends CiviUnitTestCase {
     ];
 
     $price_set = $this->callAPISuccess('price_set', 'create', $priceSetParams);
-    $this->priceSetID = $price_set['id'];
+    $priceSetID = $price_set['id'];
 
     $priceFieldParams = [
-      'price_set_id' => $this->priceSetID,
+      'price_set_id' => $priceSetID,
       'name' => 'grassvariety',
       'label' => 'Grass Variety',
       'html_type' => 'Text',
@@ -52,15 +52,15 @@ class CRM_Price_BAO_PriceFieldValueTest extends CiviUnitTestCase {
       'is_active' => 1,
     ];
     $priceField = $this->callAPISuccess('price_field', 'create', $priceFieldParams);
-    $this->priceFieldID = $priceField['id'];
-    $this->_params = [
-      'price_field_id' => $this->priceFieldID,
+    $priceFieldID = $priceField['id'];
+    $params = [
+      'price_field_id' => $priceFieldID,
       'name' => 'rye_grass',
       'label' => '',
       'amount' => 1,
       'financial_type_id' => 1,
     ];
-    $priceFieldValue = CRM_Price_BAO_PriceFieldValue::create($this->_params);
+    $priceFieldValue = CRM_Price_BAO_PriceFieldValue::create($params);
     $priceFieldValue->find(TRUE);
     $this->assertEquals('', $priceFieldValue->label);
   }

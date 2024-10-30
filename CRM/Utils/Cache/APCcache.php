@@ -34,8 +34,8 @@ class CRM_Utils_Cache_APCcache implements CRM_Utils_Cache_Interface {
   /**
    * The prefix prepended to cache keys.
    *
-   * If we are using the same memcache instance for multiple CiviCRM
-   * installs, we must have a unique prefix for each install to prevent
+   * If we are using the same instance for multiple CiviCRM installs,
+   * we must have a unique prefix for each install to prevent
    * the keys from clobbering each other.
    *
    * @var string

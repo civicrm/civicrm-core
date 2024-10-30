@@ -57,10 +57,12 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType implements \Civi\Core\
 
     $caseTypeName = (isset($params['name'])) ? $params['name'] : CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $params['id'], 'name', 'id', TRUE);
 
-    // function to format definition column
+    // Format definition column
     if (isset($params['definition']) && is_array($params['definition'])) {
       $params['definition'] = self::convertDefinitionToXML($caseTypeName, $params['definition']);
-      CRM_Core_ManagedEntities::scheduleReconciliation();
+      // Ensure entities declared in the definition get created.
+      // @see CRM_Case_ManagedEntities
+      CRM_Core_ManagedEntities::scheduleReconciliation(['civicrm']);
     }
 
     $caseTypeDAO->copyValues($params);
@@ -439,6 +441,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType implements \Civi\Core\
    * @return CRM_Case_DAO_CaseType
    */
   public static function del($caseTypeId) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     return static::deleteRecord(['id' => $caseTypeId]);
   }
 
@@ -453,8 +456,8 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType implements \Civi\Core\
       $caseType = new CRM_Case_DAO_CaseType();
       $caseType->id = $event->id;
       $refCounts = $caseType->getReferenceCounts();
-      $total = array_sum(CRM_Utils_Array::collect('count', $refCounts));
-      if (array_sum(CRM_Utils_Array::collect('count', $refCounts))) {
+      $total = array_sum(array_column($refCounts, 'count'));
+      if ($total) {
         throw new CRM_Core_Exception(ts("You can not delete this case type -- it is assigned to %1 existing case record(s). If you do not want this case type to be used going forward, consider disabling it instead.", [1 => $total]));
       }
     }

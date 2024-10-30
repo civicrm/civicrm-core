@@ -14,6 +14,8 @@
  */
 class CRM_Contact_Form_Relationship extends CRM_Core_Form {
 
+  use CRM_Custom_Form_CustomDataTrait;
+
   /**
    * The relationship id, used when editing the relationship
    *
@@ -131,7 +133,9 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     // Check for permissions
     if (in_array($this->_action, [CRM_Core_Action::ADD, CRM_Core_Action::UPDATE, CRM_Core_Action::DELETE])) {
       if (!CRM_Contact_BAO_Contact_Permission::allow($this->_contactId, CRM_Core_Permission::EDIT)
-        && !CRM_Contact_BAO_Contact_Permission::allow($this->_values['contact_id_b'], CRM_Core_Permission::EDIT)) {
+        ||
+        (!empty($this->_values['contact_id_b']) && !CRM_Contact_BAO_Contact_Permission::allow($this->_values['contact_id_b'], CRM_Core_Permission::EDIT))
+      ) {
         CRM_Core_Error::statusBounce(ts('You do not have the necessary permission to edit this contact.'));
       }
     }
@@ -175,8 +179,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       $this->_rtype = str_replace($this->_relationshipTypeId . '_', '', $this->_rtypeId);
     }
 
-    //need to assign custom data type and subtype to the template - FIXME: explain why
-    $this->assign('customDataType', 'Relationship');
+    //need to assign custom data subtype to the template for the initial load of custom fields.
     $this->assign('customDataSubType', $this->_relationshipTypeId);
     $this->assign('entityID', $this->_relationshipId);
 
@@ -190,12 +193,25 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       }
     }
 
-    // when custom data is included in this page
-    if (!empty($_POST['hidden_custom'])) {
-      CRM_Custom_Form_CustomData::preProcess($this, NULL, $this->_relationshipTypeId, 1, 'Relationship', $this->_relationshipId);
-      CRM_Custom_Form_CustomData::buildQuickForm($this);
-      CRM_Custom_Form_CustomData::setDefaultValues($this);
+    if ($this->isSubmitted()) {
+      // The custom data fields are added to the form by an ajax form.
+      // However, if they are not present in the element index they will
+      // not be available from `$this->getSubmittedValue()` in post process.
+      // We do not have to set defaults or otherwise render - just add to the element index.
+      $this->addCustomDataFieldsToForm('Relationship', array_filter([
+        'id' => $this->getRelationshipID(),
+        'relationship_type_id' => $this->_relationshipTypeId,
+      ]));
     }
+  }
+
+  /**
+   * @api supported for use from outside core.
+   *
+   * @return int|null
+   */
+  public function getRelationshipID(): ?int {
+    return $this->_relationshipId;
   }
 
   /**
@@ -381,13 +397,13 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    */
   public function postProcess() {
     // Store the submitted values in an array.
-    $params = $this->controller->exportValues($this->_name);
+    $params = $this->getSubmittedValues();
 
     $values = $this->submit($params);
     if (empty($values)) {
       return;
     }
-    list ($params, $relationshipIds) = $values;
+    [$params, $relationshipIds] = $values;
 
     // if this is called from case view,
     //create an activity for case role removal.CRM-4480
@@ -403,10 +419,6 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     // Refresh contact tabs which might have been affected
     $this->ajaxResponse = [
       'reloadBlocks' => ['#crm-contactinfo-content'],
-      'updateTabs' => [
-        '#tab_member' => CRM_Contact_BAO_Contact::getCountComponent('membership', $this->_contactId),
-        '#tab_contribute' => CRM_Contact_BAO_Contact::getCountComponent('contribution', $this->_contactId),
-      ],
     ];
   }
 
@@ -493,7 +505,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
         $jsData[$id] = array_filter(array_intersect_key($allRelationshipNames[$id], $whatWeWant));
         // Add user-friendly placeholder
         foreach (['a', 'b'] as $x) {
-          $type = !empty($jsData[$id]["contact_sub_type_$x"]) ? $jsData[$id]["contact_sub_type_$x"] : CRM_Utils_Array::value("contact_type_$x", $jsData[$id]);
+          $type = !empty($jsData[$id]["contact_sub_type_$x"]) ? $jsData[$id]["contact_sub_type_$x"] : (CRM_Utils_Array::value("contact_type_$x", $jsData[$id]));
           $jsData[$id]["placeholder_$x"] = $type ? ts('- select %1 -', [strtolower($contactTypes[$type]['label'])]) : ts('- select contact -');
         }
       }
@@ -508,7 +520,8 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    *   Relationship ID
    */
   private function deleteAction($id) {
-    CRM_Contact_BAO_Relationship::del($id);
+    CRM_Contact_BAO_Relationship::deleteRecord(['id' => $id]);
+    CRM_Core_Session::setStatus(ts('Selected relationship has been deleted successfully.'), ts('Record Deleted'), 'success');
 
     // reload all blocks to reflect this change on the user interface.
     $this->ajaxResponse['reloadBlocks'] = ['#crm-contactinfo-content'];
@@ -578,8 +591,8 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     }
 
     // If this is a b_a relationship these form elements are flipped
-    $params['is_permission_a_b'] = CRM_Utils_Array::value("is_permission_{$a}_{$b}", $values, 0);
-    $params['is_permission_b_a'] = CRM_Utils_Array::value("is_permission_{$b}_{$a}", $values, 0);
+    $params['is_permission_a_b'] = $values["is_permission_{$a}_{$b}"] ?? 0;
+    $params['is_permission_b_a'] = $values["is_permission_{$b}_{$a}"] ?? 0;
 
     return [$params, $a];
   }

@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Core\Event\GenericHookEvent;
+
 /**
  * Class CRM_Core_Resources_CollectionTrait
  *
@@ -101,12 +103,15 @@ trait CRM_Core_Resources_CollectionTrait {
           break;
       }
     }
+    if (!empty($snippet['esm'])) {
+      Civi::dispatcher()->dispatch('civi.esm.useModule', GenericHookEvent::create(['snippet' => &$snippet]));
+    }
 
     if ($snippet['type'] === 'scriptFile' && !isset($snippet['scriptFileUrls'])) {
       $res = Civi::resources();
       list ($ext, $file) = $snippet['scriptFile'];
 
-      $snippet['translate'] = $snippet['translate'] ?? TRUE;
+      $snippet['translate'] ??= TRUE;
       if ($snippet['translate']) {
         $domain = ($snippet['translate'] === TRUE) ? $ext : $snippet['translate'];
         // Is this too early?

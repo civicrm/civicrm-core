@@ -68,31 +68,36 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
       self::$_actionLinks = [
         CRM_Core_Action::UPDATE => [
           'name' => ts('Edit Option'),
-          'url' => 'civicrm/admin/price/field/option',
+          'url' => 'civicrm/admin/price/field/option/edit',
           'qs' => 'reset=1&action=update&oid=%%oid%%&fid=%%fid%%&sid=%%sid%%',
           'title' => ts('Edit Price Option'),
+          'weight' => -50,
         ],
         CRM_Core_Action::VIEW => [
           'name' => ts('View'),
-          'url' => 'civicrm/admin/price/field/option',
+          'url' => 'civicrm/admin/price/field/option/edit',
           'qs' => 'action=view&oid=%%oid%%',
           'title' => ts('View Price Option'),
+          'weight' => CRM_Core_Action::getLabel(CRM_Core_Action::VIEW),
         ],
         CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable Price Option'),
+          'weight' => CRM_Core_Action::getLabel(CRM_Core_Action::DISABLE),
         ],
         CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable Price Option'),
+          'weight' => CRM_Core_Action::getLabel(CRM_Core_Action::ENABLE),
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
-          'url' => 'civicrm/admin/price/field/option',
+          'url' => 'civicrm/admin/price/field/option/edit',
           'qs' => 'action=delete&oid=%%oid%%',
           'title' => ts('Disable Price Option'),
+          'weight' => CRM_Core_Action::getLabel(CRM_Core_Action::DELETE),
         ],
       ];
     }
@@ -105,6 +110,7 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
    * @return void
    */
   public function browse(): void {
+    $this->assign('usedBy', NULL);
     $priceOptions = civicrm_api3('PriceFieldValue', 'get', [
       'price_field_id' => $this->_fid,
          // Explicitly do not check permissions so we are not
@@ -157,6 +163,8 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
         }
       }
       $customOption[$id]['order'] = $customOption[$id]['weight'];
+      $customOption[$id]['help_pre'] ??= NULL;
+      $customOption[$id]['help_post'] ??= NULL;
       $customOption[$id]['action'] = CRM_Core_Action::formLink(self::actionLinks(), $action,
         [
           'oid' => $id,
@@ -181,7 +189,7 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
     $this->assign('customOption', $customOption);
     $this->assign('sid', $this->_sid);
     $this->assign('isEvent', $isEvent);
-    $this->assignSalesTaxTermToTemplate();
+    $this->assign('taxTerm', $this->getSalesTaxTerm());
   }
 
   /**
@@ -205,6 +213,7 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
 
       $usedBy = CRM_Price_BAO_PriceSet::getUsedBy($sid);
     }
+    $this->assign('usedBy', $usedBy ?? NULL);
     // set the userContext stack
     $session = CRM_Core_Session::singleton();
 
@@ -224,7 +233,6 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
         $url
       );
       $this->assign('usedPriceSetTitle', CRM_Price_BAO_PriceFieldValue::getOptionLabel($oid));
-      $this->assign('usedBy', $usedBy);
       $comps = [
         'Event' => 'civicrm_event',
         'Contribution' => 'civicrm_contribution_page',

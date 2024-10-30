@@ -33,23 +33,31 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
   protected $entity = 'Contribution';
 
   /**
+   * Original value for background processing.
+   *
+   * @var bool
+   */
+  protected $enableBackgroundQueueOriginalValue;
+
+  /**
    * These extensions are inactive at the start. They may be activated during the test. They should be deactivated at the end.
    *
    * For the moment, the test is simply hard-coded to cleanup in a specific order. It's tempting to auto-detect and auto-uninstall these.
-   * However, the shape of their dependencies makes it tricky to auto-uninstall (e.g. some exts have managed-entities that rely on other
-   * exts -- you need to fully disable+uninstall the downstream managed-entity-ext before disabling or uninstalling the upstream
+   * However, the shape of their dependencies makes it tricky to auto-uninstall (e.g. some extensions have managed-entities that rely on other
+   * extensions -- you need to fully disable+uninstall the downstream managed-entity-ext before disabling or uninstalling the upstream
    * entity-provider-ext).
    *
-   * You may need to edit `$toggleExts` whenever the dependency-graph changes.
+   * You may need to edit `$toggleExtensions` whenever the dependency-graph changes.
    *
    * @var string[]
    */
-  protected $toggleExts = ['civiimport', 'org.civicrm.search_kit', 'org.civicrm.afform', 'authx'];
+  protected $toggleExtensions = ['civiimport'];
 
   protected function setUp(): void {
     parent::setUp();
-    $origExtensions = array_column(CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(), 'fullName');
-    $this->assertEquals([], array_intersect($origExtensions, $this->toggleExts), 'These extensions may be enabled and disabled during the test. The start-state and end-state should be the same. It appears that we have an unexpected start-state. Perhaps another test left us with a weird start-state?');
+    $originalExtensions = array_column(CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(), 'fullName');
+    $this->assertEquals([], array_values(array_intersect($originalExtensions, $this->toggleExtensions)), 'These extensions may be enabled and disabled during the test. The start-state and end-state should be the same. It appears that we have an unexpected start-state. Perhaps another test left us with a weird start-state?');
+    $this->enableBackgroundQueueOriginalValue = Civi::settings()->get('enableBackgroundQueue');
   }
 
   /**
@@ -64,10 +72,11 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     DedupeRule::delete()
       ->addWhere('rule_table', '!=', 'civicrm_email')
       ->addWhere('dedupe_rule_group_id.name', '=', 'IndividualUnsupervised')->execute();
-    foreach ($this->toggleExts as $ext) {
+    foreach ($this->toggleExtensions as $ext) {
       CRM_Extension_System::singleton()->getManager()->disable([$ext]);
       CRM_Extension_System::singleton()->getManager()->uninstall([$ext]);
     }
+    Civi::settings()->set('enableBackgroundQueue', $this->enableBackgroundQueueOriginalValue);
     parent::tearDown();
   }
 
@@ -103,6 +112,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => 'financial_type_id'],
       ['name' => 'external_identifier'],
       ['name' => 'soft_credit.contact.external_identifier', 'soft_credit_type_id' => 1],
+      ['name' => 'note'],
     ];
     $this->importCSV('contributions_amount_validate.csv', $mapping, ['onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP]);
 
@@ -119,6 +129,27 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals(1, $dataSource->getRowCount([CRM_Import_Parser::ERROR]));
     $this->assertEquals(1, $dataSource->getRowCount([CRM_Contribute_Import_Parser_Contribution::SOFT_CREDIT]));
     $this->assertEquals(1, $dataSource->getRowCount([CRM_Import_Parser::VALID]));
+
+    // Now try the import with the dots swapped to double underscores. The parser
+    // layer and api understand the dots - but QuickForm has to play switcheroo as the dots
+    // break the hierarchical multiselect js. QuickForm uses a double underscore as a stand in.;
+    $this->validateSoftCreditImport([
+      ['name' => 'total_amount'],
+      ['name' => 'receive_date'],
+      ['name' => 'financial_type_id'],
+      ['name' => 'external_identifier'],
+      ['name' => 'soft_credit__contact__external_identifier', 'soft_credit_type_id' => 1],
+    ]);
+    $this->validateSoftCreditImport([
+      ['name' => 'total_amount'],
+      ['name' => 'receive_date'],
+      ['name' => 'financial_type_id'],
+      ['name' => 'external_identifier'],
+      [],
+      [],
+      [],
+      ['name' => 'soft_credit__contact__id', 'soft_credit_type_id' => 1],
+    ]);
   }
 
   /**
@@ -223,9 +254,15 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    * These features are
    *  - default_value for each field.
    *
+   * @dataProvider getBooleanDataProvider
+   *
+   * @param bool $isBackGroundProcessing
+   *
    * @throws \CRM_Core_Exception
    */
-  public function testImportFromUserJobConfiguration(): void {
+  public function testImportFromUserJobConfiguration(bool $isBackGroundProcessing): void {
+    Civi::settings()->set('enableBackgroundQueue', $isBackGroundProcessing);
+    $this->createLoggedInUser();
     $importMappings = [
       ['name' => 'organization_name'],
       ['name' => 'legal_name'],
@@ -233,7 +270,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       // Note that default_value is supported via the parser and the angular form
       // but there is no way to enter it on the quick form.
       ['name' => 'financial_type_id', 'default_value' => 'Donation'],
-      ['name' => 'contribution_source'],
+      ['name' => 'source'],
       ['name' => 'receive_date'],
       ['name' => 'external_identifier'],
       ['name' => 'soft_credit.contact.email_primary.email', 'entity_data' => ['soft_credit' => ['soft_credit_type_id' => 5]]],
@@ -247,7 +284,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       'contactType' => 'Organization',
       'mapper' => $this->getMapperFromFieldMappings($importMappings),
       'dataSource' => 'CRM_Import_DataSource_CSV',
-      'dateFormats' => CRM_Core_Form_Date::DATE_yyyy_mm_dd,
+      'dateFormats' => CRM_Utils_Date::DATE_yyyy_mm_dd,
       'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
     ];
     $this->submitDataSourceForm('soft_credit_extended.csv', $submittedValues);
@@ -299,7 +336,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => 'receive_date'],
       ['name' => 'financial_type_id'],
       ['name' => 'external_identifier'],
-      ['name' => $this->getCustomFieldName('date')],
+      ['name' => $this->getCustomFieldName('date', 4)],
     ];
     $this->importCSV('contributions_date_validate.csv', $mapping, ['dateFormats' => 32]);
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
@@ -318,7 +355,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('Contribution', 'getsingle', ['contact_id' => $contactID]);
     $this->createCustomGroupWithFieldOfType([], 'radio');
     $values['contribution_id'] = $contribution['id'];
-    $values[$this->getCustomFieldName('radio')] = 'Red Testing';
+    $values[$this->getCustomFieldName('radio', 4)] = 'Red Testing';
     unset(Civi::$statics['CRM_Core_BAO_OptionGroup']);
     $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE);
     $contribution = $this->callAPISuccess('Contribution', 'get', ['contact_id' => $contactID, $this->getCustomFieldName('radio') => 'Red Testing']);
@@ -354,11 +391,11 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    */
   public function testPhoneMatchOnContact(): void {
     // Update existing unsupervised rule, change to general.
-    $unsupervisedRuleGroup = $this->callApiSuccess('RuleGroup', 'getsingle', [
+    $unsupervisedRuleGroup = $this->callAPISuccess('RuleGroup', 'getsingle', [
       'used' => 'Unsupervised',
       'contact_type' => 'Individual',
     ]);
-    $this->callApiSuccess('RuleGroup', 'create', [
+    $this->callAPISuccess('RuleGroup', 'create', [
       'id' => $unsupervisedRuleGroup['id'],
       'used' => 'General',
     ]);
@@ -382,12 +419,12 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $parser->setUserJobID($this->getUserJobID());
     $fields = $parser->getFieldsMetadata();
     $this->assertArrayHasKey('phone_primary.phone', $fields);
-    $this->callApiSuccess('RuleGroup', 'create', [
+    $this->callAPISuccess('RuleGroup', 'create', [
       'id' => $unsupervisedRuleGroup['id'],
       'used' => 'Unsupervised',
     ]);
-    Civi\Api4\DedupeRule::delete()->addWhere('dedupe_rule_group_id', '=', $ruleGroup['id'])->execute();
-    Civi\Api4\DedupeRuleGroup::delete()->addWhere('id', '=', $ruleGroup['id'])->execute();
+    DedupeRule::delete()->addWhere('dedupe_rule_group_id', '=', $ruleGroup['id'])->execute();
+    DedupeRuleGroup::delete()->addWhere('id', '=', $ruleGroup['id'])->execute();
   }
 
   /**
@@ -397,11 +434,13 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    */
   public function testCustomSerializedCheckBox(): void {
     $this->createCustomGroupWithFieldOfType([], 'checkbox');
-    $customField = $this->getCustomFieldName('checkbox');
+    $customField = $this->getCustomFieldName('checkbox', 4);
     $contactID = $this->individualCreate();
     $values = ['contribution_contact_id' => $contactID, 'total_amount' => 10, 'financial_type_id' => 'Donation', $customField => 'L,V'];
     $this->runImport($values, CRM_Import_Parser::DUPLICATE_SKIP);
-    $initialContribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID]);
+    $initialContribution = Contribution::get()->addWhere('contact_id', '=', $contactID)
+      ->addSelect($customField)
+      ->execute()->first();
     $this->assertContains('L', $initialContribution[$customField], 'Contribution Duplicate Skip Import contains L');
     $this->assertContains('V', $initialContribution[$customField], 'Contribution Duplicate Skip Import contains V');
 
@@ -410,7 +449,10 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $values[$customField] = 'V';
     $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE);
 
-    $updatedContribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $initialContribution['id']]);
+    $updatedContribution = Contribution::get()->addWhere('id', '=', $initialContribution['id'])
+      ->addSelect($customField)
+      ->execute()->first();
+
     $this->assertNotContains('L', $updatedContribution[$customField], 'Contribution Duplicate Update Import does not contain L');
     $this->assertContains('V', $updatedContribution[$customField], 'Contribution Duplicate Update Import contains V');
 
@@ -454,6 +496,24 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ->addWhere('entity_table', '=', 'civicrm_contribution')->execute()->first();
     $this->assertEquals('Call him back', $note['note']);
 
+  }
+
+  /**
+   * Tests the form flow copes with QuickForm style dots.
+   *
+   * Because the QuickForm hierarchical select won't cope with dots
+   * we are using a double underscore on that form. The test checks that works.
+   */
+  public function testImportQuickFormEmailMatch() :void {
+    $this->individualCreate(['email' => 'jenny@example.com']);
+    $this->importCSV('checkboxes.csv', [
+      ['name' => 'total_amount'],
+      ['name' => 'receive_date'],
+      ['name' => 'financial_type_id'],
+      ['name' => ''],
+      ['name' => 'email_primary__email'],
+      ['name' => ''],
+    ]);
   }
 
   /**
@@ -530,6 +590,8 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    */
   public function testImportFieldsNotRequiredWithTrxnID(): void {
     $this->individualCreate(['email' => 'mum@example.com']);
+    $this->campaignCreate();
+    $this->callAPISuccess('System', 'flush', []);
     $fieldMappings = [
       ['name' => 'first_name'],
       ['name' => ''],
@@ -539,6 +601,8 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => ''],
       ['name' => ''],
       ['name' => 'trxn_id'],
+      ['name' => 'campaign_id'],
+      ['name' => 'contribution_contact_id'],
     ];
     // First we try to create without total_amount mapped.
     // It will fail in create mode as total_amount is required for create.
@@ -558,7 +622,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $this->importCSV('contributions.csv', $fieldMappings, ['onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP]);
 
     $row = $this->getDataSource()->getRows()[0];
-    $this->assertEquals('IMPORTED', $row[9]);
+    $this->assertEquals('IMPORTED', $row[11]);
     $contribution = Contribution::get()->addSelect('source', 'id')->execute()->first();
     $this->assertEmpty($contribution['source']);
 
@@ -572,13 +636,70 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => ''],
       ['name' => 'contribution_source'],
       ['name' => 'trxn_id'],
+      ['name' => 'campaign_id'],
     ];
     $this->importCSV('contributions.csv', $fieldMappings, ['onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE]);
 
     $row = $this->getDataSource()->getRows()[0];
-    $this->assertEquals('IMPORTED', $row[9]);
+    $this->assertEquals('IMPORTED', $row[11]);
     $contribution = Contribution::get()->addSelect('source', 'id')->execute()->first();
     $this->assertEquals('Call him back', $contribution['source']);
+  }
+
+  /**
+   * Test that campaign_id is properly validated.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportFieldsValidateCampaignID(): void {
+    $this->individualCreate(['email' => 'mum@example.com']);
+    $this->campaignCreate();
+    $this->callAPISuccess('System', 'flush', []);
+    $fieldMappings = [
+      ['name' => 'first_name'],
+      ['name' => ''],
+      ['name' => 'receive_date'],
+      ['name' => 'financial_type_id'],
+      ['name' => 'email_primary.email'],
+      ['name' => ''],
+      ['name' => ''],
+      ['name' => 'trxn_id'],
+      ['name' => 'campaign_id'],
+    ];
+    // First we try to create without total_amount mapped.
+    // It will fail in create mode as total_amount is required for create.
+    $this->submitDataSourceForm('contributions_bad_campaign.csv', $fieldMappings);
+    $form = $this->getMapFieldForm([
+      'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
+      'mapper' => $this->getMapperFromFieldMappings($fieldMappings),
+      'contactType' => 'Individual',
+    ]);
+    $form->setUserJobID($this->userJobID);
+    $form->buildForm();
+    $this->assertFalse($form->validate());
+
+    // Now we add in total amount - it works in create mode.
+    $fieldMappings[1]['name'] = 'total_amount';
+    $submittedValues = [
+      'skipColumnHeader' => TRUE,
+      'fieldSeparator' => ',',
+      'contactType' => 'Individual',
+      'mapper' => $this->getMapperFromFieldMappings($fieldMappings),
+      'dataSource' => 'CRM_Import_DataSource_CSV',
+      'file' => ['name' => 'contributions_bad_campaign.csv'],
+      'dateFormats' => CRM_Utils_Date::DATE_yyyy_mm_dd,
+      'onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE,
+      'groups' => [],
+    ];
+    $this->submitDataSourceForm('contributions_bad_campaign.csv', $submittedValues);
+    $form = $this->getMapFieldForm($submittedValues);
+    $form->setUserJobID($this->userJobID);
+    $form->buildForm();
+    $this->assertTrue($form->validate());
+    $form->postProcess();
+    $row = $this->getDataSource()->getRows()[0];
+    $this->assertEquals('ERROR', $row[10]);
+    $this->assertEquals('Invalid value for field(s) : Campaign', $row[11]);
   }
 
   /**
@@ -639,7 +760,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  protected function runImport(array $originalValues, int $onDuplicateAction, array $mappings = [], array $fields = NULL): void {
+  protected function runImport(array $originalValues, int $onDuplicateAction, array $mappings = [], ?array $fields = NULL): void {
     if (!$fields) {
       $fields = array_keys($originalValues);
     }
@@ -659,7 +780,13 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       'mapper' => $mapper,
     ]));
     $parser->init();
-    $parser->import($values);
+    try {
+      $parser->validateValues($values);
+      $parser->import($values);
+    }
+    catch (CRM_Core_Exception $e) {
+      // Validation failed.
+    }
   }
 
   /**
@@ -670,6 +797,15 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   protected function getUserJobID(array $submittedValues = []): int {
+    $isCsv = ($submittedValues['dataSource'] ?? NULL) === 'CRM_Import_DataSource_CSV';
+    if (!$isCsv && !empty($submittedValues['mapper']) && empty($submittedValues['sqlQuery'])) {
+      $submittedValues['sqlQuery'] = 'SELECT ';
+      $submittedClauses = [];
+      foreach ($submittedValues['mapper'] as $field) {
+        $submittedClauses[] = "'' as " . CRM_Utils_String::munge($field[0]);
+      }
+      $submittedValues['sqlQuery'] .= implode(',', $submittedClauses);
+    }
     $userJobID = UserJob::create()->setValues([
       'metadata' => [
         'submitted_values' => array_merge([
@@ -679,13 +815,13 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
           'sqlQuery' => 'SELECT first_name FROM civicrm_contact',
           'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
           'dedupe_rule_id' => NULL,
-          'dateFormats' => CRM_Core_Form_Date::DATE_yyyy_mm_dd,
+          'dateFormats' => CRM_Utils_Date::DATE_yyyy_mm_dd,
         ], $submittedValues),
       ],
       'status_id:name' => 'draft',
       'job_type' => 'contribution_import',
     ])->execute()->first()['id'];
-    if ($submittedValues['dataSource'] ?? NULL === 'CRM_Import_DataSource') {
+    if ($isCsv) {
       $dataSource = new CRM_Import_DataSource_CSV($userJobID);
     }
     else {
@@ -716,7 +852,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => 'total_amount'],
       ['name' => 'receive_date'],
       ['name' => 'financial_type_id'],
-      ['name' => 'contribution_source'],
+      ['name' => 'source'],
       ['name' => ''],
     ];
     $this->importCSV('contributions_update.csv', $mapping, ['onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE]);
@@ -843,13 +979,32 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test the Import api works from the extension when the extension is enabled after the import.
+   * Test the Import api works from the extension when the extension is enabled
+   * after the import.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testEnableExtension(): void {
     $this->importContributionsDotCSV();
     $this->callAPISuccess('Extension', 'enable', ['key' => 'civiimport']);
     $result = Import::get($this->userJobID)->execute();
     $this->assertEquals('ERROR', $result->first()['_status']);
+  }
+
+  /**
+   * @param array $mapping
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  protected function validateSoftCreditImport(array $mapping): void {
+    Contribution::delete()->addWhere('id', '>', 0)->execute();
+    $this->callAPISuccessGetCount('ContributionSoft', [], 0);
+    $this->importCSV('contributions_amount_validate.csv', $mapping, ['onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP]);
+    $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
+    // Check a row imported.
+    $this->assertEquals(1, $dataSource->getRowCount([CRM_Import_Parser::VALID]));
+    $this->callAPISuccessGetCount('ContributionSoft', [], 1);
   }
 
 }

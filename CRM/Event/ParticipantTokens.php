@@ -54,7 +54,7 @@ class CRM_Event_ParticipantTokens extends CRM_Core_EntityTokens {
   public function alterActionScheduleQuery(\Civi\ActionSchedule\Event\MailingQueryEvent $e): void {
     // When targeting `civicrm_participant` records, we enable both `{participant.*}` (per usual) and the related `{event.*}`.
     parent::alterActionScheduleQuery($e);
-    if ($e->mapping->getEntity() === $this->getExtendableTableName()) {
+    if ($e->mapping->getEntityTable($e->actionSchedule) === $this->getExtendableTableName()) {
       $e->query->select('e.event_id AS tokenContext_eventId');
     }
   }
@@ -95,9 +95,6 @@ class CRM_Event_ParticipantTokens extends CRM_Core_EntityTokens {
    */
   protected function getSkippedFields(): array {
     $fields = parent::getSkippedFields();
-    // Never add these 2 fields - may not be a stable part of the schema.
-    // This field is on it's way out of core.
-    $fields[] = 'cart_id';
     // this will probably get schema changed out of the table at some point.
     $fields[] = 'is_pay_later';
     return $fields;

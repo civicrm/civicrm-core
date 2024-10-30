@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!--  $Id: option_group_email_greeting.xml 23244 2009-08-11 16:06:41Z mover $  -->
 <dataset>
   <civicrm_option_group
     id="52"

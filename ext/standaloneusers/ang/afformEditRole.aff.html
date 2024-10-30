@@ -1,0 +1,10 @@
+<af-form ctrl="afform">
+  <af-entity type="Role" name="Role1" label="Role 1" actions="{create: true, update: true}" security="RBAC" url-autofill="1" />
+  <fieldset af-fieldset="Role1" class="af-container" af-title="Role 1">
+    <af-field name="name" af-if="([[&quot;Role1[0][fields][name]&quot;,&quot;!=&quot;,&quot;\&quot;admin\&quot;&quot;]])" />
+    <af-field name="label" />
+    <af-field name="permissions" af-if="([[&quot;Role1[0][fields][name]&quot;,&quot;!=&quot;,&quot;\&quot;admin\&quot;&quot;]])" />
+    <af-field name="is_active" defn="{afform_default: '1', input_attrs: {}}" />
+  </fieldset>
+  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
+</af-form>

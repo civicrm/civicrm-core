@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Test\ContributionPageTestTrait;
+
 /**
  *  Test CRM_Contribute_Form_Contribution_ThankYou
  *
@@ -17,6 +19,8 @@
  * @group headless
  */
 class CRM_Contribute_Form_Contribution_ThankYouTest extends CiviUnitTestCase {
+
+  use ContributionPageTestTrait;
 
   /**
    * Clean up DB.
@@ -27,32 +31,35 @@ class CRM_Contribute_Form_Contribution_ThankYouTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that correct contribution status is fetched for both live and test contributions.
+   * Test that correct contribution status is fetched for both live and test
+   * contributions.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testLiveAndTestContributionStatus(): void {
     $paymentProcessorID = $this->paymentProcessorCreate(['payment_processor_type_id' => 'Dummy']);
 
     $form = $this->getThankYouFormWithContribution($paymentProcessorID, FALSE, FALSE);
     $form->buildQuickForm();
-    $isPendingOutcome = $form->get_template_vars('isPendingOutcome');
+    $isPendingOutcome = $form->getTemplateVars('isPendingOutcome');
 
     $this->assertEquals(FALSE, $isPendingOutcome, 'Outcome should not be pending.');
 
     $form = $this->getThankYouFormWithContribution($paymentProcessorID, TRUE, FALSE);
     $form->buildQuickForm();
-    $isPendingOutcome = $form->get_template_vars('isPendingOutcome');
+    $isPendingOutcome = $form->getTemplateVars('isPendingOutcome');
 
     $this->assertEquals(TRUE, $isPendingOutcome, 'Outcome should be pending.');
 
     $form = $this->getThankYouFormWithContribution($paymentProcessorID, FALSE, TRUE);
     $form->buildQuickForm();
-    $isPendingOutcome = $form->get_template_vars('isPendingOutcome');
+    $isPendingOutcome = $form->getTemplateVars('isPendingOutcome');
 
     $this->assertEquals(FALSE, $isPendingOutcome, 'Outcome should not be pending.');
 
     $form = $this->getThankYouFormWithContribution($paymentProcessorID, TRUE, TRUE);
     $form->buildQuickForm();
-    $isPendingOutcome = $form->get_template_vars('isPendingOutcome');
+    $isPendingOutcome = $form->getTemplateVars('isPendingOutcome');
 
     $this->assertEquals(TRUE, $isPendingOutcome, 'Outcome should be pending.');
   }
@@ -60,28 +67,24 @@ class CRM_Contribute_Form_Contribution_ThankYouTest extends CiviUnitTestCase {
   /**
    * Get CRM_Contribute_Form_Contribution_ThankYou form with attached contribution.
    *
-   * @param $paymentProcessorID
+   * @param int $paymentProcessorID
    * @param bool $withPendingContribution
    * @param bool $isTestContribution
    * @return CRM_Contribute_Form_Contribution_ThankYou
    */
-  private function getThankYouFormWithContribution($paymentProcessorID, $withPendingContribution = FALSE, $isTestContribution = FALSE) {
+  private function getThankYouFormWithContribution(int $paymentProcessorID, bool $withPendingContribution = FALSE, bool $isTestContribution = FALSE) {
     $pageContribution = $this->getPageContribution((($withPendingContribution) ? 2 : 1), $isTestContribution);
+    if (!isset($this->ids['ContributionPage'])) {
+      $this->contributionPageCreatePaid(['payment_processor' => $paymentProcessorID])['id'];
+    }
     $form = $this->getThankYouForm();
-    $form->_lineItem = [];
-    $form->_bltID = 5;
-
     $form->_params['contributionID'] = $pageContribution['contribution_id'];
     $form->_params['invoiceID'] = $pageContribution['invoice_id'];
     $form->_params['email-5'] = 'demo@example.com';
     $form->_params['payment_processor_id'] = $paymentProcessorID;
     if ($isTestContribution) {
-      $form->_mode = 'test';
+      $_REQUEST['action'] = 1024;
     }
-    $form->_values = [
-      'custom_pre_id' => NULL,
-      'custom_post_id' => NULL,
-    ];
 
     return $form;
   }
@@ -116,9 +119,8 @@ class CRM_Contribute_Form_Contribution_ThankYouTest extends CiviUnitTestCase {
    * @return CRM_Contribute_Form_Contribution_ThankYou
    */
   private function getThankYouForm() {
-    $form = new CRM_Contribute_Form_Contribution_ThankYou();
-    $_SERVER['REQUEST_METHOD'] = 'GET';
-    $form->controller = new CRM_Contribute_Controller_Contribution();
+    $form = $this->getFormObject('CRM_Contribute_Form_Contribution_ThankYou', [], ['id' => $this->getContributionPageID()]);
+    $form->preProcess();
     return $form;
   }
 

@@ -26,7 +26,11 @@ class CiviCaseTestCase extends CiviUnitTestCase {
 
   protected $optionValues;
 
-  protected $_loggedInUser;
+  /**
+   * Tables to truncate as part of cleanup
+   * @var array
+   */
+  protected $tablesToTruncate;
 
   public function setUp(): void {
     parent::setUp();
@@ -35,10 +39,10 @@ class CiviCaseTestCase extends CiviUnitTestCase {
     //. Using XML was causing breakage as id numbers were changing over time
     // & was really hard to troubleshoot as involved truncating option_value table to mitigate this & not leaving DB in a
     // state where tests could run afterwards without re-loading.
-    $this->caseStatusGroup = $this->callAPISuccess('option_group', 'get', array(
+    $this->caseStatusGroup = $this->callAPISuccess('option_group', 'get', [
       'name' => 'case_status',
       'format.only_id' => 1,
-    ));
+    ]);
     $optionValues = [
       'Medical evaluation' => 'Medical evaluation',
       'Mental health evaluation' => "Mental health evaluation",
@@ -63,7 +67,7 @@ class CiviCaseTestCase extends CiviUnitTestCase {
     // Now, the rule is simply: use the "name" from "civicrm_case_type.name".
     $this->caseType = 'housing_support';
     $this->caseTypeId = 1;
-    $this->tablesToTruncate = array(
+    $this->tablesToTruncate = [
       'civicrm_activity',
       'civicrm_contact',
       'civicrm_custom_group',
@@ -77,29 +81,27 @@ class CiviCaseTestCase extends CiviUnitTestCase {
       'civicrm_relationship',
       'civicrm_relationship_type',
       'civicrm_uf_match',
-    );
+    ];
 
     $this->quickCleanup($this->tablesToTruncate);
 
     $this->loadAllFixtures();
 
     // enable the default custom templates for the case type xml files
-    $this->customDirectories(array('template_path' => TRUE));
+    $this->customDirectories(['template_path' => TRUE]);
 
     // case is not enabled by default
     $enableResult = CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
     $this->assertTrue($enableResult, 'Cannot enable CiviCase in line ' . __LINE__);
 
-    /** @var $hooks \CRM_Utils_Hook_UnitTests */
+    /** @var \CRM_Utils_Hook_UnitTests $hooks  */
     $hooks = \CRM_Utils_Hook::singleton();
-    $hooks->setHook('civicrm_caseTypes', array($this, 'hook_caseTypes'));
+    $hooks->setHook('civicrm_caseTypes', [$this, 'hook_caseTypes']);
     \CRM_Case_XMLRepository::singleton(TRUE);
     \CRM_Case_XMLProcessor::flushStaticCaches();
 
     // create a logged in USER since the code references it for source_contact_id
     $this->createLoggedInUser();
-    $session = CRM_Core_Session::singleton();
-    $this->_loggedInUser = $session->get('userID');
     /// note that activityType options are cached by the FULL set of options you pass in
     // ie. because Activity api includes campaign in it's call cache is not flushed unless
     // included in this call. Also note flush function doesn't work on this property as it sets to null not empty array
@@ -111,7 +113,7 @@ class CiviCaseTestCase extends CiviUnitTestCase {
    * This method is called after a test is executed.
    */
   public function tearDown(): void {
-    $this->customDirectories(array('template_path' => FALSE));
+    $this->customDirectories(['template_path' => FALSE]);
     $this->quickCleanup($this->tablesToTruncate, TRUE);
     CRM_Case_XMLRepository::singleton(TRUE);
     parent::tearDown();

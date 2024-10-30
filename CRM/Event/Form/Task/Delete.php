@@ -35,18 +35,13 @@ class CRM_Event_Form_Task_Delete extends CRM_Event_Form_Task {
    *
    * @return void
    */
-  public function preProcess() {
+  public function preProcess(): void {
 
     //check for delete
     if (!CRM_Core_Permission::checkActionPermission('CiviEvent', CRM_Core_Action::DELETE)) {
       CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
     }
     parent::preProcess();
-    foreach ($this->_participantIds as $participantId) {
-      if (CRM_Event_BAO_Participant::isPrimaryParticipant($participantId)) {
-        $this->assign('additionalParticipants', TRUE);
-      }
-    }
   }
 
   /**
@@ -55,14 +50,17 @@ class CRM_Event_Form_Task_Delete extends CRM_Event_Form_Task {
    *
    * @return void
    */
-  public function buildQuickForm() {
-    $deleteParticipants = [
-      1 => ts('Delete this participant record along with associated participant record(s).'),
-      2 => ts('Delete only this participant record.'),
-    ];
-
-    $this->addRadio('delete_participant', NULL, $deleteParticipants, NULL, '<br />');
-    $this->setDefaults(['delete_participant' => 1]);
+  public function buildQuickForm(): void {
+    foreach ($this->_participantIds as $participantId) {
+      if (CRM_Event_BAO_Participant::isPrimaryParticipant($participantId)) {
+        $this->addRadio('delete_participant', NULL, [
+          1 => ts('Delete this participant record along with associated participant record(s).'),
+          2 => ts('Delete only this participant record.'),
+        ], NULL, '<br />');
+        $this->setDefaults(['delete_participant' => 1]);
+        break;
+      }
+    }
 
     $this->addDefaultButtons(ts('Delete Participations'), 'done');
   }
@@ -72,13 +70,14 @@ class CRM_Event_Form_Task_Delete extends CRM_Event_Form_Task {
    *
    *
    * @return void
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\Core\Exception\DBQueryException
    */
-  public function postProcess() {
+  public function postProcess(): void {
     $params = $this->controller->exportValues($this->_name);
 
     $participantLinks = NULL;
-    if (CRM_Utils_Array::value('delete_participant', $params) == 2) {
-      $links = [];
+    if (($params['delete_participant'] ?? NULL) == 2) {
       foreach ($this->_participantIds as $participantId) {
         $additionalId = (CRM_Event_BAO_Participant::getAdditionalParticipantIds($participantId));
         $participantLinks = (CRM_Event_BAO_Participant::getAdditionalParticipantUrl($additionalId));
@@ -86,8 +85,8 @@ class CRM_Event_Form_Task_Delete extends CRM_Event_Form_Task {
     }
     $deletedParticipants = $additionalCount = 0;
     foreach ($this->_participantIds as $participantId) {
-      if (CRM_Utils_Array::value('delete_participant', $params) == 1) {
-        $primaryParticipantId = CRM_Core_DAO::getFieldValue("CRM_Event_DAO_Participant", $participantId, 'registered_by_id', 'id');
+      if (($params['delete_participant'] ?? NULL) == 1) {
+        $primaryParticipantId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $participantId, 'registered_by_id', 'id');
         if (CRM_Event_BAO_Participant::isPrimaryParticipant($participantId)) {
           $additionalIds = (CRM_Event_BAO_Participant::getAdditionalParticipantIds($participantId));
           $additionalCount += count($additionalIds);

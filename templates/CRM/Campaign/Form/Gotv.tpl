@@ -100,13 +100,13 @@
 
       //collapse the search form.
       var searchFormName = '#search_form_' + {/literal}'{$searchVoterFor}'{literal};
-      CRM.$( searchFormName + '.crm-accordion-wrapper:not(.collapsed)').crmAccordionToggle();
+      CRM.$( searchFormName + 'details').prop('open', false);
     }, 'html' );
   }
 
   function loadVoterList( )
   {
-    var sourceUrl = {/literal}"{crmURL p='civicrm/ajax/rest' h=0 q='snippet=4&className=CRM_Campaign_Page_AJAX&fnName=voterList' }"{literal};
+    var sourceUrl = {/literal}"{crmURL p='civicrm/ajax/rest' h=0 q='snippet=4&className=CRM_Campaign_Page_AJAX&fnName=voterList'}"{literal};
 
     var searchVoterFor = {/literal}'{$searchVoterFor}'{literal};
     CRM.$( 'table.gotvVoterRecords', 'form.{/literal}{$form.formClass}{literal}').dataTable({

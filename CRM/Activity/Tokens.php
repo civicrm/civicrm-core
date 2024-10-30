@@ -20,18 +20,7 @@ use Civi\Token\Event\TokenValueEvent;
 use Civi\Token\TokenRow;
 
 /**
- * Class CRM_Member_Tokens
- *
  * Generate "activity.*" tokens.
- *
- * This TokenSubscriber was originally produced by refactoring the code from the
- * scheduled-reminder system with the goal of making that system
- * more flexible. The current implementation is still coupled to
- * scheduled-reminders. It would be good to figure out a more generic
- * implementation which is not tied to scheduled reminders, although
- * that is outside the current scope.
- *
- * This has been enhanced to work with PDF/letter merge
  */
 class CRM_Activity_Tokens extends CRM_Core_EntityTokens {
 
@@ -48,7 +37,7 @@ class CRM_Activity_Tokens extends CRM_Core_EntityTokens {
    * @inheritDoc
    */
   public function alterActionScheduleQuery(MailingQueryEvent $e): void {
-    if ($e->mapping->getEntity() !== $this->getExtendableTableName()) {
+    if ($e->mapping->getEntityTable($e->actionSchedule) !== $this->getExtendableTableName()) {
       return;
     }
 

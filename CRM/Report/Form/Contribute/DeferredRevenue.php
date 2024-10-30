@@ -70,7 +70,7 @@ class CRM_Report_Form_Contribute_DeferredRevenue extends CRM_Report_Form {
             'title' => ts('Contact ID'),
           ],
           'source' => [
-            'title' => ts('Source'),
+            'title' => ts('Contribution Source'),
           ],
           'receive_date' => [
             'title' => ts('Receive Date'),
@@ -352,7 +352,7 @@ class CRM_Report_Form_Contribute_DeferredRevenue extends CRM_Report_Form {
    * @param int|null $rowCount
    */
   public function limit($rowCount = NULL) {
-    $rowCount = $rowCount ?? $this->getRowCount();
+    $rowCount ??= $this->getRowCount();
     $this->_limit = NULL;
   }
 
@@ -448,10 +448,10 @@ class CRM_Report_Form_Contribute_DeferredRevenue extends CRM_Report_Form {
         $arraykey = $dao->civicrm_financial_account_id . '_' . $dao->civicrm_financial_account_1_id;
 
         if (property_exists($dao, $key)) {
-          if (CRM_Utils_Array::value('type', $value) & CRM_Utils_Type::T_DATE) {
+          if (($value['type'] ?? 0) & CRM_Utils_Type::T_DATE) {
             $row[$key] = CRM_Utils_Date::customFormat($dao->$key, $dateFormat);
           }
-          elseif (CRM_Utils_Array::value('type', $value) & CRM_Utils_Type::T_MONEY) {
+          elseif (($value['type'] ?? 0) & CRM_Utils_Type::T_MONEY) {
             $values = [];
             foreach (explode(',', $dao->$key) as $moneyValue) {
               $values[] = CRM_Utils_Money::format($moneyValue);
@@ -492,32 +492,37 @@ class CRM_Report_Form_Contribute_DeferredRevenue extends CRM_Report_Form {
       foreach ($entry['rows'] as $rowNum => &$row) {
 
         // convert transaction status id to status name
-        if ($status = CRM_Utils_Array::value('civicrm_financial_trxn_status_id', $row)) {
+        $status = $row['civicrm_financial_trxn_status_id'] ?? NULL;
+        if ($status) {
           $row['civicrm_financial_trxn_status_id'] = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_FinancialTrxn', 'status_id', $status);
           $entryFound = TRUE;
         }
 
         // convert batch id to batch title
-        if ($batchId = CRM_Utils_Array::value('civicrm_batch_batch_id', $row)) {
+        $batchId = $row['civicrm_batch_batch_id'] ?? NULL;
+        if ($batchId) {
           $row['civicrm_batch_batch_id'] = $this->getLabels($batchId, 'CRM_Batch_BAO_EntityBatch', 'batch_id');
           $entryFound = TRUE;
         }
 
         // add hotlink for contribution
-        if ($amount = CRM_Utils_Array::value('civicrm_financial_trxn_total_amount', $row)) {
+        $amount = $row['civicrm_financial_trxn_total_amount'] ?? NULL;
+        if ($amount) {
           $contributionUrl = CRM_Utils_System::url("civicrm/contact/view/contribution",
             'reset=1&action=view&cid=' . $row['civicrm_contact_id'] . '&id=' . $row['civicrm_contribution_contribution_id'],
             $this->_absoluteUrl
           );
           $row['civicrm_financial_trxn_total_amount'] = "<a href={$contributionUrl}>{$amount}</a>";
-          if ($contributionId = CRM_Utils_Array::value('civicrm_contribution_id', $row)) {
+          $contributionId = $row['civicrm_contribution_id'] ?? NULL;
+          if ($contributionId) {
             $row['civicrm_contribution_id'] = "<a href={$contributionUrl}>{$contributionId}</a>";
           }
           $entryFound = TRUE;
         }
 
         // add hotlink for contact
-        if ($contactName = CRM_Utils_Array::value('civicrm_contact_display_name', $row)) {
+        $contactName = $row['civicrm_contact_display_name'] ?? NULL;
+        if ($contactName) {
           $contactUrl = CRM_Utils_System::url("civicrm/contact/view",
             'reset=1&cid=' . $row['civicrm_contact_id'],
             $this->_absoluteUrl
@@ -526,7 +531,8 @@ class CRM_Report_Form_Contribute_DeferredRevenue extends CRM_Report_Form {
           $entryFound = TRUE;
         }
 
-        if ($contactId = CRM_Utils_Array::value('civicrm_contribution_contact_id', $row)) {
+        $contactId = $row['civicrm_contribution_contact_id'] ?? NULL;
+        if ($contactId) {
           $contactUrl = CRM_Utils_System::url("civicrm/contact/view",
             'reset=1&cid=' . $row['civicrm_contact_id'],
             $this->_absoluteUrl

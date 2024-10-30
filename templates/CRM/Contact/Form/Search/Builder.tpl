@@ -8,12 +8,16 @@
  +--------------------------------------------------------------------+
 *}
 {* Search Builder *}
-
+<div class="messages status no-popup">
+  {icon icon="fa-info-circle"}{/icon}
+  {capture assign='skUrl'}{crmURL p='civicrm/admin/search'}{/capture}
+  {ts 1="href='$skUrl'"}Search Builder is a legacy part of CiviCRM. It is recommended to <a %1>use SearchKit instead</a>.{/ts}
+</div>
 <div class="crm-form-block crm-search-form-block">
-  <div class="crm-accordion-wrapper crm-search_builder-accordion {if $rows and !$showSearchForm}collapsed{/if}">
-    <div class="crm-accordion-header crm-master-accordion-header">
+  <details class="crm-accordion-light crm-search_builder-accordion" {if $rows and !$showSearchForm}{else}open{/if}>
+    <summary>
       {ts}Search Criteria{/ts} {help id='builder-intro'}
-    </div>
+    </summary>
     <div class="crm-accordion-body">
       <div id="searchForm">
         {* Table for adding search criteria. *}
@@ -23,8 +27,8 @@
           {$form.buttons.html}
         </div>
       </div>
-    </div><!-- /.crm-accordion-body -->
-  </div><!-- /.crm-accordion-wrapper -->
+    </div>
+  </details>
 </div><!-- /.crm-form-block -->
 {if $rowsEmpty || $rows}
 <div class="crm-content-block">

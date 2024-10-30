@@ -62,7 +62,8 @@ return [
     'config_key' => 'debug',
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
-    'default' => '0',
+    // default to TRUE for demo or localhost sites.
+    'default' => str_contains(CIVICRM_UF_BASEURL, 'localhost') || str_contains(CIVICRM_UF_BASEURL, 'demo.civicrm.org'),
     'add' => '4.3',
     'title' => ts('Enable Debugging'),
     'is_domain' => 1,
@@ -102,6 +103,25 @@ return [
     'on_change' => [
       'CRM_Core_BAO_Setting::onChangeEnvironmentSetting',
     ],
+  ],
+  'esm_loader' => [
+    'group_name' => 'Developer Preferences',
+    'group' => 'developer',
+    'name' => 'esm_loader',
+    'type' => 'String',
+    'quick_form_type' => 'Select',
+    'html_type' => 'Select',
+    'html_attributes' => [
+      //'class' => 'crm-select2',
+    ],
+    'default' => 'auto',
+    'add' => '5.63',
+    'title' => ts('ECMAScript Module Loader'),
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => ts('Specify how to load ESM (JS) files. The "Default" mode is the supported option. Other options may assist with diagnosing or temporarily mitigating compatibility issues.'),
+    'help_text' => NULL,
+    'options' => ['auto' => ts('Default (Auto-detect)'), 'browser' => ts('Browser'), 'shim-fast' => ts('es-module-shims (fast mode)'), 'shim-slow' => ts('es-module-shims (slow mode)')],
   ],
   'fatalErrorHandler' => [
     'group_name' => 'Developer Preferences',

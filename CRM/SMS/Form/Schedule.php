@@ -86,7 +86,7 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
     $preview = [];
     $preview['type'] = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_Mailing', $this->_mailingID, 'body_html') ? 'html' : 'text';
     $preview['viewURL'] = CRM_Utils_System::url('civicrm/mailing/view', "reset=1&id={$this->_mailingID}");
-    $this->assign_by_ref('preview', $preview);
+    $this->assign('preview', $preview);
   }
 
   /**
@@ -114,7 +114,7 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
       CRM_Utils_System::redirect($url);
     }
 
-    if ((isset($params['send_option']) && $params['send_option'] == 'send_immediate') || CRM_Utils_Array::value('_qf_Schedule_back', $params) == ts('Previous')) {
+    if ((isset($params['send_option']) && $params['send_option'] == 'send_immediate') || ($params['_qf_Schedule_back'] ?? NULL) == ts('Previous')) {
       return TRUE;
     }
 

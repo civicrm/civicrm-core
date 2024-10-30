@@ -68,17 +68,24 @@
             } else {
               cj('#saveDetails').hide();
             }
-
-            function showSaveDetails(chkbox) {
-              if (chkbox.checked) {
-                document.getElementById("saveDetails").style.display = "block";
-                document.getElementById("saveMappingName").disabled = false;
-                document.getElementById("saveMappingDesc").disabled = false;
+            cj('#updateMapping').change(function() {
+              cj('#saveMapping').prop("checked", !this.checked).change();
+            });
+            cj('#saveMapping').change(function() {
+              if (this.checked) {
+                cj('#saveDetails').show();
+                cj('#updateMapping').prop('checked', false);
+                cj('#saveMappingName').removeAttr('disabled')
+                cj('#saveMappingDesc').removeAttr('disabled')
               } else {
-                document.getElementById("saveDetails").style.display = "none";
-                document.getElementById("saveMappingName").disabled = true;
-                document.getElementById("saveMappingDesc").disabled = true;
+                cj('#saveDetails').hide();
+                cj('#saveMappingName').attr('disabled','disabled');
+                cj('#saveMappingDesc').attr('disabled','disabled');
               }
+            });
+            // Load in update mode if we have already saved the name - ie gone forwards & back.
+            if (cj('#saveMappingName').val()) {
+              cj('#updateMapping').prop("checked", true).change();
             }
             cj('select[id^="mapper"][id$="[0]"]').addClass('huge');
             {/literal}

@@ -10,7 +10,8 @@
     "scopes": [
       "https://mail.google.com/",
       "openid"
-    ]
+    ],
+    "prompt": "select_account consent"
   },
   "mailSettingsTemplate": {
     "name": "{{token.resource_owner.email}}",

@@ -178,7 +178,7 @@ class CRM_Core_BAO_Translation extends CRM_Core_DAO_Translation implements HookI
     }
 
     $communicationLanguage = \Civi\Core\Locale::detect()->nominal;
-    if ($communicationLanguage === Civi::settings()->get('lcMessages')) {
+    if (!$communicationLanguage || !self::isTranslate($communicationLanguage)) {
       return;
     }
 
@@ -196,13 +196,43 @@ class CRM_Core_BAO_Translation extends CRM_Core_DAO_Translation implements HookI
         //n }
         foreach ($translated['fields'] ?? [] as $field) {
           \Civi::$statics[__CLASS__]['translate_fields'][$apiRequest['entity']][$communicationLanguage]['fields'][$field['entity_id']][$field['entity_field']] = $field['string'];
-          \Civi::$statics[__CLASS__]['translate_fields'][$apiRequest['entity']][$communicationLanguage]['language'] = $translated['language'];
+          if (!isset(\Civi::$statics[__CLASS__]['translate_fields'][$apiRequest['entity']][$communicationLanguage]['language'][$field['entity_id']])) {
+            \Civi::$statics[__CLASS__]['translate_fields'][$apiRequest['entity']][$communicationLanguage]['language'][$field['entity_id']] = $field['language'];
+          }
         }
       }
       if (!empty(\Civi::$statics[__CLASS__]['translate_fields'][$apiRequest['entity']][$communicationLanguage])) {
         $wrappers[] = new CRM_Core_BAO_TranslateGetWrapper(\Civi::$statics[__CLASS__]['translate_fields'][$apiRequest['entity']][$communicationLanguage]);
       }
     }
+  }
+
+  /**
+   * Should the translation process be followed.
+   *
+   * It can be short-circuited if there we are in the site default language and
+   * it is not translated.
+   *
+   * @param string $communicationLanguage
+   *
+   * @return bool
+   */
+  protected static function isTranslate(string $communicationLanguage): bool {
+    if ($communicationLanguage !== Civi::settings()->get('lcMessages')) {
+      return TRUE;
+    }
+    if (!isset(\Civi::$statics[__CLASS__]['translate_main'][$communicationLanguage])) {
+      // The code had an assumption that you would not translate the primary language.
+      // However, the UI is such that the features (approval flow) so it makes sense
+      // to translation the default site language as well. If we can see sites are
+      // doing this then let's treat the main locale like any other locale
+      \Civi::$statics[__CLASS__]['translate_main'] = (bool) CRM_Core_DAO::singleValueQuery(
+        'SELECT COUNT(*) FROM civicrm_translation WHERE language = %1 LIMIT 1', [
+          1 => [$communicationLanguage, 'String'],
+        ]
+      );
+    }
+    return \Civi::$statics[__CLASS__]['translate_main'];
   }
 
   /**
@@ -237,14 +267,59 @@ class CRM_Core_BAO_Translation extends CRM_Core_DAO_Translation implements HookI
     }
     $fields = $translations->execute();
     $languages = [];
-    foreach ($fields as $index => $field) {
-      $languages[$field['language']][$index] = $field;
+    foreach ($fields as $field) {
+      $languages[$field['language']][$field['entity_id'] . $field['entity_field']] = $field;
     }
 
     $bizLocale = $userLocale->renegotiate(array_keys($languages));
-    return $bizLocale
-      ? ['fields' => $languages[$bizLocale->nominal], 'language' => $bizLocale->nominal]
-      : [];
+    if ($bizLocale) {
+      $fields = $languages[$bizLocale->nominal];
+
+      foreach ($languages as $language => $languageFields) {
+        if ($language !== $bizLocale->nominal) {
+          // Merge in any missing entities. Ie we might have a translation for one template in es_MX but
+          // need to fall back to es_ES for another. If there is a translation for the site default
+          // language we should fall back to that rather than the messageTemplate
+          // see https://github.com/civicrm/civicrm-core/pull/26232
+          $fields = array_merge(self::getSiteDefaultLanguageTranslations($apiRequest['entity'])['fields'] ?? [], $languageFields, $fields);
+        }
+      }
+      return ['fields' => $fields, 'language' => $bizLocale->nominal];
+    }
+
+    // Finally fall back to the translation of the site language, if exists.
+    // ie if the site language is en_US and there is a translation for that, then use it.
+    // see https://github.com/civicrm/civicrm-core/pull/26232
+    return self::getSiteDefaultLanguageTranslations($apiRequest['entity']);
+  }
+
+  /**
+   * Get any translations configured for the site-default language.
+   *
+   * @param string $entity
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected static function getSiteDefaultLanguageTranslations(string $entity): array {
+    if (!isset(\Civi::$statics[__CLASS__]) || !array_key_exists('site_language_translation', \Civi::$statics[__CLASS__])) {
+      \Civi::$statics[__CLASS__]['site_language_translation'] = [];
+      $translations = Translation::get(FALSE)
+        ->addWhere('entity_table', '=', CRM_Core_DAO_AllCoreTables::getTableForEntityName($entity))
+        ->setCheckPermissions(FALSE)
+        ->setSelect(['entity_field', 'entity_id', 'string', 'language'])
+        ->addWhere('language', '=', \Civi::settings()->get('lcMessages'))
+        ->execute();
+      if ($translations !== NULL) {
+        \Civi::$statics[__CLASS__]['site_language_translation'] = [
+          'fields' => [],
+          'language' => \Civi::settings()->get('lcMessages'),
+        ];
+        foreach ($translations as $translatedField) {
+          \Civi::$statics[__CLASS__]['site_language_translation']['fields'][$translatedField['entity_id'] . $translatedField['entity_field']] = $translatedField;
+        }
+      }
+    }
+    return \Civi::$statics[__CLASS__]['site_language_translation'];
   }
 
 }

@@ -73,13 +73,13 @@ class CRM_Extension_Mapper {
   protected $upgraders = [];
 
   /**
-   * @param CRM_Extension_Container_Interface $container
-   * @param CRM_Utils_Cache_Interface $cache
+   * @param CRM_Extension_Container_Interface|null $container
+   * @param CRM_Utils_Cache_Interface|null $cache
    * @param null $cacheKey
    * @param null $civicrmPath
    * @param null $civicrmUrl
    */
-  public function __construct(CRM_Extension_Container_Interface $container, CRM_Utils_Cache_Interface $cache = NULL, $cacheKey = NULL, $civicrmPath = NULL, $civicrmUrl = NULL) {
+  public function __construct(CRM_Extension_Container_Interface $container, ?CRM_Utils_Cache_Interface $cache = NULL, $cacheKey = NULL, $civicrmPath = NULL, $civicrmUrl = NULL) {
     $this->container = $container;
     $this->cache = $cache;
     $this->cacheKey = $cacheKey;
@@ -355,8 +355,8 @@ class CRM_Extension_Mapper {
     // TODO optimization/caching
     $urls = [];
     $urls['civicrm'] = $this->keyToUrl('civicrm');
+    /** @var CRM_Core_Module $module */
     foreach ($this->getModules() as $module) {
-      /** @var $module CRM_Core_Module */
       if ($module->is_active) {
         try {
           $urls[$module->name] = $this->keyToUrl($module->name);
@@ -383,7 +383,7 @@ class CRM_Extension_Mapper {
   public function getKeysByPath($pattern) {
     $keys = [];
 
-    if (CRM_Utils_String::endsWith($pattern, '*')) {
+    if (str_ends_with($pattern, '*')) {
       $prefix = rtrim($pattern, '*');
       foreach ($this->container->getKeys() as $key) {
         $path = CRM_Utils_File::addTrailingSlash($this->container->getPath($key));
@@ -452,10 +452,11 @@ class CRM_Extension_Mapper {
         $this->keyToInfo($key);
       }
       catch (CRM_Extension_Exception_ParseException $e) {
-        CRM_Core_Session::setStatus(ts('Parse error in extension: %1', [
-          1 => $e->getMessage(),
+        CRM_Core_Session::setStatus(ts('Parse error in extension %1: %2', [
+          1 => $key,
+          2 => $e->getMessage(),
         ]), '', 'error');
-        CRM_Core_Error::debug_log_message("Parse error in extension: " . $e->getMessage());
+        CRM_Core_Error::debug_log_message("Parse error in extension " . $key . ": " . $e->getMessage());
         continue;
       }
     }
@@ -488,7 +489,7 @@ class CRM_Extension_Mapper {
     $dao->type = 'module';
     $dao->find();
     while ($dao->fetch()) {
-      $result[] = new CRM_Core_Module($dao->full_name, $dao->is_active);
+      $result[] = new CRM_Core_Module($dao->full_name, $dao->is_active, $dao->label);
     }
     return $result;
   }
@@ -515,7 +516,7 @@ class CRM_Extension_Mapper {
   }
 
   /**
-   * Given te class, provides the template name.
+   * Given the class, provides the template name.
    * @todo consider multiple templates, support for one template for now
    *
    *
@@ -552,7 +553,7 @@ class CRM_Extension_Mapper {
    * @return string
    */
   public function getUpgradeLink($remoteExtensionInfo, $localExtensionInfo) {
-    if (!empty($remoteExtensionInfo) && version_compare($localExtensionInfo['version'], $remoteExtensionInfo->version, '<')) {
+    if (!empty($remoteExtensionInfo) && version_compare($localExtensionInfo['version'] ?? '', $remoteExtensionInfo->version, '<')) {
       return ts('Version %1 is installed. <a %2>Upgrade to version %3</a>.', [
         1 => $localExtensionInfo['version'],
         2 => 'href="' . CRM_Utils_System::url('civicrm/admin/extensions', "action=update&id={$localExtensionInfo['key']}&key={$localExtensionInfo['key']}") . '"',
@@ -576,10 +577,11 @@ class CRM_Extension_Mapper {
         $info = $this->keyToInfo($key);
       }
       catch (CRM_Extension_Exception_ParseException $e) {
-        CRM_Core_Session::setStatus(ts('Parse error in extension: %1', [
-          1 => $e->getMessage(),
+        CRM_Core_Session::setStatus(ts('Parse error in extension %1: %2', [
+          1 => $key,
+          2 => $e->getMessage(),
         ]), '', 'error');
-        CRM_Core_Error::debug_log_message("Parse error in extension: " . $e->getMessage());
+        CRM_Core_Error::debug_log_message("Parse error in extension " . $key . ": " . $e->getMessage());
         return NULL;
       }
 

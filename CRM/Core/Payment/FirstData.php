@@ -138,7 +138,7 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
    * This function sends request and receives response from
    * the processor
    *
-   * @param array|PropertyBag $params
+   * @param array|\Civi\Payment\PropertyBag $params
    *
    * @param string $component
    *

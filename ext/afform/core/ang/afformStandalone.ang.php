@@ -5,6 +5,5 @@ return [
     'ang/afformStandalone.js',
   ],
   'css' => [],
-  'settings' => [],
   'requires' => [],
 ];

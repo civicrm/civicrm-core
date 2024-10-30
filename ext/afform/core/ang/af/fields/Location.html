@@ -1,0 +1,8 @@
+<div class="form-inline">
+  <input class="form-control" type="number" ng-model="dataProvider.getFieldData()[$ctrl.fieldName].distance" placeholder="{{:: ts('Distance') }}" >
+  <select class="form-control" ng-model="dataProvider.getFieldData()[$ctrl.fieldName].distance_unit">
+    <option value="km">{{:: ts('Km') }}</option>
+    <option value="miles">{{:: ts('Miles') }}</option>
+  </select>
+  <input class="form-control" ng-model="dataProvider.getFieldData()[$ctrl.fieldName].address" placeholder="{{:: ts('Street, City, State, Country') }}" ng-model-options="{updateOn: 'blur'}" >
+</div>

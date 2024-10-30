@@ -11,7 +11,7 @@ return [
       'version' => 4,
       'values' => [
         'name' => 'grant_type',
-        'title' => 'Grant Type',
+        'title' => E::ts('Grant Type'),
         'description' => NULL,
         'data_type' => NULL,
         'is_reserved' => TRUE,

@@ -12,8 +12,6 @@
 
 namespace Civi\Api4\Service\Spec\Provider;
 
-use Civi\API\Request;
-use Civi\Api4\Generic\Result;
 use Civi\Api4\Query\Api4SelectQuery;
 use Civi\Api4\Service\Spec\FieldSpec;
 use Civi\Api4\Service\Spec\RequestSpec;
@@ -53,6 +51,9 @@ class EntityTagFilterSpecProvider extends \Civi\Core\Service\AutoService impleme
     if ($action !== 'get') {
       return FALSE;
     }
+    if (CoreUtil::isContact($entity)) {
+      return TRUE;
+    }
     $usedFor = \CRM_Core_OptionGroup::values('tag_used_for', FALSE, FALSE, FALSE, NULL, 'name');
     return in_array($entity, $usedFor, TRUE);
   }
@@ -74,31 +75,22 @@ class EntityTagFilterSpecProvider extends \Civi\Core\Service\AutoService impleme
         $value = array_unique(array_merge($value, $tagTree[$tagID]));
       }
     }
-    $tags = \CRM_Utils_Type::validate(implode(',', $value), 'CommaSeparatedIntegers');
+    $tags = $value ? \CRM_Utils_Type::validate(implode(',', $value), 'CommaSeparatedIntegers') : '0';
     return "$fieldAlias $operator (SELECT entity_id FROM `civicrm_entity_tag` WHERE entity_table = '$tableName' AND tag_id IN ($tags))";
   }
 
   /**
    * Callback function to build option list for tags filters.
    *
-   * @param \Civi\Api4\Service\Spec\FieldSpec $spec
+   * @param array $field
    * @param array $values
    * @param bool|array $returnFormat
    * @param bool $checkPermissions
    * @return array
    */
-  public static function getTagList($spec, $values, $returnFormat, $checkPermissions) {
-    $table = CoreUtil::getTableName($spec->getEntity());
-    $result = new Result();
-    Request::create('EntityTag', 'getFields', [
-      'version' => 4,
-      'loadOptions' => $returnFormat,
-      'values' => ['entity_table' => $table],
-      'select' => ['options'],
-      'where' => [['name', '=', 'tag_id']],
-      'checkPermissions' => $checkPermissions,
-    ])->_run($result);
-    return $result->first()['options'];
+  public static function getTagList($field, $values, $returnFormat, $checkPermissions) {
+    $values = ['entity_table' => CoreUtil::getTableName($field['entity'])];
+    return \Civi::entity('EntityTag')->getOptions('tag_id', $values, FALSE, $checkPermissions);
   }
 
 }

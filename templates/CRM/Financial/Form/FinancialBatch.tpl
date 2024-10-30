@@ -15,8 +15,6 @@
     {ts}WARNING: You cannot delete a financial type if it is currently used by any Contributions, Contribution Pages or Membership Types. Consider disabling this option instead.{/ts} {ts}Deleting a financial type cannot be undone.{/ts} {ts}Do you want to continue?{/ts}
   </div>
 {else}
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-
   <table class="form-layout">
     <tr class="crm-contribution-form-block-name">
       <td class="label">{$form.title.label}</td>
@@ -45,9 +43,9 @@
       </tr>
     {/if}
   </table>
-  <fieldset class="crm-collapsible">
-    <legend class="collapsible-title">{ts}Optional Constraints{/ts}</legend>
-      <div>
+  <details class="crm-accordion-light">
+    <summary>{ts}Optional Constraints{/ts}</summary>
+    <div class="crm-accordion-body">
       <table class="form-layout">
         <tr class="crm-contribution-form-block-payment_instrument">
           <td class="label">{$form.payment_instrument_id.label}</td>
@@ -63,7 +61,7 @@
         </tr>
       </table>
     </div>
-  </fieldset>
+  </details>
 {/if}
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="botttom"}</div>
 </div>

@@ -26,7 +26,8 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_BAO_FinancialTrxn {
     if (!$contributionFinancialTypeId) {
       $contributionFinancialTypeId = CRM_Core_DAO::getFieldValue('CRM_Contribute_BAO_Contribution', $contributionId, 'financial_type_id');
     }
-    $toFinancialAccount = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($contributionFinancialTypeId, 'Accounts Receivable Account is');
+    $toFinancialAccount = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($contributionFinancialTypeId, 'Accounts Receivable Account is');
+
     $q = "SELECT ft.id, ft.total_amount FROM civicrm_financial_trxn ft INNER JOIN civicrm_entity_financial_trxn eft ON (eft.financial_trxn_id = ft.id AND eft.entity_table = 'civicrm_contribution') WHERE eft.entity_id = %1 AND ft.to_financial_account_id = %2";
 
     $p[1] = [$contributionId, 'Integer'];
@@ -259,7 +260,6 @@ WHERE ceft.entity_id = %1";
     }
 
     if (!empty($params['cost'])) {
-      $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
       $toFinancialAccountType = !empty($params['isDeleted']) ? 'Premiums Inventory Account is' : 'Cost of Sales Account is';
       $fromFinancialAccountType = !empty($params['isDeleted']) ? 'Cost of Sales Account is' : 'Premiums Inventory Account is';
       $financialtrxn = [
@@ -268,7 +268,7 @@ WHERE ceft.entity_id = %1";
         'trxn_date' => date('YmdHis'),
         'total_amount' => $params['cost'] ?? 0,
         'currency' => $params['currency'] ?? NULL,
-        'status_id' => array_search('Completed', $contributionStatuses),
+        'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
         'entity_table' => 'civicrm_contribution',
         'entity_id' => $params['contributionId'],
       ];
@@ -477,10 +477,9 @@ WHERE ceft.entity_id = %1";
     }
     $revenueRecognitionDate = $contributionDetails->revenue_recognition_date;
     if (!CRM_Utils_System::isNull($revenueRecognitionDate)) {
-      $statuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
       if (!$update
-        && (CRM_Utils_Array::value($contributionDetails->contribution_status_id, $statuses) != 'Completed'
-          || (CRM_Utils_Array::value($contributionDetails->contribution_status_id, $statuses) != 'Pending'
+        && ($contributionDetails->contribution_status_id != CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed')
+          || ($contributionDetails->contribution_status_id != CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending')
             && $contributionDetails->is_pay_later)
           )
       ) {
@@ -617,7 +616,7 @@ WHERE ceft.entity_id = %1";
 
     $deferredFinancialAccount = $inputParams['deferred_financial_account_id'] ?? NULL;
     if (empty($deferredFinancialAccount)) {
-      $deferredFinancialAccount = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($prevContribution->financial_type_id, 'Deferred Revenue Account is');
+      $deferredFinancialAccount = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($prevContribution->financial_type_id, 'Deferred Revenue Account is');
     }
 
     $lastFinancialTrxnId = self::getFinancialTrxnId($prevContribution->id, 'DESC', FALSE, NULL, $deferredFinancialAccount);
@@ -646,7 +645,7 @@ WHERE ceft.entity_id = %1";
       CRM_Contribute_BAO_Contribution::assignProportionalLineItems($trxnParams, $trxn->id, $prevContribution->total_amount);
     }
 
-    self::createDeferredTrxn(CRM_Utils_Array::value('line_item', $inputParams), $currentContribution, TRUE, 'changePaymentInstrument');
+    self::createDeferredTrxn($inputParams['line_item'] ?? NULL, $currentContribution, TRUE, 'changePaymentInstrument');
 
     return TRUE;
   }

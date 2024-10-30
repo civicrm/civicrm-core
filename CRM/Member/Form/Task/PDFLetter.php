@@ -39,10 +39,9 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
   /**
    * Build all the data structures needed to build the form.
    *
-   * @return void
+   * @throws \CRM_Core_Exception
    */
   public function preProcess() {
-    $this->skipOnHold = $this->skipDeceased = FALSE;
     parent::preProcess();
     $this->setContactIDs();
     $this->preProcessPDF();
@@ -66,21 +65,17 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
    *
    *
    * @return void
+   * @throws \CRM_Core_Exception
    */
   public function postProcess() {
-    // TODO: rewrite using contribution token and one letter by contribution
     $this->setContactIDs();
-    $skipOnHold = $this->skipOnHold ?? FALSE;
-    $skipDeceased = $this->skipDeceased ?? TRUE;
-    $this->postProcessMembers($this->_memberIds, $skipOnHold, $skipDeceased, $this->_contactIds);
+    $this->postProcessMembers($this->_memberIds, $this->_contactIds);
   }
 
   /**
    * Process the form after the input has been submitted and validated.
    *
    * @param $membershipIDs
-   * @param $skipOnHold
-   * @param $skipDeceased
    * @param $contactIDs
    *
    * @throws \CRM_Core_Exception
@@ -88,17 +83,11 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
    * in fixing the existing pdfLetter classes to be suitably generic
    *
    */
-  public function postProcessMembers($membershipIDs, $skipOnHold, $skipDeceased, $contactIDs) {
+  public function postProcessMembers($membershipIDs, $contactIDs) {
     $form = $this;
     $formValues = $form->controller->exportValues($form->getName());
-    [$formValues, $html_message, $messageToken, $returnProperties] = $this->processMessageTemplate($formValues);
-
-    $html
-      = $this->generateHTML(
-      $membershipIDs,
-      $messageToken,
-      $html_message
-    );
+    [$formValues, $html_message] = $this->processMessageTemplate($formValues);
+    $html = $this->generateHTML($membershipIDs, $html_message);
     $form->createActivities($html_message, $contactIDs, $formValues['subject'], CRM_Utils_Array::value('campaign_id', $formValues));
     CRM_Utils_PDF_Utils::html2pdf($html, $this->getFileName() . '.pdf', FALSE, $formValues);
 
@@ -111,7 +100,6 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
    * Generate html for pdf letters.
    *
    * @param array $membershipIDs
-   * @param array $messageToken
    * @param $html_message
    *
    * @return array
@@ -119,7 +107,7 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
    * @internal
    *
    */
-  public function generateHTML($membershipIDs, $messageToken, $html_message): array {
+  public function generateHTML($membershipIDs, $html_message): array {
     $memberships = Membership::get(FALSE)
       ->addWhere('id', 'IN', $membershipIDs)
       ->addSelect('contact_id')->execute();

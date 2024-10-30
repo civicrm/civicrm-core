@@ -17,14 +17,15 @@
         ctrl = this,
         currentBatch = 0,
         totalBatches,
+        processedCount = 0,
         incrementer;
 
       this.progress = 0;
 
       // Number of records to process in each batch
-      var BATCH_SIZE = 500,
-        // Estimated number of seconds each batch will take (for auto-incrementing the progress bar)
-        EST_BATCH_TIME = 5;
+      const BATCH_SIZE = 500;
+      // Estimated number of seconds each batch will take (for auto-incrementing the progress bar)
+      const EST_BATCH_TIME = 5;
 
       this.$onInit = function() {
         if (ctrl.action === 'create') {
@@ -62,8 +63,10 @@
           function(result) {
             stopIncrementer();
             ctrl.progress = Math.floor(100 * ++currentBatch / totalBatches);
+            processedCount += result.count;
             if (ctrl.last >= ctrl.ids.length) {
               $timeout(function() {
+                result.batchCount = processedCount;
                 ctrl.success({result: result});
               }, 500);
             } else {

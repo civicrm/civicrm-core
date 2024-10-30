@@ -177,17 +177,10 @@ WHERE     pledge_id = %1
   }
 
   /**
-   * Retrieve DB object and copy to defaults array.
-   *
-   * @param array $params
-   *   Array of criteria values.
-   * @param array $defaults
-   *   Array to be populated with found values.
-   *
-   * @return self|null
-   *   The DAO object, if found.
-   *
    * @deprecated
+   * @param array $params
+   * @param array $defaults
+   * @return self|null
    */
   public static function retrieve($params, &$defaults) {
     return self::commonRetrieve(self::class, $params, $defaults);
@@ -201,6 +194,7 @@ WHERE     pledge_id = %1
    * @return bool
    */
   public static function del($id) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     return (bool) self::deleteRecord(['id' => $id]);
   }
 
@@ -228,7 +222,7 @@ WHERE     pledge_id = %1
         if ($payment->contribution_id) {
           CRM_Contribute_BAO_Contribution::deleteContribution($payment->contribution_id);
         }
-        self::del($payment->id);
+        self::deleteRecord(['id' => $payment->id]);
       }
     }
 
@@ -824,23 +818,13 @@ WHERE civicrm_pledge_payment.contribution_id = {$paymentContributionId}
   }
 
   /**
-   * Override buildOptions to hack out some statuses.
-   *
-   * @todo instead of using & hacking the shared optionGroup contribution_status use a separate one.
-   *
-   * @param string $fieldName
-   * @param string $context
-   * @param array $props
-   *
-   * @return array|bool
+   * Pseudoconstant condition_provider for status_id field.
+   * @see \Civi\Schema\EntityMetadataBase::getConditionFromProvider
    */
-  public static function buildOptions($fieldName, $context = NULL, $props = []) {
-    $result = parent::buildOptions($fieldName, $context, $props);
-    if ($fieldName == 'status_id') {
-      $result = CRM_Pledge_BAO_Pledge::buildOptions($fieldName, $context, $props);
-      $result = array_diff($result, ['Failed', 'In Progress']);
+  public static function alterStatus(string $fieldName, CRM_Utils_SQL_Select $conditions, $params) {
+    if ($fieldName == 'status_id' && !$params['include_disabled']) {
+      $conditions->where('name NOT IN (@status)', ['status' => ['Failed', 'In Progress']]);
     }
-    return $result;
   }
 
   /**

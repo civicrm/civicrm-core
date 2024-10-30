@@ -35,9 +35,14 @@ class PostEvent extends GenericHookEvent {
   public $id;
 
   /**
-   * @var Object
+   * @var \CRM_Core_DAO
    */
   public $object;
+
+  /**
+   * @var array
+   */
+  public $params;
 
   /**
    * Class constructor
@@ -46,19 +51,21 @@ class PostEvent extends GenericHookEvent {
    * @param string $entity
    * @param int $id
    * @param object $object
+   * @param array $params
    */
-  public function __construct($action, $entity, $id, &$object) {
+  public function __construct($action, $entity, $id, &$object, $params = NULL) {
     $this->action = $action;
     $this->entity = $entity;
     $this->id = $id;
     $this->object = &$object;
+    $this->params = $params;
   }
 
   /**
    * @inheritDoc
    */
   public function getHookValues() {
-    return [$this->action, $this->entity, $this->id, &$this->object];
+    return [$this->action, $this->entity, $this->id, &$this->object, $this->params];
   }
 
 }

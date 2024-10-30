@@ -15,6 +15,7 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 trait CRM_Core_Form_EntityFormTrait {
+  use CRM_Custom_Form_CustomDataTrait;
 
   /**
    * The id of the object being edited / created.
@@ -29,6 +30,41 @@ trait CRM_Core_Form_EntityFormTrait {
    * @var int
    */
   protected $_entitySubTypeId = NULL;
+
+  /**
+   * Deletion message to be assigned to the form.
+   *
+   * Depending on the screen, the deletionMessage may be plain-text (`{$deletionMessage|escape}`)
+   * or HTML (`{$deletionMessage nofilter}`). Be sure your controller+template agree.
+   *
+   * @var string
+   */
+  protected $deleteMessage;
+
+  /**
+   * Fields for the entity to be assigned to the template.
+   *
+   * Fields may have keys
+   *  - name (required to show in tpl from the array)
+   *  - description (optional, will appear below the field)
+   *  - not-auto-addable - this class will not attempt to add the field using addField.
+   *    (this will be automatically set if the field does not have html in it's metadata
+   *    or is not a core field on the form's entity).
+   *  - help (option) add help to the field - e.g ['id' => 'id-source', 'file' => 'CRM/Contact/Form/Contact']]
+   *  - template - use a field specific template to render this field
+   *  - required
+   *  - is_freeze (field should be frozen).
+   *
+   * @var array
+   */
+  protected $entityFields = [];
+
+  /**
+   * Metadata from getfields API call for the current entity.
+   *
+   * @var array
+   */
+  protected $metadata = [];
 
   /**
    * Get entity fields for the entity to be added to the form.
@@ -121,9 +157,45 @@ trait CRM_Core_Form_EntityFormTrait {
     if ($this->isSuppressCustomData()) {
       return TRUE;
     }
-    $customisableEntities = CRM_Core_SelectValues::customGroupExtends();
-    if (isset($customisableEntities[$this->getDefaultEntity()])) {
-      CRM_Custom_Form_CustomData::addToForm($this, $this->getEntitySubTypeId());
+
+    /*
+    @todo - this would be the preferred code here to better support
+    php8.2 & take advantage of code improvements
+    Note in this example an additional filter (membership_type_id)
+    is relevant although for most entities it isn't.
+    if ($this->isSubmitted()) {
+    // The custom data fields are added to the form by an ajax form.
+    // However, if they are not present in the element index they will
+    // not be available from `$this->getSubmittedValue()` in post process.
+    // We do not have to set defaults or otherwise render - just add to the element index.
+    $this->addCustomDataFieldsToForm($this->getDefaultEntity(), array_filter([
+    'id' => $this->getEntityId(),
+    'membership_type_id' => $this->getSubmittedValue('membership_type_id')
+    ]));
+    }
+     */
+    $this->assign('customDataType', $this->getDefaultEntity());
+    $this->assign('customDataSubType', $this->getEntitySubTypeId());
+    $this->assign('entityID', $this->getEntityId());
+    $this->assign('cid', NULL);
+    if ($this->isSubmitted()) {
+      $customisableEntities = CRM_Core_SelectValues::customGroupExtends();
+      if (isset($customisableEntities[$this->getDefaultEntity()])) {
+        if ($this->getEntitySubTypeId()) {
+          // Supporting entity subtypes form the EntityFormTrait is not
+          // used in core & is likely not used anywhere / was a good idea that
+          // didn't fully happen. If anyone is winding up here they should override
+          // the entire addCustomDataToForm function - e.g like the backoffice membership
+          // forms do
+          // @todo - add some noisy deprecation at some point.
+          CRM_Custom_Form_CustomData::addToForm($this, $this->getEntitySubTypeId());
+        }
+        else {
+          $this->addCustomDataFieldsToForm($this->getDefaultEntity(), array_filter([
+            'id' => $this->getEntityId(),
+          ]));
+        }
+      }
     }
   }
 
@@ -138,19 +210,18 @@ trait CRM_Core_Form_EntityFormTrait {
     $this->applyFilter('__ALL__', 'trim');
     $this->addEntityFieldsToTemplate();
     foreach ($this->entityFields as $index => $fields) {
-      $this->entityFields[$index] = array_merge([
+      $this->entityFields[$index] = array_replace_recursive([
         'template' => '',
-        'help' => [],
-        'pre_html_text' => '',
+        'help' => ['id' => '', 'file' => ''],
         'post_html_text' => '',
         'description' => '',
-        'documentation_link' => '',
+        'documentation_link' => ['page' => '', 'resource' => ''],
       ], $fields);
     }
     $this->assign('entityFields', $this->entityFields);
     $this->assign('entityID', $this->getEntityId());
     $this->assign('entityInClassFormat', strtolower(str_replace('_', '-', $this->getDefaultEntity())));
-    $this->assign('entityTable', CRM_Core_DAO_AllCoreTables::getTableForClass(CRM_Core_DAO_AllCoreTables::getFullName($this->getDefaultEntity())));
+    $this->assign('entityTable', CRM_Core_DAO_AllCoreTables::getTableForClass(CRM_Core_DAO_AllCoreTables::getDAONameForEntity($this->getDefaultEntity())));
     $this->addCustomDataToForm();
     $this->addFormButtons();
 
@@ -213,7 +284,7 @@ trait CRM_Core_Form_EntityFormTrait {
         $defaults[$fieldSpec['name']] = $value;
       }
       // Store a list of fields with money formatters
-      if (CRM_Utils_Array::value('formatter', $fieldSpec) == 'crmMoney') {
+      if (($fieldSpec['formatter'] ?? NULL) == 'crmMoney') {
         $moneyFields[] = $entityFieldName;
       }
     }
@@ -279,7 +350,7 @@ trait CRM_Core_Form_EntityFormTrait {
   protected function addEntityFieldsToTemplate() {
     foreach ($this->getEntityFields() as $fieldSpec) {
       if (empty($fieldSpec['not-auto-addable'])) {
-        $element = $this->addField($fieldSpec['name'], [], CRM_Utils_Array::value('required', $fieldSpec), FALSE);
+        $element = $this->addField($fieldSpec['name'], [], $fieldSpec['required'] ?? FALSE, FALSE);
         if (!empty($fieldSpec['is_freeze'])) {
           $element->freeze();
         }

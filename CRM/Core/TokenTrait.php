@@ -28,7 +28,7 @@ trait CRM_Core_TokenTrait {
   public function checkActive(TokenProcessor $processor) {
     return in_array($this->getEntityContextSchema(), $processor->context['schema']) ||
       (!empty($processor->context['actionMapping'])
-        && $processor->context['actionMapping']->getEntity() === $this->getEntityTableName());
+        && $processor->context['actionMapping']->getEntityTable() === $this->getEntityTableName());
   }
 
   /**

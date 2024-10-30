@@ -14,7 +14,7 @@ if (!$queue_id) {
 }
 
 require_once 'CRM/Mailing/Event/BAO/Opened.php';
-CRM_Mailing_Event_BAO_Opened::open($queue_id);
+CRM_Mailing_Event_BAO_MailingEventOpened::open($queue_id);
 
 $filename = "../i/tracker.gif";
 

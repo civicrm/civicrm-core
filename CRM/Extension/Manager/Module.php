@@ -18,6 +18,11 @@
 class CRM_Extension_Manager_Module extends CRM_Extension_Manager_Base {
 
   /**
+   * @var \CRM_Extension_Mapper
+   */
+  protected $mapper;
+
+  /**
    * @param CRM_Extension_Mapper $mapper
    */
   public function __construct(CRM_Extension_Mapper $mapper) {
@@ -30,6 +35,7 @@ class CRM_Extension_Manager_Module extends CRM_Extension_Manager_Base {
    */
   public function onPreInstall(CRM_Extension_Info $info) {
     $this->registerClassloader($info);
+    $this->callHook($info, 'preInstall');
     $this->callHook($info, 'install');
     $this->callHook($info, 'enable');
   }
@@ -132,6 +138,9 @@ class CRM_Extension_Manager_Module extends CRM_Extension_Manager_Base {
     }
 
     $classloader = CRM_Extension_System::singleton()->getClassLoader();
+    if (!$classloader->isRegistered()) {
+      $classloader->register();
+    }
     $classloader->installExtension($info, $extPath);
   }
 

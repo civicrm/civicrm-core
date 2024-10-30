@@ -49,33 +49,47 @@ class RequestSpec implements \Iterator {
   protected $values = [];
 
   /**
+   * @var array
+   */
+  protected $valuesUsed = [];
+
+  /**
    * @param string $entity
    * @param string $action
    * @param array $values
    */
-  public function __construct($entity, $action, $values = []) {
+  public function __construct(string $entity, string $action, array $values = []) {
     $this->entity = $entity;
     $this->action = $action;
     $this->entityTableName = CoreUtil::getTableName($entity);
+    $this->values = $values;
+  }
 
-    // If `id` given, lookup other values needed to filter custom fields
-    $customInfo = \Civi\Api4\Utils\CoreUtil::getCustomGroupExtends($entity);
-    $idCol = $customInfo['column'] ?? NULL;
-    if ($idCol && !empty($values[$idCol])) {
-      $grouping = (array) $customInfo['grouping'];
-      $lookupNeeded = array_diff($grouping, array_keys($values));
-      if ($lookupNeeded) {
-        $record = \civicrm_api4($entity, 'get', [
-          'checkPermissions' => FALSE,
-          'where' => [[$idCol, '=', $values[$idCol]]],
-          'select' => $lookupNeeded,
-        ])->first();
-        if ($record) {
-          $values += $record;
-        }
+  /**
+   * Resolve requested value based on available data in $values
+   * e.g. if `id` is available then we can use it to look up other values.
+   */
+  private function resolveValue(string $key) {
+    $this->valuesUsed[$key] = TRUE;
+    if (!$this->values || array_key_exists($key, $this->values)) {
+      return;
+    }
+    $baoName = CoreUtil::getBAOFromApiName($this->entity);
+    $idCol = CoreUtil::getIdFieldName($this->entity);
+    // If `id` given, use it to look up value
+    if (!array_key_exists($key, $this->values) && !empty($this->values[$idCol]) && array_key_exists($key, $baoName::getSupportedFields())) {
+      $this->values[$key] = $baoName::getDbVal($key, $this->values[$idCol], $idCol);
+    }
+    // If we need a value like `event_id.event_type_id` and we only have `event_id`,
+    // use the FK to look up the value from the event.
+    if (!array_key_exists($key, $this->values) && str_contains($key, '.')) {
+      [$fkFrom, $fkTo] = explode('.', $key);
+      $fkField = $baoName::getSupportedFields()[$fkFrom] ?? NULL;
+      $fkBAO = $fkField['FKClassName'] ?? NULL;
+      if (!empty($this->values[$fkFrom]) && $fkBAO) {
+        $this->values[$key] = $fkBAO::getDbVal($fkTo, $this->values[$fkFrom], $fkField['FKColumnName'] ?? 'id');
       }
     }
-    $this->values = $values;
   }
 
   /**
@@ -126,32 +140,10 @@ class RequestSpec implements \Iterator {
   }
 
   /**
-   * @return array|FieldSpec[]
-   */
-  public function getConditionalRequiredFields() {
-    return array_filter($this->fields, function (FieldSpec $field) {
-      return $field->getRequiredIf();
-    });
-  }
-
-  /**
-   * @param array $fieldNames
-   *   Optional array of fields to return
    * @return FieldSpec[]
    */
-  public function getFields($fieldNames = NULL) {
-    if (!$fieldNames) {
-      return $this->fields;
-    }
-    // Return all exact matches plus partial matches (to support retrieving fk fields)
-    return array_filter($this->fields, function($field) use($fieldNames) {
-      foreach ($fieldNames as $fieldName) {
-        if (strpos($fieldName, $field->getName()) === 0) {
-          return TRUE;
-        }
-      }
-      return FALSE;
-    });
+  public function getFields() {
+    return $this->fields;
   }
 
   /**
@@ -162,10 +154,17 @@ class RequestSpec implements \Iterator {
   }
 
   /**
-   * @return array
+   * Private because we want everyone downstream to use getValue() and hasValue().
    */
-  public function getValues() {
+  private function getValues(): array {
     return $this->values;
+  }
+
+  /**
+   * What values were requested by specProviders
+   */
+  public function getValuesUsed(): array {
+    return $this->valuesUsed;
   }
 
   /**
@@ -173,7 +172,13 @@ class RequestSpec implements \Iterator {
    * @return mixed
    */
   public function getValue(string $key) {
+    $this->resolveValue($key);
     return $this->values[$key] ?? NULL;
+  }
+
+  public function hasValue(string $key): bool {
+    $this->resolveValue($key);
+    return array_key_exists($key, $this->values);
   }
 
   /**

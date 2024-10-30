@@ -5,7 +5,7 @@ return [
   [
     'name' => 'SavedSearch_Administer_Contact_Types',
     'entity' => 'SavedSearch',
-    'cleanup' => 'unused',
+    'cleanup' => 'always',
     'update' => 'unmodified',
     'params' => [
       'version' => 4,
@@ -20,7 +20,6 @@ return [
           'version' => 4,
           'select' => [
             'label',
-            'parent_id:label',
             'description',
           ],
           'orderBy' => [],
@@ -31,6 +30,9 @@ return [
         ],
         'expires_date' => NULL,
         'description' => NULL,
+      ],
+      'match' => [
+        'name',
       ],
     ],
   ],
@@ -47,7 +49,7 @@ return [
         'saved_search_id.name' => 'Administer_Contact_Types',
         'type' => 'table',
         'settings' => [
-          'actions' => FALSE,
+          'actions' => TRUE,
           'limit' => 50,
           'classes' => [
             'table',
@@ -55,13 +57,11 @@ return [
           ],
           'pager' => [
             'show_count' => TRUE,
+            'expose_limit' => TRUE,
+            'hide_single' => TRUE,
           ],
           'placeholder' => 5,
           'sort' => [
-            [
-              'parent_id:label',
-              'ASC',
-            ],
             [
               'label',
               'ASC',
@@ -84,23 +84,6 @@ return [
             ],
             [
               'type' => 'field',
-              'key' => 'parent_id:label',
-              'dataType' => 'Integer',
-              'label' => E::ts('Parent'),
-              'sortable' => TRUE,
-              'icons' => [
-                [
-                  'icon' => 'fa-lock',
-                  'side' => 'left',
-                  'if' => [
-                    'parent_id:label',
-                    'IS EMPTY',
-                  ],
-                ],
-              ],
-            ],
-            [
-              'type' => 'field',
               'key' => 'description',
               'dataType' => 'Text',
               'label' => E::ts('Description'),
@@ -108,7 +91,10 @@ return [
               'editable' => TRUE,
             ],
             [
+              'text' => '',
+              'style' => 'default',
               'size' => 'btn-xs',
+              'icon' => 'fa-bars',
               'links' => [
                 [
                   'entity' => 'ContactType',
@@ -136,17 +122,27 @@ return [
                   ],
                 ],
               ],
-              'type' => 'buttons',
+              'type' => 'menu',
               'alignment' => 'text-right',
             ],
           ],
-          'addButton' => [
-            'path' => 'civicrm/admin/options/subtype/edit?action=add&reset=1',
-            'text' => E::ts('Add Contact Type'),
-            'icon' => 'fa-plus',
+          'toolbar' => [
+            [
+              'entity' => 'ContactType',
+              'action' => 'add',
+              'target' => 'crm-popup',
+              'style' => 'primary',
+              'text' => E::ts('Add Contact Type'),
+              'icon' => 'fa-plus',
+            ],
           ],
+          'hierarchical' => TRUE,
         ],
         'acl_bypass' => FALSE,
+      ],
+      'match' => [
+        'name',
+        'saved_search_id',
       ],
     ],
   ],

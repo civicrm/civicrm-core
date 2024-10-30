@@ -1,0 +1,80 @@
+<!--
+Controller: EditMailingCtrl
+Required vars: mailing, crmMailingConst
+Note: Much of this file is duplicated in crmMailing and crmMailingAB with variations on placement/title/binding.
+It could perhaps be thinned by 30-60% by making more directives.
+-->
+<div class="crm-block" ng-form="subform" crm-ui-id-scope>
+  <div class="crm-group">
+    <div crm-ui-field="{name: 'subform.msg_template_id', title: ts('Template')}" ng-if="mailing.template_type=='traditional'">
+      <div crm-mailing-block-templates="{name: 'templates', id: 'subform.msg_template_id'}" crm-mailing="mailing"></div>
+    </div>
+    <div crm-ui-field="{name: 'subform.fromAddress', title: ts('From'), help: hs('from_email')}">
+      <div ng-controller="EmailAddrCtrl" crm-mailing-from-address="fromPlaceholder" crm-mailing="mailing">
+        <select
+          crm-ui-id="subform.fromAddress"
+          crm-ui-select="{dropdownAutoWidth : true, allowClear: false, placeholder: ts('Email address')}"
+          name="fromAddress"
+          ng-model="fromPlaceholder.label"
+          required>
+          <option value=""></option>
+          <option ng-repeat="frm in crmFromAddresses.getAll() | filter:{is_active:1} | orderBy:'weight'" value="{{frm.label}}">{{frm.label}}</option>
+        </select>
+      </div>
+    </div>
+    <div crm-ui-field="{name: 'subform.replyTo', title: ts('Reply-To')}" ng-show="crmMailingConst.enableReplyTo">
+      <div ng-controller="EmailAddrCtrl">
+        <select
+          crm-ui-id="subform.replyTo"
+          crm-ui-select="{dropdownAutoWidth : true, allowClear: true, placeholder: ts('Email address')}"
+          name="replyTo"
+          ng-change="checkReplyToChange(mailing)"
+          ng-model="mailing.replyto_email"
+          >
+          <option value=""></option>
+          <option ng-repeat="frm in crmFromAddresses.getAll() | filter:{is_active:1} | orderBy:'weight'" value="{{frm.label}}">{{frm.label}}</option>
+        </select>
+      </div>
+    </div>
+    <div crm-mailing-block-recipients-multiline="{name: 'recipients'}" crm-mailing="mailing"></div>
+    <span ng-controller="EditUnsubGroupCtrl">
+      <div crm-ui-field="{name: 'subform.baseGroup', title: ts('Unsubscribe Group')}" ng-if="isUnsubGroupRequired(mailing)">
+        <input
+          crm-entityref="{entity: 'Group', api: {params: {is_hidden: 0, is_active: 1}}, select: {allowClear:true, minimumInputLength: 0}}"
+          crm-ui-id="subform.baseGroup"
+          name="baseGroup"
+          ng-model="mailing.recipients.groups.base[0]"
+          ng-required="true"
+        />
+      </div>
+    </span>
+    <div crm-ui-field="{name: 'subform.subject', title: ts('Subject')}">
+      <div style="float: right;">
+        <input crm-mailing-token on-select="$broadcast('insert:subject', token.name)" tabindex="-1"/>
+      </div>
+      <input
+        crm-ui-id="subform.subject"
+        crm-ui-insert-rx="insert:subject"
+        type="text"
+        class="crm-form-text"
+        ng-model="mailing.subject"
+        required
+        placeholder="Subject"
+        name="subject" />
+    </div>
+    <div ng-if="crmMailingConst.isMultiLingual">
+      <div crm-ui-field="{name: 'subform.language', title: ts('Language')}">
+        <select
+          crm-ui-id="subform.language"
+          crm-ui-select="{dropdownAutoWidth : true, allowClear: false, placeholder: ts('- choose language -')}"
+          name="language"
+          ng-model="mailing.language"
+          required
+          >
+          <option value=""></option>
+          <option ng-repeat="(key,val) in crmMailingConst.enabledLanguages" value="{{key}}">{{val}}</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>

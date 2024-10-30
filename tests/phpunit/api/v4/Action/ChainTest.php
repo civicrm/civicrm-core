@@ -40,7 +40,7 @@ class ChainTest extends Api4TestBase implements TransactionalInterface {
     parent::tearDown();
   }
 
-  public function testGetActionsWithFields() {
+  public function testGetActionsWithFields(): void {
     $actions = \Civi\Api4\Activity::getActions()
       ->addChain('fields', \Civi\Api4\Activity::getFields()->setAction('$name'), 'name')
       ->execute()
@@ -49,7 +49,7 @@ class ChainTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('Array', $actions['getActions']['fields']['params']['data_type']);
   }
 
-  public function testGetEntityWithActions() {
+  public function testGetEntityWithActions(): void {
     $entities = \Civi\Api4\Entity::get()
       ->addSelect('name')
       ->setChain([
@@ -59,11 +59,11 @@ class ChainTest extends Api4TestBase implements TransactionalInterface {
       ->indexBy('name');
 
     $this->assertArrayHasKey('replace', $entities['Contact']['actions']);
-    $this->assertArrayHasKey('getLinks', $entities['Entity']['actions']);
+    $this->assertArrayHasKey('autocomplete', $entities['Entity']['actions']);
     $this->assertArrayNotHasKey('replace', $entities['Entity']['actions']);
   }
 
-  public function testContactCreateWithGroup() {
+  public function testContactCreateWithGroup(): void {
     $firstName = uniqid('cwtf');
     $lastName = uniqid('cwtl');
 
@@ -81,7 +81,7 @@ class ChainTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals($contact['group']['id'], $contact['check_group'][0]['group_id']);
   }
 
-  public function testWithContactRef() {
+  public function testWithContactRef(): void {
     CustomGroup::create()
       ->setCheckPermissions(FALSE)
       ->addValue('title', 'TestActCus')

@@ -102,7 +102,7 @@ class CRM_Contact_Form_Search_Custom_Proximity extends CRM_Contact_Form_Search_C
     $group = ['' => ts('- any group -')] + CRM_Core_PseudoConstant::nestedGroup();
     $form->addElement('select', 'group', ts('Group'), $group, ['class' => 'crm-select2 huge']);
 
-    $tag = ['' => ts('- any tag -')] + CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', ['onlyActive' => FALSE]);
+    $tag = ['' => ts('- any tag -')] + CRM_Core_DAO_EntityTag::buildOptions('tag_id', 'get');
     $form->addElement('select', 'tag', ts('Tag'), $tag, ['class' => 'crm-select2 huge']);
 
     /**
@@ -278,8 +278,8 @@ class CRM_Contact_Form_Search_Custom_Proximity extends CRM_Contact_Form_Search_C
   public function formRule($fields, $files, $self) {
     $this->addGeocodingData($fields);
 
-    if (!is_numeric(CRM_Utils_Array::value('geo_code_1', $fields)) ||
-      !is_numeric(CRM_Utils_Array::value('geo_code_2', $fields)) ||
+    if (!is_numeric($fields['geo_code_1'] ?? '') ||
+      !is_numeric($fields['geo_code_2'] ?? '') ||
       !isset($fields['distance'])
     ) {
       $errorMessage = ts('Could not determine co-ordinates for provided data');

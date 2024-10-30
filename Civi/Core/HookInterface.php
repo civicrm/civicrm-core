@@ -33,6 +33,7 @@ namespace Civi\Core;
  * If you need more advanced registration abilities, consider using `Civi::dispatcher()`
  * or `EventDispatcherInterface`.
  *
+ * @serviceTags event_subscriber
  * @see \Civi\Core\Event\EventScanner::findListeners
  */
 interface HookInterface {

@@ -18,7 +18,7 @@ namespace Civi\Api4;
  * @since 5.43
  * @package Civi\Api4
  */
-class ExampleData extends \Civi\Api4\Generic\AbstractEntity {
+class ExampleData extends Generic\AbstractEntity {
 
   /**
    * @param bool $checkPermissions

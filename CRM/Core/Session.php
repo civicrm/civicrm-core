@@ -207,18 +207,18 @@ class CRM_Core_Session {
   }
 
   /**
-   * Store the variable with the value in the session scope.
-   *
-   * This function takes a name, value pair and stores this
-   * in the session scope. Not sure what happens if we try
-   * to store complex objects in the session. I suspect it
-   * is supported but we need to verify this
-   *
+   * Store a name-value pair in the session scope.
    *
    * @param string $name
    *   Name of the variable.
    * @param mixed $value
-   *   Value of the variable.
+   *   Value of the variable. It is safe to use scalar values here, as well as
+   *   arrays whose leaf nodes are scalar values. Instances of built-in classes
+   *   like DateTime may be safe, although the retrieved objects will be copies
+   *   of the ones saved here. Instances of custom classes (such as those
+   *   defined in CiviCRM core or extension code) will probably not be rebuilt
+   *   correctly on retrieval. Resources and other special variable types are
+   *   not safe to use. References will be dereferenced.
    * @param string $prefix
    *   A string to prefix the keys in the session with.
    */
@@ -325,7 +325,7 @@ class CRM_Core_Session {
     $ts = $this->get($name, 'timer');
     if (!$ts || $ts < time() - $expire) {
       $this->set($name, time(), 'timer');
-      return $ts ? $ts : 'not set';
+      return $ts ?: 'not set';
     }
     return FALSE;
   }
@@ -431,13 +431,13 @@ class CRM_Core_Session {
    * @param bool $reset
    *   Should we reset the status variable?.
    *
-   * @return string
+   * @return array
    *   the status message if any
    */
-  public function getStatus($reset = FALSE) {
+  public function getStatus($reset = FALSE) : array {
     $this->initialize();
 
-    $status = NULL;
+    $status = [];
     if (array_key_exists('status', $this->_session[$this->_key])) {
       $status = $this->_session[$this->_key]['status'];
     }
@@ -502,7 +502,7 @@ class CRM_Core_Session {
         'text' => $text,
         'title' => $title,
         'type' => $type,
-        'options' => $options ? $options : NULL,
+        'options' => $options ?: NULL,
       ];
     }
   }
@@ -550,12 +550,9 @@ class CRM_Core_Session {
    * @return int|null
    *   contact ID of logged in user
    */
-  public static function getLoggedInContactID() {
-    $session = CRM_Core_Session::singleton();
-    if (!is_numeric($session->get('userID'))) {
-      return NULL;
-    }
-    return (int) $session->get('userID');
+  public static function getLoggedInContactID(): ?int {
+    $userId = CRM_Core_Session::singleton()->get('userID');
+    return is_numeric($userId) ? (int) $userId : NULL;
   }
 
   /**
@@ -565,12 +562,12 @@ class CRM_Core_Session {
    *
    * @throws CRM_Core_Exception
    */
-  public function getLoggedInContactDisplayName() {
+  public function getLoggedInContactDisplayName(): string {
     $userContactID = CRM_Core_Session::getLoggedInContactID();
     if (!$userContactID) {
       return '';
     }
-    return civicrm_api3('Contact', 'getvalue', ['id' => $userContactID, 'return' => 'display_name']);
+    return CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $userContactID, 'display_name') ?? '';
   }
 
   /**

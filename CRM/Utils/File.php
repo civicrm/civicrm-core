@@ -21,6 +21,11 @@
 class CRM_Utils_File {
 
   /**
+   * Used to remove md5 hash that was injected into uploaded file names.
+   */
+  const HASH_REMOVAL_PATTERN = '/_[a-f0-9]{32}\./';
+
+  /**
    * Given a file name, determine if the file contents make it an ascii file
    *
    * @param string $name
@@ -46,36 +51,6 @@ class CRM_Utils_File {
 
     fclose($fd);
     return $ascii;
-  }
-
-  /**
-   * Given a file name, determine if the file contents make it an html file
-   *
-   * @param string $name
-   *   Name of file.
-   *
-   * @return bool
-   *   true if file is html
-   */
-  public static function isHtml($name) {
-    $fd = fopen($name, "r");
-    if (!$fd) {
-      return FALSE;
-    }
-
-    $html = FALSE;
-    $lineCount = 0;
-    while (!feof($fd) & $lineCount <= 5) {
-      $lineCount++;
-      $line = fgets($fd, 8192);
-      if (!CRM_Utils_String::isHtml($line)) {
-        $html = TRUE;
-        break;
-      }
-    }
-
-    fclose($fd);
-    return $html;
   }
 
   /**
@@ -120,26 +95,55 @@ class CRM_Utils_File {
    * @param bool $rmdir
    * @param bool $verbose
    *
-   * @throws Exception
+   * @throws \CRM_Core_Exception
    */
-  public static function cleanDir($target, $rmdir = TRUE, $verbose = TRUE) {
+  public static function cleanDir(string $target, bool $rmdir = TRUE, bool $verbose = TRUE) {
     static $exceptions = ['.', '..'];
-    if ($target == '' || $target == '/' || !$target) {
-      throw new Exception("Overly broad deletion");
+    if (!$target || $target === '/') {
+      throw new CRM_Core_Exception('Overly broad deletion');
+    }
+
+    $target = rtrim($target, '/' . DIRECTORY_SEPARATOR);
+
+    if (!file_exists($target) && !is_link($target)) {
+      return;
+    }
+
+    if (!is_dir($target)) {
+      CRM_Core_Session::setStatus(ts('cleanDir() can only remove directories. %1 is not a directory.', [1 => $target]), ts('Warning'), 'error');
+      return;
+    }
+
+    if (is_link($target) /* it's a directory based on a symlink... no need to recurse... */) {
+      if ($rmdir) {
+        static::try_unlink($target, 'symlink');
+      }
+      return;
     }
 
     if ($dh = @opendir($target)) {
       while (FALSE !== ($sibling = readdir($dh))) {
         if (!in_array($sibling, $exceptions)) {
           $object = $target . DIRECTORY_SEPARATOR . $sibling;
-
-          if (is_dir($object)) {
+          if (is_link($object)) {
+            // Strangely, symlinks to directories under Windows need special treatment
+            if (PHP_OS_FAMILY === "Windows" && is_dir($object)) {
+              if (!rmdir($object)) {
+                CRM_Core_Session::setStatus(ts('Unable to remove directory symlink %1', [1 => $object]), ts('Warning'), 'error');
+              }
+            }
+            else {
+              CRM_Utils_File::try_unlink($object, "symlink");
+            }
+          }
+          elseif (is_dir($object)) {
             CRM_Utils_File::cleanDir($object, $rmdir, $verbose);
           }
           elseif (is_file($object)) {
-            if (!unlink($object)) {
-              CRM_Core_Session::setStatus(ts('Unable to remove file %1', [1 => $object]), ts('Warning'), 'error');
-            }
+            CRM_Utils_File::try_unlink($object, "file");
+          }
+          else {
+            CRM_Utils_File::try_unlink($object, "other filesystem object");
           }
         }
       }
@@ -156,6 +160,15 @@ class CRM_Utils_File {
           CRM_Core_Session::setStatus(ts('Unable to remove directory %1', [1 => $target]), ts('Warning'), 'error');
         }
       }
+    }
+  }
+
+  /**
+   * Helper function to avoid repetition in cleanDir: execute unlink and produce a warning on failure.
+   */
+  private static function try_unlink($object, $description) {
+    if (!unlink($object)) {
+      CRM_Core_Session::setStatus(ts('Unable to remove %1 %2', [1 => $description, 2 => $object]), ts('Warning'), 'error');
     }
   }
 
@@ -242,11 +255,7 @@ class CRM_Utils_File {
 
     $written = fwrite($file, $contents);
     $closed = fclose($file);
-    if ($written === FALSE or !$closed) {
-      return FALSE;
-    }
-
-    return TRUE;
+    return !($written === FALSE or !$closed);
   }
 
   /**
@@ -311,11 +320,14 @@ class CRM_Utils_File {
   }
 
   /**
+   * Runs an SQL query.
    *
    * @param string|null $dsn
    * @param string $queryString
    * @param string $prefix
    * @param bool $dieOnErrors
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function runSqlQuery($dsn, $queryString, $prefix = NULL, $dieOnErrors = TRUE) {
     $string = $prefix . $queryString;
@@ -331,7 +343,7 @@ class CRM_Utils_File {
         $db = DB::connect($dsn, $options);
       }
       catch (Exception $e) {
-        die("Cannot open $dsn: " . $e->getMessage());
+        throw new CRM_Core_Exception("Cannot open $dsn: " . $e->getMessage());
       }
     }
 
@@ -353,7 +365,7 @@ class CRM_Utils_File {
         }
         catch (Exception $e) {
           if ($dieOnErrors) {
-            die("Cannot execute $query: " . $e->getMessage());
+            throw new CRM_Core_Exception("Cannot execute $query: " . $e->getMessage());
           }
           else {
             echo "Cannot execute $query: " . $e->getMessage() . "<p>";
@@ -382,8 +394,7 @@ class CRM_Utils_File {
    * @return bool
    */
   public static function isExtensionSafe($ext) {
-    static $extensions = NULL;
-    if (!$extensions) {
+    if (!isset(Civi::$statics[__CLASS__]['file_extensions'])) {
       $extensions = CRM_Core_OptionGroup::values('safe_file_extension', TRUE);
 
       // make extensions to lowercase
@@ -400,9 +411,11 @@ class CRM_Utils_File {
         unset($extensions['html']);
         unset($extensions['htm']);
       }
+      Civi::$statics[__CLASS__]['file_extensions'] = $extensions;
     }
+    $restricted = CRM_Utils_Constant::value('CIVICRM_RESTRICTED_UPLOADS', '/(php|php\d|phtml|phar|pl|py|cgi|asp|js|sh|exe|pcgi\d)/i');
     // support lower and uppercase file extensions
-    return (bool) isset($extensions[strtolower($ext)]);
+    return (bool) isset(Civi::$statics[__CLASS__]['file_extensions'][strtolower($ext)]) && !preg_match($restricted, strtolower($ext));
   }
 
   /**
@@ -423,7 +436,10 @@ class CRM_Utils_File {
   }
 
   /**
-   * Remove the 32 bit md5 we add to the fileName also remove the unknown tag if we added it.
+   * Remove 32 bit md5 hash prepended to the file suffix.
+   *
+   * Note: if the filename was munged with an `.unknown` suffix, this removes
+   * the md5 but doesn't undo the munging or remove the `.unknown` suffix.
    *
    * @param $name
    *
@@ -431,7 +447,7 @@ class CRM_Utils_File {
    */
   public static function cleanFileName($name) {
     // replace the last 33 character before the '.' with null
-    $name = preg_replace('/(_[\w]{32})\./', '.', $name);
+    $name = preg_replace(self::HASH_REMOVAL_PATTERN, '.', $name);
     return $name;
   }
 
@@ -439,23 +455,30 @@ class CRM_Utils_File {
    * Make a valid file name.
    *
    * @param string $name
+   * @param bool $unicode
    *
    * @return string
    */
-  public static function makeFileName($name) {
+  public static function makeFileName($name, bool $unicode = FALSE) {
     $uniqID = md5(uniqid(rand(), TRUE));
     $info = pathinfo($name);
     $basename = substr($info['basename'],
-      0, -(strlen(CRM_Utils_Array::value('extension', $info, '')) + (CRM_Utils_Array::value('extension', $info, '') == '' ? 0 : 1))
+      0, -(strlen($info['extension'] ?? '') + (($info['extension'] ?? '') == '' ? 0 : 1))
     );
-    if (!self::isExtensionSafe(CRM_Utils_Array::value('extension', $info, ''))) {
+    if (!self::isExtensionSafe($info['extension'] ?? '')) {
+      if ($unicode) {
+        return self::makeFilenameWithUnicode("{$basename}_" . ($info['extension'] ?? '') . "_{$uniqID}", '_', 240) . ".unknown";
+      }
       // munge extension so it cannot have an embbeded dot in it
       // The maximum length of a filename for most filesystems is 255 chars.
       // We'll truncate at 240 to give some room for the extension.
-      return CRM_Utils_String::munge("{$basename}_" . CRM_Utils_Array::value('extension', $info) . "_{$uniqID}", '_', 240) . ".unknown";
+      return CRM_Utils_String::munge("{$basename}_" . ($info['extension'] ?? '') . "_{$uniqID}", '_', 240) . ".unknown";
     }
     else {
-      return CRM_Utils_String::munge("{$basename}_{$uniqID}", '_', 240) . "." . CRM_Utils_Array::value('extension', $info);
+      if ($unicode) {
+        return self::makeFilenameWithUnicode("{$basename}_{$uniqID}", '_', 240) . "." . ($info['extension'] ?? '');
+      }
+      return CRM_Utils_String::munge("{$basename}_{$uniqID}", '_', 240) . "." . ($info['extension'] ?? '');
     }
   }
 
@@ -509,7 +532,7 @@ class CRM_Utils_File {
     if ($dh = opendir($path)) {
       while (FALSE !== ($elem = readdir($dh))) {
         if (substr($elem, -(strlen($ext) + 1)) == '.' . $ext) {
-          $files[] .= $path . $elem;
+          $files[] = $path . $elem;
         }
       }
       closedir($dh);
@@ -744,9 +767,13 @@ HTACCESS;
    *   glob pattern, eg "*.txt".
    * @param bool $relative
    *   TRUE if paths should be made relative to $dir
+   * @param int|null $maxDepth
+   *   Maximum depth of subdirs to check.
+   *   For no limit, use NULL.
+   *
    * @return array(string)
    */
-  public static function findFiles($dir, $pattern, $relative = FALSE) {
+  public static function findFiles($dir, $pattern, $relative = FALSE, ?int $maxDepth = NULL) {
     if (!is_dir($dir) || !is_readable($dir)) {
       return [];
     }
@@ -757,7 +784,8 @@ HTACCESS;
       ? constant('CIVICRM_EXCLUDE_DIRS_PATTERN')
       : '@' . preg_quote(DIRECTORY_SEPARATOR) . '\.@';
 
-    $dir = rtrim($dir, '/');
+    $dir = rtrim($dir, '/' . DIRECTORY_SEPARATOR);
+    $baseDepth = static::findPathDepth($dir);
     $todos = [$dir];
     $result = [];
     while (!empty($todos)) {
@@ -771,13 +799,34 @@ HTACCESS;
         }
       }
       // Find subdirs to recurse into.
-      $subdirs = glob("$subdir/*", GLOB_ONLYDIR);
-      if (!empty($excludeDirsPattern)) {
-        $subdirs = preg_grep($excludeDirsPattern, $subdirs, PREG_GREP_INVERT);
+      $depth = static::findPathDepth($subdir) - $baseDepth + 1;
+      if ($maxDepth === NULL || $depth <= $maxDepth) {
+        $subdirs = glob("$subdir/*", GLOB_ONLYDIR);
+        if (!empty($excludeDirsPattern)) {
+          $subdirs = preg_grep($excludeDirsPattern, $subdirs, PREG_GREP_INVERT);
+        }
+        $todos = array_merge($todos, $subdirs);
       }
-      $todos = array_merge($todos, $subdirs);
     }
     return $result;
+  }
+
+  /**
+   * Determine the absolute depth of a path expression.
+   *
+   * @param string $path
+   *   Ex: '/var/www/foo'
+   * @return int
+   *   Ex: 3
+   */
+  private static function findPathDepth(string $path): int {
+    // Both PHP-Unix and PHP-Windows support '/'s. Additionally, PHP-Windows also supports '\'s.
+    // They are roughly equivalent. (The differences are described by a secret book hidden in the tower of Mordor.)
+    $depth = substr_count($path, '/');
+    if (DIRECTORY_SEPARATOR !== '/') {
+      $depth += substr_count($path, DIRECTORY_SEPARATOR);
+    }
+    return $depth;
   }
 
   /**
@@ -797,6 +846,11 @@ HTACCESS;
         return FALSE;
       }
     }
+
+    // windows fix
+    $parent = str_replace(DIRECTORY_SEPARATOR, '/', $parent);
+    $child = str_replace(DIRECTORY_SEPARATOR, '/', $child);
+
     $parentParts = explode('/', rtrim($parent, '/'));
     $childParts = explode('/', rtrim($child, '/'));
     while (($parentPart = array_shift($parentParts)) !== NULL) {
@@ -892,8 +946,8 @@ HTACCESS;
       case 'image/x-png':
       case 'image/png':
       case 'image/jpg':
-        list($imageWidth, $imageHeight) = getimagesize($path);
-        list($imageThumbWidth, $imageThumbHeight) = CRM_Contact_BAO_Contact::getThumbSize($imageWidth, $imageHeight);
+        [$imageWidth, $imageHeight] = getimagesize($path);
+        [$imageThumbWidth, $imageThumbHeight] = CRM_Contact_BAO_Contact::getThumbSize($imageWidth, $imageHeight);
         $url = "<a href=\"$url\" class='crm-image-popup'>
           <img src=\"$url\" width=$imageThumbWidth height=$imageThumbHeight/>
           </a>";
@@ -1141,6 +1195,25 @@ HTACCESS;
       restore_error_handler();
     }
     return $is_dir;
+  }
+
+  /**
+   * Get the maximum file size permitted for upload.
+   *
+   * This function contains logic to check the server setting if none
+   * is configured. It is unclear if this is still relevant but perhaps it is no
+   * harm-no-foul.
+   *
+   * @return int
+   *   Size in mega-bytes.
+   */
+  public static function getMaxFileSize(): int {
+    $maxFileSizeMegaBytes = \Civi::settings()->get('maxFileSize');
+    //Fetch maxFileSizeMegaBytes from php_ini when $config->maxFileSize is set to "no limit".
+    if (empty($maxFileSizeMegaBytes)) {
+      $maxFileSizeMegaBytes = round((CRM_Utils_Number::formatUnitSize(ini_get('upload_max_filesize')) / (1024 * 1024)), 2);
+    }
+    return $maxFileSizeMegaBytes;
   }
 
 }

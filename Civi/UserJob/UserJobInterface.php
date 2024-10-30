@@ -18,6 +18,8 @@ interface UserJobInterface {
    *  - name
    *  - id (generally the same as name)
    *  - label
+   *  - entity
+   *  - url
    *
    *  e.g. ['activity_import' => ['id' => 'activity_import', 'label' => ts('Activity Import'), 'name' => 'activity_import']]
    *

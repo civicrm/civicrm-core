@@ -1,0 +1,47 @@
+#!/usr/bin/env php
+<?php
+
+/*
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
+ */
+
+// The purpose of this script is to copy the basic scaffolding required by standalone.
+
+// Example: Add the scaffolding to Debian-style HTTPD root
+// $ php tools/standalone/scaffold.php /var/www
+
+// Example: Add the scaffolding to a folder in this directory
+// $ php tools/standalone/scaffold.php ./srv
+
+
+if (PHP_SAPI !== 'cli') {
+  die("GenCode can only be run from command line.");
+}
+
+require_once dirname(__DIR__, 3) . '/setup/src/Setup/StandaloneScaffold.php';
+
+$destDir = rtrim($argv[1] ?? '', DIRECTORY_SEPARATOR);
+$mode = 'copy'; /* TODO: Try out symlinks... */
+switch ($argv[2] ?? '') {
+  case '--copy':
+  case '--symlink':
+  case '--auto':
+    $mode = substr($argv[2], 2);
+}
+
+if (empty($destDir)) {
+  fprintf(STDERR, "usage: php %s <folder> [--copy|--symlink|--auto] \n", basename(__FILE__));
+  exit(1);
+}
+else {
+  \Civi\Setup\StandaloneScaffold::create([
+    'scaffold-dir' => $destDir,
+    'scaffold-mode' => $mode,
+  ]);
+}

@@ -33,7 +33,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
   /**
    * Test case for add( ).
    */
-  public function testAddSimple() {
+  public function testAddSimple(): void {
 
     $checkParams = $params = [
       'title' => 'Group Uno',
@@ -42,7 +42,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
       'is_active' => 1,
     ];
 
-    $group = CRM_Contact_BAO_Group::create($params);
+    $group = CRM_Contact_BAO_Group::writeRecord($params);
 
     $this->assertDBCompareValues(
       'CRM_Contact_DAO_Group',
@@ -67,7 +67,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
       'visibility' => 'User and User Admin Only',
       'is_active' => 1,
     ];
-    $group1 = CRM_Contact_BAO_Group::create($params);
+    $group1 = CRM_Contact_BAO_Group::writeRecord($params);
 
     $params = array_merge($params, [
       'name' => 'parent group b',
@@ -76,7 +76,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
       // disable
       'is_active' => 0,
     ]);
-    $group2 = CRM_Contact_BAO_Group::create($params);
+    $group2 = CRM_Contact_BAO_Group::writeRecord($params);
 
     $params = array_merge($params, [
       'name' => 'parent group c',
@@ -87,7 +87,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
         $group2->id => 1,
       ],
     ]);
-    $group3 = CRM_Contact_BAO_Group::create($params);
+    $group3 = CRM_Contact_BAO_Group::writeRecord($params);
 
     $params = [
       $group1->id => 1,
@@ -117,7 +117,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
       // mailing group
       'group_type' => ['2' => 1],
     ];
-    $group1 = CRM_Contact_BAO_Group::create($params);
+    $group1 = CRM_Contact_BAO_Group::writeRecord($params);
 
     $params = [
       'name' => 'group b',
@@ -126,7 +126,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
       'visibility' => 'User and User Admin Only',
       'is_active' => 1,
     ];
-    $group2 = CRM_Contact_BAO_Group::create($params);
+    $group2 = CRM_Contact_BAO_Group::writeRecord($params);
 
     $params = [
       'name' => 'group c',
@@ -139,7 +139,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
       ],
       'group_type' => ['2' => 1],
     ];
-    $group3 = CRM_Contact_BAO_Group::create($params);
+    $group3 = CRM_Contact_BAO_Group::writeRecord($params);
 
     unset(Civi::$statics['CRM_Core_Permission_Base']);
     // Check with no group type restriction
@@ -247,7 +247,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
    *  Copy the output to a single sql file and place in the SavedSearchDataSets folder - use the group number as the prefix.
    *  Try to keep as much of the real world irregular glory as you can! Don't change the table ids to be number 1 as this can hide errors
    */
-  public function testGroupData() {
+  public function testGroupData(): void {
     $groups = $this->dataProviderSavedSearch();
     foreach ($groups[0] as $groupID) {
       $group = new CRM_Contact_BAO_Group();
@@ -261,7 +261,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
   /**
    * Ensure that when updating a group with a linked organisation record even tho that record's id doesn't match the group id no db error is produced
    */
-  public function testGroupUpdateWithOrganization() {
+  public function testGroupUpdateWithOrganization(): void {
     $params = [
       'name' => uniqid(),
       'title' => 'Group A',
@@ -269,7 +269,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
       'visibility' => 'User and User Admin Only',
       'is_active' => 1,
     ];
-    $group1 = CRM_Contact_BAO_Group::create($params);
+    $group1 = CRM_Contact_BAO_Group::writeRecord($params);
 
     $domain1 = $this->callAPISuccess('Domain', 'get', ['id' => 1]);
     $params2 = [
@@ -280,7 +280,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
       'is_active' => 1,
       'organization_id' => $domain1['values'][1]['contact_id'],
     ];
-    $group2 = CRM_Contact_BAO_Group::create($params2);
+    $group2 = CRM_Contact_BAO_Group::writeRecord($params2);
 
     $domain2 = $this->callAPISuccess('Domain', 'get', ['id' => 2]);
     $params3 = [
@@ -291,15 +291,15 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
       'is_active' => 1,
       'organization_id' => $domain2['values'][2]['contact_id'],
     ];
-    $group3 = CRM_Contact_BAO_Group::create($params3);
+    $group3 = CRM_Contact_BAO_Group::writeRecord($params3);
     $params2['id'] = $group2->id;
-    $testUpdate = CRM_Contact_BAO_Group::create($params2);
+    $testUpdate = CRM_Contact_BAO_Group::writeRecord($params2);
   }
 
   /**
    * Ensure that when hidden smart group is created, wildcard string value is not ignored
    */
-  public function testHiddenSmartGroup() {
+  public function testHiddenSmartGroup(): void {
     $customGroup = $this->customGroupCreate();
     $fields = [
       'label' => 'testFld',
@@ -337,7 +337,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
    * Test updating a group with just description and check the recent items
    * list has the right title.
    */
-  public function testGroupUpdateDescription() {
+  public function testGroupUpdateDescription(): void {
     // Create a group. Copied from $this->testAddSimple().
     // Note we need $checkParams because the function call changes $params.
     $checkParams = $params = [
@@ -346,14 +346,14 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
       'visibility' => 'User and User Admin Only',
       'is_active' => 1,
     ];
-    $group = CRM_Contact_BAO_Group::create($params);
+    $group = CRM_Contact_BAO_Group::writeRecord($params);
 
     // Update the group with just id and description.
     $newParams = [
       'id' => $group->id,
       'description' => 'The first group',
     ];
-    CRM_Contact_BAO_Group::create($newParams);
+    CRM_Contact_BAO_Group::writeRecord($newParams);
 
     // Check it against original array, except description.
     $result = $this->callAPISuccess('Group', 'getsingle', ['id' => $group->id]);

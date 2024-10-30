@@ -31,8 +31,9 @@ class CRM_Core_Page_AJAX_Location {
    * @throws \CRM_Core_Exception
    */
   public static function getPermissionedLocation() {
+    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
     $cid = CRM_Utils_Request::retrieve('cid', 'Integer', CRM_Core_DAO::$_nullObject, TRUE);
-    $ufId = CRM_Utils_Request::retrieve('ufId', 'Integer', CRM_Core_DAO::$_nullObject, TRUE);
+    $ufID = CRM_Utils_Request::retrieve('ufID', 'Integer', CRM_Core_DAO::$_nullObject, TRUE);
 
     // Verify user id
     $user = CRM_Utils_Request::retrieve('uid', 'Integer', CRM_Core_DAO::$_nullObject, FALSE, CRM_Core_Session::singleton()
@@ -54,7 +55,7 @@ class CRM_Core_Page_AJAX_Location {
 
     $addressSequence = array_flip(CRM_Utils_Address::sequence(\Civi::settings()->get('address_format')));
 
-    $profileFields = CRM_Core_BAO_UFGroup::getFields($ufId, FALSE, CRM_Core_Action::VIEW, NULL, NULL, FALSE,
+    $profileFields = CRM_Core_BAO_UFGroup::getFields($ufID, FALSE, CRM_Core_Action::VIEW, NULL, NULL, FALSE,
       NULL, FALSE, NULL, CRM_Core_Permission::CREATE, NULL
     );
     $website = CRM_Core_BAO_Website::getValues($entityBlock, $values);
@@ -155,7 +156,7 @@ class CRM_Core_Page_AJAX_Location {
               $elements["onbehalf_{$key}"]['value'][$k] = $v;
             }
           }
-          elseif (strstr($htmlType, 'Multi-Select')) {
+          elseif (str_contains($htmlType, 'Multi-Select')) {
             $elements["onbehalf_{$key}"]['type'] = 'Multi-Select';
             $elements["onbehalf_{$key}"]['value'] = array_values($defaults[$key]);
           }
@@ -183,14 +184,17 @@ class CRM_Core_Page_AJAX_Location {
   }
 
   public static function jqState() {
+    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
     CRM_Utils_JSON::output(CRM_Core_BAO_Location::getChainSelectValues($_GET['_value'], 'country'));
   }
 
   public static function jqCounty() {
+    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
     CRM_Utils_JSON::output(CRM_Core_BAO_Location::getChainSelectValues($_GET['_value'], 'stateProvince'));
   }
 
   public static function getLocBlock() {
+    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
     // i wish i could retrieve loc block info based on loc_block_id,
     // Anyway, lets retrieve an event which has loc_block_id set to 'lbid'.
     if ($_REQUEST['lbid']) {
@@ -210,15 +214,8 @@ class CRM_Core_Page_AJAX_Location {
     );
     // lets output only required fields.
     foreach ($addressOptions as $element => $isSet) {
-      if ($isSet && (!in_array($element, [
-        'im',
-        'openid',
-      ]))) {
-        if (in_array($element, [
-          'country',
-          'state_province',
-          'county',
-        ])) {
+      if ($isSet && (!in_array($element, ['im', 'openid']))) {
+        if (in_array($element, ['country', 'state_province', 'county'])) {
           $element .= '_id';
         }
         elseif ($element == 'address_name') {
@@ -226,30 +223,18 @@ class CRM_Core_Page_AJAX_Location {
         }
         $fld = "address[1][{$element}]";
         $value = $location['address'][1][$element] ?? NULL;
-        $value = $value ? $value : "";
-        $result[str_replace([
-          '][',
-          '[',
-          "]",
-        ], ['_', '_', ''], $fld)] = $value;
+        $value = $value ?: "";
+        $result[str_replace(['][', '[', ']'], ['_', '_', ''], $fld)] = $value;
       }
     }
 
-    foreach ([
-      'email',
-      'phone_type_id',
-      'phone',
-    ] as $element) {
+    foreach (['email', 'phone_type_id', 'phone'] as $element) {
       $block = ($element == 'phone_type_id') ? 'phone' : $element;
       for ($i = 1; $i < 3; $i++) {
         $fld = "{$block}[{$i}][{$element}]";
         $value = $location[$block][$i][$element] ?? NULL;
-        $value = $value ? $value : "";
-        $result[str_replace([
-          '][',
-          '[',
-          "]",
-        ], ['_', '_', ''], $fld)] = $value;
+        $value = $value ?: "";
+        $result[str_replace(['][', '[', ']'], ['_', '_', ''], $fld)] = $value;
       }
     }
 

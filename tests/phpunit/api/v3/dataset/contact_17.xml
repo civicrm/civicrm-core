@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!--  $Id: contact_17.xml 30511 2010-11-03 11:36:36Z shot $  -->
 <dataset>
   <table name="civicrm_contact">
     <column>id</column>
@@ -19,7 +18,6 @@
     <column>legal_name</column>
     <column>image_URL</column>
     <column>preferred_communication_method</column>
-    <column>preferred_mail_format</column>
     <column>hash</column>
     <column>api_key</column>
     <column>source</column>
@@ -63,7 +61,6 @@
       <null /><!--  legal_name  -->
       <null /><!--  image_URL  -->
       <null /><!--  preferred_communication_method  -->
-      <null /><!--  preferred_mail_format  -->
       <null /><!--  hash  -->
       <null /><!--  api_key  -->
       <null /><!--  source  -->

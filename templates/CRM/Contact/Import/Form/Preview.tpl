@@ -26,7 +26,6 @@
 
     <p>{ts}Click 'Import Now' if you are ready to proceed.{/ts}</p>
 </div>
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
 
 <div id="preview-info">
  {* Summary Preview (record counts) *}
@@ -57,10 +56,10 @@
 
  {* Group options *}
  {* New Group *}
-<div id="new-group" class="crm-accordion-wrapper collapsed">
- <div class="crm-accordion-header">
+<details id="new-group" class="crm-accordion-bold">
+ <summary>
     {ts}Add imported records to a new group{/ts}
- </div><!-- /.crm-accordion-header -->
+ </summary>
  <div class="crm-accordion-body">
             <table class="form-layout-compressed">
              <tr>
@@ -76,30 +75,30 @@
                <td>{$form.newGroupType.html}</td>
              </tr>
             </table>
- </div><!-- /.crm-accordion-body -->
-</div><!-- /.crm-accordion-wrapper -->
+ </div>
+</details>
 
 
       {* Existing Group *}
 
-<div id="existing-groups" class="crm-accordion-wrapper crm-existing_group-accordion {if !empty($form.groups)} {else}collapsed{/if}">
- <div class="crm-accordion-header">
+<details id="existing-groups" class="crm-accordion-bold crm-existing_group-accordion" {if !empty($form.groups)}open{/if}>
+ <summary>
   {$form.groups.label}
- </div><!-- /.crm-accordion-header -->
+ </summary>
  <div class="crm-accordion-body">
 
         <div class="form-item">
         <table><tr><td style="width: 14em;"></td><td>{$form.groups.html}</td></tr></table>
         </div>
- </div><!-- /.crm-accordion-body -->
-</div><!-- /.crm-accordion-wrapper -->
+ </div>
+</details>
 
     {* Tag options *}
     {* New Tag *}
-<div id="new-tag" class="crm-accordion-wrapper collapsed">
- <div class="crm-accordion-header">
+<details id="new-tag" class="crm-accordion-bold">
+ <summary>
   {ts}Create a new tag and assign it to imported records{/ts}
- </div><!-- /.crm-accordion-header -->
+ </summary>
  <div class="crm-accordion-body">
 
   <div class="form-item">
@@ -114,14 +113,14 @@
            </tr>
         </table>
     </div>
- </div><!-- /.crm-accordion-body -->
-</div><!-- /.crm-accordion-wrapper -->
+ </div>
+</details>
     {* Existing Tag Imported Contact *}
 
-<div id="existing-tags" class="crm-accordion-wrapper collapsed">
- <div class="crm-accordion-header">
+<details id="existing-tags" class="crm-accordion-bold">
+ <summary>
   {ts}Tag imported records{/ts}
-</div><!-- /.crm-accordion-header -->
+</summary>
  <div class="crm-accordion-body">
 
         <table class="form-layout-compressed">
@@ -131,25 +130,11 @@
             </td>
           </tr>
         </table>
- </div><!-- /.crm-accordion-body -->
-</div><!-- /.crm-accordion-wrapper -->
+ </div>
+</details>
 </div> {* End of preview-info div. We hide this on form submit. *}
 
 <div class="crm-submit-buttons">
    {include file="CRM/common/formButtons.tpl" location="bottom"}
 </div>
 </div>
-
-{literal}
-<script type="text/javascript">
-
-{/literal}{if $invalidGroupName}{literal}
-cj("#new-group.collapsed").crmAccordionToggle();
-{/literal}{/if}{literal}
-
-{/literal}{if $invalidTagName}{literal}
-cj("#new-tag.collapsed").crmAccordionToggle();
-{/literal}{/if}{literal}
-
-</script>
-{/literal}

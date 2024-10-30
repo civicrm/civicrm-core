@@ -3,7 +3,6 @@ return [
   'type' => 'primary',
   'defaults' => "{
     data: {
-      contact_type: 'Organization',
       source: afform.title
     }
   }",
@@ -11,5 +10,4 @@ return [
   'boilerplate' => [
     ['#tag' => 'afblock-name-organization'],
   ],
-  'admin_tpl' => '~/afGuiEditor/entityConfig/Contact.html',
 ];

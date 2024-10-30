@@ -15,10 +15,7 @@
       {ts}WARNING: You cannot delete a financial type if it is currently used by any Contributions, Contribution Pages or Membership Types. Consider disabling this option instead.{/ts} {ts}Deleting a financial type cannot be undone. Unbalanced transactions may be created if you delete this account.{/ts} {ts}Do you want to continue?{/ts}
       </div>
   {else}
-    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-
     <table class="form-layout">
-
       <tr class="crm-contribution-form-block-account_relationship">
       <td class="label">{$form.account_relationship.label}</td>
   <td class="html-adjust">{$form.account_relationship.html}</td>
@@ -27,7 +24,6 @@
       <td class="label">{$form.financial_account_id.label}</td>
   <td class="html-adjust">{$form.financial_account_id.html}</td>
       </tr>
-
     </table>
    {/if}
    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="botttom"}</div>

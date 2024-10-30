@@ -29,7 +29,7 @@ class CRM_Contact_Import_Form_DataSourceTest extends CiviUnitTestCase {
    * Post test cleanup.
    */
   public function tearDown(): void {
-    $this->quickCleanup(['civicrm_user_job']);
+    $this->quickCleanup(['civicrm_user_job', 'civicrm_mapping']);
     parent::tearDown();
   }
 
@@ -56,6 +56,7 @@ class CRM_Contact_Import_Form_DataSourceTest extends CiviUnitTestCase {
    */
   public function testDataSources(): void {
     $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'import SQL datasource']);
     $this->callAPISuccess('Mapping', 'create', ['name' => 'Well dressed ducks', 'mapping_type_id' => 'Import Contact']);
 
     $sqlFormValues = [

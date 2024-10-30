@@ -13,7 +13,12 @@ if (!defined('CIVI_SETUP')) {
   ->addListener('civi.setup.checkRequirements', function (\Civi\Setup\Event\CheckRequirementsEvent $e) {
     \Civi\Setup::log()->info(sprintf('[%s] Handle %s', basename(__FILE__), 'checkRequirements'));
 
-    $dbFields = array('db', 'cmsDb');
+    $dbFields = ['db'];
+
+    if ($e->getModel()->cms !== 'Standalone') {
+      $dbFields[] = 'cmsDb';
+    }
+
     foreach ($dbFields as $dbField) {
       $errors = 0;
       $db = $e->getModel()->{$dbField};

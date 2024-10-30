@@ -15,7 +15,7 @@ namespace Civi\API\Event;
  * Class Event
  * @package Civi\API\Event
  */
-class Event extends \Symfony\Component\EventDispatcher\Event {
+class Event extends \Civi\Core\Event\GenericHookEvent {
 
   use RequestTrait;
 

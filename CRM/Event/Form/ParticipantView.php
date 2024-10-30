@@ -20,6 +20,7 @@
  *
  */
 class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
+  use CRM_Event_Form_EventFormTrait;
 
   public $useLivePageJS = TRUE;
 
@@ -30,7 +31,7 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
    */
   public function preProcess() {
     $values = $ids = [];
-    $participantID = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
+    $participantID = $this->getParticipantID();
     $contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
     $params = ['id' => $participantID];
 
@@ -58,27 +59,28 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
     $this->assign('hasPayment', $paymentId);
     $this->assign('componentId', $participantID);
     $this->assign('component', 'event');
-
-    if ($parentParticipantId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant',
-      $participantID, 'registered_by_id'
-    )
-    ) {
-      $parentHasPayment = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
-        $parentParticipantId, 'id', 'participant_id'
-      );
-      $this->assign('parentHasPayment', $parentHasPayment);
+    $parentParticipantID = $this->getParticipantValue('registered_by_id');
+    $this->assign('participant_registered_by_id', $parentParticipantID);
+    // Check if this is a primaryParticipant (registered for others) and retrieve additional participants if true  (CRM-4859)
+    if (CRM_Event_BAO_Participant::isPrimaryParticipant($this->getParticipantID())) {
+      $additionalParticipants = CRM_Event_BAO_Participant::getAdditionalParticipants($this->getParticipantID());
     }
+    $this->assign('additionalParticipants', $additionalParticipants ?? NULL);
+
+    $this->assign('parentHasPayment', !$parentParticipantID ? NULL : CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
+      $parentParticipantID, 'id', 'participant_id'
+    ));
 
     $statusId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $participantID, 'status_id', 'id');
     $status = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_ParticipantStatusType', $statusId, 'name', 'id');
-    if ($status == 'Transferred') {
+    if ($status === 'Transferred') {
       $transferId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $participantID, 'transferred_to_contact_id', 'id');
       $pid = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $transferId, 'id', 'contact_id');
       $transferName = current(CRM_Contact_BAO_Contact::getContactDetails($transferId));
       $this->assign('pid', $pid);
       $this->assign('transferId', $transferId);
-      $this->assign('transferName', $transferName);
     }
+    $this->assign('transferName', $transferName ?? NULL);
 
     // CRM-20879: Show 'Transfer or Cancel' option beside 'Change fee selection'
     //  only if logged in user have 'edit event participants' permission and
@@ -97,37 +99,16 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
       );
     }
 
-    if ($values[$participantID]['is_test']) {
-      $values[$participantID]['status'] = CRM_Core_TestEntity::appendTestText($values[$participantID]['status']);
-    }
-
-    // Get Note
-    $noteValue = CRM_Core_BAO_Note::getNote($participantID, 'civicrm_participant');
-
-    $values[$participantID]['note'] = array_values($noteValue);
+    $this->assign('status', $this->getParticipantValue('status_id:label') . ($this->getParticipantValue('is_test') ? ' ' . ts('(test)') : ''));
+    $this->assign('note', array_values(CRM_Core_BAO_Note::getNote($participantID, 'civicrm_participant')));
 
     // Get Line Items
     $lineItem = CRM_Price_BAO_LineItem::getLineItems($participantID);
+    $this->assign('lineItem', [$lineItem]);
 
-    if (!CRM_Utils_System::isNull($lineItem)) {
-      $values[$participantID]['lineItem'][] = $lineItem;
-    }
-
-    $values[$participantID]['totalAmount'] = $values[$participantID]['fee_amount'] ?? NULL;
-
-    // Get registered_by contact ID and display_name if participant was registered by someone else (CRM-4859)
-    if (!empty($values[$participantID]['participant_registered_by_id'])) {
-      $values[$participantID]['registered_by_contact_id'] = CRM_Core_DAO::getFieldValue("CRM_Event_DAO_Participant",
-        $values[$participantID]['participant_registered_by_id'],
-        'contact_id', 'id'
-      );
-      $values[$participantID]['registered_by_display_name'] = CRM_Contact_BAO_Contact::displayName($values[$participantID]['registered_by_contact_id']);
-    }
-
-    // Check if this is a primaryParticipant (registered for others) and retrieve additional participants if true  (CRM-4859)
-    if (CRM_Event_BAO_Participant::isPrimaryParticipant($participantID)) {
-      $values[$participantID]['additionalParticipants'] = CRM_Event_BAO_Participant::getAdditionalParticipants($participantID);
-    }
+    // Assign registered_by contact ID and display_name if participant was registered by someone else (CRM-4859)
+    $this->assign('registered_by_display_name', $this->getParticipantValue('registered_by_id.contact_id.display_name'));
+    $this->assign('registered_by_contact_id', $this->getParticipantValue('registered_by_id.contact_id'));
 
     // get the option value for custom data type
     $customDataType = CRM_Core_OptionGroup::values('custom_data_type', FALSE, FALSE, FALSE, NULL, 'name');
@@ -159,16 +140,9 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
     CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $finalTree, FALSE, NULL, NULL, NULL, $participantID);
     $eventTitle = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $values[$participantID]['event_id'], 'title');
     //CRM-7150, show event name on participant view even if the event is disabled
-    if (empty($values[$participantID]['event'])) {
-      $values[$participantID]['event'] = $eventTitle;
-    }
-
-    //do check for campaigns
-    if ($campaignId = CRM_Utils_Array::value('campaign_id', $values[$participantID])) {
-      $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns($campaignId);
-      $values[$participantID]['campaign'] = $campaigns[$campaignId];
-    }
-
+    $this->assign('event', $eventTitle);
+    $this->assign('campaign', $this->getParticipantValue('campaign_id:label'));
+    // @todo - this assign makes it really hard to see what is being assigned - do individual assigns.
     $this->assign($values[$participantID]);
 
     // add viewed participant to recent items list
@@ -183,43 +157,37 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
       );
     }
     if (CRM_Core_Permission::check('delete in CiviEvent')) {
-      $recentOther['deleteUrl'] = CRM_Utils_System::url('civicrm/contact/view/participant',
-        "action=delete&reset=1&id={$values[$participantID]['id']}&cid={$values[$participantID]['contact_id']}&context=home"
+      $recentOther['deleteUrl'] = CRM_Utils_System::url('civicrm/participant/delete',
+        "reset=1&id={$values[$participantID]['id']}"
       );
     }
 
-    $participantRoles = CRM_Event_PseudoConstant::participantRole();
     $displayName = CRM_Contact_BAO_Contact::displayName($values[$participantID]['contact_id']);
 
     $participantCount = [];
-    $totalTaxAmount = 0;
+    $totalTaxAmount = $totalAmount = 0;
     foreach ($lineItem as $k => $v) {
       if (CRM_Utils_Array::value('participant_count', $lineItem[$k]) > 0) {
         $participantCount[] = $lineItem[$k]['participant_count'];
       }
       $totalTaxAmount = $v['tax_amount'] + $totalTaxAmount;
+      $totalAmount += $v['line_total'];
     }
-    if (Civi::settings()->get('invoicing')) {
-      $this->assign('totalTaxAmount', $totalTaxAmount);
-    }
-    if ($participantCount) {
-      $this->assign('pricesetFieldsCount', $participantCount);
-    }
+    $this->assign('currency', $this->getParticipantValue('fee_currency'));
+    // It would be more  correct to assign totalTaxAmount & TotalAmount
+    // from the order object - however, that assumes a contribution exists & there is this
+    // we have this weird possibility of line items against a participant record with
+    // no contribution attached to it - maybe we have eliminated this? But I have a nasty feeling about
+    // webform.
+    $this->assign('totalTaxAmount', $totalTaxAmount ?? NULL);
+    $this->assign('totalAmount', $totalAmount);
+    $this->assign('pricesetFieldsCount', $participantCount);
     $this->assign('displayName', $displayName);
     // omitting contactImage from title for now since the summary overlay css doesn't work outside of our crm-container
     $this->setTitle(ts('View Event Registration for') . ' ' . $displayName);
-
-    $roleId = $values[$participantID]['role_id'] ?? NULL;
-    $title = $displayName . ' (' . CRM_Utils_Array::value($roleId, $participantRoles) . ' - ' . $eventTitle . ')';
-
-    $sep = CRM_Core_DAO::VALUE_SEPARATOR;
-    $viewRoles = [];
-    foreach (explode($sep, $values[$participantID]['role_id']) as $k => $v) {
-      $viewRoles[] = $participantRoles[$v];
-    }
-    $values[$participantID]['role_id'] = implode(', ', $viewRoles);
-    $this->assign('role', $values[$participantID]['role_id']);
+    $this->assign('role', implode(',', $this->getParticipantValue('role_id:label')));
     // add Participant to Recent Items
+    $title = $displayName . ' (' . implode(',', $this->getParticipantValue('role_id:label')) . ' - ' . $eventTitle . ')';
     CRM_Utils_Recent::add($title,
       $url,
       $values[$participantID]['id'],
@@ -228,6 +196,17 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
       NULL,
       $recentOther
     );
+  }
+
+  /**
+   * Get id of participant being acted on.
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   */
+  public function getParticipantID(): int {
+    return (int) CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
   }
 
   /**

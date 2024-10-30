@@ -6,7 +6,7 @@
     </select>
   </div>
 </li>
-<li><af-gui-menu-item-collapsible node="$ctrl.node" class="af-gui-field-select-in-dropdown form-inline"></af-gui-menu-item-collapsible></li>
+<li><af-gui-menu-item-collapsible ng-if="$ctrl.node['#tag'] === 'details'" node="$ctrl.node" class="af-gui-field-select-in-dropdown form-inline"></af-gui-menu-item-collapsible></li>
 <li><af-gui-menu-item-style node="$ctrl.node"></af-gui-menu-item-style></li>
 <li><af-gui-menu-item-border node="$ctrl.node"></af-gui-menu-item-border></li>
 <li><af-gui-menu-item-background node="$ctrl.node"></af-gui-menu-item-background></li>

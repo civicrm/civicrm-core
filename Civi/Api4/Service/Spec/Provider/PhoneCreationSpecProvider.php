@@ -25,6 +25,7 @@ class PhoneCreationSpecProvider extends \Civi\Core\Service\AutoService implement
    */
   public function modifySpec(RequestSpec $spec) {
     $spec->getFieldByName('phone')->setRequired(TRUE);
+    $spec->getFieldByName('is_primary')->setRequired(FALSE);
   }
 
   /**

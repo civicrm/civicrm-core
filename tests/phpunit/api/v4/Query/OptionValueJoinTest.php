@@ -27,7 +27,7 @@ use api\v4\Api4TestBase;
  */
 class OptionValueJoinTest extends Api4TestBase {
 
-  public function testCommunicationMethodJoin() {
+  public function testCommunicationMethodJoin(): void {
     $this->createTestRecord('Contact', [
       'preferred_communication_method' => 1,
     ]);

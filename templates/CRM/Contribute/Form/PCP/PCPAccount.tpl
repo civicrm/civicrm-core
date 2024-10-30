@@ -22,7 +22,7 @@
 {else}
 <div class="form-item">
 {include file="CRM/common/CMSUser.tpl"}
-{include file="CRM/UF/Form/Block.tpl" fields=$fields}
+{include file="CRM/UF/Form/Block.tpl" fields=$fields prefix=false hideFieldset=false}
 </div>
 <div class="crm-submit-buttons">
 {include file="CRM/common/formButtons.tpl" location="bottom"}

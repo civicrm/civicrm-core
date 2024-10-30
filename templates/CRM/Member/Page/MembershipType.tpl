@@ -10,7 +10,7 @@
 
 {capture assign=reminderLink}{crmURL p='civicrm/admin/scheduleReminders' q='reset=1'}{/capture}
 <div class="help">
-  <p>{icon icon="fa-info-circle"}{/icon}{ts}Membership types are used to categorize memberships. You can define an unlimited number of types. Each type incorporates a 'name' (Gold Member, Honor Society Member...), a description, a minimum fee (can be $0), and a duration (can be 'lifetime'). Each member type is specifically linked to the membership entity (organization) - e.g. Bay Area Chapter.{/ts} {docURL page="user/membership/defining-memberships/"}</p>
+  <p>{icon icon="fa-info-circle"}{/icon} {ts}Membership types are used to categorize memberships. You can define an unlimited number of types. Each type incorporates a 'name' (Gold Member, Honor Society Member...), a description, a minimum fee (can be $0), and a duration (can be 'lifetime'). Each member type is specifically linked to the membership entity (organization) - e.g. Bay Area Chapter.{/ts} {docURL page="user/membership/defining-memberships/"}</p>
   <p>{ts 1=$reminderLink}Configure membership renewal reminders using <a href="%1">Schedule Reminders</a>.{/ts} {docURL page="user/email/scheduled-reminders"}</p>
 </div>
 
@@ -37,7 +37,7 @@
       </tr>
       </thead>
       {foreach from=$rows item=row}
-        <tr id="membership_type-{$row.id}" class="crm-entity {cycle values='odd-row,even-row'}{if !empty($row.class)} {$row.class}{/if} crm-membership-type {if NOT $row.is_active} disabled{/if}">
+        <tr id="membership_type-{$row.id}" class="crm-entity {cycle values='odd-row,even-row'} crm-membership-type {if NOT $row.is_active} disabled{/if}">
           <td class="crmf-name crm-editable" data-field="name">{$row.name}</td>
           <td class="crmf-period_type crm-editable" data-type="select">{$row.period_type}</td>
           <td class="crmf-fixed_period_start_day">{$row.fixed_period_start_day}</td>
@@ -64,7 +64,7 @@
 {else}
   {if $action ne 1}
   <div class="messages status no-popup">
-    <img src="{$config->resourceBase}i/Inform.gif" alt="{ts}status{/ts}"/>
+    {icon icon="fa-info-circle"}{/icon} 
     {capture assign=crmURL}{crmURL p='civicrm/admin/member/membershipType/add' q="action=add&reset=1"}{/capture}{ts 1=$crmURL}There are no membership types entered. You can <a href='%1'>add one</a>.{/ts}
   </div>
   {/if}

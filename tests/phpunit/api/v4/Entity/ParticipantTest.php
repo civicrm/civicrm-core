@@ -19,27 +19,19 @@
 
 namespace api\v4\Entity;
 
+use Civi\Api4\Event;
 use Civi\Api4\Participant;
 use api\v4\Api4TestBase;
-use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class ParticipantTest extends Api4TestBase implements TransactionalInterface {
+class ParticipantTest extends Api4TestBase {
 
-  public function setUp(): void {
-    parent::setUp();
-    $cleanup_params = [
-      'tablesToTruncate' => [
-        'civicrm_event',
-        'civicrm_participant',
-      ],
-    ];
-    $this->cleanup($cleanup_params);
-  }
-
-  public function testGetActions() {
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  public function testGetActions(): void {
     $result = Participant::getActions(FALSE)
       ->execute()
       ->indexBy('name');
@@ -51,11 +43,11 @@ class ParticipantTest extends Api4TestBase implements TransactionalInterface {
     $this->assertStringContainsString($whereDescription, $getParams['where']['description']);
   }
 
-  public function testGet() {
-    $rows = $this->getRowCount('civicrm_participant');
-    if ($rows > 0) {
-      $this->fail('Participant table must be empty');
-    }
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  public function testGet(): void {
+    Participant::delete(FALSE)->addWhere('id', '>', 0)->execute();
 
     // With no records:
     $result = Participant::get(FALSE)->execute();
@@ -115,8 +107,7 @@ class ParticipantTest extends Api4TestBase implements TransactionalInterface {
       ->addClause('AND', ['event_id', '=', $firstEventId])
       ->execute();
 
-    $this->assertEquals($expectedFirstEventCount, count($firstOnlyResult),
-      "count of first event is not $expectedFirstEventCount");
+    $this->assertCount($expectedFirstEventCount, $firstOnlyResult, "count of first event is not $expectedFirstEventCount");
 
     // get first two events using different methods
     $firstTwo = Participant::get(FALSE)
@@ -144,7 +135,7 @@ class ParticipantTest extends Api4TestBase implements TransactionalInterface {
       ->addWhere('contact_id', '=', $firstContactId)
       ->execute();
 
-    $this->assertEquals(1, count($firstParticipantResult), "more than one registration");
+    $this->assertCount(1, $firstParticipantResult, 'more than one registration');
 
     $firstParticipantId = $firstParticipantResult->first()['id'];
 
@@ -170,9 +161,9 @@ class ParticipantTest extends Api4TestBase implements TransactionalInterface {
 
     $this->assertEquals($otherParticipantResult, $otherParticipantResult2);
 
-    $this->assertEquals($participantCount - 1,
-      count($otherParticipantResult),
-      "failed to exclude a single record on complex criteria");
+    $this->assertCount($participantCount - 1,
+      $otherParticipantResult,
+      'failed to exclude a single record on complex criteria');
     // check the record we have excluded is the right one:
 
     $this->assertFalse(
@@ -249,6 +240,113 @@ class ParticipantTest extends Api4TestBase implements TransactionalInterface {
 
     // Or if you search by id
     $this->assertCount(1, Participant::get()->selectRowCount()->addWhere('id', '=', $testParticipants->first()['id'])->execute());
+  }
+
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  public function testGetRemainingParticipants(): void {
+    $eventWithMax = $this->createTestRecord('Event', ['max_participants' => 3])['id'];
+    $eventUnlimited = $this->createTestRecord('Event', ['max_participants' => 0])['id'];
+
+    $events = Event::get(FALSE)
+      ->addSelect('remaining_participants')
+      ->addWhere('id', 'IN', [$eventWithMax, $eventUnlimited])
+      ->addOrderBy('id')
+      ->execute();
+    $this->assertEquals(3, $events[0]['remaining_participants']);
+    // `remaining_participants` is always NULL for unlimited events
+    $this->assertNull($events[1]['remaining_participants']);
+
+    $deleted = $this->createTestRecord('Contact', ['is_deleted' => TRUE])['id'];
+    $this->createTestRecord('OptionValue', [
+      'option_group_id:name' => 'participant_role',
+      'filter' => 0,
+      'label' => 'invisible man',
+      'name' => 'spy',
+    ]);
+
+    $this->saveTestRecords('Participant', [
+      'records' => [
+        // 2 legit registrations for $eventWithMax
+        ['event_id' => $eventWithMax, 'status_id:name' => 'Registered'],
+        ['event_id' => $eventWithMax, 'status_id:name' => 'Attended'],
+        // None of these should count toward $eventWithMax participant limit
+        ['event_id' => $eventWithMax, 'status_id:name' => 'Registered', 'contact_id' => $deleted],
+        ['event_id' => $eventWithMax, 'status_id:name' => 'Registered', 'role_id:name' => 'spy'],
+        ['event_id' => $eventWithMax, 'status_id:name' => 'Cancelled'],
+        ['event_id' => $eventUnlimited, 'status_id:name' => 'Registered'],
+      ],
+    ]);
+
+    $events = Event::get(FALSE)
+      ->addSelect('remaining_participants')
+      ->addWhere('id', 'IN', [$eventWithMax, $eventUnlimited])
+      ->addOrderBy('id')
+      ->execute();
+    // 1 Spot remaining
+    $this->assertEquals(1, $events[0]['remaining_participants']);
+    // `remaining_participants` is always NULL for unlimited events
+    $this->assertNull($events[1]['remaining_participants']);
+
+    $this->saveTestRecords('Participant', [
+      'records' => [
+        // 2 legit registrations for $eventWithMax
+        ['event_id' => $eventWithMax, 'status_id:name' => 'Registered'],
+        ['event_id' => $eventWithMax, 'status_id:name' => 'Attended'],
+        // None of these should count toward $eventWithMax participant limit
+        ['event_id' => $eventWithMax, 'status_id:name' => 'Registered', 'contact_id' => $deleted],
+        ['event_id' => $eventUnlimited, 'status_id:name' => 'Registered'],
+      ],
+    ]);
+
+    $events = Event::get(FALSE)
+      ->addSelect('remaining_participants')
+      ->addWhere('id', 'IN', [$eventWithMax, $eventUnlimited])
+      ->addOrderBy('id')
+      ->execute();
+    // -1 spot remaining
+    $this->assertEquals(-1, $events[0]['remaining_participants']);
+    // `remaining_participants` is always NULL for unlimited events
+    $this->assertNull($events[1]['remaining_participants']);
+  }
+
+  public function testFilterByRole(): void {
+    $this->createTestRecord('OptionValue', [
+      'option_group_id:name' => 'participant_role',
+      'label' => 'Role1',
+      'name' => 'role_1',
+    ]);
+    $this->createTestRecord('OptionValue', [
+      'option_group_id:name' => 'participant_role',
+      'label' => 'Role2',
+      'name' => 'role_2',
+    ]);
+    $participants = $this->saveTestRecords('Participant', [
+      'records' => [
+        ['role_id:name' => 'role_1'],
+        ['role_id:name' => 'role_2'],
+        ['role_id:name' => ['role_1', 'role_2']],
+      ],
+    ])->column('id');
+
+    $hasRole1 = Participant::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('role_id:name', 'CONTAINS', 'role_1')
+      ->execute()->column('id');
+    $this->assertEquals([$participants[0], $participants[2]], $hasRole1);
+
+    $hasRole2 = Participant::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('role_id:name', 'CONTAINS', 'role_2')
+      ->execute()->column('id');
+    $this->assertEquals([$participants[1], $participants[2]], $hasRole2);
+
+    $notHasRole1 = Participant::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('role_id:name', 'NOT CONTAINS', 'role_1')
+      ->execute()->column('id');
+    $this->assertEquals([$participants[1]], $notHasRole1);
   }
 
   /**

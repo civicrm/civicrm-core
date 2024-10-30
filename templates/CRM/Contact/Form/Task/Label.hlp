@@ -29,6 +29,6 @@
 {/htxt}
 {htxt id="id-select-label"}
   <p>{ts}Select a label format from the dropdown list.{/ts}</p>
-  {capture assign="mailingLabelURL"}{crmURL p="civicrm/admin/labelFormats" q="reset=1"}{/capture}
-  <p>{ts 1=$mailingLabelURL}Go to <strong><a href="%1">Administer CiviCRM &raquo; Communications &raquo; Label Formats</a></strong> to add or edit labels or set the default label format.{/ts}</p>
+  {capture assign="mailingLabelURL"}href="{crmURL p='civicrm/admin/labelFormats' q='reset=1'}"{/capture}
+  <p>{ts 1=$mailingLabelURL}Go to <strong><a %1>Administer CiviCRM &raquo; Communications &raquo; Label Page Formats</a></strong> to add or edit labels or set the default label format.{/ts}</p>
 {/htxt}

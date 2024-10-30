@@ -27,7 +27,7 @@ class CRM_OAuth_MailSetupTest extends \PHPUnit\Framework\TestCase implements Hea
   }
 
   public function testEvalArrayTemplate(): void {
-    $vars = array(
+    $vars = [
       'token' => [
         'client_id' => 10,
         'resource_owner' => ['mail' => 'foo@bar.com'],
@@ -65,7 +65,7 @@ class CRM_OAuth_MailSetupTest extends \PHPUnit\Framework\TestCase implements Hea
         ],
         'class' => 'Civi\\OAuth\\CiviGenericProvider',
       ],
-    );
+    ];
     $expected = [
       'name' => 'Foozball Association: foo@bar.com',
       'domain' => 'bar.com',

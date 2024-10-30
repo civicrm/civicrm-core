@@ -8,7 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 {* Navigation template for multi-section Wizards *}
-{if count( $category.steps ) > 0}
+{if $category.steps}
 <div id="wizard-steps">
    <ul class="section-list">
     {foreach from=$category.steps item=step}

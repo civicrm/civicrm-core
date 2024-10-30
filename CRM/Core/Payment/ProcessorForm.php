@@ -25,22 +25,14 @@ class CRM_Core_Payment_ProcessorForm {
 
   /**
    * @param CRM_Contribute_Form_Contribution_Main|CRM_Event_Form_Registration_Register|CRM_Financial_Form_Payment $form
-   * @param null $type
-   * @param null $mode
    *
    * @throws Exception
    */
-  public static function preProcess(&$form, $type = NULL, $mode = NULL) {
+  public static function preProcess($form) {
+    $type = CRM_Utils_Request::retrieve('type', 'String', $form);
     if ($type) {
-      $form->_type = $type;
-    }
-    else {
-      $form->_type = CRM_Utils_Request::retrieve('type', 'String', $form);
-    }
-
-    if ($form->_type) {
       // @todo not sure when this would be true. Never passed in.
-      $form->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($form->_type, $form->_mode);
+      $form->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($type, $form->_mode);
     }
 
     if (empty($form->_paymentProcessor)) {
@@ -48,23 +40,26 @@ class CRM_Core_Payment_ProcessorForm {
       return;
     }
     $form->set('paymentProcessor', $form->_paymentProcessor);
-    $form->_paymentObject = System::singleton()->getByProcessor($form->_paymentProcessor);
+    $paymentObject = System::singleton()->getByProcessor($form->_paymentProcessor);
     if ($form->paymentInstrumentID) {
-      $form->_paymentObject->setPaymentInstrumentID($form->paymentInstrumentID);
+      $paymentObject->setPaymentInstrumentID($form->paymentInstrumentID);
     }
-    $form->_paymentObject->setBackOffice($form->isBackOffice);
+    $paymentObject->setBackOffice($form->isBackOffice);
     $form->assign('isBackOffice', $form->isBackOffice);
 
-    $form->assign('suppressSubmitButton', $form->_paymentObject->isSuppressSubmitButtons());
+    $form->assign('suppressSubmitButton', $paymentObject->isSuppressSubmitButtons());
 
     CRM_Financial_Form_Payment::addCreditCardJs($form->getPaymentProcessorID());
     $form->assign('paymentProcessorID', $form->getPaymentProcessorID());
 
     $form->assign('currency', $form->getCurrency());
 
+    $form->assign('paymentAgreementTitle', $form->_paymentProcessor['object']->getText('agreementTitle', []));
+    $form->assign('paymentAgreementText', $form->_paymentProcessor['object']->getText('agreementText', []));
+
     // also set cancel subscription url
     if (!empty($form->_paymentProcessor['is_recur']) && !empty($form->_values['is_recur'])) {
-      $form->_values['cancelSubscriptionUrl'] = $form->_paymentObject->subscriptionURL(NULL, NULL, 'cancel');
+      $form->_values['cancelSubscriptionUrl'] = $paymentObject->subscriptionURL(NULL, NULL, 'cancel');
     }
 
     $paymentProcessorBillingFields = array_keys($form->_paymentProcessor['object']->getBillingAddressFields());
@@ -93,7 +88,7 @@ class CRM_Core_Payment_ProcessorForm {
       $form->paymentInstrumentID
     );
 
-    $form->assign_by_ref('paymentProcessor', $form->_paymentProcessor);
+    $form->assign('paymentProcessor', $form->_paymentProcessor);
 
     // check if this is a paypal auto return and redirect accordingly
     //@todo - determine if this is legacy and remove
@@ -113,7 +108,7 @@ class CRM_Core_Payment_ProcessorForm {
 
     if (!empty($form->_membershipBlock) && !empty($form->_membershipBlock['is_separate_payment']) &&
       (!empty($form->_paymentProcessor['class_name']) &&
-        !$form->_paymentObject->supports('MultipleConcurrentPayments')
+        !$paymentObject->supports('MultipleConcurrentPayments')
       )
     ) {
 
@@ -127,13 +122,13 @@ class CRM_Core_Payment_ProcessorForm {
   /**
    * Build the payment processor form.
    *
-   * @param CRM_Core_Form $form
+   * @param \CRM_Event_Form_Registration_Register|\CRM_Contribute_Form_Contribution_Main|CRM_Event_Form_Registration_Confirm|CRM_Financial_Form_Payment $form
    */
-  public static function buildQuickForm(&$form) {
+  public static function buildQuickForm($form): void {
     //@todo document why this addHidden is here
     //CRM-15743 - we should not set/create hidden element for pay later
     // because payment processor is not selected
-    $processorId = $form->getVar('_paymentProcessorID');
+    $processorId = $form->getPaymentProcessorID();
     $billing_profile_id = CRM_Utils_Request::retrieve('billing_profile_id', 'String');
     if (!empty($form->_values) && !empty($form->_values['is_billing_required'])) {
       $billing_profile_id = 'billing';

@@ -26,7 +26,7 @@ class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
    * @param array $params
    *   An assoc array of name/value pairs.
    *
-   * @return CRM_Financial_DAO_PaymentProcessorType
+   * @return CRM_Core_DAO_Job
    */
   public static function create($params) {
     $job = new CRM_Core_DAO_Job();
@@ -35,34 +35,24 @@ class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
   }
 
   /**
-   * Retrieve DB object and copy to defaults array.
-   *
-   * @param array $params
-   *   Array of criteria values.
-   * @param array $defaults
-   *   Array to be populated with found values.
-   *
-   * @return self|null
-   *   The DAO object, if found.
-   *
    * @deprecated
+   * @param array $params
+   * @param array $defaults
+   * @return self|null
    */
   public static function retrieve($params, &$defaults) {
+    CRM_Core_Error::deprecatedFunctionWarning('API');
     return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
-   * Update the is_active flag in the db.
-   *
+   * @deprecated - this bypasses hooks.
    * @param int $id
-   *   Id of the database record.
    * @param bool $is_active
-   *   Value we want to set the is_active field.
-   *
    * @return bool
-   *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $is_active) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_Job', $id, 'is_active', $is_active);
   }
 
@@ -76,6 +66,7 @@ class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
    * @throws CRM_Core_Exception
    */
   public static function del($jobID) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     self::deleteRecord(['id' => $jobID]);
     return TRUE;
   }
@@ -121,9 +112,39 @@ class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
     ];
     $copy = CRM_Core_DAO::copyGeneric('CRM_Core_DAO_Job', ['id' => $id], NULL, $fieldsFix);
     $copy->save();
-    CRM_Utils_Hook::copy('Job', $copy);
+    CRM_Utils_Hook::copy('Job', $copy, $id);
 
     return $copy;
+  }
+
+  /**
+   * Parse multi-line `$parameters` string into an array
+   *
+   * @param string|null $parameters
+   * @return array
+   * @throws CRM_Core_Exception
+   */
+  public static function parseParameters(?string $parameters): array {
+    $parameters = trim($parameters ?? '');
+    if (!empty($parameters) && $parameters[0] === '{') {
+      try {
+        return json_decode($parameters, TRUE, 512, JSON_THROW_ON_ERROR);
+      }
+      catch (JsonException $e) {
+        throw new CRM_Core_Exception('Job parameters error: ' . $e->getMessage() . '. Parameters: ' . print_r($parameters, TRUE));
+      }
+    }
+    $result = ['version' => 3];
+    $lines = $parameters ? explode("\n", $parameters) : [];
+
+    foreach ($lines as $line) {
+      $pair = explode("=", $line);
+      if ($pair === FALSE || count($pair) !== 2 || !trim($pair[0]) || trim($pair[1]) === '') {
+        throw new CRM_Core_Exception('Malformed API parameters in scheduled job');
+      }
+      $result[trim($pair[0])] = trim($pair[1]);
+    }
+    return $result;
   }
 
 }

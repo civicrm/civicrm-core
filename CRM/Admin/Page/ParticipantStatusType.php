@@ -27,40 +27,6 @@ class CRM_Admin_Page_ParticipantStatusType extends CRM_Core_Page_Basic {
     return 'CRM_Event_BAO_ParticipantStatusType';
   }
 
-  /**
-   * @return array
-   */
-  public function &links() {
-    static $links = NULL;
-    if ($links === NULL) {
-      $links = [
-        CRM_Core_Action::UPDATE => [
-          'name' => ts('Edit'),
-          'url' => 'civicrm/admin/participant_status',
-          'qs' => 'action=update&id=%%id%%&reset=1',
-          'title' => ts('Edit Status'),
-        ],
-        CRM_Core_Action::DELETE => [
-          'name' => ts('Delete'),
-          'url' => 'civicrm/admin/participant_status',
-          'qs' => 'action=delete&id=%%id%%',
-          'title' => ts('Delete Status'),
-        ],
-        CRM_Core_Action::DISABLE => [
-          'name' => ts('Disable'),
-          'ref' => 'crm-enable-disable',
-          'title' => ts('Disable Status'),
-        ],
-        CRM_Core_Action::ENABLE => [
-          'name' => ts('Enable'),
-          'ref' => 'crm-enable-disable',
-          'title' => ts('Enable Status'),
-        ],
-      ];
-    }
-    return $links;
-  }
-
   public function browse() {
     $statusTypes = [];
 

@@ -1,4 +1,5 @@
 (function(angular, $, _) {
+  "use strict";
   // Example usage: <af-form ctrl="afform">
   angular.module('af').component('afForm', {
     bindings: {
@@ -9,10 +10,11 @@
     },
     controller: function($scope, $element, $timeout, crmApi4, crmStatus, $window, $location, $parse, FileUploader) {
       var schema = {},
-        data = {},
+        data = {extra: {}},
         status,
         args,
         submissionResponse,
+        ts = CRM.ts('org.civicrm.afform'),
         ctrl = this;
 
       this.$onInit = function() {
@@ -40,25 +42,38 @@
       this.getFormMeta = function getFormMeta() {
         return $scope.$parent.meta;
       };
+      this.resetForm = function() {
+        this.ngForm.$setPristine();
+        $scope.$parent.$broadcast('afFormReset');
+        this.loadData();
+      };
       // With no arguments this will prefill the entire form based on url args
+      // and also check if the form is open for submissions.
       // With selectedEntity, selectedIndex & selectedId provided this will prefill a single entity
-      this.loadData = function(selectedEntity, selectedIndex, selectedId) {
-        var toLoad = 0,
-          params = {name: ctrl.getFormMeta().name, args: {}};
+      this.loadData = function(selectedEntity, selectedIndex, selectedId, selectedField, joinEntity, joinIndex) {
+        let toLoad = true;
+        const params = {name: ctrl.getFormMeta().name, args: {}};
         // Load single entity
         if (selectedEntity) {
-          toLoad = selectedId;
-          params.fillMode = 'entity';
+          toLoad = !!selectedId;
           params.args[selectedEntity] = {};
-          params.args[selectedEntity][selectedIndex] = selectedId;
+          params.args[selectedEntity][selectedIndex] = {};
+          if (joinEntity) {
+            params.fillMode = 'join';
+            params.args[selectedEntity][selectedIndex].joins = {};
+            params.args[selectedEntity][selectedIndex].joins[joinEntity] = {};
+            params.args[selectedEntity][selectedIndex].joins[joinEntity][joinIndex] = {};
+            params.args[selectedEntity][selectedIndex].joins[joinEntity][joinIndex][selectedField] = selectedId;
+          } else {
+            params.fillMode = 'entity';
+            params.args[selectedEntity][selectedIndex][selectedField] = selectedId;
+          }
         }
         // Prefill entire form
         else {
+          params.fillMode = 'form';
           args = _.assign({}, $scope.$parent.routeParams || {}, $scope.$parent.options || {});
           _.each(schema, function (entity, entityName) {
-            if (args[entityName] || entity.autofill) {
-              toLoad++;
-            }
             if (args[entityName] && typeof args[entityName] === 'string') {
               args[entityName] = args[entityName].split(',');
             }
@@ -67,21 +82,46 @@
         }
         if (toLoad) {
           crmApi4('Afform', 'prefill', params)
-            .then(function(result) {
-              _.each(result, function(item) {
-                data[item.name] = data[item.name] || {};
-                _.extend(data[item.name], item.values, schema[item.name].data || {});
+            .then((result) => {
+              // In some cases (noticed on Wordpress) the response header incorrectly outputs success when there's an error.
+              if (result.error_message) {
+                disableForm(result.error_message);
+                return;
+              }
+              result.forEach((item) => {
+                // Use _.each() because item.values could be cast as an object if array keys are not sequential
+                _.each(item.values, (values, index) => {
+                  data[item.name][index] = data[item.name][index] || {};
+                  data[item.name][index].joins = {};
+                  angular.merge(data[item.name][index], values, {fields: _.cloneDeep(schema[item.name].data || {})});
+                });
               });
+            }, (error) => {
+              disableForm(error.error_message);
             });
         }
-        // Clear existing contact selection
-        else if (selectedEntity) {
-          data[selectedEntity][selectedIndex].fields = {};
-          if (data[selectedEntity][selectedIndex].joins) {
-            data[selectedEntity][selectedIndex].joins = {};
-          }
+        // Clear existing join selection
+        else if (joinEntity) {
+          data[selectedEntity][selectedIndex].joins[joinEntity][joinIndex] = {};
         }
+        // Clear existing entity selection
+        else if (selectedEntity) {
+          // Delete object keys without breaking object references
+          Object.keys(data[selectedEntity][selectedIndex].fields).forEach(key => delete data[selectedEntity][selectedIndex].fields[key]);
+          // Fill pre-set values
+          angular.merge(data[selectedEntity][selectedIndex].fields, _.cloneDeep(schema[selectedEntity].data || {}));
+          data[selectedEntity][selectedIndex].joins = {};
+        }
+
+        ctrl.showSubmitButton = displaySubmitButton(args);
       };
+
+      function displaySubmitButton(args) {
+        if (args.sid && args.sid.length > 0) {
+          return false;
+        }
+        return true;
+      }
 
       // Used when submitting file fields
       this.fileUploader = new FileUploader({
@@ -94,6 +134,99 @@
         }
       });
 
+      // Handle the logic for conditional fields
+      this.checkConditions = function(conditions, op) {
+        op = op || 'AND';
+        // OR and AND have the opposite behavior so the logic is inverted
+        // NOT works identically to OR but gets flipped at the end
+        var ret = op === 'AND',
+          flip = !ret;
+        _.each(conditions, function(clause) {
+          // Recurse into nested group
+          if (_.isArray(clause[1])) {
+            if (ctrl.checkConditions(clause[1], clause[0]) === flip) {
+              ret = flip;
+            }
+          } else {
+            // Angular can't handle expressions with quotes inside brackets, so they are omitted
+            // Here we add them back to make valid js
+            if (_.isString(clause[0]) && clause[0].charAt(0) !== '"') {
+              clause[0] = clause[0].replace(/\[([^'"])/g, "['$1").replace(/([^'"])]/g, "$1']");
+            }
+            let parser1 = $parse(clause[0]);
+            let parser2 = $parse(clause[2]);
+            let result = compareConditions(parser1(data), clause[1], parser2(data));
+            if (result === flip) {
+              ret = flip;
+            }
+          }
+        });
+        return op === 'NOT' ? !ret : ret;
+      };
+
+      function compareConditions(val1, op, val2) {
+        const yes = (op !== '!=' && !op.includes('NOT '));
+
+        switch (op) {
+          case '=':
+          case '!=':
+          // Legacy operator, changed to '=', but may still exist on older forms.
+          case '==':
+            return angular.equals(val1, val2) === yes;
+
+          case '>':
+            return val1 > val2;
+
+          case '<':
+            return val1 < val2;
+
+          case '>=':
+            return val1 >= val2;
+
+          case '<=':
+            return val1 <= val2;
+
+          case 'IS EMPTY':
+            return !val1;
+
+          case 'IS NOT EMPTY':
+            return !!val1;
+
+          case 'CONTAINS':
+          case 'NOT CONTAINS':
+            if (Array.isArray(val1)) {
+              return val1.includes(val2) === yes;
+            } else if (typeof val1 === 'string' && typeof val2 === 'string') {
+              return val1.toLowerCase().includes(val2.toLowerCase()) === yes;
+            }
+            return angular.equals(val1, val2) === yes;
+
+          case 'IN':
+          case 'NOT IN':
+            if (Array.isArray(val2)) {
+              return val2.includes(val1) === yes;
+            }
+            return angular.equals(val1, val2) === yes;
+
+          case 'LIKE':
+          case 'NOT LIKE':
+            if (typeof val1 === 'string' && typeof val2 === 'string') {
+              return likeCompare(val1, val2) === yes;
+            }
+            return angular.equals(val1, val2) === yes;
+        }
+      }
+
+      function likeCompare(str, pattern) {
+        // Escape regex special characters in the pattern, except for % and _
+        const regexPattern = pattern
+          .replace(/([.+?^=!:${}()|\[\]\/\\])/g, "\\$1")
+          .replace(/%/g, '.*') // Convert % to .*
+          .replace(/_/g, '.'); // Convert _ to .
+        const regex = new RegExp(`^${regexPattern}$`, 'i');
+        return regex.test(str);
+      }
+
       // Called after form is submitted and files are uploaded
       function postProcess() {
         var metaData = ctrl.getFormMeta(),
@@ -101,7 +234,8 @@
 
         $element.trigger('crmFormSuccess', {
           afform: metaData,
-          data: data
+          data: data,
+          submissionResponse: submissionResponse,
         });
 
         status.resolve();
@@ -116,7 +250,9 @@
           if (url.indexOf('civicrm/') === 0) {
             url = CRM.url(url);
           } else if (url.indexOf('/') === 0) {
-            url = $location.protocol() + '://' + $location.host() + url;
+            let port = $location.port();
+            port = port ? `:${port}` : '';
+            url = `${$location.protocol()}://${$location.host()}${port}${url}`;
           }
           $window.location.href = url;
         }
@@ -137,8 +273,26 @@
         return str;
       }
 
+      function validateFileFields() {
+        var valid = true;
+        $("af-form[ng-form=" + ctrl.getFormMeta().name +"] input[type='file']").each((index, fld) => {
+          if ($(fld).attr('required') && $(fld).get(0).files.length == 0) {
+            valid = false;
+          }
+        });
+        return valid;
+      }
+
+      function disableForm(errorMsg) {
+        $('af-form[ng-form="' + ctrl.getFormMeta().name + '"]')
+          .addClass('disabled')
+          .find('button[ng-click="afform.submit()"]').prop('disabled', true);
+        CRM.alert(errorMsg, ts('Sorry'), 'error');
+      }
+
       this.submit = function() {
-        if (!ctrl.ngForm.$valid) {
+        // validate required fields on the form
+        if (!ctrl.ngForm.$valid || !validateFileFields()) {
           CRM.alert(ts('Please fill all required fields.'), ts('Form Error'));
           return;
         }
@@ -164,6 +318,11 @@
           } else {
             postProcess();
           }
+        })
+        .catch(function(error) {
+          status.reject();
+          $element.unblock();
+          CRM.alert(error.error_message || '', ts('Form Error'));
         });
       };
     }

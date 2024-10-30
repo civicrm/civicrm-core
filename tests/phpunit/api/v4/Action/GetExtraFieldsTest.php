@@ -23,6 +23,8 @@ use api\v4\Api4TestBase;
 use Civi\Api4\Activity;
 use Civi\Api4\Address;
 use Civi\Api4\Contact;
+use Civi\Api4\Household;
+use Civi\Api4\Individual;
 use Civi\Api4\Tag;
 
 /**
@@ -30,8 +32,8 @@ use Civi\Api4\Tag;
  */
 class GetExtraFieldsTest extends Api4TestBase {
 
-  public function testGetFieldsByContactType() {
-    $getFields = Contact::getFields(FALSE)->addSelect('name')->addWhere('type', '=', 'Field');
+  public function testGetFieldsByContactType(): void {
+    $getFields = Contact::getFields(FALSE)->addWhere('type', '=', 'Field');
 
     $baseFields = array_column(\CRM_Contact_BAO_Contact::fields(), 'name');
     $returnedFields = $getFields->execute()->column('name');
@@ -40,28 +42,38 @@ class GetExtraFieldsTest extends Api4TestBase {
     // With no contact_type specified, all fields should be returned
     $this->assertEmpty($notReturned);
 
-    $individualFields = $getFields->setValues(['contact_type' => 'Individual'])->execute()->column('name');
-    $this->assertNotContains('sic_code', $individualFields);
-    $this->assertNotContains('contact_type', $individualFields);
-    $this->assertContains('first_name', $individualFields);
+    $individualFields = (array) $getFields->setValues(['contact_type' => 'Individual'])->execute()->indexBy('name');
+    $this->assertArrayNotHasKey('sic_code', $individualFields);
+    $this->assertTrue($individualFields['contact_type']['readonly']);
+    $this->assertArrayHasKey('first_name', $individualFields);
 
     $orgId = Contact::create(FALSE)->addValue('contact_type', 'Organization')->execute()->first()['id'];
-    $organizationFields = $getFields->setValues(['id' => $orgId])->execute()->column('name');
-    $this->assertContains('organization_name', $organizationFields);
-    $this->assertContains('sic_code', $organizationFields);
-    $this->assertNotContains('contact_type', $organizationFields);
-    $this->assertNotContains('first_name', $organizationFields);
-    $this->assertNotContains('household_name', $organizationFields);
+    $organizationFields = (array) $getFields->setValues(['id' => $orgId])->execute()->indexBy('name');
+    $this->assertArrayHasKey('organization_name', $organizationFields);
+    $this->assertArrayHasKey('sic_code', $organizationFields);
+    $this->assertTrue($organizationFields['contact_type']['readonly']);
+    $this->assertArrayNotHasKey('first_name', $organizationFields);
+    $this->assertArrayNotHasKey('household_name', $organizationFields);
 
-    $hhId = Contact::create(FALSE)->addValue('contact_type', 'Household')->execute()->first()['id'];
-    $householdFields = $getFields->setValues(['id' => $hhId])->execute()->column('name');
-    $this->assertNotContains('sic_code', $householdFields);
-    $this->assertNotContains('contact_type', $householdFields);
-    $this->assertNotContains('first_name', $householdFields);
-    $this->assertContains('household_name', $householdFields);
+    $hhId = Household::create(FALSE)->execute()->first()['id'];
+    $householdFields = (array) $getFields->setValues(['id' => $hhId])->execute()->indexBy('name');
+    $this->assertArrayNotHasKey('sic_code', $householdFields);
+    $this->assertTrue($householdFields['contact_type']['readonly']);
+    $this->assertArrayNotHasKey('first_name', $householdFields);
+    $this->assertArrayHasKey('household_name', $householdFields);
   }
 
-  public function testGetOptionsAddress() {
+  public function testContactPseudoEntityGetFields(): void {
+    $individualFields = (array) Individual::getFields(FALSE)
+      ->execute()->indexBy('name');
+    $this->assertArrayNotHasKey('sic_code', $individualFields);
+    $this->assertArrayNotHasKey('contact_type', $individualFields);
+    $this->assertArrayHasKey('last_name', $individualFields);
+    $this->assertEquals('Individual', $individualFields['birth_date']['entity']);
+    $this->assertEquals('Individual', $individualFields['age_years']['entity']);
+  }
+
+  public function testGetOptionsAddress(): void {
     $getFields = Address::getFields(FALSE)->addWhere('name', '=', 'state_province_id')->setLoadOptions(TRUE);
 
     $usOptions = $getFields->setValues(['country_id' => 1228])->execute()->first();
@@ -75,7 +87,7 @@ class GetExtraFieldsTest extends Api4TestBase {
     $this->assertContains('Alberta', $caOptions['options']);
   }
 
-  public function testGetFkFields() {
+  public function testGetFkFields(): void {
     $fields = \Civi\Api4\Participant::getFields()
       ->setLoadOptions(TRUE)
       ->addWhere('name', 'IN', ['event_id', 'event_id.created_id', 'contact_id.gender_id', 'event_id.created_id.sort_name'])
@@ -89,7 +101,7 @@ class GetExtraFieldsTest extends Api4TestBase {
     $this->assertGreaterThan(1, count($fields['contact_id.gender_id']['options']));
   }
 
-  public function testGetTagsFromFilterField() {
+  public function testGetTagsFromFilterField(): void {
     $actTag = Tag::create(FALSE)
       ->addValue('name', uniqid('act'))
       ->addValue('used_for', 'civicrm_activity')

@@ -14,14 +14,14 @@
 {/crmRegion}
 <div id="groupContact">
     <div class="view-content">
-        {if $groupCount eq 0 }
+        {if $groupCount eq 0}
             <div class="messages status no-popup">
                     {icon icon="fa-info-circle"}{/icon}
                     {ts}You are not currently subscribed to any Groups.{/ts}
             </div>
         {/if}
 
-        {if $groupIn }
+        {if $groupIn}
             <div class="form-item">
                 <div>
                     {strip}
@@ -55,7 +55,7 @@
             {include file="CRM/Contact/Form/GroupContact.tpl"}
         {/if}
 
-        {if $groupPending }
+        {if $groupPending}
             <div class="form-item">
                 <div class="label status-pending">{ts}Pending Subscriptions{/ts}</div>
                 <div class="description">{ts}Your subscription to these group(s) is pending confirmation.{/ts}</div>
@@ -86,7 +86,7 @@
             </div>
         {/if}
 
-        {if $groupOut }
+        {if $groupOut}
             <div class="form-item">
                 <div class="label status-removed">{ts}Unsubscribed Groups{/ts}</div>
                 <div class="description">{ts}You are no longer subscribed to these group(s). Click Rejoin Group if you want to re-subscribe.{/ts}</div>

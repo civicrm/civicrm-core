@@ -57,7 +57,7 @@ class Themes extends \Civi\Core\Service\AutoService {
    * @param \CRM_Utils_Cache_Interface $cache
    */
   public function __construct($cache = NULL) {
-    $this->cache = $cache ? $cache : Civi::cache('long');
+    $this->cache = $cache ?: Civi::cache('long');
   }
 
   /**
@@ -176,7 +176,7 @@ class Themes extends \Civi\Core\Service\AutoService {
       }
       else {
         $result = Civi\Core\Resolver::singleton()
-          ->call($all[$themeKey]['url_callback'], array($this, $themeKey, $cssExt, $cssFile));
+          ->call($all[$themeKey]['url_callback'], [$this, $themeKey, $cssExt, $cssFile]);
       }
 
       if ($result !== self::PASSTHRU) {
@@ -195,35 +195,35 @@ class Themes extends \Civi\Core\Service\AutoService {
    * @see CRM_Utils_Hook::themes
    */
   protected function buildAll() {
-    $themes = array(
-      'default' => array(
+    $themes = [
+      'default' => [
         'ext' => 'civicrm',
         'title' => ts('Automatic'),
         'help' => ts('Determine a system default automatically'),
         // This is an alias. url_callback, search_order don't matter.
-      ),
-      'greenwich' => array(
+      ],
+      'greenwich' => [
         'ext' => 'civicrm',
         'title' => 'Greenwich',
         'help' => ts('CiviCRM 4.x look-and-feel'),
-      ),
-      'none' => array(
+      ],
+      'none' => [
         'ext' => 'civicrm',
         'title' => ts('None (Unstyled)'),
         'help' => ts('Disable CiviCRM\'s built-in CSS files.'),
-        'search_order' => array('none', self::FALLBACK_THEME),
-        'excludes' => array(
+        'search_order' => ['none', self::FALLBACK_THEME],
+        'excludes' => [
           "css/civicrm.css",
           "css/bootstrap.css",
-        ),
-      ),
-      self::FALLBACK_THEME => array(
+        ],
+      ],
+      self::FALLBACK_THEME => [
         'ext' => 'civicrm',
         'title' => 'Fallback (Abstract Base Theme)',
         'url_callback' => '\Civi\Core\Themes\Resolvers::fallback',
-        'search_order' => array(self::FALLBACK_THEME),
-      ),
-    );
+        'search_order' => [self::FALLBACK_THEME],
+      ],
+    ];
 
     \CRM_Utils_Hook::themes($themes);
 
@@ -246,11 +246,11 @@ class Themes extends \Civi\Core\Service\AutoService {
    * @see CRM_Utils_Hook::themes
    */
   protected function build($themeKey, $theme) {
-    $defaults = array(
+    $defaults = [
       'name' => $themeKey,
       'url_callback' => '\Civi\Core\Themes\Resolvers::simple',
-      'search_order' => array($themeKey, self::FALLBACK_THEME),
-    );
+      'search_order' => [$themeKey, self::FALLBACK_THEME],
+    ];
     $theme = array_merge($defaults, $theme);
 
     return $theme;

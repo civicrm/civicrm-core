@@ -33,9 +33,9 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
   /**
    * We don't have a container or dependency-injection, so use singleton instead
    *
-   * @var object
+   * @var CRM_Core_Resources
    */
-  private static $_singleton = NULL;
+  private static $_singleton;
 
   /**
    * @var CRM_Extension_Mapper
@@ -103,12 +103,12 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
   /**
    * Get or set the single instance of CRM_Core_Resources.
    *
-   * @param CRM_Core_Resources $instance
+   * @param CRM_Core_Resources|null $instance
    *   New copy of the manager.
    *
    * @return CRM_Core_Resources
    */
-  public static function singleton(CRM_Core_Resources $instance = NULL) {
+  public static function singleton(?CRM_Core_Resources $instance = NULL) {
     if ($instance !== NULL) {
       self::$_singleton = $instance;
     }
@@ -290,8 +290,8 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
     // TODO consider caching results
     $base = $this->paths->hasVariable($ext)
       ? $this->paths->getVariable($ext, 'url')
-      : ($this->extMapper->keyToUrl($ext) . '/');
-    return $base . $file;
+      : $this->extMapper->keyToUrl($ext);
+    return rtrim($base, '/') . "/$file";
   }
 
   /**
@@ -381,6 +381,11 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
     if (!self::isAjaxMode()) {
       $this->addBundle('coreResources');
       $this->addCoreStyles($region);
+      if (!CRM_Core_Config::isUpgradeMode()) {
+        // This ensures that if a popup link requires AngularJS, it will always be available.
+        // Additional Ang modules required by popups will be loaded on-the-fly by Civi\Angular\AngularLoader
+        Civi::service('angularjs.loader')->addModules(['crmResource']);
+      }
     }
     return $this;
   }
@@ -420,7 +425,30 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
   }
 
   /**
+   * Get the params used to render crm-l10n.js
+   * Gets called above the caching layer and then used
+   * in the render function below
+   */
+  public static function getL10nJsParams(): array {
+    $settings = Civi::settings();
+    return [
+      'cid' => CRM_Core_Session::getLoggedInContactID() ?: 0,
+      'includeEmailInName' => (bool) $settings->get('includeEmailInName'),
+      'ajaxPopupsEnabled' => (bool) $settings->get('ajaxPopupsEnabled'),
+      'allowAlertAutodismissal' => (bool) $settings->get('allow_alert_autodismissal'),
+      'resourceCacheCode' => Civi::resources()->getCacheCode(),
+      'locale' => CRM_Core_I18n::getLocale(),
+      'lcMessages' => $settings->get('lcMessages'),
+      'dateInputFormat' => $settings->get('dateInputFormat'),
+      'timeInputFormat' => $settings->get('timeInputFormat'),
+      'moneyFormat' => CRM_Utils_Money::format(1234.56),
+    ];
+  }
+
+  /**
    * Create dynamic script for localizing js widgets.
+   * Params come from the function above
+   * @see getL10nJsParams
    */
   public static function renderL10nJs(GenericHookEvent $e) {
     if ($e->asset !== 'crm-l10n.js') {
@@ -429,11 +457,48 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
     $e->mimeType = 'application/javascript';
     $params = $e->params;
     $params += [
-      'contactSearch' => json_encode($params['includeEmailInName'] ? ts('Search by name/email or id...') : ts('Search by name or id...')),
+      'contactSearch' => json_encode(!empty($params['includeEmailInName']) ? ts('Search by name/email or id...') : ts('Search by name or id...')),
       'otherSearch' => json_encode(ts('Enter search term or id...')),
       'entityRef' => self::getEntityRefMetadata(),
+      'quickAdd' => self::getQuickAddForms($e->params['cid']),
     ];
     $e->content = CRM_Core_Smarty::singleton()->fetchWith('CRM/common/l10n.js.tpl', $params);
+  }
+
+  /**
+   * Gets links to "Quick Add" forms, for use in Autocomplete widgets
+   *
+   * @param int|null $cid
+   * @return array
+   */
+  private static function getQuickAddForms(?int $cid): array {
+    $forms = [];
+    try {
+      $contactTypes = CRM_Contact_BAO_ContactType::getAllContactTypes();
+      $routes = \Civi\Api4\Route::get(FALSE)
+        ->addSelect('path', 'title', 'access_arguments')
+        ->addWhere('path', 'LIKE', 'civicrm/quick-add/%')
+        ->execute();
+      foreach ($routes as $route) {
+        // Ensure user has permission to use the form
+        if (!empty($route['access_arguments'][0]) && !CRM_Core_Permission::check($route['access_arguments'][0], $cid)) {
+          continue;
+        }
+        // Ensure API entity exists
+        [, , $entityType] = array_pad(explode('/', $route['path']), 3, '*');
+        if (\Civi\Api4\Utils\CoreUtil::entityExists($entityType)) {
+          $forms[] = [
+            'entity' => $entityType,
+            'path' => $route['path'],
+            'title' => $route['title'],
+            'icon' => \Civi\Api4\Utils\CoreUtil::getInfoItem($entityType, 'icon'),
+          ];
+        }
+      }
+    }
+    catch (CRM_Core_Exception $e) {
+    }
+    return $forms;
   }
 
   /**
@@ -441,7 +506,7 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
    *   is this page request an ajax snippet?
    */
   public static function isAjaxMode() {
-    if (in_array(CRM_Utils_Array::value('snippet', $_REQUEST), [
+    if (in_array($_REQUEST['snippet'] ?? '', [
       CRM_Core_Smarty::PRINT_SNIPPET,
       CRM_Core_Smarty::PRINT_NOFORM,
       CRM_Core_Smarty::PRINT_JSON,
@@ -449,8 +514,9 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
     ) {
       return TRUE;
     }
-    [$arg0, $arg1] = array_pad(explode('/', (CRM_Utils_System::currentPath() ?? '')), 2, '');
-    return ($arg0 === 'civicrm' && in_array($arg1, ['ajax', 'angularprofiles', 'asset']));
+    $path = explode('/', (CRM_Utils_System::currentPath() ?? ''));
+    [$arg0, $arg1] = array_pad($path, 2, '');
+    return ($arg0 === 'civicrm' && (in_array($arg1, ['angularprofiles', 'asset']) || in_array('ajax', $path, TRUE)));
   }
 
   /**

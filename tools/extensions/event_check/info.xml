@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<extension key="event_check" type="module">
+  <file>event_check</file>
+  <name>Event Check</name>
+  <description>QA/development tool. Enable strict enforcement of event and hook behaviors.</description>
+  <license>AGPL-3.0</license>
+  <maintainer>
+    <author>Tim Otten</author>
+    <email>totten@civicrm.org</email>
+  </maintainer>
+  <urls>
+    <url desc="Main Extension Page">https://civicrm.org</url>
+    <url desc="Documentation">https://docs.civicrm.org</url>
+    <url desc="Support">https://lab.civicrm.org</url>
+    <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
+  </urls>
+  <releaseDate>[civicrm.releaseDate]</releaseDate>
+  <version>[civicrm.version]</version>
+  <develStage>alpha</develStage>
+  <compatibility>
+    <ver>[civicrm.majorVersion]</ver>
+  </compatibility>
+  <comments></comments>
+  <classloader>
+    <psr0 prefix="CRM_" path="."/>
+    <psr4 prefix="Civi\" path="Civi"/>
+  </classloader>
+  <civix>
+    <namespace>CRM/EventCheck</namespace>
+    <format>23.02.1</format>
+    <angularModule>crmEventCheck</angularModule>
+  </civix>
+  <!--
+  <mixins>
+    <mixin>mgd-php@1.0.0</mixin>
+    <mixin>setting-php@1.0.0</mixin>
+    <mixin>smarty-v2@1.0.1</mixin>
+  </mixins>
+  -->
+</extension>

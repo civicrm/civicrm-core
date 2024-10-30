@@ -21,27 +21,26 @@
   <tr><td>{ts}When{/ts}</td>
       <td width="90%">
         {$event.event_start_date|crmDate}
-        {if $event.event_end_date}
-            &nbsp; {ts}through{/ts} &nbsp;
+        {if array_key_exists('event_end_date', $event) && $event.event_end_date}{ts}through{/ts}
             {* Only show end time if end date = start date *}
             {if $event.event_end_date|crmDate:"%Y%m%d" == $event.event_start_date|crmDate:"%Y%m%d"}
-                {$event.event_end_date|crmDate:0:1}
+              {$event.event_end_date|crmDate:0:1}
             {else}
-                {$event.event_end_date|crmDate}
+              {$event.event_end_date|crmDate}
             {/if}
         {/if}
       </td>
   </tr>
 
   {if $isShowLocation}
-    {if $location.address.1}
+    {if array_key_exists(1, $location.address) && $location.address.1}
       <tr><td>{ts}Location{/ts}</td>
           <td>
             {$location.address.1.display|nl2br}
-            {if ( $event.is_map &&
+            {if ($event.is_map &&
             $config->mapProvider &&
-      ( ( !empty($location.address.1.geo_code_1) && is_numeric($location.address.1.geo_code_1) )  ||
-        ( !empty($location.address.1.city) AND !empty($location.address.1.state_province) ) ) ) }
+      ((!empty($location.address.1.geo_code_1) && is_numeric($location.address.1.geo_code_1)) ||
+        (!empty($location.address.1.city) AND !empty($location.address.1.state_province))))}
               <br/><a href="{crmURL p='civicrm/contact/map/event' q="reset=1&eid=`$event.id`"}" title="{ts}Map this Address{/ts}" target="_blank">{ts}Map this Location{/ts}</a>
             {/if}
           </td>
@@ -49,13 +48,13 @@
     {/if}
   {/if}{*End of isShowLocation condition*}
 
-  {if $location.phone.1.phone || $location.email.1.email}
+  {if !empty($location.phone.1.phone) || !empty($location.email.1.email)}
     <tr><td>{ts}Contact{/ts}</td>
         <td>
         {* loop on any phones and emails for this event *}
            {foreach from=$location.phone item=phone}
              {if $phone.phone}
-                {if $phone.phone_type}{$phone.phone_type_display}{else}{ts}Phone{/ts}{/if}: {$phone.phone} {if $phone.phone_ext}&nbsp;{ts}ext.{/ts} {$phone.phone_ext}{/if}
+                {if array_key_exists('phone_type', $phone) && $phone.phone_type}{$phone.phone_type_display}{else}{ts}Phone{/ts}{/if}: {$phone.phone} {if array_key_exists('phone_ext', $phone) && $phone.phone_ext}&nbsp;{ts}ext.{/ts} {$phone.phone_ext}{/if}
                 <br />
             {/if}
            {/foreach}

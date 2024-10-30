@@ -62,7 +62,7 @@ class CRM_Core_Form_Task_PDFLetterCommon {
       FALSE
     );
 
-    // Added for core#2121,
+    // Added for dev/core#2121,
     // To support sending a custom pdf filename before downloading.
     $form->addElement('hidden', 'pdf_file_name');
 
@@ -327,6 +327,7 @@ class CRM_Core_Form_Task_PDFLetterCommon {
    * @param string $message
    */
   public static function formatMessage(&$message) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     $newLineOperators = [
       'p' => [
         'oper' => '<p>',

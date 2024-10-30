@@ -31,6 +31,8 @@ class api_v4_OAuthContactTokenTest extends \PHPUnit\Framework\TestCase implement
 
   private $hookEvents;
 
+  protected $ids = [];
+
   public function setUpHeadless(): \Civi\Test\CiviEnvBuilder {
     // Civi\Test has many helpers, like install(), uninstall(), sql(), and sqlFile().
     // See: https://docs.civicrm.org/dev/en/latest/testing/phpunit/#civitest

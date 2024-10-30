@@ -4,6 +4,7 @@ namespace Civi\Api4;
 /**
  * Data segmentation sets for searches.
  *
+ * @since 5.50
  * @package Civi\Api4
  */
 class SearchSegment extends Generic\DAOEntity {
@@ -11,7 +12,7 @@ class SearchSegment extends Generic\DAOEntity {
 
   public static function permissions() {
     $permissions = parent::permissions();
-    $permissions['default'] = [['administer CiviCRM data', 'administer search_kit']];
+    $permissions['default'] = ['administer search_kit'];
     return $permissions;
   }
 

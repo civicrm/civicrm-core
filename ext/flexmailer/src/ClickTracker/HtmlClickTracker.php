@@ -10,12 +10,17 @@
  */
 namespace Civi\FlexMailer\ClickTracker;
 
-class HtmlClickTracker implements ClickTrackerInterface {
+use Civi\Core\Service\AutoService;
+
+/**
+ * @service civi_flexmailer_html_click_tracker
+ */
+class HtmlClickTracker extends AutoService implements ClickTrackerInterface {
 
   public function filterContent($msg, $mailing_id, $queue_id) {
     return self::replaceHrefUrls($msg,
       function ($url) use ($mailing_id, $queue_id) {
-        $data = \CRM_Mailing_BAO_TrackableURL::getTrackerURL(
+        $data = \CRM_Mailing_BAO_MailingTrackableURL::getTrackerURL(
           html_entity_decode($url), $mailing_id, $queue_id);
         $data = htmlentities($data, ENT_NOQUOTES);
         return $data;

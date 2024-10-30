@@ -8,7 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 {* This included tpl checks if a given username is taken or available. *}
-{crmSigner var=checkUserSig for=civicrm/ajax/cmsuser}
+{crmSigner var=checkUserSig for="civicrm/ajax/cmsuser"}
 {literal}
 var lastName = null;
 cj("#checkavailability").click(function() {
@@ -47,7 +47,7 @@ cj("#checkavailability").click(function() {
       cj("#msgbox").removeClass().addClass('cmsmessagebox').css({"color":"#000","backgroundColor":"#FFC","border":"1px solid #c93"}).text(check).fadeIn("slow");
 
       //check the username exists or not from ajax
-   var contactUrl = {/literal}"{crmURL p='civicrm/ajax/cmsuser' h=0 }"{literal};
+   var contactUrl = {/literal}"{crmURL p='civicrm/ajax/cmsuser' h=0}"{literal};
 
    var checkUserParams = {
        cms_name: cj("#cms_name").val(),

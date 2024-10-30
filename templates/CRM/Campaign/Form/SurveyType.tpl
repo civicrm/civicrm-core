@@ -1,1 +1,1 @@
-{include file="CRM/Admin/Form/Options.tpl" }
+{include file="CRM/Admin/Form/Options.tpl"}

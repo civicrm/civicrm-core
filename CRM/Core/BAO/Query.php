@@ -21,9 +21,15 @@ class CRM_Core_BAO_Query {
    * @param array $extends
    */
   public static function addCustomFormFields(&$form, $extends) {
-    $groupDetails = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, TRUE, $extends);
+    $groupDetails = CRM_Core_BAO_CustomGroup::getAll(['extends' => $extends]);
     if ($groupDetails) {
       foreach ($groupDetails as $group) {
+        if (empty($group['fields'])) {
+          // if there are no searchable fields in the custom group remove it
+          // from the details to avoid empty accordians per
+          // https://lab.civicrm.org/dev/core/-/issues/5112
+          unset($groupDetails[$group['id']]);
+        }
         foreach ($group['fields'] as $field) {
           $fieldId = $field['id'];
           $elementName = 'custom_' . $fieldId;

@@ -14,7 +14,7 @@
     <label for="afform-list-filter">{{:: ts('Filter:') }}</label>
     <input class="form-control" type="search" id="afform-list-filter" ng-model="$ctrl.searchAfformList" placeholder="&#xf002">
     <div class="btn-group pull-right" ng-if="types[$ctrl.tab].options !== false" af-gui-menu>
-      <a ng-if="types[$ctrl.tab].default" href="{{ types[$ctrl.tab].default }}" class="btn btn-primary">
+      <a ng-if="types[$ctrl.tab].default" ng-href="{{ types[$ctrl.tab].default }}" class="btn btn-primary">
         {{ ts('New %1', {1: types[$ctrl.tab].label }) }}
       </a>
       <button type="button" ng-click="$ctrl.createLinks()" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -28,7 +28,7 @@
           <a href ng-if="types[$ctrl.tab].options && !types[$ctrl.tab].options.length">{{:: ts('None Found') }}</a>
         </li>
         <li ng-repeat="link in types[$ctrl.tab].options | filter:searchCreateLinks" class="{{:: link.class }}">
-          <a ng-if=":: link.url" href="{{:: link.url }}">
+          <a ng-if=":: link.url" ng-href="{{:: link.url }}">
             <i class="crm-i {{:: link.icon }}"></i>
             {{:: link.label }}
           </a>
@@ -60,6 +60,11 @@
         <i class="crm-i fa-sort-{{ $ctrl.sortDir ? 'asc' : 'desc' }}" ng-if="$ctrl.sortField === 'placement.length'"></i>
         {{:: ts('Placement') }}
       </th>
+      <th ng-if="$ctrl.tab === 'form'" title="{{:: ts('Click to sort') }}" ng-click="$ctrl.sortBy('submit_currently_open')">
+        <i class="crm-i fa-sort disabled" ng-if="$ctrl.sortField !== 'submit_currently_open'"></i>
+        <i class="crm-i fa-sort-{{ $ctrl.sortDir ? 'asc' : 'desc' }}" ng-if="$ctrl.sortField === 'submit_currently_open'"></i>
+        {{:: ts('Status') }}
+      </th>
       <th ng-if="$ctrl.tab === 'form'" title="{{:: ts('Click to sort') }}" ng-click="$ctrl.sortBy('submission_count')">
         <i class="crm-i fa-sort disabled" ng-if="$ctrl.sortField !== 'submission_count'"></i>
         <i class="crm-i fa-sort-{{ $ctrl.sortDir ? 'asc' : 'desc' }}" ng-if="$ctrl.sortField === 'submission_count'"></i>
@@ -87,19 +92,25 @@
       </td>
       <td>{{:: afform.placement.join(', ') }}</td>
       <td ng-if="$ctrl.tab === 'form'">
+        {{:: afform.submit_currently_open ? ts('Open') : ts('Closed') }}
+        <span ng-if="afform.submit_limit && afform.submit_enabled">
+          ({{:: ts('%1 remaining', {1: afform.submit_limit - afform.submission_count}) }})
+        </span>
+      </td>
+      <td ng-if="$ctrl.tab === 'form'">
         <a ng-if="afform.submission_count" ng-href="{{:: crmUrl('civicrm/admin/afform/submissions#/?name=' + afform.name) }}">
           {{:: afform.submission_count === 1 ? ts('1 Submission') : ts('%1 Submissions', {1: afform.submission_count}) }}
         </a>
-        <div ng-if="afform.last_submission">
-          {{:: ts('Last submitted: %1', {1: afform.last_submission}) }}
+        <div ng-if="afform.submission_date">
+          {{:: ts('Last submitted: %1', {1: afform.submission_date}) }}
         </div>
       </td>
       <td>
         {{:: afform['base_module:label'] }}
       </td>
       <td class="text-right">
-        <a ng-if="afform.type !== 'system'" href="#/edit/{{:: afform.name }}" class="btn btn-xs btn-primary">{{:: ts('Edit') }}</a>
-        <a ng-if="afform.type !== 'system'" href="#/clone/{{:: afform.name }}" class="btn btn-xs btn-secondary">{{:: ts('Clone') }}</a>
+        <a ng-if="afform.type !== 'system'" ng-href="#/edit/{{:: afform.name }}" class="btn btn-xs btn-primary">{{:: ts('Edit') }}</a>
+        <a ng-if="afform.type !== 'system'" ng-href="#/clone/{{:: afform.name }}" class="btn btn-xs btn-secondary">{{:: ts('Clone') }}</a>
         <a href ng-if="afform.has_local" class="btn btn-xs btn-{{ afform.has_base ? 'warning' : 'danger' }}" crm-confirm="{type: afform.has_base ? 'revert' : 'delete', obj: afform}" on-yes="$ctrl.revert(afform)">
           {{ afform.has_base ? ts('Revert') : ts('Delete') }}
         </a>

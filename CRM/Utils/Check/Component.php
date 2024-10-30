@@ -133,9 +133,9 @@ abstract class CRM_Utils_Check_Component {
     $fileExists = FALSE;
     try {
       $guzzleClient = new GuzzleHttp\Client();
-      $guzzleResponse = $guzzleClient->request('GET', $url, array(
+      $guzzleResponse = $guzzleClient->request('GET', $url, [
         'timeout' => $timeoutOverride,
-      ));
+      ]);
       $fileExists = ($guzzleResponse->getStatusCode() == 200);
     }
     catch (Exception $e) {

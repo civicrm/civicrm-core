@@ -18,8 +18,6 @@
   </div>
 {literal}
   <script type="text/javascript">
-    var RecaptchaOptions = {{/literal}{$recaptchaOptions}{literal}};
-
   (function($) {
     document.addEventListener('DOMContentLoaded', function() {
       var submitButtons = $('div.crm-submit-buttons').last();

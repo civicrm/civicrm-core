@@ -17,7 +17,7 @@ class CRM_Upgrade_Incremental_php_FiveForty extends CRM_Upgrade_Incremental_Base
   public function upgrade_5_40_alpha1($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Add option list for group_used_for', 'addGroupOptionList');
-    $this->addTask('core-issue#2486  - Add product_id foreign key to civicrm_contribution_product', 'addContributionProductFK');
+    $this->addTask('dev/core#2486  - Add product_id foreign key to civicrm_contribution_product', 'addContributionProductFK');
     $this->addTask('Add membership_num_terms column to civicrm_line_item', 'addColumn',
       'civicrm_line_item', 'membership_num_terms', "int unsigned DEFAULT NULL COMMENT 'Number of terms for this membership (only supported in Order->Payment flow). If the field is NULL it means unknown and it will be assumed to be 1 during payment.create if entity_table is civicrm_membership'"
     );

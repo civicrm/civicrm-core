@@ -22,7 +22,7 @@
       <th data-data="amount">{ts}Amount{/ts}</th>
       <th data-data="sct_label">{ts}Type{/ts}</th>
       <th data-data="financial_type">{ts}Financial Type{/ts}</th>
-      <th data-data="receive_date" class="sorting_desc">{ts}Received{/ts}</th>
+      <th data-data="receive_date" class="sorting_desc">{ts}Contribution Date{/ts}</th>
       <th data-data="contribution_status">{ts}Status{/ts}</th>
       <th data-data="pcp_title">{ts}Personal Campaign Page?{/ts}</th>
       <th data-data="links" data-orderable="false">&nbsp;</th>

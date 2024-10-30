@@ -27,7 +27,7 @@ use Psr\Log\LoggerInterface;
 /**
  * @group headless
  */
-class RotateKeyTest extends Api4TestBase implements TransactionalInterface {
+class SystemRotateKeyTest extends Api4TestBase implements TransactionalInterface {
 
   use CryptoTestTrait;
 
@@ -40,7 +40,7 @@ class RotateKeyTest extends Api4TestBase implements TransactionalInterface {
     \CRM_Utils_Hook::singleton()->setHook('civicrm_cryptoRotateKey', [$this, 'onRotateKey']);
   }
 
-  public function testRekey() {
+  public function testRekey(): void {
     $result = \Civi\Api4\System::rotateKey(0)->setTag('UNIT-TEST')->execute();
     $this->assertEquals(2, count($result));
     $this->assertEquals('Updated field A using UNIT-TEST.', $result[0]['message']);

@@ -102,7 +102,7 @@ class CRM_Report_Form_Instance {
       $form->freeze('is_reserved');
     }
 
-    $getPerms = \Civi\Api4\Permission::get(0)
+    $getPerms = \Civi\Api4\Permission::get(FALSE)
       ->addWhere('is_active', '=', 1)
       ->addWhere('group', 'IN', ['civicrm', 'cms', 'const'])
       ->setOrderBy(['title' => 'ASC'])
@@ -125,6 +125,7 @@ class CRM_Report_Form_Instance {
           'size' => 5,
           'style' => 'width:240px',
           'class' => 'advmultiselect',
+          'title' => ts('ACL Group/Role'),
         ]
       );
       $grouprole->setButtonAttributes('add', ['value' => ts('Add >>')]);
@@ -246,7 +247,7 @@ class CRM_Report_Form_Instance {
 
     if ($instanceID) {
       // this is already retrieved via Form.php
-      $defaults['description'] = $defaults['description'] ?? NULL;
+      $defaults['description'] ??= NULL;
       if (!empty($defaults['header'])) {
         $defaults['report_header'] = $defaults['header'];
       }
@@ -256,7 +257,7 @@ class CRM_Report_Form_Instance {
 
       // CRM-17310 private reports option.
       $defaults['add_to_my_reports'] = 0;
-      if (CRM_Utils_Array::value('owner_id', $defaults) != NULL) {
+      if (($defaults['owner_id'] ?? NULL) != NULL) {
         $defaults['add_to_my_reports'] = 1;
       }
 
@@ -318,7 +319,7 @@ class CRM_Report_Form_Instance {
       // Delete navigation if exists.
       $navId = CRM_Core_DAO::getFieldValue('CRM_Report_DAO_ReportInstance', $instanceID, 'navigation_id', 'id');
       if ($navId) {
-        CRM_Core_BAO_Navigation::processDelete($navId);
+        CRM_Core_BAO_Navigation::deleteRecord(['id' => $navId]);
         CRM_Core_BAO_Navigation::resetNavigation();
       }
     }

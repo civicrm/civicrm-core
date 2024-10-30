@@ -17,7 +17,7 @@ class CRM_Member_Utils_RelationshipProcessor {
   /**
    * Contact IDs to process.
    *
-   * @var [int]
+   * @var int[]
    */
   protected $contactIDs = [];
 

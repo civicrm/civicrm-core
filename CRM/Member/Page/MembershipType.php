@@ -45,22 +45,26 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
           'url' => 'civicrm/admin/member/membershipType/add',
           'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit Membership Type'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
         ],
         CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable Membership Type'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DISABLE),
         ],
         CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable Membership Type'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ENABLE),
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/member/membershipType/add',
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete Membership Type'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
         ],
       ];
     }
@@ -86,9 +90,9 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
   /**
    * Browse all membership types.
    *
-   * @return void
+   * @throws \CRM_Core_Exception
    */
-  public function browse() {
+  public function browse(): void {
     // Ensure an action is assigned, even null - since this page is overloaded for other uses
     // we need to avoid e-notices.
     $this->assign('action');
@@ -136,12 +140,6 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
             $value, $relationshipName
           );
         }
-      }
-      if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() && !CRM_Core_Permission::check('edit contributions of type ' . CRM_Contribute_PseudoConstant::financialType($type['financial_type_id']))) {
-        unset($links[CRM_Core_Action::UPDATE], $links[CRM_Core_Action::ENABLE], $links[CRM_Core_Action::DISABLE]);
-      }
-      if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() && !CRM_Core_Permission::check('delete contributions of type ' . CRM_Contribute_PseudoConstant::financialType($type['financial_type_id']))) {
-        unset($links[CRM_Core_Action::DELETE]);
       }
       // form all action links
       $action = array_sum(array_keys($this->links()));

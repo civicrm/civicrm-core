@@ -77,7 +77,7 @@ function civicrm_api3_uf_field_delete($params) {
     throw new CRM_Core_Exception('Invalid value for field_id.');
   }
 
-  $result = CRM_Core_BAO_UFField::del($fieldId);
+  $result = CRM_Core_BAO_UFField::deleteRecord(['id' => $fieldId]);
 
   $fieldsType = CRM_Core_BAO_UFGroup::calculateGroupType($ufGroupId, TRUE);
   CRM_Core_BAO_UFGroup::updateGroupTypes($ufGroupId, $fieldsType);

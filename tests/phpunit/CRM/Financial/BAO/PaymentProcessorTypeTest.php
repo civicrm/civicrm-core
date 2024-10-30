@@ -18,7 +18,7 @@ class CRM_Financial_BAO_PaymentProcessorTypeTest extends CiviUnitTestCase {
   /**
    * Check method create()
    */
-  public function testCreate() {
+  public function testCreate(): void {
     $params = [
       'name' => 'Test_Payment_Processor',
       'title' => 'Test Payment Processor',
@@ -39,7 +39,7 @@ class CRM_Financial_BAO_PaymentProcessorTypeTest extends CiviUnitTestCase {
   /**
    * Check method retrieve()
    */
-  public function testRetrieve() {
+  public function testRetrieve(): void {
     $params = [
       'name' => 'Test_Retrieve_Payment_Processor',
       'title' => 'Test Retrieve Payment Processor',
@@ -55,7 +55,7 @@ class CRM_Financial_BAO_PaymentProcessorTypeTest extends CiviUnitTestCase {
   /**
    * Check method setIsActive()
    */
-  public function testSetIsActive() {
+  public function testSetIsActive(): void {
     $params = [
       'name' => 'Test_Set_Payment_Processor',
       'title' => 'Test Set Payment Processor',
@@ -81,7 +81,7 @@ class CRM_Financial_BAO_PaymentProcessorTypeTest extends CiviUnitTestCase {
   /**
    * Check method getDefault()
    */
-  public function testGetDefault() {
+  public function testGetDefault(): void {
     $params = ['is_default' => 1];
     $defaults = [];
     $result = CRM_Financial_BAO_PaymentProcessorType::retrieve($params, $defaults);
@@ -93,7 +93,7 @@ class CRM_Financial_BAO_PaymentProcessorTypeTest extends CiviUnitTestCase {
   /**
    * Check method del()
    */
-  public function testDel() {
+  public function testDel(): void {
     $params = [
       'name' => 'Test_Del_Payment_Processor',
       'title' => 'Test Del Payment Processor',

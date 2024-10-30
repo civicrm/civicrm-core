@@ -24,7 +24,12 @@ class CRM_Price_Form_OptionTest extends CiviUnitTestCase {
     ]);
   }
 
-  public function testChangingUniquePublicOptionOnPublicFieldIsNotAllowed() {
+  public function tearDown(): void {
+    $this->quickCleanUpFinancialEntities();
+    parent::tearDown();
+  }
+
+  public function testChangingUniquePublicOptionOnPublicFieldIsNotAllowed(): void {
     $this->setUpPriceSet([
       'html_type' => 'Select',
       'visibility_id' => $this->visibilityOptionsKeys['public'],
@@ -51,7 +56,7 @@ class CRM_Price_Form_OptionTest extends CiviUnitTestCase {
     $this->assertTrue(array_key_exists('visibility_id', $validationResult));
   }
 
-  public function testAddingPublicOptionToAdminFieldIsNotAllowed() {
+  public function testAddingPublicOptionToAdminFieldIsNotAllowed(): void {
     $this->setUpPriceSet([
       'html_type' => 'Select',
       'visibility_id' => $this->visibilityOptionsKeys['admin'],

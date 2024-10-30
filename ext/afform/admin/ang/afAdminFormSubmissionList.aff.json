@@ -1,6 +1,0 @@
-{
-    "type": "system",
-    "title": "Submissions",
-    "server_route": "civicrm/admin/afform/submissions",
-    "permission": [["administer CiviCRM", "administer afform"]]
-}

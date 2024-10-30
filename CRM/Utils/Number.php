@@ -30,7 +30,7 @@ class CRM_Utils_Number {
    * @link https://dev.mysql.com/doc/refman/5.1/en/fixed-point-types.html
    */
   public static function createRandomDecimal($precision) {
-    list ($sigFigs, $decFigs) = $precision;
+    [$sigFigs, $decFigs] = $precision;
     $rand = rand(0, pow(10, $sigFigs) - 1);
     return $rand / pow(10, $decFigs);
   }
@@ -47,7 +47,7 @@ class CRM_Utils_Number {
    * @link https://dev.mysql.com/doc/refman/5.1/en/fixed-point-types.html
    */
   public static function createTruncatedDecimal($keyValue, $precision) {
-    list ($sigFigs, $decFigs) = $precision;
+    [$sigFigs, $decFigs] = $precision;
     $sign = ($keyValue < 0) ? '-1' : 1;
     // ex: -123.456 ==> 123456
     $val = str_replace('.', '', abs($keyValue));
@@ -66,14 +66,13 @@ class CRM_Utils_Number {
   }
 
   /**
-   * Some kind of numbery-looky-printy thing.
+   * Convert a file size value from the formats allowed in php_ini to the number of bytes.
    *
    * @param string $size
-   * @param bool $checkForPostMax
    *
    * @return int
    */
-  public static function formatUnitSize($size, $checkForPostMax = FALSE) {
+  public static function formatUnitSize($size): int {
     if ($size) {
       $last = strtolower($size[strlen($size) - 1]);
       $size = (int) $size;
@@ -87,21 +86,22 @@ class CRM_Utils_Number {
         case 'k':
           $size *= 1024;
       }
-
-      if ($checkForPostMax) {
-        $maxImportFileSize = self::formatUnitSize(ini_get('upload_max_filesize'));
-        $postMaxSize = self::formatUnitSize(ini_get('post_max_size'));
-        if ($maxImportFileSize > $postMaxSize && $postMaxSize == $size) {
-          CRM_Core_Session::setStatus(ts("Note: Upload max filesize ('upload_max_filesize') should not exceed Post max size ('post_max_size') as defined in PHP.ini, please check with your system administrator."), ts("Warning"), "alert");
-        }
-        // respect php.ini upload_max_filesize
-        if ($size > $maxImportFileSize && $size !== $postMaxSize) {
-          $size = $maxImportFileSize;
-          CRM_Core_Session::setStatus(ts("Note: Please verify your configuration for Maximum File Size (in MB) <a href='%1'>Administrator >> System Settings >> Misc</a>. It should support 'upload_max_size' as defined in PHP.ini.Please check with your system administrator.", [1 => CRM_Utils_System::url('civicrm/admin/setting/misc', 'reset=1')]), ts("Warning"), "alert");
-        }
-      }
       return $size;
     }
+  }
+
+  /**
+   * Get the maximum size permitted for a file upload.
+   *
+   * @return float
+   */
+  public static function getMaximumFileUploadSize(): float {
+    $uploadFileSize = \CRM_Utils_Number::formatUnitSize(\Civi::settings()->get('maxFileSize') . 'm', TRUE);
+    //Fetch uploadFileSize from php_ini when $config->maxFileSize is set to "no limit".
+    if (empty($uploadFileSize)) {
+      $uploadFileSize = \CRM_Utils_Number::formatUnitSize(ini_get('upload_max_filesize'), TRUE);
+    }
+    return round(($uploadFileSize / (1024 * 1024)), 2);
   }
 
   /**
@@ -117,6 +117,11 @@ class CRM_Utils_Number {
    * @throws \Brick\Money\Exception\UnknownCurrencyException
    */
   public static function formatLocaleNumeric(string $amount, $locale = NULL): string {
+    if ($amount === "") {
+      CRM_Core_Error::deprecatedWarning('Passing an empty string for amount is deprecated.');
+      return $amount;
+    }
+
     $formatter = new \NumberFormatter($locale ?? CRM_Core_I18n::getLocale(), NumberFormatter::DECIMAL);
     $formatter->setSymbol(\NumberFormatter::DECIMAL_SEPARATOR_SYMBOL, CRM_Core_Config::singleton()->monetaryDecimalPoint);
     $formatter->setSymbol(\NumberFormatter::GROUPING_SEPARATOR_SYMBOL, CRM_Core_Config::singleton()->monetaryThousandSeparator);

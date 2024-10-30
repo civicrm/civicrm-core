@@ -61,13 +61,37 @@ AND    {$this->_componentClause}";
         'title' => ts('Search Results'),
       ],
     ];
-    CRM_Contact_Form_Task_EmailCommon ::preProcessFromAddress($this, FALSE);
+    $this->_contactIds = $this->_contactIds ?: [CRM_Core_Session::getLoggedInContactID()];
+    $this->preProcessFromAddress();
     // we have all the contribution ids, so now we get the contact ids
     parent::setContactIDs();
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
     $this->setTitle(ts('Print Contribution Receipts'));
     // Ajax submit would interfere with pdf file download
     $this->preventAjaxSubmit();
+  }
+
+  /**
+   * Pre Process Form Addresses to be used in Quickform
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function preProcessFromAddress() {
+    $fromEmailValues = CRM_Core_BAO_Email::getFromEmail();
+
+    if (empty($fromEmailValues)) {
+      CRM_Core_Error::statusBounce(ts('Your user record does not have a valid email address and no from addresses have been configured.'));
+    }
+
+    $defaults = [];
+    if (is_numeric(key($fromEmailValues))) {
+      $emailID = (int) key($fromEmailValues);
+      $defaults = CRM_Core_BAO_Email::getEmailSignatureDefaults($emailID);
+    }
+    if (!Civi::settings()->get('allow_mail_from_logged_in_contact')) {
+      $defaults['from_email_address'] = CRM_Core_BAO_Domain::getFromEmail();
+    }
+    $this->setDefaults($defaults);
   }
 
   /**
@@ -95,7 +119,7 @@ AND    {$this->_componentClause}";
     $this->add('checkbox', 'receipt_update', ts('Update receipt dates for these contributions'), FALSE);
     $this->add('checkbox', 'override_privacy', ts('Override privacy setting? (Do not email / Do not mail)'), FALSE);
 
-    $this->add('select', 'from_email_address', ts('From Email'), $this->_fromEmails, FALSE);
+    $this->add('select', 'from_email_address', ts('From Email'), $this->getFromEmails(), FALSE);
 
     $this->addButtons([
       [
@@ -108,6 +132,15 @@ AND    {$this->_componentClause}";
         'name' => ts('Cancel'),
       ],
     ]);
+  }
+
+  /**
+   * Get an array of email IDS from which the back-office user may select the from field.
+   *
+   * @return array
+   */
+  public function getFromEmails(): array {
+    return CRM_Core_BAO_Email::getFromEmail();
   }
 
   /**
@@ -158,6 +191,10 @@ AND    {$this->_componentClause}";
 
       $contribution = new CRM_Contribute_BAO_Contribution();
       $contribution->id = $contribID;
+      // @todo This fetch makes no sense because there is no query dao so
+      // $contribution only gets `id` set. It should be
+      // $contribution->find(TRUE). But then also it seems this isn't really
+      // used.
       $contribution->fetch();
 
       // set some fake input values so we can reuse IPN code
@@ -169,7 +206,7 @@ AND    {$this->_componentClause}";
       $input['trxn_date'] = $contribution->trxn_date ?? NULL;
       $input['receipt_update'] = $params['receipt_update'];
       $input['contribution_status_id'] = $contribution->contribution_status_id;
-      $input['paymentProcessor'] = empty($contribution->trxn_id) ? NULL :
+      $input['payment_processor_id'] = empty($contribution->trxn_id) ? NULL :
         CRM_Core_DAO::singleValueQuery("SELECT payment_processor_id
           FROM civicrm_financial_trxn
           WHERE trxn_id = %1
@@ -244,14 +281,13 @@ AND    {$this->_componentClause}";
     $pdfElements = [];
     $pdfElements['details'] = self::getDetails(implode(',', $contribIds));
     $excludeContactIds = [];
+    $suppressedEmails = 0;
     if (!$isCreatePDF) {
       $contactDetails = civicrm_api3('Contact', 'get', [
         'return' => ['email', 'do_not_email', 'is_deceased', 'on_hold'],
         'id' => ['IN' => $contactIds],
         'options' => ['limit' => 0],
       ])['values'];
-      $pdfElements['suppressedEmails'] = 0;
-      $suppressedEmails = 0;
       foreach ($contactDetails as $id => $values) {
         if (empty($values['email']) ||
           (empty($params['override_privacy']) && !empty($values['do_not_email']))
@@ -259,11 +295,11 @@ AND    {$this->_componentClause}";
           || !empty($values['on_hold'])
         ) {
           $suppressedEmails++;
-          $pdfElements['suppressedEmails'] = $suppressedEmails;
           $excludeContactIds[] = $values['contact_id'];
         }
       }
     }
+    $pdfElements['suppressedEmails'] = $suppressedEmails;
     $pdfElements['excludeContactIds'] = $excludeContactIds;
 
     return $pdfElements;

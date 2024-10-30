@@ -11,6 +11,8 @@
 
 namespace Civi\Core;
 
+use Civi;
+
 /**
  * Define a locale.
  *
@@ -156,7 +158,7 @@ class Locale {
     $locale->nominal = $tsLocale;
     $locale->ts = $tsLocale;
     $locale->db = $dbLocale ? ltrim($dbLocale, '_') : NULL;
-    $locale->moneyFormat = $tsLocale;
+    $locale->moneyFormat = Civi::settings()->get('format_locale') ?? $tsLocale;
     $locale->uf = \CRM_Utils_System::getUFLocale();
     return $locale;
   }
@@ -169,11 +171,12 @@ class Locale {
    *   Ex: `en_US`, `es_ES`, `fr_CA`
    * @return \Civi\Core\Locale
    *   The effective locale specification.
+   * @throws \CRM_Core_Exception
    */
   public static function negotiate(string $preferred): Locale {
     // Create a locale for the requested language
     if (!preg_match(';^[a-z][a-z]_[A-Z][A-Z]$;', $preferred)) {
-      throw new \RuntimeException("Cannot instantiate malformed locale: $preferred");
+      throw new \CRM_Core_Exception("Cannot instantiate malformed locale: $preferred");
     }
 
     $systemDefault = \Civi::settings()->get('lcMessages');
@@ -202,6 +205,14 @@ class Locale {
       $validDbLocales = \Civi::settings()->get('languageLimit');
       $locale->db = static::pickFirstLocale(array_keys($validDbLocales), $fallbacks) ?: $systemDefault;
     }
+
+    // Determine locale for UF APIs: This next bit is a little bit wrong.
+    // We should have something like `$validUfLanguages` and pick the closest match.
+    // Or perhaps each `CRM_Utils_System_{$UF}` should have a `negotiate()` helper.
+    // But it's a academic... D7/D8/BD are the only UF's which implement `setUFLocale`/`getUFLocale`,
+    // and they drop the country-code - which basically addresses the goal (falling back to a more generic locale).
+    $locale->uf = $locale->ts;
+
     return $locale;
   }
 

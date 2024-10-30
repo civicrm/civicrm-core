@@ -8,14 +8,12 @@
  +--------------------------------------------------------------------+
 *}
 <div id="changeLog" class="view-content">
-   <p></p>
-   <div class="bold">{ts}Change Log:{/ts} {$displayName}</div>
+   <h3>{ts}Change Log:{/ts} {$displayName}</h3>
    {if $useLogging}
-     <br />
      <div class='instance_data'><div class="crm-loading-element"></div></div>
    {else}
     <div class="form-item">
-     {if $logCount > 0 }
+     {if $logCount > 0}
        <table>
        <tr class="columnheader"><th>{ts}Changed By{/ts}</th><th>{ts}Change Date{/ts}</th></tr>
        {foreach from=$log item=row}

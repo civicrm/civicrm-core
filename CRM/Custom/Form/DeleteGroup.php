@@ -48,14 +48,13 @@ class CRM_Custom_Form_DeleteGroup extends CRM_Core_Form {
     CRM_Core_BAO_CustomGroup::retrieve($params, $defaults);
     $this->_title = $defaults['title'];
 
-    //check wheter this contain any custom fields
+    //check if this contains any custom fields
     $customField = new CRM_Core_DAO_CustomField();
     $customField->custom_group_id = $this->_id;
 
     if ($customField->find(TRUE)) {
-      CRM_Core_Session::setStatus(ts("The Group '%1' cannot be deleted! You must Delete all custom fields in this group prior to deleting the group.", [1 => $this->_title]), ts('Deletion Error'), 'error');
-      $url = CRM_Utils_System::url('civicrm/admin/custom/group', "reset=1");
-      CRM_Utils_System::redirect($url);
+      CRM_Core_Error::statusBounce(ts("The Group '%1' cannot be deleted! You must Delete all custom fields in this group prior to deleting the group.", [1 => $this->_title]),
+        CRM_Utils_System::url('civicrm/admin/custom/group', "reset=1"));
       return TRUE;
     }
     $this->assign('title', $this->_title);

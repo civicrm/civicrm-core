@@ -21,6 +21,7 @@ namespace api\v4\Entity;
 use Civi\Api4\Contact;
 use api\v4\Api4TestBase;
 use Civi\Api4\EntityTag;
+use Civi\Api4\Individual;
 use Civi\Api4\Tag;
 use Civi\Test\TransactionalInterface;
 
@@ -29,9 +30,9 @@ use Civi\Test\TransactionalInterface;
  */
 class TagTest extends Api4TestBase implements TransactionalInterface {
 
-  public function testTagFilter() {
+  public function testTagFilter(): void {
     // Ensure bypassing permissions works correctly by giving none to the logged-in user
-    $this->createLoggedInUser();
+    $cid = $this->createLoggedInUser();
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
 
     $conTag = Tag::create(FALSE)
@@ -56,6 +57,8 @@ class TagTest extends Api4TestBase implements TransactionalInterface {
       ->addValue('name', uniqid('child'))
       ->addValue('parent_id', $tagSet['id'])
       ->execute()->first();
+    $this->assertEquals($cid, $conTag['created_id']);
+    $this->assertEquals($cid, $setChild['created_id']);
 
     $contact1 = Contact::create(FALSE)
       ->execute()->first();
@@ -79,12 +82,53 @@ class TagTest extends Api4TestBase implements TransactionalInterface {
     $this->assertCount(1, $shouldReturnContact1);
     $this->assertEquals($contact1['id'], $shouldReturnContact1->first()['id']);
 
-    $shouldReturnContact2 = Contact::get(FALSE)
+    $shouldReturnContact2 = Individual::get(FALSE)
       ->addSelect('id')
       ->addWhere('tags', 'IN', [$setChild['id']])
       ->execute();
     $this->assertCount(1, $shouldReturnContact2);
     $this->assertEquals($contact2['id'], $shouldReturnContact2->first()['id']);
+  }
+
+  public function testEntityTagGetFields(): void {
+    $this->saveTestRecords('Tag', [
+      'records' => [
+        ['name' => 'c-1', 'used_for' => 'civicrm_contact'],
+        ['name' => 'c-2', 'used_for:name' => 'Contact'],
+        ['name' => 'a-1', 'used_for:name' => 'Activity'],
+        ['name' => 'tagset', 'used_for' => 'civicrm_activity', 'is_tagset' => TRUE],
+      ],
+    ]);
+
+    $getFields = EntityTag::getFields(FALSE)
+      ->addWhere('name', '=', 'tag_id')
+      ->setLoadOptions(TRUE);
+
+    // No filter
+    $options = $getFields
+      ->execute()[0]['options'];
+    $this->assertContains('c-1', $options);
+    $this->assertContains('c-2', $options);
+    $this->assertContains('a-1', $options);
+    $this->assertNotContains('tagset', $options);
+
+    // Filter: Contact
+    $options = $getFields
+      ->setValues(['entity_table:name' => 'Contact'])
+      ->execute()[0]['options'];
+    $this->assertContains('c-1', $options);
+    $this->assertContains('c-2', $options);
+    $this->assertNotContains('a-1', $options);
+    $this->assertNotContains('tagset', $options);
+
+    // Filter: Activity
+    $options = $getFields
+      ->setValues(['entity_table:name' => 'Activity'])
+      ->execute()[0]['options'];
+    $this->assertNotContains('c-1', $options);
+    $this->assertNotContains('c-2', $options);
+    $this->assertContains('a-1', $options);
+    $this->assertNotContains('tagset', $options);
   }
 
 }

@@ -9,13 +9,12 @@
 *}
 {* this template is used for adding/editing email settings.  *}
 <div class="crm-block crm-form-block crm-mail-settings-form-block">
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   {if $action eq 8}
     <div class="messages status no-popup">
       {icon icon="fa-info-circle"}{/icon}
       {ts}WARNING: Deleting this option will result in the loss of mail settings data.{/ts} {ts}Do you want to continue?{/ts}
     </div>
-    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
+    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
   {else}
     <table class="form-layout-compressed">
 
@@ -56,7 +55,17 @@
 
       <tr class="crm-mail-settings-form-block-is_contact_creation_disabled_if_no_match"><td class="label">&nbsp;</td><td>{$form.is_contact_creation_disabled_if_no_match.html}{$form.is_contact_creation_disabled_if_no_match.label} {help id='is_contact_creation_disabled_if_no_match'}</td></tr>
 
-      <tr class="crm-mail-settings-form-block-activity_status"><td class="label">&nbsp;</td><td>{$form.activity_status.label}<div>{$form.activity_status.html}</div></td></tr>
+      <tr class="crm-mail-settings-form-block-activity_type_id"><td class="label">{$form.activity_type_id.label} {help id='id-activity_type_id'}</td><td>{$form.activity_type_id.html}</td></tr>
+
+      <tr class="crm-mail-settings-form-block-activity_status"><td class="label">{$form.activity_status.label}</td><td>{$form.activity_status.html}</td></tr>
+
+      {include file="CRM/Campaign/Form/addCampaignToComponent.tpl" campaignTrClass="crm-mail-settings-form-block-campaign_id"}
+
+      <tr class="crm-mail-settings-form-block-activity_source"><td class="label">{$form.activity_source.label} {help id='id-activity_source'}</td><td>{$form.activity_source.html}</td></tr>
+      <tr class="crm-mail-settings-form-block-activity_targets"><td class="label">{$form.activity_targets.label}</td><td>{$form.activity_targets.html}</td></tr>
+      <tr class="crm-mail-settings-form-block-activity_assignees"><td class="label">{$form.activity_assignees.label}</td><td>{$form.activity_assignees.html}</td></tr>
+
+      <tr class="crm-mail-settings-form-block-is_active"><td class="label">{$form.is_active.label}</td><td>{$form.is_active.html}</td></tr>
     </table>
 
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
@@ -72,6 +81,12 @@
         '.crm-mail-settings-form-block-activity_status',
         '.crm-mail-settings-form-block-is_non_case_email_skipped',
         '.crm-mail-settings-form-block-is_contact_creation_disabled_if_no_match',
+        '.crm-mail-settings-form-block-activity_type_id',
+        '.crm-mail-settings-form-block-campaign_id',
+        '.crm-mail-settings-form-block-activity_source',
+        '.crm-mail-settings-form-block-activity_targets',
+        '.crm-mail-settings-form-block-activity_assignees',
+        '.crm-mail-settings-form-block-is_active',
       ];
       $(fields.join(', '), $form).toggle($(this).val() === '0');
     }

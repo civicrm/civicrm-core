@@ -41,7 +41,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
     $this->_docTypes = CRM_Core_SelectValues::documentApplicationType();
     $hooks = \CRM_Utils_Hook::singleton();
     $hooks->setHook('civicrm_alterMailParams',
-      array($this, 'hook_alterMailParams'));
+      [$this, 'hook_alterMailParams']);
   }
 
   /**
@@ -159,7 +159,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
     ];
 
     $form = $this->getFormObject('CRM_Contribute_Form_Task_PDFLetter');
-    [$contributions, $contacts] = $form->buildContributionArray('contact_id', $contributionIDs, $returnProperties, TRUE, TRUE, $messageToken, 'test', '**', FALSE);
+    [$contributions, $contacts] = $form->buildContributionArray('contact_id', $contributionIDs, $returnProperties, $messageToken, '**', FALSE);
 
     $this->assertEquals('Anthony', $contacts[$this->_individualId]['first_name']);
     $this->assertEquals('Donation', $contributions[$result['id']]['financial_type']);
@@ -205,7 +205,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
       ];
 
       $contributionId = $this->createContribution();
-      /** @var $form CRM_Contribute_Form_Task_PDFLetter */
+      /** @var CRM_Contribute_Form_Task_PDFLetter $form */
       $form = $this->getFormObject('CRM_Contribute_Form_Task_PDFLetter', $formValues);
       $form->setContributionIds([$contributionId]);
       $format = Civi::settings()->get('dateformatFull');
@@ -244,7 +244,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
       'html_message' => '{contact.display_name}',
       'document_type' => 'pdf',
     ];
-    /** @var $form CRM_Contribute_Form_Task_PDFLetter */
+    /** @var CRM_Contribute_Form_Task_PDFLetter $form */
     $form = $this->getFormObject('CRM_Contribute_Form_Task_PDFLetter', $formValues);
     $form->setContributionIds([$this->createContribution()]);
     try {
@@ -277,7 +277,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
       $formValues['html_message'] .= "$token : {contribution.$token}\n";
     }
     $formValues['html_message'] .= '{emoji.favourite_emoticon}';
-    /** @var $form CRM_Contribute_Form_Task_PDFLetter */
+    /** @var CRM_Contribute_Form_Task_PDFLetter $form */
     $form = $this->getFormObject('CRM_Contribute_Form_Task_PDFLetter', $formValues);
     $form->setContributionIds([$this->createContribution(array_merge(['campaign_id' => $tokens['campaign_id:label']], $tokens))]);
     try {
@@ -387,9 +387,9 @@ emo
     $this->createLoggedInUser();
     $this->hookClass->setHook('civicrm_tokenValues', [$this, 'hook_aggregateTokenValues']);
     $this->hookClass->setHook('civicrm_tokens', [$this, 'hook_tokens']);
-    $this->mut = new CiviMailUtils($this, TRUE);
-    $this->_individualId = $this->individualCreate();
-    $this->_individualId2 = $this->individualCreate();
+    $mailUtil = new CiviMailUtils($this, TRUE);
+    $contact1ID = $this->individualCreate();
+    $contact2ID = $this->individualCreate();
     $htmlMessage = '{aggregate.rendered_token}';
     $formValues = [
       'group_by' => 'contact_id',
@@ -401,14 +401,14 @@ emo
 
     $contributionIDs = [];
     $contribution = $this->callAPISuccess('Contribution', 'create', [
-      'contact_id' => $this->_individualId,
+      'contact_id' => $contact1ID,
       'total_amount' => 100,
       'financial_type_id' => 'Donation',
       'receive_date' => '2016-12-25',
     ]);
     $contributionIDs[] = $contribution['id'];
     $contribution = $this->callAPISuccess('Contribution', 'create', [
-      'contact_id' => $this->_individualId2,
+      'contact_id' => $contact2ID,
       'total_amount' => 10,
       'financial_type_id' => 'Donation',
       'receive_date' => '2016-12-25',
@@ -416,7 +416,7 @@ emo
     $contributionIDs[] = $contribution['id'];
 
     $contribution = $this->callAPISuccess('Contribution', 'create', [
-      'contact_id' => $this->_individualId2,
+      'contact_id' => $contact2ID,
       'total_amount' => 1,
       'financial_type_id' => 'Donation',
       'receive_date' => '2016-12-25',
@@ -499,11 +499,9 @@ emo
     $this->assertEquals(2, $activities['count']);
     $this->assertEquals($html[1], $activities['values'][0]['details']);
     $this->assertEquals($html[2], $activities['values'][1]['details']);
-    // Checking it is not called multiple times.
-    // once for each contact create + once for the activities.
-    // By calling the cached function we can get this down to 1
-    $this->assertEquals(3, $this->hookTokensCalled);
-    $this->mut->checkAllMailLog($html);
+    // Checking the cacheable hook is not called multiple times.
+    $this->assertEquals(1, $this->hookTokensCalled);
+    $mailUtil->checkAllMailLog($html);
 
   }
 
@@ -570,8 +568,7 @@ value=$contact_aggregate+$contribution.total_amount}
   public function hook_aggregateTokenValues(array &$values, $contactIDs, $job = NULL, $tokens = [], $context = NULL) {
     foreach ($contactIDs as $contactID) {
       CRM_Core_Smarty::singleton()->assign('messageContactID', $contactID);
-      $values[$contactID]['aggregate.rendered_token'] = CRM_Core_Smarty::singleton()
-        ->fetch('string:' . $this->getHtmlMessage());
+      $values[$contactID]['aggregate.rendered_token'] = CRM_Utils_String::parseOneOffStringThroughSmarty($this->getHtmlMessage());
     }
   }
 

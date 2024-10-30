@@ -1,0 +1,60 @@
+<?php
+return CRM_Core_CodeGen_SqlData::create('civicrm_preferences_date')
+  ->addValues([
+    [
+      'name' => 'activityDate',
+      'start' => 20,
+      'end' => 10,
+      'date_format' => '',
+      'time_format' => '',
+      'description' => ts('Date for relationships. activities. contributions: receive, receipt, cancel. membership: join, start, renew. case: start, end.'),
+    ],
+    [
+      'name' => 'activityDateTime',
+      'start' => 20,
+      'end' => 10,
+      'date_format' => '',
+      'time_format' => 1,
+      'description' => ts('Date and time for activity: scheduled. participant: registered.'),
+    ],
+    [
+      'name' => 'birth',
+      'start' => 100,
+      'end' => 0,
+      'date_format' => '',
+      'time_format' => '',
+      'description' => ts('Birth and deceased dates. Only year, month and day fields are supported.'),
+    ],
+    [
+      'name' => 'creditCard',
+      'start' => 0,
+      'end' => 10,
+      'date_format' => 'm Y',
+      'time_format' => '',
+      'description' => ts('Month and year only for credit card expiration.'),
+    ],
+    [
+      'name' => 'custom',
+      'start' => 20,
+      'end' => 20,
+      'date_format' => '',
+      'time_format' => '',
+      'description' => ts('Uses date range passed in by form field. Can pass in a posix date part parameter. Start and end offsets defined here are ignored.'),
+    ],
+    [
+      'name' => 'mailing',
+      'start' => 0,
+      'end' => 1,
+      'date_format' => '',
+      'time_format' => '',
+      'description' => ts('Date and time. Used for scheduling mailings.'),
+    ],
+    [
+      'name' => 'searchDate',
+      'start' => 20,
+      'end' => 20,
+      'date_format' => '',
+      'time_format' => '',
+      'description' => ts('Used in search forms.'),
+    ],
+  ]);

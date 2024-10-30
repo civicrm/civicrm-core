@@ -45,25 +45,11 @@ class CRM_Admin_Form_Setting_UpdateConfigBackend extends CRM_Admin_Form_Setting 
 
   public function postProcess() {
     if (isset($_REQUEST['_qf_UpdateConfigBackend_next_cleanup'])) {
-      $config = CRM_Core_Config::singleton();
-
-      // cleanup templates_c directory
-      $config->cleanup(1, FALSE);
-
-      // clear all caches
-      CRM_Core_Config::clearDBCache();
-      Civi::cache('session')->clear();
-      CRM_Utils_System::flushCache();
-
-      parent::rebuildMenu();
-
-      CRM_Core_BAO_WordReplacement::rebuild();
-
+      \Civi\Api4\System::flush(FALSE)->execute();
       CRM_Core_Session::setStatus(ts('Cache has been cleared and menu has been rebuilt successfully.'), ts("Success"), "success");
     }
     elseif (isset($_REQUEST['_qf_UpdateConfigBackend_next_resetpaths'])) {
       $msg = CRM_Core_BAO_ConfigSetting::doSiteMove();
-
       CRM_Core_Session::setStatus($msg, ts("Success"), "success");
     }
 

@@ -26,7 +26,7 @@
     <tr class="columnheader">
       <th>{ts}Name{/ts}</th>
       <th class="right">{ts}Amount{/ts}&nbsp;&nbsp;</th>
-      <th>{ts}Source{/ts}</th>
+      <th>{ts}Contribution Source{/ts}</th>
       <th>{ts}Fee Amount{/ts}</th>
       <th>{ts}Payment Method{/ts}</th>
       <th>{ts}Check{/ts} #</th>

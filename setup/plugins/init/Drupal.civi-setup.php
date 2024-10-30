@@ -17,7 +17,7 @@ if (!defined('CIVI_SETUP')) {
     }
 
     \Civi\Setup::log()->info(sprintf('[%s] Handle %s', basename(__FILE__), 'checkAuthorized'));
-    $e->setAuthorized(user_access('administer modules'));
+    $e->setAuthorized(\Civi\Setup\DrupalUtil::isDrush() || user_access('administer modules'));
   });
 
 \Civi\Setup::dispatcher()
@@ -55,6 +55,8 @@ if (!defined('CIVI_SETUP')) {
     // $model->paths['civicrm.files']['url'] = $filePublicPath;
     $model->paths['civicrm.files']['path'] = implode(DIRECTORY_SEPARATOR,
       [_drupal_civisetup_getPublicFiles(), 'civicrm']);
+    $model->paths['civicrm.private']['path'] = implode(DIRECTORY_SEPARATOR,
+      [_drupal_civisetup_getPrivateFiles(), 'civicrm']);
 
     // Compute templateCompileDir.
     $model->templateCompilePath = implode(DIRECTORY_SEPARATOR,

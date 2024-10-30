@@ -36,4 +36,22 @@ return [
     'help_text' => NULL,
     'pseudoconstant' => ['callback' => 'CRM_Core_SelectValues::getDashboardEntriesCount'],
   ],
+  'event_show_payment_on_confirm' => [
+    'name' => 'event_show_payment_on_confirm',
+    'settings_pages' => ['event' => ['weight' => 100]],
+    'type' => 'Array',
+    'default' => [],
+    'add' => '5.58',
+    'title' => ts('EXPERIMENTAL: Show Event Payment on Confirm?'),
+    'html_type' => 'select',
+    'html_attributes' => [
+      'class' => 'crm-select2',
+      'multiple' => TRUE,
+    ],
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => ts('Should payment element be shown on the confirmation page instead of the first page?'),
+    'help_text' => NULL,
+    'pseudoconstant' => ['callback' => 'CRM_Event_BAO_Event::getEventsForSelect2'],
+  ],
 ];

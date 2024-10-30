@@ -309,7 +309,7 @@ class CRM_Mailing_BAO_Query {
           'civicrm_mailing_event_bounce',
           'bounce_type_id',
           ts('Bounce type(s)'),
-          CRM_Core_PseudoConstant::get('CRM_Mailing_Event_DAO_Bounce', 'bounce_type_id', [
+          CRM_Core_PseudoConstant::get('CRM_Mailing_Event_DAO_MailingEventBounce', 'bounce_type_id', [
             'keyColumn' => 'id',
             'labelColumn' => 'name',
           ])
@@ -416,7 +416,7 @@ class CRM_Mailing_BAO_Query {
     $form->addElement('select', 'mailing_job_status', ts('Mailing Job Status'), $mailingJobStatuses, FALSE);
 
     $mailingBounceTypes = CRM_Core_PseudoConstant::get(
-      'CRM_Mailing_Event_DAO_Bounce', 'bounce_type_id',
+      'CRM_Mailing_Event_DAO_MailingEventBounce', 'bounce_type_id',
       ['keyColumn' => 'id', 'labelColumn' => 'name']
     );
     $form->add('select', 'mailing_bounce_types', ts('Bounce Types'), $mailingBounceTypes, FALSE,
@@ -450,8 +450,8 @@ class CRM_Mailing_BAO_Query {
    */
   public static function tableNames(&$tables) {
     if (isset($tables['civicrm_mailing_job'])) {
-      $tables['civicrm_mailing'] = $tables['civicrm_mailing'] ?? 1;
-      $tables['civicrm_mailing_recipients'] = $tables['civicrm_mailing_recipients'] ?? 1;
+      $tables['civicrm_mailing'] ??= 1;
+      $tables['civicrm_mailing_recipients'] ??= 1;
     }
   }
 

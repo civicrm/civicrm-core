@@ -15,6 +15,11 @@
  */
 class CRM_Utils_HTMLTest extends CiviUnitTestCase {
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->useTransaction();
+  }
+
   /**
    * @return array
    */

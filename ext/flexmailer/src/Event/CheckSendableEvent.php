@@ -14,7 +14,7 @@ namespace Civi\FlexMailer\Event;
  * Class CheckSendableEvent
  * @package Civi\FlexMailer\Event
  */
-class CheckSendableEvent extends \Symfony\Component\EventDispatcher\Event {
+class CheckSendableEvent extends \Civi\Core\Event\GenericHookEvent {
 
   /**
    * @var array
@@ -30,7 +30,7 @@ class CheckSendableEvent extends \Symfony\Component\EventDispatcher\Event {
    *   Ex: array('subject' => 'The Subject field is blank').
    *   Example keys: 'subject', 'name', 'from_name', 'from_email', 'body', 'body_html:unsubscribeUrl'.
    */
-  protected $errors = array();
+  protected $errors = [];
 
   /**
    * CheckSendableEvent constructor.
@@ -76,8 +76,8 @@ class CheckSendableEvent extends \Symfony\Component\EventDispatcher\Event {
       throw new \RuntimeException("getFullBody() only supports body_text and body_html");
     }
     $mailing = $this->getMailing();
-    $header = $mailing->header_id && $mailing->header_id != 'null' ? \CRM_Mailing_BAO_Component::findById($mailing->header_id) : NULL;
-    $footer = $mailing->footer_id && $mailing->footer_id != 'null' ? \CRM_Mailing_BAO_Component::findById($mailing->footer_id) : NULL;
+    $header = $mailing->header_id && $mailing->header_id != 'null' ? \CRM_Mailing_BAO_MailingComponent::findById($mailing->header_id) : NULL;
+    $footer = $mailing->footer_id && $mailing->footer_id != 'null' ? \CRM_Mailing_BAO_MailingComponent::findById($mailing->footer_id) : NULL;
     if (empty($mailing->{$field})) {
       return NULL;
     }

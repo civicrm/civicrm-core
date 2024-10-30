@@ -30,8 +30,8 @@ use Civi\Core\Event\GenericHookEvent;
  * - 'retry': Task encountered an error. Will try again later.
  * - 'fail': Task encountered an error. Will not try again later. Removed from queue.
  *
- * @method $this setItem(?array $item)
- * @method ?array getItem()
+ * @method $this setItems(?array $items)
+ * @method ?array getItems()
  * @method ?string setQueue
  * @method $this setQueue(?string $queue)
  */
@@ -56,7 +56,7 @@ class RunItems extends \Civi\Api4\Generic\AbstractAction {
     if (!empty($this->items)) {
       $this->validateItemStubs();
       $queue = \Civi::queue($this->items[0]['queue']);
-      $ids = \CRM_Utils_Array::collect('id', $this->items);
+      $ids = array_column($this->items, 'id');
       if (count($ids) > 1 && !($queue instanceof \CRM_Queue_Queue_BatchQueueInterface)) {
         throw new \CRM_Core_Exception("runItems: Error: Running multiple items requires BatchQueueInterface");
       }

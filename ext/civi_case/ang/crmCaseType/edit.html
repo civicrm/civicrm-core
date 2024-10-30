@@ -1,0 +1,63 @@
+<!--
+Controller: CaseTypeCtrl
+Required vars: caseType
+-->
+<h1 crm-page-title>{{caseType.title || ts('New Case Type')}}</h1>
+
+<div class="help">
+  {{:: ts('Use this screen to define or update the Case Roles, Activity Types, and Timelines for a case type.') }} <a href="https://docs.civicrm.org/user/en/stable/case-management/set-up/" target="_blank">{{:: ts('Learn more...') }}</a>
+</div>
+
+<form name="editCaseTypeForm" unsaved-warning-form>
+<div class="crm-block crm-form-block crmCaseType">
+
+  <div ng-include="'~/crmCaseType/caseTypeDetails.html'"></div>
+
+  <div ng-show="isForkable()" class="crmCaseType-acttab">
+    <ul>
+      <li><a href="#acttab-roles">{{:: ts('Case Roles') }}</a></li>
+      <li><a href="#acttab-statuses">{{:: ts('Case Statuses') }}</a></li>
+      <li><a href="#acttab-actType">{{:: ts('Activity Types') }}</a></li>
+      <li ng-repeat="activitySet in caseType.definition.activitySets">
+        <a ng-href="#acttab-{{$index}}" class="crmCaseType-editable">
+          <div crm-editable-tab-title title="{{:: ts('Click to edit') }}">
+            <span>{{ activitySet.label }}</span>
+          </div>
+        </a>
+        <span class="crm-i fa-trash" title="{{:: ts('Remove') }}"
+          ng-hide="activitySet.name == 'standard_timeline'"
+          ng-click="removeItem(caseType.definition.activitySets, activitySet)"></span>
+        <!-- Weird spacing:
+        <a class="crm-hover-button" ng-click="removeItem(caseType.definition.activitySets, activitySet)">
+          <span class="crm-i fa-trash" title="Remove">Remove</span>
+        </a>
+        -->
+      </li>
+      <select class="crm-form-select" ng-model="newActivitySetWorkflow" ng-change="addActivitySet(newActivitySetWorkflow); newActivitySetWorkflow='';">
+        <option value="">{{:: ts('Add...') }}</option>
+        <option value="timeline" ng-show="isNewActivitySetAllowed('timeline')">{{:: ts('Timeline') }}</option>
+        <option value="sequence" ng-show="isNewActivitySetAllowed('sequence')">{{:: ts('Sequence') }}</option>
+      </select>
+    </ul>
+
+    <div id="acttab-roles" ng-include="'~/crmCaseType/rolesTable.html'"></div>
+
+    <div id="acttab-actType" ng-include="'~/crmCaseType/activityTypesTable.html'"></div>
+
+    <div id="acttab-statuses" ng-include="'~/crmCaseType/statusTable.html'"></div>
+
+    <div ng-repeat="activitySet in caseType.definition.activitySets" id="acttab-{{$index}}">
+      <div ng-include="activityTableTemplate(activitySet)"></div>
+    </div>
+  </div>
+
+  <div class="crm-submit-buttons">
+    <button crm-icon="fa-check" ng-click="editCaseTypeForm.$setPristine(); save()" ng-disabled="editCaseTypeForm.$invalid">
+      {{:: ts('Save') }}
+    </button>
+    <button crm-icon="fa-times" ng-click="editCaseTypeForm.$setPristine(); goto('caseType')">
+      {{:: ts('Cancel') }}
+    </button>
+  </div>
+</div>
+</form>

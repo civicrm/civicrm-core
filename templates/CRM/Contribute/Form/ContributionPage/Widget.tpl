@@ -19,7 +19,6 @@
     <div class="help">
         {ts}CiviContribute widgets allow you and your supporters to easily promote this fund-raising campaign. Widget code can be added to any web page.  It will provide a real-time display of current contribution results and a direct link to this contribution page.{/ts} {help id="id-intro"}
     </div>
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
     <table class="form-layout-compressed">
       <tr class="crm-contribution-contributionpage-widget-form-block-is_active"><td style="width: 12em;">&nbsp;</td><td style="font-size: 10pt;">{$form.is_active.html}&nbsp;{$form.is_active.label}</td></tr>
     </table>
@@ -27,13 +26,22 @@
 
     <div id="widgetFields">
         <table class="form-layout-compressed">
-            <tr class="crm-contribution-contributionpage-widget-form-block-title"><td class="label">{$form.title.label}<span class="crm-marker"> *</span></td><td>{$form.title.html}</td></tr>
-            <tr class="crm-contribution-form-block-url_logo"><td class="label">{$form.url_logo.label}</span></td><td>{$form.url_logo.html}</td></tr>
-            <tr class="crm-contribution-contributionpage-widget-form-block-button_title"><td class="label">{$form.button_title.label}</td><td>{$form.button_title.html}</td></tr>
-            <tr class="crm-contribution-contributionpage-widget-form-block-about"><td class="label">{$form.about.label}<span class="crm-marker"> *</span></td><td>{$form.about.html}
-<br /><span class="description">{ts}Enter content for the about message. You may include HTML formatting tags. You can also include images, as long as they are already uploaded to a server&mdash;reference them using complete URLs.{/ts}</span>
-</td></tr>
-
+            <tr class="crm-contribution-contributionpage-widget-form-block-title">
+                <td class="label">{$form.title.label}<span class="crm-marker"> *</span></td>
+                <td>{$form.title.html}</td>
+            </tr>
+            <tr class="crm-contribution-form-block-url_logo">
+                <td class="label">{$form.url_logo.label}</span></td>
+                <td>{$form.url_logo.html}</td>
+            </tr>
+            <tr class="crm-contribution-contributionpage-widget-form-block-button_title">
+                <td class="label">{$form.button_title.label}</td>
+                <td>{$form.button_title.html}</td>
+            </tr>
+            <tr class="crm-contribution-contributionpage-widget-form-block-about">
+                <td class="label">{$form.about.label}<span class="crm-marker"> *</span></td>
+                <td>{$form.about.html}</td>
+            </tr>
         </table>
 
         <div id="id-get_code">
@@ -71,18 +79,18 @@
         </div>
 
 
-        <div class="crm-accordion-wrapper collapsed crm-case-roles-block">
-         <div class="crm-accordion-header">
+        <details class="crm-accordion-bold crm-case-roles-block">
+         <summary>
           {ts}Edit Widget Colors{/ts}
-         </div><!-- /.crm-accordion-header -->
+         </summary>
          <div class="crm-accordion-body">
             <table class="form-layout-compressed">
             {foreach from=$colorFields item=field key=fieldName}
               <tr><td class="label">{$form.$fieldName.label}<span class="crm-marker"> *</span></td><td>{$form.$fieldName.html}</td></tr>
             {/foreach}
             </table>
-         </div><!-- /.crm-accordion-body -->
-        </div><!-- /.crm-accordion-wrapper -->
+         </div>
+        </details>
 
     </div>
 

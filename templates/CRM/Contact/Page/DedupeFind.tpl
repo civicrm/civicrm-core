@@ -9,10 +9,10 @@
 *}
 {if $action eq 2 || $action eq 16}
 <div class="form-item">
-  <div class="crm-accordion-wrapper crm-search_filters-accordion">
-    <div class="crm-accordion-header">
+  <details class="crm-accordion-bold crm-search_filters-accordion" open>
+    <summary>
     {ts}Filter Contacts{/ts}</a>
-    </div><!-- /.crm-accordion-header -->
+    </summary>
     <div class="crm-accordion-body">
       <table class="no-border form-layout-compressed" id="searchOptions" style="width:100%;">
         <tr>
@@ -52,8 +52,8 @@
           </td>
         </tr>
       </table>
-    </div><!-- /.crm-accordion-body -->
-  </div><!-- /.crm-accordion-wrapper -->
+    </div>
+  </details>
   <div>
     {ts}Show / Hide columns:{/ts}
     <input type='checkbox' id='steet-address' class='toggle-vis' data-column-main="7" data-column-dupe="8" >
@@ -105,13 +105,13 @@
 {if $context eq 'search'}
    {crmButton href=$backURL icon="times"}{ts}Done{/ts}{/crmButton}
 {elseif $context eq 'conflicts'}
-  {if call_user_func(array('CRM_Core_Permission','check'), 'force merge duplicate contacts')}
+  {crmPermission has='force merge duplicate contacts'}
      {capture assign=backURL}{crmURL p="civicrm/contact/dedupemerge" q="`$urlQuery`&action=map&mode=aggressive" a=1}{/capture}
      <a href="{$backURL}" title="{ts}Force Merge Selected Duplicates{/ts}" onclick="return confirm('{ts escape="js"}This will run the batch merge process on the selected duplicates. The operation will run in force merge mode - all selected duplicates will be merged into main contacts even in case of any conflicts. Click OK to proceed if you are sure you wish to run this operation.{/ts}');" class="button"><span><i class="crm-i fa-bolt" aria-hidden="true"></i> {ts}Force Merge Selected Duplicates{/ts}</span></a>
 
      {capture assign=backURL}{crmURL p="civicrm/contact/dedupemerge" q="`$urlQuery`&action=map" a=1}{/capture}
      <a href="{$backURL}" title="{ts}Safe Merge Selected Duplicates{/ts}" onclick="return confirm('{ts escape="js"}This will run the batch merge process on the selected duplicates. The operation will run in safe mode - only records with no direct data conflicts will be merged. Click OK to proceed if you are sure you wish to run this operation.{/ts}');" class="button"><span><i class="crm-i fa-compress" aria-hidden="true"></i> {ts}Safe Merge Selected Duplicates{/ts}</span></a>
-  {/if}
+  {/crmPermission}
 
   {capture assign=backURL}{crmURL p="civicrm/contact/dedupefind" q="`$urlQuery`&action=update&selected=0" a=1}{/capture}
    <a href="{$backURL}" title="{ts}List All Duplicates{/ts}" class="button"><span><i class="crm-i fa-refresh" aria-hidden="true"></i> {ts}List All Duplicates{/ts}</span></a>
@@ -313,13 +313,8 @@
     var cacheKey = {/literal}'{$cacheKey|escape}'{literal};
 
     var dataUrl = {/literal}"{crmURL p='civicrm/ajax/toggleDedupeSelect' h=0 q='snippet=4'}"{literal};
-    var rgid = {/literal}"{$rgid}"{literal};
-    var gid = {/literal}"{$gid}"{literal};
 
-    rgid = rgid.length > 0 ? rgid : 0;
-    gid  = gid.length > 0 ? gid : 0;
-
-    CRM.$.post(dataUrl, {pnid: id, rgid: rgid, gid: gid, is_selected: is_selected, cacheKey : cacheKey}, function (data) {
+    CRM.$.post(dataUrl, {pnid: id, is_selected: is_selected, cacheKey : cacheKey}, function (data) {
       // nothing to do for now
     }, 'json');
   }

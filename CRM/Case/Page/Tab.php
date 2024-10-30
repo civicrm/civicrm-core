@@ -43,7 +43,6 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
     }
 
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
-    $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
 
     if ($this->_contactId) {
       $this->assign('contactId', $this->_contactId);
@@ -59,11 +58,6 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
       }
       else {
         CRM_Contact_Page_View::checkUserPermission($this);
-      }
-    }
-    else {
-      if ($this->_action & CRM_Core_Action::VIEW) {
-        CRM_Core_Error::statusBounce(ts('Contact Id is required for view action.'));
       }
     }
 

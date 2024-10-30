@@ -16,16 +16,9 @@
  */
 
 /**
- * Page for displaying list of location types.
+ * Page for displaying list of date preferences.
  */
 class CRM_Admin_Page_PreferencesDate extends CRM_Core_Page_Basic {
-
-  /**
-   * The action links that we need to display for the browse screen.
-   *
-   * @var array
-   */
-  public static $_links = NULL;
 
   public $useLivePageJS = TRUE;
 
@@ -37,26 +30,6 @@ class CRM_Admin_Page_PreferencesDate extends CRM_Core_Page_Basic {
    */
   public function getBAOName() {
     return 'CRM_Core_BAO_PreferencesDate';
-  }
-
-  /**
-   * Get action Links.
-   *
-   * @return array
-   *   (reference) of action links
-   */
-  public function &links() {
-    if (!(self::$_links)) {
-      self::$_links = [
-        CRM_Core_Action::UPDATE => [
-          'name' => ts('Edit'),
-          'url' => 'civicrm/admin/setting/preferences/date',
-          'qs' => 'action=update&id=%%id%%&reset=1',
-          'title' => ts('Edit Date Type'),
-        ],
-      ];
-    }
-    return self::$_links;
   }
 
   /**

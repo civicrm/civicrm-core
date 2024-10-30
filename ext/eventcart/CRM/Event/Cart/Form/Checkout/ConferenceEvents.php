@@ -116,6 +116,7 @@ EOS;
     $main_event_in_cart = $this->cart->get_event_in_cart_by_event_id($this->conference_event->id);
 
     foreach ($this->cart->events_in_carts as $event_in_cart) {
+      /* @var \CRM_Event_Cart_BAO_EventInCart $event_in_cart */
       if ($event_in_cart->event->parent_event_id == $this->conference_event->id) {
         $event_in_cart->remove_participant_by_contact_id($this->contact_id);
         if (empty($event_in_cart->participants)) {

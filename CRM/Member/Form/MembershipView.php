@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Membership;
+
 /**
  * This class generates form components for Payment-Instrument
  */
@@ -142,6 +144,7 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
    * Set variables up before form is built.
    *
    * @return void
+   * @throws \Civi\Core\Exception\DBQueryException
    */
   public function preProcess() {
     $values = [];
@@ -153,11 +156,14 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
     $this->assign('context', $context);
 
     if ($this->membershipID) {
-      $values = \Civi\Api4\Membership::get()
+      $memberships = Membership::get()
         ->addSelect('*', 'status_id:label', 'membership_type_id:label', 'membership_type_id.financial_type_id', 'status_id.is_current_member')
         ->addWhere('id', '=', $this->membershipID)
-        ->execute()
-        ->first();
+        ->execute();
+      if (!count($memberships)) {
+        CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
+      }
+      $values = $memberships->first();
 
       // Ensure keys expected by MembershipView.tpl are set correctly
       // Some of these defaults are overwritten dependant on context below
@@ -169,17 +175,16 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
       $values['owner_display_name'] = FALSE;
       $values['campaign'] = FALSE;
 
-      if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
-        $finTypeId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $values['membership_type_id'], 'financial_type_id');
-        $finType = CRM_Contribute_PseudoConstant::financialType($finTypeId);
-        if (!CRM_Core_Permission::check('view contributions of type ' . $finType)) {
-          CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
-        }
-      }
-      else {
-        $this->assign('noACL', TRUE);
-      }
-      $membershipType = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($values['membership_type_id']);
+      // This tells the template not to check financial acls when determining
+      // whether to show edit & delete links. Link decisions
+      // should be moved to the php layer - with financialacls using hooks.
+      $this->assign('noACL', !CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus());
+
+      $membershipType = \Civi\Api4\MembershipType::get(FALSE)
+        ->addSelect('relationship_direction', 'relationship_type_id')
+        ->addWhere('id', '=', $values['membership_type_id'])
+        ->execute()
+        ->first();
 
       // Do the action on related Membership if needed
       $relAction = CRM_Utils_Request::retrieve('relAction', 'String', $this);
@@ -213,9 +218,7 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
           'id'
         );
 
-        $direction = strrev($membershipType['relationship_direction']);
         // To display relationship type in view membership page
-        $relTypeIds = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ",", $membershipType['relationship_type_id']);
         $sql = "
 SELECT relationship_type_id,
   CASE
@@ -223,7 +226,7 @@ SELECT relationship_type_id,
   WHEN  contact_id_b = {$values['owner_contact_id']} AND contact_id_a = {$values['contact_id']} THEN 'a_b'
 END AS 'relType'
   FROM civicrm_relationship
- WHERE relationship_type_id IN ($relTypeIds)";
+ WHERE relationship_type_id IN (" . implode(',', $membershipType['relationship_type_id']) . ")";
         $dao = CRM_Core_DAO::executeQuery($sql);
         $values['relationship'] = NULL;
         while ($dao->fetch()) {
@@ -247,19 +250,17 @@ END AS 'relType'
       if (!empty($membershipType['relationship_type_id']) && empty($values['owner_membership_id'])) {
         // display related contacts/membership block
         $this->assign('has_related', TRUE);
-        $this->assign('max_related', CRM_Utils_Array::value('max_related', $values, ts('Unlimited')));
+        $this->assign('max_related', $values['max_related'] ?? ts('Unlimited'));
         // split the relations in 2 arrays based on direction
-        $relTypeId = explode(CRM_Core_DAO::VALUE_SEPARATOR, $membershipType['relationship_type_id']);
-        $relDirection = explode(CRM_Core_DAO::VALUE_SEPARATOR, $membershipType['relationship_direction']);
-        foreach ($relTypeId as $rid) {
-          $relTypeDir[substr($relDirection[0], 0, 1)][] = $rid;
+        foreach ($membershipType['relationship_type_id'] as $x => $rid) {
+          $relTypeDir[substr($membershipType['relationship_direction'][$x], 0, 1)][] = $rid;
         }
         // build query in 2 parts with a UNION if necessary
         // _x and _y are replaced with _a and _b first, then vice-versa
         // comment is a qualifier for the relationship - now just job_title
         $select = "
 SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
-       rt.name_x_y as relation, r.start_date, r.end_date,
+       rt.label_x_y as relation, r.start_date, r.end_date,
        m.id as mid, ms.is_current_member, ms.label as status
   FROM civicrm_relationship r
   LEFT JOIN civicrm_relationship_type rt ON rt.id = r.relationship_type_id
@@ -279,7 +280,7 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
         $query .= " ORDER BY is_current_member DESC";
         $dao = CRM_Core_DAO::executeQuery($query);
         $related = [];
-        $relatedRemaining = CRM_Utils_Array::value('max_related', $values, PHP_INT_MAX);
+        $relatedRemaining = $values['max_related'] ?? PHP_INT_MAX;
         $rowElememts = [
           'id',
           'cid',
@@ -403,7 +404,8 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
     $values['auto_renew'] = ($autoRenew && !$subscriptionCancelled) ? 'Yes' : 'No';
 
     //do check for campaigns
-    if ($campaignId = CRM_Utils_Array::value('campaign_id', $values)) {
+    $campaignId = $values['campaign_id'] ?? NULL;
+    if ($campaignId) {
       $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns($campaignId);
       $values['campaign'] = $campaigns[$campaignId];
     }

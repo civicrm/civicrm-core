@@ -19,7 +19,7 @@ class CRM_Pledge_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard 
   /**
    * called when action is browse.
    */
-  public function listPledges() {
+  public function listPledges(): void {
     $controller = new CRM_Core_Controller_Simple(
       'CRM_Pledge_Form_Search',
       ts('Pledges'),
@@ -35,25 +35,20 @@ class CRM_Pledge_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard 
     $controller->process();
     $controller->run();
 
-    // add honor block.
-    $honorParams = [];
+    // Add honor block.
     $honorParams = CRM_Pledge_BAO_Pledge::getHonorContacts($this->_contactId);
-    if (!empty($honorParams)) {
-      // assign vars to templates
-      $this->assign('pledgeHonorRows', $honorParams);
-      $this->assign('pledgeHonor', TRUE);
-    }
-    $session = CRM_Core_Session::singleton();
-    $loggedUserID = $session->get('userID');
-    $this->assign('loggedUserID', $loggedUserID);
+    $this->assign('pledgeHonorRows', $honorParams);
+    $this->assign('pledgeHonor', !empty($honorParams));
+    $this->assign('loggedUserID', CRM_Core_Session::getLoggedInContactID());
   }
 
   /**
-   * the main function that is called when the page
-   * loads, it decides the which action has to be taken for the page.
+   * The main function that is called when the page loads.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function run() {
-    parent::preProcess();
+  public function run(): void {
+    $this->preProcess();
     $this->listPledges();
   }
 

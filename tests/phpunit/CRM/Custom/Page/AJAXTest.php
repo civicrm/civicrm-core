@@ -18,7 +18,7 @@ class CRM_Custom_Page_AJAXTest extends CiviUnitTestCase {
   /**
    * Test multi-record custom fields
    */
-  public function testMultiRecordFieldList() {
+  public function testMultiRecordFieldList(): void {
     //create multi record custom group
     $ids = $this->CustomGroupMultipleCreateWithFields(['style' => 'Tab with table']);
     $params = [

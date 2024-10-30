@@ -1,0 +1,62 @@
+<div class="form-inline">
+  <label for="crm-search-admin-display-label">{{:: ts('Label') }} <span class="crm-marker">*</span></label>
+  <input id="crm-search-admin-display-label" type="text" class="form-control" ng-model="$ctrl.display.label" required placeholder="{{:: ts('Untitled') }}"/>
+</div>
+<div>
+  <textarea class="form-control" placeholder="{{:: ts('Description') }}" ng-model="$ctrl.display.settings.description"></textarea>
+</div>
+<div class="form-inline">
+  <label for="crm-search-admin-display-api">{{:: ts('API Name') }} <span class="crm-marker">*</span></label>
+  <div class="input-group">
+    <span class="input-group-addon">SK_</span>
+    <input id="crm-search-admin-display-api" type="text" class="form-control" ng-model="$ctrl.display.name" required />
+  </div>
+</div>
+<p ng-if="$ctrl.display.id">
+  <i class="crm-i fa-clock-o"></i>
+  <strong ng-if="$ctrl.display._refresh_date">{{:: ts('Last refreshed: %1. Click "Save" to refresh now.', {1: $ctrl.display._refresh_date}) }}</strong>
+  <strong ng-if="!$ctrl.display._refresh_date">{{:: ts('Checking last refresh date...') }}</strong>
+</p>
+<div class="form-inline" ng-if="$ctrl.display._job">
+  <div class="checkbox-inline form-control">
+    <label>
+      <input type="checkbox" ng-model="$ctrl.display._job.is_active">
+      <span>{{:: ts('Auto-Refresh') }}</span>
+    </label>
+  </div>
+  <select class="form-control" ng-if="$ctrl.display._job.is_active" ng-model="$ctrl.display._job.run_frequency">
+    <option ng-repeat="opt in $ctrl.jobFrequency" value="{{:: opt.id }}">{{:: opt.label }}</option>
+  </select>
+</div>
+<div class="form-inline">
+  <label for="display_entity_permission">{{:: ts('API Permission') }}</label>
+  <a crm-ui-help="hs({id: 'entity_permission', title: ts('API Permission')})"></a>
+  <input id="display_entity_permission" class="form-control" crm-ui-select="{data: $ctrl.permissions, multiple: true, placeholder: ts('administer CiviCRM')}" ng-model="$ctrl.display.settings.entity_permission" ng-list ng-change="$ctrl.onChangeEntityPermission()">
+  <select ng-if="$ctrl.display.settings.entity_permission.length > 1" title="{{:: ts('Permission operator') }}" ng-model="$ctrl.display.settings.entity_permission_operator">
+    <option value="AND">{{:: ts('And') }}</option>
+    <option value="OR">{{:: ts('Or') }}</option>
+  </select>
+</div>
+<fieldset ng-include="'~/crmSearchAdmin/crmSearchAdminDisplaySort.html'"></fieldset>
+
+<fieldset class="crm-search-admin-edit-columns-wrapper">
+  <legend>
+    {{:: ts('Columns') }}
+  </legend>
+  <div ng-include="'~/crmSearchAdmin/displays/common/addColMenu.html'"></div>
+  <fieldset class="crm-search-admin-edit-columns" ng-model="$ctrl.display.settings.columns" ui-sortable="$ctrl.parent.sortableOptions">
+    <fieldset ng-repeat="col in $ctrl.display.settings.columns" class="crm-draggable">
+      <legend>
+        <i class="crm-i fa-arrows crm-search-move-icon"></i>
+        {{ $ctrl.parent.getColLabel(col) }}
+      </legend>
+      <div class="form-inline crm-search-admin-flex-row">
+        <label for="crm-search-admin-edit-col-{{ $index }}">{{:: ts('Label') }}</label>
+        <input id="crm-search-admin-edit-col-{{ $index }}" class="form-control crm-flex-1" type="text" ng-model="col.label" >
+        <button type="button" class="btn-xs" ng-click="$ctrl.parent.removeCol($index)" title="{{:: ts('Remove') }}">
+          <i class="crm-i fa-ban"></i>
+        </button>
+      </div>
+    </fieldset>
+  </fieldset>
+</fieldset>

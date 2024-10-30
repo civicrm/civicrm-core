@@ -50,7 +50,7 @@ class CRM_Core_BAO_CustomValueTableMultipleTest extends CiviUnitTestCase {
     $this->contactDelete($contactID);
   }
 
-  public function testCustomGroupMultipleDouble() {
+  public function testCustomGroupMultipleDouble(): void {
     $contactID = $this->individualCreate();
     $customGroup = $this->customGroupCreate(['is_multiple' => 1]);
     $fields = [
@@ -82,7 +82,7 @@ class CRM_Core_BAO_CustomValueTableMultipleTest extends CiviUnitTestCase {
     $this->contactDelete($contactID);
   }
 
-  public function testCustomGroupMultipleUpdate() {
+  public function testCustomGroupMultipleUpdate(): void {
     $contactID = $this->individualCreate();
     $customGroup = $this->customGroupCreate(['is_multiple' => 1]);
     $fields = [
@@ -123,7 +123,7 @@ class CRM_Core_BAO_CustomValueTableMultipleTest extends CiviUnitTestCase {
     $this->contactDelete($contactID);
   }
 
-  public function testCustomGroupMultipleOldFormat() {
+  public function testCustomGroupMultipleOldFormat(): void {
     $contactID = $this->individualCreate();
     $customGroup = $this->customGroupCreate(['is_multiple' => 1]);
     $fields = [

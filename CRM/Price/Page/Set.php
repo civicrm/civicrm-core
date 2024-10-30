@@ -50,42 +50,49 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
           'url' => 'civicrm/admin/price/field',
           'qs' => 'reset=1&action=browse&sid=%%sid%%',
           'title' => ts('View and Edit Price Fields'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::VIEW),
         ],
         CRM_Core_Action::PREVIEW => [
           'name' => ts('Preview'),
-          'url' => 'civicrm/admin/price',
+          'url' => 'civicrm/admin/price/edit',
           'qs' => 'action=preview&reset=1&sid=%%sid%%',
           'title' => ts('Preview Price Set'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::PREVIEW),
         ],
         CRM_Core_Action::UPDATE => [
           'name' => ts('Settings'),
-          'url' => 'civicrm/admin/price',
+          'url' => 'civicrm/admin/price/edit',
           'qs' => 'action=update&reset=1&sid=%%sid%%',
           'title' => ts('Edit Price Set'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
         ],
         CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable Price Set'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DISABLE),
         ],
         CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable Price Set'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ENABLE),
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
-          'url' => 'civicrm/admin/price',
+          'url' => 'civicrm/admin/price/edit',
           'qs' => 'action=delete&reset=1&sid=%%sid%%',
           'title' => ts('Delete Price Set'),
           'extra' => 'onclick = "return confirm(\'' . $deleteExtra . '\');"',
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
         ],
         CRM_Core_Action::COPY => [
           'name' => ts('Copy Price Set'),
           'url' => CRM_Utils_System::currentPath(),
-          'qs' => 'action=copy&sid=%%sid%%',
+          'qs' => 'action=copy&sid=%%sid%%&qfKey=%%key%%',
           'title' => ts('Make a Copy of Price Set'),
           'extra' => 'onclick = "return confirm(\'' . $copyExtra . '\');"',
+          'weight' => 120,
         ],
       ];
     }
@@ -126,6 +133,11 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
       $this->preview($sid);
     }
     elseif ($action & CRM_Core_Action::COPY) {
+      $key = $_POST['qfKey'] ?? $_GET['qfKey'] ?? $_REQUEST['qfKey'] ?? NULL;
+      $k = CRM_Core_Key::validate($key, CRM_Utils_System::getClassName($this));
+      if (!$k) {
+        $this->invalidKey();
+      }
       CRM_Core_Session::setStatus(ts('A copy of the price set has been created'), ts('Saved'), 'success');
       $this->copy();
     }
@@ -280,7 +292,7 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
         $actionLinks[CRM_Core_Action::BROWSE]['name'] = ts('View Price Fields');
       }
       $priceSet[$dao->id]['action'] = CRM_Core_Action::formLink($actionLinks, $action,
-        ['sid' => $dao->id],
+        ['sid' => $dao->id, 'key' => CRM_Core_Key::get(CRM_Utils_System::getClassName($this))],
         ts('more'),
         FALSE,
         'priceSet.row.actions',

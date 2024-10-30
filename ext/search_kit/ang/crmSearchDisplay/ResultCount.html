@@ -1,0 +1,6 @@
+<label ng-if="$ctrl.rowCount === 1">
+  {{ $ctrl.selectedRows && $ctrl.selectedRows.length ? ts('%1 selected of 1 result', {1: $ctrl.selectedRows.length}) : ts('1 result') }}
+</label>
+<label ng-if="$ctrl.rowCount === 0 || $ctrl.rowCount > 1">
+  {{ $ctrl.selectedRows && $ctrl.selectedRows.length ? ts('%1 selected of %2 results', {1: $ctrl.selectedRows.length, 2: $ctrl.rowCount}) : ts('%1 results', {1: $ctrl.rowCount}) }}
+</label>

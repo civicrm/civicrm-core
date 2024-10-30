@@ -24,7 +24,7 @@ class SequenceListenerTest extends \CiviCaseTestCase {
     ]);
   }
 
-  public function testSequence() {
+  public function testSequence(): void {
     $actStatuses = array_flip(\CRM_Activity_BAO_Activity::buildOptions('status_id', 'validate'));
     $caseStatuses = array_flip(\CRM_Case_PseudoConstant::caseStatus('name'));
     $actTypes = array_flip(\CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'create'));

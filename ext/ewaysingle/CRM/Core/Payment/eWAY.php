@@ -94,6 +94,13 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
   protected $guzzleClient;
 
   /**
+   * Payment Processor Mode
+   *   either test or live
+   * @var string
+   */
+  protected $_mode;
+
+  /**
    * *******************************************************
    * Constructor
    *

@@ -10,7 +10,6 @@
 {* this template is used for adding/editing badge layouts *}
 <h3>{if $action eq 1}{ts}New Badge Layout{/ts}{elseif $action eq 2}{ts}Edit Badge Layout{/ts}{else}{ts}Delete Badge Layout{/ts}{/if}</h3>
 <div class="crm-block crm-form-block crm-badge-layout-form-block">
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   {if $action eq 8}
     <div class="messages status no-popup">
       {icon icon="fa-info-circle"}{/icon}
@@ -24,7 +23,7 @@
       </tr>
       <tr class="crm-badge-layout-form-block-label_format_name">
         <td class="label">{$form.label_format_name.label}</td>
-        <td>{$form.label_format_name.html} {help id="id-label_format"}</td>
+        <td>{$form.label_format_name.html} {help id="id-label_format" file="CRM/Badge/Form/Layout.hlp"}</td>
       </tr>
       <tr class="crm-badge-layout-form-block-description">
         <td class="label">{$form.description.label}</td>

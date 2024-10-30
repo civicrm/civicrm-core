@@ -17,33 +17,23 @@
 class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatusType {
 
   /**
+   * @deprecated
    * @param array $params
    *
    * @return self|null
    */
   public static function add(&$params) {
-    if (empty($params)) {
-      return NULL;
-    }
-    $dao = new CRM_Event_DAO_ParticipantStatusType();
-    $dao->copyValues($params);
-    return $dao->save();
+    return self::writeRecord($params);
   }
 
   /**
+   * @deprecated
    * @param array $params
    *
    * @return self|null
    */
-  public static function &create(&$params) {
-    $transaction = new CRM_Core_Transaction();
-    $statusType = self::add($params);
-    if (is_a($statusType, 'CRM_Core_Error')) {
-      $transaction->rollback();
-      return $statusType;
-    }
-    $transaction->commit();
-    return $statusType;
+  public static function create(&$params) {
+    return self::writeRecord($params);
   }
 
   /**
@@ -71,29 +61,23 @@ class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatu
   }
 
   /**
-   * Retrieve DB object and copy to defaults array.
-   *
-   * @param array $params
-   *   Array of criteria values.
-   * @param array $defaults
-   *   Array to be populated with found values.
-   *
-   * @return self|null
-   *   The DAO object, if found.
-   *
    * @deprecated
+   * @param array $params
+   * @param array $defaults
+   * @return self|null
    */
   public static function retrieve($params, &$defaults) {
     return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
+   * @deprecated - this bypasses hooks.
    * @param int $id
-   * @param $isActive
-   *
+   * @param bool $isActive
    * @return bool
    */
   public static function setIsActive($id, $isActive) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return CRM_Core_DAO::setFieldValue('CRM_Event_BAO_ParticipantStatusType', $id, 'is_active', $isActive);
   }
 
@@ -210,13 +194,13 @@ LEFT JOIN  civicrm_event event ON ( event.id = participant.event_id )
               if (is_array($results['updatedParticipantIds']) && !empty($results['updatedParticipantIds'])) {
                 foreach ($results['updatedParticipantIds'] as $processedId) {
                   $expiredParticipantCount += 1;
-                  $returnMessages[] .= "<br />Status updated to: Expired";
+                  $returnMessages[] = "<br />Status updated to: Expired";
 
                   //mailed participants.
                   if (is_array($results['mailedParticipants']) &&
                     array_key_exists($processedId, $results['mailedParticipants'])
                   ) {
-                    $returnMessages[] .= "<br />Expiration Mail sent to: {$results['mailedParticipants'][$processedId]}";
+                    $returnMessages[] = "<br />Expiration Mail sent to: {$results['mailedParticipants'][$processedId]}";
                   }
                 }
               }
@@ -282,16 +266,16 @@ LEFT JOIN  civicrm_event event ON ( event.id = participant.event_id )
                     foreach ($results['updatedParticipantIds'] as $processedId) {
                       if ($values['requires_approval']) {
                         $waitingApprovalCount += 1;
-                        $returnMessages[] .= "<br /><br />- status updated to: Awaiting approval";
-                        $returnMessages[] .= "<br />Will send you Confirmation Mail when registration gets approved.";
+                        $returnMessages[] = "<br /><br />- status updated to: Awaiting approval";
+                        $returnMessages[] = "<br />Will send you Confirmation Mail when registration gets approved.";
                       }
                       else {
                         $waitingConfirmCount += 1;
-                        $returnMessages[] .= "<br /><br />- status updated to: Pending from waitlist";
+                        $returnMessages[] = "<br /><br />- status updated to: Pending from waitlist";
                         if (is_array($results['mailedParticipants']) &&
                           array_key_exists($processedId, $results['mailedParticipants'])
                         ) {
-                          $returnMessages[] .= "<br />Confirmation Mail sent to: {$results['mailedParticipants'][$processedId]}";
+                          $returnMessages[] = "<br />Confirmation Mail sent to: {$results['mailedParticipants'][$processedId]}";
                         }
                       }
                     }
@@ -313,12 +297,12 @@ LEFT JOIN  civicrm_event event ON ( event.id = participant.event_id )
       //cron 2 ends.
     }
 
-    $returnMessages[] .= "<br /><br />Number of Expired registration(s) = {$expiredParticipantCount}";
-    $returnMessages[] .= "<br />Number of registration(s) require approval =  {$waitingApprovalCount}";
-    $returnMessages[] .= "<br />Number of registration changed to Pending from waitlist = {$waitingConfirmCount}<br /><br />";
+    $returnMessages[] = "<br /><br />Number of Expired registration(s) = {$expiredParticipantCount}";
+    $returnMessages[] = "<br />Number of registration(s) require approval =  {$waitingApprovalCount}";
+    $returnMessages[] = "<br />Number of registration changed to Pending from waitlist = {$waitingConfirmCount}<br /><br />";
     if (!empty($fullEvents)) {
       foreach ($fullEvents as $eventId => $title) {
-        $returnMessages[] .= "Full Event : {$title}<br />";
+        $returnMessages[] = "Full Event : {$title}<br />";
       }
     }
 

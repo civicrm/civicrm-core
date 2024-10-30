@@ -49,12 +49,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
   protected $_separator;
 
   /**
-   * Total number of lines in file
-   * @var int
-   */
-  protected $_lineCount;
-
-  /**
    * Get information about the provided job.
    *  - name
    *  - id (generally the same as name)
@@ -71,6 +65,8 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
         'name' => 'membership_import',
         'label' => ts('Membership Import'),
         'entity' => 'Membership',
+        'url' => 'civicrm/import/membership',
+
       ],
     ];
   }
@@ -204,7 +200,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
       if (empty($formatValues['id']) && empty($formatValues['contact_id'])) {
         $error = $this->checkContactDuplicate($formatValues);
 
-        if (CRM_Core_Error::isAPIError($error, CRM_Core_ERROR::DUPLICATE_CONTACT)) {
+        if (CRM_Core_Error::isAPIError($error, CRM_Core_Error::DUPLICATE_CONTACT)) {
           $matchedIDs = (array) $error['error_message']['params'];
           if (count($matchedIDs) > 1) {
             throw new CRM_Core_Exception('Multiple matching contact records detected for this row. The membership was not imported', CRM_Import_Parser::ERROR);
@@ -326,11 +322,11 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
         }
         elseif (empty($formatted['is_override'])) {
           if (empty($calcStatus)) {
-            throw new CRM_Core_Exception('Status in import row (' . CRM_Utils_Array::value('status_id', $formatValues) . ') does not match calculated status based on your configured Membership Status Rules. Record was not imported.', CRM_Import_Parser::ERROR);
+            throw new CRM_Core_Exception('Status in import row (' . ($formatValues['status_id'] ?? '') . ') does not match calculated status based on your configured Membership Status Rules. Record was not imported.', CRM_Import_Parser::ERROR);
           }
           if ($formatted['status_id'] != $calcStatus['id']) {
             //Status Hold" is either NOT mapped or is FALSE
-            throw new CRM_Core_Exception($rowNumber, 'ERROR', 'Status in import row (' . CRM_Utils_Array::value('status_id', $formatValues) . ') does not match calculated status based on your configured Membership Status Rules (' . $calcStatus['name'] . '). Record was not imported.', CRM_Import_Parser::ERROR);
+            throw new CRM_Core_Exception('Status in import row (' . ($formatValues['status_id'] ?? '') . ') does not match calculated status based on your configured Membership Status Rules (' . $calcStatus['name'] . '). Record was not imported.', CRM_Import_Parser::ERROR);
           }
         }
 

@@ -37,7 +37,7 @@ class CRM_Core_BAO_TranslateGetWrapper {
       }
       $toSet = array_intersect_key($this->fields[$value['id']], $value);
       $value = array_merge($value, $toSet);
-      $value['actual_language'] = $this->translatedLanguage;
+      $value['actual_language'] = $this->translatedLanguage[$value['id']];
     }
     return $result;
   }

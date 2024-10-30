@@ -59,11 +59,11 @@
           <tbody>
           {foreach from=$customOption item=row}
             <tr id="price_field_value-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"}{if !empty($row.class)} {$row.class}{/if}{if NOT $row.is_active} disabled{/if}">
-              <td class="crm-price-option-label crm-editable" data-field="label">{$row.label}</td>
+              <td class="crm-price-option-label crm-editable" data-field="label">{$row.label|escape}</td>
               <td class="crm-price-option-value">{$row.amount|crmMoney}</td>
               <td class="crm-price-option-non-deductible-amount">{$row.non_deductible_amount|crmMoney}</td>
-              <td class="crm-price-option-pre-help">{$row.help_pre}</td>
-              <td class="crm-price-option-post-help">{$row.help_post}</td>
+              <td class="crm-price-option-pre-help">{$row.help_pre|escape}</td>
+              <td class="crm-price-option-post-help">{$row.help_post|escape}</td>
               {if $isEvent}
                 <td class="crm-price-option-count">{$row.count}</td>
                 <td class="crm-price-option-max">{$row.max_value}</td>
@@ -72,7 +72,7 @@
               <td class="nowrap crm-price-option-financial-type-id">{$row.financial_type_id}</td>
               <td class="nowrap crm-price-option-order">{$row.weight|smarty:nodefaults}</td>
               {if $getTaxDetails}
-                <td>{if $row.tax_rate != '' }
+                <td>{if $row.tax_rate != ''}
                       {$taxTerm} ({$row.tax_rate}%)
                     {/if}
                 </td>
@@ -97,8 +97,8 @@
   {/if}
   {if $addMoreFields && !$isReserved}
     <div class="action-link">
-      {crmButton q="reset=1&action=add&fid=$fid&sid=$sid" icon="plus-circle"}{ts 1=$fieldTitle}New Option for '%1'{/ts}{/crmButton}
-      {crmButton p="civicrm/admin/price/field" q="reset=1&sid=$sid" class="cancel" icon="times"}{ts}Done{/ts}{/crmButton}
+      {crmButton p="civicrm/admin/price/field/option/edit" q="reset=1&action=add&fid=$fid&sid=$sid" icon="plus-circle"}{ts 1=$fieldTitle}New Option for '%1'{/ts}{/crmButton}
+      {crmButton p="civicrm/admin/price/field/option/edit" q="reset=1&sid=$sid" class="cancel" icon="times"}{ts}Done{/ts}{/crmButton}
     </div>
   {/if}
 {/if}

@@ -32,7 +32,7 @@ class CRM_Cxn_ApiRouter {
     // FIXME: Shouldn't the X-Forwarded-Proto check be part of CRM_Utils_System::isSSL()?
     if (Civi::settings()->get('enableSSL') &&
       !CRM_Utils_System::isSSL() &&
-      strtolower(CRM_Utils_Array::value('X_FORWARDED_PROTO', CRM_Utils_System::getRequestHeaders())) != 'https'
+      strtolower(CRM_Utils_System::getRequestHeaders()['X_FORWARDED_PROTO'] ?? '') != 'https'
     ) {
       return civicrm_api3_create_error('System policy requires HTTPS.');
     }

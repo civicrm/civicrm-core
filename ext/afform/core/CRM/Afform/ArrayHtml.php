@@ -111,7 +111,7 @@ class CRM_Afform_ArrayHtml {
         continue;
       }
       if (!preg_match('/^[a-zA-Z0-9\-]+$/', $attrName)) {
-        throw new \RuntimeException("Malformed HTML attribute");
+        throw new \RuntimeException("Malformed HTML attribute $attrName → $attrValue");
       }
 
       $type = $this->pickAttrType($tag, $attrName);
@@ -199,7 +199,12 @@ class CRM_Afform_ArrayHtml {
 
     $doc = new DOMDocument();
     $doc->preserveWhiteSpace = !$this->formatWhitespace;
-    @$doc->loadHTML("<?xml encoding=\"utf-8\" ?><html><body>$html</body></html>");
+    // Angular/js isn't fussy about arbitrary tags but libxml is for html data, so ignore errors.
+    // See also Civi\Afform\Symbols::scan()
+    $oldErrorStatus = libxml_use_internal_errors(TRUE);
+    $doc->loadHTML("<?xml encoding=\"utf-8\" ?><html><body>$html</body></html>");
+    libxml_clear_errors();
+    libxml_use_internal_errors($oldErrorStatus);
 
     // FIXME: Validate expected number of child nodes
 
@@ -235,6 +240,10 @@ class CRM_Afform_ArrayHtml {
         else {
           $arr['#children'] = $this->convertNodesToArray($node->childNodes);
         }
+      }
+      // Empty containers should still get a #children attribute
+      elseif (in_array($node->tagName, ['div', 'fieldset'], TRUE)) {
+        $arr['#children'] = [];
       }
       return $arr;
     }
@@ -367,7 +376,10 @@ class CRM_Afform_ArrayHtml {
    * @return string
    */
   public function replaceUnicodeChars($markup) {
-    return mb_convert_encoding($markup, 'HTML-ENTITIES', 'UTF-8');
+    $replace = [
+      ["\xc2\xa0", '&nbsp;'],
+    ];
+    return str_replace(array_column($replace, 0), array_column($replace, 1), $markup);
   }
 
   /**

@@ -19,7 +19,7 @@
 {/if}
 <div class="spacer"></div>
 {if $priceSetId}
-  {include file="CRM/Price/Form/PriceSet.tpl" context="standalone" extends="Membership"}
+  {include file="CRM/Price/Form/PriceSet.tpl" isShowAdminVisibilityFields=true extends="Membership"  hideTotal=false}
   {literal}
   <script type="text/javascript">
   CRM.$(function($) {
@@ -35,7 +35,7 @@
   </script>
   {/literal}
 {else}
-  {if $membershipMode == 'test' }
+  {if $membershipMode == 'test'}
     {assign var=registerMode value="TEST"}
     {elseif $membershipMode == 'live'}
     {assign var=registerMode value="LIVE"}
@@ -48,7 +48,7 @@
   {/if}
   {if $membershipMode}
   <div class="help">
-    {ts 1=$displayName 2=$registerMode}Use this form to submit Membership Record on behalf of %1. <strong>A %2 transaction will be submitted</strong> using the selected payment processor.{/ts}
+    {ts 1=$displayName|escape 2=$registerMode}Use this form to submit Membership Record on behalf of %1. <strong>A %2 transaction will be submitted</strong> using the selected payment processor.{/ts}
   </div>
   {/if}
   <div class="crm-block crm-form-block crm-membership-form-block">
@@ -62,11 +62,10 @@
      <a class="open-inline-noreturn action-item crm-hover-button" href="{$ccModeLink}"><i class="crm-i fa-credit-card" aria-hidden="true"></i> {ts}submit credit card membership{/ts}</a>
     </div>
     {/if}
-    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
     {if $action eq 8}
     <div class="messages status no-popup">
       {icon icon="fa-info-circle"}{/icon}
-      {$deleteMessage}
+      {$deleteMessage|smarty:nodefaults}
     </div>
     {else}
       <table class="form-layout-compressed">
@@ -90,7 +89,7 @@
               <span id='totalAmountORPriceSet'> {ts}OR{/ts}</span>
               <span id='selectPriceSet'>{$form.price_set_id.html}</span>
               {if $buildPriceSet && $priceSet}
-                <div id="priceset"><br/>{include file="CRM/Price/Form/PriceSet.tpl" extends="Membership"}</div>
+                <div id="priceset"><br/>{include file="CRM/Price/Form/PriceSet.tpl" extends="Membership" hideTotal=false isShowAdminVisibilityFields=true}</div>
                 {else}
                 <div id="priceset" class="hiddenElement"></div>
               {/if}
@@ -109,7 +108,7 @@
           <tr id="num_terms_row" class="crm-membership-form-block-num_terms">
             <td class="label">{$form.num_terms.label}</td>
             <td>&nbsp;{$form.num_terms.html}<br />
-              <span class="description">{ts}Set the membership end date this many membership periods from now. Make sure the appropriate corresponding fee is entered below.{/ts}</span>
+              <span class="description">{ts}Set the Membership Expiration Date this many membership periods from now. Make sure the appropriate corresponding fee is entered below.{/ts}</span>
             </td>
           </tr>
         {/if}
@@ -177,7 +176,7 @@
           <tr id="send-receipt" class="crm-membership-form-block-send_receipt">
             <td class="label">{$form.send_receipt.label}</td>
             <td>
-              {$form.send_receipt.html}<br />
+              {$form.send_receipt.html}
               <span class="description">
                 {ts 1=$emailExists}Automatically email a membership confirmation and receipt to %1? OR if the payment is from a different contact, this email will only go to them.{/ts}
                 <span class="auto-renew-text">{ts}For auto-renewing memberships the emails are sent when each payment is received{/ts}</span>
@@ -188,7 +187,7 @@
           <tr id="email-receipt" style="display:none;">
             <td class="label">{$form.send_receipt.label}</td>
             <td>
-              {$form.send_receipt.html}<br />
+              {$form.send_receipt.html}
               <span class="description">
                 {ts}Automatically email a membership confirmation and receipt to {/ts}<span id="email-address"></span>? {ts}OR if the payment is from a different contact, this email will only go to them.{/ts}
                 <span class="auto-renew-text">{ts}For auto-renewing memberships the emails are sent when each payment is received{/ts}</span>
@@ -198,7 +197,7 @@
         {/if}
         <tr id="fromEmail" style="display: none" class="crm-contactEmail-form-block-fromEmailAddress crm-email-element">
           <td class="label">{$form.from_email_address.label}</td>
-          <td>{$form.from_email_address.html}  {help id="id-from_email" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp"}</td>
+          <td>{$form.from_email_address.html}  {help id="id-from_email" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp" title=$form.from_email_address.label}</td>
         </tr>
         <tr id='notice' style="display:none;">
           <td class="label">{$form.receipt_text.label}</td>
@@ -206,10 +205,10 @@
             {$form.receipt_text.html|crmAddClass:huge}</td>
         </tr>
       </table>
-      {include file="CRM/common/customDataBlock.tpl"}
+      {include file="CRM/common/customDataBlock.tpl" cid=false}
       {if $accessContribution and $action eq 2 and $rows.0.contribution_id}
-        <div class="crm-accordion-wrapper">
-          <div class="crm-accordion-header">{ts}Related Contributions{/ts}</div>
+        <details class="crm-accordion-bold" open>
+          <summary>{ts}Related Contributions{/ts}</summary>
           <div class="crm-accordion-body">
             {include file="CRM/Contribute/Form/Selector.tpl" context="Search"}
             <script type="text/javascript">
@@ -237,13 +236,13 @@
             </script>
             <div id="membership-recurring-contributions"></div>
           </div>
-        </div>
+        </details>
       {/if}
       {if $softCredit}
-        <div class="crm-accordion-wrapper">
-          <div class="crm-accordion-header">{ts}Related Soft Contributions{/ts}</div>
+        <details class="crm-accordion-bold" open>
+          <summary>{ts}Related Soft Contributions{/ts}</summary>
           <div class="crm-accordion-body">{include file="CRM/Contribute/Page/ContributionSoft.tpl" context="membership"}</div>
-       </div>
+       </details>
       {/if}
     {/if}
 
@@ -443,7 +442,7 @@
     }
     {/literal}{/if}
 
-    {if $context eq 'standalone' and $isEmailEnabledForSite }
+    {if $context eq 'standalone' and $isEmailEnabledForSite}
     {literal}
     CRM.$(function($) {
       var $form = $("form.{/literal}{$form.formClass}{literal}");
@@ -591,7 +590,7 @@
       showEmailOptions();
     }
 
-    var customDataType = {/literal}{$customDataType|@json_encode}{literal};
+    var customDataType = 'Membership';
 
     // load form during form rule.
     {/literal}{if $buildPriceSet}{literal}
@@ -603,16 +602,17 @@
       if (!priceSetId) {
         priceSetId = cj("#price_set_id").val();
       }
-        var fname = '#priceset';
+
         if ( !priceSetId ) {
         cj('#membership_type_id_1').val(0);
-        CRM.buildCustomData(customDataType, null);
+        CRM.buildCustomData('Membership', null);
 
         // hide price set fields.
-        cj( fname ).hide( );
+        cj('#priceset').empty();
 
         // show/hide price set amount and total amount.
         cj( "#mem_type_id").show( );
+
         var choose = "{/literal}{ts escape='js'}Choose price set{/ts}{literal}";
         cj("#price_set_id option[value='']").html( choose );
         cj( "#totalAmountORPriceSet" ).show( );
@@ -636,7 +636,7 @@
         async: false
       }).responseText;
 
-      cj( fname ).show( ).html( response );
+      cj('#priceset').show( ).html( response );
       // freeze total amount text field.
 
       cj( "#totalAmountORPriceSet" ).hide( );
@@ -789,7 +789,7 @@
         subTypeNames = null;
       }
 
-      CRM.buildCustomData(customDataType, subTypeNames);
+      CRM.buildCustomData('Membership', subTypeNames);
     }
 
   function enableAmountSection( setContributionType ) {

@@ -38,6 +38,16 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
   public $_drilldownReport = ['contribute/detail' => 'Link to Detail Report'];
 
   /**
+   * @var string
+   */
+  protected $_outerCluase = '';
+
+  /**
+   * @var string
+   */
+  protected $_groupLimit = '';
+
+  /**
    */
   public function __construct() {
     $this->_autoIncludeIndexedFieldsAsOrderBys = 1;
@@ -216,11 +226,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
     $op = $fields['total_range_op'] ?? NULL;
     $val = $fields['total_range_value'] ?? NULL;
 
-    if (!in_array($op, [
-      'eq',
-      'lte',
-    ])
-    ) {
+    if (!in_array($op, ['eq', 'lte'])) {
       $errors['total_range_op'] = ts("Please select 'Is equal to' OR 'Is Less than or equal to' operator");
     }
 
@@ -247,12 +253,12 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
 
   public function where() {
     $clauses = [];
-    $this->_tempClause = $this->_outerCluase = $this->_groupLimit = '';
+    $this->_outerCluase = $this->_groupLimit = '';
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('filters', $table)) {
         foreach ($table['filters'] as $fieldName => $field) {
           $clause = NULL;
-          if (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE) {
+          if (($field['type'] ?? 0) & CRM_Utils_Type::T_DATE) {
             $relative = $this->_params["{$fieldName}_relative"] ?? NULL;
             $from = $this->_params["{$fieldName}_from"] ?? NULL;
             $to = $this->_params["{$fieldName}_to"] ?? NULL;
@@ -266,9 +272,9 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
             if ($op) {
               $clause = $this->whereClause($field,
                 $op,
-                CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
+                $this->_params["{$fieldName}_value"] ?? NULL,
+                $this->_params["{$fieldName}_min"] ?? NULL,
+                $this->_params["{$fieldName}_max"] ?? NULL
               );
             }
           }
@@ -340,7 +346,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
    * @param int $rowCount
    */
   public function limit($rowCount = NULL) {
-    $rowCount = $rowCount ?? $this->getRowCount();
+    $rowCount ??= $this->getRowCount();
     // lets do the pager if in html mode
     $this->_limit = NULL;
 
@@ -362,7 +368,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
         }
       }
 
-      $pageId = $pageId ? $pageId : 1;
+      $pageId = $pageId ?: 1;
       $this->set(CRM_Utils_Pager::PAGE_ID, $pageId);
       $offset = ($pageId - 1) * $rowCount;
 

@@ -41,49 +41,37 @@ class CRM_Campaign_Info extends CRM_Core_Component_Info {
 
   /**
    * @inheritDoc
-   * @param bool $getAllUnconditionally
-   * @param bool $descriptions
-   *   Whether to return permission descriptions
-   *
-   * @return array
    */
-  public function getPermissions($getAllUnconditionally = FALSE, $descriptions = FALSE) {
+  public function getPermissions(): array {
     $permissions = [
       'administer CiviCampaign' => [
-        ts('administer CiviCampaign'),
-        ts('Create new campaign, survey and petition types and their status'),
+        'label' => ts('administer CiviCampaign'),
+        'description' => ts('Create new campaign, survey and petition types and their status'),
       ],
       'manage campaign' => [
-        ts('manage campaign'),
-        ts('Create new campaigns, surveys and petitions, reserve respondents'),
+        'label' => ts('manage campaign'),
+        'description' => ts('Create new campaigns, surveys and petitions, reserve respondents'),
       ],
       'reserve campaign contacts' => [
-        ts('reserve campaign contacts'),
-        ts('Reserve campaign contacts for surveys and petitions'),
+        'label' => ts('reserve campaign contacts'),
+        'description' => ts('Reserve campaign contacts for surveys and petitions'),
       ],
       'release campaign contacts' => [
-        ts('release campaign contacts'),
-        ts('Release reserved campaign contacts for surveys and petitions'),
+        'label' => ts('release campaign contacts'),
+        'description' => ts('Release reserved campaign contacts for surveys and petitions'),
       ],
       'interview campaign contacts' => [
-        ts('interview campaign contacts'),
-        ts('Record survey and petition responses from their reserved contacts'),
+        'label' => ts('interview campaign contacts'),
+        'description' => ts('Record survey and petition responses from their reserved contacts'),
       ],
       'gotv campaign contacts' => [
-        ts('GOTV campaign contacts'),
-        ts('Record that contacts voted'),
+        'label' => ts('GOTV campaign contacts'),
+        'description' => ts('Record that contacts voted'),
       ],
       'sign CiviCRM Petition' => [
-        ts('sign CiviCRM Petition'),
+        'label' => ts('sign CiviCRM Petition'),
       ],
     ];
-
-    if (!$descriptions) {
-      foreach ($permissions as $name => $attr) {
-        $permissions[$name] = array_shift($attr);
-      }
-    }
-
     return $permissions;
   }
 

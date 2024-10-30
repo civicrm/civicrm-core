@@ -28,7 +28,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
    * Assure CRM_Core_PseudoConstant::get() is working properly for a range of
    * DAO fields having a <pseudoconstant> tag in the XML schema.
    */
-  public function testOptionValues() {
+  public function testOptionValues(): void {
 
     // Create a custom field group for testing.
     $custom_group_name = md5(microtime());
@@ -73,6 +73,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
       'domain_id' => 1,
       'payment_processor_type_id' => 'Dummy',
       'name' => $pp_name,
+      'title' => $pp_name,
       'user_name' => $pp_name,
       'class_name' => 'Payment_Dummy',
       'url_site' => 'https://test.com/',
@@ -187,19 +188,23 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
         ],
         [
           'fieldName' => 'start_action_unit',
-          'sample' => 'hour',
+          'sample' => 'hours',
         ],
         [
           'fieldName' => 'repetition_frequency_unit',
-          'sample' => 'hour',
+          'sample' => 'hours',
         ],
         [
           'fieldName' => 'end_frequency_unit',
-          'sample' => 'hour',
+          'sample' => 'hours',
         ],
         [
           'fieldName' => 'mode',
           'sample' => 'Email',
+        ],
+        [
+          'fieldName' => 'mapping_id',
+          'sample' => 'Event Type',
         ],
       ],
       'CRM_Dedupe_DAO_DedupeRuleGroup' => [
@@ -250,7 +255,8 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
       'CRM_Campaign_DAO_Survey' => [
         [
           'fieldName' => 'activity_type_id',
-          'sample' => 'Phone Call',
+          'sample' => 'Survey',
+          'exclude' => 'Phone Call',
           'max' => 100,
         ],
       ],
@@ -309,7 +315,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
         ],
         [
           'fieldName' => 'extends',
-          'sample' => 'CiviEvent',
+          'sample' => 'Event',
         ],
         [
           'fieldName' => 'financial_type_id',
@@ -385,7 +391,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
         ],
         [
           'fieldName' => 'visibility',
-          'sample' => 'Expose Publicly',
+          'sample' => 'Public Pages',
         ],
       ],
       'CRM_Core_DAO_UFJoin' => [
@@ -634,7 +640,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
       'CRM_Core_DAO_Website' => [
         [
           'fieldName' => 'website_type_id',
-          'sample' => 'Facebook',
+          'sample' => 'Social',
         ],
       ],
       'CRM_Core_DAO_WordReplacement' => [
@@ -650,7 +656,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
       'CRM_Core_DAO_MappingField' => [
         [
           'fieldName' => 'website_type_id',
-          'sample' => 'Facebook',
+          'sample' => 'Social',
         ],
         [
           'fieldName' => 'im_provider_id',
@@ -692,10 +698,6 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'fieldName' => 'preferred_language',
           'sample' => ['en_US' => 'English (United States)'],
           'max' => 250,
-        ],
-        [
-          'fieldName' => 'preferred_mail_format',
-          'sample' => 'Text',
         ],
         [
           'fieldName' => 'communication_style_id',
@@ -800,11 +802,11 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
       'CRM_Member_DAO_MembershipStatus' => [
         [
           'fieldName' => 'start_event',
-          'sample' => 'start date',
+          'sample' => 'Membership Start Date',
         ],
         [
           'fieldName' => 'end_event',
-          'sample' => 'member since',
+          'sample' => 'Member Since',
         ],
         [
           'fieldName' => 'start_event_adjust_unit',
@@ -869,13 +871,13 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'sample' => 'Scheduled',
         ],
       ],
-      'CRM_Mailing_Event_DAO_Bounce' => [
+      'CRM_Mailing_Event_DAO_MailingEventBounce' => [
         [
           'fieldName' => 'bounce_type_id',
           'sample' => 'Invalid',
         ],
       ],
-      'CRM_Mailing_Event_DAO_Subscribe' => [
+      'CRM_Mailing_Event_DAO_MailingEventSubscribe' => [
         [
           'fieldName' => 'group_id',
           'sample' => $group_name,
@@ -945,36 +947,42 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
 
     foreach ($fields as $daoName => $daoFields) {
       foreach ($daoFields as $field) {
-        $message = "DAO name: '{$daoName}', field: '{$field['fieldName']}'";
+        // Test both the new `buildOptions` method with goes through `Civi::entity()`
+        // and the old deprecated `CRM_Core_Pseudoconstant::get()`
+        $methods = [
+          "$daoName::buildOptions({$field['fieldName']})" => $daoName::buildOptions($field['fieldName']),
+          "CRM_Core_Pseudoconstant::get($daoName, {$field['fieldName']})" => CRM_Core_Pseudoconstant::get($daoName, $field['fieldName']),
+        ];
+        foreach ($methods as $message => $optionValues) {
+          $this->assertNotEmpty($optionValues, $message);
 
-        $optionValues = $daoName::buildOptions($field['fieldName']);
-        $this->assertNotEmpty($optionValues, $message);
-
-        // Ensure sample value is contained in the returned optionValues.
-        if (!is_array($field['sample'])) {
-          $this->assertContains($field['sample'], $optionValues, $message);
-        }
-        // If sample is an array, we check keys and values
-        else {
-          foreach ($field['sample'] as $key => $value) {
-            $this->assertArrayHasKey($key, $optionValues, $message);
-            $this->assertEquals(CRM_Utils_Array::value($key, $optionValues), $value, $message);
+          // Ensure sample value is contained in the returned optionValues.
+          if (!is_array($field['sample'])) {
+            $this->assertContains($field['sample'], $optionValues, $message);
           }
-        }
+          // If sample is an array, we check keys and values
+          else {
+            foreach ($field['sample'] as $key => $value) {
+              $this->assertArrayHasKey($key, $optionValues, $message);
+              $this->assertEquals($optionValues[$key], $value, $message);
+            }
+          }
 
-        // Ensure exclude value is not contained in the optionValues
-        if (!empty($field['exclude'])) {
-          $this->assertNotContains($field['exclude'], $optionValues, $message);
-        }
+          // Ensure exclude value is not contained in the optionValues
+          // Skip this check for the legacy `CRM_Core_Pseudoconstant::get()` which doesn't evaluate `condition_provider`
+          if (!empty($field['exclude']) && !str_starts_with($message, 'CRM_Core_Pseudoconstant')) {
+            $this->assertNotContains($field['exclude'], $optionValues, $message);
+          }
 
-        // Ensure count of optionValues is not extraordinarily high.
-        $max = CRM_Utils_Array::value('max', $field, 20);
-        $this->assertLessThanOrEqual($max, count($optionValues), $message);
+          // Ensure count of optionValues is not extraordinarily high.
+          $max = $field['max'] ?? 20;
+          $this->assertLessThanOrEqual($max, count($optionValues), $message);
+        }
       }
     }
   }
 
-  public function testContactTypes() {
+  public function testContactTypes(): void {
     $byName = [
       'Individual' => 'Individual',
       'Household' => 'Household',
@@ -1003,7 +1011,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
     $this->assertEquals(array_flip($byId), $result);
   }
 
-  public function testGetTaxRates() {
+  public function testGetTaxRates(): void {
     $contact = $this->createLoggedInUser();
     $financialType = $this->callAPISuccess('financial_type', 'create', [
       'name' => 'Test taxable financial Type',
@@ -1028,7 +1036,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
       'account_relationship' => 10,
       'financial_account_id' => $financialAccountId,
     ];
-    CRM_Financial_BAO_FinancialTypeAccount::add($financialAccountParams);
+    CRM_Financial_BAO_EntityFinancialAccount::add($financialAccountParams);
     $taxRates = CRM_Core_PseudoConstant::getTaxRates();
     $this->assertEquals('5.00', round($taxRates[$financialType['id']], 2));
   }

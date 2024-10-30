@@ -26,6 +26,7 @@ use Civi\Api4\Utils\CoreUtil;
 use api\v4\Traits\OptionCleanupTrait;
 use api\v4\Api4TestBase;
 use api\v4\Traits\TableDropperTrait;
+use Civi\Test\Invasive;
 use Prophecy\Argument;
 
 /**
@@ -36,9 +37,9 @@ class SpecGathererTest extends Api4TestBase {
   use TableDropperTrait;
   use OptionCleanupTrait;
 
-  public function testBasicFieldsGathering() {
+  public function testBasicFieldsGathering(): void {
     $gatherer = new SpecGatherer();
-    $specs = $gatherer->getSpec('Contact', 'get', FALSE);
+    $specs = Invasive::call([$gatherer, 'getSpec'], ['Contact', 'get']);
     $contactDAO = CoreUtil::getBAOFromApiName('Contact');
     $contactFields = $contactDAO::fields();
     $specFieldNames = $specs->getFieldNames();
@@ -47,7 +48,7 @@ class SpecGathererTest extends Api4TestBase {
     $this->assertEmpty(array_diff_key($contactFieldNames, $specFieldNames));
   }
 
-  public function testWithSpecProvider() {
+  public function testWithSpecProvider(): void {
     $gather = new SpecGatherer();
 
     $provider = $this->prophesize(SpecProviderInterface::class);
@@ -59,7 +60,7 @@ class SpecGathererTest extends Api4TestBase {
     });
     $gather->addSpecProvider($provider->reveal());
 
-    $spec = $gather->getSpec('Contact', 'create', FALSE);
+    $spec = Invasive::call([$gather, 'getSpec'], ['Contact', 'create']);
     $fieldNames = $spec->getFieldNames();
 
     $this->assertContains('foo', $fieldNames);

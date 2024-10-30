@@ -222,7 +222,7 @@ class CRM_Core_BAO_MappingTest extends CiviUnitTestCase {
   /**
    * Ensure getCreateMappingValues() doesn't return an error when there are spaces in the name.
    */
-  public function testGetCreateMappingValues() {
+  public function testGetCreateMappingValues(): void {
     CRM_Core_BAO_Mapping::getCreateMappingValues("Import Multi value custom data");
   }
 

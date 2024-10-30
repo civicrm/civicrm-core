@@ -18,6 +18,7 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  *
  */
+use Civi\Api4\MailingEventQueue;
 
 /**
  * Class api_v3_JobTest
@@ -27,7 +28,6 @@
 class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
 
-  public $DBResetRequired = FALSE;
   public $_entity = 'Job';
   public $_params = [];
   private $_groupID;
@@ -88,23 +88,62 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
     parent::tearDown();
   }
 
-  public function testBasic() {
+  public function testBasic(): void {
     $this->createContactsInGroup(10, $this->_groupID);
     Civi::settings()->add([
       'mailerBatchLimit' => 2,
     ]);
-    $this->callAPISuccess('mailing', 'create', $this->_params);
+    $mailing = $this->callAPISuccess('Mailing', 'create', $this->_params);
     $this->_mut->assertRecipients([]);
     $this->callAPISuccess('job', 'process_mailing', []);
+    $mailing = $this->callAPISuccessGetSingle('Mailing', ['id' => $mailing['id'], 'version' => 4]);
+    $this->assertEquals(date('Y-m-d'), date('Y-m-d', strtotime($mailing['start_date'])));
+    $this->assertNull($mailing['end_date']);
+    $this->assertEquals('Running', $mailing['status']);
     $this->_mut->assertRecipients($this->getRecipients(1, 2));
+    $this->_mut->clearMessages();
+    // Now test forwarding from there
+    $queue = MailingEventQueue::get(FALSE)->execute()->first();
+    $this->callAPISuccess('Mailing', 'event_forward', [
+      'event_queue_id' => $queue['id'],
+      'job_id' => $queue['job_id'],
+      'hash' => $queue['hash'],
+      'email' => 'a@b.com',
+      'params' => ['body_html' => 'Hi there'],
+    ]);
+    $this->_mut->checkAllMailLog([
+      'civicrm/mailing/optout&reset=1&j',
+      'Return-Path: b',
+      'chaos.org',
+      'From: "FIXME" <info@EXAMPLE.ORG>',
+      'Subject: Accidents in cars cause children',
+      'List-Unsubscribe: <mailto:u.',
+      '@chaos.org>',
+      'To: <a@b.com>',
+      'Precedence: bulk',
+      'X-CiviMail-Bounce: b',
+      'Content-Type: text/plain; charset=utf-8',
+      'Content-Transfer-Encoding: 8bit',
+      'Hi there',
+    ]);
+    CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0;
+    $this->callAPISuccess('Job', 'process_mailing', []);
+    CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0;
+    $this->callAPISuccess('Job', 'process_mailing', []);
+    CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0;
+    $this->callAPISuccess('Job', 'process_mailing', []);
+    CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0;
+    $this->callAPISuccess('Job', 'process_mailing', []);
+    $updatedMailing = $this->callAPISuccessGetSingle('Mailing', ['id' => $mailing['id'], 'version' => 4]);
+    $this->assertEquals($mailing['start_date'], $updatedMailing['start_date']);
+    $this->assertEquals(date('Y-m-d'), date('Y-m-d', strtotime($updatedMailing['end_date'])));
+    $this->assertEquals('Complete', $updatedMailing['status']);
   }
 
   /**
    * Test that a contact deleted after the mailing is queued is not emailed.
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function testDeletedRecipient() {
+  public function testDeletedRecipient(): void {
     $this->createContactsInGroup(2, $this->_groupID);
     $this->callAPISuccess('Mailing', 'create', $this->_params);
     $this->callAPISuccess('Contact', 'delete', ['id' => $this->callAPISuccessGetValue('GroupContact', ['return' => 'contact_id', 'options' => ['limit' => 1, 'sort' => 'id DESC']])]);
@@ -115,7 +154,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
   /**
    * Test what happens when a contact is set to decesaed
    */
-  public function testDeceasedRecipient() {
+  public function testDeceasedRecipient(): void {
     $contactID = $this->individualCreate(['first_name' => 'test dead recipeint', 'email' => 'mailtestdead@civicrm.org']);
     $this->callAPISuccess('group_contact', 'create', [
       'contact_id' => $contactID,
@@ -139,7 +178,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
   /**
    * Test that "multiple bulk email recipients" setting is respected.
    */
-  public function testMultipleBulkRecipients() {
+  public function testMultipleBulkRecipients(): void {
     Civi::settings()->add([
       'civimail_multiple_bulk_emails' => 1,
     ]);
@@ -171,7 +210,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
   /**
    * Test pause and resume on Mailing.
    */
-  public function testPauseAndResumeMailing() {
+  public function testPauseAndResumeMailing(): void {
     $this->createContactsInGroup(10, $this->_groupID);
     Civi::settings()->add([
       'mailerBatchLimit' => 2,
@@ -186,6 +225,8 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
     CRM_Mailing_BAO_MailingJob::pause($result['id']);
     $jobs = $this->callAPISuccess('mailing_job', 'get', ['mailing_id' => $result['id']]);
     $this->assertEquals('Paused', $jobs['values'][$jobs['id']]['status']);
+    $mailing = $this->callAPISuccessGetSingle('Mailing', ['id' => $result['id'], 'version' => 4]);
+    $this->assertEquals('Paused', $mailing['status']);
 
     //Verify if Paused mailing isn't considered in process_mailing job.
     $this->callAPISuccess('job', 'process_mailing', []);
@@ -214,7 +255,9 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
    * Test mail when in non-production environment.
    *
    */
-  public function testMailNonProductionRun() {
+  public function testMailNonProductionRun(): void {
+    $origMailingBackend = Civi::settings()->get('mailing_backend');
+
     // Test in non-production mode.
     $params = [
       'environment' => 'Staging',
@@ -234,8 +277,25 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
     $this->assertEquals($result['error_message'], "Job has not been executed as it is a Staging (non-production) environment.");
 
     // Test with runInNonProductionEnvironment param.
-    $this->callAPISuccess('job', 'process_mailing', ['runInNonProductionEnvironment' => TRUE]);
-    $this->_mut->assertRecipients($this->getRecipients(1, 2));
+    try {
+      // Do not call with callAPIFailure because we want to test the exception here
+      civicrm_api3('job', 'process_mailing', ['runInNonProductionEnvironment' => TRUE]);
+      $this->fail('should not be reachable');
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->assertEquals('Outbound mail has been disabled', substr($e->getMessage(), 0, 31));
+      $statuses = CRM_Core_Session::singleton()->getStatus();
+      $hasExpectedMessage = FALSE;
+      foreach ($statuses as $status) {
+        if (str_contains($status['text'], 'Outbound emails have been disabled')) {
+          $hasExpectedMessage = TRUE;
+          break;
+        }
+      }
+      if (!$hasExpectedMessage) {
+        $this->fail('Status messages should contain "Outbound mail has been disabled"');
+      }
+    }
 
     $jobId = $this->callAPISuccessGetValue('Job', [
       'return' => "id",
@@ -253,6 +313,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
     $this->assertEquals($mailingBackend['outBound_option'], CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED);
 
     // Test in production mode.
+    Civi::settings()->set('mailing_backend', $origMailingBackend);
     $params = [
       'environment' => 'Production',
     ];
@@ -261,7 +322,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
     $this->_mut->assertRecipients($this->getRecipients(1, 2));
   }
 
-  public function concurrencyExamples() {
+  public function concurrencyExamples(): array {
     $es = [];
 
     // Launch 3 workers, but mailerJobsMax limits us to 1 worker.
@@ -487,10 +548,8 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
    * @dataProvider getBooleanDataProvider
    *
    * @param bool $isBulk
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function testBatchActivityTargets($isBulk) {
+  public function testBatchActivityTargets(bool $isBulk): void {
     $loggedInUserId = $this->createLoggedInUser();
 
     \Civi::settings()->set('mailerBatchLimit', 2);
@@ -503,7 +562,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
 
     $this->createContactsInGroup(6, $this->_groupID);
     $mailing = $this->callAPISuccess('mailing', 'create', $this->_params + ['scheduled_id' => $loggedInUserId]);
-    $this->callAPISuccess('job', 'process_mailing', []);
+    $this->callAPISuccess('Job', 'process_mailing', []);
     $bulkEmailActivity = $this->callAPISuccess('Activity', 'getsingle', [
       'source_record_id' => $mailing['id'],
       'activity_type_id' => 'Bulk Email',

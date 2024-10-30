@@ -27,6 +27,13 @@ class CRM_Utils_AutoClean {
   protected $args;
 
   /**
+   * Have we run this cleanup method yet?
+   *
+   * @var bool
+   */
+  protected $isDone = FALSE;
+
+  /**
    * Call a cleanup function when the current context shuts down.
    *
    * ```
@@ -144,6 +151,21 @@ class CRM_Utils_AutoClean {
   }
 
   public function __destruct() {
+    $this->cleanup();
+  }
+
+  /**
+   * Explicitly apply the cleanup.
+   *
+   * Use this if you want to do the cleanup work immediately.
+   *
+   * @return void
+   */
+  public function cleanup(): void {
+    if ($this->isDone) {
+      return;
+    }
+    $this->isDone = TRUE;
     \Civi\Core\Resolver::singleton()->call($this->callback, $this->args);
   }
 

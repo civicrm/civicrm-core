@@ -57,7 +57,8 @@ function civicrm_api3_activity_type_create($params) {
 
   $action = 1;
 
-  if ($optionValueID = CRM_Utils_Array::value('option_value_id', $params)) {
+  $optionValueID = $params['option_value_id'] ?? NULL;
+  if ($optionValueID) {
     $action = 2;
   }
 
@@ -98,7 +99,7 @@ function _civicrm_api3_activity_type_create_spec(&$params) {
  * @deprecated use OptionValue api
  */
 function civicrm_api3_activity_type_delete($params) {
-  $result = CRM_Core_BAO_OptionValue::del($params['id']);
+  $result = CRM_Core_BAO_OptionValue::deleteRecord($params);
   if ($result) {
     return civicrm_api3_create_success(TRUE, $params);
   }

@@ -52,7 +52,8 @@ class CRM_Contribute_Form extends CRM_Admin_Form {
         $this->assign('organisationId', $contactID);
       }
 
-      if ($parentId = CRM_Utils_Array::value('parent_id', $defaults)) {
+      $parentId = $defaults['parent_id'] ?? NULL;
+      if ($parentId) {
         $this->assign('parentId', $parentId);
       }
     }

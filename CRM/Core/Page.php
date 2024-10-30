@@ -132,7 +132,26 @@ class CRM_Core_Page {
     // in 'body.tpl
     'suppressForm',
     'beginHookFormElements',
+    // This is checked in validate.tpl
+    'snippet_type',
   ];
+
+  /**
+   * The permission we have on this contact
+   *
+   * @var string
+   */
+  public $_permission;
+
+  /**
+   * @var int
+   */
+  protected $_action;
+
+  /**
+   * @var int
+   */
+  protected $_id;
 
   /**
    * Class constructor.
@@ -251,7 +270,7 @@ class CRM_Core_Page {
       CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js', 1, 'html-header');
     }
 
-    $content = self::$_template->fetch('CRM/common/' . strtolower($config->userFramework) . '.tpl');
+    $content = self::$_template->fetch(CRM_Utils_System::getContentTemplate());
 
     // Render page header
     if (!defined('CIVICRM_UF_HEAD') && $region = CRM_Core_Region::instance('html-header', FALSE)) {
@@ -304,9 +323,12 @@ class CRM_Core_Page {
    * @param string $var
    * @param mixed $value
    *   (reference) value of variable.
+   *
+   * @deprecated since 5.72 will be removed around 5.84
    */
   public function assign_by_ref($var, &$value) {
-    self::$_template->assign_by_ref($var, $value);
+    CRM_Core_Error::deprecatedFunctionWarning('assign');
+    self::$_template->assign($var, $value);
   }
 
   /**
@@ -324,12 +346,23 @@ class CRM_Core_Page {
   /**
    * Returns an array containing template variables.
    *
+   * @deprecated since 5.69 will be removed around 5.93. use getTemplateVars.
+   *
    * @param string $name
    *
    * @return array
    */
   public function get_template_vars($name = NULL) {
-    return self::$_template->get_template_vars($name);
+    return $this->getTemplateVars($name);
+  }
+
+  /**
+   * Get the value/s assigned to the Template Engine (Smarty).
+   *
+   * @param string|null $name
+   */
+  public function getTemplateVars($name = NULL) {
+    return self::$_template->getTemplateVars($name);
   }
 
   /**
@@ -458,7 +491,7 @@ class CRM_Core_Page {
     $fields = civicrm_api3($entity, 'getfields', ['action' => 'get']);
     $dateFields = [];
     foreach ($fields['values'] as $fieldName => $fieldMetaData) {
-      if (isset($fieldMetaData['html']) && CRM_Utils_Array::value('type', $fieldMetaData['html']) == 'Select Date') {
+      if (isset($fieldMetaData['html']) && ($fieldMetaData['html']['type'] ?? NULL) == 'Select Date') {
         $dateFields[$fieldName] = CRM_Utils_Date::addDateMetadataToField($fieldMetaData, $fieldMetaData);
       }
     }
@@ -498,7 +531,7 @@ class CRM_Core_Page {
 
     $standardAttribs = ['aria-hidden' => 'true'];
     if ($text === NULL || $text === '') {
-      $title = $sr = '';
+      $sr = '';
     }
     else {
       $standardAttribs['title'] = $text;
@@ -538,6 +571,11 @@ class CRM_Core_Page {
       // Duplicates don't actually matter....
       $this->addExpectedSmartyVariable($elementName);
     }
+  }
+
+  public function invalidKey() {
+    $msg = ts("We can't load the requested web page. This page requires cookies to be enabled in your browser settings. Please check this setting and enable cookies (if they are not enabled). Then try again. If this error persists, contact the site administrator for assistance.") . '<br /><br />' . ts('Site Administrators: This error may indicate that users are accessing this page using a domain or URL other than the configured Base URL. EXAMPLE: Base URL is http://example.org, but some users are accessing the page via http://www.example.org or a domain alias like http://myotherexample.org.') . '<br /><br />' . ts('Error type: Could not find a valid session key.');
+    throw new CRM_Core_Exception($msg);
   }
 
 }

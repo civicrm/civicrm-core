@@ -50,12 +50,15 @@
     {$form.participant_fee_amount_high.label} &nbsp; {$form.participant_fee_amount_high.html}
   </td>
 </tr>
+<tr>
+  <td colspan="2"><label>{$form.participant_id.label}</label> {$form.participant_id.html}</td>
+</tr>
 
 {* campaign in contribution search *}
 {include file="CRM/Campaign/Form/addCampaignToSearch.tpl"
 campaignTrClass='' campaignTdClass='crm-event-form-block-participant_campaign_id'}
 
-{if $participantGroupTree }
+{if $participantGroupTree}
 <tr>
   <td colspan="4">
   {include file="CRM/Custom/Form/Search.tpl" groupTree=$participantGroupTree showHideLinks=false}

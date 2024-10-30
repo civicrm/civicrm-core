@@ -37,7 +37,7 @@ class CRM_SMS_StateMachine_Send extends CRM_Core_StateMachine {
       'CRM_SMS_Form_Schedule' => NULL,
     ];
 
-    $this->addSequentialPages($this->_pages, $action);
+    $this->addSequentialPages($this->_pages);
   }
 
 }

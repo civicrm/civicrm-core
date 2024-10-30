@@ -41,7 +41,7 @@ class CRM_Contact_Form_Task_RemoveFromTag extends CRM_Contact_Form_Task {
     // add select for tag
     $this->_tags = CRM_Core_BAO_Tag::getTags();
     foreach ($this->_tags as $tagID => $tagName) {
-      $this->_tagElement = &$this->addElement('checkbox', "tag[$tagID]", NULL, $tagName);
+      $this->addElement('checkbox', "tag[$tagID]", NULL, $tagName);
     }
 
     $parentNames = CRM_Core_BAO_Tag::getTagSet('civicrm_contact');
@@ -124,7 +124,7 @@ class CRM_Contact_Form_Task_RemoveFromTag extends CRM_Contact_Form_Task {
         ]);
       }
       $status = '<ul><li>' . implode('</li><li>', $status) . '</li></ul>';
-      CRM_Core_Session::setStatus($status, ts("Removed Tag <em>%1</em>", [1 => $this->_tags[$key]]), 'success', ['expires' => 0]);
+      CRM_Core_Session::setStatus($status, ts("Removed Tag <em>%1</em>", [1 => $this->_tags[$key]]), 'success');
     }
   }
 

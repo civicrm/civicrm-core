@@ -4,7 +4,8 @@
   // Specialized searchDisplay, only used by Admins
   angular.module('crmSearchAdmin').component('crmSearchAdminResultsTable', {
     bindings: {
-      search: '<'
+      search: '<',
+      debug: '<'
     },
     require: {
       crmSearchAdmin: '^crmSearchAdmin'
@@ -12,8 +13,8 @@
     templateUrl: '~/crmSearchAdmin/resultsTable/crmSearchAdminResultsTable.html',
     controller: function($scope, $element, searchMeta, searchDisplayBaseTrait, searchDisplayTasksTrait, searchDisplaySortableTrait) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
-        // Mix in traits to this controller
-        ctrl = angular.extend(this, searchDisplayBaseTrait, searchDisplayTasksTrait, searchDisplaySortableTrait);
+        // Mix in copies of traits to this controller
+        ctrl = angular.extend(this, _.cloneDeep(searchDisplayBaseTrait), _.cloneDeep(searchDisplayTasksTrait), _.cloneDeep(searchDisplaySortableTrait));
 
       function buildSettings() {
         ctrl.apiEntity = ctrl.search.api_entity;
@@ -23,12 +24,13 @@
         ctrl.settings.columns = _.transform(ctrl.search.api_params.select, function(columns, fieldExpr) {
           columns.push(searchMeta.fieldToColumn(fieldExpr, {label: true, sortable: true}));
         }).concat(ctrl.settings.columns);
-        ctrl.debug = {
-          apiParams: JSON.stringify(ctrl.search.api_params, null, 2)
-        };
+        ctrl.debug.apiParams = JSON.stringify(ctrl.search.api_params, null, 2);
+        delete ctrl.debug.sql;
+        delete ctrl.debug.timeIndex;
         ctrl.results = null;
         ctrl.rowCount = null;
         ctrl.page = 1;
+        ctrl.selectNone();
       }
 
       this.$onInit = function() {
@@ -38,12 +40,15 @@
       };
 
       // Add callbacks for pre & post run
-      this.onPreRun.push(function(apiParams) {
-        apiParams.debug = true;
+      this.onPreRun.push(function(apiCalls) {
+        // So the raw SQL can be shown in the "Query Info" tab
+        apiCalls.run[2].debug = true;
       });
 
-      this.onPostRun.push(function(result) {
-        ctrl.debug = _.extend(_.pick(ctrl.debug, 'apiParams'), result.debug);
+      this.onPostRun.push(function(apiResults) {
+        // Add debug output (e.g. raw SQL) to the "Query Info" tab
+        ctrl.debug.sql = apiResults.run.debug.sql;
+        ctrl.debug.timeIndex = apiResults.run.debug.timeIndex;
       });
 
       $scope.sortableColumnOptions = {
@@ -54,16 +59,11 @@
           if (!ui.item.sortable.dropindex && ctrl.crmSearchAdmin.groupExists) {
             ui.item.sortable.cancel();
           }
-          // Function selectors use `ng-repeat` with `track by $index` so must be refreshed when rearranging the array
-          ctrl.crmSearchAdmin.hideFuncitons();
         }
       };
 
       $scope.fieldsForSelect = function() {
-        return {results: ctrl.crmSearchAdmin.getAllFields(':label', ['Field', 'Custom', 'Extra', 'Pseudo'], function(key) {
-            return _.contains(ctrl.search.api_params.select, key);
-          })
-        };
+        return ctrl.crmSearchAdmin.fieldsForSelect();
       };
 
       $scope.addColumn = function(col) {

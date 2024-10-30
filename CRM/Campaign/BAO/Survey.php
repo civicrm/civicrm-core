@@ -21,188 +21,28 @@
 class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey implements Civi\Core\HookInterface {
 
   /**
-   * Retrieve DB object and copy to defaults array.
-   *
-   * @param array $params
-   *   Array of criteria values.
-   * @param array $defaults
-   *   Array to be populated with found values.
-   *
-   * @return self|null
-   *   The DAO object, if found.
-   *
    * @deprecated
+   * @param array $params
+   * @param array $defaults
+   * @return self|null
    */
   public static function retrieve($params, &$defaults) {
     return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
-   * Takes an associative array and creates a Survey object based on the
-   * supplied values.
+   * @deprecated
    *
    * @param array $params
    *
    * @return bool|CRM_Campaign_DAO_Survey
    */
-  public static function create(&$params) {
+  public static function create($params) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     if (empty($params)) {
       return FALSE;
     }
-
-    if (!empty($params['is_default'])) {
-      $query = "UPDATE civicrm_survey SET is_default = 0";
-      CRM_Core_DAO::executeQuery($query);
-    }
-
-    if (empty($params['id'])) {
-      if (empty($params['created_id'])) {
-        $params['created_id'] = CRM_Core_Session::getLoggedInContactID();
-      }
-
-      if (empty($params['created_date'])) {
-        $params['created_date'] = date('YmdHis');
-      }
-    }
-
-    $dao = self::writeRecord($params);
-
-    return $dao;
-  }
-
-  /**
-   * Retrieve surveys for dashboard.
-   *
-   * @param array $params
-   * @param bool $onlyCount
-   *
-   * @return array|int
-   */
-  public static function getSurveySummary($params = [], $onlyCount = FALSE) {
-    //build the limit and order clause.
-    $limitClause = $orderByClause = $lookupTableJoins = NULL;
-    if (!$onlyCount) {
-      $sortParams = [
-        'sort' => 'created_date',
-        'offset' => 0,
-        'rowCount' => 10,
-        'sortOrder' => 'desc',
-      ];
-      foreach ($sortParams as $name => $default) {
-        if (!empty($params[$name])) {
-          $sortParams[$name] = $params[$name];
-        }
-      }
-
-      //need to lookup tables.
-      $orderOnSurveyTable = TRUE;
-      if ($sortParams['sort'] == 'campaign') {
-        $orderOnSurveyTable = FALSE;
-        $lookupTableJoins = '
- LEFT JOIN civicrm_campaign campaign ON ( campaign.id = survey.campaign_id )';
-        $orderByClause = "ORDER BY campaign.title {$sortParams['sortOrder']}";
-      }
-      elseif ($sortParams['sort'] == 'activity_type') {
-        $orderOnSurveyTable = FALSE;
-        $lookupTableJoins = "
- LEFT JOIN civicrm_option_value activity_type ON ( activity_type.value = survey.activity_type_id
-                                                   OR survey.activity_type_id IS NULL )
-INNER JOIN civicrm_option_group grp ON ( activity_type.option_group_id = grp.id AND grp.name = 'activity_type' )";
-        $orderByClause = "ORDER BY activity_type.label {$sortParams['sortOrder']}";
-      }
-      elseif ($sortParams['sort'] == 'isActive') {
-        $sortParams['sort'] = 'is_active';
-      }
-      if ($orderOnSurveyTable) {
-        $orderByClause = "ORDER BY survey.{$sortParams['sort']} {$sortParams['sortOrder']}";
-      }
-      $limitClause = "LIMIT {$sortParams['offset']}, {$sortParams['rowCount']}";
-    }
-
-    //build the where clause.
-    $queryParams = $where = [];
-
-    //we only have activity type as a
-    //difference between survey and petition.
-    $petitionTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Petition');
-    if ($petitionTypeID) {
-      $where[] = "( survey.activity_type_id != %1 )";
-      $queryParams[1] = [$petitionTypeID, 'Positive'];
-    }
-
-    if (!empty($params['title'])) {
-      $where[] = "( survey.title LIKE %2 )";
-      $queryParams[2] = ['%' . trim($params['title']) . '%', 'String'];
-    }
-    if (!empty($params['campaign_id'])) {
-      $where[] = '( survey.campaign_id = %3 )';
-      $queryParams[3] = [$params['campaign_id'], 'Positive'];
-    }
-    if (!empty($params['activity_type_id'])) {
-      $typeId = $params['activity_type_id'];
-      if (is_array($params['activity_type_id'])) {
-        $typeId = implode(' , ', $params['activity_type_id']);
-      }
-      $where[] = "( survey.activity_type_id IN ( {$typeId} ) )";
-    }
-    $whereClause = NULL;
-    if (!empty($where)) {
-      $whereClause = ' WHERE ' . implode(" \nAND ", $where);
-    }
-
-    $selectClause = '
-SELECT  survey.id                         as id,
-        survey.title                      as title,
-        survey.is_active                  as is_active,
-        survey.result_id                  as result_id,
-        survey.is_default                 as is_default,
-        survey.campaign_id                as campaign_id,
-        survey.activity_type_id           as activity_type_id,
-        survey.release_frequency          as release_frequency,
-        survey.max_number_of_contacts     as max_number_of_contacts,
-        survey.default_number_of_contacts as default_number_of_contacts';
-    if ($onlyCount) {
-      $selectClause = 'SELECT COUNT(*)';
-    }
-    $fromClause = 'FROM  civicrm_survey survey';
-
-    $query = "{$selectClause} {$fromClause} {$lookupTableJoins} {$whereClause} {$orderByClause} {$limitClause}";
-
-    //return only count.
-    if ($onlyCount) {
-      return (int) CRM_Core_DAO::singleValueQuery($query, $queryParams);
-    }
-
-    $surveys = [];
-    $properties = [
-      'id',
-      'title',
-      'campaign_id',
-      'is_active',
-      'is_default',
-      'result_id',
-      'activity_type_id',
-      'release_frequency',
-      'max_number_of_contacts',
-      'default_number_of_contacts',
-    ];
-
-    $survey = CRM_Core_DAO::executeQuery($query, $queryParams);
-    while ($survey->fetch()) {
-      foreach ($properties as $property) {
-        $surveys[$survey->id][$property] = $survey->$property;
-      }
-    }
-
-    return $surveys;
-  }
-
-  /**
-   * Get the survey count.
-   *
-   */
-  public static function getSurveyCount() {
-    return (int) CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM civicrm_survey');
+    return self::writeRecord($params);
   }
 
   /**
@@ -301,14 +141,13 @@ SELECT  survey.id    as id,
   }
 
   /**
-   * Get Surveys custom groups.
+   * @deprecated since 5.71 will be removed around 5.85.
    *
    * @param array $surveyTypes
-   *   an array of survey type id.
-   *
    * @return array
    */
   public static function getSurveyCustomGroups($surveyTypes = []) {
+    CRM_Core_Error::deprecatedFunctionWarning('API');
     $customGroups = [];
     if (!is_array($surveyTypes)) {
       $surveyTypes = [$surveyTypes];
@@ -341,17 +180,13 @@ SELECT  survey.id    as id,
   }
 
   /**
-   * Update the is_active flag in the db.
-   *
+   * @deprecated - this bypasses hooks.
    * @param int $id
-   *   Id of the database record.
    * @param bool $is_active
-   *   Value we want to set the is_active field.
-   *
    * @return bool
-   *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $is_active) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return CRM_Core_DAO::setFieldValue('CRM_Campaign_DAO_Survey', $id, 'is_active', $is_active);
   }
 
@@ -363,6 +198,7 @@ SELECT  survey.id    as id,
    * @return mixed|null
    */
   public static function del($id) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     if (!$id) {
       return NULL;
     }
@@ -380,6 +216,13 @@ SELECT  survey.id    as id,
       if ($reportId) {
         CRM_Report_BAO_ReportInstance::deleteRecord(['id' => $reportId]);
       }
+    }
+    if ($event->action === 'edit') {
+      if (!empty($event->params['is_default'])) {
+        $query = "UPDATE civicrm_survey SET is_default = 0";
+        CRM_Core_DAO::executeQuery($query);
+      }
+      $event->params['last_modified_id'] ??= CRM_Core_Session::getLoggedInContactID();
     }
   }
 
@@ -411,10 +254,7 @@ SELECT  survey.id    as id,
 
     $select = $from = [];
     foreach ($returnProperties as $property => $ignore) {
-      $value = (in_array($property, [
-        'city',
-        'street_address',
-      ])) ? 'address' : $property;
+      $value = (in_array($property, ['city', 'street_address'])) ? 'address' : $property;
       switch ($property) {
         case 'sort_name':
         case 'contact_type':
@@ -459,7 +299,7 @@ SELECT  survey.id    as id,
         foreach ($returnProperties as $property => $ignore) {
           $voterDetails[$contact->contactId][$property] = $contact->$property;
         }
-        $image = CRM_Contact_BAO_Contact_Utils::getImage($contact->contact_sub_type ? $contact->contact_sub_type : $contact->contact_type,
+        $image = CRM_Contact_BAO_Contact_Utils::getImage($contact->contact_sub_type ?: $contact->contact_type,
           FALSE,
           $contact->contactId
         );
@@ -513,7 +353,7 @@ INNER JOIN  civicrm_activity_contact activityTarget
 INNER JOIN  civicrm_activity_contact activityAssignment
   ON ( activityAssignment.activity_id = activity.id AND activityAssignment.record_type_id = $assigneeID )
      WHERE  activity.source_record_id = %1
-     AND  ( activity.is_deleted IS NULL OR activity.is_deleted = 0 ) ";
+     AND  activity.is_deleted = 0 ";
     if (!empty($interviewerId)) {
       $query .= "AND activityAssignment.contact_id = %2 ";
       $params[2] = [$interviewerId, 'Integer'];
@@ -608,7 +448,7 @@ INNER JOIN  civicrm_activity_contact activityAssignment
 INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a.id )
      WHERE  activity.source_record_id = %1
        AND  activity.activity_type_id = %2
-       AND  ( activity.is_deleted IS NULL OR activity.is_deleted = 0 )
+       AND  activity.is_deleted = 0
             $whereClause";
 
     $params = [
@@ -819,7 +659,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
         );
         $menuLinks[] = sprintf('<a href="%s" class="action-item crm-hover-button" title="%s">%s</a>',
           $urlPath,
-          CRM_Utils_Array::value('title', $link),
+          $link['title'] ?? NULL,
           $link['title']
         );
       }
@@ -847,8 +687,8 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
       return NULL;
     }
 
-    static $ufIds = [];
-    if (!array_key_exists($surveyId, $ufIds)) {
+    static $ufIDs = [];
+    if (!array_key_exists($surveyId, $ufIDs)) {
       //get the profile id.
       $ufJoinParams = [
         'entity_id' => $surveyId,
@@ -859,14 +699,14 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
       list($first, $second) = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
 
       if ($first) {
-        $ufIds[$surveyId] = [$first];
+        $ufIDs[$surveyId] = [$first];
       }
       if ($second) {
-        $ufIds[$surveyId][] = array_shift($second);
+        $ufIDs[$surveyId][] = array_shift($second);
       }
     }
 
-    return $ufIds[$surveyId] ?? NULL;
+    return $ufIDs[$surveyId] ?? NULL;
   }
 
   /**
@@ -1098,27 +938,12 @@ UPDATE  civicrm_activity
   }
 
   /**
-   * Get options for a given field.
-   * @see CRM_Core_DAO::buildOptions
-   *
-   * @param string $fieldName
-   * @param string $context : @see CRM_Core_DAO::buildOptionsContext
-   * @param array $props : whatever is known about this dao object
-   *
-   * @return array|bool
+   * Pseudoconstant condition_provider for activity_type_id field.
+   * @see \Civi\Schema\EntityMetadataBase::getConditionFromProvider
    */
-  public static function buildOptions($fieldName, $context = NULL, $props = []) {
-    $params = [];
-    // Special logic for fields whose options depend on context or properties
-    switch ($fieldName) {
-      case 'activity_type_id':
-        $campaignCompId = CRM_Core_Component::getComponentID('CiviCampaign');
-        if ($campaignCompId) {
-          $params['condition'] = ["component_id={$campaignCompId}"];
-        }
-        break;
-    }
-    return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
+  public static function alterActivityTypes(string $fieldName, CRM_Utils_SQL_Select $conditions) {
+    $campaignCompId = (int) CRM_Core_Component::getComponentID('CiviCampaign');
+    $conditions->where('component_id = #comp', ['comp' => $campaignCompId]);
   }
 
 }

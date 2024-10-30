@@ -36,6 +36,21 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
   protected $currentLogTable;
 
   /**
+   * Set within `$this->buildTemporaryTables`
+   *
+   * @var CRM_Utils_SQL_TempTable
+   */
+  protected $temporaryTable;
+
+  /**
+   * The name of the temporary table.
+   * Set within `$this->buildTemporaryTables`
+   *
+   * @var string
+   */
+  protected $temporaryTableName;
+
+  /**
    * Class constructor.
    */
   public function __construct() {
@@ -349,7 +364,8 @@ WHERE  log_date <= %1 AND id = %2 ORDER BY log_date DESC LIMIT 1";
     }
 
     $logTypeTableClause = '(1)';
-    if ($logTypeTableValue = CRM_Utils_Array::value("log_type_table_value", $this->_params)) {
+    $logTypeTableValue = $this->_params["log_type_table_value"] ?? NULL;
+    if ($logTypeTableValue) {
       $logTypeTableClause = $this->whereClause($this->_columns['log_civicrm_entity']['filters']['log_type_table'],
         $this->_params['log_type_table_op'], $logTypeTableValue, NULL, NULL);
       unset($this->_params['log_type_table_value']);
@@ -357,9 +373,9 @@ WHERE  log_date <= %1 AND id = %2 ORDER BY log_date DESC LIMIT 1";
 
     foreach ($this->_logTables as $entity => $detail) {
       if ((in_array($this->getLogType($entity), $logTypes) &&
-          CRM_Utils_Array::value('log_type_op', $this->_params) == 'in') ||
+          ($this->_params['log_type_op'] ?? NULL) == 'in') ||
         (!in_array($this->getLogType($entity), $logTypes) &&
-          CRM_Utils_Array::value('log_type_op', $this->_params) == 'notin')
+          ($this->_params['log_type_op'] ?? NULL) == 'notin')
       ) {
         $this->currentLogTable = $entity;
         $sql = $this->buildQuery(FALSE);

@@ -47,6 +47,7 @@ class CRM_Contact_Form_Task_Map extends CRM_Contact_Form_Task {
       $this, FALSE
     );
     $this->assign('profileGID', $profileGID);
+    $this->assign('showDirectly', FALSE);
     $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
 
     $type = 'Contact';
@@ -175,7 +176,7 @@ class CRM_Contact_Form_Task_Map extends CRM_Contact_Form_Task {
       CRM_Utils_System::appendBreadCrumb($breadcrumbs);
     }
 
-    $page->assign_by_ref('locations', $locations);
+    $page->assign('locations', $locations);
 
     // only issue a javascript warning if we know we will not
     // mess the poor user with too many warnings
@@ -216,8 +217,8 @@ class CRM_Contact_Form_Task_Map extends CRM_Contact_Form_Task {
       'lat' => (float) ($maxLat - $minLat),
       'lng' => (float) ($maxLng - $minLng),
     ];
-    $page->assign_by_ref('center', $center);
-    $page->assign_by_ref('span', $span);
+    $page->assign('center', $center);
+    $page->assign('span', $span);
   }
 
 }

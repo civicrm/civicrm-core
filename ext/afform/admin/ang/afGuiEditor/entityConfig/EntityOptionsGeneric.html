@@ -1,0 +1,43 @@
+<div class="form-group">
+  <label class="control-label" for="entity_security">
+    {{:: ts('Security') }}
+  </label>
+  <input crm-ui-select="{data: $ctrl.editor.securityModes}" id="entity_security" ng-model="$ctrl.entity.security" class="form-control">
+</div>
+<div class="form-group">
+  <label>
+    {{:: ts('Allowed Actions') }}
+  </label>
+  <div class="checkbox-inline">
+    <label><input type="checkbox" ng-model="$ctrl.entity.actions.create">{{:: ts('Create') }}</label>
+  </div>
+  <div class="checkbox-inline">
+    <label><input type="checkbox" ng-model="$ctrl.entity.actions.update">{{:: ts('Update') }}</label>
+  </div>
+</div>
+<div ng-if="$ctrl.entity.actions.update">
+  <div class="checkbox">
+    <label>
+      <input type="checkbox" ng-model="$ctrl.entity['url-autofill']" ng-true-value="'1'" ng-false-value="'0'" />
+      {{:: ts('Accept ID from URL') }}
+    </label>
+  </div>
+  <div class="description bg-warning" ng-if="$ctrl.entity['url-autofill'] === '1' && $ctrl.entity.security === 'FBAC'">
+    <i class="crm-i fa-warning"></i>
+    {{:: ts('Without Role-Based access, users of the form will be able to view and update any %1 by changing the id in the URL.', {1: getMeta().label}) }}
+  </div>
+  <div class="description" ng-if="$ctrl.entity['url-autofill'] === '1'">
+    <p>
+      {{:: ts('Update %1 by including the id in the link to this form:', {1: $ctrl.entity.name}) }}
+      <code>
+        {{ ($ctrl.editor.getLink() || '') + '#?' + $ctrl.entity.name + '=123' }}
+      </code>
+    </p>
+    <p>
+      {{:: ts('If you have made a repeating container for %1, you may update multiple %2s using comma-separated ids:', {1: $ctrl.entity.name, 2: getMeta().label}) }}
+      <code>
+        {{ ($ctrl.editor.getLink() || '') + '#?' + $ctrl.entity.name + '=123,456' }}
+      </code>
+    </p>
+  </div>
+</div>

@@ -29,7 +29,7 @@ use CRM_Core_BAO_CustomValueTable as CustomValueTable;
  */
 class UpdateCustomValueTest extends CustomTestBase {
 
-  public function testGetWithCustomData() {
+  public function testGetWithCustomData(): void {
 
     $customGroup = CustomGroup::create(FALSE)
       ->addValue('title', 'MyContactFields')

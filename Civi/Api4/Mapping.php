@@ -15,7 +15,7 @@ namespace Civi\Api4;
  *
  * This is a collection of MappingFields, for reuse in import, export, etc.
  *
- * @searchable none
+ * @searchable secondary
  * @since 5.19
  * @package Civi\Api4
  */

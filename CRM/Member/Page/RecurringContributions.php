@@ -116,7 +116,7 @@ class CRM_Member_Page_RecurringContributions extends CRM_Core_Page {
     $recurringContribution['is_active'] = ($recurringContribution['contribution_status_id'] != 3);
 
     if ($recurringContribution['is_active']) {
-      $details = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($recurringContribution['id'], 'recur');
+      $details = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($recurringContribution['id']);
       $hideUpdate = $details->membership_id & $details->auto_renew;
 
       if ($hideUpdate) {

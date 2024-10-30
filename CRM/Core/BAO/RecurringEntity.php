@@ -39,23 +39,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity implemen
   protected $recursion = NULL;
   protected $recursion_start_date = NULL;
 
-  public static $_entitiesToBeDeleted = [];
-
   public static $status = NULL;
-
-  public static $_recurringEntityHelper
-    = [
-      'civicrm_event' => [
-        'helper_class' => 'CRM_Event_DAO_Event',
-        'delete_func' => 'delete',
-        'pre_delete_func' => 'CRM_Event_Form_ManageEvent_Repeat::checkRegistrationForEvents',
-      ],
-      'civicrm_activity' => [
-        'helper_class' => 'CRM_Activity_DAO_Activity',
-        'delete_func' => 'delete',
-        'pre_delete_func' => '',
-      ],
-    ];
 
   public static $_dateColumns
     = [
@@ -149,6 +133,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity implemen
    * @return CRM_Core_DAO_RecurringEntity
    */
   public static function add($params) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return self::writeRecord($params);
   }
 
@@ -576,7 +561,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity implemen
       CRM_Core_BAO_RecurringEntity::quickAdd($object->id, $newObject->id, $entityTable);
     }
 
-    CRM_Utils_Hook::copy(CRM_Core_DAO_AllCoreTables::getBriefName($daoName), $newObject);
+    CRM_Utils_Hook::copy(CRM_Core_DAO_AllCoreTables::getEntityNameForClass($daoName), $newObject);
     return $newObject;
   }
 
@@ -1013,7 +998,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity implemen
           $concatStartActionDateBits = $startActionDate1 . strtoupper(substr($startActionDate[1], 0, 2));
           $r->byday([$concatStartActionDateBits]);
         }
-        elseif ($scheduleReminderDetails['limit_to']) {
+        elseif ($scheduleReminderDetails['limit_to'] == 1) {
           $r->bymonthday([$scheduleReminderDetails['limit_to']]);
         }
       }
@@ -1223,7 +1208,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity implemen
       return $this->recursion->getNextOccurrence($occurDate, $strictly_after);
     }
     catch (Exception $exception) {
-      CRM_Core_Session::setStatus(ts($exception->getMessage()));
+      CRM_Core_Session::setStatus(_ts($exception->getMessage()));
     }
     return FALSE;
   }

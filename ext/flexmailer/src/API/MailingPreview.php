@@ -3,7 +3,6 @@ namespace Civi\FlexMailer\API;
 
 use Civi\FlexMailer\FlexMailer;
 use Civi\FlexMailer\FlexMailerTask;
-use Civi\FlexMailer\Listener\Abdicator;
 
 class MailingPreview {
 
@@ -24,18 +23,13 @@ class MailingPreview {
 
     /** @var \CRM_Mailing_BAO_Mailing $mailing */
     $mailing = new \CRM_Mailing_BAO_Mailing();
-    $mailingID = \CRM_Utils_Array::value('id', $params);
+    $mailingID = $params['id'] ?? NULL;
     if ($mailingID) {
       $mailing->id = $mailingID;
       $mailing->find(TRUE);
     }
     else {
       $mailing->copyValues($params);
-    }
-
-    if (!Abdicator::isFlexmailPreferred($mailing) && empty($mailing->sms_provider_id)) {
-      require_once 'api/v3/Mailing.php';
-      return civicrm_api3_mailing_preview($params);
     }
 
     $contactID = \CRM_Utils_Array::value('contact_id', $params,
@@ -59,13 +53,13 @@ class MailingPreview {
     $job->mailing_id = $mailing->id ?: NULL;
     $job->status = 'Complete';
 
-    $flexMailer = new FlexMailer(array(
+    $flexMailer = new FlexMailer([
       'is_preview' => TRUE,
       'mailing' => $mailing,
       'job' => $job,
       'attachments' => \CRM_Core_BAO_File::getEntityFile('civicrm_mailing',
         $mailing->id),
-    ));
+    ]);
 
     if (count($flexMailer->validate()) > 0) {
       throw new \CRM_Core_Exception("FlexMailer cannot execute: invalid context");
@@ -74,9 +68,9 @@ class MailingPreview {
     $task = new FlexMailerTask($job->id, $contactID, 'fakehash',
       'placeholder@example.com');
 
-    $flexMailer->fireComposeBatch(array($task));
+    $flexMailer->fireComposeBatch([$task]);
 
-    return civicrm_api3_create_success(array(
+    return civicrm_api3_create_success([
       'id' => isset($params['id']) ? $params['id'] : NULL,
       'contact_id' => $contactID,
       'subject' => $task->getMailParam('Subject'),
@@ -84,7 +78,7 @@ class MailingPreview {
       'body_text' => $task->getMailParam('text'),
       // Flag our role in processing this - to support tests.
       '_rendered_by_' => 'flexmailer',
-    ));
+    ]);
   }
 
 }

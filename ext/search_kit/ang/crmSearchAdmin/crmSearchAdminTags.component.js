@@ -64,9 +64,9 @@
         }
       };
 
-      this.makeTag = function(name) {
+      this.makeTag = function(label) {
         crmApi4('Tag', 'create', {
-          values: {name: name, color: ctrl.color, is_selectable: true, used_for: ['civicrm_saved_search']}
+          values: {label: label, color: ctrl.color, is_selectable: true, used_for: ['civicrm_saved_search']}
         }, 0).then(function(tag) {
           ctrl.allTags.push(tag);
           ctrl.toggleTag(tag);

@@ -36,9 +36,6 @@ function civicrm_api3_action_schedule_get($params) {
  */
 function civicrm_api3_action_schedule_create($params) {
   civicrm_api3_verify_one_mandatory($params, NULL, ['start_action_date', 'absolute_date']);
-  if (!array_key_exists('name', $params) && !array_key_exists('id', $params)) {
-    $params['name'] = CRM_Utils_String::munge($params['title']);
-  }
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'ActionSchedule');
 }
 
@@ -54,6 +51,17 @@ function _civicrm_api3_action_schedule_create_spec(&$params) {
   $params['title']['api.required'] = TRUE;
   $params['mapping_id']['api.required'] = TRUE;
   $params['entity_value']['api.required'] = TRUE;
+
+  // APIv3 doesn't understand dynamic pseudoconstants so just remove them
+  // to prevent false-positive validation errors.
+  $params['entity_value']['pseudoconstant'] = NULL;
+  $params['entity_status']['pseudoconstant'] = NULL;
+  $params['recipient']['pseudoconstant'] = NULL;
+  $params['recipient_listing']['pseudoconstant'] = NULL;
+  $params['start_action_date']['pseudoconstant'] = NULL;
+  $params['end_date']['pseudoconstant'] = NULL;
+  $params['filter_contact_language']['pseudoconstant'] = NULL;
+  $params['communication_language']['pseudoconstant'] = NULL;
 }
 
 /**

@@ -55,7 +55,10 @@ trait AddressSaveTrait {
         $item = array_merge($item, \CRM_Core_BAO_Address::parseStreetAddress($item['street_address']));
       }
       $item['skip_geocode'] = $this->skipGeocode;
-      $saved[] = \CRM_Core_BAO_Address::add($item, $this->fixAddress);
+      if ($this->fixAddress) {
+        \CRM_Core_BAO_Address::fixAddress($item);
+      }
+      $saved[] = \CRM_Core_BAO_Address::writeRecord($item);
     }
     return $saved;
   }

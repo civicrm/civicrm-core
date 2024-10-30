@@ -16,13 +16,15 @@ class PermissionTest extends \CiviEndToEndTestCase {
    *
    * This is a general sanity-check/well-formed-ness
    */
-  public function testGet() {
+  public function testGet(): void {
     // If the CMS integration is working,t hen you should expect one of these "smoke-test" permissions to be present.
     $smokeTest = [
       'Backdrop' => 'Drupal:post comments',
       'Drupal' => 'Drupal:post comments',
       'Drupal8' => 'Drupal:post comments',
       'WordPress' => 'WordPress:list_users',
+      // note this should exist on Standalone as a core permission - it is not in the CMS group
+      'Standalone' => 'cms:administer users',
     ];
 
     $perms = \civicrm_api4('Permission', 'get')->indexBy('name');
@@ -46,8 +48,12 @@ class PermissionTest extends \CiviEndToEndTestCase {
 
     $groups = array_unique(\CRM_Utils_Array::collect('group', $perms->getArrayCopy()));
     $this->assertTrue(in_array('civicrm', $groups), 'There should be at least one permission in the "civicrm" group.');
-    $this->assertTrue(in_array('cms', $groups), 'There should be at least one permission in the "cms" group.');
     $this->assertTrue(in_array('const', $groups), 'There should be at least one permission in the "const" group.');
+
+    // in Standalone no permissions are "cms" permissions
+    if (CIVICRM_UF !== 'Standalone') {
+      $this->assertTrue(in_array('cms', $groups), 'There should be at least one permission in the "cms" group.');
+    }
 
     if (isset($smokeTest[CIVICRM_UF])) {
       $smokeTestPerm = $smokeTest[CIVICRM_UF];

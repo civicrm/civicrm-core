@@ -16,22 +16,21 @@ namespace Civi\Angular;
  */
 class LoaderTest extends \CiviUnitTestCase {
 
-  public static $dummy_setting_count = 0;
   public static $dummy_callback_count = 0;
 
   public function setUp(): void {
     parent::setUp();
     $this->hookClass->setHook('civicrm_angularModules', [$this, 'hook_angularModules']);
-    self::$dummy_setting_count = 0;
     self::$dummy_callback_count = 0;
     $this->createLoggedInUser();
+    \Civi::container()->get('angular')->clear();
   }
 
   public function factoryScenarios() {
     return [
-      ['dummy1', 2, 1, ['access CiviCRM', 'administer CiviCRM']],
-      ['dummy2', 2, 0, []],
-      ['dummy3', 2, 2, ['access CiviCRM', 'administer CiviCRM', 'view debug output']],
+      ['dummy1', 1, ['access CiviCRM', 'administer CiviCRM']],
+      ['dummy2', 0, []],
+      ['dummy3', 2, ['access CiviCRM', 'administer CiviCRM', 'view debug output']],
     ];
   }
 
@@ -41,11 +40,10 @@ class LoaderTest extends \CiviUnitTestCase {
    *
    * @dataProvider factoryScenarios
    * @param $module
-   * @param $expectedSettingCount
    * @param $expectedCallbackCount
    * @param $expectedPermissions
    */
-  public function testSettingFactory($module, $expectedSettingCount, $expectedCallbackCount, $expectedPermissions) {
+  public function testSettingFactory($module, $expectedCallbackCount, $expectedPermissions) {
     $loader = \Civi::service('angularjs.loader');
     $loader->addModules([$module]);
     $loader->useApp();
@@ -65,29 +63,21 @@ class LoaderTest extends \CiviUnitTestCase {
     // Dummy3 module's factory setting should be set if it is loaded directly
     $this->assertTrue(($expectedCallbackCount > 1) === isset($actual['dummy3']['dummy_setting_factory']));
 
-    // Dummy1 module's regular setting should be set if it is loaded directly or required by dummy3
-    $this->assertTrue(($module !== 'dummy2') === isset($actual['dummy1']['dummy_setting']));
-    // Dummy2 module's regular setting should be set if loaded
-    $this->assertTrue(($module === 'dummy2') === isset($actual['dummy2']['dummy_setting']));
-
     // Assert appropriate permissions have been added
     $this->assertEquals($expectedPermissions, array_keys($actual['permissions']));
 
-    // Assert the callback functions ran the expected number of times
-    $this->assertEquals($expectedSettingCount, self::$dummy_setting_count);
+    // Assert the callback function ran the expected number of times
     $this->assertEquals($expectedCallbackCount, self::$dummy_callback_count);
   }
 
   public function hook_angularModules(&$modules) {
     $modules['dummy1'] = [
       'ext' => 'civicrm',
-      'settings' => $this->getDummySetting(),
       'permissions' => ['access CiviCRM', 'administer CiviCRM'],
       'settingsFactory' => [self::class, 'getDummySettingFactory'],
     ];
     $modules['dummy2'] = [
       'ext' => 'civicrm',
-      'settings' => $this->getDummySetting(),
     ];
     $modules['dummy3'] = [
       'ext' => 'civicrm',
@@ -97,10 +87,6 @@ class LoaderTest extends \CiviUnitTestCase {
       'permissions' => ['view debug output', 'administer CiviCRM'],
       'requires' => ['dummy1'],
     ];
-  }
-
-  public function getDummySetting() {
-    return ['dummy_setting' => self::$dummy_setting_count++];
   }
 
   public static function getDummySettingFactory() {

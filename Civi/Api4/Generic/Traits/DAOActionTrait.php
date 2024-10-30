@@ -12,8 +12,6 @@
 
 namespace Civi\Api4\Generic\Traits;
 
-use Civi\Api4\CustomField;
-use Civi\Api4\Service\Schema\Joinable\CustomGroupJoinable;
 use Civi\Api4\Utils\FormattingUtil;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Api4\Utils\ReflectionUtils;
@@ -103,7 +101,7 @@ trait DAOActionTrait {
   protected function writeObjects($items) {
     $updateWeights = FALSE;
     // Adjust weights for sortable entities
-    if (in_array('SortableEntity', CoreUtil::getInfoItem($this->getEntityName(), 'type'))) {
+    if (CoreUtil::isType($this->getEntityName(), 'SortableEntity')) {
       $weightField = CoreUtil::getInfoItem($this->getEntityName(), 'order_by');
       // Only take action if updating a single record, or if no weights are specified in any record
       // This avoids messing up a bulk update with multiple recalculations
@@ -112,13 +110,23 @@ trait DAOActionTrait {
       }
     }
 
+    // Values specified by entity definition (e.g. 'Individual', 'Organization', 'Household' pseudo-entities specify `contact_type`)
+    $presetValues = CoreUtil::getInfoItem($this->getEntityName(), 'where') ?? [];
+
     $result = [];
     $idField = CoreUtil::getIdFieldName($this->getEntityName());
 
     foreach ($items as &$item) {
       $entityId = $item[$idField] ?? NULL;
+      if (CoreUtil::isContact($this->getEntityName())) {
+        $entityId = FormattingUtil::resolveContactID($idField, $entityId);
+      }
       FormattingUtil::formatWriteParams($item, $this->entityFields());
       $this->formatCustomParams($item, $entityId);
+
+      if (!$entityId) {
+        $item = $presetValues + $item;
+      }
 
       // Adjust weights for sortable entities
       if ($updateWeights) {
@@ -140,7 +148,9 @@ trait DAOActionTrait {
     }
 
     \CRM_Utils_API_HTMLInputCoder::singleton()->decodeRows($result);
-    FormattingUtil::formatOutputValues($result, $this->entityFields());
+    foreach ($result as &$row) {
+      FormattingUtil::formatOutputValues($row, $this->entityFields());
+    }
     return $result;
   }
 
@@ -182,7 +192,7 @@ trait DAOActionTrait {
    *
    * @param array $record
    */
-  private function resolveFKValues(array &$record): void {
+  protected function resolveFKValues(array &$record): void {
     // Resolve domain id first
     uksort($record, function($a, $b) {
       return substr($a, 0, 9) == 'domain_id' ? -1 : 1;
@@ -240,37 +250,32 @@ trait DAOActionTrait {
         continue;
       }
 
-      // Null and empty string are interchangeable as far as the custom bao understands
-      if (NULL === $value) {
-        $value = '';
-      }
-
       if ($field['suffix']) {
         $options = FormattingUtil::getPseudoconstantList($field, $name, $params, $this->getActionName());
         $value = FormattingUtil::replacePseudoconstant($options, $value, TRUE);
       }
 
-      if ($field['html_type'] === 'CheckBox') {
-        // this function should be part of a class
-        formatCheckBoxField($value, 'custom_' . $field['id'], $this->getEntityName());
+      // Null and empty string are interchangeable as far as the custom bao understands
+      if (NULL === $value) {
+        $value = '';
+      }
+
+      // Uglify checkbox values for the sake of CustomField::formatCustomField()
+      if ($field['html_type'] === 'CheckBox' && is_array($value)) {
+        $value = array_fill_keys($value, TRUE);
       }
 
       // Match contact id to strings like "user_contact_id"
       // FIXME handle arrays for multi-value contact reference fields, etc.
-      if ($field['data_type'] === 'ContactReference' && is_string($value) && !is_numeric($value)) {
-        // FIXME decouple from v3 API
-        require_once 'api/v3/utils.php';
-        $value = \_civicrm_api3_resolve_contactID($value);
-        if ('unknown-user' === $value) {
-          throw new \CRM_Core_Exception("\"{$field['name']}\" \"{$value}\" cannot be resolved to a contact ID", 2002, ['error_field' => $field['name'], "type" => "integer"]);
-        }
+      if (in_array($field['data_type'], ['ContactReference', 'EntityReference']) && is_string($value)) {
+        $value = FormattingUtil::resolveContactID($field['name'], $value);
       }
 
       \CRM_Core_BAO_CustomField::formatCustomField(
         $field['id'],
         $customParams,
         $value,
-        $field['custom_group_id.extends'],
+        $field['extends'],
         // todo check when this is needed
         NULL,
         $entityId,
@@ -288,33 +293,30 @@ trait DAOActionTrait {
    *
    * @param string $fieldExpr
    *   Field identifier with possible suffix, e.g. MyCustomGroup.MyField1:label
-   * @return array{id: int, name: string, entity: string, suffix: string, html_type: string, data_type: string}|NULL
+   * @return array{id: int, name: string, entity: string, suffix: string, html_type: string, data_type: string, extends: string, table_name: string}|NULL
    */
-  protected function getCustomFieldInfo(string $fieldExpr) {
-    if (strpos($fieldExpr, '.') === FALSE) {
+  protected function getCustomFieldInfo(string $fieldExpr): ?array {
+    if (!str_contains($fieldExpr, '.')) {
       return NULL;
     }
     [$groupName, $fieldName] = explode('.', $fieldExpr);
     [$fieldName, $suffix] = array_pad(explode(':', $fieldName), 2, NULL);
-    $cacheKey = "APIv4_Custom_Fields-$groupName";
-    $info = \Civi::cache('metadata')->get($cacheKey);
-    if (!isset($info[$fieldName])) {
-      $info = [];
-      $fields = CustomField::get(FALSE)
-        ->addSelect('id', 'name', 'html_type', 'data_type', 'custom_group_id.extends', 'column_name', 'custom_group_id.table_name')
-        ->addWhere('custom_group_id.name', '=', $groupName)
-        ->execute()->indexBy('name');
-      foreach ($fields as $name => $field) {
-        $field['custom_field_id'] = $field['id'];
-        $field['table_name'] = $field['custom_group_id.table_name'];
-        unset($field['custom_group_id.table_name']);
-        $field['name'] = $groupName . '.' . $name;
-        $field['entity'] = CustomGroupJoinable::getEntityFromExtends($field['custom_group_id.extends']);
-        $info[$name] = $field;
+    foreach (\CRM_Core_BAO_CustomGroup::getAll() as $customGroup) {
+      if ($customGroup['name'] === $groupName) {
+        foreach ($customGroup['fields'] as $field) {
+          if ($field['name'] === $fieldName) {
+            $field['custom_field_id'] = $field['id'];
+            $field['table_name'] = $customGroup['table_name'];
+            $field['extends'] = $customGroup['extends'];
+            $field['name'] = "$groupName.$fieldName";
+            $field['entity'] = \CRM_Core_BAO_CustomGroup::getEntityFromExtends($customGroup['extends']);
+            $field['suffix'] = $suffix;
+            return $field;
+          }
+        }
       }
-      \Civi::cache('metadata')->set($cacheKey, $info);
     }
-    return isset($info[$fieldName]) ? ['suffix' => $suffix] + $info[$fieldName] : NULL;
+    return NULL;
   }
 
   /**

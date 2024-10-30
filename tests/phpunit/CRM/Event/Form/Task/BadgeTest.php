@@ -13,7 +13,8 @@ class CRM_Event_Form_Task_BadgeTest extends CiviUnitTestCase {
   use CRMTraits_Custom_CustomDataTrait;
 
   public function tearDown(): void {
-    $this->quickCleanup(['civicrm_participant', 'civicrm_print_label'], TRUE);
+    $this->quickCleanUpFinancialEntities();
+    $this->quickCleanup(['civicrm_print_label'], TRUE);
     parent::tearDown();
   }
 
@@ -48,7 +49,7 @@ class CRM_Event_Form_Task_BadgeTest extends CiviUnitTestCase {
     $_REQUEST['id'] = $participantID;
     $_REQUEST['cid'] = $contactID;
     /** @var CRM_Event_Form_Task_Badge $form */
-    $form = $this->getFormObject(
+    $form = $this->getSearchFormObject(
       'CRM_Event_Form_Task_Badge',
       ['badge_id' => 1],
       NULL,
@@ -94,9 +95,9 @@ class CRM_Event_Form_Task_BadgeTest extends CiviUnitTestCase {
       '{participant.status_id}' => 2,
       '{participant.role_id}' => 1,
       '{participant.register_date}' => 'February 19th, 2007',
-      '{participant.source}' => 'Wimbeldon',
+      '{participant.source}' => 'Wimbledon',
       '{participant.fee_level}' => 'low',
-      '{participant.fee_amount}' => '$ 0.00',
+      '{participant.fee_amount}' => '$0.00',
       '{participant.registered_by_id}' => NULL,
       '{participant.transferred_to_contact_id}' => NULL,
       '{participant.role_id:label}' => 'Attendee',

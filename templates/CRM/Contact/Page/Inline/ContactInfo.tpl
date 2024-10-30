@@ -46,7 +46,7 @@
       </div>
       {/if}
       <div class="crm-summary-row">
-        <div class="crm-label">{ts}Source{/ts}</div>
+        <div class="crm-label">{ts}Contact Source{/ts}</div>
         <div class="crm-content crm-contact_source">{$source}</div>
       </div>
 

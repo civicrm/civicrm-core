@@ -61,6 +61,10 @@ class CRM_Core_Region implements CRM_Core_Resources_CollectionInterface, CRM_Cor
       $this->snippets['default']['markup'] = $default;
     }
 
+    if (defined('CIVICRM_IFRAME')) {
+      $allowCmsOverride = FALSE;
+    }
+
     Civi::dispatcher()->dispatch('civi.region.render', \Civi\Core\Event\GenericHookEvent::create(['region' => $this]));
 
     $this->sort();
@@ -76,19 +80,23 @@ class CRM_Core_Region implements CRM_Core_Resources_CollectionInterface, CRM_Cor
           break;
 
         case 'template':
-          $tmp = $smarty->get_template_vars('snippet');
+          $tmp = $smarty->getTemplateVars('snippet');
           $smarty->assign('snippet', $snippet);
           $html .= $smarty->fetch($snippet['template']);
           $smarty->assign('snippet', $tmp);
           break;
 
         case 'callback':
-          $args = $snippet['arguments'] ?? array(&$snippet, &$html);
+          $args = $snippet['arguments'] ?? [&$snippet, &$html];
           $html .= call_user_func_array($snippet['callback'], $args);
           break;
 
         case 'scriptUrl':
-          if (!$allowCmsOverride || !$cms->addScriptUrl($snippet['scriptUrl'], $this->_name)) {
+          // ECMAScript Modules (ESMs) are basically Javascript files, but they require a slightly different incantation.
+          if (!empty($snippet['esm'])) {
+            $html .= Civi::service('esm.loader')->renderModule($snippet);
+          }
+          elseif (!$allowCmsOverride || !$cms->addScriptUrl($snippet['scriptUrl'], $this->_name)) {
             $html .= sprintf("<script type=\"text/javascript\" src=\"%s\">\n</script>\n", $snippet['scriptUrl']);
           }
           break;
@@ -107,7 +115,11 @@ class CRM_Core_Region implements CRM_Core_Resources_CollectionInterface, CRM_Cor
           break;
 
         case 'script':
-          if (!$allowCmsOverride || !$cms->addScript($snippet['script'], $this->_name)) {
+          // ECMAScript Modules (ESMs) are basically Javascript files, but they require a slightly different incantation.
+          if (!empty($snippet['esm'])) {
+            $html .= Civi::service('esm.loader')->renderModule($snippet);
+          }
+          elseif (!$allowCmsOverride || !$cms->addScript($snippet['script'], $this->_name)) {
             $html .= sprintf("<script type=\"text/javascript\">\n%s\n</script>\n", $snippet['script']);
           }
           break;
@@ -131,7 +143,7 @@ class CRM_Core_Region implements CRM_Core_Resources_CollectionInterface, CRM_Cor
           break;
 
         case 'settings':
-          $settingsData = json_encode($this->getSettings(), JSON_UNESCAPED_SLASHES);
+          $settingsData = json_encode($this->getSettings());
           $js = "(function(vars) {
             if (window.CRM) CRM.$.extend(true, CRM, vars); else window.CRM = vars;
             })($settingsData)";

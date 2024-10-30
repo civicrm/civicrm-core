@@ -71,22 +71,19 @@ function _civicrm_api3_pledge_payment_create_spec(&$params) {
 }
 
 /**
- * Delete a pledge Payment - Note this deletes the contribution not just the link.
+ * Delete a pledge Payment - Note this deletes the contribution not just the
+ * link.
  *
  * @param array $params
  *   Input parameters.
  *
  * @return array
  *   API result
+ * @throws \CRM_Core_Exception
+ * @noinspection PhpUnused
  */
-function civicrm_api3_pledge_payment_delete($params) {
-
-  if (CRM_Pledge_BAO_PledgePayment::del($params['id'])) {
-    return civicrm_api3_create_success(['id' => $params['id']], $params, 'PledgePayment', 'delete');
-  }
-  else {
-    return civicrm_api3_create_error('Could not delete payment');
-  }
+function civicrm_api3_pledge_payment_delete(array $params): array {
+  return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**

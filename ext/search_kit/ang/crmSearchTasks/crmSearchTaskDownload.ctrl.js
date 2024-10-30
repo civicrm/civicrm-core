@@ -19,7 +19,7 @@
           ctrl.progress += 10;
         }
       }, 1000);
-      var apiParams = ctrl.displayController.getApiParams();
+      var apiParams = ctrl.taskManager.getApiParams();
       delete apiParams.return;
       delete apiParams.limit;
       apiParams.filters.id = ctrl.ids || null;

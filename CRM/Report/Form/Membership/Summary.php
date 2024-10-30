@@ -197,9 +197,9 @@ LEFT  JOIN civicrm_contribution  {$this->_aliases['civicrm_contribution']}
             if ($op) {
               $clause = $this->whereClause($field,
                 $op,
-                CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
+                $this->_params["{$fieldName}_value"] ?? NULL,
+                $this->_params["{$fieldName}_min"] ?? NULL,
+                $this->_params["{$fieldName}_max"] ?? NULL
               );
             }
           }
@@ -314,16 +314,12 @@ LEFT  JOIN civicrm_contribution  {$this->_aliases['civicrm_contribution']}
     }
     $this->formatDisplay($rows);
 
-    $this->assign_by_ref('columnHeaders', $this->_columnHeaders);
-    $this->assign_by_ref('rows', $rows);
+    $this->assign('columnHeaders', $this->_columnHeaders);
+    $this->assign('rows', $rows);
     $this->assign('statistics', $this->statistics($rows));
 
     if (!empty($this->_params['charts'])) {
-      foreach ([
-        'receive_date',
-        $this->_interval,
-        'value',
-      ] as $ignore) {
+      foreach (['receive_date', $this->_interval, 'value'] as $ignore) {
         unset($graphRows[$ignore][$count - 1]);
       }
 

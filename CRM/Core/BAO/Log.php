@@ -89,9 +89,9 @@ class CRM_Core_BAO_Log extends CRM_Core_DAO_Log {
     }
 
     if (!$userID) {
-      $api_key = CRM_Utils_Request::retrieve('api_key', 'String', $store, FALSE, NULL, 'REQUEST');
+      $api_key = CRM_Utils_Request::retrieve('api_key', 'String');
 
-      if ($api_key && strtolower($api_key) != 'null') {
+      if ($api_key && strtolower($api_key) !== 'null') {
         $userID = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $api_key, 'id', 'api_key');
       }
     }
@@ -158,31 +158,25 @@ UPDATE civicrm_log
    * If logging is not enabled a return value of FALSE means to use the
    * basic change log view.
    *
-   * @return int|FALSE
+   * @return int|false
    *   report id of Contact Logging Report (Summary)
    */
   public static function useLoggingReport() {
-    if (!\Civi::settings()->get('logging')) {
+    $loggingSchema = new CRM_Logging_Schema();
+    if (!$loggingSchema->isEnabled()) {
       return FALSE;
     }
-
-    $loggingSchema = new CRM_Logging_Schema();
-
-    if ($loggingSchema->isEnabled()) {
-      $params = ['report_id' => 'logging/contact/summary'];
-      $instance = [];
-      CRM_Report_BAO_ReportInstance::retrieve($params, $instance);
-
-      if (!empty($instance) &&
-        (empty($instance['permission']) ||
-          (!empty($instance['permission']) && CRM_Core_Permission::check($instance['permission']))
-        )
-      ) {
-        return $instance['id'];
-      }
+    try {
+      // Use civicrm_api4 wrapper as it will exception rather than fatal if civi-report disabled.
+      return civicrm_api4('ReportInstance', 'get', [
+        'where' => [['report_id', '=', 'logging/contact/summary']],
+      ])->first()['id'] ?? FALSE;
     }
-
-    return FALSE;
+    catch (CRM_Core_Exception $e) {
+      // Either CiviReport is disabled or the contact does not have permission to
+      // view the summary report. Return FALSE to use the basic log.
+      return FALSE;
+    }
   }
 
 }

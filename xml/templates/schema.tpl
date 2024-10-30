@@ -51,5 +51,5 @@ CREATE TABLE `{$table.name}` ({assign var='first' value=true}
   CONSTRAINT {$foreign.uniqName} FOREIGN KEY (`{$foreign.name}`) REFERENCES `{$foreign.table}`(`{$foreign.key}`){if $foreign.onDelete} ON DELETE {$foreign.onDelete}{/if}{/foreach}{* table.foreignKey *}{/if}{strip}
   {* table.foreignKey *}{/strip}
 )
-{if $mysql eq 'modern' }{$table.attributes_modern}{else}{$table.attributes_simple}{/if};
+{if $mysql eq 'modern'}{$table.attributes_modern}{else}{$table.attributes_simple}{/if};
 {/foreach}{* tables *}

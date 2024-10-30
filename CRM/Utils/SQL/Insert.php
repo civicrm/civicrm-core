@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Dear God Why Do I Have To Write This (Dumb SQL Builder)
+ * Object-oriented SQL builder for INSERT queries.
  *
  * Usage:
  * $insert = CRM_Utils_SQL_Insert::into('mytable')
@@ -22,7 +22,11 @@
  */
 class CRM_Utils_SQL_Insert {
 
-  private $verb = 'INSERT INTO';
+  /**
+   * @var string
+   *   Ex: 'INSERT INTO', 'REPLACE INTO'
+   */
+  private $verb;
 
   /**
    * @var string
@@ -45,10 +49,12 @@ class CRM_Utils_SQL_Insert {
    *
    * @param string $table
    *   Table-name and optional alias.
+   * @param string $verb
+   *   Ex: 'INSERT INTO', 'REPLACE INTO'
    * @return CRM_Utils_SQL_Insert
    */
-  public static function into($table) {
-    return new self($table);
+  public static function into($table, string $verb = 'INSERT INTO') {
+    return new self($table, $verb);
   }
 
   /**
@@ -59,7 +65,7 @@ class CRM_Utils_SQL_Insert {
    * @throws \CRM_Core_Exception
    */
   public static function dao(CRM_Core_DAO $dao) {
-    $table = CRM_Core_DAO::getLocaleTableName($dao->getTableName());
+    $table = $dao::getLocaleTableName();
     $row = [];
     foreach ((array) $dao as $key => $value) {
       if ($value === 'null') {
@@ -79,9 +85,12 @@ class CRM_Utils_SQL_Insert {
    *
    * @param string $table
    *   Table-name and optional alias.
+   * @param string $verb
+   *   Ex: 'INSERT INTO', 'REPLACE INTO'
    */
-  public function __construct($table) {
+  public function __construct($table, string $verb = 'INSERT INTO') {
     $this->table = $table;
+    $this->verb = $verb;
     $this->rows = [];
   }
 
@@ -136,7 +145,12 @@ class CRM_Utils_SQL_Insert {
 
     $escapedRow = [];
     foreach ($this->columns as $column) {
-      $escapedRow[$column] = $this->escapeString($row[$column]);
+      if (is_bool($row[$column])) {
+        $escapedRow[$column] = (int) $row[$column];
+      }
+      else {
+        $escapedRow[$column] = $this->escapeString($row[$column]);
+      }
     }
     $this->rows[] = $escapedRow;
 
@@ -155,17 +169,7 @@ class CRM_Utils_SQL_Insert {
     return $this;
   }
 
-  /**
-   * Escape string.
-   *
-   * @param string|null $value
-   *
-   * @return string
-   *   SQL expression, e.g. "it\'s great" (with-quotes) or NULL (without-quotes)
-   */
-  protected function escapeString($value) {
-    return $value === NULL ? 'NULL' : '"' . CRM_Core_DAO::escapeString($value) . '"';
-  }
+  use CRM_Utils_SQL_EscapeStringTrait;
 
   /**
    * Convert to SQL.
@@ -185,6 +189,21 @@ class CRM_Utils_SQL_Insert {
     $sql .= "\n";
 
     return $sql;
+  }
+
+  /**
+   * Execute the query.
+   *
+   * @param bool $i18nRewrite
+   *   If the system has multilingual features, should the field/table
+   *   names be rewritten?
+   * @return CRM_Core_DAO
+   * @see CRM_Core_DAO::executeQuery
+   * @see CRM_Core_I18n_Schema::rewriteQuery
+   */
+  public function execute($i18nRewrite = TRUE) {
+    return CRM_Core_DAO::executeQuery($this->toSQL(), [], TRUE, NULL,
+      FALSE, $i18nRewrite);
   }
 
 }

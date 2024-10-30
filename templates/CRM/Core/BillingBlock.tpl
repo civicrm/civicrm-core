@@ -9,7 +9,7 @@
 *}
 {crmRegion name="billing-block"}
 <div id="payment_information">
-  {if $paymentFields|@count}
+  {if $paymentFields}
     <fieldset class="billing_mode-group {$paymentTypeName}_info-group">
       <legend>
         {$paymentTypeLabel}
@@ -39,8 +39,16 @@
         {/foreach}
       </div>
     </fieldset>
+    {if !$isBackOffice && $paymentAgreementTitle}
+      <div id="payment_notice">
+        <fieldset class="crm-public-form-item crm-group payment_notice-group">
+          <legend>{$paymentAgreementTitle}</legend>
+          {$paymentAgreementText}
+        </fieldset>
+      </div>
+    {/if}
   {/if}
-  {if $billingDetailsFields|@count && $paymentProcessor.payment_processor_type neq 'PayPal_Express'}
+  {if $billingDetailsFields && $paymentProcessor.payment_processor_type neq 'PayPal_Express'}
     {if $profileAddressFields && !$ccid}
       <input type="checkbox" id="billingcheckbox" value="0">
       <label for="billingcheckbox">{ts}My billing address is the same as above{/ts}</label>

@@ -2,6 +2,7 @@
 
 namespace Civi\Api4\Action\Afform;
 
+use Civi\Afform\Utils;
 use Civi\Api4\Generic\Result;
 use CRM_Afform_ExtensionUtil as E;
 
@@ -49,7 +50,7 @@ class Revert extends \Civi\Api4\Generic\BasicBatchAction {
     /** @var \CRM_Afform_AfformScanner $scanner */
     $scanner = \Civi::service('afform_scanner');
     $files = [
-      \CRM_Afform_AfformScanner::METADATA_FILE,
+      \CRM_Afform_AfformScanner::METADATA_JSON,
       \CRM_Afform_AfformScanner::LAYOUT_FILE,
     ];
 
@@ -65,15 +66,12 @@ class Revert extends \Civi\Api4\Generic\BasicBatchAction {
     $original = (array) $scanner->getMeta($item['name']);
 
     // If the dashlet setting changed, managed entities must be reconciled
-    if (
-      (empty($item['is_dashlet']) !== empty($original['is_dashlet'])) ||
-      ($item['is_dashlet'] && ($item['title'] ?? '') !== ($original['title'] ?? ''))
-    ) {
+    if (Utils::shouldReconcileManaged($item, $original)) {
       $this->flushManaged = TRUE;
     }
 
     // If the server_route changed, reset menu cache
-    if (($item['server_route'] ?? '') !== ($original['server_route'] ?? '')) {
+    if (Utils::shouldClearMenuCache($item, $original)) {
       $this->flushMenu = TRUE;
     }
 
@@ -86,7 +84,7 @@ class Revert extends \Civi\Api4\Generic\BasicBatchAction {
    * @return string[]
    */
   protected function getSelect() {
-    return ['name', 'title', 'is_dashlet', 'server_route'];
+    return ['name', 'title', 'placement', 'server_route'];
   }
 
 }

@@ -23,16 +23,21 @@ class CRM_Core_BAO_Discount extends CRM_Core_DAO_Discount {
    * @param string $entityTable
    *
    * @return bool
+   *
+   * @deprecated
    */
   public static function del($entityId, $entityTable) {
     // delete all discount records with the selected discounted id
     $discount = new CRM_Core_DAO_Discount();
     $discount->entity_id = $entityId;
     $discount->entity_table = $entityTable;
-    if ($discount->delete()) {
-      return TRUE;
+    $discount->find();
+    $ret = FALSE;
+    while ($discount->fetch()) {
+      static::deleteRecord(['id' => $discount->id]);
+      $ret = TRUE;
     }
-    return FALSE;
+    return $ret;
   }
 
   /**
@@ -73,9 +78,31 @@ class CRM_Core_BAO_Discount extends CRM_Core_DAO_Discount {
     $dao->entity_table = $entityTable;
     $dao->find();
     while ($dao->fetch()) {
-      $optionGroupIDs[$dao->id] = $dao->price_set_id;
+      $optionGroupIDs[$dao->id] = (int) $dao->price_set_id;
     }
     return $optionGroupIDs;
+  }
+
+  /**
+   * Pseudoconstant condition_provider for price_set_id field.
+   * @see \Civi\Schema\EntityMetadataBase::getConditionFromProvider
+   */
+  public static function alterPriceSetOptions(string $fieldName, CRM_Utils_SQL_Select $conditions, $params) {
+    if (!empty($params['values']['entity_table']) && !empty($params['values']['entity_id'])) {
+      $priceSetIds = self::getOptionGroup($params['values']['entity_id'], $params['values']['entity_table']);
+      $conditions->where('id IN (#ids)', ['ids' => $priceSetIds ?: 0]);
+    }
+  }
+
+  /**
+   * Whitelist of possible values for the entity_table field
+   *
+   * @return array
+   */
+  public static function entityTables(): array {
+    return [
+      'civicrm_event' => ts('Event'),
+    ];
   }
 
   /**

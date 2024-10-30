@@ -22,7 +22,7 @@ class CRM_Price_BAO_PriceFieldTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testSubmitPriceFieldWithOptions() {
+  public function testSubmitPriceFieldWithOptions(): void {
     $priceSet = $this->callAPISuccess('PriceSet', 'create', [
       'is_active' => 1,
       'extends' => 2,
@@ -80,7 +80,7 @@ class CRM_Price_BAO_PriceFieldTest extends CiviUnitTestCase {
   /**
    * Test the name can be retrieved from the id using the pseudoConstant.
    */
-  public function testGetFromPseudoConstant() {
+  public function testGetFromPseudoConstant(): void {
     $this->assertNotEmpty(CRM_Core_PseudoConstant::getKey('CRM_Price_BAO_PriceField', 'price_set_id', 'default_contribution_amount'));
   }
 

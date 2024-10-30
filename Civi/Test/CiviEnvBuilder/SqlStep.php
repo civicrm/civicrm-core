@@ -20,8 +20,11 @@ class SqlStep implements StepInterface {
     return TRUE;
   }
 
+  /**
+   * @param \CiviEnvBuilder $ctx
+   * @throws \RuntimeException
+   */
   public function run($ctx) {
-    /** @var $ctx \CiviEnvBuilder */
     if (\Civi\Test::execute($this->sql) === FALSE) {
       throw new \RuntimeException("Cannot execute: {$this->sql}");
     }

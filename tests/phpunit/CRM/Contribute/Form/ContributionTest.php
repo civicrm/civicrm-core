@@ -9,8 +9,11 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\MembershipBlock;
 use Civi\Api4\PriceField;
-use Civi\Api4\PriceSet;
+use Civi\Api4\PriceSetEntity;
+use Civi\Test\FormTrait;
+use Civi\Test\FormWrapper;
 
 /**
  *  Test APIv3 civicrm_contribute_* functions
@@ -21,36 +24,10 @@ use Civi\Api4\PriceSet;
  */
 class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
   use CRMTraits_PCP_PCPTestTrait;
+  use FormTrait;
 
-  protected $_individualId;
-  protected $_contribution;
-  protected $financialTypeID = 1;
-  protected $_entity = 'Contribution';
+  protected int $financialTypeID = 1;
   protected $_params;
-  protected $_ids = [];
-  protected $_pageParams = [];
-  protected $_userId;
-
-  /**
-   * Parameters to create payment processor.
-   *
-   * @var array
-   */
-  protected $_processorParams = [];
-
-  /**
-   * ID of created event.
-   *
-   * @var int
-   */
-  protected $_eventID;
-
-  /**
-   * Payment instrument mapping.
-   *
-   * @var array
-   */
-  protected $paymentInstruments = [];
 
   /**
    * Products.
@@ -75,43 +52,27 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Setup function.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function setUp(): void {
-    $this->_apiversion = 3;
     parent::setUp();
-    $this->_userId = $this->createLoggedInUser();
+    $this->createLoggedInUser();
 
-    $this->_individualId = $this->ids['contact'][0] = $this->individualCreate();
+    $this->individualCreate([], 0);
     $this->_params = [
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact'][0],
       'receive_date' => '20120511',
       'total_amount' => 100.00,
-      'financial_type_id' => $this->financialTypeID,
+      'financial_type_id:name' => 'Donation',
       'non_deductible_amount' => 10.00,
       'fee_amount' => 5.00,
       'net_amount' => 95.00,
       'source' => 'SSF',
       'contribution_status_id' => 1,
     ];
-    $this->_processorParams = [
-      'domain_id' => 1,
-      'name' => 'Dummy',
-      'payment_processor_type_id' => 10,
-      'financial_account_id' => 12,
-      'is_active' => 1,
-      'user_name' => '',
-      'url_site' => 'http://dummy.com',
-      'url_recur' => 'http://dummy.com',
-      'billing_mode' => 1,
-    ];
 
-    $instruments = $this->callAPISuccess('contribution', 'getoptions', ['field' => 'payment_instrument_id']);
-    $this->paymentInstruments = $instruments['values'];
-    $product1 = $this->callAPISuccess('product', 'create', [
+    $product1 = $this->callAPISuccess('Product', 'create', [
       'name' => 'Smurf',
-      'options' => 'brainy smurf, clumsy smurf, papa smurf',
+      'options' => 'brainy smurf, clumsy smurf, papa smurf, skusmurf=SKU Smurf',
     ]);
 
     $this->products[] = $product1['values'][$product1['id']];
@@ -151,11 +112,11 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $this->submitContributionForm([
       'total_amount' => $this->formatMoneyInput(1234),
       'financial_type_id' => 1,
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact'][0],
       'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
       'contribution_status_id' => 1,
     ]);
-    $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $this->_individualId]);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $this->ids['Contact'][0]]);
     $this->assertEmpty($contribution['amount_level']);
     $this->assertEquals(1234, $contribution['total_amount']);
     $this->assertEquals(1234, $contribution['net_amount']);
@@ -168,100 +129,24 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $this->submitContributionForm([
       'total_amount' => 50,
       'financial_type_id' => 1,
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact'][0],
       'payment_instrument_id' => $this->getPaymentInstrumentID('Credit Card'),
       'contribution_status_id' => 1,
     ]);
     $this->callAPISuccessGetCount('Contribution', [
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact'][0],
       'contribution_status_id' => 'Completed',
     ], 1);
   }
 
   /**
    * Test the submit function on the contribution page.
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function testSubmitCreditCardPayPal(): void {
-    $mut = new CiviMailUtils($this, TRUE);
-    $mut->clearMessages();
-    $paymentProcessorID = $this->paymentProcessorCreate(['is_test' => 0]);
-    $error = FALSE;
-    try {
-      $this->submitContributionForm([
-        'total_amount' => 50,
-        'financial_type_id' => 1,
-        'contact_id' => $this->_individualId,
-        'contribution_status_id' => 1,
-        'credit_card_number' => 4444333322221111,
-        'cvv2' => 123,
-        'credit_card_exp_date' => [
-          'M' => 9,
-          'Y' => 2025,
-        ],
-        'credit_card_type' => 'Visa',
-        'billing_first_name' => 'Junko',
-        'billing_middle_name' => '',
-        'billing_last_name' => 'Adams',
-        'billing_street_address-5' => '790L Lincoln St S',
-        'billing_city-5' => 'Maryknoll',
-        'billing_state_province_id-5' => 1031,
-        'billing_postal_code-5' => 10545,
-        'billing_country_id-5' => 1228,
-        'frequency_interval' => 1,
-        'frequency_unit' => 'month',
-        'installments' => '',
-        'hidden_AdditionalDetail' => 1,
-        'hidden_Premium' => 1,
-        'from_email_address' => '"civi45" <civi45@civicrm.com>',
-        'is_email_receipt' => TRUE,
-        'receipt_date' => '',
-        'receipt_date_time' => '',
-        'payment_processor_id' => $paymentProcessorID,
-        'currency' => 'USD',
-        'source' => 'bob sled race',
-      ], NULL, 'Live');
-    }
-    catch (Civi\Payment\Exception\PaymentProcessorException $e) {
-      $error = TRUE;
-    }
-
-    $contribution = $this->callAPISuccess('Contribution', 'get', [
-      'contact_id' => $this->_individualId,
-      'contribution_status_id' => $error ? 'Failed' : 'Completed',
-      'payment_instrument_id' => $this->callAPISuccessGetValue('PaymentProcessor', [
-        'return' => 'payment_instrument_id',
-        'id' => $paymentProcessorID,
-      ]),
-    ]);
-
-    $this->assertEquals(1, $contribution['count'], 'Contribution count should be one.');
-    $this->assertNotTrue(empty($contribution['values'][$contribution['id']]['receipt_date']), 'Receipt date should not be blank.');
-
-    $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $this->_individualId]);
-    $this->assertTrue(empty($contact['source']));
-    if (!$error) {
-      $msgs = $mut->getAllMessages();
-      $this->assertCount(1, $msgs);
-    }
-    $mut->clearMessages();
-    $mut->stop();
-  }
-
-  /**
-   * Test the submit function on the contribution page
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function testSubmitCreditCardWithEmailReceipt(): void {
-    $mut = new CiviMailUtils($this, TRUE);
-    $mut->clearMessages();
-
-    $this->submitContributionForm([
+  public function testSubmitCreditCardDummyProcessor(): void {
+    $form = $this->submitContributionForm([
       'total_amount' => 50,
       'financial_type_id' => 1,
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact'][0],
       'contribution_status_id' => 1,
       'credit_card_number' => 4444333322221111,
       'cvv2' => 123,
@@ -274,7 +159,62 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'billing_middle_name' => '',
       'billing_last_name' => 'Adams',
       'billing_street_address-5' => '790L Lincoln St S',
-      'billing_city-5' => 'Maryknoll',
+      'billing_city-5' => 'Mary Knoll',
+      'billing_state_province_id-5' => 1031,
+      'billing_postal_code-5' => 10545,
+      'billing_country_id-5' => 1228,
+      'frequency_interval' => 1,
+      'frequency_unit' => 'month',
+      'installments' => '',
+      'hidden_AdditionalDetail' => 1,
+      'hidden_Premium' => 1,
+      'from_email_address' => '"civi45" <civi45@civicrm.com>',
+      'is_email_receipt' => TRUE,
+      'receipt_date' => '',
+      'receipt_date_time' => '',
+      'payment_processor_id' => $this->paymentProcessorID,
+      'currency' => 'USD',
+      'source' => 'bob sled race',
+    ], NULL, 'Live');
+    $this->assertEquals(1, $form->getMailCount());
+
+    $contribution = $this->callAPISuccess('Contribution', 'get', [
+      'contact_id' => $this->ids['Contact'][0],
+      'contribution_status_id' => 'Completed',
+      'payment_instrument_id' => $this->callAPISuccessGetValue('PaymentProcessor', [
+        'return' => 'payment_instrument_id',
+        'id' => $this->paymentProcessorID,
+      ]),
+    ]);
+
+    $this->assertEquals(1, $contribution['count'], 'Contribution count should be one.');
+    $this->assertNotEmpty($contribution['values'][$contribution['id']]['receipt_date'], 'Receipt date should not be blank.');
+
+    $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $this->ids['Contact'][0]]);
+    $this->assertArrayNotHasKey('source', $contact);
+  }
+
+  /**
+   * Test the submit function on the contribution page
+   */
+  public function testSubmitCreditCardWithEmailReceipt(): void {
+    $form = $this->submitContributionForm([
+      'total_amount' => 50,
+      'financial_type_id' => 1,
+      'contact_id' => $this->ids['Contact'][0],
+      'contribution_status_id' => 1,
+      'credit_card_number' => 4444333322221111,
+      'cvv2' => 123,
+      'credit_card_exp_date' => [
+        'M' => 9,
+        'Y' => 2025,
+      ],
+      'credit_card_type' => 'Visa',
+      'billing_first_name' => 'Junko',
+      'billing_middle_name' => '',
+      'billing_last_name' => 'Adams',
+      'billing_street_address-5' => '790L Lincoln St S',
+      'billing_city-5' => 'Mary Knoll',
       'billing_state_province_id-5' => 1031,
       'billing_postal_code-5' => 10545,
       'billing_country_id-5' => 1228,
@@ -293,23 +233,20 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     ], NULL, 'Live');
 
     $this->callAPISuccessGetCount('Contribution', [
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact'][0],
       'contribution_status_id' => 'Completed',
       'payment_instrument_id' => $this->callAPISuccessGetValue('PaymentProcessor', [
         'return' => 'payment_instrument_id',
         'id' => $this->paymentProcessorID,
       ]),
     ], 1);
-    $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $this->_individualId]);
+    $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $this->ids['Contact'][0]]);
     $this->assertArrayNotHasKey('source', $contact);
-    $this->assertCount(1, $mut->getAllMessages());
-    $mut->stop();
+    $this->assertEquals(1, $form->getMailCount());
   }
 
   /**
    * Test the submit function on the contribution page.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testSubmitCreditCardNoReceipt(): void {
     $mut = new CiviMailUtils($this, TRUE);
@@ -319,7 +256,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       $this->submitContributionForm([
         'total_amount' => 60,
         'financial_type_id' => 1,
-        'contact_id' => $this->_individualId,
+        'contact_id' => $this->ids['Contact'][0],
         'contribution_status_id' => 1,
         'credit_card_number' => 4444333322221111,
         'cvv2' => 123,
@@ -332,7 +269,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
         'billing_middle_name' => '',
         'billing_last_name' => 'Adams',
         'billing_street_address-5' => '790L Lincoln St S',
-        'billing_city-5' => 'Maryknoll',
+        'billing_city-5' => 'Mary Knoll',
         'billing_state_province_id-5' => 1031,
         'billing_postal_code-5' => 10545,
         'billing_country_id-5' => 1228,
@@ -355,14 +292,14 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     }
 
     $this->callAPISuccessGetCount('Contribution', [
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact'][0],
       'contribution_status_id' => $error ? 'Failed' : 'Completed',
       'payment_instrument_id' => $this->callAPISuccessGetValue('PaymentProcessor', [
         'return' => 'payment_instrument_id',
         'id' => $this->paymentProcessorID,
       ]),
     ], 1);
-    $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $this->_individualId]);
+    $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $this->ids['Contact'][0]]);
     $this->assertArrayNotHasKey('source', $contact);
     $mut->assertMailLogEmpty();
     $mut->stop();
@@ -376,7 +313,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $this->submitContributionForm([
       'total_amount' => 50,
       'financial_type_id' => 1,
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact'][0],
       'payment_instrument_id' => $this->getPaymentInstrumentID('Credit Card'),
       'contribution_status_id' => 1,
       'credit_card_number' => 4444333322221111,
@@ -408,7 +345,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     ], NULL, 'Live');
 
     $contribution = $this->callAPISuccessGetSingle('Contribution', [
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact'][0],
       'contribution_status_id' => 'Completed',
     ]);
     $this->assertEquals('50.00', $contribution['total_amount']);
@@ -422,12 +359,10 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    * Test a fully deductible contribution submitted by credit card (CRM-16669).
    */
   public function testSubmitCreditCardFullyDeductible(): void {
-    $form = new CRM_Contribute_Form_Contribution();
-    $form->_mode = 'Live';
-    $this->submitContributionForm([
+    $this->getTestForm('CRM_Contribute_Form_Contribution', [
       'total_amount' => 50,
       'financial_type_id' => 1,
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact'][0],
       'payment_instrument_id' => $this->getPaymentInstrumentID('Credit Card'),
       'contribution_status_id' => 1,
       'credit_card_number' => 4444333322221111,
@@ -456,10 +391,10 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'payment_processor_id' => $this->paymentProcessorID,
       'currency' => 'USD',
       'source' => '',
-    ]);
+    ], ['mode' => 'live'])->processForm();
 
     $contribution = $this->callAPISuccessGetSingle('Contribution', [
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact'][0],
       'contribution_status_id' => 'Completed',
     ]);
     $this->assertEquals('50.00', $contribution['total_amount']);
@@ -477,58 +412,50 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    *  - 1 Contribution with status = Pending
    *  - 1 Line item
    *  - 1 civicrm_financial_item. This is linked to the line item and has a status of 3
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testSubmitCreditCardInvalid(): void {
-    $form = new CRM_Contribute_Form_Contribution();
     $this->paymentProcessor->setDoDirectPaymentResult(['is_error' => 1]);
-    try {
-      $this->submitContributionForm([
-        'total_amount' => 50,
-        'financial_type_id' => 1,
-        'contact_id' => $this->_individualId,
-        'payment_instrument_id' => $this->getPaymentInstrumentID('Credit Card'),
-        'payment_processor_id' => $this->paymentProcessorID,
-        'credit_card_exp_date' => ['M' => 5, 'Y' => 2012],
-        'credit_card_number' => '411111111111111',
-      ], NULL, 'live');
-    }
-    catch (CRM_Core_Exception_PrematureExitException $e) {
-      $this->callAPISuccessGetCount('Contribution', [
-        'contact_id' => $this->_individualId,
-        'contribution_status_id' => 'Failed',
-      ], 1);
-      $lineItem = $this->callAPISuccessGetSingle('line_item', []);
-      $this->assertEquals('50.00', $lineItem['unit_price']);
-      $this->assertEquals('50.00', $lineItem['line_total']);
-      $this->assertEquals(1, $lineItem['qty']);
-      $this->assertEquals(1, $lineItem['financial_type_id']);
-      $financialItem = $this->callAPISuccessGetSingle('financial_item', [
-        'civicrm_line_item' => $lineItem['id'],
-        'entity_id' => $lineItem['id'],
-      ]);
-      $this->assertEquals('50.00', $financialItem['amount']);
-      $this->assertEquals(3, $financialItem['status_id']);
-      return;
-    }
-    $this->fail('An expected exception has not been raised.');
+    $this->submitContributionForm([
+      'total_amount' => 50,
+      'financial_type_id' => 1,
+      'contact_id' => $this->ids['Contact'][0],
+      'payment_instrument_id' => $this->getPaymentInstrumentID('Credit Card'),
+      'payment_processor_id' => $this->paymentProcessorID,
+      'credit_card_exp_date' => ['M' => 5, 'Y' => 2012],
+      'credit_card_number' => '411111111111111',
+      'credit_card_type' => 'Visa',
+    ], NULL, 'live');
+    $this->callAPISuccessGetCount('Contribution', [
+      'contact_id' => $this->ids['Contact'][0],
+      'contribution_status_id' => 'Failed',
+    ], 1);
+    $lineItem = $this->callAPISuccessGetSingle('line_item', []);
+    $this->assertEquals('50.00', $lineItem['unit_price']);
+    $this->assertEquals('50.00', $lineItem['line_total']);
+    $this->assertEquals(1, $lineItem['qty']);
+    $this->assertEquals(1, $lineItem['financial_type_id']);
+    $financialItem = $this->callAPISuccessGetSingle('financial_item', [
+      'civicrm_line_item' => $lineItem['id'],
+      'entity_id' => $lineItem['id'],
+    ]);
+    $this->assertEquals('50.00', $financialItem['amount']);
+    $this->assertEquals(3, $financialItem['status_id']);
+    $this->assertPrematureExit();
   }
 
   /**
    * Test the submit function creates a billing address if provided.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testSubmitCreditCardWithBillingAddress(): void {
     $this->submitContributionForm([
       'total_amount' => 50,
       'financial_type_id' => 1,
-      'contact_id' => $this->_individualId,
-      'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments),
+      'contact_id' => $this->individualCreate(),
+      'payment_instrument_id' => $this->getPaymentInstrumentID('Credit Card'),
       'payment_processor_id' => $this->paymentProcessorID,
       'credit_card_exp_date' => ['M' => 5, 'Y' => 2025],
       'credit_card_number' => '411111111111111',
+      'credit_card_type' => 'Visa',
       'billing_city-5' => 'Vancouver',
     ], NULL, 'live');
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['return' => 'address_id']);
@@ -554,11 +481,12 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'frequency_unit' => 'month',
       'installments' => 2,
       'receive_date' => $receiveDate,
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact'][0],
       'payment_instrument_id' => $this->getPaymentInstrumentID('Credit Card'),
       'payment_processor_id' => $this->paymentProcessorID,
       'credit_card_exp_date' => ['M' => 5, 'Y' => 2025],
       'credit_card_number' => '411111111111111',
+      'credit_card_type' => 'Visa',
       'billing_city-5' => 'Vancouver',
     ], NULL, 'live');
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['return' => 'receive_date']);
@@ -572,11 +500,12 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $this->submitContributionForm([
       'total_amount' => 50,
       'financial_type_id' => 1,
-      'contact_id' => $this->_individualId,
-      'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments),
+      'contact_id' => $this->individualCreate(),
+      'payment_instrument_id' => $this->getPaymentInstrumentID('Credit Card'),
       'payment_processor_id' => $this->paymentProcessorID,
       'credit_card_exp_date' => ['M' => 5, 'Y' => 2025],
       'credit_card_number' => '411111111111111',
+      'credit_card_type' => 'Visa',
     ], NULL, 'live');
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['return' => 'address_id']);
     $this->assertEmpty($contribution['address_id']);
@@ -590,20 +519,17 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    * Test the submit function on the contribution page.
    */
   public function testSubmitEmailReceipt(): void {
-    $mut = new CiviMailUtils($this, TRUE);
-    $this->submitContributionForm([
+    $contactID = $this->individualCreate();
+    $form = $this->submitContributionForm([
       'total_amount' => 50,
       'financial_type_id' => 1,
-      'contact_id' => $this->_individualId,
+      'contact_id' => $contactID,
       'is_email_receipt' => TRUE,
       'from_email_address' => 'test@test.com',
       'contribution_status_id' => 1,
     ]);
-    $this->callAPISuccessGetCount('Contribution', ['contact_id' => $this->_individualId], 1);
-    $mut->checkMailLog([
-      'Contribution Information',
-    ]);
-    $mut->stop();
+    $this->callAPISuccessGetCount('Contribution', ['contact_id' => $contactID], 1);
+    $this->assertStringContainsString('Contribution Information', $form->getFirstMailBody());
   }
 
   /**
@@ -611,25 +537,22 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    */
   public function testSubmitEmailReceiptUserEmailFromAddress(): void {
     $email = $this->callAPISuccess('Email', 'create', [
-      'contact_id' => $this->_userId,
+      'contact_id' => $this->ids['Contact']['logged_in'],
       'email' => 'testLoggedIn@example.com',
     ]);
-    $mut = new CiviMailUtils($this, TRUE);
+
     $this->submitContributionForm([
       'contribution_status_id' => 1,
       'total_amount' => 50,
       'financial_type_id' => 1,
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact'][0],
       'is_email_receipt' => TRUE,
       'from_email_address' => $email['id'],
     ]);
 
-    $this->callAPISuccessGetCount('Contribution', ['contact_id' => $this->_individualId], 1);
-    $mut->checkMailLog([
-      'Below you will find a receipt for this contribution.',
-      '<testloggedin@example.com>',
-    ]);
-    $mut->stop();
+    $this->callAPISuccessGetCount('Contribution', ['contact_id' => $this->ids['Contact'][0]], 1);
+    $this->assertMailSentContainingString('Below you will find a receipt for this contribution.');
+    $this->assertMailSentTo(['<testloggedin@example.com>']);
   }
 
   /**
@@ -648,13 +571,13 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       $this->enableTaxAndInvoicing();
       $this->addTaxAccountToFinancialType($financialTypeID);
     }
-    $priceSetID = PriceSet::create(FALSE)->setValues([
-      'title' => 'Price Set abcd',
+    $priceSetID = $this->createTestEntity('PriceSet', [
+      'title' => 'Price Set abc',
       'is_active' => TRUE,
       'financial_type_id:name' => 'Donation',
       'extends' => 2,
-      'name' => 'price_set_abcd',
-    ])->execute()->first()['id'];
+      'name' => 'price_set_abc',
+    ])['id'];
 
     $paramsField = [
       'label' => 'Price Field',
@@ -680,7 +603,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $params = [
       'total_amount' => 100,
       'financial_type_id' => $financialTypeID,
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact'][0],
       'is_email_receipt' => TRUE,
       'from_email_address' => 'test@test.com',
       'price_set_id' => $priceSetID,
@@ -692,57 +615,39 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
         $params['price_' . $priceFieldID] = [$id => 1];
       }
     }
-    $form = $this->getContributionForm($params);
-    $mailUtil = new CiviMailUtils($this, TRUE);
-    $form->_priceSet = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetID));
-    $form->postProcess();
+    $this->submitContributionForm($params);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', [
+      'contact_id' => $this->ids['Contact'][0],
+      'version' => 4,
+    ]);
+
+    $this->assertTrue($contribution['is_pay_later']);
+    $this->assertMailSentContainingStrings([
+      'Dear Anthony,',
+      'Contribution Information',
+      'Contributor Name Mr. Anthony Anderson II',
+      'Financial Type Donation',
+      'Contribution Date ' . date('m/d/Y'),
+      'Receipt Date ' . date('m/d/Y'),
+    ]);
     if ($isTaxed) {
-      $mailUtil->checkMailLog([
-        'Dear Anthony,
-Below you will find a receipt for this contribution.
-===========================================================
-Contribution Information
-===========================================================
-Contributor: Mr. Anthony Anderson II
-Financial Type: Donation
----------------------------------------------------------
-Item                             Qty       Each    Subtotal Tax Rate Tax Amount       Total
-----------------------------------------------------------
-Price Field - Price Field 1        1    $100.00    $100.00  10.00 %       $10.00        $110.00
-
-
-Amount before Tax : $100.00
-Sales Tax 10.00% : $10.00
-
-Total Tax Amount : $10.00
-Total Amount : $110.00
-Date Received: ' . date('m/d/Y') . '
-Receipt Date: ' . date('m/d/Y') . '
-Paid By: Check',
+      $this->assertMailSentContainingStrings([
+        'Item  Qty       Each    Subtotal Tax Rate Tax Amount       Total',
+        'Price Field - Price Field 1        1    $100.00    $100.00  10.00 %       $10.00        $110.00',
+        'Amount before Tax : $100.00',
+        'Sales Tax 10.00% $10.00',
+        'Total Tax Amount $10.00',
+        'Total Amount $110.00',
       ]);
     }
     else {
-      $mailUtil->checkMailLog([
-        'Dear Anthony,
-Below you will find a receipt for this contribution.
-===========================================================
-Contribution Information
-===========================================================
-Contributor: Mr. Anthony Anderson II
-Financial Type: Donation
----------------------------------------------------------
-Item                             Qty       Each       Total
-----------------------------------------------------------
-Price Field - Price Field 1        1    $100.00       $100.00
-
-
-
-Total Amount : $100.00
-Date Received: ' . date('m/d/Y') . '
-Receipt Date: ' . date('m/d/Y') . '
-Paid By: Check',
-      ],
-      ['Amount before Tax', 'Tax Amount']);
+      $this->assertMailSentContainingStrings([
+        'Item  Qty       Each       Total',
+        'Price Field - Price Field 1        1    $100.00       $100.00',
+        'Total Amount $100.00',
+      ]);
+      $this->assertMailSentNotContainingString('Amount before Tax');
+      $this->assertMailSentNotContainingString('Tax Amount');
     }
   }
 
@@ -751,7 +656,7 @@ Paid By: Check',
    */
   public function testUpdatePledge(): void {
     $pledge = $this->callAPISuccess('Pledge', 'create', [
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact'][0],
       'pledge_create_date' => date('Ymd'),
       'start_date' => date('Ymd'),
       'amount' => 100.00,
@@ -772,7 +677,7 @@ Paid By: Check',
     $this->submitContributionForm([
       'total_amount' => 50,
       'financial_type_id' => 1,
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact'][0],
       'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
       'contribution_status_id' => 1,
     ], NULL, NULL, $pledgePaymentID);
@@ -786,14 +691,13 @@ Paid By: Check',
    * Test functions involving premiums.
    */
   public function testPremiumUpdate(): void {
-    $mut = new CiviMailUtils($this, TRUE);
     $this->submitContributionForm([
       'total_amount' => 50,
       'financial_type_id' => 1,
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact'][0],
       'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
       'contribution_status_id' => 1,
-      'product_name' => [$this->products[0]['id'], 1],
+      'product_name' => [$this->products[0]['id'], 'clumsy smurf'],
       'fulfilled_date' => '',
       'is_email_receipt' => TRUE,
       'from_email_address' => 'test@test.com',
@@ -801,42 +705,65 @@ Paid By: Check',
     ]);
     $contributionProduct = $this->callAPISuccess('contribution_product', 'getsingle', []);
     $this->assertEquals('clumsy smurf', $contributionProduct['product_option']);
-    $mut->checkMailLog([
+    $this->assertMailSentContainingStrings([
       'Premium Information',
       'Smurf',
       'clumsy smurf',
     ]);
-    $mut->stop();
+    $this->assertMailSentContainingStrings(['Smurf', 'clumsy smurf']);
+  }
+
+  /**
+   * Test functions involving premiums.
+   */
+  public function testPremiumUpdateWithSKUkey(): void {
+    $this->submitContributionForm([
+      'total_amount' => 50,
+      'financial_type_id' => 1,
+      'contact_id' => $this->ids['Contact'][0],
+      'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
+      'contribution_status_id' => 1,
+      'product_name' => [$this->products[0]['id'], 'skusmurf'],
+      'fulfilled_date' => '',
+      'is_email_receipt' => TRUE,
+      'from_email_address' => 'test@test.com',
+      'hidden_Premium' => 1,
+    ]);
+    $contributionProduct = $this->callAPISuccess('contribution_product', 'getsingle', []);
+    $this->assertEquals('skusmurf', $contributionProduct['product_option']);
+    $this->assertMailSentContainingStrings([
+      'Premium Information',
+      'Smurf',
+      'SKU Smurf',
+    ]);
+    $this->assertMailSentContainingStrings(['Smurf', 'SKU Smurf']);
   }
 
   /**
    * Test functions involving premiums.
    */
   public function testPremiumUpdateCreditCard(): void {
-    $mut = new CiviMailUtils($this, TRUE);
-    $this->submitContributionForm([
+    $form = $this->submitContributionForm([
       'total_amount' => 50,
       'financial_type_id' => 1,
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact'][0],
       'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
       'contribution_status_id' => 1,
-      'product_name' => [$this->products[0]['id'], 1],
+      'product_name' => [$this->products[0]['id'], 'clumsy smurf'],
       'fulfilled_date' => '',
       'is_email_receipt' => TRUE,
       'from_email_address' => 'test@test.com',
       'payment_processor_id' => $this->paymentProcessorID,
       'credit_card_exp_date' => ['M' => 5, 'Y' => 2026],
       'credit_card_number' => '411111111111111',
+      'credit_card_type' => 'Visa',
       'hidden_Premium' => 1,
     ], NULL, 'live');
     $contributionProduct = $this->callAPISuccess('contribution_product', 'getsingle', []);
     $this->assertEquals('clumsy smurf', $contributionProduct['product_option']);
-    $mut->checkMailLog([
-      'Premium Information',
-      'Smurf',
-      'clumsy smurf',
-    ]);
-    $mut->stop();
+    $this->assertStringContainsString('Premium Information', $form->getFirstMailBody());
+    $this->assertStringContainsString('Smurf', $form->getFirstMailBody());
+    $this->assertStringContainsString('clumsy smurf', $form->getFirstMailBody());
   }
 
   /**
@@ -846,13 +773,11 @@ Paid By: Check',
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   public function testSubmitWithPCP(): void {
-    $mut = new CiviMailUtils($this, TRUE);
-    $mut->clearMessages();
     $params = $this->pcpParams();
     $pcpID = $this->createPCPBlock($params);
     $this->submitContributionForm([
       'financial_type_id' => 3,
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact'][0],
       'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
       'contribution_status_id' => 1,
       'total_amount' => 5,
@@ -863,7 +788,7 @@ Paid By: Check',
     ]);
     $softCredit = $this->callAPISuccessGetSingle('ContributionSoft', []);
     $this->assertEquals('Dobby', $softCredit['pcp_roll_nickname']);
-    $mut->checkMailLog(['Personal Campaign Page Owner Notification']);
+    $this->assertMailSentContainingStrings(['You have received a donation at your personal page']);
   }
 
   /**
@@ -873,31 +798,34 @@ Paid By: Check',
     $this->submitContributionForm([
       'total_amount' => 50,
       'financial_type_id' => 1,
-      'contact_id' => $this->_individualId,
-      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'contact_id' => $this->individualCreate([], 'with_note'),
+      'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
       'contribution_status_id' => 1,
       'note' => 'Super cool and interesting stuff',
     ]);
-    $this->callAPISuccessGetCount('Contribution', ['contact_id' => $this->_individualId], 1);
+    $this->callAPISuccessGetCount('Contribution', ['contact_id' => $this->ids['Contact']['with_note']], 1);
     $note = $this->callAPISuccessGetSingle('note', ['entity_table' => 'civicrm_contribution']);
     $this->assertEquals('Super cool and interesting stuff', $note['note']);
   }
 
   /**
    * Test the submit function on the contribution page.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSubmitWithNoteCreditCard(): void {
     $this->submitContributionForm([
       'total_amount' => 50,
       'financial_type_id' => 1,
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact'][0],
       'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
       'contribution_status_id' => 1,
       'note' => 'Super cool and interesting stuff',
     ] + $this->getCreditCardParams());
-    $this->callAPISuccessGetCount('Contribution', ['contact_id' => $this->_individualId], 1);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $this->ids['Contact'][0]]);
     $note = $this->callAPISuccessGetSingle('note', ['entity_table' => 'civicrm_contribution']);
-    $this->assertEquals($note['note'], 'Super cool and interesting stuff');
+    $this->assertEquals('Super cool and interesting stuff', $note['note']);
+    $this->assertEquals($contribution['id'], $this->getDeprecatedProperty('_contributionID'));
   }
 
   /**
@@ -911,14 +839,14 @@ Paid By: Check',
     $this->submitContributionForm([
       'total_amount' => -5,
       'financial_type_id' => 1,
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact'][0],
       'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
       'contribution_status_id' => 1,
     ]);
-    $this->callAPISuccessGetCount('Contribution', ['contact_id' => $this->_individualId], 1);
+    $this->callAPISuccessGetCount('Contribution', ['contact_id' => $this->ids['Contact'][0]], 1);
 
     $contribution = $this->callAPISuccessGetSingle('Contribution', [
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact'][0],
     ]);
     $this->assertEquals(-5, $contribution['total_amount']);
   }
@@ -931,31 +859,32 @@ Paid By: Check',
    * @dataProvider getThousandSeparators
    */
   public function testSubmitUpdate(string $thousandSeparator): void {
+    $contactID = $this->individualCreate();
     $this->setCurrencySeparators($thousandSeparator);
     $this->submitContributionForm([
       'total_amount' => $this->formatMoneyInput(6100.10),
       'financial_type_id' => 1,
-      'contact_id' => $this->_individualId,
+      'contact_id' => $contactID,
       'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
       'contribution_status_id' => 1,
     ]);
-    $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $this->_individualId]);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID]);
     $this->submitContributionForm([
       'total_amount' => $this->formatMoneyInput(5200.20),
       'net_amount' => $this->formatMoneyInput(5200.20),
       'financial_type_id' => 1,
-      'contact_id' => $this->_individualId,
+      'contact_id' => $contactID,
       'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
       'contribution_status_id' => 1,
     ], $contribution['id']);
-    $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $this->_individualId]);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID]);
     $this->assertEquals(5200.20, $contribution['total_amount'], 2);
 
-    $financialTransactions = $this->callAPISuccess('FinancialTrxn', 'get', ['sequential' => TRUE]);
-    $this->assertEquals(2, $financialTransactions['count']);
-    $this->assertEquals(6100.10, $financialTransactions['values'][0]['total_amount']);
-    $this->assertEquals(-899.90, $financialTransactions['values'][1]['total_amount']);
-    $this->assertEquals(-899.90, $financialTransactions['values'][1]['net_amount']);
+    $financialTransactions = $this->callAPISuccess('FinancialTrxn', 'get', ['sequential' => TRUE])['values'];
+    $this->assertCount(2, $financialTransactions);
+    $this->assertEquals(6100.10, $financialTransactions[0]['total_amount']);
+    $this->assertEquals(-899.90, $financialTransactions[1]['total_amount']);
+    $this->assertEquals(-899.90, $financialTransactions[1]['net_amount']);
     $lineItem = $this->callAPISuccessGetSingle('LineItem', []);
     $this->assertEquals(5200.20, $lineItem['line_total']);
   }
@@ -972,24 +901,24 @@ Paid By: Check',
     $this->submitContributionForm([
       'total_amount' => 1200.55,
       'financial_type_id' => 1,
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact'][0],
       'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
       'check_number' => '123AX',
       'contribution_status_id' => 1,
     ]);
-    $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $this->_individualId]);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $this->ids['Contact'][0]]);
     $this->submitContributionForm([
       'total_amount' => 1200.55,
       'net_amount' => 1200.55,
       'financial_type_id' => 1,
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact'][0],
       'payment_instrument_id' => $this->getPaymentInstrumentID('Credit Card'),
       'card_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Financial_DAO_FinancialTrxn', 'card_type_id', 'Visa'),
       'pan_truncation' => '1011',
       'contribution_status_id' => 1,
       'id' => $contribution['id'],
     ], $contribution['id']);
-    $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $this->_individualId]);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $this->ids['Contact'][0]]);
     $this->assertEquals(1200.55, $contribution['total_amount']);
 
     $financialTransactions = $this->callAPISuccess('FinancialTrxn', 'get', ['sequential' => TRUE]);
@@ -999,15 +928,15 @@ Paid By: Check',
 
     $this->assertEquals(1200.55, $oldTrxn['total_amount']);
     $this->assertEquals('123AX', $oldTrxn['check_number']);
-    $this->assertEquals(array_search('Check', $this->paymentInstruments), $oldTrxn['payment_instrument_id']);
+    $this->assertEquals($this->getPaymentInstrumentID('Check'), $oldTrxn['payment_instrument_id']);
 
     $this->assertEquals(-1200.55, $reversedTrxn['total_amount']);
     $this->assertEquals('123AX', $reversedTrxn['check_number']);
-    $this->assertEquals(array_search('Check', $this->paymentInstruments), $reversedTrxn['payment_instrument_id']);
+    $this->assertEquals($this->getPaymentInstrumentID('Check'), $reversedTrxn['payment_instrument_id']);
 
     $this->assertEquals(1200.55, $latestTrxn['total_amount']);
     $this->assertEquals('1011', $latestTrxn['pan_truncation']);
-    $this->assertEquals(array_search('Credit Card', $this->paymentInstruments), $latestTrxn['payment_instrument_id']);
+    $this->assertEquals($this->getPaymentInstrumentID('Credit Card'), $latestTrxn['payment_instrument_id']);
     $this->callAPISuccessGetSingle('LineItem', []);
   }
 
@@ -1022,20 +951,19 @@ Paid By: Check',
       'payment_processor_id' => $this->paymentProcessorID,
       'credit_card_exp_date' => ['M' => 5, 'Y' => 2012],
       'credit_card_number' => '411111111111111',
+      'credit_card_type' => 'Visa',
     ];
   }
 
   /**
    * Test the submit function that completes the partially paid payment using Credit Card
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testPartialPaymentWithCreditCard(): void {
     // create a partially paid contribution by using back-office form
     $form = $this->getContributionForm([
       'total_amount' => 50,
       'financial_type_id' => 1,
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact'][0],
       'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
       'check_number' => '7890',
       'billing_city-5' => 'Vancouver',
@@ -1047,15 +975,11 @@ Paid By: Check',
     $this->callAPISuccess('Payment', 'create', ['contribution_id' => $contribution['id'], 'total_amount' => 10, 'payment_instrument_id' => 'Cash']);
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $contribution['id']]);
     $this->assertEquals('Partially paid', $contribution['contribution_status']);
-    // pay additional amount by using Credit Card
-    $form = new CRM_Contribute_Form_AdditionalPayment();
-    $form->testSubmit([
-      'contribution_id' => $contribution['id'],
-      'contact_id' => $this->_individualId,
+    $form = $this->getTestForm('CRM_Contribute_Form_AdditionalPayment', [
       'total_amount' => 40,
       'currency' => 'USD',
       'financial_type_id' => 1,
-      'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments),
+      'payment_instrument_id' => $this->getPaymentInstrumentID('Credit Card'),
       'payment_processor_id' => $this->paymentProcessorID,
       'credit_card_exp_date' => ['M' => 5, 'Y' => 2025],
       'credit_card_number' => '411111111111111',
@@ -1066,7 +990,8 @@ Paid By: Check',
       'billing_postal_code-5' => 1321312,
       'billing_country_id-5' => 1228,
       'trxn_date' => '2017-04-11 13:05:11',
-    ], 'live');
+    ], ['id' => $contribution['id'], 'mode' => 'live'])->processForm();
+    $this->assertEquals($contribution['id'], $form->getContributionID());
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
     $this->assertNotEmpty($contribution);
     $this->assertEquals('Completed', $contribution['contribution_status']);
@@ -1081,14 +1006,13 @@ Paid By: Check',
    * @group locale
    */
   public function testSubmitSaleTax(string $thousandSeparator): void {
-    $mailUtil = new CiviMailUtils($this, TRUE);
     $this->setCurrencySeparators($thousandSeparator);
     $this->enableTaxAndInvoicing();
     $this->addTaxAccountToFinancialType($this->financialTypeID);
     $this->submitContributionForm([
       'total_amount' => $this->formatMoneyInput(1000.00),
       'financial_type_id' => $this->financialTypeID,
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact'][0],
       'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
       'contribution_status_id' => 1,
       'price_set_id' => 0,
@@ -1096,16 +1020,18 @@ Paid By: Check',
       'from_email_address' => 'demo@example.com',
     ]);
 
-    $mailUtil->checkAllMailLog([
-      'Total Tax Amount : $' . $this->formatMoneyInput(100),
-      'Total Amount : $' . $this->formatMoneyInput(1100),
-      'Paid By: Check',
-    ], []);
-    $mailUtil->clearMessages();
+    $this->assertMailSentContainingStrings([
+      'Total Tax Amount',
+      '$' . $this->formatMoneyInput(100),
+      'Total Amount',
+      '$' . $this->formatMoneyInput(1100),
+      'Paid By',
+      'Check',
+    ]);
 
     $contribution = $this->callAPISuccessGetSingle('Contribution',
       [
-        'contact_id' => $this->_individualId,
+        'contact_id' => $this->ids['Contact'][0],
         'return' => ['tax_amount', 'total_amount'],
       ]
     );
@@ -1121,28 +1047,28 @@ Paid By: Check',
     $this->submitContributionForm([
       'id' => $contribution['id'],
       'financial_type_id' => 3,
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact'][0],
       'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
       'contribution_status_id' => 1,
       'is_email_receipt' => 1,
       'from_email_address' => 'demo@example.com',
     ], $contribution['id']);
 
-    $mailUtil->checkAllMailLog([
-      'Total Tax Amount : $' . $this->formatMoneyInput(100),
-      'Total Amount : $' . $this->formatMoneyInput(1100),
-      'Paid By: Check',
-    ], []);
-    $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $this->_individualId]);
+    $this->assertMailSentContainingStrings([
+      'Total Tax Amount',
+      '$' . $this->formatMoneyInput(100),
+      'Total Amount',
+      '$' . $this->formatMoneyInput(1100),
+      'Paid By',
+      'Check',
+    ]);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $this->ids['Contact'][0]]);
     // Check if total amount is unchanged
     $this->assertEquals(1100, $contribution['total_amount']);
   }
 
   /**
-   * Test the submit function for FT without tax.
-   *
-   * @throws \CRM_Core_Exception
-   * @throws \Civi\Payment\Exception\PaymentProcessorException
+   * Test the submit function for Financial Type without tax.
    */
   public function testSubmitWithOutSaleTax(): void {
     $this->enableTaxAndInvoicing();
@@ -1150,13 +1076,13 @@ Paid By: Check',
     $this->submitContributionForm([
       'total_amount' => 100,
       'financial_type_id' => 3,
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact'][0],
       'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
       'contribution_status_id' => 1,
     ]);
     $contribution = $this->callAPISuccessGetSingle('Contribution',
       [
-        'contact_id' => $this->_individualId,
+        'contact_id' => $this->ids['Contact'][0],
         'return' => ['tax_amount', 'total_amount'],
       ]
     );
@@ -1190,7 +1116,6 @@ Paid By: Check',
     $this->assertEquals(1000, $contribution['tax_amount']);
     $this->assertEquals(11000, $contribution['net_amount']);
 
-    $mut = new CiviMailUtils($this, TRUE);
     // Testing here if when we edit something trivial like adding a check_number tax, net, total amount stay the same:
     $this->submitContributionForm([
       'id' => $contribution['id'],
@@ -1213,15 +1138,19 @@ Paid By: Check',
     $this->assertEquals(1000, $contribution['tax_amount']);
     $this->assertEquals(11000, $contribution['net_amount']);
 
-    $strings = [
-      'Total Tax Amount : $' . $this->formatMoneyInput(1000.00),
-      'Total Amount : $' . $this->formatMoneyInput(11000.00),
-      'Date Received: 04/21/2015',
-      'Paid By: Check',
-      'Check Number: 12345',
-    ];
+    $this->assertMailSentContainingStrings([
+      'Total Tax Amount',
+      '$' . $this->formatMoneyInput(1000.00),
+      'Total Amount',
+      '$' . $this->formatMoneyInput(11000.00),
+      'Contribution Date',
+      '04/21/2015',
+      'Paid By',
+      'Check',
+      'Check Number',
+      '12345',
+    ]);
 
-    $mut->checkMailLog($strings);
     $this->callAPISuccessGetCount('FinancialTrxn', [], 3);
     $items = $this->callAPISuccess('FinancialItem', 'get', ['sequential' => 1])['values'];
     $this->assertCount(2, $items);
@@ -1246,8 +1175,6 @@ Paid By: Check',
     $this->enableTaxAndInvoicing();
     $this->addTaxAccountToFinancialType($this->financialTypeID);
     $contribution = $this->doInitialSubmit();
-
-    $mut = new CiviMailUtils($this, TRUE);
     // Testing here if when we edit something trivial like adding a check_number tax, net, total amount stay the same:
     $this->submitContributionForm([
       'id' => $contribution['id'],
@@ -1272,16 +1199,21 @@ Paid By: Check',
     $this->assertEquals(2000, $contribution['tax_amount']);
     $this->assertEquals(22000, $contribution['net_amount']);
 
-    $strings = [
-      'Total Tax Amount : $' . $this->formatMoneyInput(2000),
-      'Total Amount : $' . $this->formatMoneyInput(22000.00),
-      'Date Received: 04/21/2015',
-      'Paid By: Check',
-      'Check Number: 12345',
-      'Financial Type: Donation',
-    ];
+    $this->assertMailSentContainingStrings([
+      'Total Tax Amount',
+      '$' . $this->formatMoneyInput(2000),
+      'Total Amount',
+      '$' . $this->formatMoneyInput(22000.00),
+      'Contribution Date',
+      '04/21/2015',
+      'Paid By',
+      'Check',
+      'Check Number',
+      '12345',
+      'Financial Type',
+      'Donation',
+    ]);
 
-    $mut->checkMailLog($strings);
     $this->callAPISuccessGetCount('FinancialTrxn', [], 4);
     $items = $this->callAPISuccess('FinancialItem', 'get', ['sequential' => 1]);
     $this->assertEquals(4, $items['count']);
@@ -1303,12 +1235,12 @@ Paid By: Check',
    *
    * @throws \Exception
    */
-  protected function doInitialSubmit() {
+  protected function doInitialSubmit(): array {
     $this->submitContributionForm([
       'total_amount' => $this->formatMoneyInput(10000),
       'financial_type_id' => $this->financialTypeID,
       'receive_date' => '2015-04-21 00:00:00',
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact'][0],
       'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
       'contribution_status_id' => 1,
     ]);
@@ -1338,8 +1270,8 @@ Paid By: Check',
     $form = $this->getContributionForm([
       'total_amount' => 100,
       'financial_type_id' => 3,
-      'contact_id' => $this->_individualId,
-      'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments),
+      'contact_id' => $this->ids['Contact'][0],
+      'payment_instrument_id' => $this->getPaymentInstrumentID('Credit Card'),
       'contribution_status_id' => 1,
       'credit_card_type' => 'Visa',
       'pan_truncation' => 4567,
@@ -1348,7 +1280,7 @@ Paid By: Check',
     $form->postProcess();
     $contribution = $this->callAPISuccessGetSingle('Contribution',
       [
-        'contact_id' => $this->_individualId,
+        'contact_id' => $this->ids['Contact'][0],
         'return' => ['id'],
       ]
     );
@@ -1366,12 +1298,9 @@ Paid By: Check',
 
   /**
    * Check payment processor is correctly assigned for a contribution page.
-   *
-   * @throws \CRM_Core_Exception
-   * @throws \CRM_Contribute_Exception_InactiveContributionPageException
    */
   public function testContributionBasePreProcess(): void {
-    //Create contribution page with only pay later enabled.
+    // Create contribution page with only pay later enabled.
     $params = [
       'title' => 'Test Contribution Page',
       'financial_type_id' => 1,
@@ -1386,28 +1315,19 @@ Paid By: Check',
       'receipt_from_name' => 'Ego Freud',
     ];
 
-    $page1 = $this->callAPISuccess('ContributionPage', 'create', $params);
-
-    //Execute CRM_Contribute_Form_ContributionBase preProcess
-    //and check the assignment of payment processors
-    $form = new CRM_Contribute_Form_ContributionBase();
-    $form->controller = new CRM_Core_Controller();
-    $form->set('id', $page1['id']);
-    $_REQUEST['id'] = $page1['id'];
+    $_REQUEST['id'] = $this->callAPISuccess('ContributionPage', 'create', $params)['id'];
+    PriceSetEntity::create(FALSE)->setValues(['entity_id' => $_REQUEST['id'], 'entity_table' => 'civicrm_contribution_page', 'price_set_id:name' => 'default_contribution_amount'])->execute();
+    // Execute CRM_Contribute_Form_ContributionBase preProcess (via child class).
+    // Check the assignment of payment processors.
+    /* @var \CRM_Contribute_Form_Contribution_Main $form */
+    $form = $this->getFormObject('CRM_Contribute_Form_Contribution_Main', ['payment_processor_id' => 0]);
 
     $form->preProcess();
     $this->assertEquals('pay_later', $form->_paymentProcessor['name']);
 
     //Disable all the payment processor for the contribution page.
     $params['is_pay_later'] = 0;
-    $page2 = $this->callAPISuccess('ContributionPage', 'create', $params);
-
-    //Assert an exception is thrown on loading the contribution page.
-    $form = new CRM_Contribute_Form_ContributionBase();
-    $form->controller = new CRM_Core_Controller();
-    $_REQUEST['id'] = $page2['id'];
-    $form->set('id', $page2['id']);
-    $form->preProcess();
+    $this->callAPISuccess('ContributionPage', 'create', $params);
   }
 
   /**
@@ -1419,7 +1339,7 @@ Paid By: Check',
       [
         'total_amount' => 50,
         'financial_type_id' => 1,
-        'contact_id' => $this->_individualId,
+        'contact_id' => $this->ids['Contact'][0],
         'credit_card_number' => 4444333322221111,
         'payment_instrument_id' => $this->getPaymentInstrumentID('Credit Card'),
         'cvv2' => 123,
@@ -1449,7 +1369,7 @@ Paid By: Check',
         'source' => 'bob sled race',
       ], NULL, 'live'
     );
-    $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $this->_individualId]);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $this->ids['Contact'][0]]);
     $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
     $financialTrxn = $this->callAPISuccessGetSingle(
       'FinancialTrxn',
@@ -1523,8 +1443,8 @@ Paid By: Check',
       'text_length' => 255,
     ]);
 
-    // create profile
-    $membershipCustomFieldsProfile = civicrm_api3('UFGroup', 'create', [
+    // Create profile.
+    $membershipCustomFieldsProfile = $this->createTestEntity('UFGroup', [
       'is_active' => 1,
       'group_type' => 'Membership,Individual',
       'title' => 'Membership Custom Fields',
@@ -1635,11 +1555,16 @@ Paid By: Check',
       'entity_table' => 'civicrm_contribution_page',
       'entity_id' => $contribPage1,
     ]);
+    MembershipBlock::create(FALSE)->setValues([
+      'entity_id' => $contribPage1,
+      'entity_table' => 'civicrm_contribution_page',
+      'is_separate_payment' => FALSE,
+    ])->execute();
 
     $form = new CRM_Contribute_Form_Contribution_Confirm();
     $form->_params = [
       'id' => $contribPage1,
-      'qfKey' => 'donotcare',
+      'qfKey' => 'abc',
       "custom_{$membershipCustomField['id']}" => 'Hello',
       'priceSetId' => $priceSet['id'],
       'price_set_id' => $priceSet['id'],
@@ -1672,19 +1597,19 @@ Paid By: Check',
 
   /**
    * Test non-membership donation on a contribution page
-   * using membership priceset.
+   * using membership PriceSet.
    */
-  public function testDonationOnMembershipPagePriceset() {
+  public function testDonationOnMembershipPagePriceSet(): void {
     $contactID = $this->individualCreate();
     $this->createPriceSetWithPage();
     $form = new CRM_Contribute_Form_Contribution_Confirm();
     $form->controller = new CRM_Core_Controller();
     $form->_params = [
-      'id' => $this->_ids['contribution_page'],
-      'qfKey' => 'donotcare',
-      'priceSetId' => $this->_ids['price_set'],
-      'price_set_id' => $this->_ids['price_set'],
-      'price_' . $this->_ids['price_field'][0] => $this->_ids['price_field_value']['cont'],
+      'id' => $this->ids['ContributionPage']['default'],
+      'qfKey' => 'abc',
+      'priceSetId' => reset($this->ids['PriceSet']),
+      'price_set_id' => reset($this->ids['PriceSet']),
+      'price_' . $this->ids['PriceField']['default'] => $this->ids['PriceFieldValue']['donation'],
       'invoiceID' => '9a6f7b49358dc31c3604e463b225c5be',
       'email' => 'admin@example.com',
       'currencyID' => 'USD',
@@ -1697,7 +1622,6 @@ Paid By: Check',
       'amount' => 10,
       'tax_amount' => NULL,
       'is_pay_later' => 1,
-      'is_quick_config' => 1,
     ];
     $form->submit($form->_params);
 
@@ -1711,7 +1635,7 @@ Paid By: Check',
     $this->contributionDelete($contribution['id']);
 
     //Choose Membership Priceset
-    $form->_params["price_{$this->_ids['price_field'][0]}"] = $this->_ids['price_field_value'][0];
+    $form->_params["price_{$this->ids['PriceField']['default']}"] = $this->ids['PriceFieldValue']['one_term_membership'];
     $form->_params['amount'] = 20;
     $form->submit($form->_params);
 
@@ -1732,26 +1656,22 @@ Paid By: Check',
   /**
    * Test no warnings or errors during preProcess when editing.
    */
-  public function testPreProcessContributionEdit() {
+  public function testPreProcessContributionEdit(): void {
     // Simulate a contribution in pending status
-    $contribution = $this->callAPISuccess(
+    $contribution = $this->createTestEntity(
       'Contribution',
-      'create',
-      array_merge($this->_params, ['contribution_status_id' => 'Pending'])
+      array_merge($this->_params, ['contribution_status_id:name' => 'Pending'])
     );
 
     // set up the form to edit the contribution and call preProcess
     $form = $this->getFormObject('CRM_Contribute_Form_Contribution');
-    $_REQUEST['cid'] = $this->_individualId;
+    $_REQUEST['cid'] = $this->ids['Contact'][0];
     $_REQUEST['id'] = $contribution['id'];
     $form->_action = CRM_Core_Action::UPDATE;
     $form->preProcess();
 
-    // Check something while we're here
+    // Check something while we're here.
     $this->assertEquals($contribution['id'], $form->_values['contribution_id']);
-
-    unset($_REQUEST['cid']);
-    unset($_REQUEST['id']);
   }
 
   /**
@@ -1784,7 +1704,7 @@ Paid By: Check',
    * @param array $input
    * @param array $expectedFormatted
    */
-  public function testAdditionalInfoPostProcessCommon(array $input, array $expectedFormatted) {
+  public function testAdditionalInfoPostProcessCommon(array $input, array $expectedFormatted): void {
     $formatted = [];
     $dummy = new CRM_Contribute_Form_AdditionalInfo();
     CRM_Contribute_Form_AdditionalInfo::postProcessCommon($input, $formatted, $dummy);
@@ -1792,15 +1712,16 @@ Paid By: Check',
   }
 
   /**
-   * Dataprovider for testAdditionalInfoPostProcessCommon
+   * Data provider for testAdditionalInfoPostProcessCommon.
+   *
    * @return array
    */
   public function additionalInfoProvider(): array {
     return [
       'no-date' => [
         'input' => [
-          'qfKey' => 'CRMContributeFormContributionu2pbzqqmz74oscck4ss4osccw4wgccc884wkk4ws0o8wgss4w_8953',
-          'entryURL' => 'http://example.org/civicrm/contact/view/contribution?reset=1&amp;action=add&amp;cid=1&amp;context=contribution',
+          'qfKey' => 'CRMContributeFormContribution1u2pbzqqmz74oscck4ss4osccw4wgccc884wkk4ws0o8wgss4w_8953',
+          'entryURL' => 'https://example.org/civicrm/contact/view/contribution?reset=1&amp;action=add&amp;cid=1&amp;context=contribution',
           'check_number' => '',
           'frequency_interval' => '1',
           'hidden_AdditionalDetail' => '1',
@@ -1810,7 +1731,7 @@ Paid By: Check',
           'trxn_id' => '',
           'from_email_address' => '2',
           'contribution_status_id' => '1',
-          // This is unused here but is iffy to put in a dataprovider
+          // This is unused here but is iffy to put in a Data Provider
           'receive_date' => '2021-01-14 11:12:13',
           'receipt_date' => '',
           'cancel_date' => '',
@@ -1879,8 +1800,8 @@ Paid By: Check',
 
       'date-no-time' => [
         'input' => [
-          'qfKey' => 'CRMContributeFormContributionu2pbzqqmz74oscck4ss4osccw4wgccc884wkk4ws0o8wgss4w_8953',
-          'entryURL' => 'http://example.org/civicrm/contact/view/contribution?reset=1&amp;action=add&amp;cid=1&amp;context=contribution',
+          'qfKey' => 'abc',
+          'entryURL' => 'https://example.org/civicrm/contact/view/contribution?reset=1&amp;action=add&amp;cid=1&amp;context=contribution',
           'id' => '40',
           'frequency_interval' => '1',
           'hidden_AdditionalDetail' => '1',
@@ -1895,7 +1816,6 @@ Paid By: Check',
           'financial_type_id' => '1',
           'from_email_address' => '2',
           'contribution_status_id' => '1',
-          // This is unused here but is iffy to put in a dataprovider
           'receive_date' => '2021-01-14 11:12:13',
           'receipt_date' => '',
           'cancel_date' => '',
@@ -1962,8 +1882,8 @@ Paid By: Check',
 
       'date-and-time' => [
         'input' => [
-          'qfKey' => 'CRMContributeFormContributionu2pbzqqmz74oscck4ss4osccw4wgccc884wkk4ws0o8wgss4w_8953',
-          'entryURL' => 'http://example.org/civicrm/contact/view/contribution?reset=1&amp;action=add&amp;cid=1&amp;context=contribution',
+          'qfKey' => 'abc',
+          'entryURL' => 'https://example.org/civicrm/contact/view/contribution?reset=1&amp;action=add&amp;cid=1&amp;context=contribution',
           'id' => '40',
           'frequency_interval' => '1',
           'hidden_AdditionalDetail' => '1',
@@ -1978,7 +1898,6 @@ Paid By: Check',
           'financial_type_id' => '1',
           'from_email_address' => '2',
           'contribution_status_id' => '1',
-          // This is unused here but is iffy to put in a dataprovider
           'receive_date' => '2021-01-14 11:12:13',
           'receipt_date' => '',
           'cancel_date' => '',
@@ -2048,9 +1967,9 @@ Paid By: Check',
   /**
    * Test formRule
    */
-  public function testContributionFormRule() {
+  public function testContributionFormRule(): void {
     $fields = [
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact'][0],
       'financial_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'),
       'currency' => 'USD',
       'total_amount' => '10',
@@ -2111,11 +2030,11 @@ Paid By: Check',
    * Check that formRule validates you can only have one contribution with a
    * given trxn_id.
    */
-  public function testContributionFormRuleDuplicateTrxn() {
-    $contribution = $this->callAPISuccess('Contribution', 'create', array_merge($this->_params, ['trxn_id' => '1234']));
+  public function testContributionFormRuleDuplicateTrxn(): void {
+    $this->createTestEntity('Contribution', array_merge($this->_params, ['trxn_id' => '1234']));
 
     $fields = [
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact'][0],
       'financial_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'),
       'currency' => 'USD',
       'total_amount' => '10',
@@ -2182,6 +2101,7 @@ Paid By: Check',
   protected function getContributionForm(array $formValues): CRM_Contribute_Form_Contribution {
     /** @var CRM_Contribute_Form_Contribution $form */
     $form = $this->getFormObject('CRM_Contribute_Form_Contribution', $formValues);
+    $form->preProcess();
     $form->buildForm();
     return $form;
   }
@@ -2203,23 +2123,25 @@ Paid By: Check',
   /**
    * Submit the contribution form.
    *
-   * @param array $formValues
+   * @param array $submittedValues
    * @param int|null $contributionID
    * @param string|null $cardMode
    *   Either 'test' or 'live' or NULL
    * @param int|null $pledgePaymentID
+   *
+   * @return \Civi\Test\FormWrapper
    */
-  protected function submitContributionForm(array $formValues, ?int $contributionID = NULL, ?string $cardMode = NULL, ?int $pledgePaymentID = NULL): void {
-    if ($contributionID) {
-      $_REQUEST['action'] = 'update';
-      $_REQUEST['id'] = $contributionID;
-    }
-    if ($cardMode) {
-      $_REQUEST['mode'] = $cardMode;
-    }
-    $_REQUEST['ppid'] = $pledgePaymentID;
-    $form = $this->getContributionForm($formValues);
-    $form->postProcess();
+  protected function submitContributionForm(array $submittedValues, ?int $contributionID = NULL, ?string $cardMode = NULL, ?int $pledgePaymentID = NULL): FormWrapper {
+    $form = $this->getTestForm('CRM_Contribute_Form_Contribution', $submittedValues,
+      [
+        'id' => $contributionID,
+        'mode' => $cardMode,
+        'action' => $contributionID ? 'update' : 'add',
+        'ppid' => $pledgePaymentID,
+      ]
+    );
+    $form->processForm();
+    return $form;
   }
 
 }

@@ -32,11 +32,11 @@ class CRM_Case_XMLRepository {
   protected $hookCache = NULL;
 
   /**
-   * Symbolic names of case-types.
+   * Override case types, only used by unit tests
    *
    * @var array|null
    */
-  protected $allCaseTypes = NULL;
+  protected $unitTestCaseTypes = NULL;
 
   /**
    * @param bool $fresh
@@ -52,18 +52,18 @@ class CRM_Case_XMLRepository {
   public function flush() {
     $this->xml = [];
     $this->hookCache = NULL;
-    $this->allCaseTypes = NULL;
+    $this->unitTestCaseTypes = NULL;
     CRM_Core_DAO::$_dbColumnValueCache = [];
   }
 
   /**
    * Class constructor.
    *
-   * @param array $allCaseTypes
+   * @param array $unitTestCaseTypes
    * @param array $xml
    */
-  public function __construct($allCaseTypes = NULL, $xml = []) {
-    $this->allCaseTypes = $allCaseTypes;
+  public function __construct($unitTestCaseTypes = NULL, $xml = []) {
+    $this->unitTestCaseTypes = $unitTestCaseTypes;
     $this->xml = $xml;
   }
 
@@ -215,13 +215,11 @@ class CRM_Case_XMLRepository {
   }
 
   /**
-   * @return array<string> symbolic names of case-types
+   * @return string[]
+   *   symbolic names of case-types
    */
   public function getAllCaseTypes() {
-    if ($this->allCaseTypes === NULL) {
-      $this->allCaseTypes = CRM_Case_PseudoConstant::caseType("name");
-    }
-    return $this->allCaseTypes;
+    return $this->unitTestCaseTypes ?? CRM_Case_PseudoConstant::caseType("name");
   }
 
   /**

@@ -7,12 +7,8 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{* Template for "Change Case Type" activities *}
+{* Template for "Change Case Start Date" activities *}
    <div class="crm-block crm-form-block crm-case-changecasestartdate-form-block">
-    <tr class="crm-case-changecasestartdate-form-block-case_type_id">
-  <td class="label">{$form.case_type_id.label}</td>
-  <td>{$form.case_type_id.html}</td>
-    </tr>
     <tr class="crm-case-changecasestartdate-form-block-current_start_date">
   <td class="label">{ts}Current Start Date{/ts}</td>
         <td>{$current_start_date|crmDate}</td>

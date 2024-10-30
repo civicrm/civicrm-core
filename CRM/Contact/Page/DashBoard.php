@@ -32,7 +32,7 @@ class CRM_Contact_Page_DashBoard extends CRM_Core_Page {
     $contentPlacement = CRM_Utils_Hook::DASHBOARD_BELOW;
     $html = CRM_Utils_Hook::dashboard($contactID, $contentPlacement);
     if (is_array($html)) {
-      $this->assign_by_ref('hookContent', $html);
+      $this->assign('hookContent', $html);
       $this->assign('hookContentPlacement', $contentPlacement);
     }
 

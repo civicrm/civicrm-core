@@ -15,15 +15,14 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
-  const
-    NUM_ROWS_TO_INSERT = 100;
+  private const NUM_ROWS_TO_INSERT = 100;
 
   /**
    * Form fields declared for this datasource.
    *
    * @var string[]
    */
-  protected $submittableFields = ['skipColumnHeader', 'uploadField'];
+  protected $submittableFields = ['skipColumnHeader', 'uploadFile', 'fieldSeparator'];
 
   /**
    * Provides information about the data source.
@@ -32,7 +31,10 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
    *   collection of info about this data source
    */
   public function getInfo(): array {
-    return ['title' => ts('Comma-Separated Values (CSV)')];
+    return [
+      'title' => ts('Comma-Separated Values (CSV)'),
+      'template' => 'CRM/Contact/Import/Form/CSV.tpl',
+    ];
   }
 
   /**
@@ -41,29 +43,24 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
    * It should add all fields necessary to get the data
    * uploaded to the temporary table in the DB.
    *
-   * @param CRM_Core_Form $form
-   *
-   * @throws \CRM_Core_Exception
+   * @param CRM_Contact_Import_Form_DataSource|\CRM_Import_Form_DataSourceConfig $form
    */
-  public function buildQuickForm(&$form) {
+  public function buildQuickForm(\CRM_Import_Forms $form): void {
     $form->add('hidden', 'hidden_dataSource', 'CRM_Import_DataSource_CSV');
 
-    $uploadFileSize = CRM_Utils_Number::formatUnitSize(Civi::settings()->get('maxFileSize') . 'm', TRUE);
-    //Fetch uploadFileSize from php_ini when $config->maxFileSize is set to "no limit".
-    if (empty($uploadFileSize)) {
-      $uploadFileSize = CRM_Utils_Number::formatUnitSize(ini_get('upload_max_filesize'), TRUE);
-    }
-    $uploadSize = round(($uploadFileSize / (1024 * 1024)), 2);
-    $form->assign('uploadSize', $uploadSize);
+    $maxFileSizeMegaBytes = CRM_Utils_File::getMaxFileSize();
+    $maxFileSizeBytes = $maxFileSizeMegaBytes * 1024 * 1024;
+    $form->assign('uploadSize', $maxFileSizeMegaBytes);
     $form->add('File', 'uploadFile', ts('Import Data File'), NULL, TRUE);
-    $form->setMaxFileSize($uploadFileSize);
+    $form->add('text', 'fieldSeparator', ts('Import Field Separator'), ['size' => 2], TRUE);
+    $form->setMaxFileSize($maxFileSizeBytes);
     $form->addRule('uploadFile', ts('File size should be less than %1 MBytes (%2 bytes)', [
-      1 => $uploadSize,
-      2 => $uploadFileSize,
-    ]), 'maxfilesize', $uploadFileSize);
+      1 => $maxFileSizeMegaBytes,
+      2 => $maxFileSizeBytes,
+    ]), 'maxfilesize', $maxFileSizeBytes);
     $form->addRule('uploadFile', ts('Input file must be in CSV format'), 'utf8File');
     $form->addRule('uploadFile', ts('A valid file must be uploaded.'), 'uploadedfile');
-
+    $form->setDataSourceDefaults($this->getDefaultValues());
     $form->addElement('checkbox', 'skipColumnHeader', ts('First row contains column headers'));
   }
 
@@ -80,7 +77,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
     );
     $this->addTrackingFieldsToTable($result['import_table_name']);
 
-    $this->updateUserJobMetadata('DataSource', [
+    $this->updateUserJobDataSource([
       'table_name' => $result['import_table_name'],
       'column_headers' => $result['column_headers'],
       'number_of_columns' => $result['number_of_columns'],
@@ -127,56 +124,14 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
     if ($headers) {
       //need to get original headers.
       $result['column_headers'] = $firstrow;
-
-      $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
-      $columns = array_map($strtolower, $firstrow);
-      $columns = array_map('trim', $columns);
-      $columns = str_replace(' ', '_', $columns);
-      $columns = preg_replace('/[^a-z_]/', '', $columns);
-
-      // need to take care of null as well as duplicate col names.
-      $duplicateColName = FALSE;
-      if (count($columns) != count(array_unique($columns))) {
-        $duplicateColName = TRUE;
-      }
-
-      // need to truncate values per mysql field name length limits
-      // mysql allows 64, but we need to account for appending colKey
-      // CRM-9079
-      foreach ($columns as $colKey => & $colName) {
-        if (strlen($colName) > 58) {
-          $colName = substr($colName, 0, 58);
-        }
-      }
-
-      if (in_array('', $columns) || $duplicateColName) {
-        foreach ($columns as $colKey => & $colName) {
-          if (!$colName) {
-            $colName = "col_$colKey";
-          }
-          elseif ($duplicateColName) {
-            $colName .= "_$colKey";
-          }
-        }
-      }
-
-      // CRM-4881: we need to quote column names, as they may be MySQL reserved words
-      foreach ($columns as & $column) {
-        $column = "`$column`";
-      }
+      $columns = $this->getColumnNamesFromHeaders($firstrow);
     }
     else {
-      $columns = [];
-      foreach ($firstrow as $i => $_) {
-        $columns[] = "column_$i";
-      }
+      $columns = $this->getColumnNamesForUnnamedColumns($firstrow);
       $result['column_headers'] = $columns;
     }
 
-    $table = CRM_Utils_SQL_TempTable::build()->setDurable();
-    $tableName = $table->getName();
-    CRM_Core_DAO::executeQuery("DROP TABLE IF EXISTS $tableName");
-    $table->createWithColumns(implode(' text, ', $columns) . ' text');
+    $tableName = $this->createTempTableFromColumns($columns);
 
     $numColumns = count($columns);
 
@@ -210,7 +165,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
       $first = FALSE;
 
       // CRM-17859 Trim non-breaking spaces from columns.
-      $row = array_map(['CRM_Import_DataSource_CSV', 'trimNonBreakingSpaces'], $row);
+      $row = array_map([__CLASS__, 'trimNonBreakingSpaces'], $row);
       $row = array_map(['CRM_Core_DAO', 'escapeString'], $row);
       $sql .= "('" . implode("', '", $row) . "')";
       $count++;
@@ -237,27 +192,17 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
   }
 
   /**
-   * Trim non-breaking spaces in a multibyte-safe way.
-   * See also dev/core#2127 - avoid breaking strings ending in à or any other
-   * unicode character sharing the same 0xA0 byte as a non-breaking space.
+   * Get default values for csv dataSource fields.
    *
-   * @param string $string
-   * @return string The trimmed string
+   * @return array
    */
-  public static function trimNonBreakingSpaces(string $string): string {
-    $encoding = mb_detect_encoding($string, NULL, TRUE);
-    if ($encoding === FALSE) {
-      // This could mean a couple things. One is that the string is
-      // ASCII-encoded but contains a non-breaking space, which causes
-      // php to fail to detect the encoding. So let's just do what we
-      // did before which works in that situation and is at least no
-      // worse in other situations.
-      return trim($string, chr(0xC2) . chr(0xA0));
-    }
-    elseif ($encoding !== 'UTF-8') {
-      $string = mb_convert_encoding($string, 'UTF-8', [$encoding]);
-    }
-    return preg_replace("/^(\u{a0})+|(\u{a0})+$/", '', $string);
+  public function getDefaultValues(): array {
+    return [
+      'fieldSeparator' => CRM_Core_Config::singleton()->fieldSeparator,
+      'skipColumnHeader' => 1,
+      'template' => 'CRM/Contact/Import/Form/CSV.tpl',
+    ];
+
   }
 
 }

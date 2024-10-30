@@ -19,6 +19,7 @@
 
 namespace api\v4\Action;
 
+use Civi\Api4\Activity;
 use Civi\Api4\Contact;
 use api\v4\Api4TestBase;
 use Civi\Test\TransactionalInterface;
@@ -28,7 +29,7 @@ use Civi\Test\TransactionalInterface;
  */
 class ResultTest extends Api4TestBase implements TransactionalInterface {
 
-  public function testJsonSerialize() {
+  public function testJsonSerialize(): void {
     $result = Contact::getFields(FALSE)->addWhere('type', '=', 'Field')->execute();
     $json = json_encode($result);
     $this->assertStringStartsWith('[{"', $json);
@@ -42,7 +43,7 @@ class ResultTest extends Api4TestBase implements TransactionalInterface {
    * @see https://issues.civicrm.org/jira/browse/CRM-11532
    * @see https://lab.civicrm.org/dev/core/-/issues/1328
    */
-  public function testNoDataCorruptionThroughEncoding() {
+  public function testNoDataCorruptionThroughEncoding(): void {
 
     $original = 'hello < you';
     $result = Contact::create(FALSE)
@@ -66,6 +67,29 @@ class ResultTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals($original, $result['first_name'],
       "The value returned from Contact.get is different to the value sent."
     );
+  }
+
+  public function testRekey(): void {
+    $result = Activity::getFields(FALSE)
+      ->execute()->indexBy('name');
+    $this->assertEquals('id', $result['id']['name']);
+    $this->assertEquals('String', $result['subject']['data_type']);
+
+    $result->rekey(['name' => 'theFieldName', 'data_type' => 'theDataType']);
+
+    $this->assertEquals('id', $result['id']['theFieldName']);
+    $this->assertEquals('String', $result['subject']['theDataType']);
+
+    $result->rekey(['CRM_Utils_String', 'convertStringToSnakeCase']);
+    $this->assertEquals('id', $result['id']['the_field_name']);
+    $this->assertEquals('String', $result['subject']['the_data_type']);
+    // Other keys not in map haven't been affected
+    $this->assertEquals('Text', $result['subject']['input_type']);
+    // Original versions of remapped keys have been removed
+    $this->assertArrayNotHasKey('name', $result['id']);
+    $this->assertArrayNotHasKey('theFieldName', $result['id']);
+    $this->assertArrayNotHasKey('data_type', $result['subject']);
+    $this->assertArrayNotHasKey('theDataType', $result['subject']);
   }
 
   /**

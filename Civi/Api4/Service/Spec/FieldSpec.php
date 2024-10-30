@@ -81,9 +81,19 @@ class FieldSpec {
   public $readonly = FALSE;
 
   /**
+   * @var bool
+   */
+  public $deprecated = FALSE;
+
+  /**
    * @var callable[]
    */
   public $outputFormatters;
+
+  /**
+   * @var string[]
+   */
+  public array $usage = [];
 
   /**
    * @param string $name
@@ -119,7 +129,7 @@ class FieldSpec {
    *
    * @return $this
    */
-  public function setEntity($entity) {
+  public function setEntity(string $entity) {
     $this->entity = $entity;
 
     return $this;
@@ -128,14 +138,14 @@ class FieldSpec {
   /**
    * @return string
    */
-  public function getEntity() {
+  public function getEntity(): ?string {
     return $this->entity;
   }
 
   /**
    * @return bool
    */
-  public function getNullable() {
+  public function getNullable(): bool {
     return $this->nullable;
   }
 
@@ -153,7 +163,7 @@ class FieldSpec {
   /**
    * @return bool
    */
-  public function isRequired() {
+  public function isRequired(): bool {
     return $this->required;
   }
 
@@ -162,7 +172,7 @@ class FieldSpec {
    *
    * @return $this
    */
-  public function setRequired($required) {
+  public function setRequired(bool $required) {
     $this->required = $required;
 
     return $this;
@@ -171,16 +181,16 @@ class FieldSpec {
   /**
    * @return string
    */
-  public function getRequiredIf() {
+  public function getRequiredIf(): ?string {
     return $this->requiredIf;
   }
 
   /**
-   * @param string $requiredIf
+   * @param string|null $requiredIf
    *
    * @return $this
    */
-  public function setRequiredIf($requiredIf) {
+  public function setRequiredIf(?string $requiredIf) {
     $this->requiredIf = $requiredIf;
 
     return $this;
@@ -239,10 +249,41 @@ class FieldSpec {
    * @param bool $readonly
    * @return $this
    */
-  public function setReadonly($readonly) {
-    $this->readonly = (bool) $readonly;
+  public function setReadonly(bool $readonly) {
+    $this->readonly = $readonly;
 
     return $this;
+  }
+
+  /**
+   * @return bool
+   */
+  public function getReadonly(): bool {
+    return $this->readonly;
+  }
+
+  /**
+   * @param bool $deprecated
+   * @return $this
+   */
+  public function setDeprecated(bool $deprecated) {
+    $this->deprecated = $deprecated;
+
+    return $this;
+  }
+
+  /**
+   * @return string[]
+   */
+  public function getUsage(): array {
+    return $this->usage;
+  }
+
+  /**
+   * @param string[] $usage
+   */
+  public function setUsage(array $usage): void {
+    $this->usage = $usage;
   }
 
 }

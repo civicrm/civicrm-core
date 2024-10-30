@@ -83,6 +83,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
+    $this->assign('entityInClassFormat', 'setting');
 
     $this->addButtons([
       [

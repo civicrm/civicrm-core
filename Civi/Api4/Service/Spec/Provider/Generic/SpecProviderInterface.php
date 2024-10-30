@@ -14,6 +14,9 @@ namespace Civi\Api4\Service\Spec\Provider\Generic;
 
 use Civi\Api4\Service\Spec\RequestSpec;
 
+/**
+ * @serviceTags spec_provider
+ */
 interface SpecProviderInterface {
 
   /**
@@ -29,6 +32,6 @@ interface SpecProviderInterface {
    *
    * @return bool
    */
-  public function applies($entity, $action);
+  public function applies(string $entity, string $action);
 
 }

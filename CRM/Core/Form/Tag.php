@@ -19,7 +19,6 @@
  * This class generates form element for free tag widget.
  */
 class CRM_Core_Form_Tag {
-  public $_entityTagValues;
 
   /**
    * Build tag widget if correct parent is passed
@@ -46,10 +45,7 @@ class CRM_Core_Form_Tag {
     $form->assign('isTagset', FALSE);
     $mode = NULL;
 
-    foreach ($parentNames as &$parentNameItem) {
-      // get the parent id for tag list input for keyword
-      $parentId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $parentNameItem, 'id', 'name');
-
+    foreach ($parentNames as $parentId => $parentNameItem) {
       // check if parent exists
       if ($parentId) {
         $tagsetItem = $tagsetElementName . 'parentId_' . $parentId;
@@ -92,7 +88,7 @@ class CRM_Core_Form_Tag {
       $form->_tagsetInfo = $tagset;
       $form->assign("tagsetType", $mode);
       // Merge this tagset info with possibly existing info in the template
-      $tagsetInfo = (array) $form->get_template_vars("tagsetInfo");
+      $tagsetInfo = (array) $form->getTemplateVars("tagsetInfo");
       if (empty($tagsetInfo[$mode])) {
         $tagsetInfo[$mode] = [];
       }

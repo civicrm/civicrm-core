@@ -38,7 +38,6 @@ class CRM_Case_Form_Task_PDF extends CRM_Case_Form_Task {
    */
   public function preProcess() {
     $this->preProcessPDF();
-    $this->skipOnHold = $this->skipDeceased = FALSE;
     parent::preProcess();
     $this->setContactIDs();
   }

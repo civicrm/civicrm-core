@@ -14,5 +14,5 @@
           <p>{ts}Are you sure you want to unhold email of selected contact(s)?.{/ts} {ts}This action cannot be undone.{/ts}</p>
       <p>{include file="CRM/Contact/Form/Task.tpl"}</p>
     </div>
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>
+<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location=''}</div>
 </div>

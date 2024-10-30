@@ -1,0 +1,13 @@
+<div af-fieldset="">
+  <div class="af-markup">
+    <div class="help">
+      {{:: ts('Financial accounts correspond to those in your accounting system.') }}
+      {{:: ts('The following are associated with financial accounts so that they can result in the proper double-entry transactions to export to your accounting system:') }}
+      <a ng-href="{{:: crmUrl('civicrm/admin/financial/financialType?reset=1') }}">{{:: ts('Financial types') }}</a>,
+      <a ng-href="{{:: crmUrl('civicrm/admin/options/payment_instrument?reset=1') }}">{{:: ts('payment methods') }}</a>,
+      {{:: ts('and') }}
+      <a ng-href="{{:: crmUrl('civicrm/admin/contribute/managePremiums?reset=1') }}">{{:: ts('contribution premiums.') }}</a>
+    </div>
+  </div>
+  <crm-search-display-table search-name="Administer_Financial_Accounts" display-name="Administer_Financial_Accounts_Table_1"></crm-search-display-table>
+</div>

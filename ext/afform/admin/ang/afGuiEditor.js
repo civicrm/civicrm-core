@@ -14,14 +14,25 @@
             evaluate(item['#children']);
             _.each(item, function(prop, key) {
               if (_.isString(prop) && !_.includes(doNotEval, key)) {
-                var str = _.trim(prop);
-                if (str[0] === '{' || str[0] === '[' || str.slice(0, 3) === 'ts(') {
-                  item[key] = $parse(str)({ts: CRM.ts('afform')});
+                if (looksLikeJs(prop)) {
+                  try {
+                    item[key] = $parse(prop)({ts: CRM.ts('afform')});
+                  } catch (e) {
+                  }
                 }
               }
             });
           }
         });
+      }
+
+      function looksLikeJs(str) {
+        str = _.trim(str);
+        let firstChar = str.charAt(0);
+        let lastChar = str.slice(-1);
+        return (firstChar === '{' && lastChar === '}') ||
+          (firstChar === '[' && lastChar === ']') ||
+          str.slice(0, 3) === 'ts(';
       }
 
       function getStyles(node) {
@@ -112,31 +123,27 @@
               CRM.afGuiEditor.blocks[block.directive_name] = block;
             }
           });
+          // Add behavior data
+          CRM.afGuiEditor.behaviors = CRM.afGuiEditor.behaviors || {};
+          _.extend(CRM.afGuiEditor.behaviors, data.behaviors);
+          // Add entities
           _.each(data.entities, function(entity, entityName) {
             if (!CRM.afGuiEditor.entities[entityName]) {
               CRM.afGuiEditor.entities[entityName] = entity;
             }
           });
+          // Combine entities with fields
           _.each(data.fields, function(fields, entityName) {
             if (CRM.afGuiEditor.entities[entityName]) {
               CRM.afGuiEditor.entities[entityName].fields = fields;
             }
           });
-          // Optimization - since contact fields are a combination of these three,
-          // the server doesn't send contact fields if sending contact-type fields
-          if ('Individual' in data.fields || 'Household' in data.fields || 'Organization' in data.fields) {
-            CRM.afGuiEditor.entities.Contact.fields = _.assign({},
-              (CRM.afGuiEditor.entities.Individual || {}).fields,
-              (CRM.afGuiEditor.entities.Household || {}).fields,
-              (CRM.afGuiEditor.entities.Organization || {}).fields
-            );
-          }
           _.each(data.search_displays, function(display) {
             CRM.afGuiEditor.searchDisplays[display['saved_search_id.name'] + (display.name ? '.' + display.name : '')] = display;
           });
         },
 
-        meta: CRM.afGuiEditor,
+        meta: _.extend(CRM.afGuiEditor, CRM.afAdmin),
 
         getEntity: function(entityName) {
           return CRM.afGuiEditor.entities[entityName];
@@ -203,6 +210,29 @@
             }
           });
           return indexBy ? _.indexBy(items, indexBy) : items;
+        },
+
+        // Recursively searches part of a form and returns all elements matching predicate
+        // Will recurse into block elements
+        // Will stop recursing when it encounters an element matching 'exclude'
+        getFormElements: function getFormElements(collection, predicate, exclude) {
+          var childMatches = [],
+            items = _.filter(collection, predicate),
+            isExcluded = exclude ? (_.isFunction(exclude) ? exclude : _.matches(exclude)) : _.constant(false);
+          function isIncluded(item) {
+            return !isExcluded(item);
+          }
+          _.each(_.filter(collection, isIncluded), function(item) {
+            if (_.isPlainObject(item) && item['#children']) {
+              childMatches = getFormElements(item['#children'], predicate, exclude);
+            } else if (item['#tag'] && item['#tag'] in CRM.afGuiEditor.blocks) {
+              childMatches = getFormElements(CRM.afGuiEditor.blocks[item['#tag']].layout, predicate, exclude);
+            }
+            if (childMatches.length) {
+              Array.prototype.push.apply(items, childMatches);
+            }
+          });
+          return items;
         },
 
         // Applies _.remove() to an item and its children

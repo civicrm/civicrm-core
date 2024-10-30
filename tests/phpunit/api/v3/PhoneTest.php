@@ -55,7 +55,7 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
   public function testCreatePhone($version) {
     $this->_apiversion = $version;
 
-    $result = $this->callAPIAndDocument('Phone', 'create', $this->_params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('Phone', 'create', $this->_params);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
 
@@ -75,7 +75,7 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
     $this->_apiversion = $version;
     $params = $this->_params;
     unset($params['location_type_id']);
-    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess($this->_entity, 'create', $params);
     $this->assertEquals(CRM_Core_BAO_LocationType::getDefault()->id, $result['values'][$result['id']]['location_type_id']);
     $this->callAPISuccess($this->_entity, 'delete', ['id' => $result['id']]);
   }
@@ -89,7 +89,7 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
     //create one
     $create = $this->callAPISuccess('phone', 'create', $this->_params);
 
-    $result = $this->callAPIAndDocument('phone', 'delete', ['id' => $create['id']], __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('phone', 'delete', ['id' => $create['id']]);
     $this->assertEquals(1, $result['count']);
     $get = $this->callAPISuccess('phone', 'get', [
       'id' => $create['id'],
@@ -111,7 +111,7 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
   /**
    * Test civicrm_phone_get with wrong params.
    */
-  public function testGetWrongParams() {
+  public function testGetWrongParams(): void {
     $this->callAPIFailure('Phone', 'Get', ['contact_id' => 'abc']);
     $this->callAPIFailure('Phone', 'Get', ['location_type_id' => 'abc']);
     $this->callAPIFailure('Phone', 'Get', ['phone_type_id' => 'abc']);
@@ -129,7 +129,7 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
       'contact_id' => $this->_params['contact_id'],
       'phone' => $phone['values'][$phone['id']]['phone'],
     ];
-    $result = $this->callAPIAndDocument('Phone', 'Get', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('Phone', 'Get', $params);
     $this->assertEquals($phone['values'][$phone['id']]['location_type_id'], $result['values'][$phone['id']]['location_type_id']);
     $this->assertEquals($phone['values'][$phone['id']]['phone_type_id'], $result['values'][$phone['id']]['phone_type_id']);
     $this->assertEquals($phone['values'][$phone['id']]['is_primary'], $result['values'][$phone['id']]['is_primary']);

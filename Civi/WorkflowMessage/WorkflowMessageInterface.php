@@ -14,6 +14,11 @@ namespace Civi\WorkflowMessage;
 interface WorkflowMessageInterface {
 
   /**
+   * @return string
+   */
+  public function getWorkflowName(): ?string;
+
+  /**
    * @return \Civi\WorkflowMessage\FieldSpec[]
    *   A list of field-specs that are used in the given format, keyed by their name in that format.
    *   If the implementation does not understand a specific format, return NULL.
@@ -21,14 +26,14 @@ interface WorkflowMessageInterface {
   public function getFields(): array;
 
   /**
-   * @param string $format
+   * @param string|null $format
    *   Ex: 'tplParams', 'tokenContext', 'modelProps', 'envelope'
    * @return array|null
    *   A list of field-values that are used in the given format, keyed by their name in that format.
    *   If the implementation does not understand a specific format, return NULL.
    * @see \Civi\WorkflowMessage\Traits\ReflectiveWorkflowTrait::export()
    */
-  public function export(string $format = NULL): ?array;
+  public function export(?string $format = NULL): ?array;
 
   /**
    * Import values from some scope.
@@ -72,6 +77,13 @@ interface WorkflowMessageInterface {
    * @throws \CRM_Core_Exception
    */
   public function assertValid($strict = FALSE);
+
+  /**
+   * Get the locale in use, if set.
+   *
+   * @return string|null
+   */
+  public function getLocale(): ?string;
 
   /**
    * Render a message template.

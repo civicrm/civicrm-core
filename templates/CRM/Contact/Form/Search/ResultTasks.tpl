@@ -13,15 +13,11 @@
 {elseif $context EQ 'amtg'}{crmURL p='civicrm/contact/search/advanced' q="context=amtg&amtgID=`$group.id`&reset=1&force=1"}
 {else}{crmURL p='civicrm/contact/search/advanced' q="reset=1"}
 {/if}{/capture}
-{capture assign=searchBuilderURL}{crmURL p='civicrm/contact/search/builder' q="reset=1"}{/capture}
 
  <div id="search-status">
   <div class="float-right right">
     {if $action eq 256}
-        <a href="{$advSearchURL}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}Advanced Search{/ts}</a><br />
-        {if $context eq 'search'} {* Only show Search Builder link for basic search. *}
-            <a href="{$searchBuilderURL}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}Search Builder{/ts}</a><br />
-        {/if}
+        <a href="{$advSearchURL}">{ts}Advanced Search{/ts}</a><br />
         {if $context eq 'smog'}
             {help id="id-smog-criteria" group_title=$group.title}
         {elseif $context eq 'amtg'}
@@ -29,32 +25,28 @@
         {else}
             {help id="id-basic-criteria"}
         {/if}
-    {elseif $action eq 512}
-        <a href="{$searchBuilderURL}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}Search Builder{/ts}</a><br />
     {elseif $action eq 8192}
-        <a href="{$advSearchURL}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}Advanced Search{/ts}</a><br />
+        <a href="{$advSearchURL}">{ts}Advanced Search{/ts}</a><br />
     {/if}
   </div>
-
+  <a href="#" class="crm-selection-reset crm-hover-button float-right"><i class="crm-i fa-times-circle-o" aria-hidden="true"></i> {ts}Reset all selections{/ts}</a>
   <table class="form-layout-compressed">
-  <tr>
-    <td style="width: 30%;">
-        {if !empty($savedSearch.name)}{$savedSearch.name} ({ts}smart group{/ts}) - {/if}
-        {ts count=$pager->_totalItems plural='%count Contacts'}%count Contact{/ts}
-    </td>
-
-    {* Search criteria are passed to tpl in the $qill array *}
-    <td class="nowrap">
-    {if $qill}
-      {include file="CRM/common/displaySearchCriteria.tpl"}
+    {if !empty($savedSearch.name)}
+      <tr>
+        <td colspan="2">{$savedSearch.name} ({ts}Smart Group{/ts})</td>
+      </tr>
     {/if}
-    </td>
-  </tr>
+    {* Search criteria are passed to tpl in the $qill array *}
+   {if $qill}
+     <tr>
+       <td class="nowrap">{include file="CRM/common/displaySearchCriteria.tpl"}</td>
+     </tr>
+   {/if}
   <tr>
     <td> {ts}Select Records{/ts}:</td>
     <td class="nowrap">
       {assign var="checked" value=$selectedContactIds|@count}
-      {$form.radio_ts.ts_all.html} <label for="{$ts_all_id}">{ts count=$pager->_totalItems plural='All %count records'}The found record{/ts}</label>
+      {$form.radio_ts.ts_all.html} <label for="{$ts_all_id}">{ts count=$pager->_totalItems plural="All %count records"}The found record{/ts}</label>
       {if $pager->_totalItems > 1}
         &nbsp; {$form.radio_ts.ts_sel.html} <label for="{$ts_sel_id}">{ts 1="<span>$checked</span>"}%1 Selected records only{/ts}</label>
       {/if}

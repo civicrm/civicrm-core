@@ -19,7 +19,7 @@ class CRM_Case_BAO_QueryTest extends CiviCaseTestCase {
    *  - case_activity_status_id
    *  - case_activity_medium_id
    */
-  public function testWhereClauseSingle() {
+  public function testWhereClauseSingle(): void {
     $params = [
       0 => [
         0 => 'case_activity_type',
@@ -58,7 +58,7 @@ class CRM_Case_BAO_QueryTest extends CiviCaseTestCase {
   /**
    * Test the qill for a find cases search.
    */
-  public function testFindCasesQuery() {
+  public function testFindCasesQuery(): void {
     $params = [
       [
         0 => 'case_type_id',

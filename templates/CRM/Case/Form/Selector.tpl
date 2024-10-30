@@ -12,7 +12,7 @@
 <table class="caseSelector row-highlight">
   <tr class="columnheader">
 
-  {if ! $single and $context eq 'Search' }
+  {if ! $single and $context eq 'Search'}
     <th scope="col" title="{ts}Select rows{/ts}">{$form.toggleSelect.html}</th>
   {/if}
 
@@ -33,7 +33,7 @@
   {counter start=0 skip=1 print=false}
   {foreach from=$rows item=row}
 
-  <tr id='rowid{$list}{$row.case_id}' class="{cycle values="odd-row,even-row"} crm-case crm-case-status_{$row.case_status_id} crm-case-type_{$row.case_type_id}">
+  <tr id='rowid{$row.case_id}' class="{cycle values="odd-row,even-row"} crm-case crm-case-status_{$row.case_status_id} crm-case-type_{$row.case_type_id}">
     {if $context eq 'Search' && !$single}
         {assign var=cbName value=$row.checkbox}
         <td>{$form.$cbName.html}</td>
@@ -55,11 +55,11 @@
   {$row.case_recent_activity_type}<br />{$row.case_recent_activity_date|crmDate}{else}---{/if}</td>
     <td class="crm-case-case_scheduled_activity_type">{if $row.case_scheduled_activity_type}
   {$row.case_scheduled_activity_type}<br />{$row.case_scheduled_activity_date|crmDate}{else}---{/if}</td>
-    <td>{$row.action|replace:'xx':$row.case_id}{$row.moreActions|replace:'xx':$row.case_id}</td>
+    <td>{$row.action|replace:'xx':$row.case_id}</td>
   {/foreach}
 
     {* Dashboard only lists 10 most recent cases. *}
-    {if $context EQ 'dashboard' and $limit and $pager->_totalItems GT $limit }
+    {if $context EQ 'dashboard' and $limit and $pager->_totalItems GT $limit}
       <tr class="even-row">
         <td colspan="10"><a href="{crmURL p='civicrm/case/search' q='reset=1'}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}Find more cases{/ts}... </a></td>
       </tr>

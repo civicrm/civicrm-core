@@ -1,5 +1,0 @@
-{
-  "title": "OAuth2 Client Administration",
-  "server_route": "civicrm/admin/oauth",
-  "permission": "manage OAuth client"
-}

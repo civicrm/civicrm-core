@@ -36,19 +36,19 @@ class CRM_Contact_Page_View_Vcard extends CRM_Contact_Page_View {
     $ids = [];
 
     $params['id'] = $params['contact_id'] = $this->_contactId;
-    $contact = CRM_Contact_BAO_Contact::retrieve($params, $defaults, $ids);
+    CRM_Contact_BAO_Contact::retrieve($params, $defaults, $ids);
 
     // now that we have the contact's data - let's build the vCard
     // TODO: non-US-ASCII support (requires changes to the Contact_Vcard_Build class)
-    $vcardNames = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', ['labelColumn' => 'vcard_name']);
+    $vcardNames = CRM_Core_BAO_Address::buildOptions('location_type_id', 'abbreviate');
     $vcard = new Contact_Vcard_Build('2.1');
 
     if ($defaults['contact_type'] == 'Individual') {
-      $vcard->setName(CRM_Utils_Array::value('last_name', $defaults),
-        CRM_Utils_Array::value('first_name', $defaults),
-        CRM_Utils_Array::value('middle_name', $defaults),
-        CRM_Utils_Array::value('prefix', $defaults),
-        CRM_Utils_Array::value('suffix', $defaults)
+      $vcard->setName($defaults['last_name'] ?? NULL,
+        $defaults['first_name'] ?? NULL,
+        $defaults['middle_name'] ?? NULL,
+        $defaults['prefix'] ?? NULL,
+        $defaults['suffix'] ?? NULL
       );
       $organizationName = $defaults['organization_name'] ?? NULL;
       if ($organizationName !== NULL) {

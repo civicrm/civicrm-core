@@ -24,9 +24,6 @@
         </div>
       {/if}
     {else}
-      {if $statusProfile EQ 1} {* Update Participant Status in batch task *}
-        <div class="status">{$status}</div>
-      {/if}
       {ts}Update field values for each participant as needed. To set a field to the same value for ALL rows, enter that value for the first participation and then click the
         <strong>Copy icon</strong>
         (next to the column title).{/ts}
@@ -60,23 +57,21 @@
                 {* CRM-19860 Copied from templates/CRM/Contact/Form/Task/Batch.tpl *}
                 {if $field.options_per_line}
                   <td class="compressed">
-                    {assign var="count" value="1"}
+                    {assign var="count" value=1}
                     {strip}
                       <table class="form-layout-compressed">
                       <tr>
                         {* sort by fails for option per line. Added a variable to iterate through the element array*}
-                        {assign var="index" value="1"}
                         {foreach name=optionOuter key=optionKey item=optionItem from=$form.field.$pid.$n}
-                          {if $index < 10}
-                            {assign var="index" value=`$index+1`}
-                          {else}
+                          {* There are both numeric and non-numeric keys mixed in here, where the non-numeric are metadata that aren't arrays with html members. *}
+                          {if is_array($optionItem) && array_key_exists('html', $optionItem)}
                             <td class="labels font-light">{$form.field.$pid.$n.$optionKey.html}</td>
                             {if $count == $field.options_per_line}
                             </tr>
                             <tr>
-                              {assign var="count" value="1"}
+                              {assign var="count" value=1}
                               {else}
-                              {assign var="count" value=`$count+1`}
+                              {assign var="count" value=$count+1}
                             {/if}
                           {/if}
                         {/foreach}
@@ -93,7 +88,7 @@
            </tr>
          </table>
 <div class="crm-submit-buttons">
-{if $fields}{$form._qf_Batch_refresh.html}{/if}{include file="CRM/common/formButtons.tpl"}
+{if $fields}{$form._qf_Batch_refresh.html}{/if}{include file="CRM/common/formButtons.tpl" location=''}
 </div>
 </div>
 

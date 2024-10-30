@@ -30,12 +30,12 @@ class CRM_Event_Form_SearchEvent extends CRM_Core_Form {
     $defaults = [];
     $defaults['eventsByDates'] = 0;
 
-    $this->_showHide = new CRM_Core_ShowHideBlocks();
+    $showHide = new CRM_Core_ShowHideBlocks();
     if (empty($defaults['eventsByDates'])) {
-      $this->_showHide->addHide('id_fromToDates');
+      $showHide->addHide('id_fromToDates');
     }
 
-    $this->_showHide->addToTemplate();
+    $showHide->addToTemplate();
     return $defaults;
   }
 
@@ -46,12 +46,11 @@ class CRM_Event_Form_SearchEvent extends CRM_Core_Form {
    */
   public function buildQuickForm() {
     $this->add('text', 'title', ts('Event Name'),
-      [CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event', 'title')]
+      CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event', 'title')
     );
 
     $this->addSelect('event_type_id', ['multiple' => TRUE, 'context' => 'search']);
 
-    $eventsByDates = [];
     $searchOption = [ts('Show Current and Upcoming Events'), ts('Search All or by Date Range')];
     $this->addRadio('eventsByDates', ts('Events by Dates'), $searchOption, ['onclick' => "return showHideByValue('eventsByDates','1','id_fromToDates','block','radio',true);"], '&nbsp;');
 

@@ -15,7 +15,7 @@
  */
 class CRM_Core_BAO_PreferencesTest extends CiviUnitTestCase {
 
-  public function testValueOptions() {
+  public function testValueOptions(): void {
 
     $addressOptions = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
       'address_options'

@@ -108,7 +108,7 @@ class CRM_Admin_Form_OptionGroup extends CRM_Admin_Form {
       $name = CRM_Utils_String::titleToVar(strtolower($fields['title']));
     }
     if (!CRM_Core_DAO::objectExists($name, 'CRM_Core_DAO_OptionGroup', $self->_id)) {
-      $errors['title'] = ts('Option Group name ' . $name . ' already exists in the database. Option Group Names need to be unique');
+      $errors['title'] = ts("Option Group name '%1' already exists in the database. Option Group Names must be unique.", [1 => $name]);
     }
     return empty($errors) ? TRUE : $errors;
   }
@@ -120,7 +120,7 @@ class CRM_Admin_Form_OptionGroup extends CRM_Admin_Form {
     CRM_Utils_System::flushCache();
 
     if ($this->_action & CRM_Core_Action::DELETE) {
-      CRM_Core_BAO_OptionGroup::del($this->_id);
+      CRM_Core_BAO_OptionGroup::deleteRecord(['id' => $this->_id]);
       CRM_Core_Session::setStatus(ts('Selected option group has been deleted.'), ts('Record Deleted'), 'success');
     }
     else {

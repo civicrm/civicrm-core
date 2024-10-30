@@ -26,7 +26,7 @@ return function ($mixInfo, $bootCache) {
 
     $files = (array) glob($mixInfo->getPath('ang/*.ang.php'));
     foreach ($files as $file) {
-      $name = preg_replace(':\.ang\.php$:', '', basename($file));
+      $name = basename($file, '.ang.php');
       $module = include $file;
       if (empty($module['ext'])) {
         $module['ext'] = $mixInfo->longName;

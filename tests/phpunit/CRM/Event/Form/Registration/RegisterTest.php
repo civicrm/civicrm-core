@@ -9,11 +9,15 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Test\FormTrait;
+use Civi\Test\FormWrapper;
+
 /**
  * Class CRM_Event_Form_Registration_RegisterTest
  * @group headless
  */
 class CRM_Event_Form_Registration_RegisterTest extends CiviUnitTestCase {
+  use FormTrait;
 
   /**
    * CRM-19626 - Test minimum value configured for price set.
@@ -21,36 +25,34 @@ class CRM_Event_Form_Registration_RegisterTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testMinValueForPriceSet(): void {
-    $minAmt = 100;
-    $feeAmt = 1000;
-    $event = $this->eventCreate();
-    $form = $this->getEventForm($this->ids['event'][0]);
-    $priceSetId = $this->eventPriceSetCreate($feeAmt, $minAmt);
-    $priceSet = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId));
-    $form->_values['fee'] = $form->_feeBlock = $priceSet['fields'];
-    $form->_values['event'] = $event;
-    $form->_skipDupeRegistrationCheck = 1;
-
-    $priceField = $this->callAPISuccess('PriceField', 'get', ['price_set_id' => $priceSetId]);
-    $params = [
+    $this->eventCreatePaid([], ['min_amount' => 100]);
+    $submittedValues = [
       'email-Primary' => 'someone@example.com',
-      'priceSetId' => $priceSetId,
+      'priceSetId' => $this->ids['PriceSet']['PaidEvent'],
+      'price_' . $this->ids['PriceField']['PaidEvent'] => $this->ids['PriceFieldValue']['PaidEvent_student_early'],
+      'payment_processor_id' => 0,
     ];
-    // Check empty values for price fields.
-    foreach (array_keys($priceField['values']) as $fieldId) {
-      $params['price_' . $fieldId] = 0;
-    }
-    $form->set('priceSetId', $priceSetId);
-    $form->set('priceSet', $priceSet);
-    $form->set('name', 'CRM_Event_Form_Registration_Register');
-    $files = [];
-    $errors = CRM_Event_Form_Registration_Register::formRule($params, $files, $form);
+    $form = $this->getTestForm('CRM_Event_Form_Registration_Register', $submittedValues, ['id' => $this->getEventID()]);
+    $form->processForm(FormWrapper::VALIDATED);
 
     //Assert the validation Error.
     $expectedResult = [
-      '_qf_default' => ts('A minimum amount of %1 should be selected from Event Fee(s).', [1 => CRM_Utils_Money::format($minAmt)]),
+      '_qf_default' => ts('A minimum amount of %1 should be selected from Event Fee(s).', [1 => CRM_Utils_Money::format(100)]),
     ];
-    $this->checkArrayEquals($expectedResult, $errors);
+    $this->assertValidationError($expectedResult);
+  }
+
+  public function testValidateEventWithAvailableSpace(): void {
+    $event = $this->eventCreateUnpaid(['max_participants' => 2]);
+    $form = $this->getTestForm('CRM_Event_Form_Registration_Register', [
+      'additional_participants' => 2,
+      'email-Primary' => 'someone@example.com',
+    ], ['id' => $this->getEventID()]);
+    $form->processForm(FormWrapper::VALIDATED);
+    $expectedResult = [
+      'additional_participants' => 'There is only enough space left on this event for 2 participant(s).',
+    ];
+    $this->assertValidationError($expectedResult);
   }
 
   /**
@@ -64,7 +66,7 @@ class CRM_Event_Form_Registration_RegisterTest extends CiviUnitTestCase {
     CRM_Core_DAO::executeQuery($sql);
 
     // Create an event, fill its participant slots.
-    $event = $this->eventCreate([
+    $event = $this->eventCreateUnpaid([
       'has_waitlist' => 1,
       'max_participants' => 1,
       'start_date' => 20351021,
@@ -76,16 +78,18 @@ class CRM_Event_Form_Registration_RegisterTest extends CiviUnitTestCase {
     // Add someone to the waitlist.
     $waitlistContact = $this->individualCreate();
 
-    $this->participantCreate(['event_id' => $event['id'], 'contact_id' => $waitlistContact, 'status_id' => 'On waitlist']);
+    $this->participantCreate(['event_id' => $event['id'], 'contact_id' => $waitlistContact, 'status_id.name' => 'On waitlist']);
 
     // We should now have two participants.
     $this->callAPISuccessGetCount('Participant', ['event_id' => $event['id']], 2);
 
-    $form = $this->getEventForm($event['id']);
-    $form->set('cid', $waitlistContact);
+    $form = $this->getTestForm('CRM_Event_Form_Registration_Register', [], [
+      'id' => $this->getEventID(),
+      'cid' => $waitlistContact,
+    ]);
     // We SHOULD get an error when double registering a waitlisted user.
     try {
-      $form->preProcess();
+      $form->processForm(FormWrapper::PREPROCESSED);
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
       return;
@@ -94,15 +98,67 @@ class CRM_Event_Form_Registration_RegisterTest extends CiviUnitTestCase {
   }
 
   /**
-   * @param int $eventID
+   * Test that current event is valid or not.
    *
-   * @return CRM_Event_Form_Registration_Register
+   * @dataProvider eventDataProvider
+   *
+   * @return void
    */
-  protected function getEventForm(int $eventID): CRM_Event_Form_Registration_Register {
-    /** @var \CRM_Event_Form_Registration_Register $form */
-    $form = $this->getFormObject('CRM_Event_Form_Registration_Register');
-    $_REQUEST['id'] = $eventID;
-    return $form;
+  public function testValidEvent(array $formValues): void {
+    $event = $this->eventCreateUnpaid();
+    $this->updateEvent($formValues);
+    $form = $this->getTestForm('CRM_Event_Form_Registration_Register', [], [
+      'id' => $this->getEventID(),
+    ]);
+
+    try {
+      $form->processForm(FormWrapper::PREPROCESSED);
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $message = CRM_Core_Session::singleton()->getStatus();
+      foreach ([
+        'is_active' => 'The event you requested is currently unavailable (contact the site administrator for assistance).',
+        'is_online_registration' => 'Online registration is not currently available for this event (contact the site administrator for assistance).',
+        'is_template' => 'Event templates are not meant to be registered.',
+        'registration_start_date' => 'Registration for this event begins on ' . CRM_Utils_Date::customFormat(date('Ymd000000', strtotime('+ 1 day'))),
+        'registration_end_date' => 'Registration for this event ended on ' . CRM_Utils_Date::customFormat(date('Ymd000000', strtotime('- 1 day'))),
+        'event_end_date' => 'Registration for this event ended on ' . CRM_Utils_Date::customFormat(date('Ymd000000', strtotime('- 1 day'))),
+      ] as $parameter => $errorMessage) {
+        $check = ($parameter === 'is_template');
+        if (isset($formValues[$parameter]) && $formValues[$parameter] === $check) {
+          $this->assertEquals($errorMessage, $message[0]['text']);
+        }
+        elseif ($parameter == 'registration_start_date' && !empty($formValues[$parameter])) {
+          $this->assertEquals($errorMessage, $message[0]['text']);
+        }
+        elseif ($parameter == 'registration_end_date' && !empty($formValues[$parameter])) {
+          $this->assertEquals($errorMessage, $message[0]['text']);
+        }
+      }
+    }
+  }
+
+  public function eventDataProvider(): array {
+    return [
+      'inactive_event' => [
+        'form_values' => ['is_active' => FALSE],
+      ],
+      'online_registration_disabled' => [
+        'form_values' => ['is_online_registration' => FALSE],
+      ],
+      'event_is_template' => [
+        'form_values' => ['is_template' => TRUE],
+      ],
+      'start_date_in_future' => [
+        'form_values' => ['registration_start_date' => date('Ymd000000', strtotime('+ 1 day'))],
+      ],
+      'registration_end_date_in_past' => [
+        'form_values' => ['registration_end_date' => date('Ymd000000', strtotime('- 1 day'))],
+      ],
+      'event_end_date_in_past' => [
+        'form_values' => ['event_end_date' => date('Ymd000000', strtotime('- 1 day'))],
+      ],
+    ];
   }
 
 }

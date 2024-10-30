@@ -33,10 +33,13 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
   protected $raw;
   protected $tables = [];
   protected $interval = '10 SECOND';
+  protected $dblimit;
+  protected $dboffset;
 
   protected $altered_name;
   protected $altered_by;
   protected $altered_by_id;
+  protected $layout;
 
   /**
    * detail/summary report ids
@@ -80,7 +83,7 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
     CRM_Utils_System::resetBreadCrumb();
     $breadcrumb = [
       [
-        'title' => ts('Home'),
+        'title' => ts('Home', ['context' => 'menu']),
         'url' => CRM_Utils_System::url(),
       ],
       [
@@ -172,6 +175,9 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
       return [];
     }
 
+    // $cfDataTypesToBeFormatted corresponds to values in the db column civicrm_custom_field.data_type
+    $cfDataTypesToBeFormatted = array("Int", "ContactReference", "EntityReference");
+
     // populate $rows with only the differences between $changed and $original (skipping certain columns and NULL ↔ empty changes unless raw requested)
     $skipped = ['id'];
     $nRows = $rows = [];
@@ -180,7 +186,7 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
       if (empty($metadata[$table])) {
         list($metadata[$table]['titles'], $metadata[$table]['values']) = $this->differ->titlesAndValuesForTable($table, $diff['log_date']);
       }
-      $values = CRM_Utils_Array::value('values', $metadata[$diff['table']], []);
+      $values = $metadata[$diff['table']]['values'] ?? [];
       $titles = $metadata[$diff['table']]['titles'];
       $field = $diff['field'];
       $from = $diff['from'];
@@ -215,12 +221,24 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
           $to = implode(', ', array_filter($tos));
         }
 
+        $cfArray = [];
         $tableDAOClass = CRM_Core_DAO_AllCoreTables::getClassForTable($table);
+        $fkClassName = NULL;
         if (!empty($tableDAOClass)) {
           $tableDAOFields = (new $tableDAOClass())->fields();
           // If this field is a foreign key, then we can later use the foreign
           // class to translate the id into something more useful for display.
           $fkClassName = $tableDAOFields[$field]['FKClassName'] ?? NULL;
+        }
+        else {
+          // Since this table didn't match a core table, check if it's a custom field.
+          $customGroup = CRM_Core_BAO_CustomGroup::getGroup(['table_name' => $table]);
+          foreach ($customGroup['fields'] ?? [] as $customField) {
+            if ($customField['column_name'] === $field) {
+              $cfArray = $customField;
+              break;
+            }
+          }
         }
         if (isset($values[$field][$from])) {
           $from = $values[$field][$from];
@@ -228,12 +246,42 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
         elseif (!empty($from) && !empty($fkClassName)) {
           $from = $this->convertForeignKeyValuesToLabels($fkClassName, $field, $from);
         }
+        elseif (!empty($from) && is_numeric($from) && array_key_exists("id", $cfArray) && is_int($cfArray["id"])) {
+          // Translate the id into something more useful for display, namely for id's that refer to option values and contacts.
+          $fromAsArray = civicrm_api3('CustomValue', 'getdisplayvalue', [
+            'entity_id' => $this->cid,
+            'custom_field_id' => $cfArray["id"],
+            'custom_field_value' => $from,
+          ]);
+          if (array_key_exists("data_type", $cfArray) && in_array($cfArray["data_type"], $cfDataTypesToBeFormatted)) {
+            $from = $this->formatLabelAndIdForDisplay($fromAsArray['values'][$cfArray["id"]]['display'], $from);
+          }
+          elseif (!empty($fromAsArray['values'][$cfArray["id"]]['display'])) {
+            $from = $fromAsArray['values'][$cfArray["id"]]['display'];
+          }
+        }
+
         if (isset($values[$field][$to])) {
           $to = $values[$field][$to];
         }
         elseif (!empty($to) && !empty($fkClassName)) {
           $to = $this->convertForeignKeyValuesToLabels($fkClassName, $field, $to);
         }
+        elseif (!empty($to) && is_numeric($to) && array_key_exists("id", $cfArray) && is_int($cfArray["id"])) {
+          // Translate the id into something more useful for display, namely for id's that refer to option values and contacts.
+          $toAsArray = civicrm_api3('CustomValue', 'getdisplayvalue', [
+            'entity_id' => $this->cid,
+            'custom_field_id' => $cfArray["id"],
+            'custom_field_value' => $to,
+          ]);
+          if (array_key_exists("data_type", $cfArray) && in_array($cfArray["data_type"], $cfDataTypesToBeFormatted)) {
+            $to = $this->formatLabelAndIdForDisplay($toAsArray['values'][$cfArray["id"]]['display'], $to);
+          }
+          elseif (!empty($toAsArray['values'][$cfArray["id"]]['display'])) {
+            $to = $toAsArray['values'][$cfArray["id"]]['display'];
+          }
+        }
+
         if (isset($titles[$field])) {
           $field = $titles[$field];
         }
@@ -452,7 +500,7 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
         unset($_POST['crmPID_B'], $_POST['crmPID']);
       }
 
-      $pageId = $pageId ? $pageId : 1;
+      $pageId = $pageId ?: 1;
       $offset = ($pageId - 1) * $rowCount;
 
       $offset = CRM_Utils_Type::escape($offset, 'Int');
@@ -477,12 +525,23 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
    * @return string
    */
   private function convertForeignKeyValuesToLabels(string $fkClassName, string $field, int $keyval): string {
-    if ($fkClassName::$_labelField) {
-      $labelValue = CRM_Core_DAO::getFieldValue($fkClassName, $keyval, $fkClassName::$_labelField);
+    if ($fkClassName::getLabelField()) {
+      $labelValue = CRM_Core_DAO::getFieldValue($fkClassName, $keyval, $fkClassName::getLabelField());
       // Not sure if this should use ts - there's not a lot of context (`%1 (id: %2)`) - and also the similar field labels above don't use ts.
       return "{$labelValue} (id: {$keyval})";
     }
     return (string) $keyval;
+  }
+
+  /**
+   * Return a string with the label and value combined.
+   *
+   * @param string $labelValue
+   * @param int $keyval
+   * @return string
+   */
+  private function formatLabelAndIdForDisplay(string $labelValue, int $keyval): string {
+    return empty($labelValue) ? (string) $keyval : "{$labelValue} (id: {$keyval})";
   }
 
 }

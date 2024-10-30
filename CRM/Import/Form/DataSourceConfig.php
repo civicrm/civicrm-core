@@ -21,14 +21,31 @@
 class CRM_Import_Form_DataSourceConfig extends CRM_Import_Forms {
 
   /**
+   * Default values for datasource fields.
+   *
+   * @var array
+   */
+  protected $dataSourceDefaults = [];
+
+  /**
+   * Set dataSource default values.
+   *
+   * @param array $dataSourceDefaults
+   *
+   * @return CRM_Import_Form_DataSourceConfig
+   */
+  public function setDataSourceDefaults(array $dataSourceDefaults): CRM_Import_Form_DataSourceConfig {
+    $this->dataSourceDefaults = $dataSourceDefaults;
+    return $this;
+  }
+
+  /**
    * Set variables up before form is built.
    *
    * @throws \CRM_Core_Exception
    */
   public function preProcess(): void {
-    $dataSourcePath = explode('_', $this->getDataSourceClassName());
-    $templateFile = 'CRM/Contact/Import/Form/' . $dataSourcePath[3] . '.tpl';
-    $this->assign('dataSourceFormTemplateFile', $templateFile ?? NULL);
+    $this->assign('dataSourceFormTemplateFile', $this->getDataSourceObject()->getInfo()['template']);
     if (CRM_Utils_Request::retrieveValue('user_job_id', 'Integer')) {
       $this->setUserJobID(CRM_Utils_Request::retrieveValue('user_job_id', 'Integer'));
     }
@@ -56,6 +73,9 @@ class CRM_Import_Form_DataSourceConfig extends CRM_Import_Forms {
       foreach ($this->getDataSourceFields() as $fieldName) {
         $defaults[$fieldName] = $this->getSubmittedValue($fieldName);
       }
+    }
+    else {
+      $defaults = array_merge($this->dataSourceDefaults, $defaults);
     }
     return $defaults;
   }

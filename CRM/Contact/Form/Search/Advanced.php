@@ -21,6 +21,24 @@
 class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
 
   /**
+   * @var string
+   * @internal
+   */
+  public $_searchPane;
+
+  /**
+   * @var array
+   * @internal
+   */
+  public $_searchOptions = [];
+
+  /**
+   * @var array
+   * @internal
+   */
+  public $_paneTemplatePath = [];
+
+  /**
    * Processing needed for buildForm and later.
    */
   public function preProcess() {
@@ -63,13 +81,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
     ];
 
     //check if there are any custom data searchable fields
-    $extends = array_merge(['Contact'],
-      CRM_Contact_BAO_ContactType::basicTypes(),
-      CRM_Contact_BAO_ContactType::subTypes()
-    );
-    $groupDetails = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, TRUE,
-      $extends
-    );
+    $groupDetails = CRM_Core_BAO_CustomGroup::getAll(['extends' => 'Contact']);
     // if no searchable fields unset panel
     if (empty($groupDetails)) {
       unset($paneNames[ts('Custom Fields')]);
@@ -226,6 +238,10 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
     $this->set('isAdvanced', '1');
 
     $this->setFormValues();
+    if (is_numeric($_POST['id'] ?? NULL)) {
+      $this->_formValues['contact_id'] = (int) $_POST['id'];
+    }
+    $this->set('formValues', $this->_formValues);
     // get user submitted values
     // get it from controller only if form has been submitted, else preProcess has set this
     if (!empty($_POST)) {
@@ -238,13 +254,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
         }
       }
 
-      // set the group if group is submitted
-      if (!empty($this->_formValues['uf_group_id'])) {
-        $this->set('id', $this->_formValues['uf_group_id']);
-      }
-      else {
-        $this->set('id', '');
-      }
+      $this->set('uf_group_id', $this->_formValues['uf_group_id'] ?? '');
     }
 
     // retrieve ssID values only if formValues is null, i.e. form has never been posted
@@ -351,7 +361,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
       unset($this->_formValues['contact_taglist']);
       foreach ($taglist as $value) {
         if ($value) {
-          $value = explode(',', $value);
+          $value = !is_array($value) ? explode(',', $value) : $value;
           foreach ($value as $tId) {
             if (is_numeric($tId)) {
               $this->_formValues['contact_tags'][] = $tId;

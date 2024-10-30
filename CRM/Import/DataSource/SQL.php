@@ -33,6 +33,7 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
     return [
       'title' => ts('SQL Query'),
       'permissions' => ['import SQL datasource'],
+      'template' => 'CRM/Contact/Import/Form/SQL.tpl',
     ];
   }
 
@@ -41,12 +42,9 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
    * form snippet. It should add all fields necesarry to get the data
    * uploaded to the temporary table in the DB.
    *
-   * @param CRM_Core_Form $form
-   *
-   * @return void
-   *   (operates directly on form argument)
+   * @param CRM_Import_Forms $form
    */
-  public function buildQuickForm(&$form) {
+  public function buildQuickForm(CRM_Import_Forms $form): void {
     $form->add('hidden', 'hidden_dataSource', 'CRM_Import_DataSource_SQL');
     $form->add('textarea', 'sqlQuery', ts('Specify SQL Query'), ['rows' => 10, 'cols' => 45], TRUE);
     $form->addFormRule(['CRM_Import_DataSource_SQL', 'formRule'], $form);
@@ -81,7 +79,7 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
   public function initialize(): void {
     $table = CRM_Utils_SQL_TempTable::build()->setDurable();
     $tableName = $table->getName();
-    $table->createWithQuery($this->getSubmittedValue('sqlQuery'));
+    $table->createWithQuery($this->restoreOperators($this->getSubmittedValue('sqlQuery')));
 
     // Get the names of the fields to be imported.
     $columnsResult = CRM_Core_DAO::executeQuery(
@@ -103,11 +101,22 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
     }
 
     $this->addTrackingFieldsToTable($tableName);
-    $this->updateUserJobMetadata('DataSource', [
+    $this->updateUserJobDataSource([
       'table_name' => $tableName,
       'column_headers' => $columnNames,
       'number_of_columns' => count($columnNames),
     ]);
+  }
+
+  /**
+   * Restore greater than & equal operators that the form html_encoded.
+   *
+   * @param string $string
+   *
+   * @return string
+   */
+  public function restoreOperators(string $string): string {
+    return str_replace(['&lt;', '&gt;'], ['<', '>'], $string);
   }
 
 }

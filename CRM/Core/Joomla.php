@@ -52,9 +52,9 @@ class CRM_Core_Joomla {
     }
 
     $template = CRM_Core_Smarty::singleton();
-    $template->assign_by_ref('blocks', $blocks);
+    $template->assign('blocks', $blocks);
     $sidebarLeft = $template->fetch('CRM/Block/blocks.tpl');
-    $template->assign_by_ref('sidebarLeft', $sidebarLeft);
+    $template->assign('sidebarLeft', $sidebarLeft);
   }
 
 }

@@ -15,33 +15,105 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Standalone\SessionHandler;
+
 /**
  * Standalone specific stuff goes here.
  */
 class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
 
   /**
+   * Standalone uses a CiviCRM Extension, Standaloneusers, to provide user
+   * functionality
+   *
+   * This is great for modularity - but does mean that there are points in
+   * bootstrap / install / failure where the extension isn't available
+   * and we need to provide fallback/failsafe behaviours
+   *
+   * This function provides a general check for whether we are in such a
+   * scenario
+   *
+   * (In the future, alternative user-providing extensions may be available - in
+   * which case this check might need generalising. One possibility could be
+   * to use the Api4 User interface as a spec for what any extension must provide
+   *
+   * Then maybe the check could be if (class_exists(\Civi\Api4\User::class))?
+   *
+   * @return bool
+   *   Whether user extension is available
+   */
+  protected function isUserExtensionAvailable(): bool {
+    if (!class_exists(\Civi\Api4\User::class)) {
+      return FALSE;
+    }
+    // TODO: the following would be be a better check, as sometimes during
+    // upgrade the User class can exist but the entity is not actually loaded
+    //
+    // HOWEVER: it currently causes a crash during the install phase.
+    // https://github.com/civicrm/civicrm-core/pull/31198 may help.
+    //
+    // if (!\Civi\Api4\Utils\CoreUtil::entityExists('User')) {
+    //   return FALSE;
+    // }
+
+    // authx function is required for standalone user system
+    if (!function_exists('_authx_uf')) {
+      return FALSE;
+    }
+
+    return TRUE;
+  }
+
+  /**
+   * @inheritdoc
+   *
+   * In Standalone the UF is CiviCRM, so we're never
+   * running without it
+   */
+  public function isLoaded(): bool {
+    return TRUE;
+  }
+
+  /**
    * @inheritdoc
    */
   public function getDefaultFileStorage() {
     return [
-      'url' => 'upload',
-      // @todo Not sure if this is wise
-      'path' => $_SERVER['DOCUMENT_ROOT'],
+      'path' => \Civi::paths()->getPath('[cms.root]/public'),
+      'url' => \Civi::paths()->getUrl('[cms.root]/public'),
     ];
   }
 
   /**
    * @inheritDoc
    */
-  public function createUser(&$params, $mail) {
-    return FALSE;
+  public function createUser(&$params, $emailParam) {
+    try {
+      $email = $params[$emailParam];
+      $userID = \Civi\Api4\User::create(FALSE)
+        ->addValue('username', $params['cms_name'])
+        ->addValue('uf_name', $email)
+        ->addValue('password', $params['cms_pass'])
+        ->addValue('contact_id', $params['contact_id'] ?? NULL)
+        // ->addValue('uf_id', 0) // does not work without this.
+        ->execute()->single()['id'];
+    }
+    catch (\Exception $e) {
+      \Civi::log()->warning("Failed to create user '$email': " . $e->getMessage());
+      return FALSE;
+    }
+
+    return (int) $userID;
   }
 
   /**
    * @inheritDoc
    */
   public function updateCMSName($ufID, $email) {
+    \Civi\Api4\User::update(FALSE)
+      ->addWhere('id', '=', $ufID)
+      ->addValue('uf_name', $email)
+      ->execute();
   }
 
   /**
@@ -49,7 +121,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    */
   public function getLoginURL($destination = '') {
     $query = $destination ? ['destination' => $destination] : [];
-    return \Drupal\Core\Url::fromRoute('user.login', [], ['query' => $query])->toString();
+    return CRM_Utils_System::url('civicrm/login', $query, TRUE);
   }
 
   /**
@@ -68,12 +140,18 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function appendBreadCrumb($breadcrumbs) {
+    $crumbs = \Civi::$statics[__CLASS__]['breadcrumb'] ?? [];
+    $crumbs += array_column($breadcrumbs, NULL, 'url');
+    \Civi::$statics[__CLASS__]['breadcrumb'] = $crumbs;
+    CRM_Core_Smarty::singleton()->assign('breadcrumb', array_values($crumbs));
   }
 
   /**
    * @inheritDoc
    */
   public function resetBreadCrumb() {
+    \Civi::$statics[__CLASS__]['breadcrumb'] = [];
+    CRM_Core_Smarty::singleton()->assign('breadcrumb', NULL);
   }
 
   /**
@@ -81,6 +159,9 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    */
   public function addHTMLHead($header) {
     $template = CRM_Core_Smarty::singleton();
+    // Smarty's append function does not check for the existence of the var before appending to it.
+    // So this prevents a stupid notice error:
+    $template->ensureVariablesAreAssigned(['pageHTMLHead']);
     $template->append('pageHTMLHead', $header);
     return;
   }
@@ -106,12 +187,12 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
-   * Check if a resource url is within the drupal directory and format appropriately.
+   * Check if a resource url is within the public webroot and format appropriately.
    *
-   * This seems to be a legacy function. We assume all resources are within the drupal
-   * directory and always return TRUE. As well, we clean up the $url.
+   * This seems to be a legacy function. We assume all resources are
+   * ok directory and always return TRUE. As well, we clean up the $url.
    *
-   * FIXME: This is not a legacy function and the above is not a safe assumption.
+   * @todo: This is not a legacy function and the above is not a safe assumption.
    * External urls are allowed by CRM_Core_Resources and this needs to return the correct value.
    *
    * @param $url
@@ -126,13 +207,12 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
     if (($pos = strpos($url, '?')) !== FALSE) {
       $url = substr($url, 0, $pos);
     }
-    // FIXME: Should not unconditionally return true
+    // @todo: Should not unconditionally return true
     return TRUE;
   }
 
   /**
-   * This function does nothing in Drupal 8. Changes to the base_url should be made
-   * in settings.php directly.
+   * Changes to the base_url should be made in settings.php directly.
    */
   public function mapConfigToSSL() {
   }
@@ -146,98 +226,134 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
     $absolute = FALSE,
     $fragment = NULL,
     $frontend = FALSE,
-    $forceBackend = FALSE,
-    $htmlize = TRUE
+    $forceBackend = FALSE
   ) {
-    // @todo Implement absolute etc
-    $fragment = $fragment ? ('#' . $fragment) : '';
-    $url = "/{$path}?{$query}$fragment";
-    return $url;
+    // TODO: Add type hints
+    $query = (string) $query;
+    if (strlen($query)) {
+      $query = "?$query";
+    }
+    $fragment = (string) $fragment;
+    if (strlen($fragment)) {
+      $fragment = "#$fragment";
+    }
+    return Civi::paths()->getUrl("[cms.root]/$path$query$fragment", $absolute ? 'absolute' : 'relative');
+  }
+
+  /**
+   * Path of the current page e.g. 'civicrm/contact/view'
+   *
+   * @return string|null
+   *   the current menu path
+   */
+  public static function currentPath() {
+    $path = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
+
+    return $path ? trim($path, '/') : NULL;
   }
 
   /**
    * @inheritDoc
+   * Authenticate the user against the CMS db.
+   *
+   * I think this is only used by CLI so setting the session
+   * doesn't make sense
+   *
+   * @param string $name
+   *   The user name.
+   * @param string $password
+   *   The password for the above user.
+   * @param bool $loadCMSBootstrap
+   *   Not used in Standalone context
+   * @param string $realPath
+   *   Not used in Standalone context
+   *
+   * @return array|bool
+   *   [contactID, ufID, unique string] else false if no auth
+   * @throws \CRM_Core_Exception.
    */
   public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
-    $system = new CRM_Utils_System_Drupal8();
-    $system->loadBootStrap([], FALSE);
+    $authxLogin = authx_login(['flow' => 'login', 'cred' => 'Basic ' . base64_encode("{$name}:{$password}")]);
 
-    $uid = \Drupal::service('user.auth')->authenticate($name, $password);
-    if ($uid) {
-      if ($this->loadUser($name)) {
-        $contact_id = CRM_Core_BAO_UFMatch::getContactId($uid);
-        return [$contact_id, $uid, mt_rand()];
-      }
-    }
-
-    return FALSE;
+    // Note: random_int is more appropriate for cryptographical use than mt_rand
+    // The long number is the max 32 bit value.
+    return [$authxLogin['contactId'], $authxLogin['userId'], random_int(0, 2147483647)];
   }
 
   /**
-   * @inheritDoc
-   */
-  public function loadUser($username) {
-    $user = user_load_by_name($username);
-    if (!$user) {
-      return FALSE;
-    }
-
-    // Set Drupal's current user to the loaded user.
-    \Drupal::currentUser()->setAccount($user);
-
-    $uid = $user->id();
-    $contact_id = CRM_Core_BAO_UFMatch::getContactId($uid);
-
-    // Store the contact id and user id in the session
-    $session = CRM_Core_Session::singleton();
-    $session->set('ufID', $uid);
-    $session->set('userID', $contact_id);
-    return TRUE;
-  }
-
-  /**
-   * Determine the native ID of the CMS user.
+   * Determine the CMS-native ID from the user name
+   *
+   * In standalone this means the User ID.
    *
    * @param string $username
    * @return int|null
    */
   public function getUfId($username) {
-    if ($id = user_load_by_name($username)->id()) {
-      return $id;
+    if (!$this->isUserExtensionAvailable()) {
+      return NULL;
     }
+    return \Civi\Api4\User::get(FALSE)
+      ->addWhere('username', '=', $username)
+      ->execute()
+      ->first()['id'] ?? NULL;
   }
 
   /**
-   * @inheritDoc
-   */
-  public function permissionDenied() {
-    die('Standalone permissionDenied');
-  }
-
-  /**
-   * @inheritDoc
+   * Immediately stop script execution and log out the user
    */
   public function logout() {
-    // @todo
+    _authx_uf()->logoutSession();
+    // redirect to the home page?
+    // breaks tests in standaloneusers-e2e
+    // \CRM_Utils_System::redirect('/civicrm/login');
+  }
+
+  /**
+   * @inheritDoc
+   *
+   * Standalone offers different HTML templates for front and back-end routes.
+   *
+   */
+  public static function getContentTemplate($print = 0): string {
+    if ($print) {
+      return parent::getContentTemplate($print);
+    }
+    else {
+      $isPublic = CRM_Utils_System::isFrontEndPage();
+      return $isPublic ? 'CRM/common/standalone-frontend.tpl' : 'CRM/common/standalone.tpl';
+    }
   }
 
   /**
    * @inheritDoc
    */
   public function theme(&$content, $print = FALSE, $maintenance = FALSE) {
+
+    // Q. what does this do? Why do we only include this for maintenance?
     if ($maintenance) {
       $smarty = CRM_Core_Smarty::singleton();
-      echo implode('', $smarty->_tpl_vars['pageHTMLHead']);
+      echo implode('', $smarty->getTemplateVars('pageHTMLHead'));
     }
 
     // @todo Add variables from the body tag? (for Shoreditch)
-
     print $content;
     return NULL;
   }
 
   /**
-   * Load drupal bootstrap.
+   * Bootstrap Standalone.
+   *
+   * In CRM_Utils_System context, this function is used by cv/civix/? to bootstrap
+   * the CMS *after* CiviCRM is already loaded (as compared to normal web requests,
+   * which load the CMS then CiviCRM)
+   *
+   * For Standalone there shouldn't be anything additional to load at this
+   * stage in terms of system services.
+   *
+   *
+   * This is used by cv and civix, but not I (artfulrobot) think, in the main http requests.
+   * External scripts may assume loading a users requires the CMS bootstrap
+   * - so we keep support for logging in a user now
    *
    * @param array $params
    *   Either uid, or name & pass.
@@ -245,117 +361,124 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    *   Boolean Require CMS user load.
    * @param bool $throwError
    *   If true, print error on failure and exit.
-   * @param bool|string $realPath path to script
+   * @param bool|string $realPath
+   *   Not used in Standalone context
    *
    * @return bool
    * @Todo Handle setting cleanurls configuration for CiviCRM?
    */
   public function loadBootStrap($params = [], $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
-    static $run_once = FALSE;
-    if ($run_once) {
+    static $runOnce;
+
+    if (isset($runOnce)) {
+      // we've already run
       return TRUE;
     }
-    else {
-      $run_once = TRUE;
+
+    // dont run again
+    $runOnce = TRUE;
+
+    if (!$loadUser) {
+      return TRUE;
     }
 
-    if (!($root = $this->cmsRootPath())) {
+    try {
+      if (!empty($params['uid'])) {
+        _authx_uf()->loginStateless($params['uid']);
+        return TRUE;
+      }
+      elseif (!empty($params['name'] && !empty($params['pass']))) {
+        // It seems from looking at the Drupal implementation, that
+        // if given username we expect a correct password.
+
+        /**
+         * @throws CRM_Core_Exception if login unsuccessful
+         */
+        $this->authenticate($params['name'], $params['pass']);
+        return TRUE;
+      }
+      else {
+        return FALSE;
+      }
+    }
+    catch (\CRM_Core_Exception $e) {
+      // swallow any errors if $throwError is false
+      // (presume the expectation is these are login errors
+      // - though that isn't guaranteed?)
+      if (!$throwError) {
+        return FALSE;
+      }
+      throw $e;
+    }
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function loadUser($username) {
+    $userID = $this->getUfId($username) ?? NULL;
+    if (!$userID) {
       return FALSE;
     }
-    chdir($root);
-
-    // Create a mock $request object
-    $autoloader = require_once $root . '/autoload.php';
-    if ($autoloader === TRUE) {
-      $autoloader = ComposerAutoloaderInitDrupal8::getLoader();
-    }
-    // @Todo: do we need to handle case where $_SERVER has no HTTP_HOST key, ie. when run via cli?
-    $request = new \Symfony\Component\HttpFoundation\Request([], [], [], [], [], $_SERVER);
-
-    // Create a kernel and boot it.
-    $kernel = \Drupal\Core\DrupalKernel::createFromRequest($request, $autoloader, 'prod');
-    $kernel->boot();
-    $kernel->preHandle($request);
-    $container = $kernel->rebuildContainer();
-    // Add our request to the stack and route context.
-    $request->attributes->set(\Symfony\Cmf\Component\Routing\RouteObjectInterface::ROUTE_OBJECT, new \Symfony\Component\Routing\Route('<none>'));
-    $request->attributes->set(\Symfony\Cmf\Component\Routing\RouteObjectInterface::ROUTE_NAME, '<none>');
-    $container->get('request_stack')->push($request);
-    $container->get('router.request_context')->fromRequest($request);
-
-    // Initialize Civicrm
-    \Drupal::service('civicrm')->initialize();
-
-    // We need to call the config hook again, since we now know
-    // all the modules that are listening on it (CRM-8655).
-    CRM_Utils_Hook::config($config);
-
-    if ($loadUser) {
-      if (!empty($params['uid']) && $username = \Drupal\user\Entity\User::load($params['uid'])->getAccountName()) {
-        $this->loadUser($username);
-      }
-      elseif (!empty($params['name']) && !empty($params['pass']) && \Drupal::service('user.auth')->authenticate($params['name'], $params['pass'])) {
-        $this->loadUser($params['name']);
-      }
-    }
+    _authx_uf()->loginSession($userID);
     return TRUE;
   }
 
   /**
-   * Determine the location of the CMS root.
+   * Load an active user by internal user ID.
    *
-   * @param string $path
+   * @return array|bool FALSE if not found.
+   */
+  public function getUserById(int $userID) {
+    if (!$this->isUserExtensionAvailable()) {
+      return FALSE;
+    }
+    return \Civi\Api4\User::get(FALSE)
+      ->addWhere('id', '=', $userID)
+      ->addWhere('is_active', '=', TRUE)
+      ->execute()
+      ->first() ?: FALSE;
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function getCiviSourceStorage(): array {
+    return [
+      'path' => Civi::paths()->getPath('[cms.root]/core'),
+      'url' => Civi::paths()->getUrl('[cms.root]/core'),
+    ];
+  }
+
+  /**
+   * In Standalone, this returns the app root
+   *
+   * The $appRootPath global is set in civicrm.standalone.php
    *
    * @return NULL|string
    */
-  public function cmsRootPath($path = NULL) {
-    global $civicrm_paths;
-    if (!empty($civicrm_paths['cms.root']['path'])) {
-      return $civicrm_paths['cms.root']['path'];
-    }
+  public function cmsRootPath() {
+    global $appRootPath;
+    return $appRootPath;
+  }
 
-    if (defined('DRUPAL_ROOT')) {
-      return DRUPAL_ROOT;
-    }
-
-    // It looks like Drupal hasn't been bootstrapped.
-    // We're going to attempt to discover the root Drupal path
-    // by climbing out of the folder hierarchy and looking around to see
-    // if we've found the Drupal root directory.
-    if (!$path) {
-      $path = $_SERVER['SCRIPT_FILENAME'];
-    }
-
-    // Normalize and explode path into its component paths.
-    $paths = explode(DIRECTORY_SEPARATOR, realpath($path));
-
-    // Remove script filename from array of directories.
-    array_pop($paths);
-
-    while (count($paths)) {
-      $candidate = implode('/', $paths);
-      if (file_exists($candidate . "/core/includes/bootstrap.inc")) {
-        return $candidate;
-      }
-
-      array_pop($paths);
-    }
+  public function isFrontEndPage() {
+    return CRM_Core_Menu::isPublicRoute(CRM_Utils_System::currentPath() ?? '');
   }
 
   /**
    * @inheritDoc
    */
   public function isUserLoggedIn() {
-    // @todo
-    return TRUE;
+    return !empty($this->getLoggedInUfID());
   }
 
   /**
    * @inheritDoc
    */
   public function isUserRegistrationPermitted() {
-    // @todo Have a setting
-    return TRUE;
+    // We don't support user registration in Standalone.
+    return FALSE;
   }
 
   /**
@@ -376,57 +499,33 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
 
   /**
    * @inheritDoc
+   *
+   * If the User extension isn't available
+   * then no one is logged in
    */
   public function getLoggedInUfID() {
-    // @todo Not implemented
-    // This helps towards getting the CiviCRM menu to display
-    return 1;
+    if (!$this->isUserExtensionAvailable()) {
+      return NULL;
+    }
+    return _authx_uf()->getCurrentUserId();
   }
 
   /**
    * @inheritDoc
-   */
-  public function getDefaultBlockLocation() {
-    // @todo No sidebars, no blocks
-    return 'sidebar_first';
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public function flush() {
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public function getUser($contactID) {
-    $user_details = parent::getUser($contactID);
-    $user_details['name'] = $user_details['name']->value;
-    $user_details['email'] = $user_details['email']->value;
-    return $user_details;
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public function getUniqueIdentifierFromUserObject($user) {
-    return $user->get('mail')->value;
-  }
-
-  /**
-   * @inheritDoc
+   *
+   * In Standalone our user object is just an array from a User::get() call.
    */
   public function getUserIDFromUserObject($user) {
-    return $user->get('uid')->value;
+    return $user['id'] ?? NULL;
   }
 
   /**
-   * @inheritDoc
+   * CMS User Sync doesn't make sense when using standaloneusers
+   * (but leave open the door for other user extensions, which might have a sync method)
+   * @return bool
    */
-  public function synchronizeUsers() {
-    // @todo
-    Civi::log()->debug('CRM_Utils_System_Standalone::synchronizeUsers: not implemented');
+  public function allowSynchronizeUsers() {
+    return !\CRM_Extension_System::singleton()->getManager()->isEnabled('standaloneusers');
   }
 
   /**
@@ -439,62 +538,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
-   * Function to return current language of Drupal8
-   *
-   * @return string
-   */
-  public function getCurrentLanguage() {
-    // @todo FIXME
-    Civi::log()->debug('CRM_Utils_System_Standalone::getCurrentLanguage: not implemented');
-    return NULL;
-  }
-
-  /**
-   * Helper function to extract path, query and route name from Civicrm URLs.
-   *
-   * For example, 'civicrm/contact/view?reset=1&cid=66' will be returned as:
-   *
-   * ```
-   * array(
-   *   'path' => 'civicrm/contact/view',
-   *   'route' => 'civicrm.civicrm_contact_view',
-   *   'query' => array('reset' => '1', 'cid' => '66'),
-   * );
-   * ```
-   *
-   * @param string $url
-   *   The url to parse.
-   *
-   * @return string[]
-   *   The parsed url parts, containing 'path', 'route' and 'query'.
-   */
-  public function parseUrl($url) {
-    $processed = ['path' => '', 'route_name' => '', 'query' => []];
-
-    // Remove leading '/' if it exists.
-    $url = ltrim($url, '/');
-
-    // Separate out the url into its path and query components.
-    $url = parse_url($url);
-    if (empty($url['path'])) {
-      return $processed;
-    }
-    $processed['path'] = $url['path'];
-
-    // Create a route name by replacing the forward slashes in the path with
-    // underscores, civicrm/contact/search => civicrm.civicrm_contact_search.
-    $processed['route_name'] = 'civicrm.' . implode('_', explode('/', $url['path']));
-
-    // Turn the query string (if it exists) into an associative array.
-    if (!empty($url['query'])) {
-      parse_str($url['query'], $processed['query']);
-    }
-
-    return $processed;
-  }
-
-  /**
-   * Append Drupal8 js to coreResourcesList.
+   * Append any Standalone js to coreResourcesList.
    *
    * @param \Civi\Core\Event\GenericHookEvent $e
    */
@@ -505,91 +549,21 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function getTimeZoneString() {
-    $timezone = date_default_timezone_get();
-    return $timezone;
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public function setUFLocale($civicrm_language) {
-    $langcode = substr(str_replace('_', '', $civicrm_language), 0, 2);
-    $languageManager = \Drupal::languageManager();
-    $languages = $languageManager->getLanguages();
-
-    if (isset($languages[$langcode])) {
-      $languageManager->setConfigOverrideLanguage($languages[$langcode]);
-
-      // Config must be re-initialized to reset the base URL
-      // otherwise links will have the wrong language prefix/domain.
-      $config = CRM_Core_Config::singleton();
-      $config->free();
-
-      return TRUE;
-    }
-
-    return FALSE;
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public function languageNegotiationURL($url, $addLanguagePart = TRUE, $removeLanguagePart = FALSE) {
-    if (empty($url)) {
-      return $url;
-    }
-
-    // Drupal might not be bootstrapped if being called by the REST API.
-    if (!class_exists('Drupal') || !\Drupal::hasContainer()) {
-      return $url;
-    }
-
-    $language = $this->getCurrentLanguage();
-    if (\Drupal::service('module_handler')->moduleExists('language')) {
-      $config = \Drupal::config('language.negotiation')->get('url');
-
-      //does user configuration allow language
-      //support from the URL (Path prefix or domain)
-      $enabledLanguageMethods = \Drupal::config('language.types')->get('negotiation.language_interface.enabled') ?: [];
-      if (array_key_exists(\Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl::METHOD_ID, $enabledLanguageMethods)) {
-        $urlType = $config['source'];
-
-        //url prefix
-        if ($urlType == \Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl::CONFIG_PATH_PREFIX) {
-          if (!empty($language)) {
-            if ($addLanguagePart && !empty($config['prefixes'][$language])) {
-              $url .= $config['prefixes'][$language] . '/';
-            }
-            if ($removeLanguagePart && !empty($config['prefixes'][$language])) {
-              $url = str_replace("/" . $config['prefixes'][$language] . "/", '/', $url);
-            }
-          }
-        }
-        //domain
-        if ($urlType == \Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl::CONFIG_DOMAIN) {
-          if (isset($language->domain) && $language->domain) {
-            if ($addLanguagePart) {
-              $url = (CRM_Utils_System::isSSL() ? 'https' : 'http') . '://' . $config['domains'][$language] . base_path();
-            }
-            if ($removeLanguagePart && defined('CIVICRM_UF_BASEURL')) {
-              $url = str_replace('\\', '/', $url);
-              $parseUrl = parse_url($url);
-
-              //kinda hackish but not sure how to do it right
-              //hope http_build_url() will help at some point.
-              if (is_array($parseUrl) && !empty($parseUrl)) {
-                $urlParts = explode('/', $url);
-                $hostKey = array_search($parseUrl['host'], $urlParts);
-                $ufUrlParts = parse_url(CIVICRM_UF_BASEURL);
-                $urlParts[$hostKey] = $ufUrlParts['host'];
-                $url = implode('/', $urlParts);
-              }
-            }
-          }
-        }
+    $userId = $this->getLoggedInUfID();
+    if ($userId) {
+      $user = $this->getUserById($userId);
+      if ($user && !empty($user['timezone'])) {
+        return $user['timezone'];
       }
     }
+    return date_default_timezone_get();
+  }
 
+  /**
+   * @inheritDoc
+   * @todo implement language negotiation for Standalone?
+   */
+  public function languageNegotiationURL($url, $addLanguagePart = TRUE, $removeLanguagePart = FALSE) {
     return $url;
   }
 
@@ -598,31 +572,105 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @return array
    */
   public function getCMSPermissionsUrlParams() {
-    return ['ufAccessURL' => \Drupal\Core\Url::fromRoute('user.admin_permissions')->toString()];
+    return ['ufAccessURL' => '/civicrm/admin/roles'];
+  }
+
+  public function permissionDenied() {
+    // If not logged in, they need to.
+    if ($this->isUserLoggedIn()) {
+      // They are logged in; they're just not allowed this page.
+      CRM_Core_Error::statusBounce(ts("Access denied"), CRM_Utils_System::url('civicrm'));
+    }
+    else {
+      http_response_code(403);
+
+      // render a login page
+      if (class_exists('CRM_Standaloneusers_Page_Login')) {
+        $loginPage = new CRM_Standaloneusers_Page_Login();
+        $loginPage->assign('anonAccessDenied', TRUE);
+        return $loginPage->run();
+      }
+
+      throw new CRM_Core_Exception('Access denied. Standaloneusers login page not found');
+    }
   }
 
   /**
    * Start a new session.
+   *
+   * Generally this uses the SessionHander provided by Standaloneusers
+   * extension - but we fallback to a default PHP session to:
+   * a) allow the installer to work (early in the Standalone install, we dont have Standaloneusers yet)
+   * b) avoid unhelpfully hard crash if the ExtensionSystem goes down (without the fallback, the crash
+   * here swallows whatever error is actually causing the crash)
    */
   public function sessionStart() {
-    session_start();
-    // @todo This helps towards getting the CiviCRM menu to display
-    // but obviously should be replaced once we have user management
-    CRM_Core_Session::singleton()->set('userID', 1);
+    if (!$this->isUserExtensionAvailable()) {
+      $session_cookie_name = 'SESSCIVISOFALLBACK';
+    }
+    else {
+      $session_handler = new SessionHandler();
+      session_set_save_handler($session_handler);
+      $session_cookie_name = 'SESSCIVISO';
+    }
+
+    // session lifetime in seconds (default = 24 minutes)
+    $session_max_lifetime = (Civi::settings()->get('standaloneusers_session_max_lifetime') ?? 24) * 60;
+
+    session_start([
+      'cookie_httponly'  => 1,
+      'cookie_secure'    => !empty($_SERVER['HTTPS']),
+      'gc_maxlifetime'   => $session_max_lifetime,
+      'name'             => $session_cookie_name,
+      'use_cookies'      => 1,
+      'use_only_cookies' => 1,
+      'use_strict_mode'  => 1,
+    ]);
+  }
+
+  public function initialize() {
+    parent::initialize();
+    $this->registerDefaultPaths();
   }
 
   /**
-   * @inheritdoc
+   * Specify the default computation for various paths/URLs.
    */
-  public function getSessionId() {
-    return session_id();
+  protected function registerDefaultPaths(): void {
+    \Civi::paths()
+      ->register('civicrm.private', function () {
+          return [
+            'path' => \Civi::paths()->getPath('[cms.root]/private'),
+          ];
+      })
+      ->register('civicrm.compile', function () {
+        return [
+          'path' => \Civi::paths()->getPath('[civicrm.private]/cache'),
+        ];
+      })
+      ->register('civicrm.log', function () {
+        return [
+          'path' => \Civi::paths()->getPath('[civicrm.private]/log'),
+        ];
+      })
+      ->register('civicrm.l10n', function () {
+        return [
+          'path' => \Civi::paths()->getPath('[civicrm.private]/l10n'),
+        ];
+      });
   }
 
   /**
-   * Helper function to rebuild the Drupal 8 or 9 dynamic routing cache.
-   * We need to do this after enabling extensions that add routes and it's worth doing when we reset Civi paths.
+   * Standalone's session cannot be initialized until CiviCRM is booted,
+   * since it is defined in an extension,
+   *
+   * This is also when we set timezone
    */
-  public function invalidateRouteCache() {
+  public function postContainerBoot(): void {
+    $sess = \CRM_Core_Session::singleton();
+    $sess->initialize();
+
+    $this->setTimeZone();
   }
 
 }

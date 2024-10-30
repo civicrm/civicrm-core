@@ -57,7 +57,7 @@ trait CRMTraits_Financial_TaxTrait {
       'account_relationship' => 10,
       'financial_account_id' => $this->ids['FinancialAccount'][$key],
     ];
-    CRM_Financial_BAO_FinancialTypeAccount::add($financialAccountParams);
+    CRM_Financial_BAO_EntityFinancialAccount::add($financialAccountParams);
   }
 
 }

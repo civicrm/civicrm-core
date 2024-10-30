@@ -24,6 +24,8 @@ use Civi\Api4\Utils\CoreUtil;
  */
 class CheckAccessAction extends AbstractAction {
 
+  use Traits\GetSetValueTrait;
+
   /**
    * @var string
    * @required
@@ -57,17 +59,6 @@ class CheckAccessAction extends AbstractAction {
    */
   public function isAuthorized(): bool {
     return TRUE;
-  }
-
-  /**
-   * Add an item to the values array
-   * @param string $fieldName
-   * @param mixed $value
-   * @return $this
-   */
-  public function addValue(string $fieldName, $value) {
-    $this->values[$fieldName] = $value;
-    return $this;
   }
 
 }

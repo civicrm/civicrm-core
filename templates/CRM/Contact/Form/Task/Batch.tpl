@@ -19,7 +19,12 @@
       {if $field.skipDisplay}
         {continue}
       {/if}
-      <td>{copyIcon name=$field.name title=$field.title}{$field.title}</td>
+      <td>
+      {if !$field.is_view}
+        {copyIcon name=$field.name title=$field.title}
+      {/if}
+        {$field.title}
+      </td>
     {/foreach}
     </tr>
     </thead>
@@ -33,23 +38,21 @@
       {assign var=n value=$field.name}
       {if $field.options_per_line}
         <td class="compressed">
-          {assign var="count" value="1"}
+          {assign var="count" value=1}
           {strip}
             <table class="form-layout-compressed">
             <tr>
             {* sort by fails for option per line. Added a variable to iterate through the element array*}
-              {assign var="index" value="1"}
               {foreach name=optionOuter key=optionKey item=optionItem from=$form.field.$cid.$n}
-                {if $index < 10}
-                  {assign var="index" value=`$index+1`}
-                {else}
+                {* There are both numeric and non-numeric keys mixed in here, where the non-numeric are metadata that aren't arrays with html members. *}
+                {if is_array($optionItem) && array_key_exists('html', $optionItem)}
                   <td class="labels font-light">{$form.field.$cid.$n.$optionKey.html}</td>
                   {if $count == $field.options_per_line}
                   </tr>
                   <tr>
-                    {assign var="count" value="1"}
+                    {assign var="count" value=1}
                     {else}
-                    {assign var="count" value=`$count+1`}
+                    {assign var="count" value=$count+1}
                   {/if}
                 {/if}
               {/foreach}

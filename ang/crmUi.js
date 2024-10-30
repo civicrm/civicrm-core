@@ -2,31 +2,35 @@
 (function (angular, $, _) {
 
   var uidCount = 0,
-    pageTitle = 'CiviCRM',
+    pageTitleHTML = 'CiviCRM',
     documentTitle = 'CiviCRM';
 
   angular.module('crmUi', CRM.angRequires('crmUi'))
 
-    // example <div crm-ui-accordion crm-title="ts('My Title')" crm-collapsed="true">...content...</div>
-    // WISHLIST: crmCollapsed should support two-way/continuous binding
+    // example <div crm-ui-accordion="{title: ts('My Title'), collapsed: true}">...content...</div>
+    // @deprecated: just use <details><summary> markup
     .directive('crmUiAccordion', function() {
       return {
         scope: {
           crmUiAccordion: '='
         },
-        template: '<div ng-class="cssClasses"><div class="crm-accordion-header">{{crmUiAccordion.title}} <a crm-ui-help="help" ng-if="help"></a></div><div class="crm-accordion-body" ng-transclude></div></div>',
+        template: '<details class="crm-accordion-bold"><summary>{{crmUiAccordion.title}} <a crm-ui-help="help" ng-if="help"></a></summary><div class="crm-accordion-body" ng-transclude></div></details>',
         transclude: true,
         link: function (scope, element, attrs) {
-          scope.cssClasses = {
-            'crm-accordion-wrapper': true,
-            collapsed: scope.crmUiAccordion.collapsed
-          };
           scope.help = null;
-          scope.$watch('crmUiAccordion', function(crmUiAccordion) {
-            if (crmUiAccordion && crmUiAccordion.help) {
-              scope.help = crmUiAccordion.help.clone({}, {
-                title: crmUiAccordion.title
-              });
+          let openSet = false;
+          scope.$watch('crmUiAccordion', function(crmUiAccordion, oldVal) {
+            if (crmUiAccordion) {
+              // Only process this once
+              if (!openSet) {
+                $(element).children('details').prop('open', !crmUiAccordion.collapsed);
+                openSet = true;
+              }
+              if (crmUiAccordion.help) {
+                scope.help = crmUiAccordion.help.clone({}, {
+                  title: crmUiAccordion.title
+                });
+              }
             }
           });
         }
@@ -78,17 +82,21 @@
           ngModel.$render = function () {
             element.val(ngModel.$viewValue).change();
           };
+          let settings = angular.copy(scope.crmUiDatepicker || {});
+          // Set defaults to be non-restrictive
+          settings.start_date_years = settings.start_date_years || 100;
+          settings.end_date_years = settings.end_date_years || 100;
 
           element
-            .crmDatepicker(scope.crmUiDatepicker)
+            .crmDatepicker(settings)
             .on('change', function() {
               // Because change gets triggered from the $render function we could be either inside or outside the $digest cycle
               $timeout(function() {
-                var requiredLength = 19;
-                if (scope.crmUiDatepicker && scope.crmUiDatepicker.time === false) {
+                let requiredLength = 19;
+                if (settings.time === false) {
                   requiredLength = 10;
                 }
-                if (scope.crmUiDatepicker && scope.crmUiDatepicker.date === false) {
+                if (settings.date === false) {
                   requiredLength = 8;
                 }
                 ngModel.$setValidity('incompleteDateTime', !(element.val().length && element.val().length !== requiredLength));
@@ -399,24 +407,28 @@
         require: '?ngModel',
         link: function (scope, elm, attr, ngModel) {
 
-          var editor = CRM.wysiwyg.create(elm);
-          if (!ngModel) {
-            return;
-          }
+          // Wait for #id to stabilize so the wysiwyg doesn't init with an id like `cke_{{:: fieldId }}`
+          $timeout(function() {
+            var editor = CRM.wysiwyg.create(elm);
 
-          if (attr.ngBlur) {
-            $(elm).on('blur', function() {
-              $timeout(function() {
-                scope.$eval(attr.ngBlur);
+            if (!ngModel) {
+              return;
+            }
+
+            if (attr.ngBlur) {
+              $(elm).on('blur', function() {
+                $timeout(function() {
+                  scope.$eval(attr.ngBlur);
+                });
               });
-            });
-          }
+            }
 
-          ngModel.$render = function(value) {
-            editor.done(function() {
-              CRM.wysiwyg.setVal(elm, ngModel.$viewValue || '');
-            });
-          };
+            ngModel.$render = function(value) {
+              editor.done(function() {
+                CRM.wysiwyg.setVal(elm, ngModel.$viewValue || '');
+              });
+            };
+          });
         }
       };
     })
@@ -608,7 +620,7 @@
                 var newVal = _.cloneDeep(ngModel.$modelValue);
                 // Fix possible data-type mismatch
                 if (typeof newVal === 'string' && element.select2('container').hasClass('select2-container-multi')) {
-                  newVal = newVal.length ? newVal.split(',') : [];
+                  newVal = newVal.length ? newVal.split(scope.crmUiSelect.separator || ',') : [];
                 }
                 element.select2('val', newVal);
               });
@@ -616,6 +628,10 @@
           }
           function refreshModel() {
             var oldValue = ngModel.$viewValue, newValue = element.select2('val');
+            // Let ng-list do the splitting
+            if (Array.isArray(newValue) && attrs.ngList) {
+              newValue = newValue.join(attrs.ngList);
+            }
             if (oldValue != newValue) {
               scope.$parent.$apply(function () {
                 ngModel.$setViewValue(newValue);
@@ -716,23 +732,82 @@
     .directive('crmAutocomplete', function () {
       return {
         require: {
+          crmAutocomplete: 'crmAutocomplete',
           ngModel: '?ngModel'
         },
+        priority: 100,
         bindToController: {
-          crmAutocomplete: '<',
-          crmAutocompleteParams: '<'
+          entity: '<crmAutocomplete',
+          crmAutocompleteParams: '<',
+          multi: '<',
+          autoOpen: '<',
+          quickAdd: '<',
+          staticOptions: '<'
+        },
+        link: function(scope, element, attr, ctrl) {
+          // Copied from ng-list but applied conditionally if field is multi-valued
+          var parseList = function(viewValue) {
+            // If the viewValue is invalid (say required but empty) it will be `undefined`
+            if (_.isUndefined(viewValue)) return;
+
+            if (!ctrl.crmAutocomplete.multi) {
+              return viewValue;
+            }
+
+            var list = [];
+
+            if (viewValue) {
+              _.each(viewValue.split(','), function(value) {
+                if (value) {
+                  list.push(_.trim(value));
+                }
+              });
+            }
+
+            return list;
+          };
+
+          if (ctrl.ngModel) {
+            // Ensure widget is updated when model changes
+            ctrl.ngModel.$render = function() {
+              // Trigger change so the Select2 renders the current value,
+              // but only if the value has actually changed (to avoid recursion)
+              // We need to coerce null|false in the model to '' and numbers to strings.
+              // We need 0 not to be equivalent to null|false|''
+              const newValue = (ctrl.ngModel.$viewValue === null || ctrl.ngModel.$viewValue === undefined || ctrl.ngModel.$viewValue === false) ? '' : ctrl.ngModel.$viewValue.toString();
+              if (newValue !== element.val().toString()) {
+                element.val(newValue).change();
+              }
+            };
+
+            // Copied from ng-list
+            ctrl.ngModel.$parsers.push(parseList);
+            ctrl.ngModel.$formatters.push(function(value) {
+              return _.isArray(value) ? value.join(',') : value;
+            });
+
+            // Copied from ng-list
+            ctrl.ngModel.$isEmpty = function(value) {
+              return !value || !value.length;
+            };
+          }
         },
         controller: function($element, $timeout) {
           var ctrl = this;
-          $timeout(function() {
-            $element.crmAutocomplete(ctrl.crmAutocomplete, ctrl.crmAutocompleteParams);
-            // Ensure widget is updated when model changes
-            if (ctrl.ngModel) {
-              ctrl.ngModel.$render = function() {
-                $element.val(ctrl.ngModel.$viewValue || '').change();
-              };
-            }
-          });
+
+          // Intitialize widget, and re-render it every time params change
+          this.$onChanges = function() {
+            // Timeout is to wait for `placeholder="{{ ts(...) }}"` to be resolved
+            $timeout(function() {
+              $element.crmAutocomplete(ctrl.entity, ctrl.crmAutocompleteParams || {}, {
+                multiple: ctrl.multi,
+                // Only auto-open if there are no static options
+                minimumInputLength: ctrl.autoOpen && _.isEmpty(ctrl.staticOptions) ? 0 : 1,
+                static: ctrl.staticOptions || [],
+                quickAdd: ctrl.quickAdd,
+              });
+            });
+          };
         }
       };
     })
@@ -1123,7 +1198,7 @@
     // WARNING: Use only once per route!
     // WARNING: This directive works only if your AngularJS base page does not
     // set a custom title (i.e., it has an initial title of "CiviCRM"). See the
-    // global variables pageTitle and documentTitle.
+    // global variables pageTitleHTML and documentTitle.
     // Example (same title for both): <h1 crm-page-title>{{ts('Hello')}}</h1>
     // Example (separate document title): <h1 crm-document-title="ts('Hello')" crm-page-title><i class="crm-i fa-flag" aria-hidden="true"></i>{{ts('Hello')}}</h1>
     .directive('crmPageTitle', function($timeout) {
@@ -1134,27 +1209,22 @@
         link: function(scope, $el, attrs) {
           function update() {
             $timeout(function() {
-              var newPageTitle = _.trim($el.html()),
+              var newPageTitleHTML = $el.html().trim(),
                 newDocumentTitle = scope.crmDocumentTitle || $el.text(),
-                h1Count = 0,
                 dialog = $el.closest('.ui-dialog-content');
               if (dialog.length) {
                 dialog.dialog('option', 'title', newDocumentTitle);
                 $el.hide();
               } else {
                 document.title = $('title').text().replace(documentTitle, newDocumentTitle);
-                // If the CMS has already added title markup to the page, use it
-                $('h1').not('.crm-container h1').each(function () {
-                  if ($(this).hasClass('crm-page-title') || _.trim($(this).html()) === pageTitle) {
-                    $(this).addClass('crm-page-title').html(newPageTitle);
+                [].forEach.call(document.querySelectorAll('h1:not(.crm-container h1), .crm-page-title-wrapper>h1'), h1 => {
+                  if (h1.classList.contains('crm-page-title') || h1.innerHTML.trim() === pageTitleHTML) {
+                    h1.classList.add('crm-page-title');
+                    h1.innerHTML = newPageTitleHTML;
                     $el.hide();
-                    ++h1Count;
                   }
                 });
-                if (!h1Count) {
-                  $el.show();
-                }
-                pageTitle = newPageTitle;
+                pageTitleHTML = newPageTitleHTML;
                 documentTitle = newDocumentTitle;
               }
             });
@@ -1180,7 +1250,7 @@
           var ts = CRM.ts();
 
           function read() {
-            var htmlVal = element.html();
+            var htmlVal = element.text();
             if (!htmlVal) {
               htmlVal = scope.defaultValue || '';
               element.text(htmlVal);
@@ -1227,6 +1297,19 @@
             });
           });
         }
+      };
+    })
+
+    // Reformat an array of objects for compatibility with select2
+    .factory('formatForSelect2', function() {
+      return function(input, key, label, extra) {
+        return _.transform(input, function(result, item) {
+          var formatted = {id: item[key], text: item[label]};
+          if (extra) {
+            _.merge(formatted, _.pick(item, extra));
+          }
+          result.push(formatted);
+        }, []);
       };
     })
 

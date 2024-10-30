@@ -39,7 +39,6 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
    * Build all the data structures needed to build the form.
    */
   public function preProcess() {
-    $this->skipOnHold = $this->skipDeceased = FALSE;
     $this->preProcessPDF();
     parent::preProcess();
     $this->assign('single', $this->isSingle());
@@ -81,7 +80,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
     $this->assign('suppressForm', FALSE);
 
     // Contribute PDF tasks allow you to email as well, so we need to add email address to those forms
-    $this->add('select', 'from_email_address', ts('From Email Address'), $this->_fromEmails, TRUE);
+    $this->add('select', 'from_email_address', ts('From Email Address'), $this->getFromEmails(), TRUE);
     $this->addPDFElementsToForm();
 
     // specific need for contributions
@@ -168,7 +167,6 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
     $nowDate = date('YmdHis');
     $receipts = $thanks = $emailed = 0;
     $updateStatus = '';
-    $task = 'CRM_Contribution_Form_Task_PDFLetterCommon';
     $realSeparator = ', ';
     $tableSeparators = [
       'td' => '</td><td>',
@@ -188,9 +186,6 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
     $separator = '****~~~~';
     $groupBy = $this->getSubmittedValue('group_by');
 
-    // skip some contacts ?
-    $skipOnHold = $this->skipOnHold ?? FALSE;
-    $skipDeceased = $this->skipDeceased ?? TRUE;
     $contributionIDs = $this->getIDs();
     if ($this->isQueryIncludesSoftCredits()) {
       $contributionIDs = [];
@@ -200,7 +195,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
         $contributionIDs["{$result->contact_id}-{$result->contribution_id}"] = $result->contribution_id;
       }
     }
-    [$contributions, $contacts] = $this->buildContributionArray($groupBy, $contributionIDs, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $task, $separator, $this->isQueryIncludesSoftCredits());
+    [$contributions, $contacts] = $this->buildContributionArray($groupBy, $contributionIDs, $returnProperties, $messageToken, $separator, $this->isQueryIncludesSoftCredits());
     $html = [];
     $contactHtml = $emailedHtml = [];
     foreach ($contributions as $contributionId => $contribution) {
@@ -246,7 +241,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
     $contactIds = array_keys($contacts);
     // CRM-16725 Skip creation of activities if user is previewing their PDF letter(s)
     if ($this->isLiveMode()) {
-      $this->createActivities($html_message, $contactIds, CRM_Utils_Array::value('subject', $formValues, ts('Thank you letter')), CRM_Utils_Array::value('campaign_id', $formValues), $contactHtml);
+      $this->createActivities($html_message, $contactIds, CRM_Utils_Array::value('subject', $formValues, ts('Thank you letter')), $formValues['campaign_id'] ?? NULL, $contactHtml);
     }
     $html = array_diff_key($html, $emailedHtml);
 
@@ -307,17 +302,14 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
    * @param string $groupBy
    * @param array $contributionIDs
    * @param array $returnProperties
-   * @param bool $skipOnHold
-   * @param bool $skipDeceased
    * @param array $messageToken
-   * @param string $task
    * @param string $separator
    * @param bool $isIncludeSoftCredits
    *
    * @return array
    * @throws \CRM_Core_Exception
    */
-  public function buildContributionArray($groupBy, $contributionIDs, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $task, $separator, $isIncludeSoftCredits) {
+  public function buildContributionArray($groupBy, $contributionIDs, $returnProperties, $messageToken, $separator, $isIncludeSoftCredits) {
     $contributions = $contacts = [];
     foreach ($contributionIDs as $item => $contributionId) {
       $contribution = CRM_Contribute_BAO_Contribution::getContributionTokenValues($contributionId, $messageToken)['values'][$contributionId];

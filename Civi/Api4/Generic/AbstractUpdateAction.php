@@ -28,6 +28,8 @@ use Civi\Api4\Utils\CoreUtil;
  */
 abstract class AbstractUpdateAction extends AbstractBatchAction {
 
+  use Traits\GetSetValueTrait;
+
   /**
    * Field values to update.
    *
@@ -105,27 +107,6 @@ abstract class AbstractUpdateAction extends AbstractBatchAction {
 
     $this->validateValues();
     $result->exchangeArray($this->updateRecords($items));
-  }
-
-  /**
-   * @param string $fieldName
-   *
-   * @return mixed|null
-   */
-  public function getValue(string $fieldName) {
-    return $this->values[$fieldName] ?? NULL;
-  }
-
-  /**
-   * Add an item to the values array.
-   *
-   * @param string $fieldName
-   * @param mixed $value
-   * @return $this
-   */
-  public function addValue(string $fieldName, $value) {
-    $this->values[$fieldName] = $value;
-    return $this;
   }
 
   /**

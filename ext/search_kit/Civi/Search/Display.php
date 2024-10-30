@@ -12,7 +12,6 @@
 namespace Civi\Search;
 
 use CRM_Search_ExtensionUtil as E;
-use Civi\Api4\Utils\CoreUtil;
 
 /**
  * Class Display
@@ -55,66 +54,29 @@ class Display {
    * @param string|bool $addLabel
    *   Pass a string to supply a custom label, TRUE to use the default,
    *   or FALSE to keep the %1 placeholders in the text (used for the admin UI)
-   * @return array[]|null
+   * @param array|null $excludeActions
+   * @return array[]
    */
-  public static function getEntityLinks(string $entity, $addLabel = FALSE) {
-    $paths = CoreUtil::getInfoItem($entity, 'paths');
-    // Hack to support links to relationships
-    if ($entity === 'RelationshipCache') {
-      $entity = 'Relationship';
+  public static function getEntityLinks(string $entity, $addLabel = FALSE, array $excludeActions = NULL): array {
+    $apiParams = [
+      'checkPermissions' => FALSE,
+      'entityTitle' => $addLabel,
+      'select' => ['ui_action', 'entity', 'text', 'icon', 'target'],
+    ];
+    if ($excludeActions) {
+      $apiParams['where'][] = ['ui_action', 'NOT IN', $excludeActions];
     }
-    if ($addLabel === TRUE) {
-      $addLabel = CoreUtil::getInfoItem($entity, 'title');
+    $links = (array) civicrm_api4($entity, 'getLinks', $apiParams);
+    $styles = [
+      'delete' => 'danger',
+      'add' => 'primary',
+    ];
+    foreach ($links as &$link) {
+      $link['action'] = $link['ui_action'];
+      $link['style'] = $styles[$link['ui_action']] ?? 'default';
+      unset($link['ui_action']);
     }
-    $label = $addLabel ? [1 => $addLabel] : [];
-    if ($paths) {
-      $links = [
-        'view' => [
-          'action' => 'view',
-          'entity' => $entity,
-          'text' => E::ts('View %1', $label),
-          'icon' => 'fa-external-link',
-          'style' => 'default',
-          // Contacts and cases are too cumbersome to view in a popup
-          'target' => in_array($entity, ['Contact', 'Case']) ? '_blank' : 'crm-popup',
-        ],
-        'preview' => [
-          'action' => 'preview',
-          'entity' => $entity,
-          'text' => E::ts('Preview %1', $label),
-          'icon' => 'fa-eye',
-          'style' => 'default',
-          'target' => 'crm-popup',
-        ],
-        'update' => [
-          'action' => 'update',
-          'entity' => $entity,
-          'text' => E::ts('Edit %1', $label),
-          'icon' => 'fa-pencil',
-          'style' => 'default',
-          // Contacts and cases are too cumbersome to edit in a popup
-          'target' => in_array($entity, ['Contact', 'Case']) ? '_blank' : 'crm-popup',
-        ],
-        'move' => [
-          'action' => 'move',
-          'entity' => $entity,
-          'text' => E::ts('Move %1', $label),
-          'icon' => 'fa-random',
-          'style' => 'default',
-          'target' => 'crm-popup',
-        ],
-        'delete' => [
-          'action' => 'delete',
-          'entity' => $entity,
-          'text' => E::ts('Delete %1', $label),
-          'icon' => 'fa-trash',
-          'style' => 'danger',
-          'target' => 'crm-popup',
-        ],
-      ];
-      return array_intersect_key($links, $paths) ?: NULL;
-    }
-    return NULL;
+    return $links;
   }
 
 }

@@ -53,13 +53,13 @@ class CRM_Queue_Queue_SqlParallel extends CRM_Queue_Queue implements CRM_Queue_Q
     $sql = "SELECT id, queue_name, submit_time, release_time, run_count, data
         FROM civicrm_queue_item
         WHERE queue_name = %1
-              AND (release_time IS NULL OR release_time < %2)
+              AND (release_time IS NULL OR UNIX_TIMESTAMP(release_time) < %2)
         ORDER BY weight ASC, id ASC
         LIMIT %3
       ";
     $params = [
       1 => [$this->getName(), 'String'],
-      2 => [CRM_Utils_Time::getTime(), 'Timestamp'],
+      2 => [CRM_Utils_Time::time(), 'Integer'],
       3 => [$limit, 'Integer'],
     ];
     $dao = CRM_Core_DAO::executeQuery($sql, $params, TRUE, 'CRM_Queue_DAO_QueueItem');
@@ -78,9 +78,8 @@ class CRM_Queue_Queue_SqlParallel extends CRM_Queue_Queue implements CRM_Queue_Q
       ];
     }
     if ($result) {
-      $nowEpoch = CRM_Utils_Time::getTimeRaw();
-      $sql = CRM_Utils_SQL::interpolate('UPDATE civicrm_queue_item SET release_time = @RT, run_count = 1+run_count WHERE id IN (#ids)', [
-        'RT' => date('YmdHis', $nowEpoch + $lease_time),
+      $sql = CRM_Utils_SQL::interpolate('UPDATE civicrm_queue_item SET release_time = FROM_UNIXTIME(UNIX_TIMESTAMP() + #release), run_count = 1+run_count WHERE id IN (#ids)', [
+        'release' => CRM_Utils_Time::delta() + $lease_time,
         'ids' => CRM_Utils_Array::collect('id', $result),
       ]);
       CRM_Core_DAO::executeQuery($sql);
@@ -117,8 +116,8 @@ class CRM_Queue_Queue_SqlParallel extends CRM_Queue_Queue implements CRM_Queue_Q
     if ($dao->fetch()) {
       $nowEpoch = CRM_Utils_Time::getTimeRaw();
       $dao->run_count++;
-      CRM_Core_DAO::executeQuery("UPDATE civicrm_queue_item SET release_time = %1, run_count = %3 WHERE id = %2", [
-        '1' => [date('YmdHis', $nowEpoch + $lease_time), 'String'],
+      CRM_Core_DAO::executeQuery("UPDATE civicrm_queue_item SET release_time = from_unixtime(unix_timestamp() + %1), run_count = %3 WHERE id = %2", [
+        '1' => [CRM_Utils_Time::delta() + $lease_time, 'Integer'],
         '2' => [$dao->id, 'Integer'],
         '3' => [$dao->run_count, 'Integer'],
       ]);

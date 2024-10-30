@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\ActionSchedule\AbstractMappingTest;
+
 /**
  * Class CRM_Event_ActionMappingTest
  * @group ActionSchedule
@@ -19,24 +21,22 @@
  * @see \Civi\ActionSchedule\AbstractMappingTest
  * @group headless
  */
-class CRM_Event_ActionMappingTest extends \Civi\ActionSchedule\AbstractMappingTest {
+class CRM_Event_ActionMappingTest extends AbstractMappingTest {
 
   public function createTestCases() {
   }
 
-  public function testLimitByRoleId() {
-    $participantId = $this->participantCreate(['role_id' => [1, 2]]);
-    $participant = $this->callAPISuccess('participant', 'getsingle', ['id' => $participantId]);
-    $eventId = $participant['event_id'];
+  public function testLimitByRoleID(): void {
+    $this->participantCreate(['role_id' => [1, 2], 'event_id' => $this->eventCreateUnpaid()['id']]);
     $this->schedule->mapping_id = CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID;
     $this->schedule->start_action_date = 'start_date';
-    $this->schedule->entity_value = $eventId;
+    $this->schedule->entity_value = $this->getEventID();
     $this->schedule->limit_to = 1;
     $this->schedule->recipient_listing = 1;
     $this->startWeekBefore();
     $this->useHelloFirstName();
     $this->schedule->save();
-    $this->callAPISuccess('job', 'send_reminder', []);
+    $this->callAPISuccess('Job', 'send_reminder', []);
   }
 
 }

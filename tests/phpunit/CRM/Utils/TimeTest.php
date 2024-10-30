@@ -6,6 +6,11 @@
  */
 class CRM_Utils_TimeTest extends CiviUnitTestCase {
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->useTransaction();
+  }
+
   /**
    * Equal cases.
    *

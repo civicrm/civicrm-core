@@ -21,19 +21,13 @@
 class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement implements \Civi\Core\HookInterface {
 
   /**
-   * Retrieve DB object and copy to defaults array.
-   *
-   * @param array $params
-   *   Array of criteria values.
-   * @param array $defaults
-   *   Array to be populated with found values.
-   *
-   * @return self|null
-   *   The DAO object, if found.
-   *
    * @deprecated
+   * @param array $params
+   * @param array $defaults
+   * @return self|null
    */
   public static function retrieve($params, &$defaults) {
+    CRM_Core_Error::deprecatedFunctionWarning('API');
     return self::commonRetrieve(self::class, $params, $defaults);
   }
 
@@ -65,6 +59,7 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement implemen
    * @return array
    */
   public static function create($params) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     if (array_key_exists("domain_id", $params) === FALSE) {
       $params["domain_id"] = CRM_Core_Config::domainID();
     }
@@ -85,6 +80,7 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement implemen
    * @return CRM_Core_DAO_WordReplacement
    */
   public static function del($id) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     return static::deleteRecord(['id' => $id]);
   }
 
@@ -267,11 +263,8 @@ WHERE  domain_id = %1
    *   List of word replacements (enabled/disabled) for the given locale.
    */
   public static function getLocaleCustomStrings($locale, $domainId = NULL) {
-    if ($domainId === NULL) {
-      $domainId = CRM_Core_Config::domainID();
-    }
-
-    return CRM_Utils_Array::value($locale, self::_getLocaleCustomStrings($domainId));
+    $domainId ??= CRM_Core_Config::domainID();
+    return self::_getLocaleCustomStrings($domainId)[$locale] ?? [];
   }
 
   /**
@@ -283,9 +276,10 @@ WHERE  domain_id = %1
    */
   private static function _getLocaleCustomStrings($domainId) {
     // TODO: Would it be worthwhile using memcache here?
+    // Disable i18n rewrite in query to avoid infinite recursion as this function is called from ts() and the rewrite fetches the schema which also uses ts()
     $domain = CRM_Core_DAO::executeQuery('SELECT locale_custom_strings FROM civicrm_domain WHERE id = %1', [
       1 => [$domainId, 'Integer'],
-    ]);
+    ], TRUE, NULL, FALSE, FALSE);
     while ($domain->fetch()) {
       return empty($domain->locale_custom_strings) ? [] : CRM_Utils_String::unserialize($domain->locale_custom_strings);
     }

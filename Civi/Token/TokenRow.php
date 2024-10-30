@@ -183,15 +183,24 @@ class TokenRow {
    */
   public function customToken($entity, $customFieldID, $entityID) {
     $customFieldName = 'custom_' . $customFieldID;
+    if (empty($entityID)) {
+      return $this->format('text/html')->tokens($entity, $customFieldName, '');
+    }
     $record = civicrm_api3($entity, 'getSingle', [
       'return' => $customFieldName,
       'id' => $entityID,
     ]);
-    $fieldValue = \CRM_Utils_Array::value($customFieldName, $record, '');
-
+    $fieldValue = $record[$customFieldName] ?? '';
+    $originalValue = $fieldValue;
     // format the raw custom field value into proper display value
     if (isset($fieldValue)) {
       $fieldValue = (string) \CRM_Core_BAO_CustomField::displayValue($fieldValue, $customFieldID);
+    }
+    // This is a bit of a clumsy wy of detecting a link field but if you look into the displayValue
+    // function you will understand.... By assigning the url as a plain token the text version can
+    // use it as plain text (not html re-converted which kinda works but not in subject lines)
+    if (is_string($fieldValue) && is_string($originalValue) && strpos($fieldValue, '<a href') !== FALSE && strpos($originalValue, '<a href') === FALSE) {
+      $this->format('text/plain')->tokens($entity, $customFieldName, $originalValue);
     }
 
     return $this->format('text/html')->tokens($entity, $customFieldName, $fieldValue);
@@ -275,12 +284,12 @@ class TokenRow {
               if ($entity == 'activity' && $field == 'details') {
                 $htmlTokens[$entity][$field] = $value;
               }
-              elseif (\CRM_Utils_Array::value('data_type', \CRM_Utils_Array::value($field, $entityFields['values'])) == 'Memo') {
+              elseif (($entityFields['values'][$field]['data_type'] ?? NULL) === 'Memo') {
                 // Memo fields aka custom fields of type Note are html.
                 $htmlTokens[$entity][$field] = \CRM_Utils_String::purifyHTML($value);
               }
               else {
-                $htmlTokens[$entity][$field] = is_object($value) ? $value : htmlentities($value, ENT_QUOTES);
+                $htmlTokens[$entity][$field] = is_object($value) ? $value : rtrim(nl2br(htmlentities($value, ENT_QUOTES)), "\r\n");
               }
             }
           }
@@ -292,7 +301,8 @@ class TokenRow {
         foreach ($htmlTokens as $entity => $values) {
           foreach ($values as $field => $value) {
             if (!$value instanceof \DateTime && !$value instanceof Money) {
-              $value = html_entity_decode(strip_tags($value));
+              // rtrim removes trailing lines from <p> tags.
+              $value = rtrim(\CRM_Utils_String::htmlToText($value));
             }
             if (!isset($textTokens[$entity][$field])) {
               $textTokens[$entity][$field] = $value;

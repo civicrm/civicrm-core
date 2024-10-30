@@ -40,12 +40,12 @@ class CRM_Queue_TaskRunner {
     /** @var string $outcome One of 'ok', 'retry', 'delete', 'abort' */
 
     if (is_numeric($queue->getSpec('retry_limit')) && $item->run_count > 1 + $queue->getSpec('retry_limit')) {
-      \Civi::log()->debug("Skipping exhausted task: " . $task->title);
+      \Civi::log()->debug('Skipping exhausted task: ' . $task->title);
       $outcome = $queue->getSpec('error');
       $exception = new \CRM_Core_Exception(sprintf('Skipping exhausted task after %d tries: %s', $item->run_count, print_r($task, 1)), 'queue_retry_exhausted');
     }
     else {
-      \Civi::log()->debug("Running task: " . $task->title);
+      \Civi::log()->debug('Running task: ' . $task->title);
       try {
         $runResult = $task->run($this->createContext($queue));
         $outcome = $runResult ? 'ok' : $queue->getSpec('error');
@@ -80,17 +80,17 @@ class CRM_Queue_TaskRunner {
 
     switch ($outcome) {
       case 'retry':
-        \Civi::log('queue')->error('Task "{id}" failed and should be retried. {message}', $logDetails);
+        \Civi::log('queue')->error('Task "{id}" failed and should be retried. Task specific error: {message}', $logDetails);
         $queue->releaseItem($item);
         break;
 
       case 'delete':
-        \Civi::log('queue')->error('Task "{id}" failed and will be deleted. {message}', $logDetails);
+        \Civi::log('queue')->error('Task "{id}" failed and will be deleted. Task specific error: {message}', $logDetails);
         $queue->deleteItem($item);
         break;
 
       case 'abort':
-        \Civi::log('queue')->error('Task "{id}" failed. Queue processing aborted. {message}', $logDetails);
+        \Civi::log('queue')->error('Task "{id}" failed. Queue processing aborted. Task specific error: {message}', $logDetails);
         $queue->setStatus('aborted');
         $queue->releaseItem($item); /* Sysadmin might inspect, fix, and then resume. Item should be accessible. */
         break;

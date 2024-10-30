@@ -527,7 +527,7 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
       'class' => 'crm-select2',
     ]);
 
-    $form->addElement('text', 'member_source', ts('Source'));
+    $form->addElement('text', 'member_source', ts('Membership Source'));
     $form->add('number', 'membership_id', ts('Membership ID'), ['class' => 'four', 'min' => 1]);
 
     $form->addYesNo('membership_is_current_member', ts('Current Member?'), TRUE);

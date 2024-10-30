@@ -9,7 +9,7 @@
 *}
 {include file="CRM/common/pager.tpl" location="top"}
 
-{if $rows }
+{if $rows}
   {include file="CRM/common/jsortable.tpl"}
   {strip}
     <table id="mailing_event">
@@ -71,8 +71,8 @@
         jumpTo = totalPages;
       }
       {/literal}
-      {foreach from=$pager->_linkData item=val key=k }
-        {if $k neq 'crmPID' && $k neq 'force' && $k neq 'q' }
+      {foreach from=$pager->_linkData item=val key=k}
+        {if $k neq 'crmPID' && $k neq 'force' && $k neq 'q'}
         {literal}
         urlParams += '&{/literal}{$k}={$val}{literal}';
         {/literal}
@@ -80,7 +80,7 @@
       {/foreach}
       {literal}
       urlParams += '&crmPID=' + parseInt(jumpTo);
-      var submitUrl = {/literal}'{crmURL p="civicrm/mailing/report/event" q="force=1" h=0 }'{literal};
+      var submitUrl = {/literal}'{crmURL p="civicrm/mailing/report/event" q="force=1" h=0}'{literal};
       document.location = submitUrl + urlParams;
     }
   </script>

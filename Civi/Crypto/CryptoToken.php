@@ -11,6 +11,7 @@
 
 namespace Civi\Crypto;
 
+use Civi\Core\Service\AutoService;
 use Civi\Crypto\Exception\CryptoException;
 
 /**
@@ -42,8 +43,9 @@ use Civi\Crypto\Exception\CryptoException;
  *           "t", the text (base64-encoded ciphertext)
  *
  * @package Civi\Crypto
+ * @service crypto.token
  */
-class CryptoToken {
+class CryptoToken extends AutoService {
 
   /**
    * Format identification code

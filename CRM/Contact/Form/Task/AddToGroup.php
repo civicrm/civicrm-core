@@ -22,6 +22,7 @@
  * addition of contacts to groups.
  */
 class CRM_Contact_Form_Task_AddToGroup extends CRM_Contact_Form_Task {
+  use CRM_Custom_Form_CustomDataTrait;
 
   /**
    * The context that we are working on
@@ -52,9 +53,13 @@ class CRM_Contact_Form_Task_AddToGroup extends CRM_Contact_Form_Task {
     parent::preProcess();
 
     $this->_context = $this->get('context');
-    $this->_id = $this->get('amtgID');
 
-    CRM_Custom_Form_CustomData::preProcess($this, NULL, NULL, 1, 'Group', $this->_id);
+    $this->assign('entityID', $this->getGroupID());
+  }
+
+  public function getGroupID(): ?int {
+    $this->_id = $this->get('amtgID');
+    return $this->_id ? (int) $this->_id : NULL;
   }
 
   /**
@@ -109,10 +114,6 @@ class CRM_Contact_Form_Task_AddToGroup extends CRM_Contact_Form_Task {
 
     if ($this->_context === 'amtg') {
       $groupElement->freeze();
-
-      // also set the group title
-      $groupValues = ['id' => $this->_id, 'title' => $this->_title];
-      $this->assign_by_ref('group', $groupValues);
     }
 
     // Set dynamic page title for 'Add Members Group (confirm)'
@@ -121,8 +122,9 @@ class CRM_Contact_Form_Task_AddToGroup extends CRM_Contact_Form_Task {
     }
     else {
       $this->setTitle(ts('Add Contacts to A Group'));
-      //build custom data
-      CRM_Custom_Form_CustomData::buildQuickForm($this);
+    }
+    if ($this->isSubmitted()) {
+      $this->addCustomDataFieldsToForm('Group');
     }
 
     $this->addDefaultButtons(ts('Add to Group'));
@@ -143,7 +145,6 @@ class CRM_Contact_Form_Task_AddToGroup extends CRM_Contact_Form_Task {
     }
 
     $defaults['group_option'] = 0;
-    $defaults += CRM_Custom_Form_CustomData::setDefaultValues($this);
     return $defaults;
   }
 
@@ -159,7 +160,7 @@ class CRM_Contact_Form_Task_AddToGroup extends CRM_Contact_Form_Task {
    *
    * @param array $params
    *
-   * @return array
+   * @return array|true
    *   list of errors to be posted back to the form
    */
   public static function formRule($params) {
@@ -178,19 +179,19 @@ class CRM_Contact_Form_Task_AddToGroup extends CRM_Contact_Form_Task {
   /**
    * Process the form after the input has been submitted and validated.
    */
-  public function postProcess() {
+  public function postProcess(): void {
     $params = $this->controller->exportValues();
     $groupOption = $params['group_option'] ?? NULL;
     if ($groupOption) {
       $groupParams = [];
       $groupParams['title'] = $params['title'];
       $groupParams['description'] = $params['description'];
-      $groupParams['visibility'] = "User and User Admin Only";
+      $groupParams['visibility'] = 'User and User Admin Only';
       $groupParams['group_type'] = array_keys($params['group_type'] ?? []);
       $groupParams['is_active'] = 1;
-      $groupParams['custom'] = CRM_Core_BAO_CustomField::postProcess($params, $this->_id, 'Group');
+      $groupParams['custom'] = CRM_Core_BAO_CustomField::postProcess($this->getSubmittedValues(), $this->_id, 'Group');
 
-      $createdGroup = CRM_Contact_BAO_Group::create($groupParams);
+      $createdGroup = CRM_Contact_BAO_Group::writeRecord($groupParams);
       $groupID = $createdGroup->id;
       $groupName = $groupParams['title'];
     }
@@ -200,7 +201,7 @@ class CRM_Contact_Form_Task_AddToGroup extends CRM_Contact_Form_Task {
       $groupName = $group[$groupID];
     }
 
-    list($total, $added, $notAdded) = CRM_Contact_BAO_GroupContact::addContactsToGroup($this->_contactIds, $groupID);
+    [$total, $added, $notAdded] = CRM_Contact_BAO_GroupContact::addContactsToGroup($this->_contactIds, $groupID);
 
     $status = [
       ts('%count contact added to group', [
@@ -219,7 +220,7 @@ class CRM_Contact_Form_Task_AddToGroup extends CRM_Contact_Form_Task {
       1 => $groupName,
       'count' => $added,
       'plural' => 'Added Contacts to %1',
-    ]), 'success', ['expires' => 0]);
+    ]), 'success');
 
     if ($this->_context === 'amtg') {
       CRM_Core_Session::singleton()

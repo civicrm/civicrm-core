@@ -81,6 +81,10 @@ class SearchExportTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     // Readonly fields should not be included
     $this->assertArrayNotHasKey('created_date', $export['SavedSearch_TestSearchToExport_SearchDisplay_TestDisplayToExport']['params']['values']);
     $this->assertArrayNotHasKey('modified_date', $export['SavedSearch_TestSearchToExport_SearchDisplay_TestDisplayToExport']['params']['values']);
+    // Match criteria
+    $this->assertEquals(['name'], $export['SavedSearch_TestSearchToExport']['params']['match']);
+    sort($export['SavedSearch_TestSearchToExport_SearchDisplay_TestDisplayToExport']['params']['match']);
+    $this->assertEquals(['name', 'saved_search_id'], $export['SavedSearch_TestSearchToExport_SearchDisplay_TestDisplayToExport']['params']['match']);
 
     // Add a second display
     SearchDisplay::create(FALSE)

@@ -78,7 +78,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    * @var array
    */
   public $_tag;
-  public $_tagElement;
 
   /**
    * The params used for search.
@@ -431,7 +430,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
 
         // set the group title
         $groupValues = ['id' => $this->_groupID, 'title' => $this->_group[$this->_groupID]];
-        $this->assign_by_ref('group', $groupValues);
+        $this->assign('group', $groupValues);
 
         // also set ssID if this is a saved search
         $ssID = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $this->_groupID, 'saved_search_id');
@@ -472,7 +471,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       $this->setTitle(ts('Add to Group: %1', [1 => $this->_group[$this->_amtgID]]));
       // also set the group title and freeze the action task with Add Members to Group
       $groupValues = ['id' => $this->_amtgID, 'title' => $this->_group[$this->_amtgID]];
-      $this->assign_by_ref('group', $groupValues);
+      $this->assign('group', $groupValues);
       $this->add('xbutton', $this->_actionButtonName, ts('Add Contacts to %1', [1 => $this->_group[$this->_amtgID]]),
         [
           'type' => 'submit',
@@ -496,7 +495,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       $selectedContactIds = array_keys($selectedContactIdsArr[$qfKeyParam]);
     }
 
-    $this->assign_by_ref('selectedContactIds', $selectedContactIds);
+    $this->assign('selectedContactIds', $selectedContactIds);
 
     $rows = $this->get('rows');
 
@@ -531,7 +530,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     $this->_amtgID = CRM_Utils_Request::retrieve('amtgID', 'Positive', $this);
     $this->_ssID = CRM_Utils_Request::retrieve('ssID', 'Positive', $this);
     $this->_sortByCharacter = CRM_Utils_Request::retrieve('sortByCharacter', 'String', $this);
-    $this->_ufGroupID = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    $ufGroupID = CRM_Utils_Request::retrieve('uf_group_id', 'Positive', $this);
     $this->_componentMode = CRM_Utils_Request::retrieve('component_mode', 'Positive', $this, FALSE, CRM_Contact_BAO_Query::MODE_CONTACTS, $_REQUEST);
     $this->_operator = CRM_Utils_Request::retrieve('operator', 'String', $this, FALSE, CRM_Contact_BAO_Query::SEARCH_OPERATOR_AND, 'REQUEST');
 
@@ -548,10 +547,10 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
 
     // if we dont get this from the url, use default if one exsts
     $config = CRM_Core_Config::singleton();
-    if ($this->_ufGroupID == NULL &&
+    if ($ufGroupID == NULL &&
       $config->defaultSearchProfileID != NULL
     ) {
-      $this->_ufGroupID = $config->defaultSearchProfileID;
+      $ufGroupID = $config->defaultSearchProfileID;
     }
 
     // assign context to drive the template display, make sure context is valid
@@ -580,9 +579,9 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       $this->_returnProperties = &$this->returnProperties();
 
       // also get the uf group id directly from the post value
-      $this->_ufGroupID = CRM_Utils_Array::value('uf_group_id', $_POST, $this->_ufGroupID);
-      $this->_formValues['uf_group_id'] = $this->_ufGroupID;
-      $this->set('id', $this->_ufGroupID);
+      $ufGroupID = $_POST['uf_group_id'] ?? $ufGroupID;
+      $this->_formValues['uf_group_id'] = $ufGroupID;
+      $this->set('uf_group_id', $ufGroupID);
 
       // also get the object mode directly from the post value
       $this->_componentMode = CRM_Utils_Array::value('component_mode', $_POST, $this->_componentMode);
@@ -596,8 +595,8 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       $this->_formValues = $this->get('formValues');
       $this->_params = CRM_Contact_BAO_Query::convertFormValues($this->_formValues, 0, FALSE, NULL, $this->entityReferenceFields);
       $this->_returnProperties = &$this->returnProperties();
-      if (!empty($this->_ufGroupID)) {
-        $this->set('id', $this->_ufGroupID);
+      if ($ufGroupID) {
+        $this->set('uf_group_id', $ufGroupID);
       }
     }
 
@@ -624,9 +623,9 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         $this->_returnProperties = &$this->returnProperties();
       }
       else {
-        if (isset($this->_ufGroupID)) {
+        if ($ufGroupID) {
           // also set the uf group id if not already present
-          $this->_formValues['uf_group_id'] = $this->_ufGroupID;
+          $this->_formValues['uf_group_id'] = $ufGroupID;
         }
         if (isset($this->_componentMode)) {
           $this->_formValues['component_mode'] = $this->_componentMode;
@@ -668,9 +667,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         }
       }
     }
-    $this->assign('id',
-      CRM_Utils_Array::value('uf_group_id', $this->_formValues)
-    );
+    $this->assign('id', $ufGroupID);
     $operator = CRM_Utils_Array::value('operator', $this->_formValues, CRM_Contact_BAO_Query::SEARCH_OPERATOR_AND);
     $this->set('queryOperator', $operator);
     if ($operator == CRM_Contact_BAO_Query::SEARCH_OPERATOR_OR) {
@@ -683,8 +680,8 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     // show the context menu only when we’re not searching for deleted contacts; CRM-5673
     if (empty($this->_formValues['deleted_contacts'])) {
       $menuItems = CRM_Contact_BAO_Contact::contextMenu();
-      $primaryActions = CRM_Utils_Array::value('primaryActions', $menuItems, []);
-      $this->_contextMenu = CRM_Utils_Array::value('moreActions', $menuItems, []);
+      $primaryActions = $menuItems['primaryActions'] ?? [];
+      $this->_contextMenu = $menuItems['moreActions'] ?? [];
       $this->assign('contextMenu', $primaryActions + $this->_contextMenu);
     }
 
@@ -769,10 +766,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
 
     //get the button name
     $buttonName = $this->controller->getButtonName();
-
-    if (isset($this->_ufGroupID) && empty($this->_formValues['uf_group_id'])) {
-      $this->_formValues['uf_group_id'] = $this->_ufGroupID;
-    }
+    $this->_formValues['uf_group_id'] ??= $this->get('uf_group_id') ?: CRM_Core_Config::singleton()->defaultSearchProfileID;
 
     if (isset($this->_componentMode) && empty($this->_formValues['component_mode'])) {
       $this->_formValues['component_mode'] = $this->_componentMode;

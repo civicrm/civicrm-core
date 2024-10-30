@@ -12,15 +12,19 @@
     <tr>
         <td class="label">{$form.uploadFile.label}</td>
         <td>{$form.uploadFile.html}<br />
-            <div class="description">{ts}File format must be comma-separated-values (CSV). File must be UTF8 encoded if it contains special characters (e.g. accented letters, etc.).{/ts}</div>
-            {ts 1=$uploadSize}Maximum Upload File Size: %1 MB{/ts}
+            <div class="description">
+              {ts}File format must be comma-separated-values (CSV). File must be UTF8 encoded if it contains special characters (e.g. accented letters, etc.).{/ts}<br />
+              {ts 1=$uploadSize}Maximum Upload File Size: %1 MB{/ts}
+            </div>
         </td>
     </tr>
     <tr>
         <td></td>
-        <td>{$form.skipColumnHeader.html} {$form.skipColumnHeader.label}
-            <div class="description">{ts}Check this box if the first row of your file consists of field names (Example: 'First Name','Last Name','Email'){/ts}</div>
-        </td>
+        <td>{$form.skipColumnHeader.html} {$form.skipColumnHeader.label}</td>
+    </tr>
+    <tr class="crm-import-datasource-form-block-fieldSeparator">
+      <td class="label">{$form.fieldSeparator.label} {help id='id-fieldSeparator' file='CRM/Contact/Import/Form/DataSource'}</td>
+      <td>{$form.fieldSeparator.html}</td>
     </tr>
   </table>
 

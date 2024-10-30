@@ -16,10 +16,18 @@
  */
 class CRM_Mailing_MailStore {
   /**
-   * flag to decide whether to print debug messages
+   * Flag to decide whether to print debug messages
+   *
    * @var bool
    */
   public $_debug = FALSE;
+
+  /**
+   * Holds the underlying mailbox transport implementation
+   *
+   * @var ezcMailImapTransport|ezcMailMboxTransport|ezcMailPop3Transport|null
+   */
+  protected $_transport;
 
   /**
    * Return the proper mail store implementation, based on config settings.
@@ -39,7 +47,7 @@ class CRM_Mailing_MailStore {
       throw new Exception("Could not find entry named $name in civicrm_mail_settings");
     }
 
-    $protocols = CRM_Core_PseudoConstant::get('CRM_Core_DAO_MailSettings', 'protocol', [], 'validate');
+    $protocols = CRM_Core_DAO_MailSettings::buildOptions('protocol', 'validate');
 
     // Prepare normalized/hookable representation of the mail settings.
     $mailSettings = $dao->toArray();
@@ -183,11 +191,7 @@ class CRM_Mailing_MailStore {
   public function maildir($name) {
     $config = CRM_Core_Config::singleton();
     $dir = $config->customFileUploadDir . DIRECTORY_SEPARATOR . $name;
-    foreach ([
-      'cur',
-      'new',
-      'tmp',
-    ] as $sub) {
+    foreach (['cur', 'new', 'tmp'] as $sub) {
       if (!file_exists($dir . DIRECTORY_SEPARATOR . $sub)) {
         if ($this->_debug) {
           print "creating $dir/$sub\n";

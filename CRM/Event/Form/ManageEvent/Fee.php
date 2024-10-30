@@ -84,7 +84,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
             $countRow = 0;
             foreach ($options as $optionId => $optionValue) {
               $countRow++;
-              $defaults['value'][$countRow] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($optionValue['amount']);
+              $defaults['value'][$countRow] = isset($optionValue['amount']) ? CRM_Utils_Money::formatLocaleNumericRoundedByOptionalPrecision($optionValue['amount'], 9) : '';
               $defaults['label'][$countRow] = $optionValue['label'];
               $defaults['name'][$countRow] = $optionValue['name'];
               $defaults['weight'][$countRow] = $optionValue['weight'];
@@ -124,7 +124,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
 
         foreach ($discountFields['options'] as $discountFieldsval) {
           $defaults['discounted_label'][$discountFieldsval['weight']] = $discountFieldsval['label'];
-          $defaults['discounted_value'][$discountFieldsval['weight']][$rowCount] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($discountFieldsval['amount']);
+          $defaults['discounted_value'][$discountFieldsval['weight']][$rowCount] = isset($discountFieldsval['amount']) ? CRM_Utils_Money::formatLocaleNumericRoundedByOptionalPrecision($discountFieldsval['amount'], 9) : '';
           $defaults['discount_option_id'][$rowCount][$discountFieldsval['weight']] = $discountFieldsval['id'];
           if (!empty($discountFieldsval['is_default'])) {
             $defaults['discounted_default'] = $discountFieldsval['weight'];
@@ -203,15 +203,15 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
       $defaults['pay_later_text'] = ts('I will send payment by check');
     }
 
-    $this->_showHide = new CRM_Core_ShowHideBlocks();
+    $showHide = new CRM_Core_ShowHideBlocks();
     if (!$defaults['is_monetary']) {
-      $this->_showHide->addHide('event-fees');
+      $showHide->addHide('event-fees');
     }
 
     if (isset($defaults['price_set_id'])) {
-      $this->_showHide->addHide('map-field');
+      $showHide->addHide('map-field');
     }
-    $this->_showHide->addToTemplate();
+    $showHide->addToTemplate();
     $this->assign('inDate', $this->_inDate);
     if (!empty($defaults['payment_processor'])) {
       $defaults['payment_processor'] = array_fill_keys(explode(CRM_Core_DAO::VALUE_SEPARATOR,
@@ -236,7 +236,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
     //add currency element.
     $this->addCurrency('currency', ts('Currency'), FALSE);
 
-    $paymentProcessor = CRM_Core_PseudoConstant::paymentProcessor();
+    $paymentProcessor = CRM_Contribute_BAO_ContributionRecur::buildOptions('payment_processor_id', 'create');
 
     $this->assign('paymentProcessor', $paymentProcessor);
     $this->addCheckBox('payment_processor', ts('Payment Processor'),
@@ -246,16 +246,17 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
     );
 
     // financial type
-    if (!CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() ||
-        (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() && CRM_Core_Permission::check('administer CiviCRM Financial Types'))) {
-      $this->addSelect('financial_type_id');
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, CRM_Core_Action::ADD);
+    $financialOptions = [
+      'options' => $financialTypes,
+    ];
+    if (!CRM_Core_Permission::check('administer CiviCRM Financial Types')) {
+      $financialOptions['context'] = 'search';
     }
-    else {
-      CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, CRM_Core_Action::ADD);
-      $this->addSelect('financial_type_id', ['context' => 'search', 'options' => $financialTypes]);
-    }
+    $this->addSelect('financial_type_id', $financialOptions);
+
     // add pay later options
-    $this->addElement('checkbox', 'is_pay_later', ts('Enable Pay Later option?'), NULL,
+    $this->addElement('checkbox', 'is_pay_later', ts('Pay later option'), NULL,
       ['onclick' => "return showHideByValue('is_pay_later','','payLaterOptions','block','radio',false);"]
     );
     $this->addElement('textarea', 'pay_later_text', ts('Pay Later Label'),
@@ -274,9 +275,11 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
     else {
       $this->assign('price', TRUE);
     }
-    $this->addField('price_set_id', [
-      'entity' => 'PriceField',
+    $this->addSelect('price_set_id', [
+      'entity' => 'PriceSet',
+      'option_url' => 'civicrm/admin/price',
       'options' => $price,
+      'label' => ts('Price Set'),
       'onchange' => "return showHideByValue('price_set_id', '', 'map-field', 'block', 'select', false);",
     ]);
 
@@ -548,8 +551,8 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
       $params['payment_processor'] = 'null';
     }
 
-    $params['is_pay_later'] = CRM_Utils_Array::value('is_pay_later', $params, 0);
-    $params['is_billing_required'] = CRM_Utils_Array::value('is_billing_required', $params, 0);
+    $params['is_pay_later'] ??= 0;
+    $params['is_billing_required'] ??= 0;
 
     if ($this->_id) {
 
@@ -652,7 +655,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
 
         $discountPriceSets = !empty($this->_defaultValues['discount_price_set']) ? $this->_defaultValues['discount_price_set'] : [];
         $discountFieldIDs = !empty($this->_defaultValues['discount_option_id']) ? $this->_defaultValues['discount_option_id'] : [];
-        if (CRM_Utils_Array::value('is_discount', $params) == 1) {
+        if (($params['is_discount'] ?? NULL) == 1) {
           // if there are discounted set of label / values,
           // create custom options for them
           $labels = $params['discounted_label'] ?? NULL;
@@ -664,7 +667,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
               $discountOptions = [];
               for ($i = 1; $i < self::NUM_OPTION; $i++) {
                 if (!empty($labels[$i]) &&
-                  !CRM_Utils_System::isNull(CRM_Utils_Array::value($j, $values[$i]))
+                  !CRM_Utils_System::isNull($values[$i][$j] ?? NULL)
                 ) {
                   $discountOptions[] = [
                     'label' => trim($labels[$i]),
@@ -779,7 +782,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
     $params['id'] = $this->_id;
     // skip update of financial type in price set
     $params['skipFinancialType'] = TRUE;
-    CRM_Event_BAO_Event::add($params);
+    \Civi\Api4\Event::save(FALSE)->addRecord($params)->execute();
 
     // Update tab "disabled" css class
     $this->ajaxResponse['tabValid'] = !empty($params['is_monetary']);

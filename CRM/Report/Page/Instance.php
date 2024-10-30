@@ -44,6 +44,7 @@ class CRM_Report_Page_Instance extends CRM_Core_Page {
     $optionVal = CRM_Report_Utils_Report::getValueFromUrl($instanceId);
     $templateInfo = CRM_Core_OptionGroup::getRowValues('report_template', "{$optionVal}", 'value');
     if (empty($templateInfo)) {
+      CRM_Core_Session::singleton()->replaceUserContext(CRM_Utils_System::url('civicrm/report/list', 'reset=1'));
       CRM_Core_Error::statusBounce(ts('You have tried to access a report that does not exist.'));
     }
 
@@ -57,7 +58,7 @@ class CRM_Report_Page_Instance extends CRM_Core_Page {
       $templateInfo['name'] = $reportClass;
     }
 
-    if (strstr($templateInfo['name'], '_Form') || !is_null($reportClass)) {
+    if (str_contains($templateInfo['name'], '_Form') || !is_null($reportClass)) {
       $instanceInfo = [];
       CRM_Report_BAO_ReportInstance::retrieve(['id' => $instanceId], $instanceInfo);
 

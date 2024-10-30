@@ -9,7 +9,11 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\EntityFinancialAccount;
 use Civi\Api4\EntityFinancialTrxn;
+use Civi\Api4\FinancialAccount;
+use Civi\Api4\FinancialType;
+use Civi\Api4\Generic\Result;
 
 /**
  * Class api_v3_TaxContributionPageTest
@@ -19,16 +23,14 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
   protected $params;
   protected $financialTypeID;
   protected $financialAccountId;
-  protected $_entity = 'contribution_page';
   protected $_priceSetParams = [];
   protected $_paymentProcessorType;
   protected $payParams = [];
   protected $settingValue = [];
   protected $setInvoiceSettings;
-  protected $_individualId;
-  protected $financialAccHalftax;
-  protected $financialtypeHalftax;
-  protected $financialRelationHalftax;
+  protected $financialAccountHalfTax;
+  protected $financialTypeHalfTax;
+  protected $financialRelationHalfTax;
   protected $halfFinancialAccId;
   protected $halfFinancialTypeId;
 
@@ -39,8 +41,8 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
    */
   public function setUp(): void {
     parent::setUp();
-    $this->_individualId = $this->individualCreate();
-    $this->_orgId = $this->organizationCreate(NULL);
+    $this->ids['Contact']['individual'] = $this->individualCreate();
+    $this->organizationCreate();
 
     $this->ids['PaymentProcessor'] = $this->paymentProcessorCreate();
     $this->params = [
@@ -67,19 +69,18 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       'is_quick_config' => 0,
       'is_reserved' => 0,
     ];
+
     // Financial Account with 20% tax rate
-    $financialAccountSetparams = [
+    $financialAccount = $this->callAPISuccess('financial_account', 'create', [
       'name' => 'vat full tax rate account',
-      'contact_id' => $this->_orgId,
+      'contact_id' => $this->ids['Contact']['organization_0'],
       'financial_account_type_id' => 2,
       'is_tax' => 1,
       'tax_rate' => 20.00,
       'is_reserved' => 0,
       'is_active' => 1,
       'is_default' => 0,
-    ];
-
-    $financialAccount = $this->callAPISuccess('financial_account', 'create', $financialAccountSetparams);
+    ]);
     $this->financialAccountId = $financialAccount['id'];
 
     // Financial type having 'Sales Tax Account is' with liability financial account
@@ -94,12 +95,12 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       'account_relationship' => 10,
       'financial_account_id' => $this->financialAccountId,
     ];
-    CRM_Financial_BAO_FinancialTypeAccount::add($financialRelationParams);
+    EntityFinancialAccount::create()->setValues($financialRelationParams)->execute();
 
     // Financial type with 5% tax rate
     $financialAccountHalfTax = [
       'name' => 'vat half tax_rate account',
-      'contact_id' => $this->_orgId,
+      'contact_id' => $this->ids['Contact']['organization_0'],
       'financial_account_type_id' => 2,
       'is_tax' => 1,
       'tax_rate' => 5.00,
@@ -107,24 +108,21 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       'is_active' => 1,
       'is_default' => 0,
     ];
-    $halfFinancialAccount = CRM_Financial_BAO_FinancialAccount::add($financialAccountHalfTax);
-    $this->halfFinancialAccId = $halfFinancialAccount->id;
+    $this->halfFinancialAccId = FinancialAccount::create()->setValues($financialAccountHalfTax)->execute()->first()['id'];
     $halfFinancialTypeHalfTax = [
       'name' => 'grass_variety_2',
       'is_reserved' => 0,
       'is_active' => 1,
     ];
 
-    $halfFinancialType = CRM_Financial_BAO_FinancialType::add($halfFinancialTypeHalfTax);
-    $this->halfFinancialTypeId = $halfFinancialType->id;
-    $financialRelationHalftax = [
+    $this->halfFinancialTypeId = FinancialType::create()->setValues($halfFinancialTypeHalfTax)->execute()->first()['id'];
+
+    EntityFinancialAccount::create()->setValues([
       'entity_table' => 'civicrm_financial_type',
       'entity_id' => $this->halfFinancialTypeId,
       'account_relationship' => 10,
       'financial_account_id' => $this->halfFinancialAccId,
-    ];
-
-    CRM_Financial_BAO_FinancialTypeAccount::add($financialRelationHalftax);
+    ])->execute();
 
     // Enable component contribute setting
     $this->enableTaxAndInvoicing();
@@ -132,8 +130,6 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
 
   /**
    * Cleanup after function.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
@@ -141,15 +137,15 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   * @throws \CRM_Core_Exception
+   * Set up a page for test use.
    */
   public function setUpContributionPage(): void {
-    $contributionPageResult = $this->callAPISuccess($this->_entity, 'create', $this->params);
+    $contributionPageResult = $this->callAPISuccess('ContributionPage', 'create', $this->params);
     if (empty($this->ids['price_set'])) {
       $priceSet = $this->callAPISuccess('price_set', 'create', $this->_priceSetParams);
       $this->ids['price_set'][] = $priceSet['id'];
     }
-    $priceSetID = $this->_price = reset($this->ids['price_set']);
+    $priceSetID = reset($this->ids['price_set']);
     CRM_Price_BAO_PriceSet::addTo('civicrm_contribution_page', $contributionPageResult['id'], $priceSetID);
 
     if (empty($this->ids['price_field'])) {
@@ -194,7 +190,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     $this->setCurrencySeparators($thousandSeparator);
     $this->setUpContributionPage();
     $params = [
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact']['individual'],
       'receive_date' => '20120511',
       'total_amount' => $this->formatMoneyInput(100.00),
       'financial_type_id' => $this->financialTypeID,
@@ -208,7 +204,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     ];
 
     $contribution = $this->callAPISuccess('Contribution', 'create', $params)['values'][0];
-    $this->assertEquals($this->_individualId, $contribution['contact_id']);
+    $this->assertEquals($this->ids['Contact']['individual'], $contribution['contact_id']);
     $this->assertEquals(120.00, $contribution['total_amount']);
     $this->assertEquals($this->financialTypeID, $contribution['financial_type_id']);
     $this->assertEquals(12345, $contribution['trxn_id']);
@@ -226,14 +222,12 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
    *   punctuation used to refer to thousands.
    *
    * @dataProvider getThousandSeparators
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testCreateContributionChainedLineItems(string $thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);
     $this->setUpContributionPage();
     $params = [
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact']['individual'],
       'receive_date' => '20120511',
       'total_amount' => 400.00,
       'financial_type_id' => $this->financialTypeID,
@@ -277,7 +271,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
   public function testCreateContributionPayLaterOnline(): void {
     $this->setUpContributionPage();
     $params = [
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact']['individual'],
       'receive_date' => '20120511',
       'total_amount' => 100.00,
       'financial_type_id' => $this->financialTypeID,
@@ -290,7 +284,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       'sequential' => 1,
     ];
     $contribution = $this->callAPISuccess('Contribution', 'create', $params)['values'][0];
-    $this->assertEquals($contribution['contact_id'], $this->_individualId);
+    $this->assertEquals($contribution['contact_id'], $this->ids['Contact']['individual']);
     $this->assertEquals(120.00, $contribution['total_amount']);
     $this->assertEquals($this->financialTypeID, $contribution['financial_type_id']);
     $this->assertEquals(12345, $contribution['trxn_id']);
@@ -316,7 +310,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     $this->setCurrencySeparators($thousandSeparator);
     $this->setUpContributionPage();
     $params = [
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact']['individual'],
       'receive_date' => '20120511',
       'total_amount' => $this->formatMoneyInput(100.00),
       'financial_type_id' => $this->financialTypeID,
@@ -329,7 +323,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     ];
 
     $contribution = $this->callAPISuccess('Contribution', 'create', $params)['values'][0];
-    $this->assertEquals($this->_individualId, $contribution['contact_id']);
+    $this->assertEquals($this->ids['Contact']['individual'], $contribution['contact_id']);
     $this->assertEquals(120.00, $contribution['total_amount']);
     $this->assertEquals($this->financialTypeID, $contribution['financial_type_id']);
     $this->assertEquals(12345, $contribution['trxn_id']);
@@ -348,13 +342,11 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
    *
    * Function tests that line items, financial records are updated when
    * contribution amount is changed
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testCreateUpdateContributionChangeTotal(): void {
     $this->setUpContributionPage();
     $contributionParams = [
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact']['individual'],
       'receive_date' => '20120511',
       'total_amount' => 100.00,
       'financial_type_id' => $this->financialTypeID,
@@ -369,7 +361,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       'return' => 'line_total',
     ]);
     $this->assertEquals('100.00', $lineItems);
-    $trxnAmount = $this->_getFinancialTrxnAmount($contribution['id']);
+    $trxnAmount = $this->getFinancialTrxnAmount($contribution['id']);
     $this->assertEquals('120.00', $trxnAmount);
     $newParams = [
       'id' => $contribution['id'],
@@ -387,22 +379,22 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     ]);
 
     $this->assertEquals('300.00', $lineItems);
-    $this->assertEquals('300.00', $this->_getFinancialTrxnAmount($contribution['id']));
+    $this->assertEquals('300.00', $this->getFinancialTrxnAmount($contribution['id']));
     $this->assertEquals('320.00', $this->_getFinancialItemAmount($contribution['id']));
   }
 
   /**
-   * @param int $contId
+   * @param int $contributionID
    *
    * @return null|string
    */
-  public function _getFinancialTrxnAmount(int $contId): ?string {
+  public function getFinancialTrxnAmount(int $contributionID): ?string {
     $query = "SELECT
      SUM( ft.total_amount ) AS total
      FROM civicrm_financial_trxn AS ft
      LEFT JOIN civicrm_entity_financial_trxn AS ceft ON ft.id = ceft.financial_trxn_id
      WHERE ceft.entity_table = 'civicrm_contribution'
-     AND ceft.entity_id = {$contId}";
+     AND ceft.entity_id = $contributionID";
     return CRM_Core_DAO::singleValueQuery($query);
   }
 
@@ -417,7 +409,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
      SUM(amount)
      FROM civicrm_financial_item
      WHERE entity_table = 'civicrm_line_item'
-     AND entity_id = {$lineItem}";
+     AND entity_id = $lineItem";
     return CRM_Core_DAO::singleValueQuery($query);
   }
 
@@ -430,37 +422,37 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
   public function _checkFinancialRecords($params, $context): void {
     $contributionID = $params['id'];
     $trxn = $this->getFinancialTransactionsForContribution($contributionID);
-
     $trxnParams = [
       'id' => $trxn->first()['financial_trxn_id'],
     ];
     if ($context !== 'online' && $context !== 'payLater') {
-      $compareParams = [
+      $this->assertDBCompareValues('CRM_Financial_DAO_FinancialTrxn', $trxnParams, [
         'to_financial_account_id' => 6,
         'total_amount' => 120,
         'status_id' => 1,
-      ];
+      ]);
     }
     if ($context === 'online') {
-      $compareParams = [
+      $this->assertDBCompareValues('CRM_Financial_DAO_FinancialTrxn', $trxnParams, [
         'to_financial_account_id' => 12,
         'total_amount' => 120,
         'status_id' => 1,
-      ];
+      ]);
     }
     elseif ($context === 'payLater') {
-      $compareParams = [
+      $this->assertDBCompareValues('CRM_Financial_DAO_FinancialTrxn', $trxnParams, [
         'to_financial_account_id' => 7,
         'total_amount' => 120,
         'status_id' => 2,
-      ];
+      ]);
     }
-    $this->assertDBCompareValues('CRM_Financial_DAO_FinancialTrxn', $trxnParams, $compareParams);
+
     $entityParams = [
       'financial_trxn_id' => $trxn->first()['financial_trxn_id'],
       'entity_table' => 'civicrm_financial_item',
     ];
-    $entityTrxn = current(CRM_Financial_BAO_FinancialItem::retrieveEntityFinancialTrxn($entityParams));
+    $entityTrxn = current($this->retrieveEntityFinancialTrxn($entityParams));
+
     $compareParams = [
       'amount' => 100,
       'status_id' => 1,
@@ -481,20 +473,16 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
   /**
    * @param int $financialTypeId
    *
-   * @return int
+   * @return int|null
+   *
+   * @throws \CRM_Core_Exception
    */
   public function _getFinancialAccountId(int $financialTypeId): ?int {
-    $accountRel = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Income Account is' "));
-
-    $searchParams = [
-      'entity_table' => 'civicrm_financial_type',
-      'entity_id' => $financialTypeId,
-      'account_relationship' => $accountRel,
-    ];
-
-    $result = [];
-    CRM_Financial_BAO_FinancialTypeAccount::retrieve($searchParams, $result);
-    return $result['financial_account_id'] ?? NULL;
+    return EntityFinancialAccount::get()
+      ->addWhere('entity_table', '=', 'civicrm_financial_type')
+      ->addWhere('entity_id', '=', $financialTypeId)
+      ->addWhere('account_relationship', '=', key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Income Account is' ")))
+      ->addSelect('financial_account_id')->execute()->first()['financial_account_id'];
   }
 
   /**
@@ -503,12 +491,10 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
    * (It is unclear why this is in this class - it seems like maybe it doesn't
    * test anything not on the contribution test class & might be copy and
    * paste....).
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testDeleteContribution(): void {
     $contributionID = $this->contributionCreate([
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->ids['Contact']['individual'],
       'trxn_id' => 12389,
       'financial_type_id' => $this->financialTypeID,
       'invoice_id' => 'abc',
@@ -523,7 +509,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  protected function getFinancialTransactionsForContribution($contributionID): \Civi\Api4\Generic\Result {
+  protected function getFinancialTransactionsForContribution($contributionID): Result {
     return EntityFinancialTrxn::get()
       ->addWhere('id', '=', $contributionID)
       ->addWhere('entity_table', '=', 'civicrm_contribution')
