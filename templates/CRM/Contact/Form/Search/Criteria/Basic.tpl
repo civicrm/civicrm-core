@@ -33,4 +33,9 @@
       {include file=$fieldSpec.template}
     {/if}
   {/foreach}
+  {if !empty($form.deleted_contacts)}
+    <div class="search-field">
+      {$form.deleted_contacts.html} {$form.deleted_contacts.label}
+    </div>
+  {/if}
 </div>

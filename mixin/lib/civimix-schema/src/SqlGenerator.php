@@ -48,7 +48,8 @@ return new class() {
   }
 
   public function __construct(array $entities = [], ?callable $findExternalTable = NULL) {
-    $this->entities = $entities;
+    // Filter out entities without a sql table (e.g. Afform)
+    $this->entities = array_filter($entities, fn($entity) => !empty($entity['table']));
     $this->findExternalTable = $findExternalTable ?: function() {
       return NULL;
     };
@@ -163,8 +164,7 @@ return new class() {
     if (!empty($field['required'])) {
       $fieldSql .= ' NOT NULL';
     }
-    // Mysql 5.7 requires timestamp to be explicitly declared NULL
-    if (empty($field['required']) && $field['sql_type'] === 'timestamp') {
+    else {
       $fieldSql .= ' NULL';
     }
     if (!empty($field['auto_increment'])) {

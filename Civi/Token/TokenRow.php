@@ -144,31 +144,35 @@ class TokenRow {
   /**
    * Update the value of a token.
    *
-   * If you are reading this it probably means you can't follow this function.
+   * Eileen said: If you are reading this it probably means you can't follow this function.
    * Don't worry - I've stared at it & all I see is a bunch of letters. However,
    * the answer to your problem is almost certainly that you are passing in null
    * rather than an empty string for 'c'.
+   * MJW said: I've renamed the bunch of letters so they might be a bit more meaningful.
+   * Also, I don't think this function should ever be called without $tokenField being set
+   * but tests do call it like that.
    *
-   * @param string|array $a
-   * @param string|array $b
-   * @param mixed $c
+   * @param string|array $tokenEntity
+   * @param string|array $tokenField
+   * @param string|array $tokenValue
+   *
    * @return TokenRow
    */
-  public function tokens($a = NULL, $b = NULL, $c = NULL) {
-    if (is_array($a)) {
-      \CRM_Utils_Array::extend($this->tokens, $a);
+  public function tokens($tokenEntity, $tokenField = NULL, $tokenValue = NULL): TokenRow {
+    if (is_array($tokenEntity)) {
+      \CRM_Utils_Array::extend($this->tokens, $tokenEntity);
     }
-    elseif (is_array($b)) {
-      \CRM_Utils_Array::extend($this->tokens[$a], $b);
+    elseif (is_array($tokenField)) {
+      \CRM_Utils_Array::extend($this->tokens[$tokenEntity], $tokenField);
     }
-    elseif (is_array($c)) {
-      \CRM_Utils_Array::extend($this->tokens[$a][$b], $c);
+    elseif (is_array($tokenValue)) {
+      \CRM_Utils_Array::extend($this->tokens[$tokenEntity][$tokenField], $tokenValue);
     }
-    elseif ($c === NULL) {
-      $this->tokens[$a] = $b;
+    elseif ($tokenValue === NULL) {
+      $this->tokens[$tokenEntity] = $tokenField;
     }
     else {
-      $this->tokens[$a][$b] = $c;
+      $this->tokens[$tokenEntity][$tokenField] = $tokenValue;
     }
     return $this;
   }

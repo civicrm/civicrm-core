@@ -211,7 +211,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
       $fields = $subset;
     }
     else {
-      $ufGroups = CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id');
+      $ufGroups = CRM_Core_DAO_UFField::buildOptions('uf_group_id');
 
       $fields = [];
       foreach ($ufGroups as $id => $title) {
@@ -362,26 +362,15 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
    * @param array $groupArr
    *   (mimic CRM_UF_DAO_UFGroup).
    * @param array $fieldArrs
-   *   List of fields (each mimics CRM_UF_DAO_UFField).
-   * @param bool $visibility
-   *   Visibility of fields we are interested in.
-   * @param bool $searchable
-   * @param bool $showAll
-   * @param null $ctype
-   * @param int $permissionType
    *
    * @return array
    * @see self::getFields
    */
   public static function formatUFFields(
     $groupArr,
-    $fieldArrs,
-    $visibility = NULL,
-    $searchable = NULL,
-    $showAll = FALSE,
-    $ctype = NULL,
-    $permissionType = CRM_Core_Permission::CREATE
+    $fieldArrs
   ) {
+    $showAll = FALSE;
     // $group = new CRM_Core_DAO_UFGroup();
     // $group->copyValues($groupArr); // no... converts string('') to string('null')
     $group = (object) $groupArr;
@@ -392,17 +381,17 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
     $ufGroupType = self::_calculateGroupType($fieldArrs);
     $profileType = CRM_Core_BAO_UFField::calculateProfileType(implode(',', $ufGroupType));
     $contactActivityProfile = CRM_Core_BAO_UFField::checkContactActivityProfileTypeByGroupType(implode(',', $ufGroupType));
-    $importableFields = self::getImportableFields($showAll, $profileType, $contactActivityProfile);
-    [$customFields, $addressCustomFields] = self::getCustomFields($ctype, $permissionType);
+    $importableFields = self::getImportableFields(FALSE, $profileType, $contactActivityProfile);
+    [$customFields, $addressCustomFields] = self::getCustomFields(NULL, CRM_Core_Permission::CREATE);
 
     $formattedFields = [];
     foreach ($fieldArrs as $fieldArr) {
       $field = (object) $fieldArr;
-      if (!self::filterUFField($field, $searchable, $showAll, $visibility)) {
+      if (!empty($fieldArr['is_active'])) {
         continue;
       }
 
-      [$name, $formattedField] = self::formatUFField($group, $field, $customFields, $addressCustomFields, $importableFields, $permissionType);
+      [$name, $formattedField] = self::formatUFField($group, $field, $customFields, $addressCustomFields, $importableFields, CRM_Core_Permission::CREATE);
       if ($formattedField !== NULL) {
         $formattedFields[$name] = $formattedField;
       }
@@ -575,48 +564,6 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
       return $query;
     }
     return $query;
-  }
-
-  /**
-   * Create a query to find all visible UFFields in a UFGroup.
-   *
-   * This is the PHP in-memory variant of createUFFieldQuery().
-   *
-   * @param CRM_Core_DAO_UFField|CRM_Core_DAO $field
-   * @param bool $searchable
-   * @param bool $showAll
-   * @param int $visibility
-   *
-   * @return bool
-   *   TRUE if field is displayable
-   */
-  protected static function filterUFField($field, $searchable, $showAll, $visibility) {
-    if ($searchable && $field->is_searchable != 1) {
-      return FALSE;
-    }
-
-    if (!$showAll && $field->is_active != 1) {
-      return FALSE;
-    }
-
-    if ($visibility) {
-      $allowedVisibilities = [];
-      if ($visibility & self::PUBLIC_VISIBILITY) {
-        $allowedVisibilities[] = 'Public Pages';
-      }
-      if ($visibility & self::ADMIN_VISIBILITY) {
-        $allowedVisibilities[] = 'User and User Admin Only';
-      }
-      if ($visibility & self::LISTINGS_VISIBILITY) {
-        $allowedVisibilities[] = 'Public Pages and Listings';
-      }
-      // !empty($allowedVisibilities) seems silly to me, but it is equivalent to the pre-existing SQL
-      if (!empty($allowedVisibilities) && !in_array($field->visibility, $allowedVisibilities)) {
-        return FALSE;
-      }
-    }
-
-    return TRUE;
   }
 
   /**
@@ -1056,7 +1003,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
         }
         elseif ($name == 'tag') {
           $entityTags = CRM_Core_BAO_EntityTag::getTag($cid);
-          $allTags = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', ['onlyActive' => FALSE]);
+          $allTags = CRM_Core_DAO_EntityTag::buildOptions('tag_id', 'get');
           $title = [];
           foreach ($entityTags as $tagId) {
             $title[] = $allTags[$tagId];
@@ -1412,6 +1359,15 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
       $ufJoin->uf_group_id = $event->id;
       $ufJoin->delete();
     }
+  }
+
+  /**
+   * Callback for hook_civicrm_post().
+   * @param \Civi\Core\Event\PostEvent $event
+   * @throws CRM_Core_Exception
+   */
+  public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
+    Civi::cache('metadata')->clear();
   }
 
   /**
@@ -1873,12 +1829,12 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
             $providerName = substr($name, 0, -1) . '-provider_id]';
           }
           $form->add('select', $providerName, NULL,
-            CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id'), $required
+            CRM_Core_DAO_IM::buildOptions('provider_id'), $required
           );
         }
         else {
           $form->add('select', $name . '-provider_id', $title,
-            CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id'), $required
+            CRM_Core_DAO_IM::buildOptions('provider_id'), $required
           );
         }
 
@@ -1912,7 +1868,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     }
     elseif (in_array($fieldName, ['gender_id', 'communication_style_id'])) {
       $options = [];
-      $pseudoValues = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', $fieldName);
+      $pseudoValues = CRM_Contact_DAO_Contact::buildOptions($fieldName);
       $form->addRadio($name, ts('%1', [1 => $title]), $pseudoValues, ['allowClear' => !$required], NULL, $required);
     }
     elseif ($fieldName === 'prefix_id' || $fieldName === 'suffix_id') {
@@ -1979,7 +1935,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       );
     }
     elseif ($fieldName === 'preferred_communication_method') {
-      $communicationFields = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method');
+      $communicationFields = CRM_Contact_DAO_Contact::buildOptions('preferred_communication_method');
       foreach ($communicationFields as $key => $var) {
         if ($key == '') {
           continue;
@@ -2434,7 +2390,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    */
   public static function getProfiles($types, $onlyPure = FALSE) {
     $profiles = [];
-    $ufGroups = CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id');
+    $ufGroups = CRM_Core_DAO_UFField::buildOptions('uf_group_id');
 
     CRM_Utils_Hook::aclGroup(CRM_Core_Permission::ADMIN, NULL, 'civicrm_uf_group', $ufGroups, $ufGroups);
 
@@ -2468,7 +2424,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     }
 
     $profiles = [];
-    $ufGroups = CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id');
+    $ufGroups = CRM_Core_DAO_UFField::buildOptions('uf_group_id');
 
     CRM_Utils_Hook::aclGroup(CRM_Core_Permission::ADMIN, NULL, 'civicrm_uf_group', $ufGroups, $ufGroups);
 

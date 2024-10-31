@@ -531,13 +531,7 @@ class CRM_Utils_Rule {
     $config = CRM_Core_Config::singleton();
 
     //CRM-14868
-    $currencySymbols = CRM_Core_PseudoConstant::get(
-      'CRM_Contribute_DAO_Contribution',
-      'currency', [
-        'keyColumn' => 'name',
-        'labelColumn' => 'symbol',
-      ]
-    );
+    $currencySymbols = CRM_Contribute_DAO_Contribution::buildOptions('currency', 'abbreviate');
     $value = str_replace($currencySymbols, '', $value);
 
     if ($config->monetaryThousandSeparator) {

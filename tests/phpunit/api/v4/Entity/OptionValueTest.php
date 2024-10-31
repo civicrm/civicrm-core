@@ -123,4 +123,26 @@ class OptionValueTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals([1 => 1, 2 => 2, 3 => 3, 4 => 4], $getValues('controlGroup'));
   }
 
+  public function testEnsureOptionGroupExistsNewValue(): void {
+    OptionGroup::create(FALSE)
+      ->addValue('name', 'Bombed')
+      ->addValue('title', 'Bombed')
+      ->execute();
+    $optionGroups = OptionValue::getFields(FALSE)
+      ->addWhere('name', '=', 'option_group_id')
+      ->setLoadOptions(TRUE)
+      ->execute()->first()['options'];
+    $this->assertContains('Bombed', $optionGroups);
+
+    OptionGroup::create(FALSE)
+      ->addValue('name', 'Bombed Again')
+      ->addValue('title', 'Bombed Again')
+      ->execute();
+    $optionGroups = OptionValue::getFields(FALSE)
+      ->addWhere('name', '=', 'option_group_id')
+      ->setLoadOptions(TRUE)
+      ->execute()->first()['options'];
+    $this->assertContains('Bombed Again', $optionGroups);
+  }
+
 }

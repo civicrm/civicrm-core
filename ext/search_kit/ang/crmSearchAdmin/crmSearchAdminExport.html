@@ -5,10 +5,21 @@
       {{:: ts('Search configuration can be copied from here, then pasted into "Import" to e.g. transfer between sites.') }}
     </p>
     <p>
+      <i class="crm-i fa-link"></i>
+      {{:: ts('Copyable link:') }}
+      <a ng-href="{{:: $ctrl.simpleLink }}" target="_blank">
+        <u>{{:: ts('Saved Search Criteria') }}</u>
+      </a>
+    <p>
       <i class="crm-i fa-suitcase"></i>
       {{:: ts('To package for distribution in an extension, use') }}
+      <a ng-href="https://docs.civicrm.org/dev/en/latest/extensions/civix/#export" target="_blank">
+        <u>{{:: ts('Civix Export') }}</u>
+        <i class="crm-i fa-file-circle-question"></i>
+      </a>
+      {{:: ts('or') }}
       <a ng-href="{{:: $ctrl.apiExplorerLink }}" target="_blank">
-        <u>{{:: ts('API Explorer Export') }}</u>
+        <u>{{:: ts('API Explorer') }}</u>
         <i class="crm-i fa-external-link"></i>
       </a>
     </p>

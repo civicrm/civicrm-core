@@ -314,6 +314,17 @@ class Civi {
   }
 
   /**
+   * Get the canonical entityProvider for a given entity table.
+   *
+   * @param string $tableName
+   * @return \Civi\Schema\EntityProvider
+   */
+  public static function table(string $tableName): \Civi\Schema\EntityProvider {
+    $entityName = \Civi\Schema\EntityRepository::getTableIndex()[$tableName];
+    return new \Civi\Schema\EntityProvider($entityName);
+  }
+
+  /**
    * Get the schema-helper for CiviCRM (core-core).
    *
    * @param string $key

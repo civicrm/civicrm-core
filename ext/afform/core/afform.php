@@ -25,17 +25,6 @@ function _afform_fields_filter($params) {
 }
 
 /**
- * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
- */
-function afform_civicrm_container($container) {
-  $container->addResource(new \Symfony\Component\Config\Resource\FileResource(__FILE__));
-  $container->setDefinition('afform_scanner', new \Symfony\Component\DependencyInjection\Definition(
-    'CRM_Afform_AfformScanner',
-    []
-  ))->setPublic(TRUE);
-}
-
-/**
  * Implements hook_civicrm_config().
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_config
@@ -421,7 +410,7 @@ function afform_civicrm_alterMenu(&$items) {
   foreach ($afforms as $name => $meta) {
     if (!empty($meta['server_route'])) {
       $items[$meta['server_route']] = [
-        'title' => $meta['title'],
+        'title' => $meta['title'] ?? NULL,
         'page_callback' => 'CRM_Afform_Page_AfformBase',
         'page_arguments' => 'afform=' . urlencode($name),
         'access_arguments' => [["@afform:$name"], 'and'],

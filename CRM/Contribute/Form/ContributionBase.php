@@ -355,6 +355,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     $this->getContributionPageID();
     $this->_ccid = CRM_Utils_Request::retrieve('ccid', 'Positive', $this);
     $this->_emailExists = $this->get('emailExists') ?? FALSE;
+    $this->assign('isShowAdminVisibilityFields', CRM_Core_Permission::check('administer CiviCRM'));
 
     $this->_contactID = $this->_membershipContactID = $this->getContactID();
 
@@ -714,7 +715,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     $this->assign('currencyID', $this->_params['currencyID'] ?? NULL);
     $this->assign('credit_card_type', $this->_params['credit_card_type'] ?? NULL);
     $this->assign('trxn_id', $this->_params['trxn_id'] ?? NULL);
-    $this->assign('amount_level', $this->order->getAmountLevel());
+    $this->assign('amount_level', str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ' ', $this->order->getAmountLevel()));
     $this->assign('amount', $this->getMainContributionAmount() > 0 ? CRM_Utils_Money::format($this->getMainContributionAmount(), NULL, NULL, TRUE) : NULL);
 
     $isRecurEnabled = isset($this->_values['is_recur']) && !empty($this->_paymentProcessor['is_recur']);

@@ -95,11 +95,26 @@
 {ts 1=$mapURL}Include map presenting event location on event information page? (A map provider must be configured under <a href='%1'>Administer > System Settings > Mapping and Geocoding</a>){/ts}
 {/htxt}
 
+{htxt id="id-is_show_calendar_links-title"}
+  {ts}Calendar Links{/ts}
+{/htxt}
+{htxt id="id-is_show_calendar_links"}
+{ts}Displays links to download an iCal file with the event information, as well as a link to add to Google Calendar. The links will be displayed on the event information page, as well as on the thank-you page and in the email receipt.{/ts}
+{/htxt}
+
+{htxt id="id-is_active-title"}
+  {ts}Event is active{/ts}
+{/htxt}
+{htxt id="id-is_active"}
+<p>{ts}Enables the Event Information page, which also allows access to Event Registration (if registrations are open).{/ts}</p>
+{/htxt}
+
 {htxt id="id-is_public-title"}
   {ts}Public Events{/ts}
 {/htxt}
 {htxt id="id-is_public"}
-<p>{ts}When enabled, this event will be included in iCalendar feeds and displayed on your site's "Upcoming Events" block.{/ts}</p>
+{capture assign=eventsURL}target="_blank" href="{crmURL p="civicrm/event/list" q="reset=1" fe=1 h=1}"{/capture}
+<p>{ts 1=$eventsURL}When enabled, this event will be included in iCalendar feeds and displayed on your site's <a %1>Upcoming Events</a> block.{/ts}</p>
 {/htxt}
 
 {htxt id="id-is_share-title"}

@@ -323,7 +323,10 @@ WHERE  ( civicrm_event.is_template  = 0 )";
    * @return array
    */
   public static function getEventsForSelect2() {
-    $options = ['all' => ts('- all -')];
+    $options = [
+      'all' => ts('- all -'),
+      'multiparticipant' => ts('- All multi-participant events -'),
+    ];
     // Check that CiviEvent is enabled before calling the api
     if (class_exists('\Civi\Api4\Event')) {
       $options += \Civi\Api4\Event::get(FALSE)
@@ -900,14 +903,6 @@ WHERE civicrm_event.is_active = 1
         $info['location'] = $address;
         $info['url'] = CRM_Utils_System::url('civicrm/event/info', 'reset=1&id=' . $dao->event_id, TRUE, NULL, FALSE);
 
-        // @todo Move to eventcart extension
-        // check if we're in shopping cart mode for events
-        if ((bool) Civi::settings()->get('enable_cart')) {
-          $reg = CRM_Event_Cart_BAO_EventInCart::get_registration_link($dao->event_id);
-          $info['registration_link'] = CRM_Utils_System::url($reg['path'], $reg['query'], TRUE);
-          $info['registration_link_text'] = $reg['label'];
-        }
-
         $all[] = $info;
       }
     }
@@ -1350,7 +1345,7 @@ WHERE civicrm_event.is_active = 1
         $groupTitle['groupTitle'] = CRM_Core_BAO_UFGroup::getFrontEndTitle((int) $gid);
       }
 
-      $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
+      $imProviders = CRM_Core_DAO_IM::buildOptions('provider_id');
       //start of code to set the default values
       foreach ($fields as $name => $field) {
         $customVal = '';
@@ -1406,7 +1401,7 @@ WHERE civicrm_event.is_active = 1
           $values[$index] = $greeting[$params[$name]];
         }
         elseif ($name === 'preferred_communication_method') {
-          $communicationFields = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method');
+          $communicationFields = CRM_Contact_DAO_Contact::buildOptions('preferred_communication_method');
           $compref = [];
           $pref = $params[$name];
           if (is_array($pref)) {
@@ -1433,7 +1428,7 @@ WHERE civicrm_event.is_active = 1
         }
         elseif ($name == 'tag') {
           $entityTags = $params[$name];
-          $allTags = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', ['onlyActive' => FALSE]);
+          $allTags = CRM_Core_DAO_EntityTag::buildOptions('tag_id', 'get');
           $title = [];
           if (is_array($entityTags)) {
             foreach ($entityTags as $tagId => $dontCare) {
@@ -2241,33 +2236,6 @@ WHERE  ce.loc_block_id = $locBlockId";
       $params[2] = [$eventCampaignID, 'Integer'];
     }
     CRM_Core_DAO::executeQuery($query, $params);
-  }
-
-  /**
-   * Get options for a given field.
-   * @see CRM_Core_DAO::buildOptions
-   *
-   * @param string $fieldName
-   * @param string $context : @see CRM_Core_DAO::buildOptionsContext
-   * @param array $props : whatever is known about this dao object
-   *
-   * @return array|bool
-   */
-  public static function buildOptions($fieldName, $context = NULL, $props = []) {
-    $params = [];
-    // Special logic for fields whose options depend on context or properties
-    switch ($fieldName) {
-      case 'financial_type_id':
-        // https://lab.civicrm.org/dev/core/issues/547 if CiviContribute not enabled this causes an invalid query
-        // @todo - the component is enabled check should be done within getIncomeFinancialType
-        // It looks to me like test cover was NOT added to cover the change
-        // that added this so we need to assume there is no test cover
-        if (CRM_Core_Component::isEnabled('CiviContribute')) {
-          return CRM_Financial_BAO_FinancialType::getIncomeFinancialType($props['check_permissions'] ?? TRUE);
-        }
-        return [];
-    }
-    return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }
 
   /**

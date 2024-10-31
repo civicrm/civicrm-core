@@ -44,6 +44,9 @@ class LegacySqlEntityMetadata extends EntityMetadataBase {
       case 'primary_keys':
         return $this->getClassName()::$_primaryKey ?? ['id'];
 
+      case 'primary_key':
+        return $this->getClassName()::$_primaryKey[0] ?? 'id';
+
       case 'description':
         return $this->getClassName()::getEntityDescription();
 
@@ -184,10 +187,6 @@ class LegacySqlEntityMetadata extends EntityMetadataBase {
       $usage[] = 'export';
     }
     return $usage;
-  }
-
-  public function getOptions(string $fieldName, ?array $values = NULL): ?array {
-    // TODO: Implement getOptions() method.
   }
 
 }

@@ -327,6 +327,22 @@ class CoreUtil {
   }
 
   /**
+   * Gets total number of references
+   *
+   * @param string $entityName
+   * @param $entityId
+   * @return int
+   * @throws NotImplementedException
+   */
+  public static function getRefCountTotal(string $entityName, $entityId): int {
+    $total = 0;
+    foreach ((array) self::getRefCount($entityName, $entityId) as $ref) {
+      $total += $ref['count'] ?? 0;
+    }
+    return $total;
+  }
+
+  /**
    * @return array
    */
   public static function getSearchableOptions(): array {

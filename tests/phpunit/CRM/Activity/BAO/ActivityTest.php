@@ -1713,7 +1713,7 @@ $textValue
     // Check the smarty doesn't mess stuff up.
     $text = 'text:' . '{contact.display_name} {$contact.first_name}';
 
-    $filepath = Civi::paths()->getPath('[civicrm.files]/custom');
+    $filepath = CRM_Core_Config::singleton()->customFileUploadDir;
     $fileName = 'test_email_create.txt';
     $fileUri = "{$filepath}/{$fileName}";
     // Create a file.
@@ -1778,7 +1778,7 @@ $textValue
     $html = __FUNCTION__ . ' html';
     $text = __FUNCTION__ . ' text';
 
-    $filepath = Civi::paths()->getPath('[civicrm.files]/custom');
+    $filepath = CRM_Core_Config::singleton()->customFileUploadDir;
     $fileName = 'test_email_create.txt';
     $fileUri = "{$filepath}/{$fileName}";
     // Create a file.

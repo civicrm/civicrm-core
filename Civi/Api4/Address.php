@@ -20,6 +20,7 @@ namespace Civi\Api4;
  * and other attributes (although optional) like street address, city, country etc.
  *
  * @ui_join_filters is_primary
+ * @searchFields street_address,city
  *
  * @searchable secondary
  * @since 5.19

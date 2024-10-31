@@ -64,6 +64,7 @@ return [
       'input_type' => 'EntityRef',
       'description' => ts('FK to Contact ID'),
       'add' => '3.3',
+      'default_callback' => ['CRM_Core_Session', 'getLoggedInContactID'],
       'input_attrs' => [
         'label' => ts('Created By'),
       ],
@@ -78,6 +79,9 @@ return [
       'sql_type' => 'datetime',
       'input_type' => 'Select Date',
       'description' => ts('When was this item created'),
+      'required' => TRUE,
+      'readonly' => TRUE,
+      'default' => 'CURRENT_TIMESTAMP',
       'add' => '3.3',
       'input_attrs' => [
         'format_type' => 'activityDateTime',
@@ -89,6 +93,7 @@ return [
       'input_type' => 'EntityRef',
       'description' => ts('FK to Contact ID'),
       'add' => '3.3',
+      'default_callback' => ['CRM_Core_Session', 'getLoggedInContactID'],
       'input_attrs' => [
         'label' => ts('Modified By'),
       ],
@@ -101,7 +106,9 @@ return [
     'modified_date' => [
       'title' => ts('Batch Modified Date'),
       'sql_type' => 'datetime',
-      'input_type' => NULL,
+      'input_type' => 'Select Date',
+      'required' => TRUE,
+      'default' => 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
       'readonly' => TRUE,
       'description' => ts('When was this item modified'),
       'add' => '3.3',

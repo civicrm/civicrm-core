@@ -43,7 +43,7 @@
       <label for="af_config_form_server_route">
         {{:: ts('Page Route') }}
       </label>
-      <input ng-model="editor.afform.server_route" name="server_route" class="form-control" id="af_config_form_server_route" pattern="^civicrm\/[-0-9a-zA-Z\/_]+$" onfocus="this.value = this.value || 'civicrm/'" onblur="if (this.value === 'civicrm/') this.value = ''" title="{{:: ts('Path must begin with &quot;civicrm/&quot;') }}" placeholder="{{:: ts('None') }}" ng-model-options="editor.debounceMode">
+      <input ng-model="editor.afform.server_route" name="server_route" class="form-control" id="af_config_form_server_route" pattern="^civicrm\/[\-0-9a-zA-Z\/_]+$" onfocus="this.value = this.value || 'civicrm/'" onblur="if (this.value === 'civicrm/') this.value = ''" title="{{:: ts('Path must begin with &quot;civicrm/&quot;') }}" placeholder="{{:: ts('None') }}" ng-model-options="editor.debounceMode">
       <p class="help-block">{{:: ts('Expose the form as a standalone webpage. (Example: "civicrm/my-form")') }}</p>
     </div>
 

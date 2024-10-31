@@ -43,7 +43,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    * @return CRM_Financial_DAO_FinancialItem
    */
   public static function add($lineItem, $contribution, $taxTrxnID = FALSE, $trxnId = NULL) {
-    $financialItemStatus = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialItem', 'status_id');
+    $financialItemStatus = CRM_Financial_DAO_FinancialItem::buildOptions('status_id');
     $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution->contribution_status_id);
     $itemStatus = NULL;
     if ($contributionStatus === 'Completed' || $contributionStatus === 'Pending refund') {

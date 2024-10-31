@@ -459,7 +459,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
           'group_type' => ['2' => 1],
         ];
 
-        $group = CRM_Contact_BAO_Group::create($groupParams);
+        $group = CRM_Contact_BAO_Group::writeRecord($groupParams);
         $grpID = $group->id;
 
         CRM_Contact_BAO_GroupContact::addContactsToGroup($this->_contactIds, $group->id);
@@ -471,7 +471,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
           'title' => $newGroupTitle,
           'group_type' => ['2' => 1],
         ];
-        CRM_Contact_BAO_Group::create($groupParams);
+        CRM_Contact_BAO_Group::writeRecord($groupParams);
       }
 
       // note at this point its a static group

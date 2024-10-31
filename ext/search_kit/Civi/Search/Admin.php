@@ -47,6 +47,7 @@ class Admin {
       'defaultDisplay' => SearchDisplay::getDefault(FALSE)->setSavedSearch(['id' => NULL])->execute()->first(),
       'modules' => \CRM_Core_BAO_Managed::getBaseModules(),
       'defaultDistanceUnit' => \CRM_Utils_Address::getDefaultDistanceUnit(),
+      'optionAttributes' => \CRM_Core_SelectValues::optionAttributes(),
       'jobFrequency' => \Civi\Api4\Job::getFields()
         ->addWhere('name', '=', 'run_frequency')
         ->setLoadOptions(['id', 'label'])
@@ -326,7 +327,8 @@ class Admin {
                   'description' => '',
                   'entity' => $targetEntityName,
                   'conditions' => self::getJoinConditions($keyField['name'], $alias . '.' . $reference->getTargetKey(), $dynamicValue, $dynamicCol),
-                  'defaults' => self::getJoinDefaults($alias, $targetEntity),
+                  // No default conditions for straight joins as they ought to be direct 1-1
+                  'defaults' => [],
                   'alias' => $alias,
                   'multi' => FALSE,
                 ];
@@ -476,7 +478,7 @@ class Admin {
    * @param string|null $dynamicCol
    * @return array[]
    */
-  private static function getJoinConditions(string $nearCol, string $farCol, string $dynamicValue = NULL, string $dynamicCol = NULL):array {
+  private static function getJoinConditions(string $nearCol, string $farCol, ?string $dynamicValue = NULL, ?string $dynamicCol = NULL):array {
     $conditions = [
       [
         $nearCol,
@@ -505,28 +507,30 @@ class Admin {
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\NotImplementedException
    */
-  private static function getJoinDefaults(string $alias, ...$entities):array {
+  private static function getJoinDefaults(string $alias, ...$entities): array {
     $conditions = [];
     foreach ($entities as $entity) {
-      foreach ($entity['ui_join_filters'] ?? [] as $fieldName) {
-        $field = civicrm_api4($entity['name'], 'getFields', [
-          'select' => ['options', 'data_type'],
-          'where' => [['name', '=', $fieldName]],
+      if (!empty($entity['ui_join_filters'])) {
+        $filterFields = civicrm_api4($entity['name'], 'getFields', [
+          'select' => ['name', 'options', 'data_type'],
+          'where' => [['name', 'IN', $entity['ui_join_filters']]],
           'loadOptions' => ['name'],
-        ])->first();
-        $value = '';
-        if ($field['data_type'] === 'Boolean') {
-          $value = TRUE;
+        ])->indexBy('name');
+        foreach ($filterFields as $fieldName => $field) {
+          $value = '';
+          if ($field['data_type'] === 'Boolean') {
+            $value = TRUE;
+          }
+          elseif (isset($field['options'][0])) {
+            $fieldName .= ':name';
+            $value = json_encode($field['options'][0]['name']);
+          }
+          $conditions[] = [
+            $alias . '.' . $fieldName,
+            '=',
+            $value,
+          ];
         }
-        elseif (isset($field['options'][0])) {
-          $fieldName .= ':name';
-          $value = json_encode($field['options'][0]['name']);
-        }
-        $conditions[] = [
-          $alias . '.' . $fieldName,
-          '=',
-          $value,
-        ];
       }
     }
     return $conditions;

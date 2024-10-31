@@ -2,27 +2,35 @@
 namespace api\v4\Afform;
 
 use Civi\Api4\Afform;
-use Civi\Test\TransactionalInterface;
 
 /**
  * Test case for Afform.prefill and Afform.submit with Event records.
  *
  * @group headless
  */
-class AfformEventUsageTest extends AfformUsageTestCase implements TransactionalInterface {
+class AfformEventUsageTest extends AfformUsageTestCase {
+  use \Civi\Test\Api4TestTrait;
 
   /**
-   * Tests creating a relationship between multiple contacts
+   * Tests prefilling an event from a template
    */
   public function testEventTemplatePrefill(): void {
-    $eventTemplate = civicrm_api4('Event', 'create', [
-      'values' => [
-        'template_title' => 'Test Template Title',
-        'title' => 'Test Me',
-        'event_type_id' => 1,
-        'is_template' => TRUE,
-      ],
-    ])->single();
+    $locBlock1 = $this->createTestEntity('LocBlock', [
+      'email_id' => $this->createTestEntity('Email', ['email' => '1@te.st'])['id'],
+      'phone_id' => $this->createTestEntity('Phone', ['phone' => '1234567'])['id'],
+    ]);
+    $locBlock2 = $this->createTestEntity('LocBlock', [
+      'email_id' => $this->createTestEntity('Email', ['email' => '2@te.st'])['id'],
+      'phone_id' => $this->createTestEntity('Phone', ['phone' => '2234567'])['id'],
+    ]);
+
+    $eventTemplate = $this->createTestEntity('Event', [
+      'template_title' => 'Test Template Title',
+      'title' => 'Test Me',
+      'event_type_id' => 1,
+      'is_template' => TRUE,
+      'loc_block_id' => $locBlock1['id'],
+    ]);
 
     $layout = <<<EOHTML
 <af-form ctrl="afform">
@@ -31,6 +39,9 @@ class AfformEventUsageTest extends AfformUsageTestCase implements TransactionalI
     <af-field name="template_id" />
     <af-field name="title" />
     <af-field name="event_type_id" />
+    <div af-join="LocBlock">
+      <afblock-event-loc-block></afblock-event-loc-block>
+    </div>
   </fieldset>
   <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
 </af-form>
@@ -41,16 +52,27 @@ EOHTML;
       'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
     ]);
 
+    // Prefill from template
     $prefill = Afform::prefill()
       ->setName($this->formName)
-      ->setMatchField('template_id')
-      ->setArgs(['Event1' => [$eventTemplate['id']]])
+      ->setFillMode('entity')
+      ->setArgs(['Event1' => [['template_id' => $eventTemplate['id']]]])
       ->execute()->single();
-
     $this->assertSame('Test Me', $prefill['values'][0]['fields']['title']);
-    $this->assertSame(1, $prefill['values'][0]['fields']['event_type_id']);
+    $this->assertSame($eventTemplate['event_type_id'], $prefill['values'][0]['fields']['event_type_id']);
     $this->assertSame($eventTemplate['id'], $prefill['values'][0]['fields']['template_id']);
     $this->assertArrayNotHasKey('id', $prefill['values'][0]['fields']);
+    $this->assertSame('1@te.st', $prefill['values'][0]['joins']['LocBlock'][0]['email_id.email']);
+    $this->assertSame('1234567', $prefill['values'][0]['joins']['LocBlock'][0]['phone_id.phone']);
+
+    // Prefill just the locBlock
+    $prefill = Afform::prefill()
+      ->setName($this->formName)
+      ->setFillMode('join')
+      ->setArgs(['Event1' => [['joins' => ['LocBlock' => [['id' => $locBlock2['id']]]]]]])
+      ->execute()->single();
+    $this->assertSame('2@te.st', $prefill['values'][0]['joins']['LocBlock'][0]['email_id.email']);
+    $this->assertSame('2234567', $prefill['values'][0]['joins']['LocBlock'][0]['phone_id.phone']);
   }
 
 }

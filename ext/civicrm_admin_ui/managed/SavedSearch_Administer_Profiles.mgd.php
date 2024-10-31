@@ -253,6 +253,7 @@ return [
                   'condition' => [],
                   'entity' => 'UFGroup',
                   'action' => 'copy',
+                  'csrf' => 'qfKey',
                   'join' => '',
                   'target' => '',
                 ],

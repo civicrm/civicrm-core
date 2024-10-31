@@ -17,7 +17,7 @@
   <table class="form-layout-compressed">
     <tr class="crm-uf-field-form-block-field_name">
       <td class="label">{$form.field_name.label} {help id='field_name_0'}</td>
-      <td>{$form.field_name.html|smarty:nodefaults}<br />
+      <td>{$form.field_name.html nofilter}<br />
         <span class="description">&nbsp;{ts}Select the type of CiviCRM record and the field you want to include in this Profile.{/ts}</span></td>
     </tr>
     <tr class="crm-uf-field-form-block-label">
@@ -69,13 +69,13 @@
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
 
-{$initHideBoxes|smarty:nodefaults}
+{$initHideBoxes nofilter}
 
 {literal}
 <script type="text/javascript">
 
 CRM.$(function($) {
-  var otherModule = {/literal}{$otherModules|@json_encode}{literal};
+  var otherModule = {/literal}{$otherModules|@json_encode nofilter}{literal};
   if ( $.inArray( "Profile", otherModule ) > -1 && $.inArray( "Search Profile", otherModule ) == -1 ){
     $('#profile_visibility').show();
   }

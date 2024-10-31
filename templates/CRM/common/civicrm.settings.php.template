@@ -199,7 +199,7 @@ if (!defined('CIVICRM_TEMPLATE_COMPILEDIR')) {
  * (see above).
  *
  * This tells smarty to pass all variables through the escape function
- * unless they are piped to smarty:nodefaults (eg. {$myScript|smarty:nodefaults}
+ * unless they are marked with nofilter (eg. {$myScript nofilter}
  * At this stage it should only be enabled on development sites.
  * @see https://github.com/civicrm/civicrm-core/pull/21935
  */
@@ -243,27 +243,13 @@ if (!defined('CIVICRM_UF_BASEURL')) {
  * the near future - this opt-in setting is transitional.
  */
 if (!defined('CIVICRM_SMARTY_AUTOLOAD_PATH') && getenv('CIVICRM_SMARTY_AUTOLOAD_PATH') === FALSE) {
-  // enable by default for dev & demo sites for now - will soon enable by default for all new installs.
-  if (CIVICRM_UF === 'UnitTests' || strpos(CIVICRM_UF_BASEURL, 'localhost') !== FALSE || strpos(CIVICRM_UF_BASEURL, 'demo.civicrm.org') !== FALSE
-    || strpos(CIVICRM_UF_BASEURL, 'http://build') !== FALSE
-  ) {
-    if (is_dir($civicrm_root . '/packages')) {
-      define('CIVICRM_SMARTY_AUTOLOAD_PATH', $civicrm_root . '/packages/smarty5/Smarty.php');
-    }
-    elseif (is_dir($civicrm_root . '/../civicrm-packages')) {
-      define('CIVICRM_SMARTY_AUTOLOAD_PATH', $civicrm_root . '/../civicrm-packages/smarty5/Smarty.php');
-    }
-  }
-}
-
-// If not set above we should default the Smarty version to Smarty4 which is our stable version.
-// This will not work for all composer-based installs @todo.
-if (!defined('CIVICRM_SMARTY_AUTOLOAD_PATH') && getenv('CIVICRM_SMARTY_AUTOLOAD_PATH') === FALSE) {
+  // If not set we should default the Smarty version to Smarty5 which is our stable version.
+  // This will not work for all composer-based installs @todo.
   if (is_dir($civicrm_root . '/packages')) {
-    define('CIVICRM_SMARTY_AUTOLOAD_PATH', $civicrm_root . '/packages/smarty4/vendor/autoload.php');
+    define('CIVICRM_SMARTY_AUTOLOAD_PATH', $civicrm_root . '/packages/smarty5/Smarty.php');
   }
   elseif (is_dir($civicrm_root . '/../civicrm-packages')) {
-    define('CIVICRM_SMARTY_AUTOLOAD_PATH', $civicrm_root . '/../civicrm-packages/smarty4/vendor/autoload.php');
+    define('CIVICRM_SMARTY_AUTOLOAD_PATH', $civicrm_root . '/../civicrm-packages/smarty5/Smarty.php');
   }
 }
 
@@ -398,6 +384,16 @@ if (!defined('CIVICRM_MAIL_SMARTY')) {
  */
 // if (!defined('CIVICRM_MAIL_LOG')) {
 // define('CIVICRM_MAIL_LOG', '%%templateCompileDir%%/mail.log');
+// }
+
+/**
+ * If needed to modify the file nad directory permissions for any LogFiles / directories created by Pear/log package
+ */
+// if (!defined('CIVICRM_LOG_FILE_PERMISSIONS')) {
+//   define('CIVICRM_LOG_FILE_PERMISSIONS', '0664');
+// }
+// if (!defined('CIVICRM_LOG_FILE_DIR_PERMISSIONS')) {
+//   define('CIVICRM_LOG_FILE_DIR_PERMISSIONS', '775');
 // }
 
 /**

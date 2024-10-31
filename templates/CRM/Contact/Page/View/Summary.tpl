@@ -66,14 +66,6 @@
           {/if}
         {/crmPermission}
 
-        {crmPermission has='delete contacts'}
-          <li class="crm-contact-delete">
-            {crmButton p='civicrm/contact/view/delete' q="reset=1&delete=1&cid=$contactId" class="delete" icon="trash"}
-              {ts}Delete Contact{/ts}
-            {/crmButton}
-          </li>
-        {/crmPermission}
-
         {* Previous and Next contact navigation when accessing contact summary from search results. *}
         {if $nextPrevError}
           <li class="crm-next-action">

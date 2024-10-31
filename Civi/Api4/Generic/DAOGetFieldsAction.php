@@ -98,11 +98,8 @@ class DAOGetFieldsAction extends BasicGetFieldsAction {
       if (strpos($key, ':')) {
         if (isset($this->values[$key]) && $this->values[$key] !== '') {
           [$fieldName, $suffix] = explode(':', $key);
-          $context = FormattingUtil::$pseudoConstantContexts[$suffix] ?? NULL;
-          // This only works for basic pseudoconstants like :name :label and :abbr. Skip others.
-          if ($context && !isset($this->values[$fieldName])) {
-            $baoName = CoreUtil::getBAOFromApiName($this->getEntityName());
-            $options = $baoName::buildOptions($fieldName, $context) ?: [];
+          if (!isset($this->values[$fieldName])) {
+            $options = FormattingUtil::getPseudoconstantList(['name' => $fieldName, 'entity' => $this->getEntityName()], $key, $this->values);
             $this->values[$fieldName] = FormattingUtil::replacePseudoconstant($options, $this->values[$key], TRUE);
           }
         }

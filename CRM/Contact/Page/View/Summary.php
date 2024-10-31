@@ -19,6 +19,7 @@
  * Main page for viewing contact.
  */
 class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
+  use CRM_Custom_Page_CustomDataTrait;
 
   /**
    * Contents of contact_view_options setting.
@@ -185,11 +186,13 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
 
     CRM_Contact_BAO_Contact::getValues(['id' => $this->_contactId], $defaults);
     $defaults['im'] = $this->getLocationValues($this->_contactId, 'IM');
-    $defaults['email'] = $this->getLocationValues($this->_contactId, 'Email');
+    $emails = $this->getLocationValues($this->_contactId, 'Email');
+    foreach ($emails as $blockId => $email) {
+      $emails[$blockId]['custom'] = $this->addBlockCustomData('Email', $email['id']);
+    }
+    $this->assign('email', $emails);
     $defaults['openid'] = $this->getLocationValues($this->_contactId, 'OpenID');
     $defaults['phone'] = $this->getLocationValues($this->_contactId, 'Phone');
-    // This microformat magic is still required...
-    $defaults['address'] = CRM_Core_BAO_Address::getValues(['contact_id' => $this->_contactId], TRUE);
     $defaults['website'] = $this->getLocationValues($this->_contactId, 'Website');
     // Copy employer fields to the current_employer keys.
     if (($defaults['contact_type'] === 'Individual') && !empty($defaults['employer_id']) && !empty($defaults['organization_name'])) {
@@ -201,28 +204,23 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     $mailingBackend = Civi::settings()->get('mailing_backend');
     $this->assign('mailingOutboundOption', $mailingBackend['outBound_option']);
 
-    if (!empty($defaults['address'])) {
-      foreach ($defaults['address'] as & $val) {
-        CRM_Utils_Array::lookupValue($val, 'location_type', CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', ['labelColumn' => 'display_name']), FALSE);
-      }
+    // This microformat magic is still required...
+    $addresses = (array) CRM_Core_BAO_Address::getValues(['contact_id' => $this->_contactId], TRUE);
+    foreach ($addresses as $blockId => &$blockVal) {
+      // Does this do anything?
+      CRM_Utils_Array::lookupValue($blockVal, 'location_type', CRM_Core_BAO_Address::buildOptions('location_type_id'), FALSE);
 
-      foreach ($defaults['address'] as $blockId => $blockVal) {
-        $idValue = $blockVal['id'];
-        if (!empty($blockVal['master_id'])) {
-          $idValue = $blockVal['master_id'];
-        }
-        $groupTree = CRM_Core_BAO_CustomGroup::getTree(ucfirst('address'), NULL, $idValue, NULL, [],
-          NULL, TRUE, NULL, FALSE, CRM_Core_Permission::VIEW);
-        // we setting the prefix to dnc_ below so that we don't overwrite smarty's grouptree var.
-        $defaults['address'][$blockId]['custom'] = CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, "dnc_");
+      $idValue = $blockVal['id'];
+      if (!empty($blockVal['master_id'])) {
+        $idValue = $blockVal['master_id'];
       }
-      // reset template variable since that won't be of any use, and could be misleading
-      $this->assign("dnc_viewCustomData", NULL);
+      $addresses[$blockId]['custom'] = $this->addBlockCustomData('Address', $idValue);
     }
+    $this->assign('address', $addresses);
 
     $defaults['gender_display'] = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', 'gender_id', $defaults['gender_id'] ?? NULL);
 
-    $communicationStyle = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'communication_style_id');
+    $communicationStyle = CRM_Contact_DAO_Contact::buildOptions('communication_style_id');
     if (!empty($communicationStyle)) {
       if (!empty($defaults['communication_style_id'])) {
         $defaults['communication_style_display'] = $communicationStyle[$defaults['communication_style_id']];
@@ -258,8 +256,8 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
 
     // get contact name of shared contact names
     $sharedAddresses = [];
-    $shareAddressContactNames = CRM_Contact_BAO_Contact_Utils::getAddressShareContactNames($defaults['address']);
-    foreach ($defaults['address'] as $key => $addressValue) {
+    $shareAddressContactNames = CRM_Contact_BAO_Contact_Utils::getAddressShareContactNames($addresses);
+    foreach ($addresses as $key => $addressValue) {
       if (!empty($addressValue['master_id']) &&
         !$shareAddressContactNames[$addressValue['master_id']]['is_deleted']
       ) {
@@ -270,7 +268,9 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
       }
     }
     $this->assign('sharedAddresses', $sharedAddresses);
-
+    // @todo - stop assigning defaults - assign variables individually
+    // rather than adding to defaults for transparency - this is some old
+    // copy & paste.
     $this->assign($defaults);
 
     // FIXME: when we sort out TZ isssues with DATETIME/TIMESTAMP, we can skip next query
@@ -514,6 +514,18 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
       }
     }
     return $locationEntities;
+  }
+
+  /**
+   * @param string $entityType
+   *
+   * @param int $entityID
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  private function addBlockCustomData(string $entityType, int $entityID): array {
+    return $this->getCustomDataFieldsForEntityDisplay($entityType, $entityID);
   }
 
 }

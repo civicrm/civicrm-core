@@ -100,6 +100,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus im
 
     $membershipStatus->save();
     CRM_Member_PseudoConstant::flush('membershipStatus');
+    Civi::cache('metadata')->clear();
     return $membershipStatus;
   }
 

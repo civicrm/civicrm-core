@@ -2992,6 +2992,20 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
       ];
     }
 
+    if (CRM_Core_Permission::check('delete contacts')) {
+      $menu['otherActions']['delete'] = [
+        'title' => ts('Delete'),
+        'description' => ts('Delete Contact'),
+        'weight' => 90,
+        'ref' => 'crm-contact-delete',
+        'key' => 'delete',
+        'tab' => 'delete',
+        'class' => 'delete',
+        'href' => CRM_Utils_System::url('civicrm/contact/view/delete', "reset=1&delete=1&id=$contactId"),
+        'icon' => 'crm-i fa-trash',
+      ];
+    }
+
     $uid = CRM_Core_BAO_UFMatch::getUFId($contactId);
     if ($uid) {
       $menu['otherActions']['user-record'] = [
@@ -3284,33 +3298,13 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
   }
 
   /**
-   * Get options for a given contact field.
+   * Legacy option getter
    *
-   * @param string $fieldName
-   * @param string $context
-   * @param array $props
-   *   whatever is known about this dao object.
-   *
-   * @return array|bool
-   * @see CRM_Core_DAO::buildOptions
-   *
-   * TODO: Should we always assume chainselect? What fn should be responsible for controlling that flow?
-   * TODO: In context of chainselect, what to return if e.g. a country has no states?
-   *
-   * @see CRM_Core_DAO::buildOptionsContext
+   * @deprecated
+   * @inheritDoc
    */
   public static function buildOptions($fieldName, $context = NULL, $props = []) {
-    $params = [];
-    // Special logic for fields whose options depend on context or properties
     switch ($fieldName) {
-      case 'contact_sub_type':
-        if (!empty($props['contact_type'])) {
-          $params['condition'] = CRM_Core_DAO::composeQuery('parent_id = (SELECT id FROM civicrm_contact_type WHERE name = %1)', [
-            1 => [$props['contact_type'], 'String'],
-          ]);
-        }
-        break;
-
       case 'contact_type':
         if ($context == 'search') {
           // CRM-15495 - EntityRef filters and basic search forms expect this format
@@ -3340,7 +3334,17 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
         return CRM_Core_BAO_Address::buildOptions($fieldName, 'get', $props);
 
     }
-    return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
+    return parent::buildOptions($fieldName, $context, $props);
+  }
+
+  /**
+   * Pseudoconstant condition_provider for contact_sub_type field.
+   * @see \Civi\Schema\EntityMetadataBase::getConditionFromProvider
+   */
+  public static function alterContactSubType(string $fieldName, CRM_Utils_SQL_Select $conditions, $params) {
+    if (!empty($params['values']['contact_type'])) {
+      $conditions->where('parent_id = (SELECT id FROM civicrm_contact_type WHERE name = @contactSubType)', ['contactSubType' => $params['values']['contact_type']]);
+    }
   }
 
   /**

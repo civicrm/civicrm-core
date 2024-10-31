@@ -85,7 +85,7 @@ return [
       'description' => ts('Operator to use if item has more than one permission'),
       'add' => '3.0',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::andOr',
+        'callback' => ['CRM_Core_SelectValues', 'andOr'],
       ],
     ],
     'parent_id' => [
@@ -129,7 +129,7 @@ return [
       'add' => '3.0',
       'default' => 0,
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::navigationMenuSeparator',
+        'callback' => ['CRM_Core_SelectValues', 'navigationMenuSeparator'],
       ],
     ],
     'weight' => [

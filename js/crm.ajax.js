@@ -271,7 +271,7 @@
         if (url.search(/[&?]snippet=/) < 0) {
           url += (url.indexOf('?') < 0 ? '?' : '&') + 'snippet=' + snippetType;
         } else {
-          url = url.replace(/snippet=[^&]*/, 'snippet=' + snippetType);
+          url = url.replace(/([&?])snippet=[^&]*/, '$1snippet=' + snippetType);
         }
         // See Civi\Angular\AngularLoader
         if (snippetType === 'json' && CRM.angular) {
@@ -394,7 +394,7 @@
             $(this).dialog('option', 'title', data.title);
           }
           // Update print url
-          $(this).parent().find('a.crm-dialog-titlebar-print').attr('href', $(this).data('civiCrmSnippet')._formatUrl($(this).crmSnippet('option', 'url'), '2'));
+          $(this).parent().find('a.crm-dialog-titlebar-print').attr('href', $(this).data('civiCrmSnippet')._formatUrl($(this).crmSnippet('option', 'url'), '1'));
         });
     }
     $(settings.target).crmSnippet(settings).crmSnippet('refresh');

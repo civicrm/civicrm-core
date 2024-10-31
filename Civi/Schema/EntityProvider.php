@@ -40,6 +40,10 @@ final class EntityProvider {
     return $this->getMetaProvider()->getFields();
   }
 
+  public function getCustomFields(array $customGroupFilters = []): array {
+    return $this->getMetaProvider()->getCustomFields($customGroupFilters);
+  }
+
   public function getSupportedFields(): array {
     $fields = $this->getMetaProvider()->getFields();
     if ($this->getMeta('module') === 'civicrm') {
@@ -57,11 +61,11 @@ final class EntityProvider {
   }
 
   public function getField(string $fieldName): ?array {
-    return $this->getFields()[$fieldName] ?? NULL;
+    return $this->getMetaProvider()->getField($fieldName);
   }
 
-  public function getOptions(string $fieldName, ?array $values = NULL): ?array {
-    return $this->getMetaProvider()->getOptions($fieldName, $values);
+  public function getOptions(string $fieldName, array $values = [], bool $includeDisabled = FALSE, bool $checkPermissions = FALSE, ?int $userId = NULL): ?array {
+    return $this->getMetaProvider()->getOptions($fieldName, $values, $includeDisabled, $checkPermissions, $userId);
   }
 
   public function writeRecords(array $records): array {

@@ -39,9 +39,7 @@ class Get extends BasicGetAction {
       foreach ($perms as $permName => $permission) {
         $defaults = [
           'name' => $permName,
-          'group' => 'unknown',
           'is_synthetic' => ($permName[0] === '@'),
-          'is_active' => TRUE,
         ];
         $perms[$permName] = array_merge($defaults, $permission);
       }

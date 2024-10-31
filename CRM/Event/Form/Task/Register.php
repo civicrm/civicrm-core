@@ -14,6 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
+use Civi\Api4\Participant;
 
 /**
  * This class provides the register functionality from a search context.
@@ -115,11 +116,7 @@ class CRM_Event_Form_Task_Register extends CRM_Event_Form_Participant {
       $duplicateContacts = 0;
       foreach ($this->_contactIds as $k => $dupeCheckContactId) {
         // Eliminate contacts that have already been assigned to this event.
-        $dupeCheck = new CRM_Event_BAO_Participant();
-        $dupeCheck->contact_id = $dupeCheckContactId;
-        $dupeCheck->event_id = $event_id;
-        $dupeCheck->find(TRUE);
-        if (!empty($dupeCheck->id)) {
+        if (!empty($this->getExistingParticipantRecords($dupeCheckContactId))) {
           $duplicateContacts++;
           if (!$allowSameParticipantEmails) {
             unset($this->_contactIds[$k]);
@@ -227,6 +224,36 @@ class CRM_Event_Form_Task_Register extends CRM_Event_Form_Participant {
     }
 
     return empty($errorMsg) ? TRUE : $errorMsg;
+  }
+
+  /**
+   * Get any existing participant records for the given contact ID.
+   *
+   * @internal this function is expected to change. It should only be called from tested
+   * core functions. If other core forms need this function we should move it to the EventFormTrait,
+   * which holds functions shared between core forms.
+   *
+   * The expectation is that at some point an api will be available for getDuplicates functionality
+   * that would be used by this function, and by the import code. It would also be called
+   * by the Participant.validate api once it emerges.
+   *
+   * @param int $contactID
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  private function getExistingParticipantRecords(int $contactID): array {
+    $participants = Participant::get(FALSE)
+      ->addWhere('contact_id', '=', $contactID)
+      ->addWhere('event_id', '=', $this->getEventID())
+      ->addWhere('is_test', '=', FALSE)
+      // @todo - consider also adding this filter - it is used elsewhere
+      // and everything points to it being omitted by accident rather than
+      // on purpose on this form.
+      // if added, then add to the data provider for testRegisterDuplicateParticipant
+      // ->addWhere('participant_status_id.name', '!=', 'Cancelled')
+      ->execute();
+    return (array) $participants;
   }
 
 }

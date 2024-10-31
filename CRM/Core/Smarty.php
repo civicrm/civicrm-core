@@ -464,7 +464,7 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
    * anything coming in with this be happening because of the default modifier.
    *
    * Also note the right way to opt a field OUT of escaping is
-   * ``{$fieldName|smarty:nodefaults}``
+   * ``{$fieldName nofilter}``
    * This should be used for fields with known html AND for fields where
    * we are doing empty or isset checks - as otherwise the value is passed for
    * escaping first so you still get an enotice for 'empty' or a fatal for 'isset'
@@ -523,7 +523,8 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
       }
     }
 
-    $value = smarty_modifier_escape($string, $esc_type, $char_set);
+    $string = mb_convert_encoding($string, 'UTF-8', $char_set);
+    $value = htmlentities($string, ENT_QUOTES, 'UTF-8');
     if ($value !== $string) {
       Civi::log('smarty')->debug('smarty escaping original {original}, escaped {escaped} type {type} charset {charset}', [
         'original' => $string,

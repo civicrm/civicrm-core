@@ -179,8 +179,8 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
       // unknown mobile sender -- create new contact
       // use fake @mobile.sms email address for new contact since civi
       // requires email or name for all contacts
-      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
-      $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
+      $locationTypes = CRM_Core_DAO_Address::buildOptions('location_type_id');
+      $phoneTypes = CRM_Core_DAO_Phone::buildOptions('phone_type_id');
       $phoneloc = array_search('Home', $locationTypes);
       $phonetype = array_search('Mobile', $phoneTypes);
       $stripFrom = $this->stripPhone($message->from);

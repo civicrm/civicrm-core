@@ -50,6 +50,7 @@
     <div class="clear"></div>
 
     <div id="crm-main-content-wrapper">
+      {include file="CRM/common/status.tpl"}
       {crmRegion name='page-body'}
         {if isset($isForm) and $isForm and isset($formTpl)}
           {include file="CRM/Form/$formTpl.tpl"}

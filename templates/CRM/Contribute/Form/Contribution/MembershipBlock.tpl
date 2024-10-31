@@ -26,30 +26,14 @@
         {/if}
       {/if}
     </div>
-
   {strip}
-    <table id="membership-listings">
+    <div id="membership-listings">
       {foreach from=$membershipTypes item=row}
-        <tr valign="top">
-          <td style="width: auto;">
-                <span class="bold">{$row.name} &nbsp;
-                </span><br />
-            {$row.description} &nbsp;
-          </td>
-
-          <td style="width: auto;">
-          </td>
-        </tr>
-
+        <p>
+          <strong>{$row.name}</strong>
+          <br>{$row.description}
+        </p>
       {/foreach}
-      {if array_key_exists('auto_renew', $form)}
-        <tr id="allow_auto_renew">
-          <td style="width: auto;">{$form.auto_renew.html}</td>
-          <td style="width: auto;">
-            {$form.auto_renew.label}
-          </td>
-        </tr>
-      {/if}
-    </table>
+    </div>
   {/strip}
 {/if}

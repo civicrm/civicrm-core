@@ -55,6 +55,7 @@ use Civi\Test\FormTrait;
 use Civi\Test\GenericAssertionsTrait;
 use Civi\Test\LocaleTestTrait;
 use Civi\Test\MailingTestTrait;
+use Civi\Test\PageTrait;
 use League\Csv\Reader;
 
 /**
@@ -91,6 +92,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   use MailingTestTrait;
   use LocaleTestTrait;
   use FormTrait;
+  use PageTrait;
 
   /**
    * API version in use.
@@ -2146,7 +2148,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @return int|null
    */
   public function getLoggedInUser(): ?int {
-    return CRM_Core_Session::singleton()->get('userID') ?: NULL;
+    return CRM_Core_Session::getLoggedInContactID();
   }
 
   /**

@@ -120,10 +120,7 @@ function dm_install_core() {
   dm_install_files "$repo" "$to" composer.json composer.lock package.json Civi.php functions.php README.md release-notes.md extension-compatibility.json deleted-files-list.json guzzle_php81_shim.php
 
   mkdir -p "$to/sql"
-  pushd "$repo" >> /dev/null
-    dm_install_files "$repo" "$to" sql/civicrm*.mysql sql/case_sample*.mysql
-    ## TODO: for master, remove counties.US.SQL.gz
-  popd >> /dev/null
+  dm_install_files "$repo/sql" "$to/sql" civicrm_drop.mysql civicrm_generated.mysql civicrm_navigation.mysql
 
   if [ -d $to/bin ] ; then
     rm -f $to/bin/setup.sh
@@ -132,7 +129,6 @@ function dm_install_core() {
   fi
 
   set +e
-  rm -rf $to/sql/civicrm_*.??_??.mysql
   rm -rf $to/mixin/*/example
   set -e
 }
@@ -328,8 +324,8 @@ function dm_install_cvext() {
     return
   fi
   dm_h2 "dm_install_cvext: $@"
-  # cv dl -b '@https://civicrm.org/extdir/ver=4.7.25|cms=Drupal/com.iatspayments.civicrm.xml' --destination=$PWD/iatspayments
-  cv dl -b "@https://civicrm.org/extdir/ver=$DM_VERSION|cms=Drupal/$1.xml" --to="$2"
+  # cv dl -b '@https://civicrm.org/extdir/ver=4.7.25/com.iatspayments.civicrm.xml' --destination=$PWD/iatspayments
+  cv dl -b "@https://civicrm.org/extdir/ver=$DM_VERSION/$1.xml" --to="$2"
 }
 
 ## Export a list of patch files from a git repo

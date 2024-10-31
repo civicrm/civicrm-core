@@ -10,6 +10,8 @@
  */
 namespace Civi\Api4;
 
+use Civi\Api4\Generic\Traits\HierarchicalEntity;
+
 /**
  * (Read-only) Available permissions
  *
@@ -18,10 +20,13 @@ namespace Civi\Api4;
  * on top of permissions!) or during install/uninstall processes.
  *
  * @searchable none
+ * @primaryKey name
+ * @parentField parent
  * @since 5.34
  * @package Civi\Api4
  */
 class Permission extends Generic\AbstractEntity {
+  use HierarchicalEntity;
 
   /**
    * @param bool $checkPermissions
@@ -43,6 +48,8 @@ class Permission extends Generic\AbstractEntity {
           'name' => 'group',
           'title' => 'Group',
           'data_type' => 'String',
+          'input_type' => 'Select',
+          'readonly' => TRUE,
           'options' => [
             'civicrm' => 'civicrm',
             'cms' => 'cms',
@@ -51,39 +58,85 @@ class Permission extends Generic\AbstractEntity {
             'afformGeneric' => 'afformGeneric',
             'unknown' => 'unknown',
           ],
+          'input_attrs' => [
+            'label' => ts('Group'),
+          ],
         ],
         [
           'name' => 'name',
           'title' => 'Name',
           'data_type' => 'String',
+          'input_type' => 'Text',
+          'readonly' => TRUE,
+          'input_attrs' => [
+            'label' => ts('Machine name'),
+          ],
         ],
         [
           'name' => 'title',
           'title' => 'Title',
           'data_type' => 'String',
+          'input_type' => 'Text',
+          'readonly' => TRUE,
+          'input_attrs' => [
+            'label' => ts('Title'),
+          ],
         ],
         [
           'name' => 'description',
           'title' => 'Description',
           'data_type' => 'String',
+          'input_type' => 'Text',
+          'readonly' => TRUE,
+          'input_attrs' => [
+            'label' => ts('Description'),
+          ],
         ],
         [
           'name' => 'is_synthetic',
           'title' => 'Is Synthetic',
           'data_type' => 'Boolean',
+          'input_type' => 'CheckBox',
+          'readonly' => TRUE,
         ],
         [
           'name' => 'is_active',
-          'title' => 'Is Active',
+          'title' => 'Enabled',
           'description' => '',
-          'default' => TRUE,
+          'default_value' => TRUE,
           'data_type' => 'Boolean',
+          'input_type' => 'CheckBox',
+          'readonly' => TRUE,
+          'input_attrs' => [
+            'label' => ts('Enabled'),
+          ],
         ],
         [
           'name' => 'implies',
           'title' => 'Implies',
           'description' => 'List of sub-permissions automatically granted by this one',
           'data_type' => 'Array',
+          'readonly' => TRUE,
+        ],
+        [
+          'name' => 'parent',
+          'title' => 'Parent',
+          'description' => 'Higher permission that implies this one',
+          'data_type' => 'String',
+          'fk_entity' => 'Permission',
+          'fk_column' => 'name',
+          'readonly' => TRUE,
+        ],
+        [
+          'name' => '_depth',
+          'type' => 'Extra',
+          'readonly' => TRUE,
+          'title' => ts('Depth'),
+          'description' => ts('Depth in the nested hierarchy'),
+          'data_type' => 'Integer',
+          'default_value' => 0,
+          'label' => ts('Depth'),
+          'input_type' => 'Number',
         ],
       ];
     }))->setCheckPermissions($checkPermissions);

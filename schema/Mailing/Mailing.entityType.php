@@ -160,7 +160,7 @@ return [
       'description' => ts('differentiate between standalone mailings, A/B tests, and A/B final-winner'),
       'add' => '4.6',
       'pseudoconstant' => [
-        'callback' => 'CRM_Mailing_PseudoConstant::mailingTypes',
+        'callback' => ['CRM_Mailing_PseudoConstant', 'mailingTypes'],
       ],
     ],
     'from_name' => [
@@ -199,7 +199,7 @@ return [
       'add' => '4.7',
       'default' => 'traditional',
       'pseudoconstant' => [
-        'callback' => 'CRM_Mailing_BAO_Mailing::getTemplateTypeNames',
+        'callback' => ['CRM_Mailing_BAO_Mailing', 'getTemplateTypeNames'],
       ],
     ],
     'template_options' => [
@@ -438,7 +438,7 @@ return [
         'type' => 'Select',
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::getMailingJobStatus',
+        'callback' => ['CRM_Core_SelectValues', 'getMailingJobStatus'],
       ],
       'readonly' => TRUE,
       'add' => 5.76,
@@ -505,7 +505,7 @@ return [
         'label' => ts('Visibility'),
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::groupVisibility',
+        'callback' => ['CRM_Core_SelectValues', 'groupVisibility'],
       ],
     ],
     'campaign_id' => [
@@ -573,7 +573,10 @@ return [
       'pseudoconstant' => [
         'table' => 'civicrm_location_type',
         'key_column' => 'id',
+        'name_column' => 'name',
+        'description_column' => 'description',
         'label_column' => 'display_name',
+        'abbr_column' => 'vcard_name',
       ],
       'entity_reference' => [
         'entity' => 'LocationType',
@@ -592,7 +595,7 @@ return [
         'label' => ts('Email Selection Method'),
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::emailSelectMethods',
+        'callback' => ['CRM_Core_SelectValues', 'emailSelectMethods'],
       ],
     ],
     'language' => [

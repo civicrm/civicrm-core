@@ -12,7 +12,7 @@
         <th ng-class="{'crm-search-result-select': $ctrl.settings.actions}" ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTaskHeader.html'" ng-if=":: $ctrl.hasExtraFirstColumn()">
           <span class="sr-only">{{:: ts('Bulk row actions')}}</span>
         </th>
-        <th ng-repeat="col in $ctrl.settings.columns" ng-click="$ctrl.setSort(col, $event)" class="{{:: $ctrl.isSortable(col) ? 'crm-sortable-col' : ''}} {{:: col.alignment }}" title="{{:: $ctrl.isSortable(col) ? ts('Click to sort results (shift-click to sort by multiple).') : '' }}">
+        <th ng-repeat="col in $ctrl.settings.columns" ng-click="$ctrl.setSort(col, $event)" class="{{:: $ctrl.getHeaderClass(col) }}" title="{{:: $ctrl.isSortable(col) ? ts('Click to sort results (shift-click to sort by multiple).') : '' }}">
           <i ng-if=":: $ctrl.isSortable(col)" class="crm-i crm-search-table-column-sort-icon {{ $ctrl.getSort(col) }}"></i>
           <span class="crm-search-display-table-column-label">{{:: col.label }}</span>
         </th>
@@ -21,7 +21,7 @@
     <tbody ng-if="$ctrl.loading" ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTableLoading.html'"></tbody>
     <tbody ng-if="!$ctrl.loading && !$ctrl.settings.draggable" ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTableBody.html'"></tbody>
     <tbody ng-if="!$ctrl.loading && $ctrl.settings.draggable" ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTableBody.html'" ui-sortable="$ctrl.draggableOptions" ng-model="$ctrl.results"></tbody>
-    <tfoot ng-if="!$ctrl.loading && $ctrl.settings.tally" ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTally.html'"></tfoot>
+    <tfoot ng-if="!$ctrl.loading && $ctrl.results.length && $ctrl.settings.tally" ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTally.html'"></tfoot>
   </table>
   <div ng-include="'~/crmSearchDisplay/Pager.html'"></div>
 </div>

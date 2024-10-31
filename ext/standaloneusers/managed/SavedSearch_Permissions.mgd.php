@@ -1,7 +1,7 @@
 <?php
 use CRM_Standaloneusers_ExtensionUtil as E;
 
-return [
+$items = [
   [
     'name' => 'SavedSearch_Permissions',
     'entity' => 'SavedSearch',
@@ -11,23 +11,17 @@ return [
       'version' => 4,
       'values' => [
         'name' => 'Permissions',
-        'label' => E::ts('Permissions'),
+        'label' => E::ts('Administer Role Permissions'),
         'api_entity' => 'RolePermission',
         'api_params' => [
           'version' => 4,
           'select' => [
-            'role_name',
-            'role_label',
-            'permission_group',
-            'permission_name',
-            'permission_title',
-            'permission_description',
-            'permission_granted',
+            'name',
+            'title',
           ],
           'orderBy' => [],
           'where' => [],
         ],
-        'description' => E::ts('Shows the permissions of the different roles in standalone CiviCRM.'),
       ],
       'match' => [
         'name',
@@ -43,65 +37,40 @@ return [
       'version' => 4,
       'values' => [
         'name' => 'Permissions_Table_1',
-        'label' => E::ts('Permissions Table 1'),
+        'label' => E::ts('Administer Role Permissions'),
         'saved_search_id.name' => 'Permissions',
         'type' => 'table',
         'settings' => [
-          'description' => E::ts('This lists all the permissions for each role. You need to click the the granted column to change it.
-    It takes a while before the screen is shown.'),
+          'description' => NULL,
           'sort' => [
             [
-              'role_label',
-              'ASC',
-            ],
-            [
-              'permission_name',
+              'title',
               'ASC',
             ],
           ],
-          'limit' => 0,
-          'pager' => FALSE,
-          'placeholder' => 5,
+          'limit' => 50,
+          'pager' => [
+            'expose_limit' => TRUE,
+          ],
+          'placeholder' => 10,
           'columns' => [
             [
-              'type' => 'field',
-              'key' => 'role_label',
-              'dataType' => 2,
-              'label' => E::ts('Role'),
-              'sortable' => TRUE,
-            ],
-            [
-              'type' => 'field',
-              'key' => 'permission_group',
-              'dataType' => 2,
-              'label' => E::ts('Component / Extension'),
-              'sortable' => TRUE,
-            ],
-            [
               'type' => 'html',
-              'key' => 'permission_title',
-              'dataType' => 2,
+              'key' => 'title',
               'label' => E::ts('Permission'),
               'sortable' => TRUE,
-              'rewrite' => '[permission_title]
-    <p class="description">[permission_description]</p>',
-              'title' => E::ts('[permission_description]'),
-            ],
-            [
-              'type' => 'field',
-              'key' => 'permission_granted',
-              'dataType' => 16,
-              'label' => E::ts('Granted'),
-              'sortable' => TRUE,
-              'rewrite' => '',
-              'editable' => TRUE,
+              'rewrite' => '[title]<p class="description">[description]</p>',
             ],
           ],
-          'actions' => FALSE,
+          'actions' => [
+            'update',
+          ],
           'classes' => [
             'table',
             'table-striped',
+            'crm-sticky-header',
           ],
+          'hierarchical' => TRUE,
         ],
       ],
       'match' => [
@@ -111,3 +80,57 @@ return [
     ],
   ],
 ];
+
+$roles = \Civi\Api4\Role::get(FALSE)
+  ->addSelect('name', 'label')
+  ->addWhere('name', '!=', 'admin')
+  ->execute()
+  ->column('label', 'name');
+
+foreach ($roles as $roleName => $roleLabel) {
+  $items[0]['params']['values']['api_params']['select'][] = 'granted_' . $roleName;
+  $items[1]['params']['values']['settings']['columns'][] = [
+    'type' => 'field',
+    'key' => 'granted_' . $roleName,
+    'label' => $roleLabel,
+    'sortable' => FALSE,
+    'rewrite' => ' ',
+    'icons' => [
+      [
+        'icon' => 'fa-square-check',
+        'side' => 'left',
+        'if' => [
+          'granted_' . $roleName,
+          '=',
+          TRUE,
+        ],
+      ],
+      [
+        'icon' => 'fa-circle-check',
+        'side' => 'left',
+        'if' => [
+          'implied_' . $roleName,
+          '=',
+          TRUE,
+        ],
+      ],
+    ],
+    'cssRules' => [
+      [
+        'text-success',
+        'granted_' . $roleName,
+        '=',
+        TRUE,
+      ],
+      [
+        'disabled',
+        'implied_' . $roleName,
+        '=',
+        TRUE,
+      ],
+    ],
+    'alignment' => 'text-center',
+  ];
+}
+
+return $items;

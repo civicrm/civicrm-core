@@ -706,9 +706,12 @@ class CRM_Utils_Token {
   /**
    * Get the categories required for rendering tokens.
    *
+   * @deprecated since 5.78 will be removed around 5.90.
+   *
    * @return array
    */
   public static function getTokenCategories(): array {
+    CRM_Core_Error::deprecatedFunctionWarning('token processor');
     if (!isset(\Civi::$statics[__CLASS__]['token_categories'])) {
       $tokens = [];
       \CRM_Utils_Hook::tokens($tokens);
@@ -1403,6 +1406,7 @@ class CRM_Utils_Token {
    * @throws \CRM_Core_Exception
    */
   public static function getApiTokenReplacement($entity, $token, $entityArray) {
+    CRM_Core_Error::deprecatedFunctionWarning('use the token processor');
     if (!isset($entityArray[$token])) {
       return '';
     }
@@ -1448,6 +1452,7 @@ class CRM_Utils_Token {
    * @return string token replacement
    */
   public static function getMembershipTokenReplacement($entity, $token, $membership) {
+    CRM_Core_Error::deprecatedFunctionWarning('use the token processor');
     $supportedTokens = [
       'id',
       'status',
@@ -1571,6 +1576,7 @@ class CRM_Utils_Token {
    *   [legacy_token => new_token]
    */
   public static function legacyContactTokens() {
+    CRM_Core_Error::deprecatedFunctionWarning('use the token processor');
     return [
       'individual_prefix' => 'prefix_id',
       'individual_suffix' => 'suffix_id',
@@ -1589,6 +1595,7 @@ class CRM_Utils_Token {
    *   return custom field tokens in array('custom_N' => 'label') format
    */
   public static function getCustomFieldTokens($entity) {
+    CRM_Core_Error::deprecatedFunctionWarning('use the token processor');
     $customTokens = [];
     foreach (CRM_Core_BAO_CustomField::getFields($entity) as $id => $info) {
       $customTokens['custom_' . $id] = $info['label'] . ' :: ' . $info['groupTitle'];

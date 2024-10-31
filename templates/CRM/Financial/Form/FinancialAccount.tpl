@@ -16,9 +16,9 @@
   </div>
 {else}
   <table class="form-layout-compressed">
-    <tr class="crm-contribution-form-block-name">
-      <td class="label">{$form.name.label}</td>
-      <td class="html-adjust">{$form.name.html}</td>
+    <tr class="crm-contribution-form-block-label">
+      <td class="label">{$form.label.label}</td>
+      <td class="html-adjust">{$form.label.html}</td>
     </tr>
     <tr class="crm-contribution-form-block-description">
       <td class="label">{$form.description.label}</td>

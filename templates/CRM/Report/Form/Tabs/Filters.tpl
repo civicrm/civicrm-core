@@ -37,7 +37,12 @@
                     <td class="label report-contents">{if !empty($field.title)}{$field.title}{/if}</td>
                     <td class="report-contents">{$form.$fieldOp.html}</td>
                     <td>
-                      <span id="{$filterVal}_cell">{$form.$filterVal.label}&nbsp;{$form.$filterVal.html}</span>
+                      <span id="{$filterVal}_cell">
+                        <label class="sr-only" for="{$form.$filterVal.id}">
+                          {if !empty($field.title)}{$field.title}{else}{$field.name}{/if} filter value
+                        </label>
+                        {$form.$filterVal.label}&nbsp;{$form.$filterVal.html}
+                      </span>
                       <span id="{$filterMin}_max_cell">
                         {if array_key_exists($filterMin, $form) && $form.$filterMin}{$form.$filterMin.label}&nbsp;{$form.$filterMin.html}&nbsp;&nbsp;{/if}
                         {if array_key_exists($filterMax, $form) && $form.$filterMax}{$form.$filterMax.label}&nbsp;{$form.$filterMax.html}{/if}

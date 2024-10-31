@@ -24,6 +24,7 @@ class CRM_Admin_Page_AJAX {
    * Outputs menubar data (json format) for the current user.
    */
   public static function navMenu() {
+    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
     if (CRM_Core_Session::getLoggedInContactID()) {
 
       $menu = CRM_Core_BAO_Navigation::buildNavigationTree();
@@ -96,6 +97,7 @@ class CRM_Admin_Page_AJAX {
    * Process drag/move action for menu tree.
    */
   public static function menuTree() {
+    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
     CRM_Core_BAO_Navigation::processNavigation($_GET);
   }
 
@@ -103,6 +105,7 @@ class CRM_Admin_Page_AJAX {
    * Build status message while enabling/ disabling various objects.
    */
   public static function getStatusMsg() {
+    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
     require_once 'api/v3/utils.php';
     $recordID = CRM_Utils_Type::escape($_GET['id'], 'Integer');
     $entity = CRM_Utils_Type::escape($_GET['entity'], 'String');
@@ -298,6 +301,7 @@ class CRM_Admin_Page_AJAX {
    * Used by jstree to incrementally load tags
    */
   public static function getTagTree() {
+    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
     $parent = CRM_Utils_Type::escape(($_GET['parent_id'] ?? 0), 'Integer');
     $substring = CRM_Utils_Type::escape(CRM_Utils_Array::value('str', $_GET), 'String');
     $result = [];

@@ -30,31 +30,12 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
   const DEFAULT_MAX_ATTACHMENTS_BACKEND = 100;
 
   /**
-   * Takes an associative array and creates a File object.
-   *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
-   *
+   * @deprecated
    * @return CRM_Core_BAO_File
    */
   public static function create($params) {
-    $fileDAO = new CRM_Core_DAO_File();
-
-    $op = empty($params['id']) ? 'create' : 'edit';
-
-    CRM_Utils_Hook::pre($op, 'File', $params['id'] ?? NULL, $params);
-
-    $fileDAO->copyValues($params);
-
-    if (empty($params['id']) && empty($params['created_id'])) {
-      $fileDAO->created_id = CRM_Core_Session::getLoggedInContactID();
-    }
-
-    $fileDAO->save();
-
-    CRM_Utils_Hook::post($op, 'File', $fileDAO->id, $fileDAO);
-
-    return $fileDAO;
+    return self::writeRecord($params);
   }
 
   /**
@@ -330,7 +311,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
     }
 
     //fix tag names
-    $tags = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', ['onlyActive' => FALSE]);
+    $tags = CRM_Core_DAO_EntityTag::buildOptions('tag_id', 'get');
 
     foreach ($results as &$values) {
       if (!empty($values['tag'])) {

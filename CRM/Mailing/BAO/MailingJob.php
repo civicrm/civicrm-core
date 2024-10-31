@@ -156,7 +156,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
           'start_date' => date('YmdHis'),
           'status' => 'Running',
         ])->execute();
-        if (empty($testParams) && empty($job->mailing_start_date)) {
+        if (empty($testParams) && empty($result->mailing_start_date)) {
           Mailing::update(FALSE)->setValues([
             'id' => $result->mailing_id,
             'start_date' => $startDate,

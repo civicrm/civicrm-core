@@ -266,9 +266,9 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     }
     $this->assign('noSearchable', $noSearchable);
 
-    $this->_location_types = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+    $this->_location_types = CRM_Core_DAO_Address::buildOptions('location_type_id');
     $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
-    $this->_website_types = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id');
+    $this->_website_types = CRM_Core_DAO_Website::buildOptions('website_type_id');
 
     /**
      * FIXME: dirty hack to make the default option show up first.  This
@@ -323,7 +323,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       }
     }
     $sel3[''] = NULL;
-    $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
+    $phoneTypes = CRM_Core_DAO_Phone::buildOptions('phone_type_id');
     ksort($phoneTypes);
 
     foreach ($sel1 as $k => $sel) {

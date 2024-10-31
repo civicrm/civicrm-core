@@ -45,7 +45,7 @@ return [
       'description' => ts('Type of the queue'),
       'add' => '5.47',
       'pseudoconstant' => [
-        'callback' => 'CRM_Queue_BAO_Queue::getTypes',
+        'callback' => ['CRM_Queue_BAO_Queue', 'getTypes'],
       ],
     ],
     'runner' => [
@@ -97,7 +97,7 @@ return [
       'add' => '5.51',
       'default' => 'active',
       'pseudoconstant' => [
-        'callback' => 'CRM_Queue_BAO_Queue::getStatuses',
+        'callback' => ['CRM_Queue_BAO_Queue', 'getStatuses'],
       ],
     ],
     'error' => [
@@ -107,7 +107,7 @@ return [
       'description' => ts('Fallback behavior for unhandled errors'),
       'add' => '5.51',
       'pseudoconstant' => [
-        'callback' => 'CRM_Queue_BAO_Queue::getErrorModes',
+        'callback' => ['CRM_Queue_BAO_Queue', 'getErrorModes'],
       ],
     ],
     'is_template' => [

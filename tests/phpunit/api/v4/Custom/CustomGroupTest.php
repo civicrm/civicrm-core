@@ -105,7 +105,7 @@ class CustomGroupTest extends CustomTestBase {
 
     $result = CustomGroup::get(FALSE)
       ->addWhere('extends_entity_column_value:name', 'CONTAINS', $activityTypeName)
-      ->addWhere('extends:name', '=', 'Activities')
+      ->addWhere('extends:name', '=', 'Activity')
       ->execute()->single();
 
     $this->assertEquals([$activityType['value']], $result['extends_entity_column_value']);

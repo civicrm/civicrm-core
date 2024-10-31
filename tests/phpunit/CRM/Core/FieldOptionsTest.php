@@ -118,7 +118,6 @@ class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
     $this->targetField = 'gender_id';
     $this->appendOptions = ['foo' => 'Foo', 'bar' => 'Bar'];
     $this->replaceOptions = NULL;
-    CRM_Core_PseudoConstant::flush();
     $result = CRM_Contact_BAO_Contact::buildOptions('gender_id');
     $this->assertEquals($result, $originalGender + $this->appendOptions);
   }
@@ -183,10 +182,10 @@ class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
     $field->id = $customField2;
     $this->assertEquals($this->replaceOptions + $this->appendOptions, $field->getOptions());
 
-    $this->targetField = 'custom_' . $customField3;
+    $this->targetField = "$custom_group_name.{$custom_group_name}3";
     $this->replaceOptions = NULL;
     $this->appendOptions = [2 => 'Maybe'];
-    $options = CRM_Core_PseudoConstant::get('CRM_Core_BAO_CustomField', $this->targetField);
+    $options = CRM_Contact_BAO_Contact::buildOptions($this->targetField);
     $this->assertEquals([1 => 'Yes', 0 => 'No', 2 => 'Maybe'], $options);
   }
 

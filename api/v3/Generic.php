@@ -44,6 +44,7 @@ function civicrm_api3_generic_getfields($apiRequest, $unique = TRUE) {
     $results = [];
     // we will also clear pseudoconstants here - should potentially be moved to relevant BAO classes
     CRM_Core_PseudoConstant::flush();
+    Civi::cache('metadata')->clear();
     if (!empty($apiRequest['params']['fieldname'])) {
       CRM_Utils_PseudoConstant::flushConstant($apiRequest['params']['fieldname']);
     }

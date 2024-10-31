@@ -13,7 +13,7 @@ use Civi\Test\TransactionalInterface;
 class AfformGroupSubscriptionUsageTest extends AfformUsageTestCase implements TransactionalInterface {
 
   /**
-   * Tests creating a relationship between multiple contacts
+   * Tests subscribing and unsubscribing to groups
    */
   public function testGroupSubscription(): void {
     $groupName = __FUNCTION__;
@@ -80,6 +80,7 @@ EOHTML;
     // Prefill - afform will show group checkbox checked
     $prefill = Afform::prefill()
       ->setName($this->formName)
+      ->setFillMode('form')
       ->setArgs(['Individual1' => $cid])
       ->execute()
       ->indexBy('name');

@@ -24,7 +24,7 @@
   </tr>
   <tr class="crm-contribution-form-block-source">
     <td class="label">{ts}Contribution Source{/ts}</td>
-    <td>{$source}</td>
+    <td>{$source|escape}</td>
   </tr>
   {if empty($is_template)}
   <tr class="crm-contribution-form-block-receive_date">

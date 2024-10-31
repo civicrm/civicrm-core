@@ -80,8 +80,8 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
 
     $this->applyFilter('__ALL__', 'trim');
     $attributes = CRM_Core_DAO::getAttribute('CRM_Financial_DAO_FinancialAccount');
-    $this->add('text', 'name', ts('Name'), $attributes['name'], TRUE);
-    $this->addRule('name', ts('A financial type with this name already exists. Please select another name.'),
+    $this->add('text', 'label', ts('Label'), $attributes['label'], TRUE);
+    $this->addRule('label', ts('A financial type with this label already exists. Please select another label.'),
       'objectExists', ['CRM_Financial_DAO_FinancialAccount', $this->_id]);
 
     $this->add('text', 'description', ts('Description'), $attributes['description']);
@@ -102,7 +102,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
       $element->freeze();
     }
 
-    $financialAccountType = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialAccount', 'financial_account_type_id');
+    $financialAccountType = CRM_Financial_DAO_FinancialAccount::buildOptions('financial_account_type_id');
     if (!empty($financialAccountType)) {
       $element = $this->add('select', 'financial_account_type_id', ts('Financial Account Type'),
         ['' => ts('- select -')] + $financialAccountType, TRUE, ['class' => 'crm-select2 huge']);
@@ -119,7 +119,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
     if ($this->_action == CRM_Core_Action::UPDATE &&
       CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', $this->_id, 'is_reserved')
     ) {
-      $this->freeze(['name', 'description', 'is_active']);
+      $this->freeze(['description', 'is_active']);
     }
     $this->addFormRule(['CRM_Financial_Form_FinancialAccount', 'formRule'], $this);
   }
@@ -204,7 +204,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
         $params[$field] ??= FALSE;
       }
       $financialAccount = CRM_Financial_BAO_FinancialAccount::writeRecord($params);
-      CRM_Core_Session::setStatus(ts('The Financial Account \'%1\' has been saved.', [1 => $financialAccount->name]), ts('Saved'), 'success');
+      CRM_Core_Session::setStatus(ts('The Financial Account \'%1\' has been saved.', [1 => $financialAccount->label]), ts('Saved'), 'success');
     }
   }
 

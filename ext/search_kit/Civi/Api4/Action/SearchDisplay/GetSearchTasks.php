@@ -219,6 +219,9 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
       $task['entity'] = $entity['name'];
       // Add default for number of rows action requires
       $task += ['number' => '> 0'];
+      if (!empty($task['apiBatch']['fields'])) {
+        $this->getApiBatchFields($task);
+      }
     }
 
     usort($tasks[$entity['name']], function($a, $b) {
@@ -226,6 +229,19 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
     });
 
     $result->exchangeArray($tasks[$entity['name']]);
+  }
+
+  private function getApiBatchFields(array &$task) {
+    $fieldInfo = civicrm_api4($task['entity'], 'getFields', [
+      'checkPermissions' => $this->getCheckPermissions(),
+      'action' => $task['apiBatch']['action'] ?? 'update',
+      'select' => ['name', 'label', 'description', 'input_type', 'data_type', 'serialize', 'options', 'fk_entity', 'required', 'nullable'],
+      'loadOptions' => ['id', 'name', 'label', 'description', 'color', 'icon'],
+      'where' => [['name', 'IN', array_column($task['apiBatch']['fields'], 'name')]],
+    ])->indexBy('name');
+    foreach ($task['apiBatch']['fields'] as &$field) {
+      $field += $fieldInfo[$field['name']] ?? [];
+    }
   }
 
   public static function fields(): array {

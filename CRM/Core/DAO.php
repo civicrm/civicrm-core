@@ -1046,6 +1046,9 @@ class CRM_Core_DAO extends DB_DataObject {
     }, $record);
 
     \CRM_Utils_Hook::pre($op, $entityName, $record[$idField] ?? NULL, $record);
+
+    // Fill defaults after pre hook to accept any hook modifications
+    self::setDefaultsFromCallback($entityName, $record);
     $fields = static::getSupportedFields();
     $instance = new static();
     // Ensure fields exist before attempting to write to them
@@ -1053,16 +1056,6 @@ class CRM_Core_DAO extends DB_DataObject {
     $instance->copyValues($values);
     if (empty($values[$idField]) && array_key_exists('name', $fields) && empty($values['name'])) {
       $instance->makeNameFromLabel();
-    }
-    if (empty($values[$idField]) && array_key_exists('frontend_title', $fields) && empty($values['frontend_title'])) {
-      $instance->frontend_title = $instance->title;
-    }
-    if (empty($values[$idField]) && array_key_exists('frontend_title', $fields) && !$instance->frontend_title) {
-      // Still empty? Fall back to name.
-      $instance->frontend_title = $instance->name;
-    }
-    if (empty($values[$idField]) && array_key_exists('title', $fields) && empty($values['title']) && array_key_exists('frontend_title', $fields) && $instance->frontend_title) {
-      $instance->title = $instance->frontend_title;
     }
     $instance->save();
 
@@ -1140,6 +1133,51 @@ class CRM_Core_DAO extends DB_DataObject {
       $results[] = static::deleteRecord($record);
     }
     return $results;
+  }
+
+  /**
+   * Set default values for fields based on callback functions
+   *
+   * @param string $entityName
+   *   The entity name
+   * @param array &$record
+   *   The record array to set default values for
+   * @return void
+   */
+  private static function setDefaultsFromCallback(string $entityName, array &$record): void {
+    $entity = Civi::entity($entityName);
+    $idField = $entity->getMeta('primary_key');
+    // Only fill values for create operations
+    if (!empty($record[$idField])) {
+      return;
+    }
+    foreach ($entity->getFields() as $fieldName => $field) {
+      if (!empty($field['default_fallback'])) {
+        $field += ['default_callback' => [__CLASS__, 'getDefaultFallbackValues']];
+      }
+      // Check if value is empty using `strlen()` to avoid php quirk of '0' == false.
+      if (!empty($field['default_callback']) && !strlen((string) ($record[$fieldName] ?? ''))) {
+        $record[$fieldName] = \Civi\Core\Resolver::singleton()->call($field['default_callback'], [$record, $entityName, $fieldName, $field]);
+      }
+    }
+  }
+
+  /**
+   * Callback for `default_fallback` field values
+   *
+   * @param array $record
+   * @param string $entityName
+   * @param string $fieldName
+   * @param array $field
+   * @return mixed
+   */
+  public static function getDefaultFallbackValues(array $record, string $entityName, string $fieldName, array $field) {
+    foreach ($field['default_fallback'] as $defaultFieldName) {
+      if (strlen((string) ($record[$defaultFieldName] ?? ''))) {
+        return $record[$defaultFieldName];
+      }
+    }
+    return NULL;
   }
 
   /**
@@ -2843,7 +2881,6 @@ SELECT contact_id
         elseif (
           !empty($field['FKClassName'])
           && ($pseudoConstant['keyColumn'] ?? NULL) === 'id'
-          && ($pseudoConstant['labelColumn'] ?? NULL) === 'name'
         ) {
           $pseudoFieldName = str_replace('_' . $pseudoConstant['keyColumn'], '', $field['name']);
           // This if is just an extra caution when adding change.
@@ -2868,10 +2905,14 @@ SELECT contact_id
   }
 
   /**
-   * Get options for the called BAO object's field.
+   * Legacy field options getter.
    *
-   * This function can be overridden by each BAO to add more logic related to context.
-   * The overriding function will generally call the lower-level CRM_Core_PseudoConstant::get
+   * @deprecated in favor of `Civi::entity()->getOptions()`
+   *
+   * Overriding this function is no longer recommended as a way to customize options.
+   * Instead, option lists can be customized by either:
+   * 1. Using a pseudoconstant callback
+   * 2. Implementing hook_civicrm_fieldOptions
    *
    * @param string $fieldName
    * @param string $context
@@ -2884,17 +2925,31 @@ SELECT contact_id
    * @return array|bool
    */
   public static function buildOptions($fieldName, $context = NULL, $values = []) {
-    // If a given bao does not override this function
-    $baoName = get_called_class();
-    return CRM_Core_PseudoConstant::get($baoName, $fieldName, ['values' => $values], $context);
+    $entityName = CRM_Core_DAO_AllCoreTables::getEntityNameForClass(get_called_class());
+    $entity = Civi::entity($entityName);
+    // Legacy handling for custom field names in `custom_123` format
+    if (str_starts_with($fieldName, 'custom_') && is_numeric($fieldName[7] ?? '')) {
+      $fieldName = CRM_Core_BAO_CustomField::getLongNameFromShortName($fieldName) ?? $fieldName;
+    }
+    // Legacy handling for field "unique name"
+    elseif (!$entity->getField($fieldName)) {
+      $uniqueNames = static::fieldKeys();
+      $fieldName = array_search($fieldName, $uniqueNames) ?: $fieldName;
+    }
+    $checkPermissions = (bool) ($values['check_permissions'] ?? ($context == 'create' || $context == 'search'));
+    $includeDisabled = ($context == 'validate' || $context == 'get');
+    $options = $entity->getOptions($fieldName, $values, $includeDisabled, $checkPermissions);
+    return $options ? CRM_Core_PseudoConstant::formatArrayOptions($context, $options) : $options;
   }
 
   /**
    * Populate option labels for this object's fields.
    *
+   * @deprecated
    * @throws exception if called directly on the base class
    */
   public function getOptionLabels() {
+    CRM_Core_Error::deprecatedFunctionWarning('Civi::entity()->getOptions');
     $fields = $this->fields();
     if ($fields === NULL) {
       throw new Exception('Cannot call getOptionLabels on CRM_Core_DAO');

@@ -66,7 +66,7 @@
       <label for="skin">{ts}Skin{/ts}</label>
       <select id="skin" name="config_skin" class="crm-select2 eight config-param">
         {foreach from=$skins item='s'}
-          <option value="{$s}" {if $s == $skin}selected{/if}>{$s|ucfirst}</option>
+          <option value="{$s}" {if $s == $skin}selected{/if}>{$s|capitalize}</option>
         {/foreach}
       </select>
       &nbsp;&nbsp;

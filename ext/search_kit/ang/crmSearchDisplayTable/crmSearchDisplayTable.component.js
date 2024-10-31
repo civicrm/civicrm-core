@@ -74,6 +74,26 @@
         }
       };
 
+      // Get header classes for each column
+      this.getHeaderClass = function (column) {
+        let headerClasses = [];
+        if (ctrl.isSortable(column)) {
+          headerClasses.push('crm-sortable-col');
+        }
+        if (column.alignment) {
+          headerClasses.push(column.alignment);
+        }
+        // Include unconditional css rules
+        if (column.cssRules) {
+          column.cssRules.forEach(function (cssRule) {
+            if (cssRule.length === 1) {
+              headerClasses.push(cssRule[0]);
+            }
+          });
+        }
+        return headerClasses.join(' ');
+      };
+
     }
   });
 

@@ -119,10 +119,6 @@
         updateAfformCounts();
       });
 
-      this.encode = function(params) {
-        return encodeURI(angular.toJson(params));
-      };
-
       this.deleteOrRevert = function(row) {
         var search = row.data,
           revert = !!search['base_module:label'];

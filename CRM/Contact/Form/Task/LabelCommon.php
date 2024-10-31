@@ -74,23 +74,10 @@ class CRM_Contact_Form_Task_LabelCommon {
     $returnProperties = ['display_name' => 1, 'contact_type' => 1, 'prefix_id' => 1];
     $mailingFormat = Civi::settings()->get('mailing_format');
 
-    $mailingFormatProperties = [];
     if ($mailingFormat) {
       $mailingFormatProperties = CRM_Utils_Token::getReturnProperties($mailingFormat);
       $returnProperties = array_merge($returnProperties, $mailingFormatProperties);
     }
-
-    $customFormatProperties = [];
-    if (stristr($mailingFormat, 'custom_')) {
-      foreach ($mailingFormatProperties as $token => $true) {
-        if (substr($token, 0, 7) == 'custom_') {
-          if (empty($customFormatProperties[$token])) {
-            $customFormatProperties[$token] = $mailingFormatProperties[$token];
-          }
-        }
-      }
-    }
-    $returnProperties = array_merge($returnProperties, $customFormatProperties);
 
     if ($mergeSameAddress) {
       // we need first name/last name for summarising to avoid spillage
@@ -118,7 +105,7 @@ class CRM_Contact_Form_Task_LabelCommon {
     $params[] = ['is_deceased', '=', 0, 0, 0];
 
     if ($locationTypeID) {
-      $locType = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+      $locType = CRM_Core_DAO_Address::buildOptions('location_type_id');
       $locName = $locType[$locationTypeID];
       $location = ['location' => ["{$locName}" => $addressReturnProperties]];
       $returnProperties = array_merge($returnProperties, $location);
@@ -128,13 +115,6 @@ class CRM_Contact_Form_Task_LabelCommon {
       $returnProperties = array_merge($returnProperties, $addressReturnProperties);
     }
 
-    foreach ($returnProperties as $name) {
-      $cfID = CRM_Core_BAO_CustomField::getKeyID($name);
-      if ($cfID) {
-        $custom[] = $cfID;
-      }
-    }
-
     //get the total number of contacts to fetch from database.
     $numberofContacts = count($contactIDs);
     //this does the same as calling civicrm_api3('contact, get, array('id' => array('IN' => $this->_contactIds)
@@ -142,16 +122,7 @@ class CRM_Contact_Form_Task_LabelCommon {
     [$details] = CRM_Contact_BAO_Query::apiQuery($params, $returnProperties, NULL, NULL, 0, $numberofContacts);
 
     foreach ($contactIDs as $value) {
-      foreach ($custom as $cfID) {
-        if (isset($details[$value]["custom_{$cfID}"])) {
-          $details[$value]["custom_{$cfID}"] = CRM_Core_BAO_CustomField::displayValue($details[$value]["custom_{$cfID}"], $cfID);
-        }
-      }
       $contact = $details[$value] ?? NULL;
-
-      if (is_a($contact, 'CRM_Core_Error')) {
-        return NULL;
-      }
 
       // we need to remove all the "_id"
       unset($contact['contact_id']);
@@ -165,10 +136,6 @@ class CRM_Contact_Form_Task_LabelCommon {
         if (!empty($contact['county_id'])) {
           unset($contact['county_id']);
         }
-
-        foreach ($contact as $field => $fieldValue) {
-          $rows[$value][$field] = $fieldValue;
-        }
       }
       else {
 
@@ -178,11 +145,10 @@ class CRM_Contact_Form_Task_LabelCommon {
         if (!empty($contact['addressee'])) {
           $contact['addressee'] = $contact['addressee_display'];
         }
-
-        // now create the rows for generating mailing labels
-        foreach ($contact as $field => $fieldValue) {
-          $rows[$value][$field] = $fieldValue;
-        }
+      }
+      // now create the rows for generating mailing labels
+      foreach ($contact as $field => $fieldValue) {
+        $rows[$value][$field] = $fieldValue;
       }
     }
     // sigh couldn't extract out tokenfields yet

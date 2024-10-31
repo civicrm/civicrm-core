@@ -16,17 +16,21 @@
   */
 class CRM_Contact_Form_Task_PrintMailingLabelTest extends CiviUnitTestCase {
 
+  use CRMTraits_Custom_CustomDataTrait;
+
   private string $mailingFormat;
 
   public function setUp(): void {
     $this->mailingFormat = Civi::settings()->get('mailing_format') ?? '';
     Civi::settings()->set('mailing_format', $this->getDefaultMailingFormat());
+    $this->createCustomGroupWithFieldOfType();
     parent::setUp();
   }
 
   public function tearDown(): void {
     Civi::settings()->set('mailing_format', $this->mailingFormat);
     Civi::settings()->set('searchPrimaryDetailsOnly', TRUE);
+    $this->quickCleanup(['civicrm_contact'], TRUE);
     parent::tearDown();
   }
 
@@ -40,6 +44,43 @@ class CRM_Contact_Form_Task_PrintMailingLabelTest extends CiviUnitTestCase {
    */
   protected function getDefaultMailingFormat(): string {
     return "{contact.addressee}\n{contact.street_address}\n{contact.supplemental_address_1}\n{contact.supplemental_address_2}\n{contact.supplemental_address_3}\n{contact.city}{, }{contact.state_province}{ }{contact.postal_code}\n{contact.country}";
+  }
+
+  /**
+   * Test tokens are rendered in the mailing labels when declared via deprecated hooks.
+   */
+  public function testMailingLabelTokens(): void {
+    \Civi::settings()->set('mailing_format', $this->getDefaultMailingFormat() . ' {test.last_initial} . {contact.' . $this->getCustomFieldName() . '}');
+    $this->hookClass->setHook('civicrm_tokenValues', [$this, 'hookTokenValues']);
+    $this->hookClass->setHook('civicrm_tokens', [$this, 'hook_tokens']);
+    $this->createTestAddresses();
+    $rows = $this->submitForm([]);
+    $this->assertCount(2, $rows);
+    $this->assertEquals($this->getExpectedAddress('collins') . ' C . Ho', $rows[$this->ids['Contact']['collins']][0]);
+    $this->assertEquals($this->getExpectedAddress('souza') . ' S . Hey', $rows[$this->ids['Contact']['souza']][0]);
+  }
+
+  /**
+   * Test tokens are rendered in the mailing labels when declared via deprecated hooks.
+   */
+  public function testMailingLabelAddressMergeWithTokens(): void {
+    \Civi::settings()->set('mailing_format', $this->getDefaultMailingFormat() . ' {test.last_initial}');
+    $this->hookClass->setHook('civicrm_tokenValues', [$this, 'hookTokenValues']);
+    $this->hookClass->setHook('civicrm_tokens', [$this, 'hook_tokens']);
+    $this->createTestAddresses();
+    $rows = $this->submitForm([
+      'merge_same_address' => TRUE,
+    ]);
+    $this->assertCount(1, $rows);
+    // The address has been combined. Note both names appear.
+    // No merge handling is done on the token - this test was added to lock
+    // in token merge handling as at the time of writing, not to weigh in on
+    // or change behaviour.
+    $this->assertEquals('Mr. Anthony J. Collins II
+Mr. Antonia J. D`souza II
+Main Street 231
+Brummen, 6971 BN
+NETHERLANDS S', $rows[$this->ids['Contact']['collins']][0]);
   }
 
   /**
@@ -98,11 +139,13 @@ NETHERLANDS';
         'first_name' => 'Antonia',
         'last_name' => 'D`souza',
         'middle_name' => 'J.',
+        $this->getCustomFieldName() => 'Hey',
       ], 'souza'),
       $this->individualCreate([
         'first_name' => 'Anthony',
         'last_name' => 'Collins',
         'middle_name' => 'J.',
+        $this->getCustomFieldName() => 'Ho',
       ], 'collins'),
     ];
     $addresses = [];
@@ -125,6 +168,24 @@ NETHERLANDS';
       }
     }
     return $addresses;
+  }
+
+  /**
+   * Implement token values hook.
+   *
+   * @param array $details
+   */
+  public function hookTokenValues(array &$details): void {
+    foreach ($details as $index => $detail) {
+      $details[$index]['last_initial'] = str_contains($detail['display_name'], 'souza') ? 'S' : 'C';
+    }
+  }
+
+  /**
+   * Implements civicrm_tokens().
+   */
+  public function hook_tokens(&$tokens): void {
+    $tokens['test'] = ['last_initial' => 'last_initial'];
   }
 
   /**

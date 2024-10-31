@@ -736,27 +736,25 @@ AND    contact_id IN ( $contactStr )
   }
 
   /**
-   * Get options for a given field.
-   * @see CRM_Core_DAO::buildOptions
+   * Legacy option getter
+   *
+   * @deprecated
    *
    * @param string $fieldName
    * @param string $context
-   * @see CRM_Core_DAO::buildOptionsContext
    * @param array $props
-   *   whatever is known about this dao object.
    *
    * @return array|bool
    */
   public static function buildOptions($fieldName, $context = NULL, $props = []) {
-    $options = CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, [], $context);
-
-    // Sort group list by hierarchy
-    // TODO: This will only work when api.entity is "group_contact". What about others?
+    // Legacy formatting used by some forms
+    // TODO: Do any forms still use this? If not, remove this function.
     if (($fieldName == 'group' || $fieldName == 'group_id') && ($context == 'search' || $context == 'create')) {
-      $options = CRM_Contact_BAO_Group::getGroupsHierarchy($options, NULL, '- ', TRUE);
+      $options = CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, [], $context);
+      return CRM_Contact_BAO_Group::getGroupsHierarchy($options, NULL, '- ', TRUE);
     }
 
-    return $options;
+    return parent::buildOptions($fieldName, $context, $props);
   }
 
 }

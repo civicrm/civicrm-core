@@ -1,9 +1,6 @@
 <div af-fieldset="">
   <div class="af-container af-layout-inline">
-    <af-field name="role_name" defn="{input_attrs: {multiple: true}, label: 'Role'}" />
-    <af-field name="permission_group" defn="{input_attrs: {multiple: true}, label: 'Component / Extension'}" />
-    <af-field name="permission_title" />
-    <af-field name="permission_granted" defn="{input_type: 'Select', input_attrs: {}, options: [{id: '1', label: 'Granted'}, {id: '0', label: 'Not granted'}]}" />
+    <af-field name="title" defn="{label: false, input_attrs: {placeholder: ts('Search Permissions')}}" />
   </div>
   <crm-search-display-table search-name="Permissions" display-name="Permissions_Table_1"></crm-search-display-table>
 </div>

@@ -1977,6 +1977,133 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('$250.00', $result[3]['columns'][0]['val']);
   }
 
+  public function testTally(): void {
+    \Civi::settings()->set('dateformatshortdate', '%m/%d/%Y');
+    $contacts = $this->saveTestRecords('Individual', [
+      'records' => [
+        ['first_name' => 'A', 'last_name' => 'A'],
+        ['first_name' => 'B', 'last_name' => 'B'],
+        ['first_name' => 'C', 'last_name' => 'C'],
+      ],
+    ]);
+
+    $contributions = $this->saveTestRecords('Contribution', [
+      'records' => [
+        ['total_amount' => 100, 'contact_id' => $contacts[0]['id'], 'receive_date' => '2024-02-02', 'financial_type_id:name' => 'Donation'],
+        ['total_amount' => 200, 'contact_id' => $contacts[0]['id'], 'receive_date' => '2021-02-02', 'financial_type_id:name' => 'Campaign Contribution'],
+        ['total_amount' => 300, 'contact_id' => $contacts[1]['id'], 'receive_date' => '2022-02-02', 'financial_type_id:name' => 'Member Dues'],
+        ['total_amount' => 400, 'contact_id' => $contacts[2]['id'], 'receive_date' => '2023-02-02', 'financial_type_id:name' => 'Donation'],
+      ],
+    ]);
+
+    $this->createTestRecord('SavedSearch', [
+      'name' => __FUNCTION__,
+      'label' => __FUNCTION__,
+      'api_entity' => 'Contribution',
+      'api_params' => [
+        'version' => 4,
+        'select' => [
+          'COUNT(id) AS COUNT_id',
+          'GROUP_CONCAT(DISTINCT contact_id.sort_name) AS GROUP_CONCAT_contact_id_sort_name',
+          'SUM(total_amount) AS SUM_total_amount',
+          'GROUP_FIRST(receive_date ORDER BY receive_date ASC) AS GROUP_FIRST_receive_date',
+          'GROUP_FIRST(financial_type_id:label ORDER BY receive_date ASC) AS GROUP_FIRST_financial_type_id_label',
+        ],
+        'orderBy' => [],
+        'where' => [
+          ['id', 'IN', $contributions->column('id')],
+        ],
+        'groupBy' => [
+          'contact_id',
+        ],
+        'join' => [],
+        'having' => [],
+      ],
+    ]);
+
+    $this->createTestRecord('SearchDisplay', [
+      'name' => __FUNCTION__,
+      'label' => __FUNCTION__,
+      'saved_search_id.name' => __FUNCTION__,
+      'type' => 'table',
+      'settings' => [
+        'description' => NULL,
+        'sort' => [],
+        'limit' => 50,
+        'pager' => [],
+        'placeholder' => 5,
+        'columns' => [
+          [
+            'type' => 'field',
+            'key' => 'COUNT_id',
+            'label' => '(Count) Contribution ID',
+            'sortable' => TRUE,
+            'tally' => [
+              'fn' => 'SUM',
+            ],
+          ],
+          [
+            'type' => 'field',
+            'key' => 'GROUP_CONCAT_contact_id_sort_name',
+            'label' => '(List) Contact Sort Name',
+            'sortable' => TRUE,
+            'tally' => [
+              'fn' => 'GROUP_CONCAT',
+            ],
+          ],
+          [
+            'type' => 'field',
+            'key' => 'SUM_total_amount',
+            'label' => '(Sum) Total Amount',
+            'sortable' => TRUE,
+            'tally' => [
+              'fn' => 'SUM',
+            ],
+          ],
+          [
+            'type' => 'field',
+            'key' => 'GROUP_FIRST_receive_date',
+            'label' => 'First Contribution Date',
+            'sortable' => TRUE,
+            'tally' => [
+              'fn' => 'GROUP_FIRST',
+            ],
+            'format' => 'dateformatshortdate',
+          ],
+          [
+            'type' => 'field',
+            'key' => 'GROUP_FIRST_financial_type_id_label',
+            'label' => '(First) Financial Type',
+            'sortable' => TRUE,
+            'tally' => [
+              'fn' => 'GROUP_FIRST',
+            ],
+          ],
+        ],
+        'actions' => TRUE,
+        'classes' => [
+          'table',
+          'table-striped',
+        ],
+        'tally' => [
+          'label' => 'Total',
+        ],
+      ],
+    ]);
+
+    $tally = SearchDisplay::run(FALSE)
+      ->setReturn('tally')
+      ->setDisplay(__FUNCTION__)
+      ->setSavedSearch(__FUNCTION__)
+      ->execute()->single();
+
+    $this->assertSame('4', $tally['COUNT_id']);
+    $this->assertEquals(['A, A', 'B, B', 'C, C'], $tally['GROUP_CONCAT_contact_id_sort_name']);
+    $this->assertSame('$1,000.00', $tally['SUM_total_amount']);
+    $this->assertSame('02/02/2021', $tally['GROUP_FIRST_receive_date']);
+    $this->assertSame('Donation', $tally['GROUP_FIRST_financial_type_id_label']);
+  }
+
   public function testContributionTotalCountWithTestAndTemplateContributions():void {
     // Add a source here for the where below, as if we use id, we get the test and template contributions
     $contributions = $this->saveTestRecords('Contribution', [
@@ -2175,6 +2302,116 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
 
     // Link should appear for 2nd activity but not the first
     $this->assertCount(0, $result[0]['columns'][1]['links']);
+    $this->assertCount(1, $result[1]['columns'][1]['links']);
+  }
+
+  public function testLinksWithGroupBy() {
+    $contacts = $this->saveTestRecords('Individual', [
+      'records' => [
+        ['first_name' => 'A', 'last_name' => 'A'],
+        ['first_name' => 'B', 'last_name' => 'B'],
+      ],
+    ]);
+    $contributions = $this->saveTestRecords('Contribution', [
+      'records' => [
+        ['contact_id' => $contacts[0]['id']],
+        ['contact_id' => $contacts[1]['id']],
+      ],
+    ]);
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Contribution',
+        'api_params' => [
+          'version' => 4,
+          'select' => [
+            'id',
+            'contact_id',
+            'contact_id.sort_name',
+            'total_amount',
+            'financial_type_id:label',
+          ],
+          'orderBy' => [],
+          'where' => [
+            ['id', 'IN', $contributions->column('id')],
+          ],
+          'groupBy' => [
+            'id',
+          ],
+          'join' => [
+            [
+              'Contact AS Contribution_Contact_contact_id_01',
+              'LEFT',
+              [
+                'contact_id',
+                '=',
+                'Contribution_Contact_contact_id_01.id',
+              ],
+            ],
+          ],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => 'testDisplay',
+        'settings' => [
+          'description' => NULL,
+          'sort' => [],
+          'limit' => 50,
+          'pager' => [],
+          'placeholder' => 5,
+          'columns' => [
+            [
+              'type' => 'field',
+              'key' => 'id',
+              'dataType' => 'Integer',
+              'label' => 'Contribution ID',
+              'sortable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'contact_id.sort_name',
+              'dataType' => 'String',
+              'label' => 'Contact Sort Name',
+              'sortable' => TRUE,
+              'link' => [
+                'path' => '',
+                'entity' => 'Contact',
+                'action' => 'view',
+                'join' => 'contact_id',
+                'target' => '',
+              ],
+              'title' => 'View Contact',
+            ],
+            [
+              'type' => 'field',
+              'key' => 'total_amount',
+              'dataType' => 'Money',
+              'label' => 'Total Amount',
+              'sortable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'financial_type_id:label',
+              'dataType' => 'Integer',
+              'label' => 'Financial Type',
+              'sortable' => TRUE,
+            ],
+          ],
+          'actions' => TRUE,
+          'classes' => [
+            'table',
+            'table-striped',
+          ],
+        ],
+      ],
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(2, $result);
+
+    $this->assertCount(1, $result[0]['columns'][1]['links']);
     $this->assertCount(1, $result[1]['columns'][1]['links']);
   }
 

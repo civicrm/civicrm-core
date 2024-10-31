@@ -125,6 +125,7 @@ class Authenticator extends AutoService implements HookInterface {
       'cred' => $details['cred'] ?? NULL,
       'siteKey' => $details['siteKey'] ?? NULL,
       'useSession' => $details['useSession'] ?? FALSE,
+      'requestPath' => empty($e->args) ? '*' : implode('/', $e->args),
     ]);
 
     if (isset($tgt->cred)) {
@@ -161,6 +162,7 @@ class Authenticator extends AutoService implements HookInterface {
       'cred' => $details['cred'] ?? NULL,
       'siteKey' => $details['siteKey'] ?? NULL,
       'useSession' => $details['useSession'] ?? FALSE,
+      'requestPath' => $details['requestPath'] ?? '*',
     ]);
 
     if ($principal = $this->checkCredential($tgt)) {
@@ -186,7 +188,7 @@ class Authenticator extends AutoService implements HookInterface {
     // 1. Accept the cred, which stops event propagation and further checks;
     // 2. Reject the cred, which stops event propagation and further checks;
     // 3. Neither accept nor reject, letting the event continue on to the next.
-    $checkEvent = new CheckCredentialEvent($tgt->cred);
+    $checkEvent = new CheckCredentialEvent($tgt->cred, $tgt->requestPath);
     \Civi::dispatcher()->dispatch('civi.authx.checkCredential', $checkEvent);
 
     if ($checkEvent->getRejection()) {
@@ -202,6 +204,25 @@ class Authenticator extends AutoService implements HookInterface {
    * @param \Civi\Authx\AuthenticatorTarget $tgt
    */
   protected function checkPolicy(AuthenticatorTarget $tgt) {
+    $policy = [
+      'userMode' => \Civi::settings()->get('authx_' . $tgt->flow . '_user') ?: 'optional',
+      'allowCreds' => \Civi::settings()->get('authx_' . $tgt->flow . '_cred') ?: [],
+      'guards' => \Civi::settings()->get('authx_guards'),
+    ];
+
+    $checkEvent = new CheckPolicyEvent($policy, $tgt);
+    \Civi::dispatcher()->dispatch('civi.authx.checkPolicy', $checkEvent);
+    $policy = $checkEvent->policy;
+    if ($checkEvent->getRejection()) {
+      $this->reject($checkEvent->getRejection());
+    }
+
+    // TODO: Consider splitting these checks into late-priority listeners.
+    // What follows are a handful of distinct checks in no particular order.
+    // In `checkCredential()`, similar steps were split out into distinct listeners (within `CheckCredential.php`).
+    // For `checkPolicy()`, these could be moved to similar methods (within `CheckPolicy.php`).
+    // They should probably be around priority -2000 (https://docs.civicrm.org/dev/en/latest/hooks/usage/symfony/#priorities).
+
     if (!$tgt->hasPrincipal()) {
       $this->reject('Invalid credential');
     }
@@ -213,13 +234,11 @@ class Authenticator extends AutoService implements HookInterface {
       }
     }
 
-    $allowCreds = \Civi::settings()->get('authx_' . $tgt->flow . '_cred') ?: [];
-    if ($tgt->credType !== 'assigned' && !in_array($tgt->credType, $allowCreds)) {
+    if ($tgt->credType !== 'assigned' && !in_array($tgt->credType, $policy['allowCreds'])) {
       $this->reject(sprintf('Authentication type "%s" with flow "%s" is not allowed for this principal.', $tgt->credType, $tgt->flow));
     }
 
-    $userMode = \Civi::settings()->get('authx_' . $tgt->flow . '_user') ?: 'optional';
-    switch ($userMode) {
+    switch ($policy['userMode']) {
       case 'ignore':
         $tgt->userId = NULL;
         break;
@@ -231,7 +250,7 @@ class Authenticator extends AutoService implements HookInterface {
         break;
     }
 
-    $useGuards = \Civi::settings()->get('authx_guards');
+    $useGuards = $policy['guards'];
     if (!empty($useGuards)) {
       // array(string $credType => string $requiredPermissionToUseThisCred)
       $perms['pass'] = 'authenticate with password';
@@ -344,6 +363,12 @@ class AuthenticatorTarget {
   public $flow;
 
   /**
+   * @var string|null
+   *   Ex: 'civicrm/dashboard'
+   */
+  public $requestPath;
+
+  /**
    * @var bool
    */
   public $useSession;
@@ -396,7 +421,13 @@ class AuthenticatorTarget {
    * @return $this
    */
   public static function create($args = []) {
-    return (new static())->set($args);
+    $tgt = (new static())->set($args);
+    if ($tgt->useSession || $tgt->requestPath === NULL) {
+      // If requesting access to a session (or using anything that isn't specifically tied
+      // to an HTTP route), then we are effectively asking for any/all routes.
+      $tgt->requestPath = '*';
+    }
+    return $tgt;
   }
 
   /**
@@ -470,6 +501,7 @@ class AuthenticatorTarget {
       // omit: cred
       // omit: siteKey
       'flow' => $this->flow,
+      'requestPath' => $this->requestPath,
       'credType' => $this->credType,
       'jwt' => $this->jwt,
       'useSession' => $this->useSession,

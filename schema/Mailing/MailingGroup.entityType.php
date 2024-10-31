@@ -39,7 +39,7 @@ return [
       'input_type' => 'Select',
       'description' => ts('Are the members of the group included or excluded?.'),
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::getMailingGroupTypes',
+        'callback' => ['CRM_Core_SelectValues', 'getMailingGroupTypes'],
       ],
     ],
     'entity_table' => [
@@ -49,7 +49,7 @@ return [
       'required' => TRUE,
       'description' => ts('Name of table where item being referenced is stored.'),
       'pseudoconstant' => [
-        'callback' => 'CRM_Mailing_BAO_Mailing::mailingGroupEntityTables',
+        'callback' => ['CRM_Mailing_BAO_Mailing', 'mailingGroupEntityTables'],
       ],
     ],
     'entity_id' => [

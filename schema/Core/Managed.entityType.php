@@ -46,7 +46,7 @@ return [
       'description' => ts('Name of the module which declared this object (soft FK to civicrm_extension.full_name)'),
       'add' => '4.2',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_BAO_Managed::getBaseModules',
+        'callback' => ['CRM_Core_BAO_Managed', 'getBaseModules'],
       ],
     ],
     'name' => [
@@ -81,7 +81,7 @@ return [
       'add' => '4.5',
       'default' => 'always',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_ManagedEntities::getCleanupOptions',
+        'callback' => ['CRM_Core_ManagedEntities', 'getCleanupOptions'],
       ],
     ],
     'entity_modified_date' => [

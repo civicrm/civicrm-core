@@ -305,6 +305,9 @@ function convertMetric( value, from, to ) {
 }
 
 function showSaveDetails(chkbox)  {
+    if (chkbox === undefined) {
+      return;
+    }
     var formatSelected = ( document.getElementById('format_id').value > 0 );
     var templateSelected = ( document.getElementById('template') != null && document.getElementById('template').value > 0 );
     if (chkbox.checked) {

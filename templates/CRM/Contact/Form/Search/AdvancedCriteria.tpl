@@ -13,7 +13,6 @@
 CRM.$(function($) {
   // Bind first click of accordion header to load crm-accordion-body with snippet
   // everything else is taken care of by crmAccordions()
-  $('.crm-search_criteria_basic-accordion summary').addClass('active');
   $('.crm-ajax-accordion').on('click', 'summary:not(.active)', function() {
     loadPanes($(this).attr('id'));
   });
@@ -87,15 +86,7 @@ CRM.$(function($) {
 {/if}
 
 {strip}
-  <details class="crm-accordion-bold crm-search_criteria_basic-accordion" open>
-    <summary>
-      {ts}Display Settings For Results{/ts}
-    </summary>
-    <div class="crm-accordion-body">
-      {include file="CRM/Contact/Form/Search/Criteria/DisplaySettings.tpl"}
-    </div>
-  </details>
-  <details class="crm-accordion-bold crm-search_criteria_basic-accordion" open>
+  <details class="crm-accordion-settings crm-search_criteria_basic-accordion">
     <summary>
       {ts}Search Settings{/ts}
     </summary>
@@ -108,6 +99,15 @@ CRM.$(function($) {
       {ts}Basic Criteria{/ts}
     </summary>
     <div class="crm-accordion-body">
+      <div class="float-right">
+        <span class="crm-submit-buttons reset-advanced-search">
+          <a href="{crmURL p='civicrm/contact/search/advanced' q='reset=1'}" id="resetAdvancedSearch" class="crm-hover-button crm-inline-button" title="{ts}Clear all search criteria{/ts}">
+            <i class="crm-i fa-undo" aria-hidden="true"></i>
+            &nbsp;{ts}Reset Form{/ts}
+          </a>
+        </span>
+        {include file="CRM/common/formButtons.tpl" location="top"}
+      </div>
       {include file="CRM/Contact/Form/Search/Criteria/Basic.tpl"}
     </div>
   </details>
@@ -125,12 +125,6 @@ CRM.$(function($) {
     <tr>
       <td>
         {include file="CRM/common/formButtons.tpl" location="bottom"}
-        <div class="crm-submit-buttons reset-advanced-search">
-          <a href="{crmURL p='civicrm/contact/search/advanced' q='reset=1'}" id="resetAdvancedSearch" class="crm-hover-button" title="{ts}Clear all search criteria{/ts}">
-            <i class="crm-i fa-undo" aria-hidden="true"></i>
-            &nbsp;{ts}Reset Form{/ts}
-          </a>
-        </div>
       </td>
     </tr>
   </table>

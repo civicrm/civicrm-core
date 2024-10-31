@@ -75,15 +75,10 @@ trait WriteTrait {
     $loggedInUserID = \CRM_Utils_System::getLoggedInUfID() ?? FALSE;
     $hasAdminPermission = \CRM_Core_Permission::check(['cms:administer users']);
     $authenticatedAsLoggedInUser = FALSE;
-    $security = Security::singleton();
     // Check that we have the logged-in-user's password.
     if ($this->actorPassword && $loggedInUserID) {
-      $storedHashedPassword = \Civi\Api4\User::get(FALSE)
-        ->addWhere('id', '=', $loggedInUserID)
-        ->addSelect('hashed_password')
-        ->execute()
-        ->single()['hashed_password'];
-      if (!$security->checkPassword($this->actorPassword, $storedHashedPassword)) {
+      $user = \CRM_Core_Config::singleton()->userSystem->getUserById($loggedInUserID);
+      if (!_authx_uf()->checkPassword($user['username'], $this->actorPassword)) {
         throw new UnauthorizedException("Incorrect password");
       }
       $authenticatedAsLoggedInUser = TRUE;

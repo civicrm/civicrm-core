@@ -30,10 +30,11 @@ return [
       'auto_increment' => TRUE,
     ],
     'name' => [
-      'title' => ts('Financial Type'),
+      'title' => ts('Financial Type Name'),
       'sql_type' => 'varchar(64)',
       'input_type' => 'Text',
       'required' => TRUE,
+      'default_fallback' => ['label'],
       'description' => ts('Financial Type Name.'),
       'add' => '1.3',
       'unique_name' => 'financial_type',
@@ -44,6 +45,19 @@ return [
       ],
       'input_attrs' => [
         'label' => ts('Name'),
+      ],
+    ],
+    'label' => [
+      'title' => ts('Financial Type Label'),
+      'sql_type' => 'varchar(64)',
+      'input_type' => 'Text',
+      'description' => ts('User-facing financial type label'),
+      'required' => TRUE,
+      'default_fallback' => ['name'],
+      'localizable' => TRUE,
+      'add' => '5.79',
+      'input_attrs' => [
+        'label' => ts('Financial Type'),
       ],
     ],
     'description' => [

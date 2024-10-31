@@ -124,10 +124,17 @@ class CRM_Mailing_MultilingualSystemTest extends CiviUnitTestCase {
     }
 
     // Because our parent class marks the _groupID as private, we can't use that :-(
-    $group_1 = $this->groupCreate([
-      'name' => 'Test Group 1108.1',
+    $group_1 = $this->createTestEntity('Group', [
       'title' => 'Test Group 1108.1',
-    ]);
+      'frontend_title' => 'Public group name',
+      'description' => 'New Test Group Created',
+      'is_active' => 1,
+      'visibility' => 'Public Pages',
+      'group_type' => [
+        '1' => 1,
+        '2' => 1,
+      ],
+    ], 'group')['id'];
     $this->createContactsInGroup(2, $group_1);
 
     // Also _mut is private to the parent, so we have to make our own:
@@ -153,11 +160,17 @@ class CRM_Mailing_MultilingualSystemTest extends CiviUnitTestCase {
     $this->assertEquals(2, count($allMessages));
 
     // We need a new group
-    $group_2 = $this->groupCreate([
-      'name'  => 'Test Group 1108.2',
+    $group_2 = $this->createTestEntity('Group', [
       'title' => 'Test Group 1108.2',
-    ]);
-
+      'frontend_title' => 'Public group name',
+      'description' => 'New Test Group Created',
+      'is_active' => 1,
+      'visibility' => 'Public Pages',
+      'group_type' => [
+        '1' => 1,
+        '2' => 1,
+      ],
+    ], 'group')['id'];
     // Now create the 2nd mailing to the recipients of the first,
     // excluding our new albeit empty group.
     $mailingParams = [
@@ -188,10 +201,17 @@ class CRM_Mailing_MultilingualSystemTest extends CiviUnitTestCase {
     ));
 
     // Create a group that has nothing to do with this mailing.
-    $group_3 = $this->groupCreate([
-      'name' => 'Test Group 1108.3',
+    $group_3 = $this->createTestEntity('Group', [
       'title' => 'Test Group 1108.3',
-    ]);
+      'frontend_title' => 'Public group name',
+      'description' => 'New Test Group Created',
+      'is_active' => 1,
+      'visibility' => 'Public Pages',
+      'group_type' => [
+        '1' => 1,
+        '2' => 1,
+      ],
+    ], 'group')['id'];
     // Add contacts from group 1 to group 3.
     $gcQuery = new CRM_Contact_BAO_GroupContact();
     $gcQuery->group_id = $group_1;

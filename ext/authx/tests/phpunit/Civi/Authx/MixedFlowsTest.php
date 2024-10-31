@@ -111,6 +111,31 @@ class MixedFlowsTest extends AbstractFlowsTest {
   }
 
   /**
+   * Most of our testing has been focused on AJAX/REST usage. However,
+   * the code-paths are a bit different for web UI (HTML pages), so we
+   * exercise those as well.
+   */
+  public function testStatelessWebUI() {
+    \Civi::settings()->set("authx_xheader_cred", ['jwt']);
+    $cookieJar = new CookieJar();
+    $http = $this->createGuzzle(['http_errors' => FALSE, 'cookies' => $cookieJar]);
+
+    // Make a request for the contact dashboard. It fails because we have no session and no auth token.
+    $this->assertPageNotShown($http->send($this->requestMyContactDashboard()));
+
+    // This request works because we do provide auth token...
+    $request = $this->applyAuth($this->requestMyContactDashboard(), 'jwt', 'xheader', $this->getDemoCID());
+    $response = $http->send($request);
+    $this->assertStatusCode(200, $response);
+    $this->assertContentType('text/html', $response);
+
+    // These will re-use any cookies, if set.  The requests should still fail.
+    // (We'd prefer no cookie for stateless requests, but an inert cookie works the same.)
+    $this->assertAnonymousContact($http->send($this->requestMyContact()));
+    $this->assertPageNotShown($http->send($this->requestMyContactDashboard()));
+  }
+
+  /**
    * Suppose a deployment has two layers of authorization:
    *
    * (1) a generic/site-wide HTTP restriction (perhaps enforced by a reverse proxy)

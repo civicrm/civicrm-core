@@ -329,6 +329,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group implements HookInterfa
   }
 
   /**
+   * @deprecated
    * Create a new group.
    *
    * @param array $params
@@ -337,196 +338,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group implements HookInterfa
    *   The new group BAO (if created)
    */
   public static function create(&$params) {
-
-    // only check if we need to remove parents if a params was provided
-    $parentsParamProvided = array_key_exists('parents', $params);
-
-    $params += [
-      'group_type' => NULL,
-      'parents' => NULL,
-    ];
-
-    // Fill title and frontend_title if not supplied
-    if (empty($params['id']) && empty($params['title'])) {
-      $params['title'] = $params['frontend_title'] ?? $params['name'];
-    }
-    if (empty($params['id']) && empty($params['frontend_title'])) {
-      $params['frontend_title'] = $params['title'];
-    }
-    $hook = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'Group', $params['id'] ?? NULL, $params);
-
-    // If title isn't specified, retrieve it because we use it later, e.g.
-    // for RecentItems. But note we use array_key_exists not isset or empty
-    // since otherwise there would be no way to blank out an existing title.
-    // I'm not sure what the use-case is for that, but you're allowed to do it
-    // currently.
-    if (!empty($params['id']) && !array_key_exists('title', $params)) {
-      try {
-        $groupTitle = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $params['id'], 'title', 'id');
-        $params['title'] = $groupTitle;
-      }
-      catch (CRM_Core_Exception $groupTitleException) {
-        // don't set title
-      }
-    }
-
-    if (!empty($params['id'])) {
-      // dev/core#287 Disable child groups if all parents are disabled.
-      $allChildGroupIds = self::getChildGroupIds($params['id']);
-      foreach ($allChildGroupIds as $childKey => $childValue) {
-        $parentIds = CRM_Contact_BAO_GroupNesting::getParentGroupIds($childValue);
-        $activeParentsCount = civicrm_api3('Group', 'getcount', [
-          'id' => ['IN' => $parentIds],
-          'is_active' => 1,
-        ]);
-        if (count($parentIds) >= 1 && $activeParentsCount <= 1) {
-          self::setIsActive($childValue, (int) ($params['is_active'] ?? 1));
-        }
-      }
-
-      // get current parents for removal if not in the list anymore
-      $parents = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $params['id'], 'parents');
-      $currentParentGroupIDs = $parents ? explode(',', $parents) : [];
-    }
-
-    // form the name only if missing: CRM-627
-    $nameParam = $params['name'] ?? NULL;
-    // If we were calling writeRecord it would handle this, but we need
-    // to migrate the other bits of magic.
-    if (!$nameParam && empty($params['id'])) {
-      $params['name'] = CRM_Utils_String::titleToVar($params['title']);
-    }
-
-    if ($parentsParamProvided) {
-      $params['parents'] = CRM_Utils_Array::convertCheckboxFormatToArray((array) $params['parents']);
-      // failsafe: forbid adding itself as parent
-      if (!empty($params['id']) && ($key = array_search($params['id'], $params['parents'])) !== FALSE) {
-        unset($params['parents'][$key]);
-      }
-    }
-
-    // convert params if array type
-    if (!CRM_Utils_System::isNull($params['group_type'])) {
-      $params['group_type'] = CRM_Utils_Array::convertCheckboxFormatToArray((array) $params['group_type']);
-    }
-
-    $session = CRM_Core_Session::singleton();
-    $cid = $session->get('userID');
-    // this action is add
-    if ($cid && empty($params['id'])) {
-      $params['created_id'] = $cid;
-    }
-    // this action is update
-    if ($cid && !empty($params['id'])) {
-      $params['modified_id'] = $cid;
-    }
-
-    // CRM-19068.
-    // Validate parents parameter when creating group.
-    if (!CRM_Utils_System::isNull($params['parents'])) {
-      $parents = is_array($params['parents']) ? array_keys($params['parents']) : (array) $params['parents'];
-      foreach ($parents as $parent) {
-        CRM_Utils_Type::validate($parent, 'Integer');
-      }
-    }
-    $group = new CRM_Contact_BAO_Group();
-    $group->copyValues($params);
-
-    if (empty($params['id']) && !$nameParam) {
-      $group->name .= "_tmp";
-    }
-    $group->save();
-
-    if (!$group->id) {
-      return NULL;
-    }
-
-    // Enforce unique name by appending id
-    if (empty($params['id']) && !$nameParam) {
-      $group->name = substr($group->name, 0, -4) . "_{$group->id}";
-    }
-
-    $group->save();
-
-    // add custom field values
-    if (!empty($params['custom'])) {
-      CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_group', $group->id);
-    }
-
-    // Process group nesting
-    // first deal with removed parents
-    if ($parentsParamProvided && !empty($currentParentGroupIDs)) {
-      foreach ($currentParentGroupIDs as $parentGroupId) {
-        // no more parents or not in the new list, let's remove
-        if (empty($params['parents']) || !in_array($parentGroupId, $params['parents'])) {
-          CRM_Contact_BAO_GroupNesting::remove($parentGroupId, $params['id']);
-        }
-      }
-    }
-
-    // then add missing parents
-    if (!CRM_Utils_System::isNull($params['parents'])) {
-      foreach ($params['parents'] as $parentId) {
-        if ($parentId && !CRM_Contact_BAO_GroupNesting::isParentChild($parentId, $group->id)) {
-          CRM_Contact_BAO_GroupNesting::add($parentId, $group->id);
-        }
-      }
-    }
-
-    // refresh cache if parents param was provided
-    if ($parentsParamProvided || !empty($params['parents'])) {
-      CRM_Contact_BAO_GroupNestingCache::update();
-    }
-
-    // update group contact cache for all parent groups
-    $parentIds = CRM_Contact_BAO_GroupNesting::getParentGroupIds($group->id);
-    foreach ($parentIds as $parentId) {
-      CRM_Contact_BAO_GroupContactCache::invalidateGroupContactCache($parentId);
-    }
-
-    if (!empty($params['organization_id'])) {
-      if ($params['organization_id'] == 'null') {
-        $groupOrganization = [];
-        CRM_Contact_BAO_GroupOrganization::retrieve($group->id, $groupOrganization);
-        if (!empty($groupOrganization['group_organization'])) {
-          CRM_Contact_BAO_GroupOrganization::deleteGroupOrganization($groupOrganization['group_organization']);
-        }
-      }
-      else {
-        // dev/core#382 Keeping the id here can cause db errors as it tries to update the wrong record in the Organization table
-        $groupOrg = [
-          'group_id' => $group->id,
-          'organization_id' => $params['organization_id'],
-        ];
-        CRM_Contact_BAO_GroupOrganization::add($groupOrg);
-      }
-    }
-
-    self::flushCaches();
-    CRM_Contact_BAO_GroupContactCache::invalidateGroupContactCache($group->id);
-
-    CRM_Utils_Hook::post($hook, 'Group', $group->id, $group);
-
-    $recentOther = [];
-    if (CRM_Core_Permission::check('edit groups')) {
-      $recentOther['editUrl'] = CRM_Utils_System::url('civicrm/group/edit', 'reset=1&action=update&id=' . $group->id);
-      // currently same permission we are using for delete a group
-      $recentOther['deleteUrl'] = CRM_Utils_System::url('civicrm/group/edit', 'reset=1&action=delete&id=' . $group->id);
-    }
-
-    // add the recently added group (unless hidden: CRM-6432)
-    if (!$group->is_hidden) {
-      CRM_Utils_Recent::add($group->title,
-        CRM_Utils_System::url('civicrm/group/search', 'reset=1&force=1&context=smog&gid=' . $group->id),
-        $group->id,
-        'Group',
-        NULL,
-        NULL,
-        $recentOther
-      );
-    }
-    return $group;
+    return self::writeRecord($params);
   }
 
   /**
@@ -1425,7 +1237,7 @@ WHERE {$whereClause}";
    * @return int
    */
   public static function filterActiveGroups($parentArray) {
-    if (count($parentArray) > 1) {
+    if (count($parentArray) >= 1) {
       $result = civicrm_api3('Group', 'get', [
         'id' => ['IN' => $parentArray],
         'is_active' => TRUE,
@@ -1462,6 +1274,170 @@ WHERE {$whereClause}";
       }
       else {
         $e->setAuthorized(CRM_Core_Permission::check(['access CiviCRM', 'edit groups'], $userID));
+      }
+    }
+  }
+
+  /**
+   * Callback for hook_civicrm_post().
+   * @param \Civi\Core\Event\PostEvent $event
+   */
+  public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
+    /** @var CRM_Contact_DAO_Group $group */
+    $group = $event->object;
+    if (in_array($event->action, ['create', 'edit'])) {
+      $params = $event->params;
+      if ($params['name_empty']) {
+        $group->name = substr($group->name, 0, -4) . "_{$group->id}";
+
+        // in order to avoid race condition passing $hook = FALSE
+        $group->save(FALSE);
+      }
+
+      // Process group nesting
+      // first deal with removed parents
+      if ($params['parents_param_provided'] && !empty($params['current_parents'])) {
+        foreach ($params['current_parents'] as $parentGroupId) {
+          // no more parents or not in the new list, let's remove
+          if (empty($params['parents']) || !in_array($parentGroupId, $params['parents'])) {
+            CRM_Contact_BAO_GroupNesting::remove($parentGroupId, $params['id']);
+          }
+        }
+      }
+
+      // then add missing parents
+      if (array_key_exists('parents', $params) && !CRM_Utils_System::isNull($params['parents'])) {
+        foreach ((array) $params['parents'] as $parentId) {
+          if ($parentId && !CRM_Contact_BAO_GroupNesting::isParentChild($parentId, $group->id)) {
+            CRM_Contact_BAO_GroupNesting::add($parentId, $group->id);
+          }
+        }
+      }
+
+      // refresh cache if parents param was provided
+      if ($params['parents_param_provided'] || !empty($params['parents'])) {
+        CRM_Contact_BAO_GroupNestingCache::update();
+      }
+
+      // update group contact cache for all parent groups
+      $parentIds = CRM_Contact_BAO_GroupNesting::getParentGroupIds($group->id);
+      foreach ($parentIds as $parentId) {
+        CRM_Contact_BAO_GroupContactCache::invalidateGroupContactCache($parentId);
+      }
+
+      if (!empty($params['organization_id'])) {
+        if ($params['organization_id'] == 'null') {
+          $groupOrganization = [];
+          CRM_Contact_BAO_GroupOrganization::retrieve($group->id, $groupOrganization);
+          if (!empty($groupOrganization['group_organization'])) {
+            CRM_Contact_BAO_GroupOrganization::deleteGroupOrganization($groupOrganization['group_organization']);
+          }
+        }
+        else {
+          // dev/core#382 Keeping the id here can cause db errors as it tries to update the wrong record in the Organization table
+          $groupOrg = [
+            'group_id' => $group->id,
+            'organization_id' => $params['organization_id'],
+          ];
+          CRM_Contact_BAO_GroupOrganization::add($groupOrg);
+        }
+      }
+
+      self::flushCaches();
+      CRM_Contact_BAO_GroupContactCache::invalidateGroupContactCache($group->id);
+
+      $recentOther = [];
+      if (CRM_Core_Permission::check('edit groups')) {
+        $recentOther['editUrl'] = CRM_Utils_System::url('civicrm/group/edit', 'reset=1&action=update&id=' . $group->id);
+        // currently same permission we are using for delete a group
+        $recentOther['deleteUrl'] = CRM_Utils_System::url('civicrm/group/edit', 'reset=1&action=delete&id=' . $group->id);
+      }
+
+      // add the recently added group (unless hidden: CRM-6432)
+      if (!$group->is_hidden) {
+        CRM_Utils_Recent::add($group->title,
+          CRM_Utils_System::url('civicrm/group/search', 'reset=1&force=1&context=smog&gid=' . $group->id),
+          $group->id,
+          'Group',
+          NULL,
+          NULL,
+          $recentOther
+        );
+      }
+    }
+  }
+
+  /**
+   * Callback for hook_civicrm_pre().
+   * @param \Civi\Core\Event\PreEvent $event
+   * @throws CRM_Core_Exception
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event): void {
+    if (in_array($event->action, ['create', 'edit'])) {
+      $event->params += [
+        'parents_param_provided' => array_key_exists('parents', $event->params),
+        'name_empty' => ($event->action == 'create' && empty($event->params['name'])),
+        'group_type' => NULL,
+        'parents' => NULL,
+      ];
+
+      // convert params if array type
+      if (!CRM_Utils_System::isNull($event->params['group_type']) || is_array($event->params['group_type'])) {
+        $event->params['group_type'] = CRM_Utils_Array::convertCheckboxFormatToArray((array) $event->params['group_type']);
+      }
+
+      // CRM-19068.
+      // Validate parents parameter when creating group.
+      if (!CRM_Utils_System::isNull($event->params['parents'])) {
+        $parents = is_array($event->params['parents']) ? array_keys($event->params['parents']) : (array) $event->params['parents'];
+        foreach ($parents as $parent) {
+          CRM_Utils_Type::validate($parent, 'Integer');
+        }
+      }
+    }
+
+    if ($event->action === 'edit') {
+      $event->params['modified_id'] ??= CRM_Core_Session::getLoggedInContactID();
+
+      // If title isn't specified, retrieve it because we use it later, e.g.
+      // for RecentItems. But note we use array_key_exists not isset or empty
+      // since otherwise there would be no way to blank out an existing title.
+      // I'm not sure what the use-case is for that, but you're allowed to do it
+      // currently.
+      if (!array_key_exists('title', $event->params)) {
+        try {
+          $event->params['title'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $event->params['id'], 'title', 'id');
+        }
+        catch (CRM_Core_Exception $groupTitleException) {
+          // don't set title
+        }
+      }
+
+      // dev/core#287 Disable child groups if all parents are disabled.
+      $allChildGroupIds = self::getChildGroupIds($event->params['id']);
+      foreach ($allChildGroupIds as $childKey => $childValue) {
+        $parentIds = CRM_Contact_BAO_GroupNesting::getParentGroupIds($childValue);
+        $activeParentsCount = civicrm_api3('Group', 'getcount', [
+          'id' => ['IN' => $parentIds],
+          'is_active' => 1,
+        ]);
+        if (count($parentIds) >= 1 && $activeParentsCount <= 1) {
+          self::setIsActive($childValue, (int) ($event->params['is_active'] ?? 1));
+        }
+      }
+
+      // get current parents for removal if not in the list anymore
+      $parents = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $event->params['id'], 'parents');
+      if (!empty($parents)) {
+        $event->params['current_parents'] = $parents ? explode(',', $parents) : [];
+      }
+
+      if ($event->params['parents_param_provided']) {
+        $event->params['parents'] = CRM_Utils_Array::convertCheckboxFormatToArray((array) $event->params['parents']);
+        // failsafe: forbid adding itself as parent
+        if (($key = array_search($event->params['id'], $event->params['parents'])) !== FALSE) {
+          unset($event->params['parents'][$key]);
+        }
       }
     }
   }

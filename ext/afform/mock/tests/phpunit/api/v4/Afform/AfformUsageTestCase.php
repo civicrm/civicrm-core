@@ -2,6 +2,7 @@
 namespace api\v4\Afform;
 
 use Civi\Api4\Afform;
+use Civi\Api4\CustomGroup;
 
 /**
  * Test case for Afform.prefill and Afform.submit.
@@ -27,6 +28,9 @@ abstract class AfformUsageTestCase extends AfformTestCase {
   public function tearDown(): void {
     Afform::revert(FALSE)
       ->addWhere('name', '=', $this->formName)
+      ->execute();
+    CustomGroup::delete(FALSE)
+      ->addWhere('id', '>', 0)
       ->execute();
     parent::tearDown();
   }

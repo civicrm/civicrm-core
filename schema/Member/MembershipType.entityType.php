@@ -116,7 +116,7 @@ return [
       'pseudoconstant' => [
         'table' => 'civicrm_financial_type',
         'key_column' => 'id',
-        'label_column' => 'name',
+        'label_column' => 'label',
       ],
       'entity_reference' => [
         'entity' => 'FinancialType',
@@ -142,7 +142,7 @@ return [
       'description' => ts('Unit in which membership period is expressed.'),
       'add' => '1.5',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::membershipTypeUnitList',
+        'callback' => ['CRM_Core_SelectValues', 'membershipTypeUnitList'],
       ],
     ],
     'duration_interval' => [
@@ -160,7 +160,7 @@ return [
       'description' => ts('Rolling membership period starts on signup date. Fixed membership periods start on fixed_period_start_day.'),
       'add' => '1.5',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::periodType',
+        'callback' => ['CRM_Core_SelectValues', 'periodType'],
       ],
     ],
     'fixed_period_start_day' => [
@@ -211,7 +211,7 @@ return [
       'input_type' => 'Select',
       'add' => '1.5',
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::memberVisibility',
+        'callback' => ['CRM_Core_SelectValues', 'memberVisibility'],
       ],
     ],
     'weight' => [
@@ -253,7 +253,7 @@ return [
         'label' => ts('Auto-Renew'),
       ],
       'pseudoconstant' => [
-        'callback' => 'CRM_Core_SelectValues::memberAutoRenew',
+        'callback' => ['CRM_Core_SelectValues', 'memberAutoRenew'],
       ],
     ],
     'is_active' => [

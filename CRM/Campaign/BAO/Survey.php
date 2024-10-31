@@ -31,36 +31,18 @@ class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey implements Civi\Co
   }
 
   /**
-   * Takes an associative array and creates a Survey object based on the
-   * supplied values.
+   * @deprecated
    *
    * @param array $params
    *
    * @return bool|CRM_Campaign_DAO_Survey
    */
-  public static function create(&$params) {
+  public static function create($params) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     if (empty($params)) {
       return FALSE;
     }
-
-    if (!empty($params['is_default'])) {
-      $query = "UPDATE civicrm_survey SET is_default = 0";
-      CRM_Core_DAO::executeQuery($query);
-    }
-
-    if (empty($params['id'])) {
-      if (empty($params['created_id'])) {
-        $params['created_id'] = CRM_Core_Session::getLoggedInContactID();
-      }
-
-      if (empty($params['created_date'])) {
-        $params['created_date'] = date('YmdHis');
-      }
-    }
-
-    $dao = self::writeRecord($params);
-
-    return $dao;
+    return self::writeRecord($params);
   }
 
   /**
@@ -234,6 +216,13 @@ SELECT  survey.id    as id,
       if ($reportId) {
         CRM_Report_BAO_ReportInstance::deleteRecord(['id' => $reportId]);
       }
+    }
+    if ($event->action === 'edit') {
+      if (!empty($event->params['is_default'])) {
+        $query = "UPDATE civicrm_survey SET is_default = 0";
+        CRM_Core_DAO::executeQuery($query);
+      }
+      $event->params['last_modified_id'] ??= CRM_Core_Session::getLoggedInContactID();
     }
   }
 
@@ -949,27 +938,12 @@ UPDATE  civicrm_activity
   }
 
   /**
-   * Get options for a given field.
-   * @see CRM_Core_DAO::buildOptions
-   *
-   * @param string $fieldName
-   * @param string $context : @see CRM_Core_DAO::buildOptionsContext
-   * @param array $props : whatever is known about this dao object
-   *
-   * @return array|bool
+   * Pseudoconstant condition_provider for activity_type_id field.
+   * @see \Civi\Schema\EntityMetadataBase::getConditionFromProvider
    */
-  public static function buildOptions($fieldName, $context = NULL, $props = []) {
-    $params = [];
-    // Special logic for fields whose options depend on context or properties
-    switch ($fieldName) {
-      case 'activity_type_id':
-        $campaignCompId = CRM_Core_Component::getComponentID('CiviCampaign');
-        if ($campaignCompId) {
-          $params['condition'] = ["component_id={$campaignCompId}"];
-        }
-        break;
-    }
-    return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
+  public static function alterActivityTypes(string $fieldName, CRM_Utils_SQL_Select $conditions) {
+    $campaignCompId = (int) CRM_Core_Component::getComponentID('CiviCampaign');
+    $conditions->where('component_id = #comp', ['comp' => $campaignCompId]);
   }
 
 }
