@@ -168,18 +168,14 @@ class CRM_Utils_Cache {
   public static function create($params = []) {
     $types = (array) $params['type'];
 
-    // FIXME: When would name ever be empty?
-    if (!empty($params['name'])) {
-      $params['name'] = self::cleanKey($params['name']);
-    }
-
     foreach ($types as $type) {
       switch ($type) {
         case '*memory*':
           if (defined('CIVICRM_DB_CACHE_CLASS') && in_array(CIVICRM_DB_CACHE_CLASS, ['Memcache', 'Memcached', 'Redis'])) {
+            $shortName = self::cleanKey($params['name'], 64);
             $dbCacheClass = 'CRM_Utils_Cache_' . CIVICRM_DB_CACHE_CLASS;
             $settings = self::getCacheSettings(CIVICRM_DB_CACHE_CLASS);
-            $settings['prefix'] = CRM_Utils_Array::value('prefix', $settings, '') . self::DELIMITER . $params['name'] . self::DELIMITER;
+            $settings['prefix'] = CRM_Utils_Array::value('prefix', $settings, '') . self::DELIMITER . $shortName . self::DELIMITER;
             $cache = new $dbCacheClass($settings);
             if (!empty($params['withArray'])) {
               $cache = $params['withArray'] === 'fast' ? new CRM_Utils_Cache_FastArrayDecorator($cache) : new CRM_Utils_Cache_ArrayDecorator($cache);
@@ -190,8 +186,9 @@ class CRM_Utils_Cache {
 
         case 'SqlGroup':
           if (defined('CIVICRM_DSN') && CIVICRM_DSN) {
+            $shortName = self::cleanKey($params['name'], 32);
             $cache = new CRM_Utils_Cache_SqlGroup([
-              'group' => $params['name'],
+              'group' => $shortName,
               'prefetch' => $params['prefetch'] ?? FALSE,
             ]);
             break 2;
