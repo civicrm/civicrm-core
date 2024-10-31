@@ -100,7 +100,7 @@
       },
 
       hasExtraFirstColumn: function() {
-        return this.settings.actions || this.settings.draggable || (this.settings.tally && this.settings.tally.label);
+        return this.settings.actions || this.settings.draggable || this.settings.collapsible || (this.settings.tally && this.settings.tally.label);
       },
 
       getFilters: function() {

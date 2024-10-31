@@ -268,6 +268,7 @@ return [
             ],
           ],
           'hierarchical' => TRUE,
+          'collapsible' => 'closed',
         ],
         'acl_bypass' => FALSE,
       ],
