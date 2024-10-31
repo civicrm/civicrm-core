@@ -183,10 +183,9 @@ class Container {
       'contactTypes' => 'contactTypes',
       'metadata' => 'metadata',
     ];
-    $verSuffixCaches = ['metadata'];
     foreach ($basicCaches as $cacheSvc => $cacheGrp) {
       $definitionParams = [
-        'scope' => in_array($cacheGrp, $verSuffixCaches) ? 'version' : 'global',
+        'scope' => 'version',
         'name' => $cacheGrp,
         'service' => $cacheSvc,
         'type' => ['*memory*', 'SqlGroup', 'ArrayCache'],
@@ -212,6 +211,10 @@ class Container {
         [
           'name' => 'CiviCRM Search PrevNextCache',
           'type' => ['SqlGroup'],
+          'scope' => 'global',
+          // Scope is debatable. Logically, version scope might make sense. But there are several
+          // places which bypass $cache object and use this name, so any prefix/suffix would
+          // require more updates.
         ],
       ]
     ))->setFactory('CRM_Utils_Cache::create')->setPublic(TRUE);
@@ -222,6 +225,7 @@ class Container {
       'CRM_Utils_Cache_Interface',
       [
         [
+          'scope' => 'version',
           'name' => 'extension_browser',
           'type' => ['SqlGroup', 'ArrayCache'],
         ],
@@ -441,9 +445,9 @@ class Container {
    * @return \Civi\Angular\Manager
    */
   public function createAngularManager() {
-    $moduleEnvId = md5(\CRM_Core_Config_Runtime::getId());
     $angCache = \CRM_Utils_Cache::create([
-      'name' => substr('angular_' . $moduleEnvId, 0, 32),
+      'scope' => 'version',
+      'name' => 'angular',
       'service' => 'angular_manager',
       'type' => ['*memory*', 'SqlGroup', 'ArrayCache'],
       'withArray' => 'fast',
