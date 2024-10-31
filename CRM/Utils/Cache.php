@@ -151,6 +151,10 @@ class CRM_Utils_Cache {
    *     should function correctly, but it can be harder to inspect/debug.
    *   - type: array|string, list of acceptable cache types, in order of preference.
    *   - prefetch: bool, whether to prefetch all data in cache (if possible).
+   *   - scope: string, How broadly is this cache shared? (Available in v5.80+)
+   *       - version: Cache is tied to current version of CiviCRM (RECOMMENDED)
+   *       - runtime: Cache is tied to domain ID, HTTP host, version, etc
+   *       - global: Cache is shared across all versions, domain IDs, HTTP hosts, etc (DEFAULT)
    *   - withArray: bool|null|'fast', whether to setup a thread-local array-cache in front of the cache driver.
    *     Note that cache-values may be passed to the underlying driver with extra metadata,
    *     so this will slightly change/enlarge the on-disk format.
@@ -168,6 +172,23 @@ class CRM_Utils_Cache {
   public static function create($params = []) {
     $types = (array) $params['type'];
 
+    switch ($params['scope'] ?? 'global') {
+      case 'version':
+        $scopeId = self::DELIMITER . static::getVersionCode();
+        break;
+
+      case 'runtime':
+        $scopeId = self::DELIMITER . CRM_Core_Config_Runtime::getId();
+        break;
+
+      case 'global':
+        $scopeId = '';
+        break;
+
+      default:
+        throw new \LogicException("Invalid scope given to CRM_Utils_Cache::create()");
+    }
+
     foreach ($types as $type) {
       switch ($type) {
         case '*memory*':
@@ -175,7 +196,7 @@ class CRM_Utils_Cache {
             $shortName = self::cleanKey($params['name'], 64);
             $dbCacheClass = 'CRM_Utils_Cache_' . CIVICRM_DB_CACHE_CLASS;
             $settings = self::getCacheSettings(CIVICRM_DB_CACHE_CLASS);
-            $settings['prefix'] = CRM_Utils_Array::value('prefix', $settings, '') . self::DELIMITER . $shortName . self::DELIMITER;
+            $settings['prefix'] = CRM_Utils_Array::value('prefix', $settings, '') . self::DELIMITER . $shortName . $scopeId;
             $cache = new $dbCacheClass($settings);
             if (!empty($params['withArray'])) {
               $cache = $params['withArray'] === 'fast' ? new CRM_Utils_Cache_FastArrayDecorator($cache) : new CRM_Utils_Cache_ArrayDecorator($cache);
@@ -186,7 +207,8 @@ class CRM_Utils_Cache {
 
         case 'SqlGroup':
           if (defined('CIVICRM_DSN') && CIVICRM_DSN) {
-            $shortName = self::cleanKey($params['name'], 32);
+            $shortName = self::cleanKey($params['name'] . $scopeId, 32, 16, ';[^A-Za-z0-9_\. /];');
+            // Name goes first because it's most interesting to skim. When value is long enough to provoke hashing, we want to retain as much ['name'] as possible.
             $cache = new CRM_Utils_Cache_SqlGroup([
               'group' => $shortName,
               'prefetch' => $params['prefetch'] ?? FALSE,
@@ -206,6 +228,18 @@ class CRM_Utils_Cache {
       return new CRM_Utils_Cache_CacheWrapper($cache, $params['service'] ?? $params['name'] ?? NULL);
     }
     throw new CRM_Core_Exception("Failed to instantiate cache. No supported cache type found. " . print_r($params, 1));
+  }
+
+  private static function getVersionCode(): string {
+    static $ver = NULL;
+    if ($ver === NULL) {
+      $ver = CRM_Utils_System::version();
+      if (preg_match('/^(\d+)\.(\d+)\.(alpha|beta|)(\d+)/', $ver, $matches)) {
+        $stages = ['alpha' => 'a', 'beta' => 'b', '' => '.' /* stable */];
+        $ver = $matches[1] . '.' . $matches[2] . $stages[$matches[3]] . $matches[4];
+      }
+    }
+    return $ver;
   }
 
   /**
