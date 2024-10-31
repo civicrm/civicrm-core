@@ -560,41 +560,11 @@ class CRM_Core_I18n_Schema {
       $info[] = [
         'table' => [$table],
         'when' => 'BEFORE',
-        'event' => ['UPDATE'],
+        'event' => ['INSERT', 'UPDATE'],
         'sql' => $sql,
       ];
     }
 
-    // take care of the ON INSERT triggers
-    foreach ($columns as $table => $hash) {
-      $trigger = [];
-      foreach ($hash as $column => $_) {
-        $trigger[] = "IF NEW.{$column}_{$locale} IS NOT NULL THEN";
-        foreach ($locales as $old) {
-          $trigger[] = "SET NEW.{$column}_{$old} = NEW.{$column}_{$locale};";
-        }
-        foreach ($locales as $old) {
-          $trigger[] = "ELSEIF NEW.{$column}_{$old} IS NOT NULL THEN";
-          foreach (array_merge($locales, [
-            $locale,
-          ]) as $loc) {
-            if ($loc == $old) {
-              continue;
-            }
-            $trigger[] = "SET NEW.{$column}_{$loc} = NEW.{$column}_{$old};";
-          }
-        }
-        $trigger[] = 'END IF;';
-      }
-
-      $sql = implode(' ', $trigger);
-      $info[] = [
-        'table' => [$table],
-        'when' => 'BEFORE',
-        'event' => ['INSERT'],
-        'sql' => $sql,
-      ];
-    }
   }
 
   /**
