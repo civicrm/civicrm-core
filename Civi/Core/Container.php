@@ -184,10 +184,10 @@ class Container {
       'metadata' => 'metadata',
     ];
     $verSuffixCaches = ['metadata'];
-    $verSuffix = '_' . preg_replace(';[^0-9a-z_];', '_', \CRM_Utils_System::version());
     foreach ($basicCaches as $cacheSvc => $cacheGrp) {
       $definitionParams = [
-        'name' => $cacheGrp . (in_array($cacheGrp, $verSuffixCaches) ? $verSuffix : ''),
+        'scope' => in_array($cacheGrp, $verSuffixCaches) ? 'version' : 'global',
+        'name' => $cacheGrp,
         'service' => $cacheSvc,
         'type' => ['*memory*', 'SqlGroup', 'ArrayCache'],
       ];
@@ -681,7 +681,8 @@ class Container {
     $bootServices['userPermissionClass'] = new $userPermissionClass();
 
     $bootServices['cache.settings'] = \CRM_Utils_Cache::create([
-      'name' => 'settings_' . preg_replace(';[^0-9a-z_];', '_', \CRM_Utils_System::version()),
+      'scope' => 'version',
+      'name' => 'settings',
       'type' => ['*memory*', 'SqlGroup', 'ArrayCache'],
     ]);
 
