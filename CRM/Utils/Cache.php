@@ -219,27 +219,42 @@ class CRM_Utils_Cache {
    *
    * @param string $key
    *   Ex: 'ab/cd:ef'
+   * @param int $maxLen
+   *   The maximum length of the string.
+   *   To be useful, this must exceed the hash-length (24 characters).
+   * @param int|NULL $hashLen
+   *   The maximum length of the hashed suffix.
+   *   If NULL, it will be full length (typically 24 characters).
+   * @param string $allowChars
+   *   Regex describing the list of valid characters
    * @return string
    *   Ex: '_abcd1234abcd1234' or 'ab_xx/cd_xxef'.
    *   A similar key, but suitable for use with PSR-16-compliant cache providers.
    */
-  public static function cleanKey($key) {
+  public static function cleanKey($key, int $maxLen = 64, ?int $hashLen = NULL, string $allowChars = ';[^A-Za-z0-9_\.];') {
     if (!is_string($key) && !is_int($key)) {
       throw new \RuntimeException("Malformed cache key");
     }
 
-    $maxLen = 64;
     $escape = '-';
-
-    if (strlen($key) >= $maxLen) {
-      return $escape . md5($key);
+    if ($key[0] === $escape) {
+      throw new \RuntimeException("Malformed cache key. Has this been double-encoded?");
     }
 
-    $r = preg_replace_callback(';[^A-Za-z0-9_\.];', function($m) use ($escape) {
+    $r = preg_replace_callback($allowChars, function($m) use ($escape) {
       return $escape . dechex(ord($m[0]));
     }, $key);
 
-    return strlen($r) >= $maxLen ? $escape . md5($key) : $r;
+    $len = strlen($r);
+    if ($len < $maxLen) {
+      return $r;
+    }
+
+    $hash = CRM_Utils_String::base64UrlEncode(md5($key, TRUE));
+    if ($hashLen !== NULL) {
+      $hash = substr($hash, 0, $hashLen);
+    }
+    return $escape . substr($r, 0, $maxLen - strlen($hash) - 3) . $hash;
   }
 
   /**
