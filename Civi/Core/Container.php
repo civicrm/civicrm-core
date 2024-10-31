@@ -681,7 +681,7 @@ class Container {
     $bootServices['userPermissionClass'] = new $userPermissionClass();
 
     $bootServices['cache.settings'] = \CRM_Utils_Cache::create([
-      'name' => 'settings',
+      'name' => 'settings_' . preg_replace(';[^0-9a-z_];', '_', \CRM_Utils_System::version()),
       'type' => ['*memory*', 'SqlGroup', 'ArrayCache'],
     ]);
 
