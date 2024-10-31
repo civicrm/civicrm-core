@@ -308,3 +308,40 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
     padding: 0;
     display: inline-block;
 }
+/* Credit Card Icons */
+
+.crm-credit_card_type-icons {
+    display: flex;
+    gap: var(--crm-flex-gap);
+}
+.crm-credit_card_type-icons a::before {
+    font-family: "Font Awesome 6 Free", "FontAwesome";
+    font-style: normal;
+    text-rendering: auto;
+    font-size: var(--crm-dash-icon-size);
+    display: inline-block;
+    content: '\f09d';
+    font-size: 2.5rem;
+    line-height: 1;
+}
+.crm-credit_card_type-icons a span {
+    display: none;
+}
+.crm-credit_card_type-icons a.crm-credit_card_type-icon-visa::before {
+    content: '\f1f0';
+}
+.crm-credit_card_type-icons a.crm-credit_card_type-icon-mastercard::before {
+    content: '\f1f1';
+}
+.crm-credit_card_type-icons a.crm-credit_card_type-icon-amex::before {
+    content: '\f1f3';
+}
+.crm-credit_card_type-icons a.crm-credit_card_type-icon-discover::before {
+    content: '\f1f2';
+}
+.crm-credit_card_type-icons a.crm-credit_card_type-icon-jcb::before {
+    content: '\f24b';
+}
+.crm-credit_card_type-icons a.crm-credit_card_type-icon-unionpay::before {
+    content: '\f09d'; /* uses generic, see https://github.com/FortAwesome/Font-Awesome/issues/4561 */
+}

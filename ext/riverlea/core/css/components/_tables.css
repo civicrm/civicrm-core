@@ -21,7 +21,6 @@
     font-weight: bold;
     padding: var(--crm-table-padding);
 	text-align: left;
-    /* vertical-align: bottom; */
 }
 .crm-container table:not(thead) tr {
     border-bottom: var(--crm-table-row-border);
@@ -110,6 +109,7 @@ table.dataTable.order-column.stripe tbody tr.extension-installed.even > .sorting
     .crm-report-field-form-block,
     .crm-group-search-form-block,
     #map-field,
+    #payLaterOptions,
     .crm-membership-form-block,
     .crm-contribution-form-block,
     .crm-case-caseview-form-block,
@@ -152,7 +152,6 @@ table.dataTable.order-column.stripe tbody tr.extension-installed.even > .sorting
 }
 
 /* Data Tables */
-
 .dataTables_wrapper .dataTables_length,
 .dataTables_wrapper .dataTables_filter,
 .dataTables_wrapper .dataTables_info,
@@ -167,7 +166,6 @@ table.dataTable.order-column.stripe tbody tr.extension-installed.even > .sorting
 }
 
 /* Nested table */
-
 .crm-container .crm-child-row tr:first-child {
     border: 1px solid var(--crm-c-page-background);
 }
@@ -192,8 +190,8 @@ table.dataTable.order-column.stripe tbody tr.extension-installed.even > .sorting
     box-shadow: inset 0 10px 8px -10px rgba(0,0,0,.3), inset 0 -11px 8px -9px rgba(0,0,0,.15);
     background: var(--crm-table-inset-bg);
 }
-/* Nested, inset table - groups page */
 
+/* Nested, inset table - groups page */
 tbody .crm-row-child {
     border-top: 1px solid var(--crm-c-gray-400);
 }
@@ -219,7 +217,6 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
 }
 
 /* Compressed table */
-
 .crm-container table.form-layout-compressed {
     width: var(--crm-table-compressed-width);
     border: var(--crm-table-outside-border);
@@ -241,7 +238,6 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
 }
 
 /* Advance search compressed table */
-
 #search-status table.form-layout-compressed {
     border: 0;
     background: var(--crm-c-background);
@@ -263,7 +259,6 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
 }
 
 /* Report table */
-
 .crm-container table.report {
     width: auto;
 }
@@ -278,7 +273,6 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
 }
 
 /* Batch entry table */
-
 .crm-container .crm-grid-table {
     display: table;
     border-collapse: collapse;
@@ -300,11 +294,17 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
 }
 
 /* Fees tables (contribs/events) */
-
 .crm-container table#map-field-table {
     width: auto;
     border: var(--crm-table-outside-border);
     margin-top: var(--crm-padding-reg);
+}
+
+/* Pay later table (nested inside another table) */
+
+.crm-container table#payLater table#payLaterOptions.form-layout {
+    border: 1px solid #dedede;
+    background: var(--crm-c-page-background);
 }
 
 /* BOOTSTRAP tables */

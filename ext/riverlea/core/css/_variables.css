@@ -259,7 +259,7 @@
 --crm-input-padding-large: var(--crm-s) var(--crm-m1);
 --crm-input-height: var(--crm-l);
 --crm-input-font-size: var(--crm-m3);
---crm-input-label-weight: bold;
+--crm-input-label-weight: 600;
 --crm-input-label-font: var(--crm-font);
 --crm-input-label-size: var(--crm-font-size);
 --crm-input-label-width: var(--crm-big-input);

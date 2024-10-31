@@ -350,6 +350,9 @@ dl dd, dl dl {
 	background-color: transparent;
 	border-radius: 0;
 }
+.crm-container p code {
+    display: inline-block;
+}
 .crm-container .pre-scrollable {
 	max-height: 340px;
 	overflow-y: scroll;

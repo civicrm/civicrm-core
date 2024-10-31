@@ -295,7 +295,7 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
 .crm-container .btn-group-xs > .crm-hover-button,
 .crm-container .ui-dialog-buttonset .btn-group-xs > .ui-button, .crm-container .btn-group-xs > a.button,
 .crm-container .btn-group-xs > input[type="button"] {
-    padding: var(--crm-xs) var(--crm-s);
+    padding: var(--crm-btn-small-padding);
     font-size: var(--crm-small-font-size);
     border-radius: var(--crm-roundness);
 	height: auto;

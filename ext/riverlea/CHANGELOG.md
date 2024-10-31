@@ -1,5 +1,18 @@
+1.0.11
+ - ADDED inline block for code tags inside paragraphs (#69)
+ - ADDED fixed width for WordPress checkbox/radios (#68)
+ - CHANGED checkbox list checkbox alignment to use grid alignment rather than pixels
+ - CHANGED font-weight on input labels in Mineetta to 600, not 'bold' (#66)
+ - ADDED gap between two inline buttons
+ - ADDED credit card FA icons for contribution pages (previously image sprites)
+ - FIXED table form label cell padding didn't match form input cells
+ - FIXED flexbox with help icons breaking table structure (#68)
+ - ADDED bg colour and border for pay later options in events/contribution creation to help differentiate
+ - CHANGED bootstrap small button icon height is fixed to keep button groups matching heights
+ - FIXED hover issue on cancel icon buttons (#67)
+
 1.0.10
- - CHANGED sort icons on SK tables sit inline for wrapping labels.
+ - CHANGED sort icons on SK tables to sit inline for wrapping labels.
  - FIXED checkbox for SK table header padding so shouldn't wrap.
  - CHANGED explicitly set text-decoration to none for buttons
  - REMOVED broken link to _font.css in Walbrook.

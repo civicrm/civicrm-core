@@ -1,5 +1,4 @@
 /* Form parts */
-
 .crm-container div.crm-field-wrapper {
     margin-bottom: var(--crm-r);
 }
@@ -31,7 +30,7 @@
 .crm-container .form-layout-compressed th.label {
     width: var(--crm-input-label-width);
     text-align: var(--crm-input-label-align);
-    padding: var(--crm-m2) var(--crm-m2) 0 0;
+    padding: var(--crm-m) var(--crm-m2) 0 0;
     font-family: var(--crm-input-label-font);
     font-weight: var(--crm-input-label-weight);
 }
@@ -70,7 +69,7 @@
 .crm-container .form-layout td.label label {
     margin-bottom: 0;
 }
-.crm-container .form-layout label {
+.crm-container .form-layout label:not(+ .helpicon) {
     width: var(--crm-input-label-width);
 }
 .crm-contribution_search_form-accordion .form-layout label,
@@ -91,13 +90,6 @@
 }
 .crm-search-display .form-inline {
     padding: var(--crm-padding-reg) 0;
-}
-.crm-container td.label:has(.helpicon) {
-    display: flex;
-    gap: var(--crm-m);
-    align-items: center;
-    padding-right: 0;
-    justify-content: var(--crm-input-label-align);
 }
 /* Fieldset */
 .crm-container fieldset {
@@ -208,7 +200,7 @@ select.crm-error {
 /* Input size modifiers */
 
 .crm-container .two {
-    width: 2rem;
+    width: 3rem; /* .two is used on number inputs that need 1rem for the controls */
 }
 .crm-container .four {
     width: 4rem;

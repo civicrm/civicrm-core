@@ -562,8 +562,8 @@ i.crm-i.af-gui-conditional-dialog-move-icon {
 }
 
 /* Dropdown buttons */
-#afGuiEditor-canvas .dropdown-toggle,
-#afGuiEditor .af-gui-add-element-button {
+#bootstrap-theme #afGuiEditor-canvas .dropdown-toggle,
+#bootstrap-theme #afGuiEditor .af-gui-add-element-button {
 	padding: 0;
     background-color: transparent;
     border: 0;
@@ -576,6 +576,7 @@ i.crm-i.af-gui-conditional-dialog-move-icon {
     background: transparent;
     border: 0;
     min-width: auto;
+    height: auto;
 }
 #afGuiEditor .dropdown-menu {
     min-width: 220px;

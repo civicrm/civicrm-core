@@ -272,7 +272,7 @@
 .crm-container .crm-search-display button.dropdown-toggle:not(.btn-default):not(.btn-secondary),
 #bootstrap-theme .crm-search-display th .btn-group .btn {
     background-color: var(--crm-c-background4);
-    color: var(--crm-c-text) !important;
+    color: var(--crm-c-text);
 }
 
 /* BS3 Button groups and dropdowns  */
@@ -284,6 +284,9 @@
 }
 #bootstrap-theme td.text-right:has(.btn + .btn) {
     justify-content: end;
+}
+.crm-container a.button + a.button {
+    margin-left: var(--crm-flex-gap);
 }
 .crm-actions-ribbon #actions {
     padding: 0;
@@ -562,7 +565,7 @@
 #bootstrap-theme .btn-xs i.crm-i,
 #bootstrap-theme .btn-group-xs > .btn i.crm-i {
     width: auto;
-    height: auto;
     padding: var(--crm-btn-small-padding);
     min-width: 1rem;
+    height: 1.5rem;
 }

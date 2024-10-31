@@ -74,17 +74,17 @@ af-form > fieldset > legend {
     grid-template-columns: var(--crm-f-label-width) 1fr 0;
     margin: 0 calc(-1 * var(--crm-f-form-padding));
 }
-.crm-container.crm-public .crm-section:has(input:focus),
-.crm-container.crm-public .crm-section:has(select:focus),
-.crm-container.crm-public .crm-section:has(textarea:focus) {
+.crm-container.crm-public .crm-section:has( > .content input:focus),
+.crm-container.crm-public .crm-section:has( > .content select:focus),
+.crm-container.crm-public .crm-section:has( > .content textarea:focus) {
     background-color: var(--crm-f-form-focus-bg);
 }
-.crm-container.crm-public .crm-section:has(input.error),
-.crm-container.crm-public .crm-section:has(textarea.error),
-.crm-container.crm-public .crm-section:has(select.error),
-.crm-container.crm-public .crm-section:has(input.crm-inline-error),
-.crm-container.crm-public .crm-section:has(textarea.crm-inline-error),
-.crm-container.crm-public .crm-section:has(select.crm-inline-error) {
+.crm-container.crm-public .crm-section:has( > .content input.error),
+.crm-container.crm-public .crm-section:has( > .content textarea.error),
+.crm-container.crm-public .crm-section:has( > .content select.error),
+.crm-container.crm-public .crm-section:has( > .content input.crm-inline-error),
+.crm-container.crm-public .crm-section:has( > .content textarea.crm-inline-error),
+.crm-container.crm-public .crm-section:has( > .content select.crm-inline-error) {
     background-color: var(--crm-f-form-error-bg);
 }
 .crm-container.crm-public input[type="text"],
