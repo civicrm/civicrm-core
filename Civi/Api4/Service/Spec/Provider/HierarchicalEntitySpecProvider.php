@@ -22,8 +22,7 @@ use Civi\Api4\Utils\CoreUtil;
 class HierarchicalEntitySpecProvider extends \Civi\Core\Service\AutoService implements Generic\SpecProviderInterface {
 
   /**
-   * Generic create spec function applies to all SortableEntity types.
-   * Disables required 'weight' field because that's auto-managed.
+   * Generic create spec function applies to all HierarchicalEntity types.
    *
    * @param \Civi\Api4\Service\Spec\RequestSpec $spec
    */
@@ -36,7 +35,18 @@ class HierarchicalEntitySpecProvider extends \Civi\Core\Service\AutoService impl
       ->setDescription(ts('Depth in the nested hierarchy'))
       ->setType('Extra')
       ->setReadonly(TRUE)
-      ->setSqlRenderer([__CLASS__, 'getDepth']);
+      ->setSqlRenderer([__CLASS__, 'getZero']);
+    $spec->addFieldSpec($field);
+
+    $field = new FieldSpec('_descendents', $spec->getEntity(), 'Integer');
+    $field->setLabel(ts('Descendents'))
+      ->setTitle(ts('Descendents'))
+      ->setColumnName('id')
+      ->setInputType('Number')
+      ->setDescription(ts('Number of descendents in the nested hierarchy'))
+      ->setType('Extra')
+      ->setReadonly(TRUE)
+      ->setSqlRenderer([__CLASS__, 'getZero']);
     $spec->addFieldSpec($field);
   }
 
@@ -48,11 +58,11 @@ class HierarchicalEntitySpecProvider extends \Civi\Core\Service\AutoService impl
   }
 
   /**
-   * Generate SQL for _depth field
+   * Generate SQL for default value of _depth & _descendents fields
    * @param array $field
    * @return string
    */
-  public static function getDepth(array $field): string {
+  public static function getZero(array $field): string {
     return "0";
   }
 

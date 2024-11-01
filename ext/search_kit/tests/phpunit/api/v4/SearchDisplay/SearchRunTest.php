@@ -1357,7 +1357,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('text-center', $result[0]['columns'][0]['cssClass']);
     // First contact is deceased, gets strikethrough class
     $this->assertEquals('strikethrough', $result[0]['cssClass']);
-    $this->assertNotEquals('strikethrough', $result[1]['cssClass']);
+    $this->asserttrue(empty($result[1]['cssClass']));
     // Ensure the view contact link was formed
     $this->assertStringContainsString('cid=' . $contacts[0]['id'], $result[0]['columns'][1]['links'][0]['url']);
     $this->assertEquals('_blank', $result[0]['columns'][1]['links'][0]['target']);
