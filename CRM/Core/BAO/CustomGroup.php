@@ -25,7 +25,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
    * @see CRM_Utils_Hook::post()
    */
   public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $e): void {
-    Civi::cache('metadata')->flush();
+    Civi::cache('metadata')->clear();
   }
 
   /**
