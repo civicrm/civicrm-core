@@ -2399,45 +2399,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
-   * Complete transaction if payment has been processed.
-   *
-   * Check the result for a success outcome & if paid then complete the transaction.
-   *
-   * Completing will trigger update of related entities and emails.
-   *
-   * @deprecated
-   *
-   * @param array $result
-   * @param int $contributionID
-   *
-   * @throws \CRM_Core_Exception
-   * @throws \Exception
-   */
-  protected function completeTransaction($result, $contributionID) {
-    CRM_Core_Error::deprecatedWarning('Use API3 Payment.create');
-    if (($result['payment_status_id'] ?? NULL) == 1) {
-      try {
-        civicrm_api3('contribution', 'completetransaction', [
-          'id' => $contributionID,
-          'trxn_id' => $result['trxn_id'] ?? NULL,
-          'payment_processor_id' => $result['payment_processor_id'] ?? $this->_paymentProcessor['id'],
-          'is_transactional' => FALSE,
-          'fee_amount' => $result['fee_amount'] ?? NULL,
-          'receive_date' => $result['receive_date'] ?? NULL,
-          'card_type_id' => $result['card_type_id'] ?? NULL,
-          'pan_truncation' => $result['pan_truncation'] ?? NULL,
-        ]);
-      }
-      catch (CRM_Core_Exception $e) {
-        if ($e->getErrorCode() != 'contribution_completed') {
-          \Civi::log()->error('CRM_Contribute_Form_Contribution_Confirm::completeTransaction CRM_Core_Exception: ' . $e->getMessage());
-          throw new CRM_Core_Exception('Failed to update contribution in database');
-        }
-      }
-    }
-  }
-
-  /**
    * Bounce the user back to retry when an error occurs.
    *
    * @param string $message
