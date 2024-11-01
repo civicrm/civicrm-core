@@ -29,6 +29,22 @@ class CRM_Upgrade_Incremental_php_FiveEightyOne extends CRM_Upgrade_Incremental_
    */
   public function upgrade_5_81_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Set "group_multiple_parents" setting if used', 'setMultipleGroupParents');
+  }
+
+  /**
+   * Set "group_multiple_parents" setting if used.
+   *
+   * @return bool
+   * @throws CRM_Core_Exception
+   */
+  public static function setMultipleGroupParents(): bool {
+    $sql = "SELECT COUNT(`id`)
+      FROM `civicrm_group`
+      WHERE `parents` LIKE '%,%'";
+    $groupFoundWithMutipleParents = (bool) CRM_Core_DAO::singleValueQuery($sql);
+    Civi::settings()->set('group_multiple_parents', $groupFoundWithMutipleParents);
+    return TRUE;
   }
 
 }
