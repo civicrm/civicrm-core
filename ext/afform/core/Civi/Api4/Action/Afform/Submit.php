@@ -460,8 +460,8 @@ class Submit extends AbstractProcessor {
       // Forward FK e.g. Event.loc_block_id => LocBlock
       $forwardFkField = self::getFkField($mainEntity['type'], $joinEntityName);
       if ($forwardFkField && $values) {
-        // Add id to values for update op
-        if ($whereClause) {
+        // Add id to values for update op, but only if id is not already on the form
+        if ($whereClause && empty($mainEntity['joins'][$joinEntityName]['fields'][$joinIdField])) {
           $values[0][$joinIdField] = $whereClause[0][2];
         }
         $result = civicrm_api4($joinEntityName, 'save', [
