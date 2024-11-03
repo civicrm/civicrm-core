@@ -329,11 +329,37 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
   /**
    * Test stock template for multiple participant.
    *
-   * The goal is to ensure no leakage.
+   * The goal is to ensure the profile details for all are
+   * on the first contact and the relevant contact are
+   * on the other 2.
    *
    * @throws \CRM_Core_Exception
    */
   public function testMailMultipleParticipant(): void {
+    $this->createScenarioMultipleParticipantPendingFreeEvent();
+    $mailSent = $this->sentMail;
+    // The second and 3rd emails have the job title for their participant,
+    // but not the others
+    $this->assertStringContainsString('job_title	wizard', $mailSent[1]['body']);
+    $this->assertStringContainsString('job_title	seer', $mailSent[2]['body']);
+    $this->assertStringNotContainsString('job_title	oracle', $mailSent[1]['body']);
+    $this->assertStringNotContainsString('job_title	oracle', $mailSent[2]['body']);
+
+    // The first participant, has the title for all 3.
+    $this->assertStringContainsString('job_title	oracle', $mailSent[0]['body']);
+    $this->assertStringContainsString('job_title	seer', $mailSent[0]['body']);
+    $this->assertStringContainsString('job_title	wizard', $mailSent[0]['body']);
+
+  }
+
+  /**
+   * Test stock template for multiple participant.
+   *
+   * The goal is to ensure no leakage.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testMailParticipant(): void {
     $this->createScenarioMultipleParticipantPendingWithTax();
     $mailSent = $this->sentMail;
     // amounts paid = [300, 100, 200];
