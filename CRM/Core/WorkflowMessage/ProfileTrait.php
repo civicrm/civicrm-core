@@ -109,11 +109,19 @@ trait CRM_Core_WorkflowMessage_ProfileTrait {
                 if (!isset($profile['fields'])) {
                   $profile['fields'] = [];
                 }
-                $fields = CRM_Event_BAO_Event::getProfileDisplay([$profile['id']],
-                  $participant['contact']['id'],
-                  $participant['id'],
-                  $this->getNote()
-                );
+                try {
+                  $fields = CRM_Event_BAO_Event::getProfileDisplay([$profile['id']],
+                    $participant['contact']['id'],
+                    $participant['id'],
+                    $this->getNote()
+                  );
+                }
+                catch (CRM_Core_Exception $e) {
+                  // This could be false if the person does not have permission. This came up in
+                  // the SelfSvcTransfer workflow via test testTransferAnonymous & it seems OK
+                  // to not include profile data in this scenario ... probably.
+                  $fields = [];
+                }
                 $profile['fields'][] = $fields ? $fields[0] : [];
 
               }
