@@ -370,7 +370,7 @@ VALUES
     ( @domainID, 'civicrm/admin/setting/misc&reset=1',                  'Undelete, Logging and ReCAPTCHA', 'Undelete, Logging and ReCAPTCHA', 'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 6 ),
     ( @domainID, 'civicrm/admin/setting/path&reset=1',                  'Directories',        'Directories',                                  'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 7 ),
     ( @domainID, 'civicrm/admin/setting/url&reset=1',                   'Resource URLs',      'Resource URLs',                                'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 8 ),
-    ( @domainID, 'civicrm/admin/setting/updateConfigBackend&reset=1',   'Cleanup Caches and Update Paths', 'Cleanup Caches and Update Paths', 'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 9 ),
+    ( @domainID, 'civicrm/admin/setting/updateConfigBackend&reset=1',   'Clear Caches and Reset paths', 'Clear Caches and Reset paths', 'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 9 ),
     ( @domainID, 'civicrm/admin/setting/uf&reset=1',                    'CMS Database Integration',    'CMS Integration',                     'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 10 ),
     ( @domainID, 'civicrm/admin/options/safe_file_extension&group=safe_file_extension&reset=1', 'Safe File Extensions', 'Safe File Extensions','administer CiviCRM', '',@systemSettingslastID, '1', NULL, 11 ),
     ( @domainID, 'civicrm/admin/options?reset=1',                       'Option Groups', 'Option Groups',                                     'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 12 ),
