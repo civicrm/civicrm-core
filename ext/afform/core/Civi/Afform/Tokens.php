@@ -27,9 +27,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class Tokens extends AutoService implements EventSubscriberInterface {
 
-  private static $placement = 'msg_token';
+  private static $placement = 'msg_token_single';
 
-  private static $prefix = 'afform';
+  private static $prefix = 'form';
 
   private static $jwtScope = 'afform';
 

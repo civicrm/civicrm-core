@@ -87,7 +87,7 @@ return [
     ],
   ],
   [
-    'name' => 'AfformPlacement:msg_token',
+    'name' => 'AfformPlacement:msg_token_single',
     'entity' => 'OptionValue',
     'cleanup' => 'always',
     'update' => 'always',
@@ -95,8 +95,8 @@ return [
       'version' => 4,
       'values' => [
         'option_group_id.name' => 'afform_placement',
-        'name' => 'msg_token',
-        'value' => 'msg_token',
+        'name' => 'msg_token_single',
+        'value' => 'msg_token_single',
         'label' => E::ts('Message Tokens'),
         'is_reserved' => TRUE,
         'is_active' => TRUE,

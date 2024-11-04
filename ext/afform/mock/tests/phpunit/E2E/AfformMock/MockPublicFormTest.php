@@ -94,7 +94,7 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
   }
 
   /**
-   * There are two tokens ({afform.mockPublicFormUrl} and {afform.mockPublicFormLink})
+   * There are two tokens ({form.mockPublicFormUrl} and {form.mockPublicFormLink})
    * which are rendered in two contexts (text and HTML).
    *
    * Make sure that the resulting URLs point to the same place, regardless of which
@@ -105,8 +105,8 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
   public function testWellFormedTokens() {
     $lebowski = $this->getLebowskiCID();
     $messages = \CRM_Core_TokenSmarty::render([
-      'text' => 'url=({afform.mockPublicFormUrl}) link=({afform.mockPublicFormLink})',
-      'html' => '<p>url=({afform.mockPublicFormUrl}) link=({afform.mockPublicFormLink})</p>',
+      'text' => 'url=({form.mockPublicFormUrl}) link=({form.mockPublicFormLink})',
+      'html' => '<p>url=({form.mockPublicFormUrl}) link=({form.mockPublicFormLink})</p>',
     ], ['contactId' => $lebowski]);
 
     $httpTextUrl = '(https?:[a-zA-Z0-9%_/\.\?\-\+:=#&]+)';
@@ -120,21 +120,21 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
     preg_match($textPattern, $messages['text'], $textMatches);
     preg_match($htmlPattern, $messages['html'], $htmlMatches);
 
-    $this->assertEquals($textMatches[1], html_entity_decode($htmlMatches[1]), 'Text and HTML values of {afform.mockPublicFormUrl} should point to same place');
-    $this->assertEquals($textMatches[2], html_entity_decode($htmlMatches[2]), 'Text and HTML values of {afform.mockPublicFormLink} should point to same place');
+    $this->assertEquals($textMatches[1], html_entity_decode($htmlMatches[1]), 'Text and HTML values of {form.mockPublicFormUrl} should point to same place');
+    $this->assertEquals($textMatches[2], html_entity_decode($htmlMatches[2]), 'Text and HTML values of {form.mockPublicFormLink} should point to same place');
 
     $this->assertMatchesRegularExpression(';^https?:.*civicrm(/|%2F)mock-public-form.*;', $textMatches[1], "URL should look plausible");
     $this->assertMatchesRegularExpression(';^https?:.*civicrm(/|%2F)mock-public-form.*;', $textMatches[2], "URL should look plausible");
   }
 
   /**
-   * Evaluate the email token `{afform.mockPublicFormUrl}`. The output should be a page-level auth token.
+   * Evaluate the email token `{form.mockPublicFormUrl}`. The output should be a page-level auth token.
    */
   public function testAuthenticatedUrlToken_Page() {
     $this->assertTrue(function_exists('authx_civicrm_config'), 'Cannot test without authx');
 
     $lebowski = $this->getLebowskiCID();
-    $url = $this->renderTokens($lebowski, '{afform.mockPublicFormUrl}', 'text/plain');
+    $url = $this->renderTokens($lebowski, '{form.mockPublicFormUrl}', 'text/plain');
     $this->assertMatchesRegularExpression(';^https?:.*civicrm(/|%2F)mock-public-form.*;', $url, "URL should look plausible");
 
     // This URL doesn't specifically log you in to a durable session.
