@@ -2,6 +2,7 @@
 namespace api\v4\Afform;
 
 use Civi\Api4\Afform;
+use Civi\Api4\Event;
 use Civi\Test\TransactionalInterface;
 
 /**
@@ -87,6 +88,7 @@ EOHTML;
     <af-field name="id" />
     <af-field name="title" />
     <af-field name="start_date" />
+    <af-field name="end_date" defn="{input_type: 'DisplayOnly'}" />
     <af-field name="event_type_id" />
     <div af-join="LocBlock">
       <af-field name="id" />
@@ -112,6 +114,7 @@ EOHTML;
             'fields' => [
               'title' => 'Event Title 1',
               'start_date' => '2021-01-01 00:00:00',
+              'end_date' => '2021-01-02 00:00:00',
               'event_type_id' => 1,
             ],
             'joins' => [
@@ -128,6 +131,14 @@ EOHTML;
 
     $event1 = $submit[0]['Event1'][0]['id'];
     $loc1 = $submit[0]['Event1'][0]['joins']['LocBlock'][0]['id'];
+
+    // End date is readonly so should not have been saved.
+    $event1Values = $this->getTestRecord('Event', $event1);
+    $this->assertNull($event1Values['end_date']);
+    Event::update(FALSE)
+      ->addWhere('id', '=', $event1)
+      ->addValue('end_date', '2021-01-03 00:00:00')
+      ->execute();
 
     // Create a 2nd new event with a new location
     $submit = Afform::submit()
@@ -180,6 +191,9 @@ EOHTML;
     $this->assertSame($event1, $submit[0]['Event1'][0]['id']);
     $this->assertGreaterThan($loc1, $submit[0]['Event1'][0]['joins']['LocBlock'][0]['id']);
 
+    // End date is readonly so should not have been modified.
+    $event1Values = $this->getTestRecord('Event', $event1);
+    $this->assertSame('2021-01-03 00:00:00', $event1Values['end_date']);
   }
 
 }

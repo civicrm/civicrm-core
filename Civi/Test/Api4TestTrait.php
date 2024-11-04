@@ -48,6 +48,25 @@ trait Api4TestTrait {
   }
 
   /**
+   * @param string $entityName
+   * @param array|string|int $idOrFilters
+   *   Either the entity id or filters like ['name' => 'foo']
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  public function getTestRecord(string $entityName, $idOrFilters): array {
+    if (!is_array($idOrFilters)) {
+      $idField = CoreUtil::getIdFieldName($entityName);
+      $idOrFilters = [$idField => $idOrFilters];
+    }
+    $where = [];
+    foreach ($idOrFilters as $key => $value) {
+      $where[] = [$key, '=', $value];
+    }
+    return civicrm_api4($entityName, 'get', ['where' => $where])->single();
+  }
+
+  /**
    * Saves one or more test records, supplying default values.
    *
    * Test records will be deleted when the `deleteTestRecords` function is
