@@ -25,6 +25,8 @@ class Tokens extends AutoService implements EventSubscriberInterface {
 
   private static $placement = 'msg_token_login';
 
+  private static $prefix = 'afformLogin';
+
   public static function getSubscribedEvents(): array {
     if (!\CRM_Extension_System::singleton()->getMapper()->isActiveModule('authx')) {
       return [];
@@ -40,7 +42,7 @@ class Tokens extends AutoService implements EventSubscriberInterface {
     if (in_array('contactId', $e->getTokenProcessor()->getContextValues('schema')[0])) {
       $tokenForms = static::getTokenForms();
       foreach ($tokenForms as $formName => $afform) {
-        $e->entity('afformLogin')
+        $e->entity(static::$prefix)
           ->register("{$formName}Url", E::ts('%1 (URL, Login)', [1 => $afform['title'] ?? $afform['name']]))
           ->register("{$formName}Link", E::ts('%1 (Hyperlink, Login)', [1 => $afform['title'] ?? $afform['name']]));
       }
@@ -52,7 +54,7 @@ class Tokens extends AutoService implements EventSubscriberInterface {
    */
   public function evaluateTokens(\Civi\Token\Event\TokenValueEvent $e): void {
     $activeTokens = $e->getTokenProcessor()->getMessageTokens();
-    if (empty($activeTokens['afformLogin'])) {
+    if (empty($activeTokens[static::$prefix])) {
       return;
     }
 
@@ -60,8 +62,8 @@ class Tokens extends AutoService implements EventSubscriberInterface {
     foreach ($tokenForms as $formName => $afform) {
       foreach ($e->getRows() as $row) {
         $url = self::createUrl($afform, $row->context['contactId']);
-        $row->format('text/plain')->tokens('afformLogin', "{$formName}Url", $url);
-        $row->format('text/html')->tokens('afformLogin', "{$formName}Link", sprintf('<a href="%s">%s</a>', htmlentities($url), htmlentities($afform['title'] ?? $afform['name'])));
+        $row->format('text/plain')->tokens(static::$prefix, "{$formName}Url", $url);
+        $row->format('text/html')->tokens(static::$prefix, "{$formName}Link", sprintf('<a href="%s">%s</a>', htmlentities($url), htmlentities($afform['title'] ?? $afform['name'])));
       }
     }
   }
