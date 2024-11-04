@@ -11,6 +11,7 @@
 
 namespace Civi\AfformLoginToken;
 
+use Civi\Core\Event\GenericHookEvent;
 use Civi\Core\Service\AutoService;
 use CRM_Afform_ExtensionUtil as E;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -33,9 +34,25 @@ class Tokens extends AutoService implements EventSubscriberInterface {
     }
 
     return [
+      'hook_civicrm_alterMailContent' => 'applyCkeditorWorkaround',
       'civi.token.list' => 'listTokens',
       'civi.token.eval' => 'evaluateTokens',
     ];
+  }
+
+  /**
+   * CKEditor makes it hard to set an `href` to a token, so we often get
+   * this munged `'http://{token}` data.
+   *
+   * @see CRM_Utils_Hook::alterMailContent
+   */
+  public static function applyCkeditorWorkaround(GenericHookEvent $e) {
+    $pat = ';https?://(\{' . preg_quote(static::$prefix, ';') . '.*Url\});';
+    foreach (array_keys($e->content) as $field) {
+      if (is_string($e->content[$field])) {
+        $e->content[$field] = preg_replace($pat, '$1', $e->content[$field]);
+      }
+    }
   }
 
   public function listTokens(\Civi\Token\Event\TokenRegisterEvent $e): void {
