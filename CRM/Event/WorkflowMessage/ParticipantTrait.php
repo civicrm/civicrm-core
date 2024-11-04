@@ -334,6 +334,9 @@ trait CRM_Event_WorkflowMessage_ParticipantTrait {
           // If the only tax rate charged is 0% then no tax breakdown is returned.
           $participant['tax_rate_breakdown'] = [];
         }
+        if (!isset($participant['line_items'])) {
+          $participant['line_items'] = [];
+        }
         $count++;
       }
       $this->participants = $participants;
