@@ -5,16 +5,20 @@ Theme architecture for CiviCRM that separates visual/UI CSS from structural CSS 
  - Walbrook, named after the river that runs under Shoreditch, London. It is based on Shoreditch/TheIsland theme.
  - Hackney, named after the river that runs under Finsbury Park, based on Finsbury Park theme.
  - Thames, named after the river that runs close to Artful Robot HQ, based on their Aah theme.
- You can chose between these subthemes via Display Settings
+ You can chose between these subthemes via Display Settings, where you can also set dark-mode preferences.
 
  ## Use in Front-End CiviCRM
 
-**USE AT YOUR OWN RISK.** While RiverLea has been widely tested in the backend of CiviCRM, front-end pages have had minimal testing so far, and given the wide number of themes and scenarios that front-end pages need to integrate with, this will take time. For this reason, while RiverLea should work fine applied to the front-end of a new CiviCRM website, for existing sites we would recommend only applying it  on a Dev site, or with extensive testing of your front-end Civi layouts. Overwriting CSS variables for the front is straightforward (they can be nested within `.crm-container.crm-public` and there's a number of front-end specific variables, prefixed `--crm-f-`), but **testing is essential**.
+**USE WITH CAUTION AND TESTING** While RiverLea has been widely tested in the backend of CiviCRM, given the wide number of themes and scenarios for front-end pages, for existing sites we recommend only applying it on a dev site, or after extensive testing of your front-end Civi layouts.
+
+Overwriting CSS variables for the front is straightforward (they can be nested within `.crm-container.crm-public` and there's a number of front-end specific variables, prefixed `--crm-f-`), but **testing is essential**.
 
 The extension is licensed under [AGPL-3.0](LICENSE.txt).
 
 ## [Changelog](CHANGELOG.md)
 
+- 1.1 (5.80) - Release for packaging with CiviCRM core, v5.80.
+- 1.0 - **Release candidate**, with ongoing testing and fixes.
 - 0.10 - **Adds fourth stream**. Thames (Aah), as well as extensive fixes & adjustments.
 - 0.9 - **Overwrites civi core CSS**. 5.75 only - overwrites core css like SearchKit & FormBuilder with extensive work on both. D7 Garland support.
 - 0.8 - **Front-end layouts**. Front-end support for each stream.
@@ -80,10 +84,9 @@ Contains CSS files in:
 - ~~Tidy/simplify Bootstrap~~
 - ~~Merge Thames~~
 - ~~Test creating separate extension with RiverLea as parent theme.~~
-- v1.x - Responsive testing
-- v1.x - Merge Wellow
-- v1.x - Minimal customiser
-- v1.x - Better documentation
+- Integrate Wellow/Radstock
+- Customiser
+- Better documentation
 
 ## Creating new 'streams'
 
