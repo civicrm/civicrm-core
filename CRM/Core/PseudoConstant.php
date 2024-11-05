@@ -1517,7 +1517,7 @@ WHERE  id = %1
     foreach ($options as $option) {
       // Some fallbacks in case the array is missing a 'name' or 'label' or 'abbr'
       $id = $option[$key] ?? $option['id'] ?? $option['name'];
-      $result[$id] = $option[$value] ?? $option['label'] ?? $option['name'];
+      $result[$id] = $option[$value] ?? $option['label'] ?? $option['name'] ?? $option['id'];
     }
     return $result;
   }
