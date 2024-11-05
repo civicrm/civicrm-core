@@ -446,7 +446,7 @@ function afform_civicrm_permission(&$permissions) {
  * @see CRM_Utils_Hook::permission_check()
  */
 function afform_civicrm_permission_check($permission, &$granted, $contactId) {
-  // Micro-optimization - this function may get hit a lot.
+  // This function may get hit a lot. Try to keep the conditionals efficient.
   if (str_starts_with($permission, '@afform:') && strlen($permission) >= 9) {
     [, $name] = explode(':', $permission, 2);
     // Delegate permission check to APIv4
