@@ -1,9 +1,12 @@
+1.1.1
+ - FIXED metadata - RiverLea version numbering in variables file.
+
 1.1.0
  - CHANGED info.xml version to 5.80 to synch with CiviCRM core (github.com/31389)
  - FIXED clipping of dropdown on sidescroll tables (#73).
  - FIXED Wallbrook, table header bg, should be white.
  - CHANGED readme.
- - ADDED front-end type across all Streams is reset to 'inherit', over-riding the Stream's font to instead use the CMS front-end theme font. For Standalone, inherit, will default to the System font stack.
+ - ADDED front-end type across all Streams is reset to 'inherit', over-riding the Stream's font to instead use the CMS front-end theme font(s). For Standalone, inherit will default to the System font stack.
 
 1.0.12
  - ADDED z-index to sticky table headers: ref github/#31396
