@@ -550,11 +550,27 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
     return Security::singleton()->getCMSPermissionsUrlParams();
   }
 
+  /**
+   * Respond that permission has been denied.
+   *
+   * Note that there are a few subtle variations on this:
+   *
+   * - For authenticated users with a session/cookie, it uses "statusBounce()" to show popup (on prior page or dashboard page).
+   * - For authenticated users with stateless requests, it shows formatted error page.
+   * - For unauthenticated users, it shows login screen with an error blurb.
+   */
   public function permissionDenied() {
-    // If not logged in, they need to.
-    if (CRM_Core_Session::singleton()->get('ufID')) {
+    $session = CRM_Core_Session::singleton();
+    $isAuthenticated = (bool) $session->get('ufID');
+    $useSession = ($session->get('authx')['useSession'] ?? TRUE);
+
+    if ($isAuthenticated && $useSession) {
       // They are logged in; they're just not allowed this page.
       CRM_Core_Error::statusBounce(ts("Access denied"), CRM_Utils_System::url('civicrm'));
+      return;
+    }
+    elseif ($isAuthenticated && !$useSession) {
+      return (new CRM_Standaloneusers_Page_PermissionDenied())->run();
     }
     else {
       http_response_code(403);
