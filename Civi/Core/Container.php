@@ -194,7 +194,7 @@ class Container {
       // For Caches that we don't really care about the ttl for and/or maybe accessed
       // fairly often we use the fastArrayDecorator which improves reads and writes, these
       // caches should also not have concurrency risk.
-      $fastArrayCaches = ['groups', 'navigation', 'customData', 'fields', 'contactTypes', 'metadata', 'js_strings'];
+      $fastArrayCaches = ['groups', 'navigation', 'customData', 'fields', 'contactTypes', 'metadata', 'js_strings', 'long', 'angular'];
       if (in_array($cacheSvc, $fastArrayCaches)) {
         $definitionParams['withArray'] = 'fast';
       }
