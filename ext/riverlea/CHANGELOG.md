@@ -1,11 +1,25 @@
+1.0.12
+ - ADDED z-index to sticky table headers: ref github/#31396
+ - ADDED crm-accordion-settings ref github/#31293
+ - CHANGED accordion file layout (order/headings)
+ - ADDED 5.80 version compatability to info.xml
+ - FIXED Font Awesome icon spinner off-center
+ - FIXED missing bg images in Form Builder dropdown (#71)
+ - FIXED front-end select2 dropdown input search too wide
+ - FIXED front-end date/time wrapping issue (#72)
+ - FIXED front-end date/time height inconsistent
+ - FIXED front-end FB fieldset titles beaten by Bootstrap - colour & padding
+ - FIXED stops FB flexbox front-end for inline column collapsing
+ - FIXED dropdown table select checkbox wrapping in Walbrook
+
 1.0.11
  - ADDED inline block for code tags inside paragraphs (#69)
  - ADDED fixed width for WordPress checkbox/radios (#68)
- - CHANGED checkbox list checkbox alignment to use grid alignment rather than pixels
- - CHANGED font-weight on input labels in Mineetta to 600, not 'bold' (#66)
+ - CHANGED checkbox list alignment to use grid align rather than pixels
+ - CHANGED font-weight on input labels in Minetta to 600, not 'bold' (#66)
  - ADDED gap between two inline buttons
- - ADDED credit card FA icons for contribution pages (previously image sprites)
- - FIXED table form label cell padding didn't match form input cells
+ - ADDED credit card FA icons for contribution pages (originally image sprites)
+ - FIXED padding on table form label cells didn't match form input cells
  - FIXED flexbox with help icons breaking table structure (#68)
  - ADDED bg colour and border for pay later options in events/contribution creation to help differentiate
  - CHANGED bootstrap small button icon height is fixed to keep button groups matching heights

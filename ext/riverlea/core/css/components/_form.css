@@ -372,6 +372,7 @@ input.crm-form-checkbox) + label {
 
 .crm-container input[type="file"] {
     height: auto;
+    padding: var(--crm-s);
 }
 
 /* Select2 */
@@ -623,10 +624,12 @@ input.crm-form-checkbox) + label {
 }
 .crm-form-date-wrapper {
     display: flex;
+    align-items: center;
+    flex-flow: wrap;
+    gap: var(--crm-flex-gap);
 }
 .crm-container input.crm-form-time {
     width: 9ch;
-    margin-left: var(--crm-flex-gap);
 }
 .crm-container input.dateplugin,
 .crm-container input.crm-form-date,

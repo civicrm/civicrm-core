@@ -17,7 +17,7 @@ a.af-api4-action-idle {
     padding: var(--crm-f-form-padding)
 }
 .af-container.af-layout-cols > *,
-.af-container.af-layout-cols > * {
+.af-container.af-layout-inline > * {
     flex: 1;
 }
 .af-container.af-layout-inline {
@@ -65,7 +65,7 @@ af-form {
     padding: var(--crm-form-block-padding);
     padding-top: 50px !important;
 }
-.af-container-style-pane > .af-title {
+#bootstrap-theme .af-container-style-pane > .af-title {
     background-color: var(--crm-c-background5);
     color: var(--crm-c-light-text);
     border-radius: var(--crm-form-block-border-radius) var(--crm-form-block-border-radius) 0 0;
@@ -74,6 +74,7 @@ af-form {
     left: 0;
     width: 100%;
     padding: var(--crm-m) var(--crm-r);
+    margin-top: 0;
 }
 
 /* Admin edit links */

@@ -47,7 +47,7 @@
 
 #afGuiEditor .panel-heading .af-gui-canvas-control-buttons button,
 #afGuiEditor .af-gui-remove-entity,
-#afGuiEditor .af-gui-field-select-in-dropdown button /* icon-only buttons */ {
+#bootstrap-theme #afGuiEditor .af-gui-field-select-in-dropdown button /* icon-only buttons */ {
 	padding: 0;
     margin: 0;
     max-height: 32px;

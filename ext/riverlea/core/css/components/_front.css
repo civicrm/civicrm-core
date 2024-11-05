@@ -90,6 +90,7 @@ af-form > fieldset > legend {
 .crm-container.crm-public input[type="text"],
 .crm-container.crm-public input[type="password"],
 .crm-container.crm-public input[type="email"],
+.crm-container.crm-public input,
 .crm-container.crm-public select,
 .crm-container.crm-public textarea,
 .crm-container.crm-public .select2-container .select2-choice {
@@ -97,6 +98,9 @@ af-form > fieldset > legend {
     padding: var(--crm-f-input-padding);
     font-size: var(--crm-f-input-font-size);
     min-width: var(--crm-f-input-width);
+}
+.crm-container.crm-public .select2-search input[type="text"] {
+    min-width: unset;
 }
 .crm-container.crm-public input[type="radio"] {
     margin: var(--crm-s2) var(--crm-s3) 0 0;
