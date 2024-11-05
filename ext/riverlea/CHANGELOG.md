@@ -1,5 +1,7 @@
 1.1.0
  - CHANGED info.xml version to 5.80 to syn with CiviCRM core (github.com/31389)
+ - FIXED clipping of dropdown on sidescroll tables (#73).
+ - FIXED Wallbrook, table header bg, should be white.
 
 1.0.12
  - ADDED z-index to sticky table headers: ref github/#31396

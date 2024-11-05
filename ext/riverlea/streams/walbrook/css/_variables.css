@@ -85,7 +85,7 @@
 --crm-table-outside-border: var(--crm-c-divider);
 --crm-table-background: var(--crm-c-background);
 --crm-table-header-bottom: var(--crm-c-divider);
---crm-table-header-bg: var(--crm-c-background3);
+--crm-table-header-bg: var(--crm-c-background);
 --crm-table-even-row: #fff;
 --crm-table-odd-row: var(--crm-c-gray-050);
 --crm-table-even-hover: var(--crm-c-gray-025);
