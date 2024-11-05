@@ -2,7 +2,10 @@
 
 namespace E2E\AfformMock;
 
+use Civi\Authx\AuthxRequestBuilder;
 use CRM_Core_DAO;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Uri;
 
 /**
  * Perform some tests against `mockPublicForm.aff.html`.
@@ -16,6 +19,25 @@ use CRM_Core_DAO;
 class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
 
   protected $formName = 'mockPublicForm';
+
+  /**
+   * These patterns are hints to indicate whether the page-view is authenticated in the CMS.
+   * @var string[]
+   */
+  private $sessionCues = [
+    'Backdrop' => '/<body.* class=".* logged-in[ "]/',
+    'Drupal' => '/<body.* class=".* logged-in[ "]/',
+    'Drupal8' => '/<body.* class=".* user-logged-in[ "]/',
+  ];
+
+  protected ?AuthxRequestBuilder $authxRequest;
+
+  protected function setUp(): void {
+    parent::setUp();
+    $this->authxRequest = (new AuthxRequestBuilder())
+      ->addFlow('afformpage', [$this, 'authAfformPage'])
+      ->addCred('afformjwt', [$this, 'credAfformJwt']);
+  }
 
   public function testGetPage() {
     $r = $this->createGuzzle()->get('civicrm/mock-public-form');
@@ -152,14 +174,7 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
    * We do a sniff test to see if a few other exampleswork.
    */
   public function testAuthenticatedUrl_CustomJwt(): void {
-    $sessionCues = [
-      // These patterns are hints to indicate whether the page-view is authenticated in the CMS.
-      'Backdrop' => '/<body.* class=".* logged-in[ "]/',
-      'Drupal' => '/<body.* class=".* logged-in[ "]/',
-      'Drupal8' => '/<body.* class=".* user-logged-in[ "]/',
-    ];
-
-    if (!isset($sessionCues[CIVICRM_UF])) {
+    if (!isset($this->sessionCues[CIVICRM_UF])) {
       $this->markTestIncomplete(sprintf('Cannot run test for this environment (%s). Need session-cues to identify logged-in page-views.', CIVICRM_UF));
     }
 
@@ -181,9 +196,97 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
 
     // This might be nicer as 4 separate tests.
     $this->assertBodyRegexp('/Invalid credential/', $sendRequest(['scope' => 'wrong-scope']));
-    $this->assertNotBodyRegexp($sessionCues[CIVICRM_UF], $sendRequest(['userMode' => 'ignore']));
-    $this->assertBodyRegexp($sessionCues[CIVICRM_UF], $sendRequest(['userMode' => 'optional']));
-    $this->assertBodyRegexp($sessionCues[CIVICRM_UF], $sendRequest(['userMode' => 'require']));
+    $this->assertNotBodyRegexp($this->sessionCues[CIVICRM_UF], $sendRequest(['userMode' => 'ignore']));
+    $this->assertBodyRegexp($this->sessionCues[CIVICRM_UF], $sendRequest(['userMode' => 'optional']));
+    $this->assertBodyRegexp($this->sessionCues[CIVICRM_UF], $sendRequest(['userMode' => 'require']));
+  }
+
+  public function getAuthUrlPermissionExamples(): array {
+    // What kind of users might request the form?
+    $asDemo = ['xheader', 'jwt', 'getDemoCID'];
+    $asLebowski = ['xheader', 'jwt', 'getLebowskiCID'];
+    $asLebowskiPageToken = ['afformpage', 'afformjwt', 'getLebowskiCID'];
+    $asAnon = ['none', 'none', NULL];
+
+    $cases = [];
+    // Array(array $formSpec, string $flowType, string $credType, string $cidProvider, bool $expectRencdered)
+
+    $permAlways = ['permission' => '*always allow*'];
+    $cases['always-demo'] = [$permAlways, ...$asDemo, TRUE];
+    $cases['always-lebowski-xhj'] = [$permAlways, ...$asLebowski, TRUE];
+    $cases['always-lebowski-aff'] = [$permAlways, ...$asLebowskiPageToken, TRUE];
+    $cases['always-anon'] = [$permAlways, ...$asAnon, TRUE];
+
+    $permAuthenticated = ['permission' => '*authenticated*'];
+    $cases['auth-demo'] = [$permAuthenticated, ...$asDemo, TRUE];
+    $cases['auth-lebowski-xhj'] = [$permAuthenticated, ...$asLebowski, TRUE];
+    $cases['auth-lebowski-aff'] = [$permAuthenticated, ...$asLebowskiPageToken, TRUE];
+    $cases['auth-anon'] = [$permAuthenticated, ...$asAnon, FALSE];
+
+    $permAdmin = ['permission' => 'administer CiviCRM'];
+    $cases['admin-demo'] = [$permAdmin, ...$asDemo, TRUE];
+    $cases['admin-lebowski-xhj'] = [$permAdmin, ...$asLebowski, FALSE];
+    $cases['admin-lebowski-aff'] = [$permAdmin, ...$asLebowskiPageToken, FALSE];
+    $cases['admin-anon'] = [$permAdmin, ...$asAnon, FALSE];
+
+    $permSecretLink = ['permission' => '@afformPageToken'];
+    $cases['secret-demo'] = [$permSecretLink, ...$asDemo, FALSE];
+    $cases['secret-lebowski-xhj'] = [$permSecretLink, ...$asLebowski, FALSE];
+    $cases['secret-lebowski-aff'] = [$permSecretLink, ...$asLebowskiPageToken, TRUE];
+    $cases['secret-anon'] = [$permSecretLink, ...$asAnon, FALSE];
+
+    $permAccessCiviOrSecretLink = ['permission' => ['access CiviCRM', '@afformPageToken'], 'permission_operator' => 'OR'];
+    $cases['or-demo'] = [$permAccessCiviOrSecretLink, ...$asDemo, TRUE];
+    $cases['or-lebowski-xhj'] = [$permAccessCiviOrSecretLink, ...$asLebowski, FALSE];
+    $cases['or-lebowski-aff'] = [$permAccessCiviOrSecretLink, ...$asLebowskiPageToken, TRUE];
+
+    $permAccessCiviAndSecretLink = ['permission' => ['access CiviCRM', '@afformPageToken'], 'permission_operator' => 'AND'];
+    $cases['and-demo'] = [$permAccessCiviAndSecretLink, ...$asDemo, FALSE];
+    $cases['and-lebowski-xhj'] = [$permAccessCiviAndSecretLink, ...$asLebowski, FALSE];
+    $cases['and-lebowski-aff'] = [$permAccessCiviAndSecretLink, ...$asLebowskiPageToken, FALSE];
+
+    return $cases;
+  }
+
+  /**
+   * The general purpose of the test is to see how special permissions -- like '*always allow*',
+   * '*authenticated*', or '@afformPageToken' behave.
+   *
+   * @param array $formSpec
+   *   Configuration options to apply the form.
+   *   Ex: ['permission' => 'administer CiviCRM']
+   * @param string $flowType
+   *   How to transmit authentication info for this HTTP request.
+   *   Ex: 'param', 'header', 'xheader'
+   * @param string $credType
+   *   How to encode the credential.
+   *   Ex: 'pass', 'jwt', 'afformjwt'
+   * @param string|null $contactMethod
+   *   For an authenticated page-view, which contact should we use?
+   *   Ex: 'getLebowskiCID', 'getDemoCID'
+   * @param bool $expectRendered
+   *   Should the form be displayed?
+   * @dataProvider getAuthUrlPermissionExamples
+   */
+  public function testSpecialPermissions(array $formSpec, string $flowType, string $credType, ?string $contactMethod, bool $expectRendered): void {
+    \Civi\Api4\Afform::update(FALSE)
+      ->addWhere('name', '=', $this->formName)
+      ->setValues($formSpec)
+      ->execute();
+
+    $contactId = $contactMethod ? $this->$contactMethod() : NULL;
+    $http = $this->createGuzzle(['http_errors' => FALSE]);
+    $formUrl = \Civi::url('frontend://civicrm/mock-public-form', 'a');
+    $request = $this->authxRequest->applyAuth(new Request('GET', (new Uri($formUrl))), $credType, $flowType, $contactId);
+    $response = $http->send($request);
+
+    if ($expectRendered) {
+      $this->assertStatusCode(200, $response);
+      $this->assertContentType('text/html', $response);
+    }
+    else {
+      $this->assertPageNotShown($response);
+    }
   }
 
   protected function renderTokens($cid, $body, $format) {
@@ -291,6 +394,25 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
     // We make another request in the same session. Is it the expected contact?
     $response = $http->get('civicrm/authx/id');
     $this->assertContactJson($contactId, $response);
+  }
+
+  public function authAfformPage(Request $request, $cred) {
+    $query = $request->getUri()->getQuery();
+    return $request->withUri(
+      $request->getUri()->withQuery($query . '&_aff=' . urlencode($cred))
+    );
+  }
+
+  public function credAfformJwt(int $cid, array $claims = []) {
+    $defaults = [
+      'exp' => \CRM_Utils_Time::time() + (60 * 60),
+      'sub' => 'cid:' . $cid,
+      'scope' => 'afform',
+      'afform' => $this->formName,
+    ];
+
+    $token = \Civi::service('crypto.jwt')->encode(array_merge($defaults, $claims));
+    return 'Bearer ' . $token;
   }
 
 }
