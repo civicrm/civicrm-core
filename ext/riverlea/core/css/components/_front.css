@@ -2,8 +2,13 @@
 
 /* General */
 
+.crm-container.crm-public {
+    --crm-font: inherit;
+    --crm-font-bold: inherit;
+    --crm-font-italic: inherit;
+    --crm-font-bold-italic: inherit;
+}
 .crm-container.crm-public #crm-main-content-wrapper {
-    /* max-width: var(--crm-f-form-width); */
     margin-inline: auto;
     width: clamp(calc(var(--crm-f-form-width) / 2),100%,var(--crm-f-form-width));
 }
