@@ -1,3 +1,6 @@
+1.1.0
+ - CHANGED info.xml version to 5.80 to syn with CiviCRM core (github.com/31389)
+
 1.0.12
  - ADDED z-index to sticky table headers: ref github/#31396
  - ADDED crm-accordion-settings ref github/#31293
