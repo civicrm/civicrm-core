@@ -152,9 +152,13 @@
 <tr>
   <td class="label nowrap">{ts}Text Message{/ts}</td>
   <td>
-    {$report.mailing.body_text|mb_truncate:30|escape|nl2br}
-    <br />
-    <strong><a class="crm-popup" href='{$textViewURL}'><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}View complete message{/ts}</a></strong>
+    {if $report.mailing.sms_provider_id}
+      {$report.mailing.body_text|escape|nl2br}
+    {else}
+      {$report.mailing.body_text|mb_truncate:100|escape|nl2br}
+      <br />
+      <strong><a class="crm-popup" href='{$textViewURL}'><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}View complete message{/ts}</a></strong>
+    {/if}
   </td>
 </tr>
 {/if}
@@ -188,25 +192,24 @@
 <legend>
     {ts}Mailing Settings{/ts}
 </legend>
-{strip}
 <table class="crm-info-panel">
 <tr><td class="label">{ts}Mailing Name{/ts}</td><td>{$report.mailing.name}</td></tr>
-<tr><td class="label">{ts}Subject{/ts}</td><td>{$report.mailing.subject}</td></tr>
-<tr><td class="label">{ts}From{/ts}</td><td>{$report.mailing.from_name} &lt;{$report.mailing.from_email}&gt;</td></tr>
-<tr><td class="label">{ts}Reply-to email{/ts}</td><td>{$report.mailing.replyto_email|escape:'htmlall'}</td></tr>
-
-<tr><td class="label">{ts}Forward replies{/ts}</td><td>{if $report.mailing.forward_replies}{ts}Enabled{/ts}{else}{ts}Disabled{/ts}{/if}</td></tr>
-<tr><td class="label">{ts}Auto-respond to replies{/ts}</td><td>{if $report.mailing.auto_responder}{ts}Enabled{/ts}{else}{ts}Disabled{/ts}{/if}</td></tr>
-
-<tr><td class="label">{ts}Open tracking{/ts}</td><td>{if $report.mailing.open_tracking}{ts}Enabled{/ts}{else}{ts}Disabled{/ts}{/if}</td></tr>
-<tr><td class="label">{ts}URL Click-through tracking{/ts}</td><td>{if $report.mailing.url_tracking}{ts}Enabled{/ts}{else}{ts}Disabled{/ts}{/if}</td></tr>
-{if $public_url}<td class="label">{ts}Public url{/ts}</td><td><a href="{$public_url}"> {$public_url}</a></td></tr>{/if}
-{if $report.mailing.campaign}
-<tr><td class="label">{ts}Campaign{/ts}</td><td>{$report.mailing.campaign}</td></tr>
+{if !$report.mailing.sms_provider_id}
+  <tr><td class="label">{ts}Subject{/ts}</td><td>{$report.mailing.subject}</td></tr>
+  <tr><td class="label">{ts}From{/ts}</td><td>{$report.mailing.from_name} &lt;{$report.mailing.from_email}&gt;</td></tr>
+  <tr><td class="label">{ts}Reply-to email{/ts}</td><td>{$report.mailing.replyto_email|escape:'htmlall'}</td></tr>
+  <tr><td class="label">{ts}Forward replies{/ts}</td><td>{if $report.mailing.forward_replies}{ts}Enabled{/ts}{else}{ts}Disabled{/ts}{/if}</td></tr>
+  <tr><td class="label">{ts}Auto-respond to replies{/ts}</td><td>{if $report.mailing.auto_responder}{ts}Enabled{/ts}{else}{ts}Disabled{/ts}{/if}</td></tr>
+  <tr><td class="label">{ts}Open tracking{/ts}</td><td>{if $report.mailing.open_tracking}{ts}Enabled{/ts}{else}{ts}Disabled{/ts}{/if}</td></tr>
+  <tr><td class="label">{ts}URL Click-through tracking{/ts}</td><td>{if $report.mailing.url_tracking}{ts}Enabled{/ts}{else}{ts}Disabled{/ts}{/if}</td></tr>
 {/if}
-
+{if $public_url}
+  <tr><td class="label">{ts}Public url{/ts}</td><td><a href="{$public_url}"> {$public_url}</a></td></tr>
+{/if}
+{if $report.mailing.campaign}
+  <tr><td class="label">{ts}Campaign{/ts}</td><td>{$report.mailing.campaign}</td></tr>
+{/if}
 </table>
-{/strip}
 </fieldset>
 <div class="action-link">
     <a href="{$backUrl}" ><i class="crm-i fa-chevron-left" aria-hidden="true"></i> {$backUrlTitle}</a>
