@@ -24,9 +24,21 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class Tokens extends AutoService implements EventSubscriberInterface {
 
-  private static $placement = 'msg_token_login';
+  private static $placement = 'msg_token';
 
-  private static $prefix = 'afformLogin';
+  /**
+   * Token-picker recommends the notation `{login.myFormUrl}`
+   * @var string
+   */
+  private static $prefix = 'login';
+
+  /**
+   * For compatibility with message-templates generated before 5.79, we
+   * also support notation `{afform.myFormUrl}`.
+   *
+   * @var string
+   */
+  private static $oldPrefix = 'afform';
 
   public static function getSubscribedEvents(): array {
     if (!\CRM_Extension_System::singleton()->getMapper()->isActiveModule('authx')) {
@@ -47,7 +59,8 @@ class Tokens extends AutoService implements EventSubscriberInterface {
    * @see CRM_Utils_Hook::alterMailContent
    */
   public static function applyCkeditorWorkaround(GenericHookEvent $e) {
-    $pat = ';https?://(\{' . preg_quote(static::$prefix, ';') . '.*Url\});';
+    $prefixes = '(' . preg_quote(static::$prefix, ';') . '|' . preg_quote(static::$oldPrefix, ';') . ')';
+    $pat = ';https?://(\{' . $prefixes . '\..*Url\});';
     foreach (array_keys($e->content) as $field) {
       if (is_string($e->content[$field])) {
         $e->content[$field] = preg_replace($pat, '$1', $e->content[$field]);
@@ -67,20 +80,22 @@ class Tokens extends AutoService implements EventSubscriberInterface {
   }
 
   /**
-   * Substitute any tokens of the form `{afformLogin.myFormUrl}` or `{afformLogin.myFormLink}` with actual values.
+   * Substitute any tokens of the form `{login.myFormUrl}` or `{login.myFormLink}` with actual values.
    */
   public function evaluateTokens(\Civi\Token\Event\TokenValueEvent $e): void {
     $activeTokens = $e->getTokenProcessor()->getMessageTokens();
-    if (empty($activeTokens[static::$prefix])) {
+    if (empty($activeTokens[static::$prefix]) && empty($activeTokens[static::$oldPrefix])) {
       return;
     }
 
     $tokenForms = static::getTokenForms();
-    foreach ($tokenForms as $formName => $afform) {
-      foreach ($e->getRows() as $row) {
-        $url = self::createUrl($afform, $row->context['contactId']);
-        $row->format('text/plain')->tokens(static::$prefix, "{$formName}Url", $url);
-        $row->format('text/html')->tokens(static::$prefix, "{$formName}Link", sprintf('<a href="%s">%s</a>', htmlentities($url), htmlentities($afform['title'] ?? $afform['name'])));
+    foreach ([static::$prefix, static::$oldPrefix] as $prefix) {
+      foreach ($tokenForms as $formName => $afform) {
+        foreach ($e->getRows() as $row) {
+          $url = self::createUrl($afform, $row->context['contactId']);
+          $row->format('text/plain')->tokens($prefix, "{$formName}Url", $url);
+          $row->format('text/html')->tokens($prefix, "{$formName}Link", sprintf('<a href="%s">%s</a>', htmlentities($url), htmlentities($afform['title'] ?? $afform['name'])));
+        }
       }
     }
   }

@@ -5,7 +5,7 @@ use CRM_Afform_ExtensionUtil as E;
 // Option group for Afform.placement field
 return [
   [
-    'name' => 'AfformPlacement:msg_token_login',
+    'name' => 'AfformPlacement:msg_token',
     'entity' => 'OptionValue',
     'cleanup' => 'always',
     'update' => 'always',
@@ -13,8 +13,8 @@ return [
       'version' => 4,
       'values' => [
         'option_group_id.name' => 'afform_placement',
-        'name' => 'msg_token_login',
-        'value' => 'msg_token_login',
+        'name' => 'msg_token',
+        'value' => 'msg_token',
         'label' => E::ts('Message Tokens (Login)'),
         'is_reserved' => TRUE,
         'is_active' => TRUE,
