@@ -586,6 +586,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    */
   public function permissionDenied() {
     // If not logged in, they need to.
+    $session = CRM_Core_Session::singleton();
     $useSession = ($session->get('authx')['useSession'] ?? TRUE);
     if ($this->isUserLoggedIn() && $useSession) {
       // They are logged in; they're just not allowed this page.
