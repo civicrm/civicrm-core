@@ -454,7 +454,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       $updateMode = array_key_exists($name, $defaults) && !CRM_Utils_System::isNull($defaults[$name]);
       if ($updateMode) {
         foreach ($defaults[$name] as $locationEntity) {
-          $hasPrimary = $locationEntity['is_primary'] ?: $hasPrimary;
+          $hasPrimary = (bool) ($locationEntity['is_primary'] ?? $hasPrimary);
         }
       }
       else {

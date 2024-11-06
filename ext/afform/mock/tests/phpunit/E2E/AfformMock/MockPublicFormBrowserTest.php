@@ -35,7 +35,7 @@ class MockPublicFormBrowserTest extends Civi\Test\MinkBase {
     $this->assertEquals('Donald', $this->getContact($donny)['middle_name'], 'Middle name has original value');
 
     $session = $this->mink->getSession();
-    $url = $this->renderToken('{afform.mockPublicFormUrl}', $donny);
+    $url = $this->renderToken('{form.mockPublicFormUrl}', $donny);
     $this->visit($url);
 
     // Goal: Wait for the fields to be populated. But how...?
