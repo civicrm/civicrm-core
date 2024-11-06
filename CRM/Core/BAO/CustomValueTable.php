@@ -131,12 +131,12 @@ class CRM_Core_BAO_CustomValueTable {
                   $value = NULL;
                 }
               }
-              elseif ($value == NULL || $value === '') {
-                $type = 'Timestamp';
-                $value = NULL;
-              }
               else {
                 $type = 'Integer';
+              }
+              if ($value == NULL || $value === '') {
+                $type = 'Timestamp';
+                $value = NULL;
               }
               break;
 
