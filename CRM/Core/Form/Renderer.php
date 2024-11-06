@@ -427,8 +427,11 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
       // NOTE: If we ever needed to support arguments in this link other than reset=1 we could split $path here if it contains a ?
       $url = CRM_Utils_System::url($path, 'reset=1');
       $icon = CRM_Core_Page::crmIcon('fa-wrench', ts('Edit %1 Options', [1 => $field->getLabel() ?: ts('Field')]));
+      // tabIndex is set to -1 so the tab bypasses it - this makes sense since the edit
+      // link it outside of the main form flow & is a feature only present for admins
+      // https://lab.civicrm.org/dev/core/-/issues/5577
       $el['html'] .= <<<HEREDOC
- <a href="$url" class="crm-option-edit-link medium-popup crm-hover-button" target="_blank" data-option-edit-path="$path">$icon</a>
+ <a href="$url" tabindex="-1" class="crm-option-edit-link medium-popup crm-hover-button" target="_blank" data-option-edit-path="$path">$icon</a>
 HEREDOC;
     }
   }
