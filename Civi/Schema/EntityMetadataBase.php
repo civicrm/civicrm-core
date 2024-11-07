@@ -134,7 +134,7 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
 
   private function getSqlOptions(array $field, bool $includeDisabled = FALSE): array {
     $pseudoconstant = $field['pseudoconstant'];
-    $cacheKey = 'EntityMetadataGetSqlOptions' . md5(json_encode($pseudoconstant));
+    $cacheKey = 'EntityMetadataGetSqlOptions' . \CRM_Core_Config::domainID() . '_' . \CRM_Core_I18n::getLocale() . md5(json_encode($pseudoconstant));
     $entity = \Civi::table($pseudoconstant['table']);
     $cache = \Civi::cache('metadata');
     $options = $cache->get($cacheKey);
