@@ -2405,16 +2405,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       ];
       $values['location'] = CRM_Core_BAO_Location::getValues($locationParams);
 
-      $ufJoinParams = [
-        'entity_table' => 'civicrm_event',
-        'entity_id' => $eventID,
-        'module' => 'CiviEvent',
-      ];
-
-      [$custom_pre_id, $custom_post_ids] = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
-
-      $values['custom_pre_id'] = $custom_pre_id;
-      $values['custom_post_id'] = $custom_post_ids;
       //for tasks 'Change Participant Status' and 'Update multiple Contributions' case
       //and cases involving status updation through ipn
       // whatever that means!
