@@ -3603,11 +3603,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
   /**
    * Complete an order.
    *
-   * Do not call this directly - use the contribution.completetransaction api as this function is being refactored.
-   *
-   * Currently overloaded to complete a transaction & repeat a transaction - fix!
-   *
-   * Moving it out of the BaseIPN class is just the first step.
+   * @todo This function needs further simplification/cleanup. Signature may change in the future. Do not call outside of core!
    *
    * @param array $input
    * @param int $recurringContributionID
@@ -3621,12 +3617,9 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    *
    * @return array
    * @throws \CRM_Core_Exception
+   * @internal
    */
   public static function completeOrder($input, $recurringContributionID, $contributionID, $isPostPaymentCreate = FALSE, $disableActionsOnCompleteOrder = FALSE) {
-    if (!$contributionID) {
-      CRM_Core_Error::deprecatedFunctionWarning('v3api Contribution.repeattransaction. This handling will be removed around 5.70 (calling this function directly has never been supported outside core anyway)');
-      return self::repeatTransaction($input, $recurringContributionID);
-    }
     $transaction = new CRM_Core_Transaction();
 
     $inputContributionWhiteList = [
