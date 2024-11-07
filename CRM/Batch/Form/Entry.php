@@ -467,10 +467,10 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   public function setDefaultValues() {
+    $defaults = [];
     if (empty($this->_fields)) {
-      return;
+      return $defaults;
     }
-
     // for add mode set smart defaults
     if ($this->_action & CRM_Core_Action::ADD) {
       $currentDate = date('Y-m-d H-i-s');
@@ -491,8 +491,10 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     else {
       // get the cached info from data column of civicrm_batch
       $data = CRM_Core_DAO::getFieldValue('CRM_Batch_BAO_Batch', $this->_batchId, 'data');
-      $defaults = json_decode($data, TRUE);
-      $defaults = $defaults['values'];
+      if ($data) {
+        $defaults = json_decode($data, TRUE);
+        $defaults = $defaults['values'];
+      }
     }
 
     return $defaults;
