@@ -798,10 +798,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $result = $this->processFormSubmission($contactID);
     }
     catch (CRM_Core_Exception $e) {
+      \Civi::log()->error('CRM_Contribute_Form_Contribution_Confirm::PostProcess processFormSubmissionException: ' . $e->getMessage());
       $this->bounceOnError($e->getMessage());
     }
 
     if (is_array($result) && !empty($result['is_payment_failure'])) {
+      \Civi::log()->error('CRM_Contribute_Form_Contribution_Confirm::PostProcess is_payment_failure: ' . $result['error']->getMessage());
       $this->bounceOnError($result['error']->getMessage());
     }
     // Presumably this is for hooks to access? Not quite clear & perhaps not required.
