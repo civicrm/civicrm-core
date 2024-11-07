@@ -2029,7 +2029,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     elseif ($fieldName === 'soft_credit_type') {
       $name = "soft_credit_type[$rowNumber]";
       $form->add('select', $name, $title,
-        CRM_Core_OptionGroup::values("soft_credit_type"), ['placeholder' => TRUE]
+        CRM_Core_OptionGroup::values("soft_credit_type"), FALSE, ['placeholder' => TRUE]
       );
       //CRM-15350: choose SCT field default value as 'Gift' for membership use
       //else (for contribution), use configured SCT default value
