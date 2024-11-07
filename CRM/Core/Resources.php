@@ -378,7 +378,8 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
       // it appears that all callers use 'html-header' (either implicitly or explicitly).
       throw new \CRM_Core_Exception("Error: addCoreResources only supports html-header");
     }
-    if (!self::isAjaxMode()) {
+    // Skip adding full-page resources when returning an ajax snippet or in printer mode (print.tpl has its own css)
+    if (!self::isAjaxMode() && intval($_GET['snippet'] ?? 0) !== CRM_Core_Smarty::PRINT_PAGE) {
       $this->addBundle('coreResources');
       $this->addCoreStyles($region);
       if (!CRM_Core_Config::isUpgradeMode()) {

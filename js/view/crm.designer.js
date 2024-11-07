@@ -268,7 +268,7 @@
       $.post(CRM.url("civicrm/ajax/inline"), {
         'qfKey': CRM.profilePreviewKey,
         'class_name': 'CRM_UF_Form_Inline_Preview',
-        'snippet': 1,
+        'snippet': 2, // CRM_Core_Smarty::PRINT_SNIPPET
         'ufData': JSON.stringify({
           ufGroup: this.model.toStrictJSON(),
           ufFieldCollection: this.model.getRel('ufFieldCollection').toSortedJSON()
