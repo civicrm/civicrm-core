@@ -52,7 +52,17 @@
       {/if}
       {foreach from=$fields item=field key=fieldName}
         <div class="crm-grid-cell">
-          {if $field.name|substr:0:11 ne 'soft_credit' and $field.name ne 'trxn_id'}
+          {* do not copy down for trxn_id as that would be invalid.
+          The reason for the other 2 fields to be missing copy functionality
+          is undocumented / lost in the mists of time.
+          It may be because the amount was seen as unlikely to be a copy-down candidate
+           - either that or it was left out of scope because these fields do not follow the
+           naming convention in batchCopy.tpl, making it easier to exclude than address,
+           or because the intention for future support for multiple credits per row was
+           incompatible.
+           https://issues.civicrm.org/jira/browse/CRM-12653
+           *}
+          {if $field.name ne 'trxn_id' && $field.name ne 'soft_credit_amount' && $field.name ne 'soft_credit'}
           {copyIcon name=$field.name title=$field.title}
           {/if}{$field.title}
         </div>
