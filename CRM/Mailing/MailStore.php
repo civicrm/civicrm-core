@@ -166,7 +166,7 @@ class CRM_Mailing_MailStore {
     $mails = [];
     $parser = new ezcMailParser();
     //set property text attachment as file CRM-5408
-    $parser->options->parseTextAttachmentsAsFiles = TRUE;
+    $parser->options->parseMultipartMixedTextAttachmentsAsFiles = TRUE;
 
     foreach ($set->getMessageNumbers() as $nr) {
       if ($this->_debug) {
