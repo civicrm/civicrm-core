@@ -1,5 +1,16 @@
+1.1.2 / 5.80.1
+ - FIXED padding in event config dropdown
+ - CHANGED padding in HackneyBrook dialogs from 0 to --crm-s.
+ - FIXED reset of table-scrolling with dropdowns (e.g. Event dashboard dropdown was clipping the dropdown)
+ - FIXED dropdown link width (reset in WordPress)
+ - FIXED contact dashboard action links dropdown delete icon color
+ - FIXED contact dashboard inline name edit overflow hidden reset
+ - FIXED contact dashboard white text on white bg for contact name inline edit in Walbrook
+ - CHANGED crm-accordion-settings body padding changed from 0 to match crm-accordion-bold
+ - FIXED focus colour on Select2 now should display on tab/focus (github.com/31433)
+
 1.1.1
- - FIXED metadata - RiverLea version numbering in variables file.
+ - FIXED metadata - RiverLea version numbering in variables file & info.xml
 
 1.1.0
  - CHANGED info.xml version to 5.80 to synch with CiviCRM core (github.com/31389)

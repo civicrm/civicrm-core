@@ -83,10 +83,6 @@
 .crm-container div.crm-inline-edit.form .crm-edit-help {
     display: none !important;
 }
-#crm-contactname-content > .crm-inline-block-content:hover .crm-edit-help,
-#crm-contactname-content > .crm-inline-block-content:focus .crm-edit-help {
-    color: var(--crm-dash-header-col);
-}
 .crm-container .crm-address-block+.crm-address-block .add-new .crm-summary-row {
     display: none;
 }
@@ -128,6 +124,9 @@ div.crm-inline-edit-form div.crm-clear {
 .crm-inline-edit-form div.crm-summary-row {
     border: 0 solid transparent;
     width: 100%;
+}
+#contactname-block .crm-inline-edit .crm-container {
+    overflow: scroll !important; /* vs inline css */
 }
 .crm-inline-edit-form div.crm-summary-row div.crm-label,
 .crm-inline-edit-form div.crm-summary-row .label {
@@ -270,6 +269,9 @@ div.crm-inline-edit-form div.crm-clear {
     background: var(--crm-dropdown-alert-bg);
     color: var(--crm-c-alert-text);
     border-radius: var(--crm-roundness);
+}
+#crm-contact-actions-list a.delete .crm-i.fa-trash::before {
+    color: var(--crm-c-alert-text);
 }
 #crm-contact-actions-list a.delete:hover,
 #crm-contact-actions-list a.delete:focus {

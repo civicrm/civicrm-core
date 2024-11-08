@@ -60,6 +60,13 @@
 .crm-participant-list-inner ul {
     list-style: none;
     margin: 0;
+    padding: 0;
+}
+#crm-contact-actions-list ul li,
+.crm-contribpage-links-list-inner ul li,
+.crm-event-links-list-inner ul li,
+.crm-participant-list-inner ul li {
+    padding: 0;
 }
 #crm-contact-actions-list ul a,
 .crm-contribpage-links-list-inner ul a,
@@ -69,7 +76,7 @@
     color: var(--crm-c-secondary-text);
     padding: var(--crm-xs2) var(--crm-s);
     border-radius: var(--crm-roundness);
-    display: unset;
+    display: block;
 }
 #crm-contact-actions-list ul a:hover,
 #crm-contact-actions-list ul a:focus,

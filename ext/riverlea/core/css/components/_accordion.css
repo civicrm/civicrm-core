@@ -126,6 +126,9 @@
 .crm-container details.crm-accordion-settings summary::before {
 	content: '\f013';
 }
+.crm-container details.crm-accordion-settings > .crm-accordion-body {
+	padding: var(--crm-expand2-header-padding);
+}
 
 /* Contact dashboard */
 #contact-summary details,
