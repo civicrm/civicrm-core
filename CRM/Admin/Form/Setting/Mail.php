@@ -36,11 +36,11 @@ class CRM_Admin_Form_Setting_Mail extends CRM_Admin_Form_Setting {
    */
   public static function formRule($fields) {
     $errors = [];
-    if (CRM_Utils_Array::value('mailerJobSize', $fields) > 0) {
-      if (CRM_Utils_Array::value('mailerJobSize', $fields) < 1000) {
+    if (isset($fields['mailerJobSize']) && $fields['mailerJobSize'] > 0) {
+      if ($fields['mailerJobSize'] < 1000) {
         $errors['mailerJobSize'] = ts('The job size must be at least 1000 or set to 0 (unlimited).');
       }
-      elseif (CRM_Utils_Array::value('mailerJobSize', $fields) <
+      elseif ($fields['mailerJobSize'] <
         CRM_Utils_Array::value('mailerBatchLimit', $fields)
       ) {
         $errors['mailerJobSize'] = ts('A job size smaller than the batch limit will negate the effect of the batch limit.');
