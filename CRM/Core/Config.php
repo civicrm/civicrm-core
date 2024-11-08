@@ -103,9 +103,6 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
         ]);
         self::$_singleton->authenticate();
 
-        // Extreme backward compat: $config binds to active domain at moment of setup.
-        self::$_singleton->getSettings();
-
         self::$_singleton->handleFirstRun();
       }
     }
