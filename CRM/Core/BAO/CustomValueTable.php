@@ -134,7 +134,8 @@ class CRM_Core_BAO_CustomValueTable {
               else {
                 $type = 'Integer';
               }
-              if ($value == NULL || $value === '') {
+              // An empty value should be stored as NULL
+              if (!$value) {
                 $type = 'Timestamp';
                 $value = NULL;
               }
@@ -142,7 +143,8 @@ class CRM_Core_BAO_CustomValueTable {
 
             case 'EntityReference':
               $type = 'Integer';
-              if ($value == NULL || $value === '') {
+              // An empty value should be stored as NULL
+              if (!$value) {
                 $type = 'Timestamp';
                 $value = NULL;
               }
