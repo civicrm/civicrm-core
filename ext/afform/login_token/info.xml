@@ -24,6 +24,7 @@
   </compatibility>
   <requires>
     <ext>org.civicrm.afform</ext>
+    <ext>authx</ext>
   </requires>
   <comments></comments>
   <classloader>
