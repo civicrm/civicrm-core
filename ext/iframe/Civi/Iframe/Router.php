@@ -17,7 +17,7 @@ class Router extends AutoService {
     $config = \CRM_Core_Config::singleton();
     $_GET[$config->userFrameworkURLVar] = $params['route'];
 
-    $handler = $this->getHandler();
+    $handler = [$this, 'invoke' . ucfirst($this->getLayout())];
     $handler($params);
   }
 
@@ -46,12 +46,16 @@ class Router extends AutoService {
     return FALSE;
   }
 
-  protected function getHandler(): callable {
+  /**
+   * @return string
+   *   'basic' or 'raw' or 'cms'
+   */
+  public function getLayout(): string {
     $setting = \Civi::settings()->get('iframe_layout');
     if ($setting === 'auto') {
       $setting = 'basic';
     }
-    return [$this, 'invoke' . ucfirst($setting)];
+    return $setting;
   }
 
   protected function invokeRaw(array $params): void {
