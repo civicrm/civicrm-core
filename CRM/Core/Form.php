@@ -1688,7 +1688,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $label,
       $options,
       $required,
-      ['class' => 'crm-select2']
+      ['class' => 'crm-select2', 'title' => $label]
     );
     $attributes = ['formatType' => 'searchDate'];
     $extra = ['time' => $isDateTime];
@@ -2870,10 +2870,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       // This is appropriate as it is a pseudofield.
       $this->setConstants(['task' => '']);
       $this->assign('taskMetaData', $tasks);
-      $select = $this->add('select', 'task', NULL, ['' => ts('Actions')], FALSE, [
+      $select = $this->add('select', 'task', NULL, ['' => ts('Actions')], FALSE,
+      [
         'class' => 'crm-select2 crm-action-menu fa-check-circle-o huge crm-search-result-actions',
-      ]
-      );
+        'title' => ts('Actions'),
+      ]);
       foreach ($tasks as $key => $task) {
         $attributes = [];
         if (isset($task['data'])) {
