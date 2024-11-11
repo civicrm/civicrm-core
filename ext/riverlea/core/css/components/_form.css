@@ -657,7 +657,7 @@ input.crm-form-checkbox) + label {
     min-width: 30ch;
     padding: var(--crm-m1);
     width: auto;
-    z-index: 100001 !important; /* vs menubar for datepickers in modals */
+    z-index: 100003 !important; /* vs menubar for datepickers in modals */
 }
 .ui-datepicker .ui-datepicker-header {
     border: 0;

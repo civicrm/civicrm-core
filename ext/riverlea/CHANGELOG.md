@@ -1,3 +1,7 @@
+1.1.3 / 5.80.2
+ - FIXED z-index for date-picker in modals
+ - FIXED Open Street Map tiles not loading
+
 1.1.2 / 5.80.1
  - FIXED padding in event config dropdown
  - CHANGED padding in HackneyBrook dialogs from 0 to --crm-s.
