@@ -39,7 +39,7 @@ class Prefill extends AbstractProcessor {
   }
 
   private function replaceViewValue(string $entityType, string $fieldName, array &$values, $originalValues) {
-    if (isset($values[$fieldName])) {
+    if (isset($values[$fieldName]) && !isset($values[$fieldName]['file_name'])) {
       $fieldInfo = $this->_formDataModel->getField($entityType, $fieldName, 'create', $originalValues);
       $values[$fieldName] = \Civi\Afform\Utils::formatViewValue($fieldName, $fieldInfo, $originalValues);
     }
