@@ -32,7 +32,7 @@
       }, function(error) {
         ctrl.onError();
       });
-    }
+    };
 
     this.save = function() {
       // process submission
