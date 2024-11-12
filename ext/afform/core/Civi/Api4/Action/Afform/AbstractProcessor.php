@@ -597,8 +597,9 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
       $submittableFields = $this->getSubmittableFields($entity['fields']);
       $fileFields = $this->getFileFields($entity['type'], $submittableFields);
       foreach ($submittedValues[$entityName] ?? [] as $values) {
-        // Only accept values from fields on the form
-        $values['fields'] = array_intersect_key($values['fields'] ?? [], $submittableFields);
+        // Use default values from DisplayOnly fields + submittable fields on the form
+        $values['fields'] = $this->getForcedDefaultValues($entity['fields']) +
+          array_intersect_key($values['fields'] ?? [], $submittableFields);
         // Unset prefilled file fields
         foreach ($fileFields as $fileFieldName) {
           if (isset($values['fields'][$fileFieldName]) && is_array($values['fields'][$fileFieldName])) {
@@ -623,7 +624,9 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
           // Enforce the limit set by join[max]
           $joinValues = array_slice($joinValues, 0, $entity['joins'][$joinEntity]['max'] ?? NULL);
           foreach ($joinValues as $index => $vals) {
-            $joinValues[$index] = array_intersect_key($vals, $allowedFields);
+            // As with the main entity, use default values from DisplayOnly fields + values from submittable fields
+            $joinValues[$index] = $this->getForcedDefaultValues($entity['joins'][$joinEntity]['fields'] ?? []);
+            $joinValues[$index] += array_intersect_key($vals, $allowedFields);
             // Unset prefilled file fields
             foreach ($fileFields as $fileFieldName) {
               if (isset($joinValues[$index][$fileFieldName]) && is_array($joinValues[$index][$fileFieldName])) {
@@ -663,11 +666,36 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     return $entityValues;
   }
 
+  /**
+   * Return names of submittable fields (not DisplayOnly)
+   *
+   * TODO: Should filter out conditionally hidden fields too.
+   *
+   * @param array $fields
+   * @return array
+   */
   protected function getSubmittableFields(array $fields): array {
     return array_filter($fields, function ($field) {
       $inputType = $field['defn']['input_type'] ?? NULL;
       return $inputType !== 'DisplayOnly';
     });
+  }
+
+  /**
+   * Get default values from DisplayOnly fields
+   *
+   * @param array $fields
+   * @return array
+   */
+  protected function getForcedDefaultValues(array $fields): array {
+    $values = [];
+    foreach ($fields as $field) {
+      $inputType = $field['defn']['input_type'] ?? NULL;
+      if ($inputType === 'DisplayOnly' && isset($field['defn']['afform_default'])) {
+        $values[$field['name']] = $field['defn']['afform_default'];
+      }
+    }
+    return $values;
   }
 
   /**
