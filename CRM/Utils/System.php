@@ -1249,7 +1249,18 @@ class CRM_Utils_System {
    * Determine whether this is an SSL request.
    */
   public static function isSSL() {
-    return !empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) != 'off';
+    $proto = $_SERVER['HTTP_X_FORWARDED_PROTO'] ?? NULL;
+    // accept 'https' (however capitalised)
+    if (is_string($proto) && (strtolower($proto) === 'https')) {
+      return TRUE;
+    }
+
+    $https = $_SERVER['HTTPS'] ?? NULL;
+    // accept any truthy value except 'off' (however capitalised)
+    if ($https && !(is_string($https) && (strtolower($https) === 'off'))) {
+      return TRUE;
+    }
+    return FALSE;
   }
 
   /**
@@ -1262,11 +1273,7 @@ class CRM_Utils_System {
   public static function redirectToSSL($abort = FALSE) {
     $config = CRM_Core_Config::singleton();
     $req_headers = self::getRequestHeaders();
-    // FIXME: Shouldn't the X-Forwarded-Proto check be part of CRM_Utils_System::isSSL()?
-    if (Civi::settings()->get('enableSSL') &&
-      !self::isSSL() &&
-      strtolower($req_headers['X_FORWARDED_PROTO'] ?? '') != 'https'
-    ) {
+    if (Civi::settings()->get('enableSSL') && !self::isSSL()) {
       // ensure that SSL is enabled on a civicrm url (for cookie reasons etc)
       $url = "https://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
       // @see https://lab.civicrm.org/dev/core/issues/425 if you're seeing this message.
