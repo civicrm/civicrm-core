@@ -174,11 +174,9 @@
     display: block;
 }
 .crm-container .crm-tooltip-wrapper .crm-tooltip {
-    box-shadow: var(--crm-block-shadow);
+    box-shadow: var(--crm-popup-shadow);
     background: var(--crm-c-background);
     border-radius: var(--crm-roundness);
-    padding: 0 0 var(--crm-r);
-    box-shadow: var(--crm-popup-shadow);
 }
 .crm-container .crm-tooltip-wrapper::before {
     border-bottom: 10px solid var(--crm-c-background2);
@@ -189,19 +187,18 @@
     position: relative;
     top: -7px;
 }
-.crm-container .crm-summary-display_name .crm-tooltip-wrapper::before {
-    top: -11px;
-}
 .crm-container .crm-tooltip .crm-summary-group {
     width: 700px;
-    margin-bottom: 0;
+    padding-bottom: 1rem;
 }
 .crm-container .crm-tooltip table,
+.crm-container .crm-tooltip table tr,
 .crm-container .crm-tooltip table tr td {
     background-color: var(--crm-c-background);
     border: none;
     color: var(--crm-c-text);
     word-wrap: break-word;
+    width: 100%;
 }
 .crm-container .crm-tooltip-wrapper .crm-tooltip .crm-table-group-summary > tbody > tr > td {
     vertical-align: top;

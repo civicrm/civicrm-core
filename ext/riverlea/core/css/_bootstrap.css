@@ -1118,6 +1118,11 @@
 
 /* Input */
 
+#bootstrap-theme legend {
+    position: initial;
+    text-transform: inherit;
+    float: none;
+}
 #bootstrap-theme input {
 	line-height: normal;
 }

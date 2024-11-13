@@ -30,9 +30,10 @@
 .crm-container .form-layout-compressed th.label {
     width: var(--crm-input-label-width);
     text-align: var(--crm-input-label-align);
-    padding: var(--crm-m) var(--crm-m2) 0 0;
+    margin: var(--crm-m) var(--crm-m2) 0 0;
     font-family: var(--crm-input-label-font);
     font-weight: var(--crm-input-label-weight);
+    display: inline-table;
 }
 .crm-container .crm-summary-group .crm-section .label,
 .crm-container label {
@@ -107,6 +108,7 @@
     padding-inline: var(--crm-s);
     color: var(--crm-c-text);
 }
+
 /* Required Mark */
 .crm-container .required-mark::after {
     color: var(--crm-c-alert);

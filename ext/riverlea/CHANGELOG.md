@@ -1,3 +1,13 @@
+1.1.4 / 5.80.3
+ - FIXED tooltip dropdown: double shadow, gap next to arrow, padding/border on bottom (ref #74)
+ - ADDED float: none for FormBuilder legends
+ - FIXED added 'important' to 'hiddenElement' as it's getting lost in some cascades, (ref dev/core/#5598)
+ - FIXED td.label width not being applied, creating various other quirks; changed display type to inline-table.
+ - ADDED small inline margin to help icons to separate from label text
+ - ADDED min-height of 100vh to avoid block of white-space below #crm-container (same as Thames)
+ - CHANGED Readme - simplified some wording, expenaded description, removed roadmap, changed order, created 'customisation' section.
+ - ADDED instrcutions for creating a subtheme/stream extension pointing to RiverLea.
+
 1.1.3 / 5.80.2
  - FIXED z-index for date-picker in modals
  - FIXED Open Street Map tiles not loading

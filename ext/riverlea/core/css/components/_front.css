@@ -34,6 +34,7 @@ af-form > fieldset > legend {
     top: calc(2 * var(--crm-f-fieldset-padding));
     margin-bottom: var(--crm-f-fieldset-padding);
     width: 100%;
+    float: none;
 }
 .crm-container.crm-public .header-dark {
     background: var(--crm-c-secondary);

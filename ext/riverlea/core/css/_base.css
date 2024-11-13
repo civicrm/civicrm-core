@@ -16,9 +16,7 @@ body {
 .crm-container *::after {
     box-sizing: border-box;
 }
-.crm-container .hiddenElement {
-    display: none;
-}
+.crm-container .hiddenElement,
 .crm-container .collapse {
 	display: none !important /* needs to hide items further down the cascade */;
 }
@@ -385,6 +383,7 @@ dl dd, dl dl {
 
 #crm-container /* applied to #crm not .crm to apply only once */ {
 	max-width: 100%;
+    min-height: 100vh;
 	padding: var(--crm-page-padding);
 }
 .crm-container .crm-flex-box {
