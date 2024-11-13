@@ -4,11 +4,9 @@ namespace Civi\Authx;
 
 use Civi\Test\EndToEndInterface;
 use Civi\Test\HttpTestTrait;
-use GuzzleHttp\Psr7\AppendStream;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Uri;
 use Psr\Http\Message\ResponseInterface;
-use GuzzleHttp\Psr7\Utils;
 
 class AbstractFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface {
 
@@ -91,9 +89,7 @@ class AbstractFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndI
    *   The new HTTP request (with authentication options).
    */
   protected function applyAuth($request, $credType, $flowType, $cid) {
-    $credFunc = 'cred' . ucfirst(preg_replace(';[^a-zA-Z0-9];', '', $credType));
-    $flowFunc = 'auth' . ucfirst(preg_replace(';[^a-zA-Z0-9];', '', $flowType));
-    return $this->$flowFunc($request, $this->$credFunc($cid));
+    return (new AuthxRequestBuilder())->applyAuth($request, $credType, $flowType, $cid);
   }
 
   // ------------------------------------------------
@@ -107,6 +103,14 @@ class AbstractFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndI
   public function requestMyContact() {
     $p = (['where' => [['id', '=', 'user_contact_id']]]);
     $uri = (new Uri('civicrm/authx/id'))
+      ->withQuery('params=' . urlencode(json_encode($p)));
+    $req = new Request('GET', $uri);
+    return $req;
+  }
+
+  public function requestMyContactDashboard() {
+    $p = (['reset' => 1]);
+    $uri = (new Uri('civicrm/user'))
       ->withQuery('params=' . urlencode(json_encode($p)));
     $req = new Request('GET', $uri);
     return $req;
@@ -185,98 +189,16 @@ class AbstractFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndI
   }
 
   // ------------------------------------------------
-  // Library: Flow functions
 
   /**
-   * Add query parameter ("&_authx=<CRED>").
-   *
-   * @param \GuzzleHttp\Psr7\Request $request
-   * @param string $cred
-   *   The credential add to the request (e.g. "Basic ASDF==" or "Bearer FDSA").
-   * @return \GuzzleHttp\Psr7\Request
+   * @deprecated
    */
-  public function authParam(Request $request, $cred) {
-    $query = $request->getUri()->getQuery();
-    return $request->withUri(
-      $request->getUri()->withQuery($query . '&_authx=' . urlencode($cred))
-    );
-  }
-
-  /**
-   * Add query parameter ("&_authx=<CRED>&_authxSes=1").
-   *
-   * @param \GuzzleHttp\Psr7\Request $request
-   * @param string $cred
-   *   The credential add to the request (e.g. "Basic ASDF==" or "Bearer FDSA").
-   * @return \GuzzleHttp\Psr7\Request
-   */
-  public function authAuto(Request $request, $cred) {
-    $query = $request->getUri()->getQuery();
-    return $request->withUri(
-      $request->getUri()->withQuery($query . '&_authx=' . urlencode($cred) . '&_authxSes=1')
-    );
-  }
-
-  public function authLogin(Request $request, $cred) {
-    return $request->withMethod('POST')
-      ->withBody(new AppendStream([
-        Utils::streamFor('_authx=' . urlencode($cred) . '&'),
-        $request->getBody(),
-      ]));
-  }
-
-  public function authHeader(Request $request, $cred) {
-    return $request->withHeader('Authorization', $cred);
-  }
-
-  public function authXHeader(Request $request, $cred) {
-    return $request->withHeader('X-Civi-Auth', $cred);
-  }
-
-  public function authNone(Request $request, $cred) {
-    return $request;
-  }
-
-  // ------------------------------------------------
-  // Library: Credential functions
-
-  /**
-   * @param int $cid
-   * @return string
-   *   The credential add to the request (e.g. "Basic ASDF==" or "Bearer FDSA").
-   */
-  public function credPass($cid) {
-    if ($cid === $this->getDemoCID()) {
-      return 'Basic ' . base64_encode($GLOBALS['_CV']['DEMO_USER'] . ':' . $GLOBALS['_CV']['DEMO_PASS']);
-    }
-    else {
-      $this->fail("This test does have the password the requested contact.");
-    }
-  }
-
   public function credApikey($cid) {
-    $api_key = md5(\random_bytes(16));
-    \civicrm_api3('Contact', 'create', [
-      'id' => $cid,
-      'api_key' => $api_key,
-    ]);
-    return 'Bearer ' . $api_key;
+    return (new AuthxRequestBuilder())->{__FUNCTION__}($cid);
   }
 
   public function credJwt($cid, $expired = FALSE) {
-    if (empty(\Civi::service('crypto.registry')->findKeysByTag('SIGN'))) {
-      $this->markTestIncomplete('Cannot test JWT. No CIVICRM_SIGN_KEYS are defined.');
-    }
-    $token = \Civi::service('crypto.jwt')->encode([
-      'exp' => $expired ? time() - 60 * 60 : time() + 60 * 60,
-      'sub' => "cid:$cid",
-      'scope' => 'authx',
-    ]);
-    return 'Bearer ' . $token;
-  }
-
-  public function credNone($cid) {
-    return NULL;
+    return (new AuthxRequestBuilder())->{__FUNCTION__}($cid, $expired);
   }
 
   /**

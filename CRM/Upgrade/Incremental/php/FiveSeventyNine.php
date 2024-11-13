@@ -26,10 +26,9 @@ class CRM_Upgrade_Incremental_php_FiveSeventyNine extends CRM_Upgrade_Incrementa
       $tokenForms = static::findAfformsWithMsgToken();
       if (!empty($tokenForms)) {
         $formList = implode(', ', array_map(fn($name) => '<em>"' . htmlentities($name) . '"</em>', $tokenForms));
-        $message .= '<p>' . ts('Some custom forms (%1) support authenticated email links. Links will still be generated in 5.79+, but they only confer access to one page at a time. If you need a link to provide a full login-session, please install extension <a %2>%3</a>.', [
+        $message .= '<p>' . ts('Some custom forms (%1) support authenticated email links. Please review the <strong><a %2>CiviCRM 5.79 Form-Token Notice</a></strong>.', [
           1 => $formList,
-          2 => 'href="https://lab.civicrm.org/extensions/afform-login-token" target="_blank"',
-          3 => 'Afform Login Token',
+          2 => 'href="https://lab.civicrm.org/dev/core/-/wikis/CiviCRM-v5.79-Form-Token-Notice" target="_blank"',
         ]) . '</p>';
       }
     }
@@ -63,6 +62,21 @@ class CRM_Upgrade_Incremental_php_FiveSeventyNine extends CRM_Upgrade_Incrementa
     $this->addTask('Populate financial labels', 'populateFinancialLabels');
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Update "Website Type" options', 'updateWebsiteType');
+
+    Civi::queue(CRM_Upgrade_Form::QUEUE_NAME)->createItem(
+      new CRM_Queue_Task([static::CLASS, 'checkEnableLoginTokens']),
+      ['weight' => 2001]
+    );
+  }
+
+  public static function checkEnableLoginTokens(CRM_Queue_TaskContext $ctx) {
+    if (static::findAfformsWithMsgToken()) {
+      $ctx->queue->createItem(
+        new CRM_Queue_Task([static::CLASS, 'enableExtension'], [['afform_login_token']], 'Enable Form Core Login Tokens'),
+        ['weight' => 2000]
+      );
+    }
+    return TRUE;
   }
 
   /**

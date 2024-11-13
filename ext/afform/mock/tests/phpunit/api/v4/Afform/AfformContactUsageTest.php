@@ -86,6 +86,28 @@ EOHTML;
       'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
     ]);
 
+    // Try creating empty contact: not ok
+    $submission = [
+      ['fields' => []],
+    ];
+    $result = Afform::submit()
+      ->setName($this->formName)
+      ->setValues(['me' => $submission])
+      ->execute();
+    // Contact not created
+    $this->assertEmpty($result[0]['me']);
+
+    // Try creating contact with only first_name: ok
+    $submission = [
+      ['fields' => ['first_name' => 'Hello']],
+    ];
+    $result = Afform::submit()
+      ->setName($this->formName)
+      ->setValues(['me' => $submission])
+      ->execute();
+    // Contact created
+    $this->assertNotEmpty($result[0]['me']);
+
     $cid = $this->createLoggedInUser();
     \CRM_Core_Config::singleton()->userPermissionTemp = new \CRM_Core_Permission_Temp();
 

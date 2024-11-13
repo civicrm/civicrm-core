@@ -134,19 +134,19 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
 
   private function getSqlOptions(array $field, bool $includeDisabled = FALSE): array {
     $pseudoconstant = $field['pseudoconstant'];
-    $cacheKey = 'EntityMetadataGetSqlOptions' . md5(json_encode($pseudoconstant));
+    $cacheKey = 'EntityMetadataGetSqlOptions' . \CRM_Core_Config::domainID() . '_' . \CRM_Core_I18n::getLocale() . md5(json_encode($pseudoconstant));
     $entity = \Civi::table($pseudoconstant['table']);
     $cache = \Civi::cache('metadata');
     $options = $cache->get($cacheKey);
     if (!isset($options)) {
       $options = [];
-      $fields = $entity->getFields();
+      $fields = $entity->getSupportedFields();
       $select = \CRM_Utils_SQL_Select::from($pseudoconstant['table']);
       $idCol = $pseudoconstant['key_column'] ?? $entity->getMeta('primary_key');
       $pseudoconstant['name_column'] ??= (isset($fields['name']) ? 'name' : $idCol);
       $select->select(["$idCol AS id"]);
       foreach (array_keys(\CRM_Core_SelectValues::optionAttributes()) as $prop) {
-        if (!empty($pseudoconstant["{$prop}_column"])) {
+        if (isset($pseudoconstant["{$prop}_column"], $fields[$pseudoconstant["{$prop}_column"]])) {
           $propColumn = $pseudoconstant["{$prop}_column"];
           $select->select("$propColumn AS $prop");
         }
@@ -159,13 +159,13 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
       if (isset($fields['component_id'])) {
         $select->select('component_id');
       }
-      // Order by: prefer order_column or 'weight' column
-      if (!empty($pseudoconstant['order_column']) || isset($fields['weight'])) {
-        $select->orderBy($pseudoconstant['order_column'] ?? 'weight');
-      }
-      // Fall back on label_column or id if nothing else
-      else {
-        $select->orderBy($pseudoconstant['label_column'] ?? $idCol);
+      // Order by: prefer order_column; or else 'weight' column; or else lobel_column; or as a last resort, $idCol
+      $orderColumns = [$pseudoconstant['order_column'] ?? NULL, 'weight', $pseudoconstant['label_column'] ?? NULL, $idCol];
+      foreach ($orderColumns as $orderColumn) {
+        if (isset($fields[$orderColumn])) {
+          $select->orderBy($orderColumn);
+          break;
+        }
       }
       // Filter on domain, but only if field is required
       if (!empty($fields['domain_id']['required'])) {

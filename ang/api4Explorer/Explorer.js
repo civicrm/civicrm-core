@@ -1065,6 +1065,7 @@
 
     // Format string to be cli-input-safe
     function cliFormat(str) {
+      str = str.replace(/\b(true|false)\b/g, match => match === "true" ? '1' : '0');
       if (!_.includes(str, ' ') && !_.includes(str, '"') && !_.includes(str, "'")) {
         return str;
       }

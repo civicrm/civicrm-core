@@ -248,7 +248,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
     foreach ($this->_fields as $name => $field) {
       //fix to reduce size as we are using this field in grid
-      if (is_array($field['attributes']) && $this->_fields[$name]['attributes']['size'] > 19) {
+      if (is_array($field['attributes']) && ($this->_fields[$name]['attributes']['size'] ?? 0) > 19) {
         //shrink class to "form-text-medium"
         $this->_fields[$name]['attributes']['size'] = 19;
       }

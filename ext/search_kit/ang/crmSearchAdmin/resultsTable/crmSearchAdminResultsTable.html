@@ -1,7 +1,7 @@
 <div class="crm-search-display crm-search-display-table">
   <div class="form-inline">
     <div class="btn-group" ng-include="'~/crmSearchDisplay/SearchButton.html'"></div>
-    <crm-search-tasks-menu ids="$ctrl.selectedRows" task-manager="$ctrl.taskManager"></crm-search-tasks-menu>
+    <crm-search-tasks-menu ids="$ctrl.selectedRows" task-manager="$ctrl.taskManager" display-mode="'menu'"></crm-search-tasks-menu>
     <span ng-include="'~/crmSearchDisplay/ResultCount.html'"></span>
   </div>
   <table class="{{:: $ctrl.settings.classes.join(' ') }}">

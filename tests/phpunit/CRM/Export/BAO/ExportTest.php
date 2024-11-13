@@ -89,7 +89,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'civicrm_case_activity',
       'civicrm_campaign',
     ]);
-    OptionValue::update(FALSE)->addWhere('name', '=', 'Much Much longer than just phone')->setValues(['label' => 'Mobile'])->execute();
+    OptionValue::update(FALSE)->addWhere('name', '=', 'Mobile')->addWhere('option_group_id:name', '=', 'phone_type')->setValues(['label' => 'Mobile'])->execute();
 
     if (!empty($this->locationTypes)) {
       $this->callAPISuccess('LocationType', 'delete', ['id' => $this->locationTypes['Whare Kai']['id']]);
@@ -850,7 +850,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $this->contactIDs[] = $this->individualCreate();
     $this->contactIDs[] = $this->individualCreate();
 
-    OptionValue::update()->addWhere('name', '=', 'Mobile')->setValues(['label' => 'Much Much longer than just phone'])->execute();
+    OptionValue::update()->addWhere('name', '=', 'Mobile')->addWhere('option_group_id:name', '=', 'phone_type')->setValues(['label' => 'Much Much longer than just phone'])->execute();
     $locationTypes = ['Billing' => 'Billing', 'Home' => 'Home'];
     $phoneTypes = ['Mobile', 'Phone'];
     foreach ($this->contactIDs as $contactID) {
@@ -2586,7 +2586,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'im' => '`im` varchar(64)',
       'openid' => '`openid` varchar(255)',
       'world_region' => '`world_region` varchar(128)',
-      'url' => '`url` varchar(255)',
+      'url' => '`url` varchar(2048)',
       'groups' => '`groups` longtext',
       'tags' => '`tags` longtext',
       'notes' => '`notes` longtext',
@@ -2641,7 +2641,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'activity_subject' => '`activity_subject` varchar(255)',
       'activity_date_time' => '`activity_date_time` varchar(32)',
       'activity_duration' => '`activity_duration` varchar(64)',
-      'activity_location' => '`activity_location` varchar(255)',
+      'activity_location' => '`activity_location` varchar(2048)',
       'activity_details' => '`activity_details` longtext',
       'activity_status' => '`activity_status` varchar(255)',
       'activity_priority' => '`activity_priority` varchar(255)',
@@ -2770,7 +2770,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'im' => '`im` varchar(64)',
       'openid' => '`openid` varchar(255)',
       'world_region' => '`world_region` varchar(128)',
-      'url' => '`url` varchar(255)',
+      'url' => '`url` varchar(2048)',
       'phone_type_id' => '`phone_type_id` varchar(64)',
       'financial_type' => '`financial_type` varchar(255)',
       'contribution_source' => '`contribution_source` varchar(255)',

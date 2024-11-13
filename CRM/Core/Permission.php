@@ -46,6 +46,14 @@ class CRM_Core_Permission {
   const ALWAYS_ALLOW_PERMISSION = "*always allow*";
 
   /**
+   * A generic permission which allows access to authenticated contacts.
+   *
+   * NOTE: This is slightly different from asking whether there is an authenticated CMS `User`.
+   * This permission only cares about identifying the CRM `Contact`.
+   */
+  const ANY_AUTHENTICATED_CONTACT = '*authenticated*';
+
+  /**
    * Various authentication sources.
    *
    * @var int
@@ -177,6 +185,18 @@ class CRM_Core_Permission {
   public static function checkGroupRole($array) {
     $config = CRM_Core_Config::singleton();
     return $config->userPermissionClass->checkGroupRole($array);
+  }
+
+  public static function checkConstPermissions(\Civi\Core\Event\GenericHookEvent $e) {
+    if ($e->permission === CRM_Core_Permission::ANY_AUTHENTICATED_CONTACT) {
+      // For typical web-requests, we're just asking if there is a "logged in contact ID".
+      // The other edge-case: we're asking on behalf of someone else. *If* that contact made a request, would they be approved?
+      $target = ($e->contactId ?: CRM_Core_Session::getLoggedInContactID());
+      if ($target !== NULL) {
+        $e->granted = TRUE;
+      }
+    }
+    // TODO: Consider moving similar checks for 'ALWAYS_ALLOW' and 'ALWAYS_DENY' from CRM_Core_Permission_{UF}::check() to here..
   }
 
   /**

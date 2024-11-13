@@ -23,7 +23,6 @@ class StatefulFlowsTest extends AbstractFlowsTest {
    */
   public function testStatefulLoginAllowed($credType): void {
     $flowType = 'login';
-    $credFunc = 'cred' . ucfirst(preg_replace(';[^a-zA-Z0-9];', '', $credType));
 
     // Phase 1: Some pages are not accessible.
     $http = $this->createGuzzle(['http_errors' => FALSE]);
@@ -35,7 +34,7 @@ class StatefulFlowsTest extends AbstractFlowsTest {
     $http = $this->createGuzzle(['http_errors' => FALSE, 'cookies' => $cookieJar]);
     \Civi::settings()->set("authx_{$flowType}_cred", [$credType]);
     $response = $http->post('civicrm/authx/login', [
-      'form_params' => ['_authx' => $this->$credFunc($this->getDemoCID())],
+      'form_params' => ['_authx' => (new AuthxRequestBuilder())->createCred($credType, $this->getDemoCID())],
     ]);
     $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), $credType, $flowType, $response);
     $this->assertHasCookies($response);
@@ -70,11 +69,11 @@ class StatefulFlowsTest extends AbstractFlowsTest {
   public function testStatefulLoginProhibited($credType): void {
     $flowType = 'login';
     $http = $this->createGuzzle(['http_errors' => FALSE]);
-    $credFunc = 'cred' . ucfirst(preg_replace(';[^a-zA-Z0-9];', '', $credType));
 
     \Civi::settings()->set("authx_{$flowType}_cred", []);
     $response = $http->post('civicrm/authx/login', [
-      'form_params' => ['_authx' => $this->$credFunc($this->getDemoCID())],
+      'form_params' => ['_authx' => (new AuthxRequestBuilder())->createCred($credType, $this->getDemoCID())],
+
     ]);
     $this->assertFailedDueToProhibition($response);
   }

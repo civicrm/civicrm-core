@@ -123,7 +123,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   public static function displaySessionError(&$error, $separator = '<br />') {
     $message = self::getMessages($error, $separator);
     if ($message) {
-      $status = ts("Payment Processor Error message") . "{$separator} $message";
+      $status = ts('Payment Processor Error message') . "{$separator} $message";
       $session = CRM_Core_Session::singleton();
       $session->setStatus($status);
     }

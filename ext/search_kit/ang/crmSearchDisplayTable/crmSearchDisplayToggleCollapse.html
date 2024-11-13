@@ -1,0 +1,4 @@
+<button class="btn" type="button" title="{{:: ts('Show sub-rows') }}" ng-click="$ctrl.toggleCollapsed()">
+  <i class="crm-i" ng-class="{'fa-caret-right': $ctrl.isCollapsed(), 'fa-caret-down': !$ctrl.isCollapsed()}"></i>
+  <span ng-show="$ctrl.isCollapsed()">{{:: $ctrl.countDescendents() }}</span>
+</button>

@@ -466,6 +466,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
       'help_post' => $field->help_post,
       'visibility' => $field->visibility,
       'in_selector' => $field->in_selector,
+      // In core I believe "rule" will never exist anymore in $importableFields since 5.75, but see farther down where it gets set for some input_types.
       'rule' => $importableFields[$field->field_name]['rule'] ?? NULL,
       'location_type_id' => $field->location_type_id ?? NULL,
       'website_type_id' => $field->website_type_id ?? NULL,
@@ -483,6 +484,20 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
       'bao' => $fieldMetaData['bao'] ?? NULL,
       'html_type' => $fieldMetaData['html']['type'] ?? NULL,
     ];
+
+    // "rule" used to come from the xml schema, but now we fall back to basing it on the html_type.
+    // It's used for example in buildProfile to add a form rule.
+    if (empty($formattedField['rule'])) {
+      switch ($formattedField['html_type']) {
+        case 'Email':
+          $formattedField['rule'] = 'email';
+          break;
+
+        case 'Url':
+          $formattedField['rule'] = 'url';
+          break;
+      }
+    }
 
     $formattedField = CRM_Utils_Date::addDateMetadataToField($fieldMetaData, $formattedField);
 

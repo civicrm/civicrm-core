@@ -63,6 +63,13 @@
   <textarea rows="2" class="form-control crm-flex-1" ng-if="col.rewrite" ng-model="col.rewrite" ng-model-options="{updateOn: 'blur'}" ng-trim="false"></textarea>
   <crm-search-admin-token-select ng-if="col.rewrite" model="col" field="rewrite" suffix=":label"></crm-search-admin-token-select>
 </div>
+<div class="form-inline" ng-if="!col.link">
+  <label>
+    <input type="checkbox" ng-model="col.show_linebreaks" >
+    {{:: ts('Show Linebreaks') }}
+  </label>
+  <a crm-ui-help="hs({id: 'show_linebreaks', title: ts('Show Linebreaks')})"></a>
+</div>
 <div class="form-inline">
   <label ng-if="$ctrl.parent.canBeEditable(col)" title="{{:: ts('Users will be able to click to edit this field.') }}">
     <input type="checkbox" ng-checked="col.editable" ng-click="$ctrl.parent.toggleEditable(col)">

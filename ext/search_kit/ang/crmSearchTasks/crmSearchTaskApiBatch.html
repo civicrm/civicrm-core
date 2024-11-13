@@ -1,6 +1,9 @@
 <div id="bootstrap-theme" crm-dialog="crmSearchTask">
-  <form ng-controller="crmSearchTaskApiBatch as $ctrl">
+  <form name="crmSearchTaskApiBatchForm" ng-controller="crmSearchTaskApiBatch as $ctrl">
     <p><strong ng-if="model.apiBatch.confirmMsg">{{:: ts(model.apiBatch.confirmMsg, {1: model.ids.length, 2: $ctrl.entityTitle}) }}</strong></p>
+    <div class="form-inline" ng-repeat="field in model.apiBatch.fields">
+      <crm-search-input class="form-group" ng-model="model.apiBatch.params.values[field.name]" field="field" show-label="true"></crm-search-input>
+    </div>
     <hr />
     <div ng-if="$ctrl.run" class="crm-search-task-progress">
       <h5>{{:: ts(model.apiBatch.runMsg, {1: model.ids.length, 2: $ctrl.entityTitle}) }}</h5>
@@ -8,6 +11,6 @@
     </div>
 
     <crm-dialog-button text="ts('Cancel')" icons="{primary: 'fa-times'}" on-click="$ctrl.cancel()" disabled="$ctrl.run" ></crm-dialog-button>
-    <crm-dialog-button ng-if="model.apiBatch.confirmMsg" text="model.taskTitle" icons="{primary: $ctrl.run ? 'fa-spin fa-spinner' : 'fa-check'}" on-click="$ctrl.start(model.apiBatch.params)" disabled="$ctrl.run" ></crm-dialog-button>
+    <crm-dialog-button ng-if="model.apiBatch.confirmMsg || model.apiBatch.fields" text="model.taskTitle" icons="{primary: $ctrl.run ? 'fa-spin fa-spinner' : 'fa-check'}" on-click="$ctrl.start(model.apiBatch.params)" disabled="$ctrl.run || !crmSearchTaskApiBatchForm.$valid" ></crm-dialog-button>
   </form>
 </div>

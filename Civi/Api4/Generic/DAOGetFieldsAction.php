@@ -43,11 +43,18 @@ class DAOGetFieldsAction extends BasicGetFieldsAction {
     if ($this->loadOptions) {
       $this->loadFieldOptions($fields, $fieldsToGet ?: array_keys($fields));
     }
+    // Add fields across implicit FK joins
     foreach ($fieldsToGet ?? [] as $fieldName) {
       if (empty($fields[$fieldName]) && str_contains($fieldName, '.')) {
         $fkField = $this->getFkFieldSpec($fieldName, $fields);
         if ($fkField) {
+          $fieldPrefix = substr($fieldName, 0, 0 - strlen($fkField['name']));
           $fkField['name'] = $fieldName;
+          // Control field should get the same prefix as it belongs to the new entity now
+          if (!empty($fkField['input_attrs']['control_field'])) {
+            $fkField['input_attrs']['control_field'] = $fieldPrefix . $fkField['input_attrs']['control_field'];
+          }
+          $fkField['required'] = FALSE;
           $fields[] = $fkField;
         }
       }
@@ -69,7 +76,7 @@ class DAOGetFieldsAction extends BasicGetFieldsAction {
    * @return array|null
    * @throws \CRM_Core_Exception
    */
-  private function getFkFieldSpec($fieldName, $fields) {
+  private function getFkFieldSpec(string $fieldName, array $fields): ?array {
     $fieldPath = explode('.', $fieldName);
     // Search for the first segment alone plus the first and second
     // No field in the schema contains more than one dot in its name.
@@ -81,9 +88,11 @@ class DAOGetFieldsAction extends BasicGetFieldsAction {
         'checkPermissions' => $this->checkPermissions,
         'where' => [['name', '=', $newFieldName]],
         'loadOptions' => $this->loadOptions,
+        'values' => FormattingUtil::filterByPath($this->values, $fieldName, $newFieldName),
         'action' => $this->action,
       ])->first();
     }
+    return NULL;
   }
 
   /**

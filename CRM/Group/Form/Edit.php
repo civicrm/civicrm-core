@@ -31,13 +31,6 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
   protected $_group;
 
   /**
-   * The title of the group being deleted
-   *
-   * @var string
-   */
-  protected $_title;
-
-  /**
    * Store the group values
    *
    * @var array
@@ -107,7 +100,6 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
       $this->_groupValues = [];
       $params = ['id' => $this->_id];
       $this->_group = CRM_Contact_BAO_Group::retrieve($params, $this->_groupValues);
-      $this->_title = $this->_groupValues['title'];
     }
 
     $this->assign('action', $this->_action);
@@ -115,8 +107,8 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
 
     if ($this->_action == CRM_Core_Action::DELETE) {
       if (isset($this->_id)) {
-        $this->assign('title', $this->_title);
-        if (!($this->_groupValues['saved_search_id'])) {
+        $this->assign('title', $this->_groupValues['title']);
+        if (empty($this->_groupValues['saved_search_id'])) {
           try {
             $count = CRM_Contact_BAO_Group::memberCount($this->_id);
           }
@@ -139,7 +131,7 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
       if (isset($this->_id)) {
         $groupValues = [
           'id' => $this->_id,
-          'title' => $this->_title,
+          'title' => $this->_groupValues['title'],
           'saved_search_id' => $this->_groupValues['saved_search_id'] ?? '',
         ];
         $this->assign('editSmartGroupURL', isset($this->_groupValues['saved_search_id']) ? CRM_Contact_BAO_SavedSearch::getEditSearchUrl($this->_groupValues['saved_search_id']) : NULL);
@@ -148,7 +140,7 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
 
         $this->assign('group', $groupValues);
 
-        $this->setTitle(ts('Group Settings: %1', [1 => $this->_title]));
+        $this->setTitle(ts('Group Settings: %1', [1 => $this->_groupValues['title']]));
       }
       $session = CRM_Core_Session::singleton();
       $session->pushUserContext(CRM_Utils_System::url('civicrm/group', 'reset=1'));
@@ -302,7 +294,7 @@ WHERE  title = %1
     $updateNestingCache = FALSE;
     if ($this->_action & CRM_Core_Action::DELETE) {
       CRM_Contact_BAO_Group::discard($this->_id);
-      CRM_Core_Session::setStatus(ts("The Group '%1' has been deleted.", [1 => $this->_title]), ts('Group Deleted'), 'success');
+      CRM_Core_Session::setStatus(ts("The Group '%1' has been deleted.", [1 => $this->_groupValues['title']]), ts('Group Deleted'), 'success');
       $updateNestingCache = TRUE;
     }
     else {

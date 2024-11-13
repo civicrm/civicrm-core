@@ -5,7 +5,8 @@
     bindings: {
       field: '<',
       'op': '<',
-      'optionKey': '<'
+      'optionKey': '<',
+      labelId: '@',
     },
     require: {ngModel: 'ngModel'},
     template: '<div class="form-group" ng-include="$ctrl.getTemplate()"></div>',

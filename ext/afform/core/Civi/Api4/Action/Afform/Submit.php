@@ -319,7 +319,7 @@ class Submit extends AbstractProcessor {
       if (!empty($contact['fields']['id'])) {
         continue;
       }
-      if (empty($contact['fields']) || \CRM_Contact_BAO_Contact::hasName($contact['fields'] + ['contact_type' => $entityType])) {
+      if (!empty($contact['fields']) && \CRM_Contact_BAO_Contact::hasName($contact['fields'] + ['contact_type' => $entityType])) {
         continue;
       }
       foreach ($contact['joins']['Email'] ?? [] as $email) {
@@ -460,8 +460,8 @@ class Submit extends AbstractProcessor {
       // Forward FK e.g. Event.loc_block_id => LocBlock
       $forwardFkField = self::getFkField($mainEntity['type'], $joinEntityName);
       if ($forwardFkField && $values) {
-        // Add id to values for update op
-        if ($whereClause) {
+        // Add id to values for update op, but only if id is not already on the form
+        if ($whereClause && empty($mainEntity['joins'][$joinEntityName]['fields'][$joinIdField])) {
           $values[0][$joinIdField] = $whereClause[0][2];
         }
         $result = civicrm_api4($joinEntityName, 'save', [

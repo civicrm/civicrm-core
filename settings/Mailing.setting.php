@@ -114,6 +114,7 @@ return [
     'pseudoconstant' => [
       'callback' => 'CRM_Mailing_Service_ListUnsubscribe::getMethods',
     ],
+    'settings_pages' => ['mail' => ['weight' => 80]],
   ],
   'replyTo' => [
     'group_name' => 'Mailing Preferences',
@@ -128,6 +129,7 @@ return [
     'is_contact' => 0,
     'description' => ts('Allow CiviMail users to send mailings with a custom Reply-To header.'),
     'help_text' => NULL,
+    'settings_pages' => ['mail' => ['weight' => 70]],
   ],
   'mailing_backend' => [
     'group_name' => 'Mailing Preferences',
@@ -243,6 +245,7 @@ return [
     'is_contact' => 0,
     'description' => ts('Throttle email delivery by setting the maximum number of emails sent during each CiviMail run (0 = unlimited).'),
     'help_text' => NULL,
+    'settings_pages' => ['mail' => ['weight' => 10]],
   ],
   'mailerJobSize' => [
     'group_name' => 'Mailing Preferences',
@@ -262,6 +265,7 @@ return [
     'is_contact' => 0,
     'description' => ts('If you want to utilize multi-threading enter the size you want your sub jobs to be split into. Recommended values are between 1,000 and 10,000. Use a lower value if your server has multiple cron jobs running simultaneously, but do not use values smaller than 1,000. Enter "0" to disable multi-threading and process mail as one single job - batch limits still apply.'),
     'help_text' => NULL,
+    'settings_pages' => ['mail' => ['weight' => 30]],
   ],
   'mailerJobsMax' => [
     'group_name' => 'Mailing Preferences',
@@ -281,6 +285,7 @@ return [
     'is_contact' => 0,
     'description' => ts('The maximum number of mailer delivery jobs executing simultaneously (0 = allow as many processes to execute as started by cron).'),
     'help_text' => NULL,
+    'settings_pages' => ['mail' => ['weight' => 40]],
   ],
   'mailThrottleTime' => [
     'group_name' => 'Mailing Preferences',
@@ -300,6 +305,7 @@ return [
     'is_contact' => 0,
     'description' => ts('The time to sleep in between each e-mail in micro seconds. Setting this above 0 allows you to control the rate at which e-mail messages are sent to the mail server, avoiding filling up the mail queue very quickly. Set to 0 to disable.'),
     'help_text' => NULL,
+    'settings_pages' => ['mail' => ['weight' => 20]],
   ],
   'verpSeparator' => [
     'group_name' => 'Mailing Preferences',
@@ -319,6 +325,7 @@ return [
     'is_contact' => 0,
     'description' => ts('Separator character used when CiviMail generates VERP (variable envelope return path) Mail-From addresses.'),
     'help_text' => NULL,
+    'settings_pages' => ['mail' => ['weight' => 50]],
   ],
   'write_activity_record' => [
     'group_name' => 'Mailing Preferences',
@@ -432,6 +439,7 @@ return [
     'is_contact' => 0,
     'description' => ts('The frequency that CiviMail updates its sent mail database.'),
     'help_text' => ts('CiviMail records email sent at the frequency you specify. If you set it to 1, it will update the database every time it sends an email. This ensures that emails are not resent if the batch job fails, but this may cause a performance hit, particularly for large jobs.'),
+    'settings_pages' => ['mail' => ['weight' => 60]],
   ],
   'scheduled_reminder_smarty' => [
     'group_name' => 'Mailing Preferences',

@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<extension key="afform_login_token" type="module">
+  <file>afform_login_token</file>
+  <name>Form Core Login-Tokens</name>
+  <description>Generate emails with portal login-links</description>
+  <license>AGPL-3.0</license>
+  <authors>
+    <author>
+      <name>CiviCRM</name>
+      <email>info@civicrm.org</email>
+      <role>Maintainer</role>
+    </author>
+  </authors>
+  <urls>
+    <url desc="Main Extension Page">https://civicrm.org</url>
+    <url desc="Support">https://lab.civicrm.org/dev/core/-/issues</url>
+    <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
+  </urls>
+  <releaseDate>2024-09-18</releaseDate>
+  <version>1.0.0</version>
+  <develStage>alpha</develStage>
+  <compatibility>
+    <ver>5.79</ver>
+  </compatibility>
+  <requires>
+    <ext>org.civicrm.afform</ext>
+  </requires>
+  <comments></comments>
+  <classloader>
+    <psr0 prefix="CRM_" path="."/>
+    <psr4 prefix="Civi\" path="Civi"/>
+  </classloader>
+  <civix>
+    <namespace>CRM/AfformLoginToken</namespace>
+    <format>24.09.1</format>
+    <angularModule>crmAfformLoginToken</angularModule>
+  </civix>
+  <mixins>
+    <mixin>mgd-php@1.0.0</mixin>
+    <mixin>setting-php@1.0.0</mixin>
+    <mixin>smarty@1.0.3</mixin>
+    <mixin>scan-classes@1.0.0</mixin>
+  </mixins>
+</extension>

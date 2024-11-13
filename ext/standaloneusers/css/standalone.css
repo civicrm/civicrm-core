@@ -1,5 +1,5 @@
 .standalone-page-padding {
-  padding: 1px 3vw 1rem;
+  padding: 1px max(10px, 1vw) 1rem;
 }
 
 html.crm-standalone  nav.breadcrumb>ol {

@@ -1,0 +1,18 @@
+<button type="button"
+  ng-disabled="!$ctrl.taskManager.isDisplayReady()"
+  ng-click="$ctrl.openMenu = true; $ctrl.taskManager.getMetadata();"
+  class="btn dropdown-toggle btn-default crm-search-task-menu"
+  title="{{:: ts('Perform action on selected items.') }}"
+  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+>
+  <i class="crm-i fa-pencil"></i>
+  {{:: ts('Action') }} <span class="caret"></span>
+</button>
+<ul class="dropdown-menu" ng-if="$ctrl.openMenu">
+  <li ng-class="{disabled: !$ctrl.isActionAllowed(action)}" ng-repeat="action in $ctrl.taskManager.tasks" title="{{ $ctrl.getActionTitle(action) }}">
+    <a href ng-click="$ctrl.doAction(action); $ctrl.openMenu = false;"><i class="crm-i {{:: action.icon }}"></i> {{:: action.title }}</a>
+  </li>
+  <li class="disabled" ng-if="!$ctrl.taskManager.tasks">
+    <a href><i class="crm-i fa-spinner fa-spin"></i></a>
+  </li>
+</ul>

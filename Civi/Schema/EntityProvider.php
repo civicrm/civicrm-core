@@ -36,6 +36,13 @@ final class EntityProvider {
     return $this->getMetaProvider()->getProperty($property);
   }
 
+  /**
+   * @return array
+   *   List of field descriptors, keyed by name.
+   *   Fields may or may not be defined in the underlying data-store, depending on the status of upgrade.
+   *
+   *   Ex: ['field_1' => ['title' => ..., 'sqlType' => ...]]
+   */
   public function getFields(): array {
     return $this->getMetaProvider()->getFields();
   }
@@ -44,6 +51,13 @@ final class EntityProvider {
     return $this->getMetaProvider()->getCustomFields($customGroupFilters);
   }
 
+  /**
+   * @return array
+   *   List of field descriptors, keyed by name.
+   *   Only include fields that are currently expected to be active/supported.
+   *
+   *   Ex: ['field_1' => ['title' => ..., 'sqlType' => ...]]
+   */
   public function getSupportedFields(): array {
     $fields = $this->getMetaProvider()->getFields();
     if ($this->getMeta('module') === 'civicrm') {

@@ -131,18 +131,20 @@ class CRM_Core_BAO_CustomValueTable {
                   $value = NULL;
                 }
               }
-              elseif ($value == NULL || $value === '') {
-                $type = 'Timestamp';
-                $value = NULL;
-              }
               else {
                 $type = 'Integer';
+              }
+              // An empty value should be stored as NULL
+              if (!$value) {
+                $type = 'Timestamp';
+                $value = NULL;
               }
               break;
 
             case 'EntityReference':
               $type = 'Integer';
-              if ($value == NULL || $value === '') {
+              // An empty value should be stored as NULL
+              if (!$value) {
                 $type = 'Timestamp';
                 $value = NULL;
               }

@@ -151,17 +151,28 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       foreach ($this->display['settings']['columns'] as $column) {
         $columns[] = $this->formatColumn($column, $data);
       }
-      $style = $this->getCssStyles($this->display['settings']['cssRules'] ?? [], $data);
-      // Add hierarchical styles
-      if (!empty($this->display['settings']['hierarchical'])) {
-        $style[] = 'crm-hierarchical-row crm-hierarchical-depth-' . ($data['_depth'] ?? '0');
-        $style[] = empty($data['_depth']) ? 'crm-hierarchical-parent' : 'crm-hierarchical-child';
-      }
       $row = [
         'data' => $data,
         'columns' => $columns,
-        'cssClass' => implode(' ', $style),
       ];
+      $style = $this->getCssStyles($this->display['settings']['cssRules'] ?? [], $data);
+      // Add hierarchical styles
+      if (!empty($this->display['settings']['hierarchical'])) {
+        $depth = $data['_depth'] ?? 0;
+        $style[] = 'crm-hierarchical-row crm-hierarchical-depth-' . $depth;
+        if ($depth) {
+          $style[] = 'crm-hierarchical-child';
+        }
+        if (!empty($data['_descendents'])) {
+          $style[] = 'crm-hierarchical-parent';
+          if (($this->display['settings']['collapsible'] ?? FALSE) === 'closed') {
+            $row['collapsed'] = TRUE;
+          }
+        }
+      }
+      if ($style) {
+        $row['cssClass'] = implode(' ', $style);
+      }
       if (isset($record[$keyName])) {
         $row['key'] = $record[$keyName];
       }
@@ -298,6 +309,9 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     }
     if (!empty($column['alignment'])) {
       $cssClass[] = $column['alignment'];
+    }
+    if (!empty($column['show_linebreaks'])) {
+      $cssClass[] = 'crm-search-field-show-linebreaks';
     }
     if ($cssClass) {
       $out['cssClass'] = implode(' ', $cssClass);
@@ -463,6 +477,16 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         $clause[1] = 'CONTAINS';
       }
       $fieldKey = $this->renameIfAggregate($fieldKey);
+    }
+    // Handle relative dates
+    if (!empty($clause[2])) {
+      $field = $this->getField($fieldKey);
+      if ($field && $field['data_type'] === 'Date') {
+        $clause[2] = date('Y-m-d', strtotime($clause[2]));
+      }
+      if ($field && $field['data_type'] === 'Timestamp') {
+        $clause[2] = date('Y-m-d H:i:s', strtotime($clause[2]));
+      }
     }
     return [$fieldKey, $clause[1] ?? 'IS NOT EMPTY', $clause[2] ?? NULL];
   }
@@ -1352,6 +1376,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     // Add `depth_` column for hierarchical entity displays
     if (!empty($this->display['settings']['hierarchical'])) {
       $this->addSelectExpression('_depth');
+      $this->addSelectExpression('_descendents');
     }
     // Add draggable column (typically "weight")
     if (!empty($this->display['settings']['draggable'])) {

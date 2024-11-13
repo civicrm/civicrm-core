@@ -1,6 +1,6 @@
 <div class="form-group" ng-if="!$ctrl.isMulti()" >
-  <input type="text" class="form-control" ng-model="$ctrl.value" ng-required="!$ctrl.field.nullable">
+  <input type="text" class="form-control" ng-model="$ctrl.value" id="{{:: $ctrl.labelId }}" ng-required="!$ctrl.field.nullable || $ctrl.field.required">
 </div>
 <div class="form-group" ng-if="$ctrl.isMulti()" >
-  <input class="form-control" ng-model="$ctrl.value" ng-required="!$ctrl.field.nullable" crm-ui-select="{multiple: true, tags: [], tokenSeparators: [','], formatNoMatches: ''}" ng-list>
+  <input class="form-control" ng-model="$ctrl.value" id="{{:: $ctrl.labelId }}" ng-required="!$ctrl.field.nullable || $ctrl.field.required" crm-ui-select="{multiple: true, tags: [], tokenSeparators: [','], formatNoMatches: ''}" ng-list>
 </div>

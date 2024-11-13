@@ -1,13 +1,16 @@
+<label ng-if="$ctrl.showLabel && $ctrl.field.label" for="{{:: $ctrl.domId }}">
+  {{ $ctrl.field.label }}
+</label>
 <div ng-switch="$ctrl.op || ''" class="form-group">
 
   <div ng-switch-when="BETWEEN|NOT BETWEEN" ng-switch-when-separator="|" class="form-group">
-    <crm-search-input-val field="$ctrl.field" op="'&gt;'" option-key="$ctrl.optionKey" ng-model="$ctrl.value[0]" class="form-group"></crm-search-input-val>
+    <crm-search-input-val field="$ctrl.field" op="'&gt;'" option-key="$ctrl.optionKey" ng-model="$ctrl.value[0]" class="form-group" label-id="{{:: $ctrl.domId }}"></crm-search-input-val>
     -
     <crm-search-input-val field="$ctrl.field" op="'&lt;'" option-key="$ctrl.optionKey" ng-model="$ctrl.value[1]" class="form-group"></crm-search-input-val>
   </div>
 
   <div ng-switch-default class="form-group">
-    <crm-search-input-val field="$ctrl.field" op="$ctrl.op" option-key="$ctrl.optionKey" ng-model="$ctrl.value" class="form-group"></crm-search-input-val>
+    <crm-search-input-val field="$ctrl.field" op="$ctrl.op" option-key="$ctrl.optionKey" ng-model="$ctrl.value" class="form-group" label-id="{{:: $ctrl.domId }}"></crm-search-input-val>
   </div>
 
 </div>

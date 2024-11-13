@@ -18,7 +18,7 @@
       {include file=$tplFile}
     {/if}
   {else}
-    {if $smarty.get.snippet eq 2}
+    {if $smarty.get.snippet eq 1}
       {include file="CRM/common/print.tpl"}
     {else}
       {crmRegion name='ajax-snippet'}{/crmRegion}

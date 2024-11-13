@@ -9,9 +9,28 @@
 
     this.entityTitle = this.getEntityTitle();
 
-    // If no confirmation message, skip straight to processing
-    if (!ctrl.apiBatch.confirmMsg) {
+    // If no selectable fields or confirmation message, skip straight to processing
+    if (!ctrl.apiBatch.confirmMsg && !ctrl.apiBatch.fields) {
       ctrl.start(ctrl.apiBatch.params);
+    }
+
+    if (ctrl.apiBatch.fields) {
+      ctrl.apiBatch.params = ctrl.apiBatch.params || {};
+      ctrl.apiBatch.params.values = ctrl.apiBatch.params.values || {};
+      // Set values from field defaults
+      ctrl.apiBatch.fields.forEach((field) => {
+        let value = '';
+        if ('default_value' in field) {
+          value = field.default_value;
+        } else if (field.serialize || field.data_type === 'Array') {
+          value = [];
+        } else if (field.data_type === 'Boolean') {
+          value = true;
+        } else if (field.options && field.options.length) {
+          value = field.options[0].id;
+        }
+        ctrl.apiBatch.params.values[field.name] = value;
+      });
     }
 
     this.onSuccess = function(result) {

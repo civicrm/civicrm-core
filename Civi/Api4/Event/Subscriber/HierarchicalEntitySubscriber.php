@@ -85,13 +85,14 @@ class HierarchicalEntitySubscriber extends AutoService implements EventSubscribe
       $childCount = count($children) + 1;
       // Maintaining other sort criteria, move children under their parents
       while ($children && $childCount > count($children)) {
-        // This guards against a loop getting "stuck" - if there's no progress after an iteration, abandon the orphaned children
+        // Guard loop against getting "stuck" - if there's no progress after an iteration, abandon the orphaned children
         $childCount = count($children);
         foreach (array_reverse($children, TRUE) as $index => $child) {
           // If the child has more than one parent (Groups entity), just pick the 1st valid one
           foreach ((array) $child[$parentName] as $parentId) {
             if (isset($records[$parentId])) {
-              $child['_depth'] = $records[$parentId]['_depth'] + 1;
+              self::propagateDescendents($records, $parentId, $parentName);
+              $child['_depth'] = ($records[$parentId]['_depth'] ?? 0) + 1;
               $records = self::array_insert_after($records, $parentId, [$child[$idName] => $child]);
               unset($children[$index]);
               break;
@@ -109,12 +110,36 @@ class HierarchicalEntitySubscriber extends AutoService implements EventSubscribe
     }
   }
 
+  /**
+   * Recursively propagates the count of descendents to the parents and parents-of-parents.
+   *
+   * @param array $records
+   *   Reference to the collection of records where propagation is done
+   * @param mixed $parentId
+   *   Identifier of the parent record
+   * @param string $parentName
+   *   Name of the 'parent_id' field
+   *
+   * @return void
+   */
+  private static function propagateDescendents(array &$records, $parentId, $parentName) {
+    $records[$parentId]['_descendents'] ??= 0;
+    $records[$parentId]['_descendents'] += 1;
+    // If the child has more than one parent (Groups entity), just pick the 1st valid one
+    foreach ((array) $records[$parentId][$parentName] as $parentId) {
+      if (isset($records[$parentId])) {
+        self::propagateDescendents($records, $parentId, $parentName);
+        return;
+      }
+    }
+  }
+
   private function applies(Event $event): bool {
     $apiRequest = $event->getApiRequest();
     return $apiRequest['version'] == 4 &&
       is_a($apiRequest, 'Civi\Api4\Generic\AbstractGetAction') &&
       CoreUtil::isType($apiRequest->getEntityName(), 'HierarchicalEntity') &&
-      in_array('_depth', $apiRequest->getSelect(), TRUE);
+      array_intersect(['_depth', '_descendents'], $apiRequest->getSelect());
   }
 
   private function getParentField(string $entityName): array {

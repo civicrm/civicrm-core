@@ -102,7 +102,7 @@ trait CRM_Contact_Form_Edit_EmailBlockTrait {
       'aria-label' => ts('Bulk Mailing for Email %1?', [1 => $blockNumber]),
       'onChange' => "if (CRM.$(this).is(':checked')) {
           CRM.$('.crm-email-bulkmail input').not(this).prop('checked', false);
-        } else {alert('boo')}",
+        }",
     ];
 
     $this->addElement('advcheckbox', "email[$blockNumber][is_bulkmail]", NULL, '', $js);

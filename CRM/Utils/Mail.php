@@ -311,7 +311,7 @@ class CRM_Utils_Mail {
       if ($logCount < 3) {
         // Only record the first 3 times since there might be different messages but after 3 chances are
         // it's just bulk run of the same..
-        CRM_Core_Error::deprecatedWarning('email output affected by undefined php properties:' . (CRM_Utils_Constant::value('CIVICRM_UF') === 'UnitTests' ? CRM_Utils_String::purifyHTML($htmlMessage) : ''));
+        CRM_Core_Error::deprecatedWarning('email output affected by undefined php properties:' . (CRM_Utils_Constant::value('CIVICRM_UF') === 'UnitTests' ? CRM_Utils_String::purifyHTML($htmlMessage) . CRM_Utils_String::purifyHTML($textMessage) : ''));
         $logCount++;
         \Civi::$statics[__CLASS__][__FUNCTION__]['count'] = $logCount;
       }
