@@ -319,7 +319,7 @@ class Submit extends AbstractProcessor {
       if (!empty($contact['fields']['id'])) {
         continue;
       }
-      if (empty($contact['fields']) || \CRM_Contact_BAO_Contact::hasName($contact['fields'] + ['contact_type' => $entityType])) {
+      if (!empty($contact['fields']) && \CRM_Contact_BAO_Contact::hasName($contact['fields'] + ['contact_type' => $entityType])) {
         continue;
       }
       foreach ($contact['joins']['Email'] ?? [] as $email) {
