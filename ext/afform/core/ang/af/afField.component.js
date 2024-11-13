@@ -35,6 +35,10 @@
         }
 
         if (this.defn.name !== this.fieldName) {
+          if (!this.defn.name) {
+            console.error('Missing field definition for: ' + this.fieldName);
+            return;
+          }
           namePrefix = this.fieldName.substr(0, this.fieldName.length - this.defn.name.length);
         }
 
