@@ -310,6 +310,9 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     if (!empty($column['alignment'])) {
       $cssClass[] = $column['alignment'];
     }
+    if (!empty($column['show_linebreaks'])) {
+      $cssClass[] = 'crm-search-field-show-linebreaks';
+    }
     if ($cssClass) {
       $out['cssClass'] = implode(' ', $cssClass);
     }

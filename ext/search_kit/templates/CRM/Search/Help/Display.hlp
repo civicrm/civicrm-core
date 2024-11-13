@@ -1,7 +1,11 @@
 {htxt id="rewrite"}
   <p>{ts}Both search tokens and smarty tags are supported when rewriting fields.{/ts}</p>
   <p>{ts}SMARTY conditions can be used by placing quotations around the values that should be evaluated.{/ts}</p>
+  <p>{ts}To preserve newlines entered into the rewrite textarea, click "Show Linebreaks" below.{/ts}</p>
 {/htxt}
 {htxt id="empty"}
   <p>{ts}SMARTY conditions can be used by placing quotations around the values that should be evaluated.{/ts}</p>
+{/htxt}
+{htxt id="show_linebreaks"}
+  <p>{ts}Display multi-line text with linebreaks preserved. This is useful for textarea fields such as notes, or multi-line rewrites.{/ts}</p>
 {/htxt}
