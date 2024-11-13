@@ -420,7 +420,7 @@ body.af-gui-dragging {
   left: -4px;
 }
 
-#afGuiEditor .dropdown-menu li {
+#afGuiEditor ul.dropdown-menu {
   cursor: default;
 }
 
