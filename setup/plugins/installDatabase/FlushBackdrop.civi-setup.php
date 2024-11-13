@@ -24,7 +24,15 @@ if (!defined('CIVI_SETUP')) {
     $failure = FALSE;
 
     system_rebuild_module_data();
-    module_enable(array('civicrm', 'civicrmtheme'));
+
+    $modules = ['civicrm'];
+    if (!empty(backdrop_get_path('module', 'civicrmtheme'))) {
+      // FIXME: In 5.81, this module is getting juggled around. Hopefully, for 5.82+,
+      // the final disposition will be resolved, and you can remove this reference completely.
+      $modules[] = 'civicrmtheme';
+    }
+    \Civi\Setup::log()->info(sprintf('[%s] Activate Backdrop module(s): %s', basename(__FILE__), implode(', ', $modules)));
+    module_enable($modules);
     backdrop_flush_all_caches();
     civicrm_install_set_backdrop_perms();
   }, \Civi\Setup::PRIORITY_LATE + 50);
