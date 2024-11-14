@@ -36,7 +36,7 @@
 
     this.save = function() {
       // process submission
-      ctrl.processData();
+      ctrl.processData(ctrl.ids[0]);
     };
 
     this.onSuccess = function() {
