@@ -3,10 +3,7 @@
 	border-radius: var(--crm-expand-radius);
 	margin: var(--crm-expand-gap);
 }
-/*.crm-container details details {
-	padding: 0 var(--crm-expand-gap);
-}*/
-.crm-container summary { /* default summary setting*/
+.crm-container summary {
 	display: list-item;
 	list-style: none;
 	cursor: var(--crm-hover-clickable);
