@@ -491,6 +491,7 @@ class Submit extends AbstractProcessor {
       $whereClause = self::getJoinWhereClause($event->getFormDataModel(), $event->getEntityName(), $joinEntityName, $entityId);
       $mainIdField = CoreUtil::getIdFieldName($mainEntity['type']);
       $joinIdField = CoreUtil::getIdFieldName($joinEntityName);
+      $joinAllowedAction = self::getJoinAllowedAction($mainEntity, $joinEntityName);
 
       // Forward FK e.g. Event.loc_block_id => LocBlock
       $forwardFkField = self::getFkField($mainEntity['type'], $joinEntityName);
@@ -518,12 +519,22 @@ class Submit extends AbstractProcessor {
       // the contact was being auto-updated via a dedupe rule; in that case we would not want to
       // delete any existing records.
       elseif ($values) {
-        $result = civicrm_api4($joinEntityName, 'replace', [
-          // Disable permission checks because the main entity has already been vetted
-          'checkPermissions' => FALSE,
-          'where' => $whereClause,
-          'records' => $values,
-        ]);
+        if ($joinAllowedAction["delete"] === FALSE) {
+          $result = civicrm_api4($joinEntityName, 'save', [
+            // Disable permission checks because the main entity has already been vetted
+            'checkPermissions' => FALSE,
+            'defaults' => ['entity_id' => $entityId],
+            'records' => $values,
+          ]);
+        }
+        else {
+          $result = civicrm_api4($joinEntityName, 'replace', [
+            // Disable permission checks because the main entity has already been vetted
+            'checkPermissions' => FALSE,
+            'where' => $whereClause,
+            'records' => $values,
+          ]);
+        }
         $indexedResult = array_combine(array_keys($values), (array) $result);
         $event->setJoinIds($index, $joinEntityName, $indexedResult);
       }

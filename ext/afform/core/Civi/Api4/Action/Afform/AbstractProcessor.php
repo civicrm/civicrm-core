@@ -732,4 +732,21 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     return is_array($firstValue) && $firstValue ? array_keys($firstValue)[0] : NULL;
   }
 
+  /**
+   * Function to get allowed action of a join entity
+   *
+   * @param array $mainEntity
+   * @param string $joinEntityName
+   *
+   * @return array
+   */
+  public static function getJoinAllowedAction(array $mainEntity, string $joinEntityName) {
+    $actions = ["update" => TRUE, "delete" => TRUE];
+    if (array_key_exists('actions', $mainEntity['joins'][$joinEntityName])) {
+      $actions = array_merge($actions, $mainEntity['joins'][$joinEntityName]['actions']);
+    }
+
+    return $actions;
+  }
+
 }
