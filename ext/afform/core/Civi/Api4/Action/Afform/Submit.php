@@ -483,12 +483,23 @@ class Submit extends AbstractProcessor {
       // the contact was being auto-updated via a dedupe rule; in that case we would not want to
       // delete any existing records.
       elseif ($values) {
-        $result = civicrm_api4($joinEntityName, 'replace', [
-          // Disable permission checks because the main entity has already been vetted
-          'checkPermissions' => FALSE,
-          'where' => $whereClause,
-          'records' => $values,
-        ]);
+        // Based on afform Submit::getCustomGroupBlocks(), we can use this check for "is_multiple"
+        if (str_contains($joinEntityName, "Custom_")) {
+          $values[0]["entity_id"] = $entityId;
+          $result = civicrm_api4($joinEntityName, 'save', [
+            // Disable permission checks because the main entity has already been vetted
+            'checkPermissions' => FALSE,
+            'records' => $values,
+          ]);
+        }
+        else {
+          $result = civicrm_api4($joinEntityName, 'replace', [
+            // Disable permission checks because the main entity has already been vetted
+            'checkPermissions' => FALSE,
+            'where' => $whereClause,
+            'records' => $values,
+          ]);
+        }
         $indexedResult = array_combine(array_keys($values), (array) $result);
         $event->setJoinIds($index, $joinEntityName, $indexedResult);
       }
