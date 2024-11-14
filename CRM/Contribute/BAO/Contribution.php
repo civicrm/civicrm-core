@@ -2200,7 +2200,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       if (!$paymentProcessorID) {
         $paymentProcessorID = $this->_relatedObjects['event']->payment_processor;
         if ($paymentProcessorID) {
-          $intentionalEnotice = $CRM16923AnUnreliableMethodHasBeenUserToDeterminePaymentProcessorFromEvent;
+          CRM_Core_Error::deprecatedWarning('CRM-16923 An Unreliable Method Has Been User To Determine Payment Processor From Event');
         }
       }
     }
