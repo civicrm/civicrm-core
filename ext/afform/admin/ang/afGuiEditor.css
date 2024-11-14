@@ -433,6 +433,9 @@ body.af-gui-dragging {
   white-space: nowrap;
 }
 
+#afGuiEditor .dropdown-menu li .checkbox-inline label {
+  font-weight: normal;
+}
 #afGuiEditor .dropdown-menu li > * > label {
   font-weight: normal;
   cursor: pointer;
