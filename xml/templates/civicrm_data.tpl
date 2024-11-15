@@ -109,22 +109,22 @@ SELECT @option_value_rel_id_as  := value FROM civicrm_option_value WHERE option_
 SELECT @option_value_rel_id_cg  := value FROM civicrm_option_value WHERE option_group_id = @option_group_id_arel AND name = 'Cost of Sales Account is';
 SELECT @option_value_rel_id_dr  := value FROM civicrm_option_value WHERE option_group_id = @option_group_id_arel AND name = 'Deferred Revenue Account is';
 
-SELECT @financial_type_id_dtn          := max(id) FROM civicrm_financial_type WHERE name = '{ts escape="sql"}Donation{/ts}';
-SELECT @financial_type_id_md         := max(id) FROM civicrm_financial_type WHERE name = '{ts escape="sql"}Member Dues{/ts}';
-SELECT @financial_type_id_cc         := max(id) FROM civicrm_financial_type WHERE name = '{ts escape="sql"}Campaign Contribution{/ts}';
-SELECT @financial_type_id_ef         := max(id) FROM civicrm_financial_type WHERE name = '{ts escape="sql"}Event Fee{/ts}';
+SELECT @financial_type_id_dtn          := max(id) FROM civicrm_financial_type WHERE name = 'Donation';
+SELECT @financial_type_id_md         := max(id) FROM civicrm_financial_type WHERE name = 'Member Dues';
+SELECT @financial_type_id_cc         := max(id) FROM civicrm_financial_type WHERE name = 'Campaign Contribution';
+SELECT @financial_type_id_ef         := max(id) FROM civicrm_financial_type WHERE name = 'Event Fee';
 
-SELECT @financial_account_id_dtn       := max(id) FROM civicrm_financial_account WHERE name = '{ts escape="sql"}Donation{/ts}';
-SELECT @financial_account_id_md         := max(id) FROM civicrm_financial_account WHERE name = '{ts escape="sql"}Member Dues{/ts}';
-SELECT @financial_account_id_cc         := max(id) FROM civicrm_financial_account WHERE name = '{ts escape="sql"}Campaign Contribution{/ts}';
-SELECT @financial_account_id_ef         := max(id) FROM civicrm_financial_account WHERE name = '{ts escape="sql"}Event Fee{/ts}';
-SELECT @financial_account_id_bf         := max(id) FROM civicrm_financial_account WHERE name = '{ts escape="sql"}Banking Fees{/ts}';
-SELECT @financial_account_id_ap        := max(id) FROM civicrm_financial_account WHERE name = '{ts escape="sql"}Accounts Receivable{/ts}';
-SELECT @financial_account_id_ar        := max(id) FROM civicrm_financial_account WHERE name = '{ts escape="sql"}Deposit Bank Account{/ts}';
-SELECT @financial_account_id_pp        := max(id) FROM civicrm_financial_account WHERE name = '{ts escape="sql"}Payment Processor Account{/ts}';
-SELECT @financial_account_id_pr        := max(id) FROM civicrm_financial_account WHERE name = '{ts escape="sql"}Premiums{/ts}';
-SELECT @financial_account_id_dref      := max(id) FROM civicrm_financial_account WHERE name = '{ts escape="sql"}Deferred Revenue - Event Fee{/ts}';
-SELECT @financial_account_id_drmd      := max(id) FROM civicrm_financial_account WHERE name = '{ts escape="sql"}Deferred Revenue - Member Dues{/ts}';
+SELECT @financial_account_id_dtn       := max(id) FROM civicrm_financial_account WHERE name = 'Donation';
+SELECT @financial_account_id_md         := max(id) FROM civicrm_financial_account WHERE name = 'Member Dues';
+SELECT @financial_account_id_cc         := max(id) FROM civicrm_financial_account WHERE name = 'Campaign Contribution';
+SELECT @financial_account_id_ef         := max(id) FROM civicrm_financial_account WHERE name = 'Event Fee';
+SELECT @financial_account_id_bf         := max(id) FROM civicrm_financial_account WHERE name = 'Banking Fees';
+SELECT @financial_account_id_ap        := max(id) FROM civicrm_financial_account WHERE name = 'Accounts Receivable';
+SELECT @financial_account_id_ar        := max(id) FROM civicrm_financial_account WHERE name = 'Deposit Bank Account';
+SELECT @financial_account_id_pp        := max(id) FROM civicrm_financial_account WHERE name = 'Payment Processor Account';
+SELECT @financial_account_id_pr        := max(id) FROM civicrm_financial_account WHERE name = 'Premiums';
+SELECT @financial_account_id_dref      := max(id) FROM civicrm_financial_account WHERE name = 'Deferred Revenue - Event Fee';
+SELECT @financial_account_id_drmd      := max(id) FROM civicrm_financial_account WHERE name = 'Deferred Revenue - Member Dues';
 
 INSERT INTO `civicrm_entity_financial_account`
      ( entity_table, entity_id, account_relationship, financial_account_id )
