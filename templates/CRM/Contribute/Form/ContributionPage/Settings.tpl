@@ -131,6 +131,8 @@
   </tr>
   {/if}
        </table>
+  {include file="CRM/common/customDataBlock.tpl" customDataType='ContributionPage'}
+
    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
 

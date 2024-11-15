@@ -15,6 +15,7 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_ContributionPage {
+  use CRM_Custom_Form_CustomDataTrait;
 
   /**
    * Set variables up before form is built.
@@ -22,6 +23,17 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
   public function preProcess() {
     parent::preProcess();
     $this->setSelectedChild('settings');
+
+    // Must set entityID for defaults to load via AJAX.
+    $this->assign('entityID', $this->_id);
+
+    if ($this->isSubmitted()) {
+      // The custom data fields are added to the form by an ajax form.
+      // However, if they are not present in the element index they will
+      // not be available from `$this->getSubmittedValue()` in post process.
+      // We do not have to set defaults or otherwise render - just add to the element index.
+      $this->addCustomDataFieldsToForm('ContributionPage');
+    }
   }
 
   /**
@@ -297,7 +309,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
    */
   public function postProcess() {
     // get the submitted form values.
-    $params = $this->controller->exportValues($this->_name);
+    $params = $this->getSubmittedValues();
 
     // we do this in case the user has hit the forward/back button
     if ($this->_id) {
@@ -320,6 +332,8 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
       $params['honor_block_title'] = NULL;
       $params['honor_block_text'] = NULL;
     }
+
+    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params, $this->_id, 'ContributionPage');
 
     $dao = CRM_Contribute_BAO_ContributionPage::writeRecord($params);
 
