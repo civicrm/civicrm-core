@@ -188,17 +188,10 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
         $item['join_entity'] = 'Custom_' . $custom['name'];
       }
       if ($getLayout) {
-        $item['layout'] = ($custom['help_pre'] ? '<div class="af-markup">' . $custom['help_pre'] . "</div>\n" : '');
-        foreach ($custom['fields'] as $field) {
-          $nameAttribute = $field['name'];
-          // for multiple record fields there is no need to prepend the custom group name
-          // because it is provided as the join_entity above
-          if (!$custom['is_multiple']) {
-            $nameAttribute = $custom['name'] . "." . $nameAttribute;
-          }
-          $item['layout'] .= "<af-field name=\"{$nameAttribute}\" />\n";
-        }
-        $item['layout'] .= ($custom['help_post'] ? '<div class="af-markup">' . $custom['help_post'] . "</div>\n" : '');
+        $item['layout'] = \CRM_Core_Smarty::singleton()->fetchWith(
+          'afform/customGroups/afblock.tpl',
+          ['custom' => $custom]
+        );
       }
       $afforms[$name] = $item;
     }
