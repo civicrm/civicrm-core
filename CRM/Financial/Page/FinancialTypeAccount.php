@@ -112,7 +112,7 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
     $params['entity_table'] = 'civicrm_financial_type';
     if ($this->_aid) {
       $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
-      $this->_title = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', $this->_aid, 'name');
+      $this->_title = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', $this->_aid, 'label');
       CRM_Utils_System::setTitle($this->_title . ' - ' . ts('Assigned Financial Accounts'));
       $financialAccountType = CRM_Financial_DAO_FinancialAccount::buildOptions('financial_account_type_id');
       $accountRelationship = CRM_Financial_DAO_EntityFinancialAccount::buildOptions('account_relationship');
@@ -126,7 +126,7 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
         $defaults = [];
         $financialAccount = CRM_Financial_BAO_FinancialAccount::retrieve($params, $defaults);
         if (!empty($financialAccount)) {
-          $financialType[$dao->id]['financial_account'] = $financialAccount->name;
+          $financialType[$dao->id]['financial_account'] = $financialAccount->label;
           $financialType[$dao->id]['accounting_code'] = $financialAccount->accounting_code;
           $financialType[$dao->id]['account_type_code'] = $financialAccount->account_type_code;
           $financialType[$dao->id]['is_active'] = $financialAccount->is_active;
