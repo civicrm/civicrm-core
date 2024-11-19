@@ -92,15 +92,19 @@ class CRM_Utils_Cache_ArrayCache implements CRM_Utils_Cache_Interface {
     return TRUE;
   }
 
+  /**
+   * @return true
+   * @deprecated since 5.80 will be removed around 5.98
+   */
   public function flush() {
+    return $this->clear();
+  }
+
+  public function clear() {
     unset($this->_cache);
     unset($this->_expires);
     $this->_cache = [];
     return TRUE;
-  }
-
-  public function clear() {
-    return $this->flush();
   }
 
   private function reobjectify($value) {

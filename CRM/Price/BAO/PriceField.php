@@ -167,7 +167,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
     }
 
     $transaction->commit();
-    Civi::cache('metadata')->flush();
+    Civi::cache('metadata')->clear();
     return $priceField;
   }
 

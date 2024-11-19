@@ -115,7 +115,7 @@ class CRM_Upgrade_Incremental_php_FiveFortySeven extends CRM_Upgrade_Incremental
     }
     // Reload the civi cache here as 'table_name' may not be in the cached entities
     // array generated in an earlier version retrieved via $cache->get('api4.entities.info', []);
-    Civi::cache('metadata')->flush();
+    Civi::cache('metadata')->clear();
 
     // There are existing records which should be managed by `civigrant`. To assign ownership, we need
     // placeholders in `civicrm_extension` and `civicrm_managed`.
