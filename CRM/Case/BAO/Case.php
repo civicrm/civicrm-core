@@ -451,7 +451,7 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
    *
    * @return string
    */
-  public static function getCaseXountQuery($allCases, $type, $userID, $condition = NULL) {
+  public static function getCaseCountQuery($allCases, $type, $userID, $condition = NULL) {
     if ($allCases && $type == 'any') {
       return "SELECT COUNT(*) FROM civicrm_case WHERE is_deleted = 0";
     }
