@@ -1,6 +1,12 @@
 <span ng-if="dataProvider.getFieldData()[$ctrl.fieldName].file_name">
-  <i class="crm-i {{ dataProvider.getFieldData()[$ctrl.fieldName].icon }}"></i>
-  {{ dataProvider.getFieldData()[$ctrl.fieldName].file_name }}
+  <a ng-if="dataProvider.getFieldData()[$ctrl.fieldName].url" ng-href="{{:: dataProvider.getFieldData()[$ctrl.fieldName].url }}">
+    <i class="crm-i {{ dataProvider.getFieldData()[$ctrl.fieldName].icon }}"></i>
+    {{ dataProvider.getFieldData()[$ctrl.fieldName].file_name }}
+  </a>
+  <span ng-if="!dataProvider.getFieldData()[$ctrl.fieldName].url">
+    <i class="crm-i {{ dataProvider.getFieldData()[$ctrl.fieldName].icon }}"></i>
+    {{ dataProvider.getFieldData()[$ctrl.fieldName].file_name }}
+  </span>
   <a class="crm-hover-button" title="{{:: ts('Replace') }}" ng-click="dataProvider.getFieldData()[$ctrl.fieldName].file_name = null">
     <i class="crm-i fa-times" aria-hidden="true"></i>
   </a>
