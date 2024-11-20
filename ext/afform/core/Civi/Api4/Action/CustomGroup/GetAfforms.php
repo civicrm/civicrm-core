@@ -58,7 +58,11 @@ class GetAfforms extends \Civi\Api4\Generic\BasicBatchAction {
       ->execute()
       ->column('name');
 
-    // we also needs this for
+    // restrict forms other than block to if Admin UI is enabled
+    $hasAdminUi = \CRM_Extension_System::singleton()->getMapper()->isActiveModule('civicrm_admin_ui');
+    if (!$hasAdminUi) {
+      $this->formTypes = array_intersect(['block'], $this->formTypes);
+    }
 
     foreach ($this->formTypes as $type) {
       switch ($type) {
