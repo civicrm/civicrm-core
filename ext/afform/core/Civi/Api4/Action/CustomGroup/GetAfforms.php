@@ -44,7 +44,7 @@ class GetAfforms extends \Civi\Api4\Generic\BasicBatchAction {
   protected array $formTypes = ['block', 'form', 'search'];
 
   protected function getSelect() {
-    return ['id', 'name', 'title', 'is_multiple', 'help_pre', 'help_post', 'extends'];
+      return ['id', 'name', 'title', 'is_multiple', 'help_pre', 'help_post', 'extends', 'icon'];
   }
 
   protected function doTask($item) {
@@ -102,6 +102,7 @@ class GetAfforms extends \Civi\Api4\Generic\BasicBatchAction {
       'is_public' => FALSE,
       'permission' => ['access CiviCRM'],
       'entity_type' => $item['extends'],
+      'icon' => $item['icon'],
     ];
     if ($item['is_multiple']) {
       $afform['join_entity'] = 'Custom_' . $item['name'];
@@ -127,6 +128,7 @@ class GetAfforms extends \Civi\Api4\Generic\BasicBatchAction {
       // to edit contacts
       'permission' => ['access CiviCRM'],
       'server_route' => 'civicrm/af/custom/' . $item['name'] . '/update',
+      'icon' => $item['icon'],
     ];
     if ($this->getLayout) {
 
@@ -181,6 +183,7 @@ class GetAfforms extends \Civi\Api4\Generic\BasicBatchAction {
       // to edit contacts
       'permission' => ['access CiviCRM'],
       'server_route' => 'civicrm/af/custom/' . $item['name'] . '/create',
+      'icon' => $item['icon'],
     ];
     if ($this->getLayout) {
       $formEntity = [
