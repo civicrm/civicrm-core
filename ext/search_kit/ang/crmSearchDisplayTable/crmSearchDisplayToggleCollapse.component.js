@@ -19,6 +19,7 @@
         } else {
           row.collapsed = false;
         }
+        // Button is irrelevant without any descendents; hide it without breaking the layout.
         if (!row.data._descendents) {
           $element.css('visibility', 'hidden');
         }
@@ -51,7 +52,7 @@
           // Hiding rows is simple, just hide all of them, but when un-hiding we need to skip over
           // the children of collapsed elements.
           if (!hide && ctrl.rows[i].collapsed) {
-            i += ctrl.rows[i]._descendents;
+            i += ctrl.rows[i].data._descendents;
           }
         }
       };
