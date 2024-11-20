@@ -389,15 +389,28 @@ div:has(> table) {
  */
 
 /* apply hanging indent to sorting buttons */
-.crm-container :is(tr a, table.dataTable thead th):is(.sorting, .sorting_asc, .sorting_desc),
+.crm-container :is(tr a,
+table.dataTable thead th):is(.sorting,
+.sorting_asc,
+.sorting_desc),
 .crm-search-display th.crm-sortable-col {
-  padding-left: calc(var(--crm-table-padding,
-  0) + 1ch);   &: after,
-  &: before {
-    position: absolute;
-    margin-left: -1em;
-  }
+  padding-left: calc(var(--crm-table-padding, 0) + 1ch);
 }
+
+.crm-container :is(tr a,
+table.dataTable thead th):is(.sorting,
+.sorting_asc,
+.sorting_desc)::before,
+.crm-container :is(tr a,
+table.dataTable thead th):is(.sorting,
+.sorting_asc,
+.sorting_desc)::after,
+.crm-search-display th.crm-sortable-col::before,
+.crm-search-display th.crm-sortable-col::after {
+  position: absolute;
+  margin-left: -1em;
+}
+
 /* ...and in searchkit, this is terribly awkward and could be fixed with a core PR to provide more classes */
 .crm-container .table > thead > tr > th:has(.crm-search-table-column-sort-icon) {
   padding-left: 1.5ch;
@@ -582,11 +595,11 @@ html.crm-standalone  nav.breadcrumb>ol {
 }
 /* Override contactSummary.css */
 #crm-contact-actions-list a.delete {
-  --crm-c-alert-text: var(--crm-c-red-dark);   
-&: is
-  (: hover
-  ,: focus) {
-    /* the hover state gives crm-c-red-dark to the background */
-    --crm-c-alert-text: var(--crm-c-red-light);
-  }
+  --crm-c-alert-text: var(--crm-c-red-dark);
+}
+
+#crm-contact-actions-list a.delete *:hover,
+#crm-contact-actions-list a.delete *:focus {
+  /* the hover state gives crm-c-red-dark to the background */
+  --crm-c-alert-text: var(--crm-c-red-light);
 }
