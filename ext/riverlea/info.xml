@@ -11,11 +11,11 @@
     <url desc="Main Extension Page">https://lab.civicrm.org/extensions/riverlea</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
-  <releaseDate>2024-11-13</releaseDate>
-  <version>5.80.3</version>
-  <develStage>Stable</develStage>
+  <releaseDate>[civicrm.releaseDate]</releaseDate>
+  <version>[civicrm.version]</version>
+  <develStage>stable</develStage>
   <compatibility>
-    <ver>5.75</ver>
+    <ver>[civicrm.majorVersion]</ver>
   </compatibility>
   <comments>A cross-CMS CiviCRM theme framework.</comments>
   <classloader>
