@@ -2,7 +2,7 @@
 
 namespace Civi\riverlea;
 
-use \CRM_riverlea_ExtensionUtil as E;
+use CRM_riverlea_ExtensionUtil as E;
 
 /**
  * This class generates a `river.css` file for Riverlea themes containing
@@ -40,7 +40,7 @@ class DynamicCss implements \Symfony\Component\EventDispatcher\EventSubscriberIn
   /**
    * Generate asset content (when accessed via AssetBuilder).
    *
-   * @param \Civi\Core\Event\GenericHookEvent $event
+   * @param \Civi\Core\Event\GenericHookEvent $e
    *
    * @see CRM_Utils_hook::buildAsset()
    * @see \Civi\Core\AssetBuilder

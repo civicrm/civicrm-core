@@ -3,177 +3,177 @@
    Status: merged. */
 
 .api4-explorer-row.crm-flex-box {
-	gap: var(--crm-padding-reg);
-	margin-bottom: var(--crm-padding-reg);
-    min-height: 500px;
+  gap: var(--crm-padding-reg);
+  margin-bottom: var(--crm-padding-reg);
+  min-height: 500px;
 }
 .api4-explorer-row .explorer-params-panel,
 .api4-explorer-row .explorer-code-panel {
-	flex: 2;
+  flex: 2;
 }
 .api4-explorer-row > .panel {
-    margin: 0;
-    background: var(--crm-panel-background);
+  margin: 0;
+  background: var(--crm-panel-background);
 }
 .api4-explorer-page .panel-heading {
-    /* height: 48px; */
-	display: flex;
-	align-items: center;
-    padding: var(--crm-m);
+  /* height: 48px; */
+  display: flex;
+  align-items: center;
+  padding: var(--crm-m);
 }
 .api4-explorer-row .panel-heading h3 {
-	background: transparent;
-    margin: 0 !important /* vs bootstrap3 */;
-    padding: 0 !important /* vs bootstrap3 */;
+  background: transparent;
+  margin: 0 !important /* vs bootstrap3 */;
+  padding: 0 !important /* vs bootstrap3 */;
 }
 .api4-explorer-row .panel-heading .form-inline {
-	width: 100%;
-	padding: 0;
-	display: flex;
-	align-items: center;
-	gap: var(--crm-m);
-	flex-wrap: wrap;
+  width: 100%;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--crm-m);
+  flex-wrap: wrap;
 }
 .api4-explorer-row .panel-heading .form-inline .pull-right {
-	margin-left: auto;
+  margin-left: auto;
 }
 .api4-explorer-row .panel-body {
-    background: var(--crm-tab-bg-active);
+  background: var(--crm-tab-bg-active);
 }
 
 /* General form */
 .api4-explorer-page form label,
 .api4-explorer-page fieldset legend {
-    text-transform: capitalize;
+  text-transform: capitalize;
 }
 .api4-explorer-page .api4-input-group {
-    display: inline-block;
+  display: inline-block;
 }
 .api4-explorer-page i.fa-arrows {
-    cursor: move;
+  cursor: move;
 }
 .api4-input {
-	display: flex;
-    gap: var(--crm-m);
-    margin-bottom: var(--crm-m);
+  display: flex;
+  gap: var(--crm-m);
+  margin-bottom: var(--crm-m);
 }
 .api4-input label {
-	display: flex;
+  display: flex;
 }
 .api4-explorer-page form label {
-	min-width: var(--crm-input-label-width);
+  min-width: var(--crm-input-label-width);
 }
 .api4-explorer-page form .checkbox-inline > label {
-	min-width: unset;
+  min-width: unset;
 }
 .api4-explorer-page .form-control.huge {
-    width: 25em;
+  width: 25em;
 }
 .api4-explorer-page .form-control.twenty {
-    width: 20em;
+  width: 20em;
 }
 
 /* Code panel */
 .api4-explorer-page .explorer-code-panel pre {
-    word-break: break-all;
-    white-space: pre-wrap;
-    min-height: var(--crm-xxl);
+  word-break: break-all;
+  white-space: pre-wrap;
+  min-height: var(--crm-xxl);
 }
 .api4-explorer-page .explorer-code-panel .panel-heading > .nav li a {
-    text-transform: uppercase;
+  text-transform: uppercase;
 }
 .api4-explorer-page .explorer-code-panel .alert-warning i.crm-i {
-    font-family: inherit; /* Fix for unclosed icon tag */
+  font-family: inherit; /* Fix for unclosed icon tag */
 }
 .api4-explorer-page .explorer-code-panel .alert-warning i.crm-i::before {
-    font: normal normal normal 14px/1 FontAwesome; /* Fix for unclosed icon tag */
+  font: normal normal normal 14px/1 FontAwesome; /* Fix for unclosed icon tag */
 }
 
 /* Results panel */
 .crm-container .explorer-result-panel > .panel-heading {
-    border-bottom: var(--crm-tabs-border);
+  border-bottom: var(--crm-tabs-border);
 }
 .explorer-result-panel .form-inline.pull-right {
-	order: 2;
-	justify-content: end;
+  order: 2;
+  justify-content: end;
 }
 .explorer-result-panel .panel-heading .nav-tabs {
-	width: 100%;
-	align-self: end;
-    border-bottom: 0;
+  width: 100%;
+  align-self: end;
+  border-bottom: 0;
 }
 .explorer-result-panel .nav-tabs i.fa-circle-o {
-    display: none;
+  display: none;
 }
 
 /* From original file, unsure of use, leaving intact for now */
 #bootstrap-theme.api4-explorer-page crm-api4-clause > .btn-group {
-    position: absolute;
-    right: 0;
-    top: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
 }
 #bootstrap-theme.api4-explorer-page crm-api4-clause > .btn-group .btn {
-    border: 0 none;
+  border: 0 none;
 }
 .api4-explorer-page fieldset div.api4-input.ui-sortable-helper {
-    background-color: rgba(255, 255, 255, .9);
+  background-color: rgba(255, 255, 255, .9);
 }
 .api4-explorer-page fieldset div.api4-input.ui-sortable-helper {
-    background-color: rgba(255, 255, 255, .9);
+  background-color: rgba(255, 255, 255, .9);
 }
 .api4-explorer-page .api4-clause-fieldset fieldset {
-    float: right;
-    width: calc(100% - 58px);
-    margin-top: -8px;
+  float: right;
+  width: calc(100% - 58px);
+  margin-top: -8px;
 }
 .api4-explorer-page .api4-clause-fieldset.api4-sorting fieldset .api4-clause-group-sortable {
-    min-height: 3.5em;
+  min-height: 3.5em;
 }
 .api4-explorer-page .api4-clause-badge {
-    width: 55px;
-    display: inline-block;
-    cursor: move;
+  width: 55px;
+  display: inline-block;
+  cursor: move;
 }
 .api4-explorer-page .api4-clause-badge .badge {
-    opacity: .5;
-    position: relative;
+  opacity: .5;
+  position: relative;
 }
 .api4-explorer-page .api4-clause-badge .caret {
-    margin: 0;
+  margin: 0;
 }
 .api4-explorer-page .api4-clause-badge .crm-i {
-    display: none;
-    padding: 0 6px;
+  display: none;
+  padding: 0 6px;
 }
 .api4-explorer-page .ui-sortable-helper .api4-clause-badge .badge span {
-    display: none;
+  display: none;
 }
 .api4-explorer-page .ui-sortable-helper .api4-clause-badge .crm-i {
-    display: inline-block;
+  display: inline-block;
 }
 .api4-explorer-page .api4-operator,
 .api4-explorer-page .api4-sets-action,
 .api4-explorer-page .api4-sets-type,
 .api4-explorer-page .api4-chain-index,
 .api4-explorer-page .api4-chain-action {
-    width: 90px;
+  width: 90px;
 }
 .api4-explorer-page .api4-sets-params,
 .api4-explorer-page .api4-chain-params {
-    width: calc(100% - 390px);
+  width: calc(100% - 390px);
 }
 .api4-explorer-page .api4-add-where-group-menu {
-    min-width: 80px;
-    background-color: rgba(186, 225, 251, 0.94);
+  min-width: 80px;
+  background-color: rgba(186, 225, 251, 0.94);
 }
 .api4-explorer-page .api4-add-where-group-menu a {
-    padding: var(--crm-s) var(--crm-m);
+  padding: var(--crm-s) var(--crm-m);
 }
 /* Responsive (move to own file at some point) */
 
 @media (max-width: 989px) {
-    /* base/position */ .crm-container .crm-flex-box,
-    /* sections/api4-explorer */ .api4-input {
-       flex-direction: column;
-    }
- }
+  /* base/position */ .crm-container .crm-flex-box,
+  /* sections/api4-explorer */ .api4-input {
+    flex-direction: column;
+  }
+}

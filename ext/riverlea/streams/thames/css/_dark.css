@@ -10,7 +10,6 @@
   --crm-c-code-background: var(--crm-c-dkblue-04);
   --crm-dashlet-bg: var(--crm-c-dkblue-02);
   --crm-c-green: #335417;
-
   --crm-c-link: #2c98ed;
   --crm-c-link-hover: color-mix(in srgb, white, var(--crm-c-blue-dark) 70%);
   --crm-dash-header-col: var(--crm-c-blue-light);
@@ -19,7 +18,6 @@
   --crm-dash-block-bg: var(--crm-c-dkblue-03);
   --crm-dash-summary-row-bg: transparent;
   --crm-dash-label-bg: transparent;
-
   --crm-c-text: var(--crm-c-blue-overlay2);
   --crm-tabs-bg: var(--crm-dkblue-01);
   --crm-tabs-border: var(--crm-dkblue-01);
@@ -34,7 +32,6 @@
   --crm-input-color: var(--crm-c-blue); /* text */
   --crm-alert-background-info: var(--crm-c-blue-darker);
   --crm-alert-text-info: var(--crm-c-blue-light);
-
   --crm-expand-body-bg: var(--crm-c-dkblue-03);
   --crm-expand-header-color: var(--crm-c-blue-light);
   --crm-expand-header-bg: var(--crm-c-dkblue-03);
@@ -43,16 +40,13 @@
   --crm-table-even-row: var(--crm-c-dkblue-01);
   --crm-table-odd-hover: var(--crm-c-dkblue-03);
   --crm-table-even-hover: var(--crm-c-dkblue-02);
-
   --crm-c-background2: var(--crm-c-dkblue-02);
   --crm-c-background3: var(--crm-c-dkblue-02);
   --crm-c-background4: var(--crm-c-dkblue-01);
   --crm-panel-background: var(--crm-c-dkblue-02);
   --crm-form-block-background: var(--crm-c-dkblue-02);
-
   --crm-notify-background: var(--crm-c-dkblue-02);
   --crm-expand-header-bg-active: var(--crm-c-dkblue-04);
-
 }
 
 .crm-container div.crm-summary-row div.crm-label {
@@ -65,7 +59,8 @@
   --crm-tabs-border: solid 4px var(--crm-c-dkblue-01);
 }
 
-.crm-container .crm-accordion-bold>summary:is(:hover, :focus) {
+.crm-container .crm-accordion-bold>summary:is(:hover,
+:focus) {
   background-color: var(--crm-c-dkblue-01);
 }
 
@@ -88,11 +83,21 @@
   animation: aahblockoverlay-dark 10s infinite;
 }
 
-.crm-container .crm-dashlet-content { background: var(--crm-c-dkblue-00) !important; }
-.crm-container .crm-dashlet-header { background: var(--crm-c-dkblue-01) !important; }
-.crm-container summary {  background: var(--crm-c-dkblue-03); }
-.crm-container details { background-color: var(--crm-c-dkblue-02); }
-.standalone-errors { background: #3e0a01; }
+.crm-container .crm-dashlet-content {
+  background: var(--crm-c-dkblue-00) !important;
+}
+.crm-container .crm-dashlet-header {
+  background: var(--crm-c-dkblue-01) !important;
+}
+.crm-container summary {
+  background: var(--crm-c-dkblue-03);
+}
+.crm-container details {
+  background-color: var(--crm-c-dkblue-02);
+}
+.standalone-errors {
+  background: #3e0a01;
+}
 /* .crm-container .crm-search-nav-tabs { border-color: var(--crm-c-dkblue-01); } */
 
 /* Override standalone.css */
@@ -103,6 +108,16 @@
   --crm-big-input: 100%;
 }
 /* Override _fixes.scss */
-.crm-container del, .crm-container .ui-icons_deleted, .crm-container table.caseSelector td.status-urgent, .crm-container .font-red, .crm-container .status-removed, .crm-container .status-overdue, .crm-container .status-fatal, .crm-container .status-hold, .crm-container .status-past, .crm-contact-deceased, .crm-container .status-warning {
+.crm-container del,
+.crm-container .ui-icons_deleted,
+.crm-container table.caseSelector td.status-urgent,
+.crm-container .font-red,
+.crm-container .status-removed,
+.crm-container .status-overdue,
+.crm-container .status-fatal,
+.crm-container .status-hold,
+.crm-container .status-past,
+.crm-contact-deceased,
+.crm-container .status-warning {
   --crm-c-alert: var(--crm-c-red);
 }

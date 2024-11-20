@@ -28,7 +28,7 @@
 }
 .crm-search-display button.dropdown-toggle {
   white-space: nowrap;
-	font-size: var(--crm-font-size);
+  font-size: var(--crm-font-size);
 }
 
 /* Loading placeholders */

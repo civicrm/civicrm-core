@@ -4,8 +4,8 @@
 
 /* Config Task List */
 .crm-container td.tasklist a {
-    font-weight: bold;
-    font-family: var(--crm-font-bold);
+  font-weight: bold;
+  font-family: var(--crm-font-bold);
 }
 .crm-container table.selector td.tasklist {
   border-right: var(--crm-table-row-border);
@@ -23,44 +23,44 @@
 
 /* Extension management */
 .crm-container #mainTabContainer:has(.crm-extensions-tabs-list) {
-	box-shadow: var(--crm-block-shadow);
-	margin-top: var(--crm-padding-reg);
+  box-shadow: var(--crm-block-shadow);
+  margin-top: var(--crm-padding-reg);
 }
 .crm-container #extensions-main,
 .crm-container #extensions-addnew.ui-tabs-panel {
-	padding: 0;
-	border-top: 0;
+  padding: 0;
+  border-top: 0;
 }
 .crm-container #extensions-main table.dataTable,
 .crm-container #extensions-addnew table.dataTable {
-	box-shadow: none;
-	border: 0 solid transparent;
+  box-shadow: none;
+  border: 0 solid transparent;
 }
 .crm-container #extensions-main table.dataTable th,
 .crm-container #extensions-addnew table.dataTable th {
-	background-color: var(--crm-tab-bg-active);
+  background-color: var(--crm-tab-bg-active);
   min-width: max-content;
   white-space: nowrap; /* prevents wrapping of sort icons with oversized descriptions */
 }
 .crm-container #extensions-main table.dataTable summary,
 .crm-container #extensions-addnew table.dataTable summary {
-	padding: 0;
-	background-color: unset;
-	color: var(--crm-c-text);
-	font-weight: unset;
+  padding: 0;
+  background-color: unset;
+  color: var(--crm-c-text);
+  font-weight: unset;
   font-family: var(--crm-font);
 }
 .crm-container #extensions table.dataTable summary a,
 .crm-container #extensions-addnew table.dataTable summary a {
-	color: var(--crm-c-link);
+  color: var(--crm-c-link);
 }
 .crm-container #extensions table.dataTable a.crm-hover-button,
 .crm-container #extensions-addnew table.dataTable a.crm-hover-button {
-	padding: 0 var(--crm-m1);
+  padding: 0 var(--crm-m1);
 }
 .crm-container .disabled .crm-hover-button:hover,
 .crm-container .disabled .crm-hover-button:focus {
-	color: var(--crm-c-secondary-text);
+  color: var(--crm-c-secondary-text);
 }
 .crm-container .extension-missing {
   color: var(--crm-c-warning);

@@ -24,7 +24,8 @@ html.cms-standalone body {
   cursor: pointer; /* show it's clickable */
   position: relative; /* so our animated triangle doesn't go walkies */
 }
-.crm-container :where(summary:hover, summary:focus) {
+.crm-container :where(summary:hover,
+summary:focus) {
   background-color: #b8daf4; /* novar */
 }
 
@@ -42,40 +43,56 @@ html.cms-standalone body {
 
 .crm-container details>summary::before /* accordion8 (recommended) */,
 .crm-container .crm-accordion-header::before, /* accordion1, accordion2, accordion6 */
-.crm-container .crm-collapsible .collapsible-title::before /* accordion3 */
-{
-	content: "";
-	border: .4rem solid transparent;
-	border-left-color: var(--crm-expand-icon-color);
-	position: absolute;
+.crm-container .crm-collapsible .collapsible-title::before /* accordion3 */ {
+  content: "";
+  border: .4rem solid transparent;
+  border-left-color: var(--crm-expand-icon-color);
+  position: absolute;
   margin-left: -1.5rem;
-	margin-top: 0.2rem;
-	transform: rotate(0);
-	transform-origin: .2rem 50%;
-	transition: transform .25s ease;
+  margin-top: 0.2rem;
+  transform: rotate(0);
+  transform-origin: .2rem 50%;
+  transition: transform .25s ease;
 }
 /* we have to sort of re-state these rules because the specificity of the above overrules the 'open' state
  * note that a lot of non-recommended patterns use .collapsed, whereas details uses [open] - reverse logic.
  * This covers accordion1, accordion2, accordion6.
  */
-.crm-container .crm-accordion-wrapper.collapsed>.crm-accordion-header::before { transform: none; transform-origin: .2rem 50%;}
-.crm-container .crm-accordion-wrapper:not(.collapsed)>.crm-accordion-header::before { transform:rotate(90deg); }
+.crm-container .crm-accordion-wrapper.collapsed>.crm-accordion-header::before {
+  transform: none;
+  transform-origin: .2rem 50%;
+}
+.crm-container .crm-accordion-wrapper:not(.collapsed)>.crm-accordion-header::before {
+  transform: rotate(90deg);
+}
 /* the following 2 rules are for accordion3 and accordion4(still bit weird) */
-.crm-container .crm-collapsible.collapsed>.collapsible-title::before { transform: none; transform-origin: .2rem 50%;}
-.crm-container .crm-collapsible:not(.collapsed)>.collapsible-title::before { transform:rotate(90deg); }
+.crm-container .crm-collapsible.collapsed>.collapsible-title::before {
+  transform: none;
+  transform-origin: .2rem 50%;
+}
+.crm-container .crm-collapsible:not(.collapsed)>.collapsible-title::before {
+  transform: rotate(90deg);
+}
 
 /* Apply subtle animation */
 @keyframes crm-details-show {
-  from { opacity: 0; transform: translateY(-0.5rem); }
-  50% { transform: translateY(-0.1rem); }
+  from {
+    opacity: 0;
+    transform: translateY(-0.5rem);
 }
-.crm-container :is(details, .crm-accordion-wrapper)>.crm-accordion-body {
-	padding: var(--crm-expand-body-padding);
+  50% {
+    transform: translateY(-0.1rem);
+}
+}
+.crm-container :is(details,
+.crm-accordion-wrapper)>.crm-accordion-body {
+  padding: var(--crm-expand-body-padding);
   animation: crm-details-show 240ms ease-in-out;
 }
 /* We don't want a different colour header bg on 'active' (open) but we do on hover
  * This does't work yet.*/
-.crm-container .crm-accordion-bold>summary:is(:hover, :focus) {
+.crm-container .crm-accordion-bold>summary:is(:hover,
+:focus) {
   background-color: var(--crm-c-blue-overlay2);
 }
 
@@ -89,33 +106,37 @@ html.cms-standalone body {
 /* ALERTS (these are in-page-flow boxes with info, not the (normally) popup notifications) */
 
 /* help boxes: put stripe down left with icon in it. */
-.crm-container #help, .crm-container .help {
-	border: none;
-	border-left: 2rem solid #7cb5e1;
-	border-radius: 0;
+.crm-container #help,
+.crm-container .help {
+  border: none;
+  border-left: 2rem solid #7cb5e1;
+  border-radius: 0;
 }
-.crm-container #help::before, .crm-container .help::before {
-	color: #fff;
-	content: "\f0eb";
-	display: inline-block;
-	font-size: 2rem;
-	font: normal normal normal 14px/1 FontAwesome;
-	font-size: inherit;
-	margin-left: -2.3rem;
-	position: absolute;
-	text-rendering: auto;
+.crm-container #help::before,
+.crm-container .help::before {
+  color: #fff;
+  content: "\f0eb";
+  display: inline-block;
+  font-size: 2rem;
+  font: normal normal normal 14px/1 FontAwesome;
+  font-size: inherit;
+  margin-left: -2.3rem;
+  position: absolute;
+  text-rendering: auto;
 }
 
 .crm-container .alert-success {
   background-color: var(--crm-c-green);
 }
-.crm-container :is(.status, .alert-warning, .messages.warning) {
+.crm-container :is(.status,
+.alert-warning,
+.messages.warning) {
   --crm-roundness: 0.25rem;
 }
 
 /* BUTTONS */
 
- /*.crm-container .btn,
+/*.crm-container .btn,
 .crm-container button,
 .crm-container .crm-button,
 .crm-container [type="button"],
@@ -126,8 +147,11 @@ html.cms-standalone body {
 }
 
 /* Make it clear when you're hovering delete. */
-.crm-container .btn.btn-danger:hover, .crm-container .btn.btn-danger:focus,
-.crm-container a.button.delete-button:hover, .crm-container a.button.delete-button:focus, .crm-container a.button.delete:hover {
+.crm-container .btn.btn-danger:hover,
+.crm-container .btn.btn-danger:focus,
+.crm-container a.button.delete-button:hover,
+.crm-container a.button.delete-button:focus,
+.crm-container a.button.delete:hover {
   color: var(--crm-c-red-bright);
 }
 
@@ -170,7 +194,9 @@ html.cms-standalone body {
 
 /* NOTIFICATIONS (the popup ones) */
 /* This produces a nicer hanging-indent type thing aligning the title and message to the left. */
-.crm-container .notify-content { padding-left: 1.6rem; }
+.crm-container .notify-content {
+  padding-left: 1.6rem;
+}
 
 /* Thames theme does hanging indent for the little <i>con, but happy for the list bullets to be outside of main text block as is narrow column. */
 #crm-notification-container div.ui-notify-message .notify-content ul,
@@ -180,7 +206,9 @@ html.cms-standalone body {
 }
 
 /* Only include the margin under the h1 (h1!) when it's not empty. When it's empty the h1 only contains the <i>con and adding a margin messes up vertical alignment of the message. */
-#crm-notification-container div.ui-notify-message h1:not(:empty) { margin-bottom: 1rem; }
+#crm-notification-container div.ui-notify-message h1:not(:empty) {
+  margin-bottom: 1rem;
+}
 
 /* OTHER */
 /* 'alpha-filter' is the alphabetical pager you see, for example, on adv search results */
@@ -196,9 +224,15 @@ html.cms-standalone body {
 
 /* Get rid of the ugly black overlay during loading */
 @keyframes aahblockoverlay {
-  0% { background-color: var(--crm-c-blue-overlay); }
-  50% { background-color: var(--crm-c-page-background); }
-  100% { background-color: var(--crm-c-blue-overlay); }
+  0% {
+    background-color: var(--crm-c-blue-overlay);
+}
+  50% {
+    background-color: var(--crm-c-page-background);
+}
+  100% {
+    background-color: var(--crm-c-blue-overlay);
+}
 }
 .crm-container .blockUI.blockOverlay {
   animation: aahblockoverlay 10s infinite;
@@ -286,7 +320,8 @@ div.crm-summary-contactname-block+.crm-actions-ribbon {
   width: auto;
 }
 
-#contact-summary div.crm-summary-row div.crm-label :where(.fa-stack-1x, .fa-stack-2x) {
+#contact-summary div.crm-summary-row div.crm-label :where(.fa-stack-1x,
+.fa-stack-2x) {
   position: static;
   width: auto;
 }
@@ -304,8 +339,6 @@ div.crm-summary-contactname-block+.crm-actions-ribbon {
 .crm-container div.crm-summary-row div.crm-label {
   color: var(--crm-c-blue-darker);
 }
-
-
 
 /* INLINE EDIT */
 .crm-editable.crm-editable-editing {
@@ -358,23 +391,21 @@ div:has(> table) {
 /* apply hanging indent to sorting buttons */
 .crm-container :is(tr a, table.dataTable thead th):is(.sorting, .sorting_asc, .sorting_desc),
 .crm-search-display th.crm-sortable-col {
-  padding-left: calc(var(--crm-table-padding, 0) + 1ch);
-
-  &:after, &:before {
+  padding-left: calc(var(--crm-table-padding,
+  0) + 1ch);   &: after,
+  &: before {
     position: absolute;
     margin-left: -1em;
   }
 }
 /* ...and in searchkit, this is terribly awkward and could be fixed with a core PR to provide more classes */
 .crm-container .table > thead > tr > th:has(.crm-search-table-column-sort-icon) {
-	padding-left: 1.5ch;
+  padding-left: 1.5ch;
 }
 .crm-search-display-table > table.table > thead > tr > th i.crm-search-table-column-sort-icon {
   position: absolute;
   margin-left: -1.5ch;
 }
-
-
 
 /* Advanced search: override searchForm.css for slightly better aligned fields */
 .advanced-search-fields {
@@ -414,8 +445,8 @@ nav.breadcrumb a {
 
 /* Make the tags list nicer. */
 .crm-tag-item {
-	padding: 0 1ch;
-	border-radius: 1rem;
+  padding: 0 1ch;
+  border-radius: 1rem;
 }
 
 /* clickable items in select2 drop downs should be blue like links. */
@@ -429,9 +460,9 @@ html.crm-standalone  nav.breadcrumb>ol {
   gap: var(--crm-m);
 }
 .breadcrumb ol li:not(:first-child)::before {
-	content: " \BB ";
-	margin-inline-end: var(--crm-m);
-	color: var(--crm-c-blue-dark);
+  content: " \BB ";
+  margin-inline-end: var(--crm-m);
+  color: var(--crm-c-blue-dark);
 }
 
 /* override _fixes.css */
@@ -450,22 +481,22 @@ html.crm-standalone  nav.breadcrumb>ol {
 
 /* e.g. search buttons followed by count of matches on SK screen */
 .crm-search-display .form-inline {
-    padding: var(--crm-padding-reg) 0;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--crm-m);
+  padding: var(--crm-padding-reg) 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--crm-m);
 }
 
 /* Spinner. Replace the fa icon with something nicer. */
 .fa-spinner::before {
-	content: "";
-	width: 1rem;
-	height: 1rem;
+  content: "";
+  width: 1rem;
+  height: 1rem;
   min-width: 1rem;
   min-height: 1rem;
-	border: dashed 1px white;
-	border-radius: 1rem;
+  border: dashed 1px white;
+  border-radius: 1rem;
   animation: thames-spinner 1s infinite;
 }
 .fa-spin {
@@ -495,8 +526,12 @@ html.crm-standalone  nav.breadcrumb>ol {
 }
 
 @keyframes thames-spinner {
-  0% { transform: none; }
-  100% { transform: rotateZ(360deg); }
+  0% {
+    transform: none;
+}
+  100% {
+    transform: rotateZ(360deg);
+}
 }
 
 /* Font */
@@ -537,7 +572,9 @@ html.crm-standalone  nav.breadcrumb>ol {
 
 /* Searchkit preview table headers go weird because of the button margin for the select-all button. */
 /* .crm-container .btn, .crm-container button, .crm-container .crm-button, .crm-container [type="button"], .crm-container [type="reset"], .crm-container [type="submit"]*/
-.crm-container th.crm-search-result-select { --crm-btn-margin:0; }
+.crm-container th.crm-search-result-select {
+  --crm-btn-margin: 0;
+}
 
 /* Override _dropdowns.css */
 #afGuiEditor .af-gui-bar .dropdown-menu {
@@ -545,9 +582,11 @@ html.crm-standalone  nav.breadcrumb>ol {
 }
 /* Override contactSummary.css */
 #crm-contact-actions-list a.delete {
-  --crm-c-alert-text: var(--crm-c-red-dark);
-  &:is(:hover,:focus) {
+  --crm-c-alert-text: var(--crm-c-red-dark);   
+&: is
+  (: hover
+  ,: focus) {
     /* the hover state gives crm-c-red-dark to the background */
     --crm-c-alert-text: var(--crm-c-red-light);
   }
-} 
+}

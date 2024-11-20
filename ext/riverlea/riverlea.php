@@ -54,7 +54,9 @@ function riverlea_civicrm_config(&$config) {
 }
 
 /**
- * Implements hook_civicrm_alterBundle(). Add Bootstrap JS.
+ * Implements hook_civicrm_alterBundle().
+ *
+ * Add Bootstrap JS.
  */
 function riverlea_civicrm_alterBundle(CRM_Core_Resources_Bundle $bundle) {
   if (!_riverlea_is_active()) {

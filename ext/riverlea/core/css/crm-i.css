@@ -23,9 +23,9 @@ is loaded before font-awesome.css so that .fa-XXX classes can modify it. */
 
 /* Make jQuery UI icons use FA */
 .crm-container .ui-icon[class*=" fa-"] {
-    background: none repeat scroll 0 0 transparent;
-    margin: 0;
-    text-indent: 0;
+  background: none repeat scroll 0 0 transparent;
+  margin: 0;
+  text-indent: 0;
 }
 
 /* Extra icons to augment Font Awesome, e.g. fa-crm-formula */

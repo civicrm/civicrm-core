@@ -5,7 +5,5 @@
 */
 
 :root {
-
---crm-version: 'Minetta, v' var(--crm-release);
-
+  --crm-version: 'Minetta, v' var(--crm-release);
 }

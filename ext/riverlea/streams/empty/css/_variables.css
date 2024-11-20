@@ -5,9 +5,7 @@
 */
 
 :root {
-
---crm-version: 'Empty, v' var(--crm-release);
-
+  --crm-version: 'Empty, v' var(--crm-release);
 /* Fonts *
 --crm-system-fonts:;
 --crm-font:;
@@ -116,7 +114,6 @@
 --crm-padding-inset: var(--crm-m);
 --crm-page-padding: var(--crm-xl); /* Margin left/right *
 --crm-page-width: 100%; /* Default that CMS can overwrite */
-
 /* Type *
 --crm-font-size: var(--crm-r);
 --crm-small-font-size: var(--crm-m2);
@@ -159,7 +156,6 @@
 --crm-btn-icon-border: ;
 --crm-btn-icon-padding: var(--crm-btn-padding-block);
 --crm-btn-margin: 0; /* used to add padding block between multiple stacked buttons */
-
 /* Tables *
 --crm-table-outside-border: 1px solid var(--crm-c-background3);
 --crm-table-background: var(--crm-c-page-background);
@@ -343,7 +339,6 @@
 --crm-dash-image-radius: 200px;
 --crm-dash-image-justify: space-between; /* choose from start (left), end (right), center, and space-between (spread out) *
 --crm-dash-image-direction: row; /* choose from row and row-reverse to get the image on the right, column stacks it */
-
 /* Dialog *
 --crm-dialog-bg: var(--crm-c-page-background);
 --crm-dialog-padding: var(--crm-s);
@@ -426,7 +421,6 @@
 --crm-filter-item-bg:  #fafafa;
 --crm-filter-item-shadow: 0px 0px 3px rgba(0,0,0,0.1);
 --crm-filter-spacing: start; /* choose 'space-between' to spread out evenly, or 'end' to right align. */
-
 /* Frontend *
 --crm-f-form-width:;
 --crm-f-box-shadow: var(--crm-block-shadow);

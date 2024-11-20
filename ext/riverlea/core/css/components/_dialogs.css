@@ -1,225 +1,225 @@
 /* Main modal */
 /* Header */
 .crm-container.ui-dialog {
-    background: var(--crm-dialog-bg);
-    border: 0;
-    border-radius: var(--crm-dialog-radius);
-    box-shadow: var(--crm-popup-shadow);
-    color: var(--crm-c-text);
-    max-height: 90%;
-    padding: var(--crm-dialog-padding);
+  background: var(--crm-dialog-bg);
+  border: 0;
+  border-radius: var(--crm-dialog-radius);
+  box-shadow: var(--crm-popup-shadow);
+  color: var(--crm-c-text);
+  max-height: 90%;
+  padding: var(--crm-dialog-padding);
 }
 .crm-container.ui-dialog .ui-dialog-header,
 .crm-container.ui-dialog .ui-dialog-titlebar,
 .crm-container .modal-header,
 .crm-container .ui-dialog .ui-dialog-titlebar {
-    border: 0;
-    border: 1px solid transparent;
-    border-color: var(--crm-dialog-header-border-col);
-    box-shadow: var(--crm-dialog-inner-shadow);
-    color: var(--crm-dialog-header-col);
-    background: var(--crm-dialog-header-bg);
-    font-size: var(--crm-dialog-header-size);
-    border-radius: var(--crm-dialog-header-radius);
-    padding: var(--crm-dialog-header-padding);
-    position: relative;
-    overflow: auto;
-    display: flex;
-    flex-wrap: nowrap;
-    align-items: center;
-    gap: var(--crm-m3);
+  border: 0;
+  border: 1px solid transparent;
+  border-color: var(--crm-dialog-header-border-col);
+  box-shadow: var(--crm-dialog-inner-shadow);
+  color: var(--crm-dialog-header-col);
+  background: var(--crm-dialog-header-bg);
+  font-size: var(--crm-dialog-header-size);
+  border-radius: var(--crm-dialog-header-radius);
+  padding: var(--crm-dialog-header-padding);
+  position: relative;
+  overflow: auto;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: var(--crm-m3);
 }
 .crm-container.ui-dialog .ui-dialog-header .ui-dialog-title,
 .crm-container.ui-dialog .ui-dialog-titlebar .ui-dialog-title {
-    font-weight: bold;
-    font-family: var(--crm-font-bold);
-    padding: 0;
-    float: none;
-    flex: 1;
-    margin: 0;
-    width: auto;
+  font-weight: bold;
+  font-family: var(--crm-font-bold);
+  padding: 0;
+  float: none;
+  flex: 1;
+  margin: 0;
+  width: auto;
 }
 .crm-container.ui-dialog .ui-dialog-header .ui-button,
 .crm-container.ui-dialog .ui-dialog-titlebar .ui-button {
-    background: transparent;
-    color: var(--crm-dialog-header-col);
-    display: block;
-    font-size: var(--crm-dialog-header-size);
-    padding: 0;
-    position: relative !important;
-    margin: 0;
-    right: unset !important /* vs inline - ie CiviCase Actiity View */;
-    top: unset;
+  background: transparent;
+  color: var(--crm-dialog-header-col);
+  display: block;
+  font-size: var(--crm-dialog-header-size);
+  padding: 0;
+  position: relative !important;
+  margin: 0;
+  right: unset !important /* vs inline - ie CiviCase Actiity View */;
+  top: unset;
 }
 .crm-container.ui-dialog .ui-dialog-titlebar .ui-state-hover .ui-icon,
 .crm-container.ui-dialog .ui-dialog-titlebar .ui-state-focus .ui-icon,
 .crm-container.ui-dialog .ui-dialog-titlebar .ui-button:hover,
 .crm-container.ui-dialog .ui-dialog-titlebar .ui-button:focus {
-    background: transparent;
+  background: transparent;
 }
 .crm-container.ui-dialog .ui-button:has(.fa-times) {
-    order: 1;
+  order: 1;
 }
 .crm-container.ui-dialog .ui-dialog-header .ui-button-icon.ui-icon[class*=" fa-"],
 .crm-container.ui-dialog .ui-dialog-titlebar .ui-button-icon.ui-icon[class*=" fa-"] {
-    font-size: var(--crm-dialog-header-size);
-    height: 2ch;
-    color: var(--crm-dialog-header-col);
-    opacity: 0.8;
-    width: auto;
+  font-size: var(--crm-dialog-header-size);
+  height: 2ch;
+  color: var(--crm-dialog-header-col);
+  opacity: 0.8;
+  width: auto;
 }
 .crm-container.ui-dialog .ui-dialog-titlebar .ui-button-icon.ui-icon[class*=" fa-"]:hover,
 .crm-container.ui-dialog .ui-dialog-titlebar .ui-button-icon.ui-icon[class*=" fa-"]:focus {
-    color: var(--crm-dialog-header-col);
-    opacity: 1;
+  color: var(--crm-dialog-header-col);
+  opacity: 1;
 }
 
 /* Body */
 .crm-container.ui-dialog .ui-dialog-content[id*="crm-ajax-dialog"] {
-    background: var(--crm-dialog-body-bg);
+  background: var(--crm-dialog-body-bg);
 }
 .crm-container.ui-dialog .ui-dialog-content {
-    max-height: calc(100vh - 280px) !important;
-    border-radius: var(--crm-dialog-radius);
-    background: var(--crm-dialog-body-bg);
-    color: var(--crm-c-text);
-    height: auto !important;
-    margin: var(--crm-dialog-padding) 0 calc(var(--crm-btn-height) + var(--crm-m) + var(--crm-m));
-    position: static;
-    z-index: 1;
-    padding: var(--crm-dialog-body-padding);
+  max-height: calc(100vh - 280px) !important;
+  border-radius: var(--crm-dialog-radius);
+  background: var(--crm-dialog-body-bg);
+  color: var(--crm-c-text);
+  height: auto !important;
+  margin: var(--crm-dialog-padding) 0 calc(var(--crm-btn-height) + var(--crm-m) + var(--crm-m));
+  position: static;
+  z-index: 1;
+  padding: var(--crm-dialog-body-padding);
 }
 .crm-container.ui-dialog .ui-dialog-content .crm-container {
-    background: var(--crm-dialog-bg);
+  background: var(--crm-dialog-bg);
 }
 .crm-container.ui-dialog .ui-dialog-content .crm-block,
 .crm-container.ui-dialog details table {
-    box-shadow: none;
-    padding: var(--crm-dialog-body-padding);
+  box-shadow: none;
+  padding: var(--crm-dialog-body-padding);
 }
 .crm-container.ui-dialog .form-layout-compressed {
-    background: transparent;
-    box-shadow: none;
-    border: 0 solid transparent;
+  background: transparent;
+  box-shadow: none;
+  border: 0 solid transparent;
 }
 .crm-container.ui-dialog .ui-dialog-content tr,
 .crm-container.ui-dialog .ui-dialog-content td,
 .crm-container.ui-dialog .ui-dialog-content th {
-    border-bottom: 0;
+  border-bottom: 0;
 }
 .crm-container.ui-dialog details {
-    margin: var(--crm-dialog-body-padding) 0;
+  margin: var(--crm-dialog-body-padding) 0;
 }
 .crm-container.ui-dialog .help,
 .crm-container.ui-dialog .status,
 .crm-container.ui-dialog .alert,
 .crm-container.ui-dialog .alert-success {
-    margin: var(--crm-dialog-body-padding);
+  margin: var(--crm-dialog-body-padding);
 }
 /* Footer */
 .crm-container.ui-dialog .ui-dialog-buttonpane,
 .crm-container.ui-dialog .modal-dialog .modal-footer {
-    background: var(--crm-dialog-bg);
-    border-radius: 0 0 var(--crm-dialog-radius) var(--crm-dialog-radius);
-    border-top: var(--crm-dialog-line) !important;
-    box-shadow: var(--crm-dialog-inner-shadow);
-    display: flex;
-    padding: 0;
-    margin: 0;
-    position: absolute;
-    width: 100%;
-    bottom: 0;
-    left: 0;
+  background: var(--crm-dialog-bg);
+  border-radius: 0 0 var(--crm-dialog-radius) var(--crm-dialog-radius);
+  border-top: var(--crm-dialog-line) !important;
+  box-shadow: var(--crm-dialog-inner-shadow);
+  display: flex;
+  padding: 0;
+  margin: 0;
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+  left: 0;
 }
 .crm-container.ui-dialog .ui-dialog-buttonset {
-    width: 100%;
-    display: flex;
-    gap: var(--crm-m);
-    padding: var(--crm-m);
-    justify-content: flex-end;
-    flex-wrap: wrap;
+  width: 100%;
+  display: flex;
+  gap: var(--crm-m);
+  padding: var(--crm-m);
+  justify-content: flex-end;
+  flex-wrap: wrap;
 }
 .crm-container.ui-dialog .buttons.pull-right {
-    display: flex;
-    gap: var(--crm-flex-gap);
+  display: flex;
+  gap: var(--crm-flex-gap);
 }
 .crm-container.ui-dialog .ui-dialog-buttonpane button {
-    margin: 0;
+  margin: 0;
 }
 
 /* System notifications */
 
 #crm-notification-container {
-    width: 350px;
-    position: fixed;
-    top: 64px;
-    right: var(--crm-r2);
-    z-index: 999999;
+  width: 350px;
+  position: fixed;
+  top: 64px;
+  right: var(--crm-r2);
+  z-index: 999999;
 }
 #crm-notification-container div.ui-notify-message-style {
-    background: var(--crm-notify-background);
-    box-shadow: var(--crm-popup-shadow);
-    color: var(--crm-notify-col);
-    border-radius: var(--crm-notify-radius);
-    padding: var(--crm-notify-padding);
-    margin-bottom: var(--crm-r);
-    max-height: 600px;
-    overflow: auto;
-    border-width: var(--crm-notify-accent-border);
-    border-style: solid;
-    border-color: transparent;
+  background: var(--crm-notify-background);
+  box-shadow: var(--crm-popup-shadow);
+  color: var(--crm-notify-col);
+  border-radius: var(--crm-notify-radius);
+  padding: var(--crm-notify-padding);
+  margin-bottom: var(--crm-r);
+  max-height: 600px;
+  overflow: auto;
+  border-width: var(--crm-notify-accent-border);
+  border-style: solid;
+  border-color: transparent;
 }
 #crm-notification-container div.ui-notify-message-style a {
-    color: var(--crm-notify-col);
-    text-decoration: underline;
+  color: var(--crm-notify-col);
+  text-decoration: underline;
 }
 #crm-notification-container div.ui-notify-message-style.error {
-    border-color: var(--crm-c-alert);
+  border-color: var(--crm-c-alert);
 }
 #crm-notification-container div.ui-notify-message-style.alert,
 #crm-notification-container div.ui-notify-message-style.warning {
-    border-color: var(--crm-c-warning);
+  border-color: var(--crm-c-warning);
 }
 #crm-notification-container div.ui-notify-message-style.success {
-    border-color: var(--crm-c-success);
+  border-color: var(--crm-c-success);
 }
 #crm-notification-container div.ui-notify-message-style.info {
-    border-color: var(--crm-c-info);
+  border-color: var(--crm-c-info);
 }
 #crm-notification-container div.ui-notify-message:last-child {
-    margin-bottom: 0;
+  margin-bottom: 0;
 }
 #crm-notification-container div.ui-notify-message h1 {
-    font-size: var(--crm-font-size);
-    font-weight: bold;
-    font-family: var(--crm-font-bold);
-    margin: 0 2ch var(--m) 0;
-    color: var(--crm-notify-col);
+  font-size: var(--crm-font-size);
+  font-weight: bold;
+  font-family: var(--crm-font-bold);
+  margin: 0 2ch var(--m) 0;
+  color: var(--crm-notify-col);
 }
 #crm-notification-container div.ui-notify-message h1:empty {
-    float: left;
-    margin: 0;
+  float: left;
+  margin: 0;
 }
 #crm-notification-container div.ui-notify-message-style {
-    color: var(--crm-notify-col);
+  color: var(--crm-notify-col);
 }
 #crm-notification-container div.ui-notify-message .notify-content ul,
 #crm-notification-container div.ui-notify-message .alert.notify-content ul {
-    margin: 0 var(--crm-r);
-    padding: var(--crm-m) 0 var(--crm-m) var(--crm-m);
-    color: var(--crm-notify-col);
-    list-style: unset;
+  margin: 0 var(--crm-r);
+  padding: var(--crm-m) 0 var(--crm-m) var(--crm-m);
+  color: var(--crm-notify-col);
+  list-style: unset;
 }
 #crm-notification-container div.ui-notify-message .notify-content ul li,
 #crm-notification-container div.ui-notify-message.alert .notify-content ul li {
-    color: var(--crm-notify-col);
+  color: var(--crm-notify-col);
 }
 #crm-notification-container div.ui-notify-message .notify-content p {
-    color: var(--crm-notify-col);
+  color: var(--crm-notify-col);
 }
 #crm-notification-container div.ui-notify-message-style a.ui-button.ui-widget,
 #crm-notification-container div.ui-notify-message-style a.ui-button.ui-widget:hover,
 #crm-notification-container div.ui-notify-message-style a.ui-button.ui-widget:focus {
-    background: var(--crm-c-alert);
-    border: 0;
+  background: var(--crm-c-alert);
+  border: 0;
 }

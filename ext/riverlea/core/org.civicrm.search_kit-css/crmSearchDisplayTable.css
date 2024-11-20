@@ -14,7 +14,7 @@ table.crm-sticky-header > thead > tr {
   min-width: 95px; /* Don't allow button to be split on 2 lines */
 }
 .crm-search-display-table > table.table > thead > tr > th i.crm-search-table-column-sort-icon + .crm-search-display-table-column-label {
-	margin-left: 0 !important;
+  margin-left: 0 !important;
 }
 .crm-search-display.crm-search-display-table tfoot > tr > td {
   font-weight: bold;
