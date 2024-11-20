@@ -192,11 +192,10 @@ function dm_install_drupal() {
     dm_preg_edit '/version = ([0-9]*\.x)-[1-9.]*/m' "version = \$1-$DM_VERSION" "$INFO"
   done
 
-  for f in "$to/.gitignore" "$to/.toxic.json" ; do
-    if [ -f "$f" ]; then
-      rm -f "$f"
-    fi
-  done
+  local f="$to/.gitignore"
+  if [ -f "$f" ]; then
+    rm -f "$f"
+  fi
 }
 
 ## Copy Joomla-integration module
@@ -213,11 +212,10 @@ function dm_install_joomla() {
   ## one included .gitignore and the omitted it. We'll now omit it
   ## consistently.
 
-  for f in "$to/.gitignore" "$to/.toxic.json" ; do
-    if [ -f "$f" ]; then
-      rm -f "$f"
-    fi
-  done
+  local f="$to/.gitignore"
+  if [ -f "$f" ]; then
+    rm -f "$f"
+  fi
 }
 
 ## usage: dm_install_l10n <l10n_repo_path> <to_path>
@@ -263,7 +261,6 @@ function dm_install_wordpress() {
     --exclude=.git \
     --exclude=.svn \
     --exclude=civicrm.config.php.wordpress \
-    --exclude=.toxic.json \
     --exclude=.gitignore \
     --exclude=civicrm \
     "$repo/./"  "$to/./"
