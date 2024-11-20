@@ -129,7 +129,7 @@
   --crm-icon-warning-color: var(--crm-c-warning);
   --crm-icon-info-color: var(--crm-c-info);
   /* Frontend */
-  --crm-f-legend-align:;
+  --crm-f-legend-align: unset;
   --crm-f-legend-size: var(--crm-r2);
   --crm-f-form-width: 50vw;
 }

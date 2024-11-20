@@ -88,7 +88,7 @@
   --crm-panel-head-margin: var(--crm-m2);
 /* Accordions */
   --crm-expand-icon: "\f105"; /* unicode value for FontAwesome icon */
-  --crm-expand-icon-color:;
+  --crm-expand-icon-color: unset;
   --crm-expand-icon-spacing: var(--crm-m3);
   --crm-expand-gap: 0;
 /* .crm-accordion-bold */
@@ -96,8 +96,8 @@
   --crm-expand-header-bg-active: var(--crm-c-background3);
   --crm-expand-header-color: var(--crm-c-text);
   --crm-expand-header-padding: var(--crm-m2) var(--crm-m3);
-  --crm-expand-border:;
-  --crm-expand-border-width:;
+  --crm-expand-border: unset;
+  --crm-expand-border-width: unset;
   --crm-expand-body-bg: transparent;
   --crm-expand-body-box-shadow: var(--crm-body-inset);
 /* .crm-accordion-light */
@@ -133,7 +133,7 @@
   --crm-input-label-font: var(--crm-font-bold);
   --crm-input-radio-color: var(--crm-c-primary);
   --crm-inline-edit-border: 1px solid var(--crm-c-gray-900);
-  --crm-fieldset-border-color:;
+  --crm-fieldset-border-color: unset;
   --crm-fieldset-border: 0;
   --crm-fieldset-padding: 0;
 /* Tabs */
@@ -157,13 +157,13 @@
   --crm-dash-tabs-flow: column; /* choose 'row' for tabs at top, or 'column' for tabs at side */
   --crm-dash-tabs-gap: 0;
   --crm-dash-tabs-bg: var(--crm-c-background);
-  --crm-dash-tabs-padding:;
+  --crm-dash-tabs-padding: unset;
   --crm-dash-tab-bg: transparent;
   --crm-dash-tab-bg-hover: var(--crm-c-background3);
   --crm-dash-tab-padding: var(--crm-r) var(--crm-r1);
   --crm-dash-tab-border: var(--crm-dash-border);
-  --crm-dash-tab-border-hover:;
-  --crm-dash-tab-col:;
+  --crm-dash-tab-border-hover: unset;
+  --crm-dash-tab-col: unset;
   --crm-dash-tab-count-bg: var(--crm-c-primary);
   --crm-dash-tab-count-col: var(--crm-c-light-text);
   --crm-dash-tab-hang: 0 0 -1px 0; /* lip to extend tab flush with active region - set to 0 for no lip */
@@ -208,6 +208,6 @@
   --crm-wizard-border: 1px solid var(--crm-c-page-background);
   --crm-wizard-bg: var(--crm-c-background);
 /* Frontend */
-  --crm-f-legend-align:;
+  --crm-f-legend-align: unset;
   --crm-f-legend-size: var(--crm-r2);
 }

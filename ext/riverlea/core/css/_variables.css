@@ -6,11 +6,11 @@
 :root {
   --crm-version: 'v' var(--crm-release);
 /* Fonts */
-  --crm-system-fonts:;
-  --crm-font:;
-  --crm-font-bold:;
-  --crm-font-italic:;
-  --crm-font-bold-italic:;
+  --crm-system-fonts: unset;
+  --crm-font: unset;
+  --crm-font-bold: unset;
+  --crm-font-italic: unset;
+  --crm-font-bold-italic: unset;
 /* Colour names */
   --crm-c-darkest: #0a0a0a;
   --crm-c-gray-900: #2f2f2e;
@@ -77,10 +77,10 @@
   --crm-c-focus: var(--crm-c-blue-dark);
   --crm-c-inactive: #696969;
 /* Shadows */
-  --crm-block-shadow:;
+  --crm-block-shadow: unset;
   --crm-popup-shadow: 0 3px 18px 0 rgba(48,40,40,.25);
   --crm-bottom-shadow: 0 0 16px 1px rgba(0,0,0,.1);
-  --crm-body-inset:;
+  --crm-body-inset: unset;
 /* Sizes */
   --crm-roundness: 0.25rem;
   --crm-xs: 0.1rem;
@@ -145,8 +145,8 @@
   --crm-btn-success-text: var(--crm-c-success-text);
   --crm-btn-alert-bg: var(--crm-c-alert);
   --crm-btn-alert-text: var(--crm-c-alert-text);
-  --crm-btn-icon-bg:; /* btn-icon-* supports distinct border/bg for icons. If applied, set btn-icon-padding to 0px to make the icon bg stretch to the button */
-  --crm-btn-icon-border:;
+  --crm-btn-icon-bg: unset; /* btn-icon-* supports distinct border/bg for icons. If applied, set btn-icon-padding to 0px to make the icon bg stretch to the button */
+  --crm-btn-icon-border: unset;
   --crm-btn-icon-padding: var(--crm-btn-padding-block);
   --crm-btn-margin: 0; /* used to add padding block between multiple stacked buttons */
 /* Tables */
@@ -197,21 +197,21 @@
   --crm-expand-header-border-width: 0 0 1px 0;
   --crm-expand-border: var(--crm-c-divider);
   --crm-expand-border-width: 0 1px 1px 1px;
-  --crm-expand-body-bg:;
-  --crm-expand-body-box-shadow:;
+  --crm-expand-body-bg: unset;
+  --crm-expand-body-box-shadow: unset;
   --crm-expand-body-padding: var(--crm-padding-reg);
 /* .crm-accordion-light */
-  --crm-expand2-header-bg:;
+  --crm-expand2-header-bg: unset;
   --crm-expand2-header-bg-active: var(--crm-c-background-2);
   --crm-expand2-header-weight: normal;
-  --crm-expand2-header-font:;
+  --crm-expand2-header-font: unset;
   --crm-expand2-header-color: var(--crm-c-text);
-  --crm-expand2-header-border:;
-  --crm-expand2-header-border-width:;
+  --crm-expand2-header-border: unset;
+  --crm-expand2-header-border-width: unset;
   --crm-expand2-header-padding: var(--crm-s) var(--crm-m);
-  --crm-expand2-border:;
-  --crm-expand2-border-width:;
-  --crm-expand2-body-bg:;
+  --crm-expand2-border: unset;
+  --crm-expand2-border-width: unset;
+  --crm-expand2-body-bg: unset;
   --crm-expand2-body-padding: var(--crm-s);
 /* Alerts */
   --crm-alert-padding: var(--crm-m) var(--crm-m2);
@@ -274,7 +274,7 @@
   --crm-tab-padding: var(--crm-s3) var(--crm-m) var(--crm-s) var(--crm-m);
   --crm-tab-col: var(--crm-c-text);
   --crm-tab-weight: normal;
-  --crm-tab-font:;
+  --crm-tab-font: unset;
   --crm-tab-count-bg: var(--crm-c-info-text);
   --crm-tab-count-col: var(--crm-c-info);
   --crm-tab-roundness: var(--crm-roundness);
@@ -285,7 +285,7 @@
   --crm-dash-border: var(--crm-tab-border);
   --crm-dash-roundness: var(--crm-roundness);
   --crm-dash-direction: flex; /* choose 'flex' for tabs at top, or 'grid' for tabs at side */
-  --crm-side-tabs-width:;
+  --crm-side-tabs-width: unset;
   --crm-dash-tabs-flow: row; /* choose 'row' for tabs at top, or 'column' for tabs at side */
   --crm-dash-tabs-gap: var(--crm-tabs-gap);
   --crm-dash-tabs-bg: var(--crm-tabs-bg);
@@ -307,14 +307,14 @@
   --crm-dash-icon-size: var(--crm-r);
   --crm-dash-summary-row-bg: var(--crm-c-background);
   --crm-dash-box-shadow: 0;
-  --crm-dash-heading-inset:;
+  --crm-dash-heading-inset: unset;
   --crm-dash-panel-padding: var(--crm-m);
   --crm-dash-panel-bg: #fff;
   --crm-dash-panel-border: 0;
   --crm-dash-panel-radius: 0 0 var(--crm-dash-roundness) var(--crm-dash-roundness);
   --crm-dash-edit-border: 2px dashed var(--crm-c-gray-300);
   --crm-dash-block-padding: 0;
-  --crm-dash-block-bg:;
+  --crm-dash-block-bg: unset;
   --crm-dash-block-radius: var(--crm-roundness);
   --crm-dash-label-bg: var(--crm-c-background2);
   --crm-dash-header-bg: var(--crm-c-page-background);
@@ -330,7 +330,7 @@
   --crm-dialog-bg: var(--crm-c-page-background);
   --crm-dialog-padding: var(--crm-s);
   --crm-dialog-radius: var(--crm-roundness);
-  --crm-dialog-line:;
+  --crm-dialog-line: unset;
   --crm-dialog-inner-shadow: var(--crm-bottom-shadow);
   --crm-dialog-header-bg: var(--crm-c-secondary);
   --crm-dialog-header-col: var(--crm-c-light-text);
@@ -341,15 +341,15 @@
   --crm-dialog-body-bg: var(--crm-c-background);
   --crm-dialog-body-padding: var(--crm-m);
 /* Dashlet */
-  --crm-dashlet-border:;
+  --crm-dashlet-border: unset;
   --crm-dashlet-bg: var(--crm-c-page-background);
   --crm-dashlet-padding: var(--crm-s2);
   --crm-dashlet-box-shadow: var(--crm-popup-shadow);
   --crm-dashlet-dashlets-bg: var(--crm-c-background);
   --crm-dashlet-header-bg: var(--crm-expand-header-bg);
   --crm-dashlet-header-col: var(--crm-expand-header-color);
-  --crm-dashlet-header-border:;
-  --crm-dashlet-header-border-width:;
+  --crm-dashlet-header-border: unset;
+  --crm-dashlet-header-border-width: unset;
   --crm-dashlet-header-font-size: var(--crm-font-size);
   --crm-dashlet-header-padding: var(--crm-s);
   --crm-dashlet-content-padding: var(--crm-dashlet-padding) 0;
@@ -403,7 +403,7 @@
   --crm-filter-item-shadow: 0px 0px 3px rgba(0,0,0,0.1);
   --crm-filter-spacing: start; /* choose 'space-between' to spread out evenly, or 'end' to right align. */
 /* Frontend */
-  --crm-f-form-width:;
+  --crm-f-form-width: unset;
   --crm-f-box-shadow: var(--crm-block-shadow);
   --crm-f-fieldset-bg: #f8f8f8;
   --crm-f-fieldset-padding: var(--crm-r);
@@ -413,7 +413,7 @@
   --crm-f-legend-size: var(--crm-r3);
   --crm-f-form-padding: var(--crm-padding-reg);
   --crm-f-form-layout: block; /* 'grid' = inline, 'block' = stacked */
-  --crm-f-label-position:;
+  --crm-f-label-position: unset;
   --crm-f-label-align: left;
   --crm-f-label-width: 200px;
   --crm-f-label-weight: bold;

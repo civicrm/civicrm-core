@@ -104,10 +104,10 @@
   --crm-r-2: 0.25em;
   --crm-r-1: 3px;
 /* SHADOWS */
-  --crm-block-shadow:;
+  --crm-block-shadow: unset;
   --crm-popup-shadow: 3px 3px 18px 0 rgba(0, 0, 0,.25); /* thames */
-  --crm-bottom-shadow:;  /* thames */
-  --crm-body-inset:;
+  --crm-bottom-shadow: unset;  /* thames */
+  --crm-body-inset: unset;
 /* SIZES - temporary */
   --crm-roundness: 0; /* thames - this gets applied in too many places; so setting to 0 and positively re-applying, rather than using this and negatively unapplying. */
   --crm-xs: 0.1rem;
@@ -143,7 +143,7 @@
   --crm-type-line-height: 1.5;
   --crm-link-decoration: none;
   --crm-link-decoration-hover: underline;
-  --crm-heading-bg:; /*var(--crm-c-blue-light);*/ /* thames */
+  --crm-heading-bg: unset; /*var(--crm-c-blue-light);*/ /* thames */
   --crm-heading-col: var(--crm-c-text);
   --crm-heading-padding: var(--crm-s1) var(--crm-m1); /* thames unset this? todo */
   --crm-heading-margin: var(--crm-m) 0;
@@ -175,8 +175,8 @@
   --crm-btn-success-text: #fff; /* thames */
   --crm-btn-alert-bg: var(--crm-c-red);
   --crm-btn-alert-text: var(--crm-c-red-dark);
-  --crm-btn-icon-bg:;
-  --crm-btn-icon-border:;
+  --crm-btn-icon-bg: unset;
+  --crm-btn-icon-border: unset;
   --crm-btn-margin: var(--crm-m) 0;
 }
 :root {
@@ -227,24 +227,24 @@
   --crm-expand-header-padding: 0.6rem 1.6rem 0.6rem 2.8rem; /* thames */
   --crm-expand-header-weight: var(--crm-bold-weight);
   --crm-expand-header-font: var(--crm-font-bold);
-  --crm-expand-header-border:;/*var(--crm-c-divider);*/ /* thames */
-  --crm-expand-header-border-width: /*0 0 1px 0*/; /* thames */
-  --crm-expand-border:; /* thames */
-  --crm-expand-border-width:; /* thames */
+  --crm-expand-header-border: unset;/*var(--crm-c-divider);*/ /* thames */
+  --crm-expand-header-border-width: unset; /*0 0 1px 0*/; /* thames */
+  --crm-expand-border: unset; /* thames */
+  --crm-expand-border-width: unset; /* thames */
   --crm-expand-body-bg: var(--crm-c-blue-overlay); /* thames  todo check*/
-  --crm-expand-body-box-shadow:;
+  --crm-expand-body-box-shadow: unset;
   --crm-expand-body-padding: 0.25rem 2.8rem; /* thames */
 /* .crm-accordion-light */
   --crm-expand2-header-bg: transparent;
   --crm-expand2-header-bg-active: var(--crm-c-background-2);
   --crm-expand2-header-weight: normal;
-  --crm-expand2-header-font:;
+  --crm-expand2-header-font: unset;
   --crm-expand2-header-color: var(--crm-c-text);
-  --crm-expand2-header-border:;
-  --crm-expand2-header-border-width:;
+  --crm-expand2-header-border: unset;
+  --crm-expand2-header-border-width: unset;
   --crm-expand2-header-padding: .6rem 1.6rem 0.6rem 2.8rem; /*var(--crm-s) var(--crm-m); */ /* thames */
-  --crm-expand2-border:;
-  --crm-expand2-border-width:;
+  --crm-expand2-border: unset;
+  --crm-expand2-border-width: unset;
   --crm-expand2-body-bg: transparent;
   --crm-expand2-body-padding: 0.25rem 2.8rem; /* thames */
 }
@@ -255,8 +255,8 @@
   --crm-alert-border-width: 0; /* thames */
 /* Note 'help' suffix here is for the 'success' boxes. */
   --crm-alert-background-help: var(--crm-c-blue-light); /* thames */
-  --crm-alert-border-help:; /* thames */
-  --crm-alert-text-help:; /* thames */
+  --crm-alert-border-help: unset; /* thames */
+  --crm-alert-text-help: unset; /* thames */
   --crm-alert-background-warning: var(--crm-c-yellow-light);
   --crm-alert-border-warning: var(--crm-c-yellow);
   --crm-alert-text-warning: var(--crm-c-text);
@@ -314,7 +314,7 @@
   --crm-tab-padding: var(--crm-m2) var(--crm-r1) var(--crm-m); /* thames todo check */
   --crm-tab-col: var(--crm-c-text);
   --crm-tab-weight: normal;
-  --crm-tab-font:;
+  --crm-tab-font: unset;
   --crm-tab-count-bg: var(--crm-c-info-text);
   --crm-tab-count-col: var(--crm-c-info);
   --crm-tab-roundness: var(--crm-r-3) var(--crm-r-3) 0 0;
@@ -332,7 +332,7 @@
   --crm-dash-tabs-flow: column; /* choose 'row' for tabs at top, or 'column' for tabs at side */ /* thames */
   --crm-dash-tabs-gap: 0; /* thames */
   --crm-dash-tabs-bg: var(--crm-c-blue-overlay); /* thames */
-  --crm-dash-tabs-padding:; /* thames */
+  --crm-dash-tabs-padding: unset; /* thames */
   --crm-dash-tab-bg: transparent;
   --crm-dash-tabs-roundness: var(--crm-dash-roundness) 0 0 var(--crm-dash-roundness);
   --crm-dash-tab-bg-hover: white; /* thames */
@@ -340,7 +340,7 @@
   --crm-dash-tab-border: var(--crm-dash-border); /* thames */
   --crm-dash-tab-border-hover: 0 solid transparent;
   --crm-dash-tab-border-width: 0; /* to remove border on one side for hanging tabs */
-  --crm-dash-tab-col:; /* thames */
+  --crm-dash-tab-col: unset; /* thames */
   --crm-dash-tab-count-bg: var(--crm-c-primary); /* thames */
   --crm-dash-tab-count-col: var(--crm-c-light-text); /* thames */
   --crm-dash-tab-width: 100%;
@@ -350,7 +350,7 @@
   --crm-dash-icon-size: var(--crm-r); /* thames */
   --crm-dash-summary-row-bg: var(--crm-c-background);
   --crm-dash-box-shadow: 0; /* thames */
-  --crm-dash-heading-inset:;
+  --crm-dash-heading-inset: unset;
   --crm-dash-panel-padding: var(--crm-r2); /* thames */
   --crm-dash-panel-bg: white; /* thames */
   --crm-dash-panel-border: 0;
@@ -360,11 +360,11 @@
   --crm-dash-block-bg: var(--crm-c-background); /* thames */
   --crm-dash-block-radius: var(--crm-roundness);
   --crm-dash-label-bg: var(--crm-c-background); /* thames */
-  --crm-dash-header-bg:; /* thames */
-  --crm-dash-header-bg2:; /* thames */
+  --crm-dash-header-bg: unset; /* thames */
+  --crm-dash-header-bg2: unset; /* thames */
   --crm-dash-header-col: var(--crm-c-blue-darker); /* thames */
   --crm-dash-header-size: var(--crm-r3);
-  --crm-dash-header-padding:; /* thames */
+  --crm-dash-header-padding: unset; /* thames */
   --crm-dash-image-size: 100px;
   --crm-dash-image-radius: 200px;
   --crm-dash-image-justify: space-between; /* choose from start (left), end (right), center, and space-between (spread out) */
@@ -375,7 +375,7 @@
   --crm-dialog-bg: var(--crm-c-page-background);
   --crm-dialog-padding: 0; /* thames */
   --crm-dialog-radius: var(--crm-roundness);
-  --crm-dialog-line:;
+  --crm-dialog-line: unset;
   --crm-dialog-inner-shadow: var(--crm-bottom-shadow);
   --crm-dialog-header-bg: var(--crm-c-blue-overlay); /* thames */
   --crm-dialog-header-col: var(--crm-c-blue-darker); /* thames */
@@ -388,23 +388,23 @@
 }
 :root {
 /* Dashlet */
-  --crm-dashlet-border:;
+  --crm-dashlet-border: unset;
   --crm-dashlet-bg: white;
   --crm-dashlet-padding: var(--crm-s2);
   --crm-dashlet-box-shadow: none;
   --crm-dashlet-dashlets-bg: var(--crm-c-background);
   --crm-dashlet-header-bg: white;
   --crm-dashlet-header-col: var(--crm-expand-header-color);
-  --crm-dashlet-header-border:;
-  --crm-dashlet-header-border-width:;
+  --crm-dashlet-header-border: unset;
+  --crm-dashlet-header-border-width: unset;
   --crm-dashlet-header-font-size: var(--crm-font-size);
   --crm-dashlet-header-padding: var(--crm-s);
   --crm-dashlet-content-padding: var(--crm-dashlet-padding) 0;
   --crm-dashlet-tabs-bg: var(--crm-tabs-bg);
   --crm-dashlet-tabs-border: 0;
   --crm-dashlet-tab-bg: transparent;
-  --crm-dashlet-tab-border:;
-  --crm-dashlet-tab-color:;
+  --crm-dashlet-tab-border: unset;
+  --crm-dashlet-tab-color: unset;
   --crm-dashlet-tab-active: var(--crm-tab-bg-active);
   --crm-dashlet-tab-border-active: var(--crm-tab-border-active);
   --crm-dashlet-tab-body-border: 0;
@@ -480,7 +480,7 @@
   --crm-f-legend-size: var(--crm-r3);
   --crm-f-form-padding: var(--crm-padding-reg);
   --crm-f-form-layout: block; /* 'grid' = inline, 'block' = stacked */
-  --crm-f-label-position:;
+  --crm-f-label-position: unset;
   --crm-f-label-align: left;
   --crm-f-label-width: 200px;
   --crm-f-label-weight: bold;
