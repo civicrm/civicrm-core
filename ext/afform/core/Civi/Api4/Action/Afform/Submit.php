@@ -456,6 +456,7 @@ class Submit extends AbstractProcessor {
       $whereClause = self::getJoinWhereClause($event->getFormDataModel(), $event->getEntityName(), $joinEntityName, $entityId);
       $mainIdField = CoreUtil::getIdFieldName($mainEntity['type']);
       $joinIdField = CoreUtil::getIdFieldName($joinEntityName);
+      $joinAllowedAction = self::getJoinAllowedAction($mainEntity, $joinEntityName);
 
       // Forward FK e.g. Event.loc_block_id => LocBlock
       $forwardFkField = self::getFkField($mainEntity['type'], $joinEntityName);
@@ -484,11 +485,11 @@ class Submit extends AbstractProcessor {
       // delete any existing records.
       elseif ($values) {
         // Based on afform Submit::getCustomGroupBlocks(), we can use this check for "is_multiple"
-        if (str_contains($joinEntityName, "Custom_")) {
-          $values[0]["entity_id"] = $entityId;
+        if ($joinAllowedAction["create"] === true && str_contains($joinEntityName, "Custom_")) {
           $result = civicrm_api4($joinEntityName, 'save', [
             // Disable permission checks because the main entity has already been vetted
             'checkPermissions' => FALSE,
+            'defaults' => ['entity_id' => $entityId],
             'records' => $values,
           ]);
         }
@@ -659,6 +660,23 @@ class Submit extends AbstractProcessor {
     ];
 
     \CRM_Core_BAO_MessageTemplate::sendTemplate($emailParams);
+  }
+
+  /**
+   * Function to get allowed action of a join entity
+   *
+   * @param array $mainEntity
+   * @param string $joinEntityName
+   *
+   * @return array
+   */
+  private static function getJoinAllowedAction(array $mainEntity, string $joinEntityName) {
+    $defaultActions = ["create" => true, "update" => false, "delete" => false];
+    if (array_key_exists('actions', $mainEntity['joins'][$joinEntityName])) {
+      $defaultActions = array_merge($defaultActions, $mainEntity['joins'][$joinEntityName]['actions']);
+    }
+
+    return $defaultActions;
   }
 
 }
