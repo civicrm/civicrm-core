@@ -24,12 +24,12 @@ class CRM_Admin_Form_Setting_UpdateConfigBackend extends CRM_Admin_Form_Setting 
    * Build the form object.
    */
   public function buildQuickForm() {
-    $this->setTitle(ts('Settings - Cleanup Caches and Update Paths'));
+    $this->setTitle(ts('Settings - Clear Caches and Reset Paths'));
 
     $this->addButtons([
       [
         'type' => 'next',
-        'name' => ts('Cleanup Caches'),
+        'name' => ts('Clear Caches'),
         'subName' => 'cleanup',
         'icon' => 'fa-undo',
 
