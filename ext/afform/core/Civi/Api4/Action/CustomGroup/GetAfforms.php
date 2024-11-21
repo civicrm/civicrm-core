@@ -293,6 +293,10 @@ class GetAfforms extends \Civi\Api4\Generic\BasicBatchAction {
     $forms = array_merge(...$formsByGroup);
 
     foreach ($forms as $form) {
+      $form['has_base'] = TRUE;
+      // blocks are provided by this module, but others are effectively provided
+      // by `civicrm_admin_ui` at this stage
+      $form['base_module'] = ($form['type'] === 'block') ? E::LONG_NAME : 'civicrm_admin_ui';
       $event->afforms[$form['name']] = $form;
     }
   }
