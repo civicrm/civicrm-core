@@ -249,6 +249,7 @@
   width: var(--crm-m);
   height: calc(100% - var(--crm-m));
   content: ' ';
+  width: 10px;
 }
 #afGuiEditor-canvas .af-gui-bar .form-inline {
   padding: 0;
@@ -476,40 +477,45 @@ af-gui-container > .af-gui-bar,
 #afGuiEditor.af-gui-editing-content .af-gui-bar:before {
   background: none;
 }
+#afGuiEditor .af-gui-dropzone {
+    background-color: var(--crm-c-background2);
+    border: 2px solid var(--crm-c-info);
+    min-height: 30px;
+}
+/* Options editor */
 #afGuiEditor af-gui-edit-options.af-gui-content-editing-area {
   border: 2px solid var(--crm-c-info);
 }
 #afGuiEditor af-gui-edit-options.af-gui-content-editing-area ul[ui-sortable] {
-  padding: 5px 20px 0;
+  padding-inline: var(--crm-padding-reg);
 }
 #afGuiEditor af-gui-edit-options.af-gui-content-editing-area ul[ui-sortable] li {
-  list-style: none;
-  padding-left: 15px;
-  position: relative;
-  background-color: #e7ecf1;
+  background-color: var(--crm-c-background2);
   cursor: move;
+  height: var(--crm-btn-height);
+  display: flex;
+  align-items: center;
+  padding-inline: var(--crm-m);
 }
 #afGuiEditor af-gui-edit-options.af-gui-content-editing-area ul[ui-sortable] li:nth-child(even) {
-  background-color: #f2f2f2;
+  background-color: var(--crm-c-background3);
 }
 #afGuiEditor af-gui-edit-options.af-gui-content-editing-area ul[ui-sortable] li > div {
-  width: calc(100% - 30px);
   display: inline-block;
 }
 #afGuiEditor af-gui-edit-options.af-gui-content-editing-area ul.af-gui-edit-options-deleted li > div {
   text-decoration: line-through;
 }
 #bootstrap-theme #afGuiEditor af-gui-edit-options.af-gui-content-editing-area ul[ui-sortable] li .btn-xs {
-  border: 0 none;
+  padding: 1px;
 }
 #afGuiEditor af-gui-edit-options.af-gui-content-editing-area h5 {
-  margin-left: 20px;
+  margin-left: var(--crm-padding-reg);
 }
-#afGuiEditor .af-gui-dropzone {
-  background-color: var(--crm-c-background2);
-  border: 2px solid var(--crm-c-info);
-  min-height: 30px;
+#afGuiEditor af-gui-edit-options.af-gui-content-editing-area button.pull-right {
+  margin-left: auto;
 }
+
 /* Rules for Conditional dialog */
 .af-gui-conditional-dialog fieldset {
   padding: 6px;
@@ -604,6 +610,9 @@ i.crm-i.af-gui-conditional-dialog-move-icon {
   margin-left: var(--crm-xs2);
   border: 1px solid var(--crm-input-border-color);
   border-radius: 2px;
+}
+#afGuiEditor li.disabled a strong {
+    color: var(--crm-dropdown-col); /* resets inaccessible colour for dropdown headings mislabelled disabled */
 }
 #afGuiEditor li .af-gui-field-select-in-dropdown input[type="color"] {
   width: 32px;
