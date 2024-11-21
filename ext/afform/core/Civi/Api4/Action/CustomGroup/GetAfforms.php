@@ -228,9 +228,10 @@ class GetAfforms extends \Civi\Api4\Generic\BasicBatchAction {
       'description' => E::ts('Contact summary tab display for %1', [1 => $item['title']]),
       'type' => 'search',
       'is_public' => FALSE,
-      // Q: how to restrict this appropriately?
-      // for now default to administer
-      // 'permission' => ['access CiviCRM'],
+      // Q: should this be more permissive if user has access
+      // to contact record?
+      // what about ACLs?
+      'permission' => ['access all custom data'],
       'title' => $item['title'],
       'icon' => $item['icon'],
     ];
