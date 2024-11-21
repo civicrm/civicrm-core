@@ -140,15 +140,15 @@ class GetSearchKit extends \Civi\Api4\Generic\BasicBatchAction {
             'colno' => '3',
             'toolbar' => [
               [
-                'action' => '',
-                'entity' => '',
+                'action' => 'add',
+                'entity' => $group['entity_name'],
                 'text' => E::ts('Add %1', [1 => $group['title']]),
                 'icon' => 'fa-plus',
                 'style' => 'default',
                 'target' => 'crm-popup',
                 'join' => '',
-                'path' => "civicrm/af/custom/{$group['name']}/create#?entity_id=[entity_id]",
                 'task' => '',
+                //'condition' => ['check user permission', TRUE],
               ],
             ],
           ],
@@ -196,8 +196,8 @@ class GetSearchKit extends \Civi\Api4\Generic\BasicBatchAction {
           'style' => 'default',
         ],
         [
-          // TODO: can we register this as the canonical Update link
-          'path' => "civicrm/af/custom/{$groupName}/update#?Record=[id]",
+          'entity' => $entityName,
+          'action' => 'update',
           'target' => 'crm-popup',
           'icon' => 'fa-pencil',
           'text' => E::ts('Edit'),
