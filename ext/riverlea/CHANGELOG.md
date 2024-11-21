@@ -1,4 +1,13 @@
+5.80.7
+ - CHANGED - CiviLint - made Thames CSS more verbose (#84)
+ - CHANGED - CiviLint - reduced four char spaces to two
+ - CHANGED - CiviLint - changes to PHP files
+ - CHANGED - CiviLint - no empty variables
+ - CHANGED - .gitignore file updated
+ - REMOVED - Duplicate BoostrapJS files
+
 5.80.6
+ - FIXED - trailing comma (merge_requests/42)
  - FIXED - FormBuilder customise options doesn't show icons on Wallbrook (#83)
  - FIXED - FormBuilder customise options grab region background doesn't show
  - CHANGED - Background colours for customise options alternating rows
