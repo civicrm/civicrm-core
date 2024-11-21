@@ -251,15 +251,35 @@ class GetAfforms extends \Civi\Api4\Generic\BasicBatchAction {
 
   protected static function parseGroupNamesFromAfformGetNames(array $getNames): array {
     // preserves previous logic when module_name or directive_name
-    // are specified
-    //
-    // I suspect we cannot more accurately parse kebab case names as special chars
-    // from group name may have been lost?
-    if (
-      (!empty($getNames['module_name']) && !str_contains(implode(' ', $getNames['module_name']), 'afblockCustom'))
-      || (!empty($getNames['directive_name']) && !str_contains(implode(' ', $getNames['directive_name']), 'afblock-custom'))
-    ) {
-      return [];
+    // are specified - look for at least one appearance of a known prefix
+    // otherwise we can exit early
+    if (!empty($getNames['module_name'])) {
+      $imploded = implode(' ', $getNames['module_name']);
+      $found = FALSE;
+      foreach (self::FORM_TYPES as $typePrefix) {
+        if (str_contains($imploded, $typePrefix)) {
+          $found = TRUE;
+          break;
+        }
+      }
+      if (!$found) {
+        return [];
+      }
+    }
+
+    if (!empty($getNames['directive_name'])) {
+      $imploded = implode(' ', $getNames['directive_name']);
+      $found = FALSE;
+      foreach (self::FORM_TYPES as $typePrefix) {
+        $kebabPrefix = _afform_angular_module_name($typePrefix, 'dash');
+        if (str_contains($imploded, $kebabPrefix)) {
+          $found = TRUE;
+          break;
+        }
+      }
+      if (!$found) {
+        return [];
+      }
     }
 
     $formNames = $getNames['name'] ?? [];
