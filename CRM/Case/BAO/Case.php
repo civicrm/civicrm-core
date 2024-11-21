@@ -447,6 +447,132 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
   /**
    * @param string $type
    * @param int $userID
+   * @param array $condition
+   * @param string|null $limit
+   * @param string|null $order
+   *
+   * @return array
+   */
+  public static function getCaseActivities(string $type, int $userID, array $condition = [], ?string $limit = NULL, ?string $order = NULL) : array {
+    $params = self::getCaseActivityParams($type, $userID, $condition);
+    $params['select'] = [
+      'case_id',
+      'case_id.subject',
+      'case_contact.contact_id',
+      'contact.sort_name',
+      'contact.phone_primary',
+      'contact.contact_type',
+      'contact.contact_sub_type',
+      'activity_id.activity_type_id',
+      'case_id.case_type_id',
+      'case_id.status_id',
+      'activity_id.status_id',
+      'case_id.start_date',
+      'relationship.contact_id_b',
+      'relationship.contact_id_a',
+      'relationship_type.label_b_a',
+      'activity_id.activity_date_time',
+      'activity_id.id',
+      'case_id.status_id:label',
+      'case_id.case_type_id:name',
+    ];
+    $cases = [];
+    $result = civicrm_api4('CaseActivity', 'get', $params);
+    foreach ($result as $case) {
+      $roles = [];
+      foreach ($result as $activity) {
+        if ($activity['case_id'] === $case['case_id']) {
+          if ($activity['relationship.contact_id_b'] == $userID) {
+            $roles[] = $activity['relationship_type.label_b_a'];
+          }
+          if ($activity['relationship.contact_id_a'] == $userID) {
+            $roles[] = $activity['relationship_type.label_a_b'];
+          }
+        }
+      }
+      $uniqueRoles = array_unique($roles);
+      $role = implode(', ', $uniqueRoles);
+      $cases[$case['case_id']] = [
+        'case_id' => $case['case_id'],
+        'case_subject' => $case['case_id.subject'],
+        'contact_id' => $case['case_contact.contact_id'],
+        'sort_name' => $case['contact.sort_name'],
+        'phone' => $case['contact.phone_primary'],
+        'contact_type' => $case['contact.contact_type'],
+        'contact_sub_type' => $case['contact.contact_sub_type'],
+        'activity_type_id' => $case['activity_id.activity_type_id'],
+        'case_type_id' => $case['case_id.case_type_id'],
+        'case_status_id' => $case['case_id.status_id'],
+        'status_id' => $case['activity_id.status_id'],
+        'case_start_date' => $case['case_id.start_date'],
+        'case_role' => $role,
+        'activity_date_time' => $case['activity_id.activity_date_time'],
+        'activity_id' => $case['activity_id.id'],
+        'case_status' => $case['case_id.status_id:label'],
+        'case_type' => $case['case_id.case_type_id:name'],
+      ];
+    }
+    return $cases;
+  }
+
+  /**
+   * @param string $type
+   * @param int $userID
+   * @param array $condition
+   *
+   * @return int
+   */
+  public static function getCaseActivitiesCount(string $type, int $userID, array $condition = []) : int {
+    $params = self::getCaseActivityParams($type, $userID, $condition);
+    $params['select'] = [
+      'row_count',
+    ];
+    $params['groupBy'] = ['case_id'];
+
+    $result = civicrm_api4('CaseActivity', 'get', $params);
+    return $result->rowCount ?? 0;
+  }
+
+  /**
+   * @param string $type
+   * @param int $userID
+   * @param array $condition
+   *
+   * @return array
+   */
+  public static function getCaseActivityParams(string $type, int $userID, array $condition = []) : array {
+    $params = [];
+    $params['join'] = [
+      ['Relationship AS relationship', 'LEFT', ['case_id', '=', 'relationship.case_id']],
+      ['CaseContact AS case_contact', 'LEFT', ['case_id.id', '=', 'case_contact.case_id']],
+      ['Contact AS contact', 'LEFT', ['case_contact.contact_id', '=', 'contact.id']],
+      ['RelationshipType AS relationship_type', 'LEFT', ['relationship.relationship_type_id', '=', 'relationship_type.id']],
+    ];
+    switch ($type) {
+      case 'upcoming':
+        $condition[] = ['activity_id.activity_date_time', '>' , date('Y-m-d')];
+        break;
+
+      case 'recent':
+        $condition[] = ['activity_id.activity_date_time', '<' , date('Y-m-d')];
+        break;
+
+      case 'any':
+        break;
+
+      default:
+        throw new Exception('Invalid type specified');
+    }
+
+    if ($condition) {
+      $params['where'] = $condition;
+    }
+    return $params;
+  }
+
+  /**
+   * @param string $type
+   * @param int $userID
    * @param string $condition
    *
    * @return string
@@ -567,7 +693,6 @@ HERESQL;
     if ($limit) {
       $query .= $limit;
     }
-
     return $query;
   }
 
@@ -579,11 +704,11 @@ HERESQL;
    * @param string $context
    * @param bool $getCount
    *
-   * @return array
+   * @return array|int
    *   Array of Cases
    */
   public static function getCases($allCases = TRUE, $params = [], $context = 'dashboard', $getCount = FALSE) {
-    $condition = NULL;
+    $condition = [];
     $casesList = [];
 
     // validate access for own cases.
@@ -605,27 +730,31 @@ HERESQL;
       $allCases = FALSE;
     }
 
-    $whereClauses = ['civicrm_case.is_deleted = 0 AND civicrm_contact.is_deleted <> 1'];
+    $condition[] = ['case_id.is_deleted', '<>', TRUE];
 
     if (!$allCases) {
-      $whereClauses[] = "(case_relationship.contact_id_b = {$userID} OR case_relationship.contact_id_a = {$userID})";
-      $whereClauses[] = 'case_relationship.is_active';
+      $condition[] = ['OR', [['relationship.contact_id_b', '=', $userID], ['relationship.contact_id_a', '=', $userID]]];
+      $condition[] = ['relationship.is_active', '=', TRUE];
     }
     if (empty($params['status_id']) && $type == 'upcoming') {
-      $whereClauses[] = "civicrm_case.status_id != " . CRM_Core_PseudoConstant::getKey('CRM_Case_BAO_Case', 'case_status_id', 'Closed');
+      $status_id = CRM_Core_PseudoConstant::getKey('CRM_Case_BAO_Case', 'case_status_id', 'Closed');
+      $condition[] = ['case_id.status_id', '!=', $status_id];
     }
 
     foreach (['case_type_id', 'status_id'] as $column) {
       if (!empty($params[$column])) {
-        $whereClauses[] = sprintf("civicrm_case.%s IN (%s)", $column, $params[$column]);
+        if (is_string($params[$column])) {
+          $params[$column] = explode(',', $params[$column]);
+        }
+        $condition[] = ['case_id.' . $column, 'IN', $params[$column]];
       }
     }
-    $condition = implode(' AND ', $whereClauses);
-
-    Civi::$statics[__CLASS__]['totalCount'][$type] = $totalCount = CRM_Core_DAO::singleValueQuery(self::getCaseActivityCountQuery($type, $userID, $condition));
+    $totalCount = self::getCaseActivitiesCount($type, $userID, $condition);
     if ($getCount) {
+      Civi::$statics[__CLASS__]['totalCount'][$type] = $totalCount;
       return $totalCount;
     }
+    $casesList = self::getCaseActivities($type, $userID, $condition);
     $casesList['total'] = $totalCount;
 
     $limit = '';
@@ -645,8 +774,7 @@ HERESQL;
       $order = "ORDER BY " . $params['sortBy'];
     }
 
-    $query = self::getCaseActivityQuery($type, $userID, $condition, $limit, $order);
-    $result = CRM_Core_DAO::executeQuery($query);
+    $cases = self::getCaseActivities($type, $userID, $condition, $limit, $order);
 
     // we're going to use the usual actions, so doesn't make sense to duplicate definitions
     $actions = CRM_Case_Selector_Search::links();
@@ -669,7 +797,7 @@ HERESQL;
     $caseTypeTitles = CRM_Case_PseudoConstant::caseType('title', FALSE);
     $activityTypeLabels = CRM_Activity_BAO_Activity::buildOptions('activity_type_id');
 
-    foreach ($result->fetchAll() as $case) {
+    foreach ($cases as $case) {
       $key = $case['case_id'];
       $casesList[$key] = [];
       $casesList[$key]['DT_RowId'] = $case['case_id'];
@@ -1497,27 +1625,25 @@ HERESQL;
   public static function getNextScheduledActivity($cases, $type = 'upcoming') {
     $userID = CRM_Core_Session::getLoggedInContactID();
 
-    $caseID = implode(',', $cases['case_id']);
-    $contactID = implode(',', $cases['contact_id']);
+    $caseID = $cases['case_id'];
+    $contactID = $cases['contact_id'];
+    $condition = [];
+    $condition[] = ['case_contact.id', 'IN', $contactID];
+    $condition[] = ['case_id', 'IN', $caseID];
+    $condition[] = ['case_id.is_deleted', '=', $cases['case_deleted']];
 
-    $condition = " civicrm_case_contact.contact_id IN( {$contactID} )
- AND civicrm_case.id IN( {$caseID})
- AND civicrm_case.is_deleted     = {$cases['case_deleted']}";
-
-    $query = self::getCaseActivityQuery($type, $userID, $condition);
+    $cases = self::getCaseActivities($type, $userID, $condition);
     $activityTypes = CRM_Activity_BAO_Activity::buildOptions('activity_type_id');
 
-    $res = CRM_Core_DAO::executeQuery($query);
-
     $activityInfo = [];
-    while ($res->fetch()) {
+    foreach ($cases as $case) {
       if ($type == 'upcoming') {
-        $activityInfo[$res->case_id]['date'] = $res->activity_date_time;
-        $activityInfo[$res->case_id]['type'] = $activityTypes[$res->activity_type_id] ?? NULL;
+        $activityInfo[$case->case_id]['date'] = $case->activity_date_time;
+        $activityInfo[$case->case_id]['type'] = $activityTypes[$case->activity_type_id] ?? NULL;
       }
       else {
-        $activityInfo[$res->case_id]['date'] = $res->activity_date_time;
-        $activityInfo[$res->case_id]['type'] = $activityTypes[$res->activity_type_id] ?? NULL;
+        $activityInfo[$case->case_id]['date'] = $case->activity_date_time;
+        $activityInfo[$case->case_id]['type'] = $activityTypes[$case->activity_type_id] ?? NULL;
       }
     }
 
