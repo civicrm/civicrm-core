@@ -34,7 +34,7 @@ class GetSearchKit extends \Civi\Api4\Generic\BasicBatchAction {
 
     // get active fields for this group to include as columns
     $item['fields'] = (array) \Civi\Api4\CustomField::get(FALSE)
-      ->addSelect('name', 'label')
+      ->addSelect('name', 'label', 'option_group_id')
       ->addWhere('custom_group_id', '=', $item['id'])
       ->addWhere('is_active', '=', TRUE)
       // respect "Display in table" config on each field
@@ -93,7 +93,11 @@ class GetSearchKit extends \Civi\Api4\Generic\BasicBatchAction {
     $searchDisplays = [];
 
     // most columns are reusable across displays
-    $columns = $this->getFieldColumns($group['fields']);
+    $columns = [];
+
+    foreach ($group['fields'] as $field) {
+      $columns[] = $this->getColumnForField($field);
+    }
     $columns[] = $this->getButtonColumn($group);
 
     $searchDisplays[] = $this->getTabSearchDisplay($group, $columns);
@@ -139,14 +143,24 @@ class GetSearchKit extends \Civi\Api4\Generic\BasicBatchAction {
     ];
   }
 
-  protected function getFieldColumns($fields) {
-    return array_map(fn ($field) => [
+  protected function getColumnForField($field) {
+    $key = $field['name'];
+    if ($field['option_group_id']) {
+      $key .= ':label';
+    }
+    // TODO: for entity ref columns, we would like to use
+    // a display-friendly column from the joined entity
+    // but
+    // a) we will need to determine the column based on
+    //    the entity (e.g. display_name for contact)
+    // b) we will need to add it to the SavedSearch as well
+    return [
       'type' => 'field',
-      'key' => $field['name'],
+      'key' => $key,
       'label' => $field['label'],
       'sortable' => TRUE,
       'break' => TRUE,
-    ], $fields);
+    ];
   }
 
   protected function getButtonColumn($group) {
