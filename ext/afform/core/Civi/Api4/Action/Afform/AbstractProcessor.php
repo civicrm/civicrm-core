@@ -241,6 +241,11 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
       if (!empty($result[$key])) {
         $data = ['fields' => $result[$key]];
         foreach ($entity['joins'] ?? [] as $joinEntity => $join) {
+          $isMultiRecord = str_contains($joinEntity, "Custom_");
+          $joinAllowedAction = self::getJoinAllowedAction($entity, $joinEntity);
+          if ($isMultiRecord === TRUE && $joinAllowedAction["create"] === TRUE) {
+            continue;
+          }
           $data['joins'][$joinEntity] = $this->loadJoins($joinEntity, $join, $entity, $entityId, $index);
         }
         $this->_entityValues[$entity['name']][$index] = $data;
@@ -693,6 +698,23 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   protected static function getNestedKey(array $values) {
     $firstValue = \CRM_Utils_Array::first(array_filter($values));
     return is_array($firstValue) && $firstValue ? array_keys($firstValue)[0] : NULL;
+  }
+
+  /**
+   * Function to get allowed action of a join entity
+   *
+   * @param array $mainEntity
+   * @param string $joinEntityName
+   *
+   * @return array
+   */
+  public static function getJoinAllowedAction(array $mainEntity, string $joinEntityName) {
+    $defaultActions = ["create" => false];
+    if (array_key_exists('actions', $mainEntity['joins'][$joinEntityName])) {
+      $defaultActions = array_merge($defaultActions, $mainEntity['joins'][$joinEntityName]['actions']);
+    }
+
+    return $defaultActions;
   }
 
 }

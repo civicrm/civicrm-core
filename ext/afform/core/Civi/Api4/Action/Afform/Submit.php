@@ -664,21 +664,4 @@ class Submit extends AbstractProcessor {
     \CRM_Core_BAO_MessageTemplate::sendTemplate($emailParams);
   }
 
-  /**
-   * Function to get allowed action of a join entity
-   *
-   * @param array $mainEntity
-   * @param string $joinEntityName
-   *
-   * @return array
-   */
-  private static function getJoinAllowedAction(array $mainEntity, string $joinEntityName) {
-    $actions = ["create" => FALSE];
-    if (array_key_exists('actions', $mainEntity['joins'][$joinEntityName])) {
-      $actions = array_merge($actions, $mainEntity['joins'][$joinEntityName]['actions']);
-    }
-
-    return $actions;
-  }
-
 }
