@@ -122,7 +122,7 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
       $date = CRM_Utils_Date::relativeToAbsolute($relativeString, 'year');
       $this->assertEquals([
         'from' => $year . '0101',
-        'to' => $year . '1231',
+        'to' => $year . '1231235959',
       ], $date, 'relative term is ' . $relativeString);
 
       $year--;
@@ -133,7 +133,7 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
     $thisYear = date('Y');
     $this->assertEquals([
       'from' => ($thisYear - 1) . '0101',
-      'to' => $thisYear . '1231',
+      'to' => $thisYear . '1231235959',
     ], $date, 'relative term is this_2 year');
   }
 
@@ -228,7 +228,7 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
       $offset = (substr($relativeString, -1, 1)) - 1;
       $this->assertEquals([
         'from' => $lastYear - $offset . '0101',
-        'to' => $lastYear . '1231',
+        'to' => $lastYear . '1231235959',
       ], $date, 'relative term is ' . $relativeString);
     }
   }
@@ -2618,7 +2618,7 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
 
     $this->assertEquals([
       'from' => NULL,
-      'to' => date('Ymd000000', strtotime('-1 day')),
+      'to' => date('Ymd235959', strtotime('-1 day')),
     ], $date);
   }
 
