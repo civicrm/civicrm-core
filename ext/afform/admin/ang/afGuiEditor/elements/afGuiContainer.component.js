@@ -259,16 +259,10 @@
         }
       };
 
-      this.onChangeCreateAction = function() {
-        // if (!ctrl.node.actions.update) {
-        //   ctrl.node.actions.delete = false;
-        // }
-      };
-
       function initializeBlockContainer() {
         // Set defaults for 'actions'
         if (!('actions' in ctrl.node)) {
-          ctrl.node.actions = {create: true, update: false, delete: false};
+          ctrl.node.actions = {create: false};
         }
 
         // Cancel the below $watch expressions if already set
