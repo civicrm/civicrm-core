@@ -37,6 +37,9 @@ class GetSearchKit extends \Civi\Api4\Generic\BasicBatchAction {
       ->addSelect('name', 'label')
       ->addWhere('custom_group_id', '=', $item['id'])
       ->addWhere('is_active', '=', TRUE)
+      // respect "Display in table" config on each field
+      // (Q: should we respect this for other displays?)
+      ->addWhere('in_selector', '=', TRUE)
       ->execute();
 
     $managed = [];
