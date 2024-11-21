@@ -107,7 +107,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
     while ($result->fetch()) {
       $mailingID = $result->mailing_id;
       // still use job level lock for each child job
-      $lock = Civi::lockManager()->acquire("data.mailing.job.{$result->id}");
+      $lock = Civi::lockManager()->acquire("data.mailing.job.{$result->id}", 0);
       if (!$lock->isAcquired()) {
         continue;
       }
@@ -327,7 +327,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
     // X Number of child jobs
     while ($job->fetch()) {
       // still use job level lock for each child job
-      $lock = Civi::lockManager()->acquire("data.mailing.job.{$job->id}");
+      $lock = Civi::lockManager()->acquire("data.mailing.job.{$job->id}", 0);
       if (!$lock->isAcquired()) {
         continue;
       }
