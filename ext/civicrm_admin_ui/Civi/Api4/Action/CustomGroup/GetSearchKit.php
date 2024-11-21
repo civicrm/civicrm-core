@@ -138,6 +138,19 @@ class GetSearchKit extends \Civi\Api4\Generic\BasicBatchAction {
             'actions_display_mode' => 'menu',
             // only for grid but harmless otherwise
             'colno' => '3',
+            'toolbar' => [
+              [
+                'action' => '',
+                'entity' => '',
+                'text' => E::ts('Add %1', [1 => $group['title']]),
+                'icon' => 'fa-plus',
+                'style' => 'default',
+                'target' => 'crm-popup',
+                'join' => '',
+                'path' => "civicrm/af/custom/{$group['name']}/create#?entity_id=[entity_id]",
+                'task' => '',
+              ],
+            ],
           ],
         ],
         'match' => [
