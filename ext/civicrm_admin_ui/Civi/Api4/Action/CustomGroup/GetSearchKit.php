@@ -124,9 +124,14 @@ class GetSearchKit extends \Civi\Api4\Generic\BasicBatchAction {
           'saved_search_id.name' => $searchName,
           'type' => $displayType,
           'settings' => [
-            'limit' => 50,
             'placeholder' => 5,
             'columns' => $columns,
+            'pager' => [
+              'show_count' => TRUE,
+              'expose_limit' => TRUE,
+              'hide_single' => TRUE,
+            ],
+            'headerCount' => TRUE,
             // only for table but harmless otherwise
             'actions' => TRUE,
             'classes' => ['table', 'table-striped'],
