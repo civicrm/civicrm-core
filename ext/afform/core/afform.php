@@ -169,6 +169,15 @@ function afform_civicrm_tabset($tabsetName, &$tabs, $context) {
     if (!$summaryContactType || !$contactTypes || array_intersect($summaryContactType, $contactTypes)) {
       // Convention is to name the afform like "afformTabMyInfo" which gets the tab name "my_info"
       $tabId = CRM_Utils_String::convertStringToSnakeCase(preg_replace('#^(afformtab|afsearchtab|afform|afsearch)#i', '', $afform['name']));
+      if (strpos($tabId, 'custom_') === 0) {
+        // custom group tab forms use name, but need to replace tabs using ID
+        $groupName = substr($tabId, 8);
+        $groupId = \Civi\Api4\CustomGroup::get(FALSE)
+          ->addSelect('id')
+          ->addWhere('name', '=', $groupName)
+          ->execute()->first()['id'] ?? NULL;
+        $tabId = 'custom_' . $groupId;
+      }
       // If a tab with that id already exists, allow the afform to replace it.
       $existingTab = array_search($tabId, $existingTabs);
       if ($existingTab !== FALSE) {
