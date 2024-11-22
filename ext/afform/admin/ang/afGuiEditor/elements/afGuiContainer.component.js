@@ -115,6 +115,12 @@
         return !!ctrl.join;
       };
 
+      this.isCustomMultipleRecord = function() {
+        const join_entity = ctrl.getJoinEntity().entity;
+        const matched = join_entity.match(/^Custom_/);
+        return this.isJoin() && !_.isEmpty(matched);
+      };
+
       $scope.getSetChildren = function(val) {
         var collection = block.layout || (ctrl.node && ctrl.node['#children']);
         return arguments.length ? (collection = val) : collection;
@@ -259,10 +265,18 @@
         }
       };
 
+      this.onChangeUpdateAction = function() {
+        ctrl.node.actions.create = !ctrl.node.actions.update;
+      };
+
+      this.onChangeCreateAction = function() {
+        ctrl.node.actions.update = !ctrl.node.actions.create;
+      };
+
       function initializeBlockContainer() {
         // Set defaults for 'actions'
         if (!('actions' in ctrl.node)) {
-          ctrl.node.actions = {create: false};
+          ctrl.node.actions = {create: false, update: true};
         }
 
         // Cancel the below $watch expressions if already set

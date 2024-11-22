@@ -31,12 +31,14 @@
     </div>
   </div>
 </li>
-<li ng-click="$event.stopPropagation()" ng-if="$ctrl.isJoin()">
+<li ng-click="$event.stopPropagation()" ng-if="$ctrl.isCustomMultipleRecord()">
   <div class="form-inline af-gui-field-select-in-dropdown">
     <div class="form-group">
       <label>{{:: ts('Allow:') }}</label>
       <div class="checkbox-inline">
-        <label><input type="checkbox" ng-model="$ctrl.node.actions.create">{{:: ts('Create') }}</label>
+        <label><input type="checkbox" ng-model="$ctrl.node.actions.create" ng-change="$ctrl.onChangeCreateAction()">{{:: ts('Create') }}</label>
+      </div>
+        <label><input type="checkbox" ng-model="$ctrl.node.actions.update" ng-change="$ctrl.onChangeUpdateAction()">{{:: ts('Update') }}</label>
       </div>
     </div>
   </div>

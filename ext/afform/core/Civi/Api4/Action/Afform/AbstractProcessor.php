@@ -241,8 +241,11 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
       if (!empty($result[$key])) {
         $data = ['fields' => $result[$key]];
         foreach ($entity['joins'] ?? [] as $joinEntity => $join) {
+          // Based on Civi\Api4\Action\Afform\Get::getCustomGroupBlocks(), we can use this check for "is_multiple"
+          // This is also a way to check if the join entity is a custom block
           $isMultiRecord = str_contains($joinEntity, "Custom_");
           $joinAllowedAction = self::getJoinAllowedAction($entity, $joinEntity);
+          // Do not load joins when block action is create
           if ($isMultiRecord === TRUE && $joinAllowedAction["create"] === TRUE) {
             continue;
           }
@@ -709,12 +712,12 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    * @return array
    */
   public static function getJoinAllowedAction(array $mainEntity, string $joinEntityName) {
-    $defaultActions = ["create" => false];
+    $actions = ["create" => FALSE, "update" => TRUE];
     if (array_key_exists('actions', $mainEntity['joins'][$joinEntityName])) {
-      $defaultActions = array_merge($defaultActions, $mainEntity['joins'][$joinEntityName]['actions']);
+      $actions = array_merge($actions, $mainEntity['joins'][$joinEntityName]['actions']);
     }
 
-    return $defaultActions;
+    return $actions;
   }
 
 }
