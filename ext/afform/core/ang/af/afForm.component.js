@@ -195,7 +195,7 @@
           case 'CONTAINS':
           case 'NOT CONTAINS':
             if (Array.isArray(val1)) {
-              return val1.includes(val2) === yes;
+              return val1.some(element => element == val2) === yes;
             } else if (typeof val1 === 'string' && typeof val2 === 'string') {
               return val1.toLowerCase().includes(val2.toLowerCase()) === yes;
             }
