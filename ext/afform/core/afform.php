@@ -174,9 +174,12 @@ function afform_civicrm_tabset($tabsetName, &$tabs, $context) {
         // custom group tab forms use name, but need to replace tabs using ID
         // remove 'afsearchTabCustom_' from the form name to get the group name
         $groupName = substr($afform['name'], 18);
-        $group = \CRM_Core_BAO_CustomGroup::getGroup(['name' => $groupName]);
-        if ($group) {
-          $tabId = 'custom_' . $group['id'];
+        $groupId = \Civi\Api4\CustomGroup::get(FALSE)
+          ->addSelect('id')
+          ->addWhere('name', '=', $groupName)
+          ->execute()->first()['id'] ?? NULL;
+        if ($groupId) {
+          $tabId = 'custom_' . $groupId;
         }
       }
       // If a tab with that id already exists, allow the afform to replace it.
