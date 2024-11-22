@@ -201,7 +201,7 @@ class GetSearchKit extends \Civi\Api4\Generic\BasicBatchAction {
           'target' => 'crm-popup',
           'icon' => 'fa-pencil',
           'text' => E::ts('Edit'),
-          'style' => 'warning',
+          'style' => 'default',
         ],
         [
           'entity' => $entityName,
