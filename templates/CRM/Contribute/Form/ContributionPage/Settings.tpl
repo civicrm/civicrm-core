@@ -131,9 +131,17 @@
       </tr>
     {/if}
   </table>
-  {include file="CRM/common/customDataBlock.tpl" customDataType='ContributionPage'}
+  {include file="CRM/common/customDataBlock.tpl" customDataType='ContributionPage' customDataSubType=$financialTypeId cid=''}
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
+
+<script type="text/javascript">
+  CRM.$(function($) {
+    $('#financial_type_id').change( function() {
+      CRM.buildCustomData('ContributionPage', $('#financial_type_id').val(), false, false, false, false, false, false);
+    });
+  });
+</script>
 
 {include file="CRM/common/showHideByFieldValue.tpl"
   trigger_field_id    ="is_organization"

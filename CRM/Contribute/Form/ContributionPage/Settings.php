@@ -26,6 +26,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
 
     // Must set entityID for defaults to load via AJAX.
     $this->assign('entityID', $this->_id);
+    $this->assign('financialTypeId', $this->_values['financial_type_id'] ?? '');
 
     if ($this->isSubmitted()) {
       // The custom data fields are added to the form by an ajax form.
