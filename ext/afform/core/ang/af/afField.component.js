@@ -369,8 +369,12 @@
           if (ctrl.defn.data_type === 'Boolean') {
             return ($scope.dataProvider.getFieldData()[ctrl.fieldName] = (val === 'true'));
           }
-          if (ctrl.defn.data_type === 'Integer' && typeof val === 'string') {
-            return ($scope.dataProvider.getFieldData()[ctrl.fieldName] = val.length ? +val : null);
+          if (ctrl.defn.data_type === 'Integer') {
+            if (typeof val === 'string') {
+              return ($scope.dataProvider.getFieldData()[ctrl.fieldName] = val.length ? +val : null);
+            } else if (Array.isArray(val)) {
+              return ($scope.dataProvider.getFieldData()[ctrl.fieldName] = val.map(Number));
+            }
           }
           return ($scope.dataProvider.getFieldData()[ctrl.fieldName] = val);
         }
