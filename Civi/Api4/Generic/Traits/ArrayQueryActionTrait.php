@@ -127,6 +127,13 @@ trait ArrayQueryActionTrait {
       case '=':
       case '!=':
       case '<>':
+        // For parity with SQL operators, do case-insensitive matching
+        if (is_string($value)) {
+          $value = strtolower($value);
+        }
+        if (is_string($expected)) {
+          $expected = strtolower($expected);
+        }
         $equal = $value == $expected;
         // PHP is too imprecise about comparing the number 0
         if ($expected === 0 || $expected === '0') {

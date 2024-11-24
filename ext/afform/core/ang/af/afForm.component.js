@@ -172,6 +172,13 @@
           case '!=':
           // Legacy operator, changed to '=', but may still exist on older forms.
           case '==':
+            // Case-insensitive string comparisons
+            if (typeof val1 === 'string') {
+              val1 = val1.toLowerCase();
+            }
+            if (typeof val2 === 'string') {
+              val2 = val2.toLowerCase();
+            }
             return angular.equals(val1, val2) === yes;
 
           case '>':

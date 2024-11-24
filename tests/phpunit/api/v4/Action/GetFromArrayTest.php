@@ -105,7 +105,7 @@ class GetFromArrayTest extends Api4TestBase {
     $result = MockArrayEntity::get()
       ->addWhere('field2', '=', 'yack')
       ->execute();
-    $this->assertEquals([2], $result->column('field1'));
+    $this->assertEquals([2, 6], $result->column('field1'));
 
     $result = MockArrayEntity::get()
       ->addWhere('field5', '!=', 'banana')
@@ -208,12 +208,12 @@ class GetFromArrayTest extends Api4TestBase {
     $result = MockArrayEntity::get()
       ->addClause('NOT', ['field2', '!=', 'yack'])
       ->execute();
-    $this->assertEquals([2], $result->column('field1'));
+    $this->assertEquals([2, 6], $result->column('field1'));
 
     $result = MockArrayEntity::get()
       ->addClause('OR', ['field1', '=', 2], ['AND', [['field5', '=', 'apple'], ['field3', '=', 1]]])
       ->execute();
-    $this->assertEquals([2, 4, 5], $result->column('field1'));
+    $this->assertEquals([2, 4, 5, 6], $result->column('field1'));
   }
 
 }
