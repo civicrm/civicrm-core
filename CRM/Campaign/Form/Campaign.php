@@ -124,7 +124,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
       'title' => ['name' => 'title'],
       'description' => ['name' => 'description'],
       'start_date' => ['name' => 'start_date', 'default' => date('Y-m-d H:i:s')],
-      'end_date' => ['name' => 'start_date'],
+      'end_date' => ['name' => 'end_date'],
       'campaign_type_id' => ['name' => 'campaign_type_id'],
       'status_id' => ['name' => 'status_id'],
       'goal_general' => ['name' => 'goal_general'],
