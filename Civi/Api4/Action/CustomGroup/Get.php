@@ -62,6 +62,17 @@ class Get extends \Civi\Api4\Generic\DAOGetAction {
         return TRUE;
       }
     }
+    foreach ($this->where as $clause) {
+      $field = $clause[0] ?? NULL;
+      if (!$field || !isset($standardFields[$field])) {
+        return TRUE;
+      }
+    }
+    foreach ($this->orderBy as $field => $dir) {
+      if (!isset($standardFields[$field])) {
+        return TRUE;
+      }
+    }
     return FALSE;
   }
 
