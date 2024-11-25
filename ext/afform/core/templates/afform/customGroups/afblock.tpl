@@ -1,14 +1,13 @@
-{if $custom.help_pre}
-  <div class="af-markup">{$custom.help_pre}</div>
+{if $group.help_pre}
+  <div class="af-markup">{$group.help_pre}</div>
 {/if}
 
-{foreach from=$custom.fields item=field}
+{foreach from=$group.field_names item=field_name}
   {* for multiple record fields there is no need to prepend
   the group name because it is provided as the join_entity above *}
-  <af-field name="{if !$custom.is_multiple}{$custom.name}.{/if}{$field.name}" />
+  <af-field name="{if !$group.is_multiple}{$group.name}.{/if}{$field_name}" />
 {/foreach}
 
-{if $custom.help_post}
-  <div class="af-markup">{$custom.help_post}</div>
+{if $group.help_post}
+  <div class="af-markup">{$group.help_post}</div>
 {/if}
-

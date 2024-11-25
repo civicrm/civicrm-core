@@ -46,7 +46,7 @@ function afform_civicrm_config(&$config) {
   $dispatcher->addListener('hook_civicrm_angularModules', '_afform_hook_civicrm_angularModules', -1000);
   $dispatcher->addListener('hook_civicrm_alterAngular', ['\Civi\Afform\AfformMetadataInjector', 'preprocess']);
   $dispatcher->addListener('hook_civicrm_check', ['\Civi\Afform\StatusChecks', 'hook_civicrm_check']);
-  $dispatcher->addListener('civi.afform.get', ['\Civi\Api4\Action\Afform\Get', 'getCustomGroupBlocks']);
+  $dispatcher->addListener('civi.afform.get', ['\Civi\Api4\Action\CustomGroup\GetAfforms', 'getCustomGroupAfforms']);
 }
 
 /**
@@ -169,6 +169,15 @@ function afform_civicrm_tabset($tabsetName, &$tabs, $context) {
     if (!$summaryContactType || !$contactTypes || array_intersect($summaryContactType, $contactTypes)) {
       // Convention is to name the afform like "afformTabMyInfo" which gets the tab name "my_info"
       $tabId = CRM_Utils_String::convertStringToSnakeCase(preg_replace('#^(afformtab|afsearchtab|afform|afsearch)#i', '', $afform['name']));
+      if (strpos($tabId, 'custom_') === 0) {
+        // custom group tab forms use name, but need to replace tabs using ID
+        // remove 'afsearchTabCustom_' from the form name to get the group name
+        $groupName = substr($afform['name'], 18);
+        $group = \CRM_Core_BAO_CustomGroup::getGroup(['name' => $groupName]);
+        if ($group) {
+          $tabId = 'custom_' . $group['id'];
+        }
+      }
       // If a tab with that id already exists, allow the afform to replace it.
       $existingTab = array_search($tabId, $existingTabs);
       if ($existingTab !== FALSE) {
