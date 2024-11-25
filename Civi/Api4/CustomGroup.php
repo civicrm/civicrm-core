@@ -10,6 +10,8 @@
  */
 namespace Civi\Api4;
 
+use Civi\Api4\Generic\CachedDAOGetAction;
+
 /**
  * CustomGroup entity.
  *
@@ -25,11 +27,12 @@ class CustomGroup extends Generic\DAOEntity {
 
   /**
    * @param bool $checkPermissions
-   * @return Action\CustomGroup\Get
+   * @return Generic\CachedDAOGetAction
    */
   public static function get($checkPermissions = TRUE) {
-    return (new Action\CustomGroup\Get(__CLASS__, __FUNCTION__))
-      ->setCheckPermissions($checkPermissions);
+    return (new CachedDAOGetAction(__CLASS__, __FUNCTION__, function (CachedDAOGetAction $action) {
+      return \CRM_Core_BAO_CustomGroup::getAll();
+    }))->setCheckPermissions($checkPermissions);
   }
 
 }
