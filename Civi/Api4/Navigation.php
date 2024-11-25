@@ -13,7 +13,7 @@ namespace Civi\Api4;
 /**
  * Navigation menu items.
  *
- * @searchable none
+ * @searchable secondary
  * @orderBy weight
  * @groupWeightsBy domain_id,parent_id
  * @matchFields name,domain_id
@@ -23,5 +23,6 @@ namespace Civi\Api4;
 class Navigation extends Generic\DAOEntity {
   use Generic\Traits\SortableEntity;
   use Generic\Traits\ManagedEntity;
+  use Generic\Traits\HierarchicalEntity;
 
 }
