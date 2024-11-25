@@ -127,6 +127,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
       'end_date' => ['name' => 'end_date'],
       'campaign_type_id' => ['name' => 'campaign_type_id'],
       'status_id' => ['name' => 'status_id'],
+      'parent_id' => ['name' => 'parent_id'],
       'goal_general' => ['name' => 'goal_general'],
       'goal_revenue' => ['name' => 'goal_revenue'],
       'external_identifier' => ['name' => 'external_identifier'],
