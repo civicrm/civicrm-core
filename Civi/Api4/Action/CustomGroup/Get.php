@@ -38,14 +38,11 @@ class Get extends \Civi\Api4\Generic\DAOGetAction {
   /**
    * @param \Civi\Api4\Generic\Result $result
    *
-   * Most of the time uses the standard DAOGetAction implementation
-   *
-   * However - for simple queries we can use the in-memory cache to
-   * avoid hitting the database
+   * Use self::getFromCache or DAOGetAction::getObjects
    */
-  protected function getObjects(Result $result) {
+  protected function getObjects(Result $result): void {
     if (is_null($this->useCache)) {
-      $this->useCache = !$this->needDb();
+      $this->useCache = !$this->needDatabase();
     }
     if ($this->useCache) {
       $this->getFromCache($result);
@@ -54,10 +51,17 @@ class Get extends \Civi\Api4\Generic\DAOGetAction {
     parent::getObjects($result);
   }
 
-  protected function needDb() {
+  /**
+   * Determine whether this query needs to use the
+   * database (or can be answered using the cache)
+   *
+   * @return bool
+   */
+  protected function needDatabase(): bool {
     if ($this->groupBy || $this->having || $this->join) {
       return TRUE;
     }
+
     $standardFields = \Civi::entity($this->getEntityName())->getFields();
     foreach ($this->select as $field) {
       [$field] = explode(':', $field);

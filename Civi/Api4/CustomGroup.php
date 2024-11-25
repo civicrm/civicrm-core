@@ -25,7 +25,7 @@ class CustomGroup extends Generic\DAOEntity {
 
   /**
    * @param bool $checkPermissions
-   * @return Action\CustomField\Create
+   * @return Action\CustomGroup\Get
    */
   public static function get($checkPermissions = TRUE) {
     return (new Action\CustomGroup\Get(__CLASS__, __FUNCTION__))
