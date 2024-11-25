@@ -115,12 +115,6 @@
         return !!ctrl.join;
       };
 
-      this.isCustomMultipleRecord = function() {
-        const join_entity = ctrl.getJoinEntity().entity;
-        const matched = join_entity.match(/^Custom_/);
-        return this.isJoin() && !_.isEmpty(matched);
-      };
-
       $scope.getSetChildren = function(val) {
         var collection = block.layout || (ctrl.node && ctrl.node['#children']);
         return arguments.length ? (collection = val) : collection;

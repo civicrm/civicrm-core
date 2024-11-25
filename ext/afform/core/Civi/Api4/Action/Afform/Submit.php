@@ -484,10 +484,7 @@ class Submit extends AbstractProcessor {
       // the contact was being auto-updated via a dedupe rule; in that case we would not want to
       // delete any existing records.
       elseif ($values) {
-        // Based on Civi\Api4\Action\Afform\Get::getCustomGroupBlocks(), we can use this check for "is_multiple"
-        // This is also a way to check if the join entity is a custom block
-        $isMultiRecord = str_contains($joinEntityName, "Custom_");
-        if ($isMultiRecord === TRUE && $joinAllowedAction["create"] === TRUE) {
+        if ($joinAllowedAction["create"] === TRUE) {
           $result = civicrm_api4($joinEntityName, 'save', [
             // Disable permission checks because the main entity has already been vetted
             'checkPermissions' => FALSE,

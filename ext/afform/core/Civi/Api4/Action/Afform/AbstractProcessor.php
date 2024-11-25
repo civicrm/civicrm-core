@@ -241,12 +241,9 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
       if (!empty($result[$key])) {
         $data = ['fields' => $result[$key]];
         foreach ($entity['joins'] ?? [] as $joinEntity => $join) {
-          // Based on Civi\Api4\Action\Afform\Get::getCustomGroupBlocks(), we can use this check for "is_multiple"
-          // This is also a way to check if the join entity is a custom block
-          $isMultiRecord = str_contains($joinEntity, "Custom_");
-          $joinAllowedAction = self::getJoinAllowedAction($entity, $joinEntity);
           // Do not load joins when block action is create
-          if ($isMultiRecord === TRUE && $joinAllowedAction["create"] === TRUE) {
+          $joinAllowedAction = self::getJoinAllowedAction($entity, $joinEntity);
+          if ($joinAllowedAction["create"] === TRUE) {
             continue;
           }
           $data['joins'][$joinEntity] = $this->loadJoins($joinEntity, $join, $entity, $entityId, $index);
