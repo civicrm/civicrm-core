@@ -14,6 +14,7 @@ namespace Civi\Api4\Action\CustomGroup;
 
 use Civi\Api4\Generic\Result;
 use Civi\Api4\Generic\Traits\ArrayQueryActionTrait;
+use Civi\Api4\Generic\Traits\PseudoconstantOutputTrait;
 
 /**
  * @inheritDoc
@@ -21,6 +22,7 @@ use Civi\Api4\Generic\Traits\ArrayQueryActionTrait;
  */
 class Get extends \Civi\Api4\Generic\DAOGetAction {
   use ArrayQueryActionTrait;
+  use PseudoconstantOutputTrait;
 
   /**
    * @var bool
@@ -56,19 +58,21 @@ class Get extends \Civi\Api4\Generic\DAOGetAction {
     if ($this->groupBy || $this->having || $this->join) {
       return TRUE;
     }
-    $standardFields = \Civi::entity('CustomGroup')->getFields();
+    $standardFields = \Civi::entity($this->getEntityName())->getFields();
     foreach ($this->select as $field) {
+      [$field] = explode(':', $field);
       if (!isset($standardFields[$field])) {
         return TRUE;
       }
     }
     foreach ($this->where as $clause) {
-      $field = $clause[0] ?? NULL;
+      [$field] = explode(':', $clause[0] ?? '');
       if (!$field || !isset($standardFields[$field])) {
         return TRUE;
       }
     }
     foreach ($this->orderBy as $field => $dir) {
+      [$field] = explode(':', $field);
       if (!isset($standardFields[$field])) {
         return TRUE;
       }
@@ -77,18 +81,18 @@ class Get extends \Civi\Api4\Generic\DAOGetAction {
   }
 
   /**
-   * This acts like a BasicBatchAction - ie provide all the records
-   * upfront, and then filter using queryArray
-   *
-   * NOTE: we skip formatValues because any pseudoconstant fields
-   * will trigger 'needDb'
+   * This works like BasicGetAction:
+   * - provide all the records upfront from the cache
+   * - format suffixes using PseudoconstantOutputTrait
+   * - filter using ArrayQueryActionTrait
    */
-  protected function getFromCache($result) {
-    $values = $this->getRecords();
+  protected function getFromCache($result): void {
+    $values = $this->getCachedRecords();
+    $this->formatRawValues($values);
     $this->queryArray($values, $result);
   }
 
-  protected function getRecords() {
+  protected function getCachedRecords() {
     return \CRM_Core_BAO_CustomGroup::getAll();
   }
 
