@@ -34,8 +34,8 @@
  - FIXED td.label width not being applied, creating various other quirks; changed display type to inline-table.
  - ADDED small inline margin to help icons to separate from label text
  - ADDED min-height of 100vh to avoid block of white-space below #crm-container (same as Thames)
- - CHANGED Readme - simplified some wording, expenaded description, removed roadmap, changed order, created 'customisation' section.
- - ADDED instrcutions for creating a subtheme/stream extension pointing to RiverLea.
+ - CHANGED Readme - simplified some wording, expanded description, removed roadmap, changed order, created 'customisation' section.
+ - ADDED instructions for creating a subtheme/stream extension pointing to RiverLea.
 
 1.1.3 / 5.80.2
  - FIXED z-index for date-picker in modals
