@@ -302,8 +302,8 @@
         crmApi4('Afform', 'submit', {
           name: ctrl.getFormMeta().name,
           args: args,
-          values: data}
-        ).then(function(response) {
+          values: data,
+        }).then(function(response) {
           submissionResponse = response;
           if (ctrl.fileUploader.getNotUploadedItems().length) {
             _.each(ctrl.fileUploader.getNotUploadedItems(), function(file) {

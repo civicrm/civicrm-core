@@ -543,12 +543,10 @@ if (!CRM.vars) CRM.vars = {};
       return '';
     }
     let markup = '<div class="crm-entityref-links crm-entityref-quick-add">';
-    CRM.config.quickAdd.forEach((link) => {
-      if (quickAddLinks.includes(link.path)) {
-        markup += ' <a class="crm-hover-button" href="' + _.escape(CRM.url(link.path)) + '">' +
-          '<i class="crm-i ' + _.escape(link.icon) + '" aria-hidden="true"></i> ' +
-          _.escape(link.title) + '</a>';
-      }
+    quickAddLinks.forEach((link) => {
+      markup += ' <a class="crm-hover-button" href="' + _.escape(CRM.url(link.path)) + '">' +
+        '<i class="crm-i ' + _.escape(link.icon) + '" aria-hidden="true"></i> ' +
+        _.escape(link.title) + '</a>';
     });
     markup += '</div>';
     return markup;
@@ -576,6 +574,26 @@ if (!CRM.vars) CRM.vars = {};
       }
       return apiParams || {};
     }
+    function getQuickAddLinks(paths) {
+      const links = [];
+      if (paths && paths.length) {
+        const apiParams = getApiParams();
+        paths.forEach((path) => {
+          let link = CRM.config.quickAdd.find((link) => link.path === path);
+          if (link) {
+            links.push({
+              path: path + '#?' + $.param({
+                parentFormName: apiParams.formName,
+                parentFormFieldName: apiParams.fieldName,
+              }),
+              icon: link.icon,
+              title: link.title,
+            });
+          }
+        });
+      }
+      return links;
+    }
     if (entityName === 'destroy') {
       return $(this).off('.crmEntity').crmSelect2('destroy');
     }
@@ -583,7 +601,7 @@ if (!CRM.vars) CRM.vars = {};
     return $(this).each(function() {
       const $el = $(this).off('.crmEntity');
       let staticItems = getStaticOptions(select2Options.static),
-        quickAddLinks = select2Options.quickAdd,
+        quickAddLinks = getQuickAddLinks(select2Options.quickAdd),
         multiple = !!select2Options.multiple;
 
       $el.crmSelect2(_.extend({

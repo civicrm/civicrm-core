@@ -4,6 +4,7 @@ namespace Civi\Test;
 
 use Civi\Api4\Generic\AbstractAction;
 use Civi\Api4\Generic\Result;
+use Civi\Api4\UFMatch;
 use Civi\Api4\Utils\CoreUtil;
 
 /**
@@ -398,6 +399,40 @@ trait Api4TestTrait {
     }
 
     return NULL;
+  }
+
+  /**
+   * Emulate a logged in user since certain functions use that.
+   * value to store a record in the DB (like activity)
+   *
+   * @see https://issues.civicrm.org/jira/browse/CRM-8180
+   *
+   * @return int
+   *   Contact ID of the created user.
+   * @throws \CRM_Core_Exception
+   */
+  public function createLoggedInUser(): int {
+    $contactID = $this->createTestRecord('Individual', [
+      'first_name' => 'Logged In',
+      'last_name' => 'User ' . mt_rand(),
+    ])['id'];
+    UFMatch::delete(FALSE)->addWhere('uf_id', '=', 6)->execute();
+    $this->createTestRecord('UFMatch', [
+      'contact_id' => $contactID,
+      'uf_name' => 'superman',
+      'uf_id' => 6,
+    ]);
+
+    $session = \CRM_Core_Session::singleton();
+    $session->set('userID', $contactID);
+    return $contactID;
+  }
+
+  public function userLogout() {
+    \CRM_Core_Session::singleton()->reset();
+    UFMatch::delete(FALSE)
+      ->addWhere('uf_name', '=', 'superman')
+      ->execute();
   }
 
 }
