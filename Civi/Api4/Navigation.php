@@ -17,6 +17,7 @@ namespace Civi\Api4;
  * @orderBy weight
  * @groupWeightsBy domain_id,parent_id
  * @matchFields name,domain_id
+ * @parentField parent_id
  * @since 5.19
  * @package Civi\Api4
  */

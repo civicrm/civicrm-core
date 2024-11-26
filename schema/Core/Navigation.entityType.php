@@ -10,7 +10,6 @@ return [
     'description' => ts('Table to store navigation.'),
     'add' => '3.0',
     'label_field' => 'label',
-    'parent_field' => 'parent_id',
   ],
   'getPaths' => fn() => [
     'browse' => 'civicrm/admin/menu',
