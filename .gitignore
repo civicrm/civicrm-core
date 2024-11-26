@@ -42,6 +42,7 @@
 !/ext/scheduled_communications
 !/ext/user_dashboard
 !/ext/tellafriend
+!/ext/riverlea
 backdrop/
 bower_components
 CRM/Case/xml/configuration
