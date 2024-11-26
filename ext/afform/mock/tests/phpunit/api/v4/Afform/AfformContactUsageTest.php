@@ -223,7 +223,7 @@ EOHTML;
     // Check that the data overrides form submission
     $this->assertEquals('Register A site', $contact['source']);
     // Check that the contact and the activity were correctly linked up as per the form.
-    $this->callAPISuccessGetSingle('ActivityContact', ['contact_id' => $contact['id'], 'activity_id' => $activity['id']]);
+    $this->getTestRecord('ActivityContact', ['contact_id' => $contact['id'], 'activity_id' => $activity['id']]);
   }
 
   public function testCheckAccess(): void {
@@ -272,6 +272,7 @@ EOHTML;
     catch (\CRM_Core_Exception $e) {
       // Should fail permission check
     }
+    $this->assertTrue(is_a($e, '\Civi\API\Exception\UnauthorizedException'));
 
     try {
       Afform::submit()
@@ -286,6 +287,7 @@ EOHTML;
     catch (\CRM_Core_Exception $e) {
       // Should fail permission check
     }
+    $this->assertTrue(is_a($e, '\Civi\API\Exception\UnauthorizedException'));
   }
 
   public function testEmployerReference(): void {
@@ -617,6 +619,7 @@ EOHTML;
     }
     catch (\Civi\API\Exception\UnauthorizedException $e) {
     }
+    $this->assertTrue(is_a($e, '\Civi\API\Exception\UnauthorizedException'));
   }
 
 }
