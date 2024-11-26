@@ -133,12 +133,14 @@ body.page-civicrm main > .container:has(#block-bootstrap4-content) {
    WORDPRESS
 *******************/
 
+body.toplevel_page_CiviCRM.wp-admin {
+  background: var(--crm-c-page-background);
+}
 body.toplevel_page_CiviCRM #wpcontent {
   padding-left: 0; /* resets WP padding */
 }
 body.wp-admin .crm-container {
   --crm-page-padding: 1rem 2rem;
-  background: var(--crm-c-page-background);
 }
 body.wp-admin .crm-title {
   line-height: 1.1;

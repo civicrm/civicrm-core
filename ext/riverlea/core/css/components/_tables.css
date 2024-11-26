@@ -145,7 +145,7 @@ table.dataTable.order-column.stripe tbody tr.extension-installed.even > .sorting
 
 /* resets the scroll in presence of dropdown to avoid clipping */
 .crm-container div:has(td span > .panel) {
-    overflow: initial;
+  overflow: initial;
 }
 .crm-selection-reset {
   padding: var(--crm-m) 0;

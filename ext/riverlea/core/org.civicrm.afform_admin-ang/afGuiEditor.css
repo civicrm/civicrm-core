@@ -478,9 +478,9 @@ af-gui-container > .af-gui-bar,
   background: none;
 }
 #afGuiEditor .af-gui-dropzone {
-    background-color: var(--crm-c-background2);
-    border: 2px solid var(--crm-c-info);
-    min-height: 30px;
+  background-color: var(--crm-c-background2);
+  border: 2px solid var(--crm-c-info);
+  min-height: 30px;
 }
 /* Options editor */
 #afGuiEditor af-gui-edit-options.af-gui-content-editing-area {
@@ -612,7 +612,7 @@ i.crm-i.af-gui-conditional-dialog-move-icon {
   border-radius: 2px;
 }
 #afGuiEditor li.disabled a strong {
-    color: var(--crm-dropdown-col); /* resets inaccessible colour for dropdown headings mislabelled disabled */
+  color: var(--crm-dropdown-col); /* resets inaccessible colour for dropdown headings mislabelled disabled */
 }
 #afGuiEditor li .af-gui-field-select-in-dropdown input[type="color"] {
   width: 32px;

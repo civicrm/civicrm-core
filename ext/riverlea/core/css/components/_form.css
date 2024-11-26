@@ -33,7 +33,7 @@
   margin: var(--crm-m) var(--crm-m2) 0 0;
   font-family: var(--crm-input-label-font);
   font-weight: var(--crm-input-label-weight);
-  display: inline-table;
+  display: table-cell;
 }
 .crm-container .crm-summary-group .crm-section .label,
 .crm-container label {
@@ -402,7 +402,7 @@ input.crm-form-checkbox) + label {
   border-radius: var(--crm-input-border-radius);
   box-shadow: var(--crm-input-box-shadow);
   height: var(--crm-input-height) !important /* vs select2.min.css */;
-  padding: var(--crm-xs1) var(--crm-r2) var(--crm-xs1) var(--crm-m);
+  padding: var(--crm-input-padding);
   font-size: var(--crm-input-font-size);
   color: var(--crm-input-color);
   display: flex;
@@ -410,8 +410,8 @@ input.crm-form-checkbox) + label {
   margin-right: 0;
 }
 .crm-container .select2-container .select2-choice .select2-arrow {
-  background: var(--crm-input-background);
-  border-left-color: var(--crm-input-border-color);
+  background: transparent;
+  border-left: 0;
   border-radius: 0 var(--crm-input-border-radius) var(--crm-input-border-radius) 0;
   width: var(--crm-r3);
   display: flex;

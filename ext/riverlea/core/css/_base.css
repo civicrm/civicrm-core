@@ -344,6 +344,10 @@ dl dl {
   border: 1px solid var(--crm-c-background4);
   border-radius: var(--crm-roundness);
 }
+.crm-container pre {
+  white-space: normal;
+  word-break: normal;
+}
 .crm-container pre code {
   padding: 0;
   font-size: inherit;
@@ -390,9 +394,6 @@ dl dl {
 .crm-container .crm-flex-box {
   display: flex;
   flex-wrap: wrap;
-}
-.crm-container {
-  --crm-flex-gap: 0.5rem;
 }
 .crm-container .crm-flex-box > * {
   gap: var(--crm-flex-gap);
