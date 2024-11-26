@@ -144,6 +144,10 @@
       loadAfforms();
     };
 
+    this.canAddSmartGroup = function() {
+      return !ctrl.savedSearch.groups.length && !ctrl.savedSearch.is_template;
+    };
+
     function onChangeAnything() {
       $scope.status = 'unsaved';
     }
