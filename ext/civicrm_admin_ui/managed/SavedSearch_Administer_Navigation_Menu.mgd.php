@@ -23,7 +23,18 @@ return [
             'url',
           ],
           'orderBy' => [],
-          'where' => [],
+          'where' => [
+            [
+              'domain_id:name',
+              '=',
+              'current_domain',
+            ],
+            [
+              'name',
+              '!=',
+              'Home',
+            ],
+          ],
           'groupBy' => [],
           'join' => [],
           'having' => [],
