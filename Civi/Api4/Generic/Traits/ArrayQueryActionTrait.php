@@ -165,6 +165,9 @@ trait ArrayQueryActionTrait {
 
       case 'LIKE':
       case 'NOT LIKE':
+        if ($value === NULL) {
+          return FALSE;
+        }
         $pattern = '/^' . str_replace('%', '.*', preg_quote($expected, '/')) . '$/i';
         return !preg_match($pattern, $value) == ($operator != 'LIKE');
 
@@ -172,6 +175,10 @@ trait ArrayQueryActionTrait {
       case 'NOT REGEXP':
       case 'REGEXP BINARY':
       case 'NOT REGEXP BINARY':
+        if ($value === NULL) {
+          return FALSE;
+        }
+
         // Perform case-sensitive matching for BINARY operator, otherwise insensitive
         $i = str_ends_with($operator, 'BINARY') ? '' : 'i';
         $pattern = '/' . str_replace('/', '\\/', $expected) . "/$i";
