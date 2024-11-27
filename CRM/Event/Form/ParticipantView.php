@@ -35,6 +35,11 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
     $contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
     $params = ['id' => $participantID];
 
+    // set tax related information
+    $this->assign('taxTerm', Civi::settings()->get('tax_term'));
+    $invoicing = Civi::settings()->get('invoicing');
+    $this->assign('getTaxDetails', $invoicing);
+
     CRM_Event_BAO_Participant::getValues($params,
       $values,
       $ids
@@ -180,6 +185,12 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
     // no contribution attached to it - maybe we have eliminated this? But I have a nasty feeling about
     // webform.
     $this->assign('totalTaxAmount', $totalTaxAmount ?? NULL);
+
+    // let's add add when tax is enabled.
+    if ($invoicing) {
+      $totalAmount = $totalAmount + $totalTaxAmount;
+    }
+
     $this->assign('totalAmount', $totalAmount);
     $this->assign('pricesetFieldsCount', $participantCount);
     $this->assign('displayName', $displayName);
