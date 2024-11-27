@@ -1,5 +1,6 @@
 <?php
 use CRM_CivicrmAdminUi_ExtensionUtil as E;
+
 return [
   'type' => 'search',
   'title' => E::ts('Administer Navigation Menu'),

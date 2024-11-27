@@ -1,5 +1,6 @@
 <?php
 use CRM_CivicrmAdminUi_ExtensionUtil as E;
+
 return [
   [
     'name' => 'SavedSearch_Administer_Navigation_Menu',
@@ -19,21 +20,14 @@ return [
             'label',
             'permission',
             'is_active',
+            'weight',
             'permission_operator:label',
             'url',
           ],
           'orderBy' => [],
           'where' => [
-            [
-              'domain_id:name',
-              '=',
-              'current_domain',
-            ],
-            [
-              'name',
-              '!=',
-              'Home',
-            ],
+            ['domain_id:name', '=', 'current_domain'],
+            ['name', '!=', 'Home'],
           ],
           'groupBy' => [],
           'join' => [],
@@ -56,7 +50,7 @@ return [
         'saved_search_id.name' => 'Administer_Navigation_Menu',
         'type' => 'table',
         'settings' => [
-          'description' => E::ts(NULL),
+          'description' => E::ts(''),
           'sort' => [],
           'limit' => 0,
           'pager' => FALSE,
@@ -84,22 +78,30 @@ return [
               'sortable' => TRUE,
             ],
             [
+              'type' => 'field',
+              'key' => 'weight',
+              'dataType' => 'Integer',
+              'label' => E::ts('Order'),
+              'sortable' => TRUE,
+              'editable' => TRUE,
+            ],
+            [
               'size' => 'btn-xs',
               'links' => [
                 [
-                  'path' => 'civicrm/admin/menu?action=update&id=[id]&reset=1',
                   'icon' => 'fa-pencil',
                   'text' => E::ts('Edit'),
                   'style' => 'default',
                   'condition' => [],
                   'task' => '',
-                  'entity' => '',
-                  'action' => '',
+                  'entity' => 'Navigation',
+                  'action' => 'update',
                   'join' => '',
                   'target' => 'crm-popup',
+                  'path' => '',
                 ],
                 [
-                  'path' => 'civicrm/admin/menu?action=add&parent_id=[id]&reset=1',
+                  'path' => 'civicrm/admin/menu/item?action=add&parent_id=[id]&reset=1',
                   'icon' => 'fa-folder-tree',
                   'text' => E::ts('Add subitem'),
                   'style' => 'default',
@@ -117,7 +119,7 @@ return [
                   'target' => 'crm-popup',
                   'icon' => 'fa-toggle-off',
                   'text' => E::ts('Disable'),
-                  'style' => 'default',
+                  'style' => 'warning',
                   'path' => '',
                   'action' => '',
                   'condition' => ['is_active', '=', TRUE],
@@ -129,7 +131,7 @@ return [
                   'target' => 'crm-popup',
                   'icon' => 'fa-toggle-on',
                   'text' => E::ts('Enable'),
-                  'style' => 'default',
+                  'style' => 'success',
                   'path' => '',
                   'action' => '',
                   'condition' => ['is_active', '=', FALSE],
@@ -156,6 +158,24 @@ return [
           'actions_display_mode' => 'menu',
           'hierarchical' => TRUE,
           'collapsible' => 'closed',
+          'draggable' => 'weight',
+          'cssRules' => [
+            ['bg-warning', 'is_active', '=', FALSE],
+          ],
+          'toolbar' => [
+            [
+              'entity' => 'Navigation',
+              'text' => E::ts('Add Menu Item'),
+              'icon' => 'fa-plus',
+              'target' => 'crm-popup',
+              'action' => 'add',
+              'style' => 'primary',
+              'join' => '',
+              'path' => '',
+              'task' => '',
+              'condition' => [],
+            ],
+          ],
         ],
       ],
       'match' => [
