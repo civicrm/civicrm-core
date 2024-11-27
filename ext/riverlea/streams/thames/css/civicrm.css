@@ -389,24 +389,29 @@ div:has(> table) {
  */
 
 /* apply hanging indent to sorting buttons */
-.crm-container :is(tr a,
-table.dataTable thead th):is(.sorting,
-.sorting_asc,
-.sorting_desc),
+.crm-container tr a.sorting,
+.crm-container tr a.sorting_asc,
+.crm-container tr a.sorting_desc,
+.crm-container table.dataTable thead th.sorting,
+.crm-container table.dataTable thead th.sorting_asc,
+.crm-container table.dataTable thead th.sorting_desc,
 .crm-search-display th.crm-sortable-col {
   padding-left: calc(var(--crm-table-padding, 0) + 1ch);
 }
-
-.crm-container :is(tr a,
-table.dataTable thead th):is(.sorting,
-.sorting_asc,
-.sorting_desc)::before,
-.crm-container :is(tr a,
-table.dataTable thead th):is(.sorting,
-.sorting_asc,
-.sorting_desc)::after,
-.crm-search-display th.crm-sortable-col::before,
-.crm-search-display th.crm-sortable-col::after {
+.crm-container tr a.sorting::after,
+.crm-container tr a.sorting_asc::after,
+.crm-container tr a.sorting_desc::after,
+.crm-container table.dataTable thead th.sorting::after,
+.crm-container table.dataTable thead th.sorting_asc::after,
+.crm-container table.dataTable thead th.sorting_desc::after,
+.crm-search-display th.crm-sortable-col::after,
+.crm-container tr a.sorting::before,
+.crm-container tr a.sorting_asc::before,
+.crm-container tr a.sorting_desc::before,
+.crm-container table.dataTable thead th.sorting::before,
+.crm-container table.dataTable thead th.sorting_asc::before,
+.crm-container table.dataTable thead th.sorting_desc::before,
+.crm-search-display th.crm-sortable-col::before {
   position: absolute;
   margin-left: -1em;
 }
@@ -597,9 +602,8 @@ html.crm-standalone  nav.breadcrumb>ol {
 #crm-contact-actions-list a.delete {
   --crm-c-alert-text: var(--crm-c-red-dark);
 }
-
-#crm-contact-actions-list a.delete *:hover,
-#crm-contact-actions-list a.delete *:focus {
+#crm-contact-actions-list a.delete:hover,
+#crm-contact-actions-list a.delete:focus {
   /* the hover state gives crm-c-red-dark to the background */
   --crm-c-alert-text: var(--crm-c-red-light);
 }

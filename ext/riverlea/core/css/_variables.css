@@ -109,6 +109,7 @@
   --crm-padding-inset: var(--crm-m);
   --crm-page-padding: var(--crm-xl); /* Margin left/right */
   --crm-page-width: 100%; /* Default that CMS can overwrite */
+  --crm-flex-gap: 0.5rem;
 /* Type */
   --crm-font-size: var(--crm-r);
   --crm-small-font-size: var(--crm-m2);

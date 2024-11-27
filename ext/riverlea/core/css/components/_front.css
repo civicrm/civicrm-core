@@ -111,10 +111,15 @@ af-form > fieldset > legend {
 }
 .crm-container.crm-public input[type="radio"] {
   margin: var(--crm-s2) var(--crm-s3) 0 0;
+  min-width: auto;
 }
 .crm-container.crm-public input[type="checkbox"] {
   margin: var(--crm-s2) var(--crm-s3) 0 0;
   float: left;
+  min-width: auto;
+}
+.crm-container.crm-public .crm-checkbox-list input[type="checkbox"] {
+  margin: inherit; /* resets margin in checkbox list grids */
 }
 .crm-container.crm-public .big {
   width: var(--crm-f-input-width);
