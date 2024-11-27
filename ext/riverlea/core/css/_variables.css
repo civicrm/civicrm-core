@@ -307,8 +307,8 @@
   --crm-dash-tab-radius: var(--crm-dash-roundness);
   --crm-dash-icon-size: var(--crm-r);
   --crm-dash-summary-row-bg: var(--crm-c-background);
+  --crm-dash-heading-inset: 0;
   --crm-dash-box-shadow: 0;
-  --crm-dash-heading-inset: unset;
   --crm-dash-panel-padding: var(--crm-m);
   --crm-dash-panel-bg: #fff;
   --crm-dash-panel-border: 0;
@@ -324,9 +324,10 @@
   --crm-dash-header-size: var(--crm-r3);
   --crm-dash-header-padding: 0 0 var(--crm-r) 0;
   --crm-dash-image-size: 100px;
-  --crm-dash-image-radius: 200px;
-  --crm-dash-image-justify: space-between; /* choose from start (left), end (right), center, and space-between (spread out) */
-  --crm-dash-image-direction: row; /* choose from row and row-reverse to get the image on the right, column stacks it */
+  --crm-dash-image-radius: 0;
+  --crm-dash-image-right: 10px; /* distance from right of dashboard */
+  --crm-dash-image-top: unset; /* distance from top of dashboard */
+  --crm-dash-image-border: 0;
 /* Dialog */
   --crm-dialog-bg: var(--crm-c-page-background);
   --crm-dialog-padding: var(--crm-s);

@@ -3,6 +3,7 @@
   float: left;
 }
 .crm-container div:not(.crm-search-display-editable-buttons) > button.btn-xs:has(.fa-times),
+#bootstrap-theme button.btn-xs:has(.fa-times),
 .crm-container .crm-hover-button:has(.crm-i),
 .crm-container .crm-hover-button:has(.crm-i):hover,
 .crm-container .crm-hover-button:has(.crm-i):focus {

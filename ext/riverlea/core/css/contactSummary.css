@@ -12,15 +12,23 @@
 .crm-summary-contactname-block {
   background: var(--crm-dash-header-bg);
   color: var(--crm-dash-header-col);
-  min-height: 60px;
   padding: var(--crm-dash-header-padding);
-  position: relative;
   margin-left: var(--crm-dash-heading-inset);
-  align-items: center;
-  display: flex;
-  gap: var(--crm-m);
-  justify-content: var(--crm-dash-image-justify);
-  flex-direction: var(--crm-dash-image-direction);
+}
+
+/* Image */
+
+#crm-main-content-wrapper {
+  position: relative;
+}
+#mainTabContainer {
+  position: inherit;
+}
+.crm-contact_image {
+  position: absolute;
+  top: var(--crm-dash-image-top);
+  right: var(--crm-dash-image-right);
+  z-index: 1;
 }
 .crm-image-popup {
   width: var(--crm-dash-image-size);
@@ -29,6 +37,8 @@
   background-size: cover;
   border-radius: var(--crm-dash-image-radius);
   box-shadow: var(--crm-bottom-shadow);
+  overflow: hidden;
+  border: var(--crm-dash-image-border);
 }
 .crm-container div.contact_panel {
   display: block;
@@ -74,6 +84,7 @@
   display: block;
   opacity: 1;
   background-color: var(--crm-dash-summary-row-bg);
+  z-index: 3;
 }
 #contact-summary .crm-edit-help .crm-i.fa-pencil {
   float: right;

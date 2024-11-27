@@ -97,6 +97,11 @@
   --crm-dash-panel-bg: var(--crm-c-background);
   --crm-dash-panel-border: var(--crm-c-divider);
   --crn-dash-panel-radius: var(--crm-dash-roundness);
+  --crm-dash-image-size: 100px;
+  --crm-dash-image-radius: 200px;
+  --crm-dash-image-right: 0; /* distance from right of dashboard */
+  --crm-dash-image-top: -10px; /* distance from top of dashboard */
+  --crm-dash-image-border: 0;
   /* Dialog */
   --crm-dialog-header-bg: var(--crm-c-background4);
   --crm-dialog-header-col: var(--crm-c-text);
