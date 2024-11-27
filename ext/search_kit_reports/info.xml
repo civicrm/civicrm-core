@@ -2,11 +2,11 @@
 <extension key="search_kit_reports" type="module">
   <file>search_kit_reports</file>
   <name>search_kit_reports</name>
-  <description>FIXME</description>
+  <description>SearchKit-based Reports UI</description>
   <license>AGPL-3.0</license>
   <authors>
     <author>
-      <name>benjamin</name>
+      <name>Ben</name>
       <email>ben@civicrm.org</email>
       <role>Maintainer</role>
     </author>
@@ -23,19 +23,20 @@
   <compatibility>
     <ver>5.81</ver>
   </compatibility>
-  <comments>This is a new, undeveloped module</comments>
+  <comments>SearchKit-based reporting UI</comments>
   <classloader>
     <psr0 prefix="CRM_" path="."/>
     <psr4 prefix="Civi\" path="Civi"/>
   </classloader>
   <civix>
-    <namespace>CRM/SearchKitReports</namespace>
+    <namespace>CRM/AfformReports</namespace>
     <format>24.09.1</format>
-    <angularModule>crmSearchKitReports</angularModule>
+    <angularModule>afReports</angularModule>
   </civix>
   <mixins>
     <mixin>mgd-php@1.0.0</mixin>
     <mixin>setting-php@1.0.0</mixin>
     <mixin>smarty@1.0.3</mixin>
+    <mixin>ang-php@1.0.0</mixin>
   </mixins>
 </extension>
