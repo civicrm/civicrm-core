@@ -31,6 +31,10 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
    */
   public $submitOnce = TRUE;
 
+  public function getDefaultEntity(): string {
+    return 'Navigation';
+  }
+
   /**
    * Build the form object.
    */
