@@ -389,7 +389,12 @@ WHERE  title = %1
       else {
         $required = FALSE;
       }
-      $form->add('select', 'parents', ts('Parents'), $parentGroupSelectValues, $required, ['class' => 'crm-select2', 'multiple' => TRUE]);
+      $multiple = Civi::settings()->get('group_multiple_parents');
+      $form->add('select', 'parents', ts('Parents'), $parentGroupSelectValues, $required, [
+        'placeholder' => ts('- none -'),
+        'class' => 'crm-select2',
+        'multiple' => $multiple,
+      ]);
     }
 
     return $parentGroups;
