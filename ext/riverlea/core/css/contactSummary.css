@@ -48,8 +48,8 @@
   left: 0;
 }
 #mainTabContainer:not(.narrowpage) .contactCardRight div.crm-inline-edit.form {
-  float: right;
   right: 0;
+  left: initial;
   position: absolute;
 }
 .crm-container .crm-inline-edit.add-new {

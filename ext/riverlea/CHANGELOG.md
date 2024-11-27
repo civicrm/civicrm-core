@@ -1,3 +1,32 @@
+5.80.7
+ - CHANGED - CiviLint - made Thames CSS more verbose (#84)
+ - CHANGED - CiviLint - reduced four char spaces to two
+ - CHANGED - CiviLint - changes to PHP files
+ - CHANGED - CiviLint - no empty variables
+ - CHANGED - .gitignore file updated
+ - REMOVED - Duplicate BoostrapJS files
+
+5.80.6
+ - FIXED - trailing comma (merge_requests/42)
+ - FIXED - FormBuilder customise options doesn't show icons on Wallbrook (#83)
+ - FIXED - FormBuilder customise options grab region background doesn't show
+ - CHANGED - Background colours for customise options alternating rows
+ - CHANGED - CSS tidying around FormBuilder customise options
+ - REMOVED - responsive tables - fix being used wasn't responsive and had some usability questions (#82)
+
+5.80.5
+ - FIXED - reset checkbox margin in checkbox lists (that shrunk the checkbox size)
+ - FIXED - changed td.label to table-cell to address sizing inconsistencies (#68)
+ - CHANGED - apply `--crm-c-page-background` to WordPress body, not only .crm-container (#77)
+ - FIXED - right column inline edit on contact dashboard was positioned left (#76)
+
+5.80.4
+ - CHANGED - CSS Variable '--crm-flex-gap' moved from core css into variables (fixed scenarios where it wasn't loading)
+ - ADDED - right/bottom margin to SK grid buttons to create space in SK displays (#81)
+ - CHANGED - multi-select select2, use input padding variable
+ - FIXES - action menu dropdown icon hover colour (#78)
+ - FIXES - radio buttons and checkboxes had a min-width applied causing layout problems (#80)
+
 1.1.4 / 5.80.3
  - FIXED tooltip dropdown: double shadow, gap next to arrow, padding/border on bottom (ref #74)
  - ADDED float: none for FormBuilder legends
@@ -5,8 +34,8 @@
  - FIXED td.label width not being applied, creating various other quirks; changed display type to inline-table.
  - ADDED small inline margin to help icons to separate from label text
  - ADDED min-height of 100vh to avoid block of white-space below #crm-container (same as Thames)
- - CHANGED Readme - simplified some wording, expenaded description, removed roadmap, changed order, created 'customisation' section.
- - ADDED instrcutions for creating a subtheme/stream extension pointing to RiverLea.
+ - CHANGED Readme - simplified some wording, expanded description, removed roadmap, changed order, created 'customisation' section.
+ - ADDED instructions for creating a subtheme/stream extension pointing to RiverLea.
 
 1.1.3 / 5.80.2
  - FIXED z-index for date-picker in modals
