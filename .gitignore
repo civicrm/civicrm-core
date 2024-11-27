@@ -22,6 +22,7 @@
 !/ext/message_admin
 !/ext/oauth-client
 !/ext/search_kit
+!/ext/search_kit_reports
 !/ext/financialacls
 !/ext/contributioncancelactions
 !/ext/recaptcha
