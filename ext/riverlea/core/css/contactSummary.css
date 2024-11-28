@@ -12,26 +12,42 @@
 .crm-summary-contactname-block {
   background: var(--crm-dash-header-bg);
   color: var(--crm-dash-header-col);
-  min-height: 60px;
   padding: var(--crm-dash-header-padding);
-  position: relative;
   margin-left: var(--crm-dash-heading-inset);
-  align-items: center;
-  display: flex;
-  gap: var(--crm-m);
-  justify-content: var(--crm-dash-image-justify);
-  flex-direction: var(--crm-dash-image-direction);
 }
-.crm-image-popup {
+
+/* Image */
+
+#crm-main-content-wrapper {
+  position: relative;
+}
+#mainTabContainer {
+  position: inherit;
+}
+.crm-inline-edit-container .crm-contact_image {
+  position: absolute;
+  top: var(--crm-dash-image-top);
+  right: var(--crm-dash-image-right);
+  z-index: 1;
+}
+.crm-inline-edit-container .crm-image-popup {
   width: var(--crm-dash-image-size);
   height: var(--crm-dash-image-size);
   display: block;
   background-size: cover;
   border-radius: var(--crm-dash-image-radius);
   box-shadow: var(--crm-bottom-shadow);
+  overflow: hidden;
+  border: var(--crm-dash-image-border);
 }
 .crm-container div.contact_panel {
   display: block;
+}
+.crm-container table.image_URL-section td {
+  text-align: inherit;
+  display: flex;
+  align-items: start;
+  gap: var(--crm-flex-gap);
 }
 
 /* Inline edit */
@@ -74,6 +90,7 @@
   display: block;
   opacity: 1;
   background-color: var(--crm-dash-summary-row-bg);
+  z-index: 3;
 }
 #contact-summary .crm-edit-help .crm-i.fa-pencil {
   float: right;
@@ -359,4 +376,37 @@ div.crm-summary-contactname-block + .crm-actions-ribbon {
   display: flex;
   gap: var(--crm-btn-icon-spacing);
   align-items: center;
+}
+/* Contact dashboard responsive (using Bootstrap viewports) */
+
+@media (max-width: 768px) {
+  #crm-main-content-wrapper {
+    --crm-dash-heading-inset: 0; /* resets any inset on the title/action links */
+  }
+  .crm-container #mainTabContainer,
+  .crm-container div.crm-summary-row {
+    flex-direction: column;
+  }
+  .crm-container .crm-actions-ribbon ul#actions {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .crm-actions-ribbon .crm-next-action,
+  .crm-actions-ribbon .crm-previous-action {
+    margin-left: 0;
+  }
+}
+@media (max-width: 500px) { /* shows only icons for contact dashboard */
+  .crm-contact-page #mainTabContainer.ui-tabs {
+    grid-template-columns: auto 1fr;
+  }
+  .crm-contact-page #mainTabContainer .crm-contact-tabs-list {
+    width: fit-content;
+  }
+  .crm-container #mainTabContainer .ui-tabs-nav li .ui-tabs-anchor i {
+    font-size: var(--crm-font-size);
+  }
+  .crm-container #mainTabContainer ul.ui-tabs-nav a span {
+    display: none;
+  }
 }

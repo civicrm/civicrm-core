@@ -14,7 +14,6 @@ a.af-api4-action-idle {
   display: flex;
   flex-wrap: wrap;
   gap: var(--crm-flex-gap);
-  padding: var(--crm-f-form-padding);
 }
 .af-container.af-layout-cols > *,
 .af-container.af-layout-inline > * {
