@@ -71,6 +71,9 @@ body.page-civicrm #squeeze .crm-container ul li:not(.ui-tab) {
 body.page-civicrm > #branding {
   background-color: var(--crm-c-page-background);
 }
+body.page-civicrm > #branding + #page {
+  --crm-page-padding: 0.5rem 1.25rem;
+}
 
 /* D9 Claro */
 body.page-civicrm {

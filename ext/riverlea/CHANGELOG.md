@@ -1,3 +1,27 @@
+5.80.9
+ - FIXED - D7 Seven theme .button style overwriting colours
+ - CHANGED - D7 Seven, matched page-padding.
+ - FIXED - Responsive contact dashboard, below 768px: wrapped contact-summary label/data, wrap action links.
+ - FIXED - Responsive contact dashboard, below 500px: improve hidden text and sidetabs width.
+ - MOVED - Responsive contact dashboard css from tabs.css to contactSummary.css
+ - CHANGED - Walbrook avatar image - made a little larger and thiner border
+ - FIXED - better name-spaced AFform padding for front-end vs backend
+
+5.80.8
+ - CHANGED - CiviLint - further lint adjustments (tabs for double space, missing semi-colons)
+ - FIXED - SearchKit button group hierarchy wrapping button groups
+ - FIXED - removed button styling for another (x)-type cancel-only button in SearchKit builder
+ - FIXED - avatar positioning works to an extent (floats right in dashboard header for Walbrook / Hackney) (#87)
+ - REMOVED - avatar flexbox positioning and simplified css, as not being applied
+ - ADDED - dash image border in Walbrook
+ - ADDED CSS VARIABLES (3)
+    --crm-dash-image-right (distance from right for avatar)
+    --crm-dash-image-top (distance from top)
+    --crm-dash-image-border (optional border)
+ - REMOVED CSS VARIABLES (2)
+    --crm-dash-image-justify
+    --crm-dash-image-direction
+
 5.80.7
  - CHANGED - CiviLint - made Thames CSS more verbose (#84)
  - CHANGED - CiviLint - reduced four char spaces to two

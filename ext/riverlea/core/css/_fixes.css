@@ -226,7 +226,9 @@ a.crm-expand-row:focus {
   border: 0;
   box-shadow: none;
 }
-.crm-container a.button {
+.crm-container a.button,
+.crm-container a.button:link,
+.crm-container a.button:visited {
   background: var(--crm-c-secondary);
   color: var(--crm-c-secondary-text);
   border: var(--crm-btn-border);
