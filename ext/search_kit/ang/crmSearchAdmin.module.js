@@ -133,6 +133,7 @@
       delete savedSearch.id;
       savedSearch.displays.forEach(display => {
         delete display.id;
+        display.acl_bypass = false;
         display.label += ' (' + ts('copy') + ')';
       });
       this.savedSearch = savedSearch;
