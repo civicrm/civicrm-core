@@ -179,6 +179,11 @@
   --crm-dash-header-col: var(--crm-c-light-text);
   --crm-dash-header-size: var(--crm-l);
   --crm-dash-header-padding: var(--crm-r) var(--crm-r1);
+  --crm-dash-image-size: 120px;
+  --crm-dash-image-radius: 200px;
+  --crm-dash-image-right: 30px; /* distance from right of dashboard */
+  --crm-dash-image-top: 30px; /* distance from top of dashboard */
+  --crm-dash-image-border: 2px solid #fff;
 /* Dialog */
   --crm-dialog-bg: var(--crm-c-background);
   --crm-dialog-padding: 0;

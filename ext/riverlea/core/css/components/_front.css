@@ -133,12 +133,17 @@ af-form > fieldset > legend {
 .crm-container.crm-public .select2-dropdown-open .select2-choices {
   border-radius: var(--crm-f-input-radius) var(--crm-f-input-radius) 0 0;
 }
-.crm-submit-buttons {
+.crm-container.crm-public .crm-submit-buttons {
   padding-inline: 0;
 }
-af-field {
+/* Afform */
+.crm-container.crm-public af-field {
   padding-block: var(--crm-f-form-padding);
   display: block;
+}
+.crm-container.crm-public .af-container.af-layout-inline,
+.crm-container.crm-public .af-container.af-layout-cols {
+  padding: var(--crm-f-form-padding);
 }
 /* Contribution pages */
 .crm-container.crm-public .other_amount-section {

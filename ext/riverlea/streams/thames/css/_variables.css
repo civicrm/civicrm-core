@@ -365,10 +365,7 @@
   --crm-dash-header-col: var(--crm-c-blue-darker); /* thames */
   --crm-dash-header-size: var(--crm-r3);
   --crm-dash-header-padding: unset; /* thames */
-  --crm-dash-image-size: 100px;
-  --crm-dash-image-radius: 200px;
-  --crm-dash-image-justify: space-between; /* choose from start (left), end (right), center, and space-between (spread out) */
-  --crm-dash-image-direction: row; /* choose from row and row-reverse to get the image on the right, column stacks it */
+  --crm-dash-image-right: 20px; /* distance from right of dashboard */
 }
 :root {
 /* Dialog */
