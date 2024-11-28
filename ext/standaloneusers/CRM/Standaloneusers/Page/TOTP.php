@@ -2,7 +2,6 @@
 
 use CRM_Standaloneusers_ExtensionUtil as E;
 use Civi\Standalone\MFA\Base as MFABase;
-use Civi\Standalone\MFA\TOTP;
 
 /**
  * Page for /civicrm/mfa/totp
