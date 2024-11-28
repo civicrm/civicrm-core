@@ -177,35 +177,3 @@
 .crm-container .crm-contact-page .ui-tabs-panel .ui-tabs-panel { /* handles tabs inside a tab panel */
   background: var(--crm-tab-bg-active);
 }
-
-/* Responsive - using Bootstrap viewports */
-
-@media (max-width: 768px) {
-  .crm-container #mainTabContainer {
-    flex-direction: column;
-  }
-  #mainTabContainer .crm-contact-tabs-list {
-    width: 100%;
-    flex-direction: row;
-    justify-content: space-between;
-  }
-  #mainTabContainer .crm-contact-tabs-list li {
-    flex-grow: 1;
-  }
-  .crm-actions-ribbon ul#actions {
-    display: flex;
-    flex-wrap: wrap;
-  }
-  .crm-actions-ribbon .crm-next-action,
-  .crm-actions-ribbon .crm-previous-action {
-    margin-left: 0;
-  }
-}
-@media (max-width: 500px) { /* shows only icons for contact dashboard */
-  .crm-container #mainTabContainer .ui-tabs-nav li .ui-tabs-anchor i {
-    font-size: var(--crm-font-size);
-  }
-  .crm-container #mainTabContainer ul.ui-tabs-nav a span {
-    display: none;
-  }
-}

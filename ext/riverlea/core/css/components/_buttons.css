@@ -80,7 +80,9 @@
   color: var(--crm-c-secondary-text);
 }
 .crm-container a.button.delete-button,
-.crm-container a.button.delete {
+.crm-container a.button.delete-button:link,
+.crm-container a.button.delete,
+.crm-container a.button.delete:link {
   background: var(--crm-btn-cancel-bg);
   color: var(--crm-btn-cancel-text);
 }
