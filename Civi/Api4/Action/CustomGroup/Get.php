@@ -74,6 +74,10 @@ class Get extends \Civi\Api4\Generic\DAOGetAction {
       if (!$field || !isset($standardFields[$field])) {
         return TRUE;
       }
+      // ArrayQueryTrait doesn't yet support field-to-field comparisons
+      if (!empty($clause[3])) {
+        return TRUE;
+      }
     }
     foreach ($this->orderBy as $field => $dir) {
       [$field] = explode(':', $field);
