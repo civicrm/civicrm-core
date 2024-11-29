@@ -658,7 +658,7 @@
               };
             });
           } else {
-            init();
+            $timeout(init);
           }
         }
       };
