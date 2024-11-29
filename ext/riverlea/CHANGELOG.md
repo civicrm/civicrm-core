@@ -1,4 +1,7 @@
-5.80.9
+1.80.11
+ - CHANGED version numbering again. See note in ReadMe: the 2nd number represents the Civi version tested against, the 3rd number is the RL version number for that Civi version.
+
+1.1.10 / 5.80.9
  - FIXED - D7 Seven theme .button style overwriting colours
  - CHANGED - D7 Seven, matched page-padding.
  - FIXED - Responsive contact dashboard, below 768px: wrapped contact-summary label/data, wrap action links.
@@ -7,7 +10,7 @@
  - CHANGED - Walbrook avatar image - made a little larger and thiner border
  - FIXED - better name-spaced AFform padding for front-end vs backend
 
-5.80.8
+1.1.9 / 5.80.8
  - CHANGED - CiviLint - further lint adjustments (tabs for double space, missing semi-colons)
  - FIXED - SearchKit button group hierarchy wrapping button groups
  - FIXED - removed button styling for another (x)-type cancel-only button in SearchKit builder
@@ -22,7 +25,7 @@
     --crm-dash-image-justify
     --crm-dash-image-direction
 
-5.80.7
+1.1.8 / 5.80.7
  - CHANGED - CiviLint - made Thames CSS more verbose (#84)
  - CHANGED - CiviLint - reduced four char spaces to two
  - CHANGED - CiviLint - changes to PHP files
@@ -30,7 +33,7 @@
  - CHANGED - .gitignore file updated
  - REMOVED - Duplicate BoostrapJS files
 
-5.80.6
+1.1.7 / 5.80.6
  - FIXED - trailing comma (merge_requests/42)
  - FIXED - FormBuilder customise options doesn't show icons on Wallbrook (#83)
  - FIXED - FormBuilder customise options grab region background doesn't show
@@ -38,13 +41,13 @@
  - CHANGED - CSS tidying around FormBuilder customise options
  - REMOVED - responsive tables - fix being used wasn't responsive and had some usability questions (#82)
 
-5.80.5
+1.1.6 / 5.80.5
  - FIXED - reset checkbox margin in checkbox lists (that shrunk the checkbox size)
  - FIXED - changed td.label to table-cell to address sizing inconsistencies (#68)
  - CHANGED - apply `--crm-c-page-background` to WordPress body, not only .crm-container (#77)
  - FIXED - right column inline edit on contact dashboard was positioned left (#76)
 
-5.80.4
+1.1.5 / 5.80.4
  - CHANGED - CSS Variable '--crm-flex-gap' moved from core css into variables (fixed scenarios where it wasn't loading)
  - ADDED - right/bottom margin to SK grid buttons to create space in SK displays (#81)
  - CHANGED - multi-select select2, use input padding variable
@@ -76,10 +79,10 @@
  - CHANGED crm-accordion-settings body padding changed from 0 to match crm-accordion-bold
  - FIXED focus colour on Select2 now should display on tab/focus (github.com/31433)
 
-1.1.1
+1.1.1 / 5.80.0
  - FIXED metadata - RiverLea version numbering in variables file & info.xml
 
-1.1.0
+1.1.0 / 5.80.0
  - CHANGED info.xml version to 5.80 to synch with CiviCRM core (github.com/31389)
  - FIXED clipping of dropdown on sidescroll tables (#73).
  - FIXED Wallbrook, table header bg, should be white.
