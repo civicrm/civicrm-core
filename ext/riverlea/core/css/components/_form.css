@@ -82,6 +82,8 @@
 .crm-container td.description {
   color: var(--crm-input-description);
   font-size: var(--crm-input-label-size);
+
+  margin-bottom: var(--crm-flex-gap);
 }
 .crm-container .crm-marker {
   color: var(--crm-c-alert);

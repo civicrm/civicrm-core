@@ -1,5 +1,16 @@
 1.80.11
- - CHANGED version numbering again. See note in ReadMe: the 2nd number represents the Civi version tested against, the 3rd number is the RL version number for that Civi version.
+ - FIXED - Wallbrook avatar image returned to 100px as had created a gap (ext/riverlea/#87)
+ - FIXED - Double icon on .messages.crm-empty-table
+ - FIXED - changed specificity of .hiddenElement (ext/riverlea/#11) to ensure unhidden elements are unhidden.
+ - CHANGED - version numbering again. See note in ReadMe: the 2nd number represents the Civi version tested against, the 3rd number is the RL version number for that Civi version.
+ - CHANGED - Alert colour bg for .messages.crm-empty-table now matches icon colour ('info' range)
+ - CHANGED - streams/empty/_variables.css to match core variables.css
+ - CHANGED - reduce verbose Bootstrap table styling css in tables.css
+ - CHANGED - cascade order of table colours to put .crm-row-selected class last
+ - ADDED - contact merge screen error/ok/selected background colours (ext/riverlea/#88)
+ - ADDED - margin (`--crm-flex-gap`) to bottom of .description text.
+ - ADDED - accordion with error text and border colour to fix contrast ratio issues
+ - ADDED - D9 Claro .action-link margin reset
 
 1.1.10 / 5.80.9
  - FIXED - D7 Seven theme .button style overwriting colours

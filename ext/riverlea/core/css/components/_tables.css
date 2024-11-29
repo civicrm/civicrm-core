@@ -309,7 +309,7 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
   background: var(--crm-c-page-background);
 }
 
-/* BOOTSTRAP tables */
+/* Table bg colours */
 
 .crm-container .table {
   width: 100%;
@@ -386,60 +386,27 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
 .crm-container .table-hover > tbody > tr.active:hover > th {
   background-color: var(--crm-table-odd-hover);
 }
-.crm-container .table > thead > tr > td.success,
-.crm-container .table > thead > tr > th.success,
-.crm-container .table > thead > tr.success > td,
-.crm-container .table > thead > tr.success > th,
-.crm-container .table > tbody > tr > td.success,
-.crm-container .table > tbody > tr > th.success,
-.crm-container .table > tbody > tr.success > td,
-.crm-container .table > tbody > tr.success > th,
-.crm-container .table > tfoot > tr > td.success,
-.crm-container .table > tfoot > tr > th.success,
-.crm-container .table > tfoot > tr.success > td,
-.crm-container .table > tfoot > tr.success > th {
+.crm-container .table td.success,
+.crm-container .table th.success,
+.crm-container .table tr.success > td,
+.crm-container .table tr.success > th,
+.crm-container table tr.crm-row-ok,
+.crm-container table tr.crm-row-ok > td {
   background-color: var(--crm-alert-background-help);
 }
 .crm-container .table-hover > tbody > tr > td.success:hover,
 .crm-container .table-hover > tbody > tr > th.success:hover,
 .crm-container .table-hover > tbody > tr.success:hover > td,
 .crm-container .table-hover > tbody > tr:hover > .success,
-.crm-container .table-hover > tbody > tr.success:hover > th {
+.crm-container .table-hover > tbody > tr.success:hover > th,
+.crm-container table tr.crm-row-ok:hover > td,
+.crm-container table tr.crm-row-ok > td:hover {
   background-color: var(--crm-alert-border-help);
 }
-.crm-container .table > thead > tr > td.info,
-.crm-container .table > thead > tr > th.info,
-.crm-container .table > thead > tr.info > td,
-.crm-container .table > thead > tr.info > th,
-.crm-container .table > tbody > tr > td.info,
-.crm-container .table > tbody > tr > th.info,
-.crm-container .table > tbody > tr.info > td,
-.crm-container .table > tbody > tr.info > th,
-.crm-container .table > tfoot > tr > td.info,
-.crm-container .table > tfoot > tr > th.info,
-.crm-container .table > tfoot > tr.info > td,
-.crm-container .table > tfoot > tr.info > th {
-  background-color: var(--crm-alert-background-info);
-}
-.crm-container .table-hover > tbody > tr > td.info:hover,
-.crm-container .table-hover > tbody > tr > th.info:hover,
-.crm-container .table-hover > tbody > tr.info:hover > td,
-.crm-container .table-hover > tbody > tr:hover > .info,
-.crm-container .table-hover > tbody > tr.info:hover > th {
-  background-color: var(--crm-alert-border-info);
-}
-.crm-container .table > thead > tr > td.warning,
-.crm-container .table > thead > tr > th.warning,
-.crm-container .table > thead > tr.warning > td,
-.crm-container .table > thead > tr.warning > th,
-.crm-container .table > tbody > tr > td.warning,
-.crm-container .table > tbody > tr > th.warning,
-.crm-container .table > tbody > tr.warning > td,
-.crm-container .table > tbody > tr.warning > th,
-.crm-container .table > tfoot > tr > td.warning,
-.crm-container .table > tfoot > tr > th.warning,
-.crm-container .table > tfoot > tr.warning > td,
-.crm-container .table > tfoot > tr.warning > th {
+.crm-container .table td.warning,
+.crm-container .table th.warning,
+.crm-container .table tr.warning > td,
+.crm-container .table tr.warning > th {
   background-color: var(--crm-alert-background-warning);
 }
 .crm-container .table-hover > tbody > tr > td.warning:hover,
@@ -449,26 +416,39 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
 .crm-container .table-hover > tbody > tr.warning:hover > th {
   background-color: var(--crm-alert-border-warning);
 }
-.crm-container .table > thead > tr > td.danger,
-.crm-container .table > thead > tr > th.danger,
-.crm-container .table > thead > tr.danger > td,
-.crm-container .table > thead > tr.danger > th,
-.crm-container .table > tbody > tr > td.danger,
-.crm-container .table > tbody > tr > th.danger,
-.crm-container .table > tbody > tr.danger > td,
-.crm-container .table > tbody > tr.danger > th,
-.crm-container .table > tfoot > tr > td.danger,
-.crm-container .table > tfoot > tr > th.danger,
-.crm-container .table > tfoot > tr.danger > td,
-.crm-container .table > tfoot > tr.danger > th {
+.crm-container .table td.danger,
+.crm-container .table th.danger,
+.crm-container .table tr.danger > td,
+.crm-container .table tr.danger > th,
+.crm-container table tr.crm-row-error,
+.crm-container table tr.crm-row-error > td {
   background-color: var(--crm-alert-background-danger);
 }
 .crm-container .table-hover > tbody > tr > td.danger:hover,
 .crm-container .table-hover > tbody > tr > th.danger:hover,
 .crm-container .table-hover > tbody > tr.danger:hover > td,
 .crm-container .table-hover > tbody > tr:hover > .danger,
-.crm-container .table-hover > tbody > tr.danger:hover > th {
+.crm-container .table-hover > tbody > tr.danger:hover > th,
+.crm-container table tr.crm-row-error:hover > td,
+.crm-container table tr.crm-row-error > td:hover  {
   background-color: var(--crm-alert-border-danger);
+}
+.crm-container .table td.info,
+.crm-container .table th.info,
+.crm-container .table tr.info > td,
+.crm-container .table tr.info > th,
+.crm-container table tr.crm-row-selected,
+.crm-container table tr.crm-row-selected > td {
+  background-color: var(--crm-alert-background-info);
+}
+.crm-container .table-hover > tbody > tr > td.info:hover,
+.crm-container .table-hover > tbody > tr > th.info:hover,
+.crm-container .table-hover > tbody > tr.info:hover > td,
+.crm-container .table-hover > tbody > tr:hover > .info,
+.crm-container .table-hover > tbody > tr.info:hover > th,
+.crm-container table tr.crm-row-selected:hover > td,
+.crm-container table tr.crm-row-selected > td:hover {
+  background-color: var(--crm-alert-border-info);
 }
 .crm-container .table-responsive {
   min-height: .01%;
