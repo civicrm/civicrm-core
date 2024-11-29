@@ -19,6 +19,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
   /**
    * Get the contribution details by month of the year.
    *
+   * @deprecated since 5.80 will be removed around 5.90
    * @param int $param
    *   Year.
    *
@@ -26,6 +27,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
    *   associated array
    */
   public static function contributionChartMonthly($param) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     if ($param) {
       $param = [1 => [$param, 'Integer']];
     }
@@ -63,8 +65,11 @@ INNER JOIN   civicrm_contact AS contact ON ( contact.id = contrib.contact_id )
    *
    * @return array|null
    *   associated array
+   *
+   * @deprecated since 5.80 will be removed around 5.90
    */
   public static function contributionChartYearly() {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     $config = CRM_Core_Config::singleton();
     $yearClause = "year(contrib.receive_date) as contribYear";
     if (!empty($config->fiscalYearStart) && ($config->fiscalYearStart['M'] != 1 || $config->fiscalYearStart['d'] != 1)) {
