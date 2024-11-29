@@ -28,8 +28,9 @@ class StatusChecks {
     if ($hasAuthx && $tokenFormCount && !in_array('jwt', \Civi::settings()->get('authx_auto_cred'))) {
       $e->messages[] = new \CRM_Utils_Check_Message(
         'afform_token_authx',
-        E::ts('Email token support has been configured for %1 form(s). This requires JWT authentication, <code>authx_auto_cred</code> does not include JWT. ', [
+        E::ts('Email token support has been configured for %1 form(s). This requires JSON Web Tokens are included as an acceptable credential for Auto Login in your AuthX configuration. Please <a href="%2">review your configuration here</a>.', [
           1 => $tokenFormCount,
+          2 => \Civi::url('backend://civicrm/admin/setting/authx'),
         ]),
         E::ts('AuthX Configuration'),
         \Psr\Log\LogLevel::ERROR,
