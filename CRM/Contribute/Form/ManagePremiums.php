@@ -23,6 +23,8 @@ use Civi\Api4\Product;
 class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
   use CRM_Custom_Form_CustomDataTrait;
 
+  protected $submittableMoneyFields = ['cost', 'price', 'min_contribution'];
+
   /**
    * Classes extending CRM_Core_Form should implement this method.
    *
@@ -303,13 +305,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
       return;
     }
 
-    $params = $this->controller->exportValues($this->_name);
-
-    // Clean the the money fields
-    $moneyFields = ['cost', 'price', 'min_contribution'];
-    foreach ($moneyFields as $field) {
-      $params[$field] = CRM_Utils_Rule::cleanMoney($params[$field]);
-    }
+    $params = $this->getSubmittedValues();
 
     // If we're updating, we need to pass in the premium product Id
     if ($this->_action & CRM_Core_Action::UPDATE) {
@@ -319,6 +315,8 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
     $this->_processImages($params);
 
     $params += $this->getSubmittedCustomFieldsForApi4();
+    $params['options'] = explode(',', $params['options']);
+    $params['options'] = array_map('trim', $params['options']);
 
     // Save the premium product to database
     $premium = Product::save()->addRecord($params)->execute()->first();
