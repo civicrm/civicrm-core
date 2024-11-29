@@ -430,7 +430,7 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
 .crm-container .table-hover > tbody > tr:hover > .danger,
 .crm-container .table-hover > tbody > tr.danger:hover > th,
 .crm-container table tr.crm-row-error:hover > td,
-.crm-container table tr.crm-row-error > td:hover  {
+.crm-container table tr.crm-row-error > td:hover {
   background-color: var(--crm-alert-border-danger);
 }
 .crm-container .table td.info,
