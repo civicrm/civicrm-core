@@ -42,6 +42,20 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Core_Form {
   public $submitOnce = TRUE;
 
   /**
+   * The ID of the message template being edited
+   *
+   * @var int
+   */
+  protected $_id;
+
+  /**
+   * The (current) message template database values
+   *
+   * @var array
+   */
+  protected $_values;
+
+  /**
    * PreProcess form - load existing values.
    *
    * @throws \CRM_Core_Exception
