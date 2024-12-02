@@ -17,6 +17,14 @@
 class CRM_Contact_Page_View_GroupContact extends CRM_Core_Page {
 
   /**
+   * The contact being viewed
+   *
+   * @var int
+   * @internal
+   */
+  public $_contactId;
+
+  /**
    * Called when action is browse.
    */
   public function browse() {
