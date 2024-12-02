@@ -750,6 +750,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * buildQuickForm.
    */
   public function buildForm() {
+    $this->assign('taxTerm', \Civi::settings()->get('tax_term'));
     $this->preProcess();
 
     CRM_Utils_Hook::preProcess(get_class($this), $this);
