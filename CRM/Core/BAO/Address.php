@@ -994,7 +994,7 @@ SELECT is_primary,
     }
 
     while ($downstreamDao->fetch()) {
-      // call the function to update the relationship
+      $params['master_id'] = $addressId;
       if ($masterId) {
         // If we have a master_id AND we have downstream addresses, this is
         // untenable. Ensure we overwrite the downstream addresses so they have
@@ -1002,6 +1002,7 @@ SELECT is_primary,
         $params['master_id'] = $masterId;
       }
       elseif ($createRelationship) {
+        // call the function to update the relationship
         self::processSharedAddressRelationship($addressId, $downstreamDao->contact_id);
       }
 
