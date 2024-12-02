@@ -47,7 +47,8 @@
   background-color: var(--crm-alert-background-help);
   color: var(--crm-alert-text-info);
 }
-.crm-container .alert-info {
+.crm-container .alert-info,
+.crm-container .messages.crm-empty-table {
   background-color: var(--crm-alert-background-info);
   border-color: var(--crm-alert-border-info);
   color: var(--crm-alert-text-info);

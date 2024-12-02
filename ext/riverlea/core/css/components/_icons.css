@@ -53,6 +53,9 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
   content: var(--crm-icon-info);
   color: var(--crm-c-info);
 }
+.crm-container .messages.crm-empty-table > i.crm-i {
+  display: none; /* removes double icon when markup uses both */
+}
 
 /* Help icon */
 .crm-container a.helpicon::before {

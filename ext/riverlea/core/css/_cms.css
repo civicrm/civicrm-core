@@ -103,6 +103,9 @@ body.page-civicrm .page-content:has(#block-claro-content) {
   background-image: unset;
   display: inherit;
 }
+#block-claro-content .action-link + .action-link {
+  margin-inline-start: unset;
+}
 @media (max-width: 959px) {
   #block-claro-content {
     --crm-page-padding: 1rem;
