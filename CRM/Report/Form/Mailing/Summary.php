@@ -435,17 +435,12 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
             $op = $this->_params["{$fieldName}_op"] ?? NULL;
 
             if ($op) {
-              if ($fieldName == 'relationship_type_id') {
-                $clause = "{$this->_aliases['civicrm_relationship']}.relationship_type_id=" . $this->relationshipId;
-              }
-              else {
-                $clause = $this->whereClause($field,
-                  $op,
-                  $this->_params["{$fieldName}_value"] ?? NULL,
-                  $this->_params["{$fieldName}_min"] ?? NULL,
-                  $this->_params["{$fieldName}_max"] ?? NULL
-                );
-              }
+              $clause = $this->whereClause($field,
+                $op,
+                $this->_params["{$fieldName}_value"] ?? NULL,
+                $this->_params["{$fieldName}_min"] ?? NULL,
+                $this->_params["{$fieldName}_max"] ?? NULL
+              );
             }
           }
 
