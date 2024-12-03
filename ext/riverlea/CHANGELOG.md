@@ -1,3 +1,10 @@
+1.80.12
+ - CHANGED - CRM Status Update page - added drop-shadow to dropdowns, made dropdown button border transparent, made h3 text colour match background variable.
+ - CHANGED - Minetta active accordion tab and panel bg colour now matches Greenwich
+ - FIXED - Accordion summary label colour inaccessible - needed !important, plus margin reset.
+ - FIXED - Accordion regression for Bootstrap accordions using .collapse, not summary/details (ref https://lab.civicrm.org/extensions/riverlea/-/issues/89). Also better namespaced Bootstrap collapse functions, and added support for BS4+ '.show'.
+ - REPLACED - replaced Inter font with font downloaded from https://gwfh.mranftl.com/fonts (the same place as Lato for Thames) and updated Walbrook's reference to it.
+
 1.80.11
  - FIXED - Wallbrook avatar image returned to 100px as had created a gap (ext/riverlea/#87)
  - FIXED - Double icon on .messages.crm-empty-table
