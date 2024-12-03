@@ -27,9 +27,8 @@ class CRM_Standaloneusers_Page_TOTP extends CRM_Core_Page {
       CRM_Utils_System::redirect('/civicrm/login');
     }
 
-    // CRM_Core_Session::setStatus('hello', 'oi!', 'success');
     // statusMessages are usually at top of page but in login forms they look much better
-    // inside the main box.
+    // inside the main box, so we assign them to this var for the tpl to output.
     $this->assign('statusMessages', CRM_Core_Smarty::singleton()->fetch("CRM/common/status.tpl"));
 
     $this->assign('pageTitle', '');
