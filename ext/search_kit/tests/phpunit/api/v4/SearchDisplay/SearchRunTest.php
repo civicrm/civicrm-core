@@ -1630,7 +1630,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
 
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(3, $result);
-    $data = array_column(array_column((array) $result, 'data'), 'COUNT_id', 'contact_type:label');
+    $data = array_column($result->column('data'), 'COUNT_id', 'contact_type:label');
     $this->assertEquals(3, $data['Individual']);
     $this->assertEquals(2, $data['Organization']);
     $this->assertEquals(1, $data['Household']);
@@ -1726,7 +1726,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
 
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(2, $result);
-    $data = array_column(array_column((array) $result, 'data'), 'COUNT_id');
+    $data = array_column($result->column('data'), 'COUNT_id');
     sort($data);
     $this->assertEquals([1, 2], $data);
   }
