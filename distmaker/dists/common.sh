@@ -140,6 +140,7 @@ function dm_install_coreext() {
 
   local repo="$1"
   local to="$2"
+  local excludes_rsync="--exclude=tests"
   shift
   shift
 
