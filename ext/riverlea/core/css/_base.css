@@ -18,8 +18,12 @@ body {
 }
 #crm-container .hiddenElement,
 .crm-container .hiddenElement,
-.crm-container .collapse {
+#bootstrap-theme .collapse {
   display: none
+}
+#bootstrap-theme .collapse.in,
+#bootstrap-theme .collapse.show /* BS4 */ {
+  display: block;
 }
 .crm-container .clear {
   clear: both;
