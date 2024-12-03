@@ -157,8 +157,9 @@ a.crm-expand-row:focus {
   border-radius: 0 0 var(--crm-expand-radius) var(--crm-expand-radius);
 }
 .crm-container summary label {
-  color: inherit;
-  font-size: inherit;
+  color: inherit !important; /* all vs .crm-container .form-item label */
+  font-size: inherit !important;
+  margin: 0 !important;
 }
 .crm-container details table.dataTable {
   width: 100% !important; /* dev/user-interface/-/issues/73 */

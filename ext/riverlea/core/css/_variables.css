@@ -270,7 +270,7 @@
   --crm-tabs-gap: var(--crm-s);
   --crm-tab-bg: var(--crm-c-background2);
   --crm-tab-bg-hover: var(--crm-c-background);
-  --crm-tab-bg-active: var(--crm-c-background);
+  --crm-tab-bg-active: var(--crm-c-page-background);
   --crm-tab-hang: 0; /* lip to extend tab flush with active region - set to 0 for no lip */
   --crm-tab-padding: var(--crm-s3) var(--crm-m) var(--crm-s) var(--crm-m);
   --crm-tab-col: var(--crm-c-text);
