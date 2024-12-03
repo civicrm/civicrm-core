@@ -11,13 +11,13 @@ This Framework separates CiviCRM's visual/UI CSS from structural CSS, using CSS 
 
  ## Use in Front-End CiviCRM
 
-**USE WITH CAUTION AND TESTING** While RiverLea has been widely tested in the backend of CiviCRM, given the wide number of themes and scenarios for front-end pages, for existing sites we recommend only applying it to an existing web front-end after extensive testing on a dev site.
+**USE WITH CAUTION AND TESTING** While RiverLea has been widely tested in the backend of CiviCRM, be very careful to use in front-end. Given the wide number of themes and scenarios for front-end pages, for existing sites we recommend only applying it to an existing web front-end after comprehensive testing on a dev site.
 
 Overwriting CSS variables for the front is straightforward (they can be nested within `.crm-container.crm-public` and there's a number of front-end specific variables, prefixed `--crm-f-`), but **testing is essential**.
 
 ## [Changelog](CHANGELOG.md)
 
-- 1.1 (5.80) - Release for packaging with CiviCRM core, v5.80.
+- 1.80 (5.80) - Release for packaging with CiviCRM core, v5.80 (see note on numbering below)
 - 1.0 - **Release candidate**, with ongoing testing and fixes.
 - 0.10 - **Adds fourth stream**. Thames (Aah), as well as extensive fixes & adjustments.
 - 0.9 - **Overwrites civi core CSS**. 5.75 only - overwrites core css like SearchKit & FormBuilder with extensive work on both. D7 Garland support.
@@ -29,6 +29,11 @@ Overwriting CSS variables for the front is straightforward (they can be nested w
 - 0.3 - **Two streams, 6 CMS setups tested:** adds Minetta and Walbrook streams. Backdrop, D7 (Seven), D9 (Claro + Seven), Joomla 4, Standalone & WordPress.
 - 0.2 - **Establishes structure**, adds Bootstrap3, components - accordion.
 - 0.1 - **Proof-of-concept**, basic variables.
+
+### Version numbering
+RiverLea has its own version number and confusingly this has changed a few times while we figured out the best approach. It is also different in the core-extension info.xml which in core will always match the Civi version its shipped with, but as a standalone extension has its own numbering.
+
+The pattern is `1.x.y` where x = the CiviCRM version it is developed against and y = the version number of of RiverLea for that Civi version. So `1.80.11` is the 11th version of RiverLea v1 built against CiviCRM `5.80.x`. Some previous versions tried to match the CiviCRM core version number and build on that (ie RiverLea 5.80.11), but this caused problems with upgrade prompts.
 
 ## Installation
 
@@ -140,3 +145,7 @@ function ocean_civicrm_themes(&$themes) {
     'search_order' => array('_riverlea_core_', 'styx',  '_fallback_'),
   );
 }
+
+## Troubleshooting
+- Unless you really need it (e.g. applying an urgent fix, or running a test), delete the custom/ext version of RiverLea, once you are on CiviCRM 5.80 or later.
+- After removing the custom/ext RiverLea directory, the civicrm/ext version should load automatically. It may appear to be enabled, but normally you will need to disable and re-enable it before RiverLea streams appear in Display Settings.

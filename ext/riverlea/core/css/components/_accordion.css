@@ -29,6 +29,8 @@
 .crm-container details:has(input.crm-inline-error) summary,
 .crm-container details:has(input.crm-inline-error) summary.active {
   background-color: var(--crm-alert-background-danger);
+  color: var(--crm-alert-text-danger);
+  border-color: var(--crm-alert-border-danger);
 }
 
 /* Expand/collapse icons */

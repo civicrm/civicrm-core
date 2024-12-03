@@ -12,7 +12,6 @@
 --crm-font-bold:;
 --crm-font-italic:;
 --crm-font-bold-italic:;
-
 /* Colour names *
 --crm-c-darkest: #0a0a0a;
 --crm-c-gray-900: #2f2f2e;
@@ -45,7 +44,6 @@
 --crm-c-yellow-less-light: #fffdb2;
 --crm-c-teal: #63c4b9;
 --crm-c-dark-teal: #3e8079;
-
 /* Practical colours *
 --crm-c-text: #464354;
 --crm-c-light-text: #fff;
@@ -79,13 +77,11 @@
 --crm-c-info-text: var(--crm-c-light-text);
 --crm-c-focus: var(--crm-c-blue-dark);
 --crm-c-inactive: #696969;
-
 /* Shadows *
 --crm-block-shadow:;
 --crm-popup-shadow: 0 3px 18px 0 rgba(48,40,40,.25);
 --crm-bottom-shadow: 0 0 16px 1px rgba(0,0,0,.1);
 --crm-body-inset:;
-
 /* Sizes *
 --crm-roundness: 0.25rem;
 --crm-xs: 0.1rem;
@@ -113,7 +109,8 @@
 --crm-padding-small: var(--crm-s);
 --crm-padding-inset: var(--crm-m);
 --crm-page-padding: var(--crm-xl); /* Margin left/right *
---crm-page-width: 100%; /* Default that CMS can overwrite */
+--crm-page-width: 100%; /* Default that CMS can overwrite *
+--crm-flex-gap: 0.5rem;
 /* Type *
 --crm-font-size: var(--crm-r);
 --crm-small-font-size: var(--crm-m2);
@@ -125,10 +122,8 @@
 --crm-heading-padding: var(--crm-s1) var(--crm-m1);
 --crm-heading-margin: var(--crm-m) 0;
 --crm-heading-radius: var(--crm-roundness);
-
 /* Mouse events *
 --crm-hover-clickable: pointer;
-
 /* Buttons *
 --crm-btn-box-shadow: none;
 --crm-btn-border: 0 solid transparent;
@@ -180,13 +175,11 @@
 --crm-table-nested-head-border: 0 solid transparent;
 --crm-table-nested-border: var(--crm-c-divider);
 --crm-table-inset-bg: var(--crm-c-background3);
-
 /* Panels *
 --crm-panel-shadow: var(--crm-block-shadow);
 --crm-panel-background: var(--crm-c-page-background);
 --crm-panel-border: var(--crm-c-divider);
 --crm-panel-head-margin: 0px;
-
 /* Accordions *
 --crm-expand-icon: "\f0da"; /* unicode value for FontAwesome icon *
 --crm-expand-icon-color: var(--text);
@@ -222,7 +215,6 @@
 --crm-expand2-border-width:;
 --crm-expand2-body-bg:;
 --crm-expand2-body-padding: var(--crm-s);
-
 /* Alerts *
 --crm-alert-padding: var(--crm-m) var(--crm-m2);
 --crm-alert-margin: 0 0 var(--crm-m);
@@ -239,7 +231,6 @@
 --crm-alert-background-danger: var(--crm-c-red-light);
 --crm-alert-border-danger: var(--crm-c-red);
 --crm-alert-text-danger: var(--crm-c-red-dark);
-
 /* Form *
 --crm-form-block-box-shadow: var(--crm-block-shadow);
 --crm-form-block-background: var(--crm-c-background);
@@ -272,7 +263,6 @@
 --crm-fieldset-border: 1px 0 0 0;
 --crm-fieldset-padding: var(--crm-padding-reg) var(--crm-padding-small);
 --crm-checkbox-list-col: var(--crm-c-text);
-
 /* Tabs *
 --crm-tabs-bg: var(--crm-c-background4);
 --crm-tabs-padding: var(--crm-s);
@@ -293,7 +283,6 @@
 --crm-tab-border: var(--crm-c-divider);
 --crm-tab-border-width: 0;
 --crm-tab-border-active: 0 solid transparent;
-
 /* Contact dashboard *
 --crm-dash-border: var(--crm-tab-border);
 --crm-dash-roundness: var(--crm-roundness);
@@ -354,7 +343,6 @@
 --crm-dialog-header-border-col: transparent transparent var(--crm-c-gray-300) transparent; /* set a border color for each side of the header *
 --crm-dialog-body-bg: var(--crm-c-background);
 --crm-dialog-body-padding: var(--crm-m);
-
 /* Dashlet *
 --crm-dashlet-border:;
 --crm-dashlet-bg: var(--crm-c-page-background);
@@ -370,7 +358,6 @@
 --crm-dashlet-content-padding: var(--crm-dashlet-padding) 0;
 --crm-dashlet-tabs-border:0;
 --crm-dashlet-radius: var(--crm-roundness);
-
 /* Button dropdowns *
 --crm-dropdown-padding: var(--crm-s);
 --crm-dropdown-radius: var(--crm-roundness);
@@ -384,14 +371,12 @@
 --crm-dropdown-2-bg: var(--crm-c-secondary);
 --crm-dropdown-2-col: var(--crm-c-text);
 --crm-dropdown-2-padding: var(--crm-padding-small);
-
 /* Notifications *
 --crm-notify-background: rgba(0,0,0,0.85);
 --crm-notify-padding: var(--crm-m2);
 --crm-notify-col: var(--crm-c-light-text);
 --crm-notify-accent-border: 2px 0 0 0; /* adds a border to one/several sides of the notification - set to 0 for none *
 --crm-notify-radius: var(--crm-roundness);
-
 /* Icons *
 --crm-icon-alert: "\f06a";
 --crm-icon-success: "\f058";
@@ -404,7 +389,6 @@
 --crm-icon-success-color: inherit;
 --crm-icon-warning-color: inherit;
 --crm-icon-info-color: inherit;
-
 /* Wizard *
 --crm-wizard-width: fit-content;
 --crm-wizard-margin: 0.5rem auto;
@@ -415,7 +399,6 @@
 --crm-wizard-active-bg: var(--crm-c-link);
 --crm-wizard-border: var(--crm-c-divider);
 --crm-wizard-bg: var(--crm-c-page-background);
-
 /* Alpha filter *
 --crm-filter-bg: var(--crm-c-blue-light);
 --crm-filter-padding: var(--crm-m);
