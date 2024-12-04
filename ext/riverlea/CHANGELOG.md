@@ -1,3 +1,6 @@
+1.80.14
+ - FIXED - regression caused by trying to reset clipping in Thames (ref: https://lab.civicrm.org/extensions/riverlea/-/issues/91)
+
 1.80.13
  - FIXED - removed margin on ul.nav that's added by browser/CMS theme ul styling (seen on Message Template Afform)
  - FIXED - extra box-shadow from .panel-heading (was creating an odd dble shadow)
