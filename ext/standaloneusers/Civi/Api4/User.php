@@ -86,9 +86,10 @@ class User extends Generic\DAOEntity {
       'save'              => ['access CiviCRM'],
       'create'            => ['cms:administer users'],
       'delete'            => ['cms:administer users'],
+      'sendPasswordResetEmail' => ['cms:administer users'],
+      'login'             => ['access password resets'],
       'passwordReset'     => ['access password resets'],
       'requestPasswordResetEmail' => ['access password resets'],
-      'login'             => ['access password resets'],
     ];
   }
 
