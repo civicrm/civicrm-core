@@ -223,7 +223,7 @@ EOHTML;
     // Check that the data overrides form submission
     $this->assertEquals('Register A site', $contact['source']);
     // Check that the contact and the activity were correctly linked up as per the form.
-    $this->callAPISuccessGetSingle('ActivityContact', ['contact_id' => $contact['id'], 'activity_id' => $activity['id']]);
+    $this->getTestRecord('ActivityContact', ['contact_id' => $contact['id'], 'activity_id' => $activity['id']]);
   }
 
   public function testCheckAccess(): void {
@@ -272,6 +272,7 @@ EOHTML;
     catch (\CRM_Core_Exception $e) {
       // Should fail permission check
     }
+    $this->assertTrue(is_a($e, '\Civi\API\Exception\UnauthorizedException'));
 
     try {
       Afform::submit()
@@ -286,6 +287,7 @@ EOHTML;
     catch (\CRM_Core_Exception $e) {
       // Should fail permission check
     }
+    $this->assertTrue(is_a($e, '\Civi\API\Exception\UnauthorizedException'));
   }
 
   public function testEmployerReference(): void {
@@ -617,6 +619,67 @@ EOHTML;
     }
     catch (\Civi\API\Exception\UnauthorizedException $e) {
     }
+    $this->assertTrue(is_a($e, '\Civi\API\Exception\UnauthorizedException'));
+  }
+
+  public function testQuickAddWithDataValues(): void {
+    $contactType = $this->createTestRecord('ContactType', [
+      'parent_id:name' => 'Individual',
+    ])['name'];
+
+    $html = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity type="Individual" data="{contact_sub_type: ['$contactType']}" name="me" label="Myself" url-autofill="1" autofill="user" />
+  <fieldset af-fieldset="me">
+      <af-field name="id" />
+      <af-field name="first_name" />
+      <af-field name="last_name" />
+  </fieldset>
+</af-form>
+EOHTML;
+
+    $this->useValues([
+      'layout' => $html,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+
+    $lastName = uniqid(__FUNCTION__);
+
+    // We're not submitting the above form, we're creating a 'quick-add' Individual, e.g. from the "Existing Contact" popup
+    Afform::submit()
+      ->setName('afformQuickAddIndividual')
+      ->setValues([
+        'Individual1' => [
+          [
+            'fields' => ['first_name' => 'Jane', 'last_name' => $lastName],
+          ],
+        ],
+      ])
+      ->execute();
+    // This first submit we did not specify a parent form, so got a generic individual
+    $contact = $this->getTestRecord('Individual', ['first_name' => 'Jane', 'last_name' => $lastName]);
+    $this->assertNull($contact['contact_sub_type']);
+
+    // Now specify the above form as the parent
+
+    // We're not submitting the above form, we're creating a 'quick-add' Individual, e.g. from the "Existing Contact" popup
+    Afform::submit()
+      ->setName('afformQuickAddIndividual')
+      ->setValues([
+        'Individual1' => [
+          [
+            'fields' => ['first_name' => 'John', 'last_name' => $lastName],
+          ],
+        ],
+      ])
+      ->setArgs([
+        'parentFormName' => "afform:$this->formName",
+        'parentFormFieldName' => "me:id",
+      ])
+      ->execute();
+    // This first submit we did not specify a parent form, so got a generic individual
+    $contact = $this->getTestRecord('Individual', ['first_name' => 'John', 'last_name' => $lastName]);
+    $this->assertEquals([$contactType], $contact['contact_sub_type']);
   }
 
 }

@@ -42,5 +42,10 @@
     "obsolete": "5.8",
     "disable": true,
     "uninstall": true
+  },
+  "biz.jmaconsulting.contributionpagecustomfield": {
+    "obsolete": "5.81",
+    "disable": true,
+    "uninstall": true
   }
 }

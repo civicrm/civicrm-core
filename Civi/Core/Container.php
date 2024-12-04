@@ -48,7 +48,7 @@ class Container {
    * each (eg "templates_c/CachedCiviContainer.$ENVID.php").
    *
    * Constants:
-   *   - CIVICRM_CONTAINER_CACHE -- 'always' [default], 'never', 'auto'
+   *   - CIVICRM_CONTAINER_CACHE -- 'auto' [default], 'always', 'never',
    *   - CIVICRM_DSN
    *   - CIVICRM_DOMAIN_ID
    *

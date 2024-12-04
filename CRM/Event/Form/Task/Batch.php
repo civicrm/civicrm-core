@@ -46,6 +46,12 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
   protected $_fromStatusIds;
 
   /**
+   * All  the fields that belong to the group.
+   * @var array
+   */
+  protected $_fields = [];
+
+  /**
    * Build all the data structures needed to build the form.
    *
    * @return void
@@ -126,7 +132,6 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
 
     $this->assign('profileTitle', $this->_title);
     $this->assign('componentIds', $this->_participantIds);
-    $fileFieldExists = FALSE;
 
     //load all campaigns.
     if (array_key_exists('participant_campaign_id', $this->_fields)) {
@@ -141,15 +146,15 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
     //fix for CRM-2752
     // get the option value for custom data type
     $customDataType = CRM_Core_OptionGroup::values('custom_data_type', FALSE, FALSE, FALSE, NULL, 'name');
-    $this->_roleCustomDataTypeID = array_search('ParticipantRole', $customDataType);
-    $this->_eventNameCustomDataTypeID = array_search('ParticipantEventName', $customDataType);
-    $this->_eventTypeCustomDataTypeID = array_search('ParticipantEventType', $customDataType);
+    $roleCustomDataTypeID = array_search('ParticipantRole', $customDataType);
+    $eventNameCustomDataTypeID = array_search('ParticipantEventName', $customDataType);
+    $eventTypeCustomDataTypeID = array_search('ParticipantEventType', $customDataType);
 
     // build custom data getFields array
-    $customFieldsRole = CRM_Core_BAO_CustomField::getFields('Participant', FALSE, FALSE, NULL, $this->_roleCustomDataTypeID);
+    $customFieldsRole = CRM_Core_BAO_CustomField::getFields('Participant', FALSE, FALSE, NULL, $roleCustomDataTypeID);
 
-    $customFieldsEvent = CRM_Core_BAO_CustomField::getFields('Participant', FALSE, FALSE, NULL, $this->_eventNameCustomDataTypeID);
-    $customFieldsEventType = CRM_Core_BAO_CustomField::getFields('Participant', FALSE, FALSE, NULL, $this->_eventTypeCustomDataTypeID);
+    $customFieldsEvent = CRM_Core_BAO_CustomField::getFields('Participant', FALSE, FALSE, NULL, $eventNameCustomDataTypeID);
+    $customFieldsEventType = CRM_Core_BAO_CustomField::getFields('Participant', FALSE, FALSE, NULL, $eventTypeCustomDataTypeID);
 
     $customFields = CRM_Utils_Array::crmArrayMerge($customFieldsRole,
       CRM_Core_BAO_CustomField::getFields('Participant', FALSE, FALSE, NULL, NULL, TRUE)
@@ -170,17 +175,17 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
               $customValue['extends_entity_column_value']
             );
           }
-          if (($this->_roleCustomDataTypeID == $customValue['extends_entity_column_id']) &&
+          if (($roleCustomDataTypeID == $customValue['extends_entity_column_id']) &&
             in_array($roleId, $entityColumnValue)
           ) {
             CRM_Core_BAO_UFGroup::buildProfile($this, $field, NULL, $participantId);
           }
-          elseif (($this->_eventNameCustomDataTypeID == $customValue['extends_entity_column_id']) &&
+          elseif (($eventNameCustomDataTypeID == $customValue['extends_entity_column_id']) &&
             in_array($eventId, $entityColumnValue)
           ) {
             CRM_Core_BAO_UFGroup::buildProfile($this, $field, NULL, $participantId);
           }
-          elseif ($this->_eventTypeCustomDataTypeID == $customValue['extends_entity_column_id'] &&
+          elseif ($eventTypeCustomDataTypeID == $customValue['extends_entity_column_id'] &&
             in_array($eventTypeId, $entityColumnValue)
           ) {
             CRM_Core_BAO_UFGroup::buildProfile($this, $field, NULL, $participantId);
