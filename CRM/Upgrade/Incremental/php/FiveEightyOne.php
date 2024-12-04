@@ -29,6 +29,15 @@ class CRM_Upgrade_Incremental_php_FiveEightyOne extends CRM_Upgrade_Incremental_
    */
   public function upgrade_5_81_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Add SavedSearch.is_template column', 'alterSchemaField', 'SavedSearch', 'is_template', [
+      'title' => ts('Template'),
+      'sql_type' => 'boolean',
+      'input_type' => 'CheckBox',
+      'required' => TRUE,
+      'description' => ts('Search templates are used as a starting point for building new searches'),
+      'add' => '5.81',
+      'default' => FALSE,
+    ]);
   }
 
 }

@@ -144,6 +144,7 @@ class AfformAutocompleteSubscriber extends AutoService implements EventSubscribe
         else {
           $apiRequest->addFilter('api_entity', $apiRequest->getFilters()['api_entity']);
         }
+        $apiRequest->addFilter('is_template', FALSE);
         return;
 
       case 'autocompleteDisplay':

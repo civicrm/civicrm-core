@@ -1,6 +1,9 @@
 <div class="btn-group btn-group-xs crm-search-admin-search-listing-buttons">
-  <a class="btn btn-primary" ng-href="#/edit/{{:: row.data.id }}" ng-if=":: row.permissionToEdit" title="{{:: ts('Edit search and displays') }}">
+  <a class="btn btn-primary" ng-href="#/edit/{{:: row.data.id }}" ng-if=":: row.permissionToEdit && !row.data.is_template" title="{{:: ts('Edit search and displays') }}">
     <i class="crm-i fa-pencil fa-fw"></i>
+  </a>
+  <a class="btn btn-primary" ng-href="#/clone/{{:: row.data.id }}?is_template=0" ng-if=":: !row.permissionToEdit || row.data.is_template" title="{{:: ts('Create a new search based on this one') }}">
+    <i class="crm-i fa-clone"></i>
   </a>
   <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-click="row.menuOpen = true">
     <i class="crm-i fa-bars"></i>
@@ -10,7 +13,7 @@
     <li ng-if=":: row.permissionToEdit" title="{{:: ts('Edit search and displays') }}">
       <a ng-href="#/edit/{{:: row.data.id }}">
         <i class="crm-i fa-pencil fa-fw"></i>
-        {{:: ts('Edit') }}
+        {{ row.data.is_template ? ts('Edit Template') : ts('Edit Search') }}
       </a>
     </li>
     <li title="{{:: ts('View search results table') }}">
@@ -20,15 +23,21 @@
       </a>
     </li>
     <li title="{{:: ts('Create a new search based on this one') }}">
-      <a ng-href="#/clone/{{:: row.data.id }}">
-        <i class="crm-i fa-copy"></i>
-        {{:: ts('Clone...') }}
+      <a ng-href="#/clone/{{:: row.data.id }}?is_template=0">
+        <i class="crm-i fa-clone"></i>
+        {{ row.data.is_template ? ts('Create from Template') : ts('Clone Search') }}
       </a>
     </li>
-    <li title="{{:: ts('Export this saved search to a file') }}">
+    <li title="{{:: ts('Create a new template based on this one') }}">
+      <a ng-href="#/clone/{{:: row.data.id }}?is_template=1">
+        <i class="crm-i fa-paste"></i>
+        {{ row.data.is_template ? ts('Clone Template') : ts('Save as Template') }}
+      </a>
+    </li>
+    <li title="{{:: ts('Export this saved search for sharing or reuse') }}">
       <a href crm-dialog-popup="crmSearchAdminExport" popup-data="row" popup-tpl="~/crmSearchAdmin/searchListing/export.html" title="{{:: ts('Export %1', {1: row.data.label}) }}">
         <i class="crm-i fa-download"></i>
-        {{:: ts('Export...') }}
+        {{ row.data.is_template ? ts('Export Template') : ts('Export Search') }}
       </a>
     </li>
     <li ng-if="!row.data['base_module:label']" title="{{:: ts('Delete search along with any displays and forms') }}">
