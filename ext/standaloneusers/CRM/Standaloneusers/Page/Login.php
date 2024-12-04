@@ -15,7 +15,7 @@ class CRM_Standaloneusers_Page_Login extends CRM_Core_Page {
       // the message when they press Back.
       CRM_Core_Session::setStatus(
         ts('You have been logged out.'),
-        ts('Successfully signed out'),
+        ts('Successfully signed out.'),
         'success');
       CRM_Utils_System::redirect('/civicrm/login');
     }
