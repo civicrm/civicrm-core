@@ -519,7 +519,7 @@ class Submit extends AbstractProcessor {
       // the contact was being auto-updated via a dedupe rule; in that case we would not want to
       // delete any existing records.
       elseif ($values) {
-        if ($joinAllowedAction["create"] === TRUE) {
+        if ($joinAllowedAction["delete"] === FALSE) {
           $result = civicrm_api4($joinEntityName, 'save', [
             // Disable permission checks because the main entity has already been vetted
             'checkPermissions' => FALSE,

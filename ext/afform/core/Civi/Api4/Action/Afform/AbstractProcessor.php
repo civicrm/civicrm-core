@@ -241,11 +241,6 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
       if (!empty($result[$key])) {
         $data = ['fields' => $result[$key]];
         foreach ($entity['joins'] ?? [] as $joinEntity => $join) {
-          // Do not load joins when block action is create
-          $joinAllowedAction = self::getJoinAllowedAction($entity, $joinEntity);
-          if ($joinAllowedAction["create"] === TRUE) {
-            continue;
-          }
           $data['joins'][$joinEntity] = $this->loadJoins($joinEntity, $join, $entity, $entityId, $index);
         }
         $this->_entityValues[$entity['name']][$index] = $data;
@@ -737,7 +732,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    * @return array
    */
   public static function getJoinAllowedAction(array $mainEntity, string $joinEntityName) {
-    $actions = ["create" => FALSE, "update" => TRUE];
+    $actions = ["update" => TRUE, "delete" => TRUE];
     if (array_key_exists('actions', $mainEntity['joins'][$joinEntityName])) {
       $actions = array_merge($actions, $mainEntity['joins'][$joinEntityName]['actions']);
     }

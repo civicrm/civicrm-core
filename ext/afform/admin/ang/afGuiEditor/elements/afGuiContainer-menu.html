@@ -36,10 +36,10 @@
     <div class="form-group">
       <label>{{:: ts('Allow:') }}</label>
       <div class="checkbox-inline">
-        <label><input type="checkbox" ng-model="$ctrl.node.actions.create" ng-change="$ctrl.onChangeCreateAction()">{{:: ts('Create') }}</label>
+        <label><input type="checkbox" ng-model="$ctrl.node.actions.update" ng-change="$ctrl.onChangeUpdateAction()">{{:: ts('Update') }}</label>
       </div>
       <div class="checkbox-inline">
-        <label><input type="checkbox" ng-model="$ctrl.node.actions.update" ng-change="$ctrl.onChangeUpdateAction()">{{:: ts('Update') }}</label>
+        <label><input type="checkbox" ng-model="$ctrl.node.actions.delete" ng-disabled="!$ctrl.node.actions.update">{{:: ts('Delete') }}</label>
       </div>
     </div>
   </div>
