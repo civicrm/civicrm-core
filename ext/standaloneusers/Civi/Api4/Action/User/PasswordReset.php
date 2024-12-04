@@ -116,7 +116,7 @@ class PasswordReset extends AbstractAction {
       return NULL;
     }
     else {
-      $userID = substr($decodedToken['sub'], 4);
+      $userID = (int) substr($decodedToken['sub'], 4);
     }
     if (!$userID > 0) {
       // Hacker
