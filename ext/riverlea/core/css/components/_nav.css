@@ -2,7 +2,7 @@
 
 .crm-container .nav {
   padding-left: 0;
-  margin-bottom: 0;
+  margin: 0;
   list-style: none;
   display: flex;
   flex-wrap: wrap;
@@ -56,4 +56,7 @@
   height: 2.25rem;
   margin: 0;
   background-position: center center;
+}
+.crm-container .nav.nav-pills {
+  gap: var(--crm-flex-gap);
 }

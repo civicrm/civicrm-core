@@ -403,7 +403,7 @@
   --crm-filter-padding: var(--crm-m);
   --crm-filter-item-bg: #fafafa;
   --crm-filter-item-shadow: 0px 0px 3px rgba(0,0,0,0.1);
-  --crm-filter-spacing: start; /* choose 'space-between' to spread out evenly, or 'end' to right align. */
+  --crm-filter-spacing: space-between; /* choose 'space-between' to spread out evenly, 'start' for left align, or 'end' for right. */
 /* Frontend */
   --crm-f-form-width: unset;
   --crm-f-box-shadow: var(--crm-block-shadow);
