@@ -3,7 +3,7 @@ namespace Civi\Api4\Action\User;
 
 use Civi\Api4\Generic\Result;
 use Civi\Standalone\Security;
-use API_Exception;
+use CRM_Core_Exception;
 use Civi\Api4\User;
 use Civi\Api4\Generic\AbstractAction;
 
@@ -33,7 +33,7 @@ class PasswordReset extends AbstractAction {
   public function _run(Result $result) {
 
     if (empty($this->password)) {
-      throw new API_Exception("Invalid password");
+      throw new CRM_Core_Exception("Invalid password");
     }
 
     // todo: some minimum password quality check?
@@ -41,7 +41,7 @@ class PasswordReset extends AbstractAction {
     // Only valid change here is password, for a known ID.
     $userID = Security::singleton()->checkPasswordResetToken($this->token);
     if (!$userID) {
-      throw new API_Exception("Invalid token.");
+      throw new CRM_Core_Exception("Invalid token.");
     }
 
     User::update(FALSE)
