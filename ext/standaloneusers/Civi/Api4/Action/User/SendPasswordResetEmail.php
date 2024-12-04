@@ -31,6 +31,11 @@ class SendPasswordResetEmail extends BasicBatchAction {
     return ['id', 'username', 'uf_name', 'contact_id'];
   }
 
+  /**
+   * @inheritdoc
+   *
+   * @param array $user user record with fields from getSelect
+   */
   public function doTask($user) {
     // (Re)generate token and store on User.
     $token = PasswordReset::updateToken($user['id'], $this->timeout);
