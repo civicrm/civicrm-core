@@ -142,9 +142,9 @@ table.dataTable.order-column.stripe tbody tr.extension-installed.even > .sorting
   overflow-x: auto;
   max-width: 100%;
 }*/
-
 /* resets the scroll in presence of dropdown to avoid clipping */
-.crm-container div:has(td span > .panel) {
+.crm-container div:has(td span > .panel),
+.crm-container div:has(td > div > .dropdown-menu) {
   overflow: initial;
 }
 .crm-selection-reset {

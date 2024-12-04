@@ -4,7 +4,8 @@
 .crm-container .crm-button,
 .crm-container [type="button"],
 .crm-container [type="reset"],
-.crm-container [type="submit"] {
+.crm-container [type="submit"],
+.crm-container .nav.nav-pills li.navitem a {
   white-space: nowrap;
   touch-action: manipulation;
   cursor: var(--crm-hover-clickable);
@@ -42,6 +43,16 @@
   background: var(--crm-c-primary-hover);
   color: var(--crm-c-primary-hover-text);
   text-decoration: none;
+}
+.crm-container .nav.nav-pills li.navitem:not(.active) a {
+  background-color: transparent;
+  border-color: transparent;
+  color: var(--crm-c-link);
+}
+.crm-container .nav.nav-pills li.navitem:not(.active) a:hover,
+.crm-container .nav.nav-pills li.navitem:not(.active) a:focus {
+  background-color: transparent;
+  color: var(--crm-c-link-hover);
 }
 .crm-button:focus,
 .crm-container .btn:focus,

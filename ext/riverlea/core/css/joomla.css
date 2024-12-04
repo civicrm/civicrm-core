@@ -67,3 +67,6 @@ body.admin.com_civicrm.layout-default #content > .row > .col-md-12 {
 body.admin.com_civicrm.layout-default #content > .row {
   margin-inline: 0;
 }
+body.com_civicm.layout-default .table tbody a:not(.badge):not(.btn):not(.dropdown-item) {
+  text-decoration: var(--crm-link-decoration);
+}

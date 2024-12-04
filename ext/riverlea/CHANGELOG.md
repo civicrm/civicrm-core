@@ -1,3 +1,13 @@
+1.80.13
+ - FIXED - removed margin on ul.nav that's added by browser/CMS theme ul styling (seen on Message Template Afform)
+ - FIXED - extra box-shadow from .panel-heading (was creating an odd dble shadow)
+ - FIXED - clipped overflowing responsive tables in Thames (ref https://lab.civicrm.org/extensions/riverlea/-/issues/90)
+ - FIXED - .crm-pager padding/positioning (ref https://lab.civicrm.org/extensions/riverlea/-/issues/11#note_173013) - also removed hidden top pager from some results.
+ - FIXED - Joomla4+ Atum admin theme bug that adds underline on dropdown menu links
+ - CHANGED - removed second drop-shadow on BS .panel inside a .panel (visible in Walbrook, e.g. Message Template Afform).
+ - CHANGED - more balanced padding in panel-heading.
+ - ADDED - .nav.nav-pills style based on buttons Message Template Afform.
+
 1.80.12
  - CHANGED - CRM Status Update page - added drop-shadow to dropdowns, made dropdown button border transparent, made h3 text colour match background variable.
  - CHANGED - Minetta active accordion tab and panel bg colour now matches Greenwich

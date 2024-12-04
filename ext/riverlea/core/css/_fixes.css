@@ -638,7 +638,6 @@ tr.crm-preferences-display-form-block-contact_edit_options td table {
 .crm-case_search-accordion .crm-accordion-body .form-layout > tbody:first-child > tr:nth-of-type(1) > td:nth-of-type(1) label + input {
   margin-left: -0.6rem;
 }
-
 /* Member */
 .page-civicrm-member-search .CRM_Member_Form_Search .crm-accordion-body tr:last-child td {
   padding-top: var(--crm-r);
