@@ -1422,7 +1422,7 @@ HERESQL;
       );
 
       $activityParams['subject'] = ts('%1 - copy sent to %2', [1 => $activitySubject, 2 => $displayName]);
-      $activityParams['details'] = $message;
+      $activityParams['details'] = $html;
 
       if (!empty($result[$info['contact_id']])) {
         /*
