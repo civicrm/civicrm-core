@@ -49,7 +49,7 @@ class CachedDAOGetAction extends \Civi\Api4\Generic\DAOGetAction {
    *
    * @param string $entityName
    * @param string $actionName
-   * @param callable $getter
+   * @param callable $cacheGetter
    */
   public function __construct($entityName, $actionName, $cacheGetter = NULL) {
     parent::__construct($entityName, $actionName);
