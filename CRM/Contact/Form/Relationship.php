@@ -37,7 +37,8 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   public $_rtype;
 
   /**
-   * This is a string which is used to determine the relationship between to contacts
+   * This is a string which is used to determine the relationship between to contacts eg. 1_a_b or 1_b_a
+   *   where 1 is the relationship type
    * @var string
    */
   public $_rtypeId;
@@ -111,23 +112,54 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
 
   public function preProcess() {
     $this->_contactId = $this->get('contactId');
-
-    $this->_contactType = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactId, 'contact_type');
-
     $this->_relationshipId = $this->get('id');
 
-    $this->_rtype = CRM_Utils_Request::retrieve('rtype', 'String', $this);
-
-    $this->_rtypeId = CRM_Utils_Request::retrieve('relTypeId', 'String', $this);
-
-    $this->_display_name_a = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactId, 'display_name');
-
+    $contact = \Civi\Api4\Contact::get(FALSE)
+      ->addSelect('display_name', 'contact_type')
+      ->addWhere('id', '=', $this->_contactId)
+      ->execute()
+      ->first();
+    $this->_contactType = $contact['contact_type'];
+    $this->_display_name_a = $contact['display_name'];
     $this->assign('display_name_a', $this->_display_name_a);
+
+    $this->_rtype = CRM_Utils_Request::retrieve('rtype', 'String', $this);
+    $this->_rtypeId = CRM_Utils_Request::retrieve('relTypeId', 'String', $this);
+    $this->_caseId = CRM_Utils_Request::retrieve('caseID', 'Integer', $this);
+
     //get the relationship values.
     $this->_values = [];
     if ($this->_relationshipId) {
-      $params = ['id' => $this->_relationshipId];
-      CRM_Core_DAO::commonRetrieve('CRM_Contact_DAO_Relationship', $params, $this->_values);
+      $this->_values = \Civi\Api4\Relationship::get(FALSE)
+        ->addSelect('contact_id_a', 'contact_id_b', 'created_date', 'id', 'is_active', 'is_permission_a_b', 'is_permission_b_a', 'modified_date', 'relationship_type_id')
+        ->addWhere('id', '=', $this->_relationshipId)
+        ->execute()
+        ->first();
+      // Set "rtype" (relationship direction)
+      if ($this->_values['contact_id_a'] == $this->_contactId) {
+        $this->_rtype = 'a_b';
+      }
+      else {
+        $this->_rtype = 'b_a';
+      }
+      // Set relationship Type ID (eg. 1)
+      $this->_relationshipTypeId = $this->_values['relationship_type_id'];
+      // Set rtypeId (eg. 1_a_b)
+      $this->_rtypeId = $this->_values['relationship_type_id'] . '_' . $this->_rtype;
+    }
+    else {
+      if (!$this->_rtypeId) {
+        $params = CRM_Utils_Request::exportValues();
+        if (isset($params['relationship_type_id'])) {
+          $this->_rtypeId = $params['relationship_type_id'];
+          // get the relationship type id
+          $this->_relationshipTypeId = str_replace(['_a_b', '_b_a'], ['', ''], $this->_rtypeId);
+          //get the relationship type
+          if (!$this->_rtype) {
+            $this->_rtype = str_replace($this->_relationshipTypeId . '_', '', $this->_rtypeId);
+          }
+        }
+      }
     }
 
     // Check for permissions
@@ -157,26 +189,6 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       case CRM_Core_Action::DELETE:
         $this->setTitle(ts('Delete Relationship for %1', [1 => $this->_display_name_a]));
         break;
-    }
-
-    $this->_caseId = CRM_Utils_Request::retrieve('caseID', 'Integer', $this);
-
-    if (!$this->_rtypeId) {
-      $params = CRM_Utils_Request::exportValues();
-      if (isset($params['relationship_type_id'])) {
-        $this->_rtypeId = $params['relationship_type_id'];
-      }
-      elseif (!empty($this->_values)) {
-        $this->_rtypeId = $this->_values['relationship_type_id'] . '_' . $this->_rtype;
-      }
-    }
-
-    //get the relationship type id
-    $this->_relationshipTypeId = str_replace(['_a_b', '_b_a'], ['', ''], $this->_rtypeId);
-
-    //get the relationship type
-    if (!$this->_rtype) {
-      $this->_rtype = str_replace($this->_relationshipTypeId . '_', '', $this->_rtypeId);
     }
 
     //need to assign custom data subtype to the template for the initial load of custom fields.
