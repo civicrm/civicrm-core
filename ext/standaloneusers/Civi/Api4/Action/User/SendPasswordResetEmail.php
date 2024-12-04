@@ -27,7 +27,6 @@ class SendPasswordResetEmail extends BasicBatchAction {
    * Data we need from the User record
    */
   protected function getSelect() {
-
     return ['id', 'username', 'uf_name', 'contact_id'];
   }
 
@@ -37,6 +36,7 @@ class SendPasswordResetEmail extends BasicBatchAction {
    * @param array $user user record with fields from getSelect
    */
   public function doTask($user) {
+    // TODO: if you disable the reset email template, the action will still reset the token on the user record, which is a bit weird
     // (Re)generate token and store on User.
     $token = PasswordReset::updateToken($user['id'], $this->timeout);
 
@@ -52,8 +52,18 @@ class SendPasswordResetEmail extends BasicBatchAction {
       }
       catch (\Exception $e) {
         Civi::log()->error("Failed to send password reset to user {$user['id']} ({$user['username']}) to {$user['uf_name']}");
+        return [
+          'is_error' => TRUE,
+        ];
       }
+      return [
+        'is_error' => FALSE,
+      ];
     }
+    return [
+      'is_error' => TRUE,
+      'message' => 'No password reset message template available',
+    ];
   }
 
   /**
