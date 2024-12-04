@@ -23,4 +23,13 @@ class CustomGroup extends Generic\DAOEntity {
   use Generic\Traits\ManagedEntity;
   use Generic\Traits\SortableEntity;
 
+  /**
+   * @param bool $checkPermissions
+   * @return Action\CustomGroup\Get
+   */
+  public static function get($checkPermissions = TRUE) {
+    return (new Action\CustomGroup\Get(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
 }
