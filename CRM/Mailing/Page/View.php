@@ -62,7 +62,7 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
    *   Not really sure if anything should be returned - parent doesn't
    */
   public function run($id = NULL, $contactID = NULL, $print = TRUE, $allowID = FALSE) {
-    if (empty($id) || (!empty($id) && is_array($id))) {
+    if (empty($id) || is_array($id)) {
       $print = TRUE;
     }
     $this->getMailingID($id);
@@ -164,7 +164,7 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
 
   public function getMailingID($id): void {
     if (!empty($id) && !is_array($id)) {
-      $check = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_mailing WHERE id = %1", [
+      $check = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_mailing WHERE CAST(id AS CHAR) = %1", [
         1 => [$id, 'String'],
       ]);
       $this->_mailingID = $id;
@@ -177,7 +177,7 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
     }
     else {
       $this->_mailingID = CRM_Utils_Request::retrieveValue('id', 'String', NULL, TRUE);
-      $check = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_mailing WHERE id = %1", [
+      $check = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_mailing WHERE CAST(id AS CHAR) = %1", [
         1 => [$this->_mailingID, 'String'],
       ]);
       if (!empty($check)) {
