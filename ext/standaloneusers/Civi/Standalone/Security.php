@@ -1,11 +1,7 @@
 <?php
 namespace Civi\Standalone;
 
-use Civi\Crypto\Exception\CryptoException;
 use Civi;
-use Civi\Api4\User;
-use Civi\Api4\MessageTemplate;
-use CRM_Standaloneusers_WorkflowMessage_PasswordReset;
 
 /**
  * Security related functions for Standaloneusers.
@@ -23,11 +19,6 @@ use CRM_Standaloneusers_WorkflowMessage_PasswordReset;
  * class
  */
 class Security {
-
-  /**
-   * Scope identifier for password reset JWTs
-   */
-  const PASSWORD_RESET_SCOPE = 'pw_reset';
 
   /**
    * @return Security
@@ -194,96 +185,6 @@ class Security {
     // Implement a pluggable interface here to handle some of these password types or more.
     Civi::log()->warning("Denying access to user whose stored password relies on '$algo' which we have not implemented yet.");
     return FALSE;
-  }
-
-  /**
-   * Check a password reset token matches for a User.
-   *
-   * @param string $token
-   * @param bool $spend
-   *   If TRUE, and the token matches, the token is then reset; so it can only be used once.
-   *   If FALSE no changes are made.
-   *
-   * @return NULL|int
-   *   If int, it's the UserID
-   *
-   */
-  public function checkPasswordResetToken(string $token, bool $spend = TRUE): ?int {
-    try {
-      $decodedToken = \Civi::service('crypto.jwt')->decode($token);
-    }
-    catch (CryptoException $e) {
-      Civi::log()->warning('Exception while decoding JWT', ['exception' => $e]);
-      return NULL;
-    }
-
-    $scope = $decodedToken['scope'] ?? '';
-    if ($scope != Security::PASSWORD_RESET_SCOPE) {
-      Civi::log()->warning('Expected JWT password reset, got ' . $scope);
-      return NULL;
-    }
-
-    if (empty($decodedToken['sub']) || substr($decodedToken['sub'], 0, 4) !== 'uid:') {
-      Civi::log()->warning('Missing uid in JWT sub field');
-      return NULL;
-    }
-    else {
-      $userID = substr($decodedToken['sub'], 4);
-    }
-    if (!$userID > 0) {
-      // Hacker
-      Civi::log()->warning("Rejected passwordResetToken with invalid userID.", compact('token', 'userID'));
-      return NULL;
-    }
-
-    $matched = User::get(FALSE)
-      ->addWhere('id', '=', $userID)
-      ->addWhere('password_reset_token', '=', $token)
-      ->addWhere('is_active', '=', 1)
-      ->selectRowCount()
-      ->execute()->countMatched() === 1;
-
-    if ($matched && $spend) {
-      $matched = User::update(FALSE)
-        ->addWhere('id', '=', $userID)
-        ->addValue('password_reset_token', NULL)
-        ->execute();
-    }
-    Civi::log()->info(($matched ? 'Accepted' : 'Rejected') . " passwordResetToken for user $userID");
-    return $matched ? $userID : NULL;
-  }
-
-  /**
-   * Prepare a password reset workflow email, if configured.
-   *
-   * @return \CRM_Standaloneusers_WorkflowMessage_PasswordReset|null
-   */
-  public function preparePasswordResetWorkflow(array $user, string $token): ?CRM_Standaloneusers_WorkflowMessage_PasswordReset {
-    // Find the message template
-    $tplID = MessageTemplate::get(FALSE)
-      ->setSelect(['id'])
-      ->addWhere('workflow_name', '=', 'password_reset')
-      ->addWhere('is_default', '=', TRUE)
-      ->addWhere('is_reserved', '=', FALSE)
-      ->addWhere('is_active', '=', TRUE)
-      ->execute()->first()['id'];
-    if (!$tplID) {
-      // Some sites may deliberately disable this, but it's unusual, so leave a notice in the log.
-      Civi::log()->notice("There is no active, default password_reset message template, which has prevented emailing a reset to {username}", ['username' => $user['username']]);
-      return NULL;
-    }
-    if (!filter_var($user['uf_name'] ?? '', \FILTER_VALIDATE_EMAIL)) {
-      Civi::log()->warning("User $user[id] has an invalid email. Failed to send password reset.");
-      return NULL;
-    }
-
-    // The template_params are used in the template like {$resetUrlHtml} and {$resetUrlHtml} {$usernamePlaintext} {$usernameHtml}
-    [$domainFromName, $domainFromEmail] = \CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
-    $workflowMessage = (new \CRM_Standaloneusers_WorkflowMessage_PasswordReset())
-      ->setDataFromUser($user, $token)
-      ->setFrom("\"$domainFromName\" <$domainFromEmail>");
-
-    return $workflowMessage;
   }
 
 }
