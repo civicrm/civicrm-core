@@ -547,6 +547,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
       $payment = $this->_paymentProcessor['object'];
       $paymentParams['currency'] = $this->getCurrency();
+      $payment->setBackOffice(TRUE);
       $result = $payment->doPayment($paymentParams);
       $this->_params = array_merge($this->_params, $result);
 

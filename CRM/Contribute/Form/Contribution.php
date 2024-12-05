@@ -1306,6 +1306,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       // force a re-get of the payment processor in case the form changed it, CRM-7179
       // NOTE - I expect this is obsolete.
       $payment = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
+      $payment->setBackOffice(TRUE);
       try {
         $completeStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
         $result = $payment->doPayment($paymentParams, 'contribute');

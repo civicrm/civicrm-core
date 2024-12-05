@@ -1172,6 +1172,7 @@ DESC limit 1");
 
       if ($this->order->getTotalAmount() > 0.0) {
         $payment = $this->_paymentProcessor['object'];
+        $payment->setBackOffice(TRUE);
         try {
           $result = $payment->doPayment($paymentParams);
           $formValues = array_merge($formValues, $result);
