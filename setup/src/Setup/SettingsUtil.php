@@ -51,7 +51,11 @@ class SettingsUtil {
     }
 
     foreach ($m->mandatorySettings as $key => $value) {
-      $extraSettings[] = sprintf('$civicrm_setting[%s][%s] = %s;', '\'domain\'', var_export($key, 1), var_export($value, 1));
+      $v = $value;
+      if (str_contains($m->cmsBaseUrl, 'https') && str_contains($value, 'http') && !str_contains($value, 'https')) {
+        $v = str_replace('http', 'https', $v);
+      }
+      $extraSettings[] = sprintf('$civicrm_setting[%s][%s] = %s;', '\'domain\'', var_export($key, 1), var_export($v, 1));
     }
 
     // FIXME $m->defaultSettings, $m->components, $m->extensions, $m->callbacks
