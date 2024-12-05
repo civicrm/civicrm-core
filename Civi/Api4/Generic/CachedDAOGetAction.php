@@ -10,19 +10,17 @@
  +--------------------------------------------------------------------+
  */
 
-namespace Civi\Api4\Action\CustomGroup;
+namespace Civi\Api4\Generic;
 
-use Civi\Api4\Generic\Result;
-use Civi\Api4\Generic\Traits\ArrayQueryActionTrait;
-use Civi\Api4\Generic\Traits\PseudoconstantOutputTrait;
+use Civi\API\Exception\NotImplementedException;
 
 /**
  * @inheritDoc
  *
  */
-class Get extends \Civi\Api4\Generic\DAOGetAction {
-  use ArrayQueryActionTrait;
-  use PseudoconstantOutputTrait;
+class CachedDAOGetAction extends \Civi\Api4\Generic\DAOGetAction {
+  use Traits\ArrayQueryActionTrait;
+  use Traits\PseudoconstantOutputTrait;
 
   /**
    * @var bool
@@ -36,9 +34,32 @@ class Get extends \Civi\Api4\Generic\DAOGetAction {
   protected ?bool $useCache = NULL;
 
   /**
+   * @var callable
+   *   Function(BasicGetAction $thisAction): array[]
+   */
+  private $cacheGetter;
+
+  /**
+   * Cached DAO Get constructor.
+   *
+   * Pass a function that returns the cached records
+   * The cache should contain all the fields in the
+   * EntityRepository schema for this entity. If not override
+   * this class and override getCachedFields as well
+   *
+   * @param string $entityName
+   * @param string $actionName
+   * @param callable $cacheGetter
+   */
+  public function __construct($entityName, $actionName, $cacheGetter = NULL) {
+    parent::__construct($entityName, $actionName);
+    $this->cacheGetter = $cacheGetter;
+  }
+
+  /**
    * @param \Civi\Api4\Generic\Result $result
    *
-   * Use self::getFromCache or DAOGetAction::getObjects
+   * Decide whether to use self::getFromCache or DAOGetAction::getObjects
    */
   protected function getObjects(Result $result): void {
     if (is_null($this->useCache)) {
@@ -62,16 +83,17 @@ class Get extends \Civi\Api4\Generic\DAOGetAction {
       return TRUE;
     }
 
-    $standardFields = \Civi::entity($this->getEntityName())->getFields();
+    $cachedFields = $this->getCachedFields();
+
     foreach ($this->select as $field) {
       [$field] = explode(':', $field);
-      if (!isset($standardFields[$field])) {
+      if (!isset($cachedFields[$field])) {
         return TRUE;
       }
     }
     foreach ($this->where as $clause) {
       [$field] = explode(':', $clause[0] ?? '');
-      if (!$field || !isset($standardFields[$field])) {
+      if (!$field || !isset($cachedFields[$field])) {
         return TRUE;
       }
       // ArrayQueryTrait doesn't yet support field-to-field comparisons
@@ -81,11 +103,24 @@ class Get extends \Civi\Api4\Generic\DAOGetAction {
     }
     foreach ($this->orderBy as $field => $dir) {
       [$field] = explode(':', $field);
-      if (!isset($standardFields[$field])) {
+      if (!isset($cachedFields[$field])) {
         return TRUE;
       }
     }
     return FALSE;
+  }
+
+  /**
+   * Which fields are included in the cache?
+   *
+   * By default, this is standard fields from the
+   * EntityRepository schema - but could be overridden
+   * in child classes.
+   *
+   * @return array with known fields as array *keys*
+   */
+  protected function getCachedFields(): array {
+    return \Civi::entity($this->getEntityName())->getFields();
   }
 
   /**
@@ -100,8 +135,11 @@ class Get extends \Civi\Api4\Generic\DAOGetAction {
     $this->queryArray($values, $result);
   }
 
-  protected function getCachedRecords() {
-    return \CRM_Core_BAO_CustomGroup::getAll();
+  protected function getCachedRecords(): array {
+    if (is_callable($this->cacheGetter)) {
+      return call_user_func($this->cacheGetter, $this);
+    }
+    throw new NotImplementedException('Cache getter function not found for api4 ' . $this->getEntityName() . '::' . $this->getActionName());
   }
 
 }

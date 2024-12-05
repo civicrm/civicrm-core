@@ -21,6 +21,7 @@ namespace api\v4\Action;
 
 use api\v4\Api4TestBase;
 use Civi\Api4\CustomGroup;
+use Civi\Api4\CustomField;
 
 /**
  * Test Api4-level caching (currently = CustomGroup)
@@ -42,12 +43,22 @@ class CachedGetTest extends Api4TestBase {
       ->addValue('extends', 'Contact')
       ->addValue('pre_help', 'Some people think lemons are all the same, but some have preferences.')
       ->execute();
+
+    CustomField::create(FALSE)
+      ->addValue('name', 'skin_thickness')
+      ->addValue('label', 'Skin thickness')
+      ->addValue('custom_group_id:name', 'LemonPreferences')
+      ->addValue('html_type', 'Number')
+      ->execute();
   }
 
   /**
    * @inheritDoc
    */
   public function tearDown(): void {
+    CustomField::delete(FALSE)
+      ->addWhere('custom_group_id.name', '=', 'LemonPreferences')
+      ->execute();
     CustomGroup::delete(FALSE)
       ->addWhere('name', '=', 'LemonPreferences')
       ->execute();
@@ -67,6 +78,10 @@ class CachedGetTest extends Api4TestBase {
     $calls[] = CustomGroup::get(FALSE)
       ->addWhere('extends', '=', 'contact');
 
+    // note: pseudoconstant fields should be resolved
+    $calls[] = CustomField::get(FALSE)
+      ->addWhere('custom_group_id:name', '=', 'LemonPreferences');
+
     return $calls;
   }
 
@@ -85,7 +100,9 @@ class CachedGetTest extends Api4TestBase {
     $calls[] = CustomGroup::get(FALSE)
       ->addSelect('UPPER(name)');
 
-    // TODO: cache cant do implicit joins (but none available on CustomGroup)
+    // cache cant do implicit joins
+    $calls[] = CustomField::get(FALSE)
+      ->addSelect('custom_group_id.name');
 
     return $calls;
   }
