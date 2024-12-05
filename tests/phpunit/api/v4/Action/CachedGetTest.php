@@ -66,7 +66,7 @@ class CachedGetTest extends Api4TestBase {
   }
 
   /**
-   * @return \Civi\Api4\Action\AbstractAction[]
+   * @return \Civi\Api4\Generic\CachedDAOGetAction[]
    */
   protected function cacheableCalls(): array {
     $calls = [];
@@ -80,13 +80,19 @@ class CachedGetTest extends Api4TestBase {
 
     // note: pseudoconstant fields should be resolved
     $calls[] = CustomField::get(FALSE)
+      ->addSelect('custom_group_id:label', 'label')
       ->addWhere('custom_group_id:name', '=', 'LemonPreferences');
+
+    // Cache can do simple implicit joins
+    $calls[] = CustomField::get(FALSE)
+      ->addSelect('custom_group_id.name')
+      ->addSelect('custom_group_id.title');
 
     return $calls;
   }
 
   /**
-   * @return \Civi\Api4\Action\AbstractAction[]
+   * @return \Civi\Api4\Generic\CachedDAOGetAction[]
    */
   protected function uncacheableCalls(): array {
     $calls = [];
@@ -100,9 +106,10 @@ class CachedGetTest extends Api4TestBase {
     $calls[] = CustomGroup::get(FALSE)
       ->addSelect('UPPER(name)');
 
-    // cache cant do implicit joins
+    // cache cant do implicit joins with pseudoconstants
     $calls[] = CustomField::get(FALSE)
-      ->addSelect('custom_group_id.name');
+      ->addSelect('custom_group_id.name')
+      ->addSelect('custom_group_id.extends:label');
 
     return $calls;
   }
@@ -113,14 +120,19 @@ class CachedGetTest extends Api4TestBase {
    */
   public function testCachedGetMatchesDatabase(): void {
     foreach ($this->cacheableCalls() as $call) {
+      $call->setDebug(TRUE);
       // we need two copies of the API action object
       $dbCall = clone $call;
 
-      $cacheResult = (array) $call->setUseCache(TRUE)->execute();
+      $cacheResult = $call->setUseCache(TRUE)->execute();
 
-      $dbResult = (array) $dbCall->setUseCache(FALSE)->execute();
+      $dbResult = $dbCall->setUseCache(FALSE)->execute();
 
-      $this->assertEquals($cacheResult, $dbResult);
+      // Assert cache was actually used
+      $this->assertTrue($cacheResult->debug['useCache']);
+      $this->assertFalse($dbResult->debug['useCache']);
+
+      $this->assertEquals((array) $cacheResult, (array) $dbResult);
     }
   }
 
@@ -132,14 +144,15 @@ class CachedGetTest extends Api4TestBase {
    */
   public function testHardQueryUsesDatabaseByDefault(): void {
     foreach ($this->uncacheableCalls() as $call) {
-      // we need two copies of the API action object
-      $dbCall = clone $call;
 
-      $defaultResult = (array) $call->execute();
+      $dbResult = $call
+        // This setting will be overridden due to the complexity of the api call
+        ->setUseCache(TRUE)
+        ->setDebug(TRUE)
+        ->execute();
 
-      $dbResult = (array) $dbCall->setUseCache(FALSE)->execute();
-
-      $this->assertEquals($defaultResult, $dbResult);
+      $this->assertFalse($dbResult->debug['useCache']);
+      $this->assertGreaterThanOrEqual(1, $dbResult->count());
     }
   }
 
