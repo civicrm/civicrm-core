@@ -10,7 +10,7 @@ return [
     'description' => ts('Formerly civicrm_contribution_type merged into this table in 4.3'),
     'log' => TRUE,
     'add' => '1.3',
-    'label_field' => 'name',
+    'label_field' => 'label',
   ],
   'getPaths' => fn() => [
     'add' => 'civicrm/admin/financial/financialType/edit?action=add&reset=1',

@@ -244,6 +244,10 @@
      <weight>100</weight>
   </item>
   <item>
+     <path>civicrm/admin/menu/item</path>
+     <page_callback>CRM_Admin_Form_Navigation</page_callback>
+  </item>
+  <item>
      <path>civicrm/admin/options/wordreplacements</path>
      <title>Word Replacements</title>
      <desc>Word Replacements.</desc>

@@ -1,0 +1,436 @@
+/******************
+   VARIABLES
+*******************/
+
+@import url(_variables.css); /* default variables */
+
+/******************
+   RESETS
+*******************/
+
+body {
+  min-height: 100vh;
+}
+.crm-container *,
+.crm-container *::before,
+.crm-container *::after {
+  box-sizing: border-box;
+}
+#crm-container .hiddenElement,
+.crm-container .hiddenElement,
+#bootstrap-theme .collapse {
+  display: none
+}
+#bootstrap-theme .collapse.in,
+#bootstrap-theme .collapse.show /* BS4 */ {
+  display: block;
+}
+.crm-container .clear {
+  clear: both;
+}
+.crm-container table,
+.crm-container th,
+.crm-container tr,
+.crm-container td,
+.crm-container details {
+  background-color: transparent;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  border-radius: unset;
+  height: unset;
+  color: inherit;
+  line-height: inherit;
+  font-family: inherit;
+  font: inherit;
+  font-size: inherit;
+}
+.crm-container tr:hover,
+.crm-container tr:focus,
+.crm-container table.dataTable.hover tbody tr:hover,
+.crm-container table.dataTable.display tbody tr:hover {
+  background-color: transparent;
+}
+/* Remove list styles (bullets/numbers) */
+.crm-container ol,
+.crm-container ul,
+.crm-container menu {
+  list-style: none;
+}
+/* For images to not be able to exceed their container */
+.crm-container img {
+  max-inline-size: 100%;
+  max-block-size: 100%;
+}
+.crm-container img.olTileImage {
+  max-block-size: unset; /* open street map exception */
+}
+.crm-container table {
+  border-collapse: collapse;
+}
+
+/* JQueryUI resets (!important vs JQuery UI css) */
+
+.crm-container .ui-tabs .ui-tabs-panel,
+.crm-container .ui-tabs {
+  padding: 0;
+}
+.crm-container .ui-widget,
+.crm-container .ui-widget input,
+.crm-container.ui-widget input,
+.crm-container .ui-widget select,
+.crm-container.ui-widget select,
+.crm-container .ui-widget textarea,
+.crm-container .ui-widget select,
+.crm-container.ui-widget button,
+.crm-container .ui-widget button,
+.ui-widget.ui-autocomplete,
+.crm-quickSearch-results .ui-widget {
+  font-family: inherit !important;
+  font-size: inherit;
+}
+.crm-container .ui-icon {
+  width: inherit;
+  background-image: none !important;
+}
+.crm-container .ui-icon:hover {
+  background-image: none;
+}
+.crm-container .ui-corner-all {
+  border-radius: 0;
+}
+.crm-container .ui-button-icon-only .ui-icon {
+  position: initial;
+  top: auto;
+  left: auto;
+  margin-top: auto;
+  margin-left: auto;
+  float: right;
+}
+.crm-container .ui-widget-content {
+  color: inherit;
+}
+.crm-container .ui-widget,
+.crm-container .ui-widget-content,
+.ui-tabs .ui-tabs-nav li {
+  border: 0;
+  background: transparent;
+  white-space: unset;
+}
+.crm-container .ui-helper-clearfix::before,
+.crm-container .ui-helper-clearfix::after {
+  display: none;
+}
+
+/******************
+   ACCESSIBILITY
+*******************/
+
+.sr-only { /* text exclusively for screen readers */
+  border: 0;
+  clip: rect(1px, 1px, 1px, 1px);
+  clip-path: inset(50%);
+  height: 1px;
+  width: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+}
+.crm-container .crm-draggable {
+  cursor: move;
+}
+
+/******************
+   TYPE
+*******************/
+
+/* Set Default Type */
+
+.crm-container {
+  font-family: var(--crm-font);
+  font-size: var(--crm-font-size);
+  line-height: 1.4;
+  color: var(--crm-c-text);
+  background: var(--crm-c-page-background);
+}
+.crm-container table,
+.crm-container tr,
+.crm-container tr td,
+.crm-container p,
+.crm-container ul {
+  font-size: var(--crm-font-size);
+  line-height: var(--crm-type-line-height);
+  color: var(--crm-c-text);
+}
+
+/* Core type */
+
+.crm-container strong,
+.crm-container b,
+.crm-container .bold,
+.crm-container .font-bold {
+  font-family: var(--crm-font-bold);
+  font-weight: bold;
+}
+.crm-container em,
+.crm-container .font-italic {
+  font-family: var(--crm-font-italic);
+  font-style: italic;
+}
+.crm-container strong em,
+.crm-container em strong {
+  font-family: var(--crm-font-bold-italic);
+  font-weight: bold;
+  font-style: italic;
+}
+.crm-container .strikethrough {
+  text-decoration: line-through;
+}
+.crm-container .upper {
+  text-transform: uppercase;
+}
+.crm-container h3,
+#bootstrap-theme h3 {
+  background-color: var(--crm-heading-bg);
+  font-size: var(--crm-r1);
+  font-family: var(--crm-font-bold);
+  font-weight: bold;
+  color: var(--crm-heading-col);
+  padding: var(--crm-heading-padding);
+  border-radius: var(--crm-heading-radius);
+  margin: var(--crm-heading-margin);
+}
+
+/* Definition lists */
+
+dl dd,
+dl dl {
+  margin-block-end: var(--crm-m1);
+  margin-inline-start: var(--crm-r1);
+}
+
+/* Practical colors */
+
+.crm-container .del,
+.crm-container .crm-is_deleted,
+.crm-container table.caseSelector td.status-urgent,
+.crm-container p.error,
+.crm-container .status-removed,
+.crm-container .status-overdue,
+.crm-container .status-fatal,
+.crm-container .status-hold,
+.crm-container .status-past,
+.crm-container .crmMailing-error-link .crm-contact-deceased,
+.crm-container .status-warning,
+.crm-container .crm-error,
+.crm-container td.tasklist a:link,
+#bootstrap-theme .has-error .help-block,
+#bootstrap-theme .has-error .control-label,
+#bootstrap-theme .has-error .radio,
+#bootstrap-theme .has-error .checkbox,
+#bootstrap-theme .has-error .radio-inline,
+#bootstrap-theme .has-error .checkbox-inline,
+#bootstrap-theme .has-error.radio label,
+#bootstrap-theme .has-error.checkbox label,
+#bootstrap-theme .has-error.radio-inline label,
+#bootstrap-theme .has-error.checkbox-inline label {
+  color: var(--crm-c-alert);
+}
+.crm-container .font-red {
+  color: var(--crm-c-red-dark);
+}
+.crm-container td.tasklist a:visited,
+#bootstrap-theme .has-success .help-block,
+#bootstrap-theme .has-success .control-label,
+#bootstrap-theme .has-success .radio,
+#bootstrap-theme .has-success .checkbox,
+#bootstrap-theme .has-success .radio-inline,
+#bootstrap-theme .has-success .checkbox-inline,
+#bootstrap-theme .has-success.radio label,
+#bootstrap-theme .has-success.checkbox label,
+#bootstrap-theme .has-success.radio-inline label,
+#bootstrap-theme .has-success.checkbox-inline label {
+  color: var(--crm-c-success);
+}
+#bootstrap-theme .has-warning .help-block,
+#bootstrap-theme .has-warning .control-label,
+#bootstrap-theme .has-warning .radio,
+#bootstrap-theme .has-warning .checkbox,
+#bootstrap-theme .has-warning .radio-inline,
+#bootstrap-theme .has-warning .checkbox-inline,
+#bootstrap-theme .has-warning.radio label,
+#bootstrap-theme .has-warning.checkbox label,
+#bootstrap-theme .has-warning.radio-inline label,
+#bootstrap-theme .has-warning.checkbox-inline label {
+  color: var(--crm-c-warning);
+}
+.crm-container .disabled,
+.crm-container .crm-disabled,
+.crm-container .disabled *,
+.crm-container .cancelled,
+.crm-container .cancelled td,
+.crm-container li.disabled a.ui-tabs-anchor {
+  color: var(--crm-c-inactive);
+}
+
+/* BS3 type styles */
+
+.crm-container .text-left {
+  text-align: left;
+}
+.crm-container .text-right,
+.crm-container td.right {
+  text-align: right;
+}
+.crm-container .text-center {
+  text-align: center;
+}
+.crm-container .text-justify {
+  text-align: justify;
+}
+.crm-container .text-nowrap {
+  white-space: nowrap;
+}
+.crm-container .text-lowercase {
+  text-transform: lowercase;
+}
+.crm-container .text-uppercase,
+.crm-container .initialism {
+  text-transform: uppercase;
+}
+.crm-container .text-capitalize {
+  text-transform: capitalize;
+}
+.crm-container .text-muted,
+.crm-container .diasbled {
+  color: var(--crm-c-inactive);
+}
+.crm-container .text-primary {
+  color: var(--crm-c-primary);
+}
+.crm-container a.text-primary:hover,
+.crm-container a.text-primary:focus {
+  color: var(--crm-c-primary-hover);
+}
+.crm-container .text-success {
+  color: var(--crm-c-success);
+}
+.crm-container .text-info {
+  color: var(--crm-c-info);
+}
+.crm-container .text-warning {
+  color: var(--crm-c-warning);
+}
+.crm-container .text-danger {
+  color: var(--crm-c-alert);
+}
+.crm-container h1,
+.crm-container h2,
+.crm-container h4,
+.crm-container h5,
+.crm-container h6 {
+  color: var(--crm-c-text);
+}
+.crm-container code,
+.crm-container kbd,
+.crm-container samp,
+.crm-container pre {
+  display: block;
+  padding: var(--crm-padding-small);
+  margin: 0 0 var(--crm-padding-small);
+  font-size: var(--crm-font-size) !important /* vs inline css on api3 */;
+  line-height: 1.4  !important /* vs inline css on api3 */;
+  color: var(--crm-c-text);
+  word-break: break-all;
+  word-wrap: break-word;
+  background-color: var(--crm-c-code-background);
+  border: 1px solid var(--crm-c-background4);
+  border-radius: var(--crm-roundness);
+}
+.crm-container pre {
+  white-space: normal;
+  word-break: normal;
+}
+.crm-container pre code {
+  padding: 0;
+  font-size: inherit;
+  color: inherit;
+  white-space: pre-wrap;
+  background-color: transparent;
+  border-radius: 0;
+}
+.crm-container p code {
+  display: inline-block;
+}
+.crm-container .pre-scrollable {
+  max-height: 340px;
+  overflow-y: scroll;
+}
+
+/******************
+   LINK
+*******************/
+
+.crm-container a {
+  color: var(--crm-c-link);
+  text-decoration: var(--crm-link-decoration);
+}
+.crm-container a:hover,
+.crm-container a:focus {
+  color: var(--crm-c-link-hover);
+  text-decoration: var(--crm-link-decoration-hover);
+}
+.crm-container a:focus {
+  outline: 5px auto -webkit-focus-ring-color;
+  outline-offset: -2px;
+}
+
+/******************
+   POSITION
+*******************/
+
+#crm-container /* applied to #crm not .crm to apply only once */ {
+  max-width: 100%;
+  min-height: 100vh;
+  padding: var(--crm-page-padding);
+}
+.crm-container .crm-flex-box {
+  display: flex;
+  flex-wrap: wrap;
+}
+.crm-container .crm-flex-box > * {
+  gap: var(--crm-flex-gap);
+  flex: 1;
+  min-width: 0;
+}
+.crm-container .crm-flex-1 {
+  flex: 1;
+}
+.crm-container .crm-flex-2 {
+  flex: 2;
+}
+.crm-container .crm-flex-3 {
+  flex: 3;
+}
+.crm-container .crm-flex-4 {
+  flex: 4;
+}
+.crm-container .crm-flex-5 {
+  flex: 5;
+}
+.crm-container .css_right,
+.crm-container .float-right,
+.crm-container .pull-right,
+.crm-container .element-right {
+  float: right;
+}
+/* Responsive  */
+
+@media (max-width: 989px) {
+  .crm-container .crm-flex-box,
+  .api4-input /* sections/api4-explorer */ {
+    flex-direction: column;
+  }
+}

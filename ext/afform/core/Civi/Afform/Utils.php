@@ -101,12 +101,22 @@ class Utils {
       (!empty($updatedAfform['server_route']) && $isChanged('title'));
   }
 
-  public static function formatViewValue(string $fieldName, array $fieldInfo, array $values): string {
+  public static function formatViewValue(string $fieldName, array $fieldInfo, array $values, string $entityName = NULL, string $formName = NULL): string {
     $value = $values[$fieldName] ?? NULL;
-    if (isset($value)) {
+    if (isset($value) && $value !== '') {
       $dataType = $fieldInfo['data_type'] ?? NULL;
+      $inputType = $fieldInfo['input_type'] ?? NULL;
       if (!empty($fieldInfo['options'])) {
         $value = FormattingUtil::replacePseudoconstant(array_column($fieldInfo['options'], 'label', 'id'), $value);
+      }
+      elseif ($inputType === 'EntityRef' && !empty($fieldInfo['fk_entity']) && $formName) {
+        $autocomplete = civicrm_api4($fieldInfo['fk_entity'], 'autocomplete', [
+          'checkPermissions' => FALSE,
+          'formName' => "afform:$formName",
+          'fieldName' => "$entityName:$fieldName",
+          'ids' => (array) $value,
+        ]);
+        $value = $autocomplete->column('label');
       }
       elseif ($dataType === 'Boolean') {
         $value = $value ? ts('Yes') : ts('No');

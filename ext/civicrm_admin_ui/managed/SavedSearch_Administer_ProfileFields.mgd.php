@@ -76,6 +76,7 @@ return [
               'dataType' => 'String',
               'label' => E::ts('Field Name'),
               'sortable' => TRUE,
+              'editable' => TRUE,
             ],
             [
               'type' => 'field',

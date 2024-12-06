@@ -1019,7 +1019,7 @@
 - name        : Manish Zope
 
 - github      : MarcMichalsky
-  name        : Marc Michalsky
+  name        : Marc Koch
   organization: forumZFD
 
 - github      : mariav0
@@ -1261,6 +1261,10 @@
   name        : Phil Morice Brubaker
   organization: Just Hope
 
+- github      : pminf
+  name        : Philipp Michael
+  organization: Parlamentwatch e.V.
+
 - github      : pnbpss
   name        : Panu Boonpromsook
 
@@ -1350,6 +1354,10 @@
 - name        : Rareș Pamfil
 
 - github      : Rar9
+
+- github      : rasmuswinter
+  name        : Rasmus Winter
+  organization: Outlandish
 
 - github      : ray-wright
   name        : Ray Wright

@@ -1,0 +1,211 @@
+/* NB: CMS-specific changes should be name-spaced to the CMS *and* .crm-container, with exception of default font-size resets */
+
+/******************
+   BACKDROP
+*******************/
+
+/* Backdrop - html.admin-bar */
+
+html.admin-bar body {
+  background-color: var(--crm-c-page-background);
+}
+html.admin-bar .crm-container {
+  --crm-page-padding: 0;
+}
+html.admin-bar #admin-bar-menu a.civicrm {
+  padding-left: 1.75rem !important;
+}
+html.admin-bar #admin-bar-menu .civicrm .admin-bar-link-icon {
+  display: none;
+}
+
+/******************
+   DRUPAL
+*******************/
+
+/* Drupal - body.page-civicrm */
+
+/* D7 Garland */
+body.page-civicrm > #page {
+  padding: 0;
+  margin: 0;
+  --crm-page-padding: 1rem 3rem;
+}
+body.page-civicrm .crm-container div.status {
+  background-image: none;
+}
+
+/* D8+ */
+body.page-civicrm header.content-header {
+  margin-bottom: 0;
+  background-color: var(--crm-c-background);
+}
+body.page-civicrm main.page-content {
+  margin-top: 0;
+}
+body.page-civicrm header + div.layout-container {
+  background-color: var(--crm-c-page-background) !important;
+  margin: 0 !important; /* use of important vs some themes */
+}
+body.page-civicrm .button {
+  -webkit-font-smoothing: initial;
+}
+body.page-civicrm .page-title {
+  color: var(--crm-c-text);
+}
+
+/* D7 Garland */
+body.page-civicrm #squeeze #crm-container,
+.region-sidebar-first .block-civicrm {
+  padding: 0;
+  --crm-page-padding: 0;
+  --crm-c-page-background: transparent;
+  --crm-input-label-width: 12em;
+}
+body.page-civicrm #squeeze .crm-container ul li:not(.ui-tab) {
+  margin: 0;
+  padding: 0;
+}
+
+/* D7 Seven */
+body.page-civicrm > #branding {
+  background-color: var(--crm-c-page-background);
+}
+body.page-civicrm > #branding + #page {
+  --crm-page-padding: 0.5rem 1.25rem;
+}
+
+/* D9 Claro */
+body.page-civicrm {
+  color: unset;
+}
+body.page-civicrm .breadcrumb__item,
+body.page-civicrm .breadcrumb__link {
+  color: var(--crm-c-text);
+}
+#block-claro-content {
+  --crm-page-padding: 3rem;
+  --crm-page-width: calc(100% - var(--crm-page-padding) - var(--crm-page-padding));
+}
+#block-claro-content .crm-container:not(.crm-public) .form-item,
+#block-claro-content .crm-container p,
+#block-claro-content .crm-container .help p,
+#block-claro-content .crm-container .button {
+  margin: 0;
+}
+body.page-civicrm .page-content:has(#block-claro-content) {
+  margin-top: 0;
+}
+#block-claro-content .button:not(:focus) {
+  box-shadow: none;
+}
+#block-claro-content .required-mark::after {
+  background-image: unset;
+  display: inherit;
+}
+#block-claro-content .action-link + .action-link {
+  margin-inline-start: unset;
+}
+@media (max-width: 959px) {
+  #block-claro-content {
+    --crm-page-padding: 1rem;
+  }
+}
+
+/* D9 Seven */
+#block-seven-content {
+  --crm-page-padding: 2rem;
+}
+#block-seven-breadcrumbs {
+  --crm-page-padding: 2rem;
+  padding: 0 var(--crm-page-padding);
+}
+#block-seven-content .button {
+  text-shadow: none;
+  margin-left: 0;
+}
+#block-seven-content .form-composite > legend,
+#block-seven-content .label {
+  font-weight: inherit;
+}
+
+/* Bootstrap 4 */
+body.page-civicrm main > .container:has(#block-bootstrap4-content) {
+  max-width: 100%;
+  background: var(--crm-c-page-background);
+}
+
+/******************
+   WORDPRESS
+*******************/
+
+body.toplevel_page_CiviCRM.wp-admin {
+  background: var(--crm-c-page-background);
+}
+body.toplevel_page_CiviCRM #wpcontent {
+  padding-left: 0; /* resets WP padding */
+}
+body.wp-admin .crm-container {
+  --crm-page-padding: 1rem 2rem;
+}
+body.wp-admin .crm-title {
+  line-height: 1.1;
+  margin-bottom: 8px;
+}
+body.wp-admin .crm-container input:not([type=checkbox]):not([type=radio]):not(.crm-form-time) {
+  margin: 0;
+}
+body.wp-admin .crm-container p,
+body.wp-admin .crm-container li {
+  margin: 0; /* resets WP li bottom margin */
+  list-style: none;
+  white-space: inherit;
+}
+body.wp-admin .crm-container div.ui-notify-message .notify-content li {
+  list-style: unset;
+}
+body.wp-admin .crm-container .button {
+  line-height: inherit;
+  font-size: inherit;
+}
+body.wp-admin .breadcrumb .crm-i {
+  font-size: smaller;
+}
+body.wp-admin.page-civicrm-contact .breadcrumb {
+  display: none; /* Hides breadcrumb on contact dashboard */
+}
+body.wp-admin.wp-core-ui .crm-container select {
+  margin: 0;
+  appearance: auto;
+  background-image: none;
+}
+body.wp-admin.wp-core-ui.toplevel_page_CiviCRM select:hover {
+  color: var(--crm-input-color);
+}
+body.wp-admin .crm-container input[type="checkbox"],
+body.wp-admin .crm-container input[type="radio"] {
+  appearance: none;
+  border-radius: var(--crm-s);
+  background: #fff;
+  height: var(--crm-r);
+  width: var(--crm-r);
+}
+body.wp-admin .crm-container input[type="radio"] {
+  border-radius: 50%;
+}
+
+/******************
+   STANDALONE
+*******************/
+
+html.crm-standalone {
+  --crm-page-width: 94vw;
+  --crm-page-padding: 1px 3vw 1rem;
+}
+html.crm-standalone body {
+  margin: unset;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue",sans-serif; /* Adds fallback for base font */
+}
+html.crm-standalone #crm-container:has(.standalone-auth-form) {
+  background: var(--crm-c-background);
+}

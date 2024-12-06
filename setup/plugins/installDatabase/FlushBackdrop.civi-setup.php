@@ -24,7 +24,7 @@ if (!defined('CIVI_SETUP')) {
     $failure = FALSE;
 
     system_rebuild_module_data();
-    module_enable(array('civicrm', 'civicrmtheme'));
+    module_enable(['civicrm']);
     backdrop_flush_all_caches();
     civicrm_install_set_backdrop_perms();
   }, \Civi\Setup::PRIORITY_LATE + 50);

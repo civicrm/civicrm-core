@@ -36,6 +36,7 @@
             'api_entity',
             'api_entity:label',
             'api_params',
+            'is_template',
             // These two need to be in the select clause so they are allowed as filters
             'created_id.display_name',
             'modified_id.display_name',
@@ -81,7 +82,8 @@
         this.initializeDisplay($scope, $element);
         // Keep tab counts up-to-date - put rowCount in current tab if there are no other filters
         $scope.$watch('$ctrl.rowCount', function(val) {
-          if (typeof val === 'number' && angular.equals(['has_base'], getActiveFilters())) {
+          let activeFilters = getActiveFilters().filter(item => item !== 'has_base' && item !== 'is_template');
+          if (typeof val === 'number' && !activeFilters.length) {
             ctrl.tabCount = val;
           }
         });
@@ -237,7 +239,7 @@
             ]
           }
         };
-        if (ctrl.afformEnabled) {
+        if (ctrl.afformEnabled && !ctrl.filters.is_template) {
           ctrl.display.settings.columns.push({
             type: 'include',
             label: ts('Forms'),
@@ -245,24 +247,26 @@
           });
         }
         // Add scheduled communication column if user is allowed to use them
-        if (scheduledCommunicationsAllowed) {
+        if (scheduledCommunicationsAllowed && !ctrl.filters.is_template) {
           ctrl.display.settings.columns.push({
             type: 'include',
             label: ts('Communications'),
             path: '~/crmSearchAdmin/searchListing/communications.html'
           });
         }
-        ctrl.display.settings.columns.push(
-          searchMeta.fieldToColumn('GROUP_CONCAT(UNIQUE group.title) AS groups', {
-            label: ts('Smart Group')
-          })
-        );
-        if (ctrl.filters.has_base) {
+        if (!ctrl.filters.is_template) {
+          ctrl.display.settings.columns.push(
+            searchMeta.fieldToColumn('GROUP_CONCAT(UNIQUE group.title) AS groups', {
+              label: ts('Smart Group')
+            })
+          );
+        }
+        if (ctrl.filters.has_base || ctrl.filters.is_template) {
           ctrl.display.settings.columns.push(
             searchMeta.fieldToColumn('base_module:label', {
               label: ts('Package'),
               title: '[base_module]',
-              empty_value: ts('Missing'),
+              empty_value: ctrl.filters.has_base ? ts('Missing') : null,
               cssRules: [
                 ['font-italic', 'base_module:label', 'IS EMPTY']
               ]
@@ -297,13 +301,15 @@
             })
           );
         }
-        ctrl.display.settings.columns.push(
-          searchMeta.fieldToColumn('expires_date', {
-            label: ts('Expires'),
-            title: '[expires_date]',
-            rewrite: '[expires]'
-          })
-        );
+        if (!ctrl.filters.is_template) {
+          ctrl.display.settings.columns.push(
+            searchMeta.fieldToColumn('expires_date', {
+              label: ts('Expires'),
+              title: '[expires_date]',
+              rewrite: '[expires]'
+            })
+          );
+        }
         ctrl.display.settings.columns.push({
           type: 'include',
           alignment: 'text-right',

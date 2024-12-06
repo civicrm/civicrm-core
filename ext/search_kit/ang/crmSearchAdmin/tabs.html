@@ -31,7 +31,7 @@
     <i class="crm-i fa-plus"></i> {{:: ts('Add...') }} <span class="caret"></span>
   </button>
   <ul class="dropdown-menu">
-    <li ng-if="!$ctrl.savedSearch.groups.length" title="{{:: ts('Smart group of contacts based on search results') }}">
+    <li ng-if="$ctrl.canAddSmartGroup()" title="{{:: ts('Smart group of contacts based on search results') }}">
       <a href ng-click="$ctrl.addGroup()">
         <i class="crm-i fa-users"></i>
         {{:: ts('Smart Group') }}

@@ -26,6 +26,8 @@ final class FkEntityDeleteSubscriber extends AutoSubscriber {
     foreach ($this->getReferenceFieldNames($fkEntity, 'cascade') as $entity => $referenceFieldName) {
       civicrm_api4($entity, 'delete', [
         'where' => [[$referenceFieldName, '=', $id]],
+        // Cascade deletion shall be performed independent of current user's permissions.
+        'checkPermissions' => FALSE,
       ]);
     }
   }

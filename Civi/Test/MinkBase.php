@@ -44,7 +44,8 @@ abstract class MinkBase extends \CiviEndToEndTestCase {
       'sub' => 'cid:' . $this->getUserId($user),
       'scope' => 'authx',
     ]);
-    $loginUrl = Civi::url('backend://civicrm/authx/login')->addQuery([
+    // The use of frontend:// or backend:// is abstract on some env's. For WP, only 'frontend' supports auth
+    $loginUrl = Civi::url('frontend://civicrm/authx/login')->addQuery([
       '_authx' => 'Bearer ' . $tok,
       '_authxSes' => 1,
     ]);

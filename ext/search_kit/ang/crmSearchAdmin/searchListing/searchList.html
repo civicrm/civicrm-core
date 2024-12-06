@@ -18,22 +18,22 @@
       </li>
     </ul>
     <div class="btn-group" ng-if="$ctrl.tab !== 'segment'">
-      <a class="btn btn-primary" href="#/create/Contact" >
+      <a class="btn btn-primary" ng-href="#/create/Contact?is_template={{ $ctrl.tab === 'template' ? 1 : 0}}" >
         <i class="crm-i fa-plus"></i>
-        {{:: ts('New Search') }}
+        {{ $ctrl.tab === 'template' ? ts('New Template') : ts('New Search') }}
       </a>
       <button type="button" ng-click="$ctrl.getPrimaryEntities()" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <span class="caret"></span>
       </button>
       <ul class="dropdown-menu dropdown-menu-right">
         <li ng-repeat="entity in $ctrl.primaryEntities">
-          <a ng-href="#/create/{{ entity.name }}">
+          <a ng-href="#/create/{{ entity.name }}?is_template={{ $ctrl.tab === 'template' ? 1 : 0}}">
             <i class="crm-i {{:: entity.icon }}"></i>
             {{:: entity.title_plural }}
           </a>
         </li>
         <li title="{{:: ts('Choose other entities on the search screen') }}">
-          <a href="#/create/Contact">{{:: ts('More...') }}</a>
+          <a ng-href="#/create/Contact?is_template={{ $ctrl.tab === 'template' ? 1 : 0}}">{{:: ts('More...') }}</a>
         </li>
       </ul>
     </div>

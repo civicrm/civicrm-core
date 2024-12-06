@@ -165,7 +165,7 @@
       // Generate params for the SearchDisplay.run api
       getApiParams: function(mode) {
         return {
-          return: mode || 'page:' + this.page,
+          return: arguments.length ? mode : 'page:' + this.page,
           savedSearch: this.search,
           display: this.display,
           sort: this.sort,
@@ -201,7 +201,7 @@
             return; // Another request started after this one
           }
           ctrl.results = apiResults.run;
-          ctrl.editing = ctrl.loading = false;
+          ctrl.loading = false;
           // Update rowCount if running for the first time or during an update op
           if (!ctrl.rowCount || editedRow) {
             // No need to fetch count if on page 1 and result count is under the limit
@@ -236,7 +236,7 @@
             return; // Another request started after this one
           }
           ctrl.results = [];
-          ctrl.editing = ctrl.loading = false;
+          ctrl.loading = false;
           _.each(ctrl.onPostRun, function(callback) {
             callback.call(ctrl, error, 'error', editedRow);
           });
@@ -249,9 +249,27 @@
       formatFieldValue: function(colData) {
         return angular.isArray(colData.val) ? colData.val.join(', ') : colData.val;
       },
+
+      // Determine if an editable field is actively in editing mode
       isEditing: function(rowIndex, colIndex) {
         return this.editing && this.editing[0] === rowIndex && this.editing[1] === colIndex;
-      }
+      },
+
+      startEditing: function(rowIndex, colIndex) {
+        if (this.editing === false && this.results[rowIndex].columns[colIndex].edit) {
+          this.editing = [rowIndex, colIndex];
+        }
+      },
+
+      // Determine if a field is not currently loading or editing
+      isViewing: function(rowIndex, colIndex) {
+        return !this.isEditing(rowIndex, colIndex) && !this.isLoading(rowIndex, colIndex);
+      },
+
+      // Determine if a field is currently loading
+      isLoading: function(rowIndex, colIndex) {
+        return !this.isEditing(rowIndex, colIndex) && this.results[rowIndex].columns[colIndex].loading;
+      },
     };
   });
 

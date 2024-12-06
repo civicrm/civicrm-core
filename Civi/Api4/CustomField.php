@@ -26,6 +26,15 @@ class CustomField extends Generic\DAOEntity {
 
   /**
    * @param bool $checkPermissions
+   * @return Action\CustomField\Get
+   */
+  public static function get($checkPermissions = TRUE) {
+    return (new Action\CustomField\Get(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
    * @return Action\CustomField\Create
    */
   public static function create($checkPermissions = TRUE) {

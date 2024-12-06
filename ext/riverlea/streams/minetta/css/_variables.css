@@ -1,0 +1,9 @@
+/*
+    Name: Minetta;
+    Description: Generic CiviCRM UI, somewhat familiar to users of CiviCRM since 2014. Named after Minetta Creek, which runs under Greenwich, New York;
+    Riverlea version: 1.1.0;
+*/
+
+:root {
+  --crm-version: 'Minetta, v' var(--crm-release);
+}

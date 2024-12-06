@@ -38,9 +38,9 @@ class E2E_CivicrmAdminUi_ManageGroupsTest extends \Civi\Test\MinkBase {
     // Test some in-line editing.
     // Equivalent JS: document.querySelector('[data-field-name="is_active"]').querySelector('span').click();
     $isActiveCell = $basicGroupRow->find('css', '[data-field-name="is_active"]');
-    $isActiveField = $isActiveCell->find('css', 'span');
+    $isActiveField = $isActiveCell->find('css', 'span.crm-editable-enabled');
     $isActiveField->click();
-    $isActiveCell->find('css', 'input[value="false"]')->click();
+    $isActiveCell->find('css', 'input[type=radio][value="false"]')->click();
     $isActiveCell->find('css', 'button.btn-success')->click();
     // Confirm the group is now inactive.  But wait until "Saved" appears because of race conditions.
     $session->wait(5000, 'document.querySelectorAll("div.crm-status-box-outer.status-success").length > 0');

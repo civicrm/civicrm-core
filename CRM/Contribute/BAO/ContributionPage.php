@@ -422,7 +422,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         ];
       }
 
-      if (empty($values['receipt_from_name']) && empty($values['receipt_from_name'])) {
+      if (empty($values['receipt_from_email'])) {
         [$values['receipt_from_name'], $values['receipt_from_email']] = CRM_Core_BAO_Domain::getNameAndEmail();
       }
 

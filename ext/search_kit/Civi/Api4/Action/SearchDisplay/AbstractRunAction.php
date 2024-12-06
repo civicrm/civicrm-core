@@ -265,7 +265,14 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         elseif (!empty($column['editable']) && !$column['rewrite']) {
           $edit = $this->formatEditableColumn($column, $data);
           if ($edit) {
-            $out['edit'] = $edit;
+            // When internally processing an inline-edit, get all metadata
+            if (isset($this->colKey) && $this->colKey === $column['key']) {
+              $out['edit'] = $edit;
+            }
+            // Otherwise, the client only needs a boolean
+            else {
+              $out['edit'] = TRUE;
+            }
           }
         }
         if ($column['type'] === 'html') {
@@ -1010,7 +1017,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @param array $data
    * @return array{entity: string, action: string, input_type: string, data_type: string, options: bool, serialize: bool, nullable: bool, fk_entity: string, value_key: string, record: array, value_path: string}|null
    */
-  private function formatEditableColumn($column, $data) {
+  protected function formatEditableColumn($column, $data) {
     $editable = $this->getEditableInfo($column['key']);
     $editable['record'] = [];
     // Generate params to edit existing record
@@ -1069,21 +1076,18 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       }
       $entityValues = $editable['record'];
     }
-    // Ensure current user has access
+    // Ensure either the display uses acl_bypass or the current user has access
     if ($editable['record']) {
-      $access = civicrm_api4($editable['entity'], 'checkAccess', [
-        'action' => $editable['action'],
-        'values' => $entityValues,
-      ], 0)['access'];
+      if (!empty($this->display['settings']['acl_bypass'])) {
+        $access = TRUE;
+      }
+      else {
+        $access = civicrm_api4($editable['entity'], 'checkAccess', [
+          'action' => $editable['action'],
+          'values' => $entityValues,
+        ], 0)['access'];
+      }
       if ($access) {
-        // Add currency formatting info
-        if ($editable['data_type'] === 'Money') {
-          $currencyField = $this->getCurrencyField($column['key']);
-          $currency = is_string($data[$currencyField] ?? NULL) ? $data[$currencyField] : NULL;
-          $editable['currency_format'] = \Civi::format()->money(1234.56, $currency);
-        }
-        // Remove info that's for internal use only
-        \CRM_Utils_Array::remove($editable, 'id_key', 'id_path', 'explicit_join', 'grouping_fields');
         return $editable;
       }
     }
@@ -1119,28 +1123,28 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @param $key
    * @return array{entity: string, input_type: string, data_type: string, options: bool, serialize: bool, nullable: bool, fk_entity: string, value_key: string, value_path: string, id_key: string, id_path: string, explicit_join: string, grouping_fields: array}|null
    */
-  private function getEditableInfo($key) {
+  protected function getEditableInfo($key) {
+    // Strip pseudoconstant suffix
+    [$key] = explode(':', $key);
     if (array_key_exists($key, $this->editableInfo)) {
       return $this->editableInfo[$key];
     }
-    // Strip pseudoconstant suffix
-    [$key] = explode(':', $key);
-    $field = $this->getField($key);
+    $getModeField = $this->getField($key);
     // If field is an implicit join to another entity (not a custom group), use the original fk field
-    if (!empty($field['implicit_join']) && empty($field['custom_field_id'])) {
-      return $this->getEditableInfo(substr($key, 0, -1 - strlen($field['name'])));
+    if (!empty($getModeField['implicit_join']) && empty($getModeField['custom_field_id'])) {
+      return $this->getEditableInfo(substr($key, 0, -1 - strlen($getModeField['name'])));
     }
     $result = NULL;
-    if ($field) {
+    if ($getModeField) {
       // Reload field with correct action because `$this->getField()` uses 'get' as the action
-      // TODO: Load options if pseudoconstant is dynamic (`ControlField` present)
-      $createModeField = civicrm_api4($field['entity'], 'getFields', [
-        'where' => [['name', '=', $field['name']]],
-        'checkPermissions' => FALSE,
+      $createModeField = civicrm_api4($getModeField['entity'], 'getFields', [
+        'where' => [['name', '=', $getModeField['name']]],
+        'checkPermissions' => empty($this->display['settings']['acl_bypass']),
+        'loadOptions' => ['id', 'name', 'label', 'description', 'color', 'icon'],
         'action' => 'create',
       ])->first() ?? [];
       // Merge with the augmented metadata like `explicit_join`
-      $field = $createModeField + $field;
+      $field = $createModeField + $getModeField;
       $idKey = CoreUtil::getIdFieldName($field['entity']);
       $path = (!empty($field['explicit_join']) ? $field['explicit_join'] . '.' : '');
       $idPath = $path . $idKey;
@@ -1153,7 +1157,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         'entity' => $field['entity'],
         'input_type' => $field['input_type'],
         'data_type' => $field['data_type'],
-        'options' => !empty($field['options']),
+        'options' => $field['options'],
         'serialize' => !empty($field['serialize']),
         'nullable' => !empty($field['nullable']),
         'fk_entity' => $field['fk_entity'],
@@ -1162,8 +1166,14 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         'id_key' => $idKey,
         'id_path' => $idPath,
         'explicit_join' => $field['explicit_join'],
+        'control_field' => $field['input_attrs']['control_field'] ?? NULL,
         'grouping_fields' => [],
       ];
+      // With a control field present, options must be loaded dynamically clientside
+      // See crmSearchDisplayEditable.loadOptions()
+      if ($result['control_field'] && $getModeField['options']) {
+        $result['options'] = TRUE;
+      }
       // Grouping fields get added to the query so that contact sub-type and entity type (for custom fields)
       // are available to filter fields specific to an entity sub-type. See self::fieldBelongsToEntity()
       if ($field['type'] === 'Custom' || $field['entity'] === 'Contact') {
@@ -1362,16 +1372,10 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @param array $apiParams
    */
   protected function augmentSelectClause(&$apiParams): void {
+    $isEditable = FALSE;
     // Don't mess with EntitySets
     if ($this->savedSearch['api_entity'] === 'EntitySet') {
       return;
-    }
-    // Add primary key field if actions are enabled
-    // (only needed for non-dao entities, as Api4SelectQuery will auto-add the id)
-    if (!CoreUtil::isType($this->savedSearch['api_entity'], 'DAOEntity') &&
-      (!empty($this->display['settings']['actions']) || !empty($this->display['settings']['draggable']))
-    ) {
-      $this->addSelectExpression(CoreUtil::getIdFieldName($this->savedSearch['api_entity']));
     }
     // Add `depth_` column for hierarchical entity displays
     if (!empty($this->display['settings']['hierarchical'])) {
@@ -1409,6 +1413,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
 
       // Select id, value & grouping for in-place editing
       if (!empty($column['editable'])) {
+        $isEditable = TRUE;
         $editable = $this->getEditableInfo($column['key']);
         if ($editable) {
           foreach (array_merge($editable['grouping_fields'], [$editable['value_path'], $editable['id_path']]) as $addition) {
@@ -1424,6 +1429,15 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         $this->addSelectExpression($addition);
       }
     }
+
+    // Add primary key field if actions, draggable, or editable are enabled
+    // (only needed for non-dao entities, as Api4SelectQuery will auto-add the id)
+    if (!CoreUtil::isType($this->savedSearch['api_entity'], 'DAOEntity') &&
+      ($isEditable  || !empty($this->display['settings']['actions']) || !empty($this->display['settings']['draggable']))
+    ) {
+      $this->addSelectExpression(CoreUtil::getIdFieldName($this->savedSearch['api_entity']));
+    }
+
     // Add fields referenced via token
     foreach ($this->getTokens($possibleTokens) as $addition) {
       $this->addSelectExpression($addition);

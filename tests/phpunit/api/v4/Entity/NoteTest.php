@@ -149,4 +149,83 @@ class NoteTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(1, substr_count($visibleNotes->debug['sql'][0], 'civicrm_acl_contact_cache'));
   }
 
+  public function testGetHierarchicalNotes(): void {
+    $c1 = $this->createTestRecord('Individual');
+    $c2 = $this->createTestRecord('Individual');
+    $text = uniqid(__FUNCTION__, TRUE);
+
+    // Create 2 top-level notes.
+    $topNotes = Note::save(FALSE)
+      ->setRecords([
+        ['note' => $text, 'subject' => 'Top B'],
+        ['note' => $text, 'subject' => 'Top A'],
+      ])
+      ->setDefaults([
+        'entity_id' => $c1['id'],
+        'entity_table' => 'civicrm_contact',
+      ])->execute();
+
+    // Add 2 children of the first note
+    $children = Note::save(FALSE)
+      ->setRecords([
+        ['note' => $text, 'subject' => 'Mid A'],
+        ['note' => $text, 'subject' => 'Mid B'],
+      ])
+      ->setDefaults([
+        'entity_id' => $topNotes[0]['id'],
+        'entity_table' => 'civicrm_note',
+      ])->execute();
+
+    // Add 2 children of the first child, 1 of 2nd child
+    $grandChildren = Note::save(FALSE)
+      ->setRecords([
+        ['note' => $text, 'subject' => 'Bottom B', 'entity_id' => $children[0]['id']],
+        ['note' => $text, 'subject' => 'Bottom A', 'entity_id' => $children[0]['id']],
+        ['note' => $text, 'subject' => 'Bottom C', 'entity_id' => $children[1]['id']],
+      ])
+      ->setDefaults([
+        'entity_table' => 'civicrm_note',
+      ])->execute();
+
+    // Create 2 red herring notes for a different contact
+    $redHerrings = Note::save(FALSE)
+      ->setRecords([['note' => $text, 'subject' => 'Red'], ['note' => $text, 'subject' => 'Herring']])
+      ->setDefaults([
+        'entity_id' => $c2['id'],
+        'entity_table' => 'civicrm_contact',
+      ])->execute();
+    Note::save(FALSE)
+      ->setRecords([
+        ['note' => $text, 'subject' => 'Red Child', 'entity_id' => $redHerrings[0]['id']],
+        ['note' => $text, 'subject' => 'Herring Child', 'entity_id' => $redHerrings[1]['id']],
+      ])
+      ->setDefaults([
+        'entity_table' => 'civicrm_note',
+      ])->execute();
+
+    // Get hierarchy for a single contact
+    $notes = Note::get(FALSE)
+      ->addSelect('id', 'subject', '_depth', '_descendents')
+      ->addWhere('entity_id', 'IN', [$c1['id']])
+      ->addWhere('entity_table', 'IN', ['civicrm_contact'])
+      ->addOrderBy('subject', 'ASC')
+      ->execute();
+    $this->assertCount(7, $notes);
+    $this->assertSame(['Top A', 'Top B', 'Mid A', 'Bottom A', 'Bottom B', 'Mid B', 'Bottom C'], $notes->column('subject'));
+    $this->assertSame([0, 0, 1, 2, 2, 1, 2], $notes->column('_depth'));
+    $this->assertSame([0, 5, 2, 0, 0, 1, 0], $notes->column('_descendents'));
+
+    // Get entire hierarchy
+    $notes = Note::get(FALSE)
+      ->addSelect('id', 'subject', '_depth', '_descendents')
+      ->addWhere('note', '=', $text)
+      ->addWhere('entity_table', 'IN', ['civicrm_contact', 'civicrm_note'])
+      ->addOrderBy('subject', 'ASC')
+      ->execute();
+    $this->assertCount(11, $notes);
+    $this->assertSame(['Herring', 'Herring Child', 'Red', 'Red Child', 'Top A', 'Top B', 'Mid A', 'Bottom A', 'Bottom B', 'Mid B', 'Bottom C'], $notes->column('subject'));
+    $this->assertSame([0, 1, 0, 1, 0, 0, 1, 2, 2, 1, 2], $notes->column('_depth'));
+    $this->assertSame([1, 0, 1, 0, 0, 5, 2, 0, 0, 1, 0], $notes->column('_descendents'));
+  }
+
 }

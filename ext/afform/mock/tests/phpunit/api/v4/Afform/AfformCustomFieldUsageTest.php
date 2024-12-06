@@ -70,8 +70,8 @@ EOHTML;
     $this->assertEquals('my_text', $block['layout'][0]['name']);
     $this->assertEquals('my_friend', $block['layout'][1]['name']);
 
-    $cid1 = $this->individualCreate([], 1);
-    $cid2 = $this->individualCreate([], 2);
+    $cid1 = $this->createTestRecord('Individual')['id'];
+    $cid2 = $this->createTestRecord('Individual')['id'];
 
     $this->useValues([
       'layout' => self::$layouts['customMulti'],

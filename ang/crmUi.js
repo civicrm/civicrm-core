@@ -87,21 +87,24 @@
           settings.start_date_years = settings.start_date_years || 100;
           settings.end_date_years = settings.end_date_years || 100;
 
-          element
-            .crmDatepicker(settings)
-            .on('change', function() {
-              // Because change gets triggered from the $render function we could be either inside or outside the $digest cycle
-              $timeout(function() {
-                let requiredLength = 19;
-                if (settings.time === false) {
-                  requiredLength = 10;
-                }
-                if (settings.date === false) {
-                  requiredLength = 8;
-                }
-                ngModel.$setValidity('incompleteDateTime', !(element.val().length && element.val().length !== requiredLength));
+          // Wait for interpolated elements like {{placeholder}} to render
+          $timeout(function() {
+            element
+              .crmDatepicker(settings)
+              .on('change', function () {
+                // Because change gets triggered from the $render function we could be either inside or outside the $digest cycle
+                $timeout(function() {
+                  let requiredLength = 19;
+                  if (settings.time === false) {
+                    requiredLength = 10;
+                  }
+                  if (settings.date === false) {
+                    requiredLength = 8;
+                  }
+                  ngModel.$setValidity('incompleteDateTime', !(element.val().length && element.val().length !== requiredLength));
+                });
               });
-            });
+          });
         }
       };
     })
@@ -658,7 +661,8 @@
               };
             });
           } else {
-            init();
+            // Wait for interpolated elements like {{placeholder}} to render
+            $timeout(init);
           }
         }
       };

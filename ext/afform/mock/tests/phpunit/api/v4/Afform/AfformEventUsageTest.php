@@ -11,22 +11,21 @@ use Civi\Test\TransactionalInterface;
  * @group headless
  */
 class AfformEventUsageTest extends AfformUsageTestCase implements TransactionalInterface {
-  use \Civi\Test\Api4TestTrait;
 
   /**
    * Tests prefilling an event from a template
    */
   public function testEventTemplatePrefill(): void {
-    $locBlock1 = $this->createTestEntity('LocBlock', [
-      'email_id' => $this->createTestEntity('Email', ['email' => '1@te.st'])['id'],
-      'phone_id' => $this->createTestEntity('Phone', ['phone' => '1234567'])['id'],
+    $locBlock1 = $this->createTestRecord('LocBlock', [
+      'email_id' => $this->createTestRecord('Email', ['email' => '1@te.st'])['id'],
+      'phone_id' => $this->createTestRecord('Phone', ['phone' => '1234567'])['id'],
     ]);
-    $locBlock2 = $this->createTestEntity('LocBlock', [
-      'email_id' => $this->createTestEntity('Email', ['email' => '2@te.st'])['id'],
-      'phone_id' => $this->createTestEntity('Phone', ['phone' => '2234567'])['id'],
+    $locBlock2 = $this->createTestRecord('LocBlock', [
+      'email_id' => $this->createTestRecord('Email', ['email' => '2@te.st'])['id'],
+      'phone_id' => $this->createTestRecord('Phone', ['phone' => '2234567'])['id'],
     ]);
 
-    $eventTemplate = $this->createTestEntity('Event', [
+    $eventTemplate = $this->createTestRecord('Event', [
       'template_title' => 'Test Template Title',
       'title' => 'Test Me',
       'event_type_id' => 1,

@@ -47,7 +47,7 @@ class CRM_Core_IDS {
     }
 
     // lets bypass a few civicrm urls from this check
-    $skip = ['civicrm/admin/setting/updateConfigBackend', 'civicrm/admin/messageTemplates', 'civicrm/ajax/api4'];
+    $skip = ['civicrm/admin/setting/updateConfigBackend', 'civicrm/admin/messageTemplates', 'civicrm/ajax/api4', 'civicrm/payment/ipn'];
     CRM_Utils_Hook::idsException($skip);
     $this->path = $route['path'];
     if (in_array($this->path, $skip)) {

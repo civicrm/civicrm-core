@@ -452,10 +452,11 @@ class CRM_Core_Session {
    * Stores an alert to be displayed to the user via crm-messages.
    *
    * @param string $text
-   *   The status message
+   *   The status message.
    *
    * @param string $title
-   *   The optional title of this message
+   *   The optional title of this message. For accessibility reasons,
+   *   please terminate with a full stop/period.
    *
    * @param string $type
    *   The type of this message (printed as a css class). Possible options:

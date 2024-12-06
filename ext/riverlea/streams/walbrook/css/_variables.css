@@ -1,0 +1,218 @@
+/*
+    Name: Walbrook;
+    Description: Based on Shoreditch theme. Named after after River Walbrook, which runs under Shoreditch, London;
+    Riverlea version: 1.1.0;
+*/
+
+:root {
+  --crm-version: 'Walbrook, v' var(--crm-release);
+/* Fonts */
+  --crm-system-fonts: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue",sans-serif;
+  --crm-font: "Civitype", "Open Sans", var(--crm-system-fonts);
+  --crm-font-bold: "Civitype-bold", var(--crm-system-fonts);
+  --crm-font-italic: "Civitype-italic", var(--crm-system-fonts);
+  --crm-font-bold-italic: "Civitype", var(--crm-system-fonts);
+/* Colour names */
+  --crm-c-gray-900: #222831;
+  --crm-c-gray-800: #393a3f;
+  --crm-c-gray-700: #75767b;
+  --crm-c-gray-300: #cad5d7;
+  --crm-c-gray-200: #d3dee2;
+  --crm-c-gray-100: #ebeff0;
+  --crm-c-gray-050: #f3f6f7;
+  --crm-c-gray-025: #fcfcfc;
+  --crm-c-blue: #0071bd;
+  --crm-c-blue-light: #dff0f4;
+  --crm-c-blue-dark: #66afe9;
+  --crm-c-blue-darker: #005c99;
+  --crm-c-green: #44cb7e;
+  --crm-c-green-light: #bcecd1;
+  --crm-c-green-dark: var(--crm-c-text);
+  --crm-c-red: #cf3458;
+  --crm-c-red-light: #ecb0be;
+  --crm-c-red-dark: var(--crm-c-text);
+  --crm-c-amber: #e6ab5e;
+  --crm-c-yellow: #f8e80b;
+  --crm-c-teal: #399389;
+/* Practical colours */
+  --crm-c-link: var(--crm-c-blue);
+  --crm-c-link-hover: var(--crm-c-blue-dark);
+  --crm-c-page-background: #e8eef0; /* background to page body */
+  --crm-c-background: #fff; /* background to page header, often form block & dialog bg */
+  --crm-c-drag-background: var(--crm-c-background4); /* background for drag/drop regions, select2 highlight */
+  --crm-c-code-background: var(--crm-c-background3); /* background for code regions */
+  --crm-c-primary: var(--crm-c-blue);
+  --crm-c-primary-hover: var(--crm-c-blue-darker);
+  --crm-c-primary-text: var(--crm-c-light-text); /* text colour when on top of primary */
+  --crm-c-secondary: var(--crm-c-purple);
+  --crm-c-secondary-hover: var(--crm-c-purple-dark);
+  --crm-c-success: var(--crm-c-green);
+  --crm-c-success-text: var(--crm-c-dark-text);
+  --crm-c-alert: var(--crm-c-red);
+  --crm-c-warning-text: var(--crm-c-dark-text);
+  --crm-c-info-text: var(--crm-c-light-text);
+/* Shadows */
+  --crm-block-shadow: 0 3px 18px 0 rgba(48,40,40,.25);
+  --crm-popup-shadow: var(--crm-block-shadow);
+  --crm-body-inset: inset 0 10px 8px -10px rgba(0,0,0,.15),inset 0 -11px 8px -9px rgba(0,0,0,.15);
+/* Sizes */
+  --crm-roundness: 2px;
+  --crm-padding-inset: 0; /* to support flush theme variations */
+  --crm-page-padding: 0; /* Margin left/right */
+/* Type */
+  --crm-link-decoration-hover: none;
+  --crm-heading-bg: var(--crm-c-background3);
+  --crm-heading-padding: var(--crm-m2) var(--crm-m);
+  --crm-heading-margin: 0;
+  --crm-heading-radius: 0;
+/* Buttons */
+  --crm-btn-radius: 2px;
+  --crm-btn-padding-block: var(--crm-m); /* padding for top and bottom, one value */
+  --crm-btn-padding-inline: var(--crm-r2); /* padding for left and right, one value */
+  --crm-btn-small-padding: var(--crm-s1) var(--crm-m1);
+  --crm-btn-height: 40px;
+/* Tables */
+  --crm-table-outside-border: var(--crm-c-divider);
+  --crm-table-background: var(--crm-c-background);
+  --crm-table-header-bottom: var(--crm-c-divider);
+  --crm-table-header-bg: var(--crm-c-background);
+  --crm-table-even-row: #fff;
+  --crm-table-odd-row: var(--crm-c-gray-050);
+  --crm-table-even-hover: var(--crm-c-gray-025);
+  --crm-table-odd-hover: var(--crm-c-gray-100);
+  --crm-table-sort-col: var(--crm-c-gray-500);
+  --crm-table-nested-padding: 0 0 var(--crm-r) 0;
+  --crm-table-nested-head-border: 2px solid var(--crm-c-gray-300);
+  --crm-table-nested-border: 0 solid transparent;
+/* Panels */
+  --crm-panel-head-margin: var(--crm-m2);
+/* Accordions */
+  --crm-expand-icon: "\f105"; /* unicode value for FontAwesome icon */
+  --crm-expand-icon-color: unset;
+  --crm-expand-icon-spacing: var(--crm-m3);
+  --crm-expand-gap: 0;
+/* .crm-accordion-bold */
+  --crm-expand-header-bg: var(--crm-c-background2);
+  --crm-expand-header-bg-active: var(--crm-c-background3);
+  --crm-expand-header-color: var(--crm-c-text);
+  --crm-expand-header-padding: var(--crm-m2) var(--crm-m3);
+  --crm-expand-border: unset;
+  --crm-expand-border-width: unset;
+  --crm-expand-body-bg: transparent;
+  --crm-expand-body-box-shadow: var(--crm-body-inset);
+/* .crm-accordion-light */
+  --crm-expand2-header-bg: var(--crm-c-primary);
+  --crm-expand2-header-bg-active: var(--crm-c-primary-hover);
+  --crm-expand2-header-weight: bold;
+  --crm-expand2-header-font: var(--crm-font-bold);
+  --crm-expand2-header-color: var(--crm-c-primary-text);
+  --crm-expand2-header-padding: var(--crm-expand-header-padding);
+  --crm-expand2-border: 0;
+  --crm-expand2-body-bg: transparent;
+  --crm-expand2-body-padding: 0;
+/* Alerts */
+  --crm-alert-padding: var(--crm-r) var(--crm-r2);
+  --crm-alert-text-help: var(--crm-c-text);
+  --crm-alert-background-warning: var(--crm-c-amber-light);
+  --crm-alert-border-warning: var(--crm-c-amber);
+  --crm-alert-background-info: var(--crm-c-primary);
+  --crm-alert-border-info: var(--crm-c-primary);
+  --crm-alert-text-info: var(--crm-c-primary-text);
+  --crm-alert-text-danger: var(--crm-c-text);
+/* Form */
+  --crm-form-block-padding: var(--crm-r);
+  --crm-form-block-border-radius: 0;
+  --crm-input-background: var(--crm-c-background);
+  --crm-input-background-image: none;
+  --crm-input-color: #464354;
+  --crm-input-border-color: #c2cfd8;
+  --crm-input-border-radius: var(--crm-roundness);
+  --crm-input-box-shadow: inset 0 0 3px 0 rgba(0,0,0,.2);
+  --crm-input-padding: var(--crm-xs1) var(--crm-m1);
+  --crm-input-label-weight: bold;
+  --crm-input-label-font: var(--crm-font-bold);
+  --crm-input-radio-color: var(--crm-c-primary);
+  --crm-inline-edit-border: 1px solid var(--crm-c-gray-900);
+  --crm-fieldset-border-color: unset;
+  --crm-fieldset-border: 0;
+  --crm-fieldset-padding: 0;
+/* Tabs */
+  --crm-tabs-bg: var(--crm-c-background2);
+  --crm-tabs-padding: var(--crm-m) var(--crm-m) 0 var(--crm-m);
+  --crm-tabs-border: var(--crm-c-divider);
+  --crm-tab-roundness: 2px 2px 0 0;
+  --crm-tab-bg-hover: var(--crm-c-background);
+  --crm-tab-bg-active: var(--crm-c-background);
+  --crm-tab-hang: 0 0 -1px 0; /* lip to extend tab flush with active region - set to 0 for no lip */
+  --crm-tab-padding: var(--crm-m2) var(--crm-r1) var(--crm-m);
+  --crm-tab-font: var(--crm-font-bold);
+  --crm-tab-count-bg: transparent;
+  --crm-tab-count-col: var(--crm-c-text);
+  --crm-tab-border-active: var(--crm-c-divider);
+/* Contact dashboard */
+  --crm-dash-border: 0 solid transparent;
+  --crm-dash-roundness: 0;
+  --crm-dash-direction: grid; /* choose 'flex' for tabs at top, or 'grid' for tabs at side */
+  --crm-side-tabs-width: 220px;
+  --crm-dash-tabs-flow: column; /* choose 'row' for tabs at top, or 'column' for tabs at side */
+  --crm-dash-tabs-gap: 0;
+  --crm-dash-tabs-bg: var(--crm-c-background);
+  --crm-dash-tabs-padding: unset;
+  --crm-dash-tab-bg: transparent;
+  --crm-dash-tab-bg-hover: var(--crm-c-background3);
+  --crm-dash-tab-padding: var(--crm-r) var(--crm-r1);
+  --crm-dash-tab-border: var(--crm-dash-border);
+  --crm-dash-tab-border-hover: unset;
+  --crm-dash-tab-col: unset;
+  --crm-dash-tab-count-bg: var(--crm-c-primary);
+  --crm-dash-tab-count-col: var(--crm-c-light-text);
+  --crm-dash-tab-hang: 0 0 -1px 0; /* lip to extend tab flush with active region - set to 0 for no lip */
+  --crm-dash-icon-size: var(--crm-m2);
+  --crm-dash-box-shadow: inset 0 3px 18px -5px rgba(0, 0, 0, 0.25);
+  --crm-dash-panel-padding: var(--crm-r2);
+  --crm-dash-edit-border: 1px dashed var(--crm-c-gray-900);
+  --crm-dash-block-padding: var(--crm-m2);
+  --crm-dash-block-bg: var(--crm-c-background);
+  --crm-dash-label-bg: var(--crm-c-background);
+  --crm-dash-header-bg: var(--crm-c-gray-900);
+  --crm-dash-header-bg2: var(--crm-c-gray-800);
+  --crm-dash-header-col: var(--crm-c-light-text);
+  --crm-dash-header-size: var(--crm-l);
+  --crm-dash-header-padding: var(--crm-r) var(--crm-r1);
+  --crm-dash-image-size: 100px;
+  --crm-dash-image-radius: 200px;
+  --crm-dash-image-right: 30px; /* distance from right of dashboard */
+  --crm-dash-image-top: 30px; /* distance from top of dashboard */
+  --crm-dash-image-border: 2px solid #fff;
+/* Dialog */
+  --crm-dialog-bg: var(--crm-c-background);
+  --crm-dialog-padding: 0;
+  --crm-dialog-line: var(--crm-c-divider);
+  --crm-dialog-header-bg: var(--crm-c-background2);
+  --crm-dialog-header-col: var(--crm-c-text);
+/* Dashlet */
+  --crm-dashlet-border: var(--crm-tab-border);
+  --crm-dashlet-bg: var(--crm-c-background);
+  --crm-dashlet-padding: 0;
+  --crm-dashlet-header-bg: var(--crm-c-secondary);
+  --crm-dashlet-header-col: var(--crm-c-light-text);
+  --crm-dashlet-header-padding: var(--crm-padding-reg);
+  --crm-dashlet-tabs-border: var(--crm-tabs-border);
+/* Notifications */
+  --crm-notify-background: var(--crm-c-background);
+  --crm-notify-col: var(--crm-c-text);
+  --crm-notify-accent-border: 0 0 0 3px; /* adds a border to one/several sides of the notification - set to 0 for none */
+/* Wizard */
+  --crm-wizard-width: auto;
+  --crm-wizard-margin: calc(-1 * var(--crm-form-block-padding)) calc(-1 * var(--crm-form-block-padding)) 0;
+  --crm-wizard-height: 62px;
+  --crm-wizard-radius: 0;
+  --crm-wizard-angle: 20px;
+  --crm-wizard-active-col: var(--crm-c-link);
+  --crm-wizard-active-bg: var(--crm-c-page-background);
+  --crm-wizard-border: 1px solid var(--crm-c-page-background);
+  --crm-wizard-bg: var(--crm-c-background);
+/* Frontend */
+  --crm-f-legend-align: unset;
+  --crm-f-legend-size: var(--crm-r2);
+}

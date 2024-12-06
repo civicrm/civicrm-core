@@ -35,6 +35,10 @@
         }
 
         if (this.defn.name !== this.fieldName) {
+          if (!this.defn.name) {
+            console.error('Missing field definition for: ' + this.fieldName);
+            return;
+          }
           namePrefix = this.fieldName.substr(0, this.fieldName.length - this.defn.name.length);
         }
 
@@ -190,13 +194,9 @@
 
         // if value is a number than change it to number
         if (Array.isArray(value)) {
-          var newValue = [];
-          value.forEach((v, index) => {
-            newValue[index] = correctValueType(v);
-          });
-          return newValue;
-        } else if (dataType === 'Integer') {
-          return +value;
+          return value.map((val) => correctValueType(val, dataType));
+        } else if (dataType === 'Integer' || dataType === 'Float') {
+          return Number(value);
         } else if (dataType === 'Boolean') {
           return (value == 1);
         }
@@ -232,7 +232,7 @@
             };
           }
         } else if (ctrl.defn.input_type === 'Number') {
-          value = +value;
+          value = Number(value);
         }
         // Initialze search range unless the field also has options (as in a date search) and
         // the default value is a valid option.
@@ -365,8 +365,12 @@
           if (ctrl.defn.data_type === 'Boolean') {
             return ($scope.dataProvider.getFieldData()[ctrl.fieldName] = (val === 'true'));
           }
-          if (ctrl.defn.data_type === 'Integer' && typeof val === 'string') {
-            return ($scope.dataProvider.getFieldData()[ctrl.fieldName] = val.length ? +val : null);
+          if (ctrl.defn.data_type === 'Integer' || ctrl.defn.data_type === 'Float') {
+            if (typeof val === 'string') {
+              return ($scope.dataProvider.getFieldData()[ctrl.fieldName] = val.length ? Number(val) : null);
+            } else if (Array.isArray(val)) {
+              return ($scope.dataProvider.getFieldData()[ctrl.fieldName] = val.map(Number));
+            }
           }
           return ($scope.dataProvider.getFieldData()[ctrl.fieldName] = val);
         }

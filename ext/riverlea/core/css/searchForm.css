@@ -1,0 +1,45 @@
+/* Style rules for some search forms and results.
+   Forked on 1 JuAugustne 24.
+   Status: merged */
+
+/* Alpha filter */
+
+.crm-container div#alpha-filter {
+  background-color: var(--crm-filter-bg);
+  margin: var(--crm-r) 0;
+  padding: var(--crm-filter-padding);
+  text-align: left;
+  box-shadow: var(--crm-block-shadow);
+  border-radius: var(--crm-roundness);
+}
+#crm-container #alpha-filter ul {
+  margin: 0;
+  display: flex;
+  gap: var(--crm-flex-gap);
+  justify-content: var(--crm-filter-spacing);
+}
+.crm-container #alpha-filter li {
+  color: var(--crm-c-text);
+}
+.crm-container #alpha-filter a {
+  font-weight: normal;
+  background: var(--crm-filter-item-bg);
+  padding: var(--crm-s) var(--crm-m);
+  box-shadow: var(--crm-filter-item-shadow);
+}
+
+/* Advanced Search - basic criteria */
+
+.advanced-search-fields {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  width: 100%;
+  column-gap: var(--crm-r);
+  row-gap: var(--crm-s);
+}
+.advanced-search-fields .search-field__span-2 {
+  grid-column: 1 / span 2;
+}
+.advanced-search-fields .search-field__span-3 {
+  grid-column: 1 / span 3;
+}

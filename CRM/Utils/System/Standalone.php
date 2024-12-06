@@ -602,7 +602,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
       // render a login page
       if (class_exists('CRM_Standaloneusers_Page_Login')) {
         $loginPage = new CRM_Standaloneusers_Page_Login();
-        $loginPage->assign('anonAccessDenied', TRUE);
+        CRM_Core_Session::setStatus(ts('You need to be logged in to access this page.'), ts('Please sign in.'));
         return $loginPage->run();
       }
 

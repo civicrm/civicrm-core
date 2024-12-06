@@ -124,11 +124,14 @@ class Contact extends Generic\DAOEntity {
   }
 
   /**
-   * @inheritDoc
+   * Override base method so it can be shared with Individual, Household, Organization APIs.
    */
   public static function permissions() {
-    $permissions = \CRM_Core_Permission::getEntityActionPermissions();
-    return ($permissions['contact'] ?? []) + $permissions['default'];
+    $allPermissions = \CRM_Core_Permission::getEntityActionPermissions();
+    $permissions = ($allPermissions['contact'] ?? []) + $allPermissions['default'];
+    // Checksums are meant for anonymous use
+    $permissions['validateChecksum'] = [];
+    return $permissions;
   }
 
 }

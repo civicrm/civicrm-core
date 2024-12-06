@@ -86,7 +86,7 @@ class CRM_Utils_Schema {
 
       default:
         $field['sqlType'] = $type;
-        if ($type === 'int unsigned' || $type === 'tinyint') {
+        if ($type === 'int unsigned' || $type === 'tinyint' || $type === 'bigint unsigned') {
           $field['crmType'] = 'CRM_Utils_Type::T_INT';
         }
         else {
@@ -156,6 +156,7 @@ class CRM_Utils_Schema {
         return CRM_Utils_Type::T_FLOAT;
 
       case 'int unsigned':
+      case 'bigint unsigned':
       case 'tinyint':
         return CRM_Utils_Type::T_INT;
 

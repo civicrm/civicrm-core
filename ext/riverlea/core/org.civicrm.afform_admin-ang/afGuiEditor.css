@@ -1,0 +1,696 @@
+/* Style rules for Form Builder Admin
+   Forked on 24 July 24. Called on Form Builder
+   Status: merged */
+
+/* List page */
+.afadmin-list th[ng-click] {
+  cursor: var(--crm-hover-clickable);
+}
+.afadmin-list th i.fa-sort-desc,
+.afadmin-list th i.fa-sort-asc {
+  color: var(--crm-c-link);
+}
+.afadmin-list th:not(:hover) i.fa-sort {
+  opacity: .5;
+}
+#afform-list-filter {
+  font-family: sans-serif,'FontAwesome';
+}
+/* Editor */
+
+#afGuiEditor {
+  gap: var(--crm-r);
+  height: 100% !important /* vs inline fixed height */;
+}
+#afGuiEditor .af-gui-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--crm-r);
+}
+#afGuiEditor fieldset {
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+#afGuiEditor fieldset legend {
+  padding: var(--crm-s) 0 0 0;
+  border-bottom: var(--crm-c-divider);
+  width: 100%;
+  margin-bottom: var(--crm-m);
+}
+#afGuiEditor hr {
+  margin-block: var(--crm-m);
+}
+
+/* Icon only buttons */
+
+#afGuiEditor .panel-heading .af-gui-canvas-control-buttons button,
+#afGuiEditor .af-gui-remove-entity,
+#bootstrap-theme #afGuiEditor .af-gui-field-select-in-dropdown button /* icon-only buttons */ {
+  padding: 0;
+  margin: 0;
+  max-height: 32px;
+  aspect-ratio: 1 / 1;
+}
+#afGuiEditor .af-gui-field-select-in-dropdown button i.crm-i,
+#afGuiEditor-canvas .af-gui-canvas-control-buttons button.btn-default i.crm-i,
+#afGuiEditor .af-gui-remove-entity i.crm-i {
+  margin: 0;
+  border: 0;
+  padding: var(--crm-s2);
+  height: 100%;
+  aspect-ratio: 1 / 1;
+  min-width: var(--crm-r4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Panel */
+#afGuiEditor-canvas .panel-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: var(--crm-tabs-border);
+}
+#afGuiEditor-canvas .panel-heading > .nav-tabs {
+  width: auto;
+  border-bottom: 0;
+}
+#afGuiEditor-canvas .panel-heading > .af-gui-canvas-control-buttons,
+#afGuiEditor-canvas .panel-heading > .pull-right,
+#afGuiEditor .af-gui-edit-options-bar .pull-right {
+  order: 2;
+  display: flex;
+  gap: var(--crm-flex-gap);
+  padding: 0;
+  align-items: center;
+}
+#afGuiEditor-canvas .panel-heading > .pull-right {
+  order: 3;
+}
+#afGuiEditor .panel-heading ul.nav-tabs li.fluid-width-tab {
+  white-space: nowrap;
+  overflow: hidden;
+}
+#afGuiEditor .panel-heading .form-inline.pull-right button {
+  max-height: 32px;
+  margin: 0;
+}
+#afGuiEditor .panel-body {
+  padding: var(--crm-padding-reg);
+  position: relative;
+  border-top: none !important;
+  height: 100%;
+  background: var(--crm-tab-bg-active);
+}
+
+/* Edit palette (left side) */
+#afGuiEditor-palette input,
+#afGuiEditor-palette textarea,
+#afGuiEditor-palette select {
+  width: 100%;
+}
+#afGuiEditor-palette input[type="checkbox"],
+#afGuiEditor-palette input[type="radio"] {
+  width: 1rem;
+  height: 1rem;
+}
+#afGuiEditor-palette .form-group label {
+  width: 100%;
+  display: block;
+}
+#afGuiEditor-palette .checkbox label {
+  padding: 0;
+}
+#afGuiEditor-palette .input-group:has(#af_config_redirect) {
+  display: grid;
+  gap: var(--crm-s);
+  grid-template-columns: 1fr 250px;
+}
+#afGuiEditor-palette .input-group:has(#af_config_redirect) .input-group-addon,
+#afGuiEditor-palette input.select2-input {
+  width: 100%;
+  min-width: 100%;
+}
+#afGuiEditor-palette #s2id_autogen3 {
+  width: 100% !important /* vs inline */;
+}
+#afGuiEditor-palette #af_config_form_permission_operator {
+  width: 60px;
+}
+#afGuiEditor-palette #s2id_af_config_form_permission {
+  width: calc(100% - 66px) !important /* vs inline */;
+}
+
+/* Builder settings */
+#afGuiEditor-palette .af-gui-remove-entity {
+  position: absolute;
+  top: var(--crm-padding-reg);
+  right: var(--crm-padding-reg);
+}
+#afGuiEditor-palette .af-gui-entity-values .form-inline {
+  margin-bottom: var(--crm-m);
+  display: flex;
+  align-items: center;
+  gap: var(--crm-flex-gap);
+}
+#afGuiEditor-palette .af-gui-entity-values .select2-container {
+  width: 100% !important /* vs inline */;
+  margin-bottom: var(--crm-s2);
+}
+#afGuiEditor-palette .af-gui-entity-values .input-group {
+  width: 100%;
+  display: flex;
+}
+#afGuiEditor-palette .af-gui-entity-values .input-group > span {
+  width: 100%;
+}
+#bootstrap-theme #afGuiEditor-palette .af-gui-entity-values .input-group .btn {
+  height: calc(var(--crm-btn-height) + 4px);
+}
+#afGuiEditor-palette .af-gui-entity-palette legend {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+#afGuiEditor-palette .af-gui-entity-palette .input-group {
+  margin-top: var(--crm-s);
+}
+#afGuiEditor-palette .af-gui-entity-palette [type="search"] {
+  width: 100%;
+  border-radius: var(--crm-roundness) var(--crm-roundness) 0 0;
+  padding: var(--crm-s2);
+  font-weight: normal;
+  position: relative;
+  margin: 0;
+  border-bottom: 0;
+  font-family: sans-serif,'FontAwesome';
+}
+.af-gui-entity-palette-select-list {
+  border: var(--crm-c-divider);
+  border-radius: 0 0 var(--crm-roundness) var(--crm-roundness);
+  padding: 0 var(--crm-s) var(--crm-s);
+  max-height: 400px;
+  overflow-y: auto;
+}
+.af-gui-entity-palette-select-list [ui-sortable] > div {
+  cursor: move;
+  padding: var(--crm-xs) var(--crm-m) var(--crm-xs) var(--crm-r);
+  position: relative;
+}
+.af-gui-entity-palette-select-list [ui-sortable] > div.disabled {
+  cursor: auto;
+}
+.af-gui-entity-palette-select-list [ui-sortable] > div:not(.disabled):hover {
+  background-color: var(--crm-c-background3);
+}
+
+/* Edit canvas (right side) */
+#afGuiEditor-canvas .af-gui-container,
+#afGuiEditor-canvas .af-gui-markup,
+#afGuiEditor-canvas .af-gui-text,
+#afGuiEditor-canvas .af-gui-button,
+#afGuiEditor-canvas .af-gui-element {
+  margin-bottom: var(--crm-padding-small);
+  border: 2px solid transparent;
+  display: block;
+  border-radius: var(--crm-roundness);
+  position: relative;
+  padding: var(--crm-m);
+}
+#afGuiEditor af-gui-field,
+#afGuiEditor .af-gui-block-label,
+#afGuiEditor af-gui-edit-options {
+  display: block;
+}
+#afGuiEditor .af-gui-container-type-fieldset {
+  box-shadow: 0 0 5px var(--crm-c-gray-300);
+}
+
+/* Canvas gui bar */
+#afGuiEditor-canvas .af-gui-bar {
+  height: var(--crm-l);
+  width: 100%;
+  border-radius: 0;
+  transition: opacity .2s;
+  background-color: var(--crm-c-background3);
+  padding-inline: var(--crm-xs);
+  cursor: move;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+#afGuiEditor [ui-sortable] .af-gui-bar:before,
+#afGuiEditor .af-gui-entity-palette-select-list [ui-sortable] > div:not(.disabled):hover:before,
+#afGuiEditor af-gui-edit-options.af-gui-content-editing-area [ui-sortable] li:before {
+  background: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSIjODg4Ij48L3JlY3Q+Cjwvc3ZnPg==");
+  width: var(--crm-m);
+  height: calc(100% - var(--crm-m));
+  content: ' ';
+  width: 10px;
+}
+#afGuiEditor-canvas .af-gui-bar .form-inline {
+  padding: 0;
+  display: flex;
+  gap: var(--crm-flex-gap);
+  align-items: center;
+}
+#afGuiEditor-canvas af-gui-container-multi-toggle .btn .ng-binding {
+  display: flex;
+  margin-right: var(--crm-m);
+}
+#afGuiEditor .af-gui-node-title {
+  position: absolute;
+  top: 1px;
+  width: calc(100% - var(--crm-r4));
+}
+#afGuiEditor-canvas:not(.af-gui-menu-open) .af-gui-bar,
+#afGuiEditor-canvas:not(.af-gui-menu-open) .af-gui-container-title span:empty {
+  opacity: 0;
+}
+#afGuiEditor:not(.af-gui-dragging *) #afGuiEditor-canvas:hover .af-gui-bar,
+#afGuiEditor:not(.af-gui-dragging *) #afGuiEditor-canvas:hover .af-gui-container-title span:empty {
+  opacity: 1;
+  transition: opacity .2s;
+}
+#afGuiEditor:not(.af-gui-dragging *) #afGuiEditor-canvas:hover .af-gui-container:not(.af-gui-container-type-fieldset),
+#afGuiEditor:not(.af-gui-dragging *) #afGuiEditor-canvas:hover .af-gui-element,
+#afGuiEditor:not(.af-gui-dragging *) #afGuiEditor-canvas:hover .af-gui-markup {
+  border: 2px solid var(--crm-c-background2);
+}
+/* Dragging related */
+#afGuiEditor #afGuiEditor-canvas .af-gui-dragtarget > .af-gui-bar,
+#afGuiEditor #afGuiEditor-canvas .af-gui-dragtarget > .af-gui-container-title span:empty {
+  background-color: var(--crm-c-background4);
+  opacity: 1;
+  transition: opacity .1s;
+}
+/* Disable menu while dragging */
+body.af-gui-dragging #civicrm-menu {
+  pointer-events: none;
+}
+/* Disable scrollbars while dragging */
+body.af-gui-dragging {
+  overflow-x: hidden;
+  overflow-y: hidden;
+}
+af-gui-container > .af-gui-bar,
+.af-gui-element > .af-gui-bar,
+.af-gui-container-type-div > .af-gui-bar,
+.af-gui-markup > .af-gui-bar {
+  margin: calc(-1 * var(--crm-m)) calc(-1 * var(--crm-m)) var(--crm-m) calc(-1 * var(--crm-m));
+  width: calc(100% + var(--crm-r)) !important;
+}
+#afGuiEditor-canvas [ui-sortable] .af-gui-bar:has(~ .af-gui-field-input) {
+  border-radius: var(--crm-roundness) var(--crm-roundness) 0 0;
+}
+
+/* Canvas layout */
+#afGuiEditor .af-gui-layout {
+  min-height: 2rem;
+}
+#afGuiEditor .af-gui-layout.af-layout-cols,
+#afGuiEditor .af-gui-layout.af-layout-inline {
+  display: flex;
+  gap: var(--crm-m);
+}
+#afGuiEditor .af-gui-layout.af-layout-inline {
+  flex-flow: wrap;
+}
+#afGuiEditor .af-gui-layout.af-layout-cols > div {
+  flex: 1;
+  min-width: 1%;
+}
+#afGuiEditor .af-gui-layout.af-layout-inline > div {
+  display: inline-block;
+  width: 300px;
+  vertical-align: top;
+}
+
+/* Canvas elements */
+#afGuiEditor.af-gui-editing-content .af-gui-container,
+#afGuiEditor .af-gui-markup-content {
+  border: 2px solid transparent;
+}
+#afGuiEditor-canvas:not(.af-gui-menu-open) .af-gui-container:hover,
+.af-gui-dragging #afGuiEditor .af-gui-container,
+#afGuiEditor:not(.af-gui-dragging *) #afGuiEditor-canvas:hover .af-gui-container:hover,
+#afGuiEditor:not(.af-gui-dragging *) #afGuiEditor-canvas:hover .af-gui-element:hover,
+#afGuiEditor:not(.af-gui-dragging *) #afGuiEditor-canvas:hover .af-gui-markup:hover,
+#afGuiEditor .crm-editable-enabled:hover:not(:focus) {
+  border: 2px dashed var(--crm-c-gray-700);
+}
+#afGuiEditor-canvas:not(.af-gui-menu-open) .af-gui-container .af-gui-element:hover,
+#afGuiEditor-canvas:not(.af-gui-menu-open) .af-gui-container .af-gui-markup:hover {
+  border-width: 1px;
+}
+#afGuiEditor-canvas .af-entity-selected {
+  border: 2px dashed var(--crm-c-blue-dark);
+}
+#afGuiEditor-canvas .af-entity-selected > .af-gui-bar {
+  background-color: var(--crm-c-primary);
+  opacity: 1;
+  transition: opacity 0s;
+}
+#afGuiEditor-canvas .af-entity-selected > .af-gui-bar + label,
+#afGuiEditor .af-entity-selected > .af-gui-bar .af-gui-add-element-button span {
+  color: var(--crm-c-primary-text);
+}
+#afGuiEditor .af-gui-container.af-gui-dragtarget {
+  border: 2px solid var(--crm-c-blue-dark);
+  box-shadow: 0 0 5px var(--crm-c-blue-dark);
+}
+
+/* Card style */
+#afGuiEditor .af-gui-search-display {
+  border: 1px dotted var(--crm-c-background5);
+  color: var(--crm-c-text);
+  padding: var(--crm-padding-reg);
+  background-color: var(--crm-c-background2);
+}
+
+/* Markup area */
+#afGuiEditor .af-gui-markup-content-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+#afGuiEditor .af-gui-markup-content:hover .af-gui-markup-content-overlay {
+  background-color: rgba(255, 255, 255, .2);
+}
+#afGuiEditor .af-gui-content-editing-area .af-gui-edit-options-bar {
+  width: 100%;
+  background-color: var(--crm-c-background3);
+  display: flex;
+  align-items: center;
+  padding: var(--crm-m);
+  justify-content: space-between;
+}
+.af-gui-edit-options-bar h4 {
+  font-size: var(--crm-font-size);
+  margin: 0 !important; /* vs bootstrap.css */
+}
+#afGuiEditor .af-gui-content-editing-area {
+  pointer-events: auto;
+  cursor: auto;
+}
+#afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > .btn-group > .btn-group > button:hover > span,
+#afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > .btn-group > .btn-group > button[aria-expanded=true] > span,
+#afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > .btn-group > .btn-group > button:focus > span {
+  color: var(--crm-c-info);
+}
+#afGuiEditor .af-gui-add-element-button span {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  color: var(--crm-c-info);
+}
+#bootstrap-theme #afGuiEditor .af-gui-button > .btn.disabled .crm-editable-enabled:hover:not(:focus) {
+  border-color: var(--crm-c-background2) !important;
+}
+#bootstrap-theme #afGuiEditor .af-gui-button > .btn-default.disabled {
+  background-color: var(--crm-c-background2) !important;
+}
+#afGuiEditor .af-gui-container-title span:empty {
+  font-weight: lighter;
+}
+#afGuiEditor .af-gui-field-required:after {
+  content: '*';
+  color: var(--crm-c-alert);
+  position: relative;
+  left: -4px;
+}
+/* For editing field placeholder text */
+#afGuiEditor .af-gui-field-input input[type=text].form-control {
+  color: var(--crm-c-background5);
+}
+#afGuiEditor .af-gui-field-input-type-number input[type=text].form-control {
+  background-image: url('../images/number.png');
+  background-repeat: no-repeat;
+  background-position: center right 6px;
+}
+#afGuiEditor .af-gui-field-input input.crm-form-date {
+  width: 140px;
+  margin-right: -2px;
+}
+#afGuiEditor .af-gui-field-input input.crm-form-time {
+  width: 80px;
+}
+#afGuiEditor .af-gui-field-input-type-radio label.radio {
+  font-weight: normal;
+  margin-right: 10px;
+}
+#afGuiEditor .af-gui-field-input-type-radio label.radio input[type=radio] {
+  margin: 0;
+}
+#afGuiEditor .af-gui-field-input-type-select .input-group-btn {
+  position: initial;
+}
+#afGuiEditor .input-group-addon {
+  padding: 0;
+}
+#afGuiEditor .af-gui-text-legend {
+  text-decoration: underline;
+}
+#afGuiEditor .af-gui-text-h1,
+#afGuiEditor .af-gui-text-h2,
+#afGuiEditor .af-gui-text-h3,
+#afGuiEditor .af-gui-text-h4,
+#afGuiEditor .af-gui-text-h5,
+#afGuiEditor .af-gui-text-h6 {
+  font-weight: bold;
+  font-family: var(--crm-font-bold);
+}
+#afGuiEditor.af-gui-editing-content .panel-heading,
+#afGuiEditor.af-gui-editing-content .af-gui-element,
+#afGuiEditor.af-gui-editing-content .af-gui-markup-content,
+.af-gui-editing-content #afGuiEditor-palette .panel-body > * {
+  opacity: .5;
+}
+#afGuiEditor.af-gui-editing-content .af-gui-bar {
+  visibility: hidden;
+}
+#afGuiEditor.af-gui-editing-content .af-gui-bar:before {
+  background: none;
+}
+#afGuiEditor .af-gui-dropzone {
+  background-color: var(--crm-c-background2);
+  border: 2px solid var(--crm-c-info);
+  min-height: 30px;
+}
+/* Options editor */
+#afGuiEditor af-gui-edit-options.af-gui-content-editing-area {
+  border: 2px solid var(--crm-c-info);
+}
+#afGuiEditor af-gui-edit-options.af-gui-content-editing-area ul[ui-sortable] {
+  padding-inline: var(--crm-padding-reg);
+}
+#afGuiEditor af-gui-edit-options.af-gui-content-editing-area ul[ui-sortable] li {
+  background-color: var(--crm-c-background2);
+  cursor: move;
+  height: var(--crm-btn-height);
+  display: flex;
+  align-items: center;
+  padding-inline: var(--crm-m);
+}
+#afGuiEditor af-gui-edit-options.af-gui-content-editing-area ul[ui-sortable] li:nth-child(even) {
+  background-color: var(--crm-c-background3);
+}
+#afGuiEditor af-gui-edit-options.af-gui-content-editing-area ul[ui-sortable] li > div {
+  display: inline-block;
+}
+#afGuiEditor af-gui-edit-options.af-gui-content-editing-area ul.af-gui-edit-options-deleted li > div {
+  text-decoration: line-through;
+}
+#bootstrap-theme #afGuiEditor af-gui-edit-options.af-gui-content-editing-area ul[ui-sortable] li .btn-xs {
+  padding: 1px;
+}
+#afGuiEditor af-gui-edit-options.af-gui-content-editing-area h5 {
+  margin-left: var(--crm-padding-reg);
+}
+#afGuiEditor af-gui-edit-options.af-gui-content-editing-area button.pull-right {
+  margin-left: auto;
+}
+
+/* Rules for Conditional dialog */
+.af-gui-conditional-dialog fieldset {
+  padding: 6px;
+  border-top: 1px solid var(--crm-c-background2);
+  margin-top: 10px;
+  margin-bottom: 10px;
+  position: relative;
+}
+.af-gui-conditional-dialog fieldset fieldset {
+  padding-top: 0;
+  border: 1px solid var(--crm-c-background2);
+  border-top: 0;
+}
+#bootstrap-theme .af-gui-conditional-dialog af-gui-clause > .btn-group {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+.af-gui-conditional-dialog legend[ng-click] {
+  cursor: var(--crm-hover-clickable);
+}
+i.crm-i.af-gui-conditional-dialog-move-icon {
+  opacity: .5;
+}
+.crm-draggable:hover > i.crm-i.af-gui-conditional-dialog-move-icon,
+.crm-draggable:hover > * > i.crm-i.af-gui-conditional-dialog-move-icon {
+  opacity: 1;
+}
+.af-gui-conditional-dialog .api4-clause-badge {
+  width: 55px;
+  display: inline-block;
+  cursor: move;
+}
+.af-gui-conditional-dialog .api4-clause-badge .badge {
+  opacity: .5;
+  position: relative;
+}
+.af-gui-conditional-dialog .api4-clause-badge .caret {
+  margin: 0;
+}/* Icon only shown while dragging */
+.af-gui-conditional-dialog .api4-clause-badge .crm-i {
+  display: none;
+  padding: 0 6px;
+}
+.af-gui-conditional-dialog .ui-sortable-helper .api4-clause-badge .badge span {
+  display: none;
+}
+.af-gui-conditional-dialog .ui-sortable-helper .api4-clause-badge .crm-i {
+  display: inline-block;
+}
+
+/* Dropdown buttons */
+#bootstrap-theme #afGuiEditor-canvas .dropdown-toggle,
+#bootstrap-theme #afGuiEditor .af-gui-add-element-button {
+  padding: 0;
+  background-color: transparent;
+  border: 0;
+  box-shadow: none;
+  color: var(--crm-c-text);
+  height: auto;
+}
+#afGuiEditor-canvas .dropdown-toggle i.crm-i {
+  padding: 0 !important;
+  background: transparent;
+  border: 0;
+  min-width: auto;
+  height: auto;
+}
+#afGuiEditor .dropdown-menu {
+  min-width: 220px;
+}
+#afGuiEditor .dropdown-menu li {
+  cursor: default;
+  margin: 0;
+}
+#afGuiEditor .dropdown-menu li .af-gui-field-select-in-dropdown {
+  padding: var(--crm-xs);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+#afGuiEditor .dropdown-menu li .af-gui-field-select-in-dropdown label,
+#afGuiEditor .dropdown-menu li > * > label {
+  font-weight: normal;
+  cursor: var(--crm-hover-clickable);
+  color: var(--crm-dropdown-col);
+}
+#afGuiEditor .dropdown-menu li .af-gui-field-select-in-dropdown > select {
+  padding-inline: var(--crm-m);
+  width: 110px;
+  margin-left: var(--crm-xs2);
+  border: 1px solid var(--crm-input-border-color);
+  border-radius: 2px;
+}
+#afGuiEditor li.disabled a strong {
+  color: var(--crm-dropdown-col); /* resets inaccessible colour for dropdown headings mislabelled disabled */
+}
+#afGuiEditor li .af-gui-field-select-in-dropdown input[type="color"] {
+  width: 32px;
+  padding: 1px;
+  margin-left: var(--crm-xs2);
+}
+#afGuiEditor li .af-gui-field-select-in-dropdown input[type=number] {
+  width: 50px;
+  padding-inline: var(--crm-s) 0;
+  height: auto;
+}
+#afGuiEditor .dropdown-menu li .ng-binding:has(> .fa-square-o,
+> .fa-check-square-o) {
+  display: flex;
+  padding-block: 0;
+  align-items: center;
+  gap: var(--crm-s);
+}
+#afGuiEditor .af-gui-field-input-type-chainselect .input-group .dropdown-toggle,
+#afGuiEditor .af-gui-field-input-type-select .input-group .dropdown-toggle,
+#bootstrap-theme #afGuiEditor-palette-config .af-gui-entity-palette .input-group .btn,
+#bootstrap-theme #afGuiEditor-canvas-body .af-gui-field-input .input-group .btn {
+  padding: var(--crm-s) var(--crm-m1);
+}
+#afGuiEditor .af-gui-field-input-type-select .input-group .dropdown-menu {
+  width: 100%;
+  right: 0;
+}
+#afGuiEditor .af-gui-layout-icon {
+  width: 16px;
+  height: 16px;
+  display: block;
+  background-image: url('data:image/svg+xml,<%3Fxml version="1.0" encoding="UTF-8"%3F><svg fill="none" viewBox="0 0 64 61" xmlns="http://www.w3.org/2000/svg"><mask id="d" fill="white"><rect y="33" width="40" height="28" rx="4"/></mask><rect y="33" width="40" height="28" rx="4" mask="url(%23d)" stroke="%23000" stroke-linejoin="round" stroke-width="10"/><mask id="c" fill="white"><rect x="45" y="33" width="19" height="28" rx="4"/></mask><rect x="45" y="33" width="19" height="28" rx="4" mask="url(%23c)" stroke="%23000" stroke-linejoin="round" stroke-width="10"/><mask id="b" fill="white"><rect width="24" height="28" rx="4"/></mask><rect width="24" height="28" rx="4" mask="url(%23b)" stroke="%23000" stroke-linejoin="round" stroke-width="10"/><mask id="a" fill="white"><rect x="29" width="24" height="28" rx="4"/></mask><rect x="29" width="24" height="28" rx="4" mask="url(%23a)" stroke="%23000" stroke-linejoin="round" stroke-width="10"/></svg>');
+  background-repeat: no-repeat;
+  margin: var(--crm-m);
+  background-size: contain;
+}
+#afGuiEditor .af-gui-layout-icon.af-layout-cols {
+  background-image: url('data:image/svg+xml,<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="22" height="58" rx="3" stroke="black" stroke-width="6" stroke-linejoin="round"/><rect x="39" y="3" width="22" height="58" rx="3" stroke="black" stroke-width="6" stroke-linejoin="round"/></svg>');
+}
+#afGuiEditor .af-gui-layout-icon.af-layout-rows {
+  background-image: url('data:image/svg+xml,<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2.5" y="2.5" width="59" height="13" rx="3.5" stroke="black" stroke-width="5" stroke-linejoin="round"/><rect x="2.5" y="25.5" width="59" height="13" rx="3.5" stroke="black" stroke-width="5" stroke-linejoin="round"/><rect x="2.5" y="48.5" width="59" height="13" rx="3.5" stroke="black" stroke-width="5" stroke-linejoin="round"/></svg>');
+}
+
+/* Misc - aka stuff I can't identify but don't want to risk removing*/
+#bootstrap-theme #afGuiEditor .af-gui-bar .btn.active {
+  background-color: var(--crm-c-background5);
+}
+#afGuiEditor .af-gui-bar > .form-inline > span {
+  color: var(--crm-c-background5);
+  font-style: italic;
+}
+#afGuiEditor .ui-sortable-helper .af-gui-palette-item {
+  height: 30px;
+  width: 300px;
+  border: 2px dashed var(--crm-c-blue-dark);
+}
+.af-gui-conditional-dialog .api4-operator {
+  width: 110px;
+}
+.af-gui-conditional-dialog fieldset div.api4-input {
+  margin-bottom: 10px;
+}
+.af-gui-conditional-dialog fieldset div.api4-input.ui-sortable-helper {
+  background-color: rgba(255, 255, 255, .9);
+}
+.af-gui-conditional-dialog .api4-clause-fieldset fieldset {
+  float: right;
+  width: calc(100% - 58px);
+  margin-top: -8px;
+}
+.af-gui-conditional-dialog .api4-clause-fieldset.api4-sorting fieldset .api4-clause-group-sortable {
+  min-height: 3.5em;
+}
+.af-gui-conditional-dialog .api4-input-group {
+  display: inline-block;
+}
+#afGuiEditor .af-gui-container.af-container-style-pane {
+  background: linear-gradient(to bottom, #f2f2f2 0 var(--crm-l), transparent var(--crm-l) 100%) no-repeat;
+  border-radius: var(--crm-roundness);
+}

@@ -2,6 +2,8 @@
 
 namespace Civi\Api4\Action\Afform;
 
+use Civi\Afform\Utils;
+
 /**
  * Class Prefill
  *
@@ -22,7 +24,7 @@ class Prefill extends AbstractProcessor {
     $originalValues = $valueSets;
     foreach ($this->getDisplayOnlyFields($afformEntity['fields']) as $fieldName) {
       foreach ($valueSets as $index => $valueSet) {
-        $this->replaceViewValue($afformEntity['type'], $fieldName, $valueSets[$index]['fields'], $originalValues[$index]['fields']);
+        $this->replaceViewValue($afformEntity['name'], $afformEntity['type'], $fieldName, $valueSets[$index]['fields'], $originalValues[$index]['fields']);
       }
     }
     foreach ($afformEntity['joins'] ?? [] as $joinEntity => $join) {
@@ -30,7 +32,7 @@ class Prefill extends AbstractProcessor {
         foreach ($valueSets as $index => $valueSet) {
           if (!empty($valueSet['joins'][$joinEntity])) {
             foreach ($valueSet['joins'][$joinEntity] as $joinIndex => $joinValues) {
-              $this->replaceViewValue($joinEntity, $fieldName, $valueSets[$index]['joins'][$joinEntity][$joinIndex], $originalValues[$index]['joins'][$joinEntity][$joinIndex]);
+              $this->replaceViewValue("{$afformEntity['name']}+$joinEntity", $joinEntity, $fieldName, $valueSets[$index]['joins'][$joinEntity][$joinIndex], $originalValues[$index]['joins'][$joinEntity][$joinIndex]);
             }
           }
         }
@@ -38,10 +40,10 @@ class Prefill extends AbstractProcessor {
     }
   }
 
-  private function replaceViewValue(string $entityType, string $fieldName, array &$values, $originalValues) {
-    if (isset($values[$fieldName])) {
+  private function replaceViewValue(string $entityName, string $entityType, string $fieldName, array &$values, $originalValues) {
+    if (isset($values[$fieldName]) && !isset($values[$fieldName]['file_name'])) {
       $fieldInfo = $this->_formDataModel->getField($entityType, $fieldName, 'create', $originalValues);
-      $values[$fieldName] = \Civi\Afform\Utils::formatViewValue($fieldName, $fieldInfo, $originalValues);
+      $values[$fieldName] = Utils::formatViewValue($fieldName, $fieldInfo, $originalValues, $entityName, $this->name);
     }
   }
 

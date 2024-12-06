@@ -9,40 +9,34 @@
     this.entityTitle = this.getEntityTitle();
     this.afformName = '';
 
-    this.getAfformName = function(id) {
+    this.processData = function (submissionId) {
       crmApi4('AfformSubmission', 'get', {
         select: ["afform_name"],
-        where: [["id", "=", id]],
+        where: [["id", "=", submissionId]],
       }).then(function(afformSubmissions) {
         ctrl.afformName = afformSubmissions[0].afform_name;
+
+        _.each(ctrl.ids, function(id) {
+          ctrl.start();
+          crmApi4('Afform', 'process', {
+            submissionId: id,
+            name: ctrl.afformName
+          }).then(function(result) {
+          }, function(failure) {
+            ctrl.onError();
+          });
+        });
+
+        ctrl.onSuccess();
+
       }, function(error) {
         ctrl.onError();
       });
     };
 
-    this.processData = function() {
-      _.each(ctrl.ids, function(id) {
-        ctrl.start();
-        crmApi4('Afform', 'process', {
-          submissionId: id,
-          name: ctrl.afformName
-        }).then(function(result) {
-        }, function(failure) {
-          ctrl.onError();
-        });
-      });
-
-      ctrl.onSuccess();
-    };
-
     this.save = function() {
-      // get the afform name
-      ctrl.getAfformName(ctrl.ids[0]);
-
-      $timeout(function() {
-        ctrl.processData();
-      },500);
-
+      // process submission
+      ctrl.processData(ctrl.ids[0]);
     };
 
     this.onSuccess = function() {

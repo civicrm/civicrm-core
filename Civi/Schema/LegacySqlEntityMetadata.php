@@ -170,6 +170,9 @@ class LegacySqlEntityMetadata extends EntityMetadataBase {
       case \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME:
         return 'datetime';
 
+      case \CRM_Utils_Type::T_TIME:
+        return 'time';
+
       default:
         throw new \CRM_Core_Exception('Unknown field type for ' . $legacyField['name']);
     }

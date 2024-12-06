@@ -19,6 +19,13 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
   public $submitOnce = TRUE;
 
   /**
+   * The mailing ID being scheduled
+   *
+   * @var int
+   */
+  protected $_mailingID;
+
+  /**
    * Set variables up before form is built.
    */
   public function preProcess() {

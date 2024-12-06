@@ -22,6 +22,7 @@ namespace api\v4\Custom;
 use Civi\Api4\Activity;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
+use Civi\Api4\OptionGroup;
 
 /**
  * @group headless
@@ -165,12 +166,33 @@ class CustomFieldAlterTest extends CustomTestBase {
         ->execute();
     }
 
+    $this->assertCount(1, OptionGroup::get(FALSE)
+      ->addWhere('id', '=', $customGroup['field1']['option_group_id'])
+      ->selectRowCount()
+      ->execute());
+
     // Check that custom table exists and is then removed when group is deleted
     $this->assertNotNull(\CRM_Core_DAO::singleValueQuery("SHOW TABLES LIKE '{$customGroup['table_name']}';"));
+
+    $columnCheck = "SELECT COUNT(*) as count
+          FROM INFORMATION_SCHEMA.COLUMNS
+          WHERE table_schema = DATABASE()
+          AND table_name = '{$customGroup['table_name']}'
+          AND column_name = '{$customGroup['field1']['column_name']}'";
+    $this->assertEquals('1', \CRM_Core_DAO::singleValueQuery($columnCheck));
 
     CustomField::delete(FALSE)
       ->addWhere('custom_group_id', '=', $customGroup['id'])
       ->execute();
+
+    // Column should be gone
+    $this->assertEquals('0', \CRM_Core_DAO::singleValueQuery($columnCheck));
+
+    // Option group should be gone
+    $this->assertCount(0, OptionGroup::get(FALSE)
+      ->addWhere('id', '=', $customGroup['field1']['option_group_id'])
+      ->execute());
+
     CustomGroup::delete(FALSE)
       ->addWhere('id', '=', $customGroup['id'])
       ->execute();

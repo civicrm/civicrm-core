@@ -60,3 +60,16 @@ function civicrm_admin_ui_civicrm_postProcess($className, $form) {
     CRM_Core_Session::singleton()->replaceUserContext($url);
   }
 }
+
+function civicrm_admin_ui_civicrm_managed(&$entities, $modules) {
+  if ($modules && !in_array(E::LONG_NAME, $modules, TRUE)) {
+    return;
+  }
+
+  $records = \Civi\Api4\Action\CustomGroup\GetSearchKit::getAllManaged();
+
+  foreach ($records as $record) {
+    $record['module'] = E::LONG_NAME;
+    $entities[] = $record;
+  }
+}

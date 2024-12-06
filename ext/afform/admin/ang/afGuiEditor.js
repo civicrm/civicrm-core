@@ -165,7 +165,7 @@
           // Non-aggregated query will return the same search multiple times - once per display
           crmApi4('SavedSearch', 'get', {
             select: ['name', 'label', 'display.name', 'display.label', 'display.type:name', 'display.type:icon'],
-            where: [['api_entity', 'IS NOT NULL'], ['api_params', 'IS NOT NULL']],
+            where: [['api_entity', 'IS NOT NULL'], ['api_params', 'IS NOT NULL'], ['is_template', '=', false]],
             join: [['SearchDisplay AS display', 'LEFT', ['id', '=', 'display.saved_search_id']]],
             orderBy: {'label':'ASC'}
           }).then(function(searches) {

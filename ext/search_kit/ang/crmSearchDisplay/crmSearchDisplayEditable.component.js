@@ -7,30 +7,37 @@
   angular.module('crmSearchDisplay').component('crmSearchDisplayEditable', {
     bindings: {
       row: '<',
-      col: '<',
-      cancel: '&'
+      rowIndex: '<',
+      searchDisplay: '<',
+      colKey: '<',
     },
     templateUrl: '~/crmSearchDisplay/crmSearchDisplayEditable.html',
     controller: function($scope, $element, crmApi4, crmStatus) {
-      var ctrl = this,
-        initialValue,
-        col;
+      const ctrl = this;
+      let initialValue;
+      let editableInfo;
+      let valuePath;
 
       this.$onInit = function() {
-        col = this.col;
-        this.value = _.cloneDeep(this.row.data[col.edit.value_path]);
-        initialValue = _.cloneDeep(this.row.data[col.edit.value_path]);
+        editableInfo = this.searchDisplay.results.editable[this.colKey];
+        valuePath = this.colKey.split(':')[0];
+        this.value = JSON.parse(JSON.stringify(this.row.data[valuePath]));
+        initialValue = JSON.parse(JSON.stringify(this.row.data[valuePath]));
 
         this.field = {
-          data_type: col.edit.data_type,
-          input_type: col.edit.input_type,
-          entity: col.edit.entity,
-          name: col.edit.value_key,
-          options: col.edit.options,
-          fk_entity: col.edit.fk_entity,
-          serialize: col.edit.serialize,
-          nullable: col.edit.nullable
+          data_type: editableInfo.data_type,
+          input_type: editableInfo.input_type,
+          entity: editableInfo.entity,
+          name: editableInfo.value_key,
+          options: editableInfo.options,
+          fk_entity: editableInfo.fk_entity,
+          serialize: editableInfo.serialize,
+          nullable: editableInfo.nullable && ctrl.row.data[editableInfo.id_path],
         };
+
+        if (this.field.options === true) {
+          loadOptions();
+        }
 
         $(document).on('keydown.crmSearchDisplayEditable', (e) => {
           if (e.key === 'Escape') {
@@ -40,10 +47,6 @@
             $scope.$apply(() => ctrl.save());
           }
         });
-
-        if (this.field.options === true) {
-          loadOptions();
-        }
       };
 
       this.$onDestroy = function() {
@@ -53,12 +56,16 @@
       this.save = function() {
         const value = formatDataType(ctrl.value);
         if (value !== initialValue) {
-          col.edit.record[col.edit.value_key] = value;
-          crmStatus({}, crmApi4(col.edit.entity, col.edit.action, {values: col.edit.record}));
-          ctrl.row.data[col.edit.value_path] = value;
-          col.val = formatDisplayValue(value);
+          ctrl.row.data[valuePath] = value;
+          ctrl.searchDisplay.saveEditing(ctrl.rowIndex, ctrl.colKey, value);
         }
-        ctrl.cancel();
+        else {
+          ctrl.searchDisplay.cancelEditing();
+        }
+      };
+
+      this.cancel = function() {
+        ctrl.searchDisplay.cancelEditing();
       };
 
       function formatDataType(val) {
@@ -73,43 +80,16 @@
         return val;
       }
 
-      function formatDisplayValue(val) {
-        let displayValue = angular.copy(val);
-        if (_.isArray(displayValue)) {
-          displayValue.forEach((v, i) => displayValue[i] = formatDisplayValue(v));
-          return displayValue;
-        }
-        if (ctrl.field.options) {
-          ctrl.field.options.forEach((option) => {
-            if (('' + option.id) === ('' + val)) {
-              displayValue = option.label;
-            }
-          });
-        } else if (ctrl.field.data_type === 'Boolean' && val === true) {
-          displayValue = ts('Yes');
-        } else if (ctrl.field.data_type === 'Boolean' && val === false) {
-          displayValue = ts('No');
-        } else if (ctrl.field.data_type === 'Date' || ctrl.field.data_type === 'Timestamp') {
-          displayValue = CRM.utils.formatDate(val, null, ctrl.field.data_type === 'Timestamp');
-        } else if (ctrl.field.data_type === 'Money') {
-          displayValue = CRM.formatMoney(displayValue, false, col.edit.currency_format);
-        }
-        return displayValue;
-      }
-
+      // Used to dynamically load options for fields whose options are not static
       function loadOptions() {
-        var cacheKey = col.edit.entity + ' ' + ctrl.field.name;
-        if (optionsCache[cacheKey]) {
-          ctrl.field.options = optionsCache[cacheKey];
-          return;
-        }
-        crmApi4(col.edit.entity, 'getFields', {
+        crmApi4(editableInfo.entity, 'getFields', {
           action: 'update',
           select: ['options'],
+          values: ctrl.row.data,
           loadOptions: ['id', 'name', 'label', 'description', 'color', 'icon'],
           where: [['name', '=', ctrl.field.name]]
-        }, 0).then(function(field) {
-          ctrl.field.options = optionsCache[cacheKey] = field.options;
+        }, 0).then(function(fieldInfo) {
+          ctrl.field.options = fieldInfo.options;
         });
       }
     }

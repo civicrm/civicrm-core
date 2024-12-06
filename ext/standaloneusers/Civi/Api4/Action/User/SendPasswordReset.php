@@ -8,16 +8,14 @@ namespace Civi\Api4\Action\User;
 
 use Civi;
 use Civi\Api4\Generic\Result;
-use API_Exception;
+use CRM_Core_Exception;
 use Civi\Api4\User;
 use Civi\Standalone\Security;
 use Civi\Api4\Generic\AbstractAction;
 
 /**
- * @class API_Exception
- */
-
-/**
+ * @class SendPasswordReset
+ *
  * This is designed to be a public API
  *
  * @method static setIdentifier(string $identifier)
@@ -37,7 +35,7 @@ class SendPasswordReset extends AbstractAction {
 
     $identifier = trim($this->identifier);
     if (!$identifier) {
-      throw new API_Exception("Missing identifier");
+      throw new CRM_Core_Exception("Missing identifier");
     }
 
     $user = User::get(FALSE)

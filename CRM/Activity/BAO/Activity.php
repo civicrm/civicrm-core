@@ -723,12 +723,6 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
           }
         }
       }
-      // if deleted, wrap in <del>
-      if (!empty($activity['source_contact_id']) &&
-        CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $activity['source_contact_id'], 'is_deleted')
-      ) {
-        $activities[$id]['source_contact_name'] = sprintf("<del>%s<del>", htmlentities($activity['source_contact_name']));
-      }
       $activities[$id]['is_recurring_activity'] = CRM_Core_BAO_RecurringEntity::getParentFor($id, 'civicrm_activity');
     }
 
