@@ -48,7 +48,7 @@ class Container {
    * each (eg "templates_c/CachedCiviContainer.$ENVID.php").
    *
    * Constants:
-   *   - CIVICRM_CONTAINER_CACHE -- 'always' [default], 'never', 'auto'
+   *   - CIVICRM_CONTAINER_CACHE -- 'auto' [default], 'always', 'never',
    *   - CIVICRM_DSN
    *   - CIVICRM_DOMAIN_ID
    *
@@ -503,6 +503,7 @@ class Container {
     $dispatcher->addListener('hook_civicrm_permissionList', ['CRM_Core_Permission_List', 'findConstPermissions'], 975);
     $dispatcher->addListener('hook_civicrm_permissionList', ['CRM_Core_Permission_List', 'findCiviPermissions'], 950);
     $dispatcher->addListener('hook_civicrm_permissionList', ['CRM_Core_Permission_List', 'findCmsPermissions'], 925);
+    $dispatcher->addListener('hook_civicrm_permission_check', ['CRM_Core_Permission', 'checkConstPermissions'], 1000);
 
     $dispatcher->addListener('hook_civicrm_postSave_civicrm_domain', ['\CRM_Core_BAO_Domain', 'onPostSave']);
     $dispatcher->addListener('hook_civicrm_unhandled_exception', [
@@ -681,7 +682,7 @@ class Container {
     $bootServices['userPermissionClass'] = new $userPermissionClass();
 
     $bootServices['cache.settings'] = \CRM_Utils_Cache::create([
-      'name' => 'settings',
+      'name' => 'settings_' . preg_replace(';[^0-9a-z_];', '_', \CRM_Utils_System::version()),
       'type' => ['*memory*', 'SqlGroup', 'ArrayCache'],
     ]);
 

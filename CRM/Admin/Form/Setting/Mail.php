@@ -21,27 +21,6 @@
 class CRM_Admin_Form_Setting_Mail extends CRM_Admin_Form_Setting {
 
   /**
-   * Subset of settings on the page as defined using the legacy method.
-   *
-   * @var array
-   *
-   * @deprecated - do not add new settings here - the page to display
-   * settings on should be defined in the setting metadata.
-   */
-  protected $_settings = [
-    // @todo remove these, define any not yet defined in the setting metadata.
-    'mailerBatchLimit' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-    'mailThrottleTime' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-    'mailerJobSize' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-    'mailerJobsMax' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-    'verpSeparator' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-    // dev/core#1768 Make this interval configurable.
-    'civimail_sync_interval' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-    'replyTo' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-    'civimail_unsubscribe_methods' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-  ];
-
-  /**
    * Build the form object.
    */
   public function buildQuickForm() {
@@ -57,11 +36,11 @@ class CRM_Admin_Form_Setting_Mail extends CRM_Admin_Form_Setting {
    */
   public static function formRule($fields) {
     $errors = [];
-    if (CRM_Utils_Array::value('mailerJobSize', $fields) > 0) {
-      if (CRM_Utils_Array::value('mailerJobSize', $fields) < 1000) {
+    if (isset($fields['mailerJobSize']) && $fields['mailerJobSize'] > 0) {
+      if ($fields['mailerJobSize'] < 1000) {
         $errors['mailerJobSize'] = ts('The job size must be at least 1000 or set to 0 (unlimited).');
       }
-      elseif (CRM_Utils_Array::value('mailerJobSize', $fields) <
+      elseif ($fields['mailerJobSize'] <
         CRM_Utils_Array::value('mailerBatchLimit', $fields)
       ) {
         $errors['mailerJobSize'] = ts('A job size smaller than the batch limit will negate the effect of the batch limit.');

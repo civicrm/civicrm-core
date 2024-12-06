@@ -345,10 +345,11 @@ class CRM_Activity_BAO_Query {
    * @param string $name
    * @param int $mode
    * @param string $side
+   * @param int $onlyDeleted
    *
    * @return null|string
    */
-  public static function from($name, $mode, $side) {
+  public static function from($name, $mode, $side, $onlyDeleted = 0) {
     $from = NULL;
     switch ($name) {
       case 'civicrm_activity':
@@ -362,8 +363,9 @@ class CRM_Activity_BAO_Query {
                       ON ( civicrm_activity.id = civicrm_activity_contact.activity_id
                       AND civicrm_activity.is_deleted = 0 AND civicrm_activity.is_current_revision = 1 )";
         // Do not show deleted contact's activity
+        // unless we are looking at deleted contacts.
         $from .= " INNER JOIN civicrm_contact
-                      ON ( civicrm_activity_contact.contact_id = civicrm_contact.id and civicrm_contact.is_deleted != 1 )";
+                      ON ( civicrm_activity_contact.contact_id = civicrm_contact.id and civicrm_contact.is_deleted = $onlyDeleted )";
         break;
 
       case 'activity_type':

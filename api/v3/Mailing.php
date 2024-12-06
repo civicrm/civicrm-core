@@ -156,6 +156,9 @@ function civicrm_api3_mailing_clone($params) {
     'is_archived',
     'hash',
     'mailing_type',
+    'start_date',
+    'end_date',
+    'status',
   ];
 
   $get = civicrm_api3('Mailing', 'getsingle', ['id' => $params['id']]);

@@ -46,6 +46,31 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
   }
 
   /**
+   */
+  public static function on_civi_search_autocompleteDefault(GenericHookEvent $e) {
+    // Adjust search params for menubar-quicksearch
+    if ($e->formName === 'crmMenubar' && $e->fieldName === 'crm-qsearch-input') {
+      // If doing a search by a field other than the default,
+      // add that field to the main column
+      if ($e->filters) {
+        $filterField = array_keys($e->filters)[0];
+        // If the filter is from a multi-record custom field set, add necessary join to the query
+        if (str_contains($filterField, '.')) {
+          [$customGroupName, $customFieldName] = explode('.', $filterField);
+          $customGroup = \CRM_Core_BAO_CustomGroup::getGroup(['name' => $customGroupName]);
+          if (!empty($customGroup['is_multiple'])) {
+            $e->savedSearch['api_params']['join'][] = [
+              "Custom_$customGroupName AS $customGroupName",
+              'INNER',
+              ['id', '=', "$customGroupName.entity_id"],
+            ];
+          }
+        }
+      }
+    }
+  }
+
+  /**
    * Provide default SearchDisplay for Contact autocompletes
    *
    * @param \Civi\Core\Event\GenericHookEvent $e
@@ -81,8 +106,8 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
         ],
       ],
     ];
-    // Adjust display for quicksearch input - the display only needs one column
-    // as the menubar autocomplete does not support descriptions
+    // Adjust search display for menubar-quicksearch
+    // The display only needs one column as the menubar autocomplete does not support descriptions
     if (($e->context['formName'] ?? NULL) === 'crmMenubar' && ($e->context['fieldName'] ?? NULL) === 'crm-qsearch-input') {
       $column = ['type' => 'field'];
       // Map contact_autocomplete_options settings to v4 format

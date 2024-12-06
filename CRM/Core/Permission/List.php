@@ -86,6 +86,11 @@ class CRM_Core_Permission_List {
       // The functionality that actually handles this pseudo-permission is in `CRM_Core_Permission_*::check()`
       'implies' => ['*'],
     ];
+    $e->permissions[\CRM_Core_Permission::ANY_AUTHENTICATED_CONTACT] = [
+      'group' => 'const',
+      'title' => ts('Generic: Allow any authenticated contact'),
+      'is_synthetic' => TRUE,
+    ];
   }
 
 }

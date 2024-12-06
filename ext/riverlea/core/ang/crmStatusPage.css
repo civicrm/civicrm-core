@@ -1,0 +1,91 @@
+/* CSS rules for Angular module "statuspage" */
+
+#crm-status-list h3 {
+  color: inherit;
+  opacity: .85;
+  display: flex;
+  justify-content: space-between;
+  gap: var(--crm-r);
+  align-items: center;
+  padding: var(--crm-padding-small) var(--crm-padding-small) var(--crm-padding-small) var(--crm-r);
+}
+#crm-status-list h3:hover,
+#crm-status-list h3.menuopen {
+  opacity: 1;
+}
+/* Error Severity */
+#crm-status-list .crm-severity-emergency,
+#crm-status-list .crm-severity-alert,
+#crm-status-list .crm-severity-critical,
+#crm-status-list .crm-severity-error {
+  background-color: var(--crm-c-alert);
+  color: var(--crm-c-alert-text);
+}
+/* Warning Severity */
+#crm-status-list .crm-severity-warning {
+  background-color: var(--crm-c-warning);
+  color: var(--crm-c-warning-text);
+}
+/* Not Okay - Not Warning */
+#crm-status-list .crm-severity-notice {
+  background-color: var(--crm-c-info);
+  color: var(--crm-c-info-text);
+}
+/* All OK Severity */
+#crm-status-list .crm-severity-info,
+#crm-status-list .crm-severity-debug {
+  background-color: var(--crm-c-success);
+  color: var(--crm-c-success-text);
+}
+#crm-status-list .crm-status-message-body {
+  margin: var(--crm-r) 0;
+}
+#crm-status-list .hidden-until {
+  font-weight: normal;
+  font-size: var(--crm-small-font-size);
+  margin-right: var(--crm-r);
+}
+#crm-status-list .hush-menu {
+  margin-left: auto;
+}
+#crm-status-list .hush-menu > div {
+  position: relative;
+}
+#crm-status-list .hush-menu button {
+  background-color: rgba(256,256,256,0.6);
+  color: var(--crm-c-text);
+  font-size: initial;
+  border-color: transparent;
+}
+#crm-status-list .hush-menu ul {
+  position: absolute;
+  top: 1.5em;
+  right: 0;
+  width: calc(1.5 * var(--crm-dropdown-width));
+  margin: 0;
+  padding: 0;
+  z-index: 99;
+  background: var(--crm-dropdown-bg);
+  padding: var(--crm-dropdown-padding);
+  border-radius: var(--crm-dropdown-radius);
+  font-size: var(--crm-font-size);
+  box-shadow: var(--crm-popup-shadow);
+}
+#crm-status-list .hush-menu li {
+  padding: var(--crm-dropdown-padding);
+  color: var(--crm-dropdown-col);
+  background-color: var(--crm-dropdown-bg);
+  font-weight: normal;
+  border-radius: var(--crm-dropdown-radius);
+}
+#crm-status-list .hush-menu li:hover,
+#crm-status-list .hush-menu li:focus {
+  background-color: var(--crm-dropdown-hover-bg);
+  color: var(--crm-dropdown-hover);
+}
+.status-debug-information {
+  font-size: var(--crm-small-font-size);
+}
+.crm-status-message-body ul {
+  list-style: inherit;
+}

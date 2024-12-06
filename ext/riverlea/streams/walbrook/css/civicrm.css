@@ -1,0 +1,28 @@
+@import url(../../../core/css/_base.css); /* resets and civi wide styles */
+@import url(../../../core/css/_cms.css); /* CMS-specific hacks/workarounds */
+@import url(../../../core/css/_core.css); /* components and utility classes */
+@import url(../../../core/css/_fixes.css); /* deprecated-Civi handling, hacks/workarounds. one day this will go. */
+
+/* Font */
+
+@font-face {
+  font-family: Civitype;
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../../../fonts/inter-v18-latin-regular.woff2") format("woff2");
+}
+@font-face {
+  font-family: Civitype-italic;
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../../../fonts/inter-v18-latin-italic.woff2") format("woff2");
+}
+@font-face {
+  font-family: Civitype-bold;
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("../../../fonts/inter-v18-latin-600.woff2") format("woff2");
+}

@@ -29,7 +29,7 @@
           savedSearch: function($route, crmApi4) {
             var params = $route.current.params;
             return crmApi4('SavedSearch', 'get', {
-              select: ['id', 'name', 'label', 'description', 'api_entity', 'api_params', 'expires_date', 'GROUP_CONCAT(DISTINCT entity_tag.tag_id) AS tag_id'],
+              select: ['id', 'name', 'label', 'description', 'api_entity', 'api_params', 'is_template', 'expires_date', 'GROUP_CONCAT(DISTINCT entity_tag.tag_id) AS tag_id'],
               where: [['id', '=', params.id]],
               join: [
                 ['EntityTag AS entity_tag', 'LEFT', ['entity_tag.entity_table', '=', '"civicrm_saved_search"'], ['id', '=', 'entity_tag.entity_id']],
@@ -91,7 +91,8 @@
       // Tabs include a rowCount which will be updated by the search controller
       this.tabs = [
         {name: 'custom', title: ts('Custom Searches'), icon: 'fa-search-plus', rowCount: null, filters: {has_base: false}},
-        {name: 'packaged', title: ts('Packaged Searches'), icon: 'fa-suitcase', rowCount: null, filters: {has_base: true}}
+        {name: 'packaged', title: ts('Packaged Searches'), icon: 'fa-suitcase', rowCount: null, filters: {has_base: true}},
+        {name: 'template', title: ts('Search Templates'), icon: 'fa-clipboard', rowCount: null, filters: {is_template: true}},
       ];
       $scope.$bindToRoute({
         expr: '$ctrl.tab',
@@ -109,7 +110,8 @@
       searchEntity = $routeParams.entity;
       var ctrl = $scope.$ctrl = this;
       this.savedSearch = {
-        api_entity: searchEntity
+        api_entity: searchEntity,
+        is_template: ($routeParams.is_template == '1'),
       };
       // Changing entity will refresh the angular page
       $scope.$watch('$ctrl.savedSearch.api_entity', function(newEntity, oldEntity) {
@@ -127,14 +129,16 @@
     })
 
     // Controller for cloning a SavedSearch
-    .controller('searchClone', function($scope, savedSearch) {
+    .controller('searchClone', function($scope, $routeParams, savedSearch) {
       searchEntity = savedSearch.api_entity;
       savedSearch.label += ' (' + ts('copy') + ')';
       delete savedSearch.id;
       savedSearch.displays.forEach(display => {
         delete display.id;
+        display.acl_bypass = false;
         display.label += ' (' + ts('copy') + ')';
       });
+      savedSearch.is_template = ($routeParams.is_template == '1');
       this.savedSearch = savedSearch;
       $scope.$ctrl = this;
     })

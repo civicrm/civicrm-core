@@ -3,19 +3,13 @@
  *}
 <script type="text/template" id="designer_template">
   <div class="crm-designer-toolbar full-height">
-    <div class="crm-designer-buttonset-region ui-dialog-buttonset">
-    </div>
-    <hr />
-    <div class="crm-designer-palette-region full-height">
-    </div>
+    <div class="crm-designer-buttonset-region ui-dialog-buttonset"></div>
+    <div class="crm-designer-palette-region full-height"></div>
   </div>
   <div class="crm-designer-canvas full-height scroll">
     <div class="crm-designer-preview-canvas"></div>
-    <div class="crm-designer-form-region">
-    </div>
-    <hr />
-    <div class="crm-designer-fields-region">
-    </div>
+    <div class="crm-designer-form-region"></div>
+    <div class="crm-designer-fields-region"></div>
   </div>
 </script>
 
@@ -34,7 +28,6 @@
           </select>
         </span>
       </div>
-      <hr>
       <input type="text" class="crm-form-text" placeholder="{ts}Search Fields{/ts}" />
       <a class="crm-designer-palette-clear-search crm-hover-button" href="#" style="visibility:hidden" title="{ts}Clear search{/ts}"><i class="crm-i fa-times" aria-hidden="true"></i></a>
       <div class="crm-designer-palette-controls">
@@ -99,7 +92,6 @@
 
 <script type="text/template" id="designer_buttons_template">
   <button class="crm-designer-save">{ts}Save{/ts}</button>
-  <button class="crm-designer-preview">{ts}Preview{/ts}</button>
 </script>
 
 <script type="text/template" id="field_canvas_view_template">

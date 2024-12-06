@@ -31,11 +31,16 @@
 table.crm-sticky-header > thead > tr {
   position: sticky !important;
   top: var(--crm-menubar-bottom, 0px);
+  z-index: 2;
 }
 
 /* Nested styling for hierarchical rows */
 #bootstrap-theme .crm-search-display-table tr td.crm-hierarchical-row {
   position: relative;
+}
+#bootstrap-theme .crm-search-display-table crm-search-display-toggle-collapse {
+  position: relative;
+  z-index: 1;
 }
 /* Depth >= 1 */
 #bootstrap-theme .crm-search-display-table tr td.crm-hierarchical-child:first-child:not(.crm-search-ctrl-column),
@@ -53,6 +58,9 @@ table.crm-sticky-header > thead > tr {
   border-bottom: 2px dotted currentColor;
   border-left: 2px dotted currentColor;
 }
+#bootstrap-theme .crm-search-display-table .crm-hierarchical-depth-1 crm-search-display-toggle-collapse {
+  left: 30px;
+}
 /* Depth = 2 */
 #bootstrap-theme .crm-search-display-table tr td.crm-hierarchical-depth-2:first-child:not(.crm-search-ctrl-column),
 #bootstrap-theme .crm-search-display-table tr td.crm-search-ctrl-column + td.crm-hierarchical-depth-2 {
@@ -61,6 +69,9 @@ table.crm-sticky-header > thead > tr {
 #bootstrap-theme .crm-search-display-table tr td.crm-hierarchical-depth-2:first-child:not(.crm-search-ctrl-column):before,
 #bootstrap-theme .crm-search-display-table tr td.crm-search-ctrl-column + td.crm-hierarchical-depth-2:before {
   left: 45px;
+}
+#bootstrap-theme .crm-search-display-table .crm-hierarchical-depth-2 crm-search-display-toggle-collapse {
+  left: 60px;
 }
 /* Depth = 3 */
 #bootstrap-theme .crm-search-display-table tr td.crm-hierarchical-depth-3:first-child:not(.crm-search-ctrl-column),
@@ -71,6 +82,9 @@ table.crm-sticky-header > thead > tr {
 #bootstrap-theme .crm-search-display-table tr td.crm-search-ctrl-column + td.crm-hierarchical-depth-3:before {
   left: 75px;
 }
+#bootstrap-theme .crm-search-display-table .crm-hierarchical-depth-3 crm-search-display-toggle-collapse {
+  left: 90px;
+}
 /* Depth = 4 */
 #bootstrap-theme .crm-search-display-table tr td.crm-hierarchical-depth-4:first-child:not(.crm-search-ctrl-column),
 #bootstrap-theme .crm-search-display-table tr td.crm-search-ctrl-column + td.crm-hierarchical-depth-4 {
@@ -79,4 +93,7 @@ table.crm-sticky-header > thead > tr {
 #bootstrap-theme .crm-search-display-table tr td.crm-hierarchical-depth-4:first-child:not(.crm-search-ctrl-column):before,
 #bootstrap-theme .crm-search-display-table tr td.crm-search-ctrl-column + td.crm-hierarchical-depth-4:before {
   left: 105px;
+}
+#bootstrap-theme .crm-search-display-table .crm-hierarchical-depth-4 crm-search-display-toggle-collapse {
+  left: 120px;
 }

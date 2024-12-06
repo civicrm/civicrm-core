@@ -161,22 +161,33 @@ if (!defined('CIVI_SETUP')) {
       ->execute()->indexBy('name');
 
     // Create contact+user for admin.
-    $contactID = \Civi\Api4\Contact::create(FALSE)
-      ->setValues([
-        'contact_type' => 'Individual',
-        'first_name' => 'Standalone',
-        'last_name' => 'Admin',
-      ])
-      ->execute()->first()['id'];
+    $adminUser = $e->getModel()->extras['adminUser'];
+    $adminPass = $e->getModel()->extras['adminPass'];
     $adminEmail = $e->getModel()->extras['adminEmail'];
-    $params = [
-      'cms_name'   => $e->getModel()->extras['adminUser'],
-      'cms_pass'   => $e->getModel()->extras['adminPass'],
-      'email'      => $adminEmail,
-      'notify'     => FALSE,
-      'contact_id' => $contactID,
-    ];
-    $userID = \CRM_Core_BAO_CMSUser::create($params, 'email');
+
+    $contactID = \Civi\Api4\Contact::create(FALSE)
+      ->addValue('contact_type', 'Individual')
+      ->addValue('first_name', 'Standalone')
+      ->addValue('last_name', 'Admin')
+      ->execute()->single()['id'];
+
+    // add email to the contact
+    \Civi\Api4\Email::create(FALSE)
+      ->addValue('contact_id', $contactID)
+      ->addValue('email', $adminEmail)
+      ->execute();
+
+    // NOTE: normally uf_name would be derived automatically
+    // from the contact email, and roles could be provided using
+    // the facade on the User entity
+    // BUT: User BAO pre hooks are not online in the installer
+    // so we need to do them directly
+    $userID = \Civi\Api4\User::create(FALSE)
+      ->addValue('contact_id', $contactID)
+      ->addValue('username', $adminUser)
+      ->addValue('password', $adminPass)
+      ->addValue('uf_name', $adminEmail)
+      ->execute()->single()['id'];
 
     // Assign 'admin' role to user
     \Civi\Api4\UserRole::create(FALSE)
@@ -184,9 +195,9 @@ if (!defined('CIVI_SETUP')) {
       ->addValue('role_id', $roles['admin']['id'])
       ->execute();
 
-    $message = "Created new user \"{$e->getModel()->extras['adminUser']}\" (user ID #$userID, contact ID #$contactID) with 'admin' role and ";
+    $message = "Created new user \"{$adminUser}\" (user ID #$userID, contact ID #$contactID) with 'admin' role and ";
     $message .= empty($e->getModel()->extras['adminPassWasSpecified'])
-    ? "random password \"" . ($e->getModel()->extras['adminPass']) . '"'
+    ? "random password \"" . ($adminPass) . '"'
     : "specified password";
     \Civi::log()->notice($message);
 

@@ -1,0 +1,412 @@
+/* Style rules for Contact Summary.
+   Forked on 12 June 24. Called on contact Summary/Edit/Inline-Edit pages.
+   Status: merged  */
+
+.crm-container .primary .crm-label {
+  font-weight: bold;
+  font-family: var(--crm-font-bold);
+}
+
+/* Contact name/header */
+
+.crm-summary-contactname-block {
+  background: var(--crm-dash-header-bg);
+  color: var(--crm-dash-header-col);
+  padding: var(--crm-dash-header-padding);
+  margin-left: var(--crm-dash-heading-inset);
+}
+
+/* Image */
+
+#crm-main-content-wrapper {
+  position: relative;
+}
+#mainTabContainer {
+  position: inherit;
+}
+.crm-inline-edit-container .crm-contact_image {
+  position: absolute;
+  top: var(--crm-dash-image-top);
+  right: var(--crm-dash-image-right);
+  z-index: 1;
+}
+.crm-inline-edit-container .crm-image-popup {
+  width: var(--crm-dash-image-size);
+  height: var(--crm-dash-image-size);
+  display: block;
+  background-size: cover;
+  border-radius: var(--crm-dash-image-radius);
+  box-shadow: var(--crm-bottom-shadow);
+  overflow: hidden;
+  border: var(--crm-dash-image-border);
+}
+.crm-container div.contact_panel {
+  display: block;
+}
+.crm-container table.image_URL-section td {
+  text-align: inherit;
+  display: flex;
+  align-items: start;
+  gap: var(--crm-flex-gap);
+}
+
+/* Inline edit */
+
+.crm-inline-edit.form {
+  cursor: default;
+  border: 1px solid var(--crm-c-focus);
+  border-radius: var(--crm-roundness);
+  background: var(--crm-inline-edit-bg);
+  padding: var(--crm-r);
+  width: fit-content;
+  z-index: 99;
+  position: absolute;
+  left: 0;
+}
+#mainTabContainer:not(.narrowpage) .contactCardRight div.crm-inline-edit.form {
+  right: 0;
+  left: initial;
+  position: absolute;
+}
+.crm-container .crm-inline-edit.add-new {
+  min-height: 2.5em;
+}
+.crm-container div.crm-summary-block .crm-edit-help {
+  display: block;
+  position: absolute;
+  color: transparent;
+  right: 0;
+  top: 0;
+  opacity: .6;
+  padding: var(--crm-padding-small);
+}
+.crm-container .crm-address-block+.crm-address-block .add-new .crm-edit-help {
+  display: block;
+  background-color: transparent;
+}
+.crm-container #crm-contactname-content .crm-edit-help:hover,
+.crm-edit-ready .crm-summary-block .crm-inline-edit:hover .crm-edit-help {
+  color: var(--crm-c-text);
+  display: block;
+  opacity: 1;
+  background-color: var(--crm-dash-summary-row-bg);
+  z-index: 3;
+}
+#contact-summary .crm-edit-help .crm-i.fa-pencil {
+  float: right;
+  color: var(--crm-c-text);
+  margin: var(--crm-xs) 0 0 var(--crm-m);
+}
+.crm-container div.crm-inline-edit.form .crm-edit-help {
+  display: none !important;
+}
+.crm-container .crm-address-block+.crm-address-block .add-new .crm-summary-row {
+  display: none;
+}
+.crm-container span.crm-custom-greeting {
+  font-size: var(--crm-small-font-size);
+}
+.crm-container table.crm-inline-edit-form td,
+.crm-container div.crm-inline-edit-form {
+  background-color: transparent;
+  white-space: nowrap;
+  text-align: left !important /* vs _tables.css:95 */;
+}
+.crm-container table.crm-inline-edit-form td.crm-label,
+.crm-container div.crm-inline-edit-form .crm-label,
+.crm-container div.crm-inline-edit-form .messages {
+  white-space: normal;
+}
+.crm-container div.crm-inline-edit-field {
+  display: inline-block;
+  padding: 4px 5px;
+}
+.crm-inline-edit.form td {
+  background: transparent;
+  padding: var(--crm-m);
+  border-bottom: 0 solid transparent;
+}
+.CRM_Contact_Form_Inline_ContactName div.crm-inline-edit-form {
+  white-space: nowrap;
+  padding: var(--crm-dash-block-padding);
+  display: flex;
+  color: var(--crm-c-text);
+  background-color: var(--crm-inline-edit-bg);
+}
+div.crm-inline-edit-form div.crm-clear {
+  padding: var(--crm-m) 0 0;
+}
+#contactname-block,
+#contactname-block .crm-inline-edit,
+.crm-inline-edit-form div.crm-summary-row {
+  border: 0 solid transparent;
+  width: 100%;
+}
+#contactname-block .crm-inline-edit .crm-container {
+  overflow: scroll !important; /* vs inline css */
+}
+.crm-inline-edit-form div.crm-summary-row div.crm-label,
+.crm-inline-edit-form div.crm-summary-row .label {
+  background: transparent;
+}
+.crm-inline-edit-form div.crm-summary-row div.crm-content {
+  display: table-cell;
+  padding: 0;
+}
+#contact-summary .crm-inline-button,
+#contact-summary .crm-submit-buttons {
+  margin-bottom: 0;
+  padding-bottom: var(--crm-m2);
+}
+.CRM_Contact_Form_Inline_ContactName .crm-inline-button {
+  margin-left: auto;
+  order: 2;
+  align-self: end;
+}
+#crm-contactname-content > .crm-inline-block-content {
+  display: flex;
+  gap: var(--crm-r);
+  align-items: center;
+  border: 2px dashed transparent;
+}
+#crm-contactname-content > .crm-inline-block-content:hover,
+#crm-contactname-content > .crm-inline-block-content:focus {
+  border-color: var(--crm-c-gray-200);
+}
+#crm-contactname-content .crm-summary-display_name {
+  padding: var(--crm-dash-header-padding);
+  font-size: var(--crm-dash-header-size);
+  padding-inline: 0;
+}
+.crm-container div.contact_panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: var(--crm-dash-panel-padding);
+}
+.crm-container div.contactCardLeft,
+.crm-container div.contactCardRight {
+  width: 100%;
+}
+.crm-container div.contact_panel table {
+  margin-bottom: 0;
+  width: auto;
+}
+.crm-container div.contact_panel td.last {
+  border-bottom: 0;
+}
+.crm-container #customFields {
+  width: 100%;
+}
+.crm-container #customFields div.contact_panel td.talabel {
+  padding: 4px 0 0 4px;
+  border: 0;
+}
+.crm-container #customFields .contact_panel .customFieldGroup {
+  line-height: 1.4em;
+  padding: 4px;
+  width: 100%;
+}
+.crm-container div.contact_panel td.grouplabel {
+  border-bottom: var(--crm-c-divider);
+  border-width: 2px;
+}
+.crm-container div.contact_panel .crm-address-block {
+  margin-bottom: 6px;
+}
+.crm-container .crm-add-address-wrapper {
+  height: 25px;
+}
+.crm-container .crm-summary-row:after {
+  clear: both;
+  content: ".";
+  display: block;
+  height: 0;
+  visibility: hidden;
+}
+.crm-container div.crm-summary-row {
+  background-color: var(--crm-dash-summary-row-bg);
+  border-top: 1px solid var(--crm-dash-summary-row-bg);
+  display: flex;
+}
+.crm-container div.crm-summary-row div.crm-label {
+  background-color: var(--crm-dash-label-bg);
+  color: var(--crm-input-label-color);
+  font-weight: var(--crm-input-label-weight);
+  font-family: var(--crm-input-label-font);
+  font-size: var(--crm-font-size);
+  padding: var(--crm-m);
+  min-width: var(--crm-input-label-width);
+  text-align: left;
+}
+.crm-container div.crm-summary-row div.crm-content {
+  padding: var(--crm-m);
+}
+.crm-container #customFields div.contact_panel td {
+  border-bottom: 1px solid #ffffff;
+  padding: 4px;
+  vertical-align: top;
+}
+#crm-record-log {
+  padding: 0.8em 0.8em 0 0;
+  text-align: right;
+}
+
+/* contact actions menu */
+
+#crm-contact-actions-list {
+  width: 495px;
+}
+.crm-contact-actions-list-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 0;
+}
+#crm-contact-actions-list .crm-contact_print-list {
+  grid-column: 3;
+  grid-row: 1;
+}
+.crm-contact_print-list ul {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+#crm-contact-actions-list ul a {
+  display: block;
+}
+.crm-contact-crm-contact-delete {
+  margin-top: auto;
+}
+#crm-contact-actions-list .crm-contact_activities-list select {
+  margin-top: 4px;
+}
+.crm-container table.crm-address-element {
+  border: none;
+  margin-bottom: .25em;
+}
+#crm-contact-actions-list a.delete {
+  background: var(--crm-dropdown-alert-bg);
+  color: var(--crm-c-alert-text);
+  border-radius: var(--crm-roundness);
+}
+#crm-contact-actions-list a.delete .crm-i.fa-trash::before {
+  color: var(--crm-c-alert-text);
+}
+#crm-contact-actions-list a.delete:hover,
+#crm-contact-actions-list a.delete:focus {
+  color: var(--crm-c-alert-text);
+  background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-alert);
+}
+
+/* Tags */
+
+#tagtree {
+  max-height: 500px;
+  overflow: auto;
+}
+#tagtree li {
+  margin-top: 5px;
+}
+#tagtree ins.jstree-icon {
+  cursor: var(--crm-hover-clickable);
+  position: relative;
+  top: -3px;
+}
+#tagtree .jstree-disabled {
+  cursor: not-allowed;
+}
+#tagtree .jstree-disabled > .jstree-checkbox {
+  opacity: .2;
+}
+#tagGroup table .label {
+  color: #fff;
+}
+#tagGroup table {
+  color: #000;
+}
+.crm-contact-page #tags {
+  display: flex;
+  gap: var(--crm-s);
+  align-items: center;
+}
+.crm-contact-page .crm-tag-item {
+  border-radius: var(--crm-roundness);
+  padding: 0 var(--crm-m);
+  background-color: var(--crm-c-background2);
+}
+#crm-main-content-wrapper:has(.crm-contact-page) {
+  box-shadow: var(--crm-block-shadow);
+}
+#contact-summary .crm-summary-block {
+  background: var(--crm-dash-block-bg);
+  border-radius: var(--crm-roundness);
+  box-shadow: var(--crm-block-shadow);
+  margin-bottom: var(--crm-dash-panel-padding);
+}
+#contact-summary .crm-summary-block .crm-summary-block {
+  box-shadow: none;
+}
+#contact-summary div.crm-clear {
+  padding: var(--crm-dash-block-padding);
+}
+#mainTabContainer .crm-summary-block .crm-container-snippet table {
+  box-shadow: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+div.crm-summary-contactname-block + .crm-actions-ribbon {
+  color: var(--crm-dash-header-col);
+  background-color: var(--crm-dash-header-bg2);
+  margin-bottom: 0;
+  clear: both;
+  margin-left: var(--crm-dash-heading-inset);
+}
+.crm-actions-ribbon ul#actions {
+  display: grid;
+  grid-template-columns: min-content min-content auto min-content min-content;
+  gap: var(--crm-m);
+  margin: 0;
+  padding: var(--crm-dash-header-padding);
+}
+.crm-actions-ribbon ul#actions > * {
+  width: max-content;
+  display: flex;
+  list-style: none;
+}
+.crm-search-col-type-field span.ng-scope a {
+  display: flex;
+  gap: var(--crm-btn-icon-spacing);
+  align-items: center;
+}
+/* Contact dashboard responsive (using Bootstrap viewports) */
+
+@media (max-width: 768px) {
+  #crm-main-content-wrapper {
+    --crm-dash-heading-inset: 0; /* resets any inset on the title/action links */
+  }
+  .crm-container #mainTabContainer,
+  .crm-container div.crm-summary-row {
+    flex-direction: column;
+  }
+  .crm-container .crm-actions-ribbon ul#actions {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .crm-actions-ribbon .crm-next-action,
+  .crm-actions-ribbon .crm-previous-action {
+    margin-left: 0;
+  }
+}
+@media (max-width: 500px) { /* shows only icons for contact dashboard */
+  .crm-contact-page #mainTabContainer.ui-tabs {
+    grid-template-columns: auto 1fr;
+  }
+  .crm-contact-page #mainTabContainer .crm-contact-tabs-list {
+    width: fit-content;
+  }
+  .crm-container #mainTabContainer .ui-tabs-nav li .ui-tabs-anchor i {
+    font-size: var(--crm-font-size);
+  }
+  .crm-container #mainTabContainer ul.ui-tabs-nav a span {
+    display: none;
+  }
+}

@@ -9,7 +9,6 @@ use Civi\Api4\Afform;
  * @group headless
  */
 class AfformPrefillUsageTest extends AfformUsageTestCase {
-  use \Civi\Test\Api4TestTrait;
 
   /**
    * Ensure that Afform restricts autocomplete results when it's set to use a SavedSearch

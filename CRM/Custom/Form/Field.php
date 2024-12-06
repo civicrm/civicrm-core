@@ -219,7 +219,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     $this->addField('html_type', ['class' => 'twenty', 'options' => $htmlOptions], TRUE);
 
     if (CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'is_multiple')) {
-      $this->add('checkbox', 'in_selector', ts('Display in Table?'));
+      $this->add('advcheckbox', 'in_selector', ts('Display in Table?'));
     }
 
     $optionGroupParams = [
@@ -229,7 +229,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       'return' => ['title'],
     ];
 
-    $this->add('checkbox', 'serialize', ts('Multi-Select'));
+    $this->add('advcheckbox', 'serialize', ts('Multi-Select'));
 
     $this->addAutocomplete('fk_entity', ts('Entity'), [
       'class' => 'twenty',

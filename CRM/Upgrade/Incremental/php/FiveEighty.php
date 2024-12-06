@@ -29,6 +29,34 @@ class CRM_Upgrade_Incremental_php_FiveEighty extends CRM_Upgrade_Incremental_Bas
    */
   public function upgrade_5_80_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Increase length of Website.url field', 'alterSchemaField', 'Website', 'url', [
+      'title' => ts('Website'),
+      'sql_type' => 'varchar(2048)',
+      'input_type' => 'Text',
+      'description' => ts('Website'),
+      'add' => '3.2',
+      'usage' => [
+        'import',
+        'export',
+        'duplicate_matching',
+      ],
+      'input_attrs' => [
+        'size' => '45',
+      ],
+    ]);
+    $this->addTask('Increase length of Activity.location field', 'alterSchemaField', 'Activity', 'location', [
+      'title' => ts('Location'),
+      'sql_type' => 'varchar(2048)',
+      'input_type' => 'Text',
+      'description' => ts('Location of the activity (optional, open text).'),
+      'add' => '1.1',
+      'unique_name' => 'activity_location',
+      'usage' => [
+        'import',
+        'export',
+        'duplicate_matching',
+      ],
+    ]);
   }
 
 }

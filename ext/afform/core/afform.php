@@ -42,11 +42,12 @@ function afform_civicrm_config(&$config) {
   $dispatcher->addListener('civi.afform.validate', ['\Civi\Api4\Action\Afform\Submit', 'validateEntityRefFields'], 45);
   $dispatcher->addListener('civi.afform.submit', ['\Civi\Api4\Action\Afform\Submit', 'processGenericEntity'], 0);
   $dispatcher->addListener('civi.afform.submit', ['\Civi\Api4\Action\Afform\Submit', 'preprocessContact'], 10);
+  $dispatcher->addListener('civi.afform.submit', ['\Civi\Api4\Action\Afform\Submit', 'preprocessParentFormValues'], 100);
   $dispatcher->addListener('civi.afform.submit', ['\Civi\Api4\Action\Afform\Submit', 'processRelationships'], 1);
   $dispatcher->addListener('hook_civicrm_angularModules', '_afform_hook_civicrm_angularModules', -1000);
   $dispatcher->addListener('hook_civicrm_alterAngular', ['\Civi\Afform\AfformMetadataInjector', 'preprocess']);
   $dispatcher->addListener('hook_civicrm_check', ['\Civi\Afform\StatusChecks', 'hook_civicrm_check']);
-  $dispatcher->addListener('civi.afform.get', ['\Civi\Api4\Action\Afform\Get', 'getCustomGroupBlocks']);
+  $dispatcher->addListener('civi.afform.get', ['\Civi\Api4\Action\CustomGroup\GetAfforms', 'getCustomGroupAfforms']);
 }
 
 /**
@@ -169,6 +170,15 @@ function afform_civicrm_tabset($tabsetName, &$tabs, $context) {
     if (!$summaryContactType || !$contactTypes || array_intersect($summaryContactType, $contactTypes)) {
       // Convention is to name the afform like "afformTabMyInfo" which gets the tab name "my_info"
       $tabId = CRM_Utils_String::convertStringToSnakeCase(preg_replace('#^(afformtab|afsearchtab|afform|afsearch)#i', '', $afform['name']));
+      if (strpos($tabId, 'custom_') === 0) {
+        // custom group tab forms use name, but need to replace tabs using ID
+        // remove 'afsearchTabCustom_' from the form name to get the group name
+        $groupName = substr($afform['name'], 18);
+        $group = \CRM_Core_BAO_CustomGroup::getGroup(['name' => $groupName]);
+        if ($group) {
+          $tabId = 'custom_' . $group['id'];
+        }
+      }
       // If a tab with that id already exists, allow the afform to replace it.
       $existingTab = array_search($tabId, $existingTabs);
       if ($existingTab !== FALSE) {
@@ -446,18 +456,22 @@ function afform_civicrm_permission(&$permissions) {
  * @see CRM_Utils_Hook::permission_check()
  */
 function afform_civicrm_permission_check($permission, &$granted, $contactId) {
-  if (!str_starts_with($permission, '@afform:') || strlen($permission) < 9) {
-    // Micro-optimization - this function may get hit a lot.
-    return;
+  // This function may get hit a lot. Try to keep the conditionals efficient.
+  if (str_starts_with($permission, '@afform:') && strlen($permission) >= 9) {
+    [, $name] = explode(':', $permission, 2);
+    // Delegate permission check to APIv4
+    $check = \Civi\Api4\Afform::checkAccess()
+      ->addValue('name', $name)
+      ->setAction('get')
+      ->execute()
+      ->first();
+    $granted = $check['access'];
   }
-  [, $name] = explode(':', $permission, 2);
-  // Delegate permission check to APIv4
-  $check = \Civi\Api4\Afform::checkAccess()
-    ->addValue('name', $name)
-    ->setAction('get')
-    ->execute()
-    ->first();
-  $granted = $check['access'];
+  elseif ($permission === '@afformPageToken') {
+    $session = CRM_Core_Session::singleton();
+    $data = $session->get('authx');
+    $granted = isset($data['jwt']['scope'], $data['flow']) && $data['jwt']['scope'] === 'afform' && $data['flow'] === 'afformpage';
+  }
 }
 
 /**
@@ -466,6 +480,11 @@ function afform_civicrm_permission_check($permission, &$granted, $contactId) {
  * @see CRM_Utils_Hook::permissionList()
  */
 function afform_civicrm_permissionList(&$permissions) {
+  $permissions['@afformPageToken'] = [
+    'group' => 'const',
+    'title' => E::ts('Generic: Anyone with secret link'),
+    'description' => E::ts('If you link to the form with a secure token, then no other permission is needed.'),
+  ];
   $scanner = Civi::service('afform_scanner');
   foreach ($scanner->getMetas() as $name => $meta) {
     $permissions['@afform:' . $name] = [

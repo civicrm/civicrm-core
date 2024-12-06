@@ -132,8 +132,15 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
   private function formatFieldSpec(array $column, array $expr): array {
     // Strip the pseuoconstant suffix
     [$name, $suffix] = array_pad(explode(':', $column['key']), 2, NULL);
-    // Sanitize the name
-    $name = \CRM_Utils_String::munge($name, '_', 255);
+    // Sanitize the name and limit to 58 characters.
+    // 64 characters is the max for some versions of SQL, minus the length of "index_" = 58.
+    if (strlen($name) <= 58) {
+      $name = \CRM_Utils_String::munge($name, '_', NULL);
+    }
+    // Append a hash of the full name to trimmed names to keep them unique but predictable
+    else {
+      $name = \CRM_Utils_String::munge($name, '_', 42) . substr(md5($name), 0, 16);
+    }
     $spec = [
       'name' => $name,
       'data_type' => $expr['dataType'],
