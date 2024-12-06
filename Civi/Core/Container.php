@@ -176,7 +176,9 @@ class Container {
       'js_strings' => ['withArray' => 'fast'],
       'community_messages' => [],
       'checks' => [],
-      'session' => ['name' => 'CiviCRM Session'],
+      // Putting session-cache in global scope means that QF form-state will endure across upgrades.
+      // (*For better or worse -- mostly better.*)
+      'session' => ['name' => 'CiviCRM Session', 'scope' => 'global'],
       'long' => [],
       'groups' => ['name' => 'contact groups', 'withArray' => 'fast'],
       'navigation' => ['withArray' => 'fast'],
