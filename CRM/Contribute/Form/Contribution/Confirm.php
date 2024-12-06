@@ -1608,11 +1608,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           $this->_paymentProcessor['id'] = $paymentProcessorIDs[0];
         }
         try {
-          civicrm_api3('contribution', 'completetransaction', [
-            'id' => $membershipContribution->id,
-            'payment_processor_id' => $this->_paymentProcessor['id'],
-            'is_transactional' => FALSE,
-          ]);
+          CRM_Contribute_BAO_Contribution::completeOrder(
+            ['payment_processor_id' => $this->getPaymentProcessorID()],
+            $membershipContribution->contribution_recur_id,
+            $membershipContribution->id,
+            NULL);
         }
         catch (CRM_Core_Exception $e) {
           if ($e->getErrorCode() != 'contribution_completed') {
