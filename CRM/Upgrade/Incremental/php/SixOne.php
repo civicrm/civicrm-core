@@ -32,6 +32,7 @@ class CRM_Upgrade_Incremental_php_SixOne extends CRM_Upgrade_Incremental_Base {
     $this->addTask('Update afform tab names', 'updateAfformTabs');
     $this->addTask('Update import mappings', 'updateFieldMappingsForImport');
     $this->addTask('Replace Clear Caches & Reset Paths with Clear Caches in Nav Menu', 'updateUpdateConfigBackendNavItem');
+    $this->addTask('Install ImportTemplateField entity', 'createEntityTable', '6.1.alpha1.ImportTemplateField.entityType.php');
   }
 
   /**
