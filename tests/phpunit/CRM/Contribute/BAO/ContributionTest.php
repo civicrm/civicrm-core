@@ -334,7 +334,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
       'min_contribution' => 100,
       'is_active' => 1,
     ];
-    $premium = CRM_Contribute_BAO_Product::create($params);
+    $premium = CRM_Contribute_BAO_Product::writeRecord($params);
 
     $this->assertEquals('TEST Premium', $premium->name, 'Check for premium  name.');
 

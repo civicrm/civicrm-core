@@ -168,8 +168,8 @@ trait CRM_Custom_Form_CustomDataTrait {
   /**
    * Get the submitted custom fields.
    *
-   * This is returned apiv3 style but in future could take
-   * api version as a parameter.
+   * This is returned apiv3 style.
+   * @see getSubmittedCustomFieldsForApi4()
    *
    * @return array
    */
@@ -178,6 +178,23 @@ trait CRM_Custom_Form_CustomDataTrait {
     foreach ($this->getSubmittedValues() as $label => $field) {
       if (CRM_Core_BAO_CustomField::getKeyID($label)) {
         $fields[$label] = $field;
+      }
+    }
+    return $fields;
+  }
+
+  /**
+   * Get the submitted custom fields in Api4 format.
+   *
+   * @return array
+   */
+  protected function getSubmittedCustomFieldsForApi4(): array {
+    $fields = [];
+    foreach ($this->getSubmittedValues() as $label => $field) {
+      if (preg_match('/^custom_(\d+)_?(-?\d+)?$/', $label)) {
+        if ($new = CRM_Core_BAO_CustomField::getLongNameFromShortName($label)) {
+          $fields[$new] = $field;
+        }
       }
     }
     return $fields;

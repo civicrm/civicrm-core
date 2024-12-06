@@ -2,7 +2,7 @@
   "use strict";
 
   // Trait provides base methods and properties common to all search display types
-  angular.module('crmSearchDisplay').factory('searchDisplayBaseTrait', function(crmApi4, crmStatus) {
+  angular.module('crmSearchDisplay').factory('searchDisplayBaseTrait', function($timeout, $interval, crmApi4, crmStatus) {
 
     // Return a base trait shared by all search display controllers
     // Gets mixed in using angular.extend()
@@ -45,18 +45,28 @@
         // Integrations can pass in `total-count="somevar" to keep track of the number of results returned
         // FIXME: Additional hack to directly update tabHeader for contact summary tab. It would be better to
         // decouple the contactTab code into a separate directive that checks totalCount.
-        var contactTab = $element.closest('.crm-contact-page .ui-tabs-panel').attr('id');
-        if (contactTab || ctrl.hasOwnProperty('totalCount')) {
+        let contactTab = $element.closest('.crm-contact-page .ui-tabs-panel').attr('id');
+        // Only the first display in a tab gets to control the count
+        if (contactTab && !$element.is($('#' + contactTab + ' [search][display]').first())) {
+          contactTab = null;
+        }
+        let hasCounter = contactTab || ctrl.hasOwnProperty('totalCount');
+        if (hasCounter) {
           $scope.$watch('$ctrl.rowCount', function(rowCount) {
             // Update totalCount only if no user filters are set
             if (typeof rowCount === 'number' && angular.equals({}, ctrl.getAfformFilters())) {
-              ctrl.totalCount = rowCount;
-              // The first display in a tab gets to control the count
-              if (contactTab && $element.is($('#' + contactTab + ' [search][display]').first())) {
-                CRM.tabHeader.updateCount(contactTab.replace('contact-', '#tab_'), rowCount);
-              }
+              setTotalCount(rowCount);
             }
           });
+        }
+
+        function setTotalCount(rowCount) {
+          if (ctrl.hasOwnProperty('totalCount')) {
+            ctrl.totalCount = rowCount;
+          }
+          if (contactTab) {
+            CRM.tabHeader.updateCount(contactTab.replace('contact-', '#tab_'), rowCount);
+          }
         }
 
         // Popup forms in this display or surrounding Afform trigger a refresh
@@ -65,6 +75,7 @@
           ctrl.getResultsPronto();
         });
 
+        // When filters are changed, trigger callbacks and refresh search (if there's no search button)
         function onChangeFilters() {
           ctrl.page = 1;
           ctrl.rowCount = null;
@@ -85,22 +96,60 @@
         }
 
         if (this.afFieldset) {
-          $scope.$watch(this.afFieldset.getFieldData, onChangeFilters, true);
           // Add filter title to Afform
-          this.onPostRun.push(function(apiResults) {
+          this.onPostRun.push(function (apiResults) {
             if (apiResults.run.labels && apiResults.run.labels.length && $scope.$parent.addTitle) {
               $scope.$parent.addTitle(apiResults.run.labels.join(' '));
             }
           });
         }
-        if (this.settings.pager && this.settings.pager.expose_limit) {
-          $scope.$watch('$ctrl.limit', onChangePageSize);
+
+        // Set up watches to refresh search results when needed.
+        // Because `angular.$watch` runs immediately as well as on subsequent changes,
+        // this also kicks off the first run of the search (if there's no search button).
+        function setUpWatches() {
+          if (ctrl.afFieldset) {
+            $scope.$watch(ctrl.afFieldset.getFieldData, onChangeFilters, true);
+          }
+          if (ctrl.settings.pager && ctrl.settings.pager.expose_limit) {
+            $scope.$watch('$ctrl.limit', onChangePageSize);
+          }
+          $scope.$watch('$ctrl.filters', onChangeFilters, true);
         }
-        $scope.$watch('$ctrl.filters', onChangeFilters, true);
+
+        // If the search display is visible, go ahead & run it
+        if ($element.is(':visible')) {
+          setUpWatches();
+        }
+        // Wait until display is visible
+        else {
+          let checkVisibility = $interval(() => {
+            if ($element.is(':visible')) {
+              $interval.cancel(checkVisibility);
+              setUpWatches();
+            }
+          }, 250);
+        }
+
+        // Manually fetch total count if:
+        // - there is a counter (e.g. a contact summary tab)
+        // - and the search is hidden or not set to auto-run
+        // - or afform filters are present which would interfere with an accurate total
+        // (wait a brief timeout to allow more important things to happen first)
+        $timeout(function() {
+          if (hasCounter && (!(ctrl.loading || ctrl.results) || !angular.equals({}, ctrl.getAfformFilters()))) {
+            var params = ctrl.getApiParams('row_count');
+            // Exclude afform filters
+            params.filters = ctrl.filters;
+            crmApi4('SearchDisplay', 'run', params).then(function(result) {
+              setTotalCount(result.count);
+            });
+          }
+        }, 900);
       },
 
       hasExtraFirstColumn: function() {
-        return this.settings.actions || this.settings.draggable || (this.settings.tally && this.settings.tally.label);
+        return this.settings.actions || this.settings.draggable || this.settings.collapsible || (this.settings.tally && this.settings.tally.label);
       },
 
       getFilters: function() {
@@ -116,7 +165,7 @@
       // Generate params for the SearchDisplay.run api
       getApiParams: function(mode) {
         return {
-          return: mode || 'page:' + this.page,
+          return: arguments.length ? mode : 'page:' + this.page,
           savedSearch: this.search,
           display: this.display,
           sort: this.sort,
@@ -152,7 +201,7 @@
             return; // Another request started after this one
           }
           ctrl.results = apiResults.run;
-          ctrl.editing = ctrl.loading = false;
+          ctrl.loading = false;
           // Update rowCount if running for the first time or during an update op
           if (!ctrl.rowCount || editedRow) {
             // No need to fetch count if on page 1 and result count is under the limit
@@ -171,7 +220,11 @@
             // If there are no results on initial load, open an "autoOpen" toolbar link
             ctrl.toolbar.forEach((link) => {
               if (link.autoOpen && requestId === 1 && !ctrl.results.length) {
-                CRM.loadForm(link.url);
+                CRM.loadForm(link.url)
+                  .on('crmFormSuccess', (e, data) => {
+                    ctrl.rowCount = null;
+                    ctrl.getResultsPronto();
+                  });
               }
             });
           }
@@ -183,7 +236,7 @@
             return; // Another request started after this one
           }
           ctrl.results = [];
-          ctrl.editing = ctrl.loading = false;
+          ctrl.loading = false;
           _.each(ctrl.onPostRun, function(callback) {
             callback.call(ctrl, error, 'error', editedRow);
           });
@@ -196,9 +249,27 @@
       formatFieldValue: function(colData) {
         return angular.isArray(colData.val) ? colData.val.join(', ') : colData.val;
       },
+
+      // Determine if an editable field is actively in editing mode
       isEditing: function(rowIndex, colIndex) {
         return this.editing && this.editing[0] === rowIndex && this.editing[1] === colIndex;
-      }
+      },
+
+      startEditing: function(rowIndex, colIndex) {
+        if (this.editing === false && this.results[rowIndex].columns[colIndex].edit) {
+          this.editing = [rowIndex, colIndex];
+        }
+      },
+
+      // Determine if a field is not currently loading or editing
+      isViewing: function(rowIndex, colIndex) {
+        return !this.isEditing(rowIndex, colIndex) && !this.isLoading(rowIndex, colIndex);
+      },
+
+      // Determine if a field is currently loading
+      isLoading: function(rowIndex, colIndex) {
+        return !this.isEditing(rowIndex, colIndex) && this.results[rowIndex].columns[colIndex].loading;
+      },
     };
   });
 

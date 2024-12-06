@@ -1074,7 +1074,7 @@ WHERE civicrm_event.is_active = 1
     ];
 
     //get the params submitted by participant.
-    $participantParams = CRM_Utils_Array::value($participantId, $values['params'], []);
+    $participantParams = $values['params'][$participantId] ?? [];
 
     if (!$returnMessageText) {
       //send notification email if field values are set (CRM-1941)
@@ -1115,55 +1115,10 @@ WHERE civicrm_event.is_active = 1
       $notifyEmail = CRM_Utils_Array::valueByRegexKey('/^email-/', $participantParams) ?? $email;
       //send email only when email is present
       if (isset($notifyEmail) || $returnMessageText) {
-        $preProfileID = $values['custom_pre_id'] ?? NULL;
-        $postProfileID = $values['custom_post_id'] ?? NULL;
-
-        if (!empty($values['params']['additionalParticipant'])) {
-          $preProfileID = CRM_Utils_Array::value('additional_custom_pre_id', $values, $preProfileID);
-          $postProfileID = CRM_Utils_Array::value('additional_custom_post_id', $values, $postProfileID);
-        }
-
-        $profilePre = self::buildCustomDisplay($preProfileID,
-          'customPre',
-          $contactID,
-          $template,
-          $participantId,
-          $isTest,
-          TRUE,
-          $participantParams
-        );
-
-        $profilePost = self::buildCustomDisplay($postProfileID,
-          'customPost',
-          $contactID,
-          $template,
-          $participantId,
-          $isTest,
-          TRUE,
-          $participantParams
-        );
-
-        // @todo - the goal is that all params available to the message template are explicitly defined here rather than
-        // 'in a smattering of places'. Note that leakage can happen between mailings when not explicitly defined.
-        if ($postProfileID) {
-          $customPostTitles = empty($profilePost[1]) ? NULL : [];
-          foreach ($postProfileID as $offset => $id) {
-            $customPostTitles[$offset] = CRM_Core_BAO_UFGroup::getFrontEndTitle((int) $id);
-          }
-        }
-        else {
-          $customPostTitles = NULL;
-        }
         $tplParams = array_merge($values, $participantParams, [
           'email' => $notifyEmail,
           'confirm_email_text' => $values['event']['confirm_email_text'] ?? NULL,
           'isShowLocation' => $values['event']['is_show_location'] ?? NULL,
-          'customPre' => $profilePre[0],
-          'customPre_grouptitle' => empty($profilePre[1]) ? NULL : [CRM_Core_BAO_UFGroup::getFrontEndTitle((int) $preProfileID)],
-          'customPost' => $profilePost[0],
-          'customPost_grouptitle' => $customPostTitles,
-          'participantID' => $participantId,
-          'contactID' => $contactID,
           'credit_card_number' => CRM_Utils_System::mungeCreditCard(CRM_Utils_Array::value('credit_card_number', $participantParams)),
           'credit_card_exp_date' => CRM_Utils_Date::mysqlToIso(CRM_Utils_Date::format(CRM_Utils_Array::value('credit_card_exp_date', $participantParams))),
           'selfcancelxfer_time' => abs($values['event']['selfcancelxfer_time']),
@@ -1174,10 +1129,12 @@ WHERE civicrm_event.is_active = 1
         // CRM-13890 : NOTE wait list condition need to be given so that
         // wait list message is shown properly in email i.e. WRT online event registration template
         if (empty($tplParams['participant_status']) && empty($values['params']['isOnWaitlist'])) {
+          // @todo - this is no longer used in the core template - deprecate & remove
           $statusId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $participantId, 'status_id', 'id', TRUE);
           $tplParams['participant_status'] = CRM_Event_PseudoConstant::participantStatus($statusId, NULL, 'label');
         }
         //CRM-15754 - if participant_status contains status ID
+        // @todo - this is no longer used in the core template - deprecate & remove
         elseif (!empty($tplParams['participant_status']) && CRM_Utils_Rule::integer($tplParams['participant_status'])) {
           $tplParams['participant_status'] = CRM_Event_PseudoConstant::participantStatus($tplParams['participant_status'], NULL, 'label');
         }
@@ -1191,6 +1148,7 @@ WHERE civicrm_event.is_active = 1
             'participantID' => (int) $participantId,
             'eventID' => (int) $values['event']['id'],
             'contactID' => (int) $contactID,
+            'note' => $participantParams['note'] ?? '',
           ],
         ];
 
@@ -1293,7 +1251,7 @@ WHERE civicrm_event.is_active = 1
 
     $groups = $participantParams['group'] ?? NULL;
     $note = $participantParams['note'] ?? NULL;
-    $displayValues = self::getProfileDisplay($profileIds, $cid, $participantId, $isTest, $groups, $note);
+    $displayValues = self::getProfileDisplay($profileIds, $cid, $participantId, $note, $groups, $isTest);
 
     $groupTitles = UFGroup::get(FALSE)
       ->addWhere('id', 'IN', $profileIds)
@@ -2312,7 +2270,7 @@ WHERE  ce.loc_block_id = $locBlockId";
    * @throws \CRM_Core_Exception
    * @throws \Civi\Core\Exception\DBQueryException
    */
-  public static function getProfileDisplay(array $profileIds, int $cid, int $participantId, bool $isTest = FALSE, ?array $groups = NULL, ?string $note = NULL): ?array {
+  public static function getProfileDisplay(array $profileIds, int $cid, int $participantId, ?string $note = NULL, ?array $groups = NULL, bool $isTest = FALSE): ?array {
     foreach ($profileIds as $gid) {
       if (CRM_Core_BAO_UFGroup::filterUFGroups($gid, $cid)) {
         $values = [];
@@ -2391,8 +2349,8 @@ WHERE  ce.loc_block_id = $locBlockId";
         //dev/event#10
         //If the event profile includes a note field and the submitted value of
         //that field is "", then remove the old note returned by getValues.
-        if ($note === '') {
-          $noteKeyPos = array_search('note', array_keys($fields));
+        if ($note === '' && array_key_exists('note', $fields)) {
+          $noteKeyPos = array_search('note', array_keys($fields), TRUE);
           $valuesKeys = array_keys($values);
           $values[$valuesKeys[$noteKeyPos]] = "";
         }

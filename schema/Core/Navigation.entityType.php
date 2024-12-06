@@ -11,6 +11,12 @@ return [
     'add' => '3.0',
     'label_field' => 'label',
   ],
+  'getPaths' => fn() => [
+    'browse' => 'civicrm/admin/menu',
+    'add' => 'civicrm/admin/menu/item?reset=1&action=add',
+    'update' => 'civicrm/admin/menu/item?reset=1&action=update&id=[id]',
+    'delete' => 'civicrm/admin/menu/item?reset=1&action=delete&id=[id]',
+  ],
   'getFields' => fn() => [
     'id' => [
       'title' => ts('Navigation ID'),

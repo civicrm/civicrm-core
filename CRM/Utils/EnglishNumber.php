@@ -65,18 +65,32 @@ class CRM_Utils_EnglishNumber {
    *   Ex: 'Twelve' or 'FiftyFour'.
    */
   public static function toCamelCase($num, $default = NULL) {
-    if (isset(self::$lowNumbers[$num])) {
-      return self::$lowNumbers[$num];
-    }
-
+    $hundreds = (int) ($num / 100);
+    $num = ($num % 100);
     $tens = (int) ($num / 10);
     $last = $num % 10;
+
+    $prefix = '';
+    if ($hundreds > 0) {
+      $prefix = static::toCamelCase($hundreds);
+      if ($tens === 0 && $last === 0) {
+        return $prefix . 'Hundred';
+      }
+      elseif ($tens === 0) {
+        $prefix .= 'Oh';
+      }
+    }
+
+    if (isset(self::$lowNumbers[$num])) {
+      return $prefix . self::$lowNumbers[$num];
+    }
+
     if (isset(self::$intervalsOfTen[$tens])) {
       if ($last == 0) {
-        return self::$intervalsOfTen[$tens];
+        return $prefix . self::$intervalsOfTen[$tens];
       }
       else {
-        return self::$intervalsOfTen[$tens] . self::$lowNumbers[$last];
+        return $prefix . self::$intervalsOfTen[$tens] . self::$lowNumbers[$last];
       }
     }
 
@@ -99,27 +113,8 @@ class CRM_Utils_EnglishNumber {
    *   Ex: 'twelve' or 'fifty-four'.
    */
   public static function toHyphen($num, $default = NULL) {
-    if (isset(self::$lowNumbers[$num])) {
-      return strtolower(self::$lowNumbers[$num]);
-    }
-
-    $tens = (int) ($num / 10);
-    $last = $num % 10;
-    if (isset(self::$intervalsOfTen[$tens])) {
-      if ($last == 0) {
-        return strtolower(self::$intervalsOfTen[$tens]);
-      }
-      else {
-        return strtolower(self::$intervalsOfTen[$tens]) . '-' . strtolower(self::$lowNumbers[$last]);
-      }
-    }
-
-    if ($default === NULL) {
-      throw new \RuntimeException("Cannot convert number to English: " . (int) $num);
-    }
-    else {
-      return $default;
-    }
+    $camel = static::toCamelCase($num, $default);
+    return strtolower(preg_replace('/([a-zA-Z])(?=[A-Z])/', '$1-', $camel));
   }
 
   /**

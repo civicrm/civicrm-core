@@ -202,6 +202,7 @@ return [
                   'text' => E::ts('Clone'),
                   'style' => 'secondary',
                   'path' => 'civicrm/admin/job/edit?action=copy&id=[id]',
+                  'csrf' => 'qfKey',
                   'condition' => [],
                 ],
                 [
@@ -241,6 +242,7 @@ return [
           'classes' => [
             'table',
             'table-striped',
+            'crm-sticky-header',
           ],
         ],
         'acl_bypass' => FALSE,

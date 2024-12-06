@@ -234,6 +234,11 @@
         }
         else if (status === 'success' && !editedRow && apiResults.run && apiResults.run[0]) {
           const mngr = this.taskManager;
+          // If tasks are shown as buttons, they need to be loaded right away
+          if (this.settings.actions_display_mode === 'buttons') {
+            mngr.getMetadata();
+            return;
+          }
           // If results contain a link to a task, prefetch task info to prevent latency when clicking the link
           _.each(apiResults.run[0].columns, function(column) {
             if ((column.link && column.link.task) || _.find(column.links || [], 'task')) {

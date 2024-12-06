@@ -298,6 +298,41 @@ class Submit extends AbstractProcessor {
   }
 
   /**
+   * When using a "quick-add" form, this ensures the predetermined "data" values from the parent form's entity
+   * will be copied to the newly-created entity in the popup form.
+   *
+   * @param \Civi\Afform\Event\AfformSubmitEvent $event
+   */
+  public static function preprocessParentFormValues(AfformSubmitEvent $event): void {
+    $entityType = $event->getEntityType();
+    $apiRequest = $event->getApiRequest();
+    $args = $apiRequest->getArgs();
+    if (str_starts_with($args['parentFormName'] ?? '', 'afform:') && str_contains($args['parentFormFieldName'] ?? '', ':')) {
+      [, $parentFormName] = explode(':', $args['parentFormName']);
+      [$parentFormEntityName, $parentFormFieldName] = explode(':', $args['parentFormFieldName']);
+      $parentForm = civicrm_api4('Afform', 'get', [
+        'select' => ['layout'],
+        'where' => [
+          ['name', '=', $parentFormName],
+          ['submit_currently_open', '=', TRUE],
+        ],
+      ])->first();
+      if ($parentForm) {
+        $parentFormDataModel = new FormDataModel($parentForm['layout']);
+        $entity = $parentFormDataModel->getEntity($parentFormEntityName);
+        if (!$entity || $entity['type'] !== $entityType || empty($entity['data'])) {
+          return;
+        }
+        $records = $event->getRecords();
+        foreach ($records as &$record) {
+          $record['fields'] = $entity['data'] + $record['fields'];
+        }
+        $event->setRecords($records);
+      }
+    }
+  }
+
+  /**
    * Check if contact(s) meet the minimum requirements to be created (name and/or email).
    *
    * This requires a function because simple required fields validation won't work
@@ -319,7 +354,7 @@ class Submit extends AbstractProcessor {
       if (!empty($contact['fields']['id'])) {
         continue;
       }
-      if (empty($contact['fields']) || \CRM_Contact_BAO_Contact::hasName($contact['fields'] + ['contact_type' => $entityType])) {
+      if (!empty($contact['fields']) && \CRM_Contact_BAO_Contact::hasName($contact['fields'] + ['contact_type' => $entityType])) {
         continue;
       }
       foreach ($contact['joins']['Email'] ?? [] as $email) {
@@ -460,8 +495,8 @@ class Submit extends AbstractProcessor {
       // Forward FK e.g. Event.loc_block_id => LocBlock
       $forwardFkField = self::getFkField($mainEntity['type'], $joinEntityName);
       if ($forwardFkField && $values) {
-        // Add id to values for update op
-        if ($whereClause) {
+        // Add id to values for update op, but only if id is not already on the form
+        if ($whereClause && empty($mainEntity['joins'][$joinEntityName]['fields'][$joinIdField])) {
           $values[0][$joinIdField] = $whereClause[0][2];
         }
         $result = civicrm_api4($joinEntityName, 'save', [

@@ -73,6 +73,7 @@ return [
           'classes' => [
             'table',
             'table-striped',
+            'crm-sticky-header',
           ],
           'pager' => [
             'show_count' => TRUE,
@@ -253,6 +254,7 @@ return [
                   'condition' => [],
                   'entity' => 'UFGroup',
                   'action' => 'copy',
+                  'csrf' => 'qfKey',
                   'join' => '',
                   'target' => '',
                 ],

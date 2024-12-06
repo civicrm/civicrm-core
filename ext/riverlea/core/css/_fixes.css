@@ -1,0 +1,888 @@
+/* CSS hacks to accommodate quirks and inconsistencies in the markup.
+   The end goal would be to remove these once the markup is
+   consistent, and another  */
+
+/******************
+    ACCORDIONS
+    From Civi 5.72 these are only needed for extensions
+*******************/
+
+/* Reset */
+
+.crm-container .widget-content .crm-accordion-wrapper.collapsed .crm-accordion-header,
+.crm-container .widget-content .crm-accordion-header,
+.crm-container .crm-accordion-inner .crm-accordion-header,
+.crm-container .crm-accordion-wrapper .crm-master-accordion-header,
+.crm-container .crm-collapsible .collapsible-title,
+.crm-container .collapsed .crm-accordion-header,
+.crm-container .crm-accordion-header {
+  background-image: none;
+  text-indent: 0;
+}
+.crm-container div.collapsed .crm-accordion-body,
+.crm-container div.crm-collapsible.collapsed .collapsible-title+*,
+.crm-container tr.hiddenElement {
+  display: none;
+}
+.accordion.ui-accordion.ui-widget.ui-helper-reset {
+  border: 0 solid transparent;
+  box-shadow: var(--crm-block-shadow);
+}
+
+/* Expand/collapse icons */
+
+.crm-container .crm-accordion-header::before,
+details.af-collapsible > .af-title::before,
+.crm-dashlet-header .crm-dashlet-collapse.fa-caret-down::before,
+.crm-dashlet-header .crm-dashlet-collapse.fa-caret-right::before,
+.crm-container .crm-master-accordion-header:before,
+.crm-container .expanded::before,
+.crm-container a.collapsed::before,
+.crm-container .crm-collapsible .collapsible-title::before,
+.crm-container a.crm-expand-row:not(.expanded)::before,
+.crm-container .civicrm-community-messages .crm-collapsible .collapsible-title::before,
+.crm-container .show-children.collapsed::before {
+  font-size: var(--crm-font-size);
+  font-style: normal;
+  text-rendering: auto;
+  text-indent: inherit;
+  font-family: FontAwesome;
+  color: var(--crm-expand-icon-color);
+  margin-right: var(--crm-expand-icon-spacing);
+  display: inline-block;
+  transform-origin: center center;
+  content: var(--crm-expand-icon);
+  cursor: var(--crm-hover-clickable);
+}
+.crm-container .collapsed .crm-accordion-header::before,
+.crm-accordion-wrapper.collapsed .crm-master-accordion-header:before,
+.crm-dashlet-header .crm-dashlet-collapse.fa-caret-right::before,
+details.af-collapsible.af-collapsed > .af-title::before,
+.crm-container a.collapsed:not(.expanded)::before,
+.crm-container a.crm-expand-row::before,
+.crm-container .crm-collapsible.collapsed .collapsible-title::before,
+.crm-container .civicrm-community-messages .crm-collapsible.collapsed .collapsible-title::before {
+  transform: none;
+  transform-origin: center center;
+  transition: var(--crm-expand-transition);
+}
+.crm-container .crm-accordion-header::before,
+details.af-collapsible[open] > .af-title::before,
+.crm-container .crm-collapsible .collapsible-title::before,
+.crm-dashlet-header .crm-dashlet-collapse.fa-caret-down::before,
+.crm-container .crm-master-accordion-header:before,
+.crm-container a.collapsed::before,
+.crm-container a.expanded::before,
+.crm-container a.crm-expand-row.expanded::before,
+.crm-container .civicrm-community-messages .crm-collapsible .collapsible-title::before,
+.crm-container .show-children.expanded::before {
+  content: var(--crm-expand-icon);
+  transform: var(--crm-expand-transform);
+  transform-origin: center center;
+  transition: var(--crm-expand-transition);
+  float: left;
+}
+.crm-container a.crm-expand-row:not(.expanded)::before,
+.crm-container a.crm-expand-row.expanded::before {
+  margin-right: 0;
+}
+a.crm-expand-row:hover,
+a.crm-expand-row:focus {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Header */
+
+.crm-container .crm-accordion-header,
+.crm-container .crm-collapsible .collapsible-title,
+.af-collapsible > summary.af-title,
+.crm-container span.collapsed:not(.show-children) {
+  cursor: var(--crm-hover-clickable);
+  padding: var(--crm-expand-header-padding);
+  border-radius: var(--crm-expand-radius) var(--crm-expand-radius) 0 0;
+  background-color: var(--crm-expand-header-bg);
+  font-weight: var(--crm-expand-header-weight);
+  color: var(--crm-expand-header-color);
+}
+.crm-container .crm-accordion-wrapper.collapsed .crm-accordion-header,
+.crm-container .crm-collapsible.collapsed .collapsible-title {
+  border-radius: var(--crm-expand-radius);
+}
+.crm-container .widget-content .crm-accordion-header,
+.crm-container .crm-accordion-inner .crm-accordion-header,
+.crm-container .crm-collapsible .collapsible-title {
+  background-color: transparent;
+  color: var(--crm-c-text);
+  font-size: var(--crm-font-size);
+}
+.crm-accordion-wrapper .crm-accordion-header.active,
+.crm-accordion-wrapper .crm-accordion-wrapper.collapsed:hover,
+.crm-accordion-wrapper .crm-accordion-wrapper.collapsed:focus,
+.crm-accordion-wrapper .crm-accordion-header:hover,
+.crm-accordion-wrapper .crm-accordion-header.active:hover {
+  background-color: var(--crm-expand-header-bg-active);
+}
+.crm-container .crm-accordion-wrapper .crm-master-accordion-header {
+  font-family: var(--crm-expand2-header-font);
+  font-weight: var(--crm-expand2-header-weight);
+  background-color: var(--crm-expand2-header-bg);
+  color: var(--crm-expand2-header-color);
+  border: var(--crm-expand2-header-border);
+  border-width: var(--crm-expand2-header-border-width);
+  padding: var(--crm-expand2-header-padding);
+}
+.crm-container .crm-accordion-wrapper .crm-master-accordion-header:hover,
+.crm-container .crm-accordion-wrapper .crm-master-accordion-header:focus {
+  background-color: var(--crm-expand2-header-bg-active);
+}
+/* Body */
+
+.crm-container .crm-accordion-wrapper .crm-accordion-body {
+  border-radius: 0 0 var(--crm-expand-radius) var(--crm-expand-radius);
+  border: var(--crm-expand-border);
+  padding: var(--crm-expand-body-padding);
+  background-color: var(--crm-expand-body-bg);
+  box-shadow: var(--crm-expand-body-box-shadow);
+}
+.crm-container .widget-content .crm-accordion-body,
+.crm-container .crm-collapsible .crm-summary-block {
+  padding: var(--crm-expand-body-padding);
+}
+.crm-container .crm-master-accordion-header + .crm-accordion-body {
+  padding: var(--crm-expand2-body-padding);
+  background: var(--crm-expand2-body-bg);
+  border: var(--crm-expand2-border);
+  border-width: var(--crm-expand2-border-width);
+  border-radius: 0 0 var(--crm-expand-radius) var(--crm-expand-radius);
+}
+.crm-container summary label {
+  color: inherit !important; /* all vs .crm-container .form-item label */
+  font-size: inherit !important;
+  margin: 0 !important;
+}
+.crm-container details table.dataTable {
+  width: 100% !important; /* dev/user-interface/-/issues/73 */
+  box-sizing: border-box;
+}
+
+/******************
+    ALERTS
+*******************/
+
+.crm-container del,
+.crm-container .ui-icons_deleted,
+.crm-container table.caseSelector td.status-urgent,
+.crm-container .font-red,
+.crm-container .status-removed,
+.crm-container .status-overdue,
+.crm-container .status-fatal,
+.crm-container .status-hold,
+.crm-container .status-past,
+.crm-contact-deceased,
+.crm-container .status-warning {
+  color: var(--crm-c-alert);
+}
+.crm-container .alert.alert-info.font-red { /* for when an info alert wants to be a danger alert! */
+  background-color: var(--crm-alert-background-danger);
+  border-color: var(--crm-alert-border-danger);
+}
+
+/******************
+    BUTTONS
+      For buttons not using .crm-button or .btn or <button>
+*******************/
+
+.crm-container .ui-button:not(.ui-button-icon-only) {
+  white-space: nowrap;
+  vertical-align: middle;
+  touch-action: manipulation;
+  cursor: var(--crm-hover-clickable);
+  background-image: none;
+  border: var(--crm-btn-border);
+  padding: var(--crm-btn-padding-block) var(--crm-btn-padding-inline);
+  font-size: var(--crm-font-size);
+  border-radius: var(--crm-btn-radius);
+  user-select: none;
+  margin: var(--crm-btn-margin);
+  background-color: var(--crm-c-primary);
+  color: var(--crm-c-primary-text);
+  line-height: 1.5;
+  display: flex;
+  height: var(--crm-btn-height);
+  width: fit-content;
+  gap: var(--crm-btn-icon-spacing);
+}
+.crm-container .ui-button:hover,
+.crm-container .ui-button:focus {
+  background: var(--crm-c-primary-hover);
+  color: var(--crm-c-primary-text);
+  text-decoration: none;
+}
+.crm-button > input[type="button"],
+.crm-button > input[type="submit"] {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  border: 0;
+  box-shadow: none;
+}
+.crm-container a.button,
+.crm-container a.button:link,
+.crm-container a.button:visited {
+  background: var(--crm-c-secondary);
+  color: var(--crm-c-secondary-text);
+  border: var(--crm-btn-border);
+  padding: var(--crm-btn-padding-block) var(--crm-btn-padding-inline);
+  font-weight: normal;
+  text-decoration: none;
+  line-height: initial;
+  min-height: var(--crm-btn-height);
+  border-radius: var(--crm-btn-radius);
+  display: flex !important; /* vs contact dashboard edit */
+  gap: var(--crm-btn-icon-spacing);
+  align-items: center;
+  margin: var(--crm-btn-margin);
+}
+.crm-container a.button span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+.crm-container a.button:hover,
+.crm-container a.button:focus {
+  background: var(--crm-c-secondary-hover);
+  color: var(--crm-c-secondary-hover-text);
+}
+.crm-actions-ribbon a.button,
+.crm-container .action-link a.button {
+  background: var(--crm-c-primary);
+  color: var(--crm-c-primary-text);
+  font-weight: normal;
+  text-decoration: none;
+}
+.crm-container a.button i.crm-i,
+.crm-container a.button:visited i.crm-i {
+  padding: 0 var(--crm-btn-icon-spacing) 0 var(--crm-btn-padding-inline);
+  min-height: calc(var(--crm-btn-height) - 2px - var(--crm-btn-icon-padding) - var(--crm-btn-icon-padding));
+}
+.crm-container .crm-actions-ribbon a.button:not(.delete):hover,
+.crm-container .crm-actions-ribbon a.button:not(.delete):focus,
+.crm-container .action-link a.button:hover,
+.crm-container .action-link a.button:focus {
+  background: var(--crm-c-primary-hover);
+  text-decoration: none;
+}
+.crm-config-backend-form-block > div { /* makes cleanup cache buttons flow inline */
+  display: flex;
+  gap: var(--crm-flex-gap);
+}
+#ckeditor_config {
+  display: flex !important; /* odd inline styled button on display preferences page */
+}
+
+/* Small buttons */
+
+.crm-container .btn-xs,
+.crm-container button.dropdown-toggle.btn-xs,
+.crm-container .crm-accordion-header a.crm-hover-button,
+.crm-container .crm-form-date-wrapper a.crm-hover-button,
+.crm-container .btn-group-xs > .btn,
+body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLink.btn-group-xs > .form-link,
+.crm-container .crm-search-form-block.btn-group-xs > a,
+.crm-container .crm-search-form-block.btn-group-xs > span,
+.page-civicrm-admin.page-civicrm-a .crmCaseType .btn-group-xs > .crm-button,
+.page-civicrm-a.page-civicrm-a .crmCaseType .btn-group-xs > .crm-button,
+.crm-container #crm-submit-buttons .btn-group-xs > button.crm-form-submit,
+.crm-container .btn-group-xs > button.crm-button.crm-form-submit,
+.crm-container .btn-group-xs > .crm-hover-button,
+.crm-container .ui-dialog-buttonset .btn-group-xs > .ui-button,
+.crm-container .btn-group-xs > a.button,
+.crm-container .btn-group-xs > input[type="button"] {
+  padding: var(--crm-btn-small-padding);
+  font-size: var(--crm-small-font-size);
+  border-radius: var(--crm-roundness);
+  height: auto;
+}
+.crm-container .btn-group-xs button {
+  padding: var(--crm-xs) var(--crm-s);
+  font-size: var(--crm-small-font-size);
+}
+/* select all 'checkbox' on table th */
+.crm-container button.btn:has(.fa-square-o),
+.crm-container button.btn:has(.fa-check-square-o) {
+  padding-inline: 0;
+  border-right: 0;
+}
+.crm-container i.ui-icon.fa-square-o,
+.crm-container i.ui-icon.fa-check-square-o,
+.crm-container .btn i.fa-square-o,
+.crm-container .btn i.fa-check-square-o {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/******************
+    FORM
+    Inline labels/inputs with a 17% width?
+*******************/
+
+@media (min-width: 480px) {
+  .crm-container .crm-section .label {
+    float: left;
+    width: 17%;
+    text-align: right;
+  }
+  .crm-container .crm-section .content {
+    margin-left: 19%;
+  }
+}
+
+/******************
+    TABS
+*******************/
+
+/* Bootstrap tabs */
+
+.crm-container .panel-default > .panel-heading:has(.nav-tabs) { /* Fix for default panel heading bg */
+  background-color: var(--crm-tabs-bg);
+}
+.crm-container .panel-heading:has(.nav-tabs) .pull-right {
+  margin-right: var(--crm-m);
+}
+.crm-container .afadmin-list .nav.nav-tabs { /* Fix for AForm tabs border */
+  border-radius: var(--crm-roundness) var(--crm-roundness) 0 0;
+  margin-bottom: 0;
+}
+.crm-container .crm-search-nav-tabs { /* Fix for SK tabs border */
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  margin-bottom: 0;
+  border-bottom: 0;
+}
+.crm-container .panel-heading:has(.nav-tabs) {
+  padding: 0;
+  border-bottom: 0;
+  background-color: var(--crm-tabs-bg);
+}
+.crm-container .panel-heading .nav.nav-tabs {
+  background-color: transparent;
+}
+.crm-container .afadmin-list > table,
+.crm-search:has(.crm-search-nav-tabs) .crm-search-display.crm-search-display-table {
+  border: var(--crm-tabs-border);
+  box-shadow: none;
+  border-radius: 0 0 var(--crm-roundness) var(--crm-roundness);
+  background: var(--crm-tab-bg-active);
+  overflow-x: auto;
+}
+.crm-search:has(.crm-search-nav-tabs) .crm-search-display.crm-search-display-table table {
+  border-width: 1px 0 0 0;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  box-shadow: none;
+  margin-bottom: 0;
+}
+.crm-container .afadmin-list >  .form-inline,
+.crm-search > .ng-scope > .form-inline {
+  border: var(--crm-tabs-border);
+  border-radius: 0;
+  border-top-width: 0;
+  border-bottom-width: 0;
+}
+.afadmin-list > .form-inline {
+  border-radius: 0;
+  border-bottom: 0;
+}
+.afadmin-list .nav-tabs + .form-inline,
+.crm-search-nav-tabs ~ .ng-scope > .form-inline {
+  padding: var(--crm-r);
+  background: var(--crm-tab-bg-active);
+}
+.crm-container .ui-tabs ul.crm-extensions-tabs-list a em {
+  display: none;
+}
+#crm-status-list {
+  box-shadow: var(--crm-block-shadow);
+}
+
+/******************
+    PAGES
+*******************/
+
+/* Contacts - New */
+
+.CRM_Contact_Form_Contact > .crm-form-block > details,
+.CRM_Contact_Form_Contact > .crm-form-block > div > details {
+  margin-inline: calc(-1 * var(--crm-form-block-padding));
+  padding-inline: var(--crm-expand-2-body-padding);
+  margin-bottom: var(--crm-expand-2-body-padding);
+}
+.crm-container .crm-add-address-wrapper {
+  height: auto;
+}
+
+/* Tag mgmt page */
+
+#mainTabContainer #tagtree {
+  max-height: 100%;
+  overflow: inherit;
+}
+.crm-container .tag-tree-wrapper {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  margin: var(--crm-m) 0;
+}
+.crm-container .tag-tree-wrapper div.tag-tree {
+  width: auto;
+}
+.crm-container .tag-tree-wrapper div.tag-info {
+  width: auto;
+  position: relative;
+  background: var(--crm-c-background);
+  border: 0 solid transparent;
+  box-shadow: var(--crm-block-shadow);
+  padding: var(--crm-padding-reg);
+  font-family: var(--crm-font);
+  border-radius: var(--crm-roundness);
+  top: 0;;
+}
+.crm-container .tag-tree-wrapper div.tag-info .tdl {
+  font-weight: var(--crm-bold-weight);
+  font-family: var(--crm-font-bold);
+  color: var(--crm-c-text);
+}
+.crm-container .tag-tree-wrapper div.tag-info .crm-submit-buttons {
+  margin: var(--crm-m) 0 0;
+  padding: 0;
+}
+.crm-container .tag-tree-wrapper .tag-tree a.crm-tag-item {
+  font-size: var(--crm-font-size);
+  font-family: var(--crm-font);
+  height: auto;
+  padding: var(--crm-padding-small);
+  border-radius: var(--crm-btn-radius);
+}
+@media (max-width: 768px) {
+  .crm-container .tag-tree-wrapper {
+    display: block;
+  }
+}
+/* Dedupe change usage */
+.crm-container label:has(.dedupe-rules-dialog-desc) input {
+  float: left;
+  margin: var(--crm-s) var(--crm-m) 0 0;
+}
+.crm-container .dedupe-rules-dialog-desc {
+  font-weight: normal;
+  font-family: var(--crm-font);
+}
+/* CiviContribute dashboard */
+.crm-container #ContributionCharts #mainTabContainer {
+  box-shadow: var(--crm-block-shadow);
+}
+.crm-container #ContributionCharts .ui-tabs-nav {
+  align-items: center;
+  gap: 1px; /* to handle white space in markup */
+}
+.crm-container #ContributionCharts .ui-tabs-nav .float-right td {
+  padding: 0 var(--crm-s);
+}
+#ContributionCharts ul.ui-tabs-nav li.crm-tab-button {
+  padding: var(--crm-tab-padding);
+  border-radius: var(--crm-tab-roundness);
+}
+#ContributionCharts ul.ui-tabs-nav li.crm-tab-button a {
+  padding: 0;
+}
+#ContributionCharts ul.ui-tabs-nav li.crm-tab-button a span {
+  display: none;
+}
+#ContributionCharts ul.ui-tabs-nav .float-right {
+  position: absolute;
+  right: var(--crm-s);
+  top: var(--crm-s);
+}
+#ContributionCharts ul.ui-tabs-nav .float-right table,
+#ContributionCharts ul.ui-tabs-nav .float-right table tr {
+  background: none;
+  margin: 0;
+  border: 0 solid transparent;
+  box-shadow: none;
+}
+#ContributionCharts ul.ui-tabs-nav .float-right table a.button {
+  max-height: 36px;
+}
+#ContributionCharts #chartData {
+  padding: var(--crm-padding-reg);
+  box-shadow: none;
+  background: var(--crm-tab-bg-active);
+}
+/* Include profile (contribtuion page and events  */
+.crm-contribution-contributionpage-custom-form-block-custom_pre_id td.html-adjust > div > div,
+.crm-contribution-contributionpage-custom-form-block-custom_post_id td.html-adjust > div > div,
+.crm-event-manage-registration-form-block-custom_pre_id td > div > div,
+.crm-event-manage-registration-form-block-custom_post_id td > div > div {
+  display: flex;
+  gap: var(--crm-s);
+}
+/* Event dashboard */
+.CRM_Event_Form_Search .button {
+  float: left;
+  margin-right: var(--crm-m);
+}
+#crm-event-dashboard-heading + div a,
+.CRM_Event_Form_SearchEvent .crm-content-block .float-right a {
+  display: flex;
+  padding: 0 0 var(--crm-m) 0;
+  gap: var(--crm-m);
+  align-items: center;
+}
+/* Dedupe page */
+#browseValues_Individual > div:last-of-type,
+#browseValues_Household > div:last-of-type,
+#browseValues_Organization > div:last-of-type {
+  float: none !important; /* overwrites inline 'float' that breaks page wrapper */
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 0 var(--crm-l) 0;
+}
+
+/* CiviCase  */
+.crm-container .crm-case-dashboard-switch-view-buttons {
+  margin-left: auto;
+  display: flex;
+}
+.crm-container .crm-case-caseview-form-block table#searchOptions {
+  width: auto !important;
+}
+.crm-case-form-block h3,
+.crm-case-caseview-form-block h3 {
+  background: transparent;
+  padding: 0;
+}
+.crm-case-activity-form-block-followup_activity_type_id .crm-form-date-wrapper {
+  display: inline-block;
+}
+.crm-case-activity-form-block table.form-layout-compressed {
+  width: 100%;
+}
+.crm-case-form-block-medium_id td.view-value label {
+  width: auto;
+}
+/* API3 explorer */
+
+#api-generated caption {
+  font-weight: var(--crm-bold-weight);
+  font-family: var(--crm-font-bold);
+}
+#api-generated tr td:first-of-type {
+  width: var(--crm-input-label-width);
+}
+/* Display Preferences */
+
+tr.crm-preferences-display-form-block-contact_edit_options td:has(table) {
+  padding: 0;
+}
+
+tr.crm-preferences-display-form-block-contact_edit_options td table {
+  width: auto !important;
+}
+/******************
+    SEARCH
+*******************/
+
+.crm-container div#searchForm table.form-layout {
+  background: transparent;
+  box-shadow: none;
+}
+/* Advanced Search */
+.crm-container .adv-search-top-submit {
+  display: flex;
+  float: right;
+  gap: 1rem;
+  align-items: center;
+}
+.crm-container .form-layout td:has(#_qf_Advanced_refresh-bottom) {
+  display: flex;
+  gap: var(--crm-m);
+  align-items: center;
+}
+.crm-container .adv-search-top-submit .crm-submit-buttons,
+.crm-container .form-layout td:has(#_qf_Advanced_refresh-bottom) .crm-submit-buttons {
+  padding: 0;
+}
+/* Full Text */
+#searchForm table.form-layout-compressed td {
+  padding: var(--crm-padding-reg);
+}
+/* Case */
+.crm-case_search-accordion .crm-accordion-body .form-layout > tbody:first-child,
+.crm-case_search-accordion .crm-accordion-body .form-layout > tbody:first-child > tr,
+.crm-case_search-accordion .crm-accordion-body .form-layout > tbody:first-child > tr > td {
+  display: block;
+}
+.crm-case_search-accordion .crm-accordion-body .form-layout > tbody:first-child > tr:nth-of-type(1) > td:nth-of-type(2) {
+  display: none !important;
+}
+.crm-case_search-accordion .crm-accordion-body .form-layout > tbody:first-child > tr #s2id_case_status_id {
+  margin-bottom: var(--crm-r1);
+}
+.crm-case_search-accordion .crm-accordion-body .form-layout > tbody:first-child > tr:nth-of-type(1) > td:nth-of-type(1) label {
+  display: block;
+}
+.crm-case_search-accordion .crm-accordion-body .form-layout > tbody:first-child > tr:nth-of-type(1) > td:nth-of-type(1) label + input {
+  margin-left: -0.6rem;
+}
+/* Member */
+.page-civicrm-member-search .CRM_Member_Form_Search .crm-accordion-body tr:last-child td {
+  padding-top: var(--crm-r);
+}
+/* Find Participants */
+.crm-container div#searchForm table.form-layout td {
+  border: 0 solid transparent;
+}
+/* Custom searches */
+.crm-container > #crm-main-content-wrapper > fieldset {
+  display: grid;
+  background: var(--crm-c-background);
+  border: 0 solid transparent;
+  box-shadow: var(--crm-block-shadow);
+  padding: var(--crm-padding-reg);
+  gap: var(--crm-m);
+  margin-bottom: var(--crm-r);
+}
+.crm-container > #crm-main-content-wrapper > fieldset > * {
+  margin: 0;
+}
+
+/******************
+    PADDING FIXES
+*******************/
+
+/* General */
+.crm-container .crm-form-block .crm-form-block {
+  padding: var(--crm-form-block-padding);
+  margin-bottom: var(--crm-r);
+}
+/* Save as template text on new email form */
+.crm-container #editMessageDetails {
+  padding: var(--crm-padding-reg);
+}
+/* Contact dashboard page */
+.crm-contact-page {
+  padding: 0;
+}
+#mainTabContainer .form-group.pull-right  > .btn-group {
+  margin-bottom: var(--crm-m2);
+}
+/* Contact dashboard page */
+.crm-actions-ribbon .crm-next-action,
+.crm-actions-ribbon .crm-previous-action {
+  margin-left: auto;
+}
+.crm-container .view-contact-groups .description {
+  margin: var(--crm-r) 0;
+}
+/* Contacts - new */
+.CRM_Contact_Form_Contact > .crm-form-block .crm-submit-buttons:first-of-type {
+  margin-bottom: var(--crm-padding-reg);
+  padding: 0;
+}
+.CRM_Contact_Form_Contact > .crm-form-block .crm-submit-buttons:last-of-type {
+  margin-top: var(--crm-padding-reg);
+  padding: 0;
+}
+/* Imports */
+.crm-form-block.ui-iconmport-mapfield-form-block .help,
+.crm-form-block.ui-iconmport-preview-form-block .help,
+.crm-activity-import-preview-form-block .help {
+  background-color: transparent;
+  border: 0;
+}
+/* Manage groups */
+.crm-group-search-form-block details table,
+.crm-group-search-form-block details table tr {
+  border: 0 solid transparent;
+}
+/* Group contents / contact listing */
+.crm-container .crm-form-block #searchForm .crm-form-block {
+  padding: 0;
+  margin-bottom: 0;
+}
+.crm-search-form .crm-submit-buttons {
+  padding: 0 0 var(--crm-m);
+}
+.crm-search-form .crm-search-form-block {
+  margin-bottom: var(--crm-r);
+}
+/* Dedupe exceptions */
+details + .crm-content-block:has(.dataTables_wrapper) {
+  margin-top: var(--crm-r);
+}
+/* Contribution page edit/create */
+.crm-container .crm-premium-settings-accordion {
+  margin-bottom: var(--crm-padding-reg);
+}
+/* Personal Campaign pages */
+.CRM_PCP_Form_PCP .messages.status {
+  margin: var(--crm-padding-reg) 0;
+}
+/* Manage cases */
+.crm-container table.report.case-summary {
+  margin-top: var(--crm-padding-reg);
+  width: 100%;
+}
+.crm-container table.report.case-summary table.form-layout-compressed {
+  box-shadow: none;
+  border: 0;
+  margin: 0;
+  width: 100%;
+}
+.crm-container .case-control-panel,
+.crm-container .crm-case-filter-upcoming {
+  padding-bottom: var(--crm-padding-reg);
+}
+
+/******************
+    RESPONSIVE
+*******************/
+
+/* Contact dashboard */
+
+@media (max-width: 768px) {
+  .crm-container div.contact_panel {
+    display: block;
+  }
+}
+
+/******************
+    AFFORM layouts
+*******************/
+
+/* padding fixes */
+
+.crm-container .af-layout-inline ~ .btn-group.pull-right {
+  margin: var(--crm-padding-reg) 0;
+}
+.crm-container .crm-search-display-table .form-inline .form-group.pull-right {
+  margin-left: auto;
+}
+
+/* CiviCampaign dashboard */
+
+.crm-container #tab-campaigns,
+.crm-container #tab-surveys,
+.crm-container #tab-petitions {
+  padding: var(--crm-tab-padding);
+}
+
+/******************
+    COMMON EXTENSIONS
+*******************/
+
+/* Contact Dashboard Editor */
+
+.crm-actions-ribbon ul#actions:has(.crm-contact-summary-edit-layout) {
+  grid-template-columns: min-content min-content min-content auto min-content min-content;
+}
+.crm-container .crm-contact-summary-edit-layout a.crm-hover-button {
+  background: var(--crm-c-primary);
+  color: var(--crm-c-primary-text) !important;
+  padding: var(--crm-btn-padding-block) var(--crm-btn-padding-inline) var(--crm-btn-padding-block) 0;
+  border: var(--crm-btn-border);
+}
+.crm-container .crm-contact-summary-edit-layout a.crm-hover-button i.crm-i {
+  padding: 0 var(--crm-btn-icon-spacing) 0 var(--crm-btn-padding-inline);
+}
+.crm-container .crm-contact-summary-edit-layout a.crm-hover-button:hover,
+.crm-container .crm-contact-summary-edit-layout a.crm-hover-button:focus {
+  background: var(--crm-c-primary-hover);
+  color: var(--crm-c-primary-text) !important;
+  padding: var(--crm-btn-padding-block) var(--crm-btn-padding-inline) var(--crm-btn-padding-block) 0;
+}
+.crm-previous-action {
+  order: 3;
+}
+.crm-next-action {
+  order: 4;
+}
+#contactLayoutEditor .panel-heading .btn {
+  padding: var(--crm-btn-padding-block) var(--crm-btn-padding-inline);
+}
+
+/* Mosaico (all importants vs the extension css) */
+
+.crm-mosaico-wizard .crm_wizard__title .panel-body {
+  padding: 0 1rem;
+}
+.crm-mosaico-wizard .crm_wizard__body .form-group {
+  max-width: 100% !important;
+}
+.crm-mosaico-page .from-group .btn {
+  padding: var(--crm-padding-small);
+  height: auto;
+}
+.crm-mosaico-page .select2-container {
+  min-width: var(--crm-big-input);
+}
+.mosaico-templates-wrapper {
+  margin: 0 !important;
+}
+.mosaico-templates-wrapper .form-inline {
+  padding: var(--crm-padding-reg) 0 0 var(--crm-padding-reg);
+}
+.crm-mosaico-modal-panel {
+  margin: 0 !important;
+}
+.modal-dialog:has(.crm-mosaico-page) {
+  width: 100% !important;
+}
+.ui-widget-content.modal-dialog .crm-mosaico-page .panel {
+  border: 0;
+}
+.ui-widget-content.modal-dialog .crm-mosaico-page .panel .tab-pane {
+  border: var(--crm-tab-border);
+  border-top: 0;
+  padding: var(--crm-tab-padding);
+  background-color: var(--crm-tab-bg-active);
+  border-radius: 0 0 var(--crm-tab-roundness) var(--crm-tab-roundness);
+}
+.select2-drop.select2-drop-active.crm-container {
+  max-width: var(--crm-huge-input); /* Mosaico fix - https://lab.civicrm.org/extensions/riverlea/-/issues/23 */
+}
+.crmb-wizard-button-right {
+  display: flex;
+  justify-content: end;
+}
+.crm-mosaico-wizard .from-group {
+  display: flex;
+  gap: var(--crm-flex-gap);
+}
+.crm-mosaico-wizard .crm-mosaico-template-item.thumbnail {
+  background: var(--crm-c-background2) !important /* vs _template-item.scss */;
+  border: var(--crm-c-divider) !important /* vs _template-item.scss */;
+  border-radius: var(--crm-roundness) !important /* vs _template-item.scss */;
+}
+.crm-mosaico-wizard .crm_wizard__title .nav-pills li.disabled a {
+  color: var(--crm-c-inactive) !important /* vs _template-item.scss */;
+}
+#bootstrap-theme .crm-mosaico-template-item .crm-mosaico-template-actions {
+  display: flex !important /* vs _template-item.scss */;
+  opacity: 1 !important /* vs _template-item.scss */;
+  justify-content: center;
+  flex-direction: column;
+  padding-top: 50%;
+  align-items: center;
+}
+/******************
+    CORE EXTENSIONS
+*******************/
+
+.af-container.af-layout-cols { /* vs afCore */
+  column-gap: var(--crm-m);
+}

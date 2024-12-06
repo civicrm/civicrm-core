@@ -1,8 +1,10 @@
 <?php
 namespace Civi\Api4\Action\User;
 
+use Civi;
 use Civi\Api4\Generic\AbstractAction;
 use Civi\Api4\Generic\Result;
+use Civi\Standalone\Event\LoginEvent;
 use Civi\Standalone\MFA\Base as MFABase;
 use Civi\Standalone\Security;
 
@@ -58,7 +60,7 @@ class Login extends AbstractAction {
       return $this->passwordCheck($result);
     }
     else {
-      // This call is from an MFA class, needing to check the mfaData.
+      // This call is from Javascript from an MFA class, needing to check the mfaData.
       $mfaClass = MFABase::classIsAvailable($this->mfaClass);
       if (!$mfaClass) {
         \CRM_Core_Session::singleton()->set('pendingLogin', []);
@@ -68,12 +70,15 @@ class Login extends AbstractAction {
       $pending = MFABase::getPendingLogin();
       if (!$pending) {
         // Invalid, send user back to login.
-        $result['url'] = '/civicrm/login?sessionLost';
+        \CRM_Core_Session::setStatus('Please try again.', 'Session expired', 'warning');
+        $result['url'] = '/civicrm/login';
         return;
       }
 
       $mfa = new $mfaClass($pending['userID']);
       $okToLogin = $mfa->processMFAAttempt($pending, $this->mfaData);
+      $event = new LoginEvent($pending['userID'], 'post_mfa', $okToLogin ? NULL : 'wrongMFA');
+      Civi::dispatcher()->dispatch('civi.standalone.login', $event);
       if ($okToLogin) {
         // OK!
         \CRM_Core_Session::singleton()->set('pendingLogin', []);
@@ -107,9 +112,25 @@ class Login extends AbstractAction {
       return;
     }
     $security = Security::singleton();
-    $user = $security->loadUserByName($this->username);
-    if (!$security->checkPassword($this->password, $user['hashed_password'] ?? '')) {
+    $user = \Civi\Api4\User::get(FALSE)
+      ->addWhere('username', '=', $this->username)
+      ->addWhere('is_active', '=', TRUE)
+      ->addSelect('hashed_password', 'id')
+      ->execute()->first();
+
+    // Allow flood control (etc.) by extensions.
+    $event = new LoginEvent($user['id'] ?? NULL, 'pre_credentials_check');
+    Civi::dispatcher()->dispatch('civi.standalone.login', $event);
+    if ($event->stopReason) {
+      $result['url'] = '/civicrm/login?' . $event->stopReason;
+    }
+
+    $userID = $security->checkPassword($this->username, $this->password);
+    if (!$userID) {
       $result['publicError'] = "Invalid credentials";
+      // Allow monitoring of failed attempts.
+      $event = new LoginEvent($user['id'] ?? NULL, 'post_credentials_check', 'wrongUserPassword');
+      Civi::dispatcher()->dispatch('civi.standalone.login', $event);
       return;
     }
     // Password is ok. Do we have mfa configured?
@@ -126,7 +147,7 @@ class Login extends AbstractAction {
 
       case 0:
         // MFA not enabled.
-        $this->loginUser($user['id']);
+        $this->loginUser($userID);
         $result['url'] = $successUrl;
         return;
 
@@ -134,13 +155,13 @@ class Login extends AbstractAction {
         // MFA enabled. Store data in a pendingLogin key on session.
         // @todo expose the 120s timeout to config?
         \CRM_Core_Session::singleton()->set('pendingLogin', [
-          'userID' => $user['id'],
+          'userID' => $userID,
           'username' => $this->username,
           'expiry' => time() + 120,
           'successUrl' => $successUrl,
         ]);
         $mfaClass = $mfaClasses[0];
-        $mfa = new $mfaClass($user['id']);
+        $mfa = new $mfaClass($userID);
         // Return the URL for the MFA form.
         $result['url'] = $mfa->getFormUrl();
         break;
@@ -153,8 +174,9 @@ class Login extends AbstractAction {
   }
 
   protected function loginUser(int $userID) {
-    $authx = new \Civi\Authx\Standalone();
-    $authx->loginSession($userID);
+    _authx_uf()->loginSession($userID);
+    $event = new LoginEvent($userID, 'post_login');
+    Civi::dispatcher()->dispatch('civi.standalone.login', $event);
   }
 
 }

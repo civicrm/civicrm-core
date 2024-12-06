@@ -128,7 +128,19 @@ class FormattingUtil {
 
     switch ($fieldSpec['data_type'] ?? NULL) {
       case 'Timestamp':
-        $value = self::formatDateValue('YmdHis', $value, $operator, $index);
+        $format = 'YmdHis';
+        // Using `=` with a Y-m-d timestamp means we really want `BETWEEN` midnight and 11:59:59pm.
+        if ($operator && is_string($value) && !array_key_exists($value, \CRM_Core_OptionGroup::values('relative_date_filters'))) {
+          $isYmd = (preg_match('/^\d{4}-\d{2}-\d{2}$/', $value));
+          if ($isYmd && in_array($operator, ['=', '!=', '<>'])) {
+            $operator = $operator === '=' ? 'BETWEEN' : 'NOT BETWEEN';
+            $dateFrom = self::formatDateValue($format, "$value 00:00:00");
+            $dateTo = self::formatDateValue($format, "$value 23:59:59");
+            $value = [self::formatDateValue($format, $dateFrom), self::formatDateValue($format, $dateTo)];
+            break;
+          }
+        }
+        $value = self::formatDateValue($format, $value, $operator, $index);
         break;
 
       case 'Date':
@@ -278,7 +290,7 @@ class FormattingUtil {
    * @return void
    * @throws \CRM_Core_Exception
    */
-  public static function getFieldOptions(array &$field, array $values = [], bool $includeDisabled = FALSE, bool $checkPermissions = FALSE, ?int $userId = NULL): ?array {
+  public static function getFieldOptions(array $field, array $values = [], bool $includeDisabled = FALSE, bool $checkPermissions = FALSE, ?int $userId = NULL): ?array {
     $fieldName = $field['name'];
     $entityName = $field['entity'];
     $customGroupName = CoreUtil::getCustomGroupName($entityName);

@@ -247,6 +247,8 @@ return [
               'icon' => 'fa-bars',
               'links' => $links,
               'type' => 'menu',
+              'label' => ts('Row Actions'),
+              'label_hidden' => TRUE,
               'alignment' => 'text-right',
             ],
           ],
@@ -404,6 +406,8 @@ return [
               'style' => 'default',
               'size' => 'btn-xs',
               'icon' => 'fa-bars',
+              'label' => ts('Row Actions'),
+              'label_hidden' => TRUE,
               'links' => [
                 [
                   'entity' => 'Relationship',

@@ -425,6 +425,12 @@ class CRM_Contact_BAO_Query {
   public $_groupKeys = [];
 
   /**
+   * @var int
+   * Set to 1 if Search in Trash selected.
+   */
+  public $_onlyDeleted = 0;
+
+  /**
    * Class constructor which also does all the work.
    *
    * @param array $params
@@ -592,10 +598,19 @@ class CRM_Contact_BAO_Query {
         $this->_whereClause .= ' AND ' . implode(' AND ', $clauses);
       }
     }
+    // Flag if we are only lookif for deleted contacts. Once flagged, keep it
+    // because we seem to forget it.
+    if (in_array(['deleted_contacts', '=', '1', '0', '0'], $this->_params)) {
+      $this->_onlyDeleted = 1;
+    }
+    else {
+      $this->_onlyDeleted = 0;
+    }
 
-    $this->_fromClause = self::fromClause($this->_tables, NULL, NULL, $this->_primaryLocation, $this->_mode, $apiEntity);
-    $this->_simpleFromClause = self::fromClause($this->_whereTables, NULL, NULL, $this->_primaryLocation, $this->_mode);
-
+    $this->_fromClause = self::fromClause($this->_tables, NULL, NULL,
+      $this->_primaryLocation, $this->_mode, $apiEntity, $this->_onlyDeleted);
+    $this->_simpleFromClause = self::fromClause($this->_whereTables, NULL,
+      NULL, $this->_primaryLocation, $this->_mode, NULL, $this->_onlyDeleted);
     $this->openedSearchPanes(TRUE);
   }
 
@@ -1398,12 +1413,12 @@ class CRM_Contact_BAO_Query {
    * @param bool $count
    * @param bool $sortByChar
    * @param bool $groupContacts
-   * @param bool $onlyDeleted
+   * @param int $onlyDeleted
    *
    * @return array
    *   sql query parts as an array
    */
-  public function query($count = FALSE, $sortByChar = FALSE, $groupContacts = FALSE, $onlyDeleted = FALSE) {
+  public function query($count = FALSE, $sortByChar = FALSE, $groupContacts = FALSE, $onlyDeleted = 0) {
     // build permission clause
     $this->generatePermissionClause($onlyDeleted, $count);
 
@@ -2543,6 +2558,8 @@ class CRM_Contact_BAO_Query {
    *   Determines search mode based on bitwise MODE_* constants.
    * @param string|null $apiEntity
    *   Determines search mode based on entity by string.
+   * @param int $onlyDeleted
+   *   Determines if we are only looking for deleted contacts
    *
    * The $primaryLocation flag only seems to be used when
    * locationType() has been called. This may be a search option
@@ -2554,7 +2571,8 @@ class CRM_Contact_BAO_Query {
    * @return string
    *   the from clause
    */
-  public static function fromClause(&$tables, $inner = NULL, $right = NULL, $primaryLocation = TRUE, $mode = 1, $apiEntity = NULL) {
+  public static function fromClause(&$tables, $inner = NULL, $right = NULL,
+    $primaryLocation = TRUE, $mode = 1, $apiEntity = NULL, $onlyDeleted = 0) {
 
     $from = ' FROM civicrm_contact contact_a';
     if (empty($tables)) {
@@ -2644,7 +2662,7 @@ class CRM_Contact_BAO_Query {
         continue;
       }
 
-      $from .= ' ' . trim(self::getEntitySpecificJoins($name, $mode, $side, $primaryLocation)) . ' ';
+      $from .= ' ' . trim(self::getEntitySpecificJoins($name, $mode, $side, $primaryLocation, $onlyDeleted)) . ' ';
     }
     return $from;
   }
@@ -2656,9 +2674,10 @@ class CRM_Contact_BAO_Query {
    * @param int $mode
    * @param string $side
    * @param string $primaryLocation
+   * @param int $onlyDeleted
    * @return string
    */
-  protected static function getEntitySpecificJoins($name, $mode, $side, $primaryLocation): string {
+  protected static function getEntitySpecificJoins($name, $mode, $side, $primaryLocation, $onlyDeleted = 0): string {
     $limitToPrimaryClause = $primaryLocation ? "AND {$name}.is_primary = 1" : '';
     switch ($name) {
       case 'civicrm_address':
@@ -2720,7 +2739,7 @@ class CRM_Contact_BAO_Query {
       case 'civicrm_activity_contact':
       case 'source_contact':
       case 'activity_priority':
-        return CRM_Activity_BAO_Query::from($name, $mode, $side) ?? '';
+        return CRM_Activity_BAO_Query::from($name, $mode, $side, $onlyDeleted) ?? '';
 
       case 'civicrm_entity_tag':
         $from = " $side JOIN civicrm_entity_tag ON ( civicrm_entity_tag.entity_table = 'civicrm_contact'";
@@ -2829,7 +2848,7 @@ class CRM_Contact_BAO_Query {
     [$_, $_, $value, $grouping, $_] = $values;
     if ($value) {
       // *prepend* to the relevant grouping as this is quite an important factor
-      array_unshift($this->_qill[$grouping], ts('Search in Trash'));
+      array_unshift($this->_qill[$grouping], ts('Search Deleted Contacts'));
     }
   }
 
@@ -6441,8 +6460,8 @@ AND   displayRelType.is_active = 1
       }
     }
 
-    $this->_fromClause = self::fromClause($this->_tables, NULL, NULL, $this->_primaryLocation, $this->_mode);
-    $this->_simpleFromClause = self::fromClause($this->_whereTables, NULL, NULL, $this->_primaryLocation, $this->_mode);
+    $this->_fromClause = self::fromClause($this->_tables, NULL, NULL, $this->_primaryLocation, $this->_mode, NULL, $this->_onlyDeleted);
+    $this->_simpleFromClause = self::fromClause($this->_whereTables, NULL, NULL, $this->_primaryLocation, $this->_mode, NULL, $this->_onlyDeleted);
 
     // The above code relies on crazy brittle string manipulation of a peculiarly-encoded ORDER BY
     // clause. But this magic helper which forgivingly reescapes ORDER BY.

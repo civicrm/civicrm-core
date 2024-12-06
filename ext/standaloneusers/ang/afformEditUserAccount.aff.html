@@ -4,7 +4,7 @@
     <af-field name="roles" />
     <af-field name="username" />
     <af-field name="contact_id" defn="{required: true, input_attrs: {quickAdd: ['civicrm/quick-add/Individual']}}" />
-    <af-field name="uf_name" />
+    <af-field name="uf_name" defn="{help_pre: ts('Email used for password resets.'), input_attrs: {placeholder: ts('Leave blank to use the primary email from the selected contact')}}" />
     <af-field name="is_active" />
     <af-field name="timezone" defn="{help_pre: ts('Set the timezone of the user. Date and times will be shown in this timezone. You can also leave it empty to use the default system timezone (which is a server setting).'), input_attrs: {placeholder: ts('Server default timezone')}}" />
     <af-field name="language" defn="{help_pre: ts('Set the user interface language of this user. You can also leave it empty to use the default system language.'), input_attrs: {placeholder: ts('System default language')}}" />

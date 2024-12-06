@@ -10,8 +10,7 @@ use Civi\Api4\CustomGroup;
  * @group headless
  */
 abstract class AfformUsageTestCase extends AfformTestCase {
-  use \Civi\Test\Api3TestTrait;
-  use \Civi\Test\ContactTestTrait;
+  use \Civi\Test\Api4TestTrait;
 
   protected static $layouts = [];
 

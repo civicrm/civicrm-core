@@ -25,7 +25,7 @@
 
     {foreach from=$priceSet.fields item=element key=field_id}
         {* Skip 'Admin' visibility price fields WHEN this tpl is used in online registration unless user has administer CiviCRM permission. *}
-        {if $element.visibility !== 'admin' || isShowAdminVisibilityFields}
+        {if $element.visibility !== 'admin' || $isShowAdminVisibilityFields}
             {if $element.help_pre}<span class="content description">{$element.help_pre|purify}</span><br />{/if}
             <div class="crm-section {$element.name|escape}-section crm-price-field-id-{$field_id}">
             {if ($element.html_type eq 'CheckBox' || $element.html_type == 'Radio') && $element.options_per_line}

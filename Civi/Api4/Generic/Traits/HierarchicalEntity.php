@@ -14,8 +14,8 @@ namespace Civi\Api4\Generic\Traits;
 /**
  * A hierarchical entity has nested parent/child levels.
  *
- * A special `_depth` field is available to these entities. Adding it to the select clause
- * will cause returned records to be sorted in nested order.
+ * The calculated `_depth` and `_descendents` fields are automatically added to these entities.
+ * Adding either to the select clause will return records pre-sorted in nested order.
  *
  * NOTE: In order to use this trait, an entity must have a column that is an EntityReference to itself.
  * Note: Hierarchical sorting is performed in-memory, so this is not suitable for entities with unlimited records.

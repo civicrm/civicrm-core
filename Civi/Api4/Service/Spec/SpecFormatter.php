@@ -150,7 +150,7 @@ class SpecFormatter {
     if (in_array($inputType, ['Select', 'EntityRef'], TRUE) && !empty($data['serialize'])) {
       $inputAttrs['multiple'] = TRUE;
     }
-    if ($inputType == 'Date' && !empty($inputAttrs['formatType'])) {
+    if ($inputType == 'Date' && !empty($inputAttrs['format_type'])) {
       self::setLegacyDateFormat($inputAttrs);
     }
     if ($inputType == 'Text' && !empty($data['maxlength'])) {
@@ -168,14 +168,14 @@ class SpecFormatter {
   /**
    * @param array $inputAttrs
    */
-  private static function setLegacyDateFormat(&$inputAttrs) {
-    if (empty(\Civi::$statics['legacyDatePrefs'][$inputAttrs['formatType']])) {
-      \Civi::$statics['legacyDatePrefs'][$inputAttrs['formatType']] = [];
-      $params = ['name' => $inputAttrs['formatType']];
-      \CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_PreferencesDate', $params, \Civi::$statics['legacyDatePrefs'][$inputAttrs['formatType']]);
+  public static function setLegacyDateFormat(&$inputAttrs) {
+    if (empty(\Civi::$statics['legacyDatePrefs'][$inputAttrs['format_type']])) {
+      \Civi::$statics['legacyDatePrefs'][$inputAttrs['format_type']] = [];
+      $params = ['name' => $inputAttrs['format_type']];
+      \CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_PreferencesDate', $params, \Civi::$statics['legacyDatePrefs'][$inputAttrs['format_type']]);
     }
-    $dateFormat = \Civi::$statics['legacyDatePrefs'][$inputAttrs['formatType']];
-    unset($inputAttrs['formatType']);
+    $dateFormat = \Civi::$statics['legacyDatePrefs'][$inputAttrs['format_type']];
+    unset($inputAttrs['format_type']);
     $inputAttrs['time'] = !empty($dateFormat['time_format']);
     $inputAttrs['date'] = TRUE;
     $inputAttrs['start_date_years'] = (int) $dateFormat['start'];

@@ -130,19 +130,25 @@ class CRM_Core_BAO_CustomValueTable {
                 if (str_replace($validChars, '', $value)) {
                   throw new CRM_Core_Exception('Contact ID must be of type Integer');
                 }
-              }
-              elseif ($value == NULL || $value === '') {
-                $type = 'Timestamp';
-                $value = NULL;
+                // Prevent saving an empty "array" which results in a fatal error on render.
+                if ($value === '' || $value === $VS . $VS) {
+                  $value = NULL;
+                }
               }
               else {
                 $type = 'Integer';
+              }
+              // An empty value should be stored as NULL
+              if (!$value) {
+                $type = 'Timestamp';
+                $value = NULL;
               }
               break;
 
             case 'EntityReference':
               $type = 'Integer';
-              if ($value == NULL || $value === '') {
+              // An empty value should be stored as NULL
+              if (!$value) {
                 $type = 'Timestamp';
                 $value = NULL;
               }

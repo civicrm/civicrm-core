@@ -95,7 +95,7 @@ class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
   }
 
   public function buildQuickForm() {
-    CRM_Utils_System::addHTMLHead('<META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">');
+    CRM_Utils_System::setNoRobotsFlag();
     $this->setTitle(ts('Unsubscribe Confirmation'));
 
     $buttons = [

@@ -182,6 +182,24 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
+   * @inheritdoc
+   *
+   * Joomla has a very slightly different main template
+   * from the shared CMSPrint.tpl
+   *
+   * @todo can we merge these and do away with this
+   * override? might need to update the breadcrumbs
+   * function below to match the others
+   */
+  public static function getContentTemplate($print = 0): string {
+    // I fear some callers of this function still pass FALSE rather than int
+    if (!$print) {
+      return 'CRM/common/joomla.tpl';
+    }
+    return parent::getContentTemplate($print);
+  }
+
+  /**
    * @inheritDoc
    */
   public function setTitle($title, $pageTitle = NULL) {
@@ -651,8 +669,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $config = JFactory::getConfig();
     $timezone = $config->get('offset');
     if ($timezone) {
-      date_default_timezone_set($timezone);
-      CRM_Core_Config::singleton()->userSystem->setMySQLTimeZone();
+      $this->setTimeZone($timezone);
     }
     if (version_compare(JVERSION, '4.0', '>=')) {
       // Boot the DI container

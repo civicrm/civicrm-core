@@ -35,6 +35,7 @@
     <mixin>setting-php@1.0.0</mixin>
     <mixin>smarty@1.0.0</mixin>
     <mixin>entity-types-php@1.0.0</mixin>
+    <mixin>scan-classes@1.0.0</mixin>
   </mixins>
   <civix>
     <namespace>CRM/OAuth</namespace>

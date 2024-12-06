@@ -88,7 +88,7 @@ class CRM_Contact_BAO_Contact_Utils {
         "reset=1&gid={$summaryOverlayProfileId}&id={$contactId}&snippet=4&is_show_email_task=1"
       );
 
-      $imageInfo['summary-link'] = '<a href="' . $contactURL . '" data-tooltip-url="' . $profileURL . '" class="crm-summary-link">' . $imageInfo['image'] . '</a>';
+      $imageInfo['summary-link'] = '<a href="' . $contactURL . '" data-tooltip-url="' . $profileURL . '" class="crm-summary-link" aria-labelledby="crm-contactname-content">' . $imageInfo['image'] . '</a>';
     }
     else {
       $imageInfo['summary-link'] = $imageInfo['image'];
@@ -161,10 +161,15 @@ WHERE  id IN ( $idString )
     }
 
     if (!$hash) {
-      $hash = md5(uniqid(rand(), TRUE));
-      if ($hashSize) {
-        $hash = substr($hash, 0, $hashSize);
-      }
+      // Ensure we cannot generate numeric hashes
+      // to avoid breaking things elsewhere
+      // See lab issue #5541
+      do {
+        $hash = md5(uniqid(rand(), TRUE));
+        if ($hashSize) {
+          $hash = substr($hash, 0, $hashSize);
+        }
+      } while (is_numeric($hash));
 
       if ($entityType == 'contact') {
         CRM_Core_DAO::setFieldValue('CRM_Contact_DAO_Contact',

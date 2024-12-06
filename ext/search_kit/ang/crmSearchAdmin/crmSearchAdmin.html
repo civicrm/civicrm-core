@@ -1,5 +1,5 @@
 <div id="bootstrap-theme" class="crm-search">
-  <h1 crm-page-title>{{ $ctrl.entityTitle + ': ' + $ctrl.savedSearch.label }}</h1>
+  <h1 crm-page-title>{{ ($ctrl.savedSearch.is_template ? ts('Search Template') : ts('Saved Search')) + ': ' + $ctrl.savedSearch.label }}</h1>
   <div crm-ui-debug="$ctrl.savedSearch"></div>
 
   <!--This warning will show if bootstrap is unavailable. Normally it will be hidden by the bootstrap .collapse class.-->
@@ -28,7 +28,7 @@
 
         <div class="form-group pull-right">
 
-          <div class="btn-group" ng-if="$ctrl.afformEnabled && $ctrl.savedSearch.id">
+          <div class="btn-group" ng-if="$ctrl.afformEnabled && $ctrl.savedSearch.id && !$ctrl.savedSearch.is_template">
             <button type="button" ng-click="$ctrl.openAfformMenu = true;" class="btn dropdown-toggle btn-primary-outline" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <i class="crm-i fa-list-alt"></i>
               {{ ($ctrl.afformCount !== undefined) ? ($ctrl.afformCount === 1 ? ts('1 Form') : ts('%1 Forms', {1: $ctrl.afformCount})) : ts('Forms...') }}

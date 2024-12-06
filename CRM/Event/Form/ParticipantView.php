@@ -171,7 +171,7 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
         $participantCount[] = $lineItem[$k]['participant_count'];
       }
       $totalTaxAmount = $v['tax_amount'] + $totalTaxAmount;
-      $totalAmount += $v['line_total'];
+      $totalAmount += ($v['line_total'] + $v['tax_amount']);
     }
     $this->assign('currency', $this->getParticipantValue('fee_currency'));
     // It would be more  correct to assign totalTaxAmount & TotalAmount

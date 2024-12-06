@@ -1,0 +1,109 @@
+.crm-container .help,
+.crm-container #help,
+.crm-container .status,
+.crm-container .messages,
+.crm-container .alert,
+.crm-container .alert-success {
+  background-color: var(--crm-alert-background-help);
+  border: var(--crm-alert-border-width) solid var(--crm-alert-border-help);
+  color: var(--crm-alert-text-help);
+  margin: var(--crm-alert-margin);
+  padding: var(--crm-alert-padding);
+  border-radius: var(--crm-roundness);
+}
+.crm-container .help > *:first-child {
+  margin-top: 0;
+}
+.crm-container .help p,
+.crm-container .status p,
+.crm-container .messages p,
+.crm-container .alert p {
+  color: var(--crm-alert-text-help);
+}
+.crm-container .help li,
+.crm-container .status li,
+.crm-container .messages li {
+  color: var(--crm-alert-text-help);
+  list-style: initial;
+}
+.crm-container .status.alert,
+.crm-container .alert-warning,
+.crm-container .messages.warning {
+  background-color: var(--crm-alert-background-warning);
+  border-color: var(--crm-alert-border-warning);
+  color: var(--crm-alert-text-warning);
+}
+.crm-container .status.error {
+  background-color: var(--crm-alert-background-danger);
+  border-color: var(--crm-alert-border-danger);
+  color: var(--crm-alert-text-danger);
+}
+.crm-container .status.alert li,
+.crm-container .alert-warning li,
+.crm-container .messages.warning li {
+  color: var(--crm-alert-text-warning);
+}
+.crm-container .status.crm-ok {
+  background-color: var(--crm-alert-background-help);
+  color: var(--crm-alert-text-info);
+}
+.crm-container .alert-info,
+.crm-container .messages.crm-empty-table {
+  background-color: var(--crm-alert-background-info);
+  border-color: var(--crm-alert-border-info);
+  color: var(--crm-alert-text-info);
+}
+.crm-container .alert-danger {
+  background-color: var(--crm-alert-background-danger);
+  border-color: var(--crm-alert-border-danger);
+  color: var(--crm-alert-text-danger);
+}
+.crm-container .help a,
+.crm-container .messages a {
+  color: inherit;
+  text-decoration: underline;
+}
+.crm-container .help a:hover,
+.crm-container .messages a:hover,
+.crm-container .help a:focus,
+.crm-container .messages a:focus {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* BS alert close */
+
+.crm-container button.close,
+#bootstra-theme button.close {
+  float: right;
+  padding: 0;
+  border: 0;
+  cursor: var(--crm-hover-clickable);
+  background: transparent;
+  appearance: none;
+  font-size: var(--crm-r1);
+  line-height: 1;
+  color: var(--crm-c-darkest) !important;
+  text-shadow: 0 1px 0 #fff;
+  font-family: var(--crm-font-bold);
+  font-weight: bold;
+  opacity: .2;
+}
+.crm-container button.close:hover,
+.crm-container button.close:focus,
+#bootstra-theme button.close:hover,
+#bootstra-theme button.close:focus {
+  background: transparent;
+  opacity: 0.4;
+}
+.crm-container .alert-dismissable,
+.crm-container .alert-dismissible {
+  padding-right: 35px;
+}
+.crm-container .alert-dismissable .close,
+.crm-container .alert-dismissible .close {
+  position: relative;
+  top: -2px;
+  right: -21px;
+  color: inherit;
+}

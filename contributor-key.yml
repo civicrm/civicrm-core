@@ -219,10 +219,6 @@
   name        : Andrew West
   organization: British Humanist Association
 
-- github      : bjendres
-  name        : Björn Endres
-  organization: SYSTOPIA Organisationsberatung
-
 - github      : BeccaTregenna
   name        : Becca Tregenna
 
@@ -432,10 +428,6 @@
 
 - github      : don-alejandro-z
 
-- github      : dontub
-  name        : Dominic Tubach
-  organization: Systopia
-
 - github      : dptarrant
   name        : Dave T
 
@@ -543,9 +535,6 @@
 
 - name        : Evan Summers
   organization: National Democratic Institute
-
-- name        : Fabian Schuttenberg
-  organization: Systopia
 
 - name        : Fatih Ateş
 
@@ -772,9 +761,6 @@
 - name        : Jane Hanley
   organization: AGH Strategies
 
-- github      : jensschuppe
-  name        : Jens Schuppe
-
 - github      : jernic
   name        : jernic
 
@@ -819,10 +805,6 @@
 - github      : johntwyman
   name        : John Twyman
   organization: Australian Greens
-
-- github      : jofranz
-  organization: Systopia
-  name        : Johannes
 
 - github      : jorich-2000
   name        : Jonathan Richardson
@@ -1037,7 +1019,7 @@
 - name        : Manish Zope
 
 - github      : MarcMichalsky
-  name        : Marc Michalsky
+  name        : Marc Koch
   organization: forumZFD
 
 - github      : mariav0
@@ -1195,9 +1177,6 @@
   organization: Mountev Ltd
   name        : Mountev Ltd
 
-- name        : Martin Peth
-  organization: Systopia
-
 - github      : mukeshcompucorp
   name        : Mukesh Ram
   organization: CompuCorp
@@ -1282,6 +1261,10 @@
   name        : Phil Morice Brubaker
   organization: Just Hope
 
+- github      : pminf
+  name        : Philipp Michael
+  organization: Parlamentwatch e.V.
+
 - github      : pnbpss
   name        : Panu Boonpromsook
 
@@ -1329,10 +1312,6 @@
 
 - name        : Paul Barmak
 
-- github      : pbatroff
-  name        : Philipp Batroff
-  organization: Systopia
-
 - github      : penguintrax
   name        : Barbara Forbes-Lyons
   organization: Lyons Digital Media
@@ -1340,8 +1319,6 @@
 - github      : petednz
   name        : Peter Davis
   organization: Fuzion
-
-- github      : peth-systopia
 
 - github      : pillarsdotnet
   name        : Bob Vincent
@@ -1377,6 +1354,10 @@
 - name        : Rareș Pamfil
 
 - github      : Rar9
+
+- github      : rasmuswinter
+  name        : Rasmus Winter
+  organization: Outlandish
 
 - github      : ray-wright
   name        : Ray Wright
@@ -1573,8 +1554,44 @@
   organization: QED42
 
 - github      : systopia
+  name        : SYSTOPIA
+  organization: SYSTOPIA
+
+- github      : bjendres
   name        : Björn Endres
-  organization: Systopia
+  organization: SYSTOPIA
+
+- github      : dontub
+  name        : Dominic Tubach
+  organization: SYSTOPIA
+
+- github      : Fabian-SYSTOPIA
+  name        : Fabian Schuttenberg
+  organization: SYSTOPIA
+
+- github      : jensschuppe
+  name        : Jens Schuppe
+  organization: SYSTOPIA
+
+- github      : jofranz
+  name        : Johannes Franz
+  organization: SYSTOPIA
+
+- github      : peth-systopia
+  name        : Martin Peth
+  organization: SYSTOPIA
+
+- github      : pbatroff
+  name        : Philipp Batroff
+  organization: SYSTOPIA
+
+- github      : thomst
+  name        : Thomas Leichtfuss
+  organization: SYSTOPIA
+
+- github      : TychoSchottelius
+  name        : Tycho Schottelius
+  organization: SYSTOPIA
 
 - github      : tamarmeir
   name        : Tamar Meir
@@ -1605,10 +1622,6 @@
 
 - name        : Troy Mumm
   organization: Third Sun
-
-- github      : thomst
-  name        : Thomas Leichtfuss
-  organization: Systopia
 
 - github      : thoni56
   name        : Thomas Nilefalk
@@ -1667,10 +1680,6 @@
 - github      : twomice
   name        : Allen Shaw
   organization: Joinery
-
-- github      : TychoSchottelius
-  name        : Tycho Schottelius
-  organization: Systopia
 
 - github      : ufundo
   name        : Benjamin W
@@ -1811,10 +1820,6 @@
 - github      : gellweiler
   name        : Sebastian Gellweiler
   organization: craft-coders.de
-
-- github      : jofranz
-  name        : Johannes Franz
-  organization: Systopia
 
 - github      : mikeybeck
   name        : Mike Beck

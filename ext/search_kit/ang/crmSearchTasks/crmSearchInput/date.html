@@ -1,5 +1,5 @@
 <div class="form-group">
-  <select class="form-control" ng-if="$ctrl.isMulti() === false" ng-model="$ctrl.dateType" ng-change="$ctrl.changeDateType()">
+  <select id="{{:: $ctrl.labelId }}" class="form-control" ng-if="$ctrl.isMulti() === false" ng-model="$ctrl.dateType" ng-change="$ctrl.changeDateType()">
     <option value="fixed">{{:: ts('Pick Date') }}</option>
     <option value="range">{{:: ts('Date Range') }}</option>
     <option value="now">{{:: ts('Now') }}</option>
@@ -10,8 +10,8 @@
   <div class="form-group" ng-switch="$ctrl.dateType">
 
     <div class="form-group" ng-switch-when="fixed">
-      <input class="form-control" crm-ui-datepicker="{time: $ctrl.field.data_type === 'Timestamp'}" ng-model="$ctrl.value" ng-required="!$ctrl.field.nullable" ng-if="!$ctrl.isMulti()">
-      <input class="form-control" crm-multi-select-date ng-model="$ctrl.value" ng-required="!$ctrl.field.nullable" ng-if="$ctrl.isMulti()">
+      <input class="form-control" crm-ui-datepicker="{time: $ctrl.field.data_type === 'Timestamp'}" ng-model="$ctrl.value" id="{{:: $ctrl.labelId }}" ng-required="!$ctrl.field.nullable || $ctrl.field.required" ng-if="!$ctrl.isMulti()">
+      <input class="form-control" crm-multi-select-date ng-model="$ctrl.value" id="{{:: $ctrl.labelId }}" ng-required="!$ctrl.field.nullable || $ctrl.field.required" ng-if="$ctrl.isMulti()">
     </div>
 
     <div class="form-group" ng-switch-when="range">

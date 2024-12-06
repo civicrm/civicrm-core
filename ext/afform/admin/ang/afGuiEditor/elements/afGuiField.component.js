@@ -172,6 +172,16 @@
 
       function inputTypeCanBe(type) {
         var defn = ctrl.getDefn();
+        if (defn.readonly) {
+          switch (type) {
+            case 'DisplayOnly':
+            case 'Hidden':
+              return true;
+
+            default:
+              return false;
+          }
+        }
         if (defn.input_type === type) {
           return true;
         }
@@ -266,7 +276,12 @@
       }
 
       function setFieldDefn() {
+        // Deeply merge defn to include nested settings e.g. `input_attrs.time`.
         ctrl.fieldDefn = angular.merge({}, ctrl.getDefn(), ctrl.node.defn);
+        // Undo deep merge of options array.
+        if (ctrl.node.defn && ctrl.node.defn.options) {
+          ctrl.fieldDefn.options = JSON.parse(JSON.stringify(ctrl.node.defn.options));
+        }
       }
 
       $scope.toggleDefaultValue = function() {

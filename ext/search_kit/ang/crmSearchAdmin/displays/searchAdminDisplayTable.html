@@ -18,6 +18,11 @@
           <span>{{:: ts('Show nested hierarchy') }}</span>
         </label>
       </div>
+      <select class="form-control" ng-if="$ctrl.display.settings.hierarchical" ng-model="$ctrl.display.settings.collapsible" title="{{:: ts('Should hierarchical tree be collapsible') }}">
+        <option value="">{{:: ts('Not collapsible') }}</option>
+        <option value="open">{{:: ts('Collapsible - Open') }}</option>
+        <option value="closed">{{:: ts('Collapsible - Closed') }}</option>
+      </select>
     </div>
     <div class="form-inline">
       <search-admin-tasks-config display="$ctrl.display" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams"></search-admin-tasks-config>

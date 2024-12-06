@@ -1197,6 +1197,15 @@ class CRM_Utils_System {
   }
 
   /**
+   * Set the html header to direct robots not to index the page.
+   *
+   * @return void
+   */
+  public static function setNoRobotsFlag(): void {
+    CRM_Utils_System::addHTMLHead('<META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">');
+  }
+
+  /**
    * Wraps or emulates PHP's getallheaders() function.
    */
   public static function getAllHeaders() {
@@ -1238,12 +1247,20 @@ class CRM_Utils_System {
 
   /**
    * Determine whether this is an SSL request.
-   *
-   * Note that we inline this function in install/civicrm.php, so if you change
-   * this function, please go and change the code in the install script as well.
    */
   public static function isSSL() {
-    return !empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) != 'off';
+    $proto = $_SERVER['HTTP_X_FORWARDED_PROTO'] ?? NULL;
+    // accept 'https' (however capitalised)
+    if (is_string($proto) && (strtolower($proto) === 'https')) {
+      return TRUE;
+    }
+
+    $https = $_SERVER['HTTPS'] ?? NULL;
+    // accept any truthy value except 'off' (however capitalised)
+    if ($https && !(is_string($https) && (strtolower($https) === 'off'))) {
+      return TRUE;
+    }
+    return FALSE;
   }
 
   /**
@@ -1256,11 +1273,7 @@ class CRM_Utils_System {
   public static function redirectToSSL($abort = FALSE) {
     $config = CRM_Core_Config::singleton();
     $req_headers = self::getRequestHeaders();
-    // FIXME: Shouldn't the X-Forwarded-Proto check be part of CRM_Utils_System::isSSL()?
-    if (Civi::settings()->get('enableSSL') &&
-      !self::isSSL() &&
-      strtolower($req_headers['X_FORWARDED_PROTO'] ?? '') != 'https'
-    ) {
+    if (Civi::settings()->get('enableSSL') && !self::isSSL()) {
       // ensure that SSL is enabled on a civicrm url (for cookie reasons etc)
       $url = "https://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
       // @see https://lab.civicrm.org/dev/core/issues/425 if you're seeing this message.
@@ -1552,9 +1565,7 @@ class CRM_Utils_System {
     }
     $config = CRM_Core_Config::singleton();
     $result = $config->userSystem->loadBootStrap($params, $loadUser, $throwError, $realPath);
-    if (is_callable([$config->userSystem, 'setMySQLTimeZone'])) {
-      $config->userSystem->setMySQLTimeZone();
-    }
+    $config->userSystem->setTimeZone();
     return $result;
   }
 

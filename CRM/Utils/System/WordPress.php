@@ -728,8 +728,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     // Match CiviCRM timezone to WordPress site timezone.
     $wpSiteTimezone = $this->getTimeZoneString();
     if ($wpSiteTimezone) {
-      date_default_timezone_set($wpSiteTimezone);
-      CRM_Core_Config::singleton()->userSystem->setMySQLTimeZone();
+      $this->setTimeZone($wpSiteTimezone);
     }
 
     // Make sure pluggable WordPress functions are available.

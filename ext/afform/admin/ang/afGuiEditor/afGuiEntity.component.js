@@ -64,6 +64,7 @@
             $scope.fieldList.push({
               entityName: ctrl.entity.name + '-join-' + entityName,
               entityType: entityName,
+              afJoin: entityName,
               label: ts('%1 Fields', {1: entity.label}),
               fields: filterFields(entity.fields)
             });
@@ -72,9 +73,7 @@
 
         function filterFields(fields) {
           return _.transform(fields, function(fieldList, field) {
-            if (!field.readonly &&
-              (!search || _.contains(field.name, search) || _.contains(field.label.toLowerCase(), search))
-            ) {
+            if (!search || _.contains(field.name, search) || _.contains(field.label.toLowerCase(), search)) {
               fieldList.push(fieldDefaults(field));
             }
           }, []);
@@ -153,12 +152,23 @@
       };
 
       // Checks if a field is on the form or set as a value
-      $scope.fieldInUse = function(fieldName) {
+      $scope.fieldInUse = function(fieldName, joinEntity) {
         var data = ctrl.entity.data || {};
-        if (fieldName in data) {
-          return true;
+        if (!joinEntity) {
+          return (fieldName in data) || check(ctrl.editor.layout['#children'], {'#tag': 'af-field', name: fieldName});
         }
-        return check(ctrl.editor.layout['#children'], {'#tag': 'af-field', name: fieldName});
+        // Joins might support multiple instances per entity; first fetch them all
+        let afJoinContainers = afGui.getFormElements(ctrl.editor.layout['#children'], {'af-join': joinEntity}, (item) => {
+          return item['af-join'] || (item['af-fieldset'] && item['af-fieldset'] !== ctrl.entity.name);
+        });
+        // Check if ALL af-join containers are using the field
+        let inUse = true;
+        afJoinContainers.forEach(function(container) {
+          if (inUse && !check(container['#children'], {'#tag': 'af-field', name: fieldName})) {
+            inUse = false;
+          }
+        });
+        return inUse;
       };
 
       // Checks if fields in a block are already in use on the form.
@@ -189,7 +199,7 @@
           }
           if (_.isPlainObject(item)) {
             // Recurse through everything but skip fieldsets for other entities
-            if ((!item['af-fieldset'] || (item['af-fieldset'] === ctrl.entity.name)) && item['#children']) {
+            if (!item['af-join'] && (!item['af-fieldset'] || (item['af-fieldset'] === ctrl.entity.name)) && item['#children']) {
               check(item['#children'], criteria, found);
             }
             // Recurse into block directives

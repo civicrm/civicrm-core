@@ -58,6 +58,11 @@ class CRM_Core_Invoke {
     if (($args[1] ?? NULL) == 'ajax' || !empty($_REQUEST['snippet'])) {
       ini_set('display_errors', 0);
     }
+    // Guard against CSRF for ajax snippets
+    $ajaxModes = [CRM_Core_Smarty::PRINT_SNIPPET, CRM_Core_Smarty::PRINT_NOFORM, CRM_Core_Smarty::PRINT_JSON];
+    if (in_array($_REQUEST['snippet'] ?? NULL, $ajaxModes)) {
+      CRM_Core_Page_AJAX::validateAjaxRequestMethod();
+    }
 
     self::hackMenuRebuild($args);
     self::init($args);

@@ -454,7 +454,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       $updateMode = array_key_exists($name, $defaults) && !CRM_Utils_System::isNull($defaults[$name]);
       if ($updateMode) {
         foreach ($defaults[$name] as $locationEntity) {
-          $hasPrimary = $locationEntity['is_primary'] ?: $hasPrimary;
+          $hasPrimary = (bool) ($locationEntity['is_primary'] ?? $hasPrimary);
         }
       }
       else {
@@ -1122,9 +1122,11 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     // here we replace the user context with the url to view this contact
     $buttonName = $this->controller->getButtonName();
     if ($buttonName == $this->getButtonName('upload', 'new')) {
-      $contactSubTypes = array_filter(explode(CRM_Core_DAO::VALUE_SEPARATOR, $this->_contactSubType));
       $resetStr = "reset=1&ct={$contact->contact_type}";
-      $resetStr .= (count($contactSubTypes) == 1) ? "&cst=" . array_pop($contactSubTypes) : '';
+      if (is_string($this->_contactSubType)) {
+        $contactSubTypes = array_filter(explode(CRM_Core_DAO::VALUE_SEPARATOR, $this->_contactSubType));
+        $resetStr .= (count($contactSubTypes) == 1) ? "&cst=" . array_pop($contactSubTypes) : '';
+      }
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/add', $resetStr));
     }
     else {

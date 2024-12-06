@@ -798,10 +798,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $result = $this->processFormSubmission($contactID);
     }
     catch (CRM_Core_Exception $e) {
+      \Civi::log()->error('CRM_Contribute_Form_Contribution_Confirm::PostProcess processFormSubmissionException: ' . $e->getMessage());
       $this->bounceOnError($e->getMessage());
     }
 
     if (is_array($result) && !empty($result['is_payment_failure'])) {
+      \Civi::log()->error('CRM_Contribute_Form_Contribution_Confirm::PostProcess is_payment_failure: ' . $result['error']->getMessage());
       $this->bounceOnError($result['error']->getMessage());
     }
     // Presumably this is for hooks to access? Not quite clear & perhaps not required.
@@ -1606,11 +1608,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           $this->_paymentProcessor['id'] = $paymentProcessorIDs[0];
         }
         try {
-          civicrm_api3('contribution', 'completetransaction', [
-            'id' => $membershipContribution->id,
-            'payment_processor_id' => $this->_paymentProcessor['id'],
-            'is_transactional' => FALSE,
-          ]);
+          CRM_Contribute_BAO_Contribution::completeOrder(
+            ['payment_processor_id' => $this->getPaymentProcessorID()],
+            $membershipContribution->contribution_recur_id,
+            $membershipContribution->id,
+            NULL);
         }
         catch (CRM_Core_Exception $e) {
           if ($e->getErrorCode() != 'contribution_completed') {
@@ -2399,53 +2401,13 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
-   * Complete transaction if payment has been processed.
-   *
-   * Check the result for a success outcome & if paid then complete the transaction.
-   *
-   * Completing will trigger update of related entities and emails.
-   *
-   * @deprecated
-   *
-   * @param array $result
-   * @param int $contributionID
-   *
-   * @throws \CRM_Core_Exception
-   * @throws \Exception
-   */
-  protected function completeTransaction($result, $contributionID) {
-    CRM_Core_Error::deprecatedWarning('Use API3 Payment.create');
-    if (($result['payment_status_id'] ?? NULL) == 1) {
-      try {
-        civicrm_api3('contribution', 'completetransaction', [
-          'id' => $contributionID,
-          'trxn_id' => $result['trxn_id'] ?? NULL,
-          'payment_processor_id' => $result['payment_processor_id'] ?? $this->_paymentProcessor['id'],
-          'is_transactional' => FALSE,
-          'fee_amount' => $result['fee_amount'] ?? NULL,
-          'receive_date' => $result['receive_date'] ?? NULL,
-          'card_type_id' => $result['card_type_id'] ?? NULL,
-          'pan_truncation' => $result['pan_truncation'] ?? NULL,
-        ]);
-      }
-      catch (CRM_Core_Exception $e) {
-        if ($e->getErrorCode() != 'contribution_completed') {
-          \Civi::log()->error('CRM_Contribute_Form_Contribution_Confirm::completeTransaction CRM_Core_Exception: ' . $e->getMessage());
-          throw new CRM_Core_Exception('Failed to update contribution in database');
-        }
-      }
-    }
-  }
-
-  /**
    * Bounce the user back to retry when an error occurs.
    *
    * @param string $message
    */
   protected function bounceOnError($message): void {
     CRM_Core_Session::singleton()
-      ->setStatus(ts('Payment Processor Error message :') .
-        $message);
+      ->setStatus(ts('Payment Processor Error message') . ': ' . $message);
     CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact',
       '_qf_Main_display=true&qfKey=' . ($this->_params['qfKey'] ?? NULL)
     ));
@@ -2598,43 +2560,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $form->_values['contribution_page_id'] = $contribution->contribution_page_id;
 
       if (!empty($form->_paymentProcessor)) {
-        try {
-          $payment = Civi\Payment\System::singleton()->getByProcessor($form->_paymentProcessor);
-          if ($contribution->contribution_recur_id && $this->getPaymentProcessorObject()->supports('noReturnForRecurring')) {
-            // We want to get rid of this & make it generic - eg. by making payment processing the last thing
-            // and always calling it first.
-            $form->postProcessHook();
-          }
-          $paymentParams['currency'] = $this->getCurrency();
-          $result = $payment->doPayment($paymentParams);
-          $form->_params = array_merge($form->_params, $result);
-          $form->assign('trxn_id', $result['trxn_id'] ?? '');
-          $contribution->trxn_id = $result['trxn_id'] ?? $contribution->trxn_id ?? '';
-          $contribution->payment_status_id = $result['payment_status_id'];
-          $result['contribution'] = $contribution;
-          if ($result['payment_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending')
-            && $payment->isSendReceiptForPending()) {
-            CRM_Contribute_BAO_ContributionPage::sendMail($contactID,
-              $form->_values,
-              $contribution->is_test
-            );
-          }
-          return $result;
-        }
-        catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
-          // Clean up DB as appropriate.
-          if (!empty($paymentParams['contributionID'])) {
-            CRM_Contribute_BAO_Contribution::failPayment($paymentParams['contributionID'],
-              $paymentParams['contactID'], $e->getMessage());
-          }
-          if (!empty($paymentParams['contributionRecurID'])) {
-            CRM_Contribute_BAO_ContributionRecur::deleteRecurContribution($paymentParams['contributionRecurID']);
-          }
-
-          $result['is_payment_failure'] = TRUE;
-          $result['error'] = $e;
-          return $result;
-        }
+        return $this->processConfirmPayment($contribution, $contactID, $paymentParams);
       }
     }
 
@@ -2653,6 +2579,57 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       ];
     }
     throw new CRM_Core_Exception('code is unreachable, exception is for clarity for refactoring');
+  }
+
+  /**
+   * This was extracted from processConfirm() as part of a refactoring process.
+   * Signature/params subject to change!
+   * This should probably throw the exception instead of catching it and putting it in an array
+   * @internal
+   *
+   * @param \CRM_Contribute_DAO_Contribution $contribution
+   * @param int $contactID
+   * @param array $paymentParams
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  private function processConfirmPayment(\CRM_Contribute_DAO_Contribution $contribution, int $contactID, array $paymentParams): array {
+    $form = $this;
+    try {
+      $payment = Civi\Payment\System::singleton()->getByProcessor($form->_paymentProcessor);
+      if ($contribution->contribution_recur_id && $this->getPaymentProcessorObject()->supports('noReturnForRecurring')) {
+        // We want to get rid of this & make it generic - eg. by making payment processing the last thing
+        // and always calling it first.
+        $form->postProcessHook();
+      }
+      $paymentParams['currency'] = $this->getCurrency();
+      $result = $payment->doPayment($paymentParams);
+      $form->_params = array_merge($form->_params, $result);
+      $form->assign('trxn_id', $result['trxn_id'] ?? '');
+      $contribution->trxn_id = $result['trxn_id'] ?? $contribution->trxn_id ?? '';
+      $contribution->payment_status_id = $result['payment_status_id'];
+      $result['contribution'] = $contribution;
+      if ($result['payment_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending')
+        && $payment->isSendReceiptForPending()) {
+        CRM_Contribute_BAO_ContributionPage::sendMail($contactID, $form->_values, $contribution->is_test);
+      }
+      return $result;
+    }
+    catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
+      // Clean up DB as appropriate.
+      if (!empty($paymentParams['contributionID'])) {
+        CRM_Contribute_BAO_Contribution::failPayment($paymentParams['contributionID'],
+          $paymentParams['contactID'], $e->getMessage());
+      }
+      if (!empty($paymentParams['contributionRecurID'])) {
+        CRM_Contribute_BAO_ContributionRecur::deleteRecurContribution($paymentParams['contributionRecurID']);
+      }
+
+      $result['is_payment_failure'] = TRUE;
+      $result['error'] = $e;
+      return $result;
+    }
   }
 
   /**
