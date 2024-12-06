@@ -16,7 +16,7 @@ use Civi\Api4\Contribution;
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
+class CRM_Core_Payment_PayPalProIPN {
 
   /**
    * Input parameters from payment processor. Store these so that
@@ -129,9 +129,11 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
    * @throws CRM_Core_Exception
    */
   public function __construct($inputData) {
-    $this->setInputParameters($inputData);
+    if (!is_array($inputData)) {
+      throw new CRM_Core_Exception('Invalid input parameters');
+    }
+    $this->_inputParameters = $inputData;
     $this->setInvoiceData();
-    parent::__construct();
   }
 
   /**

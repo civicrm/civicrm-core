@@ -18,7 +18,14 @@ use Civi\Api4\PaymentProcessor;
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
+class CRM_Core_Payment_AuthorizeNetIPN {
+
+  /**
+   * Input parameters from payment processor. Store these so that
+   * the code does not need to keep retrieving from the http request
+   * @var array
+   */
+  protected $_inputParameters = [];
 
   /**
    * Constructor function.
@@ -29,8 +36,10 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
    * @throws CRM_Core_Exception
    */
   public function __construct($inputData) {
-    $this->setInputParameters($inputData);
-    parent::__construct();
+    if (!is_array($inputData)) {
+      throw new CRM_Core_Exception('Invalid input parameters');
+    }
+    $this->_inputParameters = $inputData;
   }
 
   /**
