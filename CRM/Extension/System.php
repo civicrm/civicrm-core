@@ -263,10 +263,11 @@ class CRM_Extension_System {
    */
   public function getCache() {
     if ($this->cache === NULL) {
-      $cacheGroup = md5(serialize(['ext', $this->parameters, CRM_Utils_System::version()]));
+      $cacheGroup = 'ext_' . CRM_Utils_String::base64UrlEncode(md5(serialize($this->parameters), TRUE));
       // Extension system starts before container. Manage our own cache.
       $this->cache = CRM_Utils_Cache::create([
         'name' => $cacheGroup,
+        'scope' => 'version',
         'service' => 'extension_system',
         'type' => ['*memory*', 'SqlGroup', 'ArrayCache'],
         'prefetch' => TRUE,
