@@ -171,32 +171,31 @@ class Container {
     // $container->setDefinition('log.ipn', new Definition('CRM_Core_Error_Log', []))->setPublic(TRUE);
 
     $basicCaches = [
-      'js_strings' => 'js_strings',
-      'community_messages' => 'community_messages',
-      'checks' => 'checks',
-      'session' => 'CiviCRM Session',
-      'long' => 'long',
-      'groups' => 'contact groups',
-      'navigation' => 'navigation',
-      'customData' => 'custom data',
-      'fields' => 'contact fields',
-      'contactTypes' => 'contactTypes',
-      'metadata' => 'metadata',
+      // $cacheServiceName => array $cacheCreateParams,
+      // @see \CRM_Utils_Cache::create()
+      'js_strings' => ['withArray' => 'fast'],
+      'community_messages' => [],
+      'checks' => [],
+      'session' => ['name' => 'CiviCRM Session'],
+      'long' => [],
+      'groups' => ['name' => 'contact groups', 'withArray' => 'fast'],
+      'navigation' => ['withArray' => 'fast'],
+      'customData' => ['name' => 'custom data', 'withArray' => 'fast'],
+      'fields' => ['name' => 'contact fields', 'withArray' => 'fast'],
+      'contactTypes' => ['withArray' => 'fast'],
+      'metadata' => ['withArray' => 'fast'],
     ];
-    foreach ($basicCaches as $cacheSvc => $cacheGrp) {
-      $definitionParams = [
+    // Use the FastArrayDecorator on caches where (1) we don't really care about TTL,
+    // (2) they're accessed frequently, (3) there's not much risk of concurrency issues.
+    foreach ($basicCaches as $cacheSvc => $cacheParams) {
+      $cacheDefaults = [
+        // Most caches should not be shared/re-used across versions.
         'scope' => 'version',
-        'name' => $cacheGrp,
+        'name' => $cacheSvc,
         'service' => $cacheSvc,
         'type' => ['*memory*', 'SqlGroup', 'ArrayCache'],
       ];
-      // For Caches that we don't really care about the ttl for and/or maybe accessed
-      // fairly often we use the fastArrayDecorator which improves reads and writes, these
-      // caches should also not have concurrency risk.
-      $fastArrayCaches = ['groups', 'navigation', 'customData', 'fields', 'contactTypes', 'metadata', 'js_strings'];
-      if (in_array($cacheSvc, $fastArrayCaches)) {
-        $definitionParams['withArray'] = 'fast';
-      }
+      $definitionParams = $cacheParams + $cacheDefaults;
       $container->setDefinition("cache.{$cacheSvc}", new Definition(
         'CRM_Utils_Cache_Interface',
         [$definitionParams]
