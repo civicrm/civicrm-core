@@ -6,10 +6,11 @@
 
   angular.module('crmSearchDisplay').component('crmSearchDisplayEditable', {
     bindings: {
-      row: '<',
+      row: '<?',
       rowIndex: '<',
-      searchDisplay: '<',
+      display: '<',
       colKey: '<',
+      isFullRowMode: '<',
     },
     templateUrl: '~/crmSearchDisplay/crmSearchDisplayEditable.html',
     controller: function($scope, $element, crmApi4, crmStatus) {
@@ -19,10 +20,14 @@
       let valuePath;
 
       this.$onInit = function() {
-        editableInfo = this.searchDisplay.results.editable[this.colKey];
+        editableInfo = this.display.results.editable[this.colKey];
         valuePath = this.colKey.split(':')[0];
-        this.value = JSON.parse(JSON.stringify(this.row.data[valuePath]));
-        initialValue = JSON.parse(JSON.stringify(this.row.data[valuePath]));
+        this.display.editValues = this.display.editValues || {};
+        // Not applicable to create mode
+        if (this.row) {
+          initialValue = JSON.parse(JSON.stringify(this.row.data[valuePath]));
+          this.display.editValues[this.colKey] = JSON.parse(JSON.stringify(this.row.data[valuePath]));
+        }
 
         this.field = {
           data_type: editableInfo.data_type,
@@ -32,13 +37,14 @@
           options: editableInfo.options,
           fk_entity: editableInfo.fk_entity,
           serialize: editableInfo.serialize,
-          nullable: editableInfo.nullable && ctrl.row.data[editableInfo.id_path],
+          nullable: editableInfo.nullable && ctrl.row && ctrl.row.data[editableInfo.id_path],
         };
 
         if (this.field.options === true) {
           loadOptions();
         }
 
+        $(document).off('.crmSearchDisplayEditable');
         $(document).on('keydown.crmSearchDisplayEditable', (e) => {
           if (e.key === 'Escape') {
             $scope.$apply(() => ctrl.cancel());
@@ -54,38 +60,25 @@
       };
 
       this.save = function() {
-        const value = formatDataType(ctrl.value);
-        if (value !== initialValue) {
-          ctrl.row.data[valuePath] = value;
-          ctrl.searchDisplay.saveEditing(ctrl.rowIndex, ctrl.colKey, value);
+        const value = ctrl.display.editValues[ctrl.colKey];
+        if (value !== initialValue || ctrl.isFullRowMode) {
+          ctrl.display.saveEditing(ctrl.rowIndex, ctrl.colKey);
         }
         else {
-          ctrl.searchDisplay.cancelEditing();
+          ctrl.display.cancelEditing();
         }
       };
 
       this.cancel = function() {
-        ctrl.searchDisplay.cancelEditing();
+        ctrl.display.cancelEditing();
       };
-
-      function formatDataType(val) {
-        if (_.isArray(val)) {
-          const formatted = angular.copy(val);
-          formatted.forEach((v, i) => formatted[i] = formatDataType(v));
-          return formatted;
-        }
-        if (ctrl.field.data_type === 'Integer') {
-          return +val;
-        }
-        return val;
-      }
 
       // Used to dynamically load options for fields whose options are not static
       function loadOptions() {
         crmApi4(editableInfo.entity, 'getFields', {
           action: 'update',
           select: ['options'],
-          values: ctrl.row.data,
+          values: ctrl.row && ctrl.row.data,
           loadOptions: ['id', 'name', 'label', 'description', 'color', 'icon'],
           where: [['name', '=', ctrl.field.name]]
         }, 0).then(function(fieldInfo) {

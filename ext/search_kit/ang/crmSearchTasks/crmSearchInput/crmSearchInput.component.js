@@ -34,8 +34,20 @@
         });
 
         this.ngModel.$render = function() {
-          ctrl.value = ctrl.ngModel.$viewValue;
+          ctrl.value = formatDataType(ctrl.ngModel.$viewValue);
         };
+
+        function formatDataType(val) {
+          if (_.isArray(val)) {
+            const formatted = angular.copy(val);
+            formatted.forEach((v, i) => formatted[i] = formatDataType(v));
+            return formatted;
+          }
+          if (ctrl.field.data_type === 'Integer' || ctrl.field.data_type === 'Float') {
+            return Number(val);
+          }
+          return val;
+        }
 
       };
     }
