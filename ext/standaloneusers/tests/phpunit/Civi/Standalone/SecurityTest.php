@@ -4,6 +4,8 @@ namespace Civi\Standalone;
 use Civi\Test\EndToEndInterface;
 use Civi\Test\TransactionalInterface;
 use Civi\Api4\User;
+use Civi\Api4\Action\User\PasswordReset;
+use Civi\Api4\Action\User\SendPasswordResetEmail;
 
 /**
  * Test Security flows in Standalone
@@ -171,7 +173,7 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     $token = \Civi::service('crypto.jwt')->encode([
       'exp' => $expires,
       'sub' => "uid:$userID",
-      'scope' => Security::PASSWORD_RESET_SCOPE,
+      'scope' => PasswordReset::PASSWORD_RESET_SCOPE,
     ]);
     User::update(FALSE)
       ->addValue('password_reset_token', $token)
@@ -187,18 +189,18 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     [$contactID, $userID, $security] = $this->createFixtureContactAndUser();
 
     // Create token.
-    $token = \Civi\Api4\Action\User\SendPasswordReset::updateToken($userID);
+    $token = PasswordReset::updateToken($userID);
     $decodedToken = \Civi::service('crypto.jwt')->decode($token);
     $this->assertEquals('uid:' . $userID, $decodedToken['sub']);
-    $this->assertEquals(Security::PASSWORD_RESET_SCOPE, $decodedToken['scope']);
+    $this->assertEquals(PasswordReset::PASSWORD_RESET_SCOPE, $decodedToken['scope']);
 
     // Check it works, but only once.
-    $extractedUserID = $security->checkPasswordResetToken($token);
+    $extractedUserID = PasswordReset::checkPasswordResetToken($token);
     $this->assertEquals($userID, $extractedUserID);
-    $this->assertNull($security->checkPasswordResetToken($token));
+    $this->assertNull(PasswordReset::checkPasswordResetToken($token));
 
     // OK, let's change that password.
-    $token = \Civi\Api4\Action\User\SendPasswordReset::updateToken($userID);
+    $token = PasswordReset::updateToken($userID);
 
     // Attempt to change the user's password using this token to authenticate.
     $result = User::passwordReset(TRUE)
@@ -223,8 +225,8 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     }
 
     // Check the message template generation
-    $token = \Civi\Api4\Action\User\SendPasswordReset::updateToken($userID);
-    $workflow = $security->preparePasswordResetWorkflow($user, $token);
+    $token = PasswordReset::updateToken($userID);
+    $workflow = SendPasswordResetEmail::preparePasswordResetWorkflow($user, $token);
     $this->assertNotNull($workflow);
     $result = $workflow->renderTemplate();
 
@@ -234,7 +236,7 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
 
     // Fake an expired token
     $token = $this->storeFakePasswordResetToken($userID, time() - 1);
-    $this->assertNull($security->checkPasswordResetToken($token));
+    $this->assertNull(PasswordReset::checkPasswordResetToken($token));
   }
 
   protected function deleteStuffWeMade() {
