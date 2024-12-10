@@ -947,7 +947,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       CRM_Core_Payment_Form::mapParams(NULL, $mapParams, $paymentParams, TRUE);
 
       $payment = $this->_paymentProcessor['object'];
-
+      $payment->setBackOffice(TRUE);
       // CRM-15622: fix for incorrect contribution.fee_amount
       $paymentParams['fee_amount'] = NULL;
       $paymentParams['description'] = $this->getSourceText();
