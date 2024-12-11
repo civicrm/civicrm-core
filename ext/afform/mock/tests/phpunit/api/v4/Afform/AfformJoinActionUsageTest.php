@@ -122,7 +122,7 @@ class AfformJoinActionUsageTest extends AfformUsageTestCase {
       ->execute();
 
     $contact = Contact::get(FALSE)
-      ->addWhere('first_name', '=', $lastName)
+      ->addWhere('last_name', '=', $lastName)
       ->addJoin('Custom_MyThings AS Custom_MyThings', 'LEFT', ['id', '=', 'Custom_MyThings.entity_id'])
       ->addSelect('Custom_MyThings.my_text', 'Custom_MyThings.my_friend')
       ->addOrderBy('Custom_MyThings.id')
@@ -203,7 +203,7 @@ class AfformJoinActionUsageTest extends AfformUsageTestCase {
       ->execute();
 
     $contact = Contact::get(FALSE)
-      ->addWhere('first_name', '=', $lastName)
+      ->addWhere('last_name', '=', $lastName)
       ->addJoin('Custom_MyThings AS Custom_MyThings', 'LEFT', ['id', '=', 'Custom_MyThings.entity_id'])
       ->addSelect('Custom_MyThings.my_text', 'Custom_MyThings.my_friend')
       ->addOrderBy('Custom_MyThings.id')
