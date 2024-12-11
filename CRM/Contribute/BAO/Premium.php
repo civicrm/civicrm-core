@@ -245,22 +245,11 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
   /**
    * Convert key=val options into an array while keeping
    * compatibility for values only.
+   *
+   * @deprecated
    */
   public static function parseProductOptions($string) : array {
-    $options = [];
-    $temp = explode(',', $string);
-
-    foreach ($temp as $value) {
-      $parts = explode('=', $value, 2);
-      if (count($parts) == 2) {
-        $options[trim($parts[0])] = trim($parts[1]);
-      }
-      else {
-        $options[trim($value)] = trim($value);
-      }
-    }
-
-    return $options;
+    return CRM_Utils_CommaKV::unserialize($string);
   }
 
 }
