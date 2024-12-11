@@ -67,7 +67,7 @@ return [
       'localizable' => TRUE,
       'description' => ts('Store comma-delimited list of color, size, etc. options for the product.'),
       'add' => '1.4',
-      'serialize' => CRM_Core_DAO::SERIALIZE_COMMA,
+      'serialize' => CRM_Core_DAO::SERIALIZE_COMMA_KEY_VALUE,
     ],
     'image' => [
       'title' => ts('Image'),
