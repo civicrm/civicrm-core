@@ -34,6 +34,13 @@ class Iframe extends AutoService implements EventSubscriberInterface {
    * @throws \CRM_Core_Exception
    */
   public function onRenderUrl(Url $url, ?string &$result) {
+    if (CIVICRM_UF === 'WordPress') {
+      $result = \Civi::url('frontend://', 'a')
+        ->merge($url, ['path', 'query', 'fragment', 'fragmentQuery', 'flags'])
+        ->addQuery('_cvwpif=1');
+      return;
+    }
+
     $result = \Civi::url('[civicrm.iframe]', 'a')->merge($url, ['path', 'query', 'fragment', 'fragmentQuery', 'flags']);
   }
 
