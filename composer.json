@@ -231,7 +231,7 @@
       "monaco-editor": {
         "url": "https://registry.npmjs.org/monaco-editor/-/monaco-editor-0.49.0.tgz",
         "path": "bower_components/monaco-editor",
-        "ignore": ["dev", "esm"]
+        "ignore": ["dev", "esm", "min-maps", "min/vs/language/typescript"]
       },
       "google-code-prettify": {
         "url": "https://github.com/tcollard/google-code-prettify/archive/v1.0.5.zip",
@@ -299,7 +299,7 @@
         "CiviCRM Custom patch to fix a php8.1 issue found in CiviCRM unit tests": "https://raw.githubusercontent.com/civicrm/civicrm-core/5506f4ce5d46799857b4f4ddf34069e7541e9cc5/tools/scripts/composer/zetacomponents-php-81-civicrm-custom.patch"
       }
     },
-    "compile-includes": ["ext/greenwich/composer.compile.json"],
+    "compile-includes": ["composer.compile.json", "ext/greenwich/composer.compile.json"],
     "compile-whitelist": ["civicrm/composer-compile-lib"]
   }
 }
