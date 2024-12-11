@@ -2,7 +2,7 @@
 
 namespace Civi\Api4\Action\CustomGroup;
 
-use CRM_Afform_ExtensionUtil as E;
+use CRM_CivicrmAdminUi_ExtensionUtil as E;
 
 /**
  * For multi-value custom groups, produce managed records
