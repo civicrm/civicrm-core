@@ -19,8 +19,7 @@ class AfformJoinActionUsageTest extends AfformUsageTestCase {
     CustomGroup::delete(FALSE)->addWhere('id', '>', '0')->execute();
   }
 
-  public static function setUpBeforeClass(): void
-  {
+  public static function setUpBeforeClass(): void {
     parent::setUpBeforeClass();
     self::$layouts['joinUncheckedActions'] = <<<EOHTML
       <af-form ctrl="afform">
@@ -93,8 +92,8 @@ class AfformJoinActionUsageTest extends AfformUsageTestCase {
       ->addValue('email_primary.email', '123@example.com')
       ->addValue('email_primary.location_type_id', $locationType)
       ->addValue('email_primary.is_primary', TRUE)
-      ->addValue('my_text', "One")
-      ->addValue('my_friend', $cid1)
+      ->addValue('Custom_MyThings.my_text', "One")
+      ->addValue('Custom_MyThings.my_friend', $cid1)
       ->execute()->single();
 
     $values = [
@@ -137,7 +136,6 @@ class AfformJoinActionUsageTest extends AfformUsageTestCase {
     $this->assertEquals($cid2, $contact[2]['Custom_MyThings.my_friend']);
   }
 
-
   /**
    * Checks that checked actions will behave as is
    */
@@ -174,8 +172,8 @@ class AfformJoinActionUsageTest extends AfformUsageTestCase {
       ->addValue('email_primary.email', '1234@example.com')
       ->addValue('email_primary.location_type_id', $locationType)
       ->addValue('email_primary.is_primary', TRUE)
-      ->addValue('my_text', "One")
-      ->addValue('my_friend', $cid1)
+      ->addValue('Custom_MyThings.my_text', "One")
+      ->addValue('Custom_MyThings.my_friend', $cid1)
       ->execute()->single();
 
     $values = [
