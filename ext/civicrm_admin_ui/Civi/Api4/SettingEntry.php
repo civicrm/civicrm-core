@@ -84,6 +84,29 @@ class SettingEntry extends Generic\AbstractEntity {
           'data_type' => 'Boolean',
           'input_type' => 'Radio',
         ],
+        [
+          'name' => 'current_value',
+          'title' => E::ts('Current value'),
+          'description' => E::ts('Current value of this setting'),
+          'data_type' => 'String',
+          'input_type' => 'Text',
+        ],
+        [
+          'name' => 'current_layer',
+          'title' => E::ts('Current layer'),
+          'description' => E::ts('Where is the current value of this setting set? (e.g. environment variable, settings file, database)'),
+          'data_type' => 'String',
+          'input_type' => 'Select',
+          'options' => [
+            'environment' => 'Environment variable',
+            'file' => 'PHP define or $civicrm_setting override (usually in civicrm.settings.php)',
+            // we can't easily distinguish between these.. yet?
+            //'define' => 'PHP Define (usually in civicrm.settings.php)',
+            //'override' => '$civicrm_setting override (usually in civicrm.settings.php)',
+            'database' => 'Database (civicrm_setting table)',
+            'default' => 'Using the default value',
+          ],
+        ],
       ];
     }))->setCheckPermissions($checkPermissions);
   }
