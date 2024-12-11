@@ -642,6 +642,8 @@ class CRM_Utils_String {
       $config->set('Cache.DefinitionImpl', NULL);
       $config->set('HTML.DefinitionID', 'enduser-customize.html tutorial');
       $config->set('HTML.DefinitionRev', 1);
+      $config->set('HTML.MaxImgLength', NULL);
+      $config->set('CSS.MaxImgLength', NULL);
       $def = $config->maybeGetRawHTMLDefinition();
       if (!empty($def)) {
         $def->addElement('figcaption', 'Block', 'Flow', 'Common');

@@ -1068,8 +1068,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         'url_tracking' => Civi::settings()->get('url_tracking_default'),
         'visibility' => 'Public Pages',
         'replyto_email' => $domain_email,
-        'header_id' => CRM_Mailing_PseudoConstant::defaultComponent('Header', ''),
-        'footer_id' => CRM_Mailing_PseudoConstant::defaultComponent('Footer', ''),
+        'header_id' => NULL,
+        'footer_id' => NULL,
         'from_email' => $domain_email,
         'from_name' => $domain_name,
         'msg_template_id' => NULL,
@@ -1083,6 +1083,10 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         'start_date' => NULL,
         'end_date' => NULL,
       ];
+      if (CRM_Utils_System::isNull($params['sms_provider_id'] ?? NULL)) {
+        $defaults['header_id'] = CRM_Mailing_PseudoConstant::defaultComponent('Header', '');
+        $defaults['footer_id'] = CRM_Mailing_PseudoConstant::defaultComponent('Footer', '');
+      }
 
       // Get the default from email address, if not provided.
       if (empty($defaults['from_email'])) {
@@ -1915,8 +1919,10 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
       $params['dedupe_email'] ??= Civi::settings()->get('dedupe_email_default');
       $params['open_tracking'] ??= Civi::settings()->get('open_tracking_default');
       $params['url_tracking'] ??= Civi::settings()->get('url_tracking_default');
-      $params['header_id'] ??= CRM_Mailing_PseudoConstant::defaultComponent('Header', '');
-      $params['footer_id'] ??= CRM_Mailing_PseudoConstant::defaultComponent('Footer', '');
+      if (CRM_Utils_System::isNull($params['sms_provider_id'] ?? NULL)) {
+        $params['header_id'] ??= CRM_Mailing_PseudoConstant::defaultComponent('Header', '');
+        $params['footer_id'] ??= CRM_Mailing_PseudoConstant::defaultComponent('Footer', '');
+      }
       $params['optout_id'] ??= CRM_Mailing_PseudoConstant::defaultComponent('OptOut', '');
       $params['reply_id'] ??= CRM_Mailing_PseudoConstant::defaultComponent('Reply', '');
       $params['resubscribe_id'] ??= CRM_Mailing_PseudoConstant::defaultComponent('Resubscribe', '');

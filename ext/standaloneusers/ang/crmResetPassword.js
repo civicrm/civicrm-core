@@ -36,14 +36,14 @@
           ctrl[prop] = newVal;
         }, 0);
       };
-      ctrl.sendPasswordReset = () => {
+      ctrl.requestPasswordResetEmail = () => {
         updateAngular('busy', ts('Just a moment...'));
         updateAngular('formSubmitted', true);
         if (!ctrl.identifier) {
           alert(ts('Please provide your username/email.'));
           return;
         }
-        crmApi4('User', 'sendPasswordReset', { identifier: ctrl.identifier })
+        crmApi4('User', 'requestPasswordResetEmail', { identifier: ctrl.identifier })
         .then(r => {
           updateAngular('busy', '');
           updateAngular('resetSuccessfullySubmitted', true);
