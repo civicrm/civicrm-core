@@ -117,7 +117,17 @@ class CRM_Core_DAO extends DB_DataObject {
     /**
      * Comma separated string, no quotes, no spaces
      */
-    SERIALIZE_COMMA = 5;
+    SERIALIZE_COMMA = 5,
+    /**
+     * @deprecated
+     *
+     * Comma separated, spaces trimmed, key=value optional
+     *
+     * This was added to handle a wonky/legacy field, `civicrm_product.options`.
+     * If you're adding new fields, then use SERIALIZE_JSON instead. JSON is more
+     * standardized and has fewer quirks.
+     */
+    SERIALIZE_COMMA_KEY_VALUE = 6;
 
   /**
    * Define entities that shouldn't be created or deleted when creating/ deleting
@@ -3411,6 +3421,9 @@ SELECT contact_id
       case self::SERIALIZE_COMMA:
         return is_array($value) ? implode(',', $value) : $value;
 
+      case self::SERIALIZE_COMMA_KEY_VALUE:
+        return is_array($value) ? CRM_Utils_CommaKV::serialize($value) : $value;
+
       default:
         throw new Exception('Unknown serialization method for field.');
     }
@@ -3447,6 +3460,9 @@ SELECT contact_id
 
       case self::SERIALIZE_COMMA:
         return explode(',', trim(str_replace(', ', '', $value)));
+
+      case self::SERIALIZE_COMMA_KEY_VALUE:
+        return CRM_Utils_CommaKV::unserialize($value);
 
       default:
         throw new CRM_Core_Exception('Unknown serialization method for field.');

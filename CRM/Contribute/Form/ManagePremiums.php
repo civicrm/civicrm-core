@@ -320,6 +320,13 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
 
     $params += $this->getSubmittedCustomFieldsForApi4();
 
+    if (is_string($params['options'])) {
+      // In setDefaultValues(), we loaded the serialized `options` string to present
+      // it as one editable string. Now we pass to APIv4 save() -- but it doesn't want
+      // the serialized string. It wants the array...
+      $params['options'] = CRM_Utils_CommaKV::unserialize($params['options']);
+    }
+
     // Save the premium product to database
     $premium = Product::save()->addRecord($params)->execute()->first();
 
