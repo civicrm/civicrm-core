@@ -25,6 +25,10 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
       $allValues = \Civi::settings()->all();
 
       foreach ($meta as $i => $record) {
+        if ($record['is_secret']) {
+          $meta[$i]['current_value'] = '[SECRET]';
+          continue;
+        }
         $name = $record['name'];
 
         $value = $allValues[$name] ?? NULL;
@@ -39,7 +43,7 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
 
     // TODO: SettingsManager doesn't expose the layer at which a setting
     // is set publicly, so this is a slightly rough implementation for now
-    if ($this->_isFieldSelected('current_layer')) {
+    if ($this->_isFieldSelected('current_layer') || $this->_isFieldSelected('current_layer:label')) {
       foreach ($meta as $i => $record) {
         $meta[$i]['current_layer'] = $this->getLayer($record);
       }
