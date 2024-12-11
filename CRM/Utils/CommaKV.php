@@ -52,7 +52,7 @@ class CRM_Utils_CommaKV {
         $parts[] = $key . '=' . $value;
       }
     }
-    return implode(',', $parts);
+    return implode(",\n", $parts);
   }
 
 }
