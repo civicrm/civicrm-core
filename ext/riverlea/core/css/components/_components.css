@@ -109,9 +109,10 @@ table.advmultiselect {
 }
 .crm-container #wizard-steps,
 .crm-container ul.crm-wizard-nav,
-.crm-mosaico-wizard .crm_wizard__title ul {
+.crm-container .crm-mosaico-wizard .crm_wizard__title ul {
   margin: var(--crm-wizard-margin) !important;
   width: var(--crm-wizard-width);
+  gap: initial; /* resets .nav.nav-pills gap */
 }
 .crm-container ul.crm-wizard-nav {
   margin-bottom: var(--crm-r);
@@ -207,10 +208,9 @@ table.advmultiselect {
   background: transparent;
 }
 .crm-container .panel-heading {
-  padding: var(--crm-padding-reg);
+  padding: var(--crm-m2) var(--crm-padding-reg);
   border-radius: var(--crm-roundness) var(--crm-roundness) 0 0;
   border-bottom: var(--crm-panel-border);
-  box-shadow: var(--crm-panel-shadow);
 }
 .crm-container .panel-heading > .dropdown .dropdown-toggle {
   color: inherit;
@@ -307,6 +307,9 @@ table.advmultiselect {
 .crm-container .panel:has(.nav.nav-tabs) {
   border: var(--crm-tabs-border);
   border-radius: var(--crm-tabs-radius);
+}
+.crm-container .panel .panel {
+  box-shadow: none;
 }
 
 /* Badges - from BS3 */

@@ -2,6 +2,7 @@
   <div class="standalone-auth-box">
     <form id=totp-form>
       <img class="crm-logo" src="{$logoUrl}" alt="logo for CiviCRM, with an intersecting blue and green triangle">
+      {$statusMessages}
 
       <h1>{ts}Set up Multi-Factor Authentication{/ts}</h1>
       <div class="input-wrapper">
@@ -53,6 +54,7 @@
         submit(e);
       }
     });
+    totpcodeInput.focus();
 
   });
 </script>
