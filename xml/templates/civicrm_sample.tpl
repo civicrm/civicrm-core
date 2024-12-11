@@ -74,7 +74,7 @@ VALUES
 INSERT INTO civicrm_premiums
     VALUES (1, 'civicrm_contribution_page', 1, 1, 'Thank-you Gifts', 'We appreciate your support and invite you to choose from the exciting collection of thank-you gifts below. Minimum contribution amounts for each selection are included in the descriptions. (NOTE: These gifts are shown as examples only. No gifts will be sent to donors.)', 'premiums@example.org', NULL, 1, 'No thank-you', 1);
 
-INSERT INTO civicrm_product VALUES (1, 'Coffee Mug', 'This heavy-duty mug is great for home or office, coffee or tea or hot chocolate. Show your support to family, friends and colleagues. Choose from three great colors.', 'MUG-101', 'White, Black, Green', NULL, NULL, 12.50, 'USD', NULL, 5.00, NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO civicrm_product VALUES (1, 'Coffee Mug', 'This heavy-duty mug is great for home or office, coffee or tea or hot chocolate. Show your support to family, friends and colleagues. Choose from three great colors.', 'MUG-101', 'White,Black,Green', NULL, NULL, 12.50, 'USD', NULL, 5.00, NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO civicrm_premiums_product VALUES (1, 1, 1, 1, NULL);
 
 
