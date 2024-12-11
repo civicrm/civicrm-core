@@ -18,7 +18,7 @@ class ProductTest extends BaseTestClass {
     $this->createTestEntity('Product', [
       'name' => '10_dollars',
       'description' => '10 dollars worth of monopoly money',
-      'options' => 'White, Black, Green',
+      'options' => 'White,Black,Green',
       'price' => 2,
       'min_contribution' => 10,
       'cost' => .05,
