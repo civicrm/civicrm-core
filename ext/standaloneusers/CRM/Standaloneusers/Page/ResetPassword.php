@@ -1,7 +1,7 @@
 <?php
 use CRM_Standaloneusers_ExtensionUtil as E;
 
-use Civi\Standalone\Security;
+use Civi\Api4\Action\User\PasswordReset;
 
 /**
  * Provide the send password reset / reset password page.
@@ -23,7 +23,7 @@ class CRM_Standaloneusers_Page_ResetPassword extends CRM_Core_Page {
     // If we have a password reset token, validate it without 'spending' it.
     $token = CRM_Utils_Request::retrieveValue('token', 'String', NULL, FALSE, $method = 'GET');
     if ($token) {
-      if (!Security::singleton()->checkPasswordResetToken($token, FALSE)) {
+      if (!PasswordReset::checkPasswordResetToken($token, FALSE)) {
         $token = 'invalid';
       }
       $this->assign('token', $token);
