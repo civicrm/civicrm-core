@@ -943,6 +943,10 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         // the selected option to the page for display.
         $product['options'] = ts('Selected Option') . ': ' . $selectedOption;
       }
+      elseif ($selectedOption) {
+        // We are on the thank you or confirm page, but this option wasn't selected.
+        continue;
+      }
       $options = array_filter((array) $product['options']);
       $productOptions = [];
       foreach ($options as $option) {
