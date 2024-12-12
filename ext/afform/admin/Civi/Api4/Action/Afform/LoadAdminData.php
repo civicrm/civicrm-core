@@ -205,6 +205,9 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
     foreach (array_diff($entities, $this->skipEntities) as $entity) {
       $info['entities'][$entity] = AfformAdminMeta::getApiEntity($entity);
       $info['fields'][$entity] = AfformAdminMeta::getFields($entity, ['action' => $getFieldsMode]);
+      foreach ($info['fields'][$entity] as $key => $field) {
+        $info['fields'][$entity][$key]['original_input_type'] = $field['input_type'];
+      }
       $behaviors = AfformBehavior::get(FALSE)
         ->addWhere('entities', 'CONTAINS', $entity)
         ->execute();
