@@ -51,6 +51,10 @@
           } else if (inputType) {
             multi = (dataType !== 'Boolean' &&
               (inputType === 'CheckBox' || (field.input_attrs && field.input_attrs.multiple)));
+            // Hidden fields are multi-select if the original input type is.
+            if (inputType === 'Hidden') {
+              multi = _.contains(['CheckBox', 'Radio', 'Select'], field.original_input_type);
+            }
           } else {
             multi = field.serialize || dataType === 'Array';
           }
