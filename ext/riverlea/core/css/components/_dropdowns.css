@@ -90,7 +90,7 @@
 #crm-create-new-list ul a:focus {
   text-decoration: none;
   color: var(--crm-c-text);
-  background-color: var(--crm-c-page-background);
+  background-color: var(--crm-c-background);
 }
 
 /* In-table dropdown */

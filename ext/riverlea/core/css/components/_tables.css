@@ -142,7 +142,7 @@ table.dataTable.order-column.stripe tbody tr.extension-installed.even > .sorting
   overflow-x: auto;
   max-width: 100%;
 }*/
-/* needed to reset the scroll in Thames but causes other problem - #91)
+/* needed to reset the scroll in Thames but causes other problems #91)
 .crm-container div:has(td span > .panel),
 .crm-container div:has(td > div > .dropdown-menu) {
   overflow: initial;
