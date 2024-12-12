@@ -87,6 +87,7 @@ class CiviTestListenerPHPUnit7 implements \PHPUnit\Framework\TestListener {
     \CRM_Utils_Time::resetTime();
     if ($this->isCiviTest($test)) {
       unset($GLOBALS['CIVICRM_TEST_CASE']);
+      unset($_SERVER['HTTP_X_REQUESTED_WITH']); /* Several tests neglect to clean this up... */
       error_reporting(E_ALL & ~E_NOTICE);
       $this->errorScope = NULL;
     }
