@@ -323,7 +323,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   }
 
   /**
-   * Delegated by loadEntity to call API.get and fill in additioal info
+   * Delegated by loadEntity to call API.get and fill in additional info
    *
    * @param string $afEntityName
    *   e.g. Individual1
@@ -343,10 +343,14 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     // Fill additional info about file fields
     $fileFields = $this->getFileFields($apiEntityName, $entityFields);
     foreach ($fileFields as $fieldName => $fieldDefn) {
+      $select = ['file_name', 'icon'];
+      if ($this->canViewFileAttachments($afEntityName)) {
+        $select[] = 'url';
+      }
       foreach ($result as &$item) {
         if (!empty($item[$fieldName])) {
           $fileInfo = File::get(FALSE)
-            ->addSelect('file_name', 'icon')
+            ->setSelect($select)
             ->addWhere('id', '=', $item[$fieldName])
             ->execute()->first();
           $item[$fieldName] = $fileInfo;
@@ -354,6 +358,11 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
       }
     }
     return $result;
+  }
+
+  private function canViewFileAttachments(string $afEntityName): bool {
+    $afEntity = $this->_formDataModel->getEntity($afEntityName);
+    return ($afEntity['security'] === 'FBAC' || \CRM_Core_Permission::check('access uploaded files'));
   }
 
   protected static function getFileFields($entityName, $entityFields): array {
