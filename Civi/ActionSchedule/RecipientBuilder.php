@@ -221,6 +221,7 @@ class RecipientBuilder {
       ->merge($this->prepareRepetitionEndFilter($query['casDateField']))
       ->where($this->actionSchedule->start_action_date ? $startDateClauses[0] : [])
       ->groupBy("reminder.contact_id, reminder.entity_id, reminder.entity_table")
+      ->having("SUM(ISNULL(reminder.action_date_time)) = 0")  // do not create any more entries if there are unprocessed ones still pending
       ->having("TIMESTAMPDIFF(HOUR, MAX(reminder.action_date_time), CAST(!casNow AS datetime)) >= TIMESTAMPDIFF(HOUR, MAX(reminder.action_date_time), DATE_ADD(MAX(reminder.action_date_time), INTERVAL !casRepetitionInterval))")
       ->param([
         'casRepetitionInterval' => $this->parseRepetitionInterval(),
@@ -256,6 +257,7 @@ class RecipientBuilder {
         ->merge($this->prepareAddlFilter('c.id'), ['params'])
         ->where("c.is_deleted = 0 AND c.is_deceased = 0")
         ->groupBy("reminder.contact_id")
+        ->having("SUM(ISNULL(reminder.action_date_time)) = 0")  // do not create any more entries if there are unprocessed ones still pending
         ->having("TIMESTAMPDIFF(HOUR, MAX(reminder.action_date_time), CAST(!casNow AS datetime)) >= TIMESTAMPDIFF(HOUR, MAX(reminder.action_date_time), DATE_ADD(MAX(reminder.action_date_time), INTERVAL !casRepetitionInterval))")
         ->param([
           'casRepetitionInterval' => $this->parseRepetitionInterval(),
@@ -316,6 +318,9 @@ class RecipientBuilder {
     }
     elseif ($actionSchedule->repetition_frequency_unit == 'year') {
       $interval = "{$actionSchedule->repetition_frequency_interval} YEAR";
+    }
+    elseif ($actionSchedule->repetition_frequency_unit == 'minute') {
+      $interval = "{$actionSchedule->repetition_frequency_interval} MINUTE";
     }
     else {
       $interval = "{$actionSchedule->repetition_frequency_interval} HOUR";
