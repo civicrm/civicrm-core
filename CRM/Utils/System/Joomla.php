@@ -492,7 +492,28 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     }
     $contactID = CRM_Core_BAO_UFMatch::getContactId($uid);
     if (!empty($password)) {
-      $instance = JFactory::getApplication('site');
+      if (version_compare(JVERSION, '4.0.0', 'ge')) {
+        // Joomla 4 compatible way of getting the SiteApplication object, not the generic global application object
+        // we need this because only the specific site application object has the login() method
+        // the below is adapted from <JOOMLA_ROOT>/includes/app.php on Joomla 4.4.9
+        $joomlaBase = self::getBasePath();
+        require_once $joomlaBase . '/plugins/authentication/joomla/src/Extension/Joomla.php';
+        require_once $joomlaBase . '/plugins/authentication/cookie/src/Extension/Cookie.php';
+        require_once $joomlaBase . '/plugins/user/token/src/Extension/Token.php';
+        require_once $joomlaBase . '/plugins/user/joomla/src/Extension/Joomla.php';
+        $container = \Joomla\CMS\Factory::getContainer();
+        $container->alias('session.web', 'session.web.site')
+                  ->alias('session', 'session.web.site')
+                  ->alias('JSession', 'session.web.site')
+                  ->alias(\Joomla\CMS\Session\Session::class, 'session.web.site')
+                  ->alias(\Joomla\Session\Session::class, 'session.web.site')
+                  ->alias(\Joomla\Session\SessionInterface::class, 'session.web.site');
+        $app = $container->get(\Joomla\CMS\Application\SiteApplication::class);
+        \Joomla\CMS\Factory::$application = $app;
+        $instance = JFactory::getApplication();
+      } else {
+        $instance = JFactory::getApplication('site');
+      }
       $params = [
         'username' => $username,
         'password' => $password,
