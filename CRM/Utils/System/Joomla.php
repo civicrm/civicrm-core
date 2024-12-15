@@ -503,15 +503,16 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
         require_once $joomlaBase . '/plugins/user/joomla/src/Extension/Joomla.php';
         $container = \Joomla\CMS\Factory::getContainer();
         $container->alias('session.web', 'session.web.site')
-                  ->alias('session', 'session.web.site')
-                  ->alias('JSession', 'session.web.site')
-                  ->alias(\Joomla\CMS\Session\Session::class, 'session.web.site')
-                  ->alias(\Joomla\Session\Session::class, 'session.web.site')
-                  ->alias(\Joomla\Session\SessionInterface::class, 'session.web.site');
+          ->alias('session', 'session.web.site')
+          ->alias('JSession', 'session.web.site')
+          ->alias(\Joomla\CMS\Session\Session::class, 'session.web.site')
+          ->alias(\Joomla\Session\Session::class, 'session.web.site')
+          ->alias(\Joomla\Session\SessionInterface::class, 'session.web.site');
         $app = $container->get(\Joomla\CMS\Application\SiteApplication::class);
         \Joomla\CMS\Factory::$application = $app;
         $instance = JFactory::getApplication();
-      } else {
+      }
+      else {
         $instance = JFactory::getApplication('site');
       }
       $params = [
