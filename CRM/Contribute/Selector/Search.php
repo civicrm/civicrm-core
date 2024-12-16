@@ -508,14 +508,14 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
             'type' => '',
           ],
           [
-            'name' => ts('Contribution Source'),
+            'name' => ts('Source'),
             'sort' => 'contribution_source',
             'field_name' => 'contribution_source',
             'direction' => CRM_Utils_Sort::DONTCARE,
             'type' => '',
           ],
           [
-            'name' => ts('Contribution Date'),
+            'name' => ts('Date'),
             'sort' => 'receive_date',
             'field_name' => 'receive_date',
             'type' => 'date',

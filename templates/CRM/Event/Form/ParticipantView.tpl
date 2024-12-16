@@ -83,41 +83,34 @@
         <td class="label">{ts}Participant Source{/ts}</td><td>{$source|escape}&nbsp;</td>
       </tr>
     {/if}
-    {if $participantId and $hasPayment}
-      <tr>
-        <td class='label'>{ts}Fees{/ts}</td>
-        <td id='payment-info'></td>
-      </tr>
-    {/if}
     {if $fee_level}
-        <tr class="crm-event-participantview-form-block-fee_amount">
-            {if $lineItem}
-                <td class="label">{ts}Selections{/ts}</td>
-                <td>{include file="CRM/Price/Page/LineItem.tpl" context="Event" displayLineItemFinancialType=false getTaxDetails=$totalTaxAmount hookDiscount=false}
-                {crmPermission has='edit event participants'}
-                    {if $hasPayment or $parentHasPayment}
-                      <a class="action-item crm-hover-button" href='{crmURL p="civicrm/event/participant/feeselection" q="reset=1&id=`$participantId`&cid=`$contactId`&action=update"}'><i class="crm-i fa-pencil" aria-hidden="true"></i> {ts}Change Selections{/ts}</a>
-                    {else}
-                      <a class="action-item crm-hover-button" href='{crmURL p="civicrm/contact/view/participant" q=$editUrlParams}'><i class="crm-i fa-pencil" aria-hidden="true"></i> {ts}Change Selections{/ts}</a>
-                    {/if}
-                    {if $transferOrCancelLink}
-                      <a class="action-item crm-hover-button" href={$transferOrCancelLink}><i class="crm-i fa-times" aria-hidden="true"></i> {ts}Transfer or Cancel{/ts}</a>
-                    {/if}
-                {/crmPermission}
-                </td>
-            {else}
-                <td class="label">{ts}Event Level{/ts}</td>
-                <td>{$fee_level|escape}&nbsp;{if $fee_amount}- {$fee_amount|crmMoney:$currency}{/if}</td>
-            {/if}
-        </tr>
-    {/if}
-    {foreach from=$note item="rec"}
-      {if $rec}
-            <tr><td class="label">{ts}Note{/ts}</td><td>{$rec|escape|nl2br}</td></tr>
+      {if $lineItem}
+        {include file="CRM/Price/Page/LineItem.tpl" context="Event" displayLineItemFinancialType=false getTaxDetails=$totalTaxAmount hookDiscount=false}
+        {crmPermission has='edit event participants'}
+          {if $hasPayment or $parentHasPayment}
+            <a class="action-item crm-hover-button" href='{crmURL p="civicrm/event/participant/feeselection" q="reset=1&id=`$participantId`&cid=`$contactId`&action=update"}'><i class="crm-i fa-pencil" aria-hidden="true"></i> {ts}Change Selections{/ts}</a>
+          {else}
+            <a class="action-item crm-hover-button" href='{crmURL p="civicrm/contact/view/participant" q=$editUrlParams}'><i class="crm-i fa-pencil" aria-hidden="true"></i> {ts}Change Selections{/ts}</a>
+          {/if}
+          {if $transferOrCancelLink}
+            <a class="action-item crm-hover-button" href={$transferOrCancelLink}><i class="crm-i fa-times" aria-hidden="true"></i> {ts}Transfer or Cancel{/ts}</a>
+          {/if}
+        {/crmPermission}
+        <div class="clear"></div>
+        <br>
+      {else}
+        <td class="label">{ts}Event Level{/ts}</td>
+        <td>{$fee_level|escape}&nbsp;{if $fee_amount}- {$fee_amount|crmMoney:$currency}{/if}</td>
       {/if}
-    {/foreach}
-    </table>
+    {/if}
+  </table>
+  {foreach from=$note item="rec"}
+    {if $rec}
+      <div class="messages status no-popup">{icon icon="fa-info-circle"}{/icon} {ts}Note:{/ts} {$rec|escape|nl2br}</div>
+    {/if}
+  {/foreach}
     {if $participantId and $hasPayment}
+      <div id="payment-info"></div>
       {include file="CRM/Contribute/Page/PaymentInfo.tpl" show='payments'}
     {/if}
     {include file="CRM/Custom/Page/CustomDataView.tpl"}
