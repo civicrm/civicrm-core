@@ -83,11 +83,9 @@ class GetAfforms extends \Civi\Api4\Generic\BasicBatchAction {
         case 'search':
           // TODO:
           // 1. tabs with grid display
-          // 2. tabs for other entities (e.g. Event)
           if (
             $item['is_multiple']
             && ($item['style'] === 'Tab with table')
-            && CoreUtil::isContact($item['extends'])
           ) {
             $forms[] = $this->generateTabForm($item);
           }
@@ -225,7 +223,7 @@ class GetAfforms extends \Civi\Api4\Generic\BasicBatchAction {
     $afform = [
       // name required to replace the existing tab
       'name' => 'afsearchTabCustom_' . $item['name'],
-      'description' => E::ts('Contact summary tab display for %1', [1 => $item['title']]),
+      'description' => E::ts('%1 tab display for %2', [1 => $item['extends'], 2 => $item['title']]),
       'type' => 'search',
       'is_public' => FALSE,
       // Q: should this be more permissive if user has access
@@ -243,7 +241,9 @@ class GetAfforms extends \Civi\Api4\Generic\BasicBatchAction {
       $afform['summary_contact_type'] = [$item['extends']];
     }
     else {
-      // TODO implement tabs for other tabsets
+      // tabs for other entities are placed without any
+      // additional afform meta
+      // @see civicrm_admin_ui_civicrm_tabset
     }
     if ($this->getLayout) {
       // TODO: the template should be a table or grid depending
