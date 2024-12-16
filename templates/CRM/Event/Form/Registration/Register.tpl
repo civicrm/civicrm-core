@@ -58,7 +58,7 @@
       <div class="crm-public-form-item crm-section additional_participants-section" id="noOfparticipants">
         <div class="label">{$form.additional_participants.label} <span class="crm-marker" title="{ts}This field is required.{/ts}">*</span></div>
         <div class="content">
-          {$form.additional_participants.html}{if $contact_id}&nbsp;{ts}(including yourself){/ts}{/if}
+          {$form.additional_participants.html}{ts}(including yourself){/ts}
           <br/>
           <div class="description" id="additionalParticipantsDescription" style="display: none;">{ts}Fill in your registration information on this page. You will be able to enter the registration information for additional people after you complete this page and click &quot;Continue&quot;.{/ts}</div>
         </div>
