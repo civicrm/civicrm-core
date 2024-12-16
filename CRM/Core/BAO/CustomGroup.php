@@ -2196,7 +2196,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
         'label' => ts('Events'),
         'grouping' => 'event_type_id',
         'table_name' => 'civicrm_event',
-        'allow_is_multiple' => FALSE,
+        'allow_is_multiple' => TRUE,
       ],
       [
         'id' => 'Participant',
