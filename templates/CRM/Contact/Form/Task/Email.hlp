@@ -51,14 +51,7 @@ be an equal sign and a number (=12). The number (12 in this example) is the id o
 <p>{docURL page="user/common-workflows/tokens-and-mail-merge" text=$tokentext}</p>
 {/htxt}
 
-{htxt id="id-message-text-title"}
-  {ts}Message Text{/ts}
-{/htxt}
-{htxt id="id-message-text"}
-<p>{ts}You can include tokens in your message{/ts}</p>
-<p>{docURL page="user/common-workflows/tokens-and-mail-merge" text=$tokentext}</p>
-{/htxt}
-{htxt id="id-message-text-title"}
+{htxt id="id-message-plain-title"}
   {ts}Message Plain Text{/ts}
 {/htxt}
 {htxt id="id-message-plain"}

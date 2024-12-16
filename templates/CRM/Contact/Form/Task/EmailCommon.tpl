@@ -11,8 +11,7 @@
 
 <details class="crm-accordion-bold crm-html_email-accordion " open>
 <summary>
-    {ts}HTML Format{/ts}
-    {help id="id-message-text" file="CRM/Contact/Form/Task/Email.hlp"}
+  {ts}Message Body{/ts}
 </summary>
  <div class="crm-accordion-body">
   <div class="helpIcon" id="helphtml">
@@ -29,7 +28,8 @@
 <details class="crm-accordion-bold crm-plaint_text_email-accordion">
 <summary>
   {ts}Plain-Text Format{/ts}
-  </summary>
+  {help id="id-message-plain" file="CRM/Contact/Form/Task/Email.hlp"}
+</summary>
  <div class="crm-accordion-body">
    <div class="helpIcon" id="helptext">
      <input class="crm-token-selector big" data-field="text_message" />
