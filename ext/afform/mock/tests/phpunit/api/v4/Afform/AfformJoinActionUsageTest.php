@@ -3,8 +3,8 @@ namespace api\v4\Afform;
 
 use Civi\Api4\Afform;
 use Civi\Api4\Contact;
-use Civi\Api4\CustomField;
-use Civi\Api4\CustomGroup;
+use Civi\Api4\CustomValue;
+use Civi\Api4\Email;
 
 /**
  * Test case for Afform.submit.
@@ -13,41 +13,39 @@ use Civi\Api4\CustomGroup;
  */
 class AfformJoinActionUsageTest extends AfformUsageTestCase {
 
-  public function tearDown(): void {
-    parent::tearDown();
-    CustomField::delete(FALSE)->addWhere('id', '>', '0')->execute();
-    CustomGroup::delete(FALSE)->addWhere('id', '>', '0')->execute();
+  public function setUp(): void {
+    $this->createTestRecord('CustomGroup', [
+      'name' => 'MyThings',
+      'title' => 'My Things',
+      'style' => 'Tab with table',
+      'extends' => 'Contact',
+      'is_multiple' => TRUE,
+    ]);
+    $this->saveTestRecords('CustomField', [
+      'defaults' => ['custom_group_id.name' => 'MyThings'],
+      'records' => [
+        ['name' => 'my_text', 'label' => 'My Text', 'data_type' => 'String', 'html_type' => 'Text'],
+      ],
+    ]);
+    parent::setUp();
   }
 
-  public static function setUpBeforeClass(): void {
-    parent::setUpBeforeClass();
-    self::$layouts['joinUncheckedActions'] = <<<EOHTML
+  /**
+   * Generate layout for testing permutations of the 'actions' parameter
+   */
+  private function getLayout(array $actions = []): string {
+    $emailActions = empty($actions['Email']) ? '' : 'actions="' . \CRM_Utils_JS::encode($actions['Email']) . '"';
+    $myThingsActions = empty($actions['Custom_MyThings']) ? '' : 'actions="' . \CRM_Utils_JS::encode($actions['Custom_MyThings']) . '"';
+    return <<<EOHTML
       <af-form ctrl="afform">
-        <af-entity data="{contact_type: 'Individual'}" type="Contact" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="FBAC" contact-dedupe="Individual.Supervised"/>
+        <af-entity data="{contact_type: 'Individual'}" type="Contact" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="FBAC"/>
         <fieldset af-fieldset="Individual1">
-          <legend class="af-text">Individual 1</legend>
+          <af-field name="id"></af-field>
           <afblock-name-individual></afblock-name-individual>
-          <div af-join="Email" min="1" af-repeat="Add" actions="{update: true, delete: true}" >
+          <div af-join="Email" min="1" af-repeat="Add" $emailActions >
             <afblock-contact-email></afblock-contact-email>
           </div>
-          <div af-join="Custom_MyThings" af-repeat="Add" actions="{update: false, delete: false}">
-            <afblock-custom-my-things></afblock-custom-my-things>
-          </div>
-        </fieldset>
-        <button class="af-button btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
-      </af-form>
-    EOHTML;
-
-    self::$layouts['joinCheckedActions'] = <<<EOHTML
-      <af-form ctrl="afform">
-        <af-entity data="{contact_type: 'Individual'}" type="Contact" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="FBAC" contact-dedupe="Individual.Supervised"/>
-        <fieldset af-fieldset="Individual1">
-          <legend class="af-text">Individual 1</legend>
-          <afblock-name-individual></afblock-name-individual>
-          <div af-join="Email" min="1" af-repeat="Add" actions="{update: true, delete: true}" >
-            <afblock-contact-email></afblock-contact-email>
-          </div>
-          <div af-join="Custom_MyThings" af-repeat="Add" actions="{update: true, delete: true}">
+          <div af-join="Custom_MyThings" af-repeat="Add" $myThingsActions>
             <afblock-custom-my-things></afblock-custom-my-things>
           </div>
         </fieldset>
@@ -60,56 +58,53 @@ class AfformJoinActionUsageTest extends AfformUsageTestCase {
    * Checks that unchecked actions allows creation without deleting previous data
    */
   public function testJoinEntityActionsUnchecked(): void {
-    CustomGroup::create(FALSE)
-      ->addValue('name', 'MyThings')
-      ->addValue('title', 'My Things')
-      ->addValue('style', 'Tab with table')
-      ->addValue('extends', 'Contact')
-      ->addValue('is_multiple', TRUE)
-      ->addChain('fields', CustomField::save()
-        ->addDefault('custom_group_id', '$id')
-        ->setRecords([
-          ['name' => 'my_text', 'label' => 'My Text', 'data_type' => 'String', 'html_type' => 'Text'],
-          ['name' => 'my_friend', 'label' => 'My Friend', 'data_type' => 'ContactReference', 'html_type' => 'Autocomplete-Select'],
-        ])
-      )
-      ->execute();
-
     $this->useValues([
-      'layout' => self::$layouts['joinUncheckedActions'],
+      'layout' => $this->getLayout([
+        'Custom_MyThings' => ['update' => FALSE, 'delete' => FALSE],
+        'Email' => ['update' => TRUE, 'delete' => FALSE],
+      ]),
       'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
     ]);
 
     $lastName = uniqid(__FUNCTION__);
-    $locationType = \CRM_Core_BAO_LocationType::getDefault()->id;
-    $cid1 = $this->createTestRecord('Individual')['id'];
-    $cid2 = $this->createTestRecord('Individual')['id'];
+    $newLocationId = $this->createTestRecord('LocationType')['id'];
 
     // Create contact with email and custom fields
-    $contact = \Civi\Api4\Contact::create(FALSE)
-      ->addValue('first_name', 'Bob')
-      ->addValue('last_name', $lastName)
-      ->addValue('email_primary.email', '123@example.com')
-      ->addValue('email_primary.location_type_id', $locationType)
-      ->addValue('email_primary.is_primary', TRUE)
-      ->addValue('Custom_MyThings.my_text', "One")
-      ->addValue('Custom_MyThings.my_friend', $cid1)
-      ->execute()->single();
+    $contact = $this->createTestRecord('Individual', [
+      'first_name' => 'Bob',
+      'last_name' => $lastName,
+      'email_primary.email' => '123@example.com',
+    ]);
+    CustomValue::create('MyThings', FALSE)
+      ->addValue('entity_id', $contact['id'])
+      ->addValue('my_text', 'One')
+      ->execute();
+
+    $result = Contact::get(FALSE)
+      ->addWhere('id', '=', $contact['id'])
+      ->addJoin('Custom_MyThings AS Custom_MyThings', 'LEFT', ['id', '=', 'Custom_MyThings.entity_id'])
+      ->addSelect('Custom_MyThings.my_text', 'first_name')
+      ->addOrderBy('Custom_MyThings.id')
+      ->execute();
+    $this->assertCount(1, $result);
+    $this->assertEquals('Bob', $result[0]['first_name']);
+    $this->assertEquals('One', $result[0]['Custom_MyThings.my_text']);
 
     $values = [
       'Individual1' => [
         [
           'fields' => [
-            'first_name' => 'Bob',
+            'id' => $contact['id'],
+            'first_name' => 'Bobby',
             'last_name' => $lastName,
           ],
           'joins' => [
             'Email' => [
-              ['email' => '123@example.com', 'location_type_id' => $locationType, 'is_primary' => TRUE],
+              ['email' => '1234@example.com', 'location_type_id' => $newLocationId, 'is_primary' => TRUE],
             ],
             'Custom_MyThings' => [
-              ['my_text' => 'Two', 'my_friend' => $cid2],
-              ['my_text' => 'Three', 'my_friend' => $cid2],
+              ['my_text' => 'Two'],
+              ['my_text' => 'Three'],
             ],
           ],
         ],
@@ -120,76 +115,87 @@ class AfformJoinActionUsageTest extends AfformUsageTestCase {
       ->setValues($values)
       ->execute();
 
-    $contact = Contact::get(FALSE)
-      ->addWhere('last_name', '=', $lastName)
+    $result = Contact::get(FALSE)
+      ->addWhere('id', '=', $contact['id'])
       ->addJoin('Custom_MyThings AS Custom_MyThings', 'LEFT', ['id', '=', 'Custom_MyThings.entity_id'])
-      ->addSelect('Custom_MyThings.my_text', 'Custom_MyThings.my_friend')
+      ->addSelect('Custom_MyThings.my_text', 'first_name')
       ->addOrderBy('Custom_MyThings.id')
       ->execute();
 
-    $this->assertEquals('One', $contact[0]['Custom_MyThings.my_text']);
-    $this->assertEquals($cid1, $contact[0]['Custom_MyThings.my_friend']);
-    $this->assertEquals('Two', $contact[1]['Custom_MyThings.my_text']);
-    $this->assertEquals($cid2, $contact[1]['Custom_MyThings.my_friend']);
-    // We can test more since this custom data set has no max
-    $this->assertEquals('Three', $contact[2]['Custom_MyThings.my_text']);
-    $this->assertEquals($cid2, $contact[2]['Custom_MyThings.my_friend']);
+    $this->assertCount(3, $result);
+    $this->assertEquals('Bobby', $result[0]['first_name']);
+    $this->assertEquals('One', $result[0]['Custom_MyThings.my_text']);
+    $this->assertEquals('Two', $result[1]['Custom_MyThings.my_text']);
+    $this->assertEquals('Three', $result[2]['Custom_MyThings.my_text']);
+
+    $emails = Email::get(FALSE)
+      ->addWhere('contact_id', '=', $contact['id'])
+      ->execute();
+    $this->assertCount(1, $emails);
+    $this->assertEquals('1234@example.com', $emails[0]['email']);
   }
 
   /**
    * Checks that checked actions will behave as is
    */
   public function testJoinEntityActionsChecked(): void {
-    CustomGroup::create(FALSE)
-      ->addValue('name', 'MyThings')
-      ->addValue('title', 'My Things')
-      ->addValue('style', 'Tab with table')
-      ->addValue('extends', 'Contact')
-      ->addValue('is_multiple', TRUE)
-      ->addChain('fields', CustomField::save()
-        ->addDefault('custom_group_id', '$id')
-        ->setRecords([
-          ['name' => 'my_text', 'label' => 'My Text', 'data_type' => 'String', 'html_type' => 'Text'],
-          ['name' => 'my_friend', 'label' => 'My Friend', 'data_type' => 'ContactReference', 'html_type' => 'Autocomplete-Select'],
-        ])
-      )
-      ->execute();
-
     $this->useValues([
-      'layout' => self::$layouts['joinCheckedActions'],
+      'layout' => $this->getLayout([
+        'Custom_MyThings' => ['update' => TRUE, 'delete' => TRUE],
+        'Email' => ['update' => FALSE, 'delete' => FALSE],
+      ]),
       'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
     ]);
 
     $lastName = uniqid(__FUNCTION__);
-    $locationType = \CRM_Core_BAO_LocationType::getDefault()->id;
-    $cid1 = $this->createTestRecord('Individual')['id'];
-    $cid2 = $this->createTestRecord('Individual')['id'];
+    $newLocationId = $this->createTestRecord('LocationType')['id'];
 
     // Create contact with email and custom fields
-    $contact = \Civi\Api4\Contact::create(FALSE)
-      ->addValue('first_name', 'Bobby')
-      ->addValue('last_name', $lastName)
-      ->addValue('email_primary.email', '1234@example.com')
-      ->addValue('email_primary.location_type_id', $locationType)
-      ->addValue('email_primary.is_primary', TRUE)
-      ->addValue('Custom_MyThings.my_text', "One")
-      ->addValue('Custom_MyThings.my_friend', $cid1)
-      ->execute()->single();
+    $contact = $this->createTestRecord('Individual', [
+      'first_name' => 'Bob',
+      'last_name' => $lastName,
+      'email_primary.email' => '123@example.com',
+    ]);
+    CustomValue::create('MyThings', FALSE)
+      ->addValue('entity_id', $contact['id'])
+      ->addValue('my_text', 'One')
+      ->execute();
+    CustomValue::create('MyThings', FALSE)
+      ->addValue('entity_id', $contact['id'])
+      ->addValue('my_text', 'Two')
+      ->execute();
+
+    $result = Contact::get(FALSE)
+      ->addWhere('id', '=', $contact['id'])
+      ->addJoin('Custom_MyThings AS Custom_MyThings', 'LEFT', ['id', '=', 'Custom_MyThings.entity_id'])
+      ->addSelect('Custom_MyThings.my_text', 'first_name')
+      ->addOrderBy('Custom_MyThings.id')
+      ->execute();
+    $this->assertCount(2, $result);
+    $this->assertEquals('Bob', $result[0]['first_name']);
+    $this->assertEquals('One', $result[0]['Custom_MyThings.my_text']);
+    $this->assertEquals('Two', $result[1]['Custom_MyThings.my_text']);
+
+    $emails = Email::get(FALSE)
+      ->addWhere('contact_id', '=', $contact['id'])
+      ->execute();
+    $this->assertCount(1, $emails);
+    $this->assertEquals('123@example.com', $emails[0]['email']);
 
     $values = [
       'Individual1' => [
         [
           'fields' => [
+            'id' => $contact['id'],
             'first_name' => 'Bobby',
             'last_name' => $lastName,
           ],
           'joins' => [
             'Email' => [
-              ['email' => '1234@example.com', 'location_type_id' => $locationType, 'is_primary' => TRUE],
+              ['email' => '1234@example.com', 'location_type_id' => $newLocationId, 'is_primary' => TRUE],
             ],
             'Custom_MyThings' => [
-              ['my_text' => 'Two', 'my_friend' => $cid2],
-              ['my_text' => 'Three', 'my_friend' => $cid2],
+              ['my_text' => 'Three'],
             ],
           ],
         ],
@@ -200,18 +206,23 @@ class AfformJoinActionUsageTest extends AfformUsageTestCase {
       ->setValues($values)
       ->execute();
 
-    $contact = Contact::get(FALSE)
-      ->addWhere('last_name', '=', $lastName)
+    $result = Contact::get(FALSE)
+      ->addWhere('id', '=', $contact['id'])
       ->addJoin('Custom_MyThings AS Custom_MyThings', 'LEFT', ['id', '=', 'Custom_MyThings.entity_id'])
-      ->addSelect('Custom_MyThings.my_text', 'Custom_MyThings.my_friend')
+      ->addSelect('Custom_MyThings.my_text', 'first_name')
       ->addOrderBy('Custom_MyThings.id')
       ->execute();
 
-    $this->assertEquals('Two', $contact[0]['Custom_MyThings.my_text']);
-    $this->assertEquals($cid2, $contact[0]['Custom_MyThings.my_friend']);
-    // We can test more since this custom data set has no max
-    $this->assertEquals('Three', $contact[1]['Custom_MyThings.my_text']);
-    $this->assertEquals($cid2, $contact[1]['Custom_MyThings.my_friend']);
+    $this->assertCount(1, $result);
+    $this->assertEquals('Bobby', $result[0]['first_name']);
+    $this->assertEquals('Three', $result[0]['Custom_MyThings.my_text']);
+
+    $emails = Email::get(FALSE)
+      ->addWhere('contact_id', '=', $contact['id'])
+      ->execute();
+    $this->assertCount(2, $emails);
+    $this->assertEquals('123@example.com', $emails[0]['email']);
+    $this->assertEquals('1234@example.com', $emails[1]['email']);
   }
 
 }

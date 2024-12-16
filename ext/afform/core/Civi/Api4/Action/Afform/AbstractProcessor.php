@@ -241,7 +241,10 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
       if (!empty($result[$key])) {
         $data = ['fields' => $result[$key]];
         foreach ($entity['joins'] ?? [] as $joinEntity => $join) {
-          $data['joins'][$joinEntity] = $this->loadJoins($joinEntity, $join, $entity, $entityId, $index);
+          $joinAllowedAction = self::getJoinAllowedAction($entity, $joinEntity);
+          if ($joinAllowedAction['update']) {
+            $data['joins'][$joinEntity] = $this->loadJoins($joinEntity, $entity, $entityId, $index);
+          }
         }
         $this->_entityValues[$entity['name']][$index] = $data;
       }
@@ -251,8 +254,9 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   /**
    * Finds all joins after loading an entity.
    */
-  public function loadJoins($joinEntity, $join, $afEntity, $entityId, $index): array {
+  public function loadJoins(string $joinEntity, array $afEntity, $entityId, $index): array {
     $joinIdField = CoreUtil::getIdFieldName($joinEntity);
+    $join = $afEntity['joins'][$joinEntity];
     $multipleLocationBlocks = is_array($join['data']['location_type_id'] ?? NULL);
     $limit = 1;
     // Repeating blocks - set limit according to `max`, if set, otherwise 0 for unlimited
@@ -462,9 +466,13 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   }
 
   protected static function getFkField($mainEntity, $otherEntity): ?array {
+    $fkEntities = [$otherEntity];
+    if ($otherEntity !== 'Contact' && CoreUtil::isContact($otherEntity)) {
+      $fkEntities[] = 'Contact';
+    }
     foreach (self::getEntityFields($mainEntity) as $field) {
       if ($field['type'] === 'Field' && empty($field['custom_field_id']) &&
-        ($field['fk_entity'] === $otherEntity || in_array($otherEntity, $field['dfk_entities'] ?? [], TRUE))
+        (in_array($field['fk_entity'], $fkEntities, TRUE) || array_intersect($fkEntities, $field['dfk_entities'] ?? []))
       ) {
         return $field;
       }
@@ -738,7 +746,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    * @param array $mainEntity
    * @param string $joinEntityName
    *
-   * @return array
+   * @return array{update: bool, delete: bool}
    */
   public static function getJoinAllowedAction(array $mainEntity, string $joinEntityName) {
     $actions = ["update" => TRUE, "delete" => TRUE];
