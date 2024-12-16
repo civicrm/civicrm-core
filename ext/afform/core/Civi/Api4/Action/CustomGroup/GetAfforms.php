@@ -220,10 +220,11 @@ class GetAfforms extends \Civi\Api4\Generic\BasicBatchAction {
   }
 
   private function generateTabForm($item): array {
+    $extendsLabel = CoreUtil::getInfoItem($item['extends'], 'title');
     $afform = [
       // name required to replace the existing tab
       'name' => 'afsearchTabCustom_' . $item['name'],
-      'description' => E::ts('%1 tab display for %2', [1 => $item['extends'], 2 => $item['title']]),
+      'description' => E::ts('%1 tab display for %2', [1 => $extendsLabel, 2 => $item['title']]),
       'type' => 'search',
       'is_public' => FALSE,
       // Q: should this be more permissive if user has access
