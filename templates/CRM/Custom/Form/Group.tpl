@@ -83,7 +83,7 @@ CRM.$(function($) {
   const {/literal}
     $form = $('form.{$form.formClass}'),
     entityColumnIdOptions = {$entityColumnIdOptions|@json_encode},
-    allMultiple = {$allowMultiple|@json_encode},
+    allowMultiple = {$allowMultiple|@json_encode},
     defaultSubtypes = {$defaultSubtypes|@json_encode};
   {literal}
   let tabWithTableOption;
@@ -151,7 +151,7 @@ CRM.$(function($) {
 
   // When changing or initializing the primary `extends` field
   function handleExtends() {
-    let multiAllowed = $(this).val() && allMultiple[$(this).val()];
+    let multiAllowed = $(this).val() && allowMultiple[$(this).val()];
 
     if (multiAllowed) {
       $('tr.field-style, tr.field-is_multiple', $form).show();
