@@ -342,7 +342,12 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
    */
   public function getEventID(): int {
     if (!isset($this->_id)) {
-      $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
+      try {
+        $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
+      }
+      catch (CRM_Core_Exception $e) {
+        CRM_Utils_System::sendInvalidRequestResponse(ts('Missing Event ID'));
+      }
       $this->_id = $id;
     }
     return (int) $this->_id;
