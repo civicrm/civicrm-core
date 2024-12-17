@@ -129,6 +129,8 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
         'items',
         // Survey entity
         'instructions',
+        // ImportTemplateField entity_data
+        'entity_data',
       ];
       $custom = CRM_Core_DAO::executeQuery('
         SELECT cf.id, cf.name AS field_name, cg.name AS group_name
