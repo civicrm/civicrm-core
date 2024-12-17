@@ -54,8 +54,12 @@ class GetAfforms extends \Civi\Api4\Generic\BasicBatchAction {
     $forms = [];
 
     // get field names once, for use across all the generate actions
-    $fields = \CRM_Core_BAO_CustomGroup::getGroup(['id' => $item['id']])['fields'];
-    $item['field_names'] = array_column($fields, 'name');
+    $item['field_names'] = \Civi\Api4\CustomField::get(FALSE)
+      ->addSelect('name')
+      ->addWhere('custom_group_id', '=', $item['id'])
+      ->addWhere('is_active', '=', TRUE)
+      ->execute()
+      ->column('name');
 
     // restrict forms other than block to if Admin UI is enabled
     $hasAdminUi = \CRM_Extension_System::singleton()->getMapper()->isActiveModule('civicrm_admin_ui');
