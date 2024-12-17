@@ -14,11 +14,13 @@
             {if $primaryParticipantProfile.CustomPre}
                <fieldset class="label-left no-border"><div class="bold crm-profile-view-title">{$primaryParticipantProfile.CustomPreGroupTitle}</div>
                    {foreach from=$primaryParticipantProfile.CustomPre item=value key=field}
-                      <div class="crm-public-form-item crm-section {$field}-section">
-                          <div class="label">{$field}</div>
-                          <div class="content">{$value}</div>
-                          <div class="clear"></div>
-                      </div>
+                      {if !empty($value)}
+                        <div class="crm-public-form-item crm-section {$field}-section">
+                            <div class="label">{$field}</div>
+                            <div class="content">{$value}</div>
+                            <div class="clear"></div>
+                        </div>
+                      {/if}
                    {/foreach}
                </fieldset>
             {/if}
@@ -27,11 +29,13 @@
                   <fieldset class="label-left no-border"><div class="bold crm-profile-view-title">{$primaryParticipantProfile.CustomPostGroupTitle.$field.groupTitle}</div>
                     <div class="crm-profile-view">
                       {foreach from=$primaryParticipantProfile.CustomPost.$field item=value key=field}
-                        <div class="crm-public-form-item crm-section {$field}-section">
-                          <div class="label">{$field}</div>
-                          <div class="content">{$value}</div>
-                          <div class="clear"></div>
-                        </div>
+                        {if !empty($value)}
+                          <div class="crm-public-form-item crm-section {$field}-section">
+                            <div class="label">{$field}</div>
+                            <div class="content">{$value}</div>
+                            <div class="clear"></div>
+                          </div>
+                        {/if}
                       {/foreach}
                     </div>
                   </fieldset>
@@ -52,11 +56,13 @@
               <fieldset class="label-left no-border"><div class="bold crm-additional-profile-view-title">{$participant.additionalCustomPreGroupTitle}</div>
                 <div class="crm-profile-view">
                   {foreach from=$participant.additionalCustomPre item=value key=field}
-                    <div class="crm-public-form-item crm-section {$field}-section">
-                      <div class="label">{$field}</div>
-                      <div class="content">{$value}</div>
-                      <div class="clear"></div>
-                    </div>
+                    {if !empty($value)}
+                      <div class="crm-public-form-item crm-section {$field}-section">
+                        <div class="label">{$field}</div>
+                        <div class="content">{$value}</div>
+                        <div class="clear"></div>
+                      </div>
+                    {/if}
                   {/foreach}
                 </div>
               </fieldset>
@@ -67,11 +73,13 @@
                 <fieldset class="label-left no-border"><div class="bold crm-additional-profile-view-title">{$participant.additionalCustomPostGroupTitle.$field.groupTitle}</div>
                   <div class="crm-profile-view">
                     {foreach from=$participant.additionalCustomPost.$field item=value key=field}
-                      <div class="crm-public-form-item crm-section {$field}-section">
-                        <div class="label">{$field}</div>
-                        <div class="content">{$value}</div>
-                        <div class="clear"></div>
-                      </div>
+                      {if !empty($value)}
+                        <div class="crm-public-form-item crm-section {$field}-section">
+                          <div class="label">{$field}</div>
+                          <div class="content">{$value}</div>
+                          <div class="clear"></div>
+                        </div>
+                      {/if}
                     {/foreach}
                   </div>
                 </fieldset>
