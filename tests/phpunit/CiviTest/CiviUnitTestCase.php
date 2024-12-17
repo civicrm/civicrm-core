@@ -282,23 +282,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   }
 
   /**
-   * Override to run the test and assert its state.
-   *
-   * @return mixed
-   *
-   * @throws \Throwable
-   */
-  protected function runTest() {
-    try {
-      return parent::runTest();
-    }
-    catch (PEAR_Exception $e) {
-      // PEAR_Exception has metadata in funny places, and PHPUnit won't log it nicely
-      throw new Exception(\CRM_Core_Error::formatTextException($e), $e->getCode());
-    }
-  }
-
-  /**
    * Declare the environment that we wish to run in.
    *
    * TODO: The hope is to get this to align with `Civi\Test::headless()` and perhaps
