@@ -275,6 +275,28 @@ abstract class SqlFunction extends SqlExpression {
   }
 
   /**
+   * Returns the dataType of rendered output, based on the fields passed into the function
+   *
+   * @param array $fieldSpecs
+   *   List of available fields, e.g. Api4Query::$apiFieldSpec
+   * @return string|null
+   */
+  public function getRenderedDataType(array $fieldSpecs): ?string {
+    $dataType = $this::getDataType();
+    if ($dataType) {
+      return $dataType;
+    }
+    if ($this->getSerialize()) {
+      return 'Array';
+    }
+    $fields = $this->getFields();
+    if (!empty($fields[0])) {
+      return $fieldSpecs[$fields[0]]['data_type'] ?? NULL;
+    }
+    return NULL;
+  }
+
+  /**
    * @param string|null $suffix
    */
   private function setSuffix(?string $suffix): void {
