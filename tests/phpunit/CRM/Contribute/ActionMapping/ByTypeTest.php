@@ -9,7 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
-use Civi\ActionSchedule\AbstractMappingTest;
+use Civi\ActionSchedule\AbstractMappingTestCase;
 use Civi\Api4\Contribution;
 use Civi\Token\TokenProcessor;
 
@@ -21,10 +21,10 @@ use Civi\Token\TokenProcessor;
  * reminders for *contribution types*. It follows a design/pattern described in
  * AbstractMappingTest.
  *
- * @see \Civi\ActionSchedule\AbstractMappingTest
+ * @see \Civi\ActionSchedule\AbstractMappingTestCase
  * @group headless
  */
-class CRM_Contribute_ActionMapping_ByTypeTest extends AbstractMappingTest {
+class CRM_Contribute_ActionMapping_ByTypeTest extends AbstractMappingTestCase {
 
   /**
    * Generate a list of test cases, where each is a distinct combination of

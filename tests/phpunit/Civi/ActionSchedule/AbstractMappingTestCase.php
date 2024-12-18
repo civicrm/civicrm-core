@@ -38,7 +38,7 @@ namespace Civi\ActionSchedule;
  * @see CRM_Contribute_ActionMapping_ByTypeTest
  * @see CRM_Activity_ActionMappingTest
  */
-abstract class AbstractMappingTest extends \CiviUnitTestCase {
+abstract class AbstractMappingTestCase extends \CiviUnitTestCase {
 
   /**
    * @var \CRM_Core_DAO_ActionSchedule

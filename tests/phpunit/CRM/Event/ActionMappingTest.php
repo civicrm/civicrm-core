@@ -9,7 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
-use Civi\ActionSchedule\AbstractMappingTest;
+use Civi\ActionSchedule\AbstractMappingTestCase;
 
 /**
  * Class CRM_Event_ActionMappingTest
@@ -18,10 +18,10 @@ use Civi\ActionSchedule\AbstractMappingTest;
  * This class tests various configurations of event scheduled-reminders. It follows a design/pattern described in
  * AbstractMappingTest.
  *
- * @see \Civi\ActionSchedule\AbstractMappingTest
+ * @see \Civi\ActionSchedule\AbstractMappingTestCase
  * @group headless
  */
-class CRM_Event_ActionMappingTest extends AbstractMappingTest {
+class CRM_Event_ActionMappingTest extends AbstractMappingTestCase {
 
   public function createTestCases() {
   }

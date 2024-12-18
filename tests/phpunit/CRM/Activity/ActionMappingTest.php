@@ -22,10 +22,10 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  * NOTE: There are also pretty deep tests of activity-based reminders in
  * CRM_Core_BAO_ActionScheduleTest.
  *
- * @see \Civi\ActionSchedule\AbstractMappingTest
+ * @see \Civi\ActionSchedule\AbstractMappingTestCase
  * @see CRM_Core_BAO_ActionScheduleTest
  */
-class CRM_Activity_ActionMappingTest extends \Civi\ActionSchedule\AbstractMappingTest {
+class CRM_Activity_ActionMappingTest extends \Civi\ActionSchedule\AbstractMappingTestCase {
 
   /**
    * Generate a list of test cases, where each is a distinct combination of
