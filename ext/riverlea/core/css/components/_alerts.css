@@ -59,8 +59,13 @@
   color: var(--crm-alert-text-danger);
 }
 .crm-container .help a,
-.crm-container .messages a {
+.crm-container .messages a,
+.crm-container .alert a,
+.crm-container table tr.crm-row-selected a {
   color: inherit;
+}
+.crm-container .help a,
+.crm-container .messages a {
   text-decoration: underline;
 }
 .crm-container .help a:hover,
@@ -106,4 +111,12 @@
   top: -2px;
   right: -21px;
   color: inherit;
+}
+
+/* Alerts in tables (ref https://github.com/civicrm/civicrm-core/pull/31605) */
+
+#bootstrap-theme td > p.alert.ng-binding {
+  width: fit-content;
+  margin: 1rem auto;
+  padding: var(--crm-padding-small) var(--crm-padding-reg);
 }
