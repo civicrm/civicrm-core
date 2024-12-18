@@ -574,7 +574,7 @@ input.crm-form-checkbox) + label {
   padding: var(--crm-s) var(--crm-m);
   margin: 0;
 }
-.select2-drop.select2-drop-active.crm-container .select2-results li:has(i.crm-i) {
+.select2-drop.select2-drop-active.crm-container .select2-results li:has(.crm-select2-row-description) {
   border-top: var(--crm-c-divider);
 }
 .select2-results .select2-ajax-error,
