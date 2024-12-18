@@ -9,7 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
-namespace Civi\tests\phpunit\api\v4\Entity;
+namespace api\v4\Entity;
 
 use api\v4\Api4TestBase;
 

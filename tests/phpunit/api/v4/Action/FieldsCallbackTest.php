@@ -17,7 +17,7 @@
  */
 
 
-namespace Civi\tests\phpunit\api\v4\Action;
+namespace api\v4\Action;
 
 use api\v4\Api4TestBase;
 use Civi\Api4\Email;
