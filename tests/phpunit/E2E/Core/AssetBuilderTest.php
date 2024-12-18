@@ -75,7 +75,7 @@ class AssetBuilderTest extends \CiviEndToEndTestCase {
    * Get a list of example assets to build/request.
    * @return array
    */
-  public function getExamples() {
+  public static function getExamples() {
     $examples = [];
 
     $examples[] = [
