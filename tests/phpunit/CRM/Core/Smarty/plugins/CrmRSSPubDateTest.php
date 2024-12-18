@@ -9,6 +9,11 @@ class CRM_Core_Smarty_plugins_CrmRSSPubDateTest extends CiviUnitTestCase {
   const FIXED_DATE = '2022-06-20 13:14:15';
   const FIXED_DATE_RSS = 'Mon, 20 Jun 2022 13:14:15';
 
+  public function setUp(): void {
+    parent::setUp();
+    $this->useTransaction();
+  }
+
   /**
    * DataProvider for testRSSPubDate
    * @return array
