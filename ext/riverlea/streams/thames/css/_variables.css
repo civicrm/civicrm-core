@@ -24,9 +24,6 @@
 /* --crm-font-bold-italic:; */
 }
 :root {
-/* COLOUR */
-  color-scheme: light dark; /* check to use simpler syntax late-2024 (Edge+iOS Safari)
-
 /* COLOUR NAMES */
   --crm-c-darkest: #0a0a0a;
   --crm-c-gray-900: #2f2f2e;
