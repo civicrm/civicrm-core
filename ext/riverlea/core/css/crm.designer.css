@@ -1,0 +1,268 @@
+.crm-profile-selector-preview-pane {
+  width: 75%;
+  min-width: 500px;
+  height: 20em;
+  border: 1px solid black;
+  padding: 4px;
+}
+
+.crm-container .crm-profile-selector-preview .icon {
+  float: none;
+}
+
+.crm-designer-toolbar {
+  width: 290px;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.crm-designer-toolbar hr,
+.crm-designer-palette-search {
+  margin: var(--crm-m) 0;
+}
+
+.crm-designer-palette-search .crm-filter-objects {
+  margin-bottom: var(--crm-m);
+}
+
+.crm-designer-palette-search input {
+  max-width: 75%;
+}
+
+.crm-designer-toolbar .ui-resizable-w {
+  border-left: 4px dotted var(--crm-c-background4);
+  cursor: ew-resize;
+  height: 50px;
+  top: 45%;
+  left: -10px; /* stops resize handle overlap */
+}
+
+.crm-designer-toolbar .ui-resizable-w:hover {
+  border-left: 4px dotted #6b6b6b;
+}
+
+.crm-designer-palette {
+  height: 20em;
+}
+
+.crm-designer-palette-section > a {
+  font-weight: bold;
+}
+
+.crm-designer-palette .crm-designer-palette-field,
+.crm-designer-palette .crm-designer-palette-field.disabled:hover {
+  padding: 1px;
+  border: 1px dashed transparent;
+  background-color: transparent;
+  margin-right: 0.5em;
+}
+
+.crm-designer-palette .crm-designer-palette-field a {
+  cursor: move;
+}
+
+.crm-designer-palette .crm-designer-palette-field:hover,
+.crm-designer-fields-region .crm-designer-row:hover,
+.crm-designer-open .crm-designer-row,
+.crm-designer-row-placeholder {
+  border: 1px dashed gray;
+  cursor: move;
+  background-color: var(--crm-c-background);
+}
+
+.crm-designer-palette .crm-designer-palette-field.disabled a,
+.crm-designer-open .crm-designer-row:hover {
+  cursor: default;
+}
+
+.crm-container .crm-designer-palette .crm-designer-palette-tree a {
+  color: #222;
+  font-style: normal;
+}
+
+.crm-container .crm-designer-palette .disabled a,
+.crm-designer-palette .crm-designer-palette-tree .disabled a.jstree-search {
+  color: #999;
+}
+
+.crm-designer-palette .jstree-leaf ins {
+  width: 6px;
+}
+
+/* Cancel hovering affect from JSTree theme -- we already do this! */
+.crm-designer-palette .crm-designer-palette-tree .jstree-hovered {
+  background: transparent;
+  border: 1px transparent;
+  padding: 1px 2px 0 2px;
+}
+
+.crm-designer-canvas {
+  padding-right: 1em;
+  margin-right: 300px;
+}
+
+.crm-container.ui-dialog .crm-designer-buttonset-region.ui-dialog-buttonset {
+  text-align: center;
+  margin: auto;
+  padding: 0;
+}
+
+.crm-designer-field-binding {
+  border: 1px inset black;
+  padding: 0.4em;
+  background: #ccc;
+}
+
+.crm-designer-fields {
+  min-width: 100px;
+  /* to allow dropping in big whitespace, coordinate with min-height of dialog */
+  min-height: 500px;
+}
+
+.crm-designer-duplicate .crm-designer-row {
+  background: #fbb;
+}
+
+.crm-designer-duplicate .field-location_type_id,
+.crm-designer-duplicate .field-phone_type_id {
+  color: #f00;
+}
+
+.crm-designer-row .crm-designer-buttons {
+  right: 5px;
+  top: 5px;
+  position: absolute;
+  height: 20px;
+}
+
+.crm-designer-fields-region .crm-designer-buttons {
+  display: none;
+}
+
+.crm-designer-fields-region .crm-designer-open .crm-designer-buttons,
+.crm-designer-row:hover .crm-designer-buttons {
+  display: block;
+}
+
+.crm-designer-row .crm-designer-buttons a {
+  cursor: pointer;
+  display: inline-block;
+  padding: var(--crm-s);
+  font-size: var(--crm-m2);
+  border-radius: 4px;
+  border: 0;
+}
+
+.crm-designer .crm-designer-palette-tree button {
+  font-size: .8em;
+}
+
+.crm-designer .crm-designer-palette-tree span.ui-button-text {
+  padding: 0.4em;
+}
+
+.crm-designer .crm-designer-edit-custom {
+  position: absolute;
+  right: 5px;
+  top: 35px;
+  font-size: .8em;
+  border: 1px solid #cfcec3;
+}
+
+button#crm-designer-add-custom-set {
+  margin-top: 10px;
+}
+
+.ui-sortable-helper > .crm-designer-row {
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  opacity: 0.75;
+}
+
+.crm-designer-row .crm-designer-buttons a.crm-designer-action-settings:hover {
+  background-color: var(--crm-c-success);
+  color: var(--crm-c-success-text);
+  text-decoration: none;
+}
+
+.crm-designer-row .crm-designer-buttons a.crm-designer-action-remove:hover {
+  background-color: var(--crm-c-alert);
+  color: var(--crm-c-alert-text);
+  text-decoration: none;
+}
+
+.crm-designer-row,
+.crm-designer-row-placeholder {
+  border: 1px dashed transparent;
+  padding: 0.3em;
+  margin: auto;
+  position: relative;
+}
+
+.crm-designer-row-label {
+  padding: 0.5em 0;
+}
+
+.crm-designer-label {
+  font-weight: bold;
+}
+
+.crm-designer-row-placeholder {
+  visibility: visible !important;
+  height: 2em;
+}
+
+.crm-designer-dialog .description {
+  margin: 0 2em 0 0;
+}
+
+/* Hack for Drupal 8 for some reason was moving it around strange */
+.crm-designer-dialog .ui-resizable {
+  position: absolute;
+}
+
+.crm-designer-dialog .disabled .description {
+  display: none;
+}
+
+.crm-designer-dialog li.crm-designer-row-placeholder,
+.crm-designer-dialog li.ui-draggable-dragging,
+.crm-designer-dialog .bbf-form ul {
+  list-style-image: none;
+  list-style: none;
+}
+
+.ui-dialog .crm-designer-dialog.ui-dialog-content {
+  overflow: auto;
+  padding-right: .25em;
+}
+
+.crm-designer-dialog .full-height {
+  height: 100%;
+}
+
+.crm-designer {
+  position: relative;
+}
+
+.crm-profile-selector-preview-pane,
+.crm-designer-dialog .crm-designer .scroll {
+  overflow-x: auto;
+  overflow-y: scroll;
+}
+
+.ui-dialog {
+  border: 1px solid #444;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Hide annoying 'preview' message */
+.crm-profile-selector-preview-pane div.profile-preview-msg {
+  display: none;
+}
+
+/* Adds spacing between form rows */
+
+.crm-designer-field-detail fieldset > ul > li {
+  margin-bottom: var(--crm-s);
+}
