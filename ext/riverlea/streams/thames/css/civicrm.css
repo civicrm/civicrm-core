@@ -387,7 +387,8 @@ div:has(> table) {
  * which the user might not notice / might make the menu hard to access.
  * https://lab.civicrm.org/extensions/riverlea/-/issues/90
  */
-div:has(> table .btn-slide-active, > table .dropdown-toggle[aria-expanded="true"]) {
+div:has(> table .btn-slide-active),
+div:has(> table .dropdown-toggle[aria-expanded="true"]) {
   padding-bottom: 20rem;
 }
 
