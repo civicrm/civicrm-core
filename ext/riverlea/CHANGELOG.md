@@ -1,3 +1,9 @@
+1.2.1-5.81beta
+ - FIXED - integrated this fix to rendered radio buttons: https://github.com/civicrm/civicrm-core/pull/31345
+ - FIXED - text colour on selected rows illegible: https://lab.civicrm.org/extensions/riverlea/-/issues/94#note_174585
+ - FIXED - accordions inside Select2 now work. Some small tidying of Select2 list borders/padding.
+ - CHANGED - reduced size of 'not found' alerts in SearchKit tables: https://github.com/civicrm/civicrm-core/pull/31605
+
 1.2.0-5.81.beta
  - CHANGED - version numbering (again!) ref
 https://lab.civicrm.org/extensions/riverlea/-/issues/44#note_174132
