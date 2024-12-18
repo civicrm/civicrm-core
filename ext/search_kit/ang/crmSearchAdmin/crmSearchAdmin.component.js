@@ -270,7 +270,7 @@
       var newDisplay = angular.copy(display);
       delete newDisplay.name;
       delete newDisplay.id;
-      newDisplay.label += ts(' (copy)');
+      newDisplay.label += ' ' + ts('(copy)');
       ctrl.savedSearch.displays.push(newDisplay);
       $scope.selectTab('display_' + (ctrl.savedSearch.displays.length - 1));
     };
