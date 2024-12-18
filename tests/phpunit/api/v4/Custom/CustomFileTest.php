@@ -15,9 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-namespace Civi\tests\phpunit\api\v4\Custom;
+namespace api\v4\Custom;
 
-use api\v4\Custom\CustomTestBase;
 use Civi\Api4\CustomGroup;
 use Civi\Api4\CustomField;
 use Civi\Api4\File;
