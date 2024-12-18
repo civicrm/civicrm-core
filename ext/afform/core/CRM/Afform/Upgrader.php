@@ -70,7 +70,7 @@ class CRM_Afform_Upgrader extends CRM_Extension_Upgrader_Base {
   public function upgrade_1001(): bool {
     $this->ctx->log->info('Applying update 1001 - install civicrm_afform_submission table.');
     if (!CRM_Core_DAO::singleValueQuery("SHOW TABLES LIKE 'civicrm_afform_submission'")) {
-      $this->executeSqlFile('sql/auto_install.sql');
+      $this->executeSqlFile('sql/upgrade_1001.sql');
     }
     return TRUE;
   }
