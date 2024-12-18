@@ -14,7 +14,7 @@
  *
  * @group e2e
  */
-class E2E_Extern_LegacyRestTest extends E2E_Extern_BaseRestTest {
+class E2E_Extern_LegacyRestTest extends E2E_Extern_RestTestCase {
 
   protected $LEGACY_EXTERN_SUPPORTED = ['Drupal', 'Backdrop', 'Joomla', 'WordPress'];
 

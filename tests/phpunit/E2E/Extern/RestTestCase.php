@@ -16,7 +16,7 @@ use Civi\Test\HttpTestTrait;
  *
  * @group e2e
  */
-abstract class E2E_Extern_BaseRestTest extends CiviEndToEndTestCase {
+abstract class E2E_Extern_RestTestCase extends CiviEndToEndTestCase {
 
   use HttpTestTrait;
 
