@@ -82,7 +82,7 @@ define('API_LATEST_VERSION', 3);
  *
  * @package CiviCRM
  */
-class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
+class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
 
   use Api3TestTrait;
   use EventTestTrait;
@@ -3901,4 +3901,32 @@ WHERE table_schema = DATABASE()");
     return $data;
   }
 
+}
+
+if (version_compare(phpversion(), '8', '<')) {
+  class CiviUnitTestCase extends CiviUnitTestCaseCommon {
+
+  }
+}
+else {
+  class CiviUnitTestCase extends CiviUnitTestCaseCommon {
+
+    /**
+     * Override to run the test and assert its state.
+     *
+     * @return mixed
+     *
+     * @throws \Throwable
+     */
+    protected function runTest(): mixed {
+      try {
+        return parent::runTest();
+      }
+      catch (PEAR_Exception $e) {
+        // PEAR_Exception has metadata in funny places, and PHPUnit won't log it nicely
+        throw new Exception(\CRM_Core_Error::formatTextException($e), $e->getCode());
+      }
+    }
+
+  }
 }
