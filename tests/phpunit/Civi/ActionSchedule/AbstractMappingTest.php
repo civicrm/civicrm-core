@@ -198,7 +198,7 @@ abstract class AbstractMappingTest extends \CiviUnitTestCase {
     ];
 
     $this->schedule = new \CRM_Core_DAO_ActionSchedule();
-    $this->schedule->title = $this->getName(TRUE);
+    $this->schedule->title = is_callable([$this, 'name']) ? $this->name() : $this->getName(TRUE);
     $this->schedule->name = \CRM_Utils_String::munge($this->schedule->title);
     $this->schedule->is_active = 1;
     $this->schedule->group_id = NULL;
