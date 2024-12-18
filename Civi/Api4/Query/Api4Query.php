@@ -22,13 +22,8 @@ use Civi\Api4\Utils\FormattingUtil;
  * * negated: ['NOT', $node]
  * * branch: ['OR|NOT', [$node, $node, ...]]
  *
- * Leaf operators are one of:
- *
- * * '=', '<=', '>=', '>', '<', 'LIKE', "<>", "!=",
- * * 'NOT LIKE', 'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN',
- * * 'IS NOT NULL', 'IS NULL', 'CONTAINS', 'NOT CONTAINS',
- * * 'IS EMPTY', 'IS NOT EMPTY', 'REGEXP', 'NOT REGEXP'
- * * 'REGEXP BINARY', 'NOT REGEXP BINARY'
+ * For leaf operators,
+ * @see CoreUtil::getOperators()
  */
 abstract class Api4Query {
 
