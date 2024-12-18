@@ -21,15 +21,23 @@ namespace api\v4\Action;
 
 use api\v4\Api4TestBase;
 use Civi\Api4\Email;
-use Civi\Core\HookInterface;
 
 /**
  * @group headless
  */
-class FieldsCallbackTest extends Api4TestBase implements HookInterface {
+class FieldsCallbackTest extends Api4TestBase {
 
   public function setUp(): void {
+    // hook_civicrm_entityTypes has special significance in system boot. This seems to be more reliable way to register it.
+    \CRM_Utils_Hook::singleton()->setHook('civicrm_entityTypes', [$this, 'hook_civicrm_entityTypes']);
+    \CRM_Core_DAO_AllCoreTables::flush();
     parent::setUp();
+  }
+
+  public function tearDown(): void {
+    \CRM_Utils_Hook::singleton()->reset();
+    \CRM_Core_DAO_AllCoreTables::flush();
+    parent::tearDown();
   }
 
   public function testFieldsCallback(): void {
