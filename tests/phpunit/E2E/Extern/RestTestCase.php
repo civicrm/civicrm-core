@@ -40,7 +40,7 @@ abstract class E2E_Extern_RestTestCase extends CiviEndToEndTestCase {
    *
    * @return bool
    */
-  abstract protected function isOldQSupported(): bool;
+  abstract protected static function isOldQSupported(): bool;
 
   /**
    * @param $apiResult
@@ -94,7 +94,7 @@ abstract class E2E_Extern_RestTestCase extends CiviEndToEndTestCase {
    *
    * @return array; each item is a list of parameters for testAPICalls
    */
-  public function apiTestCases() {
+  public static function apiTestCases() {
     $cases = [];
 
     // entity,action: omit apiKey, valid entity+action
@@ -217,7 +217,7 @@ abstract class E2E_Extern_RestTestCase extends CiviEndToEndTestCase {
       0,
     ];
 
-    if (!$this->isOldQSupported()) {
+    if (!static::isOldQSupported()) {
       $cases = array_filter($cases, function($case) {
         // The 'civicrm/ajax/rest' end-point does not support '?q' inputs.
         return !isset($case[0]['q']);
