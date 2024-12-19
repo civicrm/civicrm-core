@@ -31,6 +31,19 @@
     </div>
   </div>
 </li>
+<li ng-click="$event.stopPropagation()" ng-if="$ctrl.isJoin()">
+  <div class="form-inline af-gui-field-select-in-dropdown">
+    <div class="form-group">
+      <label>{{:: ts('Allow:') }}</label>
+      <div class="checkbox-inline">
+        <label><input type="checkbox" ng-model="$ctrl.node.actions.update" ng-change="$ctrl.onChangeUpdateAction()">{{:: ts('Update') }}</label>
+      </div>
+      <div class="checkbox-inline">
+        <label><input type="checkbox" ng-model="$ctrl.node.actions.delete" ng-disabled="!$ctrl.node.actions.update">{{:: ts('Delete') }}</label>
+      </div>
+    </div>
+  </div>
+</li>
 <li><af-gui-menu-item-style node="$ctrl.node"></af-gui-menu-item-style></li>
 <li><af-gui-menu-item-border node="$ctrl.node"></af-gui-menu-item-border></li>
 <li><af-gui-menu-item-background node="$ctrl.node"></af-gui-menu-item-background></li>
