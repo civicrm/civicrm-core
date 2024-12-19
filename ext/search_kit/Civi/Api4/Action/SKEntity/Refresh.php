@@ -28,6 +28,10 @@ class Refresh extends AbstractAction {
       ->addWhere('name', '=', $displayName)
       ->execute()->single();
 
+    if (($display['settings']['data_mode'] ?? 'table') !== 'table') {
+      return;
+    }
+
     $query = (new SKEntityGenerator())->createQuery($display['saved_search_id.api_entity'], $display['saved_search_id.api_params'], $display['settings']);
     $sql = $query->getSql();
     $tableName = _getSearchKitDisplayTableName($displayName);
