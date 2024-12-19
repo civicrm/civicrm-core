@@ -65,7 +65,7 @@ class CRM_Core_ClassLoader {
       'CiviTestSuite',
       'CiviUnitTestCase',
       'CiviEndToEndTestCase',
-      'CiviSimpleCacheTest',
+      'CiviSimpleCacheTestCase',
       'Contact',
       'ContributionPage',
       'Custom',

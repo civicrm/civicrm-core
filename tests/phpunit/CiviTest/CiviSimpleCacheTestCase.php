@@ -32,7 +32,7 @@
 
 use PHPUnit\Framework\TestCase;
 
-abstract class CiviSimpleCacheTest extends TestCase {
+abstract class CiviSimpleCacheTestCase extends TestCase {
   /**
    * @var array
    * with functionName => reason.
@@ -40,12 +40,12 @@ abstract class CiviSimpleCacheTest extends TestCase {
   protected $skippedTests = [];
 
   /**
-   * @var CiviSimpleCacheTest
+   * @var CiviSimpleCacheTestCase
    */
   protected $cache;
 
   /**
-   * @return CiviSimpleCacheTest that is used in the tests
+   * @return CiviSimpleCacheTestCase that is used in the tests
    */
   abstract public function createSimpleCache();
 
