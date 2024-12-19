@@ -17,6 +17,11 @@
       $scope.hs = crmUiHelp({file: 'CRM/Search/Help/DisplayTypeEntity'});
 
       this.permissions = CRM.crmSearchAdmin.permissions;
+      this.dataModes = [
+        {id: 'table', text: ts('MySQL Table')},
+        {id: 'view', text: ts('MySQL View')},
+        {id: 'cte', text: ts('MySQL CTE')}
+      ];
 
       this.$onInit = function () {
         ctrl.jobFrequency = CRM.crmSearchAdmin.jobFrequency;
