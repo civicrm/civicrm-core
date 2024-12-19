@@ -163,7 +163,9 @@ class DefaultSender extends AutoService {
    */
   protected function isTemporaryError($message) {
     // SMTP response code is buried in the message.
-    $code = preg_match('/ \(code: (.+), response: /', $message, $matches) ? $matches[1] : '';
+    preg_match('/ \(code: (.+), response: ([0-9\.]+) /', $message, $matches);
+    $code = $matches ? $matches[1] : '';
+    $class = $matches ? $matches[2] : '';
 
     if (strpos($message, 'Failed to write to socket') !== FALSE) {
       return TRUE;
@@ -171,6 +173,11 @@ class DefaultSender extends AutoService {
 
     // Register 5xx SMTP response code (permanent failure) as bounce.
     if (isset($code[0]) && $code[0] === '5') {
+      return FALSE;
+    }
+
+    // code: 450, response: 4.1.2: "Recipient address rejected: Domain not found" (consider as permanent failure)
+    if ($code === '450' && $class === '4.1.2') {
       return FALSE;
     }
 
