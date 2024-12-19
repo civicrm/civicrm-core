@@ -159,8 +159,8 @@ class SavedSearchMappingTest extends AbstractMappingTestCase {
   /**
    * Disable testDefault by returning no test cases
    */
-  public function createTestCases() {
-    return [];
+  public static function createTestCases(): array {
+    return [['INCOMPLETE', '', []]];
   }
 
 }

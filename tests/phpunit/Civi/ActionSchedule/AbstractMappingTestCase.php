@@ -95,7 +95,7 @@ abstract class AbstractMappingTestCase extends \CiviUnitTestCase {
    *        - subject: regex
    *        - message: regex
    */
-  abstract public function createTestCases();
+  abstract public static function createTestCases(): array;
 
   // ---------------------------------------- Setup Helpers ----------------------------------------
 
@@ -274,6 +274,9 @@ abstract class AbstractMappingTestCase extends \CiviUnitTestCase {
    * @throws \Exception
    */
   public function testDefault(string $targetDate, string $setupFuncs, array $expectMessages) {
+    if ($targetDate === 'INCOMPLETE') {
+      $this->markTestIncomplete();
+    }
     $this->targetDate = $targetDate;
 
     foreach (explode(' ', $setupFuncs) as $setupFunc) {

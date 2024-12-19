@@ -40,7 +40,7 @@ class CRM_Activity_ActionMappingTest extends \Civi\ActionSchedule\AbstractMappin
    *        - recipients: array of emails
    *        - subject: regex
    */
-  public function createTestCases() {
+  public static function createTestCases(): array {
     $cs = [];
 
     $cs[] = [

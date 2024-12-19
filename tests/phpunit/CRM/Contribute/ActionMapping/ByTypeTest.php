@@ -39,7 +39,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends AbstractMappingTestCase {
    *        - recipients: array of emails
    *        - subject: regex
    */
-  public function createTestCases(): array {
+  public static function createTestCases(): array {
     $cs = [];
 
     $cs[] = [
