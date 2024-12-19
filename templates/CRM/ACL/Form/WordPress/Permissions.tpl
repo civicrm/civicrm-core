@@ -19,35 +19,26 @@
         <th class="label">&nbsp;</th>
         {assign var="num" value=0}
         {foreach from=$roles key=role_name item=role_value}
-          <th align="center"><strong>{$role_value}</strong></th>
+          <th align="center">{$role_value}</th>
           {assign var="num" value=$num+1}
         {/foreach}
       </tr>
     </thead>
     <tbody>
-      {assign var="x" value=0}
       {foreach from=$table key=perm_name item=row}
-        {if $x mod 2 eq 1}
-          <tr style="background-color: #E6E6DC;">
-        {else}
-          <tr style="background-color: #FFFFFF;">
-        {/if}
-
-       <td style="height: 2.6em;">
-           {$row.label}
-          {if !empty($row.desc)}
-            <br/><span class="description">{$row.desc}</span>
-          {/if}
-        </td>
-
-        {foreach from=$row.roles key=index item=role_name}
-          <td align="center" style="padding-top: 0.6em;">
-            {$form.$role_name.$perm_name.html}
+        <tr class="{cycle values="odd-row,even-row"}">
+          <td style="height: 2.6em;">
+            {$row.label}
+            {if !empty($row.desc)}
+              <br/><span class="description">{$row.desc}</span>
+            {/if}
           </td>
-        {/foreach}
-
+          {foreach from=$row.roles key=index item=role_name}
+            <td align="center" style="padding-top: 0.6em;">
+              {$form.$role_name.$perm_name.html}
+            </td>
+          {/foreach}
         </tr>
-        {assign var="x" value=$x+1}
       {/foreach}
     </tbody>
   </table>
