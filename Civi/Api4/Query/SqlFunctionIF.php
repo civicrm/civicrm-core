@@ -18,8 +18,6 @@ class SqlFunctionIF extends SqlFunction {
 
   protected static $category = self::CATEGORY_COMPARISON;
 
-  protected static $dataType = 'String';
-
   protected static function params(): array {
     return [
       [
