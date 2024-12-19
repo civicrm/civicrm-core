@@ -193,7 +193,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends AbstractMappingTestCase {
    * Create a contribution record for Alice with type "Member Dues".
    */
   public function addAliceDues(): void {
-    $campaignID = $this->campaignCreate([
+    $campaignID = $this->ids['Campaign']['big'] = $this->campaignCreate([
       'title' => 'Campaign',
       'name' => 'big_campaign',
     ]);
@@ -373,7 +373,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends AbstractMappingTestCase {
       'fee_amount = €5.00',
       'paid_amount = €100.00',
       'balance_amount = €0.00',
-      'campaign_id = 1',
+      'campaign_id = ' . $this->ids['Campaign']['big'],
       'campaign name = big_campaign',
       'campaign label = Campaign',
       'receipt text = Thank you!',
