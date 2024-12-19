@@ -399,6 +399,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
       $tabs = $this->processTab();
       $this->set('tabHeader', $tabs);
     }
+    $tabs = \CRM_Core_Smarty::setRequiredTabTemplateKeys($tabs);
     $this->assign('tabHeader', $tabs);
     CRM_Core_Resources::singleton()
       ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')
