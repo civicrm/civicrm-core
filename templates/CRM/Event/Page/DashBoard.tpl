@@ -105,7 +105,7 @@
                             href="{crmURL p="`$v.url`" q="reset=1&action=browse&setTab=1&id=`$id`"}">{$v.title}</a></li>
                       {else}
                         <li><a title="{$v.title|escape}" class="action-item crm-hover-button no-popup {$status}"
-                            href="{crmURL p="`$v.url`" q="reset=1&action=update&id=`$id`"}">{$v.title}</a></li>
+                            href="{crmURL p="civicrm/event/manage/settings" q="reset=1&action=update&id=`$id`&selectedChild=`$k`"}">{$v.title}</a></li>
                       {/if}
                     {/foreach}
                   </ul>
