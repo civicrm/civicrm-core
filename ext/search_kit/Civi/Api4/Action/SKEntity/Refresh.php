@@ -2,10 +2,9 @@
 
 namespace Civi\Api4\Action\SKEntity;
 
-use Civi\API\Request;
 use Civi\Api4\Generic\AbstractAction;
 use Civi\Api4\Generic\Result;
-use Civi\Api4\Query\Api4SelectQuery;
+use Civi\Search\SKEntityGenerator;
 
 /**
  * Store the results of a SearchDisplay as a SQL table.
@@ -29,25 +28,7 @@ class Refresh extends AbstractAction {
       ->addWhere('name', '=', $displayName)
       ->execute()->single();
 
-    $apiParams = $display['saved_search_id.api_params'];
-    // Add orderBy to api params
-    foreach ($display['settings']['sort'] ?? [] as $item) {
-      $apiParams['orderBy'][$item[0]] = $item[1];
-    }
-    // Set select clause to match display columns
-    $select = [];
-    foreach ($display['settings']['columns'] as $column) {
-      foreach ($apiParams['select'] as $selectExpr) {
-        if ($selectExpr === $column['key'] || str_ends_with($selectExpr, " AS {$column['key']}")) {
-          $select[] = $selectExpr;
-          continue 2;
-        }
-      }
-    }
-    $apiParams['select'] = $select;
-    $api = Request::create($display['saved_search_id.api_entity'], 'get', $apiParams);
-    $query = new Api4SelectQuery($api);
-    $query->forceSelectId = FALSE;
+    $query = (new SKEntityGenerator())->createQuery($display['saved_search_id.api_entity'], $display['saved_search_id.api_params'], $display['settings']);
     $sql = $query->getSql();
     $tableName = _getSearchKitDisplayTableName($displayName);
     $columnSpecs = array_column($display['settings']['columns'], 'spec');
