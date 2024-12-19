@@ -51,7 +51,7 @@
           savedSearch: function($route, crmApi4) {
             var params = $route.current.params;
             return crmApi4('SavedSearch', 'get', {
-              select: ['label', 'description', 'api_entity', 'api_params', 'expires_date', 'GROUP_CONCAT(DISTINCT entity_tag.tag_id) AS tag_id'],
+              select: ['label', 'description', 'api_entity', 'api_params', 'is_template', 'expires_date', 'GROUP_CONCAT(DISTINCT entity_tag.tag_id) AS tag_id'],
               where: [['id', '=', params.id]],
               join: [
                 ['EntityTag AS entity_tag', 'LEFT', ['entity_tag.entity_table', '=', '"civicrm_saved_search"'], ['id', '=', 'entity_tag.entity_id']],
@@ -130,15 +130,25 @@
 
     // Controller for cloning a SavedSearch
     .controller('searchClone', function($scope, $routeParams, savedSearch) {
+      const makeTemplate = ($routeParams.is_template == '1');
       searchEntity = savedSearch.api_entity;
-      savedSearch.label += ' (' + ts('copy') + ')';
+      // When cloning a search or a template as-is, append 'copy' to the label
+      if (savedSearch.is_template === makeTemplate) {
+        savedSearch.label += ' ' + ts('(copy)');
+      }
+      // When making a new search from a template, delete label
+      else if (!makeTemplate) {
+        savedSearch.label = '';
+      }
       delete savedSearch.id;
       savedSearch.displays.forEach(display => {
         delete display.id;
         display.acl_bypass = false;
-        display.label += ' (' + ts('copy') + ')';
+        if (savedSearch.is_template === makeTemplate) {
+          display.label += ' ' + ts('(copy)');
+        }
       });
-      savedSearch.is_template = ($routeParams.is_template == '1');
+      savedSearch.is_template = makeTemplate;
       this.savedSearch = savedSearch;
       $scope.$ctrl = this;
     })
