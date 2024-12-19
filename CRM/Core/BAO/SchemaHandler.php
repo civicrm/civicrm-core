@@ -1000,4 +1000,15 @@ MODIFY      {$columnName} varchar( $length )
     return CRM_Core_DAO::singleValueQuery('SELECT @@character_set_database');
   }
 
+  /**
+   * @param string $table
+   * @return string|null
+   *   Ex: 'BASE TABLE' or 'VIEW'
+   */
+  public static function getTableType(string $table): ?string {
+    return \CRM_Core_DAO::singleValueQuery(
+      'SELECT TABLE_TYPE  FROM information_schema.tables  WHERE TABLE_SCHEMA=database() AND TABLE_NAME LIKE %1',
+      [1 => [$table, 'String']]);
+  }
+
 }
