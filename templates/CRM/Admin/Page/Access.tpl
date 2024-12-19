@@ -20,7 +20,7 @@
     <p>{ts 1=$ufAccessURL|smarty:nodefaults 2=$jAccessParams 3=$config->userFramework}Note that <a href='%1' %2>%3 permissions</a> take precedence over CiviCRM ACLs. If you wish to use CiviCRM ACLs, first disable the related permission in %3 for a user role, and then gradually add ACLs to replace that permission for certain groups of contacts.{/ts}
   {/if}
 </div>
-<table class="report">
+<table>
   <tr>
     {if $config->userFramework == 'Standalone'}
       <td class="nowrap"><a href="{$ufAccessURL|smarty:nodefaults}" id="adminAccess"><i class="crm-i fa-chevron-right fa-fw" aria-hidden="true"></i>{ts}User Roles{/ts}</a></td>
