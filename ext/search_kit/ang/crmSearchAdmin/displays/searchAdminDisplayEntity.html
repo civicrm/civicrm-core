@@ -37,6 +37,11 @@
     <option value="OR">{{:: ts('Or') }}</option>
   </select>
 </div>
+<div class="form-inline">
+  <label for="display_data_mode">{{:: ts('Data Mode') }}</label>
+  <a crm-ui-help="hs({id: 'data_mode', title: ts('Data Mode')})"></a>
+  <input id="display_data_mode" class="form-control" crm-ui-select="{data: $ctrl.dataModes, placeholder: ts('MySQL Table')}" ng-model="$ctrl.display.settings.data_mode">
+</div>
 <fieldset ng-include="'~/crmSearchAdmin/crmSearchAdminDisplaySort.html'"></fieldset>
 
 <fieldset class="crm-search-admin-edit-columns-wrapper">
