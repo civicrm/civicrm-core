@@ -335,7 +335,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $trxnsData = [
       'total_amount' => $this->isARefund() ? -$totalAmount : $totalAmount,
       'check_number' => $this->getSubmittedValue('check_number'),
-      'fee_amount' => $paymentResult['fee_amount'] ?? 0,
+      'fee_amount' => $paymentResult['fee_amount'] ?? ($this->getSubmittedValue('fee_amount') ?? 0),
       'contribution_id' => $this->getContributionID(),
       'payment_processor_id' => $this->getPaymentProcessorID(),
       'card_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_FinancialTrxn', 'card_type_id', $this->getSubmittedValue('credit_card_type')),
