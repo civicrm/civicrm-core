@@ -36,8 +36,8 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
   public static function getSubscribedEvents(): array {
     return [
       'civi.api4.entityTypes' => 'on_civi_api4_entityTypes',
-      'hook_civicrm_pre' => 'onPreSaveDisplay',
-      'hook_civicrm_post' => 'onPostSaveDisplay',
+      'hook_civicrm_pre::SearchDisplay' => 'onPreSaveDisplay',
+      'hook_civicrm_post::SearchDisplay' => 'onPostSaveDisplay',
     ];
   }
 
