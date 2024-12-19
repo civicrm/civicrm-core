@@ -194,12 +194,20 @@ function afform_civicrm_tabset($tabsetName, &$tabs, $context) {
         'icon' => 'crm-i ' . ($afform['icon'] ?: 'fa-list-alt'),
         'is_active' => TRUE,
         'contact_type' => _afform_get_contact_types($summaryContactType) ?: NULL,
-        'template' => 'afform/contactSummary/AfformTab.tpl',
+        'template' => 'afform/InlineAfform.tpl',
         'module' => $afform['module_name'],
         'directive' => $afform['directive_name'],
       ];
-      // If this is the real contact summary page (and not a callback from ContactLayoutEditor), load module.
+      // If this is the real contact summary page (and not a callback from ContactLayoutEditor), load module
+      // and assign contact id to required smarty variable
       if (empty($context['caller'])) {
+        // note we assign the contact id to entity_id as preferred key
+        // but also contact_id to maintain backwards compatibility with older
+        // afforms
+        CRM_Core_Smarty::singleton()->assign('afformOptions', [
+          'entity_id' => $context['contact_id'],
+          'contact_id' => $context['contact_id'],
+        ]);
         Civi::service('angularjs.loader')->addModules($afform['module_name']);
       }
     }
