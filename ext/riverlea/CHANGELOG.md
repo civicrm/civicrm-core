@@ -1,3 +1,12 @@
+1.2.0-5.81.beta
+ - CHANGED - version numbering (again!) ref
+https://lab.civicrm.org/extensions/riverlea/-/issues/44#note_174132
+ - FIXED - Thames, dropdown clipping, ref
+https://lab.civicrm.org/extensions/riverlea/-/issues/90
+ - FIXED - Backbone.js Profile edit via Event/Contribution page issues, ref https://lab.civicrm.org/extensions/riverlea/-/issues/92
+ - ADDED - crm.designer.css into /core/css to allow for RL overrides. Added some simple integrations (button colour, spacing fixe)
+ - CHANGED - dropdown items hover state now has a background color that should contrast the hover text colour - it was using a variable that was sometimes transparent, creating contrast ratio issues in Minetta
+
 1.80.14
  - FIXED - regression caused by trying to reset clipping in Thames (ref: https://lab.civicrm.org/extensions/riverlea/-/issues/91)
 
