@@ -875,7 +875,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
         if (!empty($url_parts['query'])) {
           $redirect_url .= '?' . $url_parts['query'];
         }
-        CRM_Core_Session::setStatus(ts('Sorry, your session has expired. Please resubmit your information to complete your submission.'));
+        CRM_Core_Session::setStatus(ts('Sorry, your session has expired. Please try again.'));
         return CRM_Utils_System::redirect($redirect_url);
       }
     }
