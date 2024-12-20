@@ -90,7 +90,7 @@ class CRM_Core_JobManager {
     $jobs = array_merge($successfulJobs, $maybeUnsuccessfulJobs);
     foreach ($jobs as $job) {
       $temp = ['class' => NULL, 'parameters' => NULL, 'last_run' => NULL];
-      $scheduledJobParams = array_merge($job, $temp);
+      $scheduledJobParams = array_merge($temp, $job);
       $jobDAO = new CRM_Core_ScheduledJob($scheduledJobParams);
 
       if ($jobDAO->needsRunning()) {
