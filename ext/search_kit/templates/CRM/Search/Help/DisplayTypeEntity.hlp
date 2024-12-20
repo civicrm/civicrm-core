@@ -2,3 +2,31 @@
   <p>{ts}Set the permission level needed to view this entity.{/ts}</p>
   <p>{ts}Users without this permission will not be able to see this entity in SearchKit nor in any search queries or displays that use this entity.{/ts}</p>
 {/htxt}
+{htxt id="data_mode"}
+  <p>{ts}Determine which data-storage features to use when generating this entity.{/ts}</p>
+  <ul>
+    {* We should probably give some more hints about when to use each. Included draft notes about expected trade-offs. *}
+
+    {* TABLE: Expected trade-offs:
+      Strength: Stable data. Stable structure. Analytics with grouping/aggregation/function-evaluation.
+      Weakness: Volatile data. Volatile structure.
+    *}
+    <li>{ts}<strong>MySQL Table</strong>: Create a persistent MySQL table and re-fill it periodically.{/ts}</li>
+    {* VIEW: Expected trade-offs:
+      Strength: Volatile data. Stable structure. Simple variations on existing entities. Targeted access to subsets of data.
+      Weakness: Volatile structure. Analytics with grouping/aggregation/function-evaluation.
+    *}
+    <li>{ts}<strong>MySQL View</strong>: Create a persistent MySQL view. Better suited to volatile data with a stable data-structure. Better suited to targeted data-access but not to analytics.{/ts}</li>
+    {* CTE: Expected trade-offs:
+      Strength: Volatile data. Volatile structure.
+      Moderate: Analytics with grouping/aggregation/function-evaluation.
+      Weakness: Targeted access to subsets of data.
+
+      Compared to VIEWs, a key difference is CTEs are likely to build an on-demand temporary table to cache intermediate
+      results. This is good if you need to full-table operations like grouping/aggregating. But it may be bad if you're
+      only accessing a small portion of the data.
+    <li>{ts}<strong>MySQL CTE</strong>: Create dynamic MySQL query using Common Table Expression. Better suited to volatile {/ts}</li>
+    *}
+  </ul>
+
+{/htxt}
