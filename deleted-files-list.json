@@ -495,6 +495,7 @@
     "Civi/Api4/Action/CiviCase/*",
     "Civi/Api4/Action/Contact/GetFields.php",
     "Civi/Api4/Action/Contribution/*",
+    "Civi/Api4/Action/CustomGroup/*",
     "Civi/Api4/Action/CustomValue/GetActions.php",
     "Civi/Api4/Action/CustomValue/GetFields.php",
     "Civi/Api4/Action/CustomValue/Replace.php",
