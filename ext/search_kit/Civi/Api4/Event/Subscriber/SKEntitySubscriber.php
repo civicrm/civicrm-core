@@ -55,7 +55,6 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
         'title' => $display['label'],
         'title_plural' => $display['label'],
         'description' => $display['settings']['description'] ?? NULL,
-        'primary_key' => ['_row'],
         'type' => ['SavedSearch'],
         'table_name' => $display['tableName'],
         'class_args' => [$display['name']],
@@ -101,15 +100,6 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
       'is_multiple' => FALSE,
       'attributes' => 'ENGINE=InnoDB',
       'fields' => [],
-    ];
-    // Primary key field
-    $table['fields'][] = [
-      'name' => '_row',
-      'type' => 'int unsigned',
-      'primary' => TRUE,
-      'required' => TRUE,
-      'attributes' => 'AUTO_INCREMENT',
-      'comment' => 'Row number',
     ];
     foreach ($newSettings['columns'] as &$column) {
       $expr = $this->getSelectExpression($column['key']);
