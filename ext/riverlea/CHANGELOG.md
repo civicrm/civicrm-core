@@ -1,3 +1,7 @@
+1.2.2-5.81beta
+ - FIXED - major regression introduced in 1.2.1-5.81beta around Select2 sub-results: https://lab.civicrm.org/extensions/riverlea/-/issues/11#note_174883
+ - FIXED - contact dashboard tags didn't wrap: https://lab.civicrm.org/extensions/riverlea/-/issues/97
+
 1.2.1-5.81beta
  - FIXED - integrated this fix to rendered radio buttons: https://github.com/civicrm/civicrm-core/pull/31345
  - FIXED - text colour on selected rows illegible: https://lab.civicrm.org/extensions/riverlea/-/issues/94#note_174585
