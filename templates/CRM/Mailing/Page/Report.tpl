@@ -21,7 +21,7 @@
   <tr><td class="label"><a href="{$report.event_totals.links.delivered}">{ts}Successful Deliveries{/ts}</a></td>
       <td>{$report.event_totals.delivered} ({$report.event_totals.delivered_rate|string_format:"%0.2f"}%)</td>
       <td>{$report.event_totals.actionlinks.delivered}</td></tr>
-{if $report.mailing.open_tracking}
+{if array_key_exists('mailing', $report) && $report.mailing.open_tracking}
   <tr><td class="label"><a href="{$report.event_totals.links.opened}&distinct=1">{ts}Unique Opens{/ts}</a></td>
       <td>{$report.event_totals.opened} ({$report.event_totals.opened_rate|string_format:"%0.2f"}%)</td>
       <td>{$report.event_totals.actionlinks.opened_unique}</td></tr>
@@ -29,7 +29,7 @@
       <td>{$report.event_totals.total_opened}</td>
       <td>{$report.event_totals.actionlinks.opened}</td></tr>
 {/if}
-{if $report.mailing.url_tracking}
+{if array_key_exists('mailing', $report) && $report.mailing.url_tracking}
   <tr><td class="label"><a href="{$report.event_totals.links.clicks}">{ts}Click-throughs{/ts}</a></td>
       <td>{$report.event_totals.url} ({$report.event_totals.clickthrough_rate|string_format:"%0.2f"}%)</td>
       <td>{$report.event_totals.actionlinks.clicks}</td></tr>
@@ -119,7 +119,7 @@
 {/if}
 </fieldset>
 
-{if $report.mailing.url_tracking && $report.click_through|@count > 0}
+{if array_key_exists('mailing', $report) && $report.mailing.url_tracking && $report.click_through|@count > 0}
 <fieldset>
 <legend>{ts}Click-through Summary{/ts}</legend>
 {strip}
@@ -148,7 +148,7 @@
 <legend>{ts}Content{/ts}</legend>
 {strip}
 <table class="crm-info-panel">
-{if $report.mailing.body_text}
+{if array_key_exists('mailing', $report) && $report.mailing.body_text}
 <tr>
   <td class="label nowrap">{ts}Text Message{/ts}</td>
   <td>
@@ -172,7 +172,7 @@
 </tr>
 {/if}
 
-{if $report.mailing.attachment}
+{if array_key_exists('mailing', $report) && $report.mailing.attachment}
 <tr>
   <td class="label nowrap">{ts}Attachments{/ts}</td>
   <td>
@@ -193,6 +193,7 @@
     {ts}Mailing Settings{/ts}
 </legend>
 <table class="crm-info-panel">
+{if array_key_exists('mailing', $report)}
 <tr><td class="label">{ts}Mailing Name{/ts}</td><td>{$report.mailing.name}</td></tr>
 {if !$report.mailing.sms_provider_id}
   <tr><td class="label">{ts}Subject{/ts}</td><td>{$report.mailing.subject}</td></tr>
@@ -203,10 +204,11 @@
   <tr><td class="label">{ts}Open tracking{/ts}</td><td>{if $report.mailing.open_tracking}{ts}Enabled{/ts}{else}{ts}Disabled{/ts}{/if}</td></tr>
   <tr><td class="label">{ts}URL Click-through tracking{/ts}</td><td>{if $report.mailing.url_tracking}{ts}Enabled{/ts}{else}{ts}Disabled{/ts}{/if}</td></tr>
 {/if}
+{/if}
 {if $public_url}
   <tr><td class="label">{ts}Public url{/ts}</td><td><a href="{$public_url}"> {$public_url}</a></td></tr>
 {/if}
-{if $report.mailing.campaign}
+{if array_key_exists('mailing', $report) && $report.mailing.campaign}
   <tr><td class="label">{ts}Campaign{/ts}</td><td>{$report.mailing.campaign}</td></tr>
 {/if}
 </table>
