@@ -622,11 +622,15 @@ input.crm-form-checkbox) + label {
   margin: 0;
   padding: 0;
 }
-.select2-result-sub {
-  display: none;
-}
+
 /* Select2 accordion (re-uses some of accordion.css) */
 
+.select2-drop.collapsible-optgroups-enabled .select2-result-with-children .select2-result-sub {
+  display: none;
+}
+.select2-drop.collapsible-optgroups-enabled .select2-result-with-children.optgroup-expanded .select2-result-sub {
+  display: block;
+}
 .select2-drop.collapsible-optgroups-enabled .select2-result-with-children.optgroup-expanded > .select2-result-label:before {
   transform: var(--crm-expand-transform);
   transition: var(--crm-expand-transition);
@@ -647,9 +651,7 @@ input.crm-form-checkbox) + label {
 .select2-drop.select2-drop-active.crm-container li.select2-result-with-children {
   padding: 0;
 }
-.select2-result-with-children.optgroup-expanded .select2-result-sub {
-  display: block;
-}
+
 
 /* Dates */
 
