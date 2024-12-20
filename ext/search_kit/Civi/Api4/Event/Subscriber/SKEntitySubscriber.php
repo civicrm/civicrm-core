@@ -127,10 +127,7 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
         $query = (new SKEntityGenerator())->createQuery($this->savedSearch['api_entity'], $this->savedSearch['api_params'], $tempSettings);
         $columnSpecs = array_column($tempSettings['columns'], 'spec');
         $columns = implode(', ', array_column($columnSpecs, 'name'));
-
-        $sql = "CREATE VIEW `$tableName` (_row, $columns) AS " . $query->getSql();
-        $sql = preg_replace('/ SELECT /', ' SELECT row_number() over () AS _row, ', $sql, 1);
-        // Q: Do we really need _row? What are the performance implications?
+        $sql = "CREATE VIEW `$tableName` ($columns) AS " . $query->getSql();
 
         // do not i18n-rewrite
         \CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, FALSE, FALSE);
