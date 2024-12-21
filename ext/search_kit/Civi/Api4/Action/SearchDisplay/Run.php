@@ -179,6 +179,13 @@ class Run extends AbstractRunAction {
         }
       }
     }
+    $data = $tally;
+    // Handle any rewrite tokens
+    foreach ($columns as $col) {
+      if (!empty($col['tally']['rewrite'])) {
+        $tally[$key] = $this->rewrite($col['tally']['rewrite'], $data, 'raw');
+      }
+    }
     return $tally;
   }
 
