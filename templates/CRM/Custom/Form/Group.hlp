@@ -43,17 +43,10 @@
   {ts}Allow Multiple Records{/ts}
 {/htxt}
 {htxt id="id-is_multiple"}
-    <p>{ts}Checking this box allows you to enter multiple sets of values for a given contact.{/ts}</p>
+    <p>{ts}Checking this box allows you to enter multiple sets of values for a given record.{/ts}</p>
     <p>{ts}<strong>EXAMPLE:</strong> When creating a set of custom fields used to collect <strong>Employment History</strong> - you might have fields for Job Title, Start Date, End Date, and Reason for Leaving. Checking the "multiple records" box allows you to collect information for multiple jobs.{/ts}</p>
     <p>{ts}You can also set the maximum number of records which can be recorded per contact. Using the previous example, you might only want data for the three most recent jobs.{/ts}</p>
-    <p>{ts 1=$importMultipleURL}Use the <a href="%1">Multi-value Custom Data Import tool</a> to import data into multiple record custom fields (contact records must already exist).{/ts}</p>
-    <p>
-    {ts}CAUTION: The following features are NOT available for custom fields in 'multiple record' custom set:{/ts}
-      <ul>
-        <li>{ts}They can not be Exported{/ts}</li>
-        <li>{ts}If they are included in a report as a display column, only the first set of values are shown.{/ts}</li>
-      </ul>
-    </p>
+    <p>{ts 1=$importMultipleURL}Use the <a href="%1">Multi-value Custom Data Import tool</a> to import data into multiple record custom fields (the parent records should already exist).{/ts}</p>
 {/htxt}
 
 {htxt id="id-max_multiple-title"}

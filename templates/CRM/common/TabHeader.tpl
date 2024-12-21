@@ -29,7 +29,12 @@
       {foreach from=$tabHeader key=tabName item=tabValue}
         {if $tabValue.template}
           <div id="panel_{$tabName}">
-            {include file=$tabValue.template}
+            {if $tabValue.module}
+              <!-- afform tab - need to pass module and directive to afform param -->
+              {include file=$tabValue.template afform=$tabValue}
+            {else}
+              {include file=$tabValue.template}
+            {/if}
           </div>
         {/if}
       {/foreach}

@@ -167,7 +167,7 @@ class CRM_Custom_Form_Group extends CRM_Admin_Form {
     // Assign data for use by js chain-selects
     $this->assign('entityColumnIdOptions', $entityColumnIdOptions);
     // List of entities that allow `is_multiple`
-    $this->assign('allowMultiple', array_column($extendsOptions, 'is_multiple', 'id'));
+    $this->assign('allowMultiple', array_column($extendsOptions, 'allow_is_multiple', 'id'));
     // Used by warnDataLoss
     $this->assign('defaultSubtypes', $this->_values['extends_entity_column_value'] ?? []);
     // Used to initially hide selects with no options
