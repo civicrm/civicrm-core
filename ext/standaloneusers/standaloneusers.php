@@ -94,3 +94,28 @@ function standaloneusers_civicrm_navigationMenu(&$menu) {
     'permission' => 'cms:administer users',
   ]);
 }
+
+/**
+ * Implements search tasks hook to add the `sendPasswordReset` action
+ *
+ * @param array $tasks
+ * @param bool $checkPermissions
+ * @param int|null $userId
+ */
+function standaloneusers_civicrm_searchKitTasks(array &$tasks, bool $checkPermissions, ?int $userId) {
+  if ($checkPermissions && !CRM_Core_Permission::check('cms:administer users', $userId)) {
+    return;
+  }
+  $tasks['User']['send_password_reset'] = [
+    'title' => E::ts('Send Password Reset'),
+    'icon' => 'fa-lock',
+    'apiBatch' => [
+      'action' => 'sendPasswordResetEmail',
+      'params' => NULL,
+      'confirmMsg' => E::ts('Send password reset email to %1 user(s)?'),
+      'runMsg' => E::ts('Sending password reset email(s) to %1 user(s)...'),
+      'successMsg' => E::ts('Password reset emails sent to %1 user(s). Note that reset links are valid for 1 hour.'),
+      'errorMsg' => E::ts('An error occurred while attempting to send password reset email(s).'),
+    ],
+  ];
+}
