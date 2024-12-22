@@ -60,15 +60,39 @@
     </tr>
     {/if}
     <tr>
-        <td class="label">{ts}Compatible with{/ts}</td>
-        <td>
-            {if $extension.compatibility}
-                {foreach from=$extension.compatibility.ver item=ver}
-                    {$ver|escape} &nbsp;
-                {/foreach}
-            {/if}
-        </td>
-    </tr>
+      <td class="label">{ts}Compatible with CiviCRM version{/ts}</td>
+      <td>
+        {if $extension.compatibility}
+          {foreach from=$extension.compatibility.ver item=ver}
+            {$ver|escape} &nbsp;
+          {/foreach}
+        {/if}
+      </td>
+  </tr>
+  <tr>
+    <td class="label">{ts}Compatible with PHP version{/ts}</td>
+    <td>
+      {if $extension.php_compatibility}
+        {foreach from=$extension.php_compatibility.ver item=ver}
+          {$ver|escape} &nbsp;
+        {/foreach}
+      {else}
+        {ts}Unknown{/ts}
+      {/if}
+    </td>
+  </tr>
+  <tr>
+    <td class="label">{ts}Compatible with Smarty version{/ts}</td>
+    <td>
+      {if $extension.smarty_compatibility}
+        {foreach from=$extension.smarty_compatibility.ver item=ver}
+          {$ver|escape} &nbsp;
+        {/foreach}
+      {else}
+        {ts}Unknown{/ts}
+      {/if}
+    </td>
+  </tr>
     <tr>
       <td class="label">{ts}License{/ts}</td><td>{$extension.license|escape}</td>
     </tr>
