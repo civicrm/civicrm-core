@@ -112,6 +112,18 @@ class CRM_Extension_Info {
   public $compatibility;
 
   /**
+   * @var array
+   *   Ex: ['ver' => '8.4']
+   */
+  public $php_compatibility;
+
+  /**
+   * @var array
+   *   Ex: ['ver' => '5']
+   */
+  public $smarty_compatibility;
+
+  /**
    * @var string|null
    */
   public $description;
