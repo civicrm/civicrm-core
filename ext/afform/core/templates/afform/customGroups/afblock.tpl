@@ -4,7 +4,7 @@
 
 {foreach from=$group.field_names item=field_name}
   {* for multiple record fields there is no need to prepend
-  the group name because it is provided as the join_entity above *}
+  the group name because it  will be the form entity itself *}
   <af-field name="{if !$group.is_multiple}{$group.name}.{/if}{$field_name}" />
 {/foreach}
 

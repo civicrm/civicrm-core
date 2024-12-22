@@ -34,6 +34,7 @@ class CustomGroupEntityLinks extends \Civi\Core\Service\AutoSubscriber {
         $groupName = substr($name, 7);
         $event->entities[$name]['paths']['add'] = "civicrm/af/custom/{$groupName}/create#?entity_id=[entity_id]";
         $event->entities[$name]['paths']['update'] = "civicrm/af/custom/{$groupName}/update#?Record=[id]";
+        $event->entities[$name]['paths']['view'] = "civicrm/af/custom/{$groupName}/view#?Record=[id]";
       }
     }
   }
