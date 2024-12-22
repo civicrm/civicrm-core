@@ -206,7 +206,7 @@
 {if $public_url}
   <tr><td class="label">{ts}Public url{/ts}</td><td><a href="{$public_url}"> {$public_url}</a></td></tr>
 {/if}
-{if $report.mailing.campaign}
+{if array_key_exists('campaign', $report.mailing) && $report.mailing.campaign}
   <tr><td class="label">{ts}Campaign{/ts}</td><td>{$report.mailing.campaign}</td></tr>
 {/if}
 </table>
