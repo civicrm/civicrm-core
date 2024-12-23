@@ -467,7 +467,7 @@ return [
     'add' => '5.80',
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => ts('Consider domains that will not resolve (SMTP Erorr 450 - class 4.1.2 "Domain not found") as permanent failures. '),
+    'description' => ts('Consider domains that will not resolve (SMTP Error 450 - class 4.1.2 "Domain not found") as permanent failures.'),
     'help_text' => NULL,
     'help' => ['id' => 'smtp_450_is_permanent'],
   ],
