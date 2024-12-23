@@ -88,30 +88,8 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     //it is set during renewal of membership.
     $logStartDate = $params['log_start_date'] ?? NULL;
     $logStartDate = ($logStartDate) ? CRM_Utils_Date::isoToMysql($logStartDate) : CRM_Utils_Date::isoToMysql($membership->start_date);
-    $values = self::getStatusANDTypeValues($membership->id);
-
-    $membershipLog = [
-      'membership_id' => $membership->id,
-      'status_id' => $membership->status_id,
-      'start_date' => $logStartDate,
-      'end_date' => CRM_Utils_Date::isoToMysql($membership->end_date),
-      'modified_date' => CRM_Utils_Time::date('Ymd'),
-      'membership_type_id' => $values[$membership->id]['membership_type_id'],
-      'max_related' => $membership->max_related,
-    ];
-
-    if (!empty($params['modified_id'])) {
-      $membershipLog['modified_id'] = $params['modified_id'];
-    }
-    // If we have an authenticated session, set modified_id to that user's contact_id, else set to membership.contact_id
-    elseif (CRM_Core_Session::getLoggedInContactID()) {
-      $membershipLog['modified_id'] = CRM_Core_Session::getLoggedInContactID();
-    }
-    else {
-      $membershipLog['modified_id'] = $membership->contact_id;
-    }
-
-    CRM_Member_BAO_MembershipLog::add($membershipLog);
+    $membershipTypeID = (int) self::getStatusANDTypeValues($membership->id)[$membership->id]['membership_type_id'];
+    $membershipLog = self::createMembershipLog($membership, $logStartDate, $membershipTypeID, $params['modified_id'] ?? NULL);
 
     // reset the group contact cache since smart groups might be affected due to this
     CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
@@ -2027,6 +2005,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
     // This query retrieves ALL memberships of active types.
     // Note: id, is_test, campaign_id expected by CRM_Activity_BAO_Activity::addActivity()
     //   called by createChangeMembershipStatusActivity().
+    // max_related expected by createMembershipLog().
     $baseQuery = "
 SELECT     civicrm_membership.id                    as membership_id,
            civicrm_membership.id                    as id,
@@ -2040,6 +2019,7 @@ SELECT     civicrm_membership.id                    as membership_id,
            civicrm_membership.start_date            as start_date,
            civicrm_membership.end_date              as end_date,
            civicrm_membership.source                as source,
+           civicrm_membership.max_related           as max_related,
            civicrm_contact.id                       as contact_id,
            civicrm_membership.owner_membership_id   as owner_membership_id,
            civicrm_membership.contribution_recur_id as recur_id
@@ -2087,6 +2067,8 @@ WHERE {$whereClause}";
         $allStatusLabels = CRM_Member_BAO_Membership::buildOptions('status_id', 'get');
         $changedByContactID = CRM_Core_Session::getLoggedInContactID() ?? $dao2->contact_id;
         self::createChangeMembershipStatusActivity($dao2, $allStatusLabels[$dao2->status_id], $allStatusLabels[$newStatusId], $changedByContactID);
+        $dao2->status_id = $newStatusId;
+        self::createMembershipLog($dao2);
         $updateCount++;
       }
     }
@@ -2569,6 +2551,49 @@ WHERE {$whereClause}";
         'priority_id' => 'Normal',
       ]
     );
+  }
+
+  /**
+   *  Create the MembershipLog record.
+   *  This was embedded deep in the ::add() function.
+   *  Extracted here to it's own function so we have a single place to create it.
+   *
+   * @param CRM_Core_DAO $membership
+   * @param string $logStartDate
+   * @param ?int $membershipTypeID
+   * @param ?int $modifiedContactID
+   *
+   * @return array
+   *
+   * @internal Signature may change
+   */
+  private static function createMembershipLog($membership, string $logStartDate = '', ?int $membershipTypeID = NULL, ?int $modifiedContactID = NULL): array {
+    if (empty($logStartDate)) {
+      $logStartDate = CRM_Utils_Date::isoToMysql($membership->start_date);
+    }
+    $membershipLog = [
+      'membership_id' => $membership->id,
+      'status_id' => $membership->status_id,
+      'start_date' => $logStartDate,
+      'end_date' => CRM_Utils_Date::isoToMysql($membership->end_date),
+      'modified_date' => CRM_Utils_Time::date('Ymd'),
+      'membership_type_id' => $membershipTypeID ?? $membership->membership_type_id,
+      'max_related' => $membership->max_related,
+    ];
+
+    if (!empty($modifiedContactID)) {
+      $membershipLog['modified_id'] = $modifiedContactID;
+    }
+    // If we have an authenticated session, set modified_id to that user's contact_id, else set to membership.contact_id
+    elseif (CRM_Core_Session::getLoggedInContactID()) {
+      $membershipLog['modified_id'] = CRM_Core_Session::getLoggedInContactID();
+    }
+    else {
+      $membershipLog['modified_id'] = $membership->contact_id;
+    }
+    // @todo maybe move this to an API4 call, or writeRecord()
+    CRM_Member_BAO_MembershipLog::add($membershipLog);
+    return $membershipLog;
   }
 
 }
