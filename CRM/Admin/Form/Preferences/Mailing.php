@@ -37,6 +37,7 @@ class CRM_Admin_Form_Preferences_Mailing extends CRM_Admin_Form_Preferences {
     'url_tracking_default' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
     'open_tracking_default' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
     'scheduled_reminder_smarty' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
+    'smtp_450_is_permanent' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
   ];
 
   public function postProcess() {
