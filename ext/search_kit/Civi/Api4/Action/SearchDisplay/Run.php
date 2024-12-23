@@ -52,7 +52,7 @@ class Run extends AbstractRunAction {
     $pagerMode = 'page';
 
     $this->preprocessLinks();
-    $this->augmentSelectClause($apiParams, $settings);
+    $this->augmentSelectClause($apiParams);
     $this->applyFilters();
 
     switch ($this->return) {
@@ -70,62 +70,7 @@ class Run extends AbstractRunAction {
         break;
 
       case 'tally':
-        unset($apiParams['orderBy'], $apiParams['limit']);
-        $api = Request::create($entityName, 'get', $apiParams);
-        $api->setDefaultWhereClause();
-        $queryObject = new Api4SelectQuery($api);
-        $queryObject->forceSelectId = FALSE;
-        $sql = $queryObject->getSql();
-        $select = [];
-        foreach ($settings['columns'] as $col) {
-          $key = str_replace(':', '_', $col['key'] ?? '');
-          if (!empty($col['tally']['fn']) && \CRM_Utils_Rule::mysqlColumnNameOrAlias($key)) {
-            /* @var \Civi\Api4\Query\SqlFunction $sqlFnClass */
-            $sqlFnClass = '\Civi\Api4\Query\SqlFunction' . $col['tally']['fn'];
-            $fnArgs = ["`$key`"];
-            // Add default args (e.g. `GROUP_CONCAT(SEPARATOR)`)
-            foreach ($sqlFnClass::getParams() as $param) {
-              $name = $param['name'] ?? '';
-              if (!empty($param['api_default']['expr'])) {
-                $fnArgs[] = $name . ' ' . implode(' ', $param['api_default']['expr']);
-              }
-              // Feed field as order by
-              elseif ($name === 'ORDER BY') {
-                $fnArgs[] = "ORDER BY `$key`";
-              }
-            }
-            $select[] = $sqlFnClass::renderExpression(implode(' ', $fnArgs)) . " `$key`";
-          }
-        }
-        $query = 'SELECT ' . implode(', ', $select) . ' FROM (' . $sql . ') `api_query`';
-        $dao = \CRM_Core_DAO::executeQuery($query);
-        $dao->fetch();
-        $tally = [];
-        foreach ($settings['columns'] as $col) {
-          if (!empty($col['tally']['fn']) && !empty($col['key'])) {
-            $key = $col['key'];
-            $rawKey = str_replace(['.', ':'], '_', $key);
-            $tally[$key] = $dao->$rawKey ?? '';
-            // Format value according to data type of function/field
-            if (strlen($tally[$key])) {
-              $sqlExpression = SqlExpression::convert($col['tally']['fn'] . "($key)");
-              $selectExpression = $this->getSelectExpression($key);
-              $fieldName = $selectExpression['expr']->getFields()[0] ?? '';
-              $dataType = $selectExpression['dataType'] ?? NULL;
-              $sqlExpression->formatOutputValue($dataType, $tally, $key);
-              $field = $queryObject->getField($fieldName);
-              // Expand pseudoconstant list
-              if ($sqlExpression->supportsExpansion && $field && strpos($fieldName, ':')) {
-                $fieldOptions = FormattingUtil::getPseudoconstantList($field, $fieldName);
-                $tally[$key] = FormattingUtil::replacePseudoconstant($fieldOptions, $tally[$key]);
-              }
-              else {
-                $tally[$key] = $this->formatViewValue($key, $tally[$key], $tally, $dataType, $col['format'] ?? NULL);
-              }
-            }
-          }
-        }
-        $result[] = $tally;
+        $result[] = $this->getTally();
         return;
 
       default:
@@ -170,6 +115,78 @@ class Run extends AbstractRunAction {
       $result->exchangeArray($this->formatResult($apiResult));
       $result->labels = $this->filterLabels;
     }
+  }
+
+  /**
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  private function getTally(): array {
+    $apiParams = $this->_apiParams;
+    unset($apiParams['orderBy'], $apiParams['limit']);
+    $api = Request::create($this->savedSearch['api_entity'], 'get', $apiParams);
+    $api->setDefaultWhereClause();
+    $queryObject = new Api4SelectQuery($api);
+    $queryObject->forceSelectId = FALSE;
+    $sql = $queryObject->getSql();
+    $select = [];
+    $columns = $this->display['settings']['columns'];
+    foreach ($columns as $col) {
+      $key = str_replace(':', '_', $col['key'] ?? '');
+      if (!empty($col['tally']['fn']) && \CRM_Utils_Rule::mysqlColumnNameOrAlias($key)) {
+        /* @var \Civi\Api4\Query\SqlFunction $sqlFnClass */
+        $sqlFnClass = '\Civi\Api4\Query\SqlFunction' . $col['tally']['fn'];
+        $fnArgs = ["`$key`"];
+        // Add default args (e.g. `GROUP_CONCAT(SEPARATOR)`)
+        foreach ($sqlFnClass::getParams() as $param) {
+          $name = $param['name'] ?? '';
+          if (!empty($param['api_default']['expr'])) {
+            $fnArgs[] = $name . ' ' . implode(' ', $param['api_default']['expr']);
+          }
+          // Feed field as order by
+          elseif ($name === 'ORDER BY') {
+            $fnArgs[] = "ORDER BY `$key`";
+          }
+        }
+        $select[] = $sqlFnClass::renderExpression(implode(' ', $fnArgs)) . " `$key`";
+      }
+    }
+    $query = 'SELECT ' . implode(', ', $select) . ' FROM (' . $sql . ') `api_query`';
+    $dao = \CRM_Core_DAO::executeQuery($query);
+    $dao->fetch();
+    $tally = [];
+    foreach ($columns as $col) {
+      if (!empty($col['tally']['fn']) && !empty($col['key'])) {
+        $key = $col['key'];
+        $rawKey = str_replace(['.', ':'], '_', $key);
+        $tally[$key] = $dao->$rawKey ?? '';
+        // Format value according to data type of function/field
+        if (strlen($tally[$key])) {
+          $sqlExpression = SqlExpression::convert($col['tally']['fn'] . "($key)");
+          $selectExpression = $this->getSelectExpression($key);
+          $fieldName = $selectExpression['expr']->getFields()[0] ?? '';
+          $dataType = $selectExpression['dataType'] ?? NULL;
+          $sqlExpression->formatOutputValue($dataType, $tally, $key);
+          $field = $queryObject->getField($fieldName);
+          // Expand pseudoconstant list
+          if ($sqlExpression->supportsExpansion && $field && strpos($fieldName, ':')) {
+            $fieldOptions = FormattingUtil::getPseudoconstantList($field, $fieldName);
+            $tally[$key] = FormattingUtil::replacePseudoconstant($fieldOptions, $tally[$key]);
+          }
+          else {
+            $tally[$key] = $this->formatViewValue($key, $tally[$key], $tally, $dataType, $col['format'] ?? NULL);
+          }
+        }
+      }
+    }
+    $data = $tally;
+    // Handle any rewrite tokens
+    foreach ($columns as $col) {
+      if (!empty($col['tally']['rewrite'])) {
+        $tally[$key] = $this->rewrite($col['tally']['rewrite'], $data, 'raw');
+      }
+    }
+    return $tally;
   }
 
   /**

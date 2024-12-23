@@ -5,6 +5,8 @@
     bindings: {
       model: '<',
       field: '@',
+      // If true, limit options to only what's in the select clause
+      onlySelect: '<?',
       suffix: '@'
     },
     require: {
@@ -27,7 +29,10 @@
       };
 
       this.getTokens = function() {
-        var allFields = ctrl.admin.getAllFields(ctrl.suffix || '', ['Field', 'Custom', 'Extra', 'Pseudo']);
+        let allFields = [];
+        if (!ctrl.onlySelect) {
+          allFields = ctrl.admin.getAllFields(ctrl.suffix || '', ['Field', 'Custom', 'Extra', 'Pseudo']);
+        }
         return {
           results: ctrl.admin.getSelectFields().concat(allFields)
         };

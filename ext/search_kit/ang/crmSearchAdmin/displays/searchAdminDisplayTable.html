@@ -98,6 +98,12 @@
           <input class="form-control" ng-model="col.tally.label" placeholder="{{:: ts('None') }}">
           <label>{{:: ts('Footer Aggregate') }}</label>
           <input class="form-control" ng-model="col.tally.fn" crm-ui-select="{data: $ctrl.getTallyFunctions, placeholder: ts('None'), allowClear: true}">
+          <label>
+            <input type="checkbox" ng-click="$ctrl.toggleTallyRewrite(col)" ng-checked="!!col.tally.rewrite">
+            {{:: ts('Footer Rewrite') }}
+          </label>
+          <input class="form-control" ng-if="col.tally.rewrite" ng-model="col.tally.rewrite" placeholder="{{:: ts('None') }}" title="{{:: ts('Footer Rewrite') }}" ng-model-options="{updateOn: 'blur'}">
+          <crm-search-admin-token-select ng-if="col.tally.rewrite" model="col.tally" field="rewrite" only-select="true"></crm-search-admin-token-select>
         </div>
       </details>
     </fieldset>

@@ -1856,6 +1856,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
             'sortable' => TRUE,
             'tally' => [
               'fn' => 'GROUP_FIRST',
+              'rewrite' => '[GROUP_FIRST_financial_type_id_label], Innit',
             ],
           ],
         ],
@@ -1880,7 +1881,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(['A, A', 'B, B', 'C, C'], $tally['GROUP_CONCAT_contact_id_sort_name']);
     $this->assertSame('$1,000.00', $tally['SUM_total_amount']);
     $this->assertSame('02/02/2021', $tally['GROUP_FIRST_receive_date']);
-    $this->assertSame('Donation', $tally['GROUP_FIRST_financial_type_id_label']);
+    $this->assertSame('Donation, Innit', $tally['GROUP_FIRST_financial_type_id_label']);
   }
 
   public function testContributionTotalCountWithTestAndTemplateContributions():void {

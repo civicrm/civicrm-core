@@ -86,6 +86,14 @@
         return {results: formatForSelect2(allowedFunctions, 'name', 'title', ['description'])};
       };
 
+      this.toggleTallyRewrite = function(col) {
+        if (col.tally.rewrite) {
+          delete col.tally.rewrite;
+        } else {
+          col.tally.rewrite = '[' + col.key + ']';
+        }
+      };
+
     }
   });
 

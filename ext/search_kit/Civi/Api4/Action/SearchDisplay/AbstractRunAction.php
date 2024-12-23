@@ -247,7 +247,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
           $out['val'] = $this->replaceTokens($column['empty_value'], $data, 'view');
         }
         elseif ($column['rewrite']) {
-          $out['val'] = $this->rewrite($column, $data);
+          $out['val'] = $this->rewrite($column['rewrite'], $data);
         }
         else {
           $dataType = $this->getSelectExpression($key)['dataType'] ?? NULL;
@@ -332,14 +332,15 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   /**
    * Rewrite field value, subtituting tokens and evaluating smarty tags
    *
-   * @param array $column
+   * @param string $rewrite
    * @param array $data
+   * @param string $format view|raw|url
    * @return string
    */
-  private function rewrite(array $column, array $data): string {
+  protected function rewrite(string $rewrite, array $data, string $format = 'view'): string {
     // Cheap strpos to skip Smarty processing if not needed
-    $hasSmarty = strpos($column['rewrite'], '{') !== FALSE;
-    $output = $this->replaceTokens($column['rewrite'], $data, 'view');
+    $hasSmarty = strpos($rewrite, '{') !== FALSE;
+    $output = $this->replaceTokens($rewrite, $data, $format);
     if ($hasSmarty) {
       $vars = [];
       $nestedIds = [];
