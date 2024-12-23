@@ -708,6 +708,8 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     $params['end_event'] = 'end_date';
     $params['is_current_member'] = 1;
     $params['is_active'] = 1;
+    // Make sure weight is after existing statuses (could be cleverer and get max(weight) first).
+    $params['weight'] = 100;
 
     $result = $this->callAPISuccess('MembershipStatus', 'Create', $params);
     CRM_Member_PseudoConstant::flush('membershipStatus');

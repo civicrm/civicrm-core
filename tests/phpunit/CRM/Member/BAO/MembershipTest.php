@@ -9,6 +9,9 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\MembershipLog;
+use Civi\Api4\MembershipStatus;
+
 /**
  * Class CRM_Member_BAO_MembershipTest
  * @group headless
@@ -600,6 +603,19 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
     $this->assertEquals($createdMembershipID, $membershipAfterProcess['id']);
     $this->assertArrayNotHasKey('status_override_end_date', $membershipAfterProcess);
+
+    // Check that MembershipLog was created and is correct
+    $latestMembershipLog = MembershipLog::get(FALSE)
+      ->addWhere('membership_id', '=', $createdMembershipID)
+      ->addOrderBy('id', 'DESC')
+      ->execute()
+      ->first();
+    $newMembershipStatus = MembershipStatus::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('name', '=', 'New')
+      ->execute()
+      ->first();
+    $this->assertEquals($newMembershipStatus['id'], $latestMembershipLog['status_id']);
   }
 
   /**
@@ -630,6 +646,19 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
     $this->assertEquals($createdMembershipID, $membershipAfterProcess['id']);
     $this->assertArrayNotHasKey('status_override_end_date', $membershipAfterProcess);
+
+    // Check that MembershipLog was created and is correct
+    $latestMembershipLog = MembershipLog::get(FALSE)
+      ->addWhere('membership_id', '=', $createdMembershipID)
+      ->addOrderBy('id', 'DESC')
+      ->execute()
+      ->first();
+    $newMembershipStatus = MembershipStatus::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('name', '=', 'New')
+      ->execute()
+      ->first();
+    $this->assertEquals($newMembershipStatus['id'], $latestMembershipLog['status_id']);
   }
 
   /**
@@ -659,6 +688,14 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
     $this->assertEquals($createdMembershipID, $membershipAfterProcess['id']);
     $this->assertEquals(1, $membershipAfterProcess['is_override']);
+
+    // Check that MembershipLog was created and is correct
+    $latestMembershipLog = MembershipLog::get(FALSE)
+      ->addWhere('membership_id', '=', $createdMembershipID)
+      ->addOrderBy('id', 'DESC')
+      ->execute()
+      ->first();
+    $this->assertEquals($this->_membershipStatusID, $latestMembershipLog['status_id']);
   }
 
   /**
