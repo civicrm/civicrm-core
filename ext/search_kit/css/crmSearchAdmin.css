@@ -298,6 +298,11 @@
   text-align: left;
 }
 
+search-admin-placeholder-config,
+search-admin-css-rules,
+search-admin-tasks-config,
+search-admin-toolbar-config,
+search-admin-pager-config,
 crm-search-admin-export,
 crm-search-admin-import {
   display: block;
@@ -317,4 +322,8 @@ crm-search-admin-import {
 
 #bootstrap-theme .crm-search-admin-edit-columns details summary {
   font-size: inherit;
+}
+
+#bootstrap-theme .crm-search-admin-outer details summary ~ * {
+  margin-left: 1rem;
 }
