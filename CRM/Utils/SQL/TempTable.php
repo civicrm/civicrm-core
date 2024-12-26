@@ -1,4 +1,5 @@
 <?php
+
 /*
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC. All rights reserved.                        |
@@ -46,7 +47,6 @@
  * Example 5: Auto-drop a temp table when $tmpTbl falls out of scope
  *
  * $tmpTbl->setAutodrop();
- *
  */
 class CRM_Utils_SQL_TempTable {
 
@@ -60,7 +60,7 @@ class CRM_Utils_SQL_TempTable {
 
   const CATEGORY_LENGTH = 12;
   const CATEGORY_REGEXP = ';^[a-zA-Z0-9]+$;';
-  // MAX{64} - CATEGORY_LENGTH{12} - CONST_LENGHTH{15} = 37
+  // MAX{64} - CATEGORY_LENGTH{12} - CONST_LENGHTH{15} = 37.
   const ID_LENGTH = 37;
   const ID_REGEXP = ';^[a-zA-Z0-9_]+$;';
   const INNODB = 'ENGINE=InnoDB';
@@ -101,6 +101,9 @@ class CRM_Utils_SQL_TempTable {
     return $t;
   }
 
+  /**
+   * Destruct function.
+   */
   public function __destruct() {
     if ($this->autodrop) {
       $this->drop();
@@ -125,6 +128,7 @@ class CRM_Utils_SQL_TempTable {
    * Create the table using results from a SELECT query.
    *
    * @param string|CRM_Utils_SQL_Select $selectQuery
+   *
    * @return CRM_Utils_SQL_TempTable
    */
   public function createWithQuery($selectQuery) {
@@ -160,6 +164,7 @@ class CRM_Utils_SQL_TempTable {
    * @param string $columns
    *   SQL column listing.
    *   Ex: 'id int(10), name varchar(64)'.
+   *
    * @return CRM_Utils_SQL_TempTable
    */
   public function createWithColumns($columns) {
@@ -172,7 +177,8 @@ class CRM_Utils_SQL_TempTable {
         $this->getUtf8String()
       );
       CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, TRUE, FALSE);
-    } catch (Exception $e) {
+    }
+    catch (Exception $e) {
       $sql = sprintf(
         '%s (%s) %s %s',
         $this->toSQL('CREATE'),
@@ -199,12 +205,12 @@ class CRM_Utils_SQL_TempTable {
 
   /**
    * @param string $action
-   *   Ex: 'CREATE', 'DROP'
+   *   Ex: 'CREATE', 'DROP'.
    * @param string|null $ifne
    *   Ex: 'IF EXISTS', 'IF NOT EXISTS'.
    * @return string
-   *   Ex: 'CREATE TEMPORARY TABLE `civicrm_tmp_e_foo_abcd1234`'
-   *   Ex: 'CREATE TABLE IF NOT EXISTS `civicrm_tmp_d_foo_abcd1234`'
+   *   Ex: 'CREATE TEMPORARY TABLE `civicrm_tmp_e_foo_abcd1234`'.
+   *   Ex: 'CREATE TABLE IF NOT EXISTS `civicrm_tmp_d_foo_abcd1234`'.
    */
   private function toSQL($action, $ifne = NULL) {
     $parts = [];
@@ -221,21 +227,21 @@ class CRM_Utils_SQL_TempTable {
   }
 
   /**
-   * @return string|NULL
+   * @return string|null
    */
   public function getCategory() {
     return $this->category;
   }
 
   /**
-   * @return string|NULL
+   * @return string|null
    */
   public function getId() {
     return $this->id;
   }
 
   /**
-   * @return string|NULL
+   * @return string|null
    */
   public function getCreateSql() {
     return $this->createSql;
@@ -308,7 +314,7 @@ class CRM_Utils_SQL_TempTable {
   }
 
   /**
-   * Setter for id
+   * Setter for id.
    *
    * @param mixed $id
    *
@@ -335,7 +341,8 @@ class CRM_Utils_SQL_TempTable {
       try {
         CRM_Core_DAO::executeQuery("CREATE TABLE `$tablename` (`id` integer) " . self::MEMORY, [], TRUE, NULL, TRUE, FALSE);
         CRM_Core_DAO::executeQuery("DROP TABLE `$tablename`", [], TRUE, NULL, TRUE, FALSE);
-      } catch (\Exception $e) {
+      }
+      catch (\Exception $e) {
         $value = FALSE;
       }
     }
