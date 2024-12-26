@@ -128,25 +128,14 @@ class CRM_Utils_SQL_TempTable {
    * @return CRM_Utils_SQL_TempTable
    */
   public function createWithQuery($selectQuery) {
-    try {
-      $sql = sprintf(
-        '%s %s %s AS %s',
-        $this->toSQL('CREATE'),
-        $this->memory = self::MEMORY,
-        $this->getUtf8String(),
-        ($selectQuery instanceof CRM_Utils_SQL_Select ? $selectQuery->toSQL() : $selectQuery)
-      );
-      CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, TRUE, FALSE);
-    } catch (Exception $e) {
-      $sql = sprintf(
-        '%s %s %s AS %s',
-        $this->toSQL('CREATE'),
-        $this->memory = self::INNODB,
-        $this->getUtf8String(),
-        ($selectQuery instanceof CRM_Utils_SQL_Select ? $selectQuery->toSQL() : $selectQuery)
-      );
-      CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, TRUE, FALSE);
-    }
+    $sql = sprintf(
+      '%s %s %s AS %s',
+      $this->toSQL('CREATE'),
+      $this->memory ? self::MEMORY : self::INNODB,
+      $this->getUtf8String(),
+      ($selectQuery instanceof CRM_Utils_SQL_Select ? $selectQuery->toSQL() : $selectQuery)
+    );
+    CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, TRUE, FALSE);
     $this->createSql = $sql;
     return $this;
   }
@@ -341,6 +330,15 @@ class CRM_Utils_SQL_TempTable {
    * @return $this
    */
   public function setMemory($value = TRUE) {
+    if ($value) {
+      $tablename = 'civicrm_testing_memory_' . $this->id;
+      try {
+        CRM_Core_DAO::executeQuery("CREATE TABLE `$tablename` (`id` integer) " . self::MEMORY, [], TRUE, NULL, TRUE, FALSE);
+        CRM_Core_DAO::executeQuery("DROP TABLE `$tablename`", [], TRUE, NULL, TRUE, FALSE);
+      } catch (\Exception $e) {
+        $value = FALSE;
+      }
+    }
     $this->memory = $value;
     return $this;
   }
