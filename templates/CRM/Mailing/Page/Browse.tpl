@@ -28,8 +28,6 @@
 
 {if $rows}
     {include file="CRM/common/pager.tpl" location="top"}
-    {include file="CRM/common/pagerAToZ.tpl"}
-
     {strip}
     <table class="selector row-highlight">
       <thead class="sticky">
@@ -75,7 +73,7 @@
       {/foreach}
     </table>
     {/strip}
-
+    {include file="CRM/common/pagerAToZ.tpl"}
     {include file="CRM/common/pager.tpl" location="bottom"}
     {if $showLinks}
       <div class="action-link">

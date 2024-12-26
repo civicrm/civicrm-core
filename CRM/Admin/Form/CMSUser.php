@@ -26,6 +26,15 @@ class CRM_Admin_Form_CMSUser extends CRM_Core_Form {
   public $submitOnce = TRUE;
 
   /**
+   * Disable on Standalone
+   */
+  public function preProcess() {
+    if (!\CRM_Utils_System::allowSynchronizeUsers()) {
+      \CRM_Core_Error::statusBounce(ts('This framework doesn\'t allow for syncing CMS users.'));
+    }
+  }
+
+  /**
    * Build the form object.
    */
   public function buildQuickForm() {
@@ -47,7 +56,7 @@ class CRM_Admin_Form_CMSUser extends CRM_Core_Form {
    * Process the form submission.
    */
   public function postProcess() {
-    $result = CRM_Utils_System::synchronizeUsers();
+    $result = CRM_Utils_System::synchronizeUsersIfAllowed();
 
     $status = ts('Checked one user record.',
         [

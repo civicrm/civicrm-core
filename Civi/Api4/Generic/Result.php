@@ -107,6 +107,8 @@ class Result extends \ArrayObject implements \JsonSerializable {
    *
    * Drops any item from the results that does not contain the specified key
    *
+   * Unlike $this->rekey, this rewrites the row keys not the column keys.
+   *
    * @param string $key
    * @return $this
    * @throws \CRM_Core_Exception
@@ -156,7 +158,7 @@ class Result extends \ArrayObject implements \JsonSerializable {
    *
    * @return int
    */
-  public function countFetched() :int {
+  public function countFetched(): int {
     return parent::count();
   }
 
@@ -165,7 +167,7 @@ class Result extends \ArrayObject implements \JsonSerializable {
    *
    * @return int
    */
-  public function countMatched() :int {
+  public function countMatched(): int {
     if (!isset($this->matchedCount)) {
       throw new \CRM_Core_Exception("countMatched can only be used if there was no limit set or if row_count was included in the select fields.");
     }
@@ -187,18 +189,36 @@ class Result extends \ArrayObject implements \JsonSerializable {
   /**
    * Reduce each result to one field
    *
-   * @param $name
+   * @param string $columnName
+   * @param string|null $indexBy
    * @return array
    */
-  public function column($name) {
-    return array_column($this->getArrayCopy(), $name, $this->indexedBy);
+  public function column($columnName, $indexBy = NULL): array {
+    return array_column($this->getArrayCopy(), $columnName, $indexBy ?? $this->indexedBy);
+  }
+
+  /**
+   * Rewrite keys in each result according to a map or a callback function.
+   *
+   * Unlike $this->indexBy, this rewrites the column keys not the row keys.
+   *
+   * @param array|callable $map
+   *   Map of keys to convert e.g. `[old_key => new_key]`
+   *   Or a callback function like `fn($key, $value) => $newKey`
+   * @return $this
+   */
+  public function rekey($map) {
+    $callback = is_callable($map) ? $map : fn($key) => $map[$key] ?? $key;
+    foreach ($this as &$items) {
+      $items = \CRM_Utils_Array::rekey($items, $callback);
+    }
+    return $this;
   }
 
   /**
    * @return array
    */
-  #[\ReturnTypeWillChange]
-  public function jsonSerialize() {
+  public function jsonSerialize(): array {
     return $this->getArrayCopy();
   }
 

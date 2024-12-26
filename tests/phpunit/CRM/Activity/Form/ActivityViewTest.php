@@ -6,6 +6,13 @@
 class CRM_Activity_Form_ActivityViewTest extends CiviUnitTestCase {
 
   /**
+   * API version in use.
+   *
+   * @var int
+   */
+  protected $_apiversion = 4;
+
+  /**
    * @var int
    */
   protected $source_contact_id;
@@ -63,14 +70,13 @@ class CRM_Activity_Form_ActivityViewTest extends CiviUnitTestCase {
    * Test that the smarty template for ActivityView contains what we expect
    * after preProcess().
    *
-   * @throws \CRM_Core_Exception
    */
   public function testActivityViewPreProcess(): void {
     // create activity
     $activity = $this->activityCreate();
 
     // $activity doesn't contain everything we need, so do another get call
-    $activityMoreInfo = $this->callAPISuccess('activity', 'getsingle', ['id' => $activity['id']]);
+    $activityMoreInfo = $this->callAPISuccess('Activity', 'getsingle', ['id' => $activity['id'], 'version' => 3]);
 
     // do preProcess
     $activityViewForm = new CRM_Activity_Form_ActivityView();
@@ -82,13 +88,13 @@ class CRM_Activity_Form_ActivityViewTest extends CiviUnitTestCase {
 
     // check one of the smarty template vars
     // not checking EVERYTHING
-    $templateVar = CRM_Activity_Form_ActivityView::getTemplate()->get_template_vars('values');
+    $templateVar = CRM_Activity_Form_ActivityView::getTemplate()->getTemplateVars('values');
     $expected = [
       'assignee_contact' => [0 => $activity['target_contact_id']],
       // it's always Julia
-      'assignee_contact_value' => 'Anderson, Julia',
+      'assignee_contact_value' => 'Anderson, Julia II',
       'target_contact' => [0 => $activity['target_contact_id']],
-      'target_contact_value' => 'Anderson, Julia',
+      'target_contact_value' => 'Anderson, Julia II',
       'source_contact' => $activityMoreInfo['source_contact_sort_name'],
       'case_subject' => NULL,
       'id' => $activity['id'],

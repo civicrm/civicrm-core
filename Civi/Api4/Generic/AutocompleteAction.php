@@ -36,6 +36,7 @@ use Civi\Core\Event\GenericHookEvent;
  */
 class AutocompleteAction extends AbstractAction {
   use Traits\SavedSearchInspectorTrait;
+  use Traits\GetSetValueTrait;
 
   /**
    * Autocomplete search input for search mode
@@ -89,6 +90,17 @@ class AutocompleteAction extends AbstractAction {
   protected $key;
 
   /**
+   * Known entity values.
+   *
+   * Value will be populated by the form based on data entered at the time.
+   * They can be used by hooks for contextual filtering.
+   *
+   * Format: [fieldName => value][]
+   * @var array
+   */
+  protected $values = [];
+
+  /**
    * Search conditions that will be automatically added to the WHERE or HAVING clauses
    *
    * Format: [fieldName => value][]
@@ -127,6 +139,7 @@ class AutocompleteAction extends AbstractAction {
         'savedSearch' => &$this->savedSearch,
         'formName' => $this->formName,
         'fieldName' => $this->fieldName,
+        'filters' => $this->filters,
       ]));
     }
     $this->loadSavedSearch();
@@ -169,12 +182,14 @@ class AutocompleteAction extends AbstractAction {
       // For subsequent pages when searching by id, subtract the "extra" first page
       elseif ($searchById && $this->page > 1) {
         $this->page -= 1;
+        // Record with that id was already returned on page one so exclude it from subsequent pages
+        $this->savedSearch['api_params']['where'][] = [$primaryKeys[0], '!=', $this->input];
       }
       // If first line uses a rewrite, search on those fields too
       if (!$initialSearchById && !empty($this->display['settings']['columns'][0]['rewrite'])) {
         $searchFields = array_merge($searchFields, $this->getTokens($this->display['settings']['columns'][0]['rewrite']));
       }
-      $this->display['settings']['limit'] = $this->display['settings']['limit'] ?? \Civi::settings()->get('search_autocomplete_count');
+      $this->display['settings']['limit'] ??= \Civi::settings()->get('search_autocomplete_count');
       $this->display['settings']['pager'] = [];
       $return = 'scroll:' . $this->page;
       // SearchKit treats comma-separated fieldnames as OR clauses

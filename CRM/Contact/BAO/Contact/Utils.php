@@ -88,7 +88,7 @@ class CRM_Contact_BAO_Contact_Utils {
         "reset=1&gid={$summaryOverlayProfileId}&id={$contactId}&snippet=4&is_show_email_task=1"
       );
 
-      $imageInfo['summary-link'] = '<a href="' . $contactURL . '" data-tooltip-url="' . $profileURL . '" class="crm-summary-link">' . $imageInfo['image'] . '</a>';
+      $imageInfo['summary-link'] = '<a href="' . $contactURL . '" data-tooltip-url="' . $profileURL . '" class="crm-summary-link" aria-labelledby="crm-contactname-content">' . $imageInfo['image'] . '</a>';
     }
     else {
       $imageInfo['summary-link'] = $imageInfo['image'];
@@ -161,10 +161,15 @@ WHERE  id IN ( $idString )
     }
 
     if (!$hash) {
-      $hash = md5(uniqid(rand(), TRUE));
-      if ($hashSize) {
-        $hash = substr($hash, 0, $hashSize);
-      }
+      // Ensure we cannot generate numeric hashes
+      // to avoid breaking things elsewhere
+      // See lab issue #5541
+      do {
+        $hash = md5(uniqid(rand(), TRUE));
+        if ($hashSize) {
+          $hash = substr($hash, 0, $hashSize);
+        }
+      } while (is_numeric($hash));
 
       if ($entityType == 'contact') {
         CRM_Core_DAO::setFieldValue('CRM_Contact_DAO_Contact',
@@ -467,9 +472,12 @@ WHERE id={$contactId}; ";
    * @param string $title
    *   fieldset title.
    *
+   * @deprecated since 5.74 will be removed around 5.80
+   *
    * @throws \CRM_Core_Exception
    */
   public static function buildOnBehalfForm(&$form, $contactType, $countryID, $stateID, $title) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     $form->assign('contact_type', $contactType);
     $form->assign('fieldSetTitle', $title);
     $form->assign('contactEditMode', TRUE);
@@ -491,7 +499,7 @@ WHERE id={$contactId}; ";
       default:
         // individual
         $form->addElement('select', 'prefix_id', ts('Prefix'),
-          ['' => ts('- prefix -')] + CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id')
+          ['' => ts('- prefix -')] + CRM_Contact_DAO_Contact::buildOptions('prefix_id')
         );
         $form->addElement('text', 'first_name', ts('First Name'),
           $attributes['first_name']
@@ -503,7 +511,7 @@ WHERE id={$contactId}; ";
           $attributes['last_name']
         );
         $form->addElement('select', 'suffix_id', ts('Suffix'),
-          ['' => ts('- suffix -')] + CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id')
+          ['' => ts('- suffix -')] + CRM_Contact_DAO_Contact::buildOptions('suffix_id')
         );
     }
 
@@ -584,10 +592,7 @@ UPDATE civicrm_contact
       }
 
       // check permission on acl basis.
-      if (in_array($task, [
-        'view',
-        'edit',
-      ])) {
+      if (in_array($task, ['view', 'edit'])) {
         $aclPermission = CRM_Core_Permission::VIEW;
         if ($task == 'edit') {
           $aclPermission = CRM_Core_Permission::EDIT;
@@ -863,7 +868,7 @@ INNER JOIN civicrm_contact contact_target ON ( contact_target.id = act.contact_i
    * @return array
    *   associated array of contact names
    */
-  public static function getAddressShareContactNames(&$addresses) {
+  public static function getAddressShareContactNames($addresses) {
     $contactNames = [];
     // get the list of master id's for address
     $masterAddressIds = [];
@@ -944,14 +949,6 @@ INNER JOIN civicrm_contact contact_target ON ( contact_target.id = act.contact_i
     $originalGreetingString = $greetingString = $allGreetings[$valueID] ?? NULL;
     if (!$greetingString) {
       throw new CRM_Core_Exception(ts('Incorrect greeting value id %1, or no default greeting for this contact type and greeting type.', [1 => $valueID]));
-    }
-
-    // build return properties based on tokens
-    $greetingTokens = CRM_Utils_Token::getTokens($greetingString);
-    $tokens = $greetingTokens['contact'] ?? NULL;
-    $greetingsReturnProperties = [];
-    if (is_array($tokens)) {
-      $greetingsReturnProperties = array_fill_keys(array_values($tokens), 1);
     }
 
     // Process ALL contacts only when force=1 or force=2 is passed. Else only contacts with NULL greeting or addressee value are updated.
@@ -1119,35 +1116,6 @@ WHERE id IN (" . implode(',', $contactIds) . ")";
     $allTokens = array_merge_recursive($tokens['addressee'], $tokens['email_greeting'], $tokens['postal_greeting']);
     $tokens['all'] = $allTokens;
     return $tokens;
-  }
-
-  /**
-   * Process a greeting template string to produce the individualised greeting text.
-   *
-   * This works just like message templates for mailings:
-   * the template is processed with the token substitution mechanism,
-   * to supply the individual contact data;
-   * and it is also processed with Smarty,
-   * to allow for conditionals etc. based on the contact data.
-   *
-   * Note: We don't pass any variables to Smarty --
-   * all variable data is inserted into the input string
-   * by the token substitution mechanism,
-   * before Smarty is invoked.
-   *
-   * @param string $templateString
-   *   The greeting template string with contact tokens + Smarty syntax.
-   *
-   * @deprecated
-   *
-   * @param array $contactDetails
-   * @param int $contactID
-   * @param string $className
-   */
-  public static function processGreetingTemplate(&$templateString, $contactDetails, $contactID, $className) {
-    CRM_Core_Error::deprecatedFunctionWarning('no replacement');
-    CRM_Utils_Token::replaceGreetingTokens($templateString, $contactDetails, $contactID, $className, TRUE);
-    $templateString = CRM_Utils_String::parseOneOffStringThroughSmarty($templateString);
   }
 
   /**

@@ -26,6 +26,7 @@ class api_v3_MultilingualTest extends CiviUnitTestCase {
    */
   protected function setUp(): void {
     parent::setUp();
+    CRM_Core_BAO_ConfigSetting::enableAllComponents();
     $this->useTransaction(TRUE);
   }
 

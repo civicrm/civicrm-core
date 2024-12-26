@@ -36,8 +36,8 @@ class CRM_Contribute_ActionMapping_ByPage extends CRM_Contribute_ActionMapping {
     return ts('Contribution Page');
   }
 
-  public function modifySpec(\Civi\Api4\Service\Spec\RequestSpec $spec) {
-    parent::modifySpec($spec);
+  public function modifyApiSpec(\Civi\Api4\Service\Spec\RequestSpec $spec) {
+    parent::modifyApiSpec($spec);
     $spec->getFieldByName('entity_value')
       ->setLabel(ts('Contribution Page'));
   }

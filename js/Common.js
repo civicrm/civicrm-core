@@ -543,12 +543,10 @@ if (!CRM.vars) CRM.vars = {};
       return '';
     }
     let markup = '<div class="crm-entityref-links crm-entityref-quick-add">';
-    CRM.config.quickAdd.forEach((link) => {
-      if (quickAddLinks.includes(link.path)) {
-        markup += ' <a class="crm-hover-button" href="' + _.escape(CRM.url(link.path)) + '">' +
-          '<i class="crm-i ' + _.escape(link.icon) + '" aria-hidden="true"></i> ' +
-          _.escape(link.title) + '</a>';
-      }
+    quickAddLinks.forEach((link) => {
+      markup += ' <a class="crm-hover-button" href="' + _.escape(CRM.url(link.path)) + '">' +
+        '<i class="crm-i ' + _.escape(link.icon) + '" aria-hidden="true"></i> ' +
+        _.escape(link.title) + '</a>';
     });
     markup += '</div>';
     return markup;
@@ -570,6 +568,32 @@ if (!CRM.vars) CRM.vars = {};
 
   // Autocomplete based on APIv4 and Select2.
   $.fn.crmAutocomplete = function(entityName, apiParams, select2Options) {
+    function getApiParams() {
+      if (typeof apiParams === 'function') {
+        return apiParams();
+      }
+      return apiParams || {};
+    }
+    function getQuickAddLinks(paths) {
+      const links = [];
+      if (paths && paths.length) {
+        const apiParams = getApiParams();
+        paths.forEach((path) => {
+          let link = CRM.config.quickAdd.find((link) => link.path === path);
+          if (link) {
+            links.push({
+              path: path + '#?' + $.param({
+                parentFormName: apiParams.formName,
+                parentFormFieldName: apiParams.fieldName,
+              }),
+              icon: link.icon,
+              title: link.title,
+            });
+          }
+        });
+      }
+      return links;
+    }
     if (entityName === 'destroy') {
       return $(this).off('.crmEntity').crmSelect2('destroy');
     }
@@ -577,9 +601,8 @@ if (!CRM.vars) CRM.vars = {};
     return $(this).each(function() {
       const $el = $(this).off('.crmEntity');
       let staticItems = getStaticOptions(select2Options.static),
-        quickAddLinks = select2Options.quickAdd,
-        multiple = !!select2Options.multiple,
-        key = apiParams.key || 'id';
+        quickAddLinks = getQuickAddLinks(select2Options.quickAdd),
+        multiple = !!select2Options.multiple;
 
       $el.crmSelect2(_.extend({
         ajax: {
@@ -589,7 +612,7 @@ if (!CRM.vars) CRM.vars = {};
             return {params: JSON.stringify(_.assign({
               input: input,
               page: pageNum || 1
-            }, apiParams))};
+            }, getApiParams()))};
           },
           results: function(data) {
             return {
@@ -615,7 +638,7 @@ if (!CRM.vars) CRM.vars = {};
           if (!idsNeeded.length) {
             callback(multiple ? existing : existing[0]);
           } else {
-            var params = $.extend({}, apiParams || {}, {ids: idsNeeded});
+            var params = $.extend({}, getApiParams(), {ids: idsNeeded});
             CRM.api4(entityName, 'autocomplete', params).then(function (result) {
               callback(multiple ? result.concat(existing) : result[0]);
             });
@@ -663,6 +686,7 @@ if (!CRM.vars) CRM.vars = {};
               const response = data.submissionResponse && data.submissionResponse[0];
               let createdId;
               if (typeof response === 'object') {
+                let key = getApiParams().key || 'id';
                 // Loop through entities created by the afform (there should be only one)
                 Object.keys(response).forEach((entity) => {
                   if (Array.isArray(response[entity]) && response[entity][0] && response[entity][0][key]) {
@@ -1166,20 +1190,10 @@ if (!CRM.vars) CRM.vars = {};
       $('table.crm-ajax-table', e.target).each(function() {
         var
           $table = $(this),
-          script = CRM.config.resourceBase + 'js/jquery/jquery.crmAjaxTable.js',
-          $accordion = $table.closest('.crm-accordion-wrapper.collapsed, .crm-collapsible.collapsed');
-        // For tables hidden by collapsed accordions, wait.
-        if ($accordion.length) {
-          $accordion.one('crmAccordion:open', function() {
-            CRM.loadScript(script).done(function() {
-              $table.crmAjaxTable();
-            });
-          });
-        } else {
-          CRM.loadScript(script).done(function() {
-            $table.crmAjaxTable();
-          });
-        }
+          script = CRM.config.resourceBase + 'js/jquery/jquery.crmAjaxTable.js';
+        CRM.loadScript(script).done(function() {
+          $table.crmAjaxTable();
+        });
       });
       if ($("input:radio[name=radio_ts]").length == 1) {
         $("input:radio[name=radio_ts]").prop("checked", true);
@@ -1689,15 +1703,18 @@ if (!CRM.vars) CRM.vars = {};
       // Handle clear button for form elements
       .on('click', 'a.crm-clear-link', function() {
         $(this).css({visibility: 'hidden'}).siblings('.crm-form-radio:checked').prop('checked', false).trigger('change', ['crmClear']);
+        $(this).siblings('.crm-multiple-checkbox-radio-options').find('.crm-form-radio:checked').prop('checked', false).trigger('change', ['crmClear']);
         $(this).siblings('input:text').val('').trigger('change', ['crmClear']);
         return false;
       })
       .on('change keyup', 'input.crm-form-radio:checked, input[allowclear=1]', function(e, context) {
         if (context !== 'crmClear' && ($(this).is(':checked') || ($(this).is('[allowclear=1]') && $(this).val()))) {
           $(this).siblings('.crm-clear-link').css({visibility: ''});
+          $(this).closest('.crm-multiple-checkbox-radio-options').siblings('.crm-clear-link').css({visibility: ''});
         }
         if (context !== 'crmClear' && $(this).is('[allowclear=1]') && $(this).val() === '') {
           $(this).siblings('.crm-clear-link').css({visibility: 'hidden'});
+          $(this).closest('.crm-multiple-checkbox-radio-options').siblings('.crm-clear-link').css({visibility: 'hidden'});
         }
       })
 
@@ -1706,16 +1723,14 @@ if (!CRM.vars) CRM.vars = {};
         e.stopPropagation();
       })
       // Handle accordions
-      .on('click.crmAccordions', '.crm-accordion-header, .crm-collapsible .collapsible-title', function (e) {
-        var action = 'open';
+      .on('click.crmAccordions', 'div.crm-accordion-header, fieldset.crm-accordion-header, .crm-collapsible .collapsible-title', function (e) {
         if ($(this).parent().hasClass('collapsed')) {
           $(this).next().css('display', 'none').slideDown(200);
         }
         else {
           $(this).next().css('display', 'block').slideUp(200);
-          action = 'close';
         }
-        $(this).parent().toggleClass('collapsed').trigger('crmAccordion:' + action);
+        $(this).parent().toggleClass('collapsed');
         e.preventDefault();
       });
 
@@ -1724,19 +1739,23 @@ if (!CRM.vars) CRM.vars = {};
 
   /**
    * Collapse or expand an accordion
+   * @deprecated
    * @param speed
    */
   $.fn.crmAccordionToggle = function (speed) {
     $(this).each(function () {
-      var action = 'open';
+      // Backward-compat, for when this older function is used on a newer <details> element
+      if ($(this).is('details')) {
+        this.open = !this.open;
+        return;
+      }
       if ($(this).hasClass('collapsed')) {
         $('.crm-accordion-body', this).first().css('display', 'none').slideDown(speed);
       }
       else {
         $('.crm-accordion-body', this).first().css('display', 'block').slideUp(speed);
-        action = 'close';
       }
-      $(this).toggleClass('collapsed').trigger('crmAccordion:' + action);
+      $(this).toggleClass('collapsed');
     });
   };
 

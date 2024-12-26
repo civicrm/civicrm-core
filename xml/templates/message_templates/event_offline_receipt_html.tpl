@@ -13,20 +13,20 @@
 {capture assign=tdStyle}style="width: 100px;"{/capture}
 {capture assign=participantTotalStyle}style="margin: 0.5em 0 0.5em;padding: 0.5em;background-color: #999999;font-weight: bold;color: #FAFAFA;border-radius: 2px;"{/capture}
 
-<table id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left; width:100%; max-width:700px; padding:0; margin:0; border:0px;">
-
   <!-- BEGIN HEADER -->
-  <!-- You can add table row(s) here with logo or other header elements -->
+    {* To modify content in this section, you can edit the Custom Token named "Message Header". See also: https://docs.civicrm.org/user/en/latest/email/message-templates/#modifying-system-workflow-message-templates *}
+    {site.message_header}
   <!-- END HEADER -->
 
   <!-- BEGIN CONTENT -->
 
+  <table id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left; width:100%; max-width:700px; padding:0; margin:0; border:0px;">
   <tr>
    <td>
     {assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}<p>{$greeting},</p>{/if}
 
-    {if !empty($event.confirm_email_text) AND (empty($isOnWaitlist) AND empty($isRequireApproval))}
-     <p>{$event.confirm_email_text}</p>
+    {if $userText}
+     <p>{$userText}</p>
     {/if}
 
     {if !empty($isOnWaitlist)}
@@ -55,17 +55,6 @@
        {event.start_date|crmDate}{if {event.end_date|boolean}}-{if '{event.end_date|crmDate:"%Y%m%d"}' === '{event.start_date|crmDate:"%Y%m%d"}'}{event.end_date|crmDate:"Time"}{else}{event.end_date}{/if}{/if}
       </td>
      </tr>
-
-     {if "{participant.role_id:label}" neq 'Attendee'}
-      <tr>
-       <td {$labelStyle}>
-        {ts}Participant Role{/ts}
-       </td>
-       <td {$valueStyle}>
-         {participant.role_id:label}
-       </td>
-      </tr>
-     {/if}
 
      {if {event.is_show_location|boolean}}
       <tr>
@@ -404,7 +393,6 @@
               <td colspan="2" {$valueStyle}>
                 {$credit_card_type}<br/>
                 {$credit_card_number}<br/>
-                {ts}Expires{/ts}: {$credit_card_exp_date|truncate:7:''|crmDate}
               </td>
             </tr>
           {/if}

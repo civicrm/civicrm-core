@@ -22,8 +22,10 @@
  * @return string|void
  */
 function smarty_function_crmAPI($params, &$smarty) {
+  CRM_Core_Smarty_UserContentPolicy::assertTagAllowed('crmAPI');
+
   if (!array_key_exists('entity', $params)) {
-    $smarty->trigger_error("assign: missing 'entity' parameter");
+    trigger_error('crmAPI: missing &#039;entity&#039; parameter', E_USER_ERROR);
     return "crmAPI: missing 'entity' parameter";
   }
   $entity = $params['entity'];
@@ -35,7 +37,7 @@ function smarty_function_crmAPI($params, &$smarty) {
     $result = civicrm_api3($entity, $action, $params);
   }
   catch (Exception $e) {
-    $smarty->trigger_error('{crmAPI} ' . $e->getMessage());
+    trigger_error('{crmAPI} ' . htmlentities($e->getMessage()), E_USER_ERROR);
     return NULL;
   }
 

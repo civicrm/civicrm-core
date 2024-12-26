@@ -286,7 +286,10 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function clearResourceCache() {
-    _drupal_flush_css_js();
+    // Sometimes metadata gets cleared while the cms isn't bootstrapped.
+    if (function_exists('_drupal_flush_css_js')) {
+      _drupal_flush_css_js();
+    }
   }
 
   /**
@@ -505,8 +508,8 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
 
       // Config must be re-initialized to reset the base URL
       // otherwise links will have the wrong language prefix/domain.
-      $config = CRM_Core_Config::singleton();
-      $config->free();
+      $domain = \CRM_Core_BAO_Domain::getDomain();
+      \CRM_Core_BAO_ConfigSetting::applyLocale(\Civi::settings($domain->id), $domain->locales);
 
       return TRUE;
     }
@@ -572,7 +575,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
     if (!empty($action)) {
       return $action;
     }
-    return $this->url($_GET['q']);
+    return (string) Civi::url('current://' . $_GET['q']);
   }
 
   /**
@@ -792,15 +795,15 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    */
   public function getEmailFieldName(CRM_Core_Form $form, array $fields):string {
     $emailName = '';
-
-    if (!empty($form->_bltID) && array_key_exists("email-{$form->_bltID}", $fields)) {
+    $billingLocationTypeID = CRM_Core_BAO_LocationType::getBilling();
+    if (array_key_exists("email-{$billingLocationTypeID}", $fields)) {
       // this is a transaction related page
-      $emailName = 'email-' . $form->_bltID;
+      $emailName = 'email-' . $billingLocationTypeID;
     }
     else {
       // find the email field in a profile page
       foreach ($fields as $name => $dontCare) {
-        if (substr($name, 0, 5) == 'email') {
+        if (str_starts_with($name, 'email')) {
           $emailName = $name;
           break;
         }

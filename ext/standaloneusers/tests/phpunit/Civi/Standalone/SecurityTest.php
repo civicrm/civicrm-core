@@ -4,9 +4,11 @@ namespace Civi\Standalone;
 use Civi\Test\EndToEndInterface;
 use Civi\Test\TransactionalInterface;
 use Civi\Api4\User;
+use Civi\Api4\Action\User\PasswordReset;
+use Civi\Api4\Action\User\SendPasswordResetEmail;
 
 /**
- * FIXME - Add test description.
+ * Test Security flows in Standalone
  *
  * Tips:
  *  - With HookInterface, you may implement CiviCRM hooks directly in the test class.
@@ -25,8 +27,6 @@ use Civi\Api4\User;
  */
 class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface, TransactionalInterface {
 
-  protected $originalUF;
-  protected $originalUFPermission;
   protected $contactID;
   protected $userID;
 
@@ -50,12 +50,10 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
 
   public function tearDown():void {
     $this->deleteStuffWeMade();
-    // $this->switchBackFromOurUFClasses(TRUE);
     parent::tearDown();
   }
 
   protected function loginUser($userID) {
-    $security = Security::singleton();
     $user = \Civi\Api4\User::get(FALSE)
       ->addWhere('id', '=', $userID)
       ->execute()->first();
@@ -66,27 +64,20 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
       'uf_id' => $user['id'],
     ])['values'][0]['contact_id'] ?? NULL;
     $this->assertNotNull($contactID);
-    /** @var \Civi\Standalone\Security $security */
-    $security->loginAuthenticatedUserRecord($user, FALSE);
+
+    \CRM_Core_Config::singleton()->userSystem->loadUser($user['username']);
   }
 
-  public function testCreateUser():void {
+  public function testCheckPassword():void {
     [$contactID, $userID, $security] = $this->createFixtureContactAndUser();
 
     $user = \Civi\Api4\User::get(FALSE)
       ->addWhere('id', '=', $userID)
       ->execute()->single();
 
-    $this->assertEquals('user_one', $user['username']);
-    $this->assertEquals($contactID, $user['contact_id']);
-    $this->assertEquals($userID, $user['id']);
-    $this->assertEquals($userID, $user['uf_id']);
-    $this->assertEquals('user_one@example.org', $user['uf_name']);
-    $this->assertStringStartsWith('$', $user['hashed_password']);
-
     // Test that the password can be checked ok.
-    $this->assertTrue($security->checkPassword('secret1', $user['hashed_password']));
-    $this->assertFalse($security->checkPassword('some other password', $user['hashed_password']));
+    $this->assertTrue((bool) $security->checkPassword($user['username'], 'secret1'));
+    $this->assertFalse((bool) $security->checkPassword($user['username'], 'some other password'));
   }
 
   public function testPerms() {
@@ -115,36 +106,13 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
       ->addWhere('id', '=', $userID)
       ->execute();
 
-    // $this->switchToOurUFClasses();
     foreach (['access CiviCRM', 'view all contacts', 'add contacts', 'edit all contacts'] as $allowed) {
       $this->assertTrue(\CRM_Core_Permission::check([$allowed], $contactID), "Should have '$allowed' permission but don't");
     }
     foreach (['administer CiviCRM', 'access uploaded files'] as $notAllowed) {
       $this->assertFalse(\CRM_Core_Permission::check([$notAllowed], $contactID), "Should NOT have '$allowed' permission but do");
     }
-    // $this->switchBackFromOurUFClasses();
   }
-
-  // protected function switchToOurUFClasses() {
-  //   return;
-  //   if (!empty($this->originalUFPermission)) {
-  //     throw new \RuntimeException("are you calling switchToOurUFClasses twice?");
-  //   }
-  //   $this->originalUFPermission = \CRM_Core_Config::singleton()->userPermissionClass;
-  //   $this->originalUF = \CRM_Core_Config::singleton()->userSystem;
-  //   \CRM_Core_Config::singleton()->userPermissionClass = new \CRM_Core_Permission_Standalone();
-  //   \CRM_Core_Config::singleton()->userSystem = new \CRM_Utils_System_Standalone();
-  // }
-  //
-  // protected function switchBackFromOurUFClasses($justInCase = FALSE) {
-  //   return;
-  //   if (!$justInCase && empty($this->originalUFPermission)) {
-  //     throw new \RuntimeException("are you calling switchBackFromOurUFClasses() twice?");
-  //   }
-  //   \CRM_Core_Config::singleton()->userPermissionClass = $this->originalUFPermission;
-  //   \CRM_Core_Config::singleton()->userSystem = $this->originalUF;
-  //   $this->originalUFPermission = $this->originalUF = NULL;
-  // }
 
   /**
    * Temporary debugging function
@@ -169,9 +137,7 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
       ])->execute()->first()['id'];
 
     $params = ['cms_name' => 'user_one', 'cms_pass' => 'secret1', 'notify' => FALSE, 'contact_id' => $contactID, 'email' => 'user_one@example.org'];
-    // $this->switchToOurUFClasses();
     $userID = \CRM_Core_BAO_CMSUser::create($params, 'email');
-    // $this->switchBackFromOurUFClasses();
     $this->assertGreaterThan(0, $userID);
     $this->contactID = $contactID;
     $this->userID = $userID;
@@ -203,170 +169,18 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     }
   }
 
-  public function testUserApi() {
-    [$contactID, $adminUserID, $security] = $this->createFixtureContactAndUser();
-    // Make our main user an admin and log them in.
-    User::update(FALSE)->addWhere('id', '=', $adminUserID)->addValue('roles:name', ['admin'])->execute();
-    $this->loginUser($adminUserID);
-    $this->ensureStaffRoleExists();
-
-    // Create a 2nd contact and linked user.
-    $stafferContactID = \Civi\Api4\Contact::create(FALSE)
-      ->setValues(['display_name' => 'Test Staffer'])
-      ->execute()->first()['id'];
-    /** @var \Civi\Api4\Action\User\Create */
-    $userID = User::create(FALSE)
-      ->setValues([
-        'username' => 'testuser1',
-        'password' => 'shhh',
-        'contact_id' => $stafferContactID,
-        'roles:name' => ['staff'],
-        'uf_name' => 'testuser1@example.org',
-      ])
-      ->execute()->first()['id'];
-    $user = User::get(FALSE)->addWhere('id', '=', $userID)->execute()->first();
-    \Civi\Api4\UFMatch::create(FALSE)
-      ->setValues([
-        'contact_id' => $stafferContactID,
-        'uf_id' => $user['id'],
-      ])
+  public static function storeFakePasswordResetToken(int $userID, int $expires): string {
+    $token = \Civi::service('crypto.jwt')->encode([
+      'exp' => $expires,
+      'sub' => "uid:$userID",
+      'scope' => PasswordReset::PASSWORD_RESET_SCOPE,
+    ]);
+    User::update(FALSE)
+      ->addValue('password_reset_token', $token)
+      ->addWhere('id', '=', $userID)
       ->execute();
-    ;
-    $userId = \CRM_Core_BAO_UFMatch::getUFId($stafferContactID);
-    $this->assertNotNull($userId);
 
-    $this->assertArrayNotHasKey('password', $user);
-    $this->assertMatchesRegularExpression('/^[$].+[$].+/', $user['hashed_password']);
-
-    // Update to the loaded values should NOT result in the password being changed.
-    $updatedUser = User::update(FALSE)
-      ->setValues($user)
-      ->addWhere('id', '=', $user['id'])
-      ->setReload(TRUE)
-      ->execute()->first();
-    $this->assertEquals($user['hashed_password'], $updatedUser['hashed_password']);
-
-    // Ditto save
-    $updated = User::save(FALSE)
-      ->setRecords([$user])
-      ->setReload(TRUE)
-      ->execute()->first();
-    $updatedUser = User::get(FALSE)->addWhere('id', '=', $user['id'])->execute()->first();
-    $this->assertEquals($user['hashed_password'], $updatedUser['hashed_password']);
-
-    // Test we can force saving a raw password
-    $updatedUser = User::update(FALSE)
-      ->setReload(TRUE)
-      ->addValue('hashed_password', '$shhh')
-      ->addWhere('id', '=', $user['id'])
-      ->execute()->first();
-    $this->assertEquals('$shhh', $updatedUser['hashed_password']);
-
-    // Now move on to tests with checkPermissions:TRUE
-
-    // Check we are allowed to update this user's password if we provide our own, since we have 'cms:administer users'
-    // ...by password
-    $previousHash = $updatedUser['hashed_password'];
-    $updatedUser = User::update(TRUE)
-      ->addValue('password', 'topSecret')
-      ->addWhere('id', '=', $user['id'])
-      ->setActorPassword('secret1')
-      ->setReload(TRUE)
-      ->execute()->first();
-    $this->assertNotEquals($previousHash, $updatedUser['hashed_password'], "Expected that the password was changed, but it wasn't.");
-    $previousHash = $updatedUser['hashed_password'];
-
-    // ...but NOT by hashed_password
-    $previousHash = $updatedUser['hashed_password'];
-    try {
-      $updatedUser = User::update(TRUE)
-        ->addValue('hashed_password', '$someNefariousHash')
-        ->addWhere('id', '=', $user['id'])
-        ->setActorPassword('secret1')
-        ->execute();
-      $this->fail("Expected UnauthorizedException got none.");
-    }
-    catch (\Civi\API\Exception\UnauthorizedException $e) {
-      $this->assertEquals('Not allowed to change hashed_password', $e->getMessage());
-    }
-
-    // Check that if we don't supply OUR correct password, we're not allowed to update the user's password.
-    try {
-      User::update(TRUE)
-        ->addValue('password', 'anotherNewPassword')
-        ->addWhere('id', '=', $user['id'])
-        ->setActorPassword('wrong pass')
-        ->execute();
-      $this->fail("Expected UnauthorizedException got none.");
-    }
-    catch (\Civi\API\Exception\UnauthorizedException $e) {
-      $this->assertEquals('Incorrect password', $e->getMessage());
-    }
-
-    // Check that if we don't supply OUR password at all, we're not allowed to update the user's password.
-    try {
-      User::update(TRUE)
-        ->addValue('password', 'anotherNewPassword')
-        ->addWhere('id', '=', $user['id'])
-        ->execute();
-      $this->fail("Expected UnauthorizedException got none.");
-    }
-    catch (\Civi\API\Exception\UnauthorizedException $e) {
-      $this->assertEquals('Unauthorized', $e->getMessage());
-    }
-
-    // Now login as the user in question who only has the 'staff' role.
-    $this->loginUser($user['id']);
-
-    // Check we are allowed to update our own password if we provide the current one.
-    $updatedUser = User::update(TRUE)
-      ->setActorPassword('topSecret')
-      ->addValue('password', 'ourNewSecret')
-      ->addWhere('id', '=', $user['id'])
-      ->setReload(TRUE)
-      ->execute()->first();
-    $this->assertNotEquals($previousHash, $updatedUser['hashed_password'], "Expected that the password was changed, but it wasn't.");
-    $previousHash = $updatedUser['hashed_password'];
-
-    // Check that if we don't supply OUR correct password, we're not allowed to update our password.
-    try {
-      User::update(TRUE)
-        ->addValue('password', 'anotherNewPassword')
-        ->addWhere('id', '=', $user['id'])
-        ->setActorPassword('wrong pass')
-        ->execute();
-      $this->fail("Expected UnauthorizedException got none.");
-    }
-    catch (\Civi\API\Exception\UnauthorizedException $e) {
-      $this->assertEquals('Incorrect password', $e->getMessage());
-    }
-
-    // Check that if we don't supply OUR password at all, we're not allowed to update the user's password.
-    try {
-      User::update(TRUE)
-        ->addValue('password', 'anotherNewPassword')
-        ->addWhere('id', '=', $user['id'])
-        ->execute();
-      $this->fail("Expected UnauthorizedException got none.");
-    }
-    catch (\Civi\API\Exception\UnauthorizedException $e) {
-      $this->assertEquals('Unauthorized', $e->getMessage());
-    }
-
-    // Check that we're not allowed to update the admin user's password, since we are not an admin.
-    try {
-      User::update(TRUE)
-        ->addValue('password', 'anotherNewPassword')
-        ->addWhere('id', '=', $adminUserID)
-        ->setActorPassword('ourNewSecret')
-        ->execute();
-      $this->fail("Expected UnauthorizedException got none.");
-    }
-    catch (\Civi\API\Exception\UnauthorizedException $e) {
-      $this->assertEquals("You are not permitted to change other users' accounts.", $e->getMessage());
-    }
-
-    $this->deleteStuffWeMade();
+    return $token;
   }
 
   public function testForgottenPassword() {
@@ -375,23 +189,18 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     [$contactID, $userID, $security] = $this->createFixtureContactAndUser();
 
     // Create token.
-    $token = \Civi\Api4\Action\User\SendPasswordReset::updateToken($userID);
-    $this->assertMatchesRegularExpression('/^([0-9a-f]{8}[a-zA-Z0-9]{32})([0-9a-f]+)$/', $token);
-
-    // Fake an expired token
-    $old = dechex(time() - 1);
-    $this->assertNull($security->checkPasswordResetToken($old . substr($token, 9)));
-
-    // Check token fails if contact ID is different.
-    $this->assertNull($security->checkPasswordResetToken($token . '0'));
+    $token = PasswordReset::updateToken($userID);
+    $decodedToken = \Civi::service('crypto.jwt')->decode($token);
+    $this->assertEquals('uid:' . $userID, $decodedToken['sub']);
+    $this->assertEquals(PasswordReset::PASSWORD_RESET_SCOPE, $decodedToken['scope']);
 
     // Check it works, but only once.
-    $extractedUserID = $security->checkPasswordResetToken($token);
+    $extractedUserID = PasswordReset::checkPasswordResetToken($token);
     $this->assertEquals($userID, $extractedUserID);
-    $this->assertNull($security->checkPasswordResetToken($token));
+    $this->assertNull(PasswordReset::checkPasswordResetToken($token));
 
     // OK, let's change that password.
-    $token = \Civi\Api4\Action\User\SendPasswordReset::updateToken($userID);
+    $token = PasswordReset::updateToken($userID);
 
     // Attempt to change the user's password using this token to authenticate.
     $result = User::passwordReset(TRUE)
@@ -401,7 +210,7 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
 
     $this->assertEquals(1, $result['success']);
     $user = User::get(FALSE)->addWhere('id', '=', $userID)->execute()->single();
-    $this->assertTrue($security->checkPassword('fingersCrossed', $user['hashed_password']));
+    $this->assertTrue((bool) $security->checkPassword($user['username'], 'fingersCrossed'));
 
     // Should not work a 2nd time with same token.
     try {
@@ -416,14 +225,18 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     }
 
     // Check the message template generation
-    $token = \Civi\Api4\Action\User\SendPasswordReset::updateToken($userID);
-    $workflow = $security->preparePasswordResetWorkflow($user, $token);
+    $token = PasswordReset::updateToken($userID);
+    $workflow = SendPasswordResetEmail::preparePasswordResetWorkflow($user, $token);
     $this->assertNotNull($workflow);
     $result = $workflow->renderTemplate();
 
     $this->assertMatchesRegularExpression(';https?://[^/]+/civicrm/login/password.*' . $token . ';', $result['text']);
     $this->assertMatchesRegularExpression(';https?://[^/]+/civicrm/login/password.*' . $token . ';', $result['html']);
     $this->assertEquals('Password reset link for Demonstrators Anonymous', $result['subject']);
+
+    // Fake an expired token
+    $token = $this->storeFakePasswordResetToken($userID, time() - 1);
+    $this->assertNull(PasswordReset::checkPasswordResetToken($token));
   }
 
   protected function deleteStuffWeMade() {

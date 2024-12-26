@@ -29,21 +29,19 @@
         <a href="{$advSearchURL}">{ts}Advanced Search{/ts}</a><br />
     {/if}
   </div>
-
+  <a href="#" class="crm-selection-reset crm-hover-button float-right"><i class="crm-i fa-times-circle-o" aria-hidden="true"></i> {ts}Reset all selections{/ts}</a>
   <table class="form-layout-compressed">
-  <tr>
-    <td style="width: 30%;">
-        {if !empty($savedSearch.name)}{$savedSearch.name} ({ts}smart group{/ts}) - {/if}
-        {ts count=$pager->_totalItems plural="%count Contacts"}%count Contact{/ts}
-    </td>
-
-    {* Search criteria are passed to tpl in the $qill array *}
-    <td class="nowrap">
-    {if $qill}
-      {include file="CRM/common/displaySearchCriteria.tpl"}
+    {if !empty($savedSearch.name)}
+      <tr>
+        <td colspan="2">{$savedSearch.name} ({ts}Smart Group{/ts})</td>
+      </tr>
     {/if}
-    </td>
-  </tr>
+    {* Search criteria are passed to tpl in the $qill array *}
+   {if $qill}
+     <tr>
+       <td class="nowrap">{include file="CRM/common/displaySearchCriteria.tpl"}</td>
+     </tr>
+   {/if}
   <tr>
     <td> {ts}Select Records{/ts}:</td>
     <td class="nowrap">

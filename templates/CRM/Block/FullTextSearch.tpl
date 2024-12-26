@@ -28,7 +28,7 @@
     <input type="hidden" name="qfKey" value="{crmKey name='CRM_Legacycustomsearches_Controller_Search' addSequence=1}" />
   </div>
   <select class="form-select" id="fulltext_table" name="fulltext_table">
-{if call_user_func(array('CRM_Core_Permission','giveMeAllACLs'))}
+{if $hasAllACLs}
       <option value="">{ts}All{/ts}</option>
       <option value="Contact">{ts}Contacts{/ts}</option>
 {/if}

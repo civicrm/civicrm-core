@@ -1,7 +1,7 @@
 (function(angular, $, _) {
 
   angular.module('crmMailingAB').controller('CrmMailingABReportCtrl', function($scope, crmApi, crmMailingStats) {
-    var ts = $scope.ts = CRM.ts(null);
+    var ts = $scope.ts = CRM.ts('civi_mail');
 
     var CrmMailingABReportCnt = 1, activeMailings = null;
     $scope.getActiveMailings = function() {

@@ -9,6 +9,9 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Mailing;
+use Civi\Api4\MailingJob;
+
 /**
  * Class CRM_Mailing_BAO_MailingTest
  */
@@ -161,7 +164,7 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test verify that a disabled mailing group doesn't prvent access to the mailing generated with the group.
+   * Test verify that a disabled mailing group doesn't prevent access to the mailing generated with the group.
    */
   public function testGetMailingDisabledGroup(): void {
     $this->prepareForACLs();
@@ -406,7 +409,22 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test That No BUlk Emails User Optt Out is resepected when constructing a mailing
+   * Test that the non-crud actions do not occur when creating a mailing using apiv4.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testApiV4DoesNotSchedule(): void {
+    $mailing = Mailing::create(FALSE)->setValues(['name' => 'bob', 'scheduled_date' => 'tomorrow'])->execute()->first();
+    $jobs = MailingJob::get(FALSE)->execute();
+    $this->assertEquals(0, $jobs->rowCount);
+    MailingJob::create(FALSE)->setValues([
+      'mailing_id' => $mailing['id'],
+    ])->execute();
+    $this->assertEquals(0, CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_mailing_recipients'));
+  }
+
+  /**
+   * Test that No Bulk Emails User Out is respected when constructing a mailing
    */
   public function testGetReceipientNoBulkEmails(): void {
     // Set up groups; 3 standard, 4 smart

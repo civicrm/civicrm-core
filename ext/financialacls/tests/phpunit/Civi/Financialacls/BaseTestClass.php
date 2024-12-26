@@ -7,6 +7,7 @@ use Civi\Api4\FinancialType;
 use Civi\Api4\PriceField;
 use Civi\Api4\PriceFieldValue;
 use Civi\Api4\PriceSet;
+use Civi\Api4\Product;
 use Civi\Test;
 use Civi\Test\CiviEnvBuilder;
 use Civi\Test\HeadlessInterface;
@@ -44,11 +45,11 @@ class BaseTestClass extends TestCase implements HeadlessInterface, HookInterface
 
   /**
    * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function tearDown(): void {
     Contribution::delete(FALSE)->addWhere('id', '>', 0)->execute();
     FinancialType::delete(FALSE)->addWhere('name', 'LIKE', '%test%')->execute();
+    Product::delete(FALSE)->addWhere('name', '=', '10_dollars')->execute();
     $this->cleanupPriceSets();
   }
 
@@ -79,32 +80,25 @@ class BaseTestClass extends TestCase implements HeadlessInterface, HookInterface
       'edit contributions of type Donation',
       'view all contacts',
     ]);
-    \Civi::settings()->set('acl_financial_type', TRUE);
     $this->createLoggedInUser();
   }
 
   /**
    * Create price set.
    *
-   * @throws \CRM_Core_Exception
+   * @param string $identifier
    */
-  protected function createPriceSet(): void {
-    $priceSet = PriceSet::create(FALSE)->setValues([
+  protected function createPriceSet(string $identifier = 'default'): void {
+    $priceSet = $this->createTestEntity('PriceSet', [
       'title' => 'Price Set',
       'name' => 'price_set',
       'financial_type_id.name' => 'Event Fee',
       'extends' => 1,
-    ])->execute()->first();
-    $this->ids['PriceSet'][0] = $priceSet['id'];
-    $this->ids['PriceField'][0] = PriceField::create(FALSE)->setValues([
+    ], $identifier);
+    $this->createTestEntity('PriceField', [
       'label' => 'Price Field',
       'name' => 'price_field',
       'html_type' => 'CheckBox',
-      'option_label' => ['1' => 'Price Field 1', '2' => 'Price Field 2'],
-      'option_value' => ['1' => 100, '2' => 200],
-      'option_name' => ['1' => 'Price Field 1', '2' => 'Price Field 2'],
-      'option_weight' => ['1' => 1, '2' => 2],
-      'option_amount' => ['1' => 100, '2' => 200],
       'is_display_amounts' => 1,
       'weight' => 1,
       'options_per_line' => 1,
@@ -112,10 +106,25 @@ class BaseTestClass extends TestCase implements HeadlessInterface, HookInterface
       'price_set_id' => $priceSet['id'],
       'is_enter_qty' => 1,
       'financial_type_id.name' => 'Event Fee',
-    ])->execute()->first()['id'];
-    $this->ids['PriceFieldValue'] = array_keys((array) PriceFieldValue::get()
-      ->addWhere('price_field_id', '=', $this->ids['PriceField'][0])
-      ->execute()->indexBy('id'));
+    ], $identifier);
+    $this->createTestEntity('PriceFieldValue', [
+      'name' => 'Price Field 1',
+      'label' => 'Price Field 1',
+      'value' => 100,
+      'weight' => 1,
+      'amount' => 100,
+      'price_field_id' => $this->ids['PriceField'][$identifier],
+      'financial_type_id:name' => 'Event Fee',
+    ], $identifier . '-1');
+    $this->createTestEntity('PriceFieldValue', [
+      'name' => 'Price Field 2',
+      'label' => 'Price Field 2',
+      'value' => 200,
+      'weight' => 2,
+      'amount' => 200,
+      'price_field_id' => $this->ids['PriceField'][$identifier],
+      'financial_type_id:name' => 'Event Fee',
+    ], $identifier . '-2');
   }
 
   /**
@@ -139,6 +148,21 @@ class BaseTestClass extends TestCase implements HeadlessInterface, HookInterface
       ->addWhere('price_set_id', 'IN', $addedPriceSets)
       ->execute();
     PriceSet::delete(FALSE)->addWhere('id', 'IN', $addedPriceSets)->execute();
+  }
+
+  /**
+   * Add a permission to the financial ACLs.
+   *
+   * @param array $aclPermissions
+   *   Array of ACL permissions in the format
+   *   [[$action, $financialType], [$action, $financialType]
+   */
+  protected function addFinancialAclPermissions(array $aclPermissions):void {
+    $permissions = \CRM_Core_Config::singleton()->userPermissionClass->permissions;
+    foreach ($aclPermissions as $aclPermission) {
+      $permissions[] = $aclPermission[0] . ' contributions of type ' . $aclPermission[1];
+    }
+    $this->setPermissions($permissions);
   }
 
 }

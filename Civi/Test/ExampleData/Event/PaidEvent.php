@@ -38,6 +38,7 @@ class PaidEvent extends EntityExample {
       'pay_later_text' => 'Transfer funds',
       'pay_later_receipt' => 'Please transfer funds to our bank account.',
       'fee_label' => 'Event fees',
+      'allow_selfcancelxfer' => TRUE,
     ];
   }
 

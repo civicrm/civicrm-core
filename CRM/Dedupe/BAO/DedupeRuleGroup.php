@@ -22,8 +22,11 @@
 class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
 
   /**
-   * Ids of the contacts to limit the SQL queries (whole-database queries otherwise)
    * @var array
+   *
+   * Ids of the contacts to limit the SQL queries (whole-database queries otherwise)
+   *
+   * @internal
    */
   public $contactIds = [];
 
@@ -33,6 +36,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
    * @param array $contactIds
    */
   public function setContactIds($contactIds) {
+    CRM_Core_Error::deprecatedWarning('unused');
     $this->contactIds = $contactIds;
   }
 
@@ -44,7 +48,13 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
 
   /**
    * If there are no rules in rule group.
+   *
    * @var bool
+   *
+   * @deprecated this was introduced in https://github.com/civicrm/civicrm-svn/commit/15136b07013b3477d601ebe5f7aa4f99f801beda
+   * as an awkward way to avoid fatalling on an invalid rule set with no rules.
+   *
+   * Passing around a property is a bad way to do that check & we will work to remove.
    */
   public $noRules = FALSE;
 
@@ -57,151 +67,61 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
    *   The requested contact type.
    *
    * @return array
-   *   a table-keyed array of field-keyed arrays holding supported fields' titles
+   *   a table-keyed array of field-keyed arrays holding supported fields'
+   *   titles
+   * @throws \CRM_Core_Exception
    */
-  public static function supportedFields($requestedType): array {
+  public static function supportedFields(string $requestedType): array {
     if (!isset(Civi::$statics[__CLASS__]['supportedFields'])) {
-      // this is needed, as we're piggy-backing importableFields() below
-      $replacements = [
-        'civicrm_country.name' => 'civicrm_address.country_id',
-        'civicrm_county.name' => 'civicrm_address.county_id',
-        'civicrm_state_province.name' => 'civicrm_address.state_province_id',
-        'gender.label' => 'civicrm_contact.gender_id',
-        'individual_prefix.label' => 'civicrm_contact.prefix_id',
-        'individual_suffix.label' => 'civicrm_contact.suffix_id',
-        'addressee.label' => 'civicrm_contact.addressee_id',
-        'email_greeting.label' => 'civicrm_contact.email_greeting_id',
-        'postal_greeting.label' => 'civicrm_contact.postal_greeting_id',
-        'civicrm_phone.phone' => 'civicrm_phone.phone_numeric',
-      ];
-      // the table names we support in dedupe rules - a filter for importableFields()
-      $supportedTables = [
-        'civicrm_address',
-        'civicrm_contact',
-        'civicrm_email',
-        'civicrm_im',
-        'civicrm_note',
-        'civicrm_openid',
-        'civicrm_phone',
-        'civicrm_website',
-      ];
-
-      foreach (CRM_Contact_BAO_ContactType::basicTypes() as $ctype) {
-        // take the table.field pairs and their titles from importableFields() if the table is supported
-        foreach (self::importableFields($ctype) as $iField) {
-          if (isset($iField['where'])) {
-            $where = $iField['where'];
-            if (isset($replacements[$where])) {
-              $where = $replacements[$where];
-            }
-            [$table, $field] = explode('.', $where);
-            if (!in_array($table, $supportedTables)) {
-              continue;
-            }
-            $fields[$ctype][$table][$field] = $iField['title'];
-          }
+      $genericFields = $fields = [];
+      // We have a hard-coded list of entities - as we always have
+      // but if that were to get restrictive we could declare whether dedupe fields are supported
+      // in the entity metadata and maybe get rid of the hook at the end of this function?
+      foreach (['Address', 'Email', 'Phone', 'Website', 'OpenID', 'IM', 'Note'] as $entity) {
+        $entityFields = civicrm_api4($entity, 'getFields', [
+          'where' => [['usage', 'CONTAINS', 'duplicate_matching']],
+          'orderBy' => ['title'],
+          'checkPermissions' => FALSE,
+          // The action is a bit arguable - if not set it would default to 'get'.
+          // At the moment it makes no difference but if someone where to add a
+          // pseudo-field and set duplicate matching to 'true' then it would probably be a
+          // field used when creating/updating & de-duping while saving a contact - so
+          // save feels like a safer guess at future requirements than get.
+          'action' => 'save',
+        ], 'name');
+        foreach ($entityFields as $entityField) {
+          $genericFields[$entityField['table_name']][$entityField['column_name']] = $entityField['input_attrs']['label'] ?? $entityField['title'];
         }
-        // Note that most of the fields available come from 'importable fields' -
-        // I thought about making this field 'importable' but it felt like there might be unknown consequences
-        // so I opted for just adding it in & securing it with a unit test.
-        /// Example usage of sort_name - It is possible to alter sort name via hook so 2 organization names might differ as in
-        // Justice League vs The Justice League but these could have the same sort_name if 'the the'
-        // exension is installed (https://github.com/eileenmcnaughton/org.wikimedia.thethe)
-        $fields[$ctype]['civicrm_contact']['sort_name'] = ts('Sort Name');
+      }
 
-        // add all custom data fields including those only for sub_types.
-        foreach (CRM_Core_BAO_CustomGroup::getTree($ctype, NULL, NULL, -1, [], NULL, TRUE, NULL, TRUE) as $key => $cg) {
-          if (!is_int($key)) {
-            continue;
-          }
-          foreach ($cg['fields'] as $cf) {
-            $fields[$ctype][$cg['table_name']][$cf['column_name']] = $cg['title'] . ' : ' . $cf['label'];
-          }
+      foreach (CRM_Contact_BAO_ContactType::basicTypes() as $contactType) {
+        $fields[$contactType] = $genericFields;
+        $contactFields = civicrm_api4('Contact', 'getFields', [
+          'where' => [['usage', 'CONTAINS', 'duplicate_matching']],
+          'orderBy' => ['title'],
+          'values' => [
+            'contact_type' => $contactType,
+          ],
+          'checkPermissions' => FALSE,
+          // The action is a bit arguable - if not set it would default to 'get'.
+          // At the moment it makes no difference but if someone where to add a
+          // pseudo-field and set duplicate matching to 'true' then it would probably be a
+          // field used when creating/updating & de-duping while saving a contact - so
+          // save feels like a safer guess at future requirements than get.
+          'action' => 'save',
+        ], 'name');
+        // take the table.field pairs and their titles from importableFields() if the table is supported
+        foreach ($contactFields as $entityField) {
+          $fields[$contactType][$entityField['table_name']][$entityField['column_name']] = $entityField['input_attrs']['label'] ?? $entityField['title'];
         }
       }
       //Does this have to run outside of cache?
-      CRM_Utils_Hook::dupeQuery(CRM_Core_DAO::$_nullObject, 'supportedFields', $fields);
+      CRM_Utils_Hook::dupeQuery(NULL, 'supportedFields', $fields);
       Civi::$statics[__CLASS__]['supportedFields'] = $fields;
     }
 
     return Civi::$statics[__CLASS__]['supportedFields'][$requestedType] ?? [];
 
-  }
-
-  /**
-   * Combine all the importable fields from the lower levels object.
-   *
-   * @deprecated - copy of importableFields to unravel.
-   *
-   * The ordering is important, since currently we do not have a weight
-   * scheme. Adding weight is super important
-   *
-   * @param int|string $contactType contact Type
-   *
-   * @return array
-   *   array of importable Fields
-   */
-  private static function importableFields($contactType): array {
-
-    $fields = CRM_Contact_DAO_Contact::import();
-
-    // get the fields thar are meant for contact types
-    if (in_array($contactType, [
-      'Individual',
-      'Household',
-      'Organization',
-      'All',
-    ])) {
-      $fields = array_merge($fields, CRM_Core_OptionValue::getFields('', $contactType));
-    }
-
-    $locationFields = array_merge(CRM_Core_DAO_Address::import(),
-      CRM_Core_DAO_Phone::import(),
-      CRM_Core_DAO_Email::import(),
-      CRM_Core_DAO_IM::import(TRUE),
-      CRM_Core_DAO_OpenID::import()
-    );
-
-    $locationFields = array_merge($locationFields,
-      CRM_Core_BAO_CustomField::getFieldsForImport('Address',
-        FALSE,
-        FALSE,
-        FALSE,
-        FALSE
-      )
-    );
-
-    foreach ($locationFields as $key => $field) {
-      $locationFields[$key]['hasLocationType'] = TRUE;
-    }
-
-    $fields = array_merge($fields, $locationFields);
-
-    $fields = array_merge($fields, CRM_Contact_DAO_Contact::import());
-    $fields = array_merge($fields, CRM_Core_DAO_Note::import());
-
-    //website fields
-    $fields = array_merge($fields, CRM_Core_DAO_Website::import());
-    $fields['url']['hasWebsiteType'] = TRUE;
-
-    $fields = array_merge($fields,
-      CRM_Core_BAO_CustomField::getFieldsForImport($contactType,
-        FALSE,
-        TRUE,
-        FALSE,
-        FALSE,
-        FALSE
-      )
-    );
-    // Unset the fields which are not related to their contact type.
-    foreach (CRM_Contact_DAO_Contact::import() as $name => $value) {
-      if (!empty($value['contactType']) && $value['contactType'] !== $contactType) {
-        unset($fields[$name]);
-      }
-    }
-
-    //Sorting fields in alphabetical order(CRM-1507)
-    return CRM_Utils_Array::crmArraySortByField($fields, 'title');
   }
 
   /**
@@ -212,63 +132,44 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
   }
 
   /**
-   * Return a set of SQL queries whose cummulative weights will mark matched
-   * records for the RuleGroup::threasholdQuery() to retrieve.
+   * Fill the dedupe finder table.
+   *
+   * @internal do not access from outside core.
+   *
+   * @param int $id
+   * @param array $contactIDs
+   * @param array $params
+   *
+   * @return bool
+   * @throws \Civi\Core\Exception\DBQueryException
    */
-  private function tableQuery() {
+  public function fillTable(int $id, array $contactIDs, array $params): bool {
+    $this->contactIds = $contactIDs;
+    $this->params = $params;
+    $this->id = $id;
     // make sure we've got a fetched dbrecord, not sure if this is enforced
-    if (!$this->name == NULL || $this->is_reserved == NULL) {
-      $this->find(TRUE);
-    }
-
+    $this->find(TRUE);
+    $optimizer = new CRM_Dedupe_FinderQueryOptimizer($this->id, $contactIDs, $params);
     // Reserved Rule Groups can optionally get special treatment by
     // implementing an optimization class and returning a query array.
-    if ($this->is_reserved &&
-      CRM_Utils_File::isIncludable("CRM/Dedupe/BAO/QueryBuilder/{$this->name}.php")
-    ) {
-      $command = empty($this->params) ? 'internal' : 'record';
-      $queries = call_user_func(["CRM_Dedupe_BAO_QueryBuilder_{$this->name}", $command], $this);
+    if ($optimizer->isUseReservedQuery()) {
+      $tableQueries = $optimizer->getReservedQuery();
     }
     else {
-      // All other rule groups have queries generated by the member dedupe
-      // rules defined in the administrative interface.
-
-      // Find all rules contained by this script sorted by weight so that
-      // their execution can be short circuited on RuleGroup::fillTable()
-      $bao = new CRM_Dedupe_BAO_DedupeRule();
-      $bao->dedupe_rule_group_id = $this->id;
-      $bao->orderBy('rule_weight DESC');
-      $bao->find();
-
-      // Generate a SQL query for each rule in the rule group that is
-      // tailored to respect the param and contactId options provided.
-      $queries = [];
-      while ($bao->fetch()) {
-        $bao->contactIds = $this->contactIds;
-        $bao->params = $this->params;
-
-        // Skipping empty rules? Empty rules shouldn't exist; why check?
-        if ($query = $bao->sql()) {
-          $queries["{$bao->rule_table}.{$bao->rule_field}.{$bao->rule_weight}"] = $query;
-        }
-      }
+      $tableQueries = $optimizer->getRuleQueries();
     }
-
     // if there are no rules in this rule group
     // add an empty query fulfilling the pattern
-    if (!$queries) {
+    if (!$tableQueries) {
+      // Just for the hook.... (which is deprecated).
       $this->noRules = TRUE;
-      return [];
+    }
+    CRM_Utils_Hook::dupeQuery($this, 'table', $tableQueries);
+    if (empty($tableQueries)) {
+      return FALSE;
     }
 
-    return $queries;
-  }
-
-  public function fillTable() {
-    // get the list of queries handy
-    $tableQueries = $this->tableQuery();
-
-    if ($this->params && !$this->noRules) {
+    if ($params) {
       $this->temporaryTables['dedupe'] = CRM_Utils_SQL_TempTable::build()
         ->setCategory('dedupe')
         ->createWithColumns("id1 int, weight int, UNIQUE UI_id1 (id1)")->getName();
@@ -292,8 +193,6 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
     }
     $patternColumn = '/t1.(\w+)/';
     $exclWeightSum = [];
-
-    CRM_Utils_Hook::dupeQuery($this, 'table', $tableQueries);
 
     while (!empty($tableQueries)) {
       [$isInclusive, $isDie] = self::isQuerySetInclusive($tableQueries, $this->threshold, $exclWeightSum);
@@ -369,6 +268,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
         break;
       }
     }
+    return TRUE;
   }
 
   /**
@@ -453,29 +353,29 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
    * @return string
    */
   public function thresholdQuery($checkPermission = TRUE) {
-    $this->_aclFrom = '';
+    $aclFrom = '';
     $aclWhere = '';
 
-    if ($this->params && !$this->noRules) {
+    if ($this->params) {
       if ($checkPermission) {
-        [$this->_aclFrom, $aclWhere] = CRM_Contact_BAO_Contact_Permission::cacheClause('civicrm_contact');
+        [$aclFrom, $aclWhere] = CRM_Contact_BAO_Contact_Permission::cacheClause('civicrm_contact');
         $aclWhere = $aclWhere ? "AND {$aclWhere}" : '';
       }
       $query = "SELECT {$this->temporaryTables['dedupe']}.id1 as id
-                FROM {$this->temporaryTables['dedupe']} JOIN civicrm_contact ON {$this->temporaryTables['dedupe']}.id1 = civicrm_contact.id {$this->_aclFrom}
+                FROM {$this->temporaryTables['dedupe']} JOIN civicrm_contact ON {$this->temporaryTables['dedupe']}.id1 = civicrm_contact.id {$aclFrom}
                 WHERE contact_type = '{$this->contact_type}' AND is_deleted = 0 $aclWhere
                 AND weight >= {$this->threshold}";
     }
     else {
       $aclWhere = '';
       if ($checkPermission) {
-        [$this->_aclFrom, $aclWhere] = CRM_Contact_BAO_Contact_Permission::cacheClause(['c1', 'c2']);
+        [$aclFrom, $aclWhere] = CRM_Contact_BAO_Contact_Permission::cacheClause(['c1', 'c2']);
         $aclWhere = $aclWhere ? "AND {$aclWhere}" : '';
       }
       $query = "SELECT IF({$this->temporaryTables['dedupe']}.id1 < {$this->temporaryTables['dedupe']}.id2, {$this->temporaryTables['dedupe']}.id1, {$this->temporaryTables['dedupe']}.id2) as id1,
                 IF({$this->temporaryTables['dedupe']}.id1 < {$this->temporaryTables['dedupe']}.id2, {$this->temporaryTables['dedupe']}.id2, {$this->temporaryTables['dedupe']}.id1) as id2, {$this->temporaryTables['dedupe']}.weight
                 FROM {$this->temporaryTables['dedupe']} JOIN civicrm_contact c1 ON {$this->temporaryTables['dedupe']}.id1 = c1.id
-                            JOIN civicrm_contact c2 ON {$this->temporaryTables['dedupe']}.id2 = c2.id {$this->_aclFrom}
+                            JOIN civicrm_contact c2 ON {$this->temporaryTables['dedupe']}.id2 = c2.id {$aclFrom}
                        LEFT JOIN civicrm_dedupe_exception exc ON {$this->temporaryTables['dedupe']}.id1 = exc.contact_id1 AND {$this->temporaryTables['dedupe']}.id2 = exc.contact_id2
                 WHERE c1.contact_type = '{$this->contact_type}' AND
                       c2.contact_type = '{$this->contact_type}'

@@ -123,6 +123,18 @@ class CRM_Extension_Info {
   public $develStage;
 
   /**
+   * @var string|null
+   *   Ex: 'ready', 'not_ready'
+   */
+  public $ready;
+
+  /**
+   * @var int|null
+   *   Ex: 1234
+   */
+  public $usage;
+
+  /**
    * Full URL of the zipball for this extension/version.
    *
    * This property is (usually) only provided on the feed of new/available extensions.
@@ -249,8 +261,20 @@ class CRM_Extension_Info {
    * Copy attributes from an XML document to $this
    *
    * @param SimpleXMLElement $info
+   * @param bool $useVariables
+   *  Whether to interpolate variables like [civicrm.version]
    */
-  public function parse($info) {
+  public function parse($info, bool $useVariables = TRUE) {
+    // Note that these variables must evaluated at fairly low-level of bootstrap.
+    // So it's good to be conservative about how much dynamism you put in.
+    $vars = [
+      '[civicrm.version]' => CRM_Utils_System::version(),
+      '[civicrm.majorVersion]' => CRM_Utils_System::majorVersion(),
+      '[civicrm.releaseDate]' => CRM_Utils_System::versionXml()['releaseDate'],
+      '[self.key]' => (string) $info->attributes()->key,
+    ];
+    $eval = $useVariables ? (fn($v) => $this->interpolate($v, $vars)) : (fn($v) => $v);
+
     $this->key = (string) $info->attributes()->key;
     $this->type = (string) $info->attributes()->type;
     $this->file = (string) $info->file;
@@ -265,7 +289,7 @@ class CRM_Extension_Info {
         continue;
       }
       if (!count($val->children())) {
-        $this->$attr = is_array($this->$attr) ? [] : trim((string) $val);
+        $this->$attr = $eval(is_array($this->$attr) ? [] : trim((string) $val));
       }
       elseif ($attr === 'urls') {
         $this->urls = [];
@@ -324,8 +348,20 @@ class CRM_Extension_Info {
         }
       }
       else {
-        $this->$attr = CRM_Utils_XML::xmlObjToArray($val);
+        $this->$attr = $eval(CRM_Utils_XML::xmlObjToArray($val));
       }
+    }
+  }
+
+  private function interpolate($value, $vars) {
+    if (is_string($value)) {
+      return strtr($value, $vars);
+    }
+    elseif (is_array($value)) {
+      return array_map(fn($item) => $this->interpolate($item, $vars), $value);
+    }
+    else {
+      return $value;
     }
   }
 

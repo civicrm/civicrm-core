@@ -13,6 +13,7 @@ namespace Civi\WorkflowMessage\Traits;
 
 use Civi\Api4\Contact;
 use Civi\Api4\MessageTemplate;
+use CRM_Core_Exception;
 
 /**
  * @method getTemplate(): ?array
@@ -81,7 +82,7 @@ trait TemplateTrait {
    * @throws \CRM_Core_Exception
    * @internal
    */
-  private static function loadTemplate(string $workflowName, bool $isTest, int $messageTemplateID = NULL, $groupName = NULL, ?array $messageTemplateOverride = NULL, ?string $language = NULL): array {
+  private static function loadTemplate(string $workflowName, bool $isTest, ?int $messageTemplateID = NULL, $groupName = NULL, ?array $messageTemplateOverride = NULL, ?string $language = NULL): array {
     $base = ['msg_subject' => NULL, 'msg_text' => NULL, 'msg_html' => NULL, 'pdf_format_id' => NULL];
     if (!$workflowName && !$messageTemplateID && !$messageTemplateOverride) {
       throw new CRM_Core_Exception(ts("Message template not specified. No option value, ID, or template content."));

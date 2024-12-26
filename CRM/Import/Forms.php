@@ -17,6 +17,8 @@
 
 use Civi\Api4\Mapping;
 use Civi\Api4\UserJob;
+use Civi\Core\ClassScanner;
+use Civi\Import\DataSource\DataSourceInterface;
 use League\Csv\Writer;
 
 /**
@@ -78,6 +80,10 @@ class CRM_Import_Forms extends CRM_Core_Form {
   public function getUserJobType(): string {
     CRM_Core_Error::deprecatedWarning('this function should be overridden');
     return '';
+  }
+
+  public function getEntity() {
+    return $this->controller->getEntity();
   }
 
   /**
@@ -269,7 +275,8 @@ class CRM_Import_Forms extends CRM_Core_Form {
    */
   protected function getDataSources(): array {
     $dataSources = [];
-    foreach (['CRM_Import_DataSource_SQL', 'CRM_Import_DataSource_CSV'] as $dataSourceClass) {
+    $classes = ClassScanner::get(['interface' => DataSourceInterface::class]);
+    foreach ($classes as $dataSourceClass) {
       $object = new $dataSourceClass();
       if ($object->checkPermission()) {
         $dataSources[$dataSourceClass] = $object->getInfo()['title'];
@@ -388,11 +395,10 @@ class CRM_Import_Forms extends CRM_Core_Form {
   /**
    * Get the relevant datasource object.
    *
-   * @return \CRM_Import_DataSource|null
-   *
+   * @return \Civi\Import\DataSource\DataSourceInterface|null
    * @throws \CRM_Core_Exception
    */
-  protected function getDataSourceObject(): ?CRM_Import_DataSource {
+  protected function getDataSourceObject(): ?DataSourceInterface {
     $className = $this->getDataSourceClassName();
     if ($className) {
       return new $className($this->getUserJobID());
@@ -559,7 +565,16 @@ class CRM_Import_Forms extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   protected function getColumnHeaders(): array {
-    return $this->getDataSourceObject()->getColumnHeaders();
+    $headers = $this->getDataSourceObject()->getColumnHeaders();
+    $mappedFields = $this->getUserJob()['metadata']['import_mappings'] ?? [];
+    if (!empty($mappedFields) && count($mappedFields) > count($headers)) {
+      // The user has mapped one or more non-database fields, add those in.
+      $userMappedFields = array_diff_key($mappedFields, $headers);
+      foreach ($userMappedFields as $field) {
+        $headers[] = '';
+      }
+    }
+    return $headers;
   }
 
   /**
@@ -591,7 +606,21 @@ class CRM_Import_Forms extends CRM_Core_Form {
    */
   protected function getDataRows($statuses = [], int $limit = 0): array {
     $statuses = (array) $statuses;
-    return $this->getDataSourceObject()->setLimit($limit)->setStatuses($statuses)->getRows();
+    $rows = $this->getDataSourceObject()->setLimit($limit)->setStatuses($statuses)->getRows();
+    $headers = $this->getColumnHeaders();
+    $mappings = $this->getUserJob()['metadata']['import_mappings'] ?? [];
+    foreach ($rows as &$row) {
+      foreach ($headers as $index => $header) {
+        if (!$header) {
+          // Our rows are sequential lists of the values in the database table but the database
+          // table has some non-mapping related rows (`_status`, `_statusMessage` etc)
+          // and our mappings have some virtual rows, which do not have headers
+          // so, we populate our virtual values here.
+          $row[$index] = $mappings[$index]['default_value'] ?? '';
+        }
+      }
+    }
+    return $rows;
   }
 
   /**
@@ -848,15 +877,26 @@ class CRM_Import_Forms extends CRM_Core_Form {
   public function getHeaderPatterns(): array {
     $headerPatterns = [];
     foreach ($this->getFields() as $name => $field) {
-      if (empty($field['headerPattern']) || $field['headerPattern'] === '//') {
-        continue;
+      if (!empty($field['usage']['import']) && !empty($field['title'])) {
+        $patterns = [
+          $this->strToPattern($field['name']),
+          $this->strToPattern($field['title']),
+        ];
+        if (!empty($field['html']['label'])) {
+          $patterns[] = $this->strToPattern($field['html']['label']);
+        }
+        // Swap out dots for double underscores so as not to break the quick form js.
+        // We swap this back on postProcess.
+        $name = str_replace('.', '__', $name);
+        $headerPatterns[$name] = '/^' . implode('|', array_unique($patterns)) . '$/i';
       }
-      // Swap out dots for double underscores so as not to break the quick form js.
-      // We swap this back on postProcess.
-      $name = str_replace('.', '__', $name);
-      $headerPatterns[$name] = $field['headerPattern'];
     }
     return $headerPatterns;
+  }
+
+  private function strToPattern(string $str) {
+    $str = str_replace(['_', '-'], ' ', $str);
+    return strtolower(str_replace(' ', '[-_ ]?', preg_quote($str, '/')));
   }
 
   /**
@@ -932,6 +972,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
       'entityMetadata' => $this->getFieldOptions(),
       'dedupeRules' => $parser->getAllDedupeRules(),
       'userJob' => $this->getUserJob(),
+      'columnHeaders' => $this->getColumnHeaders(),
     ]);
   }
 
@@ -951,7 +992,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
       ->addWhere('name', '=', 'import_' . $mappingName)
       ->addWhere('is_template', '=', TRUE)
       ->execute()->first();
-    $this->templateID = $templateJob['id'];
+    $this->templateID = $templateJob['id'] ?? NULL;
     return $templateJob ?? NULL;
   }
 

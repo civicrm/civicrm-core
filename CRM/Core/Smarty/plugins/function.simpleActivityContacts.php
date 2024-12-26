@@ -24,7 +24,7 @@
  */
 function smarty_function_simpleActivityContacts($params, &$smarty) {
   if (empty($params['activity_id'])) {
-    $smarty->trigger_error('assign: missing \'activity_id\' parameter');
+    trigger_error('simpleActivityContacts: missing &#039;activity_id&#039; parameter', E_USER_ERROR);
   }
   if (!isset($params['target_var'])) {
     $params['target_var'] = 'target';
@@ -50,10 +50,7 @@ function smarty_function_simpleActivityContacts($params, &$smarty) {
     $baseContactParams['return.' . $field] = 1;
   }
 
-  foreach ([
-    'target',
-    'assignee',
-  ] as $role) {
+  foreach (['target', 'assignee'] as $role) {
     $contact = [];
     if (!empty($activity[$role . '_contact_id'])) {
       $contact_id = array_shift($activity[$role . '_contact_id']);

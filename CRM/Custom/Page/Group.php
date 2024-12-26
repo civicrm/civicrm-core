@@ -136,7 +136,7 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
         $customGroups[$id]['style_display'] = $customGroupStyle[$customGroups[$id]['style']];
       }
       $customGroups[$id]['extends_display'] = $customGroupExtends[$customGroups[$id]['extends']];
-      $customGroups[$id]['extends_entity_column_value'] = $customGroups[$id]['extends_entity_column_value'] ?? NULL;
+      $customGroups[$id]['extends_entity_column_value'] ??= NULL;
     }
 
     // FIXME: This hardcoded array is mostly redundant with CRM_Core_BAO_CustomGroup::getSubTypes

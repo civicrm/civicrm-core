@@ -25,7 +25,15 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
   public static $_membershipTypesLinks = NULL;
 
   public $_permission = NULL;
-  public $_contactId = NULL;
+
+  /**
+   * Contact ID.
+   *
+   * @var int
+   *
+   * @deprecated
+   */
+  public $_contactId;
 
   /**
    * @var bool
@@ -44,8 +52,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
     $links = self::links('all', $this->_isPaymentProcessor, $this->_accessContribution);
     $membershipTypes = \Civi\Api4\MembershipType::get(TRUE)
       ->execute()
-      ->indexBy('id')
-      ->column('name');
+      ->column('name', 'id');
     $addWhere = "membership_type_id IN (0)";
     if (!empty($membershipTypes)) {
       $addWhere = "membership_type_id IN (" . implode(',', array_keys($membershipTypes)) . ")";
@@ -237,13 +244,6 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
       $displayName = CRM_Contact_BAO_Contact::displayName($this->_contactId);
       $this->assign('displayName', $displayName);
       $this->ajaxResponse['tabCount'] = CRM_Contact_BAO_Contact::getCountComponent('membership', $this->_contactId);
-      // Refresh other tabs with related data
-      $this->ajaxResponse['updateTabs'] = [
-        '#tab_activity' => CRM_Contact_BAO_Contact::getCountComponent('activity', $this->_contactId),
-      ];
-      if (CRM_Core_Permission::access('CiviContribute')) {
-        $this->ajaxResponse['updateTabs']['#tab_contribute'] = CRM_Contact_BAO_Contact::getCountComponent('contribution', $this->_contactId);
-      }
     }
   }
 
@@ -332,8 +332,9 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
       $this->_action = CRM_Core_Action::ADD;
     }
     else {
-      $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
-      $this->assign('contactId', $this->_contactId);
+      $contactID = $this->getContactID();
+      $this->assign('contactId', $contactID);
+      CRM_Contact_Form_Inline::renderFooter($contactID, FALSE);
 
       // check logged in url permission
       CRM_Contact_Page_View::checkUserPermission($this);
@@ -372,13 +373,9 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
       $this->assign('accessContribution', TRUE);
 
       //show associated soft credit when contribution payment is paid by different person
-      if ($this->_id && $this->_contactId) {
-        $softCreditList = CRM_Contribute_BAO_ContributionSoft::getSoftContributionList($this->_contactId, $this->_id);
-        if (!empty($softCreditList)) {
-          $this->assign('softCredit', TRUE);
-          $this->assign('softCreditRows', $softCreditList);
-        }
-      }
+      $softCreditList = ($this->_id && $this->_contactId) ? CRM_Contribute_BAO_ContributionSoft::getSoftContributionList($this->_contactId, $this->_id) : FALSE;
+      $this->assign('softCredit', (bool) $softCreditList);
+      $this->assign('softCreditRows', $softCreditList);
     }
     else {
       $this->_accessContribution = FALSE;
@@ -518,6 +515,8 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
           'url' => 'civicrm/contact/view/membership',
           'qs' => 'action=view&reset=1&cid=%%cid%%&id=%%id%%&context=membership&selectedChild=member',
           'title' => ts('View Membership'),
+          // The constants are a bit backward - VIEW comes after UPDATE
+          'weight' => 2,
         ],
       ];
     }
@@ -529,24 +528,29 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
           'url' => 'civicrm/contact/view/membership',
           'qs' => 'action=update&reset=1&cid=%%cid%%&id=%%id%%&context=membership&selectedChild=member',
           'title' => ts('Edit Membership'),
+          // The constants are a bit backward - VIEW comes after UPDATE
+          'weight' => 4,
         ],
         CRM_Core_Action::RENEW => [
           'name' => ts('Renew'),
           'url' => 'civicrm/contact/view/membership',
           'qs' => 'action=renew&reset=1&cid=%%cid%%&id=%%id%%&context=membership&selectedChild=member',
           'title' => ts('Renew Membership'),
+          'weight' => CRM_Core_Action::RENEW,
         ],
         CRM_Core_Action::FOLLOWUP => [
           'name' => ts('Renew-Credit Card'),
           'url' => 'civicrm/contact/view/membership',
           'qs' => 'action=renew&reset=1&cid=%%cid%%&id=%%id%%&context=membership&selectedChild=member&mode=live',
           'title' => ts('Renew Membership Using Credit Card'),
+          'weight' => CRM_Core_Action::FOLLOWUP,
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/contact/view/membership',
           'qs' => 'action=delete&reset=1&cid=%%cid%%&id=%%id%%&context=membership&selectedChild=member',
           'title' => ts('Delete Membership'),
+          'weight' => CRM_Core_Action::DELETE,
         ],
       ];
       if (!$isPaymentProcessor || !$accessContribution) {
@@ -565,6 +569,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
         'qs' => 'reset=1&cid=%%cid%%&mid=%%id%%&context=membership&selectedChild=member',
         'title' => ts('Cancel Auto Renew Subscription'),
         'extra' => 'onclick = "if (confirm(\'' . $cancelMessage . '\') ) {  return true; else return false;}"',
+        'weight' => CRM_Core_Action::DISABLE,
       ];
     }
     elseif (isset(self::$_links['all'][CRM_Core_Action::DISABLE])) {
@@ -577,6 +582,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
         'url' => 'civicrm/contribute/updatebilling',
         'qs' => 'reset=1&cid=%%cid%%&mid=%%id%%&context=membership&selectedChild=member',
         'title' => ts('Change Billing Details'),
+        'weight' => CRM_Core_Action::MAP,
       ];
     }
     elseif (isset(self::$_links['all'][CRM_Core_Action::MAP])) {
@@ -667,6 +673,19 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
     if (!CRM_Core_Permission::check('delete contributions of type ' . $finType)) {
       unset($links[CRM_Core_Action::DELETE]);
     }
+  }
+
+  /**
+   * Get the contact ID.
+   *
+   * @api Supported for external use.
+   *
+   * @return int|null
+   * @throws \CRM_Core_Exception
+   */
+  public function getContactID(): ?int {
+    $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
+    return $this->_contactId;
   }
 
 }

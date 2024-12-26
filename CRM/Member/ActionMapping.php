@@ -35,7 +35,7 @@ class CRM_Member_ActionMapping extends \Civi\ActionSchedule\MappingBase {
     return 'Membership';
   }
 
-  public function modifySpec(\Civi\Api4\Service\Spec\RequestSpec $spec) {
+  public function modifyApiSpec(\Civi\Api4\Service\Spec\RequestSpec $spec) {
     $spec->getFieldByName('entity_value')
       ->setLabel(ts('Membership Type'));
     $spec->getFieldByName('entity_status')
@@ -47,7 +47,7 @@ class CRM_Member_ActionMapping extends \Civi\ActionSchedule\MappingBase {
   }
 
   public function getStatusLabels(?array $entityValue): array {
-    foreach ($entityValue ?? [] as $membershipType) {
+    foreach (array_filter($entityValue ?? []) as $membershipType) {
       if (\CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $membershipType, 'auto_renew')) {
         return \CRM_Core_OptionGroup::values('auto_renew_options');
       }
@@ -95,13 +95,27 @@ class CRM_Member_ActionMapping extends \Civi\ActionSchedule\MappingBase {
       $query['casDateField'] = 'e.' . $query['casDateField'];
     }
 
+    // Exclude the renewals that are cancelled or failed.
+    $nonRenewStatusIds = [
+      CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', 'Cancelled'),
+      CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', 'Failed'),
+    ];
+
     // FIXME: Numbers should be constants.
     if (in_array(2, $selectedStatuses)) {
       //auto-renew memberships
-      $query->where("e.contribution_recur_id IS NOT NULL");
+      $query->join('cr', 'INNER JOIN civicrm_contribution_recur cr on e.contribution_recur_id = cr.id');
+      $query->where("cr.contribution_status_id NOT IN (#nonRenewStatusIds)")
+        ->param('nonRenewStatusIds', $nonRenewStatusIds);
     }
     elseif (in_array(1, $selectedStatuses)) {
-      $query->where("e.contribution_recur_id IS NULL");
+      // non-auto-renew memberships
+      // Include the renewals that were cancelled or Failed.
+      $query->join('cr', 'LEFT JOIN civicrm_contribution_recur cr on e.contribution_recur_id = cr.id');
+      $query->where("e.contribution_recur_id IS NULL OR (
+        e.contribution_recur_id IS NOT NULL AND cr.contribution_status_id IN (#nonRenewStatusIds)
+        )")
+        ->param('nonRenewStatusIds', $nonRenewStatusIds);
     }
 
     if (!empty($selectedValues)) {

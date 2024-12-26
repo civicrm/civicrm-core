@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Participant;
 use Civi\Payment\System;
 use Civi\Payment\Exception\PaymentProcessorException;
 use Civi\Payment\PropertyBag;
@@ -589,7 +590,13 @@ abstract class CRM_Core_Payment {
         return '';
 
       case 'contributionPageContinueText':
-        return ts('Click the <strong>Continue</strong> button to proceed with the payment.');
+        if ($params['amount'] <= 0.0 || (int) $this->_paymentProcessor['billing_mode'] === 4) {
+          return ts('Click the <strong>Continue</strong> button to proceed with the payment.');
+        }
+        if ($params['is_payment_to_existing']) {
+          return ts('Click the <strong>Make Payment</strong> button to proceed with the payment.');
+        }
+        return ts('Click the <strong>Make Contribution</strong> button to proceed with the payment.');
 
       case 'contributionPageConfirmText':
         if ($params['amount'] <= 0.0) {
@@ -1234,9 +1241,15 @@ abstract class CRM_Core_Payment {
     }
 
     if ($this->_component == 'event') {
+      $eventID = NULL;
+      if ($participantID) {
+        $eventID = Participant::get(FALSE)->addWhere('id', '=', $participantID)
+          ->addSelect('event_id')->execute()->single()['event_id'];
+      }
       return CRM_Utils_System::url($this->getBaseReturnUrl(), [
         'reset' => 1,
         'cc' => 'fail',
+        'id' => $eventID,
         'participantId' => $participantID,
       ],
         TRUE, NULL, FALSE
@@ -1512,13 +1525,14 @@ abstract class CRM_Core_Payment {
   /**
    * Refunds payment
    *
-   * Payment processors should set payment_status_id if it set the status to Refunded in case the transaction is successful
-   *
    * @param array $params
    *
-   * @throws \Civi\Payment\Exception\PaymentProcessorException
+   * @return array
+   *   Result array (containing at least the key refund_status)
    */
-  public function doRefund(&$params) {}
+  public function doRefund(&$params) {
+    return ['refund_status' => 'Completed'];
+  }
 
   /**
    * Query payment processor for details about a transaction.
@@ -1560,15 +1574,11 @@ abstract class CRM_Core_Payment {
       return FALSE;
     }
 
-    if (isset($_GET['payment_date']) &&
+    return (isset($_GET['payment_date']) &&
       isset($_GET['merchant_return_link']) &&
       ($_GET['payment_status'] ?? NULL) == 'Completed' &&
       $paymentProcessor['payment_processor_type'] == "PayPal_Standard"
-    ) {
-      return TRUE;
-    }
-
-    return FALSE;
+    );
   }
 
   /**
@@ -1899,6 +1909,19 @@ abstract class CRM_Core_Payment {
   public function supportsNoReturn(): bool {
     $billingMode = (int) $this->_paymentProcessor['billing_mode'];
     return $billingMode === self::BILLING_MODE_NOTIFY || $billingMode === self::BILLING_MODE_BUTTON;
+  }
+
+  /**
+   * Checks if payment processor supports not returning to the form processing on recurring.
+   *
+   * The exists to support historical event form logic where emails are sent
+   * & the form postProcess hook is called before redirecting the browser where
+   * the user is redirected.
+   *
+   * @return bool
+   */
+  public function supportsNoReturnForRecurring(): bool {
+    return $this->supportsNoReturn();
   }
 
   /**

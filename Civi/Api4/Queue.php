@@ -20,11 +20,11 @@ use Civi\Api4\Action\Queue\Run;
  * Registering a queue in this table (and setting `is_auto=1`) can
  * allow it to execute tasks automatically in the background.
  *
- * @searchable none
+ * @searchable secondary
  * @since 5.47
  * @package Civi\Api4
  */
-class Queue extends \Civi\Api4\Generic\DAOEntity {
+class Queue extends Generic\DAOEntity {
 
   use Generic\Traits\ManagedEntity;
 

@@ -90,10 +90,8 @@
             {$row.title|escape}
           </td>
         {/if}
-
-          {assign var=position  value=$field|strrpos:'_'}
-          {assign var=blockId   value=$field|substr:$position+1}
-          {assign var=blockName value=$field|substr:14:$position-14}
+          {assign var=blockId  value=$row.location_block_index}
+          {assign var=blockName value=$row.location_entity}
 
           <td>
             {* @TODO check if this is ever an array or a fileName? *}

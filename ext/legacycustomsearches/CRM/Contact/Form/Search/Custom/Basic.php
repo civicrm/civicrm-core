@@ -79,7 +79,7 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
     $form->addElement('select', 'group', ts('in'), $group, ['class' => 'crm-select2 huge']);
 
     // add select for categories
-    $tag = ['' => ts('- any tag -')] + CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', ['onlyActive' => FALSE]);
+    $tag = ['' => ts('- any tag -')] + CRM_Core_DAO_EntityTag::buildOptions('tag_id', 'get');
     $form->addElement('select', 'tag', ts('Tagged'), $tag, ['class' => 'crm-select2 huge']);
 
     // text for sort_name

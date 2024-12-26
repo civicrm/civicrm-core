@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Event\AuthorizeRecordEvent;
 use Civi\Api4\MembershipType;
 use Civi\Api4\Relationship;
 
@@ -157,7 +158,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship implemen
    * @throws \CRM_Core_Exception
    */
   public static function add($params, $ids = []) {
-    $params['id'] = CRM_Utils_Array::value('relationship', $ids, CRM_Utils_Array::value('id', $params));
+    $params['id'] = $ids['relationship'] ?? $params['id'] ?? NULL;
 
     $hook = 'create';
     if ($params['id']) {
@@ -1590,13 +1591,7 @@ contact_id_a IN ( %1 ) OR contact_id_b IN ( %1 ) AND id IN (" . implode(',', $re
       return TRUE;
     }
 
-    $recordsFound = (int) CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM civicrm_relationship WHERE relationship_type_id IN ( " . implode(',', $membershipTypeRelationshipTypeIDs) . " ) AND contact_id_a IN ( %1, %2 ) AND contact_id_b IN ( %1, %2 ) AND id NOT IN (" . implode(',', $relIds) . ")", $relParamas);
-
-    if ($recordsFound) {
-      return FALSE;
-    }
-
-    return TRUE;
+    return !CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM civicrm_relationship WHERE relationship_type_id IN ( " . implode(',', $membershipTypeRelationshipTypeIDs) . " ) AND contact_id_a IN ( %1, %2 ) AND contact_id_b IN ( %1, %2 ) AND id NOT IN (" . implode(',', $relIds) . ")", $relParamas);
   }
 
   /**
@@ -2007,7 +2002,10 @@ AND cc.sort_name LIKE '%$name%'";
   }
 
   /**
-   * @inheritdoc
+   * Legacy option getter
+   *
+   * @deprecated
+   * @inheritDoc
    */
   public static function buildOptions($fieldName, $context = NULL, $props = []) {
     // Quickform-specific format, for use when editing relationship type options in a popup from the contact relationship form
@@ -2272,24 +2270,24 @@ SELECT count(*)
   }
 
   /**
-   * @param string $entityName
-   * @param string $action
-   * @param array $record
-   * @param int $userID
-   * @return bool
-   * @see CRM_Core_DAO::checkAccess
+   * Check related contact access.
+   * @see \Civi\Api4\Utils\CoreUtil::checkAccessRecord
    */
-  public static function _checkAccess(string $entityName, string $action, array $record, int $userID): bool {
+  public static function self_civi_api4_authorizeRecord(AuthorizeRecordEvent $e): void {
+    $record = $e->getRecord();
+    $userID = $e->getUserID();
+    $delegateAction = $e->getActionName() === 'get' ? 'get' : 'update';
+
     // Delegate relationship permissions to contacts a & b
     foreach (['a', 'b'] as $ab) {
       if (empty($record["contact_id_$ab"]) && !empty($record['id'])) {
         $record["contact_id_$ab"] = CRM_Core_DAO::getFieldValue(__CLASS__, $record['id'], "contact_id_$ab");
       }
-      if (!\Civi\Api4\Utils\CoreUtil::checkAccessDelegated('Contact', 'update', ['id' => $record["contact_id_$ab"]], $userID)) {
-        return FALSE;
+      if (!empty($record["contact_id_$ab"]) && !\Civi\Api4\Utils\CoreUtil::checkAccessDelegated('Contact', $delegateAction, ['id' => $record["contact_id_$ab"]], $userID)) {
+        $e->setAuthorized(FALSE);
+        break;
       }
     }
-    return TRUE;
   }
 
 }

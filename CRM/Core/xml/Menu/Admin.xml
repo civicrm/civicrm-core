@@ -231,11 +231,9 @@
      <weight>95</weight>
   </item>
   <item>
-     <path>civicrm/admin/setting/preferences/date</path>
+     <path>civicrm/admin/setting/preferences/date/edit</path>
      <title>Date Preferences</title>
      <page_callback>CRM_Admin_Form_PreferencesDate</page_callback>
-     <adminGroup>Customize Data and Screens</adminGroup>
-     <weight>97</weight>
   </item>
   <item>
      <path>civicrm/admin/menu</path>
@@ -246,20 +244,16 @@
      <weight>100</weight>
   </item>
   <item>
+     <path>civicrm/admin/menu/item</path>
+     <page_callback>CRM_Admin_Form_Navigation</page_callback>
+  </item>
+  <item>
      <path>civicrm/admin/options/wordreplacements</path>
      <title>Word Replacements</title>
      <desc>Word Replacements.</desc>
      <page_callback>CRM_Admin_Form_WordReplacements</page_callback>
      <adminGroup>Customize Data and Screens</adminGroup>
      <weight>105</weight>
-  </item>
-  <item>
-     <path>civicrm/admin/options/custom_search</path>
-     <title>Manage Custom Searches</title>
-     <desc>Developers and accidental techies with a bit of PHP and SQL knowledge can create new search forms to handle specific search and reporting needs which aren't covered by the built-in Advanced Search and Search Builder features.</desc>
-     <page_callback>CRM_Admin_Page_Options</page_callback>
-     <adminGroup>Customize Data and Screens</adminGroup>
-     <weight>110</weight>
   </item>
   <item>
      <path>civicrm/admin/domain</path>
@@ -300,7 +294,6 @@
      <title>Schedule Reminders</title>
      <desc>Schedule Reminders.</desc>
      <page_callback>CRM_Admin_Page_ScheduleReminders</page_callback>
-     <access_callback>1</access_callback>
      <access_arguments>administer CiviCRM data</access_arguments>
      <adminGroup>Communications</adminGroup>
      <weight>40</weight>
@@ -309,7 +302,6 @@
      <path>civicrm/admin/scheduleReminders/edit</path>
      <title>Schedule Reminders</title>
      <page_callback>CRM_Admin_Form_ScheduleReminders</page_callback>
-     <access_callback>1</access_callback>
      <access_arguments>administer CiviCRM data;edit all events</access_arguments>
   </item>
   <item>
@@ -333,12 +325,22 @@
      <weight>60</weight>
   </item>
   <item>
+     <path>civicrm/admin/labelFormats/edit</path>
+     <title>Label Page Formats</title>
+     <page_callback>CRM_Admin_Page_LabelFormats</page_callback>
+  </item>
+  <item>
      <path>civicrm/admin/pdfFormats</path>
      <title>Print Page (PDF) Formats</title>
      <desc>Configure PDF Page Formats that can be assigned to Message Templates when creating PDF letters.</desc>
      <page_callback>CRM_Admin_Page_PdfFormats</page_callback>
      <adminGroup>Communications</adminGroup>
      <weight>70</weight>
+  </item>
+  <item>
+     <path>civicrm/admin/pdfFormats/edit</path>
+     <title>Print Page (PDF) Formats</title>
+     <page_callback>CRM_Admin_Page_PdfFormats</page_callback>
   </item>
   <item>
      <path>civicrm/admin/options/communication_style</path>
@@ -546,6 +548,14 @@
      <weight>110</weight>
   </item>
   <item>
+     <path>civicrm/admin/mapping/edit</path>
+     <title>Import/Export Mappings</title>
+     <desc>Import and Export mappings allow you to easily run the same job multiple times. This option allows you to rename or delete existing mappings.</desc>
+     <page_callback>CRM_Admin_Form_Mapping</page_callback>
+     <adminGroup>System Settings</adminGroup>
+     <weight>111</weight>
+  </item>
+  <item>
      <path>civicrm/admin/setting/debug</path>
      <title>Debugging</title>
      <page_callback>CRM_Admin_Form_Setting_Debugging</page_callback>
@@ -581,8 +591,10 @@
   </item>
   <item>
      <path>civicrm/admin/setting/preferences/date</path>
-     <title>View Date Preferences</title>
+     <title>Date Preferences</title>
      <page_callback>CRM_Admin_Page_PreferencesDate</page_callback>
+     <adminGroup>Customize Data and Screens</adminGroup>
+     <weight>97</weight>
   </item>
 
   <item>
@@ -670,7 +682,7 @@
      <title>Price Sets</title>
      <page_callback>CRM_Price_Page_Set</page_callback>
      <desc>Price sets allow you to offer multiple options with associated fees (e.g. pre-conference workshops, additional meals, etc.). Configure Price Sets for events which need more than a single set of fee levels.</desc>
-     <access_arguments>access CiviCRM,access CiviEvent</access_arguments>
+     <access_arguments>access CiviContribute;access CiviEvent</access_arguments>
      <adminGroup>Customize</adminGroup>
      <weight>380</weight>
   </item>
@@ -679,14 +691,14 @@
      <title>New Price Set</title>
      <page_callback>CRM_Price_Page_Set</page_callback>
      <desc>Price sets allow you to offer multiple options with associated fees (e.g. pre-conference workshops, additional meals, etc.). Configure Price Sets for events which need more than a single set of fee levels.</desc>
-     <access_arguments>access CiviCRM,access CiviEvent</access_arguments>
+     <access_arguments>access CiviCRM</access_arguments>
      <path_arguments>action=add</path_arguments>
   </item>
   <item>
      <path>civicrm/admin/price/edit</path>
      <title>Price Sets</title>
      <page_callback>CRM_Price_Page_Set</page_callback>
-     <access_arguments>access CiviCRM,access CiviEvent</access_arguments>
+     <access_arguments>access CiviCRM</access_arguments>
   </item>
   <item>
      <path>civicrm/admin/price/field</path>
@@ -718,7 +730,16 @@
      <adminGroup>System Settings</adminGroup>
      <weight>500</weight>
   </item>
-    <item>
+  <item>
+     <path>civicrm/admin/sms/provider/edit</path>
+     <title>Sms Providers</title>
+     <desc>To configure a sms provider</desc>
+     <page_callback>CRM_SMS_Form_Provider</page_callback>
+     <access_arguments>administer CiviCRM</access_arguments>
+     <adminGroup>System Settings</adminGroup>
+     <weight>501</weight>
+  </item>
+  <item>
      <path>civicrm/sms/send</path>
      <title>New Mass SMS</title>
      <page_callback>CRM_SMS_Controller_Send</page_callback>

@@ -11,10 +11,10 @@
 {foreach from=$viewCustomData item=customValues key=customGroupId}
   {foreach from=$customValues item=cd_edit key=cvID}
     {assign var='index' value=$groupId|cat:"_$cvID"}
-  <div id="{$cd_edit.name}" class="crm-accordion-wrapper {if $cd_edit.collapse_display neq 0}collapsed{/if}">
-    <div class="crm-accordion-header">
+  <details id="{$cd_edit.name}" class="crm-accordion-bold" {if $cd_edit.collapse_display neq 0}{else}open{/if}>
+    <summary>
       {$cd_edit.title}
-    </div>
+    </summary>
     <div class="crm-accordion-body">
       {if !empty($cd_edit.fields)}
         <table class="crm-info-panel">
@@ -47,7 +47,7 @@
       <br/>
       <div class="clear"></div>
     </div>
-  </div>
+  </details>
 
   {/foreach}
 {/foreach}

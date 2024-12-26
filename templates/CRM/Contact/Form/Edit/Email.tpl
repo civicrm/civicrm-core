@@ -29,11 +29,11 @@
   <td>{$form.email.$blockId.email.html|crmAddClass:email}&nbsp;{$form.email.$blockId.location_type_id.html}
     {if $isAddSignatureFields}
       <div class="clear"></div>
-      <div class="email-signature crm-collapsible collapsed">
-        <div class="collapsible-title">
+      <details class="email-signature crm-accordion-light">
+        <summary>
           {ts}Signature{/ts}
-        </div>
-        <div id="signatureBlock{$blockId}">
+        </summary>
+        <div id="signatureBlock{$blockId}" class="crm-accordion-body">
           {$form.email.$blockId.signature_html.label}<br/>{$form.email.$blockId.signature_html.html}<br/>
           {$form.email.$blockId.signature_text.label}<br/>{$form.email.$blockId.signature_text.html}
         </div>
@@ -41,7 +41,7 @@
     {/if}
   </td>
   <td align="center">{$form.email.$blockId.on_hold.html}</td>
-  <td align="center" id="Email-Bulkmail-html">{$form.email.$blockId.is_bulkmail.html}</td>
+  <td align="center" id="Email-Bulkmail-html" {if !$multipleBulk}class="crm-email-bulkmail"{/if}>{$form.email.$blockId.is_bulkmail.html}</td>
   <td align="center" id="Email-Primary-html" {if $blockId eq 1}class="hiddenElement"{/if}>
     {$form.email.$blockId.is_primary.1.html}
   </td>

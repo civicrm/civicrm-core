@@ -147,14 +147,21 @@ class CRM_Core_BAO_ConfigSetting {
     // Grab session reference.
     $session = CRM_Core_Session::singleton();
 
-    // Set flag for multi-language setup.
-    $multiLang = (bool) $activatedLocales;
-
     // Initialise the default and chosen locales.
     $defaultLocale = $settings->get('lcMessages');
     $chosenLocale = NULL;
 
+    // Parse multi lang locales
+    $multiLangLocales = $activatedLocales ? explode(CRM_Core_DAO::VALUE_SEPARATOR, $activatedLocales) : NULL;
+
+    // On multilang, defaultLocale should be one of the activated locales
+    if ($multiLangLocales && !in_array($defaultLocale, $multiLangLocales)) {
+      $defaultLocale = NULL;
+    }
+
     // When there is a choice of permitted languages.
+    // Why would this be different from the locales?
+    // @see https://github.com/civicrm/civicrm-core/pull/30533#discussion_r1756400531
     $permittedLanguages = CRM_Core_I18n::uiLanguages(TRUE);
     if (count($permittedLanguages) >= 2) {
 
@@ -185,7 +192,7 @@ class CRM_Core_BAO_ConfigSetting {
          * many cases returns nothing if $dbLocale is not set, so set it to the
          * default - even if it's overridden later.
          */
-        $dbLocale = $multiLang && $defaultLocale ? "_{$defaultLocale}" : '';
+        $dbLocale = $multiLangLocales && $defaultLocale ? "_{$defaultLocale}" : '';
 
         // Retrieve locale as reported by CMS.
         $cmsLocale = CRM_Utils_System::getUFLocale();
@@ -194,10 +201,9 @@ class CRM_Core_BAO_ConfigSetting {
         }
 
         // Clear chosen locale if not activated in multi-language CiviCRM.
-        if ($activatedLocales && !in_array($chosenLocale, explode(CRM_Core_DAO::VALUE_SEPARATOR, $activatedLocales))) {
+        if ($multiLangLocales && !in_array($chosenLocale, $multiLangLocales)) {
           $chosenLocale = NULL;
         }
-
       }
 
       // Assign the system default if the chosen locale hasn't been set.
@@ -207,14 +213,14 @@ class CRM_Core_BAO_ConfigSetting {
 
     }
     else {
-
       // CRM-11993 - Use default when it's a single-language install.
       $chosenLocale = $defaultLocale;
-
     }
 
-    if (!$session->isEmpty()) {
-      // Always assign the chosen locale to the session.
+    if ($chosenLocale && ($requestLocale ?? NULL) === $chosenLocale) {
+      // If the locale is passed in via lcMessages key on GET or POST data,
+      // and it's valid against our configured locales, we require the session
+      // to store this, even if that means starting an anonymous session.
       $session->set('lcMessages', $chosenLocale);
     }
 
@@ -222,7 +228,7 @@ class CRM_Core_BAO_ConfigSetting {
      * Set suffix for table names in multi-language installs.
      * Use views if more than one language.
      */
-    $dbLocale = $multiLang && $chosenLocale ? "_{$chosenLocale}" : '';
+    $dbLocale = $multiLangLocales && $chosenLocale ? "_{$chosenLocale}" : '';
 
     // FIXME: an ugly hack to fix CRM-4041.
     $tsLocale = $chosenLocale;
@@ -283,11 +289,14 @@ class CRM_Core_BAO_ConfigSetting {
       FALSE,
       FALSE
     );
-    if ($config->userSystem->is_drupal &&
-      $resetSessionTable
-    ) {
+
+    if ($resetSessionTable && $config->userSystem->is_drupal) {
       db_query("DELETE FROM {sessions} WHERE 1");
       $moveStatus .= ts('Drupal session table cleared.') . '<br />';
+    }
+    elseif (!$resetSessionTable && CIVICRM_UF === 'Standalone') {
+      // dont reset CRM sessions on Standalone unless explicitly requested
+      // as otherwise it will log you out
     }
     else {
       $session = CRM_Core_Session::singleton();

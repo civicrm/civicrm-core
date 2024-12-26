@@ -9,6 +9,7 @@ class CRM_Event_Cart_Form_Checkout_ThankYou extends CRM_Event_Cart_Form_Cart {
 
   public function buildLineItems() {
     foreach ($this->cart->events_in_carts as $event_in_cart) {
+      /* @var \CRM_Event_Cart_BAO_EventInCart $event_in_cart */
       $event_in_cart->load_location();
     }
     $line_items = $this->get('line_items');

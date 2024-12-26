@@ -83,9 +83,7 @@ class CRM_Mailing_ActionTokens extends \Civi\Token\AbstractTokenSubscriber {
     list($verp, $urls) = CRM_Mailing_BAO_Mailing::getVerpAndUrls(
       $row->context['mailingJobId'],
       $row->context['mailingActionTarget']['id'] ?? NULL,
-      $row->context['mailingActionTarget']['hash'] ?? NULL,
-      // Note: Behavior is already undefined for SMS/'phone' mailings...
-      $row->context['mailingActionTarget']['email'] ?? NULL
+      $row->context['mailingActionTarget']['hash'] ?? NULL
     );
 
     $row->format('text/plain')->tokens($entity, $field,

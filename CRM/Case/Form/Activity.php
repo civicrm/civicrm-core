@@ -50,6 +50,32 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
   public $_caseTypeDefinition;
 
   /**
+   * This is here to avoid php 8 warnings but it should be converted to
+   * some mechanism more local to ChangeCaseStatus. It also doesn't make sense
+   * that it's an array.
+   *
+   * @var array
+   * @internal
+   */
+  public $_oldCaseStatus;
+
+  /**
+   * This is here to avoid php 8 warnings but it should be converted to
+   * some mechanism more local to ChangeCaseStatus. It also doesn't make sense
+   * that it's an array.
+   *
+   * @var array
+   * @internal
+   */
+  public $_defaultCaseStatus;
+
+  /**
+   * @var int
+   * Used by ChangeCaseStartDate. See getter/setter below.
+   */
+  private $openCaseActivityId;
+
+  /**
    * Build the form object.
    */
   public function preProcess() {
@@ -184,35 +210,15 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
    */
   public function setDefaultValues() {
     $this->_defaults = parent::setDefaultValues();
-    $targetContactValues = [];
-    foreach ($this->_caseId as $key => $val) {
-      //get all clients.
-      $clients = CRM_Case_BAO_Case::getContactNames($val);
-      if (isset($this->_activityId) && empty($_POST)) {
-        if (!CRM_Utils_Array::crmIsEmptyArray($this->_defaults['target_contact'])) {
-          $targetContactValues = array_combine(array_unique($this->_defaults['target_contact']),
-            explode(';', trim($this->_defaults['target_contact_value']))
-          );
-          //exclude all clients.
-          foreach ($clients as $clientId => $vals) {
-            if (array_key_exists($clientId, $targetContactValues)) {
-              unset($targetContactValues[$clientId]);
-            }
-          }
-        }
+    if (empty($this->_defaults['medium_id'])) {
+      // set default encounter medium CRM-4816
+      $medium = CRM_Core_OptionGroup::values('encounter_medium', FALSE, FALSE, FALSE, 'AND is_default = 1');
+      if (count($medium) == 1) {
+        $this->_defaults['medium_id'] = key($medium);
       }
-      $this->assign('targetContactValues', empty($targetContactValues) ? FALSE : $targetContactValues);
-
-      if (empty($this->_defaults['medium_id'])) {
-        // set default encounter medium CRM-4816
-        $medium = CRM_Core_OptionGroup::values('encounter_medium', FALSE, FALSE, FALSE, 'AND is_default = 1');
-        if (count($medium) == 1) {
-          $this->_defaults['medium_id'] = key($medium);
-        }
-      }
-
-      return $this->_defaults;
     }
+
+    return $this->_defaults;
   }
 
   public function buildQuickForm() {
@@ -401,34 +407,32 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
     }
 
     // format activity custom data
-    if (!empty($params['hidden_custom'])) {
-      if ($this->_activityId) {
-        // retrieve and include the custom data of old Activity
-        $oldActivity = civicrm_api3('Activity', 'getsingle', ['id' => $this->_activityId]);
-        $params = array_merge($oldActivity, $params);
+    if ($this->_activityId) {
+      // retrieve and include the custom data of old Activity
+      $oldActivity = civicrm_api3('Activity', 'getsingle', ['id' => $this->_activityId]);
+      $params = array_merge($oldActivity, $params);
 
-        // unset custom fields-id from params since we want custom
-        // fields to be saved for new activity.
-        foreach ($params as $key => $value) {
-          $match = [];
-          if (preg_match('/^(custom_\d+_)(\d+)$/', $key, $match)) {
-            $params[$match[1] . '-1'] = $params[$key];
+      // unset custom fields-id from params since we want custom
+      // fields to be saved for new activity.
+      foreach ($params as $key => $value) {
+        $match = [];
+        if (preg_match('/^(custom_\d+_)(\d+)$/', $key, $match)) {
+          $params[$match[1] . '-1'] = $params[$key];
 
-            // for autocomplete transfer hidden value instead of label
-            if ($params[$key] && isset($params[$key . '_id'])) {
-              $params[$match[1] . '-1_id'] = $params[$key . '_id'];
-              unset($params[$key . '_id']);
-            }
-            unset($params[$key]);
+          // for autocomplete transfer hidden value instead of label
+          if ($params[$key] && isset($params[$key . '_id'])) {
+            $params[$match[1] . '-1_id'] = $params[$key . '_id'];
+            unset($params[$key . '_id']);
           }
+          unset($params[$key]);
         }
       }
-
-      $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
-        $this->_activityId,
-        'Activity'
-      );
     }
+
+    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
+      $this->_activityId,
+      'Activity'
+    );
 
     // assigning formatted value
     if (!empty($params['assignee_contact_id'])) {
@@ -445,7 +449,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       }
 
       // @todo This is called newActParams because it USED TO create new activity revisions. But at the moment just changing the part that is broken.
-      // hidden_custom is always 1, so see above where $params gets merged with the existing activity data every time, including the activity id.
+      // $params gets merged with the existing activity data every time, including the activity id.
       $newActParams = $params;
 
       // add target contact values in update mode
@@ -576,6 +580,9 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
                 [$vval['actId']], TRUE, FALSE
               );
               $mailStatus .= ' ' . ts("A copy of the activity has also been sent to assignee contact(s).");
+            }
+            else {
+              continue;
             }
           }
           //build an associative array with unique email addresses.
@@ -796,6 +803,24 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       }
     }
     return $bounceMessage;
+  }
+
+  /**
+   * Getter used by ChangeCaseStartDate
+   * @return int|null
+   * @internal
+   */
+  public function getOpenCaseActivityId(): ?int {
+    return $this->openCaseActivityId;
+  }
+
+  /**
+   * Setter used by ChangeCaseStartDate
+   * @param int $id
+   * @internal
+   */
+  public function setOpenCaseActivityId(int $id): void {
+    $this->openCaseActivityId = $id;
   }
 
 }

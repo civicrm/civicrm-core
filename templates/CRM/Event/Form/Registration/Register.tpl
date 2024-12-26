@@ -7,11 +7,11 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{if call_user_func(array('CRM_Core_Permission','check'), 'administer CiviCRM')}
+{crmPermission has='administer CiviCRM'}
   {capture assign="buttonTitle"}{ts}Configure Event{/ts}{/capture}
   {crmButton target="_blank" p="civicrm/event/manage/settings" q="reset=1&action=update&id=`$event.id`" fb=1 title="$buttonTitle" icon="fa-wrench"}{ts}Configure{/ts}{/crmButton}
   <div class='clear'></div>
-{/if}
+{/crmPermission}
 {* Callback snippet: Load payment processor *}
   {if $action & 1024}
     {include file="CRM/Event/Form/Registration/PreviewHeader.tpl"}
@@ -76,8 +76,8 @@
       {include file="CRM/UF/Form/Block.tpl" fields=$customPre prefix=false hideFieldset=false}
     </div>
 
-    {if $priceSet}
-      {if ! $quickConfig}<fieldset id="priceset" class="crm-public-form-item crm-group priceset-group">
+    {if !$suppressPaymentBlock}
+      {if !$quickConfig}<fieldset id="priceset" class="crm-public-form-item crm-group priceset-group">
         <legend>{$event.fee_label}</legend>{/if}
       {include file="CRM/Price/Form/PriceSet.tpl" extends="Event" hideTotal=$quickConfig}
       {include file="CRM/Price/Form/ParticipantCount.tpl"}
@@ -130,12 +130,14 @@
       </fieldset>
     {/if}
 
-    {if $priceSet && !$showPaymentOnConfirm}
+    {if !$suppressPaymentBlock && !$showPaymentOnConfirm}
       {include file='CRM/Core/BillingBlockWrapper.tpl'}
     {/if}
 
     <div class="crm-public-form-item crm-section custom_post-section">
-      {include file="CRM/UF/Form/Block.tpl" fields=$customPost prefix=false hideFieldset=false}
+      {foreach from=$postPageProfiles item=customPost}
+        {include file="CRM/UF/Form/Block.tpl" fields=$customPost prefix=false hideFieldset=false}
+      {/foreach}
     </div>
 
     <div id="crm-submit-buttons" class="crm-submit-buttons">

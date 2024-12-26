@@ -56,7 +56,7 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
        *
        * @var bool
        */
-      public static $_log = {$table.log|strtoupper};
+      public static $_log = {$table.log|upper};
       {if $table.paths}
      /**
       * Paths for accessing this entity in the UI.
@@ -111,36 +111,9 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
   * @return string
   */
   public static function getEntityDescription() {ldelim}
-    return {$tsFunctionName}('{$table.description|replace:"'":"\'"}');
+    return {$tsFunctionName}('{$table.description|crmEscapeSingleQuotes}');
   {rdelim}
 {/if}
-
-
-{if !empty($table.foreignKey) || !empty($table.dynamicForeignKey)}
-    /**
-     * Returns foreign keys and entity references.
-     *
-     * @return array
-     *   [CRM_Core_Reference_Interface]
-     */
-    public static function getReferenceColumns() {ldelim}
-      if (!isset(Civi::$statics[__CLASS__]['links'])) {ldelim}
-        Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
-{if isset($table.foreignKey)}
-{foreach from=$table.foreignKey item=foreign}
-        Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), '{$foreign.name}', '{$foreign.table}', '{$foreign.key}');
-{/foreach}
-{/if}
-{if isset($table.dynamicForeignKey)}
-{foreach from=$table.dynamicForeignKey item=foreign}
-        Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Dynamic(self::getTableName(), '{$foreign.idColumn}', NULL, '{$foreign.key|default:'id'}', '{$foreign.typeColumn}');
-{/foreach}
-{/if}
-        CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
-      {rdelim}
-      return Civi::$statics[__CLASS__]['links'];
-    {rdelim}
-{/if} {* table.foreignKey *}
 
       /**
        * Returns all the column names of this table
@@ -164,16 +137,16 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
                                                                       'title'     => {$tsFunctionName}('{$field.title}'),
 {/if}
 {if $field.comment}
-                                                                      'description'     => {$tsFunctionName}('{$field.comment|replace:"'":"\'"}'),
+                                                                      'description'     => {$tsFunctionName}('{$field.comment|crmEscapeSingleQuotes}'),
 {/if}
 {if $field.required}
-                                        'required'  => {$field.required|strtoupper},
+                                        'required'  => {$field.required|upper},
 {/if} {* field.required *}
 {if isset($field.length)}
                       'maxlength' => {$field.length},
 {/if} {* field.length *}
 {if isset($field.precision)}
-                      'precision'      => array({$field.precision}),
+                      'precision'      => array({$field.precision},),
 {/if}
 {if isset($field.size)}
                       'size'      => {$field.size},
@@ -185,17 +158,16 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
                       'cols'      => {$field.cols},
 {/if} {* field.cols *}
                       'usage'     => array(
-                                       {foreach from=$field.usage key=usage item=isUsed}'{$usage}' => {$isUsed},
+                                       {foreach from=$field.usage key="usage" item="isUsed"}'{$usage}' => {if $isUsed}TRUE{else}FALSE{/if},
                                        {/foreach}),
-{if $field.import === 'TRUE'}
+{if $field.usage.import}
                       'import'    => TRUE,
-
 {/if} {* field.import *}
   'where'     => '{$table.name}.{$field.name}',
   {if $field.headerPattern}'headerPattern' => '{$field.headerPattern}',{/if}
   {if $field.dataPattern}'dataPattern' => '{$field.dataPattern}',{/if}
-{if $field.export === 'TRUE' || ($field.export === 'FALSE' && $field.import === 'TRUE')}
-                      'export'    => {$field.export},
+{if $field.usage.export || (!$field.usage.export && $field.usage.import)}
+                      'export'    => {if $field.usage.export}TRUE{else}FALSE{/if},
 {/if} {* field.export - only show if meaningful, deprecated for usage *}
 {if $field.contactType}
                       'contactType' => {if $field.contactType == 'null'}NULL{else}'{$field.contactType}'{/if},
@@ -219,11 +191,17 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
 {if isset($field.FKClassName)}
                       'FKClassName' => '{$field.FKClassName}',
 {/if}
+{if isset($field.DFKEntityColumn)}
+                      'DFKEntityColumn' => '{$field.DFKEntityColumn}',
+{/if}
+{if isset($field.FKColumnName)}
+                      'FKColumnName' => '{$field.FKColumnName}',
+{/if}
 {if !empty($field.component)}
                       'component' => '{$field.component}',
 {/if}
 {if $field.serialize}
-  'serialize' => self::SERIALIZE_{$field.serialize|strtoupper},
+  'serialize' => self::SERIALIZE_{$field.serialize|upper},
 {/if}
 {if $field.uniqueTitle}
   'unique_title' => {$tsFunctionName}('{$field.uniqueTitle}'),
@@ -251,41 +229,6 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
             CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);
           {rdelim}
           return Civi::$statics[__CLASS__]['fields'];
-      {rdelim}
-
-      /**
-       * Return a mapping from field-name to the corresponding key (as used in fields()).
-       *
-       * @return array
-       *   Array(string $name => string $uniqueName).
-       */
-      public static function &fieldKeys( ) {ldelim}
-        if (!isset(Civi::$statics[__CLASS__]['fieldKeys'])) {ldelim}
-          Civi::$statics[__CLASS__]['fieldKeys'] = array_flip(CRM_Utils_Array::collect('name', self::fields()));
-        {rdelim}
-        return Civi::$statics[__CLASS__]['fieldKeys'];
-      {rdelim}
-
-      /**
-       * Returns the names of this table
-       *
-       * @return string
-       */
-      public static function getTableName( ) {ldelim}
-        {if $table.localizable}
-          return CRM_Core_DAO::getLocaleTableName( self::$_tableName );
-        {else}
-          return self::$_tableName;
-        {/if}
-      {rdelim}
-
-      /**
-       * Returns if this table needs to be logged
-       *
-       * @return bool
-       */
-      public function getLog( ) {ldelim}
-          return self::$_log;
       {rdelim}
 
       /**

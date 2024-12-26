@@ -314,12 +314,6 @@ function _civicrm_api3_get_DAO($name) {
   if ($name === 'AclRole' || $name === 'ACLRole') {
     return 'CRM_ACL_DAO_ACLEntityRole';
   }
-  // FIXME: DAO should be renamed CRM_SMS_DAO_SmsProvider
-  // But this would impact SMS extensions so need to coordinate
-  // Probably best approach is to migrate them to use the api and decouple them from core BAOs
-  if ($name === 'SmsProvider') {
-    return 'CRM_SMS_DAO_Provider';
-  }
   // Entity was renamed to CRM_Dedupe_DAO_DedupeRule for APIv4
   if ($name === 'Rule') {
     return 'CRM_Dedupe_DAO_DedupeRule';
@@ -337,7 +331,7 @@ function _civicrm_api3_get_DAO($name) {
     $name = strtoupper($name);
   }
 
-  $dao = CRM_Core_DAO_AllCoreTables::getFullName($name);
+  $dao = CRM_Core_DAO_AllCoreTables::getDAONameForEntity($name);
   if ($dao || !$name) {
     return $dao;
   }
@@ -637,7 +631,7 @@ function _civicrm_api3_dao_set_filter(&$dao, $params, $unique = TRUE, $extraSql 
 
   //accept filters like filter.activity_date_time_high
   // std is now 'filters' => ..
-  if (strstr(implode(',', array_keys($params)), 'filter')) {
+  if (str_contains(implode(',', array_keys($params)), 'filter')) {
     if (isset($params['filters']) && is_array($params['filters'])) {
       foreach ($params['filters'] as $paramkey => $paramvalue) {
         _civicrm_api3_apply_filters_to_dao($paramkey, $paramvalue, $dao);
@@ -645,7 +639,7 @@ function _civicrm_api3_dao_set_filter(&$dao, $params, $unique = TRUE, $extraSql 
     }
     else {
       foreach ($params as $paramkey => $paramvalue) {
-        if (strstr($paramkey, 'filter')) {
+        if (str_contains($paramkey, 'filter')) {
           _civicrm_api3_apply_filters_to_dao(substr($paramkey, 7), $paramvalue, $dao);
         }
       }
@@ -723,11 +717,11 @@ function _civicrm_api3_dao_set_filter(&$dao, $params, $unique = TRUE, $extraSql 
  *   DAO object.
  */
 function _civicrm_api3_apply_filters_to_dao($filterField, $filterValue, &$dao) {
-  if (strstr($filterField, 'high')) {
+  if (str_contains($filterField, 'high')) {
     $fieldName = substr($filterField, 0, -5);
     $dao->whereAdd("($fieldName <= $filterValue )");
   }
-  if (strstr($filterField, 'low')) {
+  if (str_contains($filterField, 'low')) {
     $fieldName = substr($filterField, 0, -4);
     $dao->whereAdd("($fieldName >= $filterValue )");
   }
@@ -1233,7 +1227,7 @@ function formatCheckBoxField(&$checkboxFieldValue, $customFieldLabel, $entity) {
  * @return array
  */
 function _civicrm_api3_basic_get($bao_name, $params, $returnAsSuccess = TRUE, $entity = "", $sql = NULL, $uniqueFields = FALSE) {
-  $entity = $entity ?: CRM_Core_DAO_AllCoreTables::getBriefName($bao_name);
+  $entity = $entity ?: CRM_Core_DAO_AllCoreTables::getEntityNameForClass($bao_name);
   $options = _civicrm_api3_get_options_from_params($params);
 
   // Skip query if table doesn't exist yet due to pending upgrade
@@ -1329,7 +1323,7 @@ function _civicrm_api3_basic_create($bao_name, &$params, $entity = NULL) {
       $alreadyHandled[] = 'Tag';
       $alreadyHandled[] = 'Website';
       if (!in_array($entity, $alreadyHandled)) {
-        CRM_Core_BAO_CustomValueTable::store($params['custom'], CRM_Core_DAO_AllCoreTables::getTableForClass(CRM_Core_DAO_AllCoreTables::getFullName($entity)), $bao->id);
+        CRM_Core_BAO_CustomValueTable::store($params['custom'], CRM_Core_DAO_AllCoreTables::getTableForClass(CRM_Core_DAO_AllCoreTables::getDAONameForEntity($entity)), $bao->id);
       }
     }
     $values = [];
@@ -1429,7 +1423,7 @@ function _civicrm_api3_custom_data_get(&$returnArray, $checkPermission, $entity,
   CRM_Core_BAO_CustomGroup::setDefaults($groupTree, $customValues);
   $fieldInfo = [];
   foreach ($groupTree as $set) {
-    $fieldInfo += $set['fields'];
+    $fieldInfo += ($set['fields'] ?? []);
   }
   if (!empty($customValues)) {
     foreach ($customValues as $key => $val) {
@@ -1945,7 +1939,7 @@ function _civicrm_api_get_fields($entity, $unique = FALSE, &$params = []) {
   // Translate FKClassName to the corresponding api
   foreach ($fields as $name => &$field) {
     if (!empty($field['FKClassName'])) {
-      $FKApi = CRM_Core_DAO_AllCoreTables::getBriefName($field['FKClassName']);
+      $FKApi = CRM_Core_DAO_AllCoreTables::getEntityNameForClass($field['FKClassName']);
       if ($FKApi) {
         $field['FKApiName'] = $FKApi;
       }
@@ -2489,7 +2483,7 @@ function _civicrm_api3_field_value_check(&$params, $fieldName, $type = NULL) {
 
   if (!empty($fieldValue) && is_array($fieldValue) &&
     (array_search(key($fieldValue), CRM_Core_DAO::acceptedSQLOperators()) ||
-      $type == 'String' && strstr(key($fieldValue), 'EMPTY'))
+      $type == 'String' && str_contains(key($fieldValue), 'EMPTY'))
   ) {
     $op = key($fieldValue);
     $fieldValue = $fieldValue[$op] ?? NULL;

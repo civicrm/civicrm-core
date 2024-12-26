@@ -20,18 +20,6 @@ use Civi\Api4\EntityFinancialAccount;
 class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType implements \Civi\Core\HookInterface {
 
   /**
-   * Static cache holder of available financial types for this session
-   * @var array
-   */
-  public static $_availableFinancialTypes = [];
-
-  /**
-   * Static cache holder of status of ACL-FT enabled/disabled for this session
-   * @var array
-   */
-  public static $_statusACLFt = [];
-
-  /**
    * @deprecated
    * @param array $params
    * @param array $defaults
@@ -150,6 +138,16 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
   }
 
   /**
+   * Pseudoconstant condition_provider for financial_type_id field.
+   * @see \Civi\Schema\EntityMetadataBase::getConditionFromProvider
+   */
+  public static function alterIncomeFinancialTypes(string $fieldName, CRM_Utils_SQL_Select $conditions, $params): void {
+    $allowedTypes = self::getIncomeFinancialType($params['check_permissions']);
+    $allowedTypes = array_keys($allowedTypes) ?: 0;
+    $conditions->where('id IN (#financialTypeId)', ['financialTypeId' => $allowedTypes]);
+  }
+
+  /**
    * Fetch financial types having relationship as Income Account is.
    *
    * @return array
@@ -158,6 +156,9 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
    * @throws \CRM_Core_Exception
    */
   public static function getIncomeFinancialType($checkPermissions = TRUE): array {
+    if (!CRM_Core_Component::isEnabled('CiviContribute')) {
+      return [];
+    }
     // Realistically tests are the only place where logged in contact can
     // change during the session at this stage.
     $key = 'income_type' . (int) $checkPermissions;
@@ -347,7 +348,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
   /**
    * Function to check if lineitems present in a contribution have permissioned FTs.
    *
-   * @deprecated since 5.68 not part of core - to be handled within financialacls extension
+   * @deprecated since 5.68 not part of core - to be removed 5.74
    *
    * @param int $id
    *   contribution id
@@ -359,6 +360,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
    * @return bool
    */
   public static function checkPermissionedLineItems($id, $op, $force = TRUE, $contactID = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('use financial acls extension');
     if (!self::isACLFinancialTypeStatus()) {
       return TRUE;
     }
@@ -405,12 +407,24 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType im
   /**
    * Check if FT-ACL is turned on or off.
    *
-   * @todo rename this function e.g isFinancialTypeACLsEnabled.
+   * @deprecated since 5.75 will be removed around 5.90
+   * Generally you should call hooks & allow the extension to engage but if you need to
+   * then check the extension status directly - do not use a helper.
    *
    * @return bool
    */
   public static function isACLFinancialTypeStatus() {
-    return Civi::settings()->get('acl_financial_type');
+    return self::isFinancialTypeAclExtensionInstalled();
+  }
+
+  /**
+   * @return bool
+   * @throws \CRM_Core_Exception
+   * @internal transitional function.
+   */
+  public static function isFinancialTypeAclExtensionInstalled(): bool {
+    $financialAclExtension = civicrm_api3('extension', 'get', ['key' => 'financialacls', 'sequential' => 1])['values'];
+    return !empty($financialAclExtension) && $financialAclExtension[0]['status'] === 'installed';
   }
 
 }

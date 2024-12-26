@@ -28,7 +28,6 @@ class DAOGetFieldsAction extends BasicGetFieldsAction {
    */
   protected function getRecords() {
     $fieldsToGet = $this->_itemsToGet('name');
-    $typesToGet = $this->_itemsToGet('type');
     // Force-set values supplied by entity definition
     // e.g. if this is a ContactType pseudo-entity, set `contact_type` value which is used by the following:
     // @see \Civi\Api4\Service\Spec\Provider\ContactGetSpecProvider
@@ -39,22 +38,23 @@ class DAOGetFieldsAction extends BasicGetFieldsAction {
     }
     /** @var \Civi\Api4\Service\Spec\SpecGatherer $gatherer */
     $gatherer = \Civi::container()->get('spec_gatherer');
-    $includeCustom = TRUE;
-    if ($typesToGet) {
-      $includeCustom = in_array('Custom', $typesToGet, TRUE);
-    }
-    elseif ($fieldsToGet) {
-      // Any fields name with a dot in it is either custom or an implicit join
-      $includeCustom = strpos(implode('', $fieldsToGet), '.') !== FALSE;
-    }
     $this->formatValues();
-    $spec = $gatherer->getSpec($this->getEntityName(), $this->getAction(), $includeCustom, $this->values, $this->checkPermissions);
-    $fields = $this->specToArray($spec->getFields($fieldsToGet));
+    $fields = $gatherer->getAllFields($this->getEntityName(), $this->getAction(), $this->values, $this->checkPermissions);
+    if ($this->loadOptions) {
+      $this->loadFieldOptions($fields, $fieldsToGet ?: array_keys($fields));
+    }
+    // Add fields across implicit FK joins
     foreach ($fieldsToGet ?? [] as $fieldName) {
-      if (empty($fields[$fieldName]) && strpos($fieldName, '.') !== FALSE) {
+      if (empty($fields[$fieldName]) && str_contains($fieldName, '.')) {
         $fkField = $this->getFkFieldSpec($fieldName, $fields);
         if ($fkField) {
+          $fieldPrefix = substr($fieldName, 0, 0 - strlen($fkField['name']));
           $fkField['name'] = $fieldName;
+          // Control field should get the same prefix as it belongs to the new entity now
+          if (!empty($fkField['input_attrs']['control_field'])) {
+            $fkField['input_attrs']['control_field'] = $fieldPrefix . $fkField['input_attrs']['control_field'];
+          }
+          $fkField['required'] = FALSE;
           $fields[] = $fkField;
         }
       }
@@ -62,22 +62,12 @@ class DAOGetFieldsAction extends BasicGetFieldsAction {
     return $fields;
   }
 
-  /**
-   * @param \Civi\Api4\Service\Spec\FieldSpec[] $fields
-   *
-   * @return array
-   */
-  protected function specToArray($fields) {
-    $fieldArray = [];
-
-    foreach ($fields as $field) {
-      if ($this->loadOptions) {
-        $field->getOptions($this->values, $this->loadOptions, $this->checkPermissions);
+  protected function loadFieldOptions(array &$fields, array $fieldsToGet) {
+    foreach ($fieldsToGet as $fieldName) {
+      if (!empty($fields[$fieldName]['options_callback'])) {
+        $fields[$fieldName]['options'] = $fields[$fieldName]['options_callback']($fields[$fieldName], $this->values, $this->loadOptions, $this->checkPermissions, $fields[$fieldName]['options_callback_params'] ?? NULL);
       }
-      $fieldArray[$field->getName()] = $field->toArray();
     }
-
-    return $fieldArray;
   }
 
   /**
@@ -86,7 +76,7 @@ class DAOGetFieldsAction extends BasicGetFieldsAction {
    * @return array|null
    * @throws \CRM_Core_Exception
    */
-  private function getFkFieldSpec($fieldName, $fields) {
+  private function getFkFieldSpec(string $fieldName, array $fields): ?array {
     $fieldPath = explode('.', $fieldName);
     // Search for the first segment alone plus the first and second
     // No field in the schema contains more than one dot in its name.
@@ -98,9 +88,11 @@ class DAOGetFieldsAction extends BasicGetFieldsAction {
         'checkPermissions' => $this->checkPermissions,
         'where' => [['name', '=', $newFieldName]],
         'loadOptions' => $this->loadOptions,
+        'values' => FormattingUtil::filterByPath($this->values, $fieldName, $newFieldName),
         'action' => $this->action,
       ])->first();
     }
+    return NULL;
   }
 
   /**
@@ -115,11 +107,8 @@ class DAOGetFieldsAction extends BasicGetFieldsAction {
       if (strpos($key, ':')) {
         if (isset($this->values[$key]) && $this->values[$key] !== '') {
           [$fieldName, $suffix] = explode(':', $key);
-          $context = FormattingUtil::$pseudoConstantContexts[$suffix] ?? NULL;
-          // This only works for basic pseudoconstants like :name :label and :abbr. Skip others.
-          if ($context) {
-            $baoName = CoreUtil::getBAOFromApiName($this->getEntityName());
-            $options = $baoName::buildOptions($fieldName, $context) ?: [];
+          if (!isset($this->values[$fieldName])) {
+            $options = FormattingUtil::getPseudoconstantList(['name' => $fieldName, 'entity' => $this->getEntityName()], $key, $this->values);
             $this->values[$fieldName] = FormattingUtil::replacePseudoconstant($options, $this->values[$key], TRUE);
           }
         }
@@ -130,6 +119,11 @@ class DAOGetFieldsAction extends BasicGetFieldsAction {
 
   public function fields() {
     $fields = parent::fields();
+    $fields[] = [
+      'name' => 'fk_column',
+      'data_type' => 'String',
+      'description' => 'Name of fk_entity column this field references.',
+    ];
     $fields[] = [
       'name' => 'dfk_entities',
       'description' => 'List of possible entity types this field could be referencing.',

@@ -89,7 +89,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
       }
     }
     $hook = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'MessageTemplate', CRM_Utils_Array::value('id', $params), $params);
+    CRM_Utils_Hook::pre($hook, 'MessageTemplate', $params['id'] ?? NULL, $params);
 
     if (!empty($params['file_id']) && is_array($params['file_id']) && count($params['file_id'])) {
       $fileParams = $params['file_id'];
@@ -193,7 +193,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
       ->addWhere('is_sms', '=', $isSMS);
 
     if (!$all) {
-      $messageTemplates->addWhere('workflow_id', 'IS NULL');
+      $messageTemplates->addWhere('workflow_name', 'IS NULL');
     }
 
     $msgTpls = array_column((array) $messageTemplates->execute(), 'msg_title', 'id');
@@ -448,7 +448,14 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
           $params['attachments'] = [];
         }
         $params['attachments'][] = CRM_Utils_Mail::appendPDF($params['PDFFilename'], $params['html'], $mailContent['format']);
+        // This specifically allows the invoice code to attach an invoice & have
+        // a different message body. It will be removed & replaced with something
+        // saner so avoid trying to leverage this. There are no universe usages outside
+        // the core invoice task as of Dec 2023
         if (isset($params['tplParams']['email_comment'])) {
+          if ($params['workflow'] !== 'contribution_invoice_receipt') {
+            CRM_Core_Error::deprecatedWarning('unsupported parameter email_comment used');
+          }
           $params['html'] = $params['tplParams']['email_comment'];
           $params['text'] = strip_tags($params['tplParams']['email_comment']);
         }

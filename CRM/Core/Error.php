@@ -123,7 +123,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   public static function displaySessionError(&$error, $separator = '<br />') {
     $message = self::getMessages($error, $separator);
     if ($message) {
-      $status = ts("Payment Processor Error message") . "{$separator} $message";
+      $status = ts('Payment Processor Error message') . "{$separator} $message";
       $session = CRM_Core_Session::singleton();
       $session->setStatus($status);
     }
@@ -182,7 +182,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
         else {
           $mysql_error = 'fixme-unknown-db-cxn';
         }
-        $template->assign_by_ref('mysql_code', $mysql_error);
+        $template->assign('mysql_code', $mysql_error);
       }
     }
 
@@ -199,9 +199,9 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       }
     }
 
-    $template->assign_by_ref('error', $error);
+    $template->assign('error', $error);
     $errorDetails = CRM_Core_Error::debug('', $error, FALSE);
-    $template->assign_by_ref('errorDetails', $errorDetails);
+    $template->assign('errorDetails', $errorDetails);
 
     CRM_Core_Error::debug_var('Fatal Error Details', $error, TRUE, TRUE, '', PEAR_LOG_ERR);
     CRM_Core_Error::backtrace('backTrace', TRUE);
@@ -451,6 +451,9 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       $content = self::formatHtmlException($exception) . $content;
     }
 
+    // set the response code before starting the request
+    http_response_code(500);
+
     echo CRM_Utils_System::theme($content);
     $exit = CRM_Utils_System::shouldExitAfterFatal();
 
@@ -656,11 +659,10 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   public static function createDebugLogger($prefix = '') {
     self::generateLogFileName($prefix);
     $log = Log::singleton('file', \Civi::$statics[__CLASS__]['logger_file' . $prefix], '', [
-      'timeFormat' => '%Y-%m-%d %H:%M:%S%z',
+      'timeFormat' => 'Y-m-d H:i:sO',
+      'mode' => CRM_Utils_Constant::value('CIVICRM_LOG_FILE_PERMISSIONS', '0664'),
+      'dirmode' => CRM_Utils_Constant::value('CIVICRM_LOG_FILE_DIR_PERMISSIONS', '0775'),
     ]);
-    if (is_callable([$log, 'setLocale'])) {
-      $log->setLocale(CRM_Core_I18n::getLocale());
-    }
     return $log;
   }
 
@@ -693,8 +695,9 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * the file exists.
    *
    * @param string $prefix
+   * @return string The full path to the file.
    */
-  protected static function generateLogFileName($prefix) {
+  public static function generateLogFileName($prefix): string {
     if (!isset(\Civi::$statics[__CLASS__]['logger_file' . $prefix])) {
       $config = CRM_Core_Config::singleton();
 
@@ -728,6 +731,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       }
       \Civi::$statics[__CLASS__]['logger_file' . $prefix] = $fileName;
     }
+    return \Civi::$statics[__CLASS__]['logger_file' . $prefix];
   }
 
   /**
@@ -1109,7 +1113,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     foreach ($backtrace as $backtraceLine) {
       $miniBacktrace[] = ($backtraceLine['class'] ?? '') . '::' . ($backtraceLine['function'] ?? '');
     }
-    Civi::log()->warning($message . "\n" . implode("\n", $miniBacktrace), ['civi.tag' => 'deprecated']);
+    Civi::log('deprecated')->warning($message . "\n" . implode("\n", $miniBacktrace), ['civi.tag' => 'deprecated']);
     trigger_error($message, E_USER_DEPRECATED);
   }
 
@@ -1125,7 +1129,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     $callerFunction = $dbt[2]['function'] ?? NULL;
     $callerClass = $dbt[2]['class'] ?? NULL;
     $message .= " Caller: {$callerClass}::{$callerFunction}";
-    Civi::log()->warning($message, ['civi.tag' => 'deprecated']);
+    Civi::log('deprecated')->warning($message, ['civi.tag' => 'deprecated']);
     trigger_error($message, E_USER_DEPRECATED);
   }
 

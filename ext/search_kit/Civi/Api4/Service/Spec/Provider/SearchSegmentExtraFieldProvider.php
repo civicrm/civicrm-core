@@ -15,8 +15,13 @@ namespace Civi\Api4\Service\Spec\Provider;
 use Civi\Api4\Query\Api4SelectQuery;
 use Civi\Api4\Service\Spec\FieldSpec;
 use Civi\Api4\Service\Spec\RequestSpec;
+use Civi\Core\Service\AutoService;
 
-class SearchSegmentExtraFieldProvider implements Generic\SpecProviderInterface {
+/**
+ * @service
+ * @internal
+ */
+class SearchSegmentExtraFieldProvider extends AutoService implements Generic\SpecProviderInterface {
 
   /**
    * @inheritDoc
@@ -62,6 +67,11 @@ class SearchSegmentExtraFieldProvider implements Generic\SpecProviderInterface {
       }
       foreach ($searchSegments as $set) {
         \Civi::$statics['all_search_segments'][$set['entity_name']]['segment_' . $set['name']] = $set;
+        if ($set['entity_name'] === 'Contact') {
+          foreach (\CRM_Contact_BAO_ContactType::basicTypes() as $contactType) {
+            \Civi::$statics['all_search_segments'][$contactType]['segment_' . $set['name']] = $set;
+          }
+        }
       }
     }
     return \Civi::$statics['all_search_segments'][$entity] ?? [];

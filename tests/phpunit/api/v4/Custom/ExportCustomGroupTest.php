@@ -84,7 +84,7 @@ class ExportCustomGroupTest extends CustomTestBase {
     $this->assertEquals(['name'], $export[1]['params']['match']);
     // Match optionValue by name and option_group_id
     sort($export[2]['params']['match']);
-    $this->assertEquals(['name', 'option_group_id'], $export[2]['params']['match']);
+    $this->assertEquals(['name', 'option_group_id', 'value'], $export[2]['params']['match']);
     // Match customField by name and custom_group_id
     sort($export[5]['params']['match']);
     $this->assertEquals(['custom_group_id', 'name'], $export[5]['params']['match']);

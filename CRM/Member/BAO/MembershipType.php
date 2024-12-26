@@ -9,6 +9,9 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Membership;
+use Civi\Api4\MembershipType;
+
 /**
  *
  * @package CRM
@@ -54,11 +57,8 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
    * @return \CRM_Member_DAO_MembershipType
    * @throws \CRM_Core_Exception
    */
-  public static function add(&$params) {
-    $hook = empty($params['id']) ? 'create' : 'edit';
+  public static function add($params) {
     $membershipTypeID = $params['id'] ?? NULL;
-    CRM_Utils_Hook::pre($hook, 'MembershipType', $membershipTypeID, $params);
-
     if (!$membershipTypeID && !isset($params['domain_id'])) {
       $params['domain_id'] = CRM_Core_Config::domainID();
     }
@@ -68,10 +68,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
     if ($membershipTypeID) {
       $previousID = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $membershipTypeID, 'member_of_contact_id');
     }
-
-    $membershipType = new CRM_Member_DAO_MembershipType();
-    $membershipType->copyValues($params);
-    $membershipType->save();
+    $membershipType = self::writeRecord($params);
 
     if ($membershipTypeID) {
       // on update we may need to retrieve some details for the price field function - otherwise we get e-notices on attempts to retrieve
@@ -83,9 +80,6 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
     if ($membershipTypeID) {
       self::updateAllPriceFieldValue($membershipTypeID, $params);
     }
-
-    CRM_Utils_Hook::post($hook, 'MembershipType', $membershipType->id, $membershipType);
-
     self::flush();
     return $membershipType;
   }
@@ -168,7 +162,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
         if (in_array('Membership', $status)) {
           $findMembersURL = CRM_Utils_System::url('civicrm/member/search', 'reset=1');
           $deleteURL = CRM_Utils_System::url('civicrm/contact/search/advanced', 'reset=1');
-          $message .= '<br/>' . ts('%3. There are some contacts who have this membership type assigned to them. Search for contacts with this membership type from <a href=\'%1\'>Find Members</a>. If you are still getting this message after deleting these memberships, there may be contacts in the Trash (deleted) with this membership type. Try using <a href="%2">Advanced Search</a> and checking "Search in Trash".', [
+          $message .= '<br/>' . ts('%3. There are some contacts who have this membership type assigned to them. Search for contacts with this membership type from <a href=\'%1\'>Find Members</a>. If you are still getting this message after deleting these memberships, there may be contacts in the Trash (deleted) with this membership type. Try using <a href="%2">Advanced Search</a> and checking "Search Deleted Contacts".', [
             1 => $findMembersURL,
             2 => $deleteURL,
             3 => $cnt,
@@ -255,7 +249,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
   }
 
   /**
-   * Get membership Type Details.
+   * Get membership Type Details (cached).
    *
    * @deprecated use getMembershipType.
    *
@@ -264,6 +258,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
    * @return array|null
    */
   public static function getMembershipTypeDetails($membershipTypeId) {
+    CRM_Core_Error::deprecatedFunctionWarning('getMembershipType');
     $membershipTypeDetails = [];
 
     $membershipType = new CRM_Member_DAO_MembershipType();
@@ -295,14 +290,10 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
    *   associated array with  start date, end date and join date for the membership
    */
   public static function getDatesForMembershipType($membershipTypeId, $joinDate = NULL, $startDate = NULL, $endDate = NULL, $numRenewTerms = 1) {
-    $membershipTypeDetails = self::getMembershipTypeDetails($membershipTypeId);
+    $membershipTypeDetails = self::getMembershipType($membershipTypeId);
 
     // Convert all dates to 'Y-m-d' format.
-    foreach ([
-      'joinDate',
-      'startDate',
-      'endDate',
-    ] as $dateParam) {
+    foreach (['joinDate', 'startDate', 'endDate'] as $dateParam) {
       if (!empty($$dateParam)) {
         $$dateParam = CRM_Utils_Date::processDate($$dateParam, NULL, FALSE, 'Y-m-d');
       }
@@ -498,16 +489,21 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
       $membershipDates['join_date'] = CRM_Utils_Date::customFormat($membershipDetails->join_date, '%Y%m%d');
     }
 
-    $oldPeriodType = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
-      CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $membershipId, 'membership_type_id'), 'period_type');
+    $oldPeriodType = Membership::get(FALSE)
+      ->addSelect('membership_type_id.period_type')
+      ->addWhere('id', '=', $membershipId)
+      ->execute()
+      ->first()['membership_type_id.period_type'];
 
     // CRM-7297 Membership Upsell
     if (is_null($membershipTypeID)) {
-      $membershipTypeDetails = self::getMembershipTypeDetails($membershipDetails->membership_type_id);
+      $membershipTypeIDForDetails = $membershipDetails->membership_type_id;
     }
     else {
-      $membershipTypeDetails = self::getMembershipTypeDetails($membershipTypeID);
+      $membershipTypeIDForDetails = $membershipTypeID;
     }
+    $membershipTypeDetails = self::getMembershipType($membershipTypeIDForDetails);
+
     $statusDetails = CRM_Member_BAO_MembershipStatus::getMembershipStatus($statusID);
 
     if ($statusDetails['is_current_member'] == 1) {
@@ -809,28 +805,13 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
   public static function getAllMembershipTypes(): array {
     $cacheString = __CLASS__ . __FUNCTION__ . CRM_Core_Config::domainID() . '_' . CRM_Core_I18n::getLocale();
     if (!Civi::cache('metadata')->has($cacheString)) {
-      $types = civicrm_api3('MembershipType', 'get', ['options' => ['limit' => 0, 'sort' => 'weight']])['values'];
+      $types = (array) MembershipType::get(FALSE)->addOrderBy('weight')->execute()->indexBy('id');
       $taxRates = CRM_Core_PseudoConstant::getTaxRates();
-      $keys = ['description', 'relationship_type_id', 'relationship_direction', 'max_related', 'auto_renew'];
-      // In order to avoid down-stream e-notices we undo api v3 filtering of NULL values. This is covered
-      // in Unit tests & ideally we might switch to apiv4 but I would argue we should build caching
-      // of metadata entities like this directly into apiv4.
       foreach ($types as $id => $type) {
-        foreach ($keys as $key) {
-          if (!isset($type[$key])) {
-            $types[$id][$key] = NULL;
-          }
-        }
-        if (isset($type['contribution_type_id'])) {
-          unset($types[$id]['contribution_type_id']);
-        }
         $types[$id]['tax_rate'] = (float) ($taxRates[$type['financial_type_id']] ?? 0.0);
         $multiplier = 1;
         if ($types[$id]['tax_rate'] !== 0.0) {
           $multiplier += ($types[$id]['tax_rate'] / 100);
-        }
-        if (!array_key_exists('minimum_fee', $types[$id])) {
-          $types[$id]['minimum_fee'] = 0;
         }
         $types[$id]['minimum_fee_with_tax'] = (float) $types[$id]['minimum_fee'] * $multiplier;
       }

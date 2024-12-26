@@ -24,6 +24,8 @@ use Civi\Api4\Activity;
 use Civi\Api4\Address;
 use Civi\Api4\Contact;
 use Civi\Api4\Household;
+use Civi\Api4\Individual;
+use Civi\Api4\LocBlock;
 use Civi\Api4\Tag;
 
 /**
@@ -62,6 +64,16 @@ class GetExtraFieldsTest extends Api4TestBase {
     $this->assertArrayHasKey('household_name', $householdFields);
   }
 
+  public function testContactPseudoEntityGetFields(): void {
+    $individualFields = (array) Individual::getFields(FALSE)
+      ->execute()->indexBy('name');
+    $this->assertArrayNotHasKey('sic_code', $individualFields);
+    $this->assertArrayNotHasKey('contact_type', $individualFields);
+    $this->assertArrayHasKey('last_name', $individualFields);
+    $this->assertEquals('Individual', $individualFields['birth_date']['entity']);
+    $this->assertEquals('Individual', $individualFields['age_years']['entity']);
+  }
+
   public function testGetOptionsAddress(): void {
     $getFields = Address::getFields(FALSE)->addWhere('name', '=', 'state_province_id')->setLoadOptions(TRUE);
 
@@ -88,6 +100,20 @@ class GetExtraFieldsTest extends Api4TestBase {
     $this->assertEquals('Event', $fields['event_id.created_id']['entity']);
     $this->assertEquals('Contact', $fields['event_id.created_id.sort_name']['entity']);
     $this->assertGreaterThan(1, count($fields['contact_id.gender_id']['options']));
+  }
+
+  public function testGetLocBlockFields() {
+    $field = LocBlock::getFields(FALSE)
+      ->setLoadOptions(TRUE)
+      ->addWhere('name', '=', 'address_id.state_province_id')
+      ->addValue('address_id.country_id', 1039)
+      ->execute()->single();
+
+    $this->assertEquals('Address', $field['entity']);
+    $this->assertEquals('address_id.state_province_id', $field['name']);
+    $this->assertEquals('address_id.country_id', $field['input_attrs']['control_field']);
+    $this->assertContains('Manitoba', $field['options']);
+    $this->assertNotContains('Alabama', $field['options']);
   }
 
   public function testGetTagsFromFilterField(): void {

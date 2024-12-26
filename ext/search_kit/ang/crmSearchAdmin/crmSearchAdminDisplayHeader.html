@@ -1,4 +1,4 @@
-<fieldset>
+<fieldset class="crm-search-admin-display-header">
   <div class="form-inline">
     <label for="crm-search-admin-display-label">{{:: ts('Name') }} <span class="crm-marker">*</span></label>
     <input id="crm-search-admin-display-label" type="text" class="form-control" ng-model="$ctrl.display.label" required placeholder="{{:: ts('Untitled') }}"/>
@@ -19,7 +19,7 @@
     <textarea class="form-control" placeholder="{{:: ts('Description (shown above)') }}" ng-model="$ctrl.display.settings.description"></textarea>
   </div>
 </fieldset>
-<div class="form-group crm-search-admin-right" ng-if="$ctrl.display.id">
+<div class="form-group crm-search-admin-right crm-search-admin-display-header-links" ng-if="$ctrl.display.id">
   <a ng-href="{{ $ctrl.parent.crmSearchAdmin.searchDisplayPath + '#/display/' + $ctrl.parent.savedSearch.name + '/' + $ctrl.display.name }}" target="_blank" class="btn btn-primary-outline" title="{{:: ts('View search display on its own page') }}">
     <i class="crm-i fa-external-link"></i>
     {{:: ts('View Display') }}

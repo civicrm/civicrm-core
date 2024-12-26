@@ -15,6 +15,7 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\PremiumsProduct;
 use Civi\Api4\PriceSet;
 
 /**
@@ -228,6 +229,53 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   }
 
   /**
+   * Provide support for extensions that are used to being able to retrieve _lineItem
+   *
+   * Note extension should call getPriceSetID() and getLineItems() directly.
+   * They are supported for external use per the api annotation.
+   *
+   * @param string $name
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  public function __get($name) {
+    if ($name === '_lineItem') {
+      CRM_Core_Error::deprecatedWarning('attempt to access undefined property _lineItem - use externally supported function getLineItems()');
+      return [$this->getPriceSetID() => $this->getLineItems()];
+    }
+    CRM_Core_Error::deprecatedWarning('attempt to access invalid property :' . $name);
+  }
+
+  /**
+   * Provide support for extensions that are used to being able to retrieve _lineItem
+   *
+   * Note extension should call getPriceSetID() and getLineItems() directly.
+   * They are supported for external use per the api annotation.
+   *
+   * @param string $name
+   * @param mixed $value
+   */
+  public function __set($name, $value) {
+    if ($name === '_lineItem') {
+      CRM_Core_Error::deprecatedWarning('attempt to access undefined property _lineItem - use externally supported function setLineItems()');
+      $this->order->setLineItems($value[$this->getPriceSetID()]);
+      return;
+    }
+    CRM_Core_Error::deprecatedWarning('attempt to set invalid property :' . $name);
+  }
+
+  /**
+   * Is the form being submitted in test mode.
+   *
+   * @api this function is supported for external use.
+   *
+   * @return bool
+   */
+  public function isTest(): bool {
+    return (bool) ($this->getAction() & CRM_Core_Action::PREVIEW);
+  }
+
+  /**
    * Get the price set for the contribution page.
    *
    * Note that we use the `get` from the form as a legacy method but
@@ -235,6 +283,10 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * form. It does not confer meaningful performance benefits & adds confusion.
    *
    * Out of caution we still allow `get`, `set` to take precedence.
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
    *
    * @return int|null
    * @throws \CRM_Core_Exception
@@ -302,49 +354,13 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     // current contribution page id
     $this->getContributionPageID();
     $this->_ccid = CRM_Utils_Request::retrieve('ccid', 'Positive', $this);
-    $this->_emailExists = $this->get('emailExists');
+    $this->_emailExists = $this->get('emailExists') ?? FALSE;
+    $this->assign('isShowAdminVisibilityFields', CRM_Core_Permission::check('administer CiviCRM'));
 
     $this->_contactID = $this->_membershipContactID = $this->getContactID();
-    $this->getRenewalMembershipID();
 
     if ($this->getRenewalMembershipID()) {
-      $membership = new CRM_Member_DAO_Membership();
-      $membership->id = $this->getRenewalMembershipID();
-
-      if ($membership->find(TRUE)) {
-        $this->_defaultMemTypeId = $membership->membership_type_id;
-        if ($membership->contact_id != $this->_contactID) {
-          $validMembership = FALSE;
-          $organizations = CRM_Contact_BAO_Relationship::getPermissionedContacts($this->getAuthenticatedContactID(), NULL, NULL, 'Organization');
-          if (!empty($organizations) && array_key_exists($membership->contact_id, $organizations)) {
-            $this->_membershipContactID = $membership->contact_id;
-            $this->assign('membershipContactID', $this->_membershipContactID);
-            $this->assign('membershipContactName', $organizations[$this->_membershipContactID]['name']);
-            $validMembership = TRUE;
-          }
-          else {
-            $membershipType = new CRM_Member_BAO_MembershipType();
-            $membershipType->id = $membership->membership_type_id;
-            if ($membershipType->find(TRUE)) {
-              // CRM-14051 - membership_type.relationship_type_id is a CTRL-A padded string w one or more ID values.
-              // Convert to comma separated list.
-              $inheritedRelTypes = implode(',', CRM_Utils_Array::explodePadded($membershipType->relationship_type_id));
-              $permContacts = CRM_Contact_BAO_Relationship::getPermissionedContacts($this->getAuthenticatedContactID(), $membershipType->relationship_type_id);
-              if (array_key_exists($membership->contact_id, $permContacts)) {
-                $this->_membershipContactID = $membership->contact_id;
-                $validMembership = TRUE;
-              }
-            }
-          }
-          if (!$validMembership) {
-            CRM_Core_Session::setStatus(ts("Oops. The membership you're trying to renew appears to be invalid. Contact your site administrator if you need assistance. If you continue, you will be issued a new membership."), ts('Membership Invalid'), 'alert');
-          }
-        }
-      }
-      else {
-        CRM_Core_Session::setStatus(ts("Oops. The membership you're trying to renew appears to be invalid. Contact your site administrator if you need assistance. If you continue, you will be issued a new membership."), ts('Membership Invalid'), 'alert');
-      }
-      unset($membership);
+      $this->defineRenewalMembership();
     }
 
     // we do not want to display recently viewed items, so turn off
@@ -365,9 +381,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     // In tests price set id is not always set - it is unclear if this is just
     // poor test set up or it is possible in 'the real world'
     if ($this->getPriceSetID()) {
-      $this->order = new CRM_Financial_BAO_Order();
-      $this->order->setPriceSetID($this->getPriceSetID());
-      $this->order->setIsExcludeExpiredFields(TRUE);
+      $this->initializeOrder();
     }
     else {
       CRM_Core_Error::deprecatedFunctionWarning('forms require a price set ID');
@@ -471,16 +485,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $this->_pcpInfo = $pcp['pcpInfo'];
     }
 
-    // Link (button) for users to create their own Personal Campaign page
-    if ($linkText = CRM_PCP_BAO_PCP::getPcpBlockStatus($this->_id, 'contribute')) {
-      $linkTextUrl = CRM_Utils_System::url('civicrm/contribute/campaign',
-        "action=add&reset=1&pageId={$this->_id}&component=contribute",
-        FALSE, NULL, TRUE
-      );
-      $this->assign('linkTextUrl', $linkTextUrl);
-      $this->assign('linkText', $linkText);
-    }
-
     $this->assign('pledgeBlock', !empty($this->_values['pledge_block_id']));
 
     // @todo - move this check to `getMembershipBlock`
@@ -527,6 +531,118 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $this->_isBillingAddressRequiredForPayLater = $this->_values['is_billing_required'] ?? NULL;
       $this->assign('isBillingAddressRequiredForPayLater', $this->_isBillingAddressRequiredForPayLater);
     }
+  }
+
+  /**
+   * Set the selected line items.
+   *
+   * This returns all selected line items, even if they will
+   * be split to a secondary contribution.
+   *
+   * @api Supported for external use.
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function getLineItems(): array {
+    return $this->order->getLineItems();
+  }
+
+  /**
+   * Set the selected line items.
+   *
+   * This returns all selected line items, even if they will
+   * be split to a secondary contribution.
+   *
+   * @api Supported for external use.
+   */
+  public function setLineItems($lineItems): void {
+    $this->order->setLineItems($lineItems);
+    $this->set('_lineItem', $lineItems);
+  }
+
+  /**
+   * Set the selected line items.
+   *
+   * @internal
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getMainContributionLineItems(): array {
+    $membershipLineItems = $this->getSecondaryMembershipContributionLineItems();
+    $allLineItems = $this->getOrder()->getLineItems();
+    if (!$membershipLineItems || $allLineItems === $membershipLineItems) {
+      return $allLineItems;
+    }
+    $mainContributionLineItems = [];
+    foreach ($allLineItems as $index => $lineItem) {
+      if (empty($lineItem['membership_type_id'])) {
+        $mainContributionLineItems[$index] = $lineItem;
+      }
+    }
+    return $mainContributionLineItems;
+  }
+
+  /**
+   * Is the form separate payment AND has the user selected 2 options,
+   * resulting in 2 payments.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function isSeparatePaymentSelected(): bool {
+    return (bool) $this->getSecondaryMembershipContributionLineItems();
+  }
+
+  /**
+   * Set the line items for the secondary membership contribution.
+   *
+   * Return false if the page is not configured for separate contributions,
+   * or if only the membership or the contribution has been selected.
+   *
+   * @internal
+   *
+   * @return array|false
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getSecondaryMembershipContributionLineItems() {
+    if (!$this->isSeparateMembershipPayment()) {
+      return FALSE;
+    }
+    $lineItems = [];
+    foreach ($this->getLineItems() as $index => $lineItem) {
+      if (!empty($lineItem['membership_type_id'])) {
+        $lineItems[$index] = $lineItem;
+      }
+    }
+    if (empty($lineItems) || count($lineItems) === count($this->getLineItems())) {
+      return FALSE;
+    }
+    return $lineItems;
+  }
+
+  /**
+   * Get membership line items.
+   *
+   * Get all line items relating to membership, regardless of primary or secondary membership.
+   *
+   * @internal
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getMembershipLineItems(): array {
+    $lineItems = [];
+    foreach ($this->getLineItems() as $index => $lineItem) {
+      if (!empty($lineItem['membership_type_id'])) {
+        $lineItems[$index] = $lineItem;
+      }
+    }
+    return $lineItems;
   }
 
   /**
@@ -596,67 +712,34 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    */
   public function assignToTemplate() {
     $this->set('name', $this->assignBillingName($this->_params));
+    $this->assign('currencyID', $this->_params['currencyID'] ?? NULL);
+    $this->assign('credit_card_type', $this->_params['credit_card_type'] ?? NULL);
+    $this->assign('trxn_id', $this->_params['trxn_id'] ?? NULL);
+    $this->assign('amount_level', str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ' ', $this->order->getAmountLevel()));
+    $this->assign('amount', $this->getMainContributionAmount() > 0 ? CRM_Utils_Money::format($this->getMainContributionAmount(), NULL, NULL, TRUE) : NULL);
 
-    $this->assign('paymentProcessor', $this->_paymentProcessor);
-    $vars = [
-      'amount',
-      'currencyID',
-      'credit_card_type',
-      'trxn_id',
-      'amount_level',
-    ];
+    $isRecurEnabled = isset($this->_values['is_recur']) && !empty($this->_paymentProcessor['is_recur']);
+    $this->assign('is_recur_enabled', $isRecurEnabled);
+    $this->assign('is_recur', $isRecurEnabled ? ($this->_params['is_recur'] ?? NULL) : NULL);
+    $this->assign('frequency_interval', $isRecurEnabled ? ($this->_params['frequency_interval'] ?? NULL) : NULL);
+    $this->assign('frequency_unit', $isRecurEnabled ? ($this->_params['frequency_unit'] ?? NULL) : NULL);
+    $this->assign('installments', $isRecurEnabled ? ($this->_params['installments'] ?? NULL) : NULL);
+    $isPledgeEnabled = CRM_Core_Component::isEnabled('CiviPledge') && !empty($this->_params['is_pledge']);
+    // @todo Assigned pledge_enabled variable appears to be unused
+    $this->assign('pledge_enabled', $isPledgeEnabled);
+    $this->assign('is_pledge', $isPledgeEnabled ? ($this->_params['is_pledge'] ?? NULL) : NULL);
+    $this->assign('pledge_frequency_interval', $isPledgeEnabled ? ($this->_params['pledge_frequency_interval'] ?? NULL) : NULL);
+    $this->assign('pledge_frequency_unit', $isPledgeEnabled ? ($this->_params['pledge_frequency_unit'] ?? NULL) : NULL);
+    $this->assign('pledge_installments', $isPledgeEnabled ? ($this->_params['pledge_installments'] ?? NULL) : NULL);
+    $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters($this->_params));
 
-    if (isset($this->_values['is_recur']) && !empty($this->_paymentProcessor['is_recur'])) {
-      $this->assign('is_recur_enabled', 1);
-      $vars = array_merge($vars, [
-        'is_recur',
-        'frequency_interval',
-        'frequency_unit',
-        'installments',
-      ]);
-    }
-
-    if (CRM_Core_Component::isEnabled('CiviPledge') &&
-      !empty($this->_params['is_pledge'])
-    ) {
-      // TODO: Assigned variable appears to be unused
-      $this->assign('pledge_enabled', 1);
-
-      $vars = array_merge($vars, [
-        'is_pledge',
-        'pledge_frequency_interval',
-        'pledge_frequency_unit',
-        'pledge_installments',
-      ]);
-    }
-
-    // @todo - stop setting amount level in this function & call the CRM_Price_BAO_PriceSet::getAmountLevel
-    // function to get correct amount level consistently. Remove setting of the amount level in
-    // CRM_Price_BAO_PriceSet::processAmount. Extend the unit tests in CRM_Price_BAO_PriceSetTest
-    // to cover all variants.
-    if (isset($this->_params['amount_other']) || isset($this->_params['selectMembership'])) {
-      $this->_params['amount_level'] = '';
-    }
-
-    foreach ($vars as $v) {
-      if (isset($this->_params[$v])) {
-        if ($v == "amount" && $this->_params[$v] === 0) {
-          $this->_params[$v] = CRM_Utils_Money::format($this->_params[$v], NULL, NULL, TRUE);
-        }
-        $this->assign($v, $this->_params[$v]);
-      }
-    }
-
-    $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters(
-      $this->_params,
-      $this->_bltID
-    ));
-
-    if (!empty($this->_params['onbehalf_profile_id']) && !empty($this->_params['onbehalf'])) {
+    $isDisplayOnBehalf = !empty($this->_params['onbehalf_profile_id']) && !empty($this->_params['onbehalf']);
+    if ($isDisplayOnBehalf) {
       $this->assign('onBehalfName', $this->_params['organization_name']);
       $locTypeId = array_keys($this->_params['onbehalf_location']['email']);
-      $this->assign('onBehalfEmail', $this->_params['onbehalf_location']['email'][$locTypeId[0]]['email']);
+      $onBehalfEmail = $this->_params['onbehalf_location']['email'][$locTypeId[0]]['email'] ?? NULL;
     }
+    $this->assign('onBehalfEmail', $onBehalfEmail ?? NULL);
     $this->assignPaymentFields();
     $this->assignEmailField();
     $this->assign('emailExists', $this->_emailExists);
@@ -682,7 +765,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       }
     }
     else {
-      $this->assign('email', CRM_Utils_Array::value("email-{$this->_bltID}", $this->_params));
+      $this->assign('email', $this->_params["email-{$this->_bltID}"] ?? NULL);
     }
   }
 
@@ -831,6 +914,57 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   }
 
   /**
+   * Build Premium Block im Contribution Pages.
+   *
+   * @param bool $formItems
+   * @param string $selectedOption
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  protected function buildPremiumsBlock(bool $formItems = FALSE, $selectedOption = NULL): void {
+    $selectedProductID = $this->getProductID();
+    $this->add('hidden', 'selectProduct', $selectedProductID, ['id' => 'selectProduct']);
+    $premiumProducts = PremiumsProduct::get()
+      ->addSelect('product_id.*')
+      ->addSelect('premiums_id.*')
+      ->addWhere('product_id.is_active', '=', TRUE)
+      ->addWhere('premiums_id.premiums_active', '=', TRUE)
+      ->addWhere('premiums_id.entity_id', '=', $this->getContributionPageID())
+      ->addWhere('premiums_id.entity_table', '=', 'civicrm_contribution_page')
+      ->addOrderBy('weight')
+      ->execute();
+    $products = [];
+    $premium = [];
+    foreach ($premiumProducts as $premiumProduct) {
+      $product = CRM_Utils_Array::filterByPrefix($premiumProduct, 'product_id.');
+      $premium = CRM_Utils_Array::filterByPrefix($premiumProduct, 'premiums_id.');
+      if ($selectedProductID === $product['id'] && $selectedOption) {
+        // In this case we are on the thank you or confirm page so assign
+        // the selected option to the page for display.
+        $product['options'] = ts('Selected Option') . ': ' . $selectedOption;
+      }
+      elseif ($selectedOption) {
+        // We are on the thank you or confirm page, but this option wasn't selected.
+        continue;
+      }
+      $options = array_filter((array) $product['options']);
+      $productOptions = [];
+      foreach ($options as $option) {
+        $optionValue = trim($option);
+        if ($optionValue) {
+          $productOptions[$optionValue] = $optionValue;
+        }
+      }
+      if (!empty($options)) {
+        $this->addElement('select', 'options_' . $product['id'], NULL, $productOptions);
+      }
+      $products[$product['id']] = $product;
+    }
+    $this->assign('premiumBlock', $premium);
+    $this->assign('products', $products);
+  }
+
+  /**
    * Assign payment field information to the template.
    *
    * @throws \CRM_Core_Exception
@@ -838,7 +972,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   public function assignPaymentFields() {
     //fix for CRM-3767
     $isMonetary = FALSE;
-    if ($this->_amount > 0.0) {
+    if ($this->order->getTotalAmount() > 0.0) {
       $isMonetary = TRUE;
     }
     elseif (!empty($this->_params['selectMembership'])) {
@@ -882,9 +1016,8 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         }
       }
       $this->assign('paymentFieldsetLabel', CRM_Core_Payment_Form::getPaymentLabel($paymentProcessorObject));
-      $this->assign('paymentFields', $paymentFields);
-
     }
+    $this->assign('paymentFields', $paymentFields ?? []);
   }
 
   /**
@@ -979,7 +1112,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
     //check for valid pledge status.
     if (!in_array($pledgeValues['status_id'], $validStatus)) {
-      CRM_Core_Error::statusBounce(ts('Oops. You cannot make a payment for this pledge - pledge status is %1.', [1 => CRM_Utils_Array::value($pledgeValues['status_id'], $allStatus)]));
+      CRM_Core_Error::statusBounce(ts('Oops. You cannot make a payment for this pledge - pledge status is %1.', [1 => $allStatus[$pledgeValues['status_id']] ?? '']));
     }
   }
 
@@ -1006,30 +1139,33 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $priceFieldValue = $this->_params["price_{$priceFieldId}"];
     }
     $selectedMembershipTypeID = $this->_values['fee'][$priceFieldId]['options'][$priceFieldValue]['membership_type_id'] ?? NULL;
-    if (!$selectedMembershipTypeID) {
+    if (!$selectedMembershipTypeID || !$this->getPaymentProcessorValue('is_recur')) {
       return;
     }
 
     // Check if membership the selected membership is automatically opted into auto renew or give user the option.
     // In the 2nd case we check that the user has in deed opted in (auto renew as at June 22 is the field name for the membership auto renew checkbox)
     // Also check that the payment Processor used can support recurring contributions.
-    $membershipTypes = CRM_Price_BAO_PriceSet::getMembershipTypesFromPriceSet($this->getPriceSetID());
-    if (in_array($selectedMembershipTypeID, $membershipTypes['autorenew_required'])
-      || (in_array($selectedMembershipTypeID, $membershipTypes['autorenew_optional']) &&
-        !empty($this->_params['auto_renew']))
-        && !empty($this->_paymentProcessor['is_recur'])
+    $membershipTypeDetails = CRM_Member_BAO_MembershipType::getMembershipType($selectedMembershipTypeID);
+    if (
+      // 2 means required
+      $membershipTypeDetails['auto_renew'] === 2
+      // 1 means optional - so they must also select the check box on the form
+      || ($membershipTypeDetails['auto_renew'] === 1 && !empty($this->_params['auto_renew']))
     ) {
       $this->_params['auto_renew'] = TRUE;
       $this->_params['is_recur'] = $this->_values['is_recur'] = 1;
-      $membershipTypeDetails = \Civi\Api4\MembershipType::get(FALSE)
-        ->addWhere('id', '=', $selectedMembershipTypeID)
-        ->execute()
-        ->first();
-      $this->_params['frequency_interval'] = $this->_params['frequency_interval'] ?? $this->_values['fee'][$priceFieldId]['options'][$priceFieldValue]['membership_num_terms'];
-      $this->_params['frequency_unit'] = $this->_params['frequency_unit'] ?? $membershipTypeDetails['duration_unit'];
+      // If membership_num_terms is not specified on the the price field value (which seems not uncommon
+      // in default config) then the membership type provides the values.
+      // @todo - access the line item value from $this->getLineItems() rather than _values['fee']
+      $membershipNumTerms = $this->_values['fee'][$priceFieldId]['options'][$priceFieldValue]['membership_num_terms'] ?? 1;
+      $membershipDurationInterval = $membershipTypeDetails['duration_interval'] ?? 1;
+      $this->_params['frequency_interval'] = $this->getSubmittedValue('frequency_interval') ?? ($membershipNumTerms * $membershipDurationInterval);
+      $this->_params['frequency_unit'] = $this->getSubmittedValue('frequency_unit') ?? $membershipTypeDetails['duration_unit'];
     }
-    elseif (!$this->_separateMembershipPayment && (in_array($selectedMembershipTypeID, $membershipTypes['autorenew_required'])
-      || in_array($selectedMembershipTypeID, $membershipTypes['autorenew_optional']))) {
+    // This seems like it repeats the above with less care...
+    elseif (!$this->_separateMembershipPayment && ($membershipTypeDetails['auto_renew'] === 2
+      || $membershipTypeDetails['auto_renew'] === 1)) {
       // otherwise check if we have a separate membership payment setting as that will allow people to independently opt into recurring contributions and memberships
       // If we don't have that and the membership type is auto recur or opt into recur set is_recur to 0.
       $this->_params['is_recur'] = $this->_values['is_recur'] = 0;
@@ -1039,44 +1175,59 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   /**
    * Get the amount for the main contribution.
    *
-   * The goal is to expand this function so that all the argy-bargy of figuring out the amount
-   * winds up here as the main spaghetti shrinks.
-   *
    * If there is a separate membership contribution this is the 'other one'. Otherwise there
    * is only one.
-   *
-   * @param $params
    *
    * @return float
    *
    * @throws \CRM_Core_Exception
    */
-  protected function getMainContributionAmount($params) {
-    if (!empty($params['selectMembership'])) {
-      if (empty($params['amount']) && !$this->_separateMembershipPayment) {
-        return CRM_Member_BAO_MembershipType::getMembershipType($params['selectMembership'])['minimum_fee'] ?? 0;
+  protected function getMainContributionAmount(): float {
+    $amount = 0;
+    foreach ($this->getMainContributionLineItems() as $lineItem) {
+      // Line total inclusive should really be always set but this is a safe fall back.
+      $amount += $lineItem['line_total_inclusive'] ?? ($lineItem['line_total'] + $lineItem['tax_amount']);
+    }
+    return $amount;
+  }
+
+  /**
+   * Get the amount level description for the main contribution.
+   *
+   * If there is a separate membership contribution this is the 'other one'. Otherwise there
+   * is only one.
+   *
+   * @return string
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getMainContributionAmountLevel(): string {
+    $amountLevel = [];
+    if ($this->getSecondaryMembershipContributionLineItems()) {
+      // This is really only needed transitionally because the
+      // test ConfirmTest::testSeparatePaymentConfirm has some set up configuration
+      // issues that will take a bit longer to work through (the labels
+      // should be Contribution Amount or Other Amount but in that test set up they are not.
+      return '';
+    }
+    foreach ($this->getMainContributionLineItems() as $lineItem) {
+      if ($lineItem['label'] !== ts('Contribution Amount') && $lineItem['label'] !== ts('Other Amount')) {
+        $amountLevel[] = $lineItem['label'] . ' - ' . (float) $lineItem['qty'];
       }
     }
-    return $params['amount'] ?? 0;
+    return empty($amountLevel) ? '' : CRM_Utils_Array::implodePadded($amountLevel);
   }
 
   /**
    * Wrapper for processAmount that also sets autorenew.
    *
-   * @param $fields
-   *   This is the output of the function CRM_Price_BAO_PriceSet::getSetDetail($priceSetID, FALSE, FALSE);
-   *   And, it would make sense to introduce caching into that function and call it from here rather than
-   *   require the $fields array which is passed from pillar to post around the form in order to pass it in here.
    * @param array $params
    *   Params reflecting form input e.g with fields 'price_5' => 7, 'price_8' => array(7, 8)
-   * @param $lineItems
-   *   Line item array to be altered.
    */
-  public function processAmountAndGetAutoRenew($fields, &$params, &$lineItems) {
-    CRM_Price_BAO_PriceSet::processAmount($fields, $params, $lineItems, $this->getPriceSetID());
+  public function processAmountAndGetAutoRenew(&$params) {
     $autoRenew = [];
     $autoRenew[0] = $autoRenew[1] = $autoRenew[2] = 0;
-    foreach ($lineItems as $lineItem) {
+    foreach ($this->getLineItems() as $lineItem) {
       if (!empty($lineItem['auto_renew']) &&
         is_numeric($lineItem['auto_renew'])
       ) {
@@ -1212,6 +1363,53 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   }
 
   /**
+   * @return int|bool
+   */
+  protected function getProductID() {
+    $productID = $this->getSubmittedValue('selectProduct') ? (int) $this->getSubmittedValue('selectProduct') : FALSE;
+    $this->set('productID', $productID);
+    return $productID;
+  }
+
+  /**
+   * Get the submitted value, accessing it from whatever form in the flow it is
+   * submitted on.
+   *
+   * @param string $fieldName
+   *
+   * @return mixed|null
+   */
+  public function getSubmittedValue(string $fieldName) {
+    $value = $this->controller->exportValue('Main', $fieldName);
+    if (in_array($fieldName, $this->submittableMoneyFields, TRUE)) {
+      return CRM_Utils_Rule::cleanMoney($value);
+    }
+
+    // Numeric fields are not in submittableMoneyFields (for now)
+    $fieldRules = $this->_rules[$fieldName] ?? [];
+    foreach ($fieldRules as $rule) {
+      if ('money' === $rule['type']) {
+        return CRM_Utils_Rule::cleanMoney($value);
+      }
+    }
+    return $value;
+  }
+
+  /**
+   * Get the fields that can be submitted in this form flow.
+   *
+   * This is overridden to make the fields submitted on the first
+   * form (Contribution_Main) available from the others in the same flow
+   * (Contribution_Confirm, Contribution_ThankYou).
+   *
+   * @return string[]
+   */
+  protected function getSubmittableFields(): array {
+    $fieldNames = array_keys($this->controller->exportValues('Main'));
+    return array_fill_keys($fieldNames, $this->_name);
+  }
+
+  /**
    * @return array
    */
   protected function getExistingContributionLineItems(): array {
@@ -1253,6 +1451,104 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       return $this->_contributionID;
     }
     return NULL;
+  }
+
+  protected function getOrder(): CRM_Financial_BAO_Order {
+    if (!$this->order) {
+      $this->initializeOrder();
+    }
+    return $this->order;
+  }
+
+  protected function initializeOrder(): void {
+    $this->order = new CRM_Financial_BAO_Order();
+    $this->order->setPriceSetID($this->getPriceSetID());
+    $this->order->setIsExcludeExpiredFields(TRUE);
+    if ($this->get('lineItem')) {
+      $this->order->setLineItems($this->get('lineItem')[$this->getPriceSetID()]);
+    }
+    if ($this->getExistingContributionID()) {
+      $this->order->setTemplateContributionID($this->getExistingContributionID());
+    }
+    $this->order->setForm($this);
+    foreach ($this->getPriceFieldMetaData() as $priceField) {
+      if ($priceField['html_type'] === 'Text') {
+        $this->submittableMoneyFields[] = 'price_' . $priceField['id'];
+      }
+    }
+    $this->order->setPriceSelectionFromUnfilteredInput($this->getSubmittedValues());
+  }
+
+  protected function defineRenewalMembership(): void {
+    $membership = new CRM_Member_DAO_Membership();
+    $membership->id = $this->getRenewalMembershipID();
+
+    if ($membership->find(TRUE)) {
+      $this->_defaultMemTypeId = $membership->membership_type_id;
+      if ($membership->contact_id != $this->_contactID) {
+        $validMembership = FALSE;
+        $organizations = CRM_Contact_BAO_Relationship::getPermissionedContacts($this->getAuthenticatedContactID(), NULL, NULL, 'Organization');
+        if (!empty($organizations) && array_key_exists($membership->contact_id, $organizations)) {
+          $this->_membershipContactID = $membership->contact_id;
+          $this->assign('membershipContactID', $this->_membershipContactID);
+          $this->assign('membershipContactName', $organizations[$this->_membershipContactID]['name']);
+          $validMembership = TRUE;
+        }
+        else {
+          $membershipType = new CRM_Member_BAO_MembershipType();
+          $membershipType->id = $membership->membership_type_id;
+          if ($membershipType->find(TRUE)) {
+            // CRM-14051 - membership_type.relationship_type_id is a CTRL-A padded string w one or more ID values.
+            // Convert to comma separated list.
+            $inheritedRelTypes = implode(',', CRM_Utils_Array::explodePadded($membershipType->relationship_type_id));
+            $permContacts = CRM_Contact_BAO_Relationship::getPermissionedContacts($this->getAuthenticatedContactID(), $membershipType->relationship_type_id);
+            if (array_key_exists($membership->contact_id, $permContacts)) {
+              $this->_membershipContactID = $membership->contact_id;
+              $validMembership = TRUE;
+            }
+          }
+        }
+        if (!$validMembership) {
+          CRM_Core_Session::setStatus(ts("Oops. The membership you're trying to renew appears to be invalid. Contact your site administrator if you need assistance. If you continue, you will be issued a new membership."), ts('Membership Invalid'), 'alert');
+        }
+      }
+    }
+    else {
+      CRM_Core_Session::setStatus(ts("Oops. The membership you're trying to renew appears to be invalid. Contact your site administrator if you need assistance. If you continue, you will be issued a new membership."), ts('Membership Invalid'), 'alert');
+    }
+  }
+
+  /**
+   * Assign the total amounts for display on Confirm and ThankYou pages.
+   *
+   * These values are used in the separate payments section.
+   *
+   * @return void
+   * @throws \CRM_Core_Exception
+   */
+  protected function assignTotalAmounts(): void {
+    // orderTotal includes both payments, if separate.
+    $orderTotal = $this->getOrder() ? $this->order->getTotalAmount() : 0;
+    $membershipTotalAmount = $this->getOrder() ? $this->order->getMembershipTotalAmount() : 0;
+    $this->assign('orderTotal', $orderTotal);
+    $this->assign('membershipTotalAmount', $membershipTotalAmount);
+    $this->assign('nonMembershipTotalAmount', $orderTotal - $membershipTotalAmount);
+  }
+
+  /**
+   * Get the currency for the form.
+   *
+   * Rather historic - might have unneeded stuff
+   *
+   * @return string
+   * @throws \CRM_Core_Exception
+   */
+  public function getCurrency(): string {
+    $currency = $this->getContributionPageValue('currency');
+    if (empty($currency)) {
+      $currency = CRM_Utils_Request::retrieveValue('currency', 'String');
+    }
+    return (string) ($currency ?? \Civi::settings()->get('currency'));
   }
 
 }

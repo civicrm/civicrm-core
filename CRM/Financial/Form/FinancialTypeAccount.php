@@ -211,7 +211,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Core_Form {
     $errorMsg = [];
     $errorFlag = FALSE;
     if ($self->_action == CRM_Core_Action::DELETE) {
-      $relationValues = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship');
+      $relationValues = CRM_Financial_DAO_EntityFinancialAccount::buildOptions('account_relationship');
       if (($values['financial_account_id'] ?? NULL) != 'select') {
         if ($relationValues[$values['account_relationship']] == 'Premiums Inventory Account is' || $relationValues[$values['account_relationship']] == 'Cost of Sales Account is') {
           $premiumsProduct = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_PremiumsProduct', $values['financial_type_id'], 'product_id', 'financial_type_id');

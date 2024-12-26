@@ -205,7 +205,9 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
     $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'validate');
 
     $propertyBag = PropertyBag::cast($params);
-
+    if ((float) $propertyBag->getAmount() !== (float) $params['amount']) {
+      CRM_Core_Error::deprecatedWarning('amount should be passed through in machine-ready format');
+    }
     // If we have a $0 amount, skip call to processor and set payment_status to Completed.
     // Conceivably a processor might override this - perhaps for setting up a token - but we don't
     // have an example of that at the mome.

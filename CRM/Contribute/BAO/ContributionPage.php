@@ -26,17 +26,12 @@ use Civi\Core\HookInterface;
 class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_ContributionPage implements HookInterface {
 
   /**
-   * Creates a contribution page.
-   *
+   * @deprecated
    * @param array $params
-   *
    * @return CRM_Contribute_DAO_ContributionPage
    */
   public static function create($params) {
-    // @todo  - this implode is probably handled by writeRecord - test & remove.
-    if (isset($params['payment_processor']) && is_array($params['payment_processor'])) {
-      $params['payment_processor'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $params['payment_processor']);
-    }
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return self::writeRecord($params);
   }
 
@@ -49,6 +44,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    */
   public static function self_hook_civicrm_post(PostEvent $event): void {
     CRM_Core_PseudoConstant::flush();
+    Civi::cache('metadata')->clear();
   }
 
   /**
@@ -147,7 +143,6 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       'customPre_grouptitle',
       'customPost_grouptitle',
       'useForMember',
-      'membership_assign',
       'amount',
       'receipt_date',
       'is_pay_later',
@@ -314,18 +309,14 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         }
         [$values['customPost_grouptitle'], $values['customPost']] = self::getProfileNameAndFields($postID, $userID, $params['custom_post_id']);
       }
-      // Assign honoree values for the receipt. But first, stop any leaks from
-      // previously assigned values.
-      $template->assign('honoreeProfile', []);
-      $template->assign('honorName', NULL);
-      if (isset($values['honor'])) {
-        $honorValues = $values['honor'];
-        $template->_values = ['honoree_profile_id' => $values['honoree_profile_id']];
-        CRM_Contribute_BAO_ContributionSoft::formatHonoreeProfileFields(
-          $template,
-          $honorValues['honor_profile_values'],
-          $honorValues['honor_id']
-        );
+      // Assign honoree values for the receipt.
+      $honorValues = $values['honor'] ?? ['honor_profile_id' => NULL, 'honor_id' => NULL, 'honor_profile_values' => []];
+      foreach (CRM_Contribute_BAO_ContributionSoft::getHonorTemplateVariables(
+        $honorValues['honor_profile_id'] ? (int) $honorValues['honor_profile_id'] : NULL,
+        $honorValues['honor_id'] ? (int) $honorValues['honor_id'] : NULL,
+        $honorValues['honor_profile_values'] ?? [],
+      ) as $honorFieldName => $honorFieldValue) {
+        $template->assign($honorFieldName, $honorFieldValue);
       }
 
       $title = $values['title'] ?? CRM_Contribute_BAO_Contribution_Utils::getContributionPageTitle($values['contribution_page_id']);
@@ -351,7 +342,6 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         'customPost' => $values['customPost'],
         'customPost_grouptitle' => $values['customPost_grouptitle'],
         'useForMember' => $values['useForMember'],
-        'membership_assign' => $values['membership_assign'],
         'amount' => $values['amount'],
         'is_pay_later' => $values['is_pay_later'],
         'receipt_date' => !$values['receipt_date'] ? NULL : date('YmdHis', strtotime($values['receipt_date'])),
@@ -405,13 +395,21 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       }
 
       // use either the contribution or membership receipt, based on whether it’s a membership-related contrib or not
+      $tokenContext = ['contactId' => (int) $contactID];
+      if (!empty($tplParams['contributionID'])) {
+        $tokenContext['contributionId'] = $tplParams['contributionID'];
+      }
+      if (!empty($values['membership_id'])) {
+        $tokenContext['membershipId'] = $values['membership_id'];
+      }
       $sendTemplateParams = [
-        'workflow' => !empty($values['isMembership']) ? 'membership_online_receipt' : 'contribution_online_receipt',
+        'workflow' => !empty($values['membership_id']) ? 'membership_online_receipt' : 'contribution_online_receipt',
         'contactId' => $contactID,
         'tplParams' => $tplParams,
-        'tokenContext' => $tplParams['contributionID'] ? ['contributionId' => (int) $tplParams['contributionID'], 'contactId' => $contactID] : ['contactId' => $contactID],
+        'tokenContext' => $tokenContext,
         'isTest' => $isTest,
         'PDFFilename' => 'receipt.pdf',
+        'modelProps' => $values['modelProps'] ?? [],
       ];
 
       if ($returnMessageText) {
@@ -424,7 +422,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         ];
       }
 
-      if (empty($values['receipt_from_name']) && empty($values['receipt_from_name'])) {
+      if (empty($values['receipt_from_email'])) {
         [$values['receipt_from_name'], $values['receipt_from_email']] = CRM_Core_BAO_Domain::getNameAndEmail();
       }
 
@@ -740,11 +738,15 @@ WHERE entity_table = 'civicrm_contribution_page'
       'membership',
       'custom',
       'thankyou',
-      'friend',
       'pcp',
       'widget',
       'premium',
     ];
+
+    if (function_exists('tellafriend_civicrm_config')) {
+      $sections[] = 'friend';
+    }
+
     $query = "
    SELECT  civicrm_contribution_page.id as id,
            civicrm_contribution_page.financial_type_id as settings,
@@ -790,34 +792,6 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
     }
 
     return $info;
-  }
-
-  /**
-   * Get options for a given field.
-   * @see CRM_Core_DAO::buildOptions
-   *
-   * @param string $fieldName
-   * @param string $context : @see CRM_Core_DAO::buildOptionsContext
-   * @param array $props : whatever is known about this dao object
-   *
-   * @return array|bool
-   */
-  public static function buildOptions($fieldName, $context = NULL, $props = []) {
-    $params = [];
-    // Special logic for fields whose options depend on context or properties
-    switch ($fieldName) {
-      case 'financial_type_id':
-        // https://lab.civicrm.org/dev/core/issues/547 if CiviContribute not enabled this causes an invalid query
-        // @todo - the component is enabled check should be done within getIncomeFinancialType
-        // It looks to me like test cover was NOT added to cover the change
-        // that added this so we need to assume there is no test cover
-        if (CRM_Core_Component::isEnabled('CiviContribute')) {
-          // if check_permission has been passed in (not Null) then restrict.
-          return CRM_Financial_BAO_FinancialType::getIncomeFinancialType($props['check_permissions'] ?? TRUE);
-        }
-        return [];
-    }
-    return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }
 
   /**

@@ -51,23 +51,4 @@ class SK_Entity extends CRM_Core_DAO {
     return TRUE;
   }
 
-  /**
-   * Defines the primary key(s).
-   *
-   * @return array
-   */
-  public function keys() {
-    return ['_row'];
-  }
-
-  /**
-   * Tells DB_DataObject which keys use autoincrement.
-   * Overrides the default 'id'.
-   *
-   * @return array
-   */
-  public function sequenceKey() {
-    return ['_row', TRUE];
-  }
-
 }

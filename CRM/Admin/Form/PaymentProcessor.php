@@ -52,6 +52,9 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
       'payment_processor_type_id' => [
         'name' => 'payment_processor_type_id',
         'required' => TRUE,
+        // This is being double added - perhaps we can fix but for now....
+        // dev/core#5266
+        'not-auto-addable' => TRUE,
       ],
       'title' => [
         'name' => 'title',
@@ -464,11 +467,8 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
       $this->set('pp', $this->_paymentProcessorType);
     }
     else {
-      $paymentProcessorTypes = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_PaymentProcessor', 'payment_processor_type_id', [
-        'labelColumn' => 'name',
-        'flip' => 1,
-      ]);
-      $this->_paymentProcessorType = CRM_Utils_Request::retrieve('pp', 'String', $this, FALSE, $paymentProcessorTypes['PayPal']);
+      $payPal = CRM_Core_PseudoConstant::getKey('CRM_Financial_DAO_PaymentProcessor', 'payment_processor_type_id', 'PayPal');
+      $this->_paymentProcessorType = CRM_Utils_Request::retrieve('pp', 'String', $this, FALSE, $payPal);
     }
   }
 

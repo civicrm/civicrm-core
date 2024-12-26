@@ -115,7 +115,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
         $el['html'] = $date . '<input type="hidden" value="' . $element->getValue() . '" name="' . $element->getAttribute('name') . '">';
       }
       // Render html for wysiwyg textareas
-      if ($el['type'] == 'textarea' && isset($element->_attributes['class']) && strstr($element->_attributes['class'], 'wysiwyg')) {
+      if ($el['type'] == 'textarea' && isset($element->_attributes['class']) && str_contains($element->_attributes['class'], 'wysiwyg')) {
         $el['html'] = '<span class="crm-frozen-field">' . $el['value'] . '</span>';
       }
       else {
@@ -190,6 +190,9 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
     elseif (strpos($class, 'crm-form-entityref') !== FALSE) {
       self::preProcessEntityRef($element);
     }
+    elseif (str_contains($class, 'crm-form-autocomplete')) {
+      self::preProcessAutocomplete($element);
+    }
     elseif (strpos($class, 'crm-form-contact-reference') !== FALSE) {
       self::preprocessContactReference($element);
     }
@@ -233,16 +236,26 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
   public function _tplFetch($tplSource) {
     // Smarty3 does not have this function defined so the parent fails.
     // Adding this is preparatory to smarty 3....
-    if (!function_exists('smarty_function_eval') && !file_exists(SMARTY_DIR . '/plugins/function.eval.php')) {
+    if (!function_exists('smarty_function_eval') && (!defined('SMARTY_DIR') || !file_exists(SMARTY_DIR . '/plugins/function.eval.php'))) {
       $smarty = $this->_tpl;
       $smarty->assign('var', $tplSource);
-      return $smarty->fetch("string:$tplSource");
+      return $smarty->fetch("eval:$tplSource");
     }
     // This part is what the parent does & is suitable to Smarty 2.
     if (!function_exists('smarty_function_eval')) {
       require SMARTY_DIR . '/plugins/function.eval.php';
     }
     return smarty_function_eval(['var' => $tplSource], $this->_tpl);
+  }
+
+  /**
+   * @param HTML_QuickForm_element $field
+   */
+  private static function preProcessAutocomplete($field) {
+    $val = $field->getValue();
+    if (is_array($val)) {
+      $field->setValue(implode(',', $val));
+    }
   }
 
   /**

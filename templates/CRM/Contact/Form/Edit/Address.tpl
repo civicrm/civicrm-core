@@ -12,10 +12,10 @@
 {* @var $blockId Contains the current address block id, and assigned in the  CRM/Contact/Form/Location.php file *}
 
 {if $className eq 'CRM_Contact_Form_Contact' && $title}
-<div id="addressBlockId" class="crm-accordion-wrapper crm-address-accordion collapsed">
- <div class="crm-accordion-header">
+<details id="addressBlockId" class="crm-accordion-bold crm-address-accordion">
+ <summary>
     {$title}
- </div><!-- /.crm-accordion-header -->
+ </summary>
  <div class="crm-accordion-body" id="addressBlock">
 {/if}
 
@@ -71,8 +71,8 @@
 
 {if $className eq 'CRM_Contact_Form_Contact' && $title}
 </div>
- </div><!-- /.crm-accordion-body -->
-</div><!-- /.crm-accordion-wrapper -->
+ </div>
+</details>
 {/if}
 {literal}
 <script type="text/javascript">

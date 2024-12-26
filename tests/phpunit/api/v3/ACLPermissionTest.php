@@ -1154,10 +1154,10 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     $this->hookClass->setHook('civicrm_aclWhereClause', [$this, 'aclWhereOnlyOne']);
     $this->cleanupCachedPermissions();
 
-    $customValues = CustomValue::get($group)->addSelect('*', 'contact.first_name')->execute();
+    $customValues = CustomValue::get($group)->addSelect('*', 'entity_id.first_name')->execute();
     $this->assertCount(1, $customValues);
     $this->assertEquals($c2, $customValues[0]['entity_id']);
-    $this->assertEquals('C2', $customValues[0]['contact.first_name']);
+    $this->assertEquals('C2', $customValues[0]['entity_id.first_name']);
 
     $customValues = Contact::get()
       ->addJoin('Custom_' . $group . ' AS cf')

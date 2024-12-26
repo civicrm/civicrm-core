@@ -9,13 +9,17 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\MembershipBlock;
 use Civi\Api4\MembershipType;
+use Civi\Test\ContributionPageTestTrait;
 
 /**
  * Class CRM_Member_BAO_MembershipTypeTest
  * @group headless
  */
 class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
+
+  use ContributionPageTestTrait;
 
   /**
    * @throws \CRM_Core_Exception
@@ -178,7 +182,12 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
    */
   public function testGetMembershipTypeDetails(): void {
     $membershipTypeID = $this->createGeneralMembershipType();
-    $result = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($membershipTypeID);
+    $result = MembershipType::get(FALSE)
+      ->addSelect('id', 'name', 'duration_unit')
+      ->addWhere('id', '=', $membershipTypeID)
+      ->addWhere('is_active', '=', TRUE)
+      ->execute()
+      ->first();
 
     $this->assertEquals('General', $result['name'], 'Verify membership type details.');
     $this->assertEquals('year', $result['duration_unit'], 'Verify membership types details.');
@@ -323,6 +332,38 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
       $this->fail($e->getMessage());
       return 0;
     }
+  }
+
+  /**
+   * Test that when renewal settings are modified membership blocks are updated.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testRenewModification(): void {
+    $this->contributionPageQuickConfigCreate();
+    $autoRenew = MembershipBlock::get(FALSE)->execute()->first()['membership_types'];
+    $this->assertEquals(1, reset($autoRenew));
+
+    // Disable auto-renew on membership type - block should update to 0 (no auto-renew).
+    MembershipType::update()
+      ->addWhere('name', '=', 'General')
+      ->setValues(['auto_renew' => 0])->execute();
+    $autoRenew = MembershipBlock::get(FALSE)->execute()->first()['membership_types'];
+    $this->assertEquals(0, reset($autoRenew));
+
+    // Force auto-renew on membership type - block should update to 2 (force auto-renew).
+    MembershipType::update()->addWhere('name', '=', 'General')
+      ->setValues(['auto_renew' => 2])->execute();
+    $autoRenew = MembershipBlock::get(FALSE)->execute()->first()['membership_types'];
+    $this->assertEquals(2, reset($autoRenew));
+
+    // Make auto-renew optional on membership type - block should stay at 2 (force autorenew).
+    // If the membership type is optional if can be made more or less restrictive at
+    // the block level.
+    MembershipType::update()->addWhere('name', '=', 'General')
+      ->setValues(['auto_renew' => 1])->execute();
+    $autoRenew = MembershipBlock::get(FALSE)->execute()->first()['membership_types'];
+    $this->assertEquals(2, reset($autoRenew));
   }
 
 }

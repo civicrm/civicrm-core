@@ -53,9 +53,6 @@ DTEND;TZID={$timezone}:{$event.start_date|crmICalDate}
 {if $event.is_show_location EQ 1 && $event.location}
 LOCATION:{$event.location|crmICalText}
 {/if}
-{if $event.contact_email}
-ORGANIZER:MAILTO:{$event.contact_email|crmICalText}
-{/if}
 {if $event.url}
 URL:{$event.url}
 {/if}

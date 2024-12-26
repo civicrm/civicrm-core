@@ -56,7 +56,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    * @param bool $excludeHidden
    */
   public function buildTree($usedFor = NULL, $excludeHidden = FALSE) {
-    $sql = "SELECT id, parent_id, name, description, is_selectable FROM civicrm_tag";
+    $sql = "SELECT id, parent_id, name, label, description, is_selectable FROM civicrm_tag";
 
     $whereClause = [];
     if ($usedFor) {
@@ -81,6 +81,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
 
       $thisref['parent_id'] = $dao->parent_id;
       $thisref['name'] = $dao->name;
+      $thisref['label'] = $dao->label;
       $thisref['description'] = $dao->description;
       $thisref['is_selectable'] = $dao->is_selectable;
       if (!isset($thisref['children'])) {
@@ -411,11 +412,6 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
       $params['color'] = '';
     }
 
-    // save creator id and time
-    if (!$id) {
-      $params['created_id'] = $params['created_id'] ?? CRM_Core_Session::getLoggedInContactID();
-    }
-
     $tag = self::writeRecord($params);
 
     // if we modify parent tag, then we need to update all children
@@ -430,6 +426,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
     }
 
     CRM_Core_PseudoConstant::flush();
+    Civi::cache('metadata')->clear();
 
     return $tag;
   }

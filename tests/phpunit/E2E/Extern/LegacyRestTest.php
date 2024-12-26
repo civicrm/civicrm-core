@@ -14,11 +14,13 @@
  *
  * @group e2e
  */
-class E2E_Extern_LegacyRestTest extends E2E_Extern_BaseRestTest {
+class E2E_Extern_LegacyRestTest extends E2E_Extern_RestTestCase {
+
+  protected $LEGACY_EXTERN_SUPPORTED = ['Drupal', 'Backdrop', 'Joomla', 'WordPress'];
 
   protected function setUp(): void {
-    if (CIVICRM_UF === 'Drupal8') {
-      $this->markTestSkipped('Legacy extern/rest.php does not apply to Drupal 8+');
+    if (!in_array(CIVICRM_UF, $this->LEGACY_EXTERN_SUPPORTED)) {
+      $this->markTestSkipped('Legacy extern/rest.php is not supported by ' . CIVICRM_UF);
     }
     parent::setUp();
   }
@@ -28,7 +30,7 @@ class E2E_Extern_LegacyRestTest extends E2E_Extern_BaseRestTest {
       ->getUrl('civicrm', 'extern/rest.php');
   }
 
-  protected function isOldQSupported(): bool {
+  protected static function isOldQSupported(): bool {
     return TRUE;
   }
 

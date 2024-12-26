@@ -9,7 +9,7 @@
   //       - "msg_text": string
   //       - "msg_html": string
   angular.module('crmMailing').controller('SaveMsgTemplateDialogCtrl', function SaveMsgTemplateDialogCtrl($scope, crmMsgTemplates, dialogService) {
-    var ts = $scope.ts = CRM.ts(null);
+    var ts = $scope.ts = CRM.ts('civi_mail');
     $scope.saveOpt = {mode: '', newTitle: ''};
     $scope.selected = null;
 

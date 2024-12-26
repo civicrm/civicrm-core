@@ -452,10 +452,11 @@ class CRM_Core_Session {
    * Stores an alert to be displayed to the user via crm-messages.
    *
    * @param string $text
-   *   The status message
+   *   The status message.
    *
    * @param string $title
-   *   The optional title of this message
+   *   The optional title of this message. For accessibility reasons,
+   *   please terminate with a full stop/period.
    *
    * @param string $type
    *   The type of this message (printed as a css class). Possible options:
@@ -550,12 +551,9 @@ class CRM_Core_Session {
    * @return int|null
    *   contact ID of logged in user
    */
-  public static function getLoggedInContactID() {
-    $session = CRM_Core_Session::singleton();
-    if (!is_numeric($session->get('userID'))) {
-      return NULL;
-    }
-    return (int) $session->get('userID');
+  public static function getLoggedInContactID(): ?int {
+    $userId = CRM_Core_Session::singleton()->get('userID');
+    return is_numeric($userId) ? (int) $userId : NULL;
   }
 
   /**
@@ -565,12 +563,12 @@ class CRM_Core_Session {
    *
    * @throws CRM_Core_Exception
    */
-  public function getLoggedInContactDisplayName() {
+  public function getLoggedInContactDisplayName(): string {
     $userContactID = CRM_Core_Session::getLoggedInContactID();
     if (!$userContactID) {
       return '';
     }
-    return civicrm_api3('Contact', 'getvalue', ['id' => $userContactID, 'return' => 'display_name']);
+    return CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $userContactID, 'display_name') ?? '';
   }
 
   /**

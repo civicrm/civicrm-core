@@ -14,3 +14,9 @@
   <p>{ts}Specify an Email From Address to use when the system sends an email but a reply is not expected, for example when a user is sent an email for a double opt-in.{/ts}</p>
   <p>{ts}Leaving this blank will use the default which will be do-not-reply@default_domain where the default_domain will be the email domain address of your default mailing account also used for bounce handling.{/ts}</p>
 {/htxt}
+{htxt id="smtp_450_is_permanent-title"}
+  {ts}Treat SMTP Error 450 4.1.2 as permanent.{/ts}
+{/htxt}
+{htxt id="smtp_450_is_permanent"}
+  <p>{ts}Some SMTP servers are configured to not accept an email if the recipient cannot be reached. Most of the time it means that the domain doesn't exist at all and the SMTP server returns a 5xx permanent error. But sometimes the domain name is actually registered but its name servers are not reachable, or they don't give a meaningful answer. In these cases the SMTP server returns a 450 temporary delivery error and the mailing job gets stuck in status Running. Enabling this option will consider them as permanent failures.{/ts}</p>
+{/htxt}

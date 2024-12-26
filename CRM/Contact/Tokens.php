@@ -260,7 +260,8 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
         [$row->context['contactId']],
         empty($row->context['mailingJobId']) ? NULL : $row->context['mailingJobId'],
         $messageTokens,
-        $row->context['controller']
+        $row->context['controller'],
+        TRUE
       );
       foreach ($this->getHookTokens() as $category => $hookToken) {
         if (!empty($messageTokens[$category])) {
@@ -407,7 +408,7 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
           // Set audience to sysadmin in case adding them to UI annoys people. If people ask to see this
           // in the UI we could set to 'user'.
           $field['audience'] = 'sysadmin';
-          $field['name'] = $entity . '_billing.' . $field['name'];
+          $field['name'] = str_replace('_primary.', '_billing.', $field['name']);
           $this->addFieldToTokenMetadata($tokensMetadata, $field, $exposedFields, $entity . '_billing');
         }
       }
@@ -417,6 +418,9 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
     $tokensMetadata['address_primary.state_province_id:abbr'] = $tokensMetadata['address_primary.state_province_id:label'];
     $tokensMetadata['address_primary.state_province_id:abbr']['name'] = 'address_primary.state_province_id:abbr';
     $tokensMetadata['address_primary.state_province_id:abbr']['audience'] = 'user';
+    $tokensMetadata['address_billing.state_province_id:abbr'] = $tokensMetadata['address_billing.state_province_id:label'];;
+    $tokensMetadata['address_billing.state_province_id:abbr']['name'] = 'address_billing.state_province_id:abbr';
+
     // Hide the label for now because we are not sure if there are paths
     // where legacy token resolution is in play where this could not be resolved.
     $tokensMetadata['address_primary.state_province_id:label']['audience'] = 'sysadmin';
@@ -449,6 +453,20 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
     }
     $joins = [];
     $customFields = [];
+    $billingFields = [];
+    foreach ($requiredFields as $field) {
+      if (str_contains($field, '_billing.')) {
+        // Make sure we have enough data to fall back to primary.
+        $billingEntity = explode('.', $field)[0];
+        $billingFields[$field] = $billingEntity;
+        $extraFields = [$billingEntity . '.id', str_replace('_billing.', '_primary.', $field)];
+        foreach ($extraFields as $extraField) {
+          if (!in_array($extraField, $requiredFields, TRUE)) {
+            $requiredFields[] = $extraField;
+          }
+        }
+      }
+    }
     foreach ($requiredFields as $field) {
       $fieldSpec = $this->getMetadataForField($field);
       $prefix = '';
@@ -487,6 +505,11 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
       // This is probably a test-only situation where tokens are retrieved for a
       // fake contact id - check `testReplaceGreetingTokens`
       return [];
+    }
+    foreach ($this->getEmptyBillingEntities($billingFields, $contact) as $billingEntityFields) {
+      foreach ($billingEntityFields as $billingField) {
+        $contact[$billingField] = $contact[str_replace('_billing.', '_primary.', $billingField)];
+      }
     }
 
     foreach ($this->getDeprecatedTokens() as $apiv3Name => $fieldName) {
@@ -688,6 +711,39 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
   }
 
   /**
+   * Get the array of related billing entities that are empty.
+   *
+   * The billing tokens fall back to the primary address tokens as we cannot rely
+   * on all contacts having an address with is_billing set and the code historically has
+   * treated billing addresses as 'get the best billing address', despite the failure
+   * to set the fields.
+   *
+   * Here we figure out the entities where swapping in the primary fields makes sense.
+   * This is the case when there is no billing address at all, but we don't want to 'supplement'
+   * a partial billing address with data from a possibly-completely-different primary address.
+   *
+   * @param array $billingFields
+   * @param array $contact
+   *
+   * @return array
+   */
+  private function getEmptyBillingEntities(array $billingFields, array $contact): array {
+    $billingEntitiesToReplaceWithPrimary = [];
+    foreach ($billingFields as $billingField => $billingEntity) {
+      // In most cases it is enough to check the 'id' is not present but it is possible
+      // that a partial address is passed in in preview mode - in which case
+      // we need to treat the entire address as 'usable'.
+      if (empty($contact[$billingField]) && empty($contact[$billingEntity . '.id'])) {
+        $billingEntitiesToReplaceWithPrimary[$billingEntity][] = $billingField;
+      }
+      else {
+        unset($billingEntitiesToReplaceWithPrimary[$billingEntity]);
+      }
+    }
+    return $billingEntitiesToReplaceWithPrimary;
+  }
+
+  /**
    * Get the tokens defined by the legacy hook.
    *
    * @return array
@@ -697,7 +753,7 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
       return Civi::$statics[__CLASS__]['hook_tokens'];
     }
     $tokens = [];
-    \CRM_Utils_Hook::tokens($tokens);
+    \CRM_Utils_Hook::tokens($tokens, TRUE);
     Civi::$statics[__CLASS__]['hook_tokens'] = $tokens;
     return $tokens;
   }

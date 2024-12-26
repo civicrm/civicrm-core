@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+
+
+
+###############################################################################
+## Bootstrap
+
+## Determine the absolute path of the directory with the file
+## usage: absdirname <file-path>
+function absdirname() {
+  pushd $(dirname $0) >> /dev/null
+    pwd
+  popd >> /dev/null
+}
+
+BINDIR=$(absdirname "$0")
+set -e
+
+###############################################################################
+
+function getCiviVer() {
+  pushd "$1" >> /dev/null
+    if [ -f xml/version.xml ]; then
+      ## Works in any git-based build, even if gencode hasn't run yet.
+      php -r 'echo simplexml_load_file("xml/version.xml")->version_no;'
+    else
+      ## works in any tar-based build.
+      php -r 'require "civicrm-version.php"; $a = civicrmVersion(); echo $a["version"];'
+    fi
+  popd >> /dev/null
+}
+
+
+function PHAR() {
+ php -d phar.readonly=0 `which phar` "$@"
+}
+
+###############################################################################
+
+TOOLMIX=$(dirname "$BINDIR")
+CIVI_CORE=$(dirname $(dirname "$TOOLMIX"))
+OUTPUT="$1"
+VERSION=$(getCiviVer "$CIVI_CORE")
+
+if [ -z "$OUTPUT" ]; then
+  echo 2>&1 "usage: $0 <output-dir>"
+  echo 2>&1 "example: $0 /tmp/civimix"
+  exit 1
+fi
+
+if [ ! -d "$OUTPUT" ]; then
+  mkdir "$OUTPUT"
+fi
+
+for PACKAGE in civimix-schema ; do
+
+  SRC="${CIVI_CORE}/mixin/lib/${PACKAGE}"
+  OUTPUT_PHAR="${OUTPUT}/${PACKAGE}@${VERSION}.phar"
+  #OUTPUT_PHP="${OUTPUT}/${PACKAGE}@${VERSION}.php"
+
+  echo "Read $SRC"
+  echo "Create $OUTPUT_PHAR"
+
+  [ -f "$OUTPUT_PHAR" ] && rm -f "$OUTPUT_PHAR" || true
+  #[ -f "$OUTPUT_PHP" ] && rm -f "$OUTPUT_PHP" || true
+
+  (cd "$SRC" ; PHAR pack -f "$OUTPUT_PHAR" -s "$TOOLMIX/src/empty-stub.php" -i '\.php$' . )
+  #php "$CIVI_CORE/scripts/concat-php.php" pathload.main.php $( find src -name '*.php' ) >"$OUTPUT_PHP"
+
+done

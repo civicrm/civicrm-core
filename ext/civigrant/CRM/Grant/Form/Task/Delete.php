@@ -63,7 +63,7 @@ class CRM_Grant_Form_Task_Delete extends CRM_Grant_Form_Task {
   public function postProcess() {
     $deleted = $failed = 0;
     foreach ($this->_grantIds as $grantId) {
-      if (CRM_Grant_BAO_Grant::del($grantId)) {
+      if (CRM_Grant_BAO_Grant::deleteRecord(['id' => $grantId])) {
         $deleted++;
       }
       else {

@@ -89,7 +89,7 @@ class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
         CRM_Core_Action::COPY => [
           'name' => ts('Copy'),
           'url' => 'civicrm/admin/job/edit',
-          'qs' => 'action=copy&id=%%id%%',
+          'qs' => 'action=copy&id=%%id%%&qfKey=%%key%%',
           'title' => ts('Copy Scheduled Job'),
           'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::COPY),
         ],
@@ -120,11 +120,13 @@ class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String',
       $this, FALSE, 0
     );
-    $this->_context = CRM_Utils_Request::retrieve('context', 'String',
-      $this, FALSE, 0
-    );
 
     if (($this->_action & CRM_Core_Action::COPY) && (!empty($this->_id))) {
+      $key = $_POST['qfKey'] ?? $_GET['qfKey'] ?? $_REQUEST['qfKey'] ?? NULL;
+      $k = CRM_Core_Key::validate($key, CRM_Utils_System::getClassName($this));
+      if (!$k) {
+        $this->invalidKey();
+      }
       try {
         $jobResult = civicrm_api3('Job', 'clone', ['id' => $this->_id]);
         if ($jobResult['count'] > 0) {
@@ -146,7 +148,7 @@ class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
   public function browse() {
     // check if non-prod mode is enabled.
     if (CRM_Core_Config::environment() != 'Production') {
-      CRM_Core_Session::setStatus(ts('Execution of scheduled jobs has been turned off by default since this is a non-production environment. You can override this for particular jobs by adding runInNonProductionEnvironment=TRUE as a parameter. This will ignore email settings for this job and will send actual emails if this job is sending mails!'), ts('Non-production Environment'), 'warning', ['expires' => 0]);
+      CRM_Core_Session::setStatus(ts('Execution of scheduled jobs has been turned off by default since this is a non-production environment. You can override this for particular jobs by adding runInNonProductionEnvironment=TRUE as a parameter. Note: this will send emails if your <a %1>outbound email</a> is enabled.', [1 => 'href="' . CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1') . '"']), ts('Non-production Environment'), 'warning', ['expires' => 0]);
     }
     else {
       $cronError = Civi\Api4\System::check(FALSE)
@@ -160,9 +162,8 @@ class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
       }
     }
 
-    $sj = new CRM_Core_JobManager();
     $rows = [];
-    foreach ($sj->jobs as $job) {
+    foreach ($this->getJobs() as $job) {
       $action = array_sum(array_keys($this->links()));
 
       // update enable/disable links.
@@ -179,7 +180,7 @@ class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
       }
 
       $job->action = CRM_Core_Action::formLink($this->links(), $action,
-        ['id' => $job->id],
+        ['id' => $job->id, 'key' => CRM_Core_Key::get(CRM_Utils_System::getClassName($this))],
         ts('more'),
         FALSE,
         'job.manage.action',
@@ -189,6 +190,29 @@ class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
       $rows[] = get_object_vars($job);
     }
     $this->assign('rows', $rows);
+  }
+
+  /**
+   * Retrieves the list of jobs from the database,
+   * populates class param.
+   *
+   * @fixme: Copied from JobManager. We should replace with API
+   *
+   * @return array
+   *   ($id => CRM_Core_ScheduledJob)
+   */
+  private function getJobs(): array {
+    $jobs = [];
+    $dao = new CRM_Core_DAO_Job();
+    $dao->orderBy('name');
+    $dao->domain_id = CRM_Core_Config::domainID();
+    $dao->find();
+    while ($dao->fetch()) {
+      $temp = ['class' => NULL, 'parameters' => NULL, 'last_run' => NULL];
+      CRM_Core_DAO::storeValues($dao, $temp);
+      $jobs[$dao->id] = new CRM_Core_ScheduledJob($temp);
+    }
+    return $jobs;
   }
 
   /**

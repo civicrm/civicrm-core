@@ -67,12 +67,6 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
     $transaction = new CRM_Core_Transaction();
 
     $cart = self::add($params);
-
-    if (is_a($cart, 'CRM_Core_Error')) {
-      $transaction->rollback();
-      throw new CRM_Core_Exception(ts('There was an error creating an event cart'));
-    }
-
     $transaction->commit();
 
     return $cart;
@@ -168,6 +162,7 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
     //return CRM_Event_Cart_BAO_EventInCart::find_all_by_params( array('main_conference_event_id'
     $all = [];
     foreach ($this->events_in_carts as $event_in_cart) {
+      /* @var \CRM_Event_Cart_BAO_EventInCart $event_in_cart */
       if (!$event_in_cart->is_child_event()) {
         $all[] = $event_in_cart;
       }
@@ -220,6 +215,7 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
   public function get_subparticipants($main_participant) {
     $subparticipants = [];
     foreach ($this->events_in_carts as $event_in_cart) {
+      /* @var \CRM_Event_Cart_BAO_EventInCart $event_in_cart */
       if ($event_in_cart->is_child_event($main_participant->event_id)) {
         foreach ($event_in_cart->participants as $participant) {
           if ($participant->contact_id == $main_participant->contact_id) {
@@ -235,7 +231,7 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
   /**
    * @param int $event_id
    *
-   * @return mixed
+   * @return \CRM_Event_Cart_BAO_EventInCart|null
    */
   public function get_event_in_cart_by_event_id($event_id) {
     return $this->events_in_carts[$event_id] ?? NULL;

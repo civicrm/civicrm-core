@@ -285,6 +285,7 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
     $cid = $contacts[11]['id'];
 
     Contact::save(FALSE)
+      ->addRecord(['id' => $contacts[11]['id'], 'last_name' => "Aaaac$cid"])
       ->addRecord(['id' => $contacts[0]['id'], 'last_name' => "Aaaac$cid"])
       ->addRecord(['id' => $contacts[14]['id'], 'last_name' => "Aaaab$cid"])
       ->addRecord(['id' => $contacts[6]['id'], 'last_name' => "Aaaaa$cid"])

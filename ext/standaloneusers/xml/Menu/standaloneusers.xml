@@ -23,4 +23,16 @@
     <title>Reset Password</title>
     <access_arguments>access password resets</access_arguments>
   </item>
+  <item>
+    <path>civicrm/mfa/totp</path>
+    <page_callback>CRM_Standaloneusers_Page_TOTP</page_callback>
+    <title>Multi Factor Authentication Check</title>
+    <access_arguments>*always allow*</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/mfa/totp-setup</path>
+    <page_callback>CRM_Standaloneusers_Page_TOTPSetup</page_callback>
+    <title>Multi Factor Authentication: Set-up</title>
+    <access_arguments>*always allow*</access_arguments>
+  </item>
 </menu>

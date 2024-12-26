@@ -65,7 +65,7 @@ class CRM_Contact_Page_DedupeException extends CRM_Core_Page {
       'pageID' => $this->get(CRM_Utils_Pager::PAGE_ID),
     ];
     $this->_pager = new CRM_Utils_Pager($params);
-    $this->assign_by_ref('pager', $this->_pager);
+    $this->assign('pager', $this->_pager);
   }
 
   /**

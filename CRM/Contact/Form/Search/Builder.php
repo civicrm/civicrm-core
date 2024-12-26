@@ -65,8 +65,6 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
       }
     }
 
-    $this->_loadedMappingId = $this->get('savedMapping');
-
     if ($this->get('showSearchForm')) {
       $this->assign('showSearchForm', TRUE);
     }
@@ -201,7 +199,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
             $fldType = $fldValue['type'] ?? NULL;
             $type = CRM_Utils_Type::typeToString($fldType);
 
-            if (strstr($v[1], 'IN')) {
+            if (str_contains($v[1], 'IN')) {
               if (empty($v[2])) {
                 $errorMsg["value[$v[3]][$v[4]]"] = ts("Please enter a value.");
               }
@@ -221,7 +219,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
 
           if ($type && empty($errorMsg)) {
             // check for valid format while using IN Operator
-            if (strstr($v[1], 'IN')) {
+            if (str_contains($v[1], 'IN')) {
               if (!is_array($v[2])) {
                 $inVal = trim($v[2]);
                 //checking for format to avoid db errors
@@ -570,9 +568,11 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
 
       foreach ($value as $key1 => $value1) {
         //CRM-2676, replacing the conflict for same custom field name from different custom group.
-        $customGroupName = CRM_Core_BAO_Mapping::getCustomGroupName($key1);
+        $customFieldId = CRM_Core_BAO_CustomField::getKeyID($key1);
 
-        if ($customGroupName) {
+        if ($customFieldId) {
+          $customGroupName = CRM_Core_BAO_CustomField::getField($customFieldId)['custom_group']['title'];
+          $customGroupName = CRM_Utils_String::ellipsify($customGroupName, 13);
           $relatedMapperFields[$key][$key1] = $mapperFields[$key][$key1] = $customGroupName . ': ' . $value1['title'];
         }
         else {
@@ -593,7 +593,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
       }
     }
 
-    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+    $locationTypes = CRM_Core_DAO_Address::buildOptions('location_type_id');
 
     $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
 
@@ -628,8 +628,8 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
 
     $sel3[''] = NULL;
     $sel5[''] = NULL;
-    $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
-    $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
+    $phoneTypes = CRM_Core_DAO_Phone::buildOptions('phone_type_id');
+    $imProviders = CRM_Core_DAO_IM::buildOptions('provider_id');
     asort($phoneTypes);
 
     foreach ($sel1 as $k => $sel) {

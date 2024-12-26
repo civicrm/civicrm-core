@@ -4,6 +4,7 @@
  *  File for the Participant import class
  */
 
+use Civi\Api4\Participant;
 use Civi\Api4\UserJob;
 
 /**
@@ -36,6 +37,8 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
       'civicrm_queue_item',
       'civicrm_mapping',
       'civicrm_mapping_field',
+      'civicrm_uf_field',
+      'civicrm_uf_group',
     ], TRUE);
     parent::tearDown();
   }
@@ -58,7 +61,7 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
       'mapper' => $this->getMapperFromFieldMappings($fieldMappings),
       'dataSource' => 'CRM_Import_DataSource_CSV',
       'file' => ['name' => $csv],
-      'dateFormats' => CRM_Core_Form_Date::DATE_yyyy_mm_dd,
+      'dateFormats' => CRM_Utils_Date::DATE_yyyy_mm_dd,
       'onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE,
       'groups' => [],
       'saveMapping' => TRUE,
@@ -141,6 +144,70 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that we can do an update using the participant ID.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportUpdateUsingID() :void {
+    // Ensure that the next id on the participant table is 1 since that is in the csv.
+    $this->quickCleanup(['civicrm_participant']);
+    $this->individualCreate();
+    $this->createCustomGroupWithFieldOfType(['extends' => 'Participant'], 'radio', '', ['data_type' => 'Boolean']);
+    $this->createTestEntity('Participant', [
+      'status_id:name' => 'Pending from pay later',
+      'contact_id' => $this->individualCreate(),
+      'event_id' => $this->eventCreatePaid()['id'],
+      'role_id:name' => ['Attendee'],
+    ]);
+    $this->importCSV('cancel_participant.csv', [
+      ['name' => 'id'],
+      ['name' => 'status_id'],
+      ['name' => $this->getCustomFieldName('radio')],
+    ]);
+    $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
+    $row = $dataSource->getRow();
+    $this->assertEquals('IMPORTED', $row['_status'], $row['_status_message']);
+    $participant = Participant::get(FALSE)
+      ->addWhere('id', '=', $row['_entity_id'])
+      ->addSelect($this->getCustomFieldName('radio', 4))
+      ->execute()->first();
+    $this->assertEquals(TRUE, $participant[$this->getCustomFieldName('radio', 4)]);
+    $row = $dataSource->getRow();
+    $this->assertEquals('ERROR', $row['_status']);
+    $this->assertEquals('Participant record not found for id 2', $row['_status_message']);
+  }
+
+  /**
+   * Test that we cannot import to a template event.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportToTemplateEvent() :void {
+    // When setting up for the test make sure the IDs match those in the csv.
+    $this->assertEquals(1, $this->eventCreatePaid(['is_template' => TRUE])['id']);
+    $this->assertEquals(3, $this->individualCreate());
+    $this->importCSV('participant_with_event_id.csv', [
+      ['name' => 'event_id'],
+      ['name' => 'do_not_import'],
+      ['name' => 'contact_id'],
+      ['name' => 'fee_amount'],
+      ['name' => 'do_not_import'],
+      ['name' => 'fee_level'],
+      ['name' => 'is_pay_later'],
+      ['name' => 'role_id'],
+      ['name' => 'source'],
+      ['name' => 'status_id'],
+      ['name' => 'register_date'],
+      ['name' => 'do_not_import'],
+      ['name' => 'do_not_import'],
+    ]);
+    $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
+    $row = $dataSource->getRow();
+    $this->assertEquals('ERROR', $row['_status']);
+    $this->assertEquals('Missing required fields: Event ID', $row['_status_message']);
+  }
+
+  /**
    * Test that imports work generally.
    *
    * @throws \CRM_Core_Exception
@@ -197,7 +264,7 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
           'sqlQuery' => 'SELECT first_name FROM civicrm_contact',
           'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
           'dedupe_rule_id' => NULL,
-          'dateFormats' => CRM_Core_Form_Date::DATE_yyyy_mm_dd,
+          'dateFormats' => CRM_Utils_Date::DATE_yyyy_mm_dd,
         ], $submittedValues),
       ],
       'status_id:name' => 'draft',

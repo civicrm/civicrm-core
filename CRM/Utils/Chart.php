@@ -196,11 +196,7 @@ class CRM_Utils_Chart {
     $chartData['yname'] = $rows['yname'] ?? NULL;
 
     // carry some chart params if pass.
-    foreach ([
-      'xSize',
-      'ySize',
-      'divName',
-    ] as $f) {
+    foreach (['xSize', 'ySize', 'divName'] as $f) {
       if (!empty($rows[$f])) {
         $chartData[$f] = $rows[$f];
       }
@@ -236,11 +232,7 @@ class CRM_Utils_Chart {
     }
 
     // carry some chart params if pass.
-    foreach ([
-      'xSize',
-      'ySize',
-      'divName',
-    ] as $f) {
+    foreach (['xSize', 'ySize', 'divName'] as $f) {
       if (!empty($rows[$f])) {
         $chartData[$f] = $rows[$f];
       }

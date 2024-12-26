@@ -6,6 +6,13 @@
 class CRM_Activity_BAO_ActivityTypeTest extends CiviUnitTestCase {
 
   /**
+   * API version in use.
+   *
+   * @var int
+   */
+  protected $_apiversion = 4;
+
+  /**
    * Test ActivityType
    */
   public function testActivityType(): void {
@@ -16,7 +23,7 @@ class CRM_Activity_BAO_ActivityTypeTest extends CiviUnitTestCase {
       'is_active' => 1,
       'is_default' => 0,
     ];
-    $result = $this->callAPISuccess('option_value', 'create', $actParams);
+    $result = $this->callAPISuccess('OptionValue', 'create', $actParams);
 
     $activity_type_id = $result['values'][$result['id']]['value'];
 
@@ -24,8 +31,8 @@ class CRM_Activity_BAO_ActivityTypeTest extends CiviUnitTestCase {
     $activityTypeObj = new CRM_Activity_BAO_ActivityType($activity_type_id);
     $keyValuePair = $activityTypeObj->getActivityType();
 
-    $this->assertEquals($keyValuePair['machineName'], 'abc123');
-    $this->assertEquals($keyValuePair['displayLabel'], 'Write Unit Test');
+    $this->assertEquals('abc123', $keyValuePair['machineName']);
+    $this->assertEquals('Write Unit Test', $keyValuePair['displayLabel']);
 
     // cleanup
     $this->callAPISuccess('option_value', 'delete', ['id' => $result['id']]);

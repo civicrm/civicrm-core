@@ -49,7 +49,7 @@ class CRM_Export_Controller_Standalone extends CRM_Core_Controller {
 
     // add all the actions
     $this->addActions();
-    $dao = CRM_Core_DAO_AllCoreTables::getFullName($entity);
+    $dao = CRM_Core_DAO_AllCoreTables::getDAONameForEntity($entity);
     CRM_Utils_System::setTitle(ts('Export %1', [1 => $dao::getEntityTitle(TRUE)]));
   }
 

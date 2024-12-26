@@ -13,10 +13,10 @@
 {else}
 
 <div class="crm-block crm-form-block crm-case-search-form-block">
-<div class="crm-accordion-wrapper crm-case_search-accordion {if $rows}collapsed{/if}">
- <div class="crm-accordion-header crm-master-accordion-header">
+<details class="crm-accordion-light crm-case_search-accordion" {if $rows}{else}open{/if}>
+ <summary>
             {ts}Edit Search Criteria{/ts}
-</div><!-- /.crm-accordion-header -->
+</summary>
  <div class="crm-accordion-body">
         {strip}
             <table class="form-layout">
@@ -33,8 +33,8 @@
             </tr>
             </table>
         {/strip}
-</div><!-- /.crm-accordion-body -->
-</div><!-- /.crm-accordion-wrapper -->
+</div>
+</details>
 </div><!-- /.crm-form-block -->
     {if $rowsEmpty || $rows}
 <div class="crm-content-block">

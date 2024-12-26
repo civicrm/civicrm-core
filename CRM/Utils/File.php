@@ -103,18 +103,47 @@ class CRM_Utils_File {
       throw new CRM_Core_Exception('Overly broad deletion');
     }
 
+    $target = rtrim($target, '/' . DIRECTORY_SEPARATOR);
+
+    if (!file_exists($target) && !is_link($target)) {
+      return;
+    }
+
+    if (!is_dir($target)) {
+      CRM_Core_Session::setStatus(ts('cleanDir() can only remove directories. %1 is not a directory.', [1 => $target]), ts('Warning'), 'error');
+      return;
+    }
+
+    if (is_link($target) /* it's a directory based on a symlink... no need to recurse... */) {
+      if ($rmdir) {
+        static::try_unlink($target, 'symlink');
+      }
+      return;
+    }
+
     if ($dh = @opendir($target)) {
       while (FALSE !== ($sibling = readdir($dh))) {
         if (!in_array($sibling, $exceptions)) {
           $object = $target . DIRECTORY_SEPARATOR . $sibling;
-
-          if (is_dir($object)) {
+          if (is_link($object)) {
+            // Strangely, symlinks to directories under Windows need special treatment
+            if (PHP_OS_FAMILY === "Windows" && is_dir($object)) {
+              if (!rmdir($object)) {
+                CRM_Core_Session::setStatus(ts('Unable to remove directory symlink %1', [1 => $object]), ts('Warning'), 'error');
+              }
+            }
+            else {
+              CRM_Utils_File::try_unlink($object, "symlink");
+            }
+          }
+          elseif (is_dir($object)) {
             CRM_Utils_File::cleanDir($object, $rmdir, $verbose);
           }
           elseif (is_file($object)) {
-            if (!unlink($object)) {
-              CRM_Core_Session::setStatus(ts('Unable to remove file %1', [1 => $object]), ts('Warning'), 'error');
-            }
+            CRM_Utils_File::try_unlink($object, "file");
+          }
+          else {
+            CRM_Utils_File::try_unlink($object, "other filesystem object");
           }
         }
       }
@@ -131,6 +160,15 @@ class CRM_Utils_File {
           CRM_Core_Session::setStatus(ts('Unable to remove directory %1', [1 => $target]), ts('Warning'), 'error');
         }
       }
+    }
+  }
+
+  /**
+   * Helper function to avoid repetition in cleanDir: execute unlink and produce a warning on failure.
+   */
+  private static function try_unlink($object, $description) {
+    if (!unlink($object)) {
+      CRM_Core_Session::setStatus(ts('Unable to remove %1 %2', [1 => $description, 2 => $object]), ts('Warning'), 'error');
     }
   }
 
@@ -217,11 +255,7 @@ class CRM_Utils_File {
 
     $written = fwrite($file, $contents);
     $closed = fclose($file);
-    if ($written === FALSE or !$closed) {
-      return FALSE;
-    }
-
-    return TRUE;
+    return !($written === FALSE or !$closed);
   }
 
   /**
@@ -286,11 +320,14 @@ class CRM_Utils_File {
   }
 
   /**
+   * Runs an SQL query.
    *
    * @param string|null $dsn
    * @param string $queryString
    * @param string $prefix
    * @param bool $dieOnErrors
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function runSqlQuery($dsn, $queryString, $prefix = NULL, $dieOnErrors = TRUE) {
     $string = $prefix . $queryString;
@@ -306,7 +343,7 @@ class CRM_Utils_File {
         $db = DB::connect($dsn, $options);
       }
       catch (Exception $e) {
-        die("Cannot open $dsn: " . $e->getMessage());
+        throw new CRM_Core_Exception("Cannot open $dsn: " . $e->getMessage());
       }
     }
 
@@ -328,7 +365,7 @@ class CRM_Utils_File {
         }
         catch (Exception $e) {
           if ($dieOnErrors) {
-            die("Cannot execute $query: " . $e->getMessage());
+            throw new CRM_Core_Exception("Cannot execute $query: " . $e->getMessage());
           }
           else {
             echo "Cannot execute $query: " . $e->getMessage() . "<p>";
@@ -495,7 +532,7 @@ class CRM_Utils_File {
     if ($dh = opendir($path)) {
       while (FALSE !== ($elem = readdir($dh))) {
         if (substr($elem, -(strlen($ext) + 1)) == '.' . $ext) {
-          $files[] .= $path . $elem;
+          $files[] = $path . $elem;
         }
       }
       closedir($dh);

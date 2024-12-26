@@ -52,7 +52,7 @@
    </tr>
    <tr class="crm-campaign-form-block-custom_data">
        <td colspan="2">
-         {include file="CRM/common/customDataBlock.tpl"}
+         {include file="CRM/common/customDataBlock.tpl" groupID='' entityID=$surveyId customDataType='Survey' customDataSubType=false cid=false}
        </td>
    </tr>
   </table>

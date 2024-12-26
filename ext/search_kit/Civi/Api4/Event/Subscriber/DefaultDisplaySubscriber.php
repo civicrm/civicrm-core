@@ -59,10 +59,9 @@ class DefaultDisplaySubscriber extends \Civi\Core\Service\AutoService implements
       throw new \CRM_Core_Exception("Entity name is required to get autocomplete default display.");
     }
     $idField = CoreUtil::getIdFieldName($entityName);
-    $searchFields = CoreUtil::getSearchFields($entityName);
-    if (!$searchFields) {
-      throw new \CRM_Core_Exception("Entity $entityName has no default label field.");
-    }
+
+    // If there's no label field, fall back on id. That's a pretty lame autocomplete but better than nothing.
+    $searchFields = CoreUtil::getSearchFields($entityName) ?: [$idField];
 
     // Default sort order
     $e->display['settings']['sort'] = self::getDefaultSort($entityName);
@@ -123,6 +122,8 @@ class DefaultDisplaySubscriber extends \Civi\Core\Service\AutoService implements
     if ($e->display['settings']) {
       return;
     }
+    /** @var \Civi\Api4\Action\SearchDisplay\GetDefault $getDefaultAction */
+    $getDefaultAction = $e->apiAction;
     $e->display['settings'] += [
       'description' => $e->savedSearch['description'] ?? NULL,
       'sort' => [],
@@ -138,8 +139,8 @@ class DefaultDisplaySubscriber extends \Civi\Core\Service\AutoService implements
     if (!empty($e->savedSearch['api_entity']) && empty($e->savedSearch['api_params']['orderBy'])) {
       $e->display['settings']['sort'] = self::getDefaultSort($e->savedSearch['api_entity']);
     }
-    foreach ($e->apiAction->getSelectClause() as $key => $clause) {
-      $e->display['settings']['columns'][] = $e->apiAction->configureColumn($clause, $key);
+    foreach ($getDefaultAction->getSelectClause() as $key => $clause) {
+      $e->display['settings']['columns'][] = $getDefaultAction->configureColumn($clause, $key);
     }
     // Table-specific settings
     if ($e->display['type'] === 'table') {
@@ -152,7 +153,7 @@ class DefaultDisplaySubscriber extends \Civi\Core\Service\AutoService implements
         'size' => 'btn-xs',
         'style' => 'secondary-outline',
         'alignment' => 'text-right',
-        'links' => $e->apiAction->getLinksMenu(),
+        'links' => $getDefaultAction->getLinksMenu(),
       ];
     }
   }

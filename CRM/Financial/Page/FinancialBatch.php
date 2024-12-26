@@ -72,6 +72,7 @@ class CRM_Financial_Page_FinancialBatch extends CRM_Core_Page_Basic {
     ) {
       $this->edit($this->_action, $id);
     }
+    $this->assign('financialAJAXQFKey', CRM_Core_Key::get('CRM_Financial_Page_AJAX'));
     // parent run
     return CRM_Core_Page::run();
   }

@@ -25,13 +25,4 @@ class CRM_Member_WorkflowMessage_MembershipOfflineReceipt extends GenericWorkflo
   use CRM_Contribute_WorkflowMessage_ContributionTrait;
   public const WORKFLOW = 'membership_offline_receipt';
 
-  /**
-   * Additional text to include in the receipt.
-   *
-   * @var string
-   *
-   * @scope tplParams as receipt_text
-   */
-  protected $receiptText;
-
 }

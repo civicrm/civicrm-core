@@ -145,8 +145,8 @@ class CRM_PCP_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
     $dao->find(TRUE);
     $params['id'] = $dao->id;
     $params['is_active'] = $params['pcp_active'] ?? FALSE;
-    $params['is_approval_needed'] = $params['is_approval_needed'] ?? FALSE;
-    $params['is_tellfriend_enabled'] = $params['is_tellfriend_enabled'] ?? FALSE;
+    $params['is_approval_needed'] ??= FALSE;
+    $params['is_tellfriend_enabled'] ??= FALSE;
 
     CRM_PCP_BAO_PCPBlock::writeRecord($params);
 

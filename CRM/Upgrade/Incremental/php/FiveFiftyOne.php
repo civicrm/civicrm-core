@@ -153,7 +153,7 @@ class CRM_Upgrade_Incremental_php_FiveFiftyOne extends CRM_Upgrade_Incremental_B
       ->addWhere('mapping_id.mapping_type_id:name', '=', 'Import Participant')
       ->execute();
 
-    $fields = CRM_Event_BAO_Participant::importableFields('All', FALSE);
+    $fields = self::getImportableParticipantFields('All', FALSE);
     $fields['event_id']['title'] = 'Event ID';
     $eventfields = CRM_Event_BAO_Event::fields();
     $fields['event_title'] = $eventfields['event_title'];
@@ -243,6 +243,96 @@ class CRM_Upgrade_Incremental_php_FiveFiftyOne extends CRM_Upgrade_Incremental_B
     }
 
     return TRUE;
+  }
+
+  /**
+   * Combine all the importable fields from the lower levels object.
+   *
+   * @return array
+   *   array of importable Fields
+   */
+  protected static function getImportableParticipantFields(): array {
+    $fields = ['' => ['title' => ts('- do not import -')]];
+    $tmpFields = CRM_Event_DAO_Participant::import();
+
+    $note = [
+      'participant_note' => [
+        'title' => ts('Participant Note'),
+        'name' => 'participant_note',
+        'headerPattern' => '/(participant.)?note$/i',
+        'data_type' => CRM_Utils_Type::T_TEXT,
+      ],
+    ];
+
+    // Split status and status id into 2 fields
+    // Fixme: it would be better to leave as 1 field and intelligently handle both during import
+    // note import undoes this - it is still here in case the search usage uses it.
+    $participantStatus = [
+      'participant_status' => [
+        'title' => ts('Participant Status'),
+        'name' => 'participant_status',
+        'data_type' => CRM_Utils_Type::T_STRING,
+      ],
+    ];
+    $tmpFields['participant_status_id']['title'] = ts('Participant Status Id');
+
+    // Split role and role id into 2 fields
+    // Fixme: it would be better to leave as 1 field and intelligently handle both during import
+    // note import undoes this - it is still here in case the search usage uses it.
+    $participantRole = [
+      'participant_role' => [
+        'title' => ts('Participant Role'),
+        'name' => 'participant_role',
+        'data_type' => CRM_Utils_Type::T_STRING,
+      ],
+    ];
+    $tmpFields['participant_role_id']['title'] = ts('Participant Role Id');
+
+    $eventType = [
+      'event_type' => [
+        'title' => ts('Event Type'),
+        'name' => 'event_type',
+        'data_type' => CRM_Utils_Type::T_STRING,
+      ],
+    ];
+
+    $tmpContactField = [];
+    $contactFields = CRM_Contact_BAO_Contact::importableFields('All', NULL);
+
+    // Using new Dedupe rule.
+    $ruleParams = [
+      'contact_type' => 'All',
+      'used' => 'Unsupervised',
+    ];
+    $fieldsArray = CRM_Dedupe_BAO_DedupeRule::dedupeRuleFields($ruleParams);
+
+    if (is_array($fieldsArray)) {
+      foreach ($fieldsArray as $value) {
+        $customFieldId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField',
+          $value,
+          'id',
+          'column_name'
+        );
+        $value = $customFieldId ? 'custom_' . $customFieldId : $value;
+        $tmpContactField[trim($value)] = $contactFields[trim($value)] ?? NULL;
+        $title = $tmpContactField[trim($value)]['title'] . ' (match to contact)';
+
+        $tmpContactField[trim($value)]['title'] = $title;
+      }
+    }
+    $extIdentifier = $contactFields['external_identifier'] ?? NULL;
+    if ($extIdentifier) {
+      $tmpContactField['external_identifier'] = $extIdentifier;
+      $tmpContactField['external_identifier']['title'] = ($extIdentifier['title'] ?? '') . ' (match to contact)';
+    }
+    $tmpFields['participant_contact_id']['title'] = $tmpFields['participant_contact_id']['title'] . ' (match to contact)';
+
+    $fields = array_merge($fields, $tmpContactField);
+    $fields = array_merge($fields, $tmpFields);
+    $fields = array_merge($fields, $note, $participantStatus, $participantRole, $eventType);
+    $fields = array_merge($fields, CRM_Core_BAO_CustomField::getFieldsForImport('Participant', FALSE, FALSE, FALSE, FALSE));
+
+    return $fields;
   }
 
   /**

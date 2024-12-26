@@ -1,14 +1,8 @@
 <!-- This example is entirely public; anonymous users may use it to submit a `Contact`, but they cannot view or modify data. -->
 <af-form ctrl="afform">
-  <af-entity data="{contact_type: 'Individual', source: 'Hello'}" url-autofill="1" security="FBAC" actions="{create: true, update: false}" type="Contact" name="me" label="Myself" />
-  <fieldset af-fieldset="me">
-    <legend class="af-text">Individual 1</legend>
-    <div class="af-container">
-      <div class="af-container af-layout-inline">
-        <af-field name="first_name" />
-        <af-field name="last_name" />
-      </div>
-    </div>
+  <af-entity data="{contact_type: 'Individual', source: 'Mock Public Form'}" type="Contact" name="me" label="Myself" actions="{create: true, update: true}" security="FBAC" url-autofill="0" autofill="user" />
+  <fieldset af-fieldset="me" class="af-container" af-title="Myself">
+    <afblock-name-individual></afblock-name-individual>
   </fieldset>
   <button class="af-button btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
 </af-form>

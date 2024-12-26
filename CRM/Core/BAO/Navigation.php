@@ -75,9 +75,9 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
    */
   public static function add(&$params) {
     if (empty($params['id'])) {
-      $params['is_active'] = $params['is_active'] ?? FALSE;
-      $params['has_separator'] = $params['has_separator'] ?? FALSE;
-      $params['domain_id'] = CRM_Utils_Array::value('domain_id', $params, CRM_Core_Config::domainID());
+      $params['is_active'] ??= FALSE;
+      $params['has_separator'] ??= FALSE;
+      $params['domain_id'] = $params['domain_id'] ?? CRM_Core_Config::domainID();
     }
 
     if (!isset($params['id']) ||
@@ -899,6 +899,16 @@ ORDER BY weight";
               'label' => ts('Hide Menu'),
               'name' => 'Hide Menu',
               'url' => '#hidemenu',
+              'weight' => 2,
+            ],
+          ];
+        }
+        else {
+          $item['child'][] = [
+            'attributes' => [
+              'label' => ts('Change Password'),
+              'name' => 'Change Password',
+              'url' => 'civicrm/admin/user/password',
               'weight' => 2,
             ],
           ];

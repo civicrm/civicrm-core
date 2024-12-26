@@ -17,7 +17,7 @@ namespace Civi\Api4;
  * @searchable secondary
  * @orderBy weight
  * @groupWeightsBy option_group_id
- * @matchFields option_group_id,name
+ * @matchFields option_group_id,name,value
  * @since 5.19
  * @package Civi\Api4
  */

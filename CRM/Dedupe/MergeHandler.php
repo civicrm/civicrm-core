@@ -448,7 +448,7 @@ class CRM_Dedupe_MergeHandler {
     foreach ($blocksDAO as $blockDAOs) {
       if (!empty($blockDAOs['update'])) {
         foreach ($blockDAOs['update'] as $blockDAO) {
-          $entity = CRM_Core_DAO_AllCoreTables::getBriefName(get_class($blockDAO));
+          $entity = CRM_Core_DAO_AllCoreTables::getEntityNameForClass(get_class($blockDAO));
           $values = ['checkPermissions' => FALSE];
           foreach ($blockDAO->fields() as $field) {
             if (isset($blockDAO->{$field['name']})) {
@@ -460,7 +460,7 @@ class CRM_Dedupe_MergeHandler {
       }
       if (!empty($blockDAOs['delete'])) {
         foreach ($blockDAOs['delete'] as $blockDAO) {
-          $entity = CRM_Core_DAO_AllCoreTables::getBriefName(get_class($blockDAO));
+          $entity = CRM_Core_DAO_AllCoreTables::getEntityNameForClass(get_class($blockDAO));
           civicrm_api4($entity, 'delete', ['where' => [['id', '=', $blockDAO->id]], 'checkPermissions' => FALSE]);
         }
       }

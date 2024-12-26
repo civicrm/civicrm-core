@@ -82,10 +82,8 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     ]);
     $enabledLanguages = CRM_Core_I18n::languages(TRUE);
     $isMultiLingual = (count($enabledLanguages) > 1);
-    // FlexMailer is a refactoring of CiviMail which provides new hooks/APIs/docs. If the sysadmin has opted to enable it, then use that instead of CiviMail.
-    $requiredTokens = defined('CIVICRM_FLEXMAILER_HACK_REQUIRED_TOKENS') ? Civi\Core\Resolver::singleton()
-      ->call(CIVICRM_FLEXMAILER_HACK_REQUIRED_TOKENS,
-        []) : CRM_Utils_Token::getRequiredTokens();
+    $requiredTokens = Civi\Core\Resolver::singleton()->call('call://civi_flexmailer_required_tokens/getRequiredTokens', []);
+
     $crmMailingSettings = [
       'templateTypes' => CRM_Mailing_BAO_Mailing::getTemplateTypes(),
       'civiMails' => [],
@@ -139,48 +137,37 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
 
   /**
    * @inheritDoc
-   * @param bool $getAllUnconditionally
-   * @param bool $descriptions
-   *   Whether to return permission descriptions
-   *
-   * @return array
    */
-  public function getPermissions($getAllUnconditionally = FALSE, $descriptions = FALSE) {
+  public function getPermissions(): array {
     $permissions = [
       'access CiviMail' => [
-        ts('access CiviMail'),
+        'label' => ts('access CiviMail'),
       ],
       'access CiviMail subscribe/unsubscribe pages' => [
-        ts('access CiviMail subscribe/unsubscribe pages'),
-        ts('Subscribe/unsubscribe from mailing list group'),
+        'label' => ts('access CiviMail subscribe/unsubscribe pages'),
+        'description' => ts('Subscribe/unsubscribe from mailing list group'),
       ],
       'delete in CiviMail' => [
-        ts('delete in CiviMail'),
-        ts('Delete Mailing'),
+        'label' => ts('delete in CiviMail'),
+        'description' => ts('Delete Mailing'),
       ],
       'view public CiviMail content' => [
-        ts('view public CiviMail content'),
+        'label' => ts('view public CiviMail content'),
       ],
     ];
-
-    if (self::workflowEnabled() || $getAllUnconditionally) {
-      $permissions['create mailings'] = [
-        ts('create mailings'),
-      ];
-      $permissions['schedule mailings'] = [
-        ts('schedule mailings'),
-      ];
-      $permissions['approve mailings'] = [
-        ts('approve mailings'),
-      ];
-    }
-
-    if (!$descriptions) {
-      foreach ($permissions as $name => $attr) {
-        $permissions[$name] = array_shift($attr);
-      }
-    }
-
+    // Workflow permissions
+    $permissions['create mailings'] = [
+      'label' => ts('create mailings'),
+      'disabled' => !self::workflowEnabled(),
+    ];
+    $permissions['schedule mailings'] = [
+      'label' => ts('schedule mailings'),
+      'disabled' => !self::workflowEnabled(),
+    ];
+    $permissions['approve mailings'] = [
+      'label' => ts('approve mailings'),
+      'disabled' => !self::workflowEnabled(),
+    ];
     return $permissions;
   }
 

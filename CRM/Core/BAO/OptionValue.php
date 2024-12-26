@@ -48,10 +48,10 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue implements \Civi
    * @param array $params
    */
   public static function setDefaults(&$params) {
-    $params['label'] = $params['label'] ?? $params['name'];
-    $params['name'] = $params['name'] ?? CRM_Utils_String::titleToVar($params['label']);
-    $params['weight'] = $params['weight'] ?? self::getDefaultWeight($params);
-    $params['value'] = $params['value'] ?? self::getDefaultValue($params);
+    $params['label'] ??= $params['name'];
+    $params['name'] ??= CRM_Utils_String::titleToVar($params['label']);
+    $params['weight'] ??= self::getDefaultWeight($params);
+    $params['value'] ??= self::getDefaultValue($params);
   }
 
   /**
@@ -179,7 +179,13 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue implements \Civi
       $optionValue->find(TRUE);
       self::updateOptionDefaults($params['option_group_id'], $optionValue->id, $optionValue, $groupName);
     }
-    Civi::cache('metadata')->flush();
+    if (!empty($params['custom']) &&
+      is_array($params['custom'])
+    ) {
+      CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_option_value', $optionValue->id, $op);
+    }
+
+    Civi::cache('metadata')->clear();
     CRM_Core_PseudoConstant::flush();
 
     CRM_Utils_Hook::post($op, 'OptionValue', $id, $optionValue);
@@ -230,7 +236,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue implements \Civi
   public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
     if ($event->action === 'delete' && $event->id) {
       if (self::updateRecords($event->id, CRM_Core_Action::DELETE)) {
-        Civi::cache('metadata')->flush();
+        Civi::cache('metadata')->clear();
         CRM_Core_PseudoConstant::flush();
       }
     }

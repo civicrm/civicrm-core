@@ -10,10 +10,10 @@
 {* This file provides the plugin for the communication preferences in all the three types of contact *}
 {* @var $form Contains the array for the form elements and other form associated information assigned to the template by the controller *}
 
-<div class="crm-accordion-wrapper crm-commPrefs-accordion collapsed">
- <div class="crm-accordion-header">
+<details class="crm-accordion-bold crm-commPrefs-accordion">
+ <summary>
     {$title}
-  </div><!-- /.crm-accordion-header -->
+  </summary>
 <div id="commPrefs" class="crm-accordion-body">
     <table class="form-layout-compressed" >
         {if array_key_exists('communication_style_id', $form)}
@@ -106,6 +106,6 @@
           <td>{$form.is_opt_out.html} {$form.is_opt_out.label} {help id="id-optOut" file="CRM/Contact/Form/Contact.hlp"}</td>
         </tr>
     </table>
- </div><!-- /.crm-accordion-body -->
-</div><!-- /.crm-accordion-wrapper -->
+ </div>
+</details>
 {include file="CRM/Contact/Form/Edit/CommunicationPreferences.js.tpl"}

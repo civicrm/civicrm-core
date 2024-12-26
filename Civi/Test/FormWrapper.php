@@ -36,6 +36,15 @@ class FormWrapper {
 
   private $mail;
 
+  private $exception;
+
+  /**
+   * @return \Exception
+   */
+  public function getException() {
+    return $this->exception;
+  }
+
   /**
    * @return null|array
    */
@@ -70,11 +79,30 @@ class FormWrapper {
     return $this->templateVariables;
   }
 
+  /**
+   * Get a variable assigned to the template.
+   *
+   * @return mixed
+   */
+  public function getTemplateVariable($string) {
+    return $this->templateVariables[$string];
+  }
+
   private $redirects;
 
   private $mailSpoolID;
 
+  /**
+   * @var array|bool
+   */
   private $validation;
+
+  /**
+   * @return array|bool
+   */
+  public function getValidationOutput() {
+    return $this->validation;
+  }
 
   private $originalMailSetting;
 
@@ -85,7 +113,7 @@ class FormWrapper {
   public const SUBMITTED = 5;
 
   /**
-   * @var \CRM_Contribute_Import_Controller|\CRM_Core_Controller|\CRM_Event_Controller_Registration
+   * @var \CRM_Import_Controller|\CRM_Core_Controller|\CRM_Event_Controller_Registration
    */
   private $formController;
 
@@ -107,6 +135,7 @@ class FormWrapper {
    * @return \Civi\Test\FormWrapper
    */
   public function processForm(int $state = self::SUBMITTED): self {
+    \CRM_Core_Smarty::singleton()->pushScope([]);
     if ($state > self::CONSTRUCTED) {
       $this->form->preProcess();
     }
@@ -114,12 +143,14 @@ class FormWrapper {
       $this->form->buildForm();
     }
     if ($state > self::BUILT) {
-      $this->validation = $this->form->validate();
+      $this->form->validate();
+      $this->validation = $this->form->_errors;
     }
     if ($state > self::VALIDATED) {
       $this->postProcess();
     }
-    $this->templateVariables = $this->form->get_template_vars();
+    $this->templateVariables = \CRM_Core_Smarty::singleton()->getTemplateVars();
+    \CRM_Core_Smarty::singleton()->popScope([]);
     return $this;
   }
 
@@ -132,9 +163,11 @@ class FormWrapper {
    * @return $this
    */
   public function addSubsequentForm(string $formName, array $formValues = []): FormWrapper {
-    /* @var \CRM_Core_Form */
+    /* @var \CRM_Core_Form $form */
     $form = new $formName();
     $form->controller = $this->form->controller;
+    $form->_submitValues = $formValues;
+    $form->controller->addPage($form);
     $_SESSION['_' . $this->form->controller->_name . '_container']['values'][$form->getName()] = $formValues;
     $this->subsequentForms[$form->getName()] = $form;
     return $this;
@@ -161,7 +194,7 @@ class FormWrapper {
    */
   public function __call(string $name, array $arguments) {
     if (!empty(ReflectionUtils::getCodeDocs((new \ReflectionMethod($this->form, $name)), 'Method')['api'])) {
-      return call_user_func([$this->form, $name], $arguments);
+      return call_user_func_array([$this->form, $name], $arguments);
     }
     throw new \CRM_Core_Exception($name . ' method not supported for external use');
   }
@@ -173,11 +206,18 @@ class FormWrapper {
    */
   public function postProcess(): self {
     $this->startTrackingMail();
-    $this->form->postProcess();
-    foreach ($this->subsequentForms as $form) {
-      $form->preProcess();
-      $form->buildForm();
-      $form->postProcess();
+    try {
+      $this->form->postProcess();
+      foreach ($this->subsequentForms as $form) {
+        $form->preProcess();
+        $form->buildForm();
+        $form->validate();
+        $this->validation[$form->getName()] = $form->_errors;
+        $form->postProcess();
+      }
+    }
+    catch (\CRM_Core_Exception_PrematureExitException $e) {
+      $this->exception = $e;
     }
     $this->stopTrackingMail();
     return $this;
@@ -235,7 +275,7 @@ class FormWrapper {
       case 'CRM_Contact_Import_Form_DataSource':
       case 'CRM_Contact_Import_Form_MapField':
       case 'CRM_Contact_Import_Form_Preview':
-        $this->form->controller = new \CRM_Contact_Import_Controller();
+        $this->form->controller = new \CRM_Import_Controller('Contact import', ['entity' => 'Contact']);
         $this->form->controller->setStateMachine(new \CRM_Core_StateMachine($this->form->controller));
         // The submitted values should be set on one or the other of the forms in the flow.
         // For test simplicity we set on all rather than figuring out which ones go where....
@@ -252,7 +292,7 @@ class FormWrapper {
           $this->form->controller = $this->formController;
         }
         else {
-          $this->form->controller = new \CRM_Contribute_Import_Controller();
+          $this->form->controller = new \CRM_Import_Controller('Contribution import', ['entity' => 'Contribution']);
           $this->form->controller->setStateMachine(new \CRM_Core_StateMachine($this->form->controller));
           $this->formController = $this->form->controller;
         }
@@ -266,7 +306,7 @@ class FormWrapper {
       case 'CRM_Member_Import_Form_DataSource':
       case 'CRM_Member_Import_Form_MapField':
       case 'CRM_Member_Import_Form_Preview':
-        $this->form->controller = new \CRM_Member_Import_Controller();
+        $this->form->controller = new \CRM_Import_Controller('Membership import', ['entity' => 'Membership']);
         $this->form->controller->setStateMachine(new \CRM_Core_StateMachine($this->form->controller));
         // The submitted values should be set on one or the other of the forms in the flow.
         // For test simplicity we set on all rather than figuring out which ones go where....
@@ -278,7 +318,7 @@ class FormWrapper {
       case 'CRM_Event_Import_Form_DataSource':
       case 'CRM_Event_Import_Form_MapField':
       case 'CRM_Event_Import_Form_Preview':
-        $this->form->controller = new \CRM_Event_Import_Controller();
+        $this->form->controller = new \CRM_Import_Controller('Participant import', ['entity' => 'Participant']);
         $this->form->controller->setStateMachine(new \CRM_Core_StateMachine($this->form->controller));
         // The submitted values should be set on one or the other of the forms in the flow.
         // For test simplicity we set on all rather than figuring out which ones go where....
@@ -290,7 +330,7 @@ class FormWrapper {
       case 'CRM_Activity_Import_Form_DataSource':
       case 'CRM_Activity_Import_Form_MapField':
       case 'CRM_Activity_Import_Form_Preview':
-        $this->form->controller = new \CRM_Activity_Import_Controller();
+        $this->form->controller = new \CRM_Import_Controller('Activity import', ['entity' => 'Activity']);
         $this->form->controller->setStateMachine(new \CRM_Core_StateMachine($this->form->controller));
         // The submitted values should be set on one or the other of the forms in the flow.
         // For test simplicity we set on all rather than figuring out which ones go where....
@@ -302,7 +342,7 @@ class FormWrapper {
       case 'CRM_Custom_Import_Form_DataSource':
       case 'CRM_Custom_Import_Form_MapField':
       case 'CRM_Custom_Import_Form_Preview':
-        $this->form->controller = new \CRM_Custom_Import_Controller();
+        $this->form->controller = new \CRM_Import_Controller('Custom Value import', ['class_prefix' => 'CRM_Custom_Import']);
         $this->form->controller->setStateMachine(new \CRM_Core_StateMachine($this->form->controller));
         // The submitted values should be set on one or the other of the forms in the flow.
         // For test simplicity we set on all rather than figuring out which ones go where....
@@ -311,8 +351,16 @@ class FormWrapper {
         $_SESSION['_' . $this->form->controller->_name . '_container']['values']['Preview'] = $formValues;
         return;
 
+      case $class === 'CRM_Contact_Form_Search_Basic':
+        $this->form->controller = new \CRM_Contact_Controller_Search('Basic', TRUE, \CRM_Core_Action::BASIC);
+        $this->form->setAction(\CRM_Core_Action::BASIC);
+        break;
+
       case strpos($class, 'Search') !== FALSE:
         $this->form->controller = new \CRM_Contact_Controller_Search();
+        if ($class === 'CRM_Contact_Form_Search_Basic') {
+          $this->form->setAction(\CRM_Core_Action::BASIC);
+        }
         break;
 
       case strpos($class, '_Form_') !== FALSE:
@@ -375,6 +423,28 @@ class FormWrapper {
       return $value;
     }
     throw new \CRM_Core_Exception('Deprecation should have been triggered');
+  }
+
+  /**
+   * @param string $name
+   * @param mixed $value
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function checkTemplateVariable(string $name, $value): void {
+    $actual = $this->templateVariables[$name];
+    if ($this->templateVariables[$name] !== $value) {
+      $differences = [];
+      if (is_array($value)) {
+        foreach ($value as $key => $expectedItem) {
+          $actualItem = $this->templateVariables[$name][$key];
+          if ($expectedItem !== $actualItem) {
+            $differences[] = $key;
+          }
+        }
+      }
+      throw new \CRM_Core_Exception("Template variable $name expected " . print_r($value, TRUE) . ' actual value: ' . print_r($this->templateVariables[$name], TRUE) . ($differences ? 'differences in ' . implode(',', $differences) : ''));
+    }
   }
 
 }

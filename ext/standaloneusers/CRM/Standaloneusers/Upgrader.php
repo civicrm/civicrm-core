@@ -1,6 +1,7 @@
 <?php
 use CRM_Standaloneusers_ExtensionUtil as E;
 use Civi\Api4\MessageTemplate;
+use Civi\Api4\Navigation;
 
 /**
  * Collection of upgrade steps.
@@ -16,16 +17,16 @@ class CRM_Standaloneusers_Upgrader extends CRM_Extension_Upgrader_Base {
    * @return void
    * @throws \CRM_Core_Exception
    */
-  public function onInstall() {
+  public function preInstall() {
     $config = \CRM_Core_Config::singleton();
     // We generally only want to run on standalone. In theory, we might also run headless tests.
-    if (!in_array(get_class($config->userPermissionClass), ['CRM_Core_Permission_Standalone', 'CRM_Core_Permission_Headless'])) {
+    if (!in_array(get_class($config->userPermissionClass), ['CRM_Core_Permission_Standalone', 'CRM_Core_Permission_UnitTests'])) {
       throw new \CRM_Core_Exception("standaloneusers can only be installed on standalone");
     }
-    if (!in_array(get_class($config->userSystem), ['CRM_Utils_System_Standalone', 'CRM_Utils_System_Headless'])) {
+    if (!in_array(get_class($config->userSystem), ['CRM_Utils_System_Standalone', 'CRM_Utils_System_UnitTests'])) {
       throw new \CRM_Core_Exception("standaloneusers can only be installed on standalone");
     }
-    parent::onInstall();
+    CRM_Core_DAO::executeQuery('DROP TABLE civicrm_uf_match');
   }
 
   /**
@@ -99,18 +100,43 @@ class CRM_Standaloneusers_Upgrader extends CRM_Extension_Upgrader_Base {
   // }
 
   /**
-   * Example: Run a simple query when a module is enabled.
+   * On enable:
+   * - disable the user sync menu item
    */
-  // public function enable() {
-  //  CRM_Core_DAO::executeQuery('UPDATE foo SET is_active = 1 WHERE bar = "whiz"');
-  // }
+  public function enable() {
+    // standaloneusers is incompatible with user sync, so disable this nav menu item
+    Navigation::update(FALSE)
+      ->addWhere('url', '=', 'civicrm/admin/synchUser?reset=1')
+      ->addValue('is_active', FALSE)
+      ->execute();
+  }
 
   /**
-   * Example: Run a simple query when a module is disabled.
+   * On disable:
+   * - re-enable the user sync menu item
    */
-  // public function disable() {
-  //   CRM_Core_DAO::executeQuery('UPDATE foo SET is_active = 0 WHERE bar = "whiz"');
-  // }
+  public function disable() {
+    // reinstate user sync menu item
+    Navigation::update(FALSE)
+      ->addWhere('url', '=', 'civicrm/admin/synchUser?reset=1')
+      ->addValue('is_active', TRUE)
+      ->execute();
+  }
+
+  public function upgrade_5692(): bool {
+    CRM_Core_DAO::executeQuery(<<<SQL
+      CREATE TABLE IF NOT EXISTS `civicrm_totp` (
+        `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique TOTP ID',
+        `user_id` int(10) unsigned NOT NULL COMMENT 'Reference to User (UFMatch) ID',
+        `seed` varchar(512) NOT NULL,
+        `hash` varchar(20) NOT NULL DEFAULT '\"sha1\"',
+        `period` INT(1) UNSIGNED NOT NULL DEFAULT '30',
+        `length` INT(1) UNSIGNED NOT NULL DEFAULT '6',
+        PRIMARY KEY (`id`)
+      )
+      SQL);
+    return TRUE;
+  }
 
   /**
    * Example: Run a couple simple queries.
@@ -188,5 +214,17 @@ class CRM_Standaloneusers_Upgrader extends CRM_Extension_Upgrader_Base {
   //   }
   //   return TRUE;
   // }
+
+  /**
+   * Create table civicrm_session
+   *
+   * @return TRUE on success
+   * @throws Exception
+   */
+  public function upgrade_5691(): bool {
+    $this->ctx->log->info('Applying update 5691');
+    $this->executeSqlFile('sql/upgrade_5691.sql');
+    return TRUE;
+  }
 
 }

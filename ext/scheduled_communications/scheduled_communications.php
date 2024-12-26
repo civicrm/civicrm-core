@@ -31,6 +31,43 @@ function scheduled_communications_civicrm_enable(): void {
 }
 
 /**
+ * @implements CRM_Utils_Hook::permission().
+ */
+function scheduled_communications_civicrm_permission(&$permissions) {
+  $permissions['schedule communications'] = [
+    'label' => E::ts('SearchKit: schedule communications'),
+    'description' => E::ts('Create, update & delete search-based communications'),
+  ];
+}
+
+/**
+ * Implements hook_civicrm_pre().
+ */
+function scheduled_communications_civicrm_pre($op, $entity, $id, $params): void {
+  // Do not allow users without 'schedule communications' permission to edit a saved search used for communications.
+  if ($entity === 'SavedSearch' && $id && !empty($params['check_permissions']) && !CRM_Core_Permission::check('schedule communications')) {
+    $relatedCommunications = civicrm_api4('ActionSchedule', 'get', [
+      'checkPermissions' => FALSE,
+      'select' => ['ROW_COUNT'],
+      'where' => [
+        ['mapping_id', '=', 'saved_search'],
+        ['entity_value', '=', $id],
+      ],
+    ])->count();
+    if ($relatedCommunications) {
+      throw new CRM_Core_Exception(E::ts('Permission denied to modify saved search that controls a scheduled communication.'));
+    }
+  }
+  // Do not allow search-based scheduled communications to be created/edited/deleted without permission
+  if ($entity === 'ActionSchedule' && !empty($params['check_permissions']) && !CRM_Core_Permission::check('schedule communications')) {
+    $mappingType = $params['mapping_id'] ?? CRM_Core_DAO_ActionSchedule::getDbVal('mapping_id', $id);
+    if ($mappingType === 'saved_search') {
+      throw new CRM_Core_Exception(E::ts('Permission denied: search-based communications require the "schedule communications" permission.'));
+    }
+  }
+}
+
+/**
  * Implements hook_civicrm_post().
  */
 function scheduled_communications_civicrm_post($op, $entity, $id, $object): void {

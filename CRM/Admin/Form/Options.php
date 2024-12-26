@@ -23,6 +23,8 @@ use Civi\Api4\OptionValue;
  */
 class CRM_Admin_Form_Options extends CRM_Admin_Form {
 
+  use CRM_Core_Form_EntityFormTrait;
+
   /**
    * The option group name.
    *
@@ -47,6 +49,20 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
    * @var bool
    */
   public $submitOnce = TRUE;
+
+  /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'OptionValue';
+  }
+
+  /**
+   * The Option Group ID.
+   * @var int
+   * @internal
+   */
+  protected $_gid;
 
   /**
    * Pre-process
@@ -98,13 +114,30 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
 
     $session->pushUserContext(CRM_Utils_System::url($url, $params));
     $this->assign('id', $this->_id);
-
+    $this->setDeleteMessage();
     if ($this->_id && CRM_Core_OptionGroup::isDomainOptionGroup($this->_gName)) {
       $domainID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', $this->_id, 'domain_id', 'id');
       if (CRM_Core_Config::domainID() != $domainID) {
         CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
       }
     }
+    if ($this->isSubmitted()) {
+      // The custom data fields are added to the form by an ajax form.
+      // However, if they are not present in the element index they will
+      // not be available from `$this->getSubmittedValue()` in post process.
+      // We do not have to set defaults or otherwise render - just add to the element index.
+      $this->addCustomDataFieldsToForm('OptionValue', array_filter([
+        'id' => $this->_id,
+        'option_group_id' => $this->_gid,
+      ]));
+    }
+  }
+
+  /**
+   * Get the form-specific delete message.
+   */
+  public function setDeleteMessage(): void {
+    $this->deleteMessage = ts('WARNING: Deleting this option will result in the loss of all %1 related records which use the option.', [1 => $this->_gLabel]) . ' ' . ts('This may mean the loss of a substantial amount of data, and the action cannot be undone.') . ' ' . ts('Do you want to continue?');
   }
 
   /**
@@ -156,6 +189,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
     $this->setPageTitle(ts('%1 Option', [1 => $this->_gLabel]));
 
     if ($this->_action & CRM_Core_Action::DELETE) {
+      $this->buildDeleteForm();
       return;
     }
 
@@ -353,6 +387,23 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
     }
 
     $this->addFormRule(['CRM_Admin_Form_Options', 'formRule'], $this);
+    //need to assign subtype to the template
+    $this->assign('customDataSubType', $this->_gid);
+    $this->assign('entityID', $this->_id);
+
+    if (($this->_action & CRM_Core_Action::ADD) || ($this->_action & CRM_Core_Action::UPDATE)) {
+      $this->addButtons([
+        [
+          'type' => 'upload',
+          'name' => ts('Save'),
+          'isDefault' => TRUE,
+        ],
+        [
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ],
+      ]);
+    }
   }
 
   /**
@@ -472,7 +523,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       }
     }
     else {
-      $params = $this->exportValues();
+      $params = $this->getSubmittedValues();
       if ($this->isGreetingOptionGroup()) {
         $params['filter'] = $params['contact_type_id'];
       }
@@ -494,7 +545,10 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       if (isset($params['color']) && strtolower($params['color']) == '#ffffff') {
         $params['color'] = 'null';
       }
-
+      $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
+        $this->_id,
+        'OptionValue'
+      );
       $optionValue = CRM_Core_OptionValue::addOptionValue($params, $this->_gName, $this->_action, $this->_id);
 
       CRM_Core_Session::setStatus(ts('The %1 \'%2\' has been saved.', [
@@ -518,6 +572,17 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
    */
   protected function isGreetingOptionGroup(): bool {
     return in_array($this->getOptionGroupName(), ['email_greeting', 'postal_greeting', 'addressee'], TRUE);
+  }
+
+  /**
+   * Override
+   * @return array
+   */
+  protected function getFieldsToExcludeFromPurification(): array {
+    if ($this->_gName === 'from_email_address') {
+      return ['label'];
+    }
+    return [];
   }
 
 }

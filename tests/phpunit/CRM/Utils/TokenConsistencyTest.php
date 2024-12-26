@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\FinancialTrxn;
 use Civi\Token\TokenProcessor;
 use Civi\Api4\LocBlock;
 use Civi\Api4\Email;
@@ -304,6 +305,9 @@ Czech Republic<br />', $html);
 The End
 Czech Republic
 ', $text);
+    $financialTrxn = FinancialTrxn::get()->addWhere('is_payment', '=', TRUE)->execute()->first();
+    $text = $this->renderText(['financial_trxnId' => $financialTrxn['id']], '{financial_trxn.total_amount}', [], FALSE);
+    $this->assertEquals('$100.00', $text);
   }
 
   /**
@@ -341,15 +345,28 @@ Czech Republic
    */
   public function testLocationTokens(): void {
     $contactID = $this->individualCreate(['email' => 'me@example.com']);
-    Address::create()->setValues([
+    $this->createTestEntity('Address', [
       'contact_id' => $contactID,
       'is_primary' => TRUE,
       'street_address' => 'Heartbreak Hotel',
       'supplemental_address_1' => 'Lonely Street',
-    ])->execute();
-    $text = '{contact.first_name} {contact.email_primary.email} {contact.address_primary.street_address}';
-    $text = $this->renderText(['contactId' => $contactID], $text);
-    $this->assertEquals('Anthony me@example.com Heartbreak Hotel', $text);
+      'state_province_id:name' => 'New York',
+    ], 'primary');
+
+    $this->createTestEntity('Address', [
+      'contact_id' => $contactID,
+      'is_billing' => TRUE,
+      'street_address' => 'Heartbreak Motel',
+      'supplemental_address_1' => 'Lonely Avenue',
+      'country_id:name' => 'United States',
+      'state_province_id:name' => 'California',
+    ], 'billing');
+    $template = '{contact.first_name} {contact.email_primary.email} {contact.address_primary.street_address} {contact.address_billing.supplemental_address_1} {contact.address_billing.state_province_id:abbr}';
+    $text = $this->renderText(['contactId' => $contactID], $template);
+    $this->assertEquals('Anthony me@example.com Heartbreak Hotel Lonely Avenue CA', $text);
+    Address::delete()->addWhere('id', '=', $this->ids['Address']['billing'])->execute();
+    $text = $this->renderText(['contactId' => $contactID], $template);
+    $this->assertEquals('Anthony me@example.com Heartbreak Hotel Lonely Street NY', $text);
   }
 
   /**
@@ -364,11 +381,11 @@ Czech Republic
     $variants = [
       [
         'string' => '{contact.individual_prefix}{ }{contact.first_name}{ }{contact.middle_name}{ }{contact.last_name}{ }{contact.individual_suffix}',
-        'expected' => 'Mr. Anthony  Anderson II',
+        'expected' => 'Mr. Anthony Anderson II',
       ],
       [
         'string' => '{contact.prefix_id:label}{ }{contact.first_name}{ }{contact.middle_name}{ }{contact.last_name}{ }{contact.suffix_id:label}',
-        'expected' => 'Mr. Anthony  Anderson II',
+        'expected' => 'Mr. Anthony Anderson II',
       ],
     ];
     $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
@@ -569,6 +586,7 @@ contribution_recur.payment_instrument_id:name :Check
    *
    */
   public function testMembershipTokenConsistency(): void {
+    CRM_Utils_Time::setTime('2007-01-22 15:00:00');
     $this->createLoggedInUser();
     $this->restoreMembershipTypes();
     $this->createCustomGroupWithFieldOfType(['extends' => 'Membership']);
@@ -582,7 +600,6 @@ contribution_recur.payment_instrument_id:name :Check
     $tokenString .= "\n{membership." . $this->getCustomFieldName('text') . '}';
     // Now compare with scheduled reminder
     $mut = new CiviMailUtils($this);
-    CRM_Utils_Time::setTime('2007-01-22 15:00:00');
     $this->callAPISuccess('ActionSchedule', 'create', [
       'title' => 'job',
       'subject' => 'job',
@@ -608,6 +625,8 @@ contribution_recur.payment_instrument_id:name :Check
     $tokens = $tokenProcessor->listTokens();
     // Add in custom tokens as token processor supports these.
     $expectedTokens = array_merge($expectedTokens, $this->getTokensAdvertisedByTokenProcessorButNotLegacy());
+    // Token 'fee' is deprecated & no longer advertised.
+    unset($expectedTokens['{membership.fee}']);
     $this->assertEquals(array_merge($expectedTokens, $this->getDomainTokens(), $this->getRecurEntityTokens('membership')), $tokens);
     $tokenProcessor->addMessage('html', $tokenString, 'text/plain');
     $tokenProcessor->addRow(['membershipId' => $this->getMembershipID()]);
@@ -673,7 +692,9 @@ contribution_recur.payment_instrument_id:name :Check
       '{membership.start_date}' => 'Membership Start Date',
       '{membership.join_date}' => 'Member Since',
       '{membership.end_date}' => 'Membership Expiration Date',
+      '{membership.membership_type_id.minimum_fee}' => 'Minimum Fee',
       '{membership.fee}' => 'Membership Fee',
+      '{membership.status_id.is_new}' => 'Is new membership status',
     ];
   }
 
@@ -701,7 +722,7 @@ contribution_recur.payment_instrument_id:name :Check
     return "participant.status_id :2
 participant.role_id :1
 participant.register_date :February 19th, 2007
-participant.source :Wimbeldon
+participant.source :Wimbledon
 participant.fee_level :steep
 participant.fee_amount :$50.00
 participant.registered_by_id :
@@ -756,15 +777,17 @@ event.fee_label :Event fees
    */
   protected function getExpectedMembershipTokenOutput(): string {
     return '
-Expired
+New
 General
 1
-Expired
+New
 General
 January 21st, 2007
 January 21st, 2007
 December 21st, 2007
-100.00';
+$100.00
+$100.00
+1';
   }
 
   /**
@@ -929,6 +952,7 @@ United States', $tokenProcessor->getRow(0)->render('message'));
       '{domain.state_province_id:label}' => 'Domain (Organization) State',
       '{domain.country_id:label}' => 'Domain (Organization) Country',
       '{domain.empowered_by_civicrm_image_url}' => 'Empowered By CiviCRM Image',
+      '{site.message_header}' => 'Message Header',
     ];
   }
 
@@ -1128,7 +1152,7 @@ United States', $tokenProcessor->getRow(0)->render('message'));
       'event_id' => $this->ids['Event'][0],
       'fee_amount' => 50,
       'fee_level' => 'steep',
-      $this->getCustomFieldName('participant_int') => '99999',
+      $this->getCustomFieldName('participant_int', 4) => '99999',
     ]);
   }
 
@@ -1170,7 +1194,7 @@ Attendees will need to install the [TeleFoo](http://telefoo.example.com) app.';
    *
    * @return \Civi\Token\TokenProcessor
    */
-  protected function getTokenProcessor(array $override): TokenProcessor {
+  protected function getTokenProcessor(array $override = []): TokenProcessor {
     return new TokenProcessor(\Civi::dispatcher(), array_merge([
       'controller' => __CLASS__,
     ], $override));
@@ -1187,7 +1211,7 @@ Attendees will need to install the [TeleFoo](http://telefoo.example.com) app.';
    * @return string
    */
   protected function renderText(array $rowContext, string $text, array $context = [], $isHtml = TRUE): string {
-    $context['schema'] = $context['schema'] ?? [];
+    $context['schema'] ??= [];
     foreach (array_keys($rowContext) as $key) {
       $context['schema'][] = $key;
     }
@@ -1196,6 +1220,23 @@ Attendees will need to install the [TeleFoo](http://telefoo.example.com) app.';
     $tokenProcessor->addMessage('text', $text, 'text/' . ($isHtml ? 'html' : 'plain'));
     $tokenProcessor->evaluate();
     return $tokenProcessor->getRow(0)->render('text');
+  }
+
+  public function testQuotedTokens(): void {
+    $quoteOptions = [
+      '"',
+      '&lquote;',
+      '&rquote;',
+      '&quot;',
+      '&#8221;',
+      '&#8220;',
+      '&#x22;',
+    ];
+    Civi::settings()->set('dateformatFull', '%B %E%f, %Y');
+    foreach ($quoteOptions as $quote) {
+      $date = CRM_Utils_Date::customFormat(date('Y-m-d H:i:s'), '%B %E%f, %Y');
+      $this->assertEquals($date, $this->renderText([], '{domain.now|crmDate:' . $quote . 'Full' . $quote . '}'), 'render with quote type :' . $quote);
+    }
   }
 
 }

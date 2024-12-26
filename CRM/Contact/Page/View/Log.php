@@ -17,6 +17,12 @@
 class CRM_Contact_Page_View_Log extends CRM_Core_Page {
 
   /**
+   * @var int
+   * @internal
+   */
+  public $_contactId;
+
+  /**
    * Called when action is browse.
    *
    * @return null
@@ -33,6 +39,7 @@ class CRM_Contact_Page_View_Log extends CRM_Core_Page {
     }
 
     $log = new CRM_Core_DAO_Log();
+    $modifiers = [];
 
     $log->entity_table = 'civicrm_contact';
     $log->entity_id = $this->_contactId;
@@ -41,11 +48,15 @@ class CRM_Contact_Page_View_Log extends CRM_Core_Page {
 
     $logEntries = [];
     while ($log->fetch()) {
-      [$displayName, $contactImage] = CRM_Contact_BAO_Contact::getDisplayAndImage($log->modified_id);
+      if ($log->modified_id && !isset($modifiers[$log->modified_id])) {
+        $displayInfo = CRM_Contact_BAO_Contact::getDisplayAndImage($log->modified_id);
+        $modifiers[$log->modified_id] = ['name' => $displayInfo[0] ?? '', 'image' => $displayInfo[1] ?? ''];
+      }
+
       $logEntries[] = [
         'id' => $log->modified_id,
-        'name' => $displayName,
-        'image' => $contactImage,
+        'name' => $modifiers[$log->modified_id]['name'] ?? '',
+        'image' => $modifiers[$log->modified_id]['image'] ?? '',
         'date' => $log->modified_date,
       ];
     }
@@ -53,7 +64,7 @@ class CRM_Contact_Page_View_Log extends CRM_Core_Page {
     $this->assign('logCount', count($logEntries));
     $this->ajaxResponse['tabCount'] = count($logEntries);
     $this->ajaxResponse += CRM_Contact_Form_Inline::renderFooter($this->_contactId, FALSE);
-    $this->assign_by_ref('log', $logEntries);
+    $this->assign('log', $logEntries);
   }
 
   public function preProcess() {

@@ -100,10 +100,7 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
     $pcpBlock->find(TRUE);
 
     if (!empty($pcpBlock->id) && CRM_PCP_BAO_PCP::getPcpBlockInUse($pcpBlock->id)) {
-      foreach ([
-        'target_entity_type',
-        'target_entity_id',
-      ] as $element_name) {
+      foreach (['target_entity_type', 'target_entity_id'] as $element_name) {
         $element = $this->getElement($element_name);
         $element->freeze();
       }
@@ -188,8 +185,8 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
     $dao->find(TRUE);
     $params['id'] = $dao->id;
     $params['is_active'] = $params['pcp_active'] ?? FALSE;
-    $params['is_approval_needed'] = $params['is_approval_needed'] ?? FALSE;
-    $params['is_tellfriend_enabled'] = $params['is_tellfriend_enabled'] ?? FALSE;
+    $params['is_approval_needed'] ??= FALSE;
+    $params['is_tellfriend_enabled'] ??= FALSE;
 
     CRM_PCP_BAO_PCPBlock::writeRecord($params);
 

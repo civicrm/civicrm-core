@@ -80,7 +80,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
     $this->assign('suppressForm', FALSE);
 
     // Contribute PDF tasks allow you to email as well, so we need to add email address to those forms
-    $this->add('select', 'from_email_address', ts('From Email Address'), $this->_fromEmails, TRUE);
+    $this->add('select', 'from_email_address', ts('From Email Address'), $this->getFromEmails(), TRUE);
     $this->addPDFElementsToForm();
 
     // specific need for contributions

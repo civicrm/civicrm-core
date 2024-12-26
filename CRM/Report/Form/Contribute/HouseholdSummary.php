@@ -21,6 +21,30 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
   protected $_summary = NULL;
 
   /**
+   * @var array
+   * @internal
+   */
+  public $relationTypes;
+
+  /**
+   * @var int
+   * @internal
+   */
+  public $relationshipId;
+
+  /**
+   * @var string
+   * @internal
+   */
+  public $householdContact;
+
+  /**
+   * @var string
+   * @internal
+   */
+  public $otherContact;
+
+  /**
    * Class constructor.
    */
   public function __construct() {
@@ -407,6 +431,8 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
    */
   public function alterDisplay(&$rows) {
     $type = substr($this->_params['relationship_type_id_value'], -3);
+    $previousHousehold = NULL;
+    $previousContact = NULL;
 
     $entryFound = FALSE;
     $flagHousehold = $flagContact = 0;
@@ -426,16 +452,16 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
       ) {
         if ($value = $row['civicrm_contact_household_household_name']) {
           if ($rowNum == 0) {
-            $priviousHousehold = $value;
+            $previousHousehold = $value;
           }
           else {
-            if ($priviousHousehold == $value) {
+            if ($previousHousehold == $value) {
               $flagHousehold = 1;
-              $priviousHousehold = $value;
+              $previousHousehold = $value;
             }
             else {
               $flagHousehold = 0;
-              $priviousHousehold = $value;
+              $previousHousehold = $value;
             }
           }
 
@@ -460,16 +486,16 @@ class CRM_Report_Form_Contribute_HouseholdSummary extends CRM_Report_Form {
       ) {
         if ($value = $row['civicrm_contact_id']) {
           if ($rowNum == 0) {
-            $priviousContact = $value;
+            $previousContact = $value;
           }
           else {
-            if ($priviousContact == $value) {
+            if ($previousContact == $value) {
               $flagContact = 1;
-              $priviousContact = $value;
+              $previousContact = $value;
             }
             else {
               $flagContact = 0;
-              $priviousContact = $value;
+              $previousContact = $value;
             }
           }
 

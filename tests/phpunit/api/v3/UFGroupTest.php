@@ -142,15 +142,6 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
    * @param int $version
    * @dataProvider versionThreeAndFour
    */
-  public function testUFGroupCreateWithWrongParams($version) {
-    $this->_apiversion = $version;
-    $result = $this->callAPIFailure('uf_group', 'create', ['name' => 'A title-less group']);
-  }
-
-  /**
-   * @param int $version
-   * @dataProvider versionThreeAndFour
-   */
   public function testUFGroupUpdate($version) {
     $this->_apiversion = $version;
     $params = [

@@ -2,7 +2,6 @@
 
 namespace Civi\Financialacls;
 
-use Civi;
 use Civi\Api4\PriceField;
 use Civi\Api4\PriceFieldValue;
 use Civi\Api4\PriceSet;
@@ -21,7 +20,6 @@ class FinancialTypeTest extends BaseTestClass {
    * financial type.
    */
   public function testChangeFinancialTypeName(): void {
-    Civi::settings()->set('acl_financial_type', TRUE);
     $type = $this->callAPISuccess('FinancialType', 'create', [
       'name' => 'my test',
     ]);
@@ -29,15 +27,17 @@ class FinancialTypeTest extends BaseTestClass {
       'name' => 'your test',
       'id' => $type['id'],
     ]);
-    $status = CRM_Core_Session::singleton()->getStatus(TRUE);
-    $this->assertEquals('Changing the name', substr($status[0]['text'], 0, 17));
+    $statusMessages = CRM_Core_Session::singleton()->getStatus(TRUE);
+    $financialTypeMessages = array_filter($statusMessages, function ($msg) {
+        return strpos($msg['text'], 'Changing the name of a Financial Type') === 0;
+    });
+    $this->assertEquals(1, count($financialTypeMessages));
   }
 
   /**
    * Check method testPermissionedFinancialTypes()
    */
   public function testPermissionedFinancialTypes(): void {
-    Civi::settings()->set('acl_financial_type', TRUE);
     $permissions = \CRM_Core_Permission::basicPermissions(FALSE, TRUE);
     $actions = [
       'add' => ts('add'),
@@ -46,23 +46,25 @@ class FinancialTypeTest extends BaseTestClass {
       'delete' => ts('delete'),
     ];
     $financialTypes = \CRM_Contribute_BAO_Contribution::buildOptions('financial_type_id', 'validate');
-    foreach ($financialTypes as $id => $type) {
+    foreach ($financialTypes as $type) {
       foreach ($actions as $action => $action_ts) {
         $this->assertEquals(
           [
-            ts('CiviCRM: %1 contributions of type %2', [
+            'label' => ts('CiviCRM: %1 contributions of type %2', [
               1 => $action_ts,
               2 => $type,
             ]),
-            ts('%1 contributions of type %2', [1 => $action_ts, 2 => $type]),
+            'description' => ts('%1 contributions of type %2', [1 => $action_ts, 2 => $type]),
+            'implied_by' => [ts('%1 contributions of all types', [1 => $action_ts])],
+            'parent' => $action_ts . ' contributions of all types',
           ],
           $permissions[$action . ' contributions of type ' . $type]
         );
       }
     }
     $this->assertEquals([
-      ts('CiviCRM: administer CiviCRM Financial Types'),
-      ts('Administer access to Financial Types'),
+      'label' => ts('CiviCRM: administer CiviCRM Financial Types'),
+      'description' => ts('Administer access to Financial Types'),
     ], $permissions['administer CiviCRM Financial Types']);
   }
 
@@ -78,7 +80,7 @@ class FinancialTypeTest extends BaseTestClass {
   }
 
   /**
-   * Check method testCheckPermissionedLineItems()
+   * Check method test_civicrm_financial_acls_check_permissioned_line_items()
    *
    * @throws \CRM_Core_Exception
    */
@@ -132,14 +134,13 @@ class FinancialTypeTest extends BaseTestClass {
     ];
 
     $contribution = $this->callAPISuccess('Order', 'create', $contributionParams);
-    Civi::settings()->set('acl_financial_type', TRUE);
 
     $this->setPermissions([
       'view contributions of type Member Dues',
     ]);
 
     try {
-      \CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($contribution['id'], 'view');
+      _civicrm_financial_acls_check_permissioned_line_items($contribution['id'], 'view');
       $this->fail('Missed expected exception');
     }
     catch (\CRM_Core_Exception $e) {
@@ -150,7 +151,7 @@ class FinancialTypeTest extends BaseTestClass {
       'view contributions of type Donation',
     ]);
     try {
-      \CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($contribution['id'], 'view');
+      _civicrm_financial_acls_check_permissioned_line_items($contribution['id'], 'view');
     }
     catch (\CRM_Core_Exception $e) {
       $this->fail('permissions should be established');

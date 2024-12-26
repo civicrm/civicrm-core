@@ -45,7 +45,7 @@ jobs:
     steps:
       - uses: shivammathur/setup-php@v2
         with:
-            php-version: 7.4
+            php-version: 8.1
             extensions: dom, curl, libxml, mbstring, zip, pdo, mysql, pdo_mysql, bcmath, soap, intl, gd, exif, iconv
             coverage: none
             tools: composer:v2
@@ -117,7 +117,7 @@ jobs:
           git commit -m "regenerate civicrm_generated" sql/civicrm_generated.mysql
           git remote add mine https://${GITHUB_ACTOR}:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY.git
           git push mine
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: ${{ success() }}
         with:
           name: the_file_you_requested

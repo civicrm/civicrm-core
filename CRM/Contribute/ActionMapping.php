@@ -24,7 +24,7 @@ abstract class CRM_Contribute_ActionMapping extends \Civi\ActionSchedule\Mapping
     return 'Contribution';
   }
 
-  public function modifySpec(\Civi\Api4\Service\Spec\RequestSpec $spec) {
+  public function modifyApiSpec(\Civi\Api4\Service\Spec\RequestSpec $spec) {
     $spec->getFieldByName('entity_status')
       ->setLabel(ts('Contribution Status'));
   }

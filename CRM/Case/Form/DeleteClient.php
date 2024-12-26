@@ -66,10 +66,7 @@ class CRM_Case_Form_DeleteClient extends CRM_Core_Form {
     elseif ($context == 'dashboard') {
       $url = CRM_Utils_System::url('civicrm/case', 'reset=1');
     }
-    elseif (in_array($context, [
-      'dashlet',
-      'dashletFullscreen',
-    ])) {
+    elseif (in_array($context, ['dashlet', 'dashletFullscreen'])) {
       $url = CRM_Utils_System::url('civicrm/dashboard', 'reset=1');
     }
     $session = CRM_Core_Session::singleton();

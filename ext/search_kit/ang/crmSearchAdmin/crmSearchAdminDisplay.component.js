@@ -35,6 +35,7 @@
     controller: function($scope, $timeout, searchMeta) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
+      let initDefaults;
 
       this.isSuperAdmin = CRM.checkPerm('all CiviCRM permissions and ACLs');
       this.aclBypassHelp = ts('Only users with "all CiviCRM permissions and ACLs" can disable permission checks.');
@@ -78,6 +79,8 @@
         }
       };
 
+      this.dateFormats = CRM.crmSearchAdmin.dateFormats;
+
       // Drag-n-drop settings for reordering columns
       this.sortableOptions = {
         connectWith: '.crm-search-admin-edit-columns',
@@ -86,6 +89,10 @@
       };
 
       this.styles = CRM.crmSearchAdmin.styles;
+
+      function selectToKey(selectExpr) {
+        return selectExpr.split(' AS ').slice(-1)[0];
+      }
 
       this.addCol = function(type) {
         var col = _.cloneDeep(this.colTypes[type].defaults);
@@ -97,31 +104,49 @@
       };
 
       this.removeCol = function(index) {
-        if (ctrl.display.settings.columns[index].type === 'field') {
-          ctrl.hiddenColumns.push(ctrl.display.settings.columns[index]);
-        }
         ctrl.display.settings.columns.splice(index, 1);
       };
 
-      this.restoreCol = function(index) {
-        ctrl.display.settings.columns.push(ctrl.hiddenColumns[index]);
-        ctrl.hiddenColumns.splice(index, 1);
+      this.getColumnIndex = function(key) {
+        key = selectToKey(key);
+        return ctrl.display.settings.columns.findIndex(col => key === col.key);
+      };
+
+      this.columnExists = function(key) {
+        return ctrl.getColumnIndex(key) > -1;
+      };
+
+      this.toggleColumn = function(key) {
+        let index = ctrl.getColumnIndex(key);
+        if (index > -1) {
+          ctrl.removeCol(index);
+        } else {
+          ctrl.display.settings.columns.push(searchMeta.fieldToColumn(key, initDefaults));
+        }
+      };
+
+      this.getDataType = function(key) {
+        const expr = ctrl.getExprFromSelect(key);
+        const info = searchMeta.parseExpr(expr);
+        const field = (_.findWhere(info.args, {type: 'field'}) || {}).field || {};
+        return (info.fn && info.fn.data_type) || field.data_type;
+      };
+
+      this.isDate = function(key) {
+        return ['Date', 'Timestamp'].includes(this.getDataType(key));
       };
 
       this.getExprFromSelect = function(key) {
-        var match;
-        _.each(ctrl.savedSearch.api_params.select, function(expr) {
-          var parts = expr.split(' AS ');
-          if (_.includes(parts, key)) {
-            match = parts[0];
-            return false;
-          }
+        let fieldKey = key.split(':')[0];
+        let match = ctrl.savedSearch.api_params.select.find((expr) => {
+          let parts = expr.split(' AS ');
+          return (parts[1] === fieldKey || parts[0].split(':')[0] === fieldKey);
         });
-        return match;
+        return match ? match.split(' AS ')[0] : null;
       };
 
       this.getFieldLabel = function(key) {
-        var expr = ctrl.getExprFromSelect(key);
+        var expr = ctrl.getExprFromSelect(selectToKey(key));
         return searchMeta.getDefaultLabel(expr);
       };
 
@@ -171,6 +196,39 @@
           delete col.icons;
           col.type = 'html';
         }
+      };
+
+      // Because angular dropdowns must be a by-reference variable
+      const suffixOptionCache = {};
+
+      this.getSuffixOptions = function(col) {
+        let expr = ctrl.getExprFromSelect(col.key),
+          info = searchMeta.parseExpr(expr);
+        if (!info.fn && info.args[0] && info.args[0].field && info.args[0].field.suffixes) {
+          let cacheKey = info.args[0].field.suffixes.join();
+          if (!(cacheKey in suffixOptionCache)) {
+            suffixOptionCache[cacheKey] = Object.keys(CRM.crmSearchAdmin.optionAttributes)
+              .filter(key => info.args[0].field.suffixes.includes(key))
+              .reduce((filteredOptions, key) => {
+                filteredOptions[key] = CRM.crmSearchAdmin.optionAttributes[key];
+                return filteredOptions;
+              }, {});
+          }
+          return suffixOptionCache[cacheKey];
+        }
+      };
+
+      function getSetSuffix(index, val) {
+        let col = ctrl.display.settings.columns[index];
+        if (arguments.length > 1) {
+          col.key = col.key.split(':')[0] + (val ? ':' + val : '');
+        }
+        return col.key.split(':')[1] || '';
+      }
+
+      // Provides getter/setter for the pseudoconstant suffix selector
+      this.getSetSuffix = function(index) {
+        return _.wrap(index, getSetSuffix);
       };
 
       this.canBeImage = function(col) {
@@ -294,25 +352,17 @@
 
       // Helper function to sort active from hidden columns and initialize each column with defaults
       this.initColumns = function(defaults) {
+        initDefaults = defaults;
         if (!ctrl.display.settings.columns) {
           ctrl.display.settings.columns = _.transform(ctrl.savedSearch.api_params.select, function(columns, fieldExpr) {
             columns.push(searchMeta.fieldToColumn(fieldExpr, defaults));
           });
-          ctrl.hiddenColumns = [];
         } else {
-          var activeColumns = _.collect(ctrl.display.settings.columns, 'key'),
-            selectAliases = _.map(ctrl.savedSearch.api_params.select, function(select) {
-              return _.last(select.split(' AS '));
-            });
-          ctrl.hiddenColumns = _.transform(ctrl.savedSearch.api_params.select, function(hiddenColumns, fieldExpr) {
-            var key = _.last(fieldExpr.split(' AS '));
-            if (!_.includes(activeColumns, key)) {
-              hiddenColumns.push(searchMeta.fieldToColumn(fieldExpr, defaults));
-            }
-          });
-          _.eachRight(activeColumns, function(key, index) {
-            if (key && !_.includes(selectAliases, key)) {
-              ctrl.display.settings.columns.splice(index, 1);
+          let activeColumns = ctrl.display.settings.columns.map(col => col.key);
+          // Delete any column that is no longer in the search
+          activeColumns.reverse().forEach((key, index) => {
+            if (key && !ctrl.getExprFromSelect(key)) {
+              ctrl.removeCol(activeColumns.length - 1 - index);
             }
           });
         }

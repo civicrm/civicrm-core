@@ -7,6 +7,11 @@ class CRM_Core_CodeGen_Util_Template {
   protected $filetype;
 
   protected $smarty;
+
+  public function getSmarty(): Smarty {
+    return $this->smarty;
+  }
+
   protected $beautifier;
 
   /**
@@ -128,7 +133,7 @@ class CRM_Core_CodeGen_Util_Template {
    * @param $value
    */
   public function assign($key, $value) {
-    $this->smarty->assign_by_ref($key, $value);
+    $this->smarty->assign($key, $value);
   }
 
 }

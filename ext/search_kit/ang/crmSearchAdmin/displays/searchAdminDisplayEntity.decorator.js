@@ -30,9 +30,14 @@
         crmApi4('SK_' + display.name, 'refresh', {}, 0).then(function(result) {
           display._refresh_date = CRM.utils.formatDate(result.refresh_date, null, true);
         });
+        // Job was a separate api call, add its result back in to the model
         if (apiResults['job_' + display.name]) {
           display._job = apiResults['job_' + display.name];
         }
+        // Refresh admin settings to reflect any new/updated entity + joins
+        fetch(CRM.url('civicrm/ajax/admin/search'))
+          .then(response => response.json())
+          .then(data => CRM.crmSearchAdmin = data);
       }
     });
     return $delegate;

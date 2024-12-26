@@ -26,6 +26,8 @@ use Civi\WorkflowMessage\Traits\TemplateTrait;
  * @method int|null getContactID()
  * @method $this setContact(array|null $contact)
  * @method array|null getContact()
+ * @method $this setUserEnteredText(string $text)
+ * @method $this setUserEnteredHTML(string $html)
  *
  * @support template-only
  * GenericWorkflowMessage should aim for "full" support, but it's prudent to keep
@@ -115,6 +117,32 @@ class GenericWorkflowMessage implements WorkflowMessageInterface {
     // However, these basically now all implement the ContributionTrait so we
     // can hopefully remove from here (after some checking).
     $export['smartyTokenAlias']['taxTerm'] = 'domain.tax_term';
+  }
+
+  /**
+   * Additional text to include in the receipt.
+   *
+   * @var string
+   *
+   * @scope tplParams as userTextPlain
+   */
+  protected $userEnteredText;
+
+  /**
+   * Additional html to include in the receipt.
+   *
+   * @var string
+   *
+   * @scope tplParams as userText
+   */
+  protected $userEnteredHTML;
+
+  public function getUserEnteredText(): ?string {
+    return $this->userEnteredText ?: ($this->userEnteredHTML ? \CRM_Utils_String::htmlToText($this->userEnteredHTML) : NULL);
+  }
+
+  public function getUserEnteredHTML(): ?string {
+    return \CRM_Utils_String::purifyHTML($this->userEnteredHTML ?: ($this->userEnteredText ? nl2br($this->userEnteredText) : ''));
   }
 
 }

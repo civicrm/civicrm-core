@@ -14,6 +14,8 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
+use Civi\Api4\Contribution;
+use Civi\Api4\Payment;
 
 /**
  * This class provides the functionality for batch profile update for contributions.
@@ -38,6 +40,8 @@ class CRM_Contribute_Form_Task_Batch extends CRM_Contribute_Form_Task {
    * @var string
    */
   protected $_userContext;
+
+  private array $_fields;
 
   /**
    * Build all the data structures needed to build the form.
@@ -201,24 +205,23 @@ class CRM_Contribute_Form_Task_Batch extends CRM_Contribute_Form_Task {
         if (!empty($value['financial_type'])) {
           $value['financial_type_id'] = $value['financial_type'];
         }
-
-        $value['options'] = [
-          'reload' => 1,
-        ];
-        $contribution = civicrm_api3('Contribution', 'create', $value);
-        $contribution = $contribution['values'][$contributionID];
+        $contribution = Contribution::get(FALSE)
+          ->addWhere('id', '=', $contributionID)
+          ->addSelect('balance_amount', 'contribution_status_id:name')
+          ->execute()->single();
 
         $currentStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $value['contribution_status_id'] ?? NULL);
-        $previousStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $this->_defaultValues["field[{$contributionID}][contribution_status_id]"] ?? NULL);
 
         if ('Completed' === $currentStatus &&
-          in_array($previousStatus, ['Pending', 'Partially paid'], TRUE)) {
-          // @todo - use completeorder api or make api call do this.
-          CRM_Contribute_BAO_Contribution::transitionComponents([
-            'contribution_id' => $contribution['id'],
-            'receive_date' => $contribution['receive_date'],
-          ]);
+          in_array($contribution['contribution_status_id:name'], ['Pending', 'Partially paid'], TRUE)) {
+          Payment::create(FALSE)
+            ->setValues([
+              'contribution_id' => $contribution['id'],
+              'trxn_date' => date('Y-m-d H:i:s'),
+              'total_amount' => $contribution['balance_amount'],
+            ])->execute();
         }
+        civicrm_api3('Contribution', 'create', $value);
       }
       CRM_Core_Session::setStatus(ts("Your updates have been saved."), ts('Saved'), 'success');
     }

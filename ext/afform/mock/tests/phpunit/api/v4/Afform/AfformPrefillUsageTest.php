@@ -9,7 +9,6 @@ use Civi\Api4\Afform;
  * @group headless
  */
 class AfformPrefillUsageTest extends AfformUsageTestCase {
-  use \Civi\Test\Api4TestTrait;
 
   /**
    * Ensure that Afform restricts autocomplete results when it's set to use a SavedSearch
@@ -60,6 +59,7 @@ EOHTML;
 
     $prefill = Afform::prefill()
       ->setName($this->formName)
+      ->setFillMode('entity')
       ->setArgs(['Individual1' => $cid])
       ->execute()
       ->indexBy('name');
@@ -74,11 +74,12 @@ EOHTML;
     // One email should have been filled
     $this->assertCount(1, $prefill['Individual1']['values'][1]['joins']['Email']);
     $this->assertEquals('b@afform.test', $prefill['Individual1']['values'][1]['joins']['Email'][0]['email']);
-    $this->assertEmpty($prefill['Individual1']['values'][0]['joins']['Email']);
+    $joins = $prefill['Individual1']['values'][0]['joins'];
+    $this->assertEmpty($joins['Email']);
     $this->assertEmpty($prefill['Individual1']['values'][2]['joins']['Email']);
 
     // Phone join has `max="2"`
-    $this->assertCount(2, $prefill['Individual1']['values'][0]['joins']['Phone']);
+    $this->assertCount(2, $joins['Phone']);
     $this->assertCount(1, $prefill['Individual1']['values'][2]['joins']['Phone']);
     $this->assertEquals('2-1', $prefill['Individual1']['values'][2]['joins']['Phone'][0]['phone']);
     $this->assertEmpty($prefill['Individual1']['values'][1]['joins']['Phone']);
@@ -86,6 +87,7 @@ EOHTML;
     // Prefill a specific contact for the af-repeat entity
     $prefill = Afform::prefill()
       ->setName($this->formName)
+      ->setFillMode('entity')
       ->setArgs(['Individual1' => [1 => $cid[3]]])
       ->execute()
       ->indexBy('name');
@@ -98,9 +100,87 @@ EOHTML;
     // Form entity has `max="3"` so a forth contact (index 3) is out-of-bounds
     $prefill = Afform::prefill()
       ->setName($this->formName)
+      ->setFillMode('entity')
       ->setArgs(['Individual1' => [3 => $cid[0]]])
       ->execute();
     $this->assertTrue(empty($prefill['Individual1']['values']));
+  }
+
+  /**
+   * Ensure that Afform restricts autocomplete results when it's set to use a SavedSearch
+   */
+  public function testPrefillByLocationType(): void {
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity data="{contact_type: 'Individual'}" type="Contact" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" url-autofill="1" />
+  <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1" af-repeat="Add" min="1" max="3">
+    <div class="af-container">
+      <af-field name="id"></af-field>
+      <af-field name="preferred_communication_method"></af-field>
+      <afblock-name-individual></afblock-name-individual>
+    </div>
+    <div af-join="Email" data="{location_type_id: 1}">
+      <afblock-contact-email></afblock-contact-email>
+    </div>
+    <div af-join="Email" data="{location_type_id: 2}">
+      <afblock-contact-email></afblock-contact-email>
+    </div>
+  </fieldset>
+</af-form>
+EOHTML;
+
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+
+    $cid = $this->saveTestRecords('Contact', [
+      'records' => [
+        ['first_name' => 'A', 'last_name' => '_A'],
+        ['first_name' => 'B', 'last_name' => '_B'],
+        ['first_name' => 'C', 'last_name' => '_C'],
+        ['first_name' => 'D', 'last_name' => '_D'],
+      ],
+    ])->column('id');
+
+    $this->saveTestRecords('email', [
+      'records' => [
+        ['contact_id' => $cid[0], 'email' => 'a2@test.com', 'location_type_id' => 2],
+        ['contact_id' => $cid[0], 'email' => 'a1@test.com', 'location_type_id' => 1],
+        // Wrong location type
+        ['contact_id' => $cid[1], 'email' => 'b3@test.com', 'location_type_id' => 3],
+        ['contact_id' => $cid[2], 'email' => 'c2@test.com', 'location_type_id' => 2],
+        // Wrong contact
+        ['contact_id' => $cid[3], 'email' => 'd1@test.com', 'location_type_id' => 1],
+      ],
+    ]);
+
+    $prefill = Afform::prefill()
+      ->setName($this->formName)
+      ->setFillMode('entity')
+      ->setArgs(['Individual1' => $cid])
+      ->execute()
+      ->indexBy('name');
+
+    // Form entity has `max="3"`
+    $this->assertCount(3, $prefill['Individual1']['values']);
+    $this->assertEquals('A', $prefill['Individual1']['values'][0]['fields']['first_name']);
+    $this->assertEquals('B', $prefill['Individual1']['values'][1]['fields']['first_name']);
+    $this->assertEquals('C', $prefill['Individual1']['values'][2]['fields']['first_name']);
+
+    // Emails should have been filled for A & C
+    $this->assertCount(2, $prefill['Individual1']['values'][0]['joins']['Email']);
+    $this->assertCount(2, $prefill['Individual1']['values'][1]['joins']['Email']);
+    $this->assertCount(2, $prefill['Individual1']['values'][2]['joins']['Email']);
+    // 2 Emails for contact 0
+    $this->assertEquals('a1@test.com', $prefill['Individual1']['values'][0]['joins']['Email'][0]['email']);
+    $this->assertEquals('a2@test.com', $prefill['Individual1']['values'][0]['joins']['Email'][1]['email']);
+    // 0 Emails for contact 1
+    $this->assertEmpty($prefill['Individual1']['values'][1]['joins']['Email'][0]);
+    $this->assertEmpty($prefill['Individual1']['values'][1]['joins']['Email'][1]);
+    // 1 Email for contact 2
+    $this->assertEmpty($prefill['Individual1']['values'][2]['joins']['Email'][0]);
+    $this->assertEquals('c2@test.com', $prefill['Individual1']['values'][2]['joins']['Email'][1]['email']);
   }
 
   public function testPrefillByRelationship(): void {
@@ -149,6 +229,7 @@ EOHTML;
 
     $prefill = Afform::prefill()
       ->setName($this->formName)
+      ->setFillMode('form')
       ->execute()
       ->indexBy('name');
 
@@ -163,6 +244,71 @@ EOHTML;
     $this->assertContains('Co', array_column($parents, 'first_name'));
     $this->assertContains($uid, array_column($parents, 'id'));
     $this->assertContains($cid[0], array_column($parents, 'id'));
+  }
+
+  public function testPrefillWithDisplayOnlyFields(): void {
+
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity data="{contact_type: 'Individual'}" type="Contact" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC"  />
+  <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1" min="1" af-repeat="Add">
+    <af-field name="id" />
+    <afblock-name-individual />
+    <af-field name="gender_id" defn="{input_type: 'DisplayOnly', input_attrs: {}}" />
+    <af-field name="is_opt_out" defn="{input_type: 'DisplayOnly', input_attrs: {}}" />
+    <af-field name="birth_date" defn="{input_type: 'DisplayOnly', input_attrs: {}}" />
+    <div af-join="Address" af-repeat="Add" min="1" max="2">
+      <af-field name="country_id" defn="{input_type: 'DisplayOnly', input_attrs: {}}" />
+      <af-field name="state_province_id" defn="{input_type: 'DisplayOnly', input_attrs: {}}" />
+      <af-field name="is_primary" defn="{input_type: 'DisplayOnly', input_attrs: {}}" />
+    </div>
+  </fieldset>
+  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
+</af-form>
+EOHTML;
+
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+
+    $cid = $this->saveTestRecords('Individual', [
+      'records' => [
+        ['first_name' => 'One', 'last_name' => 'Name', 'gender_id:name' => 'Female', 'is_opt_out' => TRUE, 'birth_date' => '01-02-2001'],
+        ['first_name' => 'Two', 'last_name' => 'Name', 'gender_id:name' => 'Male', 'is_opt_out' => FALSE],
+      ],
+    ])->column('id');
+
+    $this->saveTestRecords('Address', [
+      'records' => [
+        ['contact_id' => $cid[0], 'country_id:name' => 'United States', 'state_province_id:name' => 'California', 'is_primary' => TRUE],
+        ['contact_id' => $cid[0], 'country_id:name' => 'Canada', 'state_province_id:name' => 'Manitoba', 'is_primary' => FALSE],
+      ],
+    ]);
+
+    $prefill = Afform::prefill()
+      ->setName($this->formName)
+      ->setFillMode('entity')
+      ->setArgs(['Individual1' => $cid])
+      ->execute()
+      ->indexBy('name');
+    $this->assertCount(2, $prefill['Individual1']['values']);
+    // First contact
+    $this->assertEquals('One', $prefill['Individual1']['values'][0]['fields']['first_name']);
+    $this->assertEquals('Female', $prefill['Individual1']['values'][0]['fields']['gender_id']);
+    $this->assertEquals('Yes', $prefill['Individual1']['values'][0]['fields']['is_opt_out']);
+    $this->assertEquals('February 1st, 2001', $prefill['Individual1']['values'][0]['fields']['birth_date']);
+    $joins = $prefill['Individual1']['values'][0]['joins'];
+    $this->assertEquals('United States', $joins['Address'][0]['country_id']);
+    $this->assertEquals('California', $joins['Address'][0]['state_province_id']);
+    $this->assertEquals('Yes', $joins['Address'][0]['is_primary']);
+    $this->assertEquals('Canada', $joins['Address'][1]['country_id']);
+    $this->assertEquals('Manitoba', $joins['Address'][1]['state_province_id']);
+    $this->assertEquals('No', $joins['Address'][1]['is_primary']);
+    // Second contact
+    $this->assertEquals('Two', $prefill['Individual1']['values'][1]['fields']['first_name']);
+    $this->assertEquals('Male', $prefill['Individual1']['values'][1]['fields']['gender_id']);
+    $this->assertEquals('No', $prefill['Individual1']['values'][1]['fields']['is_opt_out']);
   }
 
 }

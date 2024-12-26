@@ -4,6 +4,7 @@ namespace Civi\Test;
 
 use Civi\Api4\Generic\AbstractAction;
 use Civi\Api4\Generic\Result;
+use Civi\Api4\UFMatch;
 use Civi\Api4\Utils\CoreUtil;
 
 /**
@@ -48,6 +49,25 @@ trait Api4TestTrait {
   }
 
   /**
+   * @param string $entityName
+   * @param array|string|int $idOrFilters
+   *   Either the entity id or filters like ['name' => 'foo']
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  public function getTestRecord(string $entityName, $idOrFilters): array {
+    if (!is_array($idOrFilters)) {
+      $idField = CoreUtil::getIdFieldName($entityName);
+      $idOrFilters = [$idField => $idOrFilters];
+    }
+    $where = [];
+    foreach ($idOrFilters as $key => $value) {
+      $where[] = [$key, '=', $value];
+    }
+    return civicrm_api4($entityName, 'get', ['where' => $where])->single();
+  }
+
+  /**
    * Saves one or more test records, supplying default values.
    *
    * Test records will be deleted when the `deleteTestRecords` function is
@@ -83,9 +103,23 @@ trait Api4TestTrait {
     }
     $saved = civicrm_api4($entityName, 'save', $saveParams);
     foreach ($saved as $item) {
-      $this->testRecords[] = [$entityName, [[$idField, '=', $item[$idField]]]];
+      $this->registerTestRecord($entityName, [[$idField, '=', $item[$idField]]]);
     }
     return $saved;
+  }
+
+  /**
+   * Register a record to be automatically cleaned up during tearDown
+   * @param string $entityName
+   * @param string|int|array $where
+   *   Where clause (or for short, just the ID)
+   */
+  public function registerTestRecord(string $entityName, $where): void {
+    if (!is_array($where)) {
+      $idField = CoreUtil::getIdFieldName($entityName);
+      $where = [[$idField, '=', $where]];
+    }
+    $this->testRecords[] = [$entityName, $where];
   }
 
   /**
@@ -124,6 +158,7 @@ trait Api4TestTrait {
         ['readonly', 'IS EMPTY'],
       ],
       'orderBy' => ['required' => 'DESC'],
+      'checkPermissions' => FALSE,
     ], 'name');
 
     $extraValues = [];
@@ -246,7 +281,7 @@ trait Api4TestTrait {
       return $this->getFkID($field['fk_entity']);
     }
     if (!empty($field['dfk_entities'])) {
-      return $this->getFkID($field['dfk_entities'][0]);
+      return $this->getFkID(reset($field['dfk_entities']));
     }
     if (isset($field['default_value'])) {
       return $field['default_value'];
@@ -367,6 +402,7 @@ trait Api4TestTrait {
         return $this->randomLetters(100);
 
       case 'Money':
+      case 'Float':
         return sprintf('%d.%2d', random_int(0, 2000), random_int(10, 99));
 
       case 'Date':
@@ -377,6 +413,40 @@ trait Api4TestTrait {
     }
 
     return NULL;
+  }
+
+  /**
+   * Emulate a logged in user since certain functions use that.
+   * value to store a record in the DB (like activity)
+   *
+   * @see https://issues.civicrm.org/jira/browse/CRM-8180
+   *
+   * @return int
+   *   Contact ID of the created user.
+   * @throws \CRM_Core_Exception
+   */
+  public function createLoggedInUser(): int {
+    $contactID = $this->createTestRecord('Individual', [
+      'first_name' => 'Logged In',
+      'last_name' => 'User ' . mt_rand(),
+    ])['id'];
+    UFMatch::delete(FALSE)->addWhere('uf_id', '=', 6)->execute();
+    $this->createTestRecord('UFMatch', [
+      'contact_id' => $contactID,
+      'uf_name' => 'superman',
+      'uf_id' => 6,
+    ]);
+
+    $session = \CRM_Core_Session::singleton();
+    $session->set('userID', $contactID);
+    return $contactID;
+  }
+
+  public function userLogout() {
+    \CRM_Core_Session::singleton()->reset();
+    UFMatch::delete(FALSE)
+      ->addWhere('uf_name', '=', 'superman')
+      ->execute();
   }
 
 }

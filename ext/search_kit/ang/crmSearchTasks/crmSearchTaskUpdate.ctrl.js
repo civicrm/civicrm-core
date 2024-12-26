@@ -11,13 +11,15 @@
     this.add = null;
     this.fields = null;
 
-    crmApi4(this.entity, 'getFields', {
-      action: 'update',
-      select: ['name', 'label', 'description', 'input_type', 'data_type', 'serialize', 'options', 'fk_entity', 'nullable'],
-      loadOptions: ['id', 'name', 'label', 'description', 'color', 'icon'],
-      where: [['deprecated', '=', false], ["readonly", "=", false]],
-    }).then(function(fields) {
-        ctrl.fields = fields;
+    crmApi4({
+      getFields: [this.entity, 'getFields', {
+        action: 'update',
+        select: ['name', 'label', 'description', 'input_type', 'data_type', 'serialize', 'options', 'fk_entity', 'nullable'],
+        loadOptions: ['id', 'name', 'label', 'description', 'color', 'icon'],
+        where: [['deprecated', '=', false], ["readonly", "=", false]],
+      }],
+    }).then(function(results) {
+        ctrl.fields = results.getFields;
       });
 
     this.updateField = function(index) {
@@ -35,7 +37,7 @@
         if (ctrl.add) {
           var field = ctrl.getField(ctrl.add),
             value = '';
-          if (field.serialize) {
+          if (field.serialize || field.data_type === 'Array') {
             value = [];
           } else if (field.data_type === 'Boolean') {
             value = true;

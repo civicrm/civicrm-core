@@ -95,7 +95,7 @@ class BasicReplaceAction extends AbstractBatchAction {
     }
 
     $idField = $this->getSelect()[0];
-    $toDelete = array_diff_key(array_column($items, NULL, $idField), array_flip(array_filter(\CRM_Utils_Array::collect($idField, $this->records))));
+    $toDelete = array_diff_key(array_column($items, NULL, $idField), array_flip(array_column($this->records, $idField)));
 
     $saveAction = \Civi\API\Request::create($this->getEntityName(), 'save', ['version' => 4]);
     $saveAction

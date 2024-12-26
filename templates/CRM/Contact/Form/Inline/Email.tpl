@@ -8,7 +8,6 @@
  +--------------------------------------------------------------------+
 *}
 {* This file provides the template for inline editing of emails *}
-{$form.oplock_ts.html}
 <table class="crm-inline-edit-form">
   <tr>
     <td colspan="5">
@@ -32,13 +31,15 @@
   </tr>
   {section name='i' start=1 loop=$totalBlocks}
     {assign var='blockId' value=$smarty.section.i.index}
-    <tr id="Email_Block_{$blockId}" {if $blockId gt $actualBlockCount}class="hiddenElement"{/if}>
+    <tr data-entity='email' data-block-number={$blockId} id="Email_Block_{$blockId}" {if $blockId gt $actualBlockCount}class="hiddenElement"{/if}>
       <td>{$form.email.$blockId.email.html|crmAddClass:email}&nbsp;{$form.email.$blockId.location_type_id.html}</td>
       <td align="center">{$form.email.$blockId.on_hold.html}</td>
       <td align="center" {if !$multipleBulk}class="crm-email-bulkmail"{/if}>{$form.email.$blockId.is_bulkmail.html}</td>
       <td align="center" class="crm-email-is_primary">{$form.email.$blockId.is_primary.1.html}</td>
       <td><a title="{ts}Delete Email{/ts}" class="crm-delete-inline crm-hover-button" href="#"><span class="icon delete-icon"></span></a></td>
     </tr>
+    {include file="CRM/Contact/Form/Inline/BlockCustomData.tpl" entity=email customFields=$custom_fields_email blockId=$blockId actualBlockCount=$actualBlockCount}
+
   {/section}
 </table>
 

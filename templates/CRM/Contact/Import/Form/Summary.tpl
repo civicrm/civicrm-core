@@ -118,7 +118,7 @@
     {if $groupAdditions}
     <tr><td class="label crm-grid-cell">{ts}Import to Groups{/ts}</td>
         <td colspan="2" class="explanation">
-            {foreach from="$groupAdditions" item="group"}
+            {foreach from=$groupAdditions item="group"}
                 <label><a href="{$group.url}">{$group.name}</a></label>:
                 {if $group.new}
                     {ts count=$group.added plural='%count contacts added to this new group.'}One contact added to this new group.{/ts}
@@ -134,7 +134,7 @@
     {if $tagAdditions}
     <tr><td class="label crm-grid-cell">{ts}Tagged Imported Contacts{/ts}</td>
         <td colspan="2" class="explanation">
-            {foreach from="$tagAdditions" item="tag"}
+            {foreach from=$tagAdditions item="tag"}
                 <label>{$tag.name}</label>:
                 {ts count=$tag.added plural='%count contacts are tagged with this tag.'}One contact is tagged with this tag.{/ts}
                 {if $tag.notAdded}{ts count=$tag.notAdded plural='%count contacts NOT tagged (already tagged to this tag).'}One contact NOT tagged (already tagged to this tag).{/ts}{/if}<br />

@@ -63,11 +63,7 @@ class CRM_Contact_Form_Search_Custom_PriceSet extends CRM_Contact_Form_Search_Cu
 ';
 
     foreach ($this->_columns as $fieldName) {
-      if (in_array($fieldName, [
-        'contact_id',
-        'participant_id',
-        'display_name',
-      ])) {
+      if (in_array($fieldName, ['contact_id', 'participant_id', 'display_name'])) {
         continue;
       }
       $sql .= "{$fieldName} int default 0,\n";
@@ -259,10 +255,7 @@ contact_a.id             as contact_id  ,
 contact_a.display_name   as display_name";
 
       foreach ($this->_columns as $dontCare => $fieldName) {
-        if (in_array($fieldName, [
-          'contact_id',
-          'display_name',
-        ])) {
+        if (in_array($fieldName, ['contact_id', 'display_name'])) {
           continue;
         }
         $selectClause .= ",\ntempTable.{$fieldName} as {$fieldName}";

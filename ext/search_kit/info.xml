@@ -14,28 +14,28 @@
     <url desc="Issues">https://lab.civicrm.org/dev/report/-/issues</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
-  <releaseDate>2023-11-02</releaseDate>
-  <version>5.69.alpha1</version>
+  <releaseDate>[civicrm.releaseDate]</releaseDate>
+  <version>[civicrm.version]</version>
   <develStage>stable</develStage>
   <tags>
     <tag>mgmt:required</tag>
   </tags>
   <compatibility>
-    <ver>5.69</ver>
+    <ver>[civicrm.majorVersion]</ver>
   </compatibility>
   <comments>Click on the chat link above to discuss development, report problems or ask questions.</comments>
   <classloader>
     <psr0 prefix="CRM_" path="."/>
     <psr4 prefix="Civi\" path="Civi"/>
   </classloader>
-  <upgrader>CRM_Search_Upgrader</upgrader>
+  <upgrader>CiviMix\Schema\SearchKit\AutomaticUpgrader</upgrader>
   <mixins>
     <mixin>ang-php@1.0.0</mixin>
     <mixin>scan-classes@1.0.0</mixin>
     <mixin>menu-xml@1.0.0</mixin>
     <mixin>mgd-php@1.0.0</mixin>
-    <mixin>entity-types-php@1.0.0</mixin>
-    <mixin>smarty-v2@1.0.1</mixin>
+    <mixin>entity-types-php@2.0.0</mixin>
+    <mixin>smarty@1.0.0</mixin>
   </mixins>
   <civix>
     <namespace>CRM/Search</namespace>

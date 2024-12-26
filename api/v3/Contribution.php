@@ -196,7 +196,7 @@ function _civicrm_api3_contribution_create_legacy_support_45(&$params) {
     $params['soft_credit'][] = [
       'contact_id'          => $params['honor_contact_id'],
       'amount'              => $params['total_amount'],
-      'soft_credit_type_id' => CRM_Utils_Array::value('honor_type_id', $params, CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionSoft', 'soft_credit_type_id', 'in_honor_of')),
+      'soft_credit_type_id' => $params['honor_type_id'] ?? CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionSoft', 'soft_credit_type_id', 'in_honor_of'),
     ];
   }
 }
@@ -403,6 +403,10 @@ function civicrm_api3_contribution_sendconfirmation($params) {
     'payment_processor_id',
   ];
   $input = array_intersect_key($params, array_flip($allowedParams));
+  $input['modelProps'] = [
+    // Pass through legacy receipt_text.
+    'userEnteredText' => $params['receipt_text'] ?? NULL,
+  ];
   CRM_Contribute_BAO_Contribution::sendMail($input, [], $params['id']);
   return [];
 }
@@ -483,7 +487,7 @@ function civicrm_api3_contribution_completetransaction($params): array {
     throw new CRM_Core_Exception(ts('Contribution already completed'), 'contribution_completed');
   }
 
-  $params['trxn_id'] = $params['trxn_id'] ?? $contribution->trxn_id;
+  $params['trxn_id'] ??= $contribution->trxn_id;
 
   $passThroughParams = [
     'fee_amount',

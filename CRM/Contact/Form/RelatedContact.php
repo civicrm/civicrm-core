@@ -109,12 +109,11 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
         $this->_defaults['address'][1]
       );
     }
-    CRM_Contact_BAO_Contact_Utils::buildOnBehalfForm($this,
-      $this->_contactType,
-      $countryID,
-      $stateID,
-      ts('Contact Information')
-    );
+    $this->buildOnBehalfForm();
+
+    $this->assign('contact_type', $this->_contactType);
+    $this->assign('fieldSetTitle', ts('Contact Information'));
+    $this->assign('contactEditMode', TRUE);
 
     $this->addButtons([
       [
@@ -130,6 +129,70 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
   }
 
   /**
+   * Build form for related contacts / on behalf of organization.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function buildOnBehalfForm() {
+    $form = $this;
+
+    $attributes = CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact');
+    if ($form->_contactId) {
+      $form->assign('orgId', $form->_contactId);
+    }
+
+    switch ($this->_contactType) {
+      case 'Organization':
+        $form->add('text', 'organization_name', ts('Organization Name'), $attributes['organization_name'], TRUE);
+        break;
+
+      case 'Household':
+        $form->add('text', 'household_name', ts('Household Name'), $attributes['household_name']);
+        break;
+
+      default:
+        // individual
+        $form->addElement('select', 'prefix_id', ts('Prefix'),
+          ['' => ts('- prefix -')] + CRM_Contact_DAO_Contact::buildOptions('prefix_id')
+        );
+        $form->addElement('text', 'first_name', ts('First Name'),
+          $attributes['first_name']
+        );
+        $form->addElement('text', 'middle_name', ts('Middle Name'),
+          $attributes['middle_name']
+        );
+        $form->addElement('text', 'last_name', ts('Last Name'),
+          $attributes['last_name']
+        );
+        $form->addElement('select', 'suffix_id', ts('Suffix'),
+          ['' => ts('- suffix -')] + CRM_Contact_DAO_Contact::buildOptions('suffix_id')
+        );
+    }
+
+    $addressSequence = CRM_Utils_Address::sequence(\Civi::settings()->get('address_format'));
+    $form->assign('addressSequence', array_fill_keys($addressSequence, 1));
+
+    //Primary Phone
+    $form->addElement('text',
+      'phone[1][phone]',
+      ts('Primary Phone'),
+      CRM_Core_DAO::getAttribute('CRM_Core_DAO_Phone',
+        'phone'
+      )
+    );
+    //Primary Email
+    $form->addElement('text',
+      'email[1][email]',
+      ts('Primary Email'),
+      CRM_Core_DAO::getAttribute('CRM_Core_DAO_Email',
+        'email'
+      )
+    );
+    //build the address block
+    CRM_Contact_Form_Edit_Address::buildQuickForm($form);
+  }
+
+  /**
    * Form submission of new/edit contact is processed.
    */
   public function postProcess() {
@@ -137,11 +200,7 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
     $params = $this->controller->exportValues($this->_name);
 
     $locType = CRM_Core_BAO_LocationType::getDefault();
-    foreach ([
-      'phone',
-      'email',
-      'address',
-    ] as $locFld) {
+    foreach (['phone', 'email', 'address'] as $locFld) {
       if (!empty($this->_defaults[$locFld]) && $this->_defaults[$locFld][1]['location_type_id']) {
         $params[$locFld][1]['is_primary'] = $this->_defaults[$locFld][1]['is_primary'];
         $params[$locFld][1]['location_type_id'] = $this->_defaults[$locFld][1]['location_type_id'];

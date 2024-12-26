@@ -68,8 +68,8 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
 
     $descArray = [];
     foreach ($permissionsDesc as $perm => $attr) {
-      if (count($attr) > 1) {
-        $descArray[$perm] = $attr['description'] ?? $attr[1];
+      if (!empty($attr['description'])) {
+        $descArray[$perm] = $attr['description'];
       }
     }
 

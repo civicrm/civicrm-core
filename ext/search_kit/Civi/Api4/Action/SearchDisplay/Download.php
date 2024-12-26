@@ -78,7 +78,7 @@ class Download extends AbstractRunAction {
       $apiParams['limit'] = $settings['limit'];
     }
     $apiParams['orderBy'] = $this->getOrderByFromSort();
-    $this->augmentSelectClause($apiParams);
+    $this->augmentSelectClause($apiParams, $settings);
 
     $this->applyFilters();
 
@@ -127,16 +127,16 @@ class Download extends AbstractRunAction {
    * Return raw value if it is a single date, otherwise return parent
    * {@inheritDoc}
    */
-  protected function formatViewValue($key, $rawValue, $data, $dataType) {
+  protected function formatViewValue($key, $rawValue, $data, $dataType, $format = NULL) {
     if (is_array($rawValue)) {
-      return parent::formatViewValue($key, $rawValue, $data, $dataType);
+      return parent::formatViewValue($key, $rawValue, $data, $dataType, $format);
     }
 
     if (($dataType === 'Date' || $dataType === 'Timestamp') && in_array($this->format, ['csv', 'xlsx', 'ods'])) {
       return $rawValue;
     }
     else {
-      return parent::formatViewValue($key, $rawValue, $data, $dataType);
+      return parent::formatViewValue($key, $rawValue, $data, $dataType, $format);
     }
   }
 
@@ -179,13 +179,14 @@ class Download extends AbstractRunAction {
 
     // Header row
     foreach (array_values($columns) as $index => $col) {
-      $sheet->setCellValueByColumnAndRow($index + 1, 1, $col['label']);
+      $sheet->setCellValue([$index + 1, 1], $col['label']);
+      $sheet->getColumnDimensionByColumn($index)->setAutoSize(TRUE);
     }
 
     foreach ($rows as $rowNum => $data) {
       $colNum = 1;
       foreach ($columns as $index => $col) {
-        $sheet->setCellValueByColumnAndRow($colNum++, $rowNum + 2, $this->formatColumnValue($col, $data['columns'][$index]));
+        $sheet->setCellValue([$colNum++, $rowNum + 2], $this->formatColumnValue($col, $data['columns'][$index]));
       }
     }
 

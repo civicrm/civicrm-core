@@ -24,7 +24,7 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
    * Set variables up before form is built.
    */
   public function preProcess() {
-    if (!CRM_SMS_BAO_Provider::activeProviderCount()) {
+    if (!CRM_SMS_BAO_SmsProvider::activeProviderCount()) {
       CRM_Core_Error::statusBounce(ts('The <a href="%1">SMS Provider</a> has not been configured or is not active.', [1 => CRM_Utils_System::url('civicrm/admin/sms/provider', 'reset=1')]));
     }
 
@@ -70,8 +70,8 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
       $defaults['includeGroups'] = $mailingGroups['civicrm_group']['Include'];
       $defaults['excludeGroups'] = $mailingGroups['civicrm_group']['Exclude'] ?? NULL;
 
-      $defaults['includeMailings'] = CRM_Utils_Array::value('Include', CRM_Utils_Array::value('civicrm_mailing', $mailingGroups));
-      $defaults['excludeMailings'] = CRM_Utils_Array::value('Exclude', CRM_Utils_Array::value('civicrm_mailing', $mailingGroups));
+      $defaults['includeMailings'] = $mailingGroups['civicrm_mailing']['Include'] ?? NULL;
+      $defaults['excludeMailings'] = $mailingGroups['civicrm_mailing']['Exclude'] ?? NULL;
     }
 
     return $defaults;
@@ -94,7 +94,7 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
 
     $this->add('select', 'sms_provider_id',
       ts('Select SMS Provider'),
-      CRM_Utils_Array::collect('title', CRM_SMS_BAO_Provider::getProviders(NULL, ['is_active' => 1])),
+      CRM_Utils_Array::collect('title', CRM_SMS_BAO_SmsProvider::getProviders(NULL, ['is_active' => 1])),
       TRUE
     );
 
@@ -170,17 +170,12 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
 
     $groups = [];
 
-    foreach ([
-      'name',
-      'group_id',
-      'is_sms',
-      'sms_provider_id',
-    ] as $n) {
+    foreach (['name', 'group_id', 'is_sms', 'sms_provider_id'] as $n) {
       if (!empty($values[$n])) {
         $params[$n] = $values[$n];
         if ($n == 'sms_provider_id') {
           // Get the from Name.
-          $params['from_name'] = CRM_Core_DAO::getFieldValue('CRM_SMS_DAO_Provider', $params['sms_provider_id'], 'username');
+          $params['from_name'] = CRM_Core_DAO::getFieldValue('CRM_SMS_DAO_SmsProvider', $params['sms_provider_id'], 'username');
         }
       }
     }
@@ -237,10 +232,7 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
       $mailingTableName = CRM_Mailing_BAO_Mailing::getTableName();
 
       // delete previous includes/excludes, if mailing already existed
-      foreach ([
-        'groups',
-        'mailings',
-      ] as $entity) {
+      foreach (['groups', 'mailings'] as $entity) {
         $mg = new CRM_Mailing_DAO_MailingGroup();
         $mg->mailing_id = $ids['mailing_id'];
         $mg->entity_table = ($entity == 'groups') ? $groupTableName : $mailingTableName;

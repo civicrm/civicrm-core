@@ -10,6 +10,7 @@
  */
 namespace Civi\Api4;
 
+use Civi\Api4\Action\GetLinks;
 use Civi\Api4\Import\CheckAccessAction;
 use Civi\Api4\Generic\DAOGetAction;
 use Civi\Api4\Generic\DAOGetFieldsAction;
@@ -106,6 +107,17 @@ class Import {
 
   /**
    * @param int $userJobID
+   * @param bool $checkPermissions
+   *
+   * @return \Civi\Api4\Action\GetLinks
+   */
+  public static function getLinks(int $userJobID, bool $checkPermissions = TRUE): GetLinks {
+    return (new GetLinks('Import_' . $userJobID, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param int $userJobID
    * @return \Civi\Api4\Generic\CheckAccessAction
    * @throws \CRM_Core_Exception
    */
@@ -119,7 +131,6 @@ class Import {
    *
    * @return \Civi\Api4\Import\Import
    *
-   * @throws \API_Exception
    */
   public static function import(int $userJobID, bool $checkPermissions = TRUE): ImportAction {
     return (new ImportAction('Import_' . $userJobID, __FUNCTION__))
@@ -131,7 +142,6 @@ class Import {
    * @param bool $checkPermissions
    *
    * @return \Civi\Api4\Import\Validate
-   * @throws \API_Exception
    */
   public static function validate(int $userJobID, bool $checkPermissions = TRUE): Validate {
     return (new Validate('Import_' . $userJobID, __FUNCTION__))->setCheckPermissions($checkPermissions);

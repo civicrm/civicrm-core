@@ -27,11 +27,11 @@ trait CRM_Utils_SQL_EscapeStringTrait {
       }
     }
 
-    if (CRM_Core_I18n::$SQL_ESCAPER == NULL) {
+    if (!isset($GLOBALS['CIVICRM_SQL_ESCAPER'])) {
       return '"' . CRM_Core_DAO::escapeString($value) . '"';
     }
     else {
-      return '"' . call_user_func(CRM_Core_I18n::$SQL_ESCAPER, $value) . '"';
+      return '"' . call_user_func($GLOBALS['CIVICRM_SQL_ESCAPER'], $value) . '"';
     }
 
   }

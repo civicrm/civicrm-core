@@ -58,32 +58,18 @@ class CRM_Core_Invoke {
     if (($args[1] ?? NULL) == 'ajax' || !empty($_REQUEST['snippet'])) {
       ini_set('display_errors', 0);
     }
+    // Guard against CSRF for ajax snippets
+    $ajaxModes = [CRM_Core_Smarty::PRINT_SNIPPET, CRM_Core_Smarty::PRINT_NOFORM, CRM_Core_Smarty::PRINT_JSON];
+    if (in_array($_REQUEST['snippet'] ?? NULL, $ajaxModes)) {
+      CRM_Core_Page_AJAX::validateAjaxRequestMethod();
+    }
 
-    if (!defined('CIVICRM_SYMFONY_PATH')) {
-      // Traditional Civi invocation path
-      // may exit
-      self::hackMenuRebuild($args);
-      self::init($args);
-      Civi::dispatcher()->dispatch('civi.invoke.auth', \Civi\Core\Event\GenericHookEvent::create(['args' => $args]));
-      $item = self::getItem($args);
-      return self::runItem($item);
-    }
-    else {
-      // Symfony-based invocation path
-      require_once CIVICRM_SYMFONY_PATH . '/app/bootstrap.php.cache';
-      require_once CIVICRM_SYMFONY_PATH . '/app/AppKernel.php';
-      $kernel = new AppKernel('dev', TRUE);
-      $kernel->loadClassCache();
-      $response = $kernel->handle(Symfony\Component\HttpFoundation\Request::createFromGlobals());
-      if (preg_match(':^text/html:', $response->headers->get('Content-Type'))) {
-        // let the CMS handle the trappings
-        return $response->getContent();
-      }
-      else {
-        $response->send();
-        exit();
-      }
-    }
+    self::hackMenuRebuild($args);
+    self::init($args);
+    Civi::dispatcher()->dispatch('civi.invoke.auth', \Civi\Core\Event\GenericHookEvent::create(['args' => $args]));
+    $item = self::getItem($args);
+    return self::runItem($item);
+    // NOTE: runItem() may return HTML, or it may call print+exit.
   }
 
   /**
@@ -120,15 +106,16 @@ class CRM_Core_Invoke {
     $config = CRM_Core_Config::singleton();
 
     // also initialize the i18n framework
-    require_once 'CRM/Core/I18n.php';
     $i18n = CRM_Core_I18n::singleton();
   }
 
   /**
    * Determine which menu $item corresponds to $args
    *
-   * @param array $args
-   *   List of path parts.
+   * @param string|string[] $args
+   *   Path to lookup
+   *   Ex: 'civicrm/foo/bar'
+   *   Ex: ['civicrm', 'foo', 'bar']
    * @return array; see CRM_Core_Menu
    */
   public static function getItem($args) {
@@ -198,7 +185,9 @@ class CRM_Core_Invoke {
    *
    * @param array $item
    *   See CRM_Core_Menu.
+   *
    * @return string, HTML
+   * @throws \CRM_Core_Exception
    */
   public static function runItem($item) {
     $ids = new CRM_Core_IDS();
@@ -229,6 +218,7 @@ class CRM_Core_Invoke {
     // jsortable.tpl (datatables)
     $template->assign('sourceUrl');
     $template->assign('useAjax', 0);
+    $template->assign('defaultOrderByDirection', 'asc');
 
     if ($item) {
 
@@ -303,18 +293,25 @@ class CRM_Core_Invoke {
           unset($pageArgs['mode']);
         }
         $title = $item['title'] ?? NULL;
-        if (strstr($item['page_callback'], '_Page') || strstr($item['page_callback'], '\\Page\\')) {
+        if (str_contains($item['page_callback'], '_Page') || str_contains($item['page_callback'], '\\Page\\')) {
           $object = new $item['page_callback']($title, $mode);
           $object->urlPath = explode('/', $_GET[$config->userFrameworkURLVar]);
         }
-        elseif (strstr($item['page_callback'], '_Controller') || strstr($item['page_callback'], '\\Controller\\')) {
+        elseif (str_contains($item['page_callback'], '_Controller') || str_contains($item['page_callback'], '\\Controller\\')) {
           $addSequence = 'false';
           if (isset($pageArgs['addSequence'])) {
             $addSequence = $pageArgs['addSequence'];
             $addSequence = $addSequence ? 'true' : 'false';
             unset($pageArgs['addSequence']);
           }
-          $object = new $item['page_callback']($title, TRUE, $mode, NULL, $addSequence);
+          if ($item['page_callback'] === 'CRM_Import_Controller') {
+            // Let the generic import controller have the page arguments.... so we don't need
+            // one class per import.
+            $object = new CRM_Import_Controller($title, $pageArgs ?? []);
+          }
+          else {
+            $object = new $item['page_callback']($title, TRUE, $mode, NULL, $addSequence);
+          }
         }
         else {
           throw new CRM_Core_Exception('Execute supplied menu action');

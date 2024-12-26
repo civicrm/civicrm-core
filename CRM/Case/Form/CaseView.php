@@ -239,6 +239,8 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
       return;
     }
 
+    $this->assign('hasAllACLs', CRM_Core_Permission::giveMeAllACLs());
+
     $allowedRelationshipTypes = CRM_Contact_BAO_Relationship::getContactRelationshipType($this->_contactID);
     $relationshipTypeMetadata = CRM_Contact_Form_Relationship::getRelationshipTypeMetadata($allowedRelationshipTypes);
 
@@ -467,6 +469,10 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
           ],
         ];
         $tagSetTags[$tag['tag_id.parent_id']]['items'][] = $tag['tag_id.label'];
+      }
+      // Add a displayable string version of the items
+      foreach ($tagSetTags as $tagIndex => $tagData) {
+        $tagSetTags[$tagIndex]['itemsStr'] = implode(', ', $tagData['items']);
       }
     }
     $this->assign('tagSetTags', $tagSetTags);

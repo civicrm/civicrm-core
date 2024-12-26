@@ -394,7 +394,7 @@ class CRM_Export_BAO_ExportProcessor {
    *   - addressee_other
    */
   public function __construct($exportMode, $requestedFields, $queryOperator, $isMergeSameHousehold = FALSE, $isPostalableOnly = FALSE, $isMergeSameAddress = FALSE, $formValues = []) {
-    $this->setExportMode($exportMode);
+    $this->setExportMode((int) $exportMode);
     $this->setQueryMode();
     $this->setQueryOperator($queryOperator);
     $this->setRequestedFields($requestedFields);
@@ -697,14 +697,14 @@ class CRM_Export_BAO_ExportProcessor {
   /**
    * @return int
    */
-  public function getExportMode() {
+  public function getExportMode(): int {
     return $this->exportMode;
   }
 
   /**
    * @param int $exportMode
    */
-  public function setExportMode($exportMode) {
+  public function setExportMode(int $exportMode) {
     $this->exportMode = $exportMode;
   }
 
@@ -977,7 +977,7 @@ class CRM_Export_BAO_ExportProcessor {
     if ($this->isHouseholdToSkip($iterationDAO->contact_id)) {
       return FALSE;
     }
-    $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
+    $imProviders = CRM_Core_DAO_IM::buildOptions('provider_id');
 
     $row = [];
     $householdMergeRelationshipType = $this->getHouseholdMergeTypeForRow($iterationDAO->contact_id);
@@ -1010,7 +1010,7 @@ class CRM_Export_BAO_ExportProcessor {
         if ($field == 'provider_id' || $field == 'im_provider') {
           $fieldValue = $imProviders[$fieldValue] ?? NULL;
         }
-        elseif (strstr($field, 'master_id')) {
+        elseif (str_contains($field, 'master_id')) {
           // @todo - why not just $field === 'master_id'  - what else would it be?
           $masterAddressId = $iterationDAO->$field ?? NULL;
           // get display name of contact that address is shared.
@@ -1126,11 +1126,7 @@ class CRM_Export_BAO_ExportProcessor {
 
         return CRM_Core_BAO_CustomField::displayValue($fieldValue, $cfID);
       }
-      elseif (in_array($field, [
-        'email_greeting',
-        'postal_greeting',
-        'addressee',
-      ])) {
+      elseif (in_array($field, ['email_greeting', 'postal_greeting', 'addressee'])) {
         //special case for greeting replacement
         $fldValue = "{$field}_display";
         return $iterationDAO->$fldValue;
@@ -2126,8 +2122,8 @@ WHERE  id IN ( $deleteIDString )
    * @throws \Exception
    */
   public function fetchRelationshipDetails($relDAO, $value, $field, &$row) {
-    $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
-    $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
+    $phoneTypes = CRM_Core_DAO_Phone::buildOptions('phone_type_id');
+    $imProviders = CRM_Core_DAO_IM::buildOptions('provider_id');
     $i18n = CRM_Core_I18n::singleton();
     $field = $field . '_';
 
@@ -2138,11 +2134,9 @@ WHERE  id IN ( $deleteIDString )
           $fieldValue = $imProviders[$relationValue] ?? NULL;
         }
         // CRM-13995
-        elseif (is_object($relDAO) && in_array($relationField, [
-          'email_greeting',
-          'postal_greeting',
-          'addressee',
-        ])) {
+        elseif (is_object($relDAO) &&
+          in_array($relationField, ['email_greeting', 'postal_greeting', 'addressee'])
+        ) {
           //special case for greeting replacement
           $fldValue = "{$relationField}_display";
           $fieldValue = $relDAO->$fldValue;
@@ -2371,6 +2365,67 @@ LIMIT $offset, $limit
       );
     }
     return $copyPostalGreeting;
+  }
+
+  /**
+   * Get the contribution details for component export.
+   *
+   * @internal do not call from outside core.
+   *
+   * @return array
+   *   associated array
+   */
+  public function getContributionDetails() {
+    $paymentDetails = [];
+    $componentClause = ' IN ( ' . implode(',', $this->ids) . ' ) ';
+
+    if ($this->getExportMode() === CRM_Export_Form_Select::EVENT_EXPORT) {
+      $componentSelect = " civicrm_participant_payment.participant_id id";
+      $additionalClause = "
+INNER JOIN civicrm_participant_payment ON (civicrm_contribution.id = civicrm_participant_payment.contribution_id
+AND civicrm_participant_payment.participant_id {$componentClause} )
+";
+    }
+    elseif ($this->getExportMode() === CRM_Export_Form_Select::MEMBER_EXPORT) {
+      $componentSelect = " civicrm_membership_payment.membership_id id";
+      $additionalClause = "
+INNER JOIN civicrm_membership_payment ON (civicrm_contribution.id = civicrm_membership_payment.contribution_id
+AND civicrm_membership_payment.membership_id {$componentClause} )
+";
+    }
+    elseif ($this->getExportMode() === CRM_Export_Form_Select::PLEDGE_EXPORT) {
+      $componentSelect = " civicrm_pledge_payment.id id";
+      $additionalClause = "
+INNER JOIN civicrm_pledge_payment ON (civicrm_contribution.id = civicrm_pledge_payment.contribution_id
+AND civicrm_pledge_payment.pledge_id {$componentClause} )
+";
+    }
+
+    $query = " SELECT total_amount, contribution_status.name as status_id, contribution_status.label as status, payment_instrument.name as payment_instrument, receive_date,
+                          trxn_id, {$componentSelect}
+FROM civicrm_contribution
+LEFT JOIN civicrm_option_group option_group_payment_instrument ON ( option_group_payment_instrument.name = 'payment_instrument')
+LEFT JOIN civicrm_option_value payment_instrument ON (civicrm_contribution.payment_instrument_id = payment_instrument.value
+     AND option_group_payment_instrument.id = payment_instrument.option_group_id )
+LEFT JOIN civicrm_option_group option_group_contribution_status ON (option_group_contribution_status.name = 'contribution_status')
+LEFT JOIN civicrm_option_value contribution_status ON (civicrm_contribution.contribution_status_id = contribution_status.value
+                               AND option_group_contribution_status.id = contribution_status.option_group_id )
+{$additionalClause}
+";
+
+    $dao = CRM_Core_DAO::executeQuery($query);
+
+    while ($dao->fetch()) {
+      $paymentDetails[$dao->id] = [
+        'total_amount' => $dao->total_amount,
+        'contribution_status' => $dao->status,
+        'receive_date' => $dao->receive_date,
+        'pay_instru' => $dao->payment_instrument,
+        'trxn_id' => $dao->trxn_id,
+      ];
+    }
+
+    return $paymentDetails;
   }
 
 }

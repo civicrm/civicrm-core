@@ -64,12 +64,12 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
    * @param array $containers
    *   Array($name => CRM_Extension_Container_Interface) in order from highest
    *   priority (winners) to lowest priority (losers).
-   * @param CRM_Utils_Cache_Interface $cache
+   * @param CRM_Utils_Cache_Interface|null $cache
    *   Cache in which to store extension metadata.
    * @param string $cacheKey
    *   Unique name for this container.
    */
-  public function __construct($containers, CRM_Utils_Cache_Interface $cache = NULL, $cacheKey = NULL) {
+  public function __construct($containers, ?CRM_Utils_Cache_Interface $cache = NULL, $cacheKey = NULL) {
     $this->containers = $containers;
     $this->cache = $cache;
     $this->cacheKey = $cacheKey;

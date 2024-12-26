@@ -10,9 +10,15 @@
  */
 namespace Civi\FlexMailer\Listener;
 
+use Civi\Core\Service\AutoService;
 use Civi\FlexMailer\Event\ComposeBatchEvent;
 
-class BasicHeaders extends BaseListener {
+/**
+ * @service civi_flexmailer_basic_headers
+ */
+class BasicHeaders extends AutoService {
+
+  use IsActiveTrait;
 
   /**
    * Inject basic headers
@@ -34,8 +40,7 @@ class BasicHeaders extends BaseListener {
       }
 
       list($verp) = $mailing->getVerpAndUrlsAndHeaders(
-        $e->getJob()->id, $task->getEventQueueId(), $task->getHash(),
-        $task->getAddress());
+        $e->getJob()->id, $task->getEventQueueId(), $task->getHash());
 
       $mailParams = [];
       $mailParams['List-Unsubscribe'] = "<mailto:{$verp['unsubscribe']}>";

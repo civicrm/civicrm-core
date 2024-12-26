@@ -12,7 +12,6 @@
 
 namespace Civi\Api4\Service\Spec\Provider;
 
-use Civi\Api4\Service\Spec\FieldSpec;
 use Civi\Api4\Service\Spec\Provider\Generic\SpecProviderInterface;
 use Civi\Api4\Service\Spec\RequestSpec;
 use Civi\Core\Service\AutoService;
@@ -34,24 +33,12 @@ class SKEntitySpecProvider extends AutoService implements SpecProviderInterface 
       if ($entityDisplay['entityName'] !== $entityName) {
         continue;
       }
-      // Primary key field
-      $field = new FieldSpec('_row', $entityName, 'Int');
-      $field->setTitle(E::ts('Row'));
-      $field->setLabel(E::ts('Row'));
-      $field->setType('Field');
-      $field->setDescription('Search result row number');
-      $field->setColumnName('_row');
-      $spec->addFieldSpec($field);
-
       foreach ($entityDisplay['settings']['columns'] as $column) {
-        $field = new FieldSpec($column['spec']['name'], $entityName, $column['spec']['data_type']);
-        $field->setTitle($column['label']);
-        $field->setLabel($column['label']);
-        $field->setType('Field');
-        $field->setFkEntity($column['spec']['fk_entity']);
-        $field->setColumnName($column['spec']['name']);
-        $field->setSuffixes($column['spec']['suffixes']);
+        // Add pseudoconstant options
+        // TODO: This could probably be handled in SkEntityMetaProvider
         if (!empty($column['spec']['options'])) {
+          $field = $spec->getFieldByName($column['spec']['name']);
+          $field->setSuffixes($column['spec']['suffixes']);
           if (is_array($column['spec']['options'])) {
             $field->setOptions($column['spec']['options']);
           }
@@ -59,7 +46,6 @@ class SKEntitySpecProvider extends AutoService implements SpecProviderInterface 
             $field->setOptionsCallback([__CLASS__, 'getOptionsForSKEntityField'], $column['spec']);
           }
         }
-        $spec->addFieldSpec($field);
       }
     }
   }
@@ -74,14 +60,14 @@ class SKEntitySpecProvider extends AutoService implements SpecProviderInterface 
   /**
    * Callback function retrieve options from original field.
    *
-   * @param \Civi\Api4\Service\Spec\FieldSpec $spec
+   * @param array $field
    * @param array $values
    * @param bool|array $returnFormat
    * @param bool $checkPermissions
    * @param array $params
    * @return array|false
    */
-  public static function getOptionsForSKEntityField($spec, $values, $returnFormat, $checkPermissions, $params) {
+  public static function getOptionsForSKEntityField($field, $values, $returnFormat, $checkPermissions, $params) {
     return civicrm_api4($params['original_field_entity'], 'getFields', [
       'where' => [['name', '=', $params['original_field_name']]],
       'loadOptions' => $returnFormat,

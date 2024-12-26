@@ -20,7 +20,6 @@ use CRM_Afform_ExtensionUtil as E;
  * @see https://lab.civicrm.org/extensions/afform
  * @labelField title
  * @iconField type:icon
- * @searchable none
  * @since 5.31
  * @package Civi\Api4
  */
@@ -100,6 +99,15 @@ class Afform extends Generic\AbstractEntity {
 
   /**
    * @param bool $checkPermissions
+   * @return Action\Afform\Process
+   */
+  public static function process($checkPermissions = TRUE) {
+    return (new Action\Afform\Process('Afform', __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
    * @return Action\Afform\SubmitFile
    */
   public static function submitFile($checkPermissions = TRUE) {
@@ -135,12 +143,14 @@ class Afform extends Generic\AbstractEntity {
         [
           'name' => 'name',
           'title' => E::ts('Name'),
+          'input_type' => 'Text',
         ],
         [
           'name' => 'type',
           'title' => E::ts('Type'),
           'pseudoconstant' => ['optionGroupName' => 'afform_type'],
           'default_value' => 'form',
+          'input_type' => 'Select',
         ],
         [
           'name' => 'requires',
@@ -161,10 +171,12 @@ class Afform extends Generic\AbstractEntity {
           'name' => 'title',
           'title' => E::ts('Title'),
           'required' => $self->getAction() === 'create',
+          'input_type' => 'Text',
         ],
         [
           'name' => 'description',
           'title' => E::ts('Description'),
+          'input_type' => 'Text',
         ],
         [
           'name' => 'placement',
@@ -230,6 +242,18 @@ class Afform extends Generic\AbstractEntity {
           'name' => 'create_submission',
           'title' => E::ts('Log Submissions'),
           'data_type' => 'Boolean',
+        ],
+        [
+          'name' => 'manual_processing',
+          'data_type' => 'Boolean',
+        ],
+        [
+          'name' => 'allow_verification_by_email',
+          'data_type' => 'Boolean',
+        ],
+        [
+          'name' => 'email_confirmation_template_id',
+          'data_type' => 'Integer',
         ],
         [
           'name' => 'navigation',
@@ -309,6 +333,7 @@ class Afform extends Generic\AbstractEntity {
           'description' => 'Name of extension which provides this form',
           'readonly' => TRUE,
           'pseudoconstant' => ['callback' => ['CRM_Core_BAO_Managed', 'getBaseModules']],
+          'input_type' => 'Select',
         ];
         $fields[] = [
           'name' => 'search_displays',
@@ -329,7 +354,7 @@ class Afform extends Generic\AbstractEntity {
   public static function permissions() {
     return [
       'meta' => ['access CiviCRM'],
-      'default' => [['administer CiviCRM', 'administer afform']],
+      'default' => ['administer afform'],
       // These all check form-level permissions
       'get' => [],
       'getOptions' => [],

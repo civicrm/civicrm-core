@@ -83,6 +83,8 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
     }
     // If we don't have a group we will browse all groups
     if (!self::$_gName) {
+      // Ensure that gName is assigned to the template to prevent smarty notice.
+      $this->assign('gName');
       return;
     }
     $this->set('gName', self::$_gName);

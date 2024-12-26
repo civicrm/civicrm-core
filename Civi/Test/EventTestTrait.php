@@ -14,7 +14,6 @@ namespace Civi\Test;
 use Civi\Api4\Event;
 use Civi\Api4\ExampleData;
 use Civi\Api4\PriceFieldValue;
-use Civi\Api4\PriceSetEntity;
 use Civi\Api4\UFField;
 use Civi\Api4\UFGroup;
 use Civi\Api4\UFJoin;
@@ -51,22 +50,19 @@ trait EventTestTrait {
   protected function eventCreatePaid(array $eventParameters = [], array $priceSetParameters = [], string $identifier = 'PaidEvent'): array {
     $eventParameters = array_merge($this->getEventExampleData(), $eventParameters);
     $event = $this->eventCreate($eventParameters, $identifier);
-    if (empty($priceSetParameters['id'])) {
-      try {
+    try {
+      if (empty($priceSetParameters['id'])) {
         $this->eventCreatePriceSet($priceSetParameters, $identifier);
-        $this->setTestEntityID('PriceSetEntity', PriceSetEntity::create(FALSE)
-          ->setValues([
-            'entity_table' => 'civicrm_event',
-            'entity_id' => $event['id'],
-            'price_set_id' => $this->ids['PriceSet'][$identifier],
-          ])
-          ->execute()
-          ->first()['id'], $identifier);
+        $priceSetParameters['id'] = $this->ids['PriceSet'][$identifier];
       }
-
-      catch (\CRM_Core_Exception $e) {
-        $this->fail('Failed to create PriceSetEntity: ' . $e->getMessage());
-      }
+      $this->createTestEntity('PriceSetEntity', [
+        'entity_table' => 'civicrm_event',
+        'entity_id' => $event['id'],
+        'price_set_id' => $priceSetParameters['id'],
+      ], $identifier);
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->fail('Failed to create PriceSetEntity: ' . $e->getMessage());
     }
     return $event;
   }
@@ -117,6 +113,23 @@ trait EventTestTrait {
     $eventParameters = array_merge($this->getEventExampleData(), $eventParameters);
     $eventParameters['is_monetary'] = FALSE;
     return $this->eventCreate($eventParameters, $identifier);
+  }
+
+  /**
+   * Update an event.
+   *
+   * @param array $eventParameters
+   *   Values to
+   *
+   * @param string $identifier
+   *   Index for storing event ID in ids array.
+   *
+   */
+  protected function updateEvent(array $eventParameters = [], string $identifier = 'event'): void {
+    Event::update(FALSE)
+      ->addWhere('id', '=', $this->getEventID($identifier))
+      ->setValues($eventParameters)
+      ->execute();
   }
 
   /**
@@ -190,6 +203,9 @@ trait EventTestTrait {
    */
   public function eventCreate(array $params = [], string $identifier = 'event'): array {
     try {
+      if ($params['is_template'] ?? NULL && empty($params['template_title'])) {
+        $params['template_title'] = 'template event';
+      }
       $event = Event::create(FALSE)->setValues($params)->execute()->first();
       $this->setTestEntity('Event', $event, $identifier);
       $this->addProfilesToEvent($identifier);
@@ -244,13 +260,27 @@ trait EventTestTrait {
     $profiles = [
       ['name' => '_pre', 'title' => 'Event Pre Profile', 'weight' => 1, 'fields' => ['email']],
       ['name' => '_post', 'title' => 'Event Post Profile', 'weight' => 2, 'fields' => ['first_name', 'last_name']],
-      ['name' => '_post_post', 'title' => 'Event Post Post Profile', 'weight' => 3, 'fields' => ['job_title']],
     ];
     foreach ($profiles as $profile) {
       $this->createEventProfile($profile, $identifier);
       if ($this->getEventValue('is_multiple_registrations', $identifier)) {
         $this->createEventProfile($profile, $identifier, TRUE);
       }
+    }
+    $sharedProfile = ['name' => '_post_post', 'title' => 'Event Post Post Profile', 'weight' => 3, 'fields' => ['job_title']];
+    $this->createEventProfile($sharedProfile, $identifier);
+    if ($this->getEventValue('is_multiple_registrations', $identifier)) {
+      // For this one use the same profile but 2 UFJoins - to provide variation.
+      // e.g. we hit a bug where behaviour was different if the profiles for
+      // additional were the same uf group or different ones.
+      $profileName = $identifier . '_post_post';
+      $this->setTestEntity('UFJoin', UFJoin::create(FALSE)->setValues([
+        'module' => 'CiviEvent_Additional',
+        'entity_table' => 'civicrm_event',
+        'uf_group_id:name' => $profileName,
+        'weight' => $profile['weight'],
+        'entity_id' => $this->getEventID($identifier),
+      ])->execute()->first(), $profileName . '_' . $identifier);
     }
   }
 
@@ -292,7 +322,9 @@ trait EventTestTrait {
     try {
       $this->setTestEntity('UFJoin', UFJoin::create(FALSE)->setValues([
         'module' => $additionalSuffix ? 'CiviEvent_Additional' : 'CiviEvent',
+        'entity_table' => 'civicrm_event',
         'uf_group_id:name' => $profileName,
+        'weight' => $profile['weight'],
         'entity_id' => $this->getEventID($identifier),
       ])->execute()->first(), $profileIdentifier);
     }
@@ -308,13 +340,13 @@ trait EventTestTrait {
    * @param string $identifier
    */
   private function eventCreatePriceSet(array $priceSetParameters, string $identifier): void {
-    $priceSetParameters = array_merge($priceSetParameters, [
+    $priceSetParameters = array_merge([
       'min_amount' => 0,
       'title' => 'Fundraising dinner',
       'name' => $identifier,
       'extends:name' => 'CiviEvent',
       'financial_type_id:name' => 'Event Fee',
-    ]);
+    ], $priceSetParameters);
 
     $this->createTestEntity('PriceSet', $priceSetParameters, $identifier);
     $this->createTestEntity('PriceField', [

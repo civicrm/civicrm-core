@@ -17,6 +17,7 @@
   {* Main case view *}
   {else}
 
+  {crmRegion name="case-view-summary"}
   <h3>{ts}Summary{/ts}</h3>
   <table class="report crm-entity case-summary" data-entity="case" data-id="{$caseID}" data-cid="{$contactID}">
     {if $multiClient}
@@ -82,6 +83,8 @@
       </td>
     </tr>
   </table>
+  {/crmRegion}
+  {crmRegion name="case-view-hook-case-summary"}
   {if $hookCaseSummary}
     <div id="caseSummary" class="crm-clearfix">
       {foreach from=$hookCaseSummary item=val key=div_id}
@@ -89,7 +92,9 @@
       {/foreach}
     </div>
   {/if}
+  {/crmRegion}
 
+  {crmRegion name="case-view-control-panel"}
   <div class="case-control-panel">
     <div>
       <p>
@@ -118,20 +123,24 @@
           </span>
         {/if}
 
-        {if call_user_func(array('CRM_Core_Permission','giveMeAllACLs'))}
+        {if $hasAllACLs}
           <a class="action-item crm-hover-button medium-popup" href="{crmURL p='civicrm/contact/view/case/editClient' h=1 q="reset=1&action=update&id=$caseID&cid=$contactID"}"><i class="crm-i fa-user" aria-hidden="true"></i> {ts}Assign to Another Client{/ts}</a>
         {/if}
       </p>
     </div>
   </div>
+  {/crmRegion}
 
+  {crmRegion name="case-view-custom-data-view"}
   <div class="clear"></div>
   {include file="CRM/Case/Page/CustomDataView.tpl"}
+  {/crmRegion}
 
-  <div class="crm-accordion-wrapper collapsed crm-case-roles-block">
-    <div class="crm-accordion-header">
+  {crmRegion name="case-view-roles"}
+  <details class="crm-accordion-bold crm-case-roles-block">
+    <summary>
       {ts}Roles{/ts}
-    </div><!-- /.crm-accordion-header -->
+    </summary>
     <div class="crm-accordion-body">
 
       {if $hasAccessToAllCases}
@@ -147,30 +156,14 @@
       {/if}
 
       <div id="editCaseRoleDialog" class="hiddenElement">
-        <div><label for="edit_role_contact_id">{ts}Change To{/ts}:</label></div>
+        <div><label for="edit_role_contact_id">{ts}Change To{/ts} <span class="crm-marker">*</span></label></div>
         <div><input name="edit_role_contact_id" placeholder="{ts}- select contact -{/ts}" class="huge" /></div>
       </div>
       <div id="caseRoles-selector-show-active">
         {* Add checkbox to show inactive roles. For open cases, default value is unchecked, i.e. show active roles. For closed cases default is checked. *}
         <label><input type="checkbox" id="role_inactive" name="role_inactive[]"{if $caseDetails.status_class neq 'Opened'} checked="checked"{/if}>{ts}Show Inactive relationships{/ts}</label>
       </div>
-      {literal}
-        <script type="text/javascript">
-            (function($) {
-                // hide the inactive role when checkbox is checked
-                $('input[type=checkbox][id=role_inactive]').change(function() {
-                  if (this.checked == true) {
-                    CRM.$('[id^=caseRoles-selector] tbody tr').not('.disabled').hide();
-                    CRM.$('[id^=caseRoles-selector] tbody tr.disabled').show();
-                  } else if (this.checked == false) {
-                    CRM.$('[id^=caseRoles-selector] tbody tr').not('.disabled').show();
-                    CRM.$('[id^=caseRoles-selector] tbody tr.disabled').hide();
-                  }
-                });
-            })(CRM.$);
-        </script>
-      {/literal}
-      <table id="caseRoles-selector-{$caseID}"  class="report-layout crm-ajax-table" data-page-length="10">
+      <table id="caseRoles-selector-{$caseID}" class="report-layout crm-ajax-table" data-page-length="10">
         <thead>
           <tr>
             <th data-data="relation">{ts}Case Role{/ts}</th>
@@ -188,19 +181,9 @@
         <script type="text/javascript">
           (function($) {
             var caseId = {/literal}{$caseID}{literal};
-            CRM.$('table#caseRoles-selector-' + caseId).data({
+            $('table#caseRoles-selector-' + caseId).data({
               "ajax": {
                 "url": {/literal}'{crmURL p="civicrm/ajax/caseroles" h=0 q="snippet=4&caseID=$caseId&cid=$contactID&userID=$userID"}'{literal},
-                "complete" : function(){
-                  if (CRM.$('input[type=checkbox][id=role_inactive]').prop('checked')) {
-                    CRM.$('[id^=caseRoles-selector] tbody tr').not('.disabled').hide();
-                    CRM.$('[id^=caseRoles-selector] tbody tr.disabled').show();
-                  }
-                  else {
-                    CRM.$('[id^=caseRoles-selector] tbody tr').not('.disabled').show();
-                    CRM.$('[id^=caseRoles-selector] tbody tr.disabled').hide();
-                  }
-                }
               }
             });
           })(CRM.$);
@@ -211,14 +194,16 @@
         {ts}Are you sure you want to end this relationship?{/ts}
       </div>
 
-   </div><!-- /.crm-accordion-body -->
-  </div><!-- /.crm-accordion-wrapper -->
+   </div>
+  </details>
+  {/crmRegion}
 
+  {crmRegion name="case-view-other-relationships"}
   {if $hasAccessToAllCases}
-  <div class="crm-accordion-wrapper collapsed crm-case-other-relationships-block">
-    <div class="crm-accordion-header">
+  <details class="crm-accordion-bold crm-case-other-relationships-block">
+    <summary>
       {ts}Other Relationships{/ts}
-    </div><!-- /.crm-accordion-header -->
+    </summary>
     <div class="crm-accordion-body">
       <div class="crm-submit-buttons">
         {crmButton p='civicrm/contact/view/rel' q="action=add&reset=1&cid=`$contactId`&caseID=`$caseID`" icon="plus-circle"}{ts}Add client relationship{/ts}{/crmButton}
@@ -278,18 +263,20 @@
     {/literal}
   {/if}
 
-  </div><!-- /.crm-accordion-body -->
-</div><!-- /.crm-accordion-wrapper -->
+  </div>
+</details>
 
 {/if} {* other relationship section ends *}
+  {/crmRegion}
 {include file="CRM/Case/Form/ActivityToCase.tpl"}
 
 {* pane to display / edit regular tags or tagsets for cases *}
+{crmRegion name="case-view-tags"}
 {if $showTags}
-<div id="casetags" class="crm-accordion-wrapper  crm-case-tags-block">
- <div class="crm-accordion-header">
+<details id="casetags" class="crm-accordion-bold  crm-case-tags-block" open>
+ <summary>
   {ts}Case Tags{/ts}
- </div><!-- /.crm-accordion-header -->
+ </summary>
  <div class="crm-accordion-body">
   {if $tags}
     <p class="crm-block crm-content-block crm-case-caseview-display-tags">
@@ -305,7 +292,7 @@
    {foreach from=$tagSetTags item=displayTagset}
      <p class="crm-block crm-content-block crm-case-caseview-display-tagset">
        &nbsp;&nbsp;<strong>{$displayTagset.label}:</strong>
-       {', '|implode:$displayTagset.items|escape}
+       {$displayTagset.itemsStr|escape}
      </p>
    {/foreach}
 
@@ -321,8 +308,8 @@
     </a>
   </div>
 
- </div><!-- /.crm-accordion-body -->
-</div><!-- /.crm-accordion-wrapper -->
+ </div>
+</details>
 
 <div id="manageTagsDialog" class="hiddenElement">
   <div class="label">{$form.case_tag.label}</div>
@@ -335,8 +322,11 @@
 </div>
 
 {/if} {* end of tag block*}
+{/crmRegion}
 
+{crmRegion name="case-view-activity-tab"}
 {include file="CRM/Case/Form/ActivityTab.tpl"}
+{/crmRegion}
 
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 {/if} {* view related cases if end *}

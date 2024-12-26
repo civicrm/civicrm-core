@@ -20,7 +20,6 @@ return [
           'version' => 4,
           'select' => [
             'label',
-            'parent_id:label',
             'description',
           ],
           'orderBy' => [],
@@ -55,6 +54,7 @@ return [
           'classes' => [
             'table',
             'table-striped',
+            'crm-sticky-header',
           ],
           'pager' => [
             'show_count' => TRUE,
@@ -63,10 +63,6 @@ return [
           ],
           'placeholder' => 5,
           'sort' => [
-            [
-              'parent_id:label',
-              'ASC',
-            ],
             [
               'label',
               'ASC',
@@ -86,23 +82,6 @@ return [
                 ],
               ],
               'editable' => TRUE,
-            ],
-            [
-              'type' => 'field',
-              'key' => 'parent_id:label',
-              'dataType' => 'Integer',
-              'label' => E::ts('Parent'),
-              'sortable' => TRUE,
-              'icons' => [
-                [
-                  'icon' => 'fa-lock',
-                  'side' => 'left',
-                  'if' => [
-                    'parent_id:label',
-                    'IS EMPTY',
-                  ],
-                ],
-              ],
             ],
             [
               'type' => 'field',
@@ -158,6 +137,7 @@ return [
               'icon' => 'fa-plus',
             ],
           ],
+          'hierarchical' => TRUE,
         ],
         'acl_bypass' => FALSE,
       ],

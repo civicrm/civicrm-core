@@ -1,6 +1,11 @@
 <?php
 use CRM_CivicrmAdminUi_ExtensionUtil as E;
 
+// Temporary check can be removed when moving this file to the civi_contribute extension.
+if (!CRM_Core_Component::isEnabled('CiviContribute')) {
+  return [];
+}
+
 return [
   [
     'name' => 'SavedSearch_Administer_Assigned_Financial_Accounts',
@@ -69,6 +74,7 @@ return [
           'classes' => [
             'table',
             'table-striped',
+            'crm-sticky-header',
           ],
           'pager' => [
             'show_count' => TRUE,
@@ -142,7 +148,7 @@ return [
                   'text' => E::ts('Delete'),
                   'style' => 'danger',
                   'condition' => [
-                    'account_relationship:label',
+                    'account_relationship:name',
                     '!=',
                     'Accounts Receivable Account is',
                   ],

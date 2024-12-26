@@ -30,7 +30,7 @@ class CRM_Utils_Number {
    * @link https://dev.mysql.com/doc/refman/5.1/en/fixed-point-types.html
    */
   public static function createRandomDecimal($precision) {
-    list ($sigFigs, $decFigs) = $precision;
+    [$sigFigs, $decFigs] = $precision;
     $rand = rand(0, pow(10, $sigFigs) - 1);
     return $rand / pow(10, $decFigs);
   }
@@ -47,7 +47,7 @@ class CRM_Utils_Number {
    * @link https://dev.mysql.com/doc/refman/5.1/en/fixed-point-types.html
    */
   public static function createTruncatedDecimal($keyValue, $precision) {
-    list ($sigFigs, $decFigs) = $precision;
+    [$sigFigs, $decFigs] = $precision;
     $sign = ($keyValue < 0) ? '-1' : 1;
     // ex: -123.456 ==> 123456
     $val = str_replace('.', '', abs($keyValue));
@@ -88,6 +88,20 @@ class CRM_Utils_Number {
       }
       return $size;
     }
+  }
+
+  /**
+   * Get the maximum size permitted for a file upload.
+   *
+   * @return float
+   */
+  public static function getMaximumFileUploadSize(): float {
+    $uploadFileSize = \CRM_Utils_Number::formatUnitSize(\Civi::settings()->get('maxFileSize') . 'm', TRUE);
+    //Fetch uploadFileSize from php_ini when $config->maxFileSize is set to "no limit".
+    if (empty($uploadFileSize)) {
+      $uploadFileSize = \CRM_Utils_Number::formatUnitSize(ini_get('upload_max_filesize'), TRUE);
+    }
+    return round(($uploadFileSize / (1024 * 1024)), 2);
   }
 
   /**

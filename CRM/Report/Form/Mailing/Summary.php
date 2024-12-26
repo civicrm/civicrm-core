@@ -82,6 +82,11 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
           'type' => CRM_Utils_Type::T_STRING,
           'operator' => 'like',
         ],
+        'is_archived' => [
+          'name' => 'is_archived',
+          'title' => ts('Is archived?'),
+          'type' => CRM_Utils_Type::T_BOOLEAN,
+        ],
       ],
       'order_bys' => [
         'mailing_name' => [
@@ -430,17 +435,12 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
             $op = $this->_params["{$fieldName}_op"] ?? NULL;
 
             if ($op) {
-              if ($fieldName == 'relationship_type_id') {
-                $clause = "{$this->_aliases['civicrm_relationship']}.relationship_type_id=" . $this->relationshipId;
-              }
-              else {
-                $clause = $this->whereClause($field,
-                  $op,
-                  $this->_params["{$fieldName}_value"] ?? NULL,
-                  $this->_params["{$fieldName}_min"] ?? NULL,
-                  $this->_params["{$fieldName}_max"] ?? NULL
-                );
-              }
+              $clause = $this->whereClause($field,
+                $op,
+                $this->_params["{$fieldName}_value"] ?? NULL,
+                $this->_params["{$fieldName}_min"] ?? NULL,
+                $this->_params["{$fieldName}_max"] ?? NULL
+              );
             }
           }
 

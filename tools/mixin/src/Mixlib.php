@@ -75,7 +75,7 @@ class Mixlib {
 
     $phpCode = $this->getSourceCode($mixin);
     $mixinSpec = $this->parseString($phpCode);
-    $mixinSpec['mixinName'] = $mixinSpec['mixinName'] ?? preg_replace(';@.*$;', '', $mixin);
+    $mixinSpec['mixinName'] ??= preg_replace(';@.*$;', '', $mixin);
 
     $parts = explode('@', $mixin);
     $effectiveVersion = !empty($mixinSpec['mixinVersion']) ? $mixinSpec['mixinVersion'] : ($parts[1] ?? '');

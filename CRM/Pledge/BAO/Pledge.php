@@ -289,9 +289,9 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    * @param string $startDate
    * @param string $endDate
    *
-   * @return array|null
+   * @return array
    */
-  public static function getTotalAmountAndCount($status = NULL, $startDate = NULL, $endDate = NULL) {
+  public static function getTotalAmountAndCount($status = NULL, $startDate = NULL, $endDate = NULL): array {
     $where = [];
     $select = $from = $queryDate = NULL;
     $statusId = CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'status_id', $status);
@@ -324,19 +324,20 @@ FROM   civicrm_pledge
 WHERE  $whereCond AND is_test=0
 GROUP BY  currency
 ";
-    $start = substr($startDate, 0, 8);
-    $end = substr($endDate, 0, 8);
-    $pCount = 0;
-    $pamount = [];
+
+    $pledgeCounts = 0;
+    $pledgeAmounts = [];
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
-      $pCount += $dao->pledge_count;
-      $pamount[] = CRM_Utils_Money::format($dao->pledge_amount, $dao->currency);
+      $pledgeCounts += $dao->pledge_count;
+      $pledgeAmounts[] = CRM_Utils_Money::format($dao->pledge_amount, $dao->currency);
     }
 
+    $start = $startDate ? substr($startDate, 0, 8) : '';
+    $end = $endDate ? substr($endDate, 0, 8) : '';
     $pledge_amount = [
-      'pledge_amount' => implode(', ', $pamount),
-      'pledge_count' => $pCount,
+      'pledge_amount' => implode(', ', $pledgeAmounts),
+      'pledge_count' => $pledgeCounts,
       'purl' => CRM_Utils_System::url('civicrm/pledge/search',
         "reset=1&force=1&pstatus={$statusId}&pstart={$start}&pend={$end}&test=0"
       ),
@@ -411,7 +412,12 @@ GROUP BY  currency
     else {
       return $pledge_amount;
     }
-    return NULL;
+    return [
+      'purl' => '',
+      'pledge_count' => 0,
+      'received_count' => 0,
+      'url' => '',
+    ];
   }
 
   /**
@@ -1175,23 +1181,13 @@ SELECT  pledge.contact_id              as contact_id,
   }
 
   /**
-   * Override buildOptions to hack out some statuses.
-   *
-   * @param string $fieldName
-   * @param string $context
-   * @param array $props
-   *
-   * @return array|bool
-   * @todo instead of using & hacking the shared optionGroup
-   *   contribution_status use a separate one.
-   *
+   * Pseudoconstant condition_provider for status_id field.
+   * @see \Civi\Schema\EntityMetadataBase::getConditionFromProvider
    */
-  public static function buildOptions($fieldName, $context = NULL, $props = []) {
-    $result = parent::buildOptions($fieldName, $context, $props);
-    if ($fieldName == 'status_id') {
-      $result = array_diff($result, ['Failed']);
+  public static function alterStatus(string $fieldName, CRM_Utils_SQL_Select $conditions, $params) {
+    if ($fieldName == 'status_id' && !$params['include_disabled']) {
+      $conditions->where('name NOT IN (@status)', ['status' => ['Failed']]);
     }
-    return $result;
   }
 
 }

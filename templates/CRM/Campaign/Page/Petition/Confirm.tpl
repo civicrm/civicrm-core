@@ -25,6 +25,6 @@
   {/if}
   </div>
   {if $is_share}
-    {include file="CRM/Campaign/Page/Petition/SocialNetwork.tpl"}
+    {include file="CRM/Campaign/Page/Petition/SocialNetwork.tpl" emailMode=false}
   {/if}
 {/if}

@@ -256,7 +256,7 @@ class CRM_Core_BAO_CustomQuery {
                 $value = str_replace(",", "$sp|$sp", $value);
                 $value = str_replace(['[:comma:]', '(', ')'], [',', '[(]', '[)]'], $value);
 
-                $op = (strstr($op, '!') || strstr($op, 'NOT')) ? 'NOT RLIKE' : 'RLIKE';
+                $op = (str_contains($op, '!') || str_contains($op, 'NOT')) ? 'NOT RLIKE' : 'RLIKE';
                 $value = $sp . $value . $sp;
                 if (!$wildcard) {
                   foreach (explode("|", $value) as $val) {
@@ -396,8 +396,8 @@ class CRM_Core_BAO_CustomQuery {
   protected function joinCustomTableForField($field) {
     $name = $field['table_name'];
     $join = "\nLEFT JOIN $name ON $name.entity_id = {$field['search_table']}.id";
-    $this->_tables[$name] = $this->_tables[$name] ?? $join;
-    $this->_whereTables[$name] = $this->_whereTables[$name] ?? $join;
+    $this->_tables[$name] ??= $join;
+    $this->_whereTables[$name] ??= $join;
 
     $joinTable = $field['search_table'];
     if ($joinTable) {

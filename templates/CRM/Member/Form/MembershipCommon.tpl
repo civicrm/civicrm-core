@@ -3,7 +3,7 @@
     <table>
       <tr class="crm-{$formClass}-form-block-contribution-contact">
         <td class="label">{$form.is_different_contribution_contact.label}</td>
-        <td>{$form.is_different_contribution_contact.html}&nbsp;&nbsp;{help id="id-contribution_contact"}</td>
+        <td>{$form.is_different_contribution_contact.html}&nbsp;&nbsp;{help id="id-contribution_contact" file="CRM/Member/Page/Tab.hlp"}</td>
       </tr>
       <tr id="record-different-contact">
         <td>&nbsp;</td>

@@ -76,10 +76,11 @@ class CRM_Core_Action {
     'revert' => self::REVERT,
     'close' => self::CLOSE,
     'reopen' => self::REOPEN,
+    'advanced' => self::ADVANCED,
   ];
 
   private static function getInfo(): array {
-    Civi::$statics[__CLASS__ . 'Info'] = Civi::$statics[__CLASS__ . 'Info'] ?? [
+    Civi::$statics[__CLASS__ . 'Info'] ??= [
       self::ADD => [
         'name' => 'add',
         'label' => ts('Add'),

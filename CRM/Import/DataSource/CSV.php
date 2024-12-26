@@ -15,8 +15,7 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
-  const
-    NUM_ROWS_TO_INSERT = 100;
+  private const NUM_ROWS_TO_INSERT = 100;
 
   /**
    * Form fields declared for this datasource.
@@ -32,7 +31,10 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
    *   collection of info about this data source
    */
   public function getInfo(): array {
-    return ['title' => ts('Comma-Separated Values (CSV)')];
+    return [
+      'title' => ts('Comma-Separated Values (CSV)'),
+      'template' => 'CRM/Contact/Import/Form/CSV.tpl',
+    ];
   }
 
   /**
@@ -42,10 +44,8 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
    * uploaded to the temporary table in the DB.
    *
    * @param CRM_Contact_Import_Form_DataSource|\CRM_Import_Form_DataSourceConfig $form
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function buildQuickForm(&$form) {
+  public function buildQuickForm(\CRM_Import_Forms $form): void {
     $form->add('hidden', 'hidden_dataSource', 'CRM_Import_DataSource_CSV');
 
     $maxFileSizeMegaBytes = CRM_Utils_File::getMaxFileSize();
@@ -77,7 +77,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
     );
     $this->addTrackingFieldsToTable($result['import_table_name']);
 
-    $this->updateUserJobMetadata('DataSource', [
+    $this->updateUserJobDataSource([
       'table_name' => $result['import_table_name'],
       'column_headers' => $result['column_headers'],
       'number_of_columns' => $result['number_of_columns'],
@@ -127,17 +127,11 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
       $columns = $this->getColumnNamesFromHeaders($firstrow);
     }
     else {
-      $columns = [];
-      foreach ($firstrow as $i => $_) {
-        $columns[] = "column_$i";
-      }
+      $columns = $this->getColumnNamesForUnnamedColumns($firstrow);
       $result['column_headers'] = $columns;
     }
 
-    $table = CRM_Utils_SQL_TempTable::build()->setDurable();
-    $tableName = $table->getName();
-    CRM_Core_DAO::executeQuery("DROP TABLE IF EXISTS $tableName");
-    $table->createWithColumns(implode(' text, ', $columns) . ' text');
+    $tableName = $this->createTempTableFromColumns($columns);
 
     $numColumns = count($columns);
 
@@ -171,7 +165,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
       $first = FALSE;
 
       // CRM-17859 Trim non-breaking spaces from columns.
-      $row = array_map(['CRM_Import_DataSource_CSV', 'trimNonBreakingSpaces'], $row);
+      $row = array_map([__CLASS__, 'trimNonBreakingSpaces'], $row);
       $row = array_map(['CRM_Core_DAO', 'escapeString'], $row);
       $sql .= "('" . implode("', '", $row) . "')";
       $count++;
@@ -198,30 +192,6 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
   }
 
   /**
-   * Trim non-breaking spaces in a multibyte-safe way.
-   * See also dev/core#2127 - avoid breaking strings ending in à or any other
-   * unicode character sharing the same 0xA0 byte as a non-breaking space.
-   *
-   * @param string $string
-   * @return string The trimmed string
-   */
-  public static function trimNonBreakingSpaces(string $string): string {
-    $encoding = mb_detect_encoding($string, NULL, TRUE);
-    if ($encoding === FALSE) {
-      // This could mean a couple things. One is that the string is
-      // ASCII-encoded but contains a non-breaking space, which causes
-      // php to fail to detect the encoding. So let's just do what we
-      // did before which works in that situation and is at least no
-      // worse in other situations.
-      return trim($string, chr(0xC2) . chr(0xA0));
-    }
-    elseif ($encoding !== 'UTF-8') {
-      $string = mb_convert_encoding($string, 'UTF-8', [$encoding]);
-    }
-    return preg_replace("/^(\u{a0})+|(\u{a0})+$/", '', $string);
-  }
-
-  /**
    * Get default values for csv dataSource fields.
    *
    * @return array
@@ -230,49 +200,9 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
     return [
       'fieldSeparator' => CRM_Core_Config::singleton()->fieldSeparator,
       'skipColumnHeader' => 1,
+      'template' => 'CRM/Contact/Import/Form/CSV.tpl',
     ];
 
-  }
-
-  /**
-   * Get the column names from the headers, turning them into something sql-suitable.
-   *
-   * @param $headers
-   * @return array
-   */
-  private function getColumnNamesFromHeaders($headers): array {
-    $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
-    $columns = array_map($strtolower, $headers);
-    $columns = array_map('trim', $columns);
-    $columns = str_replace(' ', '_', $columns);
-    $columns = preg_replace('/[^a-z_]/', '', $columns);
-
-    // need to truncate values per mysql field name length limits
-    // mysql allows 64, but we need to account for appending colKey
-    // CRM-9079
-    foreach ($columns as &$columnName) {
-      if (strlen($columnName) > 58) {
-        $columnName = substr($columnName, 0, 58);
-      }
-    }
-
-    $hasNonUniqueColumnNames = count($columns) !== count(array_unique($columns));
-    if ($hasNonUniqueColumnNames || in_array('', $columns, TRUE)) {
-      foreach ($columns as $colKey => & $colName) {
-        if (!$colName) {
-          $colName = "col_$colKey";
-        }
-        elseif ($hasNonUniqueColumnNames) {
-          $colName .= "_$colKey";
-        }
-      }
-    }
-
-    // CRM-4881: we need to quote column names, as they may be MySQL reserved words
-    foreach ($columns as & $column) {
-      $column = "`$column`";
-    }
-    return $columns;
   }
 
 }

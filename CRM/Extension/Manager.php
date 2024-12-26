@@ -525,6 +525,17 @@ class CRM_Extension_Manager {
   }
 
   /**
+   * Check if a given extension is installed and enabled
+   *
+   * @param $key
+   *
+   * @return bool
+   */
+  public function isEnabled($key) {
+    return ($this->getStatus($key) === self::STATUS_INSTALLED);
+  }
+
+  /**
    * Check if a given extension is incompatible with this version of CiviCRM
    *
    * @param $key

@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\StatusPreference;
+
 /**
  * System.check API has many special test cases, so they have their own class.
  *
@@ -21,8 +23,14 @@
  */
 class api_v3_SystemCheckTest extends CiviUnitTestCase {
 
+  /**
+   * @throws \CRM_Core_Exception
+   */
   public function setUp(): void {
     parent::setUp();
+    CRM_Core_BAO_ConfigSetting::enableComponent('CiviMail');
+    StatusPreference::update(FALSE)->setValues(['is_active', '=', TRUE])
+      ->addWhere('is_active', '=', FALSE)->execute();
     $this->useTransaction(TRUE);
   }
 
@@ -35,7 +43,7 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testSystemCheckBasic($version) {
+  public function testSystemCheckBasic(int $version): void {
     $this->_apiversion = $version;
     $this->runStatusCheck([], ['severity_id' => 3]);
   }
@@ -143,7 +151,7 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testSystemCheckHushAboveSeverity($version) {
+  public function testSystemCheckHushAboveSeverity($version): void {
     $this->_apiversion = $version;
     $this->runStatusCheck([
       'name' => 'checkDefaultMailbox',
@@ -176,7 +184,7 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
    * @dataProvider versionThreeAndFour
    * @throws \CRM_Core_Exception
    */
-  public function testSystemCheckHushBelowSeverity($version) {
+  public function testSystemCheckHushBelowSeverity(int $version): void {
     $this->_apiversion = $version;
     $this->runStatusCheck([
       'name' => 'checkDefaultMailbox',
@@ -193,7 +201,7 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  protected function runStatusCheck($params, $expected) {
+  protected function runStatusCheck(array $params, $expected): void {
     if (!empty($params)) {
       $this->callAPISuccess('StatusPreference', 'create', $params);
     }

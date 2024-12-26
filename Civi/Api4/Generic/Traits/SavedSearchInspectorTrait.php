@@ -58,7 +58,7 @@ trait SavedSearchInspectorTrait {
    * @throws UnauthorizedException
    * @throws \CRM_Core_Exception
    */
-  protected function loadSavedSearch(int $id = NULL) {
+  protected function loadSavedSearch(?int $id = NULL) {
     if ($id || is_string($this->savedSearch)) {
       $this->savedSearch = SavedSearch::get(FALSE)
         ->addWhere($id ? 'id' : 'name', '=', $id ?: $this->savedSearch)
@@ -163,7 +163,7 @@ trait SavedSearchInspectorTrait {
    * @return array
    */
   private function getEntityFields() {
-    if (!isset($this->_searchEntityFields)) {
+    if (!isset($this->_searchEntityFields) && !empty($this->savedSearch['api_entity'])) {
       $this->_searchEntityFields = Request::create($this->savedSearch['api_entity'], 'get', $this->savedSearch['api_params'])
         ->entityFields();
     }
@@ -227,6 +227,16 @@ trait SavedSearchInspectorTrait {
     // If the column is used for a groupBy, no
     if (in_array($fieldPath, $apiParams['groupBy'])) {
       return FALSE;
+    }
+
+    // If this is an implicit join, use the parent field
+    if (str_ends_with($fieldPath, '.' . $field['name'])) {
+      $baseFieldPath = substr($fieldPath, 0, -strlen('.' . $field['name']));
+      $baseField = $this->getField($baseFieldPath);
+      if ($baseField) {
+        $fieldPath = $baseFieldPath;
+        $field = $baseField;
+      }
     }
 
     // If the entity this column belongs to is being grouped by id, then also no
@@ -361,12 +371,7 @@ trait SavedSearchInspectorTrait {
    * @return array
    */
   protected function getTokens(string $str): array {
-    if (strpos($str, '[') === FALSE) {
-      return [];
-    }
-    $tokens = [];
-    preg_match_all('/\\[([^]]+)\\]/', $str, $tokens);
-    return array_unique($tokens[1]);
+    return array_keys(\CRM_Utils_String::getSquareTokens($str));
   }
 
   /**
@@ -377,7 +382,7 @@ trait SavedSearchInspectorTrait {
   protected function checkPermissionToLoadSearch() {
     if (
       (is_array($this->savedSearch) || (isset($this->display) && is_array($this->display))) && $this->checkPermissions &&
-      !\CRM_Core_Permission::check([['administer CiviCRM data', 'administer search_kit']])
+      !\CRM_Core_Permission::check('administer search_kit')
     ) {
       throw new UnauthorizedException('Access denied');
     }

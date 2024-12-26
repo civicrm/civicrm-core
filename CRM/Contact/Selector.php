@@ -82,6 +82,13 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
   protected $_contextMenu;
 
   /**
+   * The search context
+   *
+   * @var string
+   */
+  public $_context;
+
+  /**
    * Params is the array in a value used by the search query creator
    *
    * @var array
@@ -190,8 +197,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
         FALSE, $this->_ufGroupID
       );
       self::$_columnHeaders = NULL;
-
-      $this->_customFields = CRM_Core_BAO_CustomField::getFieldsForImport('Individual');
 
       $this->_returnProperties = CRM_Contact_BAO_Contact::makeHierReturnProperties($this->_fields);
       $this->_returnProperties['contact_type'] = 1;
@@ -597,7 +602,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     }
 
     if ($this->_ufGroupID) {
-      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+      $locationTypes = CRM_Core_DAO_Address::buildOptions('location_type_id');
 
       $names = [];
       static $skipFields = ['group', 'tag'];
@@ -685,7 +690,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
         elseif (strpos($property, '-im')) {
           $row[$property] = $result->$property;
           if (!empty($result->$property)) {
-            $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
+            $imProviders = CRM_Core_DAO_IM::buildOptions('provider_id');
             $providerId = $property . "-provider_id";
             $providerName = $imProviders[$result->$providerId];
             $row[$property] = $result->$property . " ({$providerName})";
@@ -711,7 +716,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
           $propertyArray = explode('-', $property);
           $websiteFld = $websiteKey . '-' . array_pop($propertyArray);
           if (!empty($result->$websiteFld)) {
-            $websiteTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id');
+            $websiteTypes = CRM_Core_DAO_Website::buildOptions('website_type_id');
             $websiteType = $websiteTypes[$result->{"$websiteKey-website_type_id"}];
             $websiteValue = $result->$websiteFld;
             $websiteUrl = "<a href=\"{$websiteValue}\">{$websiteValue}  ({$websiteType})</a>";
@@ -842,14 +847,14 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
         $contactUrl = CRM_Utils_System::url('civicrm/contact/view',
           "reset=1&cid={$result->contact_id}&key={$this->_key}&context={$this->_context}"
         );
-        $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ? $result->contact_sub_type : $result->contact_type,
+        $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ?: $result->contact_type,
           FALSE,
           $result->contact_id,
           TRUE,
           $contactUrl
         );
 
-        $row['contact_type_orig'] = $result->contact_sub_type ? $result->contact_sub_type : $result->contact_type;
+        $row['contact_type_orig'] = $result->contact_sub_type ?: $result->contact_type;
         $row['contact_id'] = $result->contact_id;
         $row['sort_name'] = $result->sort_name;
         // Surely this if should be if NOT - otherwise it's just wierd.
@@ -964,6 +969,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
             'url' => 'civicrm/contact/view/delete',
             'qs' => 'reset=1&cid=%%id%%&restore=1',
             'title' => ts('Restore Contact'),
+            'weight' => 80,
           ],
         ];
         if (CRM_Core_Permission::check('delete contacts')) {

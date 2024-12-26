@@ -74,6 +74,7 @@ function civicrm_api3_job_clone($params) {
   $id = $params['id'];
   unset($params['id']);
   $params['last_run'] = 'null';
+  $params['last_run_end'] = 'null';
   $params['scheduled_run_date'] = 'null';
   $newJobDAO = CRM_Core_BAO_Job::copy($id, $params);
   return civicrm_api3('Job', 'get', ['id' => $newJobDAO->id]);
@@ -139,6 +140,8 @@ function _civicrm_api3_job_execute_spec(&$params) {
  *   API Result Array
  */
 function civicrm_api3_job_geocode($params) {
+  // We are in api v3, so version has already done it's job.
+  unset($params['version']);
   $gc = new CRM_Utils_Address_BatchUpdate($params);
 
   $result = $gc->run();

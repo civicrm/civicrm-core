@@ -105,12 +105,14 @@ class CRM_Core_ErrorTest extends CiviUnitTestCase {
     $log = CRM_Core_Error::createDebugLogger('my-test');
     $log->log('Mary had a little lamb');
     $log->log('Little lamb');
+    $fileName = CRM_Core_Error::generateLogFileName('my-test');
     $config = CRM_Core_Config::singleton();
-    $fileContents = file_get_contents($log->_filename);
-    $this->assertEquals($config->configAndLogDir . 'CiviCRM.' . CIVICRM_DOMAIN_ID . '.' . 'my-test.' . CRM_Core_Error::generateLogFileHash($config) . '.log', $log->_filename);
-    // The 5 here is a bit arbitrary - on my local the date part is 15 chars (Mar 29 05:29:16) - but we are just checking that
-    // there are chars for the date at the start.
-    $this->assertTrue(strpos($fileContents, '[info] Mary had a little lamb') > 10);
+    $this->assertEquals($config->configAndLogDir . 'CiviCRM.' . CIVICRM_DOMAIN_ID . '.' . 'my-test.' . CRM_Core_Error::generateLogFileHash($config) . '.log', $fileName);
+    $fileContents = file_get_contents($fileName);
+    // Date format should be ISO
+    $this->assertMatchesRegularExpression('/^\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d[+-]\d\d\d\d$/', substr($fileContents, 0, 24));
+    // Check the text starts at the expected position
+    $this->assertEquals(26, strpos($fileContents, '[info] Mary had a little lamb'));
     $this->assertStringContainsString('[info] Little lamb', $fileContents);
   }
 

@@ -65,12 +65,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
     //operation for state machine.
     $this->_operation = CRM_Utils_Request::retrieve('op', 'String', $this, FALSE, 'reserve');
     //validate operation.
-    if (!in_array($this->_operation, [
-      'reserve',
-      'release',
-      'interview',
-    ])
-    ) {
+    if (!in_array($this->_operation, ['reserve', 'release', 'interview'])) {
       $this->_operation = 'reserve';
       $this->set('op', $this->_operation);
     }
@@ -307,7 +302,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
     }
 
     //apply filter of survey contact type for search.
-    $contactType = CRM_Campaign_BAO_Survey::getSurveyContactType(CRM_Utils_Array::value('campaign_survey_id', $this->_formValues));
+    $contactType = CRM_Campaign_BAO_Survey::getSurveyContactType($this->_formValues['campaign_survey_id'] ?? NULL);
     if ($contactType && in_array($this->_operation, ['reserve', 'interview'])) {
       $this->_formValues['contact_type'][$contactType] = 1;
     }

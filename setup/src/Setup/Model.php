@@ -38,6 +38,8 @@ namespace Civi\Setup;
  * @property string|NULL $lang
  *   The language of the default dataset.
  *   Ex: 'fr_FR'.
+ * @property bool $syncUsers
+ *   Whether to automatically create `Contact` records for each pre-existing CMS `User`
  * @property bool $loadGenerated
  *   UNSUPPORTED: Load example dataset (in lieu of the standard dataset).
  *   This was copied-in from the previous installer code, but it should probably be
@@ -133,6 +135,11 @@ class Model {
     $this->addField(array(
       'description' => 'Load example data',
       'name' => 'loadGenerated',
+      'type' => 'bool',
+    ));
+    $this->addField(array(
+      'description' => 'Load users',
+      'name' => 'syncUsers',
       'type' => 'bool',
     ));
     $this->addField(array(

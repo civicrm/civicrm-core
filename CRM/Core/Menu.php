@@ -635,7 +635,7 @@ UNION (
       }
     }
 
-    if (strstr($path, 'report/instance')) {
+    if (str_contains($path, 'report/instance')) {
       $args = explode('/', $path);
       if (is_numeric(end($args))) {
         $menuPath['path'] .= '/' . end($args);

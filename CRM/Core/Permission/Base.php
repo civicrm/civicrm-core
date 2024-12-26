@@ -60,14 +60,12 @@ class CRM_Core_Permission_Base {
     [$civiPrefix, $name] = CRM_Utils_String::parsePrefix(':', $perm, NULL);
     switch ($civiPrefix) {
       case $nativePrefix:
+      case NULL:
         return $name;
 
       // pass through
       case 'cms':
-        return CRM_Utils_Array::value($name, $map, CRM_Core_Permission::ALWAYS_DENY_PERMISSION);
-
-      case NULL:
-        return $name;
+        return $map[$name] ?? CRM_Core_Permission::ALWAYS_DENY_PERMISSION;
 
       default:
         return CRM_Core_Permission::ALWAYS_DENY_PERMISSION;
@@ -154,7 +152,7 @@ class CRM_Core_Permission_Base {
 
       $groups = CRM_Core_PseudoConstant::allGroup($groupType, $excludeHidden);
 
-      if ($this->check('edit all contacts')) {
+      if (CRM_Core_Permission::check('edit all contacts')) {
         // this is the most powerful permission, so we return
         // immediately rather than dilute it further
         $this->_editAdminUser = $this->_viewAdminUser = TRUE;
@@ -163,7 +161,7 @@ class CRM_Core_Permission_Base {
         Civi::$statics['CRM_ACL_API']['viewPermissionedGroups_' . $domainId . '_' . $userId][$groupKey] = $groups;
         return Civi::$statics['CRM_ACL_API']['viewPermissionedGroups_' . $domainId . '_' . $userId][$groupKey];
       }
-      elseif ($this->check('view all contacts')) {
+      elseif (CRM_Core_Permission::check('view all contacts')) {
         $this->_viewAdminUser = TRUE;
         $this->_viewPermission = TRUE;
         Civi::$statics['CRM_ACL_API']['viewPermissionedGroups_' . $domainId . '_' . $userId][$groupKey] = $groups;
@@ -310,7 +308,21 @@ class CRM_Core_Permission_Base {
    * @see \CRM_Core_Permission_Base::translatePermission()
    */
   public function getAvailablePermissions() {
-    return [];
+    // These "synthetic" permissions are translated to the relevant CMS permissions in CRM/Core/Permission/*.php
+    // using the `translatePermission()` mechanism.
+    // EXCEPT in Standalone, where they are not needed
+    return [
+      'cms:view user account' => [
+        'title' => ts('CMS') . ': ' . ts('View user accounts'),
+        'description' => ts('View user accounts. (Synthetic permission - adapts to local CMS)'),
+        'is_synthetic' => TRUE,
+      ],
+      'cms:administer users' => [
+        'title' => ts('CMS') . ': ' . ts('Administer user accounts'),
+        'description' => ts('Administer user accounts. (Synthetic permission - adapts to local CMS)'),
+        'is_synthetic' => TRUE,
+      ],
+    ];
   }
 
   /**
@@ -392,25 +404,30 @@ class CRM_Core_Permission_Base {
    * Get the permissions defined in the hook_civicrm_permission implementation
    * in all enabled CiviCRM module extensions.
    *
-   * @param bool $descriptions
-   *
    * @return array
    *   Array of permissions, in the same format as CRM_Core_Permission::getCorePermissions().
+   * @throws RuntimeException
    */
-  public function getAllModulePermissions($descriptions = FALSE): array {
+  public function getAllModulePermissions(): array {
     $permissions = [];
     CRM_Utils_Hook::permission($permissions);
 
-    if ($descriptions) {
-      foreach ($permissions as $permission => $label) {
-        $permissions[$permission] = (is_array($label)) ? $label : [$label];
+    // Normalize permission array format.
+    // Historically, a string was acceptable (interpreted as label), as was a non-associative array.
+    // Convert them all to associative arrays.
+    foreach ($permissions as $name => $defn) {
+      $defn = (array) $defn;
+      if (!isset($defn['label'])) {
+        CRM_Core_Error::deprecatedWarning("Permission '$name' should be declared with 'label' and 'description' keys. See https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_permission/");
       }
-    }
-    else {
-      // Passing in false here is to be deprecated.
-      foreach ($permissions as $permission => $label) {
-        $permissions[$permission] = (is_array($label)) ? array_shift($label) : $label;
-      }
+      $permission = [
+        'label' => $defn['label'] ?? $defn[0],
+        'description' => $defn['description'] ?? $defn[1] ?? NULL,
+        'disabled' => $defn['disabled'] ?? NULL,
+        'implies' => $defn['implies'] ?? NULL,
+        'implied_by' => $defn['implied_by'] ?? NULL,
+      ];
+      $permissions[$name] = array_filter($permission, fn($item) => isset($item));
     }
     return $permissions;
   }

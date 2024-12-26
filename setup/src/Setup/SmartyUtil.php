@@ -7,27 +7,25 @@ class SmartyUtil {
    * Create a Smarty instance.
    *
    * @return \Smarty
+   * @throws \SmartyException
    */
   public static function createSmarty($srcPath) {
-    require_once 'CRM/Core/I18n.php';
-
-    $packagePath = PackageUtil::getPath($srcPath);
-    require_once $packagePath . DIRECTORY_SEPARATOR . 'Smarty' . DIRECTORY_SEPARATOR . 'Smarty.class.php';
-
+    if (!class_exists('Smarty', FALSE)) {
+      // Prefer Smarty v5; but if we get here in some scenario with another Smarty, use that.
+      $packagePath = PackageUtil::getPath($srcPath);
+      require_once $packagePath . '/smarty5/Smarty.php';
+    }
     $smarty = new \Smarty();
-    $smarty->template_dir = implode(DIRECTORY_SEPARATOR, [$srcPath, 'xml', 'templates']);
-    $smarty->plugins_dir = [
-      implode(DIRECTORY_SEPARATOR, [$packagePath, 'Smarty', 'plugins']),
+    $smarty->setTemplateDir(implode(DIRECTORY_SEPARATOR, [$srcPath, 'xml', 'templates']));
+    $pluginsDirectory = $smarty->addPluginsDir([
       implode(DIRECTORY_SEPARATOR, [$srcPath, 'CRM', 'Core', 'Smarty', 'plugins']),
-    ];
-    $smarty->compile_dir = \Civi\Setup\FileUtil::createTempDir('templates_c');
-    $smarty->clear_all_cache();
-
-    // CRM-5308 / CRM-3507 - we need {localize} to work in the templates
-    require_once implode(DIRECTORY_SEPARATOR, [$srcPath, 'CRM', 'Core', 'Smarty', 'plugins', 'block.localize.php']);
-    $smarty->register_block('localize', 'smarty_block_localize');
-    $smarty->assign('gencodeXmlDir', "$srcPath/xml");
+    ]);
+    $smarty->setCompileDir(\Civi\Setup\FileUtil::createTempDir('templates_c'));
+    $smarty->clearAllCache();
     require_once implode(DIRECTORY_SEPARATOR, [$srcPath, 'CRM', 'Core', 'CodeGen', 'Util', 'MessageTemplates.php']);
+    $smarty->registerPlugin('modifier', 'json_encode', 'json_encode');
+    $smarty->registerPlugin('modifier', 'count', 'count');
+    $smarty->registerPlugin('modifier', 'implode', 'implode');
     \CRM_Core_CodeGen_Util_MessageTemplates::assignSmartyVariables($smarty);
     return $smarty;
   }

@@ -18,23 +18,28 @@
 class CRM_Activity_BAO_ActivityAssignmentTest extends CiviUnitTestCase {
 
   /**
+   * API version in use.
+   *
+   * @var int
+   */
+  protected $_apiversion = 4;
+
+  /**
    *  Pass zero as an id and make sure no Assignees are retrieved.
    */
   public function testGetAssigneeNamesNoId(): void {
-    $activity = $this->activityCreate();
+    $this->activityCreate();
     $assignees = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames(0);
-
-    $this->assertEquals(count($assignees), 0, '0 assignee names retrieved');
+    $this->assertCount(0, $assignees, '0 assignee names retrieved');
   }
 
   /**
    *  Pass Null as an id and make sure no Assignees are retrieved.
    */
   public function testGetAssigneeNamesNullId(): void {
-    $activity = $this->activityCreate();
+    $this->activityCreate();
     $assignees = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames(NULL);
-
-    $this->assertEquals(count($assignees), 0, '0 assignee names retrieved');
+    $this->assertCount(0, $assignees, '0 assignee names retrieved');
   }
 
   /**
@@ -43,7 +48,7 @@ class CRM_Activity_BAO_ActivityAssignmentTest extends CiviUnitTestCase {
   public function testGetAssigneeNamesOneId(): void {
     $activity = $this->activityCreate();
     $assignees = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames([$activity['id']]);
-    $this->assertEquals(count($assignees), 1, '1 assignee names retrieved');
+    $this->assertCount(1, $assignees, '1 assignee names retrieved');
   }
 
 }

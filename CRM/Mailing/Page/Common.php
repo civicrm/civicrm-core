@@ -44,7 +44,7 @@ class CRM_Mailing_Page_Common extends CRM_Core_Page {
     }
 
     $cancel = CRM_Utils_Request::retrieve("_qf_{$this->_type}_cancel", 'String');
-    if ($cancel) {
+    if (isset($cancel)) {
       $config = CRM_Core_Config::singleton();
       CRM_Utils_System::redirect($config->userFrameworkBaseURL);
     }

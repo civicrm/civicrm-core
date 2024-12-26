@@ -43,6 +43,10 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
 
   protected $_isTemplate = FALSE;
 
+  protected $_searchResult;
+
+  protected $_force;
+
   /**
    * Get action Links.
    *
@@ -77,7 +81,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
         CRM_Core_Action::COPY => [
           'name' => ts('Copy'),
           'url' => CRM_Utils_System::currentPath(),
-          'qs' => 'reset=1&action=copy&id=%%id%%',
+          'qs' => 'reset=1&action=copy&id=%%id%%&qfKey=%%key%%',
           'extra' => 'onclick = "return confirm(\'' . $copyExtra . '\');"',
           'title' => ts('Copy Event'),
           'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::COPY),
@@ -178,12 +182,6 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
             'field' => 'reminder',
           ];
       }
-      self::$_tabLinks[$cacheKey]['friend']
-        = [
-          'title' => ts('Tell a Friend'),
-          'url' => 'civicrm/event/manage/friend',
-          'field' => 'friend',
-        ];
       self::$_tabLinks[$cacheKey]['pcp']
         = [
           'title' => ts('Personal Campaign Pages'),
@@ -257,6 +255,11 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
       return $controller->run();
     }
     elseif ($action & CRM_Core_Action::COPY) {
+      $key = $_POST['qfKey'] ?? $_GET['qfKey'] ?? $_REQUEST['qfKey'] ?? NULL;
+      $k = CRM_Core_Key::validate($key, CRM_Utils_System::getClassName($this));
+      if (!$k) {
+        $this->invalidKey();
+      }
       $this->copy();
     }
 
@@ -297,6 +300,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
     );
     $this->_searchResult = CRM_Utils_Request::retrieve('searchResult', 'Boolean', $this);
 
+    // @todo Does $this->_force get used somewhere deeper down? It doesn't seem used in whereClause()?
     $whereClause = $this->whereClause($params, FALSE, $this->_force);
 
     if (CRM_Core_Config::singleton()->includeAlphabeticalPager) {
@@ -389,7 +393,7 @@ ORDER BY start_date desc
         );
         $manageEvent[$dao->id]['action'] = CRM_Core_Action::formLink(self::links(),
           $action,
-          ['id' => $dao->id],
+          ['id' => $dao->id, 'key' => CRM_Core_Key::get(CRM_Utils_System::getClassName($this))],
           ts('more'),
           TRUE,
           'event.manage.list',
@@ -405,7 +409,9 @@ ORDER BY start_date desc
 
         $defaults['location'] = CRM_Core_BAO_Location::getValues($params, TRUE);
 
-        $manageEvent[$dao->id]['friend'] = CRM_Friend_BAO_Friend::getValues($params);
+        if (function_exists('tellafriend_civicrm_config')) {
+          $manageEvent[$dao->id]['friend'] = CRM_Friend_BAO_Friend::getValues($params);
+        }
 
         if (isset($defaults['location']['address'][1]['city'])) {
           $manageEvent[$dao->id]['city'] = $defaults['location']['address'][1]['city'];
@@ -588,7 +594,7 @@ SELECT count(id)
     $params['total'] = CRM_Core_DAO::singleValueQuery($query, $whereParams);
 
     $this->_pager = new CRM_Utils_Pager($params);
-    $this->assign_by_ref('pager', $this->_pager);
+    $this->assign('pager', $this->_pager);
   }
 
   /**

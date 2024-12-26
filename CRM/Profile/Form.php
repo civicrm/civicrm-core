@@ -58,6 +58,9 @@ class CRM_Profile_Form extends CRM_Core_Form {
    * The group id that we are passing in url.
    *
    * @var int
+   *
+   * @deprecated
+   * @internal
    */
   public $_grid;
 
@@ -154,6 +157,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
   protected $_deleteButtonName = NULL;
 
   protected $_customGroupId = NULL;
+
+  protected $_mail;
 
   protected $_currentUserID = NULL;
   protected $_session = NULL;
@@ -473,11 +478,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
           }
 
         }
-        elseif (!empty($this->_multiRecordFields)
-          && (!$this->_multiRecord || !in_array($this->_multiRecord, [
-            CRM_Core_Action::DELETE,
-            CRM_Core_Action::UPDATE,
-          ]))
+        elseif (!empty($this->_multiRecordFields) &&
+          (!$this->_multiRecord || !in_array($this->_multiRecord, [CRM_Core_Action::DELETE, CRM_Core_Action::UPDATE]))
         ) {
           CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js', 1, 'html-header');
           //multi-record listing page
@@ -485,11 +487,15 @@ class CRM_Profile_Form extends CRM_Core_Form {
           $page = new CRM_Profile_Page_MultipleRecordFieldsListing();
           $cs = $this->get('cs');
           $page->set('pageCheckSum', $cs);
-          $page->set('contactId', $this->_id);
-          $page->set('profileId', $this->_gid);
+          $page->_contactId = $this->_id;
+          $page->setProfileID($this->_gid);
           $page->set('action', CRM_Core_Action::BROWSE);
-          $page->set('multiRecordFieldListing', $multiRecordFieldListing);
-          $page->run();
+          $action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, FALSE);
+          // assign vars to templates
+          $page->assign('action', $action);
+          $page->_pageViewType = 'profileDataView';
+
+          $page->browse();
         }
       }
 
@@ -808,7 +814,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
       // if we are a admin OR the same user OR acl-user with access to the profile
       // or we have checksum access to this contact (i.e. the user without a login) - CRM-5909
       if (
-        CRM_Core_Permission::check('administer users') ||
+        CRM_Core_Permission::check('cms:administer users') ||
         $this->_id == $this->_currentUserID ||
         $this->_isPermissionedChecksum ||
         in_array(
@@ -817,7 +823,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
             CRM_Core_Permission::EDIT,
             NULL,
             'civicrm_uf_group',
-            CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id')
+            CRM_Core_DAO_UFField::buildOptions('uf_group_id')
           )
         )
       ) {
@@ -889,10 +895,10 @@ class CRM_Profile_Form extends CRM_Core_Form {
     $this->setDefaultsValues();
 
     $action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, NULL);
+    $this->assign('showCMS', FALSE);
     if ($this->_mode == self::MODE_CREATE || $this->_mode == self::MODE_EDIT) {
       CRM_Core_BAO_CMSUser::buildForm($this, $this->_gid, $emailPresent, $action);
     }
-    $this->assign('showCMS', FALSE);
 
     $this->assign('groupId', $this->_gid);
 

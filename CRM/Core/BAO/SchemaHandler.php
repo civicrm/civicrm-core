@@ -39,6 +39,8 @@
  */
 class CRM_Core_BAO_SchemaHandler {
 
+  const DEFAULT_COLLATION = 'utf8mb4_unicode_ci';
+
   /**
    * Create a CiviCRM-table
    *
@@ -95,8 +97,28 @@ class CRM_Core_BAO_SchemaHandler {
         $sql .= self::buildForeignKeySQL($field, $separator, '', $params['name']);
       }
     }
+    $params['attributes'] ??= '';
+    if (!str_contains(strtoupper($params['attributes']), 'COLLATE')) {
+      $params['attributes'] .= self::defaultAttributes();
+    }
     $sql .= "\n) {$params['attributes']};";
     return $sql;
+  }
+
+  public static function defaultAttributes(): string {
+    $collation = self::getInUseCollation();
+    $characterSet = 'utf8';
+    if (stripos($collation, 'utf8mb4') !== FALSE) {
+      $characterSet = 'utf8mb4';
+    }
+    $attributes = " ENGINE=InnoDB DEFAULT CHARACTER SET {$characterSet} COLLATE {$collation}";
+
+    // If on MySQL 5.6 include ROW_FORMAT=DYNAMIC to fix unit tests
+    $databaseVersion = CRM_Utils_SQL::getDatabaseVersion();
+    if (version_compare($databaseVersion, '5.7', '<') && version_compare($databaseVersion, '5.6', '>=')) {
+      $attributes .= ' ROW_FORMAT=DYNAMIC';
+    }
+    return $attributes;
   }
 
   /**
@@ -113,9 +135,10 @@ class CRM_Core_BAO_SchemaHandler {
     $sql .= $prefix;
     $sql .= "`{$params['name']}` {$params['type']}";
 
-    if (!empty($params['required'])) {
-      $sql .= " NOT NULL";
-    }
+    // explicitly set NULL attribute for non-required fields to work around
+    // MySQL's special handling of timestamp columns
+    // see https://dev.mysql.com/doc/refman/8.4/en/timestamp-initialization.html
+    $sql .= empty($params['required']) ? ' NULL' : ' NOT NULL';
 
     if (!empty($params['attributes'])) {
       $sql .= " {$params['attributes']}";
@@ -318,31 +341,35 @@ ADD UNIQUE INDEX `unique_entity_id` ( `entity_id` )";
   /**
    * Create indexes.
    *
-   * @param $tables
+   * @param array $tables
    *   Tables to create index for in the format:
    *     ['civicrm_entity_table' => ['entity_id']]
    *     OR
-   *     array['civicrm_entity_table' => array['entity_id', 'entity_table']]
+   *     array['civicrm_entity_table' => [['entity_id', 'entity_table']]
    *   The latter will create a combined index on the 2 keys (in order).
    *
-   *  Side note - when creating combined indexes the one with the most variation
+   *  Side note - when creating combined indexes the one with the most
+   *   variation
    *  goes first  - so entity_table always goes after entity_id.
    *
-   *  It probably makes sense to consider more sophisticated options at some point
-   *  but at the moment this is only being as enhanced as fast as the test is.
-   *
-   * @todo add support for length & multilingual on combined keys.
+   *  It probably makes sense to consider more sophisticated options at some
+   *   point but at the moment this is only being as enhanced as fast as the
+   *   test is.
    *
    * @param string $createIndexPrefix
    * @param array $substrLengths
+   *
+   * @throws \Civi\Core\Exception\DBQueryException
+   * @todo add support for length & multilingual on combined keys.
+   *
    */
-  public static function createIndexes($tables, $createIndexPrefix = 'index', $substrLengths = []) {
+  public static function createIndexes(array $tables, string $createIndexPrefix = 'index', array $substrLengths = []): void {
     $queries = [];
     $locales = CRM_Core_I18n::getMultilingual();
 
-    // if we're multilingual, cache the information on internationalised fields
+    // If we're multilingual, cache the information on internationalised fields.
     static $columns = NULL;
-    if (!CRM_Utils_System::isNull($locales) and $columns === NULL) {
+    if ($columns === NULL && !CRM_Utils_System::isNull($locales)) {
       $columns = CRM_Core_I18n_SchemaStructure::columns();
     }
 
@@ -785,7 +812,7 @@ MODIFY      {$columnName} varchar( $length )
    *
    * @return bool
    */
-  public static function migrateUtf8mb4($revert = FALSE, $patterns = ['civicrm\_%'], $databaseList = NULL) {
+  public static function migrateUtf8mb4($revert = FALSE, $patterns = [], $databaseList = NULL) {
     $newCharSet = $revert ? 'utf8' : 'utf8mb4';
     $newCollation = $revert ? 'utf8_unicode_ci' : 'utf8mb4_unicode_ci';
     $newBinaryCollation = $revert ? 'utf8_bin' : 'utf8mb4_bin';
@@ -795,6 +822,8 @@ MODIFY      {$columnName} varchar( $length )
 
     $tableNameLikePatterns = [];
     $logTableNameLikePatterns = [];
+
+    $patterns = $patterns ?: CRM_Core_DAO::getTableNames();
 
     foreach ($patterns as $pattern) {
       $pattern = CRM_Utils_Type::escape($pattern, 'String');
@@ -897,7 +926,7 @@ MODIFY      {$columnName} varchar( $length )
     if (!isset(\Civi::$statics[__CLASS__][__FUNCTION__])) {
       $dao = CRM_Core_DAO::executeQuery('SHOW TABLE STATUS LIKE \'civicrm_contact\'');
       $dao->fetch();
-      \Civi::$statics[__CLASS__][__FUNCTION__] = $dao->Collation;
+      \Civi::$statics[__CLASS__][__FUNCTION__] = $dao->Collation ?? self::DEFAULT_COLLATION;
     }
     return \Civi::$statics[__CLASS__][__FUNCTION__];
   }

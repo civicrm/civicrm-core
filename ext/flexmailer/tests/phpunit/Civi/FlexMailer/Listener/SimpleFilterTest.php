@@ -49,10 +49,7 @@ class SimpleFilterTest extends \CiviUnitTestCase {
     SimpleFilter::byValue($e, 'text', function ($value, $t, $e) use ($test) {
       $test->assertInstanceOf('Civi\FlexMailer\FlexMailerTask', $t);
       $test->assertInstanceOf('Civi\FlexMailer\Event\ComposeBatchEvent', $e);
-      $test->assertTrue(in_array($value, [
-        'eat more cheese',
-        'eat more ice cream',
-      ]));
+      $test->assertTrue(in_array($value, ['eat more cheese', 'eat more ice cream']));
       return preg_replace('/more/', 'thoughtfully considered quantities of', $value);
     });
 

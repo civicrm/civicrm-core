@@ -63,7 +63,7 @@
                   <th>{ts}Type{/ts}</th>
                   <th>{ts}ID{/ts}</th>
                   <th id="nosort">{ts}Used For{/ts}</th>
-                  <th></th>
+                  <th><span class="sr-only">{ts}Actions{/ts}</span></th>
                 </tr>
               </thead>
               <tbody>
@@ -108,7 +108,7 @@
                   <th>{ts}Type{/ts}</th>
                   <th>{ts}ID{/ts}</th>
                   <th id="nosort">{ts}Used For{/ts}</th>
-                  <th></th>
+                  <th><span class="sr-only">{ts}Actions{/ts}</span></th>
                 </tr>
               </thead>
               <tbody>

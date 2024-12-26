@@ -47,7 +47,7 @@
         <tr class="crm-relationship-form-block-is_permission_b_a">
           <td class="label"> </td>
           <td>
-            {ts 1=$contact_b|ucfirst 2=$display_name_a}Permission for <strong>%1</strong> to access information about <strong>%2</strong>{/ts}<br />
+            {ts 1=$contact_b|capitalize 2=$display_name_a}Permission for <strong>%1</strong> to access information about <strong>%2</strong>{/ts}<br />
             {$form.is_permission_b_a.html}
           </td>
         </tr>
@@ -56,13 +56,13 @@
           <td>{$form.is_active.html}</td>
         </tr>
       </table>
-      <div id="customData"></div>
+      <div id="customData_Relationship" class="crm-customData-block"></div>
       <div class="spacer"></div>
     </div>
   {/if}
   {if ($action EQ 1) OR ($action EQ 2)}
     {*include custom data js file *}
-    {include file="CRM/common/customData.tpl"}
+    {include file="CRM/common/customDataBlock.tpl" groupID='' customDataType='Relationship' cid=false}
     <script type="text/javascript">
       {literal}
       CRM.$(function($) {

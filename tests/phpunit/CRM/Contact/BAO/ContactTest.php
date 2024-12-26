@@ -91,7 +91,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $this->assertEquals('1', $contact->do_not_trade, 'Check for do_not_trade creation.');
     $this->assertEquals('1', $contact->is_opt_out, 'Check for is_opt_out creation.');
     $this->assertEquals($params['external_identifier'], $contact->external_identifier, 'Check for external_identifier creation.');
-    $this->assertEquals($params['last_name'] . ', ' . $params['first_name'], $contact->sort_name, 'Check for sort_name creation.');
+    $this->assertEquals($params['last_name'] . ', ' . $params['first_name'] . ' Sr.', $contact->sort_name, 'Check for sort_name creation.');
 
     $this->assertEquals($params['contact_source'], $contact->source, 'Check for contact_source creation.');
     $this->assertEquals($params['prefix_id'], $contact->prefix_id, 'Check for prefix_id creation.');
@@ -474,28 +474,6 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     // Cleanup DB by deleting the contact.
     $this->contactDelete($contactId);
     $this->quickCleanup(['civicrm_contact', 'civicrm_note']);
-  }
-
-  /**
-   * Test case for resolveDefaults( ).
-   *
-   * @todo the resolveDefaults function is on it's way out - so is this test...
-   *
-   * Test all pseudoConstant, stateProvince, country.
-   */
-  public function testResolveDefaults(): void {
-    $params = [];
-
-    $params['address'][1] = [
-      'location_type_id' => 1,
-      'is_primary' => 1,
-      'country_id' => 1228,
-      'state_province_id' => 1004,
-    ];
-    // @todo - we are testing this with $reverse = FALSE but it is never called that way!
-    CRM_Contact_BAO_Contact::resolveDefaults($params);
-
-    $this->assertEquals(1004, $params['address'][1]['state_province_id']);
   }
 
   /**
@@ -1185,8 +1163,8 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     //get display name.
     $dbDisplayName = CRM_Contact_BAO_Contact::displayName($contactId);
 
-    $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
-    $suffix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id');
+    $prefix = CRM_Contact_DAO_Contact::buildOptions('prefix_id');
+    $suffix = CRM_Contact_DAO_Contact::buildOptions('suffix_id');
 
     //build display name
     $paramsDisplayName = $prefix[$params['prefix_id']] . ' ' . $params['first_name'] . ' ' . $params['last_name'] . ' ' . $suffix[$params['suffix_id']];
@@ -1214,8 +1192,8 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
 
     $checkImage = CRM_Contact_BAO_Contact_Utils::getImage($params['contact_type'], FALSE, $contactId);
 
-    $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
-    $suffix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id');
+    $prefix = CRM_Contact_DAO_Contact::buildOptions('prefix_id');
+    $suffix = CRM_Contact_DAO_Contact::buildOptions('suffix_id');
 
     //build display name
     $paramsDisplayName = $prefix[$params['prefix_id']] . ' ' . $params['first_name'] . ' ' . $params['last_name'] . ' ' . $suffix[$params['suffix_id']];

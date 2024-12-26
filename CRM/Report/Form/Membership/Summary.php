@@ -314,16 +314,12 @@ LEFT  JOIN civicrm_contribution  {$this->_aliases['civicrm_contribution']}
     }
     $this->formatDisplay($rows);
 
-    $this->assign_by_ref('columnHeaders', $this->_columnHeaders);
-    $this->assign_by_ref('rows', $rows);
+    $this->assign('columnHeaders', $this->_columnHeaders);
+    $this->assign('rows', $rows);
     $this->assign('statistics', $this->statistics($rows));
 
     if (!empty($this->_params['charts'])) {
-      foreach ([
-        'receive_date',
-        $this->_interval,
-        'value',
-      ] as $ignore) {
+      foreach (['receive_date', $this->_interval, 'value'] as $ignore) {
         unset($graphRows[$ignore][$count - 1]);
       }
 

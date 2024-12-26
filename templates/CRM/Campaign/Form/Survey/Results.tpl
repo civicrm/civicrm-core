@@ -20,8 +20,8 @@
     {* Create Report *}
     <tr id='showoption'>
       <td colspan="2">
-        <div id="new-group" class="crm-accordion-wrapper">
-          <div class="crm-accordion-header">{ts}Create Report{/ts}</div>
+        <details id="new-group" class="crm-accordion-bold" open>
+          <summary>{ts}Create Report{/ts}</summary>
           <div class="crm-accordion-body">
             <table class="form-layout-compressed">
               <tr>
@@ -34,7 +34,7 @@
               </tr>
             </table>
           </div>
-        </div>
+        </details>
       </td>
     </tr>
   </table>

@@ -28,6 +28,7 @@ class Euro5990 extends \Civi\Test\EntityExample {
       'net_amount' => 5990,
       'currency' => 'EUR',
       'source' => 'Online donation',
+      'invoice_number' => 56789,
       'amount_level' => 'premium purchased',
       'contribution_recur_id' => 50,
       'check_number' => '',

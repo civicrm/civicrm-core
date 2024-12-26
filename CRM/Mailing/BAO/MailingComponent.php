@@ -58,7 +58,7 @@ class CRM_Mailing_BAO_MailingComponent extends CRM_Mailing_DAO_MailingComponent 
 
     $component->copyValues($params);
     if (empty($id) && empty($params['body_text'])) {
-      $component->body_text = CRM_Utils_String::htmlToText(CRM_Utils_Array::value('body_html', $params));
+      $component->body_text = CRM_Utils_String::htmlToText($params['body_html'] ?? '');
     }
 
     if ($component->is_default) {

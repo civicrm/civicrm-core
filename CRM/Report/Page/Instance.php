@@ -58,7 +58,7 @@ class CRM_Report_Page_Instance extends CRM_Core_Page {
       $templateInfo['name'] = $reportClass;
     }
 
-    if (strstr($templateInfo['name'], '_Form') || !is_null($reportClass)) {
+    if (str_contains($templateInfo['name'], '_Form') || !is_null($reportClass)) {
       $instanceInfo = [];
       CRM_Report_BAO_ReportInstance::retrieve(['id' => $instanceId], $instanceInfo);
 

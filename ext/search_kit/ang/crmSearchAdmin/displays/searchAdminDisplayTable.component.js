@@ -56,7 +56,8 @@
         // Displays created prior to 5.43 may not have this property
         ctrl.display.settings.classes = ctrl.display.settings.classes || [];
         // Table can be draggable if the main entity is a SortableEntity.
-        ctrl.canBeDraggable = _.includes(searchMeta.getEntity(ctrl.apiEntity).type, 'SortableEntity');
+        ctrl.sortableEntity = _.includes(searchMeta.getEntity(ctrl.apiEntity).type, 'SortableEntity');
+        ctrl.hierarchicalEntity = _.includes(searchMeta.getEntity(ctrl.apiEntity).type, 'HierarchicalEntity');
         ctrl.parent.initColumns({label: true, sortable: true});
       };
 
@@ -71,7 +72,7 @@
           _.each(ctrl.display.settings.columns, function(col) {
             if (col.type === 'field') {
               col.tally = {
-                fn: searchMeta.getDefaultAggregateFn(searchMeta.parseExpr(ctrl.parent.getExprFromSelect(col.key)))
+                fn: searchMeta.getDefaultAggregateFn(searchMeta.parseExpr(ctrl.parent.getExprFromSelect(col.key)), ctrl.apiParams)
               };
             }
           });

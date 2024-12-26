@@ -20,16 +20,15 @@
 
   <div class="crm-block crm-content-block">
     <div id="new-menu-item">
-      {crmButton p="civicrm/admin/menu" q="action=add&reset=1" id="newMenuItem" icon="plus-circle" style="margin-left: 6px;"}{ts}Add Menu Item{/ts}{/crmButton}
+      {crmButton p="civicrm/admin/menu/item" q="action=add&reset=1" id="newMenuItem" icon="plus-circle" style="margin-left: 6px;"}{ts}Add Menu Item{/ts}{/crmButton}
     </div>
     <div class="spacer"></div>
     <div style="padding-left: 48px;"><img src="{$config->resourceBase}i/logo_sm.png" /></div>
-    <div id="navigation-tree" class="navigation-tree" style="height:auto; border-collapse:separate; background-color:#FFFFFF;"></div>
+    <div id="navigation-tree" class="navigation-tree"></div>
     <div class="spacer"></div>
     <div>
       <a href="#" class="nav-reset crm-hover-button">
-        {* TODO: fa-broom would be better, but not implemented yet. https://github.com/FortAwesome/Font-Awesome/issues/239 *}
-        <i class="crm-i fa-undo" aria-hidden="true"></i> {ts}Cleanup reports menu{/ts}
+        <i class="crm-i fa-broom" aria-hidden="true"></i> {ts}Cleanup reports menu{/ts}
       </a>
     </div>
     <div class="spacer"></div>
@@ -118,7 +117,7 @@
         } else {
           args.id = nodeID;
         }
-        CRM.loadForm(CRM.url('civicrm/admin/menu', args)).on('crmFormSuccess', function() {
+        CRM.loadForm(CRM.url('civicrm/admin/menu/item', args)).on('crmFormSuccess', function() {
           $("#navigation-tree").jstree(true).refresh();
           refreshMenubar();
         });

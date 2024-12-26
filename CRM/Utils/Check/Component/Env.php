@@ -9,6 +9,9 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Extension;
+use Psr\Log\LogLevel;
+
 /**
  *
  * @package CRM
@@ -200,7 +203,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       return $messages;
     }
 
-    list($domainEmailName, $domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
+    [$domainEmailName, $domainEmailAddress] = CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
     $domain        = CRM_Core_BAO_Domain::getDomain();
     $domainName    = $domain->name;
     $fixEmailUrl   = CRM_Utils_System::url("civicrm/admin/options/from_email_address", "&reset=1");
@@ -243,16 +246,16 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
    * @param bool $force
    * @return CRM_Utils_Check_Message[]
    */
-  public function checkDefaultMailbox($force = FALSE) {
+  public function checkDefaultMailbox($force = FALSE): array {
     $messages = [];
 
     // CiviMail doesn't work in non-production environments; skip.
-    if (!$force && CRM_Core_Config::environment() != 'Production') {
+    if (!$force && CRM_Core_Config::environment() !== 'Production') {
       return $messages;
     }
 
     if (CRM_Core_Component::isEnabled('CiviMail') &&
-      CRM_Core_BAO_MailSettings::defaultDomain() == "EXAMPLE.ORG"
+      CRM_Core_BAO_MailSettings::defaultDomain() === "EXAMPLE.ORG"
     ) {
       $message = new CRM_Utils_Check_Message(
         __FUNCTION__,
@@ -591,8 +594,8 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
         $e->getMessage(),
-        ts('Extension download error'),
-        \Psr\Log\LogLevel::ERROR,
+        ts('Unable to get updates to extensions'),
+        \Psr\Log\LogLevel::WARNING,
         'fa-plug'
       );
       return $messages;
@@ -766,11 +769,11 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     $messages = [];
 
     $setting = Civi::settings()->get('enable_components');
-    $exts = \Civi\Api4\Extension::get(FALSE)
+    $exts = Extension::get(FALSE)
       ->addWhere('key', 'LIKE', 'civi_%')
       ->addWhere('status', '=', 'installed')
       ->execute()
-      ->indexBy('key')->column('status');
+      ->column('status', 'key');
     if (empty($setting) || empty($exts)) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
@@ -855,6 +858,31 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         ['path' => 'civicrm/admin/extensions/upgrade', 'query' => ['reset' => 1, 'destination' => CRM_Utils_System::url('civicrm/a/#/status')]]
       );
       return [$message];
+    }
+    return [];
+  }
+
+  /**
+   * Checks if logging is enabled but Civi-report is not.
+   *
+   * @return CRM_Utils_Check_Message[]
+   * @throws \CRM_Core_Exception
+   */
+  public function checkLoggingHasCiviReport(): array {
+    if (Civi::settings()->get('logging')) {
+      $isEnabledCiviReport = (bool) Extension::get(FALSE)
+        ->addWhere('key', '=', 'civi_report')
+        ->addWhere('status', '=', 'installed')
+        ->execute()->countFetched();
+      return $isEnabledCiviReport ? [] : [
+        new CRM_Utils_Check_Message(
+          __FUNCTION__,
+          ts('You have enabled detailed logging but to display this in the change log tab CiviReport must be enabled'),
+          ts('CiviReport required to display detailed logging.'),
+          LogLevel::WARNING,
+          'fa-plug'
+        ),
+      ];
     }
     return [];
   }
@@ -1092,21 +1120,60 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     return $messages;
   }
 
-  public function checkPHPIntlExists() {
+  public function checkPHPIntlExists(): array {
     $messages = [];
     if (!extension_loaded('intl')) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
         ts('This system currently does not have the PHP-Intl extension enabled.  Please contact your system administrator about getting the extension enabled.'),
         ts('Missing PHP Extension: INTL'),
-        \Psr\Log\LogLevel::WARNING,
+        LogLevel::WARNING,
         'fa-server'
       );
     }
     return $messages;
   }
 
-  public function checkAngularModuleSettings() {
+  /**
+   * Let people know if they could improve performance by defining the exclude directory.
+   *
+   * @return array
+   */
+  public function checkExcludeDirectories(): array {
+    $messages = [];
+    if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN' && !defined('CIVICRM_EXCLUDE_DIRS_PATTERN')) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('You can improve performance by defining the CIVICRM_EXCLUDE_DIRS_PATTERN in your civicrm.settings.php file.') . '<br />' . CRM_Utils_System::docURL2('sysadmin/setup/optimizations/#exclude-dirs-that-do-not-need-to-be-scanned'),
+        ts('Performance can be improved by configuring the exclude directories path'),
+        LogLevel::NOTICE,
+        'fa-flag'
+      );
+    }
+    return $messages;
+  }
+
+  /**
+   * Let people know if they could improve performance by defining the template compile check.
+   *
+   * @return array
+   */
+  public function checkTemplateCompileCheck(): array {
+    $messages = [];
+    $isProbablyDevelopmentSite = str_contains(CIVICRM_UF_BASEURL, 'localhost') || str_contains(CIVICRM_UF_BASEURL, 'staging') || str_contains(CIVICRM_UF_BASEURL, 'dev');
+    if (!defined('CIVICRM_TEMPLATE_COMPILE_CHECK') && !$isProbablyDevelopmentSite && !\Civi::settings()->get('debug_enabled')) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('You can improve performance on production sites by specifying the CIVICRM_TEMPLATE_COMPILE_CHECK in the civicrm.settings.php file.') . '<br />' . CRM_Utils_System::docURL2('sysadmin/setup/optimizations/#disable-compile-check'),
+        ts('Performance can be improved on live sites by defining the template compile check'),
+        LogLevel::NOTICE,
+        'fa-flag'
+      );
+    }
+    return $messages;
+  }
+
+  public function checkAngularModuleSettings(): array {
     $messages = [];
     $modules = Civi::container()->get('angular')->getModules();
     foreach ($modules as $name => $module) {
@@ -1119,12 +1186,66 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
             3 => 'target="_blank" href="https://github.com/civicrm/civicrm-core/pull/19052"',
           ]),
           ts('Unsupported Angular Setting'),
-          \Psr\Log\LogLevel::WARNING,
+          LogLevel::WARNING,
           'fa-code'
         );
       }
     }
     return $messages;
+  }
+
+  public function checkForMultipleL10NDirs(): array {
+    $messages = [];
+    $dirs = [];
+
+    // This is what civi thinks is the current l10n path.
+    // Even if the site is currently en_US, we still want to do this check
+    // since they could change the language later.
+    $current_l10n = self::normalizePath(\Civi::Paths()->getPath('[civicrm.l10n]/'));
+    if (is_dir($current_l10n)) {
+      // use array keys instead of values to automatically dedupe paths
+      $dirs[$current_l10n] = 1;
+    }
+
+    // check the traditional path under civicrm_root
+    $traditional = self::normalizePath(\Civi::Paths()->getPath('[civicrm.root]/l10n'));
+    if (is_dir($traditional)) {
+      $dirs[$traditional] = 1;
+    }
+
+    $private = self::normalizePath(\Civi::Paths()->getPath('[civicrm.private]/l10n'));
+    if (is_dir($private)) {
+      $dirs[$private] = 1;
+    }
+
+    // @todo where else to check? CIVICRM_L10N_BASEDIR is covered by [civicrm.l10n] above.
+
+    if (count($dirs) > 1) {
+      $dirlist = '';
+      foreach (array_keys($dirs) as $dir) {
+        $dirlist .= '<li>' . htmlspecialchars($dir) . '</li>';
+      }
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('There are multiple l10n directories, listed below. The one that appears to be in use is %1. You may wish to remove the others to avoid confusion when updating translation files.', [1 => $current_l10n])
+          . '<p><ul>' . $dirlist . '</ul></p>',
+        ts('Multiple l10n Directories'),
+        LogLevel::WARNING,
+        'fa-files-o'
+      );
+    }
+    return $messages;
+  }
+
+  /**
+   * Avoid issues with trailing slashes and mixed separators on windows.
+   *
+   * @param string $path
+   *
+   * @return string
+   */
+  private static function normalizePath($path): string {
+    return rtrim(str_replace(DIRECTORY_SEPARATOR, '/', $path), '/');
   }
 
 }

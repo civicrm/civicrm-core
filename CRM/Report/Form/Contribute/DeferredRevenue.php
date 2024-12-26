@@ -352,7 +352,7 @@ class CRM_Report_Form_Contribute_DeferredRevenue extends CRM_Report_Form {
    * @param int|null $rowCount
    */
   public function limit($rowCount = NULL) {
-    $rowCount = $rowCount ?? $this->getRowCount();
+    $rowCount ??= $this->getRowCount();
     $this->_limit = NULL;
   }
 

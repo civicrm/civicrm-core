@@ -59,13 +59,6 @@ class CRM_UF_Form_AdvanceSetting extends CRM_UF_Form_Group {
     $config = CRM_Core_Config::singleton();
     $form->addElement('advcheckbox', 'is_uf_link', ts('Include %1 user account information links in search results?', [1 => $config->userFramework]));
 
-    // want to create cms user
-    $session = CRM_Core_Session::singleton();
-    $cmsId = FALSE;
-    if ($form->_cId = $session->get('userID')) {
-      $form->_cmsId = TRUE;
-    }
-
     $form->addRadio('is_cms_user', ts('%1 user account registration option?', [1 => $config->userFramework]), [ts('No account create option'), ts('Give option, but not required'), ts('Account creation required')]);
 
     // options for including Proximity Search in the profile search form

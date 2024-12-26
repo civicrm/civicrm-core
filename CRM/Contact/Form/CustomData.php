@@ -83,24 +83,20 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
    * Gets session variables for table name, id of entity in table, type of entity and stores them.
    */
   public function preProcess() {
-    $this->_cdType = $_GET['type'] ?? NULL;
-    $this->assign('cdType', FALSE);
+    $this->_cdType = CRM_Utils_Request::retrieve('type', 'String', $this, FALSE, NULL);
     $this->_multiRecordDisplay = CRM_Utils_Request::retrieve('multiRecordDisplay', 'String', $this);
-    if ($this->_cdType || $this->_multiRecordDisplay == 'single') {
-      if ($this->_cdType) {
-        $this->assign('cdType', TRUE);
-      }
+    $isBuildForm = $this->_cdType && $this->_multiRecordDisplay;
+    $this->assign('cdType', (bool) $this->_cdType);
+    // This will be false if display type is tab and it's not multivalued.
+    if ($isBuildForm) {
       // NOTE : group id is not stored in session from within CRM_Custom_Form_CustomData::preProcess func
       // this is due to some condition inside it which restricts it from saving in session
       // so doing this for multi record edit action
       $entityId = CRM_Utils_Request::retrieve('entityID', 'Positive', $this);
-      if (!empty($entityId)) {
-        $subType = CRM_Contact_BAO_Contact::getContactSubType($entityId, ',');
-      }
-      CRM_Custom_Form_CustomData::preProcess($this, NULL, $subType, NULL, CRM_Utils_Request::retrieve('type', 'String', $this), $entityId);
+      $this->preProcessCustomData(NULL, CRM_Utils_Request::retrieve('type', 'String', $this), $entityId);
       if ($this->_multiRecordDisplay) {
         $this->_groupID = CRM_Utils_Request::retrieve('groupID', 'Positive', $this);
-        $this->_tableID = $this->_entityId;
+        $this->_tableID = $entityId;
         $this->_contactType = CRM_Contact_BAO_Contact::getContactType($this->_tableID);
         $mode = CRM_Utils_Request::retrieve('mode', 'String', $this);
         $hasReachedMax = CRM_Core_BAO_CustomGroup::hasReachedMaxLimit($this->_groupID, $this->_tableID);
@@ -126,6 +122,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
 
         if (!empty($_POST['hidden_custom'])) {
           $this->assign('postedInfo', TRUE);
+          CRM_Core_Error::deprecatedWarning("I'm kinda confused - how did we get here?");
         }
       }
       return;
@@ -143,10 +140,110 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
     // when custom data is included in this page
     if (!empty($_POST['hidden_custom'])) {
       for ($i = 1; $i <= $_POST['hidden_custom_group_count'][$this->_groupID]; $i++) {
-        CRM_Custom_Form_CustomData::preProcess($this, NULL, $this->_contactSubType, $i, $this->_contactType, $this->_tableID);
-        CRM_Custom_Form_CustomData::buildQuickForm($this);
-        CRM_Custom_Form_CustomData::setDefaultValues($this);
+        $this->preProcessCustomData($i, $this->_contactType, $this->_tableID);
+        $this->addElement('hidden', 'hidden_custom', 1);
+        $this->addElement('hidden', "hidden_custom_group_count[{$this->_groupID}]", $this->_groupCount);
+        CRM_Core_BAO_CustomGroup::buildQuickForm($this, $this->_groupTree);
       }
+    }
+  }
+
+  /**
+   * Previously shared function
+   *
+   * @param null|int $groupCount
+   * @param null $type
+   * @param null|int $entityID
+   *
+   * @throws \CRM_Core_Exception
+   * @deprecated see https://github.com/civicrm/civicrm-core/pull/29241 for preferred approach - basically
+   * 1) at the tpl layer use CRM/common/customDataBlock.tpl
+   * 2) to make the fields available for postProcess
+   * if ($this->isSubmitted()) {
+   *   $this->addCustomDataFieldsToForm('FinancialAccount');
+   * }
+   * 3) pass getSubmittedValues() to CRM_Core_BAO_CustomField::postProcess($this->getSubmittedValues(), $this->_id, 'FinancialAccount');
+   *  to ensure any money or number fields are handled for localisation
+   */
+  private function preProcessCustomData($groupCount = NULL, $type = NULL, $entityID = NULL) {
+    $form = $this;
+
+    $extendsEntityColumn = CRM_Utils_Request::retrieve('subName', 'String', $form);
+    if ($extendsEntityColumn === 'null') {
+      // Is this reachable?
+      $extendsEntityColumn = NULL;
+    }
+
+    if ($groupCount) {
+      $form->_groupCount = $groupCount;
+    }
+    else {
+      $form->_groupCount = CRM_Utils_Request::retrieve('cgcount', 'Positive', $form);
+    }
+
+    $form->assign('cgCount', $form->_groupCount);
+
+    //carry qf key, since this form is not inhereting core form.
+    if ($qfKey = CRM_Utils_Request::retrieve('qfKey', 'String')) {
+      $form->assign('qfKey', $qfKey);
+    }
+
+    if ($entityID) {
+      $form->_entityId = $entityID;
+    }
+    else {
+      $form->_entityId = CRM_Utils_Request::retrieve('entityID', 'Positive', $form);
+    }
+
+    $typeCheck = CRM_Utils_Request::retrieve('type', 'String');
+    $urlGroupId = CRM_Utils_Request::retrieve('groupID', 'Positive');
+    if (isset($typeCheck) && $urlGroupId) {
+      $form->_groupID = $urlGroupId;
+    }
+    else {
+      $form->_groupID = CRM_Utils_Request::retrieve('groupID', 'Positive', $form);
+    }
+
+    $gid = (isset($form->_groupID)) ? $form->_groupID : NULL;
+
+    $singleRecord = NULL;
+    if (!empty($form->_groupCount) && !empty($form->_multiRecordDisplay) && $form->_multiRecordDisplay == 'single') {
+      $singleRecord = $form->_groupCount;
+    }
+    $mode = CRM_Utils_Request::retrieve('mode', 'String', $form);
+    // when a new record is being added for multivalued custom fields.
+    if (isset($form->_groupCount) && $form->_groupCount == 0 && $mode == 'add' &&
+      !empty($form->_multiRecordDisplay) && $form->_multiRecordDisplay == 'single') {
+      $singleRecord = 'new';
+    }
+
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree($type,
+      NULL,
+      $form->_entityId,
+      $gid,
+      CRM_Contact_BAO_Contact::getContactSubType($entityID),
+      $extendsEntityColumn,
+      TRUE,
+      NULL,
+      FALSE,
+      CRM_Core_Permission::EDIT,
+      $singleRecord
+    );
+
+    if (property_exists($form, '_customValueCount') && !empty($groupTree)) {
+      $form->_customValueCount = CRM_Core_BAO_CustomGroup::buildCustomDataView($form, $groupTree, TRUE, NULL, NULL, NULL, $form->_entityId);
+    }
+    // we should use simplified formatted groupTree
+    $groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, $form->_groupCount, $form);
+
+    if (isset($form->_groupTree) && is_array($form->_groupTree)) {
+      $keys = array_keys($groupTree);
+      foreach ($keys as $key) {
+        $form->_groupTree[$key] = $groupTree[$key];
+      }
+    }
+    else {
+      $form->_groupTree = $groupTree;
     }
   }
 
@@ -182,7 +279,10 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
           ]);
         }
       }
-      return CRM_Custom_Form_CustomData::buildQuickForm($this);
+      $this->addElement('hidden', 'hidden_custom', 1);
+      $this->addElement('hidden', "hidden_custom_group_count[{$this->_groupID}]", $this->_groupCount);
+      CRM_Core_BAO_CustomGroup::buildQuickForm($this, $this->_groupTree);
+      return;
     }
 
     //need to assign custom data type and subtype to the template
@@ -239,7 +339,8 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
         }
       }
       else {
-        $customDefaultValue = CRM_Custom_Form_CustomData::setDefaultValues($this);
+        $customDefaultValue = [];
+        CRM_Core_BAO_CustomGroup::setDefaults($this->_groupTree, $customDefaultValue, FALSE, FALSE, $this->get('action'));
       }
       return $customDefaultValue;
     }
@@ -266,15 +367,14 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
    */
   public function postProcess() {
     // Get the form values and groupTree
-    //CRM-18183
-    $params = $this->controller->exportValues($this->_name);
+    $params = $this->getSubmittedValues();
 
     CRM_Core_BAO_CustomValueTable::postProcess($params,
       'civicrm_contact',
       $this->_tableID,
       $this->_entityType
     );
-    $table = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_groupID, 'table_name');
+    $table = CRM_Core_BAO_CustomGroup::getGroup(['id' => $this->_groupID])['table_name'];
     $cgcount = CRM_Core_BAO_CustomGroup::customGroupDataExistsForEntity($this->_tableID, $table, TRUE);
     $cgcount += 1;
     $buttonName = $this->controller->getButtonName();

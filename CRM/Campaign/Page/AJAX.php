@@ -21,6 +21,7 @@
 class CRM_Campaign_Page_AJAX {
 
   public static function registerInterview() {
+    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
     $fields = [
       'result',
       'voter_id',
@@ -127,10 +128,7 @@ class CRM_Campaign_Page_AJAX {
     }
 
     //format multi-select group and contact types.
-    foreach ([
-      'group',
-      'contact_type',
-    ] as $param) {
+    foreach (['group', 'contact_type'] as $param) {
       $paramValue = $params[$param] ?? NULL;
       if ($paramValue) {
         unset($params[$param]);
@@ -293,7 +291,7 @@ class CRM_Campaign_Page_AJAX {
       );
       while ($result->fetch()) {
         $contactID = $result->contact_id;
-        $typeImage = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ? $result->contact_sub_type : $result->contact_type,
+        $typeImage = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ?: $result->contact_type,
           FALSE,
           $result->contact_id
         );

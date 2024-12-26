@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Extension;
+
 /**
  * This class contains generic upgrade logic which runs regardless of version.
  */
@@ -26,21 +28,19 @@ class CRM_Upgrade_Incremental_General {
    * The point release will be dropped in recommendations unless it's .1 or
    * higher.
    */
-  const RECOMMENDED_PHP_VER = '8.1.0';
+  const RECOMMENDED_PHP_VER = '8.3.0';
 
   /**
    * The minimum recommended PHP version.
    *
    * A site running an earlier version will be told to upgrade.
    */
-  const MIN_RECOMMENDED_PHP_VER = '8.0.0';
+  const MIN_RECOMMENDED_PHP_VER = '8.1.0';
 
   /**
    * The minimum PHP version required to install Civi.
-   *
-   * @see install/index.php
    */
-  const MIN_INSTALL_PHP_VER = '7.3.0';
+  const MIN_INSTALL_PHP_VER = '7.4.0';
 
   /**
    * The minimum recommended MySQL version.
@@ -51,8 +51,6 @@ class CRM_Upgrade_Incremental_General {
 
   /**
    * The minimum MySQL version required to install Civi.
-   *
-   * @see install/index.php
    */
   const MIN_INSTALL_MYSQL_VER = '5.7';
 
@@ -133,15 +131,6 @@ class CRM_Upgrade_Incremental_General {
       $preUpgradeMessage .= '<br />' . ts('This database uses InnoDB Full Text Search for optimized searching. The upgrade procedure has not been tested with this feature. You should disable (and later re-enable) the feature by navigating to "Administer => Customize Data and Screens => Search Preferences".');
     }
 
-    $ftAclSetting = Civi::settings()->get('acl_financial_type');
-    $financialAclExtension = civicrm_api3('extension', 'get', ['key' => 'biz.jmaconsulting.financialaclreport', 'sequential' => 1]);
-    if ($ftAclSetting && (($financialAclExtension['count'] == 1 && $financialAclExtension['values'][0]['status'] != 'Installed') || $financialAclExtension['count'] !== 1)) {
-      $preUpgradeMessage .= '<br />' . ts('CiviCRM will in the future require the extension %1 for CiviCRM Reports to work correctly with the Financial Type ACLs. The extension can be downloaded <a href="%2">here</a>', [
-        1 => 'biz.jmaconsulting.financialaclreport',
-        2 => 'https://github.com/JMAConsulting/biz.jmaconsulting.financialaclreport',
-      ]);
-    }
-
     $snapshotIssues = CRM_Upgrade_Snapshot::getActivationIssues();
     if ($snapshotIssues) {
       $preUpgradeMessage .= '<details>';
@@ -183,6 +172,16 @@ class CRM_Upgrade_Incremental_General {
     ]) . '<ul>' . implode('', $messagesHtml) . '</ul>';
 
     $messageObj->updateTemplates();
+  }
+
+  private static function isExtensionInstalled(string $key): bool {
+    $extension = Extension::get(FALSE)
+      ->addWhere('key', '=', $key)
+      ->addWhere('status', '=', 'Installed')
+      ->selectRowCount()
+      ->execute();
+
+    return $extension->countMatched() === 1;
   }
 
 }

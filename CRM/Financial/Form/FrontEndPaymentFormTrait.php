@@ -113,7 +113,7 @@ trait CRM_Financial_Form_FrontEndPaymentFormTrait {
    * @param array $tplLineItems
    */
   protected function alterLineItemsForTemplate(&$tplLineItems) {
-    if (!CRM_Invoicing_Utils::isInvoicingEnabled()) {
+    if (!\Civi::settings()->get('invoicing')) {
       return;
     }
     // @todo this should really be the first time we are determining
@@ -128,7 +128,7 @@ trait CRM_Financial_Form_FrontEndPaymentFormTrait {
         if (isset($v['tax_rate']) && $v['tax_rate'] != '') {
           // These only need assigning once, but code is more readable with them here
           $this->assign('getTaxDetails', TRUE);
-          $this->assign('taxTerm', CRM_Invoicing_Utils::getTaxTerm());
+          $this->assign('taxTerm', \Civi::settings()->get('tax_term'));
           // Cast to float to display without trailing zero decimals
           $tplLineItems[$key][$k]['tax_rate'] = (float) $v['tax_rate'];
         }

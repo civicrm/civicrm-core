@@ -194,10 +194,6 @@
     margin-top: 1em;
     border-top: 1px solid #d3d3d3;
   }
-  .api-doc-code .collapsible-title {
-    font-weight: bold;
-    margin-top: .5em;
-  }
   .doc-filename {
     text-align: right;
     font-style: italic;
@@ -265,8 +261,8 @@
         <input type="checkbox" class="crm-form-checkbox api-param-checkbox api-input" id="sequential-checkbox" name="sequential" checked="checked" value="1">sequential
       </label>
 
-      <div id="api-join" class="crm-form-block crm-collapsible collapsed" style="display:none;">
-        <h4 class="collapsible-title">{ts}Join on:{/ts} {help id='api-join'}</h4>
+      <div id="api-join" class="crm-form-block">
+        <h4>{ts}Join on:{/ts} {help id='api-join'}</h4>
         <div></div>
       </div>
 
@@ -370,7 +366,7 @@
       {/literal}
         <select class="crm-form-select api-param-op">
           {foreach from=$operators item='op'}
-            <option value="{$op|htmlspecialchars}">{$op|htmlspecialchars}</option>
+            <option value="{$op|escape}">{$op|escape}</option>
           {/foreach}
         </select>
       {literal}
@@ -438,13 +434,13 @@
 </script>
 
 <script type="text/template" id="doc-code-tpl">
-  <div class="crm-collapsible collapsed api-doc-code">
-    <div class="collapsible-title">{ts}Source Code{/ts}</div>
-    <div>
+  <details class="api-doc-code">
+    <summary>{ts}Source Code{/ts}</summary>
+    <div class="crm-accordion-body">
       <div class="doc-filename"><%- file %></div>
       <pre class="lang-php linenums"><%- code %></pre>
     </div>
-  </div>
+  </details>
 </script>
 
 <script type="text/template" id="join-tpl">

@@ -107,11 +107,11 @@ trait ArrayQueryActionTrait {
   /**
    * @param array $row
    * @param array $condition
-   * @param int $index
+   * @param int|null $index
    * @return bool
    * @throws \Civi\API\Exception\NotImplementedException
    */
-  public static function filterCompare(array $row, array $condition, int $index = NULL): bool {
+  public static function filterCompare(array $row, array $condition, ?int $index = NULL): bool {
     $value = $row[$condition[0]] ?? NULL;
     $operator = $condition[1];
     $expected = $condition[2] ?? NULL;
@@ -119,10 +119,21 @@ trait ArrayQueryActionTrait {
     if (isset($index) && is_array($value) && $operator !== 'IN' && $operator !== 'NOT IN') {
       $value = $value[$index] ?? NULL;
     }
+    return self::compareValues($value, $operator, $expected);
+  }
+
+  public static function compareValues($value, string $operator, $expected): bool {
     switch ($operator) {
       case '=':
       case '!=':
       case '<>':
+        // For parity with SQL operators, do case-insensitive matching
+        if (is_string($value)) {
+          $value = strtolower($value);
+        }
+        if (is_string($expected)) {
+          $expected = strtolower($expected);
+        }
         $equal = $value == $expected;
         // PHP is too imprecise about comparing the number 0
         if ($expected === 0 || $expected === '0') {
@@ -161,6 +172,9 @@ trait ArrayQueryActionTrait {
 
       case 'LIKE':
       case 'NOT LIKE':
+        if ($value === NULL) {
+          return FALSE;
+        }
         $pattern = '/^' . str_replace('%', '.*', preg_quote($expected, '/')) . '$/i';
         return !preg_match($pattern, $value) == ($operator != 'LIKE');
 
@@ -168,6 +182,10 @@ trait ArrayQueryActionTrait {
       case 'NOT REGEXP':
       case 'REGEXP BINARY':
       case 'NOT REGEXP BINARY':
+        if ($value === NULL) {
+          return FALSE;
+        }
+
         // Perform case-sensitive matching for BINARY operator, otherwise insensitive
         $i = str_ends_with($operator, 'BINARY') ? '' : 'i';
         $pattern = '/' . str_replace('/', '\\/', $expected) . "/$i";

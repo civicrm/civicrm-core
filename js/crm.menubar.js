@@ -145,6 +145,12 @@
     },
     spin: function(spin) {
       $('.crm-logo-sm', '#civicrm-menu').toggleClass('fa-spin', spin);
+      // Sometimes the logo does not stop spinning (ex: file downloads)
+      if (spin) {
+        window.setTimeout(function() {
+          CRM.menubar.spin(false);
+        }, 10000);
+      }
     },
     getItem: function(itemName) {
       return traverse(CRM.menubar.data.menu, itemName, 'get');
@@ -411,7 +417,7 @@
           label = $selection.parent().text(),
           // Set name because the mini-form submits directly to adv search
           value = $selection.data('advSearchLegacy') || $selection.val();
-        $('#crm-qsearch-input').attr({name: value, placeholder: '\uf002 ' + label});
+        $('#crm-qsearch-input').attr({name: value, placeholder: '\uf002 ' + label, title: label});
       }
       $('.crm-quickSearchField').click(function() {
         var input = $('input', this);
@@ -448,7 +454,7 @@
         '<label class="crm-menubar-toggle-btn" for="crm-menubar-state">' +
           '<span class="crm-menu-logo"></span>' +
           '<span class="crm-menubar-toggle-btn-icon"></span>' +
-          '<%- ts("Toggle main menu") %>' +
+          '<span class="sr-only"><%- ts("Toggle main menu") %></span>' +
         '</label>' +
         '<ul id="civicrm-menu" class="sm sm-civicrm">' +
           '<%= searchTpl({items: search}) %>' +

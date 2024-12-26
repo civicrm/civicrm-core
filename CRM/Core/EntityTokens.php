@@ -17,6 +17,7 @@ use Civi\Token\TokenRow;
 use Civi\ActionSchedule\Event\MailingQueryEvent;
 use Civi\Token\TokenProcessor;
 use Brick\Money\Money;
+use Brick\Math\RoundingMode;
 
 /**
  * Class CRM_Core_EntityTokens
@@ -126,7 +127,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
       }
 
       return $row->format('text/plain')->tokens($entity, $field,
-        Money::of($fieldValue, $currency));
+        Money::of($fieldValue, $currency, NULL, RoundingMode::HALF_UP));
 
     }
     if ($this->isDateField($field)) {
@@ -306,7 +307,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @internal function will likely be protected soon.
    */
   protected function getPseudoValue(string $realField, string $pseudoKey, $fieldValue): string {
-    $bao = CRM_Core_DAO_AllCoreTables::getFullName($this->getMetadataForField($realField)['entity']);
+    $bao = CRM_Core_DAO_AllCoreTables::getDAONameForEntity($this->getMetadataForField($realField)['entity']);
     if ($pseudoKey === 'name') {
       // There is a theoretical possibility fieldValue could be an array but
       // specifically for preferred communication type - but real world usage
@@ -362,9 +363,13 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @return bool
    */
   public function checkActive(TokenProcessor $processor) {
+    $isEntityEnabled = in_array($this->getApiEntityName(), array_keys(\Civi::service('action_object_provider')->getEntities()));
+    if (!$isEntityEnabled) {
+      return FALSE;
+    }
     return ((!empty($processor->context['actionMapping'])
         // This makes the 'schema context compulsory - which feels accidental
-      && $processor->context['actionMapping']->getEntityName()) || in_array($this->getEntityIDField(), $processor->context['schema'])) && in_array($this->getApiEntityName(), array_keys(\Civi::service('action_object_provider')->getEntities()));
+      && $processor->context['actionMapping']->getEntityName()) || in_array($this->getEntityIDField(), $processor->context['schema']));
   }
 
   /**
@@ -435,7 +440,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     // 'not a real field' offered up by case - seems like an oddity
     // we should skip at the top level for now.
     $fields = ['tags'];
-    if (!CRM_Campaign_BAO_Campaign::isComponentEnabled()) {
+    if (!CRM_Core_Component::isEnabled('CiviCampaign')) {
       $fields[] = 'campaign_id';
     }
     return $fields;
@@ -641,7 +646,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     if ($field['type'] !== 'Custom' && !$isExposed) {
       return;
     }
-    $field['audience'] = $field['audience'] ?? 'user';
+    $field['audience'] ??= 'user';
     if ($field['name'] === 'contact_id') {
       // Since {contact.id} is almost always present don't confuse users
       // by also adding (e.g {participant.contact_id)
@@ -713,6 +718,9 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @throws \CRM_Core_Exception
    */
   protected function getRelatedTokensForEntity(string $entity, string $joinField, array $tokenList, $hiddenTokens = []): array {
+    if (!array_key_exists($entity, \Civi::service('action_object_provider')->getEntities())) {
+      return [];
+    }
     $apiParams = ['checkPermissions' => FALSE];
     if ($tokenList !== ['*']) {
       $apiParams['where'] = [['name', 'IN', $tokenList]];

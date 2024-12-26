@@ -15,12 +15,7 @@ class OAuthContactToken extends Generic\DAOEntity {
   public static function permissions(): array {
     return [
       'meta' => ['access CiviCRM'],
-      'default' => [
-        [
-          'manage my OAuth contact tokens',
-          'manage all OAuth contact tokens',
-        ],
-      ],
+      'default' => ['manage my OAuth contact tokens'],
     ];
   }
 

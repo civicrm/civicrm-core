@@ -8,10 +8,10 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-activity-selector-{$context}">
-  <div class="crm-accordion-wrapper crm-search_filters-accordion">
-    <div class="crm-accordion-header">
+  <details class="crm-accordion-bold crm-search_filters-accordion" open>
+    <summary>
     {ts}Filter by Activity{/ts}
-    </div><!-- /.crm-accordion-header -->
+    </summary>
     <div class="crm-accordion-body">
       <form><!-- form element is here to fool the datepicker widget -->
       <table class="no-border form-layout-compressed activity-search-options">
@@ -22,17 +22,15 @@
           <td class="crm-contact-form-block-activity_type_exclude_filter_id crm-inline-edit-field">
             {$form.activity_type_exclude_filter_id.label}<br /> {$form.activity_type_exclude_filter_id.html|crmAddClass:medium}
           </td>
-          <td>
-            {include file="CRM/Core/DatePickerRange.tpl" fieldName="activity_date_time"}
-          </td>
+          {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="activity_date_time" hideRelativeLabel=false}
           <td class="crm-contact-form-block-activity_status_filter_id crm-inline-edit-field">
-            <label>{ts}Status{/ts}</label><br /> {$form.status_id.html|crmAddClass:medium}
+            <label for="status_id">{ts}Status{/ts}</label><br /> {$form.status_id.html|crmAddClass:medium}
           </td>
         </tr>
       </table>
       </form>
-    </div><!-- /.crm-accordion-body -->
-  </div><!-- /.crm-accordion-wrapper -->
+    </div>
+  </details>
   <table class="contact-activity-selector-{$context} crm-ajax-table" style="width: 100%;">
     <thead>
     <tr>

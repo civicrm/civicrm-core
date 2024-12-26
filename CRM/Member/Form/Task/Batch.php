@@ -39,6 +39,8 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
    */
   protected $_userContext;
 
+  private array $_fields;
+
   /**
    * Build all the data structures needed to build the form.
    *
@@ -80,7 +82,6 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
     $this->setTitle($this->_title);
 
     $this->addDefaultButtons(ts('Save'));
-    $this->_fields = [];
     $this->_fields = CRM_Core_BAO_UFGroup::getFields($ufGroupId, FALSE, CRM_Core_Action::VIEW);
 
     // remove file type field and then limit fields
@@ -206,7 +207,7 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
    * @return mixed
    * @throws \CRM_Core_Exception
    */
-  public function submit(array $params) {
+  protected function submit(array $params) {
     $dates = [
       'membership_join_date',
       'membership_start_date',

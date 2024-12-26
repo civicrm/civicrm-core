@@ -123,7 +123,7 @@
           <tr class="crm-localization-form-block-makeSinglelingual">
               <td class="label">{$form.makeSinglelingual.label}</td>
               <td>{$form.makeSinglelingual.html}<br />
-              <span class="description">{ts}Check this box and click 'Save' to switch this installation from multi- to single-language.{/ts}</span><br /><br />
+              <span class="description">{ts}Check this box and click 'Save' to switch this installation from multi-language to single-language.{/ts}</span><br /><br />
               <span class="description font-red">{$warning}</span></td>
           </tr>
         {elseif $form.makeMultilingual}

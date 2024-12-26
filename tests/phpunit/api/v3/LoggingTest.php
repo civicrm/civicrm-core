@@ -401,6 +401,8 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
 
   /**
    * Test changes can be retrieved.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testGet(): void {
     $contactId = $this->individualCreate();
@@ -417,13 +419,15 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
     ]);
     $this->callAPISuccessGetSingle('email', ['email' => 'dopey@mail.com']);
     $diffs = $this->callAPISuccess('Logging', 'get', ['log_conn_id' => 'wooty woot', 'log_date' => $timeStamp], __FUNCTION__, __FILE__);
-    $this->assertLoggingIncludes($diffs['values'], ['to' => 'Dwarf, Dopey']);
+    $this->assertLoggingIncludes($diffs['values'], ['to' => 'Dwarf, Dopey II']);
     $this->assertLoggingIncludes($diffs['values'], ['to' => 'Mr. Dopey Dwarf II', 'table' => 'civicrm_contact', 'action' => 'Update', 'field' => 'display_name']);
     $this->assertLoggingIncludes($diffs['values'], ['to' => 'dopey@mail.com', 'table' => 'civicrm_email', 'action' => 'Insert', 'field' => 'email']);
   }
 
   /**
    * Test changes can be retrieved without log_date being required.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testGetNoDate(): void {
     $contactId = $this->individualCreate();
@@ -440,7 +444,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
     ]);
     $this->callAPISuccessGetSingle('email', ['email' => 'dopey@mail.com']);
     $diffs = $this->callAPISuccess('Logging', 'get', ['log_conn_id' => 'wooty wop wop']);
-    $this->assertLoggingIncludes($diffs['values'], ['to' => 'Dwarf, Dopey']);
+    $this->assertLoggingIncludes($diffs['values'], ['to' => 'Dwarf, Dopey II']);
     $this->assertLoggingIncludes($diffs['values'], ['to' => 'Mr. Dopey Dwarf II', 'table' => 'civicrm_contact', 'action' => 'Update', 'field' => 'display_name']);
     $this->assertLoggingIncludes($diffs['values'], ['to' => 'dopey@mail.com', 'table' => 'civicrm_email', 'action' => 'Insert', 'field' => 'email']);
   }

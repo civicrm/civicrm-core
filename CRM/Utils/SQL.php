@@ -57,7 +57,7 @@ class CRM_Utils_SQL {
    * @return array
    */
   public static function mergeSubquery($entityName, $joinColumn = 'id') {
-    $baoName = CRM_Core_DAO_AllCoreTables::getBAOClassName(CRM_Core_DAO_AllCoreTables::getFullName($entityName));
+    $baoName = CRM_Core_DAO_AllCoreTables::getBAOClassName(CRM_Core_DAO_AllCoreTables::getDAONameForEntity($entityName));
     $bao = new $baoName();
     $fields = $bao::getSupportedFields();
     $mergeClauses = $subClauses = [];

@@ -512,11 +512,15 @@ class QueueTest extends Api4TestBase {
     ]);
     $this->assertQueueStats(0, 0, 0, $queue);
 
+    $cid = $this->createLoggedInUser();
+
     $userJob = \Civi\Api4\UserJob::create(FALSE)->setValues([
       'job_type:name' => 'contact_import',
       'status_id:name' => 'in_progress',
       'queue_id.name' => $queue->getName(),
     ])->execute()->single();
+
+    $this->assertEquals($cid, $userJob['created_id']);
 
     \Civi::queue($queueName)->createItem(new \CRM_Queue_Task(
       [QueueTest::class, 'doSomething'],

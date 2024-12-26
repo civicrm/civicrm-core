@@ -918,13 +918,11 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
     $form->addRule('contribution_amount_high', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency('99.99')]), 'money');
 
     // Adding select option for curreny type -- CRM-4711
-    $form->add('select', 'contribution_currency_type',
+    $form->add('select2', 'contribution_currency_type',
       ts('Currency Type'),
-      [
-        '' => ts('- any -'),
-      ] +
-      CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'currency', ['labelColumn' => 'name']),
-      FALSE, ['class' => 'crm-select2']
+      Civi::entity('Contribution')->getOptions('currency', [], FALSE, TRUE),
+      FALSE,
+      ['placeholder' => ts('- any -')]
     );
 
     // CRM-13848

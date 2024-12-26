@@ -67,6 +67,11 @@ class AutocompleteFieldSubscriber extends AutoService implements EventSubscriber
           $apiRequest->addFilter($key, $value);
         }
 
+        // Use FK key from fieldSpec, e.g. custom Autocomplete field keys by 'value' not 'id'
+        if (!$apiRequest->getKey() && !empty($fieldSpec['fk_column'])) {
+          $apiRequest->setKey($fieldSpec['fk_column']);
+        }
+
         if ($formType === 'qf') {
           $this->autocompleteProfilePermissions($apiRequest, $formName, $fieldSpec);
         }

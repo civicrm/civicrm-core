@@ -43,11 +43,11 @@
   </div>
   <table class="form-layout-compressed">
     <tr>
-      <td class="label"><strong>{if $component eq 'event'}{ts}Participant{/ts}{else}{ts}Contact{/ts}{/if}</strong></td><td><strong>{$displayName}</strong></td>
+      <td class="label"><strong>{if $component eq 'event'}{ts}Participant{/ts}{else}{ts}Contact{/ts}{/if}</strong></td><td><strong>{$displayName|escape}</strong></td>
     </tr>
     {if $eventName}
       <tr>
-        <td class='label'>{ts}Event{/ts}</td><td>{$eventName}</td>
+        <td class='label'>{ts}Event{/ts}</td><td>{$eventName|escape}</td>
       </tr>
     {/if}
     <tr class="crm-payment-form-block-total_amount">
@@ -61,12 +61,12 @@
             {$form.is_email_receipt.label}
           </td>
           <td>{$form.is_email_receipt.html}
-              <span class="description">{ts 1=$email}Automatically email a receipt to %1?{/ts}</span>
+              <span class="description">{ts 1=$email|escape}Automatically email a receipt to %1?{/ts}</span>
           </td>
         </tr>
         <tr id="fromEmail" class="crm-payment-form-block-from_email_address" style="display:none;">
           <td class="label">{$form.from_email_address.label}</td>
-          <td>{$form.from_email_address.html} {help id="id-from_email" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp"}</td>
+          <td>{$form.from_email_address.html} {help id="id-from_email" file="CRM/Contact/Form/Task/Help/Email/id-from_email.hlp" title=$form.from_email_address.label}</td>
         </tr>
       {/if}
       {if $contributionMode}
@@ -75,11 +75,11 @@
     </tr>
    </table>
 
-    <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed" id="paymentDetails_Information">
+    <details class="crm-accordion-bold crm-accordion_title-accordion crm-accordion-processed" id="paymentDetails_Information" open>
       {if !$contributionMode}
-      <div class="crm-accordion-header">
+      <summary>
         {if $paymentType EQ 'refund'}{ts}Refund Details{/ts}{else}{ts}Payment Details{/ts}{/if}
-      </div>
+      </summary>
       <div class="crm-accordion-body">
         <table class="form-layout-compressed" >
           <tr class="crm-payment-form-block-trxn_date">
@@ -97,14 +97,15 @@
           </tr>
           <tr class="crm-payment-form-block-fee_amount">
             <td class="label">{$form.fee_amount.label}</td>
-            <td{$valueStyle}>{$form.fee_amount.html}</td>
+            <td>{$form.fee_amount.html}</td>
           </tr>
         </table>
       </div>
       {/if}
-      {include file='CRM/Core/BillingBlockWrapper.tpl'}
-    </div>
+      {include file='CRM/Core/BillingBlockWrapper.tpl' currency=false}
+    </details>
 
+    {include file="CRM/common/customDataBlock.tpl" customDataType='FinancialTrxn'}
     {literal}
     <script type="text/javascript">
       CRM.$(function($) {

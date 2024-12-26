@@ -25,3 +25,13 @@ input[type="search"]::-webkit-search-cancel-button {
   font-size: inherit;
   font-weight: normal;
 }
+/* Bootstrap3 styles these as block which is non-compliant with html standards */
+summary {
+  display: list-item;
+}
+/* Reset breaky stuff from some cms themes: https://lab.civicrm.org/dev/core/-/issues/5561 */
+legend {
+  position: initial;
+  text-transform: inherit;
+  float: none;
+}

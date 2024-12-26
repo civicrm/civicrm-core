@@ -71,13 +71,6 @@
      <page_callback>CRM_Core_BAO_File::deleteAttachment</page_callback>
   </item>
   <item>
-     <path>civicrm/friend</path>
-     <title>Tell a Friend</title>
-     <page_callback>CRM_Friend_Form</page_callback>
-     <access_callback>1</access_callback>
-     <is_public>true</is_public>
-  </item>
-  <item>
      <path>civicrm/logout</path>
      <title>Log out</title>
      <page_callback>CRM_Utils_System::logout</page_callback>
@@ -194,6 +187,13 @@
     <access_arguments>*always allow*</access_arguments>
   </item>
   <item>
+    <path>civicrm/dev/rtf</path>
+    <page_callback>CRM_Core_Page_RemoteTestFunction</page_callback>
+    <title>Remote Test Function</title>
+    <is_public>true</is_public>
+    <access_arguments>*always allow*</access_arguments>
+  </item>
+  <item>
     <path>civicrm/profile-editor/schema</path>
     <page_callback>CRM_UF_Page_ProfileEditor::getSchemaJSON</page_callback>
     <title>ProfileEditor</title>
@@ -289,6 +289,16 @@
   <item>
     <path>civicrm/note</path>
     <page_callback>CRM_Note_Form_Note</page_callback>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/task/delete-permanently</path>
+    <page_callback>CRM_Contact_Form_Task_Delete</page_callback>
+    <access_arguments>access deleted contacts</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/task/restore-contact</path>
+    <page_callback>CRM_Contact_Form_Task_Delete</page_callback>
     <access_arguments>access CiviCRM</access_arguments>
   </item>
 </menu>

@@ -15,6 +15,58 @@
  */
 class CRM_Price_BAO_PriceSetTest extends CiviUnitTestCase {
 
+  public function testGetCachedPriceSetDetail(): void {
+    $priceSetId = \Civi\Api4\PriceSet::create(FALSE)
+      ->addValue('name', 'Contribution Price Set')
+      ->addValue('title', 'contribution_price_set')
+      ->addValue('extends:name', ['CiviContribute'])
+      ->execute()
+      ->first()['id'];
+    // The last shall be last and the first shall be first.
+    \Civi\Api4\PriceField::create()
+      ->addValue('price_set_id', $priceSetId)
+      ->addValue('name', 'last')
+      ->addValue('label', 'Last')
+      ->addValue('html_type', 'Radio')
+      ->addValue('weight', 2)
+      ->execute();
+    $radioPriceFieldId = \Civi\Api4\PriceField::create()
+      ->addValue('price_set_id', $priceSetId)
+      ->addValue('name', 'first')
+      ->addValue('label', 'First')
+      ->addValue('html_type', 'Text')
+      ->addValue('weight', 1)
+      ->execute()
+      ->first()['id'];
+
+    // Test for price field values as well.
+    \Civi\Api4\PriceFieldValue::create()
+      ->addValue('price_field_id', $radioPriceFieldId)
+      ->addValue('label', 'Radio 2')
+      ->addValue('amount', '2')
+      ->addValue('weight', 2)
+      ->addValue('financial_type_id', 1)
+      ->execute();
+    \Civi\Api4\PriceFieldValue::create()
+      ->addValue('price_field_id', $radioPriceFieldId)
+      ->addValue('label', 'Radio 1')
+      ->addValue('amount', '1')
+      ->addValue('weight', 1)
+      ->addValue('financial_type_id', 1)
+      ->execute();
+    $priceSet = CRM_Price_BAO_PriceSet::getCachedPriceSetDetail($priceSetId);
+    $firstPriceField = array_values($priceSet['fields'])[0];
+    $secondPriceField = array_values($priceSet['fields'])[1];
+    $this->assertEquals(1, $firstPriceField['weight']);
+    $this->assertEquals(2, $secondPriceField['weight']);
+
+    $priceValues = $priceSet['fields'][$radioPriceFieldId]['options'];
+    $firstPriceFieldValue = array_values($priceValues)[0];
+    $secondPriceFieldValue = array_values($priceValues)[1];
+    $this->assertEquals(1, $firstPriceFieldValue['weight']);
+    $this->assertEquals(2, $secondPriceFieldValue['weight']);
+  }
+
   /**
    * Test the correct amount level is returned for an event which is not presented as a price set event.
    *

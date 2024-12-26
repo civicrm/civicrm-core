@@ -1,0 +1,20 @@
+<div class="help">
+
+  <div>{{:: ts('You can configure one or more Label Formats for your CiviCRM installation. Label Formats are used when creating mailing labels.')}}<br/>
+{{:: ts('You can change which fields are printed on each label in')}} <a ng-href="{{ crmUrl('civicrm/admin/setting/preferences/address?reset=1') }}">{{:: ts('Address Settings')}}</a>.</div>
+
+</div>
+<div crm-ui-tab-set="">
+
+  <div af-fieldset="" crm-ui-tab="" crm-title="ts('Mailing Labels')" id="tab-mailinglabels">
+    <div class="af-markup">
+      <crm-search-display-table search-name="Label_Formats" display-name="Label_Formats_Table_1" filters="{'option_group_id:name': 'label_format'}"/>
+    </div>
+  </div>
+  <div af-fieldset="" crm-ui-tab="" crm-title="ts('Name Badges')" id="tab-namebadge">
+    <div class="af-markup">
+      <crm-search-display-table search-name="Label_Formats" display-name="Label_Formats_Table_1" filters="{'option_group_id:name': 'name_badge'}"/>
+    </div>
+  </div>
+
+</div>

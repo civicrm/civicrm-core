@@ -58,7 +58,7 @@ class CRM_Contribute_Form_ContributionPageTranslationTest extends CiviUnitTestCa
       'is_credit_card_only' => '',
     ];
 
-    $contributionPage = CRM_Contribute_BAO_ContributionPage::create($params);
+    $contributionPage = CRM_Contribute_BAO_ContributionPage::writeRecord($params);
 
     // The BAO does not save these
     $params['id'] = $contributionPage->id;

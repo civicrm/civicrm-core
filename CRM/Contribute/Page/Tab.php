@@ -269,15 +269,12 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
   private function addRecurringContributionsBlock() {
     [$activeContributions, $activeContributionsCount] = $this->getActiveRecurringContributions();
     [$inactiveRecurringContributions, $inactiveContributionsCount] = $this->getInactiveRecurringContributions();
-
-    if (!empty($activeContributions) || !empty($inactiveRecurringContributions)) {
-      // assign vars to templates
-      $this->assign('action', $this->_action);
-      $this->assign('activeRecurRows', $activeContributions);
-      $this->assign('contributionRecurCount', $activeContributionsCount + $inactiveContributionsCount);
-      $this->assign('inactiveRecurRows', $inactiveRecurringContributions);
-      $this->assign('recur', TRUE);
-    }
+    // assign vars to templates
+    $this->assign('action', $this->_action);
+    $this->assign('activeRecurRows', $activeContributions);
+    $this->assign('contributionRecurCount', $activeContributionsCount + $inactiveContributionsCount);
+    $this->assign('inactiveRecurRows', $inactiveRecurringContributions);
+    $this->assign('recur', !empty($activeContributions) || !empty($inactiveRecurringContributions));
   }
 
   /**

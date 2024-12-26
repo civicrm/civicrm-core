@@ -27,6 +27,13 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
 
   protected $_profileId = NULL;
 
+  /**
+   * @param int $profileId
+   */
+  public function setProfileID(int $profileId): void {
+    $this->_profileId = $profileId;
+  }
+
   public $_contactId = NULL;
 
   public $_customGroupTitle = NULL;
@@ -200,7 +207,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
       }
       $this->assign('reachedMax', $reached);
       // custom group info : this consists of the field title of group fields
-      $groupDetail = CRM_Core_BAO_CustomGroup::getGroupDetail($customGroupId, NULL, CRM_Core_DAO::$_nullObject, TRUE);
+      $groupDetail = CRM_Core_BAO_CustomGroup::getCustomGroupDetail($customGroupId, NULL, TRUE);
       // field ids of fields in_selector for the custom group id provided
       $fieldIDs = array_keys($groupDetail[$customGroupId]['fields']);
       // field labels for headers

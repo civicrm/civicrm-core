@@ -202,6 +202,7 @@ return [
                   'text' => E::ts('Clone'),
                   'style' => 'secondary',
                   'path' => 'civicrm/admin/job/edit?action=copy&id=[id]',
+                  'csrf' => 'qfKey',
                   'condition' => [],
                 ],
                 [
@@ -211,7 +212,7 @@ return [
                   'icon' => 'fa-toggle-on',
                   'text' => E::ts('Enable'),
                   'style' => 'default',
-                  'condition' => ['is_active', '=', FALSE],
+                  'condition' => [],
                 ],
                 [
                   'task' => 'disable',
@@ -220,7 +221,7 @@ return [
                   'icon' => 'fa-toggle-off',
                   'text' => E::ts('Disable'),
                   'style' => 'default',
-                  'condition' => ['is_active', '=', TRUE],
+                  'condition' => [],
                 ],
                 [
                   'entity' => 'Job',
@@ -241,6 +242,7 @@ return [
           'classes' => [
             'table',
             'table-striped',
+            'crm-sticky-header',
           ],
         ],
         'acl_bypass' => FALSE,

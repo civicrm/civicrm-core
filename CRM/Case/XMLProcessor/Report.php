@@ -31,6 +31,11 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
   protected $_redactionStringRules = [];
 
   /**
+   * @var array
+   */
+  public $_redactionRegexRules;
+
+  /**
    */
   public function __construct() {
   }
@@ -529,7 +534,7 @@ WHERE      a.id = %1
           if ($value) {
             // Note: this is already taken care in getDisplayValue above, but sometimes
             // strings like '^A^A' creates problem. So to fix this special case -
-            if (strstr($value, CRM_Core_DAO::VALUE_SEPARATOR)) {
+            if (str_contains($value, CRM_Core_DAO::VALUE_SEPARATOR)) {
               $value = trim($value, CRM_Core_DAO::VALUE_SEPARATOR);
             }
             if (($typeValue['type'] ?? NULL) == 'String' ||
@@ -725,7 +730,7 @@ LIMIT  1
    * @param int $caseID
    * @param string $activitySetName
    * @param array $params
-   * @param CRM_Core_Form $form
+   * @param CRM_Case_XMLProcessor_Report $form
    *
    * @return CRM_Core_Smarty
    */
@@ -748,7 +753,7 @@ LIMIT  1
 
     // first get all case information
     $case = $form->caseInfo($clientID, $caseID);
-    $template->assign_by_ref('case', $case);
+    $template->assign('case', $case);
 
     if (($params['include_activities'] ?? NULL) == 1) {
       $template->assign('includeActivities', 'All');
@@ -780,12 +785,12 @@ LIMIT  1
       'includeActivities' => 'All',
       'redact' => 'false',
     ];
-    $template->assign_by_ref('activitySet', $activitySet);
+    $template->assign('activitySet', $activitySet);
 
     //now collect all the information about activities
     $activities = [];
     $form->getActivities($clientID, $caseID, $activityTypes, $activities);
-    $template->assign_by_ref('activities', $activities);
+    $template->assign('activities', $activities);
 
     return $template;
   }
@@ -954,8 +959,7 @@ LIMIT  1
 
     // Retrieve custom values for cases.
     $customValues = CRM_Core_BAO_CustomValueTable::getEntityValues($caseID, 'Case');
-    $extends = ['case'];
-    $groupTree = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, NULL, $extends);
+    $groupTree = CRM_Core_BAO_CustomGroup::getAll(['extends' => ['Case']]);
     $caseCustomFields = [];
     foreach ($groupTree as $gid => $group_values) {
       foreach ($group_values['fields'] as $id => $field_values) {

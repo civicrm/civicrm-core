@@ -118,6 +118,13 @@ abstract class SqlFunction extends SqlExpression {
     if (static::$dataType) {
       $dataType = static::$dataType;
     }
+    elseif (static::$category === self::CATEGORY_AGGREGATE) {
+      $exprArgs = $this->getArgs();
+      // If the first expression is a SqlFunction/SqlEquation, allow it to control the aggregate dataType
+      if (method_exists($exprArgs[0]['expr'][0], 'formatOutputValue')) {
+        $exprArgs[0]['expr'][0]->formatOutputValue($dataType, $values, $key);
+      }
+    }
     if (isset($values[$key]) && $this->suffix && $this->suffix !== 'id') {
       $dataType = 'String';
       $value =& $values[$key];
@@ -161,8 +168,8 @@ abstract class SqlFunction extends SqlExpression {
    * @param string $output
    * @return string
    */
-  protected function renderExpression(string $output): string {
-    return $this->getName() . '(' . $output . ')';
+  public static function renderExpression(string $output): string {
+    return static::getName() . "($output)";
   }
 
   /**
@@ -265,6 +272,28 @@ abstract class SqlFunction extends SqlExpression {
    */
   public function getType(): string {
     return 'SqlFunction';
+  }
+
+  /**
+   * Returns the dataType of rendered output, based on the fields passed into the function
+   *
+   * @param array $fieldSpecs
+   *   List of available fields, e.g. Api4Query::$apiFieldSpec
+   * @return string|null
+   */
+  public function getRenderedDataType(array $fieldSpecs): ?string {
+    $dataType = $this::getDataType();
+    if ($dataType) {
+      return $dataType;
+    }
+    if ($this->getSerialize()) {
+      return 'Array';
+    }
+    $fields = $this->getFields();
+    if (!empty($fields[0])) {
+      return $fieldSpecs[$fields[0]]['data_type'] ?? NULL;
+    }
+    return NULL;
   }
 
   /**

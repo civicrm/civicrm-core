@@ -354,7 +354,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
 
     // Finally update Event params.
     $params['id'] = $this->_id;
-    CRM_Event_BAO_Event::add($params);
+    Event::save(FALSE)->addRecord($params)->execute();
 
     // Update tab "disabled" CSS class.
     $this->ajaxResponse['tabValid'] = TRUE;

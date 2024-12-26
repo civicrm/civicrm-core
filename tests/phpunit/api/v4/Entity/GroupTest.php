@@ -22,11 +22,21 @@ namespace api\v4\Entity;
 use api\v4\Api4TestBase;
 use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Group;
+use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
-class GroupTest extends Api4TestBase {
+class GroupTest extends Api4TestBase implements TransactionalInterface {
+
+  public function testGetFields(): void {
+    $fields = Group::getFields(FALSE)
+      ->execute()->indexBy('name');
+    $this->assertFalse($fields['title']['required']);
+    $this->assertSame('empty($values.frontend_title) && empty($values.name)', $fields['title']['required_if']);
+    $this->assertFalse($fields['frontend_title']['required']);
+    $this->assertSame('empty($values.title)', $fields['frontend_title']['required_if']);
+  }
 
   public function testSmartGroupCache(): void {
     \Civi::settings()->set('smartGroupCacheTimeout', 5);
@@ -88,6 +98,8 @@ class GroupTest extends Api4TestBase {
   }
 
   public function testCreate(): void {
+    \Civi::settings()->set('civimail_workflow', TRUE);
+    \CRM_Core_BAO_ConfigSetting::enableAllComponents();
     $this->createLoggedInUser();
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
       'access CiviCRM',
@@ -182,17 +194,17 @@ class GroupTest extends Api4TestBase {
 
   public function testGetParents(): void {
     $parent1 = Group::create(FALSE)
-      ->addValue('title', uniqid())
+      ->addValue('title', uniqid('e'))
       ->execute()->single();
     $parent2 = Group::create(FALSE)
-      ->addValue('title', uniqid())
+      ->addValue('title', uniqid('b'))
       ->execute()->single();
     $child1 = Group::create(FALSE)
-      ->addValue('title', uniqid())
+      ->addValue('title', uniqid('d'))
       ->addValue('parents', [$parent1['id'], $parent2['id']])
       ->execute()->single();
     $child2 = Group::create(FALSE)
-      ->addValue('title', uniqid())
+      ->addValue('title', uniqid('c'))
       ->addValue('parents', [$parent2['id']])
       ->execute()->single();
 
@@ -235,6 +247,39 @@ class GroupTest extends Api4TestBase {
     $this->assertEquals($child1['title'], $joined[1]['child_group.title']);
     $this->assertEquals($parent2['id'], $joined[2]['id']);
     $this->assertEquals($child2['title'], $joined[2]['child_group.title']);
+
+    // Add a sub-child to increase the depth
+    $subChild = Group::create(FALSE)
+      ->addValue('title', uniqid('a'))
+      ->addValue('parents', [$child2['id']])
+      ->execute()->single();
+
+    // Using hierarchical entity trait, get the _descendents and _depth of each group
+    $herarchical = Group::get(FALSE)
+      ->addWhere('id', 'IN', [$parent1['id'], $parent2['id'], $child1['id'], $child2['id'], $subChild['id']])
+      ->addSelect('id', '_depth', '_descendents')
+      ->addOrderBy('title')
+      ->execute();
+
+    $this->assertCount(5, $herarchical);
+    $this->assertEquals($parent2['id'], $herarchical[0]['id']);
+    $this->assertEquals(0, $herarchical[0]['_depth']);
+    // Parent 2 has 2 descendents; child2 and subChild
+    $this->assertEquals(2, $herarchical[0]['_descendents']);
+    $this->assertEquals($child2['id'], $herarchical[1]['id']);
+    $this->assertEquals(1, $herarchical[1]['_depth']);
+    $this->assertEquals(1, $herarchical[1]['_descendents']);
+    $this->assertEquals($subChild['id'], $herarchical[2]['id']);
+    $this->assertEquals(2, $herarchical[2]['_depth']);
+    $this->assertEquals(0, $herarchical[2]['_descendents']);
+    // Parent1 comes after parent2, alphabetically
+    $this->assertEquals($parent1['id'], $herarchical[3]['id']);
+    $this->assertEquals(0, $herarchical[3]['_depth']);
+    $this->assertEquals(1, $herarchical[3]['_descendents']);
+    // Parent 1 has 1 descendent; child1
+    $this->assertEquals($child1['id'], $herarchical[4]['id']);
+    $this->assertEquals(1, $herarchical[4]['_depth']);
+    $this->assertEquals(0, $herarchical[4]['_descendents']);
   }
 
   public function testAddRemoveParents(): void {

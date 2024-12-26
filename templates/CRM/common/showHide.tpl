@@ -9,8 +9,8 @@
 *}
 {* This included tpl hides and displays the appropriate blocks as directed by the php code which assigns showBlocks and hideBlocks arrays. *}
  <script type="text/javascript">
-    var showBlocks = new Array({$showBlocks|smarty:nodefaults});
-    var hideBlocks = new Array({$hideBlocks|smarty:nodefaults});
+    var showBlocks = new Array({$showBlocks nofilter});
+    var hideBlocks = new Array({$hideBlocks nofilter});
 
     on_load_init_blocks( showBlocks, hideBlocks{if $elemType and $elemType EQ 'table-row'}, 'table-row'{/if} );
  </script>

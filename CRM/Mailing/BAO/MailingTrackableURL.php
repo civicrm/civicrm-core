@@ -141,7 +141,7 @@ class CRM_Mailing_BAO_MailingTrackableURL extends CRM_Mailing_DAO_MailingTrackab
     // Append the tokenised bits and the fragment.
     if ($tokenised_params) {
       // We know the URL will already have the '?'
-      $data .= '&' . implode('&', $tokenised_params);
+      $data .= (str_contains($data, '?') ? '&' : '?') . implode('&', $tokenised_params);
     }
     if (!empty($parsed[3])) {
       $data .= $parsed[3];

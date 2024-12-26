@@ -1,15 +1,17 @@
 <?php
 namespace Civi\Search;
 
-use Civi\Test\HeadlessInterface;
-use Civi\Test\TransactionalInterface;
+use api\v4\Api4TestBase;
+use Civi\Test\CiviEnvBuilder;
+
+require_once __DIR__ . '/../../../../../../tests/phpunit/api/v4/Api4TestBase.php';
 
 /**
  * @group headless
  */
-class AdminTest extends \PHPUnit\Framework\TestCase implements HeadlessInterface, TransactionalInterface {
+class AdminTest extends Api4TestBase {
 
-  public function setUpHeadless() {
+  public function setUpHeadless(): CiviEnvBuilder {
     return \Civi\Test::headless()->installMe(__DIR__)->apply();
   }
 
@@ -124,24 +126,95 @@ class AdminTest extends \PHPUnit\Framework\TestCase implements HeadlessInterface
       'multi' => FALSE,
     ]);
     $this->assertCount(1, $optionValueToGroup);
+
+    // Location joins
+    $addressJoins = \CRM_Utils_Array::findAll($joins['Individual'], [
+      'entity' => 'Address',
+      'multi' => TRUE,
+    ]);
+    $this->assertCount(1, $addressJoins);
+    $this->assertEquals(
+      [['id', '=', 'Contact_Address_contact_id.contact_id']],
+      $addressJoins[0]['conditions']
+    );
+    $this->assertEquals(
+      [['Contact_Address_contact_id.is_primary', '=', TRUE]],
+      $addressJoins[0]['defaults']
+    );
+
+    // LocBlock joins
+    $locBlockAddress = \CRM_Utils_Array::findAll($joins['LocBlock'], [
+      'entity' => 'Address',
+    ]);
+    $this->assertCount(2, $locBlockAddress);
+    $this->assertEquals(
+      [['address_id', '=', 'LocBlock_Address_address_id.id']],
+      $locBlockAddress[0]['conditions']
+    );
+    // Should have no defaults because it's a straight 1-1 join
+    $this->assertEquals(
+      [],
+      $locBlockAddress[0]['defaults']
+    );
   }
 
   public function testEntityRefGetJoins(): void {
-    \Civi\Api4\CustomGroup::create()->setValues([
+    $this->createTestRecord('CustomGroup', [
       'title' => 'EntityRefFields',
       'extends' => 'Individual',
-    ])->execute();
-    \Civi\Api4\CustomField::create()->setValues([
+    ]);
+    $this->createTestRecord('CustomField', [
       'label' => 'Favorite Nephew',
       'name' => 'favorite_nephew',
       'custom_group_id.name' => 'EntityRefFields',
       'html_type' => 'Autocomplete-Select',
       'data_type' => 'EntityReference',
       'fk_entity' => 'Contact',
-    ])->execute();
+    ]);
     $allowedEntities = Admin::getSchema();
     $joins = Admin::getJoins($allowedEntities);
-    $this->assertContains('Contact Favorite Nephew', array_column($joins['Contact'], 'label'));
+
+    $entityRefJoin = \CRM_Utils_Array::findAll($joins['Contact'], ['alias' => 'Contact_Contact_favorite_nephew']);
+    $this->assertCount(1, $entityRefJoin);
+    $this->assertEquals([['EntityRefFields.favorite_nephew', '=', 'Contact_Contact_favorite_nephew.id']], $entityRefJoin[0]['conditions']);
+    $this->assertStringContainsString('Favorite Nephew', $entityRefJoin[0]['label']);
+  }
+
+  public function testMultiRecordCustomGetJoins(): void {
+    $this->createTestRecord('CustomGroup', [
+      'title' => 'Multiple Things',
+      'name' => 'MultiRecordActivity',
+      'extends' => 'Activity',
+      'is_multiple' => TRUE,
+    ]);
+    $this->createTestRecord('CustomField', [
+      'label' => 'Ref Group',
+      'name' => 'ref_group',
+      'custom_group_id.name' => 'MultiRecordActivity',
+      'html_type' => 'Autocomplete-Select',
+      'data_type' => 'EntityReference',
+      'fk_entity' => 'Group',
+    ]);
+    $allowedEntities = Admin::getSchema();
+    $joins = Admin::getJoins($allowedEntities);
+
+    $entityRefJoin = \CRM_Utils_Array::findAll($joins['Custom_MultiRecordActivity'], ['alias' => 'Custom_MultiRecordActivity_Group_ref_group']);
+    $this->assertCount(1, $entityRefJoin);
+    $this->assertEquals([['ref_group', '=', 'Custom_MultiRecordActivity_Group_ref_group.id']], $entityRefJoin[0]['conditions']);
+
+    $reverseJoin = \CRM_Utils_Array::findAll($joins['Group'], ['alias' => 'Group_Custom_MultiRecordActivity_ref_group']);
+    $this->assertCount(1, $reverseJoin);
+    $this->assertEquals([['id', '=', 'Group_Custom_MultiRecordActivity_ref_group.ref_group']], $reverseJoin[0]['conditions']);
+
+    $activityToCustomJoin = \CRM_Utils_Array::findAll($joins['Activity'], ['alias' => 'Activity_Custom_MultiRecordActivity_entity_id']);
+    $this->assertCount(1, $activityToCustomJoin);
+    $this->assertEquals([['id', '=', 'Activity_Custom_MultiRecordActivity_entity_id.entity_id']], $activityToCustomJoin[0]['conditions']);
+    $this->assertEquals('Multiple Things', $activityToCustomJoin[0]['label']);
+
+    $customToActivityJoin = \CRM_Utils_Array::findAll($joins['Custom_MultiRecordActivity'], ['alias' => 'Custom_MultiRecordActivity_Activity_entity_id']);
+    $this->assertCount(1, $customToActivityJoin);
+    $this->assertEquals([['entity_id', '=', 'Custom_MultiRecordActivity_Activity_entity_id.id']], $customToActivityJoin[0]['conditions']);
+    $this->assertEquals('Multiple Things Activity', $customToActivityJoin[0]['label']);
   }
 
 }

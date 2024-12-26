@@ -126,7 +126,7 @@ class CRM_Utils_Time {
    * @return string
    */
   public static function setTime($newDateTime, $returnFormat = 'YmdHis') {
-    $mode = getenv('TIME_FUNC') ? getenv('TIME_FUNC') : 'natural';
+    $mode = getenv('TIME_FUNC') ?: 'natural';
 
     list ($modeName, $modeNum) = explode(":", "$mode:");
 
@@ -198,6 +198,40 @@ class CRM_Utils_Time {
   public static function isEqual($a, $b, $threshold = 0) {
     $diff = strtotime($b) - strtotime($a);
     return (abs($diff) <= $threshold);
+  }
+
+  /**
+   * Get timezone offset from a timezone string
+   *
+   * @return string|false|null
+   */
+  public static function getTimeZoneOffsetFromString(string $timezone) {
+    if ($timezone) {
+      if ($timezone == 'UTC' || $timezone == 'Etc/UTC') {
+        // CRM-17072 Let's short-circuit all the zero handling & return it here!
+        return '+00:00';
+      }
+      $tzObj = new DateTimeZone($timezone);
+      $dateTime = new DateTime("now", $tzObj);
+      $tz = $tzObj->getOffset($dateTime);
+
+      if ($tz === 0) {
+        // CRM-21422
+        return '+00:00';
+      }
+
+      if (empty($tz)) {
+        return FALSE;
+      }
+
+      $timeZoneOffset = sprintf("%02d:%02d", $tz / 3600, abs(($tz / 60) % 60));
+
+      if ($timeZoneOffset > 0) {
+        $timeZoneOffset = '+' . $timeZoneOffset;
+      }
+      return $timeZoneOffset;
+    }
+    return NULL;
   }
 
 }

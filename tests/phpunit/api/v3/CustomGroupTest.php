@@ -160,25 +160,6 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check with extends array length greater than 1
-   */
-  public function testCustomGroupExtendsMultipleCreate(): void {
-    $params = [
-      'title' => 'Test_Group_1',
-      'name' => 'test_group_1',
-      'extends' => ['Individual', 'Household'],
-      'weight' => 4,
-      'collapse_display' => 1,
-      'style' => 'Inline',
-      'help_pre' => 'This is Pre Help For Test Group 1',
-      'help_post' => 'This is Post Help For Test Group 1',
-      'is_active' => 1,
-    ];
-
-    $result = $this->callAPIFailure('custom_group', 'create', $params, 'Supplied Sub type is not valid for the specified entitiy');
-  }
-
-  /**
    * Check with style missing from params array.
    */
   public function testCustomGroupCreateNoStyle(): void {

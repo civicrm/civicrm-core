@@ -7,10 +7,10 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-<div class="crm-accordion-wrapper collapsed">
- <div class="crm-accordion-header">
+<details class="crm-accordion-bold">
+ <summary>
     {ts}Advanced Settings{/ts}
-  </div><!-- /.crm-accordion-header -->
+  </summary>
   <div class="crm-accordion-body">
   <div class="crm-block crm-form-block crm-uf-advancesetting-form-block">
     <table class="form-layout">
@@ -86,8 +86,8 @@
         </tr>
     </table>
     </div><!-- / .crm-block -->
-  </div><!-- /.crm-accordion-body -->
-</div><!-- /.crm-accordion-wrapper -->
+  </div>
+</details>
 {literal}
   <script type="text/javascript">
   CRM.$(function($) {

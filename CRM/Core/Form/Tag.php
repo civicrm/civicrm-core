@@ -19,7 +19,6 @@
  * This class generates form element for free tag widget.
  */
 class CRM_Core_Form_Tag {
-  public $_entityTagValues;
 
   /**
    * Build tag widget if correct parent is passed
@@ -89,7 +88,7 @@ class CRM_Core_Form_Tag {
       $form->_tagsetInfo = $tagset;
       $form->assign("tagsetType", $mode);
       // Merge this tagset info with possibly existing info in the template
-      $tagsetInfo = (array) $form->get_template_vars("tagsetInfo");
+      $tagsetInfo = (array) $form->getTemplateVars("tagsetInfo");
       if (empty($tagsetInfo[$mode])) {
         $tagsetInfo[$mode] = [];
       }

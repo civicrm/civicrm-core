@@ -17,10 +17,12 @@
 {include file="CRM/Mailing/Form/Count.tpl"}
 
 <table class="form-layout-compressed">
+  {if array_key_exists('SMStemplate', $form)}
     <tr class="crm-mailing-upload-form-block-template">
       <td class="label">{$form.SMStemplate.label}</td>
-  <td>{$form.SMStemplate.html}</td>
+      <td>{$form.SMStemplate.html}</td>
     </tr>
+  {/if}
     <tr class="crm-mailing-upload-form-block-upload_type"><td></td><td colspan="2">{$form.upload_type.label} {$form.upload_type.html} {help id="upload-compose"}</td></tr>
 </table>
 

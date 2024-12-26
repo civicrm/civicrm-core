@@ -49,6 +49,15 @@ abstract class AbstractBehavior extends AutoService implements BehaviorInterface
   }
 
   /**
+   * Default mode. If set then mode will not be de-selectable.
+   *
+   * @return string|null
+   */
+  public static function getDefaultMode(): ?string {
+    return NULL;
+  }
+
+  /**
    * Dashed name, name of entity attribute for selected mode
    * @return string
    */

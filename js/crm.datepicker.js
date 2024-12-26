@@ -81,7 +81,10 @@
         // Set placeholder as calendar icon (`fa-calendar` is Unicode f073)
         $dateField.attr({placeholder: placeholder === undefined ? '\uF073' : placeholder}).change(updateDataField);
         if (!placeholder) {
-          $dateField.addClass('crm-placeholder-icon');
+          $dateField.addClass('crm-placeholder-icon').attr('aria-label', ts('Select Date'));
+        }
+        else {
+          $dateField.attr('aria-label', placeholder);
         }
       }
       // Rudimentary validation. TODO: Roll into use of jQUery validate and ui.datepicker.validation

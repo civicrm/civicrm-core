@@ -14,6 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
+use Civi\Api4\MailingComponent;
 
 /**
  * This class generates form components for Location Type.
@@ -35,8 +36,7 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
   protected $_BAOName;
 
   public function preProcess() {
-    $this->_id = $this->get('id');
-    $this->_BAOName = $this->get('BAOName');
+    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
   }
 
   /**
@@ -89,13 +89,11 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
    * Set default values for the form.
    */
   public function setDefaultValues() {
-    $defaults = [];
-    $params = [];
 
     if (isset($this->_id)) {
-      $params = ['id' => $this->_id];
-      $baoName = $this->_BAOName;
-      $baoName::retrieve($params, $defaults);
+      $defaults = MailingComponent::get(FALSE)
+        ->addWhere('id', '=', $this->_id)
+        ->execute()->single();
     }
     else {
       $defaults['is_active'] = 1;
@@ -146,10 +144,7 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
       $InvalidTokens = ['action.forward' => ts("This token can only be used in send mailing context (body, header, footer)..")];
     }
     $errors = [];
-    foreach ([
-      'text',
-      'html',
-    ] as $type) {
+    foreach (['text', 'html'] as $type) {
       $dataErrors = [];
       foreach ($InvalidTokens as $token => $desc) {
         if ($params['body_' . $type]) {
@@ -188,6 +183,13 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
       $errors['body_html'] = ts("Please provide either HTML or TEXT format for the Body.");
     }
     return empty($errors) ? TRUE : $errors;
+  }
+
+  /**
+   * @return array
+   */
+  protected function getFieldsToExcludeFromPurification(): array {
+    return ['body_html'];
   }
 
 }

@@ -25,11 +25,13 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
   use \Civi\Test\GuzzleTestTrait;
 
   public function setUp(): void {
+    parent::setUp();
     Civi::settings()->set('ext_repo_url', 'http://localhost:9999/fake-repo');
   }
 
   public function tearDown(): void {
     Civi::settings()->revert('ext_repo_url');
+    parent::tearDown();
   }
 
   /**

@@ -797,7 +797,7 @@ HERESQL;
    * @param int|null $rowCount
    */
   public function limit($rowCount = NULL) {
-    $rowCount = $rowCount ?? $this->getRowCount();
+    $rowCount ??= $this->getRowCount();
     parent::limit($rowCount);
   }
 
@@ -806,7 +806,7 @@ HERESQL;
    * @param int|null $rowCount
    */
   public function setPager($rowCount = NULL): void {
-    $rowCount = $rowCount ?? $this->getRowCount();
+    $rowCount ??= $this->getRowCount();
     parent::setPager($rowCount);
   }
 
@@ -843,8 +843,8 @@ HERESQL;
         unset($this->_columnHeadersComponent[$componentTitle][$id_header], $this->_columnHeadersComponent[$componentTitle][$contact_header]);
       }
 
-      $this->assign_by_ref('columnHeadersComponent', $this->_columnHeadersComponent);
-      $this->assign_by_ref('componentRows', $componentRows);
+      $this->assign('columnHeadersComponent', $this->_columnHeadersComponent);
+      $this->assign('componentRows', $componentRows);
     }
 
     $this->doTemplateAssignment($rows);

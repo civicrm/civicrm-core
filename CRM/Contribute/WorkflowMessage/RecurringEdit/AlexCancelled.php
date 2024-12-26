@@ -20,7 +20,7 @@ class CRM_Contribute_WorkflowMessage_RecurringEdit_AlexCancelled extends \Civi\W
     $example['asserts'] = [
       'default' => [
         ['for' => 'subject', 'regex' => '/Recurring Contribution Update.*Alex/'],
-        ['for' => 'text', 'regex' => '/Recurring contribution is for €5,990.99, every 2 year.s. for 24 installments/'],
+        ['for' => 'html', 'regex' => '/Recurring contribution is for €5,990.99, every 2 year.s. for 24 installments/'],
       ],
     ];
   }

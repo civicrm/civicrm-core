@@ -57,7 +57,7 @@ class Meta {
     ];
 
     foreach ($apiParams['select'] ?? [] as $select) {
-      if (strstr($select, ' AS ')) {
+      if (str_contains($select, ' AS ')) {
         $expr = SqlExpression::convert($select, TRUE);
         $label = $expr::getTitle();
         foreach ($expr->getFields() as $num => $fieldName) {

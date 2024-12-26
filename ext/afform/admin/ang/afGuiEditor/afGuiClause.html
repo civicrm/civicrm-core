@@ -1,0 +1,43 @@
+<legend ng-if="!$ctrl.hideLabel">{{ $ctrl.label || ts('%1 group', {1: $ctrl.conjunctions[$ctrl.op]}) }}</legend>
+<div class="btn-group btn-group-xs" ng-if=":: $ctrl.hasParent">
+  <button type="button" class="btn btn-danger-outline" ng-click="$ctrl.deleteGroup()" title="{{:: ts('Remove group') }}">
+    <i class="crm-i fa-trash" aria-hidden="true"></i>
+  </button>
+</div>
+<div class="api4-clause-group-sortable" ng-model="$ctrl.clauses" ui-sortable="$ctrl.sortOptions">
+  <div class="api4-input form-inline clearfix" ng-repeat="(index, clause) in $ctrl.clauses" ng-class="{hiddenElement: index &lt; ($ctrl.skip || 0)}">
+    <div ng-if="index &gt;= ($ctrl.skip || 0)">
+      <div class="api4-clause-badge" title="{{:: ts('Drag to reposition') }}">
+        <span class="badge badge-info">
+          <span ng-if="index === ($ctrl.skip || 0) && !$ctrl.hasParent">{{ $ctrl.label }}</span>
+          <span ng-if="index &gt; ($ctrl.skip || 0) || $ctrl.hasParent">{{ $ctrl.conjunctions[$ctrl.op] }}</span>
+          <i class="crm-i fa-arrows" aria-hidden="true"></i>
+        </span>
+      </div>
+      <div ng-if="!$ctrl.conjunctions[clause[0]]" class="api4-input-group">
+        <input class="form-control collapsible-optgroups" ng-model="clause[0]" crm-ui-select="{data: $ctrl.fields, allowClear: true, placeholder: 'Field'}" ng-change="$ctrl.changeClauseField(clause, index)" />
+        <af-gui-condition clause="clause" field="$ctrl.getField(clause[0])" offset="1" format="$ctrl.format" class="form-group"></af-gui-condition>
+      </div>
+      <fieldset class="clearfix" ng-if="$ctrl.conjunctions[clause[0]]">
+        <af-gui-clause clauses="clause[1]" fields="$ctrl.fields" field-defns="$ctrl.fieldDefns" op="{{ clause[0] }}" delete-group="$ctrl.deleteRow(index)"></af-gui-clause>
+      </fieldset>
+    </div>
+  </div>
+</div>
+<div class="api4-input form-inline">
+  <div class="api4-clause-badge">
+    <div class="btn-group btn-group-xs" title="{{ $ctrl.hasParent ? ts('Add a subgroup of clauses') : ts('Add a group of clauses') }}">
+      <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        {{ $ctrl.conjunctions[$ctrl.op] }} <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu api4-add-where-group-menu">
+        <li ng-repeat="(con, label) in $ctrl.conjunctions" ng-show="$ctrl.op !== con">
+          <a href ng-click="$ctrl.addGroup(con)">{{ label }}</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <input class="form-control collapsible-optgroups"
+         on-crm-ui-select="$ctrl.addClause(selection)"
+         crm-ui-select="{data: $ctrl.fields, placeholder: $ctrl.placeholder || ts('Select field')}" >
+</div>

@@ -732,6 +732,106 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
   }
 
   /**
+   * Ensure shared address updates work in opposite direction
+   *
+   * If Person A shares their address with Person B and person B updates
+   * the address, ensure it is updated in Person A's record.
+   */
+  public function testSharedAddressReverseUpdate(): void {
+    // Create two contacts. ContactA shares their address with ContactB.
+    $contactIdA = $this->individualCreate([], 0);
+    $contactIdB = $this->individualCreate([], 1);
+
+    $addressParamsA = [
+      'street_address' => '123 Fake St.',
+      'location_type_id' => '1',
+      'is_primary' => '1',
+      'contact_id' => $contactIdA,
+    ];
+    $addAddressA = \Civi\Api4\Address::create(FALSE);
+    foreach ($addressParamsA as $key => $value) {
+      $addAddressA = $addAddressA->addValue($key, $value);
+    }
+    $addressA = $addAddressA->execute()->first();
+
+    $addressParamsB = [
+      'street_address' => '123 Fake St.',
+      'location_type_id' => '1',
+      'is_primary' => '1',
+      'master_id' => $addressA['id'],
+      'contact_id' => $contactIdB,
+    ];
+    $addAddressB = \Civi\Api4\Address::create(FALSE);
+    foreach ($addressParamsB as $key => $value) {
+      $addAddressB = $addAddressB->addValue($key, $value);
+    }
+    $addressB = $addAddressB->execute()->first();
+
+    // Update ContactB's address.
+    $updateAddressParamsB = [
+      'id' => $addressB['id'],
+      'street_address' => '456 New Street St.',
+      'master_id' => $addressA['id'],
+    ];
+    $updateAddressB = \Civi\Api4\Address::update(FALSE);
+    foreach ($updateAddressParamsB as $key => $value) {
+      $updateAddressB = $updateAddressB->addValue($key, $value);
+    }
+    $updatedAddressB = $updateAddressB->execute()->first();
+
+    // Is the update reflected in ContactA's address?
+    $updatedAddressA = \Civi\Api4\Address::get(FALSE)
+      ->addSelect('street_address')
+      ->addWhere('id', '=', $addressA['id'])
+      ->execute()->first();
+
+    $this->assertEquals($updatedAddressB['street_address'], $updatedAddressA['street_address']);
+
+    // Update ContactB's address again, but leave out the master id. We should still
+    // update the master id address record, even if we leave it out (e.g. could be a
+    // profile that doesn't include the master id value).
+    $updateAddressParamsB = [
+      'id' => $addressB['id'],
+      'street_address' => '456 New Street St.',
+    ];
+    $updateAddressB = \Civi\Api4\Address::update(FALSE);
+    foreach ($updateAddressParamsB as $key => $value) {
+      $updateAddressB = $updateAddressB->addValue($key, $value);
+    }
+    $updatedAddressB = $updateAddressB->execute()->first();
+
+    // Is the update reflected in ContactA's address?
+    $updatedAddressA = \Civi\Api4\Address::get(FALSE)
+      ->addSelect('street_address')
+      ->addWhere('id', '=', $addressA['id'])
+      ->execute()->first();
+
+    $this->assertEquals($updatedAddressB['street_address'], $updatedAddressA['street_address']);
+
+    // Update ContactB's address again, but set master id to NULL. We should not
+    // update the master id address record.
+    $updateAddressParamsB = [
+      'id' => $addressB['id'],
+      'street_address' => '890 I Am Moving Out St.',
+      'master_id' => NULL,
+    ];
+    $updateAddressB = \Civi\Api4\Address::update(FALSE);
+    foreach ($updateAddressParamsB as $key => $value) {
+      $updateAddressB = $updateAddressB->addValue($key, $value);
+    }
+    $updatedAddressB = $updateAddressB->execute()->first();
+
+    // The update should not be reflected in ContactA's address
+    $updatedAddressA = \Civi\Api4\Address::get(FALSE)
+      ->addSelect('street_address')
+      ->addWhere('id', '=', $addressA['id'])
+      ->execute()->first();
+
+    $this->assertNotEquals($updatedAddressB['street_address'], $updatedAddressA['street_address']);
+
+  }
+
+  /**
    * dev/dev/core#1670 - Ensure that the custom fields on adresses are copied
    * to inherited address
    * 1. test the creation of the shared address with custom field

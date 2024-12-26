@@ -48,7 +48,7 @@ trait CRM_Financial_Form_PaymentProcessorFormTrait {
    * @return CRM_Core_Payment
    */
   protected function getPaymentProcessorObject() {
-    if (!empty($this->_paymentProcessor)) {
+    if (!empty($this->_paymentProcessor['object'])) {
       return $this->_paymentProcessor['object'];
     }
     return new CRM_Core_Payment_Manual();

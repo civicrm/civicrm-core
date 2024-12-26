@@ -545,7 +545,7 @@
             .then(function (deliveryInfos) {
               var count = Object.keys(deliveryInfos).length;
               if (count === 0) {
-                CRM.alert(ts('Could not identify any recipients. Perhaps your test group is empty, or you tried sending to contacts that do not exist and you have no permission to add contacts.'));
+                CRM.alert(ts('Could not identify any recipients. Perhaps your test group is empty, all contacts are set to deceased/opt out/do_not_email, or you tried sending to contacts that do not exist and you have no permission to add contacts.'));
               }
             })
           ;
@@ -639,7 +639,7 @@
             scope.mailing = newValue;
           });
           scope.crmMailingConst = CRM.crmMailing;
-          scope.ts = CRM.ts(null);
+          scope.ts = CRM.ts('civi_mail');
           scope.hs = crmUiHelp({file: 'CRM/Mailing/MailingUI'});
           scope.checkPerm = CRM.checkPerm;
           scope[directiveName] = attr[directiveName] ? scope.$parent.$eval(attr[directiveName]) : {};

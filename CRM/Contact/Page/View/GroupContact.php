@@ -17,6 +17,14 @@
 class CRM_Contact_Page_View_GroupContact extends CRM_Core_Page {
 
   /**
+   * The contact being viewed
+   *
+   * @var int
+   * @internal
+   */
+  public $_contactId;
+
+  /**
    * Called when action is browse.
    */
   public function browse() {
@@ -37,9 +45,9 @@ class CRM_Contact_Page_View_GroupContact extends CRM_Core_Page {
     }
 
     $this->assign('groupCount', $count);
-    $this->assign_by_ref('groupIn', $in);
-    $this->assign_by_ref('groupPending', $pending);
-    $this->assign_by_ref('groupOut', $out);
+    $this->assign('groupIn', $in);
+    $this->assign('groupPending', $pending);
+    $this->assign('groupOut', $out);
 
     // get the info on contact smart groups
     $contactSmartGroupSettings = Civi::settings()->get('contact_smart_group_display');

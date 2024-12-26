@@ -59,7 +59,7 @@ class CRM_Contact_Page_Inline_CustomData extends CRM_Core_Page {
     $this->assign('customRecId', $customRecId);
     $this->assign('contactId', $contactId);
     $this->assign('customGroupId', $cgId);
-    $this->assign_by_ref('cd_edit', $fields);
+    $this->assign('cd_edit', $fields);
 
     // check logged in user permission
     CRM_Contact_Page_View::checkUserPermission($this, $contactId);

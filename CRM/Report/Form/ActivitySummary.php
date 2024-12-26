@@ -142,7 +142,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
             'title' => ts('Activity Priority'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id'),
+            'options' => CRM_Activity_DAO_Activity::buildOptions('priority_id'),
           ],
         ],
         'group_bys' => [
@@ -505,7 +505,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
    * @param int|null $rowCount
    */
   public function setPager($rowCount = NULL) {
-    $rowCount = $rowCount ?? $this->getRowCount();
+    $rowCount ??= $this->getRowCount();
     $this->_rowsFound = $this->totalRows;
     parent::setPager($rowCount);
   }
@@ -665,7 +665,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     $entryFound = FALSE;
     $activityType = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);
     $activityStatus = CRM_Core_PseudoConstant::activityStatus();
-    $priority = CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id');
+    $priority = CRM_Activity_DAO_Activity::buildOptions('priority_id');
     $onHover = ts('View Contact Summary for this Contact');
     foreach ($rows as $rowNum => $row) {
       // make count columns point to activity detail report

@@ -76,7 +76,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form {
       $eventSummary[$eventDAO->event_id][ts('Registered Participant')] = "{$eventDAO->participant} (" . implode(', ', $this->getActiveParticipantStatuses()) . ")";
       $currency[$eventDAO->event_id] = $eventDAO->currency;
     }
-    $this->assign_by_ref('summary', $eventSummary);
+    $this->assign('summary', $eventSummary);
 
     $activeParticipantClause = " AND civicrm_participant.status_id IN ( " . implode(',', array_keys($this->getActiveParticipantStatuses())) . " ) ";
     //Total Participant Registerd for the Event
@@ -198,7 +198,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form {
     }
     $rows[ts('Payment Method')] = $instrumentRows;
 
-    $this->assign_by_ref('rows', $rows);
+    $this->assign('rows', $rows);
     if (!$this->_setVariable) {
       $this->_params['id_value'] = NULL;
     }
@@ -225,7 +225,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form {
    * @inheritDoc
    */
   public function limit($rowCount = NULL) {
-    $rowCount = $rowCount ?? $this->getRowCount();
+    $rowCount ??= $this->getRowCount();
     parent::limit($rowCount);
 
     // Modify limit.
@@ -243,7 +243,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form {
    * @param int|null $rowCount
    */
   public function setPager($rowCount = NULL) {
-    $rowCount = $rowCount ?? $this->getRowCount();
+    $rowCount ??= $this->getRowCount();
     $params = [
       'total' => $this->_rowsFound,
       'rowCount' => $rowCount,
@@ -254,7 +254,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form {
     ];
 
     $pager = new CRM_Utils_Pager($params);
-    $this->assign_by_ref('pager', $pager);
+    $this->assign('pager', $pager);
   }
 
   /**

@@ -43,7 +43,6 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
     }
 
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
-    $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
 
     if ($this->_contactId) {
       $this->assign('contactId', $this->_contactId);

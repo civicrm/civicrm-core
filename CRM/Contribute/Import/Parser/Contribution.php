@@ -26,13 +26,6 @@ use Civi\Api4\Note;
  */
 class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
 
-  /**
-   * Array of successfully imported contribution id's
-   *
-   * @var array
-   */
-  protected $_newContributions;
-
   protected $baseEntity = 'Contribution';
 
   /**
@@ -62,18 +55,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    * @see CRM_Import_Parser result code constants
    */
   const SOFT_CREDIT = 512, SOFT_CREDIT_ERROR = 1024, PLEDGE_PAYMENT = 2048, PLEDGE_PAYMENT_ERROR = 4096;
-
-  /**
-   * Separator being used
-   * @var string
-   */
-  protected $_separator;
-
-  /**
-   * Array of pledge payment error lines, bounded by MAX_ERROR
-   * @var array
-   */
-  protected $_pledgePaymentErrors;
 
   /**
    * Get the field mappings for the import.
@@ -163,7 +144,10 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         continue;
       }
       $fieldSpec = $this->getFieldMetadata($mappedField['name']);
-      $fieldValue = $values[$i];
+      $columnHeader = $this->getUserJob()['metadata']['DataSource']['column_headers'][$i] ?? '';
+      // If there is no column header we are dealing with an added value mapping, do not use
+      // the database value as it will be for (e.g.) `_status`
+      $fieldValue = $columnHeader ? $values[$i] : '';
       if ($fieldValue === '' && isset($mappedField['default_value'])) {
         $fieldValue = $mappedField['default_value'];
       }
@@ -339,13 +323,12 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    */
   public function getImportEntities() : array {
     $softCreditTypes = ContributionSoft::getFields(FALSE)
-      ->setLoadOptions(['id', 'name', 'label', 'description', 'is_default'])
+      ->setLoadOptions(['id', 'name', 'label', 'description'])
       ->addWhere('name', '=', 'soft_credit_type_id')
-      ->selectRowCount()
       ->addSelect('options')->execute()->first()['options'];
-    $defaultSoftCreditTypeID = NULL;
+    $defaultSoftCreditTypeID = CRM_Core_OptionGroup::getDefaultValue('soft_credit_type');
     foreach ($softCreditTypes as &$softCreditType) {
-      if (empty($defaultSoftCreditTypeID) || $softCreditType['is_default']) {
+      if (empty($defaultSoftCreditTypeID)) {
         $defaultSoftCreditTypeID = $softCreditType['id'];
       }
       $softCreditType['text'] = $softCreditType['label'];
@@ -452,7 +435,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
         }
       }
 
-      $this->deprecatedFormatParams($contributionParams, $contributionParams);
+      $this->deprecatedFormatParams($contributionParams);
 
       // From this point on we are changing stuff - the prior rows were doing lookups and exiting
       // if the lookups failed.
@@ -583,14 +566,10 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
    * convert it into the same format that we use in QF and BAO object
    *
    * @param array $params
-   *   Associative array of property name/value
-   *   pairs to insert in new contact.
-   * @param array $values
-   *   The reformatted properties that we can use internally.
    *
    * @throws \CRM_Core_Exception
    */
-  private function deprecatedFormatParams($params, &$values): void {
+  private function deprecatedFormatParams(&$params): void {
     // copy all the contribution fields as is
     if (empty($params['pledge_id'])) {
       return;
@@ -622,14 +601,13 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
       if (CRM_Core_DAO::getFieldValue('CRM_Pledge_DAO_Pledge', $params['pledge_id'], 'contact_id') != $contributionContactID) {
         throw new CRM_Core_Exception('Invalid Pledge ID provided. Contribution row was skipped.', CRM_Import_Parser::ERROR);
       }
-      $values['pledge_id'] = $params['pledge_id'];
     }
 
     // we need to check if oldest payment amount equal to contribution amount
-    $pledgePaymentDetails = CRM_Pledge_BAO_PledgePayment::getOldestPledgePayment($values['pledge_id']);
+    $pledgePaymentDetails = CRM_Pledge_BAO_PledgePayment::getOldestPledgePayment($params['pledge_id']);
 
     if ($pledgePaymentDetails['amount'] == $totalAmount) {
-      $values['pledge_payment_id'] = $pledgePaymentDetails['id'];
+      $params['pledge_payment_id'] = $pledgePaymentDetails['id'];
     }
     else {
       throw new CRM_Core_Exception('Contribution and Pledge Payment amount mismatch for this record. Contribution row was skipped.', CRM_Import_Parser::ERROR);

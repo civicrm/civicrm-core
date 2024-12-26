@@ -24,6 +24,7 @@ class CRM_Admin_Page_AJAX {
    * Outputs menubar data (json format) for the current user.
    */
   public static function navMenu() {
+    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
     if (CRM_Core_Session::getLoggedInContactID()) {
 
       $menu = CRM_Core_BAO_Navigation::buildNavigationTree();
@@ -96,6 +97,7 @@ class CRM_Admin_Page_AJAX {
    * Process drag/move action for menu tree.
    */
   public static function menuTree() {
+    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
     CRM_Core_BAO_Navigation::processNavigation($_GET);
   }
 
@@ -103,6 +105,7 @@ class CRM_Admin_Page_AJAX {
    * Build status message while enabling/ disabling various objects.
    */
   public static function getStatusMsg() {
+    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
     require_once 'api/v3/utils.php';
     $recordID = CRM_Utils_Type::escape($_GET['id'], 'Integer');
     $entity = CRM_Utils_Type::escape($_GET['entity'], 'String');
@@ -241,7 +244,21 @@ class CRM_Admin_Page_AJAX {
 
         case 'CRM_Contact_BAO_Group':
           $ret['content'] = ts('Are you sure you want to disable this Group?');
-          $ret['content'] .= '<br /><br /><strong>' . ts('WARNING - Disabling this group will disable all the child groups associated if any.') . '</strong>';
+          $sgContent = '';
+          $sgReferencingThisGroup = CRM_Contact_BAO_SavedSearch::getSmartGroupsUsingGroup($recordID);
+          if (!empty($sgReferencingThisGroup)) {
+            $sgContent .= '<br /><br /><strong>' . ts('WARNING - This Group is currently referenced by %1 smart group(s).', [
+              1 => count($sgReferencingThisGroup),
+            ]) . '</strong><ul>';
+            foreach ($sgReferencingThisGroup as $gid => $group) {
+              $sgContent .= '<li>' . ts('%1 <a class="action-item crm-hover-button" href="%2" target="_blank">Edit Smart Group Criteria</a>', [
+                1 => $group['title'],
+                2 => $group['editSearchURL'],
+              ]) . '</li>';
+            }
+            $sgContent .= '</ul>' . ts('Disabling this group will cause these groups to no longer restrict members based on membership in this group. Please edit and remove this group as a criteria from these smart groups.');
+          }
+          $ret['content'] .= $sgContent . '<br /><br /><strong>' . ts('WARNING - Disabling this group will disable all the child groups associated if any.') . '</strong>';
           break;
 
         case 'CRM_Core_BAO_OptionGroup':
@@ -284,6 +301,7 @@ class CRM_Admin_Page_AJAX {
    * Used by jstree to incrementally load tags
    */
   public static function getTagTree() {
+    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
     $parent = CRM_Utils_Type::escape(($_GET['parent_id'] ?? 0), 'Integer');
     $substring = CRM_Utils_Type::escape(CRM_Utils_Array::value('str', $_GET), 'String');
     $result = [];
@@ -337,7 +355,7 @@ class CRM_Admin_Page_AJAX {
             'is_selectable' => (bool) $dao->is_selectable,
             'is_reserved' => (bool) $dao->is_reserved,
             'used_for' => $usedFor,
-            'color' => $dao->color ? $dao->color : '#ffffff',
+            'color' => $dao->color ?: '#ffffff',
             'usages' => civicrm_api3('EntityTag', 'getcount', [
               'entity_table' => ['IN' => $usedFor],
               'tag_id' => $dao->id,

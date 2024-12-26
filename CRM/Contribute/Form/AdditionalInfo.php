@@ -40,11 +40,9 @@ class CRM_Contribute_Form_AdditionalInfo {
     while ($dao->fetch()) {
       $sel1[$dao->id] = $dao->name . " ( " . $dao->sku . " )";
       $min_amount[$dao->id] = $dao->min_contribution;
-      $options = explode(',', $dao->options);
-      foreach ($options as $k => $v) {
-        $options[$k] = trim($v);
-      }
-      if ($options[0] != '') {
+      $options = CRM_Contribute_BAO_Premium::parseProductOptions($dao->options);
+      if (!empty($options)) {
+        $options = ['' => ts('- select -')] + $options;
         $sel2[$dao->id] = $options;
       }
       $form->assign('premiums', TRUE);
@@ -189,7 +187,7 @@ class CRM_Contribute_Form_AdditionalInfo {
     CRM_Contribute_BAO_Product::retrieve($premiumParams, $productDetails);
     $dao->financial_type_id = $productDetails['financial_type_id'] ?? NULL;
     if (!empty($options[$selectedProductID])) {
-      $dao->product_option = $options[$selectedProductID][$selectedProductOptionID];
+      $dao->product_option = $selectedProductOptionID;
     }
 
     // This IF condition codeblock does the following:
@@ -239,6 +237,8 @@ class CRM_Contribute_Form_AdditionalInfo {
    * @param int $contactID
    * @param int $contributionID
    * @param int $contributionNoteID
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function processNote($params, $contactID, $contributionID, $contributionNoteID = NULL) {
     if (CRM_Utils_System::isNull($params['note']) && $contributionNoteID) {
@@ -253,13 +253,12 @@ class CRM_Contribute_Form_AdditionalInfo {
       'note' => $params['note'],
       'entity_id' => $contributionID,
       'contact_id' => $contactID,
+      'id' => $contributionNoteID,
     ];
-    $noteID = [];
     if ($contributionNoteID) {
-      $noteID = ["id" => $contributionNoteID];
       $noteParams['note'] = $noteParams['note'] ?: "null";
     }
-    CRM_Core_BAO_Note::add($noteParams, $noteID);
+    CRM_Core_BAO_Note::add($noteParams);
   }
 
   /**
@@ -322,7 +321,7 @@ class CRM_Contribute_Form_AdditionalInfo {
     if (!empty($params['payment_instrument_id'])) {
       $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
       $params['paidBy'] = $paymentInstrument[$params['payment_instrument_id']];
-      if ($params['paidBy'] != 'Check' && isset($params['check_number'])) {
+      if ($params['paidBy'] !== 'Check' && isset($params['check_number'])) {
         unset($params['check_number']);
       }
     }
@@ -367,10 +366,7 @@ class CRM_Contribute_Form_AdditionalInfo {
     $form->assign('ccContribution', $ccContribution);
     if ($ccContribution) {
       $form->assignBillingName($params);
-      $form->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters(
-        $params,
-        $form->_bltID
-      ));
+      $form->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters($params));
 
       $valuesForForm = CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($params);
       $form->assignVariables($valuesForForm, ['credit_card_exp_date', 'credit_card_type', 'credit_card_number']);
@@ -424,7 +420,7 @@ class CRM_Contribute_Form_AdditionalInfo {
       $form->assign('customGroup', $customGroup);
     }
 
-    $form->assign_by_ref('formValues', $params);
+    $form->assign('formValues', $params);
     list($contributorDisplayName,
       $contributorEmail
       ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($params['contact_id']);

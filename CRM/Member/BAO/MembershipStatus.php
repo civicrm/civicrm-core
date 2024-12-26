@@ -100,6 +100,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus im
 
     $membershipStatus->save();
     CRM_Member_PseudoConstant::flush('membershipStatus');
+    Civi::cache('metadata')->clear();
     return $membershipStatus;
   }
 
@@ -337,6 +338,25 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus im
       $statusIds[] = $membershipStatus->id;
     }
     return $statusIds;
+  }
+
+  /**
+   * Get the id of the status to be used for new memberships.
+   *
+   * @return int
+   * @throws \CRM_Core_Exception
+   */
+  public static function getNewMembershipTypeID(): int {
+    $cacheKey = __CLASS__ . __FUNCTION__;
+    if (!isset(\Civi::$statics[$cacheKey])) {
+      \Civi::$statics[$cacheKey] = (bool) CRM_Core_DAO::singleValueQuery(
+        'SELECT id FROM civicrm_membership_status
+        WHERE start_event = "join_date"
+        AND start_event_adjust_unit IS NULL
+        ORDER BY weight LIMIT 1'
+      );
+    }
+    return \Civi::$statics[$cacheKey];
   }
 
 }

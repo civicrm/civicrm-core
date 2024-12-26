@@ -10,6 +10,7 @@
  */
 namespace Civi\FlexMailer\Listener;
 
+use Civi\Core\Service\AutoService;
 use Civi\FlexMailer\Event\RunEvent;
 
 /**
@@ -22,8 +23,12 @@ use Civi\FlexMailer\Event\RunEvent;
  *
  * During incubation, we want to mostly step-aside -- for traditional
  * mailings, simply continue using the old system.
+ *
+ * @service civi_flexmailer_abdicator
  */
-class Abdicator {
+class Abdicator extends AutoService {
+
+  use IsActiveTrait;
 
   /**
    * @param \CRM_Mailing_BAO_Mailing $mailing
@@ -60,12 +65,15 @@ class Abdicator {
    * @param \Civi\FlexMailer\Event\CheckSendableEvent $e
    */
   public function onCheckSendable($e) {
-    if (self::isFlexmailPreferred($e->getMailing())) {
+    $mailing = $e->getMailing();
+    if (empty($mailing->sms_provider_id)) {
       // OK, we'll continue running.
       return;
     }
 
     $e->stopPropagation();
+    // @todo - just do the one tiny sms field check here & don't call the
+    // other function.
     $errors = \CRM_Mailing_BAO_Mailing::checkSendable($e->getMailing());
     if (is_array($errors)) {
       foreach ($errors as $key => $message) {

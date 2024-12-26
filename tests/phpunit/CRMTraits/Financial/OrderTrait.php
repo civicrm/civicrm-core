@@ -38,7 +38,7 @@ trait CRMTraits_Financial_OrderTrait {
       'frequency_interval' => 1,
       'invoice_id' => 'xyz',
       'contribution_status_id' => 2,
-      'payment_processor_id' => $this->_paymentProcessorID,
+      'payment_processor_id' => reset($this->ids['PaymentProcessor']),
       // processor provided ID - use contact ID as proxy.
       'processor_id' => $this->_contactID,
     ]));
@@ -49,7 +49,7 @@ trait CRMTraits_Financial_OrderTrait {
       'source' => 'Online Contribution: form payment',
       'contact_id' => $this->_contactID,
       'contribution_page_id' => $this->ids['ContributionPage'][0] ?? NULL,
-      'payment_processor_id' => $this->_paymentProcessorID,
+      'payment_processor_id' => reset($this->ids['PaymentProcessor']),
       'is_test' => 0,
       'receive_date' => '2019-07-25 07:34:23',
       'skipCleanMoney' => TRUE,
@@ -77,7 +77,7 @@ trait CRMTraits_Financial_OrderTrait {
    * @throws \CRM_Core_Exception
    */
   protected function createContributionAndMembershipOrder(): void {
-    $this->ids['membership_type'][0] = $this->membershipTypeCreate();
+    $this->ids['MembershipType'][0] = $this->membershipTypeCreate();
     if (empty($this->ids['Contact']['order'])) {
       $this->ids['Contact']['order'] = $this->individualCreate();
     }
@@ -143,8 +143,8 @@ trait CRMTraits_Financial_OrderTrait {
     $this->createExtraneousContribution();
     $this->ids['contact'][0] = $this->individualCreate();
     $this->ids['contact'][1] = $this->individualCreate();
-    $this->ids['membership_type'][0] = $this->membershipTypeCreate();
-    $this->ids['membership_type'][1] = $this->membershipTypeCreate(['name' => 'Type 2']);
+    $this->ids['MembershipType'][0] = $this->membershipTypeCreate();
+    $this->ids['MembershipType'][1] = $this->membershipTypeCreate(['name' => 'Type 2']);
     $priceFieldID = $this->callAPISuccessGetValue('price_field', [
       'return' => 'id',
       'label' => 'Membership Amount',
@@ -167,7 +167,7 @@ trait CRMTraits_Financial_OrderTrait {
         [
           'params' => [
             'contact_id' => $this->ids['contact'][0],
-            'membership_type_id' => $this->ids['membership_type'][0],
+            'membership_type_id' => $this->ids['MembershipType'][0],
             'source' => 'Payment',
           ],
           'line_item' => [
@@ -186,7 +186,7 @@ trait CRMTraits_Financial_OrderTrait {
         [
           'params' => [
             'contact_id' => $this->ids['contact'][1],
-            'membership_type_id' => $this->ids['membership_type'][0],
+            'membership_type_id' => $this->ids['MembershipType'][0],
             'source' => 'Payment',
           ],
           'line_item' => [

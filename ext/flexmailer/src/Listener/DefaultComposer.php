@@ -10,6 +10,7 @@
  */
 namespace Civi\FlexMailer\Listener;
 
+use Civi\Core\Service\AutoService;
 use Civi\FlexMailer\Event\ComposeBatchEvent;
 use Civi\FlexMailer\Event\RunEvent;
 use Civi\FlexMailer\FlexMailerTask;
@@ -22,8 +23,12 @@ use Civi\Token\TokenRow;
  *
  * The DefaultComposer uses a TokenProcessor to generate all messages as
  * a batch.
+ *
+ * @service civi_flexmailer_default_composer
  */
-class DefaultComposer extends BaseListener {
+class DefaultComposer extends AutoService {
+
+  use IsActiveTrait;
 
   public function onRun(RunEvent $e) {
     // FIXME: This probably doesn't belong here...

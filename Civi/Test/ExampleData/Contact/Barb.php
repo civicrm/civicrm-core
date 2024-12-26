@@ -50,6 +50,13 @@ class Barb extends EntityExample {
       'email_primary.email' => 'barb@testing.net',
       'email_greeting_display' => 'Dear Barb',
       'postal_greeting_display' => 'Dear Barb',
+      'address_billing.street_address' => '1407 Graymalkin Lane',
+      'address_billing.city' => 'New York',
+      'address_billing.supplemental_address_1' => 'Salem Center',
+      'address_billing.postal_code' => 10573,
+      'address_billing.name' => 'Xavier Institute for Higher Learning',
+      'address_billing.country_id' => \CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'country_id', 'United States'),
+      'address_billing.state_province_id:abbr' => 'NY',
     ];
   }
 

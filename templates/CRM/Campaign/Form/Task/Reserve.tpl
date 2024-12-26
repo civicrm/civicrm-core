@@ -16,8 +16,8 @@
   {include file="CRM/Contact/Form/Task.tpl"}
 
   {* New Group *}
-  <div id="new-group" class="crm-accordion-wrapper collapsed">
-    <div class="crm-accordion-header">{ts}Add respondent(s) to a new group{/ts}</div>
+  <details id="new-group" class="crm-accordion-bold">
+    <summary>{ts}Add respondent(s) to a new group{/ts}</summary>
     <div class="crm-accordion-body">
             <table class="form-layout-compressed">
              <tr>
@@ -30,11 +30,11 @@
              </tr>
             </table>
     </div>
-  </div>
+  </details>
 
   {* Existing Group *}
-  <div class="crm-accordion-wrapper crm-existing_group-accordion {if $hasExistingGroups} {else}collapsed{/if}">
-    <div class="crm-accordion-header">{ts}Add respondent(s) to existing group(s){/ts}</div>
+  <details class="crm-accordion-bold crm-existing_group-accordion" {if $hasExistingGroups}open{/if}>
+    <summary>{ts}Add respondent(s) to existing group(s){/ts}</summary>
     <div class="crm-accordion-body">
       <table class="form-layout-compressed">
         <tr>
@@ -43,7 +43,7 @@
         </tr>
       </table>
     </div>
-  </div>
+  </details>
 
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
@@ -57,7 +57,7 @@
   function setDefaultGroup() {
     var invalidGroupName = {/literal}'{$invalidGroupName}'{literal};
     if (invalidGroupName) {
-       cj("#new-group.collapsed").crmAccordionToggle();
+       cj("#new-group").prop('open', true);
     } else {
        cj("#newGroupName").val('');
        cj("#newGroupDesc").val('');

@@ -777,3 +777,15 @@ function _civicrm_api3_case_getlist_spec(&$params, $apiRequest) {
   require_once 'api/v3/Generic/Getlist.php';
   _civicrm_api3_generic_getlist_spec($params, $apiRequest);
 }
+
+function civicrm_api3_case_getoptions($params) {
+  $apiRequest = [
+    'entity' => 'Case',
+    'params' => $params,
+  ];
+  // This field is not part of this object but the api supports it
+  if ($params['field'] === 'medium_id') {
+    $apiRequest['entity'] = 'Activity';
+  }
+  return civicrm_api3_generic_getOptions($apiRequest);
+}

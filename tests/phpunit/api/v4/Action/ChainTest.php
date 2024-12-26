@@ -59,7 +59,7 @@ class ChainTest extends Api4TestBase implements TransactionalInterface {
       ->indexBy('name');
 
     $this->assertArrayHasKey('replace', $entities['Contact']['actions']);
-    $this->assertArrayHasKey('getLinks', $entities['Entity']['actions']);
+    $this->assertArrayHasKey('autocomplete', $entities['Entity']['actions']);
     $this->assertArrayNotHasKey('replace', $entities['Entity']['actions']);
   }
 

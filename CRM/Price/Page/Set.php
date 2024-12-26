@@ -89,7 +89,7 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
         CRM_Core_Action::COPY => [
           'name' => ts('Copy Price Set'),
           'url' => CRM_Utils_System::currentPath(),
-          'qs' => 'action=copy&sid=%%sid%%',
+          'qs' => 'action=copy&sid=%%sid%%&qfKey=%%key%%',
           'title' => ts('Make a Copy of Price Set'),
           'extra' => 'onclick = "return confirm(\'' . $copyExtra . '\');"',
           'weight' => 120,
@@ -133,6 +133,11 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
       $this->preview($sid);
     }
     elseif ($action & CRM_Core_Action::COPY) {
+      $key = $_POST['qfKey'] ?? $_GET['qfKey'] ?? $_REQUEST['qfKey'] ?? NULL;
+      $k = CRM_Core_Key::validate($key, CRM_Utils_System::getClassName($this));
+      if (!$k) {
+        $this->invalidKey();
+      }
       CRM_Core_Session::setStatus(ts('A copy of the price set has been created'), ts('Saved'), 'success');
       $this->copy();
     }
@@ -287,7 +292,7 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
         $actionLinks[CRM_Core_Action::BROWSE]['name'] = ts('View Price Fields');
       }
       $priceSet[$dao->id]['action'] = CRM_Core_Action::formLink($actionLinks, $action,
-        ['sid' => $dao->id],
+        ['sid' => $dao->id, 'key' => CRM_Core_Key::get(CRM_Utils_System::getClassName($this))],
         ts('more'),
         FALSE,
         'priceSet.row.actions',

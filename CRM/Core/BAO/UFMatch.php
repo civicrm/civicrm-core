@@ -29,7 +29,7 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
    */
   public static function create($params) {
     $hook = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'UFMatch', CRM_Utils_Array::value('id', $params), $params);
+    CRM_Utils_Hook::pre($hook, 'UFMatch', $params['id'] ?? NULL, $params);
     if (empty($params['domain_id'])) {
       $params['domain_id'] = CRM_Core_Config::domainID();
     }
@@ -113,8 +113,8 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
       // Are we processing logged in user.
       if ($loggedInUserUfID && $loggedInUserUfID != $ufID) {
         $userIds = self::getUFValues($loggedInUserUfID);
-        $ufID = CRM_Utils_Array::value('uf_id', $userIds, '');
-        $userID = CRM_Utils_Array::value('contact_id', $userIds, '');
+        $ufID = $userIds['uf_id'] ?? '';
+        $userID = $userIds['contact_id'] ?? '';
       }
     }
 
@@ -620,11 +620,39 @@ AND    domain_id    = %4
    * @param array $conditions
    * @inheritDoc
    */
-  public function addSelectWhereClause(string $entityName = NULL, int $userId = NULL, array $conditions = []): array {
+  public function addSelectWhereClause(?string $entityName = NULL, ?int $userId = NULL, array $conditions = []): array {
     // Prevent default behavior of joining ACLs onto the contact_id field.
     $clauses = [];
     CRM_Utils_Hook::selectWhereClause($this, $clauses, $userId, $conditions);
     return $clauses;
+  }
+
+  /**
+   * This checks and adds a unique index on (uf_id,domain_id)
+   *
+   * @return bool
+   * @throws \Civi\Core\Exception\DBQueryException
+   */
+  public static function tryToAddUniqueIndexOnUfId(): bool {
+    if (!CRM_Core_BAO_SchemaHandler::checkIfIndexExists('civicrm_uf_match', 'UI_uf_match_uf_id_domain_id')) {
+      // Run a query to check if we have duplicates
+      $query = 'SELECT COUNT(*) FROM civicrm_uf_match
+GROUP BY uf_id,domain_id
+HAVING COUNT(*) > 1';
+      $dao = CRM_Core_DAO::executeQuery($query);
+      if ($dao->fetch()) {
+        // Tell the user they need to fix it manually
+        \Civi::log()->error('You have multiple records with the same uf_id in civicrm_uf_match. You need to manually fix this in the database so that uf_id is unique.');
+        return FALSE;
+      }
+      else {
+        // Add the unique index
+        CRM_Core_DAO::executeQuery("
+        ALTER TABLE civicrm_uf_match ADD UNIQUE INDEX UI_uf_match_uf_id_domain_id (uf_id,domain_id);
+      ");
+      }
+    }
+    return TRUE;
   }
 
 }

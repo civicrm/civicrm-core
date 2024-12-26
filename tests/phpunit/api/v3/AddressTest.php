@@ -490,11 +490,18 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     // Now try it in Liberia
     $params = $this->_params;
     $params['sequential'] = 1;
-    // Liberia country id
-    $params['country_id'] = '1122';
+    $params['country_id'] = \Civi\Api4\Country::get()
+      ->addWhere('name', '=', 'Liberia')
+      ->execute()
+      ->single()['id'];
     $params['state_province_id'] = 'Maryland';
     $address2 = $this->callAPISuccess('address', 'create', $params);
-    $this->assertEquals('3497', $address2['values'][0]['state_province_id']);
+    $liberia_maryland_id = \Civi\Api4\StateProvince::get()
+      ->addWhere('country_id', '=', $params['country_id'])
+      ->addWhere('name', '=', 'Maryland')
+      ->execute()
+      ->single()['id'];
+    $this->assertEquals($liberia_maryland_id, $address2['values'][0]['state_province_id']);
   }
 
   public function getSymbolicCountryStateExamples() {
@@ -550,12 +557,13 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     ]);
     $result = $this->callAPIFailure('address', 'getoptions', ['field' => 'state_province_id']);
     // confirm that we hit our error not a SQLI.
-    $this->assertEquals('Province limit or default country setting is incorrect', $result['error_message']);
+    $this->assertEquals('Failed encoding non-numeric value (#countryLimit)', $result['error_message']);
     $this->callAPISuccess('setting', 'create', [
       'provinceLimit' => [1228],
     ]);
     // Now confirm with a correct province setting it works fine
-    $this->callAPISuccess('address', 'getoptions', ['field' => 'state_province_id']);
+    $options = $this->callAPISuccess('address', 'getoptions', ['field' => 'state_province_id']);
+    $this->assertLessThan(70, count($options['values']));
   }
 
   /**
@@ -570,12 +578,13 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     ]);
     $result = $this->callAPIFailure('address', 'getoptions', ['field' => 'country_id']);
     // confirm that we hit our error not a SQLI.
-    $this->assertEquals('Available Country setting is incorrect', $result['error_message']);
+    $this->assertEquals('Failed encoding non-numeric value (#countryLimit)', $result['error_message']);
     $this->callAPISuccess('setting', 'create', [
       'countryLimit' => [1228],
     ]);
     // Now confirm with a correct province setting it works fine
-    $this->callAPISuccess('address', 'getoptions', ['field' => 'country_id']);
+    $options = $this->callAPISuccess('address', 'getoptions', ['field' => 'country_id']);
+    $this->assertCount(1, $options['values']);
   }
 
   public function testBuildCountyWithDodgeStateProvinceFiltering(): void {
@@ -583,7 +592,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
       'field' => 'county_id',
       'state_province_id' => "abcd;ef",
     ]);
-    $this->assertEquals('Can only accept Integers for state_province_id filtering', $result['error_message']);
+    $this->assertEquals('Failed encoding non-numeric value (#stateProvince)', $result['error_message']);
     $goodResult = $this->callAPISuccess('Address', 'getoptions', [
       'field' => 'county_id',
       'state_province_id' => 1004,

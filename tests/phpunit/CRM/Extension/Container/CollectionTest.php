@@ -80,12 +80,12 @@ class CRM_Extension_Container_CollectionTest extends CiviUnitTestCase {
   }
 
   /**
-   * @param CRM_Utils_Cache_Interface $cache
+   * @param CRM_Utils_Cache_Interface|null $cache
    * @param null $cacheKey
    *
    * @return CRM_Extension_Container_Collection
    */
-  public function _createContainer(CRM_Utils_Cache_Interface $cache = NULL, $cacheKey = NULL) {
+  public function _createContainer(?CRM_Utils_Cache_Interface $cache = NULL, $cacheKey = NULL) {
     $containers = [];
     $containers['a'] = new CRM_Extension_Container_Static([
       'test.foo' => [

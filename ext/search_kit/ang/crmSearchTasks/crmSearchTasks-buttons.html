@@ -1,0 +1,8 @@
+<button type="button"
+    class="btn btn-default crm-search-task-button"
+    ng-disabled="!$ctrl.isActionAllowed(action)"
+    ng-repeat="action in $ctrl.taskManager.tasks"
+    title="{{ $ctrl.getActionTitle(action) }}"
+    ng-click="$ctrl.doAction(action)">
+  <i class="crm-i {{:: action.icon }}"></i> {{:: action.title }}
+</button>

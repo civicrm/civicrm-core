@@ -54,7 +54,7 @@ function civicrm_api3_loc_block_create($params) {
         }
         // Bother calling the api.
         else {
-          $info['contact_id'] = $info['contact_id'] ?? 'null';
+          $info['contact_id'] ??= 'null';
           $result = civicrm_api3($item, 'create', $info);
           $entities[$key] = $result['values'][$result['id']];
           $params[$key . '_id'] = $result['id'];

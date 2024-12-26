@@ -186,7 +186,7 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
     else {
       foreach (CRM_Contact_BAO_Contact::$_greetingTypes as $greeting) {
         $name = "{$greeting}_display";
-        $form->assign($name, CRM_Utils_Array::value($name, $defaults));
+        $form->assign($name, $defaults[$name] ?? NULL);
       }
     }
   }

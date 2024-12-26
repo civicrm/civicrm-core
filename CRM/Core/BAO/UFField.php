@@ -18,8 +18,7 @@
 /**
  * This class contains function for UFField.
  */
-class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
-
+class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField implements \Civi\Core\HookInterface {
   /**
    * Batch entry fields.
    * @var array
@@ -171,7 +170,7 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
     $ufField->field_type = $params['field_type'] ?? NULL;
     $ufField->field_name = $params['field_name'] ?? NULL;
     $ufField->website_type_id = $params['website_type_id'] ?? NULL;
-    if (is_null(CRM_Utils_Array::value('location_type_id', $params, ''))) {
+    if (array_key_exists('location_type_id', $params) && is_null($params['location_type_id'])) {
       // primary location type have NULL value in DB
       $ufField->whereAdd("location_type_id IS NULL");
     }
@@ -188,11 +187,11 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
   }
 
   /**
-   * Does profile consists of a multi-record custom field.
+   * Returns the id of the first multi-record custom group in this profile (if any).
    *
    * @param int $gId
    *
-   * @return bool
+   * @return int|false
    */
   public static function checkMultiRecordFieldExists($gId) {
     $queryString = "SELECT f.field_name
@@ -201,36 +200,18 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
                           AND  g.id = %1 AND f.field_name LIKE 'custom%'";
     $p = [1 => [$gId, 'Integer']];
     $dao = CRM_Core_DAO::executeQuery($queryString, $p);
-    $customFieldIds = [];
-    $isMultiRecordFieldPresent = FALSE;
+
     while ($dao->fetch()) {
-      if ($customId = CRM_Core_BAO_CustomField::getKeyID($dao->field_name)) {
-        if (is_numeric($customId)) {
-          $customFieldIds[] = $customId;
+      $customId = CRM_Core_BAO_CustomField::getKeyID($dao->field_name);
+      if ($customId && is_numeric($customId)) {
+        $multiRecordGroupId = CRM_Core_BAO_CustomField::isMultiRecordField($customId);
+        if ($multiRecordGroupId) {
+          return $multiRecordGroupId;
         }
       }
     }
 
-    if (!empty($customFieldIds) && count($customFieldIds) == 1) {
-      $customFieldId = array_pop($customFieldIds);
-      $isMultiRecordFieldPresent = CRM_Core_BAO_CustomField::isMultiRecordField($customFieldId);
-    }
-    elseif (count($customFieldIds) > 1) {
-      $customFieldIds = implode(", ", $customFieldIds);
-      $queryString = "
-      SELECT cg.id as cgId
- FROM civicrm_custom_group cg
- INNER JOIN civicrm_custom_field cf
- ON cg.id = cf.custom_group_id
-WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
-
-      $dao = CRM_Core_DAO::executeQuery($queryString);
-      if ($dao->fetch()) {
-        $isMultiRecordFieldPresent = ($dao->cgId) ? $dao->cgId : FALSE;
-      }
-    }
-
-    return $isMultiRecordFieldPresent;
+    return FALSE;
   }
 
   /**
@@ -299,9 +280,10 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    * Delete profile field given a custom field.
    *
    * @param int $customFieldId
-   *   ID of the custom field to be deleted.
+   * @deprecated
    */
   public static function delUFField($customFieldId) {
+    CRM_Core_Error::deprecatedFunctionWarning('Api');
     //find the profile id given custom field id
     $ufField = new CRM_Core_DAO_UFField();
     $ufField->field_name = "custom_" . $customFieldId;
@@ -1151,6 +1133,19 @@ SELECT  id
       ];
     }
     return self::$_memberBatchEntryFields;
+  }
+
+  /**
+   * Callback for hook_civicrm_pre().
+   * @param \Civi\Core\Event\PreEvent $event
+   * @throws CRM_Core_Exception
+   */
+  public static function on_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if ($event->action === 'delete' && $event->entity === 'CustomField') {
+      \Civi\Api4\UFField::delete(FALSE)
+        ->addWhere('field_name', '=', 'custom_' . $event->id)
+        ->execute();
+    }
   }
 
 }

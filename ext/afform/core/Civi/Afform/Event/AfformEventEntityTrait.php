@@ -90,9 +90,9 @@ trait AfformEventEntityTrait {
    * @param string|null $entityName
    * @return array
    */
-  public function getEntityIds(string $entityName = NULL): array {
+  public function getEntityIds(?string $entityName = NULL): array {
     $entityName = $entityName ?: $this->entityName;
-    $apiEntity = $this->getFormDataModel()->getEntity($this->entityName)['type'];
+    $apiEntity = $this->getFormDataModel()->getEntity($entityName)['type'];
     $idField = CoreUtil::getIdFieldName($apiEntity);
     return array_column($this->entityIds[$entityName] ?? [], $idField);
   }
@@ -105,7 +105,7 @@ trait AfformEventEntityTrait {
    */
   public function setJoinIds($index, $joinEntity, $joinIds) {
     $idField = CoreUtil::getIdFieldName($joinEntity);
-    $this->entityIds[$this->entityName][$index]['_joins'][$joinEntity] = \CRM_Utils_Array::filterColumns($joinIds, [$idField]);
+    $this->entityIds[$this->entityName][$index]['joins'][$joinEntity] = \CRM_Utils_Array::filterColumns($joinIds, [$idField]);
     return $this;
   }
 

@@ -25,7 +25,6 @@
  */
 class CRM_Profile_Form_Edit extends CRM_Profile_Form {
   protected $_postURL = NULL;
-  protected $_cancelURL = NULL;
   protected $_errorURL = NULL;
   protected $_context;
   protected $_blockNo;
@@ -146,9 +145,10 @@ SELECT module,is_reserved
 
     $this->assign('recentlyViewed', FALSE);
 
+    $cancelURL = '';
     if ($this->_context !== 'dialog') {
       $this->_postURL = $this->_ufGroup['post_url'];
-      $this->_cancelURL = $this->_ufGroup['cancel_url'];
+      $cancelURL = $this->_ufGroup['cancel_url'];
 
       $gidString = $this->_gid;
       if (!empty($this->_profileIds)) {
@@ -172,15 +172,15 @@ SELECT module,is_reserved
         }
       }
 
-      if (!$this->_cancelURL) {
-        $this->_cancelURL = CRM_Utils_System::url('civicrm/profile',
+      if (!$cancelURL) {
+        $cancelURL = CRM_Utils_System::url('civicrm/profile',
           "reset=1&gid={$gidString}"
         );
       }
 
       // we do this gross hack since qf also does entity replacement
       $this->_postURL = str_replace('&amp;', '&', ($this->_postURL ?? ''));
-      $this->_cancelURL = str_replace('&amp;', '&', ($this->_cancelURL ?? ''));
+      $cancelURL = str_replace('&amp;', '&', ($cancelURL ?? ''));
 
       // also retain error URL if set
       $this->_errorURL = $_POST['errorURL'] ?? NULL;
@@ -197,11 +197,11 @@ SELECT module,is_reserved
 
     parent::buildQuickForm();
 
-    $this->assign('cancelURL', $this->_cancelURL);
+    $this->assign('cancelURL', $cancelURL);
 
     $cancelButtonValue = !empty($this->_ufGroup['cancel_button_text']) ? $this->_ufGroup['cancel_button_text'] : ts('Cancel');
     $this->assign('cancelButtonText', $cancelButtonValue);
-    $this->assign('includeCancelButton', CRM_Utils_Array::value('add_cancel_button', $this->_ufGroup));
+    $this->assign('includeCancelButton', $this->_ufGroup['add_cancel_button'] ?? FALSE);
 
     if (($this->_multiRecord & CRM_Core_Action::DELETE) && $this->_recordExists) {
       $this->_deleteButtonName = $this->getButtonName('upload', 'delete');

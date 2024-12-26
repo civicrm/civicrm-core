@@ -94,7 +94,7 @@
     <tr class="crm-contribution-form-block-options">
        <td class="label">{$form.options.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_product' field='options' id=$productId}{/if}</td>
       <td class="html-adjust">{$form.options.html}<br />
-          <span class="description">{ts}Enter a comma-delimited list of color, size, etc. options for the product if applicable. Contributors will be presented a drop-down menu of these options when they select this product.{/ts}</span>
+          <span class="description">{ts}Enter a comma-delimited list of color, size, etc. options for the product if applicable. Contributors will be presented a drop-down menu of these options when they select this product.{/ts} {ts}You can also use the format key=label, where the key could be the SKU of the option, for example.{/ts}</span>
        </td>
     </tr>
     <tr class="crm-contribution-form-block-is_active">
@@ -104,9 +104,9 @@
   </table>
   {/crmRegion}
   {crmRegion name="contribute-form-managepremiums-other-fields"}
-  <fieldset id="time-delimited" class="crm-collapsible {if empty($showSubscriptions)}collapsed{/if}">
-    <legend class="collapsible-title">{ts}Subscription or Service Settings{/ts}</legend>
-    <div>
+  <details id="time-delimited" class="crm-accordion-light" {if !empty($showSubscriptions)}open{/if}>
+    <summary>{ts}Subscription or Service Settings{/ts}</summary>
+    <div class="crm-accordion-body">
       <table class="form-layout-compressed">
         <tr class="crm-contribution-form-block-period_type">
            <td class="label">{$form.period_type.label}</td>
@@ -134,10 +134,11 @@
         </tr>
       </table>
     </div>
-  </fieldset>
+  </details>
   {/crmRegion}
  {/if}
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
+  {include file="CRM/common/customDataBlock.tpl" customDataType='Product' entityID=$productId}
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
 {if $action eq 1 or $action eq 2}
 

@@ -37,7 +37,7 @@
   {assign var=notSetFieldName value=$fieldName|cat:'_notset'}
 <tr>
   <td>
-    {include file="CRM/Core/DatePickerRange.tpl" from='_low' to='_high'}
+    {include file="CRM/Core/DatePickerRange.tpl" from='_low' to='_high' hideRelativeLabel=0}
   </td>
   <td>
     &nbsp;{$form.$notSetFieldName.html}&nbsp;&nbsp;{$form.$notSetFieldName.label}

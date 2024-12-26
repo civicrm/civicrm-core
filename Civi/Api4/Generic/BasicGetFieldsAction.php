@@ -109,6 +109,8 @@ class BasicGetFieldsAction extends BasicGetAction {
    *
    * Format option lists.
    *
+   * Configure read-only input fields based on the action.
+   *
    * In most cases it's not necessary to override this function, even if your entity is really weird.
    * Instead just override $this->fields and this function will respect that.
    *
@@ -136,7 +138,7 @@ class BasicGetFieldsAction extends BasicGetAction {
       ], $fieldDefaults);
       $field += $defaults + $fieldDefaults;
       if (array_key_exists('label', $fieldDefaults)) {
-        $field['label'] = $field['label'] ?? $field['title'] ?? $field['name'];
+        $field['label'] ??= $field['title'] ?? $field['name'];
       }
       if (isset($field['options']) && is_array($field['options']) && empty($field['suffixes']) && array_key_exists('suffixes', $field)) {
         $this->setFieldSuffixes($field);
@@ -144,7 +146,16 @@ class BasicGetFieldsAction extends BasicGetAction {
       if (isset($defaults['options'])) {
         $this->formatOptionList($field);
       }
+      if ($this->getAction() === 'create' && $field['readonly'] === TRUE) {
+        $field['input_type'] = 'DisplayOnly';
+      }
       $field = array_diff_key($field, $internalProps);
+    }
+    // Hide the 'contact_type' field from Individual,Organization,Household pseudo-entities
+    if (!$isInternal && $this->getEntityName() !== 'Contact' && CoreUtil::isContact($this->getEntityName())) {
+      $values = array_filter($values, function($field) {
+        return $field['name'] !== 'contact_type';
+      });
     }
   }
 
@@ -310,6 +321,7 @@ class BasicGetFieldsAction extends BasicGetAction {
           'Date' => ts('Date'),
           'Float' => ts('Float'),
           'Integer' => ts('Integer'),
+          'Money' => ts('Money'),
           'String' => ts('String'),
           'Text' => ts('Text'),
           'Timestamp' => ts('Timestamp'),
@@ -322,6 +334,7 @@ class BasicGetFieldsAction extends BasicGetAction {
           'ChainSelect' => ts('Chain-Select'),
           'CheckBox' => ts('Checkboxes'),
           'Date' => ts('Date Picker'),
+          'DisplayOnly' => ts('Display Only'),
           'Email' => ts('Email'),
           'EntityRef' => ts('Autocomplete Entity'),
           'File' => ts('File'),
@@ -371,6 +384,12 @@ class BasicGetFieldsAction extends BasicGetAction {
       [
         'name' => 'permission',
         'data_type' => 'Array',
+      ],
+      [
+        'name' => 'usage',
+        'data_type' => 'Array',
+        'description' => 'Contexts in which field is used.',
+        'default_value' => [],
       ],
       [
         'name' => 'output_formatters',

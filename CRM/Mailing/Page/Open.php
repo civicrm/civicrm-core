@@ -36,9 +36,7 @@ class CRM_Mailing_Page_Open extends CRM_Core_Page {
       $queue_id = CRM_Utils_Request::retrieveValue('q', 'Positive', NULL, FALSE, 'GET');
     }
     if (!$queue_id) {
-      CRM_Utils_System::sendResponse(
-        new \GuzzleHttp\Psr7\Response(400, [], ts("Missing input parameters"))
-      );
+      CRM_Utils_System::sendInvalidRequestResponse(ts("Missing input parameters"));
     }
 
     CRM_Mailing_Event_BAO_MailingEventOpened::open($queue_id);

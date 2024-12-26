@@ -19,7 +19,7 @@
       $scope.elementTitles = [];
 
       this.getEntityType = function() {
-        return (ctrl.entity.type === 'Contact' && ctrl.entity.data) ? ctrl.entity.data.contact_type || 'Contact' : ctrl.entity.type;
+        return ctrl.entity.type;
       };
 
       $scope.getMeta = function() {
@@ -46,6 +46,10 @@
         buildElementList(search);
       };
 
+      this.getOptionsTpl = function() {
+        return $scope.getMeta().options_tpl || '~/afGuiEditor/entityConfig/EntityOptionsGeneric.html';
+      };
+
       function buildFieldList(search) {
         $scope.fieldList.length = 0;
         $scope.fieldList.push({
@@ -60,6 +64,7 @@
             $scope.fieldList.push({
               entityName: ctrl.entity.name + '-join-' + entityName,
               entityType: entityName,
+              afJoin: entityName,
               label: ts('%1 Fields', {1: entity.label}),
               fields: filterFields(entity.fields)
             });
@@ -68,9 +73,7 @@
 
         function filterFields(fields) {
           return _.transform(fields, function(fieldList, field) {
-            if (!field.readonly &&
-              (!search || _.contains(field.name, search) || _.contains(field.label.toLowerCase(), search))
-            ) {
+            if (!search || _.contains(field.name, search) || _.contains(field.label.toLowerCase(), search)) {
               fieldList.push(fieldDefaults(field));
             }
           }, []);
@@ -90,7 +93,9 @@
         $scope.blockTitles.length = 0;
         _.each(afGui.meta.blocks, function(block, directive) {
           if ((!search || _.contains(directive, search) || _.contains(block.name.toLowerCase(), search) || _.contains(block.title.toLowerCase(), search)) &&
-            (block.entity_type === '*' || block.entity_type === ctrl.entity.type || (ctrl.entity.type === 'Contact' && block.entity_type === ctrl.entity.data.contact_type)) &&
+            // A block of type "*" applies to everything. A block of type "Contact" also applies to "Individual", "Organization" & "Household".
+            (block.entity_type === '*' || block.entity_type === ctrl.entity.type || (block.entity_type === 'Contact' && ['Individual', 'Household', 'Organization'].includes(ctrl.entity.type))) &&
+            // Prevent recursion
             block.name !== ctrl.editor.getAfform().name
           ) {
             var item = {"#tag": block.join_entity ? "div" : directive};
@@ -102,11 +107,13 @@
               }
               item['af-join'] = block.join_entity;
               item['#children'] = [{"#tag": directive}];
-              item['af-repeat'] = ts('Add');
-              item['af-copy'] = ts('Copy');
-              item.min = '1';
-              if (typeof joinEntity.repeat_max === 'number') {
-                item.max = '' + joinEntity.repeat_max;
+              if (joinEntity.repeat_max !== 1) {
+                item['af-repeat'] = ts('Add');
+                item['af-copy'] = ts('Copy');
+                item.min = '1';
+                if (typeof joinEntity.repeat_max === 'number') {
+                  item.max = '' + joinEntity.repeat_max;
+                }
               }
             }
             $scope.blockList.push(item);
@@ -145,19 +152,30 @@
       };
 
       // Checks if a field is on the form or set as a value
-      $scope.fieldInUse = function(fieldName) {
+      $scope.fieldInUse = function(fieldName, joinEntity) {
         var data = ctrl.entity.data || {};
-        if (fieldName in data) {
-          return true;
+        if (!joinEntity) {
+          return (fieldName in data) || check(ctrl.editor.layout['#children'], {'#tag': 'af-field', name: fieldName});
         }
-        return check(ctrl.editor.layout['#children'], {'#tag': 'af-field', name: fieldName});
+        // Joins might support multiple instances per entity; first fetch them all
+        let afJoinContainers = afGui.getFormElements(ctrl.editor.layout['#children'], {'af-join': joinEntity}, (item) => {
+          return item['af-join'] || (item['af-fieldset'] && item['af-fieldset'] !== ctrl.entity.name);
+        });
+        // Check if ALL af-join containers are using the field
+        let inUse = true;
+        afJoinContainers.forEach(function(container) {
+          if (inUse && !check(container['#children'], {'#tag': 'af-field', name: fieldName})) {
+            inUse = false;
+          }
+        });
+        return inUse;
       };
 
       // Checks if fields in a block are already in use on the form.
       // Note that if a block contains no fields it can be used repeatedly, so this will always return false for those.
       $scope.blockInUse = function(block) {
         if (block['af-join']) {
-          return check(ctrl.editor.layout['#children'], {'af-join': block['af-join']});
+          return check(ctrl.editor.layout['#children'], (item) => item['af-join'] === block['af-join'] && !(item.data && item.data.location_type_id));
         }
         var fieldsInBlock = _.pluck(afGui.findRecursive(afGui.meta.blocks[block['#tag']].layout, {'#tag': 'af-field'}), 'name');
         return check(ctrl.editor.layout['#children'], function(item) {
@@ -181,7 +199,7 @@
           }
           if (_.isPlainObject(item)) {
             // Recurse through everything but skip fieldsets for other entities
-            if ((!item['af-fieldset'] || (item['af-fieldset'] === ctrl.entity.name)) && item['#children']) {
+            if (!item['af-join'] && (!item['af-fieldset'] || (item['af-fieldset'] === ctrl.entity.name)) && item['#children']) {
               check(item['#children'], criteria, found);
             }
             // Recurse into block directives
@@ -200,6 +218,10 @@
           }
           ctrl.entity.data[fieldName] = '';
         }
+      };
+
+      this.getFieldId = function(fieldName) {
+        return _.kebabCase(ctrl.entity.name + '-' + fieldName);
       };
 
       this.$onInit = function() {

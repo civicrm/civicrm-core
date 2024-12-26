@@ -2,8 +2,6 @@
 
 namespace Civi\Api4\Action\Afform;
 
-use Civi\Api4\CustomField;
-use Civi\Api4\CustomGroup;
 use Civi\Core\Event\GenericHookEvent;
 use CRM_Afform_ExtensionUtil as E;
 
@@ -95,9 +93,15 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
       }
     }
 
-    if ($getLayout && $this->layoutFormat !== 'html') {
+    // Format layouts
+    if ($getLayout) {
       foreach ($afforms as $name => $record) {
-        $afforms[$name]['layout'] = isset($record['layout']) ? $this->convertHtmlToOutput($record['layout']) : NULL;
+        if (isset($record['layout'])) {
+          $this->convertLegacyContactTypes($afforms[$name]['layout']);
+          if ($this->layoutFormat !== 'html') {
+            $afforms[$name]['layout'] = $this->convertHtmlToOutput($afforms[$name]['layout']);
+          }
+        }
       }
     }
 
@@ -134,74 +138,6 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
   }
 
   /**
-   * Generates afform blocks from custom field sets.
-   *
-   * @param \Civi\Core\Event\GenericHookEvent $event
-   * @throws \CRM_Core_Exception
-   */
-  public static function getCustomGroupBlocks($event) {
-    // Early return if blocks are not requested
-    if ($event->getTypes && !in_array('block', $event->getTypes, TRUE)) {
-      return;
-    }
-
-    $getNames = $event->getNames;
-    $getLayout = $event->getLayout;
-    $groupNames = [];
-    $afforms =& $event->afforms;
-    foreach ($getNames['name'] ?? [] as $name) {
-      if (strpos($name, 'afblockCustom_') === 0 && strlen($name) > 13) {
-        $groupNames[] = substr($name, 14);
-      }
-    }
-    // Early return if this api call is fetching afforms by name and those names are not custom-related
-    if ((!empty($getNames['name']) && !$groupNames)
-      || (!empty($getNames['module_name']) && !strstr(implode(' ', $getNames['module_name']), 'afblockCustom'))
-      || (!empty($getNames['directive_name']) && !strstr(implode(' ', $getNames['directive_name']), 'afblock-custom'))
-    ) {
-      return;
-    }
-    $customApi = CustomGroup::get(FALSE)
-      ->addSelect('name', 'title', 'help_pre', 'help_post', 'extends', 'max_multiple')
-      ->addWhere('is_multiple', '=', 1)
-      ->addWhere('is_active', '=', 1);
-    if ($groupNames) {
-      $customApi->addWhere('name', 'IN', $groupNames);
-    }
-    if ($getLayout) {
-      $customApi->addSelect('help_pre', 'help_post');
-      $customApi->addChain('fields', CustomField::get(FALSE)
-        ->addSelect('name')
-        ->addWhere('custom_group_id', '=', '$id')
-        ->addWhere('is_active', '=', 1)
-        ->addOrderBy('weight', 'ASC')
-      );
-    }
-    foreach ($customApi->execute() as $custom) {
-      $name = 'afblockCustom_' . $custom['name'];
-      $item = [
-        'name' => $name,
-        'type' => 'block',
-        'requires' => [],
-        'title' => E::ts('%1 block', [1 => $custom['title']]),
-        'description' => '',
-        'is_public' => FALSE,
-        'permission' => ['access CiviCRM'],
-        'join_entity' => 'Custom_' . $custom['name'],
-        'entity_type' => $custom['extends'],
-      ];
-      if ($getLayout) {
-        $item['layout'] = ($custom['help_pre'] ? '<div class="af-markup">' . $custom['help_pre'] . "</div>\n" : '');
-        foreach ($custom['fields'] as $field) {
-          $item['layout'] .= "<af-field name=\"{$field['name']}\" />\n";
-        }
-        $item['layout'] .= ($custom['help_post'] ? '<div class="af-markup">' . $custom['help_post'] . "</div>\n" : '');
-      }
-      $afforms[$name] = $item;
-    }
-  }
-
-  /**
    * Find search display tags in afform markup
    *
    * @param string $html
@@ -220,6 +156,33 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
       }
     }
     return $searchDisplays;
+  }
+
+  /**
+   * Backward-compatability conversion of <af-entity> Contact tags
+   * to use contact-type-specific API entity names.
+   *
+   * Converts: <af-entity type="Contact" data="{contact_type: 'Individual'}">
+   * Into:     <af-entity type="Individual" data="{}">
+   *
+   * @param string $layout
+   * @return void
+   */
+  private static function convertLegacyContactTypes(&$layout): void {
+    if (!$layout || !is_string($layout)) {
+      return;
+    }
+    // It was easier to write two regexes:
+    // 1. If the `type` property precedes the `data` property
+    $regex1 = <<<'REGEX'
+      /<af-entity([^>]+)type\s*=\s*["']Contact["']([^>]*)data\s*=\s*"\{([^>]*)'?contact_type'?\s*:\s*'(Individual|Household|Organization)'\s*,?/
+      REGEX;
+    $layout = preg_replace($regex1, '<af-entity$1type="$4"$2data="{', $layout);
+    // 2. If the `data` property precedes the `type` property
+    $regex2 = <<<'REGEX'
+      /<af-entity([^>]+)data\s*=\s*"\{([^>]*)'?contact_type'?\s*:\s*'(Individual|Household|Organization)'\s*,?([^>]+)type\s*=\s*["']Contact["']/
+      REGEX;
+    $layout = preg_replace($regex2, '<af-entity$1data="{$2$4type="$3"', $layout);
   }
 
   private static function convertLegacyPlacement(array &$afform): void {

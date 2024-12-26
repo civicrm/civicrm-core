@@ -123,6 +123,9 @@
    * @param count {Number}
    */
   CRM.tabHeader.updateCount = function(tab, count) {
+    if (typeof count === 'boolean') {
+      return;
+    }
     var oldClass = getCountClass(tab);
     if (oldClass) {
       $(tab).removeClass(oldClass);

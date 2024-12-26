@@ -171,7 +171,7 @@ class CRM_Grant_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
       self::$_links = [
         CRM_Core_Action::VIEW => [
           'name' => ts('View'),
-          'url' => 'civicrm/grant/add',
+          'url' => 'civicrm/grant/view',
           'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=view&' . $extraParams,
           'title' => ts('View Grant'),
           'weight' => -20,

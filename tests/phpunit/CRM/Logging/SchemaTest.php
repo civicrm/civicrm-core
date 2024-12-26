@@ -441,6 +441,13 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     $this->assertStringNotContainsString('FOREIGN KEY', $dao->Create_Table);
   }
 
+  public function testGetLogTableNames(): void {
+    Civi::settings()->set('logging', TRUE);
+    $log_tables = (new CRM_Logging_Schema())->getLogTableNames();
+    $this->assertIsArray($log_tables);
+    $this->assertNotEmpty($log_tables);
+  }
+
   /**
    * Determine if we are running on MySQL 8 version 8.0.19 or later.
    *

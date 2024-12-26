@@ -104,6 +104,7 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
     // Added two lines below to allow commercial cards to go through as per page 15 of Elavon developer guide
     $requestFields['ssl_customer_code'] = '1111';
     $requestFields['ssl_salestax'] = 0.0;
+    $requestFields['ssl_cardholder_ip'] = CRM_Utils_System::ipAddress();
     return $requestFields;
   }
 
@@ -153,7 +154,6 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
     if ($this->_mode === 'test') {
       $requestFields['ssl_test_mode'] = "TRUE";
     }
-
     // Allow further manipulation of the arguments via custom hooks ..
     CRM_Utils_Hook::alterPaymentProcessorParams($this, $params, $requestFields);
 
@@ -286,6 +286,7 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
     $xmlFieldLength['ssl_salestax'] = 10;
     $xmlFieldLength['ssl_customer_code'] = 17;
     $xmlFieldLength['ssl_customer_number'] = 25;
+    $xmlFieldLength['ssl_cardholder_ip'] = 40;
 
     $xml = '<txn>';
     foreach ($requestFields as $key => $value) {

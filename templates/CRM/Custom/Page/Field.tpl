@@ -24,7 +24,7 @@
             <th>{ts}Req?{/ts}</th>
             <th>{ts}Searchable?{/ts}</th>
             <th>{ts}Enabled?{/ts}</th>
-            <th></th>
+            <th><span class="sr-only">{ts}Actions{/ts}</span></th>
         </tr>
         </thead>
         <tbody>

@@ -27,5 +27,6 @@ namespace Civi\Api4;
  */
 class ContactType extends Generic\DAOEntity {
   use Generic\Traits\ManagedEntity;
+  use Generic\Traits\HierarchicalEntity;
 
 }

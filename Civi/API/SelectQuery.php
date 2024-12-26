@@ -267,7 +267,7 @@ abstract class SelectQuery {
       $entityTable = $this->where[$entityTableParam] ?? NULL;
       if ($entityTable && is_string($entityTable) && \CRM_Core_DAO_AllCoreTables::getClassForTable($entityTable)) {
         $fkField['FKClassName'] = \CRM_Core_DAO_AllCoreTables::getClassForTable($entityTable);
-        $fkField['FKApiName'] = \CRM_Core_DAO_AllCoreTables::getBriefName($fkField['FKClassName']);
+        $fkField['FKApiName'] = \CRM_Core_DAO_AllCoreTables::getEntityNameForClass($fkField['FKClassName']);
       }
     }
     if (!empty($fkField['pseudoconstant']['optionGroupName'])) {

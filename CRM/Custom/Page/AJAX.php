@@ -25,6 +25,7 @@ class CRM_Custom_Page_AJAX {
    * @deprecated
    */
   public static function getOptionList() {
+    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
     $params = $_REQUEST;
 
     $sEcho = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
@@ -57,6 +58,7 @@ class CRM_Custom_Page_AJAX {
    *
    */
   public static function fixOrdering() {
+    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
     $params = $_REQUEST;
 
     $queryParams = [
@@ -94,6 +96,7 @@ class CRM_Custom_Page_AJAX {
    * Get list of Multi Record Fields.
    */
   public static function getMultiRecordFieldList(): void {
+    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
 
     $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams(0, 10);
     $params['cid'] = CRM_Utils_Type::escape($_GET['cid'], 'Integer');

@@ -71,8 +71,7 @@ class CRM_Mailing_Event_BAO_MailingEventQueue extends CRM_Mailing_Event_DAO_Mail
   /**
    * Verify that a queue event exists with the specified id/job id/hash.
    *
-   * @param int|int $job_id
-   *   The job ID of the event to find.
+   * @param null $unused
    * @param int $queue_id
    *   The Queue Event ID to find.
    * @param string $hash
@@ -81,7 +80,7 @@ class CRM_Mailing_Event_BAO_MailingEventQueue extends CRM_Mailing_Event_DAO_Mail
    * @return object|null
    *   The queue event if verified, or null
    */
-  public static function verify($job_id, $queue_id, $hash) {
+  public static function verify($unused, $queue_id, $hash) {
     $success = NULL;
     $q = new CRM_Mailing_Event_BAO_MailingEventQueue();
     if ($queue_id && $hash) {

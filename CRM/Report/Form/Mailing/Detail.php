@@ -131,6 +131,10 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
           'title' => ts('Delivery Status'),
           'default' => TRUE,
         ],
+        'time_stamp' => [
+          'title' => ts('Delivery Date'),
+          'default' => TRUE,
+        ],
       ],
       'filters' => [
         'delivery_status' => [
@@ -143,6 +147,12 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
             'successful' => 'Successful',
             'bounced' => 'Bounced',
           ],
+        ],
+        'time_stamp' => [
+          'name' => 'time_stamp',
+          'title' => ts('Delivery Date'),
+          'operatorType' => CRM_Report_Form::OP_DATE,
+          'type' => CRM_Utils_Type::T_DATE,
         ],
       ],
       'grouping' => 'mailing-fields',
@@ -271,12 +281,7 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
           if (!empty($field['required']) ||
             !empty($this->_params['fields'][$fieldName])
           ) {
-            if (in_array($fieldName, [
-              'unsubscribe_id',
-              'optout_id',
-              'forward_id',
-              'reply_id',
-            ])) {
+            if (in_array($fieldName, ['unsubscribe_id', 'optout_id', 'forward_id', 'reply_id'])) {
               $select[] = "IF({$field['dbAlias']} IS NULL, 'No', 'Yes') as {$tableName}_{$fieldName}";
               $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = $field['type'] ?? NULL;
               $this->_columnHeaders["{$tableName}_{$fieldName}"]['no_display'] = $field['no_display'] ?? NULL;

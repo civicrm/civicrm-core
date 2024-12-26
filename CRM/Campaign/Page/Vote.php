@@ -79,7 +79,7 @@ class CRM_Campaign_Page_Vote extends CRM_Core_Page {
       ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')
       ->addSetting([
         'tabSettings' => [
-          'active' => strtolower(CRM_Utils_Array::value('subPage', $_GET, 'reserve')),
+          'active' => strtolower($_GET['subPage'] ?? 'reserve'),
         ],
       ]);
   }
@@ -122,7 +122,8 @@ class CRM_Campaign_Page_Vote extends CRM_Core_Page {
       ];
     }
 
-    $this->assign('tabHeader', empty($allTabs) ? FALSE : $allTabs);
+    $tabs = empty($allTabs) ? [] : \CRM_Core_Smarty::setRequiredTabTemplateKeys($allTabs);
+    $this->assign('tabHeader', $tabs);
   }
 
 }

@@ -8,8 +8,8 @@
 
   var VISIBILITY = [
     {val: 'User and User Admin Only', label: ts('User and User Admin Only'), isInSelectorAllowed: false},
-    {val: 'Public Pages', label: ts('Expose Publicly'), isInSelectorAllowed: true},
-    {val: 'Public Pages and Listings', label: ts('Expose Publicly and for Listings'), isInSelectorAllowed: true}
+    {val: 'Public Pages', label: ts('Public Pages'), isInSelectorAllowed: true},
+    {val: 'Public Pages and Listings', label: ts('Public Pages and Listings'), isInSelectorAllowed: true}
   ];
 
   var LOCATION_TYPES = _.map(CRM.PseudoConstant.locationType, function(value, key) {

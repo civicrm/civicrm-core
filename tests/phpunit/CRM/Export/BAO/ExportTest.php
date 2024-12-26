@@ -89,7 +89,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'civicrm_case_activity',
       'civicrm_campaign',
     ]);
-    OptionValue::update(FALSE)->addWhere('name', '=', 'Much Much longer than just phone')->setValues(['label' => 'Mobile'])->execute();
+    OptionValue::update(FALSE)->addWhere('name', '=', 'Mobile')->addWhere('option_group_id:name', '=', 'phone_type')->setValues(['label' => 'Mobile'])->execute();
 
     if (!empty($this->locationTypes)) {
       $this->callAPISuccess('LocationType', 'delete', ['id' => $this->locationTypes['Whare Kai']['id']]);
@@ -184,7 +184,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'componentClause' => 'civicrm_contribution.id IN ( ' . implode(',', $this->contributionIDs) . ')',
     ]);
 
-    $this->assertEquals(array_merge($this->getBasicHeaderDefinition(FALSE), $this->getContributeHeaderDefinition()), $this->csv->getHeader());
+    $this->assertEquals(array_values(array_merge($this->getBasicHeaderDefinition(FALSE), $this->getContributeHeaderDefinition())), $this->csv->getHeader());
     $this->assertCount(3, $this->csv);
     $row = $this->csv->fetchOne();
     $this->assertEquals(95, $row['Net Amount']);
@@ -192,7 +192,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $row = $this->csv->fetchOne(1);
     $this->assertEquals(95, $row['Net Amount']);
     $this->assertEquals(5, $row['Soft Credit Amount']);
-    $this->assertEquals('Anderson, Anthony', $row['Soft Credit For']);
+    $this->assertEquals('Anderson, Anthony II', $row['Soft Credit For']);
     $this->assertEquals($this->contributionIDs[0], $row['Soft Credit For Contribution ID']);
 
     // Ideally we would use a randomised temp table name & use generic temp cleanup for cleanup - but
@@ -230,7 +230,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'No Bulk Emails (User Opt Out)' => '',
       'Legal Identifier' => '',
       'External Identifier' => '',
-      'Sort Name' => 'Anderson, Anthony',
+      'Sort Name' => 'Anderson, Anthony II',
       'Display Name' => 'Mr. Anthony Anderson II',
       'Nickname' => '',
       'Legal Name' => '',
@@ -850,7 +850,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $this->contactIDs[] = $this->individualCreate();
     $this->contactIDs[] = $this->individualCreate();
 
-    OptionValue::update()->addWhere('name', '=', 'Mobile')->setValues(['label' => 'Much Much longer than just phone'])->execute();
+    OptionValue::update()->addWhere('name', '=', 'Mobile')->addWhere('option_group_id:name', '=', 'phone_type')->setValues(['label' => 'Much Much longer than just phone'])->execute();
     $locationTypes = ['Billing' => 'Billing', 'Home' => 'Home'];
     $phoneTypes = ['Mobile', 'Phone'];
     foreach ($this->contactIDs as $contactID) {
@@ -1082,7 +1082,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'No Bulk Emails (User Opt Out)' => '',
       'Legal Identifier' => '',
       'External Identifier' => '',
-      'Sort Name' => 'Anderson, Anthony',
+      'Sort Name' => 'Anderson, Anthony II',
       'Display Name' => 'Mr. Anthony Anderson II',
       'Nickname' => '',
       'Legal Name' => '',
@@ -1114,9 +1114,9 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'Contact is in Trash' => '',
       'Created Date' => '2019-07-11 10:28:15',
       'Modified Date' => '2019-07-11 10:28:15',
-      'Addressee' => 'Mr. Anthony J. Anderson II, Dr. Sarah J. Smith II',
-      'Email Greeting' => 'Dear Anthony, Sarah',
-      'Postal Greeting' => 'Dear Anthony, Sarah',
+      'Addressee' => 'Mr. Anthony J. Anderson II, Mr. Joe M. Miller II',
+      'Email Greeting' => 'Dear Anthony, Joe',
+      'Postal Greeting' => 'Dear Anthony, Joe',
       'Current Employer' => '',
       'Location Type' => 'Home',
       'Street Address' => 'Ambachtstraat 23',
@@ -1184,14 +1184,13 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
         'addressee' => '2',
         'addressee_other' => 'random string {contact.display_name}',
         'mergeOption' => '1',
-        'additional_group' => '',
         'mapping' => '',
       ],
     ]);
     $this->assertExpectedOutput([
-      'Addressee' => 'random string Mr. Anthony Anderson II, Dr. Sarah Smith II',
-      'Email Greeting' => 'II Anderson and first is Anthony , II Smith Sarah ',
-      'Postal Greeting' => 'II Anderson and first is Anthony , II Smith Sarah ',
+      'Addressee' => 'random string Mr. Anthony Anderson II, Mr. Joe Miller II',
+      'Email Greeting' => 'II Anderson and first is Anthony , II Miller Joe ',
+      'Postal Greeting' => 'II Anderson and first is Anthony , II Miller Joe ',
     ], $this->csv->fetchOne());
     // 3 contacts merged to 2.
     $this->assertCount(2, $this->csv);
@@ -1856,7 +1855,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $this->setupBaseExportData($exportMode);
     $this->doExportTest(['selectAll' => TRUE, 'exportMode' => $exportMode, 'ids' => [1]]);
     $this->assertEquals($expected, $this->processor->getSQLColumns());
-    $this->assertEquals($expectedHeaders, $this->processor->getHeaderRows());
+    $this->assertEquals(array_values($expectedHeaders), $this->processor->getHeaderRows());
   }
 
   /**
@@ -2373,7 +2372,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    */
   protected function getContributeHeaderDefinition(): array {
     return [
-      82 => 'Financial Type',
+      82 => 'Financial Type Label',
       83 => 'Contribution Source',
       84 => 'Contribution Date',
       85 => 'Thank-you Date',
@@ -2587,7 +2586,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'im' => '`im` varchar(64)',
       'openid' => '`openid` varchar(255)',
       'world_region' => '`world_region` varchar(128)',
-      'url' => '`url` varchar(255)',
+      'url' => '`url` varchar(2048)',
       'groups' => '`groups` longtext',
       'tags' => '`tags` longtext',
       'notes' => '`notes` longtext',
@@ -2642,7 +2641,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'activity_subject' => '`activity_subject` varchar(255)',
       'activity_date_time' => '`activity_date_time` varchar(32)',
       'activity_duration' => '`activity_duration` varchar(64)',
-      'activity_location' => '`activity_location` varchar(255)',
+      'activity_location' => '`activity_location` varchar(2048)',
       'activity_details' => '`activity_details` longtext',
       'activity_status' => '`activity_status` varchar(255)',
       'activity_priority' => '`activity_priority` varchar(255)',
@@ -2771,7 +2770,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'im' => '`im` varchar(64)',
       'openid' => '`openid` varchar(255)',
       'world_region' => '`world_region` varchar(128)',
-      'url' => '`url` varchar(255)',
+      'url' => '`url` varchar(2048)',
       'phone_type_id' => '`phone_type_id` varchar(64)',
       'financial_type' => '`financial_type` varchar(255)',
       'contribution_source' => '`contribution_source` varchar(255)',
@@ -2986,9 +2985,9 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       [
         'first_name' => 'Joe',
         'last_name' => 'Miller',
-        'Home-street_address' => '',
-        'Home-city' => '',
-        'Home-country' => '',
+        'Home-street_address' => 'Ambachtstraat 23',
+        'Home-city' => 'Brummen',
+        'Home-country' => 'Netherlands',
         'Home-email' => 'joe_miller@civicrm.org',
       ],
     ], $result);
@@ -3004,7 +3003,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $params = [
       'contact_id' => $contact3,
       'location_type_id' => 'Home',
-      'street_address' => 'Ambachtstraat 23',
+      'street_address' => 'A different address',
       'postal_code' => '6971 BN',
       'country_id' => '1152',
       'city' => 'Brummen',

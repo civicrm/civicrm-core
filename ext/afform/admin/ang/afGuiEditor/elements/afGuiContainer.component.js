@@ -99,7 +99,8 @@
 
       $scope.tags = {
         div: ts('Container'),
-        fieldset: ts('Fieldset')
+        fieldset: ts('Fieldset'),
+        details: ts('Collapsible')
       };
 
       // Block settings
@@ -110,13 +111,17 @@
         return 'layout' in block;
       };
 
+      this.isJoin = function() {
+        return !!ctrl.join;
+      };
+
       $scope.getSetChildren = function(val) {
         var collection = block.layout || (ctrl.node && ctrl.node['#children']);
         return arguments.length ? (collection = val) : collection;
       };
 
       $scope.isRepeatable = function() {
-        return ctrl.join ||
+        return (ctrl.join && $scope.getRepeatMax() !== 1) ||
           (block.directive && afGui.meta.blocks[block.directive].repeat) ||
           (ctrl.node['af-fieldset'] && ctrl.editor.getEntityDefn(ctrl.editor.getEntity(ctrl.node['af-fieldset'])) !== false);
       };
@@ -139,9 +144,10 @@
       };
 
       this.getCollapsibleIcon = function() {
-        if (afGui.hasClass(ctrl.node, 'af-collapsible')) {
-          return afGui.hasClass(ctrl.node, 'af-collapsed') ? 'fa-caret-right' : 'fa-caret-down';
+        if (ctrl.node['#tag'] === 'details') {
+          return 'open' in ctrl.node ? 'fa-caret-down' : 'fa-caret-right';
         }
+        return '';
       };
 
       // Sets min value for af-repeat as a string, returns it as an int
@@ -253,7 +259,17 @@
         }
       };
 
+      this.onChangeUpdateAction = function() {
+        if (!ctrl.node.actions.update) {
+          ctrl.node.actions.delete = false;
+        }
+      };
+
       function initializeBlockContainer() {
+        // Set defaults for 'actions'
+        if (!('actions' in ctrl.node)) {
+          ctrl.node.actions = {update: true, delete: true};
+        }
 
         // Cancel the below $watch expressions if already set
         _.each(block.listeners, function(deregister) {
@@ -369,8 +385,6 @@
             ctrl.node['af-title'] = value;
           } else {
             delete ctrl.node['af-title'];
-            // With no title, cannot be collapsible
-            afGui.modifyClasses(ctrl.node, 'af-collapsible af-collapsed');
           }
         }
         return ctrl.node['af-title'];

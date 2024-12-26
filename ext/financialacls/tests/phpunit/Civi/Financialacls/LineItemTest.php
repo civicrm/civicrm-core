@@ -43,15 +43,15 @@ class LineItemTest extends BaseTestClass {
             [
               'financial_type_id' => \CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'),
               'line_total' => 40,
-              'price_field_id' => $this->ids['PriceField'][0],
-              'price_field_value_id' => $this->ids['PriceFieldValue'][0],
+              'price_field_id' => $this->ids['PriceField']['default'],
+              'price_field_value_id' => $this->ids['PriceFieldValue']['default-1'],
               'qty' => 1,
             ],
             [
               'financial_type_id' => \CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Member Dues'),
               'line_total' => 50,
-              'price_field_id' => $this->ids['PriceField'][0],
-              'price_field_value_id' => $this->ids['PriceFieldValue'][1],
+              'price_field_id' => $this->ids['PriceField']['default'],
+              'price_field_value_id' => $this->ids['PriceFieldValue']['default-2'],
               'qty' => 1,
             ],
           ],
@@ -64,7 +64,7 @@ class LineItemTest extends BaseTestClass {
 
     $lineItems = $this->callAPISuccess('LineItem', 'get', ['sequential' => TRUE])['values'];
     $this->assertCount(2, $lineItems);
-    $this->callAPISuccessGetCount('LineItem', ['check_permissions' => TRUE], 1);
+    $this->callAPISuccessGetCount('LineItem', ['check_permissions' => TRUE], 0);
 
     $this->callAPISuccess('LineItem', 'Delete', ['check_permissions' => ($version == 3), 'id' => $lineItems[0]['id']]);
     $this->callAPIFailure('LineItem', 'Delete', ['check_permissions' => TRUE, 'id' => $lineItems[1]['id']]);
@@ -73,7 +73,7 @@ class LineItemTest extends BaseTestClass {
       'entity_table' => 'civicrm_contribution',
       'line_total' => 20,
       'unit_price' => 20,
-      'price_field_id' => $this->ids['PriceField'][0],
+      'price_field_id' => $this->ids['PriceField']['default'],
       'qty' => 1,
       'financial_type_id' => 'Donation',
       'check_permissions' => ($version === 3),

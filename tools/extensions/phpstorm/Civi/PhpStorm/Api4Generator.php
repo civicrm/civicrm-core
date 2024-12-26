@@ -32,7 +32,7 @@ class Api4Generator extends AutoService implements EventSubscriberInterface {
      */
 
     $entities = Entity::get(FALSE)->addSelect('name')->execute()->column('name');
-    $actions = ['get', 'save', 'create', 'update', 'delete', 'replace', 'revert', 'export', 'autocomplete', 'getFields', 'getActions', 'checkAccess'];
+    $actions = ['get', 'save', 'create', 'update', 'delete', 'replace', 'revert', 'export', 'autocomplete', 'getFields', 'getActions', 'getLinks', 'checkAccess'];
     $properties = Entity::getFields(FALSE)->addOrderBy('name')->execute()->column('name');
     $entityTypes = Entity::getFields(FALSE)->addWhere('name', '=', 'type')->setLoadOptions(TRUE)->execute()->first()['options'] ?? [];
 
@@ -54,6 +54,7 @@ class Api4Generator extends AutoService implements EventSubscriberInterface {
     $builder->addExpectedArguments('\Civi\Api4\Utils\CoreUtil::getTableName()', 0, 'api4Entities');
     $builder->addExpectedArguments('\Civi\Api4\Utils\CoreUtil::getCustomGroupExtends()', 0, 'api4Entities');
     $builder->addExpectedArguments('\Civi\Api4\Utils\CoreUtil::getRefCount()', 0, 'api4Entities');
+    $builder->addExpectedArguments('\Civi\Api4\Utils\CoreUtil::getRefCountTotal()', 0, 'api4Entities');
     $builder->addExpectedArguments('\Civi\Api4\Utils\CoreUtil::isType()', 0, 'api4Entities');
     $builder->addExpectedArguments('\Civi\Api4\Utils\CoreUtil::isType()', 1, 'api4EntityTypes');
     $builder->addExpectedArguments('\Civi\Api4\Utils\CoreUtil::checkAccessDelegated()', 0, 'api4Entities');

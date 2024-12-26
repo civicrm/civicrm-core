@@ -148,7 +148,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
           'gender_id' => [
             'title' => ts('Gender'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'),
+            'options' => CRM_Contact_DAO_Contact::buildOptions('gender_id'),
           ],
           'birth_date' => [
             'title' => ts('Birth Date'),
@@ -494,7 +494,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
    * @return array
    */
   public function limit($rowCount = NULL) {
-    $rowCount = $rowCount ?? $this->getRowCount();
+    $rowCount ??= $this->getRowCount();
     return parent::limit($rowCount);
   }
 
@@ -504,7 +504,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
    * @param int|null $rowCount
    */
   public function setPager($rowCount = NULL) {
-    $rowCount = $rowCount ?? $this->getRowCount();
+    $rowCount ??= $this->getRowCount();
     parent::setPager($rowCount);
   }
 

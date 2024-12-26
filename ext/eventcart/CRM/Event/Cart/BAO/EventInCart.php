@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Api4\Contact;
+
 /**
  * Class CRM_Event_Cart_BAO_EventInCart
  */
@@ -9,6 +11,8 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
   public $event_cart;
   public $location = NULL;
   public $participants = [];
+
+  private $main_conference_event_id;
 
   /**
    * Add participant to cart.
@@ -30,12 +34,6 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
     $event_in_cart = new CRM_Event_Cart_BAO_EventInCart();
     $event_in_cart->copyValues($params);
     $event_in_cart = $event_in_cart->save();
-
-    if (is_a($event_in_cart, 'CRM_Core_Error')) {
-      $transaction->rollback();
-      throw new CRM_Core_Exception(ts('There was an error creating an event_in_cart'));
-    }
-
     $transaction->commit();
 
     return $event_in_cart;
@@ -50,12 +48,11 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
     $this->load_associations();
     $contacts_to_delete = [];
     foreach ($this->participants as $participant) {
-      $defaults = [];
-      $params = ['id' => $participant->contact_id];
-      $temporary_contact = CRM_Contact_BAO_Contact::retrieve($params, $defaults);
-
-      if ($temporary_contact->is_deleted) {
-        $contacts_to_delete[$temporary_contact->id] = 1;
+      // Selecting the already deleted ones because? But, it's how it has been....
+      if (Contact::get(FALSE)
+        ->addWhere('id', '=', $participant->contact_id)
+        ->addWhere('is_deleted', '=', TRUE)->execute()->first()) {
+        $contacts_to_delete[$participant->contact_id] = 1;
       }
       $participant->delete();
     }

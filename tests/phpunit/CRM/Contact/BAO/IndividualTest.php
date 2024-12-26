@@ -45,14 +45,14 @@ class CRM_Contact_BAO_IndividualTest extends CiviUnitTestCase {
     $contact = new CRM_Contact_DAO_Contact();
     CRM_Contact_BAO_Individual::format($params, $contact);
     $this->assertEquals('Mr. Ben Lee Jr.', $contact->display_name);
-    $this->assertEquals('Lee, Ben', $contact->sort_name);
+    $this->assertEquals('Lee, Ben Jr.', $contact->sort_name);
 
     // Check with legacy tokens too.
     \Civi::settings()->set('display_name_format', '{contact.individual_prefix}{ }{contact.first_name}{ }{contact.last_name}{ }{contact.individual_suffix}');
     $contact = new CRM_Contact_DAO_Contact();
     CRM_Contact_BAO_Individual::format($params, $contact);
     $this->assertEquals('Mr. Ben Lee Jr.', $contact->display_name);
-    $this->assertEquals('Lee, Ben', $contact->sort_name);
+    $this->assertEquals('Lee, Ben Jr.', $contact->sort_name);
   }
 
   /**
@@ -118,8 +118,44 @@ class CRM_Contact_BAO_IndividualTest extends CiviUnitTestCase {
     CRM_Contact_BAO_Individual::format($params, $contact);
 
     $this->assertEquals("bleu02@example.com", $contact->display_name);
-    $this->assertEquals("bleu02@example.com", $contact->sort_name);
+    $this->assertEquals('bleu02@example.com', $contact->sort_name);
 
+  }
+
+  /**
+   * Display Format cases
+   */
+  public static function displayFormatCases(): array {
+    return [
+      'Nick name with tilde' => ['{contact.first_name}{ }{contact.last_name}{ ~ }{contact.nick_name}', 'Michael Jackson ~ Mick'],
+      'Empty nick name' => ['{contact.first_name}{ }{contact.last_name}{ ~ }{contact.nick_name}', 'Michael Jackson', ['nick_name' => '']],
+      'Nick name with tilde, empty nick' => ['{contact.first_name}{ }{contact.last_name}{ ~ }{contact.nick_name}', 'Michael Jackson', ['nick_name' => '']],
+      'Nick name surrounding brackets' => ['{contact.first_name}{ }{ (}{contact.nick_name}{) }{contact.last_name}', 'Michael (Mick) Jackson'],
+      'Nick name surrounding brackets, empty nick' => ['{contact.first_name}{ }{ (}{contact.nick_name}{) }{contact.last_name}', 'Michael Jackson', ['nick_name' => '']],
+      'Nick name surrounding brackets at end' => ['{contact.first_name}{ }{contact.last_name}{ (}{contact.nick_name}{)}', 'Michael Jackson (Mick)'],
+      'Nick name surrounding brackets at end, empty nick' => ['{contact.first_name}{ }{contact.last_name}{ (}{contact.nick_name}{)}', 'Michael Jackson', ['nick_name' => '']],
+      'No Nick Name but Prefix' => ['{contact.individual_prefix}{ }{contact.first_name}{ }{contact.middle_name}{ }{contact.last_name}{ }{contact.individual_suffix}{ ~ }{contact.nick_name}', 'Mr. Michael Jackson Jr.', ['nick_name' => '']],
+    ];
+  }
+
+  /**
+   * @dataProvider displayFormatCases
+   */
+  public function testGenerateDisplayNameCustomFormats(string $displayNameFormat, string $expected, $contactValues = []): void {
+    $params = $contactValues + [
+      'contact_type' => 'Individual',
+      'first_name' => 'Michael',
+      'last_name' => 'Jackson',
+      'individual_prefix' => 'Mr.',
+      'individual_suffix' => 'Jr.',
+      'nick_name' => 'Mick',
+    ];
+    \Civi::settings()->set('display_name_format', $displayNameFormat);
+    $contact = new CRM_Contact_DAO_Contact();
+
+    CRM_Contact_BAO_Individual::format($params, $contact);
+    $this->assertEquals($expected, $contact->display_name);
+    \Civi::settings()->set('display_name_format', \Civi::settings()->getDefault('display_name_format'));
   }
 
 }

@@ -117,9 +117,9 @@
           <td>{$form.is_active.html}</td>
         </tr>
       </table>
-      <fieldset id="email-section" class="crm-collapsible" style="display: block;">
-        <legend class="collapsible-title">{ts}Email{/ts}</legend>
-        <div>
+      <details id="email-section" open>
+        <summary>{ts}Email{/ts}</summary>
+        <div class="crm-accordion-body">
           <table id="email-field-table" class="form-layout-compressed">
             <tr>
               <td class="label">{$form.from_name.label}</td>
@@ -145,10 +145,11 @@
           </table>
             {include file="CRM/Contact/Form/Task/EmailCommon.tpl" upload=1 noAttach=1}
         </div>
-      </fieldset>
+      </details>
     {if $sms}
-      <fieldset id="sms-section" class="crm-collapsible"><legend class="collapsible-title">{ts}SMS{/ts}</legend>
-        <div>
+      <details id="sms-section" open>
+        <summary>{ts}SMS{/ts}</summary>
+        <div class="crm-accordion-body">
           <table id="sms-field-table" class="form-layout-compressed">
             <tr class="crm-scheduleReminder-form-block-sms_provider_id">
               <td class="label">{$form.sms_provider_id.label} <span class="crm-marker">*</span></td>
@@ -159,9 +160,9 @@
               <td>{$form.SMStemplate.html}</td>
             </tr>
           </table>
-            {include file="CRM/Contact/Form/Task/SMSCommon.tpl" upload=1 noAttach=1}
-          <div>
-      </fieldset>
+          {include file="CRM/Contact/Form/Task/SMSCommon.tpl" upload=1 noAttach=1}
+        <div>
+      </details>
     {/if}
 
     {literal}
@@ -169,8 +170,8 @@
         (function($, _) {
           $(function($) {
             const $form = $('form.{/literal}{$form.formClass}{literal}'),
-              controlFields = {/literal}{$controlFields|@json_encode}{literal},
-              recurringFrequencyOptions = {/literal}{$recurringFrequencyOptions|@json_encode}{literal};
+              controlFields = {/literal}{$controlFields|@json_encode nofilter}{literal},
+              recurringFrequencyOptions = {/literal}{$recurringFrequencyOptions|@json_encode nofilter}{literal};
 
             // Reload metadata when a controlField is changed
             $form.on('change', 'input', function() {
@@ -201,11 +202,15 @@
                       $label = $('label[for=' + fieldSpec.name + ']', $form);
                     $label.text(fieldSpec.label);
                     if (fieldSpec.required) {
-                      $label.append(' <span class="crm-marker">*</span>')
+                      $label.append(' <span class="crm-marker">*</span>');
                     }
+                    // 'required' css class gets picked up by jQuery validate (but only in popup mode)
+                    // In full-page mode there is no clientside validation & this doesn't have any effect.
+                    // TODO: Would be nice for those things to be more consistent & also to use real html validation not jQuery.
+                    $field.toggleClass('required', fieldSpec.required);
                     $field.removeClass('loading');
                     // Show field and update option list if applicable
-                    if (fieldSpec.options) {
+                    if (fieldSpec.options && fieldSpec.options.length) {
                       fieldSpec.options.forEach(function(option) {
                         option.text = option.label;
                         delete(option.label);

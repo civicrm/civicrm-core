@@ -18,7 +18,7 @@
  * @group headless
  */
 class api_v3_ActivityContactTest extends CiviUnitTestCase {
-  protected $_apiversion;
+  protected $_apiversion = 3;
   protected $_contactID;
   protected $_activityID;
   protected $_params;
@@ -42,9 +42,8 @@ class api_v3_ActivityContactTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @dataProvider versionThreeAndFour
-   * @throws \CRM_Core_Exception
    */
-  public function testCreateActivityContact($version) {
+  public function testCreateActivityContact(int $version): void {
     $this->_apiversion = $version;
 
     $result = $this->callAPISuccess('ActivityContact', 'create', $this->_params);
@@ -61,9 +60,8 @@ class api_v3_ActivityContactTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @dataProvider versionThreeAndFour
-   * @throws \CRM_Core_Exception
    */
-  public function testDeleteActivityContact($version) {
+  public function testDeleteActivityContact(int $version): void {
     $this->_apiversion = $version;
     //create one
     $create = $this->callAPISuccess('activity_contact', 'create', $this->_params);

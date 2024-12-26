@@ -75,7 +75,7 @@ class AssetBuilderTest extends \CiviEndToEndTestCase {
    * Get a list of example assets to build/request.
    * @return array
    */
-  public function getExamples() {
+  public static function getExamples() {
     $examples = [];
 
     $examples[] = [
@@ -166,6 +166,11 @@ class AssetBuilderTest extends \CiviEndToEndTestCase {
     $this->assertEquals($expectedContent, $asset['content']);
   }
 
+  /**
+   * @group ornery
+   *
+   * @throws \GuzzleHttp\Exception\GuzzleException
+   */
   public function testInvalid(): void {
     \Civi::service('asset_builder')->setCacheEnabled(FALSE);
     $url = \Civi::service('asset_builder')->getUrl('invalid.json');

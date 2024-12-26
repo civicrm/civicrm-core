@@ -12,8 +12,8 @@
   {foreach from=$tree item="node" key="id"}
     <li>
       <a id="tag_{$id}" class="{if !$node.is_selectable || $permission neq 'edit'}jstree-disabled{/if} {if $tagged[$id]}jstree-clicked{/if}">
-        <span class="crm-tag-item" {if !empty($allTags.$id.color)}style="background-color: {$allTags.$id.color}; color: {$allTags.$id.color|colorContrast};"{/if} title="{$node.description|escape}">
-          {$node.name}
+        <span class="crm-tag-item" {if array_key_exists($id, $allTags) && !empty($allTags.$id.color)}style="background-color: {$allTags.$id.color}; color: {$allTags.$id.color|colorContrast};"{/if} title="{$node.description|escape}">
+          {$node.label}
         </span>
       </a>
       {if $node.children}

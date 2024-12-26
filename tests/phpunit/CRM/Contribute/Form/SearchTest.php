@@ -615,7 +615,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
         'expected_qill' => "Recurring Contribution Status = 'Cancelled'",
       ],
       // Case 4: Search for contributions with is_template = 1
-      'in_progress_search' => [
+      'is_template_search' => [
         'form_value' => ['contribution_is_template' => 1],
         'expected_count' => 1,
         'expected_contact' => ['Mr. Joe Miller II'],

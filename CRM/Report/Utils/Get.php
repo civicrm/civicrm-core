@@ -190,10 +190,7 @@ class CRM_Report_Utils_Get {
    */
   public static function processChart(&$defaults) {
     $chartType = $_GET["charts"] ?? NULL;
-    if (in_array($chartType, [
-      'barChart',
-      'pieChart',
-    ])) {
+    if (in_array($chartType, ['barChart', 'pieChart'])) {
       $defaults["charts"] = $chartType;
     }
   }

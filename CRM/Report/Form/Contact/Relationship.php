@@ -772,8 +772,8 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
 
   /**
    * Convert values to permissioned relationship descriptions
-   * @param  [int] $key
-   * @return [string]
+   * @param int[] $key
+   * @return string[]
    */
   public static function permissionedRelationship($key) {
     static $lookup;

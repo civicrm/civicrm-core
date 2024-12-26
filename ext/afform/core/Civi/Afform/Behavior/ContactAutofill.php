@@ -4,6 +4,7 @@ namespace Civi\Afform\Behavior;
 use Civi\Afform\AbstractBehavior;
 use Civi\Afform\Event\AfformEntitySortEvent;
 use Civi\Afform\Event\AfformPrefillEvent;
+use Civi\Api4\Utils\CoreUtil;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use CRM_Afform_ExtensionUtil as E;
 
@@ -96,16 +97,16 @@ class ContactAutofill extends AbstractBehavior implements EventSubscriberInterfa
   }
 
   public static function onAfformPrefill(AfformPrefillEvent $event): void {
-    if ($event->getEntityType() === 'Contact') {
+    if (CoreUtil::isContact($event->getEntityType())) {
       $entity = $event->getEntity();
       $id = $event->getEntityId();
       $autoFillMode = $entity['autofill'] ?? '';
       $relatedContact = $entity['autofill-relationship'] ?? NULL;
-      // Autofill with current user
-      if (!$id && $autoFillMode === 'user') {
+      // Autofill with current user, but only if this is an "entire form" prefill
+      if (!$id && $autoFillMode === 'user' && $event->getApiRequest()->getFillMode() === 'form') {
         $id = \CRM_Core_Session::getLoggedInContactID();
         if ($id) {
-          $event->getApiRequest()->loadEntity($entity, [$id]);
+          $event->getApiRequest()->loadEntity($entity, [['id' => $id]]);
         }
       }
       // Autofill by relationship
@@ -122,8 +123,12 @@ class ContactAutofill extends AbstractBehavior implements EventSubscriberInterfa
             ->addWhere('far_contact_id', '=', $relatedContact)
             ->addWhere('near_contact_id.is_deleted', '=', FALSE)
             ->addWhere('is_current', '=', TRUE)
-            ->execute()->column('near_contact_id');
-          $event->getApiRequest()->loadEntity($entity, $relations);
+            ->execute();
+          $relatedIds = [];
+          foreach ($relations as $relation) {
+            $relatedIds[] = ['id' => $relation['near_contact_id']];
+          }
+          $event->getApiRequest()->loadEntity($entity, $relatedIds);
         }
       }
     }

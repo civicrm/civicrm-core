@@ -1,5 +1,4 @@
 <?php
-use CRM_AfformAdmin_ExtensionUtil as E;
 
 /**
  * Upgrader base class ONLY for core component extensions (e.g. `civi_mail`, `civi_event`).
@@ -22,7 +21,7 @@ class CRM_Extension_Upgrader_Component extends CRM_Extension_Upgrader_Base {
   }
 
   /**
-   * Get of component (e.g. CiviMail)
+   * Get name of component corresponding to this extension (e.g. CiviMail)
    *
    * @return string
    */
