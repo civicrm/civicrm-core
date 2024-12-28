@@ -1,5 +1,4 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC. All rights reserved.                        |
@@ -47,6 +46,7 @@
  * Example 5: Auto-drop a temp table when $tmpTbl falls out of scope
  *
  * $tmpTbl->setAutodrop();
+ *
  */
 class CRM_Utils_SQL_TempTable {
 
@@ -60,7 +60,7 @@ class CRM_Utils_SQL_TempTable {
 
   const CATEGORY_LENGTH = 12;
   const CATEGORY_REGEXP = ';^[a-zA-Z0-9]+$;';
-  // MAX{64} - CATEGORY_LENGTH{12} - CONST_LENGHTH{15} = 37.
+  // MAX{64} - CATEGORY_LENGTH{12} - CONST_LENGHTH{15} = 37
   const ID_LENGTH = 37;
   const ID_REGEXP = ';^[a-zA-Z0-9_]+$;';
   const INNODB = 'ENGINE=InnoDB';
@@ -101,9 +101,6 @@ class CRM_Utils_SQL_TempTable {
     return $t;
   }
 
-  /**
-   * Destruct function.
-   */
   public function __destruct() {
     if ($this->autodrop) {
       $this->drop();
@@ -128,12 +125,10 @@ class CRM_Utils_SQL_TempTable {
    * Create the table using results from a SELECT query.
    *
    * @param string|CRM_Utils_SQL_Select $selectQuery
-   *
    * @return CRM_Utils_SQL_TempTable
    */
   public function createWithQuery($selectQuery) {
-    $sql = sprintf(
-      '%s %s %s AS %s',
+    $sql = sprintf('%s %s %s AS %s',
       $this->toSQL('CREATE'),
       $this->memory ? self::MEMORY : self::INNODB,
       $this->getUtf8String(),
@@ -164,30 +159,16 @@ class CRM_Utils_SQL_TempTable {
    * @param string $columns
    *   SQL column listing.
    *   Ex: 'id int(10), name varchar(64)'.
-   *
    * @return CRM_Utils_SQL_TempTable
    */
   public function createWithColumns($columns) {
-    try {
-      $sql = sprintf(
-        '%s (%s) %s %s',
-        $this->toSQL('CREATE'),
-        $columns,
-        $this->memory = self::MEMORY,
-        $this->getUtf8String()
-      );
-      CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, TRUE, FALSE);
-    }
-    catch (Exception $e) {
-      $sql = sprintf(
-        '%s (%s) %s %s',
-        $this->toSQL('CREATE'),
-        $columns,
-        $this->memory = self::INNODB,
-        $this->getUtf8String()
-      );
-      CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, TRUE, FALSE);
-    }
+    $sql = sprintf('%s (%s) %s %s',
+      $this->toSQL('CREATE'),
+      $columns,
+      $this->memory ? self::MEMORY : self::INNODB,
+      $this->getUtf8String()
+    );
+    CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, TRUE, FALSE);
     $this->createSql = $sql;
     return $this;
   }
@@ -205,12 +186,12 @@ class CRM_Utils_SQL_TempTable {
 
   /**
    * @param string $action
-   *   Ex: 'CREATE', 'DROP'.
+   *   Ex: 'CREATE', 'DROP'
    * @param string|null $ifne
    *   Ex: 'IF EXISTS', 'IF NOT EXISTS'.
    * @return string
-   *   Ex: 'CREATE TEMPORARY TABLE `civicrm_tmp_e_foo_abcd1234`'.
-   *   Ex: 'CREATE TABLE IF NOT EXISTS `civicrm_tmp_d_foo_abcd1234`'.
+   *   Ex: 'CREATE TEMPORARY TABLE `civicrm_tmp_e_foo_abcd1234`'
+   *   Ex: 'CREATE TABLE IF NOT EXISTS `civicrm_tmp_d_foo_abcd1234`'
    */
   private function toSQL($action, $ifne = NULL) {
     $parts = [];
@@ -227,21 +208,21 @@ class CRM_Utils_SQL_TempTable {
   }
 
   /**
-   * @return string|null
+   * @return string|NULL
    */
   public function getCategory() {
     return $this->category;
   }
 
   /**
-   * @return string|null
+   * @return string|NULL
    */
   public function getId() {
     return $this->id;
   }
 
   /**
-   * @return string|null
+   * @return string|NULL
    */
   public function getCreateSql() {
     return $this->createSql;
@@ -314,7 +295,7 @@ class CRM_Utils_SQL_TempTable {
   }
 
   /**
-   * Setter for id.
+   * Setter for id
    *
    * @param mixed $id
    *
