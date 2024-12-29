@@ -240,4 +240,30 @@ class CRM_Utils_SQL {
     }
   }
 
+  /**
+   * We can't just check a server variable because it doesn't always give
+   * the expected answer.
+   * @return bool
+   */
+  public static function isUnvexedMemoryEngineAvailable(): bool {
+    $isAvailable = Civi::cache('long')->get('sql_memory_engine');
+    if ($isAvailable === NULL) {
+      $isAvailable = getenv('CIVICRM_MEMORY_ENGINE_AVAILABLE');
+      // false here means the env var isn't present, otherwise it's 0 or 1.
+      if ($isAvailable === FALSE) {
+        $isAvailable = TRUE;
+        $tablename = 'civicrm_testing_memory_' . md5(uniqid('', TRUE));
+        try {
+          CRM_Core_DAO::executeQuery("CREATE TABLE `$tablename` (`id` integer) ENGINE=MEMORY", [], TRUE, NULL, TRUE, FALSE);
+          CRM_Core_DAO::executeQuery("DROP TABLE `$tablename`", [], TRUE, NULL, TRUE, FALSE);
+        }
+        catch (\Exception $e) {
+          $isAvailable = FALSE;
+        }
+      }
+      Civi::cache('long')->set('sql_memory_engine', (bool) $isAvailable);
+    }
+    return $isAvailable;
+  }
+
 }

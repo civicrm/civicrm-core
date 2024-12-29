@@ -2355,6 +2355,16 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    *   Whether to use nesting or reference-counting.
    */
   public function useTransaction($nest = TRUE) {
+    // Prime this now so it doesn't cause problems in db transactions.
+    // We need the env var because otherwise the cache keeps getting cleared
+    // and then it causes problems anyway.
+    if (CRM_Utils_SQL::isUnvexedMemoryEngineAvailable()) {
+      putenv('CIVICRM_MEMORY_ENGINE_AVAILABLE=1');
+    }
+    else {
+      putenv('CIVICRM_MEMORY_ENGINE_AVAILABLE=0');
+    }
+
     if (!$this->tx) {
       $this->tx = new CRM_Core_Transaction($nest);
       $this->tx->rollback();

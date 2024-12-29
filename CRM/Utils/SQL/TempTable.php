@@ -317,6 +317,9 @@ class CRM_Utils_SQL_TempTable {
    * @return $this
    */
   public function setMemory($value = TRUE) {
+    if ($value && !CRM_Utils_SQL::isUnvexedMemoryEngineAvailable()) {
+      $value = FALSE;
+    }
     $this->memory = $value;
     return $this;
   }
