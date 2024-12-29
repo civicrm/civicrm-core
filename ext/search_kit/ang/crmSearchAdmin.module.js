@@ -29,7 +29,7 @@
           savedSearch: function($route, crmApi4) {
             var params = $route.current.params;
             return crmApi4('SavedSearch', 'get', {
-              select: ['id', 'name', 'label', 'description', 'api_entity', 'api_params', 'is_template', 'expires_date', 'GROUP_CONCAT(DISTINCT entity_tag.tag_id) AS tag_id'],
+              select: ['id', 'name', 'label', 'description', 'api_entity', 'api_params', 'form_values', 'is_template', 'expires_date', 'GROUP_CONCAT(DISTINCT entity_tag.tag_id) AS tag_id'],
               where: [['id', '=', params.id]],
               join: [
                 ['EntityTag AS entity_tag', 'LEFT', ['entity_tag.entity_table', '=', '"civicrm_saved_search"'], ['id', '=', 'entity_tag.entity_id']],
@@ -51,7 +51,7 @@
           savedSearch: function($route, crmApi4) {
             var params = $route.current.params;
             return crmApi4('SavedSearch', 'get', {
-              select: ['label', 'description', 'api_entity', 'api_params', 'is_template', 'expires_date', 'GROUP_CONCAT(DISTINCT entity_tag.tag_id) AS tag_id'],
+              select: ['label', 'description', 'api_entity', 'api_params', 'form_values', 'is_template', 'expires_date', 'GROUP_CONCAT(DISTINCT entity_tag.tag_id) AS tag_id'],
               where: [['id', '=', params.id]],
               join: [
                 ['EntityTag AS entity_tag', 'LEFT', ['entity_tag.entity_table', '=', '"civicrm_saved_search"'], ['id', '=', 'entity_tag.entity_id']],
@@ -160,11 +160,11 @@
         }
       }
       // Get join metadata matching a given expression like "Email AS Contact_Email_contact_id_01"
-      function getJoin(fullNameOrAlias) {
+      function getJoin(savedSearch, fullNameOrAlias) {
         var alias = _.last(fullNameOrAlias.split(' AS ')),
           path = alias,
           baseEntity = searchEntity,
-          label = [],
+          labels = [],
           join,
           result;
         while (path.length) {
@@ -177,13 +177,20 @@
           }
           path = path.replace(join.alias + '_', '');
           var num = parseInt(path.substr(0, 2), 10);
-          label.push(join.label + (num > 1 ? ' ' + num : ''));
+          labels.push(join.label + (num > 1 ? ' ' + num : ''));
           path = path.replace(/^\d\d_?/, '');
           if (path.length) {
             baseEntity = join.entity;
           }
         }
-        result = _.assign(_.cloneDeep(join), {label: label.join(' - '), alias: alias, baseEntity: baseEntity});
+        const defaultLabel = labels.join(' - ');
+        result = _.assign(_.cloneDeep(join), {
+          label: (savedSearch && savedSearch.form_values && savedSearch.form_values.join && savedSearch.form_values.join[alias]) || defaultLabel,
+          defaultLabel: defaultLabel,
+          alias: alias,
+          baseEntity: baseEntity,
+          icon: getEntity(join.entity).icon,
+        });
         // Add the numbered suffix to the join conditions
         // If this is a deep join, also add the base entity prefix
         var prefix = alias.replace(new RegExp('_?' + join.alias + '_?\\d?\\d?$'), '');
@@ -212,7 +219,7 @@
           field;
         // If 2 or more segments, the first might be the name of a join
         if (dotSplit.length > 1) {
-          join = getJoin(dotSplit[0]);
+          join = getJoin(null, dotSplit[0]);
           if (join) {
             dotSplit.shift();
             entityName = join.entity;
@@ -361,7 +368,7 @@
         }
         return info;
       }
-      function getDefaultLabel(col) {
+      function getDefaultLabel(col, savedSearch) {
         var info = parseExpr(col),
           label = '';
         if (info.fn) {
@@ -369,7 +376,8 @@
         }
         _.each(info.args, function(arg) {
           if (arg.join) {
-            label += (label ? ' ' : '') + arg.join.label + ':';
+            let join = getJoin(savedSearch, arg.join.alias);
+            label += (label ? ' ' : '') + join.label + ':';
           }
           if (arg.field) {
             label += (label ? ' ' : '') + arg.field.label;
@@ -379,7 +387,7 @@
         });
         return label;
       }
-      function fieldToColumn(fieldExpr, defaults) {
+      function fieldToColumn(fieldExpr, defaults, savedSearch) {
         var info = parseExpr(fieldExpr),
           field = (_.findWhere(info.args, {type: 'field'}) || {}).field || {},
           values = _.merge({
@@ -388,7 +396,7 @@
             dataType: (info.fn && info.fn.data_type) || field.data_type
           }, defaults);
         if (defaults.label === true) {
-          values.label = getDefaultLabel(fieldExpr);
+          values.label = getDefaultLabel(fieldExpr, savedSearch);
         }
         if (defaults.sortable) {
           values.sortable = field.type && field.type !== 'Pseudo';
@@ -448,11 +456,11 @@
           return null;
         },
         // Find all possible search columns that could serve as contact_id for a smart group
-        getSmartGroupColumns: function(api_entity, api_params) {
-          var joins = _.pluck((api_params.join || []), 0);
-          return _.transform([api_entity].concat(joins), function(columns, joinExpr) {
+        getSmartGroupColumns: function(savedSearch) {
+          var joins = _.pluck((savedSearch.api_params.join || []), 0);
+          return _.transform([savedSearch.api_entity].concat(joins), function(columns, joinExpr) {
             var joinName = joinExpr.split(' AS '),
-              joinInfo = joinName[1] ? getJoin(joinName[1]) : {entity: joinName[0]},
+              joinInfo = joinName[1] ? getJoin(savedSearch, joinName[1]) : {entity: joinName[0]},
               entity = getEntity(joinInfo.entity),
               prefix = joinInfo.alias ? joinInfo.alias + '.' : '';
             _.each(entity.fields, function(field) {
