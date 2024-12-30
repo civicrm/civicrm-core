@@ -28,7 +28,7 @@ class CRM_Contribute_Form_ContributionPage_TabHeader {
   public static function build(&$form) {
     $tabs = $form->get('tabHeader');
     if (!$tabs || empty($_GET['reset'])) {
-      $tabs = self::process($form);
+      $tabs = self::process($form) ?? [];
       $form->set('tabHeader', $tabs);
     }
     $tabs = \CRM_Core_Smarty::setRequiredTabTemplateKeys($tabs);
