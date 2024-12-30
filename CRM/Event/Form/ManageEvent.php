@@ -396,7 +396,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
   private function build() {
     $tabs = $this->get('tabHeader');
     if (!$tabs || empty($_GET['reset'])) {
-      $tabs = $this->processTab();
+      $tabs = $this->processTab() ?? [];
       $this->set('tabHeader', $tabs);
     }
     $tabs = \CRM_Core_Smarty::setRequiredTabTemplateKeys($tabs);
