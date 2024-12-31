@@ -350,16 +350,7 @@ return [
         'label' => ts('Country'),
       ],
       'pseudoconstant' => [
-        'table' => 'civicrm_country',
-        'key_column' => 'id',
-        'label_column' => 'name',
-        'name_column' => 'iso_code',
-        'abbr_column' => 'iso_code',
-        'condition_provider' => ['CRM_Core_BAO_Address', 'alterCountry'],
-        'suffixes' => [
-          'label',
-          'abbr',
-        ],
+        'callback' => ['CRM_Core_BAO_Address', 'pseudoconstantCountry'],
       ],
       'entity_reference' => [
         'entity' => 'Country',

@@ -24,6 +24,11 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $this->quickCleanup(['civicrm_contact', 'civicrm_address']);
   }
 
+  public function tearDown(): void {
+    \Civi::settings()->set('pinnedContactCountries', []);
+    parent::tearDown();
+  }
+
   /**
    * Create() method (create and update modes)
    */
@@ -928,6 +933,12 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $this->assertEquals(1152, $availableCountries[1]);
     // United States
     $this->assertEquals(1228, $availableCountries[2]);
+  }
+
+  public function testPinnedCountryWithEntity(): void {
+    \Civi::settings()->set('pinnedContactCountries', ['1228']);
+    $countries = \Civi::entity('Address')->getOptions('country_id');
+    $this->assertEquals('US', $countries[0]['name']);
   }
 
   /**
