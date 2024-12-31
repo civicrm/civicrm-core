@@ -121,15 +121,6 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   }
 
   /**
-   * An array of Custom field mappings for api formatting
-   *
-   * e.g ['custom_7' => 'IndividualData.Marriage_date']
-   *
-   * @var array
-   */
-  protected $customFieldNameMap = [];
-
-  /**
    * Get User Job.
    *
    * API call to retrieve the userJob row.
@@ -2230,7 +2221,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
       }
       foreach ($params as $key => $value) {
         if (strpos($key, 'custom_') === 0) {
-          $params[$this->getApi4Name($key)] = $value;
+          $params[CRM_Core_BAO_CustomField::getLongNameFromShortName($key)] = $value;
           unset($params[$key]);
         }
       }
@@ -2264,25 +2255,6 @@ abstract class CRM_Import_Parser implements UserJobInterface {
         2 => $id,
       ]));
     }
-  }
-
-  /**
-   * Get the Api4 name of a custom field.
-   *
-   * @param string $key
-   *
-   * @return string
-   *
-   * @throws \CRM_Core_Exception
-   */
-  protected function getApi4Name(string $key): string {
-    if (!isset($this->customFieldNameMap[$key])) {
-      $this->customFieldNameMap[$key] = Contact::getFields(FALSE)
-        ->addWhere('custom_field_id', '=', str_replace('custom_', '', $key))
-        ->addSelect('name')
-        ->execute()->first()['name'];
-    }
-    return $this->customFieldNameMap[$key];
   }
 
   /**
@@ -2396,9 +2368,6 @@ abstract class CRM_Import_Parser implements UserJobInterface {
         }
       }
       $fieldName = $prefix . $fieldName;
-      if (!empty($field['custom_field_id'])) {
-        $this->customFieldNameMap['custom_' . $field['custom_field_id']] = $fieldName;
-      }
       $prefixedFields[$fieldName] = $field;
     }
 
