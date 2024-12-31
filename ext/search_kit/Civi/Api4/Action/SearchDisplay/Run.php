@@ -204,30 +204,14 @@ class Run extends AbstractRunAction {
   }
 
   private function formatToolbar(): array {
-    $toolbar = $data = [];
+    $toolbar = [];
     $settings = $this->display['settings'];
     // If no toolbar, early return
     if (empty($settings['toolbar']) && empty($settings['addButton']['path'])) {
       return [];
     }
     // There is no row data, but some values can be inferred from query filters
-    // First pass: gather raw data from the where & having clauses
-    foreach (array_merge($this->_apiParams['where'], $this->_apiParams['having'] ?? []) as $clause) {
-      if ($clause[1] === '=' || $clause[1] === 'IN') {
-        $data[$clause[0]] = $clause[2];
-      }
-    }
-    // Second pass: format values (because data from first pass could be useful to FormattingUtil)
-    foreach ($this->_apiParams['where'] as $clause) {
-      if ($clause[1] === '=' || $clause[1] === 'IN') {
-        [$fieldPath] = explode(':', $clause[0]);
-        $fieldSpec = $this->getField($fieldPath);
-        $data[$fieldPath] = $clause[2];
-        if ($fieldSpec) {
-          FormattingUtil::formatInputValue($data[$fieldPath], $clause[0], $fieldSpec, $data, $clause[1]);
-        }
-      }
-    }
+    $data = $this->getQueryData();
     // Support legacy 'addButton' setting
     if (empty($settings['toolbar']) && !empty($settings['addButton']['path'])) {
       $settings['toolbar'][] = $settings['addButton'] + ['style' => 'primary', 'target' => 'crm-popup'];

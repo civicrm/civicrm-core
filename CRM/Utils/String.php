@@ -1114,4 +1114,21 @@ class CRM_Utils_String {
     return $tokens;
   }
 
+  public static function isQuotedString($value): bool {
+    return is_string($value) && strlen($value) > 1 && $value[0] === $value[-1] && in_array($value[0], ['"', "'"]);
+  }
+
+  public static function unquoteString(string $string): string {
+    // Strip the outer quotes if the string starts and ends with the same quote type
+    if (self::isQuotedString($string)) {
+      $string = substr($string, 1, -1);
+
+      // Replace escaped quotes with unescaped quotes, avoiding escaped backslashes
+      $string = preg_replace('/(?<!\\\\)\\\\\\"/', '"', $string);
+      $string = preg_replace('/(?<!\\\\)\\\\\\\'/', "'", $string);
+    }
+
+    return $string;
+  }
+
 }

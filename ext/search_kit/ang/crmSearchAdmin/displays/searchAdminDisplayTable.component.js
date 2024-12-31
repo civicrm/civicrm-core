@@ -61,6 +61,36 @@
         ctrl.parent.initColumns({label: true, sortable: true});
       };
 
+      this.toggleEditableRowMode = function(name, value) {
+        ctrl.display.settings.editableRow = ctrl.display.settings.editableRow || {};
+        if (arguments.length < 2) {
+          value = !ctrl.display.settings.editableRow[name];
+        }
+        if (value === ctrl.display.settings.editableRow[name]) {
+          return;
+        }
+        ctrl.display.settings.editableRow[name] = value;
+        if (!value) {
+          delete ctrl.display.settings.editableRow[name];
+          if (name === 'create') {
+            delete ctrl.display.settings.editableRow.disable;
+            delete ctrl.display.settings.editableRow.createLabel;
+          }
+        }
+        else if (name === 'create') {
+          ctrl.display.settings.editableRow.createLabel = ts('Add');
+        }
+        if (name === 'full') {
+          delete ctrl.display.settings.editableRow.disable;
+        }
+        if (name === 'disable') {
+          delete ctrl.display.settings.editableRow.full;
+        }
+        if (angular.equals({}, ctrl.display.settings.editableRow)) {
+          delete ctrl.display.settings.editableRow;
+        }
+      };
+
       this.toggleTally = function() {
         if (ctrl.display.settings.tally) {
           delete ctrl.display.settings.tally;
