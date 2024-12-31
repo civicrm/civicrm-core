@@ -985,6 +985,8 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    * If you feel tempted to use this in live code then it probably means there is some functionality
    * that needs to be moved out of the form layer.
    *
+   * @deprecated since 5.82 will be removed around 5.86
+   *
    * @param array $params
    *
    * @return bool
