@@ -23,7 +23,7 @@
             </li>
           </ul>
         </div>
-        <input ng-if="filter.mode === 'routeParams'" class="form-control" ng-model="filter.value" />
+        <input ng-if="filter.mode === 'routeParams'" class="form-control" ng-model="filter.value" title="{{ ts('Append %1 to the URL to pass a parameter value to the form' , {1: '\'#/?' + filter.value + '=value\''}) }}" />
         <span ng-if="filter.mode === 'val'">
           <input class="form-control" af-gui-field-value="getField($ctrl.getFieldEntity(filter.name), filter.name)" ng-model="filter.value" />
         </span>
