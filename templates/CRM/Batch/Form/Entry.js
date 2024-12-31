@@ -27,8 +27,10 @@ CRM.$(function($) {
     var totalAmount = $('#field_'+rowNum+'_total_amount').val();
     //assign total amount as default soft credit amount
     $('#soft_credit_amount_'+ rowNum).val(totalAmount);
-    //assign soft credit type default value if any
-    $('#soft_credit_type_'+ rowNum).val($('#sct_default_id').val());
+    //assign soft credit type default value if one has not already been selected.
+    if (!$('#soft_credit_type_'+ rowNum).val()) {
+      $('#soft_credit_type_'+ rowNum).val($('#sct_default_id').val());
+    }
   });
 
   // Could be replaced if there ever is a PCP API.
