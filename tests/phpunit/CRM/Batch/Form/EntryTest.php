@@ -25,6 +25,8 @@
  */
 
 use Civi\Api4\Campaign;
+use Civi\Api4\Contribution;
+use Civi\Api4\LineItem;
 
 /**
  * @package   CiviCRM
@@ -76,14 +78,6 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
    * @var int
    */
   protected $contactID4 = NULL;
-
-  /**
-   * Validate all financial entities before tear down.
-   *
-   * @var bool
-   * @see CiviUnitTestCase->assertPostConditions()
-   */
-  protected $isValidateFinancialsOnPostAssert = TRUE;
 
   /**
    * @throws \CRM_Core_Exception
@@ -158,7 +152,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
    */
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
-    $this->quickCleanup(['civicrm_campaign']);
+    $this->quickCleanup(['civicrm_campaign', 'civicrm_batch', 'civicrm_entity_batch']);
     $this->relationshipTypeDelete($this->relationshipTypeID);
     if ($this->callAPISuccessGetCount('membership', ['id' => $this->membershipTypeID])) {
       $this->membershipTypeDelete(['id' => $this->membershipTypeID]);
@@ -228,17 +222,19 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
   public function testProcessContribution($thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);
     $this->offsetDefaultPriceSet();
-    $form = new CRM_Batch_Form_Entry();
-    $params = $this->getContributionData();
-    $this->assertTrue($form->testProcessContribution($params));
-    $result = $this->callAPISuccess('contribution', 'get', ['return' => 'total_amount']);
-    $this->assertEquals(3, $result['count']);
-    foreach ($result['values'] as $contribution) {
-      $this->assertEquals($this->callAPISuccess('line_item', 'getvalue', [
-        'contribution_id' => $contribution['id'],
-        'return' => 'line_total',
+    $this->createTestEntity('Batch', ['name' => 'contributions', 'type_id:name' => 'Contribution', 'status_id:name' => 'Open', 'item_count' => 3, 'total' => 4500.45, 'data' => '{"values":[]}']);
+    $this->getTestForm('CRM_Batch_Form_Entry', $this->getContributionData(), ['id' => $this->ids['Batch']['default']])->processForm();
 
-      ]), $contribution['total_amount']);
+    $contributions = Contribution::get(FALSE)
+      ->addSelect('total_amount', 'financial_type_id')
+      ->execute();
+    $this->assertCount(3, $contributions);
+    foreach ($contributions as $contribution) {
+      $lineItem = LineItem::get(FALSE)
+        ->addWhere('contribution_id', '=', $contribution['id'])
+        ->execute()->single();
+      $this->assertEquals($lineItem['line_total'], $contribution['total_amount']);
+      $this->assertEquals($lineItem['financial_type_id'], $contribution['financial_type_id']);
     }
     $checkResult = $this->callAPISuccess('Contribution', 'get', ['check_number' => ['IS NOT NULL' => 1]]);
     $this->assertEquals(1, $checkResult['count']);
@@ -397,7 +393,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
           'contribution_status_id' => 1,
         ],
         3 => [
-          'financial_type' => 1,
+          'financial_type' => 3,
           'total_amount' => $this->formatMoneyInput(1500.15),
           'receive_date' => '2013-07-24',
           'receive_date_time' => NULL,
