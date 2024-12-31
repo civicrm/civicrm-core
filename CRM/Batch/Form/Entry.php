@@ -579,7 +579,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
           //CRM-15350: if soft-credit-type profile field is disabled or removed then
           //we choose configured SCT default value
-          if (!empty($params['soft_credit_type'][$key])) {
+          if (array_key_exists('soft_credit_type', $params)) {
             $value['soft_credit'][$key]['soft_credit_type_id'] = $params['soft_credit_type'][$key];
           }
           else {
