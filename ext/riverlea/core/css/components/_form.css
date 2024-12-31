@@ -352,6 +352,10 @@ input.crm-form-checkbox + label,
   flex-wrap: wrap;
   gap: var(--gap);
 }
+/* Reset checkbox width when its rendered as text '(x)' in confirmation screens /dev/core/-/issues/5550 */
+.crm-container.crm-public .crm-profile-view .crm-option-label-pair {
+  --checkbox-width: auto;
+}
 /* Override more general styling */
 .crm-container .crm-multiple-checkbox-radio-options :where(input.crm-form-radio,
 input.crm-form-checkbox) + label {
@@ -567,9 +571,11 @@ input.crm-form-checkbox) + label {
 }
 .select2-drop.select2-drop-active.crm-container .select2-results li {
   color: var(--crm-c-text);
-  padding-block: var(--crm-s);
-  border-top: 1px solid var(--crm-c-background4);
+  padding: var(--crm-s) var(--crm-m);
   margin: 0;
+}
+.select2-drop.select2-drop-active.crm-container .select2-results li:has(.crm-select2-row-description) {
+  border-top: var(--crm-c-divider);
 }
 .select2-results .select2-ajax-error,
 .select2-results .select2-no-results,
@@ -588,11 +594,6 @@ input.crm-form-checkbox) + label {
   box-sizing: border-box;
   height: var(--crm-l);
   margin-top: var(--crm-s);
-}
-.select2-drop.select2-drop-active.crm-container .select2-results > li {
-  color: var(--crm-c-text);
-  padding: var(--crm-m);
-  border-top: 0;
 }
 .select2-drop .crm-entityref-links {
   border-top: 1px solid var(--crm-input-border-color);
@@ -621,6 +622,36 @@ input.crm-form-checkbox) + label {
   margin: 0;
   padding: 0;
 }
+
+/* Select2 accordion (re-uses some of accordion.css) */
+
+.select2-drop.collapsible-optgroups-enabled .select2-result-with-children .select2-result-sub {
+  display: none;
+}
+.select2-drop.collapsible-optgroups-enabled .select2-result-with-children.optgroup-expanded .select2-result-sub {
+  display: block;
+}
+.select2-drop.collapsible-optgroups-enabled .select2-result-with-children.optgroup-expanded > .select2-result-label:before {
+  transform: var(--crm-expand-transform);
+  transition: var(--crm-expand-transition);
+}
+.select2-drop.collapsible-optgroups-enabled .select2-result-with-children > .select2-result-label:before {
+  font-size: var(--crm-font-size);
+  content: var(--crm-expand-icon);
+  color: var(--crm-expand-icon-color);
+  font-style: normal;
+  font-family: FontAwesome;
+  text-rendering: auto;
+  text-indent: inherit;
+  margin-right: 0.5rem;
+  display: inline-block;
+  transform-origin: center center;
+  transition: var(--crm-expand-transition);
+}
+.select2-drop.select2-drop-active.crm-container li.select2-result-with-children {
+  padding: 0;
+}
+
 
 /* Dates */
 
