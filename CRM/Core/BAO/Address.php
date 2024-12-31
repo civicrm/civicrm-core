@@ -1301,6 +1301,14 @@ SELECT is_primary,
   }
 
   /**
+   * Silly wrapper because the entity callback passes in different vars than
+   * the pseudoconstant takes.
+   */
+  public static function pseudoconstantCountry($dummy, $dummy2) {
+    return CRM_Core_PseudoConstant::country();
+  }
+
+  /**
    * Pseudoconstant condition_provider for county_id field.
    * @see \Civi\Schema\EntityMetadataBase::getConditionFromProvider
    */
