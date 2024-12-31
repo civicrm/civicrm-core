@@ -116,9 +116,14 @@
       </ul>
 
       {foreach from=$allTabs item=tabValue}
-        {if !empty($tabValue.template)}
+        {if $tabValue.template}
           <div id="contact-{$tabValue.id}">
-            {include file=$tabValue.template}
+            {if $tabValue.module}
+              <!-- afform tab - need to pass module and directive to afform param -->
+              {include file=$tabValue.template afform=$tabValue}
+            {else}
+              {include file=$tabValue.template}
+            {/if}
           </div>
         {/if}
       {/foreach}

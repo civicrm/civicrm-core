@@ -5,5 +5,5 @@
     <af-field name="status_id" defn="{input_attrs: {multiple: true, placeholder: ts('Status')}, label: false}" />
     <af-field name="activity_date_time" defn="{input_type: 'Select', search_range: true, input_attrs: {placeholder: ts('Date')}, label: false}" />
   </div>
-  <crm-search-display-table search-name="Contact_Summary_Activities" display-name="Contact_Summary_Activities_Tab" filters="{'Activity_ActivityContact_Contact_01.id': options.contact_id}"></crm-search-display-table>
+  <crm-search-display-table search-name="Contact_Summary_Activities" display-name="Contact_Summary_Activities_Tab" filters="{'Activity_ActivityContact_Contact_01.id': options.entity_id}"></crm-search-display-table>
 </div>

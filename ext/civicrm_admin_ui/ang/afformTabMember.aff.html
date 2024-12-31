@@ -1,11 +1,11 @@
 <div af-fieldset="">
-  <crm-search-display-table search-name="Contact_Summary_Memberships" display-name="Contact_Summary_Memberships_Active" filters="{contact_id: options.contact_id, 'status_id.is_current_member': true}"></crm-search-display-table>
+  <crm-search-display-table search-name="Contact_Summary_Memberships" display-name="Contact_Summary_Memberships_Active" filters="{contact_id: options.entity_id, 'status_id.is_current_member': true}"></crm-search-display-table>
   <h3>{{:: ts('Pending and Inactive Memberships') }}</h3>
-  <crm-search-display-table search-name="Contact_Summary_Memberships" display-name="Contact_Summary_Memberships_Inactive" filters="{contact_id: options.contact_id, 'status_id.is_current_member': false}"></crm-search-display-table>
+  <crm-search-display-table search-name="Contact_Summary_Memberships" display-name="Contact_Summary_Memberships_Inactive" filters="{contact_id: options.entity_id, 'status_id.is_current_member': false}"></crm-search-display-table>
 </div>
 <div class="af-markup">
   <hr />
 </div>
 <div af-fieldset="" af-title="Membership Types">
-  <crm-search-display-table search-name="Contact_Summary_Membership_Type" display-name="Contact_Summary_Membership_Type" filters="{member_of_contact_id: options.contact_id, 'is_active': true}"></crm-search-display-table>
+  <crm-search-display-table search-name="Contact_Summary_Membership_Type" display-name="Contact_Summary_Membership_Type" filters="{member_of_contact_id: options.entity_id, 'is_active': true}"></crm-search-display-table>
 </div>
