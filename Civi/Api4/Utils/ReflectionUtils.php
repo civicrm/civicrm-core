@@ -83,7 +83,7 @@ class ReflectionUtils {
         $key = array_shift($words);
         $param = NULL;
         if ($key == 'var') {
-          $info['type'] = explode('|', $words[0]);
+          $info['type'] = explode('|', strtolower($words[0]));
         }
         elseif ($key == 'return') {
           $info['return'] = explode('|', $words[0]);
