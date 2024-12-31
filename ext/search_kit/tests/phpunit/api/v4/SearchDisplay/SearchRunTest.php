@@ -49,6 +49,8 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
       ->addSelect('geoProvider')
       ->execute();
     parent::tearDown();
+    // Skipped by parent because of TransactionalInterface, but needed to delete custom fields & groups
+    $this->deleteTestRecords();
   }
 
   /**
@@ -560,6 +562,68 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     // 4th link is to the case, and only for the relevant entity
     $this->assertEquals('Manage Case', $result[2]['columns'][1]['links'][3]['text']);
     $this->assertStringContainsString("id={$case['id']}", $result[3]['columns'][1]['links'][3]['url']);
+  }
+
+  public function testRelatedContactSearch(): void {
+    $this->createTestRecord('CustomGroup', [
+      'extends' => 'Relationship',
+      'name' => 'test_rel_fields',
+    ]);
+    $this->createTestRecord('CustomField', [
+      'custom_group_id.name' => 'test_rel_fields',
+      'label' => 'Opts',
+      'html_type' => 'Select',
+      'option_values' => ['r' => 'Red', 'g' => 'Green', 'b' => 'Blue'],
+    ]);
+
+    $cids = $this->saveTestRecords('Individual', [
+      'records' => 3,
+    ])->column('id');
+
+    $this->saveTestRecords('Relationship', [
+      'defaults' => [
+        'contact_id_a' => $cids[0],
+        'relationship_type_id:name' => 'Child of',
+      ],
+      'records' => [
+        ['contact_id_b' => $cids[1], 'test_rel_fields.Opts' => 'r'],
+        ['contact_id_b' => $cids[2], 'test_rel_fields.Opts' => 'g'],
+      ],
+    ]);
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Individual',
+        'api_params' => [
+          'version' => 4,
+          'select' => [
+            'id',
+            'Contact_RelationshipCache_Contact_01.test_rel_fields.Opts:label',
+          ],
+          'where' => [['id', 'IN', $cids]],
+          'join' => [
+            [
+              'Contact AS Contact_RelationshipCache_Contact_01',
+              'INNER',
+              'RelationshipCache',
+              ['id', '=', 'Contact_RelationshipCache_Contact_01.far_contact_id'],
+              ['Contact_RelationshipCache_Contact_01.near_relation:name', '=', '"Child of"'],
+            ],
+          ],
+        ],
+      ],
+      'display' => NULL,
+      'sort' => [
+        ['Contact_RelationshipCache_Contact_01.test_rel_fields.Opts:label', 'ASC'],
+      ],
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(2, $result);
+    $this->assertEquals('Green', $result[0]['columns'][1]['val']);
+    $this->assertEquals('Red', $result[1]['columns'][1]['val']);
   }
 
   /**
