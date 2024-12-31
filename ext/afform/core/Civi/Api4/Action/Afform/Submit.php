@@ -106,16 +106,16 @@ class Submit extends AbstractProcessor {
   }
 
   /**
-   * Validate required field values
+   * Validate field values checking required & maxlength
    *
    * @param \Civi\Afform\Event\AfformValidateEvent $event
    */
-  public static function validateRequiredFields(AfformValidateEvent $event): void {
+  public static function validateFieldInput(AfformValidateEvent $event): void {
     foreach ($event->getFormDataModel()->getEntities() as $afEntityName => $afEntity) {
       $entityValues = $event->getEntityValues()[$afEntityName] ?? [];
       foreach ($entityValues as $values) {
         foreach ($afEntity['fields'] as $fieldName => $attributes) {
-          $error = self::getRequiredFieldError($event, $afEntity['type'], $fieldName, $attributes, $values['fields'][$fieldName] ?? NULL);
+          $error = self::getFieldInputError($event, $afEntity['type'], $fieldName, $attributes, $values['fields'][$fieldName] ?? NULL);
           if ($error) {
             $event->setError($error);
           }
@@ -123,7 +123,7 @@ class Submit extends AbstractProcessor {
         foreach ($afEntity['joins'] as $joinEntity => $join) {
           foreach ($values['joins'][$joinEntity] ?? [] as $joinIndex => $joinValues) {
             foreach ($join['fields'] ?? [] as $fieldName => $attributes) {
-              $error = self::getRequiredFieldError($event, $joinEntity, $fieldName, $attributes, $joinValues[$fieldName] ?? NULL, $joinEntity);
+              $error = self::getFieldInputError($event, $joinEntity, $fieldName, $attributes, $joinValues[$fieldName] ?? NULL, $joinEntity);
               if ($error) {
                 $event->setError($error);
               }
@@ -220,6 +220,13 @@ class Submit extends AbstractProcessor {
   }
 
   /**
+   * If a required field is missing a value or exceeds the maxlength, return an error message
+   */
+  private static function getFieldInputError(AfformValidateEvent $event, string $apiEntity, string $fieldName, $attributes, $value) {
+    return self::getRequiredFieldError($event, $apiEntity, $fieldName, $attributes, $value) ?? self::getMaxlengthError($apiEntity, $fieldName, $attributes, $value);
+  }
+
+  /**
    * If a required field is missing a value, return an error message
    *
    * @param \Civi\Afform\Event\AfformValidateEvent $event
@@ -261,6 +268,30 @@ class Submit extends AbstractProcessor {
       return E::ts('%1 is a required field.', [1 => $label]);
     }
     return NULL;
+  }
+
+  /**
+   * If a required field is missing a value or exceeds the maxlength, return an error message
+   */
+  private static function getMaxlengthError(string $apiEntity, string $fieldName, $attributes, $value) {
+    // If we have no value, no need to check maxlength
+    if (!$value || !is_string($value)) {
+      return NULL;
+    }
+
+    if (array_key_exists('maxlength', $attributes['defn']['input_attrs'] ?? [])) {
+      $maxlength = $attributes['defn']['input_attrs']['maxlength'];
+    }
+    else {
+      $fullDefn = FormDataModel::getField($apiEntity, $fieldName, 'create');
+      $maxlength = $fullDefn['input_attrs']['maxlength'] ?? NULL;
+    }
+
+    if ($maxlength && strlen($value) > $maxlength) {
+      $fullDefn ??= FormDataModel::getField($apiEntity, $fieldName, 'create');
+      $label = $attributes['defn']['label'] ?? $fullDefn['label'] ?? $fieldName;
+      return E::ts('%1 has a max length of %2.', [1 => $label, 2 => $maxlength]);
+    }
   }
 
   /**

@@ -12,6 +12,12 @@
     {{:: ts('Show Time') }}
   </a>
 </li>
+<li ng-if="$ctrl.fieldDefn.input_type === 'Text' || $ctrl.fieldDefn.input_type === 'TextArea'">
+  <form ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown">
+    <label for="{{:: $ctrl.node.name}}-maxlength">{{:: ts('Max Length:') }}</label>
+    <input id="{{:: $ctrl.node.name}}-maxlength" type="number" min="1" step="1" class="form-control" ng-model="getSet('input_attrs.maxlength')" ng-model-options="{getterSetter: true}">
+  </form>
+</li>
 <li ng-if="$ctrl.fieldDefn.input_type === 'Number' && $ctrl.fieldDefn.data_type === 'Float'">
   <div href ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown">
     <label>{{:: ts('Decimal places:') }}</label>
