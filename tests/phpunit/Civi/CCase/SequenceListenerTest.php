@@ -14,7 +14,7 @@ class SequenceListenerTest extends \CiviCaseTestCase {
     $this->_params = [
       'case_type' => $this->caseType,
       'subject' => 'Test case',
-      'contact_id' => 17,
+      'contact_id' => $this->individualCreate([], 'case_subject'),
     ];
     //Add an activity status with Type = Completed
     $this->callAPISuccess('OptionValue', 'create', [
@@ -31,9 +31,9 @@ class SequenceListenerTest extends \CiviCaseTestCase {
 
     // Create case; schedule first activity
     \CRM_Utils_Time::setTime('2013-11-30 01:00:00');
-    $case = $this->callAPISuccess('case', 'create', $this->_params);
+    $case = $this->callAPISuccess('Case', 'create', $this->_params);
     $analyzer = new \Civi\CCase\Analyzer($case['id']);
-    $this->assertEquals($caseStatuses['Open'], self::ag($analyzer->getCase(), 'status_id'));
+    $this->assertEquals('Open', \CRM_Core_PseudoConstant::getLabel('CRM_Case_BAO_Case', 'status_id', self::ag($analyzer->getCase(), 'status_id')));
     $this->assertApproxTime('2013-11-30 01:00:00', self::ag($analyzer->getSingleActivity('Medical evaluation'), 'activity_date_time'));
     $this->assertEquals($actStatuses['Scheduled'], self::ag($analyzer->getSingleActivity('Medical evaluation'), 'status_id'));
     $this->assertFalse($analyzer->hasActivity('Mental health evaluation'));
@@ -46,7 +46,7 @@ class SequenceListenerTest extends \CiviCaseTestCase {
       'subject' => 'This is the new subject',
     ]);
     $analyzer = new \Civi\CCase\Analyzer($case['id']);
-    $this->assertEquals($caseStatuses['Open'], self::ag($analyzer->getCase(), 'status_id'));
+    $this->assertEquals('Open', \CRM_Core_PseudoConstant::getLabel('CRM_Case_BAO_Case', 'status_id', self::ag($analyzer->getCase(), 'status_id')));
     $this->assertApproxTime('2013-11-30 01:00:00', self::ag($analyzer->getSingleActivity('Medical evaluation'), 'activity_date_time'));
     $this->assertEquals($actStatuses['Scheduled'], self::ag($analyzer->getSingleActivity('Medical evaluation'), 'status_id'));
     $this->assertFalse($analyzer->hasActivity('Mental health evaluation'));
