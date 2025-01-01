@@ -15,9 +15,6 @@
 {ts}If you are using the CiviMail component to send mailings to contacts, this field provides additional control over which email address is used. By default, CiviMail sends mail to each contact's preferred email address. If the contact has multiple locations, then the preferred email of the primary location is used. However, if the contact prefers to have CiviMail ('bulk') mailings set to an alternate email address - check the 'Use for Bulk Mailings' box next to that email address.{/ts}
 {/htxt}
 
-{htxt id="id-optOut-title"}
-  {ts}Opt Out{/ts}
-{/htxt}
 {htxt id="id-optOut"}
 {ts}This option is designed to be set by the contact themselves when they don't want to receive bulk email from your organization (they set it using the opt-out action from a CiviMail mailing).   Please think before changing it, as it will override the preference they have set.{/ts}
 {/htxt}
