@@ -30,10 +30,6 @@ define('CIVICRM_TEST', 1);
 eval(cv('php:boot --level=settings', 'phpcode'));
 // phpcs:enable
 
-if (CIVICRM_UF === 'UnitTests') {
-  Civi\Test::headless()->apply();
-}
-
 spl_autoload_register(function($class) {
   _phpunit_mockoloader('api\\v4\\', "tests/phpunit/api/v4/", $class);
   _phpunit_mockoloader('Civi\\Api4\\', "tests/phpunit/api/v4/Mock/Api4/", $class);
