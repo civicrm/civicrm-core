@@ -101,6 +101,8 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    */
   protected $_apiversion = 3;
 
+  private array $entityTracking = [];
+
   /**
    * Track tables we have modified during a test.
    *
@@ -377,6 +379,9 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     // something changed it and then inadvertently didn't restore it.
     $this->errorHandlerAtStartOfTest = set_error_handler(function($errno, $errstr, $errfile, $errline) {});
     restore_error_handler();
+    $this->entityTracking['RelationshipType'] = CRM_Core_DAO::singleValueQuery('
+      SELECT count(*) FROM civicrm_relationship_type
+    ');
   }
 
   /**
@@ -543,6 +548,9 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       DedupeRuleGroup::delete(FALSE)->addWhere('id', 'IN', $this->ids['DedupeRuleGroup'])->execute();
     }
     unset(CRM_Core_Config::singleton()->userPermissionClass->permissions);
+      $this->assertEquals(CRM_Core_DAO::singleValueQuery('
+        SELECT count(*) FROM civicrm_relationship_type
+      '), $this->entityTracking['RelationshipType']);
     parent::tearDown();
   }
 
