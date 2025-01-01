@@ -67,23 +67,6 @@ class CiviCaseTestCase extends CiviUnitTestCase {
     // Now, the rule is simply: use the "name" from "civicrm_case_type.name".
     $this->caseType = 'housing_support';
     $this->caseTypeId = 1;
-    $this->tablesToTruncate = [
-      'civicrm_activity',
-      'civicrm_contact',
-      'civicrm_custom_group',
-      'civicrm_custom_field',
-      'civicrm_case',
-      'civicrm_case_contact',
-      'civicrm_case_activity',
-      'civicrm_case_type',
-      'civicrm_activity_contact',
-      'civicrm_managed',
-      'civicrm_relationship',
-      'civicrm_relationship_type',
-      'civicrm_uf_match',
-    ];
-
-    $this->quickCleanup($this->tablesToTruncate);
 
     $this->loadAllFixtures();
 
@@ -91,8 +74,7 @@ class CiviCaseTestCase extends CiviUnitTestCase {
     $this->customDirectories(['template_path' => TRUE]);
 
     // case is not enabled by default
-    $enableResult = CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
-    $this->assertTrue($enableResult, 'Cannot enable CiviCase in line ' . __LINE__);
+    $this->assertTrue(CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase'));
 
     /** @var \CRM_Utils_Hook_UnitTests $hooks  */
     $hooks = \CRM_Utils_Hook::singleton();
@@ -114,6 +96,18 @@ class CiviCaseTestCase extends CiviUnitTestCase {
    */
   public function tearDown(): void {
     $this->customDirectories(['template_path' => FALSE]);
+    $this->tablesToTruncate = [
+      'civicrm_activity',
+      'civicrm_contact',
+      'civicrm_case',
+      'civicrm_case_contact',
+      'civicrm_case_activity',
+      'civicrm_case_type',
+      'civicrm_activity_contact',
+      'civicrm_managed',
+      'civicrm_relationship',
+      'civicrm_uf_match',
+    ];
     $this->quickCleanup($this->tablesToTruncate, TRUE);
     CRM_Case_XMLRepository::singleton(TRUE);
     parent::tearDown();
