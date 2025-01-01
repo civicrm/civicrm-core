@@ -401,10 +401,8 @@ AND        a.is_deleted = 0
    * @param array $params
    *
    * @return bool
-   * @throws CRM_Core_Exception
-   * @throws Exception
    */
-  public function createActivity($activityTypeXML, &$params) {
+  public function createActivity($activityTypeXML, &$params): bool {
     $activityTypeName = (string) $activityTypeXML->name;
     $activityTypes = CRM_Case_PseudoConstant::caseActivityType(TRUE, TRUE);
     $activityTypeInfo = $activityTypes[$activityTypeName] ?? NULL;

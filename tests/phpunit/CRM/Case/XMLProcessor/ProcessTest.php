@@ -54,12 +54,6 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
     $this->process = new CRM_Case_XMLProcessor_Process();
   }
 
-  public function tearDown(): void {
-    $this->deleteMoreRelationshipTypes();
-
-    parent::tearDown();
-  }
-
   /**
    * Creates sample contacts.
    */
@@ -120,25 +114,14 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
         'name_b_a' => 'Employer',
       ],
     ];
-
-    foreach ($this->relationships as $name => &$relationship) {
-      $relationship['type_id'] = $this->relationshipTypeCreate([
-        'contact_type_a' => 'Individual',
-        'contact_type_b' => 'Individual',
-        'name_a_b' => $relationship['name_a_b'],
-        'label_a_b' => $relationship['name_a_b'],
-        'name_b_a' => $relationship['name_b_a'],
-        'label_b_a' => $relationship['name_b_a'],
-      ]);
-
-      if (isset($relationship['contact_id_a'])) {
-        $this->callAPISuccess('Relationship', 'create', [
-          'contact_id_a' => $relationship['contact_id_a'],
-          'contact_id_b' => $relationship['contact_id_b'],
-          'relationship_type_id' => $relationship['type_id'],
-        ]);
-      }
-    }
+    $this->relationshipTypeCreate([
+      'contact_type_a' => 'Individual',
+      'contact_type_b' => 'Individual',
+      'name_a_b' => 'Pupil of',
+      'label_a_b' => 'Pupil of',
+      'name_b_a' => 'Instructor',
+      'label_b_a' => 'Instructor',
+    ]);
   }
 
   /**
@@ -194,15 +177,6 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
   }
 
   /**
-   * Clean up additional relationship types (tearDown).
-   */
-  protected function deleteMoreRelationshipTypes() {
-    foreach ($this->moreRelationshipTypes as $relationship) {
-      $this->callAPISuccess('relationship_type', 'delete', ['id' => $relationship['type_id']]);
-    }
-  }
-
-  /**
    * Defines the the activity parameters and XML definitions. These can be used
    * to create the activity.
    */
@@ -235,6 +209,8 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
    * Test the creation of activities where the default assignee should not
    * end up being a contact from another case where it has the same client
    * and relationship.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testCreateActivityWithDefaultContactByRelationshipTwoCases(): void {
     /*
@@ -469,6 +445,7 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
    *   we don't care about those expected values.
    * @param array $expected
    *
+   * @throws \Exception
    * @dataProvider xmlCaseRoleDataProvider
    */
   public function testLocateNameOrLabel($key, $xmlString, $dontcare, $expected) {
@@ -489,7 +466,7 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
    * Data provider for testCaseRoles and testLocateNameOrLabel
    * @return array
    */
-  public function xmlCaseRoleDataProvider() {
+  public function xmlCaseRoleDataProvider(): array {
     return [
       // Simulate one that has been converted to the format it should be going
       // forward, where name is the actual name, i.e. same as machineName.

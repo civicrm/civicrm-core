@@ -70,6 +70,7 @@ class CiviCaseTestCase extends CiviUnitTestCase {
     $this->caseType = 'housing_support';
     $this->caseTypeId = 1;
 
+    $this->individualCreate(['first_name' => 'site', 'last_name' => 'admin'], 'site_admin');
     $this->loadAllFixtures();
 
     // enable the default custom templates for the case type xml files

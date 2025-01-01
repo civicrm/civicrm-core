@@ -767,7 +767,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       'is_active' => 1,
     ], $params);
 
-    $result = $this->createTestEntity('RelationshipType', $params);
+    $result = $this->createTestEntity('RelationshipType', $params, $params['name_a_b']);
     CRM_Core_PseudoConstant::flush('relationshipType');
 
     return $result['id'];
