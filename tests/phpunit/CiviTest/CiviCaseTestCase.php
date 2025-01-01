@@ -102,10 +102,6 @@ class CiviCaseTestCase extends CiviUnitTestCase {
 
     // create a logged in USER since the code references it for source_contact_id
     $this->createLoggedInUser();
-    /// note that activityType options are cached by the FULL set of options you pass in
-    // ie. because Activity api includes campaign in it's call cache is not flushed unless
-    // included in this call. Also note flush function doesn't work on this property as it sets to null not empty array
-    CRM_Core_PseudoConstant::activityType(TRUE, TRUE, TRUE, 'name', TRUE);
   }
 
   /**
