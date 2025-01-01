@@ -306,7 +306,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       throw new \RuntimeException('CiviUnitTestCase requires CIVICRM_UF=UnitTests');
     }
 
-    \Civi\Test::asPreInstall([static::CLASS, 'buildEnvironment'])->apply(TRUE);
+    \Civi\Test::asPreInstall([static::CLASS, 'buildEnvironment'])->apply();
 
     // also set this global hack
     $GLOBALS['_PEAR_ERRORSTACK_OVERRIDE_CALLBACK'] = [];
