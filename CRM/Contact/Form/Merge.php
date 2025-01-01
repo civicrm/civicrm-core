@@ -90,7 +90,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
    *
    * @var string
    */
-  public $criteria = [];
+  public $criteria;
 
   /**
    * Query limit to be retained in the urls.
