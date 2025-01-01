@@ -20,14 +20,11 @@
  */
 class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
 
-  protected $_individual;
-  protected $_tablesToTruncate = ['civicrm_contribution', 'civicrm_line_item'];
-
   public function setUp(): void {
     parent::setUp();
-    $this->_individual = $this->individualCreate();
-    $this->ids['Contact']['contactID1'] = $this->individualCreate([], 1);
-    $this->ids['Contact']['contactID2'] = $this->individualCreate([], 2);
+    $this->individualCreate();
+    $this->individualCreate([], 1);
+    $this->individualCreate([], 2);
   }
 
   public function tearDown(): void {
@@ -37,30 +34,24 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
 
   /**
    *  CRM-19325: Test CRM_Contribute_Form_Search batch filters
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testBatchFilter(): void {
-    $this->quickCleanup($this->_tablesToTruncate);
-    $contactID1 = $this->individualCreate([], 1);
-    $contactID2 = $this->individualCreate([], 2);
-    $batchTitle = CRM_Batch_BAO_Batch::generateBatchName();
-
-    // create batch
-    $batch = $this->callAPISuccess('Batch', 'create', [
-      'created_id' => $this->_individual,
-      'created_date' => CRM_Utils_Date::processDate(date("Y-m-d"), date("H:i:s")),
-      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Data Entry'),
-      'title' => $batchTitle,
+    $this->createTestEntity('Batch', [
+      'status_id:name' => 'Data Entry',
+      'title' => 'data_entry',
       'item_count' => 2,
       'total' => 100,
-      'type_id' => array_search('Contribution', CRM_Batch_BAO_Batch::buildOptions('type_id')),
+      'type_id:name' => 'Contribution',
+      'data' => '{"values": {}}',
     ]);
-    $batchID = $batch['id'];
 
     $batchEntry = [
       'primary_profiles' => [1 => NULL, 2 => NULL, 3 => NULL],
       'primary_contact_id' => [
-        1 => $contactID1,
-        2 => $contactID2,
+        1 => $this->ids['Contact'][1],
+        2 => $this->ids['Contact'][2],
       ],
       'field' => [
         1 => [
@@ -84,58 +75,54 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
     ];
 
     // create random contribution to check IS NULL filter more precisely
-    $nonBatchContri = $this->callAPISuccess('Contribution', 'create', [
+    $nonBatchContributionID = $this->callAPISuccess('Contribution', 'create', [
       'financial_type_id' => 1,
       'total_amount' => 123,
       'receive_date' => '2014-07-24',
       'payment_instrument' => 1,
       'check_number' => NULL,
       'contribution_status_id' => 1,
-      'contact_id' => $this->_individual,
-    ]);
-    $nonBatchContriID = $nonBatchContri['id'];
+      'contact_id' => $this->ids['Contact']['individual_0'],
+    ])['id'];
 
     // process batch entries
-    $form = new CRM_Batch_Form_Entry();
-    $form->setBatchID($batchID);
-    $form->testProcessContribution($batchEntry);
+    $this->getTestForm('CRM_Batch_Form_Entry', $batchEntry, ['id' => $this->ids['Batch']['default']])->processForm();
 
     // fetch created contributions
-    $entities = $this->callAPISuccess('EntityBatch', 'get', ['batch_id' => $batchID]);
+    $entities = $this->callAPISuccess('EntityBatch', 'get', ['batch_id' => $this->ids['Batch']['default']]);
     $ids = [];
     foreach ($entities['values'] as $value) {
       $ids[] = $value['entity_id'];
     }
-    [$batchContriID1, $batchContriID2] = $ids;
 
     $useCases = [
       // Case 1: Search for ONLY those contributions which are created from batch
       [
         'form_value' => ['contribution_batch_id' => 'IS NOT NULL'],
         'expected_count' => 2,
-        'expected_contribution' => [$batchContriID1, $batchContriID2],
+        'expected_contribution' => $ids,
         'expected_qill' => 'Batch Name Not Null',
       ],
       // Case 2: Search for ONLY those contributions which are NOT created from batch
       [
         'form_value' => ['contribution_batch_id' => 'IS NULL'],
         'expected_count' => 1,
-        'expected_contribution' => [$nonBatchContriID],
+        'expected_contribution' => [$nonBatchContributionID],
         'expected_qill' => 'Batch Name Is Null',
       ],
-      // Case 3: Search for ONLY those contributions which are created from batch ID - $batchID
+      // Case 3: Search for ONLY those contributions which are created from batch ID.
       [
-        'form_value' => ['contribution_batch_id' => $batchID],
+        'form_value' => ['contribution_batch_id' => $this->ids['Batch']['default']],
         'expected_count' => 2,
-        'expected_contribution' => [$batchContriID1, $batchContriID2],
-        'expected_qill' => 'Batch Name = ' . $batchTitle,
+        'expected_contribution' => $ids,
+        'expected_qill' => 'Batch Name = data_entry',
       ],
     ];
     foreach ($useCases as $case) {
       $fv = $case['form_value'];
       CRM_Contact_BAO_Query::processSpecialFormValue($fv, ['contribution_batch_id']);
       $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($fv));
-      [$select, $from, $where] = $query->query();
+      [, $from, $where] = $query->query();
 
       // get and assert contribution count
       $contributions = CRM_Core_DAO::executeQuery(sprintf('SELECT DISTINCT civicrm_contribution.id %s %s AND civicrm_contribution.id IS NOT NULL', $from, $where))->fetchAll();
@@ -143,7 +130,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
         $contributions[$key] = $value['id'];
       }
       // assert the contribution count
-      $this->assertEquals($case['expected_count'], count($contributions));
+      $this->assertCount($case['expected_count'], $contributions);
       // assert the contribution IDs
       $this->checkArrayEquals($case['expected_contribution'], $contributions);
       // get and assert qill string
@@ -154,9 +141,10 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
 
   /**
    *  CRM-20286: Test CRM_Contribute_Form_Search Card type filters
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testCardTypeFilter(): void {
-    $this->quickCleanup($this->_tablesToTruncate);
     $contactID1 = $this->individualCreate([], 1);
     $contactID2 = $this->individualCreate([], 2);
     $Contribution1 = $this->callAPISuccess('Contribution', 'create', [
@@ -237,7 +225,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       $fv = $case['form_value'];
       CRM_Contact_BAO_Query::processSpecialFormValue($fv, ['financial_trxn_card_type_id']);
       $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($fv));
-      [$select, $from, $where] = $query->query();
+      [, $from, $where] = $query->query();
 
       // get and assert contribution count
       $contributions = CRM_Core_DAO::executeQuery(sprintf('SELECT DISTINCT civicrm_contribution.id %s %s AND civicrm_contribution.id IS NOT NULL', $from, $where))->fetchAll();
@@ -256,9 +244,10 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
 
   /**
    *  CRM-20391: Test CRM_Contribute_Form_Search Card Number filters
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testCardNumberFilter(): void {
-    $this->quickCleanup($this->_tablesToTruncate);
     $contactID1 = $this->individualCreate([], 1);
     $contactID2 = $this->individualCreate([], 2);
     $Contribution1 = $this->callAPISuccess('Contribution', 'create', [
@@ -334,7 +323,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       $fv = $case['form_value'];
       CRM_Contact_BAO_Query::processSpecialFormValue($fv, ['financial_trxn_pan_truncation']);
       $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($fv));
-      [$select, $from, $where] = $query->query();
+      [, $from, $where] = $query->query();
 
       // get and assert contribution count
       $contributions = CRM_Core_DAO::executeQuery(sprintf('SELECT DISTINCT civicrm_contribution.id %s %s AND civicrm_contribution.id IS NOT NULL', $from, $where))->fetchAll();
@@ -342,7 +331,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
         $contributions[$key] = $value['id'];
       }
       // assert the contribution count
-      $this->assertEquals($case['expected_count'], count($contributions));
+      $this->assertCount($case['expected_count'], $contributions);
       // assert the contribution IDs
       $this->checkArrayEquals($case['expected_contribution'], $contributions);
       // get and assert qill string
@@ -353,6 +342,8 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
 
   /**
    *  Test contact contributions.
+   *
+   * @throws \Civi\Core\Exception\DBQueryException
    */
   public function testContributionSearchWithContactID(): void {
     $contactID = $this->individualCreate([], 1);
@@ -363,7 +354,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
 
     // get and assert contribution count
     $contributions = CRM_Core_DAO::executeQuery("{$select} {$from} {$where}")->fetchAll();
-    $this->assertEquals(count($contributions), 0);
+    $this->assertCount(0, $contributions);
 
     $this->callAPISuccess('Contribution', 'create', [
       'financial_type_id' => "Donation",
@@ -376,19 +367,20 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
 
     // get and assert contribution count
     $contributions = CRM_Core_DAO::executeQuery("{$select} {$from} {$where}")->fetchAll();
-    $this->assertEquals(count($contributions), 1);
+    $this->assertCount(1, $contributions);
   }
 
   /**
    *  Test CRM_Contribute_Form_Search Recurring Contribution Status Id filters
    *
    * @dataProvider getSearchData
+   * @throws \CRM_Core_Exception
    */
   public function testContributionRecurSearchFilters($formValues, $expectedCount, $expectedContact, $expectedQill, $expectedWhere = NULL) {
     $this->setUpRecurringContributions();
 
     $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($formValues));
-    [$select, $from, $where, $having] = $query->query();
+    [, $from, $where] = $query->query();
 
     // get and assert contribution count
     $contacts = CRM_Core_DAO::executeQuery(sprintf('SELECT DISTINCT contact_a.id, contact_a.display_name %s %s AND contact_a.id IS NOT NULL', $from, $where))->fetchAll();
@@ -398,7 +390,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       }
     }
     // assert the contribution count
-    $this->assertEquals($expectedCount, count($contacts));
+    $this->assertCount($expectedCount, $contacts);
     // get and assert qill string
     $qill = $query->qill();
     $qillString = !empty($qill[1]) ? $qill[1] : $qill[0];
@@ -478,7 +470,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       $fv = $case['form_value'];
       CRM_Contact_BAO_Query::processSpecialFormValue($fv, ['cancel_reason']);
       $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($fv));
-      [$select, $from, $where] = $query->query();
+      [, $from, $where] = $query->query();
 
       // get and assert contribution count
       $contributions = CRM_Core_DAO::executeQuery(sprintf('SELECT DISTINCT civicrm_contribution.id %s %s AND civicrm_contribution.id IS NOT NULL AND civicrm_contribution.contribution_status_id = 3', $from, $where))->fetchAll();
@@ -486,7 +478,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
         $contributions[$key] = $value['id'];
       }
       // assert the contribution count
-      $this->assertEquals($case['expected_count'], count($contributions));
+      $this->assertCount($case['expected_count'], $contributions);
       // assert the contribution IDs
       $this->checkArrayEquals($case['expected_contribution'], $contributions);
       // get and assert qill string
@@ -502,7 +494,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
     // "In Progress" recurring contribution for contactID1
     $ContributionRecur1 = $this->callAPISuccess('ContributionRecur', 'create', [
       'sequential' => 1,
-      'contact_id' => $this->ids['Contact']['contactID1'],
+      'contact_id' => $this->ids['Contact'][1],
       'frequency_interval' => 1,
       'frequency_unit' => "month",
       'amount' => 11,
@@ -519,7 +511,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       'receive_date_time' => NULL,
       'payment_instrument_id' => 1,
       'contribution_status_id' => 1,
-      'contact_id' => $this->ids['Contact']['contactID1'],
+      'contact_id' => $this->ids['Contact'][1],
       'contribution_recur_id' => $ContributionRecur1['id'],
       'is_template' => 1,
     ]);
@@ -540,7 +532,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       'receive_date_time' => NULL,
       'payment_instrument_id' => 1,
       'contribution_status_id' => 1,
-      'contact_id' => $this->ids['Contact']['contactID1'],
+      'contact_id' => $this->ids['Contact'][1],
       'contribution_recur_id' => $ContributionRecur1['id'],
     ]);
     $params = [
@@ -555,7 +547,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
     // "Completed" recurring contribution for contactID2
     $ContributionRecur2 = $this->callAPISuccess('ContributionRecur', 'create', [
       'sequential' => 1,
-      'contact_id' => $this->ids['Contact']['contactID2'],
+      'contact_id' => $this->ids['Contact'][2],
       'frequency_interval' => 1,
       'frequency_unit' => 'month',
       'amount' => 22,
@@ -574,7 +566,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       'receive_date_time' => NULL,
       'payment_instrument' => 1,
       'contribution_status_id' => 1,
-      'contact_id' => $this->ids['Contact']['contactID2'],
+      'contact_id' => $this->ids['Contact'][2],
       'contribution_recur_id' => $ContributionRecur2['id'],
     ]);
     $params = [
@@ -591,8 +583,8 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
   /**
    * @return array
    */
-  public function getSearchData() {
-    $useCases = [
+  public function getSearchData(): array {
+    return [
       // Case 1: Search for ONLY those recurring contributions with status "In Progress"
       'in_progress_search' => [
         'form_value' => ['contribution_recur_contribution_status_id' => 5],
@@ -719,7 +711,6 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       ],
 
     ];
-    return $useCases;
   }
 
 }
