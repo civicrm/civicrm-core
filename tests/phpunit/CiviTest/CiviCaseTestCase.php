@@ -121,6 +121,9 @@ class CiviCaseTestCase extends CiviUnitTestCase {
     CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
   }
 
+  /**
+   * @throws \CRM_Core_Exception
+   */
   public static function tearDownAfterClass(): void {
     CRM_Core_BAO_ConfigSetting::disableComponent('CiviCase');
     RelationshipType::delete(FALSE)
