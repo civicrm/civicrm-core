@@ -180,6 +180,7 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
       'array_key_exists',
       'strstr',
       'strpos',
+      'is_numeric',
     ];
     foreach ($functionsForSmarty as $function) {
       $this->registerPlugin('modifier', $function, $function);
