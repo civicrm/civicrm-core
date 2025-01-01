@@ -414,7 +414,7 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
    *
    * @param $key string The array key in the moreRelationshipTypes array that
    *   is the relationship type we're currently testing. So not necessarily
-   *   unique for each entry in the dataprovider since want to test a given
+   *   unique for each entry in the dataProvider since want to test a given
    *   relationship type against multiple xml strings. It's not a test
    *   identifier, it's an array key to use to look up something.
    * @param string $xmlString
@@ -441,7 +441,7 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
    *   relationship type against multiple xml strings. It's not a test
    *   identifier, it's an array key to use to look up something.
    * @param string $xmlString
-   * @param $unused|null array We're re-using the data provider for two tests and
+   * @param null|array $unused We're re-using the data provider for two tests and
    *   we don't care about those expected values.
    * @param array $expected
    *
@@ -470,7 +470,7 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
     return [
       // Simulate one that has been converted to the format it should be going
       // forward, where name is the actual name, i.e. same as machineName.
-      [
+      'unidirectional_name_label_different' => [
         // this is the array key in the $this->moreRelationshipTypes array
         'unidirectional_name_label_different',
         // some xml
@@ -483,14 +483,14 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
       // Simulate one that is still in label format, i.e. one that is still in
       // xml files that haven't been updated, or in the db but upgrade script
       // not run yet.
-      [
+      'unidirectional_name_label_different_label_format' => [
         'unidirectional_name_label_different',
         '<CaseType><CaseRoles><RelationshipType><name>Jedi Master for</name><creator>1</creator><manager>1</manager></RelationshipType></CaseRoles></CaseType>',
         ['a_b', 'Jedi Master is'],
         ['a_b', 'jm7ba'],
       ],
       // Ditto but where we know name and label are the same in the db.
-      [
+      'unidirectional_name_label_same' => [
         'unidirectional_name_label_same',
         '<CaseType><CaseRoles><RelationshipType><name>Quilt Maker for</name><creator>1</creator><manager>1</manager></RelationshipType></CaseRoles></CaseType>',
         ['a_b', 'Quilt Maker is'],
@@ -498,29 +498,29 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
       ],
       // Simulate one that is messed up and should fail, e.g. like a typo
       // in an xml file. Here we've made a typo on purpose.
-      [
+      'unidirectional_name_label_different_wrong' => [
         'unidirectional_name_label_different',
-        '<CaseType><CaseRoles><RelationshipType><name>Jedi Master for</name><creator>1</creator><manager>1</manager></RelationshipType></CaseRoles></CaseType>',
+        '<CaseType><CaseRoles><RelationshipType><name>Jedi Masterrrr for</name><creator>1</creator><manager>1</manager></RelationshipType></CaseRoles></CaseType>',
         NULL,
-        [FALSE, 'Jedi Master for'],
+        [FALSE, 'Jedi Masterrrr for'],
       ],
       // Now some similar tests to above but for bidirectional relationships.
       // Bidirectional relationship, name and label different, using machine name.
-      [
+      'bidirectional_name_label_different' => [
         'bidirectional_name_label_different',
         '<CaseType><CaseRoles><RelationshipType><name>f12</name><creator>1</creator><manager>1</manager></RelationshipType></CaseRoles></CaseType>',
         ['b_a', 'Friend of'],
         ['b_a', 'f12'],
       ],
       // Bidirectional relationship, name and label different, using display label.
-      [
+      'bidirectional_name_label_different_label' => [
         'bidirectional_name_label_different',
         '<CaseType><CaseRoles><RelationshipType><name>Friend of</name><creator>1</creator><manager>1</manager></RelationshipType></CaseRoles></CaseType>',
         ['b_a', 'Friend of'],
         ['b_a', 'f12'],
       ],
       // Bidirectional relationship, name and label same.
-      [
+      'bidirectional_name_label_same' => [
         'bidirectional_name_label_same',
         '<CaseType><CaseRoles><RelationshipType><name>Enemy of</name><creator>1</creator><manager>1</manager></RelationshipType></CaseRoles></CaseType>',
         ['b_a', 'Enemy of'],
@@ -549,7 +549,7 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
 
     // Test getting the `name`s
     $activityTypes = $p->activityTypes($xml->ActivityTypes, FALSE, FALSE, FALSE);
-    $this->assertEquals(
+    $this->assertEquals(array_values(
       [
         13 => 'Open Case',
         56 => 'Medical evaluation',
@@ -562,8 +562,8 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
         16 => 'Change Case Status',
         18 => 'Change Case Start Date',
         25 => 'Link Cases',
-      ],
-      $activityTypes
+      ]),
+      array_values($activityTypes)
     );
 
     // While we're here and have the `name`s check the editable types in

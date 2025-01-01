@@ -28,6 +28,7 @@
 declare(strict_types = 1);
 use Civi\Api4\Address;
 use Civi\Api4\CiviCase;
+use Civi\Api4\ContactType;
 use Civi\Api4\Contribution;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
@@ -544,6 +545,9 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     }
     if (!empty($this->ids['RelationshipType'])) {
       RelationshipType::delete(FALSE)->addWhere('id', 'IN', $this->ids['RelationshipType'])->execute();
+    }
+    if (!empty($this->ids['ContactType'])) {
+      ContactType::delete(FALSE)->addWhere('id', 'IN', $this->ids['ContactType'])->execute();
     }
     unset(CRM_Core_Config::singleton()->userPermissionClass->permissions);
     parent::tearDown();
