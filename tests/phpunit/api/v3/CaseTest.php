@@ -452,7 +452,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
       'target_contact_id' => $this->_params['contact_id'],
     ];
     $result = $this->callAPISuccess('Activity', 'create', $params);
-    $this->assertEquals('Follow Up', CRM_Core_PseudoConstant::getLabel('CRM_Activity_BAO_Activity', 'activity_type_id', $result['values'][$result['id']]['activity_type_id']));
+    $this->assertEquals('Follow up', CRM_Core_PseudoConstant::getLabel('CRM_Activity_BAO_Activity', 'activity_type_id', $result['values'][$result['id']]['activity_type_id']));
 
     // might need this for other tests that piggyback on this one
     $this->_caseActivityId = $result['values'][$result['id']]['id'];

@@ -30,12 +30,12 @@ class CRM_Case_BAO_CaseTest extends CiviCaseTestCase {
     $this->createLoggedInUser();
     $params = [
       'case_id' => 1,
-      'contact_id' => 17,
+      'contact_id' => $this->individualCreate(),
     ];
     CRM_Case_BAO_CaseContact::writeRecord($params);
 
     $recent = CRM_Utils_Recent::get();
-    $this->assertEquals('Test Contact - Housing Support', $recent[0]['title']);
+    $this->assertEquals('Mr. Anthony Anderson II - Housing Support', $recent[0]['title']);
   }
 
   /**
