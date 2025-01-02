@@ -253,6 +253,13 @@ if (!defined('CIVICRM_SMARTY_AUTOLOAD_PATH') && getenv('CIVICRM_SMARTY_AUTOLOAD_
   }
 }
 
+if (!defined('CIVICRM_DEDUPE_OPTIMIZER')) {
+  // This is a temporary define to allow us to phase in improved dedupe queries
+  // with some degree of caution. If you set this to TRUE
+  // then the queries used to dedupe contacts will be combined
+  // for better performance.
+  define('CIVICRM_DEDUPE_OPTIMIZER', FALSE);
+}
 /**
  * Define any CiviCRM Settings Overrides per https://docs.civicrm.org/sysadmin/en/latest/customize/settings/
  *
