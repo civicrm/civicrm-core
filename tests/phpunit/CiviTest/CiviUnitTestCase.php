@@ -152,6 +152,8 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    */
   protected $isLocationTypesOnPostAssert = TRUE;
 
+  private array $entityTracking = [];
+
   /**
    * Has the test class been verified as 'getsafe'.
    *
@@ -389,6 +391,9 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     // something changed it and then inadvertently didn't restore it.
     $this->errorHandlerAtStartOfTest = set_error_handler(function($errno, $errstr, $errfile, $errline) {});
     restore_error_handler();
+    foreach (['civicrm_option_value', 'civicrm_campaign', 'civicrm_line_item', 'civicrm_im', 'civicrm_address'] as $entity) {
+      $this->entityTracking[$entity] = \CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM ' . $entity);
+    }
   }
 
   /**
@@ -564,6 +569,9 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       OptionValue::delete(FALSE)->addWhere('id', 'IN', $this->ids['OptionValue'])->execute();
     }
     unset(CRM_Core_Config::singleton()->userPermissionClass->permissions);
+    foreach ($this->entityTracking as $entity => $count) {
+      $this->assertEquals($count, \CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM ' . $entity), $entity . ' has not cleaned up well ' . CRM_Core_DAO::singleValueQuery('SELECT name FROM ' . $entity . ' ORDER BY id DESC LIMIT 1'));
+    }
     parent::tearDown();
   }
 
