@@ -31,6 +31,7 @@
 !/ext/payflowpro
 !/ext/ckeditor4
 !/ext/legacycustomsearches
+!/ext/legacydedupefinder
 !/ext/civiimport
 !/ext/civi_campaign
 !/ext/civi_case

@@ -1661,6 +1661,33 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * Check for existing duplicates in the database.
+   *
+   * This hook is called when
+   *
+   * @param array $duplicates
+   *   Array of duplicate pairs found using the rule, with the weight.
+   *   ['entity_id1' => 5, 'entity_id2' => 6, 'weight' => 7] where 5 & 6 are contact IDs and 7 is the weight of the match.
+   * @param int[] $ruleGroupIDs
+   *   Array of rule group IDs.
+   * @param array $whereClauses
+   *   Currently only ['id', 'IN', [5, 6, 7]] would be present.
+   * @param bool $checkPermissions
+   * @todo the existing implementation looks for situations where ONE of the contacts
+   *   is consistent with the where clause criteria. Potentially we might
+   *   implement a mode where both/all contacts must be consistent with the clause criteria.
+   *   There is a use case for both scenarios - although core code currently only implements
+   *   one.
+   *
+   * @return mixed
+   */
+  public static function findExistingDuplicates(array &$duplicates, array $ruleGroupIDs, array $whereClauses, bool $checkPermissions) {
+    $null = NULL;
+    return self::singleton()
+      ->invoke(['duplicates', 'ruleGroupIDs', 'whereClauses', 'checkPermissions'], $duplicates, $ruleGroupIDs, $whereClauses, $checkPermissions, $null, $null, 'civicrm_findExistingDuplicates');
+  }
+
+  /**
    * This hook is called AFTER EACH email has been processed by the script bin/EmailProcessor.php
    *
    * @param string $type
