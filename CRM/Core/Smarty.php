@@ -299,12 +299,17 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
       'count' => NULL,
       'hideCount' => FALSE,
       'template' => NULL,
+      'active' => TRUE,
+      'valid' => TRUE,
       // Afform tabs set the afform module and directive - NULL for non-afform tabs
       'module' => NULL,
       'directive' => NULL,
     ];
 
     foreach ($tabs as $i => $tab) {
+      if (empty($tab['url'])) {
+        $tab['url'] = $tab['link'] ?? '';
+      }
       $tabs[$i] = array_merge($defaults, (array) $tab);
     }
     return $tabs;
