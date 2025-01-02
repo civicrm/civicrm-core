@@ -1680,42 +1680,14 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
             if (!empty($customValueId) && $customValueId != $values['id']) {
               continue;
             }
-            $details[$groupID][$values['id']]['title'] = $group['title'] ?? NULL;
-            $details[$groupID][$values['id']]['name'] = $group['name'] ?? NULL;
-            $details[$groupID][$values['id']]['help_pre'] = $group['help_pre'] ?? NULL;
-            $details[$groupID][$values['id']]['help_post'] = $group['help_post'] ?? NULL;
-            $details[$groupID][$values['id']]['collapse_display'] = $group['collapse_display'] ?? NULL;
-            $details[$groupID][$values['id']]['collapse_adv_display'] = $group['collapse_adv_display'] ?? NULL;
-            $details[$groupID][$values['id']]['style'] = $group['style'] ?? NULL;
-            $details[$groupID][$values['id']]['fields'][$k] = [
-              'field_title' => $properties['label'] ?? NULL,
-              'field_type' => $properties['html_type'] ?? NULL,
-              'field_data_type' => $properties['data_type'] ?? NULL,
-              'field_value' => CRM_Core_BAO_CustomField::displayValue($values['data'], $properties['id'], $entityId),
-              'options_per_line' => $properties['options_per_line'] ?? NULL,
-              'data' => $values['data'],
-            ];
-            // editable = whether this set contains any non-read-only fields
-            if (!isset($details[$groupID][$values['id']]['editable'])) {
-              $details[$groupID][$values['id']]['editable'] = FALSE;
+            $definition = self::buildCustomDataItem($values, $properties, $group, $entityId, $editableGroups);
+            if (!isset($details[$groupID][$values['id']])) {
+              $details[$groupID][$values['id']] = $definition;
             }
-            if (empty($properties['is_view']) && in_array($key, $editableGroups)) {
-              $details[$groupID][$values['id']]['editable'] = TRUE;
-            }
-            // also return contact reference contact id if user has view all or edit all contacts perm
-            if ($details[$groupID][$values['id']]['fields'][$k]['field_data_type'] === 'ContactReference'
-              && CRM_Core_Permission::check([['view all contacts', 'edit all contacts']])
-            ) {
-              $details[$groupID][$values['id']]['fields'][$k]['contact_ref_links'] = [];
-              $path = CRM_Contact_DAO_Contact::getEntityPaths()['view'];
-              foreach (CRM_Utils_Array::explodePadded($values['data'] ?? []) as $contactId) {
-                $displayName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactId, 'display_name');
-                if ($displayName) {
-                  $url = CRM_Utils_System::url(str_replace('[id]', $contactId, $path));
-                  $details[$groupID][$values['id']]['fields'][$k]['contact_ref_links'][] = '<a href="' . $url . '" title="' . ts('View Contact', ['escape' => 'htmlattribute']) . '">' .
-                    $displayName . '</a>';
-                }
-              }
+            else {
+              // If there are multiple fields then only need to merge in the
+              // fields.
+              $details[$groupID][$values['id']]['fields'] = array_merge($details[$groupID][$values['id']]['fields'], $definition['fields']);
             }
           }
         }
@@ -1755,6 +1727,67 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
       $form->assign("{$prefix}viewCustomData", $details);
       return $details;
     }
+  }
+
+  /**
+   * Build the custom data display structure for the field.
+   *
+   * @param array $values
+   * @param array $properties
+   * @param array $group
+   * @param int $entityId
+   * @param array $editableGroups
+   *
+   * @return array
+   *   Custom field display definition
+   */
+  private static function buildCustomDataItem($values, $properties, $group, $entityId, $editableGroups) {
+    $definition = [
+      'title' => $group['title'] ?? NULL,
+      'name' => $group['name'] ?? NULL,
+      'help_pre' => $group['help_pre'] ?? NULL,
+      'help_post' => $group['help_post'] ?? NULL,
+      'collapse_display' => $group['collapse_display'] ?? NULL,
+      'collapse_adv_display' => $group['collapse_adv_display'] ?? NULL,
+      'style' => $group['style'] ?? NULL,
+    ];
+
+    $k = $properties['id'];
+    $key = $group['id'];
+    $definition['fields'][$k] = [
+      'field_title' => $properties['label'] ?? NULL,
+      'field_type' => $properties['html_type'] ?? NULL,
+      'field_data_type' => $properties['data_type'] ?? NULL,
+      'field_value' => CRM_Core_BAO_CustomField::displayValue($values['data'], $k, $entityId),
+      'options_per_line' => $properties['options_per_line'] ?? NULL,
+      'data' => $values['data'],
+    ];
+
+    // Editable = whether this set contains any non-read-only fields.
+    if (!isset($definition['editable'])) {
+      $definition['editable'] = FALSE;
+    }
+    if (empty($properties['is_view']) && in_array($key, $options['editableGroups'])) {
+      $definition['editable'] = TRUE;
+    }
+    // Also return contact reference contact id if user has view all or edit all
+    // contacts permissions.
+    if ($definition['fields'][$k]['field_data_type'] === 'ContactReference'
+      && CRM_Core_Permission::check([['view all contacts', 'edit all contacts']])
+    ) {
+      $definition['fields'][$k]['contact_ref_links'] = [];
+      $path = CRM_Contact_DAO_Contact::getEntityPaths()['view'];
+      foreach (CRM_Utils_Array::explodePadded($values['data'] ?? []) as $contactId) {
+        $displayName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactId, 'display_name');
+        if ($displayName) {
+          $url = CRM_Utils_System::url(str_replace('[id]', $contactId, $path));
+          $definition['fields'][$k]['contact_ref_links'][] = '<a href="' . $url . '" title="' . ts('View Contact', ['escape' => 'htmlattribute']) . '">' .
+            $displayName . '</a>';
+        }
+      }
+    }
+
+    return $definition;
   }
 
   /**
