@@ -28,6 +28,7 @@
 declare(strict_types = 1);
 use Civi\Api4\Address;
 use Civi\Api4\CiviCase;
+use Civi\Api4\ContactType;
 use Civi\Api4\Contribution;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
@@ -542,6 +543,12 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       DedupeRule::delete(FALSE)->addWhere('dedupe_rule_group_id', 'IN', $this->ids['DedupeRuleGroup'])->execute();
       DedupeRuleGroup::delete(FALSE)->addWhere('id', 'IN', $this->ids['DedupeRuleGroup'])->execute();
     }
+    if (!empty($this->ids['RelationshipType'])) {
+      RelationshipType::delete(FALSE)->addWhere('id', 'IN', $this->ids['RelationshipType'])->execute();
+    }
+    if (!empty($this->ids['ContactType'])) {
+      ContactType::delete(FALSE)->addWhere('id', 'IN', $this->ids['ContactType'])->execute();
+    }
     unset(CRM_Core_Config::singleton()->userPermissionClass->permissions);
     parent::tearDown();
   }
@@ -753,10 +760,8 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    * @param array $params
    *
    * @return int
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function relationshipTypeCreate($params = []) {
+  public function relationshipTypeCreate(array $params = []): int {
     $params = array_merge([
       'name_a_b' => 'Relation 1 for relationship type create',
       'name_b_a' => 'Relation 2 for relationship type create',
@@ -766,7 +771,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       'is_active' => 1,
     ], $params);
 
-    $result = $this->callAPISuccess('relationship_type', 'create', $params);
+    $result = $this->createTestEntity('RelationshipType', $params, $params['name_a_b']);
     CRM_Core_PseudoConstant::flush('relationshipType');
 
     return $result['id'];

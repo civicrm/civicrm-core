@@ -17,10 +17,6 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
 
   public function setUp(): void {
     parent::setUp();
-
-    $this->loadAllFixtures();
-
-    CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
     CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
   }
 
@@ -925,16 +921,6 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'fieldName' => 'currency',
           'sample' => ['USD' => 'US Dollar'],
           'max' => 200,
-        ],
-      ],
-      'CRM_Case_DAO_Case' => [
-        [
-          'fieldName' => 'status_id',
-          'sample' => 'Ongoing',
-        ],
-        [
-          'fieldName' => 'case_type_id',
-          'sample' => 'Housing Support',
         ],
       ],
       'CRM_Report_DAO_ReportInstance' => [

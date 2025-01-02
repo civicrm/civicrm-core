@@ -4,38 +4,7 @@
  * Class CRM_Case_BAO_CaseTest
  * @group headless
  */
-class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
-
-  const TABLES_TO_TRUNCATE = [
-    'civicrm_activity',
-    'civicrm_group_contact',
-    'civicrm_contact',
-    'civicrm_custom_group',
-    'civicrm_custom_field',
-    'civicrm_case',
-    'civicrm_case_contact',
-    'civicrm_case_activity',
-    'civicrm_case_type',
-    'civicrm_file',
-    'civicrm_entity_file',
-    'civicrm_activity_contact',
-    'civicrm_managed',
-    'civicrm_relationship',
-    'civicrm_relationship_type',
-  ];
-
-  public function setUp(): void {
-    parent::setUp();
-
-    $this->quickCleanup(self::TABLES_TO_TRUNCATE);
-
-    $this->loadAllFixtures();
-
-    // I don't understand why need to disable but if don't then only one
-    // case type is defined on 2nd and subsequent dataprovider runs.
-    CRM_Core_BAO_ConfigSetting::disableComponent('CiviCase');
-    CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
-  }
+class CRM_Case_BAO_CaseTest extends CiviCaseTestCase {
 
   /**
    * Make sure that the latest case activity works accurately.
@@ -57,21 +26,16 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     }
   }
 
-  protected function tearDown(): void {
-    $this->quickCleanup(self::TABLES_TO_TRUNCATE, TRUE);
-    parent::tearDown();
-  }
-
   public function testAddCaseToContact(): void {
     $this->createLoggedInUser();
     $params = [
       'case_id' => 1,
-      'contact_id' => 17,
+      'contact_id' => $this->individualCreate(),
     ];
     CRM_Case_BAO_CaseContact::writeRecord($params);
 
     $recent = CRM_Utils_Recent::get();
-    $this->assertEquals('Test Contact - Housing Support', $recent[0]['title']);
+    $this->assertEquals('Mr. Anthony Anderson II - Housing Support', $recent[0]['title']);
   }
 
   /**
