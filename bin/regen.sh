@@ -47,7 +47,7 @@ php GenerateData.php
 
 ## Prune local data
 $MYSQLCMD -e "DROP TABLE IF EXISTS civicrm_install_canary; DELETE FROM civicrm_cache; DELETE FROM civicrm_setting;"
-$MYSQLCMD -e "DELETE FROM civicrm_extension WHERE full_name NOT IN ('sequentialcreditnotes', 'eventcart', 'greenwich', 'org.civicrm.search_kit', 'org.civicrm.afform', 'authx', 'org.civicrm.flexmailer', 'financialacls', 'contributioncancelactions', 'recaptcha', 'ckeditor4', 'legacycustomsearches', 'civiimport', 'message_admin') and full_name NOT LIKE 'civi_%';"
+$MYSQLCMD -e "DELETE FROM civicrm_extension WHERE full_name NOT IN ('sequentialcreditnotes', 'eventcart', 'greenwich', 'org.civicrm.search_kit', 'org.civicrm.afform', 'authx', 'org.civicrm.flexmailer', 'financialacls', 'contributioncancelactions', 'recaptcha', 'ckeditor4', 'legacycustomsearches', 'civiimport', 'message_admin', 'legacydedupefinder') and full_name NOT LIKE 'civi_%';"
 TABLENAMES=$( echo "show tables like 'civicrm_%'" | $MYSQLCMD | grep ^civicrm_ | xargs )
 
 cd $CIVISOURCEDIR/sql

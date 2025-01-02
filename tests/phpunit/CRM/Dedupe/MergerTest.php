@@ -173,7 +173,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     $this->createDupeContacts();
 
     // verify that all contacts have been created separately
-    $this->assertEquals(count($this->_contactIds), 9, 'Check for number of contacts.');
+    $this->assertCount(9, $this->_contactIds, 'Check for number of contacts.');
 
     $dao = new CRM_Dedupe_DAO_DedupeRuleGroup();
     $dao->contact_type = 'Individual';
@@ -322,8 +322,6 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    *
    * It turns out there are 2 code paths retrieving this data so my initial
    * focus is on ensuring they match.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testGetMatches(): void {
     $this->setupMatchData();
@@ -337,7 +335,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
         'srcName' => 'Mr. Mickey Mouse II',
         'dstID' => $this->contacts[0]['id'],
         'dstName' => 'Mr. Mickey Mouse II',
-        'weight' => 20,
+        'weight' => 22,
         'canMerge' => TRUE,
       ],
       1 => [
@@ -345,7 +343,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
         'srcName' => 'Mr. Minnie Mouse II',
         'dstID' => $this->contacts[2]['id'],
         'dstName' => 'Mr. Minnie Mouse II',
-        'weight' => 20,
+        'weight' => 22,
         'canMerge' => TRUE,
       ],
     ], $pairs);
@@ -360,8 +358,6 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    * @dataProvider getBooleanDataProvider
    *
    * @param bool $isReverse
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testGetMatchesExcludeDeleted(bool $isReverse): void {
     $this->setupMatchData();
@@ -753,7 +749,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
         'srcName' => 'Mr. Minnie Mouse II',
         'dstID' => $this->contacts[2]['id'],
         'dstName' => 'Mr. Minnie Mouse II',
-        'weight' => 20,
+        'weight' => 22,
         'canMerge' => TRUE,
       ],
     ], $pairs);
