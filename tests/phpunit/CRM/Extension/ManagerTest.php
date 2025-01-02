@@ -38,6 +38,13 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     $this->mapper = new CRM_Extension_Mapper($this->container);
   }
 
+  public function testManagerInstance() {
+    $manager = CRM_Extension_System::singleton()->getManager();
+    $this->assertTrue($manager === CRM_Extension_System::singleton()->getManager());
+    $manager->install([]);
+    $this->assertTrue($manager === CRM_Extension_System::singleton()->getManager());
+  }
+
   /**
    * Install an extension with an invalid type name.
    */
