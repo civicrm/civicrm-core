@@ -362,7 +362,7 @@ class CRM_Report_Form_Contribute_DeferredRevenue extends CRM_Report_Form {
   public function where() {
     parent::where();
     $startDate = date('Y-m-01');
-    $endDate = date('Y-m-t', strtotime(date('ymd') . '+11 month'));
+    $endDate = (new DateTime('+11 month'))->format('Y-m-t');
     $this->_where .= " AND {$this->_aliases['civicrm_financial_trxn_1']}.trxn_date BETWEEN '{$startDate}' AND '{$endDate}'";
   }
 
