@@ -251,6 +251,21 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch implements
       // Set by mysql
       unset($event->params['modified_date']);
 
+      // Delete empty form values and save as null if completely empty
+      if (isset($event->params['form_values']) && is_array($event->params['form_values'])) {
+        // Exclude legacy smart groups by checking if api_entity is set
+        if (!empty($event->params['api_entity'])) {
+          foreach ($event->params['form_values'] as $key => $value) {
+            if (is_array($value) && !$value) {
+              unset($event->params['form_values'][$key]);
+            }
+          }
+          if (!$event->params['form_values']) {
+            $event->params['form_values'] = '';
+          }
+        }
+      }
+
       // Flush angular caches to refresh search displays
       if (isset($event->params['api_params'])) {
         Civi::container()->get('angular')->clear();

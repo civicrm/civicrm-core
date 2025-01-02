@@ -147,7 +147,7 @@
 
       this.getFieldLabel = function(key) {
         var expr = ctrl.getExprFromSelect(selectToKey(key));
-        return searchMeta.getDefaultLabel(expr);
+        return searchMeta.getDefaultLabel(expr, ctrl.savedSearch);
       };
 
       this.getColLabel = function(col) {

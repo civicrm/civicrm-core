@@ -450,7 +450,7 @@ trait SavedSearchInspectorTrait {
           $joinCount[$entityName] = 1;
         }
         $label = CoreUtil::getInfoItem($entityName, 'title');
-        $this->_joinMap[$alias] = $label . $num;
+        $this->_joinMap[$alias] = $this->savedSearch['form_values']['join'][$alias] ?? "$label$num";
       }
     }
     return $this->_joinMap[$joinAlias];

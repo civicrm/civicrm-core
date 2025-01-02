@@ -231,11 +231,15 @@ class CRM_Upgrade_Incremental_SmartGroups {
    * @return mixed
    */
   protected function getSearchesWithField($field) {
-    return civicrm_api3('SavedSearch', 'get', [
-      'options' => ['limit' => 0],
-      'form_values' => ['LIKE' => "%{$field}%"],
-      'return' => ['id', 'form_values'],
-    ])['values'];
+    $apiGet = \Civi\Api4\SavedSearch::get(FALSE);
+    $apiGet->addSelect('id', 'form_values');
+    $apiGet->addWhere('form_values', 'LIKE', "%{$field}%");
+    // Avoid error if column hasn't been added yet by pending upgrades
+    if (version_compare(\CRM_Core_BAO_Domain::version(), '5.24', '>=')) {
+      // Exclude SearchKit searches
+      $apiGet->addWhere('api_entity', 'IS NULL');
+    }
+    return $apiGet->execute()->column(NULL, 'id');
   }
 
   /**

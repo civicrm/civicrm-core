@@ -173,7 +173,7 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
             ->setSavedSearch($displayTag['search-name']);
         }
         $display = $displayGet
-          ->addSelect('*', 'type:name', 'type:icon', 'saved_search_id.name', 'saved_search_id.label', 'saved_search_id.api_entity', 'saved_search_id.api_params')
+          ->addSelect('*', 'type:name', 'type:icon', 'saved_search_id.name', 'saved_search_id.label', 'saved_search_id.api_entity', 'saved_search_id.api_params', 'saved_search_id.form_values')
           ->execute()->first();
         if (!$display) {
           continue;
