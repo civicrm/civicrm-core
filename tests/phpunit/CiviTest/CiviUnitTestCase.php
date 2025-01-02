@@ -549,6 +549,9 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     if (!empty($this->ids['ContactType'])) {
       ContactType::delete(FALSE)->addWhere('id', 'IN', $this->ids['ContactType'])->execute();
     }
+    if (!empty($this->ids['OptionValue'])) {
+      OptionValue::delete(FALSE)->addWhere('id', 'IN', $this->ids['OptionValue'])->execute();
+    }
     unset(CRM_Core_Config::singleton()->userPermissionClass->permissions);
     parent::tearDown();
   }
@@ -2069,8 +2072,8 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     if ($ov->find(TRUE)) {
       CRM_Core_DAO::executeQuery("DELETE FROM civicrm_option_value WHERE id = {$ov->id}");
     }
-    $this->callAPISuccess('option_value', 'create', [
-      'option_group_id' => $optionGroupID,
+    $this->createTestEntity('OptionValue', [
+      'option_group_id:name' => 'acl_role',
       'label' => 'pick me',
       'value' => 55,
     ]);
