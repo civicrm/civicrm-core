@@ -726,108 +726,50 @@ DESC limit 1");
       $joinDate = CRM_Utils_Date::processDate($params['join_date']);
 
       foreach ($selectedMemberships as $memType) {
-        $startDate = NULL;
-        if (!empty($params['start_date'])) {
-          $startDate = CRM_Utils_Date::processDate($params['start_date']);
-        }
-
-        // if end date is set, ensure that start date is also set
-        // and that end date is later than start date
-        $endDate = NULL;
-        if (!empty($params['end_date'])) {
-          $endDate = CRM_Utils_Date::processDate($params['end_date']);
-        }
-
-        $membershipDetails = CRM_Member_BAO_MembershipType::getMembershipType($memType);
-        if ($startDate && ($membershipDetails['period_type'] ?? NULL) === 'rolling') {
-          if ($startDate < $joinDate) {
-            $errors['start_date'] = ts('Start date must be the same or later than Member since.');
-          }
-        }
-
-        if ($endDate) {
-          if ($membershipDetails['duration_unit'] === 'lifetime') {
-            // Check if status is NOT cancelled or similar. For lifetime memberships, there is no automated
-            // process to update status based on end-date. The user must change the status now.
-            $result = civicrm_api3('MembershipStatus', 'get', [
-              'sequential' => 1,
-              'is_current_member' => 0,
-            ]);
-            $tmp_statuses = $result['values'];
-            $status_ids = [];
-            foreach ($tmp_statuses as $cur_stat) {
-              $status_ids[] = $cur_stat['id'];
-            }
-
-            if (empty($params['status_id']) || in_array($params['status_id'], $status_ids) == FALSE) {
-              $errors['status_id'] = ts('A current lifetime membership cannot have an end date. You can either remove the end date or change the status to a non-current status like Cancelled, Expired, or Deceased.');
-            }
-
-            if (!empty($params['is_override']) && !CRM_Member_StatusOverrideTypes::isPermanent($params['is_override'])) {
-              $errors['is_override'] = ts('Because you set an End Date for a lifetime membership, This must be set to "Override Permanently"');
-            }
-          }
-          else {
-            if (!$startDate) {
-              $errors['start_date'] = ts('Start date must be set if end date is set.');
-            }
-            if ($endDate < $startDate) {
-              $errors['end_date'] = ts('End date must be the same or later than start date.');
-            }
-          }
-        }
-
-        // Default values for start and end dates if not supplied on the form.
-        $defaultDates = CRM_Member_BAO_MembershipType::getDatesForMembershipType($memType,
-          $joinDate,
-          $startDate,
-          $endDate
+        $defaultDates = \CRM_Member_BAO_MembershipType::getDatesForMembershipType($memType,
+          $params['join_date'] ?? NULL,
+          $params['start_date'] ?? NULL,
+          $params['end_date'] ?? NULL
+        );
+        $calcStatus = \CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate(
+          $params['start_date'] ?? CRM_Utils_Array::value('start_date', $defaultDates),
+          $params['end_date'] ?? CRM_Utils_Array::value('end_date', $defaultDates),
+          $params['join_date'] ?? CRM_Utils_Array::value('join_date', $defaultDates),
+          'now',
+          TRUE,
+          $memType
         );
 
-        if (!$startDate) {
-          $startDate = CRM_Utils_Array::value('start_date',
-            $defaultDates
-          );
-        }
-        if (!$endDate) {
-          $endDate = CRM_Utils_Array::value('end_date',
-            $defaultDates
-          );
-        }
+        $validationErrors = civicrm_api4('Membership', 'validate', [
+          'values' => [
+            'membership_type_id' => $memType,
+            'start_date' => $params['start_date'] ? CRM_Utils_Date::processDate($params['start_date']) : NULL,
+            'end_date' => $params['end_date'] ? CRM_Utils_Date::processDate($params['end_date']) : NULL,
+            'join_date' => $params['join_date'] ? CRM_Utils_Date::processDate($params['join_date']) : NULL,
+            'status_override_end_date' => $params['status_override_end_date'] ?? NULL,
+            'status_id' => $params['status_id'] ?? NULL,
+            'is_override' => $params['is_override'] ?? NULL,
+          ],
+          'checkPermissions' => FALSE,
+        ]);
 
-        //CRM-3724, check for availability of valid membership status.
-        if ((empty($params['is_override']) || CRM_Member_StatusOverrideTypes::isNo($params['is_override'])) && !isset($errors['_qf_default'])) {
-          $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($startDate,
-            $endDate,
-            $joinDate,
-            'now',
-            TRUE,
-            $memType,
-            $params
-          );
-          if (empty($calcStatus)) {
-            $url = CRM_Utils_System::url('civicrm/admin/member/membershipStatus', 'reset=1&action=browse');
-            $errors['_qf_default'] = ts('There is no valid Membership Status available for selected membership dates.');
-            $status = ts('Oops, it looks like there is no valid membership status available for the given membership dates. You can <a href="%1">Configure Membership Status Rules</a>.', [1 => $url]);
-            if (!$self->_mode) {
-              $status .= ' ' . ts('OR You can sign up by setting Status Override? to something other than "NO".');
+        foreach ($validationErrors as $validationError) {
+          if ($valiationError['name'] !== 'mandatory_missing' && count($validationError) == 1) {
+            if (empty($errors[$validationError['fields'][0]])) {
+              $errors[$validationError['fields'][0]] = $validationError['message'];
             }
-            CRM_Core_Session::setStatus($status, ts('Membership Status Error'), 'error');
+            //CRM-3724, check for availability of valid membership status.
+            if ($valiationError['name'] == 'empty_status_id' && empty($calcStatus) && !isset($errors['_qf_default'])) {
+              $url = CRM_Utils_System::url('civicrm/admin/member/membershipStatus', 'reset=1&action=browse');
+              $errors['_qf_default'] = ts('There is no valid Membership Status available for selected membership dates.');
+              $status = ts('Oops, it looks like there is no valid membership status available for the given membership dates. You can <a href="%1">Configure Membership Status Rules</a>.', [1 => $url]);
+              if (!$self->_mode) {
+                $status .= ' ' . ts('OR You can sign up by setting Status Override? to something other than "NO".');
+              }
+              CRM_Core_Session::setStatus($status, ts('Membership Status Error'), 'error');
+            }
           }
         }
-      }
-    }
-    else {
-      $errors['join_date'] = ts('Please enter the Member Since.');
-    }
-
-    if (!empty($params['is_override']) && CRM_Member_StatusOverrideTypes::isOverridden($params['is_override']) && empty($params['status_id'])) {
-      $errors['status_id'] = ts('Please enter the Membership status.');
-    }
-
-    if (!empty($params['is_override']) && CRM_Member_StatusOverrideTypes::isUntilDate($params['is_override'])) {
-      if (empty($params['status_override_end_date'])) {
-        $errors['status_override_end_date'] = ts('Please enter the Membership override end date.');
       }
     }
 

@@ -10,6 +10,8 @@
  */
 namespace Civi\Api4;
 
+use Civi\Api4\Action\Membership\Validate;
+
 /**
  * Membership entity.
  *
@@ -19,5 +21,14 @@ namespace Civi\Api4;
  * @package Civi\Api4
  */
 class Membership extends Generic\DAOEntity {
+
+  /**
+   * @param bool $checkPermissions
+   * @return Civi\Api4\Action\Membership\Validate
+   */
+  public static function validate($checkPermissions = TRUE) {
+    return (new Validate(static::getEntityName(), __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
 
 }
