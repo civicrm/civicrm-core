@@ -55,6 +55,11 @@ class CiviEnvBuilder {
     $this->name = $name;
   }
 
+  public function setName(string $name) {
+    $this->name = $name;
+    return $this;
+  }
+
   public function addStep(StepInterface $step) {
     $this->targetSignature = NULL;
     $this->steps[] = $step;
@@ -249,6 +254,9 @@ class CiviEnvBuilder {
         $this->finalizeApply();
         return $this;
       }
+
+      fprintf(STDERR, "\nInitializing \"%s\" (%s) in \"%s\"\n", $this->name, $this->getTargetSignature(), $dbName);
+
       foreach ($this->steps as $step) {
         $step->run($this);
       }

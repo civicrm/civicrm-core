@@ -164,11 +164,18 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     // crept into the system where civicrm_api('Entity','get') must be called as part of entities()
     // (even if its return value is ignored).
 
-    $tmp = civicrm_api('Entity', 'Get', ['version' => 3]);
     if (getenv('SYNTAX_CONFORMANCE_ENTITIES')) {
       $tmp = [
         'values' => explode(' ', getenv('SYNTAX_CONFORMANCE_ENTITIES')),
       ];
+    }
+    elseif (isset(\Civi\Test::$statics[__CLASS__]['entities'])) {
+      $tmp = \Civi\Test::$statics[__CLASS__]['entities'];
+    }
+    else {
+      \Civi\Test::asPreInstall([static::CLASS, 'buildEnvironment'])->apply();
+      $tmp = civicrm_api('Entity', 'Get', ['version' => 3]);
+      \Civi\Test::$statics[__CLASS__]['entities'] = $tmp;
     }
 
     if (!is_array($skip)) {

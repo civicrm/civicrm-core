@@ -294,10 +294,21 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    */
   final public static function buildEnvironment(): \Civi\Test\CiviEnvBuilder {
     // Ideally: return Civi\Test::headless();
-    $b = new \Civi\Test\CiviEnvBuilder();
-    $b->callback(function () {
-      fprintf(STDERR, "\nInstalling %s database\n", \Civi\Test::dsn('database'));
-    });
+
+    // Currently, `CiviUnitTestCase::setUpBeforeClass()` is forcing us to run on nearly ever class.
+    // (That should ideally be fixed - but doing so would reveal other bugs and need other work)
+    // So for the moment, the choices here impact overall performance -- e.g. doing a full init
+    // (CREATE TABLE, etc) would exaggerate the performance penalty. So we can't quite do that (yet).
+
+    // Rough guess: If we lack ordinary tables, then we do need full initialization.
+    $actualTables = \Civi\Test::schema()->getTables('BASE TABLE');
+    $expectTables = ['civicrm_contact', 'civicrm_option_value', 'civicrm_worldregion', 'civitest_revs'];
+    if (4 !== count(array_intersect($expectTables, $actualTables))) {
+      return \Civi\Test::headless();
+    }
+
+    // Otherwise: Merely TRUNCATE and INSERT basic data
+    $b = new \Civi\Test\CiviEnvBuilder('Basic Data');
     $b->callback([\Civi\Test::data(), 'populate']);
     return $b;
   }

@@ -551,6 +551,10 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
   }
 
   public function getVersion (): int {
+    return static::findVersion();
+  }
+
+  public static function findVersion(): int {
     static $version;
     if ($version === NULL) {
       if (class_exists('Smarty\Smarty')) {
