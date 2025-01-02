@@ -14,12 +14,19 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
+use Civi\Core\Event\GenericHookEvent;
 
 /**
  * The CiviCRM duplicate discovery engine is based on an
  * algorithm designed by David Strauss <david@fourkitchens.com>.
  */
-class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
+class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup implements \Symfony\Component\EventDispatcher\EventSubscriberInterface {
+
+  public static function getSubscribedEvents(): array {
+    return [
+      'hook_civicrm_findExistingDuplicates' => ['hook_civicrm_findExistingDuplicates', -20],
+    ];
+  }
 
   /**
    * @var array
@@ -132,6 +139,31 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
   }
 
   /**
+   * Find existing duplicates in the database for the given rule and limitations.
+   *
+   * @return void
+   */
+  public static function hook_civicrm_findExistingDuplicates(GenericHookEvent $event) {
+    $ruleGroupIDs = $event->ruleGroupIDs;
+    $ruleGroup = new \CRM_Dedupe_BAO_DedupeRuleGroup();
+    $ruleGroup->id = reset($ruleGroupIDs);
+    $contactIDs = [];
+    if ($event->tableName) {
+      $contactIDs = explode(',', CRM_Core_DAO::singleValueQuery('SELECT GROUP_CONCAT(id) FROM ' . $event->tableName));
+    }
+    if (!$ruleGroup->fillTable($ruleGroup->id, $contactIDs, [], FALSE)) {
+      return;
+    }
+    $dao = \CRM_Core_DAO::executeQuery($ruleGroup->thresholdQuery($event->checkPermissions));
+    $duplicates = [];
+    while ($dao->fetch()) {
+      $duplicates[] = ['entity_id_1' => $dao->id1, 'entity_id_2' => $dao->id2, 'weight' => $dao->weight];
+    }
+    $event->duplicates = $duplicates;
+    \CRM_Core_DAO::executeQuery($ruleGroup->tableDropQuery());
+  }
+
+  /**
    * Fill the dedupe finder table.
    *
    * @internal do not access from outside core.
@@ -139,20 +171,27 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
    * @param int $id
    * @param array $contactIDs
    * @param array $params
+   * @param bool $legacyMode
+   *   Legacy mode is called to give backward hook compatibility, in the legacydedupefinder
+   *   extension. It is intended to be transitional, with the non-legacy mode being
+   *   separated out and optimized once it no longer has to comply with the legacy
+   *   hook and reserved query methodology.
    *
    * @return bool
    * @throws \Civi\Core\Exception\DBQueryException
    */
-  public function fillTable(int $id, array $contactIDs, array $params): bool {
-    $this->contactIds = $contactIDs;
-    $this->params = $params;
+  public function fillTable(int $id, array $contactIDs, array $params, $legacyMode = TRUE): bool {
+    if ($legacyMode) {
+      $this->contactIds = $contactIDs;
+      $this->params = $params;
+    }
     $this->id = $id;
     // make sure we've got a fetched dbrecord, not sure if this is enforced
     $this->find(TRUE);
     $optimizer = new CRM_Dedupe_FinderQueryOptimizer($this->id, $contactIDs, $params);
     // Reserved Rule Groups can optionally get special treatment by
     // implementing an optimization class and returning a query array.
-    if ($optimizer->isUseReservedQuery()) {
+    if ($legacyMode && $optimizer->isUseReservedQuery()) {
       $tableQueries = $optimizer->getReservedQuery();
     }
     else {
@@ -160,11 +199,13 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
     }
     // if there are no rules in this rule group
     // add an empty query fulfilling the pattern
-    if (!$tableQueries) {
-      // Just for the hook.... (which is deprecated).
-      $this->noRules = TRUE;
+    if ($legacyMode) {
+      if (!$tableQueries) {
+        // Just for the hook.... (which is deprecated).
+        $this->noRules = TRUE;
+      }
+      CRM_Utils_Hook::dupeQuery($this, 'table', $tableQueries);
     }
-    CRM_Utils_Hook::dupeQuery($this, 'table', $tableQueries);
     if (empty($tableQueries)) {
       return FALSE;
     }
