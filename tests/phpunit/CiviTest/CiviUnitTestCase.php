@@ -307,11 +307,8 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       return \Civi\Test::headless();
     }
 
-    // Otherwise: Merely TRUNCATE and INSERT data
-    $b = new \Civi\Test\CiviEnvBuilder();
-    $b->callback(function () {
-      fprintf(STDERR, "\nInstalling database %s (TRUNCATE, INSERT, etc)\n", \Civi\Test::dsn('database'));
-    });
+    // Otherwise: Merely TRUNCATE and INSERT basic data
+    $b = new \Civi\Test\CiviEnvBuilder('Basic Data');
     $b->callback([\Civi\Test::data(), 'populate']);
     return $b;
   }

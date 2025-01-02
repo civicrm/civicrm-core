@@ -110,14 +110,13 @@ class Test {
    */
   public static function headless() {
     $civiRoot = dirname(__DIR__);
-    $builder = new \Civi\Test\CiviEnvBuilder();
+    $builder = new \Civi\Test\CiviEnvBuilder('Headless System');
     $builder
-      ->callback(function ($ctx) {
+      ->callback(function ($builder) {
         if (CIVICRM_UF !== 'UnitTests') {
           throw new \RuntimeException("\\Civi\\Test::headless() requires CIVICRM_UF=UnitTests");
         }
         $dbName = \Civi\Test::dsn('database');
-        fprintf(STDERR, "\nInstalling database {$dbName} (DROP, CREATE, INSERT, etc)\n");
         \Civi\Test::schema()->dropAll();
       }, 'headless-drop')
       ->coreSchema()
