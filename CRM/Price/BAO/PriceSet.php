@@ -507,12 +507,15 @@ WHERE  id = %1";
    *
    * We call this function when more than one being present would represent an error
    * starting format derived from current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId))
+   *
    * @param array $priceSet
    *
-   * @throws CRM_Core_Exception
    * @return int
+   * @throws CRM_Core_Exception
+   * @deprecated since 5.82 will be removed around 5.92
    */
   public static function getOnlyPriceFieldID(array $priceSet) {
+    CRM_Core_Error::deprecatedFunctionWarning('api');
     if (count($priceSet['fields']) > 1) {
       throw new CRM_Core_Exception(ts('expected only one price field to be in price set but multiple are present'));
     }
@@ -524,10 +527,13 @@ WHERE  id = %1";
    * current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId))
    * @param array $priceSet
    *
+   * @deprecated since 5.82 will be removed around 5.92
+   *
    * @throws CRM_Core_Exception
    * @return int
    */
   public static function getOnlyPriceFieldValueID(array $priceSet) {
+    CRM_Core_Error::deprecatedFunctionWarning('api');
     $priceFieldID = self::getOnlyPriceFieldID($priceSet);
     if (count($priceSet['fields'][$priceFieldID]['options']) > 1) {
       throw new CRM_Core_Exception(ts('expected only one price field to be in price set but multiple are present'));
