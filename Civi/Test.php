@@ -245,9 +245,7 @@ class Test {
           continue;
         }
         else {
-          var_dump($result);
-          var_dump($pdo->errorInfo());
-          // die( "Cannot execute $query: " . $pdo->errorInfo() );
+          throw new \RuntimeException('Cannot execute query: ' . json_encode([$query, $pdo->errorInfo()], JSON_PRETTY_PRINT));
         }
       }
     }
