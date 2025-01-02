@@ -1037,14 +1037,14 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       [
         'contact_id' => $this->ids['Contact']['first'],
         'receive_date' => '2016-10-01',
-        'revenue_recognition_date' => date('Y-m-t', strtotime(date('ymd') . '+3 month')),
+        'revenue_recognition_date' => (new DateTime('+3 month'))->format('Y-m-t'),
         'financial_type_id' => 2,
       ]
     );
     $this->contributionCreate(
       [
         'contact_id' => $this->ids['Contact']['first'],
-        'revenue_recognition_date' => date('Y-m-t', strtotime(date('ymd') . '+22 month')),
+        'revenue_recognition_date' => (new DateTime('+22 month'))->format('Y-m-t'),
         'financial_type_id' => 4,
         'trxn_id' => NULL,
         'invoice_id' => NULL,
@@ -1053,7 +1053,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $this->contributionCreate(
       [
         'contact_id' => $this->ids['Contact']['second'],
-        'revenue_recognition_date' => date('Y-m-t', strtotime(date('ymd') . '+1 month')),
+        'revenue_recognition_date' => (new DateTime('+1 month'))->format('Y-m-t'),
         'financial_type_id' => 4,
         'trxn_id' => NULL,
         'invoice_id' => NULL,
@@ -1063,7 +1063,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       [
         'contact_id' => $this->ids['Contact']['second'],
         'receive_date' => '2016-03-01',
-        'revenue_recognition_date' => date('Y-m-t', strtotime(date('ymd') . '+4 month')),
+        'revenue_recognition_date' => (new DateTime('+4 month'))->format('Y-m-t'),
         'financial_type_id' => 2,
         'trxn_id' => NULL,
         'invoice_id' => NULL,
