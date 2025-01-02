@@ -76,8 +76,11 @@ class CRM_Core_BAO_IM extends CRM_Core_DAO_IM implements Civi\Core\HookInterface
    *
    * @return array
    *   the array of im details
+   *
+   * @deprecated since 5.82 will be removed around 5.90
    */
   public static function allIMs($id, $updateBlankLocInfo = FALSE) {
+    CRM_Core_Error::deprecatedFunctionWarning('api');
     if (!$id) {
       return NULL;
     }
@@ -124,11 +127,12 @@ ORDER BY
    * @param array $entityElements
    *   The array containing entity_id and.
    *   entity_table name
-   *
    * @return array
    *   the array of im details
+   * @deprecated since 5.82 will be removed around 5.90
    */
   public static function allEntityIMs(&$entityElements) {
+    CRM_Core_Error::deprecatedFunctionWarning('api');
     if (empty($entityElements)) {
       return NULL;
     }
