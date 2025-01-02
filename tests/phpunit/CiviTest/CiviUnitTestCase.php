@@ -296,11 +296,11 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     // Ideally: return Civi\Test::headless();
 
     // Currently, `CiviUnitTestCase::setUpBeforeClass()` is forcing us to run on nearly ever class.
-    // That should ideally be fixed (but it masks other bugs and needs other work).
-    // Consequently, doing a full and proper `headless()` initialization would further exaggerate
-    // that performance penalty. So we can't quite do that.
+    // (That should ideally be fixed - but doing so would reveal other bugs and need other work)
+    // So for the moment, the choices here impact overall performance -- e.g. doing a full init
+    // (CREATE TABLE, etc) would exaggerate the performance penalty. So we can't quite do that (yet).
 
-    // Rough guess: If there's no schema, then we do need full headless initialization.
+    // Rough guess: If we lack ordinary tables, then we do need full initialization.
     $actualTables = \Civi\Test::schema()->getTables('BASE TABLE');
     $expectTables = ['civicrm_contact', 'civicrm_option_value', 'civicrm_worldregion', 'civitest_revs'];
     if (4 !== count(array_intersect($expectTables, $actualTables))) {
