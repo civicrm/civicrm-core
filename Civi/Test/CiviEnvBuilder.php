@@ -20,6 +20,12 @@ use RuntimeException;
 class CiviEnvBuilder {
   protected $name;
 
+  /**
+   *
+   * @var bool
+   */
+  private $useOnce = FALSE;
+
   private $steps = [];
 
   /**
@@ -35,6 +41,20 @@ class CiviEnvBuilder {
   public function addStep(StepInterface $step) {
     $this->targetSignature = NULL;
     $this->steps[] = $step;
+    return $this;
+  }
+
+  /**
+   * Mark this as a single-use environment.
+   *
+   * If enabled, then we will reinitialize the environment before and/or after
+   * the test. Use this if you have a sloppy test that fails to clean up after itself.
+   *
+   * @param bool $useOnce
+   * @return $this
+   */
+  public function useOnce(bool $useOnce = TRUE) {
+    $this->useOnce = $useOnce;
     return $this;
   }
 
@@ -120,9 +140,14 @@ class CiviEnvBuilder {
    */
   protected function getTargetSignature() {
     if ($this->targetSignature === NULL) {
-      $buf = '';
-      foreach ($this->steps as $step) {
-        $buf .= $step->getSig();
+      if ($this->useOnce) {
+        $buf = \random_bytes(24);
+      }
+      else {
+        $buf = '';
+        foreach ($this->steps as $step) {
+          $buf .= $step->getSig();
+        }
       }
       $this->targetSignature = md5($buf);
     }
