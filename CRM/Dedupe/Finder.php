@@ -321,35 +321,15 @@ class CRM_Dedupe_Finder {
         $subTypes = [];
       }
       else {
-        if (strpos($subTypes, ',') !== FALSE) {
-          CRM_Core_Error::deprecatedWarning('subtype should be an array, if multiple');
-          $subTypes = explode(',', $subTypes);
-        }
-        elseif (strpos($subTypes, CRM_Core_DAO::VALUE_SEPARATOR) !== FALSE) {
-          CRM_Core_Error::deprecatedWarning('subtype should be an array, if multiple');
-          $subTypes = explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($subTypes, CRM_Core_DAO::VALUE_SEPARATOR));
-        }
-        else {
-          $subTypes = (array) $subTypes;
-        }
+        $subTypes = (array) $subTypes;
       }
     }
     foreach ($subTypes as $index => $subType) {
-      if (trim($subType, CRM_Core_DAO::VALUE_SEPARATOR) !== $subType) {
-        CRM_Core_Error::deprecatedWarning('subtype should not require extra cleanup');
-        $subTypes[$index] = trim($subType, CRM_Core_DAO::VALUE_SEPARATOR);
-      }
       $validatedSubType = self::validateSubTypeByEntity($entityType, $subType);
       if ($subType !== $validatedSubType) {
-        if (strtolower($subType) === strtolower($validatedSubType)) {
-          CRM_Core_Error::deprecatedWarning('passing in contact subtype with incorrect capitalization is deprecated');
-          $subTypes[$index] = $validatedSubType;
-        }
-        else {
-          // This is a security check rather than a deprecation.
-          \Civi::log()->warning('invalid subtype passed to duplicate check {type}', ['type' => $subType]);
-          unset($subTypes[$index]);
-        }
+        // This is a security check rather than a deprecation.
+        \Civi::log()->warning('invalid subtype passed to duplicate check {type}', ['type' => $subType]);
+        unset($subTypes[$index]);
       }
     }
 
