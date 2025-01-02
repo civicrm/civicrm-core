@@ -18,6 +18,9 @@ use RuntimeException;
  * reapply all the steps.
  */
 class CiviEnvBuilder {
+
+  public static ?CiviEnvBuilder $lastApplied = NULL;
+
   protected $name;
 
   /**
@@ -33,6 +36,20 @@ class CiviEnvBuilder {
    *   A digest of the values in $steps.
    */
   private $targetSignature = NULL;
+
+  /**
+   * Identify which test/agent/process was responsible for creating this environment.
+   *
+   * @var string|null
+   */
+  private ?string $appliedBy = NULL;
+
+  /**
+   * A detailed snapshot of how the environment looked when it was first applied.
+   *
+   * @var array|null
+   */
+  private ?array $detailedSnapshot = NULL;
 
   public function __construct(string $name = 'CiviEnvBuilder') {
     $this->name = $name;
@@ -212,17 +229,41 @@ class CiviEnvBuilder {
         throw new \RuntimeException("Failed to flag schema version: $query");
       }
 
+      if (empty($GLOBALS['CIVICRM_TEST_CASE'])) {
+        $this->appliedBy = 'Unknown';
+      }
+      else {
+        $test = $GLOBALS['CIVICRM_TEST_CASE'];
+        $this->appliedBy = get_class($test) . '::';
+        $this->appliedBy .= (is_callable($test, 'name') ? $test->name() : $test->getName());
+      }
+
       $this->assertValid();
 
+      if (SloppyTestChecker::isActive() && static::$lastApplied && !static::$lastApplied->useOnce) {
+        $currentSnapshot = SloppyTestChecker::createSnapshot();
+        SloppyTestChecker::doComparison(static::$lastApplied->detailedSnapshot, $currentSnapshot, static::$lastApplied->appliedBy, $this->appliedBy);
+      }
+
       if (!$force && $this->getSavedSignature() === $this->getTargetSignature()) {
+        $this->finalizeApply();
         return $this;
       }
       foreach ($this->steps as $step) {
         $step->run($this);
       }
       $this->setSavedSignature($this->getTargetSignature());
+      $this->finalizeApply();
+
       return $this;
     });
+  }
+
+  private function finalizeApply(): void {
+    if (SloppyTestChecker::isActive()) {
+      $this->detailedSnapshot = SloppyTestChecker::createSnapshot();
+    }
+    static::$lastApplied = $this;
   }
 
   /**
