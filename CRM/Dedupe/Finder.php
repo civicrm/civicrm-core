@@ -197,20 +197,6 @@ class CRM_Dedupe_Finder {
     $flat = [];
     CRM_Utils_Array::flatten($fields, $flat);
 
-    // FIXME: This may no longer be necessary - check inputs
-    $replace_these = [
-      'individual_prefix' => 'prefix_id',
-      'individual_suffix' => 'suffix_id',
-      'gender' => 'gender_id',
-    ];
-    foreach (['individual_suffix', 'individual_prefix', 'gender'] as $name) {
-      if (!empty($fields[$name])) {
-        CRM_Core_Error::deprecatedWarning('code thought to be unreachable - slated for removal');
-        $flat[$replace_these[$name]] = $flat[$name];
-        unset($flat[$name]);
-      }
-    }
-
     // handle {birth,deceased}_date
     foreach (['birth_date', 'deceased_date'] as $date) {
       if (!empty($fields[$date])) {
