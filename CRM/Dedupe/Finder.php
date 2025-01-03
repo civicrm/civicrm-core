@@ -25,6 +25,8 @@ class CRM_Dedupe_Finder {
    * Return a contact_id-keyed array of arrays of possible dupes
    * (of the key contact_id) - limited to dupes of $cids if provided.
    *
+   * @deprecated avoid calling this function directly as it is likely to change.
+   *
    * @param int $rgid
    *   Rule group id.
    * @param array $cids
@@ -45,16 +47,9 @@ class CRM_Dedupe_Finder {
       throw new CRM_Core_Exception('Dedupe rule not found for selected contacts');
     }
 
-    if (!$rgBao->fillTable($rgid, $cids, [])) {
-      return [];
-    }
-    $dao = CRM_Core_DAO::executeQuery($rgBao->thresholdQuery($checkPermissions));
     $dupes = [];
-    while ($dao->fetch()) {
-      $dupes[] = [$dao->id1, $dao->id2, $dao->weight];
-    }
-    CRM_Core_DAO::executeQuery($rgBao->tableDropQuery());
-
+    $where = empty($cids) ? [] : [['id', 'IN', $cids]];
+    CRM_Utils_Hook::findExistingDuplicates($dupes, [$rgid], $where, $checkPermissions);
     return $dupes;
   }
 
