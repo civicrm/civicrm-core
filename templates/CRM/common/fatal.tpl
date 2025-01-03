@@ -33,7 +33,6 @@
   </style>
 {/if}
 <div class="messages status no-popup">  <i class="crm-i fa-exclamation-triangle crm-i-red" aria-hidden="true"></i>
- <span class="status-fatal">{ts}Sorry, due to an error, we are unable to fulfill your request at the moment. You may want to contact your administrator or service provider with more details about what action you were performing when this occurred.{/ts}</span>
     <div class="crm-section crm-error-message">{$message|escape}</div>
     {if !empty($error.message) && $message != $error.message}
         <hr style="solid 1px" />
