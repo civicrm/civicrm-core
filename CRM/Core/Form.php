@@ -391,6 +391,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
     $this->_action = (int) $action;
     $this->registerElementType('radio_with_div', 'CRM/Core/QuickForm/RadioWithDiv.php', 'CRM_Core_QuickForm_RadioWithDiv');
+    $this->registerElementType('group_with_div', 'CRM/Core/QuickForm/GroupWithDiv.php', 'CRM_Core_QuickForm_GroupWithDiv');
     $this->registerRules();
 
     // let the constructor initialize this, should happen only once
@@ -1497,7 +1498,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $element = $this->createElement('radio_with_div', NULL, NULL, $var, $key, $optAttributes);
       $options[] = $element;
     }
-    $group = $this->addGroup($options, $name, $title, $separator);
+    if (!empty($attributes['options_per_line'])) {
+      $group = $this->addElement('group_with_div', $name, $title, $options, $separator, TRUE);
+      $group->setAttribute('options_per_line', $attributes['options_per_line']);
+    }
+    else {
+      $group = $this->addGroup($options, $name, $title, $separator);
+    }
 
     $optionEditKey = 'data-option-edit-path';
     if (!empty($attributes[$optionEditKey])) {
