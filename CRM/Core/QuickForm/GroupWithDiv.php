@@ -16,15 +16,15 @@
  *
  */
 
-require_once 'HTML/QuickForm/radio.php';
+require_once 'HTML/QuickForm/group.php';
 
 /**
- * Class CRM_Core_QuickForm_RadioWithDiv
+ * Class CRM_Core_QuickForm_GroupWithDiv
  */
-class CRM_Core_QuickForm_RadioWithDiv extends HTML_QuickForm_radio {
+class CRM_Core_QuickForm_GroupWithDiv extends HTML_QuickForm_group {
 
   /**
-   * Returns the radio element in HTML
+   * Returns the group element in HTML
    *
    * @since     1.0
    * @access    public
@@ -33,7 +33,7 @@ class CRM_Core_QuickForm_RadioWithDiv extends HTML_QuickForm_radio {
   public function toHtml(): string {
     $html = parent::toHtml();
     if (is_numeric($this->getAttribute('options_per_line'))) {
-      return '<div class="crm-option-label-pair" >' . $html . '</div>';
+      return '<div class="crm-multiple-checkbox-radio-options crm-options-per-line" style="--crm-opts-per-line:' . $this->getAttribute('options_per_line') . ';">' . $html . '</div>';
     }
     return $html;
   }

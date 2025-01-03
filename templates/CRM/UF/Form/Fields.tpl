@@ -30,10 +30,6 @@
           <div class="crm-multiple-checkbox-radio-options crm-options-per-line" style="--crm-opts-per-line:{$field.options_per_line};">
             {$formElement.html}
           </div>
-          {* Include the edit options list for admins *}
-          {if $formElement.html|strstr:"crm-option-edit-link"}
-            {$formElement.html|regex_replace:"@^.*(<a href=.*? class=.crm-option-edit-link.*?</a>)$@":"$1"}
-          {/if}
         </div>
         <div class="clear"></div>
       </div>
