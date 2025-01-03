@@ -101,35 +101,8 @@
     </div><!-- .crm-actions-ribbon -->
   {/if}
 
-  <div class="crm-block crm-content-block crm-contact-page crm-inline-edit-container">
-    <div id="mainTabContainer">
-      <ul class="crm-contact-tabs-list">
-        {foreach from=$allTabs item=tabValue}
-          <li id="tab_{$tabValue.id}" class="crm-tab-button ui-corner-all{if is_numeric($tabValue.count)} crm-count-{$tabValue.count}{/if}{if $tabValue.class} {$tabValue.class}{/if}">
-            <a href="{if $tabValue.template}#contact-{$tabValue.id}{else}{$tabValue.url|smarty:nodefaults}{/if}" title="{$tabValue.title|escape}">
-              <i class="{if !empty($tabValue.icon)}{$tabValue.icon}{else}crm-i fa-puzzle-piece{/if}" aria-hidden="true"></i>
-              <span>{$tabValue.title}</span>
-              {if empty($tabValue.hideCount)}<em>{if is_numeric($tabValue.count)}{$tabValue.count}{/if}</em>{/if}
-            </a>
-          </li>
-        {/foreach}
-      </ul>
+  {include file='CRM/common/TabHeader.tpl' tabHeader=$allTabs containerClasses="crm-contact-page crm-inline-edit-container" listClasses="crm-contact-tabs-list" tabIdPrefix="contact-"}
 
-      {foreach from=$allTabs item=tabValue}
-        {if $tabValue.template}
-          <div id="contact-{$tabValue.id}">
-            {if $tabValue.module}
-              <!-- afform tab - need to pass module and directive to afform param -->
-              {include file=$tabValue.template afform=$tabValue}
-            {else}
-              {include file=$tabValue.template}
-            {/if}
-          </div>
-        {/if}
-      {/foreach}
-    </div>
-    <div class="clear"></div>
-  </div>
 {/if}
 
 {* CRM-10560 *}
