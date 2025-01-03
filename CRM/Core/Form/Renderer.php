@@ -84,6 +84,13 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
   public function _elementToArray(&$element, $required, $error) {
     self::updateAttributes($element, $required, $error);
 
+    if ($element->getType() === 'group' && $element->getAttribute('options_per_line')) {
+      // Our standard template renders the erroneous html as part of it.
+      // This results in double renders in some cases - see https://lab.civicrm.org/dev/core/-/issues/5571
+      // I suspect not rendering the html is probably often better but
+      // this adds it for our known problem case.
+      $this->setErrorTemplate('CRM/Form/errorClean.tpl');
+    }
     $el = parent::_elementToArray($element, $required, $error);
     $el['textLabel'] = $element->_label ?? NULL;
 
@@ -126,7 +133,13 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
     else {
       $typesToShowEditLink = ['select', 'group'];
       $hasEditPath = NULL !== $element->getAttribute('data-option-edit-path');
-
+      if ($element->getType() === 'group' && $element->getAttribute('options_per_line')) {
+        // Our standard template renders the erroneous html as part of it.
+        // This results in double renders in some cases - see https://lab.civicrm.org/dev/core/-/issues/5571
+        // I suspect not rendering the html is probably often better but
+        // this adds it for our known problem case.
+        $this->setErrorTemplate('CRM/Form/errorClean.tpl');
+      }
       if (in_array($element->getType(), $typesToShowEditLink) && $hasEditPath) {
         $this->addOptionsEditLink($el, $element);
       }
@@ -135,7 +148,9 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
         $this->appendUnselectButton($el, $element);
       }
     }
-
+    // We can't do a get to check but the only time we ever use a different template is within this
+    // function.
+    $this->setErrorTemplate('CRM/Form/error.tpl');
     return $el;
   }
 
