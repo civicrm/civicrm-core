@@ -1498,7 +1498,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $options[] = $element;
     }
     $group = $this->addGroup($options, $name, $title, $separator);
-
+    if (!empty($attributes['options_per_line'])) {
+      $group->setAttribute('options_per_line', $attributes['options_per_line']);
+    }
     $optionEditKey = 'data-option-edit-path';
     if (!empty($attributes[$optionEditKey])) {
       $group->setAttribute($optionEditKey, $attributes[$optionEditKey]);

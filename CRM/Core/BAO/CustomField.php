@@ -775,6 +775,9 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
           if ($search || empty($useRequired)) {
             $fieldAttributes['allowClear'] = TRUE;
           }
+          if ($field->options_per_line) {
+            $fieldAttributes['options_per_line'] = $field->options_per_line;
+          }
           $qf->addRadio($elementName, $label, $options, $fieldAttributes, NULL, $useRequired);
         }
         break;
