@@ -390,7 +390,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $this->_state->setName($this->_name);
     }
     $this->_action = (int) $action;
-
+    $this->registerElementType('radio_with_div', 'CRM/Core/QuickForm/RadioWithDiv.php', 'CRM_Core_QuickForm_RadioWithDiv');
     $this->registerRules();
 
     // let the constructor initialize this, should happen only once
@@ -1494,7 +1494,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       if ($required) {
         $optAttributes['class'] .= ' required';
       }
-      $element = $this->createElement('radio', NULL, NULL, $var, $key, $optAttributes);
+      $element = $this->createElement('radio_with_div', NULL, NULL, $var, $key, $optAttributes);
       $options[] = $element;
     }
     $group = $this->addGroup($options, $name, $title, $separator);
