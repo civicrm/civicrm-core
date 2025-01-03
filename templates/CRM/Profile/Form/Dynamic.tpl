@@ -62,6 +62,8 @@
       {/if}
       {assign var="profileID" value=$field.group_id}
       {assign var="profileFieldName" value=$field.name}
+      {assign var="rowIdentifier" value=$field.name}
+      {assign var="formElement" value=$form.$profileFieldName}
 
       {if $field.groupTitle != $fieldset}
         {if $mode neq 8 && $mode neq 4}
@@ -96,34 +98,9 @@
           </div>
         {/if}
         {if array_key_exists('options_per_line', $field) && $field.options_per_line}
-          <div class="crm-section editrow_{$profileFieldName}-section form-item" id="editrow-{$profileFieldName}">
-            <div class="label">{$form.$profileFieldName.label}</div>
-            <div class="content edit-value">
-              {assign var="count" value=1}
-              {strip}
-                <table class="form-layout-compressed">
-                <tr>
-                {* sort by fails for option per line. Added a variable to iterate through the element array*}
-                  {foreach name=outer key=key item=item from=$form.$profileFieldName}
-                    {* There are both numeric and non-numeric keys mixed in here, where the non-numeric are metadata that aren't arrays with html members. *}
-                    {if is_array($item) && array_key_exists('html', $item)}
-                      <td class="labels font-light">{$form.$profileFieldName.$key.html}</td>
-                      {if $count == $field.options_per_line}
-                      </tr>
-                      <tr>
-                        {assign var="count" value=1}
-                        {else}
-                        {assign var="count" value=$count+1}
-                      {/if}
-                    {/if}
-                  {/foreach}
-                </tr>
-                </table>
-              {/strip}
-            </div>
-            <div class="clear"></div>
+          {include file="CRM/UF/Form/FieldRadioOptionsPerLine.tpl"}
           </div>{* end of main edit section div*}
-          {else}
+        {else}
           <div id="editrow-{$profileFieldName}" class="crm-section editrow_{$profileFieldName}-section form-item">
             <div class="label">
               {$form.$profileFieldName.label}
