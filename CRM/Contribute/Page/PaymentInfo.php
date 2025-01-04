@@ -16,14 +16,28 @@
  */
 class CRM_Contribute_Page_PaymentInfo extends CRM_Core_Page {
 
+  /**
+   * The component this payment is associated with (contribution, event, etc).
+   *
+   * @var string
+   */
+  protected $_component;
+
+  /**
+   * The context this is being called in (payment_info, payment)
+   *
+   * @var string
+   */
+  protected $_context;
+
   public function preProcess() {
     $this->_component = CRM_Utils_Request::retrieve('component', 'String', $this, TRUE);
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
     $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this, TRUE);
-    $this->_cid = CRM_Utils_Request::retrieve('cid', 'String', $this, TRUE);
+    $cid = CRM_Utils_Request::retrieve('cid', 'String', $this, TRUE);
 
-    $this->assign('cid', $this->_cid);
+    $this->assign('cid', $cid);
     $this->assign('id', $this->_id);
     $this->assign('context', $this->_context);
     $this->assign('component', $this->_component);
