@@ -41,6 +41,10 @@ return [
       'sql_type' => 'varchar(1024)',
       'input_type' => 'Select',
       'description' => ts('Template field key'),
+      'pseudoconstant' => [
+        'callback' => ['CRM_Core_BAO_ImportTemplateField', 'getImportableFieldOptions'],
+        'suffixes' => ['name', 'label', 'description'],
+      ],
       'add' => '5.83',
     ],
     'column_number' => [
