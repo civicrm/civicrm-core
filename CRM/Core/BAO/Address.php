@@ -1301,27 +1301,6 @@ SELECT is_primary,
   }
 
   /**
-   * Silly wrapper because the entity callback passes in different vars than
-   * the pseudoconstant takes, and wants a different result format back.
-   *
-   * Note the pseudoconstant only ever returned active countries.
-   */
-  public static function pseudoconstantCountry($dummy, $dummy2) {
-    $countries = CRM_Core_PseudoConstant::country();
-    $reformatted = [];
-    foreach ($countries as $id => $country) {
-      $reformatted[] = [
-        'id' => $id,
-        'label' => $country,
-        'name' => CRM_Core_PseudoConstant::countryIsoCode($id),
-        'abbr' => CRM_Core_PseudoConstant::countryIsoCode($id),
-        'is_active' => 1,
-      ];
-    }
-    return $reformatted;
-  }
-
-  /**
    * Pseudoconstant condition_provider for county_id field.
    * @see \Civi\Schema\EntityMetadataBase::getConditionFromProvider
    */

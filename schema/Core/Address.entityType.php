@@ -4,6 +4,7 @@ return [
   'name' => 'Address',
   'table' => 'civicrm_address',
   'class' => 'CRM_Core_DAO_Address',
+  'metaProvider' => '\Civi\Schema\Entity\AddressMetadata',
   'getInfo' => fn() => [
     'title' => ts('Address'),
     'title_plural' => ts('Addresses'),
@@ -350,7 +351,16 @@ return [
         'label' => ts('Country'),
       ],
       'pseudoconstant' => [
-        'callback' => ['CRM_Core_BAO_Address', 'pseudoconstantCountry'],
+        'table' => 'civicrm_country',
+        'key_column' => 'id',
+        'label_column' => 'name',
+        'name_column' => 'iso_code',
+        'abbr_column' => 'iso_code',
+        'condition_provider' => ['CRM_Core_BAO_Address', 'alterCountry'],
+        'suffixes' => [
+          'label',
+          'abbr',
+        ],
       ],
       'entity_reference' => [
         'entity' => 'Country',
