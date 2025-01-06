@@ -61,6 +61,7 @@
           name: param.name,
           value: val
         });
+        this.writeExpr();
       };
 
       function initFunction() {
@@ -196,11 +197,9 @@
       this.writeExpr = function() {
         if (ctrl.fnName) {
           var args = _.transform(ctrl.args, function(args, arg, index) {
-            if (arg.value || arg.value === 0 || arg.flag_before) {
-              var prefix = arg.flag_before || arg.name ? (index ? ' ' : '') + (arg.flag_before || arg.name) + (arg.value ? ' ' : '') : (index ? ', ' : '');
-              var suffix = arg.flag_after ? ' ' + arg.flag_after : '';
-              args.push(prefix + (arg.type === 'string' ? JSON.stringify(arg.value) : arg.value) + suffix);
-            }
+            var prefix = arg.flag_before || arg.name ? (index ? ' ' : '') + (arg.flag_before || arg.name) + (arg.value ? ' ' : '') : (index ? ', ' : '');
+            var suffix = arg.flag_after ? ' ' + arg.flag_after : '';
+            args.push(prefix + (arg.type === 'string' ? JSON.stringify(arg.value) : arg.value) + suffix);
           });
           // Replace fake function "e"
           ctrl.expr = (ctrl.fnName === 'e' ? '' : ctrl.fnName) + '(';
