@@ -124,6 +124,7 @@ class CRM_Core_BAO_Country extends CRM_Core_DAO_Country {
    * @return array
    */
   public static function _defaultContactCountries($availableCountries) {
+    throw new \Exception('here');
     // localise the country names if in an non-en_US locale
     $tsLocale = CRM_Core_I18n::getLocale();
     if ($tsLocale != '' and $tsLocale != 'en_US') {
