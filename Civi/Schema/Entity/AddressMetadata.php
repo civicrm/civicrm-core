@@ -32,7 +32,8 @@ class AddressMetadata extends SqlEntityMetadata {
         // There must be a better algorithm. Maybe reindex the original first so can just pull by key?
         foreach ($options as $opt) {
           if ($opt['id'] == $id) {
-            $newOptions[] = $opt;
+            // We may have translated the label in the map so we want that label.
+            $newOptions[] = array_merge($opt, ['label' => $country]);
             break;
           }
         }
