@@ -469,9 +469,18 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     // ensure all keys used in the template are set, to avoid notices
     $allTabs = \CRM_Core_Smarty::setRequiredTabTemplateKeys($allTabs);
 
+    // ensure the array keys match the value in the "id" of each item
+    $tabs = [];
+
+    foreach ($allTabs as $key => $tab) {
+      $finalKey = $tab['id'] ?? $key;
+      $tabs[$finalKey] = $tab;
+    }
+
     // now sort the tabs based on weight
-    usort($allTabs, ['CRM_Utils_Sort', 'cmpFunc']);
-    return $allTabs;
+    usort($tabs, ['CRM_Utils_Sort', 'cmpFunc']);
+
+    return $tabs;
   }
 
   /**
