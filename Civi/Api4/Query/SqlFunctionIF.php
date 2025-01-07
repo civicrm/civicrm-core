@@ -29,11 +29,13 @@ class SqlFunctionIF extends SqlFunction {
         'optional' => FALSE,
         'must_be' => ['SqlField', 'SqlString', 'SqlNumber', 'SqlNull', 'SqlFunction'],
         'label' => ts('Then'),
+        'can_be_empty' => TRUE,
       ],
       [
         'optional' => FALSE,
         'must_be' => ['SqlField', 'SqlString', 'SqlNumber', 'SqlNull', 'SqlFunction'],
         'label' => ts('Else'),
+        'can_be_empty' => TRUE,
       ],
     ];
   }
