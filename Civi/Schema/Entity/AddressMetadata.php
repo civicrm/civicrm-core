@@ -18,9 +18,16 @@ class AddressMetadata extends SqlEntityMetadata {
   public function getOptions(string $fieldName, array $values = [], bool $includeDisabled = FALSE, bool $checkPermissions = FALSE, ?int $userId = NULL): ?array {
     $options = parent::getOptions($fieldName, $values, $includeDisabled, $checkPermissions, $userId);
     if ($fieldName == 'country_id') {
+      // The general idea is call the function that does all the stuff, but it
+      // wants a different format, so we convert, then merge back in the
+      // original format data.
       $map = [];
+      $originalReindexed = [];
       foreach ($options as $opt) {
         $map[$opt['id']] = $opt['label'];
+        // It's way more efficient later to be able to get the original by id.
+        // It's currently indexed sequentially.
+        $originalReindexed[$opt['id']] = $opt;
       }
       // This sorting isn't identical to the pre-entity output because it used
       // db rules whereas this is php, e.g. Åland Islands
@@ -28,15 +35,9 @@ class AddressMetadata extends SqlEntityMetadata {
       $map = \CRM_Core_BAO_Country::_defaultContactCountries($map);
       // Now merge the format it wants back in
       $newOptions = [];
-      foreach ($map as $id => $country) {
-        // There must be a better algorithm. Maybe reindex the original first so can just pull by key?
-        foreach ($options as $opt) {
-          if ($opt['id'] == $id) {
-            // We may have translated the label in the map so we want that label.
-            $newOptions[] = array_merge($opt, ['label' => $country]);
-            break;
-          }
-        }
+      foreach ($map as $id => $possiblyTranslatedLabel) {
+        // We may have translated the label, so we want that label.
+        $newOptions[] = array_merge($originalReindexed[$id], ['label' => $possiblyTranslatedLabel]);
       }
       $options = $newOptions;
     }
