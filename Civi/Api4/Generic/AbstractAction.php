@@ -277,7 +277,7 @@ abstract class AbstractAction implements \ArrayAccess {
     $params = [];
     $magicProperties = $this->getMagicProperties();
     foreach ($magicProperties as $name => $bool) {
-      $params[$name] = $this->$name;
+      $params[$name] = $this->$name ?? NULL;
     }
     return $params;
   }
