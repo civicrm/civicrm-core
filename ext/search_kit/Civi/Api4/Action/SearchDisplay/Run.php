@@ -132,8 +132,9 @@ class Run extends AbstractRunAction {
     $select = [];
     $columns = $this->display['settings']['columns'];
     foreach ($columns as $col) {
-      $key = str_replace(':', '_', $col['key'] ?? '');
-      if (!empty($col['tally']['fn']) && \CRM_Utils_Rule::mysqlColumnNameOrAlias($key)) {
+      $key = $col['key'] ?? '';
+      $rawKey = str_replace(['.', ':'], '_', $key);
+      if (!empty($col['tally']['fn']) && \CRM_Utils_Rule::mysqlColumnNameOrAlias($rawKey)) {
         /* @var \Civi\Api4\Query\SqlFunction $sqlFnClass */
         $sqlFnClass = '\Civi\Api4\Query\SqlFunction' . $col['tally']['fn'];
         $fnArgs = ["`$key`"];
@@ -148,10 +149,10 @@ class Run extends AbstractRunAction {
             $fnArgs[] = "ORDER BY `$key`";
           }
         }
-        $select[] = $sqlFnClass::renderExpression(implode(' ', $fnArgs)) . " `$key`";
+        $select[] = $sqlFnClass::renderExpression(implode(' ', $fnArgs)) . " `$rawKey`";
       }
     }
-    $query = 'SELECT ' . implode(', ', $select) . ' FROM (' . $sql . ') `api_query`';
+    $query = 'SELECT ' . implode(', ', $select) . "\nFROM (" . $sql . ")\n`api_query`";
     $dao = \CRM_Core_DAO::executeQuery($query);
     $dao->fetch();
     $tally = [];
@@ -183,6 +184,7 @@ class Run extends AbstractRunAction {
     // Handle any rewrite tokens
     foreach ($columns as $col) {
       if (!empty($col['tally']['rewrite'])) {
+        $key = $col['key'];
         $tally[$key] = $this->rewrite($col['tally']['rewrite'], $data, 'raw');
       }
     }
