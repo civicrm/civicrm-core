@@ -24,6 +24,12 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $this->quickCleanup(['civicrm_contact', 'civicrm_address']);
   }
 
+  public function tearDown(): void {
+    \Civi::settings()->set('pinnedContactCountries', []);
+    CRM_Core_I18n::singleton()->setLocale('en_US');
+    parent::tearDown();
+  }
+
   /**
    * Create() method (create and update modes)
    */
@@ -928,6 +934,58 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $this->assertEquals(1152, $availableCountries[1]);
     // United States
     $this->assertEquals(1228, $availableCountries[2]);
+  }
+
+  public function testPinnedCountryWithEntity(): void {
+    \Civi::settings()->set('pinnedContactCountries', ['1228']);
+    $countries = \Civi::entity('Address')->getOptions('country_id');
+    $this->assertEquals('US', $countries[0]['name']);
+  }
+
+  public function testCountryLabelTranslation(): void {
+    CRM_Core_I18n::singleton()->setLocale('nl_NL');
+    $countries = \Civi::entity('Address')->getOptions('country_id');
+    $checked = [];
+    foreach ($countries as $country) {
+      switch ($country['name']) {
+        case 'NL':
+          $this->assertEquals('Nederland', $country['label']);
+          $checked[] = 'NL';
+          break;
+
+        case 'US':
+          $this->assertEquals('Verenigde Staten', $country['label']);
+          $checked[] = 'US';
+          break;
+      }
+    }
+    $this->assertCount(2, $checked, 'Country list incomplete');
+  }
+
+  public function testCountrySorting(): void {
+    $countries = \Civi::entity('Address')->getOptions('country_id');
+    $this->assertEquals('AF', $countries[0]['name']);
+    // Åland Islands should sort second in en_US locale
+    $this->assertEquals('AX', $countries[1]['name']);
+    $this->assertEquals('AL', $countries[2]['name']);
+    $this->assertEquals('ZW', array_pop($countries)['name']);
+
+    CRM_Core_I18n::singleton()->setLocale('nl_NL');
+    $countries = \Civi::entity('Address')->getOptions('country_id');
+    $this->assertEquals('AF', $countries[0]['name']);
+    $this->assertEquals('AL', $countries[1]['name']);
+    $this->assertEquals('DZ', $countries[2]['name']);
+    // Åland Islands
+    $this->assertEquals('AX', array_pop($countries)['name']);
+
+    CRM_Core_I18n::singleton()->setLocale('it_IT');
+    $countries = \Civi::entity('Address')->getOptions('country_id');
+    $this->assertEquals('AF', $countries[0]['name']);
+    $this->assertEquals('AL', $countries[1]['name']);
+    $this->assertEquals('DZ', $countries[2]['name']);
+    // Åland Islands
+    $this->assertEquals('AX', $countries[114]['name']);
+    $this->assertEquals('ZW', array_pop($countries)['name']);
   }
 
   /**

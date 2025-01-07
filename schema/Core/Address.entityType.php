@@ -4,6 +4,7 @@ return [
   'name' => 'Address',
   'table' => 'civicrm_address',
   'class' => 'CRM_Core_DAO_Address',
+  'metaProvider' => '\Civi\Schema\Entity\AddressMetadata',
   'getInfo' => fn() => [
     'title' => ts('Address'),
     'title_plural' => ts('Addresses'),
