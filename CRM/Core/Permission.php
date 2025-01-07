@@ -1289,8 +1289,10 @@ class CRM_Core_Permission {
     // Custom field permissions
     $permissions['custom_field'] = [
       'default' => [
-        'administer CiviCRM',
-        'access all custom data',
+        'administer CiviCRM data',
+      ],
+      'get' => [
+        ['access CiviCRM', 'access all custom data'],
       ],
     ];
     $permissions['custom_group'] = $permissions['custom_field'];
