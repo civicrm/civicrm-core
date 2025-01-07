@@ -8,6 +8,7 @@ return [
     'title' => ts('Open ID'),
     'title_plural' => ts('Open IDs'),
     'description' => ts('OpenID information for a specific location.'),
+    'icon' => 'fa-openid',
     'add' => '2.0',
   ],
   'getIndices' => fn() => [
