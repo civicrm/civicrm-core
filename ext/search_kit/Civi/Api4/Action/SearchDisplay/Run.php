@@ -72,8 +72,9 @@ class Run extends AbstractRunAction {
         $sql = $queryObject->getSql();
         $select = [];
         foreach ($settings['columns'] as $col) {
-          $key = str_replace(':', '_', $col['key'] ?? '');
-          if (!empty($col['tally']['fn']) && \CRM_Utils_Rule::mysqlColumnNameOrAlias($key)) {
+          $key = $col['key'] ?? '';
+          $rawKey = str_replace(['.', ':'], '_', $key);
+          if (!empty($col['tally']['fn']) && \CRM_Utils_Rule::mysqlColumnNameOrAlias($rawKey)) {
             /* @var \Civi\Api4\Query\SqlFunction $sqlFnClass */
             $sqlFnClass = '\Civi\Api4\Query\SqlFunction' . $col['tally']['fn'];
             $fnArgs = ["`$key`"];
@@ -88,7 +89,7 @@ class Run extends AbstractRunAction {
                 $fnArgs[] = "ORDER BY `$key`";
               }
             }
-            $select[] = $sqlFnClass::renderExpression(implode(' ', $fnArgs)) . " `$key`";
+            $select[] = $sqlFnClass::renderExpression(implode(' ', $fnArgs)) . " `$rawKey`";
           }
         }
         $query = 'SELECT ' . implode(', ', $select) . ' FROM (' . $sql . ') `api_query`';
