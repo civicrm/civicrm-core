@@ -19,13 +19,13 @@
 
 namespace api\v4\Action;
 
-use api\v4\Custom\CustomTestBase;
+use api\v4\Api4TestBase;
 use Civi\Api4\Contact;
 
 /**
  * @group headless
  */
-class ContactDuplicatesTest extends CustomTestBase {
+class ContactDuplicatesTest extends Api4TestBase {
 
   public function testGetDuplicatesUnsupervised(): void {
     $email = uniqid('test@');

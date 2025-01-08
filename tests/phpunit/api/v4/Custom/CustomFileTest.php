@@ -17,28 +17,27 @@
 
 namespace api\v4\Custom;
 
-use Civi\Api4\CustomGroup;
-use Civi\Api4\CustomField;
+use api\v4\Api4TestBase;
 use Civi\Api4\File;
 
 /**
  * @group headless
  */
-class CustomFileTest extends CustomTestBase {
+class CustomFileTest extends Api4TestBase {
 
   /**
    */
   public function testCustomFileField(): void {
-    $group = CustomGroup::create()->setValues([
+    $group = $this->createTestRecord('CustomGroup', [
       'title' => 'FileFields',
       'extends' => 'Individual',
-    ])->execute()->single();
-    $field = CustomField::create()->setValues([
+    ]);
+    $this->createTestRecord('CustomField', [
       'label' => 'TestMyFile',
       'custom_group_id.name' => 'FileFields',
       'html_type' => 'File',
       'data_type' => 'File',
-    ])->execute()->single();
+    ]);
 
     $fieldName = 'FileFields.TestMyFile';
 
@@ -53,6 +52,9 @@ class CustomFileTest extends CustomTestBase {
       'name' => 'test123.txt',
       'content' => 'Hello World 123',
     ]);
+    // FIXME: Autocleanup would happen if using Api4 + $this->createTestRecord
+    $this->registerTestRecord('File', $file['id']);
+    $this->registerTestRecord('EntityFile', [['file_id', '=', $file['id']]]);
 
     civicrm_api4('Individual', 'update', [
       'values' => [

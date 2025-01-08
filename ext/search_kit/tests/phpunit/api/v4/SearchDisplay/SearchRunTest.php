@@ -48,8 +48,6 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
       ->addSelect('geoProvider')
       ->execute();
     parent::tearDown();
-    // Skipped by parent because of TransactionalInterface, but needed to delete custom fields & groups
-    $this->deleteTestRecords();
   }
 
   /**
