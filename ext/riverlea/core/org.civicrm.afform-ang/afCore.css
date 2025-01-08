@@ -95,7 +95,7 @@ fieldset.af-container.af-layout-inline {
 }
 
 /* Multiple button gap */
-
-#bootstrap-theme .crm-search-col-type-buttons .btn {
+#bootstrap-theme .crm-search-col-type-buttons .btn,
+#bootstrap-theme .crm-search-col-type-menu .btn {
   margin: 0 var(--crm-flex-gap) var(--crm-flex-gap) 0;
 }
