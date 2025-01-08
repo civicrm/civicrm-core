@@ -19,6 +19,7 @@
 
 namespace api\v4\Custom;
 
+use api\v4\Api4TestBase;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
 use Civi\Api4\CustomValue;
@@ -27,7 +28,7 @@ use Civi\Api4\Entity;
 /**
  * @group headless
  */
-class CustomValueTest extends CustomTestBase {
+class CustomValueTest extends Api4TestBase {
 
   /**
    * Test CustomValue::GetFields/Get/Create/Update/Replace/Delete
@@ -40,12 +41,11 @@ class CustomValueTest extends CustomTestBase {
     $multiFieldName = uniqid('chkbx');
     $refFieldName = uniqid('txt');
 
-    $customGroup = CustomGroup::create(FALSE)
-      ->addValue('title', $group)
-      ->addValue('extends', 'Contact')
-      ->addValue('is_multiple', TRUE)
-      ->execute()
-      ->first();
+    $customGroup = $this->createTestRecord('CustomGroup', [
+      'title' => $group,
+      'extends' => 'Contact',
+      'is_multiple' => TRUE,
+    ]);
 
     $colorField = CustomField::create(FALSE)
       ->addValue('label', $colorFieldName)
@@ -296,11 +296,11 @@ class CustomValueTest extends CustomTestBase {
 
     $this->assertNotContains("Custom_$groupName", Entity::get()->execute()->column('name'));
 
-    $customGroup = CustomGroup::create(FALSE)
-      ->addValue('title', $groupName)
-      ->addValue('extends', 'Contact')
-      ->addValue('is_multiple', FALSE)
-      ->execute()->single();
+    $customGroup = $this->createTestRecord('CustomGroup', [
+      'title' => $groupName,
+      'extends' => 'Contact',
+      'is_multiple' => FALSE,
+    ]);
 
     $this->assertNotContains("Custom_$groupName", Entity::get()->execute()->column('name'));
 

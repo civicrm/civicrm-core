@@ -19,6 +19,7 @@
 
 namespace api\v4\Custom;
 
+use api\v4\Api4TestBase;
 use Civi\Api4\Activity;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
@@ -27,47 +28,50 @@ use Civi\Api4\OptionGroup;
 /**
  * @group headless
  */
-class CustomFieldAlterTest extends CustomTestBase {
+class CustomFieldAlterTest extends Api4TestBase {
 
   public function testChangeSerialize(): void {
     $contact = $this->createTestRecord('Contact');
 
-    $customGroup = CustomGroup::create(FALSE)
-      ->addValue('title', 'MyFieldsToAlter')
-      ->addValue('extends', 'Activity')
-      ->addChain('field1', CustomField::create()
-        ->addValue('custom_group_id', '$id')
-        ->addValue('label', 'TestOptions')
-        ->addValue('html_type', 'Select')
-        ->addValue('option_values', [
-          1 => 'One',
-          2 => 'Two',
-          3 => 'Three',
-          4 => 'Four',
-        ]), 0
-      )
-      ->addChain('field2', CustomField::create()
-        ->addValue('custom_group_id', '$id')
-        ->addValue('label', 'TestText')
-        ->addValue('html_type', 'Text'), 0
-      )
-      ->addChain('field3', CustomField::create()
-        ->addValue('custom_group_id', '$id')
-        ->addValue('serialize', TRUE)
-        ->addValue('label', 'TestCountry')
-        ->addValue('data_type', 'Country')
-        ->addValue('html_type', 'Select'), 0
-      )
-      ->addChain('field4', CustomField::create()
-        ->addValue('custom_group_id', '$id')
-        ->addValue('serialize', TRUE)
-        ->addValue('is_required', TRUE)
-        ->addValue('label', 'TestContact')
-        ->addValue('data_type', 'ContactReference')
-        ->addValue('html_type', 'Autocomplete-Select'), 0
-      )
-      ->execute()
-      ->first();
+    $customGroup = $this->createTestRecord('CustomGroup', [
+      'title' => 'MyFieldsToAlter',
+      'extends' => 'Activity',
+    ]);
+
+    $field1 = CustomField::create(FALSE)->setValues([
+      'custom_group_id' => $customGroup['id'],
+      'label' => 'TestOptions',
+      'html_type' => 'Select',
+      'option_values' => [
+        1 => 'One',
+        2 => 'Two',
+        3 => 'Three',
+        4 => 'Four',
+      ],
+    ])->execute()->single();
+
+    $field2 = CustomField::create(FALSE)->setValues([
+      'custom_group_id' => $customGroup['id'],
+      'label' => 'TestText',
+      'html_type' => 'Text',
+    ])->execute()->single();
+
+    $field3 = CustomField::create(FALSE)->setValues([
+      'custom_group_id' => $customGroup['id'],
+      'serialize' => TRUE,
+      'label' => 'TestCountry',
+      'data_type' => 'Country',
+      'html_type' => 'Select',
+    ])->execute()->single();
+
+    $field4 = CustomField::create(FALSE)->setValues([
+      'custom_group_id' => $customGroup['id'],
+      'serialize' => TRUE,
+      'is_required' => TRUE,
+      'label' => 'TestContact',
+      'data_type' => 'ContactReference',
+      'html_type' => 'Autocomplete-Select',
+    ])->execute()->single();
 
     $sampeData = [
       ['subject' => 'A1', 'MyFieldsToAlter.TestText' => 'A1', 'MyFieldsToAlter.TestOptions' => '1'],
@@ -95,7 +99,7 @@ class CustomFieldAlterTest extends CustomTestBase {
 
     // Change options field to multiselect
     CustomField::update(FALSE)
-      ->addWhere('id', '=', $customGroup['field1']['id'])
+      ->addWhere('id', '=', $field1['id'])
       ->addValue('serialize', TRUE)
       ->execute();
 
@@ -112,7 +116,7 @@ class CustomFieldAlterTest extends CustomTestBase {
 
     // Change back to single-select
     CustomField::update(FALSE)
-      ->addWhere('id', '=', $customGroup['field1']['id'])
+      ->addWhere('id', '=', $field1['id'])
       ->addValue('serialize', FALSE)
       ->execute();
 
@@ -131,7 +135,7 @@ class CustomFieldAlterTest extends CustomTestBase {
 
     // Change country field from multiselect to single
     CustomField::update(FALSE)
-      ->addWhere('id', '=', $customGroup['field3']['id'])
+      ->addWhere('id', '=', $field3['id'])
       ->addValue('serialize', FALSE)
       ->execute();
 
@@ -145,7 +149,7 @@ class CustomFieldAlterTest extends CustomTestBase {
 
     // Change country field from single to multiselect
     CustomField::update(FALSE)
-      ->addWhere('id', '=', $customGroup['field3']['id'])
+      ->addWhere('id', '=', $field3['id'])
       ->addValue('serialize', TRUE)
       ->execute();
 
@@ -160,14 +164,14 @@ class CustomFieldAlterTest extends CustomTestBase {
     // Repeatedly change contact ref field to ensure FK index is correctly added/dropped with no SQL error
     for ($i = 1; $i < 6; ++$i) {
       CustomField::update(FALSE)
-        ->addWhere('id', '=', $customGroup['field4']['id'])
+        ->addWhere('id', '=', $field4['id'])
         ->addValue('serialize', $i % 2 == 0)
         ->addValue('is_required', $i % 2 == 0)
         ->execute();
     }
 
     $this->assertCount(1, OptionGroup::get(FALSE)
-      ->addWhere('id', '=', $customGroup['field1']['option_group_id'])
+      ->addWhere('id', '=', $field1['option_group_id'])
       ->selectRowCount()
       ->execute());
 
@@ -175,27 +179,24 @@ class CustomFieldAlterTest extends CustomTestBase {
     $this->assertNotNull(\CRM_Core_DAO::singleValueQuery("SHOW TABLES LIKE '{$customGroup['table_name']}';"));
 
     $columnCheck = "SELECT COUNT(*) as count
-          FROM INFORMATION_SCHEMA.COLUMNS
-          WHERE table_schema = DATABASE()
-          AND table_name = '{$customGroup['table_name']}'
-          AND column_name = '{$customGroup['field1']['column_name']}'";
-    $this->assertEquals('1', \CRM_Core_DAO::singleValueQuery($columnCheck));
-
-    CustomField::delete(FALSE)
-      ->addWhere('custom_group_id', '=', $customGroup['id'])
-      ->execute();
-
-    // Column should be gone
-    $this->assertEquals('0', \CRM_Core_DAO::singleValueQuery($columnCheck));
-
-    // Option group should be gone
-    $this->assertCount(0, OptionGroup::get(FALSE)
-      ->addWhere('id', '=', $customGroup['field1']['option_group_id'])
-      ->execute());
+      FROM INFORMATION_SCHEMA.COLUMNS
+      WHERE table_schema = DATABASE()
+      AND table_name = '{$customGroup['table_name']}'
+      AND column_name IN ('{$field1['column_name']}', '{$field2['column_name']}', '{$field3['column_name']}', '{$field4['column_name']}')";
+    $this->assertEquals('4', \CRM_Core_DAO::singleValueQuery($columnCheck));
 
     CustomGroup::delete(FALSE)
       ->addWhere('id', '=', $customGroup['id'])
       ->execute();
+
+    // All columns should be gone
+    $this->assertEquals('0', \CRM_Core_DAO::singleValueQuery($columnCheck));
+
+    // Option group should be gone
+    $this->assertCount(0, OptionGroup::get(FALSE)
+      ->addWhere('id', '=', $field1['option_group_id'])
+      ->execute());
+
     // The table should be gone
     $this->assertNull(\CRM_Core_DAO::singleValueQuery("SHOW TABLES LIKE '{$customGroup['table_name']}';"));
   }

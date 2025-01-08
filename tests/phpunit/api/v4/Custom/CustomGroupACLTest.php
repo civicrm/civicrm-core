@@ -19,17 +19,17 @@
 
 namespace api\v4\Custom;
 
+use api\v4\Api4TestBase;
 use Civi\Api4\ACL;
 use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
-use Civi\Api4\CustomGroup;
 use Civi\Api4\CustomValue;
 use Civi\Api4\Individual;
 
 /**
  * @group headless
  */
-class CustomGroupACLTest extends CustomTestBase {
+class CustomGroupACLTest extends Api4TestBase {
 
   public function tearDown(): void {
     parent::tearDown();
@@ -44,40 +44,47 @@ class CustomGroupACLTest extends CustomTestBase {
     $v3 = [];
 
     foreach ($groups as $name => $access) {
-      $singleGroup = CustomGroup::create(FALSE)
-        ->addValue('title', 'My' . ucfirst($name) . 'Single')
-        ->addValue('extends', 'Individual')
-        ->addChain('field', CustomField::create()
-          ->addValue('label', 'MyField')
-          ->addValue('html_type', 'Text')
-          ->addValue('custom_group_id', '$id'), 0)
-        ->execute()->single();
-      $v3['single'][$name] = 'custom_' . $singleGroup['field']['id'];
-      $multiGroup = CustomGroup::create(FALSE)
-        ->addValue('title', 'My' . ucfirst($name) . 'Multi')
-        ->addValue('extends', 'Individual')
-        ->addValue('is_multiple', TRUE)
-        ->addChain('field', CustomField::create()
-          ->addValue('label', 'MyField')
-          ->addValue('html_type', 'Text')
-          ->addValue('custom_group_id', '$id'), 0)
-        ->execute()->single();
-      $v3['multi'][$name] = 'custom_' . $multiGroup['field']['id'];
+      $singleGroup = $this->createTestRecord('CustomGroup', [
+        'title' => 'My' . ucfirst($name) . 'Single',
+        'extends' => 'Individual',
+      ]);
+      $singleField = CustomField::create()->setValues([
+        'label' => 'MyField',
+        'html_type' => 'Text',
+        'custom_group_id' => $singleGroup['id'],
+      ])->execute()->single();
+      $v3['single'][$name] = 'custom_' . $singleField['id'];
+
+      $multiGroup = $this->createTestRecord('CustomGroup', [
+        'title' => 'My' . ucfirst($name) . 'Multi',
+        'extends' => 'Individual',
+        'is_multiple' => TRUE,
+      ]);
+      $multiField = CustomField::create()->setValues([
+        'label' => 'MyField',
+        'html_type' => 'Text',
+        'custom_group_id' => $multiGroup['id'],
+      ])->execute()->single();
+      $v3['multi'][$name] = 'custom_' . $multiField['id'];
+
       if ($access) {
-        ACL::create(FALSE)->setValues([
-          'name' => $name . 'Single',
-          'entity_id' => 0,
-          'operation' => $access,
-          'object_table' => 'civicrm_custom_group',
-          'object_id' => $singleGroup['id'],
-        ])->execute();
-        ACL::create(FALSE)->setValues([
-          'name' => $name . 'Multi',
-          'entity_id' => 0,
-          'operation' => $access,
-          'object_table' => 'civicrm_custom_group',
-          'object_id' => $multiGroup['id'],
-        ])->execute();
+        $this->saveTestRecords('ACL', [
+          'defaults' => [
+            'entity_id' => 0,
+            'operation' => $access,
+            'object_table' => 'civicrm_custom_group',
+          ],
+          'records' => [
+            [
+              'name' => $name . 'Single',
+              'object_id' => $singleGroup['id'],
+            ],
+            [
+              'name' => $name . 'Multi',
+              'object_id' => $multiGroup['id'],
+            ],
+          ],
+        ]);
       }
     }
 
@@ -91,6 +98,7 @@ class CustomGroupACLTest extends CustomTestBase {
       'MyReadOnlySingle.MyField' => '456',
       'MySuperSecretSingle.MyField' => '789',
     ])->execute()->first()['id'];
+    $this->registerTestRecord('Contact', $cid);
 
     // TEST SINGLE-VALUE CUSTOM GROUPS
 
