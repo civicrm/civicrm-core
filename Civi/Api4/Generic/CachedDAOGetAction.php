@@ -58,6 +58,24 @@ class CachedDAOGetAction extends \Civi\Api4\Generic\DAOGetAction {
   }
 
   /**
+   * Toggle the in-memory cache
+   *
+   * @param bool $useCache
+   * @return $this
+   */
+  public function setUseCache(bool $useCache): CachedDAOGetAction {
+    $this->useCache = $useCache;
+    return $this;
+  }
+
+  /**
+   * @return bool|null
+   */
+  public function getUseCache(): ?bool {
+    return $this->useCache;
+  }
+
+  /**
    * @param \Civi\Api4\Generic\Result $result
    *
    * Decide whether to use self::getFromCache or DAOGetAction::getObjects

@@ -23,7 +23,9 @@ use api\v4\Api4TestBase;
 use Civi\Api4\ACL;
 use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
+use Civi\Api4\CustomGroup;
 use Civi\Api4\CustomValue;
+use Civi\Api4\Entity;
 use Civi\Api4\Individual;
 
 /**
@@ -41,6 +43,12 @@ class CustomGroupACLTest extends Api4TestBase {
 
   public function testViewEditCustomGroupACLs(): void {
     $groups = ['readWrite' => 'Edit', 'readOnly' => 'View', 'superSecret' => NULL];
+    $visibleGroups = [];
+    $secretGroups = [];
+    $visibleFields = [];
+    $secretFields = [];
+    $visibleGetFields = [];
+    $secretGetFields = [];
     $v3 = [];
 
     foreach ($groups as $name => $access) {
@@ -85,10 +93,96 @@ class CustomGroupACLTest extends Api4TestBase {
             ],
           ],
         ]);
+        $visibleGroups[] = $singleGroup['id'];
+        $visibleGroups[] = $multiGroup['id'];
+        $visibleFields[] = $singleField['id'];
+        $visibleFields[] = $multiField['id'];
+        $visibleGetFields[] = $singleGroup['name'] . '.' . $singleField['name'];
+      }
+      else {
+        $secretGroups[] = $singleGroup['id'];
+        $secretGroups[] = $multiGroup['id'];
+        $secretFields[] = $singleField['id'];
+        $secretFields[] = $multiField['id'];
+        $secretGetFields[] = $singleGroup['name'] . '.' . $singleField['name'];
       }
     }
 
     $this->createLoggedInUser();
+
+    // 2 scenarios, first with 'access all custom data' and then without.
+    $scenarios = [
+      [
+        'permissions' => ['access all custom data', 'access CiviCRM', 'view debug output'],
+        'expectedEntities' => ['Custom_MyReadOnlyMulti', 'Custom_MyReadWriteMulti', 'Custom_MySuperSecretMulti'],
+        'expectedGroups' => array_merge($visibleGroups, $secretGroups),
+        'expectedFields' => array_merge($visibleFields, $secretFields),
+        'getFields' => array_merge($visibleGetFields, $secretGetFields),
+      ],
+      [
+        'permissions' => ['access CiviCRM', 'view debug output'],
+        'expectedEntities' => ['Custom_MyReadOnlyMulti', 'Custom_MyReadWriteMulti'],
+        'expectedGroups' => $visibleGroups,
+        'expectedFields' => $visibleFields,
+        'getFields' => $visibleGetFields,
+      ],
+    ];
+    foreach ($scenarios as $scenario) {
+      \CRM_Core_Config::singleton()->userPermissionClass->permissions = $scenario['permissions'];
+
+      // Check api entity get with given permission level
+      $entities = Entity::get()
+        ->addWhere('name', 'IN', ['Custom_MyReadOnlyMulti', 'Custom_MyReadWriteMulti', 'Custom_MySuperSecretMulti'])
+        ->addOrderBy('name')
+        ->execute()->column('name');
+      $this->assertSame($entities, $scenario['expectedEntities']);
+
+      // Check with & without the customGroup cache
+      foreach ([TRUE, FALSE] as $useCache) {
+        $result = CustomGroup::get()
+          ->setUseCache($useCache)
+          ->setDebug(TRUE)
+          ->addSelect('id')
+          ->addOrderBy('id')
+          ->addWhere('id', 'IN', array_merge($visibleGroups, $secretGroups))
+          ->execute();
+        $this->assertSame($useCache, $result->debug['useCache']);
+        $this->assertEquals($result->column('id'), $scenario['expectedGroups']);
+
+        $result = CustomField::get()
+          ->setUseCache($useCache)
+          ->setDebug(TRUE)
+          ->addSelect('id')
+          ->addOrderBy('id')
+          ->addWhere('id', 'IN', array_merge($visibleFields, $secretFields))
+          ->execute();
+        $this->assertSame($useCache, $result->debug['useCache']);
+        $this->assertEquals($result->column('id'), $scenario['expectedFields']);
+      }
+
+      // Check api.getFields
+      $getFields = Individual::getFields()
+        ->addSelect('name')
+        ->addWhere('name', 'IN', array_merge($visibleGetFields, $secretGetFields))
+        ->execute()->column('name');
+      $this->assertEquals($getFields, $scenario['getFields']);
+
+      // Check api3 get
+      $result = civicrm_api3('CustomGroup', 'get', [
+        'check_permissions' => TRUE,
+        'id' => ['IN' => array_merge($visibleGroups, $secretGroups)],
+        'return' => ['id'],
+      ]);
+      $this->assertEquals(array_column($result['values'], 'id'), $scenario['expectedGroups']);
+
+      $result = civicrm_api3('CustomField', 'get', [
+        'check_permissions' => TRUE,
+        'id' => ['IN' => array_merge($visibleFields, $secretFields)],
+        'return' => ['id'],
+      ]);
+      $this->assertEquals(array_column($result['values'], 'id'), $scenario['expectedFields']);
+    }
+
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access all custom data', 'access CiviCRM', 'add contacts'];
 
     $cid = Contact::create()->setValues([

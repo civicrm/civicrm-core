@@ -2363,4 +2363,15 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
     return $customValue;
   }
 
+  /**
+   * Enforce ACLs for custom Groups and Fields
+   */
+  public static function on_hook_civicrm_selectWhereClause(\Civi\Core\Event\GenericHookEvent $hook): void {
+    if (($hook->entity === 'CustomGroup' || $hook->entity === 'CustomField') && !CRM_Core_Permission::customGroupAdmin($hook->userId)) {
+      $idField = $hook->entity === 'CustomGroup' ? 'id' : 'custom_group_id';
+      $permittedIds = CRM_Core_Permission::customGroup(CRM_Core_Permission::VIEW, FALSE, $hook->userId) ?: [0];
+      $hook->clauses[$idField][] = 'IN (' . implode(', ', $permittedIds) . ')';
+    }
+  }
+
 }
