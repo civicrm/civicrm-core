@@ -68,8 +68,11 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
       ['first_name' => 'Two', 'last_name' => $lastName, 'contact_sub_type' => ['Tester']],
       ['first_name' => 'Three', 'last_name' => $lastName, 'contact_sub_type' => ['Bot']],
       ['first_name' => 'Four', 'middle_name' => 'None', 'last_name' => $lastName],
+      ['first_name' => 'Five', 'last_name' => $lastName],
     ];
-    Contact::save(FALSE)->setRecords($sampleData)->execute();
+    $this->saveTestRecords('Individual', [
+      'records' => $sampleData,
+    ]);
 
     $params = [
       'checkPermissions' => FALSE,
@@ -88,7 +91,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
         'type' => 'table',
         'label' => 'tesdDisplay',
         'settings' => [
-          'limit' => 20,
+          'limit' => 4,
           'pager' => TRUE,
           'columns' => [
             [
@@ -130,6 +133,10 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
       'filters' => ['last_name' => $lastName],
       'afform' => NULL,
     ];
+
+    // Check row count
+    $count = civicrm_api4('SearchDisplay', 'run', ['return' => 'row_count'] + $params);
+    $this->assertCount(5, $count);
 
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(4, $result);
@@ -2871,6 +2878,94 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
 
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(2, $result);
+  }
+
+  public function testRunWithTags(): void {
+    $contactId = $this->saveTestRecords('Contact', ['records' => 6])->column('id');
+    $tags = $this->saveTestRecords('Tag', [
+      'records' => [
+        ['label' => uniqid('a')],
+        ['label' => uniqid('b')],
+      ],
+    ]);
+    $tagId = $tags->column('id');
+    $this->saveTestRecords('EntityTag', [
+      'records' => [
+        ['entity_id' => $contactId[0], 'tag_id' => $tagId[0]],
+        ['entity_id' => $contactId[0], 'tag_id' => $tagId[1]],
+        ['entity_id' => $contactId[1], 'tag_id' => $tagId[0]],
+        ['entity_id' => $contactId[2], 'tag_id' => $tagId[1]],
+      ],
+    ]);
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'savedSearch' => [
+        'name' => 'Test_row_number',
+        'label' => 'Test row number',
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => [
+            'result_row_num',
+            'id',
+            'sort_name',
+            'GROUP_CONCAT(DISTINCT Contact_EntityTag_Tag_01.label) AS GROUP_CONCAT_Contact_EntityTag_Tag_01_label',
+          ],
+          'orderBy' => [],
+          'where' => [
+            ['id', 'IN', $contactId],
+          ],
+          'groupBy' => [
+            'id',
+          ],
+          'join' => [
+            [
+              'Tag AS Contact_EntityTag_Tag_01',
+              'LEFT',
+              'EntityTag',
+              [
+                'id',
+                '=',
+                'Contact_EntityTag_Tag_01.entity_id',
+              ],
+              [
+                'Contact_EntityTag_Tag_01.entity_table',
+                '=',
+                "'civicrm_contact'",
+              ],
+            ],
+          ],
+          'having' => [],
+        ],
+      ],
+      'display' => NULL,
+      'sort' => [
+        ['id', 'ASC'],
+      ],
+      'limit' => 5,
+      'debug' => TRUE,
+    ];
+
+    // Check row count
+    $count = civicrm_api4('SearchDisplay', 'run', ['return' => 'row_count'] + $params);
+    $this->assertCount(6, $count);
+
+    $result = civicrm_api4('SearchDisplay', 'run', ['return' => 'page:1'] + $params);
+    $this->assertCount(5, $result);
+    $row = $result->column('columns');
+
+    $this->assertEquals(1, $row[0][0]['val']);
+    $this->assertEquals($tags->column('label'), $row[0][3]['val']);
+
+    $this->assertEquals(2, $row[1][0]['val']);
+    $this->assertEquals([$tags[0]['label']], $row[1][3]['val']);
+
+    $this->assertEquals(3, $row[2][0]['val']);
+    $this->assertEquals([$tags[1]['label']], $row[2][3]['val']);
+
+    $this->assertEquals(4, $row[3][0]['val']);
+    $this->assertNull($row[3][3]['val']);
   }
 
   /**

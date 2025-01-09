@@ -218,10 +218,15 @@ class AutocompleteAction extends AbstractAction {
       }
       $result[] = $item;
     }
-    $result->setCountMatched($apiResult->count());
+    // Unlike a traditional pager, a scroll-type pager doesn't care about the total number of results,
+    // it just needs to know whether there are any more.
+    // If so, countMatched will include the 1 extra result fetched but not returned.
+    $countMatched = $apiResult->hasCountMatched() ? $apiResult->countMatched() : $apiResult->count();
+    $result->setCountMatched($countMatched);
+    $result->rowCount = $apiResult->count();
     if (!empty($initialSearchById)) {
       // Trigger "more results" after searching by exact id
-      $result->setCountMatched($apiResult->count() + 1);
+      $result->setCountMatched($countMatched + 1);
     }
   }
 

@@ -52,15 +52,19 @@ class BasicSaveAction extends AbstractSaveAction {
    * @param \Civi\Api4\Generic\Result $result
    */
   public function _run(Result $result) {
-    $idField = CoreUtil::getIdFieldName($this->getEntityName());
+    // Keep track of the number of records updated vs created
+    $matched = 0;
+
     foreach ($this->records as &$record) {
       $record += $this->defaults;
       $this->formatWriteValues($record);
-      $this->matchExisting($record);
+      $matched += $this->matchExisting($record);
     }
     $this->validateValues();
     $savedRecords = $this->updateRecords($this->records);
+    $result->setCountMatched($matched);
     if ($this->reload) {
+      $idField = CoreUtil::getIdFieldName($this->getEntityName());
       /** @var BasicGetAction $get */
       $get = \Civi\API\Request::create($this->getEntityName(), 'get', ['version' => 4]);
       $get
