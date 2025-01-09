@@ -90,8 +90,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $this->toBeImplemented['get'] = [
       // Not apiv3.
       'Afform',
-      // CxnApp.get exists but relies on remote data outside our control; QA w/UtilsTest::testBasicArrayGet
-      'CxnApp',
       'Profile',
       'CustomValue',
       'Constant',
@@ -105,8 +103,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     ];
     $this->toBeImplemented['create'] = [
       'Afform',
-      'Cxn',
-      'CxnApp',
       'SurveyRespondant',
       'OptionGroup',
       'MailingRecipients',
@@ -122,8 +118,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Logging',
     ];
     $this->toBeImplemented['delete'] = [
-      'Cxn',
-      'CxnApp',
       'MembershipPayment',
       'OptionGroup',
       'SurveyRespondant',
@@ -407,12 +401,10 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       // ones that are not real entities hence not extendable.
       'ActivityType',
       'Entity',
-      'Cxn',
       'Constant',
       'Attachment',
       'CustomSearch',
       'CustomValue',
-      'CxnApp',
       'Extension',
       'MailingContact',
       'User',

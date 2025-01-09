@@ -159,12 +159,6 @@ class Container {
     ))
       ->setFactory([new Reference(self::SELF), 'createApiKernel'])->setPublic(TRUE);
 
-    $container->setDefinition('cxn_reg_client', new Definition(
-      'Civi\Cxn\Rpc\RegistrationClient',
-      []
-    ))
-      ->setFactory('CRM_Cxn_BAO_Cxn::createRegistrationClient')->setPublic(TRUE);
-
     $container->setDefinition('psr_log', new Definition('CRM_Core_Error_Log', []))->setPublic(TRUE);
     $container->setDefinition('psr_log_manager', new Definition('Civi\Core\LogManager', []))->setPublic(TRUE);
     // With the default log-manager, you may overload a channel by defining a service, e.g.
