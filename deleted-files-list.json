@@ -790,7 +790,6 @@
     "ext/afform/core/ang/blockWebsiteDefault.aff.html",
     "ext/afform/core/ang/blockWebsiteDefault.aff.json",
     "ext/afform/core/settings/*",
-    "ext/afform/core/sql/*",
     "ext/afform/core/tests/phpunit/Civi/Afform/AfformGetFieldsTest.php",
     "ext/afform/core/tests/phpunit/api/*",
     "ext/afform/core/xml/schema/*",
