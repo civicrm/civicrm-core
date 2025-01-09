@@ -2863,15 +2863,6 @@ LOCK TABLES `civicrm_custom_group` WRITE;
 UNLOCK TABLES;
 
 --
--- Dumping data for table `civicrm_cxn`
---
-
-LOCK TABLES `civicrm_cxn` WRITE;
-/*!40000 ALTER TABLE `civicrm_cxn` DISABLE KEYS */;
-/*!40000 ALTER TABLE `civicrm_cxn` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Dumping data for table `civicrm_dashboard`
 --
 
