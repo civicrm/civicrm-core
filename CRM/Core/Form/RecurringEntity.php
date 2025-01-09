@@ -127,7 +127,7 @@ class CRM_Core_Form_RecurringEntity {
     if (self::$_scheduleReminderID) {
       $defaults['repetition_frequency_unit'] = self::$_scheduleReminderDetails->repetition_frequency_unit;
       $defaults['repetition_frequency_interval'] = self::$_scheduleReminderDetails->repetition_frequency_interval;
-      $defaults['start_action_condition'] = array_flip(explode(",", self::$_scheduleReminderDetails->start_action_condition));
+      $defaults['start_action_condition'] = array_flip(explode(",", (string) self::$_scheduleReminderDetails->start_action_condition));
       foreach ($defaults['start_action_condition'] as $key => $val) {
         $val = 1;
         $defaults['start_action_condition'][$key] = $val;
