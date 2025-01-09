@@ -988,8 +988,9 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
   public static function on_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
     // When deleting a custom group, delete all orphaned fields
     if ($event->entity === 'CustomGroup' && $event->action === 'delete') {
-      $sql = "SELECT id FROM civicrm_custom_field WHERE custom_group_id = " . $event->id;
-      $orphanedFields = CRM_Core_DAO::executeQuery($sql)->fetchAll();
+      $sql = "SELECT id FROM civicrm_custom_field WHERE custom_group_id = %1";
+      $orphanedFields = CRM_Core_DAO::executeQuery($sql, [1 => [$event->id, 'Positive']])
+        ->fetchAll();
       if ($orphanedFields) {
         self::deleteRecords($orphanedFields);
       }
