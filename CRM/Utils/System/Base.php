@@ -101,15 +101,16 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * Append an additional breadcrumb tag to the existing breadcrumb.
+   * Append additional breadcrumbs to the existing breadcrumb trail.
    *
-   * @param array $breadCrumbs
+   * @param array $breadCrumbs array of arrays
+   * sub-arrays should each have 'title' and 'url' keys
    */
   public function appendBreadCrumb($breadCrumbs) {
   }
 
   /**
-   * Reset an additional breadcrumb tag to the existing breadcrumb.
+   * Reset the breadcrumb trail
    */
   public function resetBreadCrumb() {
   }
