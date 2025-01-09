@@ -51,17 +51,13 @@ class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
     $isConfirm = CRM_Utils_Request::retrieveValue('confirm', 'Boolean', FALSE, FALSE, 'GET');
 
     if (!$job_id || !$queue_id || !$hash) {
-      CRM_Utils_System::sendResponse(
-        new \GuzzleHttp\Psr7\Response(400, [], ts("Invalid request: missing parameters"))
-      );
+      CRM_Utils_System::sendInvalidRequestResponse(ts("Invalid request: missing parameters"));
     }
 
     // verify that the three numbers above match
     $q = CRM_Mailing_Event_BAO_MailingEventQueue::verify(NULL, $queue_id, $hash);
     if (!$q) {
-      CRM_Utils_System::sendResponse(
-        new \GuzzleHttp\Psr7\Response(400, [], ts("Invalid request: bad parameters"))
-      );
+      CRM_Utils_System::sendInvalidRequestResponse(ts("Invalid request: bad parameters"));
     }
 
     [$displayName, $email] = CRM_Mailing_Event_BAO_MailingEventQueue::getContactInfo($queue_id);

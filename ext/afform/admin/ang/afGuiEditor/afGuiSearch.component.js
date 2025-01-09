@@ -128,21 +128,23 @@
         countEntity(mainEntity.entity);
 
         _.each(ctrl.display.settings['saved_search_id.api_params'].join, function(join) {
-          var joinInfo = join[0].split(' AS '),
-            entity = afGui.getEntity(joinInfo[0]),
-            joinEntity = afGui.getEntity(join[2]);
+          const joinInfo = join[0].split(' AS ');
+          const entity = afGui.getEntity(joinInfo[0]);
+          const bridgeEntity = afGui.getEntity(join[2]);
+          const defaultLabel = entity.label + countEntity(entity.entity);
+          const formValues = ctrl.display.settings['saved_search_id.form_values'] || {};
           entities.push({
             name: entity.entity,
             prefix: joinInfo[1] + '.',
-            label: entity.label + countEntity(entity.entity),
+            label: (formValues && formValues.join && formValues.join[joinInfo[1]]) || defaultLabel,
             fields: entity.fields,
           });
-          if (joinEntity) {
+          if (bridgeEntity) {
             entities.push({
-              name: joinEntity.entity,
+              name: bridgeEntity.entity,
               prefix: joinInfo[1] + '.',
-              label: joinEntity.label + countEntity(joinEntity.entity),
-              fields: _.omit(joinEntity.fields, _.keys(entity.fields)),
+              label: bridgeEntity.label + countEntity(bridgeEntity.entity),
+              fields: _.omit(bridgeEntity.fields, _.keys(entity.fields)),
             });
           }
         });

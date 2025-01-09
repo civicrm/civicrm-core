@@ -210,7 +210,8 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
    * Test upgrading multiple Event smart groups of different formats
    */
   public function testMultipleEventSmartGroupDateConversions(): void {
-    $this->callAPISuccess('SavedSearch', 'create', [
+    $savedSearchIds = [];
+    $savedSearchIds[] = $this->callAPISuccess('SavedSearch', 'create', [
       'form_values' => [
         ['event_start_date_low', '=', '20191001000000'],
         ['event_end_date_high', '=', '20191031235959'],
@@ -218,26 +219,26 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
           'event' => 'this.month',
         ],
       ],
-    ]);
-    $this->callAPISuccess('SavedSearch', 'create', [
+    ])['id'];
+    $savedSearchIds[] = $this->callAPISuccess('SavedSearch', 'create', [
       'form_values' => [
         ['event_start_date_low', '=', '20191001000000'],
       ],
-    ]);
-    $this->callAPISuccess('SavedSearch', 'create', [
+    ])['id'];
+    $savedSearchIds[] = $this->callAPISuccess('SavedSearch', 'create', [
       'form_values' => [
         'event_start_date_low' => '20191001000000',
         'event_end_date_high' => '20191031235959',
         'event_relative' => 'this.month',
       ],
-    ]);
-    $this->callAPISuccess('SavedSearch', 'create', [
+    ])['id'];
+    $savedSearchIds[] = $this->callAPISuccess('SavedSearch', 'create', [
       'form_values' => [
         'event_start_date_low' => '10/01/2019',
         'event_end_date_high' => '',
         'event_relative' => '0',
       ],
-    ]);
+    ])['id'];
     $smartGroupConversionObject = new CRM_Upgrade_Incremental_SmartGroups();
     $smartGroupConversionObject->renameFields([
       ['old' => 'event_start_date_low', 'new' => 'event_low'],
@@ -249,23 +250,25 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
       ],
     ]);
     $expectedResults = [
-      1 => [
+      $savedSearchIds[0] => [
         'relative_dates' => [],
         2 => ['event_relative', '=', 'this.month'],
       ],
-      2 => [
+      $savedSearchIds[1] => [
         0 => ['event_low', '=', '2019-10-01 00:00:00'],
         1 => ['event_relative', '=', 0],
       ],
-      3 => [
+      $savedSearchIds[2] => [
         'event_relative' => 'this.month',
       ],
-      4 => [
+      $savedSearchIds[3] => [
         'event_relative' => 0,
         'event_low' => '2019-10-01 00:00:00',
       ],
     ];
-    $savedSearches = $this->callAPISuccess('SavedSearch', 'get', []);
+    $savedSearches = $this->callAPISuccess('SavedSearch', 'get', [
+      'id' => ['IN' => $savedSearchIds],
+    ]);
     foreach ($savedSearches['values'] as $id => $savedSearch) {
       $this->assertEquals($expectedResults[$id], $savedSearch['form_values']);
     }

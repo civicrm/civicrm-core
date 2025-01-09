@@ -106,16 +106,16 @@ class Submit extends AbstractProcessor {
   }
 
   /**
-   * Validate required field values
+   * Validate field values checking required & maxlength
    *
    * @param \Civi\Afform\Event\AfformValidateEvent $event
    */
-  public static function validateRequiredFields(AfformValidateEvent $event): void {
+  public static function validateFieldInput(AfformValidateEvent $event): void {
     foreach ($event->getFormDataModel()->getEntities() as $afEntityName => $afEntity) {
       $entityValues = $event->getEntityValues()[$afEntityName] ?? [];
       foreach ($entityValues as $values) {
         foreach ($afEntity['fields'] as $fieldName => $attributes) {
-          $error = self::getRequiredFieldError($event, $afEntity['type'], $fieldName, $attributes, $values['fields'][$fieldName] ?? NULL);
+          $error = self::getFieldInputError($event, $afEntity['type'], $fieldName, $attributes, $values['fields'][$fieldName] ?? NULL);
           if ($error) {
             $event->setError($error);
           }
@@ -123,7 +123,7 @@ class Submit extends AbstractProcessor {
         foreach ($afEntity['joins'] as $joinEntity => $join) {
           foreach ($values['joins'][$joinEntity] ?? [] as $joinIndex => $joinValues) {
             foreach ($join['fields'] ?? [] as $fieldName => $attributes) {
-              $error = self::getRequiredFieldError($event, $joinEntity, $fieldName, $attributes, $joinValues[$fieldName] ?? NULL, $joinEntity);
+              $error = self::getFieldInputError($event, $joinEntity, $fieldName, $attributes, $joinValues[$fieldName] ?? NULL, $joinEntity);
               if ($error) {
                 $event->setError($error);
               }
@@ -220,6 +220,13 @@ class Submit extends AbstractProcessor {
   }
 
   /**
+   * If a required field is missing a value or exceeds the maxlength, return an error message
+   */
+  private static function getFieldInputError(AfformValidateEvent $event, string $apiEntity, string $fieldName, $attributes, $value) {
+    return self::getRequiredFieldError($event, $apiEntity, $fieldName, $attributes, $value) ?? self::getMaxlengthError($apiEntity, $fieldName, $attributes, $value);
+  }
+
+  /**
    * If a required field is missing a value, return an error message
    *
    * @param \Civi\Afform\Event\AfformValidateEvent $event
@@ -261,6 +268,30 @@ class Submit extends AbstractProcessor {
       return E::ts('%1 is a required field.', [1 => $label]);
     }
     return NULL;
+  }
+
+  /**
+   * If a required field is missing a value or exceeds the maxlength, return an error message
+   */
+  private static function getMaxlengthError(string $apiEntity, string $fieldName, $attributes, $value) {
+    // If we have no value, no need to check maxlength
+    if (!$value || !is_string($value)) {
+      return NULL;
+    }
+
+    if (array_key_exists('maxlength', $attributes['defn']['input_attrs'] ?? [])) {
+      $maxlength = $attributes['defn']['input_attrs']['maxlength'];
+    }
+    else {
+      $fullDefn = FormDataModel::getField($apiEntity, $fieldName, 'create');
+      $maxlength = $fullDefn['input_attrs']['maxlength'] ?? NULL;
+    }
+
+    if ($maxlength && strlen($value) > $maxlength) {
+      $fullDefn ??= FormDataModel::getField($apiEntity, $fieldName, 'create');
+      $label = $attributes['defn']['label'] ?? $fullDefn['label'] ?? $fieldName;
+      return E::ts('%1 has a max length of %2.', [1 => $label, 2 => $maxlength]);
+    }
   }
 
   /**
@@ -486,17 +517,18 @@ class Submit extends AbstractProcessor {
    */
   protected static function saveJoins(AfformSubmitEvent $event, $index, $entityId, $joins) {
     $mainEntity = $event->getFormDataModel()->getEntity($event->getEntityName());
-    foreach ($joins as $joinEntityName => $join) {
-      $values = self::filterEmptyJoins($mainEntity, $joinEntityName, $join);
+    foreach ($joins as $joinEntityName => $joinValues) {
+      $values = self::filterEmptyJoins($mainEntity, $joinEntityName, $joinValues);
       $whereClause = self::getJoinWhereClause($event->getFormDataModel(), $event->getEntityName(), $joinEntityName, $entityId);
       $mainIdField = CoreUtil::getIdFieldName($mainEntity['type']);
       $joinIdField = CoreUtil::getIdFieldName($joinEntityName);
+      $joinAllowedAction = self::getJoinAllowedAction($mainEntity, $joinEntityName);
 
       // Forward FK e.g. Event.loc_block_id => LocBlock
       $forwardFkField = self::getFkField($mainEntity['type'], $joinEntityName);
       if ($forwardFkField && $values) {
         // Add id to values for update op, but only if id is not already on the form
-        if ($whereClause && empty($mainEntity['joins'][$joinEntityName]['fields'][$joinIdField])) {
+        if ($whereClause && $joinAllowedAction['update'] && empty($mainEntity['joins'][$joinEntityName]['fields'][$joinIdField])) {
           $values[0][$joinIdField] = $whereClause[0][2];
         }
         $result = civicrm_api4($joinEntityName, 'save', [
@@ -514,21 +546,44 @@ class Submit extends AbstractProcessor {
       }
 
       // Reverse FK e.g. Contact <= Email.contact_id
-      // TODO: REPLACE works for creating or updating contacts, but different logic would be needed if
-      // the contact was being auto-updated via a dedupe rule; in that case we would not want to
-      // delete any existing records.
       elseif ($values) {
-        $result = civicrm_api4($joinEntityName, 'replace', [
-          // Disable permission checks because the main entity has already been vetted
-          'checkPermissions' => FALSE,
-          'where' => $whereClause,
-          'records' => $values,
-        ]);
+        // In update mode, set ids of existing values
+        if ($joinAllowedAction['update']) {
+          $existingJoinValues = $event->getApiRequest()->loadJoins($joinEntityName, $mainEntity, $entityId, $index);
+          foreach ($existingJoinValues as $joinIndex => $existingJoin) {
+            if (!empty($existingJoin[$joinIdField]) && !empty($values[$joinIndex])) {
+              $values[$joinIndex][$joinIdField] = $existingJoin[$joinIdField];
+            }
+          }
+        }
+        else {
+          foreach ($values as $key => $value) {
+            unset($values[$key][$joinIdField]);
+          }
+        }
+        // Use REPLACE action if update+delete are both allowed (only need to check for 'delete' as it implies 'update')
+        if ($joinAllowedAction['delete']) {
+          $result = civicrm_api4($joinEntityName, 'replace', [
+            // Disable permission checks because the main entity has already been vetted
+            'checkPermissions' => FALSE,
+            'where' => $whereClause,
+            'records' => $values,
+          ]);
+        }
+        else {
+          $fkField = self::getFkField($joinEntityName, $mainEntity['type']);
+          $result = civicrm_api4($joinEntityName, 'save', [
+            // Disable permission checks because the main entity has already been vetted
+            'checkPermissions' => FALSE,
+            'defaults' => [$fkField['name'] => $entityId],
+            'records' => $values,
+          ]);
+        }
         $indexedResult = array_combine(array_keys($values), (array) $result);
         $event->setJoinIds($index, $joinEntityName, $indexedResult);
       }
       // REPLACE doesn't work if there are no records, have to use DELETE
-      else {
+      elseif ($joinAllowedAction['delete']) {
         try {
           civicrm_api4($joinEntityName, 'delete', [
             // Disable permission checks because the main entity has already been vetted

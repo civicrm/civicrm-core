@@ -19,9 +19,9 @@
 
 namespace api\v4\Custom;
 
+use api\v4\Api4TestBase;
 use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
-use Civi\Api4\CustomGroup;
 use Civi\Api4\CustomValue;
 use Civi\Api4\OptionGroup;
 use Civi\Api4\OptionValue;
@@ -30,16 +30,15 @@ use Civi\Api4\Activity;
 /**
  * @group headless
  */
-class CreateCustomValueTest extends CustomTestBase {
+class CreateCustomValueTest extends Api4TestBase {
 
   public function testGetWithCustomData(): void {
     $optionValues = ['r' => 'Red', 'g' => 'Green', 'b' => 'Blue'];
 
-    $customGroup = CustomGroup::create(FALSE)
-      ->addValue('title', 'MyContactFields')
-      ->addValue('extends', 'Contact')
-      ->execute()
-      ->first();
+    $customGroup = $this->createTestRecord('CustomGroup', [
+      'title' => 'MyContactFields',
+      'extends' => 'Contact',
+    ]);
 
     CustomField::create(FALSE)
       ->addValue('label', 'Color')
@@ -96,12 +95,11 @@ class CreateCustomValueTest extends CustomTestBase {
    * Test setting/getting a multivalue customfield with date+time
    */
   public function testCustomDataWithDateTime(): void {
-    CustomGroup::create(FALSE)
-      ->addValue('title', 'MyContactDateFields')
-      ->addValue('name', 'MyContactDateFields')
-      ->addValue('extends', 'Contact')
-      ->addValue('is_multiple', TRUE)
-      ->execute();
+    $this->createTestRecord('CustomGroup', [
+      'title' => 'MyContactDateFields',
+      'extends' => 'Contact',
+      'is_multiple' => TRUE,
+    ]);
 
     CustomField::create(FALSE)
       ->addValue('custom_group_id:name', 'MyContactDateFields')
@@ -140,11 +138,10 @@ class CreateCustomValueTest extends CustomTestBase {
 
   public function testEmptyValueArrayForCustomFields(): void {
     $contactID = $this->createTestRecord('Contact')['id'];
-    CustomGroup::create(FALSE)
-      ->addValue('title', 'MyActivityFields')
-      ->addValue('name', 'MyActivityFields')
-      ->addValue('extends', 'Activity')
-      ->execute();
+    $this->createTestRecord('CustomGroup', [
+      'title' => 'MyActivityFields',
+      'extends' => 'Activity',
+    ]);
 
     $optionValues = ['r' => 'Red', 'g' => 'Green', 'b' => 'Blue'];
     CustomField::create(FALSE)

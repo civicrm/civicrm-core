@@ -11,6 +11,11 @@ class CRM_Utils_SQLTest extends CiviUnitTestCase {
     $this->useTransaction();
   }
 
+  public function tearDown(): void {
+    \Civi::settings()->set('disable_sql_memory_engine', FALSE);
+    parent::tearDown();
+  }
+
   public function testInterpolate(): void {
     // This function is a thin wrapper for `CRM_Utils_SQL_BaseParamQuery::interpolate()`, which already has
     // lots of coverage in other test classes. This test just checks the basic wiring.
@@ -86,6 +91,31 @@ class CRM_Utils_SQLTest extends CiviUnitTestCase {
       ['mysqli://user:pass@localhost:3306/drupal?cipher=aes&capath=%2Ftmp&food=banana', TRUE],
       ['mysqli://user:pass@localhost:3306/drupal?food=banana&cipher=aes', TRUE],
     ];
+  }
+
+  /**
+   * Test a memory temp table uses memory
+   */
+  public function testMemory() {
+    $tempTable = CRM_Utils_SQL_TempTable::build()
+      ->setCategory('mem')
+      ->setMemory(TRUE)
+      ->setAutodrop(TRUE)
+      ->createWithColumns('id int');
+    $this->assertTrue($tempTable->isMemory());
+  }
+
+  /**
+   * Test a memory temp table when memory is disabled.
+   */
+  public function testMemoryNoMemory() {
+    \Civi::settings()->set('disable_sql_memory_engine', TRUE);
+    $tempTable = CRM_Utils_SQL_TempTable::build()
+      ->setCategory('nomem')
+      ->setMemory(TRUE)
+      ->setAutodrop(TRUE)
+      ->createWithColumns('id int');
+    $this->assertFalse($tempTable->isMemory());
   }
 
 }

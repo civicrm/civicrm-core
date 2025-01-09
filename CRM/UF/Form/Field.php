@@ -103,7 +103,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       CRM_Utils_System::appendBreadCrumb($breadCrumb);
     }
 
-    $showBestResult = CRM_Utils_Request::retrieve('sbr', 'Positive', CRM_Core_DAO::$_nullArray);
+    $showBestResult = CRM_Utils_Request::retrieve('sbr', 'Positive');
     if ($showBestResult) {
       $this->assign('showBestResult', $showBestResult);
     }

@@ -35,7 +35,7 @@ class ErrorTest extends \CiviEndToEndTestCase {
     '/Backdrop_testErrorChrome_(fatal|exception)/',
   ];
 
-  public function getErrorTypes() {
+  public static function getErrorTypes() {
     return [
       'frontend_fatal' => ['frontend://civicrm/dev/fake-error', 'fatal'],
       'frontend_exception' => ['frontend://civicrm/dev/fake-error', 'exception'],

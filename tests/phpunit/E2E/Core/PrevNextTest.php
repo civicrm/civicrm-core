@@ -113,7 +113,7 @@ class PrevNextTest extends \CiviEndToEndTestCase {
     $this->assertEquals([200, 300], $cids);
   }
 
-  public function getFillFunctions() {
+  public static function getFillFunctions() {
     return [
       ['testFillSql'],
       ['testFillArray'],

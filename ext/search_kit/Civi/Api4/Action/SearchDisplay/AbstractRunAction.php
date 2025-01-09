@@ -149,7 +149,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         $data[$key] = $this->getValue($key, $record, $index);
       }
       foreach ($this->display['settings']['columns'] as $column) {
-        $columns[] = $this->formatColumn($column, $data);
+        $columns[] = $this->formatColumn($column, $data, $this->display['settings']);
       }
       $row = [
         'data' => $data,
@@ -232,9 +232,10 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   /**
    * @param array $column
    * @param array $data
+   * @param array $settings
    * @return array{val: mixed, links: array, edit: array, label: string, title: string, image: array, cssClass: string}
    */
-  private function formatColumn($column, $data) {
+  private function formatColumn(array $column, array $data, array $settings) {
     $column += ['rewrite' => NULL, 'label' => NULL, 'key' => ''];
     $out = [];
     switch ($column['type']) {
@@ -247,7 +248,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
           $out['val'] = $this->replaceTokens($column['empty_value'], $data, 'view');
         }
         elseif ($column['rewrite']) {
-          $out['val'] = $this->rewrite($column, $data);
+          $out['val'] = $this->rewrite($column['rewrite'], $data);
         }
         else {
           $dataType = $this->getSelectExpression($key)['dataType'] ?? NULL;
@@ -262,11 +263,11 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
             $out['links'] = $links;
           }
         }
-        elseif (!empty($column['editable']) && !$column['rewrite']) {
+        elseif (!empty($column['editable']) && !$column['rewrite'] && empty($settings['editableRow']['disable'])) {
           $edit = $this->formatEditableColumn($column, $data);
           if ($edit) {
             // When internally processing an inline-edit, get all metadata
-            if (isset($this->colKey) && $this->colKey === $column['key']) {
+            if (isset($this->rowKey) && isset($this->values) && array_key_exists($column['key'], $this->values)) {
               $out['edit'] = $edit;
             }
             // Otherwise, the client only needs a boolean
@@ -332,14 +333,15 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   /**
    * Rewrite field value, subtituting tokens and evaluating smarty tags
    *
-   * @param array $column
+   * @param string $rewrite
    * @param array $data
+   * @param string $format view|raw|url
    * @return string
    */
-  private function rewrite(array $column, array $data): string {
+  protected function rewrite(string $rewrite, array $data, string $format = 'view'): string {
     // Cheap strpos to skip Smarty processing if not needed
-    $hasSmarty = strpos($column['rewrite'], '{') !== FALSE;
-    $output = $this->replaceTokens($column['rewrite'], $data, 'view');
+    $hasSmarty = strpos($rewrite, '{') !== FALSE;
+    $output = $this->replaceTokens($rewrite, $data, $format);
     if ($hasSmarty) {
       $vars = [];
       $nestedIds = [];
@@ -1837,6 +1839,36 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       return 'relationship_id';
     }
     return CoreUtil::getIdFieldName($entityName);
+  }
+
+  /**
+   * Get data from the where/having clauses, useful for inferring values to create a new entity
+   *
+   * If $this->applyFilters has already run, it will include data from filters
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  public function getQueryData(): array {
+    // First pass: gather raw data from the where & having clauses
+    $data = [];
+    foreach (array_merge($this->_apiParams['where'], $this->_apiParams['having'] ?? []) as $clause) {
+      if ($clause[1] === '=' || $clause[1] === 'IN') {
+        $data[$clause[0]] = $clause[2];
+      }
+    }
+    // Second pass: format values (because data from first pass could be useful to FormattingUtil)
+    foreach ($this->_apiParams['where'] as $clause) {
+      if ($clause[1] === '=' || $clause[1] === 'IN') {
+        [$fieldPath] = explode(':', $clause[0]);
+        $fieldSpec = $this->getField($fieldPath);
+        $data[$fieldPath] = $clause[2];
+        if ($fieldSpec) {
+          FormattingUtil::formatInputValue($data[$fieldPath], $clause[0], $fieldSpec, $data, $clause[1]);
+        }
+      }
+    }
+    return $data;
   }
 
 }

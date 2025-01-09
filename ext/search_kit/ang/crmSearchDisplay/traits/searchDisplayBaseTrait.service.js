@@ -149,7 +149,7 @@
       },
 
       hasExtraFirstColumn: function() {
-        return this.settings.actions || this.settings.draggable || this.settings.collapsible || (this.settings.tally && this.settings.tally.label);
+        return this.settings.actions || this.settings.draggable || this.settings.collapsible || this.settings.editableRow || (this.settings.tally && this.settings.tally.label);
       },
 
       getFilters: function() {
@@ -252,7 +252,7 @@
 
       // Determine if an editable field is actively in editing mode
       isEditing: function(rowIndex, colIndex) {
-        return this.editing && this.editing[0] === rowIndex && this.editing[1] === colIndex;
+        return this.editing && this.editing[0] === rowIndex && (this.editing[1] === colIndex || (this.settings.editableRow && this.settings.editableRow.full));
       },
 
       startEditing: function(rowIndex, colIndex) {

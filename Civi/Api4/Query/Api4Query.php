@@ -22,13 +22,8 @@ use Civi\Api4\Utils\FormattingUtil;
  * * negated: ['NOT', $node]
  * * branch: ['OR|NOT', [$node, $node, ...]]
  *
- * Leaf operators are one of:
- *
- * * '=', '<=', '>=', '>', '<', 'LIKE', "<>", "!=",
- * * 'NOT LIKE', 'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN',
- * * 'IS NOT NULL', 'IS NULL', 'CONTAINS', 'NOT CONTAINS',
- * * 'IS EMPTY', 'IS NOT EMPTY', 'REGEXP', 'NOT REGEXP'
- * * 'REGEXP BINARY', 'NOT REGEXP BINARY'
+ * For leaf operators,
+ * @see CoreUtil::getOperators()
  */
 abstract class Api4Query {
 
@@ -286,6 +281,20 @@ abstract class Api4Query {
           }
         }
       }
+      // Format a function in the HAVING clause
+      if (isset($fieldAlias) && !isset($field)) {
+        try {
+          $expr = $this->getExpression($this->selectAliases[$fieldAlias], ['SqlFunction']);
+          $fauxField = [
+            'name' => NULL,
+            'data_type' => $expr->getRenderedDataType($this->apiFieldSpec),
+          ];
+          FormattingUtil::formatInputValue($value, NULL, $fauxField, $this->entityValues, $operator);
+        }
+        catch (\CRM_Core_Exception $e) {
+          // Not a function
+        }
+      }
       if (!isset($fieldAlias)) {
         if (in_array($expr, $this->getSelect())) {
           throw new UnauthorizedException("Unauthorized field '$expr'");
@@ -295,6 +304,7 @@ abstract class Api4Query {
         }
       }
       $fieldAlias = '`' . $fieldAlias . '`';
+      // Comparing two fields in the HAVING clause
       if ($isExpression) {
         $targetField = isset($this->selectAliases[$value]) ? $value : array_search($value, $this->selectAliases);
         if (!$targetField) {

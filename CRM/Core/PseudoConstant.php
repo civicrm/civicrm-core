@@ -38,13 +38,6 @@ class CRM_Core_PseudoConstant {
   private static $cache;
 
   /**
-   * activity type
-   * @var array
-   * @deprecated Please use the buildOptions() method in the appropriate BAO object.
-   */
-  private static $activityType;
-
-  /**
    * States, provinces
    * @var array
    */
@@ -437,7 +430,7 @@ class CRM_Core_PseudoConstant {
   /**
    * @deprecated Please use the buildOptions() method in the appropriate BAO object.
    *
-   * Get all Activty types.
+   * Get all Activity types.
    *
    * The static array activityType is returned
    *
@@ -445,7 +438,7 @@ class CRM_Core_PseudoConstant {
    * @return array
    *   array reference of all activity types.
    */
-  public static function &activityType() {
+  public static function activityType() {
     $args = func_get_args();
     $all = $args[0] ?? TRUE;
     $includeCaseActivities = $args[1] ?? FALSE;
@@ -456,12 +449,12 @@ class CRM_Core_PseudoConstant {
     $index = (int) $all . '_' . $returnColumn . '_' . (int) $includeCaseActivities;
     $index .= '_' . (int) $includeCampaignActivities;
     $index .= '_' . (int) $onlyComponentActivities;
-
-    if (NULL === self::$activityType) {
-      self::$activityType = [];
+    if (!isset(\Civi::$statics[__CLASS__]['activityType'])) {
+      \Civi::$statics[__CLASS__]['activityType'] = [];
     }
+    $activityTypes = &\Civi::$statics[__CLASS__]['activityType'];
 
-    if (!isset(self::$activityType[$index]) || $reset) {
+    if (!isset($activityTypes[$index]) || $reset) {
       $condition = NULL;
       if (!$all) {
         $condition = 'AND filter = 0';
@@ -501,9 +494,9 @@ class CRM_Core_PseudoConstant {
       }
       $condition = $condition . ' AND ' . $componentClause;
 
-      self::$activityType[$index] = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, $condition, $returnColumn);
+      $activityTypes[$index] = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, $condition, $returnColumn);
     }
-    return self::$activityType[$index];
+    return $activityTypes[$index];
   }
 
   /**

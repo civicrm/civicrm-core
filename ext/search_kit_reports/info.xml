@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <extension key="search_kit_reports" type="module">
   <file>search_kit_reports</file>
-  <name>search_kit_reports</name>
+  <name>Search Kit Reports</name>
   <description>SearchKit-based Reports UI</description>
   <license>AGPL-3.0</license>
   <authors>
@@ -12,16 +12,16 @@
     </author>
   </authors>
   <urls>
-    <url desc="Main Extension Page">https://FIXME</url>
-    <url desc="Documentation">https://FIXME</url>
-    <url desc="Support">https://FIXME</url>
+    <url desc="Documentation">https://docs.civicrm.org/user/en/latest/searching/searchkit/what-is-searchkit/</url>
+    <url desc="Chat">https://chat.civicrm.org/civicrm/channels/search-improvements</url>
+    <url desc="Issues">https://lab.civicrm.org/dev/report/-/issues</url>
     <url desc="Licensing">https://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
-  <releaseDate>2024-11-27</releaseDate>
-  <version>1.0.0</version>
+  <releaseDate>[civicrm.releaseDate]</releaseDate>
+  <version>[civicrm.version]</version>
   <develStage>alpha</develStage>
   <compatibility>
-    <ver>5.81</ver>
+    <ver>[civicrm.majorVersion]</ver>
   </compatibility>
   <comments>SearchKit-based reporting UI</comments>
   <classloader>
@@ -29,9 +29,9 @@
     <psr4 prefix="Civi\" path="Civi"/>
   </classloader>
   <civix>
-    <namespace>CRM/AfformReports</namespace>
+    <namespace>CRM/SearchKitReports</namespace>
     <format>24.09.1</format>
-    <angularModule>afReports</angularModule>
+    <angularModule>crmSearchKitReports</angularModule>
   </civix>
   <mixins>
     <mixin>mgd-php@1.0.0</mixin>

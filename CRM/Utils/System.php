@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use GuzzleHttp\Psr7\Response;
+
 /**
  * System wide utilities.
  *
@@ -1519,7 +1521,6 @@ class CRM_Utils_System {
       Civi::cache('metadata')->clear();
       \Civi\Core\ClassScanner::cache('index')->flush();
       CRM_Extension_System::singleton()->getCache()->flush();
-      CRM_Cxn_CiviCxnHttp::singleton()->getCache()->flush();
     }
 
     // also reset the various static memory caches
@@ -1966,6 +1967,19 @@ class CRM_Utils_System {
    */
   public static function prePostRedirect() {
     CRM_Core_Config::singleton()->userSystem->prePostRedirect();
+  }
+
+  /**
+   * Send an Invalid Request response
+   *
+   * @param string $responseMessage Response Message
+   */
+  public static function sendInvalidRequestResponse(string $responseMessage): void {
+    self::sendResponse(new Response(400, [], $responseMessage));
+  }
+
+  public static function sendOkRequestResponse(string $message = 'OK'): void {
+    self::sendResponse(new Response(200, [], $message));
   }
 
 }

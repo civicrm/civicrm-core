@@ -26,6 +26,7 @@ class GetAfforms extends \Civi\Api4\Generic\BasicBatchAction {
     'afblockCustom',
     'afformUpdateCustom',
     'afformCreateCustom',
+    'afformViewCustom',
     'afsearchTabCustom',
   ];
 
@@ -54,8 +55,12 @@ class GetAfforms extends \Civi\Api4\Generic\BasicBatchAction {
     $forms = [];
 
     // get field names once, for use across all the generate actions
-    $fields = \CRM_Core_BAO_CustomGroup::getGroup(['id' => $item['id']])['fields'];
-    $item['field_names'] = array_column($fields, 'name');
+    $item['field_names'] = \Civi\Api4\CustomField::get(FALSE)
+      ->addSelect('name')
+      ->addWhere('custom_group_id', '=', $item['id'])
+      ->addWhere('is_active', '=', TRUE)
+      ->execute()
+      ->column('name');
 
     // restrict forms other than block to if Admin UI is enabled
     $hasAdminUi = \CRM_Extension_System::singleton()->getMapper()->isActiveModule('civicrm_admin_ui');
@@ -70,6 +75,7 @@ class GetAfforms extends \Civi\Api4\Generic\BasicBatchAction {
           break;
 
         case 'form':
+          $forms[] = $this->generateViewForm($item);
           $forms[] = $this->generateUpdateForm($item);
           if ($item['is_multiple']) {
             $forms[] = $this->generateCreateForm($item);
@@ -79,11 +85,9 @@ class GetAfforms extends \Civi\Api4\Generic\BasicBatchAction {
         case 'search':
           // TODO:
           // 1. tabs with grid display
-          // 2. tabs for other entities (e.g. Event)
           if (
             $item['is_multiple']
             && ($item['style'] === 'Tab with table')
-            && CoreUtil::isContact($item['extends'])
           ) {
             $forms[] = $this->generateTabForm($item);
           }
@@ -116,6 +120,56 @@ class GetAfforms extends \Civi\Api4\Generic\BasicBatchAction {
       $afform['layout'] = \CRM_Core_Smarty::singleton()->fetchWith(
         'afform/customGroups/afblock.tpl',
         ['group' => $item]
+      );
+    }
+    return $afform;
+  }
+
+  private function generateViewForm($item): array {
+    $afform = [
+      'name' => 'afformViewCustom_' . $item['name'],
+      'type' => 'form',
+      'title' => E::ts('View %1', [1 => $item['title']]),
+      'description' => '',
+      'is_public' => FALSE,
+      // NOTE: we will use RBAC for entities to ensure
+      // this form does not allow folks who shouldn't
+      // to edit contacts
+      'permission' => ['access CiviCRM'],
+      'server_route' => 'civicrm/af/custom/' . $item['name'] . '/view',
+      'icon' => $item['icon'],
+    ];
+    if ($this->getLayout) {
+
+      // form entity depends on whether this is a multirecord custom group
+      $formEntity = $item['is_multiple'] ?
+        [
+          'type' => 'Custom_' . $item['name'],
+          'name' => 'Record',
+          'label' => $item['extends'] . ' ' . $item['title'],
+          'parent_field' => 'entity_id',
+          'parent_field_defn' => [
+            'input_type' => 'Hidden',
+            'label' => FALSE,
+          ],
+        ] :
+        [
+          'type' => $item['extends'],
+          'name' => $item['extends'] . '1',
+          'label' => $item['extends'],
+          'parent_field' => 'id',
+          'parent_field_defn' => [
+            'input_type' => 'Hidden',
+            'label' => FALSE,
+          ],
+        ];
+
+      $afform['layout'] = \CRM_Core_Smarty::singleton()->fetchWith(
+        'afform/customGroups/afformView.tpl',
+        [
+          'formEntity' => $formEntity,
+          'group' => $item,
+        ]
       );
     }
     return $afform;
@@ -161,7 +215,7 @@ class GetAfforms extends \Civi\Api4\Generic\BasicBatchAction {
         ];
 
       $afform['layout'] = \CRM_Core_Smarty::singleton()->fetchWith(
-        'afform/customGroups/afform.tpl',
+        'afform/customGroups/afformEdit.tpl',
         [
           'formEntity' => $formEntity,
           'formActions' => [
@@ -202,7 +256,7 @@ class GetAfforms extends \Civi\Api4\Generic\BasicBatchAction {
         ],
       ];
       $afform['layout'] = \CRM_Core_Smarty::singleton()->fetchWith(
-        'afform/customGroups/afform.tpl',
+        'afform/customGroups/afformEdit.tpl',
         [
           'formEntity' => $formEntity,
           'formActions' => [
@@ -218,10 +272,11 @@ class GetAfforms extends \Civi\Api4\Generic\BasicBatchAction {
   }
 
   private function generateTabForm($item): array {
+    $extendsLabel = CoreUtil::getInfoItem($item['extends'], 'title');
     $afform = [
       // name required to replace the existing tab
       'name' => 'afsearchTabCustom_' . $item['name'],
-      'description' => E::ts('Contact summary tab display for %1', [1 => $item['title']]),
+      'description' => E::ts('%1 tab display for %2', [1 => $extendsLabel, 2 => $item['title']]),
       'type' => 'search',
       'is_public' => FALSE,
       // Q: should this be more permissive if user has access
@@ -239,7 +294,9 @@ class GetAfforms extends \Civi\Api4\Generic\BasicBatchAction {
       $afform['summary_contact_type'] = [$item['extends']];
     }
     else {
-      // TODO implement tabs for other tabsets
+      // tabs for other entities are placed without any
+      // additional afform meta
+      // @see civicrm_admin_ui_civicrm_tabset
     }
     if ($this->getLayout) {
       // TODO: the template should be a table or grid depending

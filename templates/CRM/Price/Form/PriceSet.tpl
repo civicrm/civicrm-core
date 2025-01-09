@@ -77,7 +77,7 @@
                           <span class='crm-price-amount-tax'> + {$option.tax_amount|crmMoney:$currency} {$taxTerm}</span>
                         {/if}
                       {else}
-                        {$option.amount|crmMoney:$currency} {$fieldHandle} {$form.$fieldHandle.frozen}
+                        {$option.amount|crmMoney:$currency}
                       {/if}
                       {if $form.$element_name.frozen EQ 1} ({ts}Sold out{/ts}){/if}
                     {/foreach}

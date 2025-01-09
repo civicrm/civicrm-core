@@ -19,12 +19,13 @@
 
 namespace api\v4\Custom;
 
+use api\v4\Api4TestBase;
 use Civi\Api4\CustomGroup;
 
 /**
  * @group headless
  */
-class CustomGroupTest extends CustomTestBase {
+class CustomGroupTest extends Api4TestBase {
 
   public function testUpdateCustomGroup(): void {
     $this->createTestRecord('ContactType', [

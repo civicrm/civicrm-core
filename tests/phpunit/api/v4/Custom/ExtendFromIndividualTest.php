@@ -19,23 +19,22 @@
 
 namespace api\v4\Custom;
 
+use api\v4\Api4TestBase;
 use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
-use Civi\Api4\CustomGroup;
 
 /**
  * @group headless
  */
-class ExtendFromIndividualTest extends CustomTestBase {
+class ExtendFromIndividualTest extends Api4TestBase {
 
   public function testGetWithNonStandardExtends(): void {
 
-    $customGroup = CustomGroup::create(FALSE)
-      ->addValue('title', 'MyContactFields')
+    $customGroup = $this->createTestRecord('CustomGroup', [
+      'title' => 'MyContactFields',
       // not Contact
-      ->addValue('extends', 'Individual')
-      ->execute()
-      ->first();
+      'extends' => 'Individual',
+    ]);
 
     CustomField::create(FALSE)
       ->addValue('label', 'FavColor')

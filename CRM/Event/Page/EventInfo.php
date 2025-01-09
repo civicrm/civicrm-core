@@ -218,14 +218,14 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
       $this->assign('skipLocationType', TRUE);
       $this->assign('mapURL', $mapURL);
     }
-
+    $findParticipants = ['statusCounted' => '', 'statusNotCounted' => ''];
     if (CRM_Core_Permission::check('view event participants')) {
       $statusTypes = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 1', 'label');
       $statusTypesPending = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 0', 'label');
       $findParticipants['statusCounted'] = implode(', ', array_values($statusTypes));
       $findParticipants['statusNotCounted'] = implode(', ', array_values($statusTypesPending));
-      $this->assign('findParticipants', $findParticipants);
     }
+    $this->assign('findParticipants', $findParticipants);
 
     $participantListingID = $values['event']['participant_listing_id'] ?? NULL;
     if ($participantListingID) {
@@ -342,7 +342,12 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
    */
   public function getEventID(): int {
     if (!isset($this->_id)) {
-      $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
+      try {
+        $id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
+      }
+      catch (CRM_Core_Exception $e) {
+        CRM_Utils_System::sendInvalidRequestResponse(ts('Missing Event ID'));
+      }
       $this->_id = $id;
     }
     return (int) $this->_id;

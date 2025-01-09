@@ -110,14 +110,13 @@ class Test {
    */
   public static function headless() {
     $civiRoot = dirname(__DIR__);
-    $builder = new \Civi\Test\CiviEnvBuilder();
+    $builder = new \Civi\Test\CiviEnvBuilder('Headless System');
     $builder
-      ->callback(function ($ctx) {
+      ->callback(function ($builder) {
         if (CIVICRM_UF !== 'UnitTests') {
           throw new \RuntimeException("\\Civi\\Test::headless() requires CIVICRM_UF=UnitTests");
         }
         $dbName = \Civi\Test::dsn('database');
-        fprintf(STDERR, "Installing {$dbName} schema\n");
         \Civi\Test::schema()->dropAll();
       }, 'headless-drop')
       ->coreSchema()
@@ -245,9 +244,7 @@ class Test {
           continue;
         }
         else {
-          var_dump($result);
-          var_dump($pdo->errorInfo());
-          // die( "Cannot execute $query: " . $pdo->errorInfo() );
+          throw new \RuntimeException('Cannot execute query: ' . json_encode([$query, $pdo->errorInfo()], JSON_PRETTY_PRINT));
         }
       }
     }

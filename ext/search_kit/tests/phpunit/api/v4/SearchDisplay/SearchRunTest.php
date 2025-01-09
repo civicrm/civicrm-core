@@ -561,6 +561,68 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertStringContainsString("id={$case['id']}", $result[3]['columns'][1]['links'][3]['url']);
   }
 
+  public function testRelatedContactSearch(): void {
+    $this->createTestRecord('CustomGroup', [
+      'extends' => 'Relationship',
+      'name' => 'test_rel_fields',
+    ]);
+    $this->createTestRecord('CustomField', [
+      'custom_group_id.name' => 'test_rel_fields',
+      'label' => 'Opts',
+      'html_type' => 'Select',
+      'option_values' => ['r' => 'Red', 'g' => 'Green', 'b' => 'Blue'],
+    ]);
+
+    $cids = $this->saveTestRecords('Individual', [
+      'records' => 3,
+    ])->column('id');
+
+    $this->saveTestRecords('Relationship', [
+      'defaults' => [
+        'contact_id_a' => $cids[0],
+        'relationship_type_id:name' => 'Child of',
+      ],
+      'records' => [
+        ['contact_id_b' => $cids[1], 'test_rel_fields.Opts' => 'r'],
+        ['contact_id_b' => $cids[2], 'test_rel_fields.Opts' => 'g'],
+      ],
+    ]);
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Individual',
+        'api_params' => [
+          'version' => 4,
+          'select' => [
+            'id',
+            'Contact_RelationshipCache_Contact_01.test_rel_fields.Opts:label',
+          ],
+          'where' => [['id', 'IN', $cids]],
+          'join' => [
+            [
+              'Contact AS Contact_RelationshipCache_Contact_01',
+              'INNER',
+              'RelationshipCache',
+              ['id', '=', 'Contact_RelationshipCache_Contact_01.far_contact_id'],
+              ['Contact_RelationshipCache_Contact_01.near_relation:name', '=', '"Child of"'],
+            ],
+          ],
+        ],
+      ],
+      'display' => NULL,
+      'sort' => [
+        ['Contact_RelationshipCache_Contact_01.test_rel_fields.Opts:label', 'ASC'],
+      ],
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(2, $result);
+    $this->assertEquals('Green', $result[0]['columns'][1]['val']);
+    $this->assertEquals('Red', $result[1]['columns'][1]['val']);
+  }
+
   /**
    * Test smarty rewrite syntax.
    */
@@ -1757,6 +1819,139 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
   }
 
   public function testTally(): void {
+    $this->createTestRecord('CustomGroup', [
+      'extends' => 'Individual',
+      'name' => 'test_indiv_fields',
+    ]);
+    $this->createTestRecord('CustomField', [
+      'custom_group_id.name' => 'test_indiv_fields',
+      'label' => 'text',
+      'html_type' => 'Text',
+    ]);
+    $this->createTestRecord('CustomField', [
+      'custom_group_id.name' => 'test_indiv_fields',
+      'label' => 'colors',
+      'html_type' => 'Select',
+      'option_values' => ['r' => 'Red', 'g' => 'Green', 'b' => 'Blue'],
+    ]);
+
+    $contacts = $this->saveTestRecords('Individual', [
+      'records' => [
+        ['first_name' => 'A', 'last_name' => 'A', 'birth_date' => 'now - 20 year 1 month', 'test_indiv_fields.text' => 'aa'],
+        ['first_name' => 'B', 'last_name' => 'B', 'test_indiv_fields.colors' => 'b'],
+        ['first_name' => 'C', 'last_name' => 'C', 'birth_date' => 'now - 19 year 1 month'],
+      ],
+    ]);
+
+    $this->createTestRecord('SavedSearch', [
+      'name' => __FUNCTION__,
+      'label' => __FUNCTION__,
+      'api_entity' => 'Individual',
+      'api_params' => [
+        'version' => 4,
+        'select' => [
+          'id',
+          'first_name',
+          'last_name',
+          'age_years',
+          'test_indiv_fields.text',
+          'test_indiv_fields.colors:label',
+        ],
+        'where' => [
+          ['id', 'IN', $contacts->column('id')],
+        ],
+      ],
+    ]);
+    $this->createTestRecord('SearchDisplay', [
+      'name' => __FUNCTION__,
+      'label' => __FUNCTION__,
+      'saved_search_id.name' => __FUNCTION__,
+      'type' => 'table',
+      'settings' => [
+        'description' => NULL,
+        'sort' => [
+          ['last_name', 'DESC'],
+        ],
+        'limit' => 50,
+        'pager' => [],
+        'columns' => [
+          [
+            'type' => 'field',
+            'key' => 'id',
+            'label' => 'ID',
+            'sortable' => TRUE,
+            'tally' => [
+              'fn' => 'COUNT',
+            ],
+          ],
+          [
+            'type' => 'field',
+            'key' => 'first_name',
+            'label' => 'First Name',
+            'sortable' => TRUE,
+            'tally' => [
+              'fn' => 'MIN',
+            ],
+          ],
+          [
+            'type' => 'field',
+            'key' => 'last_name',
+            'label' => 'Last Name',
+            'sortable' => TRUE,
+            'tally' => [
+              'fn' => 'GROUP_CONCAT',
+            ],
+          ],
+          [
+            'type' => 'field',
+            'key' => 'age_years',
+            'label' => 'Age',
+            'sortable' => TRUE,
+            'tally' => [
+              'fn' => 'AVG',
+            ],
+          ],
+          [
+            'type' => 'field',
+            'key' => 'test_indiv_fields.text',
+            'label' => 'Text',
+            'sortable' => TRUE,
+            'tally' => [
+              'fn' => 'MIN',
+            ],
+          ],
+          [
+            'type' => 'field',
+            'key' => 'test_indiv_fields.colors:label',
+            'label' => 'Text',
+            'sortable' => TRUE,
+            'tally' => [
+              'fn' => 'MAX',
+            ],
+          ],
+        ],
+        'actions' => TRUE,
+        'tally' => [
+          'label' => 'Total',
+        ],
+      ],
+    ]);
+
+    $tally = SearchDisplay::run(FALSE)
+      ->setReturn('tally')
+      ->setDisplay(__FUNCTION__)
+      ->setSavedSearch(__FUNCTION__)
+      ->execute()->single();
+
+    $this->assertSame('3', $tally['id']);
+    $this->assertSame('A', $tally['first_name']);
+    $this->assertSame(['A', 'B', 'C'], $tally['last_name']);
+    $this->assertSame('18.5000', $tally['age_years']);
+    $this->assertSame('aa', $tally['test_indiv_fields.text']);
+    $this->assertSame('Blue', $tally['test_indiv_fields.colors:label']);
+  }
+
+  public function testTallyWithGroupBy(): void {
     \Civi::settings()->set('dateformatshortdate', '%m/%d/%Y');
     $contacts = $this->saveTestRecords('Individual', [
       'records' => [
@@ -1766,12 +1961,28 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
       ],
     ]);
 
+    $this->createTestRecord('CustomGroup', [
+      'extends' => 'Contribution',
+      'name' => 'test_contrib_fields',
+    ]);
+    $this->createTestRecord('CustomField', [
+      'custom_group_id.name' => 'test_contrib_fields',
+      'label' => 'text',
+      'html_type' => 'Text',
+    ]);
+    $this->createTestRecord('CustomField', [
+      'custom_group_id.name' => 'test_contrib_fields',
+      'label' => 'options',
+      'html_type' => 'Select',
+      'option_values' => ['r' => 'Red', 'g' => 'Green', 'b' => 'Blue'],
+    ]);
+
     $contributions = $this->saveTestRecords('Contribution', [
       'records' => [
-        ['total_amount' => 100, 'contact_id' => $contacts[0]['id'], 'receive_date' => '2024-02-02', 'financial_type_id:name' => 'Donation'],
-        ['total_amount' => 200, 'contact_id' => $contacts[0]['id'], 'receive_date' => '2021-02-02', 'financial_type_id:name' => 'Campaign Contribution'],
-        ['total_amount' => 300, 'contact_id' => $contacts[1]['id'], 'receive_date' => '2022-02-02', 'financial_type_id:name' => 'Member Dues'],
-        ['total_amount' => 400, 'contact_id' => $contacts[2]['id'], 'receive_date' => '2023-02-02', 'financial_type_id:name' => 'Donation'],
+        ['total_amount' => 100, 'contact_id' => $contacts[0]['id'], 'receive_date' => '2024-02-02', 'financial_type_id:name' => 'Donation', 'test_contrib_fields.text' => 'a', 'test_contrib_fields.options' => 'r'],
+        ['total_amount' => 200, 'contact_id' => $contacts[0]['id'], 'receive_date' => '2021-02-02', 'financial_type_id:name' => 'Campaign Contribution', 'test_contrib_fields.text' => 'b', 'test_contrib_fields.options' => 'g'],
+        ['total_amount' => 300, 'contact_id' => $contacts[1]['id'], 'receive_date' => '2022-02-02', 'financial_type_id:name' => 'Member Dues', 'test_contrib_fields.text' => 'c', 'test_contrib_fields.options' => 'b'],
+        ['total_amount' => 400, 'contact_id' => $contacts[2]['id'], 'receive_date' => '2023-02-02', 'financial_type_id:name' => 'Donation', 'test_contrib_fields.text' => 'd', 'test_contrib_fields.options' => 'r'],
       ],
     ]);
 
@@ -1787,16 +1998,15 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
           'SUM(total_amount) AS SUM_total_amount',
           'GROUP_FIRST(receive_date ORDER BY receive_date ASC) AS GROUP_FIRST_receive_date',
           'GROUP_FIRST(financial_type_id:label ORDER BY receive_date ASC) AS GROUP_FIRST_financial_type_id_label',
+          'GROUP_CONCAT(test_contrib_fields.text) AS GROUP_CONCAT_test_contrib_fields_text',
+          'GROUP_FIRST(test_contrib_fields.options:label ORDER BY receive_date ASC) AS GROUP_FIRST_test_contrib_fields_options_label',
         ],
-        'orderBy' => [],
         'where' => [
           ['id', 'IN', $contributions->column('id')],
         ],
         'groupBy' => [
           'contact_id',
         ],
-        'join' => [],
-        'having' => [],
       ],
     ]);
 
@@ -1856,14 +2066,29 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
             'sortable' => TRUE,
             'tally' => [
               'fn' => 'GROUP_FIRST',
+              'rewrite' => '[GROUP_FIRST_financial_type_id_label], Innit',
+            ],
+          ],
+          [
+            'type' => 'field',
+            'key' => 'GROUP_FIRST_test_contrib_fields_options_label',
+            'label' => '(First) Options',
+            'sortable' => TRUE,
+            'tally' => [
+              'fn' => 'GROUP_FIRST',
+            ],
+          ],
+          [
+            'type' => 'field',
+            'key' => 'GROUP_CONCAT_test_contrib_fields_text',
+            'label' => '(List) Text',
+            'sortable' => TRUE,
+            'tally' => [
+              'fn' => 'GROUP_FIRST',
             ],
           ],
         ],
         'actions' => TRUE,
-        'classes' => [
-          'table',
-          'table-striped',
-        ],
         'tally' => [
           'label' => 'Total',
         ],
@@ -1880,7 +2105,9 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(['A, A', 'B, B', 'C, C'], $tally['GROUP_CONCAT_contact_id_sort_name']);
     $this->assertSame('$1,000.00', $tally['SUM_total_amount']);
     $this->assertSame('02/02/2021', $tally['GROUP_FIRST_receive_date']);
-    $this->assertSame('Donation', $tally['GROUP_FIRST_financial_type_id_label']);
+    $this->assertSame('Donation, Innit', $tally['GROUP_FIRST_financial_type_id_label']);
+    $this->assertSame('Blue', $tally['GROUP_FIRST_test_contrib_fields_options_label']);
+    $this->assertSame('a', $tally['GROUP_CONCAT_test_contrib_fields_text']);
   }
 
   public function testContributionTotalCountWithTestAndTemplateContributions():void {

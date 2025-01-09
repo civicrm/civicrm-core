@@ -93,9 +93,3 @@ af-form {
 fieldset.af-container.af-layout-inline {
   border: 0;
 }
-
-/* Multiple button gap */
-
-#bootstrap-theme .crm-search-col-type-buttons .btn {
-  margin: 0 var(--crm-flex-gap) var(--crm-flex-gap) 0;
-}

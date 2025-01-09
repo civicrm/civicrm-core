@@ -317,6 +317,9 @@ class CRM_Utils_SQL_TempTable {
    * @return $this
    */
   public function setMemory($value = TRUE) {
+    if (\Civi::settings()->get('disable_sql_memory_engine')) {
+      $value = FALSE;
+    }
     $this->memory = $value;
     return $this;
   }

@@ -25,7 +25,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
    * @see CRM_Utils_Hook::post()
    */
   public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $e): void {
-    Civi::cache('metadata')->flush();
+    Civi::cache('metadata')->clear();
   }
 
   /**
@@ -2137,7 +2137,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
    * Returns a mix of hard-coded array and `cg_extend_objects` OptionValues.
    *  - 'id' return key (maps to `cg_extend_objects.value`).
    *  - 'grouping' key refers to the entity field used to select a sub-type.
-   *  - 'is_multiple' (@internal, not returned by getFields.loadOptions) (maps to `cg_extend_objects.filter`)
+   *  - 'allow_is_multiple' (@internal, not returned by getFields.loadOptions) (maps to `cg_extend_objects.filter`)
    *     controls whether the entity supports multi-record custom groups.
    *  - 'table_name' (@internal, not returned by getFields.loadOptions) (maps to `cg_extend_objects.name`).
    *     We don't return it as the 'name' in getFields because it is not always unique (since contact types are pseudo-entities).
@@ -2151,14 +2151,14 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
         'label' => ts('Activities'),
         'grouping' => 'activity_type_id',
         'table_name' => 'civicrm_activity',
-        'is_multiple' => FALSE,
+        'allow_is_multiple' => FALSE,
       ],
       [
         'id' => 'Relationship',
         'label' => ts('Relationships'),
         'grouping' => 'relationship_type_id',
         'table_name' => 'civicrm_relationship',
-        'is_multiple' => FALSE,
+        'allow_is_multiple' => FALSE,
       ],
       // TODO: Move to civi_contribute extension (example: OptionValue_cg_extends_objects_grant.mgd.php)
       [
@@ -2166,21 +2166,21 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
         'label' => ts('Contributions'),
         'grouping' => 'financial_type_id',
         'table_name' => 'civicrm_contribution',
-        'is_multiple' => FALSE,
+        'allow_is_multiple' => FALSE,
       ],
       [
         'id' => 'ContributionRecur',
         'label' => ts('Recurring Contributions'),
         'grouping' => NULL,
         'table_name' => 'civicrm_contribution_recur',
-        'is_multiple' => FALSE,
+        'allow_is_multiple' => FALSE,
       ],
       [
         'id' => 'Group',
         'label' => ts('Groups'),
         'grouping' => NULL,
         'table_name' => 'civicrm_group',
-        'is_multiple' => FALSE,
+        'allow_is_multiple' => FALSE,
       ],
       // TODO: Move to civi_member extension (example: OptionValue_cg_extends_objects_grant.mgd.php)
       [
@@ -2188,7 +2188,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
         'label' => ts('Memberships'),
         'grouping' => 'membership_type_id',
         'table_name' => 'civicrm_membership',
-        'is_multiple' => FALSE,
+        'allow_is_multiple' => FALSE,
       ],
       // TODO: Move to civi_event extension (example: OptionValue_cg_extends_objects_grant.mgd.php)
       [
@@ -2196,14 +2196,14 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
         'label' => ts('Events'),
         'grouping' => 'event_type_id',
         'table_name' => 'civicrm_event',
-        'is_multiple' => FALSE,
+        'allow_is_multiple' => TRUE,
       ],
       [
         'id' => 'Participant',
         'label' => ts('Participants'),
         'grouping' => NULL,
         'table_name' => 'civicrm_participant',
-        'is_multiple' => FALSE,
+        'allow_is_multiple' => FALSE,
       ],
       // TODO: Move to civi_pledge extension (example: OptionValue_cg_extends_objects_grant.mgd.php)
       [
@@ -2211,14 +2211,14 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
         'label' => ts('Pledges'),
         'grouping' => NULL,
         'table_name' => 'civicrm_pledge',
-        'is_multiple' => FALSE,
+        'allow_is_multiple' => FALSE,
       ],
       [
         'id' => 'Address',
         'label' => ts('Addresses'),
         'grouping' => NULL,
         'table_name' => 'civicrm_address',
-        'is_multiple' => FALSE,
+        'allow_is_multiple' => FALSE,
       ],
       // TODO: Move to civi_campaign extension (example: OptionValue_cg_extends_objects_grant.mgd.php)
       [
@@ -2226,14 +2226,14 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
         'label' => ts('Campaigns'),
         'grouping' => 'campaign_type_id',
         'table_name' => 'civicrm_campaign',
-        'is_multiple' => FALSE,
+        'allow_is_multiple' => FALSE,
       ],
       [
         'id' => 'Contact',
         'label' => ts('Contacts'),
         'grouping' => NULL,
         'table_name' => 'civicrm_contact',
-        'is_multiple' => TRUE,
+        'allow_is_multiple' => TRUE,
       ],
     ];
     // `CustomGroup.extends` stores contact type as if it were an entity.
@@ -2243,7 +2243,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
         'label' => $contactInfo['label'],
         'grouping' => 'contact_sub_type',
         'table_name' => 'civicrm_contact',
-        'is_multiple' => TRUE,
+        'allow_is_multiple' => TRUE,
         'icon' => $contactInfo['icon'],
       ];
     }
@@ -2255,7 +2255,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
         'label' => $ogValue['label'],
         'grouping' => $ogValue['grouping'] ?? NULL,
         'table_name' => $ogValue['name'],
-        'is_multiple' => !empty($ogValue['filter']),
+        'allow_is_multiple' => !empty($ogValue['filter']),
       ];
     }
     foreach ($options as &$option) {
@@ -2361,6 +2361,17 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements \Civi
       ];
     }
     return $customValue;
+  }
+
+  /**
+   * Enforce ACLs for custom Groups and Fields
+   */
+  public static function on_hook_civicrm_selectWhereClause(\Civi\Core\Event\GenericHookEvent $hook): void {
+    if (($hook->entity === 'CustomGroup' || $hook->entity === 'CustomField') && !CRM_Core_Permission::customGroupAdmin($hook->userId)) {
+      $idField = $hook->entity === 'CustomGroup' ? 'id' : 'custom_group_id';
+      $permittedIds = CRM_Core_Permission::customGroup(CRM_Core_Permission::VIEW, FALSE, $hook->userId) ?: [0];
+      $hook->clauses[$idField][] = 'IN (' . implode(', ', $permittedIds) . ')';
+    }
   }
 
 }

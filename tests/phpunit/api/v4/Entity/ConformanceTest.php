@@ -109,13 +109,38 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
   public function getEntitiesLotech(): array {
     $entityNames = [];
 
-    $locations = array_merge(
-      [
-        \Civi::paths()->getPath('[civicrm.root]/Civi.php'),
-        \Civi::paths()->getPath('[civicrm.root]/tests/phpunit/AllTests.php'),
-      ],
-      array_column(\CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(), 'filePath')
-    );
+    $root = dirname(__DIR__, 5);
+    $locations = [
+      "$root/Civi.php",
+      "$root/tests/phpunit/AllTests.php",
+
+      // The following allows ConformanceTest to run against entities in (some) core-extensions.
+      //
+      // (#1) The goal is good, but the implementation feels misplaced. In the long-term,
+      // the functionality of ConformanceTest would be useful for all extensions
+      // (contrib, core-default, core-non-default, etc).  It would make sense to somehow offer
+      // conformance-testing as a service to run within every extension's respective test-suite.
+      //
+      // (#2) The following list will be validated by testEntitiesProvider(). It may need
+      // to be tweaked... like... once a year? if that?
+      //
+      // (#3) If you want to overthink something, then see (#1) above...
+
+      "$root/ext/civi_campaign/civi_campaign.php",
+      "$root/ext/civi_case/civi_case.php",
+      "$root/ext/civi_contribute/civi_contribute.php",
+      "$root/ext/civi_event/civi_event.php",
+      "$root/ext/civigrant/civigrant.php",
+      "$root/ext/civi_mail/civi_mail.php",
+      "$root/ext/civi_member/civi_member.php",
+      "$root/ext/civi_pledge/civi_pledge.php",
+      "$root/ext/civi_report/civi_report.php",
+      "$root/ext/civi_survey/civi_survey.php",
+      "$root/ext/search_kit/search_kit.php",
+      "$root/ext/afform/core/afform.php",
+      "$root/ext/authx/authx.php",
+    ];
+
     foreach ($locations as $location) {
       $dir = \CRM_Utils_File::addTrailingSlash(dirname($location ?? '')) . 'Civi/Api4';
       if (is_dir($dir)) {

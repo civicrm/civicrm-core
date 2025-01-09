@@ -50,35 +50,24 @@ class CRM_Standaloneusers_WorkflowMessage_PasswordReset extends GenericWorkflowM
   public $usernameHtml;
 
   /**
-   * @var array
+   * Load the required tplParams
    */
-  protected $logParams;
-
-  /**
-   * Generate/regenerate a token for the user and load the tplParams
-   */
-  public function setDataFromUser(array $user, string $token) {
+  public function setRequiredParams(
+    string $username,
+    string $email,
+    int $contactId,
+    string $token
+    ) {
     $resetUrlPlaintext = \CRM_Utils_System::url('civicrm/login/password', ['token' => $token], TRUE, NULL, FALSE);
-    $resetUrlHtml = htmlspecialchars($resetUrlPlaintext);
-    $this->logParams = [
-      'userID'   => $user['id'],
-      'contactID' => $user['contact_id'],
-      'username' => $user['username'],
-      'email'    => $user['uf_name'],
-      'url'      => $resetUrlPlaintext,
-    ];
+
     $this
       ->setResetUrlPlaintext($resetUrlPlaintext)
-      ->setResetUrlHtml($resetUrlHtml)
-      ->setUsernamePlaintext($user['username'])
-      ->setUsernameHtml(htmlspecialchars($user['username']))
-      ->setTo(['name' => $user['username'], 'email' => $user['uf_name']])
-      ->setContactID($user['contact_id']);
+      ->setResetUrlHtml(htmlspecialchars($resetUrlPlaintext))
+      ->setUsernamePlaintext($username)
+      ->setUsernameHtml(htmlspecialchars($username))
+      ->setTo(['name' => $username, 'email' => $email])
+      ->setContactID($contactId);
     return $this;
-  }
-
-  public function getParamsForLog(): array {
-    return $this->logParams;
   }
 
 }

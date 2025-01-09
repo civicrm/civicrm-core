@@ -62,17 +62,22 @@ class DynamicCss implements \Symfony\Component\EventDispatcher\EventSubscriberIn
 
     switch ($params['dark'] ?? NULL) {
       case 'light':
-        // nothing more to do
+        // tell OS we want light for system elements
+        $content[] = ":root { color-scheme: light; }";
         break;
 
       case 'dark':
-        // add dark vars unconditionally
+        // tell OS we want dark for system elements
+        $content[] = ":root { color-scheme: dark; }";
+        // add stream dark vars unconditionally
         $content[] = self::getCSSFromFile('_dark.css', $stream);
         break;
 
       case 'inherit':
       default:
-        // add dark vars wrapped inside a media query
+        // tell OS we are happy with light or dark for system elements
+        $content[] = ":root { color-scheme: light dark; }";
+        // add stream dark vars wrapped inside a media query
         $content[] = '@media (prefers-color-scheme: dark) {';
         $content[] = self::getCSSFromFile('_dark.css', $stream);
         $content[] = '}';

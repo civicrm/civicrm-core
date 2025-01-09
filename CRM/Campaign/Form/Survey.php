@@ -130,9 +130,10 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
     $form = $this;
     $tabs = $form->get('tabHeader');
     if (!$tabs || empty($_GET['reset'])) {
-      $tabs = $this->processSurveyForm();
+      $tabs = $this->processSurveyForm() ?? [];
       $form->set('tabHeader', $tabs);
     }
+    $tabs = \CRM_Core_Smarty::setRequiredTabTemplateKeys($tabs);
     $form->assign('tabHeader', $tabs);
     CRM_Core_Resources::singleton()
       ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')
