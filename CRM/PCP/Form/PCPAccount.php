@@ -36,6 +36,20 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
   public $_single;
 
   /**
+   * The ID of the logged in contact (if the user is logged in)
+   *
+   * @var int|null
+   */
+  public $_contactID = NULL;
+
+  /**
+   * Array of fields
+   *
+   * @var array
+   */
+  public $_fields = [];
+
+  /**
    * Get the active UFGroups (profiles) on this form
    * Many forms load one or more UFGroups (profiles).
    * This provides a standard function to retrieve the IDs of those profiles from the form

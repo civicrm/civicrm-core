@@ -136,17 +136,6 @@ table.dataTable.order-column.stripe tbody tr.extension-installed.even > .sorting
 .crm-container .crm-case-caseview-form-block table {
   box-shadow: none;
 }
-/*.crm-container .dataTables_wrapper,
-.crm-container .form-item:has(> table),
-.crm-container div:has(> table) {  simple fix-all for making many tables scroll when needed
-  overflow-x: auto;
-  max-width: 100%;
-}*/
-/* needed to reset the scroll in Thames but causes other problem - #91)
-.crm-container div:has(td span > .panel),
-.crm-container div:has(td > div > .dropdown-menu) {
-  overflow: initial;
-}*/
 .crm-selection-reset {
   padding: var(--crm-m) 0;
   margin-bottom: var(--crm-m);
@@ -393,6 +382,7 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
 .crm-container table tr.crm-row-ok,
 .crm-container table tr.crm-row-ok > td {
   background-color: var(--crm-alert-background-help);
+  color: var(--crm-alert-text-help);
 }
 .crm-container .table-hover > tbody > tr > td.success:hover,
 .crm-container .table-hover > tbody > tr > th.success:hover,
@@ -408,6 +398,7 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
 .crm-container .table tr.warning > td,
 .crm-container .table tr.warning > th {
   background-color: var(--crm-alert-background-warning);
+  color: var(--crm-alert-text-warning);
 }
 .crm-container .table-hover > tbody > tr > td.warning:hover,
 .crm-container .table-hover > tbody > tr > th.warning:hover,
@@ -423,6 +414,7 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
 .crm-container table tr.crm-row-error,
 .crm-container table tr.crm-row-error > td {
   background-color: var(--crm-alert-background-danger);
+  color: var(--crm-alert-text-danger);
 }
 .crm-container .table-hover > tbody > tr > td.danger:hover,
 .crm-container .table-hover > tbody > tr > th.danger:hover,
@@ -440,6 +432,7 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
 .crm-container table tr.crm-row-selected,
 .crm-container table tr.crm-row-selected > td {
   background-color: var(--crm-alert-background-info);
+  color: var(--crm-alert-text-info);
 }
 .crm-container .table-hover > tbody > tr > td.info:hover,
 .crm-container .table-hover > tbody > tr > th.info:hover,

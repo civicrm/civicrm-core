@@ -33,9 +33,10 @@ class CRM_Campaign_Form_Survey_TabHeader {
     CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     $tabs = $form->get('tabHeader');
     if (!$tabs || empty($_GET['reset'])) {
-      $tabs = self::process($form);
+      $tabs = self::process($form) ?? [];
       $form->set('tabHeader', $tabs);
     }
+    $tabs = \CRM_Core_Smarty::setRequiredTabTemplateKeys($tabs);
     $form->assign('tabHeader', $tabs);
     CRM_Core_Resources::singleton()
       ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')

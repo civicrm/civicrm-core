@@ -103,7 +103,7 @@
           </td>
         </tr>
         <tr>
-          <td>{$form.is_opt_out.html} {$form.is_opt_out.label} {help id="id-optOut" file="CRM/Contact/Form/Contact.hlp"}</td>
+          <td>{$form.is_opt_out.html} {$form.is_opt_out.label} {help id="id-optOut" title=$form.is_opt_out.label file="CRM/Contact/Form/Contact.hlp"}</td>
         </tr>
     </table>
  </div>

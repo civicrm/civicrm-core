@@ -324,6 +324,7 @@ div.crm-inline-edit-form div.crm-clear {
 }
 .crm-contact-page #tags {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--crm-s);
   align-items: center;
 }

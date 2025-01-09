@@ -154,7 +154,7 @@ class TokenRow {
    *
    * @param string|array $tokenEntity
    * @param string|array $tokenField
-   * @param string|array $tokenValue
+   * @param string|array|\DateTime|\Brick\Money\Money $tokenValue
    *
    * @return TokenRow
    */

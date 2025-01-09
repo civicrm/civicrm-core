@@ -12,7 +12,7 @@ use Civi\API\Event\RespondEvent;
  */
 class LocaleTest extends \CiviEndToEndTestCase {
 
-  public function getLanguageExamples(): array {
+  public static function getLanguageExamples(): array {
     $results = [];
     switch (CIVICRM_UF) {
       case 'Backdrop':

@@ -1,10 +1,5 @@
 <div af-fieldset="">
-  <div class="af-markup">
-    <div class="alert alert-warning">Click Add Membership to record a new membership. Click Submit Credit Card Membership to process a Membership on behalf of the member using their credit card.</div>
-  </div>
-  <crm-search-display-table search-name="Contact_Summary_Memberships" display-name="Contact_Summary_Memberships_Active" filters="{contact_id: options.contact_id, 'status_id.is_current_member': true}"></crm-search-display-table>
-  <div class="af-markup">
-    <div class="alert alert-info font-red">Pending and Inactive Memberships </div>
-  </div>
-  <crm-search-display-table search-name="Contact_Summary_Memberships" display-name="Contact_Summary_Memberships_Inactive" filters="{contact_id: options.contact_id, 'status_id.is_current_member': false}"></crm-search-display-table>
+  <crm-search-display-table search-name="Contact_Summary_Memberships" display-name="Contact_Summary_Memberships_Active" filters="{contact_id: options.entity_id, 'status_id.is_current_member': true}"></crm-search-display-table>
+  <h3>{{:: ts('Pending and Inactive Memberships') }}</h3>
+  <crm-search-display-table search-name="Contact_Summary_Memberships" display-name="Contact_Summary_Memberships_Inactive" filters="{contact_id: options.entity_id, 'status_id.is_current_member': false}"></crm-search-display-table>
 </div>

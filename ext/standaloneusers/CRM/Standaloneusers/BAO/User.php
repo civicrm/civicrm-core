@@ -37,6 +37,9 @@ class CRM_Standaloneusers_BAO_User extends CRM_Standaloneusers_DAO_User implemen
     elseif ($action === 'create') {
       $e->setAuthorized($mayAdminUsers);
     }
+    elseif ($action === 'sendPasswordResetEmail') {
+      $e->setAuthorized($mayAdminUsers);
+    }
     else {
       // Is there another write action we don't know about? If so, play it safe and say No.
       $e->setAuthorized(FALSE);

@@ -69,7 +69,7 @@ EOHTML;
   <fieldset af-fieldset="Individual1">
       <af-field name="first_name" defn="{required: true, input_attrs: {}}" />
       <af-field name="middle_name" />
-      <af-field name="last_name" defn="{required: false, input_attrs: {}}"/>
+      <af-field name="last_name" defn="{required: false, input_attrs: {maxlength: 20}}"/>
       <div af-join="Email">
         <div class="af-container af-layout-inline">
           <af-field name="email" />
@@ -517,6 +517,42 @@ EOHTML;
       $this->assertEquals('Email is a required field.', $e->getErrorData()['validation'][1]);
     }
 
+  }
+
+  public function testFormValidationMaxlength(): void {
+    $this->useValues([
+      'layout' => self::$layouts['updateInfo'],
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+
+    $values = [
+      'Individual1' => [
+        [
+          'fields' => [
+            'first_name' => 'Bob',
+            'last_name' => str_repeat('Too Long', 3),
+          ],
+          'joins' => [
+            'Email' => [
+              ['email' => 'test@example.org'],
+            ],
+          ],
+        ],
+      ],
+    ];
+
+    try {
+      Afform::submit()
+        ->setName($this->formName)
+        ->setValues($values)
+        ->execute();
+      $this->fail('Should have thrown exception');
+    }
+    catch (\CRM_Core_Exception $e) {
+      // Should fail required fields missing
+      $this->assertCount(1, $e->getErrorData()['validation']);
+      $this->assertEquals('Last Name has a max length of 20.', $e->getErrorData()['validation'][0]);
+    }
   }
 
   public function testFormValidationEntityJoinFields(): void {

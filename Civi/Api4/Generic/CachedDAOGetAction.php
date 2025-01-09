@@ -13,6 +13,7 @@
 namespace Civi\Api4\Generic;
 
 use Civi\API\Exception\NotImplementedException;
+use Civi\Api4\Utils\CoreUtil;
 
 /**
  * @inheritDoc
@@ -57,14 +58,34 @@ class CachedDAOGetAction extends \Civi\Api4\Generic\DAOGetAction {
   }
 
   /**
+   * Toggle the in-memory cache
+   *
+   * @param bool $useCache
+   * @return $this
+   */
+  public function setUseCache(bool $useCache): CachedDAOGetAction {
+    $this->useCache = $useCache;
+    return $this;
+  }
+
+  /**
+   * @return bool|null
+   */
+  public function getUseCache(): ?bool {
+    return $this->useCache;
+  }
+
+  /**
    * @param \Civi\Api4\Generic\Result $result
    *
    * Decide whether to use self::getFromCache or DAOGetAction::getObjects
    */
   protected function getObjects(Result $result): void {
-    if (is_null($this->useCache)) {
+    // Attempt to use the cache unless explicitly disabled
+    if ($this->useCache !== FALSE) {
       $this->useCache = !$this->needDatabase();
     }
+    $this->_debugOutput['useCache'] = $this->useCache;
     if ($this->useCache) {
       $this->getFromCache($result);
       return;
@@ -130,6 +151,11 @@ class CachedDAOGetAction extends \Civi\Api4\Generic\DAOGetAction {
    * - filter using ArrayQueryActionTrait
    */
   protected function getFromCache($result): void {
+    $idField = CoreUtil::getIdFieldName($this->getEntityName());
+    // For parity with the DAO get action, always select ID.
+    if ($this->select && !in_array($idField, $this->select)) {
+      $this->select[] = $idField;
+    }
     $values = $this->getCachedRecords();
     $this->formatRawValues($values);
     $this->queryArray($values, $result);

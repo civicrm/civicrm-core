@@ -19,12 +19,12 @@
 
 namespace api\v4\Custom;
 
+use api\v4\Api4TestBase;
 use Civi\Api4\Address;
 use Civi\Api4\Contact;
 use Civi\Api4\Activity;
 use Civi\Api4\Contribution;
 use Civi\Api4\CustomField;
-use Civi\Api4\CustomGroup;
 use Civi\Api4\Email;
 use Civi\Api4\EntityTag;
 use Civi\Api4\Participant;
@@ -32,7 +32,7 @@ use Civi\Api4\Participant;
 /**
  * @group headless
  */
-class PseudoconstantTest extends CustomTestBase {
+class PseudoconstantTest extends Api4TestBase {
 
   public function testOptionValue(): void {
     $cid = $this->createTestRecord('Contact', ['first_name', 'bill'])['id'];
@@ -154,20 +154,22 @@ class PseudoconstantTest extends CustomTestBase {
       ['id' => 'b', 'name' => 'blue', 'label' => 'BLUE', 'color' => '#0000ff', 'description' => 'Blue color', 'icon' => 'fa-blue'],
     ];
 
-    CustomGroup::create(FALSE)
-      ->addValue('title', 'myPseudoconstantTest')
-      ->addValue('extends', 'Individual')
-      ->addChain('field1', CustomField::create()
-        ->addValue('custom_group_id', '$id')
-        ->addValue('option_values', ['r' => 'red', 'g' => 'green', 'b' => 'blü'])
-        ->addValue('label', 'Color')
-        ->addValue('html_type', 'Select')
-      )->addChain('field2', CustomField::create()
-        ->addValue('custom_group_id', '$id')
-        ->addValue('option_values', $technicolor)
-        ->addValue('label', 'Multicolor')
-        ->addValue('html_type', 'CheckBox')
-      )->execute();
+    $this->createTestRecord('CustomGroup', [
+      'title' => 'myPseudoconstantTest',
+      'extends' => 'Individual',
+    ]);
+    CustomField::create(FALSE)
+      ->addValue('custom_group_id.name', 'myPseudoconstantTest')
+      ->addValue('option_values', ['r' => 'red', 'g' => 'green', 'b' => 'blü'])
+      ->addValue('label', 'Color')
+      ->addValue('html_type', 'Select')
+      ->execute();
+    CustomField::create(FALSE)
+      ->addValue('custom_group_id.name', 'myPseudoconstantTest')
+      ->addValue('option_values', $technicolor)
+      ->addValue('label', 'Multicolor')
+      ->addValue('html_type', 'CheckBox')
+      ->execute();
 
     // Ensure option_value_fields were correctly set based on provided values
     $customFields = CustomField::get(FALSE)

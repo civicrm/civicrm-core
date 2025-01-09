@@ -17,7 +17,8 @@ Overwriting CSS variables for the front is straightforward (they can be nested w
 
 ## [Changelog](CHANGELOG.md)
 
-- 1.80 (5.80) - Release for packaging with CiviCRM core, v5.80 (see note on numbering below)
+- 1.2.x-5.81 - Regression fixes against 5.81 RC  (see note on numbering below).
+- 1.1 (5.80) - Release for packaging with CiviCRM core, v5.80
 - 1.0 - **Release candidate**, with ongoing testing and fixes.
 - 0.10 - **Adds fourth stream**. Thames (Aah), as well as extensive fixes & adjustments.
 - 0.9 - **Overwrites civi core CSS**. 5.75 only - overwrites core css like SearchKit & FormBuilder with extensive work on both. D7 Garland support.
@@ -31,9 +32,11 @@ Overwriting CSS variables for the front is straightforward (they can be nested w
 - 0.1 - **Proof-of-concept**, basic variables.
 
 ### Version numbering
-RiverLea has its own version number and confusingly this has changed a few times while we figured out the best approach. It is also different in the core-extension info.xml which in core will always match the Civi version its shipped with, but as a standalone extension has its own numbering.
+RiverLea has its own version number and confusingly this has changed a few times while we figured out the best approach. It currently takes the form `[River Lea version]-[CiviCRM version built on]`.
 
-The pattern is `1.x.y` where x = the CiviCRM version it is developed against and y = the version number of of RiverLea for that Civi version. So `1.80.11` is the 11th version of RiverLea v1 built against CiviCRM `5.80.x`. Some previous versions tried to match the CiviCRM core version number and build on that (ie RiverLea 5.80.11), but this caused problems with upgrade prompts.
+This means there might be simultaneously versions `1.2.1-5.81.beta` and `1.3.0-5.82.alpha`.
+
+Please ignore previous numbering patterns.
 
 ## Installation
 

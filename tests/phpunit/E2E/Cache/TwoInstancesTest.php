@@ -44,7 +44,7 @@ class E2E_Cache_TwoInstancesTest extends CiviEndToEndTestCase {
   /**
    * Get a list of cache-creation specs.
    */
-  public function getSingleGenerators() {
+  public static function getSingleGenerators() {
     $exs = [];
     $exs[] = [
       ['type' => ['SqlGroup'], 'name' => 'TwoInstancesTest_SameSQL'],
@@ -81,7 +81,7 @@ class E2E_Cache_TwoInstancesTest extends CiviEndToEndTestCase {
   /**
    * Get a list of distinct cache-creation specs.
    */
-  public function getTwoGenerators() {
+  public static function getTwoGenerators() {
     $exs = [];
     $exs[] = [
       ['type' => ['SqlGroup'], 'name' => 'testTwo_a'],

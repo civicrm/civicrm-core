@@ -1,3 +1,22 @@
+1.2.2-5.81beta
+ - FIXED - major regression introduced in 1.2.1-5.81beta around Select2 sub-results: https://lab.civicrm.org/extensions/riverlea/-/issues/11#note_174883
+ - FIXED - contact dashboard tags didn't wrap: https://lab.civicrm.org/extensions/riverlea/-/issues/97
+
+1.2.1-5.81beta
+ - FIXED - integrated this fix to rendered radio buttons: https://github.com/civicrm/civicrm-core/pull/31345
+ - FIXED - text colour on selected rows illegible: https://lab.civicrm.org/extensions/riverlea/-/issues/94#note_174585
+ - FIXED - accordions inside Select2 now work. Some small tidying of Select2 list borders/padding.
+ - CHANGED - reduced size of 'not found' alerts in SearchKit tables: https://github.com/civicrm/civicrm-core/pull/31605
+
+1.2.0-5.81.beta
+ - CHANGED - version numbering (again!) ref
+https://lab.civicrm.org/extensions/riverlea/-/issues/44#note_174132
+ - FIXED - Thames, dropdown clipping, ref
+https://lab.civicrm.org/extensions/riverlea/-/issues/90
+ - FIXED - Backbone.js Profile edit via Event/Contribution page issues, ref https://lab.civicrm.org/extensions/riverlea/-/issues/92
+ - ADDED - crm.designer.css into /core/css to allow for RL overrides. Added some simple integrations (button colour, spacing fixe)
+ - CHANGED - dropdown items hover state now has a background color that should contrast the hover text colour - it was using a variable that was sometimes transparent, creating contrast ratio issues in Minetta
+
 1.80.14
  - FIXED - regression caused by trying to reset clipping in Thames (ref: https://lab.civicrm.org/extensions/riverlea/-/issues/91)
 

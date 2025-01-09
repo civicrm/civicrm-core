@@ -277,23 +277,42 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
   }
 
   /**
-   * Avoid e-notices on pages with tabs,
-   * by ensuring tabHeader items contain the necessary keys
+   * @deprecated
+   * Directly apply self::setRequiredTemplateTabKeys to the tabHeader
+   * variable
    */
   public function addExpectedTabHeaderKeys(): void {
+    $tabs = $this->getTemplateVars('tabHeader');
+    $tabs = self::setRequiredTabTemplateKeys($tabs);
+    $this->assign('tabHeader', $tabs);
+  }
+
+  /**
+   * Ensure an array of tabs has the required keys to be passed
+   * to our Smarty tabs templates (TabHeader.tpl or Summary.tpl)
+   */
+  public static function setRequiredTabTemplateKeys(array $tabs): array {
     $defaults = [
       'class' => '',
       'extra' => '',
-      'icon' => FALSE,
-      'count' => FALSE,
-      'template' => FALSE,
+      'icon' => NULL,
+      'count' => NULL,
+      'hideCount' => FALSE,
+      'template' => NULL,
+      'active' => TRUE,
+      'valid' => TRUE,
+      // Afform tabs set the afform module and directive - NULL for non-afform tabs
+      'module' => NULL,
+      'directive' => NULL,
     ];
 
-    $tabs = $this->getTemplateVars('tabHeader');
-    foreach ((array) $tabs as $i => $tab) {
-      $tabs[$i] = array_merge($defaults, $tab);
+    foreach ($tabs as $i => $tab) {
+      if (empty($tab['url'])) {
+        $tab['url'] = $tab['link'] ?? '';
+      }
+      $tabs[$i] = array_merge($defaults, (array) $tab);
     }
-    $this->assign('tabHeader', $tabs);
+    return $tabs;
   }
 
   /**
@@ -537,6 +556,10 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
   }
 
   public function getVersion (): int {
+    return static::findVersion();
+  }
+
+  public static function findVersion(): int {
     static $version;
     if ($version === NULL) {
       if (class_exists('Smarty\Smarty')) {

@@ -18,14 +18,9 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
 
   /**
    * Clean up after the test.
-   *
-   * @throws \Civi\Core\Exception\DBQueryException
    */
   public function tearDown(): void {
-    $this->quickCleanup(['civicrm_contact'], TRUE);
-    if (isset($this->groupID)) {
-      $this->callAPISuccess('group', 'delete', ['id' => $this->groupID]);
-    }
+    $this->quickCleanup(['civicrm_contact', 'civicrm_group'], TRUE);
     parent::tearDown();
   }
 
@@ -134,7 +129,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
     $this->setupForGroupDedupe();
 
     // Create custom group with fields of all types to test.
-    $this->callAPISuccess('ContactType', 'create', ['name' => 'Big Bank', 'label' => 'biggie', 'parent_id' => 'Individual']);
+    $this->createTestEntity('ContactType', ['name' => 'Big_Bank', 'label' => 'biggie', 'parent_id:name' => 'Individual']);
     foreach ($this->ids['Contact'] as $contact_id) {
       $this->callAPISuccess('Contact', 'create', array_merge([
         'id' => $contact_id,

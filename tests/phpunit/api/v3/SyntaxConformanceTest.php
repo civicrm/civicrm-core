@@ -90,8 +90,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $this->toBeImplemented['get'] = [
       // Not apiv3.
       'Afform',
-      // CxnApp.get exists but relies on remote data outside our control; QA w/UtilsTest::testBasicArrayGet
-      'CxnApp',
       'Profile',
       'CustomValue',
       'Constant',
@@ -105,8 +103,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     ];
     $this->toBeImplemented['create'] = [
       'Afform',
-      'Cxn',
-      'CxnApp',
       'SurveyRespondant',
       'OptionGroup',
       'MailingRecipients',
@@ -122,8 +118,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Logging',
     ];
     $this->toBeImplemented['delete'] = [
-      'Cxn',
-      'CxnApp',
       'MembershipPayment',
       'OptionGroup',
       'SurveyRespondant',
@@ -164,11 +158,18 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     // crept into the system where civicrm_api('Entity','get') must be called as part of entities()
     // (even if its return value is ignored).
 
-    $tmp = civicrm_api('Entity', 'Get', ['version' => 3]);
     if (getenv('SYNTAX_CONFORMANCE_ENTITIES')) {
       $tmp = [
         'values' => explode(' ', getenv('SYNTAX_CONFORMANCE_ENTITIES')),
       ];
+    }
+    elseif (isset(\Civi\Test::$statics[__CLASS__]['entities'])) {
+      $tmp = \Civi\Test::$statics[__CLASS__]['entities'];
+    }
+    else {
+      \Civi\Test::asPreInstall([static::CLASS, 'buildEnvironment'])->apply();
+      $tmp = civicrm_api('Entity', 'Get', ['version' => 3]);
+      \Civi\Test::$statics[__CLASS__]['entities'] = $tmp;
     }
 
     if (!is_array($skip)) {
@@ -400,12 +401,10 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       // ones that are not real entities hence not extendable.
       'ActivityType',
       'Entity',
-      'Cxn',
       'Constant',
       'Attachment',
       'CustomSearch',
       'CustomValue',
-      'CxnApp',
       'Extension',
       'MailingContact',
       'User',

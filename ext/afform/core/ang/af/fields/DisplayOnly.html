@@ -1,1 +1,13 @@
-{{dataProvider.getFieldData()[$ctrl.fieldName]}}
+<span ng-if="dataProvider.getFieldData()[$ctrl.fieldName].file_name">
+  <a ng-if="dataProvider.getFieldData()[$ctrl.fieldName].url" ng-href="{{:: dataProvider.getFieldData()[$ctrl.fieldName].url }}">
+    <i class="crm-i {{ dataProvider.getFieldData()[$ctrl.fieldName].icon }}"></i>
+    {{ dataProvider.getFieldData()[$ctrl.fieldName].file_name }}
+  </a>
+  <span ng-if="!dataProvider.getFieldData()[$ctrl.fieldName].url">
+    <i class="crm-i {{ dataProvider.getFieldData()[$ctrl.fieldName].icon }}"></i>
+    {{ dataProvider.getFieldData()[$ctrl.fieldName].file_name }}
+  </span>
+</span>
+<span ng-if="!dataProvider.getFieldData()[$ctrl.fieldName].file_name">
+  {{ dataProvider.getFieldData()[$ctrl.fieldName] }}
+</span>

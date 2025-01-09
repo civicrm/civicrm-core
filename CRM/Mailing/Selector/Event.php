@@ -31,9 +31,9 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
 
   /**
    * What event type are we browsing?
-   * @var sting
+   * @var string
    */
-  private $_event;
+  private $_event_type;
 
   /**
    * Should we only count distinct contacts?

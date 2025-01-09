@@ -6,7 +6,10 @@
   <fieldset ng-repeat="join in $ctrl.savedSearch.api_params.join" class="crm-search-join">
     <div class="form-inline">
       <select class="form-control" ng-model="join[1]" ng-change="$ctrl.changeJoinType(join)" ng-options="o.k as o.v for o in ::joinTypes" ></select>
-      <input id="crm-search-join-{{ $index }}" class="form-control huge" ng-model="join[0]" crm-ui-select="{placeholder: ' ', data: getJoinEntities}" disabled >
+      <div class="input-group">
+        <span class="input-group-addon" title="{{:: getJoin(join[0]).defaultLabel }}"><i class="crm-i {{:: getJoin(join[0]).icon }}"></i></span>
+        <input class="form-control crm-search-join-label huge" ng-model="$ctrl.getSetJoinLabel(join[0])" ng-model-options="{getterSetter: true, updateOn: 'blur'}" placeholder="{{:: getJoin(join[0]).defaultLabel }}" title="{{:: ts('Optional label for this join') }}">
+      </div>
       <button type="button" class="btn btn-xs btn-danger-outline" ng-click="$ctrl.removeJoin($index)" title="{{:: ts('Remove join') }}">
         <i class="crm-i fa-trash" aria-hidden="true"></i>
       </button>

@@ -382,6 +382,15 @@ div:has(> table) {
   overflow-x: auto;
   max-width: 100%;
 }
+/* When a menu is activated, allow it 20rem height to prevent it causing scroll
+ * when the menu is opened on a row near the bottom of the table and
+ * which the user might not notice / might make the menu hard to access.
+ * https://lab.civicrm.org/extensions/riverlea/-/issues/90
+ */
+div:has(> table .btn-slide-active),
+div:has(> table .dropdown-toggle[aria-expanded="true"]) {
+  padding-bottom: 20rem;
+}
 
 /* ...and adjust the individual row checkboxes to be in line
  * Ah, no we have no way to target these.

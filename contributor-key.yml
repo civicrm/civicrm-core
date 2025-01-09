@@ -351,6 +351,9 @@
 
 - name        : Daniel Martinez
 
+- github      : danielstrum
+  name        : Daniel Strum
+
 - github      : DanielvV
   name        : Daniël van Vuuren
 
@@ -1854,3 +1857,7 @@
 - github      : jsuchogorska
   name        : Joanna Suchogórska
   organization: Future Processing
+
+- github      : anwenw
+  name        : Anwen Williams
+  organization: BrightMinded Ltd

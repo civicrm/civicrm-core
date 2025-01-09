@@ -105,10 +105,10 @@ class FileGetSpecProvider extends \Civi\Core\Service\AutoService implements Gene
       }
     }
     if (isset($entityIdField)) {
-      return "CONCAT('civicrm/file?reset=1&id=', $idField[sql_name], '&eid=', $entityIdField[sql_name])";
+      return "CONCAT('civicrm/file?reset=1&id=', {$idField['sql_name']}, '&eid=', {$entityIdField['sql_name']})";
     }
-    // Guess we couldn't find an `entity_id` in the query. This function could probably be improved.
-    return "NULL";
+    // Couldn't find an `entity_id` in the query so add a subquery instead.
+    return "CONCAT('civicrm/file?reset=1&id=', {$idField['sql_name']}, '&eid=', (SELECT `entity_id` FROM `civicrm_entity_file` WHERE `file_id` = {$idField['sql_name']} LIMIT 1))";
   }
 
   public static function renderFileIsImage(array $mimeTypeField, Api4SelectQuery $query): string {

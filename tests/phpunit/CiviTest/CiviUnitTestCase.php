@@ -28,6 +28,7 @@
 declare(strict_types = 1);
 use Civi\Api4\Address;
 use Civi\Api4\CiviCase;
+use Civi\Api4\ContactType;
 use Civi\Api4\Contribution;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
@@ -82,7 +83,7 @@ define('API_LATEST_VERSION', 3);
  *
  * @package CiviCRM
  */
-class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
+class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
 
   use Api3TestTrait;
   use EventTestTrait;
@@ -282,23 +283,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   }
 
   /**
-   * Override to run the test and assert its state.
-   *
-   * @return mixed
-   *
-   * @throws \Throwable
-   */
-  protected function runTest() {
-    try {
-      return parent::runTest();
-    }
-    catch (PEAR_Exception $e) {
-      // PEAR_Exception has metadata in funny places, and PHPUnit won't log it nicely
-      throw new Exception(\CRM_Core_Error::formatTextException($e), $e->getCode());
-    }
-  }
-
-  /**
    * Declare the environment that we wish to run in.
    *
    * TODO: The hope is to get this to align with `Civi\Test::headless()` and perhaps
@@ -310,10 +294,21 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    */
   final public static function buildEnvironment(): \Civi\Test\CiviEnvBuilder {
     // Ideally: return Civi\Test::headless();
-    $b = new \Civi\Test\CiviEnvBuilder();
-    $b->callback(function () {
-      fprintf(STDERR, "\nInstalling %s database\n", \Civi\Test::dsn('database'));
-    });
+
+    // Currently, `CiviUnitTestCase::setUpBeforeClass()` is forcing us to run on nearly ever class.
+    // (That should ideally be fixed - but doing so would reveal other bugs and need other work)
+    // So for the moment, the choices here impact overall performance -- e.g. doing a full init
+    // (CREATE TABLE, etc) would exaggerate the performance penalty. So we can't quite do that (yet).
+
+    // Rough guess: If we lack ordinary tables, then we do need full initialization.
+    $actualTables = \Civi\Test::schema()->getTables('BASE TABLE');
+    $expectTables = ['civicrm_contact', 'civicrm_option_value', 'civicrm_worldregion', 'civitest_revs'];
+    if (4 !== count(array_intersect($expectTables, $actualTables))) {
+      return \Civi\Test::headless();
+    }
+
+    // Otherwise: Merely TRUNCATE and INSERT basic data
+    $b = new \Civi\Test\CiviEnvBuilder('Basic Data');
     $b->callback([\Civi\Test::data(), 'populate']);
     return $b;
   }
@@ -559,6 +554,15 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       DedupeRule::delete(FALSE)->addWhere('dedupe_rule_group_id', 'IN', $this->ids['DedupeRuleGroup'])->execute();
       DedupeRuleGroup::delete(FALSE)->addWhere('id', 'IN', $this->ids['DedupeRuleGroup'])->execute();
     }
+    if (!empty($this->ids['RelationshipType'])) {
+      RelationshipType::delete(FALSE)->addWhere('id', 'IN', $this->ids['RelationshipType'])->execute();
+    }
+    if (!empty($this->ids['ContactType'])) {
+      ContactType::delete(FALSE)->addWhere('id', 'IN', $this->ids['ContactType'])->execute();
+    }
+    if (!empty($this->ids['OptionValue'])) {
+      OptionValue::delete(FALSE)->addWhere('id', 'IN', $this->ids['OptionValue'])->execute();
+    }
     unset(CRM_Core_Config::singleton()->userPermissionClass->permissions);
     parent::tearDown();
   }
@@ -725,6 +729,8 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $params['end_event'] = 'end_date';
     $params['is_current_member'] = 1;
     $params['is_active'] = 1;
+    // Make sure weight is after existing statuses (could be cleverer and get max(weight) first).
+    $params['weight'] = 100;
 
     $result = $this->callAPISuccess('MembershipStatus', 'Create', $params);
     CRM_Member_PseudoConstant::flush('membershipStatus');
@@ -768,10 +774,8 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @param array $params
    *
    * @return int
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function relationshipTypeCreate($params = []) {
+  public function relationshipTypeCreate(array $params = []): int {
     $params = array_merge([
       'name_a_b' => 'Relation 1 for relationship type create',
       'name_b_a' => 'Relation 2 for relationship type create',
@@ -781,7 +785,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'is_active' => 1,
     ], $params);
 
-    $result = $this->callAPISuccess('relationship_type', 'create', $params);
+    $result = $this->createTestEntity('RelationshipType', $params, $params['name_a_b']);
     CRM_Core_PseudoConstant::flush('relationshipType');
 
     return $result['id'];
@@ -2079,8 +2083,8 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     if ($ov->find(TRUE)) {
       CRM_Core_DAO::executeQuery("DELETE FROM civicrm_option_value WHERE id = {$ov->id}");
     }
-    $this->callAPISuccess('option_value', 'create', [
-      'option_group_id' => $optionGroupID,
+    $this->createTestEntity('OptionValue', [
+      'option_group_id:name' => 'acl_role',
       'label' => 'pick me',
       'value' => 55,
     ]);
@@ -3918,4 +3922,32 @@ WHERE table_schema = DATABASE()");
     return $data;
   }
 
+}
+
+if (version_compare(phpversion(), '8', '<')) {
+  class CiviUnitTestCase extends CiviUnitTestCaseCommon {
+
+  }
+}
+else {
+  class CiviUnitTestCase extends CiviUnitTestCaseCommon {
+
+    /**
+     * Override to run the test and assert its state.
+     *
+     * @return mixed
+     *
+     * @throws \Throwable
+     */
+    protected function runTest(): mixed {
+      try {
+        return parent::runTest();
+      }
+      catch (PEAR_Exception $e) {
+        // PEAR_Exception has metadata in funny places, and PHPUnit won't log it nicely
+        throw new Exception(\CRM_Core_Error::formatTextException($e), $e->getCode());
+      }
+    }
+
+  }
 }

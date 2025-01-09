@@ -17,7 +17,7 @@
  */
 
 
-namespace Civi\tests\phpunit\api\v4\Action;
+namespace api\v4\Action;
 
 use Civi\Api4\Contact;
 use Civi\Api4\Setting;

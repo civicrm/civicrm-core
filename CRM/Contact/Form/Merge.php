@@ -19,15 +19,66 @@
  * Class CRM_Contact_Form_Merge.
  */
 class CRM_Contact_Form_Merge extends CRM_Core_Form {
-  // The id of the contact that there's a duplicate for; this one will
+
   /**
+   * Rule group ID
+   *
+   * @var int
+   */
+  public $_rgid;
+
+  /**
+   * Group ID
+   *
+   * @var int
+   */
+  public $_gid;
+
+  /**
+   * @var int
+   */
+  public $_mergeId;
+
+  /**
+   * The URL to view the "next" mergeable contact
+   *
+   * @var string|null
+   */
+  public $next = NULL;
+
+  /**
+   * The URL to view the "previous" mergeable contact
+   *
+   * @var string|null
+   */
+  public $prev = NULL;
+
+  /**
+   * Details about the main contact, required for the merge handler and UI.
+   *
+   * @var array
+   */
+  protected $_mainDetails;
+
+  /**
+   * Details about the other contact, required for the merge handler and UI.
+   *
+   * @var array
+   */
+  protected $_otherDetails;
+
+
+  /**
+   * The id of the contact that there's a duplicate for; this one will
    * possibly inherit some of $_oid's properties and remain in the system.
+   *
    * @var int
    */
   public $_cid = NULL;
 
   /**
    * The id of the other contact - the duplicate one that will get deleted.
+   *
    * @var int
    */
   public $_oid = NULL;
@@ -35,9 +86,11 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
   public $_contactType = NULL;
 
   /**
-   * @var array
+   * JSON encoded string
+   *
+   * @var string
    */
-  public $criteria = [];
+  public $criteria;
 
   /**
    * Query limit to be retained in the urls.

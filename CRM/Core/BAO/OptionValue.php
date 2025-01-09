@@ -185,7 +185,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue implements \Civi
       CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_option_value', $optionValue->id, $op);
     }
 
-    Civi::cache('metadata')->flush();
+    Civi::cache('metadata')->clear();
     CRM_Core_PseudoConstant::flush();
 
     CRM_Utils_Hook::post($op, 'OptionValue', $id, $optionValue);
@@ -236,7 +236,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue implements \Civi
   public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
     if ($event->action === 'delete' && $event->id) {
       if (self::updateRecords($event->id, CRM_Core_Action::DELETE)) {
-        Civi::cache('metadata')->flush();
+        Civi::cache('metadata')->clear();
         CRM_Core_PseudoConstant::flush();
       }
     }

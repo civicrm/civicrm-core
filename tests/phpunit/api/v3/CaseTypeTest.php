@@ -231,8 +231,8 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
     $template['name'] = $template['title'] = 'test_case_type';
     $template['definition']['statuses'] = ['Closed', $statusName];
     $this->callAPISuccess('CaseType', 'create', $template);
-    $this->callAPISuccess('OptionValue', 'create', [
-      'option_group_id' => 'case_status',
+    $this->createTestEntity('OptionValue', [
+      'option_group_id:name' => 'case_status',
       'name' => $statusName,
       'label' => $statusName,
       'weight' => 99,

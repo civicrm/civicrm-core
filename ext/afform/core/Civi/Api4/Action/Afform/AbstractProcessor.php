@@ -241,7 +241,10 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
       if (!empty($result[$key])) {
         $data = ['fields' => $result[$key]];
         foreach ($entity['joins'] ?? [] as $joinEntity => $join) {
-          $data['joins'][$joinEntity] = $this->loadJoins($joinEntity, $join, $entity, $entityId, $index);
+          $joinAllowedAction = self::getJoinAllowedAction($entity, $joinEntity);
+          if ($joinAllowedAction['update']) {
+            $data['joins'][$joinEntity] = $this->loadJoins($joinEntity, $entity, $entityId, $index);
+          }
         }
         $this->_entityValues[$entity['name']][$index] = $data;
       }
@@ -251,8 +254,9 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   /**
    * Finds all joins after loading an entity.
    */
-  public function loadJoins($joinEntity, $join, $afEntity, $entityId, $index): array {
+  public function loadJoins(string $joinEntity, array $afEntity, $entityId, $index): array {
     $joinIdField = CoreUtil::getIdFieldName($joinEntity);
+    $join = $afEntity['joins'][$joinEntity];
     $multipleLocationBlocks = is_array($join['data']['location_type_id'] ?? NULL);
     $limit = 1;
     // Repeating blocks - set limit according to `max`, if set, otherwise 0 for unlimited
@@ -323,7 +327,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   }
 
   /**
-   * Delegated by loadEntity to call API.get and fill in additioal info
+   * Delegated by loadEntity to call API.get and fill in additional info
    *
    * @param string $afEntityName
    *   e.g. Individual1
@@ -343,10 +347,14 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     // Fill additional info about file fields
     $fileFields = $this->getFileFields($apiEntityName, $entityFields);
     foreach ($fileFields as $fieldName => $fieldDefn) {
+      $select = ['file_name', 'icon'];
+      if ($this->canViewFileAttachments($afEntityName)) {
+        $select[] = 'url';
+      }
       foreach ($result as &$item) {
         if (!empty($item[$fieldName])) {
           $fileInfo = File::get(FALSE)
-            ->addSelect('file_name', 'icon')
+            ->setSelect($select)
             ->addWhere('id', '=', $item[$fieldName])
             ->execute()->first();
           $item[$fieldName] = $fileInfo;
@@ -354,6 +362,11 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
       }
     }
     return $result;
+  }
+
+  private function canViewFileAttachments(string $afEntityName): bool {
+    $afEntity = $this->_formDataModel->getEntity($afEntityName);
+    return ($afEntity['security'] === 'FBAC' || \CRM_Core_Permission::check('access uploaded files'));
   }
 
   protected static function getFileFields($entityName, $entityFields): array {
@@ -453,9 +466,13 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   }
 
   protected static function getFkField($mainEntity, $otherEntity): ?array {
+    $fkEntities = [$otherEntity];
+    if ($otherEntity !== 'Contact' && CoreUtil::isContact($otherEntity)) {
+      $fkEntities[] = 'Contact';
+    }
     foreach (self::getEntityFields($mainEntity) as $field) {
       if ($field['type'] === 'Field' && empty($field['custom_field_id']) &&
-        ($field['fk_entity'] === $otherEntity || in_array($otherEntity, $field['dfk_entities'] ?? [], TRUE))
+        (in_array($field['fk_entity'], $fkEntities, TRUE) || array_intersect($fkEntities, $field['dfk_entities'] ?? []))
       ) {
         return $field;
       }
@@ -721,6 +738,23 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   protected static function getNestedKey(array $values) {
     $firstValue = \CRM_Utils_Array::first(array_filter($values));
     return is_array($firstValue) && $firstValue ? array_keys($firstValue)[0] : NULL;
+  }
+
+  /**
+   * Function to get allowed action of a join entity
+   *
+   * @param array $mainEntity
+   * @param string $joinEntityName
+   *
+   * @return array{update: bool, delete: bool}
+   */
+  public static function getJoinAllowedAction(array $mainEntity, string $joinEntityName) {
+    $actions = ["update" => TRUE, "delete" => TRUE];
+    if (array_key_exists('actions', $mainEntity['joins'][$joinEntityName])) {
+      $actions = array_merge($actions, $mainEntity['joins'][$joinEntityName]['actions']);
+    }
+
+    return $actions;
   }
 
 }

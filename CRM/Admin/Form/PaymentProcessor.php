@@ -333,7 +333,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     $cards = json_decode(CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessor',
           $this->_id,
           'accepted_credit_cards'
-        ), TRUE);
+         ) ?? '', TRUE);
     $acceptedCards = [];
     if (!empty($cards)) {
       foreach ($cards as $card => $val) {

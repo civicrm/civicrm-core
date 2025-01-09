@@ -1,12 +1,11 @@
 <div af-fieldset="">
+  <crm-search-display-table search-name="Contact_Summary_Relationships" display-name="Contact_Summary_Relationships_Active" filters="{near_contact_id: options.entity_id, is_current: true}"></crm-search-display-table>
+  <h3>{{:: ts('Inactive Relationships') }}</h3>
+  <div class="help">{{:: ts('These relationships are Disabled OR have a past End Date.') }}</div>
+  <crm-search-display-table search-name="Contact_Summary_Relationships" display-name="Contact_Summary_Relationships_Inactive" filters="{near_contact_id: options.entity_id, is_current: false}"></crm-search-display-table>
   <div class="help">
     <strong>{{:: ts('Permissioned Relationships:') }}</strong>
     <i class="crm-i fa-eye"></i> {{:: ts('This contact can be viewed by the other.') }}
     <i class="crm-i fa-pencil-square"></i> {{:: ts('This contact can be viewed and edited by the other.') }}
   </div>
-  <h3>{{:: ts('Current Relationships') }}</h3>
-  <crm-search-display-table search-name="Contact_Summary_Relationships" display-name="Contact_Summary_Relationships_Active" filters="{near_contact_id: options.contact_id, is_current: true}"></crm-search-display-table>
-  <h3>{{:: ts('Inactive Relationships') }}</h3>
-  <div class="help">{{:: ts('These relationships are Disabled OR have a past End Date.') }}</div>
-  <crm-search-display-table search-name="Contact_Summary_Relationships" display-name="Contact_Summary_Relationships_Inactive" filters="{near_contact_id: options.contact_id, is_current: false}"></crm-search-display-table>
 </div>

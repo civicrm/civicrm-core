@@ -436,7 +436,7 @@
           }
           return val;
         }
-        return $scope.getProp(propName);
+        return $scope.getProp(propName) || '';
       }
       this.getSet = getSet;
 

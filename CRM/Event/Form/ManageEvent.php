@@ -396,9 +396,10 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
   private function build() {
     $tabs = $this->get('tabHeader');
     if (!$tabs || empty($_GET['reset'])) {
-      $tabs = $this->processTab();
+      $tabs = $this->processTab() ?? [];
       $this->set('tabHeader', $tabs);
     }
+    $tabs = \CRM_Core_Smarty::setRequiredTabTemplateKeys($tabs);
     $this->assign('tabHeader', $tabs);
     CRM_Core_Resources::singleton()
       ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')
@@ -429,21 +430,21 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
     ];
 
     $tabs = [];
-    $tabs['settings'] = ['title' => ts('Info and Settings'), 'class' => 'ajaxForm livePage'] + $default;
-    $tabs['location'] = ['title' => ts('Event Location')] + $default;
+    $tabs['settings'] = ['title' => ts('Info and Settings'), 'class' => 'ajaxForm livePage', 'icon' => 'crm-i fa-circle-info'] + $default;
+    $tabs['location'] = ['title' => ts('Event Location'), 'icon' => 'crm-i fa-map-marker'] + $default;
     // If CiviContribute is active, create the Fees tab.
     if (CRM_Core_Component::isEnabled('CiviContribute')) {
-      $tabs['fee'] = ['title' => ts('Fees')] + $default;
+      $tabs['fee'] = ['title' => ts('Fees'), 'icon' => 'crm-i fa-money'] + $default;
     }
-    $tabs['registration'] = ['title' => ts('Online Registration')] + $default;
+    $tabs['registration'] = ['title' => ts('Online Registration'), 'icon' => 'crm-i fa-check'] + $default;
     // @fixme I don't understand the event permissions check here - can we just get rid of it?
     $permissions = CRM_Event_BAO_Event::getAllPermissions();
     if (CRM_Core_Permission::check('administer CiviCRM data') || !empty($permissions[CRM_Core_Permission::EDIT])) {
-      $tabs['reminder'] = ['title' => ts('Schedule Reminders'), 'class' => 'livePage'] + $default;
+      $tabs['reminder'] = ['title' => ts('Schedule Reminders'), 'class' => 'livePage', 'icon' => 'crm-i fa-envelope'] + $default;
     }
 
-    $tabs['pcp'] = ['title' => ts('Personal Campaigns')] + $default;
-    $tabs['repeat'] = ['title' => ts('Repeat')] + $default;
+    $tabs['pcp'] = ['title' => ts('Personal Campaigns'), 'icon' => 'crm-i fa-user'] + $default;
+    $tabs['repeat'] = ['title' => ts('Repeat'), 'icon' => 'crm-i fa-repeat'] + $default;
 
     // Repeat tab must refresh page when switching repeat mode so js & vars will get set-up
     if (!$this->_isRepeatingEvent) {
