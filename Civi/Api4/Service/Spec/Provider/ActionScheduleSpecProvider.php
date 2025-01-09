@@ -25,13 +25,15 @@ class ActionScheduleSpecProvider extends \Civi\Core\Service\AutoService implemen
    */
   public function modifySpec(RequestSpec $spec) {
     if ($spec->getAction() === 'create') {
-      $spec->getFieldByName('title')->setRequired(TRUE);
+      $spec->getFieldByName('title')->setRequiredIf('empty($values.name)');
       $spec->getFieldByName('name')->setRequired(FALSE);
-      $spec->getFieldByName('mapping_id')->setRequired(TRUE);
+      // Repeat events do not require mapping_id or start_action_unit (or seemingly start_action_condition)- although
+      // we don't have that level of nuance available so we make them optional for all events.
+      $spec->getFieldByName('mapping_id')->setRequiredIf('empty($values.used_for) || $values.used_for !== "civicrm_event"');
+      $spec->getFieldByName('start_action_unit')->setRequiredIf('empty($values.absolute_date) && (empty($values.used_for) || $values.used_for !== "civicrm_event")');
+      $spec->getFieldByName('start_action_condition')->setRequiredIf('empty($values.absolute_date) && (empty($values.used_for) || $values.used_for !== "civicrm_event")');
       $spec->getFieldByName('entity_value')->setRequired(TRUE);
       $spec->getFieldByName('start_action_offset')->setRequiredIf('empty($values.absolute_date)');
-      $spec->getFieldByName('start_action_unit')->setRequiredIf('empty($values.absolute_date)');
-      $spec->getFieldByName('start_action_condition')->setRequiredIf('empty($values.absolute_date)');
       $spec->getFieldByName('start_action_date')->setRequiredIf('empty($values.absolute_date)');
       $spec->getFieldByName('absolute_date')->setRequiredIf('empty($values.start_action_date)');
       $spec->getFieldByName('group_id')->setRequiredIf('!empty($values.limit_to) && !empty($values.recipient) && $values.recipient === "group"');

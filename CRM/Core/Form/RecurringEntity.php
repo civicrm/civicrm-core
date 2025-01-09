@@ -15,6 +15,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
+use Civi\Api4\ActionSchedule;
 
 /**
  * This class generates form components for processing Entity.
@@ -126,7 +127,7 @@ class CRM_Core_Form_RecurringEntity {
     if (self::$_scheduleReminderID) {
       $defaults['repetition_frequency_unit'] = self::$_scheduleReminderDetails->repetition_frequency_unit;
       $defaults['repetition_frequency_interval'] = self::$_scheduleReminderDetails->repetition_frequency_interval;
-      $defaults['start_action_condition'] = array_flip(explode(",", self::$_scheduleReminderDetails->start_action_condition));
+      $defaults['start_action_condition'] = array_flip(explode(",", (string) self::$_scheduleReminderDetails->start_action_condition));
       foreach ($defaults['start_action_condition'] as $key => $val) {
         $val = 1;
         $defaults['start_action_condition'][$key] = $val;
@@ -357,11 +358,14 @@ class CRM_Core_Form_RecurringEntity {
           unset($params['id']);
         }
         $dbParams['name'] = 'repeat_' . $params['used_for'] . '_' . $params['entity_id'];
-        $actionScheduleObj = CRM_Core_BAO_ActionSchedule::writeRecord($dbParams);
+        $actionSchedule = ActionSchedule::save(FALSE)
+          ->addRecord($dbParams)
+          ->setMatch(['name'])
+          ->execute()->first();
 
         //exclude dates
         $excludeDateList = [];
-        if (!empty($params['exclude_date_list']) && !empty($params['parent_entity_id']) && $actionScheduleObj->entity_value) {
+        if (!empty($params['exclude_date_list']) && !empty($params['parent_entity_id']) && $actionSchedule['entity_value']) {
           //Since we get comma separated values lets get them in array
           $excludeDates = explode(",", $params['exclude_date_list']);
 
@@ -375,7 +379,7 @@ class CRM_Core_Form_RecurringEntity {
             CRM_Core_BAO_OptionGroup::deleteRecord(['id' => $optionGroupIdExists]);
           }
           $optionGroupParams = [
-            'name' => $type . '_repeat_exclude_dates_' . $actionScheduleObj->entity_value,
+            'name' => $type . '_repeat_exclude_dates_' . CRM_Core_DAO::serializeField($actionSchedule['entity_value'], CRM_Core_DAO::SERIALIZE_SEPARATOR_TRIMMED),
             'title' => $type . ' recursion',
             'is_reserved' => 0,
             'is_active' => 1,
@@ -428,7 +432,7 @@ class CRM_Core_Form_RecurringEntity {
 
         $recursion = new CRM_Core_BAO_RecurringEntity();
         $recursion->dateColumns = $params['dateColumns'];
-        $recursion->scheduleId = $actionScheduleObj->id;
+        $recursion->scheduleId = $actionSchedule['id'];
 
         if (!empty($excludeDateList)) {
           $recursion->excludeDates = $excludeDateList;
