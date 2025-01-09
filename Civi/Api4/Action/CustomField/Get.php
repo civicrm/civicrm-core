@@ -43,7 +43,7 @@ class Get extends \Civi\Api4\Generic\CachedDAOGetAction {
    */
   protected function getCachedRecords(): array {
     $records = [];
-    $groups = \CRM_Core_BAO_CustomGroup::getAll();
+    $groups = \CRM_Core_BAO_CustomGroup::getAll([], $this->getCheckPermissions() ? \CRM_Core_Permission::VIEW : NULL);
     foreach ($groups as $group) {
       $groupInfo = $group;
       unset($groupInfo['fields']);
