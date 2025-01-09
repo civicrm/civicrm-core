@@ -323,8 +323,12 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
 
       // hack, make sure we reset the task values
       $stateMachine = $this->controller->getStateMachine();
-      $formName = $stateMachine->getTaskFormName();
-      $this->controller->resetPage($formName);
+      // See https://lab.civicrm.org/dev/core/-/issues/5602
+      // We do not know when this would be false....
+      if (is_object($stateMachine) && method_exists($stateMachine, 'getTaskFormName')) {
+        $formName = $stateMachine->getTaskFormName();
+      }
+      $this->controller->resetPage($formName ?? '');
       return;
     }
 
