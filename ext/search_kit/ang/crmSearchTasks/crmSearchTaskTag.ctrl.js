@@ -67,6 +67,7 @@
         params.records = ctrl.selection.map(tagId => {
           return {tag_id: tagId};
         });
+        params.match = ['entity_id', 'tag_id', 'entity_table'];
       }
       // Remove tags
       else {
