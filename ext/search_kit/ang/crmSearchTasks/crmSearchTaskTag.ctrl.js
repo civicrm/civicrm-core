@@ -86,11 +86,19 @@
       });
     };
 
-    this.onSuccess = function() {
+    this.onSuccess = function(result) {
+      let msg;
       if (ctrl.action === 'delete') {
-        CRM.alert(ts('Removed tags from %1 %2.', {1: ctrl.ids.length, 2: ctrl.entityTitle}), ts('Saved'), 'success');
+        msg = result.batchCount === 1 ? ts('1 tag removed.') : ts('%1 tags removed.', {1: result.batchCount});
+        CRM.alert(msg, ts('Saved'), 'success');
       } else {
-        CRM.alert(ts('Added tags to %1 %2.', {1: ctrl.ids.length, 2: ctrl.entityTitle}), ts('Saved'), 'success');
+        const added = result.batchCount - result.countMatched;
+        msg = added === 1 ? ts('1 tag added') : ts('%1 tags added.', {1: added});
+        msg += '<br/>';
+        if (result.countMatched > 0) {
+          msg += result.countMatched === 1 ? ts('1 tag already exists and was not added.') : ts('%1 tags already exist and were not added.', {1: result.countMatched});
+        }
+        CRM.alert(msg, ts('Saved'), 'success');
       }
       this.close();
     };
