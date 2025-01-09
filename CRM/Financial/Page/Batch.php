@@ -81,7 +81,9 @@ class CRM_Financial_Page_Batch extends CRM_Core_Page_Basic {
   public function browse() {
     $status = CRM_Utils_Request::retrieve('status', 'Positive', CRM_Core_DAO::$_nullObject, FALSE, 1);
     $this->assign('status', $status);
-    $this->assign('financialAJAXQFKey', CRM_Core_Key::get('CRM_Financial_Page_AJAX'));
+    $financialAJAXQFKey = CRM_Core_Key::get('CRM_Financial_Page_AJAX');
+    $this->assign('financialAJAXQFKey', $financialAJAXQFKey);
+    $this->assign('financialUrl', CRM_Utils_System::url('civicrm/ajax/rest', ['className' => 'CRM_Financial_Page_AJAX', 'fnName' => 'assignRemove', 'qfKey' => $financialAJAXQFKey]));
     $this->search();
   }
 
