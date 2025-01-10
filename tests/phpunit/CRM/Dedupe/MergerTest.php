@@ -30,6 +30,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
+    $this->quickCleanUpFinancialEntities();
     $this->quickCleanup([
       'civicrm_contact',
       'civicrm_group_contact',

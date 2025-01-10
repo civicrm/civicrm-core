@@ -1024,6 +1024,9 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       'installments' => 5,
     ],
       $params);
+    if (empty($params['contact_id'])) {
+      $params['contact_id'] = $this->individualCreate([], 'pledge');
+    }
 
     $result = $this->createTestEntity('Pledge', $params);
     return $result['id'];
