@@ -83,7 +83,7 @@ abstract class AbstractGetAction extends AbstractQueryAction {
     }
     foreach ($uniqueIndices as $indexFields) {
       $fetchByUnique = TRUE;
-      foreach ($indexFields as $fieldName) {
+      foreach ($indexFields ?: [] as $fieldName) {
         if (!$this->_itemsToGet($fieldName)) {
           $fetchByUnique = FALSE;
         }
