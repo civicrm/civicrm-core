@@ -75,7 +75,12 @@ function _phpunit_mockoloader($prefix, $base_dir, $class) {
  */
 function cv($cmd, $decode = 'json') {
   // If xdebug is active when launching phpunit, we usually want to focus on phpunit.
-  $cmd = 'env XDEBUG_MODE=off XDEBUG_PORT= cv ' . $cmd;
+  if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
+    $cmd = 'env XDEBUG_MODE=off XDEBUG_PORT= cv ' . $cmd;
+  }
+  else {
+    $cmd = 'cv ' . $cmd;
+  }
   $descriptorSpec = [0 => ["pipe", "r"], 1 => ["pipe", "w"], 2 => STDERR];
   $oldOutput = getenv('CV_OUTPUT');
   putenv("CV_OUTPUT=json");
