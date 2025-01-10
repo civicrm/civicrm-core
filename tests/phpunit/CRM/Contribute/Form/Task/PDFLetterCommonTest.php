@@ -138,7 +138,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
     $params = [
       'contact_id' => $this->_individualId,
       'total_amount' => 6,
-      'campaign_id' => $this->campaignCreate(['title' => $campaignTitle], FALSE),
+      'campaign_id' => $this->campaignCreate(['title' => $campaignTitle]),
       'financial_type_id' => 'Donation',
       $customFieldKey => 'Text_',
     ];
@@ -267,7 +267,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
 
     $this->createLoggedInUser();
     $this->createCustomGroupWithFieldsOfAllTypes(['extends' => 'Contribution']);
-    $this->campaignCreate(['name' => 'Big one', 'title' => 'Big one'], FALSE);
+    $this->campaignCreate(['name' => 'Big one', 'title' => 'Big one']);
     $tokens = $this->getAllContributionTokens();
     $formValues = [
       'document_type' => 'pdf',
