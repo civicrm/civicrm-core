@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\CaseType;
+use Civi\Api4\OptionValue;
 use Civi\Api4\RelationshipType;
 
 /**
@@ -24,27 +26,11 @@ class CiviCaseTestCase extends CiviUnitTestCase {
 
   protected $caseTypeId;
 
-  protected $caseStatusGroup;
-
-  protected $optionValues;
-
-  /**
-   * Tables to truncate as part of cleanup
-   * @var array
-   */
-  protected $tablesToTruncate;
-
   public function setUp(): void {
     parent::setUp();
+    $this->startTrackingEntities();
 
     // CRM-9404 - set-up is a bit cumbersome but had to put something in place to set up activity types & case types
-    //. Using XML was causing breakage as id numbers were changing over time
-    // & was really hard to troubleshoot as involved truncating option_value table to mitigate this & not leaving DB in a
-    // state where tests could run afterwards without re-loading.
-    $this->caseStatusGroup = $this->callAPISuccess('option_group', 'get', [
-      'name' => 'case_status',
-      'format.only_id' => 1,
-    ]);
     $optionValues = [
       'Medical evaluation' => 'Medical evaluation',
       'Mental health evaluation' => "Mental health evaluation",
@@ -54,15 +40,12 @@ class CiviCaseTestCase extends CiviUnitTestCase {
       'Income and benefits stabilization' => 'Income and benefits stabilization',
     ];
     foreach ($optionValues as $name => $label) {
-      $activityTypes = CRM_Core_BAO_OptionValue::ensureOptionValueExists([
+      CRM_Core_BAO_OptionValue::ensureOptionValueExists([
         'option_group_id' => 'activity_type',
         'name' => $name,
         'label' => $label,
         'component_id' => 'CiviCase',
       ]);
-      // store for cleanup
-      // @todo is this ever used?
-      $this->optionValues[] = $activityTypes['id'];
     }
 
     // We used to be inconsistent about "HousingSupport" vs "housing_support".
@@ -89,27 +72,33 @@ class CiviCaseTestCase extends CiviUnitTestCase {
   /**
    * Tears down the fixture, for example, closes a network connection.
    * This method is called after a test is executed.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
     $this->customDirectories(['template_path' => FALSE]);
-    $this->tablesToTruncate = [
+    OptionValue::delete(FALSE)
+      ->addWhere('name', '=', 'First act')
+      ->execute();
+    $this->quickCleanup([
       'civicrm_activity',
       'civicrm_contact',
       'civicrm_case',
       'civicrm_case_contact',
       'civicrm_case_activity',
-      'civicrm_case_type',
       'civicrm_activity_contact',
       'civicrm_managed',
       'civicrm_relationship',
       'civicrm_uf_match',
-      'civicrm_activity',
       'civicrm_group_contact',
       'civicrm_file',
       'civicrm_entity_file',
-    ];
-    $this->quickCleanup($this->tablesToTruncate, TRUE);
-    CRM_Case_XMLRepository::singleton(TRUE);
+    ], TRUE);
+    if (!empty($this->ids['CaseType'])) {
+      CaseType::delete(FALSE)->addWhere('id', 'IN', $this->ids['CaseType'])->execute();
+    }
+    CRM_Case_XMLRepository::singleton()->flush();
+    $this->assertEntityCleanup();
     parent::tearDown();
   }
 
@@ -141,6 +130,13 @@ class CiviCaseTestCase extends CiviUnitTestCase {
    * @see CRM_Utils_Hook::caseTypes
    */
   public function hook_caseTypes(&$caseTypes) {
+  }
+
+  /**
+   * @return string[]
+   */
+  public function getTrackedEntities(): array {
+    return ['civicrm_case_type'];
   }
 
 }
