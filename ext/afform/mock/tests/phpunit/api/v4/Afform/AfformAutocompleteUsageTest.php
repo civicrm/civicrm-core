@@ -3,8 +3,6 @@ namespace api\v4\Afform;
 
 use Civi\Api4\Afform;
 use Civi\Api4\Contact;
-use Civi\Api4\CustomField;
-use Civi\Api4\CustomGroup;
 use Civi\Api4\Group;
 use Civi\Api4\GroupContact;
 use Civi\Api4\SavedSearch;
@@ -15,13 +13,6 @@ use Civi\Api4\SavedSearch;
  * @group headless
  */
 class AfformAutocompleteUsageTest extends AfformUsageTestCase {
-
-  public function tearDown(): void {
-    CustomGroup::delete(FALSE)
-      ->addWhere('id', '>', 0)
-      ->execute();
-    parent::tearDown();
-  }
 
   /**
    * Ensure that Afform restricts autocomplete results when it's set to use a SavedSearch
@@ -69,10 +60,10 @@ EOHTML;
       ['source' => 'Yes', 'first_name' => 'A'],
       ['source' => 'No', 'first_name' => 'C'],
     ];
-    $contacts = Contact::save(FALSE)
-      ->setRecords($sampleContacts)
-      ->addDefault('last_name', $lastName)
-      ->execute()->column('id', 'first_name');
+    $contacts = $this->saveTestRecords('Contact', [
+      'records' => $sampleContacts,
+      'defaults' => ['last_name' => $lastName],
+    ])->column('id', 'first_name');
 
     $result = Contact::autocomplete()
       ->setFormName('afform:' . $this->formName)
@@ -134,9 +125,9 @@ EOHTML;
       ['last_name' => $lastName, 'first_name' => 'C'],
     ];
 
-    $contacts = Contact::save(FALSE)
-      ->setRecords($sampleData)
-      ->execute()->column('id', 'first_name');
+    $contacts = $this->saveTestRecords('Contact', [
+      'records' => $sampleData,
+    ])->column('id', 'first_name');
 
     // Place contacts A & B in the group, but not contact C
     $group = Group::create(FALSE)
@@ -146,16 +137,23 @@ EOHTML;
       ->addChain('B', GroupContact::create()->addValue('group_id', '$id')->addValue('contact_id', $contacts['B']))
       ->execute()->single();
 
-    CustomGroup::create(FALSE)
-      ->addValue('title', 'test_af_fields')
-      ->addValue('extends', 'Contact')
-      ->addChain('fields', CustomField::save()
-        ->addDefault('custom_group_id', '$id')
-        ->setRecords([
-          ['label' => 'contact_ref', 'data_type' => 'ContactReference', 'html_type' => 'Autocomplete-Select', 'filter' => 'action=get&group=' . $group['id']],
-        ])
-      )
-      ->execute();
+    $this->createTestRecord('CustomGroup', [
+      'extends' => 'Contact',
+      'title' => 'test_af_fields',
+    ]);
+    $this->saveTestRecords('CustomField', [
+      'defaults' => [
+        'custom_group_id.name' => 'test_af_fields',
+      ],
+      'records' => [
+        [
+          'html_type' => 'Autocomplete-Select',
+          'data_type' => 'ContactReference',
+          'label' => 'contact_ref',
+          'filter' => 'action=get&group=' . $group['id'],
+        ],
+      ],
+    ]);
 
     $layout = <<<EOHTML
 <af-form ctrl="afform">
@@ -233,20 +231,28 @@ EOHTML;
       ['last_name' => $lastName, 'first_name' => 'C', 'source' => 'in'],
     ];
 
-    $contacts = Contact::save(FALSE)
-      ->setRecords($sampleData)
-      ->execute()->column('id', 'first_name');
+    $contacts = $this->saveTestRecords('Contact', [
+      'records' => $sampleData,
+    ])->column('id', 'first_name');
 
-    CustomGroup::create(FALSE)
-      ->addValue('title', 'test_address_fields')
-      ->addValue('extends', 'Address')
-      ->addChain('fields', CustomField::save()
-        ->addDefault('custom_group_id', '$id')
-        ->setRecords([
-          ['label' => 'contact_ref', 'data_type' => 'ContactReference', 'html_type' => 'Autocomplete-Select', 'filter' => 'action=get&source=in'],
-        ])
-      )
-      ->execute();
+    $this->createTestRecord('CustomGroup', [
+      'extends' => 'Address',
+      'title' => 'test_address_fields',
+    ]);
+
+    $this->saveTestRecords('CustomField', [
+      'defaults' => [
+        'custom_group_id.name' => 'test_address_fields',
+      ],
+      'records' => [
+        [
+          'html_type' => 'Autocomplete-Select',
+          'data_type' => 'ContactReference',
+          'label' => 'contact_ref',
+          'filter' => 'action=get&source=in',
+        ],
+      ],
+    ]);
 
     $layout = <<<EOHTML
 <af-form ctrl="afform">
