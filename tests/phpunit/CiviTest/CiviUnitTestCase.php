@@ -152,6 +152,8 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    */
   protected $isLocationTypesOnPostAssert = TRUE;
 
+  protected array $entityTracking = [];
+
   /**
    * Has the test class been verified as 'getsafe'.
    *
@@ -465,6 +467,32 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       }
     }
     CRM_Core_DAO::executeQuery('SET FOREIGN_KEY_CHECKS = 1');
+  }
+
+  /**
+   * Start tracking cleanup on the given entities.
+   *
+   * @return void
+   * @throws \CRM_Core_Exception
+   */
+  public function startTrackingEntities(): void {
+    foreach ($this->getTrackedEntities() as $entity) {
+      $this->entityTracking[$entity] = \CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM ' . $entity);
+    }
+  }
+
+  /**
+   * @return void
+   * @throws \CRM_Core_Exception
+   */
+  protected function assertEntityCleanup(): void {
+    foreach ($this->entityTracking as $entity => $count) {
+      $field = 'name';
+      if ($entity === 'civicrm_line_item') {
+        $field = 'line_total';
+      }
+      $this->assertEquals($count, \CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM ' . $entity), $entity . ' has not cleaned up well ' . CRM_Core_DAO::singleValueQuery('SELECT ' . $field . ' FROM ' . $entity . ' ORDER BY id DESC LIMIT 1'));
+    }
   }
 
   /**
