@@ -198,7 +198,7 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
       'name' => $statusName,
       'label' => $statusName,
       'weight' => 99,
-    ]);
+    ], $statusName);
     $result = $this->callAPISuccess('Case', 'getoptions', ['field' => 'status_id', 'case_type_id' => 'test_case_type', 'context' => 'validate']);
     $this->assertEquals($template['definition']['statuses'], array_values($result['values']));
   }
