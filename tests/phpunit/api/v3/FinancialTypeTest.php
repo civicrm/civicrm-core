@@ -15,17 +15,20 @@
  */
 class api_v3_FinancialTypeTest extends CiviUnitTestCase {
 
+  public function tearDown(): void {
+    $this->quickCleanUpFinancialEntities();
+    parent::tearDown();
+  }
+
   /**
    * Test Create, Read, Update Financial type with custom field.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testCreateUpdateFinancialTypeCustomField(): void {
-    $this->callAPISuccess('OptionValue', 'create', [
-      'label' => ts('Financial Type'),
+    $this->createTestEntity('OptionValue', [
+      'label' => 'Financial Type',
       'name' => 'civicrm_financial_type',
       'value' => 'FinancialType',
-      'option_group_id' => 'cg_extend_objects',
+      'option_group_id:name' => 'cg_extend_objects',
       'is_active' => 1,
     ]);
     // create custom group and custom field
