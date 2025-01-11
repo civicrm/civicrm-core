@@ -5,6 +5,7 @@ use Civi\Api4\Afform;
 use Civi\Api4\Contact;
 use Civi\Api4\Group;
 use Civi\Api4\GroupContact;
+use Civi\Api4\OptionValue;
 use Civi\Api4\SavedSearch;
 
 /**
@@ -323,6 +324,120 @@ EOHTML;
       ->addWhere('address_primary.test_address_fields.contact_ref', '=', $contacts['A'])
       ->selectRowCount()->execute();
     $this->assertCount(1, $check);
+  }
+
+  /**
+   * Tests autocomplete fields used as savedSearch filters
+   *
+   * @return void
+   */
+  public function testAutocompleteWithSearchJoin(): void {
+    $this->createTestRecord('CustomGroup', [
+      'extends' => 'Individual',
+      'name' => 'test_af_autocomplete_search',
+    ]);
+    $this->createTestRecord('CustomField', [
+      'custom_group_id.name' => 'test_af_autocomplete_search',
+      'html_type' => 'Autocomplete-Select',
+      'data_type' => 'String',
+      'label' => 'select_auto',
+      'option_values' => ['r' => 'Red', 'g' => 'Green', 'b' => 'Blue', 'y' => 'Yellow'],
+    ]);
+
+    // Hacky workaround for transactions rolling back the autocleanup :(
+    // Ideally this test would NOT use TransactionalInterface
+    civicrm_api4('SavedSearch', 'delete', [
+      'where' => [['name', '=', 'test_activity_search']],
+    ]);
+
+    $this->createTestRecord('SavedSearch', [
+      'name' => 'test_activity_search',
+      'api_entity' => 'Activity',
+      'api_params' => [
+        'version' => 4,
+        'select' => [
+          'activity_type_id:label',
+          'Activity_ActivityContact_Contact_01.sort_name',
+          'Activity_ActivityContact_Contact_01.test_af_autocomplete_search.select_auto:label',
+        ],
+        'orderBy' => [],
+        'where' => [],
+        'groupBy' => [],
+        'join' => [
+          [
+            'Contact AS Activity_ActivityContact_Contact_01',
+            'LEFT',
+            'ActivityContact',
+            [
+              'id',
+              '=',
+              'Activity_ActivityContact_Contact_01.activity_id',
+            ],
+            [
+              'Activity_ActivityContact_Contact_01.record_type_id:name',
+              '=',
+              '"Activity Targets"',
+            ],
+          ],
+        ],
+        'having' => [],
+      ],
+    ]);
+
+    $this->createTestRecord('SearchDisplay', [
+      'name' => 'test_activity_search_display',
+      'saved_search_id.name' => 'test_activity_search',
+      'type' => 'table',
+      'settings' => [
+        'description' => NULL,
+        'sort' => [],
+        'limit' => 50,
+        'pager' => [],
+        'placeholder' => 5,
+        'columns' => [
+          [
+            'type' => 'field',
+            'key' => 'activity_type_id:label',
+            'dataType' => 'Integer',
+            'sortable' => TRUE,
+          ],
+          [
+            'type' => 'field',
+            'key' => 'Activity_ActivityContact_Contact_01.sort_name',
+            'dataType' => 'String',
+            'sortable' => TRUE,
+          ],
+          [
+            'type' => 'field',
+            'key' => 'Activity_ActivityContact_Contact_01.test_af_autocomplete_search.select_auto:label',
+            'dataType' => 'String',
+            'sortable' => TRUE,
+          ],
+        ],
+      ],
+    ]);
+
+    $layout = <<<EOHTML
+<div af-fieldset="">
+  <af-field name="Activity_ActivityContact_Contact_01.test_af_autocomplete_search.select_auto" defn="{input_attrs: {multiple: true}}" />
+  <crm-search-display-table search-name="test_activity_search" display-name="test_activity_search_display"></crm-search-display-table>
+</div>
+EOHTML;
+
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+
+    $result = OptionValue::autocomplete()
+      ->setFormName('afform:' . $this->formName)
+      ->setFieldName('test_activity_search_display:Activity_ActivityContact_Contact_01.test_af_autocomplete_search.select_auto')
+      ->setInput('l')
+      ->execute();
+
+    $this->assertCount(2, $result);
+    $this->assertEquals('Blue', $result[0]['label']);
+    $this->assertEquals('Yellow', $result[1]['label']);
   }
 
 }
