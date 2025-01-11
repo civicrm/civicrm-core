@@ -62,7 +62,7 @@ class AfformMetadataInjector {
           if ($apiEntities) {
             $action = 'get';
             $entityList = \CRM_Utils_JS::decode(htmlspecialchars_decode($apiEntities));
-            $entityType = self::getFieldEntityType($afField->getAttribute('name'), $entityList);
+            $entityType = FormDataModel::getSearchFieldEntityType($afField->getAttribute('name'), $entityList);
           }
           else {
             $entityName = pq($fieldset)->attr('af-fieldset');
@@ -205,31 +205,6 @@ class AfformMetadataInjector {
     if ($fieldInfo) {
       self::setFieldMetadata($afField, $fieldInfo);
     }
-  }
-
-  /**
-   * Determines name of the api entit(ies) based on the field name prefix
-   *
-   * Note: Normally will return a single entity name, but
-   * Will return 2 entity names in the case of Bridge joins e.g. RelationshipCache
-   *
-   * @param string $fieldName
-   * @param string[] $entityList
-   * @return string|array
-   */
-  private static function getFieldEntityType($fieldName, $entityList) {
-    $prefix = strpos($fieldName, '.') ? explode('.', $fieldName)[0] : NULL;
-    $joinEntities = [];
-    $baseEntity = array_shift($entityList);
-    if ($prefix) {
-      foreach ($entityList as $entityAndAlias) {
-        [$entity, $alias] = explode(' AS ', $entityAndAlias);
-        if ($alias === $prefix) {
-          $joinEntities[] = $entityAndAlias;
-        }
-      }
-    }
-    return $joinEntities ?: $baseEntity;
   }
 
   private static function getFormEntities(\phpQueryObject $doc) {

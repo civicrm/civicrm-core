@@ -272,6 +272,52 @@ class FormDataModel {
   }
 
   /**
+   * Retrieves the main search entity plus join entities & their aliases.
+   *
+   * @param array $savedSearch
+   * @return array
+   *   e.g.
+   *   ```
+   *   ['Contact', 'Activity AS Contact_Activity_01']
+   *   ```
+   */
+  public static function getSearchEntities(array $savedSearch): array {
+    $entityList = [$savedSearch['api_entity']];
+    foreach ($savedSearch['api_params']['join'] ?? [] as $join) {
+      $entityList[] = $join[0];
+      if (is_string($join[2] ?? NULL)) {
+        $entityList[] = $join[2] . ' AS ' . (explode(' AS ', $join[0])[1]);
+      }
+    }
+    return $entityList;
+  }
+
+  /**
+   * Determines name of the api entit(ies) based on the field name prefix
+   *
+   * Note: Normally will return a single entity name, but
+   * Will return 2 entity names in the case of Bridge joins e.g. RelationshipCache
+   *
+   * @param string $fieldName
+   * @param string[] $entityList
+   * @return array
+   */
+  public static function getSearchFieldEntityType($fieldName, $entityList): array {
+    $prefix = strpos($fieldName, '.') ? explode('.', $fieldName)[0] : NULL;
+    $joinEntities = [];
+    $baseEntity = array_shift($entityList);
+    if ($prefix) {
+      foreach ($entityList as $entityAndAlias) {
+        [$entity, $alias] = explode(' AS ', $entityAndAlias);
+        if ($alias === $prefix) {
+          $joinEntities[] = $entityAndAlias;
+        }
+      }
+    }
+    return $joinEntities ?: [$baseEntity];
+  }
+
+  /**
    * Finds a search display within a fieldset
    *
    * @param array $node

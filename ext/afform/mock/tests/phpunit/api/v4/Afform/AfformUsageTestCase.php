@@ -31,6 +31,7 @@ abstract class AfformUsageTestCase extends AfformTestCase {
     CustomGroup::delete(FALSE)
       ->addWhere('id', '>', 0)
       ->execute();
+    $this->deleteTestRecords();
     parent::tearDown();
   }
 
