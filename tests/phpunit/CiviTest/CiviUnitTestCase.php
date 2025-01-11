@@ -522,7 +522,8 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
           'name' => '"FIXME" <info@EXAMPLE.ORG>',
           'label' => '"FIXME" <info@EXAMPLE.ORG>',
           'option_group_id:name' => 'from_email_address',
-      ])->setRecords([['domain_id' => 1, 'value' => 1], ['domain_id' => 2, 'value' => 2]])->execute();
+        ])
+        ->setRecords([['domain_id' => 1, 'value' => 1], ['domain_id' => 2, 'value' => 2]])->execute();
     }
     catch (CRM_Core_Exception $e) {
       $this->fail('failed to re-instate domain contacts ' . $e->getMessage());
