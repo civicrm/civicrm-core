@@ -1337,15 +1337,16 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
   /**
    * @param array $params
    *   Optional parameters.
+   * @param string $identifier
    *
    * @return int
    *   Campaign ID.
    */
-  public function campaignCreate(array $params = []): int {
+  public function campaignCreate(array $params = [], string $identifier = 'default'): int {
     $this->enableCiviCampaign();
-    $campaign = $this->callAPISuccess('Campaign', 'create', array_merge([
+    $campaign = $this->createTestEntity('Campaign', array_merge([
       'title' => 'big campaign',
-    ], $params));
+    ], $params), $identifier);
     return $campaign['id'];
   }
 
