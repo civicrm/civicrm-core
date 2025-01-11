@@ -4,12 +4,32 @@
 <label ng-hide="$ctrl.mode !== 'select' && !$ctrl.fn">{{ $ctrl.fieldArg.field.label }}</label>
 
 <div class="form-group" ng-repeat="arg in $ctrl.args">
+  &nbsp;
   <crm-search-function-flag ng-if="$ctrl.fn" flag="flag_before" arg="arg" param="$ctrl.getParam($index)" write-expr="$ctrl.writeExpr()"></crm-search-function-flag>
-  <span ng-switch="arg.type" ng-if="arg !== $ctrl.fieldArg">
-    <input ng-switch-when="number" class="form-control" type="number" ng-model="arg.value" placeholder="{{ $ctrl.getParam($index).label }}" ng-change="$ctrl.changeArg($index)" ng-model-options="{updateOn: 'blur'}">
-    <input ng-switch-when="string" class="form-control" ng-model="arg.value" placeholder="{{ $ctrl.getParam($index).label }}" ng-change="$ctrl.changeArg($index)" ng-trim="false" ng-model-options="{updateOn: 'blur'}">
-    <input ng-switch-when="field" class="form-control" ng-model="arg.value" crm-ui-select="{data: $ctrl.getFields, placeholder: $ctrl.getParam($index).label}" ng-change="$ctrl.changeArg($index)">
-  </span>
+  <div class="input-group" ng-if="arg !== $ctrl.fieldArg" title="{{ $ctrl.getParam($index).label }}">
+    <div class="input-group-btn">
+      <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="crm-i {{ $ctrl.exprTypesByName[arg.type].icon }}"></i>
+        <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu">
+        <li ng-repeat="exprInfo in $ctrl.sqlExprTypes" ng-if="$ctrl.getParam($parent.$index).must_be.indexOf(exprInfo.type) >= 0">
+          <a href ng-click="$ctrl.changeArgType(arg, exprInfo)">
+            <i class="crm-i fa-fw {{ exprInfo.icon }}"></i>
+            {{ exprInfo.label }}
+          </a>
+        </li>
+      </ul>
+    </div>
+    <input ng-if="arg.type === 'number'" class="form-control" type="number" ng-model="arg.value" placeholder="{{ $ctrl.getParam($index).label }}" ng-change="$ctrl.writeExpr()" ng-required="!$ctrl.getParam($index).can_be_empty" ng-model-options="{updateOn: 'blur'}">
+    <input ng-if="arg.type === 'string'" class="form-control" ng-model="arg.value" placeholder="{{ $ctrl.getParam($index).label }}" ng-change="$ctrl.writeExpr()" ng-trim="false" ng-required="!$ctrl.getParam($index).can_be_empty" ng-model-options="{updateOn: 'blur'}">
+    <span ng-if="arg.type === 'field'">
+      <input class="form-control" ng-model="arg.value" crm-ui-select="{data: $ctrl.getFields, placeholder: $ctrl.getParam($index).label, allowClear: false}" required ng-change="$ctrl.writeExpr()">
+    </span>
+    <span class="input-group-btn" ng-if="$ctrl.canRemoveArg($index)">
+      <button class="btn btn-danger" type="button" ng-click="$ctrl.removeArg($index)">x</button>
+    </span>
+  </div>
   <crm-search-function-flag ng-if="$ctrl.fn && arg.value" flag="flag_after" arg="arg" param="$ctrl.getParam($index)" write-expr="$ctrl.writeExpr()"></crm-search-function-flag>
 </div>
 <div class="btn-group" ng-if="$ctrl.canAddArg()">
@@ -17,8 +37,11 @@
     <i class="crm-i fa-plus"></i> <span class="caret"></span>
   </button>
   <ul class="dropdown-menu">
-    <li ng-repeat="(name, type) in $ctrl.exprTypes" ng-show="$ctrl.getParam($ctrl.args.length).must_be.indexOf(name) >= 0">
-      <a href ng-click="$ctrl.addArg(name)">{{ type.label }}</a>
+    <li ng-repeat="exprInfo in $ctrl.sqlExprTypes" ng-if="$ctrl.getParam($ctrl.args.length).must_be.indexOf(exprInfo.type) >= 0">
+      <a href ng-click="$ctrl.addArg(exprInfo.type)">
+        <i class="crm-i fa-fw {{:: exprInfo.icon }}"></i>
+        {{:: exprInfo.label }}
+      </a>
     </li>
   </ul>
 </div>
