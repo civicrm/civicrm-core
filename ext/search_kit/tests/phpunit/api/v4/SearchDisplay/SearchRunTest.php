@@ -1998,7 +1998,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
           'SUM(total_amount) AS SUM_total_amount',
           'GROUP_FIRST(receive_date ORDER BY receive_date ASC) AS GROUP_FIRST_receive_date',
           'GROUP_FIRST(financial_type_id:label ORDER BY receive_date ASC) AS GROUP_FIRST_financial_type_id_label',
-          'GROUP_CONCAT(test_contrib_fields.text) AS GROUP_CONCAT_test_contrib_fields_text',
+          'GROUP_CONCAT(test_contrib_fields.text ORDER BY receive_date ASC) AS GROUP_CONCAT_test_contrib_fields_text',
           'GROUP_FIRST(test_contrib_fields.options:label ORDER BY receive_date ASC) AS GROUP_FIRST_test_contrib_fields_options_label',
         ],
         'where' => [
@@ -2107,7 +2107,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertSame('02/02/2021', $tally['GROUP_FIRST_receive_date']);
     $this->assertSame('Donation, Innit', $tally['GROUP_FIRST_financial_type_id_label']);
     $this->assertSame('Blue', $tally['GROUP_FIRST_test_contrib_fields_options_label']);
-    $this->assertSame('a', $tally['GROUP_CONCAT_test_contrib_fields_text']);
+    $this->assertSame('b', $tally['GROUP_CONCAT_test_contrib_fields_text']);
   }
 
   public function testContributionTotalCountWithTestAndTemplateContributions():void {
