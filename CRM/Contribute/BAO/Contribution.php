@@ -3595,7 +3595,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * @return bool
    * @throws \CRM_Core_Exception
    */
-  public static function isSingleLineItem($id) {
+  public static function isSingleLineItem(int $id) : bool {
     $lineItemCount = civicrm_api3('LineItem', 'getcount', ['contribution_id' => $id]);
     return ($lineItemCount == 1);
   }
