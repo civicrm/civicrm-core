@@ -3,10 +3,7 @@ namespace api\v4\Afform;
 
 use Civi\Api4\Afform;
 use Civi\Api4\Contact;
-use Civi\Api4\Group;
-use Civi\Api4\GroupContact;
 use Civi\Api4\OptionValue;
-use Civi\Api4\SavedSearch;
 
 /**
  * Test case for Afform with autocomplete.
@@ -37,22 +34,20 @@ EOHTML;
     ]);
 
     // Saved search for filtering
-    SavedSearch::create(FALSE)
-      ->setValues([
-        'name' => 'the_unit_test_search',
-        'label' => 'the_unit_test_search',
-        'api_entity' => 'Contact',
-        'api_params' => [
-          'version' => 4,
-          'select' => ['id', 'display_name'],
-          'orderBy' => [],
-          'where' => [
-            ['contact_type:name', '=', 'Individual'],
-            ['source', '=', 'Yes'],
-          ],
+    $this->createTestRecord('SavedSearch', [
+      'name' => 'the_unit_test_search',
+      'label' => 'the_unit_test_search',
+      'api_entity' => 'Contact',
+      'api_params' => [
+        'version' => 4,
+        'select' => ['id', 'display_name'],
+        'orderBy' => [],
+        'where' => [
+          ['contact_type:name', '=', 'Individual'],
+          ['source', '=', 'Yes'],
         ],
-      ])
-      ->execute();
+      ],
+    ]);
 
     $lastName = uniqid(__FUNCTION__);
 
@@ -130,13 +125,19 @@ EOHTML;
       'records' => $sampleData,
     ])->column('id', 'first_name');
 
+    $group = $this->createTestRecord('Group', [
+      'name' => $lastName,
+      'title' => $lastName,
+    ]);
     // Place contacts A & B in the group, but not contact C
-    $group = Group::create(FALSE)
-      ->addValue('name', $lastName)
-      ->addValue('title', $lastName)
-      ->addChain('A', GroupContact::create()->addValue('group_id', '$id')->addValue('contact_id', $contacts['A']))
-      ->addChain('B', GroupContact::create()->addValue('group_id', '$id')->addValue('contact_id', $contacts['B']))
-      ->execute()->single();
+    $this->createTestRecord('GroupContact', [
+      'group_id' => $group['id'],
+      'contact_id' => $contacts['A'],
+    ]);
+    $this->createTestRecord('GroupContact', [
+      'group_id' => $group['id'],
+      'contact_id' => $contacts['B'],
+    ]);
 
     $this->createTestRecord('CustomGroup', [
       'extends' => 'Contact',
@@ -344,12 +345,6 @@ EOHTML;
       'option_values' => ['r' => 'Red', 'g' => 'Green', 'b' => 'Blue', 'y' => 'Yellow'],
     ]);
 
-    // Hacky workaround for transactions rolling back the autocleanup :(
-    // Ideally this test would NOT use TransactionalInterface
-    civicrm_api4('SavedSearch', 'delete', [
-      'where' => [['name', '=', 'test_activity_search']],
-    ]);
-
     $this->createTestRecord('SavedSearch', [
       'name' => 'test_activity_search',
       'api_entity' => 'Activity',
@@ -429,6 +424,7 @@ EOHTML;
       'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
     ]);
 
+    // Autocompleting with the letter "l" will give 2 matches: Blue & Yellow
     $result = OptionValue::autocomplete()
       ->setFormName('afform:' . $this->formName)
       ->setFieldName('test_activity_search_display:Activity_ActivityContact_Contact_01.test_af_autocomplete_search.select_auto')
