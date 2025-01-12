@@ -448,11 +448,11 @@ EOHTML;
     ]);
 
     $lastName = uniqid(__FUNCTION__);
-    $contact = \Civi\Api4\Contact::create(FALSE)
-      ->addValue('first_name', 'Bob')
-      ->addValue('last_name', $lastName)
-      ->addValue('email_primary.email', '123@example.com')
-      ->execute()->single();
+    $contact = $this->createTestRecord('Individual', [
+      'first_name' => 'Bob',
+      'last_name' => $lastName,
+      'email_primary.email' => '123@example.com',
+    ]);
 
     $locationType = \CRM_Core_BAO_LocationType::getDefault()->id;
     $values = [
