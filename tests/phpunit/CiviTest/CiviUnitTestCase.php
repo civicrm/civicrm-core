@@ -514,13 +514,16 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
           'postal_code' => 6022,
         ],
       ]);
-      OptionValue::replace(FALSE)->addWhere(
-        'option_group_id:name', '=', 'from_email_address'
-      )->setDefaults([
-        'is_default' => 1,
-        'name' => '"FIXME" <info@EXAMPLE.ORG>',
-        'label' => '"FIXME" <info@EXAMPLE.ORG>',
-      ])->setRecords([['domain_id' => 1], ['domain_id' => 2]])->execute();
+      OptionValue::save(FALSE)
+        ->setMatch(
+          ['option_group_id', 'domain_id']
+        )->setDefaults([
+          'is_default' => 1,
+          'name' => '"FIXME" <info@EXAMPLE.ORG>',
+          'label' => '"FIXME" <info@EXAMPLE.ORG>',
+          'option_group_id:name' => 'from_email_address',
+        ])
+        ->setRecords([['domain_id' => 1, 'value' => 1], ['domain_id' => 2, 'value' => 2]])->execute();
     }
     catch (CRM_Core_Exception $e) {
       $this->fail('failed to re-instate domain contacts ' . $e->getMessage());
