@@ -110,7 +110,7 @@ class api_v3_MultilingualTest extends CiviUnitTestCase {
     ];
     // fetch all entities
     $entities = $this->callAPISuccess('Entity', 'get', []);
-    $skippableEntities = array_merge($skippableEntities, $entities['deprecated']);
+    $skippableEntities = array_merge($skippableEntities, $entities['deprecated'] ?? []);
 
     foreach ($entities['values'] as $entity) {
       $params = ['check_permissions' => 1];
