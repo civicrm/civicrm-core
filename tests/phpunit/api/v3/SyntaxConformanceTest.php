@@ -102,7 +102,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     ];
     $this->toBeImplemented['create'] = [
       'Afform',
-      'SurveyRespondant',
       'OptionGroup',
       'MailingRecipients',
       'UFMatch',
@@ -119,7 +118,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $this->toBeImplemented['delete'] = [
       'MembershipPayment',
       'OptionGroup',
-      'SurveyRespondant',
       'UFJoin',
       'UFMatch',
       'Extension',
@@ -131,7 +129,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   }
 
   public function getDeprecatedAPIs() : array {
-    return ['Location', 'SurveyRespondant'];
+    return [];
   }
 
   public function tearDown(): void {
@@ -407,7 +405,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'SystemLog',
       'ReportTemplate',
       'MailingRecipients',
-      'SurveyRespondant',
       'Profile',
       'Payment',
       'Order',
@@ -455,7 +452,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'EntityTag',
       'Participant',
       'Setting',
-      'SurveyRespondant',
       'MailingRecipients',
       'CustomSearch',
       'Extension',
@@ -950,9 +946,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     ) {
       return;
     }
-    if (in_array($Entity, ['SurveyRespondant'])) {
-      $this->markTestSkipped();
-    }
     $this->callAPISuccess($Entity, 'getlist', ['label_field' => 'id']);
   }
 
@@ -968,9 +961,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       || in_array($entity, $this->toBeSkippedGetByID())
     ) {
       return;
-    }
-    if (in_array($entity, ['SurveyRespondant'])) {
-      $this->markTestSkipped();
     }
     if ($entity === 'UFGroup') {
       $entity = 'ufgroup';
