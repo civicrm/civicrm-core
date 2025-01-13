@@ -92,7 +92,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Afform',
       'Profile',
       'CustomValue',
-      'Constant',
       'CustomSearch',
       'Extension',
       'ReportTemplate',
@@ -287,7 +286,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   public static function toBeSkipped_get($sequential = FALSE) {
     $entitiesWithoutGet = [
       'MailingEventResubscribe',
-      'Location',
     ];
     if ($sequential === TRUE) {
       return $entitiesWithoutGet;
@@ -324,7 +322,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * @return array
    */
   public static function toBeSkipped_create($sequential = FALSE) {
-    $entitiesWithoutCreate = ['Constant', 'Entity', 'Location', 'Profile', 'MailingRecipients'];
+    $entitiesWithoutCreate = ['Entity', 'Profile', 'MailingRecipients'];
     if ($sequential === TRUE) {
       return $entitiesWithoutCreate;
     }
@@ -348,9 +346,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'MailingEventSubscribe',
       'MailingEventUnsubscribe',
       'MailingRecipients',
-      'Constant',
       'Entity',
-      'Location',
       'Domain',
       'Profile',
       'CustomValue',
@@ -400,7 +396,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
       // ones that are not real entities hence not extendable.
       'Entity',
-      'Constant',
       'Attachment',
       'CustomSearch',
       'CustomValue',
@@ -493,9 +488,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Mailing',
       'MailingEventUnsubscribe',
       'MailingEventSubscribe',
-      'Constant',
       'Entity',
-      'Location',
       'Profile',
       'CustomValue',
       'UFJoin',
