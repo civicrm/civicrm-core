@@ -519,41 +519,6 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   }
 
   /**
-   * Set is deprecated but we need to ensure it still works.
-   */
-  public function testLegacySet(): void {
-    $profileFieldValues = $this->createIndividualContact();
-    $contactId = key($profileFieldValues);
-
-    $updateParams = [
-      'first_name' => 'abc2',
-      'last_name' => 'xyz2',
-      'email-Primary' => 'abc2.xyz2@gmail.com',
-      'phone-1-1' => '022 321 826',
-      'country-1' => '1013',
-      'state_province-1' => '1000',
-    ];
-
-    $params = array_merge([
-      'profile_id' => $this->_profileID,
-      'contact_id' => $contactId,
-    ], $updateParams);
-
-    $result = $this->callAPISuccess('profile', 'set', $params);
-    $this->assertArrayKeyExists('values', $result);
-    $getParams = [
-      'profile_id' => $this->_profileID,
-      'contact_id' => $contactId,
-    ];
-    $profileDetails = $this->callAPISuccess('profile', 'get', $getParams);
-
-    foreach ($updateParams as $profileField => $value) {
-      $this->assertEquals($value, $profileDetails['values'][$profileField], 'In line ' . __LINE__ . ' error message: ' . "missing/mismatching value for $profileField"
-      );
-    }
-  }
-
-  /**
    * Check contact activity profile without activity id.
    */
   public function testContactActivitySubmitWithoutActivityId(): void {

@@ -313,23 +313,6 @@ function _civicrm_api3_profile_submit_spec(&$params, $apirequest) {
 }
 
 /**
- * Update Profile field values.
- *
- * @deprecated - calling this function directly is deprecated as 'set' is not a clear action
- * use submit
- *
- * @param array $params
- *   Array of property name/value.
- *   pairs to update profile field values
- *
- * @return array
- *   Updated Contact/ Activity object|CRM_Error
- */
-function civicrm_api3_profile_set($params) {
-  return civicrm_api3('profile', 'submit', $params);
-}
-
-/**
  * Apply profile.
  *
  * @deprecated - appears to be an internal function - should not be accessible via api
@@ -758,7 +741,6 @@ function _civicrm_api3_profile_appendaliases($values, $entity) {
  */
 function _civicrm_api3_profile_deprecation() {
   return [
-    'set' => 'Profile api "set" action is deprecated in favor of "submit".',
     'apply' => 'Profile api "apply" action is deprecated in favor of "submit".',
   ];
 }
