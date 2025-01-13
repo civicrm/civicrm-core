@@ -1241,13 +1241,20 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @param string|null $format
    * @return array|string
    */
-  protected function formatViewValue($key, $rawValue, $data, $dataType, $format = NULL) {
+  protected function formatViewValue(string $key, $rawValue, $data, $dataType, $format = NULL) {
     if (is_array($rawValue)) {
       return array_map(function($val) use ($key, $data, $dataType, $format) {
         return $this->formatViewValue($key, $val, $data, $dataType, $format);
       }, $rawValue);
     }
 
+    if (!isset($rawValue) || $rawValue === '') {
+      return '';
+    }
+    // Do not reformat pseudoconstant suffixes
+    if (FormattingUtil::getSuffix($key)) {
+      return $rawValue;
+    }
     $formatted = $rawValue;
 
     switch ($dataType) {
@@ -1261,6 +1268,10 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         $currencyField = $this->getCurrencyField($key);
         $currency = is_string($data[$currencyField] ?? NULL) ? $data[$currencyField] : NULL;
         $formatted = \Civi::format()->money($rawValue, $currency);
+        break;
+
+      case 'Float':
+        $formatted = \CRM_Utils_Number::formatLocaleNumeric($rawValue);
         break;
 
       case 'Date':

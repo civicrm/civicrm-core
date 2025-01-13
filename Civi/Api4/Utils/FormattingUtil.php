@@ -537,4 +537,26 @@ class FormattingUtil {
     return $fieldValue;
   }
 
+  /**
+   * Returns the suffix from a given field name if it exists and matches known suffixes.
+   *
+   * @param string $fieldName
+   *   The name of the field, potentially containing a suffix in the format ":suffix".
+   * @return string|null
+   *   The extracted suffix if found and recognized; otherwise, NULL.
+   */
+  public static function getSuffix(string $fieldName): ?string {
+    if (!$fieldName || !str_contains($fieldName, ':')) {
+      return NULL;
+    }
+
+    $allSuffixes = array_keys(\CRM_Core_SelectValues::optionAttributes());
+    foreach ($allSuffixes as $suffix) {
+      if (str_ends_with($fieldName, ":$suffix")) {
+        return $suffix;
+      }
+    }
+    return NULL;
+  }
+
 }
