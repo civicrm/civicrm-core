@@ -122,15 +122,15 @@ class EditableSearchTest extends Api4TestBase {
     $this->assertEquals('testmail@unit.test', $result[0]['columns'][1]['val']);
     $this->assertTrue($result[0]['columns'][1]['edit']);
     // Contact 1 - new phone can be created
-    $this->assertNull($result[0]['columns'][2]['val']);
+    $this->assertEquals('', $result[0]['columns'][2]['val']);
     $this->assertTrue($result[0]['columns'][2]['edit']);
 
     $this->assertEquals($cids[1], $result[1]['key']);
     // Contact 2 first name can be added
-    $this->assertNull($result[1]['columns'][0]['val']);
+    $this->assertEquals('', $result[1]['columns'][0]['val']);
     $this->assertTrue($result[1]['columns'][0]['edit']);
     // Contact 2 - new email can be created
-    $this->assertNull($result[1]['columns'][1]['val']);
+    $this->assertEquals('', $result[1]['columns'][1]['val']);
     $this->assertTrue($result[1]['columns'][1]['edit']);
     // Contact 2 phone can be updated
     $this->assertEquals('123456', $result[1]['columns'][2]['val']);
@@ -527,7 +527,7 @@ class EditableSearchTest extends Api4TestBase {
     $this->assertTrue($result[0]['columns'][2]['edit']);
     $this->assertEquals('abc', $result[0]['columns'][3]['val']);
     $this->assertTrue($result[0]['columns'][3]['edit']);
-    $this->assertNull($result[0]['columns'][4]['val']);
+    $this->assertEquals('', $result[0]['columns'][4]['val']);
     $this->assertArrayNotHasKey('edit', $result[0]['columns'][4]);
 
     // Second contact has a spouse relation but not a child
@@ -535,19 +535,19 @@ class EditableSearchTest extends Api4TestBase {
     $this->assertTrue($result[1]['columns'][1]['edit']);
     $this->assertEquals('Married', $result[1]['columns'][2]['val']);
     $this->assertTrue($result[1]['columns'][2]['edit']);
-    $this->assertNull($result[1]['columns'][3]['val']);
+    $this->assertEquals('', $result[1]['columns'][3]['val']);
     $this->assertArrayNotHasKey('edit', $result[1]['columns'][3]);
-    $this->assertNull($result[1]['columns'][4]['val']);
+    $this->assertEquals('', $result[1]['columns'][4]['val']);
     $this->assertTrue($result[1]['columns'][4]['edit']);
 
     // Third contact is all alone in this world...
-    $this->assertNull($result[2]['columns'][1]['val']);
+    $this->assertEquals('', $result[2]['columns'][1]['val']);
     $this->assertArrayNotHasKey('edit', $result[2]['columns'][1]);
-    $this->assertNull($result[2]['columns'][2]['val']);
+    $this->assertEquals('', $result[2]['columns'][2]['val']);
     $this->assertArrayNotHasKey('edit', $result[2]['columns'][2]);
-    $this->assertNull($result[2]['columns'][3]['val']);
+    $this->assertEquals('', $result[2]['columns'][3]['val']);
     $this->assertArrayNotHasKey('edit', $result[2]['columns'][3]);
-    $this->assertNull($result[2]['columns'][4]['val']);
+    $this->assertEquals('', $result[2]['columns'][4]['val']);
     $this->assertArrayNotHasKey('edit', $result[2]['columns'][4]);
   }
 

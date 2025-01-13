@@ -104,9 +104,9 @@ class DAOGetFieldsAction extends BasicGetFieldsAction {
    */
   private function formatValues() {
     foreach (array_keys($this->values) as $key) {
-      if (strpos($key, ':')) {
+      if (FormattingUtil::getSuffix($key)) {
         if (isset($this->values[$key]) && $this->values[$key] !== '') {
-          [$fieldName, $suffix] = explode(':', $key);
+          $fieldName = FormattingUtil::removeSuffix($key);
           if (!isset($this->values[$fieldName])) {
             $options = FormattingUtil::getPseudoconstantList(['name' => $fieldName, 'entity' => $this->getEntityName()], $key, $this->values);
             $this->values[$fieldName] = FormattingUtil::replacePseudoconstant($options, $this->values[$key], TRUE);
