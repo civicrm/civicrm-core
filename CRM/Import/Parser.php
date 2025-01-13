@@ -449,59 +449,6 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   }
 
   /**
-   * Do this work on the form layer.
-   *
-   * @deprecated in 5.54 will be removed around 5.80
-   *
-   * @return array
-   */
-  public function getHeaderPatterns(): array {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Import_Forms::getHeaderPatterns');
-    $values = [];
-    foreach ($this->importableFieldsMetadata as $name => $field) {
-      if (isset($field['headerPattern'])) {
-        $values[$name] = $field['headerPattern'] ?: '//';
-      }
-    }
-    return $values;
-  }
-
-  /**
-   * Remove single-quote enclosures from a value array (row).
-   *
-   * @param array $values
-   * @param string $enclosure
-   *
-   * @deprecated
-   *
-   * @return void
-   */
-  public static function encloseScrub(&$values, $enclosure = "'") {
-    CRM_Core_Error::deprecatedFunctionWarning('no replacement');
-    if (empty($values)) {
-      return;
-    }
-
-    foreach ($values as $k => $v) {
-      $values[$k] = preg_replace("/^$enclosure(.*)$enclosure$/", '$1', $v);
-    }
-  }
-
-  /**
-   * Setter function.
-   *
-   * @deprecated
-   *
-   * @param int $max
-   *
-   * @return void
-   */
-  public function setMaxLinesToProcess($max) {
-    CRM_Core_Error::deprecatedFunctionWarning('no replacement');
-    $this->_maxLinesToProcess = $max;
-  }
-
-  /**
    * Validate that we have the required fields to create the contact or find it to update.
    *
    * Note that the users duplicate selection affects this as follows
@@ -675,44 +622,6 @@ abstract class CRM_Import_Parser implements UserJobInterface {
       $tagAdditions[$tagID] = ['added' => $outcome[1], 'notAdded' => $outcome[2]];
     }
     return $tagAdditions;
-  }
-
-  /**
-   * Determines the file extension based on error code.
-   *
-   * @deprecated
-   *
-   * @var int $type error code constant
-   * @return string
-   */
-  public static function errorFileName($type) {
-    CRM_Core_Error::deprecatedFunctionWarning('no replacement');
-    $fileName = NULL;
-    if (empty($type)) {
-      return $fileName;
-    }
-
-    $config = CRM_Core_Config::singleton();
-    $fileName = $config->uploadDir . "sqlImport";
-    switch ($type) {
-      case self::ERROR:
-        $fileName .= '.errors';
-        break;
-
-      case self::DUPLICATE:
-        $fileName .= '.duplicates';
-        break;
-
-      case self::NO_MATCH:
-        $fileName .= '.mismatch';
-        break;
-
-      case self::UNPARSED_ADDRESS_WARNING:
-        $fileName .= '.unparsedAddress';
-        break;
-    }
-
-    return $fileName;
   }
 
   /**
@@ -1239,45 +1148,6 @@ abstract class CRM_Import_Parser implements UserJobInterface {
         }
       }
     }
-  }
-
-  /**
-   * Parse a field which could be represented by a label or name value rather than the DB value.
-   *
-   * We will try to match name first or (per https://lab.civicrm.org/dev/core/issues/1285 if we have an id.
-   *
-   * but if not available then see if we have a label that can be converted to a name.
-   *
-   * @deprecated
-   *
-   * @param string|int|null $submittedValue
-   * @param array $fieldSpec
-   *   Metadata for the field
-   *
-   * @return mixed
-   */
-  protected function parsePseudoConstantField($submittedValue, $fieldSpec) {
-    CRM_Core_Error::deprecatedFunctionWarning('no replacement');
-    // dev/core#1289 Somehow we have wound up here but the BAO has not been specified in the fieldspec so we need to check this but future us problem, for now lets just return the submittedValue
-    if (!isset($fieldSpec['bao'])) {
-      return $submittedValue;
-    }
-    /** @var \CRM_Core_DAO $bao */
-    $bao = $fieldSpec['bao'];
-    // For historical reasons use validate as context - ie disabled name matches ARE permitted.
-    $nameOptions = $bao::buildOptions($fieldSpec['name'], 'validate');
-    if (isset($nameOptions[$submittedValue])) {
-      return $submittedValue;
-    }
-    if (in_array($submittedValue, $nameOptions)) {
-      return array_search($submittedValue, $nameOptions, TRUE);
-    }
-
-    $labelOptions = array_flip($bao::buildOptions($fieldSpec['name'], 'match'));
-    if (isset($labelOptions[$submittedValue])) {
-      return array_search($labelOptions[$submittedValue], $nameOptions, TRUE);
-    }
-    return '';
   }
 
   /**
