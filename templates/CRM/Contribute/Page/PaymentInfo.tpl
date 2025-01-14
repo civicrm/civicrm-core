@@ -20,36 +20,24 @@ CRM.$(function($) {
         $("#payment-info").html(html).trigger('crmLoad');
       }
     });
-    // Fixme: Possible bug - the following line won't be processed by smarty because it's in a literal block
-    var taxAmount = "{$totalTaxAmount}";
-    if (taxAmount) {
-      $('.total_amount-section').show();
-    }
-    else {
-      $('.total_amount-section').remove();
-    }
   }
 });
 </script>
 {/literal}
 {/if}
 {if $context eq 'payment_info'}
-<table id='info'>
-  <tr class="columnheader">
-    {if $component eq "event"}
-      <th>{ts}Total Fee(s){/ts}</th>
-    {else}
-      <th>{ts}Contribution Total{/ts}</th>
-    {/if}
-    <th class="right">{ts}Total Paid{/ts}</th>
-    <th class="right">{ts}Balance{/ts}</th>
-  </tr>
-  <tr>
-    <td>{$paymentInfo.total|crmMoney:$paymentInfo.currency}</td>
-    <td class='right'>
-        {$paymentInfo.paid|crmMoney:$paymentInfo.currency}
-    </td>
-    <td class="right" id="payment-info-balance" data-balance="{$paymentInfo.balance}">{$paymentInfo.balance|crmMoney:$paymentInfo.currency}</td>
-  </tr>
-</table>
+  {literal}
+  <script type='text/javascript'>
+  CRM.$(function($) {
+    $('#paymentInfoTotalPaid').text("{/literal}{$paymentInfo.paid|crmMoney:$paymentInfo.currency}{literal}").parent().addClass('crm-grid-row').removeClass('hiddenElement');
+    $('#paymentInfoAmountDue').text("{/literal}{$paymentInfo.balance|crmMoney:$paymentInfo.currency}{literal}").parent().addClass('crm-grid-row').removeClass('hiddenElement');
+    {/literal}
+      {if $paymentInfo.balance > 0}
+        // Add bold on the row so that the theme can more easily do something more meaningful
+        {literal}$('#paymentInfoAmountDue').parent().addClass('bold');{/literal}
+      {/if}
+    {literal}
+  });
+  </script>
+{/literal}
 {/if}

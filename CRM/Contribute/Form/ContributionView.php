@@ -276,12 +276,6 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
       if (($context === 'fulltext' || $context === 'search') && $searchKey) {
         $urlParams = "reset=1&id={$id}&cid={$values['contact_id']}&action=update&context={$context}&key={$searchKey}";
       }
-      if (!$contribution['is_template']) {
-        foreach (CRM_Contribute_BAO_Contribution::getContributionPaymentLinks($this->getContributionID(), $contributionStatus) as $paymentButton) {
-          $paymentButton['icon'] = 'fa-plus-circle';
-          $linkButtons[] = $paymentButton;
-        }
-      }
       $linkButtons[] = [
         'title' => ts('Edit'),
         'url' => 'civicrm/contact/view/contribution',

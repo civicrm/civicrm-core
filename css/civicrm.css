@@ -1015,30 +1015,30 @@ input.crm-form-entityref {
   border: 2px solid #999999;
 }
 
-#crm-container .float-left {
+.crm-container .float-left {
   float: left;
   padding: 4px 0;
   clear: none;
 }
 
-#crm-container .float-left + .float-left {
+.crm-container .float-left + .float-left {
   margin-left: 1em;
 }
 
-#crm-container .float-right {
+.crm-container .float-right {
   float: right;
   width: auto;
   padding: 4px 0;
   clear: none;
 }
 
-#crm-container .align-right {
+.crm-container .align-right {
   display: block;
   margin-right: 20px;
   text-align: right;
 }
 
-#crm-container .element-right {
+.crm-container .element-right {
   float: right;
   margin-right: 35px;
 }
