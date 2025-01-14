@@ -18,11 +18,6 @@ return [
           'select' => [
             'id',
             'label',
-            'permission',
-            'is_active',
-            'weight',
-            'permission_operator:label',
-            'url',
           ],
           'orderBy' => [],
           'where' => [
@@ -48,45 +43,49 @@ return [
         'name' => 'Administer_Navigation_Menu',
         'label' => E::ts('Administer Navigation Menu'),
         'saved_search_id.name' => 'Administer_Navigation_Menu',
-        'type' => 'table',
+        'type' => 'tree',
         'settings' => [
-          'description' => E::ts(''),
+          'description' => '',
           'sort' => [],
-          'limit' => 0,
-          'pager' => FALSE,
-          'placeholder' => 5,
+          'parent_field' => 'parent_id',
+          'placeholder' => 8,
           'columns' => [
             [
               'type' => 'field',
               'key' => 'label',
               'dataType' => 'String',
-              'label' => E::ts('Menu Item'),
-              'sortable' => TRUE,
               'icons' => [
+                [
+                  'icon' => 'fa-ban',
+                  'side' => 'left',
+                  'if' => [
+                    'is_active',
+                    '=',
+                    FALSE,
+                  ],
+                ],
                 [
                   'field' => 'icon',
                   'side' => 'left',
                 ],
               ],
+              'rewrite' => '',
+              'break' => FALSE,
               'editable' => TRUE,
+              'cssRules' => [
+                [
+                  'disabled',
+                  'is_active',
+                  '=',
+                  FALSE,
+                ],
+              ],
             ],
             [
-              'type' => 'field',
-              'key' => 'url',
-              'dataType' => 'String',
-              'label' => E::ts('Url'),
-              'sortable' => TRUE,
-            ],
-            [
-              'type' => 'field',
-              'key' => 'weight',
-              'dataType' => 'Integer',
-              'label' => E::ts('Order'),
-              'sortable' => TRUE,
-              'editable' => TRUE,
-            ],
-            [
+              'text' => '',
+              'style' => 'default-outline',
               'size' => 'btn-xs',
+              'icon' => 'fa-gear',
               'links' => [
                 [
                   'path' => '',
@@ -147,19 +146,13 @@ return [
                   'condition' => [],
                 ],
               ],
-              'type' => 'buttons',
-              'alignment' => 'text-right',
+              'type' => 'menu',
             ],
           ],
-          'actions' => TRUE,
-          'classes' => ['table', 'table-striped'],
-          'actions_display_mode' => 'menu',
-          'hierarchical' => TRUE,
+          'actions' => FALSE,
           'collapsible' => 'closed',
           'draggable' => 'weight',
-          'cssRules' => [
-            ['disabled', 'is_active', '=', FALSE],
-          ],
+          'cssRules' => [],
           'toolbar' => [
             [
               'entity' => 'Navigation',
