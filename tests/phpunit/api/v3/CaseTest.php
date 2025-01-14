@@ -834,9 +834,9 @@ class api_v3_CaseTest extends CiviCaseTestCase {
       ],
     ];
     $cid = $this->individualCreate();
-    $caseType = $this->callAPISuccess('CaseType', 'create', $caseSpec);
+    $this->ids['CaseType']['Application_with_Definition'] = $this->callAPISuccess('CaseType', 'create', $caseSpec)['id'];
     $case = $this->callAPISuccess('Case', 'create', [
-      'case_type_id' => $caseType['id'],
+      'case_type_id' => $this->ids['CaseType']['Application_with_Definition'],
       'contact_id' => $cid,
       'subject' => 'Test case with timeline',
     ]);

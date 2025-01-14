@@ -222,7 +222,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
 
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(1, $result[0]['columns'][0]['links']);
-    $this->assertNull($result[0]['columns'][1]['val']);
+    $this->assertEquals('', $result[0]['columns'][1]['val']);
     $this->assertArrayNotHasKey('links', $result[0]['columns'][1]);
     $this->assertCount(1, $result[1]['columns'][0]['links']);
     $this->assertCount(1, $result[1]['columns'][1]['links']);
@@ -1946,7 +1946,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertSame('3', $tally['id']);
     $this->assertSame('A', $tally['first_name']);
     $this->assertSame(['A', 'B', 'C'], $tally['last_name']);
-    $this->assertSame('18.5000', $tally['age_years']);
+    $this->assertSame('18.5', $tally['age_years']);
     $this->assertSame('aa', $tally['test_indiv_fields.text']);
     $this->assertSame('Blue', $tally['test_indiv_fields.colors:label']);
   }
@@ -1998,7 +1998,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
           'SUM(total_amount) AS SUM_total_amount',
           'GROUP_FIRST(receive_date ORDER BY receive_date ASC) AS GROUP_FIRST_receive_date',
           'GROUP_FIRST(financial_type_id:label ORDER BY receive_date ASC) AS GROUP_FIRST_financial_type_id_label',
-          'GROUP_CONCAT(test_contrib_fields.text) AS GROUP_CONCAT_test_contrib_fields_text',
+          'GROUP_CONCAT(test_contrib_fields.text ORDER BY receive_date ASC) AS GROUP_CONCAT_test_contrib_fields_text',
           'GROUP_FIRST(test_contrib_fields.options:label ORDER BY receive_date ASC) AS GROUP_FIRST_test_contrib_fields_options_label',
         ],
         'where' => [
@@ -2107,7 +2107,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertSame('02/02/2021', $tally['GROUP_FIRST_receive_date']);
     $this->assertSame('Donation, Innit', $tally['GROUP_FIRST_financial_type_id_label']);
     $this->assertSame('Blue', $tally['GROUP_FIRST_test_contrib_fields_options_label']);
-    $this->assertSame('a', $tally['GROUP_CONCAT_test_contrib_fields_text']);
+    $this->assertSame('b', $tally['GROUP_CONCAT_test_contrib_fields_text']);
   }
 
   public function testContributionTotalCountWithTestAndTemplateContributions():void {
@@ -2891,6 +2891,54 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     elseif ($type === \CRM_Core_Permission::EDIT) {
       $where = ' contact_a.id = ' . $this->allowedContactId;
     }
+  }
+
+  public function testFormatCustomData(): void {
+    $this->createTestRecord('CustomGroup', [
+      'extends' => 'Individual',
+      'name' => 'test_person_fields',
+    ]);
+    $this->saveTestRecords('CustomField', [
+      'defaults' => ['custom_group_id.name' => 'test_person_fields'],
+      'records' => [
+        ['html_type' => 'Text', 'name' => 'float', 'data_type' => 'Float'],
+        ['html_type' => 'Text', 'name' => 'money', 'data_type' => 'Money'],
+        ['html_type' => 'Text', 'name' => 'bool', 'data_type' => 'Boolean'],
+        ['html_type' => 'Select', 'name' => 'floatopts', 'data_type' => 'Float', 'option_values' => ['1' => 'One', '2' => 'Two']],
+      ],
+    ]);
+
+    $lastName = uniqid(__FUNCTION__);
+    $this->saveTestRecords('Individual', [
+      'defaults' => ['last_name' => $lastName],
+      'records' => [
+        ['test_person_fields.float' => 12345678.89, 'test_person_fields.money' => 12345678.89, 'test_person_fields.floatopts' => 2],
+      ],
+    ]);
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Individual',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['test_person_fields.float', 'test_person_fields.money', 'test_person_fields.bool', 'test_person_fields.floatopts:label'],
+          'where' => [
+            ['last_name', '=', $lastName],
+          ],
+        ],
+      ],
+      'display' => NULL,
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+
+    $this->assertCount(1, $result);
+    $this->assertSame('12,345,678.89', $result[0]['columns'][0]['val']);
+    $this->assertSame('$12,345,678.89', $result[0]['columns'][1]['val']);
+    $this->assertSame('', $result[0]['columns'][2]['val']);
+    $this->assertSame('Two', $result[0]['columns'][3]['val']);
   }
 
 }

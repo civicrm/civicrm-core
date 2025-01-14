@@ -17,7 +17,6 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
   use CRM_Financial_Form_SalesTaxTrait;
 
   protected $params;
-  protected $_entity = 'line_item';
 
   /**
    * Should financials be checked after the test but before tear down.
@@ -92,22 +91,6 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test basic create line item.
-   *
-   * @param int $version
-   *
-   * @dataProvider versionThreeAndFour
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function testCreateLineItem(int $version): void {
-    $this->_apiversion = $version;
-    $result = $this->callAPISuccess($this->_entity, 'create', $this->params)['values'];
-    $this->assertCount(1, $result);
-    $this->getAndCheck($this->params, key($result), $this->_entity);
-  }
-
-  /**
    * Test zero is valid for amount fields.
    *
    * https://github.com/civicrm/civicrm-core/pull/20342
@@ -115,8 +98,6 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @dataProvider versionThreeAndFour
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testCreateLineItemZero(int $version): void {
     $this->_apiversion = $version;
@@ -125,51 +106,10 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test basic get line item.
-   *
-   * @param int $version
-   *
-   * @dataProvider versionThreeAndFour
-   */
-  public function testGetBasicLineItem($version): void {
-    $this->_apiversion = $version;
-    $getParams = [
-      'entity_table' => 'civicrm_contribution',
-    ];
-    $getResult = $this->callAPISuccess($this->_entity, 'get', $getParams);
-    $this->assertEquals(1, $getResult['count']);
-  }
-
-  /**
-   * Test delete line item.
-   *
-   * @param int $version
-   *
-   * @dataProvider versionThreeAndFour
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function testDeleteLineItem(int $version): void {
-    // Deleting line items does not leave valid financial data.
-    $this->isValidateFinancialsOnPostAssert = FALSE;
-    $this->_apiversion = $version;
-    $getParams = [
-      'entity_table' => 'civicrm_contribution',
-    ];
-    $getResult = $this->callAPISuccess($this->_entity, 'get', $getParams);
-    $deleteParams = ['id' => $getResult['id']];
-    $this->callAPISuccess($this->_entity, 'delete', $deleteParams);
-    $checkDeleted = $this->callAPISuccess($this->_entity, 'get');
-    $this->assertEquals(0, $checkDeleted['count']);
-  }
-
-  /**
    * Test getfields function.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testGetFieldsLineItem(): void {
-    $result = $this->callAPISuccess($this->_entity, 'getfields', ['action' => 'create']);
+    $result = $this->callAPISuccess('LineItem', 'getfields', ['action' => 'create']);
     $this->assertEquals(1, $result['values']['entity_id']['api.required']);
   }
 

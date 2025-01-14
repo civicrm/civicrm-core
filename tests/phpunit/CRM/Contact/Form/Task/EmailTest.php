@@ -10,20 +10,13 @@
  */
 
 use Civi\Api4\Activity;
+use Civi\Api4\OptionValue;
 
 /**
  * Test class for CRM_Contact_Form_Task_Email.
  * @group headless
  */
 class CRM_Contact_Form_Task_EmailTest extends CiviUnitTestCase {
-
-  /**
-   * Option value for 'From Email Address' option,
-   * created as part of test setup.
-   *
-   * @var array
-   */
-  private $optionValue;
 
   /**
    * Set up for tests.
@@ -34,10 +27,10 @@ class CRM_Contact_Form_Task_EmailTest extends CiviUnitTestCase {
     $this->individualCreate(['first_name' => 'Antonia', 'last_name' => 'D`souza']);
     $this->individualCreate(['first_name' => 'Anthony', 'last_name' => 'Collins']);
 
-    $this->optionValue = $this->callAPISuccess('optionValue', 'create', [
+    $this->createTestEntity('OptionValue', [
       'label' => '"Seamus Lee" <seamus@example.com>',
-      'option_group_id' => 'from_email_address',
-    ]);
+      'option_group_id:name' => 'from_email_address',
+    ], 'aussie');
   }
 
   /**
@@ -47,6 +40,9 @@ class CRM_Contact_Form_Task_EmailTest extends CiviUnitTestCase {
    */
   public function tearDown(): void {
     Civi::settings()->set('allow_mail_from_logged_in_contact', 0);
+    if (!empty($this->ids['OptionValue'])) {
+      OptionValue::delete(FALSE)->addWhere('id', 'IN', $this->ids['OptionValue'])->execute();
+    }
     parent::tearDown();
   }
 
@@ -57,10 +53,10 @@ class CRM_Contact_Form_Task_EmailTest extends CiviUnitTestCase {
     $emails = CRM_Core_BAO_Email::domainEmails();
     $this->assertNotEmpty($emails);
     $optionValue = $this->callAPISuccess('OptionValue', 'Get', [
-      'id' => $this->optionValue['id'],
+      'id' => $this->ids['OptionValue']['aussie'],
     ]);
     $this->assertArrayHasKey('"Seamus Lee" <seamus@example.com>', $emails);
-    $this->assertEquals('"Seamus Lee" <seamus@example.com>', $optionValue['values'][$this->optionValue['id']]['label']);
+    $this->assertEquals('"Seamus Lee" <seamus@example.com>', $optionValue['values'][$this->ids['OptionValue']['aussie']]['label']);
   }
 
   /**

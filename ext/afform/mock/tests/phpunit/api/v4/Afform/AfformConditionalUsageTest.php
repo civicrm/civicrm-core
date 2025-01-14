@@ -2,13 +2,14 @@
 namespace api\v4\Afform;
 
 use Civi\Api4\Afform;
+use Civi\Test\TransactionalInterface;
 
 /**
  * Test case for Afform with autocomplete.
  *
  * @group headless
  */
-class AfformConditionalUsageTest extends AfformUsageTestCase {
+class AfformConditionalUsageTest extends AfformUsageTestCase implements TransactionalInterface {
 
   /**
    * Required field based on text input

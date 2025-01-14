@@ -2,12 +2,12 @@
 namespace api\v4\Afform;
 
 use Civi\Test\HeadlessInterface;
-use Civi\Test\TransactionalInterface;
 
 /**
  * Base class for Afform API tests.
  */
-abstract class AfformTestCase extends \PHPUnit\Framework\TestCase implements HeadlessInterface, TransactionalInterface {
+abstract class AfformTestCase extends \PHPUnit\Framework\TestCase implements HeadlessInterface {
+  use \Civi\Test\Api4TestTrait;
 
   /**
    * Civi\Test has many helpers, like install(), uninstall(), sql(), and sqlFile().

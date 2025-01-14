@@ -38,6 +38,10 @@
         };
 
         function formatDataType(val) {
+          // Do not reformat pseudoconstant values (:name, :label, etc)
+          if (ctrl.optionKey && ctrl.optionKey !== 'id') {
+            return val;
+          }
           if (_.isArray(val)) {
             const formatted = angular.copy(val);
             formatted.forEach((v, i) => formatted[i] = formatDataType(v));

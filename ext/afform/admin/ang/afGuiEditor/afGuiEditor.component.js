@@ -18,7 +18,7 @@
       mode: '@'
     },
     controllerAs: 'editor',
-    controller: function($scope, crmApi4, afGui, $parse, $timeout) {
+    controller: function($scope, crmApi4, afGui, $parse, $timeout, $location, $route, $rootScope) {
       var ts = $scope.ts = CRM.ts('org.civicrm.afform_admin');
 
       this.afform = null;
@@ -30,7 +30,7 @@
         undoHistory = [],
         undoPosition = 0,
         undoAction = null,
-        lastSaved,
+        lastSaved = {},
         sortableOptions = {};
 
       // ngModelOptions to debounce input
@@ -649,6 +649,8 @@
             if (!editor.afform.name) {
               undoAction = 'save';
               editor.afform.name = data[0].name;
+              // Update path to editing url
+              changePathQuietly('/edit/' + data[0].name);
             }
             // Update undo history - mark current snapshot as "saved"
             _.each(undoHistory, function(snapshot, index) {
@@ -708,6 +710,18 @@
           }
         });
       };
+
+      // Change the URL path without triggering a route change
+      function changePathQuietly(newPath) {
+        const lastRoute = $route.current;
+        // Intercept location change and restore current route
+        const un = $rootScope.$on('$locationChangeSuccess', function() {
+          $route.current = lastRoute;
+          un();
+        });
+        return $location.path(newPath);
+      }
+
     }
   });
 

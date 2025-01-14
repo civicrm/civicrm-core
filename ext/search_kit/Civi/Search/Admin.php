@@ -190,7 +190,7 @@ class Admin {
   private static function getDefaultColumns(array $entity, iterable $getFields): array {
     // Start with id & label
     $defaultColumns = array_merge(
-      $entity['primary_key'],
+      $entity['primary_key'] ?? [],
       $entity['search_fields'] ?? []
     );
     $possibleColumns = [];

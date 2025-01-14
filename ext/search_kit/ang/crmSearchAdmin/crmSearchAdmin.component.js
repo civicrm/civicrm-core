@@ -365,7 +365,7 @@
       if (value) {
         ctrl.savedSearch.api_params.join = ctrl.savedSearch.api_params.join || [];
         var join = searchMeta.getJoin(ctrl.savedSearch, value),
-          entity = searchMeta.getEntity(ctrl.savedSearch, join.entity),
+          entity = searchMeta.getEntity(join.entity),
           params = [value, $scope.controls.joinType || 'LEFT'];
         _.each(_.cloneDeep(join.conditions), function(condition) {
           params.push(condition);

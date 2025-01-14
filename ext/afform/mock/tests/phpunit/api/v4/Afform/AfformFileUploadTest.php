@@ -9,11 +9,7 @@ namespace api\v4\Afform;
 
 use Civi\Api4\Afform;
 use Civi\Api4\Contact;
-use Civi\Api4\CustomField;
-use Civi\Api4\CustomGroup;
 
-require_once __DIR__ . '/AfformTestCase.php';
-require_once __DIR__ . '/AfformUsageTestCase.php';
 class AfformFileUploadTest extends AfformUsageTestCase {
 
   public static function setUpBeforeClass(): void {
@@ -45,33 +41,35 @@ EOHTML;
    */
   public function testSubmitFile(): void {
     // Single-value set
-    CustomGroup::create(FALSE)
-      ->addValue('name', 'MyInfo')
-      ->addValue('title', 'My Info')
-      ->addValue('extends', 'Contact')
-      ->addChain('fields', CustomField::save()
-        ->addDefault('custom_group_id', '$id')
-        ->setRecords([
-          ['name' => 'single_file_field', 'label' => 'A File', 'data_type' => 'File', 'html_type' => 'File'],
-        ])
-      )
-      ->execute();
+    $this->createTestRecord('CustomGroup', [
+      'name' => 'MyInfo',
+      'title' => 'My Info',
+      'extends' => 'Contact',
+    ]);
+    $this->createTestRecord('CustomField', [
+      'custom_group_id.name' => 'MyInfo',
+      'name' => 'single_file_field',
+      'label' => 'A File',
+      'data_type' => 'File',
+      'html_type' => 'File',
+    ]);
 
     // Multi-record set
-    CustomGroup::create(FALSE)
-      ->addValue('name', 'MyFiles')
-      ->addValue('title', 'My Files')
-      ->addValue('style', 'Tab with table')
-      ->addValue('extends', 'Contact')
-      ->addValue('is_multiple', TRUE)
-      ->addValue('max_multiple', 3)
-      ->addChain('fields', CustomField::save()
-        ->addDefault('custom_group_id', '$id')
-        ->setRecords([
-          ['name' => 'my_file', 'label' => 'My File', 'data_type' => 'File', 'html_type' => 'File'],
-        ])
-      )
-      ->execute();
+    $this->createTestRecord('CustomGroup', [
+      'name' => 'MyFiles',
+      'title' => 'My Files',
+      'style' => 'Tab with table',
+      'extends' => 'Contact',
+      'is_multiple' => TRUE,
+      'max_multiple' => 3,
+    ]);
+    $this->createTestRecord('CustomField', [
+      'custom_group_id.name' => 'MyFiles',
+      'name' => 'my_file',
+      'label' => 'My File',
+      'data_type' => 'File',
+      'html_type' => 'File',
+    ]);
 
     $this->useValues([
       'layout' => self::$layouts['customFiles'],

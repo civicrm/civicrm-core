@@ -26,12 +26,14 @@ class SqlFunctionCONCAT_WS extends SqlFunction {
         'optional' => FALSE,
         'must_be' => ['SqlString'],
         'label' => ts('Separator'),
+        'can_be_empty' => TRUE,
       ],
       [
         'max_expr' => 99,
         'optional' => FALSE,
         'must_be' => ['SqlField', 'SqlString'],
         'label' => ts('Plus'),
+        'can_be_empty' => TRUE,
       ],
     ];
   }
