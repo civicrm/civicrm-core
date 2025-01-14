@@ -92,7 +92,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Afform',
       'Profile',
       'CustomValue',
-      'Constant',
       'CustomSearch',
       'Extension',
       'ReportTemplate',
@@ -103,7 +102,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     ];
     $this->toBeImplemented['create'] = [
       'Afform',
-      'SurveyRespondant',
       'OptionGroup',
       'MailingRecipients',
       'UFMatch',
@@ -120,7 +118,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $this->toBeImplemented['delete'] = [
       'MembershipPayment',
       'OptionGroup',
-      'SurveyRespondant',
       'UFJoin',
       'UFMatch',
       'Extension',
@@ -132,7 +129,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   }
 
   public function getDeprecatedAPIs() : array {
-    return ['Location', 'ActivityType', 'SurveyRespondant'];
+    return [];
   }
 
   public function tearDown(): void {
@@ -287,7 +284,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   public static function toBeSkipped_get($sequential = FALSE) {
     $entitiesWithoutGet = [
       'MailingEventResubscribe',
-      'Location',
     ];
     if ($sequential === TRUE) {
       return $entitiesWithoutGet;
@@ -324,7 +320,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * @return array
    */
   public static function toBeSkipped_create($sequential = FALSE) {
-    $entitiesWithoutCreate = ['Constant', 'Entity', 'Location', 'Profile', 'MailingRecipients'];
+    $entitiesWithoutCreate = ['Entity', 'Profile', 'MailingRecipients'];
     if ($sequential === TRUE) {
       return $entitiesWithoutCreate;
     }
@@ -348,9 +344,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'MailingEventSubscribe',
       'MailingEventUnsubscribe',
       'MailingRecipients',
-      'Constant',
       'Entity',
-      'Location',
       'Domain',
       'Profile',
       'CustomValue',
@@ -399,9 +393,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Relationship',
 
       // ones that are not real entities hence not extendable.
-      'ActivityType',
       'Entity',
-      'Constant',
       'Attachment',
       'CustomSearch',
       'CustomValue',
@@ -413,7 +405,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'SystemLog',
       'ReportTemplate',
       'MailingRecipients',
-      'SurveyRespondant',
       'Profile',
       'Payment',
       'Order',
@@ -461,7 +452,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'EntityTag',
       'Participant',
       'Setting',
-      'SurveyRespondant',
       'MailingRecipients',
       'CustomSearch',
       'Extension',
@@ -494,9 +484,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Mailing',
       'MailingEventUnsubscribe',
       'MailingEventSubscribe',
-      'Constant',
       'Entity',
-      'Location',
       'Profile',
       'CustomValue',
       'UFJoin',
@@ -509,7 +497,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'CustomField',
       'CustomGroup',
       'Contribution',
-      'ActivityType',
       'MailingEventConfirm',
       'Case',
       'CaseContact',
@@ -959,9 +946,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     ) {
       return;
     }
-    if (in_array($Entity, ['ActivityType', 'SurveyRespondant'])) {
-      $this->markTestSkipped();
-    }
     $this->callAPISuccess($Entity, 'getlist', ['label_field' => 'id']);
   }
 
@@ -977,9 +961,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       || in_array($entity, $this->toBeSkippedGetByID())
     ) {
       return;
-    }
-    if (in_array($entity, ['ActivityType', 'SurveyRespondant'])) {
-      $this->markTestSkipped();
     }
     if ($entity === 'UFGroup') {
       $entity = 'ufgroup';
@@ -1262,7 +1243,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * @throws \PHPUnit\Framework\IncompleteTestError
    */
   public function testInvalidSort_get($Entity) {
-    $invalidEntitys = ['ActivityType', 'Setting', 'System'];
+    $invalidEntitys = ['Setting', 'System'];
     if (in_array($Entity, $invalidEntitys)) {
       $this->markTestSkipped('It seems OK for ' . $Entity . ' to skip here as it silently sips invalid params');
     }
@@ -1277,7 +1258,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * @throws \PHPUnit\Framework\IncompleteTestError
    */
   public function testValidSortSingleArrayById_get($Entity) {
-    $invalidEntitys = ['ActivityType', 'Setting', 'System'];
+    $invalidEntitys = ['Setting', 'System'];
     $tests = [
       'id' => '_id',
       'id desc' => '_id desc',
@@ -1800,7 +1781,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    */
   protected function getOnlyIDNonZeroCount(): array {
     return [
-      'ActivityType',
       'Entity',
       'Domain',
       'Setting',

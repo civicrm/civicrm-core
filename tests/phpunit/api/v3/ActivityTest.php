@@ -1270,45 +1270,6 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test chained Activity format.
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function testChainedActivityGet(): void {
-
-    $activity = $this->callAPISuccess('Contact', 'Create', [
-      'display_name' => 'bob brown',
-      'contact_type' => 'Individual',
-      'api.activity_type.create' => [
-        'weight' => '2',
-        'label' => 'send out letters',
-        'filter' => 0,
-        'is_active' => 1,
-        'is_optgroup' => 1,
-        'is_default' => 0,
-      ],
-      'api.activity.create' => [
-        'subject' => 'send letter',
-        'activity_type_id' => '$value.api.activity_type.create.values.0.value',
-      ],
-    ]);
-
-    $this->callAPISuccess('Activity', 'Get', [
-      'id' => $activity['id'],
-      'return.assignee_contact_id' => 1,
-      'api.contact.get' => ['api.pledge.get' => 1],
-    ]);
-  }
-
-  /**
-   * Test civicrm_activity_contact_get() with invalid Contact ID.
-   */
-  public function testActivitiesContactGetWithInvalidContactId(): void {
-    $params = ['contact_id' => 'contact'];
-    $this->callAPIFailure('activity', 'get', $params);
-  }
-
-  /**
    * Test civicrm_activity_contact_get() with contact having no Activity.
    */
   public function testActivitiesContactGetHavingNoActivity(): void {
