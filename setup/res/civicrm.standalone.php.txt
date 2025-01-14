@@ -7,6 +7,9 @@
  * locate and run the CiviCRM autoloader, classloader and settingsloader
  */
 
+// this file should set these two globals
+global $appRootPath, $settingsPath;
+
 // this file should always be in the project root
 $appRootPath = __DIR__;
 
