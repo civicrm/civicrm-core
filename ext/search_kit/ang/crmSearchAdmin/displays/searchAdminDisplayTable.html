@@ -1,8 +1,9 @@
 <div ng-include="'~/crmSearchAdmin/crmSearchAdminDisplayHeader.html'"></div>
-<details>
-  <summary>{{:: ts('Settings') }}</summary>
-  <fieldset ng-if="!$ctrl.display.settings.draggable" ng-include="'~/crmSearchAdmin/crmSearchAdminDisplaySort.html'"></fieldset>
-  <fieldset>
+<fieldset>
+  <legend>{{:: ts('Display Settings') }}</legend>
+
+  <details>
+    <summary>{{:: ts('Sorting') }}</summary>
     <div ng-if="$ctrl.sortableEntity" class="form-inline">
       <div class="checkbox-inline form-control">
         <label>
@@ -11,6 +12,7 @@
         </label>
       </div>
     </div>
+    <fieldset ng-if="!$ctrl.display.settings.draggable" ng-include="'~/crmSearchAdmin/crmSearchAdminDisplaySort.html'"></fieldset>
     <div ng-if="$ctrl.hierarchicalEntity" class="form-inline">
       <div class="checkbox-inline form-control">
         <label>
@@ -24,11 +26,14 @@
         <option value="closed">{{:: ts('Collapsible - Closed') }}</option>
       </select>
     </div>
-    <div class="form-inline">
-      <search-admin-tasks-config display="$ctrl.display" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams"></search-admin-tasks-config>
-    </div>
-    <div class="form-inline">
-      <div class="form-group" ng-include="'~/crmSearchAdmin/displays/common/searchButtonConfig.html'"></div>
+  </details>
+
+  <details>
+    <summary>{{:: ts('Style') }}</summary>
+    <search-admin-placeholder-config display="$ctrl.display"></search-admin-placeholder-config>
+    <div class="form-inline crm-search-admin-flex-row" title="{{:: ts('Text to display if the table is empty.') }}">
+      <label for="crm-search-admin-display-no-results-text">{{:: ts('No Results Text') }}</label>
+      <input class="form-control crm-flex-1" id="crm-search-admin-display-no-results-text" ng-model="$ctrl.display.settings.noResultsText" placeholder="{{:: ts('None found.') }}">
     </div>
     <div class="form-inline">
       <label>{{:: ts('Table Style') }}</label>
@@ -40,13 +45,22 @@
       </div>
     </div>
     <search-admin-css-rules label="{{:: ts('Row Style') }}" item="$ctrl.display.settings"></search-admin-css-rules>
-    <search-admin-pager-config display="$ctrl.display"></search-admin-pager-config>
-    <search-admin-placeholder-config display="$ctrl.display"></search-admin-placeholder-config>
-    <div class="form-inline crm-search-admin-flex-row" title="{{:: ts('Text to display if the table is empty.') }}">
-      <label for="crm-search-admin-display-no-results-text">{{:: ts('No Results Text') }}</label>
-      <input class="form-control crm-flex-1" id="crm-search-admin-display-no-results-text" ng-model="$ctrl.display.settings.noResultsText" placeholder="{{:: ts('None found.') }}">
+  </details>
+
+  <details>
+    <summary>{{:: ts('Header') }}</summary>
+    <div class="form-inline">
+      <div class="form-group" ng-include="'~/crmSearchAdmin/displays/common/searchButtonConfig.html'"></div>
+    </div>
+    <div class="form-inline">
+      <search-admin-tasks-config display="$ctrl.display" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams"></search-admin-tasks-config>
     </div>
     <search-admin-toolbar-config display="$ctrl.display" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams"></search-admin-toolbar-config>
+  </details>
+
+  <details>
+    <summary>{{:: ts('Footer') }}</summary>
+    <search-admin-pager-config display="$ctrl.display"></search-admin-pager-config>
     <div class="form-inline">
       <div class="checkbox-inline form-control" title="{{:: ts('Shows grand totals or other statistics, configured per-column.') }}">
         <label>
@@ -59,8 +73,36 @@
         <input id="crm-search-admin-table-tally-title" ng-model="$ctrl.display.settings.tally.label" class="form-control">
       </div>
     </div>
-  </fieldset>
-</details>
+  </details>
+
+  <details>
+    <summary>{{:: ts('In-Place Edit') }}</summary>
+    <div class="form-inline">
+      <label class="radio-inline">
+        <input type="radio" ng-click="$ctrl.toggleEditableRowMode('full', false)" ng-checked="!$ctrl.display.settings.editableRow.full && !$ctrl.display.settings.editableRow.disable">
+        {{:: ts('Single Field') }}
+      </label>
+      <label class="radio-inline">
+        <input type="radio" ng-click="$ctrl.toggleEditableRowMode('full', true)" ng-checked="!!$ctrl.display.settings.editableRow.full">
+        {{:: ts('Entire Row') }}
+      </label>
+      <label class="radio-inline" ng-class="{disabled: !$ctrl.display.settings.editableRow.create}">
+        <input type="radio" ng-click="$ctrl.toggleEditableRowMode('disable', true)" ng-checked="!!$ctrl.display.settings.editableRow.disable">
+        {{:: ts('Disabled (create only)') }}
+      </label>
+    </div>
+    <div class="form-inline">
+      <div class="checkbox-inline form-control" title="{{:: ts('Create a new record using in-place edit.') }}">
+        <label>
+          <input type="checkbox" ng-click="$ctrl.toggleEditableRowMode('create')" ng-checked="!!$ctrl.display.settings.editableRow.create">
+          <span>{{:: ts('Add New Button') }}</span>
+        </label>
+      </div>
+      <input ng-if="$ctrl.display.settings.editableRow.create" class="form-control" placeholder="{{:: ts('(no label)') }}" ng-model="$ctrl.display.settings.editableRow.createLabel">
+    </div>
+  </details>
+</fieldset>
+
 <fieldset class="crm-search-admin-edit-columns-wrapper">
   <legend>
     {{:: ts('Columns') }}
@@ -98,6 +140,12 @@
           <input class="form-control" ng-model="col.tally.label" placeholder="{{:: ts('None') }}">
           <label>{{:: ts('Footer Aggregate') }}</label>
           <input class="form-control" ng-model="col.tally.fn" crm-ui-select="{data: $ctrl.getTallyFunctions, placeholder: ts('None'), allowClear: true}">
+          <label>
+            <input type="checkbox" ng-click="$ctrl.toggleTallyRewrite(col)" ng-checked="!!col.tally.rewrite">
+            {{:: ts('Footer Rewrite') }}
+          </label>
+          <input class="form-control" ng-if="col.tally.rewrite" ng-model="col.tally.rewrite" placeholder="{{:: ts('None') }}" title="{{:: ts('Footer Rewrite') }}" ng-model-options="{updateOn: 'blur'}">
+          <crm-search-admin-token-select ng-if="col.tally.rewrite" model="col.tally" field="rewrite" only-select="true"></crm-search-admin-token-select>
         </div>
       </details>
     </fieldset>

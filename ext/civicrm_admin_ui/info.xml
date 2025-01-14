@@ -26,11 +26,11 @@
   <civix>
     <namespace>CRM/CivicrmAdminUi</namespace>
     <angularModule>crmCivicrmAdminUi</angularModule>
-    <format>23.02.1</format>
+    <format>24.09.1</format>
   </civix>
   <mixins>
     <mixin>mgd-php@1.0.0</mixin>
     <mixin>scan-classes@1.0.0</mixin>
   </mixins>
-  <upgrader>CRM_CivicrmAdminUi_Upgrader</upgrader>
+  <upgrader>CiviMix\Schema\CivicrmAdminUi\AutomaticUpgrader</upgrader>
 </extension>

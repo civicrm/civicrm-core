@@ -224,6 +224,7 @@ abstract class SqlFunction extends SqlExpression {
         'flag_after' => [],
         'optional' => FALSE,
         'must_be' => ['SqlField', 'SqlFunction', 'SqlString', 'SqlNumber', 'SqlNull'],
+        'can_be_empty' => FALSE,
         'api_default' => NULL,
       ];
       if (!$param['max_expr']) {

@@ -456,11 +456,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
       }
     }
 
-    $expectedKeys = ['count', 'class', 'template', 'hideCount', 'icon'];
-
     foreach ($allTabs as &$tab) {
-      // Ensure tab has all expected keys
-      $tab += array_fill_keys($expectedKeys, NULL);
       // Get tab counts last to avoid wasting time; if a tab was removed by hook, the count isn't needed.
       if (!isset($tab['count']) && isset($getCountParams[$tab['id']])) {
         $tab['count'] = call_user_func_array([
@@ -470,9 +466,21 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
       }
     }
 
+    // ensure all keys used in the template are set, to avoid notices
+    $allTabs = \CRM_Core_Smarty::setRequiredTabTemplateKeys($allTabs);
+
+    // ensure the array keys match the value in the "id" of each item
+    $tabs = [];
+
+    foreach ($allTabs as $key => $tab) {
+      $finalKey = $tab['id'] ?? $key;
+      $tabs[$finalKey] = $tab;
+    }
+
     // now sort the tabs based on weight
-    usort($allTabs, ['CRM_Utils_Sort', 'cmpFunc']);
-    return $allTabs;
+    usort($tabs, ['CRM_Utils_Sort', 'cmpFunc']);
+
+    return $tabs;
   }
 
   /**

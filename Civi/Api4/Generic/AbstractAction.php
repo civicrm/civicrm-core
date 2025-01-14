@@ -277,7 +277,7 @@ abstract class AbstractAction implements \ArrayAccess {
     $params = [];
     $magicProperties = $this->getMagicProperties();
     foreach ($magicProperties as $name => $bool) {
-      $params[$name] = $this->$name;
+      $params[$name] = $this->$name ?? NULL;
     }
     return $params;
   }
@@ -305,6 +305,10 @@ abstract class AbstractAction implements \ArrayAccess {
         if ($name != 'version' && $name[0] != '_') {
           $docs = ReflectionUtils::getCodeDocs($property, 'Property', $vars);
           $docs['default'] = $defaults[$name];
+          // Exclude `null` which is not a value type
+          if (!empty($docs['type']) && is_array($docs['type'])) {
+            $docs['type'] = array_diff($docs['type'], ['null']);
+          }
           if (!empty($docs['optionsCallback'])) {
             $docs['options'] = $this->{$docs['optionsCallback']}();
             unset($docs['optionsCallback']);

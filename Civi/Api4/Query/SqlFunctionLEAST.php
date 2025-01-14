@@ -27,6 +27,7 @@ class SqlFunctionLEAST extends SqlFunction {
         'min_expr' => 2,
         'optional' => FALSE,
         'label' => ts('Else'),
+        'can_be_empty' => TRUE,
       ],
     ];
   }

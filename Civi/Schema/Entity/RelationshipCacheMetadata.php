@@ -9,11 +9,16 @@
  +--------------------------------------------------------------------+
  */
 
-require_once '../civicrm.config.php';
-CRM_Core_Config::singleton();
+namespace Civi\Schema\Entity;
 
-CRM_Utils_System::loadBootStrap(array(), FALSE);
+use Civi\Schema\SqlEntityMetadata;
 
-CRM_Cxn_BAO_Cxn::createApiServer()
-  ->handle(file_get_contents('php://input'))
-  ->send();
+class RelationshipCacheMetadata extends SqlEntityMetadata {
+
+  public function getCustomFields(array $customGroupFilters = []): array {
+    // Include relationship custom fields
+    $customGroupFilters += ['extends' => 'Relationship'];
+    return parent::getCustomFields($customGroupFilters);
+  }
+
+}

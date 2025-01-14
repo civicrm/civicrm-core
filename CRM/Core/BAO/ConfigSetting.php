@@ -285,7 +285,7 @@ class CRM_Core_BAO_ConfigSetting {
 
     $resetSessionTable = CRM_Utils_Request::retrieve('resetSessionTable',
       'Boolean',
-      CRM_Core_DAO::$_nullArray,
+      NULL,
       FALSE,
       FALSE
     );

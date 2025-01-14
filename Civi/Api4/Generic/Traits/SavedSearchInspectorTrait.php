@@ -4,6 +4,7 @@ namespace Civi\Api4\Generic\Traits;
 
 use Civi\API\Exception\UnauthorizedException;
 use Civi\API\Request;
+use Civi\Api4\Action\SearchDisplay\AbstractRunAction;
 use Civi\Api4\Query\SqlEquation;
 use Civi\Api4\Query\SqlExpression;
 use Civi\Api4\Query\SqlField;
@@ -413,6 +414,10 @@ trait SavedSearchInspectorTrait {
     }
     elseif ($expr instanceof SqlField) {
       $field = $this->getField($expr->getExpr());
+      if (!$field) {
+        $pseudoFields = array_column(AbstractRunAction::getPseudoFields(), NULL, 'name');
+        $field = $pseudoFields[$expr->getExpr()] ?? NULL;
+      }
       $label = '';
       if (!empty($field['explicit_join'])) {
         $label = $this->getJoinLabel($field['explicit_join']) . ': ';
@@ -445,7 +450,7 @@ trait SavedSearchInspectorTrait {
           $joinCount[$entityName] = 1;
         }
         $label = CoreUtil::getInfoItem($entityName, 'title');
-        $this->_joinMap[$alias] = $label . $num;
+        $this->_joinMap[$alias] = $this->savedSearch['form_values']['join'][$alias] ?? "$label$num";
       }
     }
     return $this->_joinMap[$joinAlias];

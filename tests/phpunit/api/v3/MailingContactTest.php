@@ -24,20 +24,9 @@
  * @group headless
  */
 class api_v3_MailingContactTest extends CiviUnitTestCase {
-  protected $contact;
-
-  public function setUp(): void {
-    parent::setUp();
-    $params = [
-      'first_name' => 'abc1',
-      'contact_type' => 'Individual',
-      'last_name' => 'xyz1',
-    ];
-    $this->contact = $this->callAPISuccess("contact", "create", $params);
-  }
 
   public function tearDown(): void {
-    $this->callAPISuccess("contact", "delete", ['id' => $this->contact['id']]);
+    $this->quickCleanup(['civicrm_contact', 'civicrm_mailing_recipients', 'civicrm_mailing', 'civicrm_mailing_event_delivered']);
     parent::tearDown();
   }
 
@@ -46,53 +35,6 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
       'action' => 'get',
     ]);
     $this->assertEquals('Delivered', $result['values']['type']['api.default']);
-  }
-
-  /**
-   * Test for proper error when you do not supply the contact_id.
-   *
-   * Do not copy and paste.
-   *
-   * Test is of marginal if any value & testing of wrapper level functionality
-   * belongs in the SyntaxConformance class
-   */
-  public function testMailingNoContactID(): void {
-    $this->callAPIFailure('MailingContact', 'get', ['something' => 'This is not a real field']);
-  }
-
-  /**
-   * Test that invalid contact_id return with proper error messages.
-   *
-   * Do not copy & paste.
-   *
-   * Test is of marginal if any value & testing of wrapper level functionality
-   * belongs in the SyntaxConformance class
-   */
-  public function testMailingContactInvalidContactID(): void {
-    $this->callAPIFailure('MailingContact', 'get', ['contact_id' => 'This is not a number']);
-  }
-
-  /**
-   * Test that invalid types are returned with appropriate errors.
-   */
-  public function testMailingContactInvalidType(): void {
-    $params = [
-      'contact_id' => 23,
-      'type' => 'invalid',
-    ];
-    $this->callAPIFailure('MailingContact', 'get', $params);
-  }
-
-  /**
-   * Test for success result when there are no mailings for a the given contact.
-   */
-  public function testMailingContactNoMailings(): void {
-    $params = [
-      'contact_id' => $this->contact['id'],
-    ];
-    $result = $this->callAPISuccess('MailingContact', 'get', $params);
-    $this->assertEquals($result['count'], 0);
-    $this->assertTrue(empty($result['values']));
   }
 
   /**
@@ -109,11 +51,11 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
 
     $result = $this->callAPISuccess('MailingContact', 'get', $params);
     $count = $this->callAPISuccess('MailingContact', 'getcount', $params);
-    $this->assertEquals($result['count'], 1);
-    $this->assertEquals($count, 1);
+    $this->assertEquals(1, $result['count']);
+    $this->assertEquals(1, $count);
     $this->assertFalse(empty($result['values']));
-    $this->assertEquals($result['values'][1]['mailing_id'], 1);
-    $this->assertEquals($result['values'][1]['subject'], "Some Subject");
+    $this->assertEquals(1, $result['values'][1]['mailing_id']);
+    $this->assertEquals("Some Subject", $result['values'][1]['subject']);
     $this->assertEquals(CRM_Core_Session::getLoggedInContactID(), $result['values'][1]['creator_id']);
   }
 
@@ -121,7 +63,7 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
    * Test that the API returns only the "Bounced" mailings when instructed to
    * do so.
    *
-   * @throws \Exception
+   * @throws \CRM_Core_Exception
    */
   public function testMailingContactBounced(): void {
     list($contactID, $mailingID, $eventQueueID) = $this->setupEventQueue();
@@ -133,7 +75,7 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
     ];
 
     $result = $this->callAPISuccess('MailingContact', 'get', $params)['values'];
-    $this->assertEquals(1, count($result));
+    $this->assertCount(1, $result);
     $this->assertEquals($mailingID, $result[$mailingID]['mailing_id']);
     $this->assertEquals('Some Subject', $result[$mailingID]['subject']);
     $this->assertEquals(CRM_Core_Session::getLoggedInContactID(), $result[$mailingID]['creator_id'], 3);
@@ -141,9 +83,8 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
 
   /**
    * @return array
-   * @throws \Exception
    */
-  public function setupEventQueue() {
+  public function setupEventQueue(): array {
     $contactID = $this->individualCreate(['first_name' => 'Test']);
     $emailID = $this->callAPISuccessGetValue('Email', [
       'return' => 'id',

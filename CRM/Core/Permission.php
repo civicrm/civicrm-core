@@ -278,10 +278,8 @@ class CRM_Core_Permission {
     }
 
     // By default, users without 'access all custom data' are permitted to see no groups.
-    $allowedGroups = [];
-
     // Allow ACLs and hooks to grant permissions to certain groups.
-    return CRM_ACL_API::group($type, $userId, 'civicrm_custom_group', $customGroups, $allowedGroups);
+    return CRM_ACL_API::group($type, $userId, 'civicrm_custom_group', $customGroups);
   }
 
   /**
@@ -1289,8 +1287,10 @@ class CRM_Core_Permission {
     // Custom field permissions
     $permissions['custom_field'] = [
       'default' => [
-        'administer CiviCRM',
-        'access all custom data',
+        'administer CiviCRM data',
+      ],
+      'get' => [
+        ['access CiviCRM', 'access all custom data'],
       ],
     ];
     $permissions['custom_group'] = $permissions['custom_field'];

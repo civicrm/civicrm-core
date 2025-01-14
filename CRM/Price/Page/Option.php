@@ -229,9 +229,12 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
     if ($action & CRM_Core_Action::DELETE) {
       // add breadcrumb
       $url = CRM_Utils_System::url('civicrm/admin/price/field/option', 'reset=1');
-      CRM_Utils_System::appendBreadCrumb(ts('Price Option'),
-        $url
-      );
+      CRM_Utils_System::appendBreadCrumb([
+        [
+          'title' => ts('Price Option'),
+          'url' => $url,
+        ],
+      ]);
       $this->assign('usedPriceSetTitle', CRM_Price_BAO_PriceFieldValue::getOptionLabel($oid));
       $comps = [
         'Event' => 'civicrm_event',

@@ -151,6 +151,10 @@ class CRM_Utils_Cache {
    *     should function correctly, but it can be harder to inspect/debug.
    *   - type: array|string, list of acceptable cache types, in order of preference.
    *   - prefetch: bool, whether to prefetch all data in cache (if possible).
+   *   - scope: string, How broadly is this cache shared? (Available in v5.80+)
+   *       - version: Cache is tied to current version of CiviCRM (RECOMMENDED)
+   *       - runtime: Cache is tied to domain ID, HTTP host, version, etc
+   *       - global: Cache is shared across all versions, domain IDs, HTTP hosts, etc (DEFAULT)
    *   - withArray: bool|null|'fast', whether to setup a thread-local array-cache in front of the cache driver.
    *     Note that cache-values may be passed to the underlying driver with extra metadata,
    *     so this will slightly change/enlarge the on-disk format.
@@ -168,18 +172,31 @@ class CRM_Utils_Cache {
   public static function create($params = []) {
     $types = (array) $params['type'];
 
-    // FIXME: When would name ever be empty?
-    if (!empty($params['name'])) {
-      $params['name'] = self::cleanKey($params['name']);
+    switch ($params['scope'] ?? 'global') {
+      case 'version':
+        $scopeId = self::DELIMITER . static::getVersionCode();
+        break;
+
+      case 'runtime':
+        $scopeId = self::DELIMITER . CRM_Core_Config_Runtime::getId();
+        break;
+
+      case 'global':
+        $scopeId = '';
+        break;
+
+      default:
+        throw new \LogicException("Invalid scope given to CRM_Utils_Cache::create()");
     }
 
     foreach ($types as $type) {
       switch ($type) {
         case '*memory*':
           if (defined('CIVICRM_DB_CACHE_CLASS') && in_array(CIVICRM_DB_CACHE_CLASS, ['Memcache', 'Memcached', 'Redis'])) {
+            $shortName = self::cleanKey($params['name'], 64);
             $dbCacheClass = 'CRM_Utils_Cache_' . CIVICRM_DB_CACHE_CLASS;
             $settings = self::getCacheSettings(CIVICRM_DB_CACHE_CLASS);
-            $settings['prefix'] = CRM_Utils_Array::value('prefix', $settings, '') . self::DELIMITER . $params['name'] . self::DELIMITER;
+            $settings['prefix'] = CRM_Utils_Array::value('prefix', $settings, '') . self::DELIMITER . $shortName . $scopeId;
             $cache = new $dbCacheClass($settings);
             if (!empty($params['withArray'])) {
               $cache = $params['withArray'] === 'fast' ? new CRM_Utils_Cache_FastArrayDecorator($cache) : new CRM_Utils_Cache_ArrayDecorator($cache);
@@ -190,8 +207,10 @@ class CRM_Utils_Cache {
 
         case 'SqlGroup':
           if (defined('CIVICRM_DSN') && CIVICRM_DSN) {
+            $shortName = self::cleanKey($params['name'] . $scopeId, 32, 16, ';[^A-Za-z0-9_\. /];');
+            // Name goes first because it's most interesting to skim. When value is long enough to provoke hashing, we want to retain as much ['name'] as possible.
             $cache = new CRM_Utils_Cache_SqlGroup([
-              'group' => $params['name'],
+              'group' => $shortName,
               'prefetch' => $params['prefetch'] ?? FALSE,
             ]);
             break 2;
@@ -211,6 +230,18 @@ class CRM_Utils_Cache {
     throw new CRM_Core_Exception("Failed to instantiate cache. No supported cache type found. " . print_r($params, 1));
   }
 
+  private static function getVersionCode(): string {
+    static $ver = NULL;
+    if ($ver === NULL) {
+      $ver = CRM_Utils_System::version();
+      if (preg_match('/^(\d+)\.(\d+)\.(alpha|beta|)(\d+)/', $ver, $matches)) {
+        $stages = ['alpha' => 'a', 'beta' => 'b', '' => '.' /* stable */];
+        $ver = $matches[1] . '.' . $matches[2] . $stages[$matches[3]] . $matches[4];
+      }
+    }
+    return $ver;
+  }
+
   /**
    * Normalize a cache key.
    *
@@ -219,27 +250,42 @@ class CRM_Utils_Cache {
    *
    * @param string $key
    *   Ex: 'ab/cd:ef'
+   * @param int $maxLen
+   *   The maximum length of the string.
+   *   To be useful, this must exceed the hash-length (24 characters).
+   * @param int|NULL $hashLen
+   *   The maximum length of the hashed suffix.
+   *   If NULL, it will be full length (typically 24 characters).
+   * @param string $allowChars
+   *   Regex describing the list of valid characters
    * @return string
    *   Ex: '_abcd1234abcd1234' or 'ab_xx/cd_xxef'.
    *   A similar key, but suitable for use with PSR-16-compliant cache providers.
    */
-  public static function cleanKey($key) {
+  public static function cleanKey($key, int $maxLen = 64, ?int $hashLen = NULL, string $allowChars = ';[^A-Za-z0-9_\.];') {
     if (!is_string($key) && !is_int($key)) {
       throw new \RuntimeException("Malformed cache key");
     }
 
-    $maxLen = 64;
     $escape = '-';
-
-    if (strlen($key) >= $maxLen) {
-      return $escape . md5($key);
+    if ($key[0] === $escape) {
+      throw new \RuntimeException("Malformed cache key. Has this been double-encoded?");
     }
 
-    $r = preg_replace_callback(';[^A-Za-z0-9_\.];', function($m) use ($escape) {
+    $r = preg_replace_callback($allowChars, function($m) use ($escape) {
       return $escape . dechex(ord($m[0]));
     }, $key);
 
-    return strlen($r) >= $maxLen ? $escape . md5($key) : $r;
+    $len = strlen($r);
+    if ($len < $maxLen) {
+      return $r;
+    }
+
+    $hash = CRM_Utils_String::base64UrlEncode(md5($key, TRUE));
+    if ($hashLen !== NULL) {
+      $hash = substr($hash, 0, $hashLen);
+    }
+    return $escape . substr($r, 0, $maxLen - strlen($hash) - 3) . $hash;
   }
 
   /**

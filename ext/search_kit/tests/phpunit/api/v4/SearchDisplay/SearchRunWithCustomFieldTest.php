@@ -3,18 +3,15 @@ namespace api\v4\SearchDisplay;
 
 // This is apparently necessary due to autoloader issues with test classes
 require_once 'tests/phpunit/api/v4/Api4TestBase.php';
-require_once 'tests/phpunit/api/v4/Custom/CustomTestBase.php';
 
-use api\v4\Custom\CustomTestBase;
+use api\v4\Api4TestBase;
 use Civi\Api4\Contact;
-use Civi\Api4\CustomField;
-use Civi\Api4\CustomGroup;
 use Civi\Test\CiviEnvBuilder;
 
 /**
  * @group headless
  */
-class SearchRunWithCustomFieldTest extends CustomTestBase {
+class SearchRunWithCustomFieldTest extends Api4TestBase {
 
   public function setUpHeadless(): CiviEnvBuilder {
     return \Civi\Test::headless()
@@ -44,17 +41,17 @@ class SearchRunWithCustomFieldTest extends CustomTestBase {
    * Test running a searchDisplay with various filters.
    */
   public function testRunWithImageField() {
-    CustomGroup::create(FALSE)
-      ->addValue('title', 'TestSearchFields')
-      ->addValue('extends', 'Individual')
-      ->execute();
+    $this->createTestRecord('CustomGroup', [
+      'title' => 'TestSearchFields',
+      'extends' => 'Individual',
+    ]);
 
-    CustomField::create(FALSE)
-      ->addValue('label', 'MyFile')
-      ->addValue('custom_group_id.name', 'TestSearchFields')
-      ->addValue('html_type', 'File')
-      ->addValue('data_type', 'File')
-      ->execute();
+    $this->createTestRecord('CustomField', [
+      'label' => 'MyFile',
+      'custom_group_id.name' => 'TestSearchFields',
+      'html_type' => 'File',
+      'data_type' => 'File',
+    ]);
 
     $lastName = uniqid(__FUNCTION__);
 
@@ -115,17 +112,17 @@ class SearchRunWithCustomFieldTest extends CustomTestBase {
   }
 
   public function testMultiValuedFields():void {
-    CustomGroup::create(FALSE)
-      ->addValue('extends', 'Contact')
-      ->addValue('title', 'my_test')
-      ->addChain('field', CustomField::create()
-        ->addValue('custom_group_id', '$id')
-        ->addValue('label', 'my_field')
-        ->addValue('html_type', 'Select')
-        ->addValue('serialize', 1)
-        ->addValue('option_values', ['zero', 'one', 'two', 'three'])
-      )
-      ->execute();
+    $this->createTestRecord('CustomGroup', [
+      'extends' => 'Contact',
+      'title' => 'my_test',
+    ]);
+    $this->createTestRecord('CustomField', [
+      'custom_group_id.name' => 'my_test',
+      'label' => 'my_field',
+      'html_type' => 'Select',
+      'serialize' => 1,
+      'option_values' => ['zero', 'one', 'two', 'three'],
+    ]);
 
     $lastName = uniqid(__FUNCTION__);
 
@@ -184,18 +181,18 @@ class SearchRunWithCustomFieldTest extends CustomTestBase {
   }
 
   public function testEntityReferenceJoins() {
-    CustomGroup::create()->setValues([
+    $this->createTestRecord('CustomGroup', [
       'title' => 'EntityRefFields',
       'extends' => 'Individual',
-    ])->execute();
-    CustomField::create()->setValues([
+    ]);
+    $this->createTestRecord('CustomField', [
       'label' => 'Favorite Nephew',
       'name' => 'favorite_nephew',
       'custom_group_id.name' => 'EntityRefFields',
       'html_type' => 'Autocomplete-Select',
       'data_type' => 'EntityReference',
       'fk_entity' => 'Contact',
-    ])->execute();
+    ]);
     $nephewId = $this->createTestRecord('Contact', ['first_name' => 'Dewey', 'last_name' => 'Duck'])['id'];
     $uncleId = $this->createTestRecord('Contact', ['first_name' => 'Donald', 'last_name' => 'Duck', 'EntityRefFields.favorite_nephew' => $nephewId])['id'];
     $contact = Contact::get(FALSE)
@@ -239,16 +236,16 @@ class SearchRunWithCustomFieldTest extends CustomTestBase {
     $contact = $this->createTestRecord('Contact');
 
     // CustomGroup based on Activity Type
-    CustomGroup::create(FALSE)
-      ->addValue('extends', 'Activity')
-      ->addValue('title', 'testactivity2')
-      ->addChain('field', CustomField::create()
-        ->addValue('custom_group_id', '$id')
-        ->addValue('label', 'testactivity_')
-        ->addValue('data_type', 'Boolean')
-        ->addValue('html_type', 'Radio')
-      )
-      ->execute();
+    $this->createTestRecord('CustomGroup', [
+      'extends' => 'Activity',
+      'title' => 'testactivity2',
+    ]);
+    $this->createTestRecord('CustomField', [
+      'custom_group_id.name' => 'testactivity2',
+      'label' => 'testactivity_',
+      'data_type' => 'Boolean',
+      'html_type' => 'Radio',
+    ]);
 
     $sampleData = [
       ['activity_type_id:name' => 'Meeting', 'testactivity2.testactivity_' => TRUE],

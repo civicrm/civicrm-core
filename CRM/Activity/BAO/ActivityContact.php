@@ -82,8 +82,8 @@ AND        contact_a.is_deleted = 0
 
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     while ($dao->fetch()) {
-      $names[$dao->id] = htmlentities($dao->sort_name);
-      $ids[] = $dao->id;
+      $names[(int) $dao->id] = htmlentities((string) $dao->sort_name);
+      $ids[] = (int) $dao->id;
     }
 
     return $alsoIDs ? [$names, $ids] : $names;

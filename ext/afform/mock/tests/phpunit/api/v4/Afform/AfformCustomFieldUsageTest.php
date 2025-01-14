@@ -3,8 +3,6 @@ namespace api\v4\Afform;
 
 use Civi\Api4\Afform;
 use Civi\Api4\Contact;
-use Civi\Api4\CustomField;
-use Civi\Api4\CustomGroup;
 
 /**
  * Test case for Afform.prefill and Afform.submit.
@@ -15,8 +13,6 @@ class AfformCustomFieldUsageTest extends AfformUsageTestCase {
 
   public function tearDown(): void {
     parent::tearDown();
-    CustomField::delete(FALSE)->addWhere('id', '>', '0')->execute();
-    CustomGroup::delete(FALSE)->addWhere('id', '>', '0')->execute();
   }
 
   public static function setUpBeforeClass(): void {
@@ -43,21 +39,33 @@ EOHTML;
    * which can be submitted multiple times
    */
   public function testMultiRecordCustomBlock(): void {
-    CustomGroup::create(FALSE)
-      ->addValue('name', 'MyThings')
-      ->addValue('title', 'My Things')
-      ->addValue('style', 'Tab with table')
-      ->addValue('extends', 'Contact')
-      ->addValue('is_multiple', TRUE)
-      ->addValue('max_multiple', 2)
-      ->addChain('fields', CustomField::save()
-        ->addDefault('custom_group_id', '$id')
-        ->setRecords([
-          ['name' => 'my_text', 'label' => 'My Text', 'data_type' => 'String', 'html_type' => 'Text'],
-          ['name' => 'my_friend', 'label' => 'My Friend', 'data_type' => 'ContactReference', 'html_type' => 'Autocomplete-Select'],
-        ])
-      )
-      ->execute();
+    $this->createTestRecord('CustomGroup', [
+      'name' => 'MyThings',
+      'title' => 'My Things',
+      'style' => 'Tab with table',
+      'extends' => 'Contact',
+      'is_multiple' => TRUE,
+      'max_multiple' => 2,
+    ]);
+    $this->saveTestRecords('CustomField', [
+      'defaults' => [
+        'custom_group_id.name' => 'MyThings',
+      ],
+      'records' => [
+        [
+          'name' => 'my_text',
+          'label' => 'My Text',
+          'data_type' => 'String',
+          'html_type' => 'Text',
+        ],
+        [
+          'name' => 'my_friend',
+          'label' => 'My Friend',
+          'data_type' => 'ContactReference',
+          'html_type' => 'Autocomplete-Select',
+        ],
+      ],
+    ]);
 
     // Creating a custom group should automatically create an afform block
     $block = Afform::get()

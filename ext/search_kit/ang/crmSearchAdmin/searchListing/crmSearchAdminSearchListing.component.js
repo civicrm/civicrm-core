@@ -8,10 +8,10 @@
       tabCount: '='
     },
     templateUrl: '~/crmSearchDisplayTable/crmSearchDisplayTable.html',
-    controller: function($scope, $element, $q, crmApi4, crmStatus, searchMeta, searchDisplayBaseTrait, searchDisplaySortableTrait) {
+    controller: function($scope, $element, $q, crmApi4, crmStatus, searchMeta, searchDisplayBaseTrait, searchDisplaySortableTrait, searchDisplayEditableTrait) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         // Mix in traits to this controller
-        ctrl = angular.extend(this, _.cloneDeep(searchDisplayBaseTrait), _.cloneDeep(searchDisplaySortableTrait)),
+        ctrl = angular.extend(this, _.cloneDeep(searchDisplayBaseTrait), _.cloneDeep(searchDisplaySortableTrait), _.cloneDeep(searchDisplayEditableTrait)),
         afformLoad;
 
       $scope.crmUrl = CRM.url;

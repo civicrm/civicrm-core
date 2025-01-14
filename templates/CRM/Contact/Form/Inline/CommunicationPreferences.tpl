@@ -29,7 +29,7 @@
       {if $key eq 'privacy'}
       <div class="crm-summary-row">
         <div class="crm-label">&nbsp;</div>
-        <div class="crm-content">{$form.is_opt_out.html} {$form.is_opt_out.label} {help id="id-optOut" file="CRM/Contact/Form/Contact.hlp"}
+        <div class="crm-content">{$form.is_opt_out.html} {$form.is_opt_out.label} {help id="id-optOut" title=$form.is_opt_out.label file="CRM/Contact/Form/Contact.hlp"}
         </div>
       </div>
       {/if}

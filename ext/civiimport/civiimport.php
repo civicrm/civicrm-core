@@ -99,7 +99,7 @@ function _civiimport_civicrm_get_import_tables(): array {
        -- it is a new convention, at best, to require anything
        -- specific in the job_type, but it saves any onerous lookups
        -- in a function which needs to avoid loops
-       AND job_type LIKE "%import"
+       AND job_type LIKE "%import%"
          -- also more of a feature than a specification - but we need a table
          -- to do this pseudo-api
        AND metadata LIKE "%table_name%"');

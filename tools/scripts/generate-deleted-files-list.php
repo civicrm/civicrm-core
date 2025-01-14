@@ -47,7 +47,7 @@ function parseLog($logString, &$deletedFiles, $prefix = '') {
         continue 2;
       }
     }
-    if (!file_exists($prefix . $fileName)) {
+    if (!file_exists_case_sensitive($prefix . $fileName)) {
       // Was the file deleted or was the entire directory deleted?
       $path = explode('/', $prefix . $fileName);
       array_pop($path);
@@ -70,6 +70,17 @@ function parseLog($logString, &$deletedFiles, $prefix = '') {
       }
     }
   }
+}
+
+/**
+ * Case-sensitive version of `file_exists`.
+ *
+ * Normalizes the inconsistency between Mac/Win (insensitive) and Linux (sensitive).
+ */
+function file_exists_case_sensitive($filename) {
+  // Use glob to list all files in the directory of the given file
+  $files = glob(dirname($filename) . '/*', GLOB_NOSORT);
+  return in_array($filename, $files, TRUE);
 }
 
 // Core files

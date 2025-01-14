@@ -19,14 +19,19 @@
 
 namespace api\v4\Custom;
 
+use api\v4\Api4TestBase;
 use Civi\Api4\CustomField;
-use Civi\Api4\CustomGroup;
 use Civi\Api4\Utils\CoreUtil;
 
 /**
  * @group headless
  */
-class CoreUtilTest extends CustomTestBase {
+class CoreUtilTest extends Api4TestBase {
+
+  public function setUp(): void {
+    \CRM_Core_BAO_ConfigSetting::enableAllComponents();
+    parent::setUp();
+  }
 
   /**
    */
@@ -34,23 +39,23 @@ class CoreUtilTest extends CustomTestBase {
     $this->assertEquals('Contact', CoreUtil::getApiNameFromTableName('civicrm_contact'));
     $this->assertNull(CoreUtil::getApiNameFromTableName('civicrm_nothing'));
 
-    $singleGroup = CustomGroup::create(FALSE)
-      ->addValue('title', uniqid())
-      ->addValue('extends', 'Contact')
-      ->execute()->first();
+    $singleGroup = $this->createTestRecord('CustomGroup', [
+      'title' => uniqid(),
+      'extends' => 'Contact',
+    ]);
 
     $this->assertNull(CoreUtil::getApiNameFromTableName($singleGroup['table_name']));
 
-    $multiGroup = CustomGroup::create(FALSE)
-      ->addValue('title', uniqid())
-      ->addValue('extends', 'Contact')
-      ->addValue('is_multiple', TRUE)
-      ->addChain('fields', CustomField::save()
-        ->addDefault('html_type', 'Text')
-        ->addDefault('custom_group_id', '$id')
-        ->addRecord(['label' => 'MyField1'])
-      )
-      ->execute()->first();
+    $multiGroup = $this->createTestRecord('CustomGroup', [
+      'title' => uniqid(),
+      'extends' => 'Contact',
+      'is_multiple' => TRUE,
+    ]);
+    CustomField::save(FALSE)
+      ->addDefault('html_type', 'Text')
+      ->addDefault('custom_group_id', $multiGroup['id'])
+      ->addRecord(['label' => 'MyField1'])
+      ->execute();
 
     $this->assertEquals('Custom_' . $multiGroup['name'], CoreUtil::getApiNameFromTableName($multiGroup['table_name']));
     $this->assertEquals($multiGroup['table_name'], CoreUtil::getTableName('Custom_' . $multiGroup['name']));
@@ -61,18 +66,18 @@ class CoreUtilTest extends CustomTestBase {
     $this->assertEquals('Civi\Api4\CiviCase', CoreUtil::getApiClass('Case'));
     $this->assertNull(CoreUtil::getApiClass('NothingAtAll'));
 
-    $singleGroup = CustomGroup::create(FALSE)
-      ->addValue('title', uniqid())
-      ->addValue('extends', 'Contact')
-      ->execute()->first();
+    $singleGroup = $this->createTestRecord('CustomGroup', [
+      'title' => uniqid(),
+      'extends' => 'Contact',
+    ]);
 
     $this->assertNull(CoreUtil::getApiClass($singleGroup['name']));
 
-    $multiGroup = CustomGroup::create(FALSE)
-      ->addValue('title', uniqid())
-      ->addValue('extends', 'Contact')
-      ->addValue('is_multiple', TRUE)
-      ->execute()->first();
+    $multiGroup = $this->createTestRecord('CustomGroup', [
+      'title' => uniqid(),
+      'extends' => 'Contact',
+      'is_multiple' => TRUE,
+    ]);
 
     $this->assertEquals('Civi\Api4\CustomValue', CoreUtil::getApiClass('Custom_' . $multiGroup['name']));
   }

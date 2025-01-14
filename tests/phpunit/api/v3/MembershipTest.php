@@ -56,7 +56,6 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->_membershipStatusID = $this->membershipStatusCreate('test status');
 
     CRM_Member_PseudoConstant::membershipStatus(NULL, NULL, 'name', TRUE);
-    CRM_Core_PseudoConstant::activityType(TRUE, TRUE, TRUE, 'name');
 
     $this->_entity = 'Membership';
     $this->_params = [
@@ -222,15 +221,15 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $memberships = $this->callAPISuccess('Membership', 'get', ['sort' => 'contact_id', 'sequential' => 1])['values'];
 
     $this->assertEquals($contactId1, $memberships[0]['contact_id']);
-    $this->assertEquals('test status', CRM_Core_PseudoConstant::getName('CRM_Member_BAO_Membership', 'status_id', $memberships[0]['status_id']));
+    $this->assertEquals('New', CRM_Core_PseudoConstant::getName('CRM_Member_BAO_Membership', 'status_id', $memberships[0]['status_id']));
 
     // check for Membership 2
     $this->assertEquals($contactId2, $memberships[1]['contact_id']);
-    $this->assertEquals('test status', CRM_Core_PseudoConstant::getName('CRM_Member_BAO_Membership', 'status_id', $memberships[1]['status_id']));
+    $this->assertEquals('New', CRM_Core_PseudoConstant::getName('CRM_Member_BAO_Membership', 'status_id', $memberships[1]['status_id']));
 
     // check for Membership 3
     $this->assertEquals($contactId3, $memberships[2]['contact_id']);
-    $this->assertEquals('test status', CRM_Core_PseudoConstant::getName('CRM_Member_BAO_Membership', 'status_id', $memberships[2]['status_id']));
+    $this->assertEquals('New', CRM_Core_PseudoConstant::getName('CRM_Member_BAO_Membership', 'status_id', $memberships[2]['status_id']));
   }
 
   /**

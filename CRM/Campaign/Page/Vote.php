@@ -122,7 +122,8 @@ class CRM_Campaign_Page_Vote extends CRM_Core_Page {
       ];
     }
 
-    $this->assign('tabHeader', empty($allTabs) ? FALSE : $allTabs);
+    $tabs = empty($allTabs) ? [] : \CRM_Core_Smarty::setRequiredTabTemplateKeys($allTabs);
+    $this->assign('tabHeader', $tabs);
   }
 
 }

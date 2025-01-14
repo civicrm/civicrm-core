@@ -52,11 +52,7 @@ class Api4TestBase extends TestCase implements HeadlessInterface {
    * Post test cleanup.
    */
   public function tearDown(): void {
-    $implements = class_implements($this);
-    // If not created in a transaction, test records must be deleted
-    if (!in_array('Civi\Test\TransactionalInterface', $implements, TRUE)) {
-      $this->deleteTestRecords();
-    }
+    $this->conditionallyDeleteTestRecords();
   }
 
   /**

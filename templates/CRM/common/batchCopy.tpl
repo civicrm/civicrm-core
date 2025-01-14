@@ -17,10 +17,15 @@
      * @return void
      */
     function copyFieldValues( fname ) {
-      // this is the most common pattern for elements, so first check if it exits
-      // this check field starting with "field[" and contains [fname] and is not
-      // hidden ( for checkbox hidden element is created )
-      var elementId    = $('.crm-copy-fields [name^="field["][name*="[' + fname +']"][type!=hidden]');
+      if (fname === 'soft_credit_type') {
+        var elementId    = $('.crm-copy-fields [name^="soft_credit_type[');
+      }
+      else {
+        // this is the most common pattern for elements, so first check if it exits
+        // this check field starting with "field[" and contains [fname] and is not
+        // hidden ( for checkbox hidden element is created )
+        var elementId = $('.crm-copy-fields [name^="field["][name*="[' + fname + ']"][type!=hidden]');
+      }
 
       // get the first element and it's value
       var firstElement = elementId.eq(0);

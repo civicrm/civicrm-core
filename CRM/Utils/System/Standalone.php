@@ -140,6 +140,11 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function appendBreadCrumb($breadcrumbs) {
+    if (!is_array($breadcrumbs)) {
+      // invalid - but no need to crash the whole page
+      \Civi::log()->warning('Non-array passed to appendBreadCrumb');
+      return;
+    }
     $crumbs = \Civi::$statics[__CLASS__]['breadcrumb'] ?? [];
     $crumbs += array_column($breadcrumbs, NULL, 'url');
     \Civi::$statics[__CLASS__]['breadcrumb'] = $crumbs;

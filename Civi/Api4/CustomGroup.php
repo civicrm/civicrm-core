@@ -31,7 +31,7 @@ class CustomGroup extends Generic\DAOEntity {
    */
   public static function get($checkPermissions = TRUE) {
     return (new CachedDAOGetAction(__CLASS__, __FUNCTION__, function (CachedDAOGetAction $action) {
-      return \CRM_Core_BAO_CustomGroup::getAll();
+      return \CRM_Core_BAO_CustomGroup::getAll([], $action->getCheckPermissions() ? \CRM_Core_Permission::VIEW : NULL);
     }))->setCheckPermissions($checkPermissions);
   }
 

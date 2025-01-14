@@ -30,10 +30,6 @@ define('CIVICRM_TEST', 1);
 eval(cv('php:boot --level=settings', 'phpcode'));
 // phpcs:enable
 
-if (CIVICRM_UF === 'UnitTests') {
-  Civi\Test::headless()->apply();
-}
-
 spl_autoload_register(function($class) {
   _phpunit_mockoloader('api\\v4\\', "tests/phpunit/api/v4/", $class);
   _phpunit_mockoloader('Civi\\Api4\\', "tests/phpunit/api/v4/Mock/Api4/", $class);
@@ -78,7 +74,13 @@ function _phpunit_mockoloader($prefix, $base_dir, $class) {
  *   If the command terminates abnormally.
  */
 function cv($cmd, $decode = 'json') {
-  $cmd = 'cv ' . $cmd;
+  // If xdebug is active when launching phpunit, we usually want to focus on phpunit.
+  if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
+    $cmd = 'env XDEBUG_MODE=off XDEBUG_PORT= cv ' . $cmd;
+  }
+  else {
+    $cmd = 'cv ' . $cmd;
+  }
   $descriptorSpec = [0 => ["pipe", "r"], 1 => ["pipe", "w"], 2 => STDERR];
   $oldOutput = getenv('CV_OUTPUT');
   putenv("CV_OUTPUT=json");

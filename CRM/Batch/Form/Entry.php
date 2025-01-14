@@ -94,11 +94,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   protected $currentRowExistingMembership;
 
   /**
-   * @var array
-   */
-  protected $_priceSet;
-
-  /**
    * Get the contribution id for the current row.
    *
    * @return int
@@ -467,10 +462,10 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   public function setDefaultValues() {
+    $defaults = [];
     if (empty($this->_fields)) {
-      return;
+      return $defaults;
     }
-
     // for add mode set smart defaults
     if ($this->_action & CRM_Core_Action::ADD) {
       $currentDate = date('Y-m-d H-i-s');
@@ -491,8 +486,10 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     else {
       // get the cached info from data column of civicrm_batch
       $data = CRM_Core_DAO::getFieldValue('CRM_Batch_BAO_Batch', $this->_batchId, 'data');
-      $defaults = json_decode($data, TRUE);
-      $defaults = $defaults['values'];
+      if ($data) {
+        $defaults = json_decode($data, TRUE);
+        $defaults = $defaults['values'];
+      }
     }
 
     return $defaults;
@@ -552,11 +549,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       }
     }
     $params['actualBatchTotal'] = CRM_Utils_Rule::cleanMoney($params['actualBatchTotal']);
-    // get the price set associated with offline contribution record.
-    $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', 'default_contribution_amount', 'id', 'name');
-    $this->_priceSet = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId));
-    $priceFieldID = CRM_Price_BAO_PriceSet::getOnlyPriceFieldID($this->_priceSet);
-    $priceFieldValueID = CRM_Price_BAO_PriceSet::getOnlyPriceFieldValueID($this->_priceSet);
 
     if (isset($params['field'])) {
       foreach ($params['field'] as $key => $value) {
@@ -577,7 +569,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
           //CRM-15350: if soft-credit-type profile field is disabled or removed then
           //we choose configured SCT default value
-          if (!empty($params['soft_credit_type'][$key])) {
+          if (array_key_exists('soft_credit_type', $params)) {
             $value['soft_credit'][$key]['soft_credit_type_id'] = $params['soft_credit_type'][$key];
           }
           else {
@@ -623,29 +615,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         $params['actualBatchTotal'] += $value['total_amount'];
         $value['batch_id'] = $this->_batchId;
         $value['skipRecentView'] = TRUE;
-
-        // build line item params
-        $this->_priceSet['fields'][$priceFieldID]['options'][$priceFieldValueID]['amount'] = $value['total_amount'];
-        $value['price_' . $priceFieldID] = 1;
-
-        $lineItem = [];
-        CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'], $value, $lineItem[$priceSetId]);
-
-        // @todo - stop setting amount level in this function - use $this->order->getAmountLevel()
-        unset($value['amount_level']);
-
-        //CRM-11529 for back office transactions
-        //when financial_type_id is passed in form, update the
-        //line items with the financial type selected in form
-        // @todo - create a price set or price field per financial type & simply choose the appropriate
-        // price field rather than working around the fact that each price_field is supposed to have a financial
-        // type & we are allowing that to be overridden.
-        if (!empty($value['financial_type_id']) && !empty($lineItem[$priceSetId])) {
-          foreach ($lineItem[$priceSetId] as &$values) {
-            $values['financial_type_id'] = $value['financial_type_id'];
-          }
-        }
-        $value['line_item'] = $lineItem;
 
         //finally call contribution create for all the magic
         $contribution = CRM_Contribute_BAO_Contribution::create($value);
@@ -745,9 +714,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    */
   private function processMembership(array $params) {
     $batchTotal = 0;
-    // get the price set associated with offline membership
-    $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', 'default_membership_type_amount', 'id', 'name');
-    $this->_priceSet = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId));
 
     if (isset($params['field'])) {
       // @todo - most of the wrangling in this function is because the api is not being used, especially date stuff.
@@ -982,6 +948,8 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    *
    * If you feel tempted to use this in live code then it probably means there is some functionality
    * that needs to be moved out of the form layer.
+   *
+   * @deprecated since 5.82 will be removed around 5.86
    *
    * @param array $params
    *

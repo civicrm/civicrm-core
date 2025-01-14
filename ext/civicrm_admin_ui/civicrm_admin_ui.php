@@ -73,3 +73,77 @@ function civicrm_admin_ui_civicrm_managed(&$entities, $modules) {
     $entities[] = $record;
   }
 }
+
+/**
+ * Implements hook_civicrm_tabset().
+ *
+ * Adds afforms as contact summary tabs.
+ */
+function civicrm_admin_ui_civicrm_tabset($tabsetName, &$tabs, $context) {
+  $entities = [];
+  $tabsetTemplate = NULL;
+
+  switch ($tabsetName) {
+
+    case 'civicrm/event/manage':
+      $entities = ['Event'];
+      \CRM_Core_Smarty::singleton()->assign('afformOptions', [
+        'entity_id' => $context['event_id'] ?? NULL,
+      ]);
+      break;
+
+    // NOTE: contact custom group tabs are added by
+    // admin_civicrm_tabset using the contact_summary_tab
+    // afform meta key
+    // case 'civicrm/contact/view':
+    //   $entities = \Civi\Api4\Generic\CoreUtil::contactEntityNames();
+    //   break;
+  }
+
+  if (!$entities) {
+    return;
+  }
+
+  $groups = \Civi\Api4\CustomGroup::get(FALSE)
+    ->addWhere('extends', 'IN', $entities)
+    ->addWhere('is_multiple', '=', TRUE)
+    ->addWhere('style', 'IN', ['Tab', 'Tab with table'])
+    ->addOrderBy('title')
+    ->addSelect('name')
+    ->execute();
+
+  $weight = 100;
+
+  foreach ($groups as $group) {
+    $tabName = 'custom_' . $group['name'];
+    $tabFormName = 'afsearchTabCustom_' . $group['name'];
+    $afform = Civi\Api4\Afform::get(FALSE)
+      ->addSelect('name', 'title', 'icon', 'module_name', 'directive_name')
+      ->addWhere('name', '=', $tabFormName)
+      ->execute()
+      ->first();
+
+    if (!$afform) {
+      // form may be disabled?
+      continue;
+    }
+
+    $tabs[$tabName] = [
+      'title' => $afform['title'],
+      // after core tabs
+      'weight' => $weight++,
+      'icon' => 'crm-i ' . ($afform['icon'] ?: 'fa-list-alt'),
+      'active' => TRUE,
+      'valid' => TRUE,
+      'template' => 'afform/InlineAfform.tpl',
+      'module' => $afform['module_name'],
+      'directive' => $afform['directive_name'],
+    ];
+
+    // If this is the real contact summary page (and not a callback from ContactLayoutEditor), load module.
+    if (empty($context['caller'])) {
+      Civi::service('angularjs.loader')->addModules($afform['module_name']);
+    }
+  }
+
+}

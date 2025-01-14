@@ -104,6 +104,9 @@ class EditableSearchTest extends Api4TestBase {
           'sort' => [
             ['id', 'ASC'],
           ],
+          'editableRow' => [
+            'create' => TRUE,
+          ],
         ],
       ],
     ];
@@ -119,15 +122,15 @@ class EditableSearchTest extends Api4TestBase {
     $this->assertEquals('testmail@unit.test', $result[0]['columns'][1]['val']);
     $this->assertTrue($result[0]['columns'][1]['edit']);
     // Contact 1 - new phone can be created
-    $this->assertNull($result[0]['columns'][2]['val']);
+    $this->assertEquals('', $result[0]['columns'][2]['val']);
     $this->assertTrue($result[0]['columns'][2]['edit']);
 
     $this->assertEquals($cids[1], $result[1]['key']);
     // Contact 2 first name can be added
-    $this->assertNull($result[1]['columns'][0]['val']);
+    $this->assertEquals('', $result[1]['columns'][0]['val']);
     $this->assertTrue($result[1]['columns'][0]['edit']);
     // Contact 2 - new email can be created
-    $this->assertNull($result[1]['columns'][1]['val']);
+    $this->assertEquals('', $result[1]['columns'][1]['val']);
     $this->assertTrue($result[1]['columns'][1]['edit']);
     // Contact 2 phone can be updated
     $this->assertEquals('123456', $result[1]['columns'][2]['val']);
@@ -138,24 +141,21 @@ class EditableSearchTest extends Api4TestBase {
 
     // Try doing some inline-edits
     $params['rowKey'] = $cids[0];
-    $params['colKey'] = 'first_name';
-    $params['value'] = 'One Up';
+    $params['values'] = ['first_name' => 'One Up'];
     $result = civicrm_api4('SearchDisplay', 'inlineEdit', $params);
     $this->assertCount(1, $result);
     $this->assertEquals($cids[0], $result[0]['key']);
     $this->assertEquals('One Up', $result[0]['columns'][0]['val']);
 
     $params['rowKey'] = $cids[0];
-    $params['colKey'] = 'gender_id:label';
-    $params['value'] = 2;
+    $params['values'] = ['gender_id:label' => 2];
     $result = civicrm_api4('SearchDisplay', 'inlineEdit', $params);
     $this->assertCount(1, $result);
     $this->assertEquals($cids[0], $result[0]['key']);
     $this->assertEquals('Male', $result[0]['columns'][3]['val']);
 
     $params['rowKey'] = $cids[0];
-    $params['colKey'] = 'Contact_Email_contact_id_01.email';
-    $params['value'] = 'testmail@unit.tested';
+    $params['values'] = ['Contact_Email_contact_id_01.email' => 'testmail@unit.tested'];
     $result = civicrm_api4('SearchDisplay', 'inlineEdit', $params);
     $this->assertCount(1, $result);
     $this->assertEquals($cids[0], $result[0]['key']);
@@ -165,8 +165,7 @@ class EditableSearchTest extends Api4TestBase {
 
     // Create new phone for contact 0
     $params['rowKey'] = $cids[0];
-    $params['colKey'] = 'Contact_Phone_contact_id_01.phone';
-    $params['value'] = '654321';
+    $params['values'] = ['Contact_Phone_contact_id_01.phone' => '654321'];
     $result = civicrm_api4('SearchDisplay', 'inlineEdit', $params);
     $this->assertCount(1, $result);
     $this->assertEquals($cids[0], $result[0]['key']);
@@ -174,12 +173,30 @@ class EditableSearchTest extends Api4TestBase {
 
     // Create new email for contact 1
     $params['rowKey'] = $cids[1];
-    $params['colKey'] = 'Contact_Email_contact_id_01.email';
-    $params['value'] = 'testmail2@unit.tested';
+    $params['values'] = [
+      'Contact_Email_contact_id_01.email' => 'testmail2@unit.tested',
+      'first_name' => 'Hello Hi',
+    ];
     $result = civicrm_api4('SearchDisplay', 'inlineEdit', $params);
     $this->assertCount(1, $result);
     $this->assertEquals($cids[1], $result[0]['key']);
     $this->assertEquals('testmail2@unit.tested', $result[0]['columns'][1]['val']);
+    $this->assertEquals('Hello Hi', $result[0]['columns'][0]['val']);
+
+    // Create a whole new row
+    $params['rowKey'] = NULL;
+    $params['values'] = [
+      'first_name' => 'Newbie',
+      'gender_id:label' => 2,
+      'Contact_Email_contact_id_01.email' => 'newbie@unit.tested',
+      'Contact_Phone_contact_id_01.phone' => '555-1234',
+    ];
+    $result = civicrm_api4('SearchDisplay', 'inlineEdit', $params);
+    $this->assertCount(1, $result);
+    $this->assertEquals('Newbie', $result[0]['columns'][0]['val']);
+    $this->assertEquals('newbie@unit.tested', $result[0]['columns'][1]['val']);
+    $this->assertEquals('555-1234', $result[0]['columns'][2]['val']);
+    $this->assertEquals('Male', $result[0]['columns'][3]['val']);
   }
 
   public function testEditableContactFields() {
@@ -360,8 +377,7 @@ class EditableSearchTest extends Api4TestBase {
 
     // Edit custom data for second activity
     $params['rowKey'] = $aid[1];
-    $params['colKey'] = 'meeting_phone.sub_field';
-    $params['value'] = 'tested!';
+    $params['values'] = ['meeting_phone.sub_field' => 'tested!'];
     $result = civicrm_api4('SearchDisplay', 'inlineEdit', $params);
     $this->assertCount(1, $result);
     $this->assertEquals($aid[1], $result[0]['key']);
@@ -369,8 +385,7 @@ class EditableSearchTest extends Api4TestBase {
 
     // Edit custom data for second activity
     $params['rowKey'] = $aid[2];
-    $params['colKey'] = 'meeting_phone.sub_field';
-    $params['value'] = 'blocked!';
+    $params['values'] = ['meeting_phone.sub_field' => 'blocked!'];
     try {
       $result = civicrm_api4('SearchDisplay', 'inlineEdit', $params);
       $this->fail();
@@ -512,7 +527,7 @@ class EditableSearchTest extends Api4TestBase {
     $this->assertTrue($result[0]['columns'][2]['edit']);
     $this->assertEquals('abc', $result[0]['columns'][3]['val']);
     $this->assertTrue($result[0]['columns'][3]['edit']);
-    $this->assertNull($result[0]['columns'][4]['val']);
+    $this->assertEquals('', $result[0]['columns'][4]['val']);
     $this->assertArrayNotHasKey('edit', $result[0]['columns'][4]);
 
     // Second contact has a spouse relation but not a child
@@ -520,19 +535,19 @@ class EditableSearchTest extends Api4TestBase {
     $this->assertTrue($result[1]['columns'][1]['edit']);
     $this->assertEquals('Married', $result[1]['columns'][2]['val']);
     $this->assertTrue($result[1]['columns'][2]['edit']);
-    $this->assertNull($result[1]['columns'][3]['val']);
+    $this->assertEquals('', $result[1]['columns'][3]['val']);
     $this->assertArrayNotHasKey('edit', $result[1]['columns'][3]);
-    $this->assertNull($result[1]['columns'][4]['val']);
+    $this->assertEquals('', $result[1]['columns'][4]['val']);
     $this->assertTrue($result[1]['columns'][4]['edit']);
 
     // Third contact is all alone in this world...
-    $this->assertNull($result[2]['columns'][1]['val']);
+    $this->assertEquals('', $result[2]['columns'][1]['val']);
     $this->assertArrayNotHasKey('edit', $result[2]['columns'][1]);
-    $this->assertNull($result[2]['columns'][2]['val']);
+    $this->assertEquals('', $result[2]['columns'][2]['val']);
     $this->assertArrayNotHasKey('edit', $result[2]['columns'][2]);
-    $this->assertNull($result[2]['columns'][3]['val']);
+    $this->assertEquals('', $result[2]['columns'][3]['val']);
     $this->assertArrayNotHasKey('edit', $result[2]['columns'][3]);
-    $this->assertNull($result[2]['columns'][4]['val']);
+    $this->assertEquals('', $result[2]['columns'][4]['val']);
     $this->assertArrayNotHasKey('edit', $result[2]['columns'][4]);
   }
 
