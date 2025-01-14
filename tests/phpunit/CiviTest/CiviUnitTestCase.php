@@ -152,6 +152,8 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    */
   protected $isLocationTypesOnPostAssert = TRUE;
 
+  protected array $entityTracking = [];
+
   /**
    * Has the test class been verified as 'getsafe'.
    *
@@ -468,6 +470,32 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
   }
 
   /**
+   * Start tracking cleanup on the given entities.
+   *
+   * @return void
+   * @throws \CRM_Core_Exception
+   */
+  public function startTrackingEntities(): void {
+    foreach ($this->getTrackedEntities() as $entity) {
+      $this->entityTracking[$entity] = \CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM ' . $entity);
+    }
+  }
+
+  /**
+   * @return void
+   * @throws \CRM_Core_Exception
+   */
+  protected function assertEntityCleanup(): void {
+    foreach ($this->entityTracking as $entity => $count) {
+      $field = 'name';
+      if ($entity === 'civicrm_line_item') {
+        $field = 'line_total';
+      }
+      $this->assertEquals($count, \CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM ' . $entity), $entity . ' has not cleaned up well ' . CRM_Core_DAO::singleValueQuery('SELECT ' . $field . ' FROM ' . $entity . ' ORDER BY id DESC LIMIT 1'));
+    }
+  }
+
+  /**
    * Create default domain contacts for the two domains added during test class.
    * database population.
    */
@@ -486,13 +514,16 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
           'postal_code' => 6022,
         ],
       ]);
-      OptionValue::replace(FALSE)->addWhere(
-        'option_group_id:name', '=', 'from_email_address'
-      )->setDefaults([
-        'is_default' => 1,
-        'name' => '"FIXME" <info@EXAMPLE.ORG>',
-        'label' => '"FIXME" <info@EXAMPLE.ORG>',
-      ])->setRecords([['domain_id' => 1], ['domain_id' => 2]])->execute();
+      OptionValue::save(FALSE)
+        ->setMatch(
+          ['option_group_id', 'domain_id']
+        )->setDefaults([
+          'is_default' => 1,
+          'name' => '"FIXME" <info@EXAMPLE.ORG>',
+          'label' => '"FIXME" <info@EXAMPLE.ORG>',
+          'option_group_id:name' => 'from_email_address',
+        ])
+        ->setRecords([['domain_id' => 1, 'value' => 1], ['domain_id' => 2, 'value' => 2]])->execute();
     }
     catch (CRM_Core_Exception $e) {
       $this->fail('failed to re-instate domain contacts ' . $e->getMessage());
@@ -1024,6 +1055,9 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       'installments' => 5,
     ],
       $params);
+    if (empty($params['contact_id'])) {
+      $params['contact_id'] = $this->individualCreate([], 'pledge');
+    }
 
     $result = $this->createTestEntity('Pledge', $params);
     return $result['id'];
@@ -1334,15 +1368,16 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
   /**
    * @param array $params
    *   Optional parameters.
+   * @param string $identifier
    *
    * @return int
    *   Campaign ID.
    */
-  public function campaignCreate(array $params = []): int {
+  public function campaignCreate(array $params = [], string $identifier = 'default'): int {
     $this->enableCiviCampaign();
-    $campaign = $this->callAPISuccess('Campaign', 'create', array_merge([
+    $campaign = $this->createTestEntity('Campaign', array_merge([
       'title' => 'big campaign',
-    ], $params));
+    ], $params), $identifier);
     return $campaign['id'];
   }
 

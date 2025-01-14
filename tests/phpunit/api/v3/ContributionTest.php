@@ -10,6 +10,7 @@
  */
 
 use Civi\Api4\ActivityContact;
+use Civi\Api4\Campaign;
 use Civi\Api4\Contribution;
 use Civi\Api4\ContributionRecur;
 use Civi\Api4\LineItem;
@@ -87,6 +88,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->quickCleanUpFinancialEntities();
     $this->restoreMembershipTypes();
     $this->quickCleanup(['civicrm_uf_match'], TRUE);
+    if (!empty($this->ids['Campaign'])) {
+      Campaign::delete(FALSE)->addWhere('id', 'IN', $this->ids['Campaign'])->execute();
+    }
     $financialAccounts = $this->callAPISuccess('FinancialAccount', 'get', ['return' => 'name']);
     foreach ($financialAccounts['values'] as $financialAccount) {
       if ($financialAccount['name'] === 'Test Tax financial account ' || $financialAccount['name'] === 'Test taxable financial Type') {

@@ -15,22 +15,16 @@
  * @package CiviCRM
  */
 class CRM_Report_Form_ActivityTest extends CiviReportTestCase {
-  protected $_tablesToTruncate = [
-    'civicrm_contact',
-    'civicrm_email',
-    'civicrm_phone',
-    'civicrm_address',
-    'civicrm_contribution',
-  ];
-
-  public function setUp(): void {
-    parent::setUp();
-    $this->quickCleanup($this->_tablesToTruncate);
-  }
 
   public function tearDown(): void {
-    parent::tearDown();
+    $this->quickCleanup([
+      'civicrm_contact',
+      'civicrm_email',
+      'civicrm_phone',
+      'civicrm_address',
+    ]);
     CRM_Core_DAO::executeQuery('DROP TEMPORARY TABLE IF EXISTS civireport_activity_temp_target');
+    parent::tearDown();
   }
 
   /**
@@ -97,20 +91,20 @@ class CRM_Report_Form_ActivityTest extends CiviReportTestCase {
     ]);
 
     // create dummy activity type
-    $activityTypeID = $this->callAPISuccess('option_value', 'create', [
-      'option_group_id' => 'activity_type',
+    $this->createTestEntity('OptionValue', [
+      'option_group_id:name' => 'activity_type',
       'name' => 'Test activity type',
       'label' => 'Test activity type',
     ])['id'];
     // create activity
-    $result = $this->callAPISuccess('activity', 'create', [
+    $this->createTestEntity('Activity', [
       'subject' => 'Make-it-Happen Meeting',
       'activity_date_time' => date('Ymd'),
       'duration' => 120,
       'location' => 'Pennsylvania',
       'details' => 'a test activity',
       'status_id' => 1,
-      'activity_type_id' => 'Test activity type',
+      'activity_type_id:name' => 'Test activity type',
       'source_contact_id' => $this->individualCreate(),
       'target_contact_id' => [$contactID1, $contactID2],
       'assignee_contact_id' => $contactID3,
@@ -131,7 +125,7 @@ class CRM_Report_Form_ActivityTest extends CiviReportTestCase {
     $rows = $obj->getResultSet();
 
     // ensure that only 1 activity is created
-    $this->assertEquals(1, count($rows));
+    $this->assertCount(1, $rows);
     // ensure that country values of respective target contacts are only shown
     $this->assertTrue(in_array($rows[0]['civicrm_address_country_id'], ['India;United States', 'United States;India']));
     // ensure that city values of respective target contacts are only shown

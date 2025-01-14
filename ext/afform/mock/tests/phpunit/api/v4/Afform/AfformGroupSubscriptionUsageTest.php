@@ -18,11 +18,9 @@ class AfformGroupSubscriptionUsageTest extends AfformUsageTestCase implements Tr
   public function testGroupSubscription(): void {
     $groupName = __FUNCTION__;
     $lastName = uniqid(__FUNCTION__);
-    civicrm_api4('Group', 'create', [
-      'values' => [
-        'title' => 'Test Group',
-        'name' => $groupName,
-      ],
+    $this->createTestRecord('Group', [
+      'title' => 'Test Group',
+      'name' => $groupName,
     ]);
 
     $layout = <<<EOHTML

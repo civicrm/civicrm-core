@@ -30,13 +30,18 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
+    $this->quickCleanUpFinancialEntities();
     $this->quickCleanup([
       'civicrm_contact',
       'civicrm_group_contact',
       'civicrm_group',
       'civicrm_prevnext_cache',
       'civicrm_relationship',
-    ]);
+      'civicrm_im',
+      'civicrm_phone',
+      'civicrm_address',
+      'civicrm_email',
+    ], TRUE);
     if ($this->hookClass) {
       // Do this here to flush the entityTables cache on teardown.
       // it might be a bit expensive to add to every single test

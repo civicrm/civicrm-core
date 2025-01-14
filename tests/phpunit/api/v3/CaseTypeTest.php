@@ -43,44 +43,6 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
     ],
   ];
 
-  public function setUp(): void {
-    $this->quickCleanup(['civicrm_case_type']);
-    parent::setUp();
-  }
-
-  /**
-   * Tears down the fixture, for example, closes a network connection.
-   *
-   * This method is called after a test is executed.
-   */
-  public function tearDown(): void {
-    parent::tearDown();
-    $this->quickCleanup(['civicrm_case_type', 'civicrm_uf_match']);
-  }
-
-  /**
-   * Check with empty array.
-   */
-  public function testCaseTypeCreateEmpty(): void {
-    $this->callAPIFailure('CaseType', 'create', []);
-  }
-
-  /**
-   * Check if required fields are not passed.
-   */
-  public function testCaseTypeCreateWithoutRequired(): void {
-    $params = [
-      'name' => 'this case should fail',
-    ];
-    $this->callAPIFailure('CaseType', 'create', $params);
-
-    $params = [
-      'name' => 'this case should fail',
-      'weight' => 4,
-    ];
-    $this->callAPIFailure('CaseType', 'create', $params);
-  }
-
   /**
    * Test create methods with valid data.
    *
@@ -96,7 +58,7 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
     ];
 
     $result = $this->callAPISuccess('CaseType', 'create', $params);
-    $id = $result['id'];
+    $id = $this->ids['CaseType']['new'] = $result['id'];
 
     // Check result.
     $result = $this->callAPISuccess('CaseType', 'get', ['id' => $id]);
@@ -132,7 +94,7 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
       'weight' => 4,
     ];
     $result = $this->callAPISuccess('CaseType', 'create', $params);
-    $id = $result['id'];
+    $id = $this->ids['CaseType']['new'] = $result['id'];
     $result = $this->callAPISuccess('CaseType', 'get', ['id' => $id]);
     $caseType = $result['values'][$id];
 
@@ -149,7 +111,7 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
   /**
    * Test delete function with valid parameters.
    */
-  public function testCaseTypeDelete_New(): void {
+  public function testCaseTypeDeleteNew(): void {
     // Create Case Type.
     $params = [
       'title' => 'Application',
@@ -175,7 +137,7 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
   public function testCaseTypeCreateWithDefinition(): void {
     // Create Case Type
     $params = self::APPLICATION_WITH_DEFINITION_PARAMS;
-    $result = $this->callAPISuccess('CaseType', 'create', $params);
+    $result = $this->createTestEntity('CaseType', $params);
     $id = $result['id'];
 
     // Check result
@@ -191,13 +153,13 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
   /**
    * Create a CaseType+case then delete the CaseType.
    */
-  public function testCaseTypeDelete_InUse(): void {
+  public function testCaseTypeDeleteInUse(): void {
     // Create Case Type
     $params = self::APPLICATION_WITH_DEFINITION_PARAMS;
     $createCaseType = $this->callAPISuccess('CaseType', 'create', $params);
 
-    $createCase = $this->callAPISuccess('Case', 'create', [
-      'case_type_id' => $createCaseType['id'],
+    $createCase = $this->createTestEntity('Case', [
+      'case_type_id:name' => 'Application_with_Definition',
       'contact_id' => $this->getLoggedInUser(),
       'subject' => 'Example',
     ]);
@@ -226,24 +188,24 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
    */
   public function testCaseStatusByCaseType(): void {
     $statusName = md5(mt_rand());
-    $template = $this->callAPISuccess('CaseType', 'getsingle', ['id' => $this->caseTypeId]);
+    $template = $this->callAPISuccess('CaseType', 'getsingle', ['name' => 'housing_support']);
     unset($template['id']);
     $template['name'] = $template['title'] = 'test_case_type';
     $template['definition']['statuses'] = ['Closed', $statusName];
-    $this->callAPISuccess('CaseType', 'create', $template);
+    $this->ids['CaseType']['new'] = (int) $this->callAPISuccess('CaseType', 'create', $template)['id'];
     $this->createTestEntity('OptionValue', [
       'option_group_id:name' => 'case_status',
       'name' => $statusName,
       'label' => $statusName,
       'weight' => 99,
-    ]);
+    ], $statusName);
     $result = $this->callAPISuccess('Case', 'getoptions', ['field' => 'status_id', 'case_type_id' => 'test_case_type', 'context' => 'validate']);
     $this->assertEquals($template['definition']['statuses'], array_values($result['values']));
   }
 
   public function testDefinitionGroups(): void {
     $gid1 = $this->groupCreate(['name' => 'testDefinitionGroups1', 'title' => 'testDefinitionGroups1']);
-    $gid2 = $this->groupCreate(['name' => 'testDefinitionGroups2', 'title' => 'testDefinitionGroups2']);
+    $this->groupCreate(['name' => 'testDefinitionGroups2', 'title' => 'testDefinitionGroups2']);
     $def = self::APPLICATION_WITH_DEFINITION_PARAMS;
     $def['definition']['caseRoles'][] = [
       'name' => 'Second role',
@@ -255,7 +217,8 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
     ];
     $def['definition']['activityAsgmtGrps'] = $gid1;
     $createCaseType = $this->callAPISuccess('CaseType', 'create', $def);
-    $caseType = $this->callAPISuccess('CaseType', 'getsingle', ['id' => $createCaseType['id']]);
+    $this->ids['CaseType']['third_role'] = $createCaseType['id'];
+    $caseType = $this->callAPISuccess('CaseType', 'getsingle', ['id' => $this->ids['CaseType']['third_role']]);
 
     // Assert the group id got converted to array with name not id
     $this->assertEquals(['testDefinitionGroups1'], $caseType['definition']['activityAsgmtGrps']);

@@ -114,7 +114,7 @@
               {/if}
             {elseif $field.html_type eq 'File' && $viewOnlyFileValues}
               {$viewOnlyFileValues.$profileFieldName}
-            {elseif $field.html_type eq 'Radio' or $field.html_type eq 'CheckBox'}
+            {elseif $field.html_type eq 'Radio' or $field.html_type eq 'CheckBox' && $field.data_type neq "Boolean"}
               <div class="crm-multiple-checkbox-radio-options" >
                 {foreach name=outer key=key item=item from=$formElement}
                   {if is_array($item) && array_key_exists('html', $item)}

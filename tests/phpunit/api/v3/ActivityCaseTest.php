@@ -27,15 +27,15 @@ class api_v3_ActivityCaseTest extends CiviCaseTestCase {
    */
   public function setUp(): void {
     parent::setUp();
-    $this->_case = $this->callAPISuccess('case', 'create', [
-      'case_type_id' => $this->caseTypeId,
-      'subject' => __CLASS__,
+    $this->_case = $this->createTestEntity('Case', [
+      'case_type_id:name' => 'housing_support',
+      'subject' => 'new case',
       'contact_id' => $this->individualCreate(),
     ]);
 
-    $this->_otherActivity = $this->callAPISuccess('Activity', 'create', [
+    $this->_otherActivity = $this->createTestEntity('Activity', [
       'source_contact_id' => $this->ids['Contact']['individual_0'],
-      'activity_type_id' => 'Phone Call',
+      'activity_type_id:name' => 'Phone Call',
       'subject' => 'Ask not what your API can do for you, but what you can do for your API.',
     ]);
   }
@@ -129,7 +129,7 @@ class api_v3_ActivityCaseTest extends CiviCaseTestCase {
       'case_id' => $this->_case['id'],
       'return' => ['case_id', 'case_id.subject'],
     ]);
-    $this->assertEquals(__CLASS__, $activities['values'][0]['case_id.subject']);
+    $this->assertEquals('new case', $activities['values'][0]['case_id.subject']);
     // Note - case_id is always an array
     $this->assertEquals($this->_case['id'], $activities['values'][0]['case_id'][0]);
   }

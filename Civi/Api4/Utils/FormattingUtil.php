@@ -84,7 +84,7 @@ class FormattingUtil {
    */
   public static function formatInputValue(&$value, ?string $fieldPath, array $fieldSpec, array $params = [], &$operator = NULL, $index = NULL) {
     // Evaluate pseudoconstant suffix
-    $suffix = str_replace(':', '', strstr(($fieldPath ?? ''), ':'));
+    $suffix = self::getSuffix($fieldPath);
     $fk = $fieldSpec['name'] == 'id' ? $fieldSpec['entity'] : $fieldSpec['fk_entity'] ?? NULL;
 
     // Handle special 'current_domain' option. See SpecFormatter::getOptions
@@ -256,7 +256,7 @@ class FormattingUtil {
         $dataType = NULL;
       }
       // Evaluate pseudoconstant suffixes
-      $suffix = strrpos(($fieldName ?? ''), ':');
+      $suffix = self::getSuffix($fieldName);
       $fieldOptions = NULL;
       if (isset($value) && $suffix) {
         $fieldOptions = self::getPseudoconstantList($field, $fieldName, $rawValues, $action);
@@ -320,13 +320,13 @@ class FormattingUtil {
    * @throws \CRM_Core_Exception
    */
   public static function getPseudoconstantList(array $field, string $fieldAlias, $values = [], $action = 'get') {
-    [$fieldPath, $valueType] = explode(':', $fieldAlias);
-    $context = self::$pseudoConstantContexts[$valueType] ?? NULL;
+    $valueType = FormattingUtil::getSuffix($fieldAlias);
     // For create actions, only unique identifiers can be used.
     // For get actions any valid suffix is ok.
-    if (($action === 'create' && !$context) || !array_key_exists($valueType, \CRM_Core_SelectValues::optionAttributes())) {
+    if (!$valueType || ($action === 'create' && !isset(self::$pseudoConstantContexts[$valueType]))) {
       throw new \CRM_Core_Exception('Illegal expression');
     }
+    $fieldPath = FormattingUtil::removeSuffix($fieldAlias);
 
     $entityValues = self::filterByPath($values, $fieldPath, $field['name']);
     try {
@@ -535,6 +535,42 @@ class FormattingUtil {
       }
     }
     return $fieldValue;
+  }
+
+  /**
+   * Returns the suffix from a given field name if it exists and matches known suffixes.
+   *
+   * @param string|null $fieldName
+   *   The name of the field, potentially containing a suffix in the format ":suffix".
+   * @return string|null
+   *   The extracted suffix if found and recognized; otherwise, NULL.
+   */
+  public static function getSuffix(?string $fieldName): ?string {
+    if (!$fieldName || !str_contains($fieldName, ':')) {
+      return NULL;
+    }
+
+    $allSuffixes = array_keys(\CRM_Core_SelectValues::optionAttributes());
+    foreach ($allSuffixes as $suffix) {
+      if (str_ends_with($fieldName, ":$suffix")) {
+        return $suffix;
+      }
+    }
+    return NULL;
+  }
+
+  /**
+   * Removes the suffix from a given field name, if a suffix is detected.
+   *
+   * @param string $fieldName The name of the field to process.
+   * @return string The field name without its suffix, or the original field name if no suffix exists.
+   */
+  public static function removeSuffix(string $fieldName): string {
+    $suffix = self::getSuffix($fieldName);
+    if ($suffix) {
+      return substr($fieldName, 0, -1 - strlen($suffix));
+    }
+    return $fieldName;
   }
 
 }

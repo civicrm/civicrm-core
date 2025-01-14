@@ -207,6 +207,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 /* Trash icons */
 .crm-container .delete-icon {
   background-image: none;
+  color: var(--crm-alert-text-danger);
 }
 .crm-container .delete-icon::before,
 .crm-container .crm-i.fa-trash::before {
