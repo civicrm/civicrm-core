@@ -41,13 +41,16 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
   public function buildQuickForm() {
     parent::buildQuickForm();
 
-    if ($this->_action & CRM_Core_Action::DELETE) {
-      return;
-    }
-
     if (isset($this->_id)) {
       $params = ['id' => $this->_id];
-      CRM_Core_BAO_Navigation::retrieve($params, $this->_defaults);
+      $navDao = CRM_Core_BAO_Navigation::retrieve($params, $this->_defaults);
+    }
+
+    if ($this->_action & CRM_Core_Action::DELETE) {
+      $childCount = CRM_Core_BAO_Navigation::getChildCount($this->_id);
+      $this->assign('label', $navDao->label ?: $navDao->url);
+      $this->assign('childCount', $childCount);
+      return;
     }
 
     $this->applyFilter('__ALL__', 'trim');
@@ -106,6 +109,11 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
    */
   public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
+
+    if ($this->_action & CRM_Core_Action::DELETE) {
+      return $defaults;
+    }
+
     if (isset($this->_id)) {
       //Take parent id in object variable to calculate the menu
       //weight if menu parent id changed
@@ -131,6 +139,17 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
   public function postProcess() {
     // get the submitted form values.
     $params = $this->controller->exportValues($this->_name);
+
+    if ($this->_action & CRM_Core_Action::DELETE) {
+      CRM_Core_BAO_Navigation::deleteRecords([['id' => $this->_id]]);
+      $childCount = $this->getTemplateVars('childCount');
+      $msg = ts('One menu item permanently deleted.', [
+        'plural' => '%count menu items permanently deleted.',
+        'count' => $childCount + 1,
+      ]);
+      CRM_Core_Session::setStatus($msg, ts('Deleted'), 'success');
+      return;
+    }
 
     if (isset($this->_id)) {
       $params['id'] = $this->_id;
