@@ -876,6 +876,28 @@ ORDER BY weight";
   }
 
   /**
+   * Count all nested child items (including sub-children and sub-sub-children, etc).
+   *
+   * @param int $id
+   *   The ID of the parent item.
+   *
+   * @return int
+   *   The total number of children.
+   */
+  public static function getChildCount(int $id): int {
+    $childCount = 0;
+    $parentIds = [$id];
+    while ($parentIds) {
+      $parentIds = \Civi\Api4\Navigation::get(FALSE)
+        ->addWhere('parent_id', 'IN', $parentIds)
+        ->addSelect('id')
+        ->execute()->column('id');
+      $childCount += count($parentIds);
+    }
+    return $childCount;
+  }
+
+  /**
    * @param array $menu
    */
   public static function buildHomeMenu(&$menu) {
