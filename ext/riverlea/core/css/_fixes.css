@@ -486,7 +486,6 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
   box-shadow: var(--crm-block-shadow);
 }
 .crm-container #ContributionCharts .ui-tabs-nav {
-  align-items: center;
   gap: 1px; /* to handle white space in markup */
 }
 .crm-container #ContributionCharts .ui-tabs-nav .float-right td {
@@ -516,6 +515,7 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
 }
 #ContributionCharts ul.ui-tabs-nav .float-right table a.button {
   max-height: 36px;
+  margin-block: 0;
 }
 #ContributionCharts #chartData {
   padding: var(--crm-padding-reg);

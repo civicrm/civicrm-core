@@ -49,10 +49,21 @@ af-form {
   top: 0;
   right: 0;
 }
+
+/* Accordion */
 .crm-container details.af-container {
   border: var(--crm-expand-border);
   border-radius: var(--crm-expand-radius);
   padding-block: 0;
+}
+details.af-container > *:not(summary) { /* adds padding to Afform internal details */
+  padding-inline: var(--crm-r);
+}
+details.af-container > *:nth-of-type(1):not(summary) {
+  padding-top: var(--crm-m);
+}
+details.af-container > *:last-of-type {
+  padding-bottom: var(--crm-m);
 }
 
 /* Card style */
@@ -92,4 +103,11 @@ af-form {
 
 fieldset.af-container.af-layout-inline {
   border: 0;
+}
+
+/* Radio buttons */
+
+.af-field-type-radio .crm-af-field {
+  display: flex;
+  padding-block: 0.25rem;
 }
