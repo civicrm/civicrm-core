@@ -54,6 +54,10 @@
               const rowIndex = ctrl.results.findIndex(row => row.key === rowKey);
               // If the api returned a refreshed row, replace the current row with it
               if (result.length) {
+                // Preserve hierarchical info which isn't returned by the refresh
+                result[0].data._descendents = ctrl.results[rowIndex].data._descendents;
+                result[0].data._depth = ctrl.results[rowIndex].data._depth;
+                // Note that extend() will preserve top-level items like 'collapsed' which aren't returned by the refresh
                 angular.extend(ctrl.results[rowIndex], result[0]);
               }
               // Or it's possible that the update caused this row to no longer match filters, in which case remove it
