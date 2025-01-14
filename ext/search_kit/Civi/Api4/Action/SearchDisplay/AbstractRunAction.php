@@ -899,8 +899,8 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       if (!empty($link['join'])) {
         $link['prefix'] = $link['join'] . '.';
       }
-      // Get path from action
-      if (!empty($link['action'])) {
+      // Get path from action for non-task links
+      if (!empty($link['action']) && empty($link['task'])) {
         $getLinks = civicrm_api4($entity, 'getLinks', [
           'checkPermissions' => FALSE,
           'where' => [
@@ -917,6 +917,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
           $link['path'] = str_replace('[', '[' . $link['prefix'], $link['path']);
         }
       }
+      // Process task links
       elseif (!$link['path'] && !empty($link['task'])) {
         $task = $this->getTask($link['task']);
         $link['conditions'] = $task['conditions'] ?? [];
