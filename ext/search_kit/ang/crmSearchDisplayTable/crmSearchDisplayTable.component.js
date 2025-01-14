@@ -94,6 +94,20 @@
         return headerClasses.join(' ');
       };
 
+      this.getRowClass = function (row) {
+        let cssClass = row.cssClass || '';
+        if (ctrl.settings.hierarchical) {
+          cssClass += ' crm-hierarchical-row crm-hierarchical-depth-' + row.data._depth;
+          if (row.data._depth) {
+            cssClass += ' crm-hierarchical-child';
+          }
+          if (row.data._descendents) {
+            cssClass += ' crm-hierarchical-parent';
+          }
+        }
+        return cssClass;
+      };
+
     }
   });
 
