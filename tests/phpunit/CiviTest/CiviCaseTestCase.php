@@ -98,8 +98,8 @@ class CiviCaseTestCase extends CiviUnitTestCase {
       CaseType::delete(FALSE)->addWhere('id', 'IN', $this->ids['CaseType'])->execute();
     }
     CRM_Case_XMLRepository::singleton()->flush();
-    $this->assertEntityCleanup();
     parent::tearDown();
+    $this->assertEntityCleanup();
   }
 
   public static function setUpBeforeClass(): void {

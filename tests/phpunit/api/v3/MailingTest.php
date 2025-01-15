@@ -83,7 +83,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
    * @dataProvider versionThreeAndFour
    */
   public function testMailerCreateSuccess(): void {
-    $this->callAPISuccess('Campaign', 'create', ['name' => 'big campaign', 'title' => 'abc']);
+    $this->campaignCreate(['name' => 'big campaign', 'title' => 'abc']);
     $result = $this->callAPISuccess('mailing', 'create', $this->_params + ['scheduled_date' => 'now', 'campaign_id' => 'big campaign']);
     $jobs = $this->callAPISuccess('MailingJob', 'get', ['mailing_id' => $result['id']]);
     $this->assertEquals(1, $jobs['count']);

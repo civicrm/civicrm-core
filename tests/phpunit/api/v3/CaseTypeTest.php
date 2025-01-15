@@ -187,7 +187,7 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
    * @throws \Exception
    */
   public function testCaseStatusByCaseType(): void {
-    $statusName = md5(mt_rand());
+    $statusName = 'crazy_new_status';
     $template = $this->callAPISuccess('CaseType', 'getsingle', ['name' => 'housing_support']);
     unset($template['id']);
     $template['name'] = $template['title'] = 'test_case_type';
