@@ -7,6 +7,7 @@ require_once __DIR__ . '/../../../../../../../tests/phpunit/api/v4/Api4TestBase.
 use api\v4\Api4TestBase;
 use Civi\Api4\Activity;
 use Civi\Api4\Email;
+use Civi\Api4\SearchDisplay;
 use Civi\Test\CiviEnvBuilder;
 
 /**
@@ -549,6 +550,79 @@ class EditableSearchTest extends Api4TestBase {
     $this->assertArrayNotHasKey('edit', $result[2]['columns'][3]);
     $this->assertEquals('', $result[2]['columns'][4]['val']);
     $this->assertArrayNotHasKey('edit', $result[2]['columns'][4]);
+  }
+
+  public function testDraggableSearchDisplay() {
+    $name = __FUNCTION__;
+    $this->createTestRecord('OptionGroup', [
+      'title' => $name,
+    ]);
+    $optionIds = $this->saveTestRecords('OptionValue', [
+      'defaults' => ['option_group_id.name' => $name],
+      'records' => [
+        ['value' => 'A'],
+        ['value' => 'B'],
+        ['value' => 'C'],
+        ['value' => 'D'],
+        ['value' => 'E'],
+      ],
+    ])->column('id');
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'OptionValue',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['value', 'weight'],
+          'where' => [['option_group_id.name', '=', $name]],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'settings' => [
+          'draggable' => 'weight',
+          'columns' => [
+            [
+              'key' => 'value',
+              'label' => 'Value',
+              'type' => 'field',
+            ],
+            [
+              'key' => 'weight',
+              'label' => 'Weight',
+              'type' => 'field',
+            ],
+          ],
+        ],
+      ],
+    ];
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertSame($optionIds, $result->column('key'));
+    $weights = array_column($result->column('data'), 'weight');
+    $this->assertSame([1, 2, 3, 4, 5], $weights);
+
+    // Put the last item first
+    $editResult = SearchDisplay::inlineEdit()
+      ->setSavedSearch($params['savedSearch'])
+      ->setDisplay($params['display'])
+      ->setReturn('draggableWeight')
+      ->setRowKey($optionIds[4])
+      ->setValues(['weight' => 1])
+      ->execute();
+    // Updated weights should be returned
+    $this->assertEquals([$optionIds[4] => 1, $optionIds[0] => 2, $optionIds[1] => 3, $optionIds[2] => 4, $optionIds[3] => 5], (array) $editResult);
+
+    // Run the search again - weights will have been updated
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    // Last id will be first
+    $lastId = array_pop($optionIds);
+    array_unshift($optionIds, $lastId);
+    $this->assertSame($optionIds, $result->column('key'));
+    $values = array_column($result->column('data'), 'value');
+    $this->assertSame(['E', 'A', 'B', 'C', 'D'], $values);
+    $weights = array_column($result->column('data'), 'weight');
+    $this->assertSame([1, 2, 3, 4, 5], $weights);
   }
 
 }

@@ -9,10 +9,10 @@ use Civi\Api4\Utils\CoreUtil;
 /**
  * Perform an inline-edit to a search display row, then re-run the search to return created/updated row.
  *
- * @method $this setValues(mixed $values)
- * @method mixed getValues()
- * @method $this setRowKey(mixed $rowKey)
- * @method mixed getRowKey()
+ * @method $this setValues(array $values)
+ * @method array getValues()
+ * @method $this setRowKey(int $rowKey)
+ * @method int getRowKey()
  * @package Civi\Api4\Action\SearchDisplay
  */
 class InlineEdit extends Run {
@@ -35,7 +35,10 @@ class InlineEdit extends Run {
   protected $values;
 
   protected function processResult(SearchDisplayRunResult $result) {
-    if (isset($this->rowKey)) {
+    if (isset($this->rowKey) && $this->return === 'draggableWeight') {
+      $this->updateDraggableWeight();
+    }
+    elseif (isset($this->rowKey)) {
       $this->updateExistingRow();
     }
     elseif (!empty($this->display['settings']['editableRow']['create'])) {
@@ -196,6 +199,29 @@ class InlineEdit extends Run {
     // Apply id of newly saved row to filters
     $keyName = CoreUtil::getIdFieldName($this->savedSearch['api_entity']);
     $this->applyFilter($keyName, $saved[''][$keyName]);
+  }
+
+  private function updateDraggableWeight(): void {
+    $weightField = $this->display['settings']['draggable'];
+    if (!$weightField) {
+      throw new \CRM_Core_Exception('Search display is not configured for draggable sorting.');
+    }
+    if (!isset($this->values[$weightField])) {
+      throw new \CRM_Core_Exception('Cannot update draggable weight: no value provided.');
+    }
+    $entityName = $this->savedSearch['api_entity'];
+    $keyName = CoreUtil::getIdFieldName($entityName);
+    // For security, do not accept arbitrary values; only update weight.
+    $values = [
+      $weightField => $this->values[$weightField],
+    ];
+    civicrm_api4($entityName, 'update', [
+      'checkPermissions' => empty($this->display['settings']['acl_bypass']),
+      'where' => [
+        [$keyName, '=', $this->rowKey],
+      ],
+      'values' => $values,
+    ]);
   }
 
 }

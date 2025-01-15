@@ -27,6 +27,7 @@ class Run extends AbstractRunAction {
    * - "page:x": a single page
    * - "scroll:x": one 'page' of autocomplete results
    * - "tally": summary row
+   * - "draggableWeight": for draggable sorting
    * - null: all rows
    * @var string
    */
@@ -73,6 +74,18 @@ class Run extends AbstractRunAction {
         $result[] = $this->getTally();
         return;
 
+      case 'draggableWeight':
+        // Used when refreshing after a drag-sort.
+        /* @see InlineEdit::updateDraggableWeight */
+        if (empty($this->display['settings']['draggable'])) {
+          throw new \CRM_Core_Exception('Search display is not configured for draggable sorting.');
+        }
+        $idField = CoreUtil::getIdFieldName($entityName);
+        $weightField = $this->display['settings']['draggable'];
+        $apiParams['select'] = [$idField, $weightField];
+        $index = [$idField => $weightField];
+        break;
+
       default:
         // Pager mode: `page:n`
         // AJAX scroll mode: `scroll:n`
@@ -100,7 +113,7 @@ class Run extends AbstractRunAction {
     $result->rowCount = $apiResult->rowCount;
     $result->debug = $apiResult->debug;
 
-    if ($this->return === 'row_count' || $this->return === 'id') {
+    if ($this->return === 'row_count' || $this->return === 'id' || $this->return === 'draggableWeight') {
       $result->exchangeArray($apiResult->getArrayCopy());
     }
     else {
