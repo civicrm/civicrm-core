@@ -23,20 +23,18 @@
         this.editValues = {};
       },
 
-      saveEditing: function(rowIndex, colKey) {
+      saveEditing: function(row, colKey) {
         const ctrl = this;
         const apiParams = this.getApiParams(null);
-        let rowKey = null;
-        // Edit mode
-        if (rowIndex >= 0) {
-          rowKey = this.results[rowIndex].key;
+        // Edit mode (with no row given it's create mode)
+        if (row) {
           if (colKey) {
             const colIndex = this.settings.columns.findIndex(column => column.key === colKey);
-            this.results[rowIndex].columns[colIndex].loading = true;
+            row.columns[colIndex].loading = true;
           } else {
-            this.results[rowIndex].columns.forEach((col) => col.loading = true);
+            row.columns.forEach((col) => col.loading = true);
           }
-          apiParams.rowKey = rowKey;
+          apiParams.rowKey = row.key;
         }
         apiParams.values = this.editValues;
         this.cancelEditing();
@@ -44,30 +42,25 @@
         crmStatus({}, crmApi4('SearchDisplay', 'inlineEdit', apiParams))
           .then(function(result) {
             // Create mode
-            if (rowIndex < 0 && result.length) {
+            if (!row && result.length) {
               ctrl.results.push(result[0]);
               ctrl.rowCount++;
             }
             // Edit mode
-            else if (rowIndex >= 0) {
-              // Re-find rowIndex in case rows have shifted (possible race conditions with other editable rows)
-              const rowIndex = ctrl.results.findIndex(row => row.key === rowKey);
+            else if (row) {
               // If the api returned a refreshed row, replace the current row with it
               if (result.length) {
                 // Preserve hierarchical info which isn't returned by the refresh
-                result[0].data._descendents = ctrl.results[rowIndex].data._descendents;
-                result[0].data._depth = ctrl.results[rowIndex].data._depth;
+                result[0].data._descendents = row.data._descendents;
+                result[0].data._depth = row.data._depth;
                 // Note that extend() will preserve top-level items like 'collapsed' which aren't returned by the refresh
-                angular.extend(ctrl.results[rowIndex], result[0]);
+                angular.extend(row, result[0]);
               }
               // Or it's possible that the update caused this row to no longer match filters, in which case remove it
               else {
-                ctrl.results.splice(rowIndex, 1);
-                // Shift value of 'editing' if needed
-                if (ctrl.editing && ctrl.editing[0] > rowIndex) {
-                  ctrl.editing[0]--;
-                } else if (ctrl.editing && ctrl.editing[0] == rowIndex) {
-                  ctrl.cancelEditing();
+                const rowIndex = ctrl.results.findIndex(result => result.key === row.key);
+                if (rowIndex >= 0) {
+                  ctrl.results.splice(rowIndex, 1);
                 }
                 ctrl.rowCount--;
               }

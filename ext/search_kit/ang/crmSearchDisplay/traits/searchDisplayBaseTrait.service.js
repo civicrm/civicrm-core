@@ -246,29 +246,31 @@
         }
         return apiRequest;
       },
-      formatFieldValue: function(colData) {
-        return angular.isArray(colData.val) ? colData.val.join(', ') : colData.val;
-      },
 
       // Determine if an editable field is actively in editing mode
-      isEditing: function(rowIndex, colIndex) {
-        return this.editing && this.editing[0] === rowIndex && (this.editing[1] === colIndex || (this.settings.editableRow && this.settings.editableRow.full));
+      isEditing: function(row, colIndex) {
+        return this.editing && row.key && this.editing[0] === row.key && (this.editing[1] === colIndex || (this.settings.editableRow && this.settings.editableRow.full));
       },
 
-      startEditing: function(rowIndex, colIndex) {
-        if (this.editing === false && this.results[rowIndex].columns[colIndex].edit) {
-          this.editing = [rowIndex, colIndex];
+      // Determine if a new row is being created via inline-edit
+      isCreating: function() {
+        return this.editing && this.editing[0] === -1;
+      },
+
+      startEditing: function(row, colIndex) {
+        if (this.editing === false && row.columns[colIndex].edit) {
+          this.editing = [row.key, colIndex];
         }
       },
 
       // Determine if a field is not currently loading or editing
-      isViewing: function(rowIndex, colIndex) {
-        return !this.isEditing(rowIndex, colIndex) && !this.isLoading(rowIndex, colIndex);
+      isViewing: function(row, colIndex) {
+        return !this.isEditing(row, colIndex) && !this.isLoading(row, colIndex);
       },
 
       // Determine if a field is currently loading
-      isLoading: function(rowIndex, colIndex) {
-        return !this.isEditing(rowIndex, colIndex) && this.results[rowIndex].columns[colIndex].loading;
+      isLoading: function(row, colIndex) {
+        return !this.isEditing(row, colIndex) && row.columns[colIndex].loading;
       },
     };
   });

@@ -7,7 +7,6 @@
   angular.module('crmSearchDisplay').component('crmSearchDisplayEditable', {
     bindings: {
       row: '<?',
-      rowIndex: '<',
       display: '<',
       colKey: '<',
       isFullRowMode: '<',
@@ -62,7 +61,7 @@
       this.save = function() {
         const value = ctrl.display.editValues[ctrl.colKey];
         if (value !== initialValue || ctrl.isFullRowMode) {
-          ctrl.display.saveEditing(ctrl.rowIndex, ctrl.colKey);
+          ctrl.display.saveEditing(ctrl.row, ctrl.colKey);
         }
         else {
           ctrl.display.cancelEditing();
