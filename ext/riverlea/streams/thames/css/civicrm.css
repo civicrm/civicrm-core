@@ -23,7 +23,8 @@ html.cms-standalone body {
   cursor: pointer; /* show it's clickable */
   position: relative; /* so our animated triangle doesn't go walkies */
 }
-.crm-container summary:where(:hover, :focus) {
+.crm-container summary:hover,
+.crm-container summary:focus {
   background-color: var(--crm-c-blue-overlay2);
 }
 
@@ -600,7 +601,7 @@ html.crm-standalone  nav.breadcrumb>ol {
 .crm-container th.crm-search-result-select {
   --crm-btn-margin: 0;
 }
-/* Searchkit accordions */ 
+/* Searchkit accordions */
 .crm-search-admin-edit-columns details,
 .crm-search .crm-search-admin-relative details {
   /*issue https://lab.civicrm.org/extensions/riverlea/-/issues/102 */
