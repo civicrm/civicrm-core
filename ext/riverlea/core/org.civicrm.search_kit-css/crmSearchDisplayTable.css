@@ -27,6 +27,11 @@ table.crm-sticky-header > thead > tr {
   flex-wrap: wrap;
   gap: var(--crm-s);
 }
+.crm-container td.crm-search-col-type-buttons:has(span:only-child),
+.crm-container td.crm-search-col-type-buttons:has(> .btn:only-child) {
+  /* when button column has only one button, turn cell back to table cell to vertically center */
+  display: table-cell;
+}
 td.crm-search-col-type-buttons.text-right {
   flex-direction: row-reverse;
 }
@@ -42,12 +47,9 @@ td.crm-search-col-type-buttons.text-right {
   color: var(--crm-c-text);
   min-width: fit-content;
   padding: 0;
+  border: 0;
+  background: transparent;
 }
-/* #bootstrap-theme th.crm-search-result-select button.btn.dropdown-toggle {
-  border-radius: var(--crm-roundness);
-  background-color: var(--crm-c-background4);
-  padding: var(--crm-xs1) var(--crm-m1);
-} */
 .crm-search-display-table table {
   border: var(--crm-table-outside-border);
   box-shadow: var(--crm-block-shadow);

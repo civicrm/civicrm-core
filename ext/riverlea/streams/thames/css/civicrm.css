@@ -14,19 +14,18 @@ html.cms-standalone body {
 }
 
 .crm-container details {
-  background-color: #bad0df45; /* @todo fix this to a var. */
+  background-color: var(--crm-expand-body-bg);
   border: var(--crm-c-divider);
 }
 
 .crm-container summary {
-  background-color: var(--crm-c-green-dark); /* novar */
   color: var(--crm-c-blue-darker); /* novar */
   cursor: pointer; /* show it's clickable */
   position: relative; /* so our animated triangle doesn't go walkies */
 }
-.crm-container :where(summary:hover,
-summary:focus) {
-  background-color: #b8daf4; /* novar */
+.crm-container summary:hover,
+.crm-container summary:focus {
+  background-color: var(--crm-c-blue-overlay2);
 }
 
 /* RL introduces a border on focus which causes layout shift
@@ -90,7 +89,7 @@ summary:focus) {
   animation: crm-details-show 240ms ease-in-out;
 }
 /* We don't want a different colour header bg on 'active' (open) but we do on hover
- * This does't work yet.*/
+ * This doesn't work yet.*/
 .crm-container .crm-accordion-bold>summary:is(:hover,
 :focus) {
   background-color: var(--crm-c-blue-overlay2);
@@ -601,6 +600,14 @@ html.crm-standalone  nav.breadcrumb>ol {
 /* .crm-container .btn, .crm-container button, .crm-container .crm-button, .crm-container [type="button"], .crm-container [type="reset"], .crm-container [type="submit"]*/
 .crm-container th.crm-search-result-select {
   --crm-btn-margin: 0;
+}
+/* Searchkit accordions */
+.crm-search-admin-edit-columns details,
+.crm-search .crm-search-admin-relative details {
+  /*issue https://lab.civicrm.org/extensions/riverlea/-/issues/102 */
+  margin-left: 1rem;
+  /* crmSearchAdmin applies this var as the bg here and it does not suit us. */
+  --crm-c-page-background: transparent;
 }
 
 /* Override _dropdowns.css */

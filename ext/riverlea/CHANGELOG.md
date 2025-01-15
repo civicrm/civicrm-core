@@ -1,3 +1,17 @@
+1.3.0-5.83.alpha
+ - ADDED - padding to body of Afform accordions
+ - REMOVED - Afform multiple buttons margin (https://github.com/civicrm/civicrm-core/pull/31739)
+ - CHANGED - SearchKit table cell with buttons reverts from flex to `table-cell` with only one button to resolve alignment issue for single buttons (not fixed for multiple buttons) (https://github.com/civicrm/civicrm-core/pull/31728#issuecomment-2580090556)
+ - CHANGED - alignment of searchkit drag handle & delete icon responds better across streams
+ - CHANGED - Reset border and margin on Afform search result select-all checkbox (mostly impacted Hackney Stream)
+ - FIXED - Small Bootstrap buttons with icons use small button padding (bug meant they had regular button padding)
+ - FIXED - SearchKit admin View Display button overlapped help text
+ - FIXED - Non-visible trash icon in some scenarios (https://github.com/civicrm/civicrm-core/pull/31769)
+ - FIXED - Thames accordion icons offset in SearchKit admin (https://lab.civicrm.org/extensions/riverlea/-/issues/102).
+ - FIXED - Thames spacing on contributions dashboard tabs and top buttons.
+ - FIXED - SearchKit Tokens extension overlaps (https://lab.civicrm.org/extensions/riverlea/-/issues/11#note_175631)
+ - LINT - spacing on crm.designer.css.
+
 1.2.2-5.81beta
  - FIXED - major regression introduced in 1.2.1-5.81beta around Select2 sub-results: https://lab.civicrm.org/extensions/riverlea/-/issues/11#note_174883
  - FIXED - contact dashboard tags didn't wrap: https://lab.civicrm.org/extensions/riverlea/-/issues/97

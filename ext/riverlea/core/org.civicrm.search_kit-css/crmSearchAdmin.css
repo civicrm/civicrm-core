@@ -140,10 +140,10 @@
   border: var(--crm-c-divider);
   border-width: 0 1px 1px 1px;
 }
-.crm-search fieldset legend {
+#bootstrap-theme.crm-search fieldset legend {
   font-size: inherit;
   margin: 0;
-  width: auto;
+  width: 100%;
   border: 0;
   padding: 0;
   text-transform: none;
@@ -197,20 +197,23 @@
   padding: 0;
   border: 0 solid transparent;
 }
-.crm-search-admin-edit-columns fieldset.crm-draggable {
+.crm-search-admin-edit-columns fieldset.crm-draggable:has(> details) { /* targetted to cetaild because SK Tokens extension shares classname */
   display: grid;
   grid-template-columns: 2ch auto;
+  align-items: center;
+}
+.crm-search-admin-edit-columns fieldset.crm-draggable:has(details[open]) {
+  align-items: start;
 }
 #bootstrap-theme .crm-search-admin-edit-columns fieldset.crm-draggable .btn.btn-xs.pull-right {
   line-height: 1.45rem;
   display: block;
   z-index: 1;
   position: absolute;
-  right: 15px;
+  right: calc(4 * var(--crm-padding-small)); /* aligns button relative to stream padding */
 }
 i.crm-i.crm-search-move-icon {
   opacity: .5;
-  margin-top: 0.5rem;
 }
 .crm-draggable details > *,
 .crm-draggable details > .form-inline {
@@ -222,7 +225,7 @@ i.crm-i.crm-search-move-icon {
 .crm-draggable details > div:last-of-type {
   padding-bottom: var(--crm-expand-body-padding);
 }
-.crm-search-admin-edit-columns .input-group-btn {
+#bootstrap-theme .crm-search-admin-edit-columns .input-group-btn {
   display: flex;
   flex-direction: row;
 }
@@ -418,4 +421,7 @@ crm-search-admin-import {
   top: 1px;
   right: 0;
   background-color: white;
+}
+.crm-search-admin-relative .help-block { /* reduces help-block by width of crm-search-admin-right button */
+  width: calc(100% - 180px);
 }
