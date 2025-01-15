@@ -392,6 +392,9 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     // something changed it and then inadvertently didn't restore it.
     $this->errorHandlerAtStartOfTest = set_error_handler(function($errno, $errstr, $errfile, $errline) {});
     restore_error_handler();
+    foreach (['civicrm_campaign', 'civicrm_mailing_spool', 'civicrm_line_item', 'civicrm_im', 'civicrm_address'] as $entity) {
+      $this->entityTracking[$entity] = \CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM ' . $entity);
+    }
   }
 
   /**
@@ -603,6 +606,16 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       OptionValue::delete(FALSE)->addWhere('id', 'IN', $this->ids['OptionValue'])->execute();
     }
     CRM_Core_Config::singleton()->userPermissionClass->permissions = NULL;
+    foreach ($this->entityTracking as $entity => $count) {
+      $field = 'name';
+      if ($entity === 'civicrm_line_item') {
+        $field = 'line_total';
+      }
+      if ($entity === 'civicrm_mailing_spool') {
+        $field = 'recipient_email';
+      }
+      $this->assertEquals($count, \CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM ' . $entity), $entity . ' has not cleaned up well ' . CRM_Core_DAO::singleValueQuery('SELECT ' . $field . ' FROM ' . $entity . ' ORDER BY id DESC LIMIT 1'));
+    }
     parent::tearDown();
   }
 
