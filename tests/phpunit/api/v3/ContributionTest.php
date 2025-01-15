@@ -87,7 +87,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
     $this->restoreMembershipTypes();
-    $this->quickCleanup(['civicrm_uf_match'], TRUE);
+    $this->quickCleanup(['civicrm_uf_match', 'civicrm_mailing_spool'], TRUE);
     if (!empty($this->ids['Campaign'])) {
       Campaign::delete(FALSE)->addWhere('id', 'IN', $this->ids['Campaign'])->execute();
     }
@@ -2788,8 +2788,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    */
   public function testRepeatTransactionPassedInCampaign(): void {
     $paymentProcessorID = $this->paymentProcessorCreate();
-    $campaignID = $this->campaignCreate();
-    $campaignID2 = $this->campaignCreate();
+    $campaignID = $this->campaignCreate([], 'first');
+    $campaignID2 = $this->campaignCreate([], 'second');
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', [
       'contact_id' => $this->individualID,
       'installments' => '12',
@@ -2801,7 +2801,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'frequency_unit' => 'month',
       'payment_processor_id' => $paymentProcessorID,
     ]);
-    $originalContribution = $this->callAPISuccess('contribution', 'create', array_merge(
+    $originalContribution = $this->callAPISuccess('Contribution', 'create', array_merge(
       $this->_params,
       [
         'contribution_recur_id' => $contributionRecur['id'],
@@ -2809,7 +2809,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       ])
     );
 
-    $this->callAPISuccess('contribution', 'repeattransaction', [
+    $this->callAPISuccess('Contribution', 'repeattransaction', [
       'original_contribution_id' => $originalContribution['id'],
       'contribution_status_id' => 'Completed',
       'trxn_id' => 2345,
@@ -2984,7 +2984,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Test that $is_recur is assigned to the receipt.
    */
   public function testCompleteTransactionForRecurring(): void {
-    $this->mut = new CiviMailUtils($this, TRUE);
+    $mut = new CiviMailUtils($this, TRUE);
     $this->swapMessageTemplateForTestTemplate();
     $recurring = $this->setUpRecurringContribution();
     $contributionPage = $this->createReceiptableContributionPage(['is_recur' => TRUE, 'recur_frequency_unit' => 'month', 'recur_interval' => 1]);
@@ -3001,12 +3001,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'is_email_receipt' => 1,
     ]);
 
-    $this->mut->checkMailLog([
+    $mut->checkMailLog([
       'is_recur:::1',
       'cancelSubscriptionUrl:::' . CIVICRM_UF_BASEURL,
     ]);
-    $this->mut->stop();
-    $this->revertTemplateToReservedTemplate();
   }
 
   /**
