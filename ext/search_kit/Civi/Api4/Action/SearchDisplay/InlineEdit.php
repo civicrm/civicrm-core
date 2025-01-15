@@ -215,6 +215,11 @@ class InlineEdit extends Run {
     $values = [
       $weightField => $this->values[$weightField],
     ];
+    // For hierarchical entities, also allow parent_field to be updated.
+    $parentField = CoreUtil::getInfoItem($entityName, 'parent_field');
+    if ($parentField && isset($this->values[$parentField])) {
+      $values[$parentField] = $this->values[$parentField];
+    }
     civicrm_api4($entityName, 'update', [
       'checkPermissions' => empty($this->display['settings']['acl_bypass']),
       'where' => [
