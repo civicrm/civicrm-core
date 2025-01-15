@@ -2,7 +2,7 @@
   "use strict";
 
   angular.module('crmSearchTasks').controller('crmSearchTaskTag', function($scope, crmApi4, searchTaskBaseTrait) {
-    var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+    const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
       // Combine this controller with model properties (ids, entity, entityInfo) and searchTaskBaseTrait
       ctrl = angular.extend(this, $scope.model, searchTaskBaseTrait);
 
@@ -33,8 +33,8 @@
 
     // Sort non-tagset tags into a nested hierarchy
     function sortTagsForSelect2(rawTags) {
-      var sorted = _.transform(rawTags, function(sorted, tag) {
-        sorted[tag.id] = {
+      const sorted = rawTags.reduce((accum, tag) => {
+        accum[tag.id] = {
           id: tag.id,
           text: tag.label,
           description: tag.description,
@@ -42,30 +42,35 @@
           disabled: !tag.is_selectable,
           parent_id: tag.parent_id
         };
+        return accum;
       }, {});
       // Capitalizing on the fact that javascript objects always copy-by-reference,
       // this creates a multi-level hierarchy in a single pass by placing child tags under their parents
       // while keeping a reference to children at the top level (which allows them to receive children of their own).
-      _.each(sorted, function(tag) {
+      Object.values(sorted).forEach(tag => {
         if (tag.parent_id && sorted[tag.parent_id]) {
           sorted[tag.parent_id].children = sorted[tag.parent_id].children || [];
           sorted[tag.parent_id].children.push(tag);
         }
       });
       // Remove the child tags from the top level, and what remains is a nested hierarchy
-      return _.filter(sorted, {parent_id: null});
+      return Object.values(sorted).filter(tag => tag.parent_id === null);
     }
 
     this.saveTags = function() {
-      var params = {};
+      const params = {};
+      // Add tags
       if (ctrl.action === 'save') {
         params.defaults = {
           'entity_table:name': ctrl.entity
         };
-        params.records = _.transform(ctrl.selection, function(records, tagId) {
-          records.push({tag_id: tagId});
+        params.records = ctrl.selection.map(tagId => {
+          return {tag_id: tagId};
         });
-      } else {
+        params.match = ['entity_id', 'tag_id', 'entity_table'];
+      }
+      // Remove tags
+      else {
         params.where = [
           ['entity_table:name', '=', ctrl.entity],
           ['tag_id', 'IN', ctrl.selection]
@@ -75,17 +80,25 @@
     };
 
     this.onSelectTags = function() {
-      ctrl.selection = _.cloneDeep(ctrl.selectedTags);
-      _.each(ctrl.selectedTagsetTags, function(set) {
-        ctrl.selection = ctrl.selection.concat(set);
+      ctrl.selection = [...ctrl.selectedTags];
+      Object.values(ctrl.selectedTagsetTags).forEach(set => {
+        ctrl.selection = [...ctrl.selection, ...set];
       });
     };
 
-    this.onSuccess = function() {
+    this.onSuccess = function(result) {
+      let msg;
       if (ctrl.action === 'delete') {
-        CRM.alert(ts('Removed tags from %1 %2.', {1: ctrl.ids.length, 2: ctrl.entityTitle}), ts('Saved'), 'success');
+        msg = result.batchCount === 1 ? ts('1 tag removed.') : ts('%1 tags removed.', {1: result.batchCount});
+        CRM.alert(msg, ts('Saved'), 'success');
       } else {
-        CRM.alert(ts('Added tags to %1 %2.', {1: ctrl.ids.length, 2: ctrl.entityTitle}), ts('Saved'), 'success');
+        const added = result.batchCount - result.countMatched;
+        msg = added === 1 ? ts('1 tag added') : ts('%1 tags added.', {1: added});
+        msg += '<br/>';
+        if (result.countMatched > 0) {
+          msg += result.countMatched === 1 ? ts('1 tag already exists and was not added.') : ts('%1 tags already exist and were not added.', {1: result.countMatched});
+        }
+        CRM.alert(msg, ts('Saved'), 'success');
       }
       this.close();
     };

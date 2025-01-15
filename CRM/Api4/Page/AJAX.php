@@ -123,9 +123,8 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
       unset($response['rowCount']);
       $response['count'] = $result->count();
       $response['countFetched'] = $result->countFetched();
-      if (in_array('row_count', $params['select'] ?? [])) {
-        // We can only return countMatched (whose value is independent of LIMIT clauses) if row_count was in the select.
-        $response['countMatched'] = $result->count();
+      if ($result->hasCountMatched()) {
+        $response['countMatched'] = $result->countMatched();
       }
       // If at least one call succeeded, we give a success code
       $this->httpResponseCode = 200;

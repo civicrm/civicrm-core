@@ -82,6 +82,8 @@ class ReplaceTest extends Api4TestBase implements TransactionalInterface {
       ->execute();
     // Should have saved 2 records
     $this->assertEquals(2, $replaced->count());
+    // Should have updated 1 record
+    $this->assertEquals(1, $replaced->countMatched());
     // Should have deleted email2
     $this->assertEquals([['id' => $e2]], $replaced->deleted);
     // Verify contact now has the new email records
