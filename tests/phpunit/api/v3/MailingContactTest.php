@@ -26,7 +26,7 @@
 class api_v3_MailingContactTest extends CiviUnitTestCase {
 
   public function tearDown(): void {
-    $this->quickCleanup(['civicrm_contact', 'civicrm_mailing_recipients', 'civicrm_mailing', 'civicrm_mailing_event_delivered']);
+    $this->quickCleanup(['civicrm_contact', 'civicrm_mailing_recipients', 'civicrm_mailing_event_queue', 'civicrm_mailing', 'civicrm_mailing_event_delivered']);
     parent::tearDown();
   }
 

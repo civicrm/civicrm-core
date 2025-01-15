@@ -30,7 +30,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     // if we don't do it more carefully here.
     CRM_Core_DAO::executeQuery('UPDATE civicrm_custom_field f
       INNER JOIN civicrm_option_group g ON g.id = option_group_id
-      SET option_group_id = NULL');
+      SET option_group_id = NULL WHERE g.name = "gender"');
     CustomField::delete()
       ->addWhere('id', '>', 0)
       ->execute();
@@ -319,7 +319,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
 
     ];
 
-    $customField = $this->callAPISuccess('custom_field', 'create', $params);
+    $customField = $this->callAPISuccess('CustomField', 'create', $params);
 
     $this->assertAPISuccess($customField);
     $this->assertNotNull($customField['id']);

@@ -491,6 +491,9 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       if ($entity === 'civicrm_line_item') {
         $field = 'line_total';
       }
+      if ($entity === 'civicrm_mailing_spool') {
+        $field = 'recipient_email';
+      }
       $this->assertEquals($count, \CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM ' . $entity), $entity . ' has not cleaned up well ' . CRM_Core_DAO::singleValueQuery('SELECT ' . $field . ' FROM ' . $entity . ' ORDER BY id DESC LIMIT 1'));
     }
   }
