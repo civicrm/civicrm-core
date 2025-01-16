@@ -1181,7 +1181,7 @@ AND civicrm_membership.is_test = %2";
           $currentMembership['end_date'],
           $format
         ),
-        'modified_date' => date('Y-m-d H:i:s', CRM_Utils_Time::strtotime($today)),
+        'modified_date' => date('YmdHis', CRM_Utils_Time::strtotime($today)),
         'membership_type_id' => $currentMembership['membership_type_id'],
         'max_related' => $currentMembership['max_related'] ?? 0,
       ];
@@ -2490,7 +2490,7 @@ WHERE {$whereClause}";
           'start_date' => CRM_Utils_Date::isoToMysql($dao->start_date),
           'end_date' => CRM_Utils_Date::isoToMysql($dao->end_date),
           'modified_id' => $userId,
-          'modified_date' => CRM_Utils_Time::date('Ymd'),
+          'modified_date' => CRM_Utils_Time::date('YmdHis'),
           'membership_type_id' => $dao->membership_type_id,
           'max_related' => $dao->max_related,
         ];
@@ -2576,7 +2576,7 @@ WHERE {$whereClause}";
       'status_id' => $membership->status_id,
       'start_date' => $logStartDate,
       'end_date' => CRM_Utils_Date::isoToMysql($membership->end_date),
-      'modified_date' => CRM_Utils_Time::date('Ymd'),
+      'modified_date' => CRM_Utils_Time::date('YmdHis'),
       'membership_type_id' => $membershipTypeID ?? $membership->membership_type_id,
       'max_related' => $membership->max_related,
     ];
