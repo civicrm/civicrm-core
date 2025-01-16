@@ -8,6 +8,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
 
   public function tearDown(): void {
     $this->callAPISuccess('OptionValue', 'get', ['option_group_id' => 'safe_file_extension', 'value' => 17, 'api.option_value.delete' => ['id' => "\$value.id"]]);
+    parent::tearDown();
   }
 
   /**
