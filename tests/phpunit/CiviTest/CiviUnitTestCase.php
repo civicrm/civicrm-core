@@ -540,7 +540,6 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    */
   protected function tearDown(): void {
     $this->_apiversion = 3;
-    $this->resetLabels();
     $this->frozenTime = NULL;
 
     error_reporting(E_ALL & ~E_NOTICE);
@@ -562,6 +561,8 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       $this->quickCleanup($tablesToTruncate);
       $this->createDomainContacts();
     }
+
+    $this->resetLabels();
 
     // If a test leaks an extraneous hold on a lock, then we want that test to fail (rather than
     // proceeding and causing spooky effects on other tests).
