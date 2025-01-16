@@ -143,6 +143,17 @@ class SloppyTestChecker {
     $snapshot['civicrm_option_value'] = static::fetchAll('SELECT * FROM %s.civicrm_option_value WHERE is_reserved = 1 ORDER BY option_group_id, name', ['option_group_id', 'name']);
     $snapshot['civicrm_relationship_type'] = static::fetchAll('SELECT * FROM %s.civicrm_relationship_type WHERE is_reserved = 1 ORDER BY name_a_b', ['name_a_b']);
 
+    // In "civicrm_setting", a value of NULL is equivalent to a non-existent value.
+    $settings = &$snapshot['civicrm_setting'];
+    foreach (array_keys($settings) as $key) {
+      if ($settings[$key]['value'] === NULL) {
+        unset($settings[$key]);
+      }
+      else {
+        $settings[$key]['value'] = \CRM_Utils_String::unserialize($settings[$key]['value']);
+      }
+    }
+
     return $snapshot;
   }
 
