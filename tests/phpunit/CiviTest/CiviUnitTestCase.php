@@ -601,7 +601,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     if (!empty($this->ids['OptionValue'])) {
       OptionValue::delete(FALSE)->addWhere('id', 'IN', $this->ids['OptionValue'])->execute();
     }
-    unset(CRM_Core_Config::singleton()->userPermissionClass->permissions);
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = NULL;
     parent::tearDown();
   }
 
@@ -1313,7 +1313,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     ];
     $this->quickCleanup($tablesToTruncate);
     $config = CRM_Core_Config::singleton();
-    unset($config->userPermissionClass->permissions);
+    $config->userPermissionClass->permissions = NULL;
   }
 
   /**
