@@ -123,7 +123,11 @@ class Test {
       ->sql("DELETE FROM civicrm_extension")
       ->callback(function ($ctx) {
         \Civi\Test::data()->populate();
-      }, 'populate');
+      }, 'populate')
+      ->callback(function ($ctx) {
+        // (1) Set baseline components. (2) Listeners on this setting are janky about "revert()".
+        \CRM_Core_BAO_ConfigSetting::setEnabledComponents(\Civi::settings()->getDefault('enable_components'));
+      }, 'reset');
     $builder->install(['org.civicrm.search_kit', 'org.civicrm.afform', 'authx']);
     return $builder;
   }
