@@ -2965,7 +2965,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals([$tags[1]['label']], $row[2][3]['val']);
 
     $this->assertEquals(4, $row[3][0]['val']);
-    $this->assertNull($row[3][3]['val']);
+    $this->assertEquals('', $row[3][3]['val']);
   }
 
   /**
