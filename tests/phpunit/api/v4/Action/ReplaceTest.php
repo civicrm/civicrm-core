@@ -38,7 +38,7 @@ class ReplaceTest extends Api4TestBase implements TransactionalInterface {
   /**
    * Set up baseline for testing
    */
-  public function setUp(): void {
+  public function tearDown(): void {
     $tablesToTruncate = [
       'civicrm_custom_group',
       'civicrm_custom_field',
@@ -46,7 +46,7 @@ class ReplaceTest extends Api4TestBase implements TransactionalInterface {
     ];
     $this->dropByPrefix('civicrm_value_replacetest');
     $this->cleanup(['tablesToTruncate' => $tablesToTruncate]);
-    parent::setUp();
+    parent::tearDown();
   }
 
   public function testEmailReplace(): void {
