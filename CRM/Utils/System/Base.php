@@ -195,15 +195,15 @@ abstract class CRM_Utils_System_Base {
   public function getRouteUrl(string $scheme, string $path, ?string $query): ?string {
     switch ($scheme) {
       case 'frontend':
-        return $this->url($path, $query, TRUE, NULL, TRUE, FALSE, FALSE);
+        return $this->url($path, $query, TRUE, NULL, TRUE, FALSE);
 
       case 'service':
         // The original `url()` didn't have an analog for "service://". But "frontend" is probably the closer bet?
         // Or maybe getNotifyUrl() makes sense?
-        return $this->url($path, $query, TRUE, NULL, TRUE, FALSE, FALSE);
+        return $this->url($path, $query, TRUE, NULL, TRUE, FALSE);
 
       case 'backend':
-        return $this->url($path, $query, TRUE, NULL, FALSE, TRUE, FALSE);
+        return $this->url($path, $query, TRUE, NULL, FALSE, TRUE);
 
       // If the UF defines other major UI/URL conventions, then you might hypothetically handle
       // additional schemes.
