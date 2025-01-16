@@ -404,7 +404,7 @@ class CRM_Upgrade_Incremental_Base {
   public static function alterSchemaField($ctx, string $entityName, string $fieldName, array $fieldSpec): bool {
     $tableName = Civi::entity($entityName)->getMeta('table');
     global $civicrm_root;
-    $sqlGenerator = require "$civicrm_root/mixin/lib/civimix-schema/src/SqlGenerator.php";
+    $sqlGenerator = require "$civicrm_root/mixin/lib/civimix-schema@5/src/SqlGenerator.php";
     $fieldSql = $sqlGenerator::generateFieldSql($fieldSpec);
     if (CRM_Core_BAO_SchemaHandler::checkIfFieldExists($tableName, $fieldName, FALSE)) {
       return self::alterColumn($ctx, $tableName, $fieldName, $fieldSql, !empty($fieldSpec['localizable']));

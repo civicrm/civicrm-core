@@ -10,16 +10,16 @@
  */
 
 /**
- * Upgrade logic for the 5.83.x series.
+ * Upgrade logic for the 6.0.x series.
  *
- * Each minor version in the series is handled by either a `5.83.x.mysql.tpl` file,
- * or a function in this class named `upgrade_5_83_x`.
+ * Each minor version in the series is handled by either a `6.0.x.mysql.tpl` file,
+ * or a function in this class named `upgrade_6_0_x`.
  * If only a .tpl file exists for a version, it will be run automatically.
  * If the function exists, it must explicitly add the 'runSql' task if there is a corresponding .mysql.tpl.
  *
  * This class may also implement `setPreUpgradeMessage()` and `setPostUpgradeMessage()` functions.
  */
-class CRM_Upgrade_Incremental_php_FiveEightyThree extends CRM_Upgrade_Incremental_Base {
+class CRM_Upgrade_Incremental_php_SixZero extends CRM_Upgrade_Incremental_Base {
 
   /**
    * Upgrade step; adds tasks including 'runSql'.
@@ -27,7 +27,7 @@ class CRM_Upgrade_Incremental_php_FiveEightyThree extends CRM_Upgrade_Incrementa
    * @param string $rev
    *   The version number matching this function name
    */
-  public function upgrade_5_83_alpha1($rev): void {
+  public function upgrade_6_0_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
   }
 
