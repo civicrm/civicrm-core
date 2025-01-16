@@ -384,7 +384,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     $this->renameLabels();
     $this->ensureMySQLMode(['IGNORE_SPACE', 'ERROR_FOR_DIVISION_BY_ZERO', 'STRICT_TRANS_TABLES']);
     putenv('CIVICRM_SMARTY_DEFAULT_ESCAPE=1');
-    $this->originalSettings = \Civi::settings()->all();
+    $this->originalSettings = \Civi::settings()->exportValues();
 
     // There doesn't seem to be a better way to get the current error handler.
     // We want to know it so we can compare at the end of the test to see if
@@ -573,6 +573,9 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       $this->assertEquals(0, $releasedLocks, "The test should not leave any dangling locks. Found $releasedLocks");
     }
 
+    // \CRM_Core_BAO_ConfigSetting::setEnabledComponents(\Civi::settings()->getDefault('enable_components'));
+    \Civi::settings()->importValues($this->originalSettings);
+
     $this->cleanTempDirs();
     $this->unsetExtensionSystem();
     $this->assertEquals([], CRM_Core_DAO::$_nullArray);
@@ -606,7 +609,12 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    * @param string $setting
    */
   protected function revertSetting(string $setting): void {
-    \Civi::settings()->set($setting, $this->originalSettings[$setting]);
+    if (isset($this->originalSettings[$setting])) {
+      \Civi::settings()->set($setting, $this->originalSettings[$setting]);
+    }
+    else {
+      \Civi::settings()->revert($setting);
+    }
   }
 
   /**

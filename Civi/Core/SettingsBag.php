@@ -252,6 +252,43 @@ class SettingsBag {
   }
 
   /**
+   * Get a list of all explicitly assigned values.
+   *
+   * @return array
+   */
+  public function exportValues(): array {
+    return $this->values;
+  }
+
+  /**
+   * Replace the list of all explicitly assigned values.
+   *
+   * @param array $newValues
+   *   Full list of all settings.
+   * @return void
+   */
+  public function importValues(array $newValues): void {
+    $currentValues = $this->exportValues();
+
+    foreach ($this->getVirtualKeys() as $key) {
+      unset($newValues[$key], $currentValues[$key]);
+    }
+
+    $revertKeys = array_diff(array_keys($currentValues), array_keys($newValues));
+    foreach ($revertKeys as $key) {
+      $this->revert($key);
+    }
+
+    foreach ($newValues as $key => $value) {
+      $this->set($key, $value);
+    }
+  }
+
+  private function getVirtualKeys(): array {
+    return ['contribution_invoice_settings'];
+  }
+
+  /**
    * Update a virtualized/deprecated setting.
    *
    * Temporary handling for phasing out contribution_invoice_settings.
