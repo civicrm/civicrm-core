@@ -267,7 +267,7 @@ class SearchRunWithCustomFieldTest extends Api4TestBase {
             'GROUP_CONCAT(DISTINCT Contact_ActivityContact_Activity_01.testactivity2.testactivity_:label) AS GROUP_CONCAT_Contact_ActivityContact_Activity_01_testactivity2_testactivity__label',
           ],
           'orderBy' => [],
-          'where' => [['contact_type:name', '=', 'Individual']],
+          'where' => [['id', '=', $contact['id']]],
           'groupBy' => ['id'],
           'join' => [
             ['Activity AS Contact_ActivityContact_Activity_01', 'INNER', 'ActivityContact',

@@ -1330,15 +1330,16 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
   public function testIcons() {
     $subject = uniqid(__FUNCTION__);
 
-    $source = Contact::create(FALSE)->execute()->first();
+    $source = $this->createTestRecord('Contact');
 
     $activities = [
       ['activity_type_id:name' => 'Meeting', 'subject' => $subject, 'status_id:name' => 'Scheduled'],
       ['activity_type_id:name' => 'Phone Call', 'subject' => $subject, 'status_id:name' => 'Completed'],
     ];
-    Activity::save(FALSE)
-      ->addDefault('source_contact_id', $source['id'])
-      ->setRecords($activities)->execute();
+    $this->saveTestRecords('Activity', [
+      'defaults' => ['source_contact_id' => $source['id']],
+      'records' => $activities,
+    ]);
 
     $search = [
       'api_entity' => 'Activity',
@@ -1348,7 +1349,9 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
           'id',
         ],
         'orderBy' => [],
-        'where' => [],
+        'where' => [
+          ['subject', '=', $subject],
+        ],
         'groupBy' => [],
         'join' => [],
         'having' => [],
