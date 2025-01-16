@@ -75,25 +75,38 @@ class SloppyTestChecker {
    *   Ex: 'FooBarTest::testTwo()'
    */
   public static function doComparison(array $startSnapshot, array $endSnapshot, string $lastParty, string $currentParty): void {
-    \CRM_Utils_Array::flatten($startSnapshot, $flatStart, '', ': ');
-    \CRM_Utils_Array::flatten($endSnapshot, $flatEnd, '', ': ');
-    $removed = array_diff($flatStart, $flatEnd);
-    $added = array_diff($flatEnd, $flatStart);
-
     $buf = [];
-    foreach (array_keys($removed) as $key) {
-      if (isset($added[$key])) {
-        $buf[] = sprintf("- Baseline data has changed (%s: %s ==> %s)", $key, json_encode($removed[$key]), json_encode($added[$key]));
-        unset($removed[$key]);
-        unset($added[$key]);
+
+    $buckets = array_keys($startSnapshot); /* Defined programmatically to be the same */
+    foreach ($buckets as $bucket) {
+      $startBucket = $startSnapshot[$bucket];
+      $endBucket = $endSnapshot[$bucket];
+
+      $removedKeys = array_diff(array_keys($startBucket), array_keys($endBucket));
+      $addedKeys = array_diff(array_keys($endBucket), array_keys($startBucket));
+      $commonKeys = array_intersect(array_keys($startBucket), array_keys($endBucket));
+
+      foreach ($commonKeys as $key) {
+        if (is_array($startBucket[$key])) {
+          ksort($startBucket[$key]);
+        }
+        if (is_array($endBucket[$key])) {
+          ksort($endBucket[$key]);
+        }
+        if ($startBucket[$key] !== $endBucket[$key]) {
+          $buf[] = sprintf("- [%s] Baseline data has changed for \"%s\":\n    OLD: %s\n    NEW: %s", $bucket, $key,
+            json_encode($startBucket[$key], JSON_UNESCAPED_SLASHES),
+            json_encode($endBucket[$key], JSON_UNESCAPED_SLASHES));
+        }
+      }
+      foreach ($removedKeys as $key) {
+        $buf[] = sprintf("- [%s] Baseline data has gone missing for \"%s\"", $bucket, $key);
+      }
+      foreach ($addedKeys as $key) {
+        $buf[] = sprintf("- [%s] Found unexpected left-over item \"%s\": %s", $bucket, $key, json_encode($endBucket[$key]));
       }
     }
-    foreach ($removed as $key => $value) {
-      $buf[] = sprintf("- Baseline data has gone missing (%s=%s)", $key, json_encode($value));
-    }
-    foreach ($added as $key => $value) {
-      $buf[] = sprintf("- Found unexpected left-overs (%s=%s)", $key, json_encode($value));
-    }
+
     if ($buf) {
       // The current environment is dirty. Not suitable for re-use.
       $query = sprintf('DELETE FROM %s.civitest_revs', \Civi\Test::dsn('database'));
