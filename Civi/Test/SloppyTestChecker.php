@@ -156,6 +156,19 @@ class SloppyTestChecker {
     $snapshot['civicrm_option_value'] = static::fetchAll('SELECT * FROM %s.civicrm_option_value WHERE is_reserved = 1 ORDER BY option_group_id, name', ['option_group_id', 'name']);
     $snapshot['civicrm_relationship_type'] = static::fetchAll('SELECT * FROM %s.civicrm_relationship_type WHERE is_reserved = 1 ORDER BY name_a_b', ['name_a_b']);
 
+    // Normalize various parts of snapshot to make it easier to compare
+
+    // In "civicrm_domain", the locale_custom_strings may be stored as empty... in different ways...
+    $domains = &$snapshot['civicrm_domain'];
+    foreach ($domains as $key => $domain) {
+      if (isset($domains[$key]['locale_custom_strings'])) {
+        $domains[$key]['locale_custom_strings'] = \CRM_Utils_String::unserialize($domains[$key]['locale_custom_strings']);
+        if (empty($domains[$key]['locale_custom_strings']['en_US'])) {
+          unset($domains[$key]['locale_custom_strings']['en_US']);
+        }
+      }
+    }
+
     // In "civicrm_setting", a value of NULL is equivalent to a non-existent value.
     $settings = &$snapshot['civicrm_setting'];
     foreach (array_keys($settings) as $key) {
