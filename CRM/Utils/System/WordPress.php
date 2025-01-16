@@ -339,7 +339,14 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
 
     // Overwrite base URL if we already have a front-end URL.
     if (!$forceBackend && $frontend_url != '') {
-      $base = $frontend_url;
+      if (!empty(\Civi::$statics['afformtokenscontext'])) {
+        \Civi::log()->debug('url(): In afformTokens context. Clearing $frontend_url');
+        $frontend_url = '';
+      }
+      else {
+        // Only if not in afform tokens context
+        $base = $frontend_url;
+      }
     }
 
     $queryParts = [];
@@ -408,6 +415,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
 
     }
 
+    unset(Civi::$statics['afformtokenscontext']);
     return $final;
   }
 
