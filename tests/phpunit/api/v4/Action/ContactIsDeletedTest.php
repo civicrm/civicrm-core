@@ -40,10 +40,18 @@ class ContactIsDeletedTest extends Api4TestBase implements TransactionalInterfac
       'civicrm_activity_contact',
     ];
     $this->cleanup(['tablesToTruncate' => $relatedTables]);
+    return parent::setUpHeadless();
+  }
+
+  protected function setUp(): void {
     $displayNameFormat = '{contact.first_name}{ }{contact.last_name}';
     \Civi::settings()->set('display_name_format', $displayNameFormat);
+    parent::setUp();
+  }
 
-    return parent::setUpHeadless();
+  public function tearDown(): void {
+    parent::tearDown();
+    \Civi::settings()->revert('display_name_format');
   }
 
   /**
