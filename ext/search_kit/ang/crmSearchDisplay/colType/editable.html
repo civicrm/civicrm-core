@@ -1,0 +1,14 @@
+<crm-search-display-editable
+  row="row"
+  display="$ctrl"
+  is-full-row-mode="$ctrl.settings.editableRow.full"
+  col-key="$ctrl.settings.columns[colIndex].key"
+  ng-if="!colData.loading && $ctrl.editing === row.key && colData.editing"
+></crm-search-display-editable>
+<span
+  ng-include=":: '~/crmSearchDisplay/colType/field.html'"
+  ng-if="!colData.loading && !($ctrl.editing === row.key && colData.editing)"
+  ng-class="{'crm-editable-enabled': colData.edit && !$ctrl.editing, 'crm-editable-disabled': colData.edit && $ctrl.editing}"
+  ng-click="$ctrl.startEditing(row, colIndex)">
+</span>
+<span ng-if="colData.loading" class="crm-search-loading-placeholder"></span>

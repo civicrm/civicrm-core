@@ -13,14 +13,27 @@
         this.cancelEditing();
       }],
 
+      startEditing: function(row, colIndex) {
+        if (this.editing === false && row.columns[colIndex].edit) {
+          this.editValues = {};
+          this.editing = row.key;
+          row.columns.forEach((col, index) => {
+            col.editing = (index === colIndex || (this.settings.editableRow && this.settings.editableRow.full));
+          });
+        }
+      },
+
       startCreating: function() {
-        this.editing = [-1];
+        this.editing = -1;
         this.editValues = {};
       },
 
-      cancelEditing: function() {
+      cancelEditing: function(row) {
         this.editing = false;
         this.editValues = {};
+        if (row && row.columns) {
+          row.columns.forEach((col) => col.editing = false);
+        }
       },
 
       saveEditing: function(row, colKey) {

@@ -247,30 +247,23 @@
         return apiRequest;
       },
 
-      // Determine if an editable field is actively in editing mode
-      isEditing: function(row, colIndex) {
-        return this.editing && row.key && this.editing[0] === row.key && (this.editing[1] === colIndex || (this.settings.editableRow && this.settings.editableRow.full));
+      getFieldClass: function(colIndex, colData) {
+        return (colData.cssClass || '') + ' crm-search-col-type-' + this.settings.columns[colIndex].type + (this.settings.columns[colIndex].break ? '' : ' crm-inline-block');
       },
 
-      // Determine if a new row is being created via inline-edit
-      isCreating: function() {
-        return this.editing && this.editing[0] === -1;
-      },
-
-      startEditing: function(row, colIndex) {
-        if (this.editing === false && row.columns[colIndex].edit) {
-          this.editing = [row.key, colIndex];
+      getFieldTemplate: function(colIndex, colData) {
+        let colType = this.settings.columns[colIndex].type;
+        if (colType === 'include') {
+          return this.settings.columns[colIndex].path;
         }
-      },
-
-      // Determine if a field is not currently loading or editing
-      isViewing: function(row, colIndex) {
-        return !this.isEditing(row, colIndex) && !this.isLoading(row, colIndex);
-      },
-
-      // Determine if a field is currently loading
-      isLoading: function(row, colIndex) {
-        return !this.isEditing(row, colIndex) && row.columns[colIndex].loading;
+        if (colType === 'field') {
+          if (colData.edit) {
+            colType = 'editable';
+          } else if (colData.links) {
+            colType = 'link';
+          }
+        }
+        return '~/crmSearchDisplay/colType/' + colType + '.html';
       },
     };
   });
