@@ -35,15 +35,6 @@
         }
       };
 
-      this.toggleDraggable = function() {
-        if (ctrl.display.settings.draggable) {
-          delete ctrl.display.settings.draggable;
-        } else {
-          ctrl.display.settings.sort = [];
-          ctrl.display.settings.draggable = searchMeta.getEntity(ctrl.apiEntity).order_by;
-        }
-      };
-
       this.getColTypes = function() {
         return ctrl.parent.colTypes;
       };

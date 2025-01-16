@@ -89,6 +89,27 @@ return [
     ],
   ],
   [
+    'name' => 'SearchDisplayType:tree',
+    'entity' => 'OptionValue',
+    'cleanup' => 'always',
+    'update' => 'always',
+    'params' => [
+      'version' => 4,
+      'values' => [
+        'option_group_id.name' => 'search_display_type',
+        'value' => 'tree',
+        'name' => 'crm-search-display-tree',
+        'label' => E::ts('Tree'),
+        'description' => E::ts('Tree displays are used to represent hierarchical data.'),
+        'icon' => 'fa-folder-tree',
+        'is_reserved' => TRUE,
+        'is_active' => TRUE,
+        'domain_id' => NULL,
+      ],
+      'match' => ['option_group_id', 'name'],
+    ],
+  ],
+  [
     'name' => 'SearchDisplayType:autocomplete',
     'entity' => 'OptionValue',
     'cleanup' => 'always',

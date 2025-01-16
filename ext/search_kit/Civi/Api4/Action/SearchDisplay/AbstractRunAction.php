@@ -1386,6 +1386,10 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     if (!empty($this->display['settings']['draggable'])) {
       $this->addSelectExpression($this->display['settings']['draggable']);
     }
+    // Add parent_field column for tree displays
+    if (!empty($this->display['settings']['parent_field'])) {
+      $this->addSelectExpression($this->display['settings']['parent_field']);
+    }
     // Add style conditions for the display
     foreach ($this->getCssRulesSelect($this->display['settings']['cssRules'] ?? []) as $addition) {
       $this->addSelectExpression($addition);
