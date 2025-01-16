@@ -108,8 +108,6 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
     $showView = TRUE;
     $showUpdate = $showDelete = FALSE;
     $qsUpdate = NULL;
-    $url = NULL;
-    $qsView = NULL;
 
     $activityTypeName = CRM_Core_PseudoConstant::getName('CRM_Activity_BAO_Activity', 'activity_type_id', $activityTypeId);
 
@@ -130,7 +128,9 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
 
       case 'Payment':
       case 'Refund':
-        $participantId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_ParticipantPayment', $sourceRecordId, 'participant_id', 'contribution_id');
+        if ($sourceRecordId) {
+          $participantId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_ParticipantPayment', $sourceRecordId, 'participant_id', 'contribution_id');
+        }
         if (!empty($participantId)) {
           $url = 'civicrm/contact/view/participant';
           $qsView = "action=view&reset=1&id={$participantId}&cid=%%cid%%&context=%%cxt%%{$extraParams}";
