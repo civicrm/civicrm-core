@@ -60,7 +60,7 @@ class CiviTestListenerPHPUnit7 implements \PHPUnit\Framework\TestListener {
       $this->tx = NULL;
     }
 
-    if ($this->isCiviTest($test) || $test instanceof \CiviUnitTestCase) {
+    if ($this->isCiviTest($test)) {
       \Civi\Test::eventChecker()->start($test);
     }
   }
@@ -68,7 +68,7 @@ class CiviTestListenerPHPUnit7 implements \PHPUnit\Framework\TestListener {
   public function endTest(\PHPUnit\Framework\Test $test, float $time): void {
     $exception = NULL;
 
-    if ($this->isCiviTest($test) || $test instanceof \CiviUnitTestCase) {
+    if ($this->isCiviTest($test)) {
       try {
         \Civi\Test::eventChecker()->stop($test);
       }
@@ -127,7 +127,7 @@ class CiviTestListenerPHPUnit7 implements \PHPUnit\Framework\TestListener {
    * @return bool
    */
   protected function isCiviTest(\PHPUnit\Framework\Test $test) {
-    return $test instanceof HookInterface || $test instanceof HeadlessInterface;
+    return $test instanceof HookInterface || $test instanceof HeadlessInterface || $test instanceof \CiviUnitTestCase;
   }
 
   /**
