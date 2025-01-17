@@ -23,13 +23,21 @@
           handle: '.crm-draggable',
           connectWith: 'crm-search-display-tree [ui-sortable]',
           placeholder: 'crm-search-display-tree-placeholder',
+          tolerance: 'pointer', // seems to work better for dragging large items into small gaps
           update: function(e, ui) {
-            // Only take action if the item was sent from a different list or is from this list
-            if (ui.sender || ui.item.sortable.source[0] === ui.item.sortable.droptarget[0]) {
-              const movedItem = ui.item.sortable.model,
-                oldPosition = ui.item.sortable.index,
-                newPosition = ui.item.sortable.dropindex,
-                displacedItem = ctrl.items[newPosition];
+            const movedItem = ui.item.sortable.model;
+            let newPosition = ui.item.sortable.dropindex;
+            let displacedItem;
+            // Item moved within the same parent group
+            if (ui.item.sortable.source[0] === ui.item.sortable.droptarget[0]) {
+              // In this mode the list hasn't yet been updated, so the new index points to the displaced item
+              displacedItem = ctrl.items[newPosition];
+              updateDraggableWeights(movedItem, displacedItem);
+            }
+            // Item moved here from a different group
+            else if (ui.sender) {
+              // In this mode the list has already been updated so the new index points to the current item
+              displacedItem = ctrl.items[newPosition + 1];
               updateDraggableWeights(movedItem, displacedItem);
             }
           }
@@ -45,10 +53,11 @@
         if (displacedItem) {
           apiParams.values[weightField] = displacedItem.data[weightField];
         }
-        // No displaced item - place at the end of the list
-        else if (ctrl.items.length > 0) {
+        // No displaced item - place at the end of the list (if the list has more than just the new item)
+        else if (ctrl.items.length > 1) {
           apiParams.values[weightField] = ctrl.items[ctrl.items.length - 1].data[weightField] + 1;
         }
+        // List was empty (only containst the new item)
         else {
           apiParams.values[weightField] = 1;
         }
