@@ -478,7 +478,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     }
 
     // now sort the tabs based on weight
-    usort($tabs, ['CRM_Utils_Sort', 'cmpFunc']);
+    uasort($tabs, ['CRM_Utils_Sort', 'cmpFunc']);
 
     return $tabs;
   }
