@@ -140,17 +140,6 @@ class CRM_Mailing_Event_BAO_MailingEventReply extends CRM_Mailing_Event_DAO_Mail
       $parsed->generateHeaders();
       $h = $parsed->headers->getCaseSensitiveArray();
       $b = $parsed->generateBody();
-
-      // FIXME: ugly hack - find the first MIME boundary in
-      // the body and make the boundary in the header match it
-      $ct = $h['Content-Type'];
-      if (substr_count($ct, 'boundary=')) {
-        $matches = [];
-        preg_match('/^--(.*)$/m', $b, $matches);
-        $boundary = rtrim($matches[1]);
-        $parts = explode('boundary=', $ct);
-        $ct = "{$parts[0]} boundary=\"$boundary\"";
-      }
     }
     else {
       $fromName = empty($eq->display_name) ? $eq->email : "{$eq->display_name} ({$eq->email})";
