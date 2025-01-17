@@ -925,46 +925,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   }
 
   /**
-   * Return a list of group names for this mailing.  Does not work with
-   * prior-mailing targets.
-   *
-   * @deprecated since 5.71 will be removed around 5.77
-   *
-   * @return array
-   *   Names of groups receiving this mailing
-   */
-  public function &getGroupNames() {
-    CRM_Core_Error::deprecatedWarning('unused function');
-    if (!isset($this->id)) {
-      return [];
-    }
-
-    /*
-    This bypasses permissions to maintain compatibility with the SQL it replaced.  This should ideally not bypass
-    permissions in the future, but it's called by some extensions during mail processing, when cron isn't necessarily
-    called with a logged-in user.
-     */
-    $mailingGroups = MailingGroup::get(FALSE)
-      ->addSelect('group.title', 'group.frontend_title')
-      ->addJoin('Group AS group', 'LEFT', ['entity_id', '=', 'group.id'])
-      ->addWhere('mailing_id', '=', $this->id)
-      ->addWhere('entity_table', '=', 'civicrm_group')
-      ->addWhere('group_type', '=', 'Include')
-      ->execute();
-
-    $groupNames = [];
-
-    foreach ($mailingGroups as $mg) {
-      $name = $mg['group.frontend_title'] ?? $mg['group.title'];
-      if ($name) {
-        $groupNames[] = $name;
-      }
-    }
-
-    return $groupNames;
-  }
-
-  /**
    * Add the mailings.
    *
    * @param array $params
