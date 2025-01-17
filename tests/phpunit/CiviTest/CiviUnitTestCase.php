@@ -384,7 +384,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     $this->renameLabels();
     $this->ensureMySQLMode(['IGNORE_SPACE', 'ERROR_FOR_DIVISION_BY_ZERO', 'STRICT_TRANS_TABLES']);
     putenv('CIVICRM_SMARTY_DEFAULT_ESCAPE=1');
-    $this->originalSettings = \Civi::settings()->all();
+    $this->originalSettings = \Civi::settings()->exportValues();
 
     // There doesn't seem to be a better way to get the current error handler.
     // We want to know it so we can compare at the end of the test to see if
@@ -540,7 +540,6 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    */
   protected function tearDown(): void {
     $this->_apiversion = 3;
-    $this->resetLabels();
     $this->frozenTime = NULL;
 
     error_reporting(E_ALL & ~E_NOTICE);
@@ -563,6 +562,8 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       $this->createDomainContacts();
     }
 
+    $this->resetLabels();
+
     // If a test leaks an extraneous hold on a lock, then we want that test to fail (rather than
     // proceeding and causing spooky effects on other tests).
     $dbVer = CRM_Utils_SQL::getDatabaseVersion();
@@ -571,6 +572,9 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       $releasedLocks = CRM_Core_DAO::singleValueQuery('SELECT RELEASE_ALL_LOCKS()');
       $this->assertEquals(0, $releasedLocks, "The test should not leave any dangling locks. Found $releasedLocks");
     }
+
+    // \CRM_Core_BAO_ConfigSetting::setEnabledComponents(\Civi::settings()->getDefault('enable_components'));
+    \Civi::settings()->importValues($this->originalSettings);
 
     $this->cleanTempDirs();
     $this->unsetExtensionSystem();
@@ -597,7 +601,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     if (!empty($this->ids['OptionValue'])) {
       OptionValue::delete(FALSE)->addWhere('id', 'IN', $this->ids['OptionValue'])->execute();
     }
-    unset(CRM_Core_Config::singleton()->userPermissionClass->permissions);
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = NULL;
     parent::tearDown();
   }
 
@@ -605,7 +609,12 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    * @param string $setting
    */
   protected function revertSetting(string $setting): void {
-    \Civi::settings()->set($setting, $this->originalSettings[$setting]);
+    if (isset($this->originalSettings[$setting])) {
+      \Civi::settings()->set($setting, $this->originalSettings[$setting]);
+    }
+    else {
+      \Civi::settings()->revert($setting);
+    }
   }
 
   /**
@@ -1304,7 +1313,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     ];
     $this->quickCleanup($tablesToTruncate);
     $config = CRM_Core_Config::singleton();
-    unset($config->userPermissionClass->permissions);
+    $config->userPermissionClass->permissions = NULL;
   }
 
   /**

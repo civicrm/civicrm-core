@@ -348,6 +348,8 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
   }
 
   public static function onChangeDefaultCurrency($oldCurrency, $newCurrency, $metadata) {
+    $newCurrency ??= $metadata['default'];
+
     if ($oldCurrency == $newCurrency) {
       return;
     }

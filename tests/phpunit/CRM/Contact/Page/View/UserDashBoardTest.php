@@ -218,6 +218,9 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testDashboardPartialPayments(): void {
+    $this->callAPISuccess('Setting', 'create', ['invoicing' => 1]);
+    $this->callAPISuccess('Setting', 'create', ['default_invoice_page' => $this->contributionPageCreate()['id']]);
+
     $contributionId = $this->contributionCreate([
       'contact_id' => $this->contactID,
       'contribution_status_id' => 'Pending',

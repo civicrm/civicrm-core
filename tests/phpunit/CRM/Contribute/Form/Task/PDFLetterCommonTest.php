@@ -262,6 +262,8 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testAllContributionTokens(): void {
+    CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
+    $this->hookClass = CRM_Utils_Hook::singleton();
     $this->hookClass->setHook('civicrm_tokenValues', [$this, 'hookTokenValues']);
     $this->hookClass->setHook('civicrm_tokens', [$this, 'hook_tokens']);
 
