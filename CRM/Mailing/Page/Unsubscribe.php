@@ -53,7 +53,7 @@ class CRM_Mailing_Page_Unsubscribe extends CRM_Core_Page {
       CRM_Utils_System::sendInvalidRequestResponse(ts("Invalid request: bad parameters"));
     }
 
-    $groups = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing($jobId, $queueId, $hash);
+    $groups = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing(NULL, $queueId, $hash);
     if (!empty($groups)) {
       CRM_Mailing_Event_BAO_MailingEventUnsubscribe::send_unsub_response($queueId, $groups, FALSE, $jobId);
     }
