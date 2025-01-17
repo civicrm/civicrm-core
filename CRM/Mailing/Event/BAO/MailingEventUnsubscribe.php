@@ -386,7 +386,7 @@ WHERE  email = %2
       'html' => $html,
       'text' => $text,
     ];
-    CRM_Mailing_BAO_Mailing::addMessageIdHeader($params, 'u', $job, $queue_id, $eq->hash);
+    CRM_Mailing_BAO_Mailing::addMessageIdHeader($params, 'u', NULL, $queue_id, $eq->hash);
     if (CRM_Core_BAO_MailSettings::includeMessageId()) {
       $params['messageId'] = $params['Message-ID'];
     }

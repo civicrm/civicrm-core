@@ -175,8 +175,7 @@ class CRM_Mailing_Event_BAO_MailingEventReply extends CRM_Mailing_Event_DAO_Mail
       $h = $message->headers($headers);
     }
 
-    CRM_Mailing_BAO_Mailing::addMessageIdHeader($h, 'r', $eq->job_id, $queue_id, $eq->hash);
-    $config = CRM_Core_Config::singleton();
+    CRM_Mailing_BAO_Mailing::addMessageIdHeader($h, 'r', NULL, $queue_id, $eq->hash);
     $mailer = \Civi::service('pear_mail');
 
     if (is_object($mailer)) {

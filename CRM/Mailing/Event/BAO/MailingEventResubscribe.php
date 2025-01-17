@@ -263,7 +263,7 @@ class CRM_Mailing_Event_BAO_MailingEventResubscribe {
       'html' => $html,
       'text' => $text,
     ];
-    CRM_Mailing_BAO_Mailing::addMessageIdHeader($params, 'e', $job, $queue_id, $eq->hash);
+    CRM_Mailing_BAO_Mailing::addMessageIdHeader($params, 'e', NULL, $queue_id, $eq->hash);
     if (CRM_Core_BAO_MailSettings::includeMessageId()) {
       $params['messageId'] = $params['Message-ID'];
     }
