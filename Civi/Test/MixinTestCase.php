@@ -6,6 +6,8 @@ namespace Civi\Test;
  * Enable, disable, and uninstall an extension. Ensure that various local example is enabled and disabled appropriately.
  *
  * The substantive assertions are split across various files in `tests/mixins/*.php`.
+ *
+ * TIP: To monitor the progress of the test, set DEBUG=1.
  */
 abstract class MixinTestCase extends \PHPUnit\Framework\TestCase implements \Civi\Test\EndToEndInterface {
 
@@ -141,6 +143,13 @@ abstract class MixinTestCase extends \PHPUnit\Framework\TestCase implements \Civ
         // phpunit/codeception, which seem to manipulate PWD.
         $cmd = sprintf('cd %s; %s', escapeshellarg(getenv('PWD')), $cmd);
 
+        if (getenv('DEBUG')) {
+          fprintf(STDERR, "#$# ");
+          if (!empty($pipeData)) {
+            fprintf(STDERR, "echo %s | ", escapeshellarg($pipeData));
+          }
+          fprintf(STDERR, "%s\n", $cmd);
+        }
         $process = proc_open($cmd, $descriptorSpec, $pipes, __DIR__);
         putenv("CV_OUTPUT=$oldOutput");
 
@@ -150,7 +159,14 @@ abstract class MixinTestCase extends \PHPUnit\Framework\TestCase implements \Civ
         fclose($pipes[0]);
         $result = stream_get_contents($pipes[1]);
         fclose($pipes[1]);
-        if (proc_close($process) !== 0) {
+        $exitCode = proc_close($process);
+
+        if (getenv('DEBUG')) {
+          // fprintf(STDERR, "## Exit: %s\n", $exitCode);
+          fprintf(STDERR, "#%d# %s\n", $exitCode, $result);
+        }
+
+        if ($exitCode !== 0) {
           throw new RuntimeException("Command failed ($cmd):\n$result");
         }
         switch ($decode) {
