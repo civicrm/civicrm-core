@@ -92,7 +92,6 @@ class CRM_Mailing_Event_BAO_MailingEventReply extends CRM_Mailing_Event_DAO_Mail
    *   Whole email to forward in one string.
    */
   public static function send($queue_id, &$mailing, &$bodyTxt, $replyto, &$bodyHTML = NULL, &$fullEmail = NULL) {
-    $domain = CRM_Core_BAO_Domain::getDomain();
     $emails = CRM_Core_BAO_Email::getTableName();
     $queue = CRM_Mailing_Event_BAO_MailingEventQueue::getTableName();
     $contacts = CRM_Contact_BAO_Contact::getTableName();
