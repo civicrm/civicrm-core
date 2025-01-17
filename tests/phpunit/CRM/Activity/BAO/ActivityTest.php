@@ -1646,6 +1646,7 @@ $text
    * Checks that tokens are uniquely replaced for contacts.
    */
   public function testSendEmailWillReplaceTokensUniquelyForEachContact(): void {
+    $this->enableCiviCampaign();
     $contactId1 = $this->individualCreate(['last_name' => 'Red']);
     $contactId2 = $this->individualCreate(['last_name' => 'Pink']);
 
