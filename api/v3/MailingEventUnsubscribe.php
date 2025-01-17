@@ -49,7 +49,7 @@ function civicrm_api3_mailing_event_unsubscribe_create($params) {
     }
   }
   else {
-    $unsubs = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_domain($job, $queue, $hash);
+    $unsubs = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_domain(NULL, $queue, $hash);
     if (!$unsubs) {
       return civicrm_api3_create_error('Domain Queue event could not be found');
     }

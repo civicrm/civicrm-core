@@ -88,7 +88,7 @@ class CRM_Mailing_Page_Common extends CRM_Core_Page {
         }
       }
       else {
-        if (CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_domain($job_id, $queue_id, $hash)) {
+        if (CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_domain(NULL, $queue_id, $hash)) {
           CRM_Mailing_Event_BAO_MailingEventUnsubscribe::send_unsub_response($queue_id, NULL, TRUE, $job_id);
         }
         else {
