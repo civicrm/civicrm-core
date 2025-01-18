@@ -16,6 +16,13 @@
  */
 class CRM_Mailing_Form_ForwardMailing extends CRM_Core_Form {
 
+  /**
+   * The email address associated with the passed job_id, queue_id and hash
+   *
+   * @var string|null
+   */
+  protected $_fromEmail = NULL;
+
   public function preProcess() {
     $job_id = CRM_Utils_Request::retrieve('jid', 'Positive',
       $this, NULL
