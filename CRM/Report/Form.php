@@ -266,9 +266,10 @@ class CRM_Report_Form extends CRM_Core_Form {
   protected $groupTempTable = '';
 
   /**
+   * Table aliases. May be altered by hook_civicrm_alterReportVar.
    * @var array
    */
-  protected $_aliases = [];
+  public $_aliases = [];
 
   /**
    * SQL where clause. May be altered by hook_civicrm_alterReportVar.
