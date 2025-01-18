@@ -152,7 +152,20 @@ return [
           'actions' => FALSE,
           'collapsible' => 'closed',
           'draggable' => 'weight',
-          'cssRules' => [],
+          'cssRules' => [
+            [
+              'crm-separator-above',
+              'has_separator:name',
+              '=',
+              '2',
+            ],
+            [
+              'crm-separator-below',
+              'has_separator:name',
+              '=',
+              '1',
+            ],
+          ],
           'toolbar' => [
             [
               'entity' => 'Navigation',

@@ -45,3 +45,13 @@
 #bootstrap-theme crm-search-display-tree .ui-sortable-helper {
   max-height: 2em;
 }
+
+/* Used for navigation menu editor in AdminUI */
+.crm-separator-above {
+  border-top: 2px dotted #2786c2;
+  padding-top: 10px;
+}
+.crm-separator-below {
+  border-bottom: 2px dotted #2786c2;
+  margin-bottom: 10px;
+}
