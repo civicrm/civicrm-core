@@ -393,7 +393,7 @@ class EditableSearchTest extends Api4TestBase {
     }
     catch (\CRM_Core_Exception $e) {
     }
-    $this->assertStringContainsString('Cannot edit', $e->getMessage());
+    $this->assertStringContainsString('Inline edit failed', $e->getMessage());
   }
 
   public function testEditableRelationshipCustomFields() {

@@ -928,6 +928,8 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
           }
           // Fill in the api action if known, for the sake of $this->checkLinkAccess
           $link['action'] = $task['apiBatch']['action'] ?? NULL;
+          // Used by inlineEdit action when running inline tasks
+          $link['api_params'] = $task['apiBatch']['params'] ?? [];
         }
       }
       $link['key'] = $link['prefix'] . $idKey;
