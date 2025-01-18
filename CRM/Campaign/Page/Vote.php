@@ -23,6 +23,13 @@ class CRM_Campaign_Page_Vote extends CRM_Core_Page {
   private $_interviewerId;
 
   /**
+   * Tab key => label
+   *
+   * @var array
+   */
+  private $tabs = [];
+
+  /**
    * @return mixed
    */
   public function reserve() {
@@ -54,7 +61,7 @@ class CRM_Campaign_Page_Vote extends CRM_Core_Page {
   }
 
   public function browse() {
-    $this->_tabs = [
+    $this->tabs = [
       'reserve' => ts('Reserve Respondents'),
       'interview' => ts('Interview Respondents'),
     ];
@@ -63,7 +70,7 @@ class CRM_Campaign_Page_Vote extends CRM_Core_Page {
     $this->_interviewerId = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
 
     $subPageType = CRM_Utils_Request::retrieve('type', 'String', $this);
-    if ($subPageType) {
+    if ($subPageType && array_key_exists($subPageType, $this->tabs)) {
       $session = CRM_Core_Session::singleton();
       $session->pushUserContext(CRM_Utils_System::url('civicrm/campaign/vote', "reset=1&subPage={$subPageType}"));
       //load the data in tabs.
@@ -95,7 +102,7 @@ class CRM_Campaign_Page_Vote extends CRM_Core_Page {
 
   public function buildTabs() {
     $allTabs = [];
-    foreach ($this->_tabs as $name => $title) {
+    foreach ($this->tabs as $name => $title) {
       // check for required permissions.
       if (!CRM_Core_Permission::check([
           [
