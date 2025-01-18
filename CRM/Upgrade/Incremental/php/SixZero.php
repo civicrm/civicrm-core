@@ -29,6 +29,14 @@ class CRM_Upgrade_Incremental_php_SixZero extends CRM_Upgrade_Incremental_Base {
    */
   public function upgrade_6_0_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask(
+      'Convert MembershipLog.modified_date to timestamp',
+      'alterColumn',
+      'civicrm_membership_log',
+      'modified_date',
+      "timestamp NULL DEFAULT NULL COMMENT 'Date this membership modification action was logged.'",
+      FALSE
+    );
   }
 
 }
