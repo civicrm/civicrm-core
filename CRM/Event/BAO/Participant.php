@@ -1009,7 +1009,7 @@ WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";
    *   $displayName => $viewUrl
    */
   public static function getAdditionalParticipants($primaryParticipantID) {
-    $additionalParticipantIDs = [];
+    $additionalParticipants = [];
     $additionalParticipantIDs = self::getAdditionalParticipantIds($primaryParticipantID);
     if (!empty($additionalParticipantIDs)) {
       foreach ($additionalParticipantIDs as $additionalParticipantID) {
