@@ -379,7 +379,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     $log = $this->callAPISuccessGetSingle('MembershipLog', ['membership_id' => $membership['id'], 'options' => ['limit' => 1, 'sort' => 'id DESC']]);
     $this->assertEquals(CRM_Utils_Time::date($nextYear . '-01-01'), $log['start_date']);
     $this->assertEquals(CRM_Utils_Time::date($nextYear . '-01-31'), $log['end_date']);
-    $this->assertApproxEquals(strtotime(CRM_Utils_Time::date('Y-m-d H:i:s')), strtotime($log['modified_date']), 20);
+    $this->assertApproxEquals(CRM_Utils_Time::time(), strtotime($log['modified_date']), 20);
 
     $contributionRecur = $this->callAPISuccessGetSingle('ContributionRecur', ['contact_id' => $this->_individualId]);
     $this->assertEquals($contributionRecur['id'], $membership['contribution_recur_id']);
@@ -710,7 +710,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     $log = $this->callAPISuccessGetSingle('MembershipLog', ['membership_id' => $renewedMembership['id'], 'options' => ['limit' => 1, 'sort' => 'id DESC']]);
     $this->assertEquals(CRM_Utils_Time::date('Y-01-01'), $log['start_date']);
     $this->assertEquals(CRM_Utils_Time::date('Y-12-31'), $log['end_date']);
-    $this->assertApproxEquals(strtotime(CRM_Utils_Time::date('Y-m-d H:i:s')), strtotime($log['modified_date']), 20);
+    $this->assertApproxEquals(CRM_Utils_Time::time(), strtotime($log['modified_date']), 20);
     $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Current'), $log['status_id']);
   }
 
