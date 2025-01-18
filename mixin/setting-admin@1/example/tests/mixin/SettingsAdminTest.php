@@ -36,7 +36,7 @@ class SettingsAdminTest extends \PHPUnit\Framework\Assert {
 
   public function testDisabled($cv): void {
     $items = $cv->api4('Permission', 'get', ['where' => [['name', '=', 'administer shimmy']]]);
-    $this->assertEquals(FALSE, $items[0]['is_active']);
+    $this->assertTrue(empty($items[0]['is_active']));
 
     $items = $cv->api4('Route', 'get', ['where' => [['path', '=', 'civicrm/admin/setting/shimmy']]]);
     $this->assertEmpty($items);
