@@ -27,7 +27,7 @@ class CRM_Utils_CommaKV {
    */
   public static function unserialize($string) : array {
     $options = [];
-    $temp = explode(',', $string);
+    $temp = explode(',', $string ?? '');
 
     foreach ($temp as $value) {
       $parts = explode('=', $value, 2);
