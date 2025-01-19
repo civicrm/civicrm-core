@@ -81,7 +81,6 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   public function preProcess() {
-    $this->addOptionalQuickFormElement('parents');
     $this->addExpectedSmartyVariables([
       'parent_groups',
       'editSmartGroupURL',
