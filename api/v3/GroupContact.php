@@ -121,6 +121,49 @@ function civicrm_api3_group_contact_create($params) {
 }
 
 /**
+ * Delete group contact record.
+ *
+ * @param array $params
+ * @return array
+ * @throws CRM_Core_Exception
+ * @throws CRM_Core_Exception
+ * @deprecated
+ */
+function civicrm_api3_group_contact_delete($params) {
+  $checkParams = $params;
+  if (!empty($checkParams['status']) && in_array($checkParams['status'], ['Removed', 'Deleted'])) {
+    $checkParams['status'] = ['IN' => ['Added', 'Pending']];
+  }
+  elseif (!empty($checkParams['status']) && $checkParams['status'] == 'Added') {
+    $checkParams['status'] = ['IN' => ['Pending', 'Removed']];
+  }
+  elseif (!empty($checkParams['status'])) {
+    unset($checkParams['status']);
+  }
+  $groupContact = civicrm_api3('GroupContact', 'get', $checkParams);
+  if ($groupContact['count'] == 0 && !empty($params['skip_undelete'])) {
+    $checkParams['status'] = ['IN' => ['Removed', 'Pending']];
+  }
+  $groupContact2 = civicrm_api3('GroupContact', 'get', $checkParams);
+  if ($groupContact['count'] == 0 && $groupContact2['count'] == 0) {
+    throw new CRM_Core_Exception('Cannot Delete GroupContact');
+  }
+  $params['status'] = CRM_Utils_Array::value('status', $params, empty($params['skip_undelete']) ? 'Removed' : 'Deleted');
+  // "Deleted" isn't a real option so skip the api wrapper to avoid pseudoconstant validation
+  return civicrm_api3_group_contact_create($params);
+}
+
+/**
+ * Adjust metadata.
+ *
+ * @param array $params
+ */
+function _civicrm_api3_group_contact_delete_spec(&$params) {
+  // set as not required no either/or std yet
+  $params['id']['api.required'] = 0;
+}
+
+/**
  * Group contact helper function.
  *
  * @todo behaviour is highly non-standard - need to figure out how to make this 'behave'
@@ -199,4 +242,17 @@ function _civicrm_api3_group_contact_common($params, $op = 'Added') {
   // can't pass this by reference
   $dao = NULL;
   return civicrm_api3_create_success(1, $params, 'GroupContact', 'create', $dao, $extraReturnValues);
+}
+
+/**
+ * Deprecated function notices.
+ *
+ * @deprecated api notice
+ * @return array
+ *   Array of deprecated actions
+ */
+function _civicrm_api3_group_contact_deprecation() {
+  return [
+    'delete' => 'GroupContact "delete" action is deprecated in favor of "create".',
+  ];
 }
