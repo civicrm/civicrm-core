@@ -130,6 +130,7 @@ function civicrm_api3_group_contact_create($params) {
  * @deprecated
  */
 function civicrm_api3_group_contact_delete($params) {
+  CRM_Core_Error::deprecatedFunctionWarning('create with parameter status=Removed');
   $checkParams = $params;
   if (!empty($checkParams['status']) && in_array($checkParams['status'], ['Removed', 'Deleted'])) {
     $checkParams['status'] = ['IN' => ['Added', 'Pending']];
@@ -253,6 +254,6 @@ function _civicrm_api3_group_contact_common($params, $op = 'Added') {
  */
 function _civicrm_api3_group_contact_deprecation() {
   return [
-    'delete' => 'GroupContact "delete" action is deprecated in favor of "create".',
+    'delete' => 'GroupContact "delete" action is deprecated in favor of "create" with parameter status=Removed.',
   ];
 }
