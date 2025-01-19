@@ -106,29 +106,6 @@
             {$form.postal_code.html}
           </td>
         </tr>
-        {if $customSearchFields.ward || $customSearchFields.precinct}
-          <tr>
-            {if $customSearchFields.ward}
-              {assign var='ward' value=$customSearchFields.ward}
-              <td>
-                {$form.$ward.label}
-              </td>
-              <td>
-                {$form.$ward.html}
-              </td>
-            {/if}
-
-            {if $customSearchFields.precinct}
-              {assign var='precinct' value=$customSearchFields.precinct}
-              <td>
-                {$form.$precinct.label}
-              </td>
-              <td>
-                {$form.$precinct.html}
-              </td>
-            {/if}
-          </tr>
-        {/if}
         <tr>
           <td colspan="2">
             {if $context eq 'search'}
