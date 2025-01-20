@@ -215,6 +215,44 @@ function afform_civicrm_tabset($tabsetName, &$tabs, $context) {
 }
 
 /**
+ * Implements hook_civicrm_summaryActions().
+ *
+ * Adds afforms to the contact summary actions menu.
+ */
+function afform_civicrm_summaryActions(&$actions, $contactID) {
+  if (!$contactID) {
+    return;
+  }
+  $contact = civicrm_api4('Contact', 'get', [
+    'checkPermissions' => FALSE,
+    'select' => ['contact_type', 'contact_sub_type'],
+    'where' => [['id', '=', $contactID]],
+  ])->first();
+  if (!$contact) {
+    return;
+  }
+  $contactTypes = array_merge([$contact['contact_type']], $contact['contact_sub_type'] ?? []);
+  $afforms = Civi\Api4\Afform::get()
+    ->addSelect('name', 'title', 'icon', 'server_route', 'summary_contact_type', 'summary_weight')
+    ->addWhere('placement', 'CONTAINS', 'contact_summary_actions')
+    ->addWhere('server_route', 'IS NOT EMPTY')
+    ->addOrderBy('title')
+    ->execute();
+  foreach ($afforms as $afform) {
+    $summaryContactType = $afform['summary_contact_type'] ?? [];
+    if (!$summaryContactType || !$contactTypes || array_intersect($summaryContactType, $contactTypes)) {
+      $actions['otherActions'][$afform['name']] = [
+        'title' => $afform['title'],
+        'weight' => $afform['summary_weight'] ?? 0,
+        'icon' => 'crm-i ' . ($afform['icon'] ?: 'fa-list-alt'),
+        'class' => 'crm-popup',
+        'href' => CRM_Utils_System::url($afform['server_route'], '', FALSE, "?entity_id=$contactID"),
+      ];
+    }
+  }
+}
+
+/**
  * Implements hook_civicrm_pageRun().
  *
  * Adds afforms as contact summary blocks.

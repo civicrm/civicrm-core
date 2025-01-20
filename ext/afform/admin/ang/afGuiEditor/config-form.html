@@ -91,7 +91,7 @@
       <p class="help-block">{{:: ts('Additional contexts in which the form can be embedded') }}</p>
     </div>
 
-    <div class="form-group" ng-if="editor.afform.placement.includes('contact_summary_block') || editor.afform.placement.includes('contact_summary_tab')">
+    <div class="form-group" ng-if="editor.isContactSummary()">
       <div class="form-inline">
         <label for="afform_summary_contact_type">{{:: ts('For') }}</label>
         <input class="form-control" crm-autocomplete="'ContactType'" id="afform_summary_contact_type" ng-model="editor.afform.summary_contact_type" auto-open="true" multi="true" crm-autocomplete-params="{key: 'name'}" placeholder="{{:: ts('Any contact type') }}">

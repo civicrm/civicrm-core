@@ -3076,9 +3076,9 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
         if (in_array($values['ref'], ['view-contact', 'edit-contact'])) {
           $contextMenu['primaryActions'][$key] = [
             'title' => $values['title'],
-            'ref' => $values['ref'],
+            'ref' => $values['ref'] ?? $key,
             'class' => $values['class'] ?? NULL,
-            'key' => $values['key'],
+            'key' => $values['key'] ?? $key,
             'weight' => $values['weight'],
           ];
           continue;
@@ -3092,11 +3092,11 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
         }
         $contextMenu['moreActions'][$values['weight']] = [
           'title' => $values['title'],
-          'ref' => $values['ref'],
+          'ref' => $values['ref'] ?? $key,
           'href' => $values['href'] ?? NULL,
           'tab' => $values['tab'] ?? NULL,
           'class' => $values['class'] ?? NULL,
-          'key' => $values['key'],
+          'key' => $values['key'] ?? $key,
           'weight' => $values['weight'],
         ];
       }
@@ -3115,12 +3115,12 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
           }
           $contextMenu['otherActions'][$value['weight']] = [
             'title' => $value['title'],
-            'ref' => $value['ref'],
+            'ref' => $value['ref'] ?? $key,
             'href' => $value['href'] ?? NULL,
             'tab' => $value['tab'] ?? NULL,
             'class' => $value['class'] ?? NULL,
             'icon' => $value['icon'] ?? NULL,
-            'key' => $value['key'],
+            'key' => $value['key'] ?? $key,
             'weight' => $value['weight'],
           ];
         }

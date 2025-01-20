@@ -338,8 +338,9 @@
         return filter ? _.filter($scope.entities, filter) : _.toArray($scope.entities);
       };
 
+      // Does afform placement include the contact summary?
       this.isContactSummary = function() {
-        return editor.afform.placement.includes('contact_summary_block') || editor.afform.placement.includes('contact_summary_tab');
+        return editor.afform.placement.some((item) => item.startsWith('contact_summary_'));
       };
 
       this.onChangePlacement = function() {
