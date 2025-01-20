@@ -214,19 +214,19 @@
           <p>
             {{:: ts('To enable REST authentication, the AuthX extension must be installed.') }}
             <a target="_blank" ng-href="{{ crmUrl('civicrm/admin/extensions') }}">
-              <i class="crm-i fa-gear"> {{:: ts('Manage Extensions') }}</i>
+              <i class="crm-i fa-gear"></i> {{:: ts('Manage Extensions') }}
             </a>
           </p>
         </div>
         <div class="alert alert-warning" ng-if="selectedTab.code === 'rest' && $ctrl.authxEnabled">
           <p>
             <a target="_blank" ng-href="{{ crmUrl('civicrm/admin/setting/authx', {reset: 1}) }}">
-              <i class="crm-i fa-gear"> {{:: ts('Configure REST Authentication') }}</i>
+              <i class="crm-i fa-gear"></i> {{:: ts('Configure REST Authentication') }}
             </a>
           </p>
           <p>
             <a target="_blank" href="https://docs.civicrm.org/dev/en/latest/api/v4/rest/">
-              <i class="crm-i fa-external-link"> {{:: ts('REST Documentation') }}</i>
+              <i class="crm-i fa-external-link"></i> {{:: ts('REST Documentation') }}
             </a>
           </p>
         </div>
