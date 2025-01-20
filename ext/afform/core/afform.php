@@ -201,9 +201,7 @@ function afform_civicrm_tabset($tabsetName, &$tabs, $context) {
       // If this is the real contact summary page (and not a callback from ContactLayoutEditor), load module
       // and assign contact id to required smarty variable
       if (empty($context['caller'])) {
-        // note we assign the contact id to entity_id as preferred key
-        // but also contact_id to maintain backwards compatibility with older
-        // afforms
+        // Preferred key is entity_id but also assign contact_id to maintain backwards compatibility with older afforms
         CRM_Core_Smarty::singleton()->assign('afformOptions', [
           'entity_id' => $context['contact_id'],
           'contact_id' => $context['contact_id'],
@@ -233,6 +231,11 @@ function afform_civicrm_pageRun(&$page) {
   $contact = NULL;
   $side = 'left';
   $weight = ['left' => 1, 'right' => 1];
+  // Preferred key is entity_id but also assign contact_id to maintain backwards compatibility with older afforms
+  $afformOptions = [
+    'entity_id' => $cid,
+    'contact_id' => $cid,
+  ];
   foreach ($afforms as $afform) {
     // If Afform specifies a contact type, lookup the contact and compare
     if (!empty($afform['summary_contact_type'])) {
@@ -248,9 +251,9 @@ function afform_civicrm_pageRun(&$page) {
     }
     $block = [
       'module' => $afform['module_name'],
-      'directive' => _afform_angular_module_name($afform['name'], 'dash'),
+      'directive' => $afform['directive_name'],
     ];
-    $content = CRM_Core_Smarty::singleton()->fetchWith('afform/contactSummary/AfformBlock.tpl', ['contactId' => $cid, 'block' => $block]);
+    $content = CRM_Core_Smarty::singleton()->fetchWith('afform/InlineAfform.tpl', ['afformOptions' => $afformOptions, 'afform' => $block]);
     CRM_Core_Region::instance("contact-basic-info-$side")->add([
       'markup' => '<div class="crm-summary-block">' . $content . '</div>',
       'name' => 'afform:' . $afform['name'],
@@ -287,7 +290,7 @@ function afform_civicrm_contactSummaryBlocks(&$blocks) {
     $blocks["afform_{$afform['type']}"]['blocks'][$afform['name']] = [
       'title' => $afform['title'],
       'contact_type' => $contactType ?: NULL,
-      'tpl_file' => 'afform/contactSummary/AfformBlock.tpl',
+      'tpl_file' => 'afform/InlineAfform.tpl',
       'module' => $afform['module_name'],
       'directive' => $afform['directive_name'],
       'sample' => [

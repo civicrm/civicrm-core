@@ -149,10 +149,14 @@ class AfformContactSummaryTest extends TestCase implements HeadlessInterface {
     // TODO: Be more flexible
     // The presence of any other afform blocks in the system might alter the left-right assumptions here
     $blockA = \CRM_Core_Region::instance('contact-basic-info-left')->get('afform:' . $this->formNames[2]);
-    $this->assertStringContainsString("<af-search-tab-test2 options=\"{contact_id: $cid}\"></af-search-tab-test2>", $blockA['markup']);
+    $this->assertStringContainsString("<af-search-tab-test2 options=", $blockA['markup']);
+    $this->assertStringContainsString("\"contact_id\":$cid", $blockA['markup']);
+    $this->assertStringContainsString("\"entity_id\":$cid", $blockA['markup']);
 
     $blockB = \CRM_Core_Region::instance('contact-basic-info-right')->get('afform:' . $this->formNames[1]);
-    $this->assertStringContainsString("<af-form-tab-test1 options=\"{contact_id: $cid}\"></af-form-tab-test1>", $blockB['markup']);
+    $this->assertStringContainsString("<af-form-tab-test1 options=", $blockB['markup']);
+    $this->assertStringContainsString("\"contact_id\":$cid", $blockB['markup']);
+    $this->assertStringContainsString("\"entity_id\":$cid", $blockB['markup']);
 
     // Block for wrong contact type should not appear
     $this->assertNull(\CRM_Core_Region::instance('contact-basic-info-left')->get('afform:' . $this->formNames[0]));
