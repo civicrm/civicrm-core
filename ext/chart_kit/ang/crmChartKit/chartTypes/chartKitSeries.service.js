@@ -39,7 +39,7 @@
     showLegend: (displayCtrl) => (displayCtrl.settings.showLegend && displayCtrl.settings.showLegend !== 'none'),
 
     // the legend gets the series "name", which is the delisted value of the series column
-    legendTextAccessor: (displayCtrl) => ((d) => displayCtrl.renderDataValue(d.name, displayCtrl.getColumnsForAxis('w')[0])),
+    legendTextAccessor: (displayCtrl) => ((d) => displayCtrl.renderDataValue(d.name, displayCtrl.getFirstColumnForAxis('w'))),
 
     // fallback to a line chart if we dont have a grouping column yet
     getChartConstructor: (displayCtrl) => displayCtrl.getColumnsForAxis('w') ? dc.seriesChart : dc.lineChart,
@@ -48,8 +48,8 @@
       // we need to add the series values in the dimension or they will get
       // aggregated
       displayCtrl.dimension = displayCtrl.ndx.dimension((d) => {
-        const xValue = d[displayCtrl.getXColumn().index];
-        const seriesCol = displayCtrl.getColumnsForAxis('w').length ? displayCtrl.getColumnsForAxis('w')[0] : null;
+        const xValue = d[displayCtrl.getFirstColumnForAxis('x').index];
+        const seriesCol = displayCtrl.getFirstColumnForAxis('w');
         const seriesVal = seriesCol ? d[seriesCol.index] : null;
 
         // we use a string separator rather than array to
@@ -63,7 +63,7 @@
       displayCtrl.chart
         .dimension(displayCtrl.dimension)
         .group(displayCtrl.group)
-        .valueAccessor(displayCtrl.getValueAccessor(displayCtrl.getColumnsForAxis('y')[0]))
+        .valueAccessor(displayCtrl.getValueAccessor(displayCtrl.getFirstColumnForAxis('y')))
         .keyAccessor((d) => d.key[0])
         .seriesAccessor((d) => d.key[1]);
 
