@@ -79,9 +79,6 @@
 #bootstrap-theme.crm-search button.btn-xs:has(i.crm-i) {
   padding: 0;
 }
-.crm-search ul.nav-stacked li:last-of-type {
-  margin-top: var(--crm-r);
-}
 #bootstrap-theme.crm-search ul.nav-stacked li:has(.btn-xs) a {
   padding-right: 5ch;
 }

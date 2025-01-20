@@ -24,19 +24,19 @@
   --crm-c-blue: #0071bd;
   --crm-c-blue-light: #dff0f4;
   --crm-c-blue-dark: #66afe9;
-  --crm-c-blue-darker: #005c99;
-  --crm-c-green: #44cb7e;
+  --crm-c-green: #6CD594;
   --crm-c-green-light: #bcecd1;
-  --crm-c-green-dark: var(--crm-c-text);
-  --crm-c-red: #cf3458;
-  --crm-c-red-light: #ecb0be;
+  --crm-c-green-dark: #1D6338;
+  --crm-c-red: #91223C;
+  --crm-c-red-light: #ECB1BC;
   --crm-c-red-dark: var(--crm-c-text);
-  --crm-c-amber: #e6ab5e;
+  --crm-c-amber: #EAB876;
   --crm-c-yellow: #f8e80b;
   --crm-c-teal: #399389;
 /* Practical colours */
-  --crm-c-link: var(--crm-c-blue);
-  --crm-c-link-hover: var(--crm-c-blue-dark);
+  --crm-c-text: #34303B;
+  --crm-c-link: var(--crm-c-blue-darker);
+  --crm-c-link-hover: #004370;
   --crm-c-page-background: #e8eef0; /* background to page body */
   --crm-c-background: #fff; /* background to page header, often form block & dialog bg */
   --crm-c-drag-background: var(--crm-c-background4); /* background for drag/drop regions, select2 highlight */
@@ -71,6 +71,7 @@
   --crm-btn-padding-inline: var(--crm-r2); /* padding for left and right, one value */
   --crm-btn-small-padding: var(--crm-s1) var(--crm-m1);
   --crm-btn-height: 40px;
+  --crm-btn-success-bg: var(--crm-c-green);
 /* Tables */
   --crm-table-outside-border: var(--crm-c-divider);
   --crm-table-background: var(--crm-c-background);
@@ -119,12 +120,13 @@
   --crm-alert-border-info: var(--crm-c-primary);
   --crm-alert-text-info: var(--crm-c-primary-text);
   --crm-alert-text-danger: var(--crm-c-text);
+  --crm-alert-background-danger: var(--crm-c-red-light);
 /* Form */
   --crm-form-block-padding: var(--crm-r);
   --crm-form-block-border-radius: 0;
   --crm-input-background: var(--crm-c-background);
   --crm-input-background-image: none;
-  --crm-input-color: #464354;
+  --crm-input-color: var(--crm-c-text);
   --crm-input-border-color: #c2cfd8;
   --crm-input-border-radius: var(--crm-roundness);
   --crm-input-box-shadow: inset 0 0 3px 0 rgba(0,0,0,.2);
@@ -202,7 +204,11 @@
   --crm-notify-background: var(--crm-c-background);
   --crm-notify-col: var(--crm-c-text);
   --crm-notify-accent-border: 0 0 0 3px; /* adds a border to one/several sides of the notification - set to 0 for none */
-/* Wizard */
+  --crm-notify-alert: #d02e2e;
+  --crm-notify-warning: #C45008;
+  --crm-notify-success: #5A803C;
+  --crm-notify-info: #277FA5  ;
+  /* Wizard */
   --crm-wizard-width: auto;
   --crm-wizard-margin: calc(-1 * var(--crm-form-block-padding)) calc(-1 * var(--crm-form-block-padding)) 0;
   --crm-wizard-height: 62px;

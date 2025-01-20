@@ -11,11 +11,13 @@
   /* Colour names */
   --crm-c-gray-025: #f9f9f9;
   --crm-c-green-light: #cff0be;
-  --crm-c-green-dark: #46b450;
-  --crm-c-red-dark: #dc3232;
-  --crm-c-amber: #ffb900;
+  --crm-c-green-dark: #286520;
+  --crm-c-red-dark: #A21B10;
+  --crm-c-red: #F9F1F4;
+  --crm-c-amber: #EBAC00;
   --crm-c-teal: #399389;
   /* Practical colours */
+  --crm-c-text: #2B2B2B;
   --crm-c-divider: 1px solid var(--crm-c-gray-200);
   --crm-c-background: var(--crm-c-gray-025); /* background to page header, often form block & dialog bg */
   --crm-c-drag-background: var(--crm-c-background3); /* background for drag/drop regions, select2 highlight */
@@ -28,6 +30,7 @@
   --crm-c-secondary-text: var(--crm-c-text);
   --crm-c-secondary-hover-text: var(--crm-c-text);
   --crm-c-info: var(--crm-c-blue-darker);
+  --crm-c-warning-text: var(--crm-c-text);
   /* Type */
   --crm-heading-padding: var(--crm-s2) var(--crm-m2);
   /* Buttons */

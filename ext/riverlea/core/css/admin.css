@@ -1,4 +1,4 @@
-/* civicrm-core/css/admin.css - branched on 7 Jun 24
+/* civicrm-core/css/admin.css - branched on 7 Jun 24, updated 16 Jan 25.
    Styles specific to certain admin pages/forms
    Status: merged. */
 
@@ -78,11 +78,21 @@
 .crm-container .crm-extensions-stage {
   margin-left: var(--crm-s);
 }
-.crm-container .crm-extensions-stage.fa-flask {
+.crm-container .crm-extensions-stage.fa-flask,
+.crm-container .crm-extensions-stage.fa-warning {
   color: var(--crm-c-warning);
 }
-.crm-container .crm-extensions-stage.fa-check-circle {
+.crm-container .crm-extensions-stage.fa-check-circle,
+.crm-container .crm-extensions-stage.fa-trophy {
   color: var(--crm-c-success);
+}
+
+/* Navigation Menu Editor */
+.crm-container .navigation-tree .jstree-hovered {
+  background: #ffffff50;
+}
+.crm-container .navigation-tree .jstree-clicked {
+  background: #beebff50;
 }
 
 @media screen and (min-width: 480px) {

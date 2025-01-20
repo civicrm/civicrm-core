@@ -1,3 +1,28 @@
+1.3.1-6.0alpha
+ - CHANGED - Upgrade success box colours to match 'alert-help/success' style (fixes some contrast ratio issues).
+ - CHANGED Updated Civi core CSS files with changes in core from last six months: admin.css, dashboard.css, searchForm.css.
+ - ADDED sticky table header css.
+ - ADDED dark-mode handling of SVG charts text labels.
+ - FIXED Joomla '.disabled' opacity fix.
+ - FIXED regression from contact dashboard ID change of `contact-summary` to `contact-0`.
+ - ADDED tr.error danger bg & text colour (e.g. on import contacts summary table).
+ - ADDED text colour to JQuery date picker (to handle inverse darkmode).
+ - ADDED provisional draft support for SearchKit Tree Display.
+ - FIXED wrong text colour on footer status label.
+ - FIXED image on contact dashboard can overlap multiple tags: https://lab.civicrm.org/extensions/riverlea/-/issues/99.
+ - FIXED wrapping of `.description` now works at smaller viewports.
+ - CHANAGED Minetta colours for Contrast Ratio WCAG AAA: success, danger & info alert bg & text;
+ - CHANGED Minetta DarkMode colours for Contrast Ratio WCAG AAA: alerts, backgrounds, input description, border, tabs.
+ - CHANGED Walbrook colours for Contrast Ratio WCAG AAA: darker text, lighter success & warning button bg, lighter danger alert bg, darker link + hover, alert-status
+ - CHANGED Walbrook DarkMode colours for Contrast Ratio WCAG AAA: brighter links, darker column rows, wizard, buttons, bg regions, alerts, accordions, heading bg color
+ - CHANGED HackneyBrook colours for Contrast Ratio WCAG AAA: darker text, some alerts.
+ - CHANGED HackneyBrook DarkMode colours for Contrast Ratio WCAG AAA: brighter links, darker column rows, wizard, buttons, bg regions, alerts, accordions, heading bg color.
+ - ADDED CSS VARIABLES (4) - WCAG AA compliance on notification icons is impossible without this (because of different notify bg color):
+     --crm-notify-alert
+     --crm-notify-warning
+     --crm-notify-success
+     --crm-notify-info
+
 1.3.0-5.83.alpha
  - ADDED - padding to body of Afform accordions
  - REMOVED - Afform multiple buttons margin (https://github.com/civicrm/civicrm-core/pull/31739)

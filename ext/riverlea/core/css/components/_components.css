@@ -400,8 +400,8 @@ table.advmultiselect {
 }
 .crm-upgrade-box-outer.crm-upgrade-success {
   margin: var(--crm-page-padding);
-  background: var(--crm-alert-background-help);
-  border: 1px solid var(--crm-alert-border-help);
+  background: var(--crm-alert-background-help) !important; /* vs inline css */
+  border: var(--crm-alert-border-width) solid var(--crm-alert-border-help) !important; /* vs inline css */
 }
 .crm-upgrade-box-inner {
   padding: 1rem;
@@ -412,14 +412,14 @@ table.advmultiselect {
 }
 p.crm-upgrade-large-text {
   grid-column: 2;
-  color: var(--crm-c-success);
+  color: var(--crm-alert-text-help);
 }
 .crm-upgrade-box-inner a {
   color: var(--crm-c-link) !important  /* vs inline */;
 }
 p.crm-upgrade-large-text:first-of-type {
   font-size: var(--crm-r1);
-  color: var(--crm-c-success);
+  color: var(--crm-alert-text-help);
   font-family: var(--crm-font-bold);
   font-weight: bold;
 }
@@ -428,7 +428,7 @@ p.crm-upgrade-large-text:first-of-type {
   padding: 0 2rem 0 0 !important /* vs inline */;
   font-size: var(--crm-l);
   line-height: 1.35;
-  color: var(--crm-c-success);
+  color: var(--crm-alert-text-help);
   grid-column: 1;
   grid-row: 1 / span 3;
 }
@@ -640,4 +640,13 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before {
 }
 #crm-quick-create input {
   max-width: 100%;
+}
+
+/* Charts */
+
+.dc-chart .axis text {
+  fill: var(--crm-c-text);
+}
+.crm-container .dc-chart .axis line, .dc-chart .axis path {
+  stroke: var(--crm-c-gray-500) !important;
 }

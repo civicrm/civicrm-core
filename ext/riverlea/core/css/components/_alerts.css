@@ -45,7 +45,7 @@
 }
 .crm-container .status.crm-ok {
   background-color: var(--crm-alert-background-help);
-  color: var(--crm-alert-text-info);
+  color: var(--crm-alert-text-help);
 }
 .crm-container .alert-info,
 .crm-container .messages.crm-empty-table {

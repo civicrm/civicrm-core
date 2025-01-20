@@ -193,6 +193,9 @@ body.wp-admin .crm-container input[type="radio"] {
 body.wp-admin .crm-container input[type="radio"] {
   border-radius: 50%;
 }
+body.wp-admin .crm-sticky thead {
+  --crm-menubar-bottom: 48px;
+}
 
 /******************
    STANDALONE

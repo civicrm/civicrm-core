@@ -273,6 +273,7 @@ dl dl {
 .crm-container .cancelled td,
 .crm-container li.disabled a.ui-tabs-anchor {
   color: var(--crm-c-inactive);
+  opacity: 1;
 }
 
 /* BS3 type styles */

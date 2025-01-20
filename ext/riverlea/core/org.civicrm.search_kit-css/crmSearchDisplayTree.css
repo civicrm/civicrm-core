@@ -1,0 +1,78 @@
+/* SearchKit tree layout styling */
+#bootstrap-theme crm-search-display-tree-branch {
+  display: block;
+}
+#bootstrap-theme ul.crm-search-display-tree-branch {
+  display: flex;
+  flex-direction: column;
+  padding-top: 0.1rem;
+}
+/* Guidelines make it easier to see the hierarchy levels */
+#bootstrap-theme ul.crm-search-display-tree-branch ul.crm-search-display-tree-branch {
+  border-left: 3px dotted var(--crm-c-gray-200);
+  margin-left: 6px;
+  padding-top: 0;
+  margin-top: 0;
+}
+#bootstrap-theme ul.crm-search-display-tree-branch > li {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: var(--crm-c-divider);
+  padding-block: 0.5rem !important;
+  align-items: start;
+  flex-wrap: wrap;
+}
+crm-search-display-tree-branch crm-search-display-tree-branch:has( > ul > li) {
+  flex-basis: 100%;
+}
+.crm-search-display-tree-collapse-toggle {
+  background: var(--crm-c-gray-200) !important;
+  color: var(--crm-c-text) !important;
+}
+#bootstrap-theme li.crm-search-display-tree-branch-collapsed {
+  /* For collapsed items, add bottom padding to compensate for the hidden subtree */
+  padding-bottom: 0.1rem;
+}
+#bootstrap-theme li.crm-search-display-tree-branch-collapsed .crm-search-display-tree-collapse-toggle i,
+/* During drag operation, present as collapsed */
+#bootstrap-theme ul.crm-search-display-tree-branch li.ui-sortable-helper .crm-search-display-tree-collapse-toggle i {
+  rotate: -90deg;
+}
+#bootstrap-theme .crm-search-display-tree-branch-count,
+/* During drag operation, present as collapsed */
+#bootstrap-theme ul.crm-search-display-tree-branch li.ui-sortable-helper crm-search-display-tree-branch {
+  display: none;
+}
+#bootstrap-theme li.crm-search-display-tree-branch-collapsed .crm-search-display-tree-branch-count,
+/* During drag operation, present as collapsed */
+#bootstrap-theme ul.crm-search-display-tree-branch li.ui-sortable-helper .crm-search-display-tree-branch-count {
+  display: inline;
+}
+/* ui-sortable drop zone */
+#bootstrap-theme .crm-search-display-tree-placeholder {
+  border: 2px dashed var(--crm-c-gray-200);
+  background-color: var(--crm-c-gray-100);
+  visibility: visible !important;
+  height: 2em;
+  width: 50%;
+}
+crm-search-display-tree-branch crm-search-display-editable form {
+  display: grid;
+  grid-template-columns: 1fr 58px;
+  gap: 0.25rem;
+  margin: 0;
+}
+
+/* During drag operation, present as collapsed */
+#bootstrap-theme crm-search-display-tree .ui-sortable-helper {
+  max-height: 2em;
+}
+
+.crm-separator-above {
+  border-top: 2px dotted var(--crm-c-blue);
+  padding-top: 10px;
+}
+.crm-separator-below {
+  border-bottom: 2px dotted var(--crm-c-blue);
+  margin-bottom: 10px;
+}
