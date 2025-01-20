@@ -119,7 +119,7 @@ function afform_civicrm_managed(&$entities, $modules) {
         ],
       ];
     }
-    if (!empty($afform['navigation']) && !empty($afform['server_route'])) {
+    if (!empty($afform['navigation'])) {
       $params = [
         'version' => 4,
         'values' => [
@@ -128,7 +128,7 @@ function afform_civicrm_managed(&$entities, $modules) {
           'permission' => (array) (empty($afform['permission']) ? 'access CiviCRM' : $afform['permission']),
           'permission_operator' => $afform['permission_operator'] ?? 'AND',
           'weight' => $afform['navigation']['weight'] ?? 0,
-          'url' => $afform['server_route'],
+          'url' => !empty($afform['server_route']) ? $afform['server_route'] : "civicrm/afform/view/{$afform['name']}",
           'icon' => !empty($afform['icon']) ? 'crm-i ' . $afform['icon'] : '',
         ],
         'match' => ['domain_id', 'name'],

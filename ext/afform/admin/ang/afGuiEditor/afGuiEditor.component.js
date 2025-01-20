@@ -588,6 +588,8 @@
       this.getLink = function() {
         if (editor.afform.server_route) {
           return CRM.url(editor.afform.server_route, null, editor.afform.is_public ? 'front' : 'back');
+        } else if (editor.afform.name) {
+          return CRM.url('civicrm/afform/view/' + editor.afform.name);
         }
       };
 

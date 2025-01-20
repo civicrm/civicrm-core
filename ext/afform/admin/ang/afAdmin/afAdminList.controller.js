@@ -25,6 +25,7 @@
     this.afforms = _.transform(afforms, function(afforms, afform) {
       afform.type = afform.type || 'system';
       afform.placement = afform['placement:label'];
+      afform.server_route = afform.server_route || 'civicrm/afform/view/' + afform.name;
       if (afform.submission_date) {
         afform.submission_date = CRM.utils.formatDate(afform.submission_date);
       }
