@@ -422,6 +422,15 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
       'extends' => $this->get('contactType'),
       'style' => ['Tab', 'Tab with table'],
     ];
+    $subTypes = CRM_Utils_Array::explodePadded($this->get('contactSubtype'));
+    if ($subTypes) {
+      // Include groups for this subtype OR groups with no subtype
+      $subTypes[] = NULL;
+      $filters['extends_entity_column_value'] = $subTypes;
+    }
+    else {
+      $filters['extends_entity_column_value'] = NULL;
+    }
     $activeGroups = CRM_Core_BAO_CustomGroup::getAll($filters, CRM_Core_Permission::VIEW);
 
     foreach ($activeGroups as $group) {
