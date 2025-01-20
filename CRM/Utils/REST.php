@@ -323,6 +323,10 @@ class CRM_Utils_REST {
         ]);
       }
     }
+    // Handle POST requests of content-type application/json.
+    elseif (array_key_exists('json', $requestParams) && is_array($requestParams['json'])) {
+      $params = $requestParams['json'];
+    }
     foreach ($requestParams as $n => $v) {
       if (!array_key_exists($n, $skipVars)) {
         $params[$n] = $v;
