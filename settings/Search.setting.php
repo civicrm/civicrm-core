@@ -169,9 +169,10 @@ return [
     ],
     'description' => ts('When performing a search, how should the search-results be cached?'),
     'help_text' => '',
-    // Not exposed in UI as breakage possible. As with the SmartGroupCache time out a different page
+    // Originally not exposed in UI as breakage possible. But by accident or design was added to misc .
+    // As with the SmartGroupCache time out a different page
     // might make more sense.
-    'settings_pages' => [],
+    'settings_pages' => ['misc' => ['weight' => 170]],
   ],
   'searchPrimaryDetailsOnly' => [
     'group_name' => 'Search Preferences',
