@@ -49,6 +49,7 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
           $info['definition'] = $this->definition + [
             'title' => '',
             'permission' => ['access CiviCRM'],
+            'server_route' => $this->createDefaultRoute('form'),
             'layout' => [
               [
                 '#tag' => 'af-form',
@@ -71,6 +72,7 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
           $info['definition'] = $this->definition + [
             'title' => '',
             'permission' => ['access CiviCRM'],
+            'server_route' => $this->createDefaultRoute('search'),
             'layout' => [
               [
                 '#tag' => 'div',
@@ -262,6 +264,19 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
         ->execute();
       $info['blocks'] = array_merge(array_values($info['blocks']), (array) $blockInfo);
     }
+  }
+
+  /**
+   * @param string $type
+   *   Ex: 'form' or 'search'
+   * @return string
+   *   Ex: 'civicrm/form/abcd-1234-abcd'
+   */
+  private function createDefaultRoute(string $type): string {
+    $randChars = fn() => \CRM_Utils_String::createRandom(4, 'abcdefghijklmnopqrstuvwxyz1234567890');
+    $id = implode('-', [$randChars(), $randChars(), $randChars()]);
+    $buckets = ['form' => 'civicrm/form/', 'search' => 'civicrm/search/'];
+    return ($buckets[$type] ?? $buckets['form']) . $id;
   }
 
   /**
