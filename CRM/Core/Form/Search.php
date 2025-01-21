@@ -290,7 +290,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    */
   protected function getEntityDefaults($entity) {
     $defaults = [];
-    foreach (CRM_Utils_Array::value($entity, $this->getSearchFieldMetadata(), []) as $fieldName => $fieldSpec) {
+    foreach (($this->getSearchFieldMetadata()[$entity] ?? []) as $fieldName => $fieldSpec) {
       if (empty($_POST[$fieldName])) {
         $value = CRM_Utils_Request::retrieveValue($fieldName, $this->getValidationTypeForField($entity, $fieldName), NULL, NULL, 'GET');
         if ($value !== NULL) {

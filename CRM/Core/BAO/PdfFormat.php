@@ -240,13 +240,13 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
    *
    * @param null $default
    *
-   * @return value
+   * @return mixed
    */
   public static function getValue($field, $values, $default = NULL) {
     if (array_key_exists($field, self::$optionValueFields)) {
       switch (self::$optionValueFields[$field]['type']) {
         case CRM_Utils_Type::T_INT:
-          return (int) CRM_Utils_Array::value($field, $values, $default);
+          return (int) ($values[$field] ?? $default);
 
         case CRM_Utils_Type::T_FLOAT:
           // Round float values to three decimal places and trim trailing zeros.
@@ -325,7 +325,7 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
     }
     // copy the supplied form values to the corresponding Option Value fields in the base class
     foreach ($this->fields() as $name => $field) {
-      $this->$name = trim(CRM_Utils_Array::value($name, $values, $this->$name));
+      $this->$name = trim($values[$name] ?? $this->$name);
       if (empty($this->$name)) {
         $this->$name = 'null';
       }

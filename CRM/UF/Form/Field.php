@@ -512,7 +512,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     }
 
     // If field_name is missing, it's formatting
-    $fieldName = CRM_Utils_Array::value(1, $params['field_name'], 'formatting');
+    $fieldName = $params['field_name'][1] ?? 'formatting';
 
     //check for duplicate fields
     $apiFormattedParams = $params;
