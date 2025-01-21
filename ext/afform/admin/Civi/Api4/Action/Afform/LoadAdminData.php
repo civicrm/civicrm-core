@@ -33,6 +33,15 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
    */
   protected $skipEntities = [];
 
+  /**
+   * Set TRUE if creating a clone.
+   *
+   * Some properties (such as `name`, `title`, `server_route`) may be filtered.
+   *
+   * @var bool
+   */
+  protected $clone = FALSE;
+
   public function _run(\Civi\Api4\Generic\Result $result) {
     $info = ['entities' => [], 'fields' => [], 'blocks' => []];
     $entities = [];
@@ -219,6 +228,17 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
       }
     }
     $info['blocks'] = array_values($info['blocks']);
+
+    if ($this->clone) {
+      unset($info['definition']['name']);
+      $info['definition']['title'] .= ' ' . ts('(copy)');
+      if (!empty($info['definition']['server_route'])) {
+        $info['definition']['server_route'] = $this->createDefaultRoute($info['definition']['type']);
+      }
+      if (!empty($info['definition']['navigation']['label'])) {
+        $info['definition']['navigation']['label'] .= ' ' . ts('(copy)');
+      }
+    }
 
     $result[] = $info;
   }

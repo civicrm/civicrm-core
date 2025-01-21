@@ -48,6 +48,7 @@
           // Load data for gui editor
           data: function($route, crmApi4) {
             return crmApi4('Afform', 'loadAdminData', {
+              clone: true,
               definition: {name: $route.current.params.name}
             }, 0);
           }
