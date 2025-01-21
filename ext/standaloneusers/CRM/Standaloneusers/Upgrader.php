@@ -59,23 +59,27 @@ class CRM_Standaloneusers_Upgrader extends CRM_Extension_Upgrader_Base {
     // See also: `StandaloneUsers.civi-setup.php`
   }
 
-  protected function createPasswordResetMessageTemplate() {
+  public function createPasswordResetMessageTemplate() {
 
     $baseTpl = [
       'workflow_name' => 'password_reset',
       'msg_title' => 'Password reset',
       'msg_subject' => '{ts}Password reset link for{/ts} {domain.name}',
       'msg_text' => <<<TXT
-        {ts}A password reset link was requested for this account.  If this wasn\'t you (and nobody else can access this email account) you can safely ignore this email.{/ts}
+        {ts}A password reset link was requested for this account.  If this wasn't you (and nobody else can access this email account) you can safely ignore this email.{/ts}
 
         {\$resetUrlPlaintext}
+
+        {ts}This link expires one hour after the date of this email.{/ts}
 
         {domain.name}
         TXT,
       'msg_html' => <<<HTML
-        <p>{ts}A password reset link was requested for this account.&nbsp; If this wasn\'t you (and nobody else can access this email account) you can safely ignore this email.{/ts}</p>
+        <p>{ts}A password reset link was requested for this account.&nbsp; If this wasn't you (and nobody else can access this email account) you can safely ignore this email.{/ts}</p>
 
         <p><a href="{\$resetUrlHtml}">{\$resetUrlHtml}</a></p>
+
+        <p><strong>{ts}This link expires one hour after the date of this email.{/ts}</strong></p>
 
         <p>{domain.name}</p>
         HTML,
