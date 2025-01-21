@@ -37,6 +37,36 @@ class CRM_Upgrade_Incremental_php_SixZero extends CRM_Upgrade_Incremental_Base {
       "timestamp NULL DEFAULT NULL COMMENT 'Date this membership modification action was logged.'",
       FALSE
     );
+    $this->addTask('Set a default activity priority', 'addActivityPriorityDefault');
+  }
+
+  /**
+   * This task sets the Normal option as the default activity status.
+   * It was previously hardcoded in Form and BAO files.
+   *
+   * @return bool
+   */
+  public static function addActivityPriorityDefault() {
+    // Check if a default option is already set (could be other than Normal)
+    $oid = CRM_Core_DAO::singleValueQuery('SELECT ov.id
+      FROM civicrm_option_value ov
+      LEFT JOIN civicrm_option_group og ON (og.id = ov.option_group_id)
+      WHERE og.name = %1 and ov.is_default = 1', [
+        1 => ['priority', 'String'],
+      ]);
+
+    if ($oid) {
+      return TRUE;
+    }
+
+    // Set 'Normal' as the default
+    $sql = CRM_Utils_SQL::interpolate('UPDATE civicrm_option_value SET is_default = 1 WHERE option_group_id = #group AND name = @name', [
+      'name' => 'Normal',
+      'group' => CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_option_group WHERE name = "priority"'),
+    ]);
+    CRM_Core_DAO::executeQuery($sql);
+
+    return TRUE;
   }
 
 }
