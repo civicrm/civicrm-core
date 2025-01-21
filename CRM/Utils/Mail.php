@@ -191,6 +191,12 @@ class CRM_Utils_Mail {
     // TODO: Refactor this quirk-handler as another filter in FilteredPearMailer. But that would merit review of impact on universe.
     $driver = ($mailer instanceof CRM_Utils_Mail_FilteredPearMailer) ? $mailer->getDriver() : NULL;
     $isPhpMail = (get_class($mailer) === "Mail_mail" || $driver === 'mail');
+    $originalValues = [
+      'html' => $params['html'] ?? NULL,
+      'text' => $params['text'] ?? NULL,
+      'attachments' => $params['attachments'] ?? [],
+      'bcc' => isset($headers['Bcc']) ? (array) $headers['Bcc'] : [],
+    ];
     if (!$isPhpMail) {
       // get emails from headers, since these are
       // combination of name and email addresses.
@@ -205,7 +211,11 @@ class CRM_Utils_Mail {
 
     if (is_object($mailer)) {
       try {
-        $result = $mailer->send($to, $headers, $message ?? '');
+        // Note that we pass out `$originalValues` to make them available where the
+        // mailer has been replaced byt an alternate library - eg.
+        // https://github.com/eileenmcnaughton/symfony_mailer
+        // Also see https://github.com/civicrm/civicrm-core/pull/31842
+        $result = $mailer->send($to, $headers, $message ?? '', $originalValues);
       }
       catch (Exception $e) {
         \Civi::log()->error('Mailing error: ' . $e->getMessage());
@@ -239,7 +249,6 @@ class CRM_Utils_Mail {
    */
   public static function sendTest($mailer, array &$params): bool {
     CRM_Utils_Hook::alterMailParams($params, 'testEmail');
-    $message = $params['text'];
     $to = $params['toEmail'];
 
     list($headers, $message) = self::setEmailHeaders($params);
@@ -253,7 +262,12 @@ class CRM_Utils_Mail {
     $mailerName = $mailer->getDriver() ?? '';
 
     try {
-      $mailer->send($to, $headers, $message);
+      $originalValues = [
+        'html' => $params['html'] ?? NULL,
+        'text' => $params['text'] ?? NULL,
+        'attachments' => $params['attachments'] ?? [],
+      ];
+      $mailer->send($to, $headers, $message, $originalValues);
 
       if (defined('CIVICRM_MAIL_LOG') && defined('CIVICRM_MAIL_LOG_AND_SEND')) {
         $testMailStatusMsg .= '<br />' . ts('You have defined CIVICRM_MAIL_LOG_AND_SEND - mail will be logged.') . '<br /><br />';
