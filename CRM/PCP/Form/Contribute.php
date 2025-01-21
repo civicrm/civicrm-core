@@ -136,7 +136,7 @@ class CRM_PCP_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
     $params['entity_id'] = $this->_id;
 
     // Target
-    $params['target_entity_type'] = CRM_Utils_Array::value('target_entity_type', $params, 'contribute');
+    $params['target_entity_type'] = $params['target_entity_type'] ?? 'contribute';
     $params['target_entity_id'] = $this->_id;
 
     $dao = new CRM_PCP_DAO_PCPBlock();

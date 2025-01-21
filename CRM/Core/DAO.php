@@ -332,7 +332,7 @@ class CRM_Core_DAO extends DB_DataObject {
     }
     else {
       //if it is required we need to generate the dependency object first
-      $depObject = CRM_Core_DAO::createTestObject($FKClassName, CRM_Utils_Array::value($dbName, $params, 1));
+      $depObject = CRM_Core_DAO::createTestObject($FKClassName, $params[$dbName] ?? 1);
       $this->$dbName = $depObject->id;
     }
   }

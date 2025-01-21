@@ -2612,7 +2612,7 @@ class CRM_Contact_BAO_Query {
       $k = 99;
       if (strpos($key, '-') !== FALSE) {
         $keyArray = explode('-', $key);
-        $k = CRM_Utils_Array::value('civicrm_' . $keyArray[1], $info, 99);
+        $k = $info['civicrm_' . $keyArray[1]] ?? 99;
       }
       elseif (strpos($key, '_') !== FALSE) {
         $keyArray = explode('_', $key);
@@ -2620,11 +2620,11 @@ class CRM_Contact_BAO_Query {
           $k = CRM_Utils_Array::value(implode('_', $keyArray), $info, 99);
         }
         else {
-          $k = CRM_Utils_Array::value($key, $info, 99);
+          $k = $info[$key] ?? 99;
         }
       }
       else {
-        $k = CRM_Utils_Array::value($key, $info, 99);
+        $k = $info[$key] ?? 99;
       }
       $tempTable[$k . ".$key"] = $key;
     }
@@ -3010,7 +3010,7 @@ class CRM_Contact_BAO_Query {
     }
 
     if (isset($value)) {
-      $value = CRM_Utils_Array::value($op, $value, $value);
+      $value = $value[$op] ?? $value;
     }
 
     if ($name === 'group_type') {
@@ -3399,7 +3399,7 @@ WHERE  $smartGroupClause
     [$name, $op, $value, $grouping, $wildcard] = $values;
 
     $noteOptionValues = $this->getWhereValues('note_option', $grouping);
-    $noteOption = CRM_Utils_Array::value('2', $noteOptionValues, '6');
+    $noteOption = $noteOptionValues['2'] ?? '6';
     $noteOption = ($name == 'note_body') ? 2 : (($name == 'note_subject') ? 3 : $noteOption);
 
     $this->_useDistinct = TRUE;
@@ -4067,7 +4067,7 @@ WHERE  $smartGroupClause
     $field = $this->_fields[$name] ?? NULL;
     CRM_Utils_Type::validate($value, 'Integer');
     $this->_where[$grouping][] = "contact_a.{$name} $op $value";
-    $op = CRM_Utils_Array::value($op, CRM_Core_SelectValues::getSearchBuilderOperators(), $op);
+    $op = CRM_Core_SelectValues::getSearchBuilderOperators()[$op] ?? $op;
     $title = $field ? $field['title'] : $name;
     $this->_qill[$grouping][] = "$title $op $value";
   }
@@ -6216,7 +6216,7 @@ AND   displayRelType.is_active = 1
       $qillString = [];
       if (!empty($pseudoOptions)) {
         foreach ((array) $fieldValue as $val) {
-          $qillString[] = CRM_Utils_Array::value($val, $pseudoOptions, $val);
+          $qillString[] = $pseudoOptions[$val] ?? $val;
         }
         $fieldValue = implode(', ', $qillString);
       }

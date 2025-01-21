@@ -695,7 +695,7 @@ HERESQL;
         $casesList[$key]['case_status'] = sprintf('<strong>%s</strong>', strtoupper($casesList[$key]['case_status']));
       }
       $casesList[$key]['case_type'] = $caseTypeTitles[$case['case_type_id']] ?? NULL;
-      $casesList[$key]['case_role'] = CRM_Utils_Array::value('case_role', $case, '---');
+      $casesList[$key]['case_role'] = $case['case_role'] ?? '---';
       $casesList[$key]['manager'] = self::getCaseManagerContact($caseTypes[$case['case_type_id']], $case['case_id']);
 
       $casesList[$key]['date'] = $activityTypeLabels[$case['activity_type_id']] ?? NULL;

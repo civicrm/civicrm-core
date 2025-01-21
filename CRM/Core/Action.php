@@ -331,7 +331,7 @@ class CRM_Core_Action {
           );
         }
         else {
-          $urlPath = CRM_Utils_Array::value('url', $link, '#');
+          $urlPath = $link['url'] ?? '#';
         }
 
         $classes = 'action-item crm-hover-button';
