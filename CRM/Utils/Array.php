@@ -1436,7 +1436,7 @@ class CRM_Utils_Array {
       if (!empty($option['children'])) {
         $option['children'] = self::formatForSelect2($option['children'], $label, $id);
       }
-      $option = array_intersect_key($option, array_flip(['id', 'text', 'children', 'color', 'icon', 'description']));
+      $option = array_intersect_key($option, array_flip(['id', 'text', 'children', 'color', 'icon', 'description', 'grouping']));
     }
     return $options;
   }

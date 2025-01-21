@@ -358,6 +358,17 @@
         }
       };
 
+      this.placementRequiresServerRoute = function() {
+        let requiresServerRoute = false;
+        editor.afform.placement.forEach(function(placement) {
+          const item = editor.meta.afform_placement.find(item => item.id === placement);
+          if (item && item.grouping === 'server_route') {
+            requiresServerRoute = item.text;
+          }
+        });
+        return requiresServerRoute;
+      };
+
       // Gets complete field defn, merging values from the field with default values
       function fillFieldDefn(entityType, field) {
         var spec = _.cloneDeep(afGui.getField(entityType, field.name));

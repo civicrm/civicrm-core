@@ -101,6 +101,8 @@ return [
         'is_reserved' => TRUE,
         'is_active' => TRUE,
         'icon' => 'fa-bars',
+        // Indicates that a server_route is required for this placement
+        'grouping' => 'server_route',
         'description' => E::ts('Add to the contact summary actions menu.'),
       ],
       'match' => ['option_group_id', 'name'],
