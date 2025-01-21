@@ -8,13 +8,13 @@ endif; ?>
 </p>
 
 <script type="text/javascript">
-  csj$(function(){
+  csj$(function($) {
     function hideLang() {
-      if (csj$('[name=lang]').val() == 'en_US') {
-        csj$('#loadGenerated').prop('disabled', false);
+      if ($('[name=lang]').val() === 'en_US') {
+        $('#loadGenerated').prop('disabled', false);
       }
       else {
-        csj$('#loadGenerated').prop('disabled', true).prop('checked', false);
+        $('#loadGenerated').prop('disabled', true).prop('checked', false);
       }
       setTimeout(hideLang, 100);
     }
