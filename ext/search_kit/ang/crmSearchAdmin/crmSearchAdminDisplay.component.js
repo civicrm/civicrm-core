@@ -255,7 +255,7 @@
       // Must be a real sql expression (not a pseudo-field like `result_row_num`)
       this.canBeSortable = function(col) {
         // Column-header sorting is incompatible with draggable sorting
-        if (ctrl.display.settings.draggable) {
+        if (!col.key || ctrl.display.settings.draggable) {
           return false;
         }
         var expr = ctrl.getExprFromSelect(col.key),
