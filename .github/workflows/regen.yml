@@ -55,6 +55,10 @@ jobs:
             echo "You need to run this in your own fork."
             exit -1
           fi
+      - name: Sendmail is now needed or else drupal install gets marked as fail
+        run: |
+          sudo apt-get update
+          sudo apt-get install sendmail
       - name: Download cv
         run: |
           cd $GITHUB_WORKSPACE
