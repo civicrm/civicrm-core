@@ -5,6 +5,7 @@ use Civi\Api4\Generic\Result;
 use CRM_Core_Exception;
 use Civi\Api4\User;
 use Civi\Api4\Generic\AbstractAction;
+use Civi\Standalone\Event\LoginEvent;
 
 /**
  * This is designed to be a public API
@@ -42,16 +43,13 @@ class RequestPasswordResetEmail extends AbstractAction {
     $userID = $user['id'] ?? 0;
 
     try {
-      // Allow flood control by extensions. (e.g. Moat).
-      $event = \Civi\Core\Event\GenericHookEvent::create([
-        'action'      => 'send_password_reset',
-        'identifiers' => ["user:$userID"],
-      ]);
-      \Civi::dispatcher()->dispatch('civi.flood.drip', $event);
+      $event = new LoginEvent('pre_send_password_reset', $userID ?: NULL);
+      \Civi::dispatcher()->dispatch('civi.standalone.login', $event);
     }
     catch (\Exception $e) {
-      // If we caught an exception, disable sending.
+      // If we caught an exception, silently disable sending.
       $userID = 0;
+      \Civi::log()->warning("Sending password reset blocked: " . $e->getMessage());
     }
 
     if ($userID) {

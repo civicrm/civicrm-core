@@ -77,7 +77,7 @@ class Login extends AbstractAction {
 
       $mfa = new $mfaClass($pending['userID']);
       $okToLogin = $mfa->processMFAAttempt($pending, $this->mfaData);
-      $event = new LoginEvent($pending['userID'], 'post_mfa', $okToLogin ? NULL : 'wrongMFA');
+      $event = new LoginEvent('post_mfa', $pending['userID'], $okToLogin ? NULL : 'wrongMFA');
       Civi::dispatcher()->dispatch('civi.standalone.login', $event);
       if ($okToLogin) {
         // OK!
@@ -119,7 +119,7 @@ class Login extends AbstractAction {
       ->execute()->first();
 
     // Allow flood control (etc.) by extensions.
-    $event = new LoginEvent($user['id'] ?? NULL, 'pre_credentials_check');
+    $event = new LoginEvent('pre_credentials_check', $user['id'] ?? NULL);
     Civi::dispatcher()->dispatch('civi.standalone.login', $event);
     if ($event->stopReason) {
       $result['url'] = '/civicrm/login?' . $event->stopReason;
@@ -129,7 +129,7 @@ class Login extends AbstractAction {
     if (!$userID) {
       $result['publicError'] = "Invalid credentials";
       // Allow monitoring of failed attempts.
-      $event = new LoginEvent($user['id'] ?? NULL, 'post_credentials_check', 'wrongUserPassword');
+      $event = new LoginEvent('post_credentials_check', $user['id'] ?? NULL, 'wrongUserPassword');
       Civi::dispatcher()->dispatch('civi.standalone.login', $event);
       return;
     }
@@ -175,7 +175,7 @@ class Login extends AbstractAction {
 
   protected function loginUser(int $userID) {
     _authx_uf()->loginSession($userID);
-    $event = new LoginEvent($userID, 'post_login');
+    $event = new LoginEvent('login_success', $userID);
     Civi::dispatcher()->dispatch('civi.standalone.login', $event);
   }
 
