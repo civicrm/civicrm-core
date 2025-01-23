@@ -274,8 +274,8 @@ class CRM_Contribute_BAO_FinancialProcessor {
     ) {
       return FALSE;
     }
-
-    if (CRM_Contribute_BAO_FinancialProcessor::isContributionUpdateARefund($params['prevContribution']->contribution_status_id, $params['contribution']->contribution_status_id)) {
+    $isARefund = self::isContributionUpdateARefund($params['prevContribution']->contribution_status_id, $params['contribution']->contribution_status_id);
+    if ($isARefund) {
       // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
       $params['trxnParams']['total_amount'] = -$params['total_amount'];
     }
@@ -296,9 +296,10 @@ class CRM_Contribute_BAO_FinancialProcessor {
       }
     }
 
-    if (($previousContributionStatus === 'Pending'
+    if ((($previousContributionStatus === 'Pending'
         || $previousContributionStatus === 'In Progress')
-      && ($currentContributionStatus === 'Completed')
+      && ($currentContributionStatus === 'Completed'))
+        || $isARefund
     ) {
       if (empty($params['line_item'])) {
         //CRM-15296
@@ -312,6 +313,12 @@ class CRM_Contribute_BAO_FinancialProcessor {
       $params['trxnParams']['currency'] = CRM_Utils_Array::value('currency', $params, $params['prevContribution']->currency);
 
       $transactionIDs[] = CRM_Contribute_BAO_FinancialProcessor::recordAlwaysAccountsReceivable($params['trxnParams'], $params);
+      if ($isARefund && in_array(NULL, $transactionIDs)) {
+        // Do not create extras transactions when recordAlwaysAccountsReceivable method returns NULL
+        // , and let updateFinancialAccounts function do the rest
+        return TRUE;
+      }
+
       $trxn = CRM_Core_BAO_FinancialTrxn::create($params['trxnParams']);
       // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
       $params['entity_id'] = $transactionIDs[] = $trxn->id;
@@ -361,7 +368,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
   }
 
   /**
-   * Create Accounts Receivable financial trxn entry for Completed Contribution.
+   * Create Accounts Receivable financial trxn entry for Completed, Cancelled and Refunded Contribution.
    *
    * @param array $trxnParams
    *   Financial trxn params
@@ -378,23 +385,38 @@ class CRM_Contribute_BAO_FinancialProcessor {
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $contributionStatus = empty($statusId) ? NULL : $contributionStatuses[$statusId];
     $previousContributionStatus = empty($contributionParams['prevContribution']) ? NULL : $contributionStatuses[$contributionParams['prevContribution']->contribution_status_id];
-    // Return if contribution status is not completed.
+    // Return if contribution status is not completed, cancel or refunded.
     if (!($contributionStatus == 'Completed' && (empty($previousContributionStatus)
         || (!empty($previousContributionStatus) && $previousContributionStatus == 'Pending'
           && $contributionParams['prevContribution']->is_pay_later == 0
         )))
+      &&
+      !(($contributionStatus == 'Cancelled' || $contributionStatus == 'Refunded')
+        && (empty($previousContributionStatus) || ($previousContributionStatus == 'Completed')))
     ) {
       return NULL;
     }
-
-    $params = $trxnParams;
+    $params = array_merge([], $trxnParams);
     $financialTypeID = !empty($contributionParams['financial_type_id']) ? $contributionParams['financial_type_id'] : $contributionParams['prevContribution']->financial_type_id;
-    $arAccountId = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($financialTypeID, 'Accounts Receivable Account is');
-    $params['to_financial_account_id'] = $arAccountId;
-    $params['status_id'] = array_search('Pending', $contributionStatuses);
+    $arAccountId = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($financialTypeID, 'Accounts Receivable Account is');
+    if ($contributionStatus !== 'Completed') {
+      $params['from_financial_account_id'] = NULL;
+      $params['to_financial_account_id'] = $arAccountId;
+      $params['status_id'] = array_search($contributionStatus, $contributionStatuses);
+    }
+    else {
+      $params['to_financial_account_id'] = $arAccountId;
+      $params['status_id'] = array_search('Pending', $contributionStatuses);
+    }
     $params['is_payment'] = FALSE;
     $trxn = CRM_Core_BAO_FinancialTrxn::create($params);
-    $trxnParams['from_financial_account_id'] = $params['to_financial_account_id'];
+    if ($contributionStatus != 'Completed') {
+      $trxnParams['from_financial_account_id'] = $arAccountId;
+    }
+    else {
+      $trxnParams['from_financial_account_id'] = $params['to_financial_account_id'];
+    }
+
     return $trxn->id;
   }
 
