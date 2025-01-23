@@ -1,25 +1,12 @@
-<crm-search-display-editable row="row" row-index="rowIndex" display="$ctrl" is-full-row-mode="$ctrl.settings.editableRow.full" col-key="$ctrl.settings.columns[colIndex].key" ng-if="colData.edit && $ctrl.isEditing(rowIndex, colIndex)"></crm-search-display-editable>
-<span ng-if="!colData.links && $ctrl.isViewing(rowIndex, colIndex)" ng-class="{'crm-editable-enabled': colData.edit && !$ctrl.editing, 'crm-editable-disabled': colData.edit && $ctrl.editing}" ng-click="$ctrl.startEditing(rowIndex, colIndex)">
-  <span ng-if="!$ctrl.isArray(colData.val)">
-    <i ng-if="colData.icons.left[0]" class="crm-i {{:: colData.icons.left[0] }}"></i>
-    <span class="crm-search-field-value">{{:: colData.val }}</span>
-    <i ng-if="colData.icons.right[$index]" class="crm-i {{:: colData.icons.right[$index] }}"></i>
-  </span>
-  <span ng-if="$ctrl.isArray(colData.val)">
-    <span ng-repeat="val in colData.val track by $index">
-      <i ng-if="colData.icons.left[$index]" class="crm-i {{:: colData.icons.left[$index] }}"></i>
-        <span class="crm-search-field-value">{{:: val }}</span><i ng-if="colData.icons.right[$index]" class="crm-i {{:: colData.icons.right[$index] }}"> </i><span ng-if="!$last">,
-      </span>
+<span ng-if=":: !$ctrl.isArray(colData.val)">
+  <i ng-if=":: colData.icons.left[0]" class="crm-i {{:: colData.icons.left[0] }}"></i>
+  <span class="crm-search-field-value">{{:: colData.val }}</span>
+  <i ng-if=":: colData.icons.right[$index]" class="crm-i {{:: colData.icons.right[$index] }}"></i>
+</span>
+<span ng-if=":: $ctrl.isArray(colData.val)">
+  <span ng-repeat="val in colData.val track by $index">
+    <i ng-if=":: colData.icons.left[$index]" class="crm-i {{:: colData.icons.left[$index] }}"></i>
+      <span class="crm-search-field-value">{{:: val }}</span><i ng-if="colData.icons.right[$index]" class="crm-i {{:: colData.icons.right[$index] }}"> </i><span ng-if="!$last">,
     </span>
   </span>
-</span>
-<span ng-if="colData.links && $ctrl.isViewing(rowIndex, colIndex)">
-  <span ng-repeat="link in colData.links">
-    <a target="{{:: link.target }}" ng-attr-href="{{ link.url || '' }}" title="{{:: link.title }}" class="{{:: link.style }} ng-click="$ctrl.onClickLink(link, row.key, $event)">
-      <i ng-if="colData.icons.left[$index]" class="crm-i {{:: colData.icons.left[$index] }}"></i>
-      {{:: link.text }}<i ng-if="colData.icons.right[$index]" class="crm-i {{:: colData.icons.right[$index] }}"> </i></a><span ng-if="!$last">,
-    </span>
-  </span>
-</span>
-<span ng-if="$ctrl.isLoading(rowIndex, colIndex)" class="crm-search-loading-placeholder">
 </span>

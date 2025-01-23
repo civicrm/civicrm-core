@@ -1,0 +1,14 @@
+<div ng-if=":: $ctrl.settings.draggable" class="crm-draggable crm-inline-block">
+  <i class="crm-i fa-arrows"></i>
+</div>
+<button type="button" ng-if=":: $ctrl.settings.collapsible" ng-style="{visibility: row.children.length ? 'visible' : 'hidden'}" ng-click="row.collapsed = !row.collapsed" class="btn btn-xs crm-search-display-tree-collapse-toggle">
+  <i class="crm-i fa-caret-down"></i>
+  <span class="crm-search-display-tree-branch-count">{{ row.children.length }}</span>
+</button>
+<div ng-repeat="(colIndex, colData) in row.columns" title="{{:: colData.title }}" class="{{:: $ctrl.getFieldClass(colIndex, colData) }}">
+  <label ng-if=":: colData.label">
+    {{:: colData.label }}
+  </label>
+  <span ng-include=":: $ctrl.getFieldTemplate(colIndex, colData)"></span>
+</div>
+<crm-search-display-tree-branch ng-if="!row.collapsed" items="row.children" parent-key="row.key"></crm-search-display-tree-branch>

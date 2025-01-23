@@ -5,6 +5,7 @@
     bindings: {
       rows: '<',
       rowIndex: '<',
+      defaultCollapsed: '<',
     },
     templateUrl: '~/crmSearchDisplayTable/crmSearchDisplayToggleCollapse.html',
     controller: function($scope, $element) {
@@ -13,6 +14,9 @@
 
       this.$onInit = function() {
         const row = this.getRow();
+        if (!('collapsed' in row)) {
+          row.collapsed = row.data._descendents && this.defaultCollapsed === 'closed';
+        }
         if (row.collapsed && row.data._descendents) {
           row.collapsed = false;
           this.toggleCollapsed();

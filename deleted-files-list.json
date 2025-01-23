@@ -1010,6 +1010,7 @@
     "ext/search_kit/ang/crmSearchAdmin/searchList.html",
     "ext/search_kit/ang/crmSearchAdmin/searchListing/crmSearchAdminSearchListing.html",
     "ext/search_kit/ang/crmSearchDisplay/AddButton.html",
+    "ext/search_kit/ang/crmSearchDisplay/colType/include.html",
     "ext/search_kit/ang/crmSearchTasks/crmSearchTaskDelete.ctrl.js",
     "ext/search_kit/ang/crmSearchTasks/crmSearchTaskDelete.html",
     "ext/search_kit/ang/crmSearchTasks/crmSearchTaskProcess.ctrl.js",

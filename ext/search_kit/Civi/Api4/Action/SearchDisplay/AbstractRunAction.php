@@ -156,20 +156,6 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         'columns' => $columns,
       ];
       $style = $this->getCssStyles($this->display['settings']['cssRules'] ?? [], $data);
-      // Add hierarchical styles
-      if (!empty($this->display['settings']['hierarchical'])) {
-        $depth = $data['_depth'] ?? 0;
-        $style[] = 'crm-hierarchical-row crm-hierarchical-depth-' . $depth;
-        if ($depth) {
-          $style[] = 'crm-hierarchical-child';
-        }
-        if (!empty($data['_descendents'])) {
-          $style[] = 'crm-hierarchical-parent';
-          if (($this->display['settings']['collapsible'] ?? FALSE) === 'closed') {
-            $row['collapsed'] = TRUE;
-          }
-        }
-      }
       if ($style) {
         $row['cssClass'] = implode(' ', $style);
       }
@@ -1399,6 +1385,10 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     // Add draggable column (typically "weight")
     if (!empty($this->display['settings']['draggable'])) {
       $this->addSelectExpression($this->display['settings']['draggable']);
+    }
+    // Add parent_field column for tree displays
+    if (!empty($this->display['settings']['parent_field'])) {
+      $this->addSelectExpression($this->display['settings']['parent_field']);
     }
     // Add style conditions for the display
     foreach ($this->getCssRulesSelect($this->display['settings']['cssRules'] ?? []) as $addition) {

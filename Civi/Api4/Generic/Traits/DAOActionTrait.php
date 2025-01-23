@@ -335,17 +335,34 @@ trait DAOActionTrait {
       return;
     }
     $newWeight = $record[$weightField] ?? NULL;
-    $oldWeight = empty($record[$idField]) ? NULL : \CRM_Core_DAO::getFieldValue($daoName, $record[$idField], $weightField);
 
     $filters = [];
     foreach ($grouping ?? [] as $filter) {
-      $filters[$filter] = $record[$filter] ?? (empty($record[$idField]) ? NULL : \CRM_Core_DAO::getFieldValue($daoName, $record[$idField], $filter));
+      if (array_key_exists($filter, $record)) {
+        $filters[$filter] = $record[$filter];
+      }
+      elseif (!empty($record[$idField])) {
+        $filters[$filter] = $daoName::getDbVal($filter, $record[$idField]);
+      }
     }
     // Supply default weight for new record
     if (!isset($record[$weightField]) && empty($record[$idField])) {
-      $record[$weightField] = $this->getMaxWeight($daoName, $filters, $weightField);
+      $max = $this->getMaxWeight($daoName, $filters, $weightField);
+      $record[$weightField] = $max;
     }
     else {
+      $oldWeight = NULL;
+      // Look up the old weight using filters (it's only relevant if this record is still within the same filter grouping)
+      if (!empty($record[$idField])) {
+        $where = [[$idField, '=', $record[$idField]]];
+        foreach ($filters as $filter => $value) {
+          $where[] = [$filter, '=', $value];
+        }
+        $oldWeight = civicrm_api4($this->getEntityName(), 'get', [
+          'select' => [$weightField],
+          'where' => $where,
+        ])[0][$weightField] ?? NULL;
+      }
       $record[$weightField] = \CRM_Utils_Weight::updateOtherWeights($daoName, $oldWeight, $newWeight, $filters, $weightField);
     }
   }
@@ -361,6 +378,7 @@ trait DAOActionTrait {
    * @return int|mixed
    */
   private function getMaxWeight($daoName, $filters, $weightField) {
+    ksort($filters);
     $key = $daoName . json_encode($filters);
     if (!isset($this->_maxWeights[$key])) {
       $this->_maxWeights[$key] = \CRM_Utils_Weight::getMax($daoName, $filters, $weightField) + 1;

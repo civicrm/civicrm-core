@@ -246,29 +246,24 @@
         }
         return apiRequest;
       },
-      formatFieldValue: function(colData) {
-        return angular.isArray(colData.val) ? colData.val.join(', ') : colData.val;
+
+      getFieldClass: function(colIndex, colData) {
+        return (colData.cssClass || '') + ' crm-search-col-type-' + this.settings.columns[colIndex].type + (this.settings.columns[colIndex].break ? '' : ' crm-inline-block');
       },
 
-      // Determine if an editable field is actively in editing mode
-      isEditing: function(rowIndex, colIndex) {
-        return this.editing && this.editing[0] === rowIndex && (this.editing[1] === colIndex || (this.settings.editableRow && this.settings.editableRow.full));
-      },
-
-      startEditing: function(rowIndex, colIndex) {
-        if (this.editing === false && this.results[rowIndex].columns[colIndex].edit) {
-          this.editing = [rowIndex, colIndex];
+      getFieldTemplate: function(colIndex, colData) {
+        let colType = this.settings.columns[colIndex].type;
+        if (colType === 'include') {
+          return this.settings.columns[colIndex].path;
         }
-      },
-
-      // Determine if a field is not currently loading or editing
-      isViewing: function(rowIndex, colIndex) {
-        return !this.isEditing(rowIndex, colIndex) && !this.isLoading(rowIndex, colIndex);
-      },
-
-      // Determine if a field is currently loading
-      isLoading: function(rowIndex, colIndex) {
-        return !this.isEditing(rowIndex, colIndex) && this.results[rowIndex].columns[colIndex].loading;
+        if (colType === 'field') {
+          if (colData.edit) {
+            colType = 'editable';
+          } else if (colData.links) {
+            colType = 'link';
+          }
+        }
+        return '~/crmSearchDisplay/colType/' + colType + '.html';
       },
     };
   });

@@ -7,7 +7,7 @@
     <div ng-if="$ctrl.sortableEntity" class="form-inline">
       <div class="checkbox-inline form-control">
         <label>
-          <input type="checkbox" ng-checked="!!$ctrl.display.settings.draggable" ng-click="$ctrl.toggleDraggable()">
+          <input type="checkbox" ng-checked="!!$ctrl.display.settings.draggable" ng-click="$ctrl.parent.toggleDraggable()">
           <span>{{:: ts('Drag and drop sorting') }}</span>
         </label>
       </div>

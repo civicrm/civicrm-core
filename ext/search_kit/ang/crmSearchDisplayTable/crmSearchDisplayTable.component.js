@@ -14,7 +14,7 @@
       afFieldset: '?^^afFieldset'
     },
     templateUrl: '~/crmSearchDisplayTable/crmSearchDisplayTable.html',
-    controller: function($scope, $element, searchDisplayBaseTrait, searchDisplayTasksTrait, searchDisplaySortableTrait, searchDisplayEditableTrait, crmApi4) {
+    controller: function($scope, $element, searchDisplayBaseTrait, searchDisplayTasksTrait, searchDisplaySortableTrait, searchDisplayEditableTrait, crmApi4, crmStatus) {
       let ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         // Mix in copies of traits to this controller
         ctrl = angular.extend(this, _.cloneDeep(searchDisplayBaseTrait), _.cloneDeep(searchDisplayTasksTrait), _.cloneDeep(searchDisplaySortableTrait), _.cloneDeep(searchDisplayEditableTrait));
@@ -56,23 +56,43 @@
               return ui;
             },
             stop: function(e, ui) {
-              $scope.$apply(function() {
-                var movedItem = ui.item.sortable.model,
-                  oldPosition = ui.item.sortable.index,
-                  newPosition = ctrl.results.indexOf(movedItem),
-                  displacement = newPosition < oldPosition ? -1 : 1,
-                  displacedItem = ctrl.results[newPosition - displacement],
-                  weightColumn = ctrl.settings.draggable,
-                  updateParams = {where: [['id', '=', movedItem.data.id]], values: {}};
-                if (newPosition > -1 && oldPosition !== newPosition) {
-                  updateParams.values[weightColumn] = displacedItem.data[weightColumn];
-                  ctrl.runSearch({updateWeight: [ctrl.apiEntity, 'update', updateParams]}, {}, movedItem);
-                }
-              });
+              const movedItem = ui.item.sortable.model,
+                oldPosition = ui.item.sortable.index,
+                newPosition = ctrl.results.indexOf(movedItem),
+                displacement = newPosition < oldPosition ? -1 : 1,
+                displacedItem = ctrl.results[newPosition - displacement];
+              if (newPosition > -1 && oldPosition !== newPosition) {
+                updateDraggableWeights(movedItem.key, displacedItem.data);
+              }
             }
           };
         }
       };
+
+      function updateDraggableWeights(key, data) {
+        const weightField = ctrl.settings.draggable;
+        const newWeight = data[weightField];
+        const apiParams = ctrl.getApiParams('draggableWeight');
+        apiParams.rowKey = key;
+        apiParams.values = {};
+        apiParams.values[weightField] = newWeight;
+        crmStatus({}, crmApi4('SearchDisplay', 'inlineEdit', apiParams))
+          .then(function(newWeights) {
+            const weightColumn = ctrl.settings.columns.findIndex(col => col.key === weightField);
+            ctrl.results.forEach(function(row) {
+              if (row.key in newWeights) {
+                row.data[weightField] = newWeights[row.key];
+                // If there is a column containing 'weight' as a value, update it and
+                // hope it doesn't use rewrite or any advanced formatting; 'cause this is but a simple refresh function
+                if (weightColumn >= 0) {
+                  row.columns[weightColumn].val = newWeights[row.key];
+                  // Break reference to trigger an Angular view refresh
+                  row.columns[weightColumn] = JSON.parse(angular.toJson(row.columns[weightColumn]));
+                }
+              }
+            });
+          });
+      }
 
       // Get header classes for each column
       this.getHeaderClass = function (column) {
@@ -92,6 +112,20 @@
           });
         }
         return headerClasses.join(' ');
+      };
+
+      this.getRowClass = function (row) {
+        let cssClass = row.cssClass || '';
+        if (ctrl.settings.hierarchical) {
+          cssClass += ' crm-hierarchical-row crm-hierarchical-depth-' + row.data._depth;
+          if (row.data._depth) {
+            cssClass += ' crm-hierarchical-child';
+          }
+          if (row.data._descendents) {
+            cssClass += ' crm-hierarchical-parent';
+          }
+        }
+        return cssClass;
       };
 
     }

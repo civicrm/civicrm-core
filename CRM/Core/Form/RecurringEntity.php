@@ -386,7 +386,7 @@ class CRM_Core_Form_RecurringEntity {
           ];
           $opGroup = CRM_Core_BAO_OptionGroup::add($optionGroupParams);
           if ($opGroup->id) {
-            $oldWeight = 0;
+            $oldWeight = NULL;
             $fieldValues = ['option_group_id' => $opGroup->id];
             foreach ($excludeDates as $val) {
               $optionGroupValue = [
