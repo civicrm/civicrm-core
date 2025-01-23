@@ -382,7 +382,7 @@ invert              = 0
       strSameAs = '{/literal}{ts escape='js'}- same as for main contact -{/ts}{literal}',
       strSelect = '{/literal}{ts escape='js'}- select -{/ts}{literal}';
 
-    $('#crm-container').on('crmLoad', function() {
+    $('.crm-container').on('crmLoad', function() {
         var $container = $("[id^='additional_profile_'],.additional_profile").not('.processed').addClass('processed');
         $container.find(".crm-profile-selector-select select").each( function() {
             var $select = $(this);
@@ -433,7 +433,7 @@ $(function($) {
     $('#registration_blocks').on('click', '.crm-button-add-profile', addBottomProfile);
     $('#registration_blocks').on('click', '.crm-button-rem-profile', removeBottomProfile);
 
-    $('#crm-container').on('crmLoad', function(e) {
+    $('.crm-container').on('crmLoad', function(e) {
         $('tr[id^="additional_profile"] input[id^="additional_custom_"]').change(function(e) {
             var $input = $(e.target);
             if ( $input.val() == '') {
