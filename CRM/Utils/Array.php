@@ -567,12 +567,12 @@ class CRM_Utils_Array {
    * Sorts an array and maintains index association (with localization).
    *
    * @param array $array
-   *   (optional) Array to be sorted.
+   *   Array to be sorted.
    *
    * @return array
    *   Sorted array.
    */
-  public static function asort($array = []) {
+  public static function asort(array $array) {
     $lcMessages = CRM_Core_I18n::getLocale();
 
     $collator = new Collator($lcMessages . '.utf8');
