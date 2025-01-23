@@ -973,10 +973,11 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     CRM_Core_I18n::singleton()->setLocale('nl_NL');
     $countries = \Civi::entity('Address')->getOptions('country_id');
     $this->assertEquals('AF', $countries[0]['name']);
-    $this->assertEquals('AL', $countries[1]['name']);
-    $this->assertEquals('DZ', $countries[2]['name']);
     // Åland Islands
-    $this->assertEquals('AX', array_pop($countries)['name']);
+    $this->assertEquals('AX', $countries[1]['name']);
+    $this->assertEquals('AL', $countries[2]['name']);
+    $this->assertEquals('US', $countries[237]['name']);
+    $this->assertEquals('CH', array_pop($countries)['name']);
 
     CRM_Core_I18n::singleton()->setLocale('it_IT');
     $countries = \Civi::entity('Address')->getOptions('country_id');
@@ -984,7 +985,8 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $this->assertEquals('AL', $countries[1]['name']);
     $this->assertEquals('DZ', $countries[2]['name']);
     // Åland Islands
-    $this->assertEquals('AX', $countries[114]['name']);
+    $this->assertEquals('AX', $countries[104]['name']);
+    $this->assertEquals('US', $countries[213]['name']);
     $this->assertEquals('ZW', array_pop($countries)['name']);
   }
 
