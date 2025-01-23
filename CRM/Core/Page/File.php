@@ -20,6 +20,8 @@ class CRM_Core_Page_File extends CRM_Core_Page {
    * Run page.
    */
   public function run() {
+    CRM_Utils_Hook::pageRun($this);
+
     $action = CRM_Utils_Request::retrieve('action', 'String', $this);
     $download = CRM_Utils_Request::retrieve('download', 'Integer', $this, FALSE, 1);
     $disposition = $download == 0 ? 'inline' : 'download';
