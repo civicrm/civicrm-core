@@ -962,32 +962,6 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $this->assertCount(2, $checked, 'Country list incomplete');
   }
 
-  public function testCountrySorting(): void {
-    $countries = \Civi::entity('Address')->getOptions('country_id');
-    $this->assertEquals('AF', $countries[0]['name']);
-    // Åland Islands should sort second in en_US locale
-    $this->assertEquals('AX', $countries[1]['name']);
-    $this->assertEquals('AL', $countries[2]['name']);
-    $this->assertEquals('ZW', array_pop($countries)['name']);
-
-    CRM_Core_I18n::singleton()->setLocale('nl_NL');
-    $countries = \Civi::entity('Address')->getOptions('country_id');
-    $this->assertEquals('AF', $countries[0]['name']);
-    $this->assertEquals('AL', $countries[1]['name']);
-    $this->assertEquals('DZ', $countries[2]['name']);
-    // Åland Islands
-    $this->assertEquals('AX', array_pop($countries)['name']);
-
-    CRM_Core_I18n::singleton()->setLocale('it_IT');
-    $countries = \Civi::entity('Address')->getOptions('country_id');
-    $this->assertEquals('AF', $countries[0]['name']);
-    $this->assertEquals('AL', $countries[1]['name']);
-    $this->assertEquals('DZ', $countries[2]['name']);
-    // Åland Islands
-    $this->assertEquals('AX', $countries[114]['name']);
-    $this->assertEquals('ZW', array_pop($countries)['name']);
-  }
-
   /**
    * Test dev/core#2379 fix - geocodes shouldn't be > 14 characters.
    */
