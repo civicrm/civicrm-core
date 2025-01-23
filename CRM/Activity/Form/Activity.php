@@ -575,8 +575,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       $defaults += $className::setDefaultValues($this);
     }
     if (empty($defaults['priority_id'])) {
-      $priority = CRM_Activity_DAO_Activity::buildOptions('priority_id');
-      $defaults['priority_id'] = CRM_Core_PseudoConstant::getKey('CRM_Activity_DAO_Activity', 'priority_id', 'Normal');
+      $defaults['priority_id'] = CRM_Core_OptionGroup::getDefaultValue('priority');
     }
     if (empty($defaults['status_id'])) {
       $defaults['status_id'] = CRM_Core_OptionGroup::getDefaultValue('activity_status');
