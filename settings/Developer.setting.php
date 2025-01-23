@@ -40,6 +40,9 @@ return [
       'callback' => '\Civi\Core\AssetBuilder::getCacheModes',
     ],
   ],
+  // note: this setting is only exposed if the userFramework declares it has support
+  // (currently only Drupal)
+  // @see CRM_Utils_System_Base::supportsUfLogging
   'userFrameworkLogging' => [
     'group_name' => 'Developer Preferences',
     'group' => 'developer',
