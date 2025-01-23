@@ -879,6 +879,10 @@ AND    option_group_id = %2";
     if ($params['data_type'] == "Memo") {
       $params['text_length'] = $params['note_length'];
     }
+    // Urls can be up to 2047 characters according to https://www.sitemaps.org/protocol.html#locdef
+    if ($params['data_type'] == 'Link') {
+      $params['text_length'] = 2047;
+    }
 
     // need the FKEY - custom group id
     $params['custom_group_id'] = $this->_gid;
