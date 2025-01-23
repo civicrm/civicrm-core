@@ -16,7 +16,7 @@
       </button>
     </div>
   </td>
-  <td ng-repeat="(colIndex, colData) in row.columns" ng-include=":: $ctrl.getFieldTemplate(colIndex, colData)" title="{{:: colData.title }}" class="crm-search-col-type-{{:: $ctrl.settings.columns[colIndex].type }} {{:: row.cssClass }} {{:: colData.cssClass }}" data-field-name="{{:: $ctrl.settings.columns[colIndex].key }}">
+  <td ng-repeat="(colIndex, colData) in row.columns" ng-include=":: $ctrl.getFieldTemplate(colIndex, colData)" title="{{:: colData.title }}" class="crm-search-col-type-{{:: $ctrl.settings.columns[colIndex].type }} {{:: $ctrl.getRowClass(row) }} {{:: colData.cssClass }}" data-field-name="{{:: $ctrl.settings.columns[colIndex].key }}">
   </td>
 </tr>
 <tr ng-if="$ctrl.rowCount === 0">

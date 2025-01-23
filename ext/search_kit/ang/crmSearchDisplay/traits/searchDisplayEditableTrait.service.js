@@ -69,11 +69,10 @@
         // If the api returned a refreshed row, replace the current row with it
         if (result.length && rowIndex >= 0) {
           const row = this.results[rowIndex];
-          // Preserve hierarchical info which isn't returned by the refresh
-          result[0].data._descendents = row.data._descendents;
-          result[0].data._depth = row.data._depth;
-          // Note that extend() will preserve top-level items like 'collapsed' which aren't returned by the refresh
-          this.results[rowIndex] = result[0];
+          // Preserve hierarchical info like _descendents and _depth which isn't returned by the refresh
+          _.defaults(result[0].data, row.data);
+          // Note that extend() will preserve top-level items like 'collapsed' while replacing columns and data
+          angular.extend(row, result[0]);
         }
         // Or it's possible that the update caused this row to no longer match filters, in which case do a full refresh
         else {
