@@ -67,9 +67,7 @@ class LegacySpecScanner implements AutoServiceInterface {
     $classes = [];
 
     $namespace = \CRM_Utils_File::addTrailingSlash($namespace, '\\');
-    $locations = array_merge([\Civi::paths()->getPath('[civicrm.root]/Civi.php')],
-      array_column(\CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(), 'filePath')
-    );
+    $locations = array_column(\CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(), 'filePath');
     foreach ($locations as $location) {
       $path = \CRM_Utils_File::addTrailingSlash(dirname($location ?? '')) . str_replace('\\', DIRECTORY_SEPARATOR, $namespace);
       if (!file_exists($path) || !is_dir($path)) {
