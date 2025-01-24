@@ -259,7 +259,7 @@
       // Must be a real sql expression (not a pseudo-field like `result_row_num`)
       this.canBeSortable = function(col) {
         // Column-header sorting is incompatible with draggable sorting
-        if (ctrl.display.settings.draggable) {
+        if (!col.key || ctrl.display.settings.draggable) {
           return false;
         }
         var expr = ctrl.getExprFromSelect(col.key),
@@ -276,7 +276,7 @@
         return !info.fn || info.fn.category !== 'aggregate' || info.fn.name === 'GROUP_CONCAT';
       }
 
-      var linkProps = ['path', 'entity', 'action', 'join', 'target'];
+      const LINK_PROPS = ['path', 'entity', 'action', 'join', 'target', 'task'];
 
       this.toggleLink = function(column) {
         if (column.link) {
@@ -290,8 +290,8 @@
 
       this.onChangeLink = function(column, afterLink) {
         column.link = column.link || {};
-        var beforeLink = column.link.action && _.findWhere(ctrl.getLinks(column.key), {action: column.link.action});
-        if (!afterLink.action && !afterLink.path) {
+        const beforeLink = column.link.action && _.findWhere(ctrl.getLinks(column.key), {action: column.link.action});
+        if (!afterLink.action && !afterLink.path && !afterLink.task) {
           if (beforeLink && beforeLink.text === column.title) {
             delete column.title;
           }
@@ -303,7 +303,7 @@
         } else if (!afterLink.text && (beforeLink && beforeLink.text === column.title)) {
           delete column.title;
         }
-        _.each(linkProps, function(prop) {
+        LINK_PROPS.forEach((prop) => {
           column.link[prop] = afterLink[prop] || '';
         });
       };
