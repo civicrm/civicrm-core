@@ -30,7 +30,6 @@ class Requirements {
     'checkMemory',
     'checkMysqlConnectExists',
     'checkJsonEncodeExists',
-    'checkMultibyteExists',
   ];
 
   protected $system_checks_web = [
@@ -245,24 +244,6 @@ class Requirements {
     if (!function_exists('json_encode')) {
       $results['severity'] = $this::REQUIREMENT_ERROR;
       $results['details'] = 'Function json_encode() does not exist';
-    }
-
-    return $results;
-  }
-
-  /**
-   * CHeck that PHP Multibyte functions are enabled.
-   * @return array
-   */
-  public function checkMultibyteExists() {
-    $results = [
-      'title' => 'CiviCRM MultiByte encoding support',
-      'severity' => $this::REQUIREMENT_OK,
-      'details' => 'PHP Multibyte etension found',
-    ];
-    if (!function_exists('mb_substr')) {
-      $results['severity'] = $this::REQUIREMENT_ERROR;
-      $results['details'] = 'PHP Multibyte extension has not been installed and enabled';
     }
 
     return $results;
