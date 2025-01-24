@@ -130,11 +130,11 @@ return [
       'default' => FALSE,
     ],
     'is_searchable' => [
-      'title' => ts('Allow Searching on Field?'),
+      'title' => ts('Optimize for Search'),
       'sql_type' => 'boolean',
       'input_type' => 'CheckBox',
       'required' => TRUE,
-      'description' => ts('Is this property searchable.'),
+      'description' => ts('Adds a database index which helps speed up searches on this field significantly. However, it can require more storage and can slow down the system if the data is frequently updated.'),
       'add' => '1.1',
       'default' => FALSE,
     ],
