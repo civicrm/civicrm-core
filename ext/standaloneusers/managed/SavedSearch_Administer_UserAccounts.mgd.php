@@ -200,6 +200,7 @@ return [
             'disable',
             'download',
             'enable',
+            'send_password_reset',
           ],
           'classes' => [
             'table',
