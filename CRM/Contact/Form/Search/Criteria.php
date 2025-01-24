@@ -603,7 +603,7 @@ class CRM_Contact_Form_Search_Criteria {
    */
   public static function custom(&$form) {
     $form->add('hidden', 'hidden_custom', 1);
-    $groupDetails = CRM_Core_BAO_CustomGroup::getAll(['extends' => 'Contact']);
+    $groupDetails = CRM_Core_BAO_CustomGroup::getAll(['extends' => 'Contact', 'is_active' => TRUE]);
     $form->assign('groupTree', $groupDetails);
 
     foreach ($groupDetails as $key => $group) {
