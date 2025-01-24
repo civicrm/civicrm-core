@@ -23,8 +23,7 @@ html.cms-standalone body {
   cursor: pointer; /* show it's clickable */
   position: relative; /* so our animated triangle doesn't go walkies */
 }
-.crm-container summary:hover,
-.crm-container summary:focus {
+.crm-container summary:where(:hover, :focus) {
   background-color: var(--crm-c-blue-overlay2);
 }
 
@@ -601,7 +600,7 @@ html.crm-standalone  nav.breadcrumb>ol {
 .crm-container th.crm-search-result-select {
   --crm-btn-margin: 0;
 }
-/* Searchkit accordions */
+/* Searchkit accordions */ 
 .crm-search-admin-edit-columns details,
 .crm-search .crm-search-admin-relative details {
   /*issue https://lab.civicrm.org/extensions/riverlea/-/issues/102 */
@@ -622,4 +621,13 @@ html.crm-standalone  nav.breadcrumb>ol {
 #crm-contact-actions-list a.delete:focus {
   /* the hover state gives crm-c-red-dark to the background */
   --crm-c-alert-text: var(--crm-c-red-light);
+}
+
+/* Fix Mosaico wizard */
+.crm_wizard__title { --crm-panel-background: transparent; }
+.crmb-wizard-button-right { gap: 1rem; }
+
+/* Support contact dashboard image float */
+.contactCardRight:has(#crm-contact-thumbnail) .float-left {
+    width: calc(100% - var(--crm-flex-gap) - var(--crm-dash-image-size));
 }
