@@ -28,7 +28,6 @@ class Requirements {
    */
   protected $system_checks = [
     'checkMemory',
-    'checkMysqlConnectExists',
   ];
 
   protected $system_checks_web = [
@@ -107,6 +106,16 @@ class Requirements {
    * @return array
    */
   public function checkDatabase(array $db_config) {
+    if (!extension_loaded('mysqli')) {
+      return [
+        [
+          'title' => 'Driver',
+          'severity' => $this::REQUIREMENT_ERROR,
+          'details' => 'mysqli driver is missing. Cannot connect to database for testing.',
+        ],
+      ];
+    }
+
     $errors = [];
 
     foreach ($this->database_checks as $check) {
@@ -226,23 +235,6 @@ class Requirements {
     if ($missing) {
       $results['severity'] = $this::REQUIREMENT_ERROR;
       $results['details'] = 'The following PHP variables are not set: ' . implode(', ', $missing);
-    }
-
-    return $results;
-  }
-
-  /**
-   * @return array
-   */
-  public function checkMysqlConnectExists() {
-    $results = [
-      'title' => 'CiviCRM MySQL check',
-      'severity' => $this::REQUIREMENT_OK,
-      'details' => 'Function mysqli_connect() found',
-    ];
-    if (!function_exists('mysqli_connect')) {
-      $results['severity'] = $this::REQUIREMENT_ERROR;
-      $results['details'] = 'Function mysqli_connect() does not exist';
     }
 
     return $results;
