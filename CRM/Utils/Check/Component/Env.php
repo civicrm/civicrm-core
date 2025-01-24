@@ -85,29 +85,6 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   }
 
   /**
-   * @return CRM_Utils_Check_Message[]
-   */
-  public function checkPhpMysqli() {
-    $messages = [];
-
-    if (!extension_loaded('mysqli')) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('Future versions of CiviCRM may require the PHP extension "%2". To ensure that your system will be compatible, please install it in advance. For more explanation, see <a href="%1">the announcement</a>.',
-          [
-            1 => 'https://civicrm.org/blog/totten/psa-please-verify-php-extension-mysqli',
-            2 => 'mysqli',
-          ]),
-          ts('Forward Compatibility: Enable "mysqli"'),
-          \Psr\Log\LogLevel::WARNING,
-          'fa-server'
-      );
-    }
-
-    return $messages;
-  }
-
-  /**
    * Check that the MySQL time settings match the PHP time settings.
    *
    * @return CRM_Utils_Check_Message[]
