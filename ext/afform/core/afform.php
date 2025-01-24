@@ -481,7 +481,11 @@ function afform_civicrm_permission_check($permission, &$granted, $contactId) {
   elseif ($permission === '@afformPageToken') {
     $session = CRM_Core_Session::singleton();
     $data = $session->get('authx');
-    $granted = isset($data['jwt']['scope'], $data['flow']) && $data['jwt']['scope'] === 'afform' && $data['flow'] === 'afformpage';
+    $granted =
+      // Check authx token
+      isset($data['jwt']['scope'], $data['flow']) && $data['jwt']['scope'] === 'afform' && $data['flow'] === 'afformpage'
+      // Allow admins to edit forms without requiring a token
+      || CRM_Core_Permission::check('administer afform');
   }
 }
 
@@ -495,7 +499,10 @@ function afform_civicrm_permissionList(&$permissions) {
     'group' => 'const',
     'title' => E::ts('Generic: Anyone with secret link'),
     'description' => E::ts('If you link to the form with a secure token, then no other permission is needed.'),
+    'parent' => 'administer afform',
   ];
+  $permissions['administer afform']['implies'] ??= [];
+  $permissions['administer afform']['implies'][] = '@afformPageToken';
   $scanner = Civi::service('afform_scanner');
   foreach ($scanner->getMetas() as $name => $meta) {
     $permissions['@afform:' . $name] = [
