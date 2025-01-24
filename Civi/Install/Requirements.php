@@ -29,7 +29,6 @@ class Requirements {
   protected $system_checks = [
     'checkMemory',
     'checkMysqlConnectExists',
-    'checkJsonEncodeExists',
   ];
 
   protected $system_checks_web = [
@@ -227,23 +226,6 @@ class Requirements {
     if ($missing) {
       $results['severity'] = $this::REQUIREMENT_ERROR;
       $results['details'] = 'The following PHP variables are not set: ' . implode(', ', $missing);
-    }
-
-    return $results;
-  }
-
-  /**
-   * @return array
-   */
-  public function checkJsonEncodeExists() {
-    $results = [
-      'title' => 'CiviCRM JSON encoding support',
-      'severity' => $this::REQUIREMENT_OK,
-      'details' => 'Function json_encode() found',
-    ];
-    if (!function_exists('json_encode')) {
-      $results['severity'] = $this::REQUIREMENT_ERROR;
-      $results['details'] = 'Function json_encode() does not exist';
     }
 
     return $results;
