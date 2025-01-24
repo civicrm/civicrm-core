@@ -140,7 +140,7 @@ class Router extends AutoService {
       case 'WordPress':
         // N.B. There are sufficient events in WP API to enforce IFRAME invariants.
         // @see \CiviCRM_For_WordPress::activate_iframe()
-        throw new \LogicException("In Civi-WP, IFRAMEs with CMS page-chrome shuld use standard invoker.");
+        throw new \LogicException("In Civi-WP, IFRAMEs with CMS page-chrome should use standard invoker.");
 
       default:
         throw new \CRM_Core_Exception("Unimplemented: invokeCms(" . CIVICRM_UF . ")");
