@@ -6,12 +6,15 @@
  * This speaks to platforms like SA, WP, BD, D7 where admins do not directly run `composer install`.
  */
 
+use Composer\InstalledVersions;
+
 if (!defined('CIVI_SETUP')) {
   exit("Installation plugins must only be loaded by the installer.\n");
 }
 
 \Civi\Setup::dispatcher()
   ->addListener('civi.setup.checkRequirements', function (\Civi\Setup\Event\CheckRequirementsEvent $e) {
+
     $model = $e->getModel();
     $lockFile = $model->srcPath . '/composer.lock';
     if (!file_exists($lockFile)) {
@@ -26,25 +29,44 @@ if (!defined('CIVI_SETUP')) {
     }
 
     \Civi\Setup::log()->info(sprintf('[%s] Check Composer requirements', basename(__FILE__)));
-    $loadedExtensions = get_loaded_extensions();
     foreach ($lock['platform'] as $key => $constraint) {
       if (str_starts_with($key, 'ext-')) {
         $extension = substr($key, 4);
+        $status = _composer_adapter_checkExtension($extension);
+        switch ($status) {
+          case 'installed':
+            $e->addInfo('system', $key, sprintf('The PHP extension "%s" is installed.', $extension));
+            break;
 
-        if (!in_array($extension, $loadedExtensions)) {
-          $e->addError('system', $key, sprintf('The PHP extension "%s" is not installed.', $extension));
-        }
-        else {
-          $e->addInfo('system', $key, sprintf('The PHP extension "%s" is installed.', $extension));
-        }
+          case 'polyfill':
+            $e->addWarning('system', $key, sprintf('For optimal performance, install the PHP extension "%s".', $extension));
+            break;
 
-        // The above (basic existence check) is much better than status quo.
-        // It would be nicer to use composer/semver's `Semver::satisfies`, but then you'd need to deal with conflict-y risks across platforms (eg J4/J5).
-        //
-        // $version = phpversion($extension);
-        // if (!\Composer\Semver\Semver::satisfies($version, $constraint)) { .... }
-        //   $e->addError('system', 'php_' . $extension, sprintf('The PHP extension \"%s\" (%s) does not satisfy constraint (%s).', $extension, $version, $constraint));
-        // }
+          default:
+            $e->addError('system', $key, sprintf('The PHP extension "%s" is not installed.', $extension));
+        }
       }
     }
   });
+
+function _composer_adapter_checkExtension(string $extension): string {
+  $loadedExtensions = get_loaded_extensions();
+  $polyfills = [
+    // Unfortunately, Composer\InstalledVersions doesn't seem know about 'provide' metdata. So we need some hints.
+    'mbstring' => ['symfony/polyfill-mbstring'],
+  ];
+
+  if (in_array($extension, $loadedExtensions)) {
+    return 'installed';
+  }
+
+  if (isset($polyfills[$extension])) {
+    foreach ($polyfills[$extension] as $polyfill) {
+      if (InstalledVersions::isInstalled($polyfill)) {
+        return 'polyfill';
+      }
+    }
+  }
+
+  return 'missing';
+}
