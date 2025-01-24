@@ -47,6 +47,8 @@ class BasicCustomFieldTest extends Api4TestBase {
       'html_type' => 'Text',
       // Will default to 2047 characters
       'data_type' => 'Link',
+      // Test that adding an index works for such a large field
+      'is_searchable' => TRUE,
     ]);
 
     // Individual fields should show up when contact_type = null|Individual but not other contact types

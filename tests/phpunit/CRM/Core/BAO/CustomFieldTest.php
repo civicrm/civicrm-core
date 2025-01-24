@@ -980,6 +980,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     $collation = \CRM_Core_BAO_SchemaHandler::getInUseCollation();
     $this->assertStringContainsString('`test_link_2` varchar(2047) COLLATE ' . $collation . ' DEFAULT NULL', $dao->Create_Table);
     $this->assertStringContainsString('KEY `index_my_text` (`my_text`)', $dao->Create_Table);
+    $this->assertStringContainsString('KEY `index_test_link_2` (`test_link_2`(512))', $dao->Create_Table);
     $characterSet = stripos($collation, 'utf8mb4') !== FALSE ? 'utf8mb4' : 'utf8';
     $this->assertStringContainsString("ENGINE=InnoDB DEFAULT CHARSET={$characterSet} COLLATE={$collation}", $dao->Create_Table);
   }
