@@ -40,6 +40,9 @@ return [
       'callback' => '\Civi\Core\AssetBuilder::getCacheModes',
     ],
   ],
+  // note: this setting is only exposed if the userFramework declares it has support
+  // (currently only Drupal)
+  // @see CRM_Utils_System_Base::supportsUfLogging
   'userFrameworkLogging' => [
     'group_name' => 'Developer Preferences',
     'group' => 'developer',
@@ -48,11 +51,11 @@ return [
     'quick_form_type' => 'YesNo',
     'default' => '0',
     'add' => '4.3',
-    'title' => ts('Enable Drupal Watchdog Logging'),
+    'title' => ts('Send CiviCRM errors to CMS logs'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => ts('Set this value to Yes if you want CiviCRM error/debugging messages to appear in the Drupal error logs.'),
-    'help_text' => "Set this value to Yes if you want CiviCRM error/debugging messages the appear in your CMS' error log. In the case of Drupal, this will cause all CiviCRM error messages to appear in the watchdog (assuming you have Drupal's watchdog enabled)",
+    'description' => ts('Set this value to Yes if you want CiviCRM error/debugging messages to appear in your CMS error log.'),
+    'help_text' => ts('In the case of Drupal, this will cause all CiviCRM error messages to appear in the Watchdog logs (assuming you have Watchdog enabled)'),
   ],
   'debug_enabled' => [
     'group_name' => 'Developer Preferences',

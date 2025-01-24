@@ -38,13 +38,6 @@ abstract class CRM_Utils_System_Base {
   public $is_wordpress = FALSE;
 
   /**
-   * Does this CMS / UF support a CMS specific logging mechanism?
-   * @var bool
-   * @todo - we should think about offering up logging mechanisms in a way that is also extensible by extensions
-   */
-  public $supports_UF_Logging = FALSE;
-
-  /**
    * @var bool
    *   TRUE, if the CMS allows CMS forms to be extended by hooks.
    */
@@ -1256,6 +1249,17 @@ abstract class CRM_Utils_System_Base {
    * Container is up (only used in Standalone currently)
    */
   public function postContainerBoot(): void {
+  }
+
+  /**
+   * Does this CMS / UF support a CMS specific logging mechanism?
+   * @todo - we should think about offering up logging mechanisms in a way that is also extensible by extensions
+   * @todo - it would be nice to provide UF specific meta for the userFrameworkLogging setting
+   *
+   * @return bool
+   */
+  public function supportsUfLogging(): bool {
+    return FALSE;
   }
 
 }

@@ -21,13 +21,6 @@
 abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
 
   /**
-   * Does this CMS / UF support a CMS specific logging mechanism?
-   * @var bool
-   * @todo - we should think about offering up logging mechanisms in a way that is also extensible by extensions
-   */
-  public $supports_UF_Logging = TRUE;
-
-  /**
    */
   public function __construct() {
     /**
@@ -848,6 +841,15 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
     $profile = str_replace('civicrm/admin/uf/group', $urlReplaceWith, $profile);
 
     return $profile;
+  }
+
+  /**
+   * @inheritdoc
+   *
+   * We support sending CiviCRM logs to Watchdog
+   */
+  public function supportsUfLogging(): bool {
+    return TRUE;
   }
 
 }
