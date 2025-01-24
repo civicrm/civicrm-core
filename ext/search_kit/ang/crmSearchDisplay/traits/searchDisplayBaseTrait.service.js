@@ -19,6 +19,7 @@
       // Called by the controller's $onInit function
       initializeDisplay: function($scope, $element) {
         var ctrl = this;
+        this.$element = $element;
         this.limit = this.settings.limit;
         this.sort = this.settings.sort ? _.cloneDeep(this.settings.sort) : [];
         this.seed = Date.now();

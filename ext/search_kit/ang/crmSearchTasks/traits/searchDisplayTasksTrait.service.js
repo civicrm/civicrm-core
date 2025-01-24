@@ -45,15 +45,17 @@
         return _.findWhere(mngr.tasks, {name: taskName});
       };
 
-      this.doTask = function(task, ids) {
+      this.doTask = function(task, ids, isLink) {
         var data = {
           ids: ids,
           entity: mngr.getEntityName(),
           search: displayCtrl.search,
           display: displayCtrl.display,
+          displayCtrl: displayCtrl,
           taskManager: mngr,
           entityInfo: mngr.entityInfo,
           taskTitle: task.title,
+          isLink: isLink,
           apiBatch: _.cloneDeep(task.apiBatch)
         };
         // If task uses a crmPopup form
@@ -82,18 +84,23 @@
           });
           dialogService.open('crmSearchTask', (task.uiDialog && task.uiDialog.templateUrl) || '~/crmSearchTasks/crmSearchTaskApiBatch.html', data, options)
             // Reload results on success, do nothing on cancel
-            .then(mngr.refreshAfterTask, _.noop);
+            .then((result) => mngr.refreshAfterTask(result, ids), _.noop);
         }
       };
 
-      this.refreshAfterTask = function() {
+      this.refreshAfterTask = function(result, ids) {
         displayCtrl.selectedRows = [];
         displayCtrl.allRowsSelected = false;
-        displayCtrl.rowCount = null;
-        displayCtrl.getResultsPronto();
-        // Trigger all other displays in the same form to update.
-        // This display won't update twice because of the debounce in getResultsPronto()
-        $element.trigger('crmPopupFormSuccess');
+        if (result.action === 'inlineEdit' && ids && ids.length === 1) {
+          displayCtrl.refreshAfterEditing(result, ids[0]);
+        }
+        else {
+          displayCtrl.rowCount = null;
+          displayCtrl.getResultsPronto();
+          // Trigger all other displays in the same form to update.
+          // This display won't update twice because of the debounce in getResultsPronto()
+          $element.trigger('crmPopupFormSuccess');
+        }
       };
     }
 
@@ -203,7 +210,7 @@
           const mngr = this.taskManager;
           event.preventDefault();
           mngr.getMetadata().then(function() {
-            mngr.doTask(_.extend({title: link.title}, mngr.getTaskInfo(link.task)), [id]);
+            mngr.doTask(_.extend({title: link.title}, mngr.getTaskInfo(link.task)), [id], true);
           });
         }
       },

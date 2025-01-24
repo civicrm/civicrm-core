@@ -8,6 +8,8 @@
       ids: '<',
       idField: '@',
       params: '<',
+      displayCtrl: '<',
+      isLink: '<',
       success: '&',
       error: '&'
     },
@@ -41,6 +43,8 @@
       };
 
       function runBatch() {
+        let entityName = ctrl.entity;
+        let actionName = ctrl.action;
         ctrl.first = currentBatch * BATCH_SIZE;
         ctrl.last = (currentBatch + 1) * BATCH_SIZE;
         if (ctrl.last > ctrl.ids.length) {
@@ -55,12 +59,18 @@
               records.push(record);
             });
           });
+        } else if (ctrl.isLink && ctrl.action === 'update' && ctrl.ids.length === 1 && ctrl.displayCtrl) {
+          // When updating a single record from a link, use the inlineEdit action
+          entityName = 'SearchDisplay';
+          actionName = 'inlineEdit';
+          angular.extend(params, ctrl.displayCtrl.getApiParams(null));
+          params.rowKey = ctrl.ids[0];
         } else if (ctrl.action !== 'create') {
           // For other batch actions (update, delete), add supplied ids to the where clause
           params.where = params.where || [];
           params.where.push([ctrl.idField || 'id', 'IN', ctrl.ids.slice(ctrl.first, ctrl.last)]);
         }
-        crmApi4(ctrl.entity, ctrl.action, params).then(
+        crmApi4(entityName, actionName, params).then(
           function(result) {
             stopIncrementer();
             ctrl.progress = Math.floor(100 * ++currentBatch / totalBatches);

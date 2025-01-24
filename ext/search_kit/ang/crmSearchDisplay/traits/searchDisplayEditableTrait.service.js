@@ -54,32 +54,35 @@
 
         crmStatus({}, crmApi4('SearchDisplay', 'inlineEdit', apiParams))
           .then(function(result) {
-            // Create mode
-            if (!row && result.length) {
-              ctrl.results.push(result[0]);
-              ctrl.rowCount++;
-            }
-            // Edit mode
-            else if (row) {
-              // If the api returned a refreshed row, replace the current row with it
-              if (result.length) {
-                // Preserve hierarchical info which isn't returned by the refresh
-                result[0].data._descendents = row.data._descendents;
-                result[0].data._depth = row.data._depth;
-                // Note that extend() will preserve top-level items like 'collapsed' which aren't returned by the refresh
-                angular.extend(row, result[0]);
-              }
-              // Or it's possible that the update caused this row to no longer match filters, in which case remove it
-              else {
-                const rowIndex = ctrl.results.findIndex(result => result.key === row.key);
-                if (rowIndex >= 0) {
-                  ctrl.results.splice(rowIndex, 1);
-                }
-                ctrl.rowCount--;
-              }
-            }
+            ctrl.refreshAfterEditing(result, row ? row.key : null);
           });
       },
+
+      refreshAfterEditing: function(result, rowKey) {
+        // Create mode
+        if (!rowKey && result.length) {
+          this.results.push(result[0]);
+          this.rowCount++;
+          return;
+        }
+        const rowIndex = this.results.findIndex(result => result.key === rowKey);
+        // If the api returned a refreshed row, replace the current row with it
+        if (result.length && rowIndex >= 0) {
+          const row = this.results[rowIndex];
+          // Preserve hierarchical info like _descendents and _depth which isn't returned by the refresh
+          _.defaults(result[0].data, row.data);
+          // Note that extend() will preserve top-level items like 'collapsed' while replacing columns and data
+          angular.extend(row, result[0]);
+        }
+        // Or it's possible that the update caused this row to no longer match filters, in which case do a full refresh
+        else {
+          this.rowCount = null;
+          this.getResultsPronto();
+          // Trigger all other displays in the same form to update.
+          // This display won't update twice because of the debounce in getResultsPronto()
+          this.$element.trigger('crmPopupFormSuccess');
+        }
+      }
 
     };
   });

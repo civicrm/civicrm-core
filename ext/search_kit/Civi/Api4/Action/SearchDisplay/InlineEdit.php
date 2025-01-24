@@ -60,7 +60,8 @@ class InlineEdit extends Run {
    */
   public function updateExistingRow(): void {
     // Apply rowKey to filters
-    $keyName = CoreUtil::getIdFieldName($this->savedSearch['api_entity']);
+    $entityName = $this->savedSearch['api_entity'];
+    $keyName = CoreUtil::getIdFieldName($entityName);
     $this->applyFilter($keyName, $this->rowKey);
     $this->return = NULL;
     $this->_apiParams['offset'] = 0;
@@ -76,11 +77,9 @@ class InlineEdit extends Run {
     // Gather tasks from values; group by entity+action+id
     $columns = $this->display['settings']['columns'];
     foreach ($columns as $columnIndex => $column) {
-      if (array_key_exists($column['key'], $this->values)) {
-        $editableInfo = $existingValues['columns'][$columnIndex]['edit'] ?? NULL;
-        if (!$editableInfo) {
-          throw new \CRM_Core_Exception('Cannot edit column ' . $column['key']);
-        }
+      // Editable column
+      $editableInfo = $existingValues['columns'][$columnIndex]['edit'] ?? NULL;
+      if (array_key_exists($column['key'], $this->values) && $editableInfo) {
         $value = $this->values[$column['key']];
         if (empty($editableInfo['nullable']) && ($value === NULL || $value === '')) {
           continue;
@@ -92,13 +91,35 @@ class InlineEdit extends Run {
         }
         $tasks[$editableInfo['entity']][$taskKey]['record'][$editableInfo['value_key']] = $value;
       }
+      // Links column - check for matching apBatch tasks
+      elseif (!empty($column['links']) || !empty($column['link'])) {
+        $links = !empty($column['links']) ? $column['links'] : [$column['link']];
+        foreach ($links as $link) {
+          if (!empty($link['task']) && ($link['action'] === 'update') && ($link['api_params']['values'] ?? NULL) === $this->values) {
+            $taskKey = 'update' . $this->rowKey;
+            if (empty($tasks[$entityName][$taskKey]['record'])) {
+              $tasks[$entityName][$taskKey]['action'] = 'update';
+              $tasks[$entityName][$taskKey]['record'] = [
+                $keyName => $this->rowKey,
+              ];
+              foreach ($this->values as $key => $value) {
+                $tasks[$entityName][$taskKey]['record'][$key] = $value;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    if (!$tasks) {
+      throw new \CRM_Core_Exception('Inline edit failed.');
     }
 
     $checkPermissions = empty($this->display['settings']['acl_bypass']);
     // Run create/update tasks
-    foreach ($tasks as $editableItems) {
+    foreach ($tasks as $editableEntity => $editableItems) {
       foreach ($editableItems as $editableItem) {
-        civicrm_api4($editableItem['entity'], $editableItem['action'], [
+        civicrm_api4($editableEntity, $editableItem['action'], [
           'checkPermissions' => $checkPermissions,
           'values' => $editableItem['record'],
         ]);

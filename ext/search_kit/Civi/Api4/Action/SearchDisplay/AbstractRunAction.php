@@ -928,6 +928,8 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
           }
           // Fill in the api action if known, for the sake of $this->checkLinkAccess
           $link['action'] = $task['apiBatch']['action'] ?? NULL;
+          // Used by inlineEdit action when running inline tasks
+          $link['api_params'] = $task['apiBatch']['params'] ?? [];
         }
       }
       $link['key'] = $link['prefix'] . $idKey;
@@ -1377,8 +1379,8 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     if ($this->savedSearch['api_entity'] === 'EntitySet') {
       return;
     }
-    // Add `depth_` column for hierarchical entity displays
-    if (!empty($this->display['settings']['hierarchical'])) {
+    // Add `depth_` column for hierarchical entity displays (but not during inline-edit)
+    if (!empty($this->display['settings']['hierarchical']) && !is_a($this, 'Civi\Api4\Action\SearchDisplay\InlineEdit')) {
       $this->addSelectExpression('_depth');
       $this->addSelectExpression('_descendents');
     }
