@@ -15,6 +15,9 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Membership;
+use Civi\Api4\OptionValue;
+
 /**
  * This class generates form components for Membership Renewal
  */
@@ -204,8 +207,12 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $defaults['send_receipt'] = 0;
 
     //set Soft Credit Type to Gift by default
-    $scTypes = CRM_Core_OptionGroup::values('soft_credit_type');
-    $defaults['soft_credit_type_id'] = CRM_Utils_Array::value(ts('Gift'), array_flip($scTypes));
+    $defaults['soft_credit_type_id'] = OptionValue::get(FALSE)
+      ->addSelect('value')
+      ->addWhere('option_group_id:name', '=', 'soft_credit_type')
+      ->addWhere('name', '=', 'gift')
+      ->execute()
+      ->first()['value'] ?? NULL;
 
     $this->assign('renewalDate', $defaults['renewal_date']);
     $this->assign('member_is_test', $defaults['member_is_test'] ?? NULL);
@@ -480,10 +487,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $now = CRM_Utils_Date::getToday(NULL, 'YmdHis');
     $this->assign('receive_date', $this->_params['receive_date'] ?? CRM_Utils_Time::date('Y-m-d H:i:s'));
     $this->processBillingAddress($this->getContributionContactID(), (string) $this->_contributorEmail);
-
-    $this->_params['total_amount'] = CRM_Utils_Array::value('total_amount', $this->_params,
-      CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_memType, 'minimum_fee')
-    );
+    $this->_params['total_amount'] = $this->_params['total_amount'] ?? CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_memType, 'minimum_fee');
     $customFieldsFormatted = CRM_Core_BAO_CustomField::postProcess($this->getSubmittedValues(),
       $this->getMembershipID(),
       'Membership'
@@ -704,22 +708,20 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    * @throws \CRM_Core_Exception
    */
   public function processMembership($memParams, $changeToday, $numRenewTerms, $pending) {
-    $allStatus = CRM_Member_PseudoConstant::membershipStatus();
     $ids = [];
-    $currentMembership = civicrm_api3('Membership', 'getsingle', ['id' => $memParams['id']]);
+    $currentMembership = Membership::get(FALSE)
+      ->addSelect('id', 'join_date', 'membership_type_id', 'start_date', 'status_id:name', 'status_id.is_current_member')
+      ->addWhere('id', '=', $memParams['id'])
+      ->execute()
+      ->first();
 
     // Do NOT do anything.
     //1. membership with status : PENDING/CANCELLED (CRM-2395)
     //2. Paylater/IPN renew. CRM-4556.
-    if ($pending || in_array($currentMembership['status_id'], [
-      array_search('Pending', $allStatus),
-      // CRM-15475
-      array_search('Cancelled', CRM_Member_PseudoConstant::membershipStatus(NULL, " name = 'Cancelled' ", 'name', FALSE, TRUE)),
-    ])) {
+    if ($pending || in_array($currentMembership['status_id:name'], ['Pending', 'Cancelled'])) {
       return CRM_Member_BAO_Membership::create($memParams);
     }
     $memParams['join_date'] = date('Ymd', CRM_Utils_Time::strtotime($currentMembership['join_date']));
-    $isMembershipCurrent = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipStatus', $currentMembership['status_id'], 'is_current_member');
 
     // CRM-7297 Membership Upsell - calculate dates based on new membership type
     $dates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType($currentMembership['id'],
@@ -729,12 +731,12 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     );
     $memParams = array_merge($memParams, [
       'end_date' => $dates['end_date'] ?? NULL,
-      'start_date' => $isMembershipCurrent ? $currentMembership['start_date'] : ($dates['start_date'] ?? NULL),
+      'start_date' => $currentMembership['status_id.is_current_member'] ? $currentMembership['start_date'] : ($dates['start_date'] ?? NULL),
       'log_start_date' => $dates['log_start_date'],
     ]);
 
     // Now Renew the membership
-    if ($isMembershipCurrent) {
+    if ($currentMembership['status_id.is_current_member']) {
       // CURRENT Membership
       if (!empty($currentMembership['id'])) {
         $ids['membership'] = $currentMembership['id'];
