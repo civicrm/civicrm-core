@@ -130,9 +130,10 @@
   --crm-c-alert: var(--crm-c-red);
 }
 
-#civicrm-footer a, nav.breadcrumb a {
-	--crm-c-link: var(--crm-c-dkblue-08);
-	--crm-c-link-hover: var(--crm-c-blue);
+#civicrm-footer a,
+nav.breadcrumb a {
+  --crm-c-link: var(--crm-c-dkblue-08);
+  --crm-c-link-hover: var(--crm-c-blue);
 }
 
 /* eg. Frontend theme selection */
