@@ -83,6 +83,7 @@
   color: var(--crm-input-description);
   font-size: var(--crm-input-label-size);
   margin-bottom: var(--crm-flex-gap);
+  text-wrap: auto;
 }
 .crm-container .crm-marker {
   color: var(--crm-c-alert);
@@ -98,6 +99,7 @@
   border: var(--crm-c-divider);
 }
 .crm-container fieldset:not(.collapsed,
+.crm-collapsible,
 .crm-inactive-dashlet-fieldset,
 .crm-search-admin-edit-columns) {
   padding: var(--crm-fieldset-padding);
@@ -550,8 +552,7 @@ input.crm-form-checkbox) + label {
   font-style: normal;
   text-rendering: auto;
   font-size: .8em;
-  color: #4d4d69;
-  color: #464354;
+  color: var(--crm-c-text);
   content: "";
   font-size: 14px;
   position: relative;
@@ -773,6 +774,7 @@ input.crm-form-checkbox) + label {
   cursor: var(--crm-hover-clickable);
   padding: var(--crm-s);
   text-align: center;
+  color: var(--crm-c-text);
 }
 
 /* JQ spinner */

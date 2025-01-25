@@ -623,3 +623,16 @@ html.crm-standalone  nav.breadcrumb>ol {
   /* the hover state gives crm-c-red-dark to the background */
   --crm-c-alert-text: var(--crm-c-red-light);
 }
+
+/* Fix Mosaico wizard */
+.crm_wizard__title {
+  --crm-panel-background: transparent;
+}
+.crmb-wizard-button-right {
+  gap: 1rem;
+}
+
+/* Support contact dashboard image float */
+.contactCardRight:has(#crm-contact-thumbnail) .float-left {
+  width: calc(100% - var(--crm-flex-gap) - var(--crm-dash-image-size));
+}

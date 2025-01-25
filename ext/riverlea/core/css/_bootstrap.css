@@ -2993,6 +2993,7 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
   cursor: var(--crm-hover-clickable);
   background: transparent;
   border: 0;
+  height: auto;
   appearance: none;
 }
 
@@ -3450,6 +3451,9 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
 #bootstrap-theme .label-danger[href]:hover,
 #bootstrap-theme .label-danger[href]:focus {
   background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-c-alert);
+}
+#bootstrap-theme .label i.crm-i {
+  color: inherit; /* resets icons inside lables to use the label text colour */
 }
 
 /* Panels */

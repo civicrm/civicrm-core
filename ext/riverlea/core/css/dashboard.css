@@ -1,5 +1,5 @@
 /* Style rules for Dashboard.
-   Forked on 11 June 24. Called on main Civi dashboard home screen.
+   Forked on 11 June 24, updated 16 Jan 25. Called on main Civi dashboard home screen.
    Status: merged (theme edits integrated)
    NB - all Important Declarations can be removed for > 5.75 */
 
@@ -49,7 +49,6 @@
   padding: var(--crm-xs) var(--crm-s);
   text-decoration: none;
   font-size: var(--crm-font-size);
-  font-weight: normal;
   cursor: var(--crm-hover-clickable);
   opacity: .7;
   float: right;

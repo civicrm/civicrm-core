@@ -144,6 +144,7 @@ a.crm-expand-row:focus {
   padding: var(--crm-expand-body-padding);
   background-color: var(--crm-expand-body-bg);
   box-shadow: var(--crm-expand-body-box-shadow);
+  color: var(--crm-c-text); /* specified for Drupal Claro Darkmode */
 }
 .crm-container .widget-content .crm-accordion-body,
 .crm-container .crm-collapsible .crm-summary-block {

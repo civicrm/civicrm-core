@@ -41,17 +41,22 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 .crm-container #crm-notification-container div.ui-notify-message.error h1::before,
 .crm-container span.batch-invalid::before {
   content: var(--crm-icon-alert);
-  color: var(--crm-c-alert);
+  color: var(--crm-notify-alert);
 }
 .crm-container #crm-notification-container div.ui-notify-message.success h1::before,
 .crm-container span.batch-valid::before {
   content: var(--crm-icon-success);
-  color: var(--crm-c-success);
+  color: var(--crm-notify-success);
 }
 .crm-container #crm-notification-container div.ui-notify-message.info h1::before,
 .crm-container .messages.crm-empty-table::before {
   content: var(--crm-icon-info);
-  color: var(--crm-c-info);
+  color: var(--crm-notify-info);
+}
+.crm-container #crm-notification-container div.ui-notify-message.alert h1::before,
+.crm-container #crm-notification-container div.ui-notify-message.warning h1::before {
+  content: var(--crm-icon-alert);
+  color: var(--crm-notify-warning);
 }
 .crm-container .messages.crm-empty-table > i.crm-i {
   display: none; /* removes double icon when markup uses both */

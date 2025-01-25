@@ -25,17 +25,16 @@
   --crm-c-gray-050: #eaeaea;
   --crm-c-gray-025: #fbfafa;
   --crm-c-blue: #bce8f1;
-  --crm-c-blue-light: #d9edf7;
-  --crm-c-blue-dark: #297292;
-  --crm-c-blue-darker: #215c76;
+  --crm-c-blue-light: #e9f5fb;
+  --crm-c-blue-dark: #20576f;
   --crm-c-purple: #4d4d69;
   --crm-c-purple-dark: #3e3e54;
   --crm-c-green: #d6e9c6;
-  --crm-c-green-light: #dff0d8;
-  --crm-c-green-dark: #468847;
+  --crm-c-green-light: #dfefdc;
+  --crm-c-green-dark: #2e562e;
   --crm-c-red: #eed3d7;
-  --crm-c-red-light: #f2dede;
-  --crm-c-red-dark: #b94a48;
+  --crm-c-red-light: #f9e6eb;
+  --crm-c-red-dark: #91223c;
   --crm-c-amber: #dd5600;
   --crm-c-amber-light: #fbf0e2;
   --crm-c-yellow: #fcfc5a;
@@ -325,7 +324,7 @@
   --crm-dash-header-padding: 0 0 var(--crm-r) 0;
   --crm-dash-image-size: 100px;
   --crm-dash-image-radius: 0;
-  --crm-dash-image-right: 10px; /* distance from right of dashboard */
+  --crm-dash-image-right: var(--crm-dash-panel-padding); /* distance from right of dashboard */
   --crm-dash-image-top: unset; /* distance from top of dashboard */
   --crm-dash-image-border: 0;
 /* Dialog */
@@ -376,8 +375,12 @@
   --crm-notify-col: var(--crm-c-light-text);
   --crm-notify-accent-border: 2px 0 0 0; /* adds a border to one/several sides of the notification - set to 0 for none */
   --crm-notify-radius: var(--crm-roundness);
+  --crm-notify-alert: #d02e2e;
+  --crm-notify-warning: #f6721e;
+  --crm-notify-success: #9bc27b;
+  --crm-notify-info: #34a0cf;
 /* Icons */
-  --crm-icon-alert: "\f06a";
+  --crm-icon-alert: "\f071";
   --crm-icon-success: "\f058";
   --crm-icon-info: "\f05a";
   --crm-icon-close: "\f00d";

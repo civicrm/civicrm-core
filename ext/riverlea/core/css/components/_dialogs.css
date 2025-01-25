@@ -174,17 +174,17 @@
   text-decoration: underline;
 }
 #crm-notification-container div.ui-notify-message-style.error {
-  border-color: var(--crm-c-alert);
+  border-color: var(--crm-notify-alert);
 }
 #crm-notification-container div.ui-notify-message-style.alert,
 #crm-notification-container div.ui-notify-message-style.warning {
-  border-color: var(--crm-c-warning);
+  border-color: var(--crm-notify-warning);
 }
 #crm-notification-container div.ui-notify-message-style.success {
-  border-color: var(--crm-c-success);
+  border-color: var(--crm-notify-success);
 }
 #crm-notification-container div.ui-notify-message-style.info {
-  border-color: var(--crm-c-info);
+  border-color: var(--crm-notify-info);
 }
 #crm-notification-container div.ui-notify-message:last-child {
   margin-bottom: 0;
@@ -220,6 +220,6 @@
 #crm-notification-container div.ui-notify-message-style a.ui-button.ui-widget,
 #crm-notification-container div.ui-notify-message-style a.ui-button.ui-widget:hover,
 #crm-notification-container div.ui-notify-message-style a.ui-button.ui-widget:focus {
-  background: var(--crm-c-alert);
+  background: var(--crm-notify-alert);
   border: 0;
 }

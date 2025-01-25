@@ -427,6 +427,10 @@
   --crm-notify-col: var(--crm-c-text); /* thames */
   --crm-notify-accent-border: 0.875rem 0 0 0; /* adds a border to one/several sides of the notification - set to 0 for none */ /* thames */
   --crm-notify-radius: 4px; /* thames */
+  --crm-notify-alert: var(--crm-c-alert);
+  --crm-notify-warning: var(--crm-c-warning);
+  --crm-notify-success: var(--crm-c-success);
+  --crm-notify-info: var(--crm-c-info);
 }
 :root {
 /* Icons */

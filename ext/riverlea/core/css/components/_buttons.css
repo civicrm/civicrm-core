@@ -149,7 +149,8 @@
   background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-btn-success-bg);
   color: var(--crm-btn-success-text);
 }
-#bootstrap-theme .btn-danger {
+#bootstrap-theme .btn-danger,
+#bootstrap-theme button.btn-danger:has(.fa-times) {
   background: var(--crm-btn-alert-bg);
   color: var(--crm-btn-alert-text);
 }

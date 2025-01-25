@@ -92,7 +92,7 @@
   background-color: var(--crm-dash-summary-row-bg);
   z-index: 3;
 }
-#contact-summary .crm-edit-help .crm-i.fa-pencil {
+.crm-contact-page .crm-edit-help .crm-i.fa-pencil {
   float: right;
   color: var(--crm-c-text);
   margin: var(--crm-xs) 0 0 var(--crm-m);
@@ -153,8 +153,8 @@ div.crm-inline-edit-form div.crm-clear {
   display: table-cell;
   padding: 0;
 }
-#contact-summary .crm-inline-button,
-#contact-summary .crm-submit-buttons {
+.crm-contact-page .crm-inline-button,
+.crm-contact-page .crm-submit-buttons {
   margin-bottom: 0;
   padding-bottom: var(--crm-m2);
 }
@@ -336,16 +336,16 @@ div.crm-inline-edit-form div.crm-clear {
 #crm-main-content-wrapper:has(.crm-contact-page) {
   box-shadow: var(--crm-block-shadow);
 }
-#contact-summary .crm-summary-block {
+.crm-contact-page .crm-summary-block {
   background: var(--crm-dash-block-bg);
   border-radius: var(--crm-roundness);
   box-shadow: var(--crm-block-shadow);
   margin-bottom: var(--crm-dash-panel-padding);
 }
-#contact-summary .crm-summary-block .crm-summary-block {
+.crm-contact-page .crm-summary-block .crm-summary-block {
   box-shadow: none;
 }
-#contact-summary div.crm-clear {
+.crm-contact-page div.crm-clear {
   padding: var(--crm-dash-block-padding);
 }
 #mainTabContainer .crm-summary-block .crm-container-snippet table {

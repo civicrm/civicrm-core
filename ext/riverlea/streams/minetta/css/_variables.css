@@ -7,3 +7,6 @@
 :root {
   --crm-version: 'Minetta, v' var(--crm-release);
 }
+.contactCardRight:has(#crm-contact-thumbnail) .float-left {
+  width: calc(100% - var(--crm-flex-gap) - var(--crm-dash-image-size));
+}

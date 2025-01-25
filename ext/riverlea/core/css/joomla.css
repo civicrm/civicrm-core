@@ -70,3 +70,6 @@ body.admin.com_civicrm.layout-default #content > .row {
 body.com_civicm.layout-default .table tbody a:not(.badge):not(.btn):not(.dropdown-item) {
   text-decoration: var(--crm-link-decoration);
 }
+.table tbody a:not(.badge):not(.btn):not(.dropdown-item) {
+  text-decoration: none; /* Reset theme */
+}
