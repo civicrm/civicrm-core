@@ -94,12 +94,6 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    * Load all entities
    */
   protected function loadEntities() {
-    // if submission id is passed then we should display the submission data
-    if ($this->fillMode === 'form' && !empty($this->args['sid'])) {
-      $this->prePopulateSubmissionData();
-      return;
-    }
-
     // When loading a single join for an entity, only that entity needs to be processed
     if ($this->fillMode === 'join') {
       $entityNames = array_keys(array_intersect_key($this->args, $this->_formDataModel->getEntities()));
@@ -145,27 +139,6 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
       }
       $event = new AfformPrefillEvent($this->_afform, $this->_formDataModel, $this, $entity['type'], $entityName, $this->_entityIds);
       \Civi::dispatcher()->dispatch('civi.afform.prefill', $event);
-    }
-  }
-
-  /**
-   * Load the data from submission table
-   */
-  protected function prePopulateSubmissionData() {
-    // if submission id is passed then get the data from submission
-    $afformSubmissionData = \Civi\Api4\AfformSubmission::get(TRUE)
-      ->addSelect('data')
-      ->addWhere('id', '=', $this->args['sid'])
-      ->addWhere('afform_name', '=', $this->name)
-      ->execute()->first();
-
-    $this->_entityValues = $this->_formDataModel->getEntities();
-    foreach ($this->_entityValues as $entity => &$values) {
-      foreach ($afformSubmissionData['data'] as $e => $submission) {
-        if ($entity === $e) {
-          $values = $submission ?? [];
-        }
-      }
     }
   }
 
