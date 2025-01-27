@@ -30,6 +30,8 @@ class CRM_Mailing_Page_Common extends CRM_Core_Page {
     $queue_id = CRM_Utils_Request::retrieve('qid', 'Integer');
     $hash = CRM_Utils_Request::retrieve('h', 'String');
 
+    // @todo - stop requiring job - at least for actions where it is not required
+    // as queue_id + hash is expected to be enough now.
     if (!$job_id ||
       !$queue_id ||
       !$hash
