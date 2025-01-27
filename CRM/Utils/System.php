@@ -1982,4 +1982,25 @@ class CRM_Utils_System {
     self::sendResponse(new Response(200, [], $message));
   }
 
+  public static function isMaintenanceMode(): bool {
+    try {
+      $civicrmSetting = \Civi::settings()->get('core_maintenance_mode');
+
+      // if CiviCRM setting is set, use that answer
+      if (!is_null($civicrmSetting)) {
+        return (bool) $civicrmSetting;
+      }
+
+      // otherwise ask the userSystem
+      return CRM_Core_Config::singleton()->userSystem->isMaintenanceMode();
+    }
+    catch (\Exception $e) {
+      // catch in case something isn't fully booted and can't answer
+      //
+      // we assume we are *NOT* in maintenance mode. though maybe we
+      // should check a constant / env var / database directly?
+      return FALSE;
+    }
+  }
+
 }

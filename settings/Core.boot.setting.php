@@ -74,4 +74,21 @@ return [
     'global_name' => 'CIVICRM_DOMAIN_ID',
     'add' => '5.80',
   ],
+  'core_maintenance_mode' => [
+    'group_name' => 'CiviCRM Preferences',
+    'group' => 'core',
+    'name' => 'core_maintenance_mode',
+    'type' => 'Boolean',
+    // NOTE: NULL means ask the userSystem
+    'default' => NULL,
+    'title' => ts('CiviCRM Maintenance Mode'),
+    'description' => ts('Enabling Maintenance Mode will restrict certain functionality such as scheduled job runs and REST api calls. If not set, CiviCRM will attempt to check whether the CMS is in maintenance mode.'),
+    'help_text' => NULL,
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'is_constant' => FALSE,
+    'is_env_loadable' => TRUE,
+    'global_name' => 'CIVICRM_MAINTENANCE_MODE',
+    'add' => '6.0',
+  ],
 ];
