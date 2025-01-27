@@ -3,6 +3,7 @@
     <af-field name="title" />
     <af-field name="description" />
     <af-field name="base_module" defn="{input_attrs: {multiple: true}}" />
+    <af-field name="tags" defn="{search_operator: 'CONTAINS', input_attrs: {}, label: 'Tag'}" />
   </div>
   <crm-search-display-table search-name="SearchKit_Reports" display-name="SearchKit_Reports_Table"></crm-search-display-table>
 </div>
