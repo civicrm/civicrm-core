@@ -21,6 +21,7 @@ class AfformPrefillUsageTest extends AfformUsageTestCase {
     <div class="af-container">
       <af-field name="id"></af-field>
       <af-field name="preferred_communication_method"></af-field>
+      <af-field name="sort_name"></af-field>
       <afblock-name-individual></afblock-name-individual>
     </div>
     <div af-join="Email" af-repeat="Add" af-copy="Copy" min="1">
@@ -67,9 +68,12 @@ EOHTML;
     // Form entity has `max="3"`
     $this->assertCount(3, $prefill['Individual1']['values']);
     $this->assertEquals('A', $prefill['Individual1']['values'][0]['fields']['first_name']);
+    $this->assertEquals('_A, A', $prefill['Individual1']['values'][0]['fields']['sort_name']);
     $this->assertEquals([1, 3], $prefill['Individual1']['values'][0]['fields']['preferred_communication_method']);
     $this->assertEquals('B', $prefill['Individual1']['values'][1]['fields']['first_name']);
+    $this->assertEquals('_B, B', $prefill['Individual1']['values'][1]['fields']['sort_name']);
     $this->assertEquals('C', $prefill['Individual1']['values'][2]['fields']['first_name']);
+    $this->assertEquals('_C, C', $prefill['Individual1']['values'][2]['fields']['sort_name']);
 
     // One email should have been filled
     $this->assertCount(1, $prefill['Individual1']['values'][1]['joins']['Email']);

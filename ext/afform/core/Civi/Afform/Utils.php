@@ -105,11 +105,10 @@ class Utils {
     $value = $values[$fieldName] ?? NULL;
     if (isset($value) && $value !== '') {
       $dataType = $fieldInfo['data_type'] ?? NULL;
-      $inputType = $fieldInfo['input_type'] ?? NULL;
       if (!empty($fieldInfo['options'])) {
         $value = FormattingUtil::replacePseudoconstant(array_column($fieldInfo['options'], 'label', 'id'), $value);
       }
-      elseif ($inputType === 'EntityRef' && !empty($fieldInfo['fk_entity']) && $formName) {
+      elseif (!empty($fieldInfo['fk_entity']) && $formName) {
         $autocomplete = civicrm_api4($fieldInfo['fk_entity'], 'autocomplete', [
           'checkPermissions' => FALSE,
           'formName' => "afform:$formName",
