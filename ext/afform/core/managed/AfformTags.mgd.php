@@ -2,47 +2,27 @@
 
 use CRM_Afform_ExtensionUtil as E;
 
-// Option group for Afform.tags field
+// This file:
+// - adds option value to `tag_used_for`, allowing Afforms to be tagged
+//   NOTE: this is unusual in that afform is not a db entity
+//   (normally the value normally corresponds to a physical table name in the
+//   database - here it is just the entity name)
 return [
   [
-    'name' => 'AfformTags',
-    'entity' => 'OptionGroup',
-    'update' => 'always',
+    'name' => 'AfformTags:tag_used_for',
+    'entity' => 'OptionValue',
     'cleanup' => 'always',
+    'update' => 'always',
     'params' => [
       'version' => 4,
       'values' => [
-        'name' => 'afform_tags',
-        'title' => E::ts('Afform Tags'),
+        'option_group_id.name' => 'tag_used_for',
+        'value' => 'Afform',
+        'name' => 'Afform',
+        'label' => E::ts('Afforms'),
         'is_reserved' => TRUE,
         'is_active' => TRUE,
-        'option_value_fields' => [
-          'name',
-          'label',
-          'icon',
-          'description',
-          'color',
-        ],
-      ],
-      'match' => ['name'],
-    ],
-  ],
-  [
-    'name' => 'AfformTags:donor_journey',
-    'entity' => 'OptionValue',
-    'cleanup' => 'unused',
-    'update' => 'unmodified',
-    'params' => [
-      'version' => 4,
-      'values' => [
-        'option_group_id.name' => 'afform_tags',
-        'name' => 'donor_journey',
-        'value' => 'donor_journey',
-        'label' => E::ts('Donor Journey'),
-        'is_reserved' => FALSE,
-        'is_active' => TRUE,
-        'icon' => 'fa-coins',
-        'description' => E::ts('Forms relating to donor journey.'),
+        'domain_id' => NULL,
       ],
       'match' => ['option_group_id', 'name'],
     ],

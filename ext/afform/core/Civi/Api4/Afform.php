@@ -196,7 +196,9 @@ class Afform extends Generic\AbstractEntity {
         [
           'name' => 'tags',
           'title' => E::ts('Tags'),
-          'pseudoconstant' => ['optionGroupName' => 'afform_tags'],
+          'pseudoconstant' => [
+            'callback' => [Utils\AfformTags::class, 'getTagOptions'],
+          ],
           'data_type' => 'Array',
           'input_type' => 'Select',
         ],
