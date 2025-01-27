@@ -1294,10 +1294,21 @@
     .directive('crmUiIconPicker', function($timeout) {
       return {
         restrict: 'A',
-        controller: function($element) {
+        require: '?ngModel', // Soft require ngModel
+        controller: function($element, $scope, $attrs) {
           CRM.loadScript(CRM.config.resourceBase + 'js/jquery/jquery.crmIconPicker.js').then(function() {
             $timeout(function() {
               $element.crmIconPicker();
+
+              // If ngModel is present, set up two-way binding
+              if ($attrs.ngModel) {
+                $scope.$watch($attrs.ngModel, function(newValue) {
+                  if (newValue !== undefined) {
+                    // Update the value in the picker
+                    $element.val(newValue).trigger('change');
+                  }
+                });
+              }
             });
           });
         }
