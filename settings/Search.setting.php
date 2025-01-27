@@ -102,7 +102,7 @@ return [
     'name' => 'includeAlphabeticalPager',
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
-    'default' => 1,
+    'default' => 0,
     'add' => '4.6',
     'title' => ts('Include Alphabetical Pager'),
     'is_domain' => 1,
