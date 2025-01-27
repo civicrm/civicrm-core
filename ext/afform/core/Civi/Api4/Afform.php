@@ -194,6 +194,13 @@ class Afform extends Generic\AbstractEntity {
           'data_type' => 'Array',
         ],
         [
+          'name' => 'tags',
+          'title' => E::ts('Tags'),
+          'pseudoconstant' => ['optionGroupName' => 'afform_tags'],
+          'data_type' => 'Array',
+          'input_type' => 'Select',
+        ],
+        [
           'name' => 'summary_contact_type',
           'title' => E::ts('Summary Contact Type'),
           'data_type' => 'Array',
