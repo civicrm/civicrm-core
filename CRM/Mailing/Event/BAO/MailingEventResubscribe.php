@@ -63,7 +63,6 @@ class CRM_Mailing_Event_BAO_MailingEventResubscribe {
     $job = CRM_Mailing_BAO_MailingJob::getTableName();
     $mailing = CRM_Mailing_BAO_Mailing::getTableName();
     $group = CRM_Contact_BAO_Group::getTableName();
-    $gc = CRM_Contact_BAO_GroupContact::getTableName();
 
     // We Need the mailing Id for the hook...
     $do->query("SELECT $job.mailing_id as mailing_id
@@ -127,20 +126,20 @@ class CRM_Mailing_Event_BAO_MailingEventResubscribe {
 
     // Now we have a complete list of recipient groups.  Filter out all
     // those except smart groups and those that the contact belongs to.
-    $do->query("
-            SELECT      $group.id as group_id,
-                        $group.title as title
-            FROM        $group
-            LEFT JOIN   $gc
-                ON      $gc.group_id = $group.id
-            WHERE       $group.id IN (" . implode(', ', $group_ids) . ")
-                AND     ($group.saved_search_id is not null
-                            OR  ($gc.contact_id = $contact_id
-                                AND $gc.status = 'Removed')
+    $dao = CRM_Core_DAO::executeQuery("
+            SELECT      civicrm_group.id as group_id,
+                        civicrm_group.title as title
+            FROM        civicrm_group
+            LEFT JOIN   civicrm_group_contact as group_contact
+                ON      group_contact.group_id = civicrm_group.id
+            WHERE       civicrm_group.id IN (" . implode(', ', $group_ids) . ")
+                AND     (civicrm_group.saved_search_id is not null
+                            OR  (group_contact.contact_id = $contact_id
+                                AND group_contact.status = 'Removed')
                         )");
 
-    while ($do->fetch()) {
-      $groups[$do->group_id] = $do->title;
+    while ($dao->fetch()) {
+      $groups[$dao->group_id] = $dao->title;
     }
 
     $contacts = [$contact_id];
