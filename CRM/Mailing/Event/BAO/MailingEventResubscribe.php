@@ -66,11 +66,9 @@ class CRM_Mailing_Event_BAO_MailingEventResubscribe {
     $gc = CRM_Contact_BAO_GroupContact::getTableName();
 
     // We Need the mailing Id for the hook...
-    $do->query("SELECT $job.mailing_id as mailing_id
-                     FROM   $job
-                     WHERE $job.id = " . CRM_Utils_Type::escape($job_id, 'Integer'));
-    $do->fetch();
-    $mailing_id = $do->mailing_id;
+    $mailing_id = CRM_Core_DAO::singleValueQuery("SELECT mailing_id as mailing_id
+                     FROM civicrm_mailing_job
+                     WHERE id = " . CRM_Utils_Type::escape($job_id, 'Integer'));
 
     $do->query("
             SELECT      $mg.entity_table as entity_table,
