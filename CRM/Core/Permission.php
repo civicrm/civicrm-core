@@ -853,6 +853,10 @@ class CRM_Core_Permission {
         'label' => $prefix . ts('access AJAX API'),
         'description' => ts('Allow API access even if Access CiviCRM is not granted'),
       ],
+      'bypass maintenance mode' => [
+        'label' => $prefix . ts('Bypass Maintenance Mode'),
+        'description' => ts('Allow to bypass maintenance mode checks - e.g. when using AJAX API'),
+      ],
       'access contact reference fields' => [
         'label' => $prefix . ts('access contact reference fields'),
         'description' => ts('Allow entering data into contact reference fields'),
