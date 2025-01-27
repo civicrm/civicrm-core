@@ -92,7 +92,7 @@ class CRM_Mailing_Form_Optout extends CRM_Core_Form {
     CRM_Core_Session::singleton()->pushUserContext($confirmURL);
 
     // Email address verified
-    if (CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_domain($this->_job_id, $this->_queue_id, $this->_hash)) {
+    if (CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_domain(NULL, $this->_queue_id, $this->_hash)) {
       CRM_Mailing_Event_BAO_MailingEventUnsubscribe::send_unsub_response($this->_queue_id, NULL, TRUE, $this->_job_id);
     }
 

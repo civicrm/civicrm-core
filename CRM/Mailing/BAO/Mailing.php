@@ -920,7 +920,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       'Subject' => $this->subject,
       'List-Unsubscribe' => "<mailto:{$verp['unsubscribe']}>",
     ];
-    self::addMessageIdHeader($headers, 'm', $job_id, $event_queue_id, $hash);
+    self::addMessageIdHeader($headers, 'm', NULL, $event_queue_id, $hash);
     return [&$verp, &$urls, &$headers];
   }
 
