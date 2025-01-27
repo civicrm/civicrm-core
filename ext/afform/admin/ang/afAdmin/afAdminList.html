@@ -75,7 +75,12 @@
         <i class="crm-i fa-sort-{{ $ctrl.sortDir ? 'asc' : 'desc' }}" ng-if="$ctrl.sortField === 'base_module'"></i>
         {{:: ts('Package') }}
       </th>
-      <th></th>
+      <th title="{{:: ts('Click to sort') }}" ng-click="$ctrl.sortBy('tags')">
+        <i class="crm-i fa-sort disabled" ng-if="$ctrl.sortField !== 'tags'"></i>
+        <i class="crm-i fa-sort-{{ $ctrl.sortDir ? 'asc' : 'desc' }}" ng-if="$ctrl.sortField === 'tags'"></i>
+        {{:: ts('Tags') }}
+      </th>
+      <th>{{:: ts('Actions') }}</th>
     </tr>
     </thead>
     <tbody>
@@ -90,7 +95,9 @@
           {{:: afform.server_route }}
         </a>
       </td>
-      <td>{{:: afform.placement.join(', ') }}</td>
+      <td>
+        {{:: afform.placement.join(', ') }}
+      </td>
       <td ng-if="$ctrl.tab === 'form'">
         {{:: afform.submit_currently_open ? ts('Open') : ts('Closed') }}
         <span ng-if="afform.submit_limit && afform.submit_enabled">
@@ -107,6 +114,9 @@
       </td>
       <td>
         {{:: afform['base_module:label'] }}
+      </td>
+      <td>
+        {{:: afform.tags.join(', ') }}
       </td>
       <td class="text-right">
         <a ng-if="afform.type !== 'system'" ng-href="#/edit/{{:: afform.name }}" class="btn btn-xs btn-primary">{{:: ts('Edit') }}</a>
