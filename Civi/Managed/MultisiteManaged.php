@@ -55,7 +55,12 @@ class MultisiteManaged extends AutoService implements EventSubscriberInterface {
       if ($index) {
         $copy['name'] .= '_' . $domainId;
       }
+      // Add concrete domain_id to the values
       $copy['params']['values']['domain_id'] = $domainId;
+      // If matching is enabled, ensure we also match on domain_id
+      if (isset($copy['params']['match']) && !in_array('domain_id', $copy['params']['match'])) {
+        $copy['params']['match'][] = 'domain_id';
+      }
       $copies[] = $copy;
     }
     return $copies;
