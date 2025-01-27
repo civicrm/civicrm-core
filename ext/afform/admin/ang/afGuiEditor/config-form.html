@@ -91,6 +91,14 @@
       <p class="help-block">{{:: ts('Additional contexts in which the form can be embedded') }}</p>
     </div>
 
+    <div class="form-group">
+      <label for="afform_tags">
+        {{:: ts('Tags') }}
+      </label>
+      <input ng-list crm-ui-select="{multiple: true, data: editor.meta.afform_tags, placeholder: ts('None')}" class="form-control" id="afform_tags" ng-model="editor.afform.tags">
+      <p class="help-block">{{:: ts('Tags can be used to keep track of your forms') }}</p>
+    </div>
+
     <div class="form-group" ng-if="editor.afform.placement.includes('contact_summary_block') || editor.afform.placement.includes('contact_summary_tab')">
       <div class="form-inline">
         <label for="afform_summary_contact_type">{{:: ts('For') }}</label>
