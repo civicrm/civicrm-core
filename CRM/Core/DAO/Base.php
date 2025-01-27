@@ -136,7 +136,7 @@ abstract class CRM_Core_DAO_Base extends CRM_Core_DAO {
         $field['required'] = TRUE;
       }
       if (str_starts_with($fieldSpec['sql_type'], 'decimal(')) {
-        $precision = self::getFieldLength($fieldSpec['sql_type']);
+        $precision = CRM_Core_BAO_SchemaHandler::getFieldLength($fieldSpec['sql_type']);
         $field['precision'] = array_map('intval', explode(',', $precision));
       }
       foreach (['maxlength', 'size', 'rows', 'cols'] as $attr) {
@@ -146,7 +146,7 @@ abstract class CRM_Core_DAO_Base extends CRM_Core_DAO {
         }
       }
       if (str_contains($fieldSpec['sql_type'], 'char(')) {
-        $length = self::getFieldLength($fieldSpec['sql_type']);
+        $length = CRM_Core_BAO_SchemaHandler::getFieldLength($fieldSpec['sql_type']);
         if (!isset($field['size'])) {
           $field['size'] = constant(CRM_Utils_Schema::getDefaultSize($length));
         }
@@ -230,14 +230,6 @@ abstract class CRM_Core_DAO_Base extends CRM_Core_DAO {
       $fields[$fieldName] = $field;
     }
     return $fields;
-  }
-
-  private static function getFieldLength($sqlType): ?string {
-    $open = strpos($sqlType, '(');
-    if ($open) {
-      return substr($sqlType, $open + 1, -1);
-    }
-    return NULL;
   }
 
   /**

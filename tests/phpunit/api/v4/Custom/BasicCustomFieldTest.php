@@ -35,85 +35,89 @@ class BasicCustomFieldTest extends Api4TestBase {
   /**
    * @throws \CRM_Core_Exception
    */
-  public function testWithSingleField(): void {
+  public function testWithLinkField(): void {
     $this->createTestRecord('CustomGroup', [
       'title' => 'MyIndividualFields',
       'extends' => 'Individual',
     ]);
 
     $this->createTestRecord('CustomField', [
-      'label' => 'FavColor',
+      'label' => 'MyLink',
       'custom_group_id.name' => 'MyIndividualFields',
       'html_type' => 'Text',
-      'data_type' => 'String',
+      // Will default to 2047 characters
+      'data_type' => 'Link',
+      // Test that adding an index works for such a large field
+      'is_searchable' => TRUE,
     ]);
 
     // Individual fields should show up when contact_type = null|Individual but not other contact types
     $getFields = Contact::getFields(FALSE);
-    $this->assertEquals('Custom', $getFields->execute()->indexBy('name')['MyIndividualFields.FavColor']['type']);
-    $this->assertContains('MyIndividualFields.FavColor', $getFields->setValues(['contact_type' => 'Individual'])->execute()->column('name'));
-    $this->assertNotContains('MyIndividualFields.FavColor', $getFields->setValues(['contact_type:name' => 'Household'])->execute()->column('name'));
+    $this->assertEquals('Custom', $getFields->execute()->indexBy('name')['MyIndividualFields.MyLink']['type']);
+    $this->assertContains('MyIndividualFields.MyLink', $getFields->setValues(['contact_type' => 'Individual'])->execute()->column('name'));
+    $this->assertNotContains('MyIndividualFields.MyLink', $getFields->setValues(['contact_type:name' => 'Household'])->execute()->column('name'));
 
     $contactId = $this->createTestRecord('Contact', [
       'first_name' => 'Johann',
       'last_name' => 'Tester',
       'contact_type' => 'Individual',
-      'MyIndividualFields.FavColor' => '<Red>',
+      'MyIndividualFields.MyLink' => 'http://example.com/?q=123&a=456',
     ])['id'];
 
     $contact = Contact::get(FALSE)
       ->addSelect('first_name')
-      ->addSelect('MyIndividualFields.FavColor')
+      ->addSelect('MyIndividualFields.MyLink')
       ->addWhere('id', '=', $contactId)
-      ->addWhere('MyIndividualFields.FavColor', '=', '<Red>')
+      ->addWhere('MyIndividualFields.MyLink', 'LIKE', '%q=123&a=456')
       ->execute()
       ->first();
 
-    $this->assertEquals('<Red>', $contact['MyIndividualFields.FavColor']);
+    $this->assertEquals('http://example.com/?q=123&a=456', $contact['MyIndividualFields.MyLink']);
 
+    $veryLongLink = 'http://example.com/?a=' . str_repeat('a', 500) . '&b=' . str_repeat('b', 500) . '&c=' . str_repeat('c', 500) . '&d=' . str_repeat('d', 500);
     Contact::update()
       ->addWhere('id', '=', $contactId)
-      ->addValue('MyIndividualFields.FavColor', 'Blue&Pink')
+      ->addValue('MyIndividualFields.MyLink', $veryLongLink)
       ->execute();
 
     $contact = Contact::get(FALSE)
-      ->addSelect('MyIndividualFields.FavColor')
+      ->addSelect('MyIndividualFields.MyLink')
       ->addWhere('id', '=', $contactId)
       ->execute()
       ->first();
 
-    $this->assertEquals('Blue&Pink', $contact['MyIndividualFields.FavColor']);
+    $this->assertSame($veryLongLink, $contact['MyIndividualFields.MyLink']);
 
     // Try setting to null
     Contact::update()
       ->addWhere('id', '=', $contactId)
-      ->addValue('MyIndividualFields.FavColor', NULL)
+      ->addValue('MyIndividualFields.MyLink', NULL)
       ->execute();
     $contact = Contact::get(FALSE)
-      ->addSelect('MyIndividualFields.FavColor')
+      ->addSelect('MyIndividualFields.MyLink')
       ->addWhere('id', '=', $contactId)
       ->execute()
       ->first();
-    $this->assertEquals(NULL, $contact['MyIndividualFields.FavColor']);
+    $this->assertEquals(NULL, $contact['MyIndividualFields.MyLink']);
 
     // Disable the field and it disappears from getFields and from the API output.
     CustomField::update(FALSE)
       ->addWhere('custom_group_id:name', '=', 'MyIndividualFields')
-      ->addWhere('name', '=', 'FavColor')
+      ->addWhere('name', '=', 'MyLink')
       ->addValue('is_active', FALSE)
       ->execute();
 
     $getFields = Contact::getFields(FALSE)
       ->execute()->column('name');
     $this->assertContains('first_name', $getFields);
-    $this->assertNotContains('MyIndividualFields.FavColor', $getFields);
+    $this->assertNotContains('MyIndividualFields.MyLink', $getFields);
 
     $contact = Contact::get(FALSE)
-      ->addSelect('MyIndividualFields.FavColor')
+      ->addSelect('MyIndividualFields.MyLink')
       ->addWhere('id', '=', $contactId)
       ->execute()
       ->first();
-    $this->assertArrayNotHasKey('MyIndividualFields.FavColor', $contact);
+    $this->assertArrayNotHasKey('MyIndividualFields.MyLink', $contact);
   }
 
   public function testWithTwoFields(): void {
