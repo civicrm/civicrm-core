@@ -1442,8 +1442,9 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
     foreach ($values as $cid => $details) {
       $relatedContacts = array_keys(CRM_Utils_Array::value('relatedContacts', $details, []));
       $mainRelatedContactId = reset($relatedContacts);
+      $relatedMemberships = $relationshipProcessor->getRelationshipMembershipsForContact((int) $cid, $params['membership_type_ids'] ?? []);
 
-      foreach ($relationshipProcessor->getRelationshipMembershipsForContact((int) $cid) as $membershipId => $membershipValues) {
+      foreach ($relatedMemberships as $membershipId => $membershipValues) {
         $membershipInherittedFromContactID = NULL;
         if (!empty($membershipValues['owner_membership_id'])) {
           // @todo - $membership already has this now.
@@ -2232,19 +2233,38 @@ SELECT count(*)
 
     // Check if relationship can be used for related memberships
     $membershipTypes = MembershipType::get(FALSE)
-      ->addSelect('relationship_type_id')
-      ->addGroupBy('relationship_type_id')
+      ->addSelect('relationship_type_id', 'id')
       ->addWhere('relationship_type_id', 'IS NOT EMPTY')
       ->execute();
+
+    $otherValidRelationshipTypes = Relationship::get(FALSE)
+      ->addSelect('relationship_type_id')
+      ->setWhere([
+        ['contact_id_a', '=', $relationship->contact_id_a],
+        ['contact_id_b', '=', $relationship->contact_id_b],
+        ['OR', [['start_date', '<=', 'now'], ['start_date', 'IS EMPTY']]],
+        ['OR', [['end_date', '>=', 'now'], ['end_date', 'IS EMPTY']]],
+        ['is_active', '=', TRUE],
+        ['relationship_type_id', '!=', $relationship->relationship_type_id],
+      ])
+      ->execute()
+      ->getArrayCopy();
+
+    $otherValidRelationshipTypeIds = !empty($otherValidRelationshipTypes) ? array_column($otherValidRelationshipTypes, 'relationship_type_id') : [];
+    $params['membership_type_ids'] = [];
+
     foreach ($membershipTypes as $membershipType) {
       // We have to loop through them because relationship_type_id is an array and we can't filter by a single
       // relationship id using API.
-      if (in_array($relationship->relationship_type_id, $membershipType['relationship_type_id'])) {
-        $relationshipIsUsedForRelatedMemberships = TRUE;
+      if (in_array($relationship->relationship_type_id, $membershipType['relationship_type_id'])
+        && empty(array_intersect($membershipType['relationship_type_id'], $otherValidRelationshipTypeIds))) {
+        $relatedMembershipsNeedsToBeUpdated = TRUE;
+        $params['membership_type_ids'][] = $membershipType['id'];
       }
     }
-    if (empty($relationshipIsUsedForRelatedMemberships)) {
-      // This relationship is not configured for any related membership types
+    if (empty($relatedMembershipsNeedsToBeUpdated)) {
+      // This relationship is not configured for any related membership types or there exists other valid relationships
+      // for related memberships.
       return;
     }
     // Call relatedMemberships to delete/add the memberships of related contacts.
