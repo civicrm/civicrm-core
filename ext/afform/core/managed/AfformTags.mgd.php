@@ -22,7 +22,8 @@ return [
         'label' => E::ts('Afforms'),
         'is_reserved' => TRUE,
         'is_active' => TRUE,
-        'domain_id' => NULL,
+        // this excludes it from being selected in EntityTag entity_table
+        'filter' => 1,
       ],
       'match' => ['option_group_id', 'name'],
     ],
