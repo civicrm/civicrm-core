@@ -147,12 +147,12 @@ class MailingGetSpecProvider extends \Civi\Core\Service\AutoService implements G
 
     switch ($field['name']) {
       case 'stats_opens_total':
-        $tableName = \CRM_Mailing_Event_BAO_MailingEventOpened::getTableName();
+        $tableName = 'civicrm_mailing_event_opened';
         break;
 
       case 'stats_opens_unique':
-        $tableName = \CRM_Mailing_Event_BAO_MailingEventOpened::getTableName();
-        $count = "DISTINCT $tableName.event_queue_id";
+        $tableName = 'civicrm_mailing_event_opened';
+        $count = "DISTINCT civicrm_mailing_event_opened.event_queue_id";
         break;
 
       case 'stats_clicks_total':
