@@ -1829,17 +1829,19 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
   }
 
   public function testTally(): void {
+    // Really long custom group name - testing to see if tally works with > 64 character column keys
+    $groupName = str_repeat('a', 63);
     $this->createTestRecord('CustomGroup', [
       'extends' => 'Individual',
-      'name' => 'test_indiv_fields',
+      'name' => $groupName,
     ]);
     $this->createTestRecord('CustomField', [
-      'custom_group_id.name' => 'test_indiv_fields',
+      'custom_group_id.name' => $groupName,
       'label' => 'text',
       'html_type' => 'Text',
     ]);
     $this->createTestRecord('CustomField', [
-      'custom_group_id.name' => 'test_indiv_fields',
+      'custom_group_id.name' => $groupName,
       'label' => 'colors',
       'html_type' => 'Select',
       'option_values' => ['r' => 'Red', 'g' => 'Green', 'b' => 'Blue'],
@@ -1847,8 +1849,8 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
 
     $contacts = $this->saveTestRecords('Individual', [
       'records' => [
-        ['first_name' => 'A', 'last_name' => 'A', 'birth_date' => 'now - 20 year 1 month', 'test_indiv_fields.text' => 'aa'],
-        ['first_name' => 'B', 'last_name' => 'B', 'test_indiv_fields.colors' => 'b'],
+        ['first_name' => 'A', 'last_name' => 'A', 'birth_date' => 'now - 20 year 1 month', "$groupName.text" => 'aa'],
+        ['first_name' => 'B', 'last_name' => 'B', "$groupName.colors" => 'b'],
         ['first_name' => 'C', 'last_name' => 'C', 'birth_date' => 'now - 19 year 1 month'],
       ],
     ]);
@@ -1864,8 +1866,8 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
           'first_name',
           'last_name',
           'age_years',
-          'test_indiv_fields.text',
-          'test_indiv_fields.colors:label',
+          "$groupName.text",
+          "$groupName.colors:label",
         ],
         'where' => [
           ['id', 'IN', $contacts->column('id')],
@@ -1923,7 +1925,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
           ],
           [
             'type' => 'field',
-            'key' => 'test_indiv_fields.text',
+            'key' => "$groupName.text",
             'label' => 'Text',
             'sortable' => TRUE,
             'tally' => [
@@ -1932,7 +1934,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
           ],
           [
             'type' => 'field',
-            'key' => 'test_indiv_fields.colors:label',
+            'key' => "$groupName.colors:label",
             'label' => 'Text',
             'sortable' => TRUE,
             'tally' => [
@@ -1957,8 +1959,8 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertSame('A', $tally['first_name']);
     $this->assertSame(['A', 'B', 'C'], $tally['last_name']);
     $this->assertSame('18.5', $tally['age_years']);
-    $this->assertSame('aa', $tally['test_indiv_fields.text']);
-    $this->assertSame('Blue', $tally['test_indiv_fields.colors:label']);
+    $this->assertSame('aa', $tally["$groupName.text"]);
+    $this->assertSame('Blue', $tally["$groupName.colors:label"]);
   }
 
   public function testTallyWithGroupBy(): void {

@@ -144,10 +144,10 @@ class Run extends AbstractRunAction {
     $sql = $queryObject->getSql();
     $select = [];
     $columns = $this->display['settings']['columns'];
-    foreach ($columns as $col) {
+    foreach ($columns as $index => $col) {
       $key = $col['key'] ?? '';
-      $rawKey = str_replace(['.', ':'], '_', $key);
-      if (!empty($col['tally']['fn']) && \CRM_Utils_Rule::mysqlColumnNameOrAlias($rawKey)) {
+      $tallyKey = 'tally_' . $index;
+      if (!empty($col['tally']['fn']) && preg_match('/^[\w .:]+$/', $key)) {
         /* @var \Civi\Api4\Query\SqlFunction $sqlFnClass */
         $sqlFnClass = '\Civi\Api4\Query\SqlFunction' . $col['tally']['fn'];
         $fnArgs = ["`$key`"];
@@ -162,18 +162,18 @@ class Run extends AbstractRunAction {
             $fnArgs[] = "ORDER BY `$key`";
           }
         }
-        $select[] = $sqlFnClass::renderExpression(implode(' ', $fnArgs)) . " `$rawKey`";
+        $select[] = $sqlFnClass::renderExpression(implode(' ', $fnArgs)) . " `$tallyKey`";
       }
     }
     $query = 'SELECT ' . implode(', ', $select) . "\nFROM (" . $sql . ")\n`api_query`";
     $dao = \CRM_Core_DAO::executeQuery($query);
     $dao->fetch();
     $tally = [];
-    foreach ($columns as $col) {
+    foreach ($columns as $index => $col) {
       if (!empty($col['tally']['fn']) && !empty($col['key'])) {
         $key = $col['key'];
-        $rawKey = str_replace(['.', ':'], '_', $key);
-        $tally[$key] = $dao->$rawKey ?? '';
+        $tallyKey = 'tally_' . $index;
+        $tally[$key] = $dao->$tallyKey ?? '';
         // Format value according to data type of function/field
         if (strlen($tally[$key])) {
           $sqlExpression = SqlExpression::convert($col['tally']['fn'] . "($key)");
