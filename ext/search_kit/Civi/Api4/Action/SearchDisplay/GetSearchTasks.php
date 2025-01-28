@@ -84,10 +84,12 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
         $tasks[$entity['name']]['enable'] = [
           'title' => E::ts('Enable %1', [1 => $entity['title_plural']]),
           'icon' => 'fa-toggle-on',
-          'conditions' => [['is_active', '=', FALSE]],
           'apiBatch' => [
             'action' => 'update',
-            'params' => ['values' => ['is_active' => TRUE]],
+            'params' => [
+              'values' => ['is_active' => TRUE],
+              'where' => [['is_active', '=', FALSE]],
+            ],
             'runMsg' => E::ts('Enabling %1 %2...'),
             'successMsg' => E::ts('Successfully enabled %1 %2.'),
             'errorMsg' => E::ts('An error occurred while attempting to enable %1 %2.'),
@@ -96,10 +98,12 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
         $tasks[$entity['name']]['disable'] = [
           'title' => E::ts('Disable %1', [1 => $entity['title_plural']]),
           'icon' => 'fa-toggle-off',
-          'conditions' => [['is_active', '=', TRUE]],
           'apiBatch' => [
             'action' => 'update',
-            'params' => ['values' => ['is_active' => FALSE]],
+            'params' => [
+              'values' => ['is_active' => FALSE],
+              'where' => [['is_active', '=', TRUE]],
+            ],
             'confirmMsg' => E::ts('Are you sure you want to disable %1 %2?'),
             'runMsg' => E::ts('Disabling %1 %2...'),
             'successMsg' => E::ts('Successfully disabled %1 %2.'),
@@ -221,6 +225,10 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
       $task += ['number' => '> 0'];
       if (!empty($task['apiBatch']['fields'])) {
         $this->getApiBatchFields($task);
+      }
+      // If action includes a WHERE clause, add it to the conditions (see e.g. the enable/disable actions)
+      if (!empty($task['apiBatch']['params']['where'])) {
+        $task['conditions'] = array_merge($task['conditions'] ?? [], $task['apiBatch']['params']['where']);
       }
     }
 
