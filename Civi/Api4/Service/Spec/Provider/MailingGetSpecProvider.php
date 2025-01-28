@@ -220,19 +220,16 @@ class MailingGetSpecProvider extends \Civi\Core\Service\AutoService implements G
    * @return string
    */
   public static function countIntendedRecipients(array $field): string {
-    $queue = \CRM_Mailing_Event_BAO_MailingEventQueue::getTableName();
-    $mailing = \CRM_Mailing_BAO_Mailing::getTableName();
-    $job = \CRM_Mailing_BAO_MailingJob::getTableName();
 
     return "(
-      SELECT      COUNT($queue.id)
-      FROM        $queue
-      INNER JOIN  $job
-              ON  $queue.job_id = $job.id
-      INNER JOIN  $mailing
-              ON  $job.mailing_id = $mailing.id
-              AND $job.is_test = 0
-      WHERE       $mailing.id = {$field['sql_name']}
+      SELECT      COUNT(queue.id)
+      FROM        civicrm_mailing_event_queue as queue
+      INNER JOIN  civicrm_mailing_job as job
+              ON  queue.job_id = job.id
+      INNER JOIN  civicrm_mailing as mailing
+              ON  job.mailing_id = mailing.id
+              AND job.is_test = 0
+      WHERE       mailing.id = {$field['sql_name']}
       )";
   }
 
