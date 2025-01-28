@@ -732,9 +732,25 @@ function afform_shortcode_content($content, $atts, $args, $context) {
  */
 function afform_civicrm_searchKitTasks(array &$tasks, bool $checkPermissions, ?int $userID) {
   $tasks['AfformSubmission']['process'] = [
-    'module' => 'afSearchTasks',
     'title' => E::ts('Process Submissions'),
     'icon' => 'fa-check-square-o',
-    'uiDialog' => ['templateUrl' => '~/afSearchTasks/afformSubmissionProcessTask.html'],
+    // The Afform.process API doesn't support batches so use get+chaining
+    'apiBatch' => [
+      'action' => 'get',
+      'params' => [
+        'select' => ['id', 'afform_name'],
+        'where' => [['status_id:name', '=', 'Pending']],
+        'chain' => [
+          ['Afform', 'process', ['submissionId' => '$id', 'name' => '$afform_name']],
+        ],
+      ],
+      'conditions' => [
+        ['check user permission', '=', ['administer afform']],
+      ],
+      'confirmMsg' => E::ts('Confirm processing %1 %2.'),
+      'runMsg' => E::ts('Processing %1 %2...'),
+      'successMsg' => E::ts('Successfully processed %1 %2.'),
+      'errorMsg' => E::ts('An error occurred while attempting to process %1 %2.'),
+    ],
   ];
 }
