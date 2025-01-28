@@ -57,29 +57,22 @@ class CRM_Mailing_Event_BAO_MailingEventResubscribe {
     $contact_id = $q->contact_id;
 
     $transaction = new CRM_Core_Transaction();
-
-    $do = new CRM_Core_DAO();
-    $mg = CRM_Mailing_DAO_MailingGroup::getTableName();
-    $job = CRM_Mailing_BAO_MailingJob::getTableName();
-    $mailing = CRM_Mailing_BAO_Mailing::getTableName();
-    $group = CRM_Contact_BAO_Group::getTableName();
-
     // We Need the mailing Id for the hook...
     $mailing_id = CRM_Core_DAO::singleValueQuery("SELECT mailing_id as mailing_id
                      FROM civicrm_mailing_job
                      WHERE id = " . CRM_Utils_Type::escape($job_id, 'Integer'));
 
-    $do->query("
-            SELECT      $mg.entity_table as entity_table,
-                        $mg.entity_id as entity_id
-            FROM        $mg
-            INNER JOIN  $job
-                ON      $job.mailing_id = $mg.mailing_id
-            INNER JOIN  $group
-                ON      $mg.entity_id = $group.id
-            WHERE       $job.id = " . CRM_Utils_Type::escape($job_id, 'Integer') . "
-                AND     $mg.group_type IN ( 'Include', 'Base' )
-                AND     $group.is_hidden = 0"
+    $do = CRM_Core_DAO::executeQuery("
+            SELECT      mailing_group.entity_table as entity_table,
+                        mailing_group.entity_id as entity_id
+            FROM        civicrm_mailing_group as mailing_group
+            INNER JOIN  civicrm_mailing_job as job
+                ON      job.mailing_id = mailing_group.mailing_id
+            INNER JOIN  civicrm_group
+                ON      mailing_group.entity_id = civicrm_group.id
+            WHERE       job.id = " . CRM_Utils_Type::escape($job_id, 'Integer') . "
+                AND     mailing_group.group_type IN ( 'Include', 'Base' )
+                AND     civicrm_group.is_hidden = 0"
     );
 
     // Make a list of groups and a list of prior mailings that received
@@ -88,10 +81,10 @@ class CRM_Mailing_Event_BAO_MailingEventResubscribe {
     $mailings = [];
 
     while ($do->fetch()) {
-      if ($do->entity_table == $group) {
+      if ($do->entity_table === 'civicrm_group') {
         $groups[$do->entity_id] = NULL;
       }
-      elseif ($do->entity_table == $mailing) {
+      elseif ($do->entity_table === 'civicrm_mailing') {
         $mailings[] = $do->entity_id;
       }
     }
@@ -99,20 +92,20 @@ class CRM_Mailing_Event_BAO_MailingEventResubscribe {
     // As long as we have prior mailings, find their groups and add to the
     // list.
     while (!empty($mailings)) {
-      $do->query("
-                SELECT      $mg.entity_table as entity_table,
-                            $mg.entity_id as entity_id
-                FROM        $mg
-                WHERE       $mg.mailing_id IN (" . implode(', ', $mailings) . ")
-                    AND     $mg.group_type = 'Include'");
+      $do = CRM_Core_DAO::executeQuery("
+                SELECT      entity_table as entity_table,
+                            entity_id as entity_id
+                FROM        civicrm_mailing_group
+                WHERE       mailing_id IN (" . implode(', ', $mailings) . ")
+                    AND     group_type = 'Include'");
 
       $mailings = [];
 
       while ($do->fetch()) {
-        if ($do->entity_table == $group) {
+        if ($do->entity_table == 'civicrm_group') {
           $groups[$do->entity_id] = TRUE;
         }
-        elseif ($do->entity_table == $mailing) {
+        elseif ($do->entity_table == 'civicrm_mailing') {
           $mailings[] = $do->entity_id;
         }
       }
