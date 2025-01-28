@@ -113,7 +113,7 @@ class Civi {
    *
    * @param string $name
    *   The name of a persistent/registered queue (stored in `civicrm_queue`)
-   * @param array{type: string, is_autorun: bool, reset: bool, is_persistent: bool} $params
+   * @param array{type: string, is_autorun: bool, reset: bool, is_persistent: bool, runner: string, error: string, retry_limit: int, retry_interval: int} $params
    *   Specification for a queue.
    *   This is not required for accessing an existing queue.
    *   Specify this if you wish to auto-create the queue or to include advanced options (eg `reset`).
