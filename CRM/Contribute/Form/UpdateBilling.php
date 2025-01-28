@@ -20,6 +20,9 @@
  */
 class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_ContributionRecur {
   protected $_mode = NULL;
+  protected $_bltID = NULL;
+  public $_paymentFields;
+  public $_fields = [];
 
   /**
    * Set variables up before form is built.
@@ -254,8 +257,8 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
       $tplParams['address'] = CRM_Utils_Address::format($addressParts);
 
       // format old address to store in activity details
-      $this->_defaults["state_province-{$billingLocationID}"] = CRM_Core_PseudoConstant::stateProvince($this->_defaults["state_province-{$billingLocationID}"], FALSE);
-      $this->_defaults["country-{$billingLocationID}"] = CRM_Core_PseudoConstant::country($this->_defaults["country-{$billingLocationID}"], FALSE);
+      $this->_defaults["state_province-{$billingLocationID}"] = CRM_Core_PseudoConstant::stateProvince($this->_defaults["state_province-{$billingLocationID}"] ?? NULL, FALSE);
+      $this->_defaults["country-{$billingLocationID}"] = CRM_Core_PseudoConstant::country($this->_defaults["country-{$billingLocationID}"] ?? NULL, FALSE);
       $addressParts = ["street_address", "city", "postal_code", "state_province", "country"];
       foreach ($addressParts as $part) {
         $key = "{$part}-{$billingLocationID}";
