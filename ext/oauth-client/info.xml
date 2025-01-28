@@ -28,17 +28,18 @@
     <psr0 prefix="CRM_" path="."/>
     <psr4 prefix="Civi\" path="Civi"/>
   </classloader>
-  <upgrader>CRM_OAuth_Upgrader</upgrader>
+  <upgrader>CiviMix\Schema\OauthClient\AutomaticUpgrader</upgrader>
   <mixins>
     <mixin>ang-php@1.0.0</mixin>
     <mixin>menu-xml@1.0.0</mixin>
     <mixin>setting-php@1.0.0</mixin>
-    <mixin>smarty@1.0.0</mixin>
-    <mixin>entity-types-php@1.0.0</mixin>
+    <mixin>smarty@1.0.3</mixin>
     <mixin>scan-classes@1.0.0</mixin>
+    <mixin>entity-types-php@2.0.0</mixin>
+    <mixin>mgd-php@1.0.0</mixin>
   </mixins>
   <civix>
     <namespace>CRM/OAuth</namespace>
-    <format>23.02.1</format>
+    <format>25.01.1</format>
   </civix>
 </extension>

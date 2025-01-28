@@ -75,9 +75,44 @@ class CRM_OAuth_ExtensionUtil {
     return self::CLASS_PREFIX . '_' . str_replace('\\', '_', $suffix);
   }
 
+  /**
+   * @return \CiviMix\Schema\SchemaHelperInterface
+   */
+  public static function schema() {
+    if (!isset($GLOBALS['CiviMixSchema'])) {
+      pathload()->loadPackage('civimix-schema@5', TRUE);
+    }
+    return $GLOBALS['CiviMixSchema']->getHelper(static::LONG_NAME);
+  }
+
 }
 
 use CRM_OAuth_ExtensionUtil as E;
+
+spl_autoload_register('_oauth_client_civix_class_loader', TRUE, TRUE);
+
+function _oauth_client_civix_class_loader($class) {
+  if ($class === 'CRM_OAuth_DAO_Base') {
+    if (version_compare(CRM_Utils_System::version(), '5.74.beta', '>=')) {
+      class_alias('CRM_Core_DAO_Base', 'CRM_OAuth_DAO_Base');
+      // ^^ Materialize concrete names -- encourage IDE's to pick up on this association.
+    }
+    else {
+      $realClass = 'CiviMix\\Schema\\OauthClient\\DAO';
+      class_alias($realClass, $class);
+      // ^^ Abstract names -- discourage IDE's from picking up on this association.
+    }
+    return;
+  }
+
+  // This allows us to tap-in to the installation process (without incurring real file-reads on typical requests).
+  if (strpos($class, 'CiviMix\\Schema\\OauthClient\\') === 0) {
+    // civimix-schema@5 is designed for backported use in download/activation workflows,
+    // where new revisions may become dynamically available.
+    pathload()->loadPackage('civimix-schema@5', TRUE);
+    CiviMix\Schema\loadClass($class);
+  }
+}
 
 /**
  * (Delegated) Implements hook_civicrm_config().
