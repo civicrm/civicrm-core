@@ -124,6 +124,17 @@
     <div ng-if="editor.afform.submit_enabled">
       <div class="form-group">
         <label>
+          <input type="checkbox" ng-model="editor.afform.autosave_draft">
+          {{:: ts('Autosave Draft') }}
+        </label>
+        <p class="help-block">
+          {{:: ts('For authenticated users, form will auto-save periodically.') }}
+          {{:: ts('You may also place a "Save Draft" button on the form, with or without Autosave enabled.') }}
+        </p>
+      </div>
+
+      <div class="form-group">
+        <label>
           <input type="checkbox" ng-model="editor.afform.create_submission" ng-class="{'disabled': !!editor.afform.require_email_confirmation}">
           {{:: ts('Log Submissions') }}
         </label>

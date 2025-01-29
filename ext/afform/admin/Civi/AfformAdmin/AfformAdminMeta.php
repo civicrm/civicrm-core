@@ -266,6 +266,20 @@ class AfformAdminMeta {
             ],
           ],
         ],
+        'save_draft' => [
+          'title' => E::ts('Save Draft Button'),
+          'afform_type' => ['form'],
+          'element' => [
+            '#tag' => 'button',
+            'class' => 'af-button btn btn-primary',
+            'crm-icon' => 'fa-floppy-disk',
+            'ng-click' => 'afform.submitDraft()',
+            'ng-if' => 'afform.showSubmitButton',
+            '#children' => [
+              ['#text' => E::ts('Save Draft')],
+            ],
+          ],
+        ],
         'reset' => [
           'title' => E::ts('Reset Button'),
           'afform_type' => ['form', 'search'],

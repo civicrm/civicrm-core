@@ -14,6 +14,8 @@
         status,
         args,
         submissionResponse,
+        saveDraftButtons = [],
+        draftStatus = 'unsaved',
         ts = CRM.ts('org.civicrm.afform'),
         ctrl = this;
 
@@ -21,7 +23,12 @@
         // This component has no template. It makes its controller available within it by adding it to the parent scope.
         $scope.$parent[this.ctrl] = this;
 
-        $timeout(ctrl.loadData);
+        $timeout(function() {
+          ctrl.loadData()
+            .then(setupDraftWatcher);
+
+          ctrl.showSubmitButton = displaySubmitButton(args);
+        });
       };
 
       this.registerEntity = function registerEntity(entity) {
@@ -39,6 +46,7 @@
         return schema[name];
       };
       // Returns the 'meta' record ('name', 'description', etc) of the active form.
+      // @see afform_civicrm_buildAsset() for whitelist of form metadata
       this.getFormMeta = function getFormMeta() {
         return $scope.$parent.meta;
       };
@@ -79,9 +87,10 @@
             }
           });
           params.args = args;
+          ctrl.showSubmitButton = displaySubmitButton(args);
         }
         if (toLoad) {
-          crmApi4('Afform', 'prefill', params)
+          return crmApi4('Afform', 'prefill', params)
             .then((result) => {
               // In some cases (noticed on Wordpress) the response header incorrectly outputs success when there's an error.
               if (result.error_message) {
@@ -112,8 +121,6 @@
           angular.merge(data[selectedEntity][selectedIndex].fields, _.cloneDeep(schema[selectedEntity].data || {}));
           data[selectedEntity][selectedIndex].joins = {};
         }
-
-        ctrl.showSubmitButton = displaySubmitButton(args);
       };
 
       function displaySubmitButton(args) {
@@ -133,6 +140,37 @@
           status = CRM.status({start: ts('Uploading %1', {1: item.file.name})});
         }
       });
+
+      // Set up background tasks for saving draft
+      function setupDraftWatcher() {
+        const buttons = getDraftButtons();
+        const autoSaveEnabled = ctrl.getFormMeta().autosave_draft;
+
+        if ((!autoSaveEnabled && !buttons.length) || !ctrl.showSubmitButton || !CRM.config.cid) {
+          // No watchers needed
+          return;
+        }
+
+        // Store initial state of any save-draft buttons on the form
+        $.each(buttons, function(index, button) {
+          saveDraftButtons[index] = {
+            text: $(button).text(),
+            icon: $(button).attr('crm-icon'),
+          };
+        });
+
+        // If autosave enabled, save every ten seconds if changes have been made
+        const saveEveryTenSeconds = autoSaveEnabled ? _.debounce(ctrl.submitDraft, 10000) : _.noop;
+
+        $scope.$watch(() => data, function (newVal, oldVal) {
+            if (oldVal) {
+              setDraftStatus('unsaved');
+              saveEveryTenSeconds(newVal);
+            }
+          },
+          true
+        );
+      }
 
       // Handle the logic for conditional fields
       this.checkConditions = function(conditions, op) {
@@ -332,6 +370,54 @@
           CRM.alert(error.error_message || '', ts('Form Error'));
         });
       };
+
+      this.submitDraft = function() {
+        setDraftStatus('saving');
+        crmApi4('Afform', 'submitDraft', {
+          name: ctrl.getFormMeta().name,
+          args: args,
+          values: data,
+        }).then(function(response) {
+          setDraftStatus('saved');
+          crmStatus(ts('Draft saved'));
+        });
+      };
+
+      function getDraftButtons() {
+        return $element.find('button[ng-click="afform.submitDraft()"]');
+      }
+
+      function setDraftStatus(newStatus) {
+        const buttons = getDraftButtons();
+        if (draftStatus === newStatus || !buttons.length) {
+          return;
+        }
+        if (draftStatus === 'unsaved' && newStatus === 'saved') {
+          // If form was altered during a save operation, keep the 'unsaved' status
+          return;
+        }
+        // Setting to 'unsaved' - restore buttons to initial state
+        if (newStatus === 'unsaved') {
+          $.each(buttons, function(index, button) {
+            const initialState = saveDraftButtons[index] || saveDraftButtons[0];
+            $(button).text(initialState.text).attr('disabled', false);
+            if (initialState.icon) {
+              $(button).prepend('<i class="crm-i ' + saveDraftButtons[index].icon + '" aria-hidden="true"></i> ');
+            }
+          });
+        }
+        // Change icon, text & disable button for 'saving' or 'saved' status
+        else {
+          const newText = newStatus === 'saving' ? ts('Saving Draft') : ts('Draft Saved');
+          const newIcon = newStatus === 'saving' ? 'fa-spinner fa-spin' : 'fa-check';
+          $.each(buttons, function(index, button) {
+            $(button).text(newText).attr('disabled', true);
+            $(button).prepend('<i class="crm-i ' + newIcon + '" aria-hidden="true"></i> ');
+          });
+        }
+        draftStatus = newStatus;
+      }
+
     }
   });
 })(angular, CRM.$, CRM._);
