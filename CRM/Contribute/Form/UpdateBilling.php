@@ -319,7 +319,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
       $tplParams['contact'] = ['display_name' => $donorDisplayName];
 
       $tplParams = array_merge($tplParams, CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($processorParams));
-
+      $tplParams['receipt_from_email'] = CRM_Contribute_BAO_ContributionRecur::getRecurFromAddress($this->getContributionRecurID());
       $sendTemplateParams = [
         'groupName' => $this->getSubscriptionDetails()->membership_id ? 'msg_tpl_workflow_membership' : 'msg_tpl_workflow_contribution',
         'workflow' => $this->getSubscriptionDetails()->membership_id ? 'membership_autorenew_billing' : 'contribution_recurring_billing',
@@ -327,7 +327,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
         'tplParams' => $tplParams,
         'isTest' => $this->getSubscriptionDetails()->is_test,
         'PDFFilename' => 'receipt.pdf',
-        'from' => CRM_Contribute_BAO_ContributionRecur::getRecurFromAddress($this->getContributionRecurID()),
+        'from' => $tplParams['receipt_from_email'],
         'toName' => $donorDisplayName,
         'toEmail' => $donorEmail,
       ];

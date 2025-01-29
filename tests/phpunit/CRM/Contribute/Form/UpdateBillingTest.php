@@ -61,7 +61,7 @@ class CRM_Contribute_Form_UpdateBillingTest extends CiviUnitTestCase {
       'Visa',
       '************1111',
       'Billing details for your recurring contribution of 10.00, every 1 month have been updated.',
-      'If you have questions please contact us at "Bob" <bob@example.org>.',
+      'If you have questions please contact us at "Bob" <bob@example.org>',
     ];
   }
 
