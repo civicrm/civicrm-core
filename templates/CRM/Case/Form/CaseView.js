@@ -183,11 +183,11 @@
     $('[id^=caseRoles-selector] tbody tr.disabled').toggle(showInactive);
   }
 
-  $('#crm-container').on('crmLoad', '#crm-main-content-wrapper', detachMiniForms);
+  $('.crm-container').on('crmLoad', '#crm-main-content-wrapper', detachMiniForms);
 
   $(document).ready(function() {
     detachMiniForms();
-    $('#crm-container')
+    $('.crm-container')
       .on('change', 'select[name=add_activity_type_id]', function() {
         open($(this).val());
         $(this).select2('val', '');

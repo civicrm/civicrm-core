@@ -113,7 +113,7 @@
       $('details').not('details details').each(function() {
         highlightTabs(this);
       });
-      $('#crm-container').on('change click', '.crm-accordion-body :input, .crm-accordion-body a', function() {
+      $('.crm-container').on('change click', '.crm-accordion-body :input, .crm-accordion-body a', function() {
         highlightTabs($(this).parents('details'));
       });
     }

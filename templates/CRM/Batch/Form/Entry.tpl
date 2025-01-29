@@ -150,7 +150,7 @@ CRM.$(function($) {
     }
   });
 
-  $('#crm-container').on('keyup change', '*.selector-rows', function () {
+  $('.crm-container').on('keyup change', '*.selector-rows', function () {
     // validate rows
     checkColumns($(this));
   });

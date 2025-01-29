@@ -11,7 +11,7 @@
 {literal}
 <style type="text/css" media="screen, print">
 <!--
-  #crm-container div {
+  .crm-container div {
     font-size: 12px;
   }
 -->
