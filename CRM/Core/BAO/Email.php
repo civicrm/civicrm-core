@@ -288,9 +288,14 @@ AND    reset_date IS NULL
    */
   public static function domainEmails() {
     $domainEmails = [];
-    $domainFrom = (array) CRM_Core_OptionGroup::values('from_email_address');
-    foreach (array_keys($domainFrom) as $k) {
-      $domainEmail = $domainFrom[$k];
+    $domainFrom = \Civi\Api4\SiteEmailAddress::get(FALSE)
+      ->addSelect('display_name', 'email')
+      ->addWhere('domain_id', '=', 'current_domain')
+      ->addWhere('is_active', '=', TRUE)
+      ->addOrderBy('display_name')
+      ->execute();
+    foreach ($domainFrom as $address) {
+      $domainEmail = CRM_Utils_Mail::formatFromAddress($address);
       $domainEmails[$domainEmail] = htmlspecialchars($domainEmail);
     }
     return $domainEmails;

@@ -192,19 +192,18 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    * @throws \CRM_Core_Exception
    */
   public static function getNameAndEmail($skipFatal = FALSE, $returnString = FALSE) {
-    $fromEmailAddress = CRM_Core_OptionGroup::values('from_email_address', NULL, NULL, NULL, ' AND is_default = 1');
+    $fromEmailAddress = \Civi\Api4\SiteEmailAddress::get(FALSE)
+      ->addSelect('display_name', 'email')
+      ->addWhere('domain_id', '=', 'current_domain')
+      ->addWhere('is_default', '=', TRUE)
+      ->addWhere('is_active', '=', TRUE)
+      ->execute()->first();
     if (!empty($fromEmailAddress)) {
       if ($returnString) {
         // Return a string like: "Demonstrators Anonymous" <info@example.org>
-        return $fromEmailAddress;
+        return [CRM_Utils_Mail::formatFromAddress($fromEmailAddress)];
       }
-      foreach ($fromEmailAddress as $key => $value) {
-        $email = CRM_Utils_Mail::pluckEmailFromHeader($value);
-        $fromArray = explode('"', $value);
-        $fromName = $fromArray[1] ?? NULL;
-        break;
-      }
-      return [$fromName, $email];
+      return [$fromEmailAddress['display_name'], $fromEmailAddress['email']];
     }
 
     if ($skipFatal) {
@@ -220,15 +219,11 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    * Get the domain email in a format suitable for using as the from address.
    *
    * @return string
+   *   E.g. '"Demonstrators Anonymous" <info@example.org>'
    * @throws \CRM_Core_Exception
    */
   public static function getFromEmail(): string {
-    $email = CRM_Core_OptionGroup::values('from_email_address', NULL, NULL, NULL, ' AND is_default = 1');
-    $email = current($email);
-    if (!$email) {
-      throw new CRM_Core_Exception(self::getMissingDomainFromEmailMessage());
-    }
-    return $email;
+    return self::getNameAndEmail(FALSE, TRUE)[0];
   }
 
   /**

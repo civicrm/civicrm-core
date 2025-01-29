@@ -649,12 +649,16 @@ class CRM_Utils_Mail {
    * If it's numeric, look up the display name and email of the corresponding
    * contact ID in RFC822 format.
    *
-   * @param string $from
+   * @param string|array $from
    *   civicrm_email.id or formatted "From address", eg. 12 or "Fred Bloggs" <fred@example.org>
+   *   or array containing 'display_name' and 'email' keys.
    * @return string
    *   The RFC822-formatted email header (display name + address)
    */
   public static function formatFromAddress($from) {
+    if (is_array($from)) {
+      return "\"{$from['display_name']}\" <{$from['email']}>";
+    }
     if (is_numeric($from)) {
       $result = civicrm_api3('Email', 'get', [
         'id' => $from,
