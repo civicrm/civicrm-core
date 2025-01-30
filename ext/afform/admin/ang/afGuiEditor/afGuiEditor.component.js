@@ -95,12 +95,6 @@
         if (!editor.afform) {
           alert('Error: unknown form');
         }
-        if (editor.mode === 'clone') {
-          delete editor.afform.name;
-          delete editor.afform.server_route;
-          delete editor.afform.navigation;
-          editor.afform.title += ' ' + ts('(copy)');
-        }
         editor.afform.icon = editor.afform.icon || 'fa-list-alt';
         editor.afform.placement = editor.afform.placement || [];
         $scope.canvasTab = 'layout';
