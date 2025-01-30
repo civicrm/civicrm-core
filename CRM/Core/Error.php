@@ -506,7 +506,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
 
       if (!$checkPermission) {
         // Permission system inactive, only emit a reference to content in logfile
-        echo "Critical error. Please see server logs for errorID:$unique";
+        echo "Critical error. Please see server logs for errorID:$unique" . (PHP_SAPI !== 'cli' ? '<br/>' : '') . "\n";
       }
       else {
         if (CRM_Core_Permission::check('view debug output')) {
