@@ -4489,7 +4489,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $originalContribution = $this->setUpRepeatTransaction([], 'single');
     $fromEmail = $this->callAPISuccess('optionValue', 'get', ['is_default' => 1, 'option_group_id' => 'from_email_address', 'sequential' => 1]);
     foreach ($fromEmail['values'] as $from) {
-      $this->callAPISuccess('optionValue', 'create', ['is_default' => 0, 'id' => $from['id']]);
+      $this->callAPISuccess('optionValue', 'create', ['option_group_id' => 'from_email_address', 'is_default' => 0, 'id' => $from['id']]);
     }
     $domain = $this->callAPISuccess('domain', 'getsingle', ['id' => CRM_Core_Config::domainID()]);
     $this->callAPISuccess('contribution', 'repeattransaction', [
