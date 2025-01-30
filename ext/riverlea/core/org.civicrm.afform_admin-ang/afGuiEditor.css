@@ -149,12 +149,16 @@
   position: absolute;
   top: var(--crm-padding-reg);
   right: var(--crm-padding-reg);
+  padding: 0 !important /* vs buttons.css */;
+  background: transparent;
+  color: var(--crm-c-text);
 }
 #afGuiEditor-palette .af-gui-entity-values .form-inline {
   margin-bottom: var(--crm-m);
   display: flex;
   align-items: center;
   gap: var(--crm-flex-gap);
+  flex-wrap: wrap;
 }
 #afGuiEditor-palette .af-gui-entity-values .select2-container {
   width: 100% !important /* vs inline */;

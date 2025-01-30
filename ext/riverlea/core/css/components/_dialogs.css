@@ -223,3 +223,11 @@
   background: var(--crm-notify-alert);
   border: 0;
 }
+
+@media (max-width: 767px) {
+  .crm-container.ui-dialog {
+    top: 10vh !important;
+    margin: 5vw !important;
+    width: 90vw !important;
+  }
+}

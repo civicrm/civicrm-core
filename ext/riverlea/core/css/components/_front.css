@@ -23,12 +23,16 @@
   margin: var(--crm-f-fieldset-margin);
   padding: var(--crm-f-fieldset-padding);
   border: var(--crm-f-fieldset-border);
-  box-shadow: var(--crm-f-box-shadow);
+  box-shadow: var(--crm-f-fieldset-box-shadow);
 }
 .crm-container.crm-public fieldset legend {
-  padding-block: var(--crm-f-fieldset-padding);
+  padding: var(--crm-f-legend-padding);
   font-size: var(--crm-f-legend-size);
   text-align: var(--crm-f-legend-align);
+  float: var(--crm-f-legend-position);
+}
+.crm-container.crm-public fieldset legend + * {
+  clear: both;
 }
 af-form > fieldset > legend {
   position: relative;
@@ -49,7 +53,7 @@ af-form > fieldset > legend {
 .crm-contribution-confirm-form-block fieldset legend:has(~ .header-dark) {
   display: none; /* fix for duplication on confirmation screen of legend text with Header Dark text */
 }
-.crm-container.crm-public .crm-section {
+.crm-container.crm-public .crm-section:not(.alert) {
   padding: 0;
 }
 .crm-container.crm-public fieldset > fieldset,
@@ -67,6 +71,9 @@ af-form > fieldset > legend {
 .crm-container.crm-public .form-layout-compressed {
   display: block;
 }
+.crm-container.crm-public table.form-layout-compressed {
+  display: table;
+}
 .crm-container.crm-public span#msgbox {
   border-radius: var(--crm-roundness);
   padding: var(--crm-padding-small);
@@ -75,11 +82,13 @@ af-form > fieldset > legend {
   display: none;
 }
 /* Input */
+.crm-container.crm-public .crm-section:has( > .label):not(.crm-public-form-item) {
+  margin: 0 calc(-1 * var(--crm-f-form-padding));
+}
 .crm-container.crm-public .crm-section:has( > .label) {
-  padding: var(--crm-f-form-padding);
   display: var(--crm-f-form-layout);
   grid-template-columns: var(--crm-f-label-width) 1fr 0;
-  margin: 0 calc(-1 * var(--crm-f-form-padding));
+  padding: var(--crm-f-form-padding);
 }
 .crm-container.crm-public .crm-section:has( > .content input:focus),
 .crm-container.crm-public .crm-section:has( > .content select:focus),
@@ -105,6 +114,15 @@ af-form > fieldset > legend {
   padding: var(--crm-f-input-padding);
   font-size: var(--crm-f-input-font-size);
   min-width: var(--crm-f-input-width);
+}
+.crm-container.crm-public select.crm-form-select {
+  min-width: auto;
+  padding-block: 0;
+}
+.crm-container.crm-public .content:has(> select) { /* to handle select-list with inline label */
+  display: flex;
+  align-items: center;
+  gap: var(--crm-flex-gap);
 }
 .crm-container.crm-public .select2-search input[type="text"] {
   min-width: unset;
@@ -193,18 +211,23 @@ af-form > fieldset > legend {
 .crm-container div.empowered-by-logo span {
   visibility: hidden;
 }
+.crm-container.crm-public .crm-section .label {
+  font-weight: var(--crm-f-label-weight);
+  margin-block: var(--crm-f-label-margin);
+  margin-right: var(--crm-f-label-gap);
+  color: var(--crm-f-label-color);
+}
 @media (min-width: 480px) {
   .crm-container.crm-public {
     --crm-page-padding: var(--crm-f-form-padding);
   }
   .crm-container.crm-public .crm-section .label {
-    float: none;
-    width: inherit;
+    float: var(--crm-f-label-position);
+    width: var(--crm-f-label-width);
     text-align: var(--crm-f-label-align);
-    font-weight: var(--crm-f-label-weight);
   }
   .crm-container.crm-public .crm-section .content {
-    margin-left: 0;
+    margin-left: calc(var(--crm-f-label-width) + var(--crm-f-label-gap));
   }
 }
 @media (max-width: 479px) {

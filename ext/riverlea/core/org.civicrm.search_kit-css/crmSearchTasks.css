@@ -14,7 +14,7 @@
 }
 crm-search-display-editable .form-inline,
 .crm-dashlet .crm-search-display crm-search-display-editable .form-inline {
-  padding: 0;
+  padding: 0 !important /* vs _form.css */;
 }
 .crm-search-display-editable-buttons button {
   padding: var(--crm-padding-small) !important;
