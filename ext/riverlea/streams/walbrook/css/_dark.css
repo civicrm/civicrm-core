@@ -22,7 +22,7 @@
   --crm-c-green-dark: #dff0d8;
   --crm-c-gray-700: #353842;
   --crm-c-gray-600: #67676a;
-  --crm-c-gray-500: #B3B3B3;
+  --crm-c-gray-500: #b3b3b3;
   --crm-c-gray-800: #222831;
   --crm-c-divider: 1px solid var(--crm-c-gray-500);
   /* And others */
@@ -70,7 +70,7 @@
   --crm-wizard-active-bg: var(--crm-c-dark-teal);
   --crm-form-block-background: var(--crm-c-background2);
   --crm-btn-cancel-bg: #9b3d4b;
-  --crm-btn-warning-bg: #7B4E14;
+  --crm-btn-warning-bg: #7b4e14;
   --crm-c-alert: var(--crm-btn-cancel-bg);
   --crm-c-warning: var(--crm-btn-warning-bg);
   --crm-btn-alert-bg: var(--crm-btn-cancel-bg);

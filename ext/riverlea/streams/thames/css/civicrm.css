@@ -632,7 +632,7 @@ html.crm-standalone  nav.breadcrumb>ol {
   gap: 1rem;
 }
 
- /* Support contact dashboard image float */
+/* Support contact dashboard image float */
 .contactCardRight:has(#crm-contact-thumbnail) .float-left {
   width: calc(100% - var(--crm-flex-gap) - var(--crm-dash-image-size));
 }

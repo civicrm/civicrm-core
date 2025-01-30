@@ -25,17 +25,17 @@
   --crm-c-blue-light: #dff0f4;
   --crm-c-blue-dark: #66afe9;
   --crm-c-blue-darker: #458ac3;
-  --crm-c-green: #6CD594;
+  --crm-c-green: #6cd594;
   --crm-c-green-light: #bcecd1;
-  --crm-c-green-dark: #1D6338;
-  --crm-c-red: #91223C;
-  --crm-c-red-light: #ECB1BC;
+  --crm-c-green-dark: #1d6338;
+  --crm-c-red: #91223c;
+  --crm-c-red-light: #ecb1bc;
   --crm-c-red-dark: var(--crm-c-text);
-  --crm-c-amber: #EAB876;
+  --crm-c-amber: #eab876;
   --crm-c-yellow: #f8e80b;
   --crm-c-teal: #399389;
 /* Practical colours */
-  --crm-c-text: #34303B;
+  --crm-c-text: #34303b;
   --crm-c-link: var(--crm-c-blue-darker);
   --crm-c-link-hover: #004370;
   --crm-c-page-background: #e8eef0; /* background to page body */
@@ -206,9 +206,9 @@
   --crm-notify-col: var(--crm-c-text);
   --crm-notify-accent-border: 0 0 0 3px; /* adds a border to one/several sides of the notification - set to 0 for none */
   --crm-notify-alert: #d02e2e;
-  --crm-notify-warning: #C45008;
-  --crm-notify-success: #5A803C;
-  --crm-notify-info: #277FA5  ;
+  --crm-notify-warning: #c45008;
+  --crm-notify-success: #5a803c;
+  --crm-notify-info: #277fa5;
   /* Wizard */
   --crm-wizard-width: auto;
   --crm-wizard-margin: calc(-1 * var(--crm-form-block-padding)) calc(-1 * var(--crm-form-block-padding)) 0;

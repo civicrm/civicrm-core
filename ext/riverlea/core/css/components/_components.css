@@ -649,6 +649,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before {
 .dc-chart .axis text {
   fill: var(--crm-c-text);
 }
-.crm-container .dc-chart .axis line, .dc-chart .axis path {
+.crm-container .dc-chart .axis line,
+.dc-chart .axis path {
   stroke: var(--crm-c-gray-500) !important;
 }
