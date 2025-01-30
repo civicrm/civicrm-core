@@ -179,6 +179,12 @@ class CRM_Utils_SQL {
     return CRM_Core_DAO::singleValueQuery('SELECT VERSION()');
   }
 
+  public static function connect($dsn) {
+    $dsn = CRM_Utils_SQL::autoSwitchDSN($dsn);
+    $options = CRM_Utils_SQL::isSSLDSN($dsn) ? ['ssl' => TRUE] : [];
+    return DB::connect($dsn, $options);
+  }
+
   /**
    * Does the DSN indicate the connection should use ssl.
    *
