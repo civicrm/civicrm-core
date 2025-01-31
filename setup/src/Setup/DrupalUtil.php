@@ -1,6 +1,8 @@
 <?php
 namespace Civi\Setup;
 
+use Drupal\Core\Database\Database;
+
 class DrupalUtil {
 
   /**
