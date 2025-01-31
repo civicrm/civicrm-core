@@ -12,7 +12,7 @@
             crmSearchAdmin: '^crmSearchAdmin'
         },
         templateUrl: '~/crmChartKit/searchAdminDisplayChartKit.html',
-        controller: function ($scope, searchMeta, chartKitColumnConfig, chartKitTypes) {
+        controller: function ($scope, searchMeta, chartKitColumnConfig, chartKitTypes, chartKitReduceTypes) {
             const ts = $scope.ts = CRM.ts('chart_kit');
 
             this.getColumnSlots = () => this.display.settings.columns.map((col, colIndex) => {
@@ -137,7 +137,7 @@
             this.axisDefaults = () => {
                 return {
                     // by default allow all types we know
-                    reduceTypes: chartKitColumnConfig.reduceType.map((type) => type.key),
+                    reduceTypes: chartKitReduceTypes.map((type) => type.key),
                     scaleTypes: chartKitColumnConfig.scaleType.map((type) => type.key),
                     dataLabelTypes: chartKitColumnConfig.dataLabelType.map((type) => type.key),
                     // by default no option
@@ -332,8 +332,15 @@
                 .map((optionKey) => this.getOptionDetailsForKey(configKey, optionKey))
                 .filter((details) => !!details);
 
-            this.getAllOptionDetails = (configKey) =>
-                (configKey === 'searchColumn') ? this.searchColumns : chartKitColumnConfig[configKey];
+            this.getAllOptionDetails = (configKey) => {
+                if (configKey === 'searchColumn') {
+                    return this.searchColumns;
+                }
+                if (configKey === 'reduceType') {
+                    return chartKitReduceTypes;
+                }
+                return chartKitColumnConfig[configKey];
+            };
 
             this.getOptionDetailsForKey = (configKey, optionKey) => this.getAllOptionDetails(configKey).find((option) => option.key === optionKey);
 

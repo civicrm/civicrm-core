@@ -6,32 +6,6 @@
         const ts = CRM.ts('chart_kit');
 
         return {
-            reduceType: [
-                {
-                    key: 'sum',
-                    label: ts('Sum')
-                },
-                {
-                    key: 'count',
-                    label: ts('Count')
-                },
-                {
-                    key: 'mean',
-                    label: ts('Average')
-                },
-                {
-                    key: "percentage_sum",
-                    label: ts("Percentage of total"),
-                },
-                {
-                    key: "percentage_count",
-                    label: ts("Percentage of count"),
-                },
-                {
-                    key: 'list',
-                    label: ts('List')
-                }
-            ],
             scaleType: [
                 {
                     key: 'numeric',
