@@ -26,7 +26,7 @@
   <civix>
     <namespace>CRM/CivicrmAdminUi</namespace>
     <angularModule>crmCivicrmAdminUi</angularModule>
-    <format>24.09.1</format>
+    <format>25.01.1</format>
   </civix>
   <mixins>
     <mixin>mgd-php@1.0.0</mixin>

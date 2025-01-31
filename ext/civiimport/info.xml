@@ -31,7 +31,7 @@
   </classloader>
   <civix>
     <namespace>CRM/Civiimport</namespace>
-    <format>23.02.1</format>
+    <format>25.01.1</format>
     <angularModule>crmCiviimport</angularModule>
   </civix>
   <mixins>
@@ -39,6 +39,6 @@
     <mixin>scan-classes@1.0.0</mixin>
     <mixin>setting-php@1.0.0</mixin>
     <mixin>ang-php@1.0.0</mixin>
-    <mixin>smarty@1.0.0</mixin>
+    <mixin>smarty@1.0.3</mixin>
   </mixins>
 </extension>
