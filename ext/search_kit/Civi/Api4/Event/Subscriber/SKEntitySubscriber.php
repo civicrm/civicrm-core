@@ -146,6 +146,12 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
   private function formatFieldSpec(array $column, array $expr): array {
     // Strip the pseuoconstant suffix
     [$name, $suffix] = array_pad(explode(':', $column['key']), 2, NULL);
+    if (!empty($column['name'])) {
+      if (!preg_match(';^[A-Za-z0-9_]+$;', $column['name']) || strlen($column['name']) > 58) {
+        throw new \CRM_Core_Exception("Malformed column name");
+      }
+      $name = $column['name'];
+    }
     // Sanitize the name and limit to 58 characters.
     // 64 characters is the max for some versions of SQL, minus the length of "index_" = 58.
     if (strlen($name) <= 58) {

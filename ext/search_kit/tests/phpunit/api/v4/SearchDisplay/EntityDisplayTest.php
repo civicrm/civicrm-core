@@ -226,16 +226,19 @@ class EntityDisplayTest extends Api4TestBase {
             'key' => 'id',
             'label' => 'Contact ID',
             'type' => 'field',
+            // 'name' is computed automatically
           ],
           [
             'key' => 'Contact_Participant_contact_id_01.event_id',
             'label' => 'Event ID',
             'type' => 'field',
+            // 'name' is computed automatically
           ],
           [
             'key' => 'Contact_Participant_contact_id_01.id',
             'label' => 'Participant ID',
             'type' => 'field',
+            'name' => 'the_participant_id',
           ],
         ],
         'sort' => [
@@ -252,9 +255,9 @@ class EntityDisplayTest extends Api4TestBase {
     $this->assertSame('Integer', $fields['Contact_Participant_contact_id_01_event_id']['data_type']);
     $this->assertSame('EntityRef', $fields['Contact_Participant_contact_id_01_event_id']['input_type']);
     $this->assertSame('Event', $fields['Contact_Participant_contact_id_01_event_id']['fk_entity']);
-    $this->assertSame('Integer', $fields['Contact_Participant_contact_id_01_id']['data_type']);
-    $this->assertSame('EntityRef', $fields['Contact_Participant_contact_id_01_id']['input_type']);
-    $this->assertSame('Participant', $fields['Contact_Participant_contact_id_01_id']['fk_entity']);
+    $this->assertSame('Integer', $fields['the_participant_id']['data_type']);
+    $this->assertSame('EntityRef', $fields['the_participant_id']['input_type']);
+    $this->assertSame('Participant', $fields['the_participant_id']['fk_entity']);
 
     civicrm_api4('SK_MyNewEntityWithJoin', 'refresh');
     $rows = (array) civicrm_api4('SK_MyNewEntityWithJoin', 'get', [
@@ -267,9 +270,9 @@ class EntityDisplayTest extends Api4TestBase {
     $this->assertEquals($event1['id'], $rows[0]['Contact_Participant_contact_id_01_event_id']);
     $this->assertEquals($event2['id'], $rows[1]['Contact_Participant_contact_id_01_event_id']);
     $this->assertNull($rows[2]['Contact_Participant_contact_id_01_event_id']);
-    $this->assertEquals($participants[0]['id'], $rows[0]['Contact_Participant_contact_id_01_id']);
-    $this->assertEquals($participants[1]['id'], $rows[1]['Contact_Participant_contact_id_01_id']);
-    $this->assertNull($rows[2]['Contact_Participant_contact_id_01_id']);
+    $this->assertEquals($participants[0]['id'], $rows[0]['the_participant_id']);
+    $this->assertEquals($participants[1]['id'], $rows[1]['the_participant_id']);
+    $this->assertNull($rows[2]['the_participant_id']);
     $this->assertEquals(__FUNCTION__, $rows[0]['Contact_Participant_contact_id_01_event_id.title']);
     $this->assertEquals(__FUNCTION__ . '2', $rows[1]['Contact_Participant_contact_id_01_event_id.title']);
 
@@ -282,7 +285,7 @@ class EntityDisplayTest extends Api4TestBase {
     $expected = [
       'SK_MyNewEntityWithJoin_Contact_id',
       'SK_MyNewEntityWithJoin_Event_Contact_Participant_contact_id_01_event_id',
-      'SK_MyNewEntityWithJoin_Participant_Contact_Participant_contact_id_01_id',
+      'SK_MyNewEntityWithJoin_Participant_the_participant_id',
     ];
     $this->assertEquals($expected, array_column($joinsFromEntity, 'alias'));
 
