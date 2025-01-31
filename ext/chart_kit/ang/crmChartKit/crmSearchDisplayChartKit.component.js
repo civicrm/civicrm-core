@@ -15,7 +15,7 @@
             afFieldset: '?^^afFieldset'
         },
         templateUrl: '~/crmChartKit/chartKitCanvas.html',
-        controller: function ($scope, $element, searchDisplayBaseTrait, chartKitTypes, chartKitReduceTypes) {
+        controller: function ($scope, $element, searchDisplayBaseTrait, chartKitChartTypes, chartKitReduceTypes) {
             const ts = $scope.ts = CRM.ts('chart_kit');
 
             // Mix in base display trait
@@ -94,7 +94,7 @@
             };
 
             this.initChartType = () => {
-                const type = chartKitTypes.find((type) => type.key === this.settings.chartType);
+                const type = chartKitChartTypes.find((type) => type.key === this.settings.chartType);
                 this.chartType = type.service;
             };
 

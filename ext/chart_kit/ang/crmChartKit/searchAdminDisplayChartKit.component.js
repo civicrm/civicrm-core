@@ -12,7 +12,7 @@
             crmSearchAdmin: '^crmSearchAdmin'
         },
         templateUrl: '~/crmChartKit/searchAdminDisplayChartKit.html',
-        controller: function ($scope, searchMeta, chartKitColumnConfig, chartKitTypes, chartKitReduceTypes) {
+        controller: function ($scope, searchMeta, chartKitColumnConfig, chartKitChartTypes, chartKitReduceTypes) {
             const ts = $scope.ts = CRM.ts('chart_kit');
 
             this.getColumnSlots = () => this.display.settings.columns.map((col, colIndex) => {
@@ -28,7 +28,7 @@
                 return this.getColumns().filter((col) => col.axis === axisKey);
             };
 
-            this.getChartTypeOptions = () => chartKitTypes.map((type) => ({ key: type.key, label: type.label, icon: type.icon }));
+            this.getChartTypeOptions = () => chartKitChartTypes.map((type) => ({ key: type.key, label: type.label, icon: type.icon }));
 
             this.getInitialDisplaySettings = () => ({
                 columns: [],
@@ -81,7 +81,7 @@
             };
 
             this.initChartType = () => {
-                const type = chartKitTypes.find((type) => type.key === this.display.settings.chartType);
+                const type = chartKitChartTypes.find((type) => type.key === this.display.settings.chartType);
                 this.chartType = type.service;
             };
 
