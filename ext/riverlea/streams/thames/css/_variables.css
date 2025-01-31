@@ -480,8 +480,9 @@
   --crm-f-form-layout: block; /* 'grid' = inline, 'block' = stacked */
   --crm-f-label-position: unset;
   --crm-f-label-align: left;
-  --crm-f-label-width: 200px;
   --crm-f-label-weight: bold;
+  --crm-f-label-margin: var(--crm-s);
+  --crm-f-label-width: unset;
   --crm-f-input-radius: var(--crm-roundness);
   --crm-f-input-padding: var(--crm-r2) var(--crm-m2);
   --crm-f-input-font-size: var(--crm-r1);

@@ -51,6 +51,7 @@
   --crm-checkbox-list-col: var(--crm-input-label-color);
   --crm-input-description: var(--crm-input-label-color);
   --crm-c-warning-text: black;
+  --crm-filter-bg: var(--crm-c-dkblue-02);
   /* these colour descriptions are used prescriptively */
   --crm-c-yellow-light: var(--crm-c-dkblue-01);
   --crm-c-yellow-less-light: var(--crm-c-dkblue-02);
@@ -129,7 +130,6 @@
 .crm-container .status-warning {
   --crm-c-alert: var(--crm-c-red);
 }
-
 #civicrm-footer a,
 nav.breadcrumb a {
   --crm-c-link: var(--crm-c-dkblue-08);

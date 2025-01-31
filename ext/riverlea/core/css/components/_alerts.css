@@ -3,7 +3,9 @@
 .crm-container .status,
 .crm-container .messages,
 .crm-container .alert,
-.crm-container .alert-success {
+.crm-container .alert-success,
+.crm-container .status.crm-ok,
+.crm-container .status.crm-ok.alert {
   background-color: var(--crm-alert-background-help);
   border: var(--crm-alert-border-width) solid var(--crm-alert-border-help);
   color: var(--crm-alert-text-help);
@@ -43,10 +45,6 @@
 .crm-container .messages.warning li {
   color: var(--crm-alert-text-warning);
 }
-.crm-container .status.crm-ok {
-  background-color: var(--crm-alert-background-help);
-  color: var(--crm-alert-text-help);
-}
 .crm-container .alert-info,
 .crm-container .messages.crm-empty-table {
   background-color: var(--crm-alert-background-info);
@@ -58,10 +56,10 @@
   border-color: var(--crm-alert-border-danger);
   color: var(--crm-alert-text-danger);
 }
-.crm-container .help a,
-.crm-container .messages a,
-.crm-container .alert a,
-.crm-container table tr.crm-row-selected a {
+.crm-container .help a:not(.btn),
+.crm-container .messages a:not(.btn),
+.crm-container .alert a:not(.btn),
+.crm-container table tr.crm-row-selected a:not(.btn) {
   color: inherit;
 }
 .crm-container .help a,

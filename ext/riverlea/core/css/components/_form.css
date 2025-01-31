@@ -83,7 +83,6 @@
   color: var(--crm-input-description);
   font-size: var(--crm-input-label-size);
   margin-bottom: var(--crm-flex-gap);
-  text-wrap: auto;
 }
 .crm-container .crm-marker {
   color: var(--crm-c-alert);
@@ -201,8 +200,10 @@ select.crm-error {
   justify-content: center;
   float: left;
 }
-.crm-container .crm-form-number {
+.crm-container .crm-form-number,
+.crm-container select.crm-form-select {
   width: auto; /* resets fixed width on input field with browser default */
+  min-width: auto !important /* vs front.css */;
 }
 
 /* Input size modifiers */
@@ -385,6 +386,15 @@ input.crm-form-checkbox) + label {
 .crm-container input[type="file"] {
   height: auto;
   padding: var(--crm-s);
+}
+
+/* Contact dashboard form */
+
+@media (max-width: 991px) {
+  .contact_basic_information-section tr,
+  .contact_basic_information-section td {
+    display: block;
+  }
 }
 
 /* Select2 */

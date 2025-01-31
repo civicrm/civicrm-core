@@ -86,7 +86,8 @@
 }
 .crm-container .crm-button-type-cancel,
 .crm-form-submit .cancel.crm-button,
-.crm-container button.ui-button:has(.fa-times) {
+.crm-container button.ui-button:has(.fa-times),
+#bootstrap-theme button.btn-secondary-outline {
   background: var(--crm-c-secondary);
   color: var(--crm-c-secondary-text);
 }
@@ -105,7 +106,9 @@
 .crm-container .crm-button-type-cancel:hover,
 .crm-container .crm-button-type-cancel:focus,
 .crm-container button.ui-button:has(.fa-times):hover,
-.crm-container button.ui-button:has(.fa-times):focus {
+.crm-container button.ui-button:has(.fa-times):focus,
+#bootstrap-theme button.btn-secondary-outline:hover,
+#bootstrap-theme button.btn-secondary-outline:focus {
   background: var(--crm-c-secondary-hover);
   color: var(--crm-c-secondary-hover-text);
 }
@@ -149,8 +152,7 @@
   background: linear-gradient(to top,rgba(0, 0, 0, 0.125),rgba(0, 0, 0, 0.125)) var(--crm-btn-success-bg);
   color: var(--crm-btn-success-text);
 }
-#bootstrap-theme .btn-danger,
-#bootstrap-theme button.btn-danger:has(.fa-times) {
+#bootstrap-theme .btn-danger {
   background: var(--crm-btn-alert-bg);
   color: var(--crm-btn-alert-text);
 }
@@ -317,6 +319,10 @@
   position: relative;
   display: inline-block;
   vertical-align: middle;
+}
+#bootstrap-theme > .btn-group.pull-right {
+  margin-block: var(--crm-padding-reg);
+  margin-left: var(--crm-flex-gap);
 }
 #bootstrap-theme .btn-group > .btn,
 #bootstrap-theme .btn-group-vertical > .btn {

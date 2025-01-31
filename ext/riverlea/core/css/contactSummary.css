@@ -380,7 +380,12 @@ div.crm-summary-contactname-block + .crm-actions-ribbon {
 }
 /* Contact dashboard responsive (using Bootstrap viewports) */
 
-@media (max-width: 768px) {
+@media (max-width: 991px) {
+  .crm-container div.contact_panel {
+    display: block;
+  }
+}
+@media (max-width: 767px) {
   #crm-main-content-wrapper {
     --crm-dash-heading-inset: 0; /* resets any inset on the title/action links */
   }
@@ -396,18 +401,16 @@ div.crm-summary-contactname-block + .crm-actions-ribbon {
   .crm-actions-ribbon .crm-previous-action {
     margin-left: 0;
   }
-}
-@media (max-width: 500px) { /* shows only icons for contact dashboard */
   .crm-contact-page #mainTabContainer.ui-tabs {
     grid-template-columns: auto 1fr;
   }
   .crm-contact-page #mainTabContainer .crm-contact-tabs-list {
     width: fit-content;
   }
-  .crm-container #mainTabContainer .ui-tabs-nav li .ui-tabs-anchor i {
-    font-size: var(--crm-font-size);
-  }
   .crm-container #mainTabContainer ul.ui-tabs-nav a span {
     display: none;
+  }
+  .crm-container #mainTabContainer .ui-tabs-nav li .ui-tabs-anchor i {
+    font-size: var(--crm-font-size);
   }
 }

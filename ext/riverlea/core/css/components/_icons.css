@@ -3,7 +3,6 @@
   float: left;
 }
 .crm-container div:not(.crm-search-display-editable-buttons) > button.btn-xs:has(.fa-times),
-#bootstrap-theme button.btn-xs:has(.fa-times),
 .crm-container .crm-hover-button:has(.crm-i),
 .crm-container .crm-hover-button:has(.crm-i):hover,
 .crm-container .crm-hover-button:has(.crm-i):focus {
@@ -291,25 +290,25 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 }
 
 /* Icon picker - vs crm-iconPicker.css */
-#crmIconPicker .icon-ctrls {
+.crm-container #crmIconPicker .icon-ctrls {
   display: flex;
 }
-#crmIconPicker .icon-ctrls > button {
+.crm-container #crmIconPicker .icon-ctrls > button {
   float: none;
   margin-left: auto;
   display: flex;
 }
-#crmIconPicker a.ui-button .ui-icon {
+.crm-container #crmIconPicker a.ui-button .ui-icon {
   margin-top: 0;
   font-size: var(--crm-r2);
 }
-#crmIconPicker .icons {
+.crm-container #crmIconPicker .icons {
   display: flex;
   flex-wrap: wrap;
   gap: var(--crm-m2);
   margin-top: 1rem;
 }
-#crmIconPicker a.ui-button {
+.crm-container #crmIconPicker a.ui-button {
   color: var(--crm-c-text) !important;
   background: transparent;
   width: var(--crm-r2);

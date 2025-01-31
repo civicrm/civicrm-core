@@ -625,7 +625,7 @@ html.crm-standalone  nav.breadcrumb>ol {
 }
 
 /* Fix Mosaico wizard */
-.crm_wizard__title {
+.crm_wizard__tille {
   --crm-panel-background: transparent;
 }
 .crmb-wizard-button-right {

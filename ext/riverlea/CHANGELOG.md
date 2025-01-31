@@ -1,3 +1,39 @@
+1.3.3-6.0alpha
+ - FIXED - FrontEnd: restored padding on alert boxes
+ - FIXED - FrontEnd: front-end-compressed table display form
+ - FIXED - Alert buttons link colour reset. Alert border colour mis-match for .alert.status.crm-ok
+ - FIXED - Front-end alignment issue for some blocks
+ - CHANGED - Minetta front-end label and inputs are inline, similar to Greenwich (others are stacked)
+ - CHANGED - FrontEnd: Added an 800px default width, similar to Greenwich, which impacts Minetta and Walbrook (forms are no longer 100% width).
+ - FIXED - Select lists match width of content
+ - FIXED - Select list padding on front-end doesn't hide selected value
+ - FIXED - Select list inline alignment for descriiption
+ - FIXED - Dark mode for alpha list Contrast Ratio across all streams, plus extra fixes in Walbrook and Thames.
+ - FIXED - AFGuiEditor - button group wrapping
+ - FIXED - alignment of buttons above some SearchKit table displays corrected
+ - ADDED CSS VARIABLES -
+    --crm-wizard-box-shadow
+    --crm-wizard-arrow-thickness (and increased Walbrook's to 2px)
+    --crm-btn-weight
+    --crm-btn-font
+    --crm-f-fieldset-box-shadow
+    --crm-f-legend-position (for moving legend between on and inside fieldset border)
+    --crm-f-legend-padding
+    --crm-f-label-margin (for vertical spacing between label and input)
+    --crm-f-label-gap (for horizontal spacing between label and input)
+    --crm-f-label-color
+
+1.3.2-6.0alpha
+ - FIXED - re-added .crm-c-blue-darker which had been removed, breaking primary hover bg in Walbrook.
+ - FIXED - crmIconPicker custom CSS not loading so moved selectors
+ - FIXED - SearchKit Tree fixes: alignment, padding, wrap & bg colour for inline edit cancel.
+ - CHANGED - SearchKit Tree adjusted the bordering to make the hierarchy a little more clear.
+ - FIXED - Responsive: contact dashboard two columns collapse to one at 768px.
+ - CHANGED - Responsive: Contact dashboard side tabs were triggering at 500px, widened to 768px for legibility.
+ - ADDED - Responsive: Wrap for Action Link multiple buttons.
+ - ADDED - Responsive: better handling of dialogs under 768px.
+ - FIXED - Responive: made min/max media queries consistent.
+
 1.3.1-6.0alpha
  - CHANGED - Upgrade success box colours to match 'alert-help/success' style (fixes some contrast ratio issues).
  - CHANGED Updated Civi core CSS files with changes in core from last six months: admin.css, dashboard.css, searchForm.css.
@@ -7,10 +43,9 @@
  - FIXED regression from contact dashboard ID change of `contact-summary` to `contact-0`.
  - ADDED tr.error danger bg & text colour (e.g. on import contacts summary table).
  - ADDED text colour to JQuery date picker (to handle inverse darkmode).
- - ADDED provisional draft support for SearchKit Tree Display.
+ - ADDED provisional support for SearchKit Tree Display.
  - FIXED wrong text colour on footer status label.
  - FIXED image on contact dashboard can overlap multiple tags: https://lab.civicrm.org/extensions/riverlea/-/issues/99.
- - FIXED wrapping of `.description` now works at smaller viewports.
  - CHANAGED Minetta colours for Contrast Ratio WCAG AAA: success, danger & info alert bg & text;
  - CHANGED Minetta DarkMode colours for Contrast Ratio WCAG AAA: alerts, backgrounds, input description, border, tabs.
  - CHANGED Walbrook colours for Contrast Ratio WCAG AAA: darker text, lighter success & warning button bg, lighter danger alert bg, darker link + hover, alert-status

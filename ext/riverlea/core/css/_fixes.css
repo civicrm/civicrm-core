@@ -244,6 +244,7 @@ a.crm-expand-row:focus {
   gap: var(--crm-btn-icon-spacing);
   align-items: center;
   margin: var(--crm-btn-margin);
+  width: max-content; /* front-end width bug when inside a td */
 }
 .crm-container a.button span {
   display: flex;
@@ -468,7 +469,7 @@ body[class*="page-civicrm-report-"] #report-tab-order-by-elements #optionFieldLi
   padding: var(--crm-padding-small);
   border-radius: var(--crm-btn-radius);
 }
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .crm-container .tag-tree-wrapper {
     display: block;
   }
@@ -755,7 +756,7 @@ details + .crm-content-block:has(.dataTables_wrapper) {
 
 /* Contact dashboard */
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .crm-container div.contact_panel {
     display: block;
   }

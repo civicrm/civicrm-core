@@ -69,6 +69,7 @@
   --crm-input-border-color: var(--crm-c-gray-300);
   --crm-input-box-shadow: 0;
   --crm-input-label-weight: normal;
+  --crm-input-label-width: 10em;
   --crm-fieldset-border: 1px;
   --crm-checkbox-list-col: var(--crm-c-text);
   /* Tabs */
@@ -140,4 +141,9 @@
   --crm-f-legend-align: unset;
   --crm-f-legend-size: var(--crm-r2);
   --crm-f-form-width: 50vw;
+  --crm-f-label-position: unset; /* 'unset' = stacked, 'left' = left align, in combination with width below */
+  --crm-f-label-align: left;
+  --crm-f-label-margin: 0 var(--crm-s);
+  --crm-f-label-width: unset;
+  --crm-f-label-weight: bold;
 }

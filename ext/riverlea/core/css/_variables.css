@@ -27,6 +27,7 @@
   --crm-c-blue: #bce8f1;
   --crm-c-blue-light: #e9f5fb;
   --crm-c-blue-dark: #20576f;
+  --crm-c-blue-darker: #133f51;
   --crm-c-purple: #4d4d69;
   --crm-c-purple-dark: #3e3e54;
   --crm-c-green: #d6e9c6;
@@ -126,6 +127,8 @@
   --crm-btn-box-shadow: none;
   --crm-btn-border: 0 solid transparent;
   --crm-btn-txt-transform: inherit;
+  --crm-btn-weight: inherit;
+  --crm-btn-font: inherit;
   --crm-btn-radius: 3px;
   --crm-btn-padding-block: var(--crm-xs1); /* padding for top and bottom, one value */
   --crm-btn-padding-inline: var(--crm-m1); /* padding for left and right, one value */
@@ -397,31 +400,39 @@
   --crm-wizard-height: 30px;
   --crm-wizard-radius: var(--crm-l);
   --crm-wizard-angle: 0px;
+  --crm-wizard-arrow-thickness: 1px;
   --crm-wizard-active-col: var(--crm-c-light-text);
   --crm-wizard-active-bg: var(--crm-c-link);
   --crm-wizard-border: var(--crm-c-divider);
   --crm-wizard-bg: var(--crm-c-page-background);
+  --crm-wizard-box-shadow: unset;
 /* Alpha filter */
   --crm-filter-bg: var(--crm-c-blue-light);
   --crm-filter-padding: var(--crm-m);
-  --crm-filter-item-bg: #fafafa;
+  --crm-filter-item-bg: var( --crm-c-background2);
   --crm-filter-item-shadow: 0px 0px 3px rgba(0,0,0,0.1);
   --crm-filter-spacing: space-between; /* choose 'space-between' to spread out evenly, 'start' for left align, or 'end' for right. */
 /* Frontend */
-  --crm-f-form-width: unset;
+  --crm-f-form-width: 800px;
   --crm-f-box-shadow: var(--crm-block-shadow);
-  --crm-f-fieldset-bg: #f8f8f8;
-  --crm-f-fieldset-padding: var(--crm-r);
+  --crm-f-fieldset-bg: var(--crm-c-page-background);
+  --crm-f-fieldset-padding: var(--crm-r) 0;
   --crm-f-fieldset-margin: 0 0 var(--crm-padding-reg) 0;
   --crm-f-fieldset-border: 0;
-  --crm-f-legend-align: center;
+  --crm-f-fieldset-box-shadow: var(--crm-f-box-shadow);
+  --crm-f-legend-position: left; /* chose 'left', 'right' or 'inherit' for browser-default of mid fieldset border */
+  --crm-f-legend-align: left;
   --crm-f-legend-size: var(--crm-r3);
+  --crm-f-legend-padding: 0;
   --crm-f-form-padding: var(--crm-padding-reg);
   --crm-f-form-layout: block; /* 'grid' = inline, 'block' = stacked */
-  --crm-f-label-position: unset;
-  --crm-f-label-align: left;
+  --crm-f-label-position: left; /* 'unset' = stacked, 'left' = left align, in combination with width/margin below */
+  --crm-f-label-align: right;
   --crm-f-label-width: 200px;
+  --crm-f-label-gap: var(--crm-m); /* applies for inline label + input */
+  --crm-f-label-margin: var(--crm-s);
   --crm-f-label-weight: bold;
+  --crm-f-label-color: inherit;
   --crm-f-input-radius: var(--crm-roundness);
   --crm-f-input-padding: var(--crm-r2) var(--crm-m2);
   --crm-f-input-font-size: var(--crm-r1);
