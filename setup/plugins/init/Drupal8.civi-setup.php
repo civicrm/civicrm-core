@@ -39,7 +39,7 @@ if (!defined('CIVI_SETUP')) {
     }
 
     // Compute DSN.
-    $connectionOptions = \Drupal::database()->getConnectionOptions();
+    $connectionOptions = \Civi\Setup\DrupalUtil::get_database_configuration()['info'];
     $ssl_params = \Civi\Setup\DrupalUtil::guessSslParams($connectionOptions);
     // @todo Does Drupal support unixsocket in config? Set 'server' => 'unix(/path/to/socket.sock)'
     $model->db = $model->cmsDb = array(
