@@ -675,12 +675,14 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
           'weight' => 50,
           'domain_id' => 'current_domain',
         ],
+        'match' => ['name'],
       ],
     ];
     $managedRecords = [];
     \CRM_Utils_Hook::managed($managedRecords, ['unit.test.fake.ext']);
     $result = \CRM_Utils_Array::findAll($managedRecords, ['module' => 'unit.test.fake.ext', 'name' => 'Navigation_Test_Domains']);
     $this->assertCount(1, $result);
+    $this->assertSame(['name'], $result[0]['params']['match']);
 
     // Enable multisite with multiple domains
     \Civi::settings()->set('is_enabled', TRUE);
@@ -697,11 +699,13 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
     // Base entity should not have been renamed
     $result = \CRM_Utils_Array::findAll($managedRecords, ['module' => 'unit.test.fake.ext', 'name' => 'Navigation_Test_Domains']);
     $this->assertCount(1, $result);
+    $this->assertSame(['name', 'domain_id'], $result[0]['params']['match']);
 
     // New item should have been inserted for extra domains
     foreach (array_slice($allDomains->column('id'), 1) as $domain) {
       $result = \CRM_Utils_Array::findAll($managedRecords, ['module' => 'unit.test.fake.ext', 'name' => 'Navigation_Test_Domains_' . $domain]);
       $this->assertCount(1, $result);
+      $this->assertSame(['name', 'domain_id'], $result[0]['params']['match']);
     }
   }
 
