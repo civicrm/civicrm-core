@@ -575,8 +575,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     // Re:^^^ => the failure was probably correct behavior, and test is now fixed, but yeah 5.5 is deprecated, and don't care enough to verify.
     // Test data providers should be able to run in pre-boot environment, so we connect directly to SQL server.
     require_once 'DB.php';
-    $dsn = CRM_Utils_SQL::autoSwitchDSN(CIVICRM_DSN);
-    $db = DB::connect($dsn);
+    $db = CRM_Utils_SQL::connect(CIVICRM_DSN);
     if ($db->connection instanceof mysqli && $db->connection->server_version < 50600) {
       $entitiesWithout[] = 'Dedupe';
     }
