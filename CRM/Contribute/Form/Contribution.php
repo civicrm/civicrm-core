@@ -680,9 +680,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       if ($buildRecurBlock) {
         $this->buildRecur();
         $this->setDefaults(['is_recur' => 0]);
-        $this->assign('buildRecurBlock', TRUE);
       }
     }
+    $this->assign('buildRecurBlock', $buildRecurBlock);
     $this->addPaymentProcessorSelect(FALSE, $buildRecurBlock);
 
     $qfKey = $this->controller->_key;
