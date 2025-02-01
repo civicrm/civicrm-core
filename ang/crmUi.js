@@ -1122,6 +1122,7 @@
     // Example: <button crm-confirm="{message: ts('Are you sure you want to continue?')}" on-yes="frobnicate(123)">Frobincate</button>
     // Example: <button crm-confirm="{type: 'disable', obj: myObject}" on-yes="myObject.is_active=0; myObject.save()">Disable</button>
     // Example: <button crm-confirm="{templateUrl: '~/path/to/view.html', export: {foo: bar}}" on-yes="frobnicate(123)">Frobincate</button>
+    // Example: <button crm-confirm="{confirmed: true}" on-yes="frobnicate(123)">Frobincate</button>
     .directive('crmConfirm', function ($compile, $rootScope, $templateRequest, $q) {
       // Helpers to calculate default options for CRM.confirm()
       var defaultFuncs = {
@@ -1178,6 +1179,11 @@
                 stubId = 'crmUiConfirm_' + (++confirmCount);
                 options.message = '<div id="' + stubId + '"></div>';
               }
+            }
+
+            if (options.confirmed) {
+              scope.$apply(attrs.onYes);
+              return;
             }
 
             CRM.confirm(_.extend(defaults, options))
