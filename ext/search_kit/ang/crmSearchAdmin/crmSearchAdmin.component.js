@@ -10,6 +10,7 @@
   //     return $delegate;
   //   });
   var hook = {
+    findCriticalChanges: [],
     preSaveDisplay: [],
     postSaveDisplay: []
   };
@@ -105,6 +106,7 @@
       this.savedSearch.form_values.join = this.savedSearch.form_values.join || {};
       this.savedSearch.groups = this.savedSearch.groups || [];
       this.savedSearch.tag_id = this.savedSearch.tag_id || [];
+      this.originalSavedSearch = _.cloneDeep(this.savedSearch);
       this.groupExists = !!this.savedSearch.groups.length;
 
       const path = $location.path();
@@ -167,6 +169,31 @@
       $scope.status = 'unsaved';
     }
 
+    // Generate the confirmation dialog
+    this.confirmSave = function() {
+      // Build displays. For each, identify the {original: ..., updated: ...} variants..
+      const targets = {}, data = {messages: []};
+      let newCount = 0;
+      ctrl.originalSavedSearch.displays.forEach(function(original) {
+        const key = original.id ? ('id_' + original.id) : ('new_' + (newCount++));
+        targets[key] = targets[key] || {};
+        targets[key].original = _.cloneDeep(original);
+      });
+      ctrl.savedSearch.displays.forEach(function(updated) {
+        const key = updated.id ? ('id_' + updated.id) : ('new_' + (newCount++));
+        targets[key] = targets[key] || {};
+        targets[key].updated = _.cloneDeep(updated);
+      });
+
+      fireHooks('findCriticalChanges', _.values(targets), data);
+      if (data.messages.length < 1) return {confirmed: true};
+      return {
+        title: ts('Are you sure?'),
+        template: '<p>' + ts('The following change(s) may affect other customizations:') +'</p><hr/><p ng-repeat="message in messages"><small>{{::message}}</small></p>',
+        export: data
+      };
+    };
+
     this.save = function() {
       if (!validate()) {
         return;
@@ -217,6 +244,7 @@
           ctrl.savedSearch.groups[0].id = results.saved.groups[0].id;
         }
         ctrl.savedSearch.displays = results.saved.displays || [];
+        ctrl.originalSavedSearch = _.cloneDeep(ctrl.savedSearch);
         // Wait until after onChangeAnything to update status
         $timeout(function() {
           $scope.status = newStatus;
