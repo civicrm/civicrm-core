@@ -482,9 +482,9 @@ class CRM_Utils_System {
    *   Page title (if different) - may include html
    */
   public static function setTitle($title, $pageTitle = NULL) {
-    self::$title = $title;
+    self::$title = $title = strip_tags($title ?: '');
     $config = CRM_Core_Config::singleton();
-    return $config->userSystem->setTitle(CRM_Utils_String::purifyHtml($title), CRM_Utils_String::purifyHtml($pageTitle));
+    return $config->userSystem->setTitle($title, CRM_Utils_String::purifyHtml($pageTitle));
   }
 
   /**
