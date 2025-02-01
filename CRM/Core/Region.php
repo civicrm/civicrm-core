@@ -64,6 +64,11 @@ class CRM_Core_Region implements CRM_Core_Resources_CollectionInterface, CRM_Cor
     if (defined('CIVICRM_IFRAME')) {
       $allowCmsOverride = FALSE;
     }
+    if (Civi::settings()->get('debug_enabled')) {
+      // The point of debug mode is to allow debugging. The CMS override only applies on BD/D7, and it makes debugging harder.
+      // https://lab.civicrm.org/dev/core/-/issues/5712
+      $allowCmsOverride = FALSE;
+    }
 
     Civi::dispatcher()->dispatch('civi.region.render', \Civi\Core\Event\GenericHookEvent::create(['region' => $this]));
 
