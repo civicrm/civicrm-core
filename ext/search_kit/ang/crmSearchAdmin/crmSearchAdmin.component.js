@@ -14,6 +14,17 @@
     postSaveDisplay: []
   };
 
+  // Dispatch {hookName} on behalf of each {target}. Pass-through open-ended {data}.
+  function fireHooks(hookName, targets, data) {
+    if (hook[hookName].length) {
+      targets.forEach(function(target) {
+        hook[hookName].forEach(function(callback) {
+          callback(target, data);
+        });
+      });
+    }
+  }
+
   // Controller function for main crmSearchAdmin component
   var ctrl = function($scope, $element, $location, $timeout, crmApi4, dialogService, searchMeta, crmUiHelp) {
     var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
@@ -172,14 +183,7 @@
       }
       _.remove(params.displays, {trashed: true});
       if (params.displays && params.displays.length) {
-        // Call preSaveDisplay hook
-        if (hook.preSaveDisplay.length) {
-          params.displays.forEach(function(display) {
-            hook.preSaveDisplay.forEach(function(callback) {
-              callback(display, apiCalls);
-            });
-          });
-        }
+        fireHooks('preSaveDisplay', params.displays, apiCalls);
         chain.displays = ['SearchDisplay', 'replace', {where: [['saved_search_id', '=', '$id']], records: params.displays}];
       } else if (params.id) {
         apiCalls.deleteDisplays = ['SearchDisplay', 'delete', {where: [['saved_search_id', '=', params.id]]}];
@@ -200,12 +204,8 @@
       apiCalls.saved = ['SavedSearch', 'save', {records: [params], chain: chain}, 0];
       crmApi4(apiCalls).then(function(results) {
         // Call postSaveDisplay hook
-        if (chain.displays && hook.postSaveDisplay.length) {
-          results.saved.displays.forEach(function(display) {
-            hook.postSaveDisplay.forEach(function(callback) {
-              callback(display, results);
-            });
-          });
+        if (chain.displays) {
+          fireHooks('postSaveDisplay', results.saved.displays, results);
         }
         // After saving a new search, redirect to the edit url
         if (!ctrl.savedSearch.id) {
