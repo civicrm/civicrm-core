@@ -10,7 +10,7 @@
 {* Links for scheduling/logging meetings and calls and Sending Email *}
 
 {if $as_select} {* on 3.2, the activities can be either a drop down select (on the activity tab) or a list (on the action menu) *}
-<select name="other_activity" class="crm-form-select crm-select2 crm-action-menu fa-plus" title="{ts}New Activity{/ts}">
+<select name="other_activity" class="crm-form-select crm-select2 crm-action-menu fa-plus" title="{ts escape='htmlattribute'}New Activity{/ts}">
   <option value="">{ts}New Activity{/ts}</option>
 {foreach from=$activityTypes item=act}
   <option value="{$act.url}" data-icon="{$act.icon}">{$act.label}</option>
