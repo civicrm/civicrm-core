@@ -27,7 +27,6 @@ class CRM_Core_OptionGroup {
    */
   public static $_domainIDGroups = [
     'from_email_address',
-    'grant_type',
   ];
 
   /**
