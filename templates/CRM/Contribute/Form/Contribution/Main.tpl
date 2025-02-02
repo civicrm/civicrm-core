@@ -59,7 +59,7 @@
     {crmRegion name='contribution-main-not-you-block'}
     {if $contact_id && !$isPaymentOnExistingContribution}
       <div class="messages status no-popup crm-not-you-message">
-        {ts 1=$display_name}Welcome %1{/ts}. (<a href="{crmURL p='civicrm/contribute/transact' q="cid=0&reset=1&id=`$contributionPageID`"}" title="{ts}Click here to do this for a different person.{/ts}">{ts 1=$display_name}Not %1, or want to do this for a different person{/ts}</a>?)
+        {ts 1=$display_name}Welcome %1{/ts}. (<a href="{crmURL p='civicrm/contribute/transact' q="cid=0&reset=1&id=`$contributionPageID`"}" title="{ts escape='htmlattribute'}Click here to do this for a different person.{/ts}">{ts 1=$display_name}Not %1, or want to do this for a different person{/ts}</a>?)
       </div>
     {/if}
     {/crmRegion}

@@ -41,13 +41,13 @@
             <td>
             <table class="form-layout">
                 <tr class="crm-contribution-contributionpage-amount-form-block-pay_later_text">
-                    <td scope="row" class="label">{$form.pay_later_text.label} <span class="crm-marker" title="{ts}This field is required.{/ts}">*</span> {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='pay_later_text' id=$contributionPageID}{/if}</td>
+                    <td scope="row" class="label">{$form.pay_later_text.label} <span class="crm-marker" title="{ts escape='htmlattribute'}This field is required.{/ts}">*</span> {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='pay_later_text' id=$contributionPageID}{/if}</td>
                     <td>{$form.pay_later_text.html|crmAddClass:big}</td>
                 </tr>
                 <tr class="crm-contribution-contributionpage-amount-form-block-pay_later_receipt">
                     <td scope="row" class="label">
                         {$form.pay_later_receipt.label}
-                        <span class="crm-marker" title="{ts}This field is required.{/ts}">*</span>
+                        <span class="crm-marker" title="{ts escape='htmlattribute'}This field is required.{/ts}">*</span>
                         {help id="id-pay_later_receipt"}
                         {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='pay_later_receipt' id=$contributionPageID}{/if}
                     </td>
@@ -82,7 +82,7 @@
                <td>
                   <table class="form-layout-compressed">
                     <tr class="crm-contribution-form-block-recur_frequency_unit">
-                        <td scope="row" class="label">{$form.recur_frequency_unit.label} <span class="crm-marker" title="{ts}This field is required.{/ts}">*</span></td>
+                        <td scope="row" class="label">{$form.recur_frequency_unit.label} <span class="crm-marker" title="{ts escape='htmlattribute'}This field is required.{/ts}">*</span></td>
                         <td>{$form.recur_frequency_unit.html}</td>
                     </tr>
                     <tr class="crm-contribution-form-block-is_recur_interval"><td scope="row" class="label">{$form.is_recur_interval.label}</td>

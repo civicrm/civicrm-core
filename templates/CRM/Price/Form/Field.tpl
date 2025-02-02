@@ -95,7 +95,7 @@
   <div id="price-block" {if $action eq 2 && $form.html_type.value.0 eq 'Text'} class="show-block" {else} class="hiddenElement" {/if}>
     <table class="form-layout">
       <tr class="crm-price-field-form-block-price">
-        <td class="label">{$form.price.label|smarty:nodefaults} <span class="crm-marker" title="{ts}This field is required.{/ts}">*</span> {help id="id-negative"}</td>
+        <td class="label">{$form.price.label|smarty:nodefaults} <span class="crm-marker" title="{ts escape='htmlattribute'}This field is required.{/ts}">*</span> {help id="id-negative"}</td>
         <td>{$form.price.html}</td>
       </tr>
       <tr class="crm-price-field-form-block-non-deductible-amount">
@@ -117,7 +117,7 @@
       </tr>
     {/if}
       <tr class="crm-price-field-form-block-financial_type">
-        <td class="label">{$form.financial_type_id.label|smarty:nodefaults}<span class="crm-marker" title="{ts}This field is required.{/ts}">*</span></td></td>
+        <td class="label">{$form.financial_type_id.label|smarty:nodefaults}<span class="crm-marker" title="{ts escape='htmlattribute'}This field is required.{/ts}">*</span></td></td>
         <td>
         {if !$financialType}
           {capture assign=ftUrl}{crmURL p='civicrm/admin/financial/financialType' q="reset=1"}{/capture}
