@@ -30,7 +30,7 @@
 {if !$addBlock}
 <tr>
 <td colspan="4">
-&nbsp;&nbsp;<a href="#" title={ts}Add{/ts} onClick="buildAdditionalBlocks( 'OpenID', '{$className}');return false;">{ts}Add another Open Id{/ts}</a>
+&nbsp;&nbsp;<a href="#" title="{ts escape='htmlattribute'}Add{/ts}" onClick="buildAdditionalBlocks( 'OpenID', '{$className}');return false;">{ts}Add another Open Id{/ts}</a>
 </td>
 </tr>
 {/if}

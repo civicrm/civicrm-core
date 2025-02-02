@@ -61,7 +61,7 @@
             <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$exception.contact_id2`"}" target="_blank">{$exception.$contact2name}</a>
           </td>
           <td>
-            <a id='duplicateContacts' href="#" title={ts}Remove Exception{/ts} onClick="processDupes( {$exception.contact_id1}, {$exception.contact_id2}, 'nondupe-dupe', 'dedupe-exception' );return false;"><i class="crm-i fa-trash" aria-hidden="true"></i> {ts}Remove Exception{/ts}</a>
+            <a id='duplicateContacts' href="#" title="{ts escape='htmlattribute'}Remove Exception{/ts}" onClick="processDupes( {$exception.contact_id1}, {$exception.contact_id2}, 'nondupe-dupe', 'dedupe-exception' );return false;"><i class="crm-i fa-trash" aria-hidden="true"></i> {ts}Remove Exception{/ts}</a>
           </td>
         </tr>
 

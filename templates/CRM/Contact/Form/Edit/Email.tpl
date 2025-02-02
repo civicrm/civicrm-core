@@ -15,7 +15,7 @@
 {if !$addBlock}
   <tr>
     <td>{ts}Email{/ts}
-      &nbsp;&nbsp;<a id='addEmail' href="#" title={ts}Add{/ts} onClick="buildAdditionalBlocks( 'Email', '{$className}');return false;">{ts}add{/ts}</a>
+      &nbsp;&nbsp;<a id='addEmail' href="#" title="{ts escape='htmlattribute'}Add{/ts}" onClick="buildAdditionalBlocks( 'Email', '{$className}');return false;">{ts}add{/ts}</a>
     </td>
     {if $className eq 'CRM_Contact_Form_Contact'}
       <td>{ts}On Hold?{/ts} {help id="id-onhold" file="CRM/Contact/Form/Contact.hlp"}</td>
