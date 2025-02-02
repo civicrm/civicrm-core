@@ -9,7 +9,7 @@
 *}
 {* template for building IM block*}
 <div id="crm-im-content" {if $permission EQ 'edit'} class="crm-inline-edit" data-edit-params='{ldelim}"cid": "{$contactId}", "class_name": "CRM_Contact_Form_Inline_IM"{rdelim}'{/if}>
-  <div class="crm-clear crm-inline-block-content" {if $permission EQ 'edit'}title="{ts}Add or edit IM{/ts}"{/if}>
+  <div class="crm-clear crm-inline-block-content" {if $permission EQ 'edit'}title="{ts escape='htmlattribute'}Add or edit IM{/ts}"{/if}>
     {if $permission EQ 'edit'}
       <div class="crm-edit-help">
         <span class="crm-i fa-pencil" aria-hidden="true"></span> {if empty($im)}{ts}Add IM{/ts}{else}{ts}Add or edit IM{/ts}{/if}

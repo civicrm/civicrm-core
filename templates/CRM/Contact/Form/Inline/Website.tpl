@@ -21,7 +21,7 @@
       <td>{ts}Website{/ts}
         {help id="id-website" file="CRM/Contact/Form/Contact.hlp"}
         {if $actualBlockCount lt 25}
-          &nbsp;&nbsp;<span id="add-more-website" title="{ts}click to add more{/ts}"><a class="crm-hover-button action-item add-more-inline" href="#">{ts}add{/ts}</a></span>
+          &nbsp;&nbsp;<span id="add-more-website" title="{ts escape='htmlattribute'}click to add more{/ts}"><a class="crm-hover-button action-item add-more-inline" href="#">{ts}add{/ts}</a></span>
         {/if}
       </td>
       <td>{ts}Website Type{/ts}</td>
@@ -34,7 +34,7 @@
       <td>{$form.website.$blockId.url.html|crmAddClass:url}&nbsp;</td>
       <td>{$form.website.$blockId.website_type_id.html}</td>
       {if $blockId gt 1}
-        <td><a class="crm-delete-inline crm-hover-button action-item" href="#" title="{ts}Delete Website{/ts}"><span class="icon delete-icon"></span></a></td>
+        <td><a class="crm-delete-inline crm-hover-button action-item" href="#" title="{ts escape='htmlattribute'}Delete Website{/ts}"><span class="icon delete-icon"></span></a></td>
       {/if}
     </tr>
     {/section}

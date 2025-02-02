@@ -9,7 +9,7 @@
 *}
 {* template for building communication preference block*}
 <div id="crm-communication-pref-content" {if $permission EQ 'edit'} class="crm-inline-edit" data-edit-params='{ldelim}"cid": "{$contactId}", "class_name": "CRM_Contact_Form_Inline_CommunicationPreferences"{rdelim}' data-dependent-fields='["#crm-phone-content", "#crm-email-content", ".address.crm-inline-edit:not(.add-new)", "#crm-contact-actions-wrapper"]'{/if}>
-  <div class="crm-clear crm-inline-block-content"{if $permission EQ 'edit'} title="{ts}Edit communication preferences{/ts}"{/if}>
+  <div class="crm-clear crm-inline-block-content"{if $permission EQ 'edit'} title="{ts escape='htmlattribute'}Edit communication preferences{/ts}"{/if}>
     {if $permission EQ 'edit'}
     <div class="crm-edit-help">
       <span class="crm-i fa-pencil" aria-hidden="true"></span> {ts}Edit communication preferences{/ts}

@@ -8,7 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 <div id="custom-set-content-{$customGroupId}" {if $permission EQ 'edit' && !empty($cd_edit.editable)} class="crm-inline-edit" data-edit-params='{ldelim}"cid": "{$contactId}", "class_name": "CRM_Contact_Form_Inline_CustomData", "groupID": "{$customGroupId}", "customRecId": "{$customRecId}", "cgcount" : "{$cgcount}"{rdelim}' data-dependent-fields='["#crm-communication-pref-content"]'{/if}>
-  <div class="crm-clear crm-inline-block-content" {if $permission EQ 'edit' && !empty($cd_edit.editable)}title="{ts}Edit{/ts}"{/if}>
+  <div class="crm-clear crm-inline-block-content" {if $permission EQ 'edit' && !empty($cd_edit.editable)}title="{ts escape='htmlattribute'}Edit{/ts}"{/if}>
     {if $permission EQ 'edit' && !empty($cd_edit.editable)}
       <div class="crm-edit-help">
         <span class="crm-i fa-pencil" aria-hidden="true"></span> {ts}Edit{/ts}

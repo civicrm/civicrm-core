@@ -26,7 +26,7 @@
     <td colspan="2">{$form.im.$blockId.provider_id.html}</td>
     <td align="center" id="IM-Primary-html" {if $blockId eq 1}class="hiddenElement"{/if}>{$form.im.$blockId.is_primary.1.html}</td>
     {if $blockId gt 1}
-        <td><a href="#" title="{ts}Delete IM Block{/ts}" onClick="removeBlock('IM','{$blockId}'); return false;">{ts}delete{/ts}</a></td>
+        <td><a href="#" title="{ts escape='htmlattribute'}Delete IM Block{/ts}" onClick="removeBlock('IM','{$blockId}'); return false;">{ts}delete{/ts}</a></td>
     {/if}
 </tr>
 {if !$addBlock}
