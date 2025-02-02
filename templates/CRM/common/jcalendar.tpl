@@ -52,7 +52,7 @@
 {/if}
 
 
- <a href="#" class="crm-hover-button crm-clear-link" title="{ts}Clear{/ts}"><i class="crm-i fa-times" aria-hidden="true"></i></a>
+ <a href="#" class="crm-hover-button crm-clear-link" title="{ts escape='htmlattribute'}Clear{/ts}"><i class="crm-i fa-times" aria-hidden="true"></i></a>
 
 <script type="text/javascript">
     {literal}
