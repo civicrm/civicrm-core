@@ -54,7 +54,7 @@
           <tr id="event-{$row.id}" class="crm-entity {if NOT $row.is_active} disabled{/if}">
           <td class="crm-event_{$row.id}">
             <a href="{crmURL p='civicrm/event/info' q="id=`$row.id`&reset=1"}"
-               title="{ts}View event info page{/ts}" class="bold">{$row.title|smarty:nodefaults|purify}</a>&nbsp;&nbsp;({ts}ID:{/ts} {$row.id})<br/>
+               title="{ts escape='htmlattribute'}View event info page{/ts}" class="bold">{$row.title|smarty:nodefaults|purify}</a>&nbsp;&nbsp;({ts}ID:{/ts} {$row.id})<br/>
                <span><b>{$row.repeat}</b></span>
           </td>
           <td class="crm-event-city">{$row.city}</td>
@@ -93,14 +93,14 @@
                 <ul class="panel" id="panel_participants_{$row.id}">
                   {if $findParticipants.statusCounted}
                     <li>
-                      <a title="{ts}Counted Participants{/ts}" class="action-item crm-hover-button" href="{crmURL p='civicrm/event/search'
+                      <a title="{ts escape='htmlattribute'}Counted Participants{/ts}" class="action-item crm-hover-button" href="{crmURL p='civicrm/event/search'
                       q="reset=1&force=1&status=true&event=`$row.id`"}">{$findParticipants.statusCounted}
                       </a>
                     </li>
                   {/if}
                   {if $findParticipants.statusNotCounted}
                     <li>
-                      <a title="{ts}Participants Not Counted{/ts}" class="action-item crm-hover-button"
+                      <a title="{ts escape='htmlattribute'}Participants Not Counted{/ts}" class="action-item crm-hover-button"
                            href="{crmURL p='civicrm/event/search'
                            q="reset=1&force=1&status=false&event=`$row.id`"}">{$findParticipants.statusNotCounted}
                       </a>
@@ -108,7 +108,7 @@
                   {/if}
                   {if $row.participant_listing_id}
                     <li>
-                      <a title="{ts}Public Participant Listing{/ts}" class="action-item crm-hover-button"
+                      <a title="{ts escape='htmlattribute'}Public Participant Listing{/ts}" class="action-item crm-hover-button"
                          href="{crmURL p='civicrm/event/participant' q="reset=1&id=`$row.id`"
                          fe='true'}">{ts}Public Participant Listing{/ts}
                       </a>

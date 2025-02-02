@@ -12,7 +12,7 @@
   <tr>
     <td colspan="2">
     {if $context EQ 'ThankYou'} {* Provide link back to event info page from Thank-you page *}
-        <a href="{crmURL p='civicrm/event/info' q="reset=1&id=`$event.id`"}"title="{ts}View complete event information.{/ts}"><strong>{$event.event_title}</strong></a>
+        <a href="{crmURL p='civicrm/event/info' q="reset=1&id=`$event.id`"}"title="{ts escape='htmlattribute'}View complete event information.{/ts}"><strong>{$event.event_title}</strong></a>
     {else}
         <strong>{$event.event_title}</strong>
     {/if}
@@ -41,7 +41,7 @@
             $config->mapProvider &&
       ((!empty($location.address.1.geo_code_1) && is_numeric($location.address.1.geo_code_1)) ||
         (!empty($location.address.1.city) AND !empty($location.address.1.state_province))))}
-              <br/><a href="{crmURL p='civicrm/contact/map/event' q="reset=1&eid=`$event.id`"}" title="{ts}Map this Address{/ts}" target="_blank">{ts}Map this Location{/ts}</a>
+              <br/><a href="{crmURL p='civicrm/contact/map/event' q="reset=1&eid=`$event.id`"}" title="{ts escape='htmlattribute'}Map this Address{/ts}" target="_blank">{ts}Map this Location{/ts}</a>
             {/if}
           </td>
       </tr>

@@ -28,7 +28,7 @@
     <tr class="crm-event-participantview-form-block-displayName">
       <td class="label">{ts}Participant Name{/ts}</td>
       <td>
-        <strong><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$contactId"}" title="{ts}View contact record{/ts}">{$displayName|escape}</a></strong>
+        <strong><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$contactId"}" title="{ts escape='htmlattribute'}View contact record{/ts}">{$displayName|escape}</a></strong>
         <div>
             <a class="action-item crm-hover-button" href="{crmURL p='civicrm/event/badge' q="reset=1&context=view&id=$participantId&cid=$contactId"}"><i class="crm-i fa-print" aria-hidden="true"></i> {ts}Print Name Badge{/ts}</a>
             <a class="action-item crm-hover-button" href="{crmURL p='civicrm/event/participant/print' q="reset=1&context=view&id=$participantId&cid=$contactId"}"><i class="crm-i fa-print" aria-hidden="true"></i> {ts}PDF letter - print for participant{/ts}</a>
@@ -38,7 +38,7 @@
   {if $participant_registered_by_id} {* Display primary participant *}
       <tr class="crm-event-participantview-form-block-registeredBy">
           <td class="label">{ts}Registered By{/ts}</td>
-          <td><a href="{crmURL p='civicrm/contact/view/participant' q="reset=1&id=$participant_registered_by_id&cid=$registered_by_contact_id&action=view"}" title="{ts}view primary participant{/ts}">{$registered_by_display_name|escape}</a></td>
+          <td><a href="{crmURL p='civicrm/contact/view/participant' q="reset=1&id=$participant_registered_by_id&cid=$registered_by_contact_id&action=view"}" title="{ts escape='htmlattribute'}view primary participant{/ts}">{$registered_by_display_name|escape}</a></td>
       </tr>
   {/if}
   {if $additionalParticipants} {* Display others registered by this participant *}
@@ -46,14 +46,14 @@
             <td class="label">{ts}Also Registered by this Participant{/ts}</td>
             <td>
                 {foreach from=$additionalParticipants key=participantName item=participantURL}
-                    <a href="{$participantURL}" title="{ts}view additional participant{/ts}">{$participantName|escape}</a><br />
+                    <a href="{$participantURL}" title="{ts escape='htmlattribute'}view additional participant{/ts}">{$participantName|escape}</a><br />
                 {/foreach}
             </td>
         </tr>
   {/if}
     <tr class="crm-event-participantview-form-block-event">
       <td class="label">{ts}Event{/ts}</td><td>
-        <a href="{crmURL p='civicrm/event/manage/settings' q="action=update&reset=1&id=$event_id"}" title="{ts}Configure this event{/ts}">{$event|escape}</a>
+        <a href="{crmURL p='civicrm/event/manage/settings' q="action=update&reset=1&id=$event_id"}" title="{ts escape='htmlattribute'}Configure this event{/ts}">{$event|escape}</a>
       </td>
   </tr>
 
@@ -74,7 +74,7 @@
     <tr class="crm-event-participantview-form-block-status">
       <td class="label">{ts}Status{/ts}</td><td>{$status|escape}&nbsp;
       {if $transferName}
-        {ts}(Transferred to <a href="{crmURL p='civicrm/contact/view/participant' q="action=view&reset=1&id=$pid&cid=$transferId"}" title="{ts}View this Participant{/ts}">{$transferName|escape}</a>){/ts}
+        {ts}(Transferred to <a href="{crmURL p='civicrm/contact/view/participant' q="action=view&reset=1&id=$pid&cid=$transferId"}" title="{ts escape='htmlattribute'}View this Participant{/ts}">{$transferName|escape}</a>){/ts}
       {/if}
       </td>
   </tr>

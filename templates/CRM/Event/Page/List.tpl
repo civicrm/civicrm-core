@@ -27,8 +27,8 @@
     </thead>
     {foreach from=$events key=uid item=event}
       <tr class="{cycle values="odd-row,even-row"}{if !empty($row.class)} {$row.class}{/if}">
-        <td><a href="{crmURL p='civicrm/event/info' q="reset=1&id=`$event.event_id`"}" title="{ts}read more{/ts}"><strong>{$event.title}</strong></a></td>
-        <td>{if $event.summary}{$event.summary|purify} (<a href="{crmURL p='civicrm/event/info' q="reset=1&id=`$event.event_id`"}" title="{ts}details...{/ts}">{ts}read more{/ts}...</a>){else}&nbsp;{/if}</td>
+        <td><a href="{crmURL p='civicrm/event/info' q="reset=1&id=`$event.event_id`"}" title="{ts escape='htmlattribute'}read more{/ts}"><strong>{$event.title}</strong></a></td>
+        <td>{if $event.summary}{$event.summary|purify} (<a href="{crmURL p='civicrm/event/info' q="reset=1&id=`$event.event_id`"}" title="{ts escape='htmlattribute'}details...{/ts}">{ts}read more{/ts}...</a>){else}&nbsp;{/if}</td>
         <td class="nowrap" data-order="{$event.start_date|crmDate:'%Y-%m-%d'}">
           {if $event.start_date}{$event.start_date|crmDate}{if $event.end_date}<br /><em>{ts}through{/ts}</em><br />{strip}
             {* Only show end time if end date = start date *}
