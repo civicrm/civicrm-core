@@ -21,7 +21,7 @@
           <tr {if $row.id EQ $latestRevisionID}style="font-weight: bold;"{/if}>
             <td class="crm-case-activityview-form-block-name">{$row.name}</td>
             <td class="crm-case-activityview-form-block-date">{$row.date|crmDate}</td>
-            <td class="crm-case-activityview-form-block-{$row.id}"><a class="open-inline-noreturn" href="{crmURL p='civicrm/case/activity/view' h=0 q="cid=$contactID&aid="}{$row.id}" title="{ts}View this revision of the activity record.{/ts}">{if $row.id != $latestRevisionID}{ts}View{/ts}{else}{ts}View (Current Revision){/ts}{/if}</a></td>
+            <td class="crm-case-activityview-form-block-{$row.id}"><a class="open-inline-noreturn" href="{crmURL p='civicrm/case/activity/view' h=0 q="cid=$contactID&aid="}{$row.id}" title="{ts escape='htmlattribute'}View this revision of the activity record.{/ts}">{if $row.id != $latestRevisionID}{ts}View{/ts}{else}{ts}View (Current Revision){/ts}{/if}</a></td>
           </tr>
         {/foreach}
       </table>
