@@ -20,13 +20,13 @@
           {/foreach}
           {if !empty($instanceForm) OR !empty($instanceFormError)}
             <li id="tab_settings" class="ui-corner-all">
-              <a title="{ts}Title and Format{/ts}" href="#report-tab-format">{ts}Title and Format{/ts}</a>
+              <a title="{ts escape='htmlattribute'}Title and Format{/ts}" href="#report-tab-format">{ts}Title and Format{/ts}</a>
             </li>
             <li class="ui-corner-all">
-              <a title="{ts}Email Delivery{/ts}" href="#report-tab-email">{ts}Email Delivery{/ts}</a>
+              <a title="{ts escape='htmlattribute'}Email Delivery{/ts}" href="#report-tab-email">{ts}Email Delivery{/ts}</a>
             </li>
             <li class="ui-corner-all">
-              <a title="{ts}Access{/ts}" href="#report-tab-access">{ts}Access{/ts}</a>
+              <a title="{ts escape='htmlattribute'}Access{/ts}" href="#report-tab-access">{ts}Access{/ts}</a>
             </li>
           {/if}
         </ul>

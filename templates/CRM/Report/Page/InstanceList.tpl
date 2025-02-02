@@ -29,7 +29,7 @@
               <table class="report-layout">
                 {foreach from=$rows item=row}
                   <tr id="row_{counter}" class="crm-report-instanceList">
-                    <td class="crm-report-instanceList-title" style="width:35%"><a href="{$row.url}" title="{ts}Run this report{/ts}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> <strong>{$row.title}</strong></a></td>
+                    <td class="crm-report-instanceList-title" style="width:35%"><a href="{$row.url}" title="{ts escape='htmlattribute'}Run this report{/ts}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> <strong>{$row.title}</strong></a></td>
                     <td class="crm-report-instanceList-description">{$row.description}</td>
                     <td>
                     <a href="{$row.viewUrl}" class="action-item crm-hover-button">{ts}View Results{/ts}</a>
