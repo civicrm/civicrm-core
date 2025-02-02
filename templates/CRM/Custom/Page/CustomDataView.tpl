@@ -42,7 +42,7 @@
                 <div class="crm-submit-buttons">
                   <a href="#" class="crm-hover-button crm-custom-value-del"
                      data-post='{ldelim}"valueID": "{$cvID}", "groupID": "{$customGroupId}", "contactId": "{$contactId}", "key": "{crmKey name='civicrm/ajax/customvalue'}"{rdelim}'
-                     title="{ts 1=$cd_edit.title|cat:" `$rowCount`"}Delete %1{/ts}">
+                     title="{ts escape='htmlattribute' 1=$cd_edit.title|cat:" `$rowCount`"}Delete %1{/ts}">
                     <i class="crm-i fa-trash" aria-hidden="true"></i> {ts}Delete{/ts}
                   </a>
                 </div>

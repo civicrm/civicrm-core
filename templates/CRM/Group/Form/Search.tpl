@@ -150,7 +150,7 @@
           if (parentsOnly) {
             $('tbody tr.crm-group-parent', settings.nTable).each(function () {
               $(this).find('td:first')
-                .prepend('{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span>{literal}')
+                .prepend('{/literal}<span class="collapsed show-children" title="{ts escape='htmlattribute'}show child groups{/ts}"/></span>{literal}')
                 .find('div').css({'display': 'inline'});
             });
           }
@@ -232,7 +232,7 @@
                 }
                 appendHTML += '<tr id="row_'+val.group_id+'_'+parent_id+'" data-entity="group" data-id="'+val.group_id+'" class="' + val.row_classes.join(' ') + '">';
                 if ( val.is_parent ) {
-                  appendHTML += '<td class="crm-group-name crmf-title ' + levelClass + '">' + '{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span><div class="crmf-title {$editableClass}" style="display:inline">{literal}' + val.title + '</div>' + smartGroupText + '</td>';
+                  appendHTML += '<td class="crm-group-name crmf-title ' + levelClass + '">' + '{/literal}<span class="collapsed show-children" title="{ts escape='htmlattribute'}show child groups{/ts}"/></span><div class="crmf-title {$editableClass}" style="display:inline">{literal}' + val.title + '</div>' + smartGroupText + '</td>';
                 }
                 else {
                   appendHTML += '<td class="crm-group-name' + levelClass + '"><div class="crmf-title {/literal}{$editableClass}{literal}"><span class="crm-no-children"></span>' + val.title + '</div>' + smartGroupText + '</td>';
