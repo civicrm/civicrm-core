@@ -30,13 +30,13 @@
     <div id="mainTabContainer" class="ui-tabs ui-widget ui-widget-content ui-corner-all">
         <ul class="crm-extensions-tabs-list">
             <li id="tab_summary" class="crm-tab-button">
-              <a href="#extensions-main" title="{ts}Extensions{/ts}">
+              <a href="#extensions-main" title="{ts escape='htmlattribute'}Extensions{/ts}">
               <span> </span> {ts}Extensions{/ts}
               <em>&nbsp;</em>
               </a>
             </li>
             <li id="tab_addnew" class="crm-tab-button">
-              <a href="#extensions-addnew" title="{ts}Add New{/ts}">
+              <a href="#extensions-addnew" title="{ts escape='htmlattribute'}Add New{/ts}">
               <span> </span> {ts}Add New{/ts}
               <em>&nbsp;</em>
               </a>

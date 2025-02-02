@@ -63,7 +63,7 @@
 </div>
 {else}
     <div class="messages status no-popup">
-      <img src="{$config->resourceBase}i/Inform.gif" alt="{ts}status{/ts}"/>
+      <img src="{$config->resourceBase}i/Inform.gif" alt="{ts escape='htmlattribute'}status{/ts}"/>
       {ts}None found.{/ts}
     </div>
 {/if}

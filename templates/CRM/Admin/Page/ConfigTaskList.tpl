@@ -33,7 +33,7 @@
         <td>{ts}Extensions are installable packages which give CiviCRM new functionality.{/ts} {ts}Some extenions are shipped with CiviCRM (known as core extensions, such as SearchKit and FormBuilder), but there are also many extensions developed by the community.{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap"><a href="{$registerSite}" title="{ts}Register your site at CiviCRM.org. Opens in a new window.{/ts}" target="_blank">{ts}Register your site{/ts}</a></td>
+        <td class="tasklist nowrap"><a href="{$registerSite}" title="{ts escape='htmlattribute'}Register your site at CiviCRM.org. Opens in a new window.{/ts}" target="_blank">{ts}Register your site{/ts}</a></td>
         <td>{ts}Join the community and help CiviCRM remain a leading CRM for organizations worldwide.{/ts}</td>
     </tr>
     <tr class="columnheader">
