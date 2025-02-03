@@ -182,16 +182,15 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
 
   /**
    * @param bool $skipFatal
-   * @param bool $returnString
-   *  If you are using this second parameter you probably are better
-   *  calling `getFromEmail()` which will return an actual string.
+   * @param bool $returnFormatted
+   *   Deprecated param. Use `getFromEmail()` instead.
    *
    * @return array
    *   name & email for domain
    *
    * @throws \CRM_Core_Exception
    */
-  public static function getNameAndEmail($skipFatal = FALSE, $returnString = FALSE) {
+  public static function getNameAndEmail($skipFatal = FALSE, $returnFormatted = FALSE): array {
     $fromEmailAddress = \Civi\Api4\SiteEmailAddress::get(FALSE)
       ->addSelect('display_name', 'email')
       ->addWhere('domain_id', '=', 'current_domain')
@@ -199,8 +198,8 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
       ->addWhere('is_active', '=', TRUE)
       ->execute()->first();
     if (!empty($fromEmailAddress)) {
-      if ($returnString) {
-        // Return a string like: "Demonstrators Anonymous" <info@example.org>
+      if ($returnFormatted) {
+        CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_BAO_Domain::getFromEmail', 'CRM_Core_BAO_Domain::getNameAndEmail with $returnFormatted = TRUE');
         return [CRM_Utils_Mail::formatFromAddress($fromEmailAddress)];
       }
       return [$fromEmailAddress['display_name'], $fromEmailAddress['email']];
@@ -223,7 +222,8 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    * @throws \CRM_Core_Exception
    */
   public static function getFromEmail(): string {
-    return self::getNameAndEmail(FALSE, TRUE)[0];
+    $fromAddress = self::getNameAndEmail();
+    return CRM_Utils_Mail::formatFromAddress(['display_name' => $fromAddress[0], 'email' => $fromAddress[1]]);
   }
 
   /**

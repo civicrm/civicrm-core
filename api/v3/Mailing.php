@@ -113,13 +113,9 @@ function _civicrm_api3_mailing_gettokens_spec(&$params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_mailing_create_spec(&$params) {
-  $defaultAddress = CRM_Core_BAO_Domain::getNameAndEmail(TRUE, TRUE);
-  foreach ($defaultAddress as $value) {
-    if (preg_match('/"(.*)" <(.*)>/', $value, $match)) {
-      $params['from_email']['api.default'] = $match[2];
-      $params['from_name']['api.default'] = $match[1];
-    }
-  }
+  $defaultAddress = CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
+  $params['from_email']['api.default'] = $defaultAddress[1];
+  $params['from_name']['api.default'] = $defaultAddress[0];
 }
 
 /**
