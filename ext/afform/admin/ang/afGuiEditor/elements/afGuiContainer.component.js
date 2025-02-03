@@ -364,6 +364,9 @@
         if (node['af-join']) {
           return 'join';
         }
+        if ('crm-ui-tab-set' in node) {
+          return 'tabset';
+        }
         if (node['#tag'] && node['#tag'] in afGui.meta.blocks) {
           return 'container';
         }
