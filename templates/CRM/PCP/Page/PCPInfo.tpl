@@ -77,7 +77,7 @@
               </marquee>
           </div>
           <div class="description">
-              [<a href="#" onclick="roll_start_stop(); return false;" id="roll" title="{ts}Stop scrolling{/ts}">{ts}Stop{/ts}</a>]
+              [<a href="#" onclick="roll_start_stop(); return false;" id="roll" title="{ts escape='htmlattribute'}Stop scrolling{/ts}">{ts}Stop{/ts}</a>]
           </div>
         </div>
      {/if}

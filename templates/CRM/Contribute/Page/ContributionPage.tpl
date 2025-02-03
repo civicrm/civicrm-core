@@ -86,7 +86,7 @@
     {else}
   {if $isSearch eq 1}
       <div class="status messages">
-                <img src="{$config->resourceBase}i/Inform.gif" alt="{ts}status{/ts}"/>
+                <img src="{$config->resourceBase}i/Inform.gif" alt="{ts escape='htmlattribute'}status{/ts}"/>
                 {capture assign=browseURL}{crmURL p='civicrm/admin/contribute/manage' q="reset=1"}{/capture}
                     {ts}No available Contribution Pages match your search criteria. Suggestions:{/ts}
                     <div class="spacer"></div>

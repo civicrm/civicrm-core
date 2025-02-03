@@ -13,7 +13,7 @@
   <tr class="columnheader">
 
   {if ! $single and $context eq 'Search'}
-    <th scope="col" title="{ts}Select rows{/ts}">{$form.toggleSelect.html}</th>
+    <th scope="col" title="{ts escape='htmlattribute'}Select rows{/ts}">{$form.toggleSelect.html}</th>
   {/if}
 
   <th></th>
@@ -39,11 +39,11 @@
         <td>{$form.$cbName.html}</td>
     {/if}
         <td class="crm-case-id crm-case-id_{$row.case_id}">
-          <a title="{ts}Activities{/ts}" class="crm-expand-row" href="{crmURL p='civicrm/case/details' q="caseId=`$row.case_id`&cid=`$row.contact_id`"}"></a>
+          <a title="{ts escape='htmlattribute'}Activities{/ts}" class="crm-expand-row" href="{crmURL p='civicrm/case/details' q="caseId=`$row.case_id`&cid=`$row.contact_id`"}"></a>
         </td>
 
     {if !$single}
-      <td class="crm-case-id crm-case-id_{$row.case_id}"><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}" title="{ts}View Contact Details{/ts}">{$row.sort_name}</a>{if $row.phone}<br /><span class="description">{$row.phone}</span>{/if}<br /><span class="description">{ts}Case ID{/ts}: {$row.case_id}</span></td>
+      <td class="crm-case-id crm-case-id_{$row.case_id}"><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}" title="{ts escape='htmlattribute'}View Contact Details{/ts}">{$row.sort_name}</a>{if $row.phone}<br /><span class="description">{$row.phone}</span>{/if}<br /><span class="description">{ts}Case ID{/ts}: {$row.case_id}</span></td>
     {/if}
 
     <td class="crm-case-subject">{$row.case_subject}</td>

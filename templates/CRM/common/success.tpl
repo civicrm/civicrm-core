@@ -45,8 +45,8 @@
           <div>{$message}</div>
         </div>
         <div>
-          <p><a href="{crmURL p='civicrm/a/#/status'}" title="{ts}CiviCRM Status Check{/ts}" style="text-decoration: underline;">{ts}View the CiviCRM System Status{/ts}</a></p>
-          <p><a href="{crmURL p='civicrm/dashboard' q='reset=1'}" title="{ts}CiviCRM home page{/ts}" style="text-decoration: underline;">{ts}Return to CiviCRM home page.{/ts}</a></p>
+          <p><a href="{crmURL p='civicrm/a/#/status'}" title="{ts escape='htmlattribute'}CiviCRM Status Check{/ts}" style="text-decoration: underline;">{ts}View the CiviCRM System Status{/ts}</a></p>
+          <p><a href="{crmURL p='civicrm/dashboard' q='reset=1'}" title="{ts escape='htmlattribute'}CiviCRM home page{/ts}" style="text-decoration: underline;">{ts}Return to CiviCRM home page.{/ts}</a></p>
         </div>
       </div>
     </div>

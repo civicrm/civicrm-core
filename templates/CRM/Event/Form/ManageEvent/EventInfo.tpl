@@ -68,7 +68,7 @@
       <td>
         {$form.max_participants.html|crmAddClass:four}
         {crmPermission has='administer CiviCRM'}
-          <a class="crm-popup crm-hover-button" target="_blank" title="{ts}Edit Participant Status Options{/ts}" href="{crmURL p='civicrm/admin/participant_status' q='reset=1'}"><i class="crm-i fa-wrench" aria-hidden="true"></i></a>
+          <a class="crm-popup crm-hover-button" target="_blank" title="{ts escape='htmlattribute'}Edit Participant Status Options{/ts}" href="{crmURL p='civicrm/admin/participant_status' q='reset=1'}"><i class="crm-i fa-wrench" aria-hidden="true"></i></a>
         {/crmPermission}
       </td>
     </tr>

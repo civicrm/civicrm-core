@@ -18,7 +18,7 @@
         <tr>
           <td class="crm-contact-form-block-contact1">
             <label for="search-contact1">{ts}Contact Name{/ts}</label><br />
-            <input class="crm-form-text" type="text" size="50" placeholder="{ts}Search Contacts{/ts}" value="{$searchcontact1}" id="search-contact1" search-column="0" />
+            <input class="crm-form-text" type="text" size="50" placeholder="{ts escape='htmlattribute'}Search Contacts{/ts}" value="{$searchcontact1}" id="search-contact1" search-column="0" />
           </td>
           <td class="crm-contact-form-block-search">
             <label>&nbsp;</label><br />
@@ -61,7 +61,7 @@
             <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$exception.contact_id2`"}" target="_blank">{$exception.$contact2name}</a>
           </td>
           <td>
-            <a id='duplicateContacts' href="#" title={ts}Remove Exception{/ts} onClick="processDupes( {$exception.contact_id1}, {$exception.contact_id2}, 'nondupe-dupe', 'dedupe-exception' );return false;"><i class="crm-i fa-trash" aria-hidden="true"></i> {ts}Remove Exception{/ts}</a>
+            <a id='duplicateContacts' href="#" title="{ts escape='htmlattribute'}Remove Exception{/ts}" onClick="processDupes( {$exception.contact_id1}, {$exception.contact_id2}, 'nondupe-dupe', 'dedupe-exception' );return false;"><i class="crm-i fa-trash" aria-hidden="true"></i> {ts}Remove Exception{/ts}</a>
           </td>
         </tr>
 

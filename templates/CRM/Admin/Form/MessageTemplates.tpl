@@ -54,7 +54,7 @@
               <strong><a class="crm-attachment" href="{$attVal.url}">{$attVal.cleanName}</a></strong>
               {if $attVal.description}&nbsp;-&nbsp;{$attVal.description}{/if}
               {if $attVal.deleteURLArgs}
-                <a href="#" class="crm-hover-button delete-attachment" data-mimetype="{$attVal.mime_type}" data-filename="{$attVal.cleanName}" data-args="{$attVal.deleteURLArgs}" title="{ts}Delete File{/ts}"><span class="icon delete-icon"></span></a>
+                <a href="#" class="crm-hover-button delete-attachment" data-mimetype="{$attVal.mime_type}" data-filename="{$attVal.cleanName}" data-args="{$attVal.deleteURLArgs}" title="{ts escape='htmlattribute'}Delete File{/ts}"><span class="icon delete-icon"></span></a>
               {/if}
               {include file="CRM/Form/attachmentjs.tpl" context='MessageTemplate'}
               {/foreach}

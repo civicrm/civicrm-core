@@ -122,7 +122,7 @@
 
         <th>{capture assign="tsNote"}{ts}Note{/ts}{/capture}{copyIcon name=note title=$tsNote}{$tsNote}</th>
         <th>{capture assign="tsResult"}{ts}Result{/ts}{/capture}{copyIcon name=result title=$tsResult}{$tsResult}</th>
-        <th><a id="interview_voter_button" class='button' style="float:left;" href="#" title={ts}Vote{/ts} onclick="registerInterviewforall( ); return false;">{ts}Record Responses for All{/ts}</a></th>
+        <th><a id="interview_voter_button" class='button' style="float:left;" href="#" title="{ts escape='htmlattribute'}Vote{/ts}" onclick="registerInterviewforall( ); return false;">{ts}Record Responses for All{/ts}</a></th>
       </tr>
       </thead>
 
@@ -157,11 +157,11 @@
           <td class='result'>{$form.field.$voterId.result.html}</td>
 
           <td>
-            <a id="interview_voter_button_{$voterId}" class='button' style="float:left;" href="#" title={ts}Vote{/ts} onclick="registerInterview( {$voterId} ); return false;">
+            <a id="interview_voter_button_{$voterId}" class='button' style="float:left;" href="#" title="{ts escape='htmlattribute'}Vote{/ts}" onclick="registerInterview( {$voterId} ); return false;">
               {ts}record response{/ts}
             </a>
             {if $allowAjaxReleaseButton}
-              <a id="release_voter_button_{$voterId}" class='button'  href="#" title={ts}Release{/ts} onclick="releaseOrReserveVoter( {$voterId} ); return false;">
+              <a id="release_voter_button_{$voterId}" class='button'  href="#" title="{ts escape='htmlattribute'}Release{/ts}" onclick="releaseOrReserveVoter( {$voterId} ); return false;">
                 {ts}release{/ts}
               </a>
             {/if}

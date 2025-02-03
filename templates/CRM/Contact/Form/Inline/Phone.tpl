@@ -19,7 +19,7 @@
     <tr>
       <td>{ts}Phone{/ts}&nbsp;
       {if $actualBlockCount lt 5}
-        <span id="add-more-phone" title="{ts}click to add more{/ts}"><a class="crm-hover-button action-item add-more-inline" href="#">{ts}add{/ts}</a></span>
+        <span id="add-more-phone" title="{ts escape='htmlattribute'}click to add more{/ts}"><a class="crm-hover-button action-item add-more-inline" href="#">{ts}add{/ts}</a></span>
       {/if}
       </td>
       <td>{ts}Phone Location{/ts}</td>
@@ -36,7 +36,7 @@
         <td align="center" class="crm-phone-is_primary">{$form.phone.$blockId.is_primary.1.html}</td>
         <td>
           {if $blockId gt 1}
-            <a class="crm-delete-inline crm-hover-button" href="#" title="{ts}Delete phone{/ts}"><span class="icon delete-icon"></span></a>
+            <a class="crm-delete-inline crm-hover-button" href="#" title="{ts escape='htmlattribute'}Delete phone{/ts}"><span class="icon delete-icon"></span></a>
           {/if}
         </td>
     </tr>

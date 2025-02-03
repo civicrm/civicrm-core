@@ -62,7 +62,7 @@
               {if $element.element_value.deleteURL}
                 <a href="#" class="crm-hover-button delete-attachment"
                    data-filename="{$element.element_value.fileName}"
-                   data-args="{$element.element_value.deleteURLArgs}" title="{ts}Delete File{/ts}">
+                   data-args="{$element.element_value.deleteURLArgs}" title="{ts escape='htmlattribute'}Delete File{/ts}">
                   <span class="icon delete-icon"></span>
                 </a>
               {/if}

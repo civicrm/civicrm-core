@@ -20,7 +20,7 @@
   Note: This file is used by CivHR
 *}
 
-<a class="css_right {$snippet.css_class}" href="#" title="{ts}View Revisions{/ts}">View Revisions</a>
+<a class="css_right {$snippet.css_class}" href="#" title="{ts escape='htmlattribute'}View Revisions{/ts}">View Revisions</a>
 
 {literal}
 <script type="text/javascript">

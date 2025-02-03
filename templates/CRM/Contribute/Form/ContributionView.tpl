@@ -189,7 +189,7 @@
           <tr>
             <td>
               <a href="{crmURL p="civicrm/contact/view" q="reset=1&cid=`$softCont.contact_id`"}"
-                 title="{ts}View contact record{/ts}">{$softCont.contact_name}
+                 title="{ts escape='htmlattribute'}View contact record{/ts}">{$softCont.contact_name}
               </a>
             </td>
             <td>{$softCont.amount|crmMoney:$currency}
@@ -238,7 +238,7 @@
         <tr>
           <td class="label">{ts}Soft Credit To{/ts}</td>
           <td><a href="{crmURL p="civicrm/contact/view" q="reset=1&cid=`$pcp_soft_credit_to_id`"}" id="view_contact"
-                 title="{ts}View contact record{/ts}">{$pcp_soft_credit_to_name}</a></td>
+                 title="{ts escape='htmlattribute'}View contact record{/ts}">{$pcp_soft_credit_to_name}</a></td>
         </tr>
         <tr>
           <td class="label">{ts}In Public Honor Roll?{/ts}</td>

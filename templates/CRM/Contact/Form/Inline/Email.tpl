@@ -19,7 +19,7 @@
   <tr>
     <td>{ts}Email{/ts}&nbsp;
       {if $actualBlockCount lt 5}
-        <span id="add-more-email" title="{ts}click to add more{/ts}">
+        <span id="add-more-email" title="{ts escape='htmlattribute'}click to add more{/ts}">
           <a class="crm-hover-button action-item add-more-inline" href="#">{ts}add{/ts}</a>
         </span>
       {/if}
@@ -36,7 +36,7 @@
       <td align="center">{$form.email.$blockId.on_hold.html}</td>
       <td align="center" {if !$multipleBulk}class="crm-email-bulkmail"{/if}>{$form.email.$blockId.is_bulkmail.html}</td>
       <td align="center" class="crm-email-is_primary">{$form.email.$blockId.is_primary.1.html}</td>
-      <td><a title="{ts}Delete Email{/ts}" class="crm-delete-inline crm-hover-button" href="#"><span class="icon delete-icon"></span></a></td>
+      <td><a title="{ts escape='htmlattribute'}Delete Email{/ts}" class="crm-delete-inline crm-hover-button" href="#"><span class="icon delete-icon"></span></a></td>
     </tr>
     {include file="CRM/Contact/Form/Inline/BlockCustomData.tpl" entity=email customFields=$custom_fields_email blockId=$blockId actualBlockCount=$actualBlockCount}
 

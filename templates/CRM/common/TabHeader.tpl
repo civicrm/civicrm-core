@@ -15,13 +15,13 @@
         {foreach from=$tabHeader key=tabName item=tabValue}
           <li id="tab_{$tabName}" class="crm-tab-button ui-corner-all {if !$tabValue.valid}disabled{/if} {if is_numeric($tabValue.count)}crm-count-{$tabValue.count}{/if} {if $tabValue.class} {$tabValue.class}{/if}" {$tabValue.extra}>
             {if $tabValue.active}
-              <a href="{if $tabValue.template}#{$tabIdPrefix|default:'panel_'}{$tabName}{else}{$tabValue.url|smarty:nodefaults}{/if}" title="{$tabValue.title|escape} {if !$tabValue.valid}({ts}disabled{/ts}){/if}">
+              <a href="{if $tabValue.template}#{$tabIdPrefix|default:'panel_'}{$tabName}{else}{$tabValue.url|smarty:nodefaults}{/if}" title="{$tabValue.title|escape} {if !$tabValue.valid}({ts escape='htmlattribute'}disabled{/ts}){/if}">
                 <i class="{$tabValue.icon|default:'crm-i fa-puzzle-piece'}" aria-hidden="true"></i>
                 <span>{$tabValue.title}</span>
                 {if empty($tabValue.hideCount) && is_numeric($tabValue.count)}<em>{$tabValue.count}</em>{/if}
               </a>
             {else}
-               <span {if !$tabValue.valid} title="{ts}disabled{/ts}"{/if}>{$tabValue.title}</span>
+               <span {if !$tabValue.valid} title="{ts escape='htmlattribute'}disabled{/ts}"{/if}>{$tabValue.title}</span>
             {/if}
           </li>
         {/foreach}

@@ -40,7 +40,7 @@
     </div>
     {else}
         <div class="messages status no-popup">
-            <img src="{$config->resourceBase}i/Inform.gif" alt="{ts}status{/ts}"/>
+            <img src="{$config->resourceBase}i/Inform.gif" alt="{ts escape='htmlattribute'}status{/ts}"/>
             {ts}There are currently no saved import or export mappings. You create saved mappings as part of an Import or Export task.{/ts}
         </div>
     {/if}

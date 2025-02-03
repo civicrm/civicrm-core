@@ -44,8 +44,8 @@
     {if $rows}
       <div id='mainTabContainer'>
         <ul>
-          <li id='tab_user-profiles'>    <a href='#user-profiles'     title='{ts}User-defined Profile{/ts}'>{ts}User-defined Profiles{/ts}</a></li>
-          <li id='tab_reserved-profiles'><a href='#reserved-profiles' title='{ts}Reserved Profiles{/ts}'>{ts}Reserved Profiles{/ts}</a></li>
+          <li id='tab_user-profiles'>    <a href='#user-profiles'     title='{ts escape='htmlattribute'}User-defined Profile{/ts}'>{ts}User-defined Profiles{/ts}</a></li>
+          <li id='tab_reserved-profiles'><a href='#reserved-profiles' title='{ts escape='htmlattribute'}Reserved Profiles{/ts}'>{ts}Reserved Profiles{/ts}</a></li>
         </ul>
 
         {* handle enable/disable actions*}

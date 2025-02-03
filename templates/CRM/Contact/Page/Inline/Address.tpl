@@ -9,7 +9,7 @@
 *}
 {* template for a single address block*}
 <div id="address-block-{$locationIndex}" class="address {if $add}crm-address_type_{$add.location_type}{else}add-new{/if}{if $permission EQ 'edit'} crm-inline-edit" data-dependent-fields='["#crm-contactinfo-content", ".crm-inline-edit.address:not(.add-new)"]' data-edit-params='{ldelim}"cid": "{$contactId}", "class_name": "CRM_Contact_Form_Inline_Address", "locno": "{$locationIndex}", "aid": "{if $add}{$add.id}{else}0{/if}"{rdelim}' data-location-type-id="{if $add}{$add.location_type_id}{else}0{/if}{/if}">
-  <div class="crm-clear crm-inline-block-content" {if $permission EQ 'edit'}title="{if $add}{ts}Edit address{/ts}{else}{ts}Add address{/ts}{/if}"{/if}>
+  <div class="crm-clear crm-inline-block-content" {if $permission EQ 'edit'}title="{if $add}{ts escape='htmlattribute'}Edit address{/ts}{else}{ts escape='htmlattribute'}Add address{/ts}{/if}"{/if}>
     {if $permission EQ 'edit'}
       <div class="crm-edit-help">
         <span class="crm-i fa-pencil" aria-hidden="true"></span> {if $add}{ts}Edit address{/ts}{else}{ts}Add address{/ts}{/if}
@@ -32,7 +32,7 @@
               is_numeric($add.geo_code_2)
           }
           {assign var='mapLocationTypeID' value=$add.location_type_id}
-          <br /><a href="{crmURL p='civicrm/contact/map' q="reset=1&cid=$contactId&lid=$mapLocationTypeID"}" title="{ts 1=$add.location_type}Map %1 Address{/ts}"><i class="crm-i fa-map-marker" aria-hidden="true"></i> {ts}Map{/ts}</a>
+          <br /><a href="{crmURL p='civicrm/contact/map' q="reset=1&cid=$contactId&lid=$mapLocationTypeID"}" title="{ts escape='htmlattribute' 1=$add.location_type}Map %1 Address{/ts}"><i class="crm-i fa-map-marker" aria-hidden="true"></i> {ts}Map{/ts}</a>
           {/if}
         </div>
         <div class="crm-content">

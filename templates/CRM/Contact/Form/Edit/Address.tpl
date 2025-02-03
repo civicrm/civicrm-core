@@ -36,7 +36,7 @@
         </td>
      {if $blockId gt 0}
          <td>
-             <a href="#" title="{ts}Delete Address Block{/ts}" onClick="removeBlock( 'Address', '{$blockId}' ); return false;">{ts}Delete this address{/ts}</a>
+             <a href="#" title="{ts escape='htmlattribute'}Delete Address Block{/ts}" onClick="removeBlock( 'Address', '{$blockId}' ); return false;">{ts}Delete this address{/ts}</a>
          </td>
      {/if}
      </tr>

@@ -9,10 +9,10 @@
 *}
 {include file="CRM/common/pager.tpl" location="top"}
 {include file="CRM/common/pagerAToZ.tpl"}
-<table summary="{ts}Search results listings.{/ts}" class="selector row-highlight">
+<table summary="{ts escape='htmlattribute'}Search results listings.{/ts}" class="selector row-highlight">
   <thead class="sticky">
     <tr>
-      <th scope="col" title="{ts}Select rows{/ts}">{$form.toggleSelect.html}</th>
+      <th scope="col" title="{ts escape='htmlattribute'}Select rows{/ts}">{$form.toggleSelect.html}</th>
       {if $context eq 'smog'}
           <th scope="col">
             {ts}Status{/ts}

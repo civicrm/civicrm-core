@@ -62,7 +62,7 @@
             {$form.email_greeting_id.html|crmAddClass:big}
           </span>
           {if !empty($email_greeting_display)}
-            <div data-id="email_greeting" class="replace-plain big" title="{ts}Click to edit{/ts}">
+            <div data-id="email_greeting" class="replace-plain big" title="{ts escape='htmlattribute'}Click to edit{/ts}">
               {$email_greeting_display}
             </div>
           {/if}
@@ -84,7 +84,7 @@
             {$form.postal_greeting_id.html|crmAddClass:big}
           </span>
           {if !empty($postal_greeting_display)}
-            <div data-id="postal_greeting" class="replace-plain big" title="{ts}Click to edit{/ts}">
+            <div data-id="postal_greeting" class="replace-plain big" title="{ts escape='htmlattribute'}Click to edit{/ts}">
               {$postal_greeting_display}
             </div>
           {/if}
@@ -105,7 +105,7 @@
             {$form.addressee_id.html|crmAddClass:big}
           </span>
           {if !empty($addressee_display)}
-            <div data-id="addressee" class="replace-plain big" title="{ts}Click to edit{/ts}">
+            <div data-id="addressee" class="replace-plain big" title="{ts escape='htmlattribute'}Click to edit{/ts}">
               {$addressee_display}
             </div>
           {/if}

@@ -47,7 +47,7 @@
                 <td class="label"><label>{ts}Also Registered by this Participant{/ts}</label></td>
                 <td>
                   {foreach from=$additionalParticipants key=apName item=apURL}
-                    <a href="{$apURL}" title="{ts}view additional participant{/ts}">{$apName}</a><br />
+                    <a href="{$apURL}" title="{ts escape='htmlattribute'}view additional participant{/ts}">{$apName}</a><br />
                   {/foreach}
                 </td>
               </tr>
@@ -57,7 +57,7 @@
                 <td class="label"><label>{ts}Registered By{/ts}</label></td>
                 <td class="view-value">
                   <a href="{crmURL p='civicrm/contact/view/participant' q="reset=1&id=$participant_registered_by_id&cid=$registered_by_contact_id&action=view"}"
-                     title="{ts}view primary participant{/ts}">{$registered_by_display_name}</a>
+                     title="{ts escape='htmlattribute'}view primary participant{/ts}">{$registered_by_display_name}</a>
                 </td>
               </tr>
             {/if}

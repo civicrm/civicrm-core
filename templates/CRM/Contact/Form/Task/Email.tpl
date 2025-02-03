@@ -29,14 +29,14 @@
       <td class="label">{$form.cc_id.label}</td>
       <td>
         {$form.cc_id.html}
-        <a class="crm-hover-button clear-cc-link" rel="cc_id" title="{ts}Clear{/ts}" href="#"><i class="crm-i fa-times" aria-hidden="true"></i></a>
+        <a class="crm-hover-button clear-cc-link" rel="cc_id" title="{ts escape='htmlattribute'}Clear{/ts}" href="#"><i class="crm-i fa-times" aria-hidden="true"></i></a>
       </td>
     </tr>
     <tr class="crm-contactEmail-form-block-bcc_id" {if empty($form.bcc_id.value)}style="display:none;"{/if}>
       <td class="label">{$form.bcc_id.label}</td>
       <td>
         {$form.bcc_id.html}
-        <a class="crm-hover-button clear-cc-link" rel="bcc_id" title="{ts}Clear{/ts}" href="#"><i class="crm-i fa-times" aria-hidden="true"></i></a>
+        <a class="crm-hover-button clear-cc-link" rel="bcc_id" title="{ts escape='htmlattribute'}Clear{/ts}" href="#"><i class="crm-i fa-times" aria-hidden="true"></i></a>
       </td>
     </tr>
     <tr>

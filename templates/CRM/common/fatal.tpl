@@ -56,7 +56,7 @@
          </div>
         </details>
     {/if}
-    <p><a href="{$config->userFrameworkBaseURL}" title="{ts}Main Menu{/ts}">{ts}Return to home page.{/ts}</a></p>
+    <p><a href="{$config->userFrameworkBaseURL}" title="{ts escape='htmlattribute'}Main Menu{/ts}">{ts}Return to home page.{/ts}</a></p>
 </div>
 </div> {* end crm-container div *}
 {if $config->userFramework != 'WordPress'}

@@ -14,7 +14,7 @@
 <tr class="columnheader-dark">
     <th scope="col">{ts}Period{/ts}</th>
     <th scope="col">{ts}Total Amount{/ts}</th>
-    <th scope="col" title="{ts}Contribution Count{/ts}"><strong>#</strong></th><th></th></tr>
+    <th scope="col" title="{ts escape='htmlattribute'}Contribution Count{/ts}"><strong>#</strong></th><th></th></tr>
 <tr>
     <td><strong>{ts}Current Month-To-Date{/ts}</strong></td>
     <td class="label">{if NOT $monthToDate.Valid.amount}{ts}(n/a){/ts}{else}{$monthToDate.Valid.amount}{/if}</td>

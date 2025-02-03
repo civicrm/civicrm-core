@@ -36,7 +36,7 @@
       <div class="messages status no-popup crm-not-you-message" id="crm-event-register-different">
         {ts 1=$display_name}Welcome %1{/ts}. (<a
           href="{crmURL p='civicrm/event/register' q="cid=0&reset=1&id=`$event.id`"}"
-          title="{ts}Click here to register a different person for this event.{/ts}">{ts 1=$display_name}Not %1, or want to register a different person{/ts}</a>?)
+          title="{ts escape='htmlattribute'}Click here to register a different person for this event.{/ts}">{ts 1=$display_name}Not %1, or want to register a different person{/ts}</a>?)
       </div>
     {/if}
     {/crmRegion}
@@ -56,7 +56,7 @@
 
     {if !empty($form.additional_participants.html)}
       <div class="crm-public-form-item crm-section additional_participants-section" id="noOfparticipants">
-        <div class="label">{$form.additional_participants.label} <span class="crm-marker" title="{ts}This field is required.{/ts}">*</span></div>
+        <div class="label">{$form.additional_participants.label} <span class="crm-marker" title="{ts escape='htmlattribute'}This field is required.{/ts}">*</span></div>
         <div class="content">
           {$form.additional_participants.html}{ts}(including yourself){/ts}
           <br/>
