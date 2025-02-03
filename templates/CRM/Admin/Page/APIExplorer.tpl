@@ -225,16 +225,16 @@
 </div>
 <div class="crm-block crm-content-block">
 <div id="mainTabContainer">
-  <ul>
-    <li class="ui-corner-all" title="GUI to build and execute API calls">
+  <ul role="tablist">
+    <li role="tab" class="ui-corner-all" title="GUI to build and execute API calls">
       <a href="#explorer-tab"><i class="crm-i fa-search" aria-hidden="true"></i> {ts}Explorer{/ts}</a>
     </li>
-    <li class="ui-corner-all" title="API source-code and code-level documentation">
+    <li role="tab" class="ui-corner-all" title="API source-code and code-level documentation">
       <a href="#docs-tab"><i class="crm-i fa-code" aria-hidden="true"></i> {ts}Code Docs{/ts}</a>
     </li>
   </ul>
 
-  <div id="explorer-tab">
+  <div id="explorer-tab" role="tabpanel">
     <div class="crm-block crm-form-block">
     <form id="api-explorer">
       <label for="api-entity">{ts}Entity{/ts}:</label>
@@ -312,7 +312,7 @@
   </div>
   </div>
 
-  <div id="docs-tab">
+  <div id="docs-tab" role="tabpanel">
     <div class="crm-block crm-form-block">
     <form id="api-docs">
       <label for="doc-entity">{ts}Entity{/ts}:</label>

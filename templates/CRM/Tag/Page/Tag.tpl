@@ -18,22 +18,22 @@
   </div>
 
   <div id="mainTabContainer">
-    <ul>
-      <li class="ui-corner-all crm-tab-button" title="{ts escape='htmlattribute'}Main Tag List{/ts}">
+    <ul role="tablist">
+      <li role="tab" class="ui-corner-all crm-tab-button" title="{ts escape='htmlattribute'}Main Tag List{/ts}">
         <a href="#tree"><i class="crm-i fa-tags" aria-hidden="true"></i> {ts}Tag Tree{/ts}</a>
       </li>
       {foreach from=$tagsets item=set}
-        <li class="ui-corner-all crm-tab-button {if ($set.is_reserved)}is-reserved{/if}" title="{ts escape='htmlattribute' 1=$set.used_for_label_str}Tag Set for %1{/ts}">
+        <li role="tab" class="ui-corner-all crm-tab-button {if ($set.is_reserved)}is-reserved{/if}" title="{ts escape='htmlattribute' 1=$set.used_for_label_str}Tag Set for %1{/ts}">
           <a href="#tagset-{$set.id}">{$set.label}</a>
         </li>
       {/foreach}
       {crmPermission has='administer Tagsets'}
-        <li class="ui-corner-all crm-tab-button" title="{ts escape='htmlattribute'}Add Tag Set{/ts}">
+        <li role="tab" class="ui-corner-all crm-tab-button" title="{ts escape='htmlattribute'}Add Tag Set{/ts}">
           <a href="#new-tagset"><i class="crm-i fa-plus" aria-hidden="true"></i></a>
         </li>
       {/crmPermission}
     </ul>
-    <div id="tree">
+    <div id="tree" role="tabpanel">
       <div class="help">
         {ts}Organize the tag hierarchy by clicking and dragging. Shift-click to select multiple tags to merge/move/delete.{/ts}
       </div>
@@ -41,10 +41,10 @@
       <a class="crm-hover-button crm-clear-link" style="visibility:hidden;" title="{ts escape='htmlattribute'}Clear{/ts}"><i class="crm-i fa-times" aria-hidden="true"></i></a>
     </div>
     {foreach from=$tagsets item=set}
-      <div id="tagset-{$set.id}">
+      <div id="tagset-{$set.id}" role="tabpanel">
       </div>
     {/foreach}
-    <div id="new-tagset">
+    <div id="new-tagset" role="tabpanel">
     </div>
   </div>
 </div>
