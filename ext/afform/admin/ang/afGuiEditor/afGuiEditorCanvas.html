@@ -27,14 +27,14 @@
       </div>
     </div>
 
-    <ul class="nav nav-tabs">
-      <li role="presentation" ng-class="{active: canvasTab === 'layout'}">
+    <ul role="tablist" class="nav nav-tabs">
+      <li role="tab" ng-class="{active: canvasTab === 'layout'}">
         <a href ng-click="canvasTab = 'layout'">
           <i class="crm-i fa-list-alt"></i>
           <span>{{:: ts('Form Layout') }}</span>
         </a>
       </li>
-      <li role="presentation" ng-class="{active: canvasTab === 'markup'}">
+      <li role="tab" ng-class="{active: canvasTab === 'markup'}">
         <a href ng-click="canvasTab = 'markup'; updateLayoutHtml()">
           <i class="crm-i fa-code"></i>
           <span>{{:: ts('Markup') }}</span>
@@ -43,10 +43,10 @@
     </ul>
 
   </div>
-  <div id="afGuiEditor-canvas-body" class="panel-body" ng-if="canvasTab === 'layout'">
+  <div id="afGuiEditor-canvas-body" role="tabpanel" class="panel-body" ng-if="canvasTab === 'layout'">
     <af-gui-container ng-if="editor.layout" node="editor.layout" entity-name="editor.blockEntity" data-entity="{{ editor.blockEntity }}" ></af-gui-container>
   </div>
-  <div class="panel-body" ng-if="canvasTab === 'markup'">
+  <div class="panel-body" role="tabpanel" ng-if="canvasTab === 'markup'">
     <p class="help-block">{{:: ts('This is a read-only preview of the auto-generated markup.') }}</p>
     <!-- Wiring up edit mode wouldn't be super-hard in itself, but it's not worthwhile until we have validation to ensure that GUI+raw content are exchangeable  -->
     <div crm-monaco="{readOnly: true}" ng-model="layoutHtml"></div>

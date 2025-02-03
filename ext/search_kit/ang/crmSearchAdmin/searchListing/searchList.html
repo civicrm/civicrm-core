@@ -3,14 +3,14 @@
 
   <!-- Tabs based on the has_base filter -->
   <div class="crm-search-nav-tabs">
-    <ul class="nav nav-tabs">
-      <li ng-repeat="tab in $ctrl.tabs" role="presentation" ng-class="{active: $ctrl.tab === tab.name}">
+    <ul role="tablist" class="nav nav-tabs">
+      <li ng-repeat="tab in $ctrl.tabs" role="tab" ng-class="{active: $ctrl.tab === tab.name}">
         <a href ng-click="$ctrl.tab = tab.name"><i class="crm-i {{:: tab.icon }}"></i>
           {{:: tab.title }}
           <span class="badge">{{ tab.rowCount }}</span>
         </a>
       </li>
-      <li ng-class="{active: $ctrl.tab === 'segment'}">
+      <li role="tab" ng-class="{active: $ctrl.tab === 'segment'}">
         <a href ng-click="$ctrl.tab = 'segment'"><i class="crm-i fa-object-group"></i>
           {{:: ts('Data Segmentation') }}
           <span class="badge">{{ $ctrl.searchSegmentCount }}</span>
@@ -59,7 +59,7 @@
     </div>
   </div>
 
-  <div ng-repeat="tab in $ctrl.tabs" ng-show="$ctrl.tab === tab.name">
+  <div role="tabpanel" ng-repeat="tab in $ctrl.tabs" ng-show="$ctrl.tab === tab.name">
     <div class="form-inline">
       <input class="form-control" type="search" ng-model="tab.filters.label" placeholder="{{:: ts('Filter by label...') }}">
       <input class="form-control" type="search" ng-if="tab.name === 'custom'" ng-model="tab.filters['created_id.display_name,modified_id.display_name']" placeholder="{{:: ts('Filter by author...') }}">

@@ -8,7 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 
-  <div id="report-tab-col-groups" class="civireport-criteria">
+  <div id="report-tab-col-groups" role="tabpanel" class="civireport-criteria">
     {foreach from=$colGroups item=grpFields key=dnc}
       {assign  var="count" value=0}
       {* Wrap custom field sets in collapsed accordion pane. *}
