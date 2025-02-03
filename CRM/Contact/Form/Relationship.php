@@ -121,7 +121,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       ->first();
     $this->_contactType = $contact['contact_type'];
     $this->_display_name_a = $contact['display_name'];
-    $this->assign('display_name_a', $this->_display_name_a);
+    $this->assign('display_name_a', htmlspecialchars($this->_display_name_a));
 
     $this->_rtype = CRM_Utils_Request::retrieve('rtype', 'String', $this);
     $this->_rtypeId = CRM_Utils_Request::retrieve('relTypeId', 'String', $this);

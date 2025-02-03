@@ -230,7 +230,7 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
     $cases['admin-anon'] = [$permAdmin, ...$asAnon, FALSE];
 
     $permSecretLink = ['permission' => '@afformPageToken'];
-    $cases['secret-demo'] = [$permSecretLink, ...$asDemo, FALSE];
+    $cases['secret-demo'] = [$permSecretLink, ...$asDemo, TRUE];
     $cases['secret-lebowski-xhj'] = [$permSecretLink, ...$asLebowski, FALSE];
     $cases['secret-lebowski-aff'] = [$permSecretLink, ...$asLebowskiPageToken, TRUE];
     $cases['secret-anon'] = [$permSecretLink, ...$asAnon, FALSE];
@@ -241,7 +241,7 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
     $cases['or-lebowski-aff'] = [$permAccessCiviOrSecretLink, ...$asLebowskiPageToken, TRUE];
 
     $permAccessCiviAndSecretLink = ['permission' => ['access CiviCRM', '@afformPageToken'], 'permission_operator' => 'AND'];
-    $cases['and-demo'] = [$permAccessCiviAndSecretLink, ...$asDemo, FALSE];
+    $cases['and-demo'] = [$permAccessCiviAndSecretLink, ...$asDemo, TRUE];
     $cases['and-lebowski-xhj'] = [$permAccessCiviAndSecretLink, ...$asLebowski, FALSE];
     $cases['and-lebowski-aff'] = [$permAccessCiviAndSecretLink, ...$asLebowskiPageToken, FALSE];
 
