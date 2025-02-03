@@ -1,7 +1,8 @@
 /// crmUi: Sundry UI helpers
 (function (angular, $, _) {
 
-  var uidCount = 0,
+  let uidCount = 0,
+    tabCount = 0,
     pageTitleHTML = 'CiviCRM',
     documentTitle = 'CiviCRM';
 
@@ -864,6 +865,10 @@
         transclude: true,
         link: function (scope, element, attrs, crmUiTabSetCtrl) {
           element.attr('role', 'tabpanel');
+          if (!scope.id) {
+            scope.id = 'crm-ui-tab-' + (tabCount++);
+            element.attr('id', scope.id);
+          }
           crmUiTabSetCtrl.add(scope);
         }
       };
@@ -881,10 +886,9 @@
         transclude: true,
         controllerAs: 'crmUiTabSetCtrl',
         controller: function($scope, $element, $timeout) {
-          var init;
+          let init;
           $scope.tabs = [];
           this.add = function(tab) {
-            if (!tab.id) throw "Tab is missing 'id'";
             $scope.tabs.push(tab);
 
             // Init jQuery.tabs() once all tabs have been added
