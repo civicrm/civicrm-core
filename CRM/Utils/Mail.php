@@ -268,6 +268,9 @@ class CRM_Utils_Mail {
         'html' => $params['html'] ?? NULL,
         'text' => $params['text'] ?? NULL,
         'attachments' => $params['attachments'] ?? [],
+        // bcc comes in as a comma-separated string of email addresses in $params['bcc'] and is copied to $headers['Bcc']
+        // Eg. testbcc@test.com,testanotherbcc@test.com
+        'bcc' => $headers['Bcc'] ?? NULL,
       ];
       $mailer->send($to, $headers, $message, $originalValues);
 
