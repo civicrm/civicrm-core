@@ -28,14 +28,6 @@ html.cms-standalone body {
   background-color: var(--crm-c-blue-overlay2);
 }
 
-/* RL introduces a border on focus which causes layout shift
- * https://lab.civicrm.org/extensions/riverlea/-/issues/49
- */
-.crm-container :focus,
-.crm-container .ui-dialog :focus {
-  border: none;
-}
-
 /* Replace Riverlea's FontAwesome icon with our own shape. */
 /* This rule is really sensitive to specificity. */
 /* .crm-container :where(details, .crm-accordion-wrapper)>:is(summary,.crm-accordion-header)::before {  */
@@ -250,6 +242,10 @@ html.cms-standalone body {
 
 .crm-contact-page #mainTabContainer .ui-tabs-nav li .ui-tabs-anchor .crm-i:first-child {
   justify-self: center;
+}
+
+.crm-summary-contactname-block:not(.crm-edit-ready) #crm-contactname-content {
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.2);
 }
 
 /* make count badges more readable */
@@ -636,3 +632,19 @@ html.crm-standalone  nav.breadcrumb>ol {
 .contactCardRight:has(#crm-contact-thumbnail) .float-left {
   width: calc(100% - var(--crm-flex-gap) - var(--crm-dash-image-size));
 }
+
+/* Quicksearch */
+ul.crm-quickSearch-results a {
+  padding: 0.25rem 1rem;
+  text-decoration: none;
+  color: var(--crm-c-link);
+}
+ul.crm-quickSearch-results .ui-state-active a /* mouse,keyboard nav */ {
+  background: var(--crm-c-blue);
+  color: var(--crm-c-link-hover);
+}
+ul.crm-quickSearch-results a:active {
+  background: white;
+}
+
+

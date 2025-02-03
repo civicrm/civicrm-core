@@ -130,6 +130,7 @@
   white-space: nowrap;
   padding: var(--crm-dash-block-padding);
   display: flex;
+  flex-wrap: wrap;
   color: var(--crm-c-text);
   background-color: var(--crm-inline-edit-bg);
 }
