@@ -1628,8 +1628,7 @@ abstract class CRM_Import_Parser implements UserJobInterface {
         $fields[$value]['title'] = $title;
         $fields[$value]['entity'] = 'Contact';
         if ($customFieldId) {
-          $fieldSpec = CRM_Core_BAO_CustomField::getField($customFieldId);
-          $fields[$value]['apiv4_name'] = $fieldSpec['custom_group']['name'] . '.' . $fieldSpec['name'];
+          $fields[$value]['apiv4_name'] = CRM_Core_BAO_CustomField::getLongNameFromShortName($value);
         }
       }
     }
