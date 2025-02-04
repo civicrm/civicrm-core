@@ -34,14 +34,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
    */
   protected $_newMemberships;
 
-  protected $_fileName;
-
-  /**
-   * Imported file size
-   * @var int
-   */
-  protected $_fileSize;
-
   /**
    * Separator being used
    * @var string
