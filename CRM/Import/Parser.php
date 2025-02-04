@@ -1888,7 +1888,8 @@ abstract class CRM_Import_Parser implements UserJobInterface {
         continue;
       }
       if ($mappedField['name']) {
-        $params[$this->getFieldMetadata($mappedField['name'])['name']] = $this->getTransformedFieldValue($mappedField['name'], $values[$i]);
+        $fieldSpec = $this->getFieldMetadata($mappedField['name']);
+        $params[$fieldSpec['name']] = $this->getTransformedFieldValue($mappedField['name'], $values[$i]);
       }
     }
     return $params;
