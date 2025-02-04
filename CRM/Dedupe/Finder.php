@@ -243,19 +243,17 @@ class CRM_Dedupe_Finder {
 
         case 'Select Date':
           $date = CRM_Utils_Date::processDate($v);
-          $customFields[$fieldId]['customValue']['data'] = $date;
+          $flat[$field['column_name']] = $date;
           break;
 
         case 'File':
+          $flat[$field['column_name']] = NULL;
           break;
 
         default:
-          $customFields[$fieldId]['customValue']['data'] = $v;
+          $flat[$field['column_name']] = $v ?? NULL;
           break;
       }
-    }
-    foreach ($customFields as $customField) {
-      $flat[$customField['column_name']] = $customField['customValue']['data'] ?? NULL;
     }
   }
 
