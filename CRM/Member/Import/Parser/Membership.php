@@ -28,6 +28,15 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
   protected $fieldMetadata = [];
 
   /**
+   * Has this parser been fixed to expect `getMappedRow` to break it up
+   * by entity yet? This is a transitional property to allow the classes
+   * to be fixed up individually.
+   *
+   * @var bool
+   */
+  protected $isUpdatedForEntityRowParsing = TRUE;
+
+  /**
    * Array of successfully imported membership id's
    *
    * @var array
@@ -89,23 +98,46 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
     foreach ($params as $key => $value) {
       $errors = array_merge($this->getInvalidValues($value, $key), $errors);
     }
-
-    if (empty($params['membership_type_id'])) {
-      $errors[] = ts('Missing required fields');
-      return;
-    }
+    $this->validateRequiredFields($this->getRequiredFields(), $params['Membership']);
 
     //To check whether start date or join date is provided
-    if (empty($params['start_date']) && empty($params['join_date'])) {
+    if (empty($params['Membership']['start_date']) && empty($params['Membership']['join_date'])) {
       $errors[] = 'Membership Start Date is required to create a memberships.';
     }
     //fix for CRM-2219 Update Membership
-    if ($this->isUpdateExisting() && !empty($params['is_override']) && empty($params['status_id'])) {
+    if ($this->isUpdateExisting() && !empty($params['Membership']['is_override']) && empty($params['Membership']['status_id'])) {
       $errors[] = 'Required parameter missing: Status';
     }
     if ($errors) {
       throw new CRM_Core_Exception('Invalid value for field(s) : ' . implode(',', $errors));
     }
+  }
+
+  /**
+   * Get the required fields.
+   *
+   * @return array
+   */
+  public function getRequiredFields(): array {
+    return [[$this->getRequiredFieldsForMatch(), $this->getRequiredFieldsForCreate()]];
+  }
+
+  /**
+   * Get required fields to create a contribution.
+   *
+   * @return array
+   */
+  public function getRequiredFieldsForCreate(): array {
+    return ['membership_type_id'];
+  }
+
+  /**
+   * Get required fields to match a contribution.
+   *
+   * @return array
+   */
+  public function getRequiredFieldsForMatch(): array {
+    return [['id']];
   }
 
   /**
@@ -117,26 +149,25 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
    * @return int|void|null
    *   the result of this processing - which is ignored
    */
-  public function import($values) {
+  public function import(array $values) {
     $rowNumber = (int) ($values[array_key_last($values)]);
     try {
       $params = $this->getMappedRow($values);
       $this->removeEmptyValues($params);
-      if (!empty($params['contact_id'])) {
-        $this->validateContactID($params['contact_id'], $this->getContactType());
+      $membershipParams = $params['Membership'];
+      $contactParams = $params['Contact'] ?? [];
+      if (!empty($membershipParams['contact_id'])) {
+        $this->validateContactID($membershipParams['contact_id'], $this->getContactType());
       }
 
       //assign join date equal to start date if join date is not provided
-      if (empty($params['join_date']) && !empty($params['start_date'])) {
-        $params['join_date'] = $params['start_date'];
+      if (empty($membershipParams['join_date']) && !empty($membershipParams['start_date'])) {
+        $membershipParams['join_date'] = $membershipParams['start_date'];
       }
 
-      $formatted = $params;
+      $formatted = $formatValues = $membershipParams;
       // don't add to recent items, CRM-4399
       $formatted['skipRecentView'] = TRUE;
-
-      $formatValues = $params;
-
       if (!$this->isUpdateExisting()) {
         $formatted['custom'] = CRM_Core_BAO_CustomField::postProcess($formatted,
           NULL,
@@ -150,7 +181,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
       $joinDate = $formatted['join_date'];
 
       if (empty($formatValues['id']) && empty($formatValues['contact_id'])) {
-        $error = $this->checkContactDuplicate($formatValues);
+        $error = $this->checkContactDuplicate($params['Contact']);
 
         if (CRM_Core_Error::isAPIError($error, CRM_Core_Error::DUPLICATE_CONTACT)) {
           $matchedIDs = (array) $error['error_message']['params'];
@@ -214,23 +245,23 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
           $disp = '';
 
           foreach ($fieldsArray as $value) {
-            if (array_key_exists(trim($value), $params)) {
-              $paramValue = $params[trim($value)];
+            if (array_key_exists(trim($value), $contactParams)) {
+              $paramValue = $contactParams[trim($value)];
               if (is_array($paramValue)) {
-                $disp .= $params[trim($value)][0][trim($value)] . " ";
+                $disp .= $contactParams[trim($value)][0][trim($value)] . " ";
               }
               else {
-                $disp .= $params[trim($value)] . " ";
+                $disp .= $contactParams[trim($value)] . " ";
               }
             }
           }
 
-          if (!empty($params['external_identifier'])) {
+          if (!empty($contactParams['external_identifier'])) {
             if ($disp) {
-              $disp .= "AND {$params['external_identifier']}";
+              $disp .= "AND {$contactParams['external_identifier']}";
             }
             else {
-              $disp = $params['external_identifier'];
+              $disp = $contactParams['external_identifier'];
             }
           }
           throw new CRM_Core_Exception('No matching Contact found for (' . $disp . ')', CRM_Import_Parser::ERROR);
