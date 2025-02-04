@@ -41,9 +41,8 @@
   --crm-c-blue-overlay: #dce9ef; /* thames only */
   --crm-c-blue-light: #d8edfe; /* thames */
   --crm-c-blue: #c5e4fc; /* thames */
-/* non-WCAG-AA --crm-c-blue-dark:     #2c98ed ; /* thames */
-  --crm-c-blue-dark: #127aca; /* thames */
-  --crm-c-blue-darker: #02477d; /* thames */
+  --crm-c-blue-dark: #0d5790; /* thames. nb #127aca not AAA on #f8f8f8  */
+  --crm-c-blue-darker: #033b67; /* thames */
   --crm-c-purple: #4d4d69;
   --crm-c-purple-dark: #3e3e54;
   --crm-c-green: #d6e9c6;

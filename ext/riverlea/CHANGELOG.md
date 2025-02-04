@@ -1,3 +1,9 @@
+1.3.4-6.0alpha
+ - FIXED - Responsive: add wrap to Contact Form Contact Name inline edit (thanks Artful Robot)
+ - CHANGED - Thames, A11y: darkened default blue.
+ - CHANGED - Thames, tweaks (removes redundant css, adds box-shadow on part of contact dashboard)
+ - CHANGED - Thames, improves QuickSearch appearance
+
 1.3.3-6.0alpha
  - FIXED - FrontEnd: restored padding on alert boxes
  - FIXED - FrontEnd: front-end-compressed table display form
@@ -7,7 +13,7 @@
  - CHANGED - FrontEnd: Added an 800px default width, similar to Greenwich, which impacts Minetta and Walbrook (forms are no longer 100% width).
  - FIXED - Select lists match width of content
  - FIXED - Select list padding on front-end doesn't hide selected value
- - FIXED - Select list inline alignment for descriiption
+ - FIXED - Select list inline alignment for description
  - FIXED - Dark mode for alpha list Contrast Ratio across all streams, plus extra fixes in Walbrook and Thames.
  - FIXED - AFGuiEditor - button group wrapping
  - FIXED - alignment of buttons above some SearchKit table displays corrected
@@ -46,7 +52,7 @@
  - ADDED provisional support for SearchKit Tree Display.
  - FIXED wrong text colour on footer status label.
  - FIXED image on contact dashboard can overlap multiple tags: https://lab.civicrm.org/extensions/riverlea/-/issues/99.
- - CHANAGED Minetta colours for Contrast Ratio WCAG AAA: success, danger & info alert bg & text;
+ - CHANGED Minetta colours for Contrast Ratio WCAG AAA: success, danger & info alert bg & text;
  - CHANGED Minetta DarkMode colours for Contrast Ratio WCAG AAA: alerts, backgrounds, input description, border, tabs.
  - CHANGED Walbrook colours for Contrast Ratio WCAG AAA: darker text, lighter success & warning button bg, lighter danger alert bg, darker link + hover, alert-status
  - CHANGED Walbrook DarkMode colours for Contrast Ratio WCAG AAA: brighter links, darker column rows, wizard, buttons, bg regions, alerts, accordions, heading bg color
