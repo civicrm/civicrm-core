@@ -1,9 +1,9 @@
 <ul role="tablist" class="nav nav-tabs af-tablist">
-  <li ng-repeat="(tabIndex, tab) in $ctrl.tabs" role="tab" class="af-tab" ng-class="{active: tabIndex === $ctrl.selectedTab}">
+  <li ng-repeat="(tabIndex, tab) in $ctrl.tabs" role="tab" class="af-tab" ng-class="{active: tab.tabSelected}">
     <a href ng-click="$ctrl.selectTab(tabIndex)">
       <i ng-if="tab.icon" class="crm-i {{ tab.icon }}" aria-hidden="true"></i>
       {{ tab.title }}
-      <em ng-if="tab.count">{{ tab.count }}</em>
+      <span class="badge">{{ tab.count }}</span>
     </a>
   </li>
 </ul>

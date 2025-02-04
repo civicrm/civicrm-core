@@ -14,7 +14,7 @@
     <a href ng-click="$ctrl.selectTab(tabIndex)">
       <i class="crm-i {{ tab.icon }}" ng-if="tab.icon"></i>
       {{ tab['title'] }}
-      <button class="btn btn-default btn-xs af-gui-add-element-button" data-tab-id="{{ tabIndex }}">
+      <button class="btn btn-default btn-xs af-gui-add-element-button" data-tab-id="{{ tabIndex }}" ng-click="$ctrl.getSearchDisplays(tabIndex)">
         <span>
           <i class="crm-i fa-gear"></i>
         </span>

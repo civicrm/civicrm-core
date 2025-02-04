@@ -7,40 +7,36 @@
     controller: function($scope, $element) {
       this.tabs = [];
 
-      this.$onInit = function() {
-      };
-
-      this.add = function(tab) {
+      this.addTab = function(tab) {
+        tab.tabSelected = !this.tabs.length;
         this.tabs.push(tab);
-        this.selectTab(0);
       };
 
       this.selectTab = function(tabIndex) {
-        this.selectedTab = tabIndex;
-        const panelWrapper = $element.find('div[ng-transclude]');
-        panelWrapper.find('af-tab').each(function(i, tab) {
-          $(tab).toggle(i === tabIndex);
+        this.tabs.forEach(function(tab, index) {
+          tab.tabSelected = index === tabIndex;
         });
       };
     }
 
   });
 
-  angular.module('af').component('afTab', {
-    require: {
-      tabset: '^afTabset',
-    },
-    bindings: {
-      title: '@',
-      icon: '@',
-      count: '@',
-    },
-    controller: function($scope, $element) {
-      this.$onInit = function() {
-        $element.attr('role', 'tabpanel');
-        this.tabset.add(this);
-      };
-    }
-
+  angular.module('af').directive('afTab', function() {
+    return {
+      restrict: 'E',
+      require: '^afTabset',
+      scope: {
+        title: '@',
+        icon: '@',
+        count: '@',
+      },
+      // Transclude allows the tab scope to be accessed from the inner html as $parent
+      transclude: true,
+      // ngShow will toggle the class `ng-hide`; also adding it to the markup avoids initial flash
+      template: '<div ng-transclude role="tabpanel" ng-show="tabSelected" class="ng-hide"></div>',
+      link: function (scope, element, attrs, afTabsetCtrl) {
+        afTabsetCtrl.addTab(scope);
+      }
+    };
   });
 })(angular, CRM.$, CRM._);
