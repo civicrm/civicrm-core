@@ -34,14 +34,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
    */
   protected $_newMemberships;
 
-  protected $_fileName;
-
-  /**
-   * Imported file size
-   * @var int
-   */
-  protected $_fileSize;
-
   /**
    * Separator being used
    * @var string
@@ -334,10 +326,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
         $this->setImportStatus($rowNumber, 'IMPORTED', '', $newMembership['id']);
         return CRM_Import_Parser::VALID;
       }
-    }
-    catch (CRM_Core_Exception $e) {
-      $this->setImportStatus($rowNumber, 'ERROR', $e->getMessage());
-      return CRM_Import_Parser::ERROR;
     }
     catch (CRM_Core_Exception $e) {
       $this->setImportStatus($rowNumber, 'ERROR', $e->getMessage());
