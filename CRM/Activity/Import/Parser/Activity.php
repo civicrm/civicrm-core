@@ -112,15 +112,6 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
             }
           }
         }
-
-        if (!empty($params['external_identifier'])) {
-          if ($disp) {
-            $disp .= "AND {$params['external_identifier']}";
-          }
-          else {
-            $disp = $params['external_identifier'];
-          }
-        }
         if (empty($params['id'])) {
           throw new CRM_Core_Exception('No matching Contact found for (' . $disp . ')');
         }
