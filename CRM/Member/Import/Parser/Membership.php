@@ -331,10 +331,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
       $this->setImportStatus($rowNumber, 'ERROR', $e->getMessage());
       return CRM_Import_Parser::ERROR;
     }
-    catch (CRM_Core_Exception $e) {
-      $this->setImportStatus($rowNumber, 'ERROR', $e->getMessage());
-      return CRM_Import_Parser::ERROR;
-    }
   }
 
   /**
