@@ -185,7 +185,6 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Import_Parser {
    */
   protected function setFieldMetadata(): void {
     if (empty($this->importableFieldsMetadata)) {
-      $activityContact = CRM_Activity_BAO_ActivityContact::import();
       $fields = ['' => ['title' => ts('- do not import -')]];
 
       $tmpFields = CRM_Activity_DAO_Activity::import();
