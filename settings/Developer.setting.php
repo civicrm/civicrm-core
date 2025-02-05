@@ -39,6 +39,7 @@ return [
     'pseudoconstant' => [
       'callback' => '\Civi\Core\AssetBuilder::getCacheModes',
     ],
+    'settings_pages' => ['debug' => ['weight' => 600]],
   ],
   // note: this setting is only exposed if the userFramework declares it has support
   // (currently only Drupal)
@@ -56,6 +57,7 @@ return [
     'is_contact' => 0,
     'description' => ts('Set this value to Yes if you want CiviCRM error/debugging messages to appear in your CMS error log.'),
     'help_text' => ts('In the case of Drupal, this will cause all CiviCRM error messages to appear in the Watchdog logs (assuming you have Watchdog enabled)'),
+    'settings_pages' => ['debug' => ['weight' => 100]],
   ],
   'debug_enabled' => [
     'group_name' => 'Developer Preferences',
@@ -72,7 +74,9 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => ts("Set this value to Yes if you want to use one of CiviCRM's debugging tools. This feature should NOT be enabled for production sites."),
-    'help_text' => 'Do not turn this on on production sites',
+    // TODO: how to incorporate extensive help text from .hlp file?
+    'help_text' => ts('Debug output is triggered by adding specific name-value pairs to the CiviCRM query string. See Developer Docs for more details.'),
+    'settings_pages' => ['debug' => ['weight' => 200]],
   ],
   'backtrace' => [
     'group_name' => 'Developer Preferences',
@@ -86,6 +90,7 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => ts('Set this value to Yes if you want to display a backtrace listing when a fatal error is encountered. This feature should NOT be enabled for production sites.'),
+    'settings_pages' => ['debug' => ['weight' => 300]],
   ],
   'environment' => [
     'group_name' => 'Developer Preferences',
@@ -106,6 +111,7 @@ return [
     'on_change' => [
       'CRM_Core_BAO_Setting::onChangeEnvironmentSetting',
     ],
+    'settings_pages' => ['debug' => ['weight' => 400]],
   ],
   'esm_loader' => [
     'group_name' => 'Developer Preferences',
@@ -125,6 +131,7 @@ return [
     'description' => ts('Specify how to load ESM (JS) files. The "Default" mode is the supported option. Other options may assist with diagnosing or temporarily mitigating compatibility issues.'),
     'help_text' => NULL,
     'options' => ['auto' => ts('Default (Auto-detect)'), 'browser' => ts('Browser'), 'shim-fast' => ts('es-module-shims (fast mode)'), 'shim-slow' => ts('es-module-shims (slow mode)')],
+    'settings_pages' => ['debug' => ['weight' => 700]],
   ],
   'fatalErrorHandler' => [
     'group_name' => 'Developer Preferences',
@@ -139,5 +146,6 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => ts('Enter the path and class for a custom PHP error-handling function if you want to override built-in CiviCRM error handling for your site.'),
+    'settings_pages' => ['debug' => ['weight' => 500]],
   ],
 ];
