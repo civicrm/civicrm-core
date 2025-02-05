@@ -378,38 +378,13 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
    * @return array|mixed
    * @throws \CRM_Core_Exception
    */
-  protected function getImportableFields($contactType = 'Individual') {
+  protected function getImportableFields(string $contactType = 'Individual'): array {
     $fields = Civi::cache('fields')->get('membership_importable_fields' . $contactType);
     if (!$fields) {
       $fields = ['' => ['title' => '- ' . ts('do not import') . ' -']];
 
       $tmpFields = CRM_Member_DAO_Membership::import();
-      $contactFields = CRM_Contact_BAO_Contact::importableFields($contactType, NULL);
-
-      // Using new Dedupe rule.
-      $ruleParams = [
-        'contact_type' => $contactType,
-        'used' => 'Unsupervised',
-      ];
-      $fieldsArray = CRM_Dedupe_BAO_DedupeRule::dedupeRuleFields($ruleParams);
-
-      $tmpContactField = [];
-      if (is_array($fieldsArray)) {
-        foreach ($fieldsArray as $value) {
-          $customFieldId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField',
-            $value,
-            'id',
-            'column_name'
-          );
-          $value = trim($customFieldId ? 'custom_' . $customFieldId : $value);
-          $tmpContactField[$value] = $contactFields[$value] ?? NULL;
-          $title = $tmpContactField[$value]['title'] . ' ' . ts('(match to contact)');
-          $tmpContactField[$value]['title'] = $title;
-        }
-      }
-      $tmpContactField['external_identifier'] = $contactFields['external_identifier'];
-      $tmpContactField['external_identifier']['title'] = $contactFields['external_identifier']['title'] . ' ' . ts('(match to contact)');
-
+      $tmpContactField = $this->getContactMatchingFields();
       $tmpFields['membership_contact_id']['title'] .= ' ' . ts('(match to contact)');
 
       $fields = array_merge($fields, $tmpContactField);
