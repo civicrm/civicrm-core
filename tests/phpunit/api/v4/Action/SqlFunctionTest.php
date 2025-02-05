@@ -234,8 +234,7 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
       ->addSelect('IFNULL(duration, 2) AS ifnull_duration_2')
       ->addSelect('created_date')
       ->addSelect('activity_date_time')
-      // SECOND in quotes is wrong because it's not a string, but hacked it for now because we specified as type SqlString...
-      ->addSelect('TIMESTAMPDIFF("SECOND", created_date, activity_date_time) AS time_diff')
+      ->addSelect('TIMESTAMPDIFF(SECOND, created_date, activity_date_time) AS time_diff')
       ->addOrderBy('id')
       ->execute()->indexBy('id');
 

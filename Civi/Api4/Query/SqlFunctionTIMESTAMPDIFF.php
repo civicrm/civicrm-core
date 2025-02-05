@@ -21,17 +21,10 @@ class SqlFunctionTIMESTAMPDIFF extends SqlFunction {
   protected static $dataType = 'Integer';
 
   protected static function params(): array {
-    /* This produces:
-     * SELECT `a`.`id` AS `id`, `a`.`description` AS `description`, `a`.`is_active` AS `is_active`, `a`.`last_run_end` AS `last_run_end`,
-     * TIMESTAMPDIFF(SECOND `a`.`last_run` , `a`.`last_run`, `a`.`last_run_end`) AS `TIMESTAMPDIFF_last_run_last_run_last_run_end`
-     *
-     * But we need eg. TIMESTAMPDIFF(SECOND, `a`.`last_run`, `a`.`last_run_end`)
-     */
     return [
       [
         'label' => ts('Unit'),
-        'must_be' => ['SqlString'], // This is wrong, it's not a string but a parameter but that doesn't seem to be an option in Civi\Api4\Query\SqlExpression
-        'expr' => [
+        'flag_before' => [
           'MICROSECOND' => ts('Microseconds'),
           'SECOND' => ts('Seconds'),
           'MINUTE' => ts('Minutes'),
@@ -42,22 +35,14 @@ class SqlFunctionTIMESTAMPDIFF extends SqlFunction {
           'QUARTER' => ts('Quarters'),
           'YEAR' => ts('Years'),
         ],
-        'max_expr' => 1,
+        'max_expr' => 0,
         'optional' => FALSE,
       ],
       [
-        'must_be' => ['SqlField'],
-        'max_expr' => 1,
-        'min_expr' => 1,
+        'max_expr' => 2,
+        'min_expr' => 2,
         'optional' => FALSE,
-        'label' => ts('diff 1'),
-      ],
-      [
-        'must_be' => ['SqlField'],
-        'max_expr' => 1,
-        'min_expr' => 1,
-        'optional' => FALSE,
-        'label' => ts('diff 2'),
+        'label' => ts('diff'),
       ],
     ];
   }
@@ -73,17 +58,7 @@ class SqlFunctionTIMESTAMPDIFF extends SqlFunction {
    * @return string
    */
   public static function getDescription(): string {
-    return ts('Time between two dates.');
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public static function renderExpression(string $output): string {
-    // As we set 'must_be' => ['SqlString'] above we need to remove the quotes from around the "SECOND", "HOUR" etc
-    // to get a valid SQL expression
-    $output = str_replace('"', '', $output);
-    return "TIMESTAMPDIFF($output)";
+    return ts('Number of minutes, hours, days, etc. between two dates.');
   }
 
 }
