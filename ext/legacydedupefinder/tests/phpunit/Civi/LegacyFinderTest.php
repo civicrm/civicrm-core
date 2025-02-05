@@ -56,8 +56,10 @@ class LegacyFinderTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     Contact::delete(FALSE)->addWhere('id', 'IN', $this->ids['Contact'])
       ->setUseTrash(FALSE)
       ->execute();
-    Group::delete(FALSE)->addWhere('id', 'IN', $this->ids['Group'])
-      ->execute();
+    if (!empty($this->ids['Group'])) {
+      Group::delete(FALSE)->addWhere('id', 'IN', $this->ids['Group'])
+        ->execute();
+    }
     parent::tearDown();
   }
 

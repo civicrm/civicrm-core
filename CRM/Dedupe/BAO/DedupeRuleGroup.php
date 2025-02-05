@@ -24,7 +24,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup impl
 
   public static function getSubscribedEvents(): array {
     return [
-      'hook_civicrm_findExistingDuplicates' => ['hook_civicrm_findExistingDuplicates', -20],
+      'hook_civicrm_findExistingDuplicates' => ['hook_civicrm_findExistingDuplicates', -200],
     ];
   }
 
