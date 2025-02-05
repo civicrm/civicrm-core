@@ -200,17 +200,22 @@ class CRM_Dedupe_Finder {
     // handle {birth,deceased}_date
     foreach (['birth_date', 'deceased_date'] as $date) {
       if (!empty($fields[$date])) {
+        $original = $fields[$date];
         $flat[$date] = $fields[$date];
         if (is_array($flat[$date])) {
           $flat[$date] = CRM_Utils_Date::format($flat[$date]);
         }
         $flat[$date] = CRM_Utils_Date::processDate($flat[$date]);
+        if ($flat[$date] !== $original) {
+          CRM_Core_Error::deprecatedWarning('passing in mis-formatted date values is deprecated');
+        }
       }
     }
 
     if (!empty($flat['contact_source'])) {
       $flat['source'] = $flat['contact_source'];
       unset($flat['contact_source']);
+      CRM_Core_Error::deprecatedWarning('passing in mis-named source field is deprecated');
     }
 
     // handle preferred_communication_method
