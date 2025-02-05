@@ -48,6 +48,7 @@
     "CRM/Contact/Form/ProfileContact.php",
     "CRM/Contact/Form/Search/Custom.php",
     "CRM/Contact/Form/Search/Custom/*",
+    "CRM/Contact/Form/Task/SMSCommon.php",
     "CRM/Contact/Import/Controller.php",
     "CRM/Contact/Import/Field.php",
     "CRM/Contact/Import/ImportJob.php",
