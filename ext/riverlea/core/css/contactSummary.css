@@ -61,12 +61,12 @@
   width: fit-content;
   z-index: 99;
   position: absolute;
-  left: 0;
+  left: calc(var(--crm-dash-panel-padding) + var(--crm-side-tabs-width));
 }
-#mainTabContainer:not(.narrowpage) .contactCardRight div.crm-inline-edit.form {
-  right: 0;
+.crm-contact-summary-layout-col-2 .crm-inline-edit.form, /* CLE */
+.contactCardRight .crm-inline-edit.form {
+  right: var(--crm-dash-panel-padding);
   left: initial;
-  position: absolute;
 }
 .crm-container .crm-inline-edit.add-new {
   min-height: 2.5em;
@@ -385,10 +385,19 @@ div.crm-summary-contactname-block + .crm-actions-ribbon {
   .crm-container div.contact_panel {
     display: block;
   }
+  .crm-container .contact_panel.crm-contact-summary-layout-row {
+    flex-direction: column;
+  }
+  .crm-contact-summary-layout-col-2 .crm-inline-edit.form,
+  .contactCardRight .crm-inline-edit.form {
+    right: inherit;
+    left: calc(var(--crm-dash-panel-padding) + var(--crm-side-tabs-width));
+  }
 }
 @media (max-width: 767px) {
   #crm-main-content-wrapper {
     --crm-dash-heading-inset: 0; /* resets any inset on the title/action links */
+    --crm-side-tabs-width: auto; /* resets offset inline edit */
   }
   .crm-container #mainTabContainer,
   .crm-container div.crm-summary-row {
@@ -414,4 +423,38 @@ div.crm-summary-contactname-block + .crm-actions-ribbon {
   .crm-container #mainTabContainer .ui-tabs-nav li .ui-tabs-anchor i {
     font-size: var(--crm-font-size);
   }
+}
+
+/* Style rules for Contact Layout Editor extension */
+
+#contact-summary .crm-contact-summary-layout-col {
+  flex: 1 1 250px;
+  padding: 0;
+}
+.crm-actions-ribbon ul#actions:has(.crm-contact-summary-edit-layout) {
+  grid-template-columns: min-content min-content min-content auto min-content min-content;
+}
+.crm-container .crm-contact-summary-edit-layout a.crm-hover-button {
+  background: var(--crm-c-primary);
+  color: var(--crm-c-primary-text) !important;
+  padding: var(--crm-btn-padding-block) var(--crm-btn-padding-inline) var(--crm-btn-padding-block) 0;
+  border: var(--crm-btn-border);
+}
+.crm-container .crm-contact-summary-edit-layout a.crm-hover-button i.crm-i {
+  padding: 0 var(--crm-btn-icon-spacing) 0 var(--crm-btn-padding-inline);
+}
+.crm-container .crm-contact-summary-edit-layout a.crm-hover-button:hover,
+.crm-container .crm-contact-summary-edit-layout a.crm-hover-button:focus {
+  background: var(--crm-c-primary-hover);
+  color: var(--crm-c-primary-text) !important;
+  padding: var(--crm-btn-padding-block) var(--crm-btn-padding-inline) var(--crm-btn-padding-block) 0;
+}
+.crm-previous-action {
+  order: 3;
+}
+.crm-next-action {
+  order: 4;
+}
+#contactLayoutEditor .panel-heading .btn {
+  padding: var(--crm-btn-padding-block) var(--crm-btn-padding-inline);
 }

@@ -1,3 +1,11 @@
+1.3.5-6.0alpha
+ - ADDED - padding to contact dashboard inline edit div (#107)
+ - FIXED - Contact Layout Editor extension: double padding; broken right float (#107)
+ - FIXED - Contact dashboard inline edit responsive handling.
+ - CHANGED - Contact dashboard inline edit - add sidebar link width to positioning to keep inline
+ - CHANGED - Moved Contact Layout Editor extension CSS from fixes.css into ContactSummary.css to reduce when it's being loaded.
+ - FIXED - Delete icon on delete buttons inherits the button text colour not the delete icon colour.
+
 1.3.4-6.0alpha
  - FIXED - Responsive: add wrap to Contact Form Contact Name inline edit (thanks Artful Robot)
  - CHANGED - Thames, A11y: darkened default blue.
