@@ -42,6 +42,9 @@ class CRM_Core_I18n {
    * @return string
    */
   protected static function escape($text, $mode) {
+    if (!$mode) {
+      return $text;
+    }
     switch ($mode) {
       case 'sql':
         return CRM_Core_DAO::escapeString($text);
@@ -52,7 +55,7 @@ class CRM_Core_I18n {
       case 'htmlattribute':
         return htmlspecialchars($text, ENT_QUOTES);
     }
-    return $text;
+    throw new Exception('Invalid escape mode: ' . $mode);
   }
 
   /**
