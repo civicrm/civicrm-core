@@ -26,8 +26,11 @@ class CRM_Contribute_Form_AdditionalInfo {
    * Putting it on this class doesn't seem to reduce complexity.
    *
    * @param CRM_Core_Form $form
+   *
+   * @deprecated since 6.0 will be removed around 6.6.
    */
   public static function buildPremium($form) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative, will be removed around 6.6');
     //premium section
     $form->add('hidden', 'hidden_Premium', 1);
     $sel1 = $sel2 = [];
@@ -71,8 +74,13 @@ class CRM_Contribute_Form_AdditionalInfo {
    * Build the form object for Additional Details.
    *
    * @param CRM_Core_Form $form
+   *
+   * @deprecated since 6.0 will be removed around 6.6.
+   *
    */
   public static function buildAdditionalDetail(&$form) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative, will be removed around 6.6');
+
     //Additional information section
     $form->add('hidden', 'hidden_AdditionalDetail', 1);
 
@@ -138,26 +146,6 @@ class CRM_Contribute_Form_AdditionalInfo {
       $feeAmount->freeze();
     }
 
-  }
-
-  /**
-   * used by  CRM/Pledge/Form/Pledge.php
-   *
-   * Build the form object for PaymentReminders Information.
-   *
-   * @deprecated since 5.68 will be removed around 5.78.
-   * @param CRM_Core_Form $form
-   */
-  public static function buildPaymentReminders(&$form) {
-    CRM_Core_Error::deprecatedFunctionWarning('no alternative, will be removed around 5.78');
-    //PaymentReminders section
-    $form->add('hidden', 'hidden_PaymentReminders', 1);
-    $form->add('text', 'initial_reminder_day', ts('Send Initial Reminder'), ['size' => 3]);
-    $form->addRule('initial_reminder_day', ts('Please enter a valid reminder day.'), 'positiveInteger');
-    $form->add('text', 'max_reminders', ts('Send up to'), ['size' => 3]);
-    $form->addRule('max_reminders', ts('Please enter a valid No. of reminders.'), 'positiveInteger');
-    $form->add('text', 'additional_reminder_day', ts('Send additional reminders'), ['size' => 3]);
-    $form->addRule('additional_reminder_day', ts('Please enter a valid additional reminder day.'), 'positiveInteger');
   }
 
   /**
