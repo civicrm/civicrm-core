@@ -958,7 +958,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * Process the contribution.
    *
    * @param array $params
-   * @param array $result
+   * @param null|mixed $paymentProcessor
+   *   Value that may always be NULL?
    * @param array $contributionParams
    *   Parameters to be passed to contribution create action.
    *   This differs from params in that we are currently adding params to it and 1) ensuring they are being
@@ -985,7 +986,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    */
   protected function processFormContribution(
     $params,
-    $result,
+    $paymentProcessor,
     $contributionParams,
     $financialType,
     $isRecur
@@ -1039,7 +1040,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $recurringContributionID), $contributionParams
       );
 
-      $contributionParams['payment_processor'] = $result ? ($result['payment_processor'] ?? NULL) : NULL;
+      $contributionParams['payment_processor'] = $paymentProcessor;
       $contributionParams['non_deductible_amount'] = $this->getNonDeductibleAmount($params, $financialType, TRUE, $form);
       $contributionParams['skipCleanMoney'] = TRUE;
       // @todo this is the wrong place for this - it should be done as close to form submission
@@ -1709,7 +1710,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     $membershipContribution = $this->processFormContribution(
       $tempParams,
-      $tempParams,
+      $tempParams['payment_processor'] ?? NULL,
       $contributionParams,
       $financialType,
       $isRecur
