@@ -56,13 +56,6 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
   protected $relationshipTypeID;
 
   /**
-   * Membership type id used in test function.
-   *
-   * @var int
-   */
-  protected $membershipStatusID;
-
-  /**
    * Set up for test.
    *
    * @throws \CRM_Core_Exception
@@ -78,7 +71,6 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     ];
     $this->relationshipTypeID = $this->relationshipTypeCreate($params);
     $organizationContactID = $this->organizationCreate();
-    $this->restoreMembershipTypes();
     $params = [
       'name' => self::MEMBERSHIP_TYPE_NAME,
       'description' => NULL,
@@ -98,22 +90,15 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     $membershipType = CRM_Member_BAO_MembershipType::add($params);
     $this->membershipTypeID = (int) $membershipType->id;
 
-    $this->membershipStatusID = $this->membershipStatusCreate('test status');
+    $this->membershipStatusCreate('test status');
   }
 
   /**
    * Tears down the fixture, for example, closes a network connection.
    * This method is called after a test is executed.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
     $tablesToTruncate = [
-      'civicrm_membership',
-      'civicrm_membership_log',
-      'civicrm_contribution',
-      'civicrm_membership_payment',
-      'civicrm_contact',
       'civicrm_email',
       'civicrm_user_job',
       'civicrm_queue',
@@ -121,7 +106,8 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     ];
     $this->relationshipTypeDelete($this->relationshipTypeID);
     $this->membershipTypeDelete(['id' => $this->membershipTypeID]);
-    $this->membershipStatusDelete($this->membershipStatusID);
+    $this->quickCleanUpFinancialEntities();
+    $this->restoreMembershipTypes();
     $this->quickCleanup($tablesToTruncate, TRUE);
     parent::tearDown();
   }
@@ -260,7 +246,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
       'General',
       date('Y-m-d'),
       1,
-      $this->membershipStatusID,
+      $this->ids['MembershipStatus']['test status'],
       'abc',
     ];
     try {

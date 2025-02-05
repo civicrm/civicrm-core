@@ -766,17 +766,16 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    *
    * @return int
    */
-  public function membershipStatusCreate($name = 'test member status'): int {
+  public function membershipStatusCreate(string $name = 'test member status'): int {
     $params['name'] = $name;
     $params['start_event'] = 'start_date';
     $params['end_event'] = 'end_date';
-    $params['is_current_member'] = 1;
+    $params['is_current_member'] = TRUE;
     $params['is_active'] = 1;
     // Make sure weight is after existing statuses (could be cleverer and get max(weight) first).
     $params['weight'] = 100;
 
-    $result = $this->callAPISuccess('MembershipStatus', 'Create', $params);
-    CRM_Member_PseudoConstant::flush('membershipStatus');
+    $result = $this->createTestEntity('MembershipStatus', $params, $name);
     return (int) $result['id'];
   }
 
