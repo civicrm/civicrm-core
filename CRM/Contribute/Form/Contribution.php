@@ -1294,7 +1294,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->_params,
       $contributionParams,
       $financialType,
-      $this->_bltID,
       $this->_params['is_recur'] ?? NULL
     );
 
@@ -1389,7 +1388,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    *   - thankyou_date (not all forms will set this)
    *
    * @param CRM_Financial_DAO_FinancialType $financialType
-   * @param int $billingLocationID
    *   ID of billing location type.
    * @param bool $isRecur
    *   Is this recurring?
@@ -1402,7 +1400,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $params,
     $contributionParams,
     $financialType,
-    $billingLocationID,
     $isRecur
   ) {
     $form = $this;
