@@ -1986,13 +1986,15 @@ class CRM_Utils_System {
     try {
       $civicrmSetting = \Civi::settings()->get('core_maintenance_mode');
 
-      // if CiviCRM setting is set, use that answer
-      if (!is_null($civicrmSetting)) {
-        return (bool) $civicrmSetting;
+      // inherit => ask the userSystem
+      if ($civicrmSetting === 'inherit') {
+        return CRM_Core_Config::singleton()->userSystem->isMaintenanceMode();
       }
 
-      // otherwise ask the userSystem
-      return CRM_Core_Config::singleton()->userSystem->isMaintenanceMode();
+      // otherwise cast the set value to a boolean
+      // this will follow PHP rules so empty string, 0 etc will be OFF
+      // and anything else will be on
+      return (bool) $civicrmSetting;
     }
     catch (\Exception $e) {
       // catch in case something isn't fully booted and can't answer
