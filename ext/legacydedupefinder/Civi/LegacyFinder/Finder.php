@@ -3,15 +3,23 @@
 namespace Civi\LegacyFinder;
 
 use Civi\Core\Event\GenericHookEvent;
+use Civi\Core\Service\AutoSubscriber;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class Finder {
+class Finder extends AutoSubscriber implements EventSubscriberInterface {
+
+  public static function getSubscribedEvents(): array {
+    return [
+      'hook_civicrm_findExistingDuplicates' => ['findExistingDuplicates', -5],
+    ];
+  }
 
   /**
    * This function exists to provide legacy hook support for finding duplicates.
    *
    * @return void
    */
-  public static function findExistingDuplicates(GenericHookEvent $event) {
+  public static function findExistingDuplicates(GenericHookEvent $event): void {
     $event->stopPropagation();
     $ruleGroupIDs = $event->ruleGroupIDs;
     $ruleGroup = new \CRM_Dedupe_BAO_DedupeRuleGroup();
