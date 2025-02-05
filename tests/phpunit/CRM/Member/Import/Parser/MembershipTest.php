@@ -24,6 +24,7 @@
  *   <http://www.gnu.org/licenses/>.
  */
 
+use Civi\Api4\Membership;
 use Civi\Api4\UserJob;
 
 /**
@@ -71,6 +72,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     ];
     $this->relationshipTypeID = $this->relationshipTypeCreate($params);
     $organizationContactID = $this->organizationCreate();
+    $this->restoreMembershipTypes();
     $params = [
       'name' => self::MEMBERSHIP_TYPE_NAME,
       'description' => NULL,
@@ -107,7 +109,6 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     $this->relationshipTypeDelete($this->relationshipTypeID);
     $this->membershipTypeDelete(['id' => $this->membershipTypeID]);
     $this->quickCleanUpFinancialEntities();
-    $this->restoreMembershipTypes();
     $this->quickCleanup($tablesToTruncate, TRUE);
     parent::tearDown();
   }
@@ -402,6 +403,29 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
   /**
    * Test the full form-flow import.
    */
+  public function testImportCSVWithID() :void {
+    $this->createTestEntity('Membership', [
+      'membership_type_id:name' => 'General',
+      'contact_id' => $this->individualCreate(),
+    ]);
+    $this->importCSV('memberships_with_id.csv', [
+      ['name' => 'membership_id'],
+      ['name' => 'membership_source'],
+      ['name' => 'membership_type_id'],
+      ['name' => 'membership_start_date'],
+      ['name' => 'do_not_import'],
+    ]);
+    $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
+    $row = $dataSource->getRow();
+    $this->assertEquals('IMPORTED', $row['_status']);
+    $membership = Membership::get(FALSE)
+      ->execute()->single();
+    $this->assertEquals('2019-03-23', $membership['start_date']);
+  }
+
+  /**
+   * Test the full form-flow import.
+   */
   public function testImportTSV() :void {
     $this->individualCreate(['email' => 'member@example.com']);
     $this->importCSV('memberships_valid.tsv', [
@@ -414,7 +438,8 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $row = $dataSource->getRow();
     $this->assertEquals('IMPORTED', $row['_status']);
-    $this->callAPISuccessGetSingle('Membership', []);
+    $membership = $this->callAPISuccessGetSingle('Membership', []);
+    $this->assertEquals('2019-03-23', $membership['join_date']);
   }
 
   /**

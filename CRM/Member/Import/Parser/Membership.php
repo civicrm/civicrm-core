@@ -144,44 +144,11 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
         $formatValues[$key] = $field;
       }
 
-      require_once 'api/v3/utils.php';
-      // It's very likely this line does nothing.
-      _civicrm_api3_store_values(CRM_Member_DAO_Membership::fields(), $formatValues, $formatted);
-
       if (!$this->isUpdateExisting()) {
         $formatted['custom'] = CRM_Core_BAO_CustomField::postProcess($formatted,
           NULL,
           'Membership'
         );
-      }
-      else {
-
-        if (!empty($formatValues['membership_id'])) {
-          $dao = new CRM_Member_BAO_Membership();
-          $dao->id = $formatValues['membership_id'];
-          $dates = ['join_date', 'start_date', 'end_date'];
-          foreach ($dates as $v) {
-            if (empty($formatted[$v])) {
-              $formatted[$v] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $formatValues['membership_id'], $v);
-            }
-          }
-
-          $formatted['custom'] = CRM_Core_BAO_CustomField::postProcess($formatted,
-            $formatValues['membership_id'],
-            'Membership'
-          );
-          if ($dao->find(TRUE)) {
-            if (empty($params['line_item']) && !empty($formatted['membership_type_id'])) {
-              CRM_Price_BAO_LineItem::getLineItemArray($formatted, NULL, 'membership', $formatted['membership_type_id']);
-            }
-
-            $newMembership = civicrm_api3('Membership', 'create', $formatted);
-            $this->_newMemberships[] = $newMembership['id'];
-            $this->setImportStatus($rowNumber, 'IMPORTED', 'Required parameter missing: Status');
-            return CRM_Import_Parser::VALID;
-          }
-          throw new CRM_Core_Exception('Matching Membership record not found for Membership ID ' . $formatValues['membership_id'] . '. Row was skipped.', CRM_Import_Parser::ERROR);
-        }
       }
 
       //Format dates
