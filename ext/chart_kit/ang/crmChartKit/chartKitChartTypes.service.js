@@ -2,7 +2,7 @@
   "use strict";
 
   // Provides pluggable chart types for use in the chart_kit display and admin components
-  angular.module('crmChartKit').factory('chartKitTypes', (
+  angular.module('crmChartKit').factory('chartKitChartTypes', (
     chartKitPie,
     chartKitRow,
     chartKitStack,
