@@ -11,7 +11,6 @@ use CRM_Legacydedupefinder_ExtensionUtil as E;
  */
 function legacydedupefinder_civicrm_config(&$config): void {
   _legacydedupefinder_civix_civicrm_config($config);
-  \Civi::dispatcher()->addListener('hook_civicrm_findExistingDuplicates', ['\Civi\LegacyFinder\Finder', 'findExistingDuplicates'], -5);
 }
 
 /**

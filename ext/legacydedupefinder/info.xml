@@ -20,10 +20,10 @@
   <compatibility>
     <ver>[civicrm.majorVersion]</ver>
   </compatibility>
-  <tags>
-    <tag>mgmt:hidden</tag>
-  </tags>
   <comments>This adds backwards compatibility for dedupe hooks. If you do not need them you can improve dedupe performance by disabling this</comments>
+  <mixins>
+    <mixin>scan-classes@1.0.0</mixin>
+  </mixins>
   <classloader>
     <psr0 prefix="CRM_" path="."/>
     <psr4 prefix="Civi\" path="Civi"/>

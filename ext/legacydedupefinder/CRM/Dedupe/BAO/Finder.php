@@ -1,10 +1,15 @@
 <?php
 
-namespace Civi\LegacyFinder;
-
 use Civi\Core\Event\GenericHookEvent;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class Finder {
+class CRM_Dedupe_BAO_Finder implements EventSubscriberInterface {
+
+  public static function getSubscribedEvents(): array {
+    return [
+      'hook_civicrm_findExistingDuplicates' => ['findExistingDuplicates', -5],
+    ];
+  }
 
   /**
    * This function exists to provide legacy hook support for finding duplicates.
