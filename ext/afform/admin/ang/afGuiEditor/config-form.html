@@ -89,7 +89,7 @@
       </label>
       <input ng-list crm-ui-select="{multiple: true, data: editor.meta.afform_placement, placeholder: ts('None')}" class="form-control" id="afform_placement" ng-model="editor.afform.placement" ng-change="editor.onChangePlacement()">
       <p class="help-block" ng-if="editor.afform.server_route || !editor.placementRequiresServerRoute()">
-        {{:: ts('Additional contexts in which the form can be embedded') }}
+        {{:: ts('Additional contexts in which the form can be embedded.') }}
       </p>
       <p class="text-warning" ng-if="!editor.afform.server_route && editor.placementRequiresServerRoute()">
         <i class="crm-i fa-exclamation-triangle"></i>{{ ts('%1 placement requires a page route.', {1: editor.placementRequiresServerRoute()}) }}
