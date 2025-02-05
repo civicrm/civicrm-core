@@ -87,7 +87,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
   /**
    * The contribution values if an existing contribution
+   *
    * @var array
+   *
+   * @deprecated - try to use getContributionValue() instead as it is strictly a
+   * cached lookup on the contribution values, rather than a grab-bag.
    */
   public $_values;
 
@@ -932,6 +936,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
   }
 
+  protected function isUpdate(): bool {
+    return $this->getAction() === CRM_Core_Action::UPDATE && $this->getContributionID();
+  }
+
   /**
    * @throws \CRM_Core_Exception
    */
@@ -1050,24 +1058,24 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     CRM_Contribute_BAO_ContributionRecur::validateRecurContribution($fields, $files, $self, $errors);
 
     // Form rule for status http://wiki.civicrm.org/confluence/display/CRM/CiviAccounts+4.3+Data+Flow
-    if (($self->_action & CRM_Core_Action::UPDATE)
-      && $self->_id
-      && $self->_values['contribution_status_id'] != $fields['contribution_status_id']
-      && $self->_values['is_template'] != 1
+    if ($self->isUpdate()
+      && $self->getContributionValue('contribution_status_id') != $fields['contribution_status_id']
+      && !$self->getContributionValue('is_template')
     ) {
       try {
-        CRM_Contribute_BAO_Contribution::checkStatusValidation($self->_values, $fields);
+        CRM_Contribute_BAO_Contribution::checkStatusValidation([
+          'contribution_status_id' => $self->getContributionValue('contribution_status_id'),
+        ], $fields);
       }
       catch (CRM_Core_Exception $e) {
         $errors['contribution_status_id'] = $e->getMessage();
       }
     }
     // CRM-16015, add form-rule to restrict change of financial type if using price field of different financial type
-    if (($self->_action & CRM_Core_Action::UPDATE)
-      && $self->_id
-      && $self->_values['financial_type_id'] != $fields['financial_type_id']
+    if ($self->isUpdate()
+      && $self->getContributionValue('financial_type_id') != $fields['financial_type_id']
     ) {
-      CRM_Contribute_BAO_Contribution::checkFinancialTypeChange(NULL, $self->_id, $errors);
+      CRM_Contribute_BAO_Contribution::checkFinancialTypeChange(NULL, $self->getContributionID(), $errors);
     }
     //FIXME FOR NEW DATA FLOW http://wiki.civicrm.org/confluence/display/CRM/CiviAccounts+4.3+Data+Flow
     if (!empty($fields['fee_amount']) && !empty($fields['financial_type_id']) && $financialType = CRM_Contribute_BAO_Contribution::validateFinancialType($fields['financial_type_id'])) {
