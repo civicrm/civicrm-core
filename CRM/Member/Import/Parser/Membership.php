@@ -31,15 +31,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
   protected string $baseEntity = 'Membership';
 
   /**
-   * Has this parser been fixed to expect `getMappedRow` to break it up
-   * by entity yet? This is a transitional property to allow the classes
-   * to be fixed up individually.
-   *
-   * @var bool
-   */
-  protected $isUpdatedForEntityRowParsing = TRUE;
-
-  /**
    * Get information about the provided job.
    *  - name
    *  - id (generally the same as name)

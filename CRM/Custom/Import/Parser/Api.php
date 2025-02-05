@@ -7,6 +7,8 @@ use Civi\Api4\CustomValue;
  */
 class CRM_Custom_Import_Parser_Api extends CRM_Import_Parser {
 
+  protected string $baseEntity = 'Contact';
+
   /**
    * Get information about the provided job.
    *
@@ -37,7 +39,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Import_Parser {
   public function import(array $values): void {
     $rowNumber = (int) $values[array_key_last($values)];
     try {
-      $params = $this->getMappedRow($values);
+      $params = $this->getMappedRow($values)['Contact'];
       $params['skipRecentView'] = TRUE;
       $params['entity_id'] = $params['contact_id'];
       $group = CRM_Core_BAO_CustomGroup::getGroup(['id' => $this->getCustomGroupID()]);
@@ -60,7 +62,7 @@ class CRM_Custom_Import_Parser_Api extends CRM_Import_Parser {
       $importableFields = $this->getGroupFieldsForImport($customGroupID);
       $this->importableFieldsMetadata = array_merge([
         'do_not_import' => ['title' => ts('- do not import -')],
-        'contact_id' => ['title' => ts('Contact ID'), 'name' => 'contact_id', 'type' => CRM_Utils_Type::T_INT, 'options' => FALSE, 'headerPattern' => '/contact?|id$/i'],
+        'contact_id' => ['title' => ts('Contact ID'), 'name' => 'contact_id', 'type' => CRM_Utils_Type::T_INT, 'options' => FALSE, 'headerPattern' => '/contact?|id$/i', 'entity' => 'Contact'],
         'external_identifier' => ['title' => ts('External Identifier'), 'name' => 'external_identifier', 'type' => CRM_Utils_Type::T_STRING, 'options' => FALSE, 'headerPattern' => '/external\s?id/i'],
       ], $importableFields);
     }
