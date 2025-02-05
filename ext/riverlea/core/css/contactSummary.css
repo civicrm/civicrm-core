@@ -61,12 +61,12 @@
   width: fit-content;
   z-index: 99;
   position: absolute;
-  left: 0;
+  left: calc(var(--crm-dash-panel-padding) + var(--crm-side-tabs-width));
 }
-#mainTabContainer:not(.narrowpage) .contactCardRight div.crm-inline-edit.form {
-  right: 0;
+.crm-contact-summary-layout-col-2 .crm-inline-edit.form, /* CLE */
+.contactCardRight .crm-inline-edit.form {
+  right: var(--crm-dash-panel-padding);
   left: initial;
-  position: absolute;
 }
 .crm-container .crm-inline-edit.add-new {
   min-height: 2.5em;
@@ -385,10 +385,19 @@ div.crm-summary-contactname-block + .crm-actions-ribbon {
   .crm-container div.contact_panel {
     display: block;
   }
+  .crm-container .contact_panel.crm-contact-summary-layout-row {
+    flex-direction: column;
+  }
+  .crm-contact-summary-layout-col-2 .crm-inline-edit.form,
+  .contactCardRight .crm-inline-edit.form {
+    right: inherit;
+    left: calc(var(--crm-dash-panel-padding) + var(--crm-side-tabs-width));
+  }
 }
 @media (max-width: 767px) {
   #crm-main-content-wrapper {
     --crm-dash-heading-inset: 0; /* resets any inset on the title/action links */
+    --crm-side-tabs-width: auto; /* resets offset inline edit */
   }
   .crm-container #mainTabContainer,
   .crm-container div.crm-summary-row {

@@ -213,6 +213,9 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
   background-image: none;
   color: var(--crm-alert-text-danger);
 }
+.crm-container .delete-button > .delete-icon {
+  color: inherit;
+}
 .crm-container .delete-icon::before,
 .crm-container .crm-i.fa-trash::before {
   content: "\f1f8";

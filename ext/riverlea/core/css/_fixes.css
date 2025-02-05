@@ -787,8 +787,12 @@ details + .crm-content-block:has(.dataTables_wrapper) {
     COMMON EXTENSIONS
 *******************/
 
-/* Contact Dashboard Editor */
+/* Style rules for Contact Layout Editor extension */
 
+#contact-summary .crm-contact-summary-layout-col {
+  flex: 1 1 250px;
+  padding: 0;
+}
 .crm-actions-ribbon ul#actions:has(.crm-contact-summary-edit-layout) {
   grid-template-columns: min-content min-content min-content auto min-content min-content;
 }
