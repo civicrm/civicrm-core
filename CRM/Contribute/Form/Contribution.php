@@ -1809,83 +1809,129 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->assign('showAdditionalInfo', TRUE);
       $pane['open'] = 'true';
     }
-    $additionalInfoFormFunction = 'build' . $type;
-    CRM_Contribute_Form_AdditionalInfo::$additionalInfoFormFunction($this);
+    if ($type === 'AdditionalDetail') {
+      $this->buildAdditionalDetail();
+    }
+    if ($type === 'Premium') {
+      $this->buildPremium();
+    }
     return $pane;
   }
 
   /**
-   * Wrapper for unit testing the post process submit function.
-   *
-   * (If we expose through api we can get default additions 'for free').
-   *
-   * @param array $params
-   * @param int $action
-   * @param string|null $creditCardMode
-   *
-   * @return CRM_Contribute_BAO_Contribution
-   *
-   * @throws \CRM_Core_Exception
-   * @throws \Civi\Payment\Exception\PaymentProcessorException
-   *
-   * @deprecated since 5.68 will be removed around 5.80.
-   *
-   * Try something like
-   *  use   use \Civi\Test\FormTrait;
-   *  $form = $this->getTestForm('CRM_Contribute_Form_Contribution', $submittedValues, [
-   *   'id' =>  4;
-   *   'action' => 'update',
-   * ]);
-   * $form->processForm();
+   * Build the form object for Premium Information.
    */
-  public function testSubmit($params, $action, $creditCardMode = NULL) {
-    // Note that this is really used from tests - so adding noisy deprecations would make them
-    // fail straight away.
-    $defaults = [
-      'soft_credit_contact_id' => [],
-      'receive_date' => date('Y-m-d H:i:s'),
-      'receipt_date' => '',
-      'cancel_date' => '',
-      'hidden_Premium' => 1,
-    ];
-    $this->_bltID = 5;
-    if (!empty($params['id'])) {
-      $existingContribution = civicrm_api3('contribution', 'getsingle', [
-        'id' => $params['id'],
-      ]);
-      $this->_id = $params['id'];
-      $this->_values = $existingContribution;
-      if (\Civi::settings()->get('invoicing')) {
-        $this->_values['tax_amount'] = civicrm_api3('contribution', 'getvalue', [
-          'id' => $params['id'],
-          'return' => 'tax_amount',
-        ]);
+  private function buildPremium(): void {
+    $form = $this;
+    //premium section
+    $form->add('hidden', 'hidden_Premium', 1);
+    $sel1 = $sel2 = [];
+
+    $dao = new CRM_Contribute_DAO_Product();
+    $dao->is_active = 1;
+    $dao->find();
+    $min_amount = [];
+    $sel1[0] = ts('-select product-');
+    while ($dao->fetch()) {
+      $sel1[$dao->id] = $dao->name . " ( " . $dao->sku . " )";
+      $min_amount[$dao->id] = $dao->min_contribution;
+      $options = CRM_Contribute_BAO_Premium::parseProductOptions($dao->options);
+      if (!empty($options)) {
+        $options = ['' => ts('- select -')] + $options;
+        $sel2[$dao->id] = $options;
+      }
+      $form->assign('premiums', TRUE);
+    }
+    $form->_options = $sel2;
+    $form->assign('mincontribution', $min_amount);
+    $sel = &$form->addElement('hierselect', "product_name", ts('Premium'), 'onclick="showMinContrib();"');
+    $js = "<script type='text/javascript'>\n";
+    $formName = 'document.forms.' . $form->getName();
+
+    for ($k = 1; $k < 2; $k++) {
+      if (!isset($defaults['product_name'][$k]) || (!$defaults['product_name'][$k])) {
+        $js .= "{$formName}['product_name[$k]'].style.display = 'none';\n";
       }
     }
+
+    $sel->setOptions([$sel1, $sel2]);
+    $js .= "</script>\n";
+    $form->assign('initHideBoxes', $js);
+
+    $form->add('datepicker', 'fulfilled_date', ts('Fulfilled'), [], FALSE, ['time' => FALSE]);
+    $form->addElement('text', 'min_amount', ts('Minimum Contribution Amount'));
+  }
+
+  /**
+   * Build the form object for Additional Details.
+   */
+  private function buildAdditionalDetail(): void {
+    $form = $this;
+    //Additional information section
+    $form->add('hidden', 'hidden_AdditionalDetail', 1);
+
+    $attributes = CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Contribution');
+
+    $form->addField('thankyou_date', ['entity' => 'contribution'], FALSE, FALSE);
+
+    // add various amounts
+    $nonDeductAmount = &$form->add('text', 'non_deductible_amount', ts('Non-deductible Amount'),
+      $attributes['non_deductible_amount']
+    );
+    $form->addRule('non_deductible_amount', ts('Please enter a valid monetary value for Non-deductible Amount.'), 'money');
+
+    if ($form->_online) {
+      $nonDeductAmount->freeze();
+    }
+    $feeAmount = &$form->add('text', 'fee_amount', ts('Fee Amount'),
+      $attributes['fee_amount']
+    );
+    $form->addRule('fee_amount', ts('Please enter a valid monetary value for Fee Amount.'), 'money');
+    if ($form->_online) {
+      $feeAmount->freeze();
+    }
+
+    $element = &$form->add('text', 'invoice_id', ts('Invoice ID'),
+      $attributes['invoice_id']
+    );
+    if ($form->_online) {
+      $element->freeze();
+    }
     else {
-      $existingContribution = [];
+      $form->addRule('invoice_id',
+        ts('This Invoice ID already exists in the database.'),
+        'objectExists',
+        ['CRM_Contribute_DAO_Contribution', $form->_id, 'invoice_id']
+      );
+    }
+    $element = $form->add('text', 'creditnote_id', ts('Credit Note ID'),
+      $attributes['creditnote_id']
+    );
+    if ($form->_online) {
+      $element->freeze();
+    }
+    else {
+      $form->addRule('creditnote_id',
+        ts('This Credit Note ID already exists in the database.'),
+        'objectExists',
+        ['CRM_Contribute_DAO_Contribution', $form->_id, 'creditnote_id']
+      );
     }
 
-    $this->_defaults['contribution_status_id'] = CRM_Utils_Array::value('contribution_status_id',
-      $existingContribution
+    $form->add('select', 'contribution_page_id',
+      ts('Contribution Page'),
+      ['' => ts('- select -')] + CRM_Contribute_PseudoConstant::contributionPage(),
+      FALSE,
+      ['class' => 'crm-select2']
     );
 
-    $this->_defaults['total_amount'] = CRM_Utils_Array::value('total_amount',
-      $existingContribution
-    );
+    $form->add('textarea', 'note', ts('Notes'), ["rows" => 4, "cols" => 60]);
 
-    if ($creditCardMode) {
-      $this->_mode = $creditCardMode;
+    $statusName = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    if ($form->_id && $form->_values['contribution_status_id'] == array_search('Cancelled', $statusName)) {
+      $feeAmount->freeze();
     }
 
-    // Required because processCreditCard calls set method on this.
-    $_SERVER['REQUEST_METHOD'] = 'GET';
-    $this->controller = new CRM_Core_Controller();
-
-    CRM_Contribute_Form_AdditionalInfo::buildPremium($this);
-
-    $this->_fields = [];
-    return $this->submit(array_merge($defaults, $params), $action, CRM_Utils_Array::value('pledge_payment_id', $params));
   }
 
   /**
