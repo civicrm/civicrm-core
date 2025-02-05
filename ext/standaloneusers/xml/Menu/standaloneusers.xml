@@ -3,7 +3,7 @@
   <item>
     <path>civicrm/login</path>
     <page_callback>CRM_Standaloneusers_Page_Login</page_callback>
-    <title>Login</title>
+    <title>Log In</title>
     <access_arguments>*always allow*</access_arguments>
   </item>
   <item>

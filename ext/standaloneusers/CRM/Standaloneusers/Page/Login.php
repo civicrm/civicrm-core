@@ -14,12 +14,13 @@ class CRM_Standaloneusers_Page_Login extends CRM_Core_Page {
       // add the session message and redirect so the user doesn't keep getting
       // the message when they press Back.
       CRM_Core_Session::setStatus(
-        ts('You have been logged out.'),
-        ts('Successfully signed out.'),
+        E::ts('You have been logged out.'),
+        E::ts('Successfully signed out.'),
         'success');
       CRM_Utils_System::redirect('/civicrm/login');
     }
 
+    CRM_Utils_System::setTitle(E::ts('Log In'));
     $this->assign('logoUrl', E::url('images/civicrm-logo.png'));
     $this->assign('pageTitle', '');
     $this->assign('forgottenPasswordURL', CRM_Utils_System::url('civicrm/login/password'));
