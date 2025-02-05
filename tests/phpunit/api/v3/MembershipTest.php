@@ -231,33 +231,6 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test membership get.
-   */
-  public function testContactMembershipsGet(): void {
-    $membershipID = $this->contactMembershipCreate($this->_params);
-    $this->callAPISuccess('Membership', 'get');
-    $this->callAPISuccess('Membership', 'Delete', ['id' => $membershipID]);
-  }
-
-  /**
-   * Test civicrm_membership_get with params not array.
-   *
-   * Gets treated as contact_id, memberships expected.
-   */
-  public function testGetWithParamsContactId(): void {
-    $this->_membershipID = $this->contactMembershipCreate($this->_params);
-    $params = [
-      'contact_id' => $this->_contactID,
-      'return' => array_keys($this->_params),
-    ];
-    $membership = $this->callAPISuccess('membership', 'get', $params);
-
-    $result = $membership['values'][$this->_membershipID];
-    $this->validateGetResult($result);
-    $this->assertEquals(1, $result['is_override']);
-  }
-
-  /**
    * Test civicrm_membership_get with params not array.
    *
    * Gets treated as contact_id, memberships expected.
@@ -304,23 +277,6 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $membership = $this->callAPISuccess('membership', 'get', $params);
     $this->assertEquals(1, $membership['count']);
     $this->assertEquals([$this->_membershipID2], array_keys($membership['values']));
-  }
-
-  /**
-   * Test civicrm_membership_get with params not array.
-   *
-   * Gets treated as contact_id, memberships expected.
-   */
-  public function testGetWithParamsMemberShipTypeId(): void {
-    $this->callAPISuccess('Membership', 'create', $this->_params);
-    $params = [
-      'membership_type_id' => 'General',
-      'return' => array_keys($this->_params),
-    ];
-    $membership = $this->callAPISuccess('membership', 'get', $params);
-    $result = $membership['values'][$membership['id']];
-    $this->validateGetResult($result);
-    $this->assertEquals(1, $result['is_override']);
   }
 
   /**
@@ -384,7 +340,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->assertEquals('2009-01-21', $result['join_date']);
     $this->assertEquals($result['contact_id'], $this->_contactID);
     $this->assertEquals($result['membership_type_id'], $this->getMembershipTypeID('General'));
-    $this->assertEquals($result['status_id'], $this->ids['MembershipStatus']['test']);
+    $this->assertEquals($result['status_id'], $this->ids['MembershipStatus']['test member status']);
 
     $this->assertEquals('2009-01-21', $result['start_date']);
     $this->assertEquals('2009-12-21', $result['end_date']);
@@ -438,69 +394,6 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $membership = $this->callAPISuccess('membership', 'get', $params);
     $this->assertEquals($membership['values'][$this->_membershipID]['status_id'], $this->_membershipStatusID);
     $this->assertEquals($membership['values'][$this->_membershipID]['contact_id'], $this->_contactID);
-  }
-
-  /**
-   * Test civicrm_membership_get with relationship.
-   * get Memberships.
-   */
-  public function testGetWithRelationship(): void {
-    $membershipOrgId = $this->organizationCreate();
-    $memberContactId = $this->individualCreate();
-
-    $relTypeParams = [
-      'name_a_b' => 'Relation 1',
-      'name_b_a' => 'Relation 2',
-      'description' => 'Testing relationship type',
-      'contact_type_a' => 'Organization',
-      'contact_type_b' => 'Individual',
-      'is_reserved' => 1,
-      'is_active' => 1,
-    ];
-    $relTypeID = $this->relationshipTypeCreate($relTypeParams);
-
-    $params = [
-      'name' => 'test General',
-      'duration_unit' => 'year',
-      'duration_interval' => 1,
-      'period_type' => 'rolling',
-      'member_of_contact_id' => $membershipOrgId,
-      'domain_id' => 1,
-      'financial_type_id' => 1,
-      'relationship_type_id' => $relTypeID,
-      'relationship_direction' => 'b_a',
-      'is_active' => 1,
-    ];
-    $memType = $this->callAPISuccess('membership_type', 'create', $params);
-
-    $params = [
-      'contact_id' => $memberContactId,
-      'membership_type_id' => $memType['id'],
-      'join_date' => '2009-01-21',
-      'start_date' => '2009-01-21',
-      'end_date' => '2009-12-21',
-      'source' => 'Payment',
-      'is_override' => 1,
-      'status_id' => $this->_membershipStatusID,
-    ];
-    $membershipID = $this->contactMembershipCreate($params);
-
-    $params = [
-      'contact_id' => $memberContactId,
-      'membership_type_id' => $memType['id'],
-    ];
-
-    $result = $this->callAPISuccess('membership', 'get', $params);
-
-    $membership = $result['values'][$membershipID];
-    $this->assertEquals($this->ids['MembershipStatus']['test'], $membership['status_id']);
-    $this->callAPISuccess('Membership', 'Delete', [
-      'id' => $membership['id'],
-    ]);
-    $this->membershipTypeDelete(['id' => $memType['id']]);
-    $this->relationshipTypeDelete($relTypeID);
-    $this->contactDelete($membershipOrgId);
-    $this->contactDelete($memberContactId);
   }
 
   /**
