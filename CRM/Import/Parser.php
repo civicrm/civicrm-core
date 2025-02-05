@@ -2402,4 +2402,16 @@ abstract class CRM_Import_Parser implements UserJobInterface {
     }
   }
 
+  protected function removeEmptyValues($array) {
+    foreach ($array as $key => $value) {
+      if (is_array($value)) {
+        $array[$key] = $this->removeEmptyValues($value);
+      }
+      elseif ($value === '') {
+        unset($array[$key]);
+      }
+    }
+    return $array;
+  }
+
 }

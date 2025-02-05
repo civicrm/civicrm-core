@@ -176,18 +176,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Import_Parser {
     return $this->removeEmptyValues($params);
   }
 
-  protected function removeEmptyValues($array) {
-    foreach ($array as $key => $value) {
-      if (is_array($value)) {
-        $array[$key] = $this->removeEmptyValues($value);
-      }
-      elseif ($value === '') {
-        unset($array[$key]);
-      }
-    }
-    return $array;
-  }
-
   /**
    * Validate the import values.
    *

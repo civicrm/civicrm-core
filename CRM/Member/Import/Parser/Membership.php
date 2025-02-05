@@ -121,6 +121,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
     $rowNumber = (int) ($values[array_key_last($values)]);
     try {
       $params = $this->getMappedRow($values);
+      $this->removeEmptyValues($params);
       if (!empty($params['contact_id'])) {
         $this->validateContactID($params['contact_id'], $this->getContactType());
       }
@@ -134,15 +135,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Import_Parser {
       // don't add to recent items, CRM-4399
       $formatted['skipRecentView'] = TRUE;
 
-      $formatValues = [];
-      foreach ($params as $key => $field) {
-        // ignore empty values or empty arrays etc
-        if (CRM_Utils_System::isNull($field)) {
-          continue;
-        }
-
-        $formatValues[$key] = $field;
-      }
+      $formatValues = $params;
 
       if (!$this->isUpdateExisting()) {
         $formatted['custom'] = CRM_Core_BAO_CustomField::postProcess($formatted,
