@@ -33,6 +33,9 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
 
   public function getOptions(string $fieldName, array $values = [], bool $includeDisabled = FALSE, bool $checkPermissions = FALSE, ?int $userId = NULL, bool $isView = FALSE): ?array {
     $field = \Civi::entity($this->entityName)->getField($fieldName);
+    if (!$field) {
+      throw new \CRM_Core_Exception("Field '$fieldName' not found");
+    }
     $options = NULL;
     $hookParams = [
       'entity' => $this->entityName,
