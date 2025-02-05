@@ -74,8 +74,13 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => ts("Set this value to Yes if you want to use one of CiviCRM's debugging tools. This feature should NOT be enabled for production sites."),
-    // TODO: how to incorporate extensive help text from .hlp file?
-    'help_text' => ts('Debug output is triggered by adding specific name-value pairs to the CiviCRM query string. See Developer Docs for more details.'),
+    // TODO: how to avoid duplication in .hlp file?
+    'help_text' => implode('<br />', [
+      ts('Debug output is triggered by adding specific name-value pairs to the CiviCRM query string.'),
+      ts('For more details, see <a %1>the Developer Docs</a>', [
+        1 => 'href="https://docs.civicrm.org/dev/en/latest/tools/debugging/#using-url-parameters" target="_blank"',
+      ]),
+    ]),
     'settings_pages' => ['debug' => ['weight' => 200]],
   ],
   'backtrace' => [
