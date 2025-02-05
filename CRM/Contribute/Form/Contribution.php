@@ -2605,22 +2605,11 @@ WHERE  contribution_id = {$id}
   private function buildRecur(): void {
     $form = $this;
     $attributes = CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionRecur');
-    $className = 'CRM_Contribute_Form_Contribution';
 
-    $form->assign('is_recur_interval', $form->_values['is_recur_interval'] ?? NULL);
-    $form->assign('is_recur_installments', $form->_values['is_recur_installments'] ?? NULL);
-    $paymentObject = $this->getPaymentProcessorObject();
-    if ($paymentObject) {
-      $form->assign('recurringHelpText', $paymentObject->getText('contributionPageRecurringHelp', [
-        'is_recur_installments' => !empty($form->_values['is_recur_installments']),
-        'is_email_receipt' => !empty($form->_values['is_email_receipt']),
-      ]));
-    }
-
+    // @todo - this is previously shared code and it feels  like the recur_frequency_unit would always be NULL here.
     $frUnits = $form->_values['recur_frequency_unit'] ?? NULL;
     $frequencyUnits = CRM_Core_OptionGroup::values('recur_frequency_units', FALSE, FALSE, TRUE);
-    if (empty($frUnits) &&
-      $className == 'CRM_Contribute_Form_Contribution'
+    if (empty($frUnits)
     ) {
       $frUnits = implode(CRM_Core_DAO::VALUE_SEPARATOR,
         CRM_Core_OptionGroup::values('recur_frequency_units', FALSE, FALSE, FALSE, NULL, 'value')
@@ -2628,12 +2617,6 @@ WHERE  contribution_id = {$id}
     }
 
     $unitVals = explode(CRM_Core_DAO::VALUE_SEPARATOR, $frUnits);
-
-    // FIXME: Ideally we should freeze select box if there is only
-    // one option but looks there is some problem /w QF freeze.
-    //if ( count( $units ) == 1 ) {
-    //$frequencyUnit->freeze( );
-    //}
 
     $form->add('text', 'installments', ts('installments'),
       $attributes['installments'] + ['class' => 'two']
@@ -2644,42 +2627,23 @@ WHERE  contribution_id = {$id}
 
     // CRM 10860, display text instead of a dropdown if there's only 1 frequency unit
     if (count($unitVals) == 1) {
-      $form->assign('one_frequency_unit', TRUE);
       $form->add('hidden', 'frequency_unit', $unitVals[0]);
-      if (!empty($form->_values['is_recur_interval']) || $className == 'CRM_Contribute_Form_Contribution') {
-        $unit = CRM_Contribute_BAO_Contribution::getUnitLabelWithPlural($unitVals[0]);
-        $form->assign('frequency_unit', $unit);
-      }
-      else {
-        $is_recur_label = ts('I want to contribute this amount every %1',
-          [1 => $frequencyUnits[$unitVals[0]]]
-        );
-        $form->assign('all_text_recur', TRUE);
-      }
+      $unit = CRM_Contribute_BAO_Contribution::getUnitLabelWithPlural($unitVals[0]);
     }
     else {
-      $form->assign('one_frequency_unit', FALSE);
       $units = [];
       foreach ($unitVals as $key => $val) {
         if (array_key_exists($val, $frequencyUnits)) {
           $units[$val] = $frequencyUnits[$val];
-          if (!empty($form->_values['is_recur_interval']) || $className == 'CRM_Contribute_Form_Contribution') {
-            $units[$val] = CRM_Contribute_BAO_Contribution::getUnitLabelWithPlural($val);
-            $unit = ts('Every');
-          }
+          $units[$val] = CRM_Contribute_BAO_Contribution::getUnitLabelWithPlural($val);
+          $unit = ts('Every');
         }
       }
       $frequencyUnit = &$form->add('select', 'frequency_unit', NULL, $units, FALSE, ['aria-label' => ts('Frequency Unit'), 'class' => 'crm-select2 eight']);
     }
 
-    if (!empty($form->_values['is_recur_interval']) || $className == 'CRM_Contribute_Form_Contribution') {
-      $form->add('text', 'frequency_interval', $unit, $attributes['frequency_interval'] + ['aria-label' => ts('Every'), 'class' => 'two']);
-      $form->addRule('frequency_interval', ts('Frequency must be a whole number (EXAMPLE: Every 3 months).'), 'integer');
-    }
-    else {
-      // make sure frequency_interval is submitted as 1 if given no choice to user.
-      $form->add('hidden', 'frequency_interval', 1);
-    }
+    $form->add('text', 'frequency_interval', $unit, $attributes['frequency_interval'] + ['aria-label' => ts('Every'), 'class' => 'two']);
+    $form->addRule('frequency_interval', ts('Frequency must be a whole number (EXAMPLE: Every 3 months).'), 'integer');
 
     $form->add('checkbox', 'is_recur', $is_recur_label, NULL);
   }
