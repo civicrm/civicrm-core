@@ -357,14 +357,12 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
       'phone' => '123-456',
     ];
     $ids = CRM_Contact_BAO_Contact::getDuplicateContacts($fields, 'Individual', 'General', [], TRUE, NULL, ['event_id' => 1]);
-
+    // Also check the deprecated method.
+    $dedupeParams = CRM_Dedupe_Finder::formatParams($fields, 'Individual');
+    $legacyIds = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual', 'General');
+    $this->assertEquals($ids, $legacyIds);
     // Check with default Individual-General rule
     $this->assertCount(2, $ids, 'Check Individual-General rule for dupesByParams().');
-
-    // delete all created contacts
-    foreach ($contactIds as $contactId) {
-      $this->contactDelete($contactId);
-    }
   }
 
   /**
@@ -399,9 +397,11 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
       $this->assertEquals($value, $dedupeResults[$key]);
     }
 
-    $expectedContext = ['event_id' => 1];
-    foreach ($expectedContext as $key => $value) {
-      $this->assertEquals($value, $contextParams[$key]);
+    if (empty($contextParams['is_legacy_usage'])) {
+      $expectedContext = ['event_id' => 1];
+      foreach ($expectedContext as $key => $value) {
+        $this->assertEquals($value, $contextParams[$key]);
+      }
     }
 
     return $dedupeResults;
