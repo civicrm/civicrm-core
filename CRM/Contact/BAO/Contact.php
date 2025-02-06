@@ -3489,7 +3489,7 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
       'contact_type' => NULL,
       'rule' => NULL,
       'excluded_contact_ids' => [],
-      'check_permission' => $checkPermission,
+      'check_permission' => (bool) $checkPermission,
     ];
     CRM_Utils_Hook::findDuplicates($dedupeParams, $dedupeResults, $contextParams);
     if (!$dedupeResults['handled']) {
