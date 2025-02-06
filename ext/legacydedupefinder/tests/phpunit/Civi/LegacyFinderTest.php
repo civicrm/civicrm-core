@@ -105,4 +105,19 @@ class LegacyFinderTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     $this->assertArrayNotHasKey($this->ids['Contact']['mary_2'], $contacts);
   }
 
+  public function testFindDuplicate(): void {
+    $this->createTestEntity('Contact', [
+      'email_primary.email' => 'bob@example.org',
+      'first_name' => 'Bob',
+    ]);
+    $matches = Contact::getDuplicates(FALSE)
+      ->setDedupeRule('Individual.Unsupervised')
+      ->setValues([
+        'email_primary.email' => 'bob@example.org',
+        'first_name' => 'Bob',
+      ])
+      ->execute();
+    $this->assertCount(1, $matches);
+  }
+
 }

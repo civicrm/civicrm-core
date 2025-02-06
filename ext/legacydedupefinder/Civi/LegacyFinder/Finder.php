@@ -10,6 +10,7 @@ class Finder extends AutoSubscriber {
   public static function getSubscribedEvents(): array {
     return [
       'hook_civicrm_findExistingDuplicates' => ['findExistingDuplicates', -150],
+      'hook_civicrm_findDuplicates' => ['findDuplicates', -150],
     ];
   }
 
@@ -37,6 +38,30 @@ class Finder extends AutoSubscriber {
     }
     $event->duplicates = $duplicates;
     \CRM_Core_DAO::executeQuery($ruleGroup->tableDropQuery());
+  }
+
+  public static function findDuplicates(GenericHookEvent $event): void {
+    $event->stopPropagation();
+
+    if (!empty($event->dedupeResults['handled'])) {
+      // @todo - in time we can deprecate this & expect them to use stopPropagation().
+      return;
+    }
+    $rgBao = new \CRM_Dedupe_BAO_DedupeRuleGroup();
+    if (!$rgBao->fillTable($event->dedupeParams['rule_group_id'], [], $event->dedupeParams['match_params'], TRUE)) {
+      $event->dedupeResults['ids'] = [];
+      return;
+    }
+
+    $dao = \CRM_Core_DAO::executeQuery($rgBao->thresholdQuery($event->dedupeParams['check_permission']));
+    $dupes = [];
+    while ($dao->fetch()) {
+      if (isset($dao->id) && $dao->id) {
+        $dupes[] = $dao->id;
+      }
+    }
+    \CRM_Core_DAO::executeQuery($rgBao->tableDropQuery());
+    $event->dedupeResults['ids'] = array_diff($dupes, $event->dedupeParams['excluded_contact_ids']);
   }
 
 }
