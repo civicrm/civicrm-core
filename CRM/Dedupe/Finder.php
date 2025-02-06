@@ -90,13 +90,7 @@ class CRM_Dedupe_Finder {
     $except = [],
     $ruleGroupID = NULL
   ) {
-    // If $params is empty there is zero reason to proceed.
-    if (!$params) {
-      return [];
-    }
     $checkPermission = $params['check_permission'] ?? TRUE;
-    // This may no longer be required - see https://github.com/civicrm/civicrm-core/pull/13176
-    $params = array_filter($params);
 
     $foundByID = FALSE;
     if ($ruleGroupID) {
@@ -109,17 +103,18 @@ class CRM_Dedupe_Finder {
     }
 
     if (!$foundByID) {
+      // @todo - add noisy deprecation - this is already set
+      // unless this function is called directly, rather than via
+      // a supported api. No core uses do this - they all go through
+      // `BAO_Contact::getDuplicateContacts()`. Extensions should use
+      // the v3 Contact.duplicatecheck or (preferably) v4 api
+      // Contact.getDuplicates().
       $rgBao = new CRM_Dedupe_BAO_DedupeRuleGroup();
       $rgBao->contact_type = $ctype;
       $rgBao->used = $used;
       if (!$rgBao->find(TRUE)) {
         throw new CRM_Core_Exception("$used rule for $ctype does not exist");
       }
-    }
-
-    if (isset($params['civicrm_phone']['phone_numeric'])) {
-      $orig = $params['civicrm_phone']['phone_numeric'];
-      $params['civicrm_phone']['phone_numeric'] = preg_replace('/[^\d]/', '', $orig);
     }
 
     if (!$rgBao->fillTable($rgBao->id, [], $params)) {
@@ -354,13 +349,8 @@ class CRM_Dedupe_Finder {
         }
       }
       if ($table === 'civicrm_phone') {
-        $fixes = [
-          'phone' => 'phone_numeric',
-        ];
-        foreach ($fixes as $orig => $target) {
-          if (!empty($flat[$orig])) {
-            $params[$table][$target] = $flat[$orig];
-          }
+        if (!empty($flat['phone'])) {
+          $flat['phone_numeric'] = preg_replace('/[^\d]/', '', $flat['phone']);
         }
       }
       foreach ($fields as $field => $title) {
