@@ -202,11 +202,6 @@ class Themes extends \Civi\Core\Service\AutoService {
         'help' => ts('Determine a system default automatically'),
         // This is an alias. url_callback, search_order don't matter.
       ],
-      'greenwich' => [
-        'ext' => 'civicrm',
-        'title' => 'Greenwich',
-        'help' => ts('CiviCRM 4.x look-and-feel'),
-      ],
       'none' => [
         'ext' => 'civicrm',
         'title' => ts('None (Unstyled)'),
