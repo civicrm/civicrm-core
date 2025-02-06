@@ -15,6 +15,39 @@ Other resources for identifying changes are:
     * https://github.com/civicrm/civicrm-joomla
     * https://github.com/civicrm/civicrm-wordpress
 
+## CiviCRM 5.82.0
+
+Released February 5, 2025
+
+- **[Synopsis](release-notes/5.82.0.md#synopsis)**
+- **[Features](release-notes/5.82.0.md#features)**
+- **[Bugs resolved](release-notes/5.82.0.md#bugs)**
+- **[Miscellany](release-notes/5.82.0.md#misc)**
+- **[Credits](release-notes/5.82.0.md#credits)**
+- **[Feedback](release-notes/5.82.0.md#feedback)**
+
+## CiviCRM 5.81.0
+
+eleased January 8, 2025
+
+- **[Synopsis](release-notes/5.81.0.md#synopsis)**
+- **[Features](release-notes/5.81.0.md#features)**
+- **[Bugs resolved](release-notes/5.81.0.md#bugs)**
+- **[Miscellany](release-notes/5.81.0.md#misc)**
+- **[Credits](release-notes/5.81.0.md#credits)**
+- **[Feedback](release-notes/5.81.0.md#feedback)**
+
+## CiviCRM 5.80.0
+
+Released December 4, 2024
+
+- **[Synopsis](release-notes/5.80.0.md#synopsis)**
+- **[Features](release-notes/5.80.0.md#features)**
+- **[Bugs resolved](release-notes/5.80.0.md#bugs)**
+- **[Miscellany](release-notes/5.80.0.md#misc)**
+- **[Credits](release-notes/5.80.0.md#credits)**
+- **[Feedback](release-notes/5.80.0.md#feedback)**
+
 ## CiviCRM 5.79.0
 
 Released November 6, 2024
