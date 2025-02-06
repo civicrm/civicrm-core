@@ -145,7 +145,8 @@ return new class() {
     $constraints = [];
     foreach ($entity['getFields']() as $fieldName => $field) {
       if (!empty($field['entity_reference']['entity'])) {
-        $constraint = "CONSTRAINT `FK_{$entity['table']}_$fieldName` FOREIGN KEY (`$fieldName`)" .
+        $fkName = \CRM_Core_BAO_SchemaHandler::getIndexName($entity['table'], $fieldName);
+        $constraint = "CONSTRAINT `FK_$fkName` FOREIGN KEY (`$fieldName`)" .
           " REFERENCES `" . $this->getTableForEntity($field['entity_reference']['entity']) . "`(`{$field['entity_reference']['key']}`)";
         if (!empty($field['entity_reference']['on_delete'])) {
           $constraint .= " ON DELETE {$field['entity_reference']['on_delete']}";
