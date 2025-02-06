@@ -213,10 +213,11 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
       ->addValue('first_name', 'hello')
       ->execute()->first()['id'];
     $sampleData = [
-      ['subject' => 'abc', 'activity_type_id:name' => 'Meeting', 'source_contact_id' => $cid, 'duration' => 123, 'location' => 'abc'],
-      ['subject' => 'xyz', 'activity_type_id:name' => 'Meeting', 'source_contact_id' => $cid, 'location' => 'abc', 'is_deleted' => 1],
-      ['subject' => 'def', 'activity_type_id:name' => 'Meeting', 'source_contact_id' => $cid, 'duration' => 456, 'location' => 'abc'],
+      ['subject' => 'abc', 'activity_type_id:name' => 'Meeting', 'source_contact_id' => $cid, 'duration' => 123, 'location' => 'abc', 'activity_date_time' => '2025-02-01 01:00:00'],
+      ['subject' => 'xyz', 'activity_type_id:name' => 'Meeting', 'source_contact_id' => $cid, 'location' => 'abc', 'is_deleted' => 1, 'activity_date_time' => '2025-02-01 01:00:03'],
+      ['subject' => 'def', 'activity_type_id:name' => 'Meeting', 'source_contact_id' => $cid, 'duration' => 456, 'location' => 'abc', 'activity_date_time' => '2025-02-01 03:00:00'],
     ];
+
     $aids = Activity::save(FALSE)
       ->setRecords($sampleData)
       ->execute()->column('id');
@@ -231,6 +232,9 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
       ->addSelect('LEAST(duration, 300) AS least_of_duration_and_300')
       ->addSelect('ISNULL(duration) AS duration_isnull')
       ->addSelect('IFNULL(duration, 2) AS ifnull_duration_2')
+      ->addSelect('created_date')
+      ->addSelect('activity_date_time')
+      ->addSelect('TIMESTAMPDIFF(SECOND, created_date, activity_date_time) AS time_diff')
       ->addOrderBy('id')
       ->execute()->indexBy('id');
 
@@ -266,6 +270,15 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(123, $result[$aids[0]]['ifnull_duration_2']);
     $this->assertEquals(2, $result[$aids[1]]['ifnull_duration_2']);
     $this->assertEquals(456, $result[$aids[2]]['ifnull_duration_2']);
+
+    // Calculate expected TIMESTAMPDIFF
+    foreach ($aids as $aid) {
+      // Calculate difference between created_date and activity_date_time
+      $origin = new \DateTimeImmutable($result[$aid]['created_date']);
+      $target = new \DateTimeImmutable($result[$aid]['activity_date_time']);
+      $diffInSeconds = $target->getTimestamp() - $origin->getTimestamp();
+      $this->assertEquals($diffInSeconds, $result[$aid]['time_diff']);
+    }
   }
 
   public function testStringFunctions(): void {

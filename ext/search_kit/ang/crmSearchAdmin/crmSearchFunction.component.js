@@ -210,8 +210,11 @@
             const value = arg.value === undefined ? '' : arg.value;
             const prefix = arg.flag_before || arg.name ? (index ? ' ' : '') + (arg.flag_before || arg.name) + (value === '' ? '' : ' ') : (index ? ', ' : '');
             const suffix = arg.flag_after ? ' ' + arg.flag_after : '';
-
-            return prefix + (arg.type === 'string' || value === '' ? JSON.stringify(value) : value) + suffix;
+            let content = '';
+            if (ctrl.getParam(index).max_expr) {
+              content = (arg.type === 'string' || value === '' ? JSON.stringify(value) : value);
+            }
+            return prefix + content + suffix;
           });
           // Replace fake function "e"
           ctrl.expr = (ctrl.fnName === 'e' ? '' : ctrl.fnName) + '(';

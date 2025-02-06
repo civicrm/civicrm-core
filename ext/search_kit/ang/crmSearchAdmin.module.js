@@ -250,7 +250,7 @@
         function getKeyword(whitelist) {
           var keyword;
           _.each(_.filter(whitelist), function(flag) {
-            if (argString.indexOf(flag + ' ') === 0 || argString === flag) {
+            if (argString.indexOf(flag + ' ') === 0 || argString.indexOf(flag + ',') === 0 || argString === flag) {
               keyword = flag;
               argString = _.trim(argString.substr(flag.length));
               return false;
@@ -310,6 +310,8 @@
               value: '',
               flag_before: flagBefore
             });
+            // Tee up the next param
+            getKeyword([',']);
           }
         });
         if (!info.data_type && info.args.length) {

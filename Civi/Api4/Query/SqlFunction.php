@@ -229,6 +229,7 @@ abstract class SqlFunction extends SqlExpression {
       ];
       if (!$param['max_expr']) {
         $param['must_be'] = [];
+        $param['min_expr'] = 0;
       }
       $params[] = $param;
     }
