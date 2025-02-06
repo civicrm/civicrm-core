@@ -25,7 +25,7 @@ class Themes extends \Civi\Core\Service\AutoService {
    * The "default" theme adapts based on the latest recommendation from civicrm.org
    * by switching to DEFAULT_THEME at runtime.
    */
-  const DEFAULT_THEME = 'greenwich';
+  const DEFAULT_THEME = 'minetta';
 
   /**
    * Fallback is a pseudotheme which can be included in "search_order".

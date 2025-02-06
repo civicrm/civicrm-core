@@ -38,6 +38,7 @@ class CRM_Upgrade_Incremental_php_SixZero extends CRM_Upgrade_Incremental_Base {
       FALSE
     );
     $this->addTask('Set a default activity priority', 'addActivityPriorityDefault');
+    $this->addTask('Freeze theme choice to Greenwich', 'freezeDefaultThemeToGreenwich');
     $this->addExtensionTask('Enable Riverlea extension', ['riverlea']);
   }
 
@@ -66,6 +67,27 @@ class CRM_Upgrade_Incremental_php_SixZero extends CRM_Upgrade_Incremental_Base {
       'group' => CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_option_group WHERE name = "priority"'),
     ]);
     CRM_Core_DAO::executeQuery($sql);
+
+    return TRUE;
+  }
+
+  /**
+   * On 6.0 the default theme changes to Riverlea.
+   *
+   * For sites upgrading that have not made an explicit theme choice and have previously got
+   * Greenwich by default, change this to an explicit choice of Greenwich.
+   *
+   * @return bool
+   */
+  public static function freezeDefaultThemeToGreenwich() {
+    $themeSettings = ['theme_backend','theme_frontend'];
+
+    foreach ($themeSettings as $key) {
+      $value = \Civi::settings()->get($key);
+      if ($value === 'default') {
+        \Civi::settings()->set($key, 'greenwich');
+      }
+    }
 
     return TRUE;
   }
