@@ -426,6 +426,29 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
   /**
    * Test the full form-flow import.
    */
+  public function testImportCSVWithIDMembershipTypeOptional() :void {
+    $this->createTestEntity('Membership', [
+      'membership_type_id:name' => 'General',
+      'contact_id' => $this->individualCreate(),
+    ]);
+    $this->importCSV('memberships_with_id.csv', [
+      ['name' => 'membership_id'],
+      ['name' => 'membership_source'],
+      ['name' => 'do_not_import'],
+      ['name' => 'membership_start_date'],
+      ['name' => 'do_not_import'],
+    ]);
+    $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
+    $row = $dataSource->getRow();
+    $this->assertEquals('IMPORTED', $row['_status']);
+    $membership = Membership::get(FALSE)
+      ->execute()->single();
+    $this->assertEquals('2019-03-23', $membership['start_date']);
+  }
+
+  /**
+   * Test the full form-flow import.
+   */
   public function testImportTSV() :void {
     $this->individualCreate(['email' => 'member@example.com']);
     $this->importCSV('memberships_valid.tsv', [
