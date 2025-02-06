@@ -355,16 +355,20 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
   public function thresholdQuery($checkPermission = TRUE) {
     $aclFrom = '';
     $aclWhere = '';
+    $dedupeTable = $this->temporaryTables['dedupe'];
+    $contactType = $this->contact_type;
+    $threshold = $this->threshold;
 
     if ($this->params) {
       if ($checkPermission) {
         [$aclFrom, $aclWhere] = CRM_Contact_BAO_Contact_Permission::cacheClause('civicrm_contact');
         $aclWhere = $aclWhere ? "AND {$aclWhere}" : '';
       }
-      $query = "SELECT {$this->temporaryTables['dedupe']}.id1 as id
-                FROM {$this->temporaryTables['dedupe']} JOIN civicrm_contact ON {$this->temporaryTables['dedupe']}.id1 = civicrm_contact.id {$aclFrom}
-                WHERE contact_type = '{$this->contact_type}' AND is_deleted = 0 $aclWhere
-                AND weight >= {$this->threshold}";
+      $query = "SELECT dedupe.id1 as id
+                FROM $dedupeTable dedupe JOIN civicrm_contact
+                  ON dedupe.id1 = civicrm_contact.id {$aclFrom}
+                WHERE contact_type = '{$contactType}' AND is_deleted = 0 $aclWhere
+                AND weight >= {$threshold}";
     }
     else {
       $aclWhere = '';
@@ -372,16 +376,17 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
         [$aclFrom, $aclWhere] = CRM_Contact_BAO_Contact_Permission::cacheClause(['c1', 'c2']);
         $aclWhere = $aclWhere ? "AND {$aclWhere}" : '';
       }
-      $query = "SELECT IF({$this->temporaryTables['dedupe']}.id1 < {$this->temporaryTables['dedupe']}.id2, {$this->temporaryTables['dedupe']}.id1, {$this->temporaryTables['dedupe']}.id2) as id1,
-                IF({$this->temporaryTables['dedupe']}.id1 < {$this->temporaryTables['dedupe']}.id2, {$this->temporaryTables['dedupe']}.id2, {$this->temporaryTables['dedupe']}.id1) as id2, {$this->temporaryTables['dedupe']}.weight
-                FROM {$this->temporaryTables['dedupe']} JOIN civicrm_contact c1 ON {$this->temporaryTables['dedupe']}.id1 = c1.id
-                            JOIN civicrm_contact c2 ON {$this->temporaryTables['dedupe']}.id2 = c2.id {$aclFrom}
-                       LEFT JOIN civicrm_dedupe_exception exc ON {$this->temporaryTables['dedupe']}.id1 = exc.contact_id1 AND {$this->temporaryTables['dedupe']}.id2 = exc.contact_id2
-                WHERE c1.contact_type = '{$this->contact_type}' AND
-                      c2.contact_type = '{$this->contact_type}'
+      $query = "SELECT IF(dedupe.id1 < dedupe.id2, dedupe.id1, dedupe.id2) as id1,
+                IF(dedupe.id1 < dedupe.id2, dedupe.id2, dedupe.id1) as id2, dedupe.weight
+                FROM $dedupeTable dedupe JOIN civicrm_contact c1 ON dedupe.id1 = c1.id
+                  JOIN civicrm_contact c2 ON dedupe.id2 = c2.id {$aclFrom}
+                  LEFT JOIN civicrm_dedupe_exception exc
+                    ON dedupe.id1 = exc.contact_id1 AND dedupe.id2 = exc.contact_id2
+                WHERE c1.contact_type = '{$contactType}' AND
+                      c2.contact_type = '{$contactType}'
                        AND c1.is_deleted = 0 AND c2.is_deleted = 0
                       {$aclWhere}
-                      AND weight >= {$this->threshold} AND exc.contact_id1 IS NULL";
+                      AND weight >= {$threshold} AND exc.contact_id1 IS NULL";
     }
 
     CRM_Utils_Hook::dupeQuery($this, 'threshold', $query);
