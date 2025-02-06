@@ -2946,6 +2946,10 @@ SELECT contact_id
       $uniqueNames = static::fieldKeys();
       $fieldName = array_search($fieldName, $uniqueNames) ?: $fieldName;
     }
+    // Legacy handling for hook-based fields from `fields_callback`
+    if (!$entity->getField($fieldName)) {
+      return CRM_Core_PseudoConstant::get(static::class, $fieldName, [], $context);
+    }
     $checkPermissions = (bool) ($values['check_permissions'] ?? ($context == 'create' || $context == 'search'));
     $includeDisabled = ($context == 'validate' || $context == 'get');
     $options = $entity->getOptions($fieldName, $values, $includeDisabled, $checkPermissions);

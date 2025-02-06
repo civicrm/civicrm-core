@@ -132,7 +132,7 @@ trait CRM_Core_WorkflowMessage_ProfileTrait {
         }
       }
     }
-    return $this->profiles;
+    return $this->profiles ?: [];
   }
 
   /**
