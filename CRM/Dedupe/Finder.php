@@ -79,6 +79,8 @@ class CRM_Dedupe_Finder {
    * @param int $ruleGroupID
    *   The id of the dedupe rule we should be using.
    *
+   * @deprecated since 6.0 will be removed around 6.24 (long deprecation as there are many non-core callers)
+   *
    * @return array
    *   matching contact ids
    * @throws \CRM_Core_Exception
@@ -116,20 +118,15 @@ class CRM_Dedupe_Finder {
         throw new CRM_Core_Exception("$used rule for $ctype does not exist");
       }
     }
-
-    if (!$rgBao->fillTable($rgBao->id, [], $params)) {
-      return [];
-    }
-
-    $dao = CRM_Core_DAO::executeQuery($rgBao->thresholdQuery($checkPermission));
-    $dupes = [];
-    while ($dao->fetch()) {
-      if (isset($dao->id) && $dao->id) {
-        $dupes[] = $dao->id;
-      }
-    }
-    CRM_Core_DAO::executeQuery($rgBao->tableDropQuery());
-    return array_diff($dupes, $except);
+    $finderParams = [
+      'rule_group_id' => $rgBao->id,
+      'contact_type' => $ctype,
+      'check_permission' => $checkPermission,
+      'excluded_contact_ids' => $except,
+      'match_params' => $params,
+      'rule' => $used,
+    ];
+    return CRM_Contact_BAO_Contact::findDuplicates($finderParams, ['is_legacy_usage' => TRUE]);
   }
 
   /**
