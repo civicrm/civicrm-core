@@ -15,6 +15,15 @@ Other resources for identifying changes are:
     * https://github.com/civicrm/civicrm-joomla
     * https://github.com/civicrm/civicrm-wordpress
 
+## CiviCRM 5.81.2
+
+Released February 5, 2025
+
+- **[Synopsis](release-notes/5.81.2.md#synopsis)**
+- **[Bugs resolved](release-notes/5.81.2.md#bugs)**
+- **[Credits](release-notes/5.81.2.md#credits)**
+- **[Feedback](release-notes/5.81.2.md#feedback)**
+
 ## CiviCRM 5.81.1
 
 Released January 21, 2025
