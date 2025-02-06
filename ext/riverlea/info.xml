@@ -17,6 +17,9 @@
   <compatibility>
     <ver>[civicrm.majorVersion]</ver>
   </compatibility>
+  <tags>
+    <tag>mgmt:required</tag>
+  </tags>
   <comments>A cross-CMS CiviCRM theme framework.</comments>
   <classloader>
     <psr4 prefix="Civi\" path="Civi"/>
