@@ -28,7 +28,7 @@
   </mixins>
   <civix>
     <namespace>CRM/Sequentialcreditnotes</namespace>
-    <format>23.02.1</format>
+    <format>25.01.1</format>
   </civix>
   <classloader>
     <psr4 prefix="Civi\" path="Civi"/>

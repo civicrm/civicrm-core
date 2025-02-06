@@ -30,7 +30,7 @@
   </classloader>
   <civix>
     <namespace>CRM/SearchKitReports</namespace>
-    <format>24.09.1</format>
+    <format>25.01.1</format>
     <angularModule>crmSearchKitReports</angularModule>
   </civix>
   <mixins>

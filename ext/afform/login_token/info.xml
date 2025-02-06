@@ -20,7 +20,7 @@
   <version>1.0.0</version>
   <develStage>alpha</develStage>
   <compatibility>
-    <ver>5.79</ver>
+    <ver>[civicrm.majorVersion]</ver>
   </compatibility>
   <requires>
     <ext>org.civicrm.afform</ext>
@@ -32,7 +32,7 @@
   </classloader>
   <civix>
     <namespace>CRM/AfformLoginToken</namespace>
-    <format>24.09.1</format>
+    <format>25.01.1</format>
     <angularModule>crmAfformLoginToken</angularModule>
   </civix>
   <mixins>

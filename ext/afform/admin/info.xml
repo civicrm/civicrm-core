@@ -25,7 +25,7 @@
   </requires>
   <civix>
     <namespace>CRM/AfformAdmin</namespace>
-    <format>23.02.1</format>
+    <format>25.01.1</format>
   </civix>
   <classloader>
     <psr4 prefix="Civi\" path="Civi"/>
@@ -37,7 +37,7 @@
     <mixin>menu-xml@1.0.0</mixin>
     <mixin>mgd-php@1.0.0</mixin>
     <mixin>afform-entity-php@1.0.0</mixin>
-    <mixin>smarty@1.0.0</mixin>
+    <mixin>smarty@1.0.3</mixin>
   </mixins>
-  <upgrader>CRM_AfformAdmin_Upgrader</upgrader>
+  <upgrader>CiviMix\Schema\AfformAdmin\AutomaticUpgrader</upgrader>
 </extension>

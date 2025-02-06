@@ -30,6 +30,6 @@
   </mixins>
   <civix>
     <namespace>CRM/Payflowpro</namespace>
-    <format>23.02.1</format>
+    <format>25.01.1</format>
   </civix>
 </extension>
