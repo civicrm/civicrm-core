@@ -76,7 +76,7 @@ class api_v3_EntityTagACLTest extends CiviUnitTestCase {
    * @return array
    */
   public function getTagOptions() {
-    $options = $this->callAPISuccess('Tag', 'getoptions', ['field' => 'used_for']);
+    $options = $this->callAPISuccess('EntityTag', 'getoptions', ['field' => 'entity_table']);
     return $options['values'];
   }
 

@@ -89,11 +89,19 @@
       </label>
       <input ng-list crm-ui-select="{multiple: true, data: editor.meta.afform_placement, placeholder: ts('None')}" class="form-control" id="afform_placement" ng-model="editor.afform.placement" ng-change="editor.onChangePlacement()">
       <p class="help-block" ng-if="editor.afform.server_route || !editor.placementRequiresServerRoute()">
-        {{:: ts('Additional contexts in which the form can be embedded') }}
+        {{:: ts('Additional contexts in which the form can be embedded.') }}
       </p>
       <p class="text-warning" ng-if="!editor.afform.server_route && editor.placementRequiresServerRoute()">
         <i class="crm-i fa-exclamation-triangle"></i>{{ ts('%1 placement requires a page route.', {1: editor.placementRequiresServerRoute()}) }}
       </p>
+    </div>
+
+    <div class="form-group">
+      <label for="afform_tags">
+        {{:: ts('Tags') }}
+      </label>
+      <input ng-list crm-ui-select="{multiple: true, data: editor.meta.afform_tags, placeholder: ts('None')}" class="form-control" id="afform_tags" ng-model="editor.afform.tags">
+      <p class="help-block">{{:: ts('Tags can be used to keep track of your forms if Used For is set to include Afform.') }} <a target="_blank" href="/civicrm/tag?reset=1">{{:: ts('Manage Tags') }}</a></p>
     </div>
 
     <div class="form-group" ng-if="editor.isContactSummary()">
