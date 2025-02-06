@@ -28,7 +28,8 @@ class Finder extends AutoSubscriber {
     if ($event->tableName) {
       $contactIDs = explode(',', \CRM_Core_DAO::singleValueQuery('SELECT GROUP_CONCAT(id) FROM ' . $event->tableName));
     }
-    if (!$ruleGroup->fillTable($ruleGroup->id, $contactIDs, [])) {
+    $tempTable = $ruleGroup->fillTable($ruleGroup->id, $contactIDs, []);
+    if (!$tempTable) {
       return;
     }
     $dao = \CRM_Core_DAO::executeQuery($ruleGroup->thresholdQuery($event->checkPermissions));
@@ -48,12 +49,29 @@ class Finder extends AutoSubscriber {
       return;
     }
     $rgBao = new \CRM_Dedupe_BAO_DedupeRuleGroup();
-    if (!$rgBao->fillTable($event->dedupeParams['rule_group_id'], [], $event->dedupeParams['match_params'], TRUE)) {
+    $dedupeTable = $rgBao->fillTable($event->dedupeParams['rule_group_id'], [], $event->dedupeParams['match_params'], TRUE);
+    if (!$dedupeTable) {
       $event->dedupeResults['ids'] = [];
       return;
     }
-
-    $dao = \CRM_Core_DAO::executeQuery($rgBao->thresholdQuery($event->dedupeParams['check_permission']));
+    $aclWhere = $aclFrom = '';
+    if ($event->dedupeParams['check_permission']) {
+      [$aclFrom, $aclWhere] = \CRM_Contact_BAO_Contact_Permission::cacheClause('civicrm_contact');
+      $aclWhere = $aclWhere ? "AND {$aclWhere}" : '';
+    }
+    $query = \CRM_Core_DAO::composeQuery("
+      SELECT dedupe.id1 as id
+        FROM $dedupeTable dedupe JOIN civicrm_contact
+          ON dedupe.id1 = civicrm_contact.id {$aclFrom}
+        WHERE contact_type = %1 AND is_deleted = 0 $aclWhere
+        AND weight >= %2
+      ", [
+        1 => [$rgBao->contact_type, 'String'],
+        2 => [$rgBao->threshold, 'Integer'],
+      ]
+    );
+    \CRM_Utils_Hook::dupeQuery($rgBao, 'threshold', $query);
+    $dao = \CRM_Core_DAO::executeQuery($query);
     $dupes = [];
     while ($dao->fetch()) {
       if (isset($dao->id) && $dao->id) {

@@ -152,7 +152,8 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup impl
     if ($event->tableName) {
       $contactIDs = explode(',', CRM_Core_DAO::singleValueQuery('SELECT GROUP_CONCAT(id) FROM ' . $event->tableName));
     }
-    if (!$ruleGroup->fillTable($ruleGroup->id, $contactIDs, [], FALSE)) {
+    $tempTable = $ruleGroup->fillTable($ruleGroup->id, $contactIDs, [], FALSE);
+    if (!$tempTable) {
       return;
     }
     $dao = \CRM_Core_DAO::executeQuery($ruleGroup->thresholdQuery($event->checkPermissions));
@@ -170,13 +171,13 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup impl
       return;
     }
     $rgBao = new CRM_Dedupe_BAO_DedupeRuleGroup();
-    if (!$rgBao->fillTable($event->dedupeParams['rule_group_id'], [], $event->dedupeParams['match_params'], FALSE)) {
+    $dedupeTable = $rgBao->fillTable($event->dedupeParams['rule_group_id'], [], $event->dedupeParams['match_params'], FALSE);
+    if (!$dedupeTable) {
       $event->dedupeResults['ids'] = [];
       return;
     }
     $aclFrom = '';
     $aclWhere = '';
-    $dedupeTable = $rgBao->temporaryTables['dedupe'];
     $contactType = $rgBao->contact_type;
     $threshold = $rgBao->threshold;
     if ($event->dedupeParams['check_permission']) {
@@ -186,10 +187,13 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup impl
     $query = "SELECT dedupe.id1 as id
                 FROM $dedupeTable dedupe JOIN civicrm_contact
                   ON dedupe.id1 = civicrm_contact.id {$aclFrom}
-                WHERE contact_type = '{$contactType}' AND is_deleted = 0 $aclWhere
-                AND weight >= {$threshold}";
+                WHERE contact_type = %1 AND is_deleted = 0 $aclWhere
+                AND weight >= %2";
 
-    $dao = CRM_Core_DAO::executeQuery($query);
+    $dao = CRM_Core_DAO::executeQuery($query, [
+      1 => [$contactType, 'String'],
+      2 => [$threshold, 'Integer'],
+    ]);
     $dupes = [];
     while ($dao->fetch()) {
       if (isset($dao->id) && $dao->id) {
@@ -214,10 +218,10 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup impl
    *   separated out and optimized once it no longer has to comply with the legacy
    *   hook and reserved query methodology.
    *
-   * @return bool
+   * @return false|string
    * @throws \Civi\Core\Exception\DBQueryException
    */
-  public function fillTable(int $id, array $contactIDs, array $params, $legacyMode = TRUE): bool {
+  public function fillTable(int $id, array $contactIDs, array $params, $legacyMode = TRUE) {
     if ($legacyMode) {
       $this->contactIds = $contactIDs;
       $this->params = $params;
@@ -248,7 +252,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup impl
     }
 
     if ($params) {
-      $this->temporaryTables['dedupe'] = CRM_Utils_SQL_TempTable::build()
+      $this->temporaryTables['dedupe'] = $dedupeTable = CRM_Utils_SQL_TempTable::build()
         ->setCategory('dedupe')
         ->createWithColumns("id1 int, weight int, UNIQUE UI_id1 (id1)")->getName();
       $dedupeCopyTemporaryTableObject = CRM_Utils_SQL_TempTable::build()
@@ -259,7 +263,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup impl
       $dupeCopyJoin = " JOIN {$this->temporaryTables['dedupe_copy']} ON {$this->temporaryTables['dedupe_copy']}.id1 = t1.column WHERE ";
     }
     else {
-      $this->temporaryTables['dedupe'] = CRM_Utils_SQL_TempTable::build()
+      $this->temporaryTables['dedupe'] = $dedupeTable = CRM_Utils_SQL_TempTable::build()
         ->setCategory('dedupe')
         ->createWithColumns("id1 int, id2 int, weight int, UNIQUE UI_id1_id2 (id1, id2)")->getName();
       $dedupeCopyTemporaryTableObject = CRM_Utils_SQL_TempTable::build()
@@ -346,7 +350,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup impl
         break;
       }
     }
-    return TRUE;
+    return $dedupeTable;
   }
 
   /**
@@ -437,35 +441,21 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup impl
     $contactType = $this->contact_type;
     $threshold = $this->threshold;
 
-    if ($this->params) {
-      if ($checkPermission) {
-        [$aclFrom, $aclWhere] = CRM_Contact_BAO_Contact_Permission::cacheClause('civicrm_contact');
-        $aclWhere = $aclWhere ? "AND {$aclWhere}" : '';
-      }
-      $query = "SELECT dedupe.id1 as id
-                FROM $dedupeTable dedupe JOIN civicrm_contact
-                  ON dedupe.id1 = civicrm_contact.id {$aclFrom}
-                WHERE contact_type = '{$contactType}' AND is_deleted = 0 $aclWhere
-                AND weight >= {$threshold}";
+    if ($checkPermission) {
+      [$aclFrom, $aclWhere] = CRM_Contact_BAO_Contact_Permission::cacheClause(['c1', 'c2']);
+      $aclWhere = $aclWhere ? "AND {$aclWhere}" : '';
     }
-    else {
-      $aclWhere = '';
-      if ($checkPermission) {
-        [$aclFrom, $aclWhere] = CRM_Contact_BAO_Contact_Permission::cacheClause(['c1', 'c2']);
-        $aclWhere = $aclWhere ? "AND {$aclWhere}" : '';
-      }
-      $query = "SELECT IF(dedupe.id1 < dedupe.id2, dedupe.id1, dedupe.id2) as id1,
-                IF(dedupe.id1 < dedupe.id2, dedupe.id2, dedupe.id1) as id2, dedupe.weight
-                FROM $dedupeTable dedupe JOIN civicrm_contact c1 ON dedupe.id1 = c1.id
-                  JOIN civicrm_contact c2 ON dedupe.id2 = c2.id {$aclFrom}
-                  LEFT JOIN civicrm_dedupe_exception exc
-                    ON dedupe.id1 = exc.contact_id1 AND dedupe.id2 = exc.contact_id2
-                WHERE c1.contact_type = '{$contactType}' AND
-                      c2.contact_type = '{$contactType}'
-                       AND c1.is_deleted = 0 AND c2.is_deleted = 0
-                      {$aclWhere}
-                      AND weight >= {$threshold} AND exc.contact_id1 IS NULL";
-    }
+    $query = "SELECT IF(dedupe.id1 < dedupe.id2, dedupe.id1, dedupe.id2) as id1,
+              IF(dedupe.id1 < dedupe.id2, dedupe.id2, dedupe.id1) as id2, dedupe.weight
+              FROM $dedupeTable dedupe JOIN civicrm_contact c1 ON dedupe.id1 = c1.id
+                JOIN civicrm_contact c2 ON dedupe.id2 = c2.id {$aclFrom}
+                LEFT JOIN civicrm_dedupe_exception exc
+                  ON dedupe.id1 = exc.contact_id1 AND dedupe.id2 = exc.contact_id2
+              WHERE c1.contact_type = '{$contactType}' AND
+                    c2.contact_type = '{$contactType}'
+                     AND c1.is_deleted = 0 AND c2.is_deleted = 0
+                    {$aclWhere}
+                    AND weight >= {$threshold} AND exc.contact_id1 IS NULL";
 
     CRM_Utils_Hook::dupeQuery($this, 'threshold', $query);
     return $query;
