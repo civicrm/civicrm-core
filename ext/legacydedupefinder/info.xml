@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<extension key="legacydedupefinder" type="module">
+  <file>legacydedupefinder</file>
+  <name>legacydedupefinder</name>
+  <description>Backwards compatibility for dedupe hooks</description>
+  <license>AGPL-3.0</license>
+  <maintainer>
+    <author>CiviCRM</author>
+    <email>info@civicrm.org</email>
+  </maintainer>
+  <urls>
+    <url desc="Main Extension Page">http://FIXME</url>
+    <url desc="Documentation">http://FIXME</url>
+    <url desc="Support">http://FIXME</url>
+    <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
+  </urls>
+  <releaseDate>[civicrm.releaseDate]</releaseDate>
+  <version>[civicrm.version]</version>
+  <develStage>stable</develStage>
+  <compatibility>
+    <ver>[civicrm.majorVersion]</ver>
+  </compatibility>
+  <tags>
+    <tag>mgmt:hidden</tag>
+  </tags>
+  <comments>This adds backwards compatibility for dedupe hooks. If you do not need them you can improve dedupe performance by disabling this</comments>
+  <mixins>
+    <mixin>scan-classes@1.0.0</mixin>
+  </mixins>
+  <classloader>
+    <psr0 prefix="CRM_" path="."/>
+    <psr4 prefix="Civi\" path="Civi"/>
+  </classloader>
+  <civix>
+    <namespace>CRM/Legacydedupefinder</namespace>
+    <format>25.01.1</format>
+    <angularModule>crmLegacydedupefinder</angularModule>
+  </civix>
+</extension>

@@ -3498,22 +3498,6 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
     ];
     $dedupeParams += $dedupeParams['match_params'];
     CRM_Utils_Hook::findDuplicates($dedupeParams, $dedupeResults, $contextParams);
-    if (!$dedupeResults['handled']) {
-      $rgBao = new CRM_Dedupe_BAO_DedupeRuleGroup();
-      if (!$rgBao->fillTable($dedupeParams['rule_group_id'], [], $dedupeParams['match_params'])) {
-        return [];
-      }
-
-      $dao = CRM_Core_DAO::executeQuery($rgBao->thresholdQuery($checkPermission));
-      $dupes = [];
-      while ($dao->fetch()) {
-        if (isset($dao->id) && $dao->id) {
-          $dupes[] = $dao->id;
-        }
-      }
-      CRM_Core_DAO::executeQuery($rgBao->tableDropQuery());
-      $dedupeResults['ids'] = array_diff($dupes, $dedupeParams['excluded_contact_ids']);
-    }
     return $dedupeResults['ids'] ?? [];
   }
 

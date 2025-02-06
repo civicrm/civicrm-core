@@ -11,17 +11,10 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
   use CRMTraits_Custom_CustomDataTrait;
 
   /**
-   * ID of the group holding the contacts.
-   *
-   * @var int
-   */
-  protected int $groupID;
-
-  /**
    * Clean up after the test.
    */
   public function tearDown(): void {
-    $this->quickCleanup(['civicrm_contact', 'civicrm_group'], TRUE);
+    $this->quickCleanup(['civicrm_contact', 'civicrm_group_contact', 'civicrm_group'], TRUE);
     parent::tearDown();
   }
 
@@ -45,7 +38,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
 
     $ruleGroup = $this->callAPISuccessGetSingle('RuleGroup', ['is_reserved' => 1, 'contact_type' => 'Individual', 'used' => 'Unsupervised']);
 
-    $foundDupes = CRM_Dedupe_Finder::dupesInGroup($ruleGroup['id'], $this->groupID);
+    $foundDupes = CRM_Dedupe_Finder::dupesInGroup($ruleGroup['id'], $this->ids['Group']['default']);
     $this->assertCount(3, $foundDupes, 'Check Individual-Fuzzy dupe rule for dupesInGroup().');
   }
 
@@ -82,6 +75,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
    */
   public function testCustomRule(): void {
     $this->setupForGroupDedupe();
+    $this->callAPISuccess('Extension', 'install', ['keys' => 'legacydedupefinder']);
 
     $ruleGroup = $this->createRuleGroup();
     foreach (['birth_date', 'first_name', 'last_name'] as $field) {
@@ -92,7 +86,13 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
         'rule_field' => $field,
       ], $field);
     }
-    $foundDupes = CRM_Dedupe_Finder::dupesInGroup($ruleGroup['id'], $this->groupID);
+    $foundDupes = CRM_Dedupe_Finder::dupesInGroup($ruleGroup['id'], $this->ids['Group']['default']);
+    $this->assertCount(4, $foundDupes);
+    CRM_Dedupe_Finder::dupes($ruleGroup['id']);
+
+    // Make sure it is the same with the extension disabled.
+    $this->callAPISuccess('Extension', 'disable', ['keys' => 'legacydedupefinder']);
+    $foundDupes = CRM_Dedupe_Finder::dupesInGroup($ruleGroup['id'], $this->ids['Group']['default']);
     $this->assertCount(4, $foundDupes);
     CRM_Dedupe_Finder::dupes($ruleGroup['id']);
   }
@@ -192,10 +192,9 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
       'rule_weight' => 10,
       'rule_field' => 'postal_code',
     ]);
-    $foundDupes = CRM_Dedupe_Finder::dupesInGroup($ruleGroup['id'], $this->groupID);
+    $foundDupes = CRM_Dedupe_Finder::dupesInGroup($ruleGroup['id'], $this->ids['Group']['default']);
     $this->assertCount(1, $foundDupes);
     CRM_Dedupe_Finder::dupes($ruleGroup['id']);
-
   }
 
   /**
@@ -223,7 +222,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
         'rule_field' => $field,
       ]);
     }
-    $foundDupes = CRM_Dedupe_Finder::dupesInGroup($ruleGroup['id'], $this->groupID);
+    $foundDupes = CRM_Dedupe_Finder::dupesInGroup($ruleGroup['id'], $this->ids['Group']['default']);
     $this->assertCount(1, $foundDupes);
   }
 
@@ -244,7 +243,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
         'rule_field' => $field,
       ], $field);
     }
-    $foundDupes = CRM_Dedupe_Finder::dupesInGroup($ruleGroup['id'], $this->groupID);
+    $foundDupes = CRM_Dedupe_Finder::dupesInGroup($ruleGroup['id'], $this->ids['Group']['default']);
     $this->assertCount(4, $foundDupes);
     CRM_Dedupe_Finder::dupes($ruleGroup['id']);
   }
@@ -257,7 +256,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
   public function testSupervisedDupes(): void {
     $this->setupForGroupDedupe();
     $ruleGroup = $this->callAPISuccessGetSingle('RuleGroup', ['is_reserved' => 1, 'contact_type' => 'Individual', 'used' => 'Supervised']);
-    $foundDupes = CRM_Dedupe_Finder::dupesInGroup($ruleGroup['id'], $this->groupID);
+    $foundDupes = CRM_Dedupe_Finder::dupesInGroup($ruleGroup['id'], $this->ids['Group']['default']);
     // -------------------------------------------------------------------------
     // default dedupe rule: threshold = 20 => (First + Last + Email) Matches ( 1 pair )
     // --------------------------------------------------------------------------
@@ -419,8 +418,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
       'visibility' => 'Public Pages',
     ];
 
-    $result = $this->createTestEntity('Group', $params);
-    $this->groupID = $result['id'];
+    $this->createTestEntity('Group', $params);
 
     $params = [
       [
@@ -478,7 +476,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
 
       $grpParams = [
         'contact_id' => $contact['id'],
-        'group_id' => $this->groupID,
+        'group_id' => $this->ids['Group']['default'],
       ];
       $this->callAPISuccess('group_contact', 'create', $grpParams);
     }
@@ -549,7 +547,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
       ]);
     }
 
-    $foundDupes = CRM_Dedupe_Finder::dupesInGroup($ruleGroup['id'], $this->groupID);
+    $foundDupes = CRM_Dedupe_Finder::dupesInGroup($ruleGroup['id'], $this->ids['Group']['default']);
     $this->assertCount(1, $foundDupes);
     CRM_Dedupe_Finder::dupes($ruleGroup['id']);
 

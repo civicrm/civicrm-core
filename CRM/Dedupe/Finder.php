@@ -25,6 +25,8 @@ class CRM_Dedupe_Finder {
    * Return a contact_id-keyed array of arrays of possible dupes
    * (of the key contact_id) - limited to dupes of $cids if provided.
    *
+   * @deprecated avoid calling this function directly as it is likely to change.
+   *
    * @param int $rgid
    *   Rule group id.
    * @param array $cids
@@ -45,17 +47,32 @@ class CRM_Dedupe_Finder {
       throw new CRM_Core_Exception('Dedupe rule not found for selected contacts');
     }
 
-    if (!$rgBao->fillTable($rgid, $cids, [])) {
-      return [];
-    }
-    $dao = CRM_Core_DAO::executeQuery($rgBao->thresholdQuery($checkPermissions));
     $dupes = [];
-    while ($dao->fetch()) {
-      $dupes[] = [$dao->id1, $dao->id2, $dao->weight];
-    }
-    CRM_Core_DAO::executeQuery($rgBao->tableDropQuery());
 
+    // Note the table will be dropped when the variable is destroyed (at the end of this function)
+    // due to the `__destruct` function on the class.
+    $table = $cids ? self::getIdTable($cids) : NULL;
+    $tableName = $table ? $table->getName() : NULL;
+    CRM_Utils_Hook::findExistingDuplicates($dupes, [$rgid], $tableName, $checkPermissions);
+    foreach ($dupes as &$dupe) {
+      // re-format to original
+      $dupe = [$dupe['entity_id_1'], $dupe['entity_id_2'], $dupe['weight']];
+    }
     return $dupes;
+  }
+
+  private static function getIdTable($ids): CRM_Utils_SQL_TempTable {
+    $table = new CRM_Utils_SQL_TempTable();
+    $table->setAutodrop();
+    $table->setDurable();
+    $table->createWithColumns(
+      'id int(10)'
+    );
+    CRM_Core_DAO::executeQuery('ALTER TABLE ' . $table->getName() . ' ADD index(id)');
+    $insert = ' INSERT INTO ' . $table->getName() . ' (`id`)
+      VALUES (' . implode('), (', $ids) . ')';
+    CRM_Core_DAO::executeQuery($insert);
+    return $table;
   }
 
   /**

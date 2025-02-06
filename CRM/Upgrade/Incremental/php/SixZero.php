@@ -38,6 +38,7 @@ class CRM_Upgrade_Incremental_php_SixZero extends CRM_Upgrade_Incremental_Base {
       FALSE
     );
     $this->addTask('Set a default activity priority', 'addActivityPriorityDefault');
+    $this->addSimpleExtensionTask(ts('enable dedupe backward compatibility'), ['legacydedupefinder']);
   }
 
   /**
