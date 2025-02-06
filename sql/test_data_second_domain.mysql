@@ -362,8 +362,9 @@ SET @systemSettingslastID:=LAST_INSERT_ID();
 INSERT INTO civicrm_navigation
     ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
 VALUES
-    ( @domainID, 'civicrm/admin/setting/component&reset=1', 'Enable CiviCRM Components', 'Enable Components',                                 'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 1 ),
-    ( @domainID, 'civicrm/admin/extensions&reset=1',        'Manage Extensions', 'Manage Extensions', 'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 2 ),
+    ( @domainID, 'civicrm/menu/rebuild?reset=1',                        'Clear Caches', 'cache_clear',                                        'administer CiviCRM', '', @systemSettingslastID, '1', 1, 0 ),
+    ( @domainID, 'civicrm/admin/setting/component&reset=1',             'Enable CiviCRM Components', 'Enable Components',                     'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 1 ),
+    ( @domainID, 'civicrm/admin/extensions&reset=1',                    'Manage Extensions', 'Manage Extensions',                             'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 2 ),
     ( @domainID, 'civicrm/admin/setting/smtp&reset=1',                  'Outbound Email (SMTP/Sendmail)', 'Outbound Email',                   'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 3 ),
     ( @domainID, 'civicrm/admin/paymentProcessor&reset=1',              'Payment Processors', 'Payment Processors',                           'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 4 ),
     ( @domainID, 'civicrm/admin/setting/mapping&reset=1',               'Mapping and Geocoding', 'Mapping and Geocoding',                     'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 5 ),

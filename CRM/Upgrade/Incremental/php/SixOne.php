@@ -30,11 +30,13 @@ class CRM_Upgrade_Incremental_php_SixOne extends CRM_Upgrade_Incremental_Base {
   public function upgrade_6_1_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
 
-    $this->addTask(ts('Remove Clear Caches & Reset Paths from Nav Menu'), 'updateUpdateConfigBackendNavItem');
+    $this->addTask(ts('Replace Clear Caches & Reset Paths with Clear Caches in Nav Menu'), 'updateUpdateConfigBackendNavItem');
   }
 
   /**
    * The updateConfigBackend page has been removed - so remove any nav items linking to it
+   *
+   * Add a new menu item to Clear Caches directly
    *
    * @return bool
    */
@@ -42,6 +44,26 @@ class CRM_Upgrade_Incremental_php_SixOne extends CRM_Upgrade_Incremental_Base {
     // delete any entries to the path that no longer exists
     \Civi\Api4\Navigation::delete(FALSE)
       ->addWhere('url', '=', 'civicrm/admin/setting/updateConfigBackend?reset=1')
+      ->execute();
+
+    $systemSettingsNavItem = \Civi\Api4\Navigation::get(FALSE)
+      ->addWhere('name', '=', 'System Settings')
+      ->execute()
+      ->first()['id'] ?? NULL;
+
+    if (!$systemSettingsNavItem) {
+      \Civi::log()->debug('Couldn\'t find System Settings Nav Menu Item to create new Clear Caches entry');
+      return TRUE;
+    }
+
+    // Q: how to handle multi domain?
+    \Civi\Api4\Navigation::create(FALSE)
+      ->addValue('url', 'civicrm/menu/rebuild?reset=1')
+      ->addValue('label', ts('Clear Caches'))
+      ->addValue('name', 'cache_clear')
+      ->addValue('has_separator', TRUE)
+      ->addValue('parent_id', $systemSettingsNavItem)
+      ->addValue('weight', 0)
       ->execute();
 
     return TRUE;
