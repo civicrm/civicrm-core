@@ -22,7 +22,7 @@ use Civi;
 class Themes extends \Civi\Core\Service\AutoService {
 
   /**
-   * The "default" theme adapts based on the latest recommendation from civicrm.org
+   * The "default" theme adapts based on the latest recommendation
    * by switching to DEFAULT_THEME at runtime.
    */
   const DEFAULT_THEME = 'minetta';
