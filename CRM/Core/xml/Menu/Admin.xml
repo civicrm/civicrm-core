@@ -516,14 +516,6 @@
      <weight>70</weight>
   </item>
   <item>
-     <path>civicrm/admin/setting/updateConfigBackend</path>
-     <title>Cleanup Caches and Update Paths</title>
-     <desc>Reset the Base Directory Path and Base URL settings - generally when a CiviCRM site is moved to another location in the file system and/or to another domain.</desc>
-     <page_callback>CRM_Admin_Form_Setting_UpdateConfigBackend</page_callback>
-     <adminGroup>System Settings</adminGroup>
-     <weight>80</weight>
-  </item>
-  <item>
      <path>civicrm/admin/setting/uf</path>
      <title>CMS Database Integration</title>
      <page_callback>CRM_Admin_Form_Setting_UF</page_callback>

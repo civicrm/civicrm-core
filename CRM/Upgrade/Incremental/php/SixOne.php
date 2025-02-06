@@ -29,6 +29,22 @@ class CRM_Upgrade_Incremental_php_SixOne extends CRM_Upgrade_Incremental_Base {
    */
   public function upgrade_6_1_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+
+    $this->addTask(ts('Remove Clear Caches & Reset Paths from Nav Menu'), 'updateUpdateConfigBackendNavItem');
+  }
+
+  /**
+   * The updateConfigBackend page has been removed - so remove any nav items linking to it
+   *
+   * @return bool
+   */
+  public static function updateUpdateConfigBackendNavItem() {
+    // delete any entries to the path that no longer exists
+    \Civi\Api4\Navigation::delete(FALSE)
+      ->addWhere('url', '=', 'civicrm/admin/setting/updateConfigBackend?reset=1')
+      ->execute();
+
+    return TRUE;
   }
 
 }
