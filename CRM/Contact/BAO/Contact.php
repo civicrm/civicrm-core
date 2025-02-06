@@ -10,6 +10,7 @@
  */
 
 use Civi\Api4\Contact;
+use Civi\Api4\DedupeRuleGroup;
 use Civi\Api4\Event\AuthorizeRecordEvent;
 use Civi\Token\TokenProcessor;
 
@@ -3470,14 +3471,28 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
       'ids' => [],
       'handled' => FALSE,
     ];
+    $checkPermission = $dedupeParams['check_permission'] ?? TRUE;
+    // This may no longer be required - see https://github.com/civicrm/civicrm-core/pull/13176
+    $dedupeParams = array_filter($dedupeParams);
+    if (empty($dedupeParams)) {
+      // If $params is empty there is zero reason to proceed.
+      return [];
+    }
+    if (empty($dedupeParams['rule_group_id'])) {
+      $dedupeParams['rule_group_id'] = DedupeRuleGroup::get(FALSE)
+        ->addWhere('contact_type', '=', $dedupeParams['contact_type'])
+        ->addWhere('used', '=', $dedupeParams['rule'])
+        ->addSelect('id')
+        ->execute()->first()['id'];
+    }
+    $dedupeParams += [
+      'contact_type' => NULL,
+      'rule' => NULL,
+      'excluded_contact_ids' => [],
+      'check_permission' => $checkPermission,
+    ];
     CRM_Utils_Hook::findDuplicates($dedupeParams, $dedupeResults, $contextParams);
     if (!$dedupeResults['handled']) {
-      $dedupeParams += [
-        'contact_type' => NULL,
-        'rule' => NULL,
-        'rule_group_id' => NULL,
-        'excluded_contact_ids' => [],
-      ];
       $dedupeResults['ids'] = CRM_Dedupe_Finder::dupesByParams($dedupeParams, $dedupeParams['contact_type'], $dedupeParams['rule'], $dedupeParams['excluded_contact_ids'], $dedupeParams['rule_group_id']);
     }
     return $dedupeResults['ids'] ?? [];

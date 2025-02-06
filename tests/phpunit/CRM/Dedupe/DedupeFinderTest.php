@@ -1,5 +1,6 @@
 <?php
 declare(strict_types = 1);
+use Civi\Api4\DedupeRuleGroup;
 
 /**
  * Class CRM_Dedupe_DedupeFinderTest
@@ -353,6 +354,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
       'last_name' => 'hood',
       'email' => 'hood@example.com',
       'street_address' => 'Ambachtstraat 23',
+      'phone' => '123-456',
     ];
     $ids = CRM_Contact_BAO_Contact::getDuplicateContacts($fields, 'Individual', 'General', [], TRUE, NULL, ['event_id' => 1]);
 
@@ -373,13 +375,19 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
    * @noinspection PhpParameterByRefIsNotUsedAsReferenceInspection
    */
   public function hook_civicrm_findDuplicates($dedupeParams, &$dedupeResults, $contextParams) {
+    $ruleGroupID = DedupeRuleGroup::get(FALSE)
+      ->addWhere('name', '=', 'IndividualGeneral')
+      ->execute()->first()['id'];
     $expectedDedupeParams = [
       'check_permission' => TRUE,
       'contact_type' => 'Individual',
       'rule' => 'General',
-      'rule_group_id' => NULL,
+      'rule_group_id' => $ruleGroupID,
       'excluded_contact_ids' => [],
     ];
+    if (!empty($dedupeParams['civicrm_phone'])) {
+      $this->assertEquals(123456, $dedupeParams['civicrm_phone']['phone_numeric']);
+    }
     foreach ($expectedDedupeParams as $key => $value) {
       $this->assertEquals($value, $dedupeParams[$key]);
     }
