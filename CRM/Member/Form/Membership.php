@@ -912,7 +912,7 @@ DESC limit 1");
    * the selected override option is not 'until date'.
    */
   private function setOverrideDateValue() {
-    if (!CRM_Member_StatusOverrideTypes::isUntilDate(CRM_Utils_Array::value('is_override', $this->_params))) {
+    if (!CRM_Member_StatusOverrideTypes::isUntilDate($this->_params['is_override'] ?? NULL)) {
       $this->_params['status_override_end_date'] = '';
     }
   }

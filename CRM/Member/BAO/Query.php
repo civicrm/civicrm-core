@@ -166,10 +166,9 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
     if (in_array($name, $fieldAliases)) {
       $qillName = array_search($name, $fieldAliases);
     }
-    $pseudoExtraParam = [];
-    $fieldSpec = CRM_Utils_Array::value($fieldName, $fields, []);
-    $tableName = CRM_Utils_Array::value('table_name', $fieldSpec, 'civicrm_membership');
-    $dataType = CRM_Utils_Type::typeToString(CRM_Utils_Array::value('type', $fieldSpec));
+    $fieldSpec = $fields[$fieldName] ?? [];
+    $tableName = $fieldSpec['table_name'] ?? 'civicrm_membership';
+    $dataType = CRM_Utils_Type::typeToString($fieldSpec['type'] ?? NULL);
     if ($dataType === 'Timestamp' || $dataType === 'Date') {
       $title = empty($fieldSpec['unique_title']) ? $fieldSpec['title'] : $fieldSpec['unique_title'];
       $query->_tables['civicrm_membership'] = $query->_whereTables['civicrm_membership'] = 1;
