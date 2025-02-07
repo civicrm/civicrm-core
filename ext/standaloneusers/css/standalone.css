@@ -18,7 +18,9 @@ html.crm-standalone  nav.breadcrumb>ol {
   box-sizing: border-box;
   width: clamp(280px, 68vw, 45rem);
   margin: 0;
-  background-color: white;
+  /* use riverlea colors if available, fallback to black on white */
+  background-color: var(--crm-c-background2, white);
+  color: var(--crm-c-text, black);
   border: none;
   border-radius: 3px;
   padding: clamp(1rem, 3vw, 2rem);
