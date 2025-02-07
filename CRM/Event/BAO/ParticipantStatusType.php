@@ -117,6 +117,12 @@ class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatu
     $expiredStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Negative'");
     $waitingStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Waiting'");
 
+    // Ignore Pending pay later and incomplete transactions status.
+    $pendingStatuses = array_diff($pendingStatuses, [
+      'Pending from pay later',
+      'Pending from incomplete transaction',
+    ]);
+
     //build the required status ids.
     $statusIds = '(' . implode(',', array_merge(array_keys($pendingStatuses), array_keys($waitingStatuses))) . ')';
 
