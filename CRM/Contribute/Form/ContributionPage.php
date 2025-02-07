@@ -210,7 +210,8 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       ];
       $pledgeBlockDefaults = [];
       CRM_Pledge_BAO_PledgeBlock::retrieve($pledgeBlockParams, $pledgeBlockDefaults);
-      if ($this->_pledgeBlockID = CRM_Utils_Array::value('id', $pledgeBlockDefaults)) {
+      $this->_pledgeBlockID = $pledgeBlockDefaults['id'] ?? NULL;
+      if ($this->_pledgeBlockID) {
         $defaults['is_pledge_active'] = TRUE;
       }
       $pledgeBlock = [
