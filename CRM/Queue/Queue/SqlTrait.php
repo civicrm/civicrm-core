@@ -101,7 +101,7 @@ trait CRM_Queue_Queue_SqlTrait {
     \CRM_Core_DAO::executeQuery("INSERT INTO civicrm_queue_item (queue_name, submit_time, data, weight, release_time) VALUES (%1, now(), %2, %3, {$releaseTime})", [
       1 => [$this->getName(), 'String'],
       2 => [serialize($data), 'String'],
-      3 => [CRM_Utils_Array::value('weight', $options, 0), 'Integer'],
+      3 => [$options['weight'] ?? 0, 'Integer'],
     ], TRUE, NULL, FALSE, FALSE);
   }
 

@@ -56,7 +56,7 @@ class CRM_Utils_Cache {
       // a generic method for utilizing any of the available db caches.
       $dbCacheClass = 'CRM_Utils_Cache_' . $className;
       $settings = self::getCacheSettings($className);
-      $settings['prefix'] = CRM_Utils_Array::value('prefix', $settings, '') . self::DELIMITER . 'default' . self::DELIMITER;
+      $settings['prefix'] = ($settings['prefix'] ?? '') . self::DELIMITER . 'default' . self::DELIMITER;
       self::$_singleton = new $dbCacheClass($settings);
     }
     return self::$_singleton;
@@ -196,7 +196,7 @@ class CRM_Utils_Cache {
             $shortName = self::cleanKey($params['name'], 64);
             $dbCacheClass = 'CRM_Utils_Cache_' . CIVICRM_DB_CACHE_CLASS;
             $settings = self::getCacheSettings(CIVICRM_DB_CACHE_CLASS);
-            $settings['prefix'] = CRM_Utils_Array::value('prefix', $settings, '') . self::DELIMITER . $shortName . $scopeId;
+            $settings['prefix'] = ($settings['prefix'] ?? '') . self::DELIMITER . $shortName . $scopeId;
             $cache = new $dbCacheClass($settings);
             if (!empty($params['withArray'])) {
               $cache = $params['withArray'] === 'fast' ? new CRM_Utils_Cache_FastArrayDecorator($cache) : new CRM_Utils_Cache_ArrayDecorator($cache);
