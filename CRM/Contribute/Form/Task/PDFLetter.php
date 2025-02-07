@@ -241,7 +241,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
     $contactIds = array_keys($contacts);
     // CRM-16725 Skip creation of activities if user is previewing their PDF letter(s)
     if ($this->isLiveMode()) {
-      $this->createActivities($html_message, $contactIds, CRM_Utils_Array::value('subject', $formValues, ts('Thank you letter')), $formValues['campaign_id'] ?? NULL, $contactHtml);
+      $this->createActivities($html_message, $contactIds, $formValues['subject'] ?? ts('Thank you letter'), $formValues['campaign_id'] ?? NULL, $contactHtml);
     }
     $html = array_diff_key($html, $emailedHtml);
 

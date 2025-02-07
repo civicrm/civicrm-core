@@ -398,13 +398,13 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         throw new CRM_Contribute_Exception_InactiveContributionPageException(ts('The page you requested is currently unavailable.'), $this->_id);
       }
 
-      $endDate = CRM_Utils_Date::processDate(CRM_Utils_Array::value('end_date', $this->_values));
+      $endDate = CRM_Utils_Date::processDate($this->_values['end_date'] ?? NULL);
       $now = date('YmdHis');
       if ($endDate && $endDate < $now) {
         throw new CRM_Contribute_Exception_PastContributionPageException(ts('The page you requested has past its end date on %1', [1 => CRM_Utils_Date::customFormat($endDate)]), $this->_id);
       }
 
-      $startDate = CRM_Utils_Date::processDate(CRM_Utils_Array::value('start_date', $this->_values));
+      $startDate = CRM_Utils_Date::processDate($this->_values['start_date'] ?? NULL);
       if ($startDate && $startDate > $now) {
         throw new CRM_Contribute_Exception_FutureContributionPageException(ts('The page you requested will be active from %1', [1 => CRM_Utils_Date::customFormat($startDate)]), $this->_id);
       }
@@ -995,13 +995,13 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
           continue;
         }
         if ($paymentField === 'credit_card_exp_date') {
-          $date = CRM_Utils_Date::format(CRM_Utils_Array::value('credit_card_exp_date', $this->_params));
+          $date = CRM_Utils_Date::format($this->_params['credit_card_exp_date'] ?? NULL);
           $date = CRM_Utils_Date::mysqlToIso($date);
           $this->assign('credit_card_exp_date', $date);
         }
         elseif ($paymentField === 'credit_card_number') {
           $this->assign('credit_card_number',
-            CRM_Utils_System::mungeCreditCard(CRM_Utils_Array::value('credit_card_number', $this->_params))
+            CRM_Utils_System::mungeCreditCard($this->_params['credit_card_number'] ?? NULL)
           );
         }
         elseif ($paymentField === 'credit_card_type') {
