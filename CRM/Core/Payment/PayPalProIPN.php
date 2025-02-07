@@ -207,7 +207,7 @@ class CRM_Core_Payment_PayPalProIPN {
    */
   public function retrieve($name, $type, $abort = TRUE) {
     $value = CRM_Utils_Type::validate(
-      CRM_Utils_Array::value($name, $this->_inputParameters),
+      $this->_inputParameters[$name] ?? NULL,
       $type,
       FALSE
     );
