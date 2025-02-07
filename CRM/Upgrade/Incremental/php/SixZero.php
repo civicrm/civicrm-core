@@ -28,6 +28,9 @@ class CRM_Upgrade_Incremental_php_SixZero extends CRM_Upgrade_Incremental_Base {
    *   The version number matching this function name
    */
   public function upgrade_6_0_alpha1($rev): void {
+    $this->addSnapshotTask('from_addresses', CRM_Utils_SQL_Select::from('civicrm_option_value')
+      ->where('option_group_id = (select id from civicrm_option_group where name = "from_email_address")')
+    );
     $this->addTask('Install SiteEmailAddress entity', 'createEntityTable', '6.0.alpha1.SiteEmailAddress.entityType.php');
     $this->addTask('Migrate from_email_address option group to SiteEmailAddress entity', 'migrateFromEmailAddressValues');
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
