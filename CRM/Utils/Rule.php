@@ -760,12 +760,7 @@ class CRM_Utils_Rule {
    *   true if object exists
    */
   public static function objectExists($value, $options) {
-    $name = 'name';
-    if (isset($options[2])) {
-      $name = $options[2];
-    }
-
-    return CRM_Core_DAO::objectExists($value, CRM_Utils_Array::value(0, $options), CRM_Utils_Array::value(1, $options), CRM_Utils_Array::value(2, $options, $name), CRM_Utils_Array::value(3, $options));
+    return CRM_Core_DAO::objectExists($value, $options[0] ?? NULL, $options[1] ?? NULL, $options[2] ?? 'name', $options[3] ?? NULL);
   }
 
   /**
