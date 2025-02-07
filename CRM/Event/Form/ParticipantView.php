@@ -167,7 +167,7 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
     $participantCount = [];
     $totalTaxAmount = $totalAmount = 0;
     foreach ($lineItem as $k => $v) {
-      if (CRM_Utils_Array::value('participant_count', $lineItem[$k]) > 0) {
+      if (($lineItem[$k]['participant_count'] ?? 0) > 0) {
         $participantCount[] = $lineItem[$k]['participant_count'];
       }
       $totalTaxAmount = $v['tax_amount'] + $totalTaxAmount;

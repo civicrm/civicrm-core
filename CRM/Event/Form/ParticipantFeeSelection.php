@@ -423,7 +423,7 @@ SELECT  id, html_type
         continue;
       }
 
-      $optionFullIds = CRM_Utils_Array::value('option_full_ids', $field, []);
+      $optionFullIds = $field['option_full_ids'] ?? [];
 
       //soft suppress required rule when option is full.
       if (!empty($optionFullIds) && (count($options) == count($optionFullIds))) {

@@ -957,7 +957,7 @@ WHERE civicrm_event.is_active = 1
     $copyEvent = CRM_Core_DAO::copyGeneric('CRM_Event_DAO_Event',
       ['id' => $id],
       // since the location is sharable, lets use the same loc_block_id.
-      ['loc_block_id' => CRM_Utils_Array::value('loc_block_id', $eventValues)] + $params,
+      ['loc_block_id' => $eventValues['loc_block_id'] ?? NULL] + $params,
       $fieldsFix,
       NULL,
       $blockCopyOfCustomValue
@@ -1119,8 +1119,8 @@ WHERE civicrm_event.is_active = 1
           'email' => $notifyEmail,
           'confirm_email_text' => $values['event']['confirm_email_text'] ?? NULL,
           'isShowLocation' => $values['event']['is_show_location'] ?? NULL,
-          'credit_card_number' => CRM_Utils_System::mungeCreditCard(CRM_Utils_Array::value('credit_card_number', $participantParams)),
-          'credit_card_exp_date' => CRM_Utils_Date::mysqlToIso(CRM_Utils_Date::format(CRM_Utils_Array::value('credit_card_exp_date', $participantParams))),
+          'credit_card_number' => CRM_Utils_System::mungeCreditCard($participantParams['credit_card_number'] ?? NULL),
+          'credit_card_exp_date' => CRM_Utils_Date::mysqlToIso(CRM_Utils_Date::format($participantParams['credit_card_exp_date'] ?? NULL)),
           'selfcancelxfer_time' => abs($values['event']['selfcancelxfer_time']),
           'selfservice_preposition' => $values['event']['selfcancelxfer_time'] < 0 ? ts('after') : ts('before'),
           'currency' => $values['event']['currency'] ?? CRM_Core_Config::singleton()->defaultCurrency,
@@ -1621,7 +1621,7 @@ WHERE  id = $cfID
           //get the params submitted by participant.
           $participantParams = NULL;
           if (isset($values['params'])) {
-            $participantParams = CRM_Utils_Array::value($pId, $values['params'], []);
+            $participantParams = $values['params'][$pId] ?? [];
           }
 
           [$profilePre, $groupTitles] = self::buildCustomDisplay($preProfileID,
