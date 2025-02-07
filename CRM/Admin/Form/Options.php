@@ -147,7 +147,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       'postal_greeting',
       'addressee',
     ])) {
-      $defaults['contact_type_id'] = (CRM_Utils_Array::value('filter', $defaults)) ? $defaults['filter'] : NULL;
+      $defaults['contact_type_id'] = !empty($defaults['filter']) ? $defaults['filter'] : NULL;
     }
     // CRM-11516
     if ($this->_gName == 'payment_instrument' && $this->_id) {
@@ -486,7 +486,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
 
       if (CRM_Core_BAO_OptionValue::deleteRecord(['id' => $this->_id])) {
         if ($this->_gName == 'phone_type') {
-          CRM_Core_BAO_Phone::setOptionToNull(CRM_Utils_Array::value('value', $this->_defaultValues));
+          CRM_Core_BAO_Phone::setOptionToNull($this->_defaultValues['value'] ?? NULL);
         }
 
         CRM_Core_Session::setStatus(ts('Selected %1 type has been deleted.', [1 => $this->_gLabel]), ts('Record Deleted'), 'success');
