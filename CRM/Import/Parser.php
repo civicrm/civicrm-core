@@ -80,6 +80,15 @@ abstract class CRM_Import_Parser implements UserJobInterface {
   protected $siteDefaultCountry = NULL;
 
   /**
+   * Has this parser been fixed to expect `getMappedRow` to break it up
+   * by entity yet? This is a transitional property to allow the classes
+   * to be fixed up individually.
+   *
+   * @var bool
+   */
+  protected $isUpdatedForEntityRowParsing = FALSE;
+
+  /**
    * @return int|null
    */
   public function getUserJobID(): ?int {
@@ -1893,7 +1902,23 @@ abstract class CRM_Import_Parser implements UserJobInterface {
       }
       if ($mappedField['name']) {
         $fieldSpec = $this->getFieldMetadata($mappedField['name']);
-        $params[$fieldSpec['name']] = $this->getTransformedFieldValue($mappedField['name'], $values[$i]);
+
+        $entity = $fieldSpec['entity_instance'] ?? $fieldSpec['entity'] ?? $fieldSpec['extends'] ?? NULL;
+        if ($this->isUpdatedForEntityRowParsing && $entity) {
+          // Split values into arrays by entity.
+          if (!isset($params[$entity])) {
+            $params[$entity] = [];
+            if ($entity === 'Contact') {
+              $params[$entity]['contact_type'] = $this->getContactTypeForEntity($entity) ?: $this->getContactType();
+            }
+          }
+          // Apiv4 name is currently only set for contact, & only in cases where it would
+          // be used for the dedupe rule (ie Membership import).
+          $params[$entity][$fieldSpec['apiv4_name'] ?? $fieldSpec['name']] = $this->getTransformedFieldValue($mappedField['name'], $values[$i]);
+        }
+        else {
+          $params[$fieldSpec['name']] = $this->getTransformedFieldValue($mappedField['name'], $values[$i]);
+        }
       }
     }
     return $params;
@@ -2400,6 +2425,18 @@ abstract class CRM_Import_Parser implements UserJobInterface {
       $this->setImportStatus($rowNumber, 'ERROR', $e->getMessage());
       return FALSE;
     }
+  }
+
+  protected function removeEmptyValues($array) {
+    foreach ($array as $key => $value) {
+      if (is_array($value)) {
+        $array[$key] = $this->removeEmptyValues($value);
+      }
+      elseif ($value === '') {
+        unset($array[$key]);
+      }
+    }
+    return $array;
   }
 
 }
