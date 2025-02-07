@@ -415,7 +415,7 @@ class CiviContributeProcessor {
     }
 
     $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
-      CRM_Utils_Array::value('id', $params, NULL),
+      $params['id'] ?? NULL,
       'Contribution'
     );
     // create contribution
@@ -505,7 +505,7 @@ class CiviContributeProcessor {
     }
 
     if (($type == 'paypal') && (!isset($transaction['net_amount']))) {
-      $transaction['net_amount'] = $transaction['total_amount'] - CRM_Utils_Array::value('fee_amount', $transaction, 0);
+      $transaction['net_amount'] = $transaction['total_amount'] - ($transaction['fee_amount'] ?? 0);
     }
 
     if (!isset($transaction['invoice_id'])) {
