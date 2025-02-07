@@ -69,9 +69,17 @@ class CRM_Upgrade_Incremental_php_SixOne extends CRM_Upgrade_Incremental_Base {
 
     CRM_Core_DAO::executeQuery("
       INSERT INTO civicrm_navigation
-        (url, label, name, has_separator, parent_id, weight)
+        (
+          url, label, name,
+          has_separator, parent_id, weight,
+          permission, domain_id
+        )
       VALUES
-        ('civicrm/menu/rebuild?reset=1', 'cache_clear', 1, {$systemSettingsNavItem}, 0)
+        (
+          'civicrm/menu/rebuild?reset=1', 'Clear Caches', 'cache_clear',
+          1, {$systemSettingsNavItem}, 0,
+          'administer CiviCRM', {$domainID}
+        )
     ");
 
     return TRUE;
