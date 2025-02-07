@@ -605,7 +605,7 @@ GROUP BY  currency
     );
 
     // FIXME: Translate
-    $details = 'Total Amount ' . CRM_Utils_Money::format($params['total_pledge_amount'], CRM_Utils_Array::value('currency', $params)) . ' To be paid in ' . $params['installments'] . ' installments of ' . CRM_Utils_Money::format($params['scheduled_amount'], CRM_Utils_Array::value('currency', $params)) . ' every ' . $params['frequency_interval'] . ' ' . $params['frequency_unit'] . '(s)';
+    $details = 'Total Amount ' . CRM_Utils_Money::format($params['total_pledge_amount'], $params['currency'] ?? NULL) . ' To be paid in ' . $params['installments'] . ' installments of ' . CRM_Utils_Money::format($params['scheduled_amount'], $params['currency'] ?? NULL) . ' every ' . $params['frequency_interval'] . ' ' . $params['frequency_unit'] . '(s)';
 
     if (!$activity->find()) {
       $activityParams = [
