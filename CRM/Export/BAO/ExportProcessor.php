@@ -1683,7 +1683,7 @@ class CRM_Export_BAO_ExportProcessor {
             foreach ($relationValue as $ltype => $val) {
               foreach (array_keys($val) as $fld) {
                 $type = explode('-', $fld);
-                $this->addOutputSpecification($type[0], $key, $ltype, CRM_Utils_Array::value(1, $type));
+                $this->addOutputSpecification($type[0], $key, $ltype, $type[1] ?? NULL);
               }
             }
           }
@@ -1700,7 +1700,7 @@ class CRM_Export_BAO_ExportProcessor {
             if (!empty($type[1])) {
               $daoFieldName .= "-" . $type[1];
             }
-            $this->addOutputSpecification($actualDBFieldName, NULL, $locationType, CRM_Utils_Array::value(1, $type));
+            $this->addOutputSpecification($actualDBFieldName, NULL, $locationType, $type[1] ?? NULL);
             $outputColumns[$daoFieldName] = TRUE;
           }
         }

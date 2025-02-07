@@ -617,7 +617,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       $primaryParticipantCount = $form->getParticipantCount($ppParams);
 
       //get price set fields errors in.
-      $errors = array_merge($errors, CRM_Utils_Array::value(0, $priceSetErrors, []));
+      $errors = array_merge($errors, $priceSetErrors[0] ?? []);
 
       $totalParticipants = $primaryParticipantCount;
       if ($numberAdditionalParticipants) {
