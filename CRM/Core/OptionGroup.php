@@ -19,15 +19,13 @@ class CRM_Core_OptionGroup {
   public static $_cache = [];
 
   /**
-   * $_domainIDGroups array maintains the list of option groups for whom
-   * domainID is to be considered.
+   * Deprecated flag for domain-specific optionValues. The `is_domain` column is no longer used.
+   * Any set of options that needs domain specificity should be stored in its own table.
    *
    * @var array
-   * @deprecated - going forward the optionValue table will not support domain-specific options
+   * @deprecated
    */
-  public static $_domainIDGroups = [
-    'from_email_address',
-  ];
+  public static $_domainIDGroups = [];
 
   /**
    * @deprecated - going forward the optionValue table will not support domain-specific options
@@ -35,7 +33,7 @@ class CRM_Core_OptionGroup {
    * @return bool
    */
   public static function isDomainOptionGroup($groupName) {
-    return in_array($groupName, self::$_domainIDGroups, TRUE);
+    return FALSE;
   }
 
   /**
@@ -153,9 +151,6 @@ WHERE  v.option_group_id = g.id
         $componentClause .= " OR v.component_id IN (SELECT id FROM civicrm_component WHERE name IN ($enabledComponents)) ";
       }
       $query .= " AND ($componentClause) ";
-    }
-    if (self::isDomainOptionGroup($name)) {
-      $query .= ' AND v.domain_id = ' . CRM_Core_Config::domainID();
     }
 
     if ($condition) {

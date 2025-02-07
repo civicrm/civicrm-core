@@ -57,13 +57,6 @@ class CRM_Campaign_Form_SurveyType extends CRM_Admin_Form {
     $session = CRM_Core_Session::singleton();
     $url = CRM_Utils_System::url('civicrm/admin/campaign/surveyType', 'reset=1');
     $session->pushUserContext($url);
-
-    if ($this->_id && CRM_Core_OptionGroup::isDomainOptionGroup($this->_gName)) {
-      $domainID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', $this->_id, 'domain_id', 'id');
-      if (CRM_Core_Config::domainID() != $domainID) {
-        CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
-      }
-    }
   }
 
   /**

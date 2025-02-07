@@ -40,12 +40,6 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
   protected $_gLabel;
 
   /**
-   * Is this Option Group Domain Specific
-   * @var bool
-   */
-  protected $_domainSpecific = FALSE;
-
-  /**
    * @var bool
    */
   public $submitOnce = TRUE;
@@ -88,7 +82,6 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       'name'
     );
     $this->_gLabel = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $this->_gid, 'title');
-    $this->_domainSpecific = CRM_Core_OptionGroup::isDomainOptionGroup($this->_gName);
     $url = "civicrm/admin/options/{$this->_gName}";
     $params = "reset=1";
 
@@ -115,12 +108,6 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
     $session->pushUserContext(CRM_Utils_System::url($url, $params));
     $this->assign('id', $this->_id);
     $this->setDeleteMessage();
-    if ($this->_id && CRM_Core_OptionGroup::isDomainOptionGroup($this->_gName)) {
-      $domainID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', $this->_id, 'domain_id', 'id');
-      if (CRM_Core_Config::domainID() != $domainID) {
-        CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
-      }
-    }
     if ($this->isSubmitted()) {
       // The custom data fields are added to the form by an ajax form.
       // However, if they are not present in the element index they will
@@ -221,7 +208,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       $this->addRule('value',
         ts('This Value already exists in the database for this option group. Please select a different Value.'),
         'optionExists',
-        ['CRM_Core_DAO_OptionValue', $this->_id, $this->_gid, 'value', $this->_domainSpecific]
+        ['CRM_Core_DAO_OptionValue', $this->_id, $this->_gid, 'value']
       );
     }
 
@@ -239,7 +226,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       $this->addRule('label',
         ts('This Label already exists in the database for this option group. Please select a different Label.'),
         'optionExists',
-        ['CRM_Core_DAO_OptionValue', $this->_id, $this->_gid, 'label', $this->_domainSpecific]
+        ['CRM_Core_DAO_OptionValue', $this->_id, $this->_gid, 'label']
       );
     }
 
